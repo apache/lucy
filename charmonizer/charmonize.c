@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "Charmonizer.h"
 #include "Charmonizer/FuncMacro.h"
 #include "Charmonizer/Integers.h"
@@ -37,6 +38,11 @@ start_conf_file();
 static void 
 finish_conf_file(FILE *fh);
 
+/* Print a message to stderr and exit.
+ */
+void
+die(char *format, ...);
+
 int main(int argc, char **argv) 
 {
     FILE *config_fh;
@@ -44,10 +50,8 @@ int main(int argc, char **argv)
     /* parse commmand line args, init Charmonizer, open outfile */
     init(argc, argv);
     config_fh = fopen(outpath, "w");
-    if (config_fh == NULL) {
-        fprintf(stderr, "Couldn't open '%s': %s", strerror(errno));
-        exit(1);
-    }
+    if (config_fh == NULL)
+        die("Couldn't open '%s': %s", strerror(errno));
     start_conf_file(config_fh);
 
     /* modules section */
@@ -59,11 +63,8 @@ int main(int argc, char **argv)
 
     /* write tail of config and clean up */
     finish_conf_file(config_fh);
-    if (fclose(config_fh)) {
-        fprintf(stderr, 
-            "Error closing file '%s': %s", outpath, strerror(errno));
-        exit(1);
-    }
+    if (fclose(config_fh))
+        die("Error closing file '%s': %s", outpath, strerror(errno));
     free(outpath);
 
     return 0;
@@ -96,11 +97,8 @@ init(int argc, char **argv)
     chaz_set_compiler(compiler);
 
     /* require an outpath */
-    if (outpath == NULL) {
-        fprintf(stderr, 
-            "Usage: ./charmonize --outpath=OUTPATH [--cc=COMPILER]");
-        exit(1);
-    }
+    if (outpath == NULL)
+        die("Usage: ./charmonize --outpath=OUTPATH [--cc=COMPILER]");
 }
 
 static void 
@@ -142,6 +140,16 @@ finish_conf_file(FILE *conf_fh)
     );
 }
 
+void 
+die(char* format, ...) 
+{
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+    exit(1);
+}
 
 /**
  * Copyright 2004 The Apache Software Foundation
