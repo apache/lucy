@@ -8,6 +8,11 @@
 void
 chaz_set_compiler(char *compiler_string);
 
+/* Supply a string which charmonizer will append to its compile commands.
+ */
+void
+chaz_set_ccflags(char *ccflags);
+
 /* These prefixes will be prepended to every symbol Charmonizer generates.
  * By default, they are blank.
  */ 

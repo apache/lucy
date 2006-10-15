@@ -92,7 +92,7 @@ init(int argc, char **argv)
     /* set up Charmonizer */
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
     chaz_set_compiler(compiler);
-    /* chaz_set_ccflags(ccflags); */  /* TODO */
+    chaz_set_ccflags(ccflags);
 
     /* clean up */
     free(infile_contents);

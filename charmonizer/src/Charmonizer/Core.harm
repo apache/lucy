@@ -22,6 +22,7 @@ typedef int chaz_bool_t;
 /* Global variables.
  */
 extern char *chaz_Core_compiler;
+extern char *chaz_Core_ccflags;
 extern char *chaz_Core_constant_prefix;
 extern char *chaz_Core_macro_prefix;
 extern char *chaz_Core_typedef_prefix;
@@ -84,6 +85,7 @@ chaz_Core_can_open_file(char *file_path);
 # define TRY_APP_PATH           CHAZ_CORE_TRY_APP_PATH
 # define TARGET_PATH            CHAZ_CORE_TARGET_PATH
 # define compiler               chaz_Core_compiler
+# define ccflags                chaz_Core_ccflags
 # define constant_prefix        chaz_Core_constant_prefix
 # define macro_prefix           chaz_Core_macro_prefix
 # define typedef_prefix         chaz_Core_typedef_prefix

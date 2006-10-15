@@ -7,6 +7,7 @@
 #include <string.h>
 
 char *compiler        = NULL;
+char *ccflags         = NULL;
 char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
@@ -39,7 +40,8 @@ capture_output(char *source, size_t source_len, size_t *output_len)
     /* security note: snprintf isn't available, so we just have to make sure
      * that the compiler command is short enough at an earlier stage.
      */
-    sprintf(command, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH "\0", compiler);
+    sprintf(command, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " %s\0", 
+        compiler, ccflags);
 
     /* Compile the source.
      * Unfortunately there's no completely portable way to redirect stderr

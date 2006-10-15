@@ -22,6 +22,22 @@ chaz_set_compiler(char* comp_cmd)
     strncpy(compiler, comp_cmd, len);
 }
 
+void 
+chaz_set_ccflags(char* flag_string) 
+{
+    size_t len = strlen(flag_string);
+
+    /* security check */
+    if (len > 100)
+        die("ccflags greater than 100 characters: %s", flag_string);
+
+    /* assign new val */
+    free(ccflags);
+    ccflags = (char*)malloc(len * (sizeof(char)) + 1);
+    ccflags[len] = '\0';
+    strncpy(ccflags, flag_string, len);
+}
+
 void
 chaz_set_prefixes(char *constant_pre, char *macro_pre, char* typedef_pre,  
                   char *function_pre) {
