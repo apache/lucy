@@ -14,14 +14,17 @@
 #include "Charmonizer/UnusedVars.h"
 #include "Charmonizer/VariadicMacros.h"
 
-/* Path to where the config file will be written.
+/* Process command line args, set up Charmonizer, etc. Returns the outpath
+ * (where the config file should be written to).
  */
-static char *outpath;
-
-/* Process command line args, set up Charmonizer, etc. 
- */
-static void
+char*
 init(int argc, char **argv);
+
+/* Find <tag_name> and </tag_name> within a string and return the text between
+ * them as a newly allocated substring.
+ */
+static char*
+extract_delim(char *source, size_t source_len, const char *tag_name);
 
 /* Assign the location where the config file will be written.
  */
@@ -48,7 +51,7 @@ int main(int argc, char **argv)
     FILE *config_fh;
 
     /* parse commmand line args, init Charmonizer, open outfile */
-    init(argc, argv);
+    char *outpath = init(argc, argv);
     config_fh = fopen(outpath, "w");
     if (config_fh == NULL)
         die("Couldn't open '%s': %s", strerror(errno));
@@ -70,35 +73,76 @@ int main(int argc, char **argv)
     return 0;
 }
 
-static void 
+char* 
 init(int argc, char **argv) 
 {
     int i;
-    char *compiler;
+    char *outpath, *compiler, *ccflags;
+    char *infile_contents;
+    size_t infile_len;
+
+    /* parse the infile */
+    if (argc != 2)
+        die("Usage: ./charmonize INFILE");
+    infile_contents = chaz_slurp_file(argv[1], &infile_len);
+    compiler = extract_delim(infile_contents, infile_len, "charm_compiler");
+    ccflags  = extract_delim(infile_contents, infile_len, "charm_ccflags");
+    outpath  = extract_delim(infile_contents, infile_len, "charm_outpath");
     
-    /* start seting up Charmonizer */
+    /* set up Charmonizer */
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
+    chaz_set_compiler(compiler);
+    /* chaz_set_ccflags(ccflags); */  /* TODO */
 
-    compiler = NULL;
-    outpath  = NULL;
+    /* clean up */
+    free(infile_contents);
+    free(compiler);
+    free(ccflags);
 
-    /* process command line args */
-    for (i = 1; i < argc; i++) {
-        if (strncmp(argv[i], "--cc=", 5) == 0) {
-            compiler = argv[i] + 5;
-        }
-        else if (strncmp(argv[i], "--outpath=", 10) == 0) {
-            outpath = strdup(argv[i] + 10);
+    return outpath;
+}
+
+static char*
+extract_delim(char *source, size_t source_len, const char *tag_name)
+{
+    const size_t tag_name_len = strlen(tag_name);
+    const size_t opening_delim_len = tag_name_len + 2;
+    const size_t closing_delim_len = tag_name_len + 3;
+    char opening_delim[100];
+    char closing_delim[100];
+    const char *limit = source + source_len - closing_delim_len;
+    char *start, *end;
+    char *retval = NULL;
+
+    /* sanity check, then create delimiter strings to match against */
+    if (tag_name_len > 95)
+        die("tag name too long: '%s'");
+    sprintf(opening_delim, "<%s>\0", tag_name);
+    sprintf(closing_delim, "</%s>\0", tag_name);
+    
+    /* find opening <delimiter> */
+    for (start = source; start < limit; start++) {
+        if (strncmp(start, opening_delim, opening_delim_len) == 0) {
+            start += opening_delim_len;
+            break;
         }
     }
 
-    /* default to using "cc" to invoke the compiler */
-    compiler = compiler == NULL ? "cc" : compiler;
-    chaz_set_compiler(compiler);
+    /* find closing </delimiter> */
+    for (end = start; end < limit; end++) {
+        if (strncmp(end, closing_delim, closing_delim_len) == 0) {
+            const size_t retval_len = end - start;
+            retval = (char*)malloc((retval_len + 1) * sizeof(char));
+            retval[retval_len] = '\0';
+            strncpy(retval, start, retval_len);
+            break;
+        }
+    }
 
-    /* require an outpath */
-    if (outpath == NULL)
-        die("Usage: ./charmonize --outpath=OUTPATH [--cc=COMPILER]");
+    if (retval == NULL)
+        die("Couldn't extract value for '%s'", tag_name);
+    
+    return retval;
 }
 
 static void 

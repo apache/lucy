@@ -134,16 +134,28 @@ sub _metaquote_charm_files {
 
 # Run the charmonizer executable, creating the lucyconf.h file.
 sub ACTION_lucyconf {
-    my $self = shift;
+    my $self          = shift;
+    my $lucyconf_in   = 'lucyconf_in';
+    my $lucyconf_path = "lucyconf.h";
 
     $self->dispatch('charmonizer');
 
-    my $lucyconf_path = "lucyconf.h";
     return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $lucyconf_path );
-
     print "\nWriting $lucyconf_path...\n\n";
-    system(
-        "./$CHARMONIZE_EXE_PATH --outpath=$lucyconf_path --cc=$Config{cc}");
+
+    # write the infile with which to communicate args to charmonize
+    open( my $infile_fh, '>', $lucyconf_in )
+        or die "Can't open '$lucyconf_in': $!";
+    print $infile_fh qq|
+        <charm_outpath>$lucyconf_path</charm_outpath>
+        <charm_compiler>$Config{cc}</charm_compiler>
+        <charm_ccflags>$Config{ccflags}</charm_ccflags>
+    |;
+    close $infile_fh or die "Can't close '$lucyconf_in': $!";
+
+    system("./$CHARMONIZE_EXE_PATH $lucyconf_in");
+
+    unlink($lucyconf_in) or die "Can't unlink '$lucyconf_in': $!";
 
     $self->add_to_cleanup($lucyconf_path);
 }
