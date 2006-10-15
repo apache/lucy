@@ -1,161 +1,75 @@
 NAME
 
-    Charmonizer - Mini-language targeted at writing portable C headers.
+    Charmonizer - write portable C header files
 
-OVERVIEW
+SYNOPSIS
 
-    Charmonizer is a tool for writing portable C header files.  It is
-    implemented using a small domain-specific language, also called
-    "Charmonizer", and a "native" interpreter, written in a language such as
-    Perl or Ruby.
+    #include "Charmonizer.h"
+    #include "Charmonizer/Integers.h"
+    #include "Charmonizer/LargeFiles.h"
+
+    int main() {
+        /* open and begin config file */
+        FILE *config_fh = fopen("myconf.h", "w");
+        if (config_fh == NULL) {
+            fprintf(stderr, "Error opening myconf.h\n")
+            exit(1);
+        }
+        printf(config_fh, "/* Auto-generated file - do not edit!! */\n\n");
+        
+        /* set up Charmonizer */
+        chaz_set_compiler("gcc");
+        
+        /* run desired Charmonizer modules */
+        chaz_Integers_run(config_fh);
+        chaz_LargeFiles_run(config_fh);
+
+        return 0;
+    }
+
+DESCRIPTION
+
+    Charmonizer is a tool for writing portable C header files.  It works by
+    attempting to compile lots of little programs and analyzing the output
+    from those that build successfully.  It is intended to work with any ISO
+    C90-compilant compiler and (eventually) on any operating system, without
+    requiring a specific shell.
+
+    Charmonizer is organized as one central library, "Charmonizer.h", and a
+    suite of topically oriented modules, e.g. "Charmonizer/Integers.h",
+    "Charmonizer/LargeFiles.h".  Each module exports 1 primary function,
+    ModuleName_run(FILE* conf_fh), which appends its output to the supplied
+    file handle.  A typical Charmonizer application proceeds in two phases:
+
+        1) Set up the Charmonizer environment and open a config file 
+           for writing.
+        2) Run selected modules, building up the config file bit by bit.
+
+    The config file can be further customized either by writing your own data
+    to it or possibly by setting options which affect the behavior of certain
+    modules.
+
+METAQUOTE UTILITY
+
+    Charmonizer is a C program which writes C code.  Writing C from C is
+    ordinarily quite awkward, because when you try to embed more than a line
+    or two of C source code inside C string literals, things get ugly fast.  
+
+    To get around this problem, Charmonizer uses a source filter.  In the
+    "real" Charmonizer source code, longer code fragments are surrounded by
+    METAQUOTE tags instead of literal double quotes.  
     
-    The Charmonizer language is neither succinct, nor flexible, nor powerful,
-    because the project's primary design specs did not require it to be any of
-    those things:
-    
-      1. It must write portable C header files.
-      2. It must require only a C compiler and the native build enviroment.
-      3. It must be easy to write a robust, reliable Charmonizer interpreter.
-    
-    Charmonizer source code consists of a linear series of function calls.
-    There are no conditionals, no loops, and no variables.  Of course it's
-    challenging to get much done without conditionals or variables, but
-    Charmonizer is able to rely upon C's preprocessor for those.  
-    
-    Charmonizer doesn't require complex functionality because basically all
-    it needs to do is attempt compilation of miniature C programs and capture
-    output from them when they build successfully.  If the C preprocessor had
-    exception handling along the lines of Perl's "eval $string" functionality
-    (ha ha), Charmonizer-the-language wouldn't be necessary.
+        char hello_source[] = METAQUOTE
+            #include <stdio.h>
+            int main() { 
+                printf("Hello, world.\n");
+                return 0;
+            }
+        METAQUOTE;
 
-PROGRAM STRUCTURE
-
-    Each run of Charmonizer follows this outline:
-    
-        I.   Initialize a temporary target file named _charmonize.c 
-        II.  Process a series of .charm files, appending _charmonize.c as
-             they indicate.
-        III. Compile _charmonize.c, run it, and capture its output to a new
-             file: the portable C header file.
-
-    Each of these steps requires a Charmonizer interpreter.  Consult the
-    documentation of your favorite among them for details.
-
-CHARMONIZER SOURCE FILES
-
-    Charmonizer source files, as mentioned above, consist of a linear series of
-    function calls.  The first function called must always be CH_api_version.
-
-    The preferred file extension is '.charm'.
-  
-LANGUAGE SYNTAX
-
-    Functions names begin with 'CH_', and all function calls must be
-    terminated with a corresponding close directive beginning with 'CH_end_'.
-    For instance, if Charmonizer had a CH_print function, here's how it
-    might work:
-    
-        CH_print
-          string Hello, world.
-        CH_end_print
-    
-    However, Charmonizer doesn't have a CH_print function, because it
-    doesn't need one.
-    
-    Files are parsed line by line.  Leading whitespace at the front of any
-    line gets ignored (unless it is part of a quoted string), so Charmonizer
-    files can be sensibly indented.
-    
-    Each line falls into one of five categories:
-    
-      * blank 
-      * start of a function
-      * end of a function
-      * name-value parameter pair 
-      * part of a multi-line quoted string
-    
-    Quoted strings begin with 'CH_quote' and are terminated by
-    'CH_end_quote'.  The strings are completely literal -- no interpolation,
-    and no escapes.  (If for some odd reason you want to embed the text
-    "CH_quote" within a string, you're out of luck.)
-
-        CH_append_raw
-          string CH_quote
-            #define TYPEDEF_PREFIX "lucy_"
-          CH_end_quote
-        CH_end_append_raw
-
-    C-style multi-line comments delimited by '/*' and '*/' are allowed.
-    Comment delimiters within quoted strings are treated as literal text, not
-    comments.
-    
-        /* This is a valid comment. */
-        CH_append_raw
-          string CH_quote
-            /* This comment will end up in _charmonize.c */
-            /* This un-terminated comment will mess up _charmonize.c,
-             * but it's not invalid Charmonizer syntax, as it's 
-             * within a quoted string.
-          CH_end_quote
-        CH_end_append_raw /* This is another valid comment. */
-    
-    All functions accept only named parameters in the form of key-value pairs.
-    Parameter names must consist of only pure ASCII alphanumerics plus the
-    underscore, and cannot start with a digit.  
-
-        CH_do_something
-          an-illegal-parameter oops
-          4nother_illegal_parameter 4RGH!
-          a_valid_parameter Ah! Just right. /* value is "Ah! Just right." */
-        CH_end_do_something
-    
-    The value of the parameter starts with the first non-whitespace character
-    following the key and is terminated immediately following the last
-    non-whitespace character in the line (not including comments, which are
-    stripped beforehand).  In the event you need a value with leading or
-    trailing whitespace (e.g. a terminating newline, which won't ordinarily be
-    there) use the CH_quote mechanism.
-
-FUNCTIONS
-
-    CH_append_raw
-
-            CH_append_raw
-              string CH_quote
-                #define CONSTANT_PREFIX "LUCY_"
-              CH_end_quote
-            CH_end_append_raw
-
-        Append verbatim contents of the specified string to the target file.
-
-
-    CH_append_output
-
-            CH_append_output
-              source CH_quote
-                #include <stdio.h>
-                int main() 
-                {
-                    printf("#define SIZEOF_LONG %d\n", (int)sizeof(long));
-                    return 0;
-                }
-              CH_end_quote
-            CH_end_append_output
-
-        Compile the supplied source code and append its output to the target
-        file.  If the code fails to compile, do nothing.
-
-    CH_api_version
-    
-            CH_api_version
-              api_version 0.01
-            CH_end_api_version
-
-        Indicate the version of Charmonizer that a .charm file conforms to.
-
-AUTHOR
-
-    Marvin Humphrey, <marvin at rectangular dot com>
+    These source files are run through the "metaquote" utility -- which
+    transforms everything between paired METAQUOTE tags into concatenated
+    string literals.  The result is hideous but valid C.
 
 COPYRIGHT AND LICENSE
 
@@ -174,5 +88,4 @@ COPYRIGHT AND LICENSE
      * implied.  See the License for the specific language governing
      * permissions and limitations under the License.
      */
-
 

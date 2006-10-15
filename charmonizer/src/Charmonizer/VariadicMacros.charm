@@ -1,0 +1,82 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "Charmonizer/Core.h"
+#include "Charmonizer/VariadicMacros.h"
+#include <string.h>
+#include <stdio.h>
+
+
+static char iso_code[] = METAQUOTE
+    #include <stdio.h>
+    #define ISO_TEST(fmt, ...) \
+        printf(fmt, __VA_ARGS__)
+    int main() {
+        freopen("_charmonizer_target", "w", stdout);
+        ISO_TEST("%d %d", 1, 1);
+        return 0;
+    }
+METAQUOTE;
+
+static char gnuc_code[] = METAQUOTE
+    #include <stdio.h>
+    #define GNU_TEST(fmt, args...) \
+        printf(fmt, ##args)
+    int main() {
+        freopen("_charmonizer_target", "w", stdout);
+        GNU_TEST("%d %d", 1, 1);
+        return 0;
+    }
+METAQUOTE;
+
+void
+chaz_VariadicMacros_run(FILE *conf_fh) 
+{
+    char *output;
+    size_t output_len;
+    chaz_bool_t has_varmacros      = false;
+    chaz_bool_t has_iso_varmacros  = false;
+    chaz_bool_t has_gnuc_varmacros = false;
+
+    Start_Run(conf_fh);
+
+    /* test for ISO-style variadic macros */
+    output = capture_output(iso_code, strlen(iso_code), &output_len);
+    if (output != NULL) {
+        has_varmacros = true;
+        fprintf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", constant_prefix);
+        fprintf(conf_fh, "#define %sHAS_ISO_VARIADIC_MACROS\n", 
+            constant_prefix);
+    }
+
+    /* test for GNU-style variadic macros */
+    output = capture_output(gnuc_code, strlen(gnuc_code), &output_len);
+    if (output != NULL) {
+        if (has_varmacros == false) {
+            has_varmacros = true;
+            fprintf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", 
+                constant_prefix);
+        }
+        fprintf(conf_fh, "#define %sHAS_GNUC_VARIADIC_MACROS\n", 
+            constant_prefix);
+    }
+
+    End_Run(conf_fh);
+}
+
+
+/**
+ * Copyright 2004 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+

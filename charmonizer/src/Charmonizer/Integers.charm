@@ -1,0 +1,185 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "Charmonizer/Core.h"
+#include "Charmonizer/Integers.h"
+#include <string.h>
+#include <stdio.h>
+
+static char sizes_code[] = 
+    METAQUOTE
+        #include <stdio.h>
+        int main () {
+            freopen("_charmonizer_target", "w", stdout);
+            printf("%d %d %d %d %d",
+                (int)sizeof(char),
+                (int)sizeof(short),
+                (int)sizeof(int),
+                (int)sizeof(long),
+                (int)sizeof(void *)
+            );
+            return 0;
+        }
+    METAQUOTE;
+
+static char inttypes_code[] = 
+    METAQUOTE
+        #include <stdio.h>
+        #include <inttypes.h>
+        int main()
+        {
+            freopen("_charmonizer_target", "w", stdout);
+            printf("We have inttypes.h\n");
+            return 0;
+        }
+    METAQUOTE;
+
+static char long_long_code[] = 
+    METAQUOTE
+        #include <stdio.h>
+        int main() 
+        {
+            freopen("_charmonizer_target", "w", stdout);
+            long long foo = 4;
+            printf("%d", (int)sizeof(long long));
+            return 0;
+        }
+    METAQUOTE;
+
+void
+chaz_Integers_run(FILE *conf_fh) 
+{
+    char *output;
+    size_t output_len;
+    int sizeof_char       = -1; 
+    int sizeof_short      = -1; 
+    int sizeof_int        = -1; 
+    int sizeof_ptr        = -1; 
+    int sizeof_long       = -1;
+    int sizeof_long_long  = -1;
+    chaz_bool_t has_long_long = false;
+    chaz_bool_t has_inttypes  = false;
+
+    Start_Run(conf_fh);
+
+    /* Record sizeof() for several common integer types. */
+    output = capture_output(sizes_code, strlen(sizes_code), &output_len);
+    if (output != NULL) {
+        char *end_ptr = output;
+        
+        sizeof_char  = strtol(output, &end_ptr, 10);
+        output       = end_ptr;
+        sizeof_short = strtol(output, &end_ptr, 10);
+        output       = end_ptr;
+        sizeof_int   = strtol(output, &end_ptr, 10);
+        output       = end_ptr;
+        sizeof_long  = strtol(output, &end_ptr, 10);
+        output       = end_ptr;
+        sizeof_ptr   = strtol(output, &end_ptr, 10);
+    }
+
+    /* Determine whether long longs are available. */
+    output = capture_output(long_long_code, strlen(long_long_code),
+        &output_len);
+    if (output != NULL) {
+        has_long_long    = true;
+        sizeof_long_long = strtol(output, NULL, 10);
+    }
+
+    /* Determine whether inttypes.h is available. */
+    output = capture_output(inttypes_code, strlen(inttypes_code),
+        &output_len);
+    if (output != NULL) {
+        has_inttypes = true;
+    }
+
+    /* write out some conditional defines */
+    if (has_inttypes) {
+        fprintf(conf_fh, "#define %sHAS_INTTYPES_H\n", constant_prefix);
+    }
+    if (has_long_long) {
+        fprintf(conf_fh, "#define %sHAS_LONG_LONG\n", constant_prefix);
+    }
+
+    /* write out sizes */
+    fprintf(conf_fh, 
+        "#define %sSIZEOF_CHAR %d\n"
+        "#define %sSIZEOF_SHORT %d\n"
+        "#define %sSIZEOF_INT %d\n"
+        "#define %sSIZEOF_LONG %d\n"
+        "#define %sSIZEOF_PTR %d\n",
+        constant_prefix, sizeof_char,
+        constant_prefix, sizeof_short,
+        constant_prefix, sizeof_int,
+        constant_prefix, sizeof_long,
+        constant_prefix, sizeof_ptr
+    );
+    if (has_long_long) {
+        fprintf(conf_fh, "#define %sSIZEOF_LONG_LONG %d\n",
+            constant_prefix, sizeof_long_long);
+    }
+
+    /* write typedefs */
+    fprintf(conf_fh, "typedef int %sbool_t;\n", typedef_prefix);
+    if (sizeof_char == 1) {
+        fprintf(conf_fh,
+            "typedef char %si8_t;\n"
+            "typedef unsigned char %su8_t;\n",
+            typedef_prefix, typedef_prefix
+        );
+    }
+    if (sizeof_short == 2) {
+        fprintf(conf_fh,
+            "typedef short %si16_t;\n"
+            "typedef unsigned short %su16_t;\n",
+            typedef_prefix, typedef_prefix
+        );
+    }
+    if (sizeof_int == 4 || sizeof_long == 4) {
+        char *type = sizeof_int == 4 ? "int" : "long";
+        fprintf(conf_fh,
+            "typedef %s %si32_t;\n"
+            "typedef unsigned %s %su32_t;\n",
+            type, typedef_prefix, 
+            type, typedef_prefix
+        );
+    }
+    if (sizeof_long == 8 || sizeof_long_long == 8) {
+        char *type = sizeof_long == 8 ? "long" : "long long";
+        fprintf(conf_fh,
+            "typedef %s %si64_t;\n"
+            "typedef unsigned %s %su64_t;\n",
+            type, typedef_prefix, 
+            type, typedef_prefix
+        );
+    }
+
+    /* true and false */
+    fprintf(conf_fh,
+        "#ifndef true\n"
+        "# define true 1\n"
+        "#endif\n"
+        "#ifndef false\n"
+        "# define false 0\n"
+        "#endif\n"
+    );
+
+    End_Run(conf_fh);
+}
+
+
+/**
+ * Copyright 2004 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+

@@ -1,0 +1,122 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "Charmonizer/Core.h"
+#include "Charmonizer/LargeFiles.h"
+#include <string.h>
+#include <stdio.h>
+
+static char ftello_code[] = METAQUOTE
+    #include <stdio.h>
+    #include <sys/types.h>
+    int main() {
+        off_t foo;
+        freopen("_charmonizer_target", "w", stdout);
+        printf("%d", (int)sizeof(off_t));
+        foo = ftello(stdout);
+        fseeko(stdout, 0, SEEK_SET);
+        return 0;
+    }
+METAQUOTE;
+
+static char ftello64_code[] = METAQUOTE
+    #include <stdio.h>
+    int main() {
+        off64_t foo;
+        freopen("_charmonizer_target", "w", stdout);
+        printf("%d", (int)sizeof(off64_t));
+        foo = ftello64(stdout);
+        fseeko64(stdout, 0, SEEK_SET);
+        return 0;
+    }
+METAQUOTE;
+
+static char sizeof_long_code[] = METAQUOTE
+    #include <stdio.h>
+    int main() {
+        freopen("_charmonizer_target", "w", stdout);
+        printf("%d\n", (int)sizeof(long));
+        return 0;
+    }
+METAQUOTE;
+
+void
+chaz_LargeFiles_run(FILE *conf_fh) 
+{
+    char *output;
+    char fseek_command[10];
+    char ftell_command[10];
+    size_t output_len;
+    chaz_bool_t has_off64_t = false;
+    int sizeof_off_t = -1;
+    int sizeof_long = -1;
+    chaz_bool_t success = false;
+
+    Start_Run(conf_fh);
+
+    /* check for ftello, fseeko, and 64-bit off_t */
+    output = capture_output(ftello_code, strlen(ftello_code), &output_len);
+    if (output != NULL) {
+        sizeof_off_t = strtol(output, NULL, 10);
+        if (sizeof_off_t == 8) {
+            success = true;
+            strcpy(fseek_command, "fseeko");
+            strcpy(ftell_command, "ftello");
+        }
+    }
+
+    /* check for ftello64, fseek064, and off64_t */
+    if (!success) {
+        output = capture_output(ftello64_code, strlen(ftello64_code), 
+            &output_len);
+        if (output != NULL) {
+            success = true;
+            has_off64_t = true;
+            strcpy(fseek_command, "fseeko64");
+            strcpy(ftell_command, "ftello64");
+        }
+    }
+
+    /* if longs are 8 bytes, then ftell/fseek will work fine */
+    if (!success){
+        output = capture_output(sizeof_long_code, strlen(sizeof_long_code),
+            &output_len);
+        if (output != NULL) {
+            sizeof_long = strtol(output, NULL, 10);
+            /* if longs are 8 bytes, ftell/fseek will work */
+            if (sizeof_long == 8) {
+                success = true;
+                strcpy(fseek_command, "fseek");
+                strcpy(ftell_command, "ftell");
+            }
+        }
+    }
+
+    if (success) {
+        fprintf(conf_fh, 
+            "#define %sFTell %s\n" 
+            "#define %sFSeek %s\n",
+            function_prefix, ftell_command,
+            function_prefix, fseek_command
+        );
+    }
+    
+    End_Run(conf_fh);
+}
+
+
+/**
+ * Copyright 2004 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
