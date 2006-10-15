@@ -21,6 +21,9 @@ my $METAQUOTE_EXE_PATH     = 'metaquote';
 my $CHARMONIZE_EXE_PATH    = 'charmonize';
 my $CHARMONIZER_SOURCE_DIR = catdir(qw( charmonizer src ));
 
+my $DEBUG         = 0;
+my $EXTRA_CCFLAGS = $DEBUG ? " -ansi -pedantic -Wall -Wextra -std=c89 " : "";
+
 # Compile the metaquote source filter utility.
 sub ACTION_metaquote {
     my $self        = shift;
@@ -32,7 +35,10 @@ sub ACTION_metaquote {
     # compile
     print "\nBuilding $METAQUOTE_EXE_PATH...\n\n";
     my $cbuilder = ExtUtils::CBuilder->new;
-    my $o_file = $cbuilder->compile( source => $source_path );
+    my $o_file   = $cbuilder->compile(
+        source               => $source_path,
+        extra_compiler_flags => $EXTRA_CCFLAGS,
+    );
     $cbuilder->link_executable(
         objects  => [$o_file],
         exe_file => $METAQUOTE_EXE_PATH,
@@ -74,8 +80,9 @@ sub ACTION_charmonizer {
         next if $self->up_to_date( $_, $o_file );
 
         $cbuilder->compile(
-            source       => $_,
-            include_dirs => [$filtered_dir],
+            source               => $_,
+            include_dirs         => [$filtered_dir],
+            extra_compiler_flags => $EXTRA_CCFLAGS,
         );
     }
 
