@@ -32,6 +32,14 @@ void
 chaz_set_prefixes(char *constant_prefix, char *macro_prefix, 
                   char *typedef_prefix,  char *function_prefix);
 
+/* Determine how much feedback Charmonizer provides.  
+ * 0 - silent
+ * 1 - normal
+ * 2 - debugging
+ */
+void
+chaz_set_verbosity(int level);
+
 /* Read an entire file into memory.
  */
 char*

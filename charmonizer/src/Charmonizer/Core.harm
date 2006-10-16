@@ -27,6 +27,7 @@ extern char *chaz_Core_constant_prefix;
 extern char *chaz_Core_macro_prefix;
 extern char *chaz_Core_typedef_prefix;
 extern char *chaz_Core_function_prefix;
+extern int chaz_Core_verbosity;
 
 /* Write the "_charm.h" file used by every probe.
  */
@@ -77,8 +78,13 @@ chaz_Core_can_open_file(char *file_path);
 
 /* Print a "chapter heading" when starting a module. 
  */
-#define Chaz_Core_Start_Run(filehandle) \
-    fprintf(filehandle, "\n/* %s */\n", __FILE__)
+#define Chaz_Core_Start_Run(filehandle, module_name) \
+    do { \
+        fprintf(filehandle, "\n/* %s */\n", module_name); \
+        if (verbosity > 0) \
+            printf("Running %s module...\n", module_name); \
+    } while (0)
+
 
 /* Leave a little whitespace at the end of each module.
  */
@@ -95,6 +101,7 @@ chaz_Core_can_open_file(char *file_path);
 # define macro_prefix           chaz_Core_macro_prefix
 # define typedef_prefix         chaz_Core_typedef_prefix
 # define function_prefix        chaz_Core_function_prefix
+# define verbosity              chaz_Core_verbosity
 # define write_charm_h          chaz_Core_write_charm_h
 # define capture_output         chaz_Core_capture_output 
 # define slurp_file             chaz_Core_slurp_file 

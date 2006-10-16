@@ -15,6 +15,8 @@ chaz_init()
 void
 chaz_clean_up()
 {
+    if (verbosity)
+        printf("Cleaning up...\n");
     remove("_charm.h");
 }
 
@@ -47,6 +49,12 @@ chaz_set_prefixes(char *constant_pre, char *macro_pre, char* typedef_pre,
     macro_prefix     = strdup(macro_pre);
     typedef_prefix   = strdup(typedef_pre);
     function_prefix  = strdup(function_pre);
+}
+
+void
+chaz_set_verbosity(int level)
+{
+    verbosity = level;
 }
 
 char*

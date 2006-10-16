@@ -12,6 +12,7 @@ char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
 char *function_prefix = NULL;
+int   verbosity       = 1;
 
 static char *command_buf = NULL;
 static size_t command_buf_len = 0;

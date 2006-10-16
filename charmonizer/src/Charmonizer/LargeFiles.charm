@@ -52,7 +52,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
     int sizeof_long = -1;
     chaz_bool_t success = false;
 
-    Start_Run(conf_fh);
+    Start_Run(conf_fh, "LargeFiles");
 
     /* check for ftello, fseeko, and 64-bit off_t */
     output = capture_output(ftello_code, strlen(ftello_code), &output_len);

@@ -9,7 +9,7 @@
 void
 chaz_UnusedVars_run(FILE *conf_fh) 
 {
-    Start_Run(conf_fh);
+    Start_Run(conf_fh, "UnusedVars");
     
     fprintf(conf_fh, 
         "#define %sUnused_Var(x) ((void)x)\n"
