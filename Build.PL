@@ -21,8 +21,9 @@ my $METAQUOTE_EXE_PATH     = 'metaquote';
 my $CHARMONIZE_EXE_PATH    = 'charmonize';
 my $CHARMONIZER_SOURCE_DIR = catdir(qw( charmonizer src ));
 
-my $DEBUG         = 0;
-my $EXTRA_CCFLAGS = $DEBUG ? " -ansi -pedantic -Wall -Wextra -std=c89 " : "";
+my $EXTRA_CCFLAGS
+    = $ENV{DEBUG_CHARM} ? " -ansi -pedantic -Wall -Wextra -std=c89 " : "";
+my $VALGRIND = $ENV{CHARM_VALGRIND} ? "valgrind " : "";
 
 # Compile the metaquote source filter utility.
 sub ACTION_metaquote {
@@ -160,7 +161,7 @@ sub ACTION_lucyconf {
     |;
     close $infile_fh or die "Can't close '$lucyconf_in': $!";
 
-    system("./$CHARMONIZE_EXE_PATH $lucyconf_in");
+    system("$VALGRIND ./$CHARMONIZE_EXE_PATH $lucyconf_in");
 
     unlink($lucyconf_in) or die "Can't unlink '$lucyconf_in': $!";
 
