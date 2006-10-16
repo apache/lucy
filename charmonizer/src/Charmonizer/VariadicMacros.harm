@@ -8,7 +8,7 @@
 
 /* Run the VariadicMacros module.
  */
-void chaz_VaradicMacros_run(FILE *conf_fh);
+void chaz_VariadicMacros_run(FILE *conf_fh);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define VariadicMacros_run    chaz_VaradicMacros_run
