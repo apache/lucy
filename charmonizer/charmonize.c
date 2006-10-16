@@ -26,11 +26,6 @@ init(int argc, char **argv);
 static char*
 extract_delim(char *source, size_t source_len, const char *tag_name);
 
-/* Assign the location where the config file will be written.
- */
-static void 
-set_outpath(char* path);
-
 /* Start the config file.
  */
 static void 
@@ -76,7 +71,6 @@ int main(int argc, char **argv)
 char* 
 init(int argc, char **argv) 
 {
-    int i;
     char *outpath, *compiler, *ccflags;
     char *infile_contents;
     size_t infile_len;
@@ -117,8 +111,8 @@ extract_delim(char *source, size_t source_len, const char *tag_name)
     /* sanity check, then create delimiter strings to match against */
     if (tag_name_len > 95)
         die("tag name too long: '%s'");
-    sprintf(opening_delim, "<%s>\0", tag_name);
-    sprintf(closing_delim, "</%s>\0", tag_name);
+    sprintf(opening_delim, "<%s>", tag_name);
+    sprintf(closing_delim, "</%s>", tag_name);
     
     /* find opening <delimiter> */
     for (start = source; start < limit; start++) {
