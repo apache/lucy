@@ -42,8 +42,9 @@ int main(int argc, char **argv)
     Check_IO_Op( fseek(in_fh, 0, SEEK_SET) );
 
     /* slurp input file and metaquote the contents */
-    source = (char*)malloc(source_len * sizeof(char));
+    source = (char*)malloc(source_len * sizeof(char) + 1);
     Check_IO_Op( fread(source, sizeof(char), source_len, in_fh) );
+    source[source_len] = '\0';
     dest = metaquote(source, source_len, &dest_len);
     
     /* blast out the metaquoted text */
@@ -128,6 +129,10 @@ metaquote(char *source, size_t source_len, size_t *dest_len)
         }
     }
 
+    /* null-terminate */
+    *dest = '\0';
+
+    /* store length in passed-in pointer */
     *dest_len = dest - dest_start;
 
     return dest_start;
