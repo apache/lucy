@@ -3,6 +3,7 @@
 #include "Charmonizer/Core.h"
 #include "Charmonizer/LargeFiles.h"
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 static char ftello_code[] = METAQUOTE

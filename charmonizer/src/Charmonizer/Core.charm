@@ -20,8 +20,8 @@ char*
 capture_output(char *source, size_t source_len, size_t *output_len) 
 {
     char *captured_output = NULL;
-    FILE *app_source_fh, *targ_fh, *garbage_fh;
-    int   command_len = 0;
+    FILE *app_source_fh, *garbage_fh;
+    size_t command_len = 0;
     int   successful;
     
     /* clear out previous versions and test to make sure removal worked */
@@ -56,7 +56,7 @@ capture_output(char *source, size_t source_len, size_t *output_len)
      * yet be able to recover it later, so we're stuck seeing the
      * errors when something fails.
      */
-    sprintf(command_buf, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " %s\0", 
+    sprintf(command_buf, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " %s", 
         compiler, ccflags);
     system(command_buf);
 

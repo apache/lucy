@@ -4,6 +4,7 @@
 #include "Charmonizer/Integers.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static char sizes_code[] = 
     METAQUOTE

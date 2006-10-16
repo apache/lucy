@@ -34,8 +34,6 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     char *output;
     size_t output_len;
     chaz_bool_t has_varmacros      = false;
-    chaz_bool_t has_iso_varmacros  = false;
-    chaz_bool_t has_gnuc_varmacros = false;
 
     Start_Run(conf_fh);
 
