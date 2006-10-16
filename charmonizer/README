@@ -18,11 +18,15 @@ SYNOPSIS
         printf(config_fh, "/* Auto-generated file - do not edit!! */\n\n");
         
         /* set up Charmonizer */
+        chaz_init();
         chaz_set_compiler("gcc");
         
         /* run desired Charmonizer modules */
         chaz_Integers_run(config_fh);
         chaz_LargeFiles_run(config_fh);
+
+        /* tear down Charmonizer */
+        chaz_clean_up();
 
         return 0;
     }
