@@ -16,6 +16,29 @@ char *function_prefix = NULL;
 static char *command_buf = NULL;
 static size_t command_buf_len = 0;
 
+static char charm_h_code[] = METAQUOTE
+    #ifndef CHARM_H
+    #define CHARM_H 1
+
+    #include <stdio.h>
+
+    #define Charm_Setup \
+        freopen("_charmonizer_target", "w", stdout)
+    
+    #endif
+METAQUOTE;
+
+void
+write_charm_h()
+{
+    FILE *fh = fopen("_charm.h", "w+");
+    if (fh == NULL)
+        die("Couldn't open '_charm.h': %s", strerror(errno));
+    fprintf(fh, "%s\n", charm_h_code);
+    if (fclose(fh))
+        die("Error when closing '_charm.h': %s", strerror(errno));
+}
+
 char*
 capture_output(char *source, size_t source_len, size_t *output_len) 
 {
@@ -57,7 +80,7 @@ capture_output(char *source, size_t source_len, size_t *output_len)
      * yet be able to recover it later, so we're stuck seeing the
      * errors when something fails.
      */
-    sprintf(command_buf, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " %s", 
+    sprintf(command_buf, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " -I. %s", 
         compiler, ccflags);
     system(command_buf);
 

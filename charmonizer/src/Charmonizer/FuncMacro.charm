@@ -7,18 +7,18 @@
 
 
 static char iso_func_code[] = METAQUOTE
-    #include <stdio.h>
+    #include "_charm.h" 
     int main() {
-        freopen("_charmonizer_target", "w", stdout);
+        Charm_Setup;
         printf("%s", __func__);
         return 0;
     }
 METAQUOTE;
 
 static char gnuc_func_code[] = METAQUOTE
-    #include <stdio.h>
+    #include "_charm.h" 
     int main() {
-        freopen("_charmonizer_target", "w", stdout);
+        Charm_Setup;
         printf("%s", __FUNCTION__);
         return 0;
     }

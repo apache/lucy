@@ -28,6 +28,11 @@ extern char *chaz_Core_macro_prefix;
 extern char *chaz_Core_typedef_prefix;
 extern char *chaz_Core_function_prefix;
 
+/* Write the "_charm.h" file used by every probe.
+ */
+void
+chaz_Core_write_charm_h();
+
 /* Attempt to compile the supplied source code.  If successful, capture the 
  * output of the program and return a pointer to a newly allocated buffer.
  * If the compilation fails, return NULL.  The length of the captured 
@@ -90,6 +95,7 @@ chaz_Core_can_open_file(char *file_path);
 # define macro_prefix           chaz_Core_macro_prefix
 # define typedef_prefix         chaz_Core_typedef_prefix
 # define function_prefix        chaz_Core_function_prefix
+# define write_charm_h          chaz_Core_write_charm_h
 # define capture_output         chaz_Core_capture_output 
 # define slurp_file             chaz_Core_slurp_file 
 # define flength                chaz_Core_flength 

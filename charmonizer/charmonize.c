@@ -64,6 +64,7 @@ int main(int argc, char **argv)
     if (fclose(config_fh))
         die("Error closing file '%s': %s", outpath, strerror(errno));
     free(outpath);
+    chaz_clean_up();
 
     return 0;
 }
@@ -84,6 +85,7 @@ init(int argc, char **argv)
     outpath  = extract_delim(infile_contents, infile_len, "charm_outpath");
     
     /* set up Charmonizer */
+    chaz_init();
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
     chaz_set_compiler(compiler);
     chaz_set_ccflags(ccflags);

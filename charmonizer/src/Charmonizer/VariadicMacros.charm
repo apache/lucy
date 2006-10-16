@@ -7,22 +7,22 @@
 
 
 static char iso_code[] = METAQUOTE
-    #include <stdio.h>
+    #include "_charm.h"
     #define ISO_TEST(fmt, ...) \
         printf(fmt, __VA_ARGS__)
     int main() {
-        freopen("_charmonizer_target", "w", stdout);
+        Charm_Setup;
         ISO_TEST("%d %d", 1, 1);
         return 0;
     }
 METAQUOTE;
 
 static char gnuc_code[] = METAQUOTE
-    #include <stdio.h>
+    #include "_charm.h"
     #define GNU_TEST(fmt, args...) \
         printf(fmt, ##args)
     int main() {
-        freopen("_charmonizer_target", "w", stdout);
+        Charm_Setup;
         GNU_TEST("%d %d", 1, 1);
         return 0;
     }

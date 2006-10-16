@@ -3,6 +3,18 @@
 
 #include <stddef.h>
 
+/* Set up the Charmonizer environment.  This should be called before anything
+ * else.
+ */
+void
+chaz_init();
+
+/* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
+ * should be called only after everything else finishes.
+ */
+void
+chaz_clean_up();
+
 /* Tell Charmonizer the name of the compiler it should use.
  */
 void

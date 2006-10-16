@@ -6,6 +6,18 @@
 #include "Charmonizer.h"
 #include "Charmonizer/Core.h"
 
+void
+chaz_init()
+{
+    write_charm_h();
+}
+
+void
+chaz_clean_up()
+{
+    remove("_charm.h");
+}
+
 void 
 chaz_set_compiler(char* comp_cmd) 
 {
