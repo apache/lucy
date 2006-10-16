@@ -18,7 +18,7 @@ die(char *format, ...);
 /* Verify fseek and ftell.  Verify fread, too, but weakly.
  */
 #define Check_IO_Op(op) \
-    if ((op) == -1) \
+    if ((int)(op) == -1) \
         die("IO operation failed at line %d: %s", __LINE__, strerror(errno))
 
 int main(int argc, char **argv) 
@@ -26,7 +26,6 @@ int main(int argc, char **argv)
     FILE   *in_fh, *out_fh;
     char   *source, *dest;
     size_t  source_len, dest_len;
-    int     chars_read;
 
     /* die unless both input and output filenames were supplied */
     if (argc != 3)
