@@ -156,28 +156,7 @@ start_conf_file(FILE *conf_fh)
 static void
 finish_conf_file(FILE *conf_fh) 
 {
-    fprintf(conf_fh,
-        "/* conf end */\n"
-        "#ifdef LUCY_USE_SHORT_NAMES\n"
-        "# define bool_t                    lucy_bool_t\n"
-        "# define i8_t                      lucy_i8_t\n"
-        "# define u8_t                      lucy_u8_t\n"
-        "# define i16_t                     lucy_i16_t\n"
-        "# define u16_t                     lucy_u16_t\n"
-        "# define i32_t                     lucy_i32_t\n"
-        "# define u32_t                     lucy_u32_t\n"
-        "# define i64_t                     lucy_i64_t\n"
-        "# define u64_t                     lucy_u64_t\n"
-        "# define Unused_Var(x)             Lucy_Unused_Var(x)\n"
-        "# define Unreachable_Return(type)  Lucy_Unreachable_Return(type)\n"
-        "# define FSeek                     lucy_FSeek\n"
-        "# define FTell                     lucy_FTell\n"
-        "#endif\n"
-    );
-
-    fprintf(conf_fh, 
-        "\n\n#endif /* H_LUCY_CONF */\n\n"
-    );
+    fprintf(conf_fh, "\n\n#endif /* H_LUCY_CONF */\n\n");
 }
 
 void 

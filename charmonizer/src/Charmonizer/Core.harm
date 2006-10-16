@@ -28,6 +28,7 @@ extern char *chaz_Core_macro_prefix;
 extern char *chaz_Core_typedef_prefix;
 extern char *chaz_Core_function_prefix;
 extern int chaz_Core_verbosity;
+extern chaz_bool_t chaz_Core_want_short_names;
 
 /* Write the "_charm.h" file used by every probe.
  */
@@ -41,6 +42,35 @@ chaz_Core_write_charm_h();
  */
 char*
 chaz_Core_capture_output(char *source, size_t source_len, size_t *output_len);
+
+/* Print bookends delimiting a short names block.
+ */
+#define Start_Short_Names(conf_fh) \
+    fprintf(conf_fh, "\n#ifdef %sUSE_SHORT_NAMES\n", chaz_Core_constant_prefix)
+
+#define End_Short_Names(conf_fh) \
+    fprintf(conf_fh, "#endif /* %sUSE_SHORT_NAMES */\n", \
+        chaz_Core_constant_prefix)
+
+/* Define a shortened version of a constant symbol (minus the prefix);
+ */
+void
+chaz_Core_shorten_constant(FILE *conf_fh, const char *symbol);
+
+/* Define a shortened version of a macro symbol (minuse the prefix);
+ */
+void
+chaz_Core_shorten_macro(FILE *conf_fh, const char *symbol);
+
+/* Define a shortened version of a typedef symbol (minuse the prefix);
+ */
+void
+chaz_Core_shorten_typedef(FILE *conf_fh, const char *symbol);
+
+/* Define a shortened version of a function symbol (minuse the prefix);
+ */
+void
+chaz_Core_shorten_function(FILE *conf_fh, const char *symbol);
 
 /* Read an entire file into memory.
  */
@@ -102,8 +132,13 @@ chaz_Core_can_open_file(char *file_path);
 # define typedef_prefix         chaz_Core_typedef_prefix
 # define function_prefix        chaz_Core_function_prefix
 # define verbosity              chaz_Core_verbosity
+# define want_short_names       chaz_Core_want_short_names
 # define write_charm_h          chaz_Core_write_charm_h
 # define capture_output         chaz_Core_capture_output 
+# define shorten_constant       chaz_Core_shorten_constant
+# define shorten_macro          chaz_Core_shorten_macro
+# define shorten_typedef        chaz_Core_shorten_typedef
+# define shorten_function       chaz_Core_shorten_function
 # define slurp_file             chaz_Core_slurp_file 
 # define flength                chaz_Core_flength 
 # define die                    chaz_Core_die 

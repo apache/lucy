@@ -13,6 +13,7 @@ char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
 char *function_prefix = NULL;
 int   verbosity       = 1;
+chaz_bool_t want_short_names = false;
 
 static char *command_buf = NULL;
 static size_t command_buf_len = 0;
@@ -107,6 +108,30 @@ capture_output(char *source, size_t source_len, size_t *output_len)
     remove(TARGET_PATH);
 
     return captured_output;
+}
+
+void
+shorten_constant(FILE *conf_fh, const char *symbol)
+{
+    fprintf(conf_fh, "# define %s %s%s\n", symbol, constant_prefix, symbol); 
+}
+
+void
+shorten_macro(FILE *conf_fh, const char *symbol)
+{
+    fprintf(conf_fh, "# define %s %s%s\n", symbol, macro_prefix, symbol); 
+}
+
+void
+shorten_typedef(FILE *conf_fh, const char *symbol)
+{
+    fprintf(conf_fh, "# define %s %s%s\n", symbol, typedef_prefix, symbol); 
+}
+
+void
+shorten_function(FILE *conf_fh, const char *symbol)
+{
+    fprintf(conf_fh, "# define %s %s%s\n", symbol, function_prefix, symbol); 
 }
 
 char*

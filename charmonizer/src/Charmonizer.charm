@@ -41,6 +41,8 @@ chaz_set_ccflags(char* flag_string)
 void
 chaz_set_prefixes(char *constant_pre, char *macro_pre, char* typedef_pre,  
                   char *function_pre) {
+    want_short_names = true;
+
     free(constant_prefix);
     free(macro_prefix);
     free(typedef_prefix);

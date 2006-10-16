@@ -164,9 +164,41 @@ chaz_Integers_run(FILE *conf_fh)
         "#endif\n"
     );
 
+    if (want_short_names) {
+        Start_Short_Names(conf_fh);
+
+        shorten_constant(conf_fh, "SIZEOF_CHAR");
+        shorten_constant(conf_fh, "SIZEOF_SHORT");
+        shorten_constant(conf_fh, "SIZEOF_LONG");
+        shorten_constant(conf_fh, "SIZEOF_INT");
+        shorten_constant(conf_fh, "SIZEOF_PTR");
+
+        if (has_long_long) {
+            shorten_constant(conf_fh, "HAS_LONG_LONG");
+            shorten_constant(conf_fh, "SIZEOF_LONG_LONG");
+        }
+
+        if (has_inttypes)
+            shorten_constant(conf_fh, "HAS_INTTYPES_H");
+
+        shorten_typedef(conf_fh, "bool_t");
+        shorten_typedef(conf_fh, "i8_t");
+        shorten_typedef(conf_fh, "u8_t");
+        shorten_typedef(conf_fh, "i16_t");
+        shorten_typedef(conf_fh, "u16_t");
+        shorten_typedef(conf_fh, "i32_t");
+        shorten_typedef(conf_fh, "u32_t");
+
+        if (sizeof_long == 8 || sizeof_long_long == 8) {
+            shorten_typedef(conf_fh, "i64_t");
+            shorten_typedef(conf_fh, "u64_t");
+        } 
+
+        End_Short_Names(conf_fh);
+    }
+    
     End_Run(conf_fh);
 }
-
 
 /**
  * Copyright 2006 The Apache Software Foundation

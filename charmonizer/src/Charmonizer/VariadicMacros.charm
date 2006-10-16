@@ -34,6 +34,8 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     char *output;
     size_t output_len;
     chaz_bool_t has_varmacros      = false;
+    chaz_bool_t has_iso_varmacros  = false;
+    chaz_bool_t has_gnuc_varmacros = false;
 
     Start_Run(conf_fh, "VariadicMacros");
 
@@ -41,6 +43,7 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     output = capture_output(iso_code, strlen(iso_code), &output_len);
     if (output != NULL) {
         has_varmacros = true;
+        has_iso_varmacros = true;
         fprintf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", constant_prefix);
         fprintf(conf_fh, "#define %sHAS_ISO_VARIADIC_MACROS\n", 
             constant_prefix);
@@ -51,11 +54,23 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     if (output != NULL) {
         if (has_varmacros == false) {
             has_varmacros = true;
+            has_gnuc_varmacros = true;
             fprintf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", 
                 constant_prefix);
         }
         fprintf(conf_fh, "#define %sHAS_GNUC_VARIADIC_MACROS\n", 
             constant_prefix);
+    }
+
+    if (want_short_names) {
+        Start_Short_Names(conf_fh);
+        if (has_varmacros)
+            shorten_constant(conf_fh, "HAS_VARIADIC_MACROS");
+        if (has_iso_varmacros)
+            shorten_constant(conf_fh, "HAS_ISO_VARIADIC_MACROS");
+        if (has_gnuc_varmacros)
+            shorten_constant(conf_fh, "HAS_GNUC_VARIADIC_MACROS");
+        End_Short_Names(conf_fh);
     }
 
     End_Run(conf_fh);
