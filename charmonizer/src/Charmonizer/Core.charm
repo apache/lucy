@@ -13,12 +13,14 @@ char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
 char *function_prefix = NULL;
 
+static char *command_buf = NULL;
+static size_t command_buf_len = 0;
+
 char*
 capture_output(char *source, size_t source_len, size_t *output_len) 
 {
     char *captured_output = NULL;
     FILE *app_source_fh, *targ_fh, *garbage_fh;
-    char  command[256];
     int   command_len = 0;
     int   successful;
     
@@ -36,19 +38,27 @@ capture_output(char *source, size_t source_len, size_t *output_len)
     if (fclose(app_source_fh))
         die("Error closing file '%s': %s", TRY_SOURCE_PATH, strerror(errno));
 
-    
-    /* security note: snprintf isn't available, so we just have to make sure
-     * that the compiler command is short enough at an earlier stage.
-     */
-    sprintf(command, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " %s\0", 
-        compiler, ccflags);
+    /* allocate space for the sprintf'd command we'll pass to system() */
+    if (compiler == NULL)
+        die("compiler has not been set");
+    if (ccflags == NULL)
+        die("ccflags has not been set");
+    command_len = strlen(compiler) + strlen(ccflags) + 200;
+    if (command_len > command_buf_len) {
+        command_buf = realloc(command_buf, command_len);
+        if (command_buf == NULL) 
+            die("allocation of command_buf failed");
+        command_buf_len = command_len;
+    }
 
     /* Compile the source.
      * Unfortunately there's no completely portable way to redirect stderr
      * yet be able to recover it later, so we're stuck seeing the
      * errors when something fails.
      */
-    system(command);
+    sprintf(command_buf, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " %s\0", 
+        compiler, ccflags);
+    system(command_buf);
 
     /* see if compilation was successful */
     garbage_fh = fopen(TRY_APP_PATH, "r");
@@ -58,11 +68,8 @@ capture_output(char *source, size_t source_len, size_t *output_len)
 
     /* if compilation was successful... */
     if (successful) {
-        /* run the app */
-        sprintf(command, "./" TRY_APP_PATH "\0");
-        system(command);
-
-        /* slurp the app's output and write it to our fh */
+        /* run the app, slurp the output and write it to our fh */
+        system("./" TRY_APP_PATH);
         captured_output = slurp_file(TARGET_PATH, output_len);
     }
     else {

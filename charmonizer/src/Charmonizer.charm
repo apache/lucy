@@ -10,14 +10,7 @@ void
 chaz_set_compiler(char* comp_cmd) 
 {
     size_t len = strlen(comp_cmd);
-
-    /* security check */
-    if (len > 100)
-        die("compiler command greater than 100 characters: %s", comp_cmd);
-
-    /* assign new val */
-    free(compiler);
-    compiler = (char*)malloc(len * (sizeof(char)) + 1);
+    compiler = (char*)realloc(compiler, len * (sizeof(char)) + 1);
     compiler[len] = '\0';
     strncpy(compiler, comp_cmd, len);
 }
@@ -26,14 +19,7 @@ void
 chaz_set_ccflags(char* flag_string) 
 {
     size_t len = strlen(flag_string);
-
-    /* security check */
-    if (len > 100)
-        die("ccflags greater than 100 characters: %s", flag_string);
-
-    /* assign new val */
-    free(ccflags);
-    ccflags = (char*)malloc(len * (sizeof(char)) + 1);
+    ccflags = (char*)realloc(ccflags, len * (sizeof(char)) + 1);
     ccflags[len] = '\0';
     strncpy(ccflags, flag_string, len);
 }
