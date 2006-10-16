@@ -42,22 +42,25 @@ DESCRIPTION
     Charmonizer is organized as one central library, "Charmonizer.h", and a
     suite of topically oriented modules, e.g. "Charmonizer/Integers.h",
     "Charmonizer/LargeFiles.h".  Each module exports 1 primary function,
-    ModuleName_run(FILE* conf_fh), which appends its output to the supplied
-    file handle.  A typical Charmonizer application proceeds in two phases:
-
-        1) Set up the Charmonizer environment and open a config file 
-           for writing.
-        2) Run selected modules, building up the config file bit by bit.
+    ModuleName_run(FILE* conf_fh), which appends its output to a supplied
+    file handle. Your config file gets built up bit by bit as you run each
+    module in turn.
 
     The config file can be further customized either by writing your own data
-    to it or possibly by setting options which affect the behavior of certain
+    to it or possibly by setting options which affect the behavior of the
     modules.
+
+FILESYSTEM NAMESPACE
+
+    Charmonizer creates a number of files within the current working directory
+    while it runs.  These files all begin with "_charm".
 
 METAQUOTE UTILITY
 
-    Charmonizer is a C program which writes C code.  Writing C from C is
-    ordinarily quite awkward, because when you try to embed more than a line
-    or two of C source code inside C string literals, things get ugly fast.  
+    Charmonizer is (more or less) a C program which writes C code.  Writing C
+    from C is ordinarily quite awkward, because when you try to embed more
+    than a line or two of C source code inside C string literals, things get
+    ugly fast.  
 
     To get around this problem, Charmonizer uses a source filter.  In the
     "real" Charmonizer source code, longer code fragments are surrounded by
