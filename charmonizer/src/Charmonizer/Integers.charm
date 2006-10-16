@@ -57,6 +57,10 @@ chaz_Integers_run(FILE *conf_fh)
     int sizeof_ptr        = -1; 
     int sizeof_long       = -1;
     int sizeof_long_long  = -1;
+    chaz_bool_t has_8     = false;
+    chaz_bool_t has_16    = false;
+    chaz_bool_t has_32    = false;
+    chaz_bool_t has_64    = false;
     chaz_bool_t has_long_long = false;
     chaz_bool_t has_inttypes  = false;
 
@@ -122,6 +126,7 @@ chaz_Integers_run(FILE *conf_fh)
     /* write typedefs */
     fprintf(conf_fh, "typedef int %sbool_t;\n", typedef_prefix);
     if (sizeof_char == 1) {
+        has_8 = true;
         fprintf(conf_fh,
             "typedef char %si8_t;\n"
             "typedef unsigned char %su8_t;\n",
@@ -129,6 +134,7 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (sizeof_short == 2) {
+        has_16 = true;
         fprintf(conf_fh,
             "typedef short %si16_t;\n"
             "typedef unsigned short %su16_t;\n",
@@ -136,6 +142,7 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (sizeof_int == 4 || sizeof_long == 4) {
+        has_32 = true;
         char *type = sizeof_int == 4 ? "int" : "long";
         fprintf(conf_fh,
             "typedef %s %si32_t;\n"
@@ -145,6 +152,7 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (sizeof_long == 8 || sizeof_long_long == 8) {
+        has_64 = true;
         char *type = sizeof_long == 8 ? "long" : "long long";
         fprintf(conf_fh,
             "typedef %s %si64_t;\n"
@@ -182,14 +190,21 @@ chaz_Integers_run(FILE *conf_fh)
             shorten_constant(conf_fh, "HAS_INTTYPES_H");
 
         shorten_typedef(conf_fh, "bool_t");
-        shorten_typedef(conf_fh, "i8_t");
-        shorten_typedef(conf_fh, "u8_t");
-        shorten_typedef(conf_fh, "i16_t");
-        shorten_typedef(conf_fh, "u16_t");
-        shorten_typedef(conf_fh, "i32_t");
-        shorten_typedef(conf_fh, "u32_t");
 
-        if (sizeof_long == 8 || sizeof_long_long == 8) {
+        if (has_8) {
+            shorten_typedef(conf_fh, "i8_t");
+            shorten_typedef(conf_fh, "u8_t");
+        }
+        if (has_16) {
+            shorten_typedef(conf_fh, "i16_t");
+            shorten_typedef(conf_fh, "u16_t");
+        }
+        if (has_32) {
+            shorten_typedef(conf_fh, "i32_t");
+            shorten_typedef(conf_fh, "u32_t");
+        }
+
+        if (has_64) {
             shorten_typedef(conf_fh, "i64_t");
             shorten_typedef(conf_fh, "u64_t");
         } 
