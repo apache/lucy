@@ -1,6 +1,11 @@
 /* Charmonizer/Integers.h -- info about integer types and sizes.
  *
- * Defines the following symbols:
+ * One or the other of these will be defined.
+ * 
+ * BIG_ENDIAN
+ * LITTLE_ENDIAN
+ * 
+ * These will always be defined:
  * 
  * SIZEOF_CHAR
  * SIZEOF_SHORT

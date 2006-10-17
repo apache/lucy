@@ -6,6 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Determine endian-ness of this machine.
+ */
+static chaz_bool_t
+machine_is_big_endian();
+
 static char sizes_code[] = METAQUOTE
     #include "_charm.h"
     int main () {
@@ -62,6 +67,12 @@ chaz_Integers_run(FILE *conf_fh)
     chaz_bool_t has_inttypes  = false;
 
     Start_Run(conf_fh, "Integers");
+
+    /* document endian-ness */
+    if (machine_is_big_endian())
+        fprintf(conf_fh, "#define %sBIG_ENDIAN\n", constant_prefix);
+    else 
+        fprintf(conf_fh, "#define %sLITTLE_ENDIAN\n", constant_prefix);
 
     /* Record sizeof() for several common integer types. */
     output = capture_output(sizes_code, strlen(sizes_code), &output_len);
@@ -262,6 +273,13 @@ chaz_Integers_run(FILE *conf_fh)
     }
     
     End_Run(conf_fh);
+}
+
+static chaz_bool_t
+machine_is_big_endian()
+{
+    long one = 1;
+    return !(*((char *)(&one)));
 }
 
 /**
