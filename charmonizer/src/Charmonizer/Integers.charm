@@ -148,8 +148,36 @@ chaz_Integers_run(FILE *conf_fh)
             type, typedef_prefix
         );
     }
+
     if (sizeof_long == 8 || sizeof_long_long == 8) {
+        int i;
         char *type = sizeof_long == 8 ? "long" : "long long";
+
+        /* printf format for 64-bit integer */
+        char *options[] = {
+            "ll",
+            "l",
+            "L",
+            "q",  /* Some *BSDs */
+            "I64", /* Microsoft */
+            NULL,
+        };
+
+        /* buffer to hold the code, and its start and end */
+        char format_64_code[1000];
+        static char format_64_code_a[] = METAQUOTE
+            #include "_charm.h"
+            int main() {
+                Charm_Setup;
+                printf(
+        METAQUOTE;
+        static char format_64_code_b[] = METAQUOTE
+                );
+                return 0;
+            }
+        METAQUOTE;
+
+        /* we have 64-bit ints, so add the typedef */
         has_64 = true;
         fprintf(conf_fh,
             "typedef %s %si64_t;\n"
@@ -157,6 +185,28 @@ chaz_Integers_run(FILE *conf_fh)
             type, typedef_prefix, 
             type, typedef_prefix
         );
+
+        /* create the I64P and U64P printf macros */
+        for (i = 0; options[i] != NULL; i++) {
+            /* try to print 2**64-1, and see if we get it back intact */
+            sprintf(format_64_code, 
+                "%s\"%%%su\", (unsigned %s)18446744073709551615%s", 
+                format_64_code_a, options[i], type, format_64_code_b);
+            output = capture_output(format_64_code, strlen(format_64_code),
+                &output_len);
+
+            if (   output_len != 0 
+                && strcmp(output, "18446744073709551615") == 0
+            ) {
+                fprintf(conf_fh, 
+                    "#define I64P \"%%%sd\"\n"
+                    "#define U64P \"%%%su\"\n",
+                    options[i], options[i]
+                );
+                break;
+            }
+        }
+
     }
 
     /* true and false */
@@ -204,6 +254,8 @@ chaz_Integers_run(FILE *conf_fh)
         if (has_64) {
             shorten_typedef(conf_fh, "i64_t");
             shorten_typedef(conf_fh, "u64_t");
+            shorten_macro(conf_fh, "I64P");
+            shorten_macro(conf_fh, "U64P");
         } 
 
         End_Short_Names(conf_fh);
