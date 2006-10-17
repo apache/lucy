@@ -142,8 +142,8 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (sizeof_int == 4 || sizeof_long == 4) {
-        has_32 = true;
         char *type = sizeof_int == 4 ? "int" : "long";
+        has_32 = true;
         fprintf(conf_fh,
             "typedef %s %si32_t;\n"
             "typedef unsigned %s %su32_t;\n",
@@ -152,8 +152,8 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (sizeof_long == 8 || sizeof_long_long == 8) {
-        has_64 = true;
         char *type = sizeof_long == 8 ? "long" : "long long";
+        has_64 = true;
         fprintf(conf_fh,
             "typedef %s %si64_t;\n"
             "typedef unsigned %s %su64_t;\n",
