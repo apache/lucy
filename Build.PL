@@ -186,8 +186,13 @@ my $builder = $class->new(
     license            => 'apache',
     dist_author        => 'Marvin Humphrey <marvin at rectangular dot com>',
     dist_version_from  => 'src/perl/Lucy.pm',
+    dist_abstract_from => 'src/perl/Lucy.pm',
     create_makefile_pl => 'passthrough',
-    add_to_cleanup     => [
+    build_requres      => {
+        'ExtUtils::CBuilder' => 0.18,
+        'ExtUtils::ParseXS'  => 2.16,
+    },
+    add_to_cleanup => [
         'Lucy-*',       'typemap', 'MANIFEST.bak', 'lastmod',
         'perltidy.ERR', '*.o',
     ],
