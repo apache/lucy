@@ -6,45 +6,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static char sizes_code[] = 
-    METAQUOTE
-        #include "_charm.h"
-        int main () {
-            Charm_Setup;
-            printf("%d %d %d %d %d",
-                (int)sizeof(char),
-                (int)sizeof(short),
-                (int)sizeof(int),
-                (int)sizeof(long),
-                (int)sizeof(void *)
-            );
-            return 0;
-        }
-    METAQUOTE;
+static char sizes_code[] = METAQUOTE
+    #include "_charm.h"
+    int main () {
+        Charm_Setup;
+        printf("%d %d %d %d %d",
+            (int)sizeof(char),
+            (int)sizeof(short),
+            (int)sizeof(int),
+            (int)sizeof(long),
+            (int)sizeof(void *)
+        );
+        return 0;
+    }
+METAQUOTE;
 
-static char inttypes_code[] = 
-    METAQUOTE
-        #include "_charm.h"
-        #include <inttypes.h>
-        int main()
-        {
-            Charm_Setup;
-            printf("We have inttypes.h\n");
-            return 0;
-        }
-    METAQUOTE;
+static char inttypes_code[] = METAQUOTE
+    #include "_charm.h"
+    #include <inttypes.h>
+    int main()
+    {
+        Charm_Setup;
+        printf("We have inttypes.h\n");
+        return 0;
+    }
+METAQUOTE;
 
-static char long_long_code[] = 
-    METAQUOTE
-        #include "_charm.h"
-        int main() 
-        {
-            Charm_Setup;
-            long long foo = 4;
-            printf("%d", (int)sizeof(long long));
-            return 0;
-        }
-    METAQUOTE;
+static char long_long_code[] = METAQUOTE
+    #include "_charm.h"
+    int main() 
+    {
+        Charm_Setup;
+        long long foo = 4;
+        printf("%d", (int)sizeof(long long));
+        return 0;
+    }
+METAQUOTE;
 
 void
 chaz_Integers_run(FILE *conf_fh) 
