@@ -37,9 +37,9 @@
  * i64_t
  * u64_t
  *
- * If 64-bit integers type are available, these macros will expand to the 
- * printf formats for signed and unsigned versions (most commonly "%lld" and
- * "%llu").
+ * If 64-bit integers type are available, these macros will expand to the
+ * printf conversion specification for signed and unsigned versions (most
+ * commonly "lld" and "llu").
  *
  * I64P
  * U64P

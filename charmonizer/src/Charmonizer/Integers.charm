@@ -210,8 +210,8 @@ chaz_Integers_run(FILE *conf_fh)
                 && strcmp(output, "18446744073709551615") == 0
             ) {
                 fprintf(conf_fh, 
-                    "#define I64P \"%%%sd\"\n"
-                    "#define U64P \"%%%su\"\n",
+                    "#define I64P \"%sd\"\n"
+                    "#define U64P \"%su\"\n",
                     options[i], options[i]
                 );
                 break;
