@@ -30,6 +30,17 @@ static char *local_command_start = NULL;
 static char *object_flag = NULL;
 static char *include_flag = NULL;
 
+static void
+grow_command_buf(size_t command_len)
+{
+    if (command_len > command_buf_len) {
+        command_buf = realloc(command_buf, command_len);
+        if (command_buf == NULL) 
+            die("allocation of command_buf failed");
+        command_buf_len = command_len;
+    }
+}
+
 static char charm_h_code[] = METAQUOTE
     #ifndef CHARM_H
     #define CHARM_H 1
@@ -41,17 +52,6 @@ static char charm_h_code[] = METAQUOTE
     
     #endif
 METAQUOTE;
-
-static void
-grow_command_buf(size_t command_len)
-{
-    if (command_len > command_buf_len) {
-        command_buf = realloc(command_buf, command_len);
-        if (command_buf == NULL) 
-            die("allocation of command_buf failed");
-        command_buf_len = command_len;
-    }
-}
 
 void
 write_charm_h()
