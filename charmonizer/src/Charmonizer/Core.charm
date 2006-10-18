@@ -6,6 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void
+grow_command_buf(size_t len);
+
+static chaz_bool_t 
+compile_and_verify(char *source, size_t source_len);
+
+static void
+clean_up_try();
+
 char *compiler        = NULL;
 char *ccflags         = NULL;
 char *constant_prefix = NULL;
@@ -17,6 +26,9 @@ chaz_bool_t want_short_names = false;
 
 static char *command_buf = NULL;
 static size_t command_buf_len = 0;
+static char *local_command_start = NULL;
+static char *object_flag = NULL;
+static char *include_flag = NULL;
 
 static char charm_h_code[] = METAQUOTE
     #ifndef CHARM_H
@@ -30,6 +42,17 @@ static char charm_h_code[] = METAQUOTE
     #endif
 METAQUOTE;
 
+static void
+grow_command_buf(size_t command_len)
+{
+    if (command_len > command_buf_len) {
+        command_buf = realloc(command_buf, command_len);
+        if (command_buf == NULL) 
+            die("allocation of command_buf failed");
+        command_buf_len = command_len;
+    }
+}
+
 void
 write_charm_h()
 {
@@ -41,12 +64,71 @@ write_charm_h()
         die("Error when closing '_charm.h': %s", strerror(errno));
 }
 
+
+void
+chaz_Core_probe_compiler_syntax()
+{
+    char *o_flags[] = { " -o ", " /o ", NULL };
+    char *i_flags[] = { "-I", "/I", NULL };
+    char *command_starts[] = { "./", ".\\", "", NULL };
+    int o_i, i_i, cs_i;
+    const char *ret_one_code = "int main() { return 1; }";
+    const int ret_one_len = strlen(ret_one_code);
+
+    if (verbosity) {
+        printf("Probing compiler/shell syntax... "
+            "you may see some errors...\n");
+        fflush(stdout);
+    }
+
+    for (o_i = 0; o_flags[o_i] != NULL; o_i++) {
+        free(object_flag);
+        object_flag = strdup(o_flags[o_i]);
+        for (i_i = 0; i_flags[i_i] != NULL; i_i++) {
+            free(include_flag);
+            include_flag = strdup(i_flags[i_i]);
+            for (cs_i = 0; command_starts[cs_i] != NULL; cs_i++) {
+                free(local_command_start);
+                local_command_start = strdup(command_starts[cs_i]);
+                if (compile_and_verify(ret_one_code, ret_one_len)) {
+                    if (verbosity) {
+                        printf("... found a syntax that works.\n");
+                        fflush(stdout);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+    die("Couldn't divine syntax for compiler");
+}
+
 char*
 capture_output(char *source, size_t source_len, size_t *output_len) 
 {
     char *captured_output = NULL;
+    chaz_bool_t compile_succeeded = compile_and_verify(source, source_len);
+
+    if (compile_succeeded) {
+        /* run the app, slurp the output */
+        grow_command_buf(strlen(local_command_start) + strlen(TRY_APP_PATH));
+        sprintf(command_buf, "%s%s", local_command_start, TRY_APP_PATH);
+        system(command_buf);
+        captured_output = slurp_file(TARGET_PATH, output_len);
+    }
+    else {
+        *output_len = 0;
+    }
+
+    clean_up_try();
+
+    return captured_output;
+}
+
+static chaz_bool_t 
+compile_and_verify(char *source, size_t source_len)
+{
     FILE *app_source_fh, *garbage_fh;
-    size_t command_len = 0;
     int   successful;
     
     /* clear out previous versions and test to make sure removal worked */
@@ -69,21 +151,15 @@ capture_output(char *source, size_t source_len, size_t *output_len)
         die("compiler has not been set");
     if (ccflags == NULL)
         die("ccflags has not been set");
-    command_len = strlen(compiler) + strlen(ccflags) + 200;
-    if (command_len > command_buf_len) {
-        command_buf = realloc(command_buf, command_len);
-        if (command_buf == NULL) 
-            die("allocation of command_buf failed");
-        command_buf_len = command_len;
-    }
+    grow_command_buf( strlen(compiler) + strlen(ccflags) + 200 );
 
     /* Compile the source.
      * Unfortunately there's no completely portable way to redirect stderr
      * yet be able to recover it later, so we're stuck seeing the
      * errors when something fails.
      */
-    sprintf(command_buf, "%s " TRY_SOURCE_PATH " -o " TRY_APP_PATH " -I. %s", 
-        compiler, ccflags);
+    sprintf(command_buf, "%s " TRY_SOURCE_PATH " %s " TRY_APP_PATH " %s. %s", 
+        compiler, object_flag, include_flag, ccflags);
     system(command_buf);
 
     /* see if compilation was successful */
@@ -92,22 +168,15 @@ capture_output(char *source, size_t source_len, size_t *output_len)
     if (garbage_fh != NULL && fclose(garbage_fh)) 
         die("Error closing file '%s': %s", TRY_SOURCE_PATH, strerror(errno));
 
-    /* if compilation was successful... */
-    if (successful) {
-        /* run the app, slurp the output and write it to our fh */
-        system("./" TRY_APP_PATH);
-        captured_output = slurp_file(TARGET_PATH, output_len);
-    }
-    else {
-        *output_len = 0;
-    }
+    return successful;
+}
 
-    /* clean up */
+static void
+clean_up_try()
+{
     remove(TRY_SOURCE_PATH);
     remove(TRY_APP_PATH);
     remove(TARGET_PATH);
-
-    return captured_output;
 }
 
 void

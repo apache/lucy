@@ -9,6 +9,7 @@
 void
 chaz_init()
 {
+    probe_compiler_syntax();
     write_charm_h();
 }
 

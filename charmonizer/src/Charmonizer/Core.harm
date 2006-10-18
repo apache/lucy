@@ -35,6 +35,13 @@ extern chaz_bool_t chaz_Core_want_short_names;
 void
 chaz_Core_write_charm_h();
 
+/* Determine whether commands should be issued as ./do_stuff, .\do_stuff, or
+ * something else.  See how the compiler wants its object argument specified:
+ * '-o', '/o'.  Etc...
+ */
+void
+chaz_Core_probe_compiler_syntax();
+
 /* Attempt to compile the supplied source code.  If successful, capture the 
  * output of the program and return a pointer to a newly allocated buffer.
  * If the compilation fails, return NULL.  The length of the captured 
@@ -134,6 +141,7 @@ chaz_Core_can_open_file(char *file_path);
 # define verbosity              chaz_Core_verbosity
 # define want_short_names       chaz_Core_want_short_names
 # define write_charm_h          chaz_Core_write_charm_h
+# define probe_compiler_syntax  chaz_Core_probe_compiler_syntax 
 # define capture_output         chaz_Core_capture_output 
 # define shorten_constant       chaz_Core_shorten_constant
 # define shorten_macro          chaz_Core_shorten_macro
