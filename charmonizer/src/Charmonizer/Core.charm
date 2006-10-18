@@ -257,7 +257,7 @@ flength(FILE *f)
         die("fseek error : %s\n", strerror(errno));
     len = ftell(f);
     if (len == -1)
-        die("fseek error : %s\n", strerror(errno));
+        die("ftell error : %s\n", strerror(errno));
 
     /* return to where we were */
     check_val = fseek(f, bookmark, SEEK_SET);
