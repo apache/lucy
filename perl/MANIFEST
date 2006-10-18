@@ -1,0 +1,6 @@
+Build.PL
+buildlib/Lucy/Build.pm
+lib/Lucy.pm
+MANIFEST			This list of files
+Makefile.PL
+META.yml

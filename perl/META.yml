@@ -1,0 +1,17 @@
+---
+name: Lucy
+version: 0.0001
+author:
+  - 'Marvin Humphrey <marvin at rectangular dot com>'
+abstract: Search engine library.
+license: apache
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
+provides:
+  Lucy:
+    file: lib/Lucy.pm
+    version: 0.0001
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
