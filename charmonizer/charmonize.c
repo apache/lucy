@@ -85,10 +85,8 @@ init(int argc, char **argv)
     outpath  = extract_delim(infile_contents, infile_len, "charm_outpath");
     
     /* set up Charmonizer */
+    chaz_init(compiler, ccflags);
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
-    chaz_set_compiler(compiler);
-    chaz_set_ccflags(ccflags);
-    chaz_init();
 
     /* clean up */
     free(infile_contents);

@@ -7,8 +7,17 @@
 #include "Charmonizer/Core.h"
 
 void
-chaz_init()
+chaz_init(const char *comp_cmd, const char *cc_flags_string )
 {
+    /* set the compiler and ccflags vars */
+    compiler = strdup(comp_cmd);
+    ccflags  = strdup(cc_flags_string);
+
+    /* don't write short names unless the user so indicates */
+    chaz_set_prefixes("", "", "", "");
+    want_short_names = false;
+
+    /* dispatch other tasks */
     probe_compiler_syntax();
     write_charm_h();
 }
@@ -21,27 +30,10 @@ chaz_clean_up()
     remove("_charm.h");
 }
 
-void 
-chaz_set_compiler(char* comp_cmd) 
-{
-    size_t len = strlen(comp_cmd);
-    compiler = (char*)realloc(compiler, len * (sizeof(char)) + 1);
-    compiler[len] = '\0';
-    strncpy(compiler, comp_cmd, len);
-}
-
-void 
-chaz_set_ccflags(char* flag_string) 
-{
-    size_t len = strlen(flag_string);
-    ccflags = (char*)realloc(ccflags, len * (sizeof(char)) + 1);
-    ccflags[len] = '\0';
-    strncpy(ccflags, flag_string, len);
-}
-
 void
-chaz_set_prefixes(char *constant_pre, char *macro_pre, char* typedef_pre,  
-                  char *function_pre) {
+chaz_set_prefixes(const char *constant_pre, const char *macro_pre, 
+                  const char* typedef_pre,  const char *function_pre) 
+{
     want_short_names = true;
 
     free(constant_prefix);
