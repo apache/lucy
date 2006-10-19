@@ -35,12 +35,24 @@ extern chaz_bool_t chaz_Core_want_short_names;
 void
 chaz_Core_write_charm_h();
 
+/* Compile a small wrapper application which is used to redirect error output
+ * to devnull.
+ */
+void
+chaz_Core_build_charm_run();
+
 /* Determine whether commands should be issued as ./do_stuff, .\do_stuff, or
  * something else.  See how the compiler wants its object argument specified:
  * '-o', '/o'.  Etc...
  */
 void
 chaz_Core_probe_compiler_syntax();
+
+/* Find a string representation for the bit black hole, e.g. '/dev/null' on
+ * Unix, 'nul' on Windows. 
+ */
+void
+chaz_Core_probe_devnull();
 
 /* Attempt to compile the supplied source code.  If successful, capture the 
  * output of the program and return a pointer to a newly allocated buffer.
@@ -78,6 +90,13 @@ chaz_Core_shorten_typedef(FILE *conf_fh, const char *symbol);
  */
 void
 chaz_Core_shorten_function(FILE *conf_fh, const char *symbol);
+
+/* Open a file (truncating if necessary) and write [content] to it.  die() if
+ * an error occurs.
+ */
+void
+chaz_Core_write_file(const char *filename, const char *content, 
+                     size_t content_len);
 
 /* Read an entire file into memory.
  */
@@ -141,12 +160,15 @@ chaz_Core_can_open_file(char *file_path);
 # define verbosity              chaz_Core_verbosity
 # define want_short_names       chaz_Core_want_short_names
 # define write_charm_h          chaz_Core_write_charm_h
+# define build_charm_run        chaz_Core_build_charm_run
 # define probe_compiler_syntax  chaz_Core_probe_compiler_syntax 
+# define probe_devnull          chaz_Core_probe_devnull
 # define capture_output         chaz_Core_capture_output 
 # define shorten_constant       chaz_Core_shorten_constant
 # define shorten_macro          chaz_Core_shorten_macro
 # define shorten_typedef        chaz_Core_shorten_typedef
 # define shorten_function       chaz_Core_shorten_function
+# define write_file             chaz_Core_write_file 
 # define slurp_file             chaz_Core_slurp_file 
 # define flength                chaz_Core_flength 
 # define die                    chaz_Core_die 

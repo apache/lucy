@@ -19,6 +19,8 @@ chaz_init(const char *comp_cmd, const char *cc_flags_string )
 
     /* dispatch other tasks */
     probe_compiler_syntax();
+    probe_devnull();
+    build_charm_run();
     write_charm_h();
 }
 
@@ -28,6 +30,7 @@ chaz_clean_up()
     if (verbosity)
         printf("Cleaning up...\n");
     remove("_charm.h");
+    remove("_charm_run");
 }
 
 void

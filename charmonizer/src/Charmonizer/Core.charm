@@ -10,7 +10,8 @@ static void
 grow_command_buf(size_t len);
 
 static chaz_bool_t 
-compile_and_verify(char *source, size_t source_len);
+compile_and_verify(const char *source_path, const char *object_path, 
+                   const char *source, size_t source_len);
 
 static void
 clean_up_try();
@@ -21,9 +22,12 @@ char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
 char *function_prefix = NULL;
+
 int   verbosity       = 1;
 chaz_bool_t want_short_names = false;
 
+static char *devnull = NULL;
+static chaz_bool_t charm_run_available = false;
 static char *command_buf = NULL;
 static size_t command_buf_len = 0;
 static char *local_command_start = NULL;
@@ -56,14 +60,69 @@ METAQUOTE;
 void
 write_charm_h()
 {
-    FILE *fh = fopen("_charm.h", "w+");
-    if (fh == NULL)
-        die("Couldn't open '_charm.h': %s", strerror(errno));
-    fprintf(fh, "%s\n", charm_h_code);
-    if (fclose(fh))
-        die("Error when closing '_charm.h': %s", strerror(errno));
+    write_file("_charm.h", charm_h_code, strlen(charm_h_code));
 }
 
+static char charm_run_code_a[] = METAQUOTE
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <stddef.h>
+    int main(char **argv, int argc)
+    {
+        char **argv_copy;
+        char *command;
+        size_t command_len = 1; /* terminating null */
+        
+        /* rebuild the command line args, minus the name of this utility */
+        argv++;
+        for (argv_copy = argv; *argv_copy != NULL; argv_copy++) {
+            command_len += strlen(*argv_copy++) + 1;
+        }
+        command = (char*)calloc(command_len, sizeof(char));
+        while (*argv)
+            strcat( strcat( command, " " ), *argv++ );
+
+        /* redirect stderr to /dev/null or equivalent */
+        freopen( 
+METAQUOTE;
+
+static char charm_run_code_b[] = METAQUOTE
+             , "w", stderr);
+
+        /* run the commmand and return its value to the parent process */
+        return system(command);
+    }
+METAQUOTE;
+
+void
+build_charm_run()
+{
+    size_t code_len = strlen(charm_run_code_a) + strlen(charm_run_code_b) +
+        strlen(devnull) + 20;
+    char *code = (char*)malloc(code_len);
+    chaz_bool_t compile_succeeded = false;
+
+    sprintf(code, "%s \"%s\" %s", charm_run_code_a, devnull,
+        charm_run_code_b);
+
+    compile_succeeded = compile_and_verify("_charm_run.c", "_charm_run", 
+        code, strlen(code));
+    if (!compile_succeeded)
+        die("failed to compile _charm_run helper utility");
+
+    remove("_charm_run.c");
+    charm_run_available = true;
+}
+
+static char print_one_code[] = METAQUOTE
+    #include <stdio.h>
+    int main() {
+        freopen("_charmonizer_target", "w", stdout);
+        printf("1");
+        return 0;
+    }
+METAQUOTE;
 
 void
 chaz_Core_probe_compiler_syntax()
@@ -72,8 +131,7 @@ chaz_Core_probe_compiler_syntax()
     char *i_flags[] = { "-I", "/I", NULL };
     char *command_starts[] = { "./", ".\\", "", NULL };
     int o_i, i_i, cs_i;
-    const char *ret_one_code = "int main() { return 1; }";
-    const int ret_one_len = strlen(ret_one_code);
+    const int print_one_len = strlen(print_one_code);
 
     if (verbosity) {
         printf("Probing compiler/shell syntax... "
@@ -88,9 +146,14 @@ chaz_Core_probe_compiler_syntax()
             free(include_flag);
             include_flag = strdup(i_flags[i_i]);
             for (cs_i = 0; command_starts[cs_i] != NULL; cs_i++) {
+                char *captured = NULL;
+                size_t captured_len = 0;
                 free(local_command_start);
                 local_command_start = strdup(command_starts[cs_i]);
-                if (compile_and_verify(ret_one_code, ret_one_len)) {
+                captured = capture_output(print_one_code, print_one_len,
+                    &captured_len);
+                free(captured);
+                if (captured != NULL) {
                     if (verbosity) {
                         printf("... found a syntax that works.\n");
                         fflush(stdout);
@@ -103,11 +166,45 @@ chaz_Core_probe_compiler_syntax()
     die("Couldn't divine syntax for compiler");
 }
 
+void
+chaz_Core_probe_devnull()
+{
+    char *const devnull_options[] = {
+        "/dev/null", 
+        "/dev/nul", 
+        "nul", 
+        NULL
+    };
+    int i;
+
+    if (verbosity)
+        printf("Trying to find a bit-bucket a la /dev/null...\n");
+
+    for (i = 0; devnull_options[i] != NULL; i++) {
+        FILE *const probe_fh = fopen(devnull_options[i], "w");
+        if (probe_fh != NULL) {
+            devnull = strdup(devnull_options[i]);
+            fclose(probe_fh);
+            return;
+        }
+    }
+    die("Couldn't find anything like /dev/null");
+}
+
 char*
 capture_output(char *source, size_t source_len, size_t *output_len) 
 {
     char *captured_output = NULL;
-    chaz_bool_t compile_succeeded = compile_and_verify(source, source_len);
+    chaz_bool_t compile_succeeded;
+
+    /* clear out previous versions and test to make sure removal worked */
+    if ( !remove_and_verify(TRY_APP_PATH) ) 
+        die("Failed to delete file '%s'", TRY_APP_PATH);
+    if ( !remove_and_verify(TARGET_PATH) )
+        die("Failed to delete file '%s'", TARGET_PATH);
+
+    compile_succeeded = compile_and_verify(TRY_SOURCE_PATH, TRY_APP_PATH, 
+        source, source_len);
 
     if (compile_succeeded) {
         /* run the app, slurp the output */
@@ -126,31 +223,16 @@ capture_output(char *source, size_t source_len, size_t *output_len)
 }
 
 static chaz_bool_t 
-compile_and_verify(char *source, size_t source_len)
+compile_and_verify(const char *source_path, const char *object_path, 
+                   const char *source, size_t source_len)
 {
     FILE *app_source_fh, *garbage_fh;
     int   successful;
     
-    /* clear out previous versions and test to make sure removal worked */
-    if ( !remove_and_verify(TRY_APP_PATH) ) 
-        die("Failed to delete file '%s'", TRY_APP_PATH);
-    if ( !remove_and_verify(TARGET_PATH) )
-        die("Failed to delete file '%s'", TARGET_PATH);
-
     /* write the source file */
-    app_source_fh = fopen(TRY_SOURCE_PATH, "w");
-    if (app_source_fh == NULL)
-        die("Error opening file '%s': %s", TRY_SOURCE_PATH, strerror(errno));
-    fwrite(source, source_len, sizeof(char), app_source_fh);
-    fprintf(app_source_fh, "\n"); /* terminating newline to quiet compiler */
-    if (fclose(app_source_fh))
-        die("Error closing file '%s': %s", TRY_SOURCE_PATH, strerror(errno));
+    write_file(source_path, source, source_len);
 
     /* allocate space for the sprintf'd command we'll pass to system() */
-    if (compiler == NULL)
-        die("compiler has not been set");
-    if (ccflags == NULL)
-        die("ccflags has not been set");
     grow_command_buf( strlen(compiler) + strlen(ccflags) + 200 );
 
     /* Compile the source.
@@ -158,15 +240,22 @@ compile_and_verify(char *source, size_t source_len)
      * yet be able to recover it later, so we're stuck seeing the
      * errors when something fails.
      */
-    sprintf(command_buf, "%s " TRY_SOURCE_PATH " %s " TRY_APP_PATH " %s. %s", 
-        compiler, object_flag, include_flag, ccflags);
+    if (charm_run_available && verbosity < 2) {
+        sprintf(command_buf, "%s_charm_run %s %s %s %s %s. %s", 
+            local_command_start, compiler, source_path, object_flag, 
+            object_path, include_flag, ccflags);
+    }
+    else {
+        sprintf(command_buf, "%s %s %s %s %s. %s", compiler, source_path, 
+            object_flag, object_path, include_flag, ccflags);
+    }
     system(command_buf);
 
     /* see if compilation was successful */
-    garbage_fh = fopen(TRY_APP_PATH, "r");
+    garbage_fh = fopen(object_path, "r");
     successful = garbage_fh != NULL;
     if (garbage_fh != NULL && fclose(garbage_fh)) 
-        die("Error closing file '%s': %s", TRY_SOURCE_PATH, strerror(errno));
+        die("Error closing file '%s': %s", object_path, strerror(errno));
 
     return successful;
 }
@@ -201,6 +290,17 @@ void
 shorten_function(FILE *conf_fh, const char *symbol)
 {
     fprintf(conf_fh, "# define %s %s%s\n", symbol, function_prefix, symbol); 
+}
+
+void
+write_file(const char *filename, const char *content, size_t content_len)
+{
+    FILE *fh = fopen(filename, "w+");
+    if (fh == NULL)
+        die("Couldn't open '%s': %s", filename, strerror(errno));
+    fwrite(content, sizeof(char), content_len, fh);
+    if (fclose(fh))
+        die("Error when closing '%s': %s", filename, strerror(errno));
 }
 
 char*
