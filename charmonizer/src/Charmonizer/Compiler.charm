@@ -1,0 +1,185 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include <string.h>
+#include <stdlib.h>
+#include "Charmonizer/Util.h"
+#include "Charmonizer/Compiler.h"
+#include "Charmonizer/CompilerSpec.h"
+#include "Charmonizer/OperSys.h"
+
+extern chaz_bool_t chaz_Core_charm_run_available;
+
+static void
+destroy(Compiler *self);
+
+static chaz_bool_t
+compile_exe(Compiler *self, const char *source_path, const char *exe_path, 
+            const char *code, size_t code_len);
+
+static chaz_bool_t
+compile_obj(Compiler *self, const char *source_path, const char *obj_path, 
+            const char *code, size_t code_len);
+
+static void
+test_compile(Compiler *self);
+
+chaz_Compiler*
+chaz_CC_new(OperSys *oper_sys, char *cc_command, char *cc_flags)
+{
+    int i;
+    char *compiler_nick;
+    CompilerSpec *compiler_spec = CCSpec_find_spec();
+    Compiler *self = (Compiler*)malloc(sizeof(Compiler));
+
+    if (verbosity)
+        printf("Creating compiler object...\n");
+
+    /* assign */
+    self->os              = oper_sys;
+    self->cc_command      = strdup(cc_command);
+    self->cc_flags        = strdup(cc_flags);
+
+    /* init */
+    self->buf             = NULL;
+    self->buf_len         = 0;
+    self->compile_exe     = compile_exe;
+    self->compile_obj     = compile_obj;
+
+    /* set compiler-specific vars */
+    self->include_flag    = strdup(compiler_spec->include_flag);
+    self->object_flag     = strdup(compiler_spec->object_flag);
+    self->exe_flag        = strdup(compiler_spec->exe_flag);
+
+    test_compile(self);
+
+    return self;
+}
+
+static void
+destroy(Compiler *self)
+{
+    free(self->buf);
+    free(self->cc_command);
+    free(self->cc_flags);
+    free(self->include_flag);
+    free(self->object_flag);
+    free(self->exe_flag);
+    free(self);
+}
+
+static chaz_bool_t
+compile_exe(Compiler *self, const char *source_path, const char *exe_path, 
+            const char *code, size_t code_len)
+{
+    FILE *app_source_fh, *garbage_fh;
+    chaz_bool_t successful;
+    OperSys *os = self->os;
+    size_t full_filepath_len = strlen(exe_path) + strlen(os->exe_ext) + 1;
+    char *exe_full_filepath = (char*)malloc(full_filepath_len);
+
+
+    /* tack on the exe_ext */
+    sprintf(exe_full_filepath, "%s%s", exe_path, os->exe_ext);
+
+    /* write the source file */
+    write_file(source_path, code, code_len);
+
+    /* allocate space for the sprintf'd command we'll pass to system() */
+    self->buf_len = grow_buf( &self->buf, self->buf_len, 
+        strlen(self->cc_command) + strlen(self->cc_flags) + 200 );
+
+    /* compile the source */
+    if (verbosity < 2 && chaz_Core_charm_run_available) {
+        sprintf(self->buf, "%s_charm_run %s %s %s%s %s. %s", 
+            os->local_command_start, self->cc_command, source_path, 
+            self->exe_flag, exe_full_filepath, self->include_flag, 
+            self->cc_flags);
+    }
+    else {
+        sprintf(self->buf, "%s %s %s%s %s. %s", 
+            self->cc_command, source_path, 
+            self->exe_flag, exe_full_filepath, self->include_flag, 
+            self->cc_flags);
+    }
+    system(self->buf);
+
+    /* see if compilation was successful */
+    successful = can_open_file(exe_full_filepath);
+    free(exe_full_filepath);
+    
+    return successful;
+}
+
+static chaz_bool_t
+compile_obj(Compiler *self, const char *source_path, const char *obj_path, 
+            const char *code, size_t code_len)
+{
+    FILE *app_source_fh, *garbage_fh;
+    chaz_bool_t successful;
+    OperSys *os = self->os;
+    size_t full_filepath_len = strlen(obj_path) + strlen(os->obj_ext) + 1;
+    char *obj_full_filepath = (char*)malloc(full_filepath_len);
+
+    /* tack on the obj_ext */
+    sprintf(obj_full_filepath, "%s%s", obj_path, os->obj_ext);
+    
+    /* write the source file */
+    write_file(source_path, code, code_len);
+
+    /* allocate space for the sprintf'd command we'll pass to system() */
+    self->buf_len = grow_buf( &self->buf, self->buf_len, 
+        strlen(self->cc_command) + strlen(self->cc_flags) + 200 );
+
+    /* compile the source */
+    if (verbosity > 2 && chaz_Core_charm_run_available) {
+        sprintf(self->buf, "%s_charm_run %s %s %s%s %s. %s", 
+            os->local_command_start, self->cc_command, source_path, 
+            self->object_flag, obj_full_filepath, self->include_flag, 
+            self->cc_flags);
+    }
+    else {
+        sprintf(self->buf, "%s %s %s%s %s. %s", 
+            self->cc_command, source_path, 
+            self->object_flag, obj_full_filepath, self->include_flag, 
+            self->cc_flags);
+    }
+    system(self->buf);
+
+    /* see if compilation was successful */
+    successful = can_open_file(obj_full_filepath);
+    free(obj_full_filepath);
+    
+    return successful;
+}
+
+static void
+test_compile(Compiler *self)
+{
+    char *code = "int main() { return 0; }\n";
+    chaz_bool_t success;
+    
+    if (verbosity) 
+        printf("Trying to compile a small test file...\n");
+    success = self->compile_exe(self, "_charm_try.c", 
+        "_charm_try", code, strlen(code));
+
+    if (!success)
+        die("Failed to compile a small test file");
+}
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
