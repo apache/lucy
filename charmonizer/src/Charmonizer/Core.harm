@@ -6,13 +6,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
-
-
-typedef int chaz_bool_t;
-#ifndef true
-# define true 1
-# define false 0
-#endif
+#include "Charmonizer/Defines.h"
 
 /* Temporary files used by Charmonizer. 
  */
