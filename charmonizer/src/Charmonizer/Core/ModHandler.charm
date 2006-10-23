@@ -1,9 +1,9 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Util.h"
-#include "Charmonizer/Core.h"
-#include "Charmonizer/OperSys.h"
-#include "Charmonizer/Compiler.h"
+#include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/OperSys.h"
+#include "Charmonizer/Core/Compiler.h"
 #include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>

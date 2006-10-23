@@ -1,4 +1,4 @@
-/* Chaz/Core.h -- symbols used by modules in the Charmonizer core distro.
+/* Chaz/Core/ModHandler.h -- symbols used by modules in the Charmonizer core distro.
  */
 
 #ifndef H_CHAZ_CORE

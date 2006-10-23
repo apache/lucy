@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Charmonizer/Util.h"
-#include "Charmonizer/OperSys.h"
+#include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/OperSys.h"
 
 static void
 probe_devnull(OperSys *self);

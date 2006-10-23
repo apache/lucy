@@ -1,7 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include <string.h>
-#include "Charmonizer/Util.h"
+#include "Charmonizer/Core/Util.h"
 #include "Charmonizer/CompilerSpec.h"
 
 static CompilerSpec specs[] = {

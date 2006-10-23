@@ -2,10 +2,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "Charmonizer/Util.h"
-#include "Charmonizer/Compiler.h"
+#include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/CompilerSpec.h"
-#include "Charmonizer/OperSys.h"
+#include "Charmonizer/Core/OperSys.h"
 
 extern chaz_bool_t chaz_Core_charm_run_available;
 

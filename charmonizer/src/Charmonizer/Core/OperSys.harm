@@ -1,4 +1,4 @@
-/* Charmonizer/OperSys.h - abstract an operating system down to a few
+/* Charmonizer/Core/OperSys.h - abstract an operating system down to a few
  * variables.
  */
 

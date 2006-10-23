@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Charmonizer.h"
-#include "Charmonizer/Core.h"
-#include "Charmonizer/Util.h"
-#include "Charmonizer/Compiler.h"
-#include "Charmonizer/OperSys.h"
+#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/Compiler.h"
+#include "Charmonizer/Core/OperSys.h"
 
 void
 chaz_init(const char *osname, const char *cc_command, const char *cc_flags)
