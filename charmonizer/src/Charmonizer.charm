@@ -32,10 +32,14 @@ chaz_clean_up()
 {
     if (verbosity)
         printf("Cleaning up...\n");
+
     os->destroy(os);
     compiler->destroy(compiler);
     remove("_charm.h");
     remove("_charm_run");
+
+    if (verbosity)
+        printf("Cleanup complete.\n");
 }
 
 void

@@ -44,6 +44,7 @@ chaz_CC_new(OperSys *oper_sys, char *cc_command, char *cc_flags)
     self->buf_len         = 0;
     self->compile_exe     = compile_exe;
     self->compile_obj     = compile_obj;
+    self->destroy         = destroy;
 
     /* set compiler-specific vars */
     self->include_flag    = strdup(compiler_spec->include_flag);
@@ -162,6 +163,10 @@ test_compile(Compiler *self)
         printf("Trying to compile a small test file...\n");
     success = self->compile_exe(self, "_charm_try.c", 
         "_charm_try", code, strlen(code));
+
+    
+    remove("_charm_try.c");
+    self->os->remove_exe(self->os, "_charm_try");
 
     if (!success)
         die("Failed to compile a small test file");
