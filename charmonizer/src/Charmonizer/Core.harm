@@ -8,50 +8,32 @@
 #include <stddef.h>
 #include "Charmonizer/Defines.h"
 
+struct chaz_OperSys;
+struct chaz_Compiler;
+
 /* Temporary files used by Charmonizer. 
  */
 #define CHAZ_CORE_TRY_SOURCE_PATH  "_charmonizer_try.c"
-#define CHAZ_CORE_TRY_APP_PATH     "_charmonizer_try"
+#define CHAZ_CORE_TRY_APP_BASENAME "_charmonizer_try"
 #define CHAZ_CORE_TARGET_PATH      "_charmonizer_target"
 
 /* Global variables.
  */
-extern char *chaz_Core_cc_command;
-extern char *chaz_Core_cc_flags;
-extern char *chaz_Core_os_name;
-extern char *chaz_Core_object_flag;
-extern char *chaz_Core_include_flag;
-extern char *chaz_Core_obj_ext;
-extern char *chaz_Core_exe_ext;
+extern struct chaz_OperSys  *chaz_Core_os;
+extern struct chaz_Compiler *chaz_Core_compiler;
+extern chaz_bool_t chaz_Core_charm_run_available;
+
 extern char *chaz_Core_constant_prefix;
 extern char *chaz_Core_macro_prefix;
 extern char *chaz_Core_typedef_prefix;
 extern char *chaz_Core_function_prefix;
 extern chaz_bool_t chaz_Core_want_short_names;
 
-/* Write the "_charm.h" file used by every probe.
+/* Initialize elements needed by Core.  Must be called before anything else,
+ * but after os and compiler are created.
  */
 void
-chaz_Core_write_charm_h();
-
-/* Compile a small wrapper application which is used to redirect error output
- * to devnull.
- */
-void
-chaz_Core_build_charm_run();
-
-/* Determine whether commands should be issued as ./do_stuff, .\do_stuff, or
- * something else.  See how the compiler wants its object argument specified:
- * '-o', '/o'.  Etc...
- */
-void
-chaz_Core_probe_compiler_syntax();
-
-/* Find a string representation for the bit black hole, e.g. '/dev/null' on
- * Unix, 'nul' on Windows. 
- */
-void
-chaz_Core_probe_devnull();
+chaz_Core_init();
 
 /* Attempt to compile the supplied source code.  If successful, capture the 
  * output of the program and return a pointer to a newly allocated buffer.
@@ -107,15 +89,11 @@ chaz_Core_shorten_function(FILE *conf_fh, const char *symbol);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define TRY_SOURCE_PATH        CHAZ_CORE_TRY_SOURCE_PATH
-# define TRY_APP_PATH           CHAZ_CORE_TRY_APP_PATH
+# define TRY_APP_BASENAME       CHAZ_CORE_TRY_APP_BASENAME
 # define TARGET_PATH            CHAZ_CORE_TARGET_PATH
-# define cc_command             chaz_Core_cc_command
-# define cc_flags               chaz_Core_cc_flags
-# define os_name                chaz_Core_os_name
-# define object_flag            chaz_Core_object_flag
-# define include_flag           chaz_Core_include_flag
-# define obj_ext                chaz_Core_obj_ext
-# define exe_ext                chaz_Core_exe_ext
+# define os                     chaz_Core_os
+# define compiler               chaz_Core_compiler
+# define charm_run_available    chaz_Core_charm_run_available
 # define constant_prefix        chaz_Core_constant_prefix
 # define macro_prefix           chaz_Core_macro_prefix
 # define typedef_prefix         chaz_Core_typedef_prefix
@@ -123,8 +101,6 @@ chaz_Core_shorten_function(FILE *conf_fh, const char *symbol);
 # define want_short_names       chaz_Core_want_short_names
 # define write_charm_h          chaz_Core_write_charm_h
 # define build_charm_run        chaz_Core_build_charm_run
-# define probe_compiler_syntax  chaz_Core_probe_compiler_syntax
-# define probe_devnull          chaz_Core_probe_devnull
 # define capture_output         chaz_Core_capture_output 
 # define shorten_constant       chaz_Core_shorten_constant
 # define shorten_macro          chaz_Core_shorten_macro

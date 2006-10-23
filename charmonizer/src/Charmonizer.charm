@@ -6,26 +6,25 @@
 #include "Charmonizer.h"
 #include "Charmonizer/Core.h"
 #include "Charmonizer/Util.h"
-#include "Charmonizer/Compilers.h"
+#include "Charmonizer/Compiler.h"
+#include "Charmonizer/OperSys.h"
 
 void
-chaz_init(const char *osname, const char *cc_cmd, const char *cc_flags_string)
+chaz_init(const char *osname, const char *cc_command, const char *cc_flags)
 {
-    /* set some global vars */
-    cc_command = strdup(cc_cmd);
-    cc_flags   = strdup(cc_flags_string);
-    os_name    = strdup(osname);
+    /* create os and compiler objects */
+    os       = OS_new(osname);
+    compiler = CC_new(os, cc_command, cc_flags);
 
     /* don't write short names unless the user so indicates */
     chaz_set_prefixes("", "", "", "");
     want_short_names = false;
 
     /* dispatch other tasks */
-    CC_detect();
-    probe_compiler_syntax();
-    probe_devnull();
-    build_charm_run();
-    write_charm_h();
+    chaz_Core_init();
+
+    if (verbosity)
+        printf("Initialization complete.\n");
 }
 
 void
@@ -33,6 +32,8 @@ chaz_clean_up()
 {
     if (verbosity)
         printf("Cleaning up...\n");
+    os->destroy(os);
+    compiler->destroy(compiler);
     remove("_charm.h");
     remove("_charm_run");
 }

@@ -2,26 +2,33 @@
 
 #include "Charmonizer/Util.h"
 #include "Charmonizer/Core.h"
+#include "Charmonizer/OperSys.h"
+#include "Charmonizer/Compiler.h"
 #include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
-static chaz_bool_t 
-compile_and_verify(const char *source_path, const char *object_path, 
-                   const char *source, size_t source_len);
 
+/* Write the "_charm.h" file used by every probe.
+ */
+static void
+write_charm_h();
+
+/* Compile a small wrapper application which is used to redirect error output
+ * to devnull.
+ */
+static void
+build_charm_run();
+
+/* Clean up the files associated with capture_output().
+ */
 static void
 clean_up_try();
 
-char *cc_command      = NULL;
-char *cc_flags        = NULL;
-char *os_name         = NULL;
-char *object_flag     = NULL;
-char *include_flag    = NULL;
-char *obj_ext         = NULL;
-char *exe_ext         = NULL;
-
+struct chaz_OperSys  *chaz_Core_os = NULL;
+struct chaz_Compiler *chaz_Core_compiler = NULL;
+chaz_bool_t chaz_Core_charm_run_available = false;
 char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
@@ -29,11 +36,29 @@ char *function_prefix = NULL;
 
 chaz_bool_t want_short_names = false;
 
-static char *devnull = NULL;
-static chaz_bool_t charm_run_available = false;
-static char *command_buf = NULL;
-static size_t command_buf_len = 0;
-static char *local_command_start = NULL;
+
+static char *try_app_path = NULL;
+static char *try_app_command = NULL;
+
+void
+chaz_Core_init()
+{
+    size_t len;
+
+    /* set the name of the application which we "try" to execute */
+    len = strlen(TRY_APP_BASENAME) + strlen(os->exe_ext) + 1;
+    try_app_path = (char*)malloc(len);
+    sprintf(try_app_path, "%s%s", TRY_APP_BASENAME, os->exe_ext);
+
+    /* set the invocation string for the "try" application */
+    len += strlen(os->local_command_start);
+    try_app_command = (char*)malloc(len);
+    sprintf(try_app_command, "%s%s", os->local_command_start, try_app_path);
+
+    /* write files needed by this module and others */
+    build_charm_run();
+    write_charm_h();
+}
 
 static char charm_h_code[] = METAQUOTE
     #ifndef CHARM_H
@@ -47,7 +72,7 @@ static char charm_h_code[] = METAQUOTE
     #endif
 METAQUOTE;
 
-void
+static void
 write_charm_h()
 {
     write_file("_charm.h", charm_h_code, strlen(charm_h_code));
@@ -85,85 +110,24 @@ static char charm_run_code_b[] = METAQUOTE
     }
 METAQUOTE;
 
-void
+static void
 build_charm_run()
 {
     size_t code_len = strlen(charm_run_code_a) + strlen(charm_run_code_b) +
-        strlen(devnull) + 20;
+        strlen(os->devnull) + 20;
     char *code = (char*)malloc(code_len);
     chaz_bool_t compile_succeeded = false;
 
-    sprintf(code, "%s \"%s\" %s", charm_run_code_a, devnull,
+    sprintf(code, "%s \"%s\" %s", charm_run_code_a, os->devnull,
         charm_run_code_b);
 
-    compile_succeeded = compile_and_verify("_charm_run.c", "_charm_run", 
-        code, strlen(code));
+    compile_succeeded = compiler->compile_exe(compiler, "_charm_run.c", 
+        "_charm_run", code, strlen(code));
     if (!compile_succeeded)
         die("failed to compile _charm_run helper utility");
 
     remove("_charm_run.c");
     charm_run_available = true;
-}
-
-static char print_one_code[] = METAQUOTE
-    #include <stdio.h>
-    int main() {
-        freopen("_charmonizer_target", "w", stdout);
-        printf("1");
-        return 0;
-    }
-METAQUOTE;
-
-void
-chaz_Core_probe_compiler_syntax()
-{
-    char *captured;
-    size_t captured_len;
-
-    if (verbosity) {
-        printf("Testing compiler/shell syntax...\n");
-    }
-
-    if (strcmp(os_name, "mswin32") == 0) {
-        local_command_start = strdup(".\\");
-    }
-    else {
-        local_command_start = strdup("./");
-    }
-
-    captured = capture_output(print_one_code, strlen(print_one_code),
-        &captured_len);
-
-    if (captured == NULL) {
-        die("Failed to compile test file");
-    }
-
-    free(captured);
-}
-
-void
-chaz_Core_probe_devnull()
-{
-    char *const devnull_options[] = {
-        "/dev/null", 
-        "/dev/nul", 
-        "nul", 
-        NULL
-    };
-    int i;
-
-    if (verbosity)
-        printf("Trying to find a bit-bucket a la /dev/null...\n");
-
-    for (i = 0; devnull_options[i] != NULL; i++) {
-        FILE *const probe_fh = fopen(devnull_options[i], "w");
-        if (probe_fh != NULL) {
-            devnull = strdup(devnull_options[i]);
-            fclose(probe_fh);
-            return;
-        }
-    }
-    die("Couldn't find anything like /dev/null");
 }
 
 char*
@@ -173,20 +137,17 @@ capture_output(char *source, size_t source_len, size_t *output_len)
     chaz_bool_t compile_succeeded;
 
     /* clear out previous versions and test to make sure removal worked */
-    if ( !remove_and_verify(TRY_APP_PATH) ) 
-        die("Failed to delete file '%s'", TRY_APP_PATH);
+    if ( !remove_and_verify(try_app_path) ) 
+        die("Failed to delete file '%s'", try_app_path);
     if ( !remove_and_verify(TARGET_PATH) )
         die("Failed to delete file '%s'", TARGET_PATH);
 
-    compile_succeeded = compile_and_verify(TRY_SOURCE_PATH, TRY_APP_PATH, 
-        source, source_len);
+    compile_succeeded = compiler->compile_exe(compiler, TRY_SOURCE_PATH, 
+        try_app_path, source, source_len);
 
     if (compile_succeeded) {
         /* run the app, slurp the output */
-        command_buf_len = grow_buf(&command_buf, command_buf_len, 
-            strlen(local_command_start) + strlen(TRY_APP_PATH));
-        sprintf(command_buf, "%s%s", local_command_start, TRY_APP_PATH);
-        system(command_buf);
+        system(try_app_command);
         captured_output = slurp_file(TARGET_PATH, output_len);
     }
     else {
@@ -198,50 +159,11 @@ capture_output(char *source, size_t source_len, size_t *output_len)
     return captured_output;
 }
 
-static chaz_bool_t 
-compile_and_verify(const char *source_path, const char *object_path, 
-                   const char *source, size_t source_len)
-{
-    FILE *app_source_fh, *garbage_fh;
-    int   successful;
-    
-    /* write the source file */
-    write_file(source_path, source, source_len);
-
-    /* allocate space for the sprintf'd command we'll pass to system() */
-    command_buf_len = grow_buf( &command_buf, command_buf_len, 
-        strlen(cc_command) + strlen(cc_flags) + 200 );
-
-    /* Compile the source.
-     * Unfortunately there's no completely portable way to redirect stderr
-     * yet be able to recover it later, so we're stuck seeing the
-     * errors when something fails.
-     */
-    if (charm_run_available && verbosity < 2) {
-        sprintf(command_buf, "%s_charm_run %s %s %s%s %s. %s", 
-            local_command_start, cc_command, source_path, object_flag, 
-            object_path, include_flag, cc_flags);
-    }
-    else {
-        sprintf(command_buf, "%s %s %s%s %s. %s", cc_command, source_path, 
-            object_flag, object_path, include_flag, cc_flags);
-    }
-    system(command_buf);
-
-    /* see if compilation was successful */
-    garbage_fh = fopen(object_path, "r");
-    successful = garbage_fh != NULL;
-    if (garbage_fh != NULL && fclose(garbage_fh)) 
-        die("Error closing file '%s': %s", object_path, strerror(errno));
-
-    return successful;
-}
-
 static void
 clean_up_try()
 {
     remove(TRY_SOURCE_PATH);
-    remove(TRY_APP_PATH);
+    remove(try_app_path);
     remove(TARGET_PATH);
 }
 
