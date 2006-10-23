@@ -16,8 +16,14 @@ compile_and_verify(const char *source_path, const char *object_path,
 static void
 clean_up_try();
 
-char *compiler        = NULL;
-char *ccflags         = NULL;
+char *cc_command      = NULL;
+char *cc_flags        = NULL;
+char *os_name         = NULL;
+char *object_flag     = NULL;
+char *include_flag    = NULL;
+char *obj_ext         = NULL;
+char *exe_ext         = NULL;
+
 char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
@@ -31,8 +37,6 @@ static chaz_bool_t charm_run_available = false;
 static char *command_buf = NULL;
 static size_t command_buf_len = 0;
 static char *local_command_start = NULL;
-static char *object_flag = NULL;
-static char *include_flag = NULL;
 
 static void
 grow_command_buf(size_t command_len)
@@ -68,20 +72,20 @@ static char charm_run_code_a[] = METAQUOTE
     #include <stdlib.h>
     #include <string.h>
     #include <stddef.h>
-    int main(char **argv, int argc)
+    int main(int argc, char **argv)
     {
-        char **argv_copy;
         char *command;
         size_t command_len = 1; /* terminating null */
+        int i;
         
         /* rebuild the command line args, minus the name of this utility */
-        argv++;
-        for (argv_copy = argv; *argv_copy != NULL; argv_copy++) {
-            command_len += strlen(*argv_copy++) + 1;
+        for (i = 1; i < argc; i++) {
+            command_len += strlen(argv[i]) + 1;
         }
         command = (char*)calloc(command_len, sizeof(char));
-        while (*argv)
-            strcat( strcat( command, " " ), *argv++ );
+        for (i = 1; i < argc; i++) {
+            strcat( strcat(command, " "), argv[i] );
+        }
 
         /* redirect stderr to /dev/null or equivalent */
         freopen( 
@@ -127,43 +131,28 @@ METAQUOTE;
 void
 chaz_Core_probe_compiler_syntax()
 {
-    char *o_flags[] = { " -o ", " /o ", NULL };
-    char *i_flags[] = { "-I", "/I", NULL };
-    char *command_starts[] = { "./", ".\\", "", NULL };
-    int o_i, i_i, cs_i;
-    const int print_one_len = strlen(print_one_code);
+    char *captured;
+    size_t captured_len;
 
     if (verbosity) {
-        printf("Probing compiler/shell syntax... "
-            "you may see some errors...\n");
-        fflush(stdout);
+        printf("Testing compiler/shell syntax...\n");
     }
 
-    for (o_i = 0; o_flags[o_i] != NULL; o_i++) {
-        free(object_flag);
-        object_flag = strdup(o_flags[o_i]);
-        for (i_i = 0; i_flags[i_i] != NULL; i_i++) {
-            free(include_flag);
-            include_flag = strdup(i_flags[i_i]);
-            for (cs_i = 0; command_starts[cs_i] != NULL; cs_i++) {
-                char *captured = NULL;
-                size_t captured_len = 0;
-                free(local_command_start);
-                local_command_start = strdup(command_starts[cs_i]);
-                captured = capture_output(print_one_code, print_one_len,
-                    &captured_len);
-                free(captured);
-                if (captured != NULL) {
-                    if (verbosity) {
-                        printf("... found a syntax that works.\n");
-                        fflush(stdout);
-                    }
-                    return;
-                }
-            }
-        }
+    if (strcmp(os_name, "mswin32") == 0) {
+        local_command_start = strdup(".\\");
     }
-    die("Couldn't divine syntax for compiler");
+    else {
+        local_command_start = strdup("./");
+    }
+
+    captured = capture_output(print_one_code, strlen(print_one_code),
+        &captured_len);
+
+    if (captured == NULL) {
+        die("Failed to compile test file");
+    }
+
+    free(captured);
 }
 
 void
@@ -233,7 +222,7 @@ compile_and_verify(const char *source_path, const char *object_path,
     write_file(source_path, source, source_len);
 
     /* allocate space for the sprintf'd command we'll pass to system() */
-    grow_command_buf( strlen(compiler) + strlen(ccflags) + 200 );
+    grow_command_buf( strlen(cc_command) + strlen(cc_flags) + 200 );
 
     /* Compile the source.
      * Unfortunately there's no completely portable way to redirect stderr
@@ -241,13 +230,13 @@ compile_and_verify(const char *source_path, const char *object_path,
      * errors when something fails.
      */
     if (charm_run_available && verbosity < 2) {
-        sprintf(command_buf, "%s_charm_run %s %s %s %s %s. %s", 
-            local_command_start, compiler, source_path, object_flag, 
-            object_path, include_flag, ccflags);
+        sprintf(command_buf, "%s_charm_run %s %s %s%s %s. %s", 
+            local_command_start, cc_command, source_path, object_flag, 
+            object_path, include_flag, cc_flags);
     }
     else {
-        sprintf(command_buf, "%s %s %s %s %s. %s", compiler, source_path, 
-            object_flag, object_path, include_flag, ccflags);
+        sprintf(command_buf, "%s %s %s%s %s. %s", cc_command, source_path, 
+            object_flag, object_path, include_flag, cc_flags);
     }
     system(command_buf);
 

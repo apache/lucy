@@ -5,19 +5,22 @@
 #include <string.h>
 #include "Charmonizer.h"
 #include "Charmonizer/Core.h"
+#include "Charmonizer/Compilers.h"
 
 void
-chaz_init(const char *comp_cmd, const char *cc_flags_string )
+chaz_init(const char *osname, const char *cc_cmd, const char *cc_flags_string)
 {
-    /* set the compiler and ccflags vars */
-    compiler = strdup(comp_cmd);
-    ccflags  = strdup(cc_flags_string);
+    /* set some global vars */
+    cc_command = strdup(cc_cmd);
+    cc_flags   = strdup(cc_flags_string);
+    os_name    = strdup(osname);
 
     /* don't write short names unless the user so indicates */
     chaz_set_prefixes("", "", "", "");
     want_short_names = false;
 
     /* dispatch other tasks */
+    CC_detect();
     probe_compiler_syntax();
     probe_devnull();
     build_charm_run();

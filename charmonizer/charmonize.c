@@ -72,26 +72,28 @@ int main(int argc, char **argv)
 char* 
 init(int argc, char **argv) 
 {
-    char *outpath, *compiler, *ccflags;
-    char *infile_contents;
+    char *outpath, *cc_command, *cc_flags, *os_name;
+    char *infile_str;
     size_t infile_len;
 
     /* parse the infile */
     if (argc != 2)
         die("Usage: ./charmonize INFILE");
-    infile_contents = chaz_slurp_file(argv[1], &infile_len);
-    compiler = extract_delim(infile_contents, infile_len, "charm_compiler");
-    ccflags  = extract_delim(infile_contents, infile_len, "charm_ccflags");
-    outpath  = extract_delim(infile_contents, infile_len, "charm_outpath");
+    infile_str = chaz_slurp_file(argv[1], &infile_len);
+    cc_command = extract_delim(infile_str, infile_len, "charm_cc_command");
+    cc_flags   = extract_delim(infile_str, infile_len, "charm_cc_flags");
+    outpath    = extract_delim(infile_str, infile_len, "charm_outpath");
+    os_name    = extract_delim(infile_str, infile_len, "charm_os_name");
     
     /* set up Charmonizer */
-    chaz_init(compiler, ccflags);
+    chaz_init(os_name, cc_command, cc_flags);
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
 
     /* clean up */
-    free(infile_contents);
-    free(compiler);
-    free(ccflags);
+    free(infile_str);
+    free(cc_command);
+    free(cc_flags);
+    free(os_name);
 
     return outpath;
 }

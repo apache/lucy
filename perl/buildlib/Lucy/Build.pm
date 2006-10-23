@@ -26,7 +26,7 @@ my $VALGRIND = $ENV{CHARM_VALGRIND} ? "valgrind " : "";
 sub ACTION_metaquote {
     my $self = shift;
     my $source_path
-        = catfile( $base_dir, qw( charmonizer metaquote metaquote.c ) );
+        = catfile( $base_dir, qw( charmonizer metaquote_src metaquote.c ) );
 
     # don't compile if we're up to date
     return if $self->up_to_date( [$source_path], $METAQUOTE_EXE_PATH );
@@ -150,12 +150,14 @@ sub ACTION_lucyconf {
     print "\nWriting $lucyconf_path...\n\n";
 
     # write the infile with which to communicate args to charmonize
+    my $os_name = lc($Config{osname});
     open( my $infile_fh, '>', $lucyconf_in )
         or die "Can't open '$lucyconf_in': $!";
     print $infile_fh qq|
         <charm_outpath>$lucyconf_path</charm_outpath>
-        <charm_compiler>$Config{cc}</charm_compiler>
-        <charm_ccflags>$Config{ccflags}</charm_ccflags>
+        <charm_os_name>$os_name</charm_os_name>
+        <charm_cc_command>$Config{cc}</charm_cc_command>
+        <charm_cc_flags>$Config{ccflags}</charm_cc_flags>
     |;
     close $infile_fh or die "Can't close '$lucyconf_in': $!";
 
