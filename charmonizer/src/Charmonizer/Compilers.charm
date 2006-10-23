@@ -4,6 +4,7 @@
 #include "Charmonizer/Compilers.h"
 
 #include "Charmonizer/Core.h"
+#include "Charmonizer/Util.h"
 
 CC_compiler_t CC_compiler = CC_unknown;
 

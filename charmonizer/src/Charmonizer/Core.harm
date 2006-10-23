@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stddef.h>
 
+
 typedef int chaz_bool_t;
 #ifndef true
 # define true 1
@@ -32,7 +33,6 @@ extern char *chaz_Core_constant_prefix;
 extern char *chaz_Core_macro_prefix;
 extern char *chaz_Core_typedef_prefix;
 extern char *chaz_Core_function_prefix;
-extern int chaz_Core_verbosity;
 extern chaz_bool_t chaz_Core_want_short_names;
 
 /* Write the "_charm.h" file used by every probe.
@@ -96,47 +96,6 @@ chaz_Core_shorten_typedef(FILE *conf_fh, const char *symbol);
 void
 chaz_Core_shorten_function(FILE *conf_fh, const char *symbol);
 
-/* Open a file (truncating if necessary) and write [content] to it.  die() if
- * an error occurs.
- */
-void
-chaz_Core_write_file(const char *filename, const char *content, 
-                     size_t content_len);
-
-/* Read an entire file into memory.
- */
-char* 
-chaz_Core_slurp_file(char *file_path, size_t *len_ptr);
-
-/* Get the length of a file (may overshoot on text files under DOS).
- */
-long  
-chaz_Core_flength(FILE *f);
-
-/* Print an error message to stderr and exit.
- */
-void  
-chaz_Core_die(char *format, ...);
-
-/* Print an error message to stderr.
- */
-void
-chaz_Core_warn(char *format, ...);
-
-/* Attept to delete a file.  Don't error if the file wasn't there to begin
- * with.  Return 1 if it seems like the file is gone because an attempt to
- * open it for reading fails (this doesn't guarantee that the file is gone,
- * but it works well enough for our purposes).  Return 0 if we can still 
- * read the file.
- */
-int
-chaz_Core_remove_and_verify(char *file_path);
-
-/* Attempt to open a file for reading, then close it immediately.
- */
-int
-chaz_Core_can_open_file(char *file_path);
-
 /* Print a "chapter heading" when starting a module. 
  */
 #define Chaz_Core_Start_Run(filehandle, module_name) \
@@ -167,7 +126,6 @@ chaz_Core_can_open_file(char *file_path);
 # define macro_prefix           chaz_Core_macro_prefix
 # define typedef_prefix         chaz_Core_typedef_prefix
 # define function_prefix        chaz_Core_function_prefix
-# define verbosity              chaz_Core_verbosity
 # define want_short_names       chaz_Core_want_short_names
 # define write_charm_h          chaz_Core_write_charm_h
 # define build_charm_run        chaz_Core_build_charm_run
@@ -178,13 +136,6 @@ chaz_Core_can_open_file(char *file_path);
 # define shorten_macro          chaz_Core_shorten_macro
 # define shorten_typedef        chaz_Core_shorten_typedef
 # define shorten_function       chaz_Core_shorten_function
-# define write_file             chaz_Core_write_file 
-# define slurp_file             chaz_Core_slurp_file 
-# define flength                chaz_Core_flength 
-# define die                    chaz_Core_die 
-# define warn                   chaz_Core_warn 
-# define remove_and_verify      chaz_Core_remove_and_verify 
-# define can_open_file          chaz_Core_can_open_file 
 # define Start_Run              Chaz_Core_Start_Run
 # define End_Run                Chaz_Core_End_Run
 #endif

@@ -5,6 +5,7 @@
 #include <string.h>
 #include "Charmonizer.h"
 #include "Charmonizer/Core.h"
+#include "Charmonizer/Util.h"
 #include "Charmonizer/Compilers.h"
 
 void

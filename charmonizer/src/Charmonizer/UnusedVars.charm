@@ -1,6 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core.h"
+#include "Charmonizer/Util.h"
 #include "Charmonizer/UnusedVars.h"
 #include <string.h>
 #include <stdio.h>
