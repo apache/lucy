@@ -50,6 +50,12 @@ chaz_Util_remove_and_verify(char *file_path);
 int
 chaz_Util_can_open_file(char *file_path);
 
+/* Make sure that the buffer pointed to by [buf_ptr] can hold least as many 
+ * bytes as [new_len] + 1.
+ */
+size_t
+chaz_Util_grow_buf(char **buf_ptr, size_t old_len, size_t new_len);
+
 #ifdef CHAZ_USE_SHORT_NAMES
 # define verbosity              chaz_Util_verbosity 
 # define write_file             chaz_Util_write_file 
@@ -59,6 +65,7 @@ chaz_Util_can_open_file(char *file_path);
 # define warn                   chaz_Util_warn 
 # define remove_and_verify      chaz_Util_remove_and_verify 
 # define can_open_file          chaz_Util_can_open_file 
+# define grow_buf               chaz_Util_grow_buf
 #endif
 
 #endif /* H_CHAZ_UTIL */

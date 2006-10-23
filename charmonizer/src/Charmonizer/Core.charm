@@ -7,9 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void
-grow_command_buf(size_t len);
-
 static chaz_bool_t 
 compile_and_verify(const char *source_path, const char *object_path, 
                    const char *source, size_t source_len);
@@ -37,17 +34,6 @@ static chaz_bool_t charm_run_available = false;
 static char *command_buf = NULL;
 static size_t command_buf_len = 0;
 static char *local_command_start = NULL;
-
-static void
-grow_command_buf(size_t command_len)
-{
-    if (command_len > command_buf_len) {
-        command_buf = realloc(command_buf, command_len);
-        if (command_buf == NULL) 
-            die("allocation of command_buf failed");
-        command_buf_len = command_len;
-    }
-}
 
 static char charm_h_code[] = METAQUOTE
     #ifndef CHARM_H
@@ -197,7 +183,8 @@ capture_output(char *source, size_t source_len, size_t *output_len)
 
     if (compile_succeeded) {
         /* run the app, slurp the output */
-        grow_command_buf(strlen(local_command_start) + strlen(TRY_APP_PATH));
+        command_buf_len = grow_buf(&command_buf, command_buf_len, 
+            strlen(local_command_start) + strlen(TRY_APP_PATH));
         sprintf(command_buf, "%s%s", local_command_start, TRY_APP_PATH);
         system(command_buf);
         captured_output = slurp_file(TARGET_PATH, output_len);
@@ -222,7 +209,8 @@ compile_and_verify(const char *source_path, const char *object_path,
     write_file(source_path, source, source_len);
 
     /* allocate space for the sprintf'd command we'll pass to system() */
-    grow_command_buf( strlen(cc_command) + strlen(cc_flags) + 200 );
+    command_buf_len = grow_buf( &command_buf, command_buf_len, 
+        strlen(cc_command) + strlen(cc_flags) + 200 );
 
     /* Compile the source.
      * Unfortunately there's no completely portable way to redirect stderr

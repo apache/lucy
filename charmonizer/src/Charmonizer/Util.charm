@@ -131,6 +131,18 @@ chaz_Util_can_open_file(char *file_path)
     }
 }
 
+size_t
+chaz_Util_grow_buf(char **buf, size_t old_len, size_t new_len)
+{
+    if (new_len > 0 && new_len >= old_len) {
+        *buf = realloc(*buf, new_len + 1);
+        if (*buf == NULL) 
+            die("buffer allocation failed");
+    }
+
+    return new_len;
+}
+
 /**
  * Copyright 2006 The Apache Software Foundation
  *
