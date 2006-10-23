@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
-#include "Charmonizer/CompilerSpec.h"
+#include "Charmonizer/Core/CompilerSpec.h"
 #include "Charmonizer/Core/OperSys.h"
 
-extern chaz_bool_t chaz_Core_charm_run_available;
+extern chaz_bool_t chaz_ModHand_charm_run_available;
 
 static void
 destroy(Compiler *self);
@@ -89,7 +89,7 @@ compile_exe(Compiler *self, const char *source_path, const char *exe_path,
         strlen(self->cc_command) + strlen(self->cc_flags) + 200 );
 
     /* compile the source */
-    if (verbosity < 2 && chaz_Core_charm_run_available) {
+    if (verbosity < 2 && chaz_ModHand_charm_run_available) {
         sprintf(self->buf, "%s_charm_run %s %s %s%s %s. %s", 
             os->local_command_start, self->cc_command, source_path, 
             self->exe_flag, exe_full_filepath, self->include_flag, 
@@ -131,7 +131,7 @@ compile_obj(Compiler *self, const char *source_path, const char *obj_path,
         strlen(self->cc_command) + strlen(self->cc_flags) + 200 );
 
     /* compile the source */
-    if (verbosity > 2 && chaz_Core_charm_run_available) {
+    if (verbosity > 2 && chaz_ModHand_charm_run_available) {
         sprintf(self->buf, "%s_charm_run %s %s %s%s %s. %s", 
             os->local_command_start, self->cc_command, source_path, 
             self->object_flag, obj_full_filepath, self->include_flag, 

@@ -26,9 +26,9 @@ build_charm_run();
 static void
 clean_up_try();
 
-struct chaz_OperSys  *chaz_Core_os = NULL;
-struct chaz_Compiler *chaz_Core_compiler = NULL;
-chaz_bool_t chaz_Core_charm_run_available = false;
+struct chaz_OperSys  *chaz_ModHand_os = NULL;
+struct chaz_Compiler *chaz_ModHand_compiler = NULL;
+chaz_bool_t chaz_ModHand_charm_run_available = false;
 char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
@@ -41,7 +41,7 @@ static char *try_app_path = NULL;
 static char *try_app_command = NULL;
 
 void
-chaz_Core_init()
+chaz_ModHand_init()
 {
     size_t len;
 
@@ -131,7 +131,8 @@ build_charm_run()
 }
 
 char*
-capture_output(char *source, size_t source_len, size_t *output_len) 
+chaz_ModHand_capture_output(char *source, size_t source_len, 
+                            size_t *output_len) 
 {
     char *captured_output = NULL;
     chaz_bool_t compile_succeeded;
@@ -168,25 +169,25 @@ clean_up_try()
 }
 
 void
-shorten_constant(FILE *conf_fh, const char *symbol)
+chaz_ModHand_shorten_constant(FILE *conf_fh, const char *symbol)
 {
     fprintf(conf_fh, "# define %s %s%s\n", symbol, constant_prefix, symbol); 
 }
 
 void
-shorten_macro(FILE *conf_fh, const char *symbol)
+chaz_ModHand_shorten_macro(FILE *conf_fh, const char *symbol)
 {
     fprintf(conf_fh, "# define %s %s%s\n", symbol, macro_prefix, symbol); 
 }
 
 void
-shorten_typedef(FILE *conf_fh, const char *symbol)
+chaz_ModHand_shorten_typedef(FILE *conf_fh, const char *symbol)
 {
     fprintf(conf_fh, "# define %s %s%s\n", symbol, typedef_prefix, symbol); 
 }
 
 void
-shorten_function(FILE *conf_fh, const char *symbol)
+chaz_ModHand_shorten_function(FILE *conf_fh, const char *symbol)
 {
     fprintf(conf_fh, "# define %s %s%s\n", symbol, function_prefix, symbol); 
 }

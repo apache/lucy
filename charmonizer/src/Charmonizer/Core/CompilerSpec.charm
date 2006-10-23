@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "Charmonizer/Core/Util.h"
-#include "Charmonizer/CompilerSpec.h"
+#include "Charmonizer/Core/CompilerSpec.h"
 
 static CompilerSpec specs[] = {
     { "MSVC", "/I", "/Fo", "/Fe" },

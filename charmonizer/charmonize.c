@@ -1,7 +1,6 @@
 /* charmonize.c -- write lucyconf.h config file.
  */
 
-#include "Charmonizer/Core.h"
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>

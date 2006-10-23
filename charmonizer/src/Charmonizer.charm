@@ -21,7 +21,7 @@ chaz_init(const char *osname, const char *cc_command, const char *cc_flags)
     want_short_names = false;
 
     /* dispatch other tasks */
-    chaz_Core_init();
+    chaz_ModHand_init();
 
     if (verbosity)
         printf("Initialization complete.\n");

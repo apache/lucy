@@ -1,8 +1,8 @@
 /* Chaz/Core/ModHandler.h -- symbols used by modules in the Charmonizer core distro.
  */
 
-#ifndef H_CHAZ_CORE
-#define H_CHAZ_CORE 1
+#ifndef H_CHAZ_MOD_HAND
+#define H_CHAZ_MOD_HAND 1
 
 #include <stdio.h>
 #include <stddef.h>
@@ -13,27 +13,27 @@ struct chaz_Compiler;
 
 /* Temporary files used by Charmonizer. 
  */
-#define CHAZ_CORE_TRY_SOURCE_PATH  "_charmonizer_try.c"
-#define CHAZ_CORE_TRY_APP_BASENAME "_charmonizer_try"
-#define CHAZ_CORE_TARGET_PATH      "_charmonizer_target"
+#define CHAZ_MOD_HAND_TRY_SOURCE_PATH  "_charmonizer_try.c"
+#define CHAZ_MOD_HAND_TRY_APP_BASENAME "_charmonizer_try"
+#define CHAZ_MOD_HAND_TARGET_PATH      "_charmonizer_target"
 
 /* Global variables.
  */
-extern struct chaz_OperSys  *chaz_Core_os;
-extern struct chaz_Compiler *chaz_Core_compiler;
-extern chaz_bool_t chaz_Core_charm_run_available;
+extern struct chaz_OperSys  *chaz_ModHand_os;
+extern struct chaz_Compiler *chaz_ModHand_compiler;
+extern chaz_bool_t chaz_ModHand_charm_run_available;
 
-extern char *chaz_Core_constant_prefix;
-extern char *chaz_Core_macro_prefix;
-extern char *chaz_Core_typedef_prefix;
-extern char *chaz_Core_function_prefix;
-extern chaz_bool_t chaz_Core_want_short_names;
+extern char *chaz_ModHand_constant_prefix;
+extern char *chaz_ModHand_macro_prefix;
+extern char *chaz_ModHand_typedef_prefix;
+extern char *chaz_ModHand_function_prefix;
+extern chaz_bool_t chaz_ModHand_want_short_names;
 
-/* Initialize elements needed by Core.  Must be called before anything else,
- * but after os and compiler are created.
+/* Initialize elements needed by ModHandler.  Must be called before anything 
+ * else, but after os and compiler are created.
  */
 void
-chaz_Core_init();
+chaz_ModHand_init();
 
 /* Attempt to compile the supplied source code.  If successful, capture the 
  * output of the program and return a pointer to a newly allocated buffer.
@@ -41,40 +41,42 @@ chaz_Core_init();
  * output will be placed into the buffer pointed to by [output_len].
  */
 char*
-chaz_Core_capture_output(char *source, size_t source_len, size_t *output_len);
+chaz_ModHand_capture_output(char *source, size_t source_len, 
+                            size_t *output_len);
 
 /* Print bookends delimiting a short names block.
  */
-#define Start_Short_Names(conf_fh) \
-    fprintf(conf_fh, "\n#ifdef %sUSE_SHORT_NAMES\n", chaz_Core_constant_prefix)
+#define Chaz_ModHand_Start_Short_Names(conf_fh) \
+    fprintf(conf_fh, "\n#ifdef %sUSE_SHORT_NAMES\n", \
+        chaz_ModHand_constant_prefix)
 
-#define End_Short_Names(conf_fh) \
+#define Chaz_ModHand_End_Short_Names(conf_fh) \
     fprintf(conf_fh, "#endif /* %sUSE_SHORT_NAMES */\n", \
-        chaz_Core_constant_prefix)
+        chaz_ModHand_constant_prefix)
 
 /* Define a shortened version of a constant symbol (minus the prefix);
  */
 void
-chaz_Core_shorten_constant(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_constant(FILE *conf_fh, const char *symbol);
 
 /* Define a shortened version of a macro symbol (minuse the prefix);
  */
 void
-chaz_Core_shorten_macro(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_macro(FILE *conf_fh, const char *symbol);
 
 /* Define a shortened version of a typedef symbol (minuse the prefix);
  */
 void
-chaz_Core_shorten_typedef(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_typedef(FILE *conf_fh, const char *symbol);
 
 /* Define a shortened version of a function symbol (minuse the prefix);
  */
 void
-chaz_Core_shorten_function(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_function(FILE *conf_fh, const char *symbol);
 
 /* Print a "chapter heading" when starting a module. 
  */
-#define Chaz_Core_Start_Run(filehandle, module_name) \
+#define Chaz_ModHand_Start_Run(filehandle, module_name) \
     do { \
         fprintf(filehandle, "\n/* %s */\n", module_name); \
         if (verbosity > 0) \
@@ -84,30 +86,32 @@ chaz_Core_shorten_function(FILE *conf_fh, const char *symbol);
 
 /* Leave a little whitespace at the end of each module.
  */
-#define Chaz_Core_End_Run(filehandle) \
+#define Chaz_ModHand_End_Run(filehandle) \
     fprintf(filehandle, "\n")
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define TRY_SOURCE_PATH        CHAZ_CORE_TRY_SOURCE_PATH
-# define TRY_APP_BASENAME       CHAZ_CORE_TRY_APP_BASENAME
-# define TARGET_PATH            CHAZ_CORE_TARGET_PATH
-# define os                     chaz_Core_os
-# define compiler               chaz_Core_compiler
-# define charm_run_available    chaz_Core_charm_run_available
-# define constant_prefix        chaz_Core_constant_prefix
-# define macro_prefix           chaz_Core_macro_prefix
-# define typedef_prefix         chaz_Core_typedef_prefix
-# define function_prefix        chaz_Core_function_prefix
-# define want_short_names       chaz_Core_want_short_names
-# define write_charm_h          chaz_Core_write_charm_h
-# define build_charm_run        chaz_Core_build_charm_run
-# define capture_output         chaz_Core_capture_output 
-# define shorten_constant       chaz_Core_shorten_constant
-# define shorten_macro          chaz_Core_shorten_macro
-# define shorten_typedef        chaz_Core_shorten_typedef
-# define shorten_function       chaz_Core_shorten_function
-# define Start_Run              Chaz_Core_Start_Run
-# define End_Run                Chaz_Core_End_Run
+# define TRY_SOURCE_PATH        CHAZ_MOD_HAND_TRY_SOURCE_PATH
+# define TRY_APP_BASENAME       CHAZ_MOD_HAND_TRY_APP_BASENAME
+# define TARGET_PATH            CHAZ_MOD_HAND_TARGET_PATH
+# define os                     chaz_ModHand_os
+# define compiler               chaz_ModHand_compiler
+# define charm_run_available    chaz_ModHand_charm_run_available
+# define constant_prefix        chaz_ModHand_constant_prefix
+# define macro_prefix           chaz_ModHand_macro_prefix
+# define typedef_prefix         chaz_ModHand_typedef_prefix
+# define function_prefix        chaz_ModHand_function_prefix
+# define want_short_names       chaz_ModHand_want_short_names
+# define write_charm_h          chaz_ModHand_write_charm_h
+# define build_charm_run        chaz_ModHand_build_charm_run
+# define Start_Short_Names      Chaz_ModHand_Start_Short_Names
+# define End_Short_Names        Chaz_ModHand_End_Short_Names
+# define capture_output         chaz_ModHand_capture_output 
+# define shorten_constant       chaz_ModHand_shorten_constant
+# define shorten_macro          chaz_ModHand_shorten_macro
+# define shorten_typedef        chaz_ModHand_shorten_typedef
+# define shorten_function       chaz_ModHand_shorten_function
+# define Start_Run              Chaz_ModHand_Start_Run
+# define End_Run                Chaz_ModHand_End_Run
 #endif
 
 #endif /* H_CHAZ_CORE */
