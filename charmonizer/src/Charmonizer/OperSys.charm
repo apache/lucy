@@ -1,0 +1,128 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include <stdlib.h>
+#include <string.h>
+
+#include "Charmonizer/Util.h"
+#include "Charmonizer/OperSys.h"
+
+static void
+probe_devnull(OperSys *self);
+
+static void
+destroy(OperSys *self);
+
+static void
+remove_exe(OperSys *self, char *name);
+
+static void
+remove_obj(OperSys *self, char *name);
+
+/* Concatenate [ext] onto the end of [name] and try to remove it.
+ */
+static void
+concat_and_remove(OperSys *self, char *name, char *ext);
+
+chaz_OperSys*
+chaz_OS_new(const char *name) 
+{
+    OperSys *self = (OperSys*)malloc(sizeof(OperSys));
+
+    if (verbosity)
+        printf("Creating os object...\n");
+
+    self->name = strdup(name);
+    self->buf        = NULL;
+    self->buf_len    = 0;
+    self->remove_obj = remove_obj;
+    self->remove_exe = remove_exe;
+    self->destroy    = destroy;
+
+    if (strcmp(name, "mswin32") == 0) {
+        self->obj_ext = strdup(".obj");
+        self->exe_ext = strdup(".exe");
+        self->local_command_start = strdup(".\\");
+        self->devnull = strdup("nul");
+    }
+    else {
+        self->obj_ext = strdup("");
+        self->exe_ext = strdup("");
+        self->local_command_start = strdup("./");
+        probe_devnull(self);
+    }
+
+    return self;
+}
+
+static void
+probe_devnull(OperSys *self)
+{
+    char *const devnull_options[] = {
+        "/dev/null", 
+        "/dev/nul", 
+        NULL
+    };
+    int i;
+
+    if (verbosity)
+        printf("Trying to find a bit-bucket a la /dev/null...\n");
+
+    for (i = 0; devnull_options[i] != NULL; i++) {
+        if (can_open_file(devnull_options[i])) {
+            self->devnull = strdup(devnull_options[i]);
+            return;
+        }
+    }
+
+    die("Couldn't find anything like /dev/null");
+}
+
+static void
+destroy(OperSys *self)
+{
+    free(self->buf);
+    free(self->name);
+    free(self->obj_ext);
+    free(self->exe_ext);
+    free(self->local_command_start);
+    free(self->devnull);
+    free(self);
+}
+
+static void
+remove_exe(OperSys *self, char *name)
+{
+    concat_and_remove(self, name, self->exe_ext);
+}
+
+static void
+remove_obj(OperSys *self, char *name)
+{
+    concat_and_remove(self, name, self->obj_ext);
+}
+
+static void
+concat_and_remove(OperSys *self, char *name, char *ext)
+{
+    self->buf_len = grow_buf(&self->buf, self->buf_len, 
+        strlen(name) + strlen(ext));
+    sprintf(self->buf, "%s%s", name, ext);
+    remove(self->buf);
+}
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
