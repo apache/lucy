@@ -1,0 +1,49 @@
+/* Charmonizer/Compilers.h
+ */
+
+#ifndef H_CHAZ_COMPILERS
+#define H_CHAZ_COMPILERS
+
+/* Compilers which Charmonizer currently supports:
+ */
+typedef enum {
+    CHAZ_CC_unknown,
+    CHAZ_CC_GCC,
+    CHAZ_CC_MSVC
+} chaz_CC_compiler_t;
+
+extern chaz_CC_compiler_t chaz_CC_compiler;
+
+/* Detect which compiler we're running and set a few variables accordingly.
+ */
+void 
+chaz_CC_detect();
+
+#ifdef CHAZ_USE_SHORT_NAMES
+# define CC_compiler_t            chaz_CC_compiler_t
+# define CC_unknown               CHAZ_CC_unknown
+# define CC_GCC                   CHAZ_CC_GCC
+# define CC_MSVC                  CHAZ_CC_MSVC
+# define CC_compiler              chaz_CC_compiler
+# define CC_detect                chaz_CC_detect
+#endif
+
+#endif /* H_CHAZ_COMPILERS */
+
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
