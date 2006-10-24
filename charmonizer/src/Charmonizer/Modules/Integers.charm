@@ -211,9 +211,10 @@ chaz_Integers_run(FILE *conf_fh)
                 && strcmp(output, "18446744073709551615") == 0
             ) {
                 append_conf(conf_fh, 
-                    "#define I64P \"%sd\"\n"
-                    "#define U64P \"%su\"\n",
-                    options[i], options[i]
+                    "#define %sI64P \"%sd\"\n"
+                    "#define %sU64P \"%su\"\n",
+                    macro_prefix, options[i], 
+                    macro_prefix, options[i]
                 );
                 break;
             }
