@@ -17,6 +17,7 @@ my $base_dir = -e 'charmonizer' ? curdir() : updir();
 my $METAQUOTE_EXE_PATH     = 'metaquote';
 my $CHARMONIZE_EXE_PATH    = 'charmonize';
 my $CHARMONIZER_SOURCE_DIR = catdir( $base_dir, 'charmonizer', 'src' );
+my $FILTERED_DIR = catdir( $base_dir, qw( charmonizer filtered_src ) );
 
 my $EXTRA_CCFLAGS
     = $ENV{DEBUG_CHARM} ? " -ansi -pedantic -Wall -Wextra -std=c89 " : "";
@@ -49,18 +50,18 @@ sub ACTION_metaquote {
 
 # Build the charmonize executable.
 sub ACTION_charmonizer {
-    my $self         = shift;
-    my $filtered_dir = catdir( $base_dir, qw( charmonizer filtered_src ) );
-    if ( !-d $filtered_dir ) {
-        mkpath($filtered_dir) or die "can't mkpath '$filtered_dir': $!";
-    }
+    my $self = shift;
 
     $self->dispatch('metaquote');
 
-    my $charm_source_files
-        = $self->_find_charm_source_files($CHARMONIZER_SOURCE_DIR);
+    # gather .charm and .harm files and run them through metaquote
+    if ( !-d $FILTERED_DIR ) {
+        mkpath($FILTERED_DIR) or die "can't mkpath '$FILTERED_DIR': $!";
+    }
+    my $charm_source_files = $self->_find_files( $CHARMONIZER_SOURCE_DIR,
+        sub { $File::Find::name =~ /\.c?harm$/ } );
     my $filtered_files = $self->_metaquote_charm_files($charm_source_files);
-    my $charmonize_c   = catfile($base_dir, qw( charmonizer charmonize.c ) );
+    my $charmonize_c   = catfile( $base_dir, qw( charmonizer charmonize.c ) );
     my @all_source     = ( $charmonize_c, @$filtered_files );
 
     # don't compile if we're up to date
@@ -73,6 +74,7 @@ sub ACTION_charmonizer {
     my @o_files;
     for (@all_source) {
         next unless /\.c$/;
+        next if m#Charmonizer/Test#;
         my $o_file = $cbuilder->object_file($_);
         push @o_files, $o_file;
 
@@ -80,7 +82,7 @@ sub ACTION_charmonizer {
 
         $cbuilder->compile(
             source               => $_,
-            include_dirs         => [$filtered_dir],
+            include_dirs         => [$FILTERED_DIR],
             extra_compiler_flags => $EXTRA_CCFLAGS,
         );
     }
@@ -90,16 +92,16 @@ sub ACTION_charmonizer {
         exe_file => $CHARMONIZE_EXE_PATH,
     );
 
-    $self->add_to_cleanup( $filtered_dir, @$filtered_files, @o_files,
+    $self->add_to_cleanup( $FILTERED_DIR, @$filtered_files, @o_files,
         $CHARMONIZE_EXE_PATH, );
 }
 
-sub _find_charm_source_files {
-    my ( $self, $dir ) = @_;
+sub _find_files {
+    my ( $self, $dir, $test_sub ) = @_;
     my @files;
     find(
         {   wanted => sub {
-                if ( $File::Find::name =~ /\.c?harm$/ ) {
+                if ( $test_sub->() and $File::Find::name !~ /\.\.?$/ ) {
                     push @files, $File::Find::name;
                 }
             },
@@ -150,7 +152,7 @@ sub ACTION_lucyconf {
     print "\nWriting $lucyconf_path...\n\n";
 
     # write the infile with which to communicate args to charmonize
-    my $os_name = lc($Config{osname});
+    my $os_name = lc( $Config{osname} );
     open( my $infile_fh, '>', $lucyconf_in )
         or die "Can't open '$lucyconf_in': $!";
     print $infile_fh qq|
@@ -171,11 +173,47 @@ sub ACTION_lucyconf {
     unlink($lucyconf_in) or die "Can't unlink '$lucyconf_in': $!";
 
     $self->add_to_cleanup($lucyconf_path);
+
+    # generated when ./charmonize is run
+    $self->add_to_cleanup("_charm_test.h");
+}
+
+sub ACTION_build_charm_test {
+    my $self = shift;
+
+    $self->dispatch('lucyconf');
+
+    # collect source files
+    my $source_path     = catfile( $base_dir, 'charmonizer', 'charm_test.c' );
+    my $exe_path        = "charm_test$Config{_exe}";
+    my $test_source_dir = catdir( $FILTERED_DIR, qw( Charmonizer Test ) );
+    my $source_files = $self->_find_files( $FILTERED_DIR,
+        sub { $File::Find::name =~ m#Charmonizer/Test/.*?\.c$# } );
+    push @$source_files, $source_path;
+
+    my $cbuilder = ExtUtils::CBuilder->new;
+
+    # compile and link "charm_test"
+    my @o_files;
+    for (@$source_files) {
+        my $o_file = $cbuilder->compile(
+            source               => $_,
+            extra_compiler_flags => $EXTRA_CCFLAGS,
+            include_dirs         => [ $FILTERED_DIR, curdir() ],
+        );
+        push @o_files, $o_file;
+    }
+    $cbuilder->link_executable(
+        objects  => \@o_files,
+        exe_file => $exe_path,
+    );
+
+    $self->add_to_cleanup( @o_files, $exe_path );
 }
 
 sub ACTION_code {
     my $self = shift;
-    $self->dispatch('lucyconf');
+    $self->dispatch('build_charm_test');
     $self->SUPER::ACTION_code(@_);
 }
 
