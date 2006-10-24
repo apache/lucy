@@ -219,6 +219,7 @@ chaz_ModHand_write_charm_test_h()
         die("Couldn't open '_charm_test.h': %s", strerror(errno));
 
     fprintf(charm_test_h_fh, "#define %sUSE_SHORT_NAMES\n", constant_prefix);
+    fprintf(charm_test_h_fh, "#define CHAZ_OS_NAME \"%s\"\n", os->name);
 
     want_charm_test_h = true;
 }

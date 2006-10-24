@@ -7,8 +7,7 @@
  * else.
  */
 void
-chaz_init(FILE *conf_fh, const char *os_name, const char *cc_command, 
-          const char *cc_flags);
+chaz_init(const char *os_name, const char *cc_command, const char *cc_flags);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
  * should be called only after everything else finishes.
