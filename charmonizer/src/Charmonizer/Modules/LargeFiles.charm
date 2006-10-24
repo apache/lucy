@@ -2,7 +2,7 @@
 
 #include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/Util.h"
-#include "Charmonizer/LargeFiles.h"
+#include "Charmonizer/Modules/LargeFiles.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

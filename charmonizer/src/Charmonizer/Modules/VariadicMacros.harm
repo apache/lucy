@@ -1,20 +1,20 @@
-/* Charmonizer/UnusedVars.h
+/* Charmonizer/Modules/VariadicMacros.h
  */
 
-#ifndef H_CHAZ_UNUSED_VARS
-#define H_CHAZ_UNUSED_VARS 
+#ifndef H_CHAZ_VARIADIC_MACROS
+#define H_CHAZ_VARIADIC_MACROS 
 
 #include <stdio.h>
 
-/* Run the UnusedVars module.
+/* Run the VariadicMacros module.
  */
-void chaz_UnusedVars_run(FILE *conf_fh);
+void chaz_VariadicMacros_run(FILE *conf_fh);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define UnusedVars_run    chaz_UnusedVars_run
+# define VariadicMacros_run    chaz_VaradicMacros_run
 #endif
 
-#endif /* H_CHAZ_UNUSED_VARS */
+#endif /* H_CHAZ_VARIADIC_MACROS */
 
 
 /**

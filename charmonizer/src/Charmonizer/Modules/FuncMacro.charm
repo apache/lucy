@@ -2,7 +2,7 @@
 
 #include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/Util.h"
-#include "Charmonizer/FuncMacro.h"
+#include "Charmonizer/Modules/FuncMacro.h"
 #include <string.h>
 #include <stdio.h>
 

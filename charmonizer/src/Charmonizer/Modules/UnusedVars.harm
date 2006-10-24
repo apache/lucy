@@ -1,20 +1,20 @@
-/* Charmonizer/LargeFiles.h
+/* Charmonizer/Modules/UnusedVars.h
  */
 
-#ifndef H_CHAZ_LARGE_FILES
-#define H_CHAZ_LARGE_FILES
+#ifndef H_CHAZ_UNUSED_VARS
+#define H_CHAZ_UNUSED_VARS 
 
 #include <stdio.h>
 
-/* Run the LargeFiles module.
+/* Run the UnusedVars module.
  */
-void chaz_LargeFiles_run(FILE *conf_fh);
+void chaz_UnusedVars_run(FILE *conf_fh);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define LargeFiles_run    chaz_LargeFiles_run
+# define UnusedVars_run    chaz_UnusedVars_run
 #endif
 
-#endif /* H_CHAZ_LARGE_FILES */
+#endif /* H_CHAZ_UNUSED_VARS */
 
 
 /**

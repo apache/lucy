@@ -1,4 +1,4 @@
-/* Charmonizer/Integers.h -- info about integer types and sizes.
+/* Charmonizer/Modules/Integers.h -- info about integer types and sizes.
  *
  * One or the other of these will be defined.
  * 
