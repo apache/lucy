@@ -137,25 +137,29 @@ chaz_Integers_run(FILE *conf_fh)
     if (sizeof_char == 1) {
         has_8 = true;
         append_conf(conf_fh,
+            "#define %sHAS_I8_T\n"
             "typedef char %si8_t;\n"
             "typedef unsigned char %su8_t;\n",
-            typedef_prefix, typedef_prefix
+            constant_prefix, typedef_prefix, typedef_prefix
         );
     }
     if (sizeof_short == 2) {
         has_16 = true;
         append_conf(conf_fh,
+            "#define %sHAS_I16_T\n"
             "typedef short %si16_t;\n"
             "typedef unsigned short %su16_t;\n",
-            typedef_prefix, typedef_prefix
+            constant_prefix, typedef_prefix, typedef_prefix
         );
     }
     if (sizeof_int == 4 || sizeof_long == 4) {
         char *type = sizeof_int == 4 ? "int" : "long";
         has_32 = true;
         append_conf(conf_fh,
+            "#define %sHAS_I32_T\n"
             "typedef %s %si32_t;\n"
             "typedef unsigned %s %su32_t;\n",
+            constant_prefix,
             type, typedef_prefix, 
             type, typedef_prefix
         );
@@ -192,8 +196,10 @@ chaz_Integers_run(FILE *conf_fh)
         /* we have 64-bit ints, so add the typedef */
         has_64 = true;
         append_conf(conf_fh,
+            "#define %sHAS_I64_T\n"
             "typedef %s %si64_t;\n"
             "typedef unsigned %s %su64_t;\n",
+            constant_prefix,
             type, typedef_prefix, 
             type, typedef_prefix
         );
@@ -252,19 +258,23 @@ chaz_Integers_run(FILE *conf_fh)
         shorten_typedef(conf_fh, "bool_t");
 
         if (has_8) {
+            shorten_constant(conf_fh, "HAS_I8_T");
             shorten_typedef(conf_fh, "i8_t");
             shorten_typedef(conf_fh, "u8_t");
         }
         if (has_16) {
+            shorten_constant(conf_fh, "HAS_I16_T");
             shorten_typedef(conf_fh, "i16_t");
             shorten_typedef(conf_fh, "u16_t");
         }
         if (has_32) {
+            shorten_constant(conf_fh, "HAS_I32_T");
             shorten_typedef(conf_fh, "i32_t");
             shorten_typedef(conf_fh, "u32_t");
         }
 
         if (has_64) {
+            shorten_constant(conf_fh, "HAS_I64_T");
             shorten_typedef(conf_fh, "i64_t");
             shorten_typedef(conf_fh, "u64_t");
             shorten_macro(conf_fh, "I64P");
