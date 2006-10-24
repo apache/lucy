@@ -16,6 +16,18 @@ chaz_TestHand_report(int value, const char *message, int test_num)
     }
 }
 
+void
+chaz_TestHand_report_skip(const char *message, int test_num)
+{
+    printf("%-4d skip: %s\n", test_num, message);
+}
+
+void
+chaz_TestHand_report_skip_remaining(const char *message, int remaining)
+{
+    printf("Skipping all %d remaining tests: %s\n", remaining, message);
+}
+
 /**
  * Copyright 2006 The Apache Software Foundation
  *

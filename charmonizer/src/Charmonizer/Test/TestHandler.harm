@@ -44,10 +44,20 @@ void
 chaz_TestHand_test_VariadicMacros(
     int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
 
-/* Print a message to stderr indicating pass/fail based on [value].
+/* Print a message indicating pass/fail based on [value].
  */
 chaz_bool_t
 chaz_TestHand_report(int value, const char *message, int test_num);
+
+/* Print a message indicating that a test was skipped.
+ */
+void
+chaz_TestHand_report_skip(const char *message, int test_num);
+
+/* Print a message indicating that all remaining tests will be skipped.
+ */
+void
+chaz_TestHand_report_skip_remaining(const char *message, int remaining);
 
 /* Wrap a call to report(), incrementing tallies based on the results of the
  * test.
@@ -62,6 +72,18 @@ chaz_TestHand_report(int value, const char *message, int test_num);
              (*num_failed)++; \
      } while (0)
 
+#define Chaz_TestHand_Skip(message) \
+    do { \
+        test_num++; \
+        chaz_TestHand_report_skip(message, test_num); \
+    } while (0)
+
+#define Chaz_TestHand_Skip_Remaining(message) \
+    do { \
+        chaz_TestHand_report_skip_remaining(message, *num_skipped); \
+        return; \
+    } while (0)
+
 #ifdef CHAZ_USE_SHORT_NAMES
 # define TestHand_test_FuncMacro        chaz_TestHand_test_FuncMacro
 # define TestHand_test_Integers         chaz_TestHand_test_Integers
@@ -69,7 +91,11 @@ chaz_TestHand_report(int value, const char *message, int test_num);
 # define TestHand_test_UnusedVars       chaz_TestHand_test_UnusedVars
 # define TestHand_test_VariadicMacros   chaz_TestHand_test_VariadicMacros
 # define TestHand_report                chaz_TestHand_report
+# define TestHand_report_skip           chaz_TestHand_report_skip
+# define TestHand_report_skip_remaining chaz_TestHand_report_skip_remaining
 # define Assert_True                    Chaz_TestHand_Assert_True
+# define Skip                           Chaz_TestHand_Skip
+# define Skip_Remaining                 Chaz_TestHand_Skip_Remaining
 #endif
 
 #endif /* H_CHAZ_TEST_HANDLER */
