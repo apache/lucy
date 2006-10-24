@@ -1,0 +1,93 @@
+/* Charmonizer/Test/TestHandler.h - test Charmonizer's output.
+ */
+
+#ifndef H_CHAZ_TEST_HANDLER
+#define H_CHAZ_TEST_HANDLER
+
+#include "Charmonizer/Defines.h"
+
+/* These tests all require the file _charm_test.h.  See the documentation for
+ * Charmonizer.h for instructions on how to produce it.
+ *
+ * No other header files should be included other than _charm_test.h and this
+ * one.
+ * 
+ * Since Charmonizer conditionally defines many symbols, it is difficult to
+ * tell whether a symbol is missing because it should not have been generated,
+ * or whether it is missing because an error occurred.  These test functions
+ * make the assumption that any missing symbols have a good excuse for their
+ * absence, and test only defined symbols.  This may result in undetected
+ * failure some of the time.  However, missing symbols required by your
+ * application will trigger compile time errors, so the problem is less severe
+ * than it appears, affecting only fallbacks.
+ *
+ * Each test function accepts four arguments: pointers to integers which the
+ * function will modify. All diagnostic information is printed to stderr.
+ */
+void 
+chaz_TestHand_test_FuncMacro(
+    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+
+void 
+chaz_TestHand_test_Integers(
+    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+
+void 
+chaz_TestHand_test_LargeFiles(
+    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+
+void 
+chaz_TestHand_test_UnusedVars(
+    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+
+void 
+chaz_TestHand_test_VariadicMacros(
+    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+
+/* Print a message to stderr indicating pass/fail based on [value].
+ */
+chaz_bool_t
+chaz_TestHand_report(int value, const char *message, int test_num);
+
+/* Wrap a call to report(), incrementing tallies based on the results of the
+ * test.
+ */
+#define Chaz_TestHand_Assert_True(expression, message) \
+     do { \
+         test_num++; \
+         (*num_skipped)--; \
+         if (chaz_TestHand_report(expression, message, test_num)) \
+             (*num_passed)++; \
+         else \
+             (*num_failed)++; \
+     } while (0)
+
+#ifdef CHAZ_USE_SHORT_NAMES
+# define TestHand_test_FuncMacro        chaz_TestHand_test_FuncMacro
+# define TestHand_test_Integers         chaz_TestHand_test_Integers
+# define TestHand_test_LargeFiles       chaz_TestHand_test_LargeFiles
+# define TestHand_test_UnusedVars       chaz_TestHand_test_UnusedVars
+# define TestHand_test_VariadicMacros   chaz_TestHand_test_VariadicMacros
+# define TestHand_report                chaz_TestHand_report
+# define Assert_True                    Chaz_TestHand_Assert_True
+#endif
+
+#endif /* H_CHAZ_TEST_HANDLER */
+
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+

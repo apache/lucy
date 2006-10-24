@@ -1,0 +1,113 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "Charmonizer/Test/TestHandler.h"
+#include "_charm_test.h"
+
+
+void 
+chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed, 
+                            int *num_skipped)
+{
+    int test_num  = 0;
+    *num_tests    = 27;
+    *num_passed   = 0;
+    *num_failed   = 0;
+    *num_skipped  = *num_tests;
+
+    {
+        long one= 1;
+        long big_endian = !(*((char *)(&one)));
+#ifdef BIG_ENDIAN
+    Assert_True(big_endian, "BIG_ENDIAN");
+#else
+ #if defined(LITTLE_ENDIAN)
+    Assert_True(!big_endian, "LITTLE_ENDIAN");
+ #else
+    Assert_True(0, "Either BIG_ENDIAN nor LITTLE_ENDIAN should be defined");
+ #endif
+#endif
+    }
+    
+    Assert_True((SIZEOF_CHAR  == sizeof(char)),  "SIZEOF_CHAR");
+    Assert_True((SIZEOF_SHORT == sizeof(short)), "SIZEOF_SHORT");
+    Assert_True((SIZEOF_INT   == sizeof(int)),   "SIZEOF_INT");
+    Assert_True((SIZEOF_LONG  == sizeof(long)),  "SIZEOF_LONG");
+    Assert_True((SIZEOF_PTR   == sizeof(void*)), "SIZEOF_PTR");
+
+#ifdef HAS_LONG_LONG
+    Assert_True((SIZEOF_LONG_LONG == sizeof(long long)), 
+        "HAS_LONG_LONG and SIZEOF_LONG_LONG");
+#endif
+    
+#ifdef HAS_INTTYPES_H
+    #include <inttypes.h>
+    Assert_True((sizeof(int8_t) == 1), "HAS_INTTYPES_H");
+#endif
+    
+    {
+        bool_t the_truth = true;
+        Assert_True(the_truth, "bool_t true");
+        Assert_True(!false, "false is false");
+    }
+#ifdef HAS_I8_T
+    {
+        i8_t foo = -100;
+        u8_t bar = 200;
+        Assert_True((foo == -100), "i8_t is signed");
+        Assert_True((bar == 200), "u8_t is unsigned");
+        Assert_True((sizeof(i8_t) == 1), "i8_t is 1 byte");
+        Assert_True((sizeof(u8_t) == 1), "u8_t is 1 byte");
+    }
+#endif
+#ifdef HAS_I16_T
+    {
+        i16_t foo = -100;
+        u16_t bar = 30000;
+        Assert_True((foo == -100), "i16_t is signed");
+        Assert_True((bar == 30000), "u16_t is unsigned");
+        Assert_True((sizeof(i16_t) == 2), "i16_t is 2 bytes");
+        Assert_True((sizeof(u16_t) == 2), "u16_t is 2 bytes");
+    }
+#endif
+#ifdef HAS_I32_T
+    {
+        i32_t foo = -100;
+        u32_t bar = (u32_t)4000000000;
+        Assert_True((foo == -100), "i32_t is signed");
+        Assert_True((bar == (u32_t)4000000000), "u32_t is unsigned");
+        Assert_True((sizeof(i32_t) == 4), "i32_t is 4 bytes");
+        Assert_True((sizeof(u32_t) == 4), "u32_t is 4 bytes");
+    }
+#endif
+#ifdef HAS_I64_T
+    {
+        char buf[100];
+        i64_t foo = -100;
+        u64_t bar = (u64_t)18000000000000000000;
+        Assert_True((foo == -100), "i64_t is signed");
+        Assert_True((bar == (u64_t)18000000000000000000), 
+            "u64_t is unsigned");
+        Assert_True((sizeof(i64_t) == 8), "i64_t is 8 bytes");
+        Assert_True((sizeof(u64_t) == 8), "u64_t is 8 bytes");
+        sprintf(buf, U64P, bar);
+        Assert_True(strcmp(buf, "18000000000000000000"), "U64P");
+    }
+#endif
+}
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
