@@ -16,7 +16,7 @@
 /* Process command line args, set up Charmonizer, etc. Returns the outpath
  * (where the config file should be written to).
  */
-char*
+FILE*
 init(int argc, char **argv);
 
 /* Find <tag_name> and </tag_name> within a string and return the text between
@@ -42,14 +42,7 @@ die(char *format, ...);
 
 int main(int argc, char **argv) 
 {
-    FILE *config_fh;
-
-    /* parse commmand line args, init Charmonizer, open outfile */
-    char *outpath = init(argc, argv);
-    config_fh = fopen(outpath, "w");
-    if (config_fh == NULL)
-        die("Couldn't open '%s': %s", strerror(errno));
-    start_conf_file(config_fh);
+    FILE *config_fh = init(argc, argv);
 
     /* modules section */
     chaz_FuncMacro_run(config_fh);
@@ -61,19 +54,19 @@ int main(int argc, char **argv)
     /* write tail of config and clean up */
     finish_conf_file(config_fh);
     if (fclose(config_fh))
-        die("Error closing file '%s': %s", outpath, strerror(errno));
-    free(outpath);
+        die("Error closing config file: %s", strerror(errno));
     chaz_clean_up();
 
     return 0;
 }
 
-char* 
+FILE* 
 init(int argc, char **argv) 
 {
     char *outpath, *cc_command, *cc_flags, *os_name;
     char *infile_str;
     size_t infile_len;
+    FILE *conf_fh;
 
     /* parse the infile */
     if (argc != 2)
@@ -84,8 +77,14 @@ init(int argc, char **argv)
     outpath    = extract_delim(infile_str, infile_len, "charm_outpath");
     os_name    = extract_delim(infile_str, infile_len, "charm_os_name");
     
+    /* open outfile */
+    conf_fh = fopen(outpath, "w");
+    if (conf_fh == NULL)
+        die("Couldn't open '%s': %s", strerror(errno));
+    start_conf_file(conf_fh);
+
     /* set up Charmonizer */
-    chaz_init(os_name, cc_command, cc_flags);
+    chaz_init(conf_fh, os_name, cc_command, cc_flags);
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
     chaz_write_charm_test_h();
 
@@ -94,8 +93,9 @@ init(int argc, char **argv)
     free(cc_command);
     free(cc_flags);
     free(os_name);
+    free(outpath);
 
-    return outpath;
+    return conf_fh;
 }
 
 static char*

@@ -10,7 +10,8 @@
 #include "Charmonizer/Core/OperSys.h"
 
 void
-chaz_init(const char *osname, const char *cc_command, const char *cc_flags)
+chaz_init(FILE *conf_fh, const char *osname, const char *cc_command, 
+          const char *cc_flags)
 {
     /* create os and compiler objects */
     os       = OS_new(osname);
@@ -22,6 +23,9 @@ chaz_init(const char *osname, const char *cc_command, const char *cc_flags)
 
     /* dispatch other tasks */
     chaz_ModHand_init();
+
+    /* record the name of the OS -- private, for now */
+    fprintf(conf_fh, "#define CHAZ_OS_NAME \"%s\"\n\n", osname);
 
     if (verbosity)
         printf("Initialization complete.\n");
