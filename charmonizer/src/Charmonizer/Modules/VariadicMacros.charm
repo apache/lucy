@@ -54,9 +54,9 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     /* test for GNU-style variadic macros */
     output = capture_output(gnuc_code, strlen(gnuc_code), &output_len);
     if (output != NULL) {
+        has_gnuc_varmacros = true;
         if (has_varmacros == false) {
             has_varmacros = true;
-            has_gnuc_varmacros = true;
             append_conf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", 
                 constant_prefix);
         }
