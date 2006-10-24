@@ -9,7 +9,7 @@ chaz_TestHand_test_VariadicMacros(int *num_tests, int *num_passed,
                                   int *num_failed, int *num_skipped)
 {
     int test_num  = 0;
-    *num_tests    = 3;
+    *num_tests    = 4;
     *num_passed   = 0;
     *num_failed   = 0;
     *num_skipped  = *num_tests;
@@ -17,14 +17,16 @@ chaz_TestHand_test_VariadicMacros(int *num_tests, int *num_passed,
     chaz_bool_t really_has_var_macs = false;
     int i;
 
-#ifndef HAS_VARIADIC_MACROS
-  #if defined(HAS_ISO_VARIADIC_MACROS) || defined(HAS_GNUC_VARIADIC_MACROS)
-    Assert_True(0, "#defines agree");
-  #else 
+#if defined(HAS_ISO_VARIADIC_MACROS) || defined(HAS_GNUC_VARIADIC_MACROS)
+  #ifdef HAS_VARIADIC_MACROS
     Assert_True(1, "#defines agree");
-    Skip_Remaining("No variadic macro support");
+  #else 
+    Assert_True(0, "#defines agree");
   #endif
+#else
+    Skip_Remaining("No variadic macro support");
 #endif
+
 
 #ifdef HAS_ISO_VARIADIC_MACROS
  #define ISO_TEST(buffer, fmt, ...) \
