@@ -13,6 +13,7 @@ typedef struct TestGroup {
 TestGroup tests[] = {
     { "FuncMacro", chaz_TestHand_test_FuncMacro },
     { "Integers", chaz_TestHand_test_Integers },
+    { "UnusedVars", chaz_TestHand_test_UnusedVars },
     { NULL, NULL }
 };
 
