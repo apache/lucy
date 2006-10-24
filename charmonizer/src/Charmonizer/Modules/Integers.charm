@@ -241,6 +241,11 @@ chaz_Integers_run(FILE *conf_fh)
     if (want_short_names) {
         Start_Short_Names(conf_fh);
 
+        if (machine_is_big_endian())
+            shorten_constant(conf_fh, "BIG_ENDIAN");
+        else 
+            shorten_constant(conf_fh, "LITTLE_ENDIAN");
+
         shorten_constant(conf_fh, "SIZEOF_CHAR");
         shorten_constant(conf_fh, "SIZEOF_SHORT");
         shorten_constant(conf_fh, "SIZEOF_LONG");
