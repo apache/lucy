@@ -14,6 +14,7 @@ TestGroup tests[] = {
     { "FuncMacro", chaz_TestHand_test_FuncMacro },
     { "Integers", chaz_TestHand_test_Integers },
     { "UnusedVars", chaz_TestHand_test_UnusedVars },
+    { "VariadicMacros", chaz_TestHand_test_VariadicMacros },
     { NULL, NULL }
 };
 
