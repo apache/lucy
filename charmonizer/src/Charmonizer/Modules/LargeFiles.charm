@@ -47,6 +47,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
     char *output;
     char fseek_command[10];
     char ftell_command[10];
+    char loff_type[10];
     size_t output_len;
     chaz_bool_t has_off64_t = false;
     int sizeof_off_t = -1;
@@ -63,6 +64,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
             success = true;
             strcpy(fseek_command, "fseeko");
             strcpy(ftell_command, "ftello");
+            strcpy(loff_type, "off_t");
         }
     }
 
@@ -75,6 +77,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
             has_off64_t = true;
             strcpy(fseek_command, "fseeko64");
             strcpy(ftell_command, "ftello64");
+            strcpy(loff_type, "off64_t");
         }
     }
 
@@ -89,14 +92,19 @@ chaz_LargeFiles_run(FILE *conf_fh)
                 success = true;
                 strcpy(fseek_command, "fseek");
                 strcpy(ftell_command, "ftell");
+                strcpy(loff_type, "long");
             }
         }
     }
 
     if (success) {
         append_conf(conf_fh, 
-            "#define %sFTell %s\n" 
-            "#define %sFSeek %s\n",
+            "#define %sHAS_LARGE_FILE_SUPPORT\n"
+            "#define %sLOFFSET_TYPE %s\n"
+            "#define %sLftell %s\n" 
+            "#define %sLfseek %s\n",
+            constant_prefix, 
+            constant_prefix, loff_type,
             function_prefix, ftell_command,
             function_prefix, fseek_command
         );
@@ -104,8 +112,10 @@ chaz_LargeFiles_run(FILE *conf_fh)
 
     if (want_short_names && success) {
         Start_Short_Names(conf_fh);
-        shorten_function(conf_fh, "FTell");
-        shorten_function(conf_fh, "FSeek");
+        shorten_constant(conf_fh, "HAS_LARGE_FILE_SUPPORT");
+        shorten_constant(conf_fh, "LOFFSET_TYPE");
+        shorten_function(conf_fh, "Lftell");
+        shorten_function(conf_fh, "Lfseek");
         End_Short_Names(conf_fh);
     }
     

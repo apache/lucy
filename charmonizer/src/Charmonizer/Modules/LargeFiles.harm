@@ -7,6 +7,14 @@
 #include <stdio.h>
 
 /* Run the LargeFiles module.
+ *
+ * If support for large files is detected, these symbols will be defined.
+ *
+ * HAS_LARGE_FILE_SUPPORT
+ * LOFFSET_TYPE 
+ * Lftell
+ * Lfseek
+ *
  */
 void chaz_LargeFiles_run(FILE *conf_fh);
 
