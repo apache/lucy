@@ -10,7 +10,7 @@ unshift @PATH, curdir();
 
 # capture and parse output of 'charm_test' 
 my $charm_test_output = qx|charm_test|;
-$charm_test_output =~ /TOTAL FAILED: (\d+)/ 
+$charm_test_output =~ /TOTAL FAILED:\s*(\d+)/ 
     or die "Didn't receive expected output from 'charm_test'";
 my $total_failed = $1;
 

@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include "Charmonizer/Test/TestHandler.h"
 
+/* this is the signature for all Charmonizer test functions */
 typedef void
 (*t_func)(int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
 
+/* create an array of test functions to loop through */
 typedef struct TestGroup {
     const char *name;
     t_func func;
 } TestGroup;
-
 TestGroup tests[] = {
     { "FuncMacro", chaz_TestHand_test_FuncMacro },
     { "Integers", chaz_TestHand_test_Integers },
@@ -23,6 +24,7 @@ int main() {
     int total_skipped = 0;
     int i;
 
+    /* loop through test functions, accumulating results */
     for (i = 0; tests[i].name != NULL; i++) {
         t_func test_func = tests[i].func;
         const char *name = tests[i].name;
@@ -38,8 +40,9 @@ int main() {
             num_tests, num_passed, num_failed, num_skipped);
     }
     
+    /* print totals */
     printf("=============================\n");
-    printf("TOTAL TESTS: %d\nTOTAL PASSED: %d\nTOTAL FAILED: %d\n"
+    printf("TOTAL TESTS:   %d\nTOTAL PASSED:  %d\nTOTAL FAILED:  %d\n"
         "TOTAL SKIPPED: %d\n", 
         total_tests, total_passed, total_failed, total_skipped);
     return 0;
