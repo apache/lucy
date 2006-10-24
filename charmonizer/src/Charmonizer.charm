@@ -48,6 +48,10 @@ chaz_set_prefixes(const char *constant_pre, const char *macro_pre,
 {
     want_short_names = true;
 
+    if (want_charm_test_h)
+        die("chaz_set_prefixes must be called prior to "
+            "chaz_write_charm_test_h()");
+
     free(constant_prefix);
     free(macro_prefix);
     free(typedef_prefix);
@@ -67,6 +71,11 @@ chaz_set_verbosity(int level)
 char*
 chaz_slurp_file(char* filepath, size_t *len_ptr) {
     return slurp_file(filepath, len_ptr);
+}
+
+chaz_write_charm_test_h()
+{
+    ModHand_write_charm_test_h();
 }
 
 /**

@@ -45,8 +45,9 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     if (output != NULL) {
         has_varmacros = true;
         has_iso_varmacros = true;
-        fprintf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", constant_prefix);
-        fprintf(conf_fh, "#define %sHAS_ISO_VARIADIC_MACROS\n", 
+        append_conf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", 
+            constant_prefix);
+        append_conf(conf_fh, "#define %sHAS_ISO_VARIADIC_MACROS\n", 
             constant_prefix);
     }
 
@@ -56,10 +57,10 @@ chaz_VariadicMacros_run(FILE *conf_fh)
         if (has_varmacros == false) {
             has_varmacros = true;
             has_gnuc_varmacros = true;
-            fprintf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", 
+            append_conf(conf_fh, "#define %sHAS_VARIADIC_MACROS\n", 
                 constant_prefix);
         }
-        fprintf(conf_fh, "#define %sHAS_GNUC_VARIADIC_MACROS\n", 
+        append_conf(conf_fh, "#define %sHAS_GNUC_VARIADIC_MACROS\n", 
             constant_prefix);
     }
 

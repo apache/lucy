@@ -94,7 +94,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
     }
 
     if (success) {
-        fprintf(conf_fh, 
+        append_conf(conf_fh, 
             "#define %sFTell %s\n" 
             "#define %sFSeek %s\n",
             function_prefix, ftell_command,

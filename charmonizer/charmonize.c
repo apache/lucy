@@ -87,6 +87,7 @@ init(int argc, char **argv)
     /* set up Charmonizer */
     chaz_init(os_name, cc_command, cc_flags);
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
+    chaz_write_charm_test_h();
 
     /* clean up */
     free(infile_str);

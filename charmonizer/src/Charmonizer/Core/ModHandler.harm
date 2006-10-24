@@ -22,6 +22,8 @@ struct chaz_Compiler;
 extern struct chaz_OperSys  *chaz_ModHand_os;
 extern struct chaz_Compiler *chaz_ModHand_compiler;
 extern chaz_bool_t chaz_ModHand_charm_run_available;
+extern FILE* chaz_ModHand_charm_test_h_fh;
+extern chaz_bool_t chaz_ModHand_want_charm_test_h;
 
 extern char *chaz_ModHand_constant_prefix;
 extern char *chaz_ModHand_macro_prefix;
@@ -44,15 +46,22 @@ char*
 chaz_ModHand_capture_output(char *source, size_t source_len, 
                             size_t *output_len);
 
+
+/* First print output to the user-supplied filehandle.  Then, write output to
+ * _charm_test.h, if indicated.
+ */
+void
+chaz_ModHand_append_conf(FILE *conf_fh, char *fmt, ...);
+
 /* Print bookends delimiting a short names block.
  */
 #define Chaz_ModHand_Start_Short_Names(conf_fh) \
-    fprintf(conf_fh, "\n#ifdef %sUSE_SHORT_NAMES\n", \
-        chaz_ModHand_constant_prefix)
+    append_conf(conf_fh, \
+        "\n#ifdef %sUSE_SHORT_NAMES\n", chaz_ModHand_constant_prefix)
 
 #define Chaz_ModHand_End_Short_Names(conf_fh) \
-    fprintf(conf_fh, "#endif /* %sUSE_SHORT_NAMES */\n", \
-        chaz_ModHand_constant_prefix)
+    append_conf(conf_fh, \
+        "#endif /* %sUSE_SHORT_NAMES */\n", chaz_ModHand_constant_prefix)
 
 /* Define a shortened version of a constant symbol (minus the prefix);
  */
@@ -74,20 +83,25 @@ chaz_ModHand_shorten_typedef(FILE *conf_fh, const char *symbol);
 void
 chaz_ModHand_shorten_function(FILE *conf_fh, const char *symbol);
 
+/* Signal Charmonizer that it should write _charm_test.h.
+ */
+void
+chaz_ModHand_write_charm_test_h();
+
 /* Print a "chapter heading" when starting a module. 
  */
 #define Chaz_ModHand_Start_Run(filehandle, module_name) \
     do { \
-        fprintf(filehandle, "\n/* %s */\n", module_name); \
+        append_conf(filehandle, "\n/* %s */\n", module_name); \
         if (verbosity > 0) \
             printf("Running %s module...\n", module_name); \
     } while (0)
 
-
 /* Leave a little whitespace at the end of each module.
  */
 #define Chaz_ModHand_End_Run(filehandle) \
-    fprintf(filehandle, "\n")
+    append_conf(filehandle, "\n")
+
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define TRY_SOURCE_PATH        CHAZ_MOD_HAND_TRY_SOURCE_PATH
@@ -96,6 +110,8 @@ chaz_ModHand_shorten_function(FILE *conf_fh, const char *symbol);
 # define os                     chaz_ModHand_os
 # define compiler               chaz_ModHand_compiler
 # define charm_run_available    chaz_ModHand_charm_run_available
+# define charm_test_h_fh        chaz_ModHand_charm_test_h_fh
+# define want_charm_test_h      chaz_ModHand_want_charm_test_h
 # define constant_prefix        chaz_ModHand_constant_prefix
 # define macro_prefix           chaz_ModHand_macro_prefix
 # define typedef_prefix         chaz_ModHand_typedef_prefix
@@ -106,12 +122,14 @@ chaz_ModHand_shorten_function(FILE *conf_fh, const char *symbol);
 # define Start_Short_Names      Chaz_ModHand_Start_Short_Names
 # define End_Short_Names        Chaz_ModHand_End_Short_Names
 # define capture_output         chaz_ModHand_capture_output 
+# define append_conf            chaz_ModHand_append_conf
 # define shorten_constant       chaz_ModHand_shorten_constant
 # define shorten_macro          chaz_ModHand_shorten_macro
 # define shorten_typedef        chaz_ModHand_shorten_typedef
 # define shorten_function       chaz_ModHand_shorten_function
 # define Start_Run              Chaz_ModHand_Start_Run
 # define End_Run                Chaz_ModHand_End_Run
+# define ModHand_write_charm_test_h chaz_ModHand_write_charm_test_h
 #endif
 
 #endif /* H_CHAZ_CORE */

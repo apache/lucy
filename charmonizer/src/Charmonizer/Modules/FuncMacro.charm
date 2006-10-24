@@ -58,7 +58,7 @@ chaz_FuncMacro_run(FILE *conf_fh)
         char *macro_text = has_iso_funcmac 
             ? "__func__"
             : "__FUNCTION__";
-        fprintf(conf_fh, 
+        append_conf(conf_fh, 
             "#define %sHAS_FUNC_MACRO\n"
             "#define %sFunc_Macro %s\n",
             constant_prefix, macro_prefix, macro_text);
@@ -66,11 +66,11 @@ chaz_FuncMacro_run(FILE *conf_fh)
 
     /* write out specific defines */
     if (has_iso_funcmac) {
-       fprintf(conf_fh, "#define %sHAS_ISO_FUNC_MACRO\n",
+       append_conf(conf_fh, "#define %sHAS_ISO_FUNC_MACRO\n",
            constant_prefix);
     }
     if (has_gnuc_funcmac) {
-       fprintf(conf_fh, "#define %sHAS_GNUC_FUNC_MACRO\n",
+        append_conf(conf_fh, "#define %sHAS_GNUC_FUNC_MACRO\n",
            constant_prefix);
     }
 
