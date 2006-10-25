@@ -75,32 +75,26 @@ compile_exe(Compiler *self, const char *source_path, const char *exe_path,
     FILE *app_source_fh, *garbage_fh;
     chaz_bool_t successful;
     OperSys *os = self->os;
-    size_t full_filepath_len = strlen(exe_path) + strlen(os->exe_ext) + 1;
-    char *exe_full_filepath = (char*)malloc(full_filepath_len);
+    char *exe_full_filepath = NULL;
 
-
-    /* tack on the exe_ext */
-    sprintf(exe_full_filepath, "%s%s", exe_path, os->exe_ext);
+    /* tack the exe_ext onto the path */
+    join_strings(&exe_full_filepath, 0, exe_path, os->exe_ext, NULL);
 
     /* write the source file */
     write_file(source_path, code, code_len);
 
-    /* allocate space for the sprintf'd command we'll pass to system() */
-    self->buf_len = grow_buf( &self->buf, self->buf_len, 
-        strlen(self->cc_command) + strlen(self->cc_flags) + 200 );
-
     /* compile the source */
     if (verbosity < 2 && chaz_ModHand_charm_run_available) {
-        sprintf(self->buf, "%s_charm_run %s %s %s%s %s. %s", 
-            os->local_command_start, self->cc_command, source_path, 
-            self->exe_flag, exe_full_filepath, self->include_flag, 
-            self->cc_flags);
+        join_strings(&(self->buf), self->buf_len, 
+            os->local_command_start, "_charm_run ", self->cc_command, " ",
+            source_path, " ", self->exe_flag, exe_full_filepath, " ",
+            self->include_flag, ". ", self->cc_flags, NULL);
     }
     else {
-        sprintf(self->buf, "%s %s %s%s %s. %s", 
-            self->cc_command, source_path, 
-            self->exe_flag, exe_full_filepath, self->include_flag, 
-            self->cc_flags);
+        join_strings(&(self->buf), self->buf_len, 
+            self->cc_command, " ", source_path, " ", self->exe_flag,
+            exe_full_filepath, " ", self->include_flag, ". ", self->cc_flags,
+            NULL);
     }
     system(self->buf);
 
@@ -118,31 +112,26 @@ compile_obj(Compiler *self, const char *source_path, const char *obj_path,
     FILE *app_source_fh, *garbage_fh;
     chaz_bool_t successful;
     OperSys *os = self->os;
-    size_t full_filepath_len = strlen(obj_path) + strlen(os->obj_ext) + 1;
-    char *obj_full_filepath = (char*)malloc(full_filepath_len);
+    char *obj_full_filepath = NULL;
 
-    /* tack on the obj_ext */
-    sprintf(obj_full_filepath, "%s%s", obj_path, os->obj_ext);
+    /* tack the obj_ext onto the path */
+    join_strings(&obj_full_filepath, 0, obj_path, os->obj_ext, NULL);
     
     /* write the source file */
     write_file(source_path, code, code_len);
 
-    /* allocate space for the sprintf'd command we'll pass to system() */
-    self->buf_len = grow_buf( &self->buf, self->buf_len, 
-        strlen(self->cc_command) + strlen(self->cc_flags) + 200 );
-
     /* compile the source */
-    if (verbosity > 2 && chaz_ModHand_charm_run_available) {
-        sprintf(self->buf, "%s_charm_run %s %s %s%s %s. %s", 
-            os->local_command_start, self->cc_command, source_path, 
-            self->object_flag, obj_full_filepath, self->include_flag, 
-            self->cc_flags);
+    if (verbosity < 2 && chaz_ModHand_charm_run_available) {
+        join_strings(&(self->buf), self->buf_len, 
+            os->local_command_start, "_charm_run ", self->cc_command, " ",
+            source_path, " ", self->object_flag, obj_full_filepath, " ",
+            self->include_flag, ". ", self->cc_flags, NULL);
     }
     else {
-        sprintf(self->buf, "%s %s %s%s %s. %s", 
-            self->cc_command, source_path, 
-            self->object_flag, obj_full_filepath, self->include_flag, 
-            self->cc_flags);
+        join_strings(&(self->buf), self->buf_len, 
+            self->cc_command, " ", source_path, " ", self->object_flag,
+            obj_full_filepath, " ", self->include_flag, ". ", self->cc_flags,
+            NULL);
     }
     system(self->buf);
 
