@@ -70,9 +70,9 @@ chaz_Integers_run(FILE *conf_fh)
 
     /* document endian-ness */
     if (machine_is_big_endian())
-        append_conf(conf_fh, "#define %sBIG_ENDIAN\n", constant_prefix);
+        append_conf(conf_fh, "#define %sBIG_END\n", constant_prefix);
     else 
-        append_conf(conf_fh, "#define %sLITTLE_ENDIAN\n", constant_prefix);
+        append_conf(conf_fh, "#define %sLITTLE_END\n", constant_prefix);
 
     /* Record sizeof() for several common integer types. */
     output = capture_output(sizes_code, strlen(sizes_code), &output_len);
@@ -241,9 +241,9 @@ chaz_Integers_run(FILE *conf_fh)
         Start_Short_Names(conf_fh);
 
         if (machine_is_big_endian())
-            shorten_constant(conf_fh, "BIG_ENDIAN");
+            shorten_constant(conf_fh, "BIG_END");
         else 
-            shorten_constant(conf_fh, "LITTLE_ENDIAN");
+            shorten_constant(conf_fh, "LITTLE_END");
 
         shorten_constant(conf_fh, "SIZEOF_CHAR");
         shorten_constant(conf_fh, "SIZEOF_SHORT");

@@ -1,9 +1,10 @@
 /* Charmonizer/Modules/Integers.h -- info about integer types and sizes.
  *
- * One or the other of these will be defined.
+ * One or the other of these will be defined, depending on whether the
+ * processor is big-endian or little-endian.
  * 
- * BIG_ENDIAN
- * LITTLE_ENDIAN
+ * BIG_END
+ * LITTLE_END
  * 
  * These will always be defined:
  * 
