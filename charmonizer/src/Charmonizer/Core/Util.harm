@@ -56,6 +56,29 @@ chaz_Util_can_open_file(char *file_path);
 size_t
 chaz_Util_grow_buf(char **buf_ptr, size_t old_len, size_t new_len);
 
+/* Concatenate each string in a null-terminated list onto the end of [buf].
+ * Grow [buf] first if necessary and return its size.
+ */
+size_t
+chaz_Util_append_strings(char **buf, size_t buf_len, ...);
+
+/* Varargs version of append_str
+ */
+size_t
+chaz_Util_vappend_strings(char **buf, size_t buf_len, va_list args);
+
+/* Replace the contents of [buf] (if any) with a string formed by
+ * concatenating all the char* arguments in a null-terminated list.
+ * Grow [buf] first if necessary and return its size.
+ */
+size_t
+chaz_Util_join_strings(char **buf, size_t buf_len, ...);
+
+/* Varargs version of join_strings.
+ */
+size_t
+chaz_Util_vjoin_strings(char **buf, size_t buf_len, va_list args);
+
 #ifdef CHAZ_USE_SHORT_NAMES
 # define verbosity              chaz_Util_verbosity 
 # define write_file             chaz_Util_write_file 
@@ -66,6 +89,10 @@ chaz_Util_grow_buf(char **buf_ptr, size_t old_len, size_t new_len);
 # define remove_and_verify      chaz_Util_remove_and_verify 
 # define can_open_file          chaz_Util_can_open_file 
 # define grow_buf               chaz_Util_grow_buf
+# define append_strings         chaz_Util_append_strings
+# define vappend_strings        chaz_Util_vappend_strings
+# define join_strings           chaz_Util_join_strings
+# define vjoin_strings          chaz_Util_vjoin_strings
 #endif
 
 #endif /* H_CHAZ_UTIL */

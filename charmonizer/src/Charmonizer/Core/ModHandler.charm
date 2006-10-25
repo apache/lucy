@@ -49,14 +49,11 @@ chaz_ModHand_init()
     size_t len;
 
     /* set the name of the application which we "try" to execute */
-    len = strlen(TRY_APP_BASENAME) + strlen(os->exe_ext) + 1;
-    try_app_path = (char*)malloc(len);
-    sprintf(try_app_path, "%s%s", TRY_APP_BASENAME, os->exe_ext);
+    (void)join_strings(&try_app_path, 0, TRY_APP_BASENAME, os->exe_ext, NULL);
 
     /* set the invocation string for the "try" application */
-    len += strlen(os->local_command_start);
-    try_app_command = (char*)malloc(len);
-    sprintf(try_app_command, "%s%s", os->local_command_start, try_app_path);
+    (void)join_strings(&try_app_command, 0, os->local_command_start,
+        try_app_path, NULL);
 
     /* write files needed by this module and others */
     build_charm_run();
@@ -120,13 +117,11 @@ METAQUOTE;
 static void
 build_charm_run()
 {
-    size_t code_len = strlen(charm_run_code_a) + strlen(charm_run_code_b) +
-        strlen(os->devnull) + 20;
-    char *code = (char*)malloc(code_len);
+    char *code = NULL;
     chaz_bool_t compile_succeeded = false;
 
-    sprintf(code, "%s \"%s\" %s", charm_run_code_a, os->devnull,
-        charm_run_code_b);
+    (void)join_strings(&code, 0, charm_run_code_a, " \"", os->devnull, "\" ",
+        charm_run_code_b, NULL);
 
     compile_succeeded = compiler->compile_exe(compiler, "_charm_run.c", 
         "_charm_run", code, strlen(code));
@@ -134,6 +129,7 @@ build_charm_run()
         die("failed to compile _charm_run helper utility");
 
     remove("_charm_run.c");
+    free(code);
     charm_run_available = true;
 }
 
