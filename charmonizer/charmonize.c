@@ -25,6 +25,12 @@ init(int argc, char **argv);
 static char*
 extract_delim(char *source, size_t source_len, const char *tag_name);
 
+/* Version of extract delim which dies rather than returns NULL upon failure.
+ */
+static char*
+extract_delim_and_verify(char *source, size_t source_len, 
+                         const char *tag_name);
+
 /* Start the config file.
  */
 static void 
@@ -63,7 +69,7 @@ int main(int argc, char **argv)
 FILE* 
 init(int argc, char **argv) 
 {
-    char *outpath, *cc_command, *cc_flags, *os_name;
+    char *outpath, *cc_command, *cc_flags, *os_name, *verbosity_str;
     char *infile_str;
     size_t infile_len;
     FILE *conf_fh;
@@ -72,11 +78,16 @@ init(int argc, char **argv)
     if (argc != 2)
         die("Usage: ./charmonize INFILE");
     infile_str = chaz_slurp_file(argv[1], &infile_len);
-    cc_command = extract_delim(infile_str, infile_len, "charm_cc_command");
-    cc_flags   = extract_delim(infile_str, infile_len, "charm_cc_flags");
-    outpath    = extract_delim(infile_str, infile_len, "charm_outpath");
-    os_name    = extract_delim(infile_str, infile_len, "charm_os_name");
-    
+    cc_command = extract_delim_and_verify(infile_str, infile_len, 
+        "charm_cc_command");
+    cc_flags = extract_delim_and_verify(infile_str, infile_len, 
+        "charm_cc_flags");
+    outpath = extract_delim_and_verify(infile_str, infile_len, 
+        "charm_outpath");
+    os_name = extract_delim_and_verify(infile_str, infile_len, 
+        "charm_os_name");
+    verbosity_str = extract_delim(infile_str, infile_len, "charm_verbosity");
+
     /* open outfile */
     conf_fh = fopen(outpath, "w");
     if (conf_fh == NULL)
@@ -84,6 +95,10 @@ init(int argc, char **argv)
     start_conf_file(conf_fh);
 
     /* set up Charmonizer */
+    if (verbosity_str != NULL) {
+        const long verbosity = strtol(verbosity_str, NULL, 10);
+        chaz_set_verbosity(verbosity);
+    }
     chaz_init(os_name, cc_command, cc_flags);
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
     chaz_write_charm_test_h();
@@ -134,10 +149,16 @@ extract_delim(char *source, size_t source_len, const char *tag_name)
             break;
         }
     }
+    
+    return retval;
+}
 
+static char*
+extract_delim_and_verify(char *source, size_t source_len, const char *tag_name)
+{
+    char *retval = extract_delim(source, source_len, tag_name);
     if (retval == NULL)
         die("Couldn't extract value for '%s'", tag_name);
-    
     return retval;
 }
 
