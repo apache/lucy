@@ -138,6 +138,7 @@ chaz_Util_grow_buf(char **buf, size_t old_len, size_t new_len)
         *buf = realloc(*buf, new_len + 1);
         if (*buf == NULL) 
             die("buffer allocation failed");
+        *((*buf) + new_len) = '\0';
     }
 
     return new_len > old_len ? new_len : old_len;
@@ -160,7 +161,7 @@ size_t
 chaz_Util_vappend_strings(char **buf, size_t buf_len, va_list args)
 {
     char *str;
-    size_t new_len = *buf == NULL ? 0 : strlen(*buf);
+    size_t new_len = buf_len == 0 ? 0 : strlen(*buf);
     size_t retval;
     va_list save_args = args;
 
@@ -170,6 +171,8 @@ chaz_Util_vappend_strings(char **buf, size_t buf_len, va_list args)
     }
     new_len += 1; /* terminating null */
     retval = grow_buf(buf, buf_len, new_len);
+    if (buf_len == 0)
+        (*buf)[0] = '\0';
 
     args = save_args;
 
