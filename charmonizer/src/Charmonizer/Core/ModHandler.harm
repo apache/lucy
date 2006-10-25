@@ -37,6 +37,12 @@ extern chaz_bool_t chaz_ModHand_want_short_names;
 void
 chaz_ModHand_init();
 
+/* Attempt to compile the supplied source code and return true if the
+ * effort succeeds.
+ */
+chaz_bool_t
+chaz_ModHand_test_compile(char *source, size_t source_len);
+
 /* Attempt to compile the supplied source code.  If successful, capture the 
  * output of the program and return a pointer to a newly allocated buffer.
  * If the compilation fails, return NULL.  The length of the captured 
@@ -121,6 +127,7 @@ chaz_ModHand_write_charm_test_h();
 # define build_charm_run        chaz_ModHand_build_charm_run
 # define Start_Short_Names      Chaz_ModHand_Start_Short_Names
 # define End_Short_Names        Chaz_ModHand_End_Short_Names
+# define test_compile           chaz_ModHand_test_compile
 # define capture_output         chaz_ModHand_capture_output 
 # define append_conf            chaz_ModHand_append_conf
 # define shorten_constant       chaz_ModHand_shorten_constant

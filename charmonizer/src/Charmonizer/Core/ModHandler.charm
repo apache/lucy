@@ -97,6 +97,10 @@ static char charm_run_code_a[] = METAQUOTE
             command_len += strlen(argv[i]) + 1;
         }
         command = (char*)calloc(command_len, sizeof(char));
+        if (command == NULL) {
+            fprintf(stderr, "calloc failed\n");
+            exit(1);
+        }
         for (i = 1; i < argc; i++) {
             strcat( strcat(command, " "), argv[i] );
         }
@@ -131,6 +135,22 @@ build_charm_run()
 
     remove("_charm_run.c");
     charm_run_available = true;
+}
+
+chaz_bool_t
+chaz_ModHand_test_compile(char *source, size_t source_len)
+{
+    chaz_bool_t compile_succeeded;
+
+    if ( !remove_and_verify(try_app_path) ) 
+        die("Failed to delete file '%s'", try_app_path);
+
+    compile_succeeded = compiler->compile_exe(compiler, TRY_SOURCE_PATH, 
+        try_app_path, source, source_len);
+
+    clean_up_try();
+
+    return compile_succeeded;
 }
 
 char*
