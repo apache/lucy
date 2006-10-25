@@ -1,6 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "_charm_test.h"
+#include <string.h>
 #include "Charmonizer/Test/TestHandler.h"
 
 void 

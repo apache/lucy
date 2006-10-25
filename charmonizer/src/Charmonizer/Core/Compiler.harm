@@ -48,7 +48,8 @@ struct chaz_Compiler {
 /** Constructor.
  */
 chaz_Compiler*
-chaz_CC_new(struct chaz_OperSys *oper_sys, char *cc_command, char *cc_flags);
+chaz_CC_new(struct chaz_OperSys *oper_sys, const char *cc_command, 
+            const char *cc_flags);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define Compiler                    chaz_Compiler

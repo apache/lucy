@@ -73,6 +73,7 @@ chaz_slurp_file(char* filepath, size_t *len_ptr) {
     return slurp_file(filepath, len_ptr);
 }
 
+void
 chaz_write_charm_test_h()
 {
     ModHand_write_charm_test_h();

@@ -39,6 +39,7 @@ chaz_slurp_file(char* filepath, size_t *len_ptr);
  * _charm_test.h in the current working directory.  This file is needed for
  * testing Charmonizer's output using the files in Charmonizer/Test.
  */
+void
 chaz_write_charm_test_h();
 
 #endif /* include guard */

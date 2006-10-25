@@ -7,14 +7,14 @@ void
 chaz_TestHand_test_UnusedVars(int *num_tests, int *num_passed, 
                               int *num_failed, int *num_skipped)
 {
+    chaz_bool_t unused_var_is_defined = false;
+    chaz_bool_t unreach_is_defined = false;
     int test_num  = 0;
+
     *num_tests    = 2;
     *num_passed   = 0;
     *num_failed   = 0;
     *num_skipped  = *num_tests;
-
-    chaz_bool_t unused_var_is_defined = false;
-    chaz_bool_t unreach_is_defined = false;
 
 #ifdef Unused_Var
     unused_var_is_defined = true;

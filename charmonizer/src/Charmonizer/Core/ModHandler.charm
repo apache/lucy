@@ -46,8 +46,6 @@ static char *try_app_command = NULL;
 void
 chaz_ModHand_init()
 {
-    size_t len;
-
     /* set the name of the application which we "try" to execute */
     (void)join_strings(&try_app_path, 0, TRY_APP_BASENAME, os->exe_ext, NULL);
 
@@ -94,6 +92,9 @@ static char charm_run_code_a[] = METAQUOTE
             command_len += strlen(argv[i]) + 1;
         }
         command = (char*)calloc(command_len, sizeof(char));
+METAQUOTE;
+
+static char charm_run_code_b[] = METAQUOTE
         if (command == NULL) {
             fprintf(stderr, "calloc failed\n");
             exit(1);
@@ -106,7 +107,7 @@ static char charm_run_code_a[] = METAQUOTE
         freopen( 
 METAQUOTE;
 
-static char charm_run_code_b[] = METAQUOTE
+static char charm_run_code_c[] = METAQUOTE
              , "w", stderr);
 
         /* run the commmand and return its value to the parent process */
@@ -120,8 +121,8 @@ build_charm_run()
     char *code = NULL;
     chaz_bool_t compile_succeeded = false;
 
-    (void)join_strings(&code, 0, charm_run_code_a, " \"", os->devnull, "\" ",
-        charm_run_code_b, NULL);
+    (void)join_strings(&code, 0, charm_run_code_a, charm_run_code_b, " \"", 
+        os->devnull, "\" ", charm_run_code_c, NULL);
 
     compile_succeeded = compiler->compile_exe(compiler, "_charm_run.c", 
         "_charm_run", code, strlen(code));

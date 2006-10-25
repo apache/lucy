@@ -11,7 +11,7 @@
  * If support for large files is detected, these symbols will be defined.
  *
  * HAS_LARGE_FILE_SUPPORT
- * LOFFSET_TYPE 
+ * loff_t 
  * Lftell
  * Lfseek
  *

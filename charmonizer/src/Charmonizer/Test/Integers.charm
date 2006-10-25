@@ -2,7 +2,8 @@
 
 #include "Charmonizer/Test/TestHandler.h"
 #include "_charm_test.h"
-
+#include <stdio.h>
+#include <string.h>
 
 void 
 chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed, 

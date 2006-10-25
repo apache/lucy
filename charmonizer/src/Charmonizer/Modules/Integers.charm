@@ -43,7 +43,6 @@ static char long_long_code[] = METAQUOTE
     int main() 
     {
         Charm_Setup;
-        long long foo = 4;
         printf("%d", (int)sizeof(long long));
         return 0;
     }

@@ -24,10 +24,8 @@ static void
 test_compile(Compiler *self);
 
 chaz_Compiler*
-chaz_CC_new(OperSys *oper_sys, char *cc_command, char *cc_flags)
+chaz_CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
 {
-    int i;
-    char *compiler_nick;
     CompilerSpec *compiler_spec = CCSpec_find_spec();
     Compiler *self = (Compiler*)malloc(sizeof(Compiler));
 
@@ -72,7 +70,6 @@ static chaz_bool_t
 compile_exe(Compiler *self, const char *source_path, const char *exe_path, 
             const char *code, size_t code_len)
 {
-    FILE *app_source_fh, *garbage_fh;
     chaz_bool_t successful;
     OperSys *os = self->os;
     char *exe_full_filepath = NULL;
@@ -109,7 +106,6 @@ static chaz_bool_t
 compile_obj(Compiler *self, const char *source_path, const char *obj_path, 
             const char *code, size_t code_len)
 {
-    FILE *app_source_fh, *garbage_fh;
     chaz_bool_t successful;
     OperSys *os = self->os;
     char *obj_full_filepath = NULL;
