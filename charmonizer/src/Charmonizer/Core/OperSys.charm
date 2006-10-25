@@ -18,11 +18,6 @@ remove_exe(OperSys *self, char *name);
 static void
 remove_obj(OperSys *self, char *name);
 
-/* Concatenate [ext] onto the end of [name] and try to remove it.
- */
-static void
-concat_and_remove(OperSys *self, char *name, char *ext);
-
 chaz_OperSys*
 chaz_OS_new(const char *name) 
 {
@@ -92,21 +87,14 @@ destroy(OperSys *self)
 static void
 remove_exe(OperSys *self, char *name)
 {
-    concat_and_remove(self, name, self->exe_ext);
+    join_strings(&(self->buf), self->buf_len, name, self->exe_ext, NULL);
+    remove(self->buf);
 }
 
 static void
 remove_obj(OperSys *self, char *name)
 {
-    concat_and_remove(self, name, self->obj_ext);
-}
-
-static void
-concat_and_remove(OperSys *self, char *name, char *ext)
-{
-    self->buf_len = grow_buf(&self->buf, self->buf_len, 
-        strlen(name) + strlen(ext));
-    sprintf(self->buf, "%s%s", name, ext);
+    join_strings(&(self->buf), self->buf_len, name, self->obj_ext, NULL);
     remove(self->buf);
 }
 
