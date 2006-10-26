@@ -1,0 +1,186 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/HeadCheck.h"
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct Header {
+    char        *name;
+    chaz_bool_t  exists;
+} Header;
+
+static char *code_buf   = NULL;
+static int code_buf_len = 0;
+
+/* hello_world.c without the hello or the world */
+static char test_code[] = "int main() { return 0; }\n";
+
+/* Keep a sorted, dynamically-sized array of names of all headers we've
+ * checked for so far.
+ */
+static int cache_size          = 0;
+static Header **header_cache   = NULL;
+
+/* Comparison function to feed to qsort, bsearch, etc.
+ */
+static int
+compare_headers(const void *vptr_a, const void *vptr_b);
+
+/* Run a test compilation and return a new Header object encapsulating the
+ * results.
+ */
+static Header* 
+discover_header(const char *header_name);
+
+/* Extend the cache, add this Header object to it, and sort.
+ */
+static void
+add_to_cache(Header *header);
+
+/* Like add_to_cache, but takes a individual elements instead of a Header* and
+ * checks if header exists in array first.
+ */
+static void
+maybe_add_to_cache(const char *header_name, chaz_bool_t exists);
+
+void
+chaz_HeadCheck_init()
+{
+    Header *null_header = (Header*)malloc(sizeof(Header));
+
+    /* create terminating record for the dynamic array of Header objects */
+    null_header->name   = NULL;
+    null_header->exists = false;
+    header_cache = (Header**)malloc(sizeof(void*));
+    *header_cache = null_header;
+    cache_size = 1;
+}
+
+chaz_bool_t
+chaz_HeadCheck_check_header(const char *header_name)
+{
+    Header *header;
+    Header  key;
+    Header *fake = &key;
+
+    /* fake up a key to feed to bsearch and see if the header's already there */
+    key.name = (char*)header_name;
+    key.exists = false;
+    header = bsearch(&fake, header_cache, cache_size, sizeof(void*),
+        compare_headers);
+    
+    /* if it's not there, go try a test compile */
+    if (header == NULL) {
+        header = discover_header(header_name);
+        add_to_cache(header);
+    }
+
+    return header->exists;
+}
+
+chaz_bool_t
+chaz_HeadCheck_check_many_headers(const char **header_names)
+{
+    chaz_bool_t success;
+    int i;
+
+    /* build the source code */
+    code_buf_len = join_strings(&code_buf, code_buf_len, " ", NULL);
+    for (i = 0; header_names[i] != NULL; i++) {
+        code_buf_len = append_strings(&code_buf, code_buf_len, "#include <", 
+            header_names[i], ">\n", NULL); 
+    }
+    code_buf_len = append_strings(&code_buf, code_buf_len, test_code, NULL);
+
+    /* if the code compiles, bulk add all header names to the cache */
+    success = test_compile(code_buf, strlen(code_buf));
+    if (success) {
+        for (i = 0; header_names[i] != NULL; i++) {
+            maybe_add_to_cache(header_names[i], true);
+        }
+    }
+
+    return success;
+}
+
+static int
+compare_headers(const void *vptr_a, const void *vptr_b) {
+    Header **const a = (Header**)vptr_a;
+    Header **const b = (Header**)vptr_b;
+
+    /* null is last, so it's "greater than" any string */
+    if ((*a)->name == NULL)
+        return 1;
+    else if ((*b)->name == NULL)
+        return -1;
+    else
+        return strcmp((*a)->name, (*b)->name);
+}
+
+static Header* 
+discover_header(const char *header_name) {
+    Header* header = (Header*)malloc(sizeof(Header));
+    
+    header->name = strdup(header_name);
+
+    /* see whether code that tries to pull in this header compiles */
+    code_buf_len = join_strings(&code_buf, code_buf_len, "#include <",
+        header_name, ">\n", test_code, NULL);
+    header->exists = test_compile(code_buf, strlen(code_buf))
+        ? true : false;
+
+    return header;
+}
+
+static void
+add_to_cache(Header *header)
+{
+    /* realloc array -- inefficient, but this isn't a bottleneck */
+    cache_size++;
+    header_cache = (Header**)realloc(header_cache, (cache_size * sizeof(void*)));
+    header_cache[ cache_size - 1 ] = header;
+
+    /* keep the list of headers sorted */
+    qsort(header_cache, cache_size, sizeof(*header_cache), compare_headers);
+}
+
+static void
+maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
+{
+    Header *header;
+    Header  key;
+    Header *fake = &key;
+
+    /* fake up a key and bsearch for it */
+    key.name   = (char*)header_name;
+    key.exists = exists;
+    header = bsearch(&fake, header_cache, cache_size, sizeof(void*),
+        compare_headers);
+    
+    /* we've already done the test compile, so skip that step and add it */
+    if (header == NULL) {
+        header = (Header*)malloc(sizeof(Header));
+        header->name   = strdup(header_name);
+        header->exists = exists;
+        add_to_cache(header);
+    }
+}
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
