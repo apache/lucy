@@ -4,14 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Charmonizer.h"
+#include "Charmonizer/Core/HeadCheck.h"
 #include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/OperSys.h"
 
 void
-chaz_init(const char *osname, const char *cc_command, const char *cc_flags)
+chaz_init(FILE *conf_fh, const char *osname, const char *cc_command,    
+          const char *cc_flags)
 {
+    (void)conf_fh; /* unused for now */
+
     /* create os and compiler objects */
     os       = OS_new(osname);
     compiler = CC_new(os, cc_command, cc_flags);
@@ -21,7 +25,8 @@ chaz_init(const char *osname, const char *cc_command, const char *cc_flags)
     want_short_names = false;
 
     /* dispatch other tasks */
-    chaz_ModHand_init();
+    ModHand_init();
+    HeadCheck_init();
 
     if (verbosity)
         printf("Initialization complete.\n");

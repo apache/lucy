@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include "Charmonizer.h"
 #include "Charmonizer/Modules/FuncMacro.h"
+#include "Charmonizer/Modules/Headers.h"
 #include "Charmonizer/Modules/Integers.h"
 #include "Charmonizer/Modules/LargeFiles.h"
 #include "Charmonizer/Modules/UnusedVars.h"
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
     FILE *config_fh = init(argc, argv);
 
     /* modules section */
+    chaz_Headers_run(config_fh);
     chaz_FuncMacro_run(config_fh);
     chaz_Integers_run(config_fh);
     chaz_LargeFiles_run(config_fh);
@@ -99,7 +101,7 @@ init(int argc, char **argv)
         const long verbosity = strtol(verbosity_str, NULL, 10);
         chaz_set_verbosity(verbosity);
     }
-    chaz_init(os_name, cc_command, cc_flags);
+    chaz_init(conf_fh, os_name, cc_command, cc_flags);
     chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
     chaz_write_charm_test_h();
 

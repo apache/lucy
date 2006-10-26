@@ -123,6 +123,7 @@ chaz_ModHand_write_charm_test_h();
 # define typedef_prefix         chaz_ModHand_typedef_prefix
 # define function_prefix        chaz_ModHand_function_prefix
 # define want_short_names       chaz_ModHand_want_short_names
+# define ModHand_init           chaz_ModHand_init
 # define write_charm_h          chaz_ModHand_write_charm_h
 # define build_charm_run        chaz_ModHand_build_charm_run
 # define Start_Short_Names      Chaz_ModHand_Start_Short_Names
