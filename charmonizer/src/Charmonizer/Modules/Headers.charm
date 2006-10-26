@@ -1,0 +1,181 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "Charmonizer/Core/HeadCheck.h"
+#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Modules/Headers.h"
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+/* keep track of which headers have succeeded */
+static int keeper_count = 0;
+#define MAX_KEEPER_COUNT 200
+static const char *keepers[MAX_KEEPER_COUNT + 1] = { NULL };
+
+/* Add a header to the keepers array.
+ */
+static void
+keep(const char *header_name);
+
+static size_t aff_buf_size = 0;
+static char *aff_buf = NULL;
+
+/* Transform "header.h" into "HAS_HEADER_H, storing the result in [aff_buf].
+ */
+static void
+encode_affirmation(const char *header_name);
+
+char *c89_headers[] = {
+    "assert.h",
+    "ctype.h",
+    "errno.h",
+    "float.h",
+    "limits.h",
+    "locale.h",
+    "math.h",
+    "setjmp.h",
+    "signal.h",
+    "stdarg.h",
+    "stddef.h",
+    "stdio.h",
+    "stdlib.h",
+    "string.h",
+    "time.h",
+    NULL
+};
+
+char *posix_headers[] = {
+    "cpio.h",
+    "dirent.h",
+    "fcntl.h",
+    "grp.h",
+    "pwd.h",
+    "sys/stat.h",
+    "sys/times.h",
+    "sys/types.h",
+    "sys/utsname.h",
+    "sys/wait.h",
+    "tar.h",
+    "termios.h",
+    "unistd.h",
+    "utime.h",
+    NULL
+};
+
+chaz_bool_t
+chaz_Headers_check(const char *header_name)
+{
+    return check_header(header_name);
+}
+
+void
+chaz_Headers_run(FILE *conf_fh) 
+{
+    int i;
+    chaz_bool_t has_posix = false;
+    chaz_bool_t has_c89   = false;
+    
+    Start_Run(conf_fh, "Headers");
+
+    /* test for all POSIX headers in one blast */
+    if (check_many_headers((const char**)posix_headers)) {
+        has_posix = true;
+        append_conf(conf_fh, "#define %sHAS_POSIX\n", constant_prefix);
+        for (i = 0; posix_headers[i] != NULL; i++) {
+            keep(posix_headers[i]);
+        }
+    }
+
+    /* test for all c89 headers in one blast */
+    if (check_many_headers((const char**)c89_headers)) {
+        has_c89 = true;
+        append_conf(conf_fh, "#define %sHAS_C89\n", constant_prefix);
+        append_conf(conf_fh, "#define %sHAS_C90\n", constant_prefix);
+        for (i = 0; c89_headers[i] != NULL; i++) {
+            keep(c89_headers[i]);
+        }
+    }
+
+    /* append the config with every header detected so far */
+    for (i = 0; keepers[i] != NULL; i++) {
+        encode_affirmation(keepers[i]);
+        append_conf(conf_fh, "#define %s%s\n", constant_prefix, aff_buf);
+    }
+
+    if (want_short_names) {
+        Start_Short_Names(conf_fh);
+
+        if (has_posix)
+            shorten_constant(conf_fh, "HAS_POSIX");
+
+        if (has_c89) {
+            shorten_constant(conf_fh, "HAS_C89");
+            shorten_constant(conf_fh, "HAS_C90");
+        }
+
+        for (i = 0; keepers[i] != NULL; i++) {
+            encode_affirmation(keepers[i]);
+            shorten_constant(conf_fh, aff_buf);
+        }
+
+        End_Short_Names(conf_fh);
+    }
+
+    End_Run(conf_fh);
+}
+
+static void
+keep(const char *header_name)
+{
+    if (keeper_count >= MAX_KEEPER_COUNT)
+        die("Too many keepers -- increase MAX_KEEPER_COUNT");
+    keepers[keeper_count++] = header_name;
+    keepers[keeper_count]   = NULL;
+}
+
+static void
+encode_affirmation(const char *header_name) {
+    char *buf, *buf_end;
+    size_t len = strlen(header_name) + 5;
+    
+    /* grow buffer and start off with "HAS_" */
+    aff_buf_size = grow_buf(&aff_buf, aff_buf_size, len);
+    strcpy(aff_buf, "HAS_");
+
+    /* transform one char at a time */
+    for(buf = aff_buf + 4, buf_end = aff_buf + len; 
+        buf < buf_end; 
+        header_name++, buf++
+    ) {
+        if (*header_name == '\0') {
+            *buf = '\0';
+            break;
+        }
+        else if (isalnum(*header_name)){
+            *buf = toupper(*header_name);
+        }
+        else {
+            *buf = '_';
+        }
+    }
+}
+
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
