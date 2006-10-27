@@ -4,7 +4,7 @@
 #ifndef H_CHAZ_HEAD_CHECK
 #define H_CHAZ_HEAD_CHECK 
 
-#include "Charmonizer/Defines.h"
+#include "Charmonizer/Core/Defines.h"
 
 /* Bootstrap the HeadCheck.  Call this before anything else.
  */

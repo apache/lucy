@@ -1,4 +1,4 @@
-/* Charmonizer/Defines.h -- Universal definitions.
+/* Charmonizer/Core/Defines.h -- Universal definitions.
  */
 #ifndef H_CHAZ_DEFINES
 #define H_CHAZ_DEFINES 1

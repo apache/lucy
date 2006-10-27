@@ -5,7 +5,7 @@
 #define H_CHAZ_COMPILER
 
 #include <stddef.h>
-#include "Charmonizer/Defines.h"
+#include "Charmonizer/Core/Defines.h"
 
 typedef struct chaz_Compiler chaz_Compiler;
 struct chaz_OperSys;

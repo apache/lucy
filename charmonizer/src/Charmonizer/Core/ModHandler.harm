@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
-#include "Charmonizer/Defines.h"
+#include "Charmonizer/Core/Defines.h"
 
 struct chaz_OperSys;
 struct chaz_Compiler;

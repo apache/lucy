@@ -4,7 +4,7 @@
 #ifndef H_CHAZ_HEADERS
 #define H_CHAZ_HEADERS
 #include <stdio.h>
-#include "Charmonizer/Defines.h"
+#include "Charmonizer/Core/Defines.h"
 
 /* Check whether a particular header file is available.  The test-compile is
  * only run the first time a given request is made.
