@@ -111,6 +111,7 @@ init(int argc, char **argv)
     free(cc_flags);
     free(os_name);
     free(outpath);
+    free(verbosity_str);
 
     return conf_fh;
 }

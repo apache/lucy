@@ -5,6 +5,7 @@
 #include "Charmonizer/Modules/FuncMacro.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 static char iso_func_code[] = METAQUOTE
@@ -44,6 +45,7 @@ chaz_FuncMacro_run(FILE *conf_fh)
         has_funcmac     = true;
         has_iso_funcmac = true;
     }
+    free(output);
 
     /* check for GNUC func macro */
     output = capture_output(gnuc_func_code, strlen(gnuc_func_code), 
@@ -52,6 +54,7 @@ chaz_FuncMacro_run(FILE *conf_fh)
         has_funcmac      = true;
         has_gnuc_funcmac = true;
     }
+    free(output);
 
     /* write out common defines */
     if (has_funcmac) {
