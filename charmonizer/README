@@ -18,7 +18,7 @@ SYNOPSIS
         printf(config_fh, "/* Auto-generated file - do not edit!! */\n\n");
         
         /* set up Charmonizer */
-        chaz_init("darwin", "cc", "-I/usr/local/include");
+        chaz_init(config_fh, "darwin", "cc", "-I/usr/local/include");
         
         /* run desired Charmonizer modules */
         chaz_Integers_run(config_fh);
@@ -75,6 +75,12 @@ METAQUOTE UTILITY
     These source files are run through the "metaquote" utility -- which
     transforms everything between paired METAQUOTE tags into concatenated
     string literals.  The result is hideous but valid C.
+
+SECURITY
+
+    Charmonizer expects that it will always be run with input from trusted users
+    only.  You should be careful about what strings you pass to chaz_init(),
+    since they will be used to concatenate commands invoked via system().
 
 COPYRIGHT AND LICENSE
 
