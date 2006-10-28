@@ -29,6 +29,10 @@ chaz_TestHand_test_FuncMacro(
     int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
 
 void 
+chaz_TestHand_test_Headers(
+    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+
+void 
 chaz_TestHand_test_Integers(
     int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
 

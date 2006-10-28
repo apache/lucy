@@ -12,6 +12,7 @@ typedef struct TestGroup {
 } TestGroup;
 TestGroup tests[] = {
     { "FuncMacro", chaz_TestHand_test_FuncMacro },
+    { "Headers", chaz_TestHand_test_Headers },
     { "Integers", chaz_TestHand_test_Integers },
     { "LargeFiles", chaz_TestHand_test_LargeFiles },
     { "UnusedVars", chaz_TestHand_test_UnusedVars },
