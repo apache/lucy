@@ -155,7 +155,7 @@ sub ACTION_lucyconf {
     my $os_name = lc( $Config{osname} );
     my $flags = "$Config{ccflags} $EXTRA_CCFLAGS";
     my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
-    my $cc = "$VALGRIND$Config{cc}";
+    my $cc = "$Config{cc}";
     open( my $infile_fh, '>', $lucyconf_in )
         or die "Can't open '$lucyconf_in': $!";
     print $infile_fh qq|

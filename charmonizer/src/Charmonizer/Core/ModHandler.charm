@@ -86,6 +86,7 @@ static char charm_run_code_a[] = METAQUOTE
         char *command;
         size_t command_len = 1; /* terminating null */
         int i;
+        int retval;
         
         /* rebuild the command line args, minus the name of this utility */
         for (i = 1; i < argc; i++) {
@@ -111,7 +112,9 @@ static char charm_run_code_c[] = METAQUOTE
              , "w", stderr);
 
         /* run the commmand and return its value to the parent process */
-        return system(command);
+        retval = system(command);
+        free(command);
+        return retval;
     }
 METAQUOTE;
 
