@@ -4,6 +4,9 @@
 #include "_charm_test.h"
 #include <stdio.h>
 #include <string.h>
+#ifdef HAS_INTTYPES_H
+    #include <inttypes.h>
+#endif
 
 void 
 chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed, 
@@ -41,9 +44,11 @@ chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed,
 #endif
     
 #ifdef HAS_INTTYPES_H
-    #include <inttypes.h>
     Assert_True((sizeof(int8_t) == 1), "HAS_INTTYPES_H");
+#else
+    Skip("No inttypes.h");
 #endif
+
     
     {
         bool_t the_truth = true;
