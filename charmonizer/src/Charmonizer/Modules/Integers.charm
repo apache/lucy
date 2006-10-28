@@ -48,6 +48,16 @@ static char long_long_code[] = METAQUOTE
     }
 METAQUOTE;
 
+static char __int64_code[] = METAQUOTE
+    #include "_charm.h"
+    int main() 
+    {
+        Charm_Setup;
+        printf("%d", (int)sizeof(__int64));
+        return 0;
+    }
+METAQUOTE;
+
 void
 chaz_Integers_run(FILE *conf_fh) 
 {
@@ -59,12 +69,20 @@ chaz_Integers_run(FILE *conf_fh)
     int sizeof_ptr        = -1; 
     int sizeof_long       = -1;
     int sizeof_long_long  = -1;
+    int sizeof___int64    = -1;
     chaz_bool_t has_8     = false;
     chaz_bool_t has_16    = false;
     chaz_bool_t has_32    = false;
     chaz_bool_t has_64    = false;
     chaz_bool_t has_long_long = false;
+    chaz_bool_t has___int64   = false;
     chaz_bool_t has_inttypes  = false;
+    char i32_t_type[10];
+    char i32_t_postfix[10];
+    char u32_t_postfix[10];
+    char i64_t_type[10];
+    char i64_t_postfix[10];
+    char u64_t_postfix[10];
 
     Start_Run(conf_fh, "Integers");
 
@@ -90,7 +108,7 @@ chaz_Integers_run(FILE *conf_fh)
         sizeof_ptr   = strtol(output, &end_ptr, 10);
     }
 
-    /* Determine whether long longs are available. */
+    /* determine whether long longs are available */
     output = capture_output(long_long_code, strlen(long_long_code),
         &output_len);
     if (output != NULL) {
@@ -98,20 +116,66 @@ chaz_Integers_run(FILE *conf_fh)
         sizeof_long_long = strtol(output, NULL, 10);
     }
 
-    /* Determine whether inttypes.h is available. */
+    /* determine whether the __int64 type is available */
+    output = capture_output(__int64_code, strlen(__int64_code),
+        &output_len);
+    if (output != NULL) {
+        has___int64 = true;
+        sizeof___int64 = strtol(output, NULL, 10);
+    }
+
+    /* determine whether inttypes.h is available */
     output = capture_output(inttypes_code, strlen(inttypes_code),
         &output_len);
     if (output != NULL) {
         has_inttypes = true;
     }
 
+    /* figure out which integer types are available */
+    if (sizeof_char == 1) {
+        has_8 = true;
+    }
+    if (sizeof_short == 2) {
+        has_16 = true;
+    }
+    if (sizeof_int == 4) {
+        has_32 = true;
+        strcpy(i32_t_type, "int");
+        strcpy(i32_t_postfix, "");
+        strcpy(u32_t_postfix, "U");
+    }
+    else if (sizeof_long == 4) {
+        has_32 = true;
+        strcpy(i32_t_type, "long");
+        strcpy(i32_t_postfix, "L");
+        strcpy(u32_t_postfix, "UL");
+    }
+    if (sizeof_long == 8) {
+        has_64 = true;
+        strcpy(i64_t_type, "long");
+        strcpy(i64_t_postfix, "L");
+        strcpy(u64_t_postfix, "UL");
+    }
+    else if (sizeof_long_long == 8) {
+        has_64 = true;
+        strcpy(i64_t_type, "long long");
+        strcpy(i64_t_postfix, "LL");
+        strcpy(u64_t_postfix, "LLU");
+    }
+    else if (sizeof___int64 == 8) {
+        has_64 = true;
+        strcpy(i64_t_type, "__int64");
+        strcpy(i64_t_postfix, "i64");
+        strcpy(u64_t_postfix, "ui64");
+    }
+
     /* write out some conditional defines */
-    if (has_inttypes) {
+    if (has_inttypes)
         append_conf(conf_fh, "#define %sHAS_INTTYPES_H\n", constant_prefix);
-    }
-    if (has_long_long) {
+    if (has_long_long)
         append_conf(conf_fh, "#define %sHAS_LONG_LONG\n", constant_prefix);
-    }
+    if (has___int64)
+        append_conf(conf_fh, "#define %sHAS___INT64\n", constant_prefix);
 
     /* write out sizes */
     append_conf(conf_fh, 
@@ -130,45 +194,81 @@ chaz_Integers_run(FILE *conf_fh)
         append_conf(conf_fh, "#define %sSIZEOF_LONG_LONG %d\n",
             constant_prefix, sizeof_long_long);
     }
+    if (has___int64) {
+        append_conf(conf_fh, "#define %sSIZEOF___INT64 %d\n",
+            constant_prefix, sizeof___int64);
+    }
 
-    /* write typedefs */
+    /* write affirmations, typedefs and maximums/minimums */
     append_conf(conf_fh, "typedef int %sbool_t;\n", typedef_prefix);
-    if (sizeof_char == 1) {
-        has_8 = true;
+    if (has_8) {
         append_conf(conf_fh,
             "#define %sHAS_I8_T\n"
             "typedef char %si8_t;\n"
             "typedef unsigned char %su8_t;\n",
             constant_prefix, typedef_prefix, typedef_prefix
         );
+        append_conf(conf_fh,
+            "#define %sI8_MAX 0x7F\n"
+            "#define %sI8_MIN (-I8_MAX - 1)\n"
+            "#define %sU8_MAX (I8_MAX * 2 + 1)\n",
+            constant_prefix, constant_prefix, constant_prefix
+        );
     }
-    if (sizeof_short == 2) {
-        has_16 = true;
+    if (has_16) {
         append_conf(conf_fh,
             "#define %sHAS_I16_T\n"
             "typedef short %si16_t;\n"
             "typedef unsigned short %su16_t;\n",
             constant_prefix, typedef_prefix, typedef_prefix
         );
+        append_conf(conf_fh,
+            "#define %sI16_MAX 0x7FFF\n"
+            "#define %sI16_MIN (-I16_MAX - 1)\n"
+            "#define %sU16_MAX (I16_MAX * 2 + 1)\n",
+            constant_prefix, constant_prefix, constant_prefix
+        );
     }
-    if (sizeof_int == 4 || sizeof_long == 4) {
-        char *type = sizeof_int == 4 ? "int" : "long";
-        has_32 = true;
+    if (has_32) {
         append_conf(conf_fh,
             "#define %sHAS_I32_T\n"
             "typedef %s %si32_t;\n"
             "typedef unsigned %s %su32_t;\n",
             constant_prefix,
-            type, typedef_prefix, 
-            type, typedef_prefix
+            i32_t_type, typedef_prefix, 
+            i32_t_type, typedef_prefix
+        );
+        append_conf(conf_fh,
+            "#define %sI32_MAX 0x7FFFFFFF%s\n"
+            "#define %sI32_MIN (-I32_MAX - 1)\n"
+            "#define %sU32_MAX (I32_MAX * 2%s + 1%s)\n",
+            constant_prefix, i32_t_postfix,
+            constant_prefix, 
+            constant_prefix, u32_t_postfix, u32_t_postfix
+        );
+    }
+    if (has_64) {
+        append_conf(conf_fh,
+            "#define %sHAS_I64_T\n"
+            "typedef %s %si64_t;\n"
+            "typedef unsigned %s %su64_t;\n",
+            constant_prefix,
+            i64_t_type, typedef_prefix, 
+            i64_t_type, typedef_prefix
+        );
+        append_conf(conf_fh,
+            "#define %sI64_MAX 0x7FFFFFFFFFFFFFFF%s\n"
+            "#define %sI64_MIN (-I64_MAX - 1%s)\n"
+            "#define %sU64_MAX (I64_MAX * 2%s + 1%s)\n",
+            constant_prefix, i64_t_postfix,
+            constant_prefix, i64_t_postfix,
+            constant_prefix, u64_t_postfix, u64_t_postfix
         );
     }
 
-    if (sizeof_long == 8 || sizeof_long_long == 8) {
+    /* create the I64P and U64P printf macros */
+    if (has_64) {
         int i;
-        char *type = sizeof_long == 8 ? "long" : "long long";
-
-        /* printf format for 64-bit integer */
         char *options[] = {
             "ll",
             "l",
@@ -192,23 +292,11 @@ chaz_Integers_run(FILE *conf_fh)
             }
         METAQUOTE;
 
-        /* we have 64-bit ints, so add the typedef */
-        has_64 = true;
-        append_conf(conf_fh,
-            "#define %sHAS_I64_T\n"
-            "typedef %s %si64_t;\n"
-            "typedef unsigned %s %su64_t;\n",
-            constant_prefix,
-            type, typedef_prefix, 
-            type, typedef_prefix
-        );
-
-        /* create the I64P and U64P printf macros */
         for (i = 0; options[i] != NULL; i++) {
             /* try to print 2**64-1, and see if we get it back intact */
             sprintf(format_64_code, 
-                "%s\"%%%su\", (unsigned %s)18446744073709551615%s", 
-                format_64_code_a, options[i], type, format_64_code_b);
+                "%s\"%%%su\", 18446744073709551615%s%s", format_64_code_a, 
+                    options[i], u64_t_postfix, format_64_code_b);
             output = capture_output(format_64_code, strlen(format_64_code),
                 &output_len);
 
@@ -225,6 +313,34 @@ chaz_Integers_run(FILE *conf_fh)
             }
         }
 
+    }
+
+    /* write out the 32-bit and 64-bit literal macros */
+    if (has_32) {
+        if (strcmp(i32_t_postfix, "") == 0) {
+            append_conf(conf_fh, 
+                "#define %sI32_C(n) n\n"
+                "#define %sU32_C(n) n##%s\n",
+                macro_prefix, 
+                macro_prefix, u32_t_postfix
+            );
+        }
+        else {
+            append_conf(conf_fh, 
+                "#define %sI32_C(n) n##%s\n"
+                "#define %sU32_C(n) n##%s\n",
+                macro_prefix, i32_t_postfix,
+                macro_prefix, u32_t_postfix
+            );
+        }
+    }
+    if (has_64) {
+        append_conf(conf_fh, 
+            "#define %sI64_C(n) n##%s\n"
+            "#define %sU64_C(n) n##%s\n",
+            macro_prefix, i64_t_postfix,
+            macro_prefix, u64_t_postfix
+        );
     }
 
     /* true and false */
@@ -255,6 +371,10 @@ chaz_Integers_run(FILE *conf_fh)
             shorten_constant(conf_fh, "HAS_LONG_LONG");
             shorten_constant(conf_fh, "SIZEOF_LONG_LONG");
         }
+        if (has___int64) {
+            shorten_constant(conf_fh, "HAS___INT64");
+            shorten_constant(conf_fh, "SIZEOF___INT64");
+        }
 
         if (has_inttypes)
             shorten_constant(conf_fh, "HAS_INTTYPES_H");
@@ -265,24 +385,40 @@ chaz_Integers_run(FILE *conf_fh)
             shorten_constant(conf_fh, "HAS_I8_T");
             shorten_typedef(conf_fh, "i8_t");
             shorten_typedef(conf_fh, "u8_t");
+            shorten_constant(conf_fh, "I8_MAX");
+            shorten_constant(conf_fh, "I8_MIN");
+            shorten_constant(conf_fh, "U8_MAX");
         }
         if (has_16) {
             shorten_constant(conf_fh, "HAS_I16_T");
             shorten_typedef(conf_fh, "i16_t");
             shorten_typedef(conf_fh, "u16_t");
+            shorten_constant(conf_fh, "I16_MAX");
+            shorten_constant(conf_fh, "I16_MIN");
+            shorten_constant(conf_fh, "U16_MAX");
         }
         if (has_32) {
             shorten_constant(conf_fh, "HAS_I32_T");
             shorten_typedef(conf_fh, "i32_t");
             shorten_typedef(conf_fh, "u32_t");
+            shorten_constant(conf_fh, "I32_MAX");
+            shorten_constant(conf_fh, "I32_MIN");
+            shorten_constant(conf_fh, "U32_MAX");
+            shorten_macro(conf_fh, "I32_C");
+            shorten_macro(conf_fh, "U32_C");
         }
 
         if (has_64) {
             shorten_constant(conf_fh, "HAS_I64_T");
             shorten_typedef(conf_fh, "i64_t");
             shorten_typedef(conf_fh, "u64_t");
+            shorten_constant(conf_fh, "I64_MAX");
+            shorten_constant(conf_fh, "I64_MIN");
+            shorten_constant(conf_fh, "U64_MAX");
             shorten_macro(conf_fh, "I64P");
             shorten_macro(conf_fh, "U64P");
+            shorten_macro(conf_fh, "I64_C");
+            shorten_macro(conf_fh, "U64_C");
         } 
 
         End_Short_Names(conf_fh);

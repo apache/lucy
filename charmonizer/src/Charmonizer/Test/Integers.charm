@@ -10,7 +10,7 @@ chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed,
                             int *num_skipped)
 {
     int test_num  = 0;
-    *num_tests    = 27;
+    *num_tests    = 37;
     *num_passed   = 0;
     *num_failed   = 0;
     *num_skipped  = *num_tests;
@@ -58,6 +58,9 @@ chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed,
         Assert_True((bar == 200), "u8_t is unsigned");
         Assert_True((sizeof(i8_t) == 1), "i8_t is 1 byte");
         Assert_True((sizeof(u8_t) == 1), "u8_t is 1 byte");
+        Assert_True((I8_MAX ==  127), "I8_MAX");
+        Assert_True((I8_MIN == -128), "I8_MIN");
+        Assert_True((U8_MAX ==  255), "U8_MAX");
     }
 #endif
 #ifdef HAS_I16_T
@@ -68,30 +71,39 @@ chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed,
         Assert_True((bar == 30000), "u16_t is unsigned");
         Assert_True((sizeof(i16_t) == 2), "i16_t is 2 bytes");
         Assert_True((sizeof(u16_t) == 2), "u16_t is 2 bytes");
+        Assert_True((I16_MAX ==  32767), "I16_MAX");
+        Assert_True((I16_MIN == -32768), "I16_MIN");
+        Assert_True((U16_MAX ==  65535), "U16_MAX");
     }
 #endif
 #ifdef HAS_I32_T
     {
         i32_t foo = -100;
-        u32_t bar = (u32_t)4000000000;
+        u32_t bar = 4000000000UL;
         Assert_True((foo == -100), "i32_t is signed");
-        Assert_True((bar == (u32_t)4000000000), "u32_t is unsigned");
+        Assert_True((bar == 4000000000UL), "u32_t is unsigned");
         Assert_True((sizeof(i32_t) == 4), "i32_t is 4 bytes");
         Assert_True((sizeof(u32_t) == 4), "u32_t is 4 bytes");
+        Assert_True((I32_MAX == I32_C(2147483647)), "I32_MAX");
+        /* The (-2147483647 - 1) avoids a compiler warning */
+        Assert_True((I32_MIN == I32_C(-2147483647 - 1)), "I32_MIN");
+        Assert_True((U32_MAX == U32_C(4294967295)), "U32_MAX");
     }
 #endif
 #ifdef HAS_I64_T
     {
         char buf[100];
         i64_t foo = -100;
-        u64_t bar = (u64_t)18000000000000000000;
+        u64_t bar = U64_C(18000000000000000000);
         Assert_True((foo == -100), "i64_t is signed");
-        Assert_True((bar == (u64_t)18000000000000000000), 
+        Assert_True((bar == U64_C(18000000000000000000)), 
             "u64_t is unsigned");
         Assert_True((sizeof(i64_t) == 8), "i64_t is 8 bytes");
         Assert_True((sizeof(u64_t) == 8), "u64_t is 8 bytes");
-        sprintf(buf, U64P, bar);
-        Assert_True(strcmp(buf, "18000000000000000000"), "U64P");
+        sprintf(buf, "%"I64P, foo);
+        Assert_True((strcmp(buf, "-100") == 0), "I64P");
+        sprintf(buf, "%"U64P, bar);
+        Assert_True((strcmp(buf, "18000000000000000000") == 0), "U64P");
     }
 #endif
 }

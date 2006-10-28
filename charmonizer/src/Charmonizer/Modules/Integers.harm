@@ -18,6 +18,11 @@
  * 
  * HAS_LONG_LONG
  * SIZEOF_LONG_LONG 
+ * 
+ * Similarly, with the __int64 type (the sizeof is included for completeness):
+ *
+ * HAS___INT64
+ * SIZEOF___INT64
  *
  * If the inttypes.h header file is available, this will be defined:
  * 
@@ -26,7 +31,7 @@
  * The following typedefs will be created if a suitable integer type exists,
  * as will most often be the case.  However, if for example a char is 64 bits
  * (as on certain Crays), no 8-bit types will be defined, or if no 64-bit
- * integer type is availabe, no 64-bit types will be defined, etc.
+ * integer type is available, no 64-bit types will be defined, etc.
  * 
  * bool_t
  * i8_t
@@ -45,6 +50,22 @@
  * HAS_I16_T
  * HAS_I32_T
  * HAS_I64_T
+ * 
+ * Maximums will be defined for all available integer types (save bool_t), and
+ * minimums for all available signed types.
+ * 
+ * I8_MAX
+ * U8_MAX
+ * I16_MAX
+ * U16_MAX
+ * I32_MAX
+ * U32_MAX
+ * I64_MAX
+ * U64_MAX
+ * I8_MIN
+ * I16_MIN
+ * I32_MIN
+ * I64_MIN
  *
  * If 64-bit integers type are available, these macros will expand to the
  * printf conversion specification for signed and unsigned versions (most
@@ -52,6 +73,14 @@
  *
  * I64P
  * U64P
+ *
+ * 32-bit and 64-bit literals can be spec'd via these macros, which append the
+ * appropriate postfix:
+ * 
+ * I32_C(n)
+ * U32_C(n)
+ * I64_C(n)
+ * U64_C(n)
  *
  * These symbols will be defined if they are not already: 
  * 
