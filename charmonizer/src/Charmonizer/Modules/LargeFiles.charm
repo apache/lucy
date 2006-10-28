@@ -1,12 +1,38 @@
 #define CHAZ_USE_SHORT_NAMES
 
+#include "Charmonizer/Core/HeadCheck.h"
 #include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/Stat.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Modules/LargeFiles.h"
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+/* Determine whether we can use sparse files.
+ */
+static chaz_bool_t 
+check_sparse_files();
+
+/* Helper for check_sparse_files().  
+ */
+static void
+test_sparse_file(long offset, Stat *st);
+
+/* See if trying to write a 5 GB file in a subprocess bombs out.  If it
+ * doesn't, then the test suite can safely verify large file support.
+ */
+static chaz_bool_t
+can_create_big_files();
+
+static char* code_buf = NULL;
+static size_t code_buf_len = 0;
+static char fseek_command[10];
+static char ftell_command[10];
+static char loff_type[10];
+
+/* code for checking ftello/fseeko and off_t */
 static char ftello_code[] = METAQUOTE
     #include "_charm.h"
     #include <sys/types.h>
@@ -20,6 +46,7 @@ static char ftello_code[] = METAQUOTE
     }
 METAQUOTE;
 
+/* code for checking ftello64/fseeko64 and off64_t */
 static char ftello64_code[] = METAQUOTE
     #include "_charm.h"
     int main() {
@@ -32,6 +59,7 @@ static char ftello64_code[] = METAQUOTE
     }
 METAQUOTE;
 
+/* code for checking size of long */
 static char sizeof_long_code[] = METAQUOTE
     #include "_charm.h"
     int main() {
@@ -45,9 +73,6 @@ void
 chaz_LargeFiles_run(FILE *conf_fh) 
 {
     char *output;
-    char fseek_command[10];
-    char ftell_command[10];
-    char loff_type[10];
     size_t output_len;
     chaz_bool_t has_off64_t = false;
     int sizeof_off_t = -1;
@@ -87,7 +112,6 @@ chaz_LargeFiles_run(FILE *conf_fh)
             &output_len);
         if (output != NULL) {
             sizeof_long = strtol(output, NULL, 10);
-            /* if longs are 8 bytes, ftell/fseek will work */
             if (sizeof_long == 8) {
                 success = true;
                 strcpy(fseek_command, "fseek");
@@ -97,6 +121,18 @@ chaz_LargeFiles_run(FILE *conf_fh)
         }
     }
 
+    /* check for sparse files */
+    if (check_sparse_files()) {
+        append_conf(conf_fh, "#define CHAZ_HAS_SPARSE_FILES\n");
+        /* see if we can create a 5 GB file without crashing */
+        if (success && can_create_big_files())
+            append_conf(conf_fh, "#define CHAZ_CAN_CREATE_BIG_FILES\n");
+    }
+    else {
+        append_conf(conf_fh, "#define CHAZ_NO_SPARSE_FILES\n");
+    }
+
+    /* write the affirmations/definitions */
     if (success) {
         append_conf(conf_fh, 
             "#define %sHAS_LARGE_FILE_SUPPORT\n"
@@ -110,6 +146,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
         );
     }
 
+    /* short names */
     if (want_short_names && success) {
         Start_Short_Names(conf_fh);
         shorten_constant(conf_fh, "HAS_LARGE_FILE_SUPPORT");
@@ -120,6 +157,104 @@ chaz_LargeFiles_run(FILE *conf_fh)
     }
     
     End_Run(conf_fh);
+}
+
+static chaz_bool_t 
+check_sparse_files()
+{
+    Stat st_a, st_b;
+
+    /* bail out if we can't stat() a file */
+    if (!check_header("sys/stat.h"))
+        return false;
+
+    /* write and stat a 1 MB file and a 2 MB file, both of them sparse */
+    test_sparse_file(1000000, &st_a);
+    test_sparse_file(2000000, &st_b);
+    if (!(st_a.valid && st_b.valid))
+        return false;
+    if (st_a.size != 1000001)
+        die ("Expected size of 1000001 but got %ld", (long)st_a.size);
+    if (st_b.size != 2000001)
+        die ("Expected size of 2000001 but got %ld", (long)st_b.size);
+
+    /* see if two files with very different lengths have the same block size */
+    if (st_a.blocks == st_b.blocks)
+        return true;
+    else
+        return false;
+} 
+
+static void
+test_sparse_file(long offset, Stat *st)
+{
+    FILE *sparse_fh;
+
+    /* make sure the file's not there, then open */
+    remove_and_verify("_charm_sparse");
+    if ( (sparse_fh = fopen("_charm_sparse", "w+")) == NULL )
+        die("Couldn't open file '_charm_sparse'");
+
+    /* seek fh to [offset], write a byte, close file, check for errors */
+    if ( (fseek(sparse_fh, offset, SEEK_SET)) == -1)
+        die("seek failed: %s", strerror(errno));
+    if ( (fprintf(sparse_fh, "X")) != 1 )
+        die("fprintf failed");
+    if (fclose(sparse_fh))
+        die("Error closing file '_charm_sparse': %s", strerror(errno));
+
+    /* stat the file */
+    Stat_stat("_charm_sparse", st);
+
+    remove("_charm_sparse");
+}
+
+/* open a file, seek to a loc, print a char, and communicate success */
+static char create_bigfile_code_a[] = METAQUOTE
+    #include "_charm.h"
+    int main() {
+        FILE *fh = fopen("_charm_large_file_test", "w+");
+        int check_seek;
+        Charm_Setup;
+        /* bail unless seek succeeds */
+        check_seek = 
+METAQUOTE;
+
+static char create_bigfile_code_b[] = METAQUOTE
+            (fh, 5000000000, SEEK_SET);
+        if (check_seek == -1)
+            exit(1);
+        /* bail unless we write successfully */
+        if (fprintf(fh, "X") != 1)
+            exit(1);
+        if (fclose(fh))
+            exit(1);
+        /* communicate success to Charmonizer */
+        printf("1");
+        return 0;
+    }
+METAQUOTE;
+
+static chaz_bool_t
+can_create_big_files()
+{
+    char *output;
+    size_t output_len;
+    FILE *truncating_fh;
+
+    /* concat the source strings, compile the file, capture output */
+    code_buf_len = join_strings(&code_buf, code_buf_len,
+        create_bigfile_code_a, fseek_command, create_bigfile_code_b, NULL);
+    output = capture_output(code_buf, code_buf_len, &output_len);
+
+    /* truncate, just in case the call to remove fails */
+    truncating_fh = fopen("_charm_large_file_test", "w");
+    if (truncating_fh != NULL)
+        fclose(truncating_fh);
+    remove_and_verify("_charm_large_file_test");
+
+    /* return true if the test app made it to the finish line */
+    return output == NULL ? false : true;
 }
 
 

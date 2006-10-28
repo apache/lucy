@@ -1,0 +1,102 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "_charm_test.h"
+
+#ifdef HAS_SYS_TYPES_H
+  #include <sys/types.h>
+#endif
+
+#include <stdio.h>
+#include "Charmonizer/Test/TestHandler.h"
+
+void 
+chaz_TestHand_test_LargeFiles(int *num_tests, int *num_passed, 
+                              int *num_failed, int *num_skipped)
+{
+    int test_num  = 0;
+    FILE *fh;
+    LOFFSET_TYPE offset;
+    int check_val;
+    char check_char;
+
+    /* a little over 4 GB, and a little over 2 GB */
+    LOFFSET_TYPE gb4_plus = ((LOFFSET_TYPE)0x7FFFFFFF << 1) + 100;
+    LOFFSET_TYPE gb2_plus = (LOFFSET_TYPE)0x7FFFFFFF + 200;
+    
+    /* gb4_plus modulo 4 GB */
+    i32_t wrap_gb4 = gb4_plus;
+
+    *num_tests    = 10;
+    *num_passed   = 0;
+    *num_failed   = 0;
+    *num_skipped  = *num_tests;
+
+    Assert_True((sizeof(LOFFSET_TYPE) == 8), "offset type has 8 bytes");
+
+#ifndef HAS_LARGE_FILE_SUPPORT
+    Skip_Remaining("No large file support");
+#endif
+#ifndef CHAZ_HAS_SPARSE_FILES
+    Skip_Remaining("Can't verify large file support without sparse files");
+#endif
+#ifndef CHAZ_CAN_CREATE_BIG_FILES
+    Skip_Remaining("Unsafe to create 5GB sparse files on this system");
+#endif
+
+    fh = fopen("_charm_large_file_test", "w+");
+    if (fh == NULL)
+        Skip_Remaining("Failed to open file");
+
+    check_val = Lfseek(fh, gb4_plus, SEEK_SET);
+    Assert_True((check_val == 0), "Lfseek above 4 GB");
+
+    offset = Lftell(fh);
+    Assert_True((offset = gb4_plus), "Lftell above 4 GB");
+
+    check_val = fprintf(fh, "X");
+    Assert_True((check_val == 1), "print above 4 GB");
+
+    check_val = Lfseek(fh, gb2_plus, SEEK_SET);
+    Assert_True((check_val == 0), "Lfseek above 2 GB");
+
+    offset = Lftell(fh);
+    Assert_True((offset = gb2_plus), "Lftell above 2 GB");
+
+    check_val = Lfseek(fh, -1, SEEK_END);
+    Assert_True((check_val == 0), "seek to near end");
+
+    check_char = fgetc(fh);
+    Assert_True((check_char == 'X'), "read value after multiple seeks");
+
+    Lfseek(fh, wrap_gb4, SEEK_SET);
+    check_char = fgetc(fh);
+    Assert_True((check_char == '\0'), "No wraparound");
+
+    check_val = fclose(fh);
+    Assert_True((check_val == 0), "fclose succeeds after all that");
+
+    /* truncate, just in case the call to remove fails */
+    fh = fopen("_charm_large_file_test", "w+");
+    if (fh != NULL)
+        fclose(fh);
+    remove("_charm_large_file_test");
+}
+
+
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
