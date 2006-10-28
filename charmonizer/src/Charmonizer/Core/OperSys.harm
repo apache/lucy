@@ -17,6 +17,12 @@ typedef void
 typedef void
 (*chaz_OS_remove_obj_t)(chaz_OperSys *self, char *name);
 
+/* Concatenate all arguments in a NULL-terminated list into a single command
+ * string, prepend the appropriate prefix, and invoke via system().
+ */
+typedef void
+(*chaz_OS_run_local_t)(chaz_OperSys *self, ...);
+
 /* Destructor.
  */
 typedef void
@@ -32,6 +38,7 @@ struct chaz_OperSys {
     size_t      buf_len;
     chaz_OS_remove_exe_t remove_exe;
     chaz_OS_remove_obj_t remove_obj;
+    chaz_OS_run_local_t  run_local;
     chaz_OS_destroy_t    destroy;
 };
 
@@ -46,6 +53,7 @@ chaz_OS_new(const char *name);
 # define OperSys                      chaz_OperSys
 # define OS_remove_exe_t              chaz_OS_remove_exe_t
 # define OS_remove_obj_t              chaz_OS_remove_obj_t
+# define OS_run_local_t               chaz_OS_run_local_t
 # define OS_destroy_t                 chaz_OS_destroy_t
 # define OS_new                       chaz_OS_new
 #endif

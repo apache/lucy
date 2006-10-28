@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/OperSys.h"
@@ -18,6 +19,9 @@ remove_exe(OperSys *self, char *name);
 static void
 remove_obj(OperSys *self, char *name);
 
+static void
+run_local(OperSys *self, ...);
+
 chaz_OperSys*
 chaz_OS_new(const char *name) 
 {
@@ -31,6 +35,7 @@ chaz_OS_new(const char *name)
     self->buf_len    = 0;
     self->remove_obj = remove_obj;
     self->remove_exe = remove_exe;
+    self->run_local  = run_local;
     self->destroy    = destroy;
 
     if (strcmp(name, "mswin32") == 0) {
@@ -87,16 +92,34 @@ destroy(OperSys *self)
 static void
 remove_exe(OperSys *self, char *name)
 {
-    join_strings(&(self->buf), self->buf_len, name, self->exe_ext, NULL);
+    self->buf_len = join_strings(&(self->buf), self->buf_len, name, 
+        self->exe_ext, NULL);
     remove(self->buf);
 }
 
 static void
 remove_obj(OperSys *self, char *name)
 {
-    join_strings(&(self->buf), self->buf_len, name, self->obj_ext, NULL);
+    self->buf_len = join_strings(&(self->buf), self->buf_len, name, 
+        self->obj_ext, NULL);
     remove(self->buf);
 }
+
+static void
+run_local(OperSys *self, ...)
+{
+    va_list args;
+
+    self->buf_len = join_strings(&(self->buf), self->buf_len,
+        self->local_command_start, NULL);
+
+    va_start(args, self);
+    self->buf_len = vappend_strings(&(self->buf), self->buf_len, args);
+    va_end(args);
+
+    system(self->buf);
+}
+
 
 /**
  * Copyright 2006 The Apache Software Foundation
