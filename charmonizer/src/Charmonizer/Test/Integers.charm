@@ -24,7 +24,7 @@ chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed,
 #ifdef BIG_END
     Assert_True(big_endian, "BIG_END");
 #else
- #if defined(LITTLE_ENDIAN)
+ #if defined(LITTLE_END)
     Assert_True(!big_endian, "LITTLE_END");
  #else
     Assert_True(0, "Either BIG_END or LITTLE_END should be defined");
