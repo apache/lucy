@@ -137,8 +137,8 @@ chaz_LargeFiles_run(FILE *conf_fh)
         append_conf(conf_fh, 
             "#define %sHAS_LARGE_FILE_SUPPORT\n"
             "#define %sLOFFSET_TYPE %s\n"
-            "#define %sLftell %s\n" 
-            "#define %sLfseek %s\n",
+            "#define %slftell %s\n" 
+            "#define %slfseek %s\n",
             constant_prefix, 
             constant_prefix, loff_type,
             function_prefix, ftell_command,
@@ -151,8 +151,8 @@ chaz_LargeFiles_run(FILE *conf_fh)
         Start_Short_Names(conf_fh);
         shorten_constant(conf_fh, "HAS_LARGE_FILE_SUPPORT");
         shorten_constant(conf_fh, "LOFFSET_TYPE");
-        shorten_function(conf_fh, "Lftell");
-        shorten_function(conf_fh, "Lfseek");
+        shorten_function(conf_fh, "lftell");
+        shorten_function(conf_fh, "lfseek");
         End_Short_Names(conf_fh);
     }
     

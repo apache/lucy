@@ -12,8 +12,8 @@
  *
  * HAS_LARGE_FILE_SUPPORT
  * loff_t 
- * Lftell
- * Lfseek
+ * lftell
+ * lfseek
  *
  */
 void chaz_LargeFiles_run(FILE *conf_fh);

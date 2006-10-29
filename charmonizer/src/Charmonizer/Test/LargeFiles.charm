@@ -47,28 +47,28 @@ chaz_TestHand_test_LargeFiles(int *num_tests, int *num_passed,
     if (fh == NULL)
         Skip_Remaining("Failed to open file");
 
-    check_val = Lfseek(fh, gb4_plus, SEEK_SET);
-    Assert_True((check_val == 0), "Lfseek above 4 GB");
+    check_val = lfseek(fh, gb4_plus, SEEK_SET);
+    Assert_True((check_val == 0), "lfseek above 4 GB");
 
-    offset = Lftell(fh);
-    Assert_True((offset = gb4_plus), "Lftell above 4 GB");
+    offset = lftell(fh);
+    Assert_True((offset = gb4_plus), "lftell above 4 GB");
 
     check_val = fprintf(fh, "X");
     Assert_True((check_val == 1), "print above 4 GB");
 
-    check_val = Lfseek(fh, gb2_plus, SEEK_SET);
-    Assert_True((check_val == 0), "Lfseek above 2 GB");
+    check_val = lfseek(fh, gb2_plus, SEEK_SET);
+    Assert_True((check_val == 0), "lfseek above 2 GB");
 
-    offset = Lftell(fh);
-    Assert_True((offset = gb2_plus), "Lftell above 2 GB");
+    offset = lftell(fh);
+    Assert_True((offset = gb2_plus), "lftell above 2 GB");
 
-    check_val = Lfseek(fh, -1, SEEK_END);
+    check_val = lfseek(fh, -1, SEEK_END);
     Assert_True((check_val == 0), "seek to near end");
 
     check_char = fgetc(fh);
     Assert_True((check_char == 'X'), "read value after multiple seeks");
 
-    Lfseek(fh, wrap_gb4, SEEK_SET);
+    lfseek(fh, wrap_gb4, SEEK_SET);
     check_char = fgetc(fh);
     Assert_True((check_char == '\0'), "No wraparound");
 
