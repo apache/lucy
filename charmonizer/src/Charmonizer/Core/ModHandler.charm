@@ -146,7 +146,7 @@ chaz_ModHand_test_compile(char *source, size_t source_len)
         die("Failed to delete file '%s'", try_app_path);
 
     compile_succeeded = compiler->compile_exe(compiler, TRY_SOURCE_PATH, 
-        try_app_path, source, source_len);
+        TRY_APP_BASENAME, source, source_len);
 
     clean_up_try();
 
@@ -167,7 +167,7 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
         die("Failed to delete file '%s'", TARGET_PATH);
 
     compile_succeeded = compiler->compile_exe(compiler, TRY_SOURCE_PATH, 
-        try_app_path, source, source_len);
+        TRY_APP_BASENAME, source, source_len);
 
     if (compile_succeeded) {
         /* run the app, slurp the output */
@@ -203,7 +203,7 @@ static void
 clean_up_try()
 {
     remove(TRY_SOURCE_PATH);
-    remove(try_app_path);
+    os->remove_exe(os, TRY_APP_BASENAME);
     remove(TARGET_PATH);
 }
 
