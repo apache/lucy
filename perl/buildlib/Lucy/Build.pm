@@ -14,8 +14,8 @@ unshift @PATH, curdir();
 
 my $base_dir = -e 'charmonizer' ? curdir() : updir();
 
-my $METAQUOTE_EXE_PATH     = 'metaquote';
-my $CHARMONIZE_EXE_PATH    = 'charmonize';
+my $METAQUOTE_EXE_PATH  = 'metaquote' . $Config{_exe};
+my $CHARMONIZE_EXE_PATH = 'charmonize' . $Config{_exe};
 my $CHARMONIZER_SOURCE_DIR = catdir( $base_dir, 'charmonizer', 'src' );
 my $FILTERED_DIR = catdir( $base_dir, qw( charmonizer filtered_src ) );
 
@@ -174,9 +174,7 @@ sub ACTION_lucyconf {
         system( $CHARMONIZE_EXE_PATH, $lucyconf_in );
     }
 
-    unlink($lucyconf_in) or die "Can't unlink '$lucyconf_in': $!";
-
-    $self->add_to_cleanup($lucyconf_path);
+    $self->add_to_cleanup( $lucyconf_path, $lucyconf_in );
 
     # generated when ./charmonize is run
     $self->add_to_cleanup("_charm_test.h");
