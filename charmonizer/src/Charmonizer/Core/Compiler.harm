@@ -26,6 +26,12 @@ typedef chaz_bool_t
                          const char *obj_path, const char *code, 
                          size_t code_len);
 
+/* Add an include directory which will be used for all future compilation
+ * attempts.
+ */
+typedef void
+(*chaz_CC_add_inc_dir_t)(chaz_Compiler *self, const char *dir);
+
 /* Destructor.
  */
 typedef void
@@ -38,10 +44,12 @@ struct chaz_Compiler {
     char          *include_flag;
     char          *object_flag;
     char          *exe_flag;
+    char         **inc_dirs;
     char          *buf;
     size_t         buf_len;
     chaz_CC_compile_exe_t compile_exe;
     chaz_CC_compile_obj_t compile_obj;
+    chaz_CC_add_inc_dir_t add_inc_dir;
     chaz_CC_destroy_t     destroy;
 };
 
@@ -55,6 +63,7 @@ chaz_CC_new(struct chaz_OperSys *oper_sys, const char *cc_command,
 # define Compiler                    chaz_Compiler
 # define CC_compile_exe_t            chaz_CC_compile_exe_t
 # define CC_compile_obj_t            chaz_CC_compile_obj_t
+# define CC_add_inc_dir_t            chaz_CC_add_inc_dir_t
 # define CC_destroy_t                chaz_CC_destroy_t
 # define CC_new                      chaz_CC_new
 #endif

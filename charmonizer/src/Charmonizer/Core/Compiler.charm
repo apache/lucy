@@ -21,6 +21,9 @@ compile_obj(Compiler *self, const char *source_path, const char *obj_path,
             const char *code, size_t code_len);
 
 static void
+add_inc_dir(Compiler *self, const char *dir);
+
+static void
 test_compile(Compiler *self);
 
 chaz_Compiler*
@@ -42,13 +45,19 @@ chaz_CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
     self->buf_len         = 0;
     self->compile_exe     = compile_exe;
     self->compile_obj     = compile_obj;
+    self->add_inc_dir     = add_inc_dir;
     self->destroy         = destroy;
+    self->inc_dirs        = (char**)calloc(sizeof(char*), 1);
 
     /* set compiler-specific vars */
     self->include_flag    = strdup(compiler_spec->include_flag);
     self->object_flag     = strdup(compiler_spec->object_flag);
     self->exe_flag        = strdup(compiler_spec->exe_flag);
 
+    /* add the current directory as an include dir */
+    self->add_inc_dir(self, ".");
+
+    /* if we can't compile anything, game over */
     test_compile(self);
 
     return self;
@@ -57,6 +66,13 @@ chaz_CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
 static void
 destroy(Compiler *self)
 {
+    char **inc_dirs;
+
+    for (inc_dirs = self->inc_dirs; *inc_dirs != NULL; inc_dirs++) {
+        free(*inc_dirs);
+    }
+    free(self->inc_dirs);
+
     free(self->buf);
     free(self->cc_command);
     free(self->cc_flags);
@@ -73,6 +89,7 @@ compile_exe(Compiler *self, const char *source_path, const char *exe_path,
     chaz_bool_t successful;
     OperSys *os = self->os;
     char *exe_full_filepath = NULL;
+    char **inc_dirs;
 
     /* tack the exe_ext onto the path */
     join_strings(&exe_full_filepath, 0, exe_path, os->exe_ext, NULL);
@@ -80,22 +97,26 @@ compile_exe(Compiler *self, const char *source_path, const char *exe_path,
     /* write the source file */
     write_file(source_path, code, code_len);
 
-    /* compile the source */
+    /* prepare the compiler command */
     if (verbosity < 2 && chaz_ModHand_charm_run_available) {
-        join_strings(&(self->buf), self->buf_len, 
+        self->buf_len = join_strings(&(self->buf), self->buf_len, 
             os->local_command_start, "_charm_run ", self->cc_command, " ",
-            source_path, " ", self->exe_flag, exe_full_filepath, " ",
-            self->include_flag, ". ", self->cc_flags, NULL);
+            source_path, " ", self->exe_flag, exe_full_filepath, " ", NULL);
     }
     else {
-        join_strings(&(self->buf), self->buf_len, 
+        self->buf_len = join_strings(&(self->buf), self->buf_len, 
             self->cc_command, " ", source_path, " ", self->exe_flag,
-            exe_full_filepath, " ", self->include_flag, ". ", self->cc_flags,
-            NULL);
+            exe_full_filepath, " ", NULL);
     }
-    system(self->buf);
+    for (inc_dirs = self->inc_dirs; *inc_dirs != NULL; inc_dirs++) {
+        self->buf_len = append_strings(&(self->buf), self->buf_len, 
+            self->include_flag, *inc_dirs, " ", NULL);
+    }
+    self->buf_len = append_strings(&(self->buf), self->buf_len, 
+        self->cc_flags, " ", NULL);
 
-    /* see if compilation was successful */
+    /* execute the compiler command and detect success/failure */
+    system(self->buf);
     successful = can_open_file(exe_full_filepath);
     free(exe_full_filepath);
     
@@ -155,6 +176,22 @@ test_compile(Compiler *self)
 
     if (!success)
         die("Failed to compile a small test file");
+}
+
+static void
+add_inc_dir(Compiler *self, const char *dir)
+{
+    size_t num_dirs = 2; /* includes the passed-in dir */
+    char **dirs = self->inc_dirs;
+
+    while (*dirs++ != NULL) {
+        num_dirs++;
+    }
+
+    self->inc_dirs == realloc(self->inc_dirs, num_dirs + 1);
+    self->inc_dirs[num_dirs] = NULL;
+    self->inc_dirs[num_dirs - 1] = strdup(dir);
+
 }
 
 /**
