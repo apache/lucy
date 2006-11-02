@@ -6,15 +6,18 @@
 
 #include <stdio.h>
 
-/* Run the LargeFiles module.
- *
- * If support for large files is detected, these symbols will be defined.
- *
+/* The LargeFiles module attempts to detect these symbols or alias them to
+ * synonyms:
+ * 
+ * off64_t
+ * ftello64
+ * fseeko64
+ * 
+ * If the attempt succeeds, this will be defined:
+ * 
  * HAS_LARGE_FILE_SUPPORT
- * loff_t 
- * lftell
- * lfseek
- *
+ * 
+ * Use of the off64_t symbol may require sys/types.h.
  */
 void chaz_LargeFiles_run(FILE *conf_fh);
 
@@ -23,7 +26,6 @@ void chaz_LargeFiles_run(FILE *conf_fh);
 #endif
 
 #endif /* H_CHAZ_LARGE_FILES */
-
 
 /**
  * Copyright 2006 The Apache Software Foundation
