@@ -6,89 +6,101 @@
 
 #include "Charmonizer/Core/Defines.h"
 
+typedef struct chaz_TestBatch chaz_TestBatch;
+
+typedef void
+(*chaz_TestBatch_destroy_t)(chaz_TestBatch *batch);
+
+struct chaz_TestBatch {
+    unsigned test_num;
+    unsigned num_tests;
+    unsigned num_passed;
+    unsigned num_failed; 
+    unsigned num_skipped;
+	chaz_TestBatch_destroy_t destroy;
+};
+
+/* Constructor for TestBatch.
+ */
+chaz_TestBatch*
+chaz_TestHand_new_batch(unsigned num_tests);
+
 /* These tests all require the file _charm_test.h.  See the documentation for
  * Charmonizer.h for instructions on how to produce it.
  *
  * No other header files should be included other than _charm_test.h and this
  * one.
  * 
- * Since Charmonizer conditionally defines many symbols, it is difficult to
- * tell whether a symbol is missing because it should not have been generated,
- * or whether it is missing because an error occurred.  These test functions
- * make the assumption that any missing symbols have a good excuse for their
- * absence, and test only defined symbols.  This may result in undetected
- * failure some of the time.  However, missing symbols required by your
- * application will trigger compile time errors, so the problem is less severe
- * than it appears, affecting only fallbacks.
- *
- * Each test function accepts four arguments: pointers to integers which the
- * function will modify. All diagnostic information is printed to stderr.
+ * Since Charmonizer conditionally defines many symbols, it can be difficult
+ * to tell whether a symbol is missing because it should not have been
+ * generated, or whether it is missing because an error occurred.  These test
+ * functions make the assumption that any missing symbols have a good excuse
+ * for their absence, and test only defined symbols.  This may result in
+ * undetected failure some of the time.  However, missing symbols required by
+ * your application will trigger compile-time errors, so the theoretical
+ * problem of silent failure is less severe than it appears, affecting only
+ * fallbacks.
  */
-void 
-chaz_TestHand_test_FuncMacro(
-    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+chaz_TestBatch* 
+chaz_TestHand_test_FuncMacro();
 
-void 
-chaz_TestHand_test_Headers(
-    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+chaz_TestBatch* 
+chaz_TestHand_test_Headers();
 
-void 
-chaz_TestHand_test_Integers(
-    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+chaz_TestBatch* 
+chaz_TestHand_test_Integers();
 
-void 
-chaz_TestHand_test_LargeFiles(
-    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+chaz_TestBatch* 
+chaz_TestHand_test_LargeFiles();
 
-void 
-chaz_TestHand_test_UnusedVars(
-    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+chaz_TestBatch* 
+chaz_TestHand_test_UnusedVars();
 
-void 
-chaz_TestHand_test_VariadicMacros(
-    int *num_tests, int *num_passed, int *num_failed, int *num_skipped);
+chaz_TestBatch* 
+chaz_TestHand_test_VariadicMacros();
 
 /* Print a message indicating pass/fail based on [value].
  */
 chaz_bool_t
-chaz_TestHand_report(int value, const char *message, int test_num);
+chaz_TestHand_report(chaz_TestBatch *batch, int value, const char *message);
 
 /* Print a message indicating that a test was skipped.
  */
 void
-chaz_TestHand_report_skip(const char *message, int test_num);
+chaz_TestHand_report_skip(chaz_TestBatch *batch, const char *message);
 
 /* Print a message indicating that all remaining tests will be skipped.
  */
 void
-chaz_TestHand_report_skip_remaining(const char *message, int remaining);
+chaz_TestHand_report_skip_remaining(chaz_TestBatch* batch, const char *message);
 
 /* Wrap a call to report(), incrementing tallies based on the results of the
  * test.
  */
-#define Chaz_TestHand_Assert_True(expression, message) \
-     do { \
-         test_num++; \
-         (*num_skipped)--; \
-         if (chaz_TestHand_report(expression, message, test_num)) \
-             (*num_passed)++; \
-         else \
-             (*num_failed)++; \
-     } while (0)
+#define CHAZ_TESTHAND_ASSERT_TRUE(batch, expression, message) \
+         chaz_TestHand_report(batch, expression, message)
 
-#define Chaz_TestHand_Skip(message) \
-    do { \
-        test_num++; \
-        chaz_TestHand_report_skip(message, test_num); \
-    } while (0)
+/* TODO */
+#define CHAZ_TESTHAND_ASSERT_FALSE
+#define CHAZ_TESTHAND_ASSERT_STREQ
+#define CHAZ_TESTHAND_ASSERT_STRNEQ
+#define CHAZ_TESTHAND_ASSERT_FLOATEQ
+#define CHAZ_TESTHAND_ASSERT_FLOATNEQ
+#define CHAZ_TESTHAND_ASSERT_INTEQ
+#define CHAZ_TESTHAND_ASSERT_INTNEQ
 
-#define Chaz_TestHand_Skip_Remaining(message) \
-    do { \
-        chaz_TestHand_report_skip_remaining(message, *num_skipped); \
-        return; \
-    } while (0)
+#define CHAZ_TESTHAND_SKIP(batch, message) \
+        chaz_TestHand_report_skip(batch, message)
+
+#define CHAZ_TESTHAND_SKIP_REMAINING(batch, message) \
+	do { \
+        chaz_TestHand_report_skip_remaining(batch, message); \
+		return batch; \
+	} while (0)
 
 #ifdef CHAZ_USE_SHORT_NAMES
+# define TestBatch                      chaz_TestBatch
+# define TestHand_new_batch             chaz_TestHand_new_batch
 # define TestHand_test_FuncMacro        chaz_TestHand_test_FuncMacro
 # define TestHand_test_Integers         chaz_TestHand_test_Integers
 # define TestHand_test_LargeFiles       chaz_TestHand_test_LargeFiles
@@ -97,9 +109,9 @@ chaz_TestHand_report_skip_remaining(const char *message, int remaining);
 # define TestHand_report                chaz_TestHand_report
 # define TestHand_report_skip           chaz_TestHand_report_skip
 # define TestHand_report_skip_remaining chaz_TestHand_report_skip_remaining
-# define Assert_True                    Chaz_TestHand_Assert_True
-# define Skip                           Chaz_TestHand_Skip
-# define Skip_Remaining                 Chaz_TestHand_Skip_Remaining
+# define ASSERT_TRUE                    CHAZ_TESTHAND_ASSERT_TRUE
+# define SKIP                           CHAZ_TESTHAND_SKIP
+# define SKIP_REMAINING                 CHAZ_TESTHAND_SKIP_REMAINING
 #endif
 
 #endif /* H_CHAZ_TEST_HANDLER */

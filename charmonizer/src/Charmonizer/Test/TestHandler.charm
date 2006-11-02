@@ -1,31 +1,65 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "Charmonizer/Test/TestHandler.h"
 
-chaz_bool_t
-chaz_TestHand_report(int value, const char *message, int test_num)
+static void
+TestBatch_destroy(TestBatch *batch);
+
+TestBatch*
+chaz_TestHand_new_batch(unsigned num_tests)
 {
+    TestBatch *batch = (TestBatch*)malloc(sizeof(TestBatch));
+
+    batch->num_tests       = num_tests;
+    batch->test_num        = 0;
+    batch->num_passed      = 0;
+    batch->num_failed      = 0;
+    batch->num_skipped     = 0;
+    batch->destroy         = TestBatch_destroy;
+
+    return batch;
+}
+
+static void
+TestBatch_destroy(TestBatch *batch)
+{
+    free(batch);
+}
+
+
+chaz_bool_t
+chaz_TestHand_report(TestBatch *batch, int value, const char *message)
+{
+    batch->test_num++;
+
     if (value) {
-        printf("%-4d pass: %s\n", test_num, message);
+        printf("%-4u pass: %s\n", batch->test_num, message);
+        batch->num_passed++;
         return true;
     }
     else {
-        printf("%-4d fail: %s\n", test_num, message);
+        printf("%-4u fail: %s\n", batch->test_num, message);
+        batch->num_failed++;
         return false;
     }
 }
 
 void
-chaz_TestHand_report_skip(const char *message, int test_num)
+chaz_TestHand_report_skip(TestBatch *batch, const char *message)
 {
-    printf("%-4d skip: %s\n", test_num, message);
+    batch->test_num++;
+    printf("%-4d skip: %s\n", batch->test_num, message);
+    batch->num_skipped++;
 }
 
 void
-chaz_TestHand_report_skip_remaining(const char *message, int remaining)
+chaz_TestHand_report_skip_remaining(TestBatch *batch, const char *message)
 {
-    printf("Skipping all %d remaining tests: %s\n", remaining, message);
+    unsigned remaining = batch->num_tests - batch->test_num;
+    batch->num_skipped += remaining;
+    printf("Skipping all %u remaining tests: %s\n", remaining, message);
 }
 
 /**

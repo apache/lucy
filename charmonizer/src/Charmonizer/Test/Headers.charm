@@ -128,25 +128,21 @@
   #include <utime.h>
 #endif
 
-void 
-chaz_TestHand_test_Headers(int *num_tests, int *num_passed, 
-                             int *num_failed, int *num_skipped)
+TestBatch*
+chaz_TestHand_test_Headers()
 {
-    int test_num  = 0;
-    *num_tests    = 2;
-    *num_passed   = 0;
-    *num_failed   = 0;
-    *num_skipped  = *num_tests;
+    TestBatch *batch = TestHand_new_batch(2);
 
-    Assert_True(1, "Include all detected header files");
+    ASSERT_TRUE(batch, 1, "Include all detected header files");
 
     /* don't bother checking all -- just use stdio as an example */
 #ifdef HAS_STDIO_H
-    Assert_True(1, "stdio.h should have been detected");
+    ASSERT_TRUE(batch, 1, "stdio.h should have been detected");
 #else
-    Assert_True(0, "stdio.h should have been detected");
+    ASSERT_TRUE(batch, 0, "stdio.h should have been detected");
 #endif
 
+    return batch;
 }
 
 /**

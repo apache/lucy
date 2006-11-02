@@ -9,11 +9,10 @@
 #include <stdio.h>
 #include "Charmonizer/Test/TestHandler.h"
 
-void 
-chaz_TestHand_test_LargeFiles(int *num_tests, int *num_passed, 
-                              int *num_failed, int *num_skipped)
+TestBatch*
+chaz_TestHand_test_LargeFiles()
 {
-    int test_num  = 0;
+    TestBatch *batch = TestHand_new_batch(10);
     FILE *fh;
     off64_t offset;
     int check_val;
@@ -26,60 +25,57 @@ chaz_TestHand_test_LargeFiles(int *num_tests, int *num_passed,
     /* gb4_plus modulo 4 GB */
     i32_t wrap_gb4 = gb4_plus;
 
-    *num_tests    = 10;
-    *num_passed   = 0;
-    *num_failed   = 0;
-    *num_skipped  = *num_tests;
-
-    Assert_True((sizeof(off64_t) == 8), "off64_t type has 8 bytes");
+    ASSERT_TRUE(batch, (sizeof(off64_t) == 8), "off64_t type has 8 bytes");
 
 #ifndef HAS_LARGE_FILE_SUPPORT
-    Skip_Remaining("No large file support");
+    SKIP_REMAINING(batch, "No large file support");
 #endif
 #ifndef CHAZ_HAS_SPARSE_FILES
-    Skip_Remaining("Can't verify large file support without sparse files");
+    SKIP_REMAINING(batch, "Can't verify large file support without sparse files");
 #endif
 #ifndef CHAZ_CAN_CREATE_BIG_FILES
-    Skip_Remaining("Unsafe to create 5GB sparse files on this system");
+    SKIP_REMAINING(batch, "Unsafe to create 5GB sparse files on this system");
 #endif
 
     fh = fopen("_charm_large_file_test", "w+");
     if (fh == NULL)
-        Skip_Remaining("Failed to open file");
+        SKIP_REMAINING(batch, "Failed to open file");
 
     check_val = fseeko64(fh, gb4_plus, SEEK_SET);
-    Assert_True((check_val == 0), "fseeko64 above 4 GB");
+    ASSERT_TRUE(batch, (check_val == 0), "fseeko64 above 4 GB");
 
     offset = ftello64(fh);
-    Assert_True((offset = gb4_plus), "ftello64 above 4 GB");
+    ASSERT_TRUE(batch, (offset = gb4_plus), "ftello64 above 4 GB");
 
     check_val = fprintf(fh, "X");
-    Assert_True((check_val == 1), "print above 4 GB");
+    ASSERT_TRUE(batch, (check_val == 1), "print above 4 GB");
 
     check_val = fseeko64(fh, gb2_plus, SEEK_SET);
-    Assert_True((check_val == 0), "fseeko64 above 2 GB");
+    ASSERT_TRUE(batch, (check_val == 0), "fseeko64 above 2 GB");
 
     offset = ftello64(fh);
-    Assert_True((offset = gb2_plus), "ftello64 above 2 GB");
+    ASSERT_TRUE(batch, (offset = gb2_plus), "ftello64 above 2 GB");
 
     check_val = fseeko64(fh, -1, SEEK_END);
-    Assert_True((check_val == 0), "seek to near end");
+    ASSERT_TRUE(batch, (check_val == 0), "seek to near end");
 
     check_char = fgetc(fh);
-    Assert_True((check_char == 'X'), "read value after multiple seeks");
+    ASSERT_TRUE(batch, (check_char == 'X'), "read value after multiple seeks");
 
     fseeko64(fh, wrap_gb4, SEEK_SET);
     check_char = fgetc(fh);
-    Assert_True((check_char == '\0'), "No wraparound");
+    ASSERT_TRUE(batch, (check_char == '\0'), "No wraparound");
 
     check_val = fclose(fh);
-    Assert_True((check_val == 0), "fclose succeeds after all that");
+    ASSERT_TRUE(batch, (check_val == 0), "fclose succeeds after all that");
 
     /* truncate, just in case the call to remove fails */
     fh = fopen("_charm_large_file_test", "w+");
     if (fh != NULL)
         fclose(fh);
     remove("_charm_large_file_test");
+
+    return batch;
 }
 
 

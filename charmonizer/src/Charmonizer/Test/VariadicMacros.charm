@@ -5,27 +5,21 @@
 #include <stdio.h>
 #include "Charmonizer/Test/TestHandler.h"
 
-void 
-chaz_TestHand_test_VariadicMacros(int *num_tests, int *num_passed, 
-                                  int *num_failed, int *num_skipped)
+TestBatch*
+chaz_TestHand_test_VariadicMacros()
 {
+    TestBatch *batch = TestHand_new_batch(4);
     char buf[10];
     chaz_bool_t really_has_var_macs = false;
-    int test_num  = 0;
-
-    *num_tests    = 4;
-    *num_passed   = 0;
-    *num_failed   = 0;
-    *num_skipped  = *num_tests;
 
 #if defined(HAS_ISO_VARIADIC_MACROS) || defined(HAS_GNUC_VARIADIC_MACROS)
   #ifdef HAS_VARIADIC_MACROS
-    Assert_True(1, "#defines agree");
+    ASSERT_TRUE(batch, 1, "#defines agree");
   #else 
-    Assert_True(0, "#defines agree");
+    ASSERT_TRUE(batch, 0, "#defines agree");
   #endif
 #else
-    Skip_Remaining("No variadic macro support");
+    SKIP_REMAINING(batch, "No variadic macro support");
 #endif
 
 
@@ -34,9 +28,9 @@ chaz_TestHand_test_VariadicMacros(int *num_tests, int *num_passed,
     sprintf(buffer, fmt, __VA_ARGS__)
     really_has_var_macs = true;
     ISO_TEST(buf, "%s", "iso");
-    Assert_True((strncmp(buf, "iso", 3) == 0), "ISO variadic macros work");
+    ASSERT_TRUE(batch, (strncmp(buf, "iso", 3) == 0), "ISO variadic macros work");
 #else
-    Skip("No ISO variadic macros");
+    SKIP(batch, "No ISO variadic macros");
 #endif
 
 #ifdef HAS_GNUC_VARIADIC_MACROS
@@ -44,12 +38,14 @@ chaz_TestHand_test_VariadicMacros(int *num_tests, int *num_passed,
     sprintf(buffer, fmt, ##args )
     really_has_var_macs = true;
     GNU_TEST(buf, "%s", "gnu");
-    Assert_True((strncmp(buf, "gnu", 3) == 0), "GNUC variadic macros work");
+    ASSERT_TRUE(batch, (strncmp(buf, "gnu", 3) == 0), "GNUC variadic macros work");
 #else
-    Skip("No GNUC variadic macros");
+    SKIP(batch, "No GNUC variadic macros");
 #endif
 
-    Assert_True(really_has_var_macs, "either ISO or GNUC");
+    ASSERT_TRUE(batch, really_has_var_macs, "either ISO or GNUC");
+
+    return batch;
 }
 
 /**

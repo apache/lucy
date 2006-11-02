@@ -4,30 +4,30 @@
 #include <string.h>
 #include "Charmonizer/Test/TestHandler.h"
 
-void 
-chaz_TestHand_test_FuncMacro(int *num_tests, int *num_passed, 
-                             int *num_failed, int *num_skipped)
+TestBatch*
+chaz_TestHand_test_FuncMacro()
 {
-    int test_num  = 0;
-    *num_tests    = 3;
-    *num_passed   = 0;
-    *num_failed   = 0;
-    *num_skipped  = *num_tests;
+    TestBatch *batch = TestHand_new_batch(3);
 
 #ifdef HAS_FUNC_MACRO
-    Assert_True((strcmp(Func_Macro, "chaz_TestHand_test_FuncMacro") == 0), 
+    ASSERT_TRUE(batch, 
+        (strcmp(Func_Macro, "chaz_TestHand_test_FuncMacro") == 0), 
         "Func_Macro");
 #endif
 
 #ifdef HAS_ISO_FUNC_MACRO
-    Assert_True((strcmp(__func__, "chaz_TestHand_test_FuncMacro") == 0),
+    ASSERT_TRUE(batch, 
+        (strcmp(__func__, "chaz_TestHand_test_FuncMacro") == 0),
         "HAS_ISO_FUNC_MACRO");
 #endif
 
 #ifdef HAS_GNUC_FUNC_MACRO
-    Assert_True((strcmp(__FUNCTION__, "chaz_TestHand_test_FuncMacro") == 0), 
+    ASSERT_TRUE(batch, 
+        (strcmp(__FUNCTION__, "chaz_TestHand_test_FuncMacro") == 0), 
         "HAS_GNUC_FUNC_MACRO");
 #endif
+    
+    return batch;
 }
 
 /**

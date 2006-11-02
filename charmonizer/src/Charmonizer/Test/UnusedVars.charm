@@ -3,18 +3,12 @@
 #include "_charm_test.h"
 #include "Charmonizer/Test/TestHandler.h"
 
-void 
-chaz_TestHand_test_UnusedVars(int *num_tests, int *num_passed, 
-                              int *num_failed, int *num_skipped)
+TestBatch*
+chaz_TestHand_test_UnusedVars()
 {
+    TestBatch *batch = TestHand_new_batch(2);
     chaz_bool_t unused_var_is_defined = false;
     chaz_bool_t unreach_is_defined = false;
-    int test_num  = 0;
-
-    *num_tests    = 2;
-    *num_passed   = 0;
-    *num_failed   = 0;
-    *num_skipped  = *num_tests;
 
 #ifdef Unused_Var
     unused_var_is_defined = true;
@@ -23,8 +17,11 @@ chaz_TestHand_test_UnusedVars(int *num_tests, int *num_passed,
     unreach_is_defined = true;
 #endif
 
-    Assert_True(unused_var_is_defined, "Unused_Var macro is defined");
-    Assert_True(unreach_is_defined, "Unreachable_Return macro is defined");
+    ASSERT_TRUE(batch, unused_var_is_defined, "Unused_Var macro is defined");
+    ASSERT_TRUE(batch, unreach_is_defined, 
+        "Unreachable_Return macro is defined");
+
+    return batch;
 }
 
 /**

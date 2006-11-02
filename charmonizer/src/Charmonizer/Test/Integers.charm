@@ -8,91 +8,87 @@
     #include <inttypes.h>
 #endif
 
-void 
-chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed, 
-                            int *num_skipped)
+TestBatch*
+chaz_TestHand_test_Integers()
 {
-    int test_num  = 0;
-    *num_tests    = 37;
-    *num_passed   = 0;
-    *num_failed   = 0;
-    *num_skipped  = *num_tests;
+    TestBatch *batch = TestHand_new_batch(37);
 
     {
         long one= 1;
         long big_endian = !(*((char *)(&one)));
 #ifdef BIG_END
-    Assert_True(big_endian, "BIG_END");
+        ASSERT_TRUE(batch, big_endian, "BIG_END");
 #else
  #if defined(LITTLE_END)
-    Assert_True(!big_endian, "LITTLE_END");
+        ASSERT_TRUE(batch, !big_endian, "LITTLE_END");
  #else
-    Assert_True(0, "Either BIG_END or LITTLE_END should be defined");
+        ASSERT_TRUE(batch, 0, 
+			"Either BIG_END or LITTLE_END should be defined");
  #endif
 #endif
     }
     
-    Assert_True((SIZEOF_CHAR  == sizeof(char)),  "SIZEOF_CHAR");
-    Assert_True((SIZEOF_SHORT == sizeof(short)), "SIZEOF_SHORT");
-    Assert_True((SIZEOF_INT   == sizeof(int)),   "SIZEOF_INT");
-    Assert_True((SIZEOF_LONG  == sizeof(long)),  "SIZEOF_LONG");
-    Assert_True((SIZEOF_PTR   == sizeof(void*)), "SIZEOF_PTR");
+    ASSERT_TRUE(batch, (SIZEOF_CHAR  == sizeof(char)),  "SIZEOF_CHAR");
+    ASSERT_TRUE(batch, (SIZEOF_SHORT == sizeof(short)), "SIZEOF_SHORT");
+    ASSERT_TRUE(batch, (SIZEOF_INT   == sizeof(int)),   "SIZEOF_INT");
+    ASSERT_TRUE(batch, (SIZEOF_LONG  == sizeof(long)),  "SIZEOF_LONG");
+    ASSERT_TRUE(batch, (SIZEOF_PTR   == sizeof(void*)), "SIZEOF_PTR");
 
 #ifdef HAS_LONG_LONG
-    Assert_True((SIZEOF_LONG_LONG == sizeof(long long)), 
+    ASSERT_TRUE(batch, (SIZEOF_LONG_LONG == sizeof(long long)), 
         "HAS_LONG_LONG and SIZEOF_LONG_LONG");
 #endif
     
 #ifdef HAS_INTTYPES_H
-    Assert_True((sizeof(int8_t) == 1), "HAS_INTTYPES_H");
+    ASSERT_TRUE(batch, (sizeof(int8_t) == 1), "HAS_INTTYPES_H");
 #else
-    Skip("No inttypes.h");
+    SKIP(batch, "No inttypes.h");
 #endif
 
     
     {
         bool_t the_truth = true;
-        Assert_True(the_truth, "bool_t true");
-        Assert_True(!false, "false is false");
+        ASSERT_TRUE(batch, the_truth, "bool_t true");
+        ASSERT_TRUE(batch, !false, "false is false");
     }
 #ifdef HAS_I8_T
     {
         i8_t foo = -100;
         u8_t bar = 200;
-        Assert_True((foo == -100), "i8_t is signed");
-        Assert_True((bar == 200), "u8_t is unsigned");
-        Assert_True((sizeof(i8_t) == 1), "i8_t is 1 byte");
-        Assert_True((sizeof(u8_t) == 1), "u8_t is 1 byte");
-        Assert_True((I8_MAX ==  127), "I8_MAX");
-        Assert_True((I8_MIN == -128), "I8_MIN");
-        Assert_True((U8_MAX ==  255), "U8_MAX");
+        ASSERT_TRUE(batch, (foo == -100), "i8_t is signed");
+        ASSERT_TRUE(batch, (bar == 200), "u8_t is unsigned");
+        ASSERT_TRUE(batch, (sizeof(i8_t) == 1), "i8_t is 1 byte");
+        ASSERT_TRUE(batch, (sizeof(u8_t) == 1), "u8_t is 1 byte");
+        ASSERT_TRUE(batch, (I8_MAX ==  127), "I8_MAX");
+        ASSERT_TRUE(batch, (I8_MIN == -128), "I8_MIN");
+        ASSERT_TRUE(batch, (U8_MAX ==  255), "U8_MAX");
     }
 #endif
 #ifdef HAS_I16_T
     {
         i16_t foo = -100;
         u16_t bar = 30000;
-        Assert_True((foo == -100), "i16_t is signed");
-        Assert_True((bar == 30000), "u16_t is unsigned");
-        Assert_True((sizeof(i16_t) == 2), "i16_t is 2 bytes");
-        Assert_True((sizeof(u16_t) == 2), "u16_t is 2 bytes");
-        Assert_True((I16_MAX ==  32767), "I16_MAX");
-        Assert_True((I16_MIN == -32768), "I16_MIN");
-        Assert_True((U16_MAX ==  65535), "U16_MAX");
+        ASSERT_TRUE(batch, (foo == -100), "i16_t is signed");
+        ASSERT_TRUE(batch, (bar == 30000), "u16_t is unsigned");
+        ASSERT_TRUE(batch, (sizeof(i16_t) == 2), "i16_t is 2 bytes");
+        ASSERT_TRUE(batch, (sizeof(u16_t) == 2), "u16_t is 2 bytes");
+        ASSERT_TRUE(batch, (I16_MAX ==  32767), "I16_MAX");
+        ASSERT_TRUE(batch, (I16_MIN == -32768), "I16_MIN");
+        ASSERT_TRUE(batch, (U16_MAX ==  65535), "U16_MAX");
     }
 #endif
 #ifdef HAS_I32_T
     {
         i32_t foo = -100;
         u32_t bar = 4000000000UL;
-        Assert_True((foo == -100), "i32_t is signed");
-        Assert_True((bar == 4000000000UL), "u32_t is unsigned");
-        Assert_True((sizeof(i32_t) == 4), "i32_t is 4 bytes");
-        Assert_True((sizeof(u32_t) == 4), "u32_t is 4 bytes");
-        Assert_True((I32_MAX == I32_C(2147483647)), "I32_MAX");
+        ASSERT_TRUE(batch, (foo == -100), "i32_t is signed");
+        ASSERT_TRUE(batch, (bar == 4000000000UL), "u32_t is unsigned");
+        ASSERT_TRUE(batch, (sizeof(i32_t) == 4), "i32_t is 4 bytes");
+        ASSERT_TRUE(batch, (sizeof(u32_t) == 4), "u32_t is 4 bytes");
+        ASSERT_TRUE(batch, (I32_MAX == I32_C(2147483647)), "I32_MAX");
         /* The (-2147483647 - 1) avoids a compiler warning */
-        Assert_True((I32_MIN == I32_C(-2147483647 - 1)), "I32_MIN");
-        Assert_True((U32_MAX == U32_C(4294967295)), "U32_MAX");
+        ASSERT_TRUE(batch, (I32_MIN == I32_C(-2147483647 - 1)), "I32_MIN");
+        ASSERT_TRUE(batch, (U32_MAX == U32_C(4294967295)), "U32_MAX");
     }
 #endif
 #ifdef HAS_I64_T
@@ -100,17 +96,19 @@ chaz_TestHand_test_Integers(int *num_tests, int *num_passed, int *num_failed,
         char buf[100];
         i64_t foo = -100;
         u64_t bar = U64_C(18000000000000000000);
-        Assert_True((foo == -100), "i64_t is signed");
-        Assert_True((bar == U64_C(18000000000000000000)), 
+        ASSERT_TRUE(batch, (foo == -100), "i64_t is signed");
+        ASSERT_TRUE(batch, (bar == U64_C(18000000000000000000)), 
             "u64_t is unsigned");
-        Assert_True((sizeof(i64_t) == 8), "i64_t is 8 bytes");
-        Assert_True((sizeof(u64_t) == 8), "u64_t is 8 bytes");
+        ASSERT_TRUE(batch, (sizeof(i64_t) == 8), "i64_t is 8 bytes");
+        ASSERT_TRUE(batch, (sizeof(u64_t) == 8), "u64_t is 8 bytes");
         sprintf(buf, "%"I64P, foo);
-        Assert_True((strcmp(buf, "-100") == 0), "I64P");
+        ASSERT_TRUE(batch, (strcmp(buf, "-100") == 0), "I64P");
         sprintf(buf, "%"U64P, bar);
-        Assert_True((strcmp(buf, "18000000000000000000") == 0), "U64P");
+        ASSERT_TRUE(batch, (strcmp(buf, "18000000000000000000") == 0), "U64P");
     }
 #endif
+
+	return batch;
 }
 
 /**
