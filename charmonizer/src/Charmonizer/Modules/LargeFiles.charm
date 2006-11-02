@@ -60,17 +60,6 @@ chaz_LargeFiles_run(FILE *conf_fh)
 
     Start_Run(conf_fh, "LargeFiles");
 
-    /* check for sparse files */
-    if (check_sparse_files()) {
-        append_conf(conf_fh, "#define CHAZ_HAS_SPARSE_FILES\n");
-        /* see if we can create a 5 GB file without crashing */
-        if (success && can_create_big_files())
-            append_conf(conf_fh, "#define CHAZ_CAN_CREATE_BIG_FILES\n");
-    }
-    else {
-        append_conf(conf_fh, "#define CHAZ_NO_SPARSE_FILES\n");
-    }
-
     /* see if off64_t and friends exist or have synonyms */
     for (i = 0; off64_combos[i].includes != NULL; i++) {
         off64_combo combo = off64_combos[i];
@@ -82,8 +71,6 @@ chaz_LargeFiles_run(FILE *conf_fh)
             break;
         }
     }
-
-
 
     /* write the affirmations/definitions */
     if (success) {
@@ -100,6 +87,17 @@ chaz_LargeFiles_run(FILE *conf_fh)
                 function_prefix, fseek_command
             );
         }
+    }
+
+    /* check for sparse files */
+    if (check_sparse_files()) {
+        append_conf(conf_fh, "#define CHAZ_HAS_SPARSE_FILES\n");
+        /* see if we can create a 5 GB file without crashing */
+        if (success && can_create_big_files())
+            append_conf(conf_fh, "#define CHAZ_CAN_CREATE_BIG_FILES\n");
+    }
+    else {
+        append_conf(conf_fh, "#define CHAZ_NO_SPARSE_FILES\n");
     }
 
     /* short names */
@@ -250,6 +248,7 @@ can_create_big_files()
     /* concat the source strings, compile the file, capture output */
     code_buf_len = join_strings(&code_buf, code_buf_len,
         create_bigfile_code_a, fseek_command, create_bigfile_code_b, NULL);
+
     output = capture_output(code_buf, code_buf_len, &output_len);
 
     /* truncate, just in case the call to remove fails */
