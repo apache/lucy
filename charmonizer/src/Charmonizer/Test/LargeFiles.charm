@@ -51,7 +51,7 @@ chaz_TestHand_test_LargeFiles()
     ASSERT_INT_EQ(batch, check_val, 1, "print above 4 GB");
 
     check_val = fseeko64(fh, gb2_plus, SEEK_SET);
-    ASSERT_TRUE(batch, check_val, 0, "fseeko64 above 2 GB");
+    ASSERT_INT_EQ(batch, check_val, 0, "fseeko64 above 2 GB");
 
     offset = ftello64(fh);
     ASSERT_TRUE(batch, (offset = gb2_plus), "ftello64 above 2 GB");
