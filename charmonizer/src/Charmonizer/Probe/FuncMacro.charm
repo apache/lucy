@@ -80,12 +80,12 @@ chaz_FuncMacro_run(FILE *conf_fh)
     if (want_short_names) {
         Start_Short_Names(conf_fh);
         if (has_iso_funcmac) 
-            shorten_constant(conf_fh, "HAS_ISO_FUNC_MACRO");
+            shorten_constant("HAS_ISO_FUNC_MACRO");
         if (has_gnuc_funcmac)
-            shorten_constant(conf_fh, "HAS_GNUC_FUNC_MACRO");
+            shorten_constant("HAS_GNUC_FUNC_MACRO");
         if (has_iso_funcmac || has_gnuc_funcmac) {
-            shorten_constant(conf_fh, "HAS_FUNC_MACRO");
-            shorten_macro(conf_fh, "Func_Macro");
+            shorten_constant("HAS_FUNC_MACRO");
+            shorten_macro("Func_Macro");
         }
         End_Short_Names(conf_fh);
     }

@@ -23,6 +23,7 @@ extern struct chaz_OperSys  *chaz_ModHand_os;
 extern struct chaz_Compiler *chaz_ModHand_compiler;
 extern chaz_bool_t chaz_ModHand_charm_run_available;
 extern FILE* chaz_ModHand_charm_test_h_fh;
+extern FILE* chaz_ModHand_conf_fh;
 extern chaz_bool_t chaz_ModHand_want_charm_test_h;
 
 extern char *chaz_ModHand_constant_prefix;
@@ -73,22 +74,22 @@ chaz_ModHand_append_conf(FILE *conf_fh, char *fmt, ...);
 /* Define a shortened version of a constant symbol (minus the prefix);
  */
 void
-chaz_ModHand_shorten_constant(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_constant(const char *symbol);
 
 /* Define a shortened version of a macro symbol (minuse the prefix);
  */
 void
-chaz_ModHand_shorten_macro(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_macro(const char *symbol);
 
 /* Define a shortened version of a typedef symbol (minuse the prefix);
  */
 void
-chaz_ModHand_shorten_typedef(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_typedef(const char *symbol);
 
 /* Define a shortened version of a function symbol (minuse the prefix);
  */
 void
-chaz_ModHand_shorten_function(FILE *conf_fh, const char *symbol);
+chaz_ModHand_shorten_function(const char *symbol);
 
 /* Signal Charmonizer that it should write _charm_test.h.
  */

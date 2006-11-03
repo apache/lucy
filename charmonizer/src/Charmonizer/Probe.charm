@@ -14,7 +14,7 @@ void
 chaz_Probe_init(FILE *conf_fh, const char *osname, const char *cc_command,    
           const char *cc_flags)
 {
-    (void)conf_fh; /* unused for now */
+    chaz_ModHand_conf_fh = conf_fh;
 
     /* create os and compiler objects */
     os       = OS_new(osname);

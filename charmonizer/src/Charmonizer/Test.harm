@@ -25,10 +25,10 @@ struct chaz_TestBatch {
 chaz_TestBatch*
 chaz_Test_new_batch(unsigned num_tests);
 
-/* These tests all require the file _charm_test.h.  See the documentation for
+/* These tests all require the file charmony.h.  See the documentation for
  * Charmonizer/Probe.h for instructions on how to produce it.
  *
- * No other header files should be included other than _charm_test.h and this
+ * No other header files should be included other than charmony.h and this
  * one.
  * 
  * Since Charmonizer conditionally defines many symbols, it can be difficult

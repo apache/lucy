@@ -103,13 +103,13 @@ chaz_LargeFiles_run(FILE *conf_fh)
     /* short names */
     if (want_short_names && success) {
         Start_Short_Names(conf_fh);
-        shorten_constant(conf_fh, "HAS_LARGE_FILE_SUPPORT");
+        shorten_constant("HAS_LARGE_FILE_SUPPORT");
 
         /* alias these only if they're not already provided and correct */
         if (strcmp(loff_type, "off64_t") != 0) {
-            shorten_constant(conf_fh, "off64_t");
-            shorten_function(conf_fh, "ftello64");
-            shorten_function(conf_fh, "fseeko64");
+            shorten_constant("off64_t");
+            shorten_function("ftello64");
+            shorten_function("fseeko64");
         }
         End_Short_Names(conf_fh);
     }

@@ -30,6 +30,7 @@ struct chaz_OperSys  *chaz_ModHand_os = NULL;
 struct chaz_Compiler *chaz_ModHand_compiler = NULL;
 chaz_bool_t chaz_ModHand_charm_run_available = false;
 FILE* chaz_ModHand_charm_test_h_fh = NULL;
+FILE* chaz_ModHand_conf_fh = NULL;
 chaz_bool_t chaz_ModHand_want_charm_test_h = false;
 
 char *constant_prefix = NULL;
@@ -208,27 +209,31 @@ clean_up_try()
 }
 
 void
-chaz_ModHand_shorten_constant(FILE *conf_fh, const char *sym)
+chaz_ModHand_shorten_constant(const char *sym)
 {
-    append_conf(conf_fh, "# define %s %s%s\n", sym, constant_prefix, sym); 
+    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
+        sym, constant_prefix, sym); 
 }
 
 void
-chaz_ModHand_shorten_macro(FILE *conf_fh, const char *sym)
+chaz_ModHand_shorten_macro(const char *sym)
 {
-    append_conf(conf_fh, "# define %s %s%s\n", sym, macro_prefix, sym); 
+    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
+        sym, macro_prefix, sym); 
 }
 
 void
-chaz_ModHand_shorten_typedef(FILE *conf_fh, const char *sym)
+chaz_ModHand_shorten_typedef(const char *sym)
 {
-    append_conf(conf_fh, "# define %s %s%s\n", sym, typedef_prefix, sym); 
+    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
+        sym, typedef_prefix, sym); 
 }
 
 void
-chaz_ModHand_shorten_function(FILE *conf_fh, const char *sym)
+chaz_ModHand_shorten_function(const char *sym)
 {
-    append_conf(conf_fh, "# define %s %s%s\n", sym, function_prefix, sym); 
+    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
+        sym, function_prefix, sym); 
 }
 
 void

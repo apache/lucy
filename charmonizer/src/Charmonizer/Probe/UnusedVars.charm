@@ -20,8 +20,8 @@ chaz_UnusedVars_run(FILE *conf_fh)
 
     if (want_short_names) {
         Start_Short_Names(conf_fh);
-        shorten_macro(conf_fh, "Unused_Var");
-        shorten_macro(conf_fh, "Unreachable_Return");
+        shorten_macro("Unused_Var");
+        shorten_macro("Unreachable_Return");
         End_Short_Names(conf_fh);
     }
 

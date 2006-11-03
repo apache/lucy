@@ -67,11 +67,11 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     if (want_short_names) {
         Start_Short_Names(conf_fh);
         if (has_varmacros)
-            shorten_constant(conf_fh, "HAS_VARIADIC_MACROS");
+            shorten_constant("HAS_VARIADIC_MACROS");
         if (has_iso_varmacros)
-            shorten_constant(conf_fh, "HAS_ISO_VARIADIC_MACROS");
+            shorten_constant("HAS_ISO_VARIADIC_MACROS");
         if (has_gnuc_varmacros)
-            shorten_constant(conf_fh, "HAS_GNUC_VARIADIC_MACROS");
+            shorten_constant("HAS_GNUC_VARIADIC_MACROS");
         End_Short_Names(conf_fh);
     }
 
