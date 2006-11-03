@@ -62,12 +62,13 @@ chaz_ModHand_append_conf(FILE *conf_fh, char *fmt, ...);
 /* Print bookends delimiting a short names block.
  */
 #define Chaz_ModHand_Start_Short_Names(conf_fh) \
-    append_conf(conf_fh, \
-        "\n#ifdef %sUSE_SHORT_NAMES\n", chaz_ModHand_constant_prefix)
+  append_conf(conf_fh, \
+    "\n#if defined(%sUSE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n", \
+            chaz_ModHand_constant_prefix)
 
 #define Chaz_ModHand_End_Short_Names(conf_fh) \
     append_conf(conf_fh, \
-        "#endif /* %sUSE_SHORT_NAMES */\n", chaz_ModHand_constant_prefix)
+        "#endif /* USE_SHORT_NAMES */\n", chaz_ModHand_constant_prefix)
 
 /* Define a shortened version of a constant symbol (minus the prefix);
  */
