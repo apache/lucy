@@ -133,13 +133,13 @@ chaz_TestHand_test_Headers()
 {
     TestBatch *batch = TestHand_new_batch(2);
 
-    ASSERT_TRUE(batch, 1, "Include all detected header files");
+    PASS(batch, "Compiled successfully with all detected headers");
 
     /* don't bother checking all -- just use stdio as an example */
 #ifdef HAS_STDIO_H
-    ASSERT_TRUE(batch, 1, "stdio.h should have been detected");
+    PASS(batch, "stdio.h should have been detected");
 #else
-    ASSERT_TRUE(batch, 0, "stdio.h should have been detected");
+    FAIL(batch, "stdio.h should have been detected");
 #endif
 
     return batch;

@@ -22,59 +22,57 @@ chaz_TestHand_test_Integers()
  #if defined(LITTLE_END)
         ASSERT_TRUE(batch, !big_endian, "LITTLE_END");
  #else
-        ASSERT_TRUE(batch, 0, 
-			"Either BIG_END or LITTLE_END should be defined");
+        FAIL(batch, "Either BIG_END or LITTLE_END should be defined");
  #endif
 #endif
     }
     
-    ASSERT_TRUE(batch, (SIZEOF_CHAR  == sizeof(char)),  "SIZEOF_CHAR");
-    ASSERT_TRUE(batch, (SIZEOF_SHORT == sizeof(short)), "SIZEOF_SHORT");
-    ASSERT_TRUE(batch, (SIZEOF_INT   == sizeof(int)),   "SIZEOF_INT");
-    ASSERT_TRUE(batch, (SIZEOF_LONG  == sizeof(long)),  "SIZEOF_LONG");
-    ASSERT_TRUE(batch, (SIZEOF_PTR   == sizeof(void*)), "SIZEOF_PTR");
+    ASSERT_INT_EQ(batch, SIZEOF_CHAR,  sizeof(char),  "SIZEOF_CHAR");
+    ASSERT_INT_EQ(batch, SIZEOF_SHORT, sizeof(short), "SIZEOF_SHORT");
+    ASSERT_INT_EQ(batch, SIZEOF_INT,   sizeof(int),   "SIZEOF_INT");
+    ASSERT_INT_EQ(batch, SIZEOF_LONG,  sizeof(long),  "SIZEOF_LONG");
+    ASSERT_INT_EQ(batch, SIZEOF_PTR,   sizeof(void*), "SIZEOF_PTR");
 
 #ifdef HAS_LONG_LONG
-    ASSERT_TRUE(batch, (SIZEOF_LONG_LONG == sizeof(long long)), 
+    ASSERT_INT_EQ(batch, SIZEOF_LONG_LONG, sizeof(long long), 
         "HAS_LONG_LONG and SIZEOF_LONG_LONG");
 #endif
     
 #ifdef HAS_INTTYPES_H
-    ASSERT_TRUE(batch, (sizeof(int8_t) == 1), "HAS_INTTYPES_H");
+    ASSERT_INT_EQ(batch, sizeof(int8_t), 1, "HAS_INTTYPES_H");
 #else
     SKIP(batch, "No inttypes.h");
 #endif
 
-    
     {
         bool_t the_truth = true;
         ASSERT_TRUE(batch, the_truth, "bool_t true");
-        ASSERT_TRUE(batch, !false, "false is false");
+        ASSERT_FALSE(batch, false, "false is false");
     }
 #ifdef HAS_I8_T
     {
         i8_t foo = -100;
         u8_t bar = 200;
-        ASSERT_TRUE(batch, (foo == -100), "i8_t is signed");
-        ASSERT_TRUE(batch, (bar == 200), "u8_t is unsigned");
-        ASSERT_TRUE(batch, (sizeof(i8_t) == 1), "i8_t is 1 byte");
-        ASSERT_TRUE(batch, (sizeof(u8_t) == 1), "u8_t is 1 byte");
-        ASSERT_TRUE(batch, (I8_MAX ==  127), "I8_MAX");
-        ASSERT_TRUE(batch, (I8_MIN == -128), "I8_MIN");
-        ASSERT_TRUE(batch, (U8_MAX ==  255), "U8_MAX");
+        ASSERT_INT_EQ(batch, foo, -100, "i8_t is signed");
+        ASSERT_INT_EQ(batch, bar, 200, "u8_t is unsigned");
+        ASSERT_INT_EQ(batch, sizeof(i8_t), 1, "i8_t is 1 byte");
+        ASSERT_INT_EQ(batch, sizeof(u8_t), 1, "u8_t is 1 byte");
+        ASSERT_INT_EQ(batch, I8_MAX,  127, "I8_MAX");
+        ASSERT_INT_EQ(batch, I8_MIN, -128, "I8_MIN");
+        ASSERT_INT_EQ(batch, U8_MAX,  255, "U8_MAX");
     }
 #endif
 #ifdef HAS_I16_T
     {
         i16_t foo = -100;
         u16_t bar = 30000;
-        ASSERT_TRUE(batch, (foo == -100), "i16_t is signed");
-        ASSERT_TRUE(batch, (bar == 30000), "u16_t is unsigned");
-        ASSERT_TRUE(batch, (sizeof(i16_t) == 2), "i16_t is 2 bytes");
-        ASSERT_TRUE(batch, (sizeof(u16_t) == 2), "u16_t is 2 bytes");
-        ASSERT_TRUE(batch, (I16_MAX ==  32767), "I16_MAX");
-        ASSERT_TRUE(batch, (I16_MIN == -32768), "I16_MIN");
-        ASSERT_TRUE(batch, (U16_MAX ==  65535), "U16_MAX");
+        ASSERT_INT_EQ(batch, foo, -100, "i16_t is signed");
+        ASSERT_INT_EQ(batch, bar, 30000, "u16_t is unsigned");
+        ASSERT_INT_EQ(batch, sizeof(i16_t), 2, "i16_t is 2 bytes");
+        ASSERT_INT_EQ(batch, sizeof(u16_t), 2, "u16_t is 2 bytes");
+        ASSERT_INT_EQ(batch, I16_MAX,  32767, "I16_MAX");
+        ASSERT_INT_EQ(batch, I16_MIN, -32768, "I16_MIN");
+        ASSERT_INT_EQ(batch, U16_MAX,  65535, "U16_MAX");
     }
 #endif
 #ifdef HAS_I32_T
@@ -102,13 +100,13 @@ chaz_TestHand_test_Integers()
         ASSERT_TRUE(batch, (sizeof(i64_t) == 8), "i64_t is 8 bytes");
         ASSERT_TRUE(batch, (sizeof(u64_t) == 8), "u64_t is 8 bytes");
         sprintf(buf, "%"I64P, foo);
-        ASSERT_TRUE(batch, (strcmp(buf, "-100") == 0), "I64P");
+        ASSERT_STR_EQ(batch, buf, "-100", "I64P");
         sprintf(buf, "%"U64P, bar);
-        ASSERT_TRUE(batch, (strcmp(buf, "18000000000000000000") == 0), "U64P");
+        ASSERT_STR_EQ(batch, buf, "18000000000000000000", "U64P");
     }
 #endif
 
-	return batch;
+    return batch;
 }
 
 /**

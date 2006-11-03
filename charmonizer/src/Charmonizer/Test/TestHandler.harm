@@ -17,7 +17,7 @@ struct chaz_TestBatch {
     unsigned num_passed;
     unsigned num_failed; 
     unsigned num_skipped;
-	chaz_TestBatch_destroy_t destroy;
+    chaz_TestBatch_destroy_t destroy;
 };
 
 /* Constructor for TestBatch.
@@ -59,44 +59,70 @@ chaz_TestHand_test_UnusedVars();
 chaz_TestBatch* 
 chaz_TestHand_test_VariadicMacros();
 
-/* Print a message indicating pass/fail based on [value].
+/* Note: maybe add line numbers later.
  */
-chaz_bool_t
-chaz_TestHand_report(chaz_TestBatch *batch, int value, const char *message);
+#define CHAZ_TESTHAND_ASSERT_TRUE       chaz_TestHand_assert_true
+#define CHAZ_TESTHAND_ASSERT_FALSE      chaz_TestHand_assert_false
+#define CHAZ_TESTHAND_ASSERT_STR_EQ     chaz_TestHand_assert_str_eq
+#define CHAZ_TESTHAND_ASSERT_STR_NEQ    chaz_TestHand_assert_str_neq
+#define CHAZ_TESTHAND_PASS              chaz_TestHand_pass
+#define CHAZ_TESTHAND_FAIL              chaz_TestHand_fail
+#define CHAZ_TESTHAND_ASSERT_INT_EQ     chaz_TestHand_assert_int_eq
+#define CHAZ_TESTHAND_ASSERT_FLOAT_EQ   chaz_TestHand_assert_float_eq
 
-/* Print a message indicating that a test was skipped.
+/* Print a message indicating that a test was skipped and update batch.
  */
-void
-chaz_TestHand_report_skip(chaz_TestBatch *batch, const char *message);
-
-/* Print a message indicating that all remaining tests will be skipped.
- */
-void
-chaz_TestHand_report_skip_remaining(chaz_TestBatch* batch, const char *message);
-
-/* Wrap a call to report(), incrementing tallies based on the results of the
- * test.
- */
-#define CHAZ_TESTHAND_ASSERT_TRUE(batch, expression, message) \
-         chaz_TestHand_report(batch, expression, message)
-
-/* TODO */
-#define CHAZ_TESTHAND_ASSERT_FALSE
-#define CHAZ_TESTHAND_ASSERT_STREQ
-#define CHAZ_TESTHAND_ASSERT_STRNEQ
-#define CHAZ_TESTHAND_ASSERT_FLOATEQ
-#define CHAZ_TESTHAND_ASSERT_FLOATNEQ
-#define CHAZ_TESTHAND_ASSERT_INTEQ
-#define CHAZ_TESTHAND_ASSERT_INTNEQ
-
 #define CHAZ_TESTHAND_SKIP(batch, message) \
-        chaz_TestHand_report_skip(batch, message)
+        chaz_TestHand_skip(batch, message)
 
+/* Print a message indicating that all remaining tests will be skipped and
+ * return.
+ */
 #define CHAZ_TESTHAND_SKIP_REMAINING(batch, message) \
-	do { \
+    do { \
         chaz_TestHand_report_skip_remaining(batch, message); \
-		return batch; \
-	} while (0)
+        return batch; \
+    } while (0)
+
+
+void 
+chaz_TestHand_assert_true(chaz_TestBatch *batch, int expression, 
+                          const char *pat, ...);
+
+void 
+chaz_TestHand_assert_false(chaz_TestBatch *batch, int expression, 
+                           const char *pat, ...);
+
+void 
+chaz_TestHand_assert_str_eq(chaz_TestBatch *batch, const char *expected, 
+                            const char *got, const char *pat, ...);
+
+void 
+chaz_TestHand_assert_str_neq(chaz_TestBatch *batch, const char *expected,
+                             const char *got, const char *pat, ...);
+
+void 
+chaz_TestHand_pass(chaz_TestBatch *batch, const char *pat, ...);
+
+void 
+chaz_TestHand_fail(chaz_TestBatch *batch, const char *pat, ...);
+
+void 
+chaz_TestHand_assert_int_eq(chaz_TestBatch *batch, long expected, long got, 
+                            const char *pat, ...);
+
+void 
+chaz_TestHand_assert_float_eq(chaz_TestBatch *batch, double expected, 
+                              double got, const char *pat, ...);
+
+void
+chaz_TestHand_skip(chaz_TestBatch *batch, const char *pat, ...);
+
+void
+chaz_TestHand_report_skip_remaining(chaz_TestBatch* batch, 
+                                    const char *pat, ...);
+
+
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define TestBatch                      chaz_TestBatch
@@ -107,9 +133,16 @@ chaz_TestHand_report_skip_remaining(chaz_TestBatch* batch, const char *message);
 # define TestHand_test_UnusedVars       chaz_TestHand_test_UnusedVars
 # define TestHand_test_VariadicMacros   chaz_TestHand_test_VariadicMacros
 # define TestHand_report                chaz_TestHand_report
-# define TestHand_report_skip           chaz_TestHand_report_skip
+# define TestHand_report_skip           chaz_TestHand_skip
 # define TestHand_report_skip_remaining chaz_TestHand_report_skip_remaining
 # define ASSERT_TRUE                    CHAZ_TESTHAND_ASSERT_TRUE
+# define ASSERT_FALSE                   CHAZ_TESTHAND_ASSERT_FALSE
+# define ASSERT_STR_EQ                  CHAZ_TESTHAND_ASSERT_STR_EQ
+# define ASSERT_STR_NEQ                    CHAZ_TESTHAND_ASSERT_STR_NEQ
+# define PASS                            CHAZ_TESTHAND_PASS
+# define FAIL                            CHAZ_TESTHAND_FAIL
+# define ASSERT_INT_EQ                    CHAZ_TESTHAND_ASSERT_INT_EQ
+# define ASSERT_FLOAT_EQ                CHAZ_TESTHAND_ASSERT_FLOAT_EQ
 # define SKIP                           CHAZ_TESTHAND_SKIP
 # define SKIP_REMAINING                 CHAZ_TESTHAND_SKIP_REMAINING
 #endif

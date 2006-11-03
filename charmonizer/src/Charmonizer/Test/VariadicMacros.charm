@@ -14,9 +14,9 @@ chaz_TestHand_test_VariadicMacros()
 
 #if defined(HAS_ISO_VARIADIC_MACROS) || defined(HAS_GNUC_VARIADIC_MACROS)
   #ifdef HAS_VARIADIC_MACROS
-    ASSERT_TRUE(batch, 1, "#defines agree");
+    PASS(batch, "#defines agree");
   #else 
-    ASSERT_TRUE(batch, 0, "#defines agree");
+    FAIL(batch, 0, "#defines agree");
   #endif
 #else
     SKIP_REMAINING(batch, "No variadic macro support");
@@ -28,7 +28,7 @@ chaz_TestHand_test_VariadicMacros()
     sprintf(buffer, fmt, __VA_ARGS__)
     really_has_var_macs = true;
     ISO_TEST(buf, "%s", "iso");
-    ASSERT_TRUE(batch, (strncmp(buf, "iso", 3) == 0), "ISO variadic macros work");
+    ASSERT_STR_EQ(batch, buf, "iso", "ISO variadic macros work");
 #else
     SKIP(batch, "No ISO variadic macros");
 #endif
@@ -38,7 +38,7 @@ chaz_TestHand_test_VariadicMacros()
     sprintf(buffer, fmt, ##args )
     really_has_var_macs = true;
     GNU_TEST(buf, "%s", "gnu");
-    ASSERT_TRUE(batch, (strncmp(buf, "gnu", 3) == 0), "GNUC variadic macros work");
+    ASSERT_STR_EQ(batch, buf, "gnu", "GNUC variadic macros work");
 #else
     SKIP(batch, "No GNUC variadic macros");
 #endif

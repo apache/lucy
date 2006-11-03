@@ -7,19 +7,17 @@ TestBatch*
 chaz_TestHand_test_UnusedVars()
 {
     TestBatch *batch = TestHand_new_batch(2);
-    chaz_bool_t unused_var_is_defined = false;
-    chaz_bool_t unreach_is_defined = false;
-
 #ifdef Unused_Var
-    unused_var_is_defined = true;
-#endif
-#ifdef Unreachable_Return
-    unreach_is_defined = true;
+    PASS(batch, "Unused_Var macro is defined");
+#else
+    FAIL(batch, "Unused_Var macro is defined");
 #endif
 
-    ASSERT_TRUE(batch, unused_var_is_defined, "Unused_Var macro is defined");
-    ASSERT_TRUE(batch, unreach_is_defined, 
-        "Unreachable_Return macro is defined");
+#ifdef Unreachable_Return
+    PASS(batch, "Unreachable_Return macro is defined");
+#else
+    FAIL(batch, "Unreachable_Return macro is defined");
+#endif
 
     return batch;
 }

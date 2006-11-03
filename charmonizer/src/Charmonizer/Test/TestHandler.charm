@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 #include "Charmonizer/Test/TestHandler.h"
 
 static void
@@ -12,7 +14,10 @@ chaz_TestHand_new_batch(unsigned num_tests)
 {
     TestBatch *batch = (TestBatch*)malloc(sizeof(TestBatch));
 
+    /* assign */
     batch->num_tests       = num_tests;
+    
+    /* initialize */
     batch->test_num        = 0;
     batch->num_passed      = 0;
     batch->num_failed      = 0;
@@ -28,38 +33,239 @@ TestBatch_destroy(TestBatch *batch)
     free(batch);
 }
 
-
-chaz_bool_t
-chaz_TestHand_report(TestBatch *batch, int value, const char *message)
+void
+chaz_TestHand_assert_true(TestBatch *batch, int value, const char *pat, ...)
 {
+    va_list args;
+
+    /* increment test number */
     batch->test_num++;
 
+    /* test condition and pass or fail */
     if (value) {
-        printf("%-4u pass: %s\n", batch->test_num, message);
+        printf("%-4u pass: ", batch->test_num);
         batch->num_passed++;
-        return true;
     }
     else {
-        printf("%-4u fail: %s\n", batch->test_num, message);
+        printf("%-4u fail: ", batch->test_num);
         batch->num_failed++;
-        return false;
     }
+    
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
 }
 
 void
-chaz_TestHand_report_skip(TestBatch *batch, const char *message)
+chaz_TestHand_assert_false(TestBatch *batch, int value, const char *pat, ...)
 {
+    va_list args;
+
+    /* increment test number */
     batch->test_num++;
-    printf("%-4d skip: %s\n", batch->test_num, message);
-    batch->num_skipped++;
+
+    /* test condition and pass or fail */
+    if (value == 0) {
+        printf("%-4u pass: ", batch->test_num);
+        batch->num_passed++;
+    }
+    else {
+        printf("%-4u fail: ", batch->test_num);
+        batch->num_failed++;
+    }
+    
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+
+    printf("\n");
+}
+
+void 
+chaz_TestHand_assert_str_eq(TestBatch *batch, const char *expected, 
+                            const char *got, const char *pat, ...)
+{
+    va_list args;
+    
+    /* increment test number */
+    batch->test_num++;
+    
+    /* test condition and pass or fail */
+    if (strcmp(expected, got) == 0) {
+        printf("%-4u pass: ", batch->test_num);
+        batch->num_passed++;
+    }
+    else {
+        printf("%-4u fail: Expected '%s', got '%s'\n    ", batch->test_num, 
+            expected, got);
+        batch->num_failed++;
+    }
+    
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
+}
+
+
+void 
+chaz_TestHand_assert_str_neq(TestBatch *batch, const char *expected, 
+                             const char *got, const char *pat, ...)
+{
+    va_list args;
+    
+    /* increment test number */
+    batch->test_num++;
+    
+    /* test condition and pass or fail */
+    if (strcmp(expected, got) != 0) {
+        printf("%-4u pass: ", batch->test_num);
+        batch->num_passed++;
+    }
+    else {
+        printf("%-4u fail: Expected '%s', got '%s'\n    ", batch->test_num, 
+            expected, got);
+        batch->num_failed++;
+    }
+    
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
+}
+
+void 
+chaz_TestHand_pass(TestBatch *batch, const char *pat, ...)
+{
+    va_list args;
+
+    /* increment test number */
+    batch->test_num++;
+
+    /* indicate pass, update pass counter */
+    printf("%-4u pass:\n", batch->test_num);
+    batch->num_passed++;
+
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
+}
+
+void 
+chaz_TestHand_fail(TestBatch *batch, const char *pat, ...)
+{
+    va_list args;
+
+    /* increment test number */
+    batch->test_num++;
+
+    /* indicate failure, update pass counter */
+    printf("%-4u fail:\n", batch->test_num);
+    batch->num_failed++;
+
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
+}
+
+void 
+chaz_TestHand_assert_int_eq(TestBatch *batch, long expected, long got, 
+                            const char *pat, ...)
+{
+    va_list args;
+
+    /* increment test number */
+    batch->test_num++;
+
+    if (expected == got) {
+        printf("%-4u pass: ", batch->test_num);
+        batch->num_passed++;
+    }
+    else {
+        printf("%-4u fail: Expected '%ld', got '%ld'\n    ", batch->test_num, 
+            expected, got);
+        batch->num_failed++;
+    }
+    
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
+}
+
+void 
+chaz_TestHand_assert_float_eq(TestBatch *batch, double expected, 
+                              double got, const char *pat, ...)
+{
+    va_list args;
+    double diff = expected/got;
+
+    /* increment test number */
+    batch->test_num++;
+    
+    /* evaluate condition and pass or fail */
+    if (diff > 0.00001) {
+        printf("%-4u pass: ", batch->test_num);
+        batch->num_passed++;
+    }
+    else {
+        printf("%-4u fail: Expected '%f', got '%f'\n    ", batch->test_num, 
+            expected, got);
+        batch->num_failed++;
+    }
+    
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
+
 }
 
 void
-chaz_TestHand_report_skip_remaining(TestBatch *batch, const char *message)
+chaz_TestHand_skip(TestBatch *batch, const char *pat, ...)
 {
+    va_list args;
+
+    /* increment test number */
+    batch->test_num++;
+
+    /* indicate that test is being skipped, update pass counter */
+    printf("%-4d skip: ", batch->test_num);
+    batch->num_skipped++;
+
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
+}
+
+void
+chaz_TestHand_report_skip_remaining(TestBatch *batch, const char *pat, ...)
+{
+    va_list args;
     unsigned remaining = batch->num_tests - batch->test_num;
+    
+    /* indicate that tests are being skipped, update skip counter */
     batch->num_skipped += remaining;
-    printf("Skipping all %u remaining tests: %s\n", remaining, message);
+    printf("Skipping all %u remaining tests: ", remaining);
+
+    /* print supplied message */
+    va_start(args, pat);
+    vprintf(pat, args);
+    va_end(args);
+    printf("\n");
 }
 
 /**
