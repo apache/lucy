@@ -1,31 +1,21 @@
-/* Charmonizer/Modules/LargeFiles.h
+/* Charmonizer/Probe/VariadicMacros.h
  */
 
-#ifndef H_CHAZ_LARGE_FILES
-#define H_CHAZ_LARGE_FILES
+#ifndef H_CHAZ_VARIADIC_MACROS
+#define H_CHAZ_VARIADIC_MACROS 
 
 #include <stdio.h>
 
-/* The LargeFiles module attempts to detect these symbols or alias them to
- * synonyms:
- * 
- * off64_t
- * ftello64
- * fseeko64
- * 
- * If the attempt succeeds, this will be defined:
- * 
- * HAS_LARGE_FILE_SUPPORT
- * 
- * Use of the off64_t symbol may require sys/types.h.
+/* Run the VariadicMacros module.
  */
-void chaz_LargeFiles_run(FILE *conf_fh);
+void chaz_VariadicMacros_run(FILE *conf_fh);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define LargeFiles_run    chaz_LargeFiles_run
+# define VariadicMacros_run    chaz_VaradicMacros_run
 #endif
 
-#endif /* H_CHAZ_LARGE_FILES */
+#endif /* H_CHAZ_VARIADIC_MACROS */
+
 
 /**
  * Copyright 2006 The Apache Software Foundation

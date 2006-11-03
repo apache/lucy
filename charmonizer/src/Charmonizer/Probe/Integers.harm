@@ -1,4 +1,4 @@
-/* Charmonizer/Modules/Integers.h -- info about integer types and sizes.
+/* Charmonizer/Probe/Integers.h -- info about integer types and sizes.
  *
  * One or the other of these will be defined, depending on whether the
  * processor is big-endian or little-endian.

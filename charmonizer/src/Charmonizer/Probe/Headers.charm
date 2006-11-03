@@ -3,7 +3,7 @@
 #include "Charmonizer/Core/HeadCheck.h"
 #include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/Util.h"
-#include "Charmonizer/Modules/Headers.h"
+#include "Charmonizer/Probe/Headers.h"
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>

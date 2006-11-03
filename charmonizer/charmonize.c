@@ -7,12 +7,12 @@
 #include <string.h>
 #include <stdarg.h>
 #include "Charmonizer.h"
-#include "Charmonizer/Modules/FuncMacro.h"
-#include "Charmonizer/Modules/Headers.h"
-#include "Charmonizer/Modules/Integers.h"
-#include "Charmonizer/Modules/LargeFiles.h"
-#include "Charmonizer/Modules/UnusedVars.h"
-#include "Charmonizer/Modules/VariadicMacros.h"
+#include "Charmonizer/Probe/FuncMacro.h"
+#include "Charmonizer/Probe/Headers.h"
+#include "Charmonizer/Probe/Integers.h"
+#include "Charmonizer/Probe/LargeFiles.h"
+#include "Charmonizer/Probe/UnusedVars.h"
+#include "Charmonizer/Probe/VariadicMacros.h"
 
 /* Process command line args, set up Charmonizer, etc. Returns the outpath
  * (where the config file should be written to).
