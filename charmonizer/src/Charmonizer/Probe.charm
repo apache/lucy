@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Charmonizer.h"
+#include "Charmonizer/Probe.h"
 #include "Charmonizer/Core/HeadCheck.h"
 #include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/Util.h"
@@ -11,7 +11,7 @@
 #include "Charmonizer/Core/OperSys.h"
 
 void
-chaz_init(FILE *conf_fh, const char *osname, const char *cc_command,    
+chaz_Probe_init(FILE *conf_fh, const char *osname, const char *cc_command,    
           const char *cc_flags)
 {
     (void)conf_fh; /* unused for now */
@@ -21,7 +21,7 @@ chaz_init(FILE *conf_fh, const char *osname, const char *cc_command,
     compiler = CC_new(os, cc_command, cc_flags);
 
     /* don't write short names unless the user so indicates */
-    chaz_set_prefixes("", "", "", "");
+    chaz_Probe_set_prefixes("", "", "", "");
     want_short_names = false;
 
     /* dispatch other tasks */
@@ -33,7 +33,7 @@ chaz_init(FILE *conf_fh, const char *osname, const char *cc_command,
 }
 
 void
-chaz_clean_up()
+chaz_Probe_clean_up()
 {
     if (verbosity)
         printf("Cleaning up...\n");
@@ -49,7 +49,7 @@ chaz_clean_up()
 }
 
 void
-chaz_set_prefixes(const char *constant_pre, const char *macro_pre, 
+chaz_Probe_set_prefixes(const char *constant_pre, const char *macro_pre, 
                   const char* typedef_pre,  const char *function_pre) 
 {
     want_short_names = true;
@@ -69,18 +69,18 @@ chaz_set_prefixes(const char *constant_pre, const char *macro_pre,
 }
 
 void
-chaz_set_verbosity(int level)
+chaz_Probe_set_verbosity(int level)
 {
     verbosity = level;
 }
 
 char*
-chaz_slurp_file(char* filepath, size_t *len_ptr) {
+chaz_Probe_slurp_file(char* filepath, size_t *len_ptr) {
     return slurp_file(filepath, len_ptr);
 }
 
 void
-chaz_write_charm_test_h()
+chaz_Probe_write_charm_test_h()
 {
     ModHand_write_charm_test_h();
 }

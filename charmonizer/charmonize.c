@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include "Charmonizer.h"
+#include "Charmonizer/Probe.h"
 #include "Charmonizer/Probe/FuncMacro.h"
 #include "Charmonizer/Probe/Headers.h"
 #include "Charmonizer/Probe/Integers.h"
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     finish_conf_file(config_fh);
     if (fclose(config_fh))
         die("Error closing config file: %s", strerror(errno));
-    chaz_clean_up();
+    chaz_Probe_clean_up();
 
     return 0;
 }
@@ -79,7 +79,7 @@ init(int argc, char **argv)
     /* parse the infile */
     if (argc != 2)
         die("Usage: ./charmonize INFILE");
-    infile_str = chaz_slurp_file(argv[1], &infile_len);
+    infile_str = chaz_Probe_slurp_file(argv[1], &infile_len);
     cc_command = extract_delim_and_verify(infile_str, infile_len, 
         "charm_cc_command");
     cc_flags = extract_delim_and_verify(infile_str, infile_len, 
@@ -99,11 +99,11 @@ init(int argc, char **argv)
     /* set up Charmonizer */
     if (verbosity_str != NULL) {
         const long verbosity = strtol(verbosity_str, NULL, 10);
-        chaz_set_verbosity(verbosity);
+        chaz_Probe_set_verbosity(verbosity);
     }
-    chaz_init(conf_fh, os_name, cc_command, cc_flags);
-    chaz_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
-    chaz_write_charm_test_h();
+    chaz_Probe_init(conf_fh, os_name, cc_command, cc_flags);
+    chaz_Probe_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
+    chaz_Probe_write_charm_test_h();
 
     /* clean up */
     free(infile_str);

@@ -8,20 +8,20 @@
  * else.
  */
 void
-chaz_init(FILE *conf_fh, const char *os_name, const char *cc_command, 
+chaz_Probe_init(FILE *conf_fh, const char *os_name, const char *cc_command, 
           const char *cc_flags);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
  * should be called only after everything else finishes.
  */
 void
-chaz_clean_up();
+chaz_Probe_clean_up();
 
 /* These prefixes will be prepended to every symbol Charmonizer generates.
  * By default, they are blank.
  */ 
 void
-chaz_set_prefixes(const char *constant_prefix, const char *macro_prefix, 
+chaz_Probe_set_prefixes(const char *constant_prefix, const char *macro_prefix, 
                   const char *typedef_prefix,  const char *function_prefix);
 
 /* Determine how much feedback Charmonizer provides.  
@@ -30,19 +30,19 @@ chaz_set_prefixes(const char *constant_prefix, const char *macro_prefix,
  * 2 - debugging
  */
 void
-chaz_set_verbosity(int level);
+chaz_Probe_set_verbosity(int level);
 
 /* Read an entire file into memory.
  */
 char*
-chaz_slurp_file(char* filepath, size_t *len_ptr);
+chaz_Probe_slurp_file(char* filepath, size_t *len_ptr);
 
 /* In addition to the main output, write symbols without prefixes to the file
  * _charm_test.h in the current working directory.  This file is needed for
  * testing Charmonizer's output using the files in Charmonizer/Test.
  */
 void
-chaz_write_charm_test_h();
+chaz_Probe_write_charm_test_h();
 
 #endif /* include guard */
 
