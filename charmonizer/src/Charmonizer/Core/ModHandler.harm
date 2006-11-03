@@ -58,17 +58,17 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
  * _charm_test.h, if indicated.
  */
 void
-chaz_ModHand_append_conf(FILE *conf_fh, char *fmt, ...);
+chaz_ModHand_append_conf(char *fmt, ...);
 
 /* Print bookends delimiting a short names block.
  */
 #define Chaz_ModHand_Start_Short_Names(conf_fh) \
-  append_conf(conf_fh, \
+  append_conf( \
     "\n#if defined(%sUSE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n", \
             chaz_ModHand_constant_prefix)
 
 #define Chaz_ModHand_End_Short_Names(conf_fh) \
-    append_conf(conf_fh, \
+    append_conf( \
         "#endif /* USE_SHORT_NAMES */\n", chaz_ModHand_constant_prefix)
 
 /* Define a shortened version of a constant symbol (minus the prefix);
@@ -100,7 +100,7 @@ chaz_ModHand_write_charm_test_h();
  */
 #define Chaz_ModHand_Start_Run(filehandle, module_name) \
     do { \
-        append_conf(filehandle, "\n/* %s */\n", module_name); \
+        append_conf("\n/* %s */\n", module_name); \
         if (verbosity > 0) \
             printf("Running %s module...\n", module_name); \
     } while (0)
@@ -108,7 +108,7 @@ chaz_ModHand_write_charm_test_h();
 /* Leave a little whitespace at the end of each module.
  */
 #define Chaz_ModHand_End_Run(filehandle) \
-    append_conf(filehandle, "\n")
+    append_conf("\n")
 
 
 #ifdef CHAZ_USE_SHORT_NAMES

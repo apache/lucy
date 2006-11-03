@@ -88,9 +88,9 @@ chaz_Integers_run(FILE *conf_fh)
 
     /* document endian-ness */
     if (machine_is_big_endian())
-        append_conf(conf_fh, "#define %sBIG_END\n", constant_prefix);
+        append_conf("#define %sBIG_END\n", constant_prefix);
     else 
-        append_conf(conf_fh, "#define %sLITTLE_END\n", constant_prefix);
+        append_conf("#define %sLITTLE_END\n", constant_prefix);
 
     /* Record sizeof() for several common integer types. */
     output = capture_output(sizes_code, strlen(sizes_code), &output_len);
@@ -171,14 +171,14 @@ chaz_Integers_run(FILE *conf_fh)
 
     /* write out some conditional defines */
     if (has_inttypes)
-        append_conf(conf_fh, "#define %sHAS_INTTYPES_H\n", constant_prefix);
+        append_conf("#define %sHAS_INTTYPES_H\n", constant_prefix);
     if (has_long_long)
-        append_conf(conf_fh, "#define %sHAS_LONG_LONG\n", constant_prefix);
+        append_conf("#define %sHAS_LONG_LONG\n", constant_prefix);
     if (has___int64)
-        append_conf(conf_fh, "#define %sHAS___INT64\n", constant_prefix);
+        append_conf("#define %sHAS___INT64\n", constant_prefix);
 
     /* write out sizes */
-    append_conf(conf_fh, 
+    append_conf(
         "#define %sSIZEOF_CHAR %d\n"
         "#define %sSIZEOF_SHORT %d\n"
         "#define %sSIZEOF_INT %d\n"
@@ -191,24 +191,24 @@ chaz_Integers_run(FILE *conf_fh)
         constant_prefix, sizeof_ptr
     );
     if (has_long_long) {
-        append_conf(conf_fh, "#define %sSIZEOF_LONG_LONG %d\n",
+        append_conf("#define %sSIZEOF_LONG_LONG %d\n",
             constant_prefix, sizeof_long_long);
     }
     if (has___int64) {
-        append_conf(conf_fh, "#define %sSIZEOF___INT64 %d\n",
+        append_conf("#define %sSIZEOF___INT64 %d\n",
             constant_prefix, sizeof___int64);
     }
 
     /* write affirmations, typedefs and maximums/minimums */
-    append_conf(conf_fh, "typedef int %sbool_t;\n", typedef_prefix);
+    append_conf("typedef int %sbool_t;\n", typedef_prefix);
     if (has_8) {
-        append_conf(conf_fh,
+        append_conf(
             "#define %sHAS_I8_T\n"
             "typedef char %si8_t;\n"
             "typedef unsigned char %su8_t;\n",
             constant_prefix, typedef_prefix, typedef_prefix
         );
-        append_conf(conf_fh,
+        append_conf(
             "#define %sI8_MAX 0x7F\n"
             "#define %sI8_MIN (-I8_MAX - 1)\n"
             "#define %sU8_MAX (I8_MAX * 2 + 1)\n",
@@ -216,13 +216,13 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (has_16) {
-        append_conf(conf_fh,
+        append_conf(
             "#define %sHAS_I16_T\n"
             "typedef short %si16_t;\n"
             "typedef unsigned short %su16_t;\n",
             constant_prefix, typedef_prefix, typedef_prefix
         );
-        append_conf(conf_fh,
+        append_conf(
             "#define %sI16_MAX 0x7FFF\n"
             "#define %sI16_MIN (-I16_MAX - 1)\n"
             "#define %sU16_MAX (I16_MAX * 2 + 1)\n",
@@ -230,7 +230,7 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (has_32) {
-        append_conf(conf_fh,
+        append_conf(
             "#define %sHAS_I32_T\n"
             "typedef %s %si32_t;\n"
             "typedef unsigned %s %su32_t;\n",
@@ -238,7 +238,7 @@ chaz_Integers_run(FILE *conf_fh)
             i32_t_type, typedef_prefix, 
             i32_t_type, typedef_prefix
         );
-        append_conf(conf_fh,
+        append_conf(
             "#define %sI32_MAX 0x7FFFFFFF%s\n"
             "#define %sI32_MIN (-I32_MAX - 1)\n"
             "#define %sU32_MAX (I32_MAX * 2%s + 1%s)\n",
@@ -248,7 +248,7 @@ chaz_Integers_run(FILE *conf_fh)
         );
     }
     if (has_64) {
-        append_conf(conf_fh,
+        append_conf(
             "#define %sHAS_I64_T\n"
             "typedef %s %si64_t;\n"
             "typedef unsigned %s %su64_t;\n",
@@ -256,7 +256,7 @@ chaz_Integers_run(FILE *conf_fh)
             i64_t_type, typedef_prefix, 
             i64_t_type, typedef_prefix
         );
-        append_conf(conf_fh,
+        append_conf(
             "#define %sI64_MAX 0x7FFFFFFFFFFFFFFF%s\n"
             "#define %sI64_MIN (-I64_MAX - 1%s)\n"
             "#define %sU64_MAX (I64_MAX * 2%s + 1%s)\n",
@@ -303,7 +303,7 @@ chaz_Integers_run(FILE *conf_fh)
             if (   output_len != 0 
                 && strcmp(output, "18446744073709551615") == 0
             ) {
-                append_conf(conf_fh, 
+                append_conf(
                     "#define %sI64P \"%sd\"\n"
                     "#define %sU64P \"%su\"\n",
                     macro_prefix, options[i], 
@@ -318,7 +318,7 @@ chaz_Integers_run(FILE *conf_fh)
     /* write out the 32-bit and 64-bit literal macros */
     if (has_32) {
         if (strcmp(i32_t_postfix, "") == 0) {
-            append_conf(conf_fh, 
+            append_conf(
                 "#define %sI32_C(n) n\n"
                 "#define %sU32_C(n) n##%s\n",
                 macro_prefix, 
@@ -326,7 +326,7 @@ chaz_Integers_run(FILE *conf_fh)
             );
         }
         else {
-            append_conf(conf_fh, 
+            append_conf(
                 "#define %sI32_C(n) n##%s\n"
                 "#define %sU32_C(n) n##%s\n",
                 macro_prefix, i32_t_postfix,
@@ -335,7 +335,7 @@ chaz_Integers_run(FILE *conf_fh)
         }
     }
     if (has_64) {
-        append_conf(conf_fh, 
+        append_conf(
             "#define %sI64_C(n) n##%s\n"
             "#define %sU64_C(n) n##%s\n",
             macro_prefix, i64_t_postfix,
@@ -344,7 +344,7 @@ chaz_Integers_run(FILE *conf_fh)
     }
 
     /* true and false */
-    append_conf(conf_fh,
+    append_conf(
         "#ifndef true\n"
         "# define true 1\n"
         "#endif\n"

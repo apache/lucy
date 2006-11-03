@@ -12,7 +12,7 @@ chaz_UnusedVars_run(FILE *conf_fh)
 {
     Start_Run(conf_fh, "UnusedVars");
     
-    append_conf(conf_fh, 
+    append_conf(
         "#define %sUnused_Var(x) ((void)x)\n"
         "#define %sUnreachable_Return(type) return (type)0\n",
         macro_prefix, macro_prefix 

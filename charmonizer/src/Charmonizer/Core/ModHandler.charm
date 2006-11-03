@@ -185,12 +185,12 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
 }
 
 void
-chaz_ModHand_append_conf(FILE *conf_fh, char *fmt, ...)
+chaz_ModHand_append_conf(char *fmt, ...)
 {
     va_list args;
 
     va_start(args, fmt);
-    vfprintf(conf_fh, fmt, args);
+    vfprintf(chaz_ModHand_conf_fh, fmt, args);
     va_end(args);
 
     if (want_charm_test_h) {
@@ -211,29 +211,25 @@ clean_up_try()
 void
 chaz_ModHand_shorten_constant(const char *sym)
 {
-    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
-        sym, constant_prefix, sym); 
+    append_conf("# define %s %s%s\n", sym, constant_prefix, sym); 
 }
 
 void
 chaz_ModHand_shorten_macro(const char *sym)
 {
-    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
-        sym, macro_prefix, sym); 
+    append_conf("# define %s %s%s\n", sym, macro_prefix, sym); 
 }
 
 void
 chaz_ModHand_shorten_typedef(const char *sym)
 {
-    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
-        sym, typedef_prefix, sym); 
+    append_conf("# define %s %s%s\n", sym, typedef_prefix, sym); 
 }
 
 void
 chaz_ModHand_shorten_function(const char *sym)
 {
-    append_conf(chaz_ModHand_conf_fh, "# define %s %s%s\n", 
-        sym, function_prefix, sym); 
+    append_conf("# define %s %s%s\n", sym, function_prefix, sym); 
 }
 
 void

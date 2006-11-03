@@ -74,11 +74,10 @@ chaz_LargeFiles_run(FILE *conf_fh)
 
     /* write the affirmations/definitions */
     if (success) {
-        append_conf(conf_fh, 
-            "#define %sHAS_LARGE_FILE_SUPPORT\n", constant_prefix );
+        append_conf("#define %sHAS_LARGE_FILE_SUPPORT\n", constant_prefix );
         /* alias these only if they're not already provided and correct */
         if (strcmp(loff_type, "off64_t") != 0) {
-            append_conf(conf_fh, 
+            append_conf(
                 "#define %soff64_t %s\n"
                 "#define %sftello64 %s\n" 
                 "#define %sfseeko64 %s\n",
@@ -91,13 +90,13 @@ chaz_LargeFiles_run(FILE *conf_fh)
 
     /* check for sparse files */
     if (check_sparse_files()) {
-        append_conf(conf_fh, "#define CHAZ_HAS_SPARSE_FILES\n");
+        append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
         /* see if we can create a 5 GB file without crashing */
         if (success && can_create_big_files())
-            append_conf(conf_fh, "#define CHAZ_CAN_CREATE_BIG_FILES\n");
+            append_conf("#define CHAZ_CAN_CREATE_BIG_FILES\n");
     }
     else {
-        append_conf(conf_fh, "#define CHAZ_NO_SPARSE_FILES\n");
+        append_conf("#define CHAZ_NO_SPARSE_FILES\n");
     }
 
     /* short names */
