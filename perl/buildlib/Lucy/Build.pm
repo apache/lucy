@@ -190,7 +190,7 @@ sub ACTION_build_charm_test {
     my $exe_path        = "charm_test$Config{_exe}";
     my $test_source_dir = catdir( $FILTERED_DIR, qw( Charmonizer Test ) );
     my $source_files = $self->_find_files( $FILTERED_DIR,
-        sub { $File::Find::name =~ m#Charmonizer/Test/.*?\.c$# } );
+        sub { $File::Find::name =~ m#Charmonizer/Test.*?\.c$# } );
     push @$source_files, $source_path;
 
     my $cbuilder = ExtUtils::CBuilder->new;

@@ -2,27 +2,27 @@
 
 #include "_charm_test.h"
 #include <string.h>
-#include "Charmonizer/Test/TestHandler.h"
+#include "Charmonizer/Test.h"
 
 TestBatch *oogabooga;
 
 TestBatch*
-chaz_TestHand_test_FuncMacro(void)
+chaz_Test_test_FuncMacro(void)
 {
-    TestBatch *batch = TestHand_new_batch(3);
+    TestBatch *batch = Test_new_batch(3);
 
 #ifdef HAS_FUNC_MACRO
-    ASSERT_STR_EQ(batch, Func_Macro, "chaz_TestHand_test_FuncMacro", 
+    ASSERT_STR_EQ(batch, Func_Macro, "chaz_Test_test_FuncMacro", 
         "Func_Macro");
 #endif
 
 #ifdef HAS_ISO_FUNC_MACRO
-    ASSERT_STR_EQ(batch, __func__, "chaz_TestHand_test_FuncMacro",
+    ASSERT_STR_EQ(batch, __func__, "chaz_Test_test_FuncMacro",
         "HAS_ISO_FUNC_MACRO");
 #endif
 
 #ifdef HAS_GNUC_FUNC_MACRO
-    ASSERT_STR_EQ(batch, __FUNCTION__, "chaz_TestHand_test_FuncMacro", 
+    ASSERT_STR_EQ(batch, __FUNCTION__, "chaz_Test_test_FuncMacro", 
         "HAS_GNUC_FUNC_MACRO");
 #endif
     

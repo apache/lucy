@@ -1,12 +1,12 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "_charm_test.h"
-#include "Charmonizer/Test/TestHandler.h"
+#include "Charmonizer/Test.h"
 
 TestBatch*
-chaz_TestHand_test_UnusedVars()
+chaz_Test_test_UnusedVars()
 {
-    TestBatch *batch = TestHand_new_batch(2);
+    TestBatch *batch = Test_new_batch(2);
 #ifdef Unused_Var
     PASS(batch, "Unused_Var macro is defined");
 #else

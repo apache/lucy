@@ -7,12 +7,12 @@
 #endif
 
 #include <stdio.h>
-#include "Charmonizer/Test/TestHandler.h"
+#include "Charmonizer/Test.h"
 
 TestBatch*
-chaz_TestHand_test_LargeFiles()
+chaz_Test_test_LargeFiles()
 {
-    TestBatch *batch = TestHand_new_batch(10);
+    TestBatch *batch = Test_new_batch(10);
     FILE *fh;
     off64_t offset;
     int check_val;

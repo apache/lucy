@@ -2,7 +2,7 @@
 
 #include "_charm_test.h"
 #include <string.h>
-#include "Charmonizer/Test/TestHandler.h"
+#include "Charmonizer/Test.h"
 
 #ifdef HAS_ASSERT_H
   #include <assert.h>
@@ -129,9 +129,9 @@
 #endif
 
 TestBatch*
-chaz_TestHand_test_Headers()
+chaz_Test_test_Headers()
 {
-    TestBatch *batch = TestHand_new_batch(2);
+    TestBatch *batch = Test_new_batch(2);
 
     PASS(batch, "Compiled successfully with all detected headers");
 

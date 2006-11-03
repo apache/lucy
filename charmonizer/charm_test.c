@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Charmonizer/Test/TestHandler.h"
+#include "Charmonizer/Test.h"
 
 /* this is the signature for all Charmonizer test functions */
 typedef chaz_TestBatch*
@@ -11,12 +11,12 @@ typedef struct TestGroup {
     t_func func;
 } TestGroup;
 TestGroup tests[] = {
-    { "FuncMacro", chaz_TestHand_test_FuncMacro },
-    { "Headers", chaz_TestHand_test_Headers },
-    { "Integers", chaz_TestHand_test_Integers },
-    { "LargeFiles", chaz_TestHand_test_LargeFiles },
-    { "UnusedVars", chaz_TestHand_test_UnusedVars },
-    { "VariadicMacros", chaz_TestHand_test_VariadicMacros },
+    { "FuncMacro", chaz_Test_test_FuncMacro },
+    { "Headers", chaz_Test_test_Headers },
+    { "Integers", chaz_Test_test_Integers },
+    { "LargeFiles", chaz_Test_test_LargeFiles },
+    { "UnusedVars", chaz_Test_test_UnusedVars },
+    { "VariadicMacros", chaz_Test_test_VariadicMacros },
     { NULL, NULL }
 };
 

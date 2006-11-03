@@ -1,6 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Test/TestHandler.h"
+#include "Charmonizer/Test.h"
 #include "_charm_test.h"
 #include <stdio.h>
 #include <string.h>
@@ -9,9 +9,9 @@
 #endif
 
 TestBatch*
-chaz_TestHand_test_Integers()
+chaz_Test_test_Integers()
 {
-    TestBatch *batch = TestHand_new_batch(37);
+    TestBatch *batch = Test_new_batch(37);
 
     {
         long one= 1;

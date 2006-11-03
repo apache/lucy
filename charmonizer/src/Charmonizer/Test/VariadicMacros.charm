@@ -3,12 +3,12 @@
 #include "_charm_test.h"
 #include <string.h>
 #include <stdio.h>
-#include "Charmonizer/Test/TestHandler.h"
+#include "Charmonizer/Test.h"
 
 TestBatch*
-chaz_TestHand_test_VariadicMacros()
+chaz_Test_test_VariadicMacros()
 {
-    TestBatch *batch = TestHand_new_batch(4);
+    TestBatch *batch = Test_new_batch(4);
     char buf[10];
     chaz_bool_t really_has_var_macs = false;
 
