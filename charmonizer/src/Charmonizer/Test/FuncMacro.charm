@@ -4,8 +4,6 @@
 #include <string.h>
 #include "Charmonizer/Test.h"
 
-TestBatch *oogabooga;
-
 TestBatch*
 chaz_Test_test_FuncMacro(void)
 {
