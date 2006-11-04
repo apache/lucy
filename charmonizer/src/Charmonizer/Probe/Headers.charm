@@ -77,7 +77,7 @@ chaz_Headers_run(FILE *conf_fh)
     chaz_bool_t has_posix = false;
     chaz_bool_t has_c89   = false;
     
-    Start_Run(conf_fh, "Headers");
+    START_RUN("Headers");
 
     /* test for all POSIX headers in one blast */
     if (check_many_headers((const char**)posix_headers)) {
@@ -123,7 +123,7 @@ chaz_Headers_run(FILE *conf_fh)
         End_Short_Names(conf_fh);
     }
 
-    End_Run(conf_fh);
+    END_RUN;
 }
 
 static void

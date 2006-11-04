@@ -58,7 +58,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
     chaz_bool_t success = false;
     unsigned i;
 
-    Start_Run(conf_fh, "LargeFiles");
+    START_RUN("LargeFiles");
 
     /* see if off64_t and friends exist or have synonyms */
     for (i = 0; off64_combos[i].includes != NULL; i++) {
@@ -114,7 +114,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
     }
     
     free(code_buf);
-    End_Run(conf_fh);
+    END_RUN;
 }
 
 /* code for checking ftello64 and friends */

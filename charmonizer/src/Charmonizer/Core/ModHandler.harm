@@ -98,7 +98,7 @@ chaz_ModHand_write_charm_test_h();
 
 /* Print a "chapter heading" when starting a module. 
  */
-#define Chaz_ModHand_Start_Run(filehandle, module_name) \
+#define CHAZ_MODHAND_START_RUN(module_name) \
     do { \
         append_conf("\n/* %s */\n", module_name); \
         if (verbosity > 0) \
@@ -107,8 +107,7 @@ chaz_ModHand_write_charm_test_h();
 
 /* Leave a little whitespace at the end of each module.
  */
-#define Chaz_ModHand_End_Run(filehandle) \
-    append_conf("\n")
+#define CHAZ_MODHAND_END_RUN append_conf("\n")
 
 
 #ifdef CHAZ_USE_SHORT_NAMES
@@ -137,8 +136,8 @@ chaz_ModHand_write_charm_test_h();
 # define shorten_macro          chaz_ModHand_shorten_macro
 # define shorten_typedef        chaz_ModHand_shorten_typedef
 # define shorten_function       chaz_ModHand_shorten_function
-# define Start_Run              Chaz_ModHand_Start_Run
-# define End_Run                Chaz_ModHand_End_Run
+# define START_RUN              CHAZ_MODHAND_START_RUN
+# define END_RUN                CHAZ_MODHAND_END_RUN
 # define ModHand_write_charm_test_h chaz_ModHand_write_charm_test_h
 #endif
 

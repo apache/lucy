@@ -38,7 +38,7 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     chaz_bool_t has_iso_varmacros  = false;
     chaz_bool_t has_gnuc_varmacros = false;
 
-    Start_Run(conf_fh, "VariadicMacros");
+    START_RUN("VariadicMacros");
 
     /* test for ISO-style variadic macros */
     output = capture_output(iso_code, strlen(iso_code), &output_len);
@@ -75,7 +75,7 @@ chaz_VariadicMacros_run(FILE *conf_fh)
         End_Short_Names(conf_fh);
     }
 
-    End_Run(conf_fh);
+    END_RUN;
 }
 
 

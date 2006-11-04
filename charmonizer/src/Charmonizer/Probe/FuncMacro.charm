@@ -36,7 +36,7 @@ chaz_FuncMacro_run(FILE *conf_fh)
     chaz_bool_t has_iso_funcmac  = false;
     chaz_bool_t has_gnuc_funcmac = false;
 
-    Start_Run(conf_fh, "FuncMacro");
+    START_RUN("FuncMacro");
     
     /* check for ISO func macro */
     output = capture_output(iso_func_code, strlen(iso_func_code), 
@@ -88,7 +88,7 @@ chaz_FuncMacro_run(FILE *conf_fh)
         End_Short_Names(conf_fh);
     }
 
-    End_Run(conf_fh);
+    END_RUN;
 }
 
 

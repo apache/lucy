@@ -84,7 +84,7 @@ chaz_Integers_run(FILE *conf_fh)
     char i64_t_postfix[10];
     char u64_t_postfix[10];
 
-    Start_Run(conf_fh, "Integers");
+    START_RUN("Integers");
 
     /* document endian-ness */
     if (machine_is_big_endian())
@@ -424,7 +424,7 @@ chaz_Integers_run(FILE *conf_fh)
         End_Short_Names(conf_fh);
     }
     
-    End_Run(conf_fh);
+    END_RUN;
 }
 
 static chaz_bool_t
