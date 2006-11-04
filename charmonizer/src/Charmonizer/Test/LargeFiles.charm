@@ -1,6 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "_charm_test.h"
+#include "charmony.h"
 
 #ifdef HAS_SYS_TYPES_H
   #include <sys/types.h>

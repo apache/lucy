@@ -144,7 +144,7 @@ sub _metaquote_charm_files {
 sub ACTION_lucyconf {
     my $self          = shift;
     my $lucyconf_in   = 'lucyconf_in';
-    my $lucyconf_path = "lucyconf.h";
+    my $lucyconf_path = "charmony.h";
 
     $self->dispatch('charmonizer');
 

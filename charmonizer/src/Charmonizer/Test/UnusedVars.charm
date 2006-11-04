@@ -1,6 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "_charm_test.h"
+#include "charmony.h"
 #include "Charmonizer/Test.h"
 
 TestBatch*
