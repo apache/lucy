@@ -4,17 +4,11 @@
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/CompilerSpec.h"
 
-static CompilerSpec specs[] = {
-    { "MSVC", "/I", "/Fo", "/Fe" },
-    { "gcc", "-I ", "-o ", "-o " },
-    { NULL, "", "", "" }
-};
-
 /* detect a supported compiler */
 #ifdef __GNUC__
-  #define COMPILER_NICK "gcc"
+    static CompilerSpec spec = { "gcc", "-I ", "-o ", "-o " };
 #elif defined(_MSC_VER)
-  #define COMPILER_NICK "MSVC"
+    static CompilerSpec spec = { "MSVC", "/I", "/Fo", "/Fe" };
 #else
   #error "Couldn't detect a supported compiler"
 #endif
@@ -23,20 +17,10 @@ static CompilerSpec specs[] = {
 chaz_CompilerSpec*
 chaz_CCSpec_find_spec()
 {
-    int i;
-    
     if (verbosity)
         printf("Trying to find a supported compiler...\n");
 
-    for (i = 0; ; i++) {
-        if (specs[i].nickname == NULL) /* shouldn't happen */
-            die("Couldn't find compiler spec in specs[] array");
-
-        if ( strcmp(specs[i].nickname, COMPILER_NICK) == 0 )
-            break;
-    }
-
-    return &specs[i];
+    return &spec;
 }
 
 /**
