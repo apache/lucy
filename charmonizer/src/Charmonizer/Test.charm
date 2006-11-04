@@ -9,6 +9,13 @@
 static void
 TestBatch_destroy(TestBatch *batch);
 
+void
+chaz_Test_init(void) {
+	int check_val = setvbuf(stdout, NULL, _IONBF, 0);
+	if (check_val != 0)
+		fprintf(stderr, "Failed when trying to unbuffer stdout\n");
+}
+
 TestBatch*
 chaz_Test_new_batch(unsigned num_tests)
 {
@@ -148,7 +155,7 @@ chaz_Test_pass(TestBatch *batch, const char *pat, ...)
     batch->test_num++;
 
     /* indicate pass, update pass counter */
-    printf("%-4u pass:\n", batch->test_num);
+    printf("%-4u pass: ", batch->test_num);
     batch->num_passed++;
 
     /* print supplied message */

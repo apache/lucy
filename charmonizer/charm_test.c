@@ -27,6 +27,8 @@ int main() {
     int total_skipped = 0;
     int i;
 
+    chaz_Test_init();
+    
     /* loop through test functions, accumulating results */
     for (i = 0; tests[i].name != NULL; i++) {
         t_func test_func = tests[i].func;

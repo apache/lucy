@@ -20,7 +20,12 @@ struct chaz_TestBatch {
     chaz_TestBatch_destroy_t destroy;
 };
 
-/* Constructor for TestBatch.
+/* Unbuffer stdout.  Perform any other setup needed.
+ */
+void
+chaz_Test_init(void);
+
+/* Constructor for TestBatch.  Will print a message to the screen.
  */
 chaz_TestBatch*
 chaz_Test_new_batch(unsigned num_tests);
