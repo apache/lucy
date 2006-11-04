@@ -2,6 +2,7 @@
 
 #include "charmony.h"
 #include "Charmonizer/Test.h"
+#include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
 chaz_TUnusedVars_prepare()

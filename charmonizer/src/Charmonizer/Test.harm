@@ -47,58 +47,6 @@ chaz_TestBatch*
 chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 				    chaz_TestBatch_test_func_t test_func);
 
-/* These tests all require the file charmony.h.  See the documentation for
- * Charmonizer/Probe.h for instructions on how to produce it.
- *
- * No other header files should be included other than charmony.h and this
- * one.
- * 
- * Since Charmonizer conditionally defines many symbols, it can be difficult
- * to tell whether a symbol is missing because it should not have been
- * generated, or whether it is missing because an error occurred.  These test
- * functions make the assumption that any missing symbols have a good excuse
- * for their absence, and test only defined symbols.  This may result in
- * undetected failure some of the time.  However, missing symbols required by
- * your application will trigger compile-time errors, so the theoretical
- * problem of silent failure is less severe than it appears, affecting only
- * fallbacks.
- */
-chaz_TestBatch* 
-chaz_TFuncMacro_prepare();
-
-chaz_TestBatch* 
-chaz_THeaders_prepare();
-
-chaz_TestBatch* 
-chaz_TIntegers_prepare();
-
-chaz_TestBatch* 
-chaz_TLargeFiles_prepare();
-
-chaz_TestBatch* 
-chaz_TUnusedVars_prepare();
-
-chaz_TestBatch* 
-chaz_TVariadicMacros_prepare();
-
-void
-chaz_TFuncMacro_run(chaz_TestBatch *batch);
-
-void
-chaz_THeaders_run(chaz_TestBatch *batch);
-
-void
-chaz_TIntegers_run(chaz_TestBatch *batch);
-
-void
-chaz_TLargeFiles_run(chaz_TestBatch *batch);
-
-void
-chaz_TUnusedVars_run(chaz_TestBatch *batch);
-
-void
-chaz_TVariadicMacros_run(chaz_TestBatch *batch);
-
 /* Note: maybe add line numbers later.
  */
 #define CHAZ_TEST_ASSERT_TRUE       chaz_Test_assert_true

@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "Charmonizer/Test.h"
+#include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
 chaz_TLargeFiles_prepare()

@@ -3,6 +3,7 @@
 #include "charmony.h"
 #include <string.h>
 #include "Charmonizer/Test.h"
+#include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
 chaz_TFuncMacro_prepare()

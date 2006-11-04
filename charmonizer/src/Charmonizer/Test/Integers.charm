@@ -1,6 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Test.h"
+#include "Charmonizer/Test/AllTests.h"
 #include "charmony.h"
 #include <stdio.h>
 #include <string.h>
