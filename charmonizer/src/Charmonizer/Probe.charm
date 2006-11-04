@@ -11,11 +11,9 @@
 #include "Charmonizer/Core/OperSys.h"
 
 void
-chaz_Probe_init(FILE *conf_fh, const char *osname, const char *cc_command,    
-          const char *cc_flags)
+chaz_Probe_init(const char *osname, const char *cc_command,
+                const char *cc_flags, const char *charmony_start)
 {
-    chaz_ModHand_conf_fh = conf_fh;
-
     /* create os and compiler objects */
     os       = OS_new(osname);
     compiler = CC_new(os, cc_command, cc_flags);
@@ -27,6 +25,7 @@ chaz_Probe_init(FILE *conf_fh, const char *osname, const char *cc_command,
     /* dispatch other tasks */
     ModHand_init();
     HeadCheck_init();
+    ModHand_open_charmony_h(charmony_start);
 
     if (verbosity)
         printf("Initialization complete.\n");
@@ -38,9 +37,7 @@ chaz_Probe_clean_up()
     if (verbosity)
         printf("Cleaning up...\n");
 
-    remove("_charm.h");
-    os->remove_exe(os, "_charm_run");
-    os->remove_exe(os, "_charm_stat");
+    ModHand_clean_up();
     os->destroy(os);
     compiler->destroy(compiler);
 

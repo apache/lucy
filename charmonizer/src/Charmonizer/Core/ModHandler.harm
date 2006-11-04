@@ -22,7 +22,7 @@ struct chaz_Compiler;
 extern struct chaz_OperSys  *chaz_ModHand_os;
 extern struct chaz_Compiler *chaz_ModHand_compiler;
 extern chaz_bool_t chaz_ModHand_charm_run_available;
-extern FILE* chaz_ModHand_conf_fh;
+extern FILE* chaz_ModHand_charmony_fh;
 
 extern char *chaz_ModHand_constant_prefix;
 extern char *chaz_ModHand_macro_prefix;
@@ -35,6 +35,18 @@ extern chaz_bool_t chaz_ModHand_want_short_names;
  */
 void
 chaz_ModHand_init();
+
+/* Open the charmony.h file handle.  Print supplied text to it, if non-null.
+ * Print an explanatory comment and open the include guard.
+ */
+void
+chaz_ModHand_open_charmony_h(const char *charmony_start);
+
+/* Close the include guard on charmony.h, then close the file.  Delete temp
+ * files and perform any other needed cleanup.
+ */
+void
+chaz_ModHand_clean_up(void);
 
 /* Attempt to compile the supplied source code and return true if the
  * effort succeeds.
@@ -109,12 +121,15 @@ chaz_ModHand_shorten_function(const char *symbol);
 # define os                     chaz_ModHand_os
 # define compiler               chaz_ModHand_compiler
 # define charm_run_available    chaz_ModHand_charm_run_available
+# define charmony_fh            chaz_ModHand_charmony_fh
 # define constant_prefix        chaz_ModHand_constant_prefix
 # define macro_prefix           chaz_ModHand_macro_prefix
 # define typedef_prefix         chaz_ModHand_typedef_prefix
 # define function_prefix        chaz_ModHand_function_prefix
 # define want_short_names       chaz_ModHand_want_short_names
 # define ModHand_init           chaz_ModHand_init
+# define ModHand_open_charmony_h  chaz_ModHand_open_charmony_h
+# define ModHand_clean_up       chaz_ModHand_clean_up
 # define write_charm_h          chaz_ModHand_write_charm_h
 # define build_charm_run        chaz_ModHand_build_charm_run
 # define START_SHORT_NAMES      CHAZ_MODHAND_START_SHORT_NAMES

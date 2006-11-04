@@ -159,7 +159,6 @@ sub ACTION_lucyconf {
     open( my $infile_fh, '>', $lucyconf_in )
         or die "Can't open '$lucyconf_in': $!";
     print $infile_fh qq|
-        <charm_outpath>$lucyconf_path</charm_outpath>
         <charm_os_name>$os_name</charm_os_name>
         <charm_cc_command>$cc</charm_cc_command>
         <charm_cc_flags>$flags</charm_cc_flags>
