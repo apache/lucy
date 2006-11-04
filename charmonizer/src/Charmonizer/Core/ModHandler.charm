@@ -138,11 +138,16 @@ static char charm_run_code_b[] = METAQUOTE
             strcat( strcat(command, " "), argv[i] );
         }
 
-        /* redirect stderr to /dev/null or equivalent */
+        /* redirect stdout and stderr to /dev/null or equivalent */
         freopen( 
 METAQUOTE;
 
 static char charm_run_code_c[] = METAQUOTE
+             , "w", stdout);
+        freopen( 
+METAQUOTE;
+
+static char charm_run_code_d[] = METAQUOTE
              , "w", stderr);
 
         /* run the commmand and return its value to the parent process */
@@ -159,7 +164,8 @@ build_charm_run()
     chaz_bool_t compile_succeeded = false;
 
     (void)join_strings(&code, 0, charm_run_code_a, charm_run_code_b, " \"", 
-        os->devnull, "\" ", charm_run_code_c, NULL);
+        os->devnull, "\" ", charm_run_code_c, " \"", os->devnull, "\" ", 
+        charm_run_code_d, NULL);
 
     compile_succeeded = compiler->compile_exe(compiler, "_charm_run.c", 
         "_charm_run", code, strlen(code));
