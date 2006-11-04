@@ -140,40 +140,40 @@ sub _metaquote_charm_files {
     return \@filtered_files;
 }
 
-# Run the charmonizer executable, creating the lucyconf.h file.
-sub ACTION_lucyconf {
+# Run the charmonizer executable, creating the charmony.h file.
+sub ACTION_charmony {
     my $self          = shift;
-    my $lucyconf_in   = 'lucyconf_in';
-    my $lucyconf_path = "charmony.h";
+    my $charmony_in   = 'charmony_in';
+    my $charmony_path = "charmony.h";
 
     $self->dispatch('charmonizer');
 
-    return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $lucyconf_path );
-    print "\nWriting $lucyconf_path...\n\n";
+    return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $charmony_path );
+    print "\nWriting $charmony_path...\n\n";
 
     # write the infile with which to communicate args to charmonize
     my $os_name = lc( $Config{osname} );
     my $flags = "$Config{ccflags} $EXTRA_CCFLAGS";
     my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
     my $cc = "$Config{cc}";
-    open( my $infile_fh, '>', $lucyconf_in )
-        or die "Can't open '$lucyconf_in': $!";
+    open( my $infile_fh, '>', $charmony_in )
+        or die "Can't open '$charmony_in': $!";
     print $infile_fh qq|
         <charm_os_name>$os_name</charm_os_name>
         <charm_cc_command>$cc</charm_cc_command>
         <charm_cc_flags>$flags</charm_cc_flags>
         <charm_verbosity>$verbosity</charm_verbosity>
     |;
-    close $infile_fh or die "Can't close '$lucyconf_in': $!";
+    close $infile_fh or die "Can't close '$charmony_in': $!";
 
     if ($VALGRIND) {
-        system("$VALGRIND ./$CHARMONIZE_EXE_PATH $lucyconf_in");
+        system("$VALGRIND ./$CHARMONIZE_EXE_PATH $charmony_in");
     }
     else {
-        system( $CHARMONIZE_EXE_PATH, $lucyconf_in );
+        system( $CHARMONIZE_EXE_PATH, $charmony_in );
     }
 
-    $self->add_to_cleanup( $lucyconf_path, $lucyconf_in );
+    $self->add_to_cleanup( $charmony_path, $charmony_in );
 
     # generated when ./charmonize is run
     $self->add_to_cleanup("_charm_test.h");
@@ -182,7 +182,7 @@ sub ACTION_lucyconf {
 sub ACTION_build_charm_test {
     my $self = shift;
 
-    $self->dispatch('lucyconf');
+    $self->dispatch('charmony');
 
     # collect source files
     my $source_path     = catfile( $base_dir, 'charmonizer', 'charm_test.c' );
