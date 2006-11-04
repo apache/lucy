@@ -72,6 +72,12 @@ chaz_Probe_slurp_file(char* filepath, size_t *len_ptr) {
     return slurp_file(filepath, len_ptr);
 }
 
+FILE*
+chaz_Probe_get_charmony_fh(void)
+{
+    return charmony_fh;
+}
+
 /**
  * Copyright 2006 The Apache Software Foundation
  *

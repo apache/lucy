@@ -42,6 +42,13 @@ chaz_Probe_set_verbosity(int level);
 char*
 chaz_Probe_slurp_file(char* filepath, size_t *len_ptr);
 
+/* Access the FILE* used to write charmony.h, so that you can write your own
+ * content to it.  Should not be called before chaz_Probe_init() or after
+ * chaz_Probe_clean_up().
+ */
+FILE*
+chaz_Probe_get_charmony_fh(void);
+
 #endif /* include guard */
 
 /**
