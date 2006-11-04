@@ -167,15 +167,16 @@ test_compile(Compiler *self)
     
     if (verbosity) 
         printf("Trying to compile a small test file...\n");
+
+    /* attempt compilation */
     success = self->compile_exe(self, "_charm_try.c", 
         "_charm_try", code, strlen(code));
-
-    
-    remove("_charm_try.c");
-    self->os->remove_exe(self->os, "_charm_try");
-
     if (!success)
         die("Failed to compile a small test file");
+    
+    /* clean up */
+    remove("_charm_try.c");
+    self->os->remove_exe(self->os, "_charm_try");
 }
 
 static void
@@ -184,14 +185,15 @@ add_inc_dir(Compiler *self, const char *dir)
     size_t num_dirs = 2; /* includes the passed-in dir */
     char **dirs = self->inc_dirs;
 
+    /* count up the present number of dirs, reallocate */
     while (*dirs++ != NULL) {
         num_dirs++;
     }
-
     self->inc_dirs == realloc(self->inc_dirs, num_dirs + 1);
     self->inc_dirs[num_dirs] = NULL;
-    self->inc_dirs[num_dirs - 1] = strdup(dir);
 
+    /* put the passed-in dir at the end of the list */
+    self->inc_dirs[num_dirs - 1] = strdup(dir);
 }
 
 /**
