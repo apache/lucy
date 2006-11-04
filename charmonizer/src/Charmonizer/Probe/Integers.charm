@@ -1,5 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
+#include "Charmonizer/Core/HeadCheck.h"
 #include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/Integers.h"
@@ -23,17 +24,6 @@ static char sizes_code[] = METAQUOTE
             (int)sizeof(long),
             (int)sizeof(void *)
         );
-        return 0;
-    }
-METAQUOTE;
-
-static char inttypes_code[] = METAQUOTE
-    #include "_charm.h"
-    #include <inttypes.h>
-    int main()
-    {
-        Charm_Setup;
-        printf("We have inttypes.h\n");
         return 0;
     }
 METAQUOTE;
@@ -76,7 +66,7 @@ chaz_Integers_run(void)
     chaz_bool_t has_64    = false;
     chaz_bool_t has_long_long = false;
     chaz_bool_t has___int64   = false;
-    chaz_bool_t has_inttypes  = false;
+    chaz_bool_t has_inttypes  = check_header("inttypes.h");
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -122,13 +112,6 @@ chaz_Integers_run(void)
     if (output != NULL) {
         has___int64 = true;
         sizeof___int64 = strtol(output, NULL, 10);
-    }
-
-    /* determine whether inttypes.h is available */
-    output = capture_output(inttypes_code, strlen(inttypes_code),
-        &output_len);
-    if (output != NULL) {
-        has_inttypes = true;
     }
 
     /* figure out which integer types are available */
