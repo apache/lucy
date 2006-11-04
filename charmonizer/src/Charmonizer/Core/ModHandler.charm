@@ -29,9 +29,7 @@ clean_up_try();
 struct chaz_OperSys  *chaz_ModHand_os = NULL;
 struct chaz_Compiler *chaz_ModHand_compiler = NULL;
 chaz_bool_t chaz_ModHand_charm_run_available = false;
-FILE* chaz_ModHand_charm_test_h_fh = NULL;
 FILE* chaz_ModHand_conf_fh = NULL;
-chaz_bool_t chaz_ModHand_want_charm_test_h = false;
 
 char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
@@ -192,12 +190,6 @@ chaz_ModHand_append_conf(char *fmt, ...)
     va_start(args, fmt);
     vfprintf(chaz_ModHand_conf_fh, fmt, args);
     va_end(args);
-
-    if (want_charm_test_h) {
-        va_start(args, fmt);
-        vfprintf(charm_test_h_fh, fmt, args);
-        va_end(args);
-    }
 }
 
 static void
@@ -230,19 +222,6 @@ void
 chaz_ModHand_shorten_function(const char *sym)
 {
     append_conf("# define %s %s%s\n", sym, function_prefix, sym); 
-}
-
-void
-chaz_ModHand_write_charm_test_h()
-{
-    charm_test_h_fh = fopen("_charm_test.h", "w+");
-    if (charm_test_h_fh == NULL)
-        die("Couldn't open '_charm_test.h': %s", strerror(errno));
-
-    fprintf(charm_test_h_fh, "#define %sUSE_SHORT_NAMES\n", constant_prefix);
-    fprintf(charm_test_h_fh, "#define CHAZ_OS_NAME \"%s\"\n", os->name);
-
-    want_charm_test_h = true;
 }
 
 

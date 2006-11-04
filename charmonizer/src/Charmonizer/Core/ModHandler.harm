@@ -22,9 +22,7 @@ struct chaz_Compiler;
 extern struct chaz_OperSys  *chaz_ModHand_os;
 extern struct chaz_Compiler *chaz_ModHand_compiler;
 extern chaz_bool_t chaz_ModHand_charm_run_available;
-extern FILE* chaz_ModHand_charm_test_h_fh;
 extern FILE* chaz_ModHand_conf_fh;
-extern chaz_bool_t chaz_ModHand_want_charm_test_h;
 
 extern char *chaz_ModHand_constant_prefix;
 extern char *chaz_ModHand_macro_prefix;
@@ -54,8 +52,7 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
                             size_t *output_len);
 
 
-/* First print output to the user-supplied filehandle.  Then, write output to
- * _charm_test.h, if indicated.
+/* Print output to the user-supplied filehandle.
  */
 void
 chaz_ModHand_append_conf(char *fmt, ...);
@@ -91,11 +88,6 @@ chaz_ModHand_shorten_typedef(const char *symbol);
 void
 chaz_ModHand_shorten_function(const char *symbol);
 
-/* Signal Charmonizer that it should write _charm_test.h.
- */
-void
-chaz_ModHand_write_charm_test_h();
-
 /* Print a "chapter heading" when starting a module. 
  */
 #define CHAZ_MODHAND_START_RUN(module_name) \
@@ -117,8 +109,6 @@ chaz_ModHand_write_charm_test_h();
 # define os                     chaz_ModHand_os
 # define compiler               chaz_ModHand_compiler
 # define charm_run_available    chaz_ModHand_charm_run_available
-# define charm_test_h_fh        chaz_ModHand_charm_test_h_fh
-# define want_charm_test_h      chaz_ModHand_want_charm_test_h
 # define constant_prefix        chaz_ModHand_constant_prefix
 # define macro_prefix           chaz_ModHand_macro_prefix
 # define typedef_prefix         chaz_ModHand_typedef_prefix
@@ -138,7 +128,6 @@ chaz_ModHand_write_charm_test_h();
 # define shorten_function       chaz_ModHand_shorten_function
 # define START_RUN              CHAZ_MODHAND_START_RUN
 # define END_RUN                CHAZ_MODHAND_END_RUN
-# define ModHand_write_charm_test_h chaz_ModHand_write_charm_test_h
 #endif
 
 #endif /* H_CHAZ_CORE */

@@ -103,7 +103,6 @@ init(int argc, char **argv)
     }
     chaz_Probe_init(conf_fh, os_name, cc_command, cc_flags);
     chaz_Probe_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
-    chaz_Probe_write_charm_test_h();
 
     /* clean up */
     free(infile_str);
