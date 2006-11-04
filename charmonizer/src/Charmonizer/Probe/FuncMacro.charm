@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+/* code for verifying ISO func macro */
 static char iso_func_code[] = METAQUOTE
     #include "_charm.h" 
     int main() {
@@ -17,6 +17,7 @@ static char iso_func_code[] = METAQUOTE
     }
 METAQUOTE;
 
+/* code for verifying GNU func macro */
 static char gnuc_func_code[] = METAQUOTE
     #include "_charm.h" 
     int main() {
@@ -75,6 +76,7 @@ chaz_FuncMacro_run(void)
         append_conf("#define %sHAS_GNUC_FUNC_MACRO\n", constant_prefix);
     }
 
+	/* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
         if (has_iso_funcmac) 

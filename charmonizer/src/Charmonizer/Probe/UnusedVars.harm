@@ -7,11 +7,17 @@
 #include <stdio.h>
 
 /* Run the UnusedVars module.
+ *
+ * These symbols are exported:
+ * 
+ * Unused_Var(var)
+ * Unreachable_Return(type)
+ * 
  */
 void chaz_UnusedVars_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define UnusedVars_run    chaz_UnusedVars_run
+  #define UnusedVars_run    chaz_UnusedVars_run
 #endif
 
 #endif /* H_CHAZ_UNUSED_VARS */

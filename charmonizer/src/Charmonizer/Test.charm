@@ -14,6 +14,7 @@ TestBatch_run_test(TestBatch *batch);
 
 void
 chaz_Test_init(void) {
+	/* unbuffer stdout */
 	int check_val = setvbuf(stdout, NULL, _IONBF, 0);
 	if (check_val != 0)
 		fprintf(stderr, "Failed when trying to unbuffer stdout\n");

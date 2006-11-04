@@ -22,7 +22,7 @@
 void chaz_LargeFiles_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define LargeFiles_run    chaz_LargeFiles_run
+  #define LargeFiles_run    chaz_LargeFiles_run
 #endif
 
 #endif /* H_CHAZ_LARGE_FILES */

@@ -104,6 +104,7 @@ chaz_Headers_run(void)
         append_conf("#define %s%s\n", constant_prefix, aff_buf);
     }
 
+    /* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
 

@@ -329,13 +329,14 @@ chaz_Integers_run(void)
     /* true and false */
     append_conf(
         "#ifndef true\n"
-        "# define true 1\n"
+        "  #define true 1\n"
         "#endif\n"
         "#ifndef false\n"
-        "# define false 0\n"
+        "  #define false 0\n"
         "#endif\n"
     );
 
+    /* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
 

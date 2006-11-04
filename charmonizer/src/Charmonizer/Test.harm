@@ -14,12 +14,12 @@ typedef void
 (*chaz_TestBatch_destroy_t)(chaz_TestBatch *batch);
 
 /* This function, which is unique to each TestBatch, actually runs the test
- * script.
+ * sequence.
  */
 typedef void
 (*chaz_TestBatch_test_func_t)(chaz_TestBatch *batch);
 
-/* Print a header, execute the test script, print a report.
+/* Print a header, execute the test sequence, print a report.
  */
 typedef void
 (*chaz_TestBatch_run_test_t)(chaz_TestBatch *batch);
@@ -111,22 +111,22 @@ chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
                                     const char *pat, ...);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define TestBatch_destroy_t          chaz_TestBatch_destroy_t
-# define TestBatch_test_func_t        chaz_TestBatch_test_func_t
-# define TestBatch_run_test_t         chaz_TestBatch_run_test_t
-# define TestBatch                    chaz_TestBatch
-# define Test_init                    chaz_Test_init
-# define Test_new_batch               chaz_Test_new_batch
-# define ASSERT_TRUE                  CHAZ_TEST_ASSERT_TRUE
-# define ASSERT_FALSE                 CHAZ_TEST_ASSERT_FALSE
-# define ASSERT_STR_EQ                CHAZ_TEST_ASSERT_STR_EQ
-# define ASSERT_STR_NEQ               CHAZ_TEST_ASSERT_STR_NEQ
-# define PASS                         CHAZ_TEST_PASS
-# define FAIL                         CHAZ_TEST_FAIL
-# define ASSERT_INT_EQ                CHAZ_TEST_ASSERT_INT_EQ
-# define ASSERT_FLOAT_EQ              CHAZ_TEST_ASSERT_FLOAT_EQ
-# define SKIP                         CHAZ_TEST_SKIP
-# define SKIP_REMAINING               CHAZ_TEST_SKIP_REMAINING
+  #define TestBatch_destroy_t          chaz_TestBatch_destroy_t
+  #define TestBatch_test_func_t        chaz_TestBatch_test_func_t
+  #define TestBatch_run_test_t         chaz_TestBatch_run_test_t
+  #define TestBatch                    chaz_TestBatch
+  #define Test_init                    chaz_Test_init
+  #define Test_new_batch               chaz_Test_new_batch
+  #define ASSERT_TRUE                  CHAZ_TEST_ASSERT_TRUE
+  #define ASSERT_FALSE                 CHAZ_TEST_ASSERT_FALSE
+  #define ASSERT_STR_EQ                CHAZ_TEST_ASSERT_STR_EQ
+  #define ASSERT_STR_NEQ               CHAZ_TEST_ASSERT_STR_NEQ
+  #define PASS                         CHAZ_TEST_PASS
+  #define FAIL                         CHAZ_TEST_FAIL
+  #define ASSERT_INT_EQ                CHAZ_TEST_ASSERT_INT_EQ
+  #define ASSERT_FLOAT_EQ              CHAZ_TEST_ASSERT_FLOAT_EQ
+  #define SKIP                         CHAZ_TEST_SKIP
+  #define SKIP_REMAINING               CHAZ_TEST_SKIP_REMAINING
 #endif
 
 #endif /* H_CHAZ_TEST */

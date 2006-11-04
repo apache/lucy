@@ -11,8 +11,8 @@ chaz_AllTests_init()
 {
     chaz_Test_init();
 
+    /* create a null-terminated array of test batches to iterate over */
     batches = malloc(7 * sizeof(TestBatch*));
-
     batches[0] = chaz_TFuncMacro_prepare();
     batches[1] = chaz_THeaders_prepare();
     batches[2] = chaz_TIntegers_prepare();
@@ -31,6 +31,7 @@ chaz_AllTests_run()
     int total_skipped = 0;
     int i;
     
+    /* sanity check */
     if (batches == NULL) {
         fprintf(stderr, "Must call AllTests_init() first.");
         exit(1);
@@ -52,7 +53,6 @@ chaz_AllTests_run()
     printf("TOTAL TESTS:   %d\nTOTAL PASSED:  %d\nTOTAL FAILED:  %d\n"
         "TOTAL SKIPPED: %d\n", 
         total_tests, total_passed, total_failed, total_skipped);
-
 }
 
 

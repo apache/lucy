@@ -238,25 +238,25 @@ clean_up_try()
 void
 chaz_ModHand_shorten_constant(const char *sym)
 {
-    append_conf("# define %s %s%s\n", sym, constant_prefix, sym); 
+    append_conf("  #define %s %s%s\n", sym, constant_prefix, sym); 
 }
 
 void
 chaz_ModHand_shorten_macro(const char *sym)
 {
-    append_conf("# define %s %s%s\n", sym, macro_prefix, sym); 
+    append_conf("  #define %s %s%s\n", sym, macro_prefix, sym); 
 }
 
 void
 chaz_ModHand_shorten_typedef(const char *sym)
 {
-    append_conf("# define %s %s%s\n", sym, typedef_prefix, sym); 
+    append_conf("  #define %s %s%s\n", sym, typedef_prefix, sym); 
 }
 
 void
 chaz_ModHand_shorten_function(const char *sym)
 {
-    append_conf("# define %s %s%s\n", sym, function_prefix, sym); 
+    append_conf("  #define %s %s%s\n", sym, function_prefix, sym); 
 }
 
 

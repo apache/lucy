@@ -37,6 +37,7 @@ chaz_Probe_clean_up()
     if (verbosity)
         printf("Cleaning up...\n");
 
+    /* dispatch ModHandler's clean up routines, destroy objects */
     ModHand_clean_up();
     os->destroy(os);
     compiler->destroy(compiler);

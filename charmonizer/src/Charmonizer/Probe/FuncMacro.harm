@@ -7,11 +7,24 @@
 #include <stdio.h>
 
 /* Run the FuncMacro module.
+ * 
+ * If __func__ successfully resolves, this will be defined:
+ *
+ * HAS_ISO_FUNC_MACRO
+ * 
+ * If __FUNCTION__ successfully resolves, this will be defined:
+ * 
+ * HAS_GNUC_FUNC_MACRO
+ * 
+ * If one or the other succeeds, these will be defined:
+ * 
+ * HAS_FUNC_MACRO
+ * Func_Macro
  */
 void chaz_FuncMacro_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define FuncMacro_run    chaz_FuncMacro_run
+  #define FuncMacro_run    chaz_FuncMacro_run
 #endif
 
 #endif /* H_CHAZ_FUNC_MACRO */

@@ -65,6 +65,18 @@ void
 chaz_TVariadicMacros_run(chaz_TestBatch *batch);
 
 #ifdef CHAZ_USE_SHORT_NAMES
+  #define TFuncMacro_prepare           chaz_TFuncMacro_prepare
+  #define THeaders_prepare             chaz_THeaders_prepare
+  #define TIntegers_prepare            chaz_TIntegers_prepare
+  #define TLargeFiles_prepare          chaz_TLargeFiles_prepare
+  #define TUnusedVars_prepare          chaz_TUnusedVars_prepare
+  #define TVariadicMacros_prepare      chaz_TVariadicMacros_prepare
+  #define TFuncMacro_run               chaz_TFuncMacro_run
+  #define THeaders_run                 chaz_THeaders_run
+  #define TIntegers_run                chaz_TIntegers_run
+  #define TLargeFiles_run              chaz_TLargeFiles_run
+  #define TUnusedVars_run              chaz_TUnusedVars_run
+  #define TVariadicMacros_run          chaz_TVariadicMacros_run
 #endif
 
 #endif /* H_CHAZ_TEST */

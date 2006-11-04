@@ -12,12 +12,14 @@ chaz_UnusedVars_run(void)
 {
     START_RUN("UnusedVars");
     
+    /* write the macros (no test, these are the same everywhere) */
     append_conf(
         "#define %sUnused_Var(x) ((void)x)\n"
         "#define %sUnreachable_Return(type) return (type)0\n",
         macro_prefix, macro_prefix 
     );
 
+    /* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
         shorten_macro("Unused_Var");

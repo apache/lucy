@@ -98,7 +98,7 @@
 void chaz_Integers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define Integers_run    chaz_Integers_run
+  #define Integers_run    chaz_Integers_run
 #endif
 
 #endif /* H_CHAZ_INTEGERS */

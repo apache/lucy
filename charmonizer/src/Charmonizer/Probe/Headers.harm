@@ -65,7 +65,7 @@ void
 chaz_Headers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define Headers_run        chaz_Headers_run
+  #define Headers_run        chaz_Headers_run
 #endif
 
 #endif /* H_CHAZ_HEADERS */

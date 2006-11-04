@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 
+/* code for verifying ISO-style variadic macros */
 static char iso_code[] = METAQUOTE
     #include "_charm.h"
     #define ISO_TEST(fmt, ...) \
@@ -18,6 +19,7 @@ static char iso_code[] = METAQUOTE
     }
 METAQUOTE;
 
+/* code for verifying GNU-style variadic macros */
 static char gnuc_code[] = METAQUOTE
     #include "_charm.h"
     #define GNU_TEST(fmt, args...) \
@@ -64,6 +66,7 @@ chaz_VariadicMacros_run(void)
             constant_prefix);
     }
 
+	/* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
         if (has_varmacros)
