@@ -129,10 +129,14 @@
 #endif
 
 TestBatch*
-chaz_Test_test_Headers()
+chaz_THeaders_prepare()
 {
-    TestBatch *batch = Test_new_batch(2);
+    return Test_new_batch("Headers", 2, chaz_THeaders_run);
+}
 
+void
+chaz_THeaders_run(TestBatch *batch)
+{
     PASS(batch, "Compiled successfully with all detected headers");
 
     /* don't bother checking all -- just use stdio as an example */
@@ -141,8 +145,6 @@ chaz_Test_test_Headers()
 #else
     FAIL(batch, "stdio.h should have been detected");
 #endif
-
-    return batch;
 }
 
 /**

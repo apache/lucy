@@ -8,16 +8,32 @@
 
 typedef struct chaz_TestBatch chaz_TestBatch;
 
+/* Destructor.
+ */
 typedef void
 (*chaz_TestBatch_destroy_t)(chaz_TestBatch *batch);
 
+/* This function, which is unique to each TestBatch, actually runs the test
+ * script.
+ */
+typedef void
+(*chaz_TestBatch_test_func_t)(chaz_TestBatch *batch);
+
+/* Print a header, execute the test script, print a report.
+ */
+typedef void
+(*chaz_TestBatch_run_test_t)(chaz_TestBatch *batch);
+
 struct chaz_TestBatch {
-    unsigned test_num;
-    unsigned num_tests;
-    unsigned num_passed;
-    unsigned num_failed; 
-    unsigned num_skipped;
-    chaz_TestBatch_destroy_t destroy;
+    char         *name;
+    unsigned      test_num;
+    unsigned      num_tests;
+    unsigned      num_passed;
+    unsigned      num_failed; 
+    unsigned      num_skipped;
+    chaz_TestBatch_destroy_t      destroy;
+    chaz_TestBatch_test_func_t    test_func;
+    chaz_TestBatch_run_test_t     run_test;
 };
 
 /* Unbuffer stdout.  Perform any other setup needed.
@@ -25,10 +41,11 @@ struct chaz_TestBatch {
 void
 chaz_Test_init(void);
 
-/* Constructor for TestBatch.  Will print a message to the screen.
+/* Constructor for TestBatch.
  */
-chaz_TestBatch*
-chaz_Test_new_batch(unsigned num_tests);
+chaz_TestBatch* 
+chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
+				    chaz_TestBatch_test_func_t test_func);
 
 /* These tests all require the file charmony.h.  See the documentation for
  * Charmonizer/Probe.h for instructions on how to produce it.
@@ -47,22 +64,40 @@ chaz_Test_new_batch(unsigned num_tests);
  * fallbacks.
  */
 chaz_TestBatch* 
-chaz_Test_test_FuncMacro();
+chaz_TFuncMacro_prepare();
 
 chaz_TestBatch* 
-chaz_Test_test_Headers();
+chaz_THeaders_prepare();
 
 chaz_TestBatch* 
-chaz_Test_test_Integers();
+chaz_TIntegers_prepare();
 
 chaz_TestBatch* 
-chaz_Test_test_LargeFiles();
+chaz_TLargeFiles_prepare();
 
 chaz_TestBatch* 
-chaz_Test_test_UnusedVars();
+chaz_TUnusedVars_prepare();
 
 chaz_TestBatch* 
-chaz_Test_test_VariadicMacros();
+chaz_TVariadicMacros_prepare();
+
+void
+chaz_TFuncMacro_run(chaz_TestBatch *batch);
+
+void
+chaz_THeaders_run(chaz_TestBatch *batch);
+
+void
+chaz_TIntegers_run(chaz_TestBatch *batch);
+
+void
+chaz_TLargeFiles_run(chaz_TestBatch *batch);
+
+void
+chaz_TUnusedVars_run(chaz_TestBatch *batch);
+
+void
+chaz_TVariadicMacros_run(chaz_TestBatch *batch);
 
 /* Note: maybe add line numbers later.
  */
@@ -86,7 +121,7 @@ chaz_Test_test_VariadicMacros();
 #define CHAZ_TEST_SKIP_REMAINING(batch, message) \
     do { \
         chaz_Test_report_skip_remaining(batch, message); \
-        return batch; \
+        return; \
     } while (0)
 
 
@@ -127,19 +162,13 @@ void
 chaz_Test_report_skip_remaining(chaz_TestBatch* batch, 
                                     const char *pat, ...);
 
-
-
 #ifdef CHAZ_USE_SHORT_NAMES
+# define TestBatch_destroy_t          chaz_TestBatch_destroy_t
+# define TestBatch_test_func_t        chaz_TestBatch_test_func_t
+# define TestBatch_run_test_t         chaz_TestBatch_run_test_t
 # define TestBatch                    chaz_TestBatch
+# define Test_init                    chaz_Test_init
 # define Test_new_batch               chaz_Test_new_batch
-# define Test_test_FuncMacro          chaz_Test_test_FuncMacro
-# define Test_test_Integers           chaz_Test_test_Integers
-# define Test_test_LargeFiles         chaz_Test_test_LargeFiles
-# define Test_test_UnusedVars         chaz_Test_test_UnusedVars
-# define Test_test_VariadicMacros     chaz_Test_test_VariadicMacros
-# define Test_report                  chaz_Test_report
-# define Test_report_skip             chaz_Test_skip
-# define Test_report_skip_remaining   chaz_Test_report_skip_remaining
 # define ASSERT_TRUE                  CHAZ_TEST_ASSERT_TRUE
 # define ASSERT_FALSE                 CHAZ_TEST_ASSERT_FALSE
 # define ASSERT_STR_EQ                CHAZ_TEST_ASSERT_STR_EQ

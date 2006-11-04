@@ -10,9 +10,14 @@
 #include "Charmonizer/Test.h"
 
 TestBatch*
-chaz_Test_test_LargeFiles()
+chaz_TLargeFiles_prepare()
 {
-    TestBatch *batch = Test_new_batch(10);
+    return Test_new_batch("LargeFiles", 10, chaz_TLargeFiles_run);
+}
+
+void
+chaz_TLargeFiles_run(TestBatch *batch)
+{
     FILE *fh;
     off64_t offset;
     int check_val;
@@ -74,8 +79,6 @@ chaz_Test_test_LargeFiles()
     if (fh != NULL)
         fclose(fh);
     remove("_charm_large_file_test");
-
-    return batch;
 }
 
 

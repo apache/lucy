@@ -1,49 +1,32 @@
 #include <stdio.h>
 #include "Charmonizer/Test.h"
 
-/* this is the signature for all Charmonizer test functions */
-typedef chaz_TestBatch*
-(*t_func)();
-
-/* create an array of test functions to loop through */
-typedef struct TestGroup {
-    const char *name;
-    t_func func;
-} TestGroup;
-TestGroup tests[] = {
-    { "FuncMacro", chaz_Test_test_FuncMacro },
-    { "Headers", chaz_Test_test_Headers },
-    { "Integers", chaz_Test_test_Integers },
-    { "LargeFiles", chaz_Test_test_LargeFiles },
-    { "UnusedVars", chaz_Test_test_UnusedVars },
-    { "VariadicMacros", chaz_Test_test_VariadicMacros },
-    { NULL, NULL }
-};
-
 int main() {
     int total_tests   = 0;
     int total_passed  = 0;
     int total_failed  = 0;
     int total_skipped = 0;
     int i;
+    chaz_TestBatch* batches[7];
 
     chaz_Test_init();
+
+    batches[0] = chaz_TFuncMacro_prepare();
+    batches[1] = chaz_THeaders_prepare();
+    batches[2] = chaz_TIntegers_prepare();
+    batches[3] = chaz_TLargeFiles_prepare();
+    batches[4] = chaz_TUnusedVars_prepare();
+    batches[5] = chaz_TVariadicMacros_prepare();
+    batches[6] = NULL;
     
     /* loop through test functions, accumulating results */
-    for (i = 0; tests[i].name != NULL; i++) {
-        t_func test_func = tests[i].func;
-        const char *name = tests[i].name;
-        chaz_TestBatch *batch = test_func();
-        printf("=========================\n");
-        printf("%s\n=========================\n", name);
+    for (i = 0; batches[i] != NULL; i++) {
+        chaz_TestBatch *batch = batches[i];
+        batch->run_test(batch);
         total_tests    += batch->num_tests;
         total_passed   += batch->num_passed;
         total_failed   += batch->num_failed;
         total_skipped  += batch->num_skipped;
-        printf("-------------------------\n");
-        printf("Tests:   %d\nPassed:  %d\nFailed:  %d\nSkipped: %d\n\n",
-            batch->num_tests, batch->num_passed, batch->num_failed, 
-            batch->num_skipped);
         batch->destroy(batch);
     }
     

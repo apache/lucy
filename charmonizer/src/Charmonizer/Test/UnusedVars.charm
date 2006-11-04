@@ -4,9 +4,13 @@
 #include "Charmonizer/Test.h"
 
 TestBatch*
-chaz_Test_test_UnusedVars()
+chaz_TUnusedVars_prepare()
 {
-    TestBatch *batch = Test_new_batch(2);
+    return Test_new_batch("UnusedVars", 2, chaz_TUnusedVars_run);
+}
+void
+chaz_TUnusedVars_run(TestBatch *batch)
+{
 #ifdef Unused_Var
     PASS(batch, "Unused_Var macro is defined");
 #else
@@ -18,8 +22,6 @@ chaz_Test_test_UnusedVars()
 #else
     FAIL(batch, "Unreachable_Return macro is defined");
 #endif
-
-    return batch;
 }
 
 /**

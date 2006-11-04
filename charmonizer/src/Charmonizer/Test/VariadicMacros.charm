@@ -6,9 +6,14 @@
 #include "Charmonizer/Test.h"
 
 TestBatch*
-chaz_Test_test_VariadicMacros()
+chaz_TVariadicMacros_prepare()
 {
-    TestBatch *batch = Test_new_batch(4);
+    return Test_new_batch("VariadicMacros", 4, chaz_TVariadicMacros_run);
+}
+
+void
+chaz_TVariadicMacros_run(TestBatch *batch)
+{
     char buf[10];
     chaz_bool_t really_has_var_macs = false;
 
@@ -44,8 +49,6 @@ chaz_Test_test_VariadicMacros()
 #endif
 
     ASSERT_TRUE(batch, really_has_var_macs, "either ISO or GNUC");
-
-    return batch;
 }
 
 /**

@@ -5,26 +5,29 @@
 #include "Charmonizer/Test.h"
 
 TestBatch*
-chaz_Test_test_FuncMacro(void)
+chaz_TFuncMacro_prepare()
 {
-    TestBatch *batch = Test_new_batch(3);
+    return Test_new_batch("FuncMacro", 3, chaz_TFuncMacro_run);
+}
+
+void
+chaz_TFuncMacro_run(TestBatch *batch)
+{
 
 #ifdef HAS_FUNC_MACRO
-    ASSERT_STR_EQ(batch, Func_Macro, "chaz_Test_test_FuncMacro", 
+    ASSERT_STR_EQ(batch, Func_Macro, "chaz_TFuncMacro_run", 
         "Func_Macro");
 #endif
 
 #ifdef HAS_ISO_FUNC_MACRO
-    ASSERT_STR_EQ(batch, __func__, "chaz_Test_test_FuncMacro",
+    ASSERT_STR_EQ(batch, __func__, "chaz_TFuncMacro_run",
         "HAS_ISO_FUNC_MACRO");
 #endif
 
 #ifdef HAS_GNUC_FUNC_MACRO
-    ASSERT_STR_EQ(batch, __FUNCTION__, "chaz_Test_test_FuncMacro", 
+    ASSERT_STR_EQ(batch, __FUNCTION__, "chaz_TFuncMacro_run", 
         "HAS_GNUC_FUNC_MACRO");
 #endif
-    
-    return batch;
 }
 
 /**

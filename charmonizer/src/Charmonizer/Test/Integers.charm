@@ -9,10 +9,14 @@
 #endif
 
 TestBatch*
-chaz_Test_test_Integers()
+chaz_TIntegers_prepare()
 {
-    TestBatch *batch = Test_new_batch(37);
+    return Test_new_batch("Integers", 37, chaz_TIntegers_run);
+}
 
+void
+chaz_TIntegers_run(TestBatch *batch)
+{
     {
         long one= 1;
         long big_endian = !(*((char *)(&one)));
@@ -105,8 +109,6 @@ chaz_Test_test_Integers()
         ASSERT_STR_EQ(batch, buf, "18000000000000000000", "U64P");
     }
 #endif
-
-    return batch;
 }
 
 /**
