@@ -6,6 +6,7 @@
 #include <string.h>
 #include "Charmonizer/Core/Util.h"
 
+/* global verbosity setting */
 int chaz_Util_verbosity = 1;
 
 void
@@ -134,6 +135,7 @@ chaz_Util_can_open_file(char *file_path)
 size_t
 chaz_Util_grow_buf(char **buf, size_t old_len, size_t new_len)
 {
+    /* grow buffer only if necessary */
     if (new_len > 0 && new_len >= old_len) {
         *buf = realloc(*buf, new_len + 1);
         if (*buf == NULL) 
@@ -141,6 +143,7 @@ chaz_Util_grow_buf(char **buf, size_t old_len, size_t new_len)
         *((*buf) + new_len) = '\0';
     }
 
+    /* return whatever the buffer size is now */
     return new_len > old_len ? new_len : old_len;
 }
 
@@ -150,6 +153,7 @@ chaz_Util_append_strings(char **buf, size_t buf_len, ...)
     va_list args;
     size_t retval;
 
+    /* delegate to vappend_strings */
     va_start(args, buf_len);
     retval = vappend_strings(buf, buf_len, args);
     va_end(args);
@@ -189,6 +193,7 @@ chaz_Util_join_strings(char **buf, size_t buf_len, ...)
     va_list args;
     size_t retval;
 
+    /* delegate to vjoin_strings */
     va_start(args, buf_len);
     retval = vjoin_strings(buf, buf_len, args);
     va_end(args);
@@ -199,6 +204,7 @@ chaz_Util_join_strings(char **buf, size_t buf_len, ...)
 size_t
 chaz_Util_vjoin_strings(char **buf, size_t buf_len, va_list args)
 {
+    /* start with en empty string for vappend to append to */
     if (*buf != NULL)
         (*buf)[0] = '\0';
 

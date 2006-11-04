@@ -50,12 +50,12 @@ chaz_OperSys*
 chaz_OS_new(const char *name);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define OperSys                      chaz_OperSys
-# define OS_remove_exe_t              chaz_OS_remove_exe_t
-# define OS_remove_obj_t              chaz_OS_remove_obj_t
-# define OS_run_local_t               chaz_OS_run_local_t
-# define OS_destroy_t                 chaz_OS_destroy_t
-# define OS_new                       chaz_OS_new
+  #define OperSys                      chaz_OperSys
+  #define OS_remove_exe_t              chaz_OS_remove_exe_t
+  #define OS_remove_obj_t              chaz_OS_remove_obj_t
+  #define OS_run_local_t               chaz_OS_run_local_t
+  #define OS_destroy_t                 chaz_OS_destroy_t
+  #define OS_new                       chaz_OS_new
 #endif
 
 #endif /* H_CHAZ_COMPILER */

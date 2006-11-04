@@ -26,6 +26,7 @@ build_charm_run();
 static void
 clean_up_try();
 
+/* global vars */
 struct chaz_OperSys  *chaz_ModHand_os = NULL;
 struct chaz_Compiler *chaz_ModHand_compiler = NULL;
 chaz_bool_t chaz_ModHand_charm_run_available = false;
@@ -38,7 +39,7 @@ char *function_prefix = NULL;
 
 chaz_bool_t want_short_names = false;
 
-
+/* static vars */
 static char *try_app_path = NULL;
 static char *try_app_command = NULL;
 
@@ -65,7 +66,7 @@ chaz_ModHand_open_charmony_h(const char *charmony_start)
     if (charmony_fh == NULL) 
         die("Can't open 'charmony.h': %s", strerror(errno));
 
-    /* print supplied text (if any), then open include guard */
+    /* print supplied text (if any) along with warning, open include guard */
     if (charmony_start != NULL)
         fprintf(charmony_fh, charmony_start);
     fprintf(charmony_fh,
@@ -199,11 +200,10 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
     if ( !remove_and_verify(TARGET_PATH) )
         die("Failed to delete file '%s'", TARGET_PATH);
 
+    /* attempt compilation; if successful, run app and slurp output */
     compile_succeeded = compiler->compile_exe(compiler, TRY_SOURCE_PATH, 
         TRY_APP_BASENAME, source, source_len);
-
     if (compile_succeeded) {
-        /* run the app, slurp the output */
         system(try_app_command);
         captured_output = slurp_file(TARGET_PATH, output_len);
     }
@@ -211,6 +211,7 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
         *output_len = 0;
     }
 
+    /* remove all the files we just created */
     clean_up_try();
 
     return captured_output;

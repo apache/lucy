@@ -16,12 +16,14 @@ struct chaz_CompilerSpec {
     char *exe_flag;
 };
 
+/* Detect a supported compiler and return its profile.
+ */
 chaz_CompilerSpec*
 chaz_CCSpec_find_spec();
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define CompilerSpec                chaz_CompilerSpec
-# define CCSpec_find_spec            chaz_CCSpec_find_spec
+  #define CompilerSpec                chaz_CompilerSpec
+  #define CCSpec_find_spec            chaz_CCSpec_find_spec
 #endif
 
 #endif /* H_CHAZ_COMPILER_SPEC */

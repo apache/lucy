@@ -23,12 +23,16 @@ struct chaz_Stat {
     long blocks;
 };
 
+/* Attempt to stat a file.  If successful, store the set target->valid to true
+ * and store the results in the stat structure.  If unsuccessful, set
+ * target->valid to false.
+ */
 void
 chaz_Stat_stat(const char *filepath, chaz_Stat *target);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define Stat                  chaz_Stat
-# define Stat_stat             chaz_Stat_stat
+  #define Stat                  chaz_Stat
+  #define Stat_stat             chaz_Stat_stat
 #endif
 
 #endif /* H_CHAZ_COMPILER */

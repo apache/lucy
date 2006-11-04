@@ -60,12 +60,12 @@ chaz_CC_new(struct chaz_OperSys *oper_sys, const char *cc_command,
             const char *cc_flags);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define Compiler                    chaz_Compiler
-# define CC_compile_exe_t            chaz_CC_compile_exe_t
-# define CC_compile_obj_t            chaz_CC_compile_obj_t
-# define CC_add_inc_dir_t            chaz_CC_add_inc_dir_t
-# define CC_destroy_t                chaz_CC_destroy_t
-# define CC_new                      chaz_CC_new
+  #define Compiler                    chaz_Compiler
+  #define CC_compile_exe_t            chaz_CC_compile_exe_t
+  #define CC_compile_obj_t            chaz_CC_compile_obj_t
+  #define CC_add_inc_dir_t            chaz_CC_add_inc_dir_t
+  #define CC_destroy_t                chaz_CC_destroy_t
+  #define CC_new                      chaz_CC_new
 #endif
 
 #endif /* H_CHAZ_COMPILER */

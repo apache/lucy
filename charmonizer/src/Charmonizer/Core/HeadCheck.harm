@@ -17,18 +17,17 @@ chaz_HeadCheck_init();
 chaz_bool_t
 chaz_HeadCheck_check_header(const char *header_name);
 
-/* Attempt to compile a file which pulls in all the headers supplied.  If the
- * compile succeeds, add them all to the internal register and return true.
- * 
- * The array of header names must be null-terminated.
+/* Attempt to compile a file which pulls in all the headers specified by name
+ * in a null-terminated array.  If the compile succeeds, add them all to the
+ * internal register and return true.
  */
 chaz_bool_t
 chaz_HeadCheck_check_many_headers(const char **header_names);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-# define HeadCheck_init             chaz_HeadCheck_init
-# define check_header               chaz_HeadCheck_check_header
-# define check_many_headers         chaz_HeadCheck_check_many_headers
+  #define HeadCheck_init             chaz_HeadCheck_init
+  #define check_header               chaz_HeadCheck_check_header
+  #define check_many_headers         chaz_HeadCheck_check_many_headers
 #endif
 
 #endif /* H_CHAZ_HEAD_CHECK */

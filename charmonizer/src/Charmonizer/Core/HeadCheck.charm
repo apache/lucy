@@ -65,7 +65,7 @@ chaz_HeadCheck_check_header(const char *header_name)
     Header  key;
     Header *fake = &key;
 
-    /* fake up a key to feed to bsearch and see if the header's already there */
+    /* fake up a key to feed to bsearch; see if the header's already there */
     key.name = (char*)header_name;
     key.exists = false;
     header = bsearch(&fake, header_cache, cache_size, sizeof(void*),
@@ -86,7 +86,7 @@ chaz_HeadCheck_check_many_headers(const char **header_names)
     chaz_bool_t success;
     int i;
 
-    /* build the source code */
+    /* build the source code string */
     code_buf_len = join_strings(&code_buf, code_buf_len, " ", NULL);
     for (i = 0; header_names[i] != NULL; i++) {
         code_buf_len = append_strings(&code_buf, code_buf_len, "#include <", 
@@ -110,8 +110,7 @@ compare_headers(const void *vptr_a, const void *vptr_b) {
     Header **const a = (Header**)vptr_a;
     Header **const b = (Header**)vptr_b;
 
-    /* null is last, so it's "greater than" any string */
-    if ((*a)->name == NULL)
+    if ((*a)->name == NULL) /* null is "greater than" any string */
         return 1;
     else if ((*b)->name == NULL)
         return -1;
@@ -123,6 +122,7 @@ static Header*
 discover_header(const char *header_name) {
     Header* header = (Header*)malloc(sizeof(Header));
     
+    /* assign */
     header->name = strdup(header_name);
 
     /* see whether code that tries to pull in this header compiles */
