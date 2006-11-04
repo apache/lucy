@@ -166,25 +166,26 @@ chaz_Util_vappend_strings(char **buf, size_t buf_len, va_list args)
 {
     char *str;
     size_t new_len = buf_len == 0 ? 0 : strlen(*buf);
-    size_t retval;
-    va_list save_args = args;
 
-    /* calculate buffer requirements and grow if needed */
+    /* start with a null-terminated empty string if necessary */
+    if (buf_len == 0) {
+        buf_len = grow_buf(buf, buf_len, 1);
+        (*buf)[0] = '\0';
+    }
+
+    /* concat, reallocating along the way as needed */
     while ( (str = va_arg(args, char*)) != NULL ) {
         new_len += strlen(str);
-    }
-    new_len += 1; /* terminating null */
-    retval = grow_buf(buf, buf_len, new_len);
-    if (buf_len == 0)
-        (*buf)[0] = '\0';
-
-    args = save_args;
-
-    while ( (str = va_arg(args, char*)) != NULL ) {
+        if (new_len >= buf_len) {
+            /* inefficient, but portable */
+            *buf = realloc(*buf, new_len + 1);
+            buf_len = new_len + 1;
+        }
         strcat(*buf, str);
     }
 
-    return retval;
+
+    return new_len;
 }
 
 size_t
