@@ -66,17 +66,17 @@
 #ifdef HAS_PWD_H
   #include <pwd.h>
 #endif
-#ifdef HAS_SYS.STAT_H
-  #include <sys.stat.h>
+#ifdef HAS_SYS_STAT_H
+  #include <sys/stat.h>
 #endif
-#ifdef HAS_SYS.TIMES_H
-  #include <sys.times.h>
+#ifdef HAS_SYS_TIMES_H
+  #include <sys/times.h>
 #endif
-#ifdef HAS_SYS.TYPES_H
-  #include <sys.types.h>
+#ifdef HAS_SYS_TYPES_H
+  #include <sys/types.h>
 #endif
-#ifdef HAS_SYS.UTSNAME_H
-  #include <sys.utsname.h>
+#ifdef HAS_SYS_UTSNAME_H
+  #include <sys/utsname.h>
 #endif
 #ifdef HAS_WAIT_H
   #include <wait.h>
