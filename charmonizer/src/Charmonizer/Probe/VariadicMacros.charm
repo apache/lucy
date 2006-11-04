@@ -30,7 +30,7 @@ static char gnuc_code[] = METAQUOTE
 METAQUOTE;
 
 void
-chaz_VariadicMacros_run(FILE *conf_fh) 
+chaz_VariadicMacros_run(void) 
 {
     char *output;
     size_t output_len;
@@ -65,14 +65,14 @@ chaz_VariadicMacros_run(FILE *conf_fh)
     }
 
     if (want_short_names) {
-        Start_Short_Names(conf_fh);
+        START_SHORT_NAMES;
         if (has_varmacros)
             shorten_constant("HAS_VARIADIC_MACROS");
         if (has_iso_varmacros)
             shorten_constant("HAS_ISO_VARIADIC_MACROS");
         if (has_gnuc_varmacros)
             shorten_constant("HAS_GNUC_VARIADIC_MACROS");
-        End_Short_Names(conf_fh);
+        END_SHORT_NAMES;
     }
 
     END_RUN;

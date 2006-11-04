@@ -19,7 +19,7 @@
  * 
  * Use of the off64_t symbol may require sys/types.h.
  */
-void chaz_LargeFiles_run(FILE *conf_fh);
+void chaz_LargeFiles_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define LargeFiles_run    chaz_LargeFiles_run

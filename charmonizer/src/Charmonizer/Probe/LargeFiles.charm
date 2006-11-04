@@ -53,7 +53,7 @@ static char ftell_command[10];
 static char loff_type[10];
 
 void
-chaz_LargeFiles_run(FILE *conf_fh) 
+chaz_LargeFiles_run(void) 
 {
     chaz_bool_t success = false;
     unsigned i;
@@ -101,7 +101,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
 
     /* short names */
     if (want_short_names && success) {
-        Start_Short_Names(conf_fh);
+        START_SHORT_NAMES;
         shorten_constant("HAS_LARGE_FILE_SUPPORT");
 
         /* alias these only if they're not already provided and correct */
@@ -110,7 +110,7 @@ chaz_LargeFiles_run(FILE *conf_fh)
             shorten_function("ftello64");
             shorten_function("fseeko64");
         }
-        End_Short_Names(conf_fh);
+        END_SHORT_NAMES;
     }
     
     free(code_buf);

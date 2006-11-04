@@ -8,7 +8,7 @@
 
 /* Run the FuncMacro module.
  */
-void chaz_FuncMacro_run(FILE *conf_fh);
+void chaz_FuncMacro_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define FuncMacro_run    chaz_FuncMacro_run

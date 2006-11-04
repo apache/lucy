@@ -95,7 +95,7 @@
 
 /* Run the Integers module.
  */
-void chaz_Integers_run(FILE *conf_fh);
+void chaz_Integers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define Integers_run    chaz_Integers_run

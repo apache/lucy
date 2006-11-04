@@ -8,7 +8,7 @@
 
 /* Run the UnusedVars module.
  */
-void chaz_UnusedVars_run(FILE *conf_fh);
+void chaz_UnusedVars_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define UnusedVars_run    chaz_UnusedVars_run

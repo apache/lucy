@@ -59,7 +59,7 @@ static char __int64_code[] = METAQUOTE
 METAQUOTE;
 
 void
-chaz_Integers_run(FILE *conf_fh) 
+chaz_Integers_run(void) 
 {
     char *output;
     size_t output_len;
@@ -354,7 +354,7 @@ chaz_Integers_run(FILE *conf_fh)
     );
 
     if (want_short_names) {
-        Start_Short_Names(conf_fh);
+        START_SHORT_NAMES;
 
         if (machine_is_big_endian())
             shorten_constant("BIG_END");
@@ -421,7 +421,7 @@ chaz_Integers_run(FILE *conf_fh)
             shorten_macro("U64_C");
         } 
 
-        End_Short_Names(conf_fh);
+        END_SHORT_NAMES;
     }
     
     END_RUN;

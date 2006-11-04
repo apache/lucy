@@ -52,12 +52,12 @@ int main(int argc, char **argv)
     FILE *config_fh = init(argc, argv);
 
     /* modules section */
-    chaz_Headers_run(config_fh);
-    chaz_FuncMacro_run(config_fh);
-    chaz_Integers_run(config_fh);
-    chaz_LargeFiles_run(config_fh);
-    chaz_UnusedVars_run(config_fh);
-    chaz_VariadicMacros_run(config_fh);
+    chaz_Headers_run();
+    chaz_FuncMacro_run();
+    chaz_Integers_run();
+    chaz_LargeFiles_run();
+    chaz_UnusedVars_run();
+    chaz_VariadicMacros_run();
 
     /* write tail of config and clean up */
     finish_conf_file(config_fh);

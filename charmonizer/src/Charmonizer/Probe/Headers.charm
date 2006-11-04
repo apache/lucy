@@ -71,7 +71,7 @@ chaz_Headers_check(const char *header_name)
 }
 
 void
-chaz_Headers_run(FILE *conf_fh) 
+chaz_Headers_run(void) 
 {
     int i;
     chaz_bool_t has_posix = false;
@@ -105,7 +105,7 @@ chaz_Headers_run(FILE *conf_fh)
     }
 
     if (want_short_names) {
-        Start_Short_Names(conf_fh);
+        START_SHORT_NAMES;
 
         if (has_posix)
             shorten_constant("HAS_POSIX");
@@ -120,7 +120,7 @@ chaz_Headers_run(FILE *conf_fh)
             shorten_constant(aff_buf);
         }
 
-        End_Short_Names(conf_fh);
+        END_SHORT_NAMES;
     }
 
     END_RUN;

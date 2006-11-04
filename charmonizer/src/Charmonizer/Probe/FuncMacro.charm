@@ -28,7 +28,7 @@ METAQUOTE;
 
 
 void
-chaz_FuncMacro_run(FILE *conf_fh) 
+chaz_FuncMacro_run(void) 
 {
     char *output;
     size_t output_len;
@@ -76,7 +76,7 @@ chaz_FuncMacro_run(FILE *conf_fh)
     }
 
     if (want_short_names) {
-        Start_Short_Names(conf_fh);
+        START_SHORT_NAMES;
         if (has_iso_funcmac) 
             shorten_constant("HAS_ISO_FUNC_MACRO");
         if (has_gnuc_funcmac)
@@ -85,7 +85,7 @@ chaz_FuncMacro_run(FILE *conf_fh)
             shorten_constant("HAS_FUNC_MACRO");
             shorten_macro("Func_Macro");
         }
-        End_Short_Names(conf_fh);
+        END_SHORT_NAMES;
     }
 
     END_RUN;

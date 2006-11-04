@@ -62,12 +62,12 @@ chaz_ModHand_append_conf(char *fmt, ...);
 
 /* Print bookends delimiting a short names block.
  */
-#define Chaz_ModHand_Start_Short_Names(conf_fh) \
+#define CHAZ_MODHAND_START_SHORT_NAMES \
   append_conf( \
     "\n#if defined(%sUSE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n", \
             chaz_ModHand_constant_prefix)
 
-#define Chaz_ModHand_End_Short_Names(conf_fh) \
+#define CHAZ_MODHAND_END_SHORT_NAMES \
     append_conf( \
         "#endif /* USE_SHORT_NAMES */\n", chaz_ModHand_constant_prefix)
 
@@ -127,8 +127,8 @@ chaz_ModHand_write_charm_test_h();
 # define ModHand_init           chaz_ModHand_init
 # define write_charm_h          chaz_ModHand_write_charm_h
 # define build_charm_run        chaz_ModHand_build_charm_run
-# define Start_Short_Names      Chaz_ModHand_Start_Short_Names
-# define End_Short_Names        Chaz_ModHand_End_Short_Names
+# define START_SHORT_NAMES      CHAZ_MODHAND_START_SHORT_NAMES
+# define END_SHORT_NAMES        CHAZ_MODHAND_END_SHORT_NAMES
 # define test_compile           chaz_ModHand_test_compile
 # define capture_output         chaz_ModHand_capture_output 
 # define append_conf            chaz_ModHand_append_conf

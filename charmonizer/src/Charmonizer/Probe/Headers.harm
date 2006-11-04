@@ -62,7 +62,7 @@ chaz_Headers_check(const char *header_name);
  * HAS_UTIME_H
  */
 void 
-chaz_Headers_run(FILE *conf_fh);
+chaz_Headers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
 # define Headers_run        chaz_Headers_run
