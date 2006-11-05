@@ -14,6 +14,8 @@
 #include "Charmonizer/Probe/UnusedVars.h"
 #include "Charmonizer/Probe/VariadicMacros.h"
 
+char *cc_command, *cc_flags, *os_name, *verbosity_str;
+
 /* Process command line args, set up Charmonizer, etc. 
  */
 void
@@ -30,6 +32,11 @@ extract_delim(char *source, size_t source_len, const char *tag_name);
 static char*
 extract_delim_and_verify(char *source, size_t source_len, 
                          const char *tag_name);
+
+/* Write some stuff to the end of charmony.h
+ */
+static void
+write_charmony_postamble(void);
 
 /* Print a message to stderr and exit.
  */
@@ -48,8 +55,15 @@ int main(int argc, char **argv)
     chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
 
+    /* write custom postamble */
+    write_charmony_postamble();
+
     /* clean up */
     chaz_Probe_clean_up();
+    free(cc_command);
+    free(cc_flags);
+    free(os_name);
+    free(verbosity_str);
 
     return 0;
 }
@@ -57,7 +71,6 @@ int main(int argc, char **argv)
 void
 init(int argc, char **argv) 
 {
-    char *cc_command, *cc_flags, *os_name, *verbosity_str;
     char *infile_str;
     size_t infile_len;
 
@@ -83,10 +96,6 @@ init(int argc, char **argv)
 
     /* clean up */
     free(infile_str);
-    free(cc_command);
-    free(cc_flags);
-    free(os_name);
-    free(verbosity_str);
 }
 
 static char*
@@ -136,6 +145,20 @@ extract_delim_and_verify(char *source, size_t source_len, const char *tag_name)
     if (retval == NULL)
         die("Couldn't extract value for '%s'", tag_name);
     return retval;
+}
+
+static void
+write_charmony_postamble(void)
+{
+    FILE *charmony_fh = chaz_Probe_get_charmony_fh();
+
+    if (strcmp(os_name, "mswin32") == 0) {
+        fprintf(charmony_fh,
+            "#ifndef LUCY_HAS_LARGE_FILE_SUPPORT\n"
+            "  #include \"win32lfs.h\"\n"  
+            "#endif /* LUCY_HAS_LARGE_FILE_SUPPORT */\n"
+        );
+    }
 }
 
 void 

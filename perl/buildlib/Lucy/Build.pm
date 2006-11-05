@@ -192,6 +192,18 @@ sub ACTION_build_charm_test {
         sub { $File::Find::name =~ m#Charmonizer/Test.*?\.c$# } );
     push @$source_files, $source_path;
 
+    # collect include dirs
+    my @include_dirs = ( $FILTERED_DIR, curdir() );
+
+    # add Windows supplements 
+    if ( $Config{osname} =~ /mswin/i ) {
+        my $win_compat_dir = catdir( $base_dir, 'c_src', 'compat' );
+        push @include_dirs, $win_compat_dir;
+        my $win_compat_files = $self->_find_files( $win_compat_dir, 
+            sub { $File::Find::name =~ m#\.c$# } );
+        push @$source_files, @$win_compat_files;
+    }
+
     my $cbuilder = ExtUtils::CBuilder->new;
 
     # compile and link "charm_test"
@@ -200,7 +212,7 @@ sub ACTION_build_charm_test {
         my $o_file = $cbuilder->compile(
             source               => $_,
             extra_compiler_flags => $EXTRA_CCFLAGS,
-            include_dirs         => [ $FILTERED_DIR, curdir() ],
+            include_dirs         => \@include_dirs,
         );
         push @o_files, $o_file;
     }
