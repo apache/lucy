@@ -206,6 +206,8 @@ sub ACTION_build_charm_test {
         push @$source_files, @$win_compat_files;
     }
 
+	return if $self->up_to_date( $source_files, $exe_path );
+
     my $cbuilder = ExtUtils::CBuilder->new;
 
     # compile and link "charm_test"
