@@ -10,8 +10,8 @@
  *
  * These symbols are exported:
  * 
- * Unused_Var(var)
- * Unreachable_Return(type)
+ * UNUSED_VAR(var)
+ * UNREACHABLE_RETURN(type)
  * 
  */
 void chaz_UnusedVars_run(void);

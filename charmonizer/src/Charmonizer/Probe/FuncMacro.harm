@@ -19,7 +19,7 @@
  * If one or the other succeeds, these will be defined:
  * 
  * HAS_FUNC_MACRO
- * Func_Macro
+ * FUNC_MACRO
  */
 void chaz_FuncMacro_run(void);
 

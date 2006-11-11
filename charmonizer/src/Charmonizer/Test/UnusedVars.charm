@@ -12,16 +12,16 @@ chaz_TUnusedVars_prepare()
 void
 chaz_TUnusedVars_run(TestBatch *batch)
 {
-#ifdef Unused_Var
-    PASS(batch, "Unused_Var macro is defined");
+#ifdef UNUSED_VAR
+    PASS(batch, "UNUSED_VAR macro is defined");
 #else
-    FAIL(batch, "Unused_Var macro is defined");
+    FAIL(batch, "UNUSED_VAR macro is defined");
 #endif
 
-#ifdef Unreachable_Return
-    PASS(batch, "Unreachable_Return macro is defined");
+#ifdef UNREACHABLE_RETURN
+    PASS(batch, "UNREACHABLE_RETURN macro is defined");
 #else
-    FAIL(batch, "Unreachable_Return macro is defined");
+    FAIL(batch, "UNREACHABLE_RETURN macro is defined");
 #endif
 }
 
