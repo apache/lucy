@@ -3,10 +3,12 @@ use strict;
 use warnings;
 use base qw( Module::Build );
 
+# Don't crash Build.PL if CBuilder isn't installed yet
+BEGIN { eval "use ExtUtils::CBuilder;"; }
+
 use File::Spec::Functions qw( catdir catfile curdir splitpath updir );
 use File::Path qw( mkpath );
 use File::Find qw( find );
-use ExtUtils::CBuilder;
 use Config;
 use Env qw( @PATH );
 
