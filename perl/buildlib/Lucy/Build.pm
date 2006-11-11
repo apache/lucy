@@ -176,9 +176,6 @@ sub ACTION_charmony {
     }
 
     $self->add_to_cleanup( $charmony_path, $charmony_in );
-
-    # generated when ./charmonize is run
-    $self->add_to_cleanup("_charm_test.h");
 }
 
 sub ACTION_build_charm_test {
