@@ -82,7 +82,7 @@ chaz_Headers_run(void)
     /* test for all POSIX headers in one blast */
     if (check_many_headers((const char**)posix_headers)) {
         has_posix = true;
-        append_conf("#define %sHAS_POSIX\n", constant_prefix);
+        append_conf("#define %sHAS_POSIX\n", macro_prefix);
         for (i = 0; posix_headers[i] != NULL; i++) {
             keep(posix_headers[i]);
         }
@@ -91,8 +91,8 @@ chaz_Headers_run(void)
     /* test for all c89 headers in one blast */
     if (check_many_headers((const char**)c89_headers)) {
         has_c89 = true;
-        append_conf("#define %sHAS_C89\n", constant_prefix);
-        append_conf("#define %sHAS_C90\n", constant_prefix);
+        append_conf("#define %sHAS_C89\n", macro_prefix);
+        append_conf("#define %sHAS_C90\n", macro_prefix);
         for (i = 0; c89_headers[i] != NULL; i++) {
             keep(c89_headers[i]);
         }
@@ -101,7 +101,7 @@ chaz_Headers_run(void)
     /* append the config with every header detected so far */
     for (i = 0; keepers[i] != NULL; i++) {
         encode_affirmation(keepers[i]);
-        append_conf("#define %s%s\n", constant_prefix, aff_buf);
+        append_conf("#define %s%s\n", macro_prefix, aff_buf);
     }
 
     /* shorten */
@@ -109,16 +109,16 @@ chaz_Headers_run(void)
         START_SHORT_NAMES;
 
         if (has_posix)
-            shorten_constant("HAS_POSIX");
+            shorten_macro("HAS_POSIX");
 
         if (has_c89) {
-            shorten_constant("HAS_C89");
-            shorten_constant("HAS_C90");
+            shorten_macro("HAS_C89");
+            shorten_macro("HAS_C90");
         }
 
         for (i = 0; keepers[i] != NULL; i++) {
             encode_affirmation(keepers[i]);
-            shorten_constant(aff_buf);
+            shorten_macro(aff_buf);
         }
 
         END_SHORT_NAMES;

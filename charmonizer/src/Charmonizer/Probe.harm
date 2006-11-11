@@ -26,8 +26,8 @@ chaz_Probe_clean_up();
  * By default, they are blank.
  */ 
 void
-chaz_Probe_set_prefixes(const char *constant_prefix, const char *macro_prefix, 
-                  const char *typedef_prefix,  const char *function_prefix);
+chaz_Probe_set_prefixes(char *macro_prefix, const char *typedef_prefix,  
+                        const char *function_prefix);
 
 /* Determine how much feedback Charmonizer provides.  
  * 0 - silent

@@ -48,9 +48,9 @@ chaz_VariadicMacros_run(void)
         has_varmacros = true;
         has_iso_varmacros = true;
         append_conf("#define %sHAS_VARIADIC_MACROS\n", 
-            constant_prefix);
+            macro_prefix);
         append_conf("#define %sHAS_ISO_VARIADIC_MACROS\n", 
-            constant_prefix);
+            macro_prefix);
     }
 
     /* test for GNU-style variadic macros */
@@ -60,21 +60,21 @@ chaz_VariadicMacros_run(void)
         if (has_varmacros == false) {
             has_varmacros = true;
             append_conf("#define %sHAS_VARIADIC_MACROS\n", 
-                constant_prefix);
+                macro_prefix);
         }
         append_conf("#define %sHAS_GNUC_VARIADIC_MACROS\n", 
-            constant_prefix);
+            macro_prefix);
     }
 
 	/* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
         if (has_varmacros)
-            shorten_constant("HAS_VARIADIC_MACROS");
+            shorten_macro("HAS_VARIADIC_MACROS");
         if (has_iso_varmacros)
-            shorten_constant("HAS_ISO_VARIADIC_MACROS");
+            shorten_macro("HAS_ISO_VARIADIC_MACROS");
         if (has_gnuc_varmacros)
-            shorten_constant("HAS_GNUC_VARIADIC_MACROS");
+            shorten_macro("HAS_GNUC_VARIADIC_MACROS");
         END_SHORT_NAMES;
     }
 

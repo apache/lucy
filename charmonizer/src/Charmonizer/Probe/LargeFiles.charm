@@ -76,14 +76,14 @@ chaz_LargeFiles_run(void)
 
     /* write the affirmations/definitions */
     if (success) {
-        append_conf("#define %sHAS_LARGE_FILE_SUPPORT\n", constant_prefix );
+        append_conf("#define %sHAS_LARGE_FILE_SUPPORT\n", macro_prefix );
         /* alias these only if they're not already provided and correct */
         if (strcmp(off64_type, "off64_t") != 0) {
             append_conf(
                 "#define %soff64_t %s\n"
                 "#define %sftello64 %s\n" 
                 "#define %sfseeko64 %s\n",
-                constant_prefix, off64_type,
+                macro_prefix, off64_type,
                 function_prefix, ftell_command,
                 function_prefix, fseek_command
             );
@@ -104,11 +104,11 @@ chaz_LargeFiles_run(void)
     /* short names */
     if (want_short_names && success) {
         START_SHORT_NAMES;
-        shorten_constant("HAS_LARGE_FILE_SUPPORT");
+        shorten_macro("HAS_LARGE_FILE_SUPPORT");
 
         /* alias these only if they're not already provided and correct */
         if (strcmp(off64_type, "off64_t") != 0) {
-            shorten_constant("off64_t");
+            shorten_macro("off64_t");
             shorten_function("ftello64");
             shorten_function("fseeko64");
         }

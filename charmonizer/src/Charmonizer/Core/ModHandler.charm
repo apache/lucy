@@ -32,7 +32,6 @@ struct chaz_Compiler *chaz_ModHand_compiler = NULL;
 chaz_bool_t chaz_ModHand_charm_run_available = false;
 FILE* chaz_ModHand_charmony_fh = NULL;
 
-char *constant_prefix = NULL;
 char *macro_prefix    = NULL;
 char *typedef_prefix  = NULL;
 char *function_prefix = NULL;
@@ -239,12 +238,6 @@ clean_up_try()
     remove(TRY_SOURCE_PATH);
     os->remove_exe(os, TRY_APP_BASENAME);
     remove(TARGET_PATH);
-}
-
-void
-chaz_ModHand_shorten_constant(const char *sym)
-{
-    append_conf("  #define %s %s%s\n", sym, constant_prefix, sym); 
 }
 
 void

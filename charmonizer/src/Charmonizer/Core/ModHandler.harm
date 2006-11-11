@@ -25,7 +25,6 @@ extern struct chaz_Compiler *chaz_ModHand_compiler;
 extern chaz_bool_t chaz_ModHand_charm_run_available;
 extern FILE* chaz_ModHand_charmony_fh;
 
-extern char *chaz_ModHand_constant_prefix;
 extern char *chaz_ModHand_macro_prefix;
 extern char *chaz_ModHand_typedef_prefix;
 extern char *chaz_ModHand_function_prefix;
@@ -74,16 +73,11 @@ chaz_ModHand_append_conf(char *fmt, ...);
 #define CHAZ_MODHAND_START_SHORT_NAMES \
   append_conf( \
     "\n#if defined(%sUSE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n", \
-            chaz_ModHand_constant_prefix)
+            chaz_ModHand_macro_prefix)
 
 #define CHAZ_MODHAND_END_SHORT_NAMES \
     append_conf( \
-        "#endif /* USE_SHORT_NAMES */\n", chaz_ModHand_constant_prefix)
-
-/* Define a shortened version of a constant symbol (minus the prefix);
- */
-void
-chaz_ModHand_shorten_constant(const char *symbol);
+        "#endif /* USE_SHORT_NAMES */\n", chaz_ModHand_macro_prefix)
 
 /* Define a shortened version of a macro symbol (minus the prefix);
  */
@@ -122,7 +116,6 @@ chaz_ModHand_shorten_function(const char *symbol);
   #define compiler                 chaz_ModHand_compiler
   #define charm_run_available      chaz_ModHand_charm_run_available
   #define charmony_fh              chaz_ModHand_charmony_fh
-  #define constant_prefix          chaz_ModHand_constant_prefix
   #define macro_prefix             chaz_ModHand_macro_prefix
   #define typedef_prefix           chaz_ModHand_typedef_prefix
   #define function_prefix          chaz_ModHand_function_prefix
@@ -137,7 +130,6 @@ chaz_ModHand_shorten_function(const char *symbol);
   #define test_compile             chaz_ModHand_test_compile
   #define capture_output           chaz_ModHand_capture_output 
   #define append_conf              chaz_ModHand_append_conf
-  #define shorten_constant         chaz_ModHand_shorten_constant
   #define shorten_macro            chaz_ModHand_shorten_macro
   #define shorten_typedef          chaz_ModHand_shorten_typedef
   #define shorten_function         chaz_ModHand_shorten_function

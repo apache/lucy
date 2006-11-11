@@ -92,7 +92,7 @@ init(int argc, char **argv)
         chaz_Probe_set_verbosity(verbosity);
     }
     chaz_Probe_init(os_name, cc_command, cc_flags, NULL);
-    chaz_Probe_set_prefixes("LUCY_", "Lucy_", "lucy_", "lucy_");
+    chaz_Probe_set_prefixes("LUCY_", "lucy_", "lucy_");
 
     /* clean up */
     free(infile_str);

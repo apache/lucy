@@ -65,26 +65,26 @@ chaz_FuncMacro_run(void)
         append_conf(
 			"#define %sHAS_FUNC_MACRO\n"
             "#define %sFUNC_MACRO %s\n",
-            constant_prefix, macro_prefix, macro_text);
+            macro_prefix, macro_prefix, macro_text);
     }
 
     /* write out specific defines */
     if (has_iso_funcmac) {
-       append_conf("#define %sHAS_ISO_FUNC_MACRO\n", constant_prefix);
+       append_conf("#define %sHAS_ISO_FUNC_MACRO\n", macro_prefix);
     }
     if (has_gnuc_funcmac) {
-        append_conf("#define %sHAS_GNUC_FUNC_MACRO\n", constant_prefix);
+        append_conf("#define %sHAS_GNUC_FUNC_MACRO\n", macro_prefix);
     }
 
 	/* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
         if (has_iso_funcmac) 
-            shorten_constant("HAS_ISO_FUNC_MACRO");
+            shorten_macro("HAS_ISO_FUNC_MACRO");
         if (has_gnuc_funcmac)
-            shorten_constant("HAS_GNUC_FUNC_MACRO");
+            shorten_macro("HAS_GNUC_FUNC_MACRO");
         if (has_iso_funcmac || has_gnuc_funcmac) {
-            shorten_constant("HAS_FUNC_MACRO");
+            shorten_macro("HAS_FUNC_MACRO");
             shorten_macro("FUNC_MACRO");
         }
         END_SHORT_NAMES;

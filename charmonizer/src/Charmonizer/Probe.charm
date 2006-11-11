@@ -19,7 +19,7 @@ chaz_Probe_init(const char *osname, const char *cc_command,
     compiler = CC_new(os, cc_command, cc_flags);
 
     /* don't write short names unless the user so indicates */
-    chaz_Probe_set_prefixes("", "", "", "");
+    chaz_Probe_set_prefixes("", "", "");
     want_short_names = false;
 
     /* dispatch other tasks */
@@ -47,16 +47,14 @@ chaz_Probe_clean_up()
 }
 
 void
-chaz_Probe_set_prefixes(const char *constant_pre, const char *macro_pre, 
-                  const char* typedef_pre,  const char *function_pre) 
+chaz_Probe_set_prefixes(char *macro_pre, const char* typedef_pre,  
+                        const char *function_pre) 
 {
     want_short_names = true;
 
-    free(constant_prefix);
     free(macro_prefix);
     free(typedef_prefix);
     free(function_prefix);
-    constant_prefix  = strdup(constant_pre);
     macro_prefix     = strdup(macro_pre);
     typedef_prefix   = strdup(typedef_pre);
     function_prefix  = strdup(function_pre);
