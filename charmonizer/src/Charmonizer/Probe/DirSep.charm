@@ -1,0 +1,101 @@
+#define CHAZ_USE_SHORT_NAMES
+
+#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Probe/DirSep.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+static char mkdir_code[] = METAQUOTE
+    #include "_charm.h"
+    #include <sys/stat.h>
+    int main () {
+        Charm_Setup;
+        if (mkdir("_charm_test_dir_orig", 0777) == 0) {
+            printf("1");
+        }
+        return 0;
+    }
+METAQUOTE;
+
+void
+chaz_DirSep_run(void) 
+{
+    char        *output;
+    size_t       output_len;
+    char         dir_sep[3];
+    chaz_bool_t  dir_sep_is_valid = false;
+
+    START_RUN("DirSep");
+
+    /* create a directory */
+    output = capture_output(mkdir_code, strlen(mkdir_code), &output_len);
+
+    if (output != NULL && (strcmp(output, "1") == 0)) {
+        FILE *f;
+
+        /* clean up */
+        free(output);
+
+        /* try to create files under the new directory */
+        if ( (f = fopen("_charm_test_dir_orig\\backslash", "w")) != NULL)
+            fclose(f);
+        if ( (f = fopen("_charm_test_dir_orig/slash", "w")) != NULL)
+            fclose(f);
+
+        /* rename the directory, and see which file we can get to */
+        rename("_charm_test_dir_orig", "_charm_test_dir_mod");
+        if ( (f = fopen("_charm_test_dir_mod\\backslash", "r")) != NULL) {
+            fclose(f);
+            strcpy(dir_sep, "\\\\");
+            dir_sep_is_valid = true;
+        }
+        else if ( (f = fopen("_charm_test_dir_mod/slash", "r")) != NULL) {
+            fclose(f);
+            strcpy(dir_sep, "/");
+            dir_sep_is_valid = true;
+        }
+    }
+
+    /* clean up - delete all possible files without verifying */
+    remove("_charm_test_dir_mod/slash");
+    remove("_charm_test_dir_mod\\backslash");
+    remove("_charm_test_dir_orig/slash");
+    remove("_charm_test_dir_orig\\backslash");
+    remove("_charm_test_dir_orig");
+    remove("_charm_test_dir_mod");
+
+    if (dir_sep_is_valid) {
+        append_conf( "#define %sDIR_SEP \"%s\"\n",
+            macro_prefix, dir_sep
+        );
+
+        /* shorten */
+        if (want_short_names) {
+            START_SHORT_NAMES;
+            shorten_macro("DIR_SEP");
+            END_SHORT_NAMES;
+        }
+    }
+
+    END_RUN;
+}
+
+
+/**
+ * Copyright 2006 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
