@@ -1,28 +1,37 @@
-package Lucy::Build;
 use strict;
 use warnings;
+
+package Lucy::Build;
 use base qw( Module::Build );
 
 # Don't crash Build.PL if CBuilder isn't installed yet
 BEGIN { eval "use ExtUtils::CBuilder;"; }
 
-use File::Spec::Functions qw( catdir catfile curdir splitpath updir );
-use File::Path qw( mkpath );
+use File::Spec::Functions
+    qw( catdir catfile curdir splitpath updir no_upwards );
+use File::Path qw( mkpath rmtree );
+use File::Copy qw( copy move );
 use File::Find qw( find );
 use Config;
 use Env qw( @PATH );
 
 unshift @PATH, curdir();
 
-my $base_dir = -e 'charmonizer' ? curdir() : updir();
+my $is_distro_not_devel = -e 'charmonizer';
+my $base_dir            = $is_distro_not_devel ? curdir() : updir();
 
-my $METAQUOTE_EXE_PATH  = 'metaquote' . $Config{_exe};
-my $CHARMONIZE_EXE_PATH = 'charmonize' . $Config{_exe};
+my $METAQUOTE_EXE_PATH     = 'metaquote' . $Config{_exe};
+my $CHARMONIZE_EXE_PATH    = 'charmonize' . $Config{_exe};
 my $CHARMONIZER_SOURCE_DIR = catdir( $base_dir, 'charmonizer', 'src' );
 my $FILTERED_DIR = catdir( $base_dir, qw( charmonizer filtered_src ) );
+my $C_SOURCE_DIR = catdir( $base_dir, 'c_src' );
+my $R_SOURCE_DIR = catdir( $C_SOURCE_DIR, 'r' );
 
-my $EXTRA_CCFLAGS
-    = $ENV{DEBUG_CHARM} ? " -ansi -pedantic -Wall -Wextra -std=c89 " : "";
+my $EXTRA_CCFLAGS = '';
+if ( $ENV{LUCY_DEBUG} ) {
+    $EXTRA_CCFLAGS = "-DPERL_GCC_PEDANTIC -ansi -pedantic -Wall -Wextra "
+        . "-std=c89 -Wno-long-long -Wno-variadic-macros";
+}
 my $VALGRIND = $ENV{CHARM_VALGRIND} ? "valgrind --leak-check=full " : "";
 
 # Compile the metaquote source filter utility.
@@ -146,7 +155,7 @@ sub _metaquote_charm_files {
 sub ACTION_charmony {
     my $self          = shift;
     my $charmony_in   = 'charmony_in';
-    my $charmony_path = "charmony.h";
+    my $charmony_path = 'charmony.h';
 
     $self->dispatch('charmonizer');
 
@@ -154,10 +163,10 @@ sub ACTION_charmony {
     print "\nWriting $charmony_path...\n\n";
 
     # write the infile with which to communicate args to charmonize
-    my $os_name = lc( $Config{osname} );
-    my $flags = "$Config{ccflags} $EXTRA_CCFLAGS";
+    my $os_name   = lc( $Config{osname} );
+    my $flags     = "$Config{ccflags} $EXTRA_CCFLAGS";
     my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
-    my $cc = "$Config{cc}";
+    my $cc        = "$Config{cc}";
     open( my $infile_fh, '>', $charmony_in )
         or die "Can't open '$charmony_in': $!";
     print $infile_fh qq|
@@ -187,23 +196,23 @@ sub ACTION_build_charm_test {
     my $source_path     = catfile( $base_dir, 'charmonizer', 'charm_test.c' );
     my $exe_path        = "charm_test$Config{_exe}";
     my $test_source_dir = catdir( $FILTERED_DIR, qw( Charmonizer Test ) );
-    my $source_files = $self->_find_files( $FILTERED_DIR,
+    my $source_files    = $self->_find_files( $FILTERED_DIR,
         sub { $File::Find::name =~ m#Charmonizer/Test.*?\.c$# } );
     push @$source_files, $source_path;
 
     # collect include dirs
     my @include_dirs = ( $FILTERED_DIR, curdir() );
 
-    # add Windows supplements 
+    # add Windows supplements
     if ( $Config{osname} =~ /mswin/i ) {
         my $win_compat_dir = catdir( $base_dir, 'c_src', 'compat' );
         push @include_dirs, $win_compat_dir;
-        my $win_compat_files = $self->_find_files( $win_compat_dir, 
+        my $win_compat_files = $self->_find_files( $win_compat_dir,
             sub { $File::Find::name =~ m#\.c$# } );
         push @$source_files, @$win_compat_files;
     }
 
-	return if $self->up_to_date( $source_files, $exe_path );
+    return if $self->up_to_date( $source_files, $exe_path );
 
     my $cbuilder = ExtUtils::CBuilder->new;
 
