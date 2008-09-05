@@ -25,11 +25,6 @@ extern struct chaz_Compiler *chaz_ModHand_compiler;
 extern chaz_bool_t chaz_ModHand_charm_run_available;
 extern FILE* chaz_ModHand_charmony_fh;
 
-extern char *chaz_ModHand_macro_prefix;
-extern char *chaz_ModHand_typedef_prefix;
-extern char *chaz_ModHand_function_prefix;
-extern chaz_bool_t chaz_ModHand_want_short_names;
-
 /* Initialize elements needed by ModHandler.  Must be called before anything 
  * else, but after os and compiler are created.
  */
@@ -72,24 +67,22 @@ chaz_ModHand_append_conf(char *fmt, ...);
  */
 #define CHAZ_MODHAND_START_SHORT_NAMES \
   append_conf( \
-    "\n#if defined(%sUSE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n", \
-            chaz_ModHand_macro_prefix)
+    "\n#if defined(CHY_USE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n")
 
 #define CHAZ_MODHAND_END_SHORT_NAMES \
-    append_conf( \
-        "#endif /* USE_SHORT_NAMES */\n", chaz_ModHand_macro_prefix)
+    append_conf("#endif /* USE_SHORT_NAMES */\n")
 
-/* Define a shortened version of a macro symbol (minus the prefix);
+/* Define a shortened version of a macro symbol (minus the "CHY_" prefix);
  */
 void
 chaz_ModHand_shorten_macro(const char *symbol);
 
-/* Define a shortened version of a typedef symbol (minus the prefix);
+/* Define a shortened version of a typedef symbol (minus the "chy_" prefix);
  */
 void
 chaz_ModHand_shorten_typedef(const char *symbol);
 
-/* Define a shortened version of a function symbol (minus the prefix);
+/* Define a shortened version of a function symbol (minus the "chy_" prefix);
  */
 void
 chaz_ModHand_shorten_function(const char *symbol);
@@ -116,10 +109,6 @@ chaz_ModHand_shorten_function(const char *symbol);
   #define compiler                 chaz_ModHand_compiler
   #define charm_run_available      chaz_ModHand_charm_run_available
   #define charmony_fh              chaz_ModHand_charmony_fh
-  #define macro_prefix             chaz_ModHand_macro_prefix
-  #define typedef_prefix           chaz_ModHand_typedef_prefix
-  #define function_prefix          chaz_ModHand_function_prefix
-  #define want_short_names         chaz_ModHand_want_short_names
   #define ModHand_init             chaz_ModHand_init
   #define ModHand_open_charmony_h  chaz_ModHand_open_charmony_h
   #define ModHand_clean_up         chaz_ModHand_clean_up

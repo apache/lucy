@@ -82,9 +82,9 @@ chaz_Integers_run(void)
 
     /* document endian-ness */
     if (machine_is_big_endian())
-        append_conf("#define %sBIG_END\n", macro_prefix);
+        append_conf("#define CHY_BIG_END\n");
     else 
-        append_conf("#define %sLITTLE_END\n", macro_prefix);
+        append_conf("#define CHY_LITTLE_END\n");
 
     /* Record sizeof() for several common integer types. */
     output = capture_output(sizes_code, strlen(sizes_code), &output_len);
@@ -188,99 +188,66 @@ chaz_Integers_run(void)
 
     /* write out some conditional defines */
     if (has_inttypes)
-        append_conf("#define %sHAS_INTTYPES_H\n", macro_prefix);
+        append_conf("#define CHY_HAS_INTTYPES_H\n");
     if (has_long_long)
-        append_conf("#define %sHAS_LONG_LONG\n", macro_prefix);
+        append_conf("#define CHY_HAS_LONG_LONG\n");
     if (has___int64)
-        append_conf("#define %sHAS___INT64\n", macro_prefix);
+        append_conf("#define CHY_HAS___INT64\n");
 
     /* write out sizes */
-    append_conf(
-        "#define %sSIZEOF_CHAR %d\n"
-        "#define %sSIZEOF_SHORT %d\n"
-        "#define %sSIZEOF_INT %d\n"
-        "#define %sSIZEOF_LONG %d\n"
-        "#define %sSIZEOF_PTR %d\n",
-        macro_prefix, sizeof_char,
-        macro_prefix, sizeof_short,
-        macro_prefix, sizeof_int,
-        macro_prefix, sizeof_long,
-        macro_prefix, sizeof_ptr
-    );
+    append_conf("#define CHY_SIZEOF_CHAR %d\n",  sizeof_char);
+    append_conf("#define CHY_SIZEOF_SHORT %d\n", sizeof_short);
+    append_conf("#define CHY_SIZEOF_INT %d\n",   sizeof_int);
+    append_conf("#define CHY_SIZEOF_LONG %d\n",  sizeof_long);
+    append_conf("#define CHY_SIZEOF_PTR %d\n",   sizeof_ptr);
     if (has_long_long) {
-        append_conf("#define %sSIZEOF_LONG_LONG %d\n",
-            macro_prefix, sizeof_long_long);
+        append_conf("#define CHY_SIZEOF_LONG_LONG %d\n", sizeof_long_long);
     }
     if (has___int64) {
-        append_conf("#define %sSIZEOF___INT64 %d\n",
-            macro_prefix, sizeof___int64);
+        append_conf("#define CHY_SIZEOF___INT64 %d\n", sizeof___int64);
     }
 
     /* write affirmations, typedefs and maximums/minimums */
-    append_conf("typedef int %sbool_t;\n", typedef_prefix);
+    append_conf("typedef int chy_bool_t;\n");
     if (has_8) {
         append_conf(
-            "#define %sHAS_I8_T\n"
-            "typedef char %si8_t;\n"
-            "typedef unsigned char %su8_t;\n",
-            macro_prefix, typedef_prefix, typedef_prefix
-        );
-        append_conf(
-            "#define %sI8_MAX 0x7F\n"
-            "#define %sI8_MIN (-I8_MAX - 1)\n"
-            "#define %sU8_MAX (I8_MAX * 2 + 1)\n",
-            macro_prefix, macro_prefix, macro_prefix
+            "#define CHY_HAS_I8_T\n"
+            "typedef char chy_i8_t;\n"
+            "typedef unsigned char chy_u8_t;\n"
+            "#define CHY_I8_MAX 0x7F\n"
+            "#define CHY_I8_MIN (-I8_MAX - 1)\n"
+            "#define CHY_U8_MAX (I8_MAX * 2 + 1)\n"
         );
     }
     if (has_16) {
         append_conf(
-            "#define %sHAS_I16_T\n"
-            "typedef short %si16_t;\n"
-            "typedef unsigned short %su16_t;\n",
-            macro_prefix, typedef_prefix, typedef_prefix
-        );
-        append_conf(
-            "#define %sI16_MAX 0x7FFF\n"
-            "#define %sI16_MIN (-I16_MAX - 1)\n"
-            "#define %sU16_MAX (I16_MAX * 2 + 1)\n",
-            macro_prefix, macro_prefix, macro_prefix
+            "#define CHY_HAS_I16_T\n"
+            "typedef short chy_i16_t;\n"
+            "typedef unsigned short chy_u16_t;\n"
+            "#define CHY_I16_MAX 0x7FFF\n"
+            "#define CHY_I16_MIN (-I16_MAX - 1)\n"
+            "#define CHY_U16_MAX (I16_MAX * 2 + 1)\n"
         );
     }
     if (has_32) {
-        append_conf(
-            "#define %sHAS_I32_T\n"
-            "typedef %s %si32_t;\n"
-            "typedef unsigned %s %su32_t;\n",
-            macro_prefix,
-            i32_t_type, typedef_prefix, 
-            i32_t_type, typedef_prefix
-        );
-        append_conf(
-            "#define %sI32_MAX 0x7FFFFFFF%s\n"
-            "#define %sI32_MIN (-I32_MAX - 1)\n"
-            "#define %sU32_MAX (I32_MAX * 2%s + 1%s)\n",
-            macro_prefix, i32_t_postfix,
-            macro_prefix, 
-            macro_prefix, u32_t_postfix, u32_t_postfix
-        );
+        append_conf("#define CHY_HAS_I32_T\n");
+        append_conf("typedef %s chy_i32_t;\n", i32_t_type);
+        append_conf("typedef unsigned %s chy_u32_t;\n", i32_t_type);
+        append_conf("#define CHY_I32_MAX 0x7FFFFFFF%s\n", i32_t_postfix);
+        append_conf("#define CHY_I32_MIN (-I32_MAX - 1)\n");
+        append_conf("#define CHY_U32_MAX (I32_MAX * 2%s + 1%s)\n",
+            u32_t_postfix, u32_t_postfix);
     }
     if (has_64) {
-        append_conf(
-            "#define %sHAS_I64_T\n"
-            "typedef %s %si64_t;\n"
-            "typedef unsigned %s %su64_t;\n",
-            macro_prefix,
-            i64_t_type, typedef_prefix, 
-            i64_t_type, typedef_prefix
-        );
-        append_conf(
-            "#define %sI64_MAX 0x7FFFFFFFFFFFFFFF%s\n"
-            "#define %sI64_MIN (-I64_MAX - 1%s)\n"
-            "#define %sU64_MAX (I64_MAX * 2%s + 1%s)\n",
-            macro_prefix, i64_t_postfix,
-            macro_prefix, i64_t_postfix,
-            macro_prefix, u64_t_postfix, u64_t_postfix
-        );
+        append_conf("#define CHY_HAS_I64_T\n");
+        append_conf("typedef %s chy_i64_t;\n", i64_t_type);
+        append_conf("typedef unsigned %s chy_u64_t;\n", i64_t_type);
+        append_conf("#define CHY_I64_MAX 0x7FFFFFFFFFFFFFFF%s\n",
+            i64_t_postfix);
+        append_conf("#define CHY_I64_MIN (-I64_MAX - 1%s)\n",
+            i64_t_postfix);
+        append_conf("#define CHY_U64_MAX (I64_MAX * 2%s + 1%s)\n",
+            u64_t_postfix, u64_t_postfix);
     }
 
     /* create the I64P and U64P printf macros */
@@ -320,12 +287,8 @@ chaz_Integers_run(void)
             if (   output_len != 0 
                 && strcmp(output, "18446744073709551615") == 0
             ) {
-                append_conf(
-                    "#define %sI64P \"%sd\"\n"
-                    "#define %sU64P \"%su\"\n",
-                    macro_prefix, options[i], 
-                    macro_prefix, options[i]
-                );
+                append_conf("#define CHY_I64P \"%sd\"\n", options[i]);
+                append_conf("#define CHY_U64P \"%su\"\n", options[i]);
                 break;
             }
         }
@@ -335,29 +298,17 @@ chaz_Integers_run(void)
     /* write out the 32-bit and 64-bit literal macros */
     if (has_32) {
         if (strcmp(i32_t_postfix, "") == 0) {
-            append_conf(
-                "#define %sI32_C(n) n\n"
-                "#define %sU32_C(n) n##%s\n",
-                macro_prefix, 
-                macro_prefix, u32_t_postfix
-            );
+            append_conf("#define CHY_I32_C(n) n\n");
+            append_conf("#define CHY_U32_C(n) n##%s\n", u32_t_postfix);
         }
         else {
-            append_conf(
-                "#define %sI32_C(n) n##%s\n"
-                "#define %sU32_C(n) n##%s\n",
-                macro_prefix, i32_t_postfix,
-                macro_prefix, u32_t_postfix
-            );
+            append_conf("#define CHY_I32_C(n) n##%s\n", i32_t_postfix);
+            append_conf("#define CHY_U32_C(n) n##%s\n", u32_t_postfix);
         }
     }
     if (has_64) {
-        append_conf(
-            "#define %sI64_C(n) n##%s\n"
-            "#define %sU64_C(n) n##%s\n",
-            macro_prefix, i64_t_postfix,
-            macro_prefix, u64_t_postfix
-        );
+        append_conf("#define CHY_I64_C(n) n##%s\n", i64_t_postfix);
+        append_conf("#define CHY_U64_C(n) n##%s\n", u64_t_postfix);
     }
 
     /* true and false */
@@ -371,76 +322,68 @@ chaz_Integers_run(void)
     );
 
     /* shorten */
-    if (want_short_names) {
-        START_SHORT_NAMES;
-
-        if (machine_is_big_endian())
-            shorten_macro("BIG_END");
-        else 
-            shorten_macro("LITTLE_END");
-
-        shorten_macro("SIZEOF_CHAR");
-        shorten_macro("SIZEOF_SHORT");
-        shorten_macro("SIZEOF_LONG");
-        shorten_macro("SIZEOF_INT");
-        shorten_macro("SIZEOF_PTR");
-
-        if (has_long_long) {
-            shorten_macro("HAS_LONG_LONG");
-            shorten_macro("SIZEOF_LONG_LONG");
-        }
-        if (has___int64) {
-            shorten_macro("HAS___INT64");
-            shorten_macro("SIZEOF___INT64");
-        }
-
-        if (has_inttypes)
-            shorten_macro("HAS_INTTYPES_H");
-
-        shorten_typedef("bool_t");
-
-        if (has_8) {
-            shorten_macro("HAS_I8_T");
-            shorten_typedef("i8_t");
-            shorten_typedef("u8_t");
-            shorten_macro("I8_MAX");
-            shorten_macro("I8_MIN");
-            shorten_macro("U8_MAX");
-        }
-        if (has_16) {
-            shorten_macro("HAS_I16_T");
-            shorten_typedef("i16_t");
-            shorten_typedef("u16_t");
-            shorten_macro("I16_MAX");
-            shorten_macro("I16_MIN");
-            shorten_macro("U16_MAX");
-        }
-        if (has_32) {
-            shorten_macro("HAS_I32_T");
-            shorten_typedef("i32_t");
-            shorten_typedef("u32_t");
-            shorten_macro("I32_MAX");
-            shorten_macro("I32_MIN");
-            shorten_macro("U32_MAX");
-            shorten_macro("I32_C");
-            shorten_macro("U32_C");
-        }
-
-        if (has_64) {
-            shorten_macro("HAS_I64_T");
-            shorten_typedef("i64_t");
-            shorten_typedef("u64_t");
-            shorten_macro("I64_MAX");
-            shorten_macro("I64_MIN");
-            shorten_macro("U64_MAX");
-            shorten_macro("I64P");
-            shorten_macro("U64P");
-            shorten_macro("I64_C");
-            shorten_macro("U64_C");
-        } 
-
-        END_SHORT_NAMES;
+    START_SHORT_NAMES;
+    if ( machine_is_big_endian() ) {
+        shorten_macro("BIG_END");
     }
+    else {
+        shorten_macro("LITTLE_END");
+    }
+    shorten_macro("SIZEOF_CHAR");
+    shorten_macro("SIZEOF_SHORT");
+    shorten_macro("SIZEOF_LONG");
+    shorten_macro("SIZEOF_INT");
+    shorten_macro("SIZEOF_PTR");
+    if (has_long_long) {
+        shorten_macro("HAS_LONG_LONG");
+        shorten_macro("SIZEOF_LONG_LONG");
+    }
+    if (has___int64) {
+        shorten_macro("HAS___INT64");
+        shorten_macro("SIZEOF___INT64");
+    }
+    if (has_inttypes)
+        shorten_macro("HAS_INTTYPES_H");
+    shorten_typedef("bool_t");
+    if (has_8) {
+        shorten_macro("HAS_I8_T");
+        shorten_typedef("i8_t");
+        shorten_typedef("u8_t");
+        shorten_macro("I8_MAX");
+        shorten_macro("I8_MIN");
+        shorten_macro("U8_MAX");
+    }
+    if (has_16) {
+        shorten_macro("HAS_I16_T");
+        shorten_typedef("i16_t");
+        shorten_typedef("u16_t");
+        shorten_macro("I16_MAX");
+        shorten_macro("I16_MIN");
+        shorten_macro("U16_MAX");
+    }
+    if (has_32) {
+        shorten_macro("HAS_I32_T");
+        shorten_typedef("i32_t");
+        shorten_typedef("u32_t");
+        shorten_macro("I32_MAX");
+        shorten_macro("I32_MIN");
+        shorten_macro("U32_MAX");
+        shorten_macro("I32_C");
+        shorten_macro("U32_C");
+    }
+    if (has_64) {
+        shorten_macro("HAS_I64_T");
+        shorten_typedef("i64_t");
+        shorten_typedef("u64_t");
+        shorten_macro("I64_MAX");
+        shorten_macro("I64_MIN");
+        shorten_macro("U64_MAX");
+        shorten_macro("I64P");
+        shorten_macro("U64P");
+        shorten_macro("I64_C");
+        shorten_macro("U64_C");
+    } 
+    END_SHORT_NAMES;
     
     END_RUN;
 }

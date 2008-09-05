@@ -28,8 +28,8 @@ chaz_TLargeFiles_run(TestBatch *batch)
     off64_t gb4_plus = ((off64_t)0x7FFFFFFF << 1) + 100;
     off64_t gb2_plus = (off64_t)0x7FFFFFFF + 200;
     
-    /* gb4_plus modulo 4 GB */
-    i32_t wrap_gb4 = gb4_plus;
+    /* gb4_plus modulo 4 GB (wrap is intentional) */
+    i32_t wrap_gb4 = (i32_t)gb4_plus;
 
     ASSERT_INT_EQ(batch, sizeof(off64_t), 8, "off64_t type has 8 bytes");
 
@@ -43,7 +43,7 @@ chaz_TLargeFiles_run(TestBatch *batch)
     SKIP_REMAINING(batch, "Unsafe to create 5GB sparse files on this system");
 #endif
 
-    fh = fopen("_charm_large_file_test", "w+");
+    fh = fopen64("_charm_large_file_test", "w+");
     if (fh == NULL)
         SKIP_REMAINING(batch, "Failed to open file");
 
@@ -51,7 +51,7 @@ chaz_TLargeFiles_run(TestBatch *batch)
     ASSERT_INT_EQ(batch, check_val, 0, "fseeko64 above 4 GB");
 
     offset = ftello64(fh);
-    ASSERT_TRUE(batch, (offset = gb4_plus), "ftello64 above 4 GB");
+    ASSERT_TRUE(batch, (offset == gb4_plus), "ftello64 above 4 GB");
 
     check_val = fprintf(fh, "X");
     ASSERT_INT_EQ(batch, check_val, 1, "print above 4 GB");
@@ -60,7 +60,7 @@ chaz_TLargeFiles_run(TestBatch *batch)
     ASSERT_INT_EQ(batch, check_val, 0, "fseeko64 above 2 GB");
 
     offset = ftello64(fh);
-    ASSERT_TRUE(batch, (offset = gb2_plus), "ftello64 above 2 GB");
+    ASSERT_TRUE(batch, (offset == gb2_plus), "ftello64 above 2 GB");
 
     check_val = fseeko64(fh, -1, SEEK_END);
     ASSERT_INT_EQ(batch, check_val, 0, "seek to near end");
@@ -76,7 +76,7 @@ chaz_TLargeFiles_run(TestBatch *batch)
     ASSERT_INT_EQ(batch, check_val, 0, "fclose succeeds after all that");
 
     /* truncate, just in case the call to remove fails */
-    fh = fopen("_charm_large_file_test", "w+");
+    fh = fopen64("_charm_large_file_test", "w+");
     if (fh != NULL)
         fclose(fh);
     remove("_charm_large_file_test");

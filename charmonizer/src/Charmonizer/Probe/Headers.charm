@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 
 /* keep track of which headers have succeeded */
@@ -22,11 +23,13 @@ keep(const char *header_name);
 static size_t aff_buf_size = 0;
 static char *aff_buf = NULL;
 
-/* Transform "header.h" into "HAS_HEADER_H, storing the result in [aff_buf].
+/* Transform "header.h" into "CHY_HAS_HEADER_H, storing the result in 
+ * [aff_buf].
  */
 static void
 encode_affirmation(const char *header_name);
 
+#define NUM_C89_HEADERS 15
 char *c89_headers[] = {
     "assert.h",
     "ctype.h",
@@ -46,6 +49,7 @@ char *c89_headers[] = {
     NULL
 };
 
+#define NUM_POSIX_HEADERS 14
 char *posix_headers[] = {
     "cpio.h",
     "dirent.h",
@@ -64,6 +68,14 @@ char *posix_headers[] = {
     NULL
 };
 
+#define NUM_WIN_HEADERS 3
+char *win_headers[] = {
+    "io.h",
+    "windows.h",
+    "process.h",
+    NULL
+};
+
 chaz_bool_t
 chaz_Headers_check(const char *header_name)
 {
@@ -76,53 +88,80 @@ chaz_Headers_run(void)
     int i;
     chaz_bool_t has_posix = false;
     chaz_bool_t has_c89   = false;
+
+    keeper_count = 0;
     
     START_RUN("Headers");
 
-    /* test for all POSIX headers in one blast */
+    /* Try for all POSIX headers in one blast. */
     if (check_many_headers((const char**)posix_headers)) {
         has_posix = true;
-        append_conf("#define %sHAS_POSIX\n", macro_prefix);
+        append_conf("#define CHY_HAS_POSIX\n");
         for (i = 0; posix_headers[i] != NULL; i++) {
             keep(posix_headers[i]);
+        }
+    }
+    /* Test one-at-a-time. */
+    else {
+        for (i = 0; posix_headers[i] != NULL; i++) {
+            if (check_header(posix_headers[i])) {
+                keep(posix_headers[i]);
+            }
         }
     }
 
     /* test for all c89 headers in one blast */
     if (check_many_headers((const char**)c89_headers)) {
         has_c89 = true;
-        append_conf("#define %sHAS_C89\n", macro_prefix);
-        append_conf("#define %sHAS_C90\n", macro_prefix);
+        append_conf("#define CHY_HAS_C89\n");
+        append_conf("#define CHY_HAS_C90\n");
         for (i = 0; c89_headers[i] != NULL; i++) {
             keep(c89_headers[i]);
+        }
+    }
+    /* Test one-at-a-time. */
+    else {
+        for (i = 0; c89_headers[i] != NULL; i++) {
+            if (check_header(c89_headers[i])) {
+                keep(c89_headers[i]);
+            }
+        }
+    }
+
+    /* Test for all Windows headers in one blast */
+    if (check_many_headers((const char**)win_headers)) {
+        for (i = 0; win_headers[i] != NULL; i++) {
+            keep(win_headers[i]);
+        }
+    }
+    /* Test one-at-a-time. */
+    else {
+        for (i = 0; win_headers[i] != NULL; i++) {
+            if (check_header(win_headers[i])) {
+                keep(win_headers[i]);
+            }
         }
     }
 
     /* append the config with every header detected so far */
     for (i = 0; keepers[i] != NULL; i++) {
         encode_affirmation(keepers[i]);
-        append_conf("#define %s%s\n", macro_prefix, aff_buf);
+        append_conf("#define CHY_%s\n", aff_buf);
     }
 
     /* shorten */
-    if (want_short_names) {
-        START_SHORT_NAMES;
-
-        if (has_posix)
-            shorten_macro("HAS_POSIX");
-
-        if (has_c89) {
-            shorten_macro("HAS_C89");
-            shorten_macro("HAS_C90");
-        }
-
-        for (i = 0; keepers[i] != NULL; i++) {
-            encode_affirmation(keepers[i]);
-            shorten_macro(aff_buf);
-        }
-
-        END_SHORT_NAMES;
+    START_SHORT_NAMES;
+    if (has_posix)
+        shorten_macro("HAS_POSIX");
+    if (has_c89) {
+        shorten_macro("HAS_C89");
+        shorten_macro("HAS_C90");
     }
+    for (i = 0; keepers[i] != NULL; i++) {
+        encode_affirmation(keepers[i]);
+        shorten_macro(aff_buf);
+    }
+    END_SHORT_NAMES;
 
     END_RUN;
 }
@@ -139,14 +178,14 @@ keep(const char *header_name)
 static void
 encode_affirmation(const char *header_name) {
     char *buf, *buf_end;
-    size_t len = strlen(header_name) + 5;
+    size_t len = strlen(header_name) + sizeof("HAS_");
     
     /* grow buffer and start off with "HAS_" */
     aff_buf_size = grow_buf(&aff_buf, aff_buf_size, len);
     strcpy(aff_buf, "HAS_");
 
     /* transform one char at a time */
-    for(buf = aff_buf + 4, buf_end = aff_buf + len; 
+    for(buf = aff_buf + sizeof("HAS_") - 1, buf_end = aff_buf + len; 
         buf < buf_end; 
         header_name++, buf++
     ) {

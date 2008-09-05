@@ -13,17 +13,25 @@
 /* sets of symbols which might provide large file support */
 typedef struct off64_combo {
     const char *includes;
+    const char *fopen_command;
     const char *ftell_command;
     const char *fseek_command;
     const char *offset64_type;
 } off64_combo;
 static off64_combo off64_combos[] = {
-    { "#include <sys/types.h>\n", "ftello64", "fseeko64", "off64_t" },
-    { "#include <sys/types.h>\n", "ftello", "fseeko", "off_t" },
-    { "", "ftell","fseek", "long" },
-    { "", "_ftelli64","_fseeki64", "__int64" },
-    { NULL, NULL, NULL, NULL }
+    { "#include <sys/types.h>\n", "fopen64",   "ftello64",  "fseeko64",  "off64_t" },
+    { "#include <sys/types.h>\n", "fopen",     "ftello64",  "fseeko64",  "off64_t" },
+    { "#include <sys/types.h>\n", "fopen",     "ftello",    "fseeko",    "off_t"   },
+    { "",                         "fopen",     "ftell",     "fseek",     "long"    },
+    { "",                         "fopen",     "_ftelli64", "_fseeki64", "__int64" },
+    { NULL, NULL, NULL, NULL, NULL }
 };
+typedef struct unbuff_combo {
+    const char *includes;
+    const char *open_command;
+    const char *tell_command;
+    const char *seek_command;
+} unbuff_combo;
 
 /* Check what name 64-bit ftell, fseek go by.
  */
@@ -50,6 +58,7 @@ static char* code_buf = NULL;
 static size_t code_buf_len = 0;
 
 /* vars for holding lfs commands, once they're discovered */
+static char fopen_command[10];
 static char fseek_command[10];
 static char ftell_command[10];
 static char off64_type[10];
@@ -67,6 +76,7 @@ chaz_LargeFiles_run(void)
         off64_combo combo = off64_combos[i];
         success = probe_off64(&combo);
         if (success) {
+            strcpy(fopen_command, combo.fopen_command);
             strcpy(fseek_command, combo.fseek_command);
             strcpy(ftell_command, combo.ftell_command);
             strcpy(off64_type, combo.offset64_type);
@@ -76,17 +86,13 @@ chaz_LargeFiles_run(void)
 
     /* write the affirmations/definitions */
     if (success) {
-        append_conf("#define %sHAS_LARGE_FILE_SUPPORT\n", macro_prefix );
+        append_conf("#define CHY_HAS_LARGE_FILE_SUPPORT\n");
         /* alias these only if they're not already provided and correct */
         if (strcmp(off64_type, "off64_t") != 0) {
-            append_conf(
-                "#define %soff64_t %s\n"
-                "#define %sftello64 %s\n" 
-                "#define %sfseeko64 %s\n",
-                macro_prefix, off64_type,
-                function_prefix, ftell_command,
-                function_prefix, fseek_command
-            );
+            append_conf("#define chy_off64_t %s\n",  off64_type);
+            append_conf("#define chy_fopen64 %s\n",  fopen_command);
+            append_conf("#define chy_ftello64 %s\n", ftell_command);
+            append_conf("#define chy_fseeko64 %s\n", fseek_command);
         }
     }
 
@@ -101,14 +107,20 @@ chaz_LargeFiles_run(void)
         append_conf("#define CHAZ_NO_SPARSE_FILES\n");
     }
 
+    /* test for unbuffered LFS commands */
+    if (success) {
+
+    }
+
     /* short names */
-    if (want_short_names && success) {
+    if (success) {
         START_SHORT_NAMES;
         shorten_macro("HAS_LARGE_FILE_SUPPORT");
 
         /* alias these only if they're not already provided and correct */
         if (strcmp(off64_type, "off64_t") != 0) {
-            shorten_macro("off64_t");
+            shorten_typedef("off64_t");
+            shorten_function("fopen64");
             shorten_function("ftello64");
             shorten_function("fseeko64");
         }
@@ -124,10 +136,13 @@ static char off64_code[] = METAQUOTE
     %s
     #include "_charm.h"
     int main() {
-        %s foo;
+        %s pos;
+        FILE *f;
         Charm_Setup;
+        f = %s("_charm_off64", "w");
+        if (f == -1) exit(-1);
         printf("%%d", (int)sizeof(%s));
-        foo = %s(stdout);
+        pos = %s(stdout);
         %s(stdout, 0, SEEK_SET);
         return 0;
     }
@@ -140,7 +155,8 @@ probe_off64(off64_combo *combo)
     char *output = NULL;
     size_t output_len;
     size_t needed = sizeof(off64_code) + (2 * strlen(combo->offset64_type)) 
-        + strlen(combo->ftell_command) + strlen(combo->fseek_command) + 20;
+        +strlen(combo->fopen_command) + strlen(combo->ftell_command) 
+        + strlen(combo->fseek_command) + 20;
     chaz_bool_t success = false;
 
     /* allocate buffer as necessary and prepare the source code */
@@ -149,7 +165,8 @@ probe_off64(off64_combo *combo)
         code_buf_len = needed;
     }
     sprintf(code_buf, off64_code, combo->includes, combo->offset64_type, 
-        combo->offset64_type, combo->ftell_command, combo->fseek_command);
+        combo->fopen_command, combo->offset64_type, combo->ftell_command, 
+        combo->fseek_command);
 
     /* verify compilation and that the offset type has 8 bytes */
     output = capture_output(code_buf, strlen(code_buf), 

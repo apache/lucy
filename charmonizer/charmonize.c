@@ -1,4 +1,4 @@
-/* charmonize.c -- write charmony.h config file.
+/* charmonize.c -- Create Charmony.
  */
 
 #include <stdio.h>
@@ -94,7 +94,6 @@ init(int argc, char **argv)
         chaz_Probe_set_verbosity(verbosity);
     }
     chaz_Probe_init(os_name, cc_command, cc_flags, NULL);
-    chaz_Probe_set_prefixes("LUCY_", "lucy_", "lucy_");
 
     /* clean up */
     free(infile_str);
@@ -152,15 +151,7 @@ extract_delim_and_verify(char *source, size_t source_len, const char *tag_name)
 static void
 write_charmony_postamble(void)
 {
-    FILE *charmony_fh = chaz_Probe_get_charmony_fh();
-
-    if (strcmp(os_name, "mswin32") == 0) {
-        fprintf(charmony_fh,
-            "#ifndef LUCY_HAS_LARGE_FILE_SUPPORT\n"
-            "  #include \"win32lfs.h\"\n"  
-            "#endif /* LUCY_HAS_LARGE_FILE_SUPPORT */\n"
-        );
-    }
+    /* No postamble for now. */
 }
 
 void 

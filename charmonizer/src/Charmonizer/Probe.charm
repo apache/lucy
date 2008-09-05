@@ -18,10 +18,6 @@ chaz_Probe_init(const char *osname, const char *cc_command,
     os       = OS_new(osname);
     compiler = CC_new(os, cc_command, cc_flags);
 
-    /* don't write short names unless the user so indicates */
-    chaz_Probe_set_prefixes("", "", "");
-    want_short_names = false;
-
     /* dispatch other tasks */
     ModHand_init();
     HeadCheck_init();
@@ -44,20 +40,6 @@ chaz_Probe_clean_up()
 
     if (verbosity)
         printf("Cleanup complete.\n");
-}
-
-void
-chaz_Probe_set_prefixes(char *macro_pre, const char* typedef_pre,  
-                        const char *function_pre) 
-{
-    want_short_names = true;
-
-    free(macro_prefix);
-    free(typedef_prefix);
-    free(function_prefix);
-    macro_prefix     = strdup(macro_pre);
-    typedef_prefix   = strdup(typedef_pre);
-    function_prefix  = strdup(function_pre);
 }
 
 void

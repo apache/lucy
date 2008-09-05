@@ -61,20 +61,24 @@ chaz_HeadCheck_init()
 chaz_bool_t
 chaz_HeadCheck_check_header(const char *header_name)
 {
-    Header *header;
-    Header  key;
-    Header *fake = &key;
+    Header  *header;
+    Header   key;
+    Header  *fake = &key;
+    Header **header_ptr;
 
     /* fake up a key to feed to bsearch; see if the header's already there */
     key.name = (char*)header_name;
     key.exists = false;
-    header = bsearch(&fake, header_cache, cache_size, sizeof(void*),
+    header_ptr = bsearch(&fake, header_cache, cache_size, sizeof(void*),
         compare_headers);
     
     /* if it's not there, go try a test compile */
-    if (header == NULL) {
+    if (header_ptr == NULL) {
         header = discover_header(header_name);
         add_to_cache(header);
+    }
+    else {
+        header = *header_ptr;
     }
 
     return header->exists;

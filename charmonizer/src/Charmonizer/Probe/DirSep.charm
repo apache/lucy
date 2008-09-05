@@ -2,13 +2,16 @@
 
 #include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/HeadCheck.h"
 #include "Charmonizer/Probe/DirSep.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+/* TODO: move mkdir and rmdir to a Core module a la Stat. */
 static char mkdir_code[] = METAQUOTE
     #include "_charm.h"
+    %s
     #include <sys/stat.h>
     int main () {
         Charm_Setup;
@@ -19,18 +22,53 @@ static char mkdir_code[] = METAQUOTE
     }
 METAQUOTE;
 
+static char *headers[] = {
+    "direct.h",
+    "unistd.h",
+    "sys/stat.h",
+    NULL,
+};
+
+static char rmdir_code[] = METAQUOTE
+    #include "_charm.h"
+    %s
+    int main () {
+        Charm_Setup;
+        printf("1");
+        rmdir("_charm_test_dir_orig");
+        rmdir("_charm_test_dir_mod");
+        return 0;
+    }
+METAQUOTE;
+
 void
 chaz_DirSep_run(void) 
 {
+    int          i;
     char        *output;
     size_t       output_len;
     char         dir_sep[3];
     chaz_bool_t  dir_sep_is_valid = false;
+    char        *includes_buf = strdup("");
+    size_t       inc_buf_len = 2;
+    size_t       needed;
+    char        *code_buf;
 
     START_RUN("DirSep");
 
+    /* Include any possible relevant headers. */
+    for (i = 0; headers[i] != NULL; i++) {
+        if (!check_header(headers[i])) 
+            break;
+        inc_buf_len = append_strings(&includes_buf, inc_buf_len, "#include <",
+            headers[i], ">\n", NULL);
+    }
+    needed = strlen(mkdir_code) + inc_buf_len + 10;
+    code_buf = malloc(needed);
+    sprintf(code_buf, mkdir_code, includes_buf);
+
     /* create a directory */
-    output = capture_output(mkdir_code, strlen(mkdir_code), &output_len);
+    output = capture_output(code_buf, strlen(code_buf), &output_len);
 
     if (output != NULL && (strcmp(output, "1") == 0)) {
         FILE *f;
@@ -66,20 +104,23 @@ chaz_DirSep_run(void)
     remove("_charm_test_dir_orig");
     remove("_charm_test_dir_mod");
 
+    /* Try rmdir. */
+    sprintf(code_buf, rmdir_code, includes_buf);
+    output = capture_output(code_buf, strlen(code_buf), &output_len);
+
     if (dir_sep_is_valid) {
-        append_conf( "#define %sDIR_SEP \"%s\"\n",
-            macro_prefix, dir_sep
-        );
+        append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
 
         /* shorten */
-        if (want_short_names) {
-            START_SHORT_NAMES;
-            shorten_macro("DIR_SEP");
-            END_SHORT_NAMES;
-        }
+        START_SHORT_NAMES;
+        shorten_macro("DIR_SEP");
+        END_SHORT_NAMES;
     }
 
     END_RUN;
+
+    free(code_buf);
+    free(includes_buf);
 }
 
 

@@ -10,6 +10,7 @@
  * synonyms:
  * 
  * off64_t
+ * fopen64
  * ftello64
  * fseeko64
  * 

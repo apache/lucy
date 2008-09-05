@@ -32,12 +32,6 @@ struct chaz_Compiler *chaz_ModHand_compiler = NULL;
 chaz_bool_t chaz_ModHand_charm_run_available = false;
 FILE* chaz_ModHand_charmony_fh = NULL;
 
-char *macro_prefix    = NULL;
-char *typedef_prefix  = NULL;
-char *function_prefix = NULL;
-
-chaz_bool_t want_short_names = false;
-
 /* static vars */
 static char *try_app_path = NULL;
 static char *try_app_command = NULL;
@@ -243,19 +237,19 @@ clean_up_try()
 void
 chaz_ModHand_shorten_macro(const char *sym)
 {
-    append_conf("  #define %s %s%s\n", sym, macro_prefix, sym); 
+    append_conf("  #define %s CHY_%s\n", sym, sym); 
 }
 
 void
 chaz_ModHand_shorten_typedef(const char *sym)
 {
-    append_conf("  #define %s %s%s\n", sym, typedef_prefix, sym); 
+    append_conf("  #define %s chy_%s\n", sym, sym); 
 }
 
 void
 chaz_ModHand_shorten_function(const char *sym)
 {
-    append_conf("  #define %s %s%s\n", sym, function_prefix, sym); 
+    append_conf("  #define %s chy_%s\n", sym, sym); 
 }
 
 

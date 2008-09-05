@@ -1,19 +1,23 @@
 NAME
 
-    Charmonizer - harmonize C build enviromnents.
+    Charmonizer - Use C to configure C.
 
 OVERVIEW
 
     Charmonizer is a tool for probing, normalizing, and testing the build
     environment provided by a C compiler and an operating system.  It works by
     attempting to compile lots of little programs and analyzing the output
-    from those that build successfully.  
+    from those that build successfully.  `
     
-    Charmonizer itself has no prerequisites other than an ISO C90-compliant
-    compiler which can be invoked from C via the system() command.  For all
-    intents and purposes it is written in pure C90.  (A lightweight source
-    filter called "metaquote" is employed to make embedding C source code
-    within C source code less gnarly).
+    Charmonizer modules are ordinary ANSI C files, and the configuration
+    application that you write is an ordinary C executable.  
+    
+REQUIREMENTS
+
+    The only prerequisite for the target machine is an ISO C90-compliant
+    compiler which can be invoked from C via the system() command.  Your
+    development environment must include Perl in order to run the metaquote 
+    utility script, but no Perl programming is required.
     
 PROBING
 
@@ -106,32 +110,18 @@ FILESYSTEM NAMESPACE
     Charmonizer creates a number of temporary files within the current working
     directory while it runs.  These files all begin with "_charm".
 
-CHARMONIZER SOURCE CODE AND THE METAQUOTE UTILITY
+GATHERING FILES
 
-    Charmonizer is (more or less) a C program which writes C code.  Writing C
-    from C is ordinarily quite awkward, because when you try to embed more
-    than a line or two of C source code inside C string literals, things get
-    ugly fast.  
+    Charmonizer master modules are stored in the src/ directory, and have
+    .harm/.charm extensions.  They are ordinary ANSI C files, except for one
+    thing: multi-line quoted snippets of source code are surrounded by
+    "METAQUOTE" tags.  This is done for maintainability's sake, since
+    embedding C source code in C source code as string literals is very messy.
 
-    To get around this problem, Charmonizer uses a source filter.  In the
-    "real" Charmonizer source code, longer code fragments are surrounded by
-    METAQUOTE tags instead of literal double quotes.  
-    
-        char hello_source[] = METAQUOTE
-            #include <stdio.h>
-            int main() { 
-                printf("Hello, world.\n");
-                return 0;
-            }
-        METAQUOTE;
+    To generate all the necessary Charmonizer .c/.h files, use the metaquote 
+    utility.
 
-    These source files are run through the "metaquote" utility -- which
-    transforms everything between paired METAQUOTE tags into concatenated
-    string literals.  The result is hideous but valid C.
-
-    The "real" charmonizer source code lives in the src/ directory.  Files use
-    the suffixes .charm and .harm to differentiate them from post-filtering .c
-    and .h files.
+        $ ./bin/metaquote --src=/path/to/charmonizer/src --out=/my/charm/dir 
 
 SECURITY
 

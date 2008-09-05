@@ -8,8 +8,15 @@
 TestBatch*
 chaz_TFuncMacro_prepare()
 {
-    return Test_new_batch("FuncMacro", 3, chaz_TFuncMacro_run);
+    return Test_new_batch("FuncMacro", 4, chaz_TFuncMacro_run);
 }
+
+#ifdef INLINE
+static INLINE char* inline_function()
+{
+    return "inline works";
+}
+#endif
 
 void
 chaz_TFuncMacro_run(TestBatch *batch)
@@ -18,16 +25,28 @@ chaz_TFuncMacro_run(TestBatch *batch)
 #ifdef HAS_FUNC_MACRO
     ASSERT_STR_EQ(batch, FUNC_MACRO, "chaz_TFuncMacro_run", 
         "FUNC_MACRO");
+#else
+    SKIP(batch, "no FUNC_MACRO");
 #endif
 
 #ifdef HAS_ISO_FUNC_MACRO
     ASSERT_STR_EQ(batch, __func__, "chaz_TFuncMacro_run",
         "HAS_ISO_FUNC_MACRO");
+#else
+    SKIP(batch, "no ISO_FUNC_MACRO");
 #endif
 
 #ifdef HAS_GNUC_FUNC_MACRO
     ASSERT_STR_EQ(batch, __FUNCTION__, "chaz_TFuncMacro_run", 
         "HAS_GNUC_FUNC_MACRO");
+#else
+    SKIP(batch, "no GNUC_FUNC_MACRO");
+#endif
+
+#ifdef INLINE
+    PASS(batch, inline_function());
+#else
+    SKIP(batch, "no INLINE functions");
 #endif
 }
 
