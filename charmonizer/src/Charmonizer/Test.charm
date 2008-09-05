@@ -14,22 +14,22 @@ TestBatch_run_test(TestBatch *batch);
 
 void
 chaz_Test_init(void) {
-	/* unbuffer stdout */
-	int check_val = setvbuf(stdout, NULL, _IONBF, 0);
-	if (check_val != 0)
-		fprintf(stderr, "Failed when trying to unbuffer stdout\n");
+    /* unbuffer stdout */
+    int check_val = setvbuf(stdout, NULL, _IONBF, 0);
+    if (check_val != 0)
+        fprintf(stderr, "Failed when trying to unbuffer stdout\n");
 }
 
 TestBatch* 
 chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
-				    TestBatch_test_func_t test_func)
+                    TestBatch_test_func_t test_func)
 {
     TestBatch *batch = (TestBatch*)malloc(sizeof(TestBatch));
 
     /* assign */
     batch->num_tests       = num_tests;
-	batch->name            = strdup(batch_name);
-	batch->test_func       = test_func;
+    batch->name            = strdup(batch_name);
+    batch->test_func       = test_func;
     
     /* initialize */
     batch->test_num        = 0;
@@ -37,7 +37,7 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
     batch->num_failed      = 0;
     batch->num_skipped     = 0;
     batch->destroy         = TestBatch_destroy;
-	batch->run_test        = TestBatch_run_test;
+    batch->run_test        = TestBatch_run_test;
 
     return batch;
 }
@@ -45,26 +45,26 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 static void
 TestBatch_destroy(TestBatch *batch)
 {
-	free(batch->name);
+    free(batch->name);
     free(batch);
 }
 
 static void
 TestBatch_run_test(TestBatch *batch) 
 {
-	/* print start */
-	printf("===================================\n");
-	printf("%s - %u tests to run\n", batch->name, batch->num_tests);
-	printf("===================================\n");
+    /* print start */
+    printf("===================================\n");
+    printf("%s - %u tests to run\n", batch->name, batch->num_tests);
+    printf("===================================\n");
 
-	/* run the batch */
-	batch->test_func(batch);
+    /* run the batch */
+    batch->test_func(batch);
 
-	/* print report */
-	printf("-------------------------\n");
-	printf("Tests:   %d\nPassed:  %d\nFailed:  %d\nSkipped: %d\n\n",
-		batch->num_tests, batch->num_passed, batch->num_failed, 
-		batch->num_skipped);
+    /* print report */
+    printf("-------------------------\n");
+    printf("Tests:   %d\nPassed:  %d\nFailed:  %d\nSkipped: %d\n\n",
+        batch->num_tests, batch->num_passed, batch->num_failed, 
+        batch->num_skipped);
 }
 
 void

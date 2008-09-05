@@ -63,7 +63,7 @@ chaz_FuncMacro_run(void)
             ? "__func__"
             : "__FUNCTION__";
         append_conf(
-			"#define %sHAS_FUNC_MACRO\n"
+            "#define %sHAS_FUNC_MACRO\n"
             "#define %sFUNC_MACRO %s\n",
             macro_prefix, macro_prefix, macro_text);
     }
@@ -76,7 +76,7 @@ chaz_FuncMacro_run(void)
         append_conf("#define %sHAS_GNUC_FUNC_MACRO\n", macro_prefix);
     }
 
-	/* shorten */
+    /* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
         if (has_iso_funcmac) 

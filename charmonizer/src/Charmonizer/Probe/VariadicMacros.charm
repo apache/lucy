@@ -66,7 +66,7 @@ chaz_VariadicMacros_run(void)
             macro_prefix);
     }
 
-	/* shorten */
+    /* shorten */
     if (want_short_names) {
         START_SHORT_NAMES;
         if (has_varmacros)

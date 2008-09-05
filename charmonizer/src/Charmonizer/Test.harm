@@ -45,7 +45,7 @@ chaz_Test_init(void);
  */
 chaz_TestBatch* 
 chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
-				    chaz_TestBatch_test_func_t test_func);
+                    chaz_TestBatch_test_func_t test_func);
 
 /* Note: maybe add line numbers later.
  */
