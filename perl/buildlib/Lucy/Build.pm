@@ -1,11 +1,32 @@
 use strict;
 use warnings;
 
+package Lucy::Build::CBuilder;
+BEGIN { our @ISA = "ExtUtils::CBuilder"; }
+use Config;
+
+sub new {
+    my $class = shift;
+    require ExtUtils::CBuilder;
+    return $class->SUPER::new(@_);
+}
+
+# This method isn't implemented by CBuilder for Windows, so we issue a basic
+# link command that works on at least one system and hope for the best.
+sub link_executable {
+    my ( $self, %args ) = @_;
+    if ( $Config{cc} eq 'cl' ) {
+        my ( $objects, $exe_file ) = @args{qw( objects exe_file )};
+        $self->do_system("link /out:$exe_file @$objects");
+        return $exe_file;
+    }
+    else {
+        return $self->SUPER::link_executable(%args);
+    }
+}
+
 package Lucy::Build;
 use base qw( Module::Build );
-
-# Don't crash Build.PL if CBuilder isn't installed yet
-BEGIN { eval "use ExtUtils::CBuilder;"; }
 
 use File::Spec::Functions
     qw( catdir catfile curdir splitpath updir no_upwards );
@@ -45,7 +66,7 @@ sub ACTION_metaquote {
 
     # compile
     print "\nBuilding $METAQUOTE_EXE_PATH...\n\n";
-    my $cbuilder = ExtUtils::CBuilder->new;
+    my $cbuilder = Lucy::Build::CBuilder->new;
     my $o_file   = $cbuilder->compile(
         source               => $source_path,
         extra_compiler_flags => $EXTRA_CCFLAGS,
@@ -80,7 +101,7 @@ sub ACTION_charmonizer {
 
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
 
-    my $cbuilder = ExtUtils::CBuilder->new;
+    my $cbuilder = Lucy::Build::CBuilder->new;
 
     my @o_files;
     for (@all_source) {
@@ -214,7 +235,7 @@ sub ACTION_build_charm_test {
 
     return if $self->up_to_date( $source_files, $exe_path );
 
-    my $cbuilder = ExtUtils::CBuilder->new;
+    my $cbuilder = Lucy::Build::CBuilder->new;
 
     # compile and link "charm_test"
     my @o_files;
