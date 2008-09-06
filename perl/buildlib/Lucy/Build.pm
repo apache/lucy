@@ -90,7 +90,7 @@ sub ACTION_charmonizer {
     if ( !-d $FILTERED_DIR ) {
         mkpath($FILTERED_DIR) or die "can't mkpath '$FILTERED_DIR': $!";
     }
-    my $charm_source_files = $self->_find_files( $CHARMONIZER_SOURCE_DIR,
+    my $charm_source_files = $self->rscan_dir( $CHARMONIZER_SOURCE_DIR,
         sub { $File::Find::name =~ /\.c?harm$/ } );
     my $filtered_files = $self->_metaquote_charm_files($charm_source_files);
     my $charmonize_c   = catfile( $base_dir, qw( charmonizer charmonize.c ) );
@@ -126,22 +126,6 @@ sub ACTION_charmonizer {
 
     $self->add_to_cleanup( $FILTERED_DIR, @$filtered_files, @o_files,
         $CHARMONIZE_EXE_PATH, );
-}
-
-sub _find_files {
-    my ( $self, $dir, $test_sub ) = @_;
-    my @files;
-    find(
-        {   wanted => sub {
-                if ( $test_sub->() and $File::Find::name !~ /\.\.?$/ ) {
-                    push @files, $File::Find::name;
-                }
-            },
-            no_chdir => 1,
-        },
-        $dir,
-    );
-    return \@files;
 }
 
 sub _metaquote_charm_files {
@@ -217,7 +201,7 @@ sub ACTION_build_charm_test {
     my $source_path     = catfile( $base_dir, 'charmonizer', 'charm_test.c' );
     my $exe_path        = "charm_test$Config{_exe}";
     my $test_source_dir = catdir( $FILTERED_DIR, qw( Charmonizer Test ) );
-    my $source_files    = $self->_find_files( $FILTERED_DIR,
+    my $source_files    = $self->rscan_dir( $FILTERED_DIR,
         sub { $File::Find::name =~ m#Charmonizer/Test.*?\.c$# } );
     push @$source_files, $source_path;
 
@@ -228,7 +212,7 @@ sub ACTION_build_charm_test {
     if ( $Config{osname} =~ /mswin/i ) {
         my $win_compat_dir = catdir( $base_dir, 'c_src', 'compat' );
         push @include_dirs, $win_compat_dir;
-        my $win_compat_files = $self->_find_files( $win_compat_dir,
+        my $win_compat_files = $self->rscan_dir( $win_compat_dir,
             sub { $File::Find::name =~ m#\.c$# } );
         push @$source_files, @$win_compat_files;
     }
@@ -259,6 +243,27 @@ sub ACTION_code {
     my $self = shift;
     $self->dispatch('build_charm_test');
     $self->SUPER::ACTION_code(@_);
+}
+
+# copied from Module::Build::Base.pm, added exclude '#' and follow symlinks
+sub rscan_dir {
+    my ( $self, $dir, $pattern ) = @_;
+    my @result;
+    local $_;    # find() can overwrite $_, so protect ourselves
+    my $subr
+        = !$pattern ? sub { push @result, $File::Find::name }
+        : !ref($pattern)
+        || ( ref $pattern eq 'Regexp' )
+        ? sub { push @result, $File::Find::name if /$pattern/ }
+        : ref($pattern) eq 'CODE'
+        ? sub { push @result, $File::Find::name if $pattern->() }
+        : die "Unknown pattern type";
+
+    File::Find::find( { wanted => $subr, no_chdir => 1, follow => 1 }, $dir );
+
+    # skip emacs lock files
+    my @filtered = grep !/#/, @result;
+    return \@filtered;
 }
 
 1;
