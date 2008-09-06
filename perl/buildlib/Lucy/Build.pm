@@ -38,15 +38,28 @@ use Env qw( @PATH );
 
 unshift @PATH, curdir();
 
-my $is_distro_not_devel = -e 'charmonizer';
-my $base_dir            = $is_distro_not_devel ? curdir() : updir();
+=for Rationale
 
-my $METAQUOTE_EXE_PATH     = 'metaquote' . $Config{_exe};
-my $CHARMONIZE_EXE_PATH    = 'charmonize' . $Config{_exe};
-my $CHARMONIZER_SOURCE_DIR = catdir( $base_dir, 'charmonizer', 'src' );
-my $FILTERED_DIR = catdir( $base_dir, qw( charmonizer filtered_src ) );
-my $C_SOURCE_DIR = catdir( $base_dir, 'c_src' );
-my $R_SOURCE_DIR = catdir( $C_SOURCE_DIR, 'r' );
+When the distribution tarball for the Perl binding of Lucy is built, c_src/,
+c_test/, and any other needed files/directories are copied into the perl/
+directory within the main Lucy directory.  Then the distro is built from the
+contents of the perl/ directory, leaving out all the files in ruby/, etc.
+However, during development, the files are accessed from their original
+locations.
+
+=cut
+
+my $is_distro_not_devel = -e 'c_src';
+my $base_dir = $is_distro_not_devel ? curdir() : updir();
+
+my $CHARMONIZE_EXE_PATH  = 'charmonize' . $Config{_exe};
+my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
+my $CHARMONIZER_GEN_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'gen' );
+my $C_SOURCE_DIR         = catdir( $base_dir, 'c_src' );
+my $H_SOURCE_DIR         = catdir( $C_SOURCE_DIR, 'h' );
+my $XS_SOURCE_DIR        = 'xs';
+my $AUTOBIND_PM_PATH     = catfile(qw( lib KinoSearch Autobinding.pm ));
+my $AUTOBIND_XS_PATH     = catfile(qw( lib KinoSearch Autobinding.xs ));
 
 my $EXTRA_CCFLAGS = '';
 if ( $ENV{LUCY_DEBUG} ) {
@@ -55,46 +68,33 @@ if ( $ENV{LUCY_DEBUG} ) {
 }
 my $VALGRIND = $ENV{CHARM_VALGRIND} ? "valgrind --leak-check=full " : "";
 
-# Compile the metaquote source filter utility.
+# Collect all relevant Charmonizer files.
 sub ACTION_metaquote {
-    my $self = shift;
-    my $source_path
-        = catfile( $base_dir, qw( charmonizer metaquote_src metaquote.c ) );
-
-    # don't compile if we're up to date
-    return if $self->up_to_date( [$source_path], $METAQUOTE_EXE_PATH );
-
-    # compile
-    print "\nBuilding $METAQUOTE_EXE_PATH...\n\n";
-    my $cbuilder = Lucy::Build::CBuilder->new;
-    my $o_file   = $cbuilder->compile(
-        source               => $source_path,
-        extra_compiler_flags => $EXTRA_CCFLAGS,
-    );
-    $cbuilder->link_executable(
-        objects  => [$o_file],
-        exe_file => $METAQUOTE_EXE_PATH,
-    );
-
-    # clean both the object file and the executable
-    $self->add_to_cleanup( $o_file, $METAQUOTE_EXE_PATH );
+    my $self          = shift;
+    my $charm_src_dir = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
+    my $orig_files    = $self->rscan_dir( $charm_src_dir, qr/\.c?harm$/ );
+    my $dest_files    = $self->rscan_dir( $CHARMONIZER_GEN_DIR, qr/\.[ch]$/ );
+    push @$dest_files, $CHARMONIZER_GEN_DIR;
+    if ( !$self->up_to_date( $orig_files, $dest_files ) ) {
+        mkpath $CHARMONIZER_GEN_DIR unless -d $CHARMONIZER_GEN_DIR;
+        $self->add_to_cleanup($CHARMONIZER_GEN_DIR);
+        my $metaquote = catfile( $CHARMONIZER_ORIG_DIR, qw( bin metaquote ) );
+        my $command = "$^X $metaquote --src=$charm_src_dir "
+            . "--out=$CHARMONIZER_GEN_DIR";
+        system($command);
+    }
 }
 
 # Build the charmonize executable.
 sub ACTION_charmonizer {
     my $self = shift;
-
     $self->dispatch('metaquote');
 
-    # gather .charm and .harm files and run them through metaquote
-    if ( !-d $FILTERED_DIR ) {
-        mkpath($FILTERED_DIR) or die "can't mkpath '$FILTERED_DIR': $!";
-    }
-    my $charm_source_files = $self->rscan_dir( $CHARMONIZER_SOURCE_DIR,
-        sub { $File::Find::name =~ /\.c?harm$/ } );
-    my $filtered_files = $self->_metaquote_charm_files($charm_source_files);
-    my $charmonize_c   = catfile( $base_dir, qw( charmonizer charmonize.c ) );
-    my @all_source     = ( $charmonize_c, @$filtered_files );
+    # Gather .c and .h Charmonizer files.
+    my $charm_source_files
+        = $self->rscan_dir( $CHARMONIZER_GEN_DIR, qr/Charmonizer.+\.[ch]$/ );
+    my $charmonize_c = catfile( $CHARMONIZER_ORIG_DIR, 'charmonize.c' );
+    my @all_source = ( $charmonize_c, @$charm_source_files );
 
     # don't compile if we're up to date
     return if $self->up_to_date( \@all_source, $CHARMONIZE_EXE_PATH );
@@ -108,52 +108,23 @@ sub ACTION_charmonizer {
         next unless /\.c$/;
         next if m#Charmonizer/Test#;
         my $o_file = $cbuilder->object_file($_);
+        $self->add_to_cleanup($o_file);
         push @o_files, $o_file;
 
         next if $self->up_to_date( $_, $o_file );
 
         $cbuilder->compile(
             source               => $_,
-            include_dirs         => [$FILTERED_DIR],
+            include_dirs         => [$CHARMONIZER_GEN_DIR],
             extra_compiler_flags => $EXTRA_CCFLAGS,
         );
     }
 
+    $self->add_to_cleanup($CHARMONIZE_EXE_PATH);
     my $exe_path = $cbuilder->link_executable(
         objects  => \@o_files,
         exe_file => $CHARMONIZE_EXE_PATH,
     );
-
-    $self->add_to_cleanup( $FILTERED_DIR, @$filtered_files, @o_files,
-        $CHARMONIZE_EXE_PATH, );
-}
-
-sub _metaquote_charm_files {
-    my ( $self, $charm_files ) = @_;
-    my @filtered_files;
-
-    for my $source_path (@$charm_files) {
-        my $dest_path = $source_path;
-        $dest_path =~ s#(.*)src#$1filtered_src#;
-        $dest_path =~ s#\.charm#.c#;
-        $dest_path =~ s#\.harm#.h#;
-
-        push @filtered_files, $dest_path;
-
-        next if ( $self->up_to_date( $source_path, $dest_path ) );
-
-        # create directories if need be
-        my ( undef, $dir, undef ) = splitpath($dest_path);
-        if ( !-d $dir ) {
-            $self->add_to_cleanup($dir);
-            mkpath $dir or die "Couldn't mkpath $dir";
-        }
-
-        # run the metaquote filter
-        system( $METAQUOTE_EXE_PATH, $source_path, $dest_path );
-    }
-
-    return \@filtered_files;
 }
 
 # Run the charmonizer executable, creating the charmony.h file.
@@ -198,15 +169,16 @@ sub ACTION_build_charm_test {
     $self->dispatch('charmony');
 
     # collect source files
-    my $source_path     = catfile( $base_dir, 'charmonizer', 'charm_test.c' );
-    my $exe_path        = "charm_test$Config{_exe}";
-    my $test_source_dir = catdir( $FILTERED_DIR, qw( Charmonizer Test ) );
-    my $source_files    = $self->rscan_dir( $FILTERED_DIR,
+    my $source_path = catfile( $base_dir, 'charmonizer', 'charm_test.c' );
+    my $exe_path = "charm_test$Config{_exe}";
+    my $test_source_dir
+        = catdir( $CHARMONIZER_GEN_DIR, qw( Charmonizer Test ) );
+    my $source_files = $self->rscan_dir( $CHARMONIZER_GEN_DIR,
         sub { $File::Find::name =~ m#Charmonizer/Test.*?\.c$# } );
     push @$source_files, $source_path;
 
     # collect include dirs
-    my @include_dirs = ( $FILTERED_DIR, curdir() );
+    my @include_dirs = ( $CHARMONIZER_GEN_DIR, curdir() );
 
     # add Windows supplements
     if ( $Config{osname} =~ /mswin/i ) {
