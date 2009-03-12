@@ -20,7 +20,7 @@ typedef void
 /* Concatenate all arguments in a NULL-terminated list into a single command
  * string, prepend the appropriate prefix, and invoke via system().
  */
-typedef void
+typedef int 
 (*chaz_OS_run_local_t)(chaz_OperSys *self, ...);
 
 /* Destructor.

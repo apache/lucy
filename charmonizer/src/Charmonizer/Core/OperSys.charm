@@ -19,7 +19,7 @@ remove_exe(OperSys *self, char *name);
 static void
 remove_obj(OperSys *self, char *name);
 
-static void
+static int 
 run_local(OperSys *self, ...);
 
 chaz_OperSys*
@@ -111,7 +111,7 @@ remove_obj(OperSys *self, char *name)
     remove(self->buf);
 }
 
-static void
+static int
 run_local(OperSys *self, ...)
 {
     va_list args;
@@ -126,7 +126,7 @@ run_local(OperSys *self, ...)
     va_end(args);
 
     /* run the command */
-    system(self->buf);
+    return system(self->buf);
 }
 
 
