@@ -28,6 +28,10 @@ chaz_AllTests_run();
  * problem of silent failure is less severe than it appears, affecting only
  * fallbacks.
  */
+
+chaz_TestBatch* 
+chaz_TDirManip_prepare();
+
 chaz_TestBatch* 
 chaz_TFuncMacro_prepare();
 
@@ -45,6 +49,9 @@ chaz_TUnusedVars_prepare();
 
 chaz_TestBatch* 
 chaz_TVariadicMacros_prepare();
+
+void
+chaz_TDirManip_run(chaz_TestBatch *batch);
 
 void
 chaz_TFuncMacro_run(chaz_TestBatch *batch);
@@ -65,6 +72,7 @@ void
 chaz_TVariadicMacros_run(chaz_TestBatch *batch);
 
 #ifdef CHAZ_USE_SHORT_NAMES
+  #define TDirManip_prepare            chaz_TDirManip_prepare
   #define TFuncMacro_prepare           chaz_TFuncMacro_prepare
   #define THeaders_prepare             chaz_THeaders_prepare
   #define TIntegers_prepare            chaz_TIntegers_prepare

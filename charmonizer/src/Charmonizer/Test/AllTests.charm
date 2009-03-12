@@ -12,14 +12,15 @@ chaz_AllTests_init()
     chaz_Test_init();
 
     /* create a null-terminated array of test batches to iterate over */
-    batches = malloc(7 * sizeof(TestBatch*));
-    batches[0] = chaz_TFuncMacro_prepare();
-    batches[1] = chaz_THeaders_prepare();
-    batches[2] = chaz_TIntegers_prepare();
-    batches[3] = chaz_TLargeFiles_prepare();
-    batches[4] = chaz_TUnusedVars_prepare();
-    batches[5] = chaz_TVariadicMacros_prepare();
-    batches[6] = NULL;
+    batches = malloc(8 * sizeof(TestBatch*));
+    batches[0] = chaz_TDirManip_prepare();
+    batches[1] = chaz_TFuncMacro_prepare();
+    batches[2] = chaz_THeaders_prepare();
+    batches[3] = chaz_TIntegers_prepare();
+    batches[4] = chaz_TLargeFiles_prepare();
+    batches[5] = chaz_TUnusedVars_prepare();
+    batches[6] = chaz_TVariadicMacros_prepare();
+    batches[7] = NULL;
 }
 
 void

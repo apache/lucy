@@ -7,13 +7,15 @@
 #include <string.h>
 #include <stdarg.h>
 #include "Charmonizer/Probe.h"
-#include "Charmonizer/Probe/DirSep.h"
+#include "Charmonizer/Probe/DirManip.h"
 #include "Charmonizer/Probe/FuncMacro.h"
 #include "Charmonizer/Probe/Headers.h"
 #include "Charmonizer/Probe/Integers.h"
 #include "Charmonizer/Probe/LargeFiles.h"
 #include "Charmonizer/Probe/UnusedVars.h"
 #include "Charmonizer/Probe/VariadicMacros.h"
+#include "Charmonizer/Core/HeadCheck.h"
+#include "Charmonizer/Core/ModHandler.h"
 
 char *cc_command, *cc_flags, *os_name, *verbosity_str;
 
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
     init(argc, argv);
 
     /* modules section */
-    chaz_DirSep_run();
+    chaz_DirManip_run();
     chaz_Headers_run();
     chaz_FuncMacro_run();
     chaz_Integers_run();
@@ -151,7 +153,9 @@ extract_delim_and_verify(char *source, size_t source_len, const char *tag_name)
 static void
 write_charmony_postamble(void)
 {
-    /* No postamble for now. */
+    if (chaz_HeadCheck_check_header("sys/mman.h")) {
+        chaz_ModHand_append_conf("#define CHY_HAS_SYS_MMAN_H\n\n");
+    }
 }
 
 void 
