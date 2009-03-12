@@ -49,6 +49,7 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 
 /* Note: maybe add line numbers later.
  */
+#define CHAZ_TEST_PLAN              chaz_Test_plan
 #define CHAZ_TEST_ASSERT_TRUE       chaz_Test_assert_true
 #define CHAZ_TEST_ASSERT_FALSE      chaz_Test_assert_false
 #define CHAZ_TEST_ASSERT_STR_EQ     chaz_Test_assert_str_eq
@@ -72,6 +73,8 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
         return; \
     } while (0)
 
+void
+chaz_Test_plan(chaz_TestBatch *batch);
 
 void 
 chaz_Test_assert_true(chaz_TestBatch *batch, int expression, 
@@ -82,12 +85,12 @@ chaz_Test_assert_false(chaz_TestBatch *batch, int expression,
                            const char *pat, ...);
 
 void 
-chaz_Test_assert_str_eq(chaz_TestBatch *batch, const char *expected, 
-                            const char *got, const char *pat, ...);
+chaz_Test_assert_str_eq(chaz_TestBatch *batch, const char *got, 
+                            const char *expected, const char *pat, ...);
 
 void 
-chaz_Test_assert_str_neq(chaz_TestBatch *batch, const char *expected,
-                             const char *got, const char *pat, ...);
+chaz_Test_assert_str_neq(chaz_TestBatch *batch, const char *got,
+                             const char *expected, const char *pat, ...);
 
 void 
 chaz_Test_pass(chaz_TestBatch *batch, const char *pat, ...);
@@ -96,12 +99,12 @@ void
 chaz_Test_fail(chaz_TestBatch *batch, const char *pat, ...);
 
 void 
-chaz_Test_assert_int_eq(chaz_TestBatch *batch, long expected, long got, 
+chaz_Test_assert_int_eq(chaz_TestBatch *batch, long got, long expected, 
                             const char *pat, ...);
 
 void 
-chaz_Test_assert_float_eq(chaz_TestBatch *batch, double expected, 
-                              double got, const char *pat, ...);
+chaz_Test_assert_float_eq(chaz_TestBatch *batch, double got, 
+                              double expected, const char *pat, ...);
 
 void
 chaz_Test_skip(chaz_TestBatch *batch, const char *pat, ...);
@@ -117,6 +120,8 @@ chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
   #define TestBatch                    chaz_TestBatch
   #define Test_init                    chaz_Test_init
   #define Test_new_batch               chaz_Test_new_batch
+  #define Test_plan                    chaz_Test_plan
+  #define PLAN                         CHAZ_TEST_PLAN
   #define ASSERT_TRUE                  CHAZ_TEST_ASSERT_TRUE
   #define ASSERT_FALSE                 CHAZ_TEST_ASSERT_FALSE
   #define ASSERT_STR_EQ                CHAZ_TEST_ASSERT_STR_EQ
