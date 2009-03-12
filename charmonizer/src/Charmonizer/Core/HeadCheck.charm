@@ -109,6 +109,27 @@ chaz_HeadCheck_check_many_headers(const char **header_names)
     return success;
 }
 
+static char contains_code[] = METAQUOTE
+  #include <stddef.h>
+  %s
+  int main() { return offsetof(%s, %s); }
+METAQUOTE;
+
+chaz_bool_t
+chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
+                               const char *includes)
+{
+    long needed = sizeof(contains_code) + strlen(struct_name) 
+                + strlen(member) + strlen(includes) + 10;
+    if (code_buf_len < needed) { 
+        code_buf_len = needed;
+        free(code_buf);
+        code_buf = malloc(code_buf_len);
+    }
+    sprintf(code_buf, contains_code, includes, struct_name, member);
+    return test_compile(code_buf, strlen(code_buf));
+}
+
 static int
 compare_headers(const void *vptr_a, const void *vptr_b) {
     Header **const a = (Header**)vptr_a;
