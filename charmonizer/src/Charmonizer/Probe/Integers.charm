@@ -311,6 +311,18 @@ chaz_Integers_run(void)
         append_conf("#define CHY_U64_C(n) n##%s\n", u64_t_postfix);
     }
 
+    /* Create macro for promoting pointers to integers. */
+    if (has_64) {
+        if (sizeof_ptr == 8) {
+            append_conf("#define CHY_PTR2I64(ptr) "
+                "((chy_i64_t)(chy_u64_t)(ptr))\n");
+        }
+        else {
+            append_conf("#define CHY_PTR2I64(ptr) "
+                "((chy_i64_t)(chy_u32_t)(ptr))\n");
+        }
+    }
+
     /* true and false */
     append_conf(
         "#ifndef true\n"
@@ -382,6 +394,7 @@ chaz_Integers_run(void)
         shorten_macro("U64P");
         shorten_macro("I64_C");
         shorten_macro("U64_C");
+        shorten_macro("PTR2I64");
     } 
     END_SHORT_NAMES;
     
