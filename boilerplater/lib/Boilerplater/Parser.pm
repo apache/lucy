@@ -5,6 +5,9 @@ package Boilerplater::Parser;
 use base qw( Parse::RecDescent );
 
 use Boilerplater::Parcel;
+use Boilerplater::Type;
+use Boilerplater::Type::Primitive;
+use Boilerplater::Type::Integer;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -29,12 +32,43 @@ cnick:
     /([A-Z][A-Za-z0-9]+)(?!\w)/
     { $1 }
 
+c_integer_type:
+    type_qualifier(s?) c_integer_specifier
+    { Boilerplater::Parser->new_integer_type(\%item) }
+
+chy_integer_type:
+    type_qualifier(s?) chy_integer_specifier
+    { Boilerplater::Parser->new_integer_type(\%item) }
+
+type_qualifier:
+      'const' 
+
+primitive_type_specifier:
+      chy_integer_specifier
+    | c_integer_specifier 
+    { $item[1] }
+
+chy_integer_specifier:
+    /(?:chy_)?([iu](8|16|32|64)|bool)_t(?!\w)/
+
+c_integer_specifier:
+    /(?:char|int|short|long|size_t)(?!\w)/
+
 END_GRAMMAR
 
 sub new { return shift->SUPER::new($grammar) }
 
 our $parcel = undef;
 sub set_parcel { $parcel = $_[1] }
+
+sub new_integer_type {
+    my ( undef, $item ) = @_;
+    my $specifier = $item->{c_integer_specifier}
+        || $item->{chy_integer_specifier};
+    my %args = ( specifier => $specifier );
+    $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
+    return Boilerplater::Type::Integer->new(%args);
+}
 
 sub new_parcel {
     my ( undef, $item ) = @_;
