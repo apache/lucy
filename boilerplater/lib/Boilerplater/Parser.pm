@@ -11,6 +11,7 @@ use Boilerplater::Type::Integer;
 use Boilerplater::Type::Float;
 use Boilerplater::Type::Void;
 use Boilerplater::Type::Object;
+use Boilerplater::Type::VAList;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -57,6 +58,10 @@ void_type:
     type_qualifier(s?) void_type_specifier
     { Boilerplater::Parser->new_void_type(\%item) }
 
+va_list_type:
+    va_list_type_specifier
+    { Boilerplater::Type::VAList->new }
+
 object_type:
     type_qualifier(s?) object_type_specifier '*'
     { Boilerplater::Parser->new_object_type(\%item); }
@@ -83,6 +88,9 @@ c_float_specifier:
 
 void_type_specifier:
     /void(?!\w)/
+
+va_list_type_specifier:
+    /va_list(?!\w)/
 
 object_type_specifier:
     /[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/
