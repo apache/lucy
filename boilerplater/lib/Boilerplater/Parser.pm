@@ -10,8 +10,9 @@ use Boilerplater::Type::Primitive;
 use Boilerplater::Type::Integer;
 use Boilerplater::Type::Float;
 use Boilerplater::Type::Void;
-use Boilerplater::Type::Object;
 use Boilerplater::Type::VAList;
+use Boilerplater::Type::Arbitrary;
+use Boilerplater::Type::Object;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -62,6 +63,10 @@ va_list_type:
     va_list_type_specifier
     { Boilerplater::Type::VAList->new }
 
+arbitrary_type:
+    arbitrary_type_specifier
+    { Boilerplater::Parser->new_arbitrary_type(\%item); }
+
 object_type:
     type_qualifier(s?) object_type_specifier '*'
     { Boilerplater::Parser->new_object_type(\%item); }
@@ -91,6 +96,9 @@ void_type_specifier:
 
 va_list_type_specifier:
     /va_list(?!\w)/
+
+arbitrary_type_specifier:
+    /\w+_t(?!\w)/
 
 object_type_specifier:
     /[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/
@@ -123,6 +131,14 @@ sub new_void_type {
     my %args = ( specifier => $item->{void_type_specifier} );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
     return Boilerplater::Type::Void->new(%args);
+}
+
+sub new_arbitrary_type {
+    my ( undef, $item ) = @_;
+    return Boilerplater::Type::Arbitrary->new(
+        specifier => $item->{arbitrary_type_specifier},
+        parcel    => $parcel,
+    );
 }
 
 sub new_object_type {
