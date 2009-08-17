@@ -8,6 +8,7 @@ use Boilerplater::Parcel;
 use Boilerplater::Type;
 use Boilerplater::Type::Primitive;
 use Boilerplater::Type::Integer;
+use Boilerplater::Type::Float;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -32,6 +33,12 @@ cnick:
     /([A-Z][A-Za-z0-9]+)(?!\w)/
     { $1 }
 
+primitive_type:
+      c_integer_type
+    | chy_integer_type
+    | float_type
+    { $item[1] }
+
 c_integer_type:
     type_qualifier(s?) c_integer_specifier
     { Boilerplater::Parser->new_integer_type(\%item) }
@@ -40,12 +47,17 @@ chy_integer_type:
     type_qualifier(s?) chy_integer_specifier
     { Boilerplater::Parser->new_integer_type(\%item) }
 
+float_type:
+    type_qualifier(s?) c_float_specifier
+    { Boilerplater::Parser->new_float_type(\%item) }
+
 type_qualifier:
       'const' 
 
 primitive_type_specifier:
       chy_integer_specifier
     | c_integer_specifier 
+    | c_float_specifier 
     { $item[1] }
 
 chy_integer_specifier:
@@ -53,6 +65,9 @@ chy_integer_specifier:
 
 c_integer_specifier:
     /(?:char|int|short|long|size_t)(?!\w)/
+
+c_float_specifier:
+    /(?:float|double)(?!\w)/
 
 END_GRAMMAR
 
@@ -68,6 +83,13 @@ sub new_integer_type {
     my %args = ( specifier => $specifier );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
     return Boilerplater::Type::Integer->new(%args);
+}
+
+sub new_float_type {
+    my ( undef, $item ) = @_;
+    my %args = ( specifier => $item->{c_float_specifier} );
+    $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
+    return Boilerplater::Type::Float->new(%args);
 }
 
 sub new_parcel {
