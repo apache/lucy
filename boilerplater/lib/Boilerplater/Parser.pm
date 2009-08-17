@@ -9,6 +9,7 @@ use Boilerplater::Type;
 use Boilerplater::Type::Primitive;
 use Boilerplater::Type::Integer;
 use Boilerplater::Type::Float;
+use Boilerplater::Type::Void;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -51,6 +52,10 @@ float_type:
     type_qualifier(s?) c_float_specifier
     { Boilerplater::Parser->new_float_type(\%item) }
 
+void_type:
+    type_qualifier(s?) void_type_specifier
+    { Boilerplater::Parser->new_void_type(\%item) }
+
 type_qualifier:
       'const' 
 
@@ -68,6 +73,9 @@ c_integer_specifier:
 
 c_float_specifier:
     /(?:float|double)(?!\w)/
+
+void_type_specifier:
+    /void(?!\w)/
 
 END_GRAMMAR
 
@@ -90,6 +98,13 @@ sub new_float_type {
     my %args = ( specifier => $item->{c_float_specifier} );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
     return Boilerplater::Type::Float->new(%args);
+}
+
+sub new_void_type {
+    my ( undef, $item ) = @_;
+    my %args = ( specifier => $item->{void_type_specifier} );
+    $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
+    return Boilerplater::Type::Void->new(%args);
 }
 
 sub new_parcel {
