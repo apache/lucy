@@ -13,6 +13,7 @@ use Boilerplater::Type::Void;
 use Boilerplater::Type::VAList;
 use Boilerplater::Type::Arbitrary;
 use Boilerplater::Type::Object;
+use Boilerplater::Type::Composite;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -36,6 +37,23 @@ cnick:
     'cnick'
     /([A-Z][A-Za-z0-9]+)(?!\w)/
     { $1 }
+
+type:
+      composite_type
+    | simple_type
+    { $item[1] }
+
+simple_type:
+      object_type
+    | primitive_type
+    | void_type
+    | va_list_type
+    | arbitrary_type
+    { $item[1] }
+
+composite_type:
+    simple_type type_postfix(s)
+    { Boilerplater::Parser->new_composite_type(\%item) }
 
 primitive_type:
       c_integer_type
@@ -103,6 +121,18 @@ arbitrary_type_specifier:
 object_type_specifier:
     /[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/
 
+type_postfix:
+      '*'
+      { '*' }
+    | '[' ']'
+      { '[]' }
+    | '[' constant_expression ']'
+      { "[$item[2]]" }
+
+constant_expression:
+      /\d+/
+    | /[A-Z_]+/
+
 END_GRAMMAR
 
 sub new { return shift->SUPER::new($grammar) }
@@ -149,6 +179,24 @@ sub new_object_type {
     );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
     return Boilerplater::Type::Object->new(%args);
+}
+
+sub new_composite_type {
+    my ( undef, $item ) = @_;
+    my %args = (
+        child       => $item->{simple_type},
+        indirection => 0,
+    );
+    for my $postfix ( @{ $item->{'type_postfix(s)'} } ) {
+        if ( $postfix =~ /\[/ ) {
+            $args{array} ||= '';
+            $args{array} .= $postfix;
+        }
+        elsif ( $postfix eq '*' ) {
+            $args{indirection}++;
+        }
+    }
+    return Boilerplater::Type::Composite->new(%args);
 }
 
 sub new_parcel {
