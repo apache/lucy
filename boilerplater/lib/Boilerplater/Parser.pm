@@ -14,6 +14,7 @@ use Boilerplater::Type::VAList;
 use Boilerplater::Type::Arbitrary;
 use Boilerplater::Type::Object;
 use Boilerplater::Type::Composite;
+use Boilerplater::Variable;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -37,6 +38,16 @@ cnick:
     'cnick'
     /([A-Z][A-Za-z0-9]+)(?!\w)/
     { $1 }
+
+var_declaration_statement:
+    exposure_specifier(?) variable_modifier(s?) type declarator ';'
+    {
+        $return = {
+            exposure  => $item[1][0] || 'parcel',
+            modifiers => $item[2],
+            declared  => Boilerplater::Parser->new_var( \%item, \%arg ),
+        };
+    }
 
 type:
       composite_type
@@ -94,6 +105,16 @@ type_qualifier:
     | 'incremented'
     | 'decremented'
 
+exposure_specifier:
+      'public'
+    | 'private'
+    | 'parcel'
+    | 'local'
+
+variable_modifier:
+      'inert'
+    { $item[1] }
+
 primitive_type_specifier:
       chy_integer_specifier
     | c_integer_specifier 
@@ -121,6 +142,10 @@ arbitrary_type_specifier:
 object_type_specifier:
     /[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/
 
+declarator:
+    identifier 
+    { $item[1] }
+
 type_postfix:
       '*'
       { '*' }
@@ -129,9 +154,18 @@ type_postfix:
     | '[' constant_expression ']'
       { "[$item[2]]" }
 
+identifier:
+    ...!reserved_word /[a-zA-Z_]\w*/x
+    { $item[2] }
+
 constant_expression:
       /\d+/
     | /[A-Z_]+/
+
+reserved_word:
+    /(char|const|double|enum|extern|float|int|long|register|signed|sizeof
+       |short|inert|struct|typedef|union|unsigned|void)(?!\w)/x
+    | chy_integer_specifier
 
 END_GRAMMAR
 
@@ -197,6 +231,22 @@ sub new_composite_type {
         }
     }
     return Boilerplater::Type::Composite->new(%args);
+}
+
+sub new_var {
+    my ( undef, $item, $arg ) = @_;
+    my $exposure = $item->{'exposure_specifier(?)'}[0];
+    my %args = $exposure ? ( exposure => $exposure ) : ();
+    if ($arg) {
+        $args{class_name}  = $arg->{class} if $arg->{class};
+        $args{class_cnick} = $arg->{cnick} if $arg->{cnick};
+    }
+    return Boilerplater::Variable->new(
+        parcel    => $parcel,
+        type      => $item->{type},
+        micro_sym => $item->{declarator},
+        %args,
+    );
 }
 
 sub new_parcel {
