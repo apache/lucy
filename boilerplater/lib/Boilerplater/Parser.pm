@@ -15,6 +15,7 @@ use Boilerplater::Type::Arbitrary;
 use Boilerplater::Type::Object;
 use Boilerplater::Type::Composite;
 use Boilerplater::Variable;
+use Boilerplater::DocuComment;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -178,6 +179,10 @@ type_postfix:
 identifier:
     ...!reserved_word /[a-zA-Z_]\w*/x
     { $item[2] }
+
+docucomment:
+    /\/\*\*.*?\*\//s
+    { Boilerplater::DocuComment->parse($item[1]) }
 
 constant_expression:
       /\d+/
