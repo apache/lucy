@@ -49,6 +49,27 @@ var_declaration_statement:
         };
     }
 
+param_list:
+    '(' 
+    param_list_elem(s? /,/)
+    (/,\s*.../)(?)
+    ')'
+    {
+        Boilerplater::Parser->new_param_list( $item[2], $item[3][0] ? 1 : 0 );
+    }
+
+param_list_elem:
+    param_variable assignment(?)
+    { [ $item[1], $item[2][0] ] }
+
+param_variable:
+    type declarator
+    { Boilerplater::Parser->new_var(\%item); }
+
+assignment: 
+    '=' scalar_constant
+    { $item[2] }
+
 type:
       composite_type
     | simple_type
@@ -162,6 +183,31 @@ constant_expression:
       /\d+/
     | /[A-Z_]+/
 
+scalar_constant:
+      hex_constant
+    | float_constant
+    | integer_constant
+    | string_literal
+    | 'NULL'
+    | 'true'
+    | 'false'
+
+integer_constant:
+    /(?:-\s*)?\d+/
+    { $item[1] }
+
+hex_constant:
+    /0x[a-fA-F0-9]+/
+    { $item[1] }
+
+float_constant:
+    /(?:-\s*)?\d+\.\d+/
+    { $item[1] }
+
+string_literal: 
+    /"(?:[^"\\]|\\.)*"/
+    { $item[1] }
+
 reserved_word:
     /(char|const|double|enum|extern|float|int|long|register|signed|sizeof
        |short|inert|struct|typedef|union|unsigned|void)(?!\w)/x
@@ -246,6 +292,17 @@ sub new_var {
         type      => $item->{type},
         micro_sym => $item->{declarator},
         %args,
+    );
+}
+
+sub new_param_list {
+    my ( undef, $param_list_elems, $variadic ) = @_;
+    my @vars = map { $_->[0] } @$param_list_elems;
+    my @vals = map { $_->[1] } @$param_list_elems;
+    return Boilerplater::ParamList->new(
+        variables      => \@vars,
+        initial_values => \@vals,
+        variadic       => $variadic,
     );
 }
 
