@@ -17,6 +17,7 @@ use Boilerplater::Type::Composite;
 use Boilerplater::Variable;
 use Boilerplater::DocuComment;
 use Boilerplater::Function;
+use Boilerplater::Method;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
