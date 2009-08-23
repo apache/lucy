@@ -1,14 +1,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
-
 package BoilingThing;
 use base qw( Boilerplater::Symbol );
 
-sub new { return shift->SUPER::new( exposure => 'parcel', @_ ) }
+sub new {
+    return shift->SUPER::new( micro_sym => 'sym', exposure => 'parcel', @_ );
+}
 
 package main;
+use Test::More tests => 44;
 
 for (qw( foo FOO 1Foo Foo_Bar FOOBAR 1FOOBAR )) {
     eval { my $thing = BoilingThing->new( class_name => $_ ) };
@@ -46,4 +47,21 @@ is( $lucifer->get_Prefix, "Lucifer_", "get_Prefix" );
 is( $lucifer->get_PREFIX, "LUCIFER_", "get_PREFIX" );
 my $luser = BoilingThing->new( parcel => 'Luser' );
 ok( !$lucifer->equals($luser), "different parcel spoils equals" );
+
+for ( qw( 1foo * 0 ), "\x{263a}" ) {
+    eval { my $thing = BoilingThing->new( micro_sym => $_ ); };
+    like( $@, qr/micro_sym/, "reject bad micro_sym" );
+}
+
+my $ooga  = BoilingThing->new( micro_sym => 'ooga' );
+my $booga = BoilingThing->new( micro_sym => 'booga' );
+ok( !$ooga->equals($booga), "Different micro_sym spoils equals()" );
+
+my $eep = BoilingThing->new(
+    parcel     => 'Eep',
+    class_name => "Op::Ork",
+    micro_sym  => 'ah_ah',
+);
+is( $eep->short_sym, "Ork_ah_ah",     "short_sym" );
+is( $eep->full_sym,  "eep_Ork_ah_ah", "full_sym" );
 

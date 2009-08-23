@@ -4,7 +4,7 @@ use warnings;
 package Boilerplater::Variable;
 use base qw( Boilerplater::Symbol );
 use Boilerplater::Type;
-use Boilerplater::Util qw( verify_args );
+use Boilerplater::Util qw( verify_args a_isa_b );
 use Carp;
 
 our %new_PARAMS = (
@@ -20,19 +20,15 @@ sub new {
     my $either = shift;
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = $either->SUPER::new( %new_PARAMS, @_ );
-    confess "micro_sym is required" unless $self->{micro_sym};
     confess "invalid type"
-        unless ref( $self->{type} )
-            && $self->{type}->isa("Boilerplater::Type");
+        unless a_isa_b( $self->{type}, "Boilerplater::Type" );
     return $self;
 }
 
-sub get_type  { shift->{type} }
-sub micro_sym { shift->{micro_sym} }
+sub get_type { shift->{type} }
 
 sub equals {
     my ( $self, $other ) = @_;
-    return 0 unless $self->{micro_sym} eq $other->{micro_sym};
     return 0 unless $self->{type}->equals( $other->{type} );
     return $self->SUPER::equals($other);
 }
@@ -51,7 +47,7 @@ sub local_c {
 sub global_c {
     my $self = shift;
     my $type = $self->{type};
-    my $name = $self->get_prefix . "$self->{class_cnick}_$self->{micro_sym}";
+    my $name = $self->full_sym;
     my $postfix = '';
     if ( $type->is_composite ) {
         $postfix = $type->get_array || '';

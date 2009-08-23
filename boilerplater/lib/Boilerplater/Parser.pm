@@ -16,6 +16,7 @@ use Boilerplater::Type::Object;
 use Boilerplater::Type::Composite;
 use Boilerplater::Variable;
 use Boilerplater::DocuComment;
+use Boilerplater::Function;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -47,6 +48,22 @@ var_declaration_statement:
             exposure  => $item[1][0] || 'parcel',
             modifiers => $item[2],
             declared  => Boilerplater::Parser->new_var( \%item, \%arg ),
+        };
+    }
+
+subroutine_declaration_statement:
+    docucomment(?)
+    exposure_specifier(?) 
+    subroutine_modifier(s?) 
+    type 
+    declarator 
+    param_list 
+    ';'
+    {
+        $return = {
+            exposure  => $item[2],
+            modifiers => $item[3],
+            declared  => Boilerplater::Parser->new_sub( \%item, \%arg ),
         };
     }
 
@@ -126,6 +143,13 @@ type_qualifier:
       'const' 
     | 'incremented'
     | 'decremented'
+
+subroutine_modifier:
+      'inert'
+    | 'inline'
+    | 'abstract'
+    | 'final'
+    { $item[1] }
 
 exposure_specifier:
       'public'
@@ -308,6 +332,38 @@ sub new_param_list {
         variables      => \@vars,
         initial_values => \@vals,
         variadic       => $variadic,
+    );
+}
+
+sub new_sub {
+    my ( undef, $item, $arg ) = @_;
+    my $class;
+    my $modifiers  = $item->{'subroutine_modifier(s?)'};
+    my $docucom    = $item->{'docucomment(?)'}[0];
+    my $exposure   = $item->{'exposure_specifier(?)'}[0];
+    my $inert      = scalar grep { $_ eq 'inert' } @$modifiers;
+    my %extra_args = $exposure ? ( exposure => $exposure ) : ();
+
+    if ($inert) {
+        $class = 'Boilerplater::Function';
+        $extra_args{micro_sym} = $item->{declarator};
+        $extra_args{inline} = scalar grep { $_ eq 'inline' } @$modifiers;
+    }
+    else {
+        $class = 'Boilerplater::Method';
+        $extra_args{macro_sym} = $item->{declarator};
+        $extra_args{abstract} = scalar grep { $_ eq 'abstract' } @$modifiers;
+        $extra_args{final}    = scalar grep { $_ eq 'final' } @$modifiers;
+    }
+
+    return $class->new(
+        parcel      => $parcel,
+        docucomment => $docucom,
+        class_name  => $arg->{class},
+        class_cnick => $arg->{cnick},
+        return_type => $item->{type},
+        param_list  => $item->{param_list},
+        %extra_args,
     );
 }
 

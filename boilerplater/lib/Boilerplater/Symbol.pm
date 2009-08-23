@@ -3,6 +3,7 @@ use warnings;
 
 package Boilerplater::Symbol;
 use Boilerplater::Parcel;
+use Boilerplater::Util qw( a_isa_b );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -11,6 +12,7 @@ my %new_PARAMS = (
     exposure    => undef,
     class_name  => undef,
     class_cnick => undef,
+    micro_sym   => undef,
 );
 
 my $struct_regex     = qr/[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*/;
@@ -35,6 +37,11 @@ sub new {
     # Create the object.
     my $self = bless { %new_PARAMS, %args, parcel => $parcel },
         ref($either) || $either;
+
+    # Validate micro_sym.
+    confess "micro_sym is required" unless $self->{micro_sym};
+    confess("Invalid micro_sym: '$self->{micro_sym}'")
+        unless $self->{micro_sym} =~ /^[A-Za-z_][A-Za-z0-9_]*$/;
 
     # Validate exposure.
     confess("Invalid value for 'exposure': $self->{exposure}")
@@ -62,6 +69,7 @@ sub new {
 sub get_parcel      { shift->{parcel} }
 sub get_class_name  { shift->{class_name} }
 sub get_class_cnick { shift->{class_cnick} }
+sub micro_sym       { shift->{micro_sym} }
 
 sub get_prefix { shift->{parcel}->get_prefix; }
 sub get_Prefix { shift->{parcel}->get_Prefix; }
@@ -72,10 +80,21 @@ sub private { shift->{exposure} eq 'private' }
 sub parcel  { shift->{exposure} eq 'parcel' }
 sub local   { shift->{exposure} eq 'local' }
 
+sub full_sym {
+    my $self   = shift;
+    my $prefix = $self->get_prefix;
+    return "$prefix$self->{class_cnick}_$self->{micro_sym}";
+}
+
+sub short_sym {
+    my $self = shift;
+    return "$self->{class_cnick}_$self->{micro_sym}";
+}
+
 sub equals {
     my ( $self, $other ) = @_;
-    return 0 unless blessed($other);
-    return 0 unless $other->isa(__PACKAGE__);
+    return 0 unless a_isa_b( $other, __PACKAGE__ );
+    return 0 unless $self->{micro_sym} eq $other->{micro_sym};
     return 0 unless $self->{parcel}->equals( $other->{parcel} );
     if ( defined $self->{exposure} ) {
         return 0 unless defined $other->{exposure};
@@ -117,6 +136,7 @@ variables.
         exposure    => $exposure,                           # required
         class_name  => "Crustacean::Lobster::LobsterClaw",  # default: undef
         class_cnick => "LobClaw",                           # default: special
+        micro_sym   => "rubber_band"                        # required
     );
 
 =over
@@ -136,11 +156,13 @@ characters [A-Za-z0-9].
 name.  If not supplied, will be derived if possible from C<class_name> by
 extracting the last class name component.
 
+=item * B<micro_sym> - The local identifier for the symbol.
+
 =back
 
 =head1 OBJECT METHODS
 
-=head2 get_parcel get_class_name get_class_cnick
+=head2 get_parcel get_class_name get_class_cnick micro_sym
 
 Getters.
 
@@ -160,6 +182,20 @@ Indicate whether the symbol matches a given access level.
     do_stuff() if $sym->equals($other_sym);
 
 Returns true if the symbols are "equal", false otherwise.
+
+=head2 short_sym
+
+    # e.g. "LobClaw_rubber_band"
+    print $symbol->short_sym;
+
+Returns the C representation for the symbol minus the parcel's prefix.
+
+=head2 full_sym
+
+    # e.g. "crust_LobClaw_rubber_band"
+    print $symbol->full_sym;
+
+Returns the fully qualified C representation for the symbol.
 
 =head1 COPYRIGHT AND LICENSE
 

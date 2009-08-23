@@ -8,7 +8,9 @@ BEGIN { use_ok('Boilerplater::Parcel') }
 package BoilingThing;
 use base qw( Boilerplater::Symbol );
 
-sub new { return shift->SUPER::new( exposure => 'parcel', @_ ) }
+sub new {
+    return shift->SUPER::new( micro_sym => 'sym', exposure => 'parcel', @_ );
+}
 
 package main;
 
