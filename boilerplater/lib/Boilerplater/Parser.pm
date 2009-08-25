@@ -19,6 +19,7 @@ use Boilerplater::DocuComment;
 use Boilerplater::Function;
 use Boilerplater::Method;
 use Boilerplater::Class;
+use Boilerplater::CBlock;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -30,6 +31,12 @@ parcel_definition:
         Boilerplater::Parser->set_parcel($parcel);
         $parcel;
     }
+
+embed_c:
+    '__C__'
+    /.*?(?=__END_C__)/s  
+    '__END_C__'
+    { Boilerplater::CBlock->new( contents => $item[2] ) }
 
 class_declaration:
     docucomment(?)
