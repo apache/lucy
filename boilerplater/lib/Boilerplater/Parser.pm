@@ -303,6 +303,16 @@ END_GRAMMAR
 
 sub new { return shift->SUPER::new($grammar) }
 
+sub strip_plain_comments {
+    my ( $self, $text ) = @_;
+    while ( $text =~ m#(/\*[^*].*?\*/)#ms ) {
+        my $blanked = $1;
+        $blanked =~ s/\S/ /g;
+        $text    =~ s#/\*[^*].*?\*/#$blanked#ms;
+    }
+    return $text;
+}
+
 our $parcel = undef;
 sub set_parcel { $parcel = $_[1] }
 
@@ -503,6 +513,24 @@ Boilerplater::Parser - Parse Boilerplater header files.
 Boilerplater::Parser is a combined lexer/parser which parses .bp code.  It is
 not at all strict, as it relies heavily on the C parser to pick up errors such
 as misspelled type names.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor, takes no arguments.
+
+=head2 strip_plain_comments
+
+    my $stripped = $parser->strip_plain_comments($code_with_comments);
+
+Remove plain C comments from supplied code.  All non-whitespace characters are
+turned to spaces; all whitespace characters are preserved, so that the number
+of lines is consistent between before and after.
+
+JavaDoc-syntax "DocuComments", which begin with "/**" are left alone.  
+
+This is a sloppy implementation which will mangle quoted comments and such.
 
 =head1 COPYRIGHT AND LICENSE
 
