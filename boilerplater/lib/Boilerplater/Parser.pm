@@ -18,6 +18,7 @@ use Boilerplater::Variable;
 use Boilerplater::DocuComment;
 use Boilerplater::Function;
 use Boilerplater::Method;
+use Boilerplater::Class;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
@@ -30,6 +31,35 @@ parcel_definition:
         $parcel;
     }
 
+class_declaration:
+    docucomment(?)
+    exposure_specifier(?) class_modifier(s?) 'class' class_name 
+        cnick(?)
+        class_extension(?)
+        class_attribute(s?)
+    '{'
+        declaration_statement[
+            class  => $item{class_name}, 
+            cnick  => $item{'cnick(?)'}[0],
+            parent => $item{'class_extension(?)'}[0],
+        ](s?)
+    '}'
+    { Boilerplater::Parser->new_class( \%item, \%arg ) }
+
+class_modifier:
+      'inert'
+    | 'abstract'
+    | 'final'
+    { $item[1] }
+
+class_extension:
+    'extends' class_name
+    { $item[2] }
+
+class_attribute:
+    ':' /[a-z]+(?!\w)/
+    { $item[2] }
+
 class_name:
     class_name_component ( "::" class_name_component )(s?)
     { join('::', $item[1], @{ $item[2] } ) }
@@ -41,6 +71,11 @@ cnick:
     'cnick'
     /([A-Z][A-Za-z0-9]+)(?!\w)/
     { $1 }
+
+declaration_statement:
+      var_declaration_statement[%arg]
+    | subroutine_declaration_statement[%arg]
+    | <error>
 
 var_declaration_statement:
     exposure_specifier(?) variable_modifier(s?) type declarator ';'
@@ -365,6 +400,48 @@ sub new_sub {
         return_type => $item->{type},
         param_list  => $item->{param_list},
         %extra_args,
+    );
+}
+
+sub new_class {
+    my ( undef, $item, $arg ) = @_;
+    my ( @member_vars, @inert_vars, @functions, @methods );
+    my $source_class = $arg->{source_class} || $item->{class_name};
+    my %class_modifiers
+        = map { ( $_ => 1 ) } @{ $item->{'class_modifier(s?)'} };
+    my %class_attributes
+        = map { ( $_ => 1 ) } @{ $item->{'class_attribute(s?)'} };
+
+    for my $declaration ( @{ $item->{'declaration_statement(s?)'} } ) {
+        my $declared  = $declaration->{declared};
+        my $exposure  = $declaration->{exposure};
+        my $modifiers = $declaration->{modifiers};
+        my $inert     = ( scalar grep {/inert/} @$modifiers ) ? 1 : 0;
+        my $subs      = $inert ? \@functions : \@methods;
+        my $vars      = $inert ? \@inert_vars : \@member_vars;
+
+        if ( $declared->isa('Boilerplater::Variable') ) {
+            push @$vars, $declared;
+        }
+        else {
+            push @$subs, $declared;
+        }
+    }
+
+    return Boilerplater::Class->create(
+        parcel            => $parcel,
+        class_name        => $item->{class_name},
+        cnick             => $item->{'cnick(?)'}[0],
+        parent_class_name => $item->{'class_extension(?)'}[0],
+        member_vars       => \@member_vars,
+        functions         => \@functions,
+        methods           => \@methods,
+        inert_vars        => \@inert_vars,
+        docucomment       => $item->{'docucomment(?)'}[0],
+        source_class      => $source_class,
+        inert             => $class_modifiers{inert},
+        final             => $class_modifiers{final},
+        attributes        => \%class_attributes,
     );
 }
 
