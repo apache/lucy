@@ -20,9 +20,20 @@ use Boilerplater::Function;
 use Boilerplater::Method;
 use Boilerplater::Class;
 use Boilerplater::CBlock;
+use Boilerplater::File;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
+
+file:
+    { Boilerplater::Parser->set_parcel(undef); 0; }
+    major_block[%arg](s) eofile
+    { Boilerplater::Parser->new_file( \%item, \%arg ) }
+
+major_block:
+      class_declaration[%arg]
+    | embed_c
+    | parcel_definition
 
 parcel_definition:
     'parcel' class_name cnick(?) ';'
@@ -285,6 +296,9 @@ reserved_word:
        |short|inert|struct|typedef|union|unsigned|void)(?!\w)/x
     | chy_integer_specifier
 
+eofile:
+    /^\Z/
+
 END_GRAMMAR
 
 sub new { return shift->SUPER::new($grammar) }
@@ -449,6 +463,16 @@ sub new_class {
         inert             => $class_modifiers{inert},
         final             => $class_modifiers{final},
         attributes        => \%class_attributes,
+    );
+}
+
+sub new_file {
+    my ( undef, $item, $arg ) = @_;
+
+    return Boilerplater::File->new(
+        parcel       => $parcel,
+        blocks       => $item->{'major_block(s)'},
+        source_class => $arg->{source_class},
     );
 }
 
