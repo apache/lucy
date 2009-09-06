@@ -5,6 +5,7 @@ package Boilerplater::Type::Integer;
 use base qw( Boilerplater::Type::Primitive );
 use Boilerplater::Util qw( verify_args );
 use Carp;
+use Config;
 
 our %new_PARAMS = (
     const     => undef,
@@ -12,27 +13,27 @@ our %new_PARAMS = (
 );
 
 our %specifiers = (
-    bool_t => undef,
-    i8_t   => undef,
-    i16_t  => undef,
-    i32_t  => undef,
-    i64_t  => undef,
-    u8_t   => undef,
-    u16_t  => undef,
-    u32_t  => undef,
-    u64_t  => undef,
-    char   => undef,
-    int    => undef,
-    short  => undef,
-    long   => undef,
-    size_t => undef,
+    bool_t => $Config{intsize},
+    i8_t   => 1,
+    i16_t  => 2,
+    i32_t  => 4,
+    i64_t  => 8,
+    u8_t   => 1,
+    u16_t  => 2,
+    u32_t  => 4,
+    u64_t  => 8,
+    char   => 1,
+    int    => $Config{intsize},
+    short  => $Config{shortsize},
+    long   => $Config{longsize},
+    size_t => $Config{sizesize},
 );
 
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    confess("Unknown specifier: '$args{specifier}'")
-        unless exists $specifiers{ $args{specifier} };
+    my $sizeof = $specifiers{ $args{specifier} }
+        or confess("Unknown specifier: '$args{specifier}'");
 
     # Cache the C representation of this type.
     my $c_string = $args{const} ? 'const ' : '';
@@ -41,10 +42,13 @@ sub new {
     }
     $c_string .= $args{specifier};
 
-    return $either->SUPER::new( %args, c_string => $c_string );
+    my $self = $either->SUPER::new( %args, c_string => $c_string );
+    $self->{sizeof} = $sizeof;
+    return $self;
 }
 
 sub is_integer {1}
+sub sizeof     { shift->{sizeof} }
 
 1;
 
