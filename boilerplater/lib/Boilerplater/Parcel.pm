@@ -56,6 +56,8 @@ sub singleton {
 sub get_prefix { shift->{prefix} }
 sub get_Prefix { shift->{Prefix} }
 sub get_PREFIX { shift->{PREFIX} }
+sub get_name   { shift->{name} }
+sub get_cnick  { shift->{cnick} }
 
 sub equals {
     my ( $self, $other ) = @_;
@@ -125,6 +127,10 @@ Return the singleton for default parcel, which has no prefix.
 =head2 get_prefix get_Prefix get_PREFIX
 
 Return one of the three capitalization variants for the parcel's prefix.
+
+=head2 get_name get_cnick
+
+Accessors.
 
 =head1 COPYRIGHT AND LICENSE
 
