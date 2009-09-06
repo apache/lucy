@@ -5,6 +5,7 @@ package Boilerplater::Util;
 use base qw( Exporter );
 use Scalar::Util qw( blessed );
 use Carp;
+use Fcntl;
 
 our @EXPORT_OK = qw(
     slurp_file
@@ -12,6 +13,7 @@ our @EXPORT_OK = qw(
     strip_c_comments
     verify_args
     a_isa_b
+    write_if_changed
 );
 
 sub slurp_file {
@@ -83,6 +85,20 @@ sub a_isa_b {
     return $thing->isa($class);
 }
 
+sub write_if_changed {
+    my ( $path, $content ) = @_;
+    my $write = 1;
+    if ( -e $path ) {
+        open( my $fh, '<', $path ) or confess "Can't open '$path': $!";
+        my $orig = do { local $/; <$fh> };
+        return if $orig eq $content;
+    }
+    unlink $path;
+    sysopen( my $fh, $path, O_CREAT | O_EXCL | O_WRONLY )
+        or confess "Can't open '$path': $!";
+    print $fh $content;
+}
+
 1;
 
 __END__
@@ -128,6 +144,14 @@ $@ if a problem is detected.
 
 Quick 'n' dirty stripping of C comments.  Will massacre stuff like comments
 embedded in string literals, so watch out.
+
+=head2 write_if_changed
+
+    write_if_changed( $path, $content );
+
+Test whether there's a file at C<$path> which already matches C<$content>
+exactly.  If something has changed, write the file.  Otherwise do nothing (and
+avoid bumping the file's modification time).
 
 =head1 COPYRIGHT AND LICENSE
 
