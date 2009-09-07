@@ -35,38 +35,62 @@ use File::Copy qw( copy move );
 use File::Find qw( find );
 use Config;
 use Env qw( @PATH );
+use Fcntl;
+use Carp;
 
-unshift @PATH, curdir();
+BEGIN { unshift @PATH, curdir() }
+
+sub project_name {'Lucy'}
+sub project_nick {'Lucy'}
+
+sub xs_filepath { catfile( 'lib', shift->project_name . ".xs" ) }
+sub autobind_pm_path {
+    catfile( 'lib', shift->project_name, 'Autobinding.pm' );
+}
+
+sub extra_ccflags {
+    my $self          = shift;
+    my $debug_env_var = uc( $self->project_nick ) . "_DEBUG";
+
+    my $extra_ccflags = "";
+    if ( defined $ENV{$debug_env_var} ) {
+        $extra_ccflags .= "-D$debug_env_var ";
+        # Allow override when Perl was compiled with an older version.
+        my $gcc_version = $ENV{REAL_GCC_VERSION} || $Config{gccversion};
+        if ( defined $gcc_version ) {
+            $gcc_version =~ /^(\d+(\.\d+)?)/ or die "no match";
+            $gcc_version = $1;
+            $extra_ccflags .= "-DPERL_GCC_PEDANTIC -ansi -pedantic -Wall "
+                . "-std=c89 -Wno-long-long ";
+            $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct
+            $extra_ccflags .= "-Wno-variadic-macros "
+                if $gcc_version > 3.4;    # at least not on gcc 3.4
+        }
+    }
+
+    return $extra_ccflags;
+}
 
 =for Rationale
 
-When the distribution tarball for the Perl binding of Lucy is built, c_src/,
-c_test/, and any other needed files/directories are copied into the perl/
-directory within the main Lucy directory.  Then the distro is built from the
-contents of the perl/ directory, leaving out all the files in ruby/, etc.
+When the distribution tarball for the Perl binding of Lucy is built, core/,
+charmonizer/, and any other needed files/directories are copied into the
+perl/ directory within the main Lucy directory.  Then the distro is built from
+the contents of the perl/ directory, leaving out all the files in ruby/, etc.
 However, during development, the files are accessed from their original
 locations.
 
 =cut
 
-my $is_distro_not_devel = -e 'c_src';
+my $is_distro_not_devel = -e 'core';
 my $base_dir = $is_distro_not_devel ? curdir() : updir();
 
 my $CHARMONIZE_EXE_PATH  = 'charmonize' . $Config{_exe};
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
 my $CHARMONIZER_GEN_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'gen' );
-my $C_SOURCE_DIR         = catdir( $base_dir, 'c_src' );
-my $H_SOURCE_DIR         = catdir( $C_SOURCE_DIR, 'h' );
+my $CORE_SOURCE_DIR      = catdir( $base_dir, 'core' );
+my $AUTOGEN_DIR          = 'autogen';
 my $XS_SOURCE_DIR        = 'xs';
-my $AUTOBIND_PM_PATH     = catfile(qw( lib KinoSearch Autobinding.pm ));
-my $AUTOBIND_XS_PATH     = catfile(qw( lib KinoSearch Autobinding.xs ));
-
-my $EXTRA_CCFLAGS = '';
-if ( $ENV{LUCY_DEBUG} ) {
-    $EXTRA_CCFLAGS = "-DPERL_GCC_PEDANTIC -ansi -pedantic -Wall -Wextra "
-        . "-std=c89 -Wno-long-long -Wno-variadic-macros";
-}
-my $VALGRIND = $ENV{CHARM_VALGRIND} ? "valgrind --leak-check=full " : "";
 
 # Collect all relevant Charmonizer files.
 sub ACTION_metaquote {
@@ -96,7 +120,7 @@ sub ACTION_charmonizer {
     my $charmonize_c = catfile( $CHARMONIZER_ORIG_DIR, 'charmonize.c' );
     my @all_source = ( $charmonize_c, @$charm_source_files );
 
-    # don't compile if we're up to date
+    # Don't compile if we're up to date.
     return if $self->up_to_date( \@all_source, $CHARMONIZE_EXE_PATH );
 
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
@@ -116,7 +140,7 @@ sub ACTION_charmonizer {
         $cbuilder->compile(
             source               => $_,
             include_dirs         => [$CHARMONIZER_GEN_DIR],
-            extra_compiler_flags => $EXTRA_CCFLAGS,
+            extra_compiler_flags => $self->extra_ccflags,
         );
     }
 
@@ -138,12 +162,18 @@ sub ACTION_charmony {
     return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $charmony_path );
     print "\nWriting $charmony_path...\n\n";
 
-    # write the infile with which to communicate args to charmonize
+    # Clean up after Charmonizer if it doesn't succeed on its own.
+    $self->add_to_cleanup("_charm*");
+
+    # Write the infile with which to communicate args to charmonize.
     my $os_name   = lc( $Config{osname} );
-    my $flags     = "$Config{ccflags} $EXTRA_CCFLAGS";
+    my $flags     = "$Config{ccflags} " . $self->extra_ccflags;
+    
     my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
     my $cc        = "$Config{cc}";
-    open( my $infile_fh, '>', $charmony_in )
+    unlink $charmony_in;
+    $self->add_to_cleanup( $charmony_path, $charmony_in );
+    sysopen( my $infile_fh, $charmony_in, O_CREAT | O_WRONLY | O_EXCL )
         or die "Can't open '$charmony_in': $!";
     print $infile_fh qq|
         <charm_os_name>$os_name</charm_os_name>
@@ -153,14 +183,15 @@ sub ACTION_charmony {
     |;
     close $infile_fh or die "Can't close '$charmony_in': $!";
 
-    if ($VALGRIND) {
-        system("$VALGRIND ./$CHARMONIZE_EXE_PATH $charmony_in");
+    if ( $ENV{CHARM_VALGRIND} ) {
+        system(
+            "valgrind --leak-check=yes ./$CHARMONIZE_EXE_PATH $charmony_in")
+            and die "Failed to write charmony.h";
     }
     else {
-        system( $CHARMONIZE_EXE_PATH, $charmony_in );
+        system( $CHARMONIZE_EXE_PATH, $charmony_in )
+            and die "Failed to write charmony.h";
     }
-
-    $self->add_to_cleanup( $charmony_path, $charmony_in );
 }
 
 sub ACTION_build_charm_test {
@@ -180,7 +211,7 @@ sub ACTION_build_charm_test {
     # collect include dirs
     my @include_dirs = ( $CHARMONIZER_GEN_DIR, curdir() );
 
-    # add Windows supplements
+    # Add Windows supplements.
     if ( $Config{osname} =~ /mswin/i ) {
         my $win_compat_dir = catdir( $base_dir, 'c_src', 'compat' );
         push @include_dirs, $win_compat_dir;
@@ -198,7 +229,7 @@ sub ACTION_build_charm_test {
     for (@$source_files) {
         my $o_file = $cbuilder->compile(
             source               => $_,
-            extra_compiler_flags => $EXTRA_CCFLAGS,
+            extra_compiler_flags => $self->extra_ccflags,
             include_dirs         => \@include_dirs,
         );
         push @o_files, $o_file;
@@ -217,7 +248,7 @@ sub ACTION_code {
     $self->SUPER::ACTION_code(@_);
 }
 
-# copied from Module::Build::Base.pm, added exclude '#' and follow symlinks
+# Copied from Module::Build::Base.pm, added exclude '#' and follow symlinks.
 sub rscan_dir {
     my ( $self, $dir, $pattern ) = @_;
     my @result;
@@ -233,7 +264,7 @@ sub rscan_dir {
 
     File::Find::find( { wanted => $subr, no_chdir => 1, follow => 1 }, $dir );
 
-    # skip emacs lock files
+    # Skip emacs lock files.
     my @filtered = grep !/#/, @result;
     return \@filtered;
 }
@@ -242,6 +273,9 @@ sub rscan_dir {
 
 __END__
 
+__POD__
+
+=head1 COPYRIGHT AND LICENCE
 
     /**
      * Copyright 2006 The Apache Software Foundation
@@ -258,4 +292,6 @@ __END__
      * implied.  See the License for the specific language governing
      * permissions and limitations under the License.
      */
+
+=cut
 
