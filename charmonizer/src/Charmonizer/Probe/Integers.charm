@@ -212,7 +212,7 @@ chaz_Integers_run(void)
     if (has_8) {
         append_conf(
             "#define CHY_HAS_I8_T\n"
-            "typedef char chy_i8_t;\n"
+            "typedef signed char chy_i8_t;\n"
             "typedef unsigned char chy_u8_t;\n"
             "#define CHY_I8_MAX 0x7F\n"
             "#define CHY_I8_MIN (-I8_MAX - 1)\n"
