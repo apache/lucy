@@ -126,7 +126,7 @@ sub propagate_modified {
         next unless $self->_propagate_modified( $tree, $modified );
         $somebody_is_modified = 1;
     }
-    return $somebody_is_modified;
+    return $somebody_is_modified || $modified;
 }
 
 # Recursive helper function.
