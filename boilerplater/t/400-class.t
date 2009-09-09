@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 49;
+use Test::More tests => 51;
 use Boilerplater::Class;
 use Boilerplater::Parser;
 
@@ -51,7 +51,8 @@ my $foo_jr = Boilerplater::Class->create(
 );
 
 ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
-is( $foo_jr->get_struct_sym, 'FooJr', "struct_sym" );
+is( $foo_jr->get_struct_sym,  'FooJr',      "struct_sym" );
+is( $foo_jr->full_struct_sym, 'boil_FooJr', "full_struct_sym" );
 
 my $final_foo = Boilerplater::Class->create(
     parcel            => 'Boil',
@@ -119,6 +120,7 @@ is_deeply( [ $foo_jr->novel_member_vars ], [], "novel_member_vars" );
 is_deeply( [ $foo_jr->inert_vars ],        [], "don't inherit inert vars" );
 is_deeply( [ $final_foo->novel_methods ],  [], "novel_methods" );
 
+like( $foo_jr->get_autocode, qr/load/i, "autogenerate Dump/Load" );
 is_deeply(
     [ $foo->tree_to_ladder ],
     [ $foo, $foo_jr, $final_foo ],
