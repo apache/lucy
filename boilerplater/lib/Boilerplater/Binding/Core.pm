@@ -93,6 +93,13 @@ $self->{header}
 #include "charmony.h"
 
 $typedefs
+typedef struct lucy_Obj lucy_Obj;
+typedef struct lucy_VTable lucy_VTable;
+typedef struct lucy_CharBuf lucy_CharBuf;
+typedef struct lucy_ZombieCharBuf lucy_ZombieCharBuf;
+typedef struct lucy_Hash lucy_Hash;
+typedef struct lucy_VArray lucy_VArray;
+typedef struct lucy_Err lucy_Err;
 
 /* Refcount / host object */
 typedef union {

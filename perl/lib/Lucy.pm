@@ -2,9 +2,34 @@ package Lucy;
 use strict;
 use warnings;
 
-our $VERSION = 0.00_01;
+use 5.008003;
+
+our $VERSION = 0.01;
+$VERSION = eval $VERSION;
+
+use XSLoader;
+BEGIN { XSLoader::load( 'Lucy', '0.01' ) }
 
 1;
+
+__END__
+
+__BINDING__
+
+my $lucy_xs_code = <<'END_XS_CODE';
+MODULE = Lucy    PACKAGE = Lucy 
+
+BOOT:
+    lucy_Lucy_bootstrap();
+END_XS_CODE
+
+Boilerplater::Binding::Perl::Class->register(
+    parcel     => "Lucy",
+    class_name => "Lucy",
+    xs_code    => $lucy_xs_code,
+);
+
+__POD__
 
 =head1 NAME
 

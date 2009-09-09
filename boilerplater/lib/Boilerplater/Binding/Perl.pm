@@ -160,13 +160,16 @@ sub _xs_file_contents {
     my ( $self, $generated_xs, $xs_init, $hand_rolled_xs ) = @_;
     return <<END_STUFF;
 #define C_LUCY_ZOMBIECHARBUF
-#include "xs/XSBind.h"
+/* #include "xs/XSBind.h" */
 #include "boil.h"
 #include "$self->{boot_h_file}"
 
-#include "Lucy/Obj/Host.h"
-#include "Lucy/Util/MemManager.h"
-#include "Lucy/Util/StringHelper.h"
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+/* #include "Lucy/Obj/Host.h" */
+/* #include "Lucy/Util/MemManager.h" */
+/* #include "Lucy/Util/StringHelper.h" */
 
 #include "Charmonizer/Test.h"
 #include "Charmonizer/Test/AllTests.h"
@@ -181,8 +184,7 @@ PPCODE:
 {
     char* file = __FILE__;
     CHY_UNUSED_VAR(cv); 
-    CHY_UNUSED_VAR(items);
-    $xs_init
+    CHY_UNUSED_VAR(items); $xs_init
 }
 
 $hand_rolled_xs
