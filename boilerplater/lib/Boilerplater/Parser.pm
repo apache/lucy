@@ -79,11 +79,8 @@ class_attribute:
     { $item[2] }
 
 class_name:
-    class_name_component ( "::" class_name_component )(s?)
+    object_type_specifier ( "::" object_type_specifier )(s?)
     { join('::', $item[1], @{ $item[2] } ) }
-
-class_name_component:
-    /[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/
 
 cnick:
     'cnick'
@@ -143,9 +140,8 @@ assignment:
     { $item[2] }
 
 type:
-      composite_type
-    | simple_type
-    { $item[1] }
+    simple_type type_postfix(s?)
+    { Boilerplater::Parser->simple_or_composite_type(\%item) }
 
 simple_type:
       object_type
@@ -155,9 +151,9 @@ simple_type:
     | arbitrary_type
     { $item[1] }
 
-composite_type:
-    simple_type type_postfix(s)
-    { Boilerplater::Parser->new_composite_type(\%item) }
+object_type:
+    type_qualifier(s?) object_type_specifier '*'
+    { Boilerplater::Parser->new_object_type(\%item); }
 
 primitive_type:
       c_integer_type
@@ -189,10 +185,6 @@ arbitrary_type:
     arbitrary_type_specifier
     { Boilerplater::Parser->new_arbitrary_type(\%item); }
 
-object_type:
-    type_qualifier(s?) object_type_specifier '*'
-    { Boilerplater::Parser->new_object_type(\%item); }
-
 type_qualifier:
       'const' 
     | 'incremented'
@@ -213,6 +205,15 @@ exposure_specifier:
 
 variable_modifier:
       'inert'
+    { $item[1] }
+
+type_specifier:
+    (    object_type_specifier 
+       | primitive_type_specifier
+       | void_type_specifier
+       | va_list_type_specifier
+       | arbitrary_type_specifier
+    ) 
     { $item[1] }
 
 primitive_type_specifier:
@@ -357,22 +358,30 @@ sub new_object_type {
     return Boilerplater::Type::Object->new(%args);
 }
 
-sub new_composite_type {
+sub simple_or_composite_type {
     my ( undef, $item ) = @_;
-    my %args = (
-        child       => $item->{simple_type},
-        indirection => 0,
-    );
-    for my $postfix ( @{ $item->{'type_postfix(s)'} } ) {
-        if ( $postfix =~ /\[/ ) {
-            $args{array} ||= '';
-            $args{array} .= $postfix;
-        }
-        elsif ( $postfix eq '*' ) {
-            $args{indirection}++;
-        }
+    my $simple_type = $item->{simple_type};
+    my $postfixes   = $item->{'type_postfix(s?)'};
+
+    if ( !@$postfixes ) {
+        return $simple_type;
     }
-    return Boilerplater::Type::Composite->new(%args);
+    else {
+        my %args = (
+            child       => $simple_type,
+            indirection => 0,
+        );
+        for my $postfix (@$postfixes) {
+            if ( $postfix =~ /\[/ ) {
+                $args{array} ||= '';
+                $args{array} .= $postfix;
+            }
+            elsif ( $postfix eq '*' ) {
+                $args{indirection}++;
+            }
+        }
+        return Boilerplater::Type::Composite->new(%args);
+    }
 }
 
 sub new_var {
