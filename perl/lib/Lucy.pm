@@ -21,6 +21,13 @@ MODULE = Lucy    PACKAGE = Lucy
 
 BOOT:
     lucy_Lucy_bootstrap();
+
+IV
+_dummy_function()
+CODE:
+    RETVAL = 1;
+OUTPUT:
+    RETVAL
 END_XS_CODE
 
 Boilerplater::Binding::Perl::Class->register(
