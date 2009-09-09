@@ -28,7 +28,7 @@ my @composite_type_strings = (
 );
 
 for my $input (@composite_type_strings) {
-    isa_ok( $parser->composite_type($input),
+    isa_ok( $parser->type($input),
         "Boilerplater::Type::Composite", $input );
 }
 
@@ -59,20 +59,20 @@ ok( !$composite_type->equals($bar_composite),
     "equals spoiled by different child"
 );
 
-my $foo_array = $parser->composite_type("foo_t[]")
+my $foo_array = $parser->type("foo_t[]")
     or die "Can't parse foo_t[]";
 is( $foo_array->get_array, '[]', "get_array" );
 unlike( $foo_array->to_c, qr/\[\]/, "array subscripts not included by to_c" );
 
-my $foo_array_array = $parser->composite_type("foo_t[][]")
+my $foo_array_array = $parser->type("foo_t[][]")
     or die "Can't parse foo_t[][]";
 ok( !$foo_array->equals($foo_array_array),
     "equals spoiled by different array postfixes"
 );
 
-my $foo_star = $parser->composite_type("foo_t*")
+my $foo_star = $parser->type("foo_t*")
     or die "Can't parse foo_t*";
-my $foo_star_star = $parser->composite_type("foo_t**")
+my $foo_star_star = $parser->type("foo_t**")
     or die "Can't parse foo_t**";
 ok( !$foo_star->equals($foo_star_star),
     "equals spoiled by different levels of indirection" );
