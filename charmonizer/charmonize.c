@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include "Charmonizer/Probe.h"
 #include "Charmonizer/Probe/DirManip.h"
+#include "Charmonizer/Probe/Floats.h"
 #include "Charmonizer/Probe/FuncMacro.h"
 #include "Charmonizer/Probe/Headers.h"
 #include "Charmonizer/Probe/Integers.h"
@@ -55,6 +56,7 @@ int main(int argc, char **argv)
     chaz_Headers_run();
     chaz_FuncMacro_run();
     chaz_Integers_run();
+    chaz_Floats_run();
     chaz_LargeFiles_run();
     chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
