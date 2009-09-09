@@ -11,6 +11,7 @@ use Boilerplater::Util qw(
     verify_args
     a_isa_b
 );
+use Boilerplater::Dumpable;
 use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
@@ -30,6 +31,8 @@ our %create_PARAMS = (
     attributes        => undef,
     exposure          => 'parcel',
 );
+
+my $dumpable = Boilerplater::Dumpable->new;
 
 our %registry;
 
@@ -118,7 +121,7 @@ sub create {
         unless reftype( $self->{attributes} ) eq 'HASH';
 
     # Store in registry.
-    my $key      = $self->get_prefix . $self->{struct_sym};
+    my $key      = $self->full_struct_sym;
     my $existing = $registry{$key};
     if ($existing) {
         confess(  "New class $self->{class_name} conflicts with previously "
@@ -165,6 +168,9 @@ sub set_parent { $_[0]->{parent} = $_[1] }
 
 sub vtable_var  { uc( shift->{struct_sym} ) }
 sub vtable_type { shift->vtable_var . '_VT' }
+
+sub full_struct_sym { $_[0]->get_prefix . $_[0]->{struct_sym} }
+sub full_vtable_var { $_[0]->get_PREFIX . $_[0]->vtable_var }
 
 sub append_autocode { $_[0]->{autocode} .= $_[1] }
 
@@ -225,6 +231,12 @@ sub add_method {
     $self->{meth_by_name}{ $method->micro_sym } = $method;
 }
 
+# Create dumpable functions unless hand coded versions were supplied.
+sub _create_dumpables {
+    my $self = shift;
+    $dumpable->add_dumpables($self) if $self->has_attribute('dumpable');
+}
+
 sub grow_tree {
     my $self = shift;
     confess("Can't call grow_tree more than once") if $self->{tree_grown};
@@ -259,6 +271,7 @@ sub _bequeath_member_vars {
 # passed down but before methods are passed down.
 sub _generate_automethods {
     my $self = shift;
+    $self->_create_dumpables;
     for my $child ( @{ $self->{children} } ) {
         $child->_generate_automethods;
     }
@@ -519,6 +532,14 @@ The C type specifier for this class's vtable.  Each vtable needs to have its
 own type because each has a variable number of methods at the end of the
 struct, and it's not possible to initialize a static struct with a flexible
 array at the end under C89.
+
+=head2 full_vtable_var
+
+Fully qualified vtable variable name, including the parcel prefix.
+
+=head2 full_struct_sym
+
+Fully qualified struct symbol, including the parcel prefix.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -51,10 +51,10 @@ sub new {
     my $args = $self->get_param_list->get_variables;
     confess "Not enough args" unless @$args;
     my $specifier = $args->[0]->get_type->get_specifier;
-    my ($struct_name) = $self->{class_name} =~ /(\w+)$/;
+    my ($struct_sym) = $self->{class_name} =~ /(\w+)$/;
     confess
         "First arg type doesn't match class: $self->{class_name} $specifier"
-        unless $specifier eq $self->get_prefix . $struct_name;
+        unless $specifier eq $self->get_prefix . $struct_sym;
 
     # Cache typedef.
     $self->{short_typedef}
@@ -329,4 +329,3 @@ one to override the other.
      */
 
 =cut
-
