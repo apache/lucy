@@ -7,6 +7,24 @@ __END__
 __BINDING__
 
 my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy   PACKAGE = Lucy::Test
+
+void
+run_tests(package)
+    char *package;
+PPCODE:
+{
+    /* Lucy::Util */
+    if (strEQ(package, "TestStringHelper")) {
+        lucy_TestStrHelp_run_tests();
+    }
+    else {
+        warn("Unknown test identifier: '%s'", package);
+    }
+}
+END_XS_CODE
+
+my $charm_xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Test::TestCharmonizer
 
 void
@@ -48,9 +66,15 @@ PPCODE:
 END_XS_CODE
 
 Boilerplater::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Test::TestCharmonizer",
-    xs_code           => $xs_code,
+    parcel     => "Lucy",
+    class_name => "Lucy::Test",
+    xs_code    => $xs_code,
+);
+
+Boilerplater::Binding::Perl::Class->register(
+    parcel     => "Lucy",
+    class_name => "Lucy::Test::TestCharmonizer",
+    xs_code    => $charm_xs_code,
 );
 
 __COPYRIGHT__

@@ -30,7 +30,7 @@
 /* #include "Lucy/Obj/VTable.h" */
 /* #include "Lucy/Util/NumberUtils.h" */
 #include "Lucy/Util/Memory.h"
-/* #include "Lucy/Util/StringHelper.h" */
+#include "Lucy/Util/StringHelper.h"
 
 #endif /* H_LUCY_TOOLSET */
 
