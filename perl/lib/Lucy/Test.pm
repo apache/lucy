@@ -15,7 +15,10 @@ run_tests(package)
 PPCODE:
 {
     /* Lucy::Util */
-    if (strEQ(package, "TestStringHelper")) {
+    if (strEQ(package, "TestNumberUtils")) {
+        lucy_TestNumUtil_run_tests();
+    }
+    else if (strEQ(package, "TestStringHelper")) {
         lucy_TestStrHelp_run_tests();
     }
     else {
