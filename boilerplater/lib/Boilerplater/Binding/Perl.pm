@@ -167,7 +167,7 @@ sub _xs_file_contents {
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-/* #include "Lucy/Obj/Host.h" */
+/* #include "Lucy/Object/Host.h" */
 /* #include "Lucy/Util/MemManager.h" */
 /* #include "Lucy/Util/StringHelper.h" */
 

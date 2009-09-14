@@ -115,12 +115,12 @@ $c_file_syms
 #define C_LUCY_VTABLE
 #define C_LUCY_ZOMBIECHARBUF
 #include "boil.h"
-/* #include "Lucy/Obj/VTable.h" */
-/* #include "Lucy/Obj/CharBuf.h" */
-/* #include "Lucy/Obj/Err.h" */
-/* #include "Lucy/Obj/Hash.h" */
-/* #include "Lucy/Obj/Host.h" */
-/* #include "Lucy/Obj/VArray.h" */
+/* #include "Lucy/Object/VTable.h" */
+/* #include "Lucy/Object/CharBuf.h" */
+/* #include "Lucy/Object/Err.h" */
+/* #include "Lucy/Object/Hash.h" */
+/* #include "Lucy/Object/Host.h" */
+/* #include "Lucy/Object/VArray.h" */
 
 $content
 

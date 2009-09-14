@@ -19,15 +19,15 @@
 #include <stdlib.h>
 #include <string.h>
 /* #include "Lucy/Obj.h" */
-/* #include "Lucy/Obj/BitVector.h" */
-/* #include "Lucy/Obj/ByteBuf.h" */
-/* #include "Lucy/Obj/CharBuf.h" */
-/* #include "Lucy/Obj/Err.h" */
-/* #include "Lucy/Obj/Hash.h" */
-/* #include "Lucy/Obj/Num.h" */
-/* #include "Lucy/Obj/Undefined.h" */
-/* #include "Lucy/Obj/VArray.h" */
-/* #include "Lucy/Obj/VTable.h" */
+/* #include "Lucy/Object/BitVector.h" */
+/* #include "Lucy/Object/ByteBuf.h" */
+/* #include "Lucy/Object/CharBuf.h" */
+/* #include "Lucy/Object/Err.h" */
+/* #include "Lucy/Object/Hash.h" */
+/* #include "Lucy/Object/Num.h" */
+/* #include "Lucy/Object/Undefined.h" */
+/* #include "Lucy/Object/VArray.h" */
+/* #include "Lucy/Object/VTable.h" */
 /* #include "Lucy/Util/NumberUtils.h" */
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"

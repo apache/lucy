@@ -34,7 +34,7 @@ XSBind_new_blank_obj(SV *either_sv)
 
     /* Get a VTable. */
     if (   sv_isobject(either_sv) 
-        && sv_derived_from(either_sv, "Lucy::Obj")
+        && sv_derived_from(either_sv, "Lucy::Object::Obj")
     ) {
         /* Use the supplied object's VTable. */
         IV iv_ptr = SvIV(SvRV(either_sv));
@@ -151,7 +151,7 @@ XSBind_perl_to_lucy(SV *sv)
                 retval = (lucy_Obj*)S_perl_hash_to_lucy_hash((HV*)inner);
             }
             else if (   sv_isobject(sv) 
-                     && sv_derived_from(sv, "Lucy::Obj")
+                     && sv_derived_from(sv, "Lucy::Object::Obj")
             ) {
                 IV tmp = SvIV(inner);
                 retval = INT2PTR(lucy_Obj*, tmp);
