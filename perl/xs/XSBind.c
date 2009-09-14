@@ -121,13 +121,13 @@ XSBind_lucy_to_perl(lucy_Obj *obj)
     if (obj == NULL) {
         return newSV(0);
     }
-    else if (LUCY_OBJ_IS_A(obj, LUCY_CHARBUF)) {
+    else if (Lucy_Obj_Is_A(obj, LUCY_CHARBUF)) {
         return XSBind_cb_to_sv((lucy_CharBuf*)obj);
     }
-    else if (LUCY_OBJ_IS_A(obj, LUCY_VARRAY)) {
+    else if (Lucy_Obj_Is_A(obj, LUCY_VARRAY)) {
         return S_lucy_array_to_perl_array((lucy_VArray*)obj);
     }
-    else if (LUCY_OBJ_IS_A(obj, LUCY_HASH)) {
+    else if (Lucy_Obj_Is_A(obj, LUCY_HASH)) {
         return S_lucy_hash_to_perl_hash((lucy_Hash*)obj);
     }
     else {
@@ -281,7 +281,7 @@ S_lucy_hash_to_perl_hash(lucy_Hash *hash)
     while (Lucy_Hash_Iter_Next(hash, (lucy_Obj**)&key, &val)) {
         /* Recurse for each value. */
         SV *val_sv = XSBind_lucy_to_perl(val);
-        if (!LUCY_OBJ_IS_A(key, LUCY_CHARBUF)) {
+        if (!Lucy_Obj_Is_A(key, LUCY_CHARBUF)) {
             LUCY_THROW(LUCY_ERR, 
                 "Can't convert a key of class %o to a Perl hash key",
                 Lucy_Obj_Get_Class_Name(key));
