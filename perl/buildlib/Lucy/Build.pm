@@ -331,11 +331,27 @@ sub ACTION_boilerplater {
     }
 }
 
+# Write ppport.h, which supplies some XS routines not found in older Perls and
+# allows us to use more up-to-date XS API while still supporting Perls back to
+# 5.8.3.
+#
+# TODO: Devel::PPPort recommends that we distribute ppport.h rather than
+# require Devel::PPPort itself, but at this point further investigation is
+# required as to whether that's possible under the Apache license.
+sub ACTION_ppport {
+    my $self = shift;
+    require Devel::PPPort;
+    $self->add_to_cleanup('ppport.h');
+    Devel::PPPort::WriteFile();
+}
+
 sub ACTION_compile_custom_xs {
     my $self         = shift;
     my $project_name = $self->project_name;
     my $xs_filepath  = $self->xs_filepath;
 
+    $self->dispatch('ppport');
+    
     require ExtUtils::ParseXS;
 
     my $cbuilder = Lucy::Build::CBuilder->new;

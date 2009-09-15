@@ -30,6 +30,7 @@ my $builder = Lucy::Build->new(
     build_requres      => {
         'ExtUtils::CBuilder' => 0.18,
         'ExtUtils::ParseXS'  => 2.16,
+        'Devel::PPPort'      => 3.13,
     },
     add_to_cleanup => [
         'Lucy-*',       'typemap', 'MANIFEST.bak', 'lastmod',
