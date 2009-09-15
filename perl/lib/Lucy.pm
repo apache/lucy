@@ -10,6 +10,51 @@ $VERSION = eval $VERSION;
 use XSLoader;
 BEGIN { XSLoader::load( 'Lucy', '0.01' ) }
 
+use Lucy::Autobinding;
+
+{
+    package KinoSearch::Object::VArray;
+    no warnings 'redefine';
+    sub clone { CORE::shift->_clone }
+}
+
+{
+    package Lucy::Object::VTable;
+
+    sub find_parent_class {
+        my ( undef, $package ) = @_;
+        no strict 'refs';
+        for my $parent ( @{"$package\::ISA"} ) {
+            return $parent if $parent->isa('Lucy::Object::Obj');
+        }
+        return;
+    }
+
+    sub novel_host_methods {
+        my ( undef, $package ) = @_;
+        no strict 'refs';
+        my $stash = \%{"$package\::"};
+        my $methods
+            = Lucy::Object::VArray->new( capacity => scalar keys %$stash );
+        while ( my ( $symbol, $glob ) = each %$stash ) {
+            next if ref $glob;
+            next unless *$glob{CODE};
+            $methods->push( Lucy::Object::CharBuf->new($symbol) );
+        }
+        return $methods;
+    }
+
+    sub _register {
+        my ( undef, %args ) = @_;
+        my $singleton_class = $args{singleton}->get_name;
+        my $parent_class    = $args{parent}->get_name;
+        if ( !$singleton_class->isa($parent_class) ) {
+            no strict 'refs';
+            push @{"$singleton_class\::ISA"}, $parent_class;
+        }
+    }
+}
+
 1;
 
 __END__
@@ -57,7 +102,7 @@ Marvin Humphrey E<lt>marvin at rectangular dot comE<gt>
 =head1 COPYRIGHT AND LICENSE
 
     /**
-     * Copyright 2006 The Apache Software Foundation
+     * Copyright 2009 The Apache Software Foundation
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
@@ -71,4 +116,6 @@ Marvin Humphrey E<lt>marvin at rectangular dot comE<gt>
      * implied.  See the License for the specific language governing
      * permissions and limitations under the License.
      */
+
+=cut
 

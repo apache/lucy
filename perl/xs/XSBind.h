@@ -5,7 +5,7 @@
 #define H_LUCY_XSBIND 1
 
 #include "charmony.h"
-#include "Lucy/Obj.h"
+#include "Lucy/Object/Obj.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"

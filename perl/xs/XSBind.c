@@ -334,12 +334,12 @@ XSBind_allot_params(SV** stack, chy_i32_t start, chy_i32_t num_stack_elems,
         for (i = num_stack_elems; i >= start + 2; i -= 2) {
             chy_i32_t tick = i - 2;
             SV *const key_sv = stack[tick];
-            const chy_i32_t comparison = lucy_StrHelp_compare_strings(
-                label, SvPVX(key_sv), label_len, SvCUR(key_sv));
-            if (comparison == 0) {
-                *target = stack[tick + 1];
-                args_left--;
-                break;
+            if (SvCUR(key_sv) == label_len) {
+                if (memcmp(SvPVX(key_sv), label, label_len) == 0) {
+                    *target = stack[tick + 1];
+                    args_left--;
+                    break;
+                }
             }
         }
     }

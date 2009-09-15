@@ -1,7 +1,6 @@
 #define C_LUCY_TESTNUMBERUTILS
 #include "Lucy/Util/ToolSet.h"
 #include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 
 #include "Lucy/Test.h"
@@ -118,10 +117,7 @@ test_c32(TestBatch *batch)
             ASSERT_INT_EQ(batch, NumUtil_decode_c32(&target), (long)ints[i], 
                 "c32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
-            if (target > limit) { 
-                fprintf(stderr, "overrun\n");
-                exit(1);
-            }
+            if (target > limit) { THROW(ERR, "overrun"); }
         }
         ASSERT_TRUE(batch, skip == target, "skip %lu == %lu", 
             (unsigned long)skip, (unsigned long)target);
@@ -139,10 +135,7 @@ test_c32(TestBatch *batch)
             ASSERT_INT_EQ(batch, NumUtil_decode_c32(&target), (long)ints[i], 
                 "padded c32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
-            if (target > limit) { 
-                fprintf(stderr, "overrun\n");
-                exit(1);
-            }
+            if (target > limit) { THROW(ERR, "overrun"); }
         }
         ASSERT_TRUE(batch, skip == target, "skip padded %lu == %lu", 
             (unsigned long)skip, (unsigned long)target);
@@ -185,10 +178,7 @@ test_c64(TestBatch *batch)
             u64_t got = NumUtil_decode_c64(&target);
             ASSERT_TRUE(batch, got == ints[i], 
                 "c64 %" U64P " == %" U64P, got, ints[i]);
-            if (target > limit) { 
-                fprintf(stderr, "overrun\n");
-                exit(1);
-            }
+            if (target > limit) { THROW(ERR, "overrun"); }
             NumUtil_skip_cint(&skip);
         }
         ASSERT_TRUE(batch, skip == target, "skip %lu == %lu", 
@@ -393,6 +383,7 @@ TestNumUtil_run_tests()
 
     batch->destroy(batch);
 }
+
 
 /* Copyright 2009 The Apache Software Foundation
  *

@@ -349,7 +349,7 @@ sub ACTION_compile_custom_xs {
 
     # Compile C source files.
     my $c_files = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.c$/ );
-    #push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,       qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,       qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $CHARMONIZER_GEN_DIR, qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,         qr/\.c$/ ) };
     for my $c_file (@$c_files) {

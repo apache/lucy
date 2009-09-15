@@ -48,7 +48,7 @@ sub new {
     $xs_file_components[-1] .= '.xs';
     $self->{xs_path} = catfile( $lib, @xs_file_components );
 
-    $self->{pm_path} = catfile( $lib, @file_components, 'AutoBinding.pm' );
+    $self->{pm_path} = catfile( $lib, @file_components, 'Autobinding.pm' );
     $self->{boot_h_file} = $parcel->get_prefix . "boot.h";
     $self->{boot_c_file} = $parcel->get_prefix . "boot.c";
     $self->{boot_h_path} = catfile( $dest_dir, $self->{boot_h_file} );
@@ -160,16 +160,13 @@ sub _xs_file_contents {
     my ( $self, $generated_xs, $xs_init, $hand_rolled_xs ) = @_;
     return <<END_STUFF;
 #define C_LUCY_ZOMBIECHARBUF
-/* #include "xs/XSBind.h" */
+#include "xs/XSBind.h"
 #include "boil.h"
 #include "$self->{boot_h_file}"
 
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-/* #include "Lucy/Object/Host.h" */
-/* #include "Lucy/Util/MemManager.h" */
-/* #include "Lucy/Util/StringHelper.h" */
+#include "Lucy/Object/Host.h"
+#include "Lucy/Util/Memory.h"
+#include "Lucy/Util/StringHelper.h"
 
 #include "Charmonizer/Test.h"
 #include "Charmonizer/Test/AllTests.h"

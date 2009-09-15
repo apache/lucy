@@ -14,15 +14,27 @@ run_tests(package)
     char *package;
 PPCODE:
 {
-    /* Lucy::Util */
-    if (strEQ(package, "TestNumberUtils")) {
+    /* Lucy::Object */
+    if (strEQ(package, "TestObj")) {
+        lucy_TestObj_run_tests();
+    }
+    else if (strEQ(package, "TestCharBuf")) {
+        lucy_TestCB_run_tests();
+    }
+    else if (strEQ(package, "TestHash")) {
+        lucy_TestHash_run_tests();
+    }
+    else if (strEQ(package, "TestNumberUtils")) {
         lucy_TestNumUtil_run_tests();
     }
     else if (strEQ(package, "TestStringHelper")) {
         lucy_TestStrHelp_run_tests();
     }
+    else if (strEQ(package, "TestVArray")) {
+        lucy_TestVArray_run_tests();
+    }
     else {
-        warn("Unknown test identifier: '%s'", package);
+        THROW(LUCY_ERR, "Unknown test id: %s", package);
     }
 }
 END_XS_CODE
@@ -60,7 +72,7 @@ PPCODE:
         batch = chaz_TVariadicMacros_prepare();
     }
     else {
-        warn("Unknown test identifier: '%s'", which);
+        THROW(LUCY_ERR, "Unknown test identifier: '%s'", which);
     }
 
     batch->run_test(batch);
@@ -83,7 +95,7 @@ Boilerplater::Binding::Perl::Class->register(
 __COPYRIGHT__
 
     /**
-     * Copyright 2006 The Apache Software Foundation
+     * Copyright 2009 The Apache Software Foundation
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
