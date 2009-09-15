@@ -13,7 +13,22 @@ BEGIN { XSLoader::load( 'Lucy', '0.01' ) }
 use Lucy::Autobinding;
 
 {
-    package KinoSearch::Object::VArray;
+    package Lucy::Object::Err;
+    sub do_to_string { shift->to_string }
+    use Carp qw( longmess );
+    use overload
+        '""'     => \&do_to_string,
+        fallback => 1;
+
+    sub do_throw {
+        my $err = shift;
+        $err->cat_mess( longmess() );
+        die $err;
+    }
+}
+
+{
+    package Lucy::Object::VArray;
     no warnings 'redefine';
     sub clone { CORE::shift->_clone }
 }
