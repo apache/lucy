@@ -4,21 +4,6 @@ use warnings;
 
 use lib 'buildlib';
 use Lucy::Build;
-use File::Spec::Functions qw( catdir updir );
-
-
-=for Rationale
-
-When the distribution tarball for the Perl binding of Lucy is built, c_src/,
-c_test/, and any other needed files/directories are copied into the perl/
-directory within the main Lucy directory.  Then the distro is built from the
-contents of the perl/ directory, leaving out all the files in ruby/, etc.
-However, during development, the files are access from their original
-locations.
-
-=cut
-
-my $c_src = -e 'c_src' ? 'c_src' : catdir( updir(), 'c_src' );
 
 my $builder = Lucy::Build->new(
     module_name        => 'Lucy',
@@ -27,15 +12,12 @@ my $builder = Lucy::Build->new(
     dist_version_from  => 'lib/Lucy.pm',
     dist_abstract_from => 'lib/Lucy.pm',
     create_makefile_pl => 'passthrough',
-    build_requres      => {
+    build_requires     => {
         'ExtUtils::CBuilder' => 0.18,
         'ExtUtils::ParseXS'  => 2.16,
         'Devel::PPPort'      => 3.13,
     },
-    add_to_cleanup => [
-        'Lucy-*',       'typemap', 'MANIFEST.bak', 'lastmod',
-        'perltidy.ERR', '*.o',
-    ],
+    add_to_cleanup => [ 'Lucy-*', 'MANIFEST.bak', 'perltidy.ERR' ],
 );
 
 $builder->create_build_script();
@@ -44,7 +26,7 @@ __END__
 
 
     /**
-     * Copyright 2006 The Apache Software Foundation
+     * Copyright 2006-2009 The Apache Software Foundation
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
