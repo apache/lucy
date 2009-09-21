@@ -3,6 +3,7 @@ use warnings;
 
 package Boilerplater::Binding::Perl::Class;
 use Boilerplater::Util qw( verify_args );
+use Carp;
 
 our %registry;
 sub registry { \%registry }
