@@ -294,6 +294,39 @@ S_lucy_hash_to_perl_hash(lucy_Hash *hash)
 }
 
 void
+XSBind_enable_overload(void *pobj)
+{
+    SV *perl_obj = (SV*)pobj;
+    HV *stash = SvSTASH(SvRV(perl_obj));
+    char *package_name = HvNAME(stash);
+    size_t size = strlen(package_name);
+
+    /* This code is informed by the following snippet from Perl_sv_bless, from
+     * sv.c:
+     *
+     *     if (Gv_AMG(stash))
+     *         SvAMAGIC_on(sv);
+     *     else
+     *         (void)SvAMAGIC_off(sv);
+     *
+     * Gv_AMupdate is undocumented.  It is extracted from the Gv_AMG macro,
+     * also undocumented, defined in sv.h:
+     *
+     *     #define Gv_AMG(stash)  (PL_amagic_generation && Gv_AMupdate(stash))
+     * 
+     * The purpose of the code is to turn on overloading for the class in
+     * question.  It seems that as soon as overloading is on for any class,
+     * anywhere, that PL_amagic_generation goes positive and stays positive,
+     * so that Gv_AMupdate gets called with every bless() invocation.  Since
+     * we need overloading for Doc and all its subclasses, we skip the check
+     * and just update every time.
+     */
+    stash = gv_stashpvn((char*)package_name, size, true);
+    Gv_AMupdate(stash);
+    SvAMAGIC_on(perl_obj);
+}
+
+void
 XSBind_allot_params(SV** stack, chy_i32_t start, chy_i32_t num_stack_elems, 
                     char* params_hash_name, ...)
 {

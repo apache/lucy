@@ -111,6 +111,11 @@ lucy_XSBind_perl_to_lucy(SV *sv);
 SV*
 lucy_XSBind_cb_to_sv(const lucy_CharBuf *cb);
 
+/** Turn on overloading for the supplied Perl object and its class.
+ */
+void
+lucy_XSBind_enable_overload(void *pobj);
+
 /** Process hash-style params passed to an XS subroutine.  The varargs must
  * come batched in groups of three: an SV**, the name of the parameter, and
  * length of the paramter name.  A NULL pointer terminates the list:
