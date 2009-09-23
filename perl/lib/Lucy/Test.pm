@@ -27,14 +27,18 @@ PPCODE:
     else if (strEQ(package, "TestHash")) {
         lucy_TestHash_run_tests();
     }
+    else if (strEQ(package, "TestNum")) {
+        lucy_TestNum_run_tests();
+    }
+    else if (strEQ(package, "TestVArray")) {
+        lucy_TestVArray_run_tests();
+    }
+    /* Lucy::Util */
     else if (strEQ(package, "TestNumberUtils")) {
         lucy_TestNumUtil_run_tests();
     }
     else if (strEQ(package, "TestStringHelper")) {
         lucy_TestStrHelp_run_tests();
-    }
-    else if (strEQ(package, "TestVArray")) {
-        lucy_TestVArray_run_tests();
     }
     else {
         THROW(LUCY_ERR, "Unknown test id: %s", package);
