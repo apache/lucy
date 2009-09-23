@@ -18,6 +18,9 @@ PPCODE:
     if (strEQ(package, "TestObj")) {
         lucy_TestObj_run_tests();
     }
+    else if (strEQ(package, "TestBitVector")) {
+        lucy_TestBitVector_run_tests();
+    }
     else if (strEQ(package, "TestCharBuf")) {
         lucy_TestCB_run_tests();
     }

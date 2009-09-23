@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Lucy/Object/Obj.h"
-/* #include "Lucy/Object/BitVector.h" */
+#include "Lucy/Object/BitVector.h"
 /* #include "Lucy/Object/ByteBuf.h" */
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
