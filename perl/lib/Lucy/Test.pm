@@ -37,6 +37,9 @@ PPCODE:
     else if (strEQ(package, "TestNumberUtils")) {
         lucy_TestNumUtil_run_tests();
     }
+    else if (strEQ(package, "TestPriorityQueue")) {
+        lucy_TestPriQ_run_tests();
+    }
     else if (strEQ(package, "TestStringHelper")) {
         lucy_TestStrHelp_run_tests();
     }
