@@ -33,6 +33,10 @@ PPCODE:
     else if (strEQ(package, "TestVArray")) {
         lucy_TestVArray_run_tests();
     }
+    /* Lucy::Store */
+    else if (strEQ(package, "TestFileHandle")) {
+        lucy_TestFH_run_tests();
+    }
     /* Lucy::Util */
     else if (strEQ(package, "TestNumberUtils")) {
         lucy_TestNumUtil_run_tests();
