@@ -245,7 +245,7 @@ CB_vcatf(CharBuf *self, const char *pattern, va_list args)
                 break;
 
                 case 'i': {
-                    u64_t val = 0;
+                    i64_t val = 0;
                     size_t size;
 
                     if (pattern[1] == '8') {
