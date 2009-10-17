@@ -146,9 +146,10 @@ lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable)
 {
     lucy_VTable *const my_vtable = *(lucy_VTable**)obj;
     if (my_vtable == vtable) {
-        Lucy_Obj_Dec_RefCount(obj);
-        LUCY_THROW(LUCY_ERR, "%o is an abstract class",
+        lucy_CharBuf *mess = LUCY_MAKE_MESS("%o is an abstract class",
             Lucy_Obj_Get_Class_Name(obj));
+        Lucy_Obj_Dec_RefCount(obj);
+        lucy_Err_throw_mess(LUCY_ERR, mess);
     }
 }
 
