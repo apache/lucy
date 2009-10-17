@@ -24,20 +24,13 @@ FH_init(FileHandle *self, const CharBuf *path, u32_t flags)
 void
 FH_destroy(FileHandle *self)
 {
-    bool_t success = FH_Close(self);
-    CharBuf *error  = NULL;
-    if (!success) {
-        error = CB_Clone(self->error);
-    }
-
-    /* Decrement count of FileHandle objects in existence. */
-    FH_object_count--;
-
+    FH_Close(self);
     DECREF(self->path);
     DECREF(self->error);
     SUPER_DESTROY(self, FILEHANDLE);
 
-    if (!success) { Err_throw_mess(ERR, error); }
+    /* Decrement count of FileHandle objects in existence. */
+    FH_object_count--;
 }
 
 void
