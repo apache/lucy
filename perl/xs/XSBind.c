@@ -124,11 +124,29 @@ XSBind_lucy_to_perl(lucy_Obj *obj)
     else if (Lucy_Obj_Is_A(obj, LUCY_CHARBUF)) {
         return XSBind_cb_to_sv((lucy_CharBuf*)obj);
     }
+    else if (Lucy_Obj_Is_A(obj, LUCY_BYTEBUF)) {
+        return XSBind_bb_to_sv((lucy_ByteBuf*)obj);
+    }
     else if (Lucy_Obj_Is_A(obj, LUCY_VARRAY)) {
         return S_lucy_array_to_perl_array((lucy_VArray*)obj);
     }
     else if (Lucy_Obj_Is_A(obj, LUCY_HASH)) {
         return S_lucy_hash_to_perl_hash((lucy_Hash*)obj);
+    }
+    else if (Lucy_Obj_Is_A(obj, LUCY_FLOATNUM)) {
+        return newSVnv(Lucy_Num_To_F64(obj));
+    }
+    else if (sizeof(IV) == 8 && Lucy_Obj_Is_A(obj, LUCY_INTNUM)) {
+        chy_i64_t num = Lucy_Num_To_I64(obj);
+        return newSViv((IV)num);
+    }
+    else if (sizeof(IV) == 4 && Lucy_Obj_Is_A(obj, LUCY_INTEGER32)) {
+        chy_i32_t num = (chy_i32_t)Lucy_Num_To_I64(obj);
+        return newSViv((IV)num);
+    }
+    else if (sizeof(IV) == 4 && Lucy_Obj_Is_A(obj, LUCY_INTEGER64)) {
+        chy_i64_t num = Lucy_Num_To_I64(obj);
+        return newSVnv((double)num); /* lossy */
     }
     else {
         return (SV*)Lucy_Obj_To_Host(obj);
@@ -178,6 +196,14 @@ XSBind_perl_to_lucy(SV *sv)
     }
 
     return retval;
+}
+
+SV*
+XSBind_bb_to_sv(const lucy_ByteBuf *bb) 
+{
+    return bb 
+        ? newSVpvn(Lucy_BB_Get_Buf(bb), Lucy_BB_Get_Size(bb)) 
+        : newSV(0);
 }
 
 SV*
@@ -367,7 +393,7 @@ XSBind_allot_params(SV** stack, chy_i32_t start, chy_i32_t num_stack_elems,
         for (i = num_stack_elems; i >= start + 2; i -= 2) {
             chy_i32_t tick = i - 2;
             SV *const key_sv = stack[tick];
-            if (SvCUR(key_sv) == label_len) {
+            if (SvCUR(key_sv) == (STRLEN)label_len) {
                 if (memcmp(SvPVX(key_sv), label, label_len) == 0) {
                     *target = stack[tick + 1];
                     args_left--;

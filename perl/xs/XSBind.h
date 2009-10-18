@@ -6,9 +6,11 @@
 
 #include "charmony.h"
 #include "Lucy/Object/Obj.h"
+#include "Lucy/Object/ByteBuf.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
+#include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Object/VTable.h"
 
@@ -106,6 +108,11 @@ lucy_XSBind_lucy_to_perl(lucy_Obj *obj);
 lucy_Obj*
 lucy_XSBind_perl_to_lucy(SV *sv);
 
+/** Convert a ByteBuf into a new string SV.
+ */
+SV*
+lucy_XSBind_bb_to_sv(const lucy_ByteBuf *bb);
+
 /** Convert a CharBuf into a new UTF-8 string SV.
  */
 SV*
@@ -156,6 +163,7 @@ lucy_XSBind_allot_params(SV** stack, chy_i32_t start,
 #define XSBind_lucy_obj_to_sv_noinc lucy_XSBind_lucy_obj_to_sv_noinc
 #define XSBind_lucy_to_perl         lucy_XSBind_lucy_to_perl
 #define XSBind_perl_to_lucy         lucy_XSBind_perl_to_lucy
+#define XSBind_bb_to_sv             lucy_XSBind_bb_to_sv
 #define XSBind_cb_to_sv             lucy_XSBind_cb_to_sv
 #define XSBind_enable_overload      lucy_XSBind_enable_overload
 #define XSBind_allot_params         lucy_XSBind_allot_params
