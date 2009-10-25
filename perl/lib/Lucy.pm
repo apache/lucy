@@ -13,6 +13,26 @@ BEGIN { XSLoader::load( 'Lucy', '0.01' ) }
 use Lucy::Autobinding;
 
 {
+    package Lucy::Util::ToolSet;
+    use Carp qw( carp croak cluck confess );
+    use Scalar::Util qw( blessed );
+    use Storable qw( nfreeze thaw );
+
+    BEGIN {
+        push our @ISA, 'Exporter';
+        our @EXPORT_OK = qw(
+            carp
+            croak
+            cluck
+            confess
+            blessed
+            nfreeze
+            thaw
+        );
+    }
+}
+
+{
     package Lucy::Object::Err;
     sub do_to_string { shift->to_string }
     use Carp qw( longmess );
