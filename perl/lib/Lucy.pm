@@ -12,6 +12,8 @@ BEGIN { XSLoader::load( 'Lucy', '0.01' ) }
 
 use Lucy::Autobinding;
 
+sub error {$Lucy::Object::Err::error}
+
 {
     package Lucy::Util::ToolSet;
     use Carp qw( carp croak cluck confess );
@@ -34,6 +36,8 @@ use Lucy::Autobinding;
 
 {
     package Lucy::Object::Err;
+    use Lucy::Util::ToolSet qw( blessed );
+
     sub do_to_string { shift->to_string }
     use Carp qw( longmess );
     use overload
@@ -45,6 +49,18 @@ use Lucy::Autobinding;
         $err->cat_mess( longmess() );
         die $err;
     }
+
+    our $error;
+    sub set_error {
+        my $val = $_[1];
+        if ( defined $val ) {
+            confess("Not a Lucy::Object::Err")
+                unless ( blessed($val)
+                && $val->isa("Lucy::Object::Err") );
+        }
+        $error = $val;
+    }
+    sub get_error {$error}
 }
 
 {

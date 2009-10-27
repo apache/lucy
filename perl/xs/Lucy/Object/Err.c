@@ -1,4 +1,22 @@
 #include "xs/XSBind.h"
+#include "Lucy/Object/Host.h"
+
+lucy_Err*
+lucy_Err_get_error()
+{
+    lucy_Err *error 
+        = (lucy_Err*)lucy_Host_callback_obj(LUCY_ERR, "get_error", 0);
+    LUCY_DECREF(error); /* Cancel out incref from callback. */
+    return error;
+}
+
+void
+lucy_Err_set_error(lucy_Err *error)
+{
+    lucy_Host_callback(LUCY_ERR, "set_error", 1, 
+        LUCY_ARG_OBJ("error", error));
+    LUCY_DECREF(error);
+}
 
 void
 lucy_Err_do_throw(lucy_Err *err)

@@ -27,26 +27,17 @@ S_new_filehandle()
     }   
     VTable_Override(vtable, S_no_op_method, Lucy_FH_Close_OFFSET);
     fh = (FileHandle*)VTable_Make_Obj(vtable);
-    return FH_init(fh, NULL, 0);
+    return FH_do_open(fh, NULL, 0);
 }
 
 void
 TestFH_run_tests()
 {
-    TestBatch     *batch  = Test_new_batch("TestFileHandle", 6, NULL);
+    TestBatch     *batch  = Test_new_batch("TestFileHandle", 2, NULL);
     FileHandle    *fh     = S_new_filehandle();
     ZombieCharBuf  foo    = ZCB_LITERAL("foo");
 
     PLAN(batch);
-
-    ASSERT_TRUE(batch, FH_Get_Error(fh) == NULL, "error starts off NULL");
-    FH_Set_Error(fh, (CharBuf*)&foo);
-    ASSERT_TRUE(batch, CB_Equals(FH_Get_Error(fh), (Obj*)&foo), "Set_Error");
-    FH_setf_error(fh, "Oops.");
-    ASSERT_TRUE(batch, CB_Equals_Str(FH_Get_Error(fh), "Oops.", 5),
-        "setf_error");
-    FH_Set_Error(fh, NULL);
-    ASSERT_TRUE(batch, FH_Get_Error(fh) == NULL, "Set_Error to NULL");
 
     ASSERT_TRUE(batch, CB_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
     FH_Set_Path(fh, (CharBuf*)&foo);

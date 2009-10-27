@@ -8,10 +8,9 @@
 i32_t FH_object_count = 0;
 
 FileHandle*
-FH_init(FileHandle *self, const CharBuf *path, u32_t flags)
+FH_do_open(FileHandle *self, const CharBuf *path, u32_t flags)
 {
     self->path    = path ? CB_Clone(path) : CB_new(0);
-    self->error   = NULL;
     self->flags   = flags;
 
     /* Track number of live FileHandles released into the wild. */
@@ -26,18 +25,18 @@ FH_destroy(FileHandle *self)
 {
     FH_Close(self);
     DECREF(self->path);
-    DECREF(self->error);
     SUPER_DESTROY(self, FILEHANDLE);
 
     /* Decrement count of FileHandle objects in existence. */
     FH_object_count--;
 }
 
-void
+bool_t
 FH_grow(FileHandle *self, i64_t length)
 {
     UNUSED_VAR(self);
     UNUSED_VAR(length);
+    return true;
 }
 
 void
@@ -48,32 +47,6 @@ FH_set_path(FileHandle *self, const CharBuf *path)
 
 CharBuf*
 FH_get_path(FileHandle *self) { return self->path; }
-CharBuf*
-FH_get_error(FileHandle *self) { return self->error; }
-
-void
-FH_set_error(FileHandle *self, CharBuf *error)
-{
-    DECREF(self->error);
-    self->error = error ? CB_Clone(error) : NULL;
-}
-
-void
-FH_setf_error(void *vself, const char *pattern, ...)
-{
-    va_list args;
-    va_start(args, pattern);
-    FH_VSetF_Error(vself, pattern, args);
-    va_end(args);
-}
-
-void
-FH_vsetf_error(FileHandle *self, const char *pattern, va_list args)
-{
-    DECREF(self->error);
-    self->error = CB_new(50);
-    CB_VCatF(self->error, pattern, args);
-}
 
 /* Copyright 2009 The Apache Software Foundation
  *

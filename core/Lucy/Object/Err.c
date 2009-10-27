@@ -141,6 +141,25 @@ CharBuf*
 Err_get_mess(Err *self) { return self->mess; }
 
 void
+Err_add_frame(Err *self, const char *file, int line, const char *func)
+{
+    if (func != NULL) {
+        CB_catf(self->mess, ",\n\t %s at %s line %i32\n", func, file, 
+            (i32_t)line);
+    }
+    else {
+        CB_catf(self->mess, "\n\tat %s line %i32\n", file, (i32_t)line);
+    }
+}
+
+void
+Err_rethrow(Err *self, const char *file, int line, const char *func)
+{
+    Err_add_frame(self, file, line, func);
+    Err_do_throw(self);
+}
+
+void
 lucy_Err_throw_at(VTable *vtable, const char *file, int line,
                   const char *func, const char *pattern, ...)
 {

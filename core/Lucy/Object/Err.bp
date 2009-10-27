@@ -10,8 +10,12 @@ parcel Lucy;
  * At present, it is only safe to catch exceptions which are specifically
  * documented as catchable; most times when an Err is raised, Lucy leaks
  * memory.
+ *
+ * The Err module also provides access to a per-thread Err shared variable via
+ * set_error() and get_error().  It may be used to store an Err object
+ * temporarily, so that calling code may choose how to handle a particular
+ * error condition.
  */
-
 class Lucy::Object::Err extends Lucy::Object::Obj {
 
     CharBuf *mess;
@@ -39,8 +43,23 @@ class Lucy::Object::Err extends Lucy::Object::Obj {
     public CharBuf*
     Get_Mess(Err *self);
 
+    /** Add information about the current stack frame onto <code>mess</code>.
+     */
+    void
+    Add_Frame(Err *self, const char *file, int line, const char *func);
+
     public incremented Err*
     Make(Err *self);
+
+    /** Set the value of "error", a per-thread Err shared variable. 
+     */
+    public inert void
+    set_error(decremented Err *error);
+
+    /** Retrieve per-thread Err shared variable "error".
+     */
+    public inert Err*
+    get_error();
 
     /** Print an error message to stderr with some C contextual information.
      * Usually invoked via the WARN(pattern, ...) macro.
@@ -54,6 +73,11 @@ class Lucy::Object::Err extends Lucy::Object::Obj {
     inert void
     throw_at(VTable *vtable, const char *file, int line, const char *func,
                const char *pattern, ...);
+
+    /** Throw an existing exception after tacking on additional context data.
+     */
+    inert void
+    rethrow(Err *error, const char *file, int line, const char *func);
 
     /** Raise an exception.  Clean up the supplied message by decrementing its
      * refcount.
@@ -105,6 +129,14 @@ __C__
 #else
  #define LUCY_ERR_FUNC_MACRO NULL
 #endif
+
+#define LUCY_ERR_ADD_FRAME(_error) \
+    Lucy_Err_Add_Frame(_error, __FILE__, __LINE__, \
+        LUCY_ERR_FUNC_MACRO)
+
+#define LUCY_RETHROW(_error) \
+    lucy_Err_rethrow((lucy_Err*)_error, __FILE__, __LINE__, \
+        LUCY_ERR_FUNC_MACRO)
 
 /* Macro version of lucy_Err_throw_at which inserts contextual information
  * automatically, provided that the compiler supports the necessary features.
@@ -158,8 +190,10 @@ lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable)
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define THROW                 LUCY_THROW
+  #define RETHROW               LUCY_RETHROW
   #define WARN                  LUCY_WARN
   #define MAKE_MESS             LUCY_MAKE_MESS
+  #define ERR_ADD_FRAME         LUCY_ERR_ADD_FRAME
   #define ERR_FUNC_MACRO        LUCY_ERR_FUNC_MACRO
   #define ASSERT_IS_A           LUCY_ASSERT_IS_A
   #define ABSTRACT_CLASS_CHECK  LUCY_ABSTRACT_CLASS_CHECK
