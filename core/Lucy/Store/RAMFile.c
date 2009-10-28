@@ -22,6 +22,7 @@ void
 RAMFile_destroy(RAMFile *self)
 {
     DECREF(self->contents);
+    SUPER_DESTROY(self, RAMFILE);
 }
 
 ByteBuf*

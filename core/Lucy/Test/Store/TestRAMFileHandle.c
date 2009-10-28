@@ -143,6 +143,7 @@ test_Window(TestBatch *batch)
     ASSERT_TRUE(batch, window->offset == 0, "Release_Window() resets offset");
     ASSERT_TRUE(batch, window->len == 0, "Release_Window() resets len");
 
+    DECREF(window);
     DECREF(fh);
     DECREF(file);
 }
