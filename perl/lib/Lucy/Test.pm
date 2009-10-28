@@ -40,6 +40,9 @@ PPCODE:
     else if (strEQ(package, "TestFileHandle")) {
         lucy_TestFH_run_tests();
     }
+    else if (strEQ(package, "TestRAMFileHandle")) {
+        lucy_TestRAMFH_run_tests();
+    }
     /* Lucy::Util */
     else if (strEQ(package, "TestNumberUtils")) {
         lucy_TestNumUtil_run_tests();
