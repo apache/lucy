@@ -40,6 +40,15 @@ PPCODE:
     else if (strEQ(package, "TestFileHandle")) {
         lucy_TestFH_run_tests();
     }
+    else if (strEQ(package, "TestInStream")) {
+        lucy_TestInStream_run_tests();
+    }
+    else if (strEQ(package, "TestIOChunks")) {
+        lucy_TestIOChunks_run_tests();
+    }
+    else if (strEQ(package, "TestIOPrimitives")) {
+        lucy_TestIOPrimitives_run_tests();
+    }
     else if (strEQ(package, "TestRAMFileHandle")) {
         lucy_TestRAMFH_run_tests();
     }
