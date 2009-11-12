@@ -58,7 +58,7 @@ test_Store_Fetch(TestBatch *batch)
     ASSERT_TRUE(batch, VA_Fetch(array, 2) == NULL, "Fetch beyond end");
 
     VA_Store(array, 2, (Obj*)CB_newf("foo"));
-    elem = (CharBuf*)ASSERT_IS_A(VA_Fetch(array, 2), CHARBUF);
+    elem = (CharBuf*)CERTIFY(VA_Fetch(array, 2), CHARBUF);
     ASSERT_INT_EQ(batch, 3, VA_Get_Size(array), "Store updates size");
     ASSERT_TRUE(batch, CB_Equals_Str(elem, "foo", 3), "Store");
 
@@ -69,7 +69,7 @@ test_Store_Fetch(TestBatch *batch)
     ASSERT_INT_EQ(batch, 1, CB_Get_RefCount(elem), 
         "Displacing elem via Store updates refcount");
     DECREF(elem);
-    elem = (CharBuf*)ASSERT_IS_A(VA_Fetch(array, 2), CHARBUF);
+    elem = (CharBuf*)CERTIFY(VA_Fetch(array, 2), CHARBUF);
     ASSERT_TRUE(batch, CB_Equals_Str(elem, "bar", 3), "Store displacement");
 
     DECREF(array);
@@ -87,20 +87,20 @@ test_Push_Pop_Shift_Unshift(TestBatch *batch)
     VA_Push(array, (Obj*)CB_newf("c"));
 
     ASSERT_INT_EQ(batch, VA_Get_Size(array), 3, "size after Push");
-    ASSERT_TRUE(batch, NULL != ASSERT_IS_A(VA_Fetch(array, 2), CHARBUF), "Push");
+    ASSERT_TRUE(batch, NULL != DOWNCAST(VA_Fetch(array, 2), CHARBUF), "Push");
 
-    elem = (CharBuf*)ASSERT_IS_A(VA_Shift(array), CHARBUF);
+    elem = (CharBuf*)CERTIFY(VA_Shift(array), CHARBUF);
     ASSERT_TRUE(batch, CB_Equals_Str(elem, "a", 1), "Shift");
     ASSERT_INT_EQ(batch, VA_Get_Size(array), 2, "size after Shift");
     DECREF(elem);
 
-    elem = (CharBuf*)ASSERT_IS_A(VA_Pop(array), CHARBUF);
+    elem = (CharBuf*)CERTIFY(VA_Pop(array), CHARBUF);
     ASSERT_TRUE(batch, CB_Equals_Str(elem, "c", 1), "Pop");
     ASSERT_INT_EQ(batch, VA_Get_Size(array), 1, "size after Pop");
     DECREF(elem);
 
     VA_Unshift(array, (Obj*)CB_newf("foo"));
-    elem = (CharBuf*)ASSERT_IS_A(VA_Fetch(array, 0), CHARBUF);
+    elem = (CharBuf*)CERTIFY(VA_Fetch(array, 0), CHARBUF);
     ASSERT_TRUE(batch, CB_Equals_Str(elem, "foo", 3), "Unshift");
     ASSERT_INT_EQ(batch, VA_Get_Size(array), 2, "size after Shift");
 

@@ -108,14 +108,23 @@ class Lucy::Object::Err extends Lucy::Object::Obj {
     make_mess(const char *file, int line, const char *func,
               const char *pattern, ...);
 
-    /** Test that <code>obj</code> belongs to the class represented by
-     * <code>vtable</code>, and throw an error if it's not.
+    /** Verify that <code>obj</code> is either NULL or inherits from
+     * the class represented by <code>vtable</code>.
      * 
      * @return the object.
      */
     inert Obj*
-    assert_is_a(Obj *obj, VTable *vtable, const char *file, int line, 
+    downcast(Obj *obj, VTable *vtable, const char *file, int line, 
                 const char *func);
+
+    /** Verify that <code>obj</code> is not NULL and inherits from the class
+     * represented by <code>vtable</code>.
+     * 
+     * @return the object.
+     */
+    inert Obj*
+    certify(Obj *obj, VTable *vtable, const char *file, int line, 
+            const char *func);
 
     /** Verify that an object belongs to a subclass and not an abstract class.
      */
@@ -169,8 +178,13 @@ __C__
   LUCY_MAKE_MESS(char* format, ...);
 #endif
 
-#define LUCY_ASSERT_IS_A(_obj, _vtable) \
-    lucy_Err_assert_is_a((lucy_Obj*)_obj, (_vtable), \
+#define LUCY_DOWNCAST(_obj, _vtable) \
+    lucy_Err_downcast((lucy_Obj*)(_obj), (_vtable), \
+        __FILE__, __LINE__, LUCY_ERR_FUNC_MACRO)
+
+
+#define LUCY_CERTIFY(_obj, _vtable) \
+    lucy_Err_certify((lucy_Obj*)(_obj), (_vtable), \
         __FILE__, __LINE__, LUCY_ERR_FUNC_MACRO)
 
 static CHY_INLINE void
@@ -195,7 +209,8 @@ lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable)
   #define MAKE_MESS             LUCY_MAKE_MESS
   #define ERR_ADD_FRAME         LUCY_ERR_ADD_FRAME
   #define ERR_FUNC_MACRO        LUCY_ERR_FUNC_MACRO
-  #define ASSERT_IS_A           LUCY_ASSERT_IS_A
+  #define DOWNCAST              LUCY_DOWNCAST
+  #define CERTIFY               LUCY_CERTIFY
   #define ABSTRACT_CLASS_CHECK  LUCY_ABSTRACT_CLASS_CHECK
 #endif
 __END_C__

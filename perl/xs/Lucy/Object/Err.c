@@ -48,8 +48,8 @@ void
 lucy_Err_throw_mess(lucy_VTable *vtable, lucy_CharBuf *message) 
 {
     lucy_Err_make_t make = (lucy_Err_make_t)LUCY_METHOD(
-        LUCY_ASSERT_IS_A(vtable, LUCY_VTABLE), Err, Make);
-    lucy_Err *err = (lucy_Err*)LUCY_ASSERT_IS_A(make(NULL), LUCY_ERR);
+        LUCY_CERTIFY(vtable, LUCY_VTABLE), Err, Make);
+    lucy_Err *err = (lucy_Err*)LUCY_CERTIFY(make(NULL), LUCY_ERR);
     Lucy_Err_Cat_Mess(err, message);
     LUCY_DECREF(message);
     lucy_Err_do_throw(err);

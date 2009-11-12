@@ -101,7 +101,7 @@ BitVec_get_capacity(BitVector *self) { return self->cap; }
 void
 BitVec_mimic(BitVector *self, Obj *other)
 {
-    BitVector *evil_twin = (BitVector*)ASSERT_IS_A(other, BITVECTOR);
+    BitVector *evil_twin = (BitVector*)CERTIFY(other, BITVECTOR);
     const u32_t my_byte_size    = (u32_t)ceil(self->cap / 8.0);
     const u32_t evil_twin_byte_size = (u32_t)ceil(evil_twin->cap / 8.0);
     if (my_byte_size > evil_twin_byte_size) {

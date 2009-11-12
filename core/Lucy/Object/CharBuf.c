@@ -450,7 +450,7 @@ CB_clone(CharBuf *self)
 CharBuf*
 CB_load(CharBuf *self, Obj *dump)
 {
-    CharBuf *source = (CharBuf*)ASSERT_IS_A(dump, CHARBUF);
+    CharBuf *source = (CharBuf*)CERTIFY(dump, CHARBUF);
     UNUSED_VAR(self);
     return CB_Clone(source);
 }
@@ -469,7 +469,7 @@ CB_mimic_str(CharBuf *self, const char* ptr, size_t size)
 void
 CB_mimic(CharBuf *self, Obj *other)
 {
-    CharBuf *evil_twin = (CharBuf*)ASSERT_IS_A(other, CHARBUF);
+    CharBuf *evil_twin = (CharBuf*)CERTIFY(other, CHARBUF);
     SI_maybe_grow(self, evil_twin->size);
     memmove(self->ptr, evil_twin->ptr, evil_twin->size);
     self->size = evil_twin->size;

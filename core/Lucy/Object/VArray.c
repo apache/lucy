@@ -70,7 +70,7 @@ VA_dump(VArray *self)
 VArray*
 VA_load(VArray *self, Obj *dump)
 {
-    VArray *source = (VArray*)ASSERT_IS_A(dump, VARRAY);
+    VArray *source = (VArray*)CERTIFY(dump, VARRAY);
     VArray *loaded = VA_new(source->size);
     u32_t i, max;
     UNUSED_VAR(self);

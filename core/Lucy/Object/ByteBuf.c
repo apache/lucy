@@ -143,7 +143,7 @@ BB_mimic_bytes(ByteBuf *self, const void *bytes, size_t size)
 void
 BB_mimic(ByteBuf *self, Obj *other)
 {
-    ByteBuf *evil_twin = (ByteBuf*)ASSERT_IS_A(other, BYTEBUF);
+    ByteBuf *evil_twin = (ByteBuf*)CERTIFY(other, BYTEBUF);
     SI_mimic_bytes(self, evil_twin->buf, evil_twin->size);
 }
 

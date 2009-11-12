@@ -34,7 +34,7 @@ Num_equals(Num *self, Obj *other)
 i32_t
 Num_compare_to(Num *self, Obj *other)
 {
-    Num *evil_twin = (Num*)ASSERT_IS_A(other, NUM);
+    Num *evil_twin = (Num*)CERTIFY(other, NUM);
     double f64_diff = Num_To_F64(self) - Num_To_F64(evil_twin);
     if (f64_diff) {
         if      (f64_diff < 0) { return -1; }

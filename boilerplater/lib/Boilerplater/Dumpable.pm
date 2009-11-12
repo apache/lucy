@@ -167,7 +167,7 @@ sub _add_load_method {
 lucy_Obj*
 $full_func_sym($full_struct *self, lucy_Obj *dump)
 {
-    lucy_Hash *source = (lucy_Hash*)LUCY_ASSERT_IS_A(dump, LUCY_HASH);
+    lucy_Hash *source = (lucy_Hash*)LUCY_CERTIFY(dump, LUCY_HASH);
     $full_struct *loaded 
         = ($full_struct*)$super_load(($super_type*)self, dump);
     CHY_UNUSED_VAR(self);
@@ -179,8 +179,8 @@ END_STUFF
 lucy_Obj*
 $full_func_sym($full_struct *self, lucy_Obj *dump)
 {
-    lucy_Hash *source = (lucy_Hash*)LUCY_ASSERT_IS_A(dump, LUCY_HASH);
-    lucy_CharBuf *class_name = (lucy_CharBuf*)LUCY_ASSERT_IS_A(
+    lucy_Hash *source = (lucy_Hash*)LUCY_CERTIFY(dump, LUCY_HASH);
+    lucy_CharBuf *class_name = (lucy_CharBuf*)LUCY_CERTIFY(
         Lucy_Hash_Fetch_Str(source, "_class", 6), LUCY_CHARBUF);
     lucy_VTable *vtable = lucy_VTable_singleton(class_name, NULL);
     $full_struct *loaded = ($full_struct*)Lucy_VTable_Make_Obj(vtable);
@@ -210,7 +210,7 @@ sub _process_load_member {
         = $type->is_integer  ? qq|($type_str)Lucy_Obj_To_I64(var)|
         : $type->is_floating ? qq|($type_str)Lucy_Obj_To_F64(var)|
         : $type->is_object
-        ? qq|($struct_sym*)LUCY_ASSERT_IS_A(Lucy_Obj_Load(var, var), $vtable_var)|
+        ? qq|($struct_sym*)LUCY_CERTIFY(Lucy_Obj_Load(var, var), $vtable_var)|
         : confess( "Don't know how to load " . $type->get_specifier );
     return <<END_STUFF;
     {

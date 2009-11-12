@@ -59,8 +59,8 @@ THROW(VTable *vtable, char *pattern, ...)
 {
     va_list args;
     Err_make_t make 
-        = (Err_make_t)METHOD(ASSERT_IS_A(vtable, VTABLE), Err, Make);
-    Err *err = ASSERT_IS_A(make(NULL), ERR);
+        = (Err_make_t)METHOD(CERTIVY(vtable, VTABLE), Err, Make);
+    Err *err = (Err*)CERTIFY(make(NULL), ERR);
     CharBuf *mess = Err_Get_Mess(err);
 
     va_start(args, pattern);
@@ -165,8 +165,8 @@ lucy_Err_throw_at(VTable *vtable, const char *file, int line,
 {
     va_list args;
     Err_make_t make 
-        = (Err_make_t)METHOD(ASSERT_IS_A(vtable, VTABLE), Err, Make);
-    Err *err = (Err*)ASSERT_IS_A(make(NULL), ERR);
+        = (Err_make_t)METHOD(CERTIFY(vtable, VTABLE), Err, Make);
+    Err *err = (Err*)CERTIFY(make(NULL), ERR);
     CharBuf *mess = Err_Get_Mess(err);
 
     va_start(args, pattern);
@@ -192,7 +192,18 @@ SI_obj_is_a(Obj *obj, VTable *target_vtable)
 }
 
 Obj*
-lucy_Err_assert_is_a(Obj *obj, VTable *vtable, const char *file, int line, 
+lucy_Err_downcast(Obj *obj, VTable *vtable, const char *file, int line, 
+                 const char *func)
+{
+    if (obj && !SI_obj_is_a(obj, vtable)) {
+        Err_throw_at(ERR, file, line, func, "Can't downcast from %o to %o", 
+            Obj_Get_Class_Name(obj), VTable_Get_Name(vtable));
+    }
+    return obj;
+}
+
+Obj*
+lucy_Err_certify(Obj *obj, VTable *vtable, const char *file, int line, 
                       const char *func)
 {
     if (!obj) {
@@ -200,8 +211,8 @@ lucy_Err_assert_is_a(Obj *obj, VTable *vtable, const char *file, int line,
             VTable_Get_Name(vtable));
     }
     else if ( !SI_obj_is_a(obj, vtable) ) {
-        Err_throw_at(ERR, file, line, func, "Object isn't a %o, it's a %o",
-            VTable_Get_Name(vtable), Obj_Get_Class_Name(obj));
+        Err_throw_at(ERR, file, line, func, "Can't downcast from %o to %o", 
+            Obj_Get_Class_Name(obj), VTable_Get_Name(vtable));
     }
     return obj;
 }

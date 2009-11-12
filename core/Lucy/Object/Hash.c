@@ -96,7 +96,7 @@ Hash_dump(Hash *self)
     while (Hash_Iter_Next(self, &key, &value)) {
         /* Since JSON only supports text hash keys, Dump() can only support
          * text hash keys. */
-        ASSERT_IS_A(key, CHARBUF);
+        CERTIFY(key, CHARBUF);
         Hash_Store(dump, key, Obj_Dump(value));
     }
 
@@ -106,7 +106,7 @@ Hash_dump(Hash *self)
 Obj*
 Hash_load(Hash *self, Obj *dump)
 {
-    Hash *source = (Hash*)ASSERT_IS_A(dump, HASH);
+    Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
     UNUSED_VAR(self);
 
