@@ -188,7 +188,7 @@ add_inc_dir(Compiler *self, const char *dir)
     /* count up the present number of dirs, reallocate */
     while (*dirs++ != NULL) { num_dirs++; }
     num_dirs += 1; /* passed-in dir */
-    self->inc_dirs = realloc(self->inc_dirs, num_dirs + 1);
+    self->inc_dirs = realloc(self->inc_dirs, (num_dirs + 1)*sizeof(char*));
 
     /* put the passed-in dir at the end of the list */
     self->inc_dirs[num_dirs - 1] = strdup(dir);
