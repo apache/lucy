@@ -53,6 +53,9 @@ PPCODE:
         lucy_TestRAMFH_run_tests();
     }
     /* Lucy::Util */
+    else if (strEQ(package, "TestIndexFileNames")) {
+        lucy_TestIxFileNames_run_tests();
+    }
     else if (strEQ(package, "TestNumberUtils")) {
         lucy_TestNumUtil_run_tests();
     }
