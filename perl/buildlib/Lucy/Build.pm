@@ -101,7 +101,7 @@ sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
 sub ACTION_metaquote {
     my $self          = shift;
     my $charm_src_dir = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
-    my $orig_files    = $self->rscan_dir( $charm_src_dir, qr/\.c?harm$/ );
+    my $orig_files    = $self->rscan_dir( $charm_src_dir, qr/\.[ch]$/ );
     my $dest_files    = $self->rscan_dir( $CHARMONIZER_GEN_DIR, qr/\.[ch]$/ );
     push @$dest_files, $CHARMONIZER_GEN_DIR;
     if ( !$self->up_to_date( $orig_files, $dest_files ) ) {

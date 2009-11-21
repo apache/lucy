@@ -19,7 +19,7 @@ $charm_src ||= File::Spec->rel2abs('src');
 
 # Validate Charmonizer source dir.
 my $probe_path
-    = File::Spec->catfile( $charm_src, 'Charmonizer', 'Probe.harm' );
+    = File::Spec->catfile( $charm_src, 'Charmonizer', 'Probe.h' );
 die("Can't find Charmonizer source tree -- was 'src' specified correctly?")
     unless -e $probe_path;
 
@@ -27,12 +27,12 @@ die("Can't find Charmonizer source tree -- was 'src' specified correctly?")
 die "Must specify output directory" unless defined $outdir;
 mkpath($outdir)                     unless -d $outdir;
 
-# Accumulate list of .harm/.charm files.
+# Accumulate list of .h/.c files.
 my @charm_files;
 find(
     {   wanted => sub {
             my $name = $File::Find::name;
-            return unless $name =~ s/.*?(Charmonizer.+\.c?harm$)/$1/;
+            return unless $name =~ s/.*?(Charmonizer.+\.[ch]$)/$1/;
             push @charm_files, $name;
         },
         no_chdir => 1,
@@ -44,8 +44,7 @@ find(
 process_file($_) for @charm_files;
 exit;
 
-# Transfer a Charmonizer source file to the destination, transforming it from
-# a .charm/.harm to a .c/.h and replacing all metaquotes.
+# Transfer a Charmonizer source file to the destination, replacing all metaquotes.
 sub process_file {
     my $rel_path = shift;
     return if $done{$rel_path};
@@ -54,7 +53,6 @@ sub process_file {
     my $content  = slurp_file($src_path);
     $content = replace_metaquotes($content);
     my $dest_path = File::Spec->catfile( $outdir, $rel_path );
-    $dest_path =~ s/(\.[ch])[^.]+$/$1/ or die "No match";
 
     # Don't generate new file if current.
     my $stat_orig = stat($src_path);
@@ -114,9 +112,8 @@ metaquote - Translate Charmonizer modules to C.
 
 =head1 DESCRIPTION
 
-The C<metaquote> utility processes a directory of Charmonizer .harm/.charm
-source files, replacing METAQUOTE-delimited text with legal C double-quoted
-text and generating .h/.c files.
+The C<metaquote> utility processes a directory of Charmonizer source files,
+replacing METAQUOTE-delimited text with legal C double-quoted text.
 
 =head1 ARGUMENTS
 
