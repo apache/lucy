@@ -26,24 +26,24 @@ static Header **header_cache   = NULL;
 /* Comparison function to feed to qsort, bsearch, etc.
  */
 static int
-compare_headers(const void *vptr_a, const void *vptr_b);
+S_compare_headers(const void *vptr_a, const void *vptr_b);
 
 /* Run a test compilation and return a new Header object encapsulating the
  * results.
  */
 static Header* 
-discover_header(const char *header_name);
+S_discover_header(const char *header_name);
 
 /* Extend the cache, add this Header object to it, and sort.
  */
 static void
-add_to_cache(Header *header);
+S_add_to_cache(Header *header);
 
 /* Like add_to_cache, but takes a individual elements instead of a Header* and
  * checks if header exists in array first.
  */
 static void
-maybe_add_to_cache(const char *header_name, chaz_bool_t exists);
+S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists);
 
 void
 chaz_HeadCheck_init()
@@ -70,12 +70,12 @@ chaz_HeadCheck_check_header(const char *header_name)
     key.name = (char*)header_name;
     key.exists = false;
     header_ptr = bsearch(&fake, header_cache, cache_size, sizeof(void*),
-        compare_headers);
+        S_compare_headers);
     
     /* if it's not there, go try a test compile */
     if (header_ptr == NULL) {
-        header = discover_header(header_name);
-        add_to_cache(header);
+        header = S_discover_header(header_name);
+        S_add_to_cache(header);
     }
     else {
         header = *header_ptr;
@@ -102,7 +102,7 @@ chaz_HeadCheck_check_many_headers(const char **header_names)
     success = test_compile(code_buf, strlen(code_buf));
     if (success) {
         for (i = 0; header_names[i] != NULL; i++) {
-            maybe_add_to_cache(header_names[i], true);
+            S_maybe_add_to_cache(header_names[i], true);
         }
     }
 
@@ -131,7 +131,7 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
 }
 
 static int
-compare_headers(const void *vptr_a, const void *vptr_b) {
+S_compare_headers(const void *vptr_a, const void *vptr_b) {
     Header **const a = (Header**)vptr_a;
     Header **const b = (Header**)vptr_b;
 
@@ -144,7 +144,7 @@ compare_headers(const void *vptr_a, const void *vptr_b) {
 }
 
 static Header* 
-discover_header(const char *header_name) {
+S_discover_header(const char *header_name) {
     Header* header = (Header*)malloc(sizeof(Header));
     
     /* assign */
@@ -160,7 +160,7 @@ discover_header(const char *header_name) {
 }
 
 static void
-add_to_cache(Header *header)
+S_add_to_cache(Header *header)
 {
     /* realloc array -- inefficient, but this isn't a bottleneck */
     cache_size++;
@@ -168,11 +168,11 @@ add_to_cache(Header *header)
     header_cache[ cache_size - 1 ] = header;
 
     /* keep the list of headers sorted */
-    qsort(header_cache, cache_size, sizeof(*header_cache), compare_headers);
+    qsort(header_cache, cache_size, sizeof(*header_cache), S_compare_headers);
 }
 
 static void
-maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
+S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
 {
     Header *header;
     Header  key;
@@ -182,14 +182,14 @@ maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
     key.name   = (char*)header_name;
     key.exists = exists;
     header = bsearch(&fake, header_cache, cache_size, sizeof(void*),
-        compare_headers);
+        S_compare_headers);
     
     /* we've already done the test compile, so skip that step and add it */
     if (header == NULL) {
         header = (Header*)malloc(sizeof(Header));
         header->name   = strdup(header_name);
         header->exists = exists;
-        add_to_cache(header);
+        S_add_to_cache(header);
     }
 }
 

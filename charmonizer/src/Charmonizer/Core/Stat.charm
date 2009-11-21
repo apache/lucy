@@ -16,7 +16,7 @@ static chaz_bool_t stat_available = false;
 
 /* lazily compile _charm_stat */
 static void
-init();
+S_init();
 
 void
 chaz_Stat_stat(const char *filepath, chaz_Stat *target)
@@ -29,7 +29,7 @@ chaz_Stat_stat(const char *filepath, chaz_Stat *target)
 
     /* lazy init */
     if (!initialized)
-        init();
+        S_init();
 
     /* bail out if we didn't succeed in compiling/using _charm_stat */
     if (!stat_available)
@@ -70,7 +70,7 @@ static char charm_stat_code[] = METAQUOTE
 METAQUOTE;
 
 static void
-init()
+S_init()
 {
     /* only try this once */
     initialized = true;

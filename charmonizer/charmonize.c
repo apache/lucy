@@ -29,18 +29,18 @@ init(int argc, char **argv);
  * them as a newly allocated substring.
  */
 static char*
-extract_delim(char *source, size_t source_len, const char *tag_name);
+S_extract_delim(char *source, size_t source_len, const char *tag_name);
 
 /* Version of extract delim which dies rather than returns NULL upon failure.
  */
 static char*
-extract_delim_and_verify(char *source, size_t source_len, 
-                         const char *tag_name);
+S_extract_delim_and_verify(char *source, size_t source_len, 
+                           const char *tag_name);
 
 /* Write some stuff to the end of charmony.h
  */
 static void
-write_charmony_postamble(void);
+S_write_charmony_postamble(void);
 
 /* Print a message to stderr and exit.
  */
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     chaz_VariadicMacros_run();
 
     /* write custom postamble */
-    write_charmony_postamble();
+    S_write_charmony_postamble();
 
     /* clean up */
     chaz_Probe_clean_up();
@@ -84,13 +84,13 @@ init(int argc, char **argv)
     if (argc != 2)
         die("Usage: ./charmonize INFILE");
     infile_str = chaz_Probe_slurp_file(argv[1], &infile_len);
-    cc_command = extract_delim_and_verify(infile_str, infile_len, 
+    cc_command = S_extract_delim_and_verify(infile_str, infile_len, 
         "charm_cc_command");
-    cc_flags = extract_delim_and_verify(infile_str, infile_len, 
+    cc_flags = S_extract_delim_and_verify(infile_str, infile_len, 
         "charm_cc_flags");
-    os_name = extract_delim_and_verify(infile_str, infile_len, 
+    os_name = S_extract_delim_and_verify(infile_str, infile_len, 
         "charm_os_name");
-    verbosity_str = extract_delim(infile_str, infile_len, "charm_verbosity");
+    verbosity_str = S_extract_delim(infile_str, infile_len, "charm_verbosity");
 
     /* set up Charmonizer */
     if (verbosity_str != NULL) {
@@ -104,7 +104,7 @@ init(int argc, char **argv)
 }
 
 static char*
-extract_delim(char *source, size_t source_len, const char *tag_name)
+S_extract_delim(char *source, size_t source_len, const char *tag_name)
 {
     const size_t tag_name_len = strlen(tag_name);
     const size_t opening_delim_len = tag_name_len + 2;
@@ -144,16 +144,17 @@ extract_delim(char *source, size_t source_len, const char *tag_name)
 }
 
 static char*
-extract_delim_and_verify(char *source, size_t source_len, const char *tag_name)
+S_extract_delim_and_verify(char *source, size_t source_len, 
+                           const char *tag_name)
 {
-    char *retval = extract_delim(source, source_len, tag_name);
+    char *retval = S_extract_delim(source, source_len, tag_name);
     if (retval == NULL)
         die("Couldn't extract value for '%s'", tag_name);
     return retval;
 }
 
 static void
-write_charmony_postamble(void)
+S_write_charmony_postamble(void)
 {
     if (chaz_HeadCheck_check_header("sys/mman.h")) {
         chaz_ModHand_append_conf("#define CHY_HAS_SYS_MMAN_H\n\n");
@@ -172,7 +173,7 @@ die(char* format, ...)
 }
 
 /**
- * Copyright 2006 The Apache Software Foundation
+ * Copyright 2006-2009 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

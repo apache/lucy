@@ -39,7 +39,7 @@ static char inline_code[] = METAQUOTE
 METAQUOTE;
 
 static char*
-try_inline(const char *keyword, size_t *output_len) {
+S_try_inline(const char *keyword, size_t *output_len) {
     char code[ sizeof(inline_code) + 30 ];
     sprintf(code, inline_code, keyword);
     return capture_output(code, strlen(code), output_len);
@@ -107,7 +107,7 @@ chaz_FuncMacro_run(void)
     
     for (i = 0; i < num_inline_options; i++) {
         const char *inline_option = inline_options[i];
-        output = try_inline(inline_option, &output_len);
+        output = S_try_inline(inline_option, &output_len);
         if (output != NULL) {
             has_inline = true;
             append_conf("#define CHY_INLINE %s\n", inline_option);

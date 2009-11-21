@@ -12,7 +12,7 @@ chaz_TFuncMacro_prepare()
 }
 
 #ifdef INLINE
-static INLINE char* inline_function()
+static INLINE char* S_inline_function()
 {
     return "inline works";
 }
@@ -44,7 +44,7 @@ chaz_TFuncMacro_run(TestBatch *batch)
 #endif
 
 #ifdef INLINE
-    PASS(batch, inline_function());
+    PASS(batch, S_inline_function());
 #else
     SKIP(batch, "no INLINE functions");
 #endif

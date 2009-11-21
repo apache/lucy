@@ -13,18 +13,18 @@
 /* Write the "_charm.h" file used by every probe.
  */
 static void
-write_charm_h();
+S_write_charm_h();
 
 /* Compile a small wrapper application which is used to redirect error output
  * to devnull.
  */
 static void
-build_charm_run();
+S_build_charm_run();
 
 /* Clean up the files associated with capture_output().
  */
 static void
-clean_up_try();
+S_clean_up_try();
 
 /* global vars */
 struct chaz_OperSys  *chaz_ModHand_os = NULL;
@@ -47,8 +47,8 @@ chaz_ModHand_init()
         try_app_path, NULL);
 
     /* write files needed by this module and others */
-    build_charm_run();
-    write_charm_h();
+    S_build_charm_run();
+    S_write_charm_h();
 }
 
 void
@@ -98,7 +98,7 @@ static char charm_h_code[] = METAQUOTE
 METAQUOTE;
 
 static void
-write_charm_h()
+S_write_charm_h()
 {
     write_file("_charm.h", charm_h_code, strlen(charm_h_code));
 }
@@ -151,7 +151,7 @@ static char charm_run_code_d[] = METAQUOTE
 METAQUOTE;
 
 static void
-build_charm_run()
+S_build_charm_run()
 {
     char *code = NULL;
     chaz_bool_t compile_succeeded = false;
@@ -181,7 +181,7 @@ chaz_ModHand_test_compile(char *source, size_t source_len)
     compile_succeeded = compiler->compile_exe(compiler, TRY_SOURCE_PATH, 
         TRY_APP_BASENAME, source, source_len);
 
-    clean_up_try();
+    S_clean_up_try();
 
     return compile_succeeded;
 }
@@ -211,7 +211,7 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
     }
 
     /* remove all the files we just created */
-    clean_up_try();
+    S_clean_up_try();
 
     return captured_output;
 }
@@ -227,7 +227,7 @@ chaz_ModHand_append_conf(char *fmt, ...)
 }
 
 static void
-clean_up_try()
+S_clean_up_try()
 {
     remove(TRY_SOURCE_PATH);
     os->remove_exe(os, TRY_APP_BASENAME);

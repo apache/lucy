@@ -36,23 +36,23 @@ typedef struct unbuff_combo {
 /* Check what name 64-bit ftell, fseek go by.
  */
 static chaz_bool_t
-probe_off64(off64_combo *combo);
+S_probe_off64(off64_combo *combo);
 
 /* Determine whether we can use sparse files.
  */
 static chaz_bool_t 
-check_sparse_files();
+S_check_sparse_files();
 
 /* Helper for check_sparse_files().  
  */
 static void
-test_sparse_file(long offset, Stat *st);
+S_test_sparse_file(long offset, Stat *st);
 
 /* See if trying to write a 5 GB file in a subprocess bombs out.  If it
  * doesn't, then the test suite can safely verify large file support.
  */
 static chaz_bool_t
-can_create_big_files();
+S_can_create_big_files();
 
 static char* code_buf = NULL;
 static size_t code_buf_len = 0;
@@ -74,7 +74,7 @@ chaz_LargeFiles_run(void)
     /* see if off64_t and friends exist or have synonyms */
     for (i = 0; off64_combos[i].includes != NULL; i++) {
         off64_combo combo = off64_combos[i];
-        success = probe_off64(&combo);
+        success = S_probe_off64(&combo);
         if (success) {
             strcpy(fopen_command, combo.fopen_command);
             strcpy(fseek_command, combo.fseek_command);
@@ -97,10 +97,10 @@ chaz_LargeFiles_run(void)
     }
 
     /* check for sparse files */
-    if (check_sparse_files()) {
+    if (S_check_sparse_files()) {
         append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
         /* see if we can create a 5 GB file without crashing */
-        if (success && can_create_big_files())
+        if (success && S_can_create_big_files())
             append_conf("#define CHAZ_CAN_CREATE_BIG_FILES\n");
     }
     else {
@@ -150,7 +150,7 @@ METAQUOTE;
 
 
 static chaz_bool_t
-probe_off64(off64_combo *combo)
+S_probe_off64(off64_combo *combo)
 {
     char *output = NULL;
     size_t output_len;
@@ -182,7 +182,7 @@ probe_off64(off64_combo *combo)
 }
 
 static chaz_bool_t 
-check_sparse_files()
+S_check_sparse_files()
 {
     Stat st_a, st_b;
 
@@ -191,8 +191,8 @@ check_sparse_files()
         return false;
 
     /* write and stat a 1 MB file and a 2 MB file, both of them sparse */
-    test_sparse_file(1000000, &st_a);
-    test_sparse_file(2000000, &st_b);
+    S_test_sparse_file(1000000, &st_a);
+    S_test_sparse_file(2000000, &st_b);
     if (!(st_a.valid && st_b.valid))
         return false;
     if (st_a.size != 1000001)
@@ -208,7 +208,7 @@ check_sparse_files()
 } 
 
 static void
-test_sparse_file(long offset, Stat *st)
+S_test_sparse_file(long offset, Stat *st)
 {
     FILE *sparse_fh;
 
@@ -258,7 +258,7 @@ static char create_bigfile_code_b[] = METAQUOTE
 METAQUOTE;
 
 static chaz_bool_t
-can_create_big_files()
+S_can_create_big_files()
 {
     char *output;
     size_t output_len;

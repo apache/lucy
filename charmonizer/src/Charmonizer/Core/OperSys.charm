@@ -8,19 +8,19 @@
 #include "Charmonizer/Core/OperSys.h"
 
 static void
-probe_devnull(OperSys *self);
+S_probe_devnull(OperSys *self);
 
 static void
-destroy(OperSys *self);
+S_destroy(OperSys *self);
 
 static void
-remove_exe(OperSys *self, char *name);
+S_remove_exe(OperSys *self, char *name);
 
 static void
-remove_obj(OperSys *self, char *name);
+S_remove_obj(OperSys *self, char *name);
 
 static int 
-run_local(OperSys *self, ...);
+S_run_local(OperSys *self, ...);
 
 chaz_OperSys*
 chaz_OS_new(const char *name) 
@@ -36,10 +36,10 @@ chaz_OS_new(const char *name)
     /* init */
     self->buf        = NULL;
     self->buf_len    = 0;
-    self->remove_obj = remove_obj;
-    self->remove_exe = remove_exe;
-    self->run_local  = run_local;
-    self->destroy    = destroy;
+    self->remove_obj = S_remove_obj;
+    self->remove_exe = S_remove_exe;
+    self->run_local  = S_run_local;
+    self->destroy    = S_destroy;
 
     /* derive */
     if (strcmp(name, "mswin32") == 0) {
@@ -52,14 +52,14 @@ chaz_OS_new(const char *name)
         self->obj_ext = strdup("");
         self->exe_ext = strdup("");
         self->local_command_start = strdup("./");
-        probe_devnull(self);
+        S_probe_devnull(self);
     }
 
     return self;
 }
 
 static void
-probe_devnull(OperSys *self)
+S_probe_devnull(OperSys *self)
 {
     char *const devnull_options[] = {
         "/dev/null", 
@@ -84,7 +84,7 @@ probe_devnull(OperSys *self)
 }
 
 static void
-destroy(OperSys *self)
+S_destroy(OperSys *self)
 {
     free(self->buf);
     free(self->name);
@@ -96,7 +96,7 @@ destroy(OperSys *self)
 }
 
 static void
-remove_exe(OperSys *self, char *name)
+S_remove_exe(OperSys *self, char *name)
 {
     self->buf_len = join_strings(&(self->buf), self->buf_len, name, 
         self->exe_ext, NULL);
@@ -104,7 +104,7 @@ remove_exe(OperSys *self, char *name)
 }
 
 static void
-remove_obj(OperSys *self, char *name)
+S_remove_obj(OperSys *self, char *name)
 {
     self->buf_len = join_strings(&(self->buf), self->buf_len, name, 
         self->obj_ext, NULL);
@@ -112,7 +112,7 @@ remove_obj(OperSys *self, char *name)
 }
 
 static int
-run_local(OperSys *self, ...)
+S_run_local(OperSys *self, ...)
 {
     va_list args;
 

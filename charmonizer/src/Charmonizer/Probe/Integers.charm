@@ -14,7 +14,7 @@ static size_t code_buf_len = 0;
 /* Determine endian-ness of this machine.
  */
 static chaz_bool_t
-machine_is_big_endian();
+S_machine_is_big_endian();
 
 static char sizes_code[] = METAQUOTE
     #include "_charm.h"
@@ -81,7 +81,7 @@ chaz_Integers_run(void)
     START_RUN("Integers");
 
     /* document endian-ness */
-    if (machine_is_big_endian())
+    if (S_machine_is_big_endian())
         append_conf("#define CHY_BIG_END\n");
     else 
         append_conf("#define CHY_LITTLE_END\n");
@@ -335,7 +335,7 @@ chaz_Integers_run(void)
 
     /* shorten */
     START_SHORT_NAMES;
-    if ( machine_is_big_endian() ) {
+    if ( S_machine_is_big_endian() ) {
         shorten_macro("BIG_END");
     }
     else {
@@ -402,7 +402,7 @@ chaz_Integers_run(void)
 }
 
 static chaz_bool_t
-machine_is_big_endian()
+S_machine_is_big_endian()
 {
     long one = 1;
     return !(*((char *)(&one)));

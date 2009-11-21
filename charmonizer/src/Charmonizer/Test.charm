@@ -7,10 +7,10 @@
 #include "Charmonizer/Test.h"
 
 static void
-TestBatch_destroy(TestBatch *batch);
+S_TestBatch_destroy(TestBatch *batch);
 
 static void
-TestBatch_run_test(TestBatch *batch);
+S_TestBatch_run_test(TestBatch *batch);
 
 #define PRINT_SUPPLIED_MESS(_pattern, _args) \
     va_start(args, pat); \
@@ -42,8 +42,8 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
     batch->num_passed      = 0;
     batch->num_failed      = 0;
     batch->num_skipped     = 0;
-    batch->destroy         = TestBatch_destroy;
-    batch->run_test        = TestBatch_run_test;
+    batch->destroy         = S_TestBatch_destroy;
+    batch->run_test        = S_TestBatch_run_test;
 
     return batch;
 }
@@ -55,14 +55,14 @@ chaz_Test_plan(TestBatch *batch)
 }
 
 static void
-TestBatch_destroy(TestBatch *batch)
+S_TestBatch_destroy(TestBatch *batch)
 {
     free(batch->name);
     free(batch);
 }
 
 static void
-TestBatch_run_test(TestBatch *batch) 
+S_TestBatch_run_test(TestBatch *batch) 
 {
     /* print start */
     PLAN(batch);
