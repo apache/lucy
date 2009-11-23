@@ -52,6 +52,9 @@ PPCODE:
     else if (strEQ(package, "TestRAMFileHandle")) {
         lucy_TestRAMFH_run_tests();
     }
+    else if (strEQ(package, "TestRAMFolder")) {
+        lucy_TestRAMFolder_run_tests();
+    }
     /* Lucy::Util */
     else if (strEQ(package, "TestIndexFileNames")) {
         lucy_TestIxFileNames_run_tests();
