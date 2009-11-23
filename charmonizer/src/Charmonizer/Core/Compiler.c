@@ -13,11 +13,11 @@ static void
 S_destroy(Compiler *self);
 
 static chaz_bool_t
-S_compile_exe(Compiler *self, const char *source_path, const char *exe_path, 
+S_compile_exe(Compiler *self, const char *source_path, const char *exe_name, 
               const char *code, size_t code_len);
 
 static chaz_bool_t
-S_compile_obj(Compiler *self, const char *source_path, const char *obj_path, 
+S_compile_obj(Compiler *self, const char *source_path, const char *obj_name, 
               const char *code, size_t code_len);
 
 static void
@@ -41,8 +41,6 @@ chaz_CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
     self->cc_flags        = strdup(cc_flags);
 
     /* init */
-    self->buf             = NULL;
-    self->buf_len         = 0;
     self->compile_exe     = S_compile_exe;
     self->compile_obj     = S_compile_obj;
     self->add_inc_dir     = S_add_inc_dir;
@@ -73,7 +71,6 @@ S_destroy(Compiler *self)
     }
     free(self->inc_dirs);
 
-    free(self->buf);
     free(self->cc_command);
     free(self->cc_flags);
     free(self->include_flag);
@@ -82,81 +79,124 @@ S_destroy(Compiler *self)
     free(self);
 }
 
-static chaz_bool_t
-S_compile_exe(Compiler *self, const char *source_path, const char *exe_path, 
-              const char *code, size_t code_len)
+static char*
+S_inc_dir_string(Compiler *self)
 {
-    chaz_bool_t successful;
-    OperSys *os = self->os;
-    char *exe_full_filepath = NULL;
+    size_t needed = 0;
+    char  *inc_dir_string;
     char **inc_dirs;
-
-    /* tack the exe_ext onto the path */
-    join_strings(&exe_full_filepath, 0, exe_path, os->exe_ext, NULL);
-
-    /* write the source file */
-    write_file(source_path, code, code_len);
-
-    /* prepare the compiler command */
-    if (verbosity < 2 && chaz_ModHand_charm_run_available) {
-        self->buf_len = join_strings(&(self->buf), self->buf_len, 
-            os->local_command_start, "_charm_run ", self->cc_command, " ",
-            source_path, " ", self->exe_flag, exe_full_filepath, " ", NULL);
-    }
-    else {
-        self->buf_len = join_strings(&(self->buf), self->buf_len, 
-            self->cc_command, " ", source_path, " ", self->exe_flag,
-            exe_full_filepath, " ", NULL);
-    }
     for (inc_dirs = self->inc_dirs; *inc_dirs != NULL; inc_dirs++) {
-        self->buf_len = append_strings(&(self->buf), self->buf_len, 
-            self->include_flag, *inc_dirs, " ", NULL);
+        needed += strlen(self->include_flag) + 2;
+        needed += strlen(*inc_dirs);
     }
-    self->buf_len = append_strings(&(self->buf), self->buf_len, 
-        self->cc_flags, " ", NULL);
-
-    /* execute the compiler command and detect success/failure */
-    system(self->buf);
-    successful = can_open_file(exe_full_filepath);
-    free(exe_full_filepath);
-    
-    return successful;
+    inc_dir_string = malloc(needed + 1);
+    inc_dir_string[0] = '\0';
+    for (inc_dirs = self->inc_dirs; *inc_dirs != NULL; inc_dirs++) {
+        strcat(inc_dir_string, self->include_flag);
+        strcat(inc_dir_string, *inc_dirs);
+        strcat(inc_dir_string, " ");
+    }
+    return inc_dir_string;
 }
 
 static chaz_bool_t
-S_compile_obj(Compiler *self, const char *source_path, const char *obj_path, 
+S_compile_exe(Compiler *self, const char *source_path, const char *exe_name, 
               const char *code, size_t code_len)
 {
-    chaz_bool_t successful;
-    OperSys *os = self->os;
-    char *obj_full_filepath = NULL;
-
-    /* tack the obj_ext onto the path */
-    join_strings(&obj_full_filepath, 0, obj_path, os->obj_ext, NULL);
+    OperSys *os                = self->os;
+    size_t   exe_file_buf_size = strlen(exe_name) + strlen(os->exe_ext) + 1;
+    char    *exe_file          = malloc(exe_file_buf_size);
+    size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, os->exe_ext);
+    char    *inc_dir_string    = S_inc_dir_string(self);
+    size_t   command_max_size  = strlen(os->local_command_start)
+                               + strlen(self->cc_command)
+                               + strlen(source_path)
+                               + strlen(self->exe_flag)
+                               + exe_file_buf_len
+                               + strlen(inc_dir_string)
+                               + strlen(self->cc_flags)
+                               + 200;
+    char *command = malloc(command_max_size);
+    chaz_bool_t result;
     
-    /* write the source file */
-    write_file(source_path, code, code_len);
-
-    /* compile the source */
+    /* Prepare the compiler command. */
     if (verbosity < 2 && chaz_ModHand_charm_run_available) {
-        join_strings(&(self->buf), self->buf_len, 
-            os->local_command_start, "_charm_run ", self->cc_command, " ",
-            source_path, " ", self->object_flag, obj_full_filepath, " ",
-            self->include_flag, ". ", self->cc_flags, NULL);
+        sprintf(command, "%s%s %s %s %s%s %s %s",
+            os->local_command_start, "_charm_run ", 
+            self->cc_command, source_path, 
+            self->exe_flag, exe_file, 
+            inc_dir_string,
+            self->cc_flags);
     }
     else {
-        join_strings(&(self->buf), self->buf_len, 
-            self->cc_command, " ", source_path, " ", self->object_flag,
-            obj_full_filepath, " ", self->include_flag, ". ", self->cc_flags,
-            NULL);
+        sprintf(command, "%s %s %s%s %s %s", 
+            self->cc_command, source_path,
+            self->exe_flag, exe_file,
+            inc_dir_string,
+            self->cc_flags);
     }
-    system(self->buf);
 
-    /* see if compilation was successful */
-    successful = can_open_file(obj_full_filepath);
-    free(obj_full_filepath);
+    /* Write the source file. */
+    write_file(source_path, code);
+
+    /* Run the compiler command.  See if compilation was successful. */
+    system(command);
+    result = can_open_file(exe_file);
+
+    free(command);
+    free(inc_dir_string);
+    free(exe_file);
+    return result;
+}
+
+static chaz_bool_t
+S_compile_obj(Compiler *self, const char *source_path, const char *obj_name, 
+              const char *code, size_t code_len)
+{
+    OperSys *os                = self->os;
+    size_t   obj_file_buf_size = strlen(obj_name) + strlen(os->obj_ext) + 1;
+    char    *obj_file          = malloc(obj_file_buf_size);
+    size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, os->obj_ext);
+    char    *inc_dir_string    = S_inc_dir_string(self);
+    size_t   command_max_size  = strlen(os->local_command_start)
+                               + strlen(self->cc_command)
+                               + strlen(source_path)
+                               + strlen(self->object_flag)
+                               + obj_file_buf_len
+                               + strlen(inc_dir_string)
+                               + strlen(self->cc_flags)
+                               + 200;
+    char *command = malloc(command_max_size);
+    chaz_bool_t result;
     
-    return successful;
+    /* Prepare the compiler command. */
+    if (verbosity < 2 && chaz_ModHand_charm_run_available) {
+        sprintf(command, "%s%s %s %s %s%s %s %s",
+            os->local_command_start, "_charm_run ", 
+            self->cc_command, source_path, 
+            self->object_flag, obj_file, 
+            inc_dir_string,
+            self->cc_flags);
+    }
+    else {
+        sprintf(command, "%s %s %s%s %s %s", 
+            self->cc_command, source_path,
+            self->object_flag, obj_file,
+            inc_dir_string,
+            self->cc_flags);
+    }
+
+    /* Write the source file. */
+    write_file(source_path, code);
+
+    /* Run the compiler command.  See if compilation was successful. */
+    system(command);
+    result = can_open_file(obj_file);
+
+    free(command);
+    free(inc_dir_string);
+    free(obj_file);
+    return result;
 }
 
 static void

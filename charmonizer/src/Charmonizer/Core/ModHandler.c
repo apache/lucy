@@ -40,11 +40,13 @@ void
 chaz_ModHand_init()
 {
     /* set the name of the application which we "try" to execute */
-    (void)join_strings(&try_app_path, 0, TRY_APP_BASENAME, os->exe_ext, NULL);
+    try_app_path = malloc(strlen(TRY_APP_BASENAME) + strlen(os->exe_ext) + 1);
+    sprintf(try_app_path, "%s%s", TRY_APP_BASENAME, os->exe_ext);
 
     /* set the invocation string for the "try" application */
-    (void)join_strings(&try_app_command, 0, os->local_command_start,
-        try_app_path, NULL);
+    try_app_command = malloc(strlen(os->local_command_start) + 
+        strlen(try_app_path) + 1);
+    sprintf(try_app_command, "%s%s", os->local_command_start, try_app_path);
 
     /* write files needed by this module and others */
     S_build_charm_run();
@@ -100,7 +102,7 @@ METAQUOTE;
 static void
 S_write_charm_h()
 {
-    write_file("_charm.h", charm_h_code, strlen(charm_h_code));
+    write_file("_charm.h", charm_h_code);
 }
 
 static char charm_run_code_a[] = METAQUOTE
@@ -153,13 +155,23 @@ METAQUOTE;
 static void
 S_build_charm_run()
 {
-    char *code = NULL;
     chaz_bool_t compile_succeeded = false;
+    size_t needed = sizeof(charm_run_code_a)
+                  + sizeof(charm_run_code_b)
+                  + strlen(os->devnull)
+                  + sizeof(charm_run_code_c)
+                  + strlen(os->devnull)
+                  + sizeof(charm_run_code_d)
+                  + 20;
+    char *code = malloc(needed);
 
-    (void)join_strings(&code, 0, charm_run_code_a, charm_run_code_b, " \"", 
-        os->devnull, "\" ", charm_run_code_c, " \"", os->devnull, "\" ", 
-        charm_run_code_d, NULL);
-
+    sprintf(code, "%s%s \"%s\" %s \"%s\" %s", 
+        charm_run_code_a, 
+        charm_run_code_b,
+        os->devnull,
+        charm_run_code_c,
+        os->devnull,
+        charm_run_code_d);
     compile_succeeded = compiler->compile_exe(compiler, "_charm_run.c", 
         "_charm_run", code, strlen(code));
     if (!compile_succeeded)

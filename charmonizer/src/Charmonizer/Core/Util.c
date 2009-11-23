@@ -10,10 +10,10 @@
 int chaz_Util_verbosity = 1;
 
 void
-chaz_Util_write_file(const char *filename, const char *content, 
-                     size_t content_len)
+chaz_Util_write_file(const char *filename, const char *content)
 {
     FILE *fh = fopen(filename, "w+");
+    size_t content_len = strlen(content);
     if (fh == NULL)
         die("Couldn't open '%s': %s", filename, strerror(errno));
     fwrite(content, sizeof(char), content_len, fh);
@@ -132,88 +132,8 @@ chaz_Util_can_open_file(char *file_path)
     }
 }
 
-size_t
-chaz_Util_grow_buf(char **buf, size_t old_len, size_t new_len)
-{
-    /* grow buffer only if necessary */
-    if (new_len > 0 && new_len >= old_len) {
-        *buf = realloc(*buf, new_len + 1);
-        if (*buf == NULL) 
-            die("buffer allocation failed");
-        *((*buf) + new_len) = '\0';
-    }
-
-    /* return whatever the buffer size is now */
-    return new_len > old_len ? new_len : old_len;
-}
-
-size_t
-chaz_Util_append_strings(char **buf, size_t buf_len, ...)
-{
-    va_list args;
-    size_t retval;
-
-    /* delegate to vappend_strings */
-    va_start(args, buf_len);
-    retval = vappend_strings(buf, buf_len, args);
-    va_end(args);
-
-    return retval;
-}
-
-size_t
-chaz_Util_vappend_strings(char **buf, size_t buf_len, va_list args)
-{
-    char *str;
-    size_t new_len = buf_len == 0 ? 0 : strlen(*buf);
-
-    /* start with a null-terminated empty string if necessary */
-    if (buf_len == 0) {
-        buf_len = grow_buf(buf, buf_len, 1);
-        (*buf)[0] = '\0';
-    }
-
-    /* concat, reallocating along the way as needed */
-    while ( (str = va_arg(args, char*)) != NULL ) {
-        new_len += strlen(str);
-        if (new_len >= buf_len) {
-            /* inefficient, but portable */
-            *buf = realloc(*buf, new_len + 1);
-            buf_len = new_len + 1;
-        }
-        strcat(*buf, str);
-    }
-
-
-    return new_len;
-}
-
-size_t
-chaz_Util_join_strings(char **buf, size_t buf_len, ...)
-{
-    va_list args;
-    size_t retval;
-
-    /* delegate to vjoin_strings */
-    va_start(args, buf_len);
-    retval = vjoin_strings(buf, buf_len, args);
-    va_end(args);
-
-    return retval;
-}
-
-size_t
-chaz_Util_vjoin_strings(char **buf, size_t buf_len, va_list args)
-{
-    /* start with en empty string for vappend to append to */
-    if (*buf != NULL)
-        (*buf)[0] = '\0';
-
-    return vappend_strings(buf, buf_len, args);
-}
-
 /**
- * Copyright 2006 The Apache Software Foundation
+ * Copyright 2006-2009 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

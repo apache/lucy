@@ -98,37 +98,44 @@ S_destroy(OperSys *self)
 static void
 S_remove_exe(OperSys *self, char *name)
 {
-    self->buf_len = join_strings(&(self->buf), self->buf_len, name, 
-        self->exe_ext, NULL);
-    remove(self->buf);
+    char *exe_name = malloc(strlen(name) + strlen(self->exe_ext) + 1);
+    sprintf(exe_name, "%s%s", name, self->exe_ext);
+    remove(exe_name);
+    free(exe_name);
 }
 
 static void
 S_remove_obj(OperSys *self, char *name)
 {
-    self->buf_len = join_strings(&(self->buf), self->buf_len, name, 
-        self->obj_ext, NULL);
-    remove(self->buf);
+    char *obj_name = malloc(strlen(name) + strlen(self->obj_ext) + 1);
+    sprintf(obj_name, "%s%s", name, self->obj_ext);
+    remove(obj_name);
+    free(obj_name);
 }
 
 static int
 S_run_local(OperSys *self, ...)
 {
-    va_list args;
-
-    /* start with "./", ".\", or whatever */
-    self->buf_len = join_strings(&(self->buf), self->buf_len,
-        self->local_command_start, NULL);
+    va_list  args;
+    char    *command = strdup(self->local_command_start);
+    size_t   len     = strlen(command);
+    int      retval;
+    char    *arg;
 
     /* append all supplied texts */ 
     va_start(args, self);
-    self->buf_len = vappend_strings(&(self->buf), self->buf_len, args);
+    while (NULL != (arg = va_arg(args, char*))) {
+        len += strlen(arg);
+        command = realloc(command, len + 1);
+        strcat(command, arg);
+    }
     va_end(args);
 
     /* run the command */
-    return system(self->buf);
+    retval = system(command);
+    free(command);
+    return retval;
 }
-
 
 /**
  * Copyright 2006 The Apache Software Foundation

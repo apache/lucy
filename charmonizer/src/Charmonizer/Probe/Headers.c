@@ -181,7 +181,11 @@ S_encode_affirmation(const char *header_name) {
     size_t len = strlen(header_name) + sizeof("HAS_");
     
     /* grow buffer and start off with "HAS_" */
-    aff_buf_size = grow_buf(&aff_buf, aff_buf_size, len);
+    if (aff_buf_size < len + 1) {
+        free(aff_buf);
+        aff_buf_size = len + 1;
+        aff_buf = malloc(aff_buf_size);
+    }
     strcpy(aff_buf, "HAS_");
 
     /* transform one char at a time */

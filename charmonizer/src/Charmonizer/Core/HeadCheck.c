@@ -11,9 +11,6 @@ typedef struct Header {
     chaz_bool_t  exists;
 } Header;
 
-static char *code_buf   = NULL;
-static int code_buf_len = 0;
-
 /* hello_world.c without the hello or the world */
 static char test_code[] = "int main() { return 0; }\n";
 
@@ -89,14 +86,22 @@ chaz_HeadCheck_check_many_headers(const char **header_names)
 {
     chaz_bool_t success;
     int i;
+    char *code_buf = strdup("");
+    size_t needed = sizeof(test_code) + 20;
 
     /* build the source code string */
-    code_buf_len = join_strings(&code_buf, code_buf_len, " ", NULL);
     for (i = 0; header_names[i] != NULL; i++) {
-        code_buf_len = append_strings(&code_buf, code_buf_len, "#include <", 
-            header_names[i], ">\n", NULL); 
+        needed += strlen(header_names[i]);
+        needed += sizeof("#include <>\n");
     }
-    code_buf_len = append_strings(&code_buf, code_buf_len, test_code, NULL);
+    code_buf = malloc(needed);
+    code_buf[0] = '\0';
+    for (i = 0; header_names[i] != NULL; i++) {
+        strcat(code_buf, "#include <");
+        strcat(code_buf, header_names[i]);
+        strcat(code_buf, ">\n");
+    }
+    strcat(code_buf, test_code);
 
     /* if the code compiles, bulk add all header names to the cache */
     success = test_compile(code_buf, strlen(code_buf));
@@ -106,6 +111,7 @@ chaz_HeadCheck_check_many_headers(const char **header_names)
         }
     }
 
+    free(code_buf);
     return success;
 }
 
@@ -121,13 +127,12 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
 {
     long needed = sizeof(contains_code) + strlen(struct_name) 
                 + strlen(member) + strlen(includes) + 10;
-    if (code_buf_len < needed) { 
-        code_buf_len = needed;
-        free(code_buf);
-        code_buf = malloc(code_buf_len);
-    }
-    sprintf(code_buf, contains_code, includes, struct_name, member);
-    return test_compile(code_buf, strlen(code_buf));
+    char *buf = malloc(needed);
+    chaz_bool_t retval;
+    sprintf(buf, contains_code, includes, struct_name, member);
+    retval = test_compile(buf, strlen(buf));
+    free(buf);
+    return retval;
 }
 
 static int
@@ -144,18 +149,19 @@ S_compare_headers(const void *vptr_a, const void *vptr_b) {
 }
 
 static Header* 
-S_discover_header(const char *header_name) {
+S_discover_header(const char *header_name) 
+{
     Header* header = (Header*)malloc(sizeof(Header));
+    char *include_test = malloc(strlen(header_name) + 30); 
     
     /* assign */
     header->name = strdup(header_name);
 
     /* see whether code that tries to pull in this header compiles */
-    code_buf_len = join_strings(&code_buf, code_buf_len, "#include <",
-        header_name, ">\n", test_code, NULL);
-    header->exists = test_compile(code_buf, strlen(code_buf))
-        ? true : false;
+    sprintf(include_test, "#include <%s>\n%s", header_name, test_code);
+    header->exists = test_compile(include_test, strlen(include_test));
 
+    free(include_test);
     return header;
 }
 

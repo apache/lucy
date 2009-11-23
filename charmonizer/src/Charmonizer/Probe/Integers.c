@@ -8,9 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static char *code_buf = NULL;
-static size_t code_buf_len = 0;
-
 /* Determine endian-ness of this machine.
  */
 static chaz_bool_t
@@ -77,6 +74,7 @@ chaz_Integers_run(void)
     char i64_t_type[10];
     char i64_t_postfix[10];
     char u64_t_postfix[10];
+    char code_buf[sizeof(type64_code) + 200];
 
     START_RUN("Integers");
 
@@ -103,8 +101,6 @@ chaz_Integers_run(void)
     }
 
     /* determine whether long longs are available */
-    code_buf_len = grow_buf(&code_buf, code_buf_len, 
-        sizeof(type64_code) + 200);
     sprintf(code_buf, type64_code, "long long");
     output = capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {

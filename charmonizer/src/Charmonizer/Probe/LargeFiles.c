@@ -54,9 +54,6 @@ S_test_sparse_file(long offset, Stat *st);
 static chaz_bool_t
 S_can_create_big_files();
 
-static char* code_buf = NULL;
-static size_t code_buf_len = 0;
-
 /* vars for holding lfs commands, once they're discovered */
 static char fopen_command[10];
 static char fseek_command[10];
@@ -127,7 +124,6 @@ chaz_LargeFiles_run(void)
         END_SHORT_NAMES;
     }
     
-    free(code_buf);
     END_RUN;
 }
 
@@ -154,16 +150,16 @@ S_probe_off64(off64_combo *combo)
 {
     char *output = NULL;
     size_t output_len;
-    size_t needed = sizeof(off64_code) + (2 * strlen(combo->offset64_type)) 
-        +strlen(combo->fopen_command) + strlen(combo->ftell_command) 
-        + strlen(combo->fseek_command) + 20;
+    size_t needed = sizeof(off64_code) 
+                  + (2 * strlen(combo->offset64_type)) 
+                  + strlen(combo->fopen_command) 
+                  + strlen(combo->ftell_command) 
+                  + strlen(combo->fseek_command) 
+                  + 20;
+    char *code_buf = malloc(needed);
     chaz_bool_t success = false;
 
-    /* allocate buffer as necessary and prepare the source code */
-    if (code_buf_len < needed) {
-        code_buf = (char*)realloc(code_buf, needed);
-        code_buf_len = needed;
-    }
+    /* Prepare the source code. */
     sprintf(code_buf, off64_code, combo->includes, combo->offset64_type, 
         combo->fopen_command, combo->offset64_type, combo->ftell_command, 
         combo->fseek_command);
@@ -263,12 +259,16 @@ S_can_create_big_files()
     char *output;
     size_t output_len;
     FILE *truncating_fh;
+    size_t needed = strlen(create_bigfile_code_a)
+                  + strlen(fseek_command)
+                  + strlen(create_bigfile_code_a)
+                  + 10;
+    char *code_buf = malloc(needed);
 
     /* concat the source strings, compile the file, capture output */
-    code_buf_len = join_strings(&code_buf, code_buf_len,
-        create_bigfile_code_a, fseek_command, create_bigfile_code_b, NULL);
-
-    output = capture_output(code_buf, code_buf_len, &output_len);
+    sprintf(code_buf, "%s%s%s", create_bigfile_code_a, fseek_command, 
+        create_bigfile_code_b);
+    output = capture_output(code_buf, strlen(code_buf), &output_len);
 
     /* truncate, just in case the call to remove fails */
     truncating_fh = fopen("_charm_large_file_test", "w");
@@ -277,6 +277,7 @@ S_can_create_big_files()
     remove_and_verify("_charm_large_file_test");
 
     /* return true if the test app made it to the finish line */
+    free(code_buf);
     return output == NULL ? false : true;
 }
 

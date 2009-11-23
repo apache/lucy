@@ -45,8 +45,6 @@ struct chaz_Compiler {
     char          *object_flag;
     char          *exe_flag;
     char         **inc_dirs;
-    char          *buf;
-    size_t         buf_len;
     chaz_CC_compile_exe_t compile_exe;
     chaz_CC_compile_obj_t compile_obj;
     chaz_CC_add_inc_dir_t add_inc_dir;
