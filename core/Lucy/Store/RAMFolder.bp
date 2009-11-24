@@ -29,6 +29,9 @@ class Lucy::Store::RAMFolder extends Lucy::Store::Folder {
     incremented FileHandle*
     Local_Open_FileHandle(RAMFolder *self, const CharBuf *name, u32_t flags);
 
+    incremented DirHandle*
+    Local_Open_Dir(RAMFolder *self);
+
     bool_t 
     Local_MkDir(RAMFolder *self, const CharBuf *name);
 

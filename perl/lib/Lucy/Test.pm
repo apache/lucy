@@ -49,6 +49,9 @@ PPCODE:
     else if (strEQ(package, "TestIOPrimitives")) {
         lucy_TestIOPrimitives_run_tests();
     }
+    else if (strEQ(package, "TestRAMDirHandle")) {
+        lucy_TestRAMDH_run_tests();
+    }
     else if (strEQ(package, "TestRAMFileHandle")) {
         lucy_TestRAMFH_run_tests();
     }

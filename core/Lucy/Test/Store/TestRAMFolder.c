@@ -7,6 +7,8 @@
 
 #include "Lucy/Test/Store/TestRAMFolder.h"
 #include "Lucy/Store/RAMFolder.h"
+#include "Lucy/Store/DirHandle.h"
+#include "Lucy/Store/RAMDirHandle.h"
 #include "Lucy/Store/RAMFileHandle.h"
 
 static CharBuf foo           = ZCB_LITERAL("foo");
@@ -147,6 +149,17 @@ test_Local_MkDir(TestBatch *batch)
             "Existing file untouched after failed Local_MkDir");
     }
 
+    DECREF(folder);
+}
+
+static void
+test_Local_Open_Dir(TestBatch *batch)
+{
+    RAMFolder *folder = RAMFolder_new(NULL);
+    DirHandle *dh = Folder_Local_Open_Dir(folder);
+    ASSERT_TRUE(batch, dh && DH_Is_A(dh, RAMDIRHANDLE), 
+        "Local_Open_Dir returns a RAMDirHandle");
+    DECREF(dh);
     DECREF(folder);
 }
 
@@ -450,7 +463,7 @@ test_Close(TestBatch *batch)
 void
 TestRAMFolder_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestRAMFolder", 97, NULL);
+    TestBatch *batch = Test_new_batch("TestRAMFolder", 98, NULL);
 
     PLAN(batch);
     test_Initialize_and_Check(batch);
@@ -458,6 +471,7 @@ TestRAMFolder_run_tests()
     test_Local_Is_Directory(batch);
     test_Local_Find_Folder(batch);
     test_Local_MkDir(batch);
+    test_Local_Open_Dir(batch);
     test_Local_Open_FileHandle(batch);
     test_Local_Delete(batch);
     test_Rename(batch);

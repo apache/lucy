@@ -4,6 +4,7 @@
 #include "Lucy/Store/RAMFolder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Store/RAMDirHandle.h"
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Store/RAMFileHandle.h"
 #include "Lucy/Util/IndexFileNames.h"
@@ -98,6 +99,14 @@ RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name,
     DECREF(fullpath);
 
     return (FileHandle*)fh;
+}
+
+DirHandle*
+RAMFolder_local_open_dir(RAMFolder *self)
+{
+    RAMDirHandle *dh = RAMDH_new(self);
+    if (!dh) { ERR_ADD_FRAME(Err_get_error()); }
+    return (DirHandle*)dh;
 }
 
 bool_t
