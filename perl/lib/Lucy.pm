@@ -44,6 +44,14 @@ sub error {$Lucy::Object::Err::error}
         '""'     => \&do_to_string,
         fallback => 1;
 
+    sub new {
+        my ( $either, $message ) = @_;
+        my ( undef, $file, $line ) = caller;
+        $message .= ", $file line $line\n";
+        return $either->_new(
+            mess => Lucy::Object::CharBuf->new($message) );
+    }
+
     sub do_throw {
         my $err = shift;
         $err->cat_mess( longmess() );

@@ -7,9 +7,10 @@ __END__
 __BINDING__
 
 Boilerplater::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Object::Err",
-    bind_methods => [qw( Cat_Mess )],
+    parcel            => "Lucy",
+    class_name        => "Lucy::Object::Err",
+    bind_methods      => [qw( Cat_Mess Get_Mess )],
+    bind_constructors => ["_new"],
 );
 
 __COPYRIGHT__
