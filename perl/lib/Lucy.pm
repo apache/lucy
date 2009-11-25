@@ -30,6 +30,8 @@ sub error {$Lucy::Object::Err::error}
             blessed
             nfreeze
             thaw
+            to_lucy
+            to_perl
         );
     }
 }
@@ -114,6 +116,57 @@ sub error {$Lucy::Object::Err::error}
     }
 }
 
+{
+    package Lucy::Util::Json;
+    use Lucy::Util::ToolSet qw( to_lucy );
+
+    use JSON::XS qw();
+
+    my $json_encoder = JSON::XS->new->pretty(1)->canonical(1);
+
+    sub slurp_json {
+        my ( undef, %args ) = @_;
+        my $instream = $args{folder}->open_in( $args{path} )
+            or return;
+        my $len = $instream->length;
+        my $json;
+        $instream->read( $json, $len );
+        my $result = eval { to_lucy( $json_encoder->decode($json) ) };
+        if ( $@ or !$result ) {
+            Lucy::Object::Err->set_error(
+                Lucy::Object::Err->new( $@ || "Failed to decode JSON" )
+            );
+            return;
+        }
+        return $result;
+    }
+
+    sub spew_json {
+        my ( undef, %args ) = @_;
+        my $json = eval { $json_encoder->encode( $args{'dump'} ) };
+        if ( !defined $json ) {
+            Lucy::Object::Err->set_error(
+                Lucy::Object::Err->new($@) );
+            return 0;
+        }
+        my $outstream = $args{folder}->open_out( $args{path} );
+        return 0 unless $outstream;
+        $outstream->print($json);
+        eval { $outstream->close; };
+        return 0 if $@;
+        return 1;
+    }
+
+    sub to_json {
+        my ( undef, $dump ) = @_;
+        return $json_encoder->encode($dump);
+    }
+
+    sub from_json {
+        return to_lucy( $json_encoder->decode( $_[1] ) );
+    }
+}
+
 1;
 
 __END__
@@ -133,6 +186,42 @@ CODE:
 OUTPUT:
     RETVAL
 END_XS_CODE
+
+my $toolset_xs_code = <<'END_XS_CODE';
+MODULE = Lucy    PACKAGE = Lucy::Util::ToolSet
+
+SV*
+to_lucy(sv)
+    SV *sv;
+CODE:
+{
+    lucy_Obj *obj = XSBind_perl_to_lucy(sv);
+    RETVAL = LUCY_OBJ_TO_SV_NOINC(obj);
+}
+OUTPUT: RETVAL
+
+SV*
+to_perl(sv)
+    SV *sv;
+CODE:
+{
+    if (sv_isobject(sv) && sv_derived_from(sv, "Lucy::Object::Obj")) {
+        IV tmp = SvIV(SvRV(sv));
+        lucy_Obj* obj = INT2PTR(lucy_Obj*, tmp);
+        RETVAL = XSBind_lucy_to_perl(obj);
+    }
+    else {
+        RETVAL = newSVsv(sv);
+    }
+}
+OUTPUT: RETVAL
+END_XS_CODE
+
+Boilerplater::Binding::Perl::Class->register(
+    parcel     => "Lucy",
+    class_name => "Lucy::Util::Toolset",
+    xs_code    => $toolset_xs_code,
+);
 
 Boilerplater::Binding::Perl::Class->register(
     parcel     => "Lucy",

@@ -12,6 +12,7 @@ my $builder = Lucy::Build->new(
     dist_version_from  => 'lib/Lucy.pm',
     dist_abstract_from => 'lib/Lucy.pm',
     create_makefile_pl => 'passthrough',
+    requires           => { 'JSON::XS' => 1.53, },
     build_requires     => {
         'ExtUtils::CBuilder' => 0.18,
         'ExtUtils::ParseXS'  => 2.16,
