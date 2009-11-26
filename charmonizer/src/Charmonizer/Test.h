@@ -122,15 +122,25 @@ chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
   #define Test_new_batch               chaz_Test_new_batch
   #define Test_plan                    chaz_Test_plan
   #define PLAN                         CHAZ_TEST_PLAN
+  #define Test_assert_true             chaz_Test_assert_true
   #define ASSERT_TRUE                  CHAZ_TEST_ASSERT_TRUE
+  #define Test_assert_false            chaz_Test_assert_false
   #define ASSERT_FALSE                 CHAZ_TEST_ASSERT_FALSE
+  #define Test_assert_str_eq           chaz_Test_assert_str_eq
   #define ASSERT_STR_EQ                CHAZ_TEST_ASSERT_STR_EQ
+  #define Test_assert_str_neq          chaz_Test_assert_str_neq
   #define ASSERT_STR_NEQ               CHAZ_TEST_ASSERT_STR_NEQ
+  #define Test_pass                    chaz_Test_pass
   #define PASS                         CHAZ_TEST_PASS
+  #define Test_fail                    chaz_Test_fail
   #define FAIL                         CHAZ_TEST_FAIL
+  #define Test_assert_int_eq           chaz_Test_assert_int_eq
   #define ASSERT_INT_EQ                CHAZ_TEST_ASSERT_INT_EQ
+  #define Test_assert_float_eq         chaz_Test_assert_float_eq
   #define ASSERT_FLOAT_EQ              CHAZ_TEST_ASSERT_FLOAT_EQ
+  #define Test_skip                    chaz_Test_skip
   #define SKIP                         CHAZ_TEST_SKIP
+  #define Test_report_skip_remaining   chaz_Test_report_skip_remaining
   #define SKIP_REMAINING               CHAZ_TEST_SKIP_REMAINING
 #endif
 

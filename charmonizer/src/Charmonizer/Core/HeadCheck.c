@@ -43,7 +43,7 @@ static void
 S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists);
 
 void
-chaz_HeadCheck_init()
+HeadCheck_init()
 {
     Header *null_header = (Header*)malloc(sizeof(Header));
 
@@ -56,7 +56,7 @@ chaz_HeadCheck_init()
 }
 
 chaz_bool_t
-chaz_HeadCheck_check_header(const char *header_name)
+HeadCheck_check_header(const char *header_name)
 {
     Header  *header;
     Header   key;
@@ -82,7 +82,7 @@ chaz_HeadCheck_check_header(const char *header_name)
 }
 
 chaz_bool_t
-chaz_HeadCheck_check_many_headers(const char **header_names)
+HeadCheck_check_many_headers(const char **header_names)
 {
     chaz_bool_t success;
     int i;
@@ -104,7 +104,7 @@ chaz_HeadCheck_check_many_headers(const char **header_names)
     strcat(code_buf, test_code);
 
     /* if the code compiles, bulk add all header names to the cache */
-    success = test_compile(code_buf, strlen(code_buf));
+    success = ModHand_test_compile(code_buf, strlen(code_buf));
     if (success) {
         for (i = 0; header_names[i] != NULL; i++) {
             S_maybe_add_to_cache(header_names[i], true);
@@ -122,7 +122,7 @@ static char contains_code[] = METAQUOTE
 METAQUOTE;
 
 chaz_bool_t
-chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
+HeadCheck_contains_member(const char *struct_name, const char *member,
                                const char *includes)
 {
     long needed = sizeof(contains_code) + strlen(struct_name) 
@@ -130,7 +130,7 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
     char *buf = malloc(needed);
     chaz_bool_t retval;
     sprintf(buf, contains_code, includes, struct_name, member);
-    retval = test_compile(buf, strlen(buf));
+    retval = ModHand_test_compile(buf, strlen(buf));
     free(buf);
     return retval;
 }
@@ -159,7 +159,7 @@ S_discover_header(const char *header_name)
 
     /* see whether code that tries to pull in this header compiles */
     sprintf(include_test, "#include <%s>\n%s", header_name, test_code);
-    header->exists = test_compile(include_test, strlen(include_test));
+    header->exists = ModHand_test_compile(include_test, strlen(include_test));
 
     free(include_test);
     return header;

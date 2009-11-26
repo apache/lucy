@@ -30,10 +30,10 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
                                const char *includes);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-  #define HeadCheck_init             chaz_HeadCheck_init
-  #define HeadCheck_contains_member  chaz_HeadCheck_contains_member
-  #define check_header               chaz_HeadCheck_check_header
-  #define check_many_headers         chaz_HeadCheck_check_many_headers
+  #define HeadCheck_init                    chaz_HeadCheck_init
+  #define HeadCheck_contains_member         chaz_HeadCheck_contains_member
+  #define HeadCheck_check_header            chaz_HeadCheck_check_header
+  #define HeadCheck_check_many_headers      chaz_HeadCheck_check_many_headers
 #endif
 
 #endif /* H_CHAZ_HEAD_CHECK */

@@ -6,9 +6,9 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-chaz_TFuncMacro_prepare()
+TFuncMacro_prepare()
 {
-    return Test_new_batch("FuncMacro", 4, chaz_TFuncMacro_run);
+    return Test_new_batch("FuncMacro", 4, TFuncMacro_run);
 }
 
 #ifdef INLINE
@@ -19,7 +19,7 @@ static INLINE char* S_inline_function()
 #endif
 
 void
-chaz_TFuncMacro_run(TestBatch *batch)
+TFuncMacro_run(TestBatch *batch)
 {
 
 #ifdef HAS_FUNC_MACRO

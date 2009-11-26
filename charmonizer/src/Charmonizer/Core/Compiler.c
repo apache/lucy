@@ -26,13 +26,13 @@ S_add_inc_dir(Compiler *self, const char *dir);
 static void
 S_do_test_compile(Compiler *self);
 
-chaz_Compiler*
-chaz_CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
+Compiler*
+CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
 {
     CompilerSpec *compiler_spec = CCSpec_find_spec();
     Compiler *self = (Compiler*)malloc(sizeof(Compiler));
 
-    if (verbosity)
+    if (Util_verbosity)
         printf("Creating compiler object...\n");
 
     /* assign */
@@ -120,7 +120,7 @@ S_compile_exe(Compiler *self, const char *source_path, const char *exe_name,
     chaz_bool_t result;
     
     /* Prepare the compiler command. */
-    if (verbosity < 2 && chaz_ModHand_charm_run_available) {
+    if (Util_verbosity < 2 && chaz_ModHand_charm_run_available) {
         sprintf(command, "%s%s %s %s %s%s %s %s",
             os->local_command_start, "_charm_run ", 
             self->cc_command, source_path, 
@@ -137,11 +137,11 @@ S_compile_exe(Compiler *self, const char *source_path, const char *exe_name,
     }
 
     /* Write the source file. */
-    write_file(source_path, code);
+    Util_write_file(source_path, code);
 
     /* Run the compiler command.  See if compilation was successful. */
     system(command);
-    result = can_open_file(exe_file);
+    result = Util_can_open_file(exe_file);
 
     free(command);
     free(inc_dir_string);
@@ -170,7 +170,7 @@ S_compile_obj(Compiler *self, const char *source_path, const char *obj_name,
     chaz_bool_t result;
     
     /* Prepare the compiler command. */
-    if (verbosity < 2 && chaz_ModHand_charm_run_available) {
+    if (Util_verbosity < 2 && chaz_ModHand_charm_run_available) {
         sprintf(command, "%s%s %s %s %s%s %s %s",
             os->local_command_start, "_charm_run ", 
             self->cc_command, source_path, 
@@ -187,11 +187,11 @@ S_compile_obj(Compiler *self, const char *source_path, const char *obj_name,
     }
 
     /* Write the source file. */
-    write_file(source_path, code);
+    Util_write_file(source_path, code);
 
     /* Run the compiler command.  See if compilation was successful. */
     system(command);
-    result = can_open_file(obj_file);
+    result = Util_can_open_file(obj_file);
 
     free(command);
     free(inc_dir_string);
@@ -205,14 +205,14 @@ S_do_test_compile(Compiler *self)
     char *code = "int main() { return 0; }\n";
     chaz_bool_t success;
     
-    if (verbosity) 
+    if (Util_verbosity) 
         printf("Trying to compile a small test file...\n");
 
     /* attempt compilation */
     success = self->compile_exe(self, "_charm_try.c", 
         "_charm_try", code, strlen(code));
     if (!success)
-        die("Failed to compile a small test file");
+        Util_die("Failed to compile a small test file");
     
     /* clean up */
     remove("_charm_try.c");

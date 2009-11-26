@@ -73,6 +73,7 @@ chaz_TVariadicMacros_run(chaz_TestBatch *batch);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define TDirManip_prepare            chaz_TDirManip_prepare
+  #define TDirManip_run                chaz_TDirManip_run
   #define TFuncMacro_prepare           chaz_TFuncMacro_prepare
   #define THeaders_prepare             chaz_THeaders_prepare
   #define TIntegers_prepare            chaz_TIntegers_prepare

@@ -10,7 +10,7 @@
 
 extern int chaz_Util_verbosity;
 
-/* Open a file (truncating if necessary) and write [content] to it.  die() if
+/* Open a file (truncating if necessary) and write [content] to it.  Util_die() if
  * an error occurs.
  */
 void
@@ -51,14 +51,14 @@ int
 chaz_Util_can_open_file(char *file_path);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-  #define verbosity              chaz_Util_verbosity 
-  #define write_file             chaz_Util_write_file 
-  #define slurp_file             chaz_Util_slurp_file 
-  #define flength                chaz_Util_flength 
-  #define die                    chaz_Util_die 
-  #define warn                   chaz_Util_warn 
-  #define remove_and_verify      chaz_Util_remove_and_verify 
-  #define can_open_file          chaz_Util_can_open_file 
+  #define Util_verbosity              chaz_Util_verbosity 
+  #define Util_write_file             chaz_Util_write_file 
+  #define Util_slurp_file             chaz_Util_slurp_file 
+  #define Util_flength                chaz_Util_flength 
+  #define Util_die                    chaz_Util_die 
+  #define Util_warn                   chaz_Util_warn 
+  #define Util_remove_and_verify      chaz_Util_remove_and_verify 
+  #define Util_can_open_file          chaz_Util_can_open_file 
 #endif
 
 #endif /* H_CHAZ_UTIL */

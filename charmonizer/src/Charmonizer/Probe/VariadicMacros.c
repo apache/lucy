@@ -32,7 +32,7 @@ static char gnuc_code[] = METAQUOTE
 METAQUOTE;
 
 void
-chaz_VariadicMacros_run(void) 
+VariadicMacros_run(void) 
 {
     char *output;
     size_t output_len;
@@ -43,33 +43,33 @@ chaz_VariadicMacros_run(void)
     START_RUN("VariadicMacros");
 
     /* test for ISO-style variadic macros */
-    output = capture_output(iso_code, strlen(iso_code), &output_len);
+    output = ModHand_capture_output(iso_code, strlen(iso_code), &output_len);
     if (output != NULL) {
         has_varmacros = true;
         has_iso_varmacros = true;
-        append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
-        append_conf("#define CHY_HAS_ISO_VARIADIC_MACROS\n");
+        ModHand_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
+        ModHand_append_conf("#define CHY_HAS_ISO_VARIADIC_MACROS\n");
     }
 
     /* test for GNU-style variadic macros */
-    output = capture_output(gnuc_code, strlen(gnuc_code), &output_len);
+    output = ModHand_capture_output(gnuc_code, strlen(gnuc_code), &output_len);
     if (output != NULL) {
         has_gnuc_varmacros = true;
         if (has_varmacros == false) {
             has_varmacros = true;
-            append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
+            ModHand_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
         }
-        append_conf("#define CHY_HAS_GNUC_VARIADIC_MACROS\n");
+        ModHand_append_conf("#define CHY_HAS_GNUC_VARIADIC_MACROS\n");
     }
 
     /* shorten */
     START_SHORT_NAMES;
     if (has_varmacros)
-        shorten_macro("HAS_VARIADIC_MACROS");
+        ModHand_shorten_macro("HAS_VARIADIC_MACROS");
     if (has_iso_varmacros)
-        shorten_macro("HAS_ISO_VARIADIC_MACROS");
+        ModHand_shorten_macro("HAS_ISO_VARIADIC_MACROS");
     if (has_gnuc_varmacros)
-        shorten_macro("HAS_GNUC_VARIADIC_MACROS");
+        ModHand_shorten_macro("HAS_GNUC_VARIADIC_MACROS");
     END_SHORT_NAMES;
 
     END_RUN;

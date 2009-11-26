@@ -14,7 +14,7 @@
 static chaz_bool_t mkdir_available = false;
 static chaz_bool_t rmdir_available = false;
 static chaz_bool_t initialized     = false;
-int    chaz_Dir_mkdir_num_args = 0;
+int    Dir_mkdir_num_args = 0;
 static char mkdir_command[7];
 char *Dir_mkdir_command = mkdir_command;
 
@@ -56,7 +56,7 @@ S_try_init_posix_mkdir(char *header)
 
     /* Attempt compilation. */
     sprintf(code_buf, posix_mkdir_code, header);
-    mkdir_available = compiler->compile_exe(compiler, "_charm_mkdir.c",
+    mkdir_available = ModHand_compiler->compile_exe(ModHand_compiler, "_charm_mkdir.c",
         "_charm_mkdir", code_buf, strlen(code_buf));
 
     /* Set vars on success. */
@@ -77,7 +77,7 @@ S_try_init_posix_mkdir(char *header)
 static chaz_bool_t
 S_try_init_win_mkdir()
 {
-    mkdir_available = compiler->compile_exe(compiler, "_charm_mkdir.c",
+    mkdir_available = ModHand_compiler->compile_exe(ModHand_compiler, "_charm_mkdir.c",
         "_charm_mkdir", win_mkdir_code, strlen(win_mkdir_code));
     if (mkdir_available) {
         strcpy(mkdir_command, "_mkdir");
@@ -89,7 +89,7 @@ S_try_init_win_mkdir()
 static void
 S_init_mkdir()
 {
-    if (verbosity) {
+    if (Util_verbosity) {
         printf("Attempting to compile _charm_mkdir utility...\n");
     }
     if (S_try_init_win_mkdir())               { return; }
@@ -103,7 +103,7 @@ S_try_init_rmdir(char *header)
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = malloc(needed);
     sprintf(code_buf, rmdir_code, header);
-    rmdir_available = compiler->compile_exe(compiler, "_charm_rmdir.c",
+    rmdir_available = ModHand_compiler->compile_exe(ModHand_compiler, "_charm_rmdir.c",
         "_charm_rmdir", code_buf, strlen(code_buf));
     free(code_buf);
     return rmdir_available;
@@ -112,7 +112,7 @@ S_try_init_rmdir(char *header)
 static void
 S_init_rmdir()
 {
-    if (verbosity) {
+    if (Util_verbosity) {
         printf("Attempting to compile _charm_rmdir utility...\n");
     }
     if (S_try_init_rmdir("unistd.h"))   { return; }
@@ -122,7 +122,7 @@ S_init_rmdir()
 
 /* Compile _charm_mkdir and _charm_rmdir. */
 void
-chaz_Dir_init(void)
+Dir_init(void)
 {
     if (!initialized) { 
         initialized = true;
@@ -132,17 +132,17 @@ chaz_Dir_init(void)
 }
 
 chaz_bool_t
-chaz_Dir_mkdir(const char *filepath)
+Dir_mkdir(const char *filepath)
 {
-    if (!initialized) { chaz_Dir_init(); }
-    return os->run_local(os, "_charm_mkdir ", filepath, NULL);
+    if (!initialized) { Dir_init(); }
+    return ModHand_os->run_local(ModHand_os, "_charm_mkdir ", filepath, NULL);
 }
 
 chaz_bool_t
-chaz_Dir_rmdir(const char *filepath)
+Dir_rmdir(const char *filepath)
 {
-    if (!initialized) { chaz_Dir_init(); }
-    return os->run_local(os, "_charm_rmdir ", filepath, NULL);
+    if (!initialized) { Dir_init(); }
+    return ModHand_os->run_local(ModHand_os, "_charm_rmdir ", filepath, NULL);
 }
 
 /**

@@ -23,7 +23,7 @@
 void chaz_VariadicMacros_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-  #define VariadicMacros_run    chaz_VaradicMacros_run
+  #define VariadicMacros_run    chaz_VariadicMacros_run
 #endif
 
 #endif /* H_CHAZ_VARIADIC_MACROS */

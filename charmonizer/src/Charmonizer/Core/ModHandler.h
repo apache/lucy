@@ -66,11 +66,11 @@ chaz_ModHand_append_conf(char *fmt, ...);
 /* Print bookends delimiting a short names block.
  */
 #define CHAZ_MODHAND_START_SHORT_NAMES \
-  append_conf( \
+  chaz_ModHand_append_conf( \
     "\n#if defined(CHY_USE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n")
 
 #define CHAZ_MODHAND_END_SHORT_NAMES \
-    append_conf("#endif /* USE_SHORT_NAMES */\n")
+    chaz_ModHand_append_conf("#endif /* USE_SHORT_NAMES */\n")
 
 /* Define a shortened version of a macro symbol (minus the "CHY_" prefix);
  */
@@ -91,39 +91,38 @@ chaz_ModHand_shorten_function(const char *symbol);
  */
 #define CHAZ_MODHAND_START_RUN(module_name) \
     do { \
-        append_conf("\n/* %s */\n", module_name); \
-        if (verbosity > 0) \
+        chaz_ModHand_append_conf("\n/* %s */\n", module_name); \
+        if (chaz_Util_verbosity > 0) \
             printf("Running %s module...\n", module_name); \
     } while (0)
 
 /* Leave a little whitespace at the end of each module.
  */
-#define CHAZ_MODHAND_END_RUN append_conf("\n")
-
+#define CHAZ_MODHAND_END_RUN chaz_ModHand_append_conf("\n")
 
 #ifdef   CHAZ_USE_SHORT_NAMES
-  #define TRY_SOURCE_PATH          CHAZ_MOD_HAND_TRY_SOURCE_PATH
-  #define TRY_APP_BASENAME         CHAZ_MOD_HAND_TRY_APP_BASENAME
-  #define TARGET_PATH              CHAZ_MOD_HAND_TARGET_PATH
-  #define os                       chaz_ModHand_os
-  #define compiler                 chaz_ModHand_compiler
-  #define charm_run_available      chaz_ModHand_charm_run_available
-  #define charmony_fh              chaz_ModHand_charmony_fh
-  #define ModHand_init             chaz_ModHand_init
-  #define ModHand_open_charmony_h  chaz_ModHand_open_charmony_h
-  #define ModHand_clean_up         chaz_ModHand_clean_up
-  #define write_charm_h            chaz_ModHand_write_charm_h
-  #define build_charm_run          chaz_ModHand_build_charm_run
-  #define START_SHORT_NAMES        CHAZ_MODHAND_START_SHORT_NAMES
-  #define END_SHORT_NAMES          CHAZ_MODHAND_END_SHORT_NAMES
-  #define test_compile             chaz_ModHand_test_compile
-  #define capture_output           chaz_ModHand_capture_output 
-  #define append_conf              chaz_ModHand_append_conf
-  #define shorten_macro            chaz_ModHand_shorten_macro
-  #define shorten_typedef          chaz_ModHand_shorten_typedef
-  #define shorten_function         chaz_ModHand_shorten_function
-  #define START_RUN                CHAZ_MODHAND_START_RUN
-  #define END_RUN                  CHAZ_MODHAND_END_RUN
+  #define TRY_SOURCE_PATH                   CHAZ_MOD_HAND_TRY_SOURCE_PATH
+  #define TRY_APP_BASENAME                  CHAZ_MOD_HAND_TRY_APP_BASENAME
+  #define TARGET_PATH                       CHAZ_MOD_HAND_TARGET_PATH
+  #define ModHand_os                        chaz_ModHand_os
+  #define ModHand_compiler                  chaz_ModHand_compiler
+  #define ModHand_charm_run_available       chaz_ModHand_charm_run_available
+  #define ModHand_charmony_fh               chaz_ModHand_charmony_fh
+  #define ModHand_init                      chaz_ModHand_init
+  #define ModHand_open_charmony_h           chaz_ModHand_open_charmony_h
+  #define ModHand_clean_up                  chaz_ModHand_clean_up
+  #define ModHand_write_charm_h             chaz_ModHand_write_charm_h
+  #define ModHand_build_charm_run           chaz_ModHand_build_charm_run
+  #define START_SHORT_NAMES                 CHAZ_MODHAND_START_SHORT_NAMES
+  #define END_SHORT_NAMES                   CHAZ_MODHAND_END_SHORT_NAMES
+  #define ModHand_test_compile              chaz_ModHand_test_compile
+  #define ModHand_capture_output            chaz_ModHand_capture_output 
+  #define ModHand_append_conf               chaz_ModHand_append_conf
+  #define ModHand_shorten_macro             chaz_ModHand_shorten_macro
+  #define ModHand_shorten_typedef           chaz_ModHand_shorten_typedef
+  #define ModHand_shorten_function          chaz_ModHand_shorten_function
+  #define START_RUN                         CHAZ_MODHAND_START_RUN
+  #define END_RUN                           CHAZ_MODHAND_END_RUN
 #endif
 
 #endif /* H_CHAZ_MOD_HAND */

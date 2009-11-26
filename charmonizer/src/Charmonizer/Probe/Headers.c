@@ -77,13 +77,13 @@ char *win_headers[] = {
 };
 
 chaz_bool_t
-chaz_Headers_check(const char *header_name)
+Headers_check(const char *header_name)
 {
-    return check_header(header_name);
+    return HeadCheck_check_header(header_name);
 }
 
 void
-chaz_Headers_run(void) 
+Headers_run(void) 
 {
     int i;
     chaz_bool_t has_posix = false;
@@ -94,9 +94,9 @@ chaz_Headers_run(void)
     START_RUN("Headers");
 
     /* Try for all POSIX headers in one blast. */
-    if (check_many_headers((const char**)posix_headers)) {
+    if (HeadCheck_check_many_headers((const char**)posix_headers)) {
         has_posix = true;
-        append_conf("#define CHY_HAS_POSIX\n");
+        ModHand_append_conf("#define CHY_HAS_POSIX\n");
         for (i = 0; posix_headers[i] != NULL; i++) {
             S_keep(posix_headers[i]);
         }
@@ -104,17 +104,17 @@ chaz_Headers_run(void)
     /* Test one-at-a-time. */
     else {
         for (i = 0; posix_headers[i] != NULL; i++) {
-            if (check_header(posix_headers[i])) {
+            if (HeadCheck_check_header(posix_headers[i])) {
                 S_keep(posix_headers[i]);
             }
         }
     }
 
     /* test for all c89 headers in one blast */
-    if (check_many_headers((const char**)c89_headers)) {
+    if (HeadCheck_check_many_headers((const char**)c89_headers)) {
         has_c89 = true;
-        append_conf("#define CHY_HAS_C89\n");
-        append_conf("#define CHY_HAS_C90\n");
+        ModHand_append_conf("#define CHY_HAS_C89\n");
+        ModHand_append_conf("#define CHY_HAS_C90\n");
         for (i = 0; c89_headers[i] != NULL; i++) {
             S_keep(c89_headers[i]);
         }
@@ -122,14 +122,14 @@ chaz_Headers_run(void)
     /* Test one-at-a-time. */
     else {
         for (i = 0; c89_headers[i] != NULL; i++) {
-            if (check_header(c89_headers[i])) {
+            if (HeadCheck_check_header(c89_headers[i])) {
                 S_keep(c89_headers[i]);
             }
         }
     }
 
     /* Test for all Windows headers in one blast */
-    if (check_many_headers((const char**)win_headers)) {
+    if (HeadCheck_check_many_headers((const char**)win_headers)) {
         for (i = 0; win_headers[i] != NULL; i++) {
             S_keep(win_headers[i]);
         }
@@ -137,7 +137,7 @@ chaz_Headers_run(void)
     /* Test one-at-a-time. */
     else {
         for (i = 0; win_headers[i] != NULL; i++) {
-            if (check_header(win_headers[i])) {
+            if (HeadCheck_check_header(win_headers[i])) {
                 S_keep(win_headers[i]);
             }
         }
@@ -146,20 +146,20 @@ chaz_Headers_run(void)
     /* append the config with every header detected so far */
     for (i = 0; keepers[i] != NULL; i++) {
         S_encode_affirmation(keepers[i]);
-        append_conf("#define CHY_%s\n", aff_buf);
+        ModHand_append_conf("#define CHY_%s\n", aff_buf);
     }
 
     /* shorten */
     START_SHORT_NAMES;
     if (has_posix)
-        shorten_macro("HAS_POSIX");
+        ModHand_shorten_macro("HAS_POSIX");
     if (has_c89) {
-        shorten_macro("HAS_C89");
-        shorten_macro("HAS_C90");
+        ModHand_shorten_macro("HAS_C89");
+        ModHand_shorten_macro("HAS_C90");
     }
     for (i = 0; keepers[i] != NULL; i++) {
         S_encode_affirmation(keepers[i]);
-        shorten_macro(aff_buf);
+        ModHand_shorten_macro(aff_buf);
     }
     END_SHORT_NAMES;
 
@@ -170,7 +170,7 @@ static void
 S_keep(const char *header_name)
 {
     if (keeper_count >= MAX_KEEPER_COUNT)
-        die("Too many keepers -- increase MAX_KEEPER_COUNT");
+        Util_die("Too many keepers -- increase MAX_KEEPER_COUNT");
     keepers[keeper_count++] = header_name;
     keepers[keeper_count]   = NULL;
 }

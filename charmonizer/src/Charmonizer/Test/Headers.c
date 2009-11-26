@@ -130,13 +130,13 @@
 #endif
 
 TestBatch*
-chaz_THeaders_prepare()
+THeaders_prepare()
 {
-    return Test_new_batch("Headers", 2, chaz_THeaders_run);
+    return Test_new_batch("Headers", 2, THeaders_run);
 }
 
 void
-chaz_THeaders_run(TestBatch *batch)
+THeaders_run(TestBatch *batch)
 {
     PASS(batch, "Compiled successfully with all detected headers");
 

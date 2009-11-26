@@ -42,6 +42,13 @@ chaz_Probe_slurp_file(char* filepath, size_t *len_ptr);
 FILE*
 chaz_Probe_get_charmony_fh(void);
 
+#ifdef CHAZ_USE_SHORT_NAMES
+  #define Probe_init            chaz_Probe_init
+  #define Probe_clean_up        chaz_Probe_clean_up
+  #define Probe_set_verbosity   chaz_Probe_set_verbosity
+  #define Probe_slurp_file      chaz_Probe_slurp_file
+#endif
+
 #endif /* include guard */
 
 /**

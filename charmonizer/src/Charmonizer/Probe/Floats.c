@@ -9,18 +9,18 @@
 #include <stdlib.h>
 
 void
-chaz_Floats_run(void) 
+Floats_run(void) 
 {
     START_RUN("Floats");
 
-    append_conf(
+    ModHand_append_conf(
         "typedef float chy_f32_t;\n"
         "typedef double chy_f64_t;\n"
         "#define CHY_HAS_F32_T\n"
         "#define CHY_HAS_F64_T\n"
     );
 
-    append_conf(
+    ModHand_append_conf(
         "typedef union { chy_i32_t i; float f; } chy_floati32;\n"
         "static const chy_floati32 chy_f32inf    = {CHY_I32_C(0x7f800000)};\n"
         "static const chy_floati32 chy_f32neginf = {CHY_I32_C(0xff800000)};\n"
@@ -32,13 +32,13 @@ chaz_Floats_run(void)
 
     /* Shorten. */
     START_SHORT_NAMES;
-    shorten_typedef("f32_t");
-    shorten_typedef("f64_t");
-    shorten_macro("HAS_F32_T");
-    shorten_macro("HAS_F64_T");
-    shorten_macro("F32_INF");
-    shorten_macro("F32_NEGINF");
-    shorten_macro("F32_NAN");
+    ModHand_shorten_typedef("f32_t");
+    ModHand_shorten_typedef("f64_t");
+    ModHand_shorten_macro("HAS_F32_T");
+    ModHand_shorten_macro("HAS_F64_T");
+    ModHand_shorten_macro("F32_INF");
+    ModHand_shorten_macro("F32_NEGINF");
+    ModHand_shorten_macro("F32_NAN");
     END_SHORT_NAMES;
     
     END_RUN;

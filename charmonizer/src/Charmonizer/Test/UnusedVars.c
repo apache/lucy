@@ -5,12 +5,12 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-chaz_TUnusedVars_prepare()
+TUnusedVars_prepare()
 {
-    return Test_new_batch("UnusedVars", 2, chaz_TUnusedVars_run);
+    return Test_new_batch("UnusedVars", 2, TUnusedVars_run);
 }
 void
-chaz_TUnusedVars_run(TestBatch *batch)
+TUnusedVars_run(TestBatch *batch)
 {
 #ifdef UNUSED_VAR
     PASS(batch, "UNUSED_VAR macro is defined");

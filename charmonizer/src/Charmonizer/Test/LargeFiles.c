@@ -11,13 +11,13 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-chaz_TLargeFiles_prepare()
+TLargeFiles_prepare()
 {
-    return Test_new_batch("LargeFiles", 10, chaz_TLargeFiles_run);
+    return Test_new_batch("LargeFiles", 10, TLargeFiles_run);
 }
 
 void
-chaz_TLargeFiles_run(TestBatch *batch)
+TLargeFiles_run(TestBatch *batch)
 {
     FILE *fh;
     off64_t offset;

@@ -7,24 +7,24 @@
 static TestBatch **batches = NULL;
 
 void
-chaz_AllTests_init()
+AllTests_init()
 {
-    chaz_Test_init();
+    Test_init();
 
     /* create a null-terminated array of test batches to iterate over */
     batches = malloc(8 * sizeof(TestBatch*));
-    batches[0] = chaz_TDirManip_prepare();
-    batches[1] = chaz_TFuncMacro_prepare();
-    batches[2] = chaz_THeaders_prepare();
-    batches[3] = chaz_TIntegers_prepare();
-    batches[4] = chaz_TLargeFiles_prepare();
-    batches[5] = chaz_TUnusedVars_prepare();
-    batches[6] = chaz_TVariadicMacros_prepare();
+    batches[0] = TDirManip_prepare();
+    batches[1] = TFuncMacro_prepare();
+    batches[2] = THeaders_prepare();
+    batches[3] = TIntegers_prepare();
+    batches[4] = TLargeFiles_prepare();
+    batches[5] = TUnusedVars_prepare();
+    batches[6] = TVariadicMacros_prepare();
     batches[7] = NULL;
 }
 
 void
-chaz_AllTests_run()
+AllTests_run()
 {
     int total_tests   = 0;
     int total_passed  = 0;
@@ -40,7 +40,7 @@ chaz_AllTests_run()
 
     /* loop through test functions, accumulating results */
     for (i = 0; batches[i] != NULL; i++) {
-        chaz_TestBatch *batch = batches[i];
+        TestBatch *batch = batches[i];
         batch->run_test(batch);
         total_tests    += batch->num_tests;
         total_passed   += batch->num_passed;

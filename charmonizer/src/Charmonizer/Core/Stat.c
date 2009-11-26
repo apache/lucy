@@ -19,7 +19,7 @@ static void
 S_init();
 
 void
-chaz_Stat_stat(const char *filepath, chaz_Stat *target)
+Stat_stat(const char *filepath, Stat *target)
 {
     char *stat_output;
     size_t output_len;
@@ -36,10 +36,10 @@ chaz_Stat_stat(const char *filepath, chaz_Stat *target)
         return;
 
     /* run _charm_stat */
-    remove_and_verify("_charm_statout");
-    os->run_local(os, "_charm_stat ", filepath, NULL);
-    stat_output = slurp_file("_charm_statout", &output_len);
-    remove_and_verify("_charm_statout");
+    Util_remove_and_verify("_charm_statout");
+    ModHand_os->run_local(ModHand_os, "_charm_stat ", filepath, NULL);
+    stat_output = Util_slurp_file("_charm_statout", &output_len);
+    Util_remove_and_verify("_charm_statout");
 
     /* parse the output of _charm_stat and store vars in Stat struct */
     if (stat_output != NULL) {
@@ -74,16 +74,16 @@ S_init()
 {
     /* only try this once */
     initialized = true;
-    if (verbosity)
+    if (Util_verbosity)
         printf("Attempting to compile _charm_stat utility...\n");
 
     /* bail if sys/stat.h isn't available */
-    if (!check_header("sys/stat.h"))
+    if (!HeadCheck_check_header("sys/stat.h"))
         return;
 
     /* if the compile succeeds, open up for business */
-    stat_available = compiler->compile_exe(compiler, "_charm_stat.c",
-        "_charm_stat", charm_stat_code, strlen(charm_stat_code));
+    stat_available = ModHand_compiler->compile_exe(ModHand_compiler, 
+        "_charm_stat.c", "_charm_stat", charm_stat_code, strlen(charm_stat_code));
     remove("_charm_stat.c");
 }
 

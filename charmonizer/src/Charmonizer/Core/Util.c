@@ -7,22 +7,22 @@
 #include "Charmonizer/Core/Util.h"
 
 /* global verbosity setting */
-int chaz_Util_verbosity = 1;
+int Util_verbosity = 1;
 
 void
-chaz_Util_write_file(const char *filename, const char *content)
+Util_write_file(const char *filename, const char *content)
 {
     FILE *fh = fopen(filename, "w+");
     size_t content_len = strlen(content);
     if (fh == NULL)
-        die("Couldn't open '%s': %s", filename, strerror(errno));
+        Util_die("Couldn't open '%s': %s", filename, strerror(errno));
     fwrite(content, sizeof(char), content_len, fh);
     if (fclose(fh))
-        die("Error when closing '%s': %s", filename, strerror(errno));
+        Util_die("Error when closing '%s': %s", filename, strerror(errno));
 }
 
 char*
-chaz_Util_slurp_file(char *file_path, size_t *len_ptr) 
+Util_slurp_file(char *file_path, size_t *len_ptr) 
 {
     FILE   *const file = fopen(file_path, "r");
     char   *contents;
@@ -31,10 +31,10 @@ chaz_Util_slurp_file(char *file_path, size_t *len_ptr)
 
     /* sanity check */
     if (file == NULL)
-        die("Error opening file '%s': %s", file_path, strerror(errno));
+        Util_die("Error opening file '%s': %s", file_path, strerror(errno));
 
     /* find length; return NULL if the file has a zero-length */
-    len = flength(file);
+    len = Util_flength(file);
     if (len == 0) {
         *len_ptr = 0;
         return NULL;
@@ -43,13 +43,13 @@ chaz_Util_slurp_file(char *file_path, size_t *len_ptr)
     /* allocate memory and read the file */
     contents = (char*)malloc(len * sizeof(char) + 1);
     if (contents == NULL)
-        die("Out of memory at %d, %s", __FILE__, __LINE__);
+        Util_die("Out of memory at %d, %s", __FILE__, __LINE__);
     contents[len] = '\0';
     check_val = fread(contents, sizeof(char), len, file);
 
     /* weak error check, because CRLF might result in fewer chars read */
     if (check_val <= 0)
-        die("Tried to read %d characters of '%s', got %d", (int)len,
+        Util_die("Tried to read %d characters of '%s', got %d", (int)len,
             file_path, check_val);
 
     /* set length pointer for benefit of caller */
@@ -57,13 +57,13 @@ chaz_Util_slurp_file(char *file_path, size_t *len_ptr)
 
     /* clean up */
     if (fclose(file))
-        die("Error closing file '%s': %s", file_path, strerror(errno));
+        Util_die("Error closing file '%s': %s", file_path, strerror(errno));
 
     return contents;
 }
 
 long 
-chaz_Util_flength(FILE *f) 
+Util_flength(FILE *f) 
 {
     const long bookmark = ftell(f);
     long check_val;
@@ -72,21 +72,21 @@ chaz_Util_flength(FILE *f)
     /* seek to end of file and check length */
     check_val = fseek(f, 0, SEEK_END);
     if (check_val == -1)
-        die("fseek error : %s\n", strerror(errno));
+        Util_die("fseek error : %s\n", strerror(errno));
     len = ftell(f);
     if (len == -1)
-        die("ftell error : %s\n", strerror(errno));
+        Util_die("ftell error : %s\n", strerror(errno));
 
     /* return to where we were */
     check_val = fseek(f, bookmark, SEEK_SET);
     if (check_val == -1)
-        die("fseek error : %s\n", strerror(errno));
+        Util_die("fseek error : %s\n", strerror(errno));
 
     return len;
 }
 
 void 
-chaz_Util_die(char* format, ...) 
+Util_die(char* format, ...) 
 {
     va_list args;
     va_start(args, format);
@@ -97,7 +97,7 @@ chaz_Util_die(char* format, ...)
 }
 
 void 
-chaz_Util_warn(char* format, ...) 
+Util_warn(char* format, ...) 
 {
     va_list args;
     va_start(args, format);
@@ -107,17 +107,17 @@ chaz_Util_warn(char* format, ...)
 }
 
 int
-chaz_Util_remove_and_verify(char *file_path) 
+Util_remove_and_verify(char *file_path) 
 {
     /* try to remove the file */
     remove(file_path);
 
     /* return what *might* be success or failure */
-    return can_open_file(file_path) ? 0 : 1;
+    return Util_can_open_file(file_path) ? 0 : 1;
 }
 
 int
-chaz_Util_can_open_file(char *file_path) 
+Util_can_open_file(char *file_path) 
 {
     FILE *garbage_fh;
 

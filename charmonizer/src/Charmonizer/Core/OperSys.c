@@ -22,12 +22,12 @@ S_remove_obj(OperSys *self, char *name);
 static int 
 S_run_local(OperSys *self, ...);
 
-chaz_OperSys*
-chaz_OS_new(const char *name) 
+OperSys*
+OS_new(const char *name) 
 {
     OperSys *self = (OperSys*)malloc(sizeof(OperSys));
 
-    if (verbosity)
+    if (Util_verbosity)
         printf("Creating os object...\n");
 
     /* assign */
@@ -68,19 +68,19 @@ S_probe_devnull(OperSys *self)
     };
     int i;
 
-    if (verbosity)
+    if (Util_verbosity)
         printf("Trying to find a bit-bucket a la /dev/null...\n");
 
     /* iterate through names of possible devnulls trying to open them */
     for (i = 0; devnull_options[i] != NULL; i++) {
-        if (can_open_file(devnull_options[i])) {
+        if (Util_can_open_file(devnull_options[i])) {
             self->devnull = strdup(devnull_options[i]);
             return;
         }
     }
 
     /* bail out we couldn't find a devnull */
-    die("Couldn't find anything like /dev/null");
+    Util_die("Couldn't find anything like /dev/null");
 }
 
 static void

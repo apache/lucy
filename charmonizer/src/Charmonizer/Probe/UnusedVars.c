@@ -8,18 +8,18 @@
 
 
 void
-chaz_UnusedVars_run(void) 
+UnusedVars_run(void) 
 {
     START_RUN("UnusedVars");
     
     /* write the macros (no test, these are the same everywhere) */
-    append_conf("#define CHY_UNUSED_VAR(x) ((void)x)\n");
-    append_conf("#define CHY_UNREACHABLE_RETURN(type) return (type)0\n");
+    ModHand_append_conf("#define CHY_UNUSED_VAR(x) ((void)x)\n");
+    ModHand_append_conf("#define CHY_UNREACHABLE_RETURN(type) return (type)0\n");
 
     /* shorten */
     START_SHORT_NAMES;
-    shorten_macro("UNUSED_VAR");
-    shorten_macro("UNREACHABLE_RETURN");
+    ModHand_shorten_macro("UNUSED_VAR");
+    ModHand_shorten_macro("UNREACHABLE_RETURN");
     END_SHORT_NAMES;
 
     END_RUN;

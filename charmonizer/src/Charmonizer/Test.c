@@ -19,7 +19,7 @@ S_TestBatch_run_test(TestBatch *batch);
     printf("\n");
 
 void
-chaz_Test_init(void) {
+Test_init(void) {
     /* unbuffer stdout */
     int check_val = setvbuf(stdout, NULL, _IONBF, 0);
     if (check_val != 0)
@@ -27,7 +27,7 @@ chaz_Test_init(void) {
 }
 
 TestBatch* 
-chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
+Test_new_batch(const char *batch_name, unsigned num_tests,
                     TestBatch_test_func_t test_func)
 {
     TestBatch *batch = (TestBatch*)malloc(sizeof(TestBatch));
@@ -49,7 +49,7 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 }
 
 void
-chaz_Test_plan(TestBatch *batch)
+Test_plan(TestBatch *batch)
 {
     printf("1..%u\n", batch->num_tests);
 }
@@ -72,7 +72,7 @@ S_TestBatch_run_test(TestBatch *batch)
 }
 
 void
-chaz_Test_assert_true(TestBatch *batch, int value, const char *pat, ...)
+Test_assert_true(TestBatch *batch, int value, const char *pat, ...)
 {
     va_list args;
 
@@ -93,7 +93,7 @@ chaz_Test_assert_true(TestBatch *batch, int value, const char *pat, ...)
 }
 
 void
-chaz_Test_assert_false(TestBatch *batch, int value, const char *pat, ...)
+Test_assert_false(TestBatch *batch, int value, const char *pat, ...)
 {
     va_list args;
 
@@ -114,7 +114,7 @@ chaz_Test_assert_false(TestBatch *batch, int value, const char *pat, ...)
 }
 
 void 
-chaz_Test_assert_str_eq(TestBatch *batch, const char *got, 
+Test_assert_str_eq(TestBatch *batch, const char *got, 
                         const char *expected, const char *pat, ...)
 {
     va_list args;
@@ -138,7 +138,7 @@ chaz_Test_assert_str_eq(TestBatch *batch, const char *got,
 
 
 void 
-chaz_Test_assert_str_neq(TestBatch *batch, const char *got, 
+Test_assert_str_neq(TestBatch *batch, const char *got, 
                          const char *expected, const char *pat, ...)
 {
     va_list args;
@@ -161,7 +161,7 @@ chaz_Test_assert_str_neq(TestBatch *batch, const char *got,
 }
 
 void 
-chaz_Test_pass(TestBatch *batch, const char *pat, ...)
+Test_pass(TestBatch *batch, const char *pat, ...)
 {
     va_list args;
 
@@ -176,7 +176,7 @@ chaz_Test_pass(TestBatch *batch, const char *pat, ...)
 }
 
 void 
-chaz_Test_fail(TestBatch *batch, const char *pat, ...)
+Test_fail(TestBatch *batch, const char *pat, ...)
 {
     va_list args;
 
@@ -191,7 +191,7 @@ chaz_Test_fail(TestBatch *batch, const char *pat, ...)
 }
 
 void 
-chaz_Test_assert_int_eq(TestBatch *batch, long got, long expected, 
+Test_assert_int_eq(TestBatch *batch, long got, long expected, 
                         const char *pat, ...)
 {
     va_list args;
@@ -213,7 +213,7 @@ chaz_Test_assert_int_eq(TestBatch *batch, long got, long expected,
 }
 
 void 
-chaz_Test_assert_float_eq(TestBatch *batch, double got, 
+Test_assert_float_eq(TestBatch *batch, double got, 
                           double expected, const char *pat, ...)
 {
     va_list args;
@@ -237,7 +237,7 @@ chaz_Test_assert_float_eq(TestBatch *batch, double got,
 }
 
 void
-chaz_Test_skip(TestBatch *batch, const char *pat, ...)
+Test_skip(TestBatch *batch, const char *pat, ...)
 {
     va_list args;
 
@@ -252,7 +252,7 @@ chaz_Test_skip(TestBatch *batch, const char *pat, ...)
 }
 
 void
-chaz_Test_report_skip_remaining(TestBatch *batch, const char *pat, ...)
+Test_report_skip_remaining(TestBatch *batch, const char *pat, ...)
 {
     va_list args;
     unsigned remaining = batch->num_tests - batch->test_num;

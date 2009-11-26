@@ -14,10 +14,10 @@
 #endif
 
 
-chaz_CompilerSpec*
-chaz_CCSpec_find_spec()
+CompilerSpec*
+CCSpec_find_spec()
 {
-    if (verbosity)
+    if (Util_verbosity)
         printf("Trying to find a supported compiler...\n");
 
     return &spec;
