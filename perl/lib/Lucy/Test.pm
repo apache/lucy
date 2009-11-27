@@ -46,6 +46,9 @@ PPCODE:
     else if (strEQ(package, "TestFileHandle")) {
         lucy_TestFH_run_tests();
     }
+    else if (strEQ(package, "TestFolder")) {
+        lucy_TestFolder_run_tests();
+    }
     else if (strEQ(package, "TestInStream")) {
         lucy_TestInStream_run_tests();
     }
