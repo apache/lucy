@@ -37,6 +37,9 @@ PPCODE:
         lucy_TestVArray_run_tests();
     }
     /* Lucy::Store */
+    else if (strEQ(package, "TestCompoundFileWriter")) {
+        lucy_TestCFWriter_run_tests();
+    }
     else if (strEQ(package, "TestFileHandle")) {
         lucy_TestFH_run_tests();
     }
