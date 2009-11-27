@@ -2,6 +2,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Store/RAMFolder.h"
+#include "Lucy/Store/CompoundFileReader.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/RAMDirHandle.h"
@@ -149,16 +150,12 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
     }
 
     /* Extract RAMFolders from compound reader wrappers, if necessary. */
-    inner_from_folder = (RAMFolder*)from_folder;
-    inner_to_folder   = (RAMFolder*)to_folder;
-    /*
     inner_from_folder = Obj_Is_A(from_folder, COMPOUNDFILEREADER)
                       ? (RAMFolder*)CFReader_Get_Real_Folder(from_folder)
                       : (RAMFolder*)from_folder;
     inner_to_folder   = Obj_Is_A(to_folder, COMPOUNDFILEREADER)
                       ? (RAMFolder*)CFReader_Get_Real_Folder(to_folder)
                       : (RAMFolder*)to_folder;
-    */
     if (!Obj_Is_A(inner_from_folder, RAMFOLDER)) {
         Err_set_error(Err_new(CB_newf("Not a RAMFolder, but a '%o'",
             Obj_Get_Class_Name(inner_from_folder))));
@@ -173,15 +170,12 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
     /* Find the original element. */
     elem = Hash_Fetch(inner_from_folder->entries, (Obj*)from_name);
     if (!elem) {
-        if (0) { }
-        /*
         if (   Obj_Is_A(from_folder, COMPOUNDFILEREADER)
             && CFReader_Local_Exists(from_folder, (CharBuf*)from_name)
         ) {
             Err_set_error(Err_new(CB_newf("Source file '%o' is virtual", 
                 from)));
         }
-        */
         else {
             Err_set_error(Err_new(CB_newf("File not found: '%o'", from)));
         }
@@ -294,7 +288,10 @@ RAMFolder_local_delete(RAMFolder *self, const CharBuf *name)
             ;
         }
         else if (Obj_Is_A(entry, FOLDER)) {
-            RAMFolder *inner_folder = (RAMFolder*)CERTIFY(entry, RAMFOLDER);
+            RAMFolder *inner_folder = Obj_Is_A(entry, COMPOUNDFILEREADER)
+                ? (RAMFolder*)CERTIFY(
+                    CFReader_Get_Real_Folder(entry), RAMFOLDER)
+                : (RAMFolder*)CERTIFY(entry, RAMFOLDER);
             if (Hash_Get_Size(inner_folder->entries)) {
                 /* Can't delete non-empty dir. */
                 return false;

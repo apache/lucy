@@ -140,6 +140,11 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
     public incremented ByteBuf*
     Slurp_File(Folder *self, const CharBuf *path);
 
+    /** Collapse the contents of the directory into a compound file.
+     */
+    void
+    Consolidate(Folder *self, const CharBuf *path);
+
     /** Given a filepath, return the Folder representing everything except
      * the last component.  E.g. the 'foo/bar' Folder for '/foo/bar/baz.txt',
      * the 'foo' Folder for 'foo/bar', etc.

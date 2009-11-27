@@ -8,6 +8,8 @@
 #endif
 
 #include "Lucy/Store/Folder.h"
+#include "Lucy/Store/CompoundFileReader.h"
+#include "Lucy/Store/CompoundFileWriter.h"
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/InStream.h"
@@ -363,6 +365,32 @@ Folder_set_path(Folder *self, const CharBuf *path)
 {
     DECREF(self->path);
     self->path = CB_Clone(path);
+}
+
+void
+Folder_consolidate(Folder *self, const CharBuf *path)
+{
+    Folder *folder = Folder_Find_Folder(self, path);
+    Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
+    if (!folder) {
+        THROW(ERR, "Can't consolidate %o", path);
+    }
+    else if (Obj_Is_A(folder, COMPOUNDFILEREADER)) {
+        THROW(ERR, "Can't consolidate %o twice", path);
+    }
+    else {
+        CompoundFileWriter *cf_writer = CFWriter_new(folder);
+        CFWriter_Consolidate(cf_writer);
+        DECREF(cf_writer);
+        {
+            ZombieCharBuf name_zcb = ZCB_BLANK;
+            ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
+            CompoundFileReader *cf_reader = CFReader_open(folder);
+            if (!cf_reader) { RETHROW(INCREF(Err_get_error())); }
+            Hash_Store(enclosing_folder->entries, (Obj*)name, 
+                (Obj*)cf_reader);
+        }
+    }
 }
 
 static Folder*
