@@ -152,7 +152,8 @@ static Header*
 S_discover_header(const char *header_name) 
 {
     Header* header = (Header*)malloc(sizeof(Header));
-    char *include_test = malloc(strlen(header_name) + 30); 
+    size_t  needed = strlen(header_name) + sizeof(test_code) + 50;
+    char *include_test = (char*)malloc(needed); 
     
     /* assign */
     header->name = strdup(header_name);
