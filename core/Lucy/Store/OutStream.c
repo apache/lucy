@@ -319,6 +319,9 @@ OutStream_close(OutStream *self)
 {
     if (self->file_handle) {
         S_flush(self);
+        if (!FH_Close(self->file_handle)) {
+            RETHROW(INCREF(Err_get_error()));
+        }
         DECREF(self->file_handle);
         self->file_handle = NULL;
     }
