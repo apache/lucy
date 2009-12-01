@@ -236,12 +236,12 @@ END_STUFF
 sub _typemap_output_start {
     my ( $big_signed_convert, $big_unsigned_convert );
     if ( $Config{ivsize} == 8 ) {
-        $big_signed_convert   = 'sv_setiv((IV)$arg);';
-        $big_unsigned_convert = 'sv_setuv((UV)$arg);';
+        $big_signed_convert   = 'sv_setiv($arg, (IV)$var);';
+        $big_unsigned_convert = 'sv_setuv($arg, (UV)$var);';
     }
     else {
-        $big_signed_convert   = 'sv_setnv((NV)$arg);';
-        $big_unsigned_convert = 'sv_setnv((NV)$arg);';
+        $big_signed_convert   = 'sv_setnv($arg, (NV)$var);';
+        $big_unsigned_convert = 'sv_setnv($arg, (NV)$var);';
     }
     return <<END_STUFF;
 
