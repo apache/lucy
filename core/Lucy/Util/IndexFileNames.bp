@@ -20,7 +20,7 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
      * @param target The target string to assign to.
      * @return target, allowing an assignment idiom.
      */
-    inert ZombieCharBuf*
+    inert incremented ZombieCharBuf*
     local_part(const CharBuf *path, ZombieCharBuf *target);
 }
 
