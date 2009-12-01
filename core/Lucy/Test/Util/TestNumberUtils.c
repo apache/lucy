@@ -277,7 +277,7 @@ test_bigend_u64(TestBatch *batch)
     target = encoded;
     for (i = 0; i < count; i++) {
         u64_t got = NumUtil_decode_bigend_u64(target);
-        ASSERT_INT_EQ(batch, got, ints[i], "bigend u64");
+        ASSERT_TRUE(batch, got == ints[i], "bigend u64");
         target += sizeof(u64_t);
     }
 
@@ -308,7 +308,8 @@ test_bigend_f32(TestBatch *batch)
     target = encoded;
     for (i = 0; i < count; i++) {
         float got = NumUtil_decode_bigend_f32(target);
-        ASSERT_INT_EQ(batch, got, source[i], "bigend f32");
+        ASSERT_TRUE(batch, got == source[i], "bigend f32");
+
         target += sizeof(float);
     }
 
@@ -344,7 +345,8 @@ test_bigend_f64(TestBatch *batch)
     target = encoded;
     for (i = 0; i < count; i++) {
         double got = NumUtil_decode_bigend_f64(target);
-        ASSERT_INT_EQ(batch, got, source[i], "bigend f64");
+        ASSERT_TRUE(batch, got == source[i], "bigend f64");
+
         target += sizeof(double);
     }
 
