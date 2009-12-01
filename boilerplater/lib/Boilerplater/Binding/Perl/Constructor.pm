@@ -122,8 +122,13 @@ XS($c_name)
         $var_assignments
         $refcount_mods
         retval = $func_sym($name_list);
-        ST(0) = Lucy_Obj_To_Host(retval);
-        LUCY_DECREF(retval);
+        if (retval) {
+            ST(0) = (SV*)Lucy_Obj_To_Host(retval);
+            Lucy_Obj_Dec_RefCount(retval);
+        }
+        else {
+            ST(0) = newSV(0);
+        }
         sv_2mortal( ST(0) );
         XSRETURN(1);
     }
