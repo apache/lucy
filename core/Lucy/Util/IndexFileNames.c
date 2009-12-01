@@ -2,7 +2,36 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Util/IndexFileNames.h"
+#include "Lucy/Store/DirHandle.h"
+#include "Lucy/Store/Folder.h"
 #include "Lucy/Util/StringHelper.h"
+
+CharBuf*
+IxFileNames_latest_snapshot(Folder *folder)
+{
+    DirHandle *dh = Folder_Open_Dir(folder, NULL);
+    CharBuf   *entry = dh ? DH_Get_Entry(dh) : NULL;
+    CharBuf   *retval   = NULL;
+    i32_t      latest_gen = 0;
+
+    if (!dh) { RETHROW(INCREF(Err_get_error())); }
+
+    while (DH_Next(dh)) {
+        if (   CB_Starts_With_Str(entry, "snapshot_", 9)
+            && CB_Ends_With_Str(entry, ".json", 5)
+        ) {
+            i32_t gen = IxFileNames_extract_gen(entry);
+            if (gen > latest_gen) {
+                latest_gen = gen;
+                if (!retval) retval = CB_Clone(entry);
+                else CB_Mimic(retval, (Obj*)entry);
+            }
+        }
+    }
+
+    DECREF(dh);
+    return retval;
+}
 
 i32_t
 IxFileNames_extract_gen(const CharBuf *name)

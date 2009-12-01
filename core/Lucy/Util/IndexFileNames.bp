@@ -13,6 +13,12 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
     inert i32_t
     extract_gen(const CharBuf *name);
 
+    /** Return the name of the latest generation snapshot file in the Folder,
+     * or NULL if no such file exists.
+     */
+    inert incremented CharBuf*
+    latest_snapshot(Folder *folder);
+
     /** Split the <code>path</code> on '/' and assign the last component to
      * <code>target</code>, which will remain valid only as long as
      * <code>path</code> is unmodified.  Trailing slashes will be stripped.  
