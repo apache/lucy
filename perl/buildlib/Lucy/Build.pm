@@ -290,7 +290,7 @@ sub ACTION_boilerplater {
         header    => $self->autogen_header,
         footer    => $self->copyfoot,
     );
-    my $modified = $core_binding->write_all_modified(1);
+    my $modified = $core_binding->write_all_modified;
     if ($modified) {
         unlink('typemap');
         print "Writing typemap...\n";
