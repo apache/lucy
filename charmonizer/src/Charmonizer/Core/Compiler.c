@@ -118,6 +118,7 @@ S_compile_exe(Compiler *self, const char *source_path, const char *exe_name,
                                + 200;
     char *command = malloc(command_max_size);
     chaz_bool_t result;
+    (void)code_len; /* Unused. */
     
     /* Prepare the compiler command. */
     if (Util_verbosity < 2 && chaz_ModHand_charm_run_available) {
@@ -168,6 +169,7 @@ S_compile_obj(Compiler *self, const char *source_path, const char *obj_name,
                                + 200;
     char *command = malloc(command_max_size);
     chaz_bool_t result;
+    (void)code_len; /* Unused. */
     
     /* Prepare the compiler command. */
     if (Util_verbosity < 2 && chaz_ModHand_charm_run_available) {
