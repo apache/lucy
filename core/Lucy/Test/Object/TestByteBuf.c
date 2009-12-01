@@ -2,6 +2,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestByteBuf.h"
 
 static void
@@ -30,6 +31,9 @@ test_Equals(TestBatch *batch)
         "same length");
     ASSERT_FALSE(batch, BB_Equals(wanted, (Obj*)got), 
         "Different content spoils Equals");
+
+    DECREF(got);
+    DECREF(wanted);
 }
 
 static void

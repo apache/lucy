@@ -1,12 +1,11 @@
 #define C_LUCY_STRINGHELPER
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "Lucy/Util/StringHelper.h"
+#include "Lucy/Object/Err.h"
 #include "Lucy/Util/Memory.h"
 
 const u8_t StrHelp_UTF8_SKIP[] = {
@@ -148,9 +147,8 @@ StrHelp_encode_utf8_char(u32_t code_point, void *buffer)
         return 4;
     }
     else {
-        fprintf(stderr, "Illegal Unicode code point: %lu", 
-            (unsigned long)code_point);
-        exit(1);
+        THROW(ERR, "Illegal Unicode code point: %u32", code_point);
+        UNREACHABLE_RETURN(u32_t);
     }
 }
 
@@ -211,9 +209,7 @@ StrHelp_decode_utf8_char(const char *ptr)
             break;
 
         default:
-            fprintf(stderr, "Invalid UTF-8 header byte: %lu", 
-                (unsigned long)retval);
-            exit(1);
+            THROW(ERR, "Invalid UTF-8 header byte: %x32", retval);
     }
 
     return retval;

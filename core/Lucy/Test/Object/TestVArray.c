@@ -87,7 +87,7 @@ test_Push_Pop_Shift_Unshift(TestBatch *batch)
     VA_Push(array, (Obj*)CB_newf("c"));
 
     ASSERT_INT_EQ(batch, VA_Get_Size(array), 3, "size after Push");
-    ASSERT_TRUE(batch, NULL != DOWNCAST(VA_Fetch(array, 2), CHARBUF), "Push");
+    ASSERT_TRUE(batch, NULL != CERTIFY(VA_Fetch(array, 2), CHARBUF), "Push");
 
     elem = (CharBuf*)CERTIFY(VA_Shift(array), CHARBUF);
     ASSERT_TRUE(batch, CB_Equals_Str(elem, "a", 1), "Shift");
