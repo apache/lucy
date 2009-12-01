@@ -15,6 +15,17 @@ extract_gen(name)
 CODE:
     RETVAL = lucy_IxFileNames_extract_gen((lucy_CharBuf*)&name);
 OUTPUT: RETVAL
+
+SV*
+latest_snapshot(folder)
+    lucy_Folder *folder;
+CODE:
+{
+    lucy_CharBuf *latest = lucy_IxFileNames_latest_snapshot(folder);
+    RETVAL = XSBind_cb_to_sv(latest);   
+    LUCY_DECREF(latest);
+}
+OUTPUT: RETVAL
 END_XS_CODE
 
 Boilerplater::Binding::Perl::Class->register(
