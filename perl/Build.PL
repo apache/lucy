@@ -6,19 +6,25 @@ use lib 'buildlib';
 use Lucy::Build;
 
 my $builder = Lucy::Build->new(
-    module_name        => 'Lucy',
-    license            => 'apache',
-    dist_author        => 'Marvin Humphrey <marvin at rectangular dot com>',
-    dist_version_from  => 'lib/Lucy.pm',
-    dist_abstract_from => 'lib/Lucy.pm',
-    create_makefile_pl => 'passthrough',
-    requires           => { 'JSON::XS' => 1.53, },
-    build_requires     => {
+    module_name       => 'Lucy',
+    license           => 'apache',
+    dist_author       => 'Marvin Humphrey <marvin at rectangular dot com>',
+    dist_version_from => 'lib/Lucy.pm',
+    requires          => { 'JSON::XS' => 1.53, },
+    build_requires    => {
         'ExtUtils::CBuilder' => 0.18,
         'ExtUtils::ParseXS'  => 2.16,
         'Devel::PPPort'      => 3.13,
     },
-    add_to_cleanup => [ 'Lucy-*', 'MANIFEST.bak', 'perltidy.ERR' ],
+    add_to_cleanup     => [
+        qw(
+            Lucy-*
+            MANIFEST.bak
+            perltidy.ERR
+            *.pdb
+            *.manifest
+        ),
+    ],
 );
 
 $builder->create_build_script();
