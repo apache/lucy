@@ -11,6 +11,7 @@
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/VTable.h"
+#include "Lucy/Util/Memory.h"
 
 Err*
 Err_new(CharBuf *mess)
@@ -216,6 +217,45 @@ lucy_Err_certify(Obj *obj, VTable *vtable, const char *file, int line,
     }
     return obj;
 }
+
+#ifdef CHY_HAS_WINDOWS_H
+
+#include <windows.h>
+
+char* 
+Err_win_error()
+{
+    size_t buf_size = 256;
+    char *buf = (char*)MALLOCATE(buf_size);
+    size_t message_len = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 
+        NULL,       /* message source table */
+        GetLastError(),
+        0,          /* language id */
+        buf,
+        buf_size,
+        NULL        /* empty va_list */
+    );
+    if (message_len == 0) {
+        char unknown[] = "Unknown error";
+        size_t len = sizeof(unknown);
+        strncpy(buf, unknown, len);
+    }
+    else if (message_len > 1) {
+        /* Kill stupid newline. */
+        buf[message_len - 2] = '\0';
+    }
+    return buf;
+}
+
+#else 
+
+char*
+Err_win_error()
+{
+    return NULL; /* Never called. */
+}
+
+#endif /* CHY_HAS_WINDOWS_H */
 
 /* Copyright 2009 The Apache Software Foundation
  *

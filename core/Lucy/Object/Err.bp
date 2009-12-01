@@ -130,6 +130,12 @@ class Lucy::Object::Err extends Lucy::Object::Obj {
      */
     inert inline void
     abstract_class_check(Obj *obj, VTable *vtable);
+
+    /** On Windows, return a newly allocated buffer containing the string
+     * description for the the last error in the thread. 
+     */
+    inert char*
+    win_error();
 }
 
 __C__
