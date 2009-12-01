@@ -48,9 +48,9 @@ SI_push_args(void *vobj, va_list args, chy_u32_t num_args)
             }
             break;
         case LUCY_HOST_ARGTYPE_I64: {
-                chy_i32_t value = va_arg(args, chy_i64_t);
+                chy_i64_t value = va_arg(args, chy_i64_t);
                 if (sizeof(IV) == 8) {
-                    XPUSHs( sv_2mortal( newSViv(value) ) );
+                    XPUSHs( sv_2mortal( newSViv((IV)value) ) );
                 }
                 else {
                     /* lossy */
