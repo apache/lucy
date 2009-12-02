@@ -384,7 +384,7 @@ Folder_consolidate(Folder *self, const CharBuf *path)
         CompoundFileWriter *cf_writer = CFWriter_new(folder);
         CFWriter_Consolidate(cf_writer);
         DECREF(cf_writer);
-        {
+        if (CB_Get_Size(path)) {
             ZombieCharBuf name_zcb = ZCB_BLANK;
             ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
             CompoundFileReader *cf_reader = CFReader_open(folder);
