@@ -39,7 +39,7 @@ lucy_Err_to_host(lucy_Err *self)
 {
     lucy_Err_to_host_t super_to_host 
         = (lucy_Err_to_host_t)LUCY_SUPER_METHOD(LUCY_ERR, Err, To_Host);
-    SV *perl_obj = super_to_host(self);
+    SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;
 }

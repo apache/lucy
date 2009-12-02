@@ -4,6 +4,10 @@
 #ifndef H_LUCY_XSBIND
 #define H_LUCY_XSBIND 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "charmony.h"
 #include "Lucy/Object/Obj.h"
 #include "Lucy/Object/ByteBuf.h"
@@ -64,7 +68,7 @@ lucy_XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable,
 static CHY_INLINE SV*
 lucy_XSBind_lucy_obj_to_sv(lucy_Obj *obj)
 {
-    return obj ? Lucy_Obj_To_Host(obj) : newSV(0);
+    return obj ? (SV*)Lucy_Obj_To_Host(obj) : newSV(0);
 }
 
 /** XSBind_lucy_obj_to_sv, with a cast. 
@@ -80,7 +84,7 @@ lucy_XSBind_lucy_obj_to_sv_noinc(lucy_Obj *obj)
 {
     SV *retval;
     if (obj) {
-        retval = Lucy_Obj_To_Host(obj);
+        retval = (SV*)Lucy_Obj_To_Host(obj);
         Lucy_Obj_Dec_RefCount(obj);
     }
     else {
@@ -175,6 +179,10 @@ lucy_XSBind_allot_params(SV** stack, chy_i32_t start,
 #define THROW            LUCY_THROW
 #define WARN             LUCY_WARN
 #define OVERRIDDEN       LUCY_OVERRIDDEN
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_LUCY_XSBIND */
 

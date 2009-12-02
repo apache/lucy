@@ -415,7 +415,7 @@ lucy_Hash_rebuild_hash(Hash *self)
 
     FREEMEM(old_entries);
 
-    return self->entries;
+    return (HashEntry*)self->entries;
 }
 
 /* Copyright 2009 The Apache Software Foundation

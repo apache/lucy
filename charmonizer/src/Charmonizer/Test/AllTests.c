@@ -12,7 +12,7 @@ AllTests_init()
     Test_init();
 
     /* create a null-terminated array of test batches to iterate over */
-    batches = malloc(8 * sizeof(TestBatch*));
+    batches = (TestBatch**)malloc(8 * sizeof(TestBatch*));
     batches[0] = TDirManip_prepare();
     batches[1] = TFuncMacro_prepare();
     batches[2] = THeaders_prepare();

@@ -6,6 +6,10 @@
 #ifndef H_CHAZ_DIR
 #define H_CHAZ_DIR
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "Charmonizer/Core/Defines.h"
 
 /* Compile the utilities which execute the Dir_mkdir and Dir_rmdir functions. */
@@ -35,6 +39,10 @@ extern int chaz_Dir_mkdir_num_args;
   #define Dir_rmdir             chaz_Dir_rmdir
   #define Dir_mkdir_command     chaz_Dir_mkdir_command
   #define Dir_mkdir_num_args    chaz_Dir_mkdir_num_args
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_DIR */

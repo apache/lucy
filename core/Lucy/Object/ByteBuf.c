@@ -49,7 +49,7 @@ ByteBuf*
 BB_new_steal_bytes(void *bytes, size_t size, size_t capacity) 
 {
     ByteBuf *self = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
-    self->buf  = bytes;
+    self->buf  = (char*)bytes;
     self->size = size;
     self->cap  = capacity;
     return self;

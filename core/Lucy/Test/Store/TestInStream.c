@@ -156,7 +156,7 @@ test_Seek_and_Tell(TestBatch *batch)
     ASSERT_TRUE(batch, instream->window->offset == gb6,
         "Seek forwards outside buffer tracks pos in window offset");
 
-    InStream_Buf(instream, gb1);
+    InStream_Buf(instream, (size_t)gb1);
     ASSERT_TRUE(batch, instream->limit == ((char*)NULL) + gb1,
         "InStream_Buf sets limit");
 

@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_DIRMANIP
 #define H_CHAZ_DIRMANIP 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The DirManip module exports or aliases symbols related to directory and file
  * manipulation.
  *
@@ -40,6 +44,10 @@ void chaz_DirManip_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define DirManip_run    chaz_DirManip_run
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_DIR_SEP */

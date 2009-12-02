@@ -13,6 +13,10 @@
 #ifndef H_CHAZ_STAT
 #define H_CHAZ_STAT
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "Charmonizer/Core/Defines.h"
 
 typedef struct chaz_Stat chaz_Stat;
@@ -33,6 +37,10 @@ chaz_Stat_stat(const char *filepath, chaz_Stat *target);
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Stat                  chaz_Stat
   #define Stat_stat             chaz_Stat_stat
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_COMPILER */

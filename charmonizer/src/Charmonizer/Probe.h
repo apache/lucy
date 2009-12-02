@@ -1,6 +1,10 @@
 #ifndef H_CHAZ
 #define H_CHAZ 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdio.h>
 
@@ -47,6 +51,10 @@ chaz_Probe_get_charmony_fh(void);
   #define Probe_clean_up        chaz_Probe_clean_up
   #define Probe_set_verbosity   chaz_Probe_set_verbosity
   #define Probe_slurp_file      chaz_Probe_slurp_file
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* include guard */

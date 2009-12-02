@@ -66,8 +66,8 @@ HeadCheck_check_header(const char *header_name)
     /* fake up a key to feed to bsearch; see if the header's already there */
     key.name = (char*)header_name;
     key.exists = false;
-    header_ptr = bsearch(&fake, header_cache, cache_size, sizeof(void*),
-        S_compare_headers);
+    header_ptr = (Header**)bsearch(&fake, header_cache, cache_size, 
+        sizeof(void*), S_compare_headers);
     
     /* if it's not there, go try a test compile */
     if (header_ptr == NULL) {
@@ -94,7 +94,7 @@ HeadCheck_check_many_headers(const char **header_names)
         needed += strlen(header_names[i]);
         needed += sizeof("#include <>\n");
     }
-    code_buf = malloc(needed);
+    code_buf = (char*)malloc(needed);
     code_buf[0] = '\0';
     for (i = 0; header_names[i] != NULL; i++) {
         strcat(code_buf, "#include <");
@@ -127,7 +127,7 @@ HeadCheck_contains_member(const char *struct_name, const char *member,
 {
     long needed = sizeof(contains_code) + strlen(struct_name) 
                 + strlen(member) + strlen(includes) + 10;
-    char *buf = malloc(needed);
+    char *buf = (char*)malloc(needed);
     chaz_bool_t retval;
     sprintf(buf, contains_code, includes, struct_name, member);
     retval = ModHand_test_compile(buf, strlen(buf));
@@ -188,8 +188,8 @@ S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
     /* fake up a key and bsearch for it */
     key.name   = (char*)header_name;
     key.exists = exists;
-    header = bsearch(&fake, header_cache, cache_size, sizeof(void*),
-        S_compare_headers);
+    header = (Header*)bsearch(&fake, header_cache, cache_size, 
+        sizeof(void*), S_compare_headers);
     
     /* we've already done the test compile, so skip that step and add it */
     if (header == NULL) {

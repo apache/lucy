@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_VARIADIC_MACROS
 #define H_CHAZ_VARIADIC_MACROS 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 /* Run the VariadicMacros module.
@@ -24,6 +28,10 @@ void chaz_VariadicMacros_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define VariadicMacros_run    chaz_VariadicMacros_run
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_VARIADIC_MACROS */

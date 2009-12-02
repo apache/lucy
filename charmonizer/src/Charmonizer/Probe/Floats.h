@@ -26,6 +26,10 @@
 #ifndef H_CHAZ_FLOATS
 #define H_CHAZ_FLOATS
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Run the Floats module.
  */
 void 
@@ -33,6 +37,10 @@ chaz_Floats_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Floats_run    chaz_Floats_run
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_FLOATS */

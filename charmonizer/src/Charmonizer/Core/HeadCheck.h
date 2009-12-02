@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_HEAD_CHECK
 #define H_CHAZ_HEAD_CHECK 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "Charmonizer/Core/Defines.h"
 
 /* Bootstrap the HeadCheck.  Call this before anything else.
@@ -34,6 +38,10 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
   #define HeadCheck_contains_member         chaz_HeadCheck_contains_member
   #define HeadCheck_check_header            chaz_HeadCheck_check_header
   #define HeadCheck_check_many_headers      chaz_HeadCheck_check_many_headers
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_HEAD_CHECK */

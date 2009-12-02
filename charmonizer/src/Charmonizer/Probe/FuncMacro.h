@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_FUNC_MACRO
 #define H_CHAZ_FUNC_MACRO 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 /* Run the FuncMacro module.
@@ -31,6 +35,10 @@ void chaz_FuncMacro_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define FuncMacro_run    chaz_FuncMacro_run
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_FUNC_MACRO */

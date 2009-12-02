@@ -66,6 +66,11 @@ sub extra_ccflags {
         }
     }
 
+    # Compile as C++ under MSVC.
+    if ( $Config{cc} eq 'cl' ) {
+        $extra_ccflags .= '/TP ';
+    }
+
     return $extra_ccflags;
 }
 

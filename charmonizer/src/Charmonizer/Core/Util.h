@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_UTIL
 #define H_CHAZ_UTIL 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdarg.h>
@@ -59,6 +63,10 @@ chaz_Util_can_open_file(char *file_path);
   #define Util_warn                   chaz_Util_warn 
   #define Util_remove_and_verify      chaz_Util_remove_and_verify 
   #define Util_can_open_file          chaz_Util_can_open_file 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_UTIL */

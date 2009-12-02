@@ -96,6 +96,10 @@
 #ifndef H_CHAZ_INTEGERS
 #define H_CHAZ_INTEGERS 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 /* Run the Integers module.
@@ -104,6 +108,10 @@ void chaz_Integers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Integers_run    chaz_Integers_run
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_INTEGERS */

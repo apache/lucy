@@ -52,7 +52,7 @@ static chaz_bool_t
 S_try_init_posix_mkdir(char *header)
 {
     size_t needed = sizeof(posix_mkdir_code) + 30;
-    char *code_buf = malloc(needed);
+    char *code_buf = (char*)malloc(needed);
 
     /* Attempt compilation. */
     sprintf(code_buf, posix_mkdir_code, header);
@@ -101,7 +101,7 @@ static chaz_bool_t
 S_try_init_rmdir(char *header) 
 {
     size_t needed = sizeof(posix_mkdir_code) + 30;
-    char *code_buf = malloc(needed);
+    char *code_buf = (char*)malloc(needed);
     sprintf(code_buf, rmdir_code, header);
     rmdir_available = ModHand_compiler->compile_exe(ModHand_compiler, "_charm_rmdir.c",
         "_charm_rmdir", code_buf, strlen(code_buf));

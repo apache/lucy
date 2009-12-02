@@ -50,10 +50,12 @@ Sort_mergesort(void *elems, void *scratch, u32_t num_elems, u32_t width,
 
     /* Dispatch by element size. */
     if (width == 4) {
-        S_msort4(elems, scratch, 0, num_elems - 1, compare, context);
+        S_msort4((FOUR_BYTE_TYPE*)elems, (FOUR_BYTE_TYPE*)scratch, 
+            0, num_elems - 1, compare, context);
     }
     else if (width == 8) {
-        S_msort8(elems, scratch, 0, num_elems - 1, compare, context);
+        S_msort8((EIGHT_BYTE_TYPE*)elems, (EIGHT_BYTE_TYPE*)scratch, 
+            0, num_elems - 1, compare, context);
     }
     else {
         THROW(ERR, "Can't sort elements which are %u32 bytes", width);
@@ -65,8 +67,9 @@ Sort_merge4(void *left_ptr,  u32_t left_size,
             void *right_ptr, u32_t right_size,
             void *dest, Sort_compare_t compare, void *context) 
 {
-    SI_merge4(left_ptr, left_size, right_ptr, right_size, dest, compare,
-        context);
+    SI_merge4((FOUR_BYTE_TYPE*)left_ptr, left_size, 
+              (FOUR_BYTE_TYPE*)right_ptr, right_size, 
+              (FOUR_BYTE_TYPE*)dest, compare, context);
 }
 
 void
@@ -74,8 +77,9 @@ Sort_merge8(void *left_ptr,  u32_t left_size,
             void *right_ptr, u32_t right_size,
             void *dest, Sort_compare_t compare, void *context) 
 {
-    SI_merge8(left_ptr, left_size, right_ptr, right_size, dest, compare,
-        context);
+    SI_merge8((EIGHT_BYTE_TYPE*)left_ptr, left_size, 
+              (EIGHT_BYTE_TYPE*)right_ptr, right_size, 
+              (EIGHT_BYTE_TYPE*)dest, compare, context);
 }
 
 static void
@@ -215,10 +219,10 @@ Sort_quicksort(void *elems, size_t num_elems, size_t width,
     }
 
     if (width == 4) { 
-        S_qsort4(elems, 0, num_elems - 1, compare, context); 
+        S_qsort4((FOUR_BYTE_TYPE*)elems, 0, num_elems - 1, compare, context); 
     }
     else if (width == 8) { 
-        S_qsort8(elems, 0, num_elems - 1, compare, context);
+        S_qsort8((EIGHT_BYTE_TYPE*)elems, 0, num_elems - 1, compare, context);
     }
     else {
         THROW(ERR, "Unsupported width: %i64", (i64_t)width);

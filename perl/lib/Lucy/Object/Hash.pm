@@ -37,8 +37,8 @@ PPCODE:
     lucy_Obj *val;
 
     if (Lucy_Hash_Iter_Next(self, &key, &val)) {
-        SV *key_sv = Lucy_Obj_To_Host(key);
-        SV *val_sv = Lucy_Obj_To_Host(val);
+        SV *key_sv = (SV*)Lucy_Obj_To_Host(key);
+        SV *val_sv = (SV*)Lucy_Obj_To_Host(val);
 
         XPUSHs(sv_2mortal( key_sv ));
         XPUSHs(sv_2mortal( val_sv ));

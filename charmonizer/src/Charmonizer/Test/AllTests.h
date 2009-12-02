@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_ALL_TESTS
 #define H_CHAZ_ALL_TESTS
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "Charmonizer/Test.h"
 
 /* Initialize the AllTests module.
@@ -86,6 +90,10 @@ chaz_TVariadicMacros_run(chaz_TestBatch *batch);
   #define TLargeFiles_run              chaz_TLargeFiles_run
   #define TUnusedVars_run              chaz_TUnusedVars_run
   #define TVariadicMacros_run          chaz_TVariadicMacros_run
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_TEST */

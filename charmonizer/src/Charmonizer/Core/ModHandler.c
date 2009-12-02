@@ -40,12 +40,13 @@ void
 ModHand_init()
 {
     /* set the name of the application which we "try" to execute */
-    try_app_path = malloc(strlen(TRY_APP_BASENAME) + strlen(ModHand_os->exe_ext) + 1);
+    size_t len = strlen(TRY_APP_BASENAME) + strlen(ModHand_os->exe_ext) + 1;
+    try_app_path = (char*)malloc(len);
     sprintf(try_app_path, "%s%s", TRY_APP_BASENAME, ModHand_os->exe_ext);
 
     /* set the invocation string for the "try" application */
-    try_app_command = malloc(strlen(ModHand_os->local_command_start) + 
-        strlen(try_app_path) + 1);
+    len = strlen(ModHand_os->local_command_start) + strlen(try_app_path) + 1;
+    try_app_command = (char*)malloc(len);
     sprintf(try_app_command, "%s%s", ModHand_os->local_command_start, try_app_path);
 
     /* write files needed by this module and others */
@@ -163,7 +164,7 @@ S_build_charm_run()
                   + strlen(ModHand_os->devnull)
                   + sizeof(charm_run_code_d)
                   + 20;
-    char *code = malloc(needed);
+    char *code = (char*)malloc(needed);
 
     sprintf(code, "%s%s \"%s\" %s \"%s\" %s", 
         charm_run_code_a, 
@@ -229,7 +230,7 @@ ModHand_capture_output(char *source, size_t source_len,
 }
 
 void
-ModHand_append_conf(char *fmt, ...)
+ModHand_append_conf(const char *fmt, ...)
 {
     va_list args;
 

@@ -3,6 +3,10 @@
 
 #ifndef H_CHAZ_HEADERS
 #define H_CHAZ_HEADERS
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdio.h>
 #include "Charmonizer/Core/Defines.h"
 
@@ -66,6 +70,10 @@ chaz_Headers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Headers_run        chaz_Headers_run
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_HEADERS */

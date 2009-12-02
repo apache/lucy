@@ -60,7 +60,16 @@ sub write_h {
 $args{header}
 
 $include_guard_start
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 $content
+
+#ifdef __cplusplus
+}
+#endif
 
 $include_guard_close
 

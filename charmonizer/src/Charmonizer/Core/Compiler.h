@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_COMPILER
 #define H_CHAZ_COMPILER
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
 
@@ -64,6 +68,10 @@ chaz_CC_new(struct chaz_OperSys *oper_sys, const char *cc_command,
   #define CC_add_inc_dir_t            chaz_CC_add_inc_dir_t
   #define CC_destroy_t                chaz_CC_destroy_t
   #define CC_new                      chaz_CC_new
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_COMPILER */

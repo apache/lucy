@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_COMPILER_SPEC
 #define H_CHAZ_COMPILER_SPEC
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
 
@@ -24,6 +28,10 @@ chaz_CCSpec_find_spec();
 #ifdef CHAZ_USE_SHORT_NAMES
   #define CompilerSpec                chaz_CompilerSpec
   #define CCSpec_find_spec            chaz_CCSpec_find_spec
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_COMPILER_SPEC */

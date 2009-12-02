@@ -152,7 +152,7 @@ RAMFH_grow(RAMFileHandle *self, i64_t len)
         return false;
     }
     else {
-        BB_Grow(self->ram_file->contents, len);
+        BB_Grow(self->ram_file->contents, (size_t)len);
         return true;
     }
 }

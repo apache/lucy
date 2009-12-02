@@ -21,7 +21,8 @@ test_u1(TestBatch *batch)
         if (ints[i]) { NumUtil_u1set(bits, i); }
     }
     for (i = 0; i < count; i++) {
-        ASSERT_INT_EQ(batch, NumUtil_u1get(bits, i), ints[i], "u1 set/get");
+        ASSERT_INT_EQ(batch, NumUtil_u1get(bits, i), (long)ints[i], 
+            "u1 set/get");
     }
 
     for (i = 0; i < count; i++) {
@@ -44,10 +45,10 @@ test_u2(TestBatch *batch)
     size_t i;
 
     for (i = 0; i < count; i++) {
-        NumUtil_u2set(bits, i, ints[i]);
+        NumUtil_u2set(bits, i, (u8_t)ints[i]);
     }
     for (i = 0; i < count; i++) {
-        ASSERT_INT_EQ(batch, NumUtil_u2get(bits, i), ints[i], "u2");
+        ASSERT_INT_EQ(batch, NumUtil_u2get(bits, i), (long)ints[i], "u2");
     }
 
     FREEMEM(bits);
@@ -63,10 +64,10 @@ test_u4(TestBatch *batch)
     size_t i;
 
     for (i = 0; i < count; i++) {
-        NumUtil_u4set(bits, i, ints[i]);
+        NumUtil_u4set(bits, i, (u8_t)ints[i]);
     }
     for (i = 0; i < count; i++) {
-        ASSERT_INT_EQ(batch, NumUtil_u4get(bits, i), ints[i], "u4");
+        ASSERT_INT_EQ(batch, NumUtil_u4get(bits, i), (long)ints[i], "u4");
     }
 
     FREEMEM(bits);
@@ -94,7 +95,7 @@ test_c32(TestBatch *batch)
             mins[set_num], limits[set_num]);
         target = encoded;
         for (i = 0; i < count; i++) {
-            NumUtil_encode_c32(ints[i], &target);
+            NumUtil_encode_c32((u32_t)ints[i], &target);
         }
         target = encoded;
         skip   = encoded;
@@ -109,7 +110,7 @@ test_c32(TestBatch *batch)
 
         target = encoded;
         for (i = 0; i < count; i++) {
-            NumUtil_encode_padded_c32(ints[i], &target);
+            NumUtil_encode_padded_c32((u32_t)ints[i], &target);
         }
         ASSERT_TRUE(batch, target == limit, 
             "padded c32 uses 5 bytes (%lu == %lu)", (unsigned long)target, 
@@ -195,13 +196,13 @@ test_bigend_u16(TestBatch *batch)
     size_t i;
 
     for (i = 0; i < count; i++) {
-        NumUtil_encode_bigend_u16(ints[i], &target);
+        NumUtil_encode_bigend_u16((u16_t)ints[i], &target);
         target += sizeof(u16_t);
     }
     target = encoded;
     for (i = 0; i < count; i++) {
         u16_t got = NumUtil_decode_bigend_u16(target);
-        ASSERT_INT_EQ(batch, got, ints[i], "bigend u16");
+        ASSERT_INT_EQ(batch, got, (long)ints[i], "bigend u16");
         target += sizeof(u16_t);
     }
 
@@ -226,13 +227,13 @@ test_bigend_u32(TestBatch *batch)
     size_t i;
 
     for (i = 0; i < count; i++) {
-        NumUtil_encode_bigend_u32(ints[i], &target);
+        NumUtil_encode_bigend_u32((u32_t)ints[i], &target);
         target += sizeof(u32_t);
     }
     target = encoded;
     for (i = 0; i < count; i++) {
         u32_t got = NumUtil_decode_bigend_u32(target);
-        ASSERT_INT_EQ(batch, got, ints[i], "bigend u32");
+        ASSERT_INT_EQ(batch, got, (long)ints[i], "bigend u32");
         target += sizeof(u32_t);
     }
 

@@ -336,7 +336,7 @@ test_f32(TestBatch *batch)
     
     /* Truncate. */
     for (i = 0; i < 1000; i++) {
-        values[i] = f64s[i];
+        values[i] = (float)f64s[i];
     }
 
     /* Test boundaries. */

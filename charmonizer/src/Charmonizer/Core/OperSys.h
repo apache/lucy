@@ -5,6 +5,10 @@
 #ifndef H_CHAZ_OPER_SYS
 #define H_CHAZ_OPER_SYS
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct chaz_OperSys chaz_OperSys;
 
 /* Remove an executable file named [name], appending the exe_ext if needed.
@@ -56,6 +60,10 @@ chaz_OS_new(const char *name);
   #define OS_run_local_t               chaz_OS_run_local_t
   #define OS_destroy_t                 chaz_OS_destroy_t
   #define OS_new                       chaz_OS_new
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_COMPILER */

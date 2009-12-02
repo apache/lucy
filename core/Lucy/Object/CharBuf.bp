@@ -339,6 +339,7 @@ __C__
 
 extern lucy_ZombieCharBuf LUCY_ZCB_EMPTY;
 
+#ifdef C_LUCY_ZOMBIECHARBUF
 /* Simple functions which allows assignment idiom for ZombieCharBuf values. 
  */
 lucy_ZombieCharBuf
@@ -346,6 +347,7 @@ lucy_ZCB_make_str(const char *ptr, size_t size);
 
 lucy_ZombieCharBuf
 lucy_ZCB_make(const lucy_CharBuf *source);
+#endif /* C_LUCY_ZOMBIECHARBUF */
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define ZCB_BLANK             LUCY_ZCB_BLANK

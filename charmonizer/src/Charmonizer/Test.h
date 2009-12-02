@@ -4,6 +4,10 @@
 #ifndef H_CHAZ_TEST
 #define H_CHAZ_TEST
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "Charmonizer/Core/Defines.h"
 
 typedef struct chaz_TestBatch chaz_TestBatch;
@@ -142,6 +146,10 @@ chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
   #define SKIP                         CHAZ_TEST_SKIP
   #define Test_report_skip_remaining   chaz_Test_report_skip_remaining
   #define SKIP_REMAINING               CHAZ_TEST_SKIP_REMAINING
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_TEST */

@@ -5,6 +5,10 @@
 #ifndef H_CHAZ_MOD_HAND
 #define H_CHAZ_MOD_HAND 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
@@ -61,7 +65,7 @@ chaz_ModHand_capture_output(char *source, size_t source_len,
 /* Print output to charmony.h.
  */
 void
-chaz_ModHand_append_conf(char *fmt, ...);
+chaz_ModHand_append_conf(const char *fmt, ...);
 
 /* Print bookends delimiting a short names block.
  */
@@ -123,6 +127,10 @@ chaz_ModHand_shorten_function(const char *symbol);
   #define ModHand_shorten_function          chaz_ModHand_shorten_function
   #define START_RUN                         CHAZ_MODHAND_START_RUN
   #define END_RUN                           CHAZ_MODHAND_END_RUN
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* H_CHAZ_MOD_HAND */

@@ -338,15 +338,17 @@ Folder_slurp_file(Folder *self, const CharBuf *path)
         RETHROW(INCREF(Err_get_error())); 
     }
     else {
-        u64_t size = InStream_Length(instream);
+        u64_t length = InStream_Length(instream);
 
-        if (size > SIZE_MAX) {
+        if (length >= SIZE_MAX) {
             InStream_Close(instream);
             DECREF(instream);
-            THROW(ERR, "File %o is too big to slurp (%u64 bytes)", path, size);
+            THROW(ERR, "File %o is too big to slurp (%u64 bytes)", path,
+                length);
         } 
         else {
-            char *ptr = (char*)MALLOCATE(size + 1);
+            size_t size = (size_t)length;
+            char *ptr = (char*)MALLOCATE((size_t)size + 1);
             InStream_Read_Bytes(instream, ptr, size);
             ptr[size] = '\0';
             retval = BB_new_steal_bytes(ptr, size, size + 1);

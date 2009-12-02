@@ -1,6 +1,10 @@
 #ifndef H_LUCY_TOOLSET
 #define H_LUCY_TOOLSET 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ToolSet groups together several commonly used header files, so that only
  * one pound-include directive is needed for them.
  *
@@ -31,6 +35,10 @@
 #include "Lucy/Util/NumberUtils.h"
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_LUCY_TOOLSET */
 

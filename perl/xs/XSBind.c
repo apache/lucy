@@ -105,7 +105,7 @@ XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable,
                  /* Mortalize the converted object -- which is somewhat
                   * dangerous, but is the only way to avoid requiring that the
                   * caller take responsibility for a refcount. */
-                SV *mortal = Lucy_Obj_To_Host(retval);
+                SV *mortal = (SV*)Lucy_Obj_To_Host(retval);
                 LUCY_DECREF(retval);
                 sv_2mortal(mortal);
             }

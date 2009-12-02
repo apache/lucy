@@ -184,7 +184,7 @@ S_encode_affirmation(const char *header_name) {
     if (aff_buf_size < len + 1) {
         free(aff_buf);
         aff_buf_size = len + 1;
-        aff_buf = malloc(aff_buf_size);
+        aff_buf = (char*)malloc(aff_buf_size);
     }
     strcpy(aff_buf, "HAS_");
 

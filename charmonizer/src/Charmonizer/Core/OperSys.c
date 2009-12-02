@@ -98,7 +98,7 @@ S_destroy(OperSys *self)
 static void
 S_remove_exe(OperSys *self, char *name)
 {
-    char *exe_name = malloc(strlen(name) + strlen(self->exe_ext) + 1);
+    char *exe_name = (char*)malloc(strlen(name) + strlen(self->exe_ext) + 1);
     sprintf(exe_name, "%s%s", name, self->exe_ext);
     remove(exe_name);
     free(exe_name);
@@ -107,7 +107,7 @@ S_remove_exe(OperSys *self, char *name)
 static void
 S_remove_obj(OperSys *self, char *name)
 {
-    char *obj_name = malloc(strlen(name) + strlen(self->obj_ext) + 1);
+    char *obj_name = (char*)malloc(strlen(name) + strlen(self->obj_ext) + 1);
     sprintf(obj_name, "%s%s", name, self->obj_ext);
     remove(obj_name);
     free(obj_name);
@@ -122,11 +122,11 @@ S_run_local(OperSys *self, ...)
     int      retval;
     char    *arg;
 
-    /* append all supplied texts */ 
+    /* append all supplied texts */
     va_start(args, self);
     while (NULL != (arg = va_arg(args, char*))) {
         len += strlen(arg);
-        command = realloc(command, len + 1);
+        command = (char*)realloc(command, len + 1);
         strcat(command, arg);
     }
     va_end(args);

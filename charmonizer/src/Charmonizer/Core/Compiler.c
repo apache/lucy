@@ -5,9 +5,8 @@
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/CompilerSpec.h"
+#include "Charmonizer/Core/ModHandler.h"
 #include "Charmonizer/Core/OperSys.h"
-
-extern chaz_bool_t chaz_ModHand_charm_run_available;
 
 static void
 S_destroy(Compiler *self);
@@ -89,7 +88,7 @@ S_inc_dir_string(Compiler *self)
         needed += strlen(self->include_flag) + 2;
         needed += strlen(*inc_dirs);
     }
-    inc_dir_string = malloc(needed + 1);
+    inc_dir_string = (char*)malloc(needed + 1);
     inc_dir_string[0] = '\0';
     for (inc_dirs = self->inc_dirs; *inc_dirs != NULL; inc_dirs++) {
         strcat(inc_dir_string, self->include_flag);
@@ -105,7 +104,7 @@ S_compile_exe(Compiler *self, const char *source_path, const char *exe_name,
 {
     OperSys *os                = self->os;
     size_t   exe_file_buf_size = strlen(exe_name) + strlen(os->exe_ext) + 1;
-    char    *exe_file          = malloc(exe_file_buf_size);
+    char    *exe_file          = (char*)malloc(exe_file_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, os->exe_ext);
     char    *inc_dir_string    = S_inc_dir_string(self);
     size_t   command_max_size  = strlen(os->local_command_start)
@@ -116,7 +115,7 @@ S_compile_exe(Compiler *self, const char *source_path, const char *exe_name,
                                + strlen(inc_dir_string)
                                + strlen(self->cc_flags)
                                + 200;
-    char *command = malloc(command_max_size);
+    char *command = (char*)malloc(command_max_size);
     chaz_bool_t result;
     (void)code_len; /* Unused. */
     
@@ -156,7 +155,7 @@ S_compile_obj(Compiler *self, const char *source_path, const char *obj_name,
 {
     OperSys *os                = self->os;
     size_t   obj_file_buf_size = strlen(obj_name) + strlen(os->obj_ext) + 1;
-    char    *obj_file          = malloc(obj_file_buf_size);
+    char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, os->obj_ext);
     char    *inc_dir_string    = S_inc_dir_string(self);
     size_t   command_max_size  = strlen(os->local_command_start)
@@ -167,7 +166,7 @@ S_compile_obj(Compiler *self, const char *source_path, const char *obj_name,
                                + strlen(inc_dir_string)
                                + strlen(self->cc_flags)
                                + 200;
-    char *command = malloc(command_max_size);
+    char *command = (char*)malloc(command_max_size);
     chaz_bool_t result;
     (void)code_len; /* Unused. */
     
@@ -230,7 +229,7 @@ S_add_inc_dir(Compiler *self, const char *dir)
     /* count up the present number of dirs, reallocate */
     while (*dirs++ != NULL) { num_dirs++; }
     num_dirs += 1; /* passed-in dir */
-    self->inc_dirs = realloc(self->inc_dirs, (num_dirs + 1)*sizeof(char*));
+    self->inc_dirs = (char**)realloc(self->inc_dirs, (num_dirs + 1)*sizeof(char*));
 
     /* put the passed-in dir at the end of the list */
     self->inc_dirs[num_dirs - 1] = strdup(dir);

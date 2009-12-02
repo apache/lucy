@@ -85,7 +85,7 @@ FuncMacro_run(void)
 
     /* write out common defines */
     if (has_funcmac) {
-        char *macro_text = has_iso_funcmac 
+        const char *macro_text = has_iso_funcmac 
             ? "__func__"
             : "__FUNCTION__";
         ModHand_append_conf(

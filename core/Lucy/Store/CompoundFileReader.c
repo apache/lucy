@@ -36,7 +36,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
     }
     else {
         Obj *format = Hash_Fetch_Str(metadata, "format", 6);
-        self->format = format ? Obj_To_I64(format) : 0;
+        self->format = format ? (i32_t)Obj_To_I64(format) : 0;
         self->records = (Hash*)INCREF(Hash_Fetch_Str(metadata, "files", 5));
         if (self->format < 1) { 
             error = Err_new(CB_newf(

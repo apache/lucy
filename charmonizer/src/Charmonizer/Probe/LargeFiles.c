@@ -136,7 +136,7 @@ static char off64_code[] = METAQUOTE
         FILE *f;
         Charm_Setup;
         f = %s("_charm_off64", "w");
-        if (f == -1) exit(-1);
+        if (f == NULL) return -1;
         printf("%%d", (int)sizeof(%s));
         pos = %s(stdout);
         %s(stdout, 0, SEEK_SET);
@@ -156,7 +156,7 @@ S_probe_off64(off64_combo *combo)
                   + strlen(combo->ftell_command) 
                   + strlen(combo->fseek_command) 
                   + 20;
-    char *code_buf = malloc(needed);
+    char *code_buf = (char*)malloc(needed);
     chaz_bool_t success = false;
 
     /* Prepare the source code. */
@@ -263,7 +263,7 @@ S_can_create_big_files()
                   + strlen(fseek_command)
                   + strlen(create_bigfile_code_a)
                   + 10;
-    char *code_buf = malloc(needed);
+    char *code_buf = (char*)malloc(needed);
 
     /* concat the source strings, compile the file, capture output */
     sprintf(code_buf, "%s%s%s", create_bigfile_code_a, fseek_command, 
