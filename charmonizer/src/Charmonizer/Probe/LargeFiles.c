@@ -261,7 +261,7 @@ S_can_create_big_files()
     FILE *truncating_fh;
     size_t needed = strlen(create_bigfile_code_a)
                   + strlen(fseek_command)
-                  + strlen(create_bigfile_code_a)
+                  + strlen(create_bigfile_code_b)
                   + 10;
     char *code_buf = (char*)malloc(needed);
 
