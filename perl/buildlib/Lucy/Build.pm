@@ -43,17 +43,12 @@ use Carp;
 
 BEGIN { unshift @PATH, curdir() }
 
-sub project_name {'Lucy'}
-sub project_nick {'Lucy'}
-
-sub xs_filepath { catfile( 'lib', shift->project_name . ".xs" ) }
-sub autobind_pm_path {
-    catfile( 'lib', shift->project_name, 'Autobinding.pm' );
-}
+sub xs_filepath { catfile( 'lib', "Lucy.xs" ) }
+sub autobind_pm_path { catfile( 'lib', 'Lucy', 'Autobinding.pm' ); }
 
 sub extra_ccflags {
     my $self          = shift;
-    my $debug_env_var = uc( $self->project_nick ) . "_DEBUG";
+    my $debug_env_var = "LUCY_DEBUG";
 
     my $extra_ccflags = "";
     if ( defined $ENV{$debug_env_var} ) {
@@ -229,10 +224,10 @@ sub _compile_boilerplater {
     }
 
     my $binding = Boilerplater::Binding::Perl->new(
-        parcel      => $self->project_name,
+        parcel      => 'Lucy',
         hierarchy   => $hierarchy,
         lib_dir     => 'lib',
-        boot_class  => $self->project_name,
+        boot_class  => 'Lucy',
         header      => $self->autogen_header,
         footer      => $self->copyfoot,
     );
@@ -346,16 +341,15 @@ sub ACTION_ppport {
 }
 
 sub ACTION_compile_custom_xs {
-    my $self         = shift;
-    my $project_name = $self->project_name;
-    my $xs_filepath  = $self->xs_filepath;
+    my $self        = shift;
+    my $xs_filepath = $self->xs_filepath;
 
     $self->dispatch('ppport');
     
     require ExtUtils::ParseXS;
 
     my $cbuilder = Lucy::Build::CBuilder->new;
-    my $archdir = catdir( $self->blib, 'arch', 'auto', $project_name );
+    my $archdir = catdir( $self->blib, 'arch', 'auto', 'Lucy', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
         curdir(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
@@ -383,7 +377,7 @@ sub ACTION_compile_custom_xs {
     }
 
     # .xs => .c
-    my $perl_binding_c_file = "lib/$project_name.c";
+    my $perl_binding_c_file = "lib/Lucy.c";
     $self->add_to_cleanup($perl_binding_c_file);
     if ( !$self->up_to_date( $xs_filepath, $perl_binding_c_file ) ) {
         ExtUtils::ParseXS::process_file(
@@ -395,7 +389,7 @@ sub ACTION_compile_custom_xs {
 
     # .c => .o
     my $version             = $self->dist_version;
-    my $perl_binding_o_file = catfile( 'lib', "$project_name$Config{_o}" );
+    my $perl_binding_o_file = catfile( 'lib', "Lucy$Config{_o}" );
     unshift @objects, $perl_binding_o_file;
     $self->add_to_cleanup($perl_binding_o_file);
     if ( !$self->up_to_date( $perl_binding_c_file, $perl_binding_o_file ) ) {
@@ -417,7 +411,7 @@ sub ACTION_compile_custom_xs {
     }
 
     # Create .bs bootstrap file, needed by Dynaloader.
-    my $bs_file = catfile( $archdir, "$project_name.bs" );
+    my $bs_file = catfile( $archdir, "Lucy.bs" );
     $self->add_to_cleanup($bs_file);
     if ( !$self->up_to_date( $perl_binding_o_file, $bs_file ) ) {
         require ExtUtils::Mkbootstrap;
@@ -431,10 +425,10 @@ sub ACTION_compile_custom_xs {
     }
 
     # .o => .(a|bundle)
-    my $lib_file = catfile( $archdir, "$project_name.$Config{dlext}" );
+    my $lib_file = catfile( $archdir, "Lucy.$Config{dlext}" );
     if ( !$self->up_to_date( [ @objects, $AUTOGEN_DIR ], $lib_file ) ) {
         $cbuilder->link(
-            module_name => $project_name,
+            module_name => 'Lucy',
             objects     => \@objects,
             lib_file    => $lib_file,
         );
