@@ -37,6 +37,31 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
+    package Lucy::Object::CharBuf;
+
+    {
+        # Defeat obscure bugs in the XS auto-generation by redefining clone()
+        # and deserialize().  (Because of how the typemap works for CharBuf*,
+        # the auto-generated methods return UTF-8 Perl scalars rather than
+        # actual CharBuf objects.)
+        no warnings 'redefine';
+        sub clone       { shift->_clone(@_) }
+    }
+
+    package Lucy::Object::ViewCharBuf;
+    use Lucy::Util::ToolSet qw( confess );
+
+    sub new { confess "ViewCharBuf has no public constructor." }
+
+    package Lucy::Object::ZombieCharBuf;
+    use Lucy::Util::ToolSet qw( confess );
+
+    sub new { confess "ZombieCharBuf objects can only be created from C." }
+
+    sub DESTROY { }
+}
+
+{
     package Lucy::Object::Err;
     use Lucy::Util::ToolSet qw( blessed );
 
@@ -71,6 +96,12 @@ sub error {$Lucy::Object::Err::error}
         $error = $val;
     }
     sub get_error {$error}
+}
+
+{
+    package Lucy::Object::Obj;
+    use Lucy::Util::ToolSet qw( to_lucy to_perl );
+    sub load { return $_[0]->_load( to_lucy( $_[1] ) ) }
 }
 
 {
