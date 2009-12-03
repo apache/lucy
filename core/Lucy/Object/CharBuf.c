@@ -13,6 +13,8 @@
 #include "Lucy/Object/CharBuf.h"
 
 #include "Lucy/Object/Err.h"
+#include "Lucy/Store/InStream.h"
+#include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"
 
@@ -453,6 +455,28 @@ CB_load(CharBuf *self, Obj *dump)
     CharBuf *source = (CharBuf*)CERTIFY(dump, CHARBUF);
     UNUSED_VAR(self);
     return CB_Clone(source);
+}
+
+void
+CB_serialize(CharBuf *self, OutStream *target)
+{
+    OutStream_Write_C32(target, self->size);
+    OutStream_Write_Bytes(target, self->ptr, self->size);
+}
+
+CharBuf*
+CB_deserialize(CharBuf *self, InStream *instream)
+{
+    self = self ? self : (CharBuf*)VTable_Make_Obj(CHARBUF);
+    self->size = InStream_Read_C32(instream);
+    self->cap  = self->size + 1;
+    self->ptr  = (char*)MALLOCATE(self->cap);
+    InStream_Read_Bytes(instream, self->ptr, self->size);
+    self->ptr[self->size] = '\0';
+    if (!StrHelp_utf8_valid(self->ptr, self->size)) {
+        S_die_invalid_utf8(self->ptr, self->size);
+    }
+    return self;
 }
 
 void

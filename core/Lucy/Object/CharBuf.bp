@@ -214,6 +214,12 @@ class Lucy::Object::CharBuf cnick CB
     public incremented CharBuf*
     Load(CharBuf *self, Obj *dump);
 
+    public void
+    Serialize(CharBuf *self, OutStream *outstream);
+
+    public incremented CharBuf*
+    Deserialize(CharBuf *self, InStream *instream);
+
     /** Remove Unicode whitespace characters from both top and tail.
      */
     u32_t

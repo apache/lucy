@@ -46,6 +46,7 @@ sub error {$Lucy::Object::Err::error}
         # actual CharBuf objects.)
         no warnings 'redefine';
         sub clone       { shift->_clone(@_) }
+        sub deserialize { shift->_deserialize(@_) }
     }
 
     package Lucy::Object::ViewCharBuf;
