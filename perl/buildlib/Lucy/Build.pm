@@ -345,6 +345,102 @@ sub ACTION_ppport {
     Devel::PPPort::WriteFile();
 }
 
+sub ACTION_suppressions {
+    my $self       = shift;
+    my $LOCAL_SUPP = 'local.supp';
+    return
+        if $self->up_to_date( '../devel/bin/valgrind_triggers.pl',
+                $LOCAL_SUPP );
+
+    # Generate suppressions.
+    print "Writing $LOCAL_SUPP...\n";
+    $self->add_to_cleanup($LOCAL_SUPP);
+    my $command
+        = "yes | "
+        . $self->_valgrind_base_command
+        . "--gen-suppressions=yes "
+        . $self->perl
+        . " ../devel/bin/valgrind_triggers.pl 2>&1";
+    my $suppressions = `$command`;
+    $suppressions =~ s/^==.*?\n//mg;
+    my $rule_number = 1;
+    while ( $suppressions =~ /<insert a.*?>/ ) {
+        $suppressions =~ s/^\s*<insert a.*?>/{\n  <core_perl_$rule_number>/m;
+        $rule_number++;
+    }
+
+    # Write local suppressions file.
+    open( my $supp_fh, '>', $LOCAL_SUPP )
+        or confess("Can't open '$LOCAL_SUPP': $!");
+    print $supp_fh $suppressions;
+}
+
+sub _valgrind_base_command {
+    return
+          "PERL_DESTRUCT_LEVEL=2 LUCY_VALGRIND=1 valgrind "
+        . "--leak-check=yes "
+        . "--show-reachable=yes "
+        . "--num-callers=10 "
+        . "--suppressions=../devel/conf/lucyperl.supp ";
+}
+
+sub ACTION_test_valgrind {
+    my $self = shift;
+    die "Must be run under a perl that was compiled with -DDEBUGGING"
+        unless $Config{ccflags} =~ /-D?DEBUGGING\b/;
+    $self->dispatch('code');
+    $self->dispatch('suppressions');
+
+    # Unbuffer STDOUT, grab test file names and suppressions files.
+    $|++;
+    my $t_files = $self->find_test_files;    # not public M::B API, may fail
+    my $valgrind_command = $self->_valgrind_base_command;
+    $valgrind_command .= "--suppressions=local.supp ";
+
+    if ( my $local_supp = $self->args('suppressions') ) {
+        for my $supp ( split( ',', $local_supp ) ) {
+            $valgrind_command .= "--suppressions=$supp ";
+        }
+    }
+
+    # Iterate over test files.
+    my @failed;
+    for my $t_file (@$t_files) {
+
+        # Run test file under Valgrind.
+        print "Testing $t_file...";
+        die "Can't find '$t_file'" unless -f $t_file;
+        my $command = "$valgrind_command $^X -Mblib $t_file 2>&1";
+        my $output = "\n" . ( scalar localtime(time) ) . "\n$command\n";
+        $output .= `$command`;
+
+        # Screen-scrape Valgrind output, looking for errors and leaks.
+        if (   $?
+            or $output =~ /ERROR SUMMARY:\s+[^0\s]/
+            or $output =~ /definitely lost:\s+[^0\s]/
+            or $output =~ /possibly lost:\s+[^0\s]/
+            or $output =~ /still reachable:\s+[^0\s]/ )
+        {
+            print " failed.\n";
+            push @failed, $t_file;
+            print "$output\n";
+        }
+        else {
+            print " succeeded.\n";
+        }
+    }
+
+    # If there are failed tests, print a summary list.
+    if (@failed) {
+        print "\nFailed "
+            . scalar @failed . "/"
+            . scalar @$t_files
+            . " test files:\n    "
+            . join( "\n    ", @failed ) . "\n";
+        exit(1);
+    }
+}
+
 sub ACTION_compile_custom_xs {
     my $self        = shift;
     my $xs_filepath = $self->xs_filepath;

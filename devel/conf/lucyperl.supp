@@ -1,0 +1,161 @@
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_CB_clone
+   fun:lucy_Hash_make_key
+   fun:lucy_Hash_do_store
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_VTable_make_obj
+   fun:lucy_Hash_new
+   fun:lucy_VTable_init_registry
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_Hash_do_store
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+
+{
+   <Snowball XS constructor>
+   Memcheck:Leak
+   fun:calloc
+   fun:Perl_safesyscalloc
+   fun:XS_Lingua__Stem__Snowball__Stemmifier_new
+   fun:*
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_Hash_store
+   fun:lucy_VTable_add_to_registry
+   fun:lucy_Lucy_bootstrap
+   fun:boot_Lucy
+   fun:*
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_Hash_do_store
+   fun:lucy_Hash_store
+   fun:lucy_VTable_singleton
+   fun:*
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_Hash_rebuild_hash
+   fun:*
+}
+
