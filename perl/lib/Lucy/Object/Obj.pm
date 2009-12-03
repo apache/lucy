@@ -21,6 +21,78 @@ CODE:
 OUTPUT: RETVAL
 
 void
+STORABLE_freeze(self, ...)
+    lucy_Obj *self;
+PPCODE:
+{
+    CHY_UNUSED_VAR(self);
+    if (items < 2 || !SvTRUE(ST(1))) {
+        SV *retval;
+        lucy_ByteBuf *serialized_bb;
+        lucy_RAMFileHandle *file_handle = lucy_RAMFH_open(NULL, 
+            LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
+        lucy_OutStream *target = lucy_OutStream_open((lucy_Obj*)file_handle);
+
+        Lucy_Obj_Serialize(self, target);
+
+        Lucy_OutStream_Close(target);
+        serialized_bb = Lucy_RAMFile_Get_Contents(
+            Lucy_RAMFH_Get_File(file_handle));
+        retval = XSBind_bb_to_sv(serialized_bb);
+        LUCY_DECREF(file_handle);
+        LUCY_DECREF(target);
+
+        if (SvCUR(retval) == 0) { /* Thwart Storable bug */
+            THROW(LUCY_ERR, "Calling serialize produced an empty string");
+        }
+        ST(0) = sv_2mortal(retval);
+        XSRETURN(1);
+    }
+}
+
+=begin comment
+
+Calls deserialize(), and copies the object pointer.  Since deserialize is an
+abstract method, it will confess() unless implemented.
+
+=end comment
+=cut
+
+void
+STORABLE_thaw(blank_obj, cloning, serialized_sv)
+    SV *blank_obj;
+    SV *cloning;
+    SV *serialized_sv;
+PPCODE:
+{
+    char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
+    lucy_ZombieCharBuf klass 
+        = lucy_ZCB_make_str(class_name, strlen(class_name));
+    lucy_VTable *vtable = (lucy_VTable*)lucy_VTable_singleton(
+        (lucy_CharBuf*)&klass, NULL);
+    STRLEN len;
+    char *ptr = SvPV(serialized_sv, len);
+    lucy_ViewByteBuf *contents = lucy_ViewBB_new(ptr, len);
+    lucy_RAMFile *ram_file = lucy_RAMFile_new((lucy_ByteBuf*)contents, true);
+    lucy_RAMFileHandle *file_handle 
+        = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
+    lucy_InStream *instream = lucy_InStream_open((lucy_Obj*)file_handle);
+    lucy_Obj *self = Lucy_VTable_Foster_Obj(vtable, blank_obj);
+    lucy_Obj *deserialized = Lucy_Obj_Deserialize(self, instream);
+
+    CHY_UNUSED_VAR(cloning);
+    LUCY_DECREF(contents);
+    LUCY_DECREF(ram_file);
+    LUCY_DECREF(file_handle);
+    LUCY_DECREF(instream);
+
+    /* Catch bad deserialize() override. */
+    if (deserialized != self) {
+        THROW(LUCY_ERR, "Error when deserializing obj of class %o", &klass);
+    }
+}
+
+void
 DESTROY(self)
     lucy_Obj *self;
 PPCODE:
@@ -52,6 +124,8 @@ Boilerplater::Binding::Perl::Class->register(
             Mimic
             Equals
             Hash_Code
+            Serialize
+            Deserialize
             Destroy
             )
     ],

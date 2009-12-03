@@ -12,6 +12,8 @@
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
 #include "Lucy/Object/VTable.h"
+#include "Lucy/Store/InStream.h"
+#include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Memory.h"
 
 Obj*
@@ -52,6 +54,35 @@ bool_t
 Obj_equals(Obj *self, Obj *other)
 {
     return (self == other);
+}
+
+void
+Obj_serialize(Obj *self, OutStream *outstream)
+{
+    CharBuf *class_name = Obj_Get_Class_Name(self);
+    size_t size = CB_Get_Size(class_name);
+    OutStream_Write_C32(outstream, size);
+    OutStream_Write_Bytes(outstream, CB_Get_Ptr8(class_name), size);
+}
+
+Obj*
+Obj_deserialize(Obj *self, InStream *instream)
+{
+    size_t size = InStream_Read_C32(instream);
+    CharBuf *class_name = CB_new(size);
+    CB_Set_Size(class_name, size);
+    InStream_Read_Bytes(instream, CB_Get_Ptr8(class_name), size);
+    if (!self) {
+        VTable *vtable = VTable_singleton(class_name, OBJ);
+        self = VTable_Make_Obj(vtable);
+    }
+    else {
+        CharBuf *my_class = VTable_Get_Name(self->vtable);
+        if (!CB_Equals(class_name, (Obj*)my_class)) 
+            THROW(ERR, "Class mismatch: %o %o", class_name, my_class);
+    }
+    DECREF(class_name);
+    return Obj_init(self);
 }
 
 CharBuf*
