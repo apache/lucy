@@ -11,6 +11,8 @@
 #include "Lucy/Object/VTable.h"
 #include "Lucy/Object/ByteBuf.h"
 #include "Lucy/Object/Err.h"
+#include "Lucy/Store/InStream.h"
+#include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Memory.h"
 
 /* Reallocate if necessary. */
@@ -189,6 +191,27 @@ BB_grow(ByteBuf *self, size_t capacity)
 {
     SI_maybe_grow(self, capacity);
     return self->buf;
+}
+
+void
+BB_serialize(ByteBuf *self, OutStream *target)
+{
+    OutStream_Write_C32(target, self->size);
+    OutStream_Write_Bytes(target, self->buf, self->size);
+}
+
+ByteBuf*
+BB_deserialize(ByteBuf *self, InStream *instream)
+{
+    const size_t size = InStream_Read_C32(instream);
+    self = self ? self : (ByteBuf*)VTable_Make_Obj(BYTEBUF);
+    self->cap  = 0; 
+    self->size = 0;
+    self->buf  = NULL;
+    SI_maybe_grow(self, size);
+    self->size = size;
+    InStream_Read_Bytes(instream, self->buf, size);
+    return self;
 }
 
 int 

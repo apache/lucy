@@ -100,6 +100,12 @@ class Lucy::Object::ByteBuf cnick BB extends Lucy::Object::Obj {
 
     public i32_t
     Hash_Code(ByteBuf *self);
+
+    public void
+    Serialize(ByteBuf *self, OutStream *outstream);
+
+    public incremented ByteBuf*
+    Deserialize(ByteBuf *self, InStream *instream);
 }
 
 /**
