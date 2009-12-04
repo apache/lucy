@@ -2,6 +2,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestVArray.h"
 
 static CharBuf*
@@ -247,10 +248,24 @@ test_Dump_and_Load(TestBatch *batch)
     DECREF(loaded);
 }
 
+static void
+test_serialization(TestBatch *batch)
+{
+    VArray *array  = VA_new(0);
+    VArray *dupe;
+    VA_Store(array, 1, (Obj*)CB_newf("foo"));
+    VA_Store(array, 3, (Obj*)CB_newf("bar"));
+    dupe = (VArray*)TestUtils_freeze_thaw((Obj*)array);
+    ASSERT_TRUE(batch, dupe && VA_Equals(array, (Obj*)dupe), 
+        "Round trip through FREEZE/THAW");
+    DECREF(dupe);
+    DECREF(array);
+}
+
 void
 TestVArray_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestVArray", 38, NULL);
+    TestBatch *batch = Test_new_batch("TestVArray", 39, NULL);
 
     PLAN(batch);
 
@@ -263,6 +278,7 @@ TestVArray_run_tests()
     test_Push_VArray(batch);
     test_Clone_and_Shallow_Copy(batch);
     test_Dump_and_Load(batch);
+    test_serialization(batch);
 
     batch->destroy(batch);
 }

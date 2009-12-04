@@ -124,6 +124,7 @@ sub error {$Lucy::Object::Err::error}
     package Lucy::Object::VArray;
     no warnings 'redefine';
     sub clone { CORE::shift->_clone }
+    sub deserialize { CORE::shift->_deserialize(@_) }
 }
 
 {

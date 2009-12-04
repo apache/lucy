@@ -9,7 +9,10 @@
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Util/Memory.h"
+#include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/SortUtils.h"
+#include "Lucy/Store/InStream.h"
+#include "Lucy/Store/OutStream.h"
 
 #define MAYBE_GROW(_self, _new_size) \
     do { \
@@ -83,6 +86,46 @@ VA_load(VArray *self, Obj *dump)
     }
 
     return loaded;
+}
+
+void
+VA_serialize(VArray *self, OutStream *outstream)
+{
+    u32_t i;
+    u32_t last_valid_tick = 0;
+    OutStream_Write_C32(outstream, self->size);
+    for (i = 0; i < self->size; i++) {
+        Obj *elem = self->elems[i];
+        if (elem) {
+            OutStream_Write_C32(outstream, i - last_valid_tick);
+            FREEZE(elem, outstream);
+            last_valid_tick = i;
+        }
+    }
+    /* Terminate. */
+    OutStream_Write_C32(outstream, self->size - last_valid_tick);
+}
+
+VArray*
+VA_deserialize(VArray *self, InStream *instream)
+{
+    u32_t tick;
+    u32_t size = InStream_Read_C32(instream);
+    if (self) {
+        self->size = size;
+        self->cap = size + 1;
+        self->elems = (Obj**)CALLOCATE(self->cap, sizeof(Obj*));
+    }
+    else self = VA_new(size);
+    for (tick = InStream_Read_C32(instream); 
+         tick < size; 
+         tick += InStream_Read_C32(instream)
+    ) {
+        Obj *obj = THAW(instream);
+        self->elems[tick] = obj;
+    }
+    self->size = size;
+    return self;
 }
 
 VArray*

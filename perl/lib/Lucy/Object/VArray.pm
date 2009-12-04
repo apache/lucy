@@ -17,6 +17,15 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_deserialize(either_sv, instream)
+    SV *either_sv;
+    lucy_InStream *instream;
+CODE:
+    CHY_UNUSED_VAR(either_sv);
+    RETVAL = LUCY_OBJ_TO_SV_NOINC(lucy_VA_deserialize(NULL, instream));
+OUTPUT: RETVAL
+
+SV*
 _clone(self)
     lucy_VArray *self;
 CODE:

@@ -146,6 +146,12 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
     Load(VArray *self, Obj *dump);
 
     public void
+    Serialize(VArray *self, OutStream *outstream);
+
+    public incremented VArray*
+    Deserialize(VArray *self, InStream *instream);
+
+    public void
     Destroy(VArray *self);
 }
 
