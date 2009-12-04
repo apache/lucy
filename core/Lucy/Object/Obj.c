@@ -60,18 +60,13 @@ void
 Obj_serialize(Obj *self, OutStream *outstream)
 {
     CharBuf *class_name = Obj_Get_Class_Name(self);
-    size_t size = CB_Get_Size(class_name);
-    OutStream_Write_C32(outstream, size);
-    OutStream_Write_Bytes(outstream, CB_Get_Ptr8(class_name), size);
+    CB_Serialize(class_name, outstream);
 }
 
 Obj*
 Obj_deserialize(Obj *self, InStream *instream)
 {
-    size_t size = InStream_Read_C32(instream);
-    CharBuf *class_name = CB_new(size);
-    CB_Set_Size(class_name, size);
-    InStream_Read_Bytes(instream, CB_Get_Ptr8(class_name), size);
+    CharBuf *class_name = CB_deserialize(NULL, instream);
     if (!self) {
         VTable *vtable = VTable_singleton(class_name, OBJ);
         self = VTable_Make_Obj(vtable);
