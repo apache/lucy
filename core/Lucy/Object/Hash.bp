@@ -121,6 +121,12 @@ class Lucy::Object::Hash extends Lucy::Object::Obj {
     Load(Hash *self, Obj *dump);
 
     public void
+    Serialize(Hash *self, OutStream *outstream);
+
+    public incremented Hash*
+    Deserialize(Hash *self, InStream *instream);
+
+    public void
     Destroy(Hash *self);
 }
 

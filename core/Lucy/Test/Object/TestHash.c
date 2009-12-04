@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "Lucy/Test.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestHash.h"
 #include "Lucy/Object/Hash.h"
 #include "Lucy/Object/Undefined.h"
@@ -217,6 +218,28 @@ test_Dump_and_Load(TestBatch *batch)
 }
 
 static void
+test_serialization(TestBatch *batch)
+{
+    Hash  *wanted = Hash_new(0); 
+    Hash  *got;
+    u32_t  i;
+
+    for (i = 0; i < 10; i++) {
+        CharBuf *cb = S_random_string();
+        Integer32 *num = Int32_new(i);
+        Hash_Store(wanted, (Obj*)cb, (Obj*)num);
+        Hash_Store(wanted, (Obj*)num, (Obj*)cb);
+    }
+
+    got = (Hash*)TestUtils_freeze_thaw((Obj*)wanted);
+    ASSERT_TRUE(batch, got && Hash_Equals(wanted, (Obj*)got), 
+        "Round trip through serialization.");
+
+    DECREF(got);
+    DECREF(wanted);
+}
+
+static void
 test_stress(TestBatch *batch)
 {
     u32_t i;
@@ -259,7 +282,7 @@ test_stress(TestBatch *batch)
 void
 TestHash_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestHash", 28, NULL);
+    TestBatch *batch = Test_new_batch("TestHash", 29, NULL);
 
     srand((unsigned int)time((time_t*)NULL));
 
@@ -268,6 +291,7 @@ TestHash_run_tests()
     test_Store_and_Fetch(batch);
     test_Keys_Values_Iter(batch);
     test_Dump_and_Load(batch);
+    test_serialization(batch);
     test_stress(batch);
 
     batch->destroy(batch);

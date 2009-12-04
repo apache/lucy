@@ -10,6 +10,15 @@ my $xs_code = <<'END_XS_CODE';
 MODULE =  Lucy    PACKAGE = Lucy::Object::Hash
 
 SV*
+_deserialize(either_sv, instream)
+    SV *either_sv;
+    lucy_InStream *instream;
+CODE:
+    CHY_UNUSED_VAR(either_sv);
+    RETVAL = LUCY_OBJ_TO_SV_NOINC(lucy_Hash_deserialize(NULL, instream));
+OUTPUT: RETVAL
+
+SV*
 _fetch(self, key)
     lucy_Hash *self;
     lucy_ZombieCharBuf key;

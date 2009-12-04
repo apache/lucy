@@ -109,6 +109,12 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
+    package Lucy::Object::Hash;
+    no warnings 'redefine';
+    sub deserialize { shift->_deserialize(@_) }
+}
+
+{
     package Lucy::Object::Obj;
     use Lucy::Util::ToolSet qw( to_lucy to_perl );
     sub load { return $_[0]->_load( to_lucy( $_[1] ) ) }
