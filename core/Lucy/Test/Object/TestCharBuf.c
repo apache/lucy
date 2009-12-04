@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "Lucy/Test.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestCharBuf.h"
 
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
@@ -350,10 +351,21 @@ test_vcatf_x32(TestBatch *batch)
     DECREF(got);
 }
 
+static void
+test_serialization(TestBatch *batch)
+{
+    CharBuf *wanted = S_get_cb("foo");
+    CharBuf *got    = (CharBuf*)TestUtils_freeze_thaw((Obj*)wanted);
+    ASSERT_TRUE(batch, got && CB_Equals(wanted, (Obj*)got), 
+        "Round trip through FREEZE/THAW");
+    DECREF(got);
+    DECREF(wanted);
+}
+
 void
 TestCB_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestCharBuf", 47, NULL);
+    TestBatch *batch = Test_new_batch("TestCharBuf", 48, NULL);
     PLAN(batch);
 
     test_vcatf_s(batch);
@@ -377,6 +389,7 @@ TestCB_run_tests()
     test_Trim(batch);
     test_To_F64(batch);
     test_To_I64(batch);
+    test_serialization(batch);
 
     batch->destroy(batch);
 }

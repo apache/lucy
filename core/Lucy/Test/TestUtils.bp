@@ -44,6 +44,12 @@ inert class Lucy::Test::TestUtils  {
      */
     inert incremented VArray*
     doc_set();
+
+    /** Return the result of round-tripping the object through FREEZE and
+     * THAW. 
+     */
+    inert incremented Obj*
+    freeze_thaw(Obj *object);
 }
 
 /* Copyright 2009 The Apache Software Foundation
