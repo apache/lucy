@@ -68,6 +68,12 @@ class Lucy::Object::Float32 extends Lucy::Object::FloatNum {
     public i32_t
     Hash_Code(Float32 *self);
 
+    public void
+    Serialize(Float32 *self, OutStream *outstream);
+
+    public incremented Float32*
+    Deserialize(Float32 *self, InStream *instream);
+
     public incremented Float32*
     Clone(Float32 *self);
 }
@@ -101,6 +107,12 @@ class Lucy::Object::Float64 extends Lucy::Object::FloatNum {
 
     public i32_t
     Hash_Code(Float64 *self);
+
+    public void
+    Serialize(Float64 *self, OutStream *outstream);
+
+    public incremented Float64*
+    Deserialize(Float64 *self, InStream *instream);
 
     public incremented Float64*
     Clone(Float64 *self);
@@ -136,6 +148,12 @@ class Lucy::Object::Integer32 cnick Int32
 
     public i32_t
     Hash_Code(Integer32 *self);
+
+    public void
+    Serialize(Integer32 *self, OutStream *outstream);
+
+    public incremented Integer32*
+    Deserialize(Integer32 *self, InStream *instream);
 
     public incremented Integer32*
     Clone(Integer32 *self);
@@ -175,6 +193,12 @@ class Lucy::Object::Integer64 cnick Int64
 
     public bool_t
     Equals(Integer64 *self, Obj *other);
+
+    public void
+    Serialize(Integer64 *self, OutStream *outstream);
+
+    public incremented Integer64*
+    Deserialize(Integer64 *self, InStream *instream);
 
     public incremented Integer64*
     Clone(Integer64 *self);

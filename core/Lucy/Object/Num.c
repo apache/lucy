@@ -12,6 +12,8 @@
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/VTable.h"
+#include "Lucy/Store/InStream.h"
+#include "Lucy/Store/OutStream.h"
 
 Num*
 Num_init(Num *self)
@@ -125,6 +127,19 @@ Float32_clone(Float32 *self)
     return Float32_new(self->value);
 }
 
+void
+Float32_serialize(Float32 *self, OutStream *outstream)
+{
+    OutStream_Write_F32(outstream, self->value);
+}
+
+Float32*
+Float32_deserialize(Float32 *self, InStream *instream)
+{
+    float value = InStream_Read_F32(instream);
+    return self ? Float32_init(self, value) : Float32_new(value);
+}
+
 /***************************************************************************/
 
 Float64*
@@ -171,6 +186,19 @@ Float64_hash_code(Float64 *self)
     return ints[0] ^ ints[1];
 }
 
+void
+Float64_serialize(Float64 *self, OutStream *outstream)
+{
+    OutStream_Write_F64(outstream, self->value);
+}
+
+Float64*
+Float64_deserialize(Float64 *self, InStream *instream)
+{
+    double value = InStream_Read_F64(instream);
+    return self ? Float64_init(self, value) : Float64_new(value);
+}
+
 /***************************************************************************/
 
 Integer32*
@@ -214,6 +242,19 @@ i32_t
 Int32_hash_code(Integer32 *self)
 {
     return self->value;
+}
+
+void
+Int32_serialize(Integer32 *self, OutStream *outstream)
+{
+    OutStream_Write_C32(outstream, (u32_t)self->value);
+}
+
+Integer32*
+Int32_deserialize(Integer32 *self, InStream *instream)
+{
+    i32_t value = (i32_t)InStream_Read_C32(instream);
+    return self ? Int32_init(self, value) : Int32_new(value);
 }
 
 /***************************************************************************/
@@ -278,6 +319,19 @@ Int64_equals(Integer64 *self, Obj *other)
         if (self->value != Num_To_I64(evil_twin)) { return false; }
     }
     return true;
+}
+
+void
+Int64_serialize(Integer64 *self, OutStream *outstream)
+{
+    OutStream_Write_C64(outstream, (u64_t)self->value);
+}
+
+Integer64*
+Int64_deserialize(Integer64 *self, InStream *instream)
+{
+    i64_t value = (i64_t)InStream_Read_C64(instream);
+    return self ? Int64_init(self, value) : Int64_new(value);
 }
 
 /* Copyright 2009 The Apache Software Foundation
