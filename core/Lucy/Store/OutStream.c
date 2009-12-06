@@ -3,6 +3,7 @@
 
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/FileHandle.h"
+#include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/RAMFile.h"
@@ -43,12 +44,10 @@ OutStream_do_open(OutStream *self, Obj *file)
         self->file_handle 
             = (FileHandle*)RAMFH_open(NULL, FH_WRITE_ONLY, (RAMFile*)file);
     }
-    /*
     else if (Obj_Is_A(file, CHARBUF)) {
         self->file_handle = (FileHandle*)FSFH_open((CharBuf*)file,
             FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE );
     }
-    */
     else {
         Err_set_error(Err_new(CB_newf("Invalid type for param 'file': '%o'",
             Obj_Get_Class_Name(file))));
