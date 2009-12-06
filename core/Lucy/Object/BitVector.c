@@ -371,6 +371,39 @@ BitVec_count(BitVector *self)
     return count;
 }
 
+I32Array*
+BitVec_to_array(BitVector *self)
+{
+    u32_t count             = BitVec_Count(self);
+    u32_t num_left          = count;
+    const u32_t capacity    = self->cap;
+    u32_t *const array      = (u32_t *const)(u32_t*)CALLOCATE(count, sizeof(u32_t));
+    const size_t byte_size  = (size_t)ceil(self->cap / 8.0);
+    u8_t *const bits        = self->bits;
+    u8_t *const limit       = bits + byte_size;
+    u32_t num               = 0;
+    u32_t i                 = 0;
+
+    while (num_left) {
+        u8_t *ptr = bits + (num >> 3);
+        while (ptr < limit && *ptr == 0) {
+            num += 8;
+            ptr++;
+        }
+        do {
+            if (BitVec_Get(self, num)) {
+                array[i++] = num;
+                if (--num_left == 0)
+                    break;
+            }
+            if (num >= capacity)
+                THROW(ERR, "Exceeded capacity: %u32 %u32", num, capacity);
+        } while (++num % 8);
+    }
+
+    return I32Arr_new_steal((i32_t*)array, count);
+}
+
 /* Copyright 2009 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

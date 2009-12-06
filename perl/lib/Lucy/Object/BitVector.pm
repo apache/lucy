@@ -12,6 +12,7 @@ my $synopsis    = <<'END_SYNOPSIS';
     $bit_vec->set($_) for ( 0, 2, 4, 6 );
     $other->set($_)   for ( 1, 3, 5, 7 );
     $bit_vec->or($other);
+    print "$_\n" for @{ $bit_vec->to_array };    # prints 0 through 7.
 END_SYNOPSIS
 my $constructor = <<'END_CONSTRUCTOR';
     my $bit_vec = Lucy::Object::BitVector->new( 
@@ -34,6 +35,7 @@ Boilerplater::Binding::Perl::Class->register(
             Flip
             Flip_Block
             Next_Set_Bit
+            To_Array
             Grow
             Count
             Get_Capacity
@@ -55,6 +57,7 @@ Boilerplater::Binding::Perl::Class->register(
                 flip
                 flip_block
                 next_set_bit
+                to_array
                 grow
                 count
                 )

@@ -28,6 +28,7 @@ extern "C" {
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
+#include "Lucy/Object/I32Array.h"
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/Undefined.h"
 #include "Lucy/Object/VArray.h"

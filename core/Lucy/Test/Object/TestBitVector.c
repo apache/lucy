@@ -2,6 +2,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestBitVector.h"
 
 static void
@@ -374,6 +375,53 @@ test_Clone(TestBatch *batch)
     DECREF(evil_twin);
 }
 
+static int
+S_compare_u64s(void *context, const void *va, const void *vb)
+{
+    u64_t a = *(u64_t*)va;
+    u64_t b = *(u64_t*)vb;
+    UNUSED_VAR(context);
+    return a == b ? 0 : a < b ? -1 : 1;
+}
+
+static void
+test_To_Array(TestBatch *batch)
+{
+    u64_t     *source_ints = TestUtils_random_u64s(NULL, 20, 0, 200);
+    BitVector *bit_vec = BitVec_new(0);
+    I32Array  *array;
+    long       num_unique = 0;
+    long       i;
+
+    /* Unique the random ints. */
+    Sort_quicksort(source_ints, 20, sizeof(u64_t), 
+        S_compare_u64s, NULL);
+    for (i = 0; i < 19; i++) {
+        if (source_ints[i] != source_ints[i + 1]) {
+            source_ints[num_unique] = source_ints[i];
+            num_unique++;
+        }
+    }
+
+    /* Set bits. */
+    for (i = 0; i < num_unique; i++) {
+        BitVec_Set(bit_vec, (u32_t)source_ints[i]);
+    }
+
+    /* Create the array and compare it to the source. */
+    array = BitVec_To_Array(bit_vec);
+    for (i = 0; i < num_unique; i++) {
+        if (I32Arr_Get(array, i) != (i32_t)source_ints[i]) { break; }
+    }
+    ASSERT_INT_EQ(batch, i, num_unique, "To_Array (%ld == %ld)", i, 
+        num_unique);
+
+    DECREF(array);
+    DECREF(bit_vec);
+    FREEMEM(source_ints);
+}
+
+
 /* Valgrind only - detect off-by-one error. */
 static void
 test_off_by_one_error()
@@ -389,7 +437,7 @@ test_off_by_one_error()
 void
 TestBitVector_run_tests()
 {
-    TestBatch   *batch     = Test_new_batch("TestInStream", 1028, NULL);
+    TestBatch   *batch     = Test_new_batch("TestInStream", 1029, NULL);
 
     PLAN(batch);
 
@@ -407,6 +455,7 @@ TestBitVector_run_tests()
     test_Next_Set_Bit(batch);
     test_Clear_All(batch);
     test_Clone(batch);
+    test_To_Array(batch);
     test_off_by_one_error();
 
     batch->destroy(batch);

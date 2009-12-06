@@ -132,6 +132,11 @@ class Lucy::Object::BitVector cnick BitVec
     public u32_t
     Count(BitVector *self);
 
+    /** Return an array where each element represents a set bit.
+     */
+    public incremented I32Array*
+    To_Array(BitVector *self);
+
     public void
     Destroy(BitVector *self);
 

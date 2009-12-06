@@ -30,6 +30,9 @@ PPCODE:
     else if (strEQ(package, "TestHash")) {
         lucy_TestHash_run_tests();
     }
+    else if (strEQ(package, "TestI32Array")) {
+        lucy_TestI32Arr_run_tests();
+    }
     else if (strEQ(package, "TestNum")) {
         lucy_TestNum_run_tests();
     }
