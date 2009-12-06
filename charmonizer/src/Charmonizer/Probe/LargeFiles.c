@@ -26,17 +26,33 @@ static off64_combo off64_combos[] = {
     { "",                         "fopen",     "ftell",     "fseek",     "long"    },
     { NULL, NULL, NULL, NULL, NULL }
 };
+
 typedef struct unbuff_combo {
     const char *includes;
-    const char *open_command;
-    const char *tell_command;
-    const char *seek_command;
+    const char *lseek_command;
+    const char *pread64_command;
 } unbuff_combo;
+static unbuff_combo unbuff_combos[] = {
+    { "#include <unistd.h>\n#include <fcntl.h>\n", "lseek64",   "pread64" },
+    { "#include <unistd.h>\n#include <fcntl.h>\n", "lseek",     "pread"      },
+    { "#include <io.h>\n#include <fcntl.h>\n",     "_lseeki64", "NO_PREAD64" },
+    { NULL, NULL, NULL }
+};
 
 /* Check what name 64-bit ftell, fseek go by.
  */
 static chaz_bool_t
 S_probe_off64(off64_combo *combo);
+
+/* Check for a 64-bit lseek. 
+ */
+static chaz_bool_t
+S_probe_lseek(unbuff_combo *combo);
+
+/* Check for a 64-bit pread. 
+ */
+static chaz_bool_t
+S_probe_pread64(unbuff_combo *combo);
 
 /* Determine whether we can use sparse files.
  */
@@ -58,12 +74,16 @@ S_can_create_big_files();
 static char fopen_command[10];
 static char fseek_command[10];
 static char ftell_command[10];
+static char lseek_command[10];
+static char pread64_command[10];
 static char off64_type[10];
 
 void
 LargeFiles_run(void) 
 {
     chaz_bool_t success = false;
+    chaz_bool_t found_lseek = false;
+    chaz_bool_t found_pread64 = false;
     unsigned i;
 
     START_RUN("LargeFiles");
@@ -93,6 +113,29 @@ LargeFiles_run(void)
         }
     }
 
+    /* Probe for 64-bit versions of lseek and pread (if we have an off64_t). */
+    if (success) {
+        for (i = 0; unbuff_combos[i].lseek_command != NULL; i++) {
+            unbuff_combo combo = unbuff_combos[i];
+            found_lseek = S_probe_lseek(&combo);
+            if (found_lseek) {
+                strcpy(lseek_command, combo.lseek_command);
+                ModHand_append_conf("#define chy_lseek64 %s\n", lseek_command);
+                break;
+            }
+        }
+        for (i = 0; unbuff_combos[i].pread64_command != NULL; i++) {
+            unbuff_combo combo = unbuff_combos[i];
+            found_pread64 = S_probe_pread64(&combo);
+            if (found_pread64) {
+                strcpy(pread64_command, combo.pread64_command);
+                ModHand_append_conf("#define chy_pread64 %s\n", pread64_command);
+                found_pread64 = true;
+                break;
+            }
+        }
+    }
+
     /* check for sparse files */
     if (S_check_sparse_files()) {
         ModHand_append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
@@ -102,11 +145,6 @@ LargeFiles_run(void)
     }
     else {
         ModHand_append_conf("#define CHAZ_NO_SPARSE_FILES\n");
-    }
-
-    /* test for unbuffered LFS commands */
-    if (success) {
-
     }
 
     /* short names */
@@ -120,6 +158,12 @@ LargeFiles_run(void)
             ModHand_shorten_function("fopen64");
             ModHand_shorten_function("ftello64");
             ModHand_shorten_function("fseeko64");
+        }
+        if (found_lseek && strcmp(lseek_command, "lseek64") != 0) {
+            ModHand_shorten_function("lseek64");
+        }
+        if (found_pread64 && strcmp(pread64_command, "pread64") != 0) {
+            ModHand_shorten_function("pread64");
         }
         END_SHORT_NAMES;
     }
@@ -174,6 +218,83 @@ S_probe_off64(off64_combo *combo)
         free(output);
     }
 
+    return success;
+}
+
+/* Code for checking 64-bit lseek. */
+static char lseek_code[] = METAQUOTE
+    %s
+    #include "_charm.h"
+    int main() {
+        int fd;
+        Charm_Setup;
+        fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666);
+        if (fd == -1) { return -1; }
+        %s(fd, 0, SEEK_SET);
+        printf("%%d", 1);
+        if (close(fd)) { return -1; }
+        return 0;
+    }
+METAQUOTE;
+
+static chaz_bool_t
+S_probe_lseek(unbuff_combo *combo)
+{
+    char *output = NULL;
+    size_t output_len;
+    size_t needed = sizeof(lseek_code) + strlen(combo->includes) 
+        + strlen(combo->lseek_command) + 20;
+    char *code_buf = (char*)malloc(needed);
+    chaz_bool_t success = false;
+
+    /* Verify compilation. */
+    sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
+    output = ModHand_capture_output(code_buf, strlen(code_buf), 
+        &output_len);
+    if (output != NULL) {
+        success = true;
+        free(output);
+    }
+
+    free(code_buf);
+    return success;
+}
+
+/* Code for checking 64-bit pread.  The pread call will fail, but that's fine
+ * as long as it compiles. */
+static char pread64_code[] = METAQUOTE
+    %s
+    #include "_charm.h"
+    int main() {
+        int fd = 20;
+        char buf[1];
+        Charm_Setup;
+        printf("1");
+        %s(fd, buf, 1, 1);
+        return 0;
+    }
+METAQUOTE;
+
+static chaz_bool_t
+S_probe_pread64(unbuff_combo *combo)
+{
+    char *output = NULL;
+    size_t output_len;
+    size_t needed = sizeof(pread64_code) + strlen(combo->includes) 
+        + strlen(combo->pread64_command) + 20;
+    char *code_buf = (char*)malloc(needed);
+    chaz_bool_t success = false;
+
+    /* Verify compilation. */
+    sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
+    output = ModHand_capture_output(code_buf, strlen(code_buf), 
+        &output_len);
+    if (output != NULL) {
+        success = true;
+        free(output);
+    }
+
+    free(code_buf);
     return success;
 }
 

@@ -22,6 +22,11 @@ extern "C" {
  * 
  * HAS_LARGE_FILE_SUPPORT
  *
+ * Additionally, 64-bit versions of lseek and pread may be detected/aliased:
+ *
+ * lseek64
+ * pread64
+ * 
  * Use of the off64_t symbol may require sys/types.h.
  */
 void chaz_LargeFiles_run(void);
