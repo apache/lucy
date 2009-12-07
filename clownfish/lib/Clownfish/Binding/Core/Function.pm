@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Core::Function;
-use Boilerplater::Util qw( a_isa_b );
+package Clownfish::Binding::Core::Function;
+use Clownfish::Util qw( a_isa_b );
 
 sub func_declaration {
     my ( undef, $function ) = @_;
     confess("Not a Function")
-        unless a_isa_b( $function, "Boilerplater::Function" );
+        unless a_isa_b( $function, "Clownfish::Function" );
     my $return_type = $function->get_return_type;
     my $param_list  = $function->get_param_list;
     my $dec = $function->inline ? 'static CHY_INLINE ' : '';
@@ -25,14 +25,14 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Core::Function - Generate core C code for a function.
+Clownfish::Binding::Core::Function - Generate core C code for a function.
 
 =head1 CLASS METHODS
 
 =head2 func_declaration
 
     my $declaration 
-        = Boilerplater::Binding::Core::Function->func_declaration($function);
+        = Clownfish::Binding::Core::Function->func_declaration($function);
 
 Return C code declaring the function's C implementation.
 

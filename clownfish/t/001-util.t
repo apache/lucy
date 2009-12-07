@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More tests => 16;
 use File::stat qw( stat );
-use Boilerplater::Util qw(
+use Clownfish::Util qw(
     slurp_file
     current
     verify_args

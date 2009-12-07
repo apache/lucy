@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Boilerplater::DocuComment;
+package Clownfish::DocuComment;
 use Carp;
 
 our %new_PARAMS = (
@@ -90,7 +90,7 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::DocuComment - Formatted comment a la Doxygen.
+Clownfish::DocuComment - Formatted comment a la Doxygen.
 
 =head1 SYNOPSIS
 
@@ -104,19 +104,19 @@ Boilerplater::DocuComment - Formatted comment a la Doxygen.
      * @return a return value.
      */
     END_COMMENT
-    my $docucomment = Boilerplater::DocuComment->parse($text);
+    my $docucomment = Clownfish::DocuComment->parse($text);
 
 =head1 CONSTRUCTORS 
 
 =head2 parse 
 
-    my $self = Boilerplater::DocuComment->parse($text);
+    my $self = Clownfish::DocuComment->parse($text);
 
 Parse comment text.
 
 =head2 new
 
-    my $self = Boilerplater::DocuComment->new(
+    my $self = Clownfish::DocuComment->new(
         description => "Brief.  Start long.  More long.",
         brief       => "Brief.",
         long        => "Long start. More long.",

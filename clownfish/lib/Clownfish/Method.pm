@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Method;
-use base qw( Boilerplater::Function );
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Method;
+use base qw( Clownfish::Function );
+use Clownfish::Util qw( verify_args );
 use Carp;
 
 my %new_PARAMS = (
@@ -164,14 +164,14 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Method - Metadata describing an instance method.
+Clownfish::Method - Metadata describing an instance method.
 
 =head1 DESCRIPTION
 
-Boilerplater::Method is a specialized subclass of Boilerplater::Function, with
+Clownfish::Method is a specialized subclass of Clownfish::Function, with
 the first argument required to be an Obj.
 
-When compiling Boilerplater code to C, Method objects generate all the code
+When compiling Clownfish code to C, Method objects generate all the code
 that Function objects do, but also create symbols for indirect invocation via
 VTable.
 
@@ -179,7 +179,7 @@ VTable.
 
 =head2 new
 
-    my $type = Boilerplater::Method->new(
+    my $type = Clownfish::Method->new(
         parcel      => 'MyProject'                 # default: special
         class_name  => 'MyProject::FooFactory',    # required
         class_cnick => 'FooFact ',                 # default: special
@@ -194,7 +194,7 @@ VTable.
 
 =over
 
-=item * B<param_list> - A Boilerplater::ParamList.  The first element must be an
+=item * B<param_list> - A Clownfish::ParamList.  The first element must be an
 object of the class identified by C<class_name>.
 
 =item * B<macro_sym> - The mixed case name which will be used when invoking the
@@ -205,7 +205,7 @@ method.
 =item * B<final> - Indicate whether the method is final.
 
 =item * B<parcel>, B<class_name>, B<class_cnick>, B<return_type>,
-B<docucomment>, - see L<Boilerplater::Function>.
+B<docucomment>, - see L<Clownfish::Function>.
 
 =back
 
@@ -221,7 +221,7 @@ overridden.
 
 =head2 self_type
 
-Return the L<Boilerplater::Type> for C<self>.
+Return the L<Clownfish::Type> for C<self>.
 
 =head2 short_method_sym
 

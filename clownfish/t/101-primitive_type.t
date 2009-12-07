@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package MyPrimitiveType;
-use base qw( Boilerplater::Type::Primitive );
+use base qw( Clownfish::Type::Primitive );
 
 package main;
 use Test::More tests => 4;

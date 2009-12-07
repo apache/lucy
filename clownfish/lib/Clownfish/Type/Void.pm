@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::Void;
-use base qw( Boilerplater::Type );
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type::Void;
+use base qw( Clownfish::Type );
+use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -39,19 +39,19 @@ __END__
 
 =head1 NAME
 
-Boilerplater::Type::Void - The void Type.
+Clownfish::Type::Void - The void Type.
 
 =head1 DESCRIPTION
 
-Boilerplater::Type::Void is used to represent a void return type.  It is also
-used in conjuction with with L<Boilerplater::Type::Composite> to support the
+Clownfish::Type::Void is used to represent a void return type.  It is also
+used in conjuction with with L<Clownfish::Type::Composite> to support the
 C<void*> opaque pointer type.
 
 =head1 METHODS
 
 =head2 new
 
-    my $type = Boilerplater::Type::Void->new(
+    my $type = Clownfish::Type::Void->new(
         specifier => 'void',    # default: void
         const     => 1,         # default: undef
     );

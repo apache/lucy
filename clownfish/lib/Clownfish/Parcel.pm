@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Parcel;
+package Clownfish::Parcel;
 use base qw( Exporter );
-use Boilerplater::Util qw( verify_args );
+use Clownfish::Util qw( verify_args );
 use Carp;
 
 our %parcels;
@@ -74,19 +74,19 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Parcel - Collection of code.
+Clownfish::Parcel - Collection of code.
 
 =head1 DESCRIPTION
 
 A Parcel is a cohesive collection of code, which could, in theory, be
 published as as a single entity.
 
-Boilerplater supports two-tier manual namespacing, using a prefix, an optional
+Clownfish supports two-tier manual namespacing, using a prefix, an optional
 class nickname, and the local symbol:
 
   prefix_ClassNick_local_symbol
   
-Boilerplater::Parcel supports the first tier, specifying initial prefixes.
+Clownfish::Parcel supports the first tier, specifying initial prefixes.
 These prefixes come in three capitalization variants: prefix_, Prefix_, and
 PREFIX_.
 
@@ -94,7 +94,7 @@ PREFIX_.
 
 =head2 singleton 
 
-    Boilerplater::Parcel->singleton(
+    Clownfish::Parcel->singleton(
         name  => 'Crustacean',
         cnick => 'Crust',
     );
@@ -118,7 +118,7 @@ Defaults to C<name>.
 
 =head2 default_parcel
 
-   $parcel ||= Boilerplater::Parcel->default_parcel;
+   $parcel ||= Clownfish::Parcel->default_parcel;
 
 Return the singleton for default parcel, which has no prefix.
 

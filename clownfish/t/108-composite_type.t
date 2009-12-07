@@ -2,10 +2,10 @@ use strict;
 use warnings;
 
 use Test::More tests => 24;
-use Boilerplater::Type::Object;
-use Boilerplater::Parser;
+use Clownfish::Type::Object;
+use Clownfish::Parser;
 
-my $parser = Boilerplater::Parser->new;
+my $parser = Clownfish::Parser->new;
 
 is( $parser->type_postfix($_), $_, "postfix: $_" )
     for ( '[]', '[A_CONSTANT]', '*' );
@@ -29,29 +29,29 @@ my @composite_type_strings = (
 
 for my $input (@composite_type_strings) {
     isa_ok( $parser->type($input),
-        "Boilerplater::Type::Composite", $input );
+        "Clownfish::Type::Composite", $input );
 }
 
-eval { my $type = Boilerplater::Type::Composite->new };
+eval { my $type = Clownfish::Type::Composite->new };
 like( $@, qr/child/i, "child required" );
 
-my $foo_type = Boilerplater::Type::Object->new( specifier => 'Foo' );
-my $composite_type = Boilerplater::Type::Composite->new(
+my $foo_type = Clownfish::Type::Object->new( specifier => 'Foo' );
+my $composite_type = Clownfish::Type::Composite->new(
     child       => $foo_type,
     indirection => 1,
 );
 is( $composite_type->get_specifier,
     'Foo', "get_specifier delegates to child" );
 
-my $other = Boilerplater::Type::Composite->new(
+my $other = Clownfish::Type::Composite->new(
     child       => $foo_type,
     indirection => 1,
 );
 ok( $composite_type->equals($other), "equals" );
 ok( $composite_type->is_composite,   "is_composite" );
 
-my $bar_type = Boilerplater::Type::Object->new( specifier => 'Bar' );
-my $bar_composite = Boilerplater::Type::Composite->new(
+my $bar_type = Clownfish::Type::Object->new( specifier => 'Bar' );
+my $bar_composite = Clownfish::Type::Composite->new(
     child       => $bar_type,
     indirection => 1,
 );

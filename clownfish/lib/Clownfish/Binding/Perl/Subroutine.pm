@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Perl::Subroutine;
+package Clownfish::Binding::Perl::Subroutine;
 use Carp;
-use Boilerplater::Class;
-use Boilerplater::Function;
-use Boilerplater::Method;
-use Boilerplater::Variable;
-use Boilerplater::ParamList;
-use Boilerplater::Util qw( verify_args );
+use Clownfish::Class;
+use Clownfish::Function;
+use Clownfish::Method;
+use Clownfish::Variable;
+use Clownfish::ParamList;
+use Clownfish::Util qw( verify_args );
 
 our %new_PARAMS = (
     param_list         => undef,
@@ -121,8 +121,8 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Perl::Subroutine - Abstract base binding for a
-Boilerplater::Function.
+Clownfish::Binding::Perl::Subroutine - Abstract base binding for a
+Clownfish::Function.
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,7 @@ Boilerplater::Function.
 
 =head1 DESCRIPTION
 
-This class is used to generate binding code for invoking Boilerplater's
+This class is used to generate binding code for invoking Clownfish's
 functions and methods across the Perl/C barrier.
 
 =head1 METHODS
@@ -149,7 +149,7 @@ Abstract constructor.
 
 =over
 
-=item * B<param_list> - A L<Boilerplater::ParamList>.
+=item * B<param_list> - A L<Clownfish::ParamList>.
 
 =item * B<alias> - The local, unqualified name for the Perl subroutine that
 will be used to invoke the function.
@@ -157,7 +157,7 @@ will be used to invoke the function.
 =item * B<class_name> - The name of the Perl class that the subroutine belongs
 to.
 
-=item * B<retval_type> - The return value's L<Type|Boilerplater::Type>.
+=item * B<retval_type> - The return value's L<Type|Clownfish::Type>.
 
 =item * B<use_labeled_params> - True if the binding should take hash-style
 labeled parameters, false if it should take positional arguments.

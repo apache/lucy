@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::File;
-use Boilerplater::Util qw( verify_args a_isa_b );
-use Boilerplater::Parcel;
+package Clownfish::File;
+use Clownfish::Util qw( verify_args a_isa_b );
+use Clownfish::Parcel;
 use Scalar::Util qw( blessed );
 use File::Spec::Functions qw( catfile );
 use Carp;
@@ -28,15 +28,15 @@ sub new {
     if ( defined $self->{parcel} ) {
         if ( !blessed( $self->{parcel} ) ) {
             $self->{parcel}
-                = Boilerplater::Parcel->singleton( name => $self->{parcel} );
+                = Clownfish::Parcel->singleton( name => $self->{parcel} );
         }
-        confess("Not a Boilerplater::Parcel")
-            unless $self->{parcel}->isa('Boilerplater::Parcel');
+        confess("Not a Clownfish::Parcel")
+            unless $self->{parcel}->isa('Clownfish::Parcel');
     }
     for my $block ( @{ $self->{blocks} } ) {
-        next if a_isa_b( $block, "Boilerplater::Parcel" );
-        next if a_isa_b( $block, "Boilerplater::Class" );
-        next if a_isa_b( $block, "Boilerplater::CBlock" );
+        next if a_isa_b( $block, "Clownfish::Parcel" );
+        next if a_isa_b( $block, "Clownfish::Class" );
+        next if a_isa_b( $block, "Clownfish::CBlock" );
         confess("Invalid block: $block");
     }
     confess("Missing required param 'source_class'")
@@ -53,7 +53,7 @@ sub blocks { @{ shift->{blocks} } }
 sub classes {
     my $self = shift;
     return
-        grep { ref $_ and $_->isa('Boilerplater::Class') }
+        grep { ref $_ and $_->isa('Clownfish::Class') }
         @{ $self->{blocks} };
 }
 
@@ -101,18 +101,18 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::File - Structured representation of the contents of a
-Boilerplater source file.
+Clownfish::File - Structured representation of the contents of a
+Clownfish source file.
 
 =head1 DESCRIPTION
 
-An abstraction representing a file which contains Boilerplater code.
+An abstraction representing a file which contains Clownfish code.
 
 =head1 METHODS
 
 =head2 new
 
-    my $file_obj = Boilerplater::File->new(
+    my $file_obj = Clownfish::File->new(
         blocks       => \@blocks,            # required
         source_class => 'Dog::Dalmation',    # required
         parcel       => 'Dog',               # default: special
@@ -121,7 +121,7 @@ An abstraction representing a file which contains Boilerplater code.
 =over
 
 =item * B<blocks> - An arrayref.  Each element must be either a
-Boilerplater::Class, a Boilerplater::Parcel, or a Boilerplater::CBlock.
+Clownfish::Class, a Clownfish::Parcel, or a Clownfish::CBlock.
 
 =item * B<source_class> - The class name associated with the source file,
 regardless of how what classes are defined in the source file. Example: If
@@ -129,7 +129,7 @@ source_class is "Foo::Bar", that implies that the source file could be found
 at 'Foo/Bar.bp' within the source directory and that the output C header file
 should be 'Foo/Bar.h' within the target include directory.
 
-=item * B<parcel> - A Boilerplater::Parcel or parcel name.
+=item * B<parcel> - A Clownfish::Parcel or parcel name.
 
 =back
 
@@ -143,7 +143,7 @@ Return all blocks as a list.
 
     my @classes = $file->classes;
 
-Return all Boilerplater::Class blocks from the file as a list.
+Return all Clownfish::Class blocks from the file as a list.
 
 =head2 get_modified set_modified
 

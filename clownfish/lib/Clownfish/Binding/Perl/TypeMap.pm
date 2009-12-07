@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Perl::TypeMap;
+package Clownfish::Binding::Perl::TypeMap;
 use base qw( Exporter );
 use Scalar::Util qw( blessed );
 use Carp;
@@ -64,7 +64,7 @@ my %primitives_to_perl = (
     chy_bool_t => sub {"$_[0] = newSViv( $_[1] );"},
 );
 
-# Extract a Boilerplater object from a Perl SV.
+# Extract a Clownfish object from a Perl SV.
 sub _sv_to_bp_obj {
     my ( $type, $bp_var, $xs_var, $stack_var ) = @_;
     my $struct_sym = $type->get_specifier;
@@ -97,8 +97,8 @@ sub _void_star_to_lucy {
 
 sub from_perl {
     my ( $type, $bp_var, $xs_var, $stack_var ) = @_;
-    confess("Not a Boilerplater::Type")
-        unless blessed($type) && $type->isa('Boilerplater::Type');
+    confess("Not a Clownfish::Type")
+        unless blessed($type) && $type->isa('Clownfish::Type');
 
     if ( $type->is_object ) {
         return _sv_to_bp_obj( $type, $bp_var, $xs_var, $stack_var );
@@ -119,8 +119,8 @@ sub from_perl {
 
 sub to_perl {
     my ( $type, $xs_var, $bp_var ) = @_;
-    confess("Not a Boilerplater::Type")
-        unless ref($type) && $type->isa('Boilerplater::Type');
+    confess("Not a Clownfish::Type")
+        unless ref($type) && $type->isa('Clownfish::Type');
     my $type_str = $type->to_c;
 
     if ( $type->is_object ) {
@@ -273,12 +273,12 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Perl::TypeMap - Convert between BP and Perl via XS.
+Clownfish::Binding::Perl::TypeMap - Convert between BP and Perl via XS.
 
 =head1 DESCRIPTION
 
 TypeMap serves up C code fragments for translating between Perl data
-structures and Boilerplater data structures.  The functions to_perl() and
+structures and Clownfish data structures.  The functions to_perl() and
 from_perl() achieve this for individual types; write_xs_typemap() exports all
 types using the XS "typemap" format documented in C<perlxs>.
 
@@ -295,7 +295,7 @@ make any declarations itself.
 
 =over
 
-=item * B<type> - A Boilerplater::Type, which will be used to select the
+=item * B<type> - A Clownfish::Type, which will be used to select the
 mapping code.
 
 =item * B<bp_var> - The name of the variable being assigned to.
@@ -304,10 +304,10 @@ mapping code.
 a value.
 
 =item * B<stack_var> - Only required needed when C<type> is
-Boilerplater::Object indicating that C<bp_var> is an either an Obj or a
-CharBuf.  When passing strings or other simple types to Boilerplater functions
+Clownfish::Object indicating that C<bp_var> is an either an Obj or a
+CharBuf.  When passing strings or other simple types to Clownfish functions
 from Perl, we allow the user to supply simple scalars rather than forcing them
-to create Boilerplater objects.  We do this by creating a ZombieCharBuf on the
+to create Clownfish objects.  We do this by creating a ZombieCharBuf on the
 stack and assigning the string from the Perl scalar to it.  C<stack_var> is
 the name of that ZombieCharBuf wrapper.  
 
@@ -324,7 +324,7 @@ any declarations itself.
 
 =over
 
-=item * B<type> - A Boilerplater::Type, which will be used to select the
+=item * B<type> - A Clownfish::Type, which will be used to select the
 mapping code.
 
 =item * B<xs_var> - The C name of the Perl scalar being assigned to.
@@ -338,13 +338,13 @@ value.
 
 =head2 write_xs_typemap 
 
-    Boilerplater::Binding::Perl::Typemap->write_xs_typemap(
+    Clownfish::Binding::Perl::Typemap->write_xs_typemap(
         hierarchy => $hierarchy,
     );
 
 =over
 
-=item * B<hierarchy> - A L<Boilerplater::Hierarchy>.
+=item * B<hierarchy> - A L<Clownfish::Hierarchy>.
 
 =back 
 
@@ -352,7 +352,7 @@ Auto-generate a "typemap" file that adheres to the conventions documented in
 L<perlxs>.  
 
 We generate this file on the fly rather than maintain a static copy because we
-want an entry for each Boilerplater type so that we can differentiate between
+want an entry for each Clownfish type so that we can differentiate between
 them when checking arguments.  Keeping the entries up-to-date manually as
 classes come and go would be a pain.
 

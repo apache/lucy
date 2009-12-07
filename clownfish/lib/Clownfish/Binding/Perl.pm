@@ -1,22 +1,22 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Perl;
+package Clownfish::Binding::Perl;
 
-use Boilerplater::Hierarchy;
+use Clownfish::Hierarchy;
 use Carp;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
 
-use Boilerplater::Parcel;
-use Boilerplater::Class;
-use Boilerplater::Function;
-use Boilerplater::Method;
-use Boilerplater::Variable;
-use Boilerplater::Util qw( verify_args a_isa_b write_if_changed );
-use Boilerplater::Binding::Perl::Class;
-use Boilerplater::Binding::Perl::Method;
-use Boilerplater::Binding::Perl::Constructor;
+use Clownfish::Parcel;
+use Clownfish::Class;
+use Clownfish::Function;
+use Clownfish::Method;
+use Clownfish::Variable;
+use Clownfish::Util qw( verify_args a_isa_b write_if_changed );
+use Clownfish::Binding::Perl::Class;
+use Clownfish::Binding::Perl::Method;
+use Clownfish::Binding::Perl::Constructor;
 
 our %new_PARAMS = (
     parcel     => undef,
@@ -31,9 +31,9 @@ sub new {
     my $either = shift;
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = bless { %new_PARAMS, @_, }, ref($either) || $either;
-    if ( !a_isa_b( $self->{parcel}, 'Boilerplater::Parcel' ) ) {
+    if ( !a_isa_b( $self->{parcel}, 'Clownfish::Parcel' ) ) {
         $self->{parcel}
-            = Boilerplater::Parcel->singleton( name => $self->{parcel} );
+            = Clownfish::Parcel->singleton( name => $self->{parcel} );
     }
     my $parcel = $self->{parcel};
     for ( keys %new_PARAMS ) {
@@ -65,7 +65,7 @@ sub new {
 sub write_bindings {
     my $self           = shift;
     my @ordered        = $self->{hierarchy}->ordered_classes;
-    my $registry       = Boilerplater::Binding::Perl::Class->registry;
+    my $registry       = Clownfish::Binding::Perl::Class->registry;
     my $hand_rolled_xs = "";
     my $generated_xs   = "";
     my $xs             = "";
@@ -216,7 +216,7 @@ sub prepare_pod {
     my %has_pod;
     my %modified;
 
-    my $registry = Boilerplater::Binding::Perl::Class->registry;
+    my $registry = Clownfish::Binding::Perl::Class->registry;
     $has_pod{ $_->get_class_name } = 1
         for grep { $_->get_make_pod } values %$registry;
 
@@ -336,7 +336,7 @@ END_STUFF
 
 sub write_xs_typemap {
     my $self = shift;
-    Boilerplater::Binding::Perl::TypeMap->write_xs_typemap(
+    Clownfish::Binding::Perl::TypeMap->write_xs_typemap(
         hierarchy => $self->{hierarchy}, );
 }
 
@@ -348,16 +348,16 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Perl - Perl bindings for a Boilerplater::Hierarchy.
+Clownfish::Binding::Perl - Perl bindings for a Clownfish::Hierarchy.
 
 =head1 DESCRIPTION
 
-Boilerplater::Binding::Perl presents an interface for auto-generating XS and
-Perl code to bind C code for a Boilerplater class hierarchy to Perl.
+Clownfish::Binding::Perl presents an interface for auto-generating XS and
+Perl code to bind C code for a Clownfish class hierarchy to Perl.
 
 In theory this module could be much more flexible and its API could be more
 elegant.  There are many ways which you could walk the parsed parcels,
-classes, methods, etc. in a Boilerplater::Hierarchy and generate binding code.
+classes, methods, etc. in a Clownfish::Hierarchy and generate binding code.
 However, our needs are very limited, so we are content with a "one size fits
 one" solution.
 
@@ -381,7 +381,7 @@ If it is "Lucy", the following files will be generated.
 
 =head2 new
 
-    my $perl_binding = Boilerplater::Binding::Perl->new(
+    my $perl_binding = Clownfish::Binding::Perl->new(
         boot_class => 'Lucy',                          # required
         parcel     => 'Lucy',                          # required
         hierarchy  => $hierarchy,                      # required
@@ -395,10 +395,10 @@ If it is "Lucy", the following files will be generated.
 =item * B<boot_class> - The name of the main class, which will own the shared
 object.
 
-=item * B<parcel> - The L<Boilerplater::Parcel> to which the C<boot_class>
+=item * B<parcel> - The L<Clownfish::Parcel> to which the C<boot_class>
 belongs.
 
-=item * B<hierarchy> - A Boilerplater::Hierarchy.
+=item * B<hierarchy> - A Clownfish::Hierarchy.
 
 =item * B<lib_dir> - location of the Perl lib directory to which files will be
 written.
@@ -440,7 +440,7 @@ after adding the filepaths to cleanup records and so on.
     $perl_binding->write_boot;
 
 Write out "boot" files to the Hierarchy's C<dest_dir> which contain code for
-bootstrapping Boilerplater classes.
+bootstrapping Clownfish classes.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -16,7 +16,7 @@ find(
     'lib'
 );
 for (@modules) {
-    s/^.*?Boilerplater/Boilerplater/;
+    s/^.*?Clownfish/Clownfish/;
     s/\.pm$//;
     s/\W+/::/g;
     use_ok($_);

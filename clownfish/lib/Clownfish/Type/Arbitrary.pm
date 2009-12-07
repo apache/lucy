@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::Arbitrary;
-use base qw( Boilerplater::Type );
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type::Arbitrary;
+use base qw( Clownfish::Type );
+use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -52,13 +52,13 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Type::Arbitrary - An arbitrary type.
+Clownfish::Type::Arbitrary - An arbitrary type.
 
 =head1 DESCRIPTION
 
 The "arbitrary" type class is a hack that spares us from having to support C
 types with complex declaration syntaxes -- such as unions, structs, enums, or
-function pointers -- from within Boilerplater itself.
+function pointers -- from within Clownfish itself.
 
 The only constraint is that the C<specifier> must end in "_t".  This allows us
 to create complex types in a C header file...
@@ -74,7 +74,7 @@ and have it parse as an "arbitrary" type.
 
 =head2 new
 
-    my $type = Boilerplater::Type->new(
+    my $type = Clownfish::Type->new(
         specifier => 'floatint_t',    # required
         parcel    => 'Boil',          # default: undef
     );
@@ -83,7 +83,7 @@ and have it parse as an "arbitrary" type.
 
 =item * B<specifier> - The name of the type, which must end in "_t".
 
-=item * B<parcel> - A L<Boilerplater::Parcel> or a parcel name.
+=item * B<parcel> - A L<Clownfish::Parcel> or a parcel name.
 
 =back
 

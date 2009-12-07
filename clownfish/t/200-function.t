@@ -3,11 +3,11 @@ use warnings;
 
 use Test::More tests => 6;
 
-BEGIN { use_ok('Boilerplater::Function') }
-use Boilerplater::Parser;
-use Boilerplater::Parcel;
+BEGIN { use_ok('Clownfish::Function') }
+use Clownfish::Parser;
+use Clownfish::Parcel;
 
-my $parser = Boilerplater::Parser->new;
+my $parser = Clownfish::Parser->new;
 $parser->parcel_definition('parcel Boil;')
     or die "failed to process parcel_definition";
 
@@ -20,13 +20,13 @@ my %args = (
     micro_sym   => 'return_an_obj',
 );
 
-my $func = Boilerplater::Function->new(%args);
-isa_ok( $func, "Boilerplater::Function" );
+my $func = Clownfish::Function->new(%args);
+isa_ok( $func, "Clownfish::Function" );
 
-eval { my $death = Boilerplater::Function->new( %args, extra_arg => undef ) };
+eval { my $death = Clownfish::Function->new( %args, extra_arg => undef ) };
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
-eval { Boilerplater::Function->new( %args, micro_sym => 'Uh_Oh' ); };
+eval { Clownfish::Function->new( %args, micro_sym => 'Uh_Oh' ); };
 like( $@, qr/Uh_Oh/, "invalid micro_sym kills constructor" );
 
 my %sub_args = ( class => 'Boil::Obj', cnick => 'Obj' );
@@ -34,7 +34,7 @@ my %sub_args = ( class => 'Boil::Obj', cnick => 'Obj' );
 isa_ok(
     $parser->subroutine_declaration_statement( $_, 0, %sub_args, inert => 1 )
         ->{declared},
-    "Boilerplater::Function",
+    "Clownfish::Function",
     "function declaration: $_"
     )
     for (

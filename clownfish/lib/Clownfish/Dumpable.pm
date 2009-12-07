@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-package Boilerplater::Dumpable;
+package Clownfish::Dumpable;
 use Carp;
-use Boilerplater::Class;
-use Boilerplater::Type;
-use Boilerplater::Method;
-use Boilerplater::Variable;
+use Clownfish::Class;
+use Clownfish::Type;
+use Clownfish::Method;
+use Clownfish::Variable;
 
 sub new {
     my $either = shift;
@@ -32,21 +32,21 @@ sub add_dumpables {
     }
 }
 
-# Create a Boilerplater::Method object for either Dump() or Load().
+# Create a Clownfish::Method object for either Dump() or Load().
 sub _make_method_obj {
     my ( $self, $class, $dump_or_load ) = @_;
-    my $return_type = Boilerplater::Type::Object->new(
+    my $return_type = Clownfish::Type::Object->new(
         incremented => 1,
         specifier   => 'Obj',
         indirection => 1,
         parcel      => $class->get_parcel,
     );
-    my $self_type = Boilerplater::Type::Object->new(
+    my $self_type = Clownfish::Type::Object->new(
         specifier   => $class->get_struct_sym,
         indirection => 1,
         parcel      => $class->get_parcel,
     );
-    my $self_var = Boilerplater::Variable->new(
+    my $self_var = Clownfish::Variable->new(
         type      => $self_type,
         parcel    => $class->get_parcel,
         micro_sym => 'self',
@@ -55,24 +55,24 @@ sub _make_method_obj {
     my $param_list;
     if ( $dump_or_load eq 'Dump' ) {
         $param_list
-            = Boilerplater::ParamList->new( variables => [$self_var], );
+            = Clownfish::ParamList->new( variables => [$self_var], );
     }
     else {
-        my $dump_type = Boilerplater::Type::Object->new(
+        my $dump_type = Clownfish::Type::Object->new(
             specifier   => 'Obj',
             indirection => 1,
             parcel      => $class->get_parcel,
         );
-        my $dump_var = Boilerplater::Variable->new(
+        my $dump_var = Clownfish::Variable->new(
             type      => $dump_type,
             parcel    => $class->get_parcel,
             micro_sym => 'dump',
         );
-        $param_list = Boilerplater::ParamList->new(
+        $param_list = Clownfish::ParamList->new(
             variables => [ $self_var, $dump_var ], );
     }
 
-    return Boilerplater::Method->new(
+    return Clownfish::Method->new(
         parcel      => $class->get_parcel,
         return_type => $return_type,
         class_name  => $class->get_class_name,
@@ -228,11 +228,11 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Dumpable - Auto-generate code for "dumpable" classes.
+Clownfish::Dumpable - Auto-generate code for "dumpable" classes.
 
 =head1 SYNOPSIS
 
-    my $dumpable = Boilerplater::Dumpable->new;
+    my $dumpable = Clownfish::Dumpable->new;
     for my $class ( grep { $_->has_attribute('dumpable') } @classes ) {
         $dumpable->add_dumpables($class);
     }
@@ -240,7 +240,7 @@ Boilerplater::Dumpable - Auto-generate code for "dumpable" classes.
 =head1 DESCRIPTION
 
 If a class declares that it has the attribute "dumpable", but does not declare
-either Dump or Load(), Boilerplater::Dumpable will attempt to auto-generate
+either Dump or Load(), Clownfish::Dumpable will attempt to auto-generate
 those methods if methods inherited from the parent class do not suffice.
 
     class Foo::Bar extends Foo : dumpable {
@@ -257,7 +257,7 @@ those methods if methods inherited from the parent class do not suffice.
 
 =head2 new
 
-    my $dumpable = Boilerplater::Dumpable->new;
+    my $dumpable = Clownfish::Dumpable->new;
 
 Constructor.  Takes no arguments.
 

@@ -3,10 +3,10 @@ use warnings;
 
 use Test::More tests => 1;
 
-use Boilerplater::Method;
-use Boilerplater::Parser;
+use Clownfish::Method;
+use Clownfish::Parser;
 
-my $parser = Boilerplater::Parser->new;
+my $parser = Clownfish::Parser->new;
 $parser->parcel_definition('parcel Boil;')
     or die "failed to process parcel_definition";
 
@@ -19,8 +19,8 @@ my %args = (
     parcel      => 'Boil',
 );
 
-my $orig      = Boilerplater::Method->new(%args);
-my $overrider = Boilerplater::Method->new(
+my $orig      = Clownfish::Method->new(%args);
+my $overrider = Clownfish::Method->new(
     %args,
     param_list  => $parser->param_list('(FooJr *self)'),
     class_name  => 'Boil::Foo::FooJr',

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::Float;
-use base qw( Boilerplater::Type::Primitive );
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type::Float;
+use base qw( Clownfish::Type::Primitive );
+use Clownfish::Util qw( verify_args );
 use Carp;
 
 our %new_PARAMS = (
@@ -38,12 +38,12 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Type::Float - A primitive Type representing a floating point
+Clownfish::Type::Float - A primitive Type representing a floating point
 number.
 
 =head1 DESCRIPTION
 
-Boilerplater::Type::Float represents floating point types of various widths.
+Clownfish::Type::Float represents floating point types of various widths.
 Currently only two are supported:
 
     float
@@ -53,7 +53,7 @@ Currently only two are supported:
 
 =head2 new
 
-    my $type = Boilerplater::Type::Float->new(
+    my $type = Clownfish::Type::Float->new(
         const     => 1,           # default: undef
         specifier => 'double',    # required
     );

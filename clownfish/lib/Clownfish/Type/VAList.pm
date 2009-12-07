@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::VAList;
-use base qw( Boilerplater::Type );
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type::VAList;
+use base qw( Clownfish::Type );
+use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -34,17 +34,17 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Type::VAList - A Type to support C's va_list.
+Clownfish::Type::VAList - A Type to support C's va_list.
 
 =head1 DESCRIPTION
 
-Boilerplater::Type::VAList represents the C va_list type, from stdarg.h.
+Clownfish::Type::VAList represents the C va_list type, from stdarg.h.
 
 =head1 METHODS
 
 =head2 new
 
-    my $type = Boilerplater::Type::VAList->new(
+    my $type = Clownfish::Type::VAList->new(
         specifier => 'va_list',    # default: va_list
     );
 

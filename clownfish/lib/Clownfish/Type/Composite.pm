@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::Composite;
-use base qw( Boilerplater::Type );
-use Boilerplater::Util qw( verify_args a_isa_b );
+package Clownfish::Type::Composite;
+use base qw( Clownfish::Type );
+use Clownfish::Util qw( verify_args a_isa_b );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -18,7 +18,7 @@ sub new {
     my $array = delete $args{array};
     my $child = delete $args{child};
     confess("Missing required param 'child'")
-        unless a_isa_b( $child, "Boilerplater::Type" );
+        unless a_isa_b( $child, "Clownfish::Type" );
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $self = $either->SUPER::new(%args);
     $self->{child} = $child;
@@ -59,13 +59,13 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Type::Composite - A composite type, e.g. Obj**.
+Clownfish::Type::Composite - A composite type, e.g. Obj**.
 
 =head1 METHODS
 
 =head2 new
 
-    my $type = Boilerplater::Type::Composite->new(
+    my $type = Clownfish::Type::Composite->new(
         specifier   => 'char',    # required
         indirection => undef,     # default 0
         array       => '[]',      # default undef,

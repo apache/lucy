@@ -3,10 +3,10 @@ use warnings;
 
 use Test::More tests => 30;
 
-BEGIN { use_ok('Boilerplater::Method') }
-use Boilerplater::Parser;
+BEGIN { use_ok('Clownfish::Method') }
+use Clownfish::Parser;
 
-my $parser = Boilerplater::Parser->new;
+my $parser = Clownfish::Parser->new;
 $parser->parcel_definition('parcel Boil;')
     or die "failed to process parcel_definition";
 
@@ -19,28 +19,28 @@ my %args = (
     macro_sym   => 'Return_An_Obj',
 );
 
-my $method = Boilerplater::Method->new(%args);
-isa_ok( $method, "Boilerplater::Method" );
+my $method = Clownfish::Method->new(%args);
+isa_ok( $method, "Clownfish::Method" );
 
 ok( $method->parcel, "parcel exposure by default" );
 
-eval { my $death = Boilerplater::Method->new( %args, extra_arg => undef ) };
+eval { my $death = Clownfish::Method->new( %args, extra_arg => undef ) };
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
-eval { Boilerplater::Method->new( %args, macro_sym => 'return_an_obj' ); };
+eval { Clownfish::Method->new( %args, macro_sym => 'return_an_obj' ); };
 like( $@, qr/macro_sym/, "Invalid macro_sym kills constructor" );
 
-my $dupe = Boilerplater::Method->new(%args);
+my $dupe = Clownfish::Method->new(%args);
 ok( $method->compatible($dupe), "compatible()" );
 
 my $macro_sym_differs
-    = Boilerplater::Method->new( %args, macro_sym => 'Eat' );
+    = Clownfish::Method->new( %args, macro_sym => 'Eat' );
 ok( !$method->compatible($macro_sym_differs),
     "different macro_sym spoils compatible()"
 );
 ok( !$macro_sym_differs->compatible($method), "... reversed" );
 
-my $extra_param = Boilerplater::Method->new( %args,
+my $extra_param = Clownfish::Method->new( %args,
     param_list => $parser->param_list('(Foo *self, i32_t count = 0, int b)'),
 );
 ok( !$method->compatible($macro_sym_differs),
@@ -48,35 +48,35 @@ ok( !$method->compatible($macro_sym_differs),
 );
 ok( !$extra_param->compatible($method), "... reversed" );
 
-my $default_differs = Boilerplater::Method->new( %args,
+my $default_differs = Clownfish::Method->new( %args,
     param_list => $parser->param_list('(Foo *self, i32_t count = 1)'), );
 ok( !$method->compatible($default_differs),
     "different initial_value spoils compatible()"
 );
 ok( !$default_differs->compatible($method), "... reversed" );
 
-my $missing_default = Boilerplater::Method->new( %args,
+my $missing_default = Clownfish::Method->new( %args,
     param_list => $parser->param_list('(Foo *self, i32_t count)'), );
 ok( !$method->compatible($missing_default),
     "missing initial_value spoils compatible()"
 );
 ok( !$missing_default->compatible($method), "... reversed" );
 
-my $param_name_differs = Boilerplater::Method->new( %args,
+my $param_name_differs = Clownfish::Method->new( %args,
     param_list => $parser->param_list('(Foo *self, i32_t countess)'), );
 ok( !$method->compatible($param_name_differs),
     "different param name spoils compatible()"
 );
 ok( !$param_name_differs->compatible($method), "... reversed" );
 
-my $param_type_differs = Boilerplater::Method->new( %args,
+my $param_type_differs = Clownfish::Method->new( %args,
     param_list => $parser->param_list('(Foo *self, u32_t count)'), );
 ok( !$method->compatible($param_type_differs),
     "different param type spoils compatible()"
 );
 ok( !$param_type_differs->compatible($method), "... reversed" );
 
-my $self_type_differs = Boilerplater::Method->new(
+my $self_type_differs = Clownfish::Method->new(
     %args,
     class_name  => 'Boil::Bar',
     class_cnick => 'Bar',
@@ -86,7 +86,7 @@ ok( $method->compatible($self_type_differs),
     "different self type still compatible(), since can't test inheritance" );
 ok( $self_type_differs->compatible($method), "... reversed" );
 
-my $not_final = Boilerplater::Method->new(%args);
+my $not_final = Clownfish::Method->new(%args);
 my $final     = $not_final->finalize;
 
 eval { $method->override($final); };
@@ -105,7 +105,7 @@ my %sub_args = ( class => 'Boil::Obj', cnick => 'Obj' );
 
 isa_ok(
     $parser->subroutine_declaration_statement( $_, 0, %sub_args )->{declared},
-    "Boilerplater::Method",
+    "Clownfish::Method",
     "method declaration: $_"
     )
     for (

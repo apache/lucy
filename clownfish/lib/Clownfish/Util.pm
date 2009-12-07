@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Boilerplater::Util;
+package Clownfish::Util;
 use base qw( Exporter );
 use Scalar::Util qw( blessed );
 use Carp;
@@ -107,12 +107,12 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Util - Miscellaneous helper functions.
+Clownfish::Util - Miscellaneous helper functions.
 
 =head1 DESCRIPTION
 
-Boilerplater::Util provides a few convenience functions used internally by
-other Boilerplater modules.
+Clownfish::Util provides a few convenience functions used internally by
+other Clownfish modules.
 
 =head1 FUNCTIONS
 

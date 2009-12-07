@@ -2,10 +2,10 @@ use strict;
 use warnings;
 
 use Test::More tests => 60;
-use Boilerplater::Type::Integer;
-use Boilerplater::Parser;
+use Clownfish::Type::Integer;
+use Clownfish::Parser;
 
-my $integer_type = Boilerplater::Type::Integer->new(
+my $integer_type = Clownfish::Type::Integer->new(
     specifier => 'i32_t',
     const     => 1,
 );
@@ -15,7 +15,7 @@ like( $integer_type->to_c, qr/chy_i32_t/,
     "prepend 'chy_' for C representation" );
 like( $integer_type->to_c, qr/const/, "'const' in C representation" );
 
-my $parser = Boilerplater::Parser->new;
+my $parser = Clownfish::Parser->new;
 
 my @chy_specifiers = qw(
     bool_t
@@ -40,9 +40,9 @@ for my $chy_specifier (@chy_specifiers) {
     is( $parser->chy_integer_specifier($chy_specifier),
         $chy_specifier, "chy_integer_specifier: $chy_specifier" );
     isa_ok( $parser->chy_integer_type($chy_specifier),
-        "Boilerplater::Type::Integer" );
+        "Clownfish::Type::Integer" );
     isa_ok( $parser->chy_integer_type("const $chy_specifier"),
-        "Boilerplater::Type::Integer" );
+        "Clownfish::Type::Integer" );
     my $bogus = $chy_specifier . "oot_toot";
     ok( !$parser->chy_integer_specifier($bogus),
         "chy_integer_specifier guards against partial word matches" );
@@ -53,10 +53,10 @@ for my $c_specifier (@c_specifiers) {
         $c_specifier, "c_integer_specifier: $c_specifier" );
     isa_ok(
         $parser->c_integer_type($c_specifier),
-        "Boilerplater::Type::Integer"
+        "Clownfish::Type::Integer"
     );
     isa_ok( $parser->c_integer_type("const $c_specifier"),
-        "Boilerplater::Type::Integer" );
+        "Clownfish::Type::Integer" );
     my $bogus = $c_specifier . "y";
     ok( !$parser->c_integer_specifier($bogus),
         "c_integer_specifier guards against partial word matches" );

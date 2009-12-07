@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::Integer;
-use base qw( Boilerplater::Type::Primitive );
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type::Integer;
+use base qw( Clownfish::Type::Primitive );
+use Clownfish::Util qw( verify_args );
 use Carp;
 use Config;
 
@@ -58,11 +58,11 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Type::Integer - A primitive Type representing an integer.
+Clownfish::Type::Integer - A primitive Type representing an integer.
 
 =head1 DESCRIPTION
 
-Boilerplater::Type::Integer holds integer types of various widths and various
+Clownfish::Type::Integer holds integer types of various widths and various
 styles.  A few standard C integer types are supported:
 
     char
@@ -90,7 +90,7 @@ Instead, the following Charmonizer typedefs are supported:
 
 =head2 new
 
-    my $type = Boilerplater::Type::Integer->new(
+    my $type = Clownfish::Type::Integer->new(
         const     => 1,       # default: undef
         specifier => 'char',  # required
     );

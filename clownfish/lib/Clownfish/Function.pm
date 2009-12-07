@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-package Boilerplater::Function;
-use base qw( Boilerplater::Symbol );
+package Clownfish::Function;
+use base qw( Clownfish::Symbol );
 use Carp;
-use Boilerplater::Util qw( verify_args a_isa_b );
-use Boilerplater::Type;
-use Boilerplater::ParamList;
+use Clownfish::Util qw( verify_args a_isa_b );
+use Clownfish::Type;
+use Clownfish::ParamList;
 
 my %new_PARAMS = (
     return_type => undef,
@@ -32,9 +32,9 @@ sub new {
     confess("Invalid micro_sym: '$self->{micro_sym}'")
         unless $self->{micro_sym} =~ /^[a-z0-9_]+$/;
     confess 'param_list must be a ParamList object'
-        unless a_isa_b( $self->{param_list}, "Boilerplater::ParamList" );
+        unless a_isa_b( $self->{param_list}, "Clownfish::ParamList" );
     confess 'return_type must be a Type object'
-        unless a_isa_b( $self->{return_type}, "Boilerplater::Type" );
+        unless a_isa_b( $self->{return_type}, "Clownfish::Type" );
 
     return $self;
 }
@@ -57,13 +57,13 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Function - Metadata describing a function.
+Clownfish::Function - Metadata describing a function.
 
 =head1 METHODS
 
 =head2 new
 
-    my $type = Boilerplater::Function->new(
+    my $type = Clownfish::Function->new(
         class_name  => 'MyProject::FooFactory',    # required
         class_cnick => 'FooFact',                  # required
         return_type => $void_type                  # required
@@ -82,21 +82,21 @@ function resides.
 
 =item * B<class_cnick> - The C nickname for the class. 
 
-=item * B<return_type> - A L<Boilerplater::Type> representing the function's
+=item * B<return_type> - A L<Clownfish::Type> representing the function's
 return type.
 
-=item * B<param_list> - A L<Boilerplater::ParamList> representing the
+=item * B<param_list> - A L<Clownfish::ParamList> representing the
 function's argument list.
 
 =item * B<micro_sym> - The lower case name of the function, without any
 namespacing prefixes.
 
-=item * B<docucomment> - A L<Boilerplater::DocuComment> describing the
+=item * B<docucomment> - A L<Clownfish::DocuComment> describing the
 function.
 
-=item * B<parcel> - A L<Boilerplater::Parcel> or a parcel name.
+=item * B<parcel> - A L<Clownfish::Parcel> or a parcel name.
 
-=item * B<exposure> - The function's exposure (see L<Boilerplater::Symbol>).
+=item * B<exposure> - The function's exposure (see L<Clownfish::Symbol>).
 
 =item * B<inline> - Should be true if the function should be inlined by the
 compiler.

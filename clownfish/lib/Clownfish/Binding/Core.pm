@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Core;
-use Boilerplater::Util qw( a_isa_b verify_args );
-use Boilerplater::Binding::Core::File;
+package Clownfish::Binding::Core;
+use Clownfish::Util qw( a_isa_b verify_args );
+use Clownfish::Binding::Core::File;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
 
@@ -24,7 +24,7 @@ sub new {
         confess("Missing required param '$_'") unless defined $self->{$_};
     }
     confess("Not a Hierarchy")
-        unless a_isa_b( $self->{hierarchy}, "Boilerplater::Hierarchy" );
+        unless a_isa_b( $self->{hierarchy}, "Clownfish::Hierarchy" );
 
     return $self;
 }
@@ -46,13 +46,13 @@ sub write_all_modified {
         my $source_class = $file->get_source_class;
         next if $written{$source_class};
         $written{$source_class} = 1;
-        Boilerplater::Binding::Core::File->write_h(
+        Clownfish::Binding::Core::File->write_h(
             file   => $file,
             dest   => $dest,
             header => $header,
             footer => $footer,
         );
-        Boilerplater::Binding::Core::File->write_c(
+        Clownfish::Binding::Core::File->write_c(
             file   => $file,
             dest   => $dest,
             header => $header,
@@ -170,16 +170,16 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Core - Generate core C code for a Boilerplater::Hierarchy.
+Clownfish::Binding::Core - Generate core C code for a Clownfish::Hierarchy.
 
 =head1 SYNOPSIS
 
-    my $hierarchy = Boilerplater::Hierarchy->new(
+    my $hierarchy = Clownfish::Hierarchy->new(
         source => '/path/to/bp/files',
         dest   => 'autogen',
     );
     $hierarchy->build;
-    my $core_binding = Boilerplater::Binding::Core->new(
+    my $core_binding = Clownfish::Binding::Core->new(
         hierarchy => $hierarchy,
         dest      => 'autogen',
         header    => "/* Auto-generated file. */\n",
@@ -189,15 +189,15 @@ Boilerplater::Binding::Core - Generate core C code for a Boilerplater::Hierarchy
 
 =head1 DESCRIPTION
 
-A Boilerplater::Hierarchy describes an abstract specifiction for a class
-hierarchy; Boilerplater::Binding::Core is responsible for auto-generating C
+A Clownfish::Hierarchy describes an abstract specifiction for a class
+hierarchy; Clownfish::Binding::Core is responsible for auto-generating C
 code which implements that specification.
 
 =head1 METHODS
 
 =head2 new
 
-    my $binding = Boilerplater::Binding::Core->new(
+    my $binding = Clownfish::Binding::Core->new(
         hierarchy => $hierarchy,            # required
         dest      => '/path/to/autogen',    # required
         header    => $header,               # required
@@ -206,7 +206,7 @@ code which implements that specification.
 
 =over
 
-=item * B<hierarchy> - A L<Boilerplater::Hierarchy>.
+=item * B<hierarchy> - A L<Clownfish::Hierarchy>.
 
 =item * B<dest> - The directory where C output files will be written.
 

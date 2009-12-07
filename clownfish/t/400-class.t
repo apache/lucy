@@ -2,23 +2,23 @@ use strict;
 use warnings;
 
 use Test::More tests => 51;
-use Boilerplater::Class;
-use Boilerplater::Parser;
+use Clownfish::Class;
+use Clownfish::Parser;
 
-my $parser = Boilerplater::Parser->new;
+my $parser = Clownfish::Parser->new;
 
-my $thing = Boilerplater::Variable->new(
+my $thing = Clownfish::Variable->new(
     parcel     => 'Boil',
     class_name => 'Foo',
     type       => $parser->type('Thing*'),
     micro_sym  => 'thing',
 );
-my $widget = Boilerplater::Variable->new(
+my $widget = Clownfish::Variable->new(
     class_name => 'Widget',
     type       => $parser->type('Widget*'),
     micro_sym  => 'widget',
 );
-my $tread_water = Boilerplater::Function->new(
+my $tread_water = Clownfish::Function->new(
     parcel      => 'Boil',
     class_name  => 'Foo',
     return_type => $parser->type('void'),
@@ -33,17 +33,17 @@ my %foo_create_args = (
     functions   => [$tread_water],
 );
 
-my $foo = Boilerplater::Class->create(%foo_create_args);
-eval { Boilerplater::Class->create(%foo_create_args) };
+my $foo = Clownfish::Class->create(%foo_create_args);
+eval { Clownfish::Class->create(%foo_create_args) };
 like( $@, qr/conflict/i,
     "Can't call create for the same class more than once" );
-my $should_be_foo = Boilerplater::Class->fetch_singleton(
+my $should_be_foo = Clownfish::Class->fetch_singleton(
     parcel     => 'Boil',
     class_name => 'Foo',
 );
 is( $foo, $should_be_foo, "fetch_singleton" );
 
-my $foo_jr = Boilerplater::Class->create(
+my $foo_jr = Clownfish::Class->create(
     parcel            => 'Boil',
     class_name        => 'Foo::FooJr',
     parent_class_name => 'Foo',
@@ -54,7 +54,7 @@ ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
 is( $foo_jr->get_struct_sym,  'FooJr',      "struct_sym" );
 is( $foo_jr->full_struct_sym, 'boil_FooJr', "full_struct_sym" );
 
-my $final_foo = Boilerplater::Class->create(
+my $final_foo = Clownfish::Class->create(
     parcel            => 'Boil',
     class_name        => 'Foo::FooJr::FinalFoo',
     parent_class_name => 'Foo::FooJr',
@@ -86,7 +86,7 @@ my %inert_args = (
     inert      => 1,
 );
 eval {
-    Boilerplater::Class->create( %inert_args, methods => [$inert_do_stuff] );
+    Clownfish::Class->create( %inert_args, methods => [$inert_do_stuff] );
 };
 like(
     $@,
@@ -136,7 +136,7 @@ ok( $parser->class_extension($_), "class_extension: $_" )
 my $class_content
     = 'public class Foo::FooJr cnick FooJr extends Foo { private int num; }';
 my $class = $parser->class_declaration($class_content);
-isa_ok( $class, "Boilerplater::Class", "class_declaration FooJr" );
+isa_ok( $class, "Clownfish::Class", "class_declaration FooJr" );
 ok( ( scalar grep { $_->micro_sym eq 'num' } $class->member_vars ),
     "parsed private member var" );
 
@@ -170,7 +170,7 @@ $class_content = q|
 |;
 
 $class = $parser->class_declaration($class_content);
-isa_ok( $class, "Boilerplater::Class", "class_declaration Dog" );
+isa_ok( $class, "Clownfish::Class", "class_declaration Dog" );
 ok( ( scalar grep { $_->micro_sym eq 'num_dogs' } $class->inert_vars ),
     "parsed inert var" );
 ok( ( scalar grep { $_->micro_sym eq 'mom' } $class->member_vars ),
@@ -195,7 +195,7 @@ $class_content = qq|
         parcel inert void lie_still(); 
     }|;
 $class = $parser->class_declaration($class_content);
-isa_ok( $class, "Boilerplater::Class", "inert class_declaration" );
+isa_ok( $class, "Clownfish::Class", "inert class_declaration" );
 ok( $class->inert, "inert modifier parsed and passed to constructor" );
 
 $class_content = qq|

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-package Boilerplater::CBlock;
-use Boilerplater::Util qw( verify_args );
+package Clownfish::CBlock;
+use Clownfish::Util qw( verify_args );
 use Carp;
 
 our %new_PARAMS = ( contents => undef, );
@@ -27,7 +27,7 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::CBlock - A block of embedded C code.
+Clownfish::CBlock - A block of embedded C code.
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ CBlock exists to support embedding literal C code within .bp files:
 
 =head2 new
 
-    my $c_block = Boilerplater::CBlock->new(
+    my $c_block = Clownfish::CBlock->new(
         contents => $text,
     );
 

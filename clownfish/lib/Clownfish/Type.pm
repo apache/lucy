@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type;
-use Boilerplater::Parcel;
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type;
+use Clownfish::Parcel;
+use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -25,10 +25,10 @@ sub new {
     if ( defined $self->{parcel} ) {
         if ( !blessed( $self->{parcel} ) ) {
             $self->{parcel}
-                = Boilerplater::Parcel->singleton( name => $self->{parcel} );
+                = Clownfish::Parcel->singleton( name => $self->{parcel} );
         }
-        confess("Not a Boilerplater::Parcel")
-            unless $self->{parcel}->isa('Boilerplater::Parcel');
+        confess("Not a Clownfish::Parcel")
+            unless $self->{parcel}->isa('Clownfish::Parcel');
     }
     return $self;
 }
@@ -63,7 +63,7 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Type - A variable's type.
+Clownfish::Type - A variable's type.
 
 =head1 METHODS
 
@@ -97,7 +97,7 @@ B<const> - should be true if the type is const.
 
 =item *
 
-B<parcel> - A Boilerplater::Parcel or a parcel name.
+B<parcel> - A Clownfish::Parcel or a parcel name.
 
 =item *
 
@@ -109,8 +109,8 @@ B<c_string> - The C representation of the type.
 
     do_stuff() if $type->equals($other);
 
-Returns true if two Boilerplater::Type objects are equivalent.  The default
-implementation merely checks that C<$other> is a Boilerplater::Type object, so
+Returns true if two Clownfish::Type objects are equivalent.  The default
+implementation merely checks that C<$other> is a Clownfish::Type object, so
 it should be overridden in all subclasses.
 
 =head2 to_c
@@ -136,23 +136,23 @@ Shorthand for various $type->isa($package) calls.
 
 =over
 
-=item * is_object: Boilerplater::Type::Object
+=item * is_object: Clownfish::Type::Object
 
-=item * is_primitive: Boilerplater::Type::Primitive
+=item * is_primitive: Clownfish::Type::Primitive
 
-=item * is_integer: Boilerplater::Type::Integer
+=item * is_integer: Clownfish::Type::Integer
 
-=item * is_floating: Boilerplater::Type::Float
+=item * is_floating: Clownfish::Type::Float
 
-=item * is_void: Boilerplater::Type::Void
+=item * is_void: Clownfish::Type::Void
 
-=item * is_composite: Boilerplater::Type::Composite
+=item * is_composite: Clownfish::Type::Composite
 
 =back
 
 =head2 is_string_type
 
-Returns true if $type represents a Boilerplater type which holds unicode
+Returns true if $type represents a Clownfish type which holds unicode
 strings.
 
 =head1 COPYRIGHT AND LICENSE

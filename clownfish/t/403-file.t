@@ -3,10 +3,10 @@ use warnings;
 
 use Test::More tests => 17;
 
-use Boilerplater::File;
-use Boilerplater::Parser;
+use Clownfish::File;
+use Clownfish::Parser;
 
-my $parser = Boilerplater::Parser->new;
+my $parser = Clownfish::Parser->new;
 
 my $parcel_declaration = "parcel Stuff;";
 my $class_content      = qq|
@@ -46,9 +46,9 @@ is( $bar->get_type->get_specifier, 'stuff_Bar', 'parcel def is sticky' );
 
 my @blocks = $file->blocks;
 is( scalar @blocks, 3, "all three blocks" );
-isa_ok( $blocks[0], "Boilerplater::Parcel" );
-isa_ok( $blocks[1], "Boilerplater::Class" );
-isa_ok( $blocks[2], "Boilerplater::CBlock" );
+isa_ok( $blocks[0], "Clownfish::Parcel" );
+isa_ok( $blocks[1], "Clownfish::Class" );
+isa_ok( $blocks[2], "Clownfish::CBlock" );
 
 $file = $parser->file( $class_content, 0, source_class => 'Stuff::Thing' );
 ($class) = $file->classes;

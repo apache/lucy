@@ -1,34 +1,34 @@
 use strict;
 use warnings;
 
-package Boilerplater::Parser;
+package Clownfish::Parser;
 use base qw( Parse::RecDescent );
 
-use Boilerplater::Parcel;
-use Boilerplater::Type;
-use Boilerplater::Type::Primitive;
-use Boilerplater::Type::Integer;
-use Boilerplater::Type::Float;
-use Boilerplater::Type::Void;
-use Boilerplater::Type::VAList;
-use Boilerplater::Type::Arbitrary;
-use Boilerplater::Type::Object;
-use Boilerplater::Type::Composite;
-use Boilerplater::Variable;
-use Boilerplater::DocuComment;
-use Boilerplater::Function;
-use Boilerplater::Method;
-use Boilerplater::Class;
-use Boilerplater::CBlock;
-use Boilerplater::File;
+use Clownfish::Parcel;
+use Clownfish::Type;
+use Clownfish::Type::Primitive;
+use Clownfish::Type::Integer;
+use Clownfish::Type::Float;
+use Clownfish::Type::Void;
+use Clownfish::Type::VAList;
+use Clownfish::Type::Arbitrary;
+use Clownfish::Type::Object;
+use Clownfish::Type::Composite;
+use Clownfish::Variable;
+use Clownfish::DocuComment;
+use Clownfish::Function;
+use Clownfish::Method;
+use Clownfish::Class;
+use Clownfish::CBlock;
+use Clownfish::File;
 use Carp;
 
 our $grammar = <<'END_GRAMMAR';
 
 file:
-    { Boilerplater::Parser->set_parcel(undef); 0; }
+    { Clownfish::Parser->set_parcel(undef); 0; }
     major_block[%arg](s) eofile
-    { Boilerplater::Parser->new_file( \%item, \%arg ) }
+    { Clownfish::Parser->new_file( \%item, \%arg ) }
 
 major_block:
       class_declaration[%arg]
@@ -38,8 +38,8 @@ major_block:
 parcel_definition:
     'parcel' class_name cnick(?) ';'
     { 
-        my $parcel = Boilerplater::Parser->new_parcel( \%item );
-        Boilerplater::Parser->set_parcel($parcel);
+        my $parcel = Clownfish::Parser->new_parcel( \%item );
+        Clownfish::Parser->set_parcel($parcel);
         $parcel;
     }
 
@@ -47,7 +47,7 @@ embed_c:
     '__C__'
     /.*?(?=__END_C__)/s  
     '__END_C__'
-    { Boilerplater::CBlock->new( contents => $item[2] ) }
+    { Clownfish::CBlock->new( contents => $item[2] ) }
 
 class_declaration:
     docucomment(?)
@@ -62,7 +62,7 @@ class_declaration:
             parent => $item{'class_extension(?)'}[0],
         ](s?)
     '}'
-    { Boilerplater::Parser->new_class( \%item, \%arg ) }
+    { Clownfish::Parser->new_class( \%item, \%arg ) }
 
 class_modifier:
       'inert'
@@ -98,7 +98,7 @@ var_declaration_statement:
         $return = {
             exposure  => $item[1][0] || 'parcel',
             modifiers => $item[2],
-            declared  => Boilerplater::Parser->new_var( \%item, \%arg ),
+            declared  => Clownfish::Parser->new_var( \%item, \%arg ),
         };
     }
 
@@ -114,7 +114,7 @@ subroutine_declaration_statement:
         $return = {
             exposure  => $item[2],
             modifiers => $item[3],
-            declared  => Boilerplater::Parser->new_sub( \%item, \%arg ),
+            declared  => Clownfish::Parser->new_sub( \%item, \%arg ),
         };
     }
 
@@ -124,7 +124,7 @@ param_list:
     (/,\s*.../)(?)
     ')'
     {
-        Boilerplater::Parser->new_param_list( $item[2], $item[3][0] ? 1 : 0 );
+        Clownfish::Parser->new_param_list( $item[2], $item[3][0] ? 1 : 0 );
     }
 
 param_list_elem:
@@ -133,7 +133,7 @@ param_list_elem:
 
 param_variable:
     type declarator
-    { Boilerplater::Parser->new_var(\%item); }
+    { Clownfish::Parser->new_var(\%item); }
 
 assignment: 
     '=' scalar_constant
@@ -141,7 +141,7 @@ assignment:
 
 type:
     simple_type type_postfix(s?)
-    { Boilerplater::Parser->simple_or_composite_type(\%item) }
+    { Clownfish::Parser->simple_or_composite_type(\%item) }
 
 simple_type:
       object_type
@@ -153,7 +153,7 @@ simple_type:
 
 object_type:
     type_qualifier(s?) object_type_specifier '*'
-    { Boilerplater::Parser->new_object_type(\%item); }
+    { Clownfish::Parser->new_object_type(\%item); }
 
 primitive_type:
       c_integer_type
@@ -163,27 +163,27 @@ primitive_type:
 
 c_integer_type:
     type_qualifier(s?) c_integer_specifier
-    { Boilerplater::Parser->new_integer_type(\%item) }
+    { Clownfish::Parser->new_integer_type(\%item) }
 
 chy_integer_type:
     type_qualifier(s?) chy_integer_specifier
-    { Boilerplater::Parser->new_integer_type(\%item) }
+    { Clownfish::Parser->new_integer_type(\%item) }
 
 float_type:
     type_qualifier(s?) c_float_specifier
-    { Boilerplater::Parser->new_float_type(\%item) }
+    { Clownfish::Parser->new_float_type(\%item) }
 
 void_type:
     type_qualifier(s?) void_type_specifier
-    { Boilerplater::Parser->new_void_type(\%item) }
+    { Clownfish::Parser->new_void_type(\%item) }
 
 va_list_type:
     va_list_type_specifier
-    { Boilerplater::Type::VAList->new }
+    { Clownfish::Type::VAList->new }
 
 arbitrary_type:
     arbitrary_type_specifier
-    { Boilerplater::Parser->new_arbitrary_type(\%item); }
+    { Clownfish::Parser->new_arbitrary_type(\%item); }
 
 type_qualifier:
       'const' 
@@ -261,7 +261,7 @@ identifier:
 
 docucomment:
     /\/\*\*.*?\*\//s
-    { Boilerplater::DocuComment->parse($item[1]) }
+    { Clownfish::DocuComment->parse($item[1]) }
 
 constant_expression:
       /\d+/
@@ -323,26 +323,26 @@ sub new_integer_type {
         || $item->{chy_integer_specifier};
     my %args = ( specifier => $specifier );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Boilerplater::Type::Integer->new(%args);
+    return Clownfish::Type::Integer->new(%args);
 }
 
 sub new_float_type {
     my ( undef, $item ) = @_;
     my %args = ( specifier => $item->{c_float_specifier} );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Boilerplater::Type::Float->new(%args);
+    return Clownfish::Type::Float->new(%args);
 }
 
 sub new_void_type {
     my ( undef, $item ) = @_;
     my %args = ( specifier => $item->{void_type_specifier} );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Boilerplater::Type::Void->new(%args);
+    return Clownfish::Type::Void->new(%args);
 }
 
 sub new_arbitrary_type {
     my ( undef, $item ) = @_;
-    return Boilerplater::Type::Arbitrary->new(
+    return Clownfish::Type::Arbitrary->new(
         specifier => $item->{arbitrary_type_specifier},
         parcel    => $parcel,
     );
@@ -355,7 +355,7 @@ sub new_object_type {
         parcel    => $parcel,
     );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Boilerplater::Type::Object->new(%args);
+    return Clownfish::Type::Object->new(%args);
 }
 
 sub simple_or_composite_type {
@@ -380,7 +380,7 @@ sub simple_or_composite_type {
                 $args{indirection}++;
             }
         }
-        return Boilerplater::Type::Composite->new(%args);
+        return Clownfish::Type::Composite->new(%args);
     }
 }
 
@@ -392,7 +392,7 @@ sub new_var {
         $args{class_name}  = $arg->{class} if $arg->{class};
         $args{class_cnick} = $arg->{cnick} if $arg->{cnick};
     }
-    return Boilerplater::Variable->new(
+    return Clownfish::Variable->new(
         parcel    => $parcel,
         type      => $item->{type},
         micro_sym => $item->{declarator},
@@ -404,7 +404,7 @@ sub new_param_list {
     my ( undef, $param_list_elems, $variadic ) = @_;
     my @vars = map { $_->[0] } @$param_list_elems;
     my @vals = map { $_->[1] } @$param_list_elems;
-    return Boilerplater::ParamList->new(
+    return Clownfish::ParamList->new(
         variables      => \@vars,
         initial_values => \@vals,
         variadic       => $variadic,
@@ -421,12 +421,12 @@ sub new_sub {
     my %extra_args = $exposure ? ( exposure => $exposure ) : ();
 
     if ($inert) {
-        $class = 'Boilerplater::Function';
+        $class = 'Clownfish::Function';
         $extra_args{micro_sym} = $item->{declarator};
         $extra_args{inline} = scalar grep { $_ eq 'inline' } @$modifiers;
     }
     else {
-        $class = 'Boilerplater::Method';
+        $class = 'Clownfish::Method';
         $extra_args{macro_sym} = $item->{declarator};
         $extra_args{abstract} = scalar grep { $_ eq 'abstract' } @$modifiers;
         $extra_args{final}    = scalar grep { $_ eq 'final' } @$modifiers;
@@ -460,7 +460,7 @@ sub new_class {
         my $subs      = $inert ? \@functions : \@methods;
         my $vars      = $inert ? \@inert_vars : \@member_vars;
 
-        if ( $declared->isa('Boilerplater::Variable') ) {
+        if ( $declared->isa('Clownfish::Variable') ) {
             push @$vars, $declared;
         }
         else {
@@ -468,7 +468,7 @@ sub new_class {
         }
     }
 
-    return Boilerplater::Class->create(
+    return Clownfish::Class->create(
         parcel            => $parcel,
         class_name        => $item->{class_name},
         cnick             => $item->{'cnick(?)'}[0],
@@ -488,7 +488,7 @@ sub new_class {
 sub new_file {
     my ( undef, $item, $arg ) = @_;
 
-    return Boilerplater::File->new(
+    return Clownfish::File->new(
         parcel       => $parcel,
         blocks       => $item->{'major_block(s)'},
         source_class => $arg->{source_class},
@@ -497,7 +497,7 @@ sub new_file {
 
 sub new_parcel {
     my ( undef, $item ) = @_;
-    Boilerplater::Parcel->singleton(
+    Clownfish::Parcel->singleton(
         name  => $item->{class_name},
         cnick => $item->{'cnick(?)'}[0],
     );
@@ -511,7 +511,7 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Parser - Parse Boilerplater header files.
+Clownfish::Parser - Parse Clownfish header files.
 
 =head1 SYNOPSIS
 
@@ -519,7 +519,7 @@ Boilerplater::Parser - Parse Boilerplater header files.
 
 =head1 DESCRIPTION
 
-Boilerplater::Parser is a combined lexer/parser which parses .bp code.  It is
+Clownfish::Parser is a combined lexer/parser which parses .bp code.  It is
 not at all strict, as it relies heavily on the C parser to pick up errors such
 as misspelled type names.
 

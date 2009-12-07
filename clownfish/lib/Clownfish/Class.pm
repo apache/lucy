@@ -1,17 +1,17 @@
 use strict;
 use warnings;
 
-package Boilerplater::Class;
-use base qw( Boilerplater::Symbol );
+package Clownfish::Class;
+use base qw( Clownfish::Symbol );
 use Carp;
 use Config;
-use Boilerplater::Function;
-use Boilerplater::Method;
-use Boilerplater::Util qw(
+use Clownfish::Function;
+use Clownfish::Method;
+use Clownfish::Util qw(
     verify_args
     a_isa_b
 );
-use Boilerplater::Dumpable;
+use Clownfish::Dumpable;
 use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
@@ -32,7 +32,7 @@ our %create_PARAMS = (
     exposure          => 'parcel',
 );
 
-my $dumpable = Boilerplater::Dumpable->new;
+my $dumpable = Clownfish::Dumpable->new;
 
 our %registry;
 
@@ -57,8 +57,8 @@ sub fetch_singleton {
     # Maybe prepend parcel prefix.
     my $parcel = $args{parcel};
     if ( defined $parcel ) {
-        if ( !a_isa_b( $parcel, "Boilerplater::Parcel" ) ) {
-            $parcel = Boilerplater::Parcel->singleton( name => $parcel );
+        if ( !a_isa_b( $parcel, "Clownfish::Parcel" ) ) {
+            $parcel = Clownfish::Parcel->singleton( name => $parcel );
         }
         $key = $parcel->get_prefix . $key;
     }
@@ -66,7 +66,7 @@ sub fetch_singleton {
     return $registry{$key};
 }
 
-sub new { confess("The constructor for Boilerplater::Class is create()") }
+sub new { confess("The constructor for Clownfish::Class is create()") }
 
 sub create {
     my ( $class_class, %args ) = @_;
@@ -100,16 +100,16 @@ sub create {
 
     # Verify that members of supplied arrays meet "is a" requirements.
     for ( @{ $self->{functions} } ) {
-        confess("Not a Boilerplater::Function")
-            unless a_isa_b( $_, 'Boilerplater::Function' );
+        confess("Not a Clownfish::Function")
+            unless a_isa_b( $_, 'Clownfish::Function' );
     }
     for ( @{ $self->{methods} } ) {
-        confess("Not a Boilerplater::Method")
-            unless a_isa_b( $_, 'Boilerplater::Method' );
+        confess("Not a Clownfish::Method")
+            unless a_isa_b( $_, 'Clownfish::Method' );
     }
     for ( @{ $self->{member_vars} }, @{ $self->{inert_vars} } ) {
-        confess("Not a Boilerplater::Variable")
-            unless a_isa_b( $_, 'Boilerplater::Variable' );
+        confess("Not a Clownfish::Variable")
+            unless a_isa_b( $_, 'Clownfish::Variable' );
     }
 
     # Assume that Foo::Bar should be found in Foo/Bar.h.
@@ -224,7 +224,7 @@ sub add_child {
 
 sub add_method {
     my ( $self, $method ) = @_;
-    confess("Not a Method") unless a_isa_b( $method, "Boilerplater::Method" );
+    confess("Not a Method") unless a_isa_b( $method, "Clownfish::Method" );
     confess("Can't call add_method after grow_tree") if $self->{tree_grown};
     confess("Can't add_method to an inert class")    if $self->{inert};
     push @{ $self->{methods} }, $method;
@@ -333,16 +333,16 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Class - An object representing a single class definition.
+Clownfish::Class - An object representing a single class definition.
 
 =head1 CONSTRUCTORS
 
-Boilerplater::Class objects are stored as quasi-singletons, one for each
+Clownfish::Class objects are stored as quasi-singletons, one for each
 unique parcel/class_name combination.
 
 =head2 fetch_singleton 
 
-    my $class = Boilerplater::Class->fetch_singleton(
+    my $class = Clownfish::Class->fetch_singleton(
         parcel     => 'Boil',
         class_name => 'Foo::Bar',
     );
@@ -351,7 +351,7 @@ Retrieve a Class, if one has already been created.
 
 =head2 create
 
-    my $class = Boilerplater::Class->create(
+    my $class = Clownfish::Class->create(
         parcel            => 'Boil',        # default: special
         class_name        => 'Foo::FooJr',  # required
         cnick             => 'FooJr',       # default: derived from class_name
@@ -373,7 +373,7 @@ unique parcel/class_name combination.
 =over
 
 =item * B<parcel>, B<class_name>, B<cnick>, B<exposure> - see
-L<Boilerplater::Symbol>.
+L<Clownfish::Symbol>.
 
 =item * B<source_class> - The name of the class that owns the file in which
 this class was declared.  Should be "Foo" if "Foo::FooJr" is defined in
@@ -385,18 +385,18 @@ in order to establish the class hierarchy.
 =item * B<inert> - Should be true if the class is inert, i.e. cannot be
 instantiated.
 
-=item * B<methods> - An array where each element is a Boilerplater::Method.
+=item * B<methods> - An array where each element is a Clownfish::Method.
 
-=item * B<functions> - An array where each element is a Boilerplater::Method.
+=item * B<functions> - An array where each element is a Clownfish::Method.
 
 =item * B<member_vars> - An array where each element is a
-Boilerplater::Variable and should be a member variable in each instantiated
+Clownfish::Variable and should be a member variable in each instantiated
 object.
 
 =item * B<inert_vars> - An array where each element is a
-Boilerplater::Variable and should be a shared (class) variable.
+Clownfish::Variable and should be a shared (class) variable.
 
-=item * B<docucomment> - A Boilerplater::DocuComment describing this Class.
+=item * B<docucomment> - A Clownfish::DocuComment describing this Class.
 
 =item * B<attributes> - An arbitrary hash of attributes.
 

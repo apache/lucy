@@ -3,20 +3,20 @@ use warnings;
 
 use Test::More tests => 124;
 
-BEGIN { use_ok('Boilerplater::Parser') }
+BEGIN { use_ok('Clownfish::Parser') }
 
-my $parser = Boilerplater::Parser->new;
-isa_ok( $parser, "Boilerplater::Parser" );
+my $parser = Clownfish::Parser->new;
+isa_ok( $parser, "Clownfish::Parser" );
 
 isa_ok( $parser->parcel_definition("parcel Fish;"),
-    "Boilerplater::Parcel", "parcel_definition" );
+    "Clownfish::Parcel", "parcel_definition" );
 isa_ok( $parser->parcel_definition("parcel Crustacean cnick Crust;"),
-    "Boilerplater::Parcel", "parcel_definition with cnick" );
+    "Clownfish::Parcel", "parcel_definition with cnick" );
 
 # Set and leave parcel.
 my $parcel = $parser->parcel_definition('parcel Boil;')
     or die "failed to process parcel_definition";
-is( $Boilerplater::Parser::parcel, $parcel,
+is( $Clownfish::Parser::parcel, $parcel,
     "parcel_definition sets internal \$parcel var" );
 
 is( $parser->strip_plain_comments("/*x*/"),
@@ -51,7 +51,7 @@ is( $parser->type_postfix($_), $_, "postfix: $_" )
     for ( '[]', '[A_CONSTANT]', '*' );
 is( $parser->type_postfix('[ FOO ]'), '[FOO]', "type_postfix: [ FOO ]" );
 
-isa_ok( $parser->type($_), "Boilerplater::Type", "type $_" )
+isa_ok( $parser->type($_), "Clownfish::Type", "type $_" )
     for ( 'const char *', 'Obj*', 'i32_t', 'char[]', 'long[1]',
     'i64_t[FOO]' );
 
@@ -59,11 +59,11 @@ is( $parser->declarator($_), $_, "declarator: $_" )
     for ( 'foo', 'bar_bar_bar' );
 
 isa_ok( $parser->param_variable($_),
-    "Boilerplater::Variable", "param_variable: $_" )
+    "Clownfish::Variable", "param_variable: $_" )
     for ( 'u32_t baz;', 'CharBuf *stuff;', 'float **ptr;', );
 
 isa_ok( $parser->var_declaration_statement($_)->{declared},
-    "Boilerplater::Variable", "var_declaration_statement: $_" )
+    "Clownfish::Variable", "var_declaration_statement: $_" )
     for (
     'parcel int foo;',
     'private Obj *obj;',
@@ -91,7 +91,7 @@ for my $composite (@composites) {
     my $parsed = $parser->type($composite);
     isa_ok(
         $parsed,
-        "Boilerplater::Type::Composite",
+        "Clownfish::Type::Composite",
         "composite_type: $composite"
     );
 }
@@ -99,7 +99,7 @@ for my $composite (@composites) {
 my @object_types = ( 'Obj *', "incremented Foo*", "decremented CharBuf *" );
 for my $object_type (@object_types) {
     my $parsed = $parser->object_type($object_type);
-    isa_ok( $parsed, "Boilerplater::Type::Object",
+    isa_ok( $parsed, "Clownfish::Type::Object",
         "object_type: $object_type" );
 }
 
@@ -110,7 +110,7 @@ my %param_lists = (
 );
 while ( my ( $param_list, $num_params ) = each %param_lists ) {
     my $parsed = $parser->param_list($param_list);
-    isa_ok( $parsed, "Boilerplater::ParamList", "param_list: $param_list" );
+    isa_ok( $parsed, "Clownfish::ParamList", "param_list: $param_list" );
 }
 ok( $parser->param_list("(int foo, ...)")->variadic, "variadic param list" );
 my $param_list = $parser->param_list(q|(int foo = 0xFF, char *bar ="blah")|);

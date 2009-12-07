@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::ParamList;
-use Boilerplater::Variable;
-use Boilerplater::Util qw( verify_args );
+package Clownfish::ParamList;
+use Clownfish::Variable;
+use Clownfish::Util qw( verify_args );
 use Carp;
 
 our %new_PARAMS = (
@@ -22,7 +22,7 @@ sub new {
         unless ref( $self->{variables} ) eq 'ARRAY';
     for my $var ( @{ $self->{variables} } ) {
         confess "invalid variable: '$var'"
-            unless ref($var) && $var->isa("Boilerplater::Variable");
+            unless ref($var) && $var->isa("Clownfish::Variable");
     }
 
     # Validate or init initial_values.
@@ -68,7 +68,7 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::ParamList - parameter list.
+Clownfish::ParamList - parameter list.
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ Boilerplater::ParamList - parameter list.
 
 =head2 new
 
-    my $type = Boilerplater::ParamList->new(
+    my $type = Clownfish::ParamList->new(
         variables      => \@vars,    # required
         initial_values => \@vals,    # default: undef
         variadic       => 1,         # default: false
@@ -85,7 +85,7 @@ Boilerplater::ParamList - parameter list.
 =over
 
 =item * B<variables> - An array where each element is a
-L<Boilerplater::Variable>. 
+L<Clownfish::Variable>. 
 
 =item * B<initial_values> - If supplied, an array of default values, one for
 each variable.

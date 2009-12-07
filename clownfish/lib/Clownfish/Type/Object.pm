@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::Object;
-use base qw( Boilerplater::Type );
-use Boilerplater::Parcel;
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type::Object;
+use base qw( Clownfish::Type );
+use Clownfish::Parcel;
+use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -28,7 +28,7 @@ sub new {
     $self->{incremented} = $incremented;
     $self->{decremented} = $decremented;
     $self->{indirection} = $indirection;
-    $self->{parcel} ||= Boilerplater::Parcel->default_parcel;
+    $self->{parcel} ||= Clownfish::Parcel->default_parcel;
     my $prefix = $self->{parcel}->get_prefix;
 
     # Validate params.
@@ -76,11 +76,11 @@ __END__
 
 =head1 NAME
 
-Boilerplater::Type::Boilerplater - An object Type.
+Clownfish::Type::Clownfish - An object Type.
 
 =head1 DESCRIPTION
 
-Boilerplater::Type::Object supports object types for all classes.  The type's 
+Clownfish::Type::Object supports object types for all classes.  The type's 
 C<specifier> must match the last component of the class name -- i.e. for the
 class "Crustacean::Lobster" it must be "Lobster".
 
@@ -88,7 +88,7 @@ class "Crustacean::Lobster" it must be "Lobster".
 
 =head2 new
 
-    my $type = Boilerplater::Type::Object->new(
+    my $type = Clownfish::Type::Object->new(
         specifier   => "Obj",     # required
         parcel      => "Boil",    # default: the default Parcel.
         const       => undef,     # default undef
@@ -100,9 +100,9 @@ class "Crustacean::Lobster" it must be "Lobster".
 =over
 
 =item * B<specifier> - Required.  Must follow the rules for
-L<Boilerplater::Class> class name components.
+L<Clownfish::Class> class name components.
 
-=item * B<parcel> - A L<Boilerplater::Parcel> or a parcel name.
+=item * B<parcel> - A L<Clownfish::Parcel> or a parcel name.
 
 =item * B<const> - Should be true if the Type is const.  Note that this refers
 to the object itself and not the pointer.

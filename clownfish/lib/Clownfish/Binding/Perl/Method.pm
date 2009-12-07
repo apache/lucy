@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Perl::Method;
-use base qw( Boilerplater::Binding::Perl::Subroutine );
-use Boilerplater::Util qw( verify_args );
-use Boilerplater::Binding::Perl::TypeMap qw( from_perl to_perl );
+package Clownfish::Binding::Perl::Method;
+use base qw( Clownfish::Binding::Perl::Subroutine );
+use Clownfish::Util qw( verify_args );
+use Clownfish::Binding::Perl::TypeMap qw( from_perl to_perl );
 use Carp;
 
 our %new_PARAMS = ( 
@@ -285,11 +285,11 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Perl::Method - Binding for an object method.
+Clownfish::Binding::Perl::Method - Binding for an object method.
 
 =head1 DESCRIPTION
 
-This class isa Boilerplater::Binding::Perl::Subroutine -- see its
+This class isa Clownfish::Binding::Perl::Subroutine -- see its
 documentation for various code-generating routines.
 
 Method bindings use labeled parameters if the C function takes more than one
@@ -300,13 +300,13 @@ will be set up to accept a single positional argument.
 
 =head2 new
 
-    my $binding = Boilerplater::Binding::Perl::Method->new(
+    my $binding = Clownfish::Binding::Perl::Method->new(
         method => $method,    # required
     );
 
 =over
 
-=item * B<method> - A L<Boilerplater::Method>.
+=item * B<method> - A L<Clownfish::Method>.
 
 =back
 

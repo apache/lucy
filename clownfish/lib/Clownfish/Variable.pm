@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Boilerplater::Variable;
-use base qw( Boilerplater::Symbol );
-use Boilerplater::Type;
-use Boilerplater::Util qw( verify_args a_isa_b );
+package Clownfish::Variable;
+use base qw( Clownfish::Symbol );
+use Clownfish::Type;
+use Clownfish::Util qw( verify_args a_isa_b );
 use Carp;
 
 our %new_PARAMS = (
@@ -21,7 +21,7 @@ sub new {
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = $either->SUPER::new( %new_PARAMS, @_ );
     confess "invalid type"
-        unless a_isa_b( $self->{type}, "Boilerplater::Type" );
+        unless a_isa_b( $self->{type}, "Clownfish::Type" );
     return $self;
 }
 
@@ -65,11 +65,11 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Variable - A Boilerplater variable.
+Clownfish::Variable - A Clownfish variable.
 
 =head1 DESCRIPTION
 
-A variable, having a L<Type|Boilerplater::Type>, a micro_sym (i.e. name), an
+A variable, having a L<Type|Clownfish::Type>, a micro_sym (i.e. name), an
 exposure, and optionally, a location in the global namespace hierarchy.
 
 Variable objects which exist only within a local scope, e.g. those within
@@ -81,7 +81,7 @@ themselves properly.
 
 =head2 new
 
-    my $var = Boilerplater::Variable->new(
+    my $var = Clownfish::Variable->new(
         parcel      => 'Boil',
         type        => $type,    # required
         micro_sym   => 'foo',    # required
@@ -92,15 +92,15 @@ themselves properly.
 
 =over
 
-=item * B<type> - A L<Boilerplater::Type>.
+=item * B<type> - A L<Clownfish::Type>.
 
 =item * B<micro_sym> - The variable's name, without any namespacing prefixes.
 
-=item * B<exposure> - See L<Boilerplater::Symbol>.
+=item * B<exposure> - See L<Clownfish::Symbol>.
 
-=item * B<class_name> - See L<Boilerplater::Symbol>.
+=item * B<class_name> - See L<Clownfish::Symbol>.
 
-=item * B<class_cnick> - See L<Boilerplater::Symbol>.
+=item * B<class_cnick> - See L<Clownfish::Symbol>.
 
 =back
 

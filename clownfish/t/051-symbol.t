@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package BoilingThing;
-use base qw( Boilerplater::Symbol );
+use base qw( Clownfish::Symbol );
 
 sub new {
     return shift->SUPER::new( micro_sym => 'sym', exposure => 'parcel', @_ );
@@ -39,7 +39,7 @@ ok( !$public_exposure->equals($parcel_exposure),
     "different exposure spoils equals"
 );
 
-my $lucifer_parcel = Boilerplater::Parcel->singleton( name => 'Lucifer' );
+my $lucifer_parcel = Clownfish::Parcel->singleton( name => 'Lucifer' );
 my $lucifer = BoilingThing->new( parcel => 'Lucifer' );
 ok( $lucifer_parcel == $lucifer->get_parcel, "derive parcel" );
 is( $lucifer->get_prefix, "lucifer_", "get_prefix" );

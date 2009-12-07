@@ -1,15 +1,15 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Core::Method;
-use Boilerplater::Util qw( a_isa_b );
+package Clownfish::Binding::Core::Method;
+use Clownfish::Util qw( a_isa_b );
 use Carp;
 
 sub method_def {
     my ( undef,   %args )  = @_;
     my ( $method, $cnick ) = @args{qw( method cnick )};
     confess("Not a Method")
-        unless a_isa_b( $method, "Boilerplater::Method" );
+        unless a_isa_b( $method, "Clownfish::Method" );
     if ( $method->final ) {
         return _final_method_def( $method, $cnick );
     }
@@ -308,18 +308,18 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Core::Method - Generate core C code for a method.
+Clownfish::Binding::Core::Method - Generate core C code for a method.
 
 =head1 DESCRIPTION
 
-Boilerplater::Method is an abstract specification; this class generates C code
+Clownfish::Method is an abstract specification; this class generates C code
 which implements the specification.
 
 =head1 METHODS
 
 =head2 method_def
 
-    my $c_code = Boilerplater::Binding::Core::Method->method_def(
+    my $c_code = Clownfish::Binding::Core::Method->method_def(
         method => $method,
         cnick  => 'FooJr',
     );
@@ -328,7 +328,7 @@ Return C code for the static inline vtable method invocation function.
 
 =over
 
-=item * B<method> - A L<Boilerplater::Method>.
+=item * B<method> - A L<Clownfish::Method>.
 
 =item * B<cnick> - The cnick for the class which will be invoking the
 method - i.e. FooJr needs its own method invocation function even if the
@@ -338,35 +338,35 @@ method was defined in Foo.
 
 =head2 typedef_dec
 
-    my $c_code = Boilerplater::Binding::Core::Method->typedef_dec($method);
+    my $c_code = Clownfish::Binding::Core::Method->typedef_dec($method);
 
 Return C code expressing a typedef declaration for the method.
 
 =head2 callback_dec
 
-    my $c_code = Boilerplater::Binding::Core::Method->callback_dec($method);
+    my $c_code = Clownfish::Binding::Core::Method->callback_dec($method);
 
 Return C code declaring the Callback object for this method.
 
 =head2 callback_obj_def
 
     my $c_code 
-        = Boilerplater::Binding::Core::Method->callback_obj_def($method);
+        = Clownfish::Binding::Core::Method->callback_obj_def($method);
 
 Return C code defining the Callback object for this method, which stores
 introspection data and a pointer to the callback function.
 
 =head2 callback_def
 
-    my $c_code = Boilerplater::Binding::Core::Method->callback_def($method);
+    my $c_code = Clownfish::Binding::Core::Method->callback_def($method);
 
 Return C code implementing a callback to the Host for this method.  This code
-is used when a Host method has overridden a method in a Boilerplater class.
+is used when a Host method has overridden a method in a Clownfish class.
 
 =head2 abstract_method_def
 
     my $c_code 
-        = Boilerplater::Binding::Core::Method->abstract_method_def($method);
+        = Clownfish::Binding::Core::Method->abstract_method_def($method);
 
 Return C code implementing a version of the method which throws an "abstract
 method" error at runtime.

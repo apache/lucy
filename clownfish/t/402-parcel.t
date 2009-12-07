@@ -3,10 +3,10 @@ use warnings;
 
 use Test::More tests => 7;
 
-BEGIN { use_ok('Boilerplater::Parcel') }
+BEGIN { use_ok('Clownfish::Parcel') }
 
 package BoilingThing;
-use base qw( Boilerplater::Symbol );
+use base qw( Clownfish::Symbol );
 
 sub new {
     return shift->SUPER::new( micro_sym => 'sym', exposure => 'parcel', @_ );
@@ -15,7 +15,7 @@ sub new {
 package main;
 
 # Register singleton.
-Boilerplater::Parcel->singleton( name => 'Boil' );
+Clownfish::Parcel->singleton( name => 'Boil' );
 
 my $thing = BoilingThing->new;
 is( $thing->get_prefix, '', 'get_prefix with no parcel' );

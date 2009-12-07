@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Type::Primitive;
-use base qw( Boilerplater::Type );
-use Boilerplater::Util qw( verify_args );
+package Clownfish::Type::Primitive;
+use base qw( Clownfish::Type );
+use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -40,13 +40,13 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Type::Primitive - Abstract base class for primitive types.
+Clownfish::Type::Primitive - Abstract base class for primitive types.
 
 =head1 DESCRIPTION
 
-Boilerplater::Type::Primitive serves as a common parent class for primitive
-types including L<Boilerplater::Type::Integer> and
-L<Boilerplater::Type::Float>.
+Clownfish::Type::Primitive serves as a common parent class for primitive
+types including L<Clownfish::Type::Integer> and
+L<Clownfish::Type::Float>.
 
 =head1 METHODS
 
@@ -58,7 +58,7 @@ L<Boilerplater::Type::Float>.
         c_string  => 'char',  # default: undef
     );
 
-Abstract constructor.  See L<Boilerplater::Type> for parameter definitions.
+Abstract constructor.  See L<Clownfish::Type> for parameter definitions.
 
 =head1 COPYRIGHT AND LICENSE
 

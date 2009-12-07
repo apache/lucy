@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Perl::Constructor;
-use base qw( Boilerplater::Binding::Perl::Subroutine );
+package Clownfish::Binding::Perl::Constructor;
+use base qw( Clownfish::Binding::Perl::Subroutine );
 use Carp;
-use Boilerplater::Binding::Perl::TypeMap qw( from_perl );
-use Boilerplater::ParamList;
+use Clownfish::Binding::Perl::TypeMap qw( from_perl );
+use Clownfish::ParamList;
 
 sub new {
     my ( $either, %args ) = @_;
@@ -147,11 +147,11 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Perl::Constructor - Binding for an object method.
+Clownfish::Binding::Perl::Constructor - Binding for an object method.
 
 =head1 DESCRIPTION
 
-This class isa Boilerplater::Binding::Perl::Subroutine -- see its
+This class isa Clownfish::Binding::Perl::Subroutine -- see its
 documentation for various code-generating routines.
 
 Constructors are always bound to accept labeled params, even if there is only
@@ -161,14 +161,14 @@ a single argument.
 
 =head2 new
 
-    my $constructor_binding = Boilerplater::Binding::Perl::Constructor->new(
+    my $constructor_binding = Clownfish::Binding::Perl::Constructor->new(
         class => $class,
         alias => "_new|init2",
     );
 
 =over
 
-=item * B<class> - A L<Boilerplater::Class>.
+=item * B<class> - A L<Clownfish::Class>.
 
 =item * B<alias> - A specifier for the name of the constructor, and
 optionally, a specifier for the implementing function.  If C<alias> has a pipe

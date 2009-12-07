@@ -3,11 +3,11 @@ use warnings;
 
 use Test::More tests => 10;
 
-BEGIN { use_ok('Boilerplater::DocuComment') }
-use Boilerplater::Parser;
+BEGIN { use_ok('Clownfish::DocuComment') }
+use Clownfish::Parser;
 
-my $parser = Boilerplater::Parser->new;
-isa_ok( $parser->docucomment('/** foo. */'), "Boilerplater::DocuComment" );
+my $parser = Clownfish::Parser->new;
+isa_ok( $parser->docucomment('/** foo. */'), "Clownfish::DocuComment" );
 
 my $text = <<'END_COMMENT';
 /** 
@@ -23,7 +23,7 @@ my $text = <<'END_COMMENT';
  */
 END_COMMENT
 
-my $docucomment = Boilerplater::DocuComment->parse($text);
+my $docucomment = Clownfish::DocuComment->parse($text);
 
 like(
     $docucomment->get_description,

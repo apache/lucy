@@ -2,13 +2,13 @@ use strict;
 use warnings;
 
 package MyType;
-use base qw( Boilerplater::Type );
+use base qw( Clownfish::Type );
 
 package main;
 use Test::More tests => 12;
-use Boilerplater::Parcel;
+use Clownfish::Parcel;
 
-my $boil_parcel = Boilerplater::Parcel->singleton( name => 'Boil' );
+my $boil_parcel = Clownfish::Parcel->singleton( name => 'Boil' );
 
 my $type = MyType->new( parcel => 'Boil', specifier => 'mytype_t' );
 is( $type->get_parcel, $boil_parcel,

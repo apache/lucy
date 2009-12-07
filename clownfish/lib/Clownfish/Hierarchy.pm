@@ -1,16 +1,16 @@
 use strict;
 use warnings;
 
-package Boilerplater::Hierarchy;
+package Clownfish::Hierarchy;
 use Carp;
 use File::Find qw( find );
 use File::Spec::Functions qw( catfile splitpath );
 use File::Path qw( mkpath );
 use Fcntl;
 
-use Boilerplater::Util qw( slurp_file current verify_args );
-use Boilerplater::Class;
-use Boilerplater::Parser;
+use Clownfish::Util qw( slurp_file current verify_args );
+use Clownfish::Class;
+use Clownfish::Parser;
 
 our %new_PARAMS = (
     source => undef,
@@ -21,7 +21,7 @@ sub new {
     my $either = shift;
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = bless {
-        parser => Boilerplater::Parser->new,
+        parser => Clownfish::Parser->new,
         trees  => {},
         files  => {},
         %new_PARAMS,
@@ -168,22 +168,22 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Hierarchy - A class hierarchy.
+Clownfish::Hierarchy - A class hierarchy.
 
 =head1 DESCRIPTION
 
-A Boilerplater::Hierarchy consists of all the classes defined in files within
+A Clownfish::Hierarchy consists of all the classes defined in files within
 a source directory and its subdirectories.
 
 There may be more than one tree within the Hierarchy, since all "inert"
-classes are root nodes, and since Boilerplater does not officially define any
+classes are root nodes, and since Clownfish does not officially define any
 core classes itself from which all instantiable classes must descend.
 
 =head1 METHODS
 
 =head2 new
 
-    my $hierarchy = Boilerplater::Hierarchy->new(
+    my $hierarchy = Clownfish::Hierarchy->new(
         source => undef,    # required
         dest   => undef,    # required
     );

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Boilerplater::Symbol;
-use Boilerplater::Parcel;
-use Boilerplater::Util qw( a_isa_b );
+package Clownfish::Symbol;
+use Clownfish::Parcel;
+use Clownfish::Util qw( a_isa_b );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -24,14 +24,14 @@ sub new {
     # Acquire a Parcel.
     my $parcel = $args{parcel};
     if ( !defined $parcel ) {
-        $parcel = Boilerplater::Parcel->default_parcel;
+        $parcel = Clownfish::Parcel->default_parcel;
     }
     elsif ( blessed($parcel) ) {
-        confess("Not a Boilerplater::Parcel")
-            unless $parcel->isa('Boilerplater::Parcel');
+        confess("Not a Clownfish::Parcel")
+            unless $parcel->isa('Clownfish::Parcel');
     }
     else {
-        $parcel = Boilerplater::Parcel->singleton( name => $args{parcel} );
+        $parcel = Clownfish::Parcel->singleton( name => $args{parcel} );
     }
 
     # Create the object.
@@ -121,11 +121,11 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Symbol - Abstract base class for Boilerplater symbols.
+Clownfish::Symbol - Abstract base class for Clownfish symbols.
 
 =head1 DESCRIPTION
 
-Boilerplater::Symbol serves as an abstract parent class for entities which may
+Clownfish::Symbol serves as an abstract parent class for entities which may
 live in the global namespace, such as classes, functions, methods, and
 variables.
 
@@ -141,7 +141,7 @@ variables.
 
 =over
 
-=item * B<parcel> - A Boilerplater::Parcel, or a string that can be used to
+=item * B<parcel> - A Clownfish::Parcel, or a string that can be used to
 create/retrieve one.  If not supplied, will be assigned to the default Parcel.
 
 =item * B<exposure> - The scope in which the symbol is exposed.  Must be

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Boilerplater::Binding::Core::Class;
-use Boilerplater::Util qw( a_isa_b verify_args );
-use Boilerplater::Binding::Core::Method;
-use Boilerplater::Binding::Core::Function;
+package Clownfish::Binding::Core::Class;
+use Clownfish::Util qw( a_isa_b verify_args );
+use Clownfish::Binding::Core::Method;
+use Clownfish::Binding::Core::Function;
 use File::Spec::Functions qw( catfile );
 
 our %new_PARAMS = ( client => undef, );
@@ -16,8 +16,8 @@ sub new {
 
     # Validate.
     my $client = $self->{client};
-    confess("Not a Boilerplater::Class")
-        unless a_isa_b( $client, "Boilerplater::Class" );
+    confess("Not a Clownfish::Class")
+        unless a_isa_b( $client, "Clownfish::Class" );
 
     # Cache some vars.
     $self->{class_name}      = $client->get_class_name;
@@ -159,7 +159,7 @@ sub to_c_header {
     my $sub_declarations = "";
     for my $sub ( @functions, @novel_methods ) {
         $sub_declarations
-            .= Boilerplater::Binding::Core::Function->func_declaration($sub)
+            .= Clownfish::Binding::Core::Function->func_declaration($sub)
             . "\n\n";
     }
 
@@ -173,14 +173,14 @@ sub to_c_header {
     my $method_typedefs = '';
     for my $method (@novel_methods) {
         $method_typedefs
-            .= Boilerplater::Binding::Core::Method->typedef_dec($method)
+            .= Clownfish::Binding::Core::Method->typedef_dec($method)
             . "\n";
     }
 
     # Define method invocation syntax.
     my $method_defs = '';
     for my $method (@methods) {
-        $method_defs .= Boilerplater::Binding::Core::Method->method_def(
+        $method_defs .= Clownfish::Binding::Core::Method->method_def(
             method => $method,
             cnick  => $cnick,
         ) . "\n";
@@ -198,7 +198,7 @@ sub to_c_header {
     for my $method (@novel_methods) {
         next unless $method->public || $method->abstract;
         $callback_declarations
-            .= Boilerplater::Binding::Core::Method->callback_dec($method);
+            .= Clownfish::Binding::Core::Method->callback_dec($method);
     }
 
     # Define short names.
@@ -214,7 +214,7 @@ sub to_c_header {
     }
     if ( !$client->inert ) {
         for my $method (@novel_methods) {
-            if ( !$method->isa("Boilerplater::Method::Overridden") ) {
+            if ( !$method->isa("Clownfish::Method::Overridden") ) {
                 my $short_typedef = $method->short_typedef;
                 my $full_typedef  = $method->full_typedef;
                 $short_names .= "  #define $short_typedef $full_typedef\n";
@@ -330,7 +330,7 @@ sub to_c {
         # Create a default implementation for abstract methods.
         if ( $method->abstract ) {
             if ( $novel{ $method->micro_sym } ) {
-                $callback_funcs .= Boilerplater::Binding::Core::Method
+                $callback_funcs .= Clownfish::Binding::Core::Method
                     ->abstract_method_def($method) . "\n";
             }
         }
@@ -341,11 +341,11 @@ sub to_c {
             my $callback_sym = $method->full_callback_sym;
             if ( $novel{ $method->micro_sym } ) {
                 $callback_funcs
-                    .= Boilerplater::Binding::Core::Method->callback_def(
+                    .= Clownfish::Binding::Core::Method->callback_def(
                     $method)
                     . "\n";
                 $callbacks
-                    .= Boilerplater::Binding::Core::Method->callback_obj_def(
+                    .= Clownfish::Binding::Core::Method->callback_obj_def(
                     method => $method,
                     offset => $offset,
                     );
@@ -385,24 +385,24 @@ __POD__
 
 =head1 NAME
 
-Boilerplater::Binding::Core::Class - Generate core C code for a class.
+Clownfish::Binding::Core::Class - Generate core C code for a class.
 
 =head1 DESCRIPTION
 
-Boilerplater::Class is an abstract specification for a class.  This module
+Clownfish::Class is an abstract specification for a class.  This module
 autogenerates the C code with implements that specification.
 
 =head1 METHODS
 
 =head2 new
 
-    my $class_binding = Boilerplater::Binding::Core::Class->new(
+    my $class_binding = Clownfish::Binding::Core::Class->new(
         client => $class,
     );
 
 =over
 
-=item * B<client> - A L<Boilerplater::Class>.
+=item * B<client> - A L<Clownfish::Class>.
 
 =back
 
