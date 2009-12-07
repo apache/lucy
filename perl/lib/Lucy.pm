@@ -165,6 +165,12 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
+    package Lucy::Store::FSFolder;
+    use File::Spec::Functions qw( rel2abs );
+    sub absolutify { return rel2abs( $_[1] ) } 
+}
+
+{
     package Lucy::Util::Json;
     use Lucy::Util::ToolSet qw( to_lucy );
 

@@ -115,7 +115,8 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
     Delete_Tree(Folder *self, const CharBuf *path);
 
     /** Rename a file or directory, or set Err_error and return false on
-     * failure.  If an entry exists at <code>to</code>, it will be removed.
+     * failure.  If an entry exists at <code>to</code>, the results are
+     * undefined.
      *
      * @param from The filepath prior to renaming.
      * @param to The filepath after renaming.
