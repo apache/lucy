@@ -1,0 +1,12 @@
+parcel Animal;
+
+class Animal::Dog extends Animal {
+    public inert incremented Dog*
+    new();
+
+    public inert Dog* 
+    init(Dog *self);
+
+    public void
+    Bark(Dog *self);
+}
