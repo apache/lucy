@@ -28,7 +28,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-Boilerplater::Binding::Perl::Class->register(
+Clownfish::Binding::Perl::Class->register(
     parcel     => "Lucy",
     class_name => "Lucy::Util::IndexFileNames",
     xs_code    => $xs_code,

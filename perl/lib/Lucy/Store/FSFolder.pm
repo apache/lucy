@@ -6,7 +6,7 @@ __END__
 
 __BINDING__
 
-Boilerplater::Binding::Perl::Class->register(
+Clownfish::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Store::FSFolder",
     bind_constructors => ["new"],

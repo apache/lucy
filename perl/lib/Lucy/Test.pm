@@ -139,13 +139,13 @@ PPCODE:
 }
 END_XS_CODE
 
-Boilerplater::Binding::Perl::Class->register(
+Clownfish::Binding::Perl::Class->register(
     parcel     => "Lucy",
     class_name => "Lucy::Test",
     xs_code    => $xs_code,
 );
 
-Boilerplater::Binding::Perl::Class->register(
+Clownfish::Binding::Perl::Class->register(
     parcel     => "Lucy",
     class_name => "Lucy::Test::TestCharmonizer",
     xs_code    => $charm_xs_code,
