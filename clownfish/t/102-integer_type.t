@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 60;
+use Test::More tests => 92;
 use Clownfish::Type::Integer;
 use Clownfish::Parser;
 
@@ -34,6 +34,14 @@ my @c_specifiers = qw(
     int
     long
     size_t
+    int8_t
+    int16_t
+    int32_t
+    int64_t
+    uint8_t
+    uint16_t
+    uint32_t
+    uint64_t
 );
 
 for my $chy_specifier (@chy_specifiers) {

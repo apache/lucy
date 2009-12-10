@@ -226,7 +226,7 @@ chy_integer_specifier:
     /(?:chy_)?([iu](8|16|32|64)|bool)_t(?!\w)/
 
 c_integer_specifier:
-    /(?:char|int|short|long|size_t)(?!\w)/
+    /(?:(?:u?int(?:8|16|32|64)_t)|(?:char|int|short|long|size_t))(?!\w)/
 
 c_float_specifier:
     /(?:float|double)(?!\w)/
