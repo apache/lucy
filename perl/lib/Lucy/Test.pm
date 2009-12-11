@@ -14,8 +14,12 @@ run_tests(package)
     char *package;
 PPCODE:
 {
+    /* Lucy::Index */
+    if (strEQ(package, "TestSegment")) {
+        lucy_TestSeg_run_tests();
+    }
     /* Lucy::Object */
-    if (strEQ(package, "TestObj")) {
+    else if (strEQ(package, "TestObj")) {
         lucy_TestObj_run_tests();
     }
     else if (strEQ(package, "TestBitVector")) {
