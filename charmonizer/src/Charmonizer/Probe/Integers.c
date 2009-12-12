@@ -68,6 +68,7 @@ Integers_run(void)
     chaz_bool_t has_long_long = false;
     chaz_bool_t has___int64   = false;
     chaz_bool_t has_inttypes  = HeadCheck_check_header("inttypes.h");
+    chaz_bool_t has_stdint    = HeadCheck_check_header("stdint.h");
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -185,6 +186,8 @@ Integers_run(void)
     /* write out some conditional defines */
     if (has_inttypes)
         ModHand_append_conf("#define CHY_HAS_INTTYPES_H\n");
+    if (has_stdint)
+        ModHand_append_conf("#define CHY_HAS_STDINT_H\n");
     if (has_long_long)
         ModHand_append_conf("#define CHY_HAS_LONG_LONG\n");
     if (has___int64)
@@ -205,6 +208,49 @@ Integers_run(void)
 
     /* write affirmations, typedefs and maximums/minimums */
     ModHand_append_conf("typedef int chy_bool_t;\n");
+    if (has_stdint) {
+        ModHand_append_conf("#include <stdint.h>\n");
+    }
+    else {
+    /* we support only the following subset of stdint.h
+     *   int8_t
+     *   int16_t
+     *   int32_t
+     *   int64_t
+     *   uint8_t
+     *   uint16_t
+     *   uint32_t
+     *   uint64_t
+     */
+        if (has_8) {
+            ModHand_append_conf(
+                "typedef signed char int8_t;\n"
+                "typedef unsigned char uint8_t;\n"
+            );
+        }
+        if (has_16) {
+            ModHand_append_conf(
+                "typedef short int16_t;\n"
+                "typedef unsigned short uint16_t;\n"
+            );
+        }
+        if (has_32) {
+            ModHand_append_conf(
+                "typedef %s int32_t;\n", i32_t_type
+            );
+            ModHand_append_conf(
+                "typedef unsigned %s uint32_t;\n", i32_t_type
+            );
+        }
+        if (has_64) {
+            ModHand_append_conf(
+                "typedef %s int64_t;\n", i64_t_type
+            );
+            ModHand_append_conf(
+                "typedef unsigned %s uint64_t;\n", i64_t_type
+            );
+        }
+    }
     if (has_8) {
         ModHand_append_conf(
             "#define CHY_HAS_I8_T\n"
@@ -391,7 +437,7 @@ Integers_run(void)
         ModHand_shorten_macro("I64_C");
         ModHand_shorten_macro("U64_C");
         ModHand_shorten_macro("PTR2I64");
-    } 
+    }
     END_SHORT_NAMES;
     
     END_RUN;

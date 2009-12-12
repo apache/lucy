@@ -24,9 +24,23 @@
  * HAS___INT64
  * SIZEOF___INT64
  *
- * If the inttypes.h header file is available, this will be defined:
+ * If the inttypes.h or stdint.h header files are available, these may be
+ * defined:
  * 
  * HAS_INTTYPES_H
+ * HAS_STDINT_H
+ *
+ * If stdint.h is is available, it will be pound-included in the configuration
+ * header.  If it is not, the following typedefs will be defined if possible:
+ *
+ * int8_t
+ * int16_t
+ * int32_t
+ * int64_t
+ * uint8_t
+ * uint16_t
+ * uint32_t
+ * uint64_t
  * 
  * The following typedefs will be created if a suitable integer type exists,
  * as will most often be the case.  However, if for example a char is 64 bits
