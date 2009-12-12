@@ -22,6 +22,14 @@ my %primitives_from_perl = (
             : "$_[0] = (long)SvNV( $_[1] );";
     },
     size_t     => sub {"$_[0] = (size_t)SvIV( $_[1] );"},
+    uint64_t   => sub {"$_[0] = (uint64_t)SvNV( $_[1] );"},
+    uint32_t   => sub {"$_[0] = (uint32_t)SvUV( $_[1] );"},
+    uint16_t   => sub {"$_[0] = (uint16_t)SvUV( $_[1] );"},
+    uint8_t    => sub {"$_[0] = (uint8_t)SvUV( $_[1] );"},
+    int64_t    => sub {"$_[0] = (int64_t)SvNV( $_[1] );"},
+    int32_t    => sub {"$_[0] = (int32_t)SvIV( $_[1] );"},
+    int16_t    => sub {"$_[0] = (int16_t)SvIV( $_[1] );"},
+    int8_t     => sub {"$_[0] = (int8_t)SvIV( $_[1] );"},
     chy_u64_t  => sub {"$_[0] = (chy_u64_t)SvNV( $_[1] );"},
     chy_u32_t  => sub {"$_[0] = (chy_u32_t)SvUV( $_[1] );"},
     chy_u16_t  => sub {"$_[0] = (chy_u16_t)SvUV( $_[1] );"},
@@ -44,7 +52,23 @@ my %primitives_to_perl = (
             ? "$_[0] = newSViv( $_[1] );"
             : "$_[0] = newSVnv( (NV)$_[1] );";
     },
-    size_t    => sub {"$_[0] = newSViv( $_[1] );"},
+    size_t   => sub {"$_[0] = newSViv( $_[1] );"},
+    uint64_t => sub {
+        $Config{uvsize} == 8
+            ? "$_[0] = newSVuv( $_[1] );"
+            : "$_[0] = newSVnv( (NV)$_[1] );";
+    },
+    uint32_t => sub {"$_[0] = newSVuv( $_[1] );"},
+    uint16_t => sub {"$_[0] = newSVuv( $_[1] );"},
+    uint8_t  => sub {"$_[0] = newSVuv( $_[1] );"},
+    int64_t  => sub {
+        $Config{ivsize} == 8
+            ? "$_[0] = newSViv( $_[1] );"
+            : "$_[0] = newSVnv( (NV)$_[1] );";
+    },
+    int32_t   => sub {"$_[0] = newSViv( $_[1] );"},
+    int16_t   => sub {"$_[0] = newSViv( $_[1] );"},
+    int8_t    => sub {"$_[0] = newSViv( $_[1] );"},
     chy_u64_t => sub {
         $Config{uvsize} == 8
             ? "$_[0] = newSVuv( $_[1] );"
