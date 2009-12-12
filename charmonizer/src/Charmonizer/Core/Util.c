@@ -6,7 +6,7 @@
 #include <string.h>
 #include "Charmonizer/Core/Util.h"
 
-/* global verbosity setting */
+/* Global verbosity setting. */
 int Util_verbosity = 1;
 
 void
@@ -29,33 +29,33 @@ Util_slurp_file(char *file_path, size_t *len_ptr)
     size_t  len;
     long    check_val;
 
-    /* sanity check */
+    /* Sanity check. */
     if (file == NULL)
         Util_die("Error opening file '%s': %s", file_path, strerror(errno));
 
-    /* find length; return NULL if the file has a zero-length */
+    /* Find length; return NULL if the file has a zero-length. */
     len = Util_flength(file);
     if (len == 0) {
         *len_ptr = 0;
         return NULL;
     }
 
-    /* allocate memory and read the file */
+    /* Allocate memory and read the file. */
     contents = (char*)malloc(len * sizeof(char) + 1);
     if (contents == NULL)
         Util_die("Out of memory at %d, %s", __FILE__, __LINE__);
     contents[len] = '\0';
     check_val = fread(contents, sizeof(char), len, file);
 
-    /* weak error check, because CRLF might result in fewer chars read */
+    /* Weak error check, because CRLF might result in fewer chars read. */
     if (check_val <= 0)
         Util_die("Tried to read %d characters of '%s', got %d", (int)len,
             file_path, check_val);
 
-    /* set length pointer for benefit of caller */
+    /* Set length pointer for benefit of caller. */
     *len_ptr = check_val;
 
-    /* clean up */
+    /* Clean up. */
     if (fclose(file))
         Util_die("Error closing file '%s': %s", file_path, strerror(errno));
 
@@ -69,7 +69,7 @@ Util_flength(FILE *f)
     long check_val;
     long len;
 
-    /* seek to end of file and check length */
+    /* Seek to end of file and check length. */
     check_val = fseek(f, 0, SEEK_END);
     if (check_val == -1)
         Util_die("fseek error : %s\n", strerror(errno));
@@ -77,7 +77,7 @@ Util_flength(FILE *f)
     if (len == -1)
         Util_die("ftell error : %s\n", strerror(errno));
 
-    /* return to where we were */
+    /* Return to where we were. */
     check_val = fseek(f, bookmark, SEEK_SET);
     if (check_val == -1)
         Util_die("fseek error : %s\n", strerror(errno));
@@ -109,10 +109,10 @@ Util_warn(char* format, ...)
 int
 Util_remove_and_verify(char *file_path) 
 {
-    /* try to remove the file */
+    /* Try to remove the file. */
     remove(file_path);
 
-    /* return what *might* be success or failure */
+    /* Return what *might* be success or failure. */
     return Util_can_open_file(file_path) ? 0 : 1;
 }
 
@@ -121,7 +121,7 @@ Util_can_open_file(char *file_path)
 {
     FILE *garbage_fh;
 
-    /* use fopen as a portable test for the existence of a file */
+    /* Use fopen as a portable test for the existence of a file. */
     garbage_fh = fopen(file_path, "r");
     if (garbage_fh == NULL) {
         return 0;

@@ -140,7 +140,7 @@ TestHeaders_run(TestBatch *batch)
 {
     PASS(batch, "Compiled successfully with all detected headers");
 
-    /* don't bother checking all -- just use stdio as an example */
+    /* Don't bother checking all -- just use stdio as an example. */
 #ifdef HAS_STDIO_H
     PASS(batch, "stdio.h should have been detected");
 #else

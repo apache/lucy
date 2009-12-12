@@ -34,27 +34,27 @@ CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
     if (Util_verbosity)
         printf("Creating compiler object...\n");
 
-    /* assign */
+    /* Assign. */
     self->os              = oper_sys;
     self->cc_command      = strdup(cc_command);
     self->cc_flags        = strdup(cc_flags);
 
-    /* init */
+    /* Init. */
     self->compile_exe     = S_compile_exe;
     self->compile_obj     = S_compile_obj;
     self->add_inc_dir     = S_add_inc_dir;
     self->destroy         = S_destroy;
     self->inc_dirs        = (char**)calloc(sizeof(char*), 1);
 
-    /* set compiler-specific vars */
+    /* Set compiler-specific vars. */
     self->include_flag    = strdup(compiler_spec->include_flag);
     self->object_flag     = strdup(compiler_spec->object_flag);
     self->exe_flag        = strdup(compiler_spec->exe_flag);
 
-    /* add the current directory as an include dir */
+    /* Add the current directory as an include dir. */
     self->add_inc_dir(self, ".");
 
-    /* if we can't compile anything, game over */
+    /* If we can't compile anything, game over. */
     S_do_test_compile(self);
 
     return self;
@@ -209,13 +209,13 @@ S_do_test_compile(Compiler *self)
     if (Util_verbosity) 
         printf("Trying to compile a small test file...\n");
 
-    /* attempt compilation */
+    /* Attempt compilation. */
     success = self->compile_exe(self, "_charm_try.c", 
         "_charm_try", code, strlen(code));
     if (!success)
         Util_die("Failed to compile a small test file");
     
-    /* clean up */
+    /* Clean up. */
     remove("_charm_try.c");
     self->os->remove_exe(self->os, "_charm_try");
 }
@@ -226,12 +226,12 @@ S_add_inc_dir(Compiler *self, const char *dir)
     size_t num_dirs = 0; 
     char **dirs = self->inc_dirs;
 
-    /* count up the present number of dirs, reallocate */
+    /* Count up the present number of dirs, reallocate. */
     while (*dirs++ != NULL) { num_dirs++; }
-    num_dirs += 1; /* passed-in dir */
+    num_dirs += 1; /* Passed-in dir. */
     self->inc_dirs = (char**)realloc(self->inc_dirs, (num_dirs + 1)*sizeof(char*));
 
-    /* put the passed-in dir at the end of the list */
+    /* Put the passed-in dir at the end of the list. */
     self->inc_dirs[num_dirs - 1] = strdup(dir);
     self->inc_dirs[num_dirs] = NULL;
 }

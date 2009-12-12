@@ -30,10 +30,10 @@ OS_new(const char *name)
     if (Util_verbosity)
         printf("Creating os object...\n");
 
-    /* assign */
+    /* Assign. */
     self->name = strdup(name);
 
-    /* init */
+    /* Init. */
     self->buf        = NULL;
     self->buf_len    = 0;
     self->remove_obj = S_remove_obj;
@@ -41,7 +41,7 @@ OS_new(const char *name)
     self->run_local  = S_run_local;
     self->destroy    = S_destroy;
 
-    /* derive */
+    /* Derive. */
     if (strcmp(name, "mswin32") == 0) {
         self->obj_ext = strdup(".obj");
         self->exe_ext = strdup(".exe");
@@ -71,7 +71,7 @@ S_probe_devnull(OperSys *self)
     if (Util_verbosity)
         printf("Trying to find a bit-bucket a la /dev/null...\n");
 
-    /* iterate through names of possible devnulls trying to open them */
+    /* Iterate through names of possible devnulls trying to open them. */
     for (i = 0; devnull_options[i] != NULL; i++) {
         if (Util_can_open_file(devnull_options[i])) {
             self->devnull = strdup(devnull_options[i]);
@@ -79,7 +79,7 @@ S_probe_devnull(OperSys *self)
         }
     }
 
-    /* bail out we couldn't find a devnull */
+    /* Bail out we couldn't find a devnull. */
     Util_die("Couldn't find anything like /dev/null");
 }
 
@@ -122,7 +122,7 @@ S_run_local(OperSys *self, ...)
     int      retval;
     char    *arg;
 
-    /* append all supplied texts */
+    /* Append all supplied texts. */
     va_start(args, self);
     while (NULL != (arg = va_arg(args, char*))) {
         len += strlen(arg);
@@ -131,7 +131,7 @@ S_run_local(OperSys *self, ...)
     }
     va_end(args);
 
-    /* run the command */
+    /* Run the command. */
     retval = system(command);
     free(command);
     return retval;

@@ -26,30 +26,30 @@ S_build_charm_run();
 static void
 S_clean_up_try();
 
-/* global vars */
+/* Global vars. */
 struct OperSys  *ModHand_os = NULL;
 struct Compiler *ModHand_compiler = NULL;
 chaz_bool_t chaz_ModHand_charm_run_available = false;
 FILE* ModHand_charmony_fh = NULL;
 
-/* static vars */
+/* Static vars. */
 static char *try_app_path = NULL;
 static char *try_app_command = NULL;
 
 void
 ModHand_init()
 {
-    /* set the name of the application which we "try" to execute */
+    /* Set the name of the application which we "try" to execute. */
     size_t len = strlen(TRY_APP_BASENAME) + strlen(ModHand_os->exe_ext) + 1;
     try_app_path = (char*)malloc(len);
     sprintf(try_app_path, "%s%s", TRY_APP_BASENAME, ModHand_os->exe_ext);
 
-    /* set the invocation string for the "try" application */
+    /* Set the invocation string for the "try" application. */
     len = strlen(ModHand_os->local_command_start) + strlen(try_app_path) + 1;
     try_app_command = (char*)malloc(len);
     sprintf(try_app_command, "%s%s", ModHand_os->local_command_start, try_app_path);
 
-    /* write files needed by this module and others */
+    /* Write files needed by this module and others. */
     S_build_charm_run();
     S_write_charm_h();
 }
@@ -57,12 +57,12 @@ ModHand_init()
 void
 ModHand_open_charmony_h(const char *charmony_start)
 {
-    /* open the filehandle */
+    /* Open the filehandle. */
     ModHand_charmony_fh = fopen("charmony.h", "w+");
     if (ModHand_charmony_fh == NULL) 
         Util_die("Can't open 'charmony.h': %s", strerror(errno));
 
-    /* print supplied text (if any) along with warning, open include guard */
+    /* Print supplied text (if any) along with warning, open include guard. */
     if (charmony_start != NULL)
         fprintf(ModHand_charmony_fh, charmony_start);
     fprintf(ModHand_charmony_fh,
@@ -77,12 +77,12 @@ ModHand_open_charmony_h(const char *charmony_start)
 void
 ModHand_clean_up(void)
 {
-    /* clean up some temp files */
+    /* Clean up some temp files. */
     remove("_charm.h");
     ModHand_os->remove_exe(ModHand_os, "_charm_run");
     ModHand_os->remove_exe(ModHand_os, "_charm_stat");
 
-    /* write the last bit of charmony.h and close */
+    /* Write the last bit of charmony.h and close. */
     fprintf(ModHand_charmony_fh, "#endif /* H_CHARMONY */\n\n");
     if (fclose(ModHand_charmony_fh))
         Util_die("Couldn't close 'charmony.h': %s", strerror(errno));
@@ -114,11 +114,11 @@ static char charm_run_code_a[] = METAQUOTE
     int main(int argc, char **argv)
     {
         char *command;
-        size_t command_len = 1; /* terminating null */
+        size_t command_len = 1; /* Terminating null. */
         int i;
         int retval;
         
-        /* rebuild the command line args, minus the name of this utility */
+        /* Rebuild the command line args, minus the name of this utility. */
         for (i = 1; i < argc; i++) {
             command_len += strlen(argv[i]) + 1;
         }
@@ -134,7 +134,7 @@ static char charm_run_code_b[] = METAQUOTE
             strcat( strcat(command, " "), argv[i] );
         }
 
-        /* redirect stdout and stderr to /dev/null or equivalent */
+        /* Redirect stdout and stderr to /dev/null or equivalent. */
         freopen( 
 METAQUOTE;
 
@@ -146,7 +146,7 @@ METAQUOTE;
 static char charm_run_code_d[] = METAQUOTE
              , "w", stderr);
 
-        /* run the commmand and return its value to the parent process */
+        /* Run the commmand and return its value to the parent process. */
         retval = system(command);
         free(command);
         return retval;
@@ -206,13 +206,13 @@ ModHand_capture_output(char *source, size_t source_len,
     char *captured_output = NULL;
     chaz_bool_t compile_succeeded;
 
-    /* clear out previous versions and test to make sure removal worked */
+    /* Clear out previous versions and test to make sure removal worked. */
     if ( !Util_remove_and_verify(try_app_path) ) 
         Util_die("Failed to delete file '%s'", try_app_path);
     if ( !Util_remove_and_verify(TARGET_PATH) )
         Util_die("Failed to delete file '%s'", TARGET_PATH);
 
-    /* attempt compilation; if successful, run app and slurp output */
+    /* Attempt compilation; if successful, run app and slurp output. */
     compile_succeeded = ModHand_compiler->compile_exe(ModHand_compiler, 
         TRY_SOURCE_PATH, TRY_APP_BASENAME, source, source_len);
     if (compile_succeeded) {
@@ -223,7 +223,7 @@ ModHand_capture_output(char *source, size_t source_len,
         *output_len = 0;
     }
 
-    /* remove all the files we just created */
+    /* Remove all the files we just created. */
     S_clean_up_try();
 
     return captured_output;

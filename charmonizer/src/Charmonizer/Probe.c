@@ -14,11 +14,11 @@ void
 Probe_init(const char *osname, const char *cc_command,
                 const char *cc_flags, const char *charmony_start)
 {
-    /* create os and compiler objects */
+    /* Create os and compiler objects. */
     ModHand_os       = OS_new(osname);
     ModHand_compiler = CC_new(ModHand_os, cc_command, cc_flags);
 
-    /* dispatch other tasks */
+    /* Dispatch other tasks. */
     ModHand_init();
     HeadCheck_init();
     ModHand_open_charmony_h(charmony_start);
@@ -33,7 +33,7 @@ Probe_clean_up()
     if (Util_verbosity)
         printf("Cleaning up...\n");
 
-    /* dispatch ModHandler's clean up routines, destroy objects */
+    /* Dispatch ModHandler's clean up routines, destroy objects. */
     ModHand_clean_up();
     ModHand_os->destroy(ModHand_os);
     ModHand_compiler->destroy(ModHand_compiler);

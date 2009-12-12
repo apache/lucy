@@ -1,4 +1,4 @@
-/* charmonize.c -- Create Charmony.
+/* Charmonize.c -- Create Charmony.
  */
 
 #include <stdio.h>
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 {
     init(argc, argv);
 
-    /* modules section */
+    /* Modules section. */
     chaz_DirManip_run();
     chaz_Headers_run();
     chaz_FuncMacro_run();
@@ -61,10 +61,10 @@ int main(int argc, char **argv)
     chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
 
-    /* write custom postamble */
+    /* Write custom postamble. */
     S_write_charmony_postamble();
 
-    /* clean up */
+    /* Clean up. */
     chaz_Probe_clean_up();
     free(cc_command);
     free(cc_flags);
@@ -80,7 +80,7 @@ init(int argc, char **argv)
     char *infile_str;
     size_t infile_len;
 
-    /* parse the infile */
+    /* Parse the infile. */
     if (argc != 2)
         die("Usage: ./charmonize INFILE");
     infile_str = chaz_Probe_slurp_file(argv[1], &infile_len);
@@ -92,14 +92,14 @@ init(int argc, char **argv)
         "charm_os_name");
     verbosity_str = S_extract_delim(infile_str, infile_len, "charm_verbosity");
 
-    /* set up Charmonizer */
+    /* Set up Charmonizer. */
     if (verbosity_str != NULL) {
         const long verbosity = strtol(verbosity_str, NULL, 10);
         chaz_Probe_set_verbosity(verbosity);
     }
     chaz_Probe_init(os_name, cc_command, cc_flags, NULL);
 
-    /* clean up */
+    /* Clean up. */
     free(infile_str);
 }
 
@@ -115,13 +115,13 @@ S_extract_delim(char *source, size_t source_len, const char *tag_name)
     char *start, *end;
     char *retval = NULL;
 
-    /* sanity check, then create delimiter strings to match against */
+    /* Sanity check, then create delimiter strings to match against. */
     if (tag_name_len > 95)
         die("tag name too long: '%s'");
     sprintf(opening_delim, "<%s>", tag_name);
     sprintf(closing_delim, "</%s>", tag_name);
     
-    /* find opening <delimiter> */
+    /* Find opening <delimiter>. */
     for (start = source; start < limit; start++) {
         if (strncmp(start, opening_delim, opening_delim_len) == 0) {
             start += opening_delim_len;
@@ -129,7 +129,7 @@ S_extract_delim(char *source, size_t source_len, const char *tag_name)
         }
     }
 
-    /* find closing </delimiter> */
+    /* Find closing </delimiter>. */
     for (end = start; end < limit; end++) {
         if (strncmp(end, closing_delim, closing_delim_len) == 0) {
             const size_t retval_len = end - start;

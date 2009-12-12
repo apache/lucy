@@ -11,7 +11,7 @@ typedef struct Header {
     chaz_bool_t  exists;
 } Header;
 
-/* hello_world.c without the hello or the world */
+/* "hello_world.c" without the hello or the world. */
 static char test_code[] = "int main() { return 0; }\n";
 
 /* Keep a sorted, dynamically-sized array of names of all headers we've
@@ -47,7 +47,7 @@ HeadCheck_init()
 {
     Header *null_header = (Header*)malloc(sizeof(Header));
 
-    /* create terminating record for the dynamic array of Header objects */
+    /* Create terminating record for the dynamic array of Header objects. */
     null_header->name   = NULL;
     null_header->exists = false;
     header_cache = (Header**)malloc(sizeof(void*));
@@ -63,13 +63,13 @@ HeadCheck_check_header(const char *header_name)
     Header  *fake = &key;
     Header **header_ptr;
 
-    /* fake up a key to feed to bsearch; see if the header's already there */
+    /* Fake up a key to feed to bsearch; see if the header's already there. */
     key.name = (char*)header_name;
     key.exists = false;
     header_ptr = (Header**)bsearch(&fake, header_cache, cache_size, 
         sizeof(void*), S_compare_headers);
     
-    /* if it's not there, go try a test compile */
+    /* If it's not there, go try a test compile. */
     if (header_ptr == NULL) {
         header = S_discover_header(header_name);
         S_add_to_cache(header);
@@ -89,7 +89,7 @@ HeadCheck_check_many_headers(const char **header_names)
     char *code_buf = strdup("");
     size_t needed = sizeof(test_code) + 20;
 
-    /* build the source code string */
+    /* Build the source code string. */
     for (i = 0; header_names[i] != NULL; i++) {
         needed += strlen(header_names[i]);
         needed += sizeof("#include <>\n");
@@ -103,7 +103,7 @@ HeadCheck_check_many_headers(const char **header_names)
     }
     strcat(code_buf, test_code);
 
-    /* if the code compiles, bulk add all header names to the cache */
+    /* If the code compiles, bulk add all header names to the cache. */
     success = ModHand_test_compile(code_buf, strlen(code_buf));
     if (success) {
         for (i = 0; header_names[i] != NULL; i++) {
@@ -140,7 +140,7 @@ S_compare_headers(const void *vptr_a, const void *vptr_b) {
     Header **const a = (Header**)vptr_a;
     Header **const b = (Header**)vptr_b;
 
-    if ((*a)->name == NULL) /* null is "greater than" any string */
+    if ((*a)->name == NULL) /* NULL is "greater than" any string. */
         return 1;
     else if ((*b)->name == NULL)
         return -1;
@@ -155,10 +155,10 @@ S_discover_header(const char *header_name)
     size_t  needed = strlen(header_name) + sizeof(test_code) + 50;
     char *include_test = (char*)malloc(needed); 
     
-    /* assign */
+    /* Assign. */
     header->name = strdup(header_name);
 
-    /* see whether code that tries to pull in this header compiles */
+    /* See whether code that tries to pull in this header compiles. */
     sprintf(include_test, "#include <%s>\n%s", header_name, test_code);
     header->exists = ModHand_test_compile(include_test, strlen(include_test));
 
@@ -169,12 +169,12 @@ S_discover_header(const char *header_name)
 static void
 S_add_to_cache(Header *header)
 {
-    /* realloc array -- inefficient, but this isn't a bottleneck */
+    /* Realloc array -- inefficient, but this isn't a bottleneck. */
     cache_size++;
     header_cache = (Header**)realloc(header_cache, (cache_size * sizeof(void*)));
     header_cache[ cache_size - 1 ] = header;
 
-    /* keep the list of headers sorted */
+    /* Keep the list of headers sorted. */
     qsort(header_cache, cache_size, sizeof(*header_cache), S_compare_headers);
 }
 
@@ -185,13 +185,13 @@ S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
     Header  key;
     Header *fake = &key;
 
-    /* fake up a key and bsearch for it */
+    /* Fake up a key and bsearch for it. */
     key.name   = (char*)header_name;
     key.exists = exists;
     header = (Header*)bsearch(&fake, header_cache, cache_size, 
         sizeof(void*), S_compare_headers);
     
-    /* we've already done the test compile, so skip that step and add it */
+    /* We've already done the test compile, so skip that step and add it. */
     if (header == NULL) {
         header = (Header*)malloc(sizeof(Header));
         header->name   = strdup(header_name);

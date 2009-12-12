@@ -24,11 +24,11 @@ TestLargeFiles_run(TestBatch *batch)
     int check_val;
     char check_char;
 
-    /* a little over 4 GB, and a little over 2 GB */
+    /* A little over 4 GB, and a little over 2 GB. */
     off64_t gb4_plus = ((off64_t)0x7FFFFFFF << 1) + 100;
     off64_t gb2_plus = (off64_t)0x7FFFFFFF + 200;
     
-    /* gb4_plus modulo 4 GB (wrap is intentional) */
+    /* Gb4_plus modulo 4 GB (wrap is intentional). */
     i32_t wrap_gb4 = (i32_t)gb4_plus;
 
     ASSERT_INT_EQ(batch, sizeof(off64_t), 8, "off64_t type has 8 bytes");
@@ -75,7 +75,7 @@ TestLargeFiles_run(TestBatch *batch)
     check_val = fclose(fh);
     ASSERT_INT_EQ(batch, check_val, 0, "fclose succeeds after all that");
 
-    /* truncate, just in case the call to remove fails */
+    /* Truncate, just in case the call to remove fails. */
     fh = fopen64("_charm_large_file_test", "w+");
     if (fh != NULL)
         fclose(fh);

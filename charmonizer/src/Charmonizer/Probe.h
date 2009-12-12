@@ -57,7 +57,7 @@ chaz_Probe_get_charmony_fh(void);
 }
 #endif
 
-#endif /* include guard */
+#endif /* Include guard. */
 
 /**
  * Copyright 2006 The Apache Software Foundation

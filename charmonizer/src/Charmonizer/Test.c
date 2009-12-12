@@ -20,7 +20,7 @@ S_TestBatch_run_test(TestBatch *batch);
 
 void
 Test_init(void) {
-    /* unbuffer stdout */
+    /* Unbuffer stdout. */
     int check_val = setvbuf(stdout, NULL, _IONBF, 0);
     if (check_val != 0)
         fprintf(stderr, "Failed when trying to unbuffer stdout\n");
@@ -32,12 +32,12 @@ Test_new_batch(const char *batch_name, unsigned num_tests,
 {
     TestBatch *batch = (TestBatch*)malloc(sizeof(TestBatch));
 
-    /* assign */
+    /* Assign. */
     batch->num_tests       = num_tests;
     batch->name            = strdup(batch_name);
     batch->test_func       = test_func;
     
-    /* initialize */
+    /* Initialize. */
     batch->test_num        = 0;
     batch->num_passed      = 0;
     batch->num_failed      = 0;
@@ -64,10 +64,10 @@ S_TestBatch_destroy(TestBatch *batch)
 static void
 S_TestBatch_run_test(TestBatch *batch) 
 {
-    /* print start */
+    /* Print start. */
     PLAN(batch);
 
-    /* run the batch */
+    /* Run the batch. */
     batch->test_func(batch);
 }
 
@@ -76,10 +76,10 @@ Test_assert_true(TestBatch *batch, int value, const char *pat, ...)
 {
     va_list args;
 
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
 
-    /* test condition and pass or fail */
+    /* Test condition and pass or fail. */
     if (value) {
         printf("ok %u - ", batch->test_num);
         batch->num_passed++;
@@ -97,10 +97,10 @@ Test_assert_false(TestBatch *batch, int value, const char *pat, ...)
 {
     va_list args;
 
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
 
-    /* test condition and pass or fail */
+    /* Test condition and pass or fail. */
     if (value == 0) {
         printf("ok %u - ", batch->test_num);
         batch->num_passed++;
@@ -119,10 +119,10 @@ Test_assert_str_eq(TestBatch *batch, const char *got,
 {
     va_list args;
     
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
     
-    /* test condition and pass or fail */
+    /* Test condition and pass or fail. */
     if (strcmp(expected, got) == 0) {
         printf("ok %u - ", batch->test_num);
         batch->num_passed++;
@@ -143,10 +143,10 @@ Test_assert_str_neq(TestBatch *batch, const char *got,
 {
     va_list args;
     
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
     
-    /* test condition and pass or fail */
+    /* Test condition and pass or fail. */
     if (strcmp(expected, got) != 0) {
         printf("ok %u - ", batch->test_num);
         batch->num_passed++;
@@ -165,10 +165,10 @@ Test_pass(TestBatch *batch, const char *pat, ...)
 {
     va_list args;
 
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
 
-    /* indicate pass, update pass counter */
+    /* Indicate pass, update pass counter. */
     printf("ok %u - ", batch->test_num);
     batch->num_passed++;
 
@@ -180,10 +180,10 @@ Test_fail(TestBatch *batch, const char *pat, ...)
 {
     va_list args;
 
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
 
-    /* indicate failure, update pass counter */
+    /* Indicate failure, update pass counter. */
     printf("not ok %u - ", batch->test_num);
     batch->num_failed++;
 
@@ -196,7 +196,7 @@ Test_assert_int_eq(TestBatch *batch, long got, long expected,
 {
     va_list args;
 
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
 
     if (expected == got) {
@@ -219,10 +219,10 @@ Test_assert_float_eq(TestBatch *batch, double got,
     va_list args;
     double diff = expected/got;
 
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
     
-    /* evaluate condition and pass or fail */
+    /* Evaluate condition and pass or fail. */
     if (diff > 0.00001) {
         printf("ok %u - ", batch->test_num);
         batch->num_passed++;
@@ -241,10 +241,10 @@ Test_skip(TestBatch *batch, const char *pat, ...)
 {
     va_list args;
 
-    /* increment test number */
+    /* Increment test number. */
     batch->test_num++;
 
-    /* indicate that test is being skipped, update pass counter */
+    /* Indicate that test is being skipped, update pass counter. */
     printf("ok %u # SKIP ", batch->test_num);
     batch->num_skipped++;
 
@@ -257,7 +257,7 @@ Test_report_skip_remaining(TestBatch *batch, const char *pat, ...)
     va_list args;
     unsigned remaining = batch->num_tests - batch->test_num;
     
-    /* indicate that tests are being skipped, update skip counter */
+    /* Indicate that tests are being skipped, update skip counter. */
     printf("# Skipping all %u remaining tests: ", remaining);
     PRINT_SUPPLIED_MESS(pat, args);
     while (batch->test_num < batch->num_tests) {

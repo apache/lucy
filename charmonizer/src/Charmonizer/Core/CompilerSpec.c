@@ -4,7 +4,7 @@
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/CompilerSpec.h"
 
-/* detect a supported compiler */
+/* Detect a supported compiler. */
 #ifdef __GNUC__
     static CompilerSpec spec = { "gcc", "-I ", "-o ", "-o " };
 #elif defined(_MSC_VER)

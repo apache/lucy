@@ -11,7 +11,7 @@ AllTests_init()
 {
     Test_init();
 
-    /* create a null-terminated array of test batches to iterate over */
+    /* Create a null-terminated array of test batches to iterate over. */
     batches = (TestBatch**)malloc(8 * sizeof(TestBatch*));
     batches[0] = TestDirManip_prepare();
     batches[1] = TestFuncMacro_prepare();
@@ -32,13 +32,13 @@ AllTests_run()
     int total_skipped = 0;
     int i;
     
-    /* sanity check */
+    /* Sanity check. */
     if (batches == NULL) {
         fprintf(stderr, "Must call AllTests_init() first.");
         exit(1);
     }
 
-    /* loop through test functions, accumulating results */
+    /* Loop through test functions, accumulating results. */
     for (i = 0; batches[i] != NULL; i++) {
         TestBatch *batch = batches[i];
         batch->run_test(batch);
@@ -49,7 +49,7 @@ AllTests_run()
         batch->destroy(batch);
     }
     
-    /* print totals */
+    /* Print totals. */
     printf("=============================\n");
     printf("TOTAL TESTS:   %d\nTOTAL PASSED:  %d\nTOTAL FAILED:  %d\n"
         "TOTAL SKIPPED: %d\n", 

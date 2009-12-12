@@ -89,7 +89,7 @@ TestIntegers_run(TestBatch *batch)
         ASSERT_TRUE(batch, (sizeof(i32_t) == 4), "i32_t is 4 bytes");
         ASSERT_TRUE(batch, (sizeof(u32_t) == 4), "u32_t is 4 bytes");
         ASSERT_TRUE(batch, (I32_MAX == I32_C(2147483647)), "I32_MAX");
-        /* the (-2147483647 - 1) avoids a compiler warning */
+        /* The (-2147483647 - 1) avoids a compiler warning. */
         ASSERT_TRUE(batch, (I32_MIN == I32_C(-2147483647 - 1)), "I32_MIN");
         ASSERT_TRUE(batch, (U32_MAX == U32_C(4294967295)), "U32_MAX");
     }
