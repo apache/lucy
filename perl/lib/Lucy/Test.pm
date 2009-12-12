@@ -114,25 +114,25 @@ PPCODE:
     chaz_Test_init();
 
     if (strcmp(which, "dirmanip") == 0) {
-        batch = chaz_TDirManip_prepare();
+        batch = chaz_TestDirManip_prepare();
     }
     else if (strcmp(which, "integers") == 0) {
-        batch = chaz_TIntegers_prepare();
+        batch = chaz_TestIntegers_prepare();
     }
     else if (strcmp(which, "func_macro") == 0) {
-        batch = chaz_TFuncMacro_prepare();
+        batch = chaz_TestFuncMacro_prepare();
     }
     else if (strcmp(which, "headers") == 0) {
-        batch = chaz_THeaders_prepare();
+        batch = chaz_TestHeaders_prepare();
     }
     else if (strcmp(which, "large_files") == 0) {
-        batch = chaz_TLargeFiles_prepare();
+        batch = chaz_TestLargeFiles_prepare();
     }
     else if (strcmp(which, "unused_vars") == 0) {
-        batch = chaz_TUnusedVars_prepare();
+        batch = chaz_TestUnusedVars_prepare();
     }
     else if (strcmp(which, "variadic_macros") == 0) {
-        batch = chaz_TVariadicMacros_prepare();
+        batch = chaz_TestVariadicMacros_prepare();
     }
     else {
         THROW(LUCY_ERR, "Unknown test identifier: '%s'", which);

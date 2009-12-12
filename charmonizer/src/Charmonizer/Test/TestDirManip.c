@@ -22,13 +22,13 @@
 #endif
 
 TestBatch*
-TDirManip_prepare()
+TestDirManip_prepare()
 {
-    return Test_new_batch("Integers", 6, TDirManip_run);
+    return Test_new_batch("Integers", 6, TestDirManip_run);
 }
 
 void
-TDirManip_run(TestBatch *batch)
+TestDirManip_run(TestBatch *batch)
 {
     ASSERT_INT_EQ(batch, 0, makedir("_chaz_test_dir", 0777), "makedir");
     ASSERT_INT_EQ(batch, 0, makedir("_chaz_test_dir" DIR_SEP "deep", 0777),

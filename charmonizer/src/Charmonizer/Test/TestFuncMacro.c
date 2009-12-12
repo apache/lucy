@@ -6,9 +6,9 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-TFuncMacro_prepare()
+TestFuncMacro_prepare()
 {
-    return Test_new_batch("FuncMacro", 4, TFuncMacro_run);
+    return Test_new_batch("FuncMacro", 4, TestFuncMacro_run);
 }
 
 #ifdef INLINE
@@ -19,25 +19,25 @@ static INLINE char* S_inline_function()
 #endif
 
 void
-TFuncMacro_run(TestBatch *batch)
+TestFuncMacro_run(TestBatch *batch)
 {
 
 #ifdef HAS_FUNC_MACRO
-    ASSERT_STR_EQ(batch, FUNC_MACRO, "chaz_TFuncMacro_run", 
+    ASSERT_STR_EQ(batch, FUNC_MACRO, "chaz_TestFuncMacro_run", 
         "FUNC_MACRO");
 #else
     SKIP(batch, "no FUNC_MACRO");
 #endif
 
 #ifdef HAS_ISO_FUNC_MACRO
-    ASSERT_STR_EQ(batch, __func__, "chaz_TFuncMacro_run",
+    ASSERT_STR_EQ(batch, __func__, "chaz_TestFuncMacro_run",
         "HAS_ISO_FUNC_MACRO");
 #else
     SKIP(batch, "no ISO_FUNC_MACRO");
 #endif
 
 #ifdef HAS_GNUC_FUNC_MACRO
-    ASSERT_STR_EQ(batch, __FUNCTION__, "chaz_TFuncMacro_run", 
+    ASSERT_STR_EQ(batch, __FUNCTION__, "chaz_TestFuncMacro_run", 
         "HAS_GNUC_FUNC_MACRO");
 #else
     SKIP(batch, "no GNUC_FUNC_MACRO");

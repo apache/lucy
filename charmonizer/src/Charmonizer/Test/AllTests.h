@@ -34,62 +34,62 @@ chaz_AllTests_run();
  */
 
 chaz_TestBatch* 
-chaz_TDirManip_prepare();
+chaz_TestDirManip_prepare();
 
 chaz_TestBatch* 
-chaz_TFuncMacro_prepare();
+chaz_TestFuncMacro_prepare();
 
 chaz_TestBatch* 
-chaz_THeaders_prepare();
+chaz_TestHeaders_prepare();
 
 chaz_TestBatch* 
-chaz_TIntegers_prepare();
+chaz_TestIntegers_prepare();
 
 chaz_TestBatch* 
-chaz_TLargeFiles_prepare();
+chaz_TestLargeFiles_prepare();
 
 chaz_TestBatch* 
-chaz_TUnusedVars_prepare();
+chaz_TestUnusedVars_prepare();
 
 chaz_TestBatch* 
-chaz_TVariadicMacros_prepare();
+chaz_TestVariadicMacros_prepare();
 
 void
-chaz_TDirManip_run(chaz_TestBatch *batch);
+chaz_TestDirManip_run(chaz_TestBatch *batch);
 
 void
-chaz_TFuncMacro_run(chaz_TestBatch *batch);
+chaz_TestFuncMacro_run(chaz_TestBatch *batch);
 
 void
-chaz_THeaders_run(chaz_TestBatch *batch);
+chaz_TestHeaders_run(chaz_TestBatch *batch);
 
 void
-chaz_TIntegers_run(chaz_TestBatch *batch);
+chaz_TestIntegers_run(chaz_TestBatch *batch);
 
 void
-chaz_TLargeFiles_run(chaz_TestBatch *batch);
+chaz_TestLargeFiles_run(chaz_TestBatch *batch);
 
 void
-chaz_TUnusedVars_run(chaz_TestBatch *batch);
+chaz_TestUnusedVars_run(chaz_TestBatch *batch);
 
 void
-chaz_TVariadicMacros_run(chaz_TestBatch *batch);
+chaz_TestVariadicMacros_run(chaz_TestBatch *batch);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-  #define TDirManip_prepare            chaz_TDirManip_prepare
-  #define TDirManip_run                chaz_TDirManip_run
-  #define TFuncMacro_prepare           chaz_TFuncMacro_prepare
-  #define THeaders_prepare             chaz_THeaders_prepare
-  #define TIntegers_prepare            chaz_TIntegers_prepare
-  #define TLargeFiles_prepare          chaz_TLargeFiles_prepare
-  #define TUnusedVars_prepare          chaz_TUnusedVars_prepare
-  #define TVariadicMacros_prepare      chaz_TVariadicMacros_prepare
-  #define TFuncMacro_run               chaz_TFuncMacro_run
-  #define THeaders_run                 chaz_THeaders_run
-  #define TIntegers_run                chaz_TIntegers_run
-  #define TLargeFiles_run              chaz_TLargeFiles_run
-  #define TUnusedVars_run              chaz_TUnusedVars_run
-  #define TVariadicMacros_run          chaz_TVariadicMacros_run
+  #define TestDirManip_prepare            chaz_TestDirManip_prepare
+  #define TestDirManip_run                chaz_TestDirManip_run
+  #define TestFuncMacro_prepare           chaz_TestFuncMacro_prepare
+  #define TestHeaders_prepare             chaz_TestHeaders_prepare
+  #define TestIntegers_prepare            chaz_TestIntegers_prepare
+  #define TestLargeFiles_prepare          chaz_TestLargeFiles_prepare
+  #define TestUnusedVars_prepare          chaz_TestUnusedVars_prepare
+  #define TestVariadicMacros_prepare      chaz_TestVariadicMacros_prepare
+  #define TestFuncMacro_run               chaz_TestFuncMacro_run
+  #define TestHeaders_run                 chaz_TestHeaders_run
+  #define TestIntegers_run                chaz_TestIntegers_run
+  #define TestLargeFiles_run              chaz_TestLargeFiles_run
+  #define TestUnusedVars_run              chaz_TestUnusedVars_run
+  #define TestVariadicMacros_run          chaz_TestVariadicMacros_run
 #endif
 
 #ifdef __cplusplus

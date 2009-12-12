@@ -7,13 +7,13 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-TVariadicMacros_prepare()
+TestVariadicMacros_prepare()
 {
-    return Test_new_batch("VariadicMacros", 4, TVariadicMacros_run);
+    return Test_new_batch("VariadicMacros", 4, TestVariadicMacros_run);
 }
 
 void
-TVariadicMacros_run(TestBatch *batch)
+TestVariadicMacros_run(TestBatch *batch)
 {
     char buf[10];
     chaz_bool_t really_has_var_macs = false;

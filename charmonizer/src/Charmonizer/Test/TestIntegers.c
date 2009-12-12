@@ -10,13 +10,13 @@
 #endif
 
 TestBatch*
-TIntegers_prepare()
+TestIntegers_prepare()
 {
-    return Test_new_batch("Integers", 37, TIntegers_run);
+    return Test_new_batch("Integers", 37, TestIntegers_run);
 }
 
 void
-TIntegers_run(TestBatch *batch)
+TestIntegers_run(TestBatch *batch)
 {
     {
         long one= 1;

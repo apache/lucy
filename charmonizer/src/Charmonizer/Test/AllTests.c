@@ -13,13 +13,13 @@ AllTests_init()
 
     /* create a null-terminated array of test batches to iterate over */
     batches = (TestBatch**)malloc(8 * sizeof(TestBatch*));
-    batches[0] = TDirManip_prepare();
-    batches[1] = TFuncMacro_prepare();
-    batches[2] = THeaders_prepare();
-    batches[3] = TIntegers_prepare();
-    batches[4] = TLargeFiles_prepare();
-    batches[5] = TUnusedVars_prepare();
-    batches[6] = TVariadicMacros_prepare();
+    batches[0] = TestDirManip_prepare();
+    batches[1] = TestFuncMacro_prepare();
+    batches[2] = TestHeaders_prepare();
+    batches[3] = TestIntegers_prepare();
+    batches[4] = TestLargeFiles_prepare();
+    batches[5] = TestUnusedVars_prepare();
+    batches[6] = TestVariadicMacros_prepare();
     batches[7] = NULL;
 }
 
