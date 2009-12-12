@@ -17,8 +17,9 @@
 CompilerSpec*
 CCSpec_find_spec()
 {
-    if (Util_verbosity)
+    if (Util_verbosity) {
         printf("Trying to find a supported compiler...\n");
+    }
 
     return &spec;
 }

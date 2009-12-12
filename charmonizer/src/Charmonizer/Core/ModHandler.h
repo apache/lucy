@@ -96,8 +96,9 @@ chaz_ModHand_shorten_function(const char *symbol);
 #define CHAZ_MODHAND_START_RUN(module_name) \
     do { \
         chaz_ModHand_append_conf("\n/* %s */\n", module_name); \
-        if (chaz_Util_verbosity > 0) \
+        if (chaz_Util_verbosity > 0) { \
             printf("Running %s module...\n", module_name); \
+        } \
     } while (0)
 
 /* Leave a little whitespace at the end of each module.

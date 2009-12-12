@@ -28,12 +28,10 @@ Stat_stat(const char *filepath, Stat *target)
     target->valid = false;
 
     /* Lazy init. */
-    if (!initialized)
-        S_init();
+    if (!initialized) { S_init(); }
 
     /* Bail out if we didn't succeed in compiling/using _charm_stat. */
-    if (!stat_available)
-        return;
+    if (!stat_available) { return; }
 
     /* Run _charm_stat. */
     Util_remove_and_verify("_charm_statout");
@@ -60,10 +58,8 @@ static char charm_stat_code[] = METAQUOTE
     int main(int argc, char **argv) {
         FILE *out_fh = fopen("_charm_statout", "w+");
         struct stat st;
-        if (argc != 2)
-            return 1;
-        if (stat(argv[1], &st) == -1)
-            return 2;
+        if (argc != 2) { return 1; }
+        if (stat(argv[1], &st) == -1) { return 2; }
         fprintf(out_fh, "%ld %ld\n", (long)st.st_size, (long)st.st_blocks);
         return 0;
     }
@@ -74,12 +70,13 @@ S_init()
 {
     /* Only try this once. */
     initialized = true;
-    if (Util_verbosity)
+    if (Util_verbosity) {
         printf("Attempting to compile _charm_stat utility...\n");
+    }
 
     /* Bail if sys/stat.h isn't available. */
-    if (!HeadCheck_check_header("sys/stat.h"))
-        return;
+    if (!HeadCheck_check_header("sys/stat.h")) { return; }
+
 
     /* If the compile succeeds, open up for business. */
     stat_available = ModHand_compiler->compile_exe(ModHand_compiler, 

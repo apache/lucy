@@ -22,8 +22,9 @@ void
 Test_init(void) {
     /* Unbuffer stdout. */
     int check_val = setvbuf(stdout, NULL, _IONBF, 0);
-    if (check_val != 0)
+    if (check_val != 0) {
         fprintf(stderr, "Failed when trying to unbuffer stdout\n");
+    }
 }
 
 TestBatch* 

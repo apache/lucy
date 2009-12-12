@@ -27,8 +27,9 @@ OS_new(const char *name)
 {
     OperSys *self = (OperSys*)malloc(sizeof(OperSys));
 
-    if (Util_verbosity)
+    if (Util_verbosity) {
         printf("Creating os object...\n");
+    }
 
     /* Assign. */
     self->name = strdup(name);
@@ -68,8 +69,10 @@ S_probe_devnull(OperSys *self)
     };
     int i;
 
-    if (Util_verbosity)
+    if (Util_verbosity) {
         printf("Trying to find a bit-bucket a la /dev/null...\n");
+    }
+
 
     /* Iterate through names of possible devnulls trying to open them. */
     for (i = 0; devnull_options[i] != NULL; i++) {

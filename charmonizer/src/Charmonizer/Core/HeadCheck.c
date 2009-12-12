@@ -140,12 +140,10 @@ S_compare_headers(const void *vptr_a, const void *vptr_b) {
     Header **const a = (Header**)vptr_a;
     Header **const b = (Header**)vptr_b;
 
-    if ((*a)->name == NULL) /* NULL is "greater than" any string. */
-        return 1;
-    else if ((*b)->name == NULL)
-        return -1;
-    else
-        return strcmp((*a)->name, (*b)->name);
+    /* (NULL is "greater than" any string.) */
+    if      ((*a)->name == NULL) { return 1; }
+    else if ((*b)->name == NULL) { return -1; }
+    else                         { return strcmp((*a)->name, (*b)->name); }
 }
 
 static Header* 

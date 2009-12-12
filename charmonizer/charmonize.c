@@ -81,8 +81,7 @@ init(int argc, char **argv)
     size_t infile_len;
 
     /* Parse the infile. */
-    if (argc != 2)
-        die("Usage: ./charmonize INFILE");
+    if (argc != 2) { die("Usage: ./charmonize INFILE"); }
     infile_str = chaz_Probe_slurp_file(argv[1], &infile_len);
     cc_command = S_extract_delim_and_verify(infile_str, infile_len, 
         "charm_cc_command");
@@ -116,8 +115,7 @@ S_extract_delim(char *source, size_t source_len, const char *tag_name)
     char *retval = NULL;
 
     /* Sanity check, then create delimiter strings to match against. */
-    if (tag_name_len > 95)
-        die("tag name too long: '%s'");
+    if (tag_name_len > 95) { die("tag name too long: '%s'"); }
     sprintf(opening_delim, "<%s>", tag_name);
     sprintf(closing_delim, "</%s>", tag_name);
     
@@ -148,8 +146,7 @@ S_extract_delim_and_verify(char *source, size_t source_len,
                            const char *tag_name)
 {
     char *retval = S_extract_delim(source, source_len, tag_name);
-    if (retval == NULL)
-        die("Couldn't extract value for '%s'", tag_name);
+    if (retval == NULL) { die("Couldn't extract value for '%s'", tag_name); }
     return retval;
 }
 

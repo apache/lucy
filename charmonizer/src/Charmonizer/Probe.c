@@ -23,23 +23,20 @@ Probe_init(const char *osname, const char *cc_command,
     HeadCheck_init();
     ModHand_open_charmony_h(charmony_start);
 
-    if (Util_verbosity)
-        printf("Initialization complete.\n");
+    if (Util_verbosity) { printf("Initialization complete.\n"); }
 }
 
 void
 Probe_clean_up()
 {
-    if (Util_verbosity)
-        printf("Cleaning up...\n");
+    if (Util_verbosity) { printf("Cleaning up...\n"); }
 
     /* Dispatch ModHandler's clean up routines, destroy objects. */
     ModHand_clean_up();
     ModHand_os->destroy(ModHand_os);
     ModHand_compiler->destroy(ModHand_compiler);
 
-    if (Util_verbosity)
-        printf("Cleanup complete.\n");
+    if (Util_verbosity) { printf("Cleanup complete.\n"); }
 }
 
 void

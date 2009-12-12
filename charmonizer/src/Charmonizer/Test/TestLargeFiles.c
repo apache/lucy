@@ -44,8 +44,9 @@ TestLargeFiles_run(TestBatch *batch)
 #endif
 
     fh = fopen64("_charm_large_file_test", "w+");
-    if (fh == NULL)
+    if (fh == NULL) {
         SKIP_REMAINING(batch, "Failed to open file");
+    }
 
     check_val = fseeko64(fh, gb4_plus, SEEK_SET);
     ASSERT_INT_EQ(batch, check_val, 0, "fseeko64 above 4 GB");
@@ -77,8 +78,9 @@ TestLargeFiles_run(TestBatch *batch)
 
     /* Truncate, just in case the call to remove fails. */
     fh = fopen64("_charm_large_file_test", "w+");
-    if (fh != NULL)
-        fclose(fh);
+    if (fh != NULL) { 
+        fclose(fh); 
+    }
     remove("_charm_large_file_test");
 }
 

@@ -31,8 +31,7 @@ CC_new(OperSys *oper_sys, const char *cc_command, const char *cc_flags)
     CompilerSpec *compiler_spec = CCSpec_find_spec();
     Compiler *self = (Compiler*)malloc(sizeof(Compiler));
 
-    if (Util_verbosity)
-        printf("Creating compiler object...\n");
+    if (Util_verbosity) { printf("Creating compiler object...\n"); }
 
     /* Assign. */
     self->os              = oper_sys;
@@ -206,14 +205,14 @@ S_do_test_compile(Compiler *self)
     char *code = "int main() { return 0; }\n";
     chaz_bool_t success;
     
-    if (Util_verbosity) 
+    if (Util_verbosity) {
         printf("Trying to compile a small test file...\n");
+    }
 
     /* Attempt compilation. */
     success = self->compile_exe(self, "_charm_try.c", 
         "_charm_try", code, strlen(code));
-    if (!success)
-        Util_die("Failed to compile a small test file");
+    if (!success) { Util_die("Failed to compile a small test file"); }
     
     /* Clean up. */
     remove("_charm_try.c");
