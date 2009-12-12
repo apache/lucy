@@ -71,18 +71,26 @@ Clownfish::Type::Integer - A primitive Type representing an integer.
 =head1 DESCRIPTION
 
 Clownfish::Type::Integer holds integer types of various widths and various
-styles.  A few standard C integer types are supported:
+styles.  Support is limited to a subset of the standard C integer types:
 
+    int8_t
+    int16_t
+    int32_t
+    int64_t
+    uint8_t
+    uint16_t
+    uint32_t
+    uint64_t
     char
     short
     int
     long
     size_t
 
-Many others are not: the types from "inttypes.h", "signed" or "unsigned"
-anything, "long long", "ptrdiff_t", "off_t", etc.  
+Many others are not supported: "signed" or "unsigned" anything, "long long",
+"ptrdiff_t", "off_t", etc.  
 
-Instead, the following Charmonizer typedefs are supported:
+The following Charmonizer typedefs are supported but deprecated:
 
     bool_t
     i8_t
