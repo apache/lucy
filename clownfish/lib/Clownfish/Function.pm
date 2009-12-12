@@ -65,7 +65,7 @@ Clownfish::Function - Metadata describing a function.
 
     my $type = Clownfish::Function->new(
         class_name  => 'MyProject::FooFactory',    # required
-        class_cnick => 'FooFact',                  # required
+        class_cnick => 'FooFact',                  # default: special 
         return_type => $void_type                  # required
         param_list  => $param_list,                # required
         micro_sym   => 'count',                    # required
