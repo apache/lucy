@@ -180,16 +180,16 @@ VTable.
 =head2 new
 
     my $type = Clownfish::Method->new(
-        parcel      => 'MyProject'                 # default: special
-        class_name  => 'MyProject::FooFactory',    # required
-        class_cnick => 'FooFact ',                 # default: special
-        macro_sym   => 'Count',                    # required
-        return_type => $void_type                  # required
-        param_list  => $param_list,                # required
-        exposure    => undef,                      # default: 'parcel'
-        docucomment => $docucomment,               # default: undef
-        abstract    => undef,                      # default: undef
-        final       => 1,                          # default: undef 
+        parcel      => 'Crustacean',                       # default: special
+        class_name  => 'Crustacean::Lobster::LobsterClaw', # required
+        class_cnick => 'LobClaw',                          # default: special
+        macro_sym   => 'Pinch',                            # required
+        return_type => $void_type,                         # required
+        param_list  => $param_list,                        # required
+        exposure    => undef,                              # default: 'parcel'
+        docucomment => $docucomment,                       # default: undef
+        abstract    => undef,                              # default: undef
+        final       => 1,                                  # default: undef
     );
 
 =over
@@ -225,38 +225,38 @@ Return the L<Clownfish::Type> for C<self>.
 
 =head2 short_method_sym
 
-    # e.g. "FooFactJr_Do_Stuff"
-    my $short_sym = $method->short_method_sym("FooFactJr");
+    # e.g. "LobClaw_Pinch"
+    my $short_sym = $method->short_method_sym("LobClaw");
 
 Returns the symbol used to invoke the method (minus the parcel Prefix).
 
 =head2 full_method_sym
 
-    # e.g. "MyProj_FooFactJr_Do_Stuff"
-    my $full_sym = $method->full_method_sym("FooFactJr");
+    # e.g. "Crust_LobClaw_Pinch"
+    my $full_sym = $method->full_method_sym("LobClaw");
 
 Returns the fully-qualified symbol used to invoke the method.
 
 =head2 full_offset_sym
 
-    # e.g. "MyProj_FooFactJr_Do_Stuff_OFFSET"
-    my $offset_sym = $method->full_offset_sym("FooFactJr");
+    # e.g. "Crust_LobClaw_Pinch_OFFSET"
+    my $offset_sym = $method->full_offset_sym("LobClaw");
 
 Returns the fully qualified name of the variable which stores the method's
 vtable offset.
 
 =head2 full_callback_sym
 
-    # e.g. "myproj_FooFactJr_do_stuff_CALLBACK"
-    my $callback_sym = $method->full_calback_sym("FooFactJr");
+    # e.g. "crust_LobClaw_pinch_CALLBACK"
+    my $callback_sym = $method->full_calback_sym("LobClaw");
 
 Returns the fully qualified name of the variable which stores the method's
 Callback object.
 
 =head2 full_override_sym
 
-    # e.g. "myproj_FooFactJr_do_stuff_OVERRIDE"
-    my $override_func_sym = $method->full_override_sym("FooFactJr");
+    # e.g. "crust_LobClaw_pinch_OVERRIDE"
+    my $override_func_sym = $method->full_override_sym("LobClaw");
 
 Returns the fully qualified name of the function which implements the callback
 to the host in the event that a host method has been defined which overrides
@@ -264,7 +264,7 @@ this method.
 
 =head2 short_typedef
 
-    # e.g. "FooFactJr_do_stuff_t"
+    # e.g. "Claw_pinch_t"
     my $short_typedef = $method->short_typedef;
 
 Returns the typedef symbol for this method, which is derived from the class
@@ -272,7 +272,7 @@ nick of the first class in which the method was declared.
 
 =head2 full_typedef
 
-    # e.g. "myproj_FooFactJr_do_stuff_t"
+    # e.g. "crust_Claw_pinch_t"
     my $full_typedef = $method->full_typedef;
 
 Returns the fully-qualified typedef symbol including parcel prefix.

@@ -8,13 +8,13 @@ use Clownfish::Parser;
 use Clownfish::Parcel;
 
 my $parser = Clownfish::Parser->new;
-$parser->parcel_definition('parcel Boil;')
+$parser->parcel_definition('parcel Neato;')
     or die "failed to process parcel_definition";
 
 my %args = (
-    parcel      => 'Boil',
+    parcel      => 'Neato',
     return_type => $parser->type('Obj*'),
-    class_name  => 'Boil::Foo',
+    class_name  => 'Neato::Foo',
     class_cnick => 'Foo',
     param_list  => $parser->param_list('(i32_t some_num)'),
     micro_sym   => 'return_an_obj',
@@ -29,7 +29,7 @@ like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 eval { Clownfish::Function->new( %args, micro_sym => 'Uh_Oh' ); };
 like( $@, qr/Uh_Oh/, "invalid micro_sym kills constructor" );
 
-my %sub_args = ( class => 'Boil::Obj', cnick => 'Obj' );
+my %sub_args = ( class => 'Neato::Obj', cnick => 'Obj' );
 
 isa_ok(
     $parser->subroutine_declaration_statement( $_, 0, %sub_args, inert => 1 )

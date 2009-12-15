@@ -113,9 +113,9 @@ An abstraction representing a file which contains Clownfish code.
 =head2 new
 
     my $file_obj = Clownfish::File->new(
-        blocks       => \@blocks,            # required
-        source_class => 'Dog::Dalmation',    # required
-        parcel       => 'Dog',               # default: special
+        blocks       => \@blocks,                 # required
+        source_class => 'Crustacean::Lobster',    # required
+        parcel       => 'Crustacean',             # default: special
     );
 
 =over
@@ -165,7 +165,7 @@ source_class with the specified extension.
 
 =head2 guard_name
 
-    # e.g. "H_DOG_DALMATION"
+    # e.g. "H_CRUSTACEAN_LOBSTER"
     my $guard_name = $file->guard_name
 
 Return a string used for an include guard in a C header, unique per file.

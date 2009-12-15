@@ -76,7 +76,7 @@ and have it parse as an "arbitrary" type.
 
     my $type = Clownfish::Type->new(
         specifier => 'floatint_t',    # required
-        parcel    => 'Boil',          # default: undef
+        parcel    => 'Crustacean',    # default: undef
     );
 
 =over
@@ -90,8 +90,8 @@ and have it parse as an "arbitrary" type.
 If C<parcel> is supplied and C<specifier> begins with a capital letter, the
 Parcel's prefix will be prepended to the specifier:
 
-    "foo_t"     -> "foo_t"           # no prefix prepending
-    "Obj_foo_t" -> "boil_Obj_foo_t"  # prefix prepended
+    foo_t         -> foo_t                # no prefix prepending
+    Lobster_foo_t -> crust_Lobster_foo_t  # prefix prepended
 
 =head1 COPYRIGHT AND LICENSE
 

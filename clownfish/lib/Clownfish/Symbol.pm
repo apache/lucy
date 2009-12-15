@@ -132,11 +132,11 @@ variables.
 =head1 CONSTRUCTOR
 
     my $symbol = MySymbol->new(
-        parcel      => $parcel,                             # default: special 
-        exposure    => $exposure,                           # required
-        class_name  => "Crustacean::Lobster::LobsterClaw",  # default: undef
-        class_cnick => "LobClaw",                           # default: special
-        micro_sym   => "rubber_band"                        # required
+        parcel      => 'Crustacean',             # default: special
+        exposure    => 'parcel',                 # required
+        class_name  => 'Crustacean::Lobster',    # default: undef
+        class_cnick => undef,                    # default: special
+        micro_sym   => 'average_lifespan',       # required
     );
 
 =over
@@ -185,14 +185,14 @@ Returns true if the symbols are "equal", false otherwise.
 
 =head2 short_sym
 
-    # e.g. "LobClaw_rubber_band"
+    # e.g. "Lobster_average_lifespan"
     print $symbol->short_sym;
 
 Returns the C representation for the symbol minus the parcel's prefix.
 
 =head2 full_sym
 
-    # e.g. "crust_LobClaw_rubber_band"
+    # e.g. "crust_Lobster_average_lifespan"
     print $symbol->full_sym;
 
 Returns the fully qualified C representation for the symbol.

@@ -14,7 +14,7 @@ isa_ok( $parser->parcel_definition("parcel Crustacean cnick Crust;"),
     "Clownfish::Parcel", "parcel_definition with cnick" );
 
 # Set and leave parcel.
-my $parcel = $parser->parcel_definition('parcel Boil;')
+my $parcel = $parser->parcel_definition('parcel Crustacean cnick Crust;')
     or die "failed to process parcel_definition";
 is( $Clownfish::Parser::parcel, $parcel,
     "parcel_definition sets internal \$parcel var" );
@@ -120,7 +120,7 @@ is_deeply(
     "initial values"
 );
 
-my %sub_args = ( class => 'Boil::Obj', cnick => 'Obj' );
+my %sub_args = ( class => 'Stuff::Obj', cnick => 'Obj' );
 
 ok( $parser->declaration_statement( $_, 0, %sub_args, inert => 1 ),
     "declaration_statment: $_" )

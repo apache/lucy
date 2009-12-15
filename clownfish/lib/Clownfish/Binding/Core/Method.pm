@@ -321,7 +321,7 @@ which implements the specification.
 
     my $c_code = Clownfish::Binding::Core::Method->method_def(
         method => $method,
-        cnick  => 'FooJr',
+        cnick  => 'LobClaw',
     );
 
 Return C code for the static inline vtable method invocation function.  
@@ -330,9 +330,9 @@ Return C code for the static inline vtable method invocation function.
 
 =item * B<method> - A L<Clownfish::Method>.
 
-=item * B<cnick> - The cnick for the class which will be invoking the
-method - i.e. FooJr needs its own method invocation function even if the
-method was defined in Foo.
+=item * B<cnick> - The cnick for the class which will be invoking the method -
+i.e. LobsterClaw needs its own method invocation function even if the method
+was defined in Claw.
 
 =back
 

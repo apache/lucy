@@ -343,8 +343,8 @@ unique parcel/class_name combination.
 =head2 fetch_singleton 
 
     my $class = Clownfish::Class->fetch_singleton(
-        parcel     => 'Boil',
-        class_name => 'Foo::Bar',
+        parcel     => 'Crustacean',
+        class_name => 'Crustacean::Lobster::LobsterClaw',
     );
 
 Retrieve a Class, if one has already been created.
@@ -352,19 +352,19 @@ Retrieve a Class, if one has already been created.
 =head2 create
 
     my $class = Clownfish::Class->create(
-        parcel            => 'Boil',        # default: special
-        class_name        => 'Foo::FooJr',  # required
-        cnick             => 'FooJr',       # default: derived from class_name
-        exposure          => 'public',      # default: 'parcel'
-        source_class      => 'Foo',         # default: same as class_name
-        parent_class_name => 'Obj',         # default: undef
-        inert             => undef,         # default: undef
-        methods           => \@methods,     # default: []
-        functions         => \@funcs,       # default: []
-        member_vars       => \@members,     # default: []
-        inert_vars        => \@inert_vars,  # default: []
-        docucomment       => $documcom,     # default: undef,
-        attributes        => \%attributes,  # default: {}
+        parcel     => 'Crustacean',                        # default: special
+        class_name => 'Crustacean::Lobster::LobsterClaw',  # required
+        cnick      => 'LobClaw',                           # default: special
+        exposure   => 'public',                            # default: 'parcel'
+        source_class      => undef,              # default: same as class_name
+        parent_class_name => 'Crustacean::Claw', # default: undef
+        inert             => undef,              # default: undef
+        methods           => \@methods,          # default: []
+        functions         => \@funcs,            # default: []
+        member_vars       => \@members,          # default: []
+        inert_vars        => \@inert_vars,       # default: []
+        docucomment       => $documcom,          # default: undef,
+        attributes        => \%attributes,       # default: {}
     );
 
 Create and register a quasi-singleton.  May only be called once for each
@@ -435,13 +435,13 @@ Return the inert Function object for the supplied C<micro_sym>, if any.
 
 =head2 method
 
-    my $do_stuff_method = $class->method("Do_Stuff");
+    my $pinch_method = $class->method("Pinch");
 
 Return the Method object for the supplied C<micro_sym> / C<macro_sym>, if any.
 
 =head2 novel_method
 
-    my $do_stuff_method = $class->novel_method("Do_Stuff");
+    my $pinch_method = $class->novel_method("Pinch");
 
 Return a Method object if the Method corresponding to the supplied string is
 novel.

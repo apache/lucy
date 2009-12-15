@@ -8,7 +8,7 @@ use Clownfish::Parser;
 BEGIN { use_ok('Clownfish::Variable') }
 
 my $parser = Clownfish::Parser->new;
-$parser->parcel_definition('parcel Boil;')
+$parser->parcel_definition('parcel Neato;')
     or die "failed to process parcel_definition";
 
 sub new_type { $parser->type(shift) }
@@ -43,13 +43,13 @@ is( $var->local_c, 'float foo[1]',
     "to_c appends array to var name rather than type specifier" );
 
 $var = Clownfish::Variable->new(
-    parcel      => 'Boil',
+    parcel      => 'Neato',
     micro_sym   => 'foo',
     type        => new_type("Foo*"),
     class_name  => 'Crustacean::Lobster::LobsterClaw',
     class_cnick => 'LobClaw',
 );
-is( $var->global_c, 'boil_Foo* boil_LobClaw_foo', "global_c" );
+is( $var->global_c, 'neato_Foo* neato_LobClaw_foo', "global_c" );
 
 isa_ok( $parser->var_declaration_statement($_)->{declared},
     "Clownfish::Variable", "var_declaration_statement: $_" )

@@ -89,12 +89,12 @@ class "Crustacean::Lobster" it must be "Lobster".
 =head2 new
 
     my $type = Clownfish::Type::Object->new(
-        specifier   => "Obj",     # required
-        parcel      => "Boil",    # default: the default Parcel.
-        const       => undef,     # default undef
-        indirection => 1,         # default 1
-        incremented => 1,         # default 0
-        decremented => 0,         # default 0
+        specifier   => "Lobster",       # required
+        parcel      => "Crustacean",    # default: the default Parcel.
+        const       => undef,           # default undef
+        indirection => 1,               # default 1
+        incremented => 1,               # default 0
+        decremented => 0,               # default 0
     );
 
 =over

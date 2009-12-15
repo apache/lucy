@@ -33,21 +33,21 @@ Clownfish::CBlock - A block of embedded C code.
 
 CBlock exists to support embedding literal C code within .bp files:
 
-    parcel Boil;
+    class Crustacean::Lobster {
+        /* ... */
 
-    class Foo {
-        /** Print a greeting. 
+        /** Give a lobstery greeting.
          */
-        public inline void
-        Say_Hello(Foo *self);
+        inert inline void
+        say_hello(Lobster *self);
     }
 
     __C__
     #include <stdio.h>
     static CHY_INLINE void
-    boil_Foo_say_hello(boil_Foo *self)
+    crust_Lobster_say_hello(crust_Lobster *self)
     {
-        printf("Greetings, Earthlings.\n");
+        printf("Prepare to die, human scum.\n");
     }
     __END_C__
 

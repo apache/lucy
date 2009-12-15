@@ -8,7 +8,7 @@ use Clownfish::Parser;
 my $parser = Clownfish::Parser->new;
 
 # Set and leave parcel.
-my $parcel = $parser->parcel_definition('parcel Boil;')
+my $parcel = $parser->parcel_definition('parcel Neato;')
     or die "failed to process parcel_definition";
 
 for my $bad_specifier (qw( foo fooBar Foo_Bar FOOBAR 1Foo 1FOO )) {
@@ -17,7 +17,7 @@ for my $bad_specifier (qw( foo fooBar Foo_Bar FOOBAR 1Foo 1FOO )) {
     );
     eval {
         my $type = Clownfish::Type::Object->new(
-            parcel    => 'Boil',
+            parcel    => 'Neato',
             specifier => $bad_specifier,
         );
     };

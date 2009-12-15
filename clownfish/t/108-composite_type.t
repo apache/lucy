@@ -18,8 +18,8 @@ my @composite_type_strings = (
         char***
         i32_t*
         Obj**
-        boil_method_t[]
-        boil_method_t[1]
+        neato_method_t[]
+        neato_method_t[1]
         multi_dimensional_t[SOME][A_FEW]
         ),
     'char * * ',

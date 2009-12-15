@@ -384,7 +384,7 @@ Clownfish::Class.
 =head1 register
 
     Clownfish::Binding::Perl::Class->register(
-        parcel       => 'Boil',                               # required
+        parcel       => 'MyProject' ,                         # required
         class_name   => 'Foo::FooJr',                         # required
         bind_methods => [qw( Do_Stuff _get_foo|Get_Foo )],    # default: undef
         bind_constructors => [qw( new _new2|init2 )],         # default: undef
@@ -415,7 +415,7 @@ prepending an alias and a pipe: e.g. C<_get_foo|Get_Foo>.
 =item * B<bind_constructors> - An array of constructor names.  The default
 implementing function is the class's C<init> function, unless it is overridden
 using a pipe-separated string: C<_new2|init2> would create a Perl subroutine
-"_new2" which would invoke C<boil_FooJr_init2>.
+"_new2" which would invoke C<myproj_FooJr_init2>.
 
 =item * B<make_pod> - A specification for generating POD.  TODO: document this
 spec, or break it up into multiple methods.  (For now, just see examples from

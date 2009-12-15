@@ -82,12 +82,12 @@ themselves properly.
 =head2 new
 
     my $var = Clownfish::Variable->new(
-        parcel      => 'Boil',
-        type        => $type,    # required
-        micro_sym   => 'foo',    # required
-        exposure    => undef,    # default: 'local'
-        class_name  => "Foo",    # default: undef
-        class_cnick => "Foo",    # default: undef
+        parcel      => 'Crustacean',
+        type        => $int32_t_type,            # required
+        micro_sym   => 'average_lifespan',       # required
+        exposure    => 'parcel',                 # default: 'local'
+        class_name  => "Crustacean::Lobster",    # default: undef
+        class_cnick => "Lobster",                # default: undef
     );
 
 =over
@@ -106,14 +106,14 @@ themselves properly.
 
 =head2 local_c
 
-    # e.g. "boil_Foo *foo"
+    # e.g. "int32_t average_lifespan"
     print $variable->local_c;
 
 Returns a string with the Variable's C type and its C<micro_sym>.
 
 =head2 global_c
 
-    # e.g. "boil_Foo *boil_Foo_foo"
+    # e.g. "int32_t crust_Lobster_average_lifespan"
     print $variable->global_c;
 
 Returns a string with the Variable's C type and its fully qualified name
@@ -121,12 +121,12 @@ within the global namespace.
 
 =head2 local_declaration
 
-    # e.g. "boil_Foo *foo;"
+    # e.g. "int32_t average_lifespan;"
     print $variable->local_declaration;
 
 Returns C code appropriate for declaring the variable in a local scope, such
-as within a C parameter list or struct definition, or as an automatic variable
-within a C function.  
+as within a struct definition, or as an automatic variable within a C
+function.  
 
 =head1 COPYRIGHT AND LICENSE
 

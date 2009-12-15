@@ -64,15 +64,15 @@ Clownfish::Function - Metadata describing a function.
 =head2 new
 
     my $type = Clownfish::Function->new(
-        class_name  => 'MyProject::FooFactory',    # required
-        class_cnick => 'FooFact',                  # default: special 
-        return_type => $void_type                  # required
-        param_list  => $param_list,                # required
-        micro_sym   => 'count',                    # required
-        docucomment => $docucomment,               # default: undef
-        parcel      => 'Boil'                      # default: special
-        exposure    => 'public'                    # default: parcel
-        inline      => 1,                          # default: false
+        class_name  => 'Crustacean::Lobster::LobsterClaw',  # required
+        class_cnick => 'LobClaw',                           # default: special
+        return_type => $int_type,                           # required
+        param_list  => $param_list,                         # required
+        micro_sym   => 'compare',                           # required
+        docucomment => $docucomment,                        # default: undef
+        parcel      => 'Crustacean',                        # default: special
+        exposure    => 'public',                            # default: parcel
+        inline      => 1,                                   # default: false
     );
 
 =over

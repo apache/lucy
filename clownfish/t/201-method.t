@@ -7,13 +7,13 @@ BEGIN { use_ok('Clownfish::Method') }
 use Clownfish::Parser;
 
 my $parser = Clownfish::Parser->new;
-$parser->parcel_definition('parcel Boil;')
+$parser->parcel_definition('parcel Neato;')
     or die "failed to process parcel_definition";
 
 my %args = (
-    parcel      => 'Boil',
+    parcel      => 'Neato',
     return_type => $parser->type('Obj*'),
-    class_name  => 'Boil::Foo',
+    class_name  => 'Neato::Foo',
     class_cnick => 'Foo',
     param_list  => $parser->param_list('(Foo *self, i32_t count = 0)'),
     macro_sym   => 'Return_An_Obj',
@@ -78,7 +78,7 @@ ok( !$param_type_differs->compatible($method), "... reversed" );
 
 my $self_type_differs = Clownfish::Method->new(
     %args,
-    class_name  => 'Boil::Bar',
+    class_name  => 'Neato::Bar',
     class_cnick => 'Bar',
     param_list  => $parser->param_list('(Bar *self, i32_t count = 0)'),
 );
@@ -101,7 +101,7 @@ for my $meth_meth (qw( short_method_sym full_method_sym full_offset_sym)) {
     like( $@, qr/invoker/, "$meth_meth requires invoker" );
 }
 
-my %sub_args = ( class => 'Boil::Obj', cnick => 'Obj' );
+my %sub_args = ( class => 'Neato::Obj', cnick => 'Obj' );
 
 isa_ok(
     $parser->subroutine_declaration_statement( $_, 0, %sub_args )->{declared},

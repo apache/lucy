@@ -138,11 +138,11 @@ functions and methods across the Perl/C barrier.
 =head2 new
 
     my $binding = $subclass->SUPER::new(
-        param_list         => $param_list,     # required
-        alias              => 'do_stuff',      # required
-        class_name         => 'Foo::FooJr',    # required
-        retval_type        => $type,           # required
-        use_labeled_params => 1,               # default: false
+        param_list         => $param_list,           # required
+        alias              => 'pinch',               # required
+        class_name         => 'Crustacean::Claw',    # required
+        retval_type        => $type,                 # required
+        use_labeled_params => 1,                     # default: false
     );
 
 Abstract constructor.

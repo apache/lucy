@@ -5,7 +5,7 @@ use Test::More tests => 7;
 
 BEGIN { use_ok('Clownfish::Parcel') }
 
-package BoilingThing;
+package ClownfishyThing;
 use base qw( Clownfish::Symbol );
 
 sub new {
@@ -15,15 +15,15 @@ sub new {
 package main;
 
 # Register singleton.
-Clownfish::Parcel->singleton( name => 'Boil' );
+Clownfish::Parcel->singleton( name => 'Crustacean', cnick => 'Crust', );
 
-my $thing = BoilingThing->new;
+my $thing = ClownfishyThing->new;
 is( $thing->get_prefix, '', 'get_prefix with no parcel' );
 is( $thing->get_Prefix, '', 'get_Prefix with no parcel' );
 is( $thing->get_PREFIX, '', 'get_PREFIx with no parcel' );
 
-$thing = BoilingThing->new( parcel => 'Boil' );
-is( $thing->get_prefix, 'boil_', 'get_prefix with parcel' );
-is( $thing->get_Prefix, 'Boil_', 'get_Prefix with parcel' );
-is( $thing->get_PREFIX, 'BOIL_', 'get_PREFIx with parcel' );
+$thing = ClownfishyThing->new( parcel => 'Crustacean' );
+is( $thing->get_prefix, 'crust_', 'get_prefix with parcel' );
+is( $thing->get_Prefix, 'Crust_', 'get_Prefix with parcel' );
+is( $thing->get_PREFIX, 'CRUST_', 'get_PREFIx with parcel' );
 

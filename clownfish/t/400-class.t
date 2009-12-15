@@ -8,7 +8,7 @@ use Clownfish::Parser;
 my $parser = Clownfish::Parser->new;
 
 my $thing = Clownfish::Variable->new(
-    parcel     => 'Boil',
+    parcel     => 'Neato',
     class_name => 'Foo',
     type       => $parser->type('Thing*'),
     micro_sym  => 'thing',
@@ -19,14 +19,14 @@ my $widget = Clownfish::Variable->new(
     micro_sym  => 'widget',
 );
 my $tread_water = Clownfish::Function->new(
-    parcel      => 'Boil',
+    parcel      => 'Neato',
     class_name  => 'Foo',
     return_type => $parser->type('void'),
     micro_sym   => 'tread_water',
     param_list  => $parser->param_list('()'),
 );
 my %foo_create_args = (
-    parcel      => 'Boil',
+    parcel      => 'Neato',
     class_name  => 'Foo',
     member_vars => [$thing],
     inert_vars  => [$widget],
@@ -38,13 +38,13 @@ eval { Clownfish::Class->create(%foo_create_args) };
 like( $@, qr/conflict/i,
     "Can't call create for the same class more than once" );
 my $should_be_foo = Clownfish::Class->fetch_singleton(
-    parcel     => 'Boil',
+    parcel     => 'Neato',
     class_name => 'Foo',
 );
 is( $foo, $should_be_foo, "fetch_singleton" );
 
 my $foo_jr = Clownfish::Class->create(
-    parcel            => 'Boil',
+    parcel            => 'Neato',
     class_name        => 'Foo::FooJr',
     parent_class_name => 'Foo',
     attributes        => { dumpable => 1 },
@@ -52,10 +52,10 @@ my $foo_jr = Clownfish::Class->create(
 
 ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
 is( $foo_jr->get_struct_sym,  'FooJr',      "struct_sym" );
-is( $foo_jr->full_struct_sym, 'boil_FooJr', "full_struct_sym" );
+is( $foo_jr->full_struct_sym, 'neato_FooJr', "full_struct_sym" );
 
 my $final_foo = Clownfish::Class->create(
-    parcel            => 'Boil',
+    parcel            => 'Neato',
     class_name        => 'Foo::FooJr::FinalFoo',
     parent_class_name => 'Foo::FooJr',
     source_class      => 'Foo::FooJr',
@@ -81,7 +81,7 @@ my $inert_do_stuff
     0, class => 'InertFoo' )->{declared}
     or die "parsing failure";
 my %inert_args = (
-    parcel     => 'Boil',
+    parcel     => 'Neato',
     class_name => 'InertFoo',
     inert      => 1,
 );

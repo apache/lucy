@@ -6,16 +6,16 @@ use Test::More tests => 2;
 use Clownfish::Parser;
 
 my $parser = Clownfish::Parser->new;
-$parser->parcel_definition('parcel Boil;')
+$parser->parcel_definition('parcel Neato;')
     or die "failed to process parcel_definition";
 
 my %args = (
     return_type => $parser->type('Obj*'),
-    class_name  => 'Boil::Foo',
+    class_name  => 'Neato::Foo',
     class_cnick => 'Foo',
     param_list  => $parser->param_list('(Foo* self)'),
     macro_sym   => 'Return_An_Obj',
-    parcel      => 'Boil',
+    parcel      => 'Neato',
 );
 
 my $not_final_method = Clownfish::Method->new(%args);

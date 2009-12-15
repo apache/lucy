@@ -6,22 +6,22 @@ use Clownfish::Type::Arbitrary;
 use Clownfish::Parser;
 
 my $foo_type = Clownfish::Type::Arbitrary->new(
-    parcel    => 'Boil',
+    parcel    => 'Neato',
     specifier => "foo_t",
 );
 is( $foo_type->get_specifier, "foo_t", "get_specifier" );
 is( $foo_type->to_c,          "foo_t", "to_c" );
 
 my $compare_t_type = Clownfish::Type::Arbitrary->new(
-    parcel    => 'Boil',
+    parcel    => 'Neato',
     specifier => "Sort_compare_t",
 );
 is( $compare_t_type->get_specifier,
-    "boil_Sort_compare_t", "Prepend prefix to specifier" );
-is( $compare_t_type->to_c, "boil_Sort_compare_t", "to_c" );
+    "neato_Sort_compare_t", "Prepend prefix to specifier" );
+is( $compare_t_type->to_c, "neato_Sort_compare_t", "to_c" );
 
 my $evil_twin = Clownfish::Type::Arbitrary->new(
-    parcel    => 'Boil',
+    parcel    => 'Neato',
     specifier => "foo_t",
 );
 ok( $foo_type->equals($evil_twin), "equals" );

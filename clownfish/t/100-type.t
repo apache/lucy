@@ -8,10 +8,10 @@ package main;
 use Test::More tests => 12;
 use Clownfish::Parcel;
 
-my $boil_parcel = Clownfish::Parcel->singleton( name => 'Boil' );
+my $neato_parcel = Clownfish::Parcel->singleton( name => 'Neato' );
 
-my $type = MyType->new( parcel => 'Boil', specifier => 'mytype_t' );
-is( $type->get_parcel, $boil_parcel,
+my $type = MyType->new( parcel => 'Neato', specifier => 'mytype_t' );
+is( $type->get_parcel, $neato_parcel,
     "constructor changes parcel name to Parcel singleton" );
 
 ok( !defined $type->to_c, "to_c()" );
