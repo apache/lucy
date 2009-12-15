@@ -56,6 +56,9 @@ PPCODE:
     else if (strEQ(package, "TestFolder")) {
         lucy_TestFolder_run_tests();
     }
+    else if (strEQ(package, "TestFSDirHandle")) {
+        lucy_TestFSDH_run_tests();
+    }
     else if (strEQ(package, "TestFSFileHandle")) {
         lucy_TestFSFH_run_tests();
     }
