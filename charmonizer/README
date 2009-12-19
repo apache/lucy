@@ -14,10 +14,8 @@ OVERVIEW
     
 REQUIREMENTS
 
-    The only prerequisite for the target machine is an ISO C90-compliant
-    compiler which can be invoked from C via the system() command.  Your
-    development environment must include Perl in order to run the metaquote 
-    utility script, but no Perl programming is required.
+    Charmonizer's only prerequisite is an ISO C90-compliant compiler which can
+    be invoked from C via the system() command.
     
 PROBING
 
@@ -27,14 +25,14 @@ PROBING
 
         int main() 
         {
-            /* tell Charmonizer about your OS and compiler */
+            /* Tell Charmonizer about your OS and compiler. */
             chaz_Probe_init("darwin", "cc", "-I/usr/local/include", NULL);
             
-            /* run desired Charmonizer modules */
+            /* Run desired Charmonizer modules. */
             chaz_Integers_run();
             chaz_LargeFiles_run();
 
-            /* tear down */
+            /* Tear down. */
             chaz_Probe_clean_up();
 
             return 0;
@@ -46,12 +44,13 @@ PROBING
     functionality which may go by many different aliases on different systems.
 
     One header file, "Charmonizer/Probe.h", provides the primary interface and
-    a suite of topically oriented modules, e.g.
-    "Charmonizer/Probe/LargeFiles.h", "Charmonizer/Probe/Integers.h" do the
-    heavy lifting.  Each module exports 1 main function, ModuleName_run(),
-    which appends output to charmony.h. The config gets built up bit by bit as
-    you run each module in turn.  "charmony.h" can be further customized by
-    writing your own content to it.
+    a suite of topically oriented modules -- e.g.
+    "Charmonizer/Probe/LargeFiles.h", "Charmonizer/Probe/Integers.h" -- do the
+    heavy lifting.  Each topical module exports 1 main function,
+    ModuleName_run(), which runs all the relevant compiler probes and appends
+    output to charmony.h.  As you run each module in turn, "charmony.h" gets
+    built up incrementally; it can be further customized by writing your own
+    content to it at any point.
 
 TESTING 
 
@@ -85,54 +84,41 @@ TESTING
     
     The stock tests require access to "charmony.h".  Not all tests will pass
     in every environment, and the expectation is that you will append
-    charmony.h with ifdef tests as necessary to draw in supplementary code.
-    (Charmonizer restricts itself to working with what it finds, and
-    does not supply a library of compatibility functions.)
+    charmony.h with ifdef tests as necessary to draw in supplementary code:
 
         #ifndef HAS_DIRENT_H
           #include "my/dirent.h"
         #endif
 
+    Charmonizer restricts itself to working with what it finds, and
+    does not supply a library of compatibility functions.
+
 C NAMESPACE
 
-    Charmonizer allows you to prepend a prefix onto every symbol it exports.
-    For public code, such as header files, this helps avoid namespace
-    collisions.  For private code, the prefixes are stripped via
-    the USE_SHORT_NAMES symbol.
+    The "charmony.h" header prepends a prefix onto most of the symbols it
+    exports: either "chy_" or "CHY_".  For public code, such as header files,
+    this helps avoid namespace collisions.  For private code, the prefixes can
+    be stripped via the CHY_USE_SHORT_NAMES symbol.
 
-        #ifdef LUCY_HAS_LONG_LONG
-            /* ... */
-        #define LUCY_USE_SHORT_NAMES
-        #ifdef HAS_LONG_LONG
+        #define CHY_USE_SHORT_NAMES
+        #ifdef HAS_LONG_LONG   /* alias for CHY_HAS_LONG_LONG */
 
 FILESYSTEM NAMESPACE
 
     Charmonizer creates a number of temporary files within the current working
     directory while it runs.  These files all begin with "_charm".
 
-GATHERING FILES
-
-    Charmonizer master modules are stored in the src/ directory, and have
-    .harm/.charm extensions.  They are ordinary ANSI C files, except for one
-    thing: multi-line quoted snippets of source code are surrounded by
-    "METAQUOTE" tags.  This is done for maintainability's sake, since
-    embedding C source code in C source code as string literals is very messy.
-
-    To generate all the necessary Charmonizer .c/.h files, use the metaquote 
-    utility.
-
-        $ ./bin/metaquote --src=/path/to/charmonizer/src --out=/my/charm/dir 
-
 SECURITY
 
     Under no circumstances should input from untrusted users be supplied to
-    Charmonizer.  A lot of what it does it does by passing strings to the
-    system() command.  
+    Charmonizer.  A lot of what Charmonizer does it does by passing strings to
+    the system() command; security cannot be assured unless input is
+    restricted.
 
 COPYRIGHT AND LICENSE
 
     /**
-     * Copyright 2006 The Apache Software Foundation
+     * Copyright 2006-2009 The Apache Software Foundation
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
