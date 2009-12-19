@@ -92,9 +92,13 @@ S_init_mkdir()
     if (Util_verbosity) {
         printf("Attempting to compile _charm_mkdir utility...\n");
     }
-    if (S_try_init_win_mkdir())               { return; }
-    if (S_try_init_posix_mkdir("sys/stat.h")) { return; }
-    if (S_try_init_posix_mkdir("direct.h"))   { return; }
+    if (HeadCheck_check_header("windows.h")) {
+        if (S_try_init_win_mkdir())               { return; }
+        if (S_try_init_posix_mkdir("direct.h"))   { return; }
+    }
+    else {
+        if (S_try_init_posix_mkdir("sys/stat.h")) { return; }
+    }
 }
 
 static chaz_bool_t
