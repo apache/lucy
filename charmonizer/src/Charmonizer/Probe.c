@@ -11,11 +11,11 @@
 #include "Charmonizer/Core/OperSys.h"
 
 void
-Probe_init(const char *osname, const char *cc_command,
-                const char *cc_flags, const char *charmony_start)
+Probe_init(const char *cc_command, const char *cc_flags, 
+           const char *charmony_start)
 {
     /* Create os and compiler objects. */
-    ModHand_os       = OS_new(osname);
+    ModHand_os       = OS_new();
     ModHand_compiler = CC_new(ModHand_os, cc_command, cc_flags);
 
     /* Dispatch other tasks. */

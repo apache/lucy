@@ -171,18 +171,17 @@ sub ACTION_charmony {
 
     # Prepare arguments to charmonize.
     my $cc        = "$Config{cc}";
-    my $os_name   = lc( $Config{osname} );
     my $flags     = "$Config{ccflags} " . $self->extra_ccflags;
     my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
     $flags =~ s/"/\\"/g;
 
     if ( $ENV{CHARM_VALGRIND} ) {
         system(   "valgrind --leak-check=yes ./$CHARMONIZE_EXE_PATH $cc "
-                . "\"$flags\" $os_name $verbosity" )
+                . "\"$flags\" $verbosity" )
             and die "Failed to write charmony.h";
     }
     else {
-        system("./$CHARMONIZE_EXE_PATH $cc \"$flags\" $os_name $verbosity")
+        system("./$CHARMONIZE_EXE_PATH $cc \"$flags\" $verbosity")
             and die "Failed to write charmony.h";
     }
 }

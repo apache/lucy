@@ -23,16 +23,13 @@ static int
 S_run_local(OperSys *self, ...);
 
 OperSys*
-OS_new(const char *name) 
+OS_new() 
 {
     OperSys *self = (OperSys*)malloc(sizeof(OperSys));
 
     if (Util_verbosity) {
         printf("Creating os object...\n");
     }
-
-    /* Assign. */
-    self->name = strdup(name);
 
     /* Init. */
     self->buf        = NULL;
@@ -41,20 +38,18 @@ OS_new(const char *name)
     self->remove_exe = S_remove_exe;
     self->run_local  = S_run_local;
     self->destroy    = S_destroy;
-
-    /* Derive. */
-    if (strcmp(name, "mswin32") == 0) {
-        self->obj_ext = strdup(".obj");
-        self->exe_ext = strdup(".exe");
-        self->local_command_start = strdup(".\\");
-        self->devnull = strdup("nul");
-    }
-    else {
-        self->obj_ext = strdup("");
-        self->exe_ext = strdup("");
-        self->local_command_start = strdup("./");
-        S_probe_devnull(self);
-    }
+#ifdef _WIN32
+    /* Assign. */
+    self->obj_ext = strdup(".obj");
+    self->exe_ext = strdup(".exe");
+    self->local_command_start = strdup(".\\");
+    self->devnull = strdup("nul");
+#else
+    self->obj_ext = strdup("");
+    self->exe_ext = strdup("");
+    self->local_command_start = strdup("./");
+    S_probe_devnull(self);
+#endif
 
     return self;
 }
@@ -73,7 +68,6 @@ S_probe_devnull(OperSys *self)
         printf("Trying to find a bit-bucket a la /dev/null...\n");
     }
 
-
     /* Iterate through names of possible devnulls trying to open them. */
     for (i = 0; devnull_options[i] != NULL; i++) {
         if (Util_can_open_file(devnull_options[i])) {
@@ -90,7 +84,6 @@ static void
 S_destroy(OperSys *self)
 {
     free(self->buf);
-    free(self->name);
     free(self->obj_ext);
     free(self->exe_ext);
     free(self->local_command_start);

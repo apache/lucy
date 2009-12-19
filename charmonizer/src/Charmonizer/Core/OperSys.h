@@ -33,7 +33,6 @@ typedef void
 (*chaz_OS_destroy_t)(chaz_OperSys *self);
 
 struct chaz_OperSys {
-    char       *name;
     char       *obj_ext;
     char       *exe_ext;
     char       *local_command_start;
@@ -47,11 +46,9 @@ struct chaz_OperSys {
 };
 
 /** Constructor. 
- * 
- * @param name A string representing the name of the operating system.
  */
 chaz_OperSys*
-chaz_OS_new(const char *name);
+chaz_OS_new();
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define OperSys                      chaz_OperSys

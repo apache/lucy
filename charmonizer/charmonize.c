@@ -19,20 +19,19 @@
 int main(int argc, char **argv) 
 {
     /* Parse and process arguments. */
-    if (argc < 4) {
+    if (argc < 3) {
         fprintf(stderr, 
-            "Usage: ./charmonize CC_COMMAND CC_FLAGS OS_NAME [VERBOSITY]\n");
+            "Usage: ./charmonize CC_COMMAND CC_FLAGS [VERBOSITY]\n");
         exit(1);
     }
     else {
         char *cc_command = argv[1];
         char *cc_flags   = argv[2];
-        char *os_name    = argv[3];
-        if (argc > 4) {
-            const long verbosity = strtol(argv[4], NULL, 10);
+        if (argc > 3) {
+            const long verbosity = strtol(argv[3], NULL, 10);
             chaz_Probe_set_verbosity(verbosity);
         }
-        chaz_Probe_init(os_name, cc_command, cc_flags, NULL);
+        chaz_Probe_init(cc_command, cc_flags, NULL);
     }
 
     /* Run probe modules. */
