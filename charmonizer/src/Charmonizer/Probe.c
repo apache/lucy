@@ -45,11 +45,6 @@ Probe_set_verbosity(int level)
     Util_verbosity = level;
 }
 
-char*
-Probe_slurp_file(char* filepath, size_t *len_ptr) {
-    return Util_slurp_file(filepath, len_ptr);
-}
-
 FILE*
 Probe_get_charmony_fh(void)
 {

@@ -34,11 +34,6 @@ chaz_Probe_clean_up();
 void
 chaz_Probe_set_verbosity(int level);
 
-/* Read an entire file into memory.
- */
-char*
-chaz_Probe_slurp_file(char* filepath, size_t *len_ptr);
-
 /* Access the FILE* used to write charmony.h, so that you can write your own
  * content to it.  Should not be called before chaz_Probe_init() or after
  * chaz_Probe_clean_up().
@@ -50,7 +45,6 @@ chaz_Probe_get_charmony_fh(void);
   #define Probe_init            chaz_Probe_init
   #define Probe_clean_up        chaz_Probe_clean_up
   #define Probe_set_verbosity   chaz_Probe_set_verbosity
-  #define Probe_slurp_file      chaz_Probe_slurp_file
 #endif
 
 #ifdef __cplusplus
