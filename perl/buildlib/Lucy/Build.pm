@@ -159,7 +159,6 @@ sub ACTION_charmonizer {
 # Run the charmonizer executable, creating the charmony.h file.
 sub ACTION_charmony {
     my $self          = shift;
-    my $charmony_in   = 'charmony_in';
     my $charmony_path = 'charmony.h';
 
     $self->dispatch('charmonizer');
@@ -170,30 +169,20 @@ sub ACTION_charmony {
     # Clean up after Charmonizer if it doesn't succeed on its own.
     $self->add_to_cleanup("_charm*");
 
-    # Write the infile with which to communicate args to charmonize.
+    # Prepare arguments to charmonize.
+    my $cc        = "$Config{cc}";
     my $os_name   = lc( $Config{osname} );
     my $flags     = "$Config{ccflags} " . $self->extra_ccflags;
     my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
-    my $cc        = "$Config{cc}";
-    unlink $charmony_in;
-    $self->add_to_cleanup( $charmony_path, $charmony_in );
-    sysopen( my $infile_fh, $charmony_in, O_CREAT | O_WRONLY | O_EXCL )
-        or die "Can't open '$charmony_in': $!";
-    print $infile_fh qq|
-        <charm_os_name>$os_name</charm_os_name>
-        <charm_cc_command>$cc</charm_cc_command>
-        <charm_cc_flags>$flags</charm_cc_flags>
-        <charm_verbosity>$verbosity</charm_verbosity>
-    |;
-    close $infile_fh or die "Can't close '$charmony_in': $!";
+    $flags =~ s/"/\\"/g;
 
     if ( $ENV{CHARM_VALGRIND} ) {
-        system(
-            "valgrind --leak-check=yes ./$CHARMONIZE_EXE_PATH $charmony_in")
+        system(   "valgrind --leak-check=yes ./$CHARMONIZE_EXE_PATH $cc "
+                . "\"$flags\" $os_name $verbosity" )
             and die "Failed to write charmony.h";
     }
     else {
-        system( $CHARMONIZE_EXE_PATH, $charmony_in )
+        system("./$CHARMONIZE_EXE_PATH $cc \"$flags\" $os_name $verbosity")
             and die "Failed to write charmony.h";
     }
 }
