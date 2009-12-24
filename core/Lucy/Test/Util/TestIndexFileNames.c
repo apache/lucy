@@ -42,19 +42,19 @@ test_extract_gen(TestBatch *batch)
     ZombieCharBuf source = ZCB_BLANK;
 
     source = ZCB_make_str("seg_9", 5);
-    ASSERT_INT_EQ(batch, IxFileNames_extract_gen((CharBuf*)&source), 9, 
+    ASSERT_TRUE(batch, IxFileNames_extract_gen((CharBuf*)&source) == 9, 
         "extract_gen");
 
     source = ZCB_make_str("seg_9/", 6);
-    ASSERT_INT_EQ(batch, IxFileNames_extract_gen((CharBuf*)&source), 9, 
+    ASSERT_TRUE(batch, IxFileNames_extract_gen((CharBuf*)&source) == 9, 
         "deal with trailing slash");
 
     source = ZCB_make_str("seg_9_8", 7);
-    ASSERT_INT_EQ(batch, IxFileNames_extract_gen((CharBuf*)&source), 9, 
+    ASSERT_TRUE(batch, IxFileNames_extract_gen((CharBuf*)&source) == 9, 
         "Only go past first underscore");
 
     source = ZCB_make_str("snapshot_5.json", 15);
-    ASSERT_INT_EQ(batch, IxFileNames_extract_gen((CharBuf*)&source), 5, 
+    ASSERT_TRUE(batch, IxFileNames_extract_gen((CharBuf*)&source) == 5, 
         "Deal with file suffix");
 }
 
