@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Storable qw( nfreeze thaw );
 use Lucy::Test;
+use Lucy::Util::ToolSet qw( to_perl to_lucy );
 
 my $hash = Lucy::Object::Hash->new( capacity => 10 );
 $hash->store( "foo", Lucy::Object::CharBuf->new("bar") );
@@ -23,3 +24,7 @@ my $instream = Lucy::Store::InStream->open( file => $ram_file )
 my $deserialized = $hash->deserialize($instream);
 is_deeply( $hash->to_perl, $deserialized->to_perl, "serialize/deserialize" );
 
+my %hash_with_utf8_keys = ( "\x{263a}" => "foo" );
+my $round_tripped = to_perl( to_lucy( \%hash_with_utf8_keys ) );
+is_deeply( $round_tripped, \%hash_with_utf8_keys,
+    "Round trip conversion of hash with UTF-8 keys" );

@@ -299,8 +299,13 @@ static SV*
 S_lucy_hash_to_perl_hash(lucy_Hash *hash)
 {
     HV *perl_hash = newHV();
+    SV *key_sv    = newSV(1);
     lucy_CharBuf *key;
     lucy_Obj     *val;
+
+    /* Prepare the SV key. */
+    SvPOK_on(key_sv);
+    SvUTF8_on(key_sv);
 
     /* Iterate over key-value pairs. */
     Lucy_Hash_Iter_Init(hash);
@@ -312,9 +317,16 @@ S_lucy_hash_to_perl_hash(lucy_Hash *hash)
                 "Can't convert a key of class %o to a Perl hash key",
                 Lucy_Obj_Get_Class_Name(key));
         }
-        hv_store(perl_hash, (char*)Lucy_CB_Get_Ptr8(key), 
-            Lucy_CB_Get_Size(key), val_sv, 0);
+        else {
+            STRLEN key_size = Lucy_CB_Get_Size(key);
+            char *key_sv_ptr = SvGROW(key_sv, key_size + 1); 
+            memcpy(key_sv_ptr, Lucy_CB_Get_Ptr8(key), key_size);
+            SvCUR_set(key_sv, key_size);
+            *SvEND(key_sv) = '\0';
+            hv_store_ent(perl_hash, key_sv, val_sv, 0);
+        }
     }
+    SvREFCNT_dec(key_sv);
 
     return newRV_noinc((SV*)perl_hash);
 }
