@@ -10,7 +10,7 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
      *
      * @return a generation number, or 0 if no number can be extracted.
      */
-    inert i32_t
+    inert u64_t
     extract_gen(const CharBuf *name);
 
     /** Return the name of the latest generation snapshot file in the Folder,

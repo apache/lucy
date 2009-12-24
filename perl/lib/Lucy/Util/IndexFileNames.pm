@@ -9,7 +9,7 @@ __BINDING__
 my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Util::IndexFileNames
 
-IV
+chy_u64_t
 extract_gen(name)
     lucy_ZombieCharBuf name;
 CODE:

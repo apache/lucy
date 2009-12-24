@@ -12,7 +12,7 @@ IxFileNames_latest_snapshot(Folder *folder)
     DirHandle *dh = Folder_Open_Dir(folder, NULL);
     CharBuf   *entry = dh ? DH_Get_Entry(dh) : NULL;
     CharBuf   *retval   = NULL;
-    i32_t      latest_gen = 0;
+    u64_t      latest_gen = 0;
 
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
 
@@ -20,7 +20,7 @@ IxFileNames_latest_snapshot(Folder *folder)
         if (   CB_Starts_With_Str(entry, "snapshot_", 9)
             && CB_Ends_With_Str(entry, ".json", 5)
         ) {
-            i32_t gen = IxFileNames_extract_gen(entry);
+            u64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_gen) {
                 latest_gen = gen;
                 if (!retval) retval = CB_Clone(entry);
@@ -33,7 +33,7 @@ IxFileNames_latest_snapshot(Folder *folder)
     return retval;
 }
 
-i32_t
+u64_t
 IxFileNames_extract_gen(const CharBuf *name)
 {
     ZombieCharBuf num_string = ZCB_make(name);
@@ -46,7 +46,7 @@ IxFileNames_extract_gen(const CharBuf *name)
         else if (code_point == '_') { break; }
     }
 
-    return (i32_t)ZCB_BaseX_To_I64(&num_string, 36);
+    return (u64_t)ZCB_BaseX_To_I64(&num_string, 36);
 }
 
 ZombieCharBuf*
