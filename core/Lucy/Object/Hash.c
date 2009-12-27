@@ -115,7 +115,7 @@ Hash_load(Hash *self, Obj *dump)
 
     /* Assume that the presence of the "_class" key paired with a valid class
      * name indicates the output of a Dump rather than an ordinary Hash. */
-    if (class_name && Obj_Is_A(class_name, CHARBUF)) {
+    if (class_name && CB_Is_A(class_name, CHARBUF)) {
         VTable *vtable = VTable_fetch_vtable(class_name);
 
         if (!vtable) {
@@ -444,7 +444,7 @@ Hash_equals(Hash *self, Obj *other)
     Obj     *val;
 
     if (evil_twin == self) return true;
-    if (!Obj_Is_A(evil_twin, HASH)) return false;
+    if (!Obj_Is_A(other, HASH)) return false;
     if (self->size != evil_twin->size) return false;
 
     Hash_Iter_Init(self);

@@ -115,7 +115,7 @@ test_Window(TestBatch *batch)
     for (i = 0; i < 1024; i++) {
         RAMFH_Write(fh, "foo ", 4);
     }
-    FH_Close(fh);
+    RAMFH_Close(fh);
 
     /* Reopen for reading. */
     DECREF(fh);

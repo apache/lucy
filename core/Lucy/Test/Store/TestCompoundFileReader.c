@@ -31,7 +31,7 @@ S_folder_with_contents()
     OutStream_Close(bar_out);
     DECREF(foo_out);
     DECREF(bar_out);
-    Folder_Consolidate(folder, (CharBuf*)&EMPTY);
+    RAMFolder_Consolidate(folder, (CharBuf*)&EMPTY);
     return (Folder*)folder;
 }
 
@@ -116,7 +116,7 @@ test_Local_MkDir_and_Find_Folder(TestBatch *batch)
     CompoundFileReader *cf_reader = CFReader_open(real_folder);
 
     ASSERT_FALSE(batch, 
-        Folder_Local_Is_Directory(cf_reader, (CharBuf*)&stuff),
+        CFReader_Local_Is_Directory(cf_reader, (CharBuf*)&stuff),
         "Local_Is_Directory returns false for non-existent entry");
 
     ASSERT_TRUE(batch, CFReader_MkDir(cf_reader, (CharBuf*)&stuff), 
@@ -126,10 +126,10 @@ test_Local_MkDir_and_Find_Folder(TestBatch *batch)
         "Local_MkDir pass-through");
     ASSERT_TRUE(batch, 
         Folder_Find_Folder(real_folder, (CharBuf*)&stuff) == 
-        Folder_Find_Folder(cf_reader, (CharBuf*)&stuff),
+        CFReader_Find_Folder(cf_reader, (CharBuf*)&stuff),
         "Local_Find_Folder pass-through");
     ASSERT_TRUE(batch, 
-        Folder_Local_Is_Directory(cf_reader, (CharBuf*)&stuff),
+        CFReader_Local_Is_Directory(cf_reader, (CharBuf*)&stuff),
         "Local_Is_Directory pass through");
 
     Err_set_error(NULL);
@@ -147,7 +147,7 @@ test_Local_MkDir_and_Find_Folder(TestBatch *batch)
     ASSERT_TRUE(batch, 
         CFReader_Find_Folder(cf_reader, (CharBuf*)&foo) == NULL,
         "Virtual file not reported as directory");
-    ASSERT_FALSE(batch, Folder_Local_Is_Directory(cf_reader, (CharBuf*)&foo),
+    ASSERT_FALSE(batch, CFReader_Local_Is_Directory(cf_reader, (CharBuf*)&foo),
         "Local_Is_Directory returns false for virtual file");
 
     DECREF(real_folder);
@@ -237,7 +237,7 @@ test_Local_Open_FileHandle(TestBatch *batch)
     FileHandle *fh;
 
     {
-        OutStream *outstream = Folder_Open_Out(cf_reader, (CharBuf*)&baz);
+        OutStream *outstream = CFReader_Open_Out(cf_reader, (CharBuf*)&baz);
         OutStream_Write_Bytes(outstream, "baz", 3);
         OutStream_Close(outstream);
         DECREF(outstream);
@@ -280,11 +280,11 @@ test_Local_Open_In(TestBatch *batch)
     ASSERT_TRUE(batch, instream != NULL,
         "Local_Open_In for virtual file");
     ASSERT_TRUE(batch, CB_Starts_With(InStream_Get_Filename(instream),
-        Folder_Get_Path(cf_reader)), "InStream's path includes directory");
+        CFReader_Get_Path(cf_reader)), "InStream's path includes directory");
     DECREF(instream);
 
     {
-        OutStream *outstream = Folder_Open_Out(cf_reader, (CharBuf*)&baz);
+        OutStream *outstream = CFReader_Open_Out(cf_reader, (CharBuf*)&baz);
         OutStream_Write_Bytes(outstream, "baz", 3);
         OutStream_Close(outstream);
         DECREF(outstream);

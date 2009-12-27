@@ -40,13 +40,13 @@ static void
 test_metadata_storage(TestBatch *batch)
 {
     Segment *segment = Seg_new(1);
-    Obj *got;
+    CharBuf *got;
 
     Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)CB_newf("bar"));
-    got = Seg_Fetch_Metadata_Str(segment, "foo", 3);
+    got = (CharBuf*)Seg_Fetch_Metadata_Str(segment, "foo", 3);
     ASSERT_TRUE(batch, 
                    got 
-                && Obj_Is_A(got, CHARBUF) 
+                && CB_Is_A(got, CHARBUF) 
                 && CB_Equals_Str(got, "bar", 3), 
                 "metadata round trip");
     DECREF(segment);
@@ -107,7 +107,7 @@ test_Write_File_and_Read_File(TestBatch *batch)
     RAMFolder *folder  = RAMFolder_new(NULL);
     Segment   *segment = Seg_new(100);
     Segment   *got     = Seg_new(100);
-    Obj       *meta;
+    CharBuf   *meta;
     ZombieCharBuf flotsam = ZCB_LITERAL("flotsam");
     ZombieCharBuf jetsam  = ZCB_LITERAL("jetsam");
 
@@ -126,8 +126,8 @@ test_Write_File_and_Read_File(TestBatch *batch)
            Seg_Field_Num(got, (CharBuf*)&jetsam) 
         == Seg_Field_Num(segment, (CharBuf*)&jetsam), 
         "Round trip field names through file");
-    meta = Seg_Fetch_Metadata_Str(got, "foo", 3);
-    ASSERT_TRUE(batch, meta && Obj_Is_A(meta, CHARBUF) 
+    meta = (CharBuf*)Seg_Fetch_Metadata_Str(got, "foo", 3);
+    ASSERT_TRUE(batch, meta && CB_Is_A(meta, CHARBUF) 
         && CB_Equals_Str(meta, "bar", 3), "Round trip metadata through file");
 
     DECREF(got);

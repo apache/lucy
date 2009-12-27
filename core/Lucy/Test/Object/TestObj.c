@@ -92,10 +92,10 @@ test_Is_A(TestBatch *batch)
 {
     CharBuf *charbuf   = CB_new(0);
     VTable  *bb_vtable = CB_Get_VTable(charbuf);
-    CharBuf *klass     = Obj_Get_Class_Name(charbuf);
+    CharBuf *klass     = CB_Get_Class_Name(charbuf);
 
-    ASSERT_TRUE(batch, Obj_Is_A(charbuf, CHARBUF), "CharBuf Is_A CharBuf.");
-    ASSERT_TRUE(batch, Obj_Is_A(charbuf, OBJ), "CharBuf Is_A Obj.");
+    ASSERT_TRUE(batch, CB_Is_A(charbuf, CHARBUF), "CharBuf Is_A CharBuf.");
+    ASSERT_TRUE(batch, CB_Is_A(charbuf, OBJ), "CharBuf Is_A Obj.");
     ASSERT_TRUE(batch, bb_vtable == CHARBUF, "Get_VTable");
     ASSERT_TRUE(batch, CB_Equals(VTable_Get_Name(CHARBUF), (Obj*)klass),
         "Get_Class_Name");

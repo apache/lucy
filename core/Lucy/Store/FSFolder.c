@@ -234,7 +234,7 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name)
         return NULL;
     }
     else if (NULL != (subfolder = (Folder*)Hash_Fetch(self->entries, (Obj*)name))) {
-        if (Obj_Is_A(subfolder, FOLDER)) {
+        if (Folder_Is_A(subfolder, FOLDER)) {
             return subfolder;
         }
         else {

@@ -110,7 +110,7 @@ test_Local_Find_Folder(TestBatch *batch, set_up_t set_up,
     local = Folder_Local_Find_Folder(folder, &foo);
     ASSERT_TRUE(batch, 
         local 
-        && Obj_Is_A(local, FOLDER)
+        && Folder_Is_A(local, FOLDER)
         && CB_Ends_With(Folder_Get_Path(local), &foo), 
         "Find local directory");
 
@@ -181,13 +181,13 @@ test_Local_Open_FileHandle(TestBatch *batch, set_up_t set_up,
 
     fh = Folder_Local_Open_FileHandle(folder, &boffo, 
         FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
-    ASSERT_TRUE(batch, fh && Obj_Is_A(fh, FILEHANDLE), 
+    ASSERT_TRUE(batch, fh && FH_Is_A(fh, FILEHANDLE), 
         "opened FileHandle");
     DECREF(fh);
 
     fh = Folder_Local_Open_FileHandle(folder, &boffo, 
         FH_CREATE | FH_WRITE_ONLY);
-    ASSERT_TRUE(batch, fh && Obj_Is_A(fh, FILEHANDLE), 
+    ASSERT_TRUE(batch, fh && FH_Is_A(fh, FILEHANDLE), 
         "opened FileHandle for append");
     DECREF(fh);
 
@@ -199,7 +199,7 @@ test_Local_Open_FileHandle(TestBatch *batch, set_up_t set_up,
         "failure due to FH_EXLUSIVE flag sets Err_error");
 
     fh = Folder_Local_Open_FileHandle(folder, &boffo, FH_READ_ONLY);
-    ASSERT_TRUE(batch, fh && Obj_Is_A(fh, FILEHANDLE), 
+    ASSERT_TRUE(batch, fh && FH_Is_A(fh, FILEHANDLE), 
         "opened FileHandle for reading");
     DECREF(fh);
 

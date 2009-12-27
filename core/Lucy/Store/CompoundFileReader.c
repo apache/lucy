@@ -30,7 +30,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
     Folder_init((Folder*)self, Folder_Get_Path(folder));
 
     /* Parse metadata file. */
-    if (!metadata || !Obj_Is_A(metadata, HASH)) {
+    if (!metadata || !Hash_Is_A(metadata, HASH)) {
         error = Err_new(CB_newf("Can't read '%o' in '%o'", &cfmeta_file,
             Folder_Get_Path(folder)));
     }
@@ -275,11 +275,11 @@ bool_t
 CFReaderDH_close(CFReaderDirHandle *self)
 {
     if (self->elems) {
-        Obj_Dec_RefCount(self->elems);
+        VA_Dec_RefCount(self->elems);
         self->elems = NULL;
     }
     if (self->cf_reader) {
-        Obj_Dec_RefCount(self->cf_reader);
+        CFReader_Dec_RefCount(self->cf_reader);
         self->cf_reader = NULL;
     }
     return true;

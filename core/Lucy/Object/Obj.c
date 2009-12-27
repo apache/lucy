@@ -26,7 +26,7 @@ Obj_init(Obj *self)
 void
 Obj_destroy(Obj *self)
 {
-    Obj_Dec_RefCount(self->vtable);
+    VTable_Dec_RefCount(self->vtable);
     FREEMEM(self);
 }
 

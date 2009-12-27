@@ -188,7 +188,7 @@ END_INPUT
 
         $typemap_output .= <<END_OUTPUT;
 $label
-    \$arg = (SV*)Lucy_Obj_To_Host(\$var);
+    \$arg = (SV*)Lucy_Obj_To_Host((lucy_Obj*)\$var);
     LUCY_DECREF(\$var);
 
 END_OUTPUT

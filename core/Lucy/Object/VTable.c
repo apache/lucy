@@ -34,7 +34,7 @@ VTable_destroy(VTable *self)
     if (self->flags & VTABLE_F_IMMORTAL) {
         THROW(ERR, "Attempt to destroy immortal VTable for class %o", self->name);
     }
-    if (self->parent && (Obj_Get_RefCount(self->parent) == 2)) {
+    if (self->parent && (VTable_Get_RefCount(self->parent) == 2)) {
         S_remove_from_registry(self->parent->name);
     }
     DECREF(self->name);
@@ -240,7 +240,7 @@ S_remove_from_registry(const CharBuf *name)
     else {
         VTable *vtable = (VTable*)Hash_Delete(VTable_registry, (Obj*)name);
         if (vtable) {
-            Obj_Dec_RefCount(vtable);
+            VTable_Dec_RefCount(vtable);
         }
     }
 }

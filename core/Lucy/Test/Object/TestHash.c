@@ -98,7 +98,7 @@ test_Store_and_Fetch(TestBatch *batch)
         "Fetch against non-existent key returns NULL");
 
     Hash_Store(hash, (Obj*)&forty, INCREF(&foo));
-    ASSERT_TRUE(batch, Hash_Equals(&foo, Hash_Fetch(hash, (Obj*)&forty)),
+    ASSERT_TRUE(batch, ZCB_Equals(&foo, Hash_Fetch(hash, (Obj*)&forty)),
         "Hash_Store replaces existing value");
     ASSERT_FALSE(batch, Hash_Equals(hash, (Obj*)dupe), 
         "replacement value spoils equals");

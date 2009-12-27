@@ -50,11 +50,11 @@ test_Initialize_and_Check(TestBatch *batch)
 {
     FSFolder *folder = FSFolder_new(&test_dir_name);
     rmdir("_fsfolder_test");
-    ASSERT_FALSE(batch, Folder_Check(folder), 
+    ASSERT_FALSE(batch, FSFolder_Check(folder), 
         "Check() returns false when folder dir doesn't exist");
-    Folder_Initialize(folder);
+    FSFolder_Initialize(folder);
     PASS(batch, "Initialize() concludes without incident");
-    ASSERT_TRUE(batch, Folder_Check(folder), 
+    ASSERT_TRUE(batch, FSFolder_Check(folder), 
         "Initialize() created dir, and now Check() succeeds");
     DECREF(folder);
     S_tear_down();

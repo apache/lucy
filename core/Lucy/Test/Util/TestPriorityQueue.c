@@ -31,7 +31,7 @@ S_insert_num(NumPriorityQueue *pq, i32_t value)
 static i32_t
 S_pop_num(NumPriorityQueue *pq)
 {
-    Float64 *num = (Float64*)PriQ_Pop(pq);
+    Float64 *num = (Float64*)NumPriQ_Pop(pq);
     i32_t retval;
     if (!num) { THROW(ERR, "Queue is empty"); }
     retval = (i32_t)Float64_Get_Value(num);
@@ -43,26 +43,30 @@ static void
 test_Peek_and_Pop_All(TestBatch *batch)
 {
     NumPriorityQueue *pq = NumPriQ_new(5);
+    Float64 *val;
 
     S_insert_num(pq, 3);
     S_insert_num(pq, 1);
     S_insert_num(pq, 2);
     S_insert_num(pq, 20);
     S_insert_num(pq, 10);
-    ASSERT_INT_EQ(batch, (long)Float64_Get_Value(PriQ_Peek(pq)), 1, 
+    val = (Float64*)CERTIFY(NumPriQ_Peek(pq), FLOAT64);
+    ASSERT_INT_EQ(batch, (long)Float64_Get_Value(val), 1, 
         "peek at the least item in the queue" );
     {
-        VArray *got = PriQ_Pop_All(pq);
-        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(VA_Fetch(got, 0)), 20, 
-            "pop_all");
-        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(VA_Fetch(got, 1)), 10, 
-            "pop_all");
-        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(VA_Fetch(got, 2)), 3, 
-            "pop_all");
-        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(VA_Fetch(got, 3)), 2, 
-            "pop_all");
-        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(VA_Fetch(got, 4)), 1, 
-            "pop_all");
+        VArray  *got = NumPriQ_Pop_All(pq);
+
+        val = (Float64*)CERTIFY(VA_Fetch(got, 0), FLOAT64);
+        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(val), 20, "pop_all");
+        val = (Float64*)CERTIFY(VA_Fetch(got, 1), FLOAT64);
+        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(val), 10, "pop_all");
+        val = (Float64*)CERTIFY(VA_Fetch(got, 2), FLOAT64);
+        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(val),  3, "pop_all");
+        val = (Float64*)CERTIFY(VA_Fetch(got, 3), FLOAT64);
+        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(val),  2, "pop_all");
+        val = (Float64*)CERTIFY(VA_Fetch(got, 4), FLOAT64);
+        ASSERT_INT_EQ(batch, (long)Float64_Get_Value(val),  1, "pop_all");
+
         DECREF(got);
     }
 

@@ -334,7 +334,7 @@ VA_equals(VArray *self, Obj *other)
 { 
     VArray *evil_twin = (VArray*)other;
     if (evil_twin == self) return true;
-    if (!Obj_Is_A(evil_twin, VARRAY)) return false;
+    if (!Obj_Is_A(other, VARRAY)) return false;
     if (evil_twin->size != self->size) {
         return false;
     }

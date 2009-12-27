@@ -552,7 +552,7 @@ CB_equals(CharBuf *self, Obj *other)
 {
     CharBuf *const evil_twin = (CharBuf*)other;
     if (evil_twin == self) return true;
-    if (!Obj_Is_A(evil_twin, CHARBUF)) return false;
+    if (!Obj_Is_A(other, CHARBUF)) return false;
     return CB_equals_str(self, evil_twin->ptr, evil_twin->size);
 }
 

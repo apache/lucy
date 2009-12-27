@@ -99,7 +99,7 @@ BB_equals(ByteBuf *self, Obj *other)
 {
     ByteBuf *const evil_twin = (ByteBuf*)other;
     if (evil_twin == self) return true;
-    if (!Obj_Is_A(evil_twin, BYTEBUF)) return false;
+    if (!Obj_Is_A(other, BYTEBUF)) return false;
     return SI_equals_bytes(self, evil_twin->buf, evil_twin->size);
 }
 

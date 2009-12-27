@@ -123,8 +123,8 @@ XS($c_name)
         $refcount_mods
         retval = $func_sym($name_list);
         if (retval) {
-            ST(0) = (SV*)Lucy_Obj_To_Host(retval);
-            Lucy_Obj_Dec_RefCount(retval);
+            ST(0) = (SV*)Lucy_Obj_To_Host((lucy_Obj*)retval);
+            Lucy_Obj_Dec_RefCount((lucy_Obj*)retval);
         }
         else {
             ST(0) = newSV(0);

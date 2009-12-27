@@ -377,7 +377,7 @@ Folder_consolidate(Folder *self, const CharBuf *path)
     if (!folder) {
         THROW(ERR, "Can't consolidate %o", path);
     }
-    else if (Obj_Is_A(folder, COMPOUNDFILEREADER)) {
+    else if (Folder_Is_A(folder, COMPOUNDFILEREADER)) {
         THROW(ERR, "Can't consolidate %o twice", path);
     }
     else {

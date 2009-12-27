@@ -67,9 +67,9 @@ test_all(TestBatch *batch)
         "File correctly identified by Entry_Is_Dir");
 
     DECREF(dh);
-    Folder_Delete(folder, &foo_boffo);
-    Folder_Delete(folder, &foo);
-    Folder_Delete(folder, &boffo);
+    FSFolder_Delete(folder, &foo_boffo);
+    FSFolder_Delete(folder, &foo);
+    FSFolder_Delete(folder, &boffo);
     DECREF(folder);
     rmdir("_fsdir_test");
 }

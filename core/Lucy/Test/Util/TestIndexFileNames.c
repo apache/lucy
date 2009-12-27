@@ -12,28 +12,28 @@ test_local_part(TestBatch *batch)
     ZombieCharBuf *got   = &target;
     
     got = IxFileNames_local_part((CharBuf*)&source, got);
-    ASSERT_TRUE(batch, CB_Equals(got, (Obj*)&source), "simple name");
+    ASSERT_TRUE(batch, ZCB_Equals(got, (Obj*)&source), "simple name");
 
     ZCB_Assign_Str(&source, "foo.txt", 7);
     got = IxFileNames_local_part((CharBuf*)&source, got);
-    ASSERT_TRUE(batch, CB_Equals(got, (Obj*)&source), "name with extension");
+    ASSERT_TRUE(batch, ZCB_Equals(got, (Obj*)&source), "name with extension");
 
     ZCB_Assign_Str(&source, "/foo", 4);
     got = IxFileNames_local_part((CharBuf*)&source, got);
-    ASSERT_TRUE(batch, CB_Equals_Str(got, "foo", 3), "strip leading slash");
+    ASSERT_TRUE(batch, ZCB_Equals_Str(got, "foo", 3), "strip leading slash");
 
     ZCB_Assign_Str(&source, "/foo/", 5);
     got = IxFileNames_local_part((CharBuf*)&source, got);
-    ASSERT_TRUE(batch, CB_Equals_Str(got, "foo", 3), "strip trailing slash");
+    ASSERT_TRUE(batch, ZCB_Equals_Str(got, "foo", 3), "strip trailing slash");
 
     ZCB_Assign_Str(&source, "foo/bar\\ ", 9);
     got = IxFileNames_local_part((CharBuf*)&source, got);
-    ASSERT_TRUE(batch, CB_Equals_Str(got, "bar\\ ", 5),
+    ASSERT_TRUE(batch, ZCB_Equals_Str(got, "bar\\ ", 5),
         "Include garbage like backslashes and spaces");
 
     ZCB_Assign_Str(&source, "foo/bar/baz.txt", 15);
     got = IxFileNames_local_part((CharBuf*)&source, got);
-    ASSERT_TRUE(batch, CB_Equals_Str(got, "baz.txt", 7), "find last component");
+    ASSERT_TRUE(batch, ZCB_Equals_Str(got, "baz.txt", 7), "find last component");
 }
 
 static void

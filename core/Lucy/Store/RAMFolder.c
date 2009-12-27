@@ -72,7 +72,7 @@ RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name,
     /* Make sure the filepath isn't a directory, and that it either exists
      * or we have permission to create it. */
     if (file) {
-        if (!Obj_Is_A(file, RAMFILE)) {
+        if (!RAMFile_Is_A(file, RAMFILE)) {
             Err_set_error(Err_new(CB_newf("Not a file: '%o'", fullpath)));
             DECREF(fullpath);
             return NULL;
@@ -150,28 +150,36 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
     }
 
     /* Extract RAMFolders from compound reader wrappers, if necessary. */
-    inner_from_folder = Obj_Is_A(from_folder, COMPOUNDFILEREADER)
-                      ? (RAMFolder*)CFReader_Get_Real_Folder(from_folder)
-                      : (RAMFolder*)from_folder;
-    inner_to_folder   = Obj_Is_A(to_folder, COMPOUNDFILEREADER)
-                      ? (RAMFolder*)CFReader_Get_Real_Folder(to_folder)
-                      : (RAMFolder*)to_folder;
-    if (!Obj_Is_A(inner_from_folder, RAMFOLDER)) {
+    if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)) {
+        inner_from_folder = (RAMFolder*)CFReader_Get_Real_Folder(
+            (CompoundFileReader*)from_folder);
+    }
+    else {
+        inner_from_folder = (RAMFolder*)from_folder;
+    }
+    if (Folder_Is_A(to_folder, COMPOUNDFILEREADER)) {
+        inner_to_folder = (RAMFolder*)CFReader_Get_Real_Folder(
+            (CompoundFileReader*)to_folder);
+    }
+    else {
+        inner_to_folder = (RAMFolder*)to_folder;
+    }
+    if (!RAMFolder_Is_A(inner_from_folder, RAMFOLDER)) {
         Err_set_error(Err_new(CB_newf("Not a RAMFolder, but a '%o'",
-            Obj_Get_Class_Name(inner_from_folder))));
+            Obj_Get_Class_Name((Obj*)inner_from_folder))));
         return false;
     }
-    if (!Obj_Is_A(inner_to_folder, RAMFOLDER)) {
+    if (!RAMFolder_Is_A(inner_to_folder, RAMFOLDER)) {
         Err_set_error(Err_new(CB_newf("Not a RAMFolder, but a '%o'",
-            Obj_Get_Class_Name(inner_to_folder))));
+            Obj_Get_Class_Name((Obj*)inner_to_folder))));
         return false;
     }
 
     /* Find the original element. */
     elem = Hash_Fetch(inner_from_folder->entries, (Obj*)from_name);
     if (!elem) {
-        if (   Obj_Is_A(from_folder, COMPOUNDFILEREADER)
-            && CFReader_Local_Exists(from_folder, (CharBuf*)from_name)
+        if (   Folder_Is_A(from_folder, COMPOUNDFILEREADER)
+            && Folder_Local_Exists(from_folder, (CharBuf*)from_name)
         ) {
             Err_set_error(Err_new(CB_newf("Source file '%o' is virtual", 
                 from)));
@@ -219,7 +227,7 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
         DECREF(Hash_Delete(inner_from_folder->entries, (Obj*)from_name));
         if (Obj_Is_A(elem, FOLDER)) {
             CharBuf *newpath = S_fullpath(inner_to_folder, (CharBuf*)to_name);
-            Folder_Set_Path(elem, newpath);
+            Folder_Set_Path((Folder*)elem, newpath);
             DECREF(newpath);
         }
     }
@@ -288,10 +296,15 @@ RAMFolder_local_delete(RAMFolder *self, const CharBuf *name)
             ;
         }
         else if (Obj_Is_A(entry, FOLDER)) {
-            RAMFolder *inner_folder = Obj_Is_A(entry, COMPOUNDFILEREADER)
-                ? (RAMFolder*)CERTIFY(
-                    CFReader_Get_Real_Folder(entry), RAMFOLDER)
-                : (RAMFolder*)CERTIFY(entry, RAMFOLDER);
+            RAMFolder *inner_folder;
+            if (Obj_Is_A(entry, COMPOUNDFILEREADER)) {
+                inner_folder = (RAMFolder*)CERTIFY(
+                    CFReader_Get_Real_Folder((CompoundFileReader*)entry), 
+                    RAMFOLDER);
+            }
+            else {
+                inner_folder = (RAMFolder*)CERTIFY(entry, RAMFOLDER);
+            }
             if (Hash_Get_Size(inner_folder->entries)) {
                 /* Can't delete non-empty dir. */
                 return false;
@@ -312,7 +325,7 @@ Folder*
 RAMFolder_local_find_folder(RAMFolder *self, const CharBuf *path)
 {
     Folder *local_folder = (Folder*)Hash_Fetch(self->entries, (Obj*)path);
-    if (local_folder && Obj_Is_A(local_folder, FOLDER)) {
+    if (local_folder && Folder_Is_A(local_folder, FOLDER)) {
         return local_folder;
     }
     return NULL;

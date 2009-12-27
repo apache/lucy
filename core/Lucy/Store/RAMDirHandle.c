@@ -27,11 +27,11 @@ bool_t
 RAMDH_close(RAMDirHandle *self)
 {
     if (self->elems) {
-        Obj_Dec_RefCount(self->elems);
+        VA_Dec_RefCount(self->elems);
         self->elems = NULL;
     }
     if (self->folder) {
-        Obj_Dec_RefCount(self->folder);
+        RAMFolder_Dec_RefCount(self->folder);
         self->folder = NULL;
     }
     return true;
@@ -62,7 +62,7 @@ RAMDH_entry_is_dir(RAMDirHandle *self)
     if (self->elems) {
         CharBuf *name = (CharBuf*)VA_Fetch(self->elems, self->tick);
         if (name) {
-            return Folder_Local_Is_Directory(self->folder, name);
+            return RAMFolder_Local_Is_Directory(self->folder, name);
         }
     }
     return false;

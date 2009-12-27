@@ -83,9 +83,9 @@ BitVec_clone(BitVector *self)
     u32_t byte_size      = (u32_t)ceil(self->cap / 8.0);
 
     /* Forbid inheritance. */
-    if (Obj_Get_VTable(self) != BITVECTOR) {
+    if (BitVec_Get_VTable(self) != BITVECTOR) {
         THROW(ERR, "Attempt by %o to inherit BitVec_Clone", 
-            Obj_Get_Class_Name(self));
+            BitVec_Get_Class_Name(self));
     }
 
     memcpy(evil_twin->bits, self->bits, byte_size * sizeof(u8_t));

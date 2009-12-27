@@ -111,7 +111,7 @@ $full_func_sym($full_struct *self)
 {
     lucy_Hash *dump = lucy_Hash_new(0);
     Lucy_Hash_Store_Str(dump, "_class", 6,
-        (lucy_Obj*)Lucy_CB_Clone(Lucy_Obj_Get_Class_Name(self)));
+        (lucy_Obj*)Lucy_CB_Clone(Lucy_Obj_Get_Class_Name((lucy_Obj*)self)));
 END_STUFF
         @members = $class->member_vars;
         shift @members;    # skip self->vtable
@@ -141,7 +141,7 @@ sub _process_dump_member {
     elsif ( $type->is_object ) {
         return <<END_STUFF;
     if (self->$name) {
-         Lucy_Hash_Store_Str(dump, "$name", $len, Lucy_Obj_Dump(self->$name));
+         Lucy_Hash_Store_Str(dump, "$name", $len, Lucy_Obj_Dump((lucy_Obj*)self->$name));
     }
 END_STUFF
     }

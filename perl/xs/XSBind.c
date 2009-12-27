@@ -87,7 +87,7 @@ XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable,
              * ZombieCharBuf. */
             STRLEN size;
             char *ptr = SvPVutf8(sv, size);
-            Lucy_ViewCB_Assign_Str(zcb, ptr, size);
+            Lucy_ZCB_Assign_Str(zcb, ptr, size);
             retval = (lucy_Obj*)zcb;
         }
         else if (SvROK(sv)) {
@@ -134,18 +134,18 @@ XSBind_lucy_to_perl(lucy_Obj *obj)
         return S_lucy_hash_to_perl_hash((lucy_Hash*)obj);
     }
     else if (Lucy_Obj_Is_A(obj, LUCY_FLOATNUM)) {
-        return newSVnv(Lucy_Num_To_F64(obj));
+        return newSVnv(Lucy_Obj_To_F64(obj));
     }
     else if (sizeof(IV) == 8 && Lucy_Obj_Is_A(obj, LUCY_INTNUM)) {
-        chy_i64_t num = Lucy_Num_To_I64(obj);
+        chy_i64_t num = Lucy_Obj_To_I64(obj);
         return newSViv((IV)num);
     }
     else if (sizeof(IV) == 4 && Lucy_Obj_Is_A(obj, LUCY_INTEGER32)) {
-        chy_i32_t num = (chy_i32_t)Lucy_Num_To_I64(obj);
+        chy_i32_t num = (chy_i32_t)Lucy_Obj_To_I64(obj);
         return newSViv((IV)num);
     }
     else if (sizeof(IV) == 4 && Lucy_Obj_Is_A(obj, LUCY_INTEGER64)) {
-        chy_i64_t num = Lucy_Num_To_I64(obj);
+        chy_i64_t num = Lucy_Obj_To_I64(obj);
         return newSVnv((double)num); /* lossy */
     }
     else {
@@ -312,10 +312,10 @@ S_lucy_hash_to_perl_hash(lucy_Hash *hash)
     while (Lucy_Hash_Iter_Next(hash, (lucy_Obj**)&key, &val)) {
         /* Recurse for each value. */
         SV *val_sv = XSBind_lucy_to_perl(val);
-        if (!Lucy_Obj_Is_A(key, LUCY_CHARBUF)) {
+        if (!Lucy_Obj_Is_A((lucy_Obj*)key, LUCY_CHARBUF)) {
             LUCY_THROW(LUCY_ERR, 
                 "Can't convert a key of class %o to a Perl hash key",
-                Lucy_Obj_Get_Class_Name(key));
+                Lucy_Obj_Get_Class_Name((lucy_Obj*)key));
         }
         else {
             STRLEN key_size = Lucy_CB_Get_Size(key);

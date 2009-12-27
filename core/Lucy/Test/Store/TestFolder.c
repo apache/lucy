@@ -127,12 +127,12 @@ test_Enclosing_Folder_and_Find_Folder(TestBatch *batch)
         Folder *found = Folder_Find_Folder(folder, &foo_bar);
         ASSERT_TRUE(batch, 
             encloser 
-            && Obj_Is_A(encloser, FOLDER)
+            && Folder_Is_A(encloser, FOLDER)
             && CB_Ends_With(Folder_Get_Path(encloser), &foo),
             "Enclosing_Folder() - find one directory down");
         ASSERT_TRUE(batch, 
             found 
-            && Obj_Is_A(found, FOLDER)
+            && Folder_Is_A(found, FOLDER)
             && CB_Ends_With(Folder_Get_Path(found), &bar),
             "Find_Folder() - 'foo/bar'");
     }
@@ -142,12 +142,12 @@ test_Enclosing_Folder_and_Find_Folder(TestBatch *batch)
         Folder *found = Folder_Find_Folder(folder, &foo_bar_baz);
         ASSERT_TRUE(batch, 
             encloser 
-            && Obj_Is_A(encloser, FOLDER)
+            && Folder_Is_A(encloser, FOLDER)
             && CB_Ends_With(Folder_Get_Path(encloser), &bar), 
             "Find two directories down");
         ASSERT_TRUE(batch, 
             found 
-            && Obj_Is_A(found, FOLDER)
+            && Folder_Is_A(found, FOLDER)
             && CB_Ends_With(Folder_Get_Path(found), &baz),
             "Find_Folder() - 'foo/bar/baz'");
     }
@@ -158,7 +158,7 @@ test_Enclosing_Folder_and_Find_Folder(TestBatch *batch)
         Folder *found = Folder_Find_Folder(folder, &foo_bar_baz_boffo);
         ASSERT_TRUE(batch, 
             encloser 
-            && Obj_Is_A(encloser, FOLDER)
+            && Folder_Is_A(encloser, FOLDER)
             && CB_Ends_With(Folder_Get_Path(encloser), &baz), 
             "Recurse to find a directory containing a real file");
         ASSERT_TRUE(batch, found == NULL,
