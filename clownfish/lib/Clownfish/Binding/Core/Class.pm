@@ -182,7 +182,7 @@ sub to_c_header {
     for my $method (@methods) {
         $method_defs .= Clownfish::Binding::Core::Method->method_def(
             method => $method,
-            cnick  => $cnick,
+            class  => $self->{client},
         ) . "\n";
     }
 
