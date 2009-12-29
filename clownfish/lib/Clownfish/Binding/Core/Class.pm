@@ -105,7 +105,7 @@ $PREFIX$vt_type $PREFIX$vt = {
     {1}, /* ref.count */
     $parent_ref, /* parent */
     (${prefix}CharBuf*)&${PREFIX}$name_var,
-    ${PREFIX}VTABLE_F_IMMORTAL, /* flags */
+    0, /* flags */
     NULL, /* "void *x" member reserved for future use */
     sizeof($self->{full_struct_sym}), /* obj_alloc_size */
     offsetof(${prefix}VTable, methods) 

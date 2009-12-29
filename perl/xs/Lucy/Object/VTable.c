@@ -12,7 +12,7 @@ lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj)
     lucy_Obj *obj 
         = (lucy_Obj*)lucy_Memory_wrapped_calloc(self->obj_alloc_size, 1);
     SV *inner_obj = SvRV((SV*)host_obj);
-    obj->vtable = (lucy_VTable*)LUCY_INCREF(self);
+    obj->vtable = self;
     sv_setiv(inner_obj, PTR2IV(obj));
     obj->ref.host_obj = inner_obj;
     return obj;
@@ -38,6 +38,19 @@ lucy_VTable_find_parent_class(const lucy_CharBuf *class_name)
 {
     return lucy_Host_callback_str(LUCY_VTABLE, "find_parent_class", 1, 
         LUCY_ARG_STR("class_name", class_name));
+}
+
+void*
+lucy_VTable_to_host(lucy_VTable *self)
+{
+    chy_bool_t first_time = self->ref.count < 4 ? true : false;
+    lucy_VTable_to_host_t to_host = (lucy_VTable_to_host_t)
+        LUCY_SUPER_METHOD(LUCY_VTABLE, VTable, To_Host);
+    SV *host_obj = (SV*)to_host(self);
+    if (first_time) {
+        SvSHARE((SV*)self->ref.host_obj);
+    }
+    return host_obj;
 }
 
 /* Copyright 2009 The Apache Software Foundation

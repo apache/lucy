@@ -17,11 +17,6 @@
 
 size_t lucy_VTable_offset_of_parent = offsetof(lucy_VTable, parent);
 
-/* Clean up a VTable when its refcount drops to 0. 
- */
-static void 
-S_remove_from_registry(const CharBuf *name);
-
 /* Remove spaces and underscores, convert to lower case. */
 static void
 S_scrunch_charbuf(CharBuf *source, CharBuf *target);
@@ -31,15 +26,7 @@ Hash *VTable_registry = NULL;
 void
 VTable_destroy(VTable *self)
 {
-    if (self->flags & VTABLE_F_IMMORTAL) {
-        THROW(ERR, "Attempt to destroy immortal VTable for class %o", self->name);
-    }
-    if (self->parent && (VTable_Get_RefCount(self->parent) == 2)) {
-        S_remove_from_registry(self->parent->name);
-    }
-    DECREF(self->name);
-    DECREF(self->parent);
-    SUPER_DESTROY(self, VTABLE);
+    THROW(ERR, "Insane attempt to destroy VTable for class '%o'", self->name);
 }
 
 VTable*
@@ -49,30 +36,42 @@ VTable_clone(VTable *self)
         = (VTable*)Memory_wrapped_calloc(self->vt_alloc_size, 1);
 
     memcpy(evil_twin, self, self->vt_alloc_size);
-    INCREF(evil_twin->vtable);
     evil_twin->name = CB_Clone(self->name);
     evil_twin->ref.count = 1; 
 
-    /* Mark evil_twin as dynamic. */
-    evil_twin->flags = self->flags & ~VTABLE_F_IMMORTAL;
-
-    if (evil_twin->parent != NULL)
-        (void)INCREF(evil_twin->parent);
-
     return evil_twin;
+}
+
+Obj*
+VTable_inc_refcount(VTable *self)
+{
+    return (Obj*)self;
 }
 
 u32_t
 VTable_dec_refcount(VTable *self)
 {
-    VTable_dec_refcount_t super_decref 
-        = (VTable_dec_refcount_t)SUPER_METHOD(VTABLE, VTable, Dec_RefCount);
-    u32_t modified_refcount = super_decref(self);
-    if (modified_refcount == 1) {
-        S_remove_from_registry(self->name);
-        modified_refcount--;
-    }
-    return modified_refcount;
+    UNUSED_VAR(self);
+    return 1;
+}
+
+u32_t
+VTable_get_refcount(VTable *self)
+{
+    UNUSED_VAR(self);
+    /* VTable_Get_RefCount() lies to other Lucy code about the refcount
+     * because we don't want to have to synchronize access to the cached host
+     * object to which we have delegated responsibility for keeping refcounts.
+     * It always returns 1 because 1 is a positive number, and thus other Lucy
+     * code will be fooled into believing it never needs to take action such
+     * as initiating a destructor.
+     * 
+     * It's possible that the host has in fact increased the refcount of the
+     * cached host object if there are multiple refs to it on the other side
+     * of the Lucy/host border, but returning 1 is good enough to fool Lucy
+     * code.
+     */
+    return 1;
 }
 
 void
@@ -116,18 +115,13 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
             }
             else {
                 parent = VTable_singleton(parent_class, NULL);
-                DECREF(parent_class);
             }
         }
-        (void)INCREF(parent);
 
         /* Copy source vtable. */
         singleton = VTable_Clone(parent);
-        DECREF(singleton->vtable);
-        singleton->vtable = (VTable*)INCREF(VTABLE);
 
         /* Turn clone into child. */
-        DECREF(singleton->parent);
         singleton->parent = parent; 
         DECREF(singleton->name);
         singleton->name = CB_Clone(subclass_name);
@@ -172,7 +166,7 @@ Obj*
 VTable_make_obj(VTable *self)
 {
     Obj *obj = (Obj*)Memory_wrapped_calloc(self->obj_alloc_size, 1);
-    obj->vtable = (VTable*)INCREF(self);
+    obj->vtable = self;
     obj->ref.count = 1;
     return obj;
 }
@@ -217,7 +211,7 @@ VTable_add_to_registry(VTable *vtable)
         }
     }
     else {
-        Hash_Store(VTable_registry, (Obj*)vtable->name, INCREF(vtable));
+        Hash_Store(VTable_registry, (Obj*)vtable->name, (Obj*)vtable);
     }
 }
 
@@ -229,20 +223,6 @@ VTable_fetch_vtable(const CharBuf *class_name)
         vtable = (VTable*)Hash_Fetch(VTable_registry, (Obj*)class_name);
     }
     return vtable;
-}
-
-static void 
-S_remove_from_registry(const CharBuf *name)
-{
-    if (VTable_registry == NULL) {
-        THROW(ERR, "Attempt to remove '%o', but registry is NULL", name);
-    }
-    else {
-        VTable *vtable = (VTable*)Hash_Delete(VTable_registry, (Obj*)name);
-        if (vtable) {
-            VTable_Dec_RefCount(vtable);
-        }
-    }
 }
 
 /* Copyright 2009 The Apache Software Foundation

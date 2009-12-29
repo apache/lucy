@@ -98,20 +98,21 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
     public incremented VTable* 
     Clone(VTable *self);
 
+    incremented Obj*
+    Inc_RefCount(VTable *self);
+
     u32_t
     Dec_RefCount(VTable *self);
+
+    u32_t
+    Get_RefCount(VTable *self);
+
+    void*
+    To_Host(VTable *self);
     
     public void 
     Destroy(VTable *self);
 }
-
-__C__
-#define LUCY_VTABLE_F_IMMORTAL 0x1
-
-#ifdef LUCY_USE_SHORT_NAMES
-  #define VTABLE_F_IMMORTAL LUCY_VTABLE_F_IMMORTAL
-#endif
-__END_C__
 
 /* Copyright 2009 The Apache Software Foundation
  *
