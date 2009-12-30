@@ -58,8 +58,7 @@ sub extra_ccflags {
         if ( defined $gcc_version ) {
             $gcc_version =~ /^(\d+(\.\d+)?)/ or die "no match";
             $gcc_version = $1;
-            $extra_ccflags .= "-DPERL_GCC_PEDANTIC -ansi -pedantic -Wall "
-                . "-std=c89 -Wno-long-long ";
+            $extra_ccflags .= "-DPERL_GCC_PEDANTIC -std=c99 -pedantic -Wall ";
             $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct
             $extra_ccflags .= "-Wno-variadic-macros "
                 if $gcc_version > 3.4;    # at least not on gcc 3.4
