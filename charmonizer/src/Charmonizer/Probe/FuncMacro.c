@@ -30,7 +30,7 @@ METAQUOTE;
 /* code for verifying inline keyword */
 static char inline_code[] = METAQUOTE
     #include "_charm.h" 
-    %s int foo() { return 1; }
+    static %s int foo() { return 1; }
     int main() {
         Charm_Setup;
         printf("%%d", foo());
@@ -46,8 +46,8 @@ S_try_inline(const char *keyword, size_t *output_len) {
 }
 
 static const char* inline_options[] = {
-    "__inline__",
     "__inline",
+    "__inline__",
     "inline"
 };
 static int num_inline_options = sizeof(inline_options) / sizeof(void*);
