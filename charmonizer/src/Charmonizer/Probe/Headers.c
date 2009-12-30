@@ -143,6 +143,11 @@ Headers_run(void)
         }
     }
 
+    /* One-offs. */
+    if (HeadCheck_check_header("pthread.h")) {
+        S_keep("pthread.h");
+    }
+
     /* append the config with every header detected so far */
     for (i = 0; keepers[i] != NULL; i++) {
         S_encode_affirmation(keepers[i]);

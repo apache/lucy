@@ -64,6 +64,10 @@ chaz_Headers_check(const char *header_name);
  * HAS_TERMIOS_H
  * HAS_UNISTD_H
  * HAS_UTIME_H
+ *
+ * If pthread.h is available, this will be exported:
+ * 
+ * HAS_PTHREAD_H
  */
 void 
 chaz_Headers_run(void);

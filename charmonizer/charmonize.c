@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Charmonizer/Probe.h"
+#include "Charmonizer/Probe/AtomicOps.h"
 #include "Charmonizer/Probe/DirManip.h"
 #include "Charmonizer/Probe/Floats.h"
 #include "Charmonizer/Probe/FuncMacro.h"
@@ -37,6 +38,7 @@ int main(int argc, char **argv)
     /* Run probe modules. */
     chaz_DirManip_run();
     chaz_Headers_run();
+    chaz_AtomicOps_run();
     chaz_FuncMacro_run();
     chaz_Integers_run();
     chaz_Floats_run();

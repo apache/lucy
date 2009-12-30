@@ -84,6 +84,9 @@ PPCODE:
         lucy_TestRAMFolder_run_tests();
     }
     /* Lucy::Util */
+    else if (strEQ(package, "TestAtomic")) {
+        lucy_TestAtomic_run_tests();
+    }
     else if (strEQ(package, "TestIndexFileNames")) {
         lucy_TestIxFileNames_run_tests();
     }
