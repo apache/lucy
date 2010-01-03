@@ -1,9 +1,9 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Dir.h"
 #include "Charmonizer/Core/Util.h"
-#include "Charmonizer/Core/HeadCheck.h"
+#include "Charmonizer/Core/HeaderChecker.h"
 #include "Charmonizer/Probe/DirManip.h"
 #include <string.h>
 #include <stdio.h>
@@ -26,10 +26,10 @@ DirManip_run(void)
 
     /* Header checks. */
     if (has_dirent_h) {
-        ModHand_append_conf("#define CHY_HAS_DIRENT_H\n");
+        ConfWriter_append_conf("#define CHY_HAS_DIRENT_H\n");
     }
     if (has_direct_h) {
-        ModHand_append_conf("#define CHY_HAS_DIRECT_H\n");
+        ConfWriter_append_conf("#define CHY_HAS_DIRECT_H\n");
     }
 
     /* Check for members in struct dirent. */
@@ -37,26 +37,26 @@ DirManip_run(void)
         has_dirent_d_namlen = HeadCheck_contains_member("struct dirent", 
             "d_namlen", "#include <sys/types.h>\n#include <dirent.h>");
         if (has_dirent_d_namlen) {
-            ModHand_append_conf("#define CHY_HAS_DIRENT_D_NAMLEN\n", dir_sep);
+            ConfWriter_append_conf("#define CHY_HAS_DIRENT_D_NAMLEN\n", dir_sep);
         }
         has_dirent_d_type = HeadCheck_contains_member("struct dirent", 
             "d_type", "#include <sys/types.h>\n#include <dirent.h>");
         if (has_dirent_d_type) {
-            ModHand_append_conf("#define CHY_HAS_DIRENT_D_TYPE\n", dir_sep);
+            ConfWriter_append_conf("#define CHY_HAS_DIRENT_D_TYPE\n", dir_sep);
         }
     }
 
     if (Dir_mkdir_num_args == 2) {
         /* It's two args, but the command isn't "mkdir". */
-        ModHand_append_conf("#define chy_makedir(_dir, _mode) %s(_dir, _mode)\n",
+        ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir, _mode)\n",
             Dir_mkdir_command);
-        ModHand_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 0\n");
+        ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 0\n");
     }
     else if (Dir_mkdir_num_args == 1) {
         /* It's one arg... mode arg will be ignored. */
-        ModHand_append_conf("#define chy_makedir(_dir, _mode) %s(_dir)\n",
+        ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir)\n",
             Dir_mkdir_command);
-        ModHand_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 1\n");
+        ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 1\n");
     }
 
     /* Create a directory. */
@@ -83,7 +83,7 @@ DirManip_run(void)
         dir_sep_is_valid = true;
     }
     if (dir_sep_is_valid) {
-        ModHand_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
+        ConfWriter_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
     }
 
     /* Clean up - delete all possible files without verifying. */
@@ -98,20 +98,20 @@ DirManip_run(void)
     Dir_mkdir("_charm_test_remove_me");
     if (0 == remove("_charm_test_remove_me")) {
         remove_zaps_dirs = true;
-        ModHand_append_conf("#define CHY_REMOVE_ZAPS_DIRS\n");
+        ConfWriter_append_conf("#define CHY_REMOVE_ZAPS_DIRS\n");
     }
     Dir_rmdir("_charm_test_remove_me");
 
     /* Shorten. */
     START_SHORT_NAMES;
-    if (dir_sep_is_valid) { ModHand_shorten_macro("DIR_SEP"); }
-    if (has_dirent_h)     { ModHand_shorten_macro("HAS_DIRENT_H"); }
-    if (has_direct_h)     { ModHand_shorten_macro("HAS_DIRECT_H"); }
-    if (has_dirent_d_namlen) { ModHand_shorten_macro("HAS_DIRENT_D_NAMLEN"); }
-    if (has_dirent_d_type)   { ModHand_shorten_macro("HAS_DIRENT_D_TYPE"); }
-    ModHand_shorten_function("makedir");
-    ModHand_shorten_macro("MAKEDIR_MODE_IGNORED");
-    if (remove_zaps_dirs) { ModHand_shorten_macro("REMOVE_ZAPS_DIRS"); }
+    if (dir_sep_is_valid) { ConfWriter_shorten_macro("DIR_SEP"); }
+    if (has_dirent_h)     { ConfWriter_shorten_macro("HAS_DIRENT_H"); }
+    if (has_direct_h)     { ConfWriter_shorten_macro("HAS_DIRECT_H"); }
+    if (has_dirent_d_namlen) { ConfWriter_shorten_macro("HAS_DIRENT_D_NAMLEN"); }
+    if (has_dirent_d_type)   { ConfWriter_shorten_macro("HAS_DIRENT_D_TYPE"); }
+    ConfWriter_shorten_function("makedir");
+    ConfWriter_shorten_macro("MAKEDIR_MODE_IGNORED");
+    if (remove_zaps_dirs) { ConfWriter_shorten_macro("REMOVE_ZAPS_DIRS"); }
 
     END_SHORT_NAMES;
 

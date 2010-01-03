@@ -5,7 +5,7 @@
 #include <stdarg.h>
 
 #include "Charmonizer/Core/Util.h"
-#include "Charmonizer/Core/OperSys.h"
+#include "Charmonizer/Core/OperatingSystem.h"
 
 static void
 S_probe_devnull(OperSys *self);

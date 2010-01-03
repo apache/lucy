@@ -6,9 +6,9 @@
 #include "Charmonizer/Core/Dir.h"
 
 #include "Charmonizer/Core/Compiler.h"
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
-#include "Charmonizer/Core/OperSys.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
+#include "Charmonizer/Core/OperatingSystem.h"
 #include "Charmonizer/Core/Util.h"
 
 static chaz_bool_t mkdir_available = false;
@@ -56,7 +56,7 @@ S_try_init_posix_mkdir(char *header)
 
     /* Attempt compilation. */
     sprintf(code_buf, posix_mkdir_code, header);
-    mkdir_available = ModHand_compiler->compile_exe(ModHand_compiler, "_charm_mkdir.c",
+    mkdir_available = ConfWriter_compiler->compile_exe(ConfWriter_compiler, "_charm_mkdir.c",
         "_charm_mkdir", code_buf, strlen(code_buf));
 
     /* Set vars on success. */
@@ -77,7 +77,7 @@ S_try_init_posix_mkdir(char *header)
 static chaz_bool_t
 S_try_init_win_mkdir()
 {
-    mkdir_available = ModHand_compiler->compile_exe(ModHand_compiler, "_charm_mkdir.c",
+    mkdir_available = ConfWriter_compiler->compile_exe(ConfWriter_compiler, "_charm_mkdir.c",
         "_charm_mkdir", win_mkdir_code, strlen(win_mkdir_code));
     if (mkdir_available) {
         strcpy(mkdir_command, "_mkdir");
@@ -107,7 +107,7 @@ S_try_init_rmdir(char *header)
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
     sprintf(code_buf, rmdir_code, header);
-    rmdir_available = ModHand_compiler->compile_exe(ModHand_compiler, "_charm_rmdir.c",
+    rmdir_available = ConfWriter_compiler->compile_exe(ConfWriter_compiler, "_charm_rmdir.c",
         "_charm_rmdir", code_buf, strlen(code_buf));
     free(code_buf);
     return rmdir_available;
@@ -139,14 +139,14 @@ chaz_bool_t
 Dir_mkdir(const char *filepath)
 {
     if (!initialized) { Dir_init(); }
-    return ModHand_os->run_local(ModHand_os, "_charm_mkdir ", filepath, NULL);
+    return ConfWriter_os->run_local(ConfWriter_os, "_charm_mkdir ", filepath, NULL);
 }
 
 chaz_bool_t
 Dir_rmdir(const char *filepath)
 {
     if (!initialized) { Dir_init(); }
-    return ModHand_os->run_local(ModHand_os, "_charm_rmdir ", filepath, NULL);
+    return ConfWriter_os->run_local(ConfWriter_os, "_charm_rmdir ", filepath, NULL);
 }
 
 /**

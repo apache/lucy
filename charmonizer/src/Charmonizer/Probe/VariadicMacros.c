@@ -1,6 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/VariadicMacros.h"
 #include <string.h>
@@ -43,33 +43,33 @@ VariadicMacros_run(void)
     START_RUN("VariadicMacros");
 
     /* test for ISO-style variadic macros */
-    output = ModHand_capture_output(iso_code, strlen(iso_code), &output_len);
+    output = ConfWriter_capture_output(iso_code, strlen(iso_code), &output_len);
     if (output != NULL) {
         has_varmacros = true;
         has_iso_varmacros = true;
-        ModHand_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
-        ModHand_append_conf("#define CHY_HAS_ISO_VARIADIC_MACROS\n");
+        ConfWriter_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
+        ConfWriter_append_conf("#define CHY_HAS_ISO_VARIADIC_MACROS\n");
     }
 
     /* test for GNU-style variadic macros */
-    output = ModHand_capture_output(gnuc_code, strlen(gnuc_code), &output_len);
+    output = ConfWriter_capture_output(gnuc_code, strlen(gnuc_code), &output_len);
     if (output != NULL) {
         has_gnuc_varmacros = true;
         if (has_varmacros == false) {
             has_varmacros = true;
-            ModHand_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
+            ConfWriter_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
         }
-        ModHand_append_conf("#define CHY_HAS_GNUC_VARIADIC_MACROS\n");
+        ConfWriter_append_conf("#define CHY_HAS_GNUC_VARIADIC_MACROS\n");
     }
 
     /* shorten */
     START_SHORT_NAMES;
     if (has_varmacros)
-        ModHand_shorten_macro("HAS_VARIADIC_MACROS");
+        ConfWriter_shorten_macro("HAS_VARIADIC_MACROS");
     if (has_iso_varmacros)
-        ModHand_shorten_macro("HAS_ISO_VARIADIC_MACROS");
+        ConfWriter_shorten_macro("HAS_ISO_VARIADIC_MACROS");
     if (has_gnuc_varmacros)
-        ModHand_shorten_macro("HAS_GNUC_VARIADIC_MACROS");
+        ConfWriter_shorten_macro("HAS_GNUC_VARIADIC_MACROS");
     END_SHORT_NAMES;
 
     END_RUN;

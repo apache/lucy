@@ -1,4 +1,4 @@
-/* Charmonizer/Probe/HeadCheck.h
+/* Charmonizer/Probe/HeaderChecker.h
  */
 
 #ifndef H_CHAZ_HEAD_CHECK

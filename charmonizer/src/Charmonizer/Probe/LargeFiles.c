@@ -1,7 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Stat.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/LargeFiles.h"
@@ -103,13 +103,13 @@ LargeFiles_run(void)
 
     /* write the affirmations/definitions */
     if (success) {
-        ModHand_append_conf("#define CHY_HAS_LARGE_FILE_SUPPORT\n");
+        ConfWriter_append_conf("#define CHY_HAS_LARGE_FILE_SUPPORT\n");
         /* alias these only if they're not already provided and correct */
         if (strcmp(off64_type, "off64_t") != 0) {
-            ModHand_append_conf("#define chy_off64_t %s\n",  off64_type);
-            ModHand_append_conf("#define chy_fopen64 %s\n",  fopen_command);
-            ModHand_append_conf("#define chy_ftello64 %s\n", ftell_command);
-            ModHand_append_conf("#define chy_fseeko64 %s\n", fseek_command);
+            ConfWriter_append_conf("#define chy_off64_t %s\n",  off64_type);
+            ConfWriter_append_conf("#define chy_fopen64 %s\n",  fopen_command);
+            ConfWriter_append_conf("#define chy_ftello64 %s\n", ftell_command);
+            ConfWriter_append_conf("#define chy_fseeko64 %s\n", fseek_command);
         }
     }
 
@@ -120,7 +120,7 @@ LargeFiles_run(void)
             found_lseek = S_probe_lseek(&combo);
             if (found_lseek) {
                 strcpy(lseek_command, combo.lseek_command);
-                ModHand_append_conf("#define chy_lseek64 %s\n", lseek_command);
+                ConfWriter_append_conf("#define chy_lseek64 %s\n", lseek_command);
                 break;
             }
         }
@@ -129,7 +129,7 @@ LargeFiles_run(void)
             found_pread64 = S_probe_pread64(&combo);
             if (found_pread64) {
                 strcpy(pread64_command, combo.pread64_command);
-                ModHand_append_conf("#define chy_pread64 %s\n", pread64_command);
+                ConfWriter_append_conf("#define chy_pread64 %s\n", pread64_command);
                 found_pread64 = true;
                 break;
             }
@@ -138,32 +138,32 @@ LargeFiles_run(void)
 
     /* check for sparse files */
     if (S_check_sparse_files()) {
-        ModHand_append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
+        ConfWriter_append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
         /* see if we can create a 5 GB file without crashing */
         if (success && S_can_create_big_files())
-            ModHand_append_conf("#define CHAZ_CAN_CREATE_BIG_FILES\n");
+            ConfWriter_append_conf("#define CHAZ_CAN_CREATE_BIG_FILES\n");
     }
     else {
-        ModHand_append_conf("#define CHAZ_NO_SPARSE_FILES\n");
+        ConfWriter_append_conf("#define CHAZ_NO_SPARSE_FILES\n");
     }
 
     /* short names */
     if (success) {
         START_SHORT_NAMES;
-        ModHand_shorten_macro("HAS_LARGE_FILE_SUPPORT");
+        ConfWriter_shorten_macro("HAS_LARGE_FILE_SUPPORT");
 
         /* alias these only if they're not already provided and correct */
         if (strcmp(off64_type, "off64_t") != 0) {
-            ModHand_shorten_typedef("off64_t");
-            ModHand_shorten_function("fopen64");
-            ModHand_shorten_function("ftello64");
-            ModHand_shorten_function("fseeko64");
+            ConfWriter_shorten_typedef("off64_t");
+            ConfWriter_shorten_function("fopen64");
+            ConfWriter_shorten_function("ftello64");
+            ConfWriter_shorten_function("fseeko64");
         }
         if (found_lseek && strcmp(lseek_command, "lseek64") != 0) {
-            ModHand_shorten_function("lseek64");
+            ConfWriter_shorten_function("lseek64");
         }
         if (found_pread64 && strcmp(pread64_command, "pread64") != 0) {
-            ModHand_shorten_function("pread64");
+            ConfWriter_shorten_function("pread64");
         }
         END_SHORT_NAMES;
     }
@@ -209,7 +209,7 @@ S_probe_off64(off64_combo *combo)
         combo->fseek_command);
 
     /* verify compilation and that the offset type has 8 bytes */
-    output = ModHand_capture_output(code_buf, strlen(code_buf), 
+    output = ConfWriter_capture_output(code_buf, strlen(code_buf), 
         &output_len);
     if (output != NULL) {
         long size = strtol(output, NULL, 10);
@@ -249,7 +249,7 @@ S_probe_lseek(unbuff_combo *combo)
 
     /* Verify compilation. */
     sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
-    output = ModHand_capture_output(code_buf, strlen(code_buf), 
+    output = ConfWriter_capture_output(code_buf, strlen(code_buf), 
         &output_len);
     if (output != NULL) {
         success = true;
@@ -287,7 +287,7 @@ S_probe_pread64(unbuff_combo *combo)
 
     /* Verify compilation. */
     sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
-    output = ModHand_capture_output(code_buf, strlen(code_buf), 
+    output = ConfWriter_capture_output(code_buf, strlen(code_buf), 
         &output_len);
     if (output != NULL) {
         success = true;
@@ -389,7 +389,7 @@ S_can_create_big_files()
     /* concat the source strings, compile the file, capture output */
     sprintf(code_buf, "%s%s%s", create_bigfile_code_a, fseek_command, 
         create_bigfile_code_b);
-    output = ModHand_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
 
     /* truncate, just in case the call to remove fails */
     truncating_fh = fopen("_charm_large_file_test", "w");

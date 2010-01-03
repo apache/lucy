@@ -14,8 +14,8 @@
 #include "Charmonizer/Probe/LargeFiles.h"
 #include "Charmonizer/Probe/UnusedVars.h"
 #include "Charmonizer/Probe/VariadicMacros.h"
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
 
 int main(int argc, char **argv) 
 {
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
     /* Write custom postamble. */
     if (chaz_HeadCheck_check_header("sys/mman.h")) {
-        chaz_ModHand_append_conf("#define CHY_HAS_SYS_MMAN_H\n\n");
+        chaz_ConfWriter_append_conf("#define CHY_HAS_SYS_MMAN_H\n\n");
     }
 
     /* Clean up. */

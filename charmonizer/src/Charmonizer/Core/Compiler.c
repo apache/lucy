@@ -5,8 +5,8 @@
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/CompilerSpec.h"
-#include "Charmonizer/Core/ModHandler.h"
-#include "Charmonizer/Core/OperSys.h"
+#include "Charmonizer/Core/ConfWriter.h"
+#include "Charmonizer/Core/OperatingSystem.h"
 
 static void
 S_destroy(Compiler *self);
@@ -119,7 +119,7 @@ S_compile_exe(Compiler *self, const char *source_path, const char *exe_name,
     (void)code_len; /* Unused. */
     
     /* Prepare the compiler command. */
-    if (Util_verbosity < 2 && chaz_ModHand_charm_run_available) {
+    if (Util_verbosity < 2 && chaz_ConfWriter_charm_run_available) {
         sprintf(command, "%s%s %s %s %s%s %s %s",
             os->local_command_start, "_charm_run ", 
             self->cc_command, source_path, 
@@ -170,7 +170,7 @@ S_compile_obj(Compiler *self, const char *source_path, const char *obj_name,
     (void)code_len; /* Unused. */
     
     /* Prepare the compiler command. */
-    if (Util_verbosity < 2 && chaz_ModHand_charm_run_available) {
+    if (Util_verbosity < 2 && chaz_ConfWriter_charm_run_available) {
         sprintf(command, "%s%s %s %s %s%s %s %s",
             os->local_command_start, "_charm_run ", 
             self->cc_command, source_path, 

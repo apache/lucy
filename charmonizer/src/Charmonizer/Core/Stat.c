@@ -6,9 +6,9 @@
 #include "Charmonizer/Core/Stat.h"
 
 #include "Charmonizer/Core/Compiler.h"
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
-#include "Charmonizer/Core/OperSys.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
+#include "Charmonizer/Core/OperatingSystem.h"
 #include "Charmonizer/Core/Util.h"
 
 static chaz_bool_t initialized    = false;
@@ -35,7 +35,7 @@ Stat_stat(const char *filepath, Stat *target)
 
     /* Run _charm_stat. */
     Util_remove_and_verify("_charm_statout");
-    ModHand_os->run_local(ModHand_os, "_charm_stat ", filepath, NULL);
+    ConfWriter_os->run_local(ConfWriter_os, "_charm_stat ", filepath, NULL);
     stat_output = Util_slurp_file("_charm_statout", &output_len);
     Util_remove_and_verify("_charm_statout");
 
@@ -79,7 +79,7 @@ S_init()
 
 
     /* If the compile succeeds, open up for business. */
-    stat_available = ModHand_compiler->compile_exe(ModHand_compiler, 
+    stat_available = ConfWriter_compiler->compile_exe(ConfWriter_compiler, 
         "_charm_stat.c", "_charm_stat", charm_stat_code, strlen(charm_stat_code));
     remove("_charm_stat.c");
 }

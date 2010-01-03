@@ -1,7 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/Headers.h"
 #include <ctype.h>
@@ -96,7 +96,7 @@ Headers_run(void)
     /* Try for all POSIX headers in one blast. */
     if (HeadCheck_check_many_headers((const char**)posix_headers)) {
         has_posix = true;
-        ModHand_append_conf("#define CHY_HAS_POSIX\n");
+        ConfWriter_append_conf("#define CHY_HAS_POSIX\n");
         for (i = 0; posix_headers[i] != NULL; i++) {
             S_keep(posix_headers[i]);
         }
@@ -113,8 +113,8 @@ Headers_run(void)
     /* test for all c89 headers in one blast */
     if (HeadCheck_check_many_headers((const char**)c89_headers)) {
         has_c89 = true;
-        ModHand_append_conf("#define CHY_HAS_C89\n");
-        ModHand_append_conf("#define CHY_HAS_C90\n");
+        ConfWriter_append_conf("#define CHY_HAS_C89\n");
+        ConfWriter_append_conf("#define CHY_HAS_C90\n");
         for (i = 0; c89_headers[i] != NULL; i++) {
             S_keep(c89_headers[i]);
         }
@@ -151,20 +151,20 @@ Headers_run(void)
     /* append the config with every header detected so far */
     for (i = 0; keepers[i] != NULL; i++) {
         S_encode_affirmation(keepers[i]);
-        ModHand_append_conf("#define CHY_%s\n", aff_buf);
+        ConfWriter_append_conf("#define CHY_%s\n", aff_buf);
     }
 
     /* shorten */
     START_SHORT_NAMES;
     if (has_posix)
-        ModHand_shorten_macro("HAS_POSIX");
+        ConfWriter_shorten_macro("HAS_POSIX");
     if (has_c89) {
-        ModHand_shorten_macro("HAS_C89");
-        ModHand_shorten_macro("HAS_C90");
+        ConfWriter_shorten_macro("HAS_C89");
+        ConfWriter_shorten_macro("HAS_C90");
     }
     for (i = 0; keepers[i] != NULL; i++) {
         S_encode_affirmation(keepers[i]);
-        ModHand_shorten_macro(aff_buf);
+        ConfWriter_shorten_macro(aff_buf);
     }
     END_SHORT_NAMES;
 

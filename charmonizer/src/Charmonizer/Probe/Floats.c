@@ -1,7 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/Floats.h"
 #include <string.h>
@@ -13,14 +13,14 @@ Floats_run(void)
 {
     START_RUN("Floats");
 
-    ModHand_append_conf(
+    ConfWriter_append_conf(
         "typedef float chy_f32_t;\n"
         "typedef double chy_f64_t;\n"
         "#define CHY_HAS_F32_T\n"
         "#define CHY_HAS_F64_T\n"
     );
 
-    ModHand_append_conf(
+    ConfWriter_append_conf(
         "typedef union { chy_i32_t i; float f; } chy_floati32;\n"
         "static const chy_floati32 chy_f32inf    = {CHY_I32_C(0x7f800000)};\n"
         "static const chy_floati32 chy_f32neginf = {CHY_I32_C(0xff800000)};\n"
@@ -32,13 +32,13 @@ Floats_run(void)
 
     /* Shorten. */
     START_SHORT_NAMES;
-    ModHand_shorten_typedef("f32_t");
-    ModHand_shorten_typedef("f64_t");
-    ModHand_shorten_macro("HAS_F32_T");
-    ModHand_shorten_macro("HAS_F64_T");
-    ModHand_shorten_macro("F32_INF");
-    ModHand_shorten_macro("F32_NEGINF");
-    ModHand_shorten_macro("F32_NAN");
+    ConfWriter_shorten_typedef("f32_t");
+    ConfWriter_shorten_typedef("f64_t");
+    ConfWriter_shorten_macro("HAS_F32_T");
+    ConfWriter_shorten_macro("HAS_F64_T");
+    ConfWriter_shorten_macro("F32_INF");
+    ConfWriter_shorten_macro("F32_NEGINF");
+    ConfWriter_shorten_macro("F32_NAN");
     END_SHORT_NAMES;
     
     END_RUN;

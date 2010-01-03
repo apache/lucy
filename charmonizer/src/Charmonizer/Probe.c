@@ -4,24 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Charmonizer/Probe.h"
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
-#include "Charmonizer/Core/OperSys.h"
+#include "Charmonizer/Core/OperatingSystem.h"
 
 void
 Probe_init(const char *cc_command, const char *cc_flags, 
            const char *charmony_start)
 {
     /* Create os and compiler objects. */
-    ModHand_os       = OS_new();
-    ModHand_compiler = CC_new(ModHand_os, cc_command, cc_flags);
+    ConfWriter_os       = OS_new();
+    ConfWriter_compiler = CC_new(ConfWriter_os, cc_command, cc_flags);
 
     /* Dispatch other tasks. */
-    ModHand_init();
+    ConfWriter_init();
     HeadCheck_init();
-    ModHand_open_charmony_h(charmony_start);
+    ConfWriter_open_charmony_h(charmony_start);
 
     if (Util_verbosity) { printf("Initialization complete.\n"); }
 }
@@ -31,10 +31,10 @@ Probe_clean_up()
 {
     if (Util_verbosity) { printf("Cleaning up...\n"); }
 
-    /* Dispatch ModHandler's clean up routines, destroy objects. */
-    ModHand_clean_up();
-    ModHand_os->destroy(ModHand_os);
-    ModHand_compiler->destroy(ModHand_compiler);
+    /* Dispatch ConfWriter's clean up routines, destroy objects. */
+    ConfWriter_clean_up();
+    ConfWriter_os->destroy(ConfWriter_os);
+    ConfWriter_compiler->destroy(ConfWriter_compiler);
 
     if (Util_verbosity) { printf("Cleanup complete.\n"); }
 }
@@ -48,7 +48,7 @@ Probe_set_verbosity(int level)
 FILE*
 Probe_get_charmony_fh(void)
 {
-    return ModHand_charmony_fh;
+    return ConfWriter_charmony_fh;
 }
 
 /**

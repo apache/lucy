@@ -1,6 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/UnusedVars.h"
 #include <string.h>
@@ -13,13 +13,13 @@ UnusedVars_run(void)
     START_RUN("UnusedVars");
     
     /* write the macros (no test, these are the same everywhere) */
-    ModHand_append_conf("#define CHY_UNUSED_VAR(x) ((void)x)\n");
-    ModHand_append_conf("#define CHY_UNREACHABLE_RETURN(type) return (type)0\n");
+    ConfWriter_append_conf("#define CHY_UNUSED_VAR(x) ((void)x)\n");
+    ConfWriter_append_conf("#define CHY_UNREACHABLE_RETURN(type) return (type)0\n");
 
     /* shorten */
     START_SHORT_NAMES;
-    ModHand_shorten_macro("UNUSED_VAR");
-    ModHand_shorten_macro("UNREACHABLE_RETURN");
+    ConfWriter_shorten_macro("UNUSED_VAR");
+    ConfWriter_shorten_macro("UNREACHABLE_RETURN");
     END_SHORT_NAMES;
 
     END_RUN;

@@ -1,6 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/FuncMacro.h"
 #include <string.h>
@@ -42,7 +42,7 @@ static char*
 S_try_inline(const char *keyword, size_t *output_len) {
     char code[ sizeof(inline_code) + 30 ];
     sprintf(code, inline_code, keyword);
-    return ModHand_capture_output(code, strlen(code), output_len);
+    return ConfWriter_capture_output(code, strlen(code), output_len);
 }
 
 static const char* inline_options[] = {
@@ -66,7 +66,7 @@ FuncMacro_run(void)
     START_RUN("FuncMacro");
     
     /* check for ISO func macro */
-    output = ModHand_capture_output(iso_func_code, strlen(iso_func_code), 
+    output = ConfWriter_capture_output(iso_func_code, strlen(iso_func_code), 
         &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac     = true;
@@ -75,7 +75,7 @@ FuncMacro_run(void)
     free(output);
 
     /* check for GNUC func macro */
-    output = ModHand_capture_output(gnuc_func_code, strlen(gnuc_func_code), 
+    output = ConfWriter_capture_output(gnuc_func_code, strlen(gnuc_func_code), 
         &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac      = true;
@@ -88,7 +88,7 @@ FuncMacro_run(void)
         const char *macro_text = has_iso_funcmac 
             ? "__func__"
             : "__FUNCTION__";
-        ModHand_append_conf(
+        ConfWriter_append_conf(
             "#define CHY_HAS_FUNC_MACRO\n"
             "#define CHY_FUNC_MACRO %s\n",
             macro_text
@@ -97,10 +97,10 @@ FuncMacro_run(void)
 
     /* write out specific defines */
     if (has_iso_funcmac) {
-       ModHand_append_conf("#define CHY_HAS_ISO_FUNC_MACRO\n");
+       ConfWriter_append_conf("#define CHY_HAS_ISO_FUNC_MACRO\n");
     }
     if (has_gnuc_funcmac) {
-        ModHand_append_conf("#define CHY_HAS_GNUC_FUNC_MACRO\n");
+        ConfWriter_append_conf("#define CHY_HAS_GNUC_FUNC_MACRO\n");
     }
 
     /* Check for inline keyword. */
@@ -110,26 +110,26 @@ FuncMacro_run(void)
         output = S_try_inline(inline_option, &output_len);
         if (output != NULL) {
             has_inline = true;
-            ModHand_append_conf("#define CHY_INLINE %s\n", inline_option);
+            ConfWriter_append_conf("#define CHY_INLINE %s\n", inline_option);
             free(output);
             break;
         }
     }
     if (!has_inline) {
-        ModHand_append_conf("#define CHY_INLINE\n");
+        ConfWriter_append_conf("#define CHY_INLINE\n");
     }
 
     /* shorten */
     START_SHORT_NAMES;
     if (has_iso_funcmac) 
-        ModHand_shorten_macro("HAS_ISO_FUNC_MACRO");
+        ConfWriter_shorten_macro("HAS_ISO_FUNC_MACRO");
     if (has_gnuc_funcmac)
-        ModHand_shorten_macro("HAS_GNUC_FUNC_MACRO");
+        ConfWriter_shorten_macro("HAS_GNUC_FUNC_MACRO");
     if (has_iso_funcmac || has_gnuc_funcmac) {
-        ModHand_shorten_macro("HAS_FUNC_MACRO");
-        ModHand_shorten_macro("FUNC_MACRO");
+        ConfWriter_shorten_macro("HAS_FUNC_MACRO");
+        ConfWriter_shorten_macro("FUNC_MACRO");
     }
-    ModHand_shorten_macro("INLINE");
+    ConfWriter_shorten_macro("INLINE");
     END_SHORT_NAMES;
 
     END_RUN;

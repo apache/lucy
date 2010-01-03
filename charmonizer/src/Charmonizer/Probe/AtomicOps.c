@@ -1,7 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
-#include "Charmonizer/Core/HeadCheck.h"
-#include "Charmonizer/Core/ModHandler.h"
+#include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/AtomicOps.h"
 #include <string.h>
@@ -19,29 +19,29 @@ AtomicOps_run(void)
 
     if (HeadCheck_check_header("libkern/OSAtomic.h")) {
         has_libkern_osatomic_h = true;
-        ModHand_append_conf("#define CHY_HAS_LIBKERN_OSATOMIC_H\n");
+        ConfWriter_append_conf("#define CHY_HAS_LIBKERN_OSATOMIC_H\n");
     }
     if (HeadCheck_check_header("sys/atomic.h")) {
         has_sys_atomic_h = true;
-        ModHand_append_conf("#define CHY_HAS_SYS_ATOMIC_H\n");
+        ConfWriter_append_conf("#define CHY_HAS_SYS_ATOMIC_H\n");
     }
     if (   HeadCheck_check_header("windows.h")
         && HeadCheck_check_header("intrin.h")
     ) {
         has_intrin_h = true;
-        ModHand_append_conf("#define CHY_HAS_INTRIN_H\n");
+        ConfWriter_append_conf("#define CHY_HAS_INTRIN_H\n");
     }
     
     /* Shorten */
     START_SHORT_NAMES;
     if (has_libkern_osatomic_h) {
-        ModHand_shorten_macro("HAS_LIBKERN_OSATOMIC_H");
+        ConfWriter_shorten_macro("HAS_LIBKERN_OSATOMIC_H");
     }
     if (has_sys_atomic_h) {
-        ModHand_shorten_macro("HAS_SYS_ATOMIC_H");
+        ConfWriter_shorten_macro("HAS_SYS_ATOMIC_H");
     }
     if (has_intrin_h) {
-        ModHand_shorten_macro("HAS_INTRIN_H");
+        ConfWriter_shorten_macro("HAS_INTRIN_H");
     }
     END_SHORT_NAMES;
 
