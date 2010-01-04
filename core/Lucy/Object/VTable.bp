@@ -18,7 +18,7 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
     Callback         **callbacks;
     lucy_method_t[1]   methods; /* flexible array */
 
-    inert Hash *registry;
+    inert LockFreeRegistry *registry;
 
     /** Return a singleton.  If a VTable can be found in the registry based on
      * the subclass name, it will be returned.  Otherwise, a new VTable will
@@ -34,11 +34,13 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
     /** Register a vtable, so that it can be retrieved by class name.
      *
      * TODO: Move this functionality to some kind of class loader.
+     * 
+     * @return true on success, false if the class was already registered.
      */
-    inert void
+    inert bool_t
     add_to_registry(VTable *vtable);
 
-    /** Initialize the registry hash.
+    /** Initialize the registry.
      */
     inert void
     init_registry();

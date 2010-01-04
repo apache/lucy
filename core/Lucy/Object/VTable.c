@@ -11,8 +11,10 @@
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
+#include "Lucy/Object/LockFreeRegistry.h"
 #include "Lucy/Object/Undefined.h"
 #include "Lucy/Object/VArray.h"
+#include "Lucy/Util/Atomic.h"
 #include "Lucy/Util/Memory.h"
 
 size_t lucy_VTable_offset_of_parent = offsetof(lucy_VTable, parent);
@@ -21,7 +23,7 @@ size_t lucy_VTable_offset_of_parent = offsetof(lucy_VTable, parent);
 static void
 S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 
-Hash *VTable_registry = NULL;
+LockFreeRegistry *VTable_registry = NULL;
 
 void
 VTable_destroy(VTable *self)
@@ -90,19 +92,23 @@ VTable_get_parent(VTable *self) { return self->parent; }
 void
 VTable_init_registry()
 {
-    VTable_registry = Hash_new(0);
+    LockFreeRegistry *reg = LFReg_new(256);
+    if (Atomic_cas_ptr((void*volatile*)&VTable_registry, NULL, reg)) {
+        return;
+    }
+    else {
+        DECREF(reg);
+    }
 }
 
 VTable*
 VTable_singleton(const CharBuf *subclass_name, VTable *parent)
 {
-    VTable *singleton;
+    if (VTable_registry == NULL) { 
+        VTable_init_registry(); 
+    }
 
-    if (VTable_registry == NULL)
-        VTable_init_registry();
-
-    singleton = (VTable*)Hash_Fetch(VTable_registry, (Obj*)subclass_name);
-
+    VTable *singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)subclass_name);
     if (singleton == NULL) {
         VArray *novel_host_methods;
         u32_t num_novel;
@@ -155,8 +161,18 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
         DECREF(novel_host_methods);
 
         /* Register the new class, both locally and with host. */
-        Hash_Store(VTable_registry, (Obj*)subclass_name, (Obj*)singleton);
-        VTable_register_with_host(singleton, parent);
+        if (VTable_add_to_registry(singleton)) {
+            /* Doing this after registering is racy, but hard to fix. :( */
+            VTable_register_with_host(singleton, parent);
+        }
+        else {
+            DECREF(singleton);
+            singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)subclass_name);
+            if (!singleton) {
+                THROW(ERR, "Failed to either insert or fetch VTable for '%o'",
+                    subclass_name);
+            }
+        }
     }
     
     return singleton;
@@ -197,21 +213,24 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target)
     }
 }
 
-void
+bool_t
 VTable_add_to_registry(VTable *vtable)
 {
-    VTable *fetched;
-
-    if (VTable_registry == NULL)
+    if (VTable_registry == NULL) {
         VTable_init_registry();
-    fetched = (VTable*)Hash_Fetch(VTable_registry, (Obj*)vtable->name);
-    if (fetched) {
-        if (fetched != vtable) {
-            THROW(ERR, "Attempt to redefine a vtable for '%o'", vtable->name);
-        }
+    }
+    if (LFReg_Fetch(VTable_registry, (Obj*)vtable->name)) {
+        return false;
     }
     else {
-        Hash_Store(VTable_registry, (Obj*)vtable->name, (Obj*)vtable);
+        CharBuf *klass = CB_Clone(vtable->name);
+        if (LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable)) {
+            return true;
+        }
+        else {
+            DECREF(klass);
+            return false;
+        }
     }
 }
 
@@ -220,7 +239,7 @@ VTable_fetch_vtable(const CharBuf *class_name)
 {
     VTable *vtable = NULL;
     if (VTable_registry != NULL) {
-        vtable = (VTable*)Hash_Fetch(VTable_registry, (Obj*)class_name);
+        vtable = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)class_name);
     }
     return vtable;
 }
