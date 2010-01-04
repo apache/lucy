@@ -35,7 +35,7 @@ Stat_stat(const char *filepath, Stat *target)
 
     /* Run _charm_stat. */
     Util_remove_and_verify("_charm_statout");
-    ConfWriter_os->run_local(ConfWriter_os, "_charm_stat ", filepath, NULL);
+    OS_run_local("_charm_stat ", filepath, NULL);
     stat_output = Util_slurp_file("_charm_statout", &output_len);
     Util_remove_and_verify("_charm_statout");
 
@@ -79,8 +79,8 @@ S_init()
 
 
     /* If the compile succeeds, open up for business. */
-    stat_available = ConfWriter_compiler->compile_exe(ConfWriter_compiler, 
-        "_charm_stat.c", "_charm_stat", charm_stat_code, strlen(charm_stat_code));
+    stat_available = CC_compile_exe("_charm_stat.c", "_charm_stat", 
+        charm_stat_code, strlen(charm_stat_code));
     remove("_charm_stat.c");
 }
 

@@ -11,63 +11,42 @@ extern "C" {
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
 
-typedef struct chaz_Compiler chaz_Compiler;
-struct chaz_OperSys;
-
 /* Attempt to compile and link an executable.  Return true if the executable
  * file exists after the attempt.
  */
-typedef chaz_bool_t
-(*chaz_CC_compile_exe_t)(chaz_Compiler *self, const char *source_path, 
-                         const char *exe_path, const char *code, 
-                         size_t code_len);
+chaz_bool_t
+chaz_CC_compile_exe(const char *source_path, const char *exe_path, 
+                    const char *code, size_t code_len);
 
 /* Attempt to compile an object file.  Return true if the object file
  * exists after the attempt.
  */
-typedef chaz_bool_t
-(*chaz_CC_compile_obj_t)(chaz_Compiler *self, const char *source_path, 
-                         const char *obj_path, const char *code, 
-                         size_t code_len);
+chaz_bool_t
+chaz_CC_compile_obj(const char *source_path, const char *obj_path, 
+                    const char *code, size_t code_len);
 
 /* Add an include directory which will be used for all future compilation
  * attempts.
  */
-typedef void
-(*chaz_CC_add_inc_dir_t)(chaz_Compiler *self, const char *dir);
+void
+chaz_CC_add_inc_dir(const char *dir);
 
-/* Destructor.
+/** Initialize the compiler environment.
  */
-typedef void
-(*chaz_CC_destroy_t)(chaz_Compiler *self);
+void
+chaz_CC_init(const char *cc_command, const char *cc_flags);
 
-struct chaz_Compiler {
-    struct chaz_OperSys *os;
-    char          *cc_command;
-    char          *cc_flags;
-    char          *include_flag;
-    char          *object_flag;
-    char          *exe_flag;
-    char         **inc_dirs;
-    chaz_CC_compile_exe_t compile_exe;
-    chaz_CC_compile_obj_t compile_obj;
-    chaz_CC_add_inc_dir_t add_inc_dir;
-    chaz_CC_destroy_t     destroy;
-};
-
-/** Constructor.
+/* Clean up the environment.
  */
-chaz_Compiler*
-chaz_CC_new(struct chaz_OperSys *oper_sys, const char *cc_command, 
-            const char *cc_flags);
+void
+chaz_CC_clean_up();
 
 #ifdef CHAZ_USE_SHORT_NAMES
-  #define Compiler                    chaz_Compiler
-  #define CC_compile_exe_t            chaz_CC_compile_exe_t
-  #define CC_compile_obj_t            chaz_CC_compile_obj_t
-  #define CC_add_inc_dir_t            chaz_CC_add_inc_dir_t
-  #define CC_destroy_t                chaz_CC_destroy_t
-  #define CC_new                      chaz_CC_new
+  #define CC_compile_exe              chaz_CC_compile_exe
+  #define CC_compile_obj              chaz_CC_compile_obj
+  #define CC_add_inc_dir              chaz_CC_add_inc_dir
+  #define CC_clean_up                 chaz_CC_clean_up
+  #define CC_init                     chaz_CC_init
 #endif
 
 #ifdef __cplusplus

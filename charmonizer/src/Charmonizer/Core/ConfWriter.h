@@ -12,9 +12,6 @@ extern "C" {
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
 
-struct chaz_OperSys;
-struct chaz_Compiler;
-
 /* Temporary files used by Charmonizer. 
  */
 #define CHAZ_CONFWRITER_TRY_SOURCE_PATH  "_charmonizer_try.c"
@@ -23,13 +20,11 @@ struct chaz_Compiler;
 
 /* Global variables.
  */
-extern struct chaz_OperSys  *chaz_ConfWriter_os;
-extern struct chaz_Compiler *chaz_ConfWriter_compiler;
 extern chaz_bool_t chaz_ConfWriter_charm_run_available;
 extern FILE* chaz_ConfWriter_charmony_fh;
 
 /* Initialize elements needed by ConfWriter.  Must be called before anything 
- * else, but after os and compiler are created.
+ * else, but after os and compiler are initialized.
  */
 void
 chaz_ConfWriter_init();
@@ -108,8 +103,6 @@ chaz_ConfWriter_shorten_function(const char *symbol);
   #define TRY_SOURCE_PATH                   CHAZ_CONFWRITER_TRY_SOURCE_PATH
   #define TRY_APP_BASENAME                  CHAZ_CONFWRITER_TRY_APP_BASENAME
   #define TARGET_PATH                       CHAZ_CONFWRITER_TARGET_PATH
-  #define ConfWriter_os                     chaz_ConfWriter_os
-  #define ConfWriter_compiler               chaz_ConfWriter_compiler
   #define ConfWriter_charm_run_available    chaz_ConfWriter_charm_run_available
   #define ConfWriter_charmony_fh            chaz_ConfWriter_charmony_fh
   #define ConfWriter_init                   chaz_ConfWriter_init

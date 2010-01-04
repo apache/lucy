@@ -14,11 +14,9 @@ void
 Probe_init(const char *cc_command, const char *cc_flags, 
            const char *charmony_start)
 {
-    /* Create os and compiler objects. */
-    ConfWriter_os       = OS_new();
-    ConfWriter_compiler = CC_new(ConfWriter_os, cc_command, cc_flags);
-
-    /* Dispatch other tasks. */
+    /* Dispatch other initializers. */
+    OS_init();
+    CC_init(cc_command, cc_flags);
     ConfWriter_init();
     HeadCheck_init();
     ConfWriter_open_charmony_h(charmony_start);
@@ -31,10 +29,10 @@ Probe_clean_up()
 {
     if (Util_verbosity) { printf("Cleaning up...\n"); }
 
-    /* Dispatch ConfWriter's clean up routines, destroy objects. */
+    /* Dispatch various clean up routines. */
     ConfWriter_clean_up();
-    ConfWriter_os->destroy(ConfWriter_os);
-    ConfWriter_compiler->destroy(ConfWriter_compiler);
+    CC_clean_up();
+    OS_clean_up();
 
     if (Util_verbosity) { printf("Cleanup complete.\n"); }
 }

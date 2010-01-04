@@ -9,54 +9,56 @@
 extern "C" {
 #endif
 
-typedef struct chaz_OperSys chaz_OperSys;
-
 /* Remove an executable file named [name], appending the exe_ext if needed.
  */
-typedef void
-(*chaz_OS_remove_exe_t)(chaz_OperSys *self, char *name);
+void
+chaz_OS_remove_exe(char *name);
 
 /* Remove an object file named [name], appending the obj_ext if needed.
  */
-typedef void
-(*chaz_OS_remove_obj_t)(chaz_OperSys *self, char *name);
+void
+chaz_OS_remove_obj(char *name);
 
 /* Concatenate all arguments in a NULL-terminated list into a single command
  * string, prepend the appropriate prefix, and invoke via system().
  */
-typedef int 
-(*chaz_OS_run_local_t)(chaz_OperSys *self, ...);
+int 
+chaz_OS_run_local(char *arg1, ...);
 
-/* Destructor.
+/* Return the extension for an executable on this system.
  */
-typedef void
-(*chaz_OS_destroy_t)(chaz_OperSys *self);
+const char*
+chaz_OS_exe_ext(void);
 
-struct chaz_OperSys {
-    char       *obj_ext;
-    char       *exe_ext;
-    char       *local_command_start;
-    char       *devnull;
-    char       *buf;
-    size_t      buf_len;
-    chaz_OS_remove_exe_t remove_exe;
-    chaz_OS_remove_obj_t remove_obj;
-    chaz_OS_run_local_t  run_local;
-    chaz_OS_destroy_t    destroy;
-};
-
-/** Constructor. 
+/* Return the extension for a compiled object on this system.
  */
-chaz_OperSys*
-chaz_OS_new();
+const char*
+chaz_OS_obj_ext(void);
+
+/* Return the equivalent of /dev/null on this system. 
+ */
+const char*
+chaz_OS_dev_null(void);
+
+/* Initialize the Charmonizer/Core/OperatingSystem module.
+ */
+void
+chaz_OS_init(void);
+
+/* Tear down the Charmonizer/Core/OperatingSystem module. 
+ */
+void
+chaz_OS_clean_up(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-  #define OperSys                      chaz_OperSys
-  #define OS_remove_exe_t              chaz_OS_remove_exe_t
-  #define OS_remove_obj_t              chaz_OS_remove_obj_t
-  #define OS_run_local_t               chaz_OS_run_local_t
-  #define OS_destroy_t                 chaz_OS_destroy_t
-  #define OS_new                       chaz_OS_new
+  #define OS_remove_exe                chaz_OS_remove_exe
+  #define OS_remove_obj                chaz_OS_remove_obj
+  #define OS_run_local                 chaz_OS_run_local
+  #define OS_exe_ext                   chaz_OS_exe_ext
+  #define OS_obj_ext                   chaz_OS_obj_ext
+  #define OS_dev_null                  chaz_OS_dev_null
+  #define OS_init                      chaz_OS_init
+  #define OS_clean_up                  chaz_OS_clean_up
 #endif
 
 #ifdef __cplusplus
@@ -64,7 +66,6 @@ chaz_OS_new();
 #endif
 
 #endif /* H_CHAZ_COMPILER */
-
 
 /**
  * Copyright 2006 The Apache Software Foundation

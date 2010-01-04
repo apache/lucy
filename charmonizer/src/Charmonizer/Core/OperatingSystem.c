@@ -7,119 +7,117 @@
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
-static void
-S_probe_devnull(OperSys *self);
+static char dev_null[20] = "";
 
-static void
-S_destroy(OperSys *self);
-
-static void
-S_remove_exe(OperSys *self, char *name);
-
-static void
-S_remove_obj(OperSys *self, char *name);
-
-static int 
-S_run_local(OperSys *self, ...);
-
-OperSys*
-OS_new() 
-{
-    OperSys *self = (OperSys*)malloc(sizeof(OperSys));
-
-    if (Util_verbosity) {
-        printf("Creating os object...\n");
-    }
-
-    /* Init. */
-    self->buf        = NULL;
-    self->buf_len    = 0;
-    self->remove_obj = S_remove_obj;
-    self->remove_exe = S_remove_exe;
-    self->run_local  = S_run_local;
-    self->destroy    = S_destroy;
 #ifdef _WIN32
-    /* Assign. */
-    self->obj_ext = strdup(".obj");
-    self->exe_ext = strdup(".exe");
-    self->local_command_start = strdup(".\\");
-    self->devnull = strdup("nul");
+static char *exe_ext = ".exe";
+static char *obj_ext = ".obj";
+static char *local_command_start = ".\\";
 #else
-    self->obj_ext = strdup("");
-    self->exe_ext = strdup("");
-    self->local_command_start = strdup("./");
-    S_probe_devnull(self);
+static char *exe_ext = "";
+static char *obj_ext = "";
+static char *local_command_start = "./";
 #endif
 
-    return self;
+static void
+S_probe_dev_null(void);
+
+void
+OS_init() 
+{
+    if (Util_verbosity) {
+        printf("Initializing Charmonizer/Core/OperatingSystem...\n");
+    }
+
+    S_probe_dev_null();
 }
 
 static void
-S_probe_devnull(OperSys *self)
+S_probe_dev_null(void)
 {
-    char *const devnull_options[] = {
-        "/dev/null", 
-        "/dev/nul", 
-        NULL
-    };
-    int i;
-
     if (Util_verbosity) {
         printf("Trying to find a bit-bucket a la /dev/null...\n");
     }
 
-    /* Iterate through names of possible devnulls trying to open them. */
-    for (i = 0; devnull_options[i] != NULL; i++) {
-        if (Util_can_open_file(devnull_options[i])) {
-            self->devnull = strdup(devnull_options[i]);
-            return;
+#ifdef _WIN32
+    strcpy(dev_null, "nul");
+#else
+    {
+        char *const options[] = {
+            "/dev/null", 
+            "/dev/nul", 
+            NULL
+        };
+        int i;
+
+        /* Iterate through names of possible devnulls trying to open them. */
+        for (i = 0; options[i] != NULL; i++) {
+            if (Util_can_open_file(options[i])) {
+                strcpy(dev_null, options[i]);
+                return;
+            }
         }
+
+        /* Bail out because we couldn't find anything like /dev/null. */
+        Util_die("Couldn't find anything like /dev/null");
     }
-
-    /* Bail out we couldn't find a devnull. */
-    Util_die("Couldn't find anything like /dev/null");
+#endif
 }
 
-static void
-S_destroy(OperSys *self)
+void
+OS_clean_up(void)
 {
-    free(self->buf);
-    free(self->obj_ext);
-    free(self->exe_ext);
-    free(self->local_command_start);
-    free(self->devnull);
-    free(self);
+    return;
 }
 
-static void
-S_remove_exe(OperSys *self, char *name)
+const char*
+OS_exe_ext(void)
 {
-    char *exe_name = (char*)malloc(strlen(name) + strlen(self->exe_ext) + 1);
-    sprintf(exe_name, "%s%s", name, self->exe_ext);
+    return exe_ext;
+}
+
+const char*
+OS_obj_ext(void)
+{
+    return obj_ext;
+}
+
+const char*
+OS_dev_null(void)
+{
+    return dev_null;
+}
+
+void
+OS_remove_exe(char *name)
+{
+    char *exe_name = (char*)malloc(strlen(name) + strlen(exe_ext) + 1);
+    sprintf(exe_name, "%s%s", name, exe_ext);
     remove(exe_name);
     free(exe_name);
 }
 
-static void
-S_remove_obj(OperSys *self, char *name)
+void
+OS_remove_obj(char *name)
 {
-    char *obj_name = (char*)malloc(strlen(name) + strlen(self->obj_ext) + 1);
-    sprintf(obj_name, "%s%s", name, self->obj_ext);
+    char *obj_name = (char*)malloc(strlen(name) + strlen(obj_ext) + 1);
+    sprintf(obj_name, "%s%s", name, obj_ext);
     remove(obj_name);
     free(obj_name);
 }
 
-static int
-S_run_local(OperSys *self, ...)
+int
+OS_run_local(char *arg1, ...)
 {
     va_list  args;
-    char    *command = strdup(self->local_command_start);
-    size_t   len     = strlen(command);
+    size_t   len     = strlen(local_command_start) + strlen(arg1);
+    char    *command = (char*)malloc(len + 1);
     int      retval;
     char    *arg;
 
     /* Append all supplied texts. */
-    va_start(args, self);
+    sprintf(command, "%s%s", local_command_start, arg1);
+    va_start(args, arg1);
     while (NULL != (arg = va_arg(args, char*))) {
         len += strlen(arg);
         command = (char*)realloc(command, len + 1);

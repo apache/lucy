@@ -16,7 +16,7 @@ static void
 S_write_charm_h();
 
 /* Compile a small wrapper application which is used to redirect error output
- * to devnull.
+ * to dev_null.
  */
 static void
 S_build_charm_run();
@@ -27,27 +27,20 @@ static void
 S_clean_up_try();
 
 /* Global vars. */
-struct OperSys  *ConfWriter_os = NULL;
-struct Compiler *ConfWriter_compiler = NULL;
 chaz_bool_t chaz_ConfWriter_charm_run_available = false;
 FILE* ConfWriter_charmony_fh = NULL;
 
 /* Static vars. */
-static char *try_app_path = NULL;
-static char *try_app_command = NULL;
+static char *try_app_name = NULL;
 
 void
 ConfWriter_init()
 {
     /* Set the name of the application which we "try" to execute. */
-    size_t len = strlen(TRY_APP_BASENAME) + strlen(ConfWriter_os->exe_ext) + 1;
-    try_app_path = (char*)malloc(len);
-    sprintf(try_app_path, "%s%s", TRY_APP_BASENAME, ConfWriter_os->exe_ext);
-
-    /* Set the invocation string for the "try" application. */
-    len = strlen(ConfWriter_os->local_command_start) + strlen(try_app_path) + 1;
-    try_app_command = (char*)malloc(len);
-    sprintf(try_app_command, "%s%s", ConfWriter_os->local_command_start, try_app_path);
+    const char *exe_ext = OS_exe_ext();
+    size_t len = strlen(TRY_APP_BASENAME) + strlen(exe_ext) + 1;
+    try_app_name = (char*)malloc(len);
+    sprintf(try_app_name, "%s%s", TRY_APP_BASENAME, exe_ext);
 
     /* Write files needed by this module and others. */
     S_build_charm_run();
@@ -81,8 +74,8 @@ ConfWriter_clean_up(void)
 {
     /* Clean up some temp files. */
     remove("_charm.h");
-    ConfWriter_os->remove_exe(ConfWriter_os, "_charm_run");
-    ConfWriter_os->remove_exe(ConfWriter_os, "_charm_stat");
+    OS_remove_exe("_charm_run");
+    OS_remove_exe("_charm_stat");
 
     /* Write the last bit of charmony.h and close. */
     fprintf(ConfWriter_charmony_fh, "#endif /* H_CHARMONY */\n\n");
@@ -160,11 +153,12 @@ static void
 S_build_charm_run()
 {
     chaz_bool_t compile_succeeded = false;
+    const char *dev_null = OS_dev_null();
     size_t needed = sizeof(charm_run_code_a)
                   + sizeof(charm_run_code_b)
-                  + strlen(ConfWriter_os->devnull)
+                  + strlen(dev_null)
                   + sizeof(charm_run_code_c)
-                  + strlen(ConfWriter_os->devnull)
+                  + strlen(dev_null)
                   + sizeof(charm_run_code_d)
                   + 20;
     char *code = (char*)malloc(needed);
@@ -172,12 +166,12 @@ S_build_charm_run()
     sprintf(code, "%s%s \"%s\" %s \"%s\" %s", 
         charm_run_code_a, 
         charm_run_code_b,
-        ConfWriter_os->devnull,
+        dev_null,
         charm_run_code_c,
-        ConfWriter_os->devnull,
+        dev_null,
         charm_run_code_d);
-    compile_succeeded = ConfWriter_compiler->compile_exe(ConfWriter_compiler, 
-        "_charm_run.c", "_charm_run", code, strlen(code));
+    compile_succeeded = CC_compile_exe("_charm_run.c", "_charm_run", 
+        code, strlen(code));
     if (!compile_succeeded) {
         Util_die("failed to compile _charm_run helper utility");
     }
@@ -192,12 +186,12 @@ ConfWriter_test_compile(char *source, size_t source_len)
 {
     chaz_bool_t compile_succeeded;
 
-    if ( !Util_remove_and_verify(try_app_path) ) {
-        Util_die("Failed to delete file '%s'", try_app_path);
+    if ( !Util_remove_and_verify(try_app_name) ) {
+        Util_die("Failed to delete file '%s'", try_app_name);
     }
 
-    compile_succeeded = ConfWriter_compiler->compile_exe(ConfWriter_compiler, 
-        TRY_SOURCE_PATH, TRY_APP_BASENAME, source, source_len);
+    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME,
+        source, source_len);
 
     S_clean_up_try();
 
@@ -212,18 +206,18 @@ ConfWriter_capture_output(char *source, size_t source_len,
     chaz_bool_t compile_succeeded;
 
     /* Clear out previous versions and test to make sure removal worked. */
-    if ( !Util_remove_and_verify(try_app_path) ) {
-        Util_die("Failed to delete file '%s'", try_app_path);
+    if ( !Util_remove_and_verify(try_app_name) ) {
+        Util_die("Failed to delete file '%s'", try_app_name);
     }
     if ( !Util_remove_and_verify(TARGET_PATH) ) {
         Util_die("Failed to delete file '%s'", TARGET_PATH);
     }
 
     /* Attempt compilation; if successful, run app and slurp output. */
-    compile_succeeded = ConfWriter_compiler->compile_exe(ConfWriter_compiler, 
-        TRY_SOURCE_PATH, TRY_APP_BASENAME, source, source_len);
+    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME, 
+        source, source_len);
     if (compile_succeeded) {
-        system(try_app_command);
+        OS_run_local(try_app_name, NULL);
         captured_output = Util_slurp_file(TARGET_PATH, output_len);
     }
     else {
@@ -250,7 +244,7 @@ static void
 S_clean_up_try()
 {
     remove(TRY_SOURCE_PATH);
-    ConfWriter_os->remove_exe(ConfWriter_os, TRY_APP_BASENAME);
+    OS_remove_exe(TRY_APP_BASENAME);
     remove(TARGET_PATH);
 }
 
