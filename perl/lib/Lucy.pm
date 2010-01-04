@@ -115,6 +115,11 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
+    package Lucy::Object::LockFreeRegistry;
+    sub DESTROY { }    # leak all
+}
+
+{
     package Lucy::Object::Obj;
     use Lucy::Util::ToolSet qw( to_lucy to_perl );
     sub load { return $_[0]->_load( to_lucy( $_[1] ) ) }

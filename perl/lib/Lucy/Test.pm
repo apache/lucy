@@ -34,6 +34,9 @@ PPCODE:
     else if (strEQ(package, "TestHash")) {
         lucy_TestHash_run_tests();
     }
+    else if (strEQ(package, "TestLockFreeRegistry")) {
+        lucy_TestLFReg_run_tests();
+    }
     else if (strEQ(package, "TestI32Array")) {
         lucy_TestI32Arr_run_tests();
     }
