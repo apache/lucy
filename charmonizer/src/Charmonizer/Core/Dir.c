@@ -135,6 +135,17 @@ Dir_init(void)
     }
 }
 
+void
+Dir_clean_up(void)
+{
+    if (!Util_remove_and_verify("_charm_mkdir")) {
+        Util_die("Failed to remove '_charm_mkdir'");
+    }
+    if (!Util_remove_and_verify("_charm_rmdir")) {
+        Util_die("Failed to remove '_charm_rmdir'");
+    }
+}
+
 chaz_bool_t
 Dir_mkdir(const char *filepath)
 {

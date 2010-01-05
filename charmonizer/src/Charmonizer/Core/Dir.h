@@ -16,6 +16,11 @@ extern "C" {
 void
 chaz_Dir_init(void);
 
+/* Tear down.
+ */
+void
+chaz_Dir_clean_up(void);
+
 /* Attempt to create a directory.  Returns true on success, false on failure.
  */
 chaz_bool_t
@@ -35,6 +40,7 @@ extern int chaz_Dir_mkdir_num_args;
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Dir_init              chaz_Dir_init
+  #define Dir_clean_up          chaz_Dir_clean_up
   #define Dir_mkdir             chaz_Dir_mkdir
   #define Dir_rmdir             chaz_Dir_rmdir
   #define Dir_mkdir_command     chaz_Dir_mkdir_command

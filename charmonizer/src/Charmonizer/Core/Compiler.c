@@ -141,8 +141,11 @@ CC_compile_exe(const char *source_path, const char *exe_name,
         system(command);
     }
 
-    /* See if compilation was successful. */
+    /* See if compilation was successful.  Remove the source file. */
     result = Util_can_open_file(exe_file);
+    if (!Util_remove_and_verify(source_path)) {
+        Util_die("Failed to remove '%s'", source_path);
+    }
 
     free(command);
     free(inc_dir_string);
@@ -186,8 +189,11 @@ CC_compile_obj(const char *source_path, const char *obj_name,
         system(command);
     }
 
-    /* See if compilation was successful. */
+    /* See if compilation was successful.  Remove the source file. */
     result = Util_can_open_file(obj_file);
+    if (!Util_remove_and_verify(source_path)) {
+        Util_die("Failed to remove '%s'", source_path);
+    }
 
     free(command);
     free(inc_dir_string);

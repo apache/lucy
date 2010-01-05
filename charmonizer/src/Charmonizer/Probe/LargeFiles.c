@@ -218,6 +218,10 @@ S_probe_off64(off64_combo *combo)
         free(output);
     }
 
+    if (!Util_remove_and_verify("_charm_off64")) {
+        Util_die("Failed to remove '_charm_off64'");
+    }
+
     return success;
 }
 
@@ -253,6 +257,10 @@ S_probe_lseek(unbuff_combo *combo)
     if (output != NULL) {
         success = true;
         free(output);
+    }
+
+    if (!Util_remove_and_verify("_charm_lseek")) {
+        Util_die("Failed to remove '_charm_lseek'");
     }
 
     free(code_buf);
