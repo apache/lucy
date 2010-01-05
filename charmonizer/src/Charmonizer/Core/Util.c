@@ -24,7 +24,7 @@ Util_write_file(const char *filename, const char *content)
 }
 
 char*
-Util_slurp_file(char *file_path, size_t *len_ptr) 
+Util_slurp_file(const char *file_path, size_t *len_ptr) 
 {
     FILE   *const file = fopen(file_path, "r");
     char   *contents;
@@ -89,7 +89,7 @@ Util_flength(FILE *f)
 }
 
 void 
-Util_die(char* format, ...) 
+Util_die(const char* format, ...) 
 {
     va_list args;
     va_start(args, format);
@@ -100,7 +100,7 @@ Util_die(char* format, ...)
 }
 
 void 
-Util_warn(char* format, ...) 
+Util_warn(const char* format, ...) 
 {
     va_list args;
     va_start(args, format);
@@ -110,7 +110,7 @@ Util_warn(char* format, ...)
 }
 
 int
-Util_remove_and_verify(char *file_path) 
+Util_remove_and_verify(const char *file_path) 
 {
     /* Try to remove the file. */
     remove(file_path);
@@ -120,7 +120,7 @@ Util_remove_and_verify(char *file_path)
 }
 
 int
-Util_can_open_file(char *file_path) 
+Util_can_open_file(const char *file_path) 
 {
     FILE *garbage_fh;
 
