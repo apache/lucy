@@ -1,6 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/Integers.h"
@@ -77,7 +78,7 @@ Integers_run(void)
     char u64_t_postfix[10];
     char code_buf[sizeof(type64_code) + 200];
 
-    START_RUN("Integers");
+    ConfWriter_start_module("Integers");
 
     /* document endian-ness */
     if (S_machine_is_big_endian())
@@ -86,7 +87,7 @@ Integers_run(void)
         ConfWriter_append_conf("#define CHY_LITTLE_END\n");
 
     /* Record sizeof() for several common integer types. */
-    output = ConfWriter_capture_output(sizes_code, strlen(sizes_code), &output_len);
+    output = CC_capture_output(sizes_code, strlen(sizes_code), &output_len);
     if (output != NULL) {
         char *end_ptr = output;
         
@@ -103,7 +104,7 @@ Integers_run(void)
 
     /* determine whether long longs are available */
     sprintf(code_buf, type64_code, "long long");
-    output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
         has_long_long    = true;
         sizeof_long_long = strtol(output, NULL, 10);
@@ -111,7 +112,7 @@ Integers_run(void)
 
     /* determine whether the __int64 type is available */
     sprintf(code_buf, type64_code, "__int64");
-    output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
         has___int64 = true;
         sizeof___int64 = strtol(output, NULL, 10);
@@ -156,26 +157,26 @@ Integers_run(void)
     }
     else if (has_64) {
         sprintf(code_buf, literal64_code, "LL");
-        output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
+        output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
         if (output != NULL) {
             strcpy(i64_t_postfix, "LL");
         }
         else {
             sprintf(code_buf, literal64_code, "i64");
-            output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
+            output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
             if (output != NULL)
                 strcpy(i64_t_postfix, "i64");
             else
                 Util_die("64-bit types, but no literal syntax found");
         }
         sprintf(code_buf, literal64_code, "ULL");
-        output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
+        output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
         if (output != NULL) {
             strcpy(u64_t_postfix, "ULL");
         }
         else {
             sprintf(code_buf, literal64_code, "Ui64");
-            output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
+            output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
             if (output != NULL)
                 strcpy(u64_t_postfix, "Ui64");
             else
@@ -323,7 +324,7 @@ Integers_run(void)
             sprintf(format_64_code, 
                 "%s\"%%%su\", 18446744073709551615%s%s", format_64_code_a, 
                     options[i], u64_t_postfix, format_64_code_b);
-            output = ConfWriter_capture_output(format_64_code, strlen(format_64_code),
+            output = CC_capture_output(format_64_code, strlen(format_64_code),
                 &output_len);
 
             if (   output_len != 0 
@@ -376,7 +377,7 @@ Integers_run(void)
     );
 
     /* shorten */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     if ( S_machine_is_big_endian() ) {
         ConfWriter_shorten_macro("BIG_END");
     }
@@ -438,9 +439,9 @@ Integers_run(void)
         ConfWriter_shorten_macro("U64_C");
         ConfWriter_shorten_macro("PTR2I64");
     }
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
     
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 static chaz_bool_t

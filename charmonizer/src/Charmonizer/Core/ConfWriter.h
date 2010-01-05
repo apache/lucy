@@ -1,4 +1,4 @@
-/* Chaz/Core/ConfWriter.h -- Write to a config file.
+/* Charmonizer/Core/ConfWriter.h -- Write to a config file.
  */
 
 #ifndef H_CHAZ_CONFWRITER
@@ -12,17 +12,6 @@ extern "C" {
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
 
-/* Temporary files used by Charmonizer. 
- */
-#define CHAZ_CONFWRITER_TRY_SOURCE_PATH  "_charmonizer_try.c"
-#define CHAZ_CONFWRITER_TRY_APP_BASENAME "_charmonizer_try"
-#define CHAZ_CONFWRITER_TARGET_PATH      "_charmonizer_target"
-
-/* Global variables.
- */
-extern chaz_bool_t chaz_ConfWriter_charm_run_available;
-extern FILE* chaz_ConfWriter_charmony_fh;
-
 /* Initialize elements needed by ConfWriter.  Must be called before anything 
  * else, but after os and compiler are initialized.
  */
@@ -35,40 +24,31 @@ chaz_ConfWriter_init();
 void
 chaz_ConfWriter_open_charmony_h(const char *charmony_start);
 
+/* Return the config file's file handle. 
+ */
+FILE*
+chaz_ConfWriter_get_charmony_fh(void);
+
 /* Close the include guard on charmony.h, then close the file.  Delete temp
  * files and perform any other needed cleanup.
  */
 void
 chaz_ConfWriter_clean_up(void);
 
-/* Attempt to compile the supplied source code and return true if the
- * effort succeeds.
- */
-chaz_bool_t
-chaz_ConfWriter_test_compile(char *source, size_t source_len);
-
-/* Attempt to compile the supplied source code.  If successful, capture the 
- * output of the program and return a pointer to a newly allocated buffer.
- * If the compilation fails, return NULL.  The length of the captured 
- * output will be placed into the integer pointed to by [output_len].
- */
-char*
-chaz_ConfWriter_capture_output(char *source, size_t source_len, 
-                            size_t *output_len);
-
 /* Print output to charmony.h.
  */
 void
 chaz_ConfWriter_append_conf(const char *fmt, ...);
 
-/* Print bookends delimiting a short names block.
+/* Start a short names block.
  */
-#define CHAZ_CONFWRITER_START_SHORT_NAMES \
-  chaz_ConfWriter_append_conf( \
-    "\n#if defined(CHY_USE_SHORT_NAMES) || defined(CHAZ_USE_SHORT_NAMES)\n")
+void
+chaz_ConfWriter_start_short_names(void);
 
-#define CHAZ_CONFWRITER_END_SHORT_NAMES \
-    chaz_ConfWriter_append_conf("#endif /* USE_SHORT_NAMES */\n")
+/* Close a short names block.
+ */
+void
+chaz_ConfWriter_end_short_names(void);
 
 /* Define a shortened version of a macro symbol (minus the "CHY_" prefix);
  */
@@ -85,41 +65,30 @@ chaz_ConfWriter_shorten_typedef(const char *symbol);
 void
 chaz_ConfWriter_shorten_function(const char *symbol);
 
-/* Print a "chapter heading" when starting a module. 
+/* Print a "chapter heading" comment in the conf file when starting a module. 
  */
-#define CHAZ_CONFWRITER_START_RUN(module_name) \
-    do { \
-        chaz_ConfWriter_append_conf("\n/* %s */\n", module_name); \
-        if (chaz_Util_verbosity > 0) { \
-            printf("Running %s module...\n", module_name); \
-        } \
-    } while (0)
+void
+chaz_ConfWriter_start_module(const char *module_name);
 
 /* Leave a little whitespace at the end of each module.
  */
-#define CHAZ_CONFWRITER_END_RUN chaz_ConfWriter_append_conf("\n")
+void
+chaz_ConfWriter_end_module(void);
 
 #ifdef   CHAZ_USE_SHORT_NAMES
-  #define TRY_SOURCE_PATH                   CHAZ_CONFWRITER_TRY_SOURCE_PATH
-  #define TRY_APP_BASENAME                  CHAZ_CONFWRITER_TRY_APP_BASENAME
-  #define TARGET_PATH                       CHAZ_CONFWRITER_TARGET_PATH
-  #define ConfWriter_charm_run_available    chaz_ConfWriter_charm_run_available
-  #define ConfWriter_charmony_fh            chaz_ConfWriter_charmony_fh
   #define ConfWriter_init                   chaz_ConfWriter_init
   #define ConfWriter_open_charmony_h        chaz_ConfWriter_open_charmony_h
+  #define ConfWriter_get_charmony_fh        chaz_ConfWriter_get_charmony_fh
   #define ConfWriter_clean_up               chaz_ConfWriter_clean_up
-  #define ConfWriter_write_charm_h          chaz_ConfWriter_write_charm_h
   #define ConfWriter_build_charm_run        chaz_ConfWriter_build_charm_run
-  #define START_SHORT_NAMES                 CHAZ_CONFWRITER_START_SHORT_NAMES
-  #define END_SHORT_NAMES                   CHAZ_CONFWRITER_END_SHORT_NAMES
-  #define ConfWriter_test_compile           chaz_ConfWriter_test_compile
-  #define ConfWriter_capture_output         chaz_ConfWriter_capture_output 
+  #define ConfWriter_start_module           chaz_ConfWriter_start_module
+  #define ConfWriter_end_module             chaz_ConfWriter_end_module
+  #define ConfWriter_start_short_names      chaz_ConfWriter_start_short_names
+  #define ConfWriter_end_short_names        chaz_ConfWriter_end_short_names
   #define ConfWriter_append_conf            chaz_ConfWriter_append_conf
   #define ConfWriter_shorten_macro          chaz_ConfWriter_shorten_macro
   #define ConfWriter_shorten_typedef        chaz_ConfWriter_shorten_typedef
   #define ConfWriter_shorten_function       chaz_ConfWriter_shorten_function
-  #define START_RUN                         CHAZ_CONFWRITER_START_RUN
-  #define END_RUN                           CHAZ_CONFWRITER_END_RUN
 #endif
 
 #ifdef __cplusplus

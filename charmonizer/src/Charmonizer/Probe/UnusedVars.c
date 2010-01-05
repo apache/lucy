@@ -10,19 +10,19 @@
 void
 UnusedVars_run(void) 
 {
-    START_RUN("UnusedVars");
+    ConfWriter_start_module("UnusedVars");
     
     /* write the macros (no test, these are the same everywhere) */
     ConfWriter_append_conf("#define CHY_UNUSED_VAR(x) ((void)x)\n");
     ConfWriter_append_conf("#define CHY_UNREACHABLE_RETURN(type) return (type)0\n");
 
     /* shorten */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     ConfWriter_shorten_macro("UNUSED_VAR");
     ConfWriter_shorten_macro("UNREACHABLE_RETURN");
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
 
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 

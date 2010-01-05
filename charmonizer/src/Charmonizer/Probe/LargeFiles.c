@@ -1,6 +1,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/HeaderChecker.h"
+#include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Stat.h"
 #include "Charmonizer/Core/Util.h"
@@ -86,7 +87,7 @@ LargeFiles_run(void)
     chaz_bool_t found_pread64 = false;
     unsigned i;
 
-    START_RUN("LargeFiles");
+    ConfWriter_start_module("LargeFiles");
 
     /* see if off64_t and friends exist or have synonyms */
     for (i = 0; off64_combos[i].includes != NULL; i++) {
@@ -149,7 +150,7 @@ LargeFiles_run(void)
 
     /* short names */
     if (success) {
-        START_SHORT_NAMES;
+        ConfWriter_start_short_names();
         ConfWriter_shorten_macro("HAS_LARGE_FILE_SUPPORT");
 
         /* alias these only if they're not already provided and correct */
@@ -165,10 +166,10 @@ LargeFiles_run(void)
         if (found_pread64 && strcmp(pread64_command, "pread64") != 0) {
             ConfWriter_shorten_function("pread64");
         }
-        END_SHORT_NAMES;
+        ConfWriter_end_short_names();
     }
     
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 /* code for checking ftello64 and friends */
@@ -209,8 +210,7 @@ S_probe_off64(off64_combo *combo)
         combo->fseek_command);
 
     /* verify compilation and that the offset type has 8 bytes */
-    output = ConfWriter_capture_output(code_buf, strlen(code_buf), 
-        &output_len);
+    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
         long size = strtol(output, NULL, 10);
         if (size == 8)
@@ -249,8 +249,7 @@ S_probe_lseek(unbuff_combo *combo)
 
     /* Verify compilation. */
     sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
-    output = ConfWriter_capture_output(code_buf, strlen(code_buf), 
-        &output_len);
+    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
         success = true;
         free(output);
@@ -287,8 +286,7 @@ S_probe_pread64(unbuff_combo *combo)
 
     /* Verify compilation. */
     sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
-    output = ConfWriter_capture_output(code_buf, strlen(code_buf), 
-        &output_len);
+    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
         success = true;
         free(output);
@@ -389,7 +387,7 @@ S_can_create_big_files()
     /* concat the source strings, compile the file, capture output */
     sprintf(code_buf, "%s%s%s", create_bigfile_code_a, fseek_command, 
         create_bigfile_code_b);
-    output = ConfWriter_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
 
     /* truncate, just in case the call to remove fails */
     truncating_fh = fopen("_charm_large_file_test", "w");

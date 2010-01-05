@@ -1,5 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
+#include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/FuncMacro.h"
@@ -42,7 +43,7 @@ static char*
 S_try_inline(const char *keyword, size_t *output_len) {
     char code[ sizeof(inline_code) + 30 ];
     sprintf(code, inline_code, keyword);
-    return ConfWriter_capture_output(code, strlen(code), output_len);
+    return CC_capture_output(code, strlen(code), output_len);
 }
 
 static const char* inline_options[] = {
@@ -63,10 +64,10 @@ FuncMacro_run(void)
     chaz_bool_t has_gnuc_funcmac = false;
     chaz_bool_t has_inline       = false;
 
-    START_RUN("FuncMacro");
+    ConfWriter_start_module("FuncMacro");
     
     /* check for ISO func macro */
-    output = ConfWriter_capture_output(iso_func_code, strlen(iso_func_code), 
+    output = CC_capture_output(iso_func_code, strlen(iso_func_code), 
         &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac     = true;
@@ -75,7 +76,7 @@ FuncMacro_run(void)
     free(output);
 
     /* check for GNUC func macro */
-    output = ConfWriter_capture_output(gnuc_func_code, strlen(gnuc_func_code), 
+    output = CC_capture_output(gnuc_func_code, strlen(gnuc_func_code), 
         &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac      = true;
@@ -120,7 +121,7 @@ FuncMacro_run(void)
     }
 
     /* shorten */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     if (has_iso_funcmac) 
         ConfWriter_shorten_macro("HAS_ISO_FUNC_MACRO");
     if (has_gnuc_funcmac)
@@ -130,9 +131,9 @@ FuncMacro_run(void)
         ConfWriter_shorten_macro("FUNC_MACRO");
     }
     ConfWriter_shorten_macro("INLINE");
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
 
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 

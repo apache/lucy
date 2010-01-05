@@ -7,9 +7,16 @@
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
+/* Temporary files. */
+#define TRY_SOURCE_PATH  "_charmonizer_try.c"
+#define TRY_APP_BASENAME "_charmonizer_try"
+#define TARGET_PATH      "_charmonizer_target"
+
+/* Static vars. */
 static char     *cc_command   = NULL;
 static char     *cc_flags     = NULL;
 static char    **inc_dirs     = NULL;
+static char     *try_app_name = NULL;
 
 /* Detect a supported compiler, or assume a generic GCC-compatible compiler
  * and hope for the best.  */
@@ -30,6 +37,11 @@ static char *object_flag       = "-o ";
 static char *exe_flag          = "-o ";
 #endif
 
+/* Clean up the files associated with CC_capture_output().
+ */
+static void
+S_clean_up_try();
+
 static void
 S_do_test_compile();
 
@@ -47,6 +59,14 @@ CC_init(const char *compiler_command, const char *compiler_flags)
 
     /* Add the current directory as an include dir. */
     CC_add_inc_dir(".");
+
+    /* Set the name of the application which we "try" to execute. */
+    {
+        const char *exe_ext = OS_exe_ext();
+        size_t len = strlen(TRY_APP_BASENAME) + strlen(exe_ext) + 1;
+        try_app_name = (char*)malloc(len);
+        sprintf(try_app_name, "%s%s", TRY_APP_BASENAME, exe_ext);
+    }
 
     /* If we can't compile anything, game over. */
     S_do_test_compile();
@@ -110,19 +130,14 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    if (Util_verbosity < 2 && chaz_ConfWriter_charm_run_available) {
-        sprintf(command, "%s %s %s %s%s %s %s",
-            "_charm_run ", 
-            cc_command, source_path, 
-            exe_flag, exe_file, 
-            inc_dir_string, cc_flags);
-        OS_run_local(command, NULL);
+    sprintf(command, "%s %s %s%s %s %s",
+        cc_command, source_path, 
+        exe_flag, exe_file, 
+        inc_dir_string, cc_flags);
+    if (Util_verbosity < 2) {
+        OS_run_quietly(command);
     }
     else {
-        sprintf(command, "%s %s %s%s %s %s", 
-            cc_command, source_path,
-            exe_flag, exe_file,
-            inc_dir_string, cc_flags);
         system(command);
     }
 
@@ -159,21 +174,15 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    if (Util_verbosity < 2 && chaz_ConfWriter_charm_run_available) {
-        sprintf(command, "%s %s %s %s%s %s %s",
-            "_charm_run ", 
-            cc_command, source_path, 
-            object_flag, obj_file, 
-            inc_dir_string,
-            cc_flags);
-        OS_run_local(command, NULL);
+    sprintf(command, "%s %s %s%s %s %s",
+        cc_command, source_path, 
+        object_flag, obj_file, 
+        inc_dir_string,
+        cc_flags);
+    if (Util_verbosity < 2) {
+        OS_run_quietly(command);
     }
     else {
-        sprintf(command, "%s %s %s%s %s %s", 
-            cc_command, source_path,
-            object_flag, obj_file,
-            inc_dir_string,
-            cc_flags);
         system(command);
     }
 
@@ -184,6 +193,62 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     free(inc_dir_string);
     free(obj_file);
     return result;
+}
+
+chaz_bool_t
+CC_test_compile(char *source, size_t source_len)
+{
+    chaz_bool_t compile_succeeded;
+
+    if ( !Util_remove_and_verify(try_app_name) ) {
+        Util_die("Failed to delete file '%s'", try_app_name);
+    }
+
+    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME,
+        source, source_len);
+
+    S_clean_up_try();
+
+    return compile_succeeded;
+}
+
+char*
+CC_capture_output(char *source, size_t source_len, size_t *output_len) 
+{
+    char *captured_output = NULL;
+    chaz_bool_t compile_succeeded;
+
+    /* Clear out previous versions and test to make sure removal worked. */
+    if ( !Util_remove_and_verify(try_app_name) ) {
+        Util_die("Failed to delete file '%s'", try_app_name);
+    }
+    if ( !Util_remove_and_verify(TARGET_PATH) ) {
+        Util_die("Failed to delete file '%s'", TARGET_PATH);
+    }
+
+    /* Attempt compilation; if successful, run app and slurp output. */
+    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME, 
+        source, source_len);
+    if (compile_succeeded) {
+        OS_run_local(try_app_name, NULL);
+        captured_output = Util_slurp_file(TARGET_PATH, output_len);
+    }
+    else {
+        *output_len = 0;
+    }
+
+    /* Remove all the files we just created. */
+    S_clean_up_try();
+
+    return captured_output;
+}
+
+static void
+S_clean_up_try()
+{
+    remove(TRY_SOURCE_PATH);
+    OS_remove_exe(TRY_APP_BASENAME);
+    remove(TARGET_PATH);
 }
 
 static void

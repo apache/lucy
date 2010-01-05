@@ -91,7 +91,7 @@ Headers_run(void)
 
     keeper_count = 0;
     
-    START_RUN("Headers");
+    ConfWriter_start_module("Headers");
 
     /* Try for all POSIX headers in one blast. */
     if (HeadCheck_check_many_headers((const char**)posix_headers)) {
@@ -155,7 +155,7 @@ Headers_run(void)
     }
 
     /* shorten */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     if (has_posix)
         ConfWriter_shorten_macro("HAS_POSIX");
     if (has_c89) {
@@ -166,9 +166,9 @@ Headers_run(void)
         S_encode_affirmation(keepers[i]);
         ConfWriter_shorten_macro(aff_buf);
     }
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
 
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 static void

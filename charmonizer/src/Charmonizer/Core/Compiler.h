@@ -25,6 +25,20 @@ chaz_bool_t
 chaz_CC_compile_obj(const char *source_path, const char *obj_path, 
                     const char *code, size_t code_len);
 
+/* Attempt to compile the supplied source code and return true if the
+ * effort succeeds.
+ */
+chaz_bool_t
+chaz_CC_test_compile(char *source, size_t source_len);
+
+/* Attempt to compile the supplied source code.  If successful, capture the 
+ * output of the program and return a pointer to a newly allocated buffer.
+ * If the compilation fails, return NULL.  The length of the captured 
+ * output will be placed into the integer pointed to by [output_len].
+ */
+char*
+chaz_CC_capture_output(char *source, size_t source_len, size_t *output_len);
+
 /* Add an include directory which will be used for all future compilation
  * attempts.
  */
@@ -46,6 +60,8 @@ chaz_CC_clean_up();
   #define CC_compile_obj              chaz_CC_compile_obj
   #define CC_add_inc_dir              chaz_CC_add_inc_dir
   #define CC_clean_up                 chaz_CC_clean_up
+  #define CC_test_compile             chaz_CC_test_compile
+  #define CC_capture_output           chaz_CC_capture_output
   #define CC_init                     chaz_CC_init
 #endif
 

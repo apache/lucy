@@ -25,6 +25,13 @@ chaz_OS_remove_obj(char *name);
 int 
 chaz_OS_run_local(char *arg1, ...);
 
+/* Invoke a command and attempt to suppress output from both stdout and stderr
+ * (as if they had been sent to /dev/null).  If it's not possible to run the
+ * command quietly, run it anyway.
+ */
+int 
+chaz_OS_run_quietly(const char *command);
+
 /* Return the extension for an executable on this system.
  */
 const char*
@@ -54,6 +61,7 @@ chaz_OS_clean_up(void);
   #define OS_remove_exe                chaz_OS_remove_exe
   #define OS_remove_obj                chaz_OS_remove_obj
   #define OS_run_local                 chaz_OS_run_local
+  #define OS_run_quietly               chaz_OS_run_quietly
   #define OS_exe_ext                   chaz_OS_exe_ext
   #define OS_obj_ext                   chaz_OS_obj_ext
   #define OS_dev_null                  chaz_OS_dev_null

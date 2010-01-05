@@ -11,7 +11,7 @@
 void
 Floats_run(void) 
 {
-    START_RUN("Floats");
+    ConfWriter_start_module("Floats");
 
     ConfWriter_append_conf(
         "typedef float chy_f32_t;\n"
@@ -31,7 +31,7 @@ Floats_run(void)
     );
 
     /* Shorten. */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     ConfWriter_shorten_typedef("f32_t");
     ConfWriter_shorten_typedef("f64_t");
     ConfWriter_shorten_macro("HAS_F32_T");
@@ -39,9 +39,9 @@ Floats_run(void)
     ConfWriter_shorten_macro("F32_INF");
     ConfWriter_shorten_macro("F32_NEGINF");
     ConfWriter_shorten_macro("F32_NAN");
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
     
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 /**

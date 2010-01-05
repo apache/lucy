@@ -4,7 +4,9 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
 static char dev_null[20] = "";
@@ -21,6 +23,15 @@ static char *local_command_start = "./";
 
 static void
 S_probe_dev_null(void);
+
+/* Compile a small wrapper application which is used to redirect error output
+ * to dev_null.
+ */
+static void
+S_build_charm_run();
+
+static chaz_bool_t charm_run_initialized = false;
+static chaz_bool_t charm_run_ok = false;
 
 void
 OS_init() 
@@ -67,7 +78,7 @@ S_probe_dev_null(void)
 void
 OS_clean_up(void)
 {
-    return;
+    OS_remove_exe("_charm_run");
 }
 
 const char*
@@ -86,6 +97,85 @@ const char*
 OS_dev_null(void)
 {
     return dev_null;
+}
+
+static char charm_run_code_a[] = METAQUOTE
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <stddef.h>
+    int main(int argc, char **argv)
+    {
+        char *command;
+        size_t command_len = 1; /* Terminating null. */
+        int i;
+        int retval;
+        
+        /* Rebuild the command line args, minus the name of this utility. */
+        for (i = 1; i < argc; i++) {
+            command_len += strlen(argv[i]) + 1;
+        }
+        command = (char*)calloc(command_len, sizeof(char));
+METAQUOTE;
+
+static char charm_run_code_b[] = METAQUOTE
+        if (command == NULL) {
+            fprintf(stderr, "calloc failed\n");
+            exit(1);
+        }
+        for (i = 1; i < argc; i++) {
+            strcat( strcat(command, " "), argv[i] );
+        }
+
+        /* Redirect stdout and stderr to /dev/null or equivalent. */
+        freopen( 
+METAQUOTE;
+
+static char charm_run_code_c[] = METAQUOTE
+             , "w", stdout);
+        freopen( 
+METAQUOTE;
+
+static char charm_run_code_d[] = METAQUOTE
+             , "w", stderr);
+
+        /* Run the commmand and return its value to the parent process. */
+        retval = system(command);
+        free(command);
+        return retval;
+    }
+METAQUOTE;
+
+static void
+S_build_charm_run()
+{
+    chaz_bool_t compile_succeeded = false;
+    const char *dev_null = OS_dev_null();
+    size_t needed = sizeof(charm_run_code_a)
+                  + sizeof(charm_run_code_b)
+                  + strlen(dev_null)
+                  + sizeof(charm_run_code_c)
+                  + strlen(dev_null)
+                  + sizeof(charm_run_code_d)
+                  + 20;
+    char *code = (char*)malloc(needed);
+
+    sprintf(code, "%s%s \"%s\" %s \"%s\" %s", 
+        charm_run_code_a, 
+        charm_run_code_b,
+        dev_null,
+        charm_run_code_c,
+        dev_null,
+        charm_run_code_d);
+    compile_succeeded = CC_compile_exe("_charm_run.c", "_charm_run", 
+        code, strlen(code));
+    if (!compile_succeeded) {
+        Util_die("failed to compile _charm_run helper utility");
+    }
+
+    remove("_charm_run.c");
+    free(code);
+    charm_run_ok = true;
 }
 
 void
@@ -128,6 +218,26 @@ OS_run_local(char *arg1, ...)
     /* Run the command. */
     retval = system(command);
     free(command);
+    return retval;
+}
+
+int
+OS_run_quietly(const char *command)
+{
+    int retval = 1;
+    
+    if (!charm_run_initialized) {
+        charm_run_initialized = true;
+        S_build_charm_run();
+    }
+
+    if (!charm_run_ok) {
+        retval = system(command);
+    }
+    else {
+        retval = OS_run_local("_charm_run ", command, NULL);
+    }
+
     return retval;
 }
 

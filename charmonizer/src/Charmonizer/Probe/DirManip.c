@@ -21,7 +21,7 @@ DirManip_run(void)
     chaz_bool_t has_dirent_d_namlen = false;
     chaz_bool_t has_dirent_d_type   = false;
 
-    START_RUN("DirManip");
+    ConfWriter_start_module("DirManip");
     Dir_init();
 
     /* Header checks. */
@@ -103,7 +103,7 @@ DirManip_run(void)
     Dir_rmdir("_charm_test_remove_me");
 
     /* Shorten. */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     if (dir_sep_is_valid) { ConfWriter_shorten_macro("DIR_SEP"); }
     if (has_dirent_h)     { ConfWriter_shorten_macro("HAS_DIRENT_H"); }
     if (has_direct_h)     { ConfWriter_shorten_macro("HAS_DIRECT_H"); }
@@ -113,9 +113,9 @@ DirManip_run(void)
     ConfWriter_shorten_macro("MAKEDIR_MODE_IGNORED");
     if (remove_zaps_dirs) { ConfWriter_shorten_macro("REMOVE_ZAPS_DIRS"); }
 
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
 
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 

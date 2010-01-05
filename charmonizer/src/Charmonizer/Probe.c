@@ -10,6 +10,11 @@
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
+/* Write the "_charm.h" file used by every probe.
+ */
+static void
+S_write_charm_h();
+
 void
 Probe_init(const char *cc_command, const char *cc_flags, 
            const char *charmony_start)
@@ -20,6 +25,7 @@ Probe_init(const char *cc_command, const char *cc_flags,
     ConfWriter_init();
     HeadCheck_init();
     ConfWriter_open_charmony_h(charmony_start);
+    S_write_charm_h();
 
     if (Util_verbosity) { printf("Initialization complete.\n"); }
 }
@@ -46,7 +52,25 @@ Probe_set_verbosity(int level)
 FILE*
 Probe_get_charmony_fh(void)
 {
-    return ConfWriter_charmony_fh;
+    return ConfWriter_get_charmony_fh();
+}
+
+static char charm_h_code[] = METAQUOTE
+    #ifndef CHARM_H
+    #define CHARM_H 1
+
+    #include <stdio.h>
+
+    #define Charm_Setup \
+        freopen("_charmonizer_target", "w", stdout)
+    
+    #endif
+METAQUOTE;
+
+static void
+S_write_charm_h()
+{
+    Util_write_file("_charm.h", charm_h_code);
 }
 
 /**

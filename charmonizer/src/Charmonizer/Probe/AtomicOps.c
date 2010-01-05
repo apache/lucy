@@ -15,7 +15,7 @@ AtomicOps_run(void)
     chaz_bool_t has_sys_atomic_h       = false;
     chaz_bool_t has_intrin_h           = false;
 
-    START_RUN("AtomicOps");
+    ConfWriter_start_module("AtomicOps");
 
     if (HeadCheck_check_header("libkern/OSAtomic.h")) {
         has_libkern_osatomic_h = true;
@@ -33,7 +33,7 @@ AtomicOps_run(void)
     }
     
     /* Shorten */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     if (has_libkern_osatomic_h) {
         ConfWriter_shorten_macro("HAS_LIBKERN_OSATOMIC_H");
     }
@@ -43,9 +43,9 @@ AtomicOps_run(void)
     if (has_intrin_h) {
         ConfWriter_shorten_macro("HAS_INTRIN_H");
     }
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
 
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 

@@ -1,5 +1,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
+#include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/VariadicMacros.h"
@@ -40,10 +41,10 @@ VariadicMacros_run(void)
     chaz_bool_t has_iso_varmacros  = false;
     chaz_bool_t has_gnuc_varmacros = false;
 
-    START_RUN("VariadicMacros");
+    ConfWriter_start_module("VariadicMacros");
 
     /* test for ISO-style variadic macros */
-    output = ConfWriter_capture_output(iso_code, strlen(iso_code), &output_len);
+    output = CC_capture_output(iso_code, strlen(iso_code), &output_len);
     if (output != NULL) {
         has_varmacros = true;
         has_iso_varmacros = true;
@@ -52,7 +53,7 @@ VariadicMacros_run(void)
     }
 
     /* test for GNU-style variadic macros */
-    output = ConfWriter_capture_output(gnuc_code, strlen(gnuc_code), &output_len);
+    output = CC_capture_output(gnuc_code, strlen(gnuc_code), &output_len);
     if (output != NULL) {
         has_gnuc_varmacros = true;
         if (has_varmacros == false) {
@@ -63,16 +64,16 @@ VariadicMacros_run(void)
     }
 
     /* shorten */
-    START_SHORT_NAMES;
+    ConfWriter_start_short_names();
     if (has_varmacros)
         ConfWriter_shorten_macro("HAS_VARIADIC_MACROS");
     if (has_iso_varmacros)
         ConfWriter_shorten_macro("HAS_ISO_VARIADIC_MACROS");
     if (has_gnuc_varmacros)
         ConfWriter_shorten_macro("HAS_GNUC_VARIADIC_MACROS");
-    END_SHORT_NAMES;
+    ConfWriter_end_short_names();
 
-    END_RUN;
+    ConfWriter_end_module();
 }
 
 
