@@ -5,9 +5,7 @@
 #define C_LUCY_FILEWINDOW
 #include "Lucy/Util/ToolSet.h"
 
-#define CHAZ_USE_SHORT_NAMES
-#include "Charmonizer/Test.h"
-
+#include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestRAMFileHandle.h"
 #include "Lucy/Store/RAMFileHandle.h"
 #include "Lucy/Store/FileWindow.h"

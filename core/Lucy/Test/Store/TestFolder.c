@@ -2,9 +2,7 @@
 #define C_LUCY_CHARBUF
 #include "Lucy/Util/ToolSet.h"
 
-#define CHAZ_USE_SHORT_NAMES
-#include "Charmonizer/Test.h"
-
+#include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFolder.h"
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/FileHandle.h"

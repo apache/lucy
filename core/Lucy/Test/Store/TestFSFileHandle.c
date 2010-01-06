@@ -11,8 +11,7 @@
   #include <io.h> /* close */
 #endif
 
-#define CHAZ_USE_SHORT_NAMES
-#include "Charmonizer/Test.h"
+#include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSFileHandle.h"
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/FileWindow.h"

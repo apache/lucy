@@ -1,9 +1,6 @@
 #define C_LUCY_CHARBUF
 #include "Lucy/Util/ToolSet.h"
 
-#define CHAZ_USE_SHORT_NAMES
-#include "Charmonizer/Test.h"
-
 /* rmdir */
 #ifdef CHY_HAS_DIRECT_H
   #include <direct.h>
@@ -14,6 +11,7 @@
   #include <unistd.h>
 #endif
 
+#include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSDirHandle.h"
 #include "Lucy/Store/FSDirHandle.h"
 #include "Lucy/Store/FSFolder.h"
