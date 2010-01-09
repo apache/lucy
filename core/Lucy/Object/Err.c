@@ -60,7 +60,7 @@ THROW(VTable *vtable, char *pattern, ...)
 {
     va_list args;
     Err_make_t make 
-        = (Err_make_t)METHOD(CERTIVY(vtable, VTABLE), Err, Make);
+        = (Err_make_t)METHOD(CERTIFY(vtable, VTABLE), Err, Make);
     Err *err = (Err*)CERTIFY(make(NULL), ERR);
     CharBuf *mess = Err_Get_Mess(err);
 
