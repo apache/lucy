@@ -122,7 +122,7 @@ test_Flip_Block_bulk(TestBatch *batch)
                     if (BitVec_Get(bit_vec, i)) { break; }
                 }
             }
-            TEST_I64_EQUALS(batch, i, 18, "Flip_Block(%d, %d)", offset, len);
+            ASSERT_INT_EQ(batch, i, 18, "Flip_Block(%d, %d)", offset, len);
 
             DECREF(bit_vec);
         }
