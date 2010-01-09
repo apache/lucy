@@ -205,9 +205,6 @@ BB_deserialize(ByteBuf *self, InStream *instream)
 {
     const size_t size = InStream_Read_C32(instream);
     self = self ? self : (ByteBuf*)VTable_Make_Obj(BYTEBUF);
-    self->cap  = 0; 
-    self->size = 0;
-    self->buf  = NULL;
     SI_maybe_grow(self, size);
     self->size = size;
     InStream_Read_Bytes(instream, self->buf, size);

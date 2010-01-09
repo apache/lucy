@@ -467,14 +467,14 @@ CB_serialize(CharBuf *self, OutStream *target)
 CharBuf*
 CB_deserialize(CharBuf *self, InStream *instream)
 {
+    size_t size = InStream_Read_C32(instream);
     self = self ? self : (CharBuf*)VTable_Make_Obj(CHARBUF);
-    self->size = InStream_Read_C32(instream);
-    self->cap  = self->size + 1;
-    self->ptr  = (char*)MALLOCATE(self->cap);
-    InStream_Read_Bytes(instream, self->ptr, self->size);
-    self->ptr[self->size] = '\0';
-    if (!StrHelp_utf8_valid(self->ptr, self->size)) {
-        S_die_invalid_utf8(self->ptr, self->size);
+    SI_maybe_grow(self, size);
+    InStream_Read_Bytes(instream, self->ptr, size);
+    self->size = size;
+    self->ptr[size] = '\0';
+    if (!StrHelp_utf8_valid(self->ptr, size)) {
+        S_die_invalid_utf8(self->ptr, size);
     }
     return self;
 }
