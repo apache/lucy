@@ -282,11 +282,11 @@ test_stress(TestBatch *batch)
 void
 TestHash_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestHash", 29, NULL);
+    TestBatch *batch = TestBatch_new(29);
 
     srand((unsigned int)time((time_t*)NULL));
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_Equals(batch);
     test_Store_and_Fetch(batch);
     test_Keys_Values_Iter(batch);
@@ -294,7 +294,7 @@ TestHash_run_tests()
     test_serialization(batch);
     test_stress(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

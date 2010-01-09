@@ -142,16 +142,16 @@ test_random_insertion(TestBatch *batch)
 void
 TestPriQ_run_tests()
 {
-    TestBatch   *batch     = Test_new_batch("TestPriQ", 17, NULL);
+    TestBatch   *batch     = TestBatch_new(17);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_Peek_and_Pop_All(batch);
     test_Insert_and_Pop(batch);
     test_discard(batch);
     test_random_insertion(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 

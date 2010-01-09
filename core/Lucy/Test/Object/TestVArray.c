@@ -265,9 +265,9 @@ test_serialization(TestBatch *batch)
 void
 TestVArray_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestVArray", 39, NULL);
+    TestBatch *batch = TestBatch_new(39);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_Equals(batch);
     test_Store_Fetch(batch);
@@ -280,7 +280,7 @@ TestVArray_run_tests()
     test_Dump_and_Load(batch);
     test_serialization(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

@@ -122,7 +122,7 @@ test_Flip_Block_bulk(TestBatch *batch)
                     if (BitVec_Get(bit_vec, i)) { break; }
                 }
             }
-            ASSERT_INT_EQ(batch, i, 18, "Flip_Block(%d, %d)", offset, len);
+            TEST_I64_EQUALS(batch, i, 18, "Flip_Block(%d, %d)", offset, len);
 
             DECREF(bit_vec);
         }
@@ -437,9 +437,9 @@ test_off_by_one_error()
 void
 TestBitVector_run_tests()
 {
-    TestBatch   *batch     = Test_new_batch("TestInStream", 1029, NULL);
+    TestBatch   *batch     = TestBatch_new(1029);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_Set_and_Get(batch);
     test_Flip(batch);
@@ -458,7 +458,7 @@ TestBitVector_run_tests()
     test_To_Array(batch);
     test_off_by_one_error();
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

@@ -87,13 +87,13 @@ test_spew_and_slurp(TestBatch *batch)
 void
 TestJson_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestJson", 10, NULL);
+    TestBatch *batch = TestBatch_new(10);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_to_and_from(batch);
     test_spew_and_slurp(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

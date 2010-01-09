@@ -193,16 +193,16 @@ test_Seek_and_Tell(TestBatch *batch)
 void
 TestInStream_run_tests()
 {
-    TestBatch   *batch     = Test_new_batch("TestInStream", 37, NULL);
+    TestBatch   *batch     = TestBatch_new(37);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_refill(batch);
     test_Clone_and_Reopen(batch);
     test_Close(batch);
     test_Seek_and_Tell(batch);
     
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

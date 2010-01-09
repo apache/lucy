@@ -202,8 +202,8 @@ test_serialization(TestBatch *batch)
 void
 TestNum_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestNum", 38, NULL);
-    PLAN(batch);
+    TestBatch *batch = TestBatch_new(38);
+    TestBatch_Plan(batch);
 
     test_To_String(batch);
     test_accessors(batch);
@@ -211,7 +211,7 @@ TestNum_run_tests()
     test_Clone(batch);
     test_serialization(batch);
     
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

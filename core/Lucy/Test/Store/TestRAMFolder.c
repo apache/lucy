@@ -461,9 +461,9 @@ test_Close(TestBatch *batch)
 void
 TestRAMFolder_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestRAMFolder", 98, NULL);
+    TestBatch *batch = TestBatch_new(98);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_Initialize_and_Check(batch);
     test_Local_Exists(batch);
     test_Local_Is_Directory(batch);
@@ -476,7 +476,7 @@ TestRAMFolder_run_tests()
     test_Hard_Link(batch);
     test_Close(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

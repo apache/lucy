@@ -61,14 +61,14 @@ test_extract_gen(TestBatch *batch)
 void
 TestIxFileNames_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestIndexFileNames", 10, NULL);
+    TestBatch *batch = TestBatch_new(10);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_local_part(batch);
     test_extract_gen(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

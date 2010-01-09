@@ -224,15 +224,15 @@ test_Window(TestBatch *batch)
 void
 TestFSFH_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestFSFileHandle", 46, NULL);
+    TestBatch *batch = TestBatch_new(46);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_open(batch);
     test_Read_Write(batch);
     test_Close(batch);
     test_Window(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

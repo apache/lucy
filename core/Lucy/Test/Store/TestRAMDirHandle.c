@@ -67,12 +67,12 @@ test_all(TestBatch *batch)
 void
 TestRAMDH_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestRAMDirHandle", 6, NULL);
+    TestBatch *batch = TestBatch_new(6);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_all(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

@@ -75,12 +75,12 @@ test_all(TestBatch *batch)
 void
 TestFSDH_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestFSDirHandle", 5, NULL);
+    TestBatch *batch = TestBatch_new(5);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_all(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

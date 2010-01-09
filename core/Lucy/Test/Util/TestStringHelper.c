@@ -214,9 +214,9 @@ test_invalid_utf8(TestBatch *batch)
 void
 TestStrHelp_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestStringHelper", 552, NULL);
+    TestBatch *batch = TestBatch_new(552);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_SKIP_and_TRAILING(batch);
     test_overlap(batch);
@@ -226,7 +226,7 @@ TestStrHelp_run_tests()
     test_back_utf8_char(batch);
     test_invalid_utf8(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 

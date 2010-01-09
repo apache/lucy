@@ -324,9 +324,9 @@ test_Close(TestBatch *batch)
 void
 TestCFReader_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestCompoundFileReader", 48, NULL);
+    TestBatch *batch = TestBatch_new(48);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_open(batch);
     test_Local_MkDir_and_Find_Folder(batch);
     test_Local_Delete_and_Exists(batch);
@@ -335,7 +335,7 @@ TestCFReader_run_tests()
     test_Local_Open_In(batch);
     test_Close(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

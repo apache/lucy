@@ -365,8 +365,8 @@ test_serialization(TestBatch *batch)
 void
 TestCB_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestCharBuf", 48, NULL);
-    PLAN(batch);
+    TestBatch *batch = TestBatch_new(48);
+    TestBatch_Plan(batch);
 
     test_vcatf_s(batch);
     test_vcatf_null_string(batch);
@@ -391,7 +391,7 @@ TestCB_run_tests()
     test_To_I64(batch);
     test_serialization(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

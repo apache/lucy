@@ -107,9 +107,9 @@ test_Is_A(TestBatch *batch)
 void
 TestObj_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestObj", 12, NULL);
+    TestBatch *batch = TestBatch_new(12);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_refcounts(batch);
     test_To_String(batch);
@@ -118,7 +118,7 @@ TestObj_run_tests()
     test_Hash_Code(batch);
     test_Is_A(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

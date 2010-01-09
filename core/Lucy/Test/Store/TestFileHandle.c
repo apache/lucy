@@ -31,18 +31,18 @@ S_new_filehandle()
 void
 TestFH_run_tests()
 {
-    TestBatch     *batch  = Test_new_batch("TestFileHandle", 2, NULL);
+    TestBatch     *batch  = TestBatch_new(2);
     FileHandle    *fh     = S_new_filehandle();
     ZombieCharBuf  foo    = ZCB_LITERAL("foo");
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     ASSERT_TRUE(batch, CB_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
     FH_Set_Path(fh, (CharBuf*)&foo);
     ASSERT_TRUE(batch, CB_Equals(FH_Get_Path(fh), (Obj*)&foo), "Set_Path");
 
     DECREF(fh);
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

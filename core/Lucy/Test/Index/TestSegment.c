@@ -138,9 +138,9 @@ test_Write_File_and_Read_File(TestBatch *batch)
 void
 TestSeg_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestSegment", 21, NULL);
+    TestBatch *batch = TestBatch_new(21);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_fields(batch);
     test_metadata_storage(batch);
     test_seg_name_and_num(batch);
@@ -148,7 +148,7 @@ TestSeg_run_tests()
     test_Compare_To(batch);
     test_Write_File_and_Read_File(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

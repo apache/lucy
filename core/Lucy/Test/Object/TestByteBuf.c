@@ -135,8 +135,8 @@ test_serialization(TestBatch *batch)
 void
 TestBB_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestByteBuf", 22, NULL);
-    PLAN(batch);
+    TestBatch *batch = TestBatch_new(22);
+    TestBatch_Plan(batch);
 
     test_Equals(batch);
     test_Grow(batch);
@@ -146,7 +146,7 @@ TestBB_run_tests()
     test_Cat(batch);
     test_serialization(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

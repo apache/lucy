@@ -35,13 +35,13 @@ test_cas_ptr(TestBatch *batch)
 void
 TestAtomic_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestAtomic", 6, NULL);
+    TestBatch *batch = TestBatch_new(6);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_cas_ptr(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

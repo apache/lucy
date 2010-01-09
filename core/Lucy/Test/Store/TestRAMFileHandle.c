@@ -149,16 +149,16 @@ test_Window(TestBatch *batch)
 void
 TestRAMFH_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestRAMFileHandle", 32, NULL);
+    TestBatch *batch = TestBatch_new(32);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_open(batch);
     test_Read_Write(batch);
     test_Grow_and_Get_File(batch);
     test_Close(batch);
     test_Window(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

@@ -470,9 +470,9 @@ test_Slurp_File(TestBatch *batch)
 void
 TestFolder_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestFolder", 74, NULL);
+    TestBatch *batch = TestBatch_new(74);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_Exists(batch);
     test_Set_Path_and_Get_Path(batch);
     test_MkDir(batch);
@@ -486,7 +486,7 @@ TestFolder_run_tests()
     test_Delete_Tree(batch);
     test_Slurp_File(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

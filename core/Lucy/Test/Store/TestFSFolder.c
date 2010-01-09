@@ -64,13 +64,13 @@ void
 TestFSFolder_run_tests()
 {
     u32_t num_tests = TestFolderCommon_num_tests() + 3;
-    TestBatch *batch = Test_new_batch("TestFSFolder", num_tests, NULL);
+    TestBatch *batch = TestBatch_new(num_tests);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_Initialize_and_Check(batch);
     TestFolderCommon_run_tests(batch, S_set_up, S_tear_down);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

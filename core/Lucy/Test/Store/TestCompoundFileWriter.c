@@ -109,13 +109,13 @@ test_offsets(TestBatch *batch)
 void
 TestCFWriter_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestCompoundFileWriter", 7, NULL);
+    TestBatch *batch = TestBatch_new(7);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     test_Consolidate(batch);
     test_offsets(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

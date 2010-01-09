@@ -352,9 +352,9 @@ test_bigend_f64(TestBatch *batch)
 void
 TestNumUtil_run_tests()
 {
-    TestBatch *batch = Test_new_batch("TestNumberUtils", 1196, NULL);
+    TestBatch *batch = TestBatch_new(1196);
 
-    PLAN(batch);
+    TestBatch_Plan(batch);
     srand((unsigned int)time((time_t*)NULL));
 
     test_u1(batch);
@@ -368,7 +368,7 @@ TestNumUtil_run_tests()
     test_bigend_f32(batch);
     test_bigend_f64(batch);
 
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 

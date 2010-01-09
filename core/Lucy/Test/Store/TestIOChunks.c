@@ -81,15 +81,15 @@ test_Buf(TestBatch *batch)
 void
 TestIOChunks_run_tests()
 {
-    TestBatch   *batch     = Test_new_batch("TestIOChunks", 5, NULL);
+    TestBatch   *batch     = TestBatch_new(5);
 
     srand((unsigned int)time((time_t*)NULL));
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_Read_Write_Bytes(batch);
     test_Buf(batch);
     
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation

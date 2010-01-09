@@ -406,10 +406,10 @@ test_f64(TestBatch *batch)
 void
 TestIOPrimitives_run_tests()
 {
-    TestBatch   *batch     = Test_new_batch("TestIOPrimitives", 11, NULL);
+    TestBatch   *batch     = TestBatch_new(11);
 
     srand((unsigned int)time((time_t*)NULL));
-    PLAN(batch);
+    TestBatch_Plan(batch);
 
     test_i8(batch);
     test_u8(batch);
@@ -422,7 +422,7 @@ TestIOPrimitives_run_tests()
     test_f32(batch);
     test_f64(batch);
     
-    batch->destroy(batch);
+    DECREF(batch);
 }
 
 /* Copyright 2009 The Apache Software Foundation
