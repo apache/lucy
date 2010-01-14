@@ -70,6 +70,16 @@ sub extra_ccflags {
         $extra_ccflags .= '/TP ';
     }
 
+    # Tell GCC explicitly to run with C99 compatability.
+    my $gcc_version = $ENV{REAL_GCC_VERSION} || $Config{gccversion};
+    if ( defined $gcc_version ) {
+        $gcc_version =~ /^(\d+(\.\d+)?)/ or die "no match";
+        $gcc_version = $1;
+        if ($extra_ccflags !~ m/-std=c99/) {
+            $extra_ccflags .= "-std=c99 ";
+        }  
+    }
+
     return $extra_ccflags;
 }
 
