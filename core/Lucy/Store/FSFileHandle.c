@@ -254,6 +254,12 @@ bool_t
 FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
 {
     const i64_t end = offset + len;
+
+    if (self->flags & FH_WRITE_ONLY) {
+        Err_set_error(Err_new(CB_newf(
+            "Can't read from write-only filehandle")));
+        return false;
+    }
     if (offset < 0) {
         Err_set_error(Err_new(CB_newf(
             "Can't read from an offset less than 0 (%i64)", offset)));
