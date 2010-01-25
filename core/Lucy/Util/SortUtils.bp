@@ -45,19 +45,11 @@ inert class Lucy::Util::SortUtils cnick Sort {
      * Lucy's external sort takes advantage of this when it is reading
      * back pre-sorted runs from disk and merging the streams into a
      * consolidated buffer.
-     * 
-     * merge4 merges elements which are 4 bytes in size; merge8 merges 8-byte
-     * elements.
      */
     inert void
-    merge4(void *left_ptr,  u32_t left_num_elems,
-           void *right_ptr, u32_t right_num_elems,
-           void *dest, Sort_compare_t compare, void *context);
-    inert void
-    merge8(void *left_ptr,  u32_t left_num_elems,
-           void *right_ptr, u32_t right_num_elems,
-           void *dest, Sort_compare_t compare, void *context);
-
+    merge(void *left_ptr,  u32_t left_num_elems,
+          void *right_ptr, u32_t right_num_elems,
+          void *dest, size_t width, Sort_compare_t compare, void *context);
 
     /** Quicksort. 
      */

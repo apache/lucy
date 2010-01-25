@@ -24,8 +24,6 @@ static void
 S_msort8(EIGHT_BYTE_TYPE *elems, EIGHT_BYTE_TYPE *scratch,
          u32_t left, u32_t right, Sort_compare_t compare, void *context);
 
-/* Static inline versions of Sort_merge4 and Sort_merge8.
- */
 static INLINE void
 SI_merge4(FOUR_BYTE_TYPE *left_ptr,  u32_t left_size,
           FOUR_BYTE_TYPE *right_ptr, u32_t right_size,
@@ -63,23 +61,23 @@ Sort_mergesort(void *elems, void *scratch, u32_t num_elems, u32_t width,
 }
 
 void
-Sort_merge4(void *left_ptr,  u32_t left_size,
-            void *right_ptr, u32_t right_size,
-            void *dest, Sort_compare_t compare, void *context) 
+Sort_merge(void *left_ptr,  u32_t left_size,
+           void *right_ptr, u32_t right_size,
+           void *dest, size_t width, Sort_compare_t compare, void *context)
 {
-    SI_merge4((FOUR_BYTE_TYPE*)left_ptr, left_size, 
-              (FOUR_BYTE_TYPE*)right_ptr, right_size, 
-              (FOUR_BYTE_TYPE*)dest, compare, context);
-}
-
-void
-Sort_merge8(void *left_ptr,  u32_t left_size,
-            void *right_ptr, u32_t right_size,
-            void *dest, Sort_compare_t compare, void *context) 
-{
-    SI_merge8((EIGHT_BYTE_TYPE*)left_ptr, left_size, 
-              (EIGHT_BYTE_TYPE*)right_ptr, right_size, 
-              (EIGHT_BYTE_TYPE*)dest, compare, context);
+    if (width == 4) {
+        SI_merge4((FOUR_BYTE_TYPE*)left_ptr, left_size, 
+                  (FOUR_BYTE_TYPE*)right_ptr, right_size, 
+                  (FOUR_BYTE_TYPE*)dest, compare, context);
+    }
+    else if (width == 8) {
+        SI_merge8((EIGHT_BYTE_TYPE*)left_ptr, left_size, 
+                  (EIGHT_BYTE_TYPE*)right_ptr, right_size, 
+                  (EIGHT_BYTE_TYPE*)dest, compare, context);
+    }
+    else {
+        THROW(ERR, "Invalid value for 'width': %u64", (uint64_t)width);
+    }
 }
 
 static void
@@ -90,7 +88,7 @@ S_msort4(FOUR_BYTE_TYPE *elems, FOUR_BYTE_TYPE *scratch,
         const u32_t mid = ( (right+left)/2 ) + 1;
         S_msort4(elems, scratch, left, mid - 1, compare, context);
         S_msort4(elems, scratch, mid,  right, compare, context);
-        Sort_merge4( (elems + left),  (mid - left), 
+        SI_merge4( (elems + left),  (mid - left), 
             (elems + mid), (right - mid + 1), scratch, compare, context);
         memcpy((elems + left), scratch,
             ((right - left + 1) * sizeof(FOUR_BYTE_TYPE)) );
@@ -105,7 +103,7 @@ S_msort8(EIGHT_BYTE_TYPE *elems, EIGHT_BYTE_TYPE *scratch,
         const u32_t mid = ( (right+left)/2 ) + 1;
         S_msort8(elems, scratch, left, mid - 1, compare, context);
         S_msort8(elems, scratch, mid,  right, compare, context);
-        Sort_merge8( (elems + left),  (mid - left), 
+        SI_merge8( (elems + left),  (mid - left), 
             (elems + mid), (right - mid + 1), scratch, compare, context);
         memcpy((elems + left), scratch,
             ((right - left + 1) * sizeof(EIGHT_BYTE_TYPE)) );
