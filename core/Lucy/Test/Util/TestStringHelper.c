@@ -8,6 +8,10 @@ static void
 test_SKIP_and_TRAILING(TestBatch *batch)
 {
     u8_t i, max;
+    
+    /* Some of the upper max boundaries are skipped (e.g. 127)
+     * because they may not appear as initial bytes in legal UTF-8.
+     */
     for (i = 0, max = 127; i < max; i++) {
         ASSERT_INT_EQ(batch, StrHelp_UTF8_SKIP[i], 1, 
             "UTF8_SKIP ascii %d", (int)i);
