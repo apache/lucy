@@ -6,6 +6,7 @@
 #include "Lucy/Store/CompoundFileWriter.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/InStream.h"
+#include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 #include "Lucy/Util/StringHelper.h"
 
@@ -75,19 +76,21 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
     if (self->format == 1) {
         VArray *files = Hash_Keys(self->records);
         ZombieCharBuf filename = ZCB_BLANK;
-        CharBuf *folder_path = Folder_Get_Path(folder);
-        size_t folder_path_len = CB_Length(folder_path);
-        u32_t i, max;
+        ZombieCharBuf folder_name = ZCB_BLANK;
+        IxFileNames_local_part(Folder_Get_Path(folder), &folder_name);
+        size_t folder_name_len = ZCB_Length(&folder_name);
 
-        for (i = 0, max = VA_Get_Size(files); i < max; i++) {
+        for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
             CharBuf *orig = (CharBuf*)VA_Fetch(files, i);
-            if (CB_Starts_With(orig, folder_path)) {
+            if (CB_Starts_With(orig, (CharBuf*)&folder_name)) {
                 Obj *record = Hash_Delete(self->records, (Obj*)orig);
                 ZCB_Assign(&filename, orig);
-                ZCB_Nip(&filename, folder_path_len + sizeof(DIR_SEP) - 1);
+                ZCB_Nip(&filename, folder_name_len + sizeof(DIR_SEP) - 1);
                 Hash_Store(self->records, (Obj*)&filename, (Obj*)record);
             }
         }
+
+        DECREF(files);
     }
 
     return self;

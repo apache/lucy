@@ -5,9 +5,10 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
-i32_t CFWriter_current_file_format = 2;
+i32_t CFWriter_current_file_format = 1;
 
 static ZombieCharBuf cfmeta_file = ZCB_LITERAL("cfmeta.json");
 static ZombieCharBuf cfmeta_temp = ZCB_LITERAL("cfmeta.json.temp");
@@ -80,6 +81,7 @@ S_do_consolidate(CompoundFileWriter *self)
     Hash      *metadata     = Hash_new(0);
     Hash      *sub_files    = Hash_new(0);
     VArray    *files        = Folder_List(folder, NULL);
+    VArray    *merged       = VA_new(VA_Get_Size(files));
     OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)&cf_file);
     u32_t      i, max;
     bool_t     rename_success;
@@ -90,6 +92,17 @@ S_do_consolidate(CompoundFileWriter *self)
     Hash_Store_Str(metadata, "files", 5, INCREF(sub_files));
     Hash_Store_Str(metadata, "format", 6, 
         (Obj*)CB_newf("%i32", CFWriter_current_file_format) );
+
+    /* Temporary hack!  Prepend the segment name for compatibility with
+     * earlier releases. */
+    CharBuf *infilepath = CB_new(30);
+    bool_t base_len = 0;
+    ZombieCharBuf seg_name = ZCB_BLANK;
+    IxFileNames_local_part(Folder_Get_Path(folder), &seg_name);
+    if (ZCB_Starts_With_Str(&seg_name, "seg_", 4)) {
+        CB_setf(infilepath, "%o/", &seg_name);
+        base_len = CB_Get_Size(infilepath);
+    }
 
     VA_Sort(files, NULL, NULL);
     for (i = 0, max = VA_Get_Size(files); i < max; i++) {
@@ -112,7 +125,10 @@ S_do_consolidate(CompoundFileWriter *self)
                 (Obj*)CB_newf("%i64", offset) );
             Hash_Store_Str(file_data, "length", 6, 
                 (Obj*)CB_newf("%i64", len) );
-            Hash_Store(sub_files, (Obj*)infilename, (Obj*)file_data);
+            CB_Set_Size(infilepath, base_len);
+            CB_Cat(infilepath, infilename);
+            Hash_Store(sub_files, (Obj*)infilepath, (Obj*)file_data);
+            VA_Push(merged, INCREF(infilename));
 
             /* Add filler NULL bytes so that every sub-file begins on a file
              * position multiple of 8. */
@@ -125,6 +141,7 @@ S_do_consolidate(CompoundFileWriter *self)
             DECREF(instream);
         }
     }
+    DECREF(infilepath);
 
     /* Write metadata to cfmeta file. */
     Json_spew_json((Obj*)metadata, (Folder*)self->folder,
@@ -139,6 +156,7 @@ S_do_consolidate(CompoundFileWriter *self)
     DECREF(files);
     DECREF(metadata);
     {
+        /*
         CharBuf *merged_file;
         Obj     *ignore;
         Hash_Iter_Init(sub_files);
@@ -149,8 +167,18 @@ S_do_consolidate(CompoundFileWriter *self)
                 Err_throw_mess(ERR, mess);
             }
         }
+        */
     }
     DECREF(sub_files);
+    for (uint32_t i = 0, max = VA_Get_Size(merged); i < max; i++) {
+        CharBuf *merged_file = (CharBuf*)VA_Fetch(merged, i);
+        if (!Folder_Delete(folder, merged_file)) {
+            CharBuf *mess = MAKE_MESS("Can't delete '%o'", merged_file);
+            DECREF(merged);
+            Err_throw_mess(ERR, mess);
+        }
+    }
+    DECREF(merged);
 }
 
 /* Copyright 2009 The Apache Software Foundation
