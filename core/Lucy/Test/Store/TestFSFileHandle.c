@@ -207,7 +207,7 @@ test_Window(TestBatch *batch)
     ASSERT_TRUE(batch, FSFH_Window(fh, window, 1021, 2), 
         "Window() returns true");
     ASSERT_TRUE(batch, 
-        strncmp(window->buf + window->offset + 1021, "oo", 2) == 0, 
+        strncmp(window->buf - window->offset + 1021, "oo", 2) == 0, 
         "Window()");
 
     ASSERT_TRUE(batch, FSFH_Release_Window(fh, window), 
