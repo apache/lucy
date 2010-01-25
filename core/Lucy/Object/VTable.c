@@ -121,6 +121,7 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
             }
             else {
                 parent = VTable_singleton(parent_class, NULL);
+                DECREF(parent_class);
             }
         }
 
@@ -224,13 +225,10 @@ VTable_add_to_registry(VTable *vtable)
     }
     else {
         CharBuf *klass = CB_Clone(vtable->name);
-        if (LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable)) {
-            return true;
-        }
-        else {
-            DECREF(klass);
-            return false;
-        }
+        bool_t retval 
+            = LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable);
+        DECREF(klass);
+        return retval;
     }
 }
 
