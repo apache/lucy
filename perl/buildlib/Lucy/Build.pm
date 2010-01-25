@@ -48,16 +48,20 @@ sub autobind_pm_path { catfile( 'lib', 'Lucy', 'Autobinding.pm' ); }
 
 sub extra_ccflags {
     my $self          = shift;
-    my $debug_env_var = "LUCY_DEBUG";
+    my $extra_ccflags = defined $ENV{CFLAGS} ? "$ENV{CFLAGS} " : "";
+    my $gcc_version 
+        = $ENV{REAL_GCC_VERSION}
+        || $Config{gccversion}
+        || undef;
+    if ( defined $gcc_version ) {
+        $gcc_version =~ /^(\d+(\.\d+))/
+            or die "Invalid GCC version: $gcc_version";
+        $gcc_version = $1;
+    }
 
-    my $extra_ccflags = "";
-    if ( defined $ENV{$debug_env_var} ) {
-        $extra_ccflags .= "-D$debug_env_var ";
-        # Allow override when Perl was compiled with an older version.
-        my $gcc_version = $ENV{REAL_GCC_VERSION} || $Config{gccversion};
+    if ( defined $ENV{LUCY_DEBUG} ) {
         if ( defined $gcc_version ) {
-            $gcc_version =~ /^(\d+(\.\d+)?)/ or die "no match";
-            $gcc_version = $1;
+            $extra_ccflags .= "-DLUCY_DEBUG ";
             $extra_ccflags .= "-DPERL_GCC_PEDANTIC -std=c99 -pedantic -Wall ";
             $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct
             $extra_ccflags .= "-Wno-variadic-macros "
@@ -65,21 +69,25 @@ sub extra_ccflags {
         }
     }
 
+    if ( $ENV{LUCY_VALGRIND} and defined $gcc_version ) {
+        $extra_ccflags .= "-fno-inline-functions ";
+    }
+
     # Compile as C++ under MSVC.
     if ( $Config{cc} eq 'cl' ) {
         $extra_ccflags .= '/TP ';
     }
-
-    # Tell GCC explicitly to run with C99 compatability.
-    my $gcc_version = $ENV{REAL_GCC_VERSION} || $Config{gccversion};
+    
     if ( defined $gcc_version ) {
-        $gcc_version =~ /^(\d+(\.\d+)?)/ or die "no match";
-        $gcc_version = $1;
+        # Tell GCC explicitly to run with C99 compatability.
         if ($extra_ccflags !~ m/-std=c99/) {
             $extra_ccflags .= "-std=c99 ";
         }  
+        if ($extra_ccflags !~ m/-D_GNU_SOURCE/) {
+            $extra_ccflags .= "-D_GNU_SOURCE ";
+        } 
     }
-
+    
     return $extra_ccflags;
 }
 
