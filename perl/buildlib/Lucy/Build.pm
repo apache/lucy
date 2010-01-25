@@ -340,14 +340,16 @@ sub ACTION_clownfish {
 # allows us to use more up-to-date XS API while still supporting Perls back to
 # 5.8.3.
 #
-# TODO: Devel::PPPort recommends that we distribute ppport.h rather than
-# require Devel::PPPort itself, but at this point further investigation is
-# required as to whether that's possible under the Apache license.
+# The Devel::PPPort docs recommend that we distribute ppport.h rather than
+# require Devel::PPPort itself, but ppport.h isn't compatible with the Apache
+# license.
 sub ACTION_ppport {
     my $self = shift;
-    require Devel::PPPort;
-    $self->add_to_cleanup('ppport.h');
-    Devel::PPPort::WriteFile();
+    if ( !-e 'ppport.h' ) {
+        require Devel::PPPort;
+        $self->add_to_cleanup('ppport.h');
+        Devel::PPPort::WriteFile();
+    }
 }
 
 sub ACTION_suppressions {
@@ -373,6 +375,9 @@ sub ACTION_suppressions {
         $suppressions =~ s/^\s*<insert a.*?>/{\n  <core_perl_$rule_number>/m;
         $rule_number++;
     }
+
+    # Change e.g. fun:_vgrZU_libcZdsoZa_calloc to fun:calloc
+    $suppressions =~ s/fun:\w+_((m|c|re)alloc)/fun:$1/g;
 
     # Write local suppressions file.
     open( my $supp_fh, '>', $LOCAL_SUPP )
@@ -451,7 +456,7 @@ sub ACTION_compile_custom_xs {
     my $xs_filepath = $self->xs_filepath;
 
     $self->dispatch('ppport');
-    
+
     require ExtUtils::ParseXS;
 
     my $cbuilder = Lucy::Build::CBuilder->new;
