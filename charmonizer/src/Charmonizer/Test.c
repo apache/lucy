@@ -13,9 +13,9 @@ static void
 S_TestBatch_run_test(TestBatch *batch);
 
 #define PRINT_SUPPLIED_MESS(_pattern, _args) \
-    va_start(args, pat); \
-    vprintf(pat, args); \
-    va_end(args); \
+    va_start(_args, _pattern); \
+    vprintf(_pattern, _args); \
+    va_end(_args); \
     printf("\n");
 
 void
