@@ -12,7 +12,6 @@
 #define set_up_t    lucy_TestFolderCommon_set_up_t
 #define tear_down_t lucy_TestFolderCommon_tear_down_t
 
-static CharBuf test_index    = ZCB_LITERAL("test_index");
 static CharBuf foo           = ZCB_LITERAL("foo");
 static CharBuf bar           = ZCB_LITERAL("bar");
 static CharBuf baz           = ZCB_LITERAL("baz");
