@@ -15,9 +15,8 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Memory.h"
 
-/* Reallocate if necessary. */
-static INLINE void
-SI_maybe_grow(ByteBuf *self, size_t capacity);
+static void
+S_grow(ByteBuf *self, size_t size);
 
 ByteBuf*
 BB_new(size_t capacity) 
@@ -33,7 +32,7 @@ BB_init(ByteBuf *self, size_t capacity)
     self->buf   = NULL;
     self->size  = 0;
     self->cap   = 0;
-    SI_maybe_grow(self, amount);
+    S_grow(self, amount);
     return self;
 }
 
@@ -131,7 +130,7 @@ BB_hash_code(ByteBuf *self)
 static INLINE void
 SI_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) 
 {
-    SI_maybe_grow(self, size);
+    if (size > self->cap) { S_grow(self, size); }
     memmove(self->buf, bytes, size);
     self->size = size;
 }
@@ -153,7 +152,9 @@ static INLINE void
 SI_cat_bytes(ByteBuf *self, const void *bytes, size_t size) 
 {
     const size_t new_size = self->size + size;
-    SI_maybe_grow(self, new_size);
+    if (new_size > self->cap) { 
+        S_grow(self, Memory_oversize(new_size, sizeof(char))); 
+    }
     memcpy((self->buf + self->size), bytes, size);
     self->size = new_size;
 }
@@ -171,25 +172,24 @@ BB_cat(ByteBuf *self, const ByteBuf *other)
 }
 
 static void
-S_grow(ByteBuf *self, size_t capacity)
+S_grow(ByteBuf *self, size_t size)
 {
-    size_t bleedover = capacity % sizeof(i64_t);
-    size_t amount    = capacity + sizeof(i64_t) - bleedover;
-    self->buf = (char*)REALLOCATE(self->buf, amount);
-    self->cap = amount;
-}
-
-static INLINE void
-SI_maybe_grow(ByteBuf *self, size_t capacity) 
-{
-    /* Reallocate only if necessary. */
-    if (self->cap < capacity) { S_grow(self, capacity); }
+    if (size > self->cap) {
+        size_t amount    = size;
+        size_t remainder = amount % sizeof(int64_t);
+        if (remainder) {
+            amount += sizeof(int64_t);
+            amount -= remainder;
+        }
+        self->buf = (char*)REALLOCATE(self->buf, amount);
+        self->cap = amount;
+    }
 }
 
 char*
-BB_grow(ByteBuf *self, size_t capacity) 
+BB_grow(ByteBuf *self, size_t size) 
 {
-    SI_maybe_grow(self, capacity);
+    if (size > self->cap) { S_grow(self, size); }
     return self->buf;
 }
 
@@ -204,8 +204,9 @@ ByteBuf*
 BB_deserialize(ByteBuf *self, InStream *instream)
 {
     const size_t size = InStream_Read_C32(instream);
+    const size_t capacity = size ? size : sizeof(i64_t);
     self = self ? self : (ByteBuf*)VTable_Make_Obj(BYTEBUF);
-    SI_maybe_grow(self, size);
+    if (capacity > self->cap) { S_grow(self, capacity); }
     self->size = size;
     InStream_Read_Bytes(instream, self->buf, size);
     return self;

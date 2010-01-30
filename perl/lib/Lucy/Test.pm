@@ -96,6 +96,9 @@ PPCODE:
     else if (strEQ(package, "TestJson")) {
         lucy_TestJson_run_tests();
     }
+    else if (strEQ(package, "TestMemory")) {
+        lucy_TestMemory_run_tests();
+    }
     else if (strEQ(package, "TestNumberUtils")) {
         lucy_TestNumUtil_run_tests();
     }

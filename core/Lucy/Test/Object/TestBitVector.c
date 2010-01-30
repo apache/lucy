@@ -437,10 +437,9 @@ test_off_by_one_error()
 void
 TestBitVector_run_tests()
 {
-    TestBatch   *batch     = TestBatch_new(1029);
+    TestBatch *batch = TestBatch_new(1029);
 
     TestBatch_Plan(batch);
-
     test_Set_and_Get(batch);
     test_Flip(batch);
     test_Flip_Block_ascending(batch);

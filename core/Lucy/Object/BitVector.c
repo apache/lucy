@@ -5,12 +5,6 @@
 
 #include "Lucy/Object/BitVector.h"
 
-#define BITVEC_GROW(self, num) \
-    do { \
-        if (num >= self->cap) \
-            BitVec_Grow(self, num); \
-    } while (0)
-
 /* Shared subroutine for performing both OR and XOR ops.
  */
 #define DO_OR 1
@@ -108,18 +102,18 @@ BitVec_mimic(BitVector *self, Obj *other)
         u32_t space = my_byte_size - evil_twin_byte_size;
         memset(self->bits + evil_twin_byte_size, 0, space);
     }
-    else {
-        BitVec_Grow(self, evil_twin->cap);
+    else if (my_byte_size < evil_twin_byte_size) {
+        BitVec_Grow(self, evil_twin->cap - 1);
     }
     memcpy(self->bits, evil_twin->bits, evil_twin_byte_size);
 }
 
 void
-BitVec_grow(BitVector *self, u32_t new_max) 
+BitVec_grow(BitVector *self, u32_t capacity) 
 {
-    if (new_max >= self->cap) {
+    if (capacity > self->cap) {
         const size_t old_byte_cap  = (size_t)ceil(self->cap / 8.0); 
-        const size_t new_byte_cap  = (size_t)ceil((new_max + 1) / 8.0); 
+        const size_t new_byte_cap  = (size_t)ceil((capacity + 1) / 8.0); 
         const size_t num_new_bytes = new_byte_cap - old_byte_cap;
 
         self->bits = (u8_t*)REALLOCATE(self->bits, new_byte_cap);
@@ -131,7 +125,10 @@ BitVec_grow(BitVector *self, u32_t new_max)
 void 
 BitVec_set(BitVector *self, u32_t tick) 
 {
-    BITVEC_GROW(self, tick);
+    if (tick >= self->cap) {
+        uint32_t new_cap = (uint32_t)Memory_oversize(tick + 1, 0);
+        BitVec_Grow(self, new_cap);
+    }
     NumUtil_u1set(self->bits, tick);
 }
 
@@ -257,7 +254,7 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation)
     }
 
     /* Grow self if smaller than other, then calc pointers. */
-    BITVEC_GROW(self, max_cap);
+    if (max_cap > self->cap) { BitVec_Grow(self, max_cap); }
     bits_a        = self->bits;
     bits_b        = other->bits;
     byte_size     = ceil(min_cap / 8.0);
@@ -309,7 +306,10 @@ BitVec_and_not(BitVector *self, const BitVector *other)
 void
 BitVec_flip(BitVector *self, u32_t tick) 
 {
-    BITVEC_GROW(self, tick);
+    if (tick >= self->cap) {
+        uint32_t new_cap = (uint32_t)Memory_oversize(tick + 1, 0);
+        BitVec_Grow(self, new_cap);
+    }
     NumUtil_u1flip(self->bits, tick);
 }
 
@@ -322,7 +322,7 @@ BitVec_flip_block(BitVector *self, u32_t offset, u32_t length)
     /* Bail if there's nothing to flip. */
     if (!length) { return; }
 
-    BITVEC_GROW(self, last);
+    if (last >= self->cap) { BitVec_Grow(self, last + 1); }
 
     /* Flip partial bytes. */
     while (last % 8 != 0 && last > first) {

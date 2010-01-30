@@ -14,13 +14,6 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 
-#define MAYBE_GROW(_self, _new_size) \
-    do { \
-        if ((_self)->cap < _new_size) \
-            VA_grow(_self, _new_size); \
-    } while (0)
-
-
 VArray*
 VA_new(u32_t capacity) 
 {
@@ -171,7 +164,9 @@ VA_shallow_copy(VArray *self)
 void
 VA_push(VArray *self, Obj *element) 
 {
-    MAYBE_GROW(self, self->size + 1);
+    if (self->size == self->cap) { 
+        VA_Grow(self, Memory_oversize(self->size + 1, sizeof(Obj*)));
+    }
     self->elems[ self->size ] = element;
     self->size++;
 }
@@ -181,14 +176,17 @@ VA_push_varray(VArray *self, VArray *other)
 {
     u32_t i;
     u32_t tick = self->size;
-    MAYBE_GROW(self, self->size + other->size);
+    u32_t new_size = self->size + other->size;
+    if (new_size > self->cap) { 
+        VA_Grow(self, Memory_oversize(new_size, sizeof(Obj*))); 
+    }
     for (i = 0; i < other->size; i++, tick++) {
         Obj *elem = VA_Fetch(other, i);
         if (elem != NULL) {
             self->elems[tick] = INCREF(elem);
         }
     }
-    self->size += other->size;
+    self->size = new_size;
 }
 
 Obj*
@@ -203,7 +201,9 @@ VA_pop(VArray *self)
 void
 VA_unshift(VArray *self, Obj *elem) 
 {
-    MAYBE_GROW(self, self->size + 1);
+    if (self->size == self->cap) { 
+        VA_Grow(self, Memory_oversize(self->size + 1, sizeof(Obj*)));
+    }
     memmove(self->elems + 1, self->elems, self->size * sizeof(Obj*));
     self->elems[0] = elem;
     self->size++;
@@ -236,20 +236,20 @@ VA_fetch(VArray *self, u32_t num)
 }
 
 void
-VA_store(VArray *self, u32_t num, Obj *elem) 
+VA_store(VArray *self, u32_t tick, Obj *elem) 
 {
-    MAYBE_GROW(self, num + 1);
-    if (num < self->size) { DECREF(self->elems[num]); }
-    else { self->size = num + 1; }
-    self->elems[num] = elem;
+    if (tick >= self->cap) {
+        VA_Grow(self, Memory_oversize(tick + 1, sizeof(Obj*))); 
+    }
+    if (tick < self->size) { DECREF(self->elems[tick]); }
+    else                   { self->size = tick + 1; }
+    self->elems[tick] = elem;
 }
 
 void
 VA_grow(VArray *self, u32_t capacity) 
 {
     if (capacity > self->cap) {
-        /* Add an extra 10%. */
-        capacity += capacity / 10;
         self->elems = (Obj**)REALLOCATE(self->elems, capacity * sizeof(Obj*)); 
         self->cap   = capacity;
         memset(self->elems + self->size, 0,

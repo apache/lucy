@@ -21,10 +21,6 @@
 /* The end of the string (address of terminating NULL). */
 #define CBEND(self) ((self)->ptr + (self)->size)
 
-/* Reallocate if necessary. */
-static INLINE void
-SI_maybe_grow(CharBuf *self, size_t new_size);
-
 /* Maximum number of characters in a stringified 64-bit integer, including
  * minus sign if negative.
  */
@@ -145,21 +141,19 @@ CB_hash_code(CharBuf *self)
     return (i32_t) hashvalue;
 }
 
-static INLINE void
-SI_maybe_grow(CharBuf *self, size_t new_size) 
+static void
+S_grow(CharBuf *self, size_t size)
 {
-    /* Bail out if the buffer's already at least as big as required. */
-    if (self->cap > new_size)
-        return;
-
-    self->ptr = (char*)REALLOCATE(self->ptr, new_size + 1);
-    self->cap = new_size + 1;
+    if (size >= self->cap) { 
+        self->cap = size + 1;
+        self->ptr = (char*)REALLOCATE(self->ptr, self->cap);
+    }
 }
 
 char*
-CB_grow(CharBuf *self, size_t new_size) 
+CB_grow(CharBuf *self, size_t size) 
 {
-    SI_maybe_grow(self, new_size);
+    if (size >= self->cap) { S_grow(self, size); }
     return self->ptr;
 }
 
@@ -357,9 +351,10 @@ CB_to_string(CharBuf *self)
 void
 CB_cat_char(CharBuf *self, u32_t code_point)
 {
-    const size_t MIN_SAFE_ROOM = 4 + 1;
-    if (self->size + MIN_SAFE_ROOM > self->cap) {
-        SI_maybe_grow(self, self->size + 10);
+    const size_t MAX_UTF8_BYTES = 4;
+    if (self->size + MAX_UTF8_BYTES >= self->cap) { 
+        S_grow(self, Memory_oversize(self->size + MAX_UTF8_BYTES, 
+            sizeof(char)));
     }
     self->size += StrHelp_encode_utf8_char(code_point, (u8_t*)CBEND(self));
     *CBEND(self) = '\0';
@@ -469,7 +464,7 @@ CB_deserialize(CharBuf *self, InStream *instream)
 {
     size_t size = InStream_Read_C32(instream);
     self = self ? self : (CharBuf*)VTable_Make_Obj(CHARBUF);
-    SI_maybe_grow(self, size);
+    if (size >= self->cap) { S_grow(self, size); }
     InStream_Read_Bytes(instream, self->ptr, size);
     self->size = size;
     self->ptr[size] = '\0';
@@ -482,9 +477,10 @@ CB_deserialize(CharBuf *self, InStream *instream)
 void
 CB_mimic_str(CharBuf *self, const char* ptr, size_t size) 
 {
-    if (!StrHelp_utf8_valid(ptr, size))
+    if (!StrHelp_utf8_valid(ptr, size)) {
         S_die_invalid_utf8(ptr, size);
-    SI_maybe_grow(self, size);
+    }
+    if (size >= self->cap) { S_grow(self, size); }
     memmove(self->ptr, ptr, size);
     self->size = size;
     self->ptr[size] = '\0';
@@ -494,7 +490,7 @@ void
 CB_mimic(CharBuf *self, Obj *other)
 {
     CharBuf *evil_twin = (CharBuf*)CERTIFY(other, CHARBUF);
-    SI_maybe_grow(self, evil_twin->size);
+    if (evil_twin->size >= self->cap) { S_grow(self, evil_twin->size); }
     memmove(self->ptr, evil_twin->ptr, evil_twin->size);
     self->size = evil_twin->size;
     self->ptr[evil_twin->size] = '\0';
@@ -512,7 +508,10 @@ void
 CB_cat_trusted_str(CharBuf *self, const char* ptr, size_t size) 
 {
     const size_t new_size = self->size + size;
-    SI_maybe_grow(self, new_size);
+    if (new_size >= self->cap) { 
+        size_t amount = Memory_oversize(new_size, sizeof(char));
+        S_grow(self, amount); 
+    }
     memcpy((self->ptr + self->size), ptr, size);
     self->size = new_size;
     self->ptr[new_size] = '\0';
@@ -522,7 +521,10 @@ void
 CB_cat(CharBuf *self, const CharBuf *other) 
 {
     const size_t new_size = self->size + other->size;
-    SI_maybe_grow(self, new_size);
+    if (new_size >= self->cap) { 
+        size_t amount = Memory_oversize(new_size, sizeof(char));
+        S_grow(self, amount); 
+    }
     memcpy((self->ptr + self->size), other->ptr, other->size);
     self->size = new_size;
     self->ptr[new_size] = '\0';

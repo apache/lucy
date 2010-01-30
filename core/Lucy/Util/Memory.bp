@@ -26,6 +26,16 @@ inert class Lucy::Util::Memory {
      */
     inert void
     wrapped_free(void *ptr);
+
+    /** Provide a number which is somewhat larger than the supplied number, so
+     * that incremental array growth does not trigger pathological
+     * reallocation.
+     * 
+     * @param minimum The minimum number of array elements.
+     * @param width The size of each array element in bytes.
+     */
+    inert size_t 
+    oversize(size_t minimum, size_t width);
 }
 
 __C__
