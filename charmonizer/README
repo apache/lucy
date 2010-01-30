@@ -26,7 +26,7 @@ PROBING
         int main() 
         {
             /* Tell Charmonizer about your OS and compiler. */
-            chaz_Probe_init("darwin", "cc", "-I/usr/local/include", NULL);
+            chaz_Probe_init("cc", "-I/usr/local/include", NULL);
             
             /* Run desired Charmonizer modules. */
             chaz_Integers_run();
