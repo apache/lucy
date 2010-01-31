@@ -24,7 +24,6 @@ sub write_h {
     confess("Not a Clownfish::File")
         unless a_isa_b( $file, "Clownfish::File" );
     my $h_path = $file->h_path( $args{dest} );
-    print "Writing $h_path\n";
 
     # Unlink then open file.
     my ( undef, $out_dir, undef ) = splitpath($h_path);
@@ -92,7 +91,6 @@ sub write_c {
     confess("Not a Clownfish::File")
         unless a_isa_b( $file, "Clownfish::File" );
     my $c_path = $file->c_path( $args{dest} );
-    print "Writing $c_path\n";
 
     # Unlink then open file.
     my ( undef, $out_dir, undef ) = splitpath($c_path);
