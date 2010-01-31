@@ -14,41 +14,37 @@
 static chaz_bool_t
 S_machine_is_big_endian();
 
-static char sizes_code[] = METAQUOTE
-    #include "_charm.h"
-    int main () {
-        Charm_Setup;
-        printf("%d %d %d %d %d",
-            (int)sizeof(char),
-            (int)sizeof(short),
-            (int)sizeof(int),
-            (int)sizeof(long),
-            (int)sizeof(void *)
-        );
-        return 0;
-    }
-METAQUOTE;
+static char sizes_code[] = 
+    QUOTE(  #include "_charm.h"                       )
+    QUOTE(  int main () {                             )
+    QUOTE(      Charm_Setup;                          )
+    QUOTE(      printf("%d ", (int)sizeof(char));     )
+    QUOTE(      printf("%d ", (int)sizeof(short));    )
+    QUOTE(      printf("%d ", (int)sizeof(int));      )
+    QUOTE(      printf("%d ", (int)sizeof(long));     )
+    QUOTE(      printf("%d ", (int)sizeof(void*));    )
+    QUOTE(      return 0;                             )
+    QUOTE(  }                                         );
 
-static char type64_code[] = METAQUOTE
-    #include "_charm.h"
-    int main() 
-    {
-        Charm_Setup;
-        printf("%%d", (int)sizeof(%s));
-        return 0;
-    }
-METAQUOTE;
+static char type64_code[] =
+    QUOTE(  #include "_charm.h"                       )
+    QUOTE(  int main()                                )
+    QUOTE(  {                                         )
+    QUOTE(      Charm_Setup;                          )
+    QUOTE(      printf("%%d", (int)sizeof(%s));       )
+    QUOTE(      return 0;                             )
+    QUOTE(  }                                         );
 
-static char literal64_code[] = METAQUOTE
-    #include "_charm.h"
-    #define big 9000000000000000000%s
-    int main()
-    {
-        Charm_Setup;
-        printf("1\n");
-        return 0;
-    }
-METAQUOTE;
+static char literal64_code[] = 
+    QUOTE(  #include "_charm.h"                       )
+    QUOTE(  #define big 9000000000000000000%s         )
+    QUOTE(  int main()                                )
+    QUOTE(  {                                         )
+    QUOTE(      Charm_Setup;                          )
+    QUOTE(      int truncated = (int)big;             )
+    QUOTE(      printf("%%d\n", truncated);           )
+    QUOTE(      return 0;                             )
+    QUOTE(  }                                         );
 
 void
 Integers_run(void) 
@@ -76,7 +72,7 @@ Integers_run(void)
     char i64_t_type[10];
     char i64_t_postfix[10];
     char u64_t_postfix[10];
-    char code_buf[sizeof(type64_code) + 200];
+    char code_buf[1000];
 
     ConfWriter_start_module("Integers");
 
@@ -306,25 +302,18 @@ Integers_run(void)
         };
 
         /* buffer to hold the code, and its start and end */
-        char format_64_code[1000];
-        static char format_64_code_a[] = METAQUOTE
-            #include "_charm.h"
-            int main() {
-                Charm_Setup;
-                printf(
-        METAQUOTE;
-        static char format_64_code_b[] = METAQUOTE
-                );
-                return 0;
-            }
-        METAQUOTE;
+        static char format_64_code[] = 
+            QUOTE(  #include "_charm.h"                           )
+            QUOTE(  int main() {                                  )
+            QUOTE(      Charm_Setup;                              )
+            QUOTE(      printf("%%%su", 18446744073709551615%s);  )
+            QUOTE(      return 0;                                 )
+            QUOTE( }                                              );
 
         for (i = 0; options[i] != NULL; i++) {
             /* try to print 2**64-1, and see if we get it back intact */
-            sprintf(format_64_code, 
-                "%s\"%%%su\", 18446744073709551615%s%s", format_64_code_a, 
-                    options[i], u64_t_postfix, format_64_code_b);
-            output = CC_capture_output(format_64_code, strlen(format_64_code),
+            sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
+            output = CC_capture_output(code_buf, strlen(code_buf),
                 &output_len);
 
             if (   output_len != 0 

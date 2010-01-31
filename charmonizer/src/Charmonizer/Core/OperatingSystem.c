@@ -99,74 +99,50 @@ OS_dev_null(void)
     return dev_null;
 }
 
-static char charm_run_code_a[] = METAQUOTE
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include <stddef.h>
-    int main(int argc, char **argv)
-    {
-        char *command;
-        size_t command_len = 1; /* Terminating null. */
-        int i;
-        int retval;
-        
-        /* Rebuild the command line args, minus the name of this utility. */
-        for (i = 1; i < argc; i++) {
-            command_len += strlen(argv[i]) + 1;
-        }
-        command = (char*)calloc(command_len, sizeof(char));
-METAQUOTE;
-
-static char charm_run_code_b[] = METAQUOTE
-        if (command == NULL) {
-            fprintf(stderr, "calloc failed\n");
-            exit(1);
-        }
-        for (i = 1; i < argc; i++) {
-            strcat( strcat(command, " "), argv[i] );
-        }
-
-        /* Redirect stdout and stderr to /dev/null or equivalent. */
-        freopen( 
-METAQUOTE;
-
-static char charm_run_code_c[] = METAQUOTE
-             , "w", stdout);
-        freopen( 
-METAQUOTE;
-
-static char charm_run_code_d[] = METAQUOTE
-             , "w", stderr);
-
-        /* Run the commmand and return its value to the parent process. */
-        retval = system(command);
-        free(command);
-        return retval;
-    }
-METAQUOTE;
+static char charm_run_code[] = 
+    QUOTE(  #include <stdio.h>                                           )
+    QUOTE(  #include <stdlib.h>                                          )
+    QUOTE(  #include <string.h>                                          )
+    QUOTE(  #include <stddef.h>                                          )
+    QUOTE(  int main(int argc, char **argv)                              )
+    QUOTE(  {                                                            )
+    QUOTE(      char *command;                                           )
+    QUOTE(      size_t command_len = 1; /* Terminating null. */          )
+    QUOTE(      int i;                                                   )
+    QUOTE(      int retval;                                              )
+                /* Rebuild command line args. */ 
+    QUOTE(      for (i = 1; i < argc; i++) {                             )
+    QUOTE(          command_len += strlen(argv[i]) + 1;                  )
+    QUOTE(      }                                                        )
+    QUOTE(      command = (char*)calloc(command_len, sizeof(char));      )
+    QUOTE(      if (command == NULL) {                                   )
+    QUOTE(          fprintf(stderr, "calloc failed\n");                  )
+    QUOTE(          exit(1);                                             )
+    QUOTE(      }                                                        )
+    QUOTE(      for (i = 1; i < argc; i++) {                             )
+    QUOTE(          strcat( strcat(command, " "), argv[i] );             )
+    QUOTE(      }                                                        )
+                /* Redirect all output to /dev/null or equivalent. */
+    QUOTE(      freopen("%s", "w", stdout);                              )
+    QUOTE(      freopen("%s", "w", stderr);                              )
+                /* Run commmand and return its value to parent. */
+    QUOTE(      retval = system(command);                                )
+    QUOTE(      free(command);                                           )
+    QUOTE(      return retval;                                           )
+    QUOTE(  }                                                            );
 
 static void
 S_build_charm_run()
 {
     chaz_bool_t compile_succeeded = false;
     const char *dev_null = OS_dev_null();
-    size_t needed = sizeof(charm_run_code_a)
-                  + sizeof(charm_run_code_b)
+    size_t needed = sizeof(charm_run_code)
                   + strlen(dev_null)
-                  + sizeof(charm_run_code_c)
                   + strlen(dev_null)
-                  + sizeof(charm_run_code_d)
                   + 20;
     char *code = (char*)malloc(needed);
 
-    sprintf(code, "%s%s \"%s\" %s \"%s\" %s", 
-        charm_run_code_a, 
-        charm_run_code_b,
-        dev_null,
-        charm_run_code_c,
-        dev_null,
-        charm_run_code_d);
+    sprintf(code, charm_run_code, dev_null, dev_null);
     compile_succeeded = CC_compile_exe("_charm_run.c", "_charm_run", 
         code, strlen(code));
     if (!compile_succeeded) {

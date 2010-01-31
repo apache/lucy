@@ -57,17 +57,12 @@ Probe_get_charmony_fh(void)
     return ConfWriter_get_charmony_fh();
 }
 
-static char charm_h_code[] = METAQUOTE
-    #ifndef CHARM_H
-    #define CHARM_H 1
-
-    #include <stdio.h>
-
-    #define Charm_Setup \
-        freopen("_charmonizer_target", "w", stdout)
-    
-    #endif
-METAQUOTE;
+static char charm_h_code[] =
+    QUOTE(  #ifndef CHARM_H                                                  )
+    QUOTE(  #define CHARM_H 1                                                )
+    QUOTE(  #include <stdio.h>                                               )
+    QUOTE(  #define Charm_Setup freopen("_charmonizer_target", "w", stdout)  )
+    QUOTE(  #endif                                                           );
 
 static void
 S_write_charm_h()

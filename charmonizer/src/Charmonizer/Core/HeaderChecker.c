@@ -116,11 +116,10 @@ HeadCheck_check_many_headers(const char **header_names)
     return success;
 }
 
-static char contains_code[] = METAQUOTE
-  #include <stddef.h>
-  %s
-  int main() { return offsetof(%s, %s); }
-METAQUOTE;
+static char contains_code[] = 
+    QUOTE(  #include <stddef.h>                           )
+    QUOTE(  %s                                            )
+    QUOTE(  int main() { return offsetof(%s, %s); }       );
 
 chaz_bool_t
 HeadCheck_contains_member(const char *struct_name, const char *member,

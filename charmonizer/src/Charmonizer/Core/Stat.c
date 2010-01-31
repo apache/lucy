@@ -52,18 +52,18 @@ Stat_stat(const char *filepath, Stat *target)
 }
 
 /* Source code for the _charm_stat utility. */
-static char charm_stat_code[] = METAQUOTE
-    #include <stdio.h>
-    #include <sys/stat.h>
-    int main(int argc, char **argv) {
-        FILE *out_fh = fopen("_charm_statout", "w+");
-        struct stat st;
-        if (argc != 2) { return 1; }
-        if (stat(argv[1], &st) == -1) { return 2; }
-        fprintf(out_fh, "%ld %ld\n", (long)st.st_size, (long)st.st_blocks);
-        return 0;
-    }
-METAQUOTE;
+static char charm_stat_code[] = 
+    QUOTE(  #include <stdio.h>                                     )
+    QUOTE(  #include <sys/stat.h>                                  )
+    QUOTE(  int main(int argc, char **argv) {                      )
+    QUOTE(      FILE *out_fh = fopen("_charm_statout", "w+");      )
+    QUOTE(      struct stat st;                                    )
+    QUOTE(      if (argc != 2) { return 1; }                       )
+    QUOTE(      if (stat(argv[1], &st) == -1) { return 2; }        )
+    QUOTE(      fprintf(out_fh, "%ld ", (long)st.st_size);         )
+    QUOTE(      fprintf(out_fh, "%ld\n", (long)st.st_blocks);      )
+    QUOTE(      return 0;                                          )
+    QUOTE(  }                                                      );
 
 static void
 S_init()

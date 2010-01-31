@@ -9,35 +9,32 @@
 #include <stdlib.h>
 
 /* code for verifying ISO func macro */
-static char iso_func_code[] = METAQUOTE
-    #include "_charm.h" 
-    int main() {
-        Charm_Setup;
-        printf("%s", __func__);
-        return 0;
-    }
-METAQUOTE;
+static char iso_func_code[] =
+    QUOTE(  #include "_charm.h"               )
+    QUOTE(  int main() {                      )
+    QUOTE(      Charm_Setup;                  )
+    QUOTE(      printf("%s", __func__);       )
+    QUOTE(      return 0;                     )
+    QUOTE(  }                                 );
 
 /* code for verifying GNU func macro */
-static char gnuc_func_code[] = METAQUOTE
-    #include "_charm.h" 
-    int main() {
-        Charm_Setup;
-        printf("%s", __FUNCTION__);
-        return 0;
-    }
-METAQUOTE;
+static char gnuc_func_code[] = 
+    QUOTE(  #include "_charm.h"               )
+    QUOTE(  int main() {                      )
+    QUOTE(      Charm_Setup;                  )
+    QUOTE(      printf("%s", __FUNCTION__);   )
+    QUOTE(      return 0;                     )
+    QUOTE(  }                                 );
 
 /* code for verifying inline keyword */
-static char inline_code[] = METAQUOTE
-    #include "_charm.h" 
-    static %s int foo() { return 1; }
-    int main() {
-        Charm_Setup;
-        printf("%%d", foo());
-        return 0;
-    }
-METAQUOTE;
+static char inline_code[] =
+    QUOTE(  #include "_charm.h"               )
+    QUOTE(  static %s int foo() { return 1; } )
+    QUOTE(  int main() {                      )
+    QUOTE(      Charm_Setup;                  )
+    QUOTE(      printf("%%d", foo());         )
+    QUOTE(      return 0;                     )
+    QUOTE(  }                                 );
 
 static char*
 S_try_inline(const char *keyword, size_t *output_len) {

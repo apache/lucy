@@ -173,21 +173,20 @@ LargeFiles_run(void)
 }
 
 /* code for checking ftello64 and friends */
-static char off64_code[] = METAQUOTE
-    %s
-    #include "_charm.h"
-    int main() {
-        %s pos;
-        FILE *f;
-        Charm_Setup;
-        f = %s("_charm_off64", "w");
-        if (f == NULL) return -1;
-        printf("%%d", (int)sizeof(%s));
-        pos = %s(stdout);
-        %s(stdout, 0, SEEK_SET);
-        return 0;
-    }
-METAQUOTE;
+static char off64_code[] = 
+    QUOTE(  %s                                         )
+    QUOTE(  #include "_charm.h"                        )
+    QUOTE(  int main() {                               )
+    QUOTE(      %s pos;                                )
+    QUOTE(      FILE *f;                               )
+    QUOTE(      Charm_Setup;                           )
+    QUOTE(      f = %s("_charm_off64", "w");           )
+    QUOTE(      if (f == NULL) return -1;              )
+    QUOTE(      printf("%%d", (int)sizeof(%s));        )
+    QUOTE(      pos = %s(stdout);                      )
+    QUOTE(      %s(stdout, 0, SEEK_SET);               )
+    QUOTE(      return 0;                              )
+    QUOTE(  }                                          );
 
 
 static chaz_bool_t
@@ -226,20 +225,19 @@ S_probe_off64(off64_combo *combo)
 }
 
 /* Code for checking 64-bit lseek. */
-static char lseek_code[] = METAQUOTE
-    %s
-    #include "_charm.h"
-    int main() {
-        int fd;
-        Charm_Setup;
-        fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666);
-        if (fd == -1) { return -1; }
-        %s(fd, 0, SEEK_SET);
-        printf("%%d", 1);
-        if (close(fd)) { return -1; }
-        return 0;
-    }
-METAQUOTE;
+static char lseek_code[] = 
+    QUOTE(  %s                                                        )
+    QUOTE(  #include "_charm.h"                                       )
+    QUOTE(  int main() {                                              )
+    QUOTE(      int fd;                                               )
+    QUOTE(      Charm_Setup;                                          )
+    QUOTE(      fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666);  )
+    QUOTE(      if (fd == -1) { return -1; }                          )
+    QUOTE(      %s(fd, 0, SEEK_SET);                                  )
+    QUOTE(      printf("%%d", 1);                                     )
+    QUOTE(      if (close(fd)) { return -1; }                         )
+    QUOTE(      return 0;                                             )
+    QUOTE(  }                                                         );
 
 static chaz_bool_t
 S_probe_lseek(unbuff_combo *combo)
@@ -269,18 +267,17 @@ S_probe_lseek(unbuff_combo *combo)
 
 /* Code for checking 64-bit pread.  The pread call will fail, but that's fine
  * as long as it compiles. */
-static char pread64_code[] = METAQUOTE
-    %s
-    #include "_charm.h"
-    int main() {
-        int fd = 20;
-        char buf[1];
-        Charm_Setup;
-        printf("1");
-        %s(fd, buf, 1, 1);
-        return 0;
-    }
-METAQUOTE;
+static char pread64_code[] = 
+    QUOTE(  %s                                     )
+    QUOTE(  #include "_charm.h"                    )
+    QUOTE(  int main() {                           )
+    QUOTE(      int fd = 20;                       )
+    QUOTE(      char buf[1];                       )
+    QUOTE(      Charm_Setup;                       )
+    QUOTE(      printf("1");                       )
+    QUOTE(      %s(fd, buf, 1, 1);                 )
+    QUOTE(      return 0;                          )
+    QUOTE(  }                                      );
 
 static chaz_bool_t
 S_probe_pread64(unbuff_combo *combo)
@@ -355,30 +352,25 @@ S_test_sparse_file(long offset, Stat *st)
 }
 
 /* open a file, seek to a loc, print a char, and communicate success */
-static char create_bigfile_code_a[] = METAQUOTE
-    #include "_charm.h"
-    int main() {
-        FILE *fh = fopen("_charm_large_file_test", "w+");
-        int check_seek;
-        Charm_Setup;
-        /* bail unless seek succeeds */
-        check_seek = 
-METAQUOTE;
-
-static char create_bigfile_code_b[] = METAQUOTE
-            (fh, 5000000000, SEEK_SET);
-        if (check_seek == -1)
-            exit(1);
-        /* bail unless we write successfully */
-        if (fprintf(fh, "X") != 1)
-            exit(1);
-        if (fclose(fh))
-            exit(1);
-        /* communicate success to Charmonizer */
-        printf("1");
-        return 0;
-    }
-METAQUOTE;
+static char create_bigfile_code[] = 
+    QUOTE(  #include "_charm.h"                                      )
+    QUOTE(  int main() {                                             )
+    QUOTE(      FILE *fh = fopen("_charm_large_file_test", "w+");    )
+    QUOTE(      int check_seek;                                      )
+    QUOTE(      Charm_Setup;                                         )
+                /* bail unless seek succeeds */
+    QUOTE(      check_seek = %s(fh, 5000000000, SEEK_SET);           )
+    QUOTE(      if (check_seek == -1)                                )
+    QUOTE(          exit(1);                                         )
+                /* bail unless we write successfully */
+    QUOTE(      if (fprintf(fh, "X") != 1)                           )
+    QUOTE(          exit(1);                                         )
+    QUOTE(      if (fclose(fh))                                      )
+    QUOTE(          exit(1);                                         )
+                /* communicate success to Charmonizer */
+    QUOTE(      printf("1");                                         )
+    QUOTE(      return 0;                                            )
+    QUOTE(  }                                                        );
 
 static chaz_bool_t
 S_can_create_big_files()
@@ -386,15 +378,13 @@ S_can_create_big_files()
     char *output;
     size_t output_len;
     FILE *truncating_fh;
-    size_t needed = strlen(create_bigfile_code_a)
+    size_t needed = strlen(create_bigfile_code)
                   + strlen(fseek_command)
-                  + strlen(create_bigfile_code_b)
                   + 10;
     char *code_buf = (char*)malloc(needed);
 
     /* concat the source strings, compile the file, capture output */
-    sprintf(code_buf, "%s%s%s", create_bigfile_code_a, fseek_command, 
-        create_bigfile_code_b);
+    sprintf(code_buf, create_bigfile_code, fseek_command);
     output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
 
     /* truncate, just in case the call to remove fails */

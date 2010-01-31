@@ -9,28 +9,25 @@
 
 
 /* code for verifying ISO-style variadic macros */
-static char iso_code[] = METAQUOTE
-    #include "_charm.h"
-    #define ISO_TEST(fmt, ...) \
-        printf(fmt, __VA_ARGS__)
-    int main() {
-        Charm_Setup;
-        ISO_TEST("%d %d", 1, 1);
-        return 0;
-    }
-METAQUOTE;
+static char iso_code[] = 
+    QUOTE(  #include "_charm.h"                                   )
+    QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
+    "           printf(fmt, __VA_ARGS__)                        \n"
+    QUOTE(  int main() {                                          )
+    QUOTE(      Charm_Setup;                                      )
+    QUOTE(      ISO_TEST("%d %d", 1, 1);                          )
+    QUOTE(      return 0;                                         )
+    QUOTE(  }                                                     );
 
 /* code for verifying GNU-style variadic macros */
-static char gnuc_code[] = METAQUOTE
-    #include "_charm.h"
-    #define GNU_TEST(fmt, args...) \
-        printf(fmt, ##args)
-    int main() {
-        Charm_Setup;
-        GNU_TEST("%d %d", 1, 1);
-        return 0;
-    }
-METAQUOTE;
+static char gnuc_code[] = 
+    QUOTE(  #include "_charm.h"                                   )
+    QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
+    QUOTE(  int main() {                                          )
+    QUOTE(      Charm_Setup;                                      )
+    QUOTE(      GNU_TEST("%d %d", 1, 1);                          )
+    QUOTE(      return 0;                                         )
+    QUOTE(  }                                                     );
 
 void
 VariadicMacros_run(void) 

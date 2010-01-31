@@ -21,17 +21,14 @@ static char     *try_app_name = NULL;
 /* Detect a supported compiler, or assume a generic GCC-compatible compiler
  * and hope for the best.  */
 #ifdef __GNUC__
-static char *compiler_nickname = "gcc";
 static char *include_flag      = "-I ";
 static char *object_flag       = "-o ";
 static char *exe_flag          = "-o ";
 #elif defined(_MSC_VER)
-static char *compiler_nickname = "MSVC";
 static char *include_flag      = "/I";
 static char *object_flag       = "/Fo";
 static char *exe_flag          = "/Fe";
 #else
-static char *compiler_nickname = "cc";
 static char *include_flag      = "-I ";
 static char *object_flag       = "-o ";
 static char *exe_flag          = "-o ";
