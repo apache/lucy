@@ -12,14 +12,6 @@
 static void
 S_do_or_or_xor(BitVector *self, const BitVector *other, int operation);
 
-/* 1 bit per byte.  Use bitwise and to see if a bit is set. 
- */
-
-/* Clear a bit.  Caller must ensure that tick is within capacity.
- */
-#define CLEAR(self, tick) \
-    self->bits[ (tick >> 3) ] &= ~(lucy_NumUtil_u1masks[tick & 0x7])
-
 /* Number of 1 bits given a u8 value. 
  */
 static const u32_t BYTE_COUNTS[256] = {
@@ -137,7 +129,7 @@ BitVec_clear(BitVector *self, u32_t tick)
 {
     if (tick >= self->cap) 
         return;
-    CLEAR(self, tick);
+    NumUtil_u1clear(self->bits, tick);
 }
 
 void 

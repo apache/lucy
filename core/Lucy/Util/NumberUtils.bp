@@ -123,6 +123,12 @@ inert class Lucy::Util::NumberUtils cnick NumUtil {
     inert inline void 
     u1set(void *array, u32_t tick);
 
+    /** Interpret <code>array</code> as an array of bits; clear the bit at
+     * <code>tick</code>.
+     */
+    inert inline void 
+    u1clear(void *array, u32_t tick);
+
     /** Interpret <code>array</code> as an array of bits; flip the bit at
      * <code>tick</code>.
      */
@@ -404,6 +410,15 @@ lucy_NumUtil_u1set(void *array, chy_u32_t tick)
     const chy_u32_t byte_offset = tick >> 3;
     const chy_u8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
     u8bits[byte_offset] |= mask;
+}
+
+static CHY_INLINE void 
+lucy_NumUtil_u1clear(void *array, chy_u32_t tick) 
+{
+    chy_u8_t *const u8bits      = (chy_u8_t*)array;
+    const chy_u32_t byte_offset = tick >> 3;
+    const chy_u8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
+    u8bits[byte_offset] &= ~mask;
 }
 
 static CHY_INLINE void
