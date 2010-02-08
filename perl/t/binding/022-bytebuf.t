@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More tests => 1;
 use Storable qw( freeze thaw );
-use Lucy;
+use Lucy::Test;
 
 my $orig   = Lucy::Object::ByteBuf->new("foo");
 my $frozen = freeze($orig);
