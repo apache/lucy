@@ -360,7 +360,14 @@ XSBind_enable_overload(void *pobj)
      * and just update every time.
      */
     stash = gv_stashpvn((char*)package_name, size, true);
+    /* Gv_AMupdate() changed in Perl 5.11 to take a second argument.
+     * http://www.mail-archive.com/perl5-changes@perl.org/msg23145.html
+     */
+#if (PERL_VERSION > 10)
+    Gv_AMupdate(stash, false);
+#else
     Gv_AMupdate(stash);
+#endif
     SvAMAGIC_on(perl_obj);
 }
 
