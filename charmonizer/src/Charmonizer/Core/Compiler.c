@@ -48,8 +48,8 @@ CC_init(const char *compiler_command, const char *compiler_flags)
     if (Util_verbosity) { printf("Creating compiler object...\n"); }
 
     /* Assign. */
-    cc_command      = strdup(compiler_command);
-    cc_flags        = strdup(compiler_flags);
+    cc_command      = Util_strdup(compiler_command);
+    cc_flags        = Util_strdup(compiler_flags);
 
     /* Init. */
     inc_dirs              = (char**)calloc(sizeof(char*), 1);
@@ -286,7 +286,7 @@ CC_add_inc_dir(const char *dir)
     inc_dirs = (char**)realloc(inc_dirs, (num_dirs + 1)*sizeof(char*));
 
     /* Put the passed-in dir at the end of the list. */
-    inc_dirs[num_dirs - 1] = strdup(dir);
+    inc_dirs[num_dirs - 1] = Util_strdup(dir);
     inc_dirs[num_dirs] = NULL;
 }
 

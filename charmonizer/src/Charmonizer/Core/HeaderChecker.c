@@ -87,7 +87,7 @@ HeadCheck_check_many_headers(const char **header_names)
 {
     chaz_bool_t success;
     int i;
-    char *code_buf = strdup("");
+    char *code_buf = Util_strdup("");
     size_t needed = sizeof(test_code) + 20;
 
     /* Build the source code string. */
@@ -154,7 +154,7 @@ S_discover_header(const char *header_name)
     char *include_test = (char*)malloc(needed); 
     
     /* Assign. */
-    header->name = strdup(header_name);
+    header->name = Util_strdup(header_name);
 
     /* See whether code that tries to pull in this header compiles. */
     sprintf(include_test, "#include <%s>\n%s", header_name, test_code);
@@ -192,7 +192,7 @@ S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
     /* We've already done the test compile, so skip that step and add it. */
     if (header == NULL) {
         header = (Header*)malloc(sizeof(Header));
-        header->name   = strdup(header_name);
+        header->name   = Util_strdup(header_name);
         header->exists = exists;
         S_add_to_cache(header);
     }

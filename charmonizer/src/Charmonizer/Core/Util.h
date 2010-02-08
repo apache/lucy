@@ -25,6 +25,11 @@ chaz_Util_write_file(const char *filename, const char *content);
 char* 
 chaz_Util_slurp_file(const char *file_path, size_t *len_ptr);
 
+/* Return a newly allocated copy of a NULL-terminated string.
+ */
+char* 
+chaz_Util_strdup(const char *string);
+
 /* Get the length of a file (may overshoot on text files under DOS).
  */
 long  
@@ -61,6 +66,7 @@ chaz_Util_can_open_file(const char *file_path);
   #define Util_flength                chaz_Util_flength 
   #define Util_die                    chaz_Util_die 
   #define Util_warn                   chaz_Util_warn 
+  #define Util_strdup                 chaz_Util_strdup
   #define Util_remove_and_verify      chaz_Util_remove_and_verify 
   #define Util_can_open_file          chaz_Util_can_open_file 
 #endif
