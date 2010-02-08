@@ -22,6 +22,9 @@ class Lucy::Store::RAMDirHandle cnick RAMDH
     Entry_Is_Dir(RAMDirHandle *self);
 
     bool_t
+    Entry_Is_Symlink(RAMDirHandle *self);
+
+    bool_t
     Close(RAMDirHandle *self);
 }
 

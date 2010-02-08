@@ -68,6 +68,13 @@ RAMDH_entry_is_dir(RAMDirHandle *self)
     return false;
 }
 
+bool_t
+RAMDH_entry_is_symlink(RAMDirHandle *self)
+{
+    UNUSED_VAR(self);
+    return false;
+}
+
 /* Copyright 2009 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

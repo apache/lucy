@@ -24,6 +24,9 @@ class Lucy::Store::FSDirHandle cnick FSDH
     Entry_Is_Dir(FSDirHandle *self);
 
     bool_t
+    Entry_Is_Symlink(FSDirHandle *self);
+
+    bool_t
     Close(FSDirHandle *self);
 
     public void

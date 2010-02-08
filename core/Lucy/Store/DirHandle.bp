@@ -45,6 +45,12 @@ abstract class Lucy::Store::DirHandle cnick DH
     abstract bool_t
     Entry_Is_Dir(DirHandle *self);
 
+    /** Returns true if the current entry is a symbolic link (or a Windows
+     * junction), false otherwise.
+     */
+    abstract bool_t
+    Entry_Is_Symlink(DirHandle *self);
+
     /** Invokes Close(), but ignores any errors. 
      */
     public void

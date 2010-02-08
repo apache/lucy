@@ -161,24 +161,25 @@ Folder_delete_tree(Folder *self, const CharBuf *path)
             DirHandle *dh = Folder_Local_Open_Dir(inner_folder);
             if (dh) {
                 VArray *files = VA_new(20);
+                VArray *dirs  = VA_new(20);
                 CharBuf *entry = DH_Get_Entry(dh);
-                u32_t i, max;
                 while (DH_Next(dh)) { 
                     VA_Push(files, (Obj*)CB_Clone(entry)); 
+                    if (DH_Entry_Is_Dir(dh) && !DH_Entry_Is_Symlink(dh)) {
+                        VA_Push(dirs, (Obj*)CB_Clone(entry)); 
+                    }
                 }
-                for (i = 0, max = VA_Get_Size(files); i < max; i++) {
+                for (uint32_t i = 0, max = VA_Get_Size(dirs); i < max; i++) {
                     CharBuf *name = (CharBuf*)VA_Fetch(files, i);
-                    if (Folder_Local_Is_Directory(inner_folder, name)) {
-                        bool_t success 
-                            = Folder_Delete_Tree(inner_folder, name);
-                        if (!success) { break; }
-                    }
-                    else {
-                        bool_t success 
-                            = Folder_Local_Delete(inner_folder, name);
-                        if (!success) { break; }
-                    }
+                    bool_t success = Folder_Delete_Tree(inner_folder, name);
+                    if (!success) { break; }
                 }
+                for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
+                    CharBuf *name = (CharBuf*)VA_Fetch(files, i);
+                    bool_t success = Folder_Local_Delete(inner_folder, name);
+                    if (!success) { break; }
+                }
+                DECREF(dirs);
                 DECREF(files);
                 DECREF(dh);
             }

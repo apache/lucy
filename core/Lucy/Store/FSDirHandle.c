@@ -103,7 +103,6 @@ FSDH_entry_is_dir(FSDirHandle *self)
     #ifdef CHY_HAS_DIRENT_D_TYPE
     return sys_dir_entry->d_type == DT_DIR ? true : false;
     #else 
-    /* Solaris struct dirent may not have a d_type member. :( */
     {
         struct stat stat_buf;
         if (!self->fullpath) { 
@@ -113,6 +112,30 @@ FSDH_entry_is_dir(FSDirHandle *self)
             self->entry);
         if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
             if (stat_buf.st_mode & S_IFDIR) return true;
+        }
+        return false;
+    }
+    #endif /* CHY_HAS_DIRENT_D_TYPE */
+}
+
+bool_t
+FSDH_entry_is_symlink(FSDirHandle *self)
+{
+    struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
+    if (!sys_dir_entry) { return false; }
+
+    #ifdef CHY_HAS_DIRENT_D_TYPE
+    return sys_dir_entry->d_type == DT_LNK ? true : false;
+    #else 
+    {
+        struct stat stat_buf;
+        if (!self->fullpath) { 
+            self->fullpath = CB_new(CB_Get_Size(self->dir) + 20);
+        }
+        CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
+            self->entry);
+        if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
+            if (stat_buf.st_mode & S_IFLNK) return true;
         }
         return false;
     }
@@ -193,6 +216,18 @@ FSDH_entry_is_dir(FSDirHandle *self)
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)self->sys_dir_entry;
     if (find_data) { 
         if ((find_data->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+            return true;
+        }
+    }
+    return false; 
+}
+
+bool_t
+FSDH_entry_is_symlink(FSDirHandle *self)
+{
+    WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)self->sys_dir_entry;
+    if (find_data) { 
+        if ((find_data->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) {
             return true;
         }
     }
