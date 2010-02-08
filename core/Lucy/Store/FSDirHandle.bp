@@ -11,10 +11,10 @@ class Lucy::Store::FSDirHandle cnick FSDH
     Err     *saved_error;
     bool_t   delayed_iter;
 
-    inert incremented FSDirHandle*
+    inert incremented nullable FSDirHandle*
     open(const CharBuf *path);
 
-    inert FSDirHandle*
+    inert nullable FSDirHandle*
     do_open(FSDirHandle *self, const CharBuf *path);
 
     bool_t

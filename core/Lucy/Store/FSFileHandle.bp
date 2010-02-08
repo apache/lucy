@@ -18,10 +18,10 @@ class Lucy::Store::FSFileHandle cnick FSFH
      * @param path Filepath. 
      * @param flags FileHandle constructor flags.
      */
-    inert incremented FSFileHandle* 
+    inert incremented nullable FSFileHandle* 
     open(const CharBuf *path = NULL, u32_t flags);
 
-    inert FSFileHandle* 
+    inert nullable FSFileHandle* 
     do_open(FSFileHandle *self, const CharBuf *path = NULL, u32_t flags);
 
     bool_t

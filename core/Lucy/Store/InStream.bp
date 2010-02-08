@@ -25,14 +25,14 @@ class Lucy::Store::InStream extends Lucy::Object::Obj {
     FileHandle *file_handle;
     FileWindow *window;
 
-    inert incremented InStream* 
+    inert incremented nullable InStream* 
     open(Obj *file);
 
     /** Return a new InStream, or set Err_error and return NULL on failure.
      *
      * @param file A FileHandle, a file path, or a RAMFile.
      */
-    inert InStream* 
+    inert nullable InStream* 
     do_open(InStream *self, Obj *file);
 
     /** Clone the instream, but specify a new offset, length, and possibly

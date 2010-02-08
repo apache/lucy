@@ -45,10 +45,10 @@ class Lucy::Object::Hash extends Lucy::Object::Obj {
      * 
      * @return the value, or NULL if <code>key</code> is not present.
      */
-    Obj*
+    nullable Obj*
     Fetch(Hash *self, const Obj *key);
 
-    Obj*
+    nullable Obj*
     Fetch_Str(Hash *self, const char *key, size_t key_len);
 
     /** Attempt to delete a key-value pair from the hash.  
@@ -56,10 +56,10 @@ class Lucy::Object::Hash extends Lucy::Object::Obj {
      * @return the value if <code>key</code> exists and thus deletion
      * succeeds; otherwise NULL.
      */
-    incremented Obj*
+    incremented nullable Obj*
     Delete(Hash *self, const Obj *key);
 
-    incremented Obj*
+    incremented nullable Obj*
     Delete_Str(Hash *self, const char *key, size_t key_ley);
 
     /** Prepare to iterate over all the key-value pairs in the hash.
@@ -81,7 +81,7 @@ class Lucy::Object::Hash extends Lucy::Object::Obj {
     /** Search for a key which Equals the key supplied, and return the key
      * rather than its value.
      */
-    Obj*
+    nullable Obj*
     Find_Key(Hash *self, const Obj *key, i32_t hash_code);
 
     /** Return an VArray of pointers to the hash's keys.

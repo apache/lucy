@@ -11,7 +11,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
     RAMFile *ram_file;
     i64_t    len;
 
-    inert incremented RAMFileHandle*
+    inert incremented nullable RAMFileHandle*
     open(const CharBuf *path = NULL, u32_t flags, RAMFile *file = NULL);
 
     /** 
@@ -23,7 +23,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
      * @param file An existing RAMFile; if not supplied, the FH_CREATE flag
      * must be passed or an error will occur.
      */
-    inert RAMFileHandle*
+    inert nullable RAMFileHandle*
     do_open(RAMFileHandle *self, const CharBuf *path = NULL, u32_t flags,
             RAMFile *file = NULL);
 

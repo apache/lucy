@@ -19,7 +19,7 @@ class Lucy::Object::LockFreeRegistry cnick LFReg extends Lucy::Object::Obj {
     bool_t
     Register(LockFreeRegistry *self, Obj *key, Obj *value);
 
-    Obj*
+    nullable Obj*
     Fetch(LockFreeRegistry *self, Obj *key);
     
     void*

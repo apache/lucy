@@ -50,7 +50,7 @@ class Lucy::Object::ByteBuf cnick BB extends Lucy::Object::Obj {
 
     /** Accessor for raw internal buffer.
      */
-    char*
+    nullable char*
     Get_Buf(ByteBuf *self);
 
     /** Return the number of bytes in the Object's allocation.
@@ -81,7 +81,7 @@ class Lucy::Object::ByteBuf cnick BB extends Lucy::Object::Obj {
      *
      * @return a pointer to the raw buffer.
      */
-    char*
+    nullable char*
     Grow(ByteBuf *self, size_t size);
 
     /** Test whether the ByteBuf matches the passed-in bytes.

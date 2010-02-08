@@ -15,7 +15,7 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
     CharBuf *path;
     Hash    *entries;
 
-    public inert Folder*
+    public inert nullable Folder*
     init(Folder *self, const CharBuf *path);
     
     public void
@@ -34,35 +34,35 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
     /** Open an OutStream, or set Err_error and return NULL on failure.
      *
      * @param path A relative filepath.
-     * @return an OutStream, or NULL.
+     * @return an OutStream.
      */
-    public incremented OutStream*
+    public incremented nullable OutStream*
     Open_Out(Folder *self,  const CharBuf *path);
 
     /** Open an InStream, or set Err_error and return NULL on failure.
      * 
      * @param path A relative filepath.
-     * @return an InStream, or NULL.
+     * @return an InStream.
      */
-    public incremented InStream*
+    public incremented nullable InStream*
     Open_In(Folder *self, const CharBuf *path);
 
     /** Open a FileHandle, or set Err_error and return NULL on failure.
      *
      * @param path A relative filepath.
      * @param flags FileHandle flags.
-     * @return a FileHandle, or NULL.
+     * @return a FileHandle.
      */
-    public incremented FileHandle*
+    public incremented nullable FileHandle*
     Open_FileHandle(Folder *self, const CharBuf *path, u32_t flags);
 
     /** Open a DirHandle or set Err_error and return NULL on failure.
      *
      * @param path Path to a subdirectory, relative to the Folder's path.  If
      * empty or NULL, returns a DirHandle for this Folder.
-     * @return a DirHandle, or NULL.
+     * @return a DirHandle.
      */
-    public incremented DirHandle*
+    public incremented nullable DirHandle*
     Open_Dir(Folder *self, const CharBuf *path = NULL);
 
     /** Create a subdirectory.
@@ -153,7 +153,7 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
      * If <code>path</code> is invalid, because an intermediate directory
      * either doesn't exist or isn't a directory, return NULL.
      */
-    Folder*
+    nullable Folder*
     Enclosing_Folder(Folder *self, const CharBuf *path);
 
     /** Return the Folder at the subdirectory specified by <code>path</code>.
@@ -162,9 +162,9 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
      * subdirectory, return NULL.
      * 
      * @param path A relative filepath specifying a subdirectory.
-     * @return A Folder, or NULL.
+     * @return A Folder.
      */
-    Folder*
+    nullable Folder*
     Find_Folder(Folder *self, const CharBuf *path);
 
     /** Perform implementation-specific initialization.  For example: FSFolder
@@ -188,19 +188,19 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
     /** Open a FileHandle for a local file, or set Err_error and return NULL
      * on failure.
      */
-    abstract incremented FileHandle*
+    abstract incremented nullable FileHandle*
     Local_Open_FileHandle(Folder *self, const CharBuf *name, u32_t flags);
 
     /** Open an InStream for a local file, or set Err_error and return NULL on
      * failure. 
      */
-    incremented InStream*
+    incremented nullable InStream*
     Local_Open_In(Folder *self, const CharBuf *name);
 
     /** Open a DirHandle to iterate over the local entries in this Folder, or
      * set Err_error and return NULL on failure.
      */
-    abstract incremented DirHandle*
+    abstract incremented nullable DirHandle*
     Local_Open_Dir(Folder *self);
 
     /** Create a local subdirectory.
@@ -231,9 +231,9 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
      * a directory exists.
      * 
      * @param name The name of a local directory.
-     * @return a Folder, or NULL.
+     * @return a Folder.
      */
-    abstract Folder*
+    abstract nullable Folder*
     Local_Find_Folder(Folder *self, const CharBuf *name);
 
     /** Delete a local entry.

@@ -28,7 +28,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * @param flags A 32-bit integer with bits set to indicate desired
      * behaviors.
      */
-    inert FileHandle*
+    inert nullable FileHandle*
     do_open(FileHandle *self, const CharBuf *path = NULL, u32_t flags);
 
     /** Ensure that the FileWindow's buffer provides access to file data for
@@ -99,7 +99,7 @@ abstract class Lucy::Store::FileHandle cnick FH
 
     /** Return the object's <code>path</code> attribute.
      */
-    CharBuf*
+    nullable CharBuf*
     Get_Path(FileHandle *self);
 
     /** Invokes Close(), but ignores whether it succeeds or fails.

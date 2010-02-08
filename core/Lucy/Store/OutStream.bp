@@ -19,12 +19,12 @@ class Lucy::Store::OutStream extends Lucy::Object::Obj {
     FileHandle    *file_handle;
     CharBuf       *path;
 
-    inert incremented OutStream* 
+    inert incremented nullable OutStream* 
     open(Obj *file);
 
     /** Return a new OutStream or set Err_error and return NULL on failure.
      */
-    inert OutStream* 
+    inert nullable OutStream* 
     do_open(OutStream *self, Obj *file);
 
     /** Return the current file position. 

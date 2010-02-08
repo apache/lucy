@@ -16,7 +16,7 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
     /** Return the name of the latest generation snapshot file in the Folder,
      * or NULL if no such file exists.
      */
-    inert incremented CharBuf*
+    inert incremented nullable CharBuf*
     latest_snapshot(Folder *folder);
 
     /** Split the <code>path</code> on '/' and assign the last component to

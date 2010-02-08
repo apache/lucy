@@ -60,10 +60,10 @@ class Lucy::Index::Segment cnick Seg extends Lucy::Object::Obj {
 
     /** Fetch a value from the Segment's metadata hash.
      */
-    public Obj*
+    public nullable Obj*
     Fetch_Metadata(Segment *self, const CharBuf *key);
 
-    Obj*
+    nullable Obj*
     Fetch_Metadata_Str(Segment *self, const char *key, size_t len);
 
     /** Given a field name, return its field number for this segment (which
@@ -78,7 +78,7 @@ class Lucy::Index::Segment cnick Seg extends Lucy::Object::Obj {
     /** Given a field number, return the name of its field, or NULL if the
      * field name can't be found.
      */
-    public CharBuf*
+    public nullable CharBuf*
     Field_Name(Segment *self, i32_t field_num);
 
     /** Getter for the object's seg name.

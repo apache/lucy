@@ -34,11 +34,11 @@ class Lucy::Store::FSFolder extends Lucy::Store::Folder {
     public void
     Close(FSFolder *self);
 
-    incremented FileHandle*
+    incremented nullable FileHandle*
     Local_Open_FileHandle(FSFolder *self, const CharBuf *name, 
                           u32_t flags);
 
-    incremented DirHandle*
+    incremented nullable DirHandle*
     Local_Open_Dir(FSFolder *self);
 
     bool_t 
@@ -50,7 +50,7 @@ class Lucy::Store::FSFolder extends Lucy::Store::Folder {
     bool_t
     Local_Is_Directory(FSFolder *self, const CharBuf *name);
 
-    Folder*
+    nullable Folder*
     Local_Find_Folder(FSFolder *self, const CharBuf *name);
 
     bool_t 

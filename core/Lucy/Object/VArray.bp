@@ -41,7 +41,7 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
 
     /** Pop an item off of the end of a VArray.
      */
-    incremented Obj*
+    incremented nullable Obj*
     Pop(VArray *self);
 
     /** Unshift an item onto the front of a VArray.
@@ -51,7 +51,7 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
 
     /** Shift an item off of the front of a VArray.
      */
-    incremented Obj*
+    incremented nullable Obj*
     Shift(VArray *self);
 
     /** Ensure that the VArray has room for at least <code>capacity</code>
@@ -62,7 +62,7 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
 
     /** Fetch the element at <code>tick</tick>.
      */
-    Obj*
+    nullable Obj*
     Fetch(VArray *self, u32_t tick);
 
     /** Store an element at index <code>tick</code>, possibly displacing an
@@ -75,7 +75,7 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
      *
      * @return whatever was stored at <code>tick</code>.
      */
-    incremented Obj*
+    incremented nullable Obj*
     Delete(VArray *self, u32_t tick);
 
     /** Remove <code>length</code> elements from the array, starting at

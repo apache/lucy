@@ -24,7 +24,7 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
      * the subclass name, it will be returned.  Otherwise, a new VTable will
      * be created using [parent] as a base.  
      * 
-     * If [parent] is null, an attempt will be made to find it using
+     * If [parent] is NULL, an attempt will be made to find it using
      * VTable_find_parent_class().  If the attempt fails, an error will
      * result.
      */
@@ -53,13 +53,13 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
     /** Find a registered class and return its vtable.  May return NULL if the
      * class is not registered.
      */
-    inert VTable*
+    inert nullable VTable*
     fetch_vtable(const CharBuf *class_name);
     
     /** Given a class name, return the name of a parent class which descends
      * from Lucy::Object::Obj, or NULL if such a class can't be found.
      */
-    inert CharBuf*
+    inert nullable CharBuf*
     find_parent_class(const CharBuf *class_name);
 
     /** List all of the methods that a class has overridden via the host

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Storable qw( nfreeze thaw );
 use Lucy::Test;
 use Lucy::Util::ToolSet qw( to_perl to_lucy );
@@ -9,6 +9,9 @@ use Lucy::Util::ToolSet qw( to_perl to_lucy );
 my $hash = Lucy::Object::Hash->new( capacity => 10 );
 $hash->store( "foo", Lucy::Object::CharBuf->new("bar") );
 $hash->store( "baz", Lucy::Object::CharBuf->new("banana") );
+
+ok( !defined( $hash->fetch("blah") ),
+    "fetch for a non-existent key returns undef" );
 
 my $frozen = nfreeze($hash);
 my $thawed = thaw($frozen);

@@ -26,10 +26,10 @@ class Lucy::Store::RAMFolder extends Lucy::Store::Folder {
     public void
     Close(RAMFolder *self);
 
-    incremented FileHandle*
+    incremented nullable FileHandle*
     Local_Open_FileHandle(RAMFolder *self, const CharBuf *name, u32_t flags);
 
-    incremented DirHandle*
+    incremented nullable DirHandle*
     Local_Open_Dir(RAMFolder *self);
 
     bool_t 
@@ -41,7 +41,7 @@ class Lucy::Store::RAMFolder extends Lucy::Store::Folder {
     bool_t
     Local_Is_Directory(RAMFolder *self, const CharBuf *name);
 
-    Folder*
+    nullable Folder*
     Local_Find_Folder(RAMFolder *self, const CharBuf *name);
 
     bool_t

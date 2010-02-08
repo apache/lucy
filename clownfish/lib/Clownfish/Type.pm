@@ -36,6 +36,7 @@ sub new {
 sub get_specifier { shift->{specifier} }
 sub get_parcel    { shift->{parcel} }
 sub const         { shift->{const} }
+sub nullable      { shift->{nullable} }
 
 sub is_object      {0}
 sub is_primitive   {0}
@@ -124,7 +125,7 @@ Return the C representation of the type.
 
 Set the C representation of the type.
 
-=head2 get_specifier get_parcel const
+=head2 get_specifier get_parcel const nullable
 
 Accessors.
 

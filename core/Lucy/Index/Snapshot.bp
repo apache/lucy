@@ -55,7 +55,7 @@ class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
     /** The name of the file that the Snapshot serves as a proxy for.
      * Initially NULL; updated by Read_File() and Write_File().
      */
-    public CharBuf*
+    public nullable CharBuf*
     Get_Filename(Snapshot *self);
 
     public void 

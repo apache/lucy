@@ -29,7 +29,7 @@ class Lucy::Util::Json extends Lucy::Object::Obj {
      * Err_error if the file can't be can't be opened or if the file doesn't
      * contain valid JSON.
      */
-    inert incremented Obj* 
+    inert incremented nullable Obj* 
     slurp_json(Folder *folder, const CharBuf *path);
 }
 

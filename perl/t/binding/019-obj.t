@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 package TestObj;
 use base qw( Lucy::Object::Obj );
@@ -34,6 +34,12 @@ package BadSerialize;
 use base qw( Lucy::Object::Obj );
 {
     sub serialize { }
+}
+
+package BadDump;
+use base qw( Lucy::Object::Obj );
+{
+    sub dump { }
 }
 
 package main;
@@ -98,4 +104,10 @@ SKIP: {
     like( $@, qr/empty/i,
         "Don't allow subclasses to perform invalid serialization" );
 }
+
+$hash = Lucy::Object::Hash->new;
+$hash->store( foo => BadDump->new );
+eval { $hash->dump };
+like( $@, qr/NULL/,
+    "Don't allow methods without nullable return values to return NULL" );
 

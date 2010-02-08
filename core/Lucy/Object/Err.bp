@@ -58,7 +58,7 @@ class Lucy::Object::Err extends Lucy::Object::Obj {
 
     /** Retrieve per-thread Err shared variable "error".
      */
-    public inert Err*
+    public inert nullable Err*
     get_error();
 
     /** Print an error message to stderr with some C contextual information.
@@ -113,7 +113,7 @@ class Lucy::Object::Err extends Lucy::Object::Obj {
      * 
      * @return the object.
      */
-    inert Obj*
+    inert nullable Obj*
     downcast(Obj *obj, VTable *vtable, const char *file, int line, 
                 const char *func);
 

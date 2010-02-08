@@ -70,20 +70,19 @@ inert class Lucy::Object::Host {
      * reclaim the return value, it's refcount is increased by one, which the
      * caller will have to deal with.
      */
-    inert incremented Obj*
+    inert incremented nullable Obj*
     callback_obj(void *self, char *method, u32_t num_args, ...);
 
     /** Invoke an object method, expecting a host string of some kind back,
-     * which will be converted into a newly allocated CharBuf.  May return
-     * NULL.
+     * which will be converted into a newly allocated CharBuf.  
      */
-    inert incremented CharBuf*
+    inert incremented nullable CharBuf*
     callback_str(void *self, char *method, u32_t num_args, ...);
 
     /** Invoke an object method, expecting a host data structure back.  It's
      * up to the caller to know how to process it.
      */
-    inert void*
+    inert nullable void*
     callback_host(void *self, char *method, u32_t num_args, ...);
 }
 

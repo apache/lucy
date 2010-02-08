@@ -22,14 +22,14 @@ class Lucy::Store::CompoundFileReader cnick CFReader
     InStream     *instream;
     i32_t         format;
 
-    inert incremented CompoundFileReader*
+    inert incremented nullable CompoundFileReader*
     open(Folder *folder);
 
     /** Return a new CompoundFileReader or set Err_error and return NULL.
      *
      * @param folder A folder containing compound files.
      */
-    inert CompoundFileReader*
+    inert nullable CompoundFileReader*
     do_open(CompoundFileReader *self, Folder *folder);
 
     Folder*
@@ -53,20 +53,20 @@ class Lucy::Store::CompoundFileReader cnick CFReader
     bool_t
     Local_Is_Directory(CompoundFileReader *self, const CharBuf *name);
 
-    incremented FileHandle*
+    incremented nullable FileHandle*
     Local_Open_FileHandle(CompoundFileReader *self, const CharBuf *name, 
                           u32_t flags);
 
-    incremented InStream*
+    incremented nullable InStream*
     Local_Open_In(CompoundFileReader *self, const CharBuf *name);
 
     bool_t
     Local_MkDir(CompoundFileReader *self, const CharBuf *name);
 
-    Folder*
+    nullable Folder*
     Local_Find_Folder(CompoundFileReader *self, const CharBuf *name);
 
-    DirHandle*
+    nullable DirHandle*
     Local_Open_Dir(CompoundFileReader *self);
 }
 

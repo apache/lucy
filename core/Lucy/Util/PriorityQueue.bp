@@ -41,12 +41,12 @@ class Lucy::Util::PriorityQueue cnick PriQ
      * room, the element is inserted and Jostle() returns NULL.  If not, then
      * the item which falls out of the bottom of the Queue is returned.
      */
-    incremented Obj*
+    incremented nullable Obj*
     Jostle(PriorityQueue *self, decremented Obj *element);
 
     /** Pop the *least* item off of the priority queue.  
      */
-    incremented Obj*
+    incremented nullable Obj*
     Pop(PriorityQueue *self);
 
     /** Empty out the PriorityQueue into a sorted array.
@@ -56,7 +56,7 @@ class Lucy::Util::PriorityQueue cnick PriQ
 
     /** Return the least item in the queue, but don't remove it.
      */
-    Obj*
+    nullable Obj*
     Peek(PriorityQueue *self);
 
     /** Accessor for "size" member. 

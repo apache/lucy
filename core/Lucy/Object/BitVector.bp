@@ -39,7 +39,7 @@ class Lucy::Object::BitVector cnick BitVec
 
     /** Accessor for the BitVector's underlying bit array.
      */
-    u8_t*
+    nullable u8_t*
     Get_Raw_Bits(BitVector *self);
 
     /** Accessor for capacity.

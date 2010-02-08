@@ -140,8 +140,11 @@ assignment:
     { $item[2] }
 
 type:
-    simple_type type_postfix(s?)
+    nullable(?) simple_type type_postfix(s?)
     { Clownfish::Parser->simple_or_composite_type(\%item) }
+
+nullable:
+    'nullable'
 
 simple_type:
       object_type
@@ -189,6 +192,7 @@ type_qualifier:
       'const' 
     | 'incremented'
     | 'decremented'
+    | 'nullable'
 
 subroutine_modifier:
       'inert'
@@ -362,14 +366,23 @@ sub simple_or_composite_type {
     my ( undef, $item ) = @_;
     my $simple_type = $item->{simple_type};
     my $postfixes   = $item->{'type_postfix(s?)'};
+    my $nullable    = scalar @{ $item->{'nullable(?)'} } ? 1 : undef;
+    my $type;
 
     if ( !@$postfixes ) {
+        if ($nullable) {
+            my $type_class = ref($simple_type);
+            confess "$type_class can't be 'nullable'" unless
+                $simple_type->isa("Clownfish::Type::Object");
+            $simple_type->set_nullable($nullable);
+        }
         return $simple_type;
     }
     else {
         my %args = (
             child       => $simple_type,
             indirection => 0,
+            nullable    => $nullable,
         );
         for my $postfix (@$postfixes) {
             if ( $postfix =~ /\[/ ) {

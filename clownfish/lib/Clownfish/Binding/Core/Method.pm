@@ -245,26 +245,28 @@ sub _obj_callback_def {
         ? "${prefix}Host_callback_str"
         : "${prefix}Host_callback_obj";
 
-    if ( $return_type->incremented ) {
-        return <<END_CALLBACK_DEF;
-$return_type_str
-$override_sym($params)
-{
-    return ($return_type_str)$cb_func_name($callback_params);
-}
-END_CALLBACK_DEF
+    my $nullable_check = "";
+    if ( !$return_type->nullable ) {
+        my $macro_sym = $method->get_macro_sym;
+        $nullable_check
+            = qq|if (!retval) { LUCY_THROW(LUCY_ERR, |
+            . qq|"$macro_sym() for class '%o' cannot return NULL", |
+            . qq|Lucy_Obj_Get_Class_Name((lucy_Obj*)self)); }\n    |;
     }
-    else {
-        return <<END_CALLBACK_DEF;
+
+    my $decrement = "";
+    if ( !$return_type->incremented ) {
+        $decrement = "LUCY_DECREF(retval);\n    ";
+    }
+
+    return <<END_CALLBACK_DEF;
 $return_type_str
 $override_sym($params)
 {
     $return_type_str retval = ($return_type_str)$cb_func_name($callback_params);
-    ${PREFIX}DECREF(retval);
-    return retval;
+    ${nullable_check}${decrement}return retval;
 }
 END_CALLBACK_DEF
-    }
 }
 
 # Create a function which throws a runtime error indicating that a method is

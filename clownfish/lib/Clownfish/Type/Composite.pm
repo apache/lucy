@@ -11,18 +11,21 @@ our %new_PARAMS = (
     child       => undef,
     indirection => undef,
     array       => undef,
+    nullable    => undef,
 );
 
 sub new {
     my ( $either, %args ) = @_;
-    my $array = delete $args{array};
-    my $child = delete $args{child};
+    my $array    = delete $args{array};
+    my $child    = delete $args{child};
+    my $nullable = delete $args{nullable};
     confess("Missing required param 'child'")
         unless a_isa_b( $child, "Clownfish::Type" );
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $self = $either->SUPER::new(%args);
-    $self->{child} = $child;
-    $self->{array} = $array;
+    $self->{child}    = $child;
+    $self->{array}    = $array;
+    $self->{nullable} = $nullable;
 
     # Default indirection to 0.
     $self->{indirection} ||= 0;
