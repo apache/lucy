@@ -65,12 +65,18 @@ sub is_string_type { shift->{is_string_type} }
 
 sub set_nullable { $_[0]->{nullable} = $_[1] }
 
-sub equals {
+sub similar {
     my ( $self, $other ) = @_;
-    return 0 unless $self->{specifier} eq $other->{specifier};
     for (qw( const incremented decremented nullable )) {
         return 0 if ( $self->{$_} xor $other->{$_} );
     }
+    return 1;
+}
+
+sub equals {
+    my ( $self, $other ) = @_;
+    return 0 unless $self->similar($other);
+    return 0 unless $self->{specifier} eq $other->{specifier};
     return 1;
 }
 
@@ -134,6 +140,12 @@ Returns true if the Type is incremented.
 =head2 decremented
 
 Returns true if the Type is decremented.
+
+=head2 similar
+
+    do_stuff() if $type->similar($other_type);
+
+Weak checking of type which allows for covariant return types.
 
 =head1 COPYRIGHT AND LICENSE
 

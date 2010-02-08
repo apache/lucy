@@ -143,6 +143,16 @@ sub compatible {
         }
     }
 
+    # Weak validation of return type to allow covariant object return types.
+    my $return_type       = $self->{return_type};
+    my $other_return_type = $other->{return_type};
+    if ( $return_type->is_object ) {
+        return 0 unless $return_type->similar($other_return_type);
+    }
+    else {
+        return 0 unless $return_type->equals($other_return_type);
+    }
+
     return 1;
 }
 

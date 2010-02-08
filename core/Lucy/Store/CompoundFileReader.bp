@@ -66,7 +66,7 @@ class Lucy::Store::CompoundFileReader cnick CFReader
     nullable Folder*
     Local_Find_Folder(CompoundFileReader *self, const CharBuf *name);
 
-    nullable DirHandle*
+    incremented nullable DirHandle*
     Local_Open_Dir(CompoundFileReader *self);
 }
 

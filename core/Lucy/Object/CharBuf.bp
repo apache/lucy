@@ -320,7 +320,7 @@ class Lucy::Object::ViewCharBuf cnick ViewCB
     Nip_One(ViewCharBuf *self);
 
     /** Throws an error. */
-    void
+    char* 
     Grow(ViewCharBuf *self, size_t size);
 
     public void
