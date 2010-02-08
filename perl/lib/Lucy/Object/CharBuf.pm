@@ -1,3 +1,4 @@
+package Lucy::Object::CharBuf;
 use Lucy;
 
 1;

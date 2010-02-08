@@ -1,3 +1,4 @@
+package Lucy::Object::Obj;
 use Lucy;
 
 1;

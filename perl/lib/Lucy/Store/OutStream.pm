@@ -1,3 +1,4 @@
+package Lucy::Store::OutStream;
 use Lucy;
 
 1;

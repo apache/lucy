@@ -1,3 +1,4 @@
+package Lucy::Store::FileHandle;
 use Lucy;
 
 1;

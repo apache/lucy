@@ -1,3 +1,4 @@
+package Lucy::Store::RAMFile;
 use Lucy;
 
 1;

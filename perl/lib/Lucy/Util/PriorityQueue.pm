@@ -1,3 +1,4 @@
+package Lucy::Util::PriorityQueue;
 use Lucy;
 
 1;

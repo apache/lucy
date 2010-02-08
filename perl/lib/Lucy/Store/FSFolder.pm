@@ -1,3 +1,4 @@
+package Lucy::Store::FSFolder;
 use Lucy;
 
 1;

@@ -1,3 +1,4 @@
+package Lucy::Object::I32Array;
 use Lucy;
 
 1;

@@ -1,3 +1,4 @@
+package Lucy::Object::VArray;
 use Lucy;
 
 1;

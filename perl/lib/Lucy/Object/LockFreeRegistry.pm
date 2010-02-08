@@ -1,3 +1,4 @@
+package Lucy::Object::LockFreeRegistry;
 use Lucy;
 
 1;

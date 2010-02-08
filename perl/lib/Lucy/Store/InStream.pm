@@ -1,3 +1,4 @@
+package Lucy::Store::InStream;
 use Lucy;
 
 1;

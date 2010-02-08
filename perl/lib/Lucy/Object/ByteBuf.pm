@@ -1,3 +1,4 @@
+package Lucy::Object::ByteBuf;
 use Lucy;
 
 1;

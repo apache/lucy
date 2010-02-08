@@ -1,3 +1,4 @@
+package Lucy::Object::Err;
 use Lucy;
 
 1;

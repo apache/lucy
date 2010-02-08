@@ -1,3 +1,4 @@
+package Lucy::Store::RAMFolder;
 use Lucy;
 
 1;

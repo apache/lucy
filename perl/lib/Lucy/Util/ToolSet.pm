@@ -1,3 +1,4 @@
+package Lucy::Util::ToolSet;
 use Lucy;
 
 1;

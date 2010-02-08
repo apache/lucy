@@ -1,3 +1,4 @@
+package Lucy::Object::VTable;
 use Lucy;
 
 1;

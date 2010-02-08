@@ -1,3 +1,4 @@
+package Lucy::Store::Folder;
 use Lucy;
 
 1;

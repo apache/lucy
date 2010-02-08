@@ -1,3 +1,4 @@
+package Lucy::Object::BitVector;
 use Lucy;
 
 1;

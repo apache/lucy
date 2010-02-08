@@ -1,3 +1,4 @@
+package Lucy::Object::Hash;
 use Lucy;
 
 1;

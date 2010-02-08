@@ -1,3 +1,4 @@
+package Lucy::Util::IndexFileNames;
 use Lucy;
 
 1;
