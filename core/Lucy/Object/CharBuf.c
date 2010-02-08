@@ -881,12 +881,12 @@ ViewCB_nip_one(ViewCharBuf *self)
     }
 }
 
-void
+char*
 ViewCB_grow(ViewCharBuf *self, size_t size)
 {
-    UNUSED_VAR(self);
     UNUSED_VAR(size);
     THROW(ERR, "Can't grow a ViewCharBuf ('%o')", self);
+    UNREACHABLE_RETURN(char*);
 }
 
 /*****************************************************************/
