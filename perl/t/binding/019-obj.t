@@ -83,8 +83,7 @@ is( "$object", $stringified_perl_obj, "same perl object as before" );
 
 is( $object->get_refcount, 2, "correct refcount after retrieval" );
 undef $hash;
-is( $object->get_refcount, 1,
-    "correct refcount after destruction of ref" );
+is( $object->get_refcount, 1, "correct refcount after destruction of ref" );
 
 my $copy = thaw( freeze($object) );
 is( ref($copy), ref($object), "freeze/thaw" );
@@ -110,4 +109,3 @@ $hash->store( foo => BadDump->new );
 eval { $hash->dump };
 like( $@, qr/NULL/,
     "Don't allow methods without nullable return values to return NULL" );
-
