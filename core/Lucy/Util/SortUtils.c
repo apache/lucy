@@ -18,20 +18,19 @@
 /* Recursive merge sorting functions. 
  */
 static void
-S_msort4(FOUR_BYTE_TYPE *elems, FOUR_BYTE_TYPE *scratch,
-         u32_t left, u32_t right, Sort_compare_t compare, void *context);
+S_msort4(void *velems, void *vscratch, uint32_t left, uint32_t right, 
+         Sort_compare_t compare, void *context);
 static void
-S_msort8(EIGHT_BYTE_TYPE *elems, EIGHT_BYTE_TYPE *scratch,
-         u32_t left, u32_t right, Sort_compare_t compare, void *context);
+S_msort8(void *velems, void *vscratch, uint32_t left, uint32_t right, 
+         Sort_compare_t compare, void *context);
+static void
+S_msort_any(void *velems, void *vscratch, uint32_t left, uint32_t right, 
+            Sort_compare_t compare, void *context, size_t width);
 
 static INLINE void
-SI_merge4(FOUR_BYTE_TYPE *left_ptr,  u32_t left_size,
-          FOUR_BYTE_TYPE *right_ptr, u32_t right_size,
-          FOUR_BYTE_TYPE *dest, Sort_compare_t compare, void *context);
-static INLINE void
-SI_merge8(EIGHT_BYTE_TYPE *left_ptr,  u32_t left_size,
-          EIGHT_BYTE_TYPE *right_ptr, u32_t right_size,
-          EIGHT_BYTE_TYPE *dest, Sort_compare_t compare, void *context);
+SI_merge(void *left_vptr,  uint32_t left_size,
+         void *right_vptr, uint32_t right_size,
+         void *vdest, size_t width, Sort_compare_t compare, void *context);
 
 void
 Sort_mergesort(void *elems, void *scratch, u32_t num_elems, u32_t width,
@@ -47,115 +46,124 @@ Sort_mergesort(void *elems, void *scratch, u32_t num_elems, u32_t width,
     }
 
     /* Dispatch by element size. */
-    if (width == 4) {
-        S_msort4((FOUR_BYTE_TYPE*)elems, (FOUR_BYTE_TYPE*)scratch, 
-            0, num_elems - 1, compare, context);
-    }
-    else if (width == 8) {
-        S_msort8((EIGHT_BYTE_TYPE*)elems, (EIGHT_BYTE_TYPE*)scratch, 
-            0, num_elems - 1, compare, context);
-    }
-    else {
-        THROW(ERR, "Can't sort elements which are %u32 bytes", width);
+    switch (width) {
+        case 0:  THROW(ERR, "Parameter 'width' cannot be 0");
+                 break;
+        case 4:  S_msort4(elems, scratch, 0, num_elems - 1, compare, context);
+                 break;
+        case 8:  S_msort8(elems, scratch, 0, num_elems - 1, compare, context);
+                 break;
+        default: S_msort_any(elems, scratch, 0, num_elems - 1, compare, 
+                    context, width);
+                 break;
     }
 }
 
 void
-Sort_merge(void *left_ptr,  u32_t left_size,
-           void *right_ptr, u32_t right_size,
+Sort_merge(void *left_ptr,  uint32_t left_size,
+           void *right_ptr, uint32_t right_size,
            void *dest, size_t width, Sort_compare_t compare, void *context)
 {
-    if (width == 4) {
-        SI_merge4((FOUR_BYTE_TYPE*)left_ptr, left_size, 
-                  (FOUR_BYTE_TYPE*)right_ptr, right_size, 
-                  (FOUR_BYTE_TYPE*)dest, compare, context);
-    }
-    else if (width == 8) {
-        SI_merge8((EIGHT_BYTE_TYPE*)left_ptr, left_size, 
-                  (EIGHT_BYTE_TYPE*)right_ptr, right_size, 
-                  (EIGHT_BYTE_TYPE*)dest, compare, context);
-    }
-    else {
-        THROW(ERR, "Invalid value for 'width': %u64", (uint64_t)width);
+
+    switch (width) {
+        case 0:  THROW(ERR, "Parameter 'width' cannot be 0");
+                 break;
+        case 4:  SI_merge(left_ptr, left_size, right_ptr, right_size, 
+                    dest, 4, compare, context);
+                 break;
+        case 8:  SI_merge(left_ptr, left_size, right_ptr, right_size, 
+                    dest, 8, compare, context);
+                 break;
+        default: SI_merge(left_ptr, left_size, right_ptr, right_size,
+                    dest, width, compare, context);
+                 break;
     }
 }
 
+#define WIDTH 4
 static void
-S_msort4(FOUR_BYTE_TYPE *elems, FOUR_BYTE_TYPE *scratch,
-         u32_t left, u32_t right, Sort_compare_t compare, void *context)
+S_msort4(void *velems, void *vscratch, uint32_t left, uint32_t right, 
+         Sort_compare_t compare, void *context)
 {
+    uint8_t *elems   = (uint8_t*)velems;
+    uint8_t *scratch = (uint8_t*)vscratch;
     if (right > left) {
-        const u32_t mid = ( (right+left)/2 ) + 1;
+        const uint32_t mid = ( (right+left)/2 ) + 1;
         S_msort4(elems, scratch, left, mid - 1, compare, context);
         S_msort4(elems, scratch, mid,  right, compare, context);
-        SI_merge4( (elems + left),  (mid - left), 
-            (elems + mid), (right - mid + 1), scratch, compare, context);
-        memcpy((elems + left), scratch,
-            ((right - left + 1) * sizeof(FOUR_BYTE_TYPE)) );
+        SI_merge( (elems + left * WIDTH),  (mid - left), 
+                  (elems + mid * WIDTH), (right - mid + 1), 
+                   scratch, WIDTH, compare, context);
+        memcpy((elems + left *WIDTH), scratch, ((right - left + 1) * WIDTH) );
     }
 }
 
+#undef WIDTH
+#define WIDTH 8
 static void
-S_msort8(EIGHT_BYTE_TYPE *elems, EIGHT_BYTE_TYPE *scratch,
-         u32_t left, u32_t right, Sort_compare_t compare, void *context)
+S_msort8(void *velems, void *vscratch, uint32_t left, uint32_t right, 
+         Sort_compare_t compare, void *context)
 {
+    uint8_t *elems   = (uint8_t*)velems;
+    uint8_t *scratch = (uint8_t*)vscratch;
     if (right > left) {
-        const u32_t mid = ( (right+left)/2 ) + 1;
+        const uint32_t mid = ( (right+left)/2 ) + 1;
         S_msort8(elems, scratch, left, mid - 1, compare, context);
         S_msort8(elems, scratch, mid,  right, compare, context);
-        SI_merge8( (elems + left),  (mid - left), 
-            (elems + mid), (right - mid + 1), scratch, compare, context);
-        memcpy((elems + left), scratch,
-            ((right - left + 1) * sizeof(EIGHT_BYTE_TYPE)) );
+        SI_merge( (elems + left * WIDTH),  (mid - left), 
+                  (elems + mid * WIDTH), (right - mid + 1), 
+                   scratch, WIDTH, compare, context);
+        memcpy((elems + left * WIDTH), scratch, ((right - left + 1) * WIDTH));
+    }
+}
+
+#undef WIDTH
+static void
+S_msort_any(void *velems, void *vscratch, uint32_t left, uint32_t right, 
+            Sort_compare_t compare, void *context, size_t width)
+{
+    uint8_t *elems   = (uint8_t*)velems;
+    uint8_t *scratch = (uint8_t*)vscratch;
+    if (right > left) {
+        const uint32_t mid = ( (right+left)/2 ) + 1;
+        S_msort_any(elems, scratch, left, mid - 1, compare, context, width);
+        S_msort_any(elems, scratch, mid,  right,   compare, context, width);
+        SI_merge( (elems + left * width),  (mid - left), 
+                  (elems + mid * width), (right - mid + 1), 
+                   scratch, width, compare, context);
+        memcpy((elems + left * width), scratch, ((right - left + 1) * width));
     }
 }
 
 static INLINE void
-SI_merge4(FOUR_BYTE_TYPE *left_ptr,  u32_t left_size,
-          FOUR_BYTE_TYPE *right_ptr, u32_t right_size,
-          FOUR_BYTE_TYPE *dest, Sort_compare_t compare, void *context) 
+SI_merge(void *left_vptr,  uint32_t left_size,
+         void *right_vptr, uint32_t right_size,
+         void *vdest, size_t width, Sort_compare_t compare, void *context)
 {
-    FOUR_BYTE_TYPE *left_limit  = left_ptr  + left_size;
-    FOUR_BYTE_TYPE *right_limit = right_ptr + right_size;
+    uint8_t *left_ptr    = (uint8_t*)left_vptr;
+    uint8_t *right_ptr   = (uint8_t*)right_vptr;
+    uint8_t *left_limit  = left_ptr + left_size * width;
+    uint8_t *right_limit = right_ptr + right_size * width;
+    uint8_t *dest        = (uint8_t*)vdest;
 
     while (left_ptr < left_limit && right_ptr < right_limit) {
         if (compare(context, left_ptr, right_ptr) < 1) {
-            *dest++ = *left_ptr++;
+            memcpy(dest, left_ptr, width);
+            dest += width;
+            left_ptr += width;
         }
         else {
-            *dest++ = *right_ptr++;
+            memcpy(dest, right_ptr, width);
+            dest += width;
+            right_ptr += width;
         }
     }
-    while (left_ptr < left_limit) {
-        *dest++ = *left_ptr++;
-    }
-    while (right_ptr < right_limit) {
-        *dest++ = *right_ptr++;
-    }
-}
 
-static INLINE void
-SI_merge8(EIGHT_BYTE_TYPE *left_ptr,  u32_t left_size,
-          EIGHT_BYTE_TYPE *right_ptr, u32_t right_size,
-          EIGHT_BYTE_TYPE *dest, Sort_compare_t compare, void *context)
-{
-    EIGHT_BYTE_TYPE *left_limit  = left_ptr  + left_size;
-    EIGHT_BYTE_TYPE *right_limit = right_ptr + right_size;
-
-    while (left_ptr < left_limit && right_ptr < right_limit) {
-        if (compare(context, left_ptr, right_ptr) < 1) {
-            *dest++ = *left_ptr++;
-        }
-        else {
-            *dest++ = *right_ptr++;
-        }
-    }
-    while (left_ptr < left_limit) {
-        *dest++ = *left_ptr++;
-    }
-    while (right_ptr < right_limit) {
-        *dest++ = *right_ptr++;
-    }
+    const size_t left_remaining = left_limit - left_ptr;
+    memcpy(dest, left_ptr, left_remaining);
+    dest += left_remaining;
+    const size_t right_remaining = right_limit - right_ptr;
+    memcpy(dest, right_ptr, right_remaining);
 }
 
 /***************************** quicksort ************************************/
