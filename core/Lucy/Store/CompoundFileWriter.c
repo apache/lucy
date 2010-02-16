@@ -132,10 +132,7 @@ S_do_consolidate(CompoundFileWriter *self)
 
             /* Add filler NULL bytes so that every sub-file begins on a file
              * position multiple of 8. */
-            {
-                i64_t filler_bytes = (8 - (len % 8)) % 8;
-                while (filler_bytes--) { OutStream_Write_U8(outstream, 0); }
-            }
+            OutStream_Align(outstream, 8);
 
             InStream_Close(instream);
             DECREF(instream);

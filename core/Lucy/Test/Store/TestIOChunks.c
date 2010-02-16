@@ -15,6 +15,22 @@
 #include "Lucy/Util/NumberUtils.h"
 
 static void
+test_Align(TestBatch *batch)
+{
+    RAMFile    *file      = RAMFile_new(NULL, false);
+    OutStream  *outstream = OutStream_open((Obj*)file);
+
+    for (int32_t i = 1; i < 32; i++) {
+        int64_t random_bytes = TestUtils_random_u64() % 32;
+        while (random_bytes--) { OutStream_Write_U8(outstream, 0); }
+        ASSERT_TRUE(batch, (OutStream_Align(outstream, i) % i) == 0,
+            "Align to %ld", (long)i);
+    }
+    DECREF(file);
+    DECREF(outstream);
+}
+
+static void
 test_Read_Write_Bytes(TestBatch *batch)
 {
     RAMFile    *file      = RAMFile_new(NULL, false);
@@ -81,11 +97,12 @@ test_Buf(TestBatch *batch)
 void
 TestIOChunks_run_tests()
 {
-    TestBatch   *batch     = TestBatch_new(5);
+    TestBatch *batch = TestBatch_new(36);
 
     srand((unsigned int)time((time_t*)NULL));
     TestBatch_Plan(batch);
 
+    test_Align(batch);
     test_Read_Write_Bytes(batch);
     test_Buf(batch);
     

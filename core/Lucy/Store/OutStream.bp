@@ -32,6 +32,14 @@ class Lucy::Store::OutStream extends Lucy::Object::Obj {
     final i64_t 
     Tell(OutStream *self);
 
+    /** Write 0 or more null bytes to the OutStream until its file position is
+     * a multiple of <code>modulus</code>.
+     *
+     * @return the new file position.
+     */
+    final i64_t
+    Align(OutStream *self, int64_t modulus);
+
     /** Flush output buffer to target FileHandle.
      */
     final void

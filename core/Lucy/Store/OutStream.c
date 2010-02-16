@@ -118,6 +118,15 @@ OutStream_tell(OutStream *self)
     return self->buf_start + self->buf_pos;
 }
 
+int64_t
+OutStream_align(OutStream *self, int64_t modulus)
+{
+    int64_t len = OutStream_Tell(self);
+    int64_t filler_bytes = (modulus - (len % modulus)) % modulus;
+    while (filler_bytes--) { OutStream_Write_U8(self, 0); }
+    return OutStream_Tell(self);
+}
+
 void
 OutStream_flush(OutStream *self) 
 {
