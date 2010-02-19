@@ -70,8 +70,8 @@ test_refill(TestBatch *batch)
 static void
 test_Clone_and_Reopen(TestBatch *batch)
 {
-    ZombieCharBuf  foo       = ZCB_LITERAL("foo");
-    ZombieCharBuf  bar       = ZCB_LITERAL("bar");
+    ZombieCharBuf *foo       = ZCB_WRAP_STR("foo", 3);
+    ZombieCharBuf *bar       = ZCB_WRAP_STR("bar", 3);
     RAMFile       *file      = RAMFile_new(NULL, false);
     OutStream     *outstream = OutStream_open((Obj*)file);
     RAMFileHandle *fh;
@@ -85,22 +85,22 @@ test_Clone_and_Reopen(TestBatch *batch)
     }
     OutStream_Close(outstream);
     
-    fh = RAMFH_open((CharBuf*)&foo, FH_READ_ONLY, file);
+    fh = RAMFH_open((CharBuf*)foo, FH_READ_ONLY, file);
     instream = InStream_open((Obj*)fh);
     InStream_Seek(instream, 1);
-    ASSERT_TRUE(batch, CB_Equals(InStream_Get_Filename(instream), (Obj*)&foo), 
+    ASSERT_TRUE(batch, CB_Equals(InStream_Get_Filename(instream), (Obj*)foo), 
         "Get_Filename");
 
     clone    = InStream_Clone(instream);
-    ASSERT_TRUE(batch, CB_Equals(InStream_Get_Filename(clone), (Obj*)&foo), 
+    ASSERT_TRUE(batch, CB_Equals(InStream_Get_Filename(clone), (Obj*)foo), 
         "Clones have same filename");
     ASSERT_TRUE(batch, InStream_Length(instream) == InStream_Length(clone),
         "Clones have same length");
     ASSERT_TRUE(batch, InStream_Read_U8(instream) == InStream_Read_U8(clone),
         "Clones start at same file position");
 
-    reopened = InStream_Reopen(instream, (CharBuf*)&bar, 25, 1);
-    ASSERT_TRUE(batch, CB_Equals(InStream_Get_Filename(reopened), (Obj*)&bar), 
+    reopened = InStream_Reopen(instream, (CharBuf*)bar, 25, 1);
+    ASSERT_TRUE(batch, CB_Equals(InStream_Get_Filename(reopened), (Obj*)bar), 
         "Reopened InStreams take new filename");
     ASSERT_TRUE(batch, InStream_Read_U8(reopened) == 'z',
         "Reopened stream starts at supplied offset");

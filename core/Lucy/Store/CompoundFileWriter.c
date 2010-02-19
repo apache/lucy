@@ -10,10 +10,6 @@
 
 i32_t CFWriter_current_file_format = 1;
 
-static ZombieCharBuf cfmeta_file = ZCB_LITERAL("cfmeta.json");
-static ZombieCharBuf cfmeta_temp = ZCB_LITERAL("cfmeta.json.temp");
-static ZombieCharBuf cf_file     = ZCB_LITERAL("cf.dat");
-
 /* Helper which does the heavy lifting for CFWriter_consolidate. */
 static void
 S_do_consolidate(CompoundFileWriter *self);
@@ -47,7 +43,8 @@ CFWriter_destroy(CompoundFileWriter *self)
 void
 CFWriter_consolidate(CompoundFileWriter *self)
 {
-    if (Folder_Exists(self->folder, (CharBuf*)&cfmeta_file)) {
+    CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+    if (Folder_Exists(self->folder, cfmeta_file)) {
         THROW(ERR, "Merge already performed for %o", 
             Folder_Get_Path(self->folder));
     }
@@ -60,16 +57,18 @@ CFWriter_consolidate(CompoundFileWriter *self)
 static void
 S_clean_up_old_temp_files(CompoundFileWriter *self)
 {
-    Folder *folder = self->folder;
+    Folder  *folder      = self->folder;
+    CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
+    CharBuf *cf_file     = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
 
-    if (Folder_Exists(folder, (CharBuf*)&cf_file)) {
-        if (!Folder_Delete(folder, (CharBuf*)&cf_file)) {
-            THROW(ERR, "Can't delete '%o'", &cf_file);
+    if (Folder_Exists(folder, cf_file)) {
+        if (!Folder_Delete(folder, cf_file)) {
+            THROW(ERR, "Can't delete '%o'", cf_file);
         }
     }
-    if (Folder_Exists(folder, (CharBuf*)&cfmeta_temp)) {
-        if (!Folder_Delete(folder, (CharBuf*)&cfmeta_temp)) {
-            THROW(ERR, "Can't delete '%o'", &cfmeta_temp);
+    if (Folder_Exists(folder, cfmeta_temp)) {
+        if (!Folder_Delete(folder, cfmeta_temp)) {
+            THROW(ERR, "Can't delete '%o'", cfmeta_temp);
         }
     }
 }
@@ -82,7 +81,8 @@ S_do_consolidate(CompoundFileWriter *self)
     Hash      *sub_files    = Hash_new(0);
     VArray    *files        = Folder_List(folder, NULL);
     VArray    *merged       = VA_new(VA_Get_Size(files));
-    OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)&cf_file);
+    CharBuf   *cf_file     = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+    OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)cf_file);
     u32_t      i, max;
     bool_t     rename_success;
 
@@ -97,10 +97,10 @@ S_do_consolidate(CompoundFileWriter *self)
      * earlier releases. */
     CharBuf *infilepath = CB_new(30);
     bool_t base_len = 0;
-    ZombieCharBuf seg_name = ZCB_BLANK;
-    IxFileNames_local_part(Folder_Get_Path(folder), &seg_name);
-    if (ZCB_Starts_With_Str(&seg_name, "seg_", 4)) {
-        CB_setf(infilepath, "%o/", &seg_name);
+    ZombieCharBuf *seg_name 
+        = IxFileNames_local_part(Folder_Get_Path(folder), ZCB_BLANK());
+    if (ZCB_Starts_With_Str(seg_name, "seg_", 4)) {
+        CB_setf(infilepath, "%o/", seg_name);
         base_len = CB_Get_Size(infilepath);
     }
 
@@ -141,10 +141,10 @@ S_do_consolidate(CompoundFileWriter *self)
     DECREF(infilepath);
 
     /* Write metadata to cfmeta file. */
-    Json_spew_json((Obj*)metadata, (Folder*)self->folder,
-        (CharBuf*)&cfmeta_temp);
-    rename_success = Folder_Rename(self->folder, (CharBuf*)&cfmeta_temp,
-        (CharBuf*)&cfmeta_file);
+    CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
+    CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+    Json_spew_json((Obj*)metadata, (Folder*)self->folder, cfmeta_temp);
+    rename_success = Folder_Rename(self->folder, cfmeta_temp, cfmeta_file);
     if (!rename_success) { RETHROW(INCREF(Err_get_error())); }
 
     /* Clean up. */

@@ -22,20 +22,20 @@ OUTPUT: RETVAL
 SV*
 _fetch(self, key)
     lucy_Hash *self;
-    lucy_ZombieCharBuf key;
+    const lucy_CharBuf *key;
 CODE:
-    RETVAL = LUCY_OBJ_TO_SV(lucy_Hash_fetch(self, (lucy_Obj*)&key));
+    RETVAL = LUCY_OBJ_TO_SV(lucy_Hash_fetch(self, (lucy_Obj*)key));
 OUTPUT: RETVAL
 
 void
 store(self, key, value);
     lucy_Hash          *self; 
-    lucy_ZombieCharBuf  key;
+    const lucy_CharBuf *key;
     lucy_Obj           *value;
 PPCODE:
 {
     if (value) { LUCY_INCREF(value); }
-    lucy_Hash_store(self, (lucy_Obj*)&key, value);
+    lucy_Hash_store(self, (lucy_Obj*)key, value);
 }
 
 void

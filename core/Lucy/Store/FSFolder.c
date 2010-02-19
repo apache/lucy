@@ -35,9 +35,15 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/IndexFileNames.h"
 
-/* Return a new CharBuf containing a platform-specific absolute filepath. */
+/* Return a ZombieCharBuf (cast to CharBuf) containing a platform-specific
+ * absolute filepath. */
 static CharBuf*
-S_fullpath(FSFolder *self, const CharBuf *path);
+S_fullpath(FSFolder *self, const CharBuf *path, void *allocation, 
+           size_t alloc_size);
+#define FULLPATH(self, _path) \
+    S_fullpath(self, _path, alloca( \
+        ZCB_size() + CB_Get_Size(self->path) + CB_Get_Size(_path) + 10), \
+        ZCB_size() + CB_Get_Size(self->path) + CB_Get_Size(_path) + 10)
 
 /* Return true if the supplied path is a directory. */
 static bool_t
@@ -86,21 +92,19 @@ FSFolder_check(FSFolder *self)
 FileHandle*
 FSFolder_local_open_filehandle(FSFolder *self, const CharBuf *name, u32_t flags)
 {
-    CharBuf      *fullpath = S_fullpath(self, name);
+    CharBuf      *fullpath = FULLPATH(self, name);
     FSFileHandle *fh = FSFH_open(fullpath, flags);
     if (!fh) {
         ERR_ADD_FRAME(Err_get_error());
     }
-    DECREF(fullpath);
     return (FileHandle*)fh;
 }
 
 bool_t
 FSFolder_local_mkdir(FSFolder *self, const CharBuf *name)
 {
-    CharBuf *dir = S_fullpath(self, name);
+    CharBuf *dir = FULLPATH(self, name);
     bool_t result = S_create_dir(dir);
-    DECREF(dir);
     if (!result) {
         ERR_ADD_FRAME(Err_get_error());
     }
@@ -126,11 +130,10 @@ FSFolder_local_exists(FSFolder *self, const CharBuf *name)
     }
     else {
         struct stat stat_buf;
-        CharBuf *fullpath = S_fullpath(self, name);
+        CharBuf *fullpath = FULLPATH(self, name);
         bool_t retval = false;
         if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1)
             retval = true;
-        DECREF(fullpath);
         return retval;
     }
 }
@@ -144,9 +147,8 @@ FSFolder_local_is_directory(FSFolder *self, const CharBuf *name)
         return true; 
     }
     else {
-        CharBuf *fullpath = S_fullpath(self, name);
+        CharBuf *fullpath = FULLPATH(self, name);
         bool_t result = S_dir_ok(fullpath);
-        DECREF(fullpath);
         return result;
     }
 }
@@ -154,16 +156,14 @@ FSFolder_local_is_directory(FSFolder *self, const CharBuf *name)
 bool_t
 FSFolder_rename(FSFolder *self, const CharBuf* from, const CharBuf *to)
 {
-    CharBuf *from_path = S_fullpath(self, from);
-    CharBuf *to_path   = S_fullpath(self, to);
+    CharBuf *from_path = FULLPATH(self, from);
+    CharBuf *to_path   = FULLPATH(self, to);
     bool_t   retval    = !rename((char*)CB_Get_Ptr8(from_path), 
         (char*)CB_Get_Ptr8(to_path));
     if (!retval) {
         Err_set_error(Err_new(CB_newf("rename from '%o' to '%o' failed: %s",
             from_path, to_path, strerror(errno))));
     }
-    DECREF(to_path);
-    DECREF(from_path);
     return retval;
 }
 
@@ -171,8 +171,8 @@ bool_t
 FSFolder_hard_link(FSFolder *self, const CharBuf *from, 
                    const CharBuf *to)
 {
-    CharBuf *from_path = S_fullpath(self, from);
-    CharBuf *to_path   = S_fullpath(self, to);
+    CharBuf *from_path = FULLPATH(self, from);
+    CharBuf *to_path   = FULLPATH(self, to);
     char    *from8     = (char*)CB_Get_Ptr8(from_path);
     char    *to8       = (char*)CB_Get_Ptr8(to_path);
 #ifdef CHY_HAS_UNISTD_H
@@ -196,22 +196,19 @@ FSFolder_hard_link(FSFolder *self, const CharBuf *from,
         FREEMEM(win_error);
     }
 #endif
-    DECREF(to_path);
-    DECREF(from_path);
     return retval;
 }
 
 bool_t
 FSFolder_local_delete(FSFolder *self, const CharBuf *name)
 {
-    CharBuf *fullpath = S_fullpath(self, name);
+    CharBuf *fullpath = FULLPATH(self, name);
     char    *path_ptr = (char*)CB_Get_Ptr8(fullpath);
 #ifdef CHY_REMOVE_ZAPS_DIRS
     bool_t result = !remove(path_ptr);
 #else 
     bool_t result = !rmdir(path_ptr) || !remove(path_ptr); 
 #endif
-    DECREF(fullpath);
     DECREF(Hash_Delete(self->entries, (Obj*)name));
     return result;
 }
@@ -243,8 +240,7 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name)
     }
 
     {
-        CharBuf *fullpath = S_fullpath(self, name);
-        static ZombieCharBuf cfmeta_file = ZCB_LITERAL("cfmeta.json");
+        CharBuf *fullpath = FULLPATH(self, name);
         if (S_dir_ok(fullpath)) {
             subfolder = (Folder*)FSFolder_new(fullpath);
             if (!subfolder) {
@@ -252,7 +248,8 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name)
             }
             /* Try to open a CompoundFileReader. On failure, just use the
              * existing folder. */
-            if (Folder_Local_Exists(subfolder, (CharBuf*)&cfmeta_file)) {
+            CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+            if (Folder_Local_Exists(subfolder, cfmeta_file)) {
                 CompoundFileReader *cf_reader = CFReader_open(subfolder);
                 if (cf_reader) {
                     DECREF(subfolder);
@@ -260,11 +257,7 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name)
                 }
             }
             Hash_Store(self->entries, (Obj*)name, (Obj*)subfolder);
-            DECREF(fullpath);
             return subfolder;
-        }
-        else {
-            DECREF(fullpath);
         }
     }
 
@@ -272,12 +265,11 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name)
 }
 
 static CharBuf*
-S_fullpath(FSFolder *self, const CharBuf *path)
+S_fullpath(FSFolder *self, const CharBuf *path, void *allocation, 
+           size_t alloc_size)
 {
-    CharBuf *fullpath = CB_new(200);
-    CB_Cat(fullpath, self->path);
-    CB_Cat_Trusted_Str(fullpath, DIR_SEP, sizeof(DIR_SEP) - 1);
-    CB_Cat(fullpath, path);
+    CharBuf *fullpath = (CharBuf*)ZCB_newf(allocation, alloc_size, "%o%s%o",
+        self->path, DIR_SEP, path);
     if (DIR_SEP[0] != '/') {
         CB_Swap_Chars(fullpath, '/', DIR_SEP[0]);
     }
@@ -308,9 +300,9 @@ S_create_dir(const CharBuf *path)
 bool_t
 S_is_local_entry(const CharBuf *path)
 {
-    ZombieCharBuf scratch = ZCB_make(path);
+    ZombieCharBuf *scratch = ZCB_WRAP(path);
     u32_t code_point;
-    while (0 != (code_point = ZCB_Nip_One(&scratch))) {
+    while (0 != (code_point = ZCB_Nip_One(scratch))) {
         if (code_point == '/') { return false; }
     }
     return true;

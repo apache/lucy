@@ -174,8 +174,8 @@ void
 Seg_store_metadata_str(Segment *self, const char *key, size_t key_len, 
                        Obj *value)
 {
-    ZombieCharBuf k = ZCB_make_str((char*)key, key_len);
-    Seg_Store_Metadata(self, (CharBuf*)&k, value);
+    ZombieCharBuf *k = ZCB_WRAP_STR((char*)key, key_len);
+    Seg_Store_Metadata(self, (CharBuf*)k, value);
 }
 
 Obj*

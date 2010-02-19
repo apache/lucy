@@ -37,7 +37,7 @@ S_die_invalid_utf8(const char *text, size_t size);
 static void
 S_die_invalid_pattern(const char *pattern);
 
-ZombieCharBuf EMPTY = ZCB_BLANK;
+ZombieCharBuf EMPTY = { ZOMBIECHARBUF, {1}, "", 0, 0 };
 
 CharBuf*
 CB_new(size_t size) 
@@ -127,13 +127,13 @@ i32_t
 CB_hash_code(CharBuf *self)
 {
     u32_t hashvalue = 5381; 
-    ZombieCharBuf iterator = ZCB_make(self);
+    ZombieCharBuf *iterator = ZCB_WRAP(self);
     
     {
         const CB_nip_one_t nip_one 
-            = (CB_nip_one_t)METHOD(iterator.vtable, CB, Nip_One);
-        while (iterator.size) {
-            u32_t code_point = (u32_t)nip_one((CharBuf*)&iterator);
+            = (CB_nip_one_t)METHOD(iterator->vtable, CB, Nip_One);
+        while (iterator->size) {
+            u32_t code_point = (u32_t)nip_one((CharBuf*)iterator);
             hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point; 
         } 
     }
@@ -145,15 +145,17 @@ static void
 S_grow(CharBuf *self, size_t size)
 {
     if (size >= self->cap) { 
-        self->cap = size + 1;
-        self->ptr = (char*)REALLOCATE(self->ptr, self->cap);
+        CB_Grow(self, size);
     }
 }
 
 char*
 CB_grow(CharBuf *self, size_t size) 
 {
-    if (size >= self->cap) { S_grow(self, size); }
+    if (size >= self->cap) { 
+        self->cap = size + 1;
+        self->ptr = (char*)REALLOCATE(self->ptr, self->cap);
+    }
     return self->ptr;
 }
 
@@ -394,19 +396,19 @@ CB_to_i64(CharBuf *self)
 i64_t
 CB_basex_to_i64(CharBuf *self, u32_t base)
 {
-    ZombieCharBuf iterator = ZCB_make(self);
+    ZombieCharBuf *iterator = ZCB_WRAP(self);
     i64_t retval = 0;
     bool_t is_negative = false;
 
     /* Advance past minus sign. */
-    if (ZCB_Code_Point_At(&iterator, 0) == '-') { 
-        ZCB_Nip_One(&iterator);
+    if (ZCB_Code_Point_At(iterator, 0) == '-') { 
+        ZCB_Nip_One(iterator);
         is_negative = true;
     }
 
     /* Accumulate. */
-    while (iterator.size) {
-        i32_t code_point = ZCB_Nip_One(&iterator);
+    while (iterator->size) {
+        i32_t code_point = ZCB_Nip_One(iterator);
         if (isalnum(code_point)) {
             i32_t addend = isdigit(code_point)
                          ? code_point - '0'
@@ -696,9 +698,9 @@ size_t
 CB_truncate(CharBuf *self, size_t count)
 {
     u32_t num_code_points;
-    ZombieCharBuf iterator = ZCB_make(self);
-    num_code_points = ZCB_Nip(&iterator, count);
-    self->size -= iterator.size;
+    ZombieCharBuf *iterator = ZCB_WRAP(self);
+    num_code_points = ZCB_Nip(iterator, count);
+    self->size -= iterator->size;
     return num_code_points;
 }
 
@@ -733,14 +735,14 @@ CB_code_point_from(CharBuf *self, size_t tick)
 CharBuf*
 CB_substring(CharBuf *self, size_t offset, size_t len)
 {
-    ZombieCharBuf iterator = ZCB_make(self);
+    ZombieCharBuf *iterator = ZCB_WRAP(self);
     char *sub_start;
     size_t byte_len;
 
-    ZCB_Nip(&iterator, offset);
-    sub_start = iterator.ptr;
-    ZCB_Nip(&iterator, len);
-    byte_len = iterator.ptr - sub_start;
+    ZCB_Nip(iterator, offset);
+    sub_start = iterator->ptr;
+    ZCB_Nip(iterator, len);
+    byte_len = iterator->ptr - sub_start;
 
     return CB_new_from_trusted_utf8(sub_start, byte_len);
 }
@@ -750,16 +752,16 @@ CB_compare(const void *va, const void *vb)
 {
     const CharBuf *a = *(const CharBuf**)va;
     const CharBuf *b = *(const CharBuf**)vb;
-    ZombieCharBuf iterator_a = ZCB_make(a);
-    ZombieCharBuf iterator_b = ZCB_make(b);
-    while (iterator_a.size && iterator_b.size) {
-        i32_t code_point_a = ZCB_Nip_One(&iterator_a);
-        i32_t code_point_b = ZCB_Nip_One(&iterator_b);
+    ZombieCharBuf *iterator_a = ZCB_WRAP(a);
+    ZombieCharBuf *iterator_b = ZCB_WRAP(b);
+    while (iterator_a->size && iterator_b->size) {
+        i32_t code_point_a = ZCB_Nip_One(iterator_a);
+        i32_t code_point_b = ZCB_Nip_One(iterator_b);
         const i32_t comparison = code_point_a - code_point_b;
         if (comparison != 0) return comparison;
     }
-    if (iterator_a.size != iterator_b.size) {
-        return iterator_a.size < iterator_b.size ? -1 : 1;
+    if (iterator_a->size != iterator_b->size) {
+        return iterator_a->size < iterator_b->size ? -1 : 1;
     }
     return 0;
 }
@@ -891,22 +893,60 @@ ViewCB_grow(ViewCharBuf *self, size_t size)
 
 /*****************************************************************/
 
-ZombieCharBuf
-ZCB_make_str(const char *ptr, size_t size) 
+ZombieCharBuf*
+ZCB_new(void *allocation)
 {
-    ZombieCharBuf retval;
-    retval.ref.count    = 1;
-    retval.vtable       = ZOMBIECHARBUF;
-    retval.cap          = 0;
-    retval.size         = size;
-    retval.ptr          = (char*)ptr;
-    return retval;
+    static char empty_string[] = "";
+    ZombieCharBuf *self = (ZombieCharBuf*)allocation;
+    self->ref.count    = 1;
+    self->vtable       = ZOMBIECHARBUF;
+    self->cap          = 0;
+    self->size         = 0;
+    self->ptr          = empty_string;
+    return self;
 }
 
-ZombieCharBuf
-ZCB_make(const CharBuf *source) 
+ZombieCharBuf*
+ZCB_newf(void *allocation, size_t alloc_size, const char *pattern, ...)
 {
-    return ZCB_make_str(source->ptr, source->size);
+    ZombieCharBuf *self = (ZombieCharBuf*)allocation;
+
+    self->ref.count    = 1;
+    self->vtable       = ZOMBIECHARBUF;
+    self->cap          = alloc_size - sizeof(ZombieCharBuf);
+    self->size         = 0;
+    self->ptr          = ((char*)allocation) + sizeof(ZombieCharBuf);
+
+    va_list args;
+    va_start(args, pattern);
+    ZCB_VCatF(self, pattern, args);
+    va_end(args);
+
+    return self;
+}
+
+ZombieCharBuf*
+ZCB_wrap_str(void *allocation, const char *ptr, size_t size)
+{
+    ZombieCharBuf *self = (ZombieCharBuf*)allocation;
+    self->ref.count    = 1;
+    self->vtable       = ZOMBIECHARBUF;
+    self->cap          = 0;
+    self->size         = size;
+    self->ptr          = (char*)ptr;
+    return self;
+}
+
+ZombieCharBuf*
+ZCB_wrap(void *allocation, const CharBuf *source)
+{
+    return ZCB_wrap_str(allocation, source->ptr, source->size);
+}
+
+size_t
+ZCB_size()
+{
+    return sizeof(ZombieCharBuf);
 }
 
 void

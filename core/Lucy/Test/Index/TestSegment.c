@@ -10,27 +10,27 @@ static void
 test_fields(TestBatch *batch)
 {
     Segment *segment = Seg_new(1);
-    ZombieCharBuf foo = ZCB_LITERAL("foo");
-    ZombieCharBuf bar = ZCB_LITERAL("bar");
-    ZombieCharBuf baz = ZCB_LITERAL("baz");
+    ZombieCharBuf *foo = ZCB_WRAP_STR("foo",3 );
+    ZombieCharBuf *bar = ZCB_WRAP_STR("bar", 3);
+    ZombieCharBuf *baz = ZCB_WRAP_STR("baz", 3);
     i32_t field_num; 
     
-    field_num = Seg_Add_Field(segment, (CharBuf*)&foo);
+    field_num = Seg_Add_Field(segment, (CharBuf*)foo);
     ASSERT_TRUE(batch, field_num == 1, 
         "Add_Field returns field number, and field numbers start at 1");
-    field_num = Seg_Add_Field(segment, (CharBuf*)&bar);
+    field_num = Seg_Add_Field(segment, (CharBuf*)bar);
     ASSERT_TRUE(batch, field_num == 2, "add a second field");
-    field_num = Seg_Add_Field(segment, (CharBuf*)&foo);
+    field_num = Seg_Add_Field(segment, (CharBuf*)foo);
     ASSERT_TRUE(batch, field_num == 1,
         "Add_Field returns existing field number if field is already known");
 
-    ASSERT_TRUE(batch, ZCB_Equals(&bar, (Obj*)Seg_Field_Name(segment, 2)),
+    ASSERT_TRUE(batch, ZCB_Equals(bar, (Obj*)Seg_Field_Name(segment, 2)),
         "Field_Name");
     ASSERT_TRUE(batch, Seg_Field_Name(segment, 3) == NULL, 
         "Field_Name returns NULL for unknown field number");
-    ASSERT_TRUE(batch, Seg_Field_Num(segment, (CharBuf*)&bar) == 2,
+    ASSERT_TRUE(batch, Seg_Field_Num(segment, (CharBuf*)bar) == 2,
         "Field_Num");
-    ASSERT_TRUE(batch, Seg_Field_Num(segment, (CharBuf*)&baz) == 0, 
+    ASSERT_TRUE(batch, Seg_Field_Num(segment, (CharBuf*)baz) == 0, 
         "Field_Num returns 0 for unknown field name");
 
     DECREF(segment);
@@ -108,13 +108,13 @@ test_Write_File_and_Read_File(TestBatch *batch)
     Segment   *segment = Seg_new(100);
     Segment   *got     = Seg_new(100);
     CharBuf   *meta;
-    ZombieCharBuf flotsam = ZCB_LITERAL("flotsam");
-    ZombieCharBuf jetsam  = ZCB_LITERAL("jetsam");
+    CharBuf   *flotsam = (CharBuf*)ZCB_WRAP_STR("flotsam", 7);
+    CharBuf   *jetsam  = (CharBuf*)ZCB_WRAP_STR("jetsam", 6);
 
     Seg_Set_Count(segment, 111);
     Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)CB_newf("bar"));
-    Seg_Add_Field(segment, (CharBuf*)&flotsam);
-    Seg_Add_Field(segment, (CharBuf*)&jetsam);
+    Seg_Add_Field(segment, flotsam);
+    Seg_Add_Field(segment, jetsam);
     
     RAMFolder_MkDir(folder, Seg_Get_Name(segment));
     Seg_Write_File(segment, (Folder*)folder);
@@ -123,8 +123,7 @@ test_Write_File_and_Read_File(TestBatch *batch)
     ASSERT_TRUE(batch, Seg_Get_Count(got) == Seg_Get_Count(segment), 
         "Round-trip count through file");
     ASSERT_TRUE(batch, 
-           Seg_Field_Num(got, (CharBuf*)&jetsam) 
-        == Seg_Field_Num(segment, (CharBuf*)&jetsam), 
+        Seg_Field_Num(got, jetsam) == Seg_Field_Num(segment, jetsam), 
         "Round trip field names through file");
     meta = (CharBuf*)Seg_Fetch_Metadata_Str(got, "foo", 3);
     ASSERT_TRUE(batch, meta && CB_Is_A(meta, CHARBUF) 

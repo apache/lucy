@@ -1,3 +1,4 @@
+#define C_LUCY_ZOMBIECHARBUF
 #define C_LUCY_RAMFOLDER
 #include "Lucy/Util/ToolSet.h"
 

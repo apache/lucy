@@ -90,21 +90,20 @@ my %primitives_to_perl = (
 
 # Extract a Clownfish object from a Perl SV.
 sub _sv_to_bp_obj {
-    my ( $type, $bp_var, $xs_var, $stack_var ) = @_;
+    my ( $type, $bp_var, $xs_var ) = @_;
     my $struct_sym = $type->get_specifier;
     my $vtable     = uc($struct_sym);
-    my $third_arg;
     if ( $struct_sym =~ /^[a-z_]*(Obj|CharBuf)$/ ) {
         # Share buffers rather than copy between Perl scalars and BP string
         # types.  Assume that the appropriate ZombieCharBuf has been declared
         # on the stack.
-        $third_arg = "&$stack_var";
+        return "$bp_var = ($struct_sym*)XSBind_sv_to_lucy_obj($xs_var, "
+            . "$vtable, alloca(lucy_ZCB_size()));"
     }
     else {
-        $third_arg = 'NULL';
+        return "$bp_var = ($struct_sym*)XSBind_sv_to_lucy_obj($xs_var, "
+            . "$vtable, NULL);";
     }
-    return "$bp_var = ($struct_sym*)XSBind_sv_to_lucy_obj($xs_var, "
-        . "$vtable, $third_arg);";
 }
 
 sub _void_star_to_lucy {
@@ -120,12 +119,12 @@ sub _void_star_to_lucy {
 }
 
 sub from_perl {
-    my ( $type, $bp_var, $xs_var, $stack_var ) = @_;
+    my ( $type, $bp_var, $xs_var ) = @_;
     confess("Not a Clownfish::Type")
         unless blessed($type) && $type->isa('Clownfish::Type');
 
     if ( $type->is_object ) {
-        return _sv_to_bp_obj( $type, $bp_var, $xs_var, $stack_var );
+        return _sv_to_bp_obj( $type, $bp_var, $xs_var );
     }
     elsif ( $type->is_primitive ) {
         if ( my $sub = $primitives_from_perl{ $type->to_c } ) {
@@ -216,7 +215,7 @@ chy_u16_t\tCHY_UNSIGNED_INT
 chy_u32_t\tCHY_UNSIGNED_INT
 chy_u64_t\tCHY_BIG_UNSIGNED_INT
 
-lucy_ZombieCharBuf\tZOMBIECHARBUF_NOT_POINTER
+const lucy_CharBuf*\tCONST_CHARBUF
 END_STUFF
 
     return $content;
@@ -251,8 +250,8 @@ CHY_BIG_SIGNED_INT
 CHY_BIG_UNSIGNED_INT 
     $big_unsigned_convert
 
-ZOMBIECHARBUF_NOT_POINTER
-    \$var = lucy_ZCB_make_str(SvPVutf8_nolen(\$arg), SvCUR(\$arg));
+CONST_CHARBUF
+    \$var = (const lucy_CharBuf*)LUCY_ZCB_WRAP_STR(SvPVutf8_nolen(\$arg), SvCUR(\$arg));
 
 END_STUFF
 }
@@ -310,7 +309,7 @@ types using the XS "typemap" format documented in C<perlxs>.
 
 =head2 from_perl
 
-    my $c_code = from_perl( $type, $bp_var, $xs_var, $stack_var );
+    my $c_code = from_perl( $type, $bp_var, $xs_var );
 
 Return C code which converts from a Perl scalar to a variable of type $type.
 
@@ -326,14 +325,6 @@ mapping code.
 
 =item * B<xs_var> - The C name of the Perl scalar from which we are extracting
 a value.
-
-=item * B<stack_var> - Only required needed when C<type> is
-Clownfish::Object indicating that C<bp_var> is an either an Obj or a
-CharBuf.  When passing strings or other simple types to Clownfish functions
-from Perl, we allow the user to supply simple scalars rather than forcing them
-to create Clownfish objects.  We do this by creating a ZombieCharBuf on the
-stack and assigning the string from the Perl scalar to it.  C<stack_var> is
-the name of that ZombieCharBuf wrapper.  
 
 =back
 

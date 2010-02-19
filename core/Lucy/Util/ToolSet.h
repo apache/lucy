@@ -15,8 +15,6 @@ extern "C" {
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
-#define C_LUCY_ZOMBIECHARBUF
-
 #include "charmony.h"
 #include <limits.h>
 #include <stddef.h>

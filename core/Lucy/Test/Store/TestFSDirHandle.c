@@ -1,4 +1,3 @@
-#define C_LUCY_CHARBUF
 #include "Lucy/Util/ToolSet.h"
 
 /* rmdir */
@@ -17,41 +16,37 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/OutStream.h"
 
-static CharBuf foo           = ZCB_LITERAL("foo");
-static CharBuf boffo         = ZCB_LITERAL("boffo");
-static CharBuf foo_boffo     = ZCB_LITERAL("foo/boffo");
-static CharBuf test_dir      = ZCB_LITERAL("_fsdir_test");
-
 static void
 test_all(TestBatch *batch)
 {
-    FSFolder     *folder = FSFolder_new(&test_dir);
-    OutStream    *outstream;
-    FSDirHandle  *dh;
-    CharBuf      *entry;
-    bool_t        saw_foo       = false;
-    bool_t        saw_boffo     = false;
-    bool_t        foo_was_dir   = false;
-    bool_t        boffo_was_dir = false; 
-    int           count         = 0;
+    CharBuf  *foo           = (CharBuf*)ZCB_WRAP_STR("foo", 3);
+    CharBuf  *boffo         = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
+    CharBuf  *foo_boffo     = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
+    CharBuf  *test_dir      = (CharBuf*)ZCB_WRAP_STR("_fsdir_test", 11);
+    FSFolder *folder        = FSFolder_new(test_dir);
+    bool_t    saw_foo       = false;
+    bool_t    saw_boffo     = false;
+    bool_t    foo_was_dir   = false;
+    bool_t    boffo_was_dir = false; 
+    int       count         = 0;
 
     rmdir("_fsdir_test");
     FSFolder_Initialize(folder);
-    FSFolder_MkDir(folder, &foo);
-    outstream = FSFolder_Open_Out(folder, &boffo);
+    FSFolder_MkDir(folder, foo);
+    OutStream *outstream = FSFolder_Open_Out(folder, boffo);
     DECREF(outstream);
-    outstream = FSFolder_Open_Out(folder, &foo_boffo);
+    outstream = FSFolder_Open_Out(folder, foo_boffo);
     DECREF(outstream);
 
-    dh = FSDH_open(&test_dir);
-    entry = FSDH_Get_Entry(dh);
+    FSDirHandle  *dh    = FSDH_open(test_dir);
+    CharBuf      *entry = FSDH_Get_Entry(dh);
     while (FSDH_Next(dh)) {
         count++;
-        if (CB_Equals(entry, (Obj*)&foo)) { 
+        if (CB_Equals(entry, (Obj*)foo)) { 
             saw_foo = true;
             foo_was_dir = FSDH_Entry_Is_Dir(dh);
         }
-        else if (CB_Equals(entry, (Obj*)&boffo)) {
+        else if (CB_Equals(entry, (Obj*)boffo)) {
             saw_boffo = true;
             boffo_was_dir = FSDH_Entry_Is_Dir(dh);
         }
@@ -65,9 +60,9 @@ test_all(TestBatch *batch)
         "File correctly identified by Entry_Is_Dir");
 
     DECREF(dh);
-    FSFolder_Delete(folder, &foo_boffo);
-    FSFolder_Delete(folder, &foo);
-    FSFolder_Delete(folder, &boffo);
+    FSFolder_Delete(folder, foo_boffo);
+    FSFolder_Delete(folder, foo);
+    FSFolder_Delete(folder, boffo);
     DECREF(folder);
     rmdir("_fsdir_test");
 }

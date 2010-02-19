@@ -12,9 +12,9 @@ MODULE = Lucy   PACKAGE = Lucy::Util::IndexFileNames
 
 chy_u64_t
 extract_gen(name)
-    lucy_ZombieCharBuf name;
+    const lucy_CharBuf *name;
 CODE:
-    RETVAL = lucy_IxFileNames_extract_gen((lucy_CharBuf*)&name);
+    RETVAL = lucy_IxFileNames_extract_gen(name);
 OUTPUT: RETVAL
 
 SV*

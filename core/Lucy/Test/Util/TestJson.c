@@ -1,4 +1,3 @@
-#define C_LUCY_CHARBUF
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
@@ -6,10 +5,6 @@
 #include "Lucy/Util/Json.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/RAMFolder.h"
-
-static CharBuf foo           = ZCB_LITERAL("foo");
-static CharBuf bar           = ZCB_LITERAL("bar");
-static CharBuf boffo         = ZCB_LITERAL("boffo");
 
 /* Create a test data structure including at least one each of Hash, VArray,
  * and CharBuf. */
@@ -40,40 +35,41 @@ test_spew_and_slurp(TestBatch *batch)
 {
     Obj *dump = S_make_dump();
     Folder *folder = (Folder*)RAMFolder_new(NULL);
-    bool_t result;
-    Obj *got;
 
-    result = Json_spew_json(dump, folder, &foo);
+    CharBuf *foo = (CharBuf*)ZCB_WRAP_STR("foo", 3);
+    bool_t result = Json_spew_json(dump, folder, foo);
     ASSERT_TRUE(batch, result, "spew_json returns true on success");
-    ASSERT_TRUE(batch, Folder_Exists(folder, (CharBuf*)&foo), 
+    ASSERT_TRUE(batch, Folder_Exists(folder, foo), 
         "spew_json wrote file");
 
-    got = Json_slurp_json(folder, &foo);
+    Obj *got = Json_slurp_json(folder, foo);
     ASSERT_TRUE(batch, got && Obj_Equals(dump, got), 
         "Round trip through spew_json and slurp_json");
     DECREF(got);
 
     Err_set_error(NULL);
-    result = Json_spew_json(dump, folder, &foo);
+    result = Json_spew_json(dump, folder, foo);
     ASSERT_FALSE(batch, result, "Can't spew_json when file exists");
     ASSERT_TRUE(batch, Err_get_error() != NULL, 
         "Failed spew_json sets Err_error");
     
     Err_set_error(NULL);
-    got = Json_slurp_json(folder, &bar);
+    CharBuf *bar = (CharBuf*)ZCB_WRAP_STR("bar", 3);
+    got = Json_slurp_json(folder, bar);
     ASSERT_TRUE(batch, got == NULL, 
         "slurp_json returns NULL when file doesn't exist");
     ASSERT_TRUE(batch, Err_get_error() != NULL, 
         "Failed slurp_json sets Err_error");
 
+    CharBuf *boffo = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
     {
-        FileHandle *fh = Folder_Open_FileHandle(folder, &boffo,
+        FileHandle *fh = Folder_Open_FileHandle(folder, boffo,
             FH_CREATE | FH_WRITE_ONLY );
         FH_Write(fh, "garbage", 7);
         DECREF(fh);
     }
     Err_set_error(NULL);
-    got = Json_slurp_json(folder, &boffo);
+    got = Json_slurp_json(folder, boffo);
     ASSERT_TRUE(batch, got == NULL, 
         "slurp_json returns NULL when file doesn't contain valid JSON");
     ASSERT_TRUE(batch, Err_get_error() != NULL, 

@@ -262,10 +262,8 @@ RAMFolder_rename(RAMFolder *self, const CharBuf* from, const CharBuf *to)
 {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
-    ZombieCharBuf  from_zbc    = ZCB_BLANK;
-    ZombieCharBuf  to_zbc      = ZCB_BLANK;
-    ZombieCharBuf *from_name   = IxFileNames_local_part(from, &from_zbc);
-    ZombieCharBuf *to_name     = IxFileNames_local_part(to, &to_zbc);
+    ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
+    ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
     bool_t         result      = S_rename_or_hard_link(self, from, to, 
         from_folder, to_folder, from_name, to_name, OP_RENAME);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
@@ -277,10 +275,8 @@ RAMFolder_hard_link(RAMFolder *self, const CharBuf *from, const CharBuf *to)
 {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
-    ZombieCharBuf  from_zbc    = ZCB_BLANK;
-    ZombieCharBuf  to_zbc      = ZCB_BLANK;
-    ZombieCharBuf *from_name   = IxFileNames_local_part(from, &from_zbc);
-    ZombieCharBuf *to_name     = IxFileNames_local_part(to, &to_zbc);
+    ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
+    ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
     bool_t         result      = S_rename_or_hard_link(self, from, to, 
         from_folder, to_folder, from_name, to_name, OP_HARD_LINK);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }

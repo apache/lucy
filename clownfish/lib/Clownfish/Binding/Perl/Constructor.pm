@@ -60,7 +60,6 @@ sub xsub_def {
         my $val        = $arg_inits->[$i];
         my $name       = $var->micro_sym;
         my $sv_name    = $name . "_sv";
-        my $stack_name = $name . "_zcb";
         my $type       = $var->get_type;
         my $len        = length $name;
 
@@ -68,7 +67,7 @@ sub xsub_def {
         $allot_params .= qq|            &$sv_name, "$name", $len,\n|;
 
         # Create code for determining and validating value.
-        my $statement = from_perl( $type, $name, $sv_name, $stack_name );
+        my $statement = from_perl( $type, $name, $sv_name );
         if ( defined $val ) {
             my $assignment = qq|if ($sv_name && XSBind_sv_defined($sv_name)) {
             $statement

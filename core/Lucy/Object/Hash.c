@@ -1,5 +1,4 @@
 #define C_LUCY_HASH
-#define C_LUCY_ZOMBIECHARBUF
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
@@ -292,9 +291,9 @@ Hash_store(Hash *self, Obj *key, Obj *value)
 void
 Hash_store_str(Hash *self, const char *key, size_t key_len, Obj *value)
 {
-    ZombieCharBuf key_buf = ZCB_make_str((char*)key, key_len);
-    lucy_Hash_do_store(self, (Obj*)&key_buf, value, 
-        ZCB_Hash_Code(&key_buf), false);
+    ZombieCharBuf *key_buf = ZCB_WRAP_STR((char*)key, key_len);
+    lucy_Hash_do_store(self, (Obj*)key_buf, value, 
+        ZCB_Hash_Code(key_buf), false);
 }
 
 Obj*
@@ -308,8 +307,8 @@ Hash_make_key(Hash *self, Obj *key, i32_t hash_code)
 Obj*
 Hash_fetch_str(Hash *self, const char *key, size_t key_len) 
 {
-    ZombieCharBuf key_buf = ZCB_make_str(key, key_len);
-    return Hash_fetch(self, (Obj*)&key_buf);
+    ZombieCharBuf *key_buf = ZCB_WRAP_STR(key, key_len);
+    return Hash_fetch(self, (Obj*)key_buf);
 }
 
 static INLINE HashEntry*
@@ -364,8 +363,8 @@ Hash_delete(Hash *self, const Obj *key)
 Obj*
 Hash_delete_str(Hash *self, const char *key, size_t key_len) 
 {
-    ZombieCharBuf key_buf = ZCB_make_str(key, key_len);
-    return Hash_delete(self, (Obj*)&key_buf);
+    ZombieCharBuf *key_buf = ZCB_WRAP_STR(key, key_len);
+    return Hash_delete(self, (Obj*)key_buf);
 }
 
 u32_t

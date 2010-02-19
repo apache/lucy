@@ -1,5 +1,4 @@
 #define C_LUCY_OBJ
-#define C_LUCY_ZOMBIECHARBUF
 #include "XSBind.h"
 #include "Lucy/Util/StringHelper.h"
 
@@ -45,8 +44,8 @@ XSBind_new_blank_obj(SV *either_sv)
         /* Use the supplied class name string to find a VTable. */
         STRLEN len;
         char *ptr = SvPVutf8(either_sv, len);
-        lucy_ZombieCharBuf klass = lucy_ZCB_make_str(ptr, len);
-        vtable = lucy_VTable_singleton((lucy_CharBuf*)&klass, NULL);
+        lucy_ZombieCharBuf *klass = LUCY_ZCB_WRAP_STR(ptr, len);
+        vtable = lucy_VTable_singleton((lucy_CharBuf*)klass, NULL);
     }
 
     /* Use the VTable to allocate a new blank object of the right size. */
@@ -54,9 +53,9 @@ XSBind_new_blank_obj(SV *either_sv)
 }
 
 lucy_Obj*
-XSBind_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, lucy_ZombieCharBuf *zcb)
+XSBind_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, void *allocation)
 {
-    lucy_Obj *retval = XSBind_maybe_sv_to_lucy_obj(sv, vtable, zcb);
+    lucy_Obj *retval = XSBind_maybe_sv_to_lucy_obj(sv, vtable, allocation);
     if (!retval) {
         THROW(LUCY_ERR, "Not a %o", Lucy_VTable_Get_Name(vtable));
     }
@@ -64,8 +63,7 @@ XSBind_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, lucy_ZombieCharBuf *zcb)
 }
 
 lucy_Obj*
-XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, 
-                            lucy_ZombieCharBuf *zcb) 
+XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, void *allocation)
 {
     lucy_Obj *retval = NULL;
     if (XSBind_sv_defined(sv)) {
@@ -77,7 +75,7 @@ XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable,
             IV tmp = SvIV( SvRV(sv) );
             retval = INT2PTR(lucy_Obj*, tmp);
         }
-        else if (   zcb &&
+        else if (   allocation &&
                  (  vtable == LUCY_ZOMBIECHARBUF
                  || vtable == LUCY_VIEWCHARBUF
                  || vtable == LUCY_CHARBUF
@@ -87,8 +85,7 @@ XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable,
              * ZombieCharBuf. */
             STRLEN size;
             char *ptr = SvPVutf8(sv, size);
-            Lucy_ZCB_Assign_Str(zcb, ptr, size);
-            retval = (lucy_Obj*)zcb;
+            retval = (lucy_Obj*)lucy_ZCB_wrap_str(allocation, ptr, size);
         }
         else if (SvROK(sv)) {
             /* Attempt to convert Perl hashes and arrays into their Lucy

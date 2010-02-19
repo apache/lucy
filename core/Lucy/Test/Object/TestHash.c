@@ -67,9 +67,9 @@ test_Store_and_Fetch(TestBatch *batch)
     const u32_t    starting_cap = Hash_Get_Capacity(hash);
     VArray        *expected     = VA_new(100);
     VArray        *got          = VA_new(100);
-    ZombieCharBuf  twenty       = ZCB_make_str("20", 2);
-    ZombieCharBuf  forty        = ZCB_make_str("40", 2);
-    ZombieCharBuf  foo          = ZCB_make_str("foo", 3);
+    ZombieCharBuf *twenty       = ZCB_WRAP_STR("20", 2);
+    ZombieCharBuf *forty        = ZCB_WRAP_STR("40", 2);
+    ZombieCharBuf *foo          = ZCB_WRAP_STR("foo", 3);
     i32_t i;
 
     for (i = 0; i < 100; i++) {
@@ -94,31 +94,31 @@ test_Store_and_Fetch(TestBatch *batch)
     ASSERT_INT_EQ(batch, Hash_Get_Size(hash), 100, 
         "size incremented properly by Hash_Store");
 
-    ASSERT_TRUE(batch, Hash_Fetch(hash, (Obj*)&foo) == NULL, 
+    ASSERT_TRUE(batch, Hash_Fetch(hash, (Obj*)foo) == NULL, 
         "Fetch against non-existent key returns NULL");
 
-    Hash_Store(hash, (Obj*)&forty, INCREF(&foo));
-    ASSERT_TRUE(batch, ZCB_Equals(&foo, Hash_Fetch(hash, (Obj*)&forty)),
+    Hash_Store(hash, (Obj*)forty, INCREF(foo));
+    ASSERT_TRUE(batch, ZCB_Equals(foo, Hash_Fetch(hash, (Obj*)forty)),
         "Hash_Store replaces existing value");
     ASSERT_FALSE(batch, Hash_Equals(hash, (Obj*)dupe), 
         "replacement value spoils equals");
     ASSERT_INT_EQ(batch, Hash_Get_Size(hash), 100, 
         "size unaffected after value replaced");
 
-    ASSERT_TRUE(batch, Hash_Delete(hash, (Obj*)&forty) == (Obj*)&foo, 
+    ASSERT_TRUE(batch, Hash_Delete(hash, (Obj*)forty) == (Obj*)foo, 
         "Delete returns value");
-    DECREF(&foo);
+    DECREF(foo);
     ASSERT_INT_EQ(batch, Hash_Get_Size(hash), 99, 
         "size decremented by successful Delete");
-    ASSERT_TRUE(batch, Hash_Delete(hash, (Obj*)&forty) == NULL, 
+    ASSERT_TRUE(batch, Hash_Delete(hash, (Obj*)forty) == NULL, 
         "Delete returns NULL when key not found");
     ASSERT_INT_EQ(batch, Hash_Get_Size(hash), 99, 
         "size not decremented by unsuccessful Delete");
-    DECREF(Hash_Delete(dupe, (Obj*)&forty));
+    DECREF(Hash_Delete(dupe, (Obj*)forty));
     ASSERT_TRUE(batch, VA_Equals(got, (Obj*)expected), "Equals after Delete");
 
     Hash_Clear(hash);
-    ASSERT_TRUE(batch, Hash_Fetch(hash, (Obj*)&twenty) == NULL, "Clear");
+    ASSERT_TRUE(batch, Hash_Fetch(hash, (Obj*)twenty) == NULL, "Clear");
     ASSERT_TRUE(batch, Hash_Get_Size(hash) == 0, "size is 0 after Clear");
 
     DECREF(hash);
@@ -169,11 +169,11 @@ test_Keys_Values_Iter(TestBatch *batch)
     ASSERT_TRUE(batch, VA_Equals(values, (Obj*)expected), "Values from Iter");
 
     {
-        ZombieCharBuf forty = ZCB_make_str("40", 2);
-        ZombieCharBuf nope  = ZCB_make_str("nope", 4);
-        Obj *key = Hash_Find_Key(hash, (Obj*)&forty, ZCB_Hash_Code(&forty));
-        ASSERT_TRUE(batch, Obj_Equals(key, (Obj*)&forty), "Find_Key");
-        key = Hash_Find_Key(hash, (Obj*)&nope, ZCB_Hash_Code(&nope)),
+        ZombieCharBuf *forty = ZCB_WRAP_STR("40", 2);
+        ZombieCharBuf *nope  = ZCB_WRAP_STR("nope", 4);
+        Obj *key = Hash_Find_Key(hash, (Obj*)forty, ZCB_Hash_Code(forty));
+        ASSERT_TRUE(batch, Obj_Equals(key, (Obj*)forty), "Find_Key");
+        key = Hash_Find_Key(hash, (Obj*)nope, ZCB_Hash_Code(nope)),
         ASSERT_TRUE(batch, key == NULL, 
             "Find_Key returns NULL for non-existent key");
     }

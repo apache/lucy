@@ -53,8 +53,7 @@ Folder_open_in(Folder *self, const CharBuf *path)
     InStream *instream = NULL;
 
     if (enclosing_folder) {
-        ZombieCharBuf name_zcb = ZCB_BLANK;
-        ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
+        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
         instream = Folder_Local_Open_In(enclosing_folder, (CharBuf*)name);
         if (!instream) {
             ERR_ADD_FRAME(Err_get_error());
@@ -114,8 +113,7 @@ Folder_open_filehandle(Folder *self, const CharBuf *path, u32_t flags)
     FileHandle *fh = NULL;
 
     if (enclosing_folder) {
-        ZombieCharBuf name_zcb = ZCB_BLANK;
-        ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
+        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
         fh = Folder_Local_Open_FileHandle(enclosing_folder, 
             (CharBuf*)name, flags);
         if (!fh) {
@@ -134,8 +132,7 @@ Folder_delete(Folder *self, const CharBuf *path)
 {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     if (enclosing_folder) {
-        ZombieCharBuf name_zcb = ZCB_BLANK;
-        ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
+        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
         bool_t result = Folder_Local_Delete(enclosing_folder, (CharBuf*)name);
         return result;
     }
@@ -153,8 +150,7 @@ Folder_delete_tree(Folder *self, const CharBuf *path)
     if (!path || !CB_Get_Size(path)) { return false; }
 
     if (enclosing_folder) {
-        ZombieCharBuf entry_zcb = ZCB_BLANK;
-        ZombieCharBuf *local = IxFileNames_local_part(path, &entry_zcb);
+        ZombieCharBuf *local = IxFileNames_local_part(path, ZCB_BLANK());
         if (Folder_Local_Is_Directory(enclosing_folder, (CharBuf*)local)) {
             Folder *inner_folder 
                 = Folder_Local_Find_Folder(enclosing_folder, (CharBuf*)local);
@@ -273,8 +269,7 @@ Folder_mkdir(Folder *self, const CharBuf *path)
             "Can't recursively create dir %o", path)));
     }
     else {
-        ZombieCharBuf name_zcb = ZCB_BLANK;
-        ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
+        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
         result = Folder_Local_MkDir(enclosing_folder, (CharBuf*)name);
         if (!result) {
             ERR_ADD_FRAME(Err_get_error());
@@ -290,8 +285,7 @@ Folder_exists(Folder *self, const CharBuf *path)
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool_t retval = false;
     if (enclosing_folder) {
-        ZombieCharBuf name_zcb = ZCB_BLANK;
-        ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
+        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
         if (Folder_Local_Exists(enclosing_folder, (CharBuf*)name)) {
             retval = true;
         }
@@ -386,8 +380,7 @@ Folder_consolidate(Folder *self, const CharBuf *path)
         CFWriter_Consolidate(cf_writer);
         DECREF(cf_writer);
         if (CB_Get_Size(path)) {
-            ZombieCharBuf name_zcb = ZCB_BLANK;
-            ZombieCharBuf *name = IxFileNames_local_part(path, &name_zcb);
+            ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
             CompoundFileReader *cf_reader = CFReader_open(folder);
             if (!cf_reader) { RETHROW(INCREF(Err_get_error())); }
             Hash_Store(enclosing_folder->entries, (Obj*)name, 
@@ -399,8 +392,6 @@ Folder_consolidate(Folder *self, const CharBuf *path)
 static Folder*
 S_enclosing_folder(Folder *self, ZombieCharBuf *path) 
 {
-    ZombieCharBuf scratch;
-    ZombieCharBuf path_component;
     size_t path_component_len = 0;
     u32_t code_point;
 
@@ -408,11 +399,11 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path)
     if (ZCB_Code_Point_From(path, 0) == '/') { ZCB_Chop(path, 1); }
 
     /* Find first component of the file path. */
-    scratch        = ZCB_make((CharBuf*)path);
-    path_component = ZCB_make((CharBuf*)path);
-    while (0 != (code_point = ZCB_Nip_One(&scratch))) {
+    ZombieCharBuf *scratch        = ZCB_WRAP((CharBuf*)path);
+    ZombieCharBuf *path_component = ZCB_WRAP((CharBuf*)path);
+    while (0 != (code_point = ZCB_Nip_One(scratch))) {
         if (code_point == '/') { 
-            ZCB_Truncate(&path_component, path_component_len);
+            ZCB_Truncate(path_component, path_component_len);
             ZCB_Nip(path, path_component_len + 1);
             break; 
         }
@@ -420,11 +411,11 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path)
     }
 
     /** If we've eaten up the entire filepath, self is enclosing folder. */
-    if (ZCB_Get_Size(&scratch) == 0) { return self; }
+    if (ZCB_Get_Size(scratch) == 0) { return self; }
 
     {
         Folder *local_folder 
-            = Folder_Local_Find_Folder(self, (CharBuf*)&path_component);
+            = Folder_Local_Find_Folder(self, (CharBuf*)path_component);
         if (!local_folder) {
             /* This element of the filepath doesn't exist, or it's not a
              * directory.  However, there are filepath characters left over,
@@ -441,8 +432,8 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path)
 Folder*
 Folder_enclosing_folder(Folder *self, const CharBuf *path)
 {
-    ZombieCharBuf scratch = ZCB_make(path);
-    return S_enclosing_folder(self, &scratch);
+    ZombieCharBuf *scratch = ZCB_WRAP(path);
+    return S_enclosing_folder(self, scratch);
 }
 
 Folder*
@@ -452,14 +443,14 @@ Folder_find_folder(Folder *self, const CharBuf *path)
         return self;
     }
     else {
-        ZombieCharBuf scratch = ZCB_make(path);
-        Folder *enclosing_folder = S_enclosing_folder(self, &scratch);
+        ZombieCharBuf *scratch = ZCB_WRAP(path);
+        Folder *enclosing_folder = S_enclosing_folder(self, scratch);
         if (!enclosing_folder) {
             return NULL;
         }
         else {
             return Folder_Local_Find_Folder(enclosing_folder, 
-                (CharBuf*)&scratch);
+                (CharBuf*)scratch);
         }
     }
 }

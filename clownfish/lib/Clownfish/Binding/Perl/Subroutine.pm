@@ -86,19 +86,7 @@ sub params_hash_def {
 sub var_declarations {
     my $self     = shift;
     my $arg_vars = $self->{param_list}->get_variables;
-    my @var_declarations;
-    for my $i ( 0 .. $#$arg_vars ) {
-        my $arg_var = $arg_vars->[$i];
-        push @var_declarations, $arg_var->local_declaration;
-        next if $i == 0;    # no ZombieCharBuf for $self.
-        next
-            unless $arg_var->get_type->get_specifier
-                =~ /^lucy_(Obj|CharBuf)$/;
-        push @var_declarations,
-              'lucy_ZombieCharBuf '
-            . $arg_var->micro_sym
-            . '_zcb = LUCY_ZCB_BLANK;';
-    }
+    my @var_declarations = map { $_->local_declaration } @$arg_vars;
     if ( !$self->{retval_type}->is_void ) {
         my $return_type = $self->{retval_type}->to_c;
         push @var_declarations, "$return_type retval;";

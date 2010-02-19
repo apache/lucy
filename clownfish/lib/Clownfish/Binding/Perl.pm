@@ -159,7 +159,6 @@ sub write_bindings {
 sub _xs_file_contents {
     my ( $self, $generated_xs, $xs_init, $hand_rolled_xs ) = @_;
     return <<END_STUFF;
-#define C_LUCY_ZOMBIECHARBUF
 #include "xs/XSBind.h"
 #include "boil.h"
 #include "$self->{boot_h_file}"

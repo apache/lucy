@@ -16,38 +16,38 @@
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
-static CharBuf test_filename = ZCB_LITERAL("_fsfh_test_file");
-
 static void
 test_open(TestBatch *batch)
 {
-    FSFileHandle *fh;
 
-    remove((char*)CB_Get_Ptr8(&test_filename));
+    FSFileHandle *fh;
+    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+
+    remove((char*)CB_Get_Ptr8(test_filename));
 
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_READ_ONLY);
+    fh = FSFH_open(test_filename, FH_READ_ONLY);
     ASSERT_TRUE(batch, fh == NULL, 
         "open() with FH_READ_ONLY on non-existent file returns NULL");
     ASSERT_TRUE(batch, Err_get_error() != NULL,
         "open() with FH_READ_ONLY on non-existent file sets error");
 
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_WRITE_ONLY);
+    fh = FSFH_open(test_filename, FH_WRITE_ONLY);
     ASSERT_TRUE(batch, fh == NULL, 
         "open() without FH_CREATE returns NULL");
     ASSERT_TRUE(batch, Err_get_error() != NULL,
         "open() without FH_CREATE sets error");
 
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_CREATE);
+    fh = FSFH_open(test_filename, FH_CREATE);
     ASSERT_TRUE(batch, fh == NULL, 
         "open() without FH_WRITE_ONLY returns NULL");
     ASSERT_TRUE(batch, Err_get_error() != NULL,
         "open() without FH_WRITE_ONLY sets error");
 
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
+    fh = FSFH_open(test_filename, FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     ASSERT_TRUE(batch, fh && FSFH_Is_A(fh, FSFILEHANDLE), "open() succeeds");
     ASSERT_TRUE(batch, Err_get_error() == NULL, "open() no errors");
     FSFH_Write(fh, "foo", 3);
@@ -55,13 +55,13 @@ test_open(TestBatch *batch)
     DECREF(fh);
 
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
+    fh = FSFH_open(test_filename, FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     ASSERT_TRUE(batch, fh == NULL, "FH_EXCLUSIVE blocks open()");
     ASSERT_TRUE(batch, Err_get_error() != NULL,
         "FH_EXCLUSIVE blocks open(), sets error");
 
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_CREATE | FH_WRITE_ONLY);
+    fh = FSFH_open(test_filename, FH_CREATE | FH_WRITE_ONLY);
     ASSERT_TRUE(batch, fh && FSFH_Is_A(fh, FSFILEHANDLE), 
         "open() for append");
     ASSERT_TRUE(batch, Err_get_error() == NULL, 
@@ -71,13 +71,13 @@ test_open(TestBatch *batch)
     DECREF(fh);
 
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_READ_ONLY);
+    fh = FSFH_open(test_filename, FH_READ_ONLY);
     ASSERT_TRUE(batch, fh && FSFH_Is_A(fh, FSFILEHANDLE), "open() read only");
     ASSERT_TRUE(batch, Err_get_error() == NULL, 
         "open() read only -- no errors");
     DECREF(fh);
     
-    remove((char*)CB_Get_Ptr8(&test_filename));
+    remove((char*)CB_Get_Ptr8(test_filename));
 }
 
 static void
@@ -88,9 +88,10 @@ test_Read_Write(TestBatch *batch)
     const char *bar = "bar";
     char buffer[12];
     char *buf = buffer;
+    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
 
-    remove((char*)CB_Get_Ptr8(&test_filename));
-    fh = FSFH_open(&test_filename, 
+    remove((char*)CB_Get_Ptr8(test_filename));
+    fh = FSFH_open(test_filename, 
         FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
 
     ASSERT_TRUE(batch, FSFH_Length(fh) == I64_C(0), "Length initially 0");
@@ -109,7 +110,7 @@ test_Read_Write(TestBatch *batch)
 
     /* Reopen for reading. */
     Err_set_error(NULL);
-    fh = FSFH_open(&test_filename, FH_READ_ONLY);
+    fh = FSFH_open(test_filename, FH_READ_ONLY);
 
     ASSERT_TRUE(batch, FSFH_Length(fh) == I64_C(6), "Length on Read");
     ASSERT_TRUE(batch, FSFH_Read(fh, buf, 0, 6), "Read returns success");
@@ -136,25 +137,26 @@ test_Read_Write(TestBatch *batch)
         "Writing to a read-only handle sets error");
 
     DECREF(fh);
-    remove((char*)CB_Get_Ptr8(&test_filename));
+    remove((char*)CB_Get_Ptr8(test_filename));
 }
 
 static void
 test_Close(TestBatch *batch)
 {
+    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
-    bool_t        result;
+    bool_t result;
 
-    remove((char*)CB_Get_Ptr8(&test_filename));
-    fh = FSFH_open(&test_filename, 
+    remove((char*)CB_Get_Ptr8(test_filename));
+    fh = FSFH_open(test_filename, 
         FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     ASSERT_TRUE(batch, FSFH_Close(fh), "Close returns true for write-only");
     DECREF(fh);
 
     /* Simulate an OS error when closing the file descriptor.  This
      * approximates what would happen if, say, we run out of disk space. */
-    remove((char*)CB_Get_Ptr8(&test_filename));
-    fh = FSFH_open(&test_filename, 
+    remove((char*)CB_Get_Ptr8(test_filename));
+    fh = FSFH_open(test_filename, 
         FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     close(fh->fd);
     fh->fd = -1;
@@ -165,22 +167,23 @@ test_Close(TestBatch *batch)
         "Failed Close() sets Err_error");
     DECREF(fh);
 
-    fh = FSFH_open(&test_filename, FH_READ_ONLY);
+    fh = FSFH_open(test_filename, FH_READ_ONLY);
     ASSERT_TRUE(batch, FSFH_Close(fh), "Close returns true for read-only");
 
     DECREF(fh);
-    remove((char*)CB_Get_Ptr8(&test_filename));
+    remove((char*)CB_Get_Ptr8(test_filename));
 }
 
 static void
 test_Window(TestBatch *batch)
 {
+    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
     FileWindow *window = FileWindow_new();
     u32_t i;
 
-    remove((char*)CB_Get_Ptr8(&test_filename));
-    fh = FSFH_open(&test_filename, 
+    remove((char*)CB_Get_Ptr8(test_filename));
+    fh = FSFH_open(test_filename, 
         FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     for (i = 0; i < 1024; i++) {
         FSFH_Write(fh, "foo ", 4);
@@ -189,7 +192,7 @@ test_Window(TestBatch *batch)
 
     /* Reopen for reading. */
     DECREF(fh);
-    fh = FSFH_open(&test_filename, FH_READ_ONLY);
+    fh = FSFH_open(test_filename, FH_READ_ONLY);
     if (!fh) { RETHROW(INCREF(Err_get_error())); }
 
     Err_set_error(NULL);
@@ -218,7 +221,7 @@ test_Window(TestBatch *batch)
 
     DECREF(window);
     DECREF(fh);
-    remove((char*)CB_Get_Ptr8(&test_filename));
+    remove((char*)CB_Get_Ptr8(test_filename));
 }
 
 void

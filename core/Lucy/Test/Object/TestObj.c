@@ -7,11 +7,11 @@
 static Obj*
 S_new_testobj()
 {
-    static ZombieCharBuf klass = ZCB_LITERAL("TestObj");
+    ZombieCharBuf *klass = ZCB_WRAP_STR("TestObj", 7);
     Obj *obj;
-    VTable *vtable = VTable_fetch_vtable((CharBuf*)&klass);
+    VTable *vtable = VTable_fetch_vtable((CharBuf*)klass);
     if (!vtable) {
-        vtable = VTable_singleton((CharBuf*)&klass, OBJ);
+        vtable = VTable_singleton((CharBuf*)klass, OBJ);
     }
     obj = VTable_Make_Obj(vtable);
     return Obj_init(obj);
@@ -39,12 +39,12 @@ test_To_String(TestBatch *batch)
 {
     Obj *testobj = S_new_testobj();
     CharBuf *string = Obj_To_String(testobj);
-    ZombieCharBuf temp = ZCB_make(string);
-    while(ZCB_Get_Size(&temp)) {
-        if (ZCB_Starts_With_Str(&temp, "TestObj", 7)) { break; }
-        ZCB_Nip_One(&temp);
+    ZombieCharBuf *temp = ZCB_WRAP(string);
+    while(ZCB_Get_Size(temp)) {
+        if (ZCB_Starts_With_Str(temp, "TestObj", 7)) { break; }
+        ZCB_Nip_One(temp);
     }
-    ASSERT_TRUE(batch, ZCB_Starts_With_Str(&temp, "TestObj", 7), "To_String");
+    ASSERT_TRUE(batch, ZCB_Starts_With_Str(temp, "TestObj", 7), "To_String");
     DECREF(string);
     DECREF(testobj);
 }

@@ -1,4 +1,3 @@
-#define C_LUCY_CHARBUF
 #include "Lucy/Util/ToolSet.h"
 
 /* mkdir, rmdir */
@@ -22,16 +21,12 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/OutStream.h"
 
-static CharBuf test_dir_name = ZCB_LITERAL("_fsfolder_test");
-static CharBuf foo           = ZCB_LITERAL("foo");
-static CharBuf bar           = ZCB_LITERAL("bar");
-static CharBuf foo_boffo     = ZCB_LITERAL("foo/boffo");
-
 static Folder*
 S_set_up()
 {
-    FSFolder *folder = FSFolder_new(&test_dir_name);
-    rmdir("_fsfolder_test");
+    rmdir("_fstest");
+    CharBuf  *test_dir = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    FSFolder *folder = FSFolder_new(test_dir);
     FSFolder_Initialize(folder);
     if (!FSFolder_Check(folder)) {
         RETHROW(INCREF(Err_get_error()));
@@ -43,17 +38,18 @@ static void
 S_tear_down()
 {
     struct stat stat_buf;
-    rmdir("_fsfolder_test");
-    if (stat("_fsfolder_test", &stat_buf) != -1) {
-        THROW(ERR, "Can't clean up directory _fsfolder_test");
+    rmdir("_fstest");
+    if (stat("_fstest", &stat_buf) != -1) {
+        THROW(ERR, "Can't clean up directory _fstest");
     }
 }
 
 static void
 test_Initialize_and_Check(TestBatch *batch)
 {
-    FSFolder *folder = FSFolder_new(&test_dir_name);
-    rmdir("_fsfolder_test");
+    rmdir("_fstest");
+    CharBuf  *test_dir = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    FSFolder *folder   = FSFolder_new(test_dir);
     ASSERT_FALSE(batch, FSFolder_Check(folder), 
         "Check() returns false when folder dir doesn't exist");
     FSFolder_Initialize(folder);
@@ -68,29 +64,32 @@ static void
 test_protect_symlinks(TestBatch *batch) 
 {
 #ifdef CHY_HAS_UNISTD_H
-    FSFolder *folder = (FSFolder*)S_set_up();
+    FSFolder *folder    = (FSFolder*)S_set_up();
+    CharBuf  *foo       = (CharBuf*)ZCB_WRAP_STR("foo", 3);
+    CharBuf  *bar       = (CharBuf*)ZCB_WRAP_STR("bar", 3);
+    CharBuf  *foo_boffo = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
     
-    FSFolder_MkDir(folder, &foo);
-    FSFolder_MkDir(folder, &bar);
-    OutStream *outstream = FSFolder_Open_Out(folder, &foo_boffo);
+    FSFolder_MkDir(folder, foo);
+    FSFolder_MkDir(folder, bar);
+    OutStream *outstream = FSFolder_Open_Out(folder, foo_boffo);
     DECREF(outstream);
 
-    if (symlink("_fsfolder_test/foo/boffo", "_fsfolder_test/bar/banana")) {
+    if (symlink("_fstest/foo/boffo", "_fstest/bar/banana")) {
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
     }
     else {
-        ASSERT_TRUE(batch, FSFolder_Delete_Tree(folder, &bar), 
+        ASSERT_TRUE(batch, FSFolder_Delete_Tree(folder, bar), 
             "Delete_Tree() returns true"), 
-        ASSERT_FALSE(batch, FSFolder_Exists(folder, &bar), 
+        ASSERT_FALSE(batch, FSFolder_Exists(folder, bar), 
             "Tree is really gone");
-        ASSERT_TRUE(batch, FSFolder_Exists(folder, &foo),
+        ASSERT_TRUE(batch, FSFolder_Exists(folder, foo),
             "Original folder sill there");
-        ASSERT_TRUE(batch, FSFolder_Exists(folder, &foo_boffo),
+        ASSERT_TRUE(batch, FSFolder_Exists(folder, foo_boffo),
             "Delete_Tree() did not follow directory symlink");
-        FSFolder_Delete_Tree(folder, &foo);
+        FSFolder_Delete_Tree(folder, foo);
     }
     DECREF(folder);
     S_tear_down();

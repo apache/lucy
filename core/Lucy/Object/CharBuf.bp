@@ -330,6 +330,31 @@ class Lucy::Object::ViewCharBuf cnick ViewCB
 class Lucy::Object::ZombieCharBuf cnick ZCB
     extends Lucy::Object::ViewCharBuf {
 
+    /** Return a ZombieCharBuf with a blank string.
+     */
+    inert incremented ZombieCharBuf*
+    new(void *allocation);
+
+    /** 
+     * @param allocation A single block of memory which will be used for both
+     * the ZombieCharBuf object and its buffer.
+     * @param alloc_size The size of the allocation.
+     * @param pattern A format pattern.
+     */
+    inert incremented ZombieCharBuf*
+    newf(void *allocation, size_t alloc_size, const char *pattern, ...);
+
+    inert incremented ZombieCharBuf*
+    wrap(void *allocation, const CharBuf *source);
+
+    inert incremented ZombieCharBuf*
+    wrap_str(void *allocation, const char *ptr, size_t size);
+
+    /** Return the size for a ZombieCharBuf struct. 
+     */
+    inert size_t
+    size();
+
     /** Throws an error.
      */
     public void
@@ -338,29 +363,25 @@ class Lucy::Object::ZombieCharBuf cnick ZCB
 
 __C__
 
-#define LUCY_ZCB_BLANK \
-    { LUCY_ZOMBIECHARBUF, {1}, "", 0, 0 }
+#define LUCY_ZCB_BLANK() lucy_ZCB_new(alloca(lucy_ZCB_size()))
+
 #define LUCY_ZCB_LITERAL(string) \
     { LUCY_ZOMBIECHARBUF, {1}, string "", sizeof(string) -1, sizeof(string) }
 
+#define LUCY_ZCB_WRAP(source) \
+    lucy_ZCB_wrap(alloca(lucy_ZCB_size()), source)
+    
+#define LUCY_ZCB_WRAP_STR(ptr, size) \
+    lucy_ZCB_wrap_str(alloca(lucy_ZCB_size()), ptr, size)
+
 extern lucy_ZombieCharBuf LUCY_ZCB_EMPTY;
-
-#ifdef C_LUCY_ZOMBIECHARBUF
-/* Simple functions which allows assignment idiom for ZombieCharBuf values. 
- */
-lucy_ZombieCharBuf
-lucy_ZCB_make_str(const char *ptr, size_t size);
-
-lucy_ZombieCharBuf
-lucy_ZCB_make(const lucy_CharBuf *source);
-#endif /* C_LUCY_ZOMBIECHARBUF */
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define ZCB_BLANK             LUCY_ZCB_BLANK
   #define ZCB_LITERAL(_string)  LUCY_ZCB_LITERAL(_string)
   #define EMPTY                 LUCY_ZCB_EMPTY
-  #define ZCB_make              lucy_ZCB_make
-  #define ZCB_make_str          lucy_ZCB_make_str
+  #define ZCB_WRAP              LUCY_ZCB_WRAP
+  #define ZCB_WRAP_STR          LUCY_ZCB_WRAP_STR
 #endif
 __END_C__
 

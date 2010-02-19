@@ -13,10 +13,10 @@ MODULE = Lucy     PACKAGE = Lucy::Object::Obj
 chy_bool_t
 is_a(self, class_name)
     lucy_Obj *self;
-    lucy_ZombieCharBuf class_name;
+    const lucy_CharBuf *class_name;
 CODE:
 {
-    lucy_VTable *target = lucy_VTable_fetch_vtable((lucy_CharBuf*)&class_name);
+    lucy_VTable *target = lucy_VTable_fetch_vtable(class_name);
     RETVAL = Lucy_Obj_Is_A(self, target);
 }
 OUTPUT: RETVAL
@@ -67,10 +67,10 @@ STORABLE_thaw(blank_obj, cloning, serialized_sv)
 PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
-    lucy_ZombieCharBuf klass 
-        = lucy_ZCB_make_str(class_name, strlen(class_name));
+    lucy_ZombieCharBuf *klass 
+        = LUCY_ZCB_WRAP_STR(class_name, strlen(class_name));
     lucy_VTable *vtable = (lucy_VTable*)lucy_VTable_singleton(
-        (lucy_CharBuf*)&klass, NULL);
+        (lucy_CharBuf*)klass, NULL);
     STRLEN len;
     char *ptr = SvPV(serialized_sv, len);
     lucy_ViewByteBuf *contents = lucy_ViewBB_new(ptr, len);
@@ -89,7 +89,7 @@ PPCODE:
 
     /* Catch bad deserialize() override. */
     if (deserialized != self) {
-        THROW(LUCY_ERR, "Error when deserializing obj of class %o", &klass);
+        THROW(LUCY_ERR, "Error when deserializing obj of class %o", klass);
     }
 }
 

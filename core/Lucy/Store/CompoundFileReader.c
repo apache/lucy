@@ -10,9 +10,6 @@
 #include "Lucy/Util/Json.h"
 #include "Lucy/Util/StringHelper.h"
 
-static ZombieCharBuf cf_file     = ZCB_LITERAL("cf.dat");
-static ZombieCharBuf cfmeta_file = ZCB_LITERAL("cfmeta.json");
-
 CompoundFileReader*
 CFReader_open(Folder *folder)
 {
@@ -24,15 +21,15 @@ CFReader_open(Folder *folder)
 CompoundFileReader*
 CFReader_do_open(CompoundFileReader *self, Folder *folder)
 {
-    Hash *metadata = (Hash*)Json_slurp_json((Folder*)folder, 
-        (CharBuf*)&cfmeta_file);
+    CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+    Hash *metadata = (Hash*)Json_slurp_json((Folder*)folder, cfmeta_file);
     Err *error = NULL;
 
     Folder_init((Folder*)self, Folder_Get_Path(folder));
 
     /* Parse metadata file. */
     if (!metadata || !Hash_Is_A(metadata, HASH)) {
-        error = Err_new(CB_newf("Can't read '%o' in '%o'", &cfmeta_file,
+        error = Err_new(CB_newf("Can't read '%o' in '%o'", cfmeta_file,
             Folder_Get_Path(folder)));
     }
     else {
@@ -42,7 +39,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
         if (self->format < 1) { 
             error = Err_new(CB_newf(
                 "Corrupt %o file: Missing or invalid 'format'", 
-                &cfmeta_file)); 
+                cfmeta_file)); 
         }
         else if (self->format > CFWriter_current_file_format) {
             error = Err_new(CB_newf("Unsupported compound file format: %i32 "
@@ -51,7 +48,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
         }
         else if (!self->records) {
             error = Err_new(CB_newf("Corrupt %o file: missing 'files' key",
-                &cfmeta_file));
+                cfmeta_file));
         }
     }
     DECREF(metadata);
@@ -62,7 +59,8 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
     }
 
     /* Open an instream which we'll clone over and over. */
-    self->instream = Folder_Open_In(folder, (CharBuf*)&cf_file);
+    CharBuf *cf_file = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+    self->instream = Folder_Open_In(folder, cf_file);
     if(!self->instream) {
         ERR_ADD_FRAME(Err_get_error());
         DECREF(self);
@@ -75,18 +73,18 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
     /* Strip directory name from filepaths for old format. */
     if (self->format == 1) {
         VArray *files = Hash_Keys(self->records);
-        ZombieCharBuf filename = ZCB_BLANK;
-        ZombieCharBuf folder_name = ZCB_BLANK;
-        IxFileNames_local_part(Folder_Get_Path(folder), &folder_name);
-        size_t folder_name_len = ZCB_Length(&folder_name);
+        ZombieCharBuf *filename = ZCB_BLANK();
+        ZombieCharBuf *folder_name
+            = IxFileNames_local_part(Folder_Get_Path(folder), ZCB_BLANK());
+        size_t folder_name_len = ZCB_Length(folder_name);
 
         for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
             CharBuf *orig = (CharBuf*)VA_Fetch(files, i);
-            if (CB_Starts_With(orig, (CharBuf*)&folder_name)) {
+            if (CB_Starts_With(orig, (CharBuf*)folder_name)) {
                 Obj *record = Hash_Delete(self->records, (Obj*)orig);
-                ZCB_Assign(&filename, orig);
-                ZCB_Nip(&filename, folder_name_len + sizeof(DIR_SEP) - 1);
-                Hash_Store(self->records, (Obj*)&filename, (Obj*)record);
+                ZCB_Assign(filename, orig);
+                ZCB_Nip(filename, folder_name_len + sizeof(DIR_SEP) - 1);
+                Hash_Store(self->records, (Obj*)filename, (Obj*)record);
             }
         }
 
@@ -150,10 +148,12 @@ CFReader_local_delete(CompoundFileReader *self, const CharBuf *name)
         /* Once the number of virtual files falls to 0, remove the compound 
          * files. */
         if (Hash_Get_Size(self->records) == 0) {
-            if (!Folder_Delete(self->real_folder, (CharBuf*)&cf_file)) {
+            CharBuf *cf_file = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+            if (!Folder_Delete(self->real_folder, cf_file)) {
                 return false;
             }
-            if (!Folder_Delete(self->real_folder, (CharBuf*)&cfmeta_file)) {
+            CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+            if (!Folder_Delete(self->real_folder, cfmeta_file)) {
                 return false;
 
             }
@@ -183,10 +183,12 @@ CFReader_local_open_in(CompoundFileReader *self, const CharBuf *name)
             return NULL;
         }
         else if (CB_Get_Size(self->path)) {
-            CharBuf *fullpath = CB_newf("%o/%o", self->path, name);
-            InStream *instream = InStream_Reopen(self->instream, fullpath,
-                Obj_To_I64(offset), Obj_To_I64(len));
-            DECREF(fullpath);
+            size_t size = ZCB_size() + CB_Get_Size(self->path) 
+                + CB_Get_Size(name) + 10;
+            CharBuf *fullpath = (CharBuf*)ZCB_newf(alloca(size), size,
+                "%o/%o", self->path, name);
+            InStream *instream = InStream_Reopen(self->instream, 
+                fullpath, Obj_To_I64(offset), Obj_To_I64(len));
             return instream;
         }
         else {

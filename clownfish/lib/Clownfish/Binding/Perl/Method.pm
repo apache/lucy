@@ -125,7 +125,6 @@ sub _xsub_def_positional_args {
         my $var        = $arg_vars->[$i];
         my $val        = $arg_inits->[$i];
         my $var_name   = $var->micro_sym;
-        my $stack_name = $var_name . '_zcb';
         my $var_type   = $var->get_type;
         my $statement;
         if ( $i == 0 ) {    # $self
@@ -133,8 +132,7 @@ sub _xsub_def_positional_args {
                 = _self_assign_statement( $var_type, $method->micro_sym );
         }
         else {
-            $statement
-                = from_perl( $var_type, $var_name, "ST($i)", $stack_name );
+            $statement = from_perl( $var_type, $var_name, "ST($i)" );
         }
         if ( defined $val ) {
             $statement
@@ -206,7 +204,6 @@ sub _xsub_def_labeled_params {
         my $val        = $arg_inits->[$i];
         my $name       = $var->micro_sym;
         my $sv_name    = $name . "_sv";
-        my $stack_name = $name . "_zcb";
         my $type       = $var->get_type;
         my $len        = length $name;
 
@@ -214,7 +211,7 @@ sub _xsub_def_labeled_params {
         $allot_params .= qq|            &$sv_name, "$name", $len,\n|;
 
         # Code for determining and validating value.
-        my $statement = from_perl( $type, $name, $sv_name, $stack_name );
+        my $statement = from_perl( $type, $name, $sv_name );
         if ( defined $val ) {
             my $assignment
                 = qq|if ( $sv_name && XSBind_sv_defined($sv_name) ) {
