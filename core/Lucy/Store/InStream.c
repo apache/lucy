@@ -181,7 +181,9 @@ S_fill(InStream *self, i64_t amount)
                     : window_limit;
     }
     else {
-        RETHROW(INCREF(Err_get_error()));
+        Err *error = Err_get_error();
+        CB_catf(Err_Get_Mess(error), " (%o)", self->filename);
+        RETHROW(INCREF(error));
     }
 }
 
