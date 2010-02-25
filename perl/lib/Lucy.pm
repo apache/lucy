@@ -85,8 +85,7 @@ sub error {$Lucy::Object::Err::error}
         my ( $either, $message ) = @_;
         my ( undef, $file, $line ) = caller;
         $message .= ", $file line $line\n";
-        return $either->_new(
-            mess => Lucy::Object::CharBuf->new($message) );
+        return $either->_new( mess => Lucy::Object::CharBuf->new($message) );
     }
 
     sub do_throw {
@@ -128,7 +127,7 @@ sub error {$Lucy::Object::Err::error}
 {
     package Lucy::Object::VArray;
     no warnings 'redefine';
-    sub clone { CORE::shift->_clone }
+    sub clone       { CORE::shift->_clone }
     sub deserialize { CORE::shift->_deserialize(@_) }
 }
 
@@ -172,7 +171,7 @@ sub error {$Lucy::Object::Err::error}
 {
     package Lucy::Store::FSFolder;
     use File::Spec::Functions qw( rel2abs );
-    sub absolutify { return rel2abs( $_[1] ) } 
+    sub absolutify { return rel2abs( $_[1] ) }
 }
 
 {
@@ -193,8 +192,7 @@ sub error {$Lucy::Object::Err::error}
         my $result = eval { to_lucy( $json_encoder->decode($json) ) };
         if ( $@ or !$result ) {
             Lucy::Object::Err->set_error(
-                Lucy::Object::Err->new( $@ || "Failed to decode JSON" )
-            );
+                Lucy::Object::Err->new( $@ || "Failed to decode JSON" ) );
             return;
         }
         return $result;
@@ -204,8 +202,7 @@ sub error {$Lucy::Object::Err::error}
         my ( undef, %args ) = @_;
         my $json = eval { $json_encoder->encode( $args{'dump'} ) };
         if ( !defined $json ) {
-            Lucy::Object::Err->set_error(
-                Lucy::Object::Err->new($@) );
+            Lucy::Object::Err->set_error( Lucy::Object::Err->new($@) );
             return 0;
         }
         my $outstream = $args{folder}->open_out( $args{path} );

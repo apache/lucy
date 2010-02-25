@@ -47,7 +47,7 @@ sub xs_filepath { catfile( 'lib', "Lucy.xs" ) }
 sub autobind_pm_path { catfile( 'lib', 'Lucy', 'Autobinding.pm' ); }
 
 sub extra_ccflags {
-    my $self          = shift;
+    my $self = shift;
     my $extra_ccflags = defined $ENV{CFLAGS} ? "$ENV{CFLAGS} " : "";
     my $gcc_version 
         = $ENV{REAL_GCC_VERSION}
@@ -77,17 +77,17 @@ sub extra_ccflags {
     if ( $Config{cc} eq 'cl' ) {
         $extra_ccflags .= '/TP ';
     }
-    
+
     if ( defined $gcc_version ) {
         # Tell GCC explicitly to run with C99 compatability.
-        if ($extra_ccflags !~ m/-std=c99/) {
+        if ( $extra_ccflags !~ m/-std=c99/ ) {
             $extra_ccflags .= "-std=c99 ";
-        }  
-        if ($extra_ccflags !~ m/-D_GNU_SOURCE/) {
+        }
+        if ( $extra_ccflags !~ m/-D_GNU_SOURCE/ ) {
             $extra_ccflags .= "-D_GNU_SOURCE ";
-        } 
+        }
     }
-    
+
     return $extra_ccflags;
 }
 
@@ -234,12 +234,12 @@ sub _compile_clownfish {
     }
 
     my $binding = Clownfish::Binding::Perl->new(
-        parcel      => 'Lucy',
-        hierarchy   => $hierarchy,
-        lib_dir     => 'lib',
-        boot_class  => 'Lucy',
-        header      => $self->autogen_header,
-        footer      => $self->copyfoot,
+        parcel     => 'Lucy',
+        hierarchy  => $hierarchy,
+        lib_dir    => 'lib',
+        boot_class => 'Lucy',
+        header     => $self->autogen_header,
+        footer     => $self->copyfoot,
     );
 
     return ( $hierarchy, $binding, \@pm_filepaths_with_xs );
@@ -359,7 +359,7 @@ sub ACTION_suppressions {
     my $LOCAL_SUPP = 'local.supp';
     return
         if $self->up_to_date( '../devel/bin/valgrind_triggers.pl',
-                $LOCAL_SUPP );
+        $LOCAL_SUPP );
 
     # Generate suppressions.
     print "Writing $LOCAL_SUPP...\n";
@@ -501,7 +501,7 @@ sub ACTION_compile_custom_xs {
     }
 
     # .c => .o
-    my $version             = $self->dist_version;
+    my $version = $self->dist_version;
     my $perl_binding_o_file = catfile( 'lib', "Lucy$Config{_o}" );
     unshift @objects, $perl_binding_o_file;
     $self->add_to_cleanup($perl_binding_o_file);
