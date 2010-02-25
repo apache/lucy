@@ -684,12 +684,10 @@ sub _gen_pause_exclusion_list {
 
 __END__
 
-__POD__
-
-=head1 COPYRIGHT AND LICENCE
+__COPYRIGHT__
 
     /**
-     * Copyright 2006 The Apache Software Foundation
+     * Copyright 2006-2010 The Apache Software Foundation
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
@@ -703,6 +701,4 @@ __POD__
      * implied.  See the License for the specific language governing
      * permissions and limitations under the License.
      */
-
-=cut
 
