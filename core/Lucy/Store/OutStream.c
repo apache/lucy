@@ -81,6 +81,9 @@ OutStream_destroy(OutStream *self)
     SUPER_DESTROY(self, OUTSTREAM);
 }
 
+CharBuf*
+OutStream_get_path(OutStream *self) { return self->path; }
+
 void 
 OutStream_absorb(OutStream *self, InStream *instream) 
 {

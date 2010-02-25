@@ -26,6 +26,11 @@ class Lucy::Store::OutStream extends Lucy::Object::Obj {
      */
     inert nullable OutStream* 
     do_open(OutStream *self, Obj *file);
+    
+    /** Accessor for <code>path</code> member. 
+     */
+    CharBuf*
+    Get_Path(OutStream *self);
 
     /** Return the current file position. 
      */
