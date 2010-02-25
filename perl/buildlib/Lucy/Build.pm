@@ -107,38 +107,20 @@ my $base_dir = $is_distro_not_devel ? curdir() : updir();
 
 my $CHARMONIZE_EXE_PATH  = 'charmonize' . $Config{_exe};
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
-my $CHARMONIZER_GEN_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'gen' );
+my $CHARMONIZER_SRC_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
 my $CORE_SOURCE_DIR      = catdir( $base_dir, 'core' );
 my $AUTOGEN_DIR          = 'autogen';
 my $XS_SOURCE_DIR        = 'xs';
 
 sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
 
-# Collect all relevant Charmonizer files.
-sub ACTION_metaquote {
-    my $self          = shift;
-    my $charm_src_dir = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
-    my $orig_files    = $self->rscan_dir( $charm_src_dir, qr/\.[ch]$/ );
-    my $dest_files    = $self->rscan_dir( $CHARMONIZER_GEN_DIR, qr/\.[ch]$/ );
-    push @$dest_files, $CHARMONIZER_GEN_DIR;
-    if ( !$self->up_to_date( $orig_files, $dest_files ) ) {
-        mkpath $CHARMONIZER_GEN_DIR unless -d $CHARMONIZER_GEN_DIR;
-        $self->add_to_cleanup($CHARMONIZER_GEN_DIR);
-        my $metaquote = catfile( $CHARMONIZER_ORIG_DIR, qw( bin metaquote ) );
-        my $command = "$^X $metaquote --src=$charm_src_dir "
-            . "--out=$CHARMONIZER_GEN_DIR";
-        system($command);
-    }
-}
-
 # Build the charmonize executable.
 sub ACTION_charmonizer {
     my $self = shift;
-    $self->dispatch('metaquote');
 
     # Gather .c and .h Charmonizer files.
     my $charm_source_files
-        = $self->rscan_dir( $CHARMONIZER_GEN_DIR, qr/Charmonizer.+\.[ch]$/ );
+        = $self->rscan_dir( $CHARMONIZER_SRC_DIR, qr/Charmonizer.+\.[ch]$/ );
     my $charmonize_c = catfile( $CHARMONIZER_ORIG_DIR, 'charmonize.c' );
     my @all_source = ( $charmonize_c, @$charm_source_files );
 
@@ -161,7 +143,7 @@ sub ACTION_charmonizer {
 
         $cbuilder->compile(
             source               => $_,
-            include_dirs         => [$CHARMONIZER_GEN_DIR],
+            include_dirs         => [$CHARMONIZER_SRC_DIR],
             extra_compiler_flags => $self->extra_ccflags,
         );
     }
@@ -466,14 +448,14 @@ sub ACTION_compile_custom_xs {
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
         curdir(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
-        $CHARMONIZER_GEN_DIR,
+        $CHARMONIZER_SRC_DIR,
     );
     my @objects;
 
     # Compile C source files.
     my $c_files = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.c$/ );
     push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,       qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $CHARMONIZER_GEN_DIR, qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $CHARMONIZER_SRC_DIR, qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,         qr/\.c$/ ) };
     for my $c_file (@$c_files) {
         my $o_file = $c_file;
