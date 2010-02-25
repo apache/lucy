@@ -28,7 +28,7 @@ S_fill(InStream *self, i64_t amount);
 /* Refill the buffer, with either IO_STREAM_BUF_SIZE bytes or all remaining
  * file content -- whichever is smaller. Throw an error if we're at EOF and
  * can't load at least one byte. */
-static void
+static int64_t
 S_refill(InStream *self);
 
 InStream*
@@ -110,12 +110,21 @@ InStream*
 InStream_reopen(InStream *self, const CharBuf *filename, i64_t offset, 
                 i64_t len)
 {
+    if (!self->file_handle) { 
+        THROW(ERR, "Can't Reopen() closed InStream %o", self->filename);
+    }
+    if (offset + len > FH_Length(self->file_handle)) {
+        THROW(ERR, "Offset + length too large (%i64 + %i64 > %i64)", 
+            offset, len, FH_Length(self->file_handle));
+    }
+
     InStream *evil_twin = (InStream*)VTable_Make_Obj(self->vtable);
     InStream_do_open(evil_twin, (Obj*)self->file_handle);
     if (filename != NULL) { CB_Mimic(evil_twin->filename, (Obj*)filename); }
     evil_twin->offset = offset;
     evil_twin->len    = len;
     InStream_Seek(evil_twin, 0);
+
     return evil_twin;
 }
 
@@ -131,7 +140,7 @@ InStream_clone(InStream *self)
 CharBuf*
 InStream_get_filename(InStream *self) { return self->filename; }
 
-static void
+static int64_t 
 S_refill(InStream *self) 
 {
     /* Determine the amount to request. */
@@ -147,6 +156,8 @@ S_refill(InStream *self)
 
     /* Make the request. */
     S_fill(self, amount);
+
+    return amount;
 }
 
 void
@@ -201,13 +212,18 @@ InStream_seek(InStream *self, i64_t target)
     i64_t virtual_window_end = virtual_window_top + window->len;
 
     if (target < 0) {
-        THROW(ERR, "Can't Seek to negative target %i64", target);
+        THROW(ERR, "Can't Seek '%o' to negative target %i64", self->filename,
+            target);
     }
     /* Seek within window if possible. */
     else if (   target >= virtual_window_top
              && target <= virtual_window_end
     ) {
         self->buf = window->buf - window->offset + self->offset + target;
+    }
+    else if (target > self->len) {
+        THROW(ERR, "Can't Seek '%o' past EOF (%i64 > %i64)", self->filename, 
+            target, self->len);
     }
     else {
         /* Target is outside window.  Set all buffer and limit variables to
@@ -313,7 +329,14 @@ SI_read_bytes(InStream *self, char* buf, size_t len)
 
         if (len < IO_STREAM_BUF_SIZE) {
             /* Ensure that we have enough mapped, then copy the rest. */
-            S_refill(self);
+            int64_t got = S_refill(self);
+            if (got < len) {
+                int64_t orig_pos = SI_tell(self) - available;
+                int64_t orig_len = len + available;
+                THROW(ERR,  "Read past EOF of %o (pos: %i64 len: %i64 "
+                    "request: %i64)", self->filename, orig_pos,
+                    self->len, orig_len);
+            }
             memcpy(buf, self->buf, len);
             self->buf += len;
         }
