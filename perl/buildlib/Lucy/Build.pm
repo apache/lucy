@@ -612,6 +612,74 @@ sub copyfoot {
 END_COPYFOOT
 }
 
+sub ACTION_dist {
+    my $self = shift;
+
+    $self->dispatch('pod');
+
+    # We build our Perl release tarball from $REPOS_ROOT/perl, rather than
+    # from the top-level.
+    #
+    # Because some items we need are outside this directory, we need to copy a
+    # bunch of stuff.  After the tarball is packaged up, we delete the copied
+    # directories.
+    my @dirs_to_copy = qw( core charmonizer devel clownfish );
+    print "Copying files...\n";
+    for my $dir (@dirs_to_copy) {
+        confess("'$dir' already exists") if -e $dir;
+        system("cp -R ../$dir $dir");
+    }
+
+    $self->dispatch('manifest');
+    my $no_index = $self->_gen_pause_exclusion_list;
+    $self->meta_add( { no_index => $no_index } );
+    $self->SUPER::ACTION_dist;
+
+    # Clean up.
+    print "Removing copied files...\n";
+    rmtree($_) for @dirs_to_copy;
+    unlink($_) for qw( MANIFEST META.yml );
+}
+
+# Generate a list of files for PAUSE, search.cpan.org, etc to ignore.
+sub _gen_pause_exclusion_list {
+    my $self = shift;
+
+    # Only exclude files that are actually on-board.
+    open( my $man_fh, '<', 'MANIFEST' ) or die "Can't open MANIFEST: $!";
+    my @manifest_entries = <$man_fh>;
+    chomp @manifest_entries;
+
+    my @excluded_files;
+    for my $entry (@manifest_entries) {
+        # Allow README.
+        next if $entry =~ m#^README#;
+
+        # Allow public modules.
+        if ( $entry =~ m#^lib.+\.(pm|pod)$# ) {
+            open( my $fh, '<', $entry ) or die "Can't open '$entry': $!";
+            my $content = do { local $/; <$fh> };
+            next if $content =~ /=head1\s*NAME/;
+        }
+
+        # Disallow everything else.
+        push @excluded_files, $entry;
+    }
+
+    # Exclude redacted modules.
+    if ( eval { require "buildlib/Lucy/Redacted.pm" } ) {
+        my @redacted = map {
+            my @parts = split( /\W+/, $_ );
+            catfile( 'lib', @parts ) . '.pm'
+        } Lucy::Redacted->redacted, Lucy::Redacted->hidden;
+        push @excluded_files, @redacted;
+    }
+
+    my %uniquifier;
+    @excluded_files = sort grep { !$uniquifier{$_}++ } @excluded_files;
+    return { file => \@excluded_files };
+}
+
 1;
 
 __END__
