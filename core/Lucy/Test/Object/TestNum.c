@@ -169,6 +169,39 @@ test_Clone(TestBatch *batch)
 }
 
 static void
+test_Mimic(TestBatch *batch)
+{
+    Float32   *f32 = Float32_new(1.33f);
+    Float64   *f64 = Float64_new(1.33);
+    Integer32 *i32 = Int32_new(I32_MAX);
+    Integer64 *i64 = Int64_new(I64_MAX);
+    Float32   *f32_dupe = Float32_new(0.0f);
+    Float64   *f64_dupe = Float64_new(0.0);
+    Integer32 *i32_dupe = Int32_new(0);
+    Integer64 *i64_dupe = Int64_new(0);
+    Float32_Mimic(f32_dupe, (Obj*)f32);
+    Float64_Mimic(f64_dupe, (Obj*)f64);
+    Int32_Mimic(i32_dupe, (Obj*)i32);
+    Int64_Mimic(i64_dupe, (Obj*)i64);
+    ASSERT_TRUE(batch, Float32_Equals(f32, (Obj*)f32_dupe), 
+        "Float32 Mimic");
+    ASSERT_TRUE(batch, Float64_Equals(f64, (Obj*)f64_dupe),
+        "Float64 Mimic");
+    ASSERT_TRUE(batch, Int32_Equals(i32, (Obj*)i32_dupe), 
+        "Integer32 Mimic");
+    ASSERT_TRUE(batch, Int64_Equals(i64, (Obj*)i64_dupe),
+        "Integer64 Mimic");
+    DECREF(i64_dupe);
+    DECREF(i32_dupe);
+    DECREF(f64_dupe);
+    DECREF(f32_dupe);
+    DECREF(i64);
+    DECREF(i32);
+    DECREF(f64);
+    DECREF(f32);
+}
+
+static void
 test_serialization(TestBatch *batch)
 {
     Float32   *f32 = Float32_new(1.33f);
@@ -202,13 +235,14 @@ test_serialization(TestBatch *batch)
 void
 TestNum_run_tests()
 {
-    TestBatch *batch = TestBatch_new(38);
+    TestBatch *batch = TestBatch_new(42);
     TestBatch_Plan(batch);
 
     test_To_String(batch);
     test_accessors(batch);
     test_Equals_and_Compare_To(batch);
     test_Clone(batch);
+    test_Mimic(batch);
     test_serialization(batch);
     
     DECREF(batch);

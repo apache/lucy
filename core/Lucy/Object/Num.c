@@ -128,6 +128,13 @@ Float32_clone(Float32 *self)
 }
 
 void
+Float32_mimic(Float32 *self, Obj *other)
+{
+    Float32 *evil_twin = (Float32*)CERTIFY(other, FLOAT32);
+    self->value = evil_twin->value;
+}
+
+void
 Float32_serialize(Float32 *self, OutStream *outstream)
 {
     OutStream_Write_F32(outstream, self->value);
@@ -177,6 +184,13 @@ Float64*
 Float64_clone(Float64 *self)
 {
     return Float64_new(self->value);
+}
+
+void
+Float64_mimic(Float64 *self, Obj *other)
+{
+    Float64 *evil_twin = (Float64*)CERTIFY(other, FLOAT64);
+    self->value = evil_twin->value;
 }
 
 i32_t
@@ -238,6 +252,13 @@ Int32_clone(Integer32 *self)
     return Int32_new(self->value);
 }
 
+void
+Int32_mimic(Integer32 *self, Obj *other)
+{
+    Integer32 *evil_twin = (Integer32*)CERTIFY(other, INTEGER32);
+    self->value = evil_twin->value;
+}
+
 i32_t
 Int32_hash_code(Integer32 *self)
 {
@@ -294,6 +315,13 @@ Integer64*
 Int64_clone(Integer64 *self)
 {
     return Int64_new(self->value);
+}
+
+void
+Int64_mimic(Integer64 *self, Obj *other)
+{
+    Integer64 *evil_twin = (Integer64*)CERTIFY(other, INTEGER64);
+    self->value = evil_twin->value;
 }
 
 i32_t

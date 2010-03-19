@@ -76,6 +76,9 @@ class Lucy::Object::Float32 extends Lucy::Object::FloatNum {
 
     public incremented Float32*
     Clone(Float32 *self);
+
+    public void
+    Mimic(Float32 *self, Obj *other);
 }
 
 /** Double precision floating point number.
@@ -116,6 +119,9 @@ class Lucy::Object::Float64 extends Lucy::Object::FloatNum {
 
     public incremented Float64*
     Clone(Float64 *self);
+
+    public void
+    Mimic(Float64 *self, Obj *other);
 }
 
 /** 32-bit signed integer.
@@ -157,6 +163,9 @@ class Lucy::Object::Integer32 cnick Int32
 
     public incremented Integer32*
     Clone(Integer32 *self);
+
+    public void
+    Mimic(Integer32 *self, Obj *other);
 }
 
 /**
@@ -202,6 +211,9 @@ class Lucy::Object::Integer64 cnick Int64
 
     public incremented Integer64*
     Clone(Integer64 *self);
+
+    public void
+    Mimic(Integer64 *self, Obj *other);
 }
 
 /* Copyright 2009 The Apache Software Foundation
