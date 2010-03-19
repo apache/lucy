@@ -42,7 +42,7 @@ class Lucy::Store::OutStream extends Lucy::Object::Obj {
      *
      * @return the new file position.
      */
-    final i64_t
+    final int64_t
     Align(OutStream *self, int64_t modulus);
 
     /** Flush output buffer to target FileHandle.
