@@ -235,6 +235,19 @@ test_vcatf_cb(TestBatch *batch)
 }
 
 static void
+test_vcatf_obj(TestBatch *batch)
+{
+    CharBuf   *wanted = S_get_cb("ooga 20 booga");
+    Integer32 *i32 = Int32_new(20);
+    CharBuf   *got = S_get_cb("ooga");
+    CB_catf(got, " %o booga", i32);
+    ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%o Obj");
+    DECREF(i32);
+    DECREF(wanted);
+    DECREF(got);
+}
+
+static void
 test_vcatf_null_obj(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo bar [NULL] baz");
@@ -365,12 +378,13 @@ test_serialization(TestBatch *batch)
 void
 TestCB_run_tests()
 {
-    TestBatch *batch = TestBatch_new(48);
+    TestBatch *batch = TestBatch_new(49);
     TestBatch_Plan(batch);
 
     test_vcatf_s(batch);
     test_vcatf_null_string(batch);
     test_vcatf_cb(batch);
+    test_vcatf_obj(batch);
     test_vcatf_null_obj(batch);
     test_vcatf_i8(batch);
     test_vcatf_i32(batch);
