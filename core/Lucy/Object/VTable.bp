@@ -96,6 +96,9 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
 
     VTable*
     Get_Parent(VTable *self);
+
+    size_t
+    Get_Obj_Alloc_Size(VTable *self);
     
     public incremented VTable* 
     Clone(VTable *self);

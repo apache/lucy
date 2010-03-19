@@ -87,6 +87,8 @@ CharBuf*
 VTable_get_name(VTable *self)   { return self->name; }
 VTable*
 VTable_get_parent(VTable *self) { return self->parent; }
+size_t
+VTable_get_obj_alloc_size(VTable *self) { return self->obj_alloc_size; }
 
 void
 VTable_init_registry()
