@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 51;
+use Test::More tests => 53;
 use Clownfish::Class;
 use Clownfish::Parser;
 
@@ -164,6 +164,8 @@ $class_content = q|
         public Thing      *Fetch(Dog *self, Thing *thing);
         public final void  Bury(Dog *self, Bone *bone);
         public Owner      *mom;
+        public abstract incremented nullable Thing*
+        Scratch(Dog *self);
 
         i32_t[1]  flexible_array_at_end_of_struct;
     }
@@ -185,8 +187,16 @@ ok( ( scalar grep { $_->micro_sym eq 'destroy' } $class->methods ),
     "parsed parcel method" );
 ok( ( scalar grep { $_->micro_sym eq 'bury' } $class->methods ),
     "parsed public method" );
+ok( ( scalar grep { $_->micro_sym eq 'scratch' } $class->methods ),
+    "parsed public abstract nullable method" );
+for my $method ($class->methods) {
+    if ($method->micro_sym eq 'scratch') {
+        ok( $method->{return_type}->nullable, 
+            "public abstract incremented nullable flagged as nullable");
+    }
+}
 is( ( scalar grep { $_->public } $class->methods ),
-    5, "pass acl to Method constructor" );
+    6, "pass acl to Method constructor" );
 ok( $class->has_attribute('lovable'), "parsed class attribute" );
 ok( $class->has_attribute('drooly'),  "parsed second class attribute" );
 
