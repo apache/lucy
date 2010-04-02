@@ -14,7 +14,7 @@ test_oversize__growth_rate(TestBatch *batch)
     double   average_growth_rate = 0.0;
 
     while (size < SIZE_MAX) {
-        uint64_t next_size = Memory_oversize(size + 1, sizeof(void*));
+        uint64_t next_size = Memory_oversize((size_t)size + 1, sizeof(void*));
         if (next_size < size) {
             success = false;
             FAIL(batch, "Asked for %" I64P ", got smaller amount %" I64P,
