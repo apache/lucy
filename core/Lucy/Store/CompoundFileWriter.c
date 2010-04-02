@@ -8,7 +8,7 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
-i32_t CFWriter_current_file_format = 1;
+i32_t CFWriter_current_file_format = 2;
 
 /* Helper which does the heavy lifting for CFWriter_consolidate. */
 static void
@@ -93,17 +93,8 @@ S_do_consolidate(CompoundFileWriter *self)
     Hash_Store_Str(metadata, "format", 6, 
         (Obj*)CB_newf("%i32", CFWriter_current_file_format) );
 
-    /* Temporary hack!  Prepend the segment name for compatibility with
-     * earlier releases. */
     CharBuf *infilepath = CB_new(30);
-    bool_t base_len = 0;
-    ZombieCharBuf *seg_name 
-        = IxFileNames_local_part(Folder_Get_Path(folder), ZCB_BLANK());
-    if (ZCB_Starts_With_Str(seg_name, "seg_", 4)) {
-        CB_setf(infilepath, "%o/", seg_name);
-        base_len = CB_Get_Size(infilepath);
-    }
-
+    size_t base_len = 0;
     VA_Sort(files, NULL, NULL);
     for (i = 0, max = VA_Get_Size(files); i < max; i++) {
         CharBuf *infilename = (CharBuf*)VA_Fetch(files, i);
