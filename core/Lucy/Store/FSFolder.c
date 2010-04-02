@@ -230,6 +230,10 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name)
     else if (!S_is_local_entry(name)) {
         return NULL;
     }
+    else if (CB_Starts_With_Str(name, ".", 1)) {
+        // Don't allow access outside of the main dir.
+        return NULL;
+    }
     else if (NULL != (subfolder = (Folder*)Hash_Fetch(self->entries, (Obj*)name))) {
         if (Folder_Is_A(subfolder, FOLDER)) {
             return subfolder;
