@@ -168,12 +168,16 @@ Folder_delete_tree(Folder *self, const CharBuf *path)
                 for (uint32_t i = 0, max = VA_Get_Size(dirs); i < max; i++) {
                     CharBuf *name = (CharBuf*)VA_Fetch(files, i);
                     bool_t success = Folder_Delete_Tree(inner_folder, name);
-                    if (!success) { break; }
+                    if (!success && Folder_Local_Exists(inner_folder, name)) { 
+                        break; 
+                    }
                 }
                 for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
                     CharBuf *name = (CharBuf*)VA_Fetch(files, i);
                     bool_t success = Folder_Local_Delete(inner_folder, name);
-                    if (!success) { break; }
+                    if (!success && Folder_Local_Exists(inner_folder, name)) { 
+                        break; 
+                    }
                 }
                 DECREF(dirs);
                 DECREF(files);
