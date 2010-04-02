@@ -58,7 +58,7 @@ lucy_Memory_oversize(size_t minimum, size_t width)
     }
     size_t amount = minimum + extra;
 
-    /* Detect wraparound and return SIZE_MAX instead. */
+    // Detect wraparound and return SIZE_MAX instead. 
     if (amount + 7 < minimum) { 
         return SIZE_MAX;
     }

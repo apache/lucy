@@ -39,7 +39,7 @@ extern "C" {
 }
 #endif
 
-#endif /* H_LUCY_TOOLSET */
+#endif // H_LUCY_TOOLSET 
 
 /* Copyright 2009 The Apache Software Foundation
  *

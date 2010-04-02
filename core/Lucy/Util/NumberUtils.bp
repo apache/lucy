@@ -168,11 +168,11 @@ lucy_NumUtil_encode_bigend_u16(chy_u16_t num, void *dest_ptr)
     chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
 #ifdef CHY_BIG_END
     memcpy(dest, &num, sizeof(chy_u16_t));
-#else /* little endian */
+#else // little endian 
     chy_u8_t *source = (chy_u8_t*)&num;
     dest[0] = source[1];
     dest[1] = source[0];
-#endif /* CHY_BIG_END (and little endian) */
+#endif // CHY_BIG_END (and little endian) 
 }
 
 static CHY_INLINE void
@@ -181,13 +181,13 @@ lucy_NumUtil_encode_bigend_u32(chy_u32_t num, void *dest_ptr)
     chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
 #ifdef CHY_BIG_END
     memcpy(dest, &num, sizeof(chy_u32_t));
-#else /* little endian */
+#else // little endian 
     chy_u8_t *source = (chy_u8_t*)&num;
     dest[0] = source[3];
     dest[1] = source[2];
     dest[2] = source[1];
     dest[3] = source[0];
-#endif /* CHY_BIG_END (and little endian) */
+#endif // CHY_BIG_END (and little endian) 
 }
 
 static CHY_INLINE void
@@ -196,7 +196,7 @@ lucy_NumUtil_encode_bigend_u64(chy_u64_t num, void *dest_ptr)
     chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
 #ifdef CHY_BIG_END
     memcpy(dest, &num, sizeof(chy_u64_t));
-#else /* little endian */
+#else // little endian 
     chy_u8_t *source = (chy_u8_t*)&num;
     dest[0] = source[7];
     dest[1] = source[6];
@@ -206,7 +206,7 @@ lucy_NumUtil_encode_bigend_u64(chy_u64_t num, void *dest_ptr)
     dest[5] = source[2];
     dest[6] = source[1];
     dest[7] = source[0];
-#endif /* CHY_BIG_END (and little endian) */
+#endif // CHY_BIG_END (and little endian) 
 }
 
 static CHY_INLINE chy_u16_t
@@ -292,8 +292,8 @@ lucy_NumUtil_decode_bigend_f64(void *source)
     return duo.d;
 }
 
-#define LUCY_NUMUTIL_C32_MAX_BYTES  ((sizeof(chy_u32_t) * 8 / 7) + 1) /* 5 */
-#define LUCY_NUMUTIL_C64_MAX_BYTES ((sizeof(chy_u64_t) * 8 / 7) + 1)  /* 10 */
+#define LUCY_NUMUTIL_C32_MAX_BYTES  ((sizeof(chy_u32_t) * 8 / 7) + 1) // 5 
+#define LUCY_NUMUTIL_C64_MAX_BYTES ((sizeof(chy_u64_t) * 8 / 7) + 1)  // 10 
 
 static CHY_INLINE void
 lucy_NumUtil_encode_c32(chy_u32_t number, char **out_buf)
@@ -303,11 +303,11 @@ lucy_NumUtil_encode_c32(chy_u32_t number, char **out_buf)
     chy_u8_t  *const limit = buf + sizeof(buf);
     chy_u8_t  *ptr         = limit - 1;
     int        num_bytes;
-    /* Write last byte first, which has no continue bit. */
+    // Write last byte first, which has no continue bit. 
     *ptr = aU32 & 0x7f;
     aU32 >>= 7;
     while (aU32) {
-        /* Work backwards, writing bytes with continue bits set. */
+        // Work backwards, writing bytes with continue bits set. 
         *--ptr = ((aU32 & 0x7f) | 0x80);
         aU32 >>= 7;
     }
@@ -324,11 +324,11 @@ lucy_NumUtil_encode_c64(chy_u64_t number, char **out_buf)
     chy_u8_t  *const limit = buf + sizeof(buf);
     chy_u8_t  *ptr         = limit - 1;
     int        num_bytes;
-    /* Write last byte first, which has no continue bit. */
+    // Write last byte first, which has no continue bit. 
     *ptr = aU64 & 0x7f;
     aU64 >>= 7;
     while (aU64) {
-        /* Work backwards, writing bytes with continue bits set. */
+        // Work backwards, writing bytes with continue bits set. 
         *--ptr = ((aU64 & 0x7f) | 0x80);
         aU64 >>= 7;
     }
@@ -345,11 +345,11 @@ lucy_NumUtil_encode_padded_c32(chy_u32_t number, char **out_buf)
     chy_u32_t aU32        = number;
     chy_u8_t *const limit = buf + sizeof(buf);
     chy_u8_t *ptr         = limit - 1;
-    /* Write last byte first, which has no continue bit. */
+    // Write last byte first, which has no continue bit. 
     *ptr = aU32 & 0x7f;
     aU32 >>= 7;
     while (aU32) {
-        /* Work backwards, writing bytes with continue bits set. */
+        // Work backwards, writing bytes with continue bits set. 
         *--ptr = ((aU32 & 0x7f) | 0x80);
         aU32 >>= 7;
     }
@@ -357,7 +357,7 @@ lucy_NumUtil_encode_padded_c32(chy_u32_t number, char **out_buf)
     *out_buf += sizeof(buf);
 }
 
-/* Decode a compressed integer up to size of 'var', advancing 'source' */
+// Decode a compressed integer up to size of 'var', advancing 'source' 
 #define LUCY_NUMUTIL_DECODE_CINT(var, source) \
     do { \
         var = (*source & 0x7f); \

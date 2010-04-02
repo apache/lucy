@@ -53,10 +53,10 @@ StrHelp_to_base36(u64_t num, void *buffer)
     char *buf = my_buf + StrHelp_MAX_BASE36_BYTES - 1;
     char *end = buf;
 
-    /* Null terminate. */
+    // Null terminate. 
     *buf = '\0';
 
-    /* Convert to base 36 characters. */
+    // Convert to base 36 characters. 
     do {
         *(--buf) = base36_chars[ num % 36 ];
         num /= 36;
@@ -69,7 +69,7 @@ StrHelp_to_base36(u64_t num, void *buffer)
     }
 }
 
-/* This function is adapted from sample code in RFC 2640. */
+// This function is adapted from sample code in RFC 2640. 
 bool_t
 StrHelp_utf8_valid(const char *ptr, size_t size)
 {
@@ -77,16 +77,16 @@ StrHelp_utf8_valid(const char *ptr, size_t size)
     const unsigned char *const end = buf + size;
     unsigned char byte2_range_mask = 0x00;
     unsigned char c;
-    int trailing = 0;  /* Continuation bytes. */
+    int trailing = 0;  // Continuation bytes. 
 
     while (buf != end) {
         c = *buf++;
         if (trailing) {
-            /* Does trailing byte follow UTF-8 format? */
+            // Does trailing byte follow UTF-8 format? 
             if ((c & 0xC0) == 0x80) {
-                /* Need to check 2nd byte for proper range? */
+                // Need to check 2nd byte for proper range? 
                 if (byte2_range_mask) {
-                    /* Reset mask if byte passes, otherwise fail. */
+                    // Reset mask if byte passes, otherwise fail. 
                     if (c & byte2_range_mask) { byte2_range_mask = 0x00; }
                     else                      { return false; }
                 }
@@ -96,19 +96,19 @@ StrHelp_utf8_valid(const char *ptr, size_t size)
                 return false;
             }
         }
-        else if ((c & 0x80) == 0x00) { /* 1-byte UTF-8 */
+        else if ((c & 0x80) == 0x00) { // 1-byte UTF-8 
             continue;
         }
-        else if ((c & 0xE0) == 0xC0) { /* 2-byte UTF-8 */
-            /* Verify UTF-8 byte in range. */
+        else if ((c & 0xE0) == 0xC0) { // 2-byte UTF-8 
+            // Verify UTF-8 byte in range. 
             if (c & 0x1E) { trailing = 1; }
             else          { return false; }
         }
-        else if ((c & 0xF0) == 0xE0) { /* 3-byte UTF-8 */
+        else if ((c & 0xF0) == 0xE0) { // 3-byte UTF-8 
             if (!(c & 0x0F)) { byte2_range_mask = 0x20; }
             trailing = 2;
         } 
-        else if (c >= 0xF0 && c <= 0xF4) { /* 4-byte UTF-8 */
+        else if (c >= 0xF0 && c <= 0xF4) { // 4-byte UTF-8 
             if (!(c & 0x07)) { byte2_range_mask = 0x30; }
             trailing = 3;
         }
@@ -124,22 +124,22 @@ u32_t
 StrHelp_encode_utf8_char(u32_t code_point, void *buffer)
 {
     u8_t *buf = (u8_t*)buffer;
-    if (code_point <= 0x7F) { /* ASCII */
+    if (code_point <= 0x7F) { // ASCII 
         buf[0] = (u8_t)code_point;
         return 1;
     }
-    else if (code_point <= 0x07FF) { /* 2 byte range */
+    else if (code_point <= 0x07FF) { // 2 byte range 
         buf[0] = (u8_t)(0xC0 | (code_point >> 6));
         buf[1] = (u8_t)(0x80 | (code_point & 0x3f));
         return 2;
     }
-    else if (code_point <= 0xFFFF) { /* 3 byte range */
+    else if (code_point <= 0xFFFF) { // 3 byte range 
         buf[0] = (u8_t)(0xE0 | ( code_point >> 12       ));
         buf[1] = (u8_t)(0x80 | ((code_point >> 6) & 0x3F));
         buf[2] = (u8_t)(0x80 | ( code_point       & 0x3f));
         return 3;
     }
-    else if (code_point <= 0x10FFFF) { /* 4 byte range */
+    else if (code_point <= 0x10FFFF) { // 4 byte range 
         buf[0] = (u8_t)(0xF0 | ( code_point >> 18        ));
         buf[1] = (u8_t)(0x80 | ((code_point >> 12) & 0x3F));
         buf[2] = (u8_t)(0x80 | ((code_point >> 6 ) & 0x3F));
@@ -156,22 +156,22 @@ bool_t
 StrHelp_is_whitespace(u32_t code_point)
 {
     switch (code_point) {
-                 /* <control-0009>..<control-000D> */
+                 // <control-0009>..<control-000D> 
     case 0x0009: case 0x000A: case 0x000B: case 0x000C: case 0x000D:
-    case 0x0020: /* SPACE */
-    case 0x0085: /* <control-0085>*/
-    case 0x00A0: /* NO-BREAK SPACE */
-    case 0x1680: /* OGHAM SPACE MARK */
-    case 0x180E: /* MONGOLIAN VOWEL SEPARATOR */
-                 /* EN QUAD..HAIR SPACE */
+    case 0x0020: // SPACE 
+    case 0x0085: // <control-0085>
+    case 0x00A0: // NO-BREAK SPACE 
+    case 0x1680: // OGHAM SPACE MARK 
+    case 0x180E: // MONGOLIAN VOWEL SEPARATOR 
+                 // EN QUAD..HAIR SPACE 
     case 0x2000: case 0x2001: case 0x2002: case 0x2003: case 0x2004: 
     case 0x2005: case 0x2006: case 0x2007: case 0x2008: case 0x2009: 
     case 0x200A:
-    case 0x2028: /* LINE SEPARATOR*/
-    case 0x2029: /* PARAGRAPH SEPARATOR*/
-    case 0x202F: /* NARROW NO-BREAK SPACE*/
-    case 0x205F: /* MEDIUM MATHEMATICAL SPACE*/
-    case 0x3000: /* IDEOGRAPHIC SPACE*/
+    case 0x2028: // LINE SEPARATOR
+    case 0x2029: // PARAGRAPH SEPARATOR
+    case 0x202F: // NARROW NO-BREAK SPACE
+    case 0x205F: // MEDIUM MATHEMATICAL SPACE
+    case 0x3000: // IDEOGRAPHIC SPACE
         return true;
 
     default:

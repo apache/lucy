@@ -35,13 +35,13 @@ lucy_Sleep_millisleep(chy_u32_t milliseconds)
     chy_u32_t seconds = milliseconds / 1000;
     milliseconds  = milliseconds % 1000;
     sleep(seconds);
-    /* TODO: probe for usleep. */
+    // TODO: probe for usleep. 
     usleep(milliseconds * 1000);
 }
 
 #else
   #error "Can't find a known sleep API."
-#endif /* OS switch. */
+#endif // OS switch. 
 
 /* Copyright 2009 The Apache Software Foundation
  *
