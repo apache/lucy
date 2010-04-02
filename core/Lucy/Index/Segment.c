@@ -1,3 +1,5 @@
+#include <ctype.h>
+
 #define C_LUCY_SEGMENT
 #include "Lucy/Util/ToolSet.h"
 
@@ -44,6 +46,22 @@ Seg_num_to_name(i64_t number)
     char base36[StrHelp_MAX_BASE36_BYTES];
     StrHelp_to_base36(number, &base36);
     return CB_newf("seg_%s", &base36);
+}
+
+bool_t
+Seg_valid_seg_name(const CharBuf *name)
+{
+    if (CB_Starts_With_Str(name, "seg_", 4)) {
+        size_t size = ZCB_size() + CB_Get_Size(name) + 1;
+        ZombieCharBuf *scratch = ZCB_wrap(alloca(size), name);
+        ZCB_Nip(scratch, 4);
+        uint32_t code_point;
+        while (0 != (code_point = ZCB_Nip_One(scratch))) {
+            if (!isalnum(code_point)) { return false; }
+        }
+        if (ZCB_Get_Size(scratch) == 0) { return true; } // Success!
+    }
+    return false;
 }
 
 void
