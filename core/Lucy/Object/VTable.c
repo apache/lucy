@@ -190,6 +190,15 @@ VTable_make_obj(VTable *self)
 }
 
 Obj*
+VTable_init_obj(VTable *self, void *allocation)
+{
+    Obj *obj = (Obj*)allocation;
+    obj->vtable = self;
+    obj->ref.count = 1;
+    return obj;
+}
+
+Obj*
 VTable_load_obj(VTable *self, Obj *dump)
 {
     Obj_load_t load = (Obj_load_t)METHOD(self, Obj, Load);

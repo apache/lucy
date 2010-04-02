@@ -80,6 +80,12 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
     Obj*
     Make_Obj(VTable *self);
 
+    /** Take a raw memory allocation which is presumed to be of adequate size,
+     * assign its vtable and give it an initial refcount of 1.
+     */
+    Obj*
+    Init_Obj(VTable *self, void *allocation);
+
     /** Create a new object using the supplied dump, assuming that Load() has
      * been defined for the class.
      */
