@@ -84,10 +84,11 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
 
     /** Recursively list all files and directories in the Folder.
      *
+     * @param path A relative filepath optionally specifying a subdirectory.
      * @return an unsorted array of relative filepaths.
      */
     incremented VArray*
-    List_R(Folder *self);
+    List_R(Folder *self, const CharBuf *path = NULL);
 
     /** Indicate whether an entity exists at <code>path</code>.
      *

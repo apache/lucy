@@ -84,7 +84,7 @@ test_protect_symlinks(TestBatch *batch)
         FAIL(batch, "symlink() failed");
     }
     else {
-        VArray *list = FSFolder_List_R(folder);
+        VArray *list = FSFolder_List_R(folder, NULL);
         bool_t saw_bazooka_boffo = false;
         for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
             CharBuf *entry = (CharBuf*)VA_Fetch(list, i);
@@ -94,6 +94,7 @@ test_protect_symlinks(TestBatch *batch)
         }
         ASSERT_FALSE(batch, saw_bazooka_boffo, 
             "List_R() shouldn't follow symlinks");
+        DECREF(list);
 
         ASSERT_TRUE(batch, FSFolder_Delete_Tree(folder, bar), 
             "Delete_Tree() returns true"), 

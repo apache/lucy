@@ -330,14 +330,20 @@ Folder_list(Folder *self, const CharBuf *path)
 }
 
 VArray*
-Folder_list_r(Folder *self)
+Folder_list_r(Folder *self, const CharBuf *path)
 {
-    CharBuf *prefix = CB_new(20);
-    CharBuf *dir    = CB_new(20);
-    VArray *list    =  VA_new(32);
-    S_add_to_file_list(self, list, dir, prefix);
-    DECREF(prefix);
-    DECREF(dir);
+    Folder *local_folder = Folder_Find_Folder(self, path);
+    VArray *list =  VA_new(0);
+    if (local_folder) {
+        CharBuf *dir    = CB_new(20);
+        CharBuf *prefix = CB_new(20);
+        if (path && CB_Get_Size(path)) {
+            CB_setf(prefix, "%o/", path);
+        }
+        S_add_to_file_list(local_folder, list, dir, prefix);
+        DECREF(prefix);
+        DECREF(dir);
+    }
     return list;
 }
 
