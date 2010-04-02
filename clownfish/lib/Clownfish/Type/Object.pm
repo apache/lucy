@@ -30,6 +30,7 @@ sub new {
     $self->{incremented} = $incremented;
     $self->{decremented} = $decremented;
     $self->{indirection} = $indirection;
+    $self->{nullable}    = $nullable;
     $self->{parcel} ||= Clownfish::Parcel->default_parcel;
     my $prefix = $self->{parcel}->get_prefix;
 
