@@ -175,7 +175,7 @@ Clownfish::Binding::Core - Generate core C code for a Clownfish::Hierarchy.
 =head1 SYNOPSIS
 
     my $hierarchy = Clownfish::Hierarchy->new(
-        source => '/path/to/bp/files',
+        source => '/path/to/clownfish/files',
         dest   => 'autogen',
     );
     $hierarchy->build;

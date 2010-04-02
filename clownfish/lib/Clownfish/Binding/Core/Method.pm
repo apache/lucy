@@ -271,7 +271,7 @@ END_CALLBACK_DEF
 
 # Create a function which throws a runtime error indicating that a method is
 # abstract.  This serves as the implementation for methods which are
-# declared as "abstract" in a .bp file.
+# declared as "abstract" in a Clownfish header file.
 sub abstract_method_def {
     my ( undef, $method ) = @_;
     my $params          = $method->get_param_list->to_c;

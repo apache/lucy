@@ -377,7 +377,7 @@ L<Clownfish::Symbol>.
 
 =item * B<source_class> - The name of the class that owns the file in which
 this class was declared.  Should be "Foo" if "Foo::FooJr" is defined in
-C<Foo.bp>.
+C<Foo.cfh>.
 
 =item * B<parent_class_name> - The name of this class's parent class.  Needed
 in order to establish the class hierarchy.

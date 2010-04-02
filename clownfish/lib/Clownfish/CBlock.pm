@@ -31,7 +31,8 @@ Clownfish::CBlock - A block of embedded C code.
 
 =head1 DESCRIPTION
 
-CBlock exists to support embedding literal C code within .bp files:
+CBlock exists to support embedding literal C code within Clownfish header
+files:
 
     class Crustacean::Lobster {
         /* ... */

@@ -65,8 +65,8 @@ to create complex types in a C header file...
 
     typedef union { float f; int i; } floatint_t;
 
-... pound-include the C header, then use the resulting typedef in a .bp file
-and have it parse as an "arbitrary" type.
+... pound-include the C header, then use the resulting typedef in a Clownfish
+header file and have it parse as an "arbitrary" type.
 
     floatint_t floatint;
 

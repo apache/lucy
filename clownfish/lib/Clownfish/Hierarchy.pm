@@ -50,15 +50,15 @@ sub ordered_classes {
 
 sub files { values %{ shift->{files} } }
 
-# Slurp all .bp files.
+# Slurp all Clownfish header files.
 # Arrange the class objects into inheritance trees.
 sub build {
     my $self = shift;
-    $self->_parse_bp_files;
+    $self->_parse_cf_files;
     $_->grow_tree for values %{ $self->{trees} };
 }
 
-sub _parse_bp_files {
+sub _parse_cf_files {
     my $self   = shift;
     my $source = $self->{source};
 
@@ -200,8 +200,8 @@ core classes itself from which all instantiable classes must descend.
 
     $hierarchy->build;
 
-Parse every .bp file which can be found under C<source>, building up the
-object hierarchy.
+Parse every Clownfish header file which can be found under C<source>, building
+up the object hierarchy.
 
 =head2 ordered_classes
 

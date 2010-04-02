@@ -10,8 +10,8 @@ use Fcntl;
 use File::Path qw( rmtree mkpath );
 
 my %args = (
-    source => 't/bpsource',
-    dest   => 't/bpdest',
+    source => 't/cfsource',
+    dest   => 't/cfdest',
 );
 
 # Clean up.
@@ -61,9 +61,9 @@ for my $file (@files) {
         or die "utime failed for '$h_path': $!";
 }
 
-my $path_to_animal_bp = $animal->bp_path( $args{source} );
-utime( undef, undef, $path_to_animal_bp )
-    or die "utime for '$path_to_animal_bp' failed";    # touch
+my $path_to_animal_cf = $animal->bp_path( $args{source} );
+utime( undef, undef, $path_to_animal_cf )
+    or die "utime for '$path_to_animal_cf' failed";    # touch
 
 $hierarchy->propagate_modified;
 
