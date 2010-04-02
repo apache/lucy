@@ -200,7 +200,7 @@ sub create_pod {
     confess("No DocuComment for '$class_name'") unless $docucom;
     my $brief       = $docucom->get_brief;
     my $description = _perlify_doc_text( $pod_args->{description}
-            || $docucom->get_description );
+            || $docucom->get_long );
 
     # Create SYNOPSIS.
     my $synopsis_pod = '';
