@@ -293,6 +293,20 @@ Folder_exists(Folder *self, const CharBuf *path)
     return retval;
 }
 
+bool_t
+Folder_is_directory(Folder *self, const CharBuf *path)
+{
+    Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
+    bool_t retval = false;
+    if (enclosing_folder) {
+        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+        if (Folder_Local_Is_Directory(enclosing_folder, (CharBuf*)name)) {
+            retval = true;
+        }
+    }
+    return retval;
+}
+
 VArray*
 Folder_list(Folder *self, const CharBuf *path)
 {

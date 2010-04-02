@@ -97,6 +97,14 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
     public bool_t
     Exists(Folder *self, const CharBuf *path);
 
+    /** Indicate whether a directory exists at <code>path</code>.
+     *
+     * @param path A relative filepath.
+     * @return true if <code>path</code> is a directory.
+     */
+    bool_t
+    Is_Directory(Folder *self, const CharBuf *path);
+
     /** Delete an entry from the folder.
      *
      * @param path A relative filepath.
