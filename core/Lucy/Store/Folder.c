@@ -223,7 +223,7 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix)
             }
             VA_Push(list, (Obj*)relpath);
 
-            if (DH_Entry_Is_Dir(dh)) {
+            if (DH_Entry_Is_Dir(dh) && !DH_Entry_Is_Symlink(dh)) {
                 CharBuf *subdir = CB_Get_Size(dir) 
                                 ? CB_newf("%o/%o", dir, entry)
                                 : CB_Clone(entry);

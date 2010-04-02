@@ -74,13 +74,27 @@ test_protect_symlinks(TestBatch *batch)
     OutStream *outstream = FSFolder_Open_Out(folder, foo_boffo);
     DECREF(outstream);
 
-    if (symlink("_fstest/foo/boffo", "_fstest/bar/banana")) {
+    if (   symlink("_fstest/foo/boffo", "_fstest/bar/banana")
+        || symlink("_fstest/foo", "_fstest/bar/bazooka")
+    ) {
+        FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
     }
     else {
+        VArray *list = FSFolder_List_R(folder);
+        bool_t saw_bazooka_boffo = false;
+        for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
+            CharBuf *entry = (CharBuf*)VA_Fetch(list, i);
+            if (CB_Ends_With_Str(entry, "bazooka/boffo", 13)) {
+                saw_bazooka_boffo = true;
+            }
+        }
+        ASSERT_FALSE(batch, saw_bazooka_boffo, 
+            "List_R() shouldn't follow symlinks");
+
         ASSERT_TRUE(batch, FSFolder_Delete_Tree(folder, bar), 
             "Delete_Tree() returns true"), 
         ASSERT_FALSE(batch, FSFolder_Exists(folder, bar), 
@@ -95,6 +109,7 @@ test_protect_symlinks(TestBatch *batch)
     S_tear_down();
 #else
     /* TODO: Add test for Windows. */
+    SKIP(batch, "No symlink() function");
     SKIP(batch, "No symlink() function");
     SKIP(batch, "No symlink() function");
     SKIP(batch, "No symlink() function");
@@ -128,7 +143,7 @@ test_disallow_updir(TestBatch *batch)
 void
 TestFSFolder_run_tests()
 {
-    u32_t num_tests = TestFolderCommon_num_tests() + 8;
+    u32_t num_tests = TestFolderCommon_num_tests() + 9;
     TestBatch *batch = TestBatch_new(num_tests);
 
     TestBatch_Plan(batch);
