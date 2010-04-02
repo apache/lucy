@@ -34,7 +34,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
     }
     else {
         Obj *format = Hash_Fetch_Str(metadata, "format", 6);
-        self->format = format ? (i32_t)Obj_To_I64(format) : 0;
+        self->format = format ? (int32_t)Obj_To_I64(format) : 0;
         self->records = (Hash*)INCREF(Hash_Fetch_Str(metadata, "files", 5));
         if (self->format < 1) { 
             error = Err_new(CB_newf(
@@ -115,7 +115,7 @@ CFReader_set_path(CompoundFileReader *self, const CharBuf *path)
 
 FileHandle*
 CFReader_local_open_filehandle(CompoundFileReader *self, 
-                               const CharBuf *name, u32_t flags)
+                               const CharBuf *name, uint32_t flags)
 {
     Hash *entry = (Hash*)Hash_Fetch(self->records, (Obj*)name);
     FileHandle *fh = NULL;
@@ -295,7 +295,7 @@ CFReaderDH_next(CFReaderDirHandle *self)
 {
     if (self->elems) {
         self->tick++;
-        if (self->tick < (i32_t)VA_Get_Size(self->elems)) {
+        if (self->tick < (int32_t)VA_Get_Size(self->elems)) {
             CharBuf *path = (CharBuf*)CERTIFY(
                 VA_Fetch(self->elems, self->tick), CHARBUF);
             CB_Mimic(self->entry, (Obj*)path);

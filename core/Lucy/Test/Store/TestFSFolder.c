@@ -144,7 +144,7 @@ test_disallow_updir(TestBatch *batch)
 void
 TestFSFolder_run_tests()
 {
-    u32_t num_tests = TestFolderCommon_num_tests() + 9;
+    uint32_t num_tests = TestFolderCommon_num_tests() + 9;
     TestBatch *batch = TestBatch_new(num_tests);
 
     TestBatch_Plan(batch);

@@ -5,8 +5,8 @@ parcel Lucy;
 class Lucy::Store::FileWindow extends Lucy::Object::Obj {
 
     char    *buf;
-    i64_t    offset;
-    i64_t    len;
+    int64_t  offset;
+    int64_t  len;
 
     inert FileWindow*
     init(FileWindow *self);
@@ -15,10 +15,10 @@ class Lucy::Store::FileWindow extends Lucy::Object::Obj {
     new();
 
     void
-    Set_Offset(FileWindow *self, i64_t offset);
+    Set_Offset(FileWindow *self, int64_t offset);
 
     void
-    Set_Window(FileWindow *self, char *buf, i64_t offset, i64_t len);
+    Set_Window(FileWindow *self, char *buf, int64_t offset, int64_t len);
 }
 
 /* Copyright 2009 The Apache Software Foundation

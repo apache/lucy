@@ -90,7 +90,7 @@ Folder_local_open_in(Folder *self, const CharBuf *name)
 OutStream*
 Folder_open_out(Folder *self, const CharBuf *path)
 {
-    const u32_t flags = FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE;
+    const uint32_t flags = FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE;
     FileHandle *fh = Folder_Open_FileHandle(self, path, flags);
     OutStream *outstream = NULL;
     if (fh) { 
@@ -107,7 +107,7 @@ Folder_open_out(Folder *self, const CharBuf *path)
 }
 
 FileHandle*
-Folder_open_filehandle(Folder *self, const CharBuf *path, u32_t flags)
+Folder_open_filehandle(Folder *self, const CharBuf *path, uint32_t flags)
 {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     FileHandle *fh = NULL;
@@ -357,7 +357,7 @@ Folder_slurp_file(Folder *self, const CharBuf *path)
         RETHROW(INCREF(Err_get_error())); 
     }
     else {
-        u64_t length = InStream_Length(instream);
+        uint64_t length = InStream_Length(instream);
 
         if (length >= SIZE_MAX) {
             InStream_Close(instream);
@@ -417,7 +417,7 @@ static Folder*
 S_enclosing_folder(Folder *self, ZombieCharBuf *path) 
 {
     size_t path_component_len = 0;
-    u32_t code_point;
+    uint32_t code_point;
 
     /* Strip trailing slash. */
     if (ZCB_Code_Point_From(path, 0) == '/') { ZCB_Chop(path, 1); }

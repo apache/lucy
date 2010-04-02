@@ -36,7 +36,7 @@ class Lucy::Store::FSFolder extends Lucy::Store::Folder {
 
     incremented nullable FileHandle*
     Local_Open_FileHandle(FSFolder *self, const CharBuf *name, 
-                          u32_t flags);
+                          uint32_t flags);
 
     incremented nullable DirHandle*
     Local_Open_Dir(FSFolder *self);

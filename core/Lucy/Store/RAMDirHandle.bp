@@ -7,7 +7,7 @@ class Lucy::Store::RAMDirHandle cnick RAMDH
 
     RAMFolder *folder;
     VArray    *elems;
-    i32_t      tick;
+    int32_t    tick;
 
     inert incremented RAMDirHandle*
     new(RAMFolder *folder);

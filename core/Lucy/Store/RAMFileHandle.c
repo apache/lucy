@@ -8,14 +8,14 @@
 #include "Lucy/Store/FileWindow.h"
 
 RAMFileHandle*
-RAMFH_open(const CharBuf *path, u32_t flags, RAMFile *file) 
+RAMFH_open(const CharBuf *path, uint32_t flags, RAMFile *file) 
 {
     RAMFileHandle *self = (RAMFileHandle*)VTable_Make_Obj(RAMFILEHANDLE);
     return RAMFH_do_open(self, path, flags, file);
 }
 
 RAMFileHandle*
-RAMFH_do_open(RAMFileHandle *self, const CharBuf *path, u32_t flags, 
+RAMFH_do_open(RAMFileHandle *self, const CharBuf *path, uint32_t flags, 
               RAMFile *file) 
 {
     bool_t must_create = (flags & (FH_CREATE | FH_EXCLUSIVE))
@@ -65,9 +65,9 @@ RAMFH_destroy(RAMFileHandle *self)
 }
 
 bool_t
-RAMFH_window(RAMFileHandle *self, FileWindow *window, i64_t offset, i64_t len)
+RAMFH_window(RAMFileHandle *self, FileWindow *window, int64_t offset, int64_t len)
 {
-    i64_t end = offset + len;
+    int64_t end = offset + len;
     if (!(self->flags & FH_READ_ONLY)) {
         Err_set_error(Err_new(CB_newf("Can't read from write-only handle")));
         return false;
@@ -99,9 +99,9 @@ RAMFH_release_window(RAMFileHandle *self, FileWindow *window)
 }
 
 bool_t
-RAMFH_read(RAMFileHandle *self, char *dest, i64_t offset, size_t len)
+RAMFH_read(RAMFileHandle *self, char *dest, int64_t offset, size_t len)
 {
-    i64_t end = offset + len;
+    int64_t end = offset + len;
     if (!(self->flags & FH_READ_ONLY)) {
         Err_set_error(Err_new(CB_newf("Can't read from write-only handle")));
         return false;
@@ -114,7 +114,7 @@ RAMFH_read(RAMFileHandle *self, char *dest, i64_t offset, size_t len)
     else if (end > self->len) {
         Err_set_error(Err_new(CB_newf(
             "Attempt to read %u64 bytes starting at %i64 goes past EOF %u64",
-            (u64_t)len, offset, self->len)));
+            (uint64_t)len, offset, self->len)));
         return false;
     }
     else {
@@ -138,12 +138,12 @@ RAMFH_write(RAMFileHandle *self, const void *data, size_t len)
 }
 
 bool_t
-RAMFH_grow(RAMFileHandle *self, i64_t len)
+RAMFH_grow(RAMFileHandle *self, int64_t len)
 {
     if (len > I32_MAX) {
         Err_set_error(Err_new(CB_newf(
             "Can't support RAM files of size %i64 (> %i32)", len, 
-            (i32_t)I32_MAX)));
+            (int32_t)I32_MAX)));
         return false;
     }
     else if (self->ram_file->read_only) {
@@ -160,7 +160,7 @@ RAMFH_grow(RAMFileHandle *self, i64_t len)
 RAMFile*
 RAMFH_get_file(RAMFileHandle *self) { return self->ram_file; }
 
-i64_t
+int64_t
 RAMFH_length(RAMFileHandle *self)
 {
     return self->len;

@@ -135,10 +135,10 @@ test_Close(TestBatch *batch)
 static void
 test_Seek_and_Tell(TestBatch *batch)
 {
-    i64_t       gb1      = 0x40000000;
-    i64_t       gb3      = gb1 * 3;
-    i64_t       gb6      = gb1 * 6;
-    i64_t       gb12     = gb1 * 12;
+    int64_t     gb1      = 0x40000000;
+    int64_t     gb3      = gb1 * 3;
+    int64_t     gb6      = gb1 * 6;
+    int64_t     gb12     = gb1 * 12;
     FileHandle *fh       = (FileHandle*)MockFileHandle_new(NULL, gb12);
     InStream   *instream = InStream_open((Obj*)fh);
 

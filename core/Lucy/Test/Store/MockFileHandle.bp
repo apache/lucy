@@ -4,21 +4,21 @@ parcel Lucy;
  */ 
 class Lucy::Store::MockFileHandle extends Lucy::Store::FileHandle {
 
-    i64_t len;
+    int64_t len;
 
     inert incremented MockFileHandle*
-    new(const CharBuf *path = NULL, i64_t length);
+    new(const CharBuf *path = NULL, int64_t length);
 
     inert MockFileHandle*
-    init(MockFileHandle *self, const CharBuf *path = NULL, i64_t length);
+    init(MockFileHandle *self, const CharBuf *path = NULL, int64_t length);
 
     bool_t
-    Window(MockFileHandle *self, FileWindow *window, i64_t offset, i64_t len);
+    Window(MockFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
     bool_t 
     Release_Window(MockFileHandle *self, FileWindow *window);
 
-    i64_t
+    int64_t
     Length(MockFileHandle *self);
 
     bool_t

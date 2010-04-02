@@ -496,7 +496,7 @@ test_Close(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
     tear_down();
 }
 
-u32_t
+uint32_t
 TestFolderCommon_num_tests()
 {
     return 99;

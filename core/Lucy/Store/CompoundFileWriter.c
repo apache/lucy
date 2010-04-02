@@ -8,7 +8,7 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
-i32_t CFWriter_current_file_format = 2;
+int32_t CFWriter_current_file_format = 2;
 
 /* Helper which does the heavy lifting for CFWriter_consolidate. */
 static void
@@ -83,7 +83,7 @@ S_do_consolidate(CompoundFileWriter *self)
     VArray    *merged       = VA_new(VA_Get_Size(files));
     CharBuf   *cf_file     = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
     OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)cf_file);
-    u32_t      i, max;
+    uint32_t   i, max;
     bool_t     rename_success;
 
     if (!outstream) { RETHROW(INCREF(Err_get_error())); }
@@ -102,7 +102,7 @@ S_do_consolidate(CompoundFileWriter *self)
         if (!CB_Ends_With_Str(infilename, ".json", 5)) {
             InStream *instream   = Folder_Open_In(folder, infilename);
             Hash     *file_data  = Hash_new(2);
-            i64_t     offset, len;
+            int64_t   offset, len;
 
             if (!instream) { RETHROW(INCREF(Err_get_error())); }
 

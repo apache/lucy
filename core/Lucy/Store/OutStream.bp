@@ -14,7 +14,7 @@ parcel Lucy;
 class Lucy::Store::OutStream extends Lucy::Object::Obj {
 
     char          *buf;
-    i64_t          buf_start;
+    int64_t        buf_start;
     size_t         buf_pos;
     FileHandle    *file_handle;
     CharBuf       *path;
@@ -34,7 +34,7 @@ class Lucy::Store::OutStream extends Lucy::Object::Obj {
 
     /** Return the current file position. 
      */
-    final i64_t 
+    final int64_t 
     Tell(OutStream *self);
 
     /** Write 0 or more null bytes to the OutStream until its file position is
@@ -52,14 +52,14 @@ class Lucy::Store::OutStream extends Lucy::Object::Obj {
 
     /** Return the current length of the file in bytes.
      */
-    final i64_t 
+    final int64_t 
     Length(OutStream *self);
 
     /** Advisory call informing the OutStream that it should prepare to occupy
      * <code>length</code> bytes.
      */
     void
-    Grow(OutStream *self, i64_t length);
+    Grow(OutStream *self, int64_t length);
 
     /** Write <code>len</code> bytes from <code>buf</code> to the OutStream.
      */
@@ -69,42 +69,42 @@ class Lucy::Store::OutStream extends Lucy::Object::Obj {
     /** Write a signed 8-bit integer. 
      */
     final void
-    Write_I8(OutStream *self, i8_t value);
+    Write_I8(OutStream *self, int8_t value);
 
     /** Write an unsigned 8-bit integer. 
      */
     final void
-    Write_U8(OutStream *self, u8_t value);
+    Write_U8(OutStream *self, uint8_t value);
 
     /** Write a signed 32-bit integer.
      */
     final void
-    Write_I32(OutStream *self, i32_t value);
+    Write_I32(OutStream *self, int32_t value);
 
     /** Write an unsigned 32-bit integer.
      */
     final void
-    Write_U32(OutStream *self, u32_t value);
+    Write_U32(OutStream *self, uint32_t value);
 
     /** Write a signed 64-bit integer.
      */
     final void
-    Write_I64(OutStream *self, i64_t value);
+    Write_I64(OutStream *self, int64_t value);
 
     /** Write an unsigned 64-bit integer.
      */
     final void
-    Write_U64(OutStream *self, u64_t value);
+    Write_U64(OutStream *self, uint64_t value);
 
     /** Write a 32-bit integer using a compressed format.
      */
     final void
-    Write_C32(OutStream *self, u32_t value);
+    Write_C32(OutStream *self, uint32_t value);
 
     /** Write a 64-bit integer using a compressed format.
      */
     final void
-    Write_C64(OutStream *self, u64_t value);
+    Write_C64(OutStream *self, uint64_t value);
 
     /** Write an IEEE 764 32-bit floating point number in big-endian byte
      * order.

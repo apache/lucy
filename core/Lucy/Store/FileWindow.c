@@ -17,7 +17,7 @@ FileWindow_init(FileWindow *self)
 }
 
 void
-FileWindow_set_offset(FileWindow *self, i64_t offset)
+FileWindow_set_offset(FileWindow *self, int64_t offset)
 {
     if (self->buf != NULL) {
         if (offset != self->offset) {
@@ -29,7 +29,7 @@ FileWindow_set_offset(FileWindow *self, i64_t offset)
 }
 
 void
-FileWindow_set_window(FileWindow *self, char *buf, i64_t offset, i64_t len)
+FileWindow_set_window(FileWindow *self, char *buf, int64_t offset, int64_t len)
 {
     self->buf    = buf;
     self->offset = offset;

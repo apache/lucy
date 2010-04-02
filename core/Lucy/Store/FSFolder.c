@@ -90,7 +90,7 @@ FSFolder_check(FSFolder *self)
 }
 
 FileHandle*
-FSFolder_local_open_filehandle(FSFolder *self, const CharBuf *name, u32_t flags)
+FSFolder_local_open_filehandle(FSFolder *self, const CharBuf *name, uint32_t flags)
 {
     CharBuf      *fullpath = FULLPATH(self, name);
     FSFileHandle *fh = FSFH_open(fullpath, flags);
@@ -305,7 +305,7 @@ bool_t
 S_is_local_entry(const CharBuf *path)
 {
     ZombieCharBuf *scratch = ZCB_WRAP(path);
-    u32_t code_point;
+    uint32_t code_point;
     while (0 != (code_point = ZCB_Nip_One(scratch))) {
         if (code_point == '/') { return false; }
     }

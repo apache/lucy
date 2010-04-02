@@ -42,7 +42,7 @@ RAMDH_next(RAMDirHandle *self)
 {
     if (self->elems) {
         self->tick++;
-        if (self->tick < (i32_t)VA_Get_Size(self->elems)) {
+        if (self->tick < (int32_t)VA_Get_Size(self->elems)) {
             CharBuf *path = (CharBuf*)CERTIFY(
                 VA_Fetch(self->elems, self->tick), CHARBUF);
             CB_Mimic(self->entry, (Obj*)path);

@@ -180,7 +180,7 @@ test_Window(TestBatch *batch)
     CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
     FileWindow *window = FileWindow_new();
-    u32_t i;
+    uint32_t i;
 
     remove((char*)CB_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename, 

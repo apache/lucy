@@ -67,7 +67,7 @@ test_u8(TestBatch *batch)
 static void
 test_i32(TestBatch *batch)
 {
-    i64_t      *ints = TestUtils_random_i64s(NULL, 1000, I32_MIN, I32_MAX);
+    int64_t    *ints = TestUtils_random_i64s(NULL, 1000, I32_MIN, I32_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -106,7 +106,7 @@ test_i32(TestBatch *batch)
 static void
 test_u32(TestBatch *batch)
 {
-    u64_t      *ints = TestUtils_random_u64s(NULL, 1000, 0, U32_MAX);
+    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, U32_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -145,7 +145,7 @@ test_u32(TestBatch *batch)
 static void
 test_i64(TestBatch *batch)
 {
-    i64_t      *ints = TestUtils_random_i64s(NULL, 1000, I64_MIN, I64_MAX);
+    int64_t    *ints = TestUtils_random_i64s(NULL, 1000, I64_MIN, I64_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -185,7 +185,7 @@ test_i64(TestBatch *batch)
 static void
 test_u64(TestBatch *batch)
 {
-    u64_t      *ints = TestUtils_random_u64s(NULL, 1000, 0, U64_MAX);
+    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, U64_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -224,7 +224,7 @@ test_u64(TestBatch *batch)
 static void
 test_c32(TestBatch *batch)
 {
-    u64_t      *ints = TestUtils_random_u64s(NULL, 1000, 0, U32_MAX);
+    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, U32_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -263,7 +263,7 @@ test_c32(TestBatch *batch)
 static void
 test_c64(TestBatch *batch)
 {
-    u64_t      *ints   = TestUtils_random_u64s(NULL, 1000, 0, U64_MAX);
+    uint64_t   *ints   = TestUtils_random_u64s(NULL, 1000, 0, U64_MAX);
     RAMFile    *file     = RAMFile_new(NULL, false);
     RAMFile    *raw_file = RAMFile_new(NULL, false);
     OutStream  *outstream     = OutStream_open((Obj*)file);

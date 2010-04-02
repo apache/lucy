@@ -15,7 +15,7 @@ SI_write_bytes(OutStream *self, const void *bytes, size_t len);
 
 /* Inlined version of OutStream_Write_C32. */
 static INLINE void
-SI_write_c32(OutStream *self, u32_t value);
+SI_write_c32(OutStream *self, uint32_t value);
 
 /* Flush content in the buffer to the FileHandle. */
 static void
@@ -88,7 +88,7 @@ void
 OutStream_absorb(OutStream *self, InStream *instream) 
 {
     char buf[IO_STREAM_BUF_SIZE];
-    i64_t  bytes_left = InStream_Length(instream);
+    int64_t  bytes_left = InStream_Length(instream);
 
     /* Read blocks of content into an intermediate buffer, than write them to
      * the OutStream. 
@@ -108,14 +108,14 @@ OutStream_absorb(OutStream *self, InStream *instream)
 }
 
 void
-OutStream_grow(OutStream *self, i64_t length)
+OutStream_grow(OutStream *self, int64_t length)
 {
     if (!FH_Grow(self->file_handle, length)) {
         RETHROW(INCREF(Err_get_error()));
     }
 }
 
-i64_t
+int64_t
 OutStream_tell(OutStream *self) 
 {
     return self->buf_start + self->buf_pos;
@@ -149,7 +149,7 @@ S_flush(OutStream *self)
     self->buf_pos = 0;
 }
 
-i64_t
+int64_t
 OutStream_length(OutStream *self) 
 {
     return OutStream_tell(self);
@@ -186,7 +186,7 @@ SI_write_bytes(OutStream *self, const void *bytes, size_t len)
 }
 
 static INLINE void
-SI_write_u8(OutStream *self, u8_t value)
+SI_write_u8(OutStream *self, uint8_t value)
 {
     if (self->buf_pos >= IO_STREAM_BUF_SIZE) {
         S_flush(self);
@@ -195,19 +195,19 @@ SI_write_u8(OutStream *self, u8_t value)
 }
 
 void
-OutStream_write_i8(OutStream *self, i8_t value) 
+OutStream_write_i8(OutStream *self, int8_t value) 
 {
-    SI_write_u8(self, (u8_t)value);
+    SI_write_u8(self, (uint8_t)value);
 }
 
 void
-OutStream_write_u8(OutStream *self, u8_t value) 
+OutStream_write_u8(OutStream *self, uint8_t value) 
 {
     SI_write_u8(self, value);
 }
 
 static INLINE void 
-SI_write_u32(OutStream *self, u32_t value) 
+SI_write_u32(OutStream *self, uint32_t value) 
 {
 #ifdef BIG_END
     SI_write_bytes(self, &value, 4);
@@ -220,38 +220,38 @@ SI_write_u32(OutStream *self, u32_t value)
 }
 
 void 
-OutStream_write_i32(OutStream *self, i32_t value) 
+OutStream_write_i32(OutStream *self, int32_t value) 
 {
-    SI_write_u32(self, (u32_t)value);
+    SI_write_u32(self, (uint32_t)value);
 }
 
 void 
-OutStream_write_u32(OutStream *self, u32_t value) 
+OutStream_write_u32(OutStream *self, uint32_t value) 
 {
     SI_write_u32(self, value);
 }
 
 static INLINE void
-SI_write_u64(OutStream *self, u64_t value) 
+SI_write_u64(OutStream *self, uint64_t value) 
 {
 #ifdef BIG_END
     SI_write_bytes(self, &value, 8);
 #else 
-    char  buf[sizeof(u64_t)];
+    char  buf[sizeof(uint64_t)];
     char *buf_copy = buf;
     NumUtil_encode_bigend_u64(value, &buf_copy);
-    SI_write_bytes(self, buf, sizeof(u64_t));
+    SI_write_bytes(self, buf, sizeof(uint64_t));
 #endif
 }
 
 void 
-OutStream_write_i64(OutStream *self, i64_t value) 
+OutStream_write_i64(OutStream *self, int64_t value) 
 {
-    SI_write_u64(self, (u64_t)value);
+    SI_write_u64(self, (uint64_t)value);
 }
 
 void 
-OutStream_write_u64(OutStream *self, u64_t value) 
+OutStream_write_u64(OutStream *self, uint64_t value) 
 {
     SI_write_u64(self, value);
 }
@@ -275,16 +275,16 @@ OutStream_write_f64(OutStream *self, double value)
 }
 
 void
-OutStream_write_c32(OutStream *self, u32_t value) 
+OutStream_write_c32(OutStream *self, uint32_t value) 
 {
     SI_write_c32(self, value);
 }
 
 static INLINE void
-SI_write_c32(OutStream *self, u32_t value) 
+SI_write_c32(OutStream *self, uint32_t value) 
 {
-    u8_t buf[C32_MAX_BYTES];
-    u8_t *ptr = buf + sizeof(buf) - 1;
+    uint8_t buf[C32_MAX_BYTES];
+    uint8_t *ptr = buf + sizeof(buf) - 1;
 
     /* Write last byte first, which has no continue bit. */
     *ptr = value & 0x7f;
@@ -300,10 +300,10 @@ SI_write_c32(OutStream *self, u32_t value)
 }
 
 void
-OutStream_write_c64(OutStream *self, u64_t value) 
+OutStream_write_c64(OutStream *self, uint64_t value) 
 {
-    u8_t buf[C64_MAX_BYTES];
-    u8_t *ptr = buf + sizeof(buf) - 1;
+    uint8_t buf[C64_MAX_BYTES];
+    uint8_t *ptr = buf + sizeof(buf) - 1;
 
     /* Write last byte first, which has no continue bit. */
     *ptr = value & 0x7f;
@@ -321,7 +321,7 @@ OutStream_write_c64(OutStream *self, u64_t value)
 void
 OutStream_write_string(OutStream *self, const char *string, size_t len) 
 {
-    SI_write_c32(self, (u32_t)len);
+    SI_write_c32(self, (uint32_t)len);
     SI_write_bytes(self, string, len);
 }
 

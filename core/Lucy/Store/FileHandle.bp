@@ -20,7 +20,7 @@ abstract class Lucy::Store::FileHandle cnick FH
     extends Lucy::Object::Obj {
 
     CharBuf *path;
-    u32_t    flags;
+    uint32_t flags;
 
     /** Abstract constructor.
      *
@@ -29,7 +29,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * behaviors.
      */
     inert nullable FileHandle*
-    do_open(FileHandle *self, const CharBuf *path = NULL, u32_t flags);
+    do_open(FileHandle *self, const CharBuf *path = NULL, uint32_t flags);
 
     /** Ensure that the FileWindow's buffer provides access to file data for
      * <code>len</code> bytes starting at <code>offset</code>. 
@@ -40,7 +40,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * @return true on success, false on failure (sets Err_error)
      */
     abstract bool_t
-    Window(FileHandle *self, FileWindow *window, i64_t offset, i64_t len);
+    Window(FileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
     /** Clean up the FileWindow, doing whatever is necessary to free its
      * buffer and reset its internal variables.
@@ -58,7 +58,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * @return true on success, false on failure (sets Err_error)
      */
     abstract bool_t
-    Read(FileHandle *self, char *dest, i64_t offset, size_t len);
+    Read(FileHandle *self, char *dest, int64_t offset, size_t len);
 
     /** Write supplied content.
      *
@@ -72,7 +72,7 @@ abstract class Lucy::Store::FileHandle cnick FH
     /** Return the current length of the file in bytes, or set Err_error and
      * return -1 on failure.
      */
-    abstract i64_t 
+    abstract int64_t 
     Length(FileHandle *self);
 
     /** Advisory call alerting the FileHandle that it should prepare to occupy
@@ -81,7 +81,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * @return true on success, false on failure (sets Err_error).
      */
     bool_t
-    Grow(FileHandle *self, i64_t len);
+    Grow(FileHandle *self, int64_t len);
 
     /** Close the FileHandle, possibly releasing resources.  Implementations
      * should be be able to handle multiple invocations, returning success
@@ -120,7 +120,7 @@ __C__
  * they're the canary in the coal mine for detecting object-destruction memory
  * leaks.
  */
-extern chy_i32_t lucy_FH_object_count; 
+extern int32_t lucy_FH_object_count; 
 
 /* Default size for the memory buffer used by both InStream and OutStream.
  */

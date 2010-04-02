@@ -8,8 +8,8 @@ class Lucy::Store::FSFileHandle cnick FSFH
     int    fd;
     void  *win_fhandle;
     void  *win_maphandle;
-    i64_t  len;
-    i64_t  page_size;
+    int64_t  len;
+    int64_t  page_size;
     char  *buf;
 
     /** Return a new FSFileHandle, or set Err_error and return NULL if
@@ -19,24 +19,24 @@ class Lucy::Store::FSFileHandle cnick FSFH
      * @param flags FileHandle constructor flags.
      */
     inert incremented nullable FSFileHandle* 
-    open(const CharBuf *path = NULL, u32_t flags);
+    open(const CharBuf *path = NULL, uint32_t flags);
 
     inert nullable FSFileHandle* 
-    do_open(FSFileHandle *self, const CharBuf *path = NULL, u32_t flags);
+    do_open(FSFileHandle *self, const CharBuf *path = NULL, uint32_t flags);
 
     bool_t
-    Window(FSFileHandle *self, FileWindow *window, i64_t offset, i64_t len);
+    Window(FSFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
     bool_t
     Release_Window(FSFileHandle *self, FileWindow *window);
 
     bool_t
-    Read(FSFileHandle *self, char *dest, i64_t offset, size_t len);
+    Read(FSFileHandle *self, char *dest, int64_t offset, size_t len);
 
     bool_t
     Write(FSFileHandle *self, const void *data, size_t len);
 
-    i64_t
+    int64_t
     Length(FSFileHandle *self);
 
     bool_t

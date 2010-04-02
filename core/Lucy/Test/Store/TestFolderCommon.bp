@@ -12,7 +12,7 @@ lucy_TestFolderCommon_tear_down_t(void);
 __END_C__
 
 inert class Lucy::Test::Store::TestFolderCommon {
-    inert u32_t
+    inert uint32_t
     num_tests();
 
     inert void

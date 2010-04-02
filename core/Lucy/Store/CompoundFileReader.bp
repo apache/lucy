@@ -20,7 +20,7 @@ class Lucy::Store::CompoundFileReader cnick CFReader
     Folder       *real_folder;
     Hash         *records;
     InStream     *instream;
-    i32_t         format;
+    int32_t       format;
 
     inert incremented nullable CompoundFileReader*
     open(Folder *folder);
@@ -55,7 +55,7 @@ class Lucy::Store::CompoundFileReader cnick CFReader
 
     incremented nullable FileHandle*
     Local_Open_FileHandle(CompoundFileReader *self, const CharBuf *name, 
-                          u32_t flags);
+                          uint32_t flags);
 
     incremented nullable InStream*
     Local_Open_In(CompoundFileReader *self, const CharBuf *name);
@@ -77,7 +77,7 @@ class Lucy::Store::CFReaderDirHandle cnick CFReaderDH
 
     CompoundFileReader *cf_reader;
     VArray             *elems;
-    i32_t               tick;
+    int32_t             tick;
 
     inert incremented CFReaderDirHandle*
     new(CompoundFileReader *cf_reader);

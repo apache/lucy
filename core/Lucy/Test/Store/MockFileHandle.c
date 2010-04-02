@@ -6,14 +6,14 @@
 #include "Lucy/Store/FileWindow.h"
 
 MockFileHandle*
-MockFileHandle_new(const CharBuf *path, i64_t length) 
+MockFileHandle_new(const CharBuf *path, int64_t length) 
 {
     MockFileHandle *self = (MockFileHandle*)VTable_Make_Obj(MOCKFILEHANDLE);
     return MockFileHandle_init(self, path, length);
 }
 
 MockFileHandle*
-MockFileHandle_init(MockFileHandle *self, const CharBuf *path, i64_t length) 
+MockFileHandle_init(MockFileHandle *self, const CharBuf *path, int64_t length) 
 {
     FH_do_open((FileHandle*)self, path, 0);
     self->len = length;
@@ -21,8 +21,8 @@ MockFileHandle_init(MockFileHandle *self, const CharBuf *path, i64_t length)
 }
 
 bool_t
-MockFileHandle_window(MockFileHandle *self, FileWindow *window, i64_t offset, 
-                     i64_t len)
+MockFileHandle_window(MockFileHandle *self, FileWindow *window, int64_t offset, 
+                     int64_t len)
 {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, offset, len);
@@ -37,7 +37,7 @@ MockFileHandle_release_window(MockFileHandle *self, FileWindow *window)
     return true;
 }
 
-i64_t
+int64_t
 MockFileHandle_length(MockFileHandle *self)
 {
     return self->len;

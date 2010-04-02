@@ -54,7 +54,7 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
      * @return a FileHandle.
      */
     public incremented nullable FileHandle*
-    Open_FileHandle(Folder *self, const CharBuf *path, u32_t flags);
+    Open_FileHandle(Folder *self, const CharBuf *path, uint32_t flags);
 
     /** Open a DirHandle or set Err_error and return NULL on failure.
      *
@@ -198,7 +198,7 @@ abstract class Lucy::Store::Folder extends Lucy::Object::Obj {
      * on failure.
      */
     abstract incremented nullable FileHandle*
-    Local_Open_FileHandle(Folder *self, const CharBuf *name, u32_t flags);
+    Local_Open_FileHandle(Folder *self, const CharBuf *name, uint32_t flags);
 
     /** Open an InStream for a local file, or set Err_error and return NULL on
      * failure. 

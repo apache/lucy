@@ -18,7 +18,7 @@ class Lucy::Store::CompoundFileWriter cnick CFWriter
 
     Folder      *folder;
 
-    inert i32_t current_file_format;
+    inert int32_t current_file_format;
 
     inert incremented CompoundFileWriter*
     new(Folder *folder);

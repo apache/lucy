@@ -25,7 +25,7 @@
 
 /* Convert FileHandle flags to POSIX flags. */
 static INLINE int
-SI_posix_flags(u32_t fh_flags)
+SI_posix_flags(uint32_t fh_flags)
 {
     int posix_flags = 0;
     if (fh_flags & FH_WRITE_ONLY) { posix_flags |= O_WRONLY; }
@@ -48,16 +48,16 @@ SI_posix_flags(u32_t fh_flags)
  * and set Err_error.
  */
 static INLINE void*
-SI_map(FSFileHandle *self, i64_t offset, i64_t len);
+SI_map(FSFileHandle *self, int64_t offset, int64_t len);
 
 /* Release a memory mapped region assigned by SI_map. 
  */
 static INLINE bool_t
-SI_unmap(FSFileHandle *self, char *ptr, i64_t len);
+SI_unmap(FSFileHandle *self, char *ptr, int64_t len);
 
 /* 32-bit or 64-bit inlined helpers for FSFH_window. */
 static INLINE bool_t
-SI_window(FSFileHandle *self, FileWindow *window, i64_t offset, i64_t len);
+SI_window(FSFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
 /* Architecture- and OS- specific initialization for a read-only FSFileHandle.
  */
@@ -71,14 +71,14 @@ SI_close_win_handles(FSFileHandle *self);
 #endif
 
 FSFileHandle*
-FSFH_open(const CharBuf *path, u32_t flags) 
+FSFH_open(const CharBuf *path, uint32_t flags) 
 {
     FSFileHandle *self = (FSFileHandle*)VTable_Make_Obj(FSFILEHANDLE);
     return FSFH_do_open(self, path, flags);
 }
 
 FSFileHandle*
-FSFH_do_open(FSFileHandle *self, const CharBuf *path, u32_t flags) 
+FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) 
 {
     FH_do_open((FileHandle*)self, path, flags);
     if (!path || !CB_Get_Size(path)) {
@@ -110,7 +110,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, u32_t flags)
                 return NULL;
             }
             else {
-                i64_t check_val = lseek64(self->fd, I64_C(0), SEEK_SET);
+                int64_t check_val = lseek64(self->fd, I64_C(0), SEEK_SET);
                 if (check_val == -1) {
                     Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s", 
                         self->path, strerror(errno))));
@@ -181,18 +181,18 @@ FSFH_write(FSFileHandle *self, const void *data, size_t len)
 {
     if (len) { 
         /* Write data, track file length, check for errors. */
-        i64_t check_val = write(self->fd, data, len);
+        int64_t check_val = write(self->fd, data, len);
         self->len += check_val;
         if (check_val != len) {
             if (check_val == -1) {
                 Err_set_error(Err_new(CB_newf(
                     "Error when writing %u64 bytes: %s",
-                    (u64_t)len, strerror(errno))));
+                    (uint64_t)len, strerror(errno))));
             }
             else {
                 Err_set_error(Err_new(CB_newf(
                     "Attempted to write %u64 bytes, but wrote %i64", 
-                    (u64_t)len, check_val)));
+                    (uint64_t)len, check_val)));
             }
             return false;
         }
@@ -201,16 +201,16 @@ FSFH_write(FSFileHandle *self, const void *data, size_t len)
     return true;
 }
 
-i64_t
+int64_t
 FSFH_length(FSFileHandle *self)
 {
     return self->len;
 }
 
 bool_t
-FSFH_window(FSFileHandle *self, FileWindow *window, i64_t offset, i64_t len)
+FSFH_window(FSFileHandle *self, FileWindow *window, int64_t offset, int64_t len)
 {
-    const i64_t end = offset + len;
+    const int64_t end = offset + len;
     if (!(self->flags & FH_READ_ONLY)) {
         Err_set_error(Err_new(CB_newf("Can't read from write-only handle")));
         return false;
@@ -236,7 +236,7 @@ FSFH_window(FSFileHandle *self, FileWindow *window, i64_t offset, i64_t len)
 #if IS_64_BIT
 
 static INLINE bool_t
-SI_window(FSFileHandle *self, FileWindow *window, i64_t offset, i64_t len)
+SI_window(FSFileHandle *self, FileWindow *window, int64_t offset, int64_t len)
 {
 	FileWindow_Set_Window(window, self->buf + offset, offset, len);
 	return true;
@@ -251,9 +251,9 @@ FSFH_release_window(FSFileHandle *self, FileWindow *window)
 }
 
 bool_t
-FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
+FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len)
 {
-    const i64_t end = offset + len;
+    const int64_t end = offset + len;
 
     if (self->flags & FH_WRITE_ONLY) {
         Err_set_error(Err_new(CB_newf(
@@ -268,7 +268,7 @@ FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
     else if (end > self->len) {
         Err_set_error(Err_new(CB_newf(
             "Tried to read past EOF: offset %i64 + request %u64 > len %i64", 
-            offset, (u64_t)len, self->len)));
+            offset, (uint64_t)len, self->len)));
         return false;
     }
     memcpy(dest, self->buf + offset, len);
@@ -280,7 +280,7 @@ FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
 #else
 
 static INLINE bool_t
-SI_window(FSFileHandle *self, FileWindow *window, i64_t offset, i64_t len)
+SI_window(FSFileHandle *self, FileWindow *window, int64_t offset, int64_t len)
 {
 	/* Release the previously mmap'd region, if any. */
 	FSFH_release_window(self, window);
@@ -289,9 +289,9 @@ SI_window(FSFileHandle *self, FileWindow *window, i64_t offset, i64_t len)
 		/* Start map on a page boundary.  Ensure that the window is at
 		 * least wide enough to view all the data spec'd in the original
 		 * request. */
-		const i64_t remainder       = offset % self->page_size;
-		const i64_t adjusted_offset = offset - remainder;
-		const i64_t adjusted_len    = len + remainder;
+		const int64_t remainder       = offset % self->page_size;
+		const int64_t adjusted_offset = offset - remainder;
+		const int64_t adjusted_len    = len + remainder;
 		char *const buf 
 			= (char*)SI_map(self, adjusted_offset, adjusted_len);
 		if (len && buf == NULL) {
@@ -341,7 +341,7 @@ SI_init_read_only(FSFileHandle *self)
         return false;
     }
     else {
-        i64_t check_val = lseek64(self->fd, I64_C(0), SEEK_SET);
+        int64_t check_val = lseek64(self->fd, I64_C(0), SEEK_SET);
         if (check_val == -1) {
             Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s",
                 self->path, strerror(errno))));
@@ -362,7 +362,7 @@ SI_init_read_only(FSFileHandle *self)
 }
 
 static INLINE void*
-SI_map(FSFileHandle *self, i64_t offset, i64_t len)
+SI_map(FSFileHandle *self, int64_t offset, int64_t len)
 {
     void *buf = NULL;
 
@@ -382,7 +382,7 @@ SI_map(FSFileHandle *self, i64_t offset, i64_t len)
 }
 
 static INLINE bool_t
-SI_unmap(FSFileHandle *self, char *buf, i64_t len)
+SI_unmap(FSFileHandle *self, char *buf, int64_t len)
 {
     if (buf != NULL) {
         if (munmap(buf, len)) {
@@ -396,9 +396,9 @@ SI_unmap(FSFileHandle *self, char *buf, i64_t len)
 
 #if !IS_64_BIT
 bool_t
-FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
+FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len)
 {
-    i64_t check_val;
+    int64_t check_val;
     
     /* Sanity check. */
     if (offset < 0) {
@@ -409,16 +409,16 @@ FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
 
     /* Read. */
     check_val = pread64(self->fd, dest, len, offset);
-    if (check_val != (i64_t)len) {
+    if (check_val != (int64_t)len) {
         if (check_val == -1) {
             Err_set_error(Err_new(CB_newf(
                 "Tried to read %u64 bytes, got %i64: %s",
-                (u64_t)len, check_val, strerror(errno))));
+                (uint64_t)len, check_val, strerror(errno))));
         }
         else {
             Err_set_error(Err_new(CB_newf(
                 "Tried to read %u64 bytes, got %i64", 
-                (u64_t)len, check_val)));
+                (uint64_t)len, check_val)));
         }
         return false;
     }
@@ -489,13 +489,13 @@ SI_init_read_only(FSFileHandle *self)
 }
 
 static INLINE void*
-SI_map(FSFileHandle *self, i64_t offset, i64_t len)
+SI_map(FSFileHandle *self, int64_t offset, int64_t len)
 {
     void *buf = NULL;
 
     if (len) {
         /* Read-only memory map. */
-        u64_t offs = (u64_t)offset;
+        uint64_t offs = (uint64_t)offset;
         DWORD file_offset_hi = offs >> 32;
         DWORD file_offset_lo = offs & 0xFFFFFFFF;
         size_t amount = (size_t)len;
@@ -519,7 +519,7 @@ SI_map(FSFileHandle *self, i64_t offset, i64_t len)
 }
 
 static INLINE bool_t
-SI_unmap(FSFileHandle *self, char *buf, i64_t len)
+SI_unmap(FSFileHandle *self, char *buf, int64_t len)
 {
     if (buf != NULL) {
         if (!UnmapViewOfFile(buf)) {
@@ -563,12 +563,12 @@ SI_close_win_handles(FSFileHandle *self)
 
 #if !IS_64_BIT
 bool_t
-FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
+FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len)
 {
     BOOL check_val;
     DWORD got;
     OVERLAPPED read_op_state;
-    u64_t offs = (u64_t)offset;
+    uint64_t offs = (uint64_t)offset;
 
     read_op_state.hEvent     = NULL;
     read_op_state.OffsetHigh = offs >> 32;
@@ -585,7 +585,7 @@ FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
      * argument, so throw a sensible error rather than wrap around. */
     if (len > U32_MAX) {
         Err_set_error(Err_new(CB_newf(
-            "Can't read more than 4 GB (%u64)", (u64_t)len))); 
+            "Can't read more than 4 GB (%u64)", (uint64_t)len))); 
         return false;
     }
 
@@ -603,7 +603,7 @@ FSFH_read(FSFileHandle *self, char *dest, i64_t offset, size_t len)
     if (!check_val) {
         char *win_error = Err_win_error();
         Err_set_error(Err_new(CB_newf("Failed to read %u64 bytes: %s",
-            (u64_t)len, win_error)));
+            (uint64_t)len, win_error)));
         FREEMEM(win_error);
         return false;
     }

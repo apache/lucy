@@ -60,7 +60,7 @@ RAMFolder_local_mkdir(RAMFolder *self, const CharBuf *name)
 
 FileHandle*
 RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name, 
-                                u32_t flags)
+                                uint32_t flags)
 {
     RAMFileHandle *fh;
     CharBuf *fullpath = S_fullpath(self, name);
@@ -251,7 +251,7 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
         }
     }
     else {
-        THROW(ERR, "Unexpected op: %i32", (i32_t)op);
+        THROW(ERR, "Unexpected op: %i32", (int32_t)op);
     }
 
     return true;
