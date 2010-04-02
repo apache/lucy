@@ -57,6 +57,8 @@ int main(int argc, char **argv)
         "  #include <alloca.h>\n"
         "#elif defined(CHY_HAS_MALLOC_H)\n"
         "  #include <malloc.h>\n"
+        "#elif defined(CHY_ALLOCA_IN_STDLIB_H)\n"
+        "  #include <stdlib.h>\n"
         "#endif\n\n"
     );
 

@@ -18,6 +18,10 @@ extern "C" {
  * 
  * HAS_ALLOCA_H            <alloca.h> 
  * HAS_MALLOC_H            <malloc.h>
+ *
+ * Defined if alloca() is available via stdlib.h:
+ *
+ * ALLOCA_IN_STDLIB_H
  */
 void chaz_Memory_run(void);
 
