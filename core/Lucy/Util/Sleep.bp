@@ -7,12 +7,12 @@ inert class Lucy::Util::Sleep {
     /** Sleep for <code>seconds</code> seconds.  
      */
     inert void
-    sleep(u32_t seconds);
+    sleep(uint32_t seconds);
 
     /** Sleep for <code>milliseconds</code> milliseconds.  
      */
     inert void
-    millisleep(u32_t milliseconds);
+    millisleep(uint32_t milliseconds);
 }
 
 /* Copyright 2009 The Apache Software Foundation

@@ -12,7 +12,7 @@ IxFileNames_latest_snapshot(Folder *folder)
     DirHandle *dh = Folder_Open_Dir(folder, NULL);
     CharBuf   *entry = dh ? DH_Get_Entry(dh) : NULL;
     CharBuf   *retval   = NULL;
-    u64_t      latest_gen = 0;
+    uint64_t   latest_gen = 0;
 
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
 
@@ -20,7 +20,7 @@ IxFileNames_latest_snapshot(Folder *folder)
         if (   CB_Starts_With_Str(entry, "snapshot_", 9)
             && CB_Ends_With_Str(entry, ".json", 5)
         ) {
-            u64_t gen = IxFileNames_extract_gen(entry);
+            uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_gen) {
                 latest_gen = gen;
                 if (!retval) retval = CB_Clone(entry);
@@ -33,7 +33,7 @@ IxFileNames_latest_snapshot(Folder *folder)
     return retval;
 }
 
-u64_t
+uint64_t
 IxFileNames_extract_gen(const CharBuf *name)
 {
     ZombieCharBuf *num_string = ZCB_WRAP(name);
@@ -41,20 +41,20 @@ IxFileNames_extract_gen(const CharBuf *name)
     /* Advance past first underscore.  Bail if we run out of string or if we
      * encounter a NULL. */
     while (1) {
-        u32_t code_point = ZCB_Nip_One(num_string);
+        uint32_t code_point = ZCB_Nip_One(num_string);
         if (code_point == 0) { return 0; }
         else if (code_point == '_') { break; }
     }
 
-    return (u64_t)ZCB_BaseX_To_I64(num_string, 36);
+    return (uint64_t)ZCB_BaseX_To_I64(num_string, 36);
 }
 
 ZombieCharBuf*
 IxFileNames_local_part(const CharBuf *path, ZombieCharBuf *target)
 {
-    ZombieCharBuf *scratch  = ZCB_WRAP(path);
+    ZombieCharBuf *scratch = ZCB_WRAP(path);
     size_t local_part_start = CB_Length(path);
-    u32_t  code_point;
+    uint32_t code_point;
 
     ZCB_Assign(target, path);
 

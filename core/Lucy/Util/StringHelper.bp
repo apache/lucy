@@ -5,7 +5,7 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
     /* A table where the values indicate the number of bytes in a UTF-8
      * sequence implied by the leading utf8 byte.
      */
-    inert const u8_t[] UTF8_SKIP;
+    inert const uint8_t[] UTF8_SKIP;
 
     /* A table where the values indicate the number of trailing bytes in a
      * UTF-8 sequence implied by the leading utf8 byte.
@@ -15,11 +15,11 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
      * 
      * Exposed for testing only.
      */
-    inert const u8_t[] UTF8_TRAILING;
+    inert const uint8_t[] UTF8_TRAILING;
 
     /** Return the number of bytes that two strings have in common.
      */
-    inert i32_t
+    inert int32_t
     overlap(const char *a, const char *b, size_t a_len,  size_t b_len);
 
     /** Encode a NULL-terminated string representation of a value in base 36
@@ -30,8 +30,8 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
      * @return the number of digits encoded (not including the terminating
      * NULL).
      */
-    inert u32_t 
-    to_base36(u64_t value, void *buffer);
+    inert uint32_t 
+    to_base36(uint64_t value, void *buffer);
 
     /** Return true if the string is valid UTF-8, false otherwise.
      */
@@ -41,7 +41,7 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
     /** Returns true if the code point qualifies as Unicode whitespace.
      */
     inert bool_t
-    is_whitespace(u32_t code_point); 
+    is_whitespace(uint32_t code_point); 
 
     /** Encode a Unicode code point to a UTF-8 sequence.  
      * 
@@ -49,12 +49,12 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
      * @param buffer Write buffer which must hold at least 4 bytes (the
      * maximum legal length for a UTF-8 char).
      */
-    inert u32_t
-    encode_utf8_char(u32_t code_point, void *buffer);
+    inert uint32_t
+    encode_utf8_char(uint32_t code_point, void *buffer);
 
     /** Decode a UTF-8 sequence to a Unicode code point.  Assumes valid UTF-8. 
      */
-    inert u32_t
+    inert uint32_t
     decode_utf8_char(const char *utf8);
 
     /** Return the first non-continuation byte before the supplied pointer.

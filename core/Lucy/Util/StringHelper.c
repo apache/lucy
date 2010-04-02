@@ -8,7 +8,7 @@
 #include "Lucy/Object/Err.h"
 #include "Lucy/Util/Memory.h"
 
-const u8_t StrHelp_UTF8_SKIP[] = {
+const uint8_t StrHelp_UTF8_SKIP[] = {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -20,7 +20,7 @@ const u8_t StrHelp_UTF8_SKIP[] = {
 };
 #define SKIP_MASK 0x7
 
-const u8_t StrHelp_UTF8_TRAILING[] = {
+const uint8_t StrHelp_UTF8_TRAILING[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -32,7 +32,7 @@ const u8_t StrHelp_UTF8_TRAILING[] = {
 };
 #define TRAILING_MASK 0x7
 
-i32_t
+int32_t
 StrHelp_overlap(const char *a, const char *b, size_t a_len,  size_t b_len)
 {
     size_t i;
@@ -46,8 +46,8 @@ StrHelp_overlap(const char *a, const char *b, size_t a_len,  size_t b_len)
 
 static const char base36_chars[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-u32_t
-StrHelp_to_base36(u64_t num, void *buffer) 
+uint32_t
+StrHelp_to_base36(uint64_t num, void *buffer) 
 {
     char  my_buf[StrHelp_MAX_BASE36_BYTES];
     char *buf = my_buf + StrHelp_MAX_BASE36_BYTES - 1;
@@ -63,7 +63,7 @@ StrHelp_to_base36(u64_t num, void *buffer)
     } while (num > 0);
 
     {
-        u32_t size = end - buf;
+        uint32_t size = end - buf;
         memcpy(buffer, buf, size + 1);
         return size;
     }
@@ -120,40 +120,40 @@ StrHelp_utf8_valid(const char *ptr, size_t size)
     return trailing == 0 ? true : false;
 }
 
-u32_t
-StrHelp_encode_utf8_char(u32_t code_point, void *buffer)
+uint32_t
+StrHelp_encode_utf8_char(uint32_t code_point, void *buffer)
 {
-    u8_t *buf = (u8_t*)buffer;
+    uint8_t *buf = (uint8_t*)buffer;
     if (code_point <= 0x7F) { // ASCII 
-        buf[0] = (u8_t)code_point;
+        buf[0] = (uint8_t)code_point;
         return 1;
     }
     else if (code_point <= 0x07FF) { // 2 byte range 
-        buf[0] = (u8_t)(0xC0 | (code_point >> 6));
-        buf[1] = (u8_t)(0x80 | (code_point & 0x3f));
+        buf[0] = (uint8_t)(0xC0 | (code_point >> 6));
+        buf[1] = (uint8_t)(0x80 | (code_point & 0x3f));
         return 2;
     }
     else if (code_point <= 0xFFFF) { // 3 byte range 
-        buf[0] = (u8_t)(0xE0 | ( code_point >> 12       ));
-        buf[1] = (u8_t)(0x80 | ((code_point >> 6) & 0x3F));
-        buf[2] = (u8_t)(0x80 | ( code_point       & 0x3f));
+        buf[0] = (uint8_t)(0xE0 | ( code_point >> 12       ));
+        buf[1] = (uint8_t)(0x80 | ((code_point >> 6) & 0x3F));
+        buf[2] = (uint8_t)(0x80 | ( code_point       & 0x3f));
         return 3;
     }
     else if (code_point <= 0x10FFFF) { // 4 byte range 
-        buf[0] = (u8_t)(0xF0 | ( code_point >> 18        ));
-        buf[1] = (u8_t)(0x80 | ((code_point >> 12) & 0x3F));
-        buf[2] = (u8_t)(0x80 | ((code_point >> 6 ) & 0x3F));
-        buf[3] = (u8_t)(0x80 | ( code_point        & 0x3f));
+        buf[0] = (uint8_t)(0xF0 | ( code_point >> 18        ));
+        buf[1] = (uint8_t)(0x80 | ((code_point >> 12) & 0x3F));
+        buf[2] = (uint8_t)(0x80 | ((code_point >> 6 ) & 0x3F));
+        buf[3] = (uint8_t)(0x80 | ( code_point        & 0x3f));
         return 4;
     }
     else {
         THROW(ERR, "Illegal Unicode code point: %u32", code_point);
-        UNREACHABLE_RETURN(u32_t);
+        UNREACHABLE_RETURN(uint32_t);
     }
 }
 
 bool_t
-StrHelp_is_whitespace(u32_t code_point)
+StrHelp_is_whitespace(uint32_t code_point)
 {
     switch (code_point) {
                  // <control-0009>..<control-000D> 
@@ -179,11 +179,11 @@ StrHelp_is_whitespace(u32_t code_point)
     }
 }
 
-u32_t
+uint32_t
 StrHelp_decode_utf8_char(const char *ptr)
 {
-    const u8_t *const string = (const u8_t*)ptr;
-    u32_t retval = *string;
+    const uint8_t *const string = (const uint8_t*)ptr;
+    uint32_t retval = *string;
     int trailing = StrHelp_UTF8_TRAILING[retval];
 
     switch (trailing & TRAILING_MASK) {

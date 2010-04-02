@@ -10,8 +10,8 @@ parcel Lucy;
 
 class Lucy::Util::PriorityQueue cnick PriQ
     extends Lucy::Object::Obj {
-    u32_t   size;
-    u32_t   max_size;
+    uint32_t   size;
+    uint32_t   max_size;
 
     /* This particular priority queue variant leaves slot 0 open in order to
      * keep the relationship between node rank and index clear in the up_heap
@@ -23,7 +23,7 @@ class Lucy::Util::PriorityQueue cnick PriQ
      * @param max_size Max elements the queue can hold.
      */
     inert PriorityQueue*
-    init(PriorityQueue *self, u32_t max_size);
+    init(PriorityQueue *self, uint32_t max_size);
 
     /** Compare queue elements.
      */
@@ -61,7 +61,7 @@ class Lucy::Util::PriorityQueue cnick PriQ
 
     /** Accessor for "size" member. 
      */
-    u32_t
+    uint32_t
     Get_Size(PriorityQueue *self);
 
     public void

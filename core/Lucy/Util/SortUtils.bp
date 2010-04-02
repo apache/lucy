@@ -24,13 +24,13 @@ inert class Lucy::Util::SortUtils cnick Sort {
      * sorted.
      */
     inert void
-    mergesort(void *elems, void *scratch, u32_t num_elems, u32_t width,
+    mergesort(void *elems, void *scratch, uint32_t num_elems, uint32_t width,
               Sort_compare_t compare, void *context);
 
     /** Standard mergesort function.
      */
     inert void
-    do_sort(void *elems, void *scratch, u32_t left, u32_t right,
+    do_sort(void *elems, void *scratch, uint32_t left, uint32_t right,
             Sort_compare_t compare, void *context);
 
     /** Merge two source arrays together using the classic mergesort merge
@@ -47,8 +47,8 @@ inert class Lucy::Util::SortUtils cnick Sort {
      * consolidated buffer.
      */
     inert void
-    merge(void *left_ptr,  u32_t left_num_elems,
-          void *right_ptr, u32_t right_num_elems,
+    merge(void *left_ptr,  uint32_t left_num_elems,
+          void *right_ptr, uint32_t right_num_elems,
           void *dest, size_t width, Sort_compare_t compare, void *context);
 
     /** Quicksort. 

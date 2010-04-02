@@ -27,9 +27,9 @@ static void
 S_down_heap(PriorityQueue *self);
 
 PriorityQueue*
-PriQ_init(PriorityQueue *self, u32_t max_size)
+PriQ_init(PriorityQueue *self, uint32_t max_size)
 {
-    u32_t heap_size = max_size + 1;
+    uint32_t heap_size = max_size + 1;
 
     // Init. 
     self->size = 0;
@@ -54,7 +54,7 @@ PriQ_destroy(PriorityQueue *self)
     SUPER_DESTROY(self, PRIORITYQUEUE);
 }
 
-u32_t
+uint32_t
 PriQ_get_size(PriorityQueue *self) { return self->size; }
 
 static void
@@ -138,7 +138,7 @@ PriQ_pop_all(PriorityQueue *self)
 
     // Map the queue nodes onto the array in reverse order. 
     if (self->size) {
-        u32_t i;
+        uint32_t i;
         for (i = self->size; i--; ) {
             Obj *const elem = PriQ_Pop(self);
             VA_Store(retval, i, elem);
@@ -162,7 +162,7 @@ PriQ_peek(PriorityQueue *self)
 static void 
 S_clear(PriorityQueue *self) 
 {
-    u32_t i;
+    uint32_t i;
     Obj **elem_ptr = (self->heap + 1);
 
     // Node 0 is held empty, to make the algo clearer. 
@@ -177,8 +177,8 @@ S_clear(PriorityQueue *self)
 static void
 S_up_heap(PriorityQueue *self) 
 {
-    u32_t i = self->size;
-    u32_t j = i >> 1;
+    uint32_t i = self->size;
+    uint32_t j = i >> 1;
     Obj *const node = self->heap[i]; // save bottom node 
 
     while (    j > 0 
@@ -194,9 +194,9 @@ S_up_heap(PriorityQueue *self)
 static void
 S_down_heap(PriorityQueue *self) 
 {
-    u32_t i = 1;
-    u32_t j = i << 1;
-    u32_t k = j + 1;
+    uint32_t i = 1;
+    uint32_t j = i << 1;
+    uint32_t k = j + 1;
     Obj *node = self->heap[i]; // save top node 
 
     // Find smaller child. 

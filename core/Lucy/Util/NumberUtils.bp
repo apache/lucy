@@ -7,43 +7,43 @@ parcel Lucy;
  */
 inert class Lucy::Util::NumberUtils cnick NumUtil { 
 
-    inert const u8_t[8] u1masks;
-    inert const u8_t[4] u2masks;
-    inert const u8_t[4] u2shifts;
-    inert const u8_t[2] u4masks;
-    inert const u8_t[2] u4shifts;
+    inert const uint8_t[8] u1masks;
+    inert const uint8_t[4] u2masks;
+    inert const uint8_t[4] u2shifts;
+    inert const uint8_t[2] u4masks;
+    inert const uint8_t[2] u4shifts;
     
     /** Encode an unsigned 16-bit integer as 2 bytes in the buffer provided,
      * using big-endian byte order.
      */
     inert inline void
-    encode_bigend_u16(u16_t value, void *dest);
+    encode_bigend_u16(uint16_t value, void *dest);
 
     /** Encode an unsigned 32-bit integer as 4 bytes in the buffer provided,
      * using big-endian byte order.
      */
     inert inline void
-    encode_bigend_u32(u32_t value, void *dest);
+    encode_bigend_u32(uint32_t value, void *dest);
 
     /** Encode an unsigned 64-bit integer as 8 bytes in the buffer provided,
      * using big-endian byte order. 
      */
     inert inline void
-    encode_bigend_u64(u64_t value, void *dest);
+    encode_bigend_u64(uint64_t value, void *dest);
 
     /** Interpret a sequence of bytes as a big-endian unsigned 16-bit int.
      */
-    inert inline u16_t
+    inert inline uint16_t
     decode_bigend_u16(void *source);
 
     /** Interpret a sequence of bytes as a big-endian unsigned 32-bit int.
      */
-    inert inline u32_t
+    inert inline uint32_t
     decode_bigend_u32(void *source);
 
     /** Interpret a sequence of bytes as a big-endian unsigned 64-bit int.
      */
-    inert inline u64_t
+    inert inline uint64_t
     decode_bigend_u64(void *source);
 
     /** Encode a 32-bit floating point number as 4 bytes in the buffer
@@ -75,7 +75,7 @@ inert class Lucy::Util::NumberUtils cnick NumUtil {
      * of the C32.
      */
     inert inline void
-    encode_c32(u32_t value, char **dest);
+    encode_c32(uint32_t value, char **dest);
 
     /** Encode a C32 at the space pointed to by <code>dest</code>, but add
      * "leading zeroes" so that the space consumed will always be 5 bytes.  As
@@ -83,27 +83,27 @@ inert class Lucy::Util::NumberUtils cnick NumUtil {
      * the end of the C32.
      */
     inert inline void
-    encode_padded_c32(u32_t value, char **dest);
+    encode_padded_c32(uint32_t value, char **dest);
 
     /** Encode a C64 at the space pointed to by <code>dest</code>. As a side
      * effect, <code>dest</code> will be advanced to immediately after the end
      * of the C64.
      */
     inert inline void
-    encode_c64(u64_t value, char **dest);
+    encode_c64(uint64_t value, char **dest);
 
     /** Read a C32 from the buffer pointed to by <code>source</code>.  As a
      * side effect, advance the pointer, consuming the bytes occupied by the
      * C32.
      */
-    inert inline u32_t
+    inert inline uint32_t
     decode_c32(char **source);
 
     /** Read a C64 from the buffer pointed to by <code>source</code>.  As a
      * side effect, advance the pointer, consuming the bytes occupied by the
      * C64.
      */
-    inert inline u64_t
+    inert inline uint64_t
     decode_c64(char **source);
 
     /** Advance <code>source</code> past one encoded C32 or C64.
@@ -115,74 +115,74 @@ inert class Lucy::Util::NumberUtils cnick NumUtil {
      * bit at <code>tick</code> is set, false otherwise.
      */
     inert inline bool_t
-    u1get(void *array, u32_t tick);
+    u1get(void *array, uint32_t tick);
 
     /** Interpret <code>array</code> as an array of bits; set the bit at
      * <code>tick</code>.
      */
     inert inline void 
-    u1set(void *array, u32_t tick);
+    u1set(void *array, uint32_t tick);
 
     /** Interpret <code>array</code> as an array of bits; clear the bit at
      * <code>tick</code>.
      */
     inert inline void 
-    u1clear(void *array, u32_t tick);
+    u1clear(void *array, uint32_t tick);
 
     /** Interpret <code>array</code> as an array of bits; flip the bit at
      * <code>tick</code>.
      */
     inert inline void
-    u1flip(void *array, u32_t tick);
+    u1flip(void *array, uint32_t tick);
 
     /** Interpret <code>array</code> as an array of two-bit integers; return
      * the value at <code>tick</code>.
      */
-    inert inline u8_t
-    u2get(void *array, u32_t tick);
+    inert inline uint8_t
+    u2get(void *array, uint32_t tick);
 
     /** Interpret <code>array</code> as an array of two-bit integers; set the
      * element at <code>tick</code> to <code>value</code>.
      */
     inert inline void 
-    u2set(void *array, u32_t tick, u8_t value);
+    u2set(void *array, uint32_t tick, uint8_t value);
 
     /** Interpret <code>array</code> as an array of four-bit integers; return
      * the value at <code>tick</code>.
      */
-    inert inline u8_t
-    u4get(void *array, u32_t tick);
+    inert inline uint8_t
+    u4get(void *array, uint32_t tick);
 
     /** Interpret <code>array</code> as an array of four-bit integers; set the
      * element at <code>tick</code> to <code>value</code>.
      */
     inert inline void 
-    u4set(void *array, u32_t tick, u8_t value);
+    u4set(void *array, uint32_t tick, uint8_t value);
 }
 
 __C__
 
 static CHY_INLINE void
-lucy_NumUtil_encode_bigend_u16(chy_u16_t num, void *dest_ptr)
+lucy_NumUtil_encode_bigend_u16(uint16_t num, void *dest_ptr)
 {
-    chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
+    uint8_t *dest = *(uint8_t**)dest_ptr;
 #ifdef CHY_BIG_END
-    memcpy(dest, &num, sizeof(chy_u16_t));
+    memcpy(dest, &num, sizeof(uint16_t));
 #else // little endian 
-    chy_u8_t *source = (chy_u8_t*)&num;
+    uint8_t *source = (uint8_t*)&num;
     dest[0] = source[1];
     dest[1] = source[0];
 #endif // CHY_BIG_END (and little endian) 
 }
 
 static CHY_INLINE void
-lucy_NumUtil_encode_bigend_u32(chy_u32_t num, void *dest_ptr)
+lucy_NumUtil_encode_bigend_u32(uint32_t num, void *dest_ptr)
 {
-    chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
+    uint8_t *dest = *(uint8_t**)dest_ptr;
 #ifdef CHY_BIG_END
-    memcpy(dest, &num, sizeof(chy_u32_t));
+    memcpy(dest, &num, sizeof(uint32_t));
 #else // little endian 
-    chy_u8_t *source = (chy_u8_t*)&num;
+    uint8_t *source = (uint8_t*)&num;
     dest[0] = source[3];
     dest[1] = source[2];
     dest[2] = source[1];
@@ -191,13 +191,13 @@ lucy_NumUtil_encode_bigend_u32(chy_u32_t num, void *dest_ptr)
 }
 
 static CHY_INLINE void
-lucy_NumUtil_encode_bigend_u64(chy_u64_t num, void *dest_ptr)
+lucy_NumUtil_encode_bigend_u64(uint64_t num, void *dest_ptr)
 {
-    chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
+    uint8_t *dest = *(uint8_t**)dest_ptr;
 #ifdef CHY_BIG_END
-    memcpy(dest, &num, sizeof(chy_u64_t));
+    memcpy(dest, &num, sizeof(uint64_t));
 #else // little endian 
-    chy_u8_t *source = (chy_u8_t*)&num;
+    uint8_t *source = (uint8_t*)&num;
     dest[0] = source[7];
     dest[1] = source[6];
     dest[2] = source[5];
@@ -209,37 +209,37 @@ lucy_NumUtil_encode_bigend_u64(chy_u64_t num, void *dest_ptr)
 #endif // CHY_BIG_END (and little endian) 
 }
 
-static CHY_INLINE chy_u16_t
+static CHY_INLINE uint16_t
 lucy_NumUtil_decode_bigend_u16(void *source)
 {
-    chy_u8_t *const buf = (chy_u8_t*)source;
+    uint8_t *const buf = (uint8_t*)source;
     return  (buf[0] << 8) |
             (buf[1]);
 }
 
-static CHY_INLINE chy_u32_t
+static CHY_INLINE uint32_t
 lucy_NumUtil_decode_bigend_u32(void *source)
 {
-    chy_u8_t *const buf = (chy_u8_t*)source;
+    uint8_t *const buf = (uint8_t*)source;
     return  (buf[0]  << 24) |
             (buf[1]  << 16) |
             (buf[2]  << 8)  |
             (buf[3]);
 }
 
-static CHY_INLINE chy_u64_t
+static CHY_INLINE uint64_t
 lucy_NumUtil_decode_bigend_u64(void *source)
 {
-    chy_u8_t *const buf = (chy_u8_t*)source;
-    chy_u64_t high_bits = (buf[0]  << 24) |
-                          (buf[1]  << 16) |
-                          (buf[2]  << 8)  |
-                          (buf[3]);
-    chy_u32_t low_bits  = (buf[4]  << 24) |
-                          (buf[5]  << 16) |
-                          (buf[6]  << 8)  |
-                          (buf[7]);
-    chy_u64_t retval = high_bits << 32;
+    uint8_t *const buf = (uint8_t*)source;
+    uint64_t high_bits = (buf[0]  << 24) |
+                         (buf[1]  << 16) |
+                         (buf[2]  << 8)  |
+                         (buf[3]);
+    uint32_t low_bits  = (buf[4]  << 24) |
+                         (buf[5]  << 16) |
+                         (buf[6]  << 8)  |
+                         (buf[7]);
+    uint64_t retval = high_bits << 32;
     retval |= low_bits;
     return retval;
 }
@@ -247,11 +247,11 @@ lucy_NumUtil_decode_bigend_u64(void *source)
 static CHY_INLINE void 
 lucy_NumUtil_encode_bigend_f32(float value, void *dest_ptr)
 {
-    chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
+    uint8_t *dest = *(uint8_t**)dest_ptr;
 #ifdef CHY_BIG_END
     memcpy(dest, &value, sizeof(float));
 #else 
-    union { float f; chy_u32_t u32; } duo; 
+    union { float f; uint32_t u32; } duo; 
     duo.f = value;
     lucy_NumUtil_encode_bigend_u32(duo.u32, &dest);
 #endif
@@ -260,11 +260,11 @@ lucy_NumUtil_encode_bigend_f32(float value, void *dest_ptr)
 static CHY_INLINE void 
 lucy_NumUtil_encode_bigend_f64(double value, void *dest_ptr)
 {
-    chy_u8_t *dest = *(chy_u8_t**)dest_ptr;
+    uint8_t *dest = *(uint8_t**)dest_ptr;
 #ifdef CHY_BIG_END
     memcpy(dest, &value, sizeof(double));
 #else 
-    union { double d; chy_u64_t u64; } duo; 
+    union { double d; uint64_t u64; } duo; 
     duo.d = value;
     lucy_NumUtil_encode_bigend_u64(duo.u64, &dest);
 #endif
@@ -273,7 +273,7 @@ lucy_NumUtil_encode_bigend_f64(double value, void *dest_ptr)
 static CHY_INLINE float 
 lucy_NumUtil_decode_bigend_f32(void *source)
 {
-    union { float f; chy_u32_t u32; } duo;
+    union { float f; uint32_t u32; } duo;
     memcpy(&duo, source, sizeof(float));
 #ifdef CHY_LITTLE_END 
     duo.u32 = lucy_NumUtil_decode_bigend_u32(&duo.u32);
@@ -284,7 +284,7 @@ lucy_NumUtil_decode_bigend_f32(void *source)
 static CHY_INLINE double 
 lucy_NumUtil_decode_bigend_f64(void *source)
 {
-    union { double d; chy_u64_t u64; } duo;
+    union { double d; uint64_t u64; } duo;
     memcpy(&duo, source, sizeof(double));
 #ifdef CHY_LITTLE_END 
     duo.u64 = lucy_NumUtil_decode_bigend_u64(&duo.u64);
@@ -292,16 +292,16 @@ lucy_NumUtil_decode_bigend_f64(void *source)
     return duo.d;
 }
 
-#define LUCY_NUMUTIL_C32_MAX_BYTES  ((sizeof(chy_u32_t) * 8 / 7) + 1) // 5 
-#define LUCY_NUMUTIL_C64_MAX_BYTES ((sizeof(chy_u64_t) * 8 / 7) + 1)  // 10 
+#define LUCY_NUMUTIL_C32_MAX_BYTES  ((sizeof(uint32_t) * 8 / 7) + 1) // 5 
+#define LUCY_NUMUTIL_C64_MAX_BYTES ((sizeof(uint64_t) * 8 / 7) + 1)  // 10 
 
 static CHY_INLINE void
-lucy_NumUtil_encode_c32(chy_u32_t number, char **out_buf)
+lucy_NumUtil_encode_c32(uint32_t number, char **out_buf)
 {
-    chy_u8_t   buf[LUCY_NUMUTIL_C32_MAX_BYTES];
-    chy_u32_t  aU32        = number;
-    chy_u8_t  *const limit = buf + sizeof(buf);
-    chy_u8_t  *ptr         = limit - 1;
+    uint8_t   buf[LUCY_NUMUTIL_C32_MAX_BYTES];
+    uint32_t  aU32        = number;
+    uint8_t  *const limit = buf + sizeof(buf);
+    uint8_t  *ptr         = limit - 1;
     int        num_bytes;
     // Write last byte first, which has no continue bit. 
     *ptr = aU32 & 0x7f;
@@ -317,12 +317,12 @@ lucy_NumUtil_encode_c32(chy_u32_t number, char **out_buf)
 }
 
 static CHY_INLINE void
-lucy_NumUtil_encode_c64(chy_u64_t number, char **out_buf)
+lucy_NumUtil_encode_c64(uint64_t number, char **out_buf)
 {
-    chy_u8_t   buf[LUCY_NUMUTIL_C64_MAX_BYTES];
-    chy_u64_t  aU64        = number;
-    chy_u8_t  *const limit = buf + sizeof(buf);
-    chy_u8_t  *ptr         = limit - 1;
+    uint8_t   buf[LUCY_NUMUTIL_C64_MAX_BYTES];
+    uint64_t  aU64        = number;
+    uint8_t  *const limit = buf + sizeof(buf);
+    uint8_t  *ptr         = limit - 1;
     int        num_bytes;
     // Write last byte first, which has no continue bit. 
     *ptr = aU64 & 0x7f;
@@ -338,13 +338,13 @@ lucy_NumUtil_encode_c64(chy_u64_t number, char **out_buf)
 }
 
 static CHY_INLINE void
-lucy_NumUtil_encode_padded_c32(chy_u32_t number, char **out_buf)
+lucy_NumUtil_encode_padded_c32(uint32_t number, char **out_buf)
 {
-    chy_u8_t buf[LUCY_NUMUTIL_C32_MAX_BYTES]
+    uint8_t buf[LUCY_NUMUTIL_C32_MAX_BYTES]
         = { 0x80, 0x80, 0x80, 0x80, 0x80 };
-    chy_u32_t aU32        = number;
-    chy_u8_t *const limit = buf + sizeof(buf);
-    chy_u8_t *ptr         = limit - 1;
+    uint32_t aU32        = number;
+    uint8_t *const limit = buf + sizeof(buf);
+    uint8_t *ptr         = limit - 1;
     // Write last byte first, which has no continue bit. 
     *ptr = aU32 & 0x7f;
     aU32 >>= 7;
@@ -366,21 +366,21 @@ lucy_NumUtil_encode_padded_c32(chy_u32_t number, char **out_buf)
         }  \
     } while (0)
 
-static CHY_INLINE chy_u32_t
+static CHY_INLINE uint32_t
 lucy_NumUtil_decode_c32(char **source_ptr)
 {
     char *source = *source_ptr;
-    chy_u32_t decoded = (*source & 0x7f); 
+    uint32_t decoded = (*source & 0x7f); 
     LUCY_NUMUTIL_DECODE_CINT(decoded, source);
     *source_ptr = source;
     return decoded;
 }
 
-static CHY_INLINE chy_u64_t
+static CHY_INLINE uint64_t
 lucy_NumUtil_decode_c64(char **source_ptr)
 {
     char *source = *source_ptr;
-    chy_u64_t decoded = (*source & 0x7f); 
+    uint64_t decoded = (*source & 0x7f); 
     LUCY_NUMUTIL_DECODE_CINT(decoded, source);
     *source_ptr = source;
     return decoded;
@@ -389,87 +389,87 @@ lucy_NumUtil_decode_c64(char **source_ptr)
 static CHY_INLINE void
 lucy_NumUtil_skip_cint(char **source_ptr)
 {
-    chy_u8_t *ptr = *(chy_u8_t**)source_ptr;
+    uint8_t *ptr = *(uint8_t**)source_ptr;
     while ((*ptr++ & 0x80) != 0) { }
     *source_ptr = (char*)ptr;
 }
 
 static CHY_INLINE chy_bool_t
-lucy_NumUtil_u1get(void *array, chy_u32_t tick) 
+lucy_NumUtil_u1get(void *array, uint32_t tick) 
 {
-    chy_u8_t *const u8bits      = (chy_u8_t*)array;
-    const chy_u32_t byte_offset = tick >> 3;
-    const chy_u8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
+    uint8_t *const u8bits      = (uint8_t*)array;
+    const uint32_t byte_offset = tick >> 3;
+    const uint8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
     return !((u8bits[byte_offset] & mask) == 0);
 }
 
 static CHY_INLINE void 
-lucy_NumUtil_u1set(void *array, chy_u32_t tick) 
+lucy_NumUtil_u1set(void *array, uint32_t tick) 
 {
-    chy_u8_t *const u8bits      = (chy_u8_t*)array;
-    const chy_u32_t byte_offset = tick >> 3;
-    const chy_u8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
+    uint8_t *const u8bits      = (uint8_t*)array;
+    const uint32_t byte_offset = tick >> 3;
+    const uint8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
     u8bits[byte_offset] |= mask;
 }
 
 static CHY_INLINE void 
-lucy_NumUtil_u1clear(void *array, chy_u32_t tick) 
+lucy_NumUtil_u1clear(void *array, uint32_t tick) 
 {
-    chy_u8_t *const u8bits      = (chy_u8_t*)array;
-    const chy_u32_t byte_offset = tick >> 3;
-    const chy_u8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
+    uint8_t *const u8bits      = (uint8_t*)array;
+    const uint32_t byte_offset = tick >> 3;
+    const uint8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
     u8bits[byte_offset] &= ~mask;
 }
 
 static CHY_INLINE void
-lucy_NumUtil_u1flip(void *array, chy_u32_t tick) 
+lucy_NumUtil_u1flip(void *array, uint32_t tick) 
 {
-    chy_u8_t *const u8bits      = (chy_u8_t*)array;
-    const chy_u32_t byte_offset = tick >> 3;
-    const chy_u8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
+    uint8_t *const u8bits      = (uint8_t*)array;
+    const uint32_t byte_offset = tick >> 3;
+    const uint8_t  mask        = lucy_NumUtil_u1masks[tick & 0x7];
     u8bits[byte_offset] ^= mask;
 }
 
-static CHY_INLINE chy_u8_t
-lucy_NumUtil_u2get(void *array, chy_u32_t tick) 
+static CHY_INLINE uint8_t
+lucy_NumUtil_u2get(void *array, uint32_t tick) 
 {
-    chy_u8_t *ints  = (chy_u8_t*)array;
-    chy_u8_t  byte  = ints[ (tick >> 2) ];
-    int       shift = lucy_NumUtil_u2shifts[ tick & 0x3 ];
+    uint8_t *ints  = (uint8_t*)array;
+    uint8_t  byte  = ints[ (tick >> 2) ];
+    int      shift = lucy_NumUtil_u2shifts[ tick & 0x3 ];
     return (byte >> shift) & 0x3;
 }
 
 static CHY_INLINE void 
-lucy_NumUtil_u2set(void *array, chy_u32_t tick, chy_u8_t value) 
+lucy_NumUtil_u2set(void *array, uint32_t tick, uint8_t value) 
 {
-    chy_u8_t *ints     = (chy_u8_t*)array;
-    unsigned  sub_tick = tick & 0x3;
-    int       shift    = lucy_NumUtil_u2shifts[sub_tick];
-    chy_u8_t  mask     = lucy_NumUtil_u2masks[sub_tick];
-    chy_u8_t  new_val  = value & 0x3;
-    chy_u8_t  new_bits = new_val << shift;
+    uint8_t *ints     = (uint8_t*)array;
+    unsigned sub_tick = tick & 0x3;
+    int      shift    = lucy_NumUtil_u2shifts[sub_tick];
+    uint8_t  mask     = lucy_NumUtil_u2masks[sub_tick];
+    uint8_t  new_val  = value & 0x3;
+    uint8_t  new_bits = new_val << shift;
     ints[(tick >> 2)]  = (ints[(tick >> 2)] & ~mask) | new_bits;
 }
 
 
-static CHY_INLINE chy_u8_t
-lucy_NumUtil_u4get(void *array, chy_u32_t tick) 
+static CHY_INLINE uint8_t
+lucy_NumUtil_u4get(void *array, uint32_t tick) 
 {
-    chy_u8_t *ints  = (chy_u8_t*)array;
-    chy_u8_t  byte  = ints[ (tick >> 1) ];
-    int       shift = lucy_NumUtil_u4shifts[(tick & 1)]; 
+    uint8_t *ints  = (uint8_t*)array;
+    uint8_t  byte  = ints[ (tick >> 1) ];
+    int      shift = lucy_NumUtil_u4shifts[(tick & 1)]; 
     return (byte >> shift) & 0xF;
 }
 
 static CHY_INLINE void 
-lucy_NumUtil_u4set(void *array, chy_u32_t tick, chy_u8_t value) 
+lucy_NumUtil_u4set(void *array, uint32_t tick, uint8_t value) 
 {
-    chy_u8_t *ints     = (chy_u8_t*)array;
+    uint8_t  *ints     = (uint8_t*)array;
     unsigned  sub_tick = tick & 0x1;
     int       shift    = lucy_NumUtil_u4shifts[sub_tick];
-    chy_u8_t  mask     = lucy_NumUtil_u4masks[sub_tick];
-    chy_u8_t  new_val  = value & 0xF;
-    chy_u8_t  new_bits = new_val << shift;
+    uint8_t   mask     = lucy_NumUtil_u4masks[sub_tick];
+    uint8_t   new_val  = value & 0xF;
+    uint8_t   new_bits = new_val << shift;
     ints[(tick >> 1)]  = (ints[(tick >> 1)] & ~mask) | new_bits;
 }
 
