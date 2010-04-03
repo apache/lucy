@@ -40,8 +40,8 @@ test_Equals(TestBatch *batch)
     ASSERT_FALSE(batch, VA_Equals(array, (Obj*)other), 
         "Non-matching value spoils Equals");
 
-    VA_Splice(array, 1, 2); /* removes empty elems */
-    VA_Delete(other, 1);    /* leaves NULL in place of deleted elem */
+    VA_Splice(array, 1, 2); // removes empty elems 
+    VA_Delete(other, 1);    // leaves NULL in place of deleted elem 
     VA_Delete(other, 2);
     ASSERT_FALSE(batch, VA_Equals(array, (Obj*)other), 
         "Empty trailing elements spoil Equals");

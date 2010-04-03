@@ -1,11 +1,11 @@
 #include "Lucy/Util/ToolSet.h"
 
-/* rmdir */
+// rmdir 
 #ifdef CHY_HAS_DIRECT_H
   #include <direct.h>
 #endif
 
-/* rmdir */
+// rmdir 
 #ifdef CHY_HAS_UNISTD_H
   #include <unistd.h>
 #endif

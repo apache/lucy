@@ -8,7 +8,7 @@
 static void
 test_Equals(TestBatch *batch)
 {
-    ByteBuf *wanted  = BB_new_bytes("foo", 4); /* Include terminating NULL. */
+    ByteBuf *wanted  = BB_new_bytes("foo", 4); // Include terminating NULL. 
     ByteBuf *got     = BB_new_bytes("foo", 4); 
 
     ASSERT_TRUE(batch, BB_Equals(wanted, (Obj*)got), "Equals");

@@ -37,7 +37,7 @@ test_Consolidate(TestBatch *batch)
     Folder *folder = S_folder_with_contents();
     FileHandle *fh;
     
-    /* Fake up detritus from failed consolidation. */
+    // Fake up detritus from failed consolidation. 
     fh = Folder_Open_FileHandle(folder, &cf_file, 
         FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE );
     DECREF(fh);

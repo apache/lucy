@@ -131,7 +131,7 @@ static void
 test_Keys_Values_Iter(TestBatch *batch)
 {
     uint32_t i;
-    Hash     *hash         = Hash_new(0); /* trigger multiple rebuilds. */
+    Hash     *hash         = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected     = VA_new(100);
     VArray   *keys;
     VArray   *values;
@@ -243,7 +243,7 @@ static void
 test_stress(TestBatch *batch)
 {
     uint32_t i;
-    Hash     *hash         = Hash_new(0); /* trigger multiple rebuilds. */
+    Hash     *hash         = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected     = VA_new(1000);
     VArray   *keys;
     VArray   *values;
@@ -260,7 +260,7 @@ test_stress(TestBatch *batch)
 
     VA_Sort(expected, NULL, NULL);
 
-    /* Overwrite for good measure. */
+    // Overwrite for good measure.
     for (i = 0; i < 1000; i++) {
         CharBuf *cb = (CharBuf*)VA_Fetch(expected, i);
         Hash_Store(hash, (Obj*)cb, INCREF(cb));

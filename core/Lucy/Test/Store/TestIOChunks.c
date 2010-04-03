@@ -70,7 +70,7 @@ test_Buf(TestBatch *batch)
     ASSERT_INT_EQ(batch, instream->limit - buf, IO_STREAM_BUF_SIZE, 
         "Small request bumped up");
 
-    buf += IO_STREAM_BUF_SIZE - 10; /* 10 bytes left in buffer. */
+    buf += IO_STREAM_BUF_SIZE - 10; // 10 bytes left in buffer. 
     InStream_Advance_Buf(instream, buf);
 
     buf = InStream_Buf(instream, 10);

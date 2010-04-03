@@ -144,7 +144,7 @@ test_Trim(TestBatch *batch)
     uint32_t i;
     CharBuf *got = CB_new(0);
 
-    /* Surround a smiley with lots of whitespace. */
+    // Surround a smiley with lots of whitespace. 
     for (i = 0; i < num_spaces; i++) { CB_Cat_Char(got, spaces[i]); }
     CB_Cat_Char(got, 0x263A);
     for (i = 0; i < num_spaces; i++) { CB_Cat_Char(got, spaces[i]); }
@@ -158,7 +158,7 @@ test_Trim(TestBatch *batch)
     ASSERT_TRUE(batch, CB_Equals_Str(got, smiley, smiley_len), 
         "Trim_Top and Trim_Tail worked");
 
-    /* Build the spacey smiley again. */
+    // Build the spacey smiley again. 
     CB_Truncate(got, 0);
     for (i = 0; i < num_spaces; i++) { CB_Cat_Char(got, spaces[i]); }
     CB_Cat_Char(got, 0x263A);
