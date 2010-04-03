@@ -4,7 +4,7 @@
 #include "Lucy/Index/Snapshot.h"
 #include "Lucy/Util/StringHelper.h"
 
-i32_t Snapshot_current_file_format = 1;
+int32_t Snapshot_current_file_format = 1;
 
 Snapshot*
 Snapshot_new()
@@ -61,7 +61,7 @@ Snapshot_list(Snapshot *self) {
     return Hash_Keys(self->entries); 
 }
 
-u32_t
+uint32_t
 Snapshot_num_entries(Snapshot *self) { return Hash_Get_Size(self->entries); }
 
 void

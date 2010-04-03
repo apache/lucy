@@ -14,7 +14,7 @@ class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
     Hash        *entries;
     CharBuf     *filename;
 
-    inert i32_t current_file_format;
+    inert int32_t current_file_format;
 
     public inert incremented Snapshot* 
     new();
@@ -32,7 +32,7 @@ class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
 
     /** Return the number of entries (including directories).
      */
-    public u32_t
+    public uint32_t
     Num_Entries(Snapshot *self);
 
 

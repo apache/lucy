@@ -18,22 +18,22 @@ parcel Lucy;
 class Lucy::Index::Segment cnick Seg extends Lucy::Object::Obj {
 
     CharBuf     *name;
-    i64_t        count;
-    i64_t        number;
+    int64_t      count;
+    int64_t      number;
     Hash        *by_name;   /* field numbers by name */
     VArray      *by_num;    /* field names by num */
     Hash        *metadata;
 
     inert incremented Segment*
-    new(i64_t number);
+    new(int64_t number);
 
     public inert Segment*
-    init(Segment *self, i64_t number);
+    init(Segment *self, int64_t number);
 
     /** Return a segment name with a base-36-encoded segment number. 
      */
     inert incremented CharBuf*
-    num_to_name(i64_t number);
+    num_to_name(int64_t number);
 
     /** Return true if the CharBuf is a segment name, i.e. matches this
      * pattern:  /^seg_\w+$/
@@ -47,7 +47,7 @@ class Lucy::Index::Segment cnick Seg extends Lucy::Object::Obj {
      * @param field Field name.
      * @return the field's field number, which is a positive integer.
      */
-    public i32_t
+    public int32_t
     Add_Field(Segment *self, const CharBuf *field);
 
     /** Store arbitrary information in the segment's metadata Hash, to be
@@ -78,14 +78,14 @@ class Lucy::Index::Segment cnick Seg extends Lucy::Object::Obj {
      * 
      * @param field Field name.
      */
-    public i32_t
+    public int32_t
     Field_Num(Segment *self, const CharBuf *field);
 
     /** Given a field number, return the name of its field, or NULL if the
      * field name can't be found.
      */
     public nullable CharBuf*
-    Field_Name(Segment *self, i32_t field_num);
+    Field_Name(Segment *self, int32_t field_num);
 
     /** Getter for the object's seg name.
      */
@@ -94,24 +94,24 @@ class Lucy::Index::Segment cnick Seg extends Lucy::Object::Obj {
 
     /** Getter for the segment number. 
      */
-    public i64_t
+    public int64_t
     Get_Number(Segment *self);
 
     /** Setter for the object's document count.
      */
     public void
-    Set_Count(Segment *self, i64_t count);
+    Set_Count(Segment *self, int64_t count);
 
     /** Getter for the object's document count.
      */
-    public i64_t 
+    public int64_t 
     Get_Count(Segment *self);
 
     /** Add <code>increment</code> to the object's document count, then return
      * the new, modified total.
      */
-    i64_t
-    Increment_Count(Segment *self, i64_t increment);
+    int64_t
+    Increment_Count(Segment *self, int64_t increment);
 
     /** Get the segment metadata.
      */

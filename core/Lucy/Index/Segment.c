@@ -10,14 +10,14 @@
 #include "Lucy/Util/IndexFileNames.h"
 
 Segment*
-Seg_new(i64_t number)
+Seg_new(int64_t number)
 {
     Segment *self = (Segment*)VTable_Make_Obj(SEGMENT);
     return Seg_init(self, number);
 }
 
 Segment*
-Seg_init(Segment *self, i64_t number)
+Seg_init(Segment *self, int64_t number)
 {
     /* Validate. */
     if (number < 0) { THROW(ERR, "Segment number %i64 less than 0", number); }
@@ -41,7 +41,7 @@ Seg_init(Segment *self, i64_t number)
 }
 
 CharBuf*
-Seg_num_to_name(i64_t number)
+Seg_num_to_name(int64_t number)
 {
     char base36[StrHelp_MAX_BASE36_BYTES];
     StrHelp_to_base36(number, &base36);
@@ -102,10 +102,10 @@ Seg_read_file(Segment *self, Folder *folder)
 
     /* Get list of field nums. */
     {
-        u32_t i;
+        uint32_t i;
         VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata, 
             "field_names", 11);
-        u32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
+        uint32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
         if (source_by_num == NULL) {
             THROW(ERR, "Failed to extract 'field_names' from metadata");
         }
@@ -148,7 +148,7 @@ Seg_write_file(Segment *self, Folder *folder)
     }
 }
 
-i32_t 
+int32_t 
 Seg_add_field(Segment *self, const CharBuf *field)
 {
     Integer32 *num = (Integer32*)Hash_Fetch(self->by_name, (Obj*)field);
@@ -156,7 +156,7 @@ Seg_add_field(Segment *self, const CharBuf *field)
         return Int32_Get_Value(num);
     }
     else {
-        i32_t field_num = VA_Get_Size(self->by_num);
+        int32_t field_num = VA_Get_Size(self->by_num);
         Hash_Store(self->by_name, (Obj*)field, (Obj*)Int32_new(field_num));
         VA_Push(self->by_num, (Obj*)CB_Clone(field));
         return field_num;
@@ -165,15 +165,15 @@ Seg_add_field(Segment *self, const CharBuf *field)
 
 CharBuf*
 Seg_get_name(Segment *self)               { return self->name; }
-i64_t
+int64_t
 Seg_get_number(Segment *self)             { return self->number; }
 void
-Seg_set_count(Segment *self, i64_t count) { self->count = count; }
-i64_t
+Seg_set_count(Segment *self, int64_t count) { self->count = count; }
+int64_t
 Seg_get_count(Segment *self)              { return self->count; }
 
-i64_t
-Seg_increment_count(Segment *self, i64_t increment) 
+int64_t
+Seg_increment_count(Segment *self, int64_t increment) 
 { 
    self->count += increment;
    return self->count;
@@ -221,14 +221,14 @@ Seg_compare_to(Segment *self, Obj *other)
 }
 
 CharBuf*
-Seg_field_name(Segment *self, i32_t field_num)
+Seg_field_name(Segment *self, int32_t field_num)
 {
      return field_num 
         ? (CharBuf*)VA_Fetch(self->by_num, field_num)
         : NULL;
 }
 
-i32_t
+int32_t
 Seg_field_num(Segment *self, const CharBuf *field)
 {
     if (field == NULL) {
