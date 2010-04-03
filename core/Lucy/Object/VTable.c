@@ -49,14 +49,14 @@ VTable_inc_refcount(VTable *self)
     return (Obj*)self;
 }
 
-u32_t
+uint32_t
 VTable_dec_refcount(VTable *self)
 {
     UNUSED_VAR(self);
     return 1;
 }
 
-u32_t
+uint32_t
 VTable_get_refcount(VTable *self)
 {
     UNUSED_VAR(self);
@@ -112,7 +112,7 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
     VTable *singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)subclass_name);
     if (singleton == NULL) {
         VArray *novel_host_methods;
-        u32_t num_novel;
+        uint32_t num_novel;
 
         if (parent == NULL) {
             CharBuf *parent_class = VTable_find_parent_class(subclass_name);
@@ -139,7 +139,7 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
         num_novel = VA_Get_Size(novel_host_methods);
         if (num_novel) {
             Hash *meths = Hash_new(num_novel);
-            u32_t i;
+            uint32_t i;
             CharBuf *scrunched = CB_new(0);
             ZombieCharBuf *callback_name = ZCB_BLANK();
             for (i = 0; i < num_novel; i++) {
@@ -214,7 +214,7 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target)
     ZombieCharBuf *iterator = ZCB_WRAP(source);
     CB_Set_Size(target, 0);
     while (ZCB_Get_Size(iterator)) {
-        u32_t code_point = ZCB_Nip_One(iterator);
+        uint32_t code_point = ZCB_Nip_One(iterator);
         if (code_point > 127) {
             THROW(ERR, "Can't fold case for %o", source);
         }

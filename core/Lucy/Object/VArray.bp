@@ -4,7 +4,7 @@ __C__
 #include "Lucy/Util/SortUtils.h"
 
 typedef chy_bool_t
-(*lucy_VA_grep_test_t)(lucy_VArray *self, chy_u32_t tick, void *data);
+(*lucy_VA_grep_test_t)(lucy_VArray *self, uint32_t tick, void *data);
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define VA_grep_test_t lucy_VA_grep_test_t
@@ -15,19 +15,19 @@ __END_C__
  */
 class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
 
-    Obj   **elems;
-    u32_t   size;
-    u32_t   cap;
+    Obj      **elems;
+    uint32_t   size;
+    uint32_t   cap;
 
     inert incremented VArray*
-    new(u32_t capacity);
+    new(uint32_t capacity);
 
     /** 
      * @param capacity Initial number of elements that the object will be able
      * to hold before reallocation.
      */
     inert VArray*
-    init(VArray *self, u32_t capacity);
+    init(VArray *self, uint32_t capacity);
 
     /** Push an item onto the end of a VArray.
      */
@@ -58,31 +58,31 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
      * elements.
      */
     void
-    Grow(VArray *self, u32_t capacity);
+    Grow(VArray *self, uint32_t capacity);
 
     /** Fetch the element at <code>tick</tick>.
      */
     nullable Obj*
-    Fetch(VArray *self, u32_t tick);
+    Fetch(VArray *self, uint32_t tick);
 
     /** Store an element at index <code>tick</code>, possibly displacing an
      * existing element.
      */
     void
-    Store(VArray *self, u32_t tick, decremented Obj *elem);
+    Store(VArray *self, uint32_t tick, decremented Obj *elem);
 
     /** Replace an element in the VArray with NULL and return it.  
      *
      * @return whatever was stored at <code>tick</code>.
      */
     incremented nullable Obj*
-    Delete(VArray *self, u32_t tick);
+    Delete(VArray *self, uint32_t tick);
 
     /** Remove <code>length</code> elements from the array, starting at
      * <code>offset</code>. Move elements over to fill in the gap.
      */
     void
-    Splice(VArray *self, u32_t offset, u32_t length);
+    Splice(VArray *self, uint32_t offset, uint32_t length);
 
     /** Clone the VArray but merely increment the refcounts of its elements
      * rather than clone them.
@@ -114,7 +114,7 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
      * than the current size, decrement and discard truncated elements.
      */
     void
-    Resize(VArray *self, u32_t size);
+    Resize(VArray *self, uint32_t size);
 
     /** Empty the VArray. 
      */
@@ -123,12 +123,12 @@ class Lucy::Object::VArray cnick VA extends Lucy::Object::Obj {
 
     /** Accessor for <code>size</code> member.
      */
-    public u32_t
+    public uint32_t
     Get_Size(VArray *self);
 
     /** Accessor for <code>capacity</code> member.
      */
-    u32_t
+    uint32_t
     Get_Capacity(VArray *self);
 
     /** Return all elements for which <code>test</code> returns true.

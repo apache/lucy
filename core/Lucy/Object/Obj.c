@@ -29,10 +29,10 @@ Obj_destroy(Obj *self)
     FREEMEM(self);
 }
 
-i32_t
+int32_t
 Obj_hash_code(Obj *self)
 {
-    return (i32_t)self;
+    return (int32_t)self;
 }
 
 bool_t
@@ -86,8 +86,8 @@ Obj_to_string(Obj *self)
     return CB_newf("%o@0x%x32", Obj_Get_Class_Name(self), self);
 #elif (SIZEOF_PTR == 8)
     size_t address = self;
-    u32_t  address_hi = address >> 32;
-    u32_t  address_lo = address & 0xFFFFFFFF;
+    uint32_t  address_hi = address >> 32;
+    uint32_t  address_lo = address & 0xFFFFFFFF;
     return CB_newf("%o@0x%x32%x32", Obj_Get_Class_Name(self), address_hi,
         address_lo);
 #endif

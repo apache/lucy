@@ -111,9 +111,9 @@ test_Push_Pop_Shift_Unshift(TestBatch *batch)
 static void
 test_Delete(TestBatch *batch)
 {
-    VArray *wanted  = VA_new(5);
-    VArray *got     = VA_new(5);
-    u32_t i;
+    VArray *wanted = VA_new(5);
+    VArray *got    = VA_new(5);
+    uint32_t i;
 
     for (i = 0; i < 5; i++) { VA_Push(got, (Obj*)CB_newf("%u32", i)); }
     VA_Store(wanted, 0, (Obj*)CB_newf("0", i));
@@ -131,7 +131,7 @@ static void
 test_Resize(TestBatch *batch)
 {
     VArray *array = VA_new(3);
-    u32_t i;
+    uint32_t i;
 
     for (i = 0; i < 2; i++) { VA_Push(array, (Obj*)CB_newf("%u32", i)); }
     ASSERT_INT_EQ(batch, VA_Get_Capacity(array), 3, "Start with capacity 3");
@@ -153,10 +153,11 @@ test_Splice(TestBatch *batch)
 {
     VArray *wanted = VA_new(5);
     VArray *got    = VA_new(5);
-    u32_t   i;
 
-    for (i = 0; i < 5; i++) { VA_Push(wanted, (Obj*)CB_newf("%u32", i)); }
-    for (i = 0; i < 5; i++) { VA_Push(got,    (Obj*)CB_newf("%u32", i)); }
+    for (uint32_t i = 0; i < 5; i++) {
+        VA_Push(wanted, (Obj*)CB_newf("%u32", i)); 
+        VA_Push(got,    (Obj*)CB_newf("%u32", i)); 
+    }
 
     VA_Splice(got, 7, 1);
     ASSERT_TRUE(batch, VA_Equals(wanted, (Obj*)got), 
@@ -191,7 +192,7 @@ test_Push_VArray(TestBatch *batch)
     VArray *wanted  = VA_new(0);
     VArray *got     = VA_new(0);
     VArray *scratch = VA_new(0);
-    u32_t i;
+    uint32_t i;
 
     for (i = 0; i < 4; i++) { VA_Push(wanted, (Obj*)CB_newf("%u32", i)); }
     for (i = 0; i < 2; i++) { VA_Push(got, (Obj*)CB_newf("%u32", i)); }
@@ -210,7 +211,7 @@ test_Clone_and_Shallow_Copy(TestBatch *batch)
 {
     VArray *array  = VA_new(0);
     VArray *evil_twin;
-    u32_t i;
+    uint32_t i;
 
     for (i = 0; i < 10; i++) {
         VA_Push(array, (Obj*)CB_newf("%u32", i));

@@ -108,9 +108,9 @@ S_vcat_mess(CharBuf *message, const char *file, int line, const char *func,
     CB_Grow(message, guess_len);
     CB_VCatF(message, pattern, args);
     if (func != NULL)
-        CB_catf(message, ", %s at %s line %i32\n", func, file, (i32_t)line);
+        CB_catf(message, ", %s at %s line %i32\n", func, file, (int32_t)line);
     else 
-        CB_catf(message, " at %s line %i32\n", file, (i32_t)line);
+        CB_catf(message, " at %s line %i32\n", file, (int32_t)line);
 }
 
 CharBuf*
@@ -146,10 +146,10 @@ Err_add_frame(Err *self, const char *file, int line, const char *func)
 {
     if (func != NULL) {
         CB_catf(self->mess, ",\n\t %s at %s line %i32\n", func, file, 
-            (i32_t)line);
+            (int32_t)line);
     }
     else {
-        CB_catf(self->mess, "\n\tat %s line %i32\n", file, (i32_t)line);
+        CB_catf(self->mess, "\n\tat %s line %i32\n", file, (int32_t)line);
     }
 }
 

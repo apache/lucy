@@ -11,12 +11,12 @@
 static CharBuf*
 S_random_string()
 {
-    u32_t    len    = rand() % 1200;
+    uint32_t len    = rand() % 1200;
     CharBuf *string = CB_new(len * 3);
 
     while (len--) {
-        u8_t bytes = (rand() % 3) + 1;
-        u32_t code_point = 0;
+        uint8_t bytes = (rand() % 3) + 1;
+        uint32_t code_point = 0;
         switch (bytes & 0x3) {
             case 1:
                 code_point = rand() % 0x80;
@@ -64,13 +64,13 @@ test_Store_and_Fetch(TestBatch *batch)
 {
     Hash          *hash         = Hash_new(100);
     Hash          *dupe         = Hash_new(100);
-    const u32_t    starting_cap = Hash_Get_Capacity(hash);
+    const uint32_t starting_cap = Hash_Get_Capacity(hash);
     VArray        *expected     = VA_new(100);
     VArray        *got          = VA_new(100);
     ZombieCharBuf *twenty       = ZCB_WRAP_STR("20", 2);
     ZombieCharBuf *forty        = ZCB_WRAP_STR("40", 2);
     ZombieCharBuf *foo          = ZCB_WRAP_STR("foo", 3);
-    i32_t i;
+    int32_t i;
 
     for (i = 0; i < 100; i++) {
         CharBuf *cb = CB_newf("%i32", i);
@@ -130,7 +130,7 @@ test_Store_and_Fetch(TestBatch *batch)
 static void
 test_Keys_Values_Iter(TestBatch *batch)
 {
-    u32_t i;
+    uint32_t i;
     Hash     *hash         = Hash_new(0); /* trigger multiple rebuilds. */
     VArray   *expected     = VA_new(100);
     VArray   *keys;
@@ -222,7 +222,7 @@ test_serialization(TestBatch *batch)
 {
     Hash  *wanted = Hash_new(0); 
     Hash  *got;
-    u32_t  i;
+    uint32_t  i;
 
     for (i = 0; i < 10; i++) {
         CharBuf *cb = S_random_string();
@@ -242,7 +242,7 @@ test_serialization(TestBatch *batch)
 static void
 test_stress(TestBatch *batch)
 {
-    u32_t i;
+    uint32_t i;
     Hash     *hash         = Hash_new(0); /* trigger multiple rebuilds. */
     VArray   *expected     = VA_new(1000);
     VArray   *keys;

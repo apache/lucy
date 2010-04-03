@@ -9,9 +9,9 @@ static void
 test_Set_and_Get(TestBatch *batch)
 {
     unsigned i, max;
-    const u32_t three      = 3;
-    const u32_t seventeen  = 17;
-    BitVector *bit_vec     = BitVec_new(8);
+    const uint32_t  three     = 3;
+    const uint32_t  seventeen = 17;
+    BitVector      *bit_vec   = BitVec_new(8);
 
     BitVec_Set(bit_vec, three);
     ASSERT_TRUE(batch, BitVec_Get_Capacity(bit_vec) < seventeen, 
@@ -104,10 +104,10 @@ test_Flip_Block_descending(TestBatch *batch)
 static void
 test_Flip_Block_bulk(TestBatch *batch)
 {
-    i32_t offset;
+    int32_t offset;
 
     for (offset = 0; offset <= 17; offset++) {
-        i32_t len;
+        int32_t len;
         for (len = 0; len <= 17; len++) {
             int i;
             int upper = offset + len - 1;
@@ -310,7 +310,7 @@ test_Count(TestBatch *batch)
     }
     for (i = 0; i < 64; i++) { 
         BitVec_Set(bit_vec, shuffled[i]);
-        if (BitVec_Count(bit_vec) != (u32_t)(i + 1)) { break; }
+        if (BitVec_Count(bit_vec) != (uint32_t)(i + 1)) { break; }
     }
     ASSERT_INT_EQ(batch, i, 64, "Count() returns the right number of bits");
 
@@ -378,8 +378,8 @@ test_Clone(TestBatch *batch)
 static int
 S_compare_u64s(void *context, const void *va, const void *vb)
 {
-    u64_t a = *(u64_t*)va;
-    u64_t b = *(u64_t*)vb;
+    uint64_t a = *(uint64_t*)va;
+    uint64_t b = *(uint64_t*)vb;
     UNUSED_VAR(context);
     return a == b ? 0 : a < b ? -1 : 1;
 }
@@ -387,14 +387,14 @@ S_compare_u64s(void *context, const void *va, const void *vb)
 static void
 test_To_Array(TestBatch *batch)
 {
-    u64_t     *source_ints = TestUtils_random_u64s(NULL, 20, 0, 200);
+    uint64_t  *source_ints = TestUtils_random_u64s(NULL, 20, 0, 200);
     BitVector *bit_vec = BitVec_new(0);
     I32Array  *array;
     long       num_unique = 0;
     long       i;
 
     /* Unique the random ints. */
-    Sort_quicksort(source_ints, 20, sizeof(u64_t), 
+    Sort_quicksort(source_ints, 20, sizeof(uint64_t), 
         S_compare_u64s, NULL);
     for (i = 0; i < 19; i++) {
         if (source_ints[i] != source_ints[i + 1]) {
@@ -405,13 +405,13 @@ test_To_Array(TestBatch *batch)
 
     /* Set bits. */
     for (i = 0; i < num_unique; i++) {
-        BitVec_Set(bit_vec, (u32_t)source_ints[i]);
+        BitVec_Set(bit_vec, (uint32_t)source_ints[i]);
     }
 
     /* Create the array and compare it to the source. */
     array = BitVec_To_Array(bit_vec);
     for (i = 0; i < num_unique; i++) {
-        if (I32Arr_Get(array, i) != (i32_t)source_ints[i]) { break; }
+        if (I32Arr_Get(array, i) != (int32_t)source_ints[i]) { break; }
     }
     ASSERT_INT_EQ(batch, i, num_unique, "To_Array (%ld == %ld)", i, 
         num_unique);

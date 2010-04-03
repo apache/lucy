@@ -1,27 +1,27 @@
 parcel Lucy;
 
 class Lucy::Object::I32Array cnick I32Arr extends Lucy::Object::Obj {
-    i32_t    *ints;
-    u32_t     size;
+    int32_t  *ints;
+    uint32_t  size;
 
     inert incremented I32Array*
-    new(i32_t *ints, u32_t size);
+    new(int32_t *ints, uint32_t size);
 
     inert incremented I32Array*
-    new_steal(i32_t *ints, u32_t size);
+    new_steal(int32_t *ints, uint32_t size);
 
     inert I32Array*
-    init(I32Array *self, i32_t *ints, u32_t size);
+    init(I32Array *self, int32_t *ints, uint32_t size);
 
     /** Return the value at <code>tick</code>, or throw an error if
      * <code>tick</code> is out of bounds.
      */
-    i32_t
-    Get(I32Array *self, u32_t tick);
+    int32_t
+    Get(I32Array *self, uint32_t tick);
 
     /** Accessor for 'size' member.
      */
-    u32_t 
+    uint32_t 
     Get_Size(I32Array *self);
 
     public void

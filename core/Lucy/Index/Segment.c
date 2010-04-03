@@ -211,7 +211,7 @@ Seg_fetch_metadata_str(Segment *self, const char *key, size_t len)
 Hash*
 Seg_get_metadata(Segment *self) { return self->metadata; }
     
-i32_t
+int32_t
 Seg_compare_to(Segment *self, Obj *other)
 {
     Segment *other_seg = (Segment*)CERTIFY(other, SEGMENT);

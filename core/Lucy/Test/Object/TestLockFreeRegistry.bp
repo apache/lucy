@@ -12,7 +12,7 @@ class Lucy::Test::Object::StupidHashCharBuf extends Lucy::Object::CharBuf {
     new(char *text);
 
     /** Always returns 1, guaranteeing collisions. */
-    public i32_t
+    public int32_t
     Hash_Code(StupidHashCharBuf *self);
 }
 

@@ -113,21 +113,21 @@ class Lucy::Object::CharBuf cnick CB
     /** Concatenate one Unicode character onto the end of the CharBuf.
      */
     void
-    Cat_Char(CharBuf *self, u32_t code_point);
+    Cat_Char(CharBuf *self, uint32_t code_point);
 
     /** Replace all instances of one character for the other.  For now, both
      * the source and replacement code points must be ASCII.
      */
-    i32_t
-    Swap_Chars(CharBuf *self, u32_t match, u32_t replacement);
+    int32_t
+    Swap_Chars(CharBuf *self, uint32_t match, uint32_t replacement);
 
-    public i64_t
+    public int64_t
     To_I64(CharBuf *self);
 
     /** Extract a 64-bit integer from a variable-base stringified version.
      */
-    i64_t
-    BaseX_To_I64(CharBuf *self, u32_t base);
+    int64_t
+    BaseX_To_I64(CharBuf *self, uint32_t base);
 
     public double
     To_F64(CharBuf *self);
@@ -184,7 +184,7 @@ class Lucy::Object::CharBuf cnick CB
     /** Return the internal backing array for the CharBuf if its internal
      * encoding is UTF-8.  If it is not encoded as UTF-8 throw an exception.
      */
-    u8_t*
+    uint8_t*
     Get_Ptr8(CharBuf *self);
 
     /** Return a fresh copy of the string data in a CharBuf with an internal
@@ -202,10 +202,10 @@ class Lucy::Object::CharBuf cnick CB
     public bool_t
     Equals(CharBuf *self, Obj *other);
 
-    public i32_t
+    public int32_t
     Compare_To(CharBuf *self, Obj *other);
 
-    public i32_t
+    public int32_t
     Hash_Code(CharBuf *self);
 
     public incremented CharBuf*
@@ -222,17 +222,17 @@ class Lucy::Object::CharBuf cnick CB
 
     /** Remove Unicode whitespace characters from both top and tail.
      */
-    u32_t
+    uint32_t
     Trim(CharBuf *self);
 
     /** Remove leading Unicode whitespace.
      */
-    u32_t
+    uint32_t
     Trim_Top(CharBuf *self);
 
     /** Remove trailing Unicode whitespace.
      */
-    u32_t
+    uint32_t
     Trim_Tail(CharBuf *self);
 
     /** Remove characters (measured in code points) from the top of the
@@ -244,7 +244,7 @@ class Lucy::Object::CharBuf cnick CB
     /** Remove one character from the top of the CharBuf.  Returns the code
      * point, or 0 if the string was empty.
      */
-    i32_t
+    int32_t
     Nip_One(CharBuf *self);
 
     /** Remove characters (measured in code points) from the end of the
@@ -267,14 +267,14 @@ class Lucy::Object::CharBuf cnick CB
      * better to throw an exception, but that's not practical with UTF-8 and
      * no cached length.)
      */
-    u32_t
+    uint32_t
     Code_Point_At(CharBuf *self, size_t tick);
 
     /** Return the Unicode code point at the specified number of code points
      * counted backwards from the end of the string.  Return 0 if outside the
      * string.
      */
-    u32_t
+    uint32_t
     Code_Point_From(CharBuf *self, size_t tick);
 
     /** Return a newly allocated CharBuf containing a copy of the indicated
@@ -310,13 +310,13 @@ class Lucy::Object::ViewCharBuf cnick ViewCB
     void
     Assign_Str(ViewCharBuf *self, const char *utf8, size_t size);
 
-    u32_t
+    uint32_t
     Trim_Top(ViewCharBuf *self);
 
     size_t
     Nip(ViewCharBuf *self, size_t count);
 
-    i32_t
+    int32_t
     Nip_One(ViewCharBuf *self);
 
     /** Throws an error. */

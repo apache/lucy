@@ -9,16 +9,16 @@
 #include "Lucy/Util/Memory.h"
 
 static SV*
-S_do_callback_sv(void *vobj, char *method, chy_u32_t num_args, va_list args);
+S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args);
 
 /* Convert all arguments to Perl and place them on the Perl stack. 
  */
 static CHY_INLINE void
-SI_push_args(void *vobj, va_list args, chy_u32_t num_args)
+SI_push_args(void *vobj, va_list args, uint32_t num_args)
 {
     lucy_Obj *obj = (lucy_Obj*)vobj;
     SV *invoker;
-    chy_u32_t i;
+    uint32_t i;
     dSP;
     
     if (Lucy_Obj_Is_A(obj, LUCY_VTABLE)) {
@@ -36,19 +36,19 @@ SI_push_args(void *vobj, va_list args, chy_u32_t num_args)
     XPUSHs( sv_2mortal(invoker) );
 
     for (i = 0; i < num_args; i++) {
-        chy_u32_t arg_type = va_arg(args, chy_u32_t);
+        uint32_t arg_type = va_arg(args, uint32_t);
         char *label = va_arg(args, char*);
         if (num_args > 1) {
             XPUSHs( sv_2mortal( newSVpvn(label, strlen(label)) ) );
         }
         switch (arg_type & LUCY_HOST_ARGTYPE_MASK) {
         case LUCY_HOST_ARGTYPE_I32: {
-                chy_i32_t value = va_arg(args, chy_i32_t);
+                int32_t value = va_arg(args, int32_t);
                 XPUSHs( sv_2mortal( newSViv(value) ) );
             }
             break;
         case LUCY_HOST_ARGTYPE_I64: {
-                chy_i64_t value = va_arg(args, chy_i64_t);
+                int64_t value = va_arg(args, int64_t);
                 if (sizeof(IV) == 8) {
                     XPUSHs( sv_2mortal( newSViv((IV)value) ) );
                 }
@@ -87,7 +87,7 @@ SI_push_args(void *vobj, va_list args, chy_u32_t num_args)
 }
 
 void
-lucy_Host_callback(void *vobj, char *method, chy_u32_t num_args, ...) 
+lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) 
 {
     va_list args;
     
@@ -100,7 +100,7 @@ lucy_Host_callback(void *vobj, char *method, chy_u32_t num_args, ...)
         int count = call_method(method, G_VOID|G_DISCARD);
         if (count != 0) {
             LUCY_THROW(LUCY_ERR, "callback '%s' returned too many values: %i32", 
-                method, (chy_i32_t)count);
+                method, (int32_t)count);
         }
         PUTBACK;
         FREETMPS;
@@ -108,18 +108,18 @@ lucy_Host_callback(void *vobj, char *method, chy_u32_t num_args, ...)
     }
 }
 
-chy_i64_t
-lucy_Host_callback_i64(void *vobj, char *method, chy_u32_t num_args, ...) 
+int64_t
+lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...) 
 {
     va_list args;
     SV *return_sv;
-    chy_i64_t retval;
+    int64_t retval;
 
     va_start(args, num_args);
     return_sv = S_do_callback_sv(vobj, method, num_args, args);
     va_end(args);
     if (sizeof(IV) == 8) {
-        retval = (chy_i64_t)SvIV(return_sv);
+        retval = (int64_t)SvIV(return_sv);
     }
     else {
         if (SvIOK(return_sv)) {
@@ -129,7 +129,7 @@ lucy_Host_callback_i64(void *vobj, char *method, chy_u32_t num_args, ...)
         else {
             /* Maybe lossy. */
             double temp = SvNV(return_sv);
-            retval = (chy_i64_t)temp;
+            retval = (int64_t)temp;
         }
     }
 
@@ -140,7 +140,7 @@ lucy_Host_callback_i64(void *vobj, char *method, chy_u32_t num_args, ...)
 }
 
 double
-lucy_Host_callback_f64(void *vobj, char *method, chy_u32_t num_args, ...) 
+lucy_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...) 
 {
     va_list args;
     SV *return_sv;
@@ -159,7 +159,7 @@ lucy_Host_callback_f64(void *vobj, char *method, chy_u32_t num_args, ...)
 
 lucy_Obj*
 lucy_Host_callback_obj(void *vobj, char *method, 
-                         chy_u32_t num_args, ...) 
+                         uint32_t num_args, ...) 
 {
     va_list args;
     SV *temp_retval;
@@ -178,7 +178,7 @@ lucy_Host_callback_obj(void *vobj, char *method,
 }
 
 lucy_CharBuf*
-lucy_Host_callback_str(void *vobj, char *method, chy_u32_t num_args, ...)
+lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
 {
     va_list args;
     SV *temp_retval;
@@ -202,7 +202,7 @@ lucy_Host_callback_str(void *vobj, char *method, chy_u32_t num_args, ...)
 }
 
 void*
-lucy_Host_callback_host(void *vobj, char *method, chy_u32_t num_args, ...)
+lucy_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...)
 {
     va_list args;
     SV *retval;
@@ -219,7 +219,7 @@ lucy_Host_callback_host(void *vobj, char *method, chy_u32_t num_args, ...)
 }
 
 static SV*
-S_do_callback_sv(void *vobj, char *method, chy_u32_t num_args, va_list args) 
+S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args) 
 {
     SV *return_val;
     SI_push_args(vobj, args, num_args);
@@ -228,7 +228,7 @@ S_do_callback_sv(void *vobj, char *method, chy_u32_t num_args, va_list args)
         dSP;
         if (num_returned != 1) {
             LUCY_THROW(LUCY_ERR, "Bad number of return vals from %s: %i32", method,
-                (chy_i32_t)num_returned);
+                (int32_t)num_returned);
         }
         return_val = POPs;
         PUTBACK;

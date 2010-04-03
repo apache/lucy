@@ -11,20 +11,20 @@ parcel Lucy;
 class Lucy::Object::Hash extends Lucy::Object::Obj {
 
     void          *entries;
-    u32_t          capacity;
-    u32_t          size;
-    u32_t          threshold;    /* rehashing trigger point */
-    i32_t          iter_tick;    /* used when iterating */
+    uint32_t       capacity;
+    uint32_t       size;
+    uint32_t       threshold;    /* rehashing trigger point */
+    int32_t        iter_tick;    /* used when iterating */
 
     inert incremented Hash*
-    new(u32_t capacity = 0);
+    new(uint32_t capacity = 0);
 
     /** 
      * @param capacity The number of elements that the hash will be asked to
      * hold initially.
      */
     inert Hash*
-    init(Hash *self, u32_t capacity = 0);
+    init(Hash *self, uint32_t capacity = 0);
 
     /** Empty the hash of all key-value pairs.
      */
@@ -66,7 +66,7 @@ class Lucy::Object::Hash extends Lucy::Object::Obj {
      *
      * @return the number of pairs which will be iterated over.
      */
-    u32_t 
+    uint32_t 
     Iter_Init(Hash *self);
 
     /** Retrieve the next key-value pair from the hash, setting the supplied
@@ -82,7 +82,7 @@ class Lucy::Object::Hash extends Lucy::Object::Obj {
      * rather than its value.
      */
     nullable Obj*
-    Find_Key(Hash *self, const Obj *key, i32_t hash_code);
+    Find_Key(Hash *self, const Obj *key, int32_t hash_code);
 
     /** Return an VArray of pointers to the hash's keys.
      */
@@ -99,16 +99,16 @@ class Lucy::Object::Hash extends Lucy::Object::Obj {
      * true for Equals().  By default, calls Clone().
      */
     public incremented Obj*
-    Make_Key(Hash *self, Obj *key, i32_t hash_code);
+    Make_Key(Hash *self, Obj *key, int32_t hash_code);
 
-    u32_t 
+    uint32_t 
     Get_Capacity(Hash *self);
 
     /** Accessor for Hash's "size" member.
      * 
      * @return the number of key-value pairs.
      */
-    public u32_t 
+    public uint32_t 
     Get_Size(Hash *self);
 
     public bool_t

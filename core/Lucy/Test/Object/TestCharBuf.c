@@ -9,7 +9,7 @@
 #include "Lucy/Test/Object/TestCharBuf.h"
 
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
-static u32_t smiley_len = 3;
+static uint32_t smiley_len = 3;
 
 static CharBuf*
 S_get_cb(char *string)
@@ -70,13 +70,13 @@ test_Mimic_and_Clone(TestBatch *batch)
 static void
 test_Code_Point_At_and_From(TestBatch *batch)
 {
-    u32_t code_points[] = { 'a', 0x263A, 0x263A, 'b', 0x263A, 'c' }; 
-    u32_t num_code_points = sizeof(code_points) / sizeof(u32_t);
+    uint32_t code_points[] = { 'a', 0x263A, 0x263A, 'b', 0x263A, 'c' }; 
+    uint32_t num_code_points = sizeof(code_points) / sizeof(uint32_t);
     CharBuf *string = CB_newf("a%s%sb%sc", smiley, smiley, smiley);
-    u32_t i;
+    uint32_t i;
 
     for (i = 0; i < num_code_points; i++) {
-        u32_t from = num_code_points - i - 1;
+        uint32_t from = num_code_points - i - 1;
         ASSERT_INT_EQ(batch, CB_Code_Point_At(string, i), code_points[i],
             "Code_Point_At %ld", (long)i);
         ASSERT_INT_EQ(batch, CB_Code_Point_At(string, from), 
@@ -134,14 +134,14 @@ test_Truncate(TestBatch *batch)
 static void
 test_Trim(TestBatch *batch)
 {
-    u32_t spaces[] = { 
+    uint32_t spaces[] = { 
         ' ',    '\t',   '\r',   '\n',   0x000B, 0x000C, 0x000D, 0x0085,
         0x00A0, 0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 
         0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029, 
         0x202F, 0x205F, 0x3000
     };
-    u32_t num_spaces = sizeof(spaces) / sizeof(u32_t);
-    u32_t i;
+    uint32_t num_spaces = sizeof(spaces) / sizeof(uint32_t);
+    uint32_t i;
     CharBuf *got = CB_new(0);
 
     /* Surround a smiley with lots of whitespace. */
@@ -262,7 +262,7 @@ static void
 test_vcatf_i8(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo bar -3 baz");
-    i8_t num = -3;
+    int8_t num = -3;
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %i8 baz", num);
     ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%i8");
@@ -274,7 +274,7 @@ static void
 test_vcatf_i32(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo bar -100000 baz");
-    i32_t num = -100000;
+    int32_t num = -100000;
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %i32 baz", num);
     ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%i32");
@@ -286,7 +286,7 @@ static void
 test_vcatf_i64(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo bar -5000000000 baz");
-    i64_t num = I64_C(-5000000000);
+    int64_t num = I64_C(-5000000000);
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %i64 baz", num);
     ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%i64");
@@ -298,7 +298,7 @@ static void
 test_vcatf_u8(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo bar 3 baz");
-    u8_t num = 3;
+    uint8_t num = 3;
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %u8 baz", num);
     ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%u8");
@@ -310,7 +310,7 @@ static void
 test_vcatf_u32(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo bar 100000 baz");
-    u32_t num = 100000;
+    uint32_t num = 100000;
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %u32 baz", num);
     ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%u32");
@@ -322,7 +322,7 @@ static void
 test_vcatf_u64(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo bar 5000000000 baz");
-    u64_t num = U64_C(5000000000);
+    uint64_t num = U64_C(5000000000);
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %u64 baz", num);
     ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%u64");
@@ -358,7 +358,7 @@ test_vcatf_x32(TestBatch *batch)
     sprintf(buf, "foo bar %.8x baz", (unsigned)num);
 #endif
     wanted = CB_new_from_trusted_utf8(buf, strlen(buf));
-    CB_catf(got, "bar %x32 baz", (u32_t)num);
+    CB_catf(got, "bar %x32 baz", (uint32_t)num);
     ASSERT_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%x32");
     DECREF(wanted);
     DECREF(got);

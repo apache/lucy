@@ -13,7 +13,7 @@ StupidHashCharBuf_new(char *text)
     return (StupidHashCharBuf*)CB_new_from_utf8(text, strlen(text));
 }
 
-i32_t
+int32_t
 StupidHashCharBuf_hash_code(StupidHashCharBuf *self)
 {
     UNUSED_VAR(self);

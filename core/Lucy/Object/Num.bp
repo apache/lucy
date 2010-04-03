@@ -10,7 +10,7 @@ abstract class Lucy::Object::Num extends Lucy::Object::Obj {
     public bool_t
     Equals(Num *self, Obj *other);
 
-    public i32_t
+    public int32_t
     Compare_To(Num *self, Obj *other);
 }
 
@@ -59,13 +59,13 @@ class Lucy::Object::Float32 extends Lucy::Object::FloatNum {
     float 
     Get_Value(Float32 *self);
 
-    public i64_t
+    public int64_t
     To_I64(Float32 *self);
 
     public double
     To_F64(Float32 *self);
 
-    public i32_t
+    public int32_t
     Hash_Code(Float32 *self);
 
     public void
@@ -102,13 +102,13 @@ class Lucy::Object::Float64 extends Lucy::Object::FloatNum {
     double
     Get_Value(Float64 *self);
 
-    public i64_t
+    public int64_t
     To_I64(Float64 *self);
 
     public double
     To_F64(Float64 *self);
 
-    public i32_t
+    public int32_t
     Hash_Code(Float64 *self);
 
     public void
@@ -129,30 +129,30 @@ class Lucy::Object::Float64 extends Lucy::Object::FloatNum {
 class Lucy::Object::Integer32 cnick Int32 
     extends Lucy::Object::IntNum {
 
-    i32_t value;
+    int32_t value;
 
     /**
      * @param value Initial value.
      */
     inert Integer32*
-    init(Integer32* self, i32_t value);
+    init(Integer32* self, int32_t value);
 
     inert Integer32*
-    new(i32_t value);
+    new(int32_t value);
 
     void
-    Set_Value(Integer32 *self, i32_t value);
+    Set_Value(Integer32 *self, int32_t value);
 
-    i32_t 
+    int32_t 
     Get_Value(Integer32 *self);
 
-    public i64_t
+    public int64_t
     To_I64(Integer32 *self);
 
     public double
     To_F64(Integer32 *self);
 
-    public i32_t
+    public int32_t
     Hash_Code(Integer32 *self);
 
     public void
@@ -174,30 +174,30 @@ class Lucy::Object::Integer32 cnick Int32
 class Lucy::Object::Integer64 cnick Int64 
     extends Lucy::Object::IntNum {
 
-    i64_t value;
+    int64_t value;
 
     /**
      * @param value Initial value.
      */
     inert Integer64*
-    init(Integer64* self, i64_t value);
+    init(Integer64* self, int64_t value);
 
     inert Integer64*
-    new(i64_t value);
+    new(int64_t value);
 
     void
-    Set_Value(Integer64 *self, i64_t value);
+    Set_Value(Integer64 *self, int64_t value);
 
-    i64_t 
+    int64_t 
     Get_Value(Integer64 *self);
 
-    public i64_t
+    public int64_t
     To_I64(Integer64 *self);
 
     public double
     To_F64(Integer64 *self);
 
-    public i32_t
+    public int32_t
     Hash_Code(Integer64 *self);
 
     public bool_t

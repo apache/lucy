@@ -20,9 +20,9 @@
 #define HashEntry lucy_HashEntry
 
 typedef struct lucy_HashEntry {
-    Obj *key;
-    Obj *value;
-    i32_t hash_code;
+    Obj     *key;
+    Obj     *value;
+    int32_t  hash_code;
 } lucy_HashEntry;
 
 /* Reset the iterator.  Hash_iter_init must be called to restart iteration.
@@ -33,7 +33,7 @@ SI_kill_iter(Hash *self);
 /* Return the entry associated with the key, if any.
  */
 static INLINE HashEntry*
-SI_fetch_entry(Hash *self, const Obj *key, i32_t hash_code);
+SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_code);
 
 /* Double the number of buckets and redistribute all entries. 
  *
@@ -45,19 +45,19 @@ HashEntry*
 lucy_Hash_rebuild_hash(Hash *self);
 
 Hash*
-Hash_new(u32_t capacity)
+Hash_new(uint32_t capacity)
 {
     Hash *self = (Hash*)VTable_Make_Obj(HASH);
     return Hash_init(self, capacity);
 }
 
 Hash*
-Hash_init(Hash *self, u32_t capacity)
+Hash_init(Hash *self, uint32_t capacity)
 {
     /* Allocate enough space to hold the requested number of elements without
      * triggering a rebuild. */
-    u32_t requested_capacity = capacity < I32_MAX ? capacity : I32_MAX;
-    u32_t threshold;
+    uint32_t requested_capacity = capacity < I32_MAX ? capacity : I32_MAX;
+    uint32_t threshold;
     capacity = 16;
     while (1) {
         threshold = (capacity / 3) * 2;
@@ -164,7 +164,7 @@ Hash_serialize(Hash *self, OutStream *outstream)
 {
     Obj *key;
     Obj *val;
-    u32_t charbuf_count = 0;
+    uint32_t charbuf_count = 0;
     OutStream_Write_C32(outstream, self->size);
 
     /* Write CharBuf keys first.  CharBuf keys are the common case; grouping
@@ -196,9 +196,9 @@ Hash_serialize(Hash *self, OutStream *outstream)
 Hash*
 Hash_deserialize(Hash *self, InStream *instream)
 {
-    u32_t    size         = InStream_Read_C32(instream);
-    u32_t    num_charbufs = InStream_Read_C32(instream);
-    u32_t    num_other    = size - num_charbufs;
+    uint32_t size         = InStream_Read_C32(instream);
+    uint32_t num_charbufs = InStream_Read_C32(instream);
+    uint32_t num_other    = size - num_charbufs;
     CharBuf *key          = num_charbufs ? CB_new(0) : NULL;
 
     if (self) Hash_init(self, size);
@@ -206,7 +206,7 @@ Hash_deserialize(Hash *self, InStream *instream)
  
     /* Read key-value pairs with CharBuf keys. */
     while (num_charbufs--) {
-        u32_t len = InStream_Read_C32(instream);
+        uint32_t len = InStream_Read_C32(instream);
         char *key_buf = CB_Grow(key, len);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';
@@ -246,18 +246,17 @@ Hash_clear(Hash *self)
 
 void
 lucy_Hash_do_store(Hash *self, Obj *key, Obj *value, 
-                   i32_t hash_code, bool_t use_this_key)
+                   int32_t hash_code, bool_t use_this_key)
 {
-    HashEntry   *entries = self->size >= self->threshold
-                         ? lucy_Hash_rebuild_hash(self)
-                         : (HashEntry*)self->entries;
-    HashEntry   *entry;
-    u32_t        tick    = hash_code;
-    const u32_t  mask    = self->capacity - 1;
+    HashEntry *entries = self->size >= self->threshold
+                       ? lucy_Hash_rebuild_hash(self)
+                       : (HashEntry*)self->entries;
+    uint32_t       tick = hash_code;
+    const uint32_t mask = self->capacity - 1;
 
     while (1) {
         tick &= mask;
-        entry = entries + tick;
+        HashEntry *entry = entries + tick;
         if (entry->key == (Obj*)UNDEF || !entry->key) {
             if (entry->key == (Obj*)UNDEF) { 
                 /* Take note of diminished tombstone clutter. */
@@ -297,7 +296,7 @@ Hash_store_str(Hash *self, const char *key, size_t key_len, Obj *value)
 }
 
 Obj*
-Hash_make_key(Hash *self, Obj *key, i32_t hash_code)
+Hash_make_key(Hash *self, Obj *key, int32_t hash_code)
 {
     UNUSED_VAR(self);
     UNUSED_VAR(hash_code);
@@ -312,9 +311,9 @@ Hash_fetch_str(Hash *self, const char *key, size_t key_len)
 }
 
 static INLINE HashEntry*
-SI_fetch_entry(Hash *self, const Obj *key, i32_t hash_code) 
+SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_code) 
 {
-    u32_t tick = hash_code;
+    uint32_t tick = hash_code;
     HashEntry *const entries = (HashEntry*)self->entries;
     HashEntry *entry;
 
@@ -367,7 +366,7 @@ Hash_delete_str(Hash *self, const char *key, size_t key_len)
     return Hash_delete(self, (Obj*)key_buf);
 }
 
-u32_t
+uint32_t
 Hash_iter_init(Hash *self) 
 {
     SI_kill_iter(self);
@@ -384,7 +383,7 @@ bool_t
 Hash_iter_next(Hash *self, Obj **key, Obj **value) 
 {
     while (1) {
-        if (++self->iter_tick >= (i32_t)self->capacity) {
+        if (++self->iter_tick >= (int32_t)self->capacity) {
             /* Bail since we've completed the iteration. */
             --self->iter_tick;
             *key   = NULL;
@@ -405,7 +404,7 @@ Hash_iter_next(Hash *self, Obj **key, Obj **value)
 }
 
 Obj*
-Hash_find_key(Hash *self, const Obj *key, i32_t hash_code)
+Hash_find_key(Hash *self, const Obj *key, int32_t hash_code)
 {
     HashEntry *entry = SI_fetch_entry(self, key, hash_code);
     return entry ? entry->key : NULL;
@@ -455,9 +454,9 @@ Hash_equals(Hash *self, Obj *other)
     return true;
 }
 
-u32_t
+uint32_t
 Hash_get_capacity(Hash *self) { return self->capacity; }
-u32_t
+uint32_t
 Hash_get_size(Hash *self)     { return self->size; }
 
 HashEntry*

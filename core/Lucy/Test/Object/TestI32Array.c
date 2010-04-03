@@ -4,18 +4,18 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Object/TestI32Array.h"
 
-static i32_t source_ints[] = { -1, 0, I32_MIN, I32_MAX, 1 };
-static size_t num_ints = sizeof(source_ints) / sizeof(i32_t);
+static int32_t source_ints[] = { -1, 0, I32_MIN, I32_MAX, 1 };
+static size_t num_ints = sizeof(source_ints) / sizeof(int32_t);
 
 static void
 test_all(TestBatch *batch)
 {
     I32Array *i32_array = I32Arr_new(source_ints, num_ints);
-    i32_t    *ints_copy = (i32_t*)malloc(num_ints * sizeof(i32_t));
+    int32_t  *ints_copy = (int32_t*)malloc(num_ints * sizeof(int32_t));
     I32Array *stolen    = I32Arr_new_steal(ints_copy, num_ints);
     size_t    num_matched;
 
-    memcpy(ints_copy, source_ints, num_ints * sizeof(i32_t));
+    memcpy(ints_copy, source_ints, num_ints * sizeof(int32_t));
 
     ASSERT_TRUE(batch, I32Arr_Get_Size(i32_array) == num_ints,
         "Get_Size");

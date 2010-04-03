@@ -133,7 +133,7 @@ class Lucy::Index::Segment cnick Seg extends Lucy::Object::Obj {
 
     /** Compare by segment number. 
      */
-    public i32_t
+    public int32_t
     Compare_To(Segment *self, Obj *other);
 
     public void

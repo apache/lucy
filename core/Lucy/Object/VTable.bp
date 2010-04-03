@@ -11,7 +11,7 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
 
     VTable            *parent;
     CharBuf           *name;
-    u32_t              flags;
+    uint32_t           flags;
     void              *x;            /* Reserved for future expansion */
     size_t             obj_alloc_size;
     size_t             vt_alloc_size;
@@ -112,10 +112,10 @@ class Lucy::Object::VTable extends Lucy::Object::Obj {
     incremented Obj*
     Inc_RefCount(VTable *self);
 
-    u32_t
+    uint32_t
     Dec_RefCount(VTable *self);
 
-    u32_t
+    uint32_t
     Get_RefCount(VTable *self);
 
     void*

@@ -81,7 +81,7 @@ static void
 test_Hash_Code(TestBatch *batch)
 {
     Obj *testobj = S_new_testobj();
-    i32_t address = (i32_t)testobj;
+    int32_t address = (int32_t)testobj;
     ASSERT_TRUE(batch, (Obj_Hash_Code(testobj) == address), 
         "Hash_Code uses memory address");
     DECREF(testobj);

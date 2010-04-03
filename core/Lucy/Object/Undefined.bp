@@ -2,13 +2,13 @@ parcel Lucy;
 
 class Lucy::Object::Undefined extends Lucy::Object::Obj {
 
-    u32_t
+    uint32_t
     Get_RefCount(Undefined* self);
 
     incremented Undefined*
     Inc_RefCount(Undefined* self);
 
-    u32_t 
+    uint32_t 
     Dec_RefCount(Undefined* self);
 }
 

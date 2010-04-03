@@ -98,7 +98,7 @@ class Lucy::Object::ByteBuf cnick BB extends Lucy::Object::Obj {
     public bool_t
     Equals(ByteBuf *self, Obj *other);
 
-    public i32_t
+    public int32_t
     Hash_Code(ByteBuf *self);
 
     public void

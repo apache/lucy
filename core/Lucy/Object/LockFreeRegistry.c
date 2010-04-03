@@ -9,9 +9,9 @@
 #include "Lucy/Util/Memory.h"
 
 typedef struct lucy_LFRegEntry {
-    Obj   *key;
-    Obj   *value;
-    i32_t  hash_code;
+    Obj *key;
+    Obj *value;
+    int32_t hash_code;
     struct lucy_LFRegEntry *volatile next;
 } lucy_LFRegEntry;
 #define LFRegEntry lucy_LFRegEntry
@@ -36,8 +36,8 @@ bool_t
 LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
 {
     LFRegEntry  *new_entry = NULL;
-    i32_t        hash_code = Obj_Hash_Code(key);
-    size_t       bucket    = (u32_t)hash_code % self->capacity;
+    int32_t      hash_code = Obj_Hash_Code(key);
+    size_t       bucket    = (uint32_t)hash_code % self->capacity;
     LFRegEntry  *volatile *entries = (LFRegEntry*volatile*)self->entries;
     LFRegEntry  *volatile *slot    = &(entries[bucket]);
 
@@ -78,8 +78,8 @@ LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
 Obj*
 LFReg_fetch(LockFreeRegistry *self, Obj *key)
 {
-    i32_t        hash_code = Obj_Hash_Code(key);
-    size_t       bucket    = (u32_t)hash_code % self->capacity;
+    int32_t      hash_code = Obj_Hash_Code(key);
+    size_t       bucket    = (uint32_t)hash_code % self->capacity;
     LFRegEntry **entries   = (LFRegEntry**)self->entries;
     LFRegEntry  *entry     = entries[bucket];
 

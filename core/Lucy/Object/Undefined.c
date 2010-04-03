@@ -8,7 +8,7 @@
 static Undefined the_undef_object = { UNDEFINED, {1} };
 Undefined *UNDEF = &the_undef_object;
 
-u32_t
+uint32_t
 Undefined_get_refcount(Undefined* self)
 {
     CHY_UNUSED_VAR(self);
@@ -21,7 +21,7 @@ Undefined_inc_refcount(Undefined* self)
     return self;
 }
 
-u32_t
+uint32_t
 Undefined_dec_refcount(Undefined* self)
 {
     UNUSED_VAR(self);
