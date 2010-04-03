@@ -134,15 +134,15 @@ XSBind_lucy_to_perl(lucy_Obj *obj)
         return newSVnv(Lucy_Obj_To_F64(obj));
     }
     else if (sizeof(IV) == 8 && Lucy_Obj_Is_A(obj, LUCY_INTNUM)) {
-        chy_i64_t num = Lucy_Obj_To_I64(obj);
+        int64_t num = Lucy_Obj_To_I64(obj);
         return newSViv((IV)num);
     }
     else if (sizeof(IV) == 4 && Lucy_Obj_Is_A(obj, LUCY_INTEGER32)) {
-        chy_i32_t num = (chy_i32_t)Lucy_Obj_To_I64(obj);
+        int32_t num = (int32_t)Lucy_Obj_To_I64(obj);
         return newSViv((IV)num);
     }
     else if (sizeof(IV) == 4 && Lucy_Obj_Is_A(obj, LUCY_INTEGER64)) {
-        chy_i64_t num = Lucy_Obj_To_I64(obj);
+        int64_t num = Lucy_Obj_To_I64(obj);
         return newSVnv((double)num); /* lossy */
     }
     else {
@@ -219,7 +219,7 @@ XSBind_cb_to_sv(const lucy_CharBuf *cb)
 static lucy_Hash*
 S_perl_hash_to_lucy_hash(HV *phash)
 {
-    chy_u32_t  num_keys = hv_iterinit(phash);
+    uint32_t  num_keys = hv_iterinit(phash);
     lucy_Hash *retval   = lucy_Hash_new(num_keys);
 
     while (num_keys--) {
@@ -249,9 +249,9 @@ S_perl_hash_to_lucy_hash(HV *phash)
 static lucy_VArray*
 S_perl_array_to_lucy_array(AV *parray)
 {
-    const chy_u32_t size = av_len(parray) + 1;
+    const uint32_t size = av_len(parray) + 1;
     lucy_VArray *retval = lucy_VA_new(size);
-    chy_u32_t i;
+    uint32_t i;
 
     /* Iterate over array elems. */
     for (i = 0; i < size; i++) {
@@ -270,11 +270,11 @@ static SV*
 S_lucy_array_to_perl_array(lucy_VArray *varray)
 {
     AV *perl_array = newAV();
-    chy_u32_t num_elems = Lucy_VA_Get_Size(varray);
+    uint32_t num_elems = Lucy_VA_Get_Size(varray);
 
     /* Iterate over array elems. */
     if (num_elems) {
-        chy_u32_t i;
+        uint32_t i;
         av_fill(perl_array, num_elems - 1);
         for (i = 0; i < num_elems; i++) {
             lucy_Obj *val = Lucy_VA_Fetch(varray, i);
@@ -369,14 +369,14 @@ XSBind_enable_overload(void *pobj)
 }
 
 void
-XSBind_allot_params(SV** stack, chy_i32_t start, chy_i32_t num_stack_elems, 
+XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, 
                     char* params_hash_name, ...)
 {
     va_list args;
     HV *params_hash = get_hv(params_hash_name, 0);
     SV **target;
-    chy_i32_t i;
-    chy_i32_t args_left = (num_stack_elems - start) / 2;
+    int32_t i;
+    int32_t args_left = (num_stack_elems - start) / 2;
 
     /* Retrieve the params hash, which must be a package global. */
     if (params_hash == NULL) {
@@ -407,7 +407,7 @@ XSBind_allot_params(SV** stack, chy_i32_t start, chy_i32_t num_stack_elems,
         /* Iterate through stack looking for a label match. Work backwards so
          * that if the label is doubled up we get the last one. */
         for (i = num_stack_elems; i >= start + 2; i -= 2) {
-            chy_i32_t tick = i - 2;
+            int32_t tick = i - 2;
             SV *const key_sv = stack[tick];
             if (SvCUR(key_sv) == (STRLEN)label_len) {
                 if (memcmp(SvPVX(key_sv), label, label_len) == 0) {

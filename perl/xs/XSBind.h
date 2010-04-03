@@ -150,8 +150,8 @@ lucy_XSBind_enable_overload(void *pobj);
  * labels which are not present in this hash will trigger an exception.
  */
 void
-lucy_XSBind_allot_params(SV** stack, chy_i32_t start, 
-                         chy_i32_t num_stack_elems, 
+lucy_XSBind_allot_params(SV** stack, int32_t start, 
+                         int32_t num_stack_elems, 
                          char* params_hash_name, ...);
 
 /* Define short names for all the functions in this file.  Note that these

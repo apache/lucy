@@ -28,9 +28,9 @@ CODE:
     }
 
     if (ints_av && SvTYPE(ints_av) == SVt_PVAV) {
-        chy_i32_t size  = av_len(ints_av) + 1;
-        chy_i32_t *ints = (chy_i32_t*)LUCY_MALLOCATE(size * sizeof(chy_i32_t));
-        chy_i32_t i;
+        int32_t size  = av_len(ints_av) + 1;
+        int32_t *ints = (int32_t*)LUCY_MALLOCATE(size * sizeof(int32_t));
+        int32_t i;
 
         for (i = 0; i < size; i++) {
             SV **const sv_ptr = av_fetch(ints_av, i, 0);
@@ -55,12 +55,12 @@ to_arrayref(self)
 CODE:
 {
     AV *out_av = newAV();
-    chy_u32_t i;
-    chy_u32_t size = Lucy_I32Arr_Get_Size(self);
+    uint32_t i;
+    uint32_t size = Lucy_I32Arr_Get_Size(self);
 
     av_extend(out_av, size);
     for (i = 0; i < size; i++) {
-        chy_i32_t result = Lucy_I32Arr_Get(self, i);
+        int32_t result = Lucy_I32Arr_Get(self, i);
         SV* result_sv = result == -1 ? newSV(0) : newSViv(result);
         av_push(out_av, result_sv);
     }

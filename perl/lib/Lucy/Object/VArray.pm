@@ -50,7 +50,7 @@ OUTPUT: RETVAL
 SV*
 delete(self, tick)
     lucy_VArray *self;
-    chy_u32_t    tick;
+    uint32_t    tick;
 CODE:
     RETVAL = LUCY_OBJ_TO_SV_NOINC(Lucy_VA_Delete(self, tick));
 OUTPUT: RETVAL
@@ -58,7 +58,7 @@ OUTPUT: RETVAL
 void
 store(self, tick, value);
     lucy_VArray *self; 
-    chy_u32_t    tick;
+    uint32_t     tick;
     lucy_Obj    *value;
 PPCODE:
 {
@@ -69,7 +69,7 @@ PPCODE:
 SV*
 fetch(self, tick)
     lucy_VArray *self;
-    chy_u32_t    tick;
+    uint32_t     tick;
 CODE:
     RETVAL = LUCY_OBJ_TO_SV(Lucy_VA_Fetch(self, tick));
 OUTPUT: RETVAL
