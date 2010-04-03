@@ -167,6 +167,7 @@ sub ACTION_charmony {
 
     # Clean up after Charmonizer if it doesn't succeed on its own.
     $self->add_to_cleanup("_charm*");
+    $self->add_to_cleanup($charmony_path);
 
     # Prepare arguments to charmonize.
     my $cc        = "$Config{cc}";
