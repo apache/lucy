@@ -5,24 +5,20 @@
 
 #include "Lucy/Util/PriorityQueue.h"
 
-/* Add an element to the heap.  Throw an error if too many elements 
- * are added.
- */
+// Add an element to the heap.  Throw an error if too many elements 
+// are added.
 static void
 S_put(PriorityQueue *self, Obj *element);
 
-/* Free all the elements in the heap and set size to 0.
- */
+// Free all the elements in the heap and set size to 0.
 static void 
 S_clear(PriorityQueue *self);
 
-/* Heap adjuster. 
- */
+// Heap adjuster. 
 static void
 S_up_heap(PriorityQueue *self);
 
-/* Heap adjuster.  Should be called when the item at the top changes. 
- */
+// Heap adjuster.  Should be called when the item at the top changes. 
 static void
 S_down_heap(PriorityQueue *self);
 

@@ -6,17 +6,15 @@
 #include "Lucy/Util/SortUtils.h"
 #include "Lucy/Object/Err.h"
 
-/* Define four-byte and eight-byte types so that we can dereference void
- * pointers like integer pointers.  The only significance of using int32_t and
- * int64_t is that they are 4 and 8 bytes.
- */
+// Define four-byte and eight-byte types so that we can dereference void
+// pointers like integer pointers.  The only significance of using int32_t and
+// int64_t is that they are 4 and 8 bytes.
 #define FOUR_BYTE_TYPE  int32_t
 #define EIGHT_BYTE_TYPE int64_t
 
 /***************************** mergesort ************************************/
 
-/* Recursive merge sorting functions. 
- */
+// Recursive merge sorting functions. 
 static void
 S_msort4(void *velems, void *vscratch, uint32_t left, uint32_t right, 
          Sort_compare_t compare, void *context);
@@ -168,8 +166,7 @@ SI_merge(void *left_vptr,  uint32_t left_size,
 
 /***************************** quicksort ************************************/
 
-/* Quicksort implementations optimized for four-byte and eight-byte elements.
- */
+// Quicksort implementations optimized for four-byte and eight-byte elements.
 static void 
 S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
          Sort_compare_t compare, void *context);
@@ -177,8 +174,7 @@ static void
 S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
          Sort_compare_t compare, void *context);
 
-/* Swap two elements. 
- */
+// Swap two elements. 
 static INLINE void
 SI_exchange4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right);
 static INLINE void
@@ -281,16 +277,16 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
         int comparison1;
         int comparison2;
 
-        /* Find an element from the left that is greater than or equal to the
-         * pivot (i.e. that should move to the right). */
+        // Find an element from the left that is greater than or equal to the
+        // pivot (i.e. that should move to the right).
         while (1) {
             i++;
             comparison1 = compare(context, elems + i, pivot);
             if (comparison1 >= 0) { break; }
         }
 
-        /* Find an element from the right that is less than or equal to the
-         * pivot (i.e. that should move to the left). */
+        // Find an element from the right that is less than or equal to the
+        // pivot (i.e. that should move to the left).
         while (1) {
             j--;
             comparison2 = compare(context, elems + j, pivot);
@@ -301,12 +297,12 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
         // Bail out of loop when we meet in the middle. 
         if (i >= j) { break; }
 
-        /* Swap the elements we found, so the lesser element moves left and
-         * the greater element moves right. */
+        // Swap the elements we found, so the lesser element moves left and
+        // the greater element moves right.
         SI_exchange4(elems, i, j);
 
-        /* Move any elements which test as "equal" to the pivot to the outside
-         * edges of the array. */
+        // Move any elements which test as "equal" to the pivot to the outside
+        // edges of the array.
         if (comparison2 == 0) {
             p++;
             SI_exchange4(elems, p, i);
@@ -387,16 +383,16 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
         int comparison1;
         int comparison2;
 
-        /* Find an element from the left that is greater than or equal to the
-         * pivot (i.e. that should move to the right). */
+        // Find an element from the left that is greater than or equal to the
+        // pivot (i.e. that should move to the right).
         while (1) {
             i++;
             comparison1 = compare(context, elems + i, pivot);
             if (comparison1 >= 0) { break; }
         }
 
-        /* Find an element from the right that is less than or equal to the
-         * pivot (i.e. that should move to the left). */
+        // Find an element from the right that is less than or equal to the
+        // pivot (i.e. that should move to the left).
         while (1) {
             j--;
             comparison2 = compare(context, elems + j, pivot);
@@ -407,12 +403,12 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
         // Bail out of loop when we meet in the middle. 
         if (i >= j) { break; }
 
-        /* Swap the elements we found, so the lesser element moves left and
-         * the greater element moves right. */
+        // Swap the elements we found, so the lesser element moves left and
+        // the greater element moves right.
         SI_exchange8(elems, i, j);
 
-        /* Move any elements which test as "equal" to the pivot to the outside
-         * edges of the array. */
+        // Move any elements which test as "equal" to the pivot to the outside
+        // edges of the array.
         if (comparison2 == 0) {
             p++;
             SI_exchange8(elems, p, i);

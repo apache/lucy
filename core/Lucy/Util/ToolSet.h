@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-/* ToolSet groups together several commonly used header files, so that only
+/** ToolSet groups together several commonly used header files, so that only
  * one pound-include directive is needed for them.
  *
  * It should only be used internally, and only included in C files rather than

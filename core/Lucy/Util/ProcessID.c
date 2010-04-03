@@ -15,18 +15,16 @@ lucy_PID_getpid(void)
 chy_bool_t
 lucy_PID_active(int pid)
 {
-    /* Attempt to open a handle to the process with permissions to terminate
-     * -- but don't actually terminate. 
-     */
+    // Attempt to open a handle to the process with permissions to terminate
+    // -- but don't actually terminate. 
     HANDLE handle = OpenProcess(PROCESS_TERMINATE, false, pid);
     if (handle != NULL) {
         // Successful open, therefore process is active. 
         CloseHandle(handle);
         return true;
     }
-    /* If the opening attempt fails because we were denied permission, assume
-     * that the process is active.
-     */
+    // If the opening attempt fails because we were denied permission, assume
+    // that the process is active.
     if (GetLastError() == ERROR_ACCESS_DENIED) {
         return true;
     }

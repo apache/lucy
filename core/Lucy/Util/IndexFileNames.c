@@ -38,8 +38,8 @@ IxFileNames_extract_gen(const CharBuf *name)
 {
     ZombieCharBuf *num_string = ZCB_WRAP(name);
 
-    /* Advance past first underscore.  Bail if we run out of string or if we
-     * encounter a NULL. */
+    // Advance past first underscore.  Bail if we run out of string or if we
+    // encounter a NULL.
     while (1) {
         uint32_t code_point = ZCB_Nip_One(num_string);
         if (code_point == 0) { return 0; }
