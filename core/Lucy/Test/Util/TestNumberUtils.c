@@ -11,24 +11,23 @@
 static void
 test_u1(TestBatch *batch)
 {
-    size_t count   = 64;
-    u64_t *ints    = TestUtils_random_u64s(NULL, count, 0, 2);
-    size_t amount  = count / 8;
-    u8_t  *bits    = (u8_t*)CALLOCATE(amount, sizeof(u8_t));
-    size_t i;
+    size_t    count   = 64;
+    uint64_t *ints    = TestUtils_random_u64s(NULL, count, 0, 2);
+    size_t    amount  = count / 8;
+    uint8_t  *bits    = (uint8_t*)CALLOCATE(amount, sizeof(uint8_t));
 
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         if (ints[i]) { NumUtil_u1set(bits, i); }
     }
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         ASSERT_INT_EQ(batch, NumUtil_u1get(bits, i), (long)ints[i], 
             "u1 set/get");
     }
 
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         NumUtil_u1flip(bits, i);
     }
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         ASSERT_INT_EQ(batch, NumUtil_u1get(bits, i), !ints[i], "u1 flip");
     }
 
@@ -39,15 +38,14 @@ test_u1(TestBatch *batch)
 static void
 test_u2(TestBatch *batch)
 {
-    size_t count = 32;
-    u64_t *ints = TestUtils_random_u64s(NULL, count, 0, 4);
-    u8_t  *bits = (u8_t*)CALLOCATE((count/4), sizeof(u8_t));
-    size_t i;
+    size_t    count = 32;
+    uint64_t *ints = TestUtils_random_u64s(NULL, count, 0, 4);
+    uint8_t  *bits = (uint8_t*)CALLOCATE((count/4), sizeof(uint8_t));
 
-    for (i = 0; i < count; i++) {
-        NumUtil_u2set(bits, i, (u8_t)ints[i]);
+    for (size_t i = 0; i < count; i++) {
+        NumUtil_u2set(bits, i, (uint8_t)ints[i]);
     }
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         ASSERT_INT_EQ(batch, NumUtil_u2get(bits, i), (long)ints[i], "u2");
     }
 
@@ -58,15 +56,14 @@ test_u2(TestBatch *batch)
 static void
 test_u4(TestBatch *batch)
 {
-    size_t count = 128;
-    u64_t *ints = TestUtils_random_u64s(NULL, count, 0, 16);
-    u8_t  *bits = (u8_t*)CALLOCATE((count/2), sizeof(u8_t));
-    size_t i;
+    size_t    count = 128;
+    uint64_t *ints  = TestUtils_random_u64s(NULL, count, 0, 16);
+    uint8_t  *bits  = (uint8_t*)CALLOCATE((count/2), sizeof(uint8_t));
 
-    for (i = 0; i < count; i++) {
-        NumUtil_u4set(bits, i, (u8_t)ints[i]);
+    for (size_t i = 0; i < count; i++) {
+        NumUtil_u4set(bits, i, (uint8_t)ints[i]);
     }
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         ASSERT_INT_EQ(batch, NumUtil_u4get(bits, i), (long)ints[i], "u4");
     }
 
@@ -77,29 +74,28 @@ test_u4(TestBatch *batch)
 static void
 test_c32(TestBatch *batch)
 {
-    u64_t mins[]   = { 0,   0x4000 - 100, (u32_t)I32_MAX - 100, U32_MAX - 10 };
-    u64_t limits[] = { 500, 0x4000 + 100, (u32_t)I32_MAX + 100, U32_MAX      };
-    u32_t   set_num;
-    u32_t   num_sets  = sizeof(mins) / sizeof(u64_t);
-    size_t  count     = 64;
-    u64_t  *ints      = NULL;
-    size_t  amount    = count * C32_MAX_BYTES;
-    char   *encoded   = (char*)CALLOCATE(amount, sizeof(char));
-    char   *target    = encoded;
-    char   *limit     = target + amount;
-    size_t i;
+    uint64_t  mins[]   = { 0,   0x4000 - 100, (uint32_t)I32_MAX - 100, U32_MAX - 10 };
+    uint64_t  limits[] = { 500, 0x4000 + 100, (uint32_t)I32_MAX + 100, U32_MAX      };
+    uint32_t  set_num;
+    uint32_t  num_sets  = sizeof(mins) / sizeof(uint64_t);
+    size_t    count     = 64;
+    uint64_t *ints      = NULL;
+    size_t    amount    = count * C32_MAX_BYTES;
+    char     *encoded   = (char*)CALLOCATE(amount, sizeof(char));
+    char     *target    = encoded;
+    char     *limit     = target + amount;
 
     for (set_num = 0; set_num < num_sets; set_num++) {
         char *skip;
         ints = TestUtils_random_u64s(ints, count, 
             mins[set_num], limits[set_num]);
         target = encoded;
-        for (i = 0; i < count; i++) {
-            NumUtil_encode_c32((u32_t)ints[i], &target);
+        for (size_t i = 0; i < count; i++) {
+            NumUtil_encode_c32((uint32_t)ints[i], &target);
         }
         target = encoded;
         skip   = encoded;
-        for (i = 0; i < count; i++) {
+        for (size_t i = 0; i < count; i++) {
             ASSERT_INT_EQ(batch, NumUtil_decode_c32(&target), (long)ints[i], 
                 "c32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
@@ -109,15 +105,15 @@ test_c32(TestBatch *batch)
             (unsigned long)skip, (unsigned long)target);
 
         target = encoded;
-        for (i = 0; i < count; i++) {
-            NumUtil_encode_padded_c32((u32_t)ints[i], &target);
+        for (size_t i = 0; i < count; i++) {
+            NumUtil_encode_padded_c32((uint32_t)ints[i], &target);
         }
         ASSERT_TRUE(batch, target == limit, 
             "padded c32 uses 5 bytes (%lu == %lu)", (unsigned long)target, 
             (unsigned long)limit);
         target = encoded;
         skip   = encoded;
-        for (i = 0; i < count; i++) {
+        for (size_t i = 0; i < count; i++) {
             ASSERT_INT_EQ(batch, NumUtil_decode_c32(&target), (long)ints[i], 
                 "padded c32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
@@ -139,30 +135,29 @@ test_c32(TestBatch *batch)
 static void
 test_c64(TestBatch *batch)
 {
-    u64_t mins[]   = { 0,   0x4000 - 100, (u64_t)U32_MAX - 100,  U64_MAX - 10 };
-    u64_t limits[] = { 500, 0x4000 + 100, (u64_t)U32_MAX + 1000, U64_MAX      };
-    u32_t   set_num;
-    u32_t   num_sets  = sizeof(mins) / sizeof(u64_t);
-    size_t  count     = 64;
-    u64_t  *ints      = NULL;
-    size_t  amount    = count * C64_MAX_BYTES;
-    char   *encoded   = (char*)CALLOCATE(amount, sizeof(char));
-    char   *target    = encoded;
-    char   *limit     = target + amount;
-    size_t i;
+    uint64_t  mins[]    = { 0,   0x4000 - 100, (uint64_t)U32_MAX - 100,  U64_MAX - 10 };
+    uint64_t  limits[]  = { 500, 0x4000 + 100, (uint64_t)U32_MAX + 1000, U64_MAX      };
+    uint32_t  set_num;
+    uint32_t  num_sets  = sizeof(mins) / sizeof(uint64_t);
+    size_t    count     = 64;
+    uint64_t *ints      = NULL;
+    size_t    amount    = count * C64_MAX_BYTES;
+    char     *encoded   = (char*)CALLOCATE(amount, sizeof(char));
+    char     *target    = encoded;
+    char     *limit     = target + amount;
 
     for (set_num = 0; set_num < num_sets; set_num++) {
         char *skip;
         ints = TestUtils_random_u64s(ints, count, 
             mins[set_num], limits[set_num]);
         target = encoded;
-        for (i = 0; i < count; i++) {
+        for (size_t i = 0; i < count; i++) {
             NumUtil_encode_c64(ints[i], &target);
         }
         target = encoded;
         skip   = encoded;
-        for (i = 0; i < count; i++) {
-            u64_t got = NumUtil_decode_c64(&target);
+        for (size_t i = 0; i < count; i++) {
+            uint64_t got = NumUtil_decode_c64(&target);
             ASSERT_TRUE(batch, got == ints[i], 
                 "c64 %" U64P " == %" U64P, got, ints[i]);
             if (target > limit) { THROW(ERR, "overrun"); }
@@ -176,7 +171,7 @@ test_c64(TestBatch *batch)
     NumUtil_encode_c64(U64_MAX, &target);
     target = encoded;
     { 
-        u64_t got = NumUtil_decode_c64(&target);
+        uint64_t got = NumUtil_decode_c64(&target);
         ASSERT_TRUE(batch, got == U64_MAX, "c64 U64_MAX");
     }
 
@@ -187,23 +182,22 @@ test_c64(TestBatch *batch)
 static void
 test_bigend_u16(TestBatch *batch)
 {
-    size_t count     = 32;
-    u64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U16_MAX + 1);
-    size_t amount    = (count + 1) * sizeof(u16_t);
-    char  *allocated = (char*)CALLOCATE(amount, sizeof(char));
-    char  *encoded   = allocated + 1; /* Intentionally misaligned. */
-    char  *target    = encoded;
-    size_t i;
+    size_t    count     = 32;
+    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U16_MAX + 1);
+    size_t    amount    = (count + 1) * sizeof(uint16_t);
+    char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
+    char     *encoded   = allocated + 1; /* Intentionally misaligned. */
+    char     *target    = encoded;
 
-    for (i = 0; i < count; i++) {
-        NumUtil_encode_bigend_u16((u16_t)ints[i], &target);
-        target += sizeof(u16_t);
+    for (size_t i = 0; i < count; i++) {
+        NumUtil_encode_bigend_u16((uint16_t)ints[i], &target);
+        target += sizeof(uint16_t);
     }
     target = encoded;
-    for (i = 0; i < count; i++) {
-        u16_t got = NumUtil_decode_bigend_u16(target);
+    for (size_t i = 0; i < count; i++) {
+        uint16_t got = NumUtil_decode_bigend_u16(target);
         ASSERT_INT_EQ(batch, got, (long)ints[i], "bigend u16");
-        target += sizeof(u16_t);
+        target += sizeof(uint16_t);
     }
 
     target = encoded;
@@ -218,23 +212,22 @@ test_bigend_u16(TestBatch *batch)
 static void
 test_bigend_u32(TestBatch *batch)
 {
-    size_t count     = 32;
-    u64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_C(1) + U32_MAX);
-    size_t amount    = (count + 1) * sizeof(u32_t);
-    char  *allocated = (char*)CALLOCATE(amount, sizeof(char));
-    char  *encoded   = allocated + 1; /* Intentionally misaligned. */
-    char  *target    = encoded;
-    size_t i;
+    size_t    count     = 32;
+    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_C(1) + U32_MAX);
+    size_t    amount    = (count + 1) * sizeof(uint32_t);
+    char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
+    char     *encoded   = allocated + 1; /* Intentionally misaligned. */
+    char     *target    = encoded;
 
-    for (i = 0; i < count; i++) {
-        NumUtil_encode_bigend_u32((u32_t)ints[i], &target);
-        target += sizeof(u32_t);
+    for (size_t i = 0; i < count; i++) {
+        NumUtil_encode_bigend_u32((uint32_t)ints[i], &target);
+        target += sizeof(uint32_t);
     }
     target = encoded;
-    for (i = 0; i < count; i++) {
-        u32_t got = NumUtil_decode_bigend_u32(target);
+    for (size_t i = 0; i < count; i++) {
+        uint32_t got = NumUtil_decode_bigend_u32(target);
         ASSERT_INT_EQ(batch, got, (long)ints[i], "bigend u32");
-        target += sizeof(u32_t);
+        target += sizeof(uint32_t);
     }
 
     target = encoded;
@@ -249,23 +242,22 @@ test_bigend_u32(TestBatch *batch)
 static void
 test_bigend_u64(TestBatch *batch)
 {
-    size_t count     = 32;
-    u64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_MAX);
-    size_t amount    = (count + 1) * sizeof(u64_t);
-    char  *allocated = (char*)CALLOCATE(amount, sizeof(char));
-    char  *encoded   = allocated + 1; /* Intentionally misaligned. */
-    char  *target    = encoded;
-    size_t i;
+    size_t    count     = 32;
+    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_MAX);
+    size_t    amount    = (count + 1) * sizeof(uint64_t);
+    char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
+    char     *encoded   = allocated + 1; /* Intentionally misaligned. */
+    char     *target    = encoded;
 
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         NumUtil_encode_bigend_u64(ints[i], &target);
-        target += sizeof(u64_t);
+        target += sizeof(uint64_t);
     }
     target = encoded;
-    for (i = 0; i < count; i++) {
-        u64_t got = NumUtil_decode_bigend_u64(target);
+    for (size_t i = 0; i < count; i++) {
+        uint64_t got = NumUtil_decode_bigend_u64(target);
         ASSERT_TRUE(batch, got == ints[i], "bigend u64");
-        target += sizeof(u64_t);
+        target += sizeof(uint64_t);
     }
 
     target = encoded;
@@ -280,20 +272,19 @@ test_bigend_u64(TestBatch *batch)
 static void
 test_bigend_f32(TestBatch *batch)
 {
-    float source[]  = { -1.3f, 0.0f, 100.2f };
-    size_t count     = 3;
-    size_t amount    = (count + 1) * sizeof(float);
-    u8_t  *allocated = (u8_t*)CALLOCATE(amount, sizeof(u8_t));
-    u8_t  *encoded   = allocated + 1; /* Intentionally misaligned. */
-    u8_t  *target    = encoded;
-    size_t i;
+    float    source[]  = { -1.3f, 0.0f, 100.2f };
+    size_t   count     = 3;
+    size_t   amount    = (count + 1) * sizeof(float);
+    uint8_t *allocated = (uint8_t*)CALLOCATE(amount, sizeof(uint8_t));
+    uint8_t *encoded   = allocated + 1; /* Intentionally misaligned. */
+    uint8_t *target    = encoded;
 
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         NumUtil_encode_bigend_f32(source[i], &target);
         target += sizeof(float);
     }
     target = encoded;
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         float got = NumUtil_decode_bigend_f32(target);
         ASSERT_TRUE(batch, got == source[i], "bigend f32");
         target += sizeof(float);
@@ -305,7 +296,7 @@ test_bigend_f32(TestBatch *batch)
         "Truly big-endian (IEEE 754 sign bit set for negative number)");
     ASSERT_INT_EQ(batch, encoded[0], 0xC0, 
         "IEEE 754 representation of -2.0f, byte 0");
-    for (i = 1; i < sizeof(float); i++) {
+    for (size_t i = 1; i < sizeof(float); i++) {
         ASSERT_INT_EQ(batch, encoded[i], 0, 
             "IEEE 754 representation of -2.0f, byte %d", (int)i);
     }
@@ -316,20 +307,19 @@ test_bigend_f32(TestBatch *batch)
 static void
 test_bigend_f64(TestBatch *batch)
 {
-    double source[]  = { -1.3, 0.0, 100.2 };
-    size_t count     = 3;
-    size_t amount    = (count + 1) * sizeof(double);
-    u8_t  *allocated = (u8_t*)CALLOCATE(amount, sizeof(u8_t));
-    u8_t  *encoded   = allocated + 1; /* Intentionally misaligned. */
-    u8_t  *target    = encoded;
-    size_t i;
+    double   source[]  = { -1.3, 0.0, 100.2 };
+    size_t   count     = 3;
+    size_t   amount    = (count + 1) * sizeof(double);
+    uint8_t *allocated = (uint8_t*)CALLOCATE(amount, sizeof(uint8_t));
+    uint8_t *encoded   = allocated + 1; /* Intentionally misaligned. */
+    uint8_t *target    = encoded;
 
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         NumUtil_encode_bigend_f64(source[i], &target);
         target += sizeof(double);
     }
     target = encoded;
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         double got = NumUtil_decode_bigend_f64(target);
         ASSERT_TRUE(batch, got == source[i], "bigend f64");
         target += sizeof(double);
@@ -341,7 +331,7 @@ test_bigend_f64(TestBatch *batch)
         "Truly big-endian (IEEE 754 sign bit set for negative number)");
     ASSERT_INT_EQ(batch, encoded[0], 0xC0, 
         "IEEE 754 representation of -2.0, byte 0");
-    for (i = 1; i < sizeof(double); i++) {
+    for (size_t i = 1; i < sizeof(double); i++) {
         ASSERT_INT_EQ(batch, encoded[i], 0, 
             "IEEE 754 representation of -2.0, byte %d", (int)i);
     }

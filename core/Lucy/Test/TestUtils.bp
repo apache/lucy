@@ -9,7 +9,7 @@ inert class Lucy::Test::TestUtils  {
 
     /** Return a random unsigned 64-bit integer. 
      */
-    inert u64_t
+    inert uint64_t
     random_u64();
 
     /** Return an array of <code>count</code> random 64-bit integers where
@@ -18,8 +18,8 @@ inert class Lucy::Test::TestUtils  {
      * If <code>buf</code> is NULL, it will be allocated, otherwise it will
      * be used.
      */
-    inert i64_t*
-    random_i64s(i64_t *buf, size_t count, i64_t min, i64_t limit);
+    inert int64_t*
+    random_i64s(int64_t *buf, size_t count, int64_t min, int64_t limit);
 
     /** Return an array of <code>count</code> random unsigned, 64-bit integers
      * where <code>min <= n < limit</code>.
@@ -27,8 +27,8 @@ inert class Lucy::Test::TestUtils  {
      * If <code>buf</code> is NULL, it will be allocated, otherwise it will
      * be used.
      */
-    inert u64_t*
-    random_u64s(u64_t *buf, size_t count, u64_t min, u64_t limit);
+    inert uint64_t*
+    random_u64s(uint64_t *buf, size_t count, uint64_t min, uint64_t limit);
 
     /** Return an array of <code>count</code> random double-precision floating
      * point numbers between 0 and 1.

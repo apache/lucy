@@ -51,7 +51,7 @@ test_all(TestBatch *batch)
         "File correctly identified by Entry_Is_Dir");
 
     {
-        u32_t refcount = RAMFolder_Get_RefCount(folder);
+        uint32_t refcount = RAMFolder_Get_RefCount(folder);
         RAMDH_Close(dh);
         ASSERT_INT_EQ(batch, RAMFolder_Get_RefCount(folder), refcount - 1,
             "Folder reference released by Close()");

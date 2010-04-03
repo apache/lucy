@@ -7,7 +7,7 @@
 static void
 test_SKIP_and_TRAILING(TestBatch *batch)
 {
-    u8_t i, max;
+    uint8_t i, max;
     
     /* Some of the upper max boundaries are skipped (e.g. 127)
      * because they may not appear as initial bytes in legal UTF-8.
@@ -53,7 +53,7 @@ test_SKIP_and_TRAILING(TestBatch *batch)
 static void
 test_overlap(TestBatch *batch)
 {
-    i32_t result;
+    int32_t result;
     result = StrHelp_overlap("", "", 0, 0);
     ASSERT_INT_EQ(batch, result, 0, "two empty strings");
     result = StrHelp_overlap("", "foo", 0, 3);
@@ -81,10 +81,10 @@ test_to_base36(TestBatch *batch)
 }
 
 static void
-S_round_trip_utf8_code_point(TestBatch *batch, u32_t code_point)
+S_round_trip_utf8_code_point(TestBatch *batch, uint32_t code_point)
 {
     char buffer[4];
-    u32_t len   = StrHelp_encode_utf8_char(code_point, buffer);
+    uint32_t len   = StrHelp_encode_utf8_char(code_point, buffer);
     char *start = buffer;
     char *end   = start + len;
     ASSERT_TRUE(batch, StrHelp_utf8_valid(buffer, len), "Valid UTF-8 for %lu", 
@@ -100,7 +100,7 @@ S_round_trip_utf8_code_point(TestBatch *batch, u32_t code_point)
 static void
 test_utf8_round_trip(TestBatch *batch)
 {
-    u32_t code_points[] = { 
+    uint32_t code_points[] = { 
         0, 
         0xA, /* newline */
         'a', 
@@ -108,8 +108,8 @@ test_utf8_round_trip(TestBatch *batch)
         0x263A, /* smiley (three-byte) */ 
         0x10FFFF, /* Max legal code point (four-byte). */
     };
-    u32_t num_code_points = sizeof(code_points) / sizeof(u32_t);
-    u32_t i;
+    uint32_t num_code_points = sizeof(code_points) / sizeof(uint32_t);
+    uint32_t i;
     for (i = 0; i < num_code_points; i++) {
         S_round_trip_utf8_code_point(batch, code_points[i]);
     }
@@ -136,7 +136,7 @@ test_back_utf8_char(TestBatch *batch)
 {
     char buffer[4];
     char *buf = buffer + 1;
-    u32_t len = StrHelp_encode_utf8_char(0x263A, buffer);
+    uint32_t len = StrHelp_encode_utf8_char(0x263A, buffer);
     char *end = buffer + len;
     ASSERT_TRUE(batch, StrHelp_back_utf8_char(end, buffer) == buffer,
         "back_utf8_char");
@@ -145,9 +145,9 @@ test_back_utf8_char(TestBatch *batch)
 }
 
 static void
-S_set_buf(char *buffer, u8_t a, u8_t b, u8_t c, u8_t d)
+S_set_buf(char *buffer, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {
-    u8_t *buf = (u8_t*)buffer;
+    uint8_t *buf = (uint8_t*)buffer;
     buf[0] = a;
     buf[1] = b;
     buf[2] = c;
@@ -199,9 +199,9 @@ test_invalid_utf8(TestBatch *batch)
         "Illegal 5-byte sequence fails");
 
     {
-        u32_t i;
+        uint32_t i;
         for (i = 0; i <= 0x10FFFF; i++) {
-            u32_t len = StrHelp_encode_utf8_char(i, buffer);
+            uint32_t len = StrHelp_encode_utf8_char(i, buffer);
             if (!StrHelp_utf8_valid(buffer, len)) {
                 FAIL(batch, "Encoding or validity failure for %lu", 
                     (unsigned long)i);

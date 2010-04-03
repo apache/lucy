@@ -108,7 +108,7 @@ test_Window(TestBatch *batch)
     RAMFile *file = RAMFile_new(NULL, false);
     RAMFileHandle *fh = RAMFH_open(NULL, FH_WRITE_ONLY, file);
     FileWindow *window = FileWindow_new();
-    u32_t i;
+    uint32_t i;
 
     for (i = 0; i < 1024; i++) {
         RAMFH_Write(fh, "foo ", 4);

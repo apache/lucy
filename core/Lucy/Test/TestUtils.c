@@ -9,22 +9,22 @@
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Util/Freezer.h"
 
-u64_t
+uint64_t
 TestUtils_random_u64()
 {
-    u64_t num =    ((u64_t)rand() << 60)
-                 | ((u64_t)rand() << 45)
-                 | ((u64_t)rand() << 30)
-                 | ((u64_t)rand() << 15) 
-                 | ((u64_t)rand() << 0);
+    uint64_t num = ((uint64_t)rand() << 60)
+                 | ((uint64_t)rand() << 45)
+                 | ((uint64_t)rand() << 30)
+                 | ((uint64_t)rand() << 15) 
+                 | ((uint64_t)rand() << 0);
     return num;
 }
 
-i64_t*
-TestUtils_random_i64s(i64_t *buf, size_t count, i64_t min, i64_t limit) 
+int64_t*
+TestUtils_random_i64s(int64_t *buf, size_t count, int64_t min, int64_t limit) 
 {
-    u64_t  range = min < limit ? limit - min : 0;
-    i64_t *ints = buf ? buf : (i64_t*)CALLOCATE(count, sizeof(i64_t));
+    uint64_t  range = min < limit ? limit - min : 0;
+    int64_t *ints = buf ? buf : (int64_t*)CALLOCATE(count, sizeof(int64_t));
     size_t i;
     for (i = 0; i < count; i++) {
         ints[i] = min + TestUtils_random_u64() % range;
@@ -32,11 +32,11 @@ TestUtils_random_i64s(i64_t *buf, size_t count, i64_t min, i64_t limit)
     return ints;
 }
 
-u64_t*
-TestUtils_random_u64s(u64_t *buf, size_t count, u64_t min, u64_t limit) 
+uint64_t*
+TestUtils_random_u64s(uint64_t *buf, size_t count, uint64_t min, uint64_t limit) 
 {
-    u64_t  range = min < limit ? limit - min : 0;
-    u64_t *ints = buf ? buf : (u64_t*)CALLOCATE(count, sizeof(u64_t));
+    uint64_t  range = min < limit ? limit - min : 0;
+    uint64_t *ints = buf ? buf : (uint64_t*)CALLOCATE(count, sizeof(uint64_t));
     size_t i;
     for (i = 0; i < count; i++) {
         ints[i] = min + TestUtils_random_u64() % range;
@@ -50,7 +50,7 @@ TestUtils_random_f64s(double *buf, size_t count)
     double *f64s = buf ? buf : (double*)CALLOCATE(count, sizeof(double));
     size_t i;
     for (i = 0; i < count; i++) {
-        u64_t num = TestUtils_random_u64();
+        uint64_t num = TestUtils_random_u64();
         f64s[i] = (double)num / U64_MAX;
     }
     return f64s;

@@ -13,7 +13,7 @@ test_fields(TestBatch *batch)
     ZombieCharBuf *foo = ZCB_WRAP_STR("foo",3 );
     ZombieCharBuf *bar = ZCB_WRAP_STR("bar", 3);
     ZombieCharBuf *baz = ZCB_WRAP_STR("baz", 3);
-    i32_t field_num; 
+    int32_t field_num; 
     
     field_num = Seg_Add_Field(segment, (CharBuf*)foo);
     ASSERT_TRUE(batch, field_num == 1, 

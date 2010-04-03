@@ -21,7 +21,7 @@ test_refill(TestBatch *batch)
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
     char        scratch[5];
-    i32_t i;
+    int32_t i;
 
     for (i = 0; i < 1023; i++) {
         OutStream_Write_U8(outstream, 'x');
@@ -78,7 +78,7 @@ test_Clone_and_Reopen(TestBatch *batch)
     InStream      *instream;
     InStream      *clone;
     InStream      *reopened;
-    u32_t i;
+    uint32_t i;
 
     for (i = 0; i < 26; i++) {
         OutStream_Write_U8(outstream, 'a' + i);

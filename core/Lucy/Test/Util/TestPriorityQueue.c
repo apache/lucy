@@ -6,7 +6,7 @@
 #include "Lucy/Util/PriorityQueue.h"
 
 NumPriorityQueue*
-NumPriQ_new(u32_t max_size)
+NumPriQ_new(uint32_t max_size)
 {
     NumPriorityQueue *self 
         = (NumPriorityQueue*)VTable_Make_Obj(NUMPRIORITYQUEUE);
@@ -23,18 +23,18 @@ NumPriQ_less_than(NumPriorityQueue *self, Obj *a, Obj *b)
 }
 
 static void
-S_insert_num(NumPriorityQueue *pq, i32_t value)
+S_insert_num(NumPriorityQueue *pq, int32_t value)
 {
     NumPriQ_Insert(pq, (Obj*)Float64_new((double)value));
 }
 
-static i32_t
+static int32_t
 S_pop_num(NumPriorityQueue *pq)
 {
     Float64 *num = (Float64*)NumPriQ_Pop(pq);
-    i32_t retval;
+    int32_t retval;
     if (!num) { THROW(ERR, "Queue is empty"); }
-    retval = (i32_t)Float64_Get_Value(num);
+    retval = (int32_t)Float64_Get_Value(num);
     DECREF(num);
     return retval;
 }
@@ -99,7 +99,7 @@ test_Insert_and_Pop(TestBatch *batch)
 static void
 test_discard(TestBatch *batch)
 {
-    i32_t i;
+    int32_t i;
     NumPriorityQueue *pq = NumPriQ_new(5);
 
     for (i = 1; i <= 10; i++) { S_insert_num(pq, i); }

@@ -4,7 +4,7 @@ class Lucy::Test::Util::NumPriorityQueue cnick NumPriQ
     extends Lucy::Util::PriorityQueue {
 
     inert incremented NumPriorityQueue*
-    new(u32_t max_size);
+    new(uint32_t max_size);
 
     bool_t
     Less_Than(NumPriorityQueue *self, Obj *a, Obj *b);
