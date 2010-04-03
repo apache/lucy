@@ -25,13 +25,11 @@ typedef struct lucy_HashEntry {
     int32_t  hash_code;
 } lucy_HashEntry;
 
-/* Reset the iterator.  Hash_iter_init must be called to restart iteration.
- */
+// Reset the iterator.  Hash_iter_init must be called to restart iteration.
 static INLINE void
 SI_kill_iter(Hash *self);
 
-/* Return the entry associated with the key, if any.
- */
+// Return the entry associated with the key, if any.
 static INLINE HashEntry*
 SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_code);
 
@@ -54,8 +52,8 @@ Hash_new(uint32_t capacity)
 Hash*
 Hash_init(Hash *self, uint32_t capacity)
 {
-    /* Allocate enough space to hold the requested number of elements without
-     * triggering a rebuild. */
+    // Allocate enough space to hold the requested number of elements without
+    // triggering a rebuild.
     uint32_t requested_capacity = capacity < I32_MAX ? capacity : I32_MAX;
     uint32_t threshold;
     capacity = 16;
@@ -65,11 +63,11 @@ Hash_init(Hash *self, uint32_t capacity)
         capacity *= 2;
     }
 
-    /* Init. */
+    // Init. 
     self->size         = 0;
     self->iter_tick    = -1;
 
-    /* Derive. */
+    // Derive. 
     self->capacity     = capacity;
     self->entries      = (HashEntry*)CALLOCATE(capacity, sizeof(HashEntry));
     self->threshold    = threshold;
@@ -96,8 +94,8 @@ Hash_dump(Hash *self)
 
     Hash_Iter_Init(self);
     while (Hash_Iter_Next(self, &key, &value)) {
-        /* Since JSON only supports text hash keys, Dump() can only support
-         * text hash keys. */
+        // Since JSON only supports text hash keys, Dump() can only support
+        // text hash keys.
         CERTIFY(key, CHARBUF);
         Hash_Store(dump, key, Obj_Dump(value));
     }
@@ -112,8 +110,8 @@ Hash_load(Hash *self, Obj *dump)
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
     UNUSED_VAR(self);
 
-    /* Assume that the presence of the "_class" key paired with a valid class
-     * name indicates the output of a Dump rather than an ordinary Hash. */
+    // Assume that the presence of the "_class" key paired with a valid class
+    // name indicates the output of a Dump rather than an ordinary Hash. */
     if (class_name && CB_Is_A(class_name, CHARBUF)) {
         VTable *vtable = VTable_fetch_vtable(class_name);
 
@@ -125,26 +123,26 @@ Hash_load(Hash *self, Obj *dump)
                 DECREF(parent_class);
             }
             else {
-                /* TODO: Fix Hash_Load() so that it works with ordinary hash
-                 * keys named "_class". */
+                // TODO: Fix Hash_Load() so that it works with ordinary hash
+                // keys named "_class".
                 THROW(ERR, "Can't find class '%o'", class_name);
             }
         }
 
-        /* Dispatch to an alternate Load() method. */
+        // Dispatch to an alternate Load() method. 
         if (vtable) {
             Obj_load_t load = (Obj_load_t)METHOD(vtable, Obj, Load);
             if (load == Obj_load) {
                 THROW(ERR, "Abstract method Load() not defined for %o", 
                     VTable_Get_Name(vtable));
             }
-            else if (load != (Obj_load_t)Hash_load) { /* stop inf loop */
+            else if (load != (Obj_load_t)Hash_load) { // stop inf loop 
                 return load(NULL, dump);
             }
         }
     }
 
-    /* It's an ordinary Hash. */
+    // It's an ordinary Hash. 
     {
         Hash *loaded = Hash_new(source->size);
         Obj *key;
@@ -167,9 +165,9 @@ Hash_serialize(Hash *self, OutStream *outstream)
     uint32_t charbuf_count = 0;
     OutStream_Write_C32(outstream, self->size);
 
-    /* Write CharBuf keys first.  CharBuf keys are the common case; grouping
-     * them together is a form of run-length-encoding and saves space, since
-     * we omit the per-key class name. */
+    // Write CharBuf keys first.  CharBuf keys are the common case; grouping
+    // them together is a form of run-length-encoding and saves space, since
+    // we omit the per-key class name.
     Hash_Iter_Init(self);
     while (Hash_Iter_Next(self, &key, &val)) {
         if (Obj_Is_A(key, CHARBUF)) { charbuf_count++; }
@@ -183,7 +181,7 @@ Hash_serialize(Hash *self, OutStream *outstream)
         }
     }
 
-    /* Punt on the classes of the remaining keys. */
+    // Punt on the classes of the remaining keys. 
     Hash_Iter_Init(self);
     while (Hash_Iter_Next(self, &key, &val)) {
         if (!Obj_Is_A(key, CHARBUF)) { 
@@ -204,7 +202,7 @@ Hash_deserialize(Hash *self, InStream *instream)
     if (self) Hash_init(self, size);
     else self = Hash_new(size);
  
-    /* Read key-value pairs with CharBuf keys. */
+    // Read key-value pairs with CharBuf keys. 
     while (num_charbufs--) {
         uint32_t len = InStream_Read_C32(instream);
         char *key_buf = CB_Grow(key, len);
@@ -215,7 +213,7 @@ Hash_deserialize(Hash *self, InStream *instream)
     }
     DECREF(key);
     
-    /* Read remaining key/value pairs. */
+    // Read remaining key/value pairs. 
     while (num_other--) {
         Obj *k = THAW(instream);
         Hash_Store(self, k, THAW(instream));
@@ -231,7 +229,7 @@ Hash_clear(Hash *self)
     HashEntry *entry       = (HashEntry*)self->entries;
     HashEntry *const limit = entry + self->capacity;
 
-    /* Iterate through all entries. */
+    // Iterate through all entries. 
     for ( ; entry < limit; entry++) {
         if (!entry->key) { continue; }
         DECREF(entry->key);
@@ -259,7 +257,7 @@ lucy_Hash_do_store(Hash *self, Obj *key, Obj *value,
         HashEntry *entry = entries + tick;
         if (entry->key == (Obj*)UNDEF || !entry->key) {
             if (entry->key == (Obj*)UNDEF) { 
-                /* Take note of diminished tombstone clutter. */
+                // Take note of diminished tombstone clutter. 
                 self->threshold++; 
             }
             entry->key       = use_this_key 
@@ -277,7 +275,7 @@ lucy_Hash_do_store(Hash *self, Obj *key, Obj *value,
             entry->value = value;
             break;
         }
-        tick++; /* linear scan */
+        tick++; // linear scan 
     }
 }
 
@@ -321,7 +319,7 @@ SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_code)
         tick &= self->capacity - 1;
         entry = entries + tick;
         if (!entry->key) { 
-            /* Failed to find the key, so return NULL. */
+            // Failed to find the key, so return NULL. 
             return NULL; 
         }
         else if (   entry->hash_code == hash_code
@@ -351,7 +349,7 @@ Hash_delete(Hash *self, const Obj *key)
         entry->value     = NULL;
         entry->hash_code = 0;
         self->size--;
-        self->threshold--; /* limit number of tombstones */
+        self->threshold--; // limit number of tombstones 
         return value;
     }
     else {
@@ -384,7 +382,7 @@ Hash_iter_next(Hash *self, Obj **key, Obj **value)
 {
     while (1) {
         if (++self->iter_tick >= (int32_t)self->capacity) {
-            /* Bail since we've completed the iteration. */
+            // Bail since we've completed the iteration. 
             --self->iter_tick;
             *key   = NULL;
             *value = NULL;
@@ -394,7 +392,7 @@ Hash_iter_next(Hash *self, Obj **key, Obj **value)
             HashEntry *const entry 
                 = (HashEntry*)self->entries + self->iter_tick;
             if (entry->key && entry->key != (Obj*)UNDEF) {
-                /* Success! */
+                // Success! 
                 *key   = entry->key;
                 *value = entry->value;
                 return true;

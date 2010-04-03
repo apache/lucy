@@ -41,8 +41,8 @@ LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
     LFRegEntry  *volatile *entries = (LFRegEntry*volatile*)self->entries;
     LFRegEntry  *volatile *slot    = &(entries[bucket]);
 
-    /* Proceed through the linked list.  Bail out if the key has already been
-     * registered. */
+    // Proceed through the linked list.  Bail out if the key has already been
+    // registered.
     FIND_END_OF_LINKED_LIST:
     while (*slot) {
         LFRegEntry *entry = *slot;
@@ -54,7 +54,7 @@ LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
         slot = &(entry->next);
     }
 
-    /* We've found an empty slot. Create the new entry. */ 
+    // We've found an empty slot. Create the new entry.  
     if (!new_entry) {
         new_entry = (LFRegEntry*)MALLOCATE(sizeof(LFRegEntry));
         new_entry->hash_code = hash_code;

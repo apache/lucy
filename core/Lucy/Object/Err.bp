@@ -153,7 +153,7 @@ __C__
     lucy_Err_rethrow((lucy_Err*)_error, __FILE__, __LINE__, \
         LUCY_ERR_FUNC_MACRO)
 
-/* Macro version of lucy_Err_throw_at which inserts contextual information
+/** Macro version of lucy_Err_throw_at which inserts contextual information
  * automatically, provided that the compiler supports the necessary features.
  */
 #ifdef CHY_HAS_VARIADIC_MACROS

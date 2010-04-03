@@ -234,10 +234,10 @@ ViewBB_new(char *buf, size_t size)
 {
     ViewByteBuf *self = (ViewByteBuf*)VTable_Make_Obj(VIEWBYTEBUF);
 
-    /* Init. */
+    // Init. 
     self->cap = 0;
 
-    /* Assign. */
+    // Assign. 
     self->buf  = buf;
     self->size = size;
     

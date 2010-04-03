@@ -25,13 +25,13 @@ VA_new(uint32_t capacity)
 VArray*
 VA_init(VArray *self, uint32_t capacity)
 {
-    /* Init. */
+    // Init. 
     self->size = 0;
 
-    /* Assign. */
+    // Assign. 
     self->cap = capacity;
 
-    /* Derive. */
+    // Derive. 
     self->elems = (Obj**)CALLOCATE(capacity, sizeof(Obj*));
 
     return self;
@@ -95,7 +95,7 @@ VA_serialize(VArray *self, OutStream *outstream)
             last_valid_tick = i;
         }
     }
-    /* Terminate. */
+    // Terminate. 
     OutStream_Write_C32(outstream, self->size - last_valid_tick);
 }
 
@@ -127,7 +127,7 @@ VA_clone(VArray *self)
     uint32_t i;
     VArray *evil_twin = VA_new(self->size);
 
-    /* Clone each element. */
+    // Clone each element. 
     for (i = 0; i < self->size; i++) {
         Obj *elem = self->elems[i];
         if (elem) {
@@ -135,7 +135,7 @@ VA_clone(VArray *self)
         }
     }
 
-    /* Ensure that size is the same if NULL elems at end. */
+    // Ensure that size is the same if NULL elems at end. 
     evil_twin->size = self->size;
 
     return evil_twin;
@@ -148,7 +148,7 @@ VA_shallow_copy(VArray *self)
     VArray *evil_twin;
     Obj **elems;
 
-    /* Dupe, then increment refcounts. */
+    // Dupe, then increment refcounts. 
     evil_twin = VA_new(self->size);
     elems = evil_twin->elems;
     memcpy(elems, self->elems, self->size * sizeof(Obj*));
@@ -318,8 +318,8 @@ S_default_compare(void *context, const void *va, const void *vb)
     UNUSED_VAR(context);
     if      (a != NULL && b != NULL) { return Obj_Compare_To(a, b); }
     else if (a == NULL && b == NULL) { return 0;  }
-    else if (a == NULL)              { return 1;  } /* NULL to the back */
-    else  /* b == NULL */            { return -1; } /* NULL to the back */
+    else if (a == NULL)              { return 1;  } // NULL to the back 
+    else  /* b == NULL */            { return -1; } // NULL to the back 
 }
 
 void

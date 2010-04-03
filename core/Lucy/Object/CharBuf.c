@@ -18,22 +18,21 @@
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"
 
-/* The end of the string (address of terminating NULL). */
+// The end of the string (address of terminating NULL). 
 #define CBEND(self) ((self)->ptr + (self)->size)
 
-/* Maximum number of characters in a stringified 64-bit integer, including
- * minus sign if negative.
- */
+// Maximum number of characters in a stringified 64-bit integer, including
+// minus sign if negative.
 #define MAX_I64_CHARS 20
 
-/* Helper function for throwing invalid UTF-8 error. Since THROW uses
- * a CharBuf internally, calling THROW with invalid UTF-8 would create an
- * infinite loop -- so we fwrite some of the bogus text to stderr invoke
- * THROW with a generic message. */
+// Helper function for throwing invalid UTF-8 error. Since THROW uses
+// a CharBuf internally, calling THROW with invalid UTF-8 would create an
+// infinite loop -- so we fwrite some of the bogus text to stderr invoke
+// THROW with a generic message.
 static void
 S_die_invalid_utf8(const char *text, size_t size);
 
-/* Helper function for throwing invalid pattern error. */
+// Helper function for throwing invalid pattern error. 
 static void
 S_die_invalid_pattern(const char *pattern);
 
@@ -49,13 +48,13 @@ CB_new(size_t size)
 CharBuf*
 CB_init(CharBuf *self, size_t size) 
 {
-    /* Derive. */
+    // Derive. 
     self->ptr = (char*)MALLOCATE(size + 1);
 
-     /* Init. */
-    *self->ptr = '\0'; /* Empty string. */
+     // Init. 
+    *self->ptr = '\0'; // Empty string. 
  
-    /* Assign. */
+    // Assign. 
     self->size   = 0;
     self->cap    = size + 1;
 
@@ -75,16 +74,16 @@ CB_new_from_trusted_utf8(const char *ptr, size_t size)
 {
     CharBuf *self = (CharBuf*)VTable_Make_Obj(CHARBUF);
 
-    /* Derive. */
+    // Derive. 
     self->ptr = (char*)MALLOCATE(size + 1);
 
-    /* Copy. */
+    // Copy. 
     memcpy(self->ptr, ptr, size);
 
-    /* Assign. */
+    // Assign. 
     self->size      = size;
     self->cap       = size + 1; 
-    self->ptr[size] = '\0'; /* Null terminate. */
+    self->ptr[size] = '\0'; // Null terminate. 
     
     return self;
 }
@@ -209,7 +208,7 @@ CB_vcatf(CharBuf *self, const char *pattern, va_list args)
     for ( ; pattern < pattern_end; pattern++) {
         const char *slice_end = pattern;
 
-        /* Consume all characters leading up to a '%'. */
+        // Consume all characters leading up to a '%'. 
         while (slice_end < pattern_end && *slice_end != '%') { slice_end++; }
         if (pattern != slice_end) {
             size_t size = slice_end - pattern;
@@ -218,7 +217,7 @@ CB_vcatf(CharBuf *self, const char *pattern, va_list args)
         }
 
         if (pattern < pattern_end) {
-            pattern++; /* Move past '%'. */
+            pattern++; // Move past '%'. 
 
             switch (*pattern) {
                 case '%': {
@@ -333,9 +332,9 @@ CB_vcatf(CharBuf *self, const char *pattern, va_list args)
                 } 
                 break;
 
-                /* Assume NULL-terminated pattern string, which eliminates the
-                 * need for bounds checking if '%' is the last visible
-                 * character. */
+                // Assume NULL-terminated pattern string, which eliminates the
+                // need for bounds checking if '%' is the last visible
+                // character.
                 default: {
                     S_die_invalid_pattern(pattern_start);
                 }
@@ -400,13 +399,13 @@ CB_basex_to_i64(CharBuf *self, uint32_t base)
     int64_t retval = 0;
     bool_t is_negative = false;
 
-    /* Advance past minus sign. */
+    // Advance past minus sign. 
     if (ZCB_Code_Point_At(iterator, 0) == '-') { 
         ZCB_Nip_One(iterator);
         is_negative = true;
     }
 
-    /* Accumulate. */
+    // Accumulate. 
     while (iterator->size) {
         int32_t code_point = ZCB_Nip_One(iterator);
         if (isalnum(code_point)) {
@@ -422,7 +421,7 @@ CB_basex_to_i64(CharBuf *self, uint32_t base)
         }
     }
 
-    /* Apply minus sign. */
+    // Apply minus sign. 
     if (is_negative) retval = 0 - retval;
 
     return retval;
@@ -613,7 +612,7 @@ CB_trim_top(CharBuf *self)
     }
 
     if (count) {
-        /* Copy string backwards. */
+        // Copy string backwards. 
         self->size = CBEND(self) - ptr;
         memmove(self->ptr, ptr, self->size);
     }
@@ -808,8 +807,8 @@ ViewCB_init(ViewCharBuf *self, const char *utf8, size_t size)
 void
 ViewCB_destroy(ViewCharBuf *self)
 {
-    /* Note that we do not free self->ptr, and that we invoke the
-     * SUPER_DESTROY with CHARBUF instead of VIEWCHARBUF. */
+    // Note that we do not free self->ptr, and that we invoke the
+    // SUPER_DESTROY with CHARBUF instead of VIEWCHARBUF.
     SUPER_DESTROY(self, CHARBUF);
 }
 

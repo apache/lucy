@@ -18,7 +18,7 @@
 
 size_t lucy_VTable_offset_of_parent = offsetof(lucy_VTable, parent);
 
-/* Remove spaces and underscores, convert to lower case. */
+// Remove spaces and underscores, convert to lower case. 
 static void
 S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 
@@ -126,15 +126,15 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
             }
         }
 
-        /* Copy source vtable. */
+        // Copy source vtable. 
         singleton = VTable_Clone(parent);
 
-        /* Turn clone into child. */
+        // Turn clone into child. 
         singleton->parent = parent; 
         DECREF(singleton->name);
         singleton->name = CB_Clone(subclass_name);
         
-        /* Allow host methods to override. */
+        // Allow host methods to override. 
         novel_host_methods = VTable_novel_host_methods(subclass_name);
         num_novel = VA_Get_Size(novel_host_methods);
         if (num_novel) {
@@ -162,9 +162,9 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
         }
         DECREF(novel_host_methods);
 
-        /* Register the new class, both locally and with host. */
+        // Register the new class, both locally and with host. 
         if (VTable_add_to_registry(singleton)) {
-            /* Doing this after registering is racy, but hard to fix. :( */
+            // Doing this after registering is racy, but hard to fix. :( 
             VTable_register_with_host(singleton, parent);
         }
         else {

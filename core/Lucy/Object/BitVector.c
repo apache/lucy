@@ -5,15 +5,13 @@
 
 #include "Lucy/Object/BitVector.h"
 
-/* Shared subroutine for performing both OR and XOR ops.
- */
+// Shared subroutine for performing both OR and XOR ops.
 #define DO_OR 1
 #define DO_XOR 2
 static void
 S_do_or_or_xor(BitVector *self, const BitVector *other, int operation);
 
-/* Number of 1 bits given a u8 value. 
- */
+// Number of 1 bits given a u8 value. 
 static const uint32_t BYTE_COUNTS[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
@@ -46,12 +44,12 @@ BitVec_init(BitVector *self, uint32_t capacity)
 {
     const uint32_t byte_size = (uint32_t)ceil(capacity / 8.0);
 
-    /* Derive. */
+    // Derive. 
     self->bits = capacity 
                ? (uint8_t*)CALLOCATE(byte_size, sizeof(uint8_t)) 
                : NULL;
 
-    /* Assign. */
+    // Assign. 
     self->cap      = byte_size * 8;
 
     return self;
@@ -70,7 +68,7 @@ BitVec_clone(BitVector *self)
     BitVector *evil_twin = BitVec_new(self->cap);
     uint32_t   byte_size = (uint32_t)ceil(self->cap / 8.0);
 
-    /* Forbid inheritance. */
+    // Forbid inheritance. 
     if (BitVec_Get_VTable(self) != BITVECTOR) {
         THROW(ERR, "Attempt by %o to inherit BitVec_Clone", 
             BitVec_Get_Class_Name(self));
@@ -170,7 +168,7 @@ BitVec_next_set_bit(BitVector *self, uint32_t tick)
         return -1;
     }
     else if (*ptr != 0) {
-        /* Special case the first byte. */
+        // Special case the first byte. 
         const int32_t base = (ptr - self->bits) * 8;
         const int32_t min_sub_tick = tick & 0x7;
         unsigned int byte = *ptr >> min_sub_tick;
@@ -183,7 +181,7 @@ BitVec_next_set_bit(BitVector *self, uint32_t tick)
 
     for (ptr++ ; ptr < limit; ptr++) {
         if (*ptr != 0) {
-            /* There's a non-zero bit in this byte. */
+            // There's a non-zero bit in this byte. 
             const int32_t base = (ptr - self->bits) * 8;
             const int32_t candidate = base + S_first_bit_in_nonzero_byte(*ptr);
             return candidate < (int32_t)self->cap ? candidate : -1;
@@ -204,13 +202,13 @@ BitVec_and(BitVector *self, const BitVector *other)
     const size_t byte_size = (size_t)ceil(min_cap / 8.0);
     uint8_t *const limit = bits_a + byte_size;
 
-    /* Intersection. */
+    // Intersection. 
     while (bits_a < limit) {
         *bits_a &= *bits_b;
         bits_a++, bits_b++;
     }
 
-    /* Set all remaining to zero. */
+    // Set all remaining to zero. 
     if (self->cap > min_cap) {
         const size_t self_byte_size = (size_t)ceil(self->cap / 8.0);
         memset(bits_a, 0, self_byte_size - byte_size);
@@ -237,7 +235,7 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation)
     uint8_t *limit;
     double byte_size;
 
-    /* Sort out what the minimum and maximum caps are. */
+    // Sort out what the minimum and maximum caps are. 
     if (self->cap < other->cap) {
         max_cap = other->cap;
         min_cap = self->cap;
@@ -247,14 +245,14 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation)
         min_cap = other->cap;
     }
 
-    /* Grow self if smaller than other, then calc pointers. */
+    // Grow self if smaller than other, then calc pointers. 
     if (max_cap > self->cap) { BitVec_Grow(self, max_cap); }
     bits_a        = self->bits;
     bits_b        = other->bits;
     byte_size     = ceil(min_cap / 8.0);
     limit         = self->bits + (size_t)byte_size;
 
-    /* Perform union of common bits. */
+    // Perform union of common bits. 
     if (operation == DO_OR) {
         while (bits_a < limit) {
             *bits_a |= *bits_b;
@@ -271,7 +269,7 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation)
         THROW(ERR, "Unrecognized operation: %i32", (int32_t)operation);
     }
 
-    /* Copy remaining bits if other is bigger than self. */
+    // Copy remaining bits if other is bigger than self. 
     if (other->cap > min_cap) {
         const double other_byte_size = ceil(other->cap / 8.0);
         const size_t bytes_to_copy = (size_t)(other_byte_size - byte_size);
@@ -290,7 +288,7 @@ BitVec_and_not(BitVector *self, const BitVector *other)
     const size_t byte_size = (size_t)ceil(min_cap / 8.0);
     uint8_t *const limit = bits_a + byte_size;
 
-    /* Clear bits set in other. */
+    // Clear bits set in other. 
     while (bits_a < limit) {
         *bits_a &= ~(*bits_b);
         bits_a++, bits_b++;
@@ -313,12 +311,12 @@ BitVec_flip_block(BitVector *self, uint32_t offset, uint32_t length)
     uint32_t first = offset;
     uint32_t last  = offset + length - 1;
 
-    /* Bail if there's nothing to flip. */
+    // Bail if there's nothing to flip. 
     if (!length) { return; }
 
     if (last >= self->cap) { BitVec_Grow(self, last + 1); }
 
-    /* Flip partial bytes. */
+    // Flip partial bytes. 
     while (last % 8 != 0 && last > first) {
         NumUtil_u1flip(self->bits, last);
         last--;
@@ -328,22 +326,22 @@ BitVec_flip_block(BitVector *self, uint32_t offset, uint32_t length)
         first++;
     }
 
-    /* Are first and last equal? */
+    // Are first and last equal? 
     if (first == last) {
-        /* There's only one bit left to flip. */
+        // There's only one bit left to flip. 
         NumUtil_u1flip(self->bits, last);
     }
-    /* They must be multiples of 8, then. */
+    // They must be multiples of 8, then. 
     else {
         const uint32_t start_tick = first >> 3;
         const uint32_t limit_tick = last  >> 3;
         uint8_t *bits  = self->bits + start_tick;
         uint8_t *limit = self->bits + limit_tick;
 
-        /* Last actually belongs to the following byte (e.g. 8, in byte 2). */
+        // Last actually belongs to the following byte (e.g. 8, in byte 2). 
         NumUtil_u1flip(self->bits, last);
 
-        /* Flip whole bytes. */
+        // Flip whole bytes. 
         for ( ; bits < limit; bits++) {
             *bits = ~(*bits);
         }
