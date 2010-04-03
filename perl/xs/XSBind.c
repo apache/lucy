@@ -2,27 +2,22 @@
 #include "XSBind.h"
 #include "Lucy/Util/StringHelper.h"
 
-/* Convert a Perl hash into a KS Hash.  Caller takes responsibility for a
- * refcount.
- */
+// Convert a Perl hash into a KS Hash.  Caller takes responsibility for a
+// refcount.
 static lucy_Hash*
 S_perl_hash_to_lucy_hash(HV *phash);
 
-/* Convert a Perl array into a KS VArray.  Caller takes responsibility for a
- * refcount.
- */
+// Convert a Perl array into a KS VArray.  Caller takes responsibility for a
+// refcount.
 static lucy_VArray*
 S_perl_array_to_lucy_array(AV *parray);
 
-/* Convert a VArray to a Perl array.  Caller takes responsibility for a
- * refcount.
- */ 
+// Convert a VArray to a Perl array.  Caller takes responsibility for a
+// refcount.
 static SV*
 S_lucy_array_to_perl_array(lucy_VArray *varray);
 
-/* Convert a Hash to a Perl hash.  Caller takes responsibility for a
- * refcount.
- */ 
+// Convert a Hash to a Perl hash.  Caller takes responsibility for a refcount.
 static SV*
 S_lucy_hash_to_perl_hash(lucy_Hash *hash);
 
@@ -31,24 +26,24 @@ XSBind_new_blank_obj(SV *either_sv)
 {
     lucy_VTable *vtable;
 
-    /* Get a VTable. */
+    // Get a VTable. 
     if (   sv_isobject(either_sv) 
         && sv_derived_from(either_sv, "Lucy::Object::Obj")
     ) {
-        /* Use the supplied object's VTable. */
+        // Use the supplied object's VTable. 
         IV iv_ptr = SvIV(SvRV(either_sv));
         lucy_Obj *self = INT2PTR(lucy_Obj*, iv_ptr);
         vtable = self->vtable;
     }
     else {
-        /* Use the supplied class name string to find a VTable. */
+        // Use the supplied class name string to find a VTable. 
         STRLEN len;
         char *ptr = SvPVutf8(either_sv, len);
         lucy_ZombieCharBuf *klass = LUCY_ZCB_WRAP_STR(ptr, len);
         vtable = lucy_VTable_singleton((lucy_CharBuf*)klass, NULL);
     }
 
-    /* Use the VTable to allocate a new blank object of the right size. */
+    // Use the VTable to allocate a new blank object of the right size. 
     return Lucy_VTable_Make_Obj(vtable);
 }
 
@@ -71,7 +66,7 @@ XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, void *allocation)
             && sv_derived_from(sv, 
                  (char*)Lucy_CB_Get_Ptr8(Lucy_VTable_Get_Name(vtable)))
         ) {
-            /* Unwrap a real Lucy object. */
+            // Unwrap a real Lucy object. 
             IV tmp = SvIV( SvRV(sv) );
             retval = INT2PTR(lucy_Obj*, tmp);
         }
@@ -81,15 +76,15 @@ XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, void *allocation)
                  || vtable == LUCY_CHARBUF
                  || vtable == LUCY_OBJ)
         ) {
-            /* Wrap the string from an ordinary Perl scalar inside a
-             * ZombieCharBuf. */
+            // Wrap the string from an ordinary Perl scalar inside a
+            // ZombieCharBuf.
             STRLEN size;
             char *ptr = SvPVutf8(sv, size);
             retval = (lucy_Obj*)lucy_ZCB_wrap_str(allocation, ptr, size);
         }
         else if (SvROK(sv)) {
-            /* Attempt to convert Perl hashes and arrays into their Lucy
-             * analogues. */
+            // Attempt to convert Perl hashes and arrays into their Lucy
+            // analogues.
             SV *inner = SvRV(sv);
             if (SvTYPE(inner) == SVt_PVAV && vtable == LUCY_VARRAY) {
                 retval = (lucy_Obj*)S_perl_array_to_lucy_array((AV*)inner);
@@ -99,9 +94,9 @@ XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, void *allocation)
             }
 
             if(retval) {
-                 /* Mortalize the converted object -- which is somewhat
-                  * dangerous, but is the only way to avoid requiring that the
-                  * caller take responsibility for a refcount. */
+                // Mortalize the converted object -- which is somewhat
+                // dangerous, but is the only way to avoid requiring that the
+                // caller take responsibility for a refcount.
                 SV *mortal = (SV*)Lucy_Obj_To_Host(retval);
                 LUCY_DECREF(retval);
                 sv_2mortal(mortal);
@@ -143,7 +138,7 @@ XSBind_lucy_to_perl(lucy_Obj *obj)
     }
     else if (sizeof(IV) == 4 && Lucy_Obj_Is_A(obj, LUCY_INTEGER64)) {
         int64_t num = Lucy_Obj_To_I64(obj);
-        return newSVnv((double)num); /* lossy */
+        return newSVnv((double)num); // lossy 
     }
     else {
         return (SV*)Lucy_Obj_To_Host(obj);
@@ -157,7 +152,7 @@ XSBind_perl_to_lucy(SV *sv)
 
     if (XSBind_sv_defined(sv)) {
         if (SvROK(sv)) {
-            /* Deep conversion of references. */
+            // Deep conversion of references. 
             SV *inner = SvRV(sv);
             if (SvTYPE(inner) == SVt_PVAV) {
                 retval = (lucy_Obj*)S_perl_array_to_lucy_array((AV*)inner);
@@ -174,8 +169,8 @@ XSBind_perl_to_lucy(SV *sv)
             }
         }
 
-        /* It's either a plain scalar or a non-Lucy Perl object, so
-         * stringify. */
+        // It's either a plain scalar or a non-Lucy Perl object, so
+        // stringify.
         if (!retval) {
             STRLEN len;
             char *ptr = SvPVutf8(sv, len);
@@ -183,7 +178,7 @@ XSBind_perl_to_lucy(SV *sv)
         }
     }
     else if (sv) {
-        /* Deep conversion of raw AVs and HVs. */
+        // Deep conversion of raw AVs and HVs. 
         if (SvTYPE(sv) == SVt_PVAV) {
             retval = (lucy_Obj*)S_perl_array_to_lucy_array((AV*)sv);
         }
@@ -225,20 +220,20 @@ S_perl_hash_to_lucy_hash(HV *phash)
     while (num_keys--) {
         HE *entry = hv_iternext(phash);
         STRLEN key_len;
-        /* Copied from Perl 5.10.0 HePV macro, because the HePV macro in
-         * earlier versions of Perl triggers a compiler warning. */
+        // Copied from Perl 5.10.0 HePV macro, because the HePV macro in
+        // earlier versions of Perl triggers a compiler warning.
         char *key = HeKLEN(entry) == HEf_SVKEY
                   ? SvPV(HeKEY_sv(entry), key_len) 
                   : ((key_len = HeKLEN(entry)), HeKEY(entry));
         SV *value_sv = HeVAL(entry);
         if (!lucy_StrHelp_utf8_valid(key, key_len)) {
-            /* Force key to UTF-8. This is kind of a buggy area for Perl, and
-             * may result in round-trip weirdness. */
+            // Force key to UTF-8. This is kind of a buggy area for Perl, and
+            // may result in round-trip weirdness.
             SV *key_sv = HeSVKEY_force(entry);
             key = SvPVutf8(key_sv, key_len);
         }
 
-        /* Recurse for each value. */
+        // Recurse for each value. 
         Lucy_Hash_Store_Str(retval, key, key_len, 
             XSBind_perl_to_lucy(value_sv));
     }
@@ -253,7 +248,7 @@ S_perl_array_to_lucy_array(AV *parray)
     lucy_VArray *retval = lucy_VA_new(size);
     uint32_t i;
 
-    /* Iterate over array elems. */
+    // Iterate over array elems. 
     for (i = 0; i < size; i++) {
         SV **elem_sv = av_fetch(parray, i, false);
         if (elem_sv) {
@@ -261,7 +256,7 @@ S_perl_array_to_lucy_array(AV *parray)
             if (elem) { Lucy_VA_Store(retval, i, elem); }
         }
     }
-    Lucy_VA_Resize(retval, size); /* needed if last elem is NULL */
+    Lucy_VA_Resize(retval, size); // needed if last elem is NULL 
 
     return retval;
 }
@@ -272,7 +267,7 @@ S_lucy_array_to_perl_array(lucy_VArray *varray)
     AV *perl_array = newAV();
     uint32_t num_elems = Lucy_VA_Get_Size(varray);
 
-    /* Iterate over array elems. */
+    // Iterate over array elems. 
     if (num_elems) {
         uint32_t i;
         av_fill(perl_array, num_elems - 1);
@@ -282,7 +277,7 @@ S_lucy_array_to_perl_array(lucy_VArray *varray)
                 continue;
             }
             else {
-                /* Recurse for each value. */
+                // Recurse for each value. 
                 SV *const val_sv = XSBind_lucy_to_perl(val);
                 av_store(perl_array, i, val_sv);
             }
@@ -300,14 +295,14 @@ S_lucy_hash_to_perl_hash(lucy_Hash *hash)
     lucy_CharBuf *key;
     lucy_Obj     *val;
 
-    /* Prepare the SV key. */
+    // Prepare the SV key. 
     SvPOK_on(key_sv);
     SvUTF8_on(key_sv);
 
-    /* Iterate over key-value pairs. */
+    // Iterate over key-value pairs. 
     Lucy_Hash_Iter_Init(hash);
     while (Lucy_Hash_Iter_Next(hash, (lucy_Obj**)&key, &val)) {
-        /* Recurse for each value. */
+        // Recurse for each value. 
         SV *val_sv = XSBind_lucy_to_perl(val);
         if (!Lucy_Obj_Is_A((lucy_Obj*)key, LUCY_CHARBUF)) {
             LUCY_THROW(LUCY_ERR, 
@@ -357,9 +352,8 @@ XSBind_enable_overload(void *pobj)
      * and just update every time.
      */
     stash = gv_stashpvn((char*)package_name, size, true);
-    /* Gv_AMupdate() changed in Perl 5.11 to take a second argument.
-     * http://www.mail-archive.com/perl5-changes@perl.org/msg23145.html
-     */
+    // Gv_AMupdate() changed in Perl 5.11 to take a second argument.
+    // http://www.mail-archive.com/perl5-changes@perl.org/msg23145.html
 #if (PERL_VERSION > 10)
     Gv_AMupdate(stash, false);
 #else
@@ -378,22 +372,22 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
     int32_t i;
     int32_t args_left = (num_stack_elems - start) / 2;
 
-    /* Retrieve the params hash, which must be a package global. */
+    // Retrieve the params hash, which must be a package global. 
     if (params_hash == NULL) {
         THROW(LUCY_ERR, "Can't find hash named %s", params_hash_name);
     }
 
-    /* Verify that our args come in pairs. Bail if there are no args. */
+    // Verify that our args come in pairs. Bail if there are no args. 
     if (num_stack_elems == start) { return; }
     if ((num_stack_elems - start) % 2 != 0) {
         THROW(LUCY_ERR, "Expecting hash-style params, got odd number of args");
     }
 
-    /* Validate param names. */
+    // Validate param names. 
     for (i = start; i < num_stack_elems; i += 2) {
         SV *const key_sv = stack[i];
         STRLEN key_len;
-        const char *key = SvPV(key_sv, key_len); /* assume ASCII labels */
+        const char *key = SvPV(key_sv, key_len); // assume ASCII labels 
         if (!hv_exists(params_hash, key, key_len)) {
             THROW(LUCY_ERR, "Invalid parameter: '%s'", key);
         }
@@ -404,8 +398,8 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         char *label = va_arg(args, char*);
         int label_len = va_arg(args, int);
 
-        /* Iterate through stack looking for a label match. Work backwards so
-         * that if the label is doubled up we get the last one. */
+        // Iterate through stack looking for a label match. Work backwards so
+        // that if the label is doubled up we get the last one.
         for (i = num_stack_elems; i >= start + 2; i -= 2) {
             int32_t tick = i - 2;
             SV *const key_sv = stack[tick];

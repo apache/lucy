@@ -21,7 +21,7 @@ lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj)
 void
 lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent)
 {
-    /* Register class with host. */
+    // Register class with host. 
     lucy_Host_callback(LUCY_VTABLE, "_register", 2, 
         LUCY_ARG_OBJ("singleton", singleton), LUCY_ARG_OBJ("parent", parent));
 }

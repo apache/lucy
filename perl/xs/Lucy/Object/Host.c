@@ -11,8 +11,7 @@
 static SV*
 S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args);
 
-/* Convert all arguments to Perl and place them on the Perl stack. 
- */
+// Convert all arguments to Perl and place them on the Perl stack. 
 static CHY_INLINE void
 SI_push_args(void *vobj, va_list args, uint32_t num_args)
 {
@@ -23,7 +22,7 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
     
     if (Lucy_Obj_Is_A(obj, LUCY_VTABLE)) {
         lucy_VTable *vtable = (lucy_VTable*)obj;
-        /* TODO: Creating a new class name SV every time is wasteful. */
+        // TODO: Creating a new class name SV every time is wasteful. 
         invoker = XSBind_cb_to_sv(Lucy_VTable_Get_Name(vtable));
     }
     else {
@@ -53,14 +52,14 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
                     XPUSHs( sv_2mortal( newSViv((IV)value) ) );
                 }
                 else {
-                    /* lossy */
+                    // lossy 
                     XPUSHs( sv_2mortal( newSVnv((double)value) ) );
                 }
             }
             break;
         case LUCY_HOST_ARGTYPE_F32:
         case LUCY_HOST_ARGTYPE_F64: {
-                /* Floats are promoted to doubles by variadic calling. */
+                // Floats are promoted to doubles by variadic calling. 
                 double value = va_arg(args, double);
                 XPUSHs( sv_2mortal( newSVnv(value) ) );
             }
@@ -123,11 +122,11 @@ lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...)
     }
     else {
         if (SvIOK(return_sv)) {
-            /* It's already no more than 32 bits, so don't convert. */
+            // It's already no more than 32 bits, so don't convert. 
             retval = SvIV(return_sv);
         }
         else {
-            /* Maybe lossy. */
+            // Maybe lossy. 
             double temp = SvNV(return_sv);
             retval = (int64_t)temp;
         }
@@ -188,7 +187,7 @@ lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
     temp_retval = S_do_callback_sv(vobj, method, num_args, args);
     va_end(args);
 
-    /* Make a stringified copy. */
+    // Make a stringified copy. 
     if (temp_retval && XSBind_sv_defined(temp_retval)) {
         STRLEN len;
         char *ptr = SvPVutf8(temp_retval, len);

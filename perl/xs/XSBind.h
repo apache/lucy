@@ -185,7 +185,7 @@ lucy_XSBind_allot_params(SV** stack, int32_t start,
 }
 #endif
 
-#endif /* H_LUCY_XSBIND */
+#endif // H_LUCY_XSBIND 
 
 /**
  * Copyright 2009 The Apache Software Foundation

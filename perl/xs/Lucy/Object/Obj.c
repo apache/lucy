@@ -16,7 +16,7 @@ S_lazy_init_host_obj(lucy_Obj *self)
 {
     size_t old_refcount = self->ref.count;
 
-    /* Find the Perl stash entry. */
+    // Find the Perl stash entry. 
     lucy_CharBuf *class_name = Lucy_VTable_Get_Name(self->vtable);
     HV *stash = gv_stashpvn((char*)Lucy_CB_Get_Ptr8(class_name),
         Lucy_CB_Get_Size(class_name), TRUE);
@@ -61,14 +61,14 @@ lucy_Obj_inc_refcount(lucy_Obj *self)
     switch (self->ref.count) {
         case 0:
             LUCY_THROW(LUCY_ERR, "Illegal refcount of 0");
-            break; /* useless */
+            break; // useless 
         case 1:
         case 2:
             self->ref.count++;
             break;
         case 3:
             S_lazy_init_host_obj(self);
-            /* fall through */
+            // fall through 
         default:
             SvREFCNT_inc_simple_void_NN((SV*)self->ref.host_obj);
     }
@@ -82,7 +82,7 @@ lucy_Obj_dec_refcount(lucy_Obj *self)
     switch (self->ref.count) {
         case 0:
             LUCY_THROW(LUCY_ERR, "Illegal refcount of 0");
-            break; /* useless */
+            break; // useless 
         case 1:
             modified_refcount = 0;
             Lucy_Obj_Destroy(self);
@@ -93,9 +93,8 @@ lucy_Obj_dec_refcount(lucy_Obj *self)
             break;
         default:
             modified_refcount = SvREFCNT((SV*)self->ref.host_obj) - 1;
-            /* If the SV's refcount falls to 0, DESTROY will be invoked from
-             * Perl-space.
-             */
+            // If the SV's refcount falls to 0, DESTROY will be invoked from
+            // Perl-space.
             SvREFCNT_dec((SV*)self->ref.host_obj);
     }
     return modified_refcount;
