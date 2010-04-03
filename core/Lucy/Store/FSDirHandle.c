@@ -25,7 +25,7 @@ FSDH_open(const CharBuf *dir)
 void
 FSDH_destroy(FSDirHandle *self)
 {
-    /* Throw away saved error -- it's too late to call Close() now. */
+    // Throw away saved error -- it's too late to call Close() now. 
     DECREF(self->saved_error);
     self->saved_error = NULL;
     SUPER_DESTROY(self, FSDIRHANDLE);
@@ -115,7 +115,7 @@ FSDH_entry_is_dir(FSDirHandle *self)
         }
         return false;
     }
-    #endif /* CHY_HAS_DIRENT_D_TYPE */
+    #endif // CHY_HAS_DIRENT_D_TYPE 
 }
 
 bool_t
@@ -139,7 +139,7 @@ FSDH_entry_is_symlink(FSDirHandle *self)
         }
         return false;
     }
-    #endif /* CHY_HAS_DIRENT_D_TYPE */
+    #endif // CHY_HAS_DIRENT_D_TYPE 
 }
 
 bool_t
@@ -180,30 +180,30 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir)
     self->saved_error      = NULL;
     
     if (dir_path_size >= MAX_PATH - 2) {
-        /* Deal with Windows ceiling on file path lengths. */
+        // Deal with Windows ceiling on file path lengths. 
         Err_set_error(Err_new(CB_newf("Directory path is too long: %o", 
             dir)));
         DECREF(self);
         return NULL;
     }
 
-    /* Append trailing wildcard so Windows lists dir contents rather than just
-     * the dir name itself. */
+    // Append trailing wildcard so Windows lists dir contents rather than just
+    // the dir name itself.
     memcpy(path_ptr, dir_path_ptr, dir_path_size);
     memcpy(path_ptr + dir_path_size, "\\*\0", 3);
 
     self->sys_dirhandle = FindFirstFile(search_string, 
         (WIN32_FIND_DATA*)self->sys_dir_entry);
     if (INVALID_HANDLE_VALUE == self->sys_dirhandle) {
-        /* Directory inaccessible or doesn't exist. */
+        // Directory inaccessible or doesn't exist. 
         Err_set_error(Err_new(CB_newf("Failed to open dir '%o'", dir)));
         DECREF(self);
         return NULL;
     }
     else {
-        /* Compensate for the fact that FindFirstFile has already returned the
-         * first entry but DirHandle's API requires that you call Next() to
-         * start the iterator. */
+        // Compensate for the fact that FindFirstFile has already returned the
+        // first entry but DirHandle's API requires that you call Next() to
+        // start the iterator.
         self->delayed_iter = true;
     }
 
@@ -254,7 +254,7 @@ FSDH_close(FSDirHandle *self)
         self->sys_dir_entry = NULL;
     }
 
-    /* If we encountered an error condition previously, report it now. */
+    // If we encountered an error condition previously, report it now. 
     if (self->saved_error) {
         Err_set_error((Err*)INCREF(self->saved_error));
         return false;
@@ -270,7 +270,7 @@ FSDH_next(FSDirHandle *self)
     HANDLE           dirhandle = (HANDLE)self->sys_dirhandle;
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)self->sys_dir_entry;
 
-    /* Attempt to move forward or absorb cached iter. */
+    // Attempt to move forward or absorb cached iter. 
     if (!dirhandle || dirhandle == INVALID_HANDLE_VALUE) {
         return false;
     }
@@ -278,7 +278,7 @@ FSDH_next(FSDirHandle *self)
         self->delayed_iter = false;
     }
     else if ((FindNextFile(dirhandle, find_data) == 0)) {
-        /* Iterator exhausted.  Verify that no errors were encountered. */
+        // Iterator exhausted.  Verify that no errors were encountered. 
         CB_Set_Size(self->entry, 0);
         if (GetLastError() != ERROR_NO_MORE_FILES) {
             char *win_error = Err_win_error();
@@ -289,7 +289,7 @@ FSDH_next(FSDirHandle *self)
         return false;
     }
 
-    /* Process the results of the iteration. */
+    // Process the results of the iteration. 
     {
         size_t len = strlen(find_data->cFileName);
         if (SI_is_updir(find_data->cFileName, len)) {
@@ -302,7 +302,7 @@ FSDH_next(FSDirHandle *self)
     }
 }
 
-#endif /* CHY_HAS_DIRENT_H vs. CHY_HAS_WINDOWS_H */
+#endif // CHY_HAS_DIRENT_H vs. CHY_HAS_WINDOWS_H 
 
 /* Copyright 2009 The Apache Software Foundation
  *

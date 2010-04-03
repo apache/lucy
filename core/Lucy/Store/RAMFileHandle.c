@@ -27,7 +27,7 @@ RAMFH_do_open(RAMFileHandle *self, const CharBuf *path, uint32_t flags,
 
     FH_do_open((FileHandle*)self, path, flags);
 
-    /* Obtain a RAMFile. */
+    // Obtain a RAMFile. 
     if (file) {
         if (must_create) {
             Err_set_error(Err_new(CB_newf(
@@ -47,7 +47,7 @@ RAMFH_do_open(RAMFileHandle *self, const CharBuf *path, uint32_t flags,
         return NULL;
     }
 
-    /* Prevent writes to to the RAMFile if FH_READ_ONLY was specified. */
+    // Prevent writes to to the RAMFile if FH_READ_ONLY was specified. 
     if (flags & FH_READ_ONLY) { 
         RAMFile_Set_Read_Only(self->ram_file, true);
     }

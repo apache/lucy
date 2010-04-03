@@ -9,15 +9,15 @@
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Store/RAMFileHandle.h"
 
-/* Inlined version of OutStream_Write_Bytes. */
+// Inlined version of OutStream_Write_Bytes. 
 static INLINE void
 SI_write_bytes(OutStream *self, const void *bytes, size_t len);
 
-/* Inlined version of OutStream_Write_C32. */
+// Inlined version of OutStream_Write_C32. 
 static INLINE void
 SI_write_c32(OutStream *self, uint32_t value);
 
-/* Flush content in the buffer to the FileHandle. */
+// Flush content in the buffer to the FileHandle. 
 static void
 S_flush(OutStream *self);
 
@@ -31,12 +31,12 @@ OutStream_open(Obj *file)
 OutStream*
 OutStream_do_open(OutStream *self, Obj *file)
 {
-    /* Init. */
+    // Init. 
     self->buf = (char*)MALLOCATE(IO_STREAM_BUF_SIZE);
     self->buf_start   = 0;
     self->buf_pos     = 0;
 
-    /* Obtain a FileHandle. */
+    // Obtain a FileHandle. 
     if (Obj_Is_A(file, FILEHANDLE)) {
         self->file_handle = (FileHandle*)INCREF(file);
     }
@@ -60,7 +60,7 @@ OutStream_do_open(OutStream *self, Obj *file)
         return NULL;
     }
 
-    /* Derive filepath from FileHandle. */
+    // Derive filepath from FileHandle. 
     self->path = CB_Clone(FH_Get_Path(self->file_handle));
 
     return self;
@@ -70,7 +70,7 @@ void
 OutStream_destroy(OutStream *self) 
 {
     if (self->file_handle != NULL) {
-        /* Inlined flush, ignoring errors. */
+        // Inlined flush, ignoring errors. 
         if (self->buf_pos) {
             FH_Write(self->file_handle, self->buf, self->buf_pos); 
         }
@@ -90,12 +90,11 @@ OutStream_absorb(OutStream *self, InStream *instream)
     char buf[IO_STREAM_BUF_SIZE];
     int64_t  bytes_left = InStream_Length(instream);
 
-    /* Read blocks of content into an intermediate buffer, than write them to
-     * the OutStream. 
-     * 
-     * TODO: optimize by utilizing OutStream's buffer directly, while still
-     * not flushing too frequently and keeping code complexity under control.
-     * */
+    // Read blocks of content into an intermediate buffer, than write them to
+    // the OutStream. 
+    // 
+    // TODO: optimize by utilizing OutStream's buffer directly, while still
+    // not flushing too frequently and keeping code complexity under control.
     OutStream_Grow(self, OutStream_Tell(self) + bytes_left);
     while (bytes_left) {
         const size_t bytes_this_iter = bytes_left < IO_STREAM_BUF_SIZE
@@ -164,7 +163,7 @@ OutStream_write_bytes(OutStream *self, const void *bytes, size_t len)
 static INLINE void
 SI_write_bytes(OutStream *self, const void *bytes, size_t len) 
 {
-    /* If this data is larger than the buffer size, flush and write. */
+    // If this data is larger than the buffer size, flush and write. 
     if (len >= IO_STREAM_BUF_SIZE) {
         S_flush(self);
         if ( !FH_Write(self->file_handle, bytes, len) ) {
@@ -172,13 +171,13 @@ SI_write_bytes(OutStream *self, const void *bytes, size_t len)
         }
         self->buf_start += len;
     }
-    /* If there's not enough room in the buffer, flush then add. */
+    // If there's not enough room in the buffer, flush then add. 
     else if (self->buf_pos + len >= IO_STREAM_BUF_SIZE) {
         S_flush(self);
         memcpy((self->buf + self->buf_pos), bytes, len);
         self->buf_pos += len;
     }
-    /* If there's room, just add these bytes to the buffer. */
+    // If there's room, just add these bytes to the buffer. 
     else {
         memcpy((self->buf + self->buf_pos), bytes, len);
         self->buf_pos += len;
@@ -286,12 +285,12 @@ SI_write_c32(OutStream *self, uint32_t value)
     uint8_t buf[C32_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;
 
-    /* Write last byte first, which has no continue bit. */
+    // Write last byte first, which has no continue bit. 
     *ptr = value & 0x7f;
     value >>= 7;
     
     while (value) {
-        /* Work backwards, writing bytes with continue bits set. */
+        // Work backwards, writing bytes with continue bits set. 
         *--ptr = ((value & 0x7f) | 0x80);
         value >>= 7;
     }
@@ -305,12 +304,12 @@ OutStream_write_c64(OutStream *self, uint64_t value)
     uint8_t buf[C64_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;
 
-    /* Write last byte first, which has no continue bit. */
+    // Write last byte first, which has no continue bit. 
     *ptr = value & 0x7f;
     value >>= 7;
     
     while (value) {
-        /* Work backwards, writing bytes with continue bits set. */
+        // Work backwards, writing bytes with continue bits set. 
         *--ptr = ((value & 0x7f) | 0x80);
         value >>= 7;
     }

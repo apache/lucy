@@ -19,15 +19,15 @@
 Folder*
 Folder_init(Folder *self, const CharBuf *path)
 {
-    /* Init. */
+    // Init. 
     self->entries = Hash_new(16);
 
-    /* Copy. */
+    // Copy. 
     if (path == NULL) {
         self->path = CB_new_from_trusted_utf8("", 0);
     }
     else {
-        /* Copy path, strip trailing slash or equivalent. */
+        // Copy path, strip trailing slash or equivalent. 
         self->path = CB_Clone(path);
         if (CB_Ends_With_Str(self->path, DIR_SEP, strlen(DIR_SEP))) {
             CB_Chop(self->path, 1);
@@ -146,7 +146,7 @@ Folder_delete_tree(Folder *self, const CharBuf *path)
 {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
 
-    /* Don't allow Folder to delete itself. */
+    // Don't allow Folder to delete itself. 
     if (!path || !CB_Get_Size(path)) { return false; }
 
     if (enclosing_folder) {
@@ -187,7 +187,7 @@ Folder_delete_tree(Folder *self, const CharBuf *path)
         return Folder_Local_Delete(enclosing_folder, (CharBuf*)local);
     }
     else {
-        /* Return failure if the entry wasn't there in the first place. */
+        // Return failure if the entry wasn't there in the first place. 
         return false;
     }
 }
@@ -215,7 +215,7 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix)
     }
 
     entry = DH_Get_Entry(dh);
-    while (DH_Next(dh)) { /* Updates entry */
+    while (DH_Next(dh)) { // Updates entry 
         if (!S_is_updir(entry)) {
             CharBuf *relpath = CB_newf("%o%o", prefix, entry);
             if (VA_Get_Size(list) == VA_Get_Capacity(list)) {
@@ -228,7 +228,7 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix)
                                 ? CB_newf("%o/%o", dir, entry)
                                 : CB_Clone(entry);
                 CB_catf(prefix, "%o/", entry);
-                S_add_to_file_list(self, list, subdir, prefix); /* recurse */
+                S_add_to_file_list(self, list, subdir, prefix); // recurse 
                 CB_Set_Size(prefix, orig_prefix_size);
                 DECREF(subdir);
             }
@@ -419,10 +419,10 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path)
     size_t path_component_len = 0;
     uint32_t code_point;
 
-    /* Strip trailing slash. */
+    // Strip trailing slash. 
     if (ZCB_Code_Point_From(path, 0) == '/') { ZCB_Chop(path, 1); }
 
-    /* Find first component of the file path. */
+    // Find first component of the file path. 
     ZombieCharBuf *scratch        = ZCB_WRAP((CharBuf*)path);
     ZombieCharBuf *path_component = ZCB_WRAP((CharBuf*)path);
     while (0 != (code_point = ZCB_Nip_One(scratch))) {
@@ -434,7 +434,7 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path)
         path_component_len++;
     }
 
-    /** If we've eaten up the entire filepath, self is enclosing folder. */
+    // If we've eaten up the entire filepath, self is enclosing folder.
     if (ZCB_Get_Size(scratch) == 0) { return self; }
 
     {
@@ -448,7 +448,7 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path)
             return NULL;
         }
 
-        /* This file path component is a folder.  Recurse into it. */
+        // This file path component is a folder.  Recurse into it. 
         return S_enclosing_folder(local_folder, path);
     }
 }

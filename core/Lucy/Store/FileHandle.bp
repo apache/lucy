@@ -122,8 +122,7 @@ __C__
  */
 extern int32_t lucy_FH_object_count; 
 
-/* Default size for the memory buffer used by both InStream and OutStream.
- */
+// Default size for the memory buffer used by both InStream and OutStream.
 #define LUCY_IO_STREAM_BUF_SIZE 1024
 
 #ifdef LUCY_USE_SHORT_NAMES

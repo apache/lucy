@@ -10,7 +10,7 @@
 #include "Lucy/Store/RAMFileHandle.h"
 #include "Lucy/Util/IndexFileNames.h"
 
-/* Return the concatenation of the Folder's path and the supplied path. */
+// Return the concatenation of the Folder's path and the supplied path. 
 static CharBuf*
 S_fullpath(RAMFolder *self, const CharBuf *path);
 
@@ -69,8 +69,8 @@ RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name,
                               == (FH_WRITE_ONLY | FH_CREATE)
                               ? true : false;
 
-    /* Make sure the filepath isn't a directory, and that it either exists
-     * or we have permission to create it. */
+    // Make sure the filepath isn't a directory, and that it either exists
+    // or we have permission to create it.
     if (file) {
         if (!RAMFile_Is_A(file, RAMFILE)) {
             Err_set_error(Err_new(CB_newf("Not a file: '%o'", fullpath)));
@@ -84,7 +84,7 @@ RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name,
         return NULL;
     }
 
-    /* Open the file and store it if it was just created. */
+    // Open the file and store it if it was just created. 
     fh = RAMFH_open(fullpath, flags, file);
     if (fh) {
         if (!file) {
@@ -138,7 +138,7 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
     RAMFolder *inner_to_folder   = NULL;
     UNUSED_VAR(self);
 
-    /* Make sure the source and destination folders exist. */
+    // Make sure the source and destination folders exist. 
     if (!from_folder) {
         Err_set_error(Err_new(CB_newf("File not found: '%o'", from)));
         return false;
@@ -149,7 +149,7 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
         return false;
     }
 
-    /* Extract RAMFolders from compound reader wrappers, if necessary. */
+    // Extract RAMFolders from compound reader wrappers, if necessary. 
     if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)) {
         inner_from_folder = (RAMFolder*)CFReader_Get_Real_Folder(
             (CompoundFileReader*)from_folder);
@@ -175,7 +175,7 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
         return false;
     }
 
-    /* Find the original element. */
+    // Find the original element. 
     elem = Hash_Fetch(inner_from_folder->entries, (Obj*)from_name);
     if (!elem) {
         if (   Folder_Is_A(from_folder, COMPOUNDFILEREADER)
@@ -190,20 +190,20 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
         return false;
     }
 
-    /* Execute the rename/hard-link. */
+    // Execute the rename/hard-link. 
     if (op == OP_RENAME) {
         Obj *existing = Hash_Fetch(inner_to_folder->entries, (Obj*)to_name);
         if (existing) {
             bool_t conflict = false;
 
-            /* Return success fast if file is copied on top of itself. */
+            // Return success fast if file is copied on top of itself. 
             if (   inner_from_folder == inner_to_folder 
                 && ZCB_Equals(from_name, (Obj*)to_name)
             ) {
                 return true;
             }
 
-            /* Don't allow clobbering of different entry type. */
+            // Don't allow clobbering of different entry type. 
             if (Obj_Is_A(elem, RAMFILE)) {
                 if (!Obj_Is_A(existing, RAMFILE)) {
                     conflict = true;
@@ -221,8 +221,8 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
             }
         }
 
-        /* Perform the store first, then the delete. Inform Folder objects
-         * about the relocation. */
+        // Perform the store first, then the delete. Inform Folder objects
+        // about the relocation.
         Hash_Store(inner_to_folder->entries, (Obj*)to_name, INCREF(elem));
         DECREF(Hash_Delete(inner_from_folder->entries, (Obj*)from_name));
         if (Obj_Is_A(elem, FOLDER)) {
@@ -302,7 +302,7 @@ RAMFolder_local_delete(RAMFolder *self, const CharBuf *name)
                 inner_folder = (RAMFolder*)CERTIFY(entry, RAMFOLDER);
             }
             if (Hash_Get_Size(inner_folder->entries)) {
-                /* Can't delete non-empty dir. */
+                // Can't delete non-empty dir. 
                 return false;
             }
         }
