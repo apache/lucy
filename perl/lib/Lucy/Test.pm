@@ -14,11 +14,11 @@ run_tests(package)
     char *package;
 PPCODE:
 {
-    /* Lucy::Index */
+    // Lucy::Index 
     if (strEQ(package, "TestSegment")) {
         lucy_TestSeg_run_tests();
     }
-    /* Lucy::Object */
+    // Lucy::Object 
     else if (strEQ(package, "TestObj")) {
         lucy_TestObj_run_tests();
     }
@@ -46,7 +46,7 @@ PPCODE:
     else if (strEQ(package, "TestVArray")) {
         lucy_TestVArray_run_tests();
     }
-    /* Lucy::Store */
+    // Lucy::Store 
     else if (strEQ(package, "TestCompoundFileReader")) {
         lucy_TestCFReader_run_tests();
     }
@@ -86,7 +86,7 @@ PPCODE:
     else if (strEQ(package, "TestRAMFolder")) {
         lucy_TestRAMFolder_run_tests();
     }
-    /* Lucy::Util */
+    // Lucy::Util 
     else if (strEQ(package, "TestAtomic")) {
         lucy_TestAtomic_run_tests();
     }

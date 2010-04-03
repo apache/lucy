@@ -43,7 +43,7 @@ PPCODE:
         LUCY_DECREF(file_handle);
         LUCY_DECREF(target);
 
-        if (SvCUR(retval) == 0) { /* Thwart Storable bug */
+        if (SvCUR(retval) == 0) { // Thwart Storable bug 
             THROW(LUCY_ERR, "Calling serialize produced an empty string");
         }
         ST(0) = sv_2mortal(retval);
@@ -87,7 +87,7 @@ PPCODE:
     LUCY_DECREF(file_handle);
     LUCY_DECREF(instream);
 
-    /* Catch bad deserialize() override. */
+    // Catch bad deserialize() override. 
     if (deserialized != self) {
         THROW(LUCY_ERR, "Error when deserializing obj of class %o", klass);
     }
