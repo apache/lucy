@@ -18,16 +18,16 @@ TestBatch_new(int64_t num_tests)
 TestBatch*
 TestBatch_init(TestBatch *self, int64_t num_tests)
 {
-    /* Assign. */
+    // Assign. 
     self->num_tests       = num_tests;
     
-    /* Initialize. */
+    // Initialize. 
     self->test_num        = 0;
     self->num_passed      = 0;
     self->num_failed      = 0;
     self->num_skipped     = 0;
 
-    /* Unbuffer stdout. TODO: move this elsewhere. */
+    // Unbuffer stdout. TODO: move this elsewhere. 
     int check_val = setvbuf(stdout, NULL, _IONBF, 0);
     if (check_val != 0) {
         fprintf(stderr, "Failed when trying to unbuffer stdout\n");
@@ -133,10 +133,10 @@ bool_t
 TestBatch_vtest_true(TestBatch *self, bool_t condition, const char *pattern, 
                      va_list args)
 {
-    /* Increment test number. */
+    // Increment test number. 
     self->test_num++;
 
-    /* Test condition and pass or fail. */
+    // Test condition and pass or fail. 
     if (condition) {
         self->num_passed++;
         printf("ok %" I64P " - ", self->test_num);
@@ -157,10 +157,10 @@ bool_t
 TestBatch_vtest_false(TestBatch *self, bool_t condition, 
                      const char *pattern, va_list args)
 {
-    /* Increment test number. */
+    // Increment test number. 
     self->test_num++;
 
-    /* Test condition and pass or fail. */
+    // Test condition and pass or fail. 
     if (!condition) {
         self->num_passed++;
         printf("ok %" I64P " - ", self->test_num);
@@ -181,10 +181,10 @@ bool_t
 TestBatch_vtest_int_equals(TestBatch *self, long got, long expected, 
                            const char *pattern, va_list args)
 {
-    /* Increment test number. */
+    // Increment test number. 
     self->test_num++;
 
-    /* Test condition and pass or fail. */
+    // Test condition and pass or fail. 
     if (expected == got) {
         self->num_passed++;
         printf("ok %" I64P " - ", self->test_num);
@@ -208,10 +208,10 @@ TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
 {
     double diff = expected/got;
 
-    /* Increment test number. */
+    // Increment test number. 
     self->test_num++;
     
-    /* Evaluate condition and pass or fail. */
+    // Evaluate condition and pass or fail. 
     if (diff > 0.00001) {
         self->num_passed++;
         printf("ok %" I64P " - ", self->test_num);
@@ -234,10 +234,10 @@ TestBatch_vtest_string_equals(TestBatch *self, const char *got,
                               const char *expected, const char *pattern, 
                               va_list args)
 {
-    /* Increment test number. */
+    // Increment test number. 
     self->test_num++;
     
-    /* Test condition and pass or fail. */
+    // Test condition and pass or fail. 
     if (strcmp(expected, got) == 0) {
         self->num_passed++;
         printf("ok %" I64P " - ", self->test_num);
@@ -258,10 +258,10 @@ TestBatch_vtest_string_equals(TestBatch *self, const char *got,
 bool_t 
 TestBatch_vpass(TestBatch *self, const char *pattern, va_list args)
 {
-    /* Increment test number. */
+    // Increment test number. 
     self->test_num++;
 
-    /* Update counter, indicate pass. */
+    // Update counter, indicate pass. 
     self->num_passed++;
     printf("ok %" I64P " - ", self->test_num);
     vprintf(pattern, args);
@@ -273,10 +273,10 @@ TestBatch_vpass(TestBatch *self, const char *pattern, va_list args)
 bool_t 
 TestBatch_vfail(TestBatch *self, const char *pattern, va_list args)
 {
-    /* Increment test number. */
+    // Increment test number. 
     self->test_num++;
 
-    /* Update counter, indicate failure. */
+    // Update counter, indicate failure. 
     self->num_failed++;
     printf("not ok %" I64P " - ", self->test_num);
     vprintf(pattern, args);
