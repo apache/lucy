@@ -562,6 +562,7 @@ CB_equals(CharBuf *self, Obj *other)
 int32_t
 CB_compare_to(CharBuf *self, Obj *other)
 {
+    CERTIFY(other, CHARBUF);
     return CB_compare(&self, &other);
 }
 
