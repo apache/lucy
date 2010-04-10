@@ -227,20 +227,28 @@ BB_compare(const void *va, const void *vb)
     return comparison;
 }
 
+int32_t
+BB_compare_to(ByteBuf *self, Obj *other)
+{
+    CERTIFY(other, BYTEBUF);
+    return BB_compare(&self, &other);
+}
+
 /******************************************************************/
 
 ViewByteBuf*
 ViewBB_new(char *buf, size_t size) 
 {
     ViewByteBuf *self = (ViewByteBuf*)VTable_Make_Obj(VIEWBYTEBUF);
+    return ViewBB_init(self, buf, size);
+}
 
-    // Init. 
-    self->cap = 0;
-
-    // Assign. 
+ViewByteBuf*
+ViewBB_init(ViewByteBuf *self, char *buf, size_t size) 
+{
+    self->cap  = 0;
     self->buf  = buf;
     self->size = size;
-    
     return self;
 }
 

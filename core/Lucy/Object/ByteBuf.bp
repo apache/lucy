@@ -89,6 +89,9 @@ class Lucy::Object::ByteBuf cnick BB extends Lucy::Object::Obj {
     bool_t
     Equals_Bytes(ByteBuf *self, const void *bytes, size_t size);
 
+    public int32_t
+    Compare_To(ByteBuf *self, Obj *other);
+
     public incremented ByteBuf*
     Clone(ByteBuf *self);
 
@@ -119,6 +122,9 @@ class Lucy::Object::ViewByteBuf cnick ViewBB
      */
     inert incremented ViewByteBuf*
     new(char *buf, size_t size);
+
+    inert incremented ViewByteBuf*
+    init(ViewByteBuf *self, char *buf, size_t size);
 
     /** Assign buf and size members to the passed in values.
      */
