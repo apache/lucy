@@ -16,7 +16,7 @@ my @composite_type_strings = (
         char*
         char**
         char***
-        i32_t*
+        int32_t*
         Obj**
         neato_method_t[]
         neato_method_t[1]

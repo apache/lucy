@@ -132,7 +132,7 @@ sub _process_dump_member {
     my $len  = length($name);
     if ( $type->is_integer ) {
         return qq|    Lucy_Hash_Store_Str(dump, "$name", $len, |
-            . qq|(lucy_Obj*)lucy_CB_newf("%i64", (chy_i64_t)self->$name));\n|;
+            . qq|(lucy_Obj*)lucy_CB_newf("%i64", (int64_t)self->$name));\n|;
     }
     elsif ( $type->is_floating ) {
         return qq|    Lucy_Hash_Store_Str(dump, "$name", $len, |

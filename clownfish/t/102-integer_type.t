@@ -1,32 +1,22 @@
 use strict;
 use warnings;
 
-use Test::More tests => 92;
+use Test::More tests => 59;
 use Clownfish::Type::Integer;
 use Clownfish::Parser;
 
 my $integer_type = Clownfish::Type::Integer->new(
-    specifier => 'i32_t',
+    specifier => 'int32_t',
     const     => 1,
 );
 ok( $integer_type->const, "const" );
-is( $integer_type->get_specifier, "i32_t" );
-like( $integer_type->to_c, qr/chy_i32_t/,
-    "prepend 'chy_' for C representation" );
+is( $integer_type->get_specifier, "int32_t" );
 like( $integer_type->to_c, qr/const/, "'const' in C representation" );
 
 my $parser = Clownfish::Parser->new;
 
 my @chy_specifiers = qw(
     bool_t
-    i8_t
-    i16_t
-    i32_t
-    i64_t
-    u8_t
-    u16_t
-    u32_t
-    u64_t
 );
 my @c_specifiers = qw(
     char

@@ -22,14 +22,6 @@ our %specifiers = (
     uint16_t => 2,
     uint32_t => 4,
     uint64_t => 8,
-    i8_t     => 1,
-    i16_t    => 2,
-    i32_t    => 4,
-    i64_t    => 8,
-    u8_t     => 1,
-    u16_t    => 2,
-    u32_t    => 4,
-    u64_t    => 8,
     char     => 1,
     int      => $Config{intsize},
     short    => $Config{shortsize},
@@ -45,7 +37,7 @@ sub new {
 
     # Cache the C representation of this type.
     my $c_string = $args{const} ? 'const ' : '';
-    if ( $args{specifier} =~ /^(?:[iu]\d+|bool)_t$/ ) {
+    if ( $args{specifier} eq 'bool_t' ) {
         $c_string .= "chy_";
     }
     $c_string .= $args{specifier};
@@ -90,17 +82,9 @@ styles.  Support is limited to a subset of the standard C integer types:
 Many others are not supported: "signed" or "unsigned" anything, "long long",
 "ptrdiff_t", "off_t", etc.  
 
-The following Charmonizer typedefs are supported but deprecated:
+The following Charmonizer typedefs are supported:
 
     bool_t
-    i8_t
-    i16_t
-    i32_t
-    i64_t
-    u8_t
-    u16_t
-    u32_t
-    u64_t
 
 =head1 METHODS
 

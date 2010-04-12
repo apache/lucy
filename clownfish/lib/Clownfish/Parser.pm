@@ -227,7 +227,7 @@ primitive_type_specifier:
     { $item[1] }
 
 chy_integer_specifier:
-    /(?:chy_)?([iu](8|16|32|64)|bool)_t(?!\w)/
+    /(?:chy_)?(bool)_t(?!\w)/
 
 c_integer_specifier:
     /(?:(?:u?int(?:8|16|32|64)_t)|(?:char|int|short|long|size_t))(?!\w)/
@@ -297,9 +297,10 @@ string_literal:
     { $item[1] }
 
 reserved_word:
-    /(char|const|double|enum|extern|float|int|long|register|signed|sizeof
-       |short|inert|struct|typedef|union|unsigned|void)(?!\w)/x
+    /(const|double|enum|extern|float|register|signed|sizeof
+       |inert|struct|typedef|union|unsigned|void)(?!\w)/x
     | chy_integer_specifier
+    | c_integer_specifier
 
 eofile:
     /^\Z/

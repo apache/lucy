@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 124;
+use Test::More tests => 116;
 
 BEGIN { use_ok('Clownfish::Parser') }
 
@@ -29,18 +29,18 @@ for (qw( foo _foo foo_yoo FOO Foo fOO f00 )) {
     is( $parser->identifier($_), $_, "identifier: $_" );
 }
 
-for (qw( void unsigned float u32_t i64_t u8_t bool_t )) {
+for (qw( void unsigned float uint32_t int64_t uint8_t bool_t )) {
     ok( !$parser->identifier($_), "reserved word not an identifier: $_" );
 }
 
 is( $parser->chy_integer_specifier($_), $_, "Charmony integer specifier $_" )
-    for qw( u8_t u16_t u32_t u64_t i8_t i16_t i32_t i64_t bool_t );
+    for qw( bool_t );
 
 is( $parser->object_type_specifier($_), $_, "object_type_specifier $_" )
     for qw( ByteBuf Obj ANDScorer );
 
 is( $parser->type_specifier($_), $_, "type_specifier $_" )
-    for qw( u32_t char int short long float double void ANDScorer );
+    for qw( uint32_t char int short long float double void ANDScorer );
 
 is( $parser->type_qualifier($_), $_, "type_qualifier $_" ) for qw( const );
 
@@ -60,7 +60,7 @@ is( $parser->declarator($_), $_, "declarator: $_" )
 
 isa_ok( $parser->param_variable($_),
     "Clownfish::Variable", "param_variable: $_" )
-    for ( 'u32_t baz;', 'CharBuf *stuff;', 'float **ptr;', );
+    for ( 'uint32_t baz;', 'CharBuf *stuff;', 'float **ptr;', );
 
 isa_ok( $parser->var_declaration_statement($_)->{declared},
     "Clownfish::Variable", "var_declaration_statement: $_" )
@@ -125,7 +125,7 @@ my %sub_args = ( class => 'Stuff::Obj', cnick => 'Obj' );
 ok( $parser->declaration_statement( $_, 0, %sub_args, inert => 1 ),
     "declaration_statment: $_" )
     for (
-    'public Foo* Spew_Foo(Obj *self, u32_t *how_many);',
+    'public Foo* Spew_Foo(Obj *self, uint32_t *how_many);',
     'private Hash *hash;',
     );
 

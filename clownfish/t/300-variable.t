@@ -24,7 +24,7 @@ like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
 eval { my $death = Clownfish::Variable->new( micro_sym => 'foo' ) };
 like( $@, qr/type/, "type is required" );
-eval { my $death = Clownfish::Variable->new( type => new_type('i32_t') ) };
+eval { my $death = Clownfish::Variable->new( type => new_type('int32_t') ) };
 like( $@, qr/micro_sym/, "micro_sym is required" );
 
 my $var = Clownfish::Variable->new(
@@ -56,6 +56,6 @@ isa_ok( $parser->var_declaration_statement($_)->{declared},
     for (
     'parcel int foo;',
     'private Obj *obj;',
-    'public inert i32_t **foo;',
+    'public inert int32_t **foo;',
     'Dog *fido;'
     );

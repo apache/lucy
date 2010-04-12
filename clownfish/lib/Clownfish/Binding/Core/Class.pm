@@ -276,7 +276,7 @@ typedef struct $vt_type {
     lucy_ref_t ref;
     ${prefix}VTable *parent;
     ${prefix}CharBuf *name;
-    chy_u32_t flags;
+    uint32_t flags;
     void *x;
     size_t obj_alloc_size;
     size_t vt_alloc_size;

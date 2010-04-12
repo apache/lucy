@@ -148,8 +148,8 @@ $class_content = q|
      */
     public class Animal::Dog extends Animal : lovable : drooly {
         public inert Dog* init(Dog *self, CharBuf *name, CharBuf *fave_food);
-        inert u32_t count();
-        inert u64_t num_dogs;
+        inert uint32_t count();
+        inert uint64_t num_dogs;
 
         private CharBuf *name;
         private bool_t   likes_to_go_fetch;
@@ -167,7 +167,7 @@ $class_content = q|
         public abstract incremented nullable Thing*
         Scratch(Dog *self);
 
-        i32_t[1]  flexible_array_at_end_of_struct;
+        int32_t[1]  flexible_array_at_end_of_struct;
     }
 |;
 

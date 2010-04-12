@@ -16,7 +16,7 @@ my %args = (
     return_type => $parser->type('Obj*'),
     class_name  => 'Neato::Foo',
     class_cnick => 'Foo',
-    param_list  => $parser->param_list('(i32_t some_num)'),
+    param_list  => $parser->param_list('(int32_t some_num)'),
     micro_sym   => 'return_an_obj',
 );
 
@@ -39,5 +39,5 @@ isa_ok(
     )
     for (
     'inert int running_count(int biscuit);',
-    'public inert Hash* init_fave_hash(i32_t num_buckets, bool_t o_rly);',
+    'public inert Hash* init_fave_hash(int32_t num_buckets, bool_t o_rly);',
     );

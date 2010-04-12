@@ -13,7 +13,7 @@ $parser->parcel_definition('parcel Neato;')
 
 isa_ok( $parser->param_variable($_),
     "Clownfish::Variable", "param_variable: $_" )
-    for ( 'u32_t baz', 'CharBuf *stuff', 'float **ptr', );
+    for ( 'uint32_t baz', 'CharBuf *stuff', 'float **ptr', );
 
 my $param_list = $parser->param_list("(Obj *self, int num)");
 isa_ok( $param_list, "Clownfish::ParamList" );

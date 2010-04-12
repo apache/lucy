@@ -15,7 +15,7 @@ my %args = (
     return_type => $parser->type('Obj*'),
     class_name  => 'Neato::Foo',
     class_cnick => 'Foo',
-    param_list  => $parser->param_list('(Foo *self, i32_t count = 0)'),
+    param_list  => $parser->param_list('(Foo *self, int32_t count = 0)'),
     macro_sym   => 'Return_An_Obj',
 );
 
@@ -33,44 +33,43 @@ like( $@, qr/macro_sym/, "Invalid macro_sym kills constructor" );
 my $dupe = Clownfish::Method->new(%args);
 ok( $method->compatible($dupe), "compatible()" );
 
-my $macro_sym_differs
-    = Clownfish::Method->new( %args, macro_sym => 'Eat' );
+my $macro_sym_differs = Clownfish::Method->new( %args, macro_sym => 'Eat' );
 ok( !$method->compatible($macro_sym_differs),
     "different macro_sym spoils compatible()"
 );
 ok( !$macro_sym_differs->compatible($method), "... reversed" );
 
 my $extra_param = Clownfish::Method->new( %args,
-    param_list => $parser->param_list('(Foo *self, i32_t count = 0, int b)'),
-);
+    param_list =>
+        $parser->param_list('(Foo *self, int32_t count = 0, int b)'), );
 ok( !$method->compatible($macro_sym_differs),
     "extra param spoils compatible()"
 );
 ok( !$extra_param->compatible($method), "... reversed" );
 
 my $default_differs = Clownfish::Method->new( %args,
-    param_list => $parser->param_list('(Foo *self, i32_t count = 1)'), );
+    param_list => $parser->param_list('(Foo *self, int32_t count = 1)'), );
 ok( !$method->compatible($default_differs),
     "different initial_value spoils compatible()"
 );
 ok( !$default_differs->compatible($method), "... reversed" );
 
 my $missing_default = Clownfish::Method->new( %args,
-    param_list => $parser->param_list('(Foo *self, i32_t count)'), );
+    param_list => $parser->param_list('(Foo *self, int32_t count)'), );
 ok( !$method->compatible($missing_default),
     "missing initial_value spoils compatible()"
 );
 ok( !$missing_default->compatible($method), "... reversed" );
 
 my $param_name_differs = Clownfish::Method->new( %args,
-    param_list => $parser->param_list('(Foo *self, i32_t countess)'), );
+    param_list => $parser->param_list('(Foo *self, int32_t countess)'), );
 ok( !$method->compatible($param_name_differs),
     "different param name spoils compatible()"
 );
 ok( !$param_name_differs->compatible($method), "... reversed" );
 
 my $param_type_differs = Clownfish::Method->new( %args,
-    param_list => $parser->param_list('(Foo *self, u32_t count)'), );
+    param_list => $parser->param_list('(Foo *self, uint32_t count)'), );
 ok( !$method->compatible($param_type_differs),
     "different param type spoils compatible()"
 );
@@ -80,7 +79,7 @@ my $self_type_differs = Clownfish::Method->new(
     %args,
     class_name  => 'Neato::Bar',
     class_cnick => 'Bar',
-    param_list  => $parser->param_list('(Bar *self, i32_t count = 0)'),
+    param_list  => $parser->param_list('(Bar *self, int32_t count = 0)'),
 );
 ok( $method->compatible($self_type_differs),
     "different self type still compatible(), since can't test inheritance" );
@@ -111,7 +110,7 @@ isa_ok(
     for (
     'public int Do_Foo(Obj *self);',
     'parcel Obj* Gimme_An_Obj(Obj *self);',
-    'void Do_Whatever(Obj *self, u32_t a_num, float real);',
+    'void Do_Whatever(Obj *self, uint32_t a_num, float real);',
     'private Foo* Fetch_Foo(Obj *self, int num);',
     );
 

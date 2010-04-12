@@ -30,14 +30,6 @@ my %primitives_from_perl = (
     int32_t    => sub {"$_[0] = (int32_t)SvIV( $_[1] );"},
     int16_t    => sub {"$_[0] = (int16_t)SvIV( $_[1] );"},
     int8_t     => sub {"$_[0] = (int8_t)SvIV( $_[1] );"},
-    chy_u64_t  => sub {"$_[0] = (chy_u64_t)SvNV( $_[1] );"},
-    chy_u32_t  => sub {"$_[0] = (chy_u32_t)SvUV( $_[1] );"},
-    chy_u16_t  => sub {"$_[0] = (chy_u16_t)SvUV( $_[1] );"},
-    chy_u8_t   => sub {"$_[0] = (chy_u8_t)SvUV( $_[1] );"},
-    chy_i64_t  => sub {"$_[0] = (chy_i64_t)SvNV( $_[1] );"},
-    chy_i32_t  => sub {"$_[0] = (chy_i32_t)SvIV( $_[1] );"},
-    chy_i16_t  => sub {"$_[0] = (chy_i16_t)SvIV( $_[1] );"},
-    chy_i8_t   => sub {"$_[0] = (chy_i8_t)SvIV( $_[1] );"},
     chy_bool_t => sub {"$_[0] = SvTRUE( $_[1] ) ? 1 : 0;"},
 );
 
@@ -69,22 +61,6 @@ my %primitives_to_perl = (
     int32_t   => sub {"$_[0] = newSViv( $_[1] );"},
     int16_t   => sub {"$_[0] = newSViv( $_[1] );"},
     int8_t    => sub {"$_[0] = newSViv( $_[1] );"},
-    chy_u64_t => sub {
-        $Config{uvsize} == 8
-            ? "$_[0] = newSVuv( $_[1] );"
-            : "$_[0] = newSVnv( (NV)$_[1] );";
-    },
-    chy_u32_t => sub {"$_[0] = newSVuv( $_[1] );"},
-    chy_u16_t => sub {"$_[0] = newSVuv( $_[1] );"},
-    chy_u8_t  => sub {"$_[0] = newSVuv( $_[1] );"},
-    chy_i64_t => sub {
-        $Config{ivsize} == 8
-            ? "$_[0] = newSViv( $_[1] );"
-            : "$_[0] = newSVnv( (NV)$_[1] );";
-    },
-    chy_i32_t  => sub {"$_[0] = newSViv( $_[1] );"},
-    chy_i16_t  => sub {"$_[0] = newSViv( $_[1] );"},
-    chy_i8_t   => sub {"$_[0] = newSViv( $_[1] );"},
     chy_bool_t => sub {"$_[0] = newSViv( $_[1] );"},
 );
 
@@ -214,14 +190,6 @@ uint8_t\tCHY_UNSIGNED_INT
 uint16_t\tCHY_UNSIGNED_INT
 uint32_t\tCHY_UNSIGNED_INT
 uint64_t\tCHY_BIG_UNSIGNED_INT
-chy_i8_t\tCHY_SIGNED_INT
-chy_i16_t\tCHY_SIGNED_INT
-chy_i32_t\tCHY_SIGNED_INT
-chy_i64_t\tCHY_BIG_SIGNED_INT
-chy_u8_t\tCHY_UNSIGNED_INT
-chy_u16_t\tCHY_UNSIGNED_INT
-chy_u32_t\tCHY_UNSIGNED_INT
-chy_u64_t\tCHY_BIG_UNSIGNED_INT
 
 const lucy_CharBuf*\tCONST_CHARBUF
 END_STUFF
