@@ -105,11 +105,11 @@ SKIP: {
 }
 
 SKIP: {
-    skip( "Exception thrown within callback leaks", 1 ) if $ENV{LUCY_VALGRIND};
+    skip( "Exception thrown within callback leaks", 1 )
+        if $ENV{LUCY_VALGRIND};
     $hash = Lucy::Object::Hash->new;
     $hash->store( foo => BadDump->new );
     eval { $hash->dump };
     like( $@, qr/NULL/,
         "Don't allow methods without nullable return values to return NULL" );
 }
-
