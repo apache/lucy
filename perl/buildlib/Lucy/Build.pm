@@ -8,17 +8,28 @@ package Lucy::Build::CBuilder;
 BEGIN { our @ISA = "ExtUtils::CBuilder"; }
 use Config;
 
+my %cc;
+
 sub new {
-    my $class = shift;
+    my ($class, %args) = @_;
     require ExtUtils::CBuilder;
-    return $class->SUPER::new(@_);
+    my $self = $class->SUPER::new(%args);
+    $cc{"$self"} = $args{'config'}->{'cc'};
+    return $self;
+}
+
+sub get_cc { $cc{"$_[0]"} }
+
+sub DESTROY {
+    my $self = shift;
+    delete $cc{"$self"};
 }
 
 # This method isn't implemented by CBuilder for Windows, so we issue a basic
 # link command that works on at least one system and hope for the best.
 sub link_executable {
     my ( $self, %args ) = @_;
-    if ( $self->{'config'}->{'cc'} eq 'cl' ) {
+    if ( $self->get_cc eq 'cl' ) {
         my ( $objects, $exe_file ) = @args{qw( objects exe_file )};
         $self->do_system("link /out:$exe_file @$objects");
         return $exe_file;
