@@ -49,6 +49,29 @@ class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
     public bool_t
     Delete_Entry(Snapshot *self, const CharBuf *entry);
 
+    /** Decode a snapshot file and initialize the object to reflect its
+     * contents.
+     *
+     * @param folder A Folder.
+     * @param path The location of the snapshot file.  If not supplied, the
+     * most recent snapshot file in the base directory will be chosen.
+     * @return the object, allowing an assignment idiom.
+     */
+    public Snapshot*
+    Read_File(Snapshot *self, Folder *folder, const CharBuf *path = NULL);
+
+    /** Write a snapshot file.  The caller must lock the index while this
+     * operation takes place, and the operation will fail if the file already
+     * exists.
+     * 
+     * @param folder A Folder.
+     * @param path The path of the file to write.  If NULL, a file name will
+     * be chosen which supersedes the latest snapshot file in the index
+     * folder.
+     */
+    public void
+    Write_File(Snapshot *self, Folder *folder, const CharBuf *path = NULL);
+
     void
     Set_Path(Snapshot *self, const CharBuf *path);
 
