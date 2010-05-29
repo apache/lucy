@@ -18,6 +18,9 @@ PPCODE:
     if (strEQ(package, "TestSegment")) {
         lucy_TestSeg_run_tests();
     }
+    else if (strEQ(package, "TestSnapshot")) {
+        lucy_TestSnapshot_run_tests();
+    }
     // Lucy::Object 
     else if (strEQ(package, "TestObj")) {
         lucy_TestObj_run_tests();
