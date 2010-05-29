@@ -2,9 +2,9 @@ parcel Lucy;
 
 /** Point-in-time index file list.
  *
- * A Snapshot is list of index files.  Because index files, once written, are
- * never modified, the list of files in a Snapshot defines a point-in-time
- * view of the data in an index.
+ * A Snapshot is list of index files and folders.  Because index files, once
+ * written, are never modified, a Snapshot defines a point-in-time view of the
+ * data in an index.
  *
  * IndexReader objects interpret the data associated with a single Snapshot.
  */
@@ -12,7 +12,7 @@ parcel Lucy;
 class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
 
     Hash        *entries;
-    CharBuf     *filename;
+    CharBuf     *path;
 
     inert int32_t current_file_format;
 
@@ -50,13 +50,13 @@ class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
     Delete_Entry(Snapshot *self, const CharBuf *entry);
 
     void
-    Set_Filename(Snapshot *self, const CharBuf *filename);
+    Set_Path(Snapshot *self, const CharBuf *path);
 
-    /** The name of the file that the Snapshot serves as a proxy for.
-     * Initially NULL; updated by Read_File() and Write_File().
+    /** The path to the file that the Snapshot serves as a proxy for.
+     * Initially NULL; updated by Read_File(), Write_File(), and Set_Path().
      */
     public nullable CharBuf*
-    Get_Filename(Snapshot *self);
+    Get_Path(Snapshot *self);
 
     public void 
     Destroy(Snapshot *self);

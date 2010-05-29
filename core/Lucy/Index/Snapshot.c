@@ -2,9 +2,12 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/Snapshot.h"
+#include "Lucy/Store/Folder.h"
 #include "Lucy/Util/StringHelper.h"
+#include "Lucy/Util/IndexFileNames.h"
+#include "Lucy/Util/Json.h"
 
-int32_t Snapshot_current_file_format = 1;
+int32_t Snapshot_current_file_format = 2;
 
 Snapshot*
 Snapshot_new()
@@ -17,9 +20,9 @@ static void
 S_zero_out(Snapshot *self)
 {
     DECREF(self->entries);
-    DECREF(self->filename);
+    DECREF(self->path);
     self->entries  = Hash_new(0);
-    self->filename = NULL;
+    self->path = NULL;
 }
 
 Snapshot*
@@ -33,14 +36,14 @@ void
 Snapshot_destroy(Snapshot *self)
 {
     DECREF(self->entries);
-    DECREF(self->filename);
+    DECREF(self->path);
     SUPER_DESTROY(self, SNAPSHOT);
 }
 
 void
-Snapshot_add_entry(Snapshot *self, const CharBuf *filename)
+Snapshot_add_entry(Snapshot *self, const CharBuf *entry)
 {
-    Hash_Store(self->entries, (Obj*)filename, INCREF(&EMPTY));
+    Hash_Store(self->entries, (Obj*)entry, INCREF(&EMPTY));
 }
 
 bool_t
@@ -65,14 +68,14 @@ uint32_t
 Snapshot_num_entries(Snapshot *self) { return Hash_Get_Size(self->entries); }
 
 void
-Snapshot_set_filename(Snapshot *self, const CharBuf *filename)
+Snapshot_set_path(Snapshot *self, const CharBuf *path)
 {
-    DECREF(self->filename);
-    self->filename = filename ? CB_Clone(filename) : NULL;
+    DECREF(self->path);
+    self->path = path ? CB_Clone(path) : NULL;
 }
 
 CharBuf*
-Snapshot_get_filename(Snapshot *self) { return self->filename; }
+Snapshot_get_path(Snapshot *self) { return self->path; }
 
 /* Copyright 2009 The Apache Software Foundation
  *
