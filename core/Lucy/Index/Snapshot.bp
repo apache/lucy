@@ -35,7 +35,6 @@ class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
     public uint32_t
     Num_Entries(Snapshot *self);
 
-
     /** Add a filepath to the snapshot. 
      */
     public void
@@ -72,11 +71,14 @@ class Lucy::Index::Snapshot extends Lucy::Object::Obj : dumpable {
     public void
     Write_File(Snapshot *self, Folder *folder, const CharBuf *path = NULL);
 
-    void
+    /** Set the path to the file that the Snapshot object serves as a proxy
+     * for.
+     */
+    public void
     Set_Path(Snapshot *self, const CharBuf *path);
 
-    /** The path to the file that the Snapshot serves as a proxy for.
-     * Initially NULL; updated by Read_File(), Write_File(), and Set_Path().
+    /** Get the path to the snapshot file.  Initially NULL; updated by
+     * Read_File(), Write_File(), and Set_Path().
      */
     public nullable CharBuf*
     Get_Path(Snapshot *self);
