@@ -1,0 +1,55 @@
+parcel Lucy;
+
+/** Judge how well a document matches a query.
+ * 
+ * After determining whether a document matches a given query, a score must be
+ * calculated which indicates how I<well> the document matches the query.  The
+ * Similarity class is used to judge how "similar" the query and the document
+ * are to each other; the closer the resemblance, they higher the document
+ * scores.
+ * 
+ * The default implementation uses Lucene's modified cosine similarity
+ * measure.  Subclasses might tweak the existing algorithms, or might be used
+ * in conjunction with custom Query subclasses to implement arbitrary scoring
+ * schemes.
+ */
+
+abstract class Lucy::Index::Similarity cnick Sim
+    extends Lucy::Object::Obj : dumpable {
+
+    /** Abstract constructor. Takes no arguments. 
+     */
+    public inert Similarity* 
+    init(Similarity *self);
+
+    public incremented Obj* 
+    Dump(Similarity *self);
+
+    public incremented Similarity* 
+    Load(Similarity *self, Obj *dump);
+
+    public bool_t
+    Equals(Similarity *self, Obj *other);
+
+    public void
+    Serialize(Similarity *self, OutStream *outstream);
+
+    public incremented Similarity*
+    Deserialize(Similarity *self, InStream *instream);
+}
+
+/* Copyright 2010 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
