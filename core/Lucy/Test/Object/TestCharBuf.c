@@ -365,6 +365,14 @@ test_vcatf_x32(TestBatch *batch)
 }
 
 static void
+test_Scalar_ID(TestBatch *batch)
+{
+    CharBuf *charbuf = S_get_cb("foo");
+    ASSERT_INT_EQ(batch, CB_Scalar_ID(charbuf), Obj_TEXT, "Scalar_ID");
+    DECREF(charbuf);
+}
+
+static void
 test_serialization(TestBatch *batch)
 {
     CharBuf *wanted = S_get_cb("foo");
@@ -378,7 +386,7 @@ test_serialization(TestBatch *batch)
 void
 TestCB_run_tests()
 {
-    TestBatch *batch = TestBatch_new(49);
+    TestBatch *batch = TestBatch_new(50);
     TestBatch_Plan(batch);
 
     test_vcatf_s(batch);
@@ -403,6 +411,7 @@ TestCB_run_tests()
     test_Trim(batch);
     test_To_F64(batch);
     test_To_I64(batch);
+    test_Scalar_ID(batch);
     test_serialization(batch);
 
     DECREF(batch);

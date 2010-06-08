@@ -147,6 +147,13 @@ Float32_deserialize(Float32 *self, InStream *instream)
     return self ? Float32_init(self, value) : Float32_new(value);
 }
 
+uint8_t
+Float32_scalar_id(Float32 *self)
+{
+    UNUSED_VAR(self);
+    return Obj_FLOAT32;
+}
+
 /***************************************************************************/
 
 Float64*
@@ -213,6 +220,13 @@ Float64_deserialize(Float64 *self, InStream *instream)
     return self ? Float64_init(self, value) : Float64_new(value);
 }
 
+uint8_t
+Float64_scalar_id(Float64 *self)
+{
+    UNUSED_VAR(self);
+    return Obj_FLOAT64;
+}
+
 /***************************************************************************/
 
 Integer32*
@@ -276,6 +290,13 @@ Int32_deserialize(Integer32 *self, InStream *instream)
 {
     int32_t value = (int32_t)InStream_Read_C32(instream);
     return self ? Int32_init(self, value) : Int32_new(value);
+}
+
+uint8_t
+Int32_scalar_id(Integer32 *self)
+{
+    UNUSED_VAR(self);
+    return Obj_INT32;
 }
 
 /***************************************************************************/
@@ -360,6 +381,13 @@ Int64_deserialize(Integer64 *self, InStream *instream)
 {
     int64_t value = (int64_t)InStream_Read_C64(instream);
     return self ? Int64_init(self, value) : Int64_new(value);
+}
+
+uint8_t
+Int64_scalar_id(Integer64 *self)
+{
+    UNUSED_VAR(self);
+    return Obj_INT64;
 }
 
 /* Copyright 2009 The Apache Software Foundation

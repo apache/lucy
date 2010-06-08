@@ -220,6 +220,9 @@ class Lucy::Object::CharBuf cnick CB
     public incremented CharBuf*
     Deserialize(CharBuf *self, InStream *instream);
 
+    uint8_t
+    Scalar_ID(CharBuf *self);
+
     /** Remove Unicode whitespace characters from both top and tail.
      */
     uint32_t

@@ -122,6 +122,14 @@ test_Cat(TestBatch *batch)
 }
 
 static void
+test_Scalar_ID(TestBatch *batch)
+{
+    ByteBuf *bytebuf = BB_new_bytes("foo", 3);
+    ASSERT_INT_EQ(batch, BB_Scalar_ID(bytebuf), Obj_BLOB, "Scalar_ID");
+    DECREF(bytebuf);
+}
+
+static void
 test_serialization(TestBatch *batch)
 {
     ByteBuf *wanted = BB_new_bytes("foobar", 6);
@@ -135,7 +143,7 @@ test_serialization(TestBatch *batch)
 void
 TestBB_run_tests()
 {
-    TestBatch *batch = TestBatch_new(22);
+    TestBatch *batch = TestBatch_new(23);
     TestBatch_Plan(batch);
 
     test_Equals(batch);
@@ -144,6 +152,7 @@ TestBB_run_tests()
     test_compare(batch);
     test_Mimic(batch);
     test_Cat(batch);
+    test_Scalar_ID(batch);
     test_serialization(batch);
 
     DECREF(batch);

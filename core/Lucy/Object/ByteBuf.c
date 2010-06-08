@@ -234,6 +234,13 @@ BB_compare_to(ByteBuf *self, Obj *other)
     return BB_compare(&self, &other);
 }
 
+uint8_t
+BB_scalar_id(ByteBuf *self)
+{
+    UNUSED_VAR(self);
+    return Obj_BLOB;
+}
+
 /******************************************************************/
 
 ViewByteBuf*

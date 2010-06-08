@@ -79,6 +79,9 @@ class Lucy::Object::Float32 extends Lucy::Object::FloatNum {
 
     public void
     Mimic(Float32 *self, Obj *other);
+
+    uint8_t
+    Scalar_ID(Float32 *self);
 }
 
 /** Double precision floating point number.
@@ -122,6 +125,9 @@ class Lucy::Object::Float64 extends Lucy::Object::FloatNum {
 
     public void
     Mimic(Float64 *self, Obj *other);
+
+    uint8_t
+    Scalar_ID(Float64 *self);
 }
 
 /** 32-bit signed integer.
@@ -166,6 +172,9 @@ class Lucy::Object::Integer32 cnick Int32
 
     public void
     Mimic(Integer32 *self, Obj *other);
+
+    uint8_t
+    Scalar_ID(Integer32 *self);
 }
 
 /**
@@ -214,6 +223,9 @@ class Lucy::Object::Integer64 cnick Int64
 
     public void
     Mimic(Integer64 *self, Obj *other);
+
+    uint8_t
+    Scalar_ID(Integer64 *self);
 }
 
 /* Copyright 2009 The Apache Software Foundation

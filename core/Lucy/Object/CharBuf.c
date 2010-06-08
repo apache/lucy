@@ -475,6 +475,13 @@ CB_deserialize(CharBuf *self, InStream *instream)
     return self;
 }
 
+uint8_t
+CB_scalar_id(CharBuf *self)
+{
+    UNUSED_VAR(self);
+    return Obj_TEXT;
+}
+
 void
 CB_mimic_str(CharBuf *self, const char* ptr, size_t size) 
 {

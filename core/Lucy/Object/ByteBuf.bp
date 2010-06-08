@@ -109,6 +109,9 @@ class Lucy::Object::ByteBuf cnick BB extends Lucy::Object::Obj {
 
     public incremented ByteBuf*
     Deserialize(ByteBuf *self, InStream *instream);
+
+    uint8_t
+    Scalar_ID(ByteBuf *self);
 }
 
 /**

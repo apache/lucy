@@ -232,10 +232,33 @@ test_serialization(TestBatch *batch)
     DECREF(f32);
 }
 
+static void
+test_Scalar_ID(TestBatch *batch)
+{
+    Float32   *f32 = Float32_new(0);
+    Float64   *f64 = Float64_new(0);
+    Integer32 *i32 = Int32_new(0);
+    Integer64 *i64 = Int64_new(0);
+
+    ASSERT_INT_EQ(batch, Float32_Scalar_ID(f32), Obj_FLOAT32,
+        "Float32_Scalar_ID");
+    ASSERT_INT_EQ(batch, Float64_Scalar_ID(f64), Obj_FLOAT64,
+        "Float64_Scalar_ID");
+    ASSERT_INT_EQ(batch, Int32_Scalar_ID(i32), Obj_INT32,
+        "Int32_Scalar_ID");
+    ASSERT_INT_EQ(batch, Int64_Scalar_ID(i64), Obj_INT64,
+        "Int64_Scalar_ID");
+
+    DECREF(i64);
+    DECREF(i32);
+    DECREF(f64);
+    DECREF(f32);
+}
+
 void
 TestNum_run_tests()
 {
-    TestBatch *batch = TestBatch_new(42);
+    TestBatch *batch = TestBatch_new(46);
     TestBatch_Plan(batch);
 
     test_To_String(batch);
@@ -244,6 +267,7 @@ TestNum_run_tests()
     test_Clone(batch);
     test_Mimic(batch);
     test_serialization(batch);
+    test_Scalar_ID(batch);
     
     DECREF(batch);
 }

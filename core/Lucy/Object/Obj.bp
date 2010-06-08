@@ -167,9 +167,45 @@ class Lucy::Object::Obj {
      */
     public abstract void
     Mimic(Obj *self, Obj *other);
+
+    /** Internal id used for switch() ops.  Unique for each scalar data type.
+     */
+    abstract uint8_t
+    Scalar_ID(Obj *self);
 }
 
 __C__
+
+#define lucy_Obj_TEXT    0x01
+#define lucy_Obj_BLOB    0x02
+#define lucy_Obj_INT8    0x03
+#define lucy_Obj_INT16   0x04
+#define lucy_Obj_INT32   0x05
+#define lucy_Obj_INT64   0x06
+#define lucy_Obj_UINT8   0x07
+#define lucy_Obj_UINT16  0x08
+#define lucy_Obj_UINT32  0x09
+#define lucy_Obj_UINT64  0x0a
+#define lucy_Obj_FLOAT32 0x0b
+#define lucy_Obj_FLOAT64 0x0c
+#define lucy_Obj_SCALAR_ID_MASK 0x0f
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define Obj_TEXT              lucy_Obj_TEXT
+  #define Obj_BLOB              lucy_Obj_BLOB
+  #define Obj_INT8              lucy_Obj_INT8
+  #define Obj_INT16             lucy_Obj_INT16
+  #define Obj_INT32             lucy_Obj_INT32
+  #define Obj_INT64             lucy_Obj_INT64
+  #define Obj_UINT8             lucy_Obj_UINT8
+  #define Obj_UINT16            lucy_Obj_UINT16
+  #define Obj_UINT32            lucy_Obj_UINT32
+  #define Obj_UINT64            lucy_Obj_UINT64
+  #define Obj_FLOAT32           lucy_Obj_FLOAT32
+  #define Obj_FLOAT64           lucy_Obj_FLOAT64
+  #define Obj_SCALAR_ID_MASK    lucy_Obj_SCALAR_ID_MASK
+#endif
+
 static CHY_INLINE void
 lucy_Obj_super_destroy(lucy_Obj *self, lucy_VTable *vtable)
 {
