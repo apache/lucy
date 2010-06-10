@@ -49,6 +49,10 @@ PPCODE:
     else if (strEQ(package, "TestVArray")) {
         lucy_TestVArray_run_tests();
     }
+    // Lucy::Plan 
+    else if (strEQ(package, "TestFieldType")) {
+        lucy_TestFType_run_tests();
+    }
     // Lucy::Store 
     else if (strEQ(package, "TestCompoundFileReader")) {
         lucy_TestCFReader_run_tests();
