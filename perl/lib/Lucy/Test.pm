@@ -53,6 +53,9 @@ PPCODE:
     else if (strEQ(package, "TestFieldType")) {
         lucy_TestFType_run_tests();
     }
+    else if (strEQ(package, "TestTextType")) {
+        lucy_TestTextType_run_tests();
+    }
     // Lucy::Store 
     else if (strEQ(package, "TestCompoundFileReader")) {
         lucy_TestCFReader_run_tests();
