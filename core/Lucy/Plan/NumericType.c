@@ -120,7 +120,10 @@ NumType_load(NumericType *self, Obj *dump)
         }
     }
 
-    return NumType_init2(loaded, sim, boost, indexed, stored, sortable);
+    NumType_init2(loaded, sim, boost, indexed, stored, sortable);
+    DECREF(sim);
+
+    return loaded;
 }
 
 /****************************************************************************/

@@ -128,6 +128,7 @@ BlobType_load(BlobType *self, Obj *dump)
     loaded->boost    = boost;
     loaded->indexed  = indexed;
 
+    DECREF(sim);
     return loaded;
 }
 
