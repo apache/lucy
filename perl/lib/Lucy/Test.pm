@@ -59,6 +59,9 @@ PPCODE:
     else if (strEQ(package, "TestNumericType")) {
         lucy_TestNumericType_run_tests();
     }
+    else if (strEQ(package, "TestSchema")) {
+        lucy_TestSchema_run_tests();
+    }
     else if (strEQ(package, "TestTextType")) {
         lucy_TestTextType_run_tests();
     }
