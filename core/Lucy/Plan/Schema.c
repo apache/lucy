@@ -6,7 +6,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Index/Similarity.h"
-#include "Lucy/Index/Similarity/LuceneSimilarity.h"
+#include "Lucy/Plan/Architecture.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/BlobType.h"
 #include "Lucy/Plan/NumericType.h"
@@ -46,7 +46,8 @@ Schema_init(Schema *self)
     VA_Resize(self->uniq_analyzers, 1);
 
     // Assign. 
-    self->sim = (Similarity*)LuceneSim_new();
+    self->arch = Schema_Architecture(self);
+    self->sim  = Arch_Make_Similarity(self->arch);
 
     return self;
 }
@@ -54,6 +55,7 @@ Schema_init(Schema *self)
 void
 Schema_destroy(Schema *self) 
 {
+    DECREF(self->arch);
     DECREF(self->analyzers);
     DECREF(self->uniq_analyzers);
     DECREF(self->uniq_sims);
@@ -86,9 +88,17 @@ Schema_equals(Schema *self, Obj *other)
     if (evil_twin == self) return true;
     if (!other) return false;
     if (!Obj_Is_A(other, SCHEMA)) return false;
+    if (!Arch_Equals(self->arch, (Obj*)evil_twin->arch)) return false;
     if (!Sim_Equals(self->sim, (Obj*)evil_twin->sim)) return false;
     if (!Hash_Equals(self->types, (Obj*)evil_twin->types)) return false;
     return true;
+}
+
+Architecture*
+Schema_architecture(Schema *self)
+{
+    UNUSED_VAR(self);
+    return Arch_new();
 }
 
 void
@@ -181,6 +191,8 @@ Schema_num_fields(Schema *self)
     return Hash_Get_Size(self->types);
 }
 
+Architecture*
+Schema_get_architecture(Schema *self) { return self->arch; }
 Similarity*
 Schema_get_similarity(Schema *self)   { return self->sim; }
 

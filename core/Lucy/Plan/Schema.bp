@@ -12,6 +12,7 @@ parcel Lucy;
  */
 class Lucy::Plan::Schema extends Lucy::Object::Obj {
 
+    Architecture      *arch;
     Similarity        *sim;
     Hash              *types;
     Hash              *sims;
@@ -26,6 +27,11 @@ class Lucy::Plan::Schema extends Lucy::Object::Obj {
      */
     public inert Schema*
     init(Schema *self);
+
+    /** Factory method which returns the Architecture for this index. 
+     */
+    public incremented Architecture*
+    Architecture(Schema *self);
 
     /** Define the behavior of a field by associating it with a FieldType.
      *
@@ -65,6 +71,11 @@ class Lucy::Plan::Schema extends Lucy::Object::Obj {
      */
     public incremented VArray*
     All_Fields(Schema *self);
+
+    /** Return the Schema instance's internal Architecture object.
+     */
+    public Architecture* 
+    Get_Architecture(Schema *self);
 
     /** Return the Schema instance's internal Similarity object.
      */
