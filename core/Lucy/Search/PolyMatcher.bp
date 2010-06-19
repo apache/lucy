@@ -1,19 +1,24 @@
 parcel Lucy;
 
-/** Ranking engine modeled after Apache Lucene.
+/** Base class for composite Matchers.
  */
 
-class Lucy::Index::Similarity::LuceneSimilarity cnick LuceneSim
-    extends Lucy::Index::Similarity : dumpable {
+class Lucy::Search::PolyMatcher extends Lucy::Search::Matcher {
 
-    public inert incremented LuceneSimilarity*
-    new();
+    VArray       *children;
+    Similarity   *sim;
+    uint32_t      num_kids;
+    uint32_t      matching_kids;
+    float        *coord_factors;
 
-    public inert LuceneSimilarity*
-    init(LuceneSimilarity *self);
+    inert incremented PolyMatcher* 
+    new(VArray *children, Similarity *similarity);
 
-    public float
-    Coord(LuceneSimilarity *self, uint32_t overlap, uint32_t max_overlap);
+    inert PolyMatcher* 
+    init(PolyMatcher *self, VArray *children, Similarity *similarity);
+
+    public void
+    Destroy(PolyMatcher *self);
 }
 
 /* Copyright 2010 The Apache Software Foundation

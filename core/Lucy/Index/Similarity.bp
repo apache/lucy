@@ -22,6 +22,11 @@ abstract class Lucy::Index::Similarity cnick Sim
     public inert Similarity* 
     init(Similarity *self);
 
+    /** Calculate a score factor based on the number of terms which match. 
+     */
+    public abstract float
+    Coord(Similarity *self, uint32_t overlap, uint32_t max_overlap);
+
     public incremented Obj* 
     Dump(Similarity *self);
 

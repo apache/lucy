@@ -18,6 +18,17 @@ LuceneSim_init(LuceneSimilarity *self)
     return self;
 }
 
+float
+LuceneSim_coord(LuceneSimilarity *self, uint32_t overlap, 
+                uint32_t max_overlap)
+{
+    UNUSED_VAR(self);
+    if (max_overlap == 0)
+        return 1;
+    else 
+        return (float)overlap / (float)max_overlap;
+}
+
 /* Copyright 2010 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
