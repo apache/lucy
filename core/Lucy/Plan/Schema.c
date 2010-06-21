@@ -19,13 +19,6 @@
 static void
 S_add_unique(VArray *array, Obj *elem);
 
-static void
-S_add_text_field(Schema *self, const CharBuf *field, FieldType *type);
-static void
-S_add_blob_field(Schema *self, const CharBuf *field, FieldType *type);
-static void
-S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type);
-
 Schema*
 Schema_new()
 {
@@ -112,53 +105,22 @@ Schema_spec_field(Schema *self, const CharBuf *field, FieldType *type)
         else { THROW(ERR, "'%o' assigned conflicting FieldType", field); }
     }
 
-    if (FType_Is_A(type, TEXTTYPE)) {
-        S_add_text_field(self, field, type);
-    }
-    else if (FType_Is_A(type, BLOBTYPE)) {
-        S_add_blob_field(self, field, type);
-    }
-    else if (FType_Is_A(type, NUMERICTYPE)) {
-        S_add_numeric_field(self, field, type);
-    }
-    else {
-        THROW(ERR, "Unrecognized field type: '%o'", type);
-    }
-}
-
-static void
-S_add_text_field(Schema *self, const CharBuf *field, FieldType *type)
-{
-    TextType   *text_type = (TextType*)CERTIFY(type, TEXTTYPE);
-    Similarity *sim       = TextType_Get_Similarity(text_type);
-    Analyzer   *analyzer  = TextType_Get_Analyzer(text_type);
-
     // Cache helpers. 
-    Hash_Store(self->sims, (Obj*)field, INCREF(sim));
-    S_add_unique(self->uniq_sims, (Obj*)sim);
-    if (analyzer) {
-        Hash_Store(self->analyzers, (Obj*)field, INCREF(analyzer));
-        S_add_unique(self->uniq_analyzers, (Obj*)analyzer);
+    Similarity *sim = FType_Get_Similarity(type);
+    if (sim) {
+        Hash_Store(self->sims, (Obj*)field, INCREF(sim));
+        S_add_unique(self->uniq_sims, (Obj*)sim);
+    }
+    if (FType_Is_A(type, TEXTTYPE)) {
+        Analyzer *analyzer = TextType_Get_Analyzer((TextType*)type);
+        if (analyzer) {
+            Hash_Store(self->analyzers, (Obj*)field, INCREF(analyzer));
+            S_add_unique(self->uniq_analyzers, (Obj*)analyzer);
+        }
     }
 
     // Store FieldType. 
     Hash_Store(self->types, (Obj*)field, INCREF(type));
-}
-
-static void
-S_add_blob_field(Schema *self, const CharBuf *field, FieldType *type)
-{
-    BlobType *blob_type = (BlobType*)CERTIFY(type, BLOBTYPE);
-    Hash_Store(self->types, (Obj*)field, INCREF(blob_type));
-    S_add_unique(self->uniq_sims, (Obj*)BlobType_Get_Similarity(blob_type));
-}
-
-static void
-S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type)
-{
-    NumericType *num_type = (NumericType*)CERTIFY(type, NUMERICTYPE);
-    Hash_Store(self->types, (Obj*)field, INCREF(num_type));
-    S_add_unique(self->uniq_sims, (Obj*)NumType_Get_Similarity(num_type));
 }
 
 FieldType*
