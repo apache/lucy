@@ -1,0 +1,36 @@
+parcel KinoSearch cnick Kino;
+
+/** DirHandle for RAMFolder.
+ */
+class KinoSearch::Store::RAMDirHandle cnick RAMDH
+    inherits KinoSearch::Store::DirHandle {
+
+    RAMFolder *folder;
+    VArray    *elems;
+    int32_t    tick;
+
+    inert incremented RAMDirHandle*
+    new(RAMFolder *folder);
+
+    inert RAMDirHandle*
+    init(RAMDirHandle *self, RAMFolder *folder);
+
+    bool_t
+    Next(RAMDirHandle *self);
+
+    bool_t
+    Entry_Is_Dir(RAMDirHandle *self);
+
+    bool_t
+    Entry_Is_Symlink(RAMDirHandle *self);
+
+    bool_t
+    Close(RAMDirHandle *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

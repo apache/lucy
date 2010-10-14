@@ -1,0 +1,41 @@
+parcel KinoSearch cnick Kino;
+
+class KSx::Search::FilterScorer inherits KinoSearch::Search::Matcher {
+
+    BitVector   *bits;
+    int32_t      doc_max;
+    int32_t      doc_id;
+
+    /**
+     * @param bits A BitVector with each doc id that should match set to
+     * true.
+     * @param doc_max The largest doc id that could possibly match.
+     */
+    inert incremented FilterScorer*
+    new(BitVector *bits, int32_t doc_max);
+
+    inert FilterScorer*
+    init(FilterScorer *self, BitVector *bits, int32_t doc_max);
+
+    public void
+    Destroy(FilterScorer *self);
+
+    public int32_t
+    Next(FilterScorer* self);
+
+    public int32_t
+    Skip_To(FilterScorer* self, int32_t target);
+
+    public float
+    Score(FilterScorer* self);
+
+    public int32_t 
+    Get_Doc_ID(FilterScorer* self);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

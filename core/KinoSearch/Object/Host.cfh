@@ -1,0 +1,94 @@
+parcel KinoSearch cnick Kino;
+
+__C__
+#define KINO_HOST_ARGTYPE_I32    (int32_t)0x00000001
+#define KINO_HOST_ARGTYPE_I64    (int32_t)0x00000002
+#define KINO_HOST_ARGTYPE_F32    (int32_t)0x00000003
+#define KINO_HOST_ARGTYPE_F64    (int32_t)0x00000004
+#define KINO_HOST_ARGTYPE_STR    (int32_t)0x00000006
+#define KINO_HOST_ARGTYPE_OBJ    (int32_t)0x00000007
+#define KINO_HOST_ARGTYPE_MASK            0x00000007
+
+#define KINO_ARG_I32(_label, _value) \
+    KINO_HOST_ARGTYPE_I32, (_label), ((int32_t)_value)
+#define KINO_ARG_I64(_label, _value) \
+    KINO_HOST_ARGTYPE_I64, (_label), ((int64_t)_value)
+#define KINO_ARG_F32(_label, _value) \
+    KINO_HOST_ARGTYPE_F32, (_label), ((double)_value)
+#define KINO_ARG_F64(_label, _value) \
+    KINO_HOST_ARGTYPE_F64, (_label), ((double)_value)
+#define KINO_ARG_STR(_label, _value) \
+    KINO_HOST_ARGTYPE_STR, (_label), ((kino_CharBuf*)_value)
+#define KINO_ARG_OBJ(_label, _value) \
+    KINO_HOST_ARGTYPE_OBJ, (_label), ((kino_Obj*)_value)
+
+#ifdef KINO_USE_SHORT_NAMES
+  #define ARG_I32                 KINO_ARG_I32
+  #define ARG_I64                 KINO_ARG_I64
+  #define ARG_F32                 KINO_ARG_F32
+  #define ARG_F64                 KINO_ARG_F64
+  #define ARG_STR                 KINO_ARG_STR
+  #define ARG_OBJ                 KINO_ARG_OBJ
+#endif
+
+__END_C__
+
+/** Callbacks to the host environment.
+ * 
+ * All the callback functions are variadic, and all are designed to take a
+ * series of arguments using the ARG_XXX macros.
+ * 
+ *   int32_t area = (int32_t)Host_callback_i64(self, "calc_area", 2, 
+ *        ARG_I32("length", len),  ARG_I32("width", width) );
+ * 
+ * The first argument is void* to avoid the need for tiresome casting to Obj*,
+ * but must always be a KinoSearch object.
+ * 
+ * If the invoker is a VTable, it will be used to make a class
+ * callback rather than an object callback.
+ */
+inert class KinoSearch::Object::Host {
+ 
+    /** Invoke an object method in a void context.
+     */
+    inert void
+    callback(void *self, char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting an integer.
+     */
+    inert int64_t
+    callback_i64(void *self, char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a 64-bit floating point return
+     * value.
+     */
+    inert double 
+    callback_f64(void *self, char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a Obj-derived object back, or
+     * possibly NULL.  In order to ensure that the host environment doesn't
+     * reclaim the return value, it's refcount is increased by one, which the
+     * caller will have to deal with.
+     */
+    inert incremented nullable Obj*
+    callback_obj(void *self, char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a host string of some kind back,
+     * which will be converted into a newly allocated CharBuf.  
+     */
+    inert incremented nullable CharBuf*
+    callback_str(void *self, char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a host data structure back.  It's
+     * up to the caller to know how to process it.
+     */
+    inert nullable void*
+    callback_host(void *self, char *method, uint32_t num_args, ...);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

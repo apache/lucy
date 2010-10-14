@@ -1,0 +1,65 @@
+parcel KinoSearch cnick Kino;
+
+/** Iterate over the files in a directory.
+ */
+abstract class KinoSearch::Store::DirHandle cnick DH 
+    inherits KinoSearch::Object::Obj {
+
+    CharBuf  *dir;
+    CharBuf  *entry;
+
+    /** Abstract constructor. 
+     * 
+     * @param dir The path to the directory.
+     */
+    inert DirHandle*
+    init(DirHandle *self, const CharBuf *dir);
+
+    /** Proceed to the next entry in the directory.
+     *
+     * @return true on success, false when finished.
+     */
+    abstract bool_t
+    Next(DirHandle *self);
+
+    /** Attempt to close the DirHandle.  Returns true on success, sets
+     * Err_error and returns false on failure.
+     */
+    abstract bool_t
+    Close(DirHandle *self);
+
+    /** Return the object's <code>dir</code> attribute.
+     */
+    CharBuf*
+    Get_Dir(DirHandle *self);
+
+    /** Return the path of the current entry.  The value is updated by each
+     * call to Next(), and is only valid when Next() has returned
+     * successfully.
+     */
+    CharBuf*
+    Get_Entry(DirHandle *self);
+
+    /** Returns true if the current entry is a directory, false otherwise.
+     */
+    abstract bool_t
+    Entry_Is_Dir(DirHandle *self);
+
+    /** Returns true if the current entry is a symbolic link (or a Windows
+     * junction), false otherwise.
+     */
+    abstract bool_t
+    Entry_Is_Symlink(DirHandle *self);
+
+    /** Invokes Close(), but ignores any errors. 
+     */
+    public void
+    Destroy(DirHandle *self);
+}
+
+/* Copyright 2009-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

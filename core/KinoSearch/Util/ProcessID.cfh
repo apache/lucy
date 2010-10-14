@@ -1,0 +1,24 @@
+parcel KinoSearch cnick Kino;
+
+/** Provide platform-compatible process ID functions.
+ */
+inert class KinoSearch::Util::ProcessID cnick PID {
+    
+    /** Return the ID for the current process.
+     */
+    inert int 
+    getpid(void);
+
+    /** Return true if the supplied process ID is associated with an active
+     * process.
+     */
+    inert bool_t
+    active(int pid);
+}
+
+/* Copyright 2009-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

@@ -1,0 +1,54 @@
+parcel KinoSearch cnick Kino;
+
+/** Query which matches all documents.
+ *
+ * MatchAllQuery is a utility class which matches all documents.  Each match
+ * is assigned a score of 0.0, so that in composite queries, any document
+ * which matches against another part of the query will be ranked higher than
+ * a document which matches only via the MatchAllQuery.
+ */
+abstract class KinoSearch::Search::MatchAllQuery 
+    inherits KinoSearch::Search::Query : dumpable {
+
+    inert incremented MatchAllQuery*
+    new();
+
+    /** Constructor.  Takes no arguments.
+     */
+    public inert MatchAllQuery*
+    init(MatchAllQuery *self);
+
+    public bool_t
+    Equals(MatchAllQuery *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(MatchAllQuery *self);
+
+    public incremented Compiler*
+    Make_Compiler(MatchAllQuery *self, Searcher *searcher, float boost);
+}
+
+class KinoSearch::Search::MatchAllCompiler 
+    inherits KinoSearch::Search::Compiler {
+
+    inert incremented MatchAllCompiler*
+    new(MatchAllQuery *parent, Searcher *searcher, float boost);
+
+    inert MatchAllCompiler*
+    init(MatchAllCompiler *self, MatchAllQuery *parent,
+         Searcher *searcher, float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(MatchAllCompiler *self, SegReader *reader, 
+                 bool_t need_score);
+
+    public incremented MatchAllCompiler*
+    Deserialize(MatchAllCompiler *self, InStream *instream);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

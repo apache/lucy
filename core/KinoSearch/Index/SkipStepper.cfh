@@ -1,0 +1,33 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Index::SkipStepper inherits KinoSearch::Util::Stepper {
+
+    int32_t doc_id;
+    int64_t filepos;
+
+    inert incremented SkipStepper*
+    new();
+
+    void
+    Read_Record(SkipStepper *self, InStream *instream);
+
+    void
+    Write_Record(SkipStepper *self, OutStream *outstream, 
+                 int32_t last_doc_id, int64_t last_filepos);
+
+    /** Set a base document id and a base file position which Read_Record
+     * will add onto with its deltas.
+     */
+    void
+    Set_ID_And_Filepos(SkipStepper *self, int32_t doc_id, int64_t filepos);
+
+    public incremented CharBuf*
+    To_String(SkipStepper *self);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

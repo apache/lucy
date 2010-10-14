@@ -1,0 +1,137 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Plan::NumericType cnick NumType 
+    inherits KinoSearch::Plan::FieldType : dumpable {
+
+    public inert NumericType* 
+    init(NumericType *self);
+
+    inert NumericType* 
+    init2(NumericType *self, float boost = 1.0, bool_t indexed = true, 
+          bool_t stored = true, bool_t sortable = false);
+
+    /** Returns true. 
+     */
+    public bool_t
+    Binary(NumericType *self);
+
+    /** Return the primitive type specifier for the object type, e.g.
+     * f64_t for Float64, uint32_t for UInteger32, etc.
+     */
+    abstract incremented CharBuf*
+    Specifier(NumericType *self);
+
+    incremented Hash*
+    Dump_For_Schema(NumericType *self);
+
+    public incremented Hash*
+    Dump(NumericType *self);
+
+    public incremented NumericType*
+    Load(NumericType *self, Obj *dump);
+}
+
+abstract class KinoSearch::Plan::FloatType 
+    inherits KinoSearch::Plan::NumericType : dumpable { }
+
+class KinoSearch::Plan::Float64Type 
+    inherits KinoSearch::Plan::FloatType : dumpable {
+
+    public inert Float64Type* 
+    new();
+
+    public inert Float64Type* 
+    init(Float64Type *self);
+
+    inert Float64Type* 
+    init2(Float64Type *self, float boost = 1.0, bool_t indexed = true, 
+          bool_t stored = true, bool_t sortable = true);
+
+    int8_t
+    Primitive_ID(Float64Type *self);
+
+    incremented CharBuf*
+    Specifier(Float64Type *self);
+
+    public bool_t
+    Equals(Float64Type *self, Obj *other);
+}
+
+class KinoSearch::Plan::Float32Type 
+    inherits KinoSearch::Plan::FloatType : dumpable {
+
+    public inert Float32Type* 
+    new();
+
+    public inert Float32Type* 
+    init(Float32Type *self);
+
+    inert Float32Type* 
+    init2(Float32Type *self, float boost = 1.0, bool_t indexed = true, 
+          bool_t stored = true, bool_t sortable = false);
+
+    int8_t
+    Primitive_ID(Float32Type *self);
+
+    incremented CharBuf*
+    Specifier(Float32Type *self);
+
+    public bool_t
+    Equals(Float32Type *self, Obj *other);
+}
+
+abstract class KinoSearch::Plan::IntType 
+    inherits KinoSearch::Plan::NumericType : dumpable { }
+
+class KinoSearch::Plan::Int32Type 
+    inherits KinoSearch::Plan::IntType : dumpable {
+
+    public inert Int32Type* 
+    new();
+
+    public inert Int32Type* 
+    init(Int32Type *self);
+
+    inert Int32Type* 
+    init2(Int32Type *self, float boost = 1.0, bool_t indexed = true, 
+          bool_t stored = true, bool_t sortable = false);
+
+    int8_t
+    Primitive_ID(Int32Type *self);
+
+    incremented CharBuf*
+    Specifier(Int32Type *self);
+
+    public bool_t
+    Equals(Int32Type *self, Obj *other);
+}
+
+class KinoSearch::Plan::Int64Type 
+    inherits KinoSearch::Plan::IntType : dumpable {
+
+    public inert Int64Type* 
+    new();
+
+    public inert Int64Type* 
+    init(Int64Type *self);
+
+    inert Int64Type* 
+    init2(Int64Type *self, float boost = 1.0, bool_t indexed = true, 
+          bool_t stored = true, bool_t sortable = false);
+
+    int8_t
+    Primitive_ID(Int64Type *self);
+
+    incremented CharBuf*
+    Specifier(Int64Type *self);
+
+    public bool_t
+    Equals(Int64Type *self, Obj *other);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

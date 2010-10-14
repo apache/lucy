@@ -1,0 +1,29 @@
+parcel KinoSearch cnick Kino;
+
+__C__
+typedef kino_Folder*
+kino_TestFolderCommon_set_up_t(void);
+typedef void
+kino_TestFolderCommon_tear_down_t(void);
+#ifdef KINO_USE_SHORT_NAMES
+  #define TestFolderCommon_set_up_t    kino_TestFolderCommon_set_up_t
+  #define TestFolderCommon_tear_down_t kino_TestFolderCommon_tear_down_t
+#endif
+__END_C__
+
+inert class KinoSearch::Test::Store::TestFolderCommon {
+    inert uint32_t
+    num_tests();
+
+    inert void
+    run_tests(void *test_batch, 
+              kino_TestFolderCommon_set_up_t set_up, 
+              kino_TestFolderCommon_tear_down_t tear_down);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

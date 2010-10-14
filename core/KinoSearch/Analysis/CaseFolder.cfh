@@ -1,0 +1,46 @@
+parcel KinoSearch cnick Kino;
+
+/** Normalize case, facilitating case-insensitive search.
+ *
+ * CaseFolder normalizes text according to Unicode case-folding rules, so that
+ * searches will be case-insensitive.
+ */
+
+class KinoSearch::Analysis::CaseFolder 
+    inherits KinoSearch::Analysis::Analyzer : dumpable {
+
+    ByteBuf *work_buf;
+
+    inert incremented CaseFolder* 
+    new();
+
+    /** Constructor.  Takes no arguments.
+     */
+    public inert CaseFolder* 
+    init(CaseFolder *self);
+
+    public incremented Inversion*
+    Transform(CaseFolder *self, Inversion *inversion);
+
+    public incremented Inversion*
+    Transform_Text(CaseFolder *self, CharBuf *text);
+
+    public bool_t
+    Equals(CaseFolder *self, Obj *other);
+
+    public incremented Hash*
+    Dump(CaseFolder *self);
+
+    public incremented CaseFolder*
+    Load(CaseFolder *self, Obj *dump);
+
+    public void
+    Destroy(CaseFolder *self);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

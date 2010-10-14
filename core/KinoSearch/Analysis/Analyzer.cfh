@@ -1,0 +1,43 @@
+parcel KinoSearch cnick Kino;
+
+/** Tokenize/modify/filter text.
+ *
+ * An Analyzer is a filter which processes text, transforming it from one form
+ * into another.  For instance, an analyzer might break up a long text into
+ * smaller pieces (L<Tokenizer|KinoSearch::Analysis::Tokenizer>), or it might
+ * perform case folding to facilitate case-insensitive search
+ * (L<CaseFolder|KinoSearch::Analysis::CaseFolder>).
+ */
+abstract class KinoSearch::Analysis::Analyzer 
+    inherits KinoSearch::Object::Obj : dumpable {
+
+    public inert Analyzer* 
+    init(Analyzer *self);
+
+    /** Take a single L<Inversion|KinoSearch::Analysis::Inversion> as input
+     * and returns an Inversion, either the same one (presumably transformed
+     * in some way), or a new one.
+     */
+    public abstract incremented Inversion*
+    Transform(Analyzer *self, Inversion *inversion);
+
+    /** Kick off an analysis chain, creating an Inversion from string input.
+     * The default implementation simply creates an initial Inversion with a
+     * single Token, then calls Transform(), but occasionally subclasses will
+     * provide an optimized implementation which minimizes string copies.
+     */
+    public incremented Inversion*
+    Transform_Text(Analyzer *self, CharBuf *text);
+
+    /** Analyze text and return an array of token texts. 
+     */
+    public incremented VArray*
+    Split(Analyzer *self, CharBuf *text);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

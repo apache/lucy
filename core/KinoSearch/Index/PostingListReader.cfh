@@ -1,0 +1,70 @@
+parcel KinoSearch cnick Kino;
+
+/** Read postings data.
+ * 
+ * PostingListReaders produce L<PostingList|KinoSearch::Index::PostingList>
+ * objects which convey document matching information.
+ */
+class KinoSearch::Index::PostingListReader cnick PListReader
+    inherits KinoSearch::Index::DataReader {
+
+    inert PostingListReader*
+    init(PostingListReader *self, Schema *schema = NULL, 
+         Folder *folder = NULL, Snapshot *snapshot = NULL, 
+         VArray *segments = NULL, int32_t seg_tick = -1);
+
+    /** Returns a PostingList, or NULL if either <code>field</code> is NULL or
+     * <code>field</code> is not present in any documents.
+     *   
+     * @param field A field name.
+     * @param term If supplied, the PostingList will be pre-located to this
+     * term using Seek(). 
+     */  
+    public abstract incremented nullable PostingList*
+    Posting_List(PostingListReader *self, const CharBuf *field = NULL,
+                 Obj *term = NULL);
+
+    abstract LexiconReader*
+    Get_Lex_Reader(PostingListReader *self);
+
+    /** Returns NULL since PostingLists may only be iterated at the segment
+     * level.
+     */
+    public incremented nullable PostingListReader*
+    Aggregator(PostingListReader *self, VArray *readers, I32Array *offsets);
+}
+
+class KinoSearch::Index::DefaultPostingListReader cnick DefPListReader
+    inherits KinoSearch::Index::PostingListReader {
+
+    LexiconReader *lex_reader;
+
+    inert incremented DefaultPostingListReader*
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+        int32_t seg_tick, LexiconReader *lex_reader);
+
+    inert DefaultPostingListReader*
+    init(DefaultPostingListReader *self, Schema *schema, Folder *folder,
+         Snapshot *snapshot, VArray *segments, int32_t seg_tick, 
+         LexiconReader *lex_reader);
+
+    public incremented nullable SegPostingList*
+    Posting_List(DefaultPostingListReader *self, const CharBuf *field = NULL,
+                 Obj *term = NULL);
+
+    LexiconReader*
+    Get_Lex_Reader(DefaultPostingListReader *self);
+
+    public void
+    Close(DefaultPostingListReader *self);
+
+    public void
+    Destroy(DefaultPostingListReader *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

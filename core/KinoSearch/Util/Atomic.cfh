@@ -1,0 +1,88 @@
+parcel KinoSearch cnick Kino;
+
+/** Provide atomic memory operations.
+ */
+inert class KinoSearch::Util::Atomic { }
+
+__C__
+
+/** Compare and swap a pointer.  Test whether the value at <code>target</code>
+ * matches <code>old_value</code>.  If it does, set <code>target</code> to
+ * <code>new_value</code> and return true.  Otherwise, return false.
+ */
+static CHY_INLINE chy_bool_t
+kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
+
+/************************** Mac OS X 10.4 and later ***********************/
+#ifdef CHY_HAS_OSATOMIC_CAS_PTR
+#include <libkern/OSAtomic.h>
+
+static CHY_INLINE chy_bool_t
+kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+{
+    return OSAtomicCompareAndSwapPtr(old_value, new_value, target);
+}
+
+/********************************** Windows *******************************/
+#elif defined(CHY_HAS_WINDOWS_H)
+
+chy_bool_t
+kino_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value, 
+                            void *new_value);
+
+static CHY_INLINE chy_bool_t
+kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+{
+    return kino_Atomic_wrapped_cas_ptr(target, old_value, new_value);
+}
+
+/**************************** Solaris 10 and later ************************/
+#elif defined(CHY_HAS_SYS_ATOMIC_H)
+#include <sys/atomic.h>
+
+static CHY_INLINE chy_bool_t
+kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+{
+    return atomic_cas_ptr(target, old_value, new_value) == old_value;
+}
+
+/************************ Fall back to pthread.h. **************************/
+#elif defined(CHY_HAS_PTHREAD_H)
+#include <pthread.h>
+
+extern pthread_mutex_t kino_Atomic_mutex;
+
+static CHY_INLINE chy_bool_t
+kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+{
+    pthread_mutex_lock(&kino_Atomic_mutex);
+    if (*target == old_value) {
+        *target = new_value;
+        pthread_mutex_unlock(&kino_Atomic_mutex);
+        return true;
+    }
+    else {
+        pthread_mutex_unlock(&kino_Atomic_mutex);
+        return false;
+    }
+}
+
+/******************** No support for atomics at all. ***********************/
+#else
+
+#error No support for atomic operations.
+
+#endif // Big platform if-else chain. 
+
+#ifdef KINO_USE_SHORT_NAMES
+  #define Atomic_cas_ptr kino_Atomic_cas_ptr
+#endif
+
+__END_C__
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

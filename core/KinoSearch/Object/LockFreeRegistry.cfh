@@ -1,0 +1,34 @@
+parcel KinoSearch cnick Kino;
+
+/** Specialized lock free hash table for storing VTables.
+ */
+class KinoSearch::Object::LockFreeRegistry cnick LFReg inherits KinoSearch::Object::Obj {
+
+    size_t  capacity;
+    void   *entries;
+
+    inert incremented LockFreeRegistry*
+    new(size_t capacity);
+
+    inert LockFreeRegistry*
+    init(LockFreeRegistry *self, size_t capacity);
+
+    public void
+    Destroy(LockFreeRegistry *self);
+
+    bool_t
+    Register(LockFreeRegistry *self, Obj *key, Obj *value);
+
+    nullable Obj*
+    Fetch(LockFreeRegistry *self, Obj *key);
+    
+    void*
+    To_Host(LockFreeRegistry *self);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

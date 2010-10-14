@@ -1,0 +1,29 @@
+parcel KinoSearch cnick Kino;
+
+/** A portion of a file, viewed as an array of bytes.
+ */
+class KinoSearch::Store::FileWindow inherits KinoSearch::Object::Obj {
+
+    char    *buf;
+    int64_t  offset;
+    int64_t  len;
+
+    inert FileWindow*
+    init(FileWindow *self);
+
+    inert incremented FileWindow*
+    new();
+
+    void
+    Set_Offset(FileWindow *self, int64_t offset);
+
+    void
+    Set_Window(FileWindow *self, char *buf, int64_t offset, int64_t len);
+}
+
+/* Copyright 2008-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

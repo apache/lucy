@@ -1,0 +1,81 @@
+parcel KinoSearch cnick Kino;
+
+/** Match a range of values.
+ *
+ * RangeQuery matches documents where the value for a particular field falls
+ * within a given range.
+ */
+
+class KinoSearch::Search::RangeQuery inherits KinoSearch::Search::Query 
+    : dumpable {
+
+    CharBuf  *field;
+    Obj      *lower_term;
+    Obj      *upper_term;
+    bool_t    include_lower;
+    bool_t    include_upper;
+
+    inert incremented RangeQuery*
+    new(const CharBuf *field, Obj *lower_term = NULL, Obj *upper_term = NULL,
+        bool_t include_lower = true, bool_t include_upper = true);
+
+    /** Takes 5 parameters; <code>field</code> is required, as 
+     * is at least one of either <code>lower_term</code> or 
+     * <code>upper_term</code>.
+     * 
+     * @param field The name of a <code>sortable</code> field.
+     * @param lower_term Lower delimiter.  If not supplied, all values
+     * less than <code>upper_term</code> will pass.
+     * @param upper_term Upper delimiter.  If not supplied, all values greater
+     * than <code>lower_term</code> will pass.
+     * @param include_lower Indicates whether docs which match
+     * <code>lower_term</code> should be included in the results.
+     * @param include_upper Indicates whether docs which match
+     * <code>upper_term</code> should be included in the results.
+     */
+    public inert RangeQuery*
+    init(RangeQuery *self, const CharBuf *field, 
+         Obj *lower_term = NULL, Obj *upper_term = NULL, 
+         bool_t include_lower = true, bool_t include_upper = true);
+
+    public bool_t
+    Equals(RangeQuery *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(RangeQuery *self);
+
+    public incremented RangeCompiler*
+    Make_Compiler(RangeQuery *self, Searcher *searcher, float boost);
+
+    public void
+    Serialize(RangeQuery *self, OutStream *outstream);
+
+    public incremented RangeQuery*
+    Deserialize(RangeQuery *self, InStream *instream);
+
+    public void
+    Destroy(RangeQuery *self);
+}
+
+class KinoSearch::Search::RangeCompiler inherits KinoSearch::Search::Compiler {
+
+    inert incremented RangeCompiler*
+    new(RangeQuery *parent, Searcher *searcher, float boost);
+
+    inert RangeCompiler*
+    init(RangeCompiler *self, RangeQuery *parent, Searcher *searcher, 
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(RangeCompiler *self, SegReader *reader, bool_t need_score);
+
+    public incremented RangeCompiler*
+    Deserialize(RangeCompiler *self, InStream *instream);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

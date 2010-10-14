@@ -1,0 +1,72 @@
+parcel KinoSearch cnick Kino;
+
+/** 
+ * Abstract encoder/decoder.
+ * 
+ * Many KinoSearch files consist of a single variable length record type
+ * repeated over and over.  A Stepper both reads and writes such a file.
+ * 
+ * Since the write algorithms for different Stepper types may require
+ * differing argument lists, it is left to the subclass to define the routine.
+ * 
+ * Sometimes it is possible to change a file's format by changing only a
+ * Stepper.  In that case, a compatibility version of the old class may be
+ * squirreled away as a plugin, to be accessed only when reading files written
+ * to the old format.  This cuts down on special-case code in the most current
+ * version.
+ * 
+ * Furthermore, isolating I/O code within a Stepper typically clarifies the
+ * logic of the class which calls Stepper_Read_Record.
+ */
+
+class KinoSearch::Util::Stepper inherits KinoSearch::Object::Obj {
+
+    inert Stepper*
+    init(Stepper *self);
+    
+    public abstract void 
+    Reset(Stepper* self);
+
+    /** Update internal state to reflect <code>value</code> and write a frame
+     * to <code>outstream</code> that can be read using Read_Key_Frame().
+     * 
+     * @param outstream An OutStream.
+     * @param value State information.
+     */
+    public abstract void
+    Write_Key_Frame(Stepper *self, OutStream *outstream, Obj *value);
+
+    /** Update internal state to reflect <code>value</code> and write a frame
+     * to <code>outstream</code> that can be read using Read_Delta().
+     *
+     * @param outstream An OutStream.
+     * @param value State information.
+     */
+    public abstract void
+    Write_Delta(Stepper *self, OutStream *outstream, Obj *value);
+
+    /** Update intern state using information read from <code>instream</code>.
+     *
+     * @param instream An InStream.
+     */
+    public abstract void
+    Read_Key_Frame(Stepper *self, InStream *instream);
+
+    /** Update state using a combination of information from
+     * <code>instream</code> and the current internal state.
+     */
+    public abstract void
+    Read_Delta(Stepper *self, InStream *instream);
+
+    /** Read the next record from the instream, storing state in [self].
+     */
+    abstract void
+    Read_Record(Stepper *self, InStream *instream);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

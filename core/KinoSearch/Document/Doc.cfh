@@ -1,0 +1,88 @@
+parcel KinoSearch cnick Kino;
+
+/** A document.
+ * 
+ * A Doc object is akin to a row in a database, in that it is made up of one
+ * or more fields, each of which has a value.
+ */
+
+public class KinoSearch::Document::Doc inherits KinoSearch::Object::Obj 
+    : dumpable {
+
+    void        *fields;
+    int32_t      doc_id;
+
+    inert incremented Doc*
+    new(void *fields = NULL, int32_t doc_id = 0);
+
+    /** 
+     * @param fields Field-value pairs.
+     * @param doc_id Internal KinoSearch document id.  Default of 0.
+     */
+    public inert Doc* 
+    init(Doc *self, void *fields = NULL, int32_t doc_id = 0);
+
+    void
+    Set_Doc_ID(Doc *self, int32_t doc_id);
+
+    int32_t
+    Get_Doc_ID(Doc *self);
+
+    /** Store a field value in the Doc.
+     */
+    void
+    Store(Doc *self, const CharBuf *field, Obj *value);
+
+    /** Set the doc's field's attribute.
+     */
+    void
+    Set_Fields(Doc *self, void *fields);
+    
+    /** Return the Doc's backing fields hash.
+     */
+    public nullable void*
+    Get_Fields(Doc *self);
+
+    /** Return the number of fields in the Doc.
+     */
+    public uint32_t
+    Get_Size(Doc *self);
+
+    /** Retrieve the field's value, or NULL if the field is not present.  If
+     * the field is a text type, assign it to <code>target</code>.  Otherwise,
+     * return the interior object.  Callers must check to verify the kind of
+     * object returned.
+     */
+    nullable Obj*
+    Extract(Doc *self, CharBuf *field, ViewCharBuf *target);
+
+    /* Unimplemented methods.
+     */
+    public bool_t
+    Equals(Doc *self, Obj *other);
+
+    public void
+    Serialize(Doc *self, OutStream *outstream);
+
+    public incremented Doc*
+    Deserialize(Doc *self, InStream *instream);
+
+    public incremented Hash*
+    Dump(Doc *self);
+
+    public incremented Doc*
+    Load(Doc *self, Obj *dump);
+
+    void*
+    To_Host(Doc *self);
+
+    public void
+    Destroy(Doc *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

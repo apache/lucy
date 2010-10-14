@@ -1,0 +1,224 @@
+parcel KinoSearch cnick Kino;
+
+/** Abstract base class for numbers.
+ */
+abstract class KinoSearch::Object::Num inherits KinoSearch::Object::Obj {
+
+    inert Num*
+    init(Num *self);
+
+    public bool_t
+    Equals(Num *self, Obj *other);
+
+    public int32_t
+    Compare_To(Num *self, Obj *other);
+}
+
+/** Abstract base class for floating point numbers. 
+ */
+abstract class KinoSearch::Object::FloatNum inherits KinoSearch::Object::Num {
+
+    inert FloatNum*
+    init(FloatNum *self);
+
+    public incremented CharBuf*
+    To_String(FloatNum *self);
+}
+
+
+/** Abstract base class for Integers. 
+ */
+abstract class KinoSearch::Object::IntNum inherits KinoSearch::Object::Num {
+
+    inert IntNum*
+    init(IntNum *self);
+
+    public incremented CharBuf*
+    To_String(IntNum *self);
+}
+
+
+/** Single precision floating point number.
+ */
+class KinoSearch::Object::Float32 inherits KinoSearch::Object::FloatNum {
+
+    float value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Float32*
+    init(Float32* self, float value);
+
+    inert Float32*
+    new(float value);
+
+    void
+    Set_Value(Float32 *self, float value);
+
+    float 
+    Get_Value(Float32 *self);
+
+    public int64_t
+    To_I64(Float32 *self);
+
+    public double
+    To_F64(Float32 *self);
+
+    public int32_t
+    Hash_Sum(Float32 *self);
+
+    public void
+    Serialize(Float32 *self, OutStream *outstream);
+
+    public incremented Float32*
+    Deserialize(Float32 *self, InStream *instream);
+
+    public incremented Float32*
+    Clone(Float32 *self);
+
+    public void
+    Mimic(Float32 *self, Obj *other);
+}
+
+/** Double precision floating point number.
+ */
+class KinoSearch::Object::Float64 inherits KinoSearch::Object::FloatNum {
+
+    double value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Float64*
+    init(Float64* self, double value);
+
+    inert Float64*
+    new(double value);
+
+    void
+    Set_Value(Float64 *self, double value);
+
+    double
+    Get_Value(Float64 *self);
+
+    public int64_t
+    To_I64(Float64 *self);
+
+    public double
+    To_F64(Float64 *self);
+
+    public int32_t
+    Hash_Sum(Float64 *self);
+
+    public void
+    Serialize(Float64 *self, OutStream *outstream);
+
+    public incremented Float64*
+    Deserialize(Float64 *self, InStream *instream);
+
+    public incremented Float64*
+    Clone(Float64 *self);
+
+    public void
+    Mimic(Float64 *self, Obj *other);
+}
+
+/** 32-bit signed integer.
+ */
+class KinoSearch::Object::Integer32 cnick Int32 
+    inherits KinoSearch::Object::IntNum {
+
+    int32_t value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Integer32*
+    init(Integer32* self, int32_t value);
+
+    inert Integer32*
+    new(int32_t value);
+
+    void
+    Set_Value(Integer32 *self, int32_t value);
+
+    int32_t 
+    Get_Value(Integer32 *self);
+
+    public int64_t
+    To_I64(Integer32 *self);
+
+    public double
+    To_F64(Integer32 *self);
+
+    public int32_t
+    Hash_Sum(Integer32 *self);
+
+    public void
+    Serialize(Integer32 *self, OutStream *outstream);
+
+    public incremented Integer32*
+    Deserialize(Integer32 *self, InStream *instream);
+
+    public incremented Integer32*
+    Clone(Integer32 *self);
+
+    public void
+    Mimic(Integer32 *self, Obj *other);
+}
+
+/**
+ * 64-bit signed integer.
+ */
+class KinoSearch::Object::Integer64 cnick Int64 
+    inherits KinoSearch::Object::IntNum {
+
+    int64_t value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Integer64*
+    init(Integer64* self, int64_t value);
+
+    inert Integer64*
+    new(int64_t value);
+
+    void
+    Set_Value(Integer64 *self, int64_t value);
+
+    int64_t 
+    Get_Value(Integer64 *self);
+
+    public int64_t
+    To_I64(Integer64 *self);
+
+    public double
+    To_F64(Integer64 *self);
+
+    public int32_t
+    Hash_Sum(Integer64 *self);
+
+    public bool_t
+    Equals(Integer64 *self, Obj *other);
+
+    public void
+    Serialize(Integer64 *self, OutStream *outstream);
+
+    public incremented Integer64*
+    Deserialize(Integer64 *self, InStream *instream);
+
+    public incremented Integer64*
+    Clone(Integer64 *self);
+
+    public void
+    Mimic(Integer64 *self, Obj *other);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

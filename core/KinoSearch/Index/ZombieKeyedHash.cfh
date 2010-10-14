@@ -1,0 +1,26 @@
+parcel KinoSearch cnick Kino;
+
+/** Hash which creates keys allocated from a MemoryPool rather than malloc.
+ */
+class KinoSearch::Index::SortFieldWriter::ZombieKeyedHash cnick ZKHash
+    inherits KinoSearch::Object::Hash {
+
+    MemoryPool *mem_pool;
+    uint8_t     prim_id;
+
+    inert incremented ZombieKeyedHash*
+    new(MemoryPool *memory_pool, uint8_t primitive_id);
+
+    public void
+    Destroy(ZombieKeyedHash *self);
+
+    public incremented Obj*
+    Make_Key(ZombieKeyedHash *self, Obj *key, int32_t hash_sum);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

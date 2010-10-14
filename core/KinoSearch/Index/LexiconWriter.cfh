@@ -1,0 +1,83 @@
+parcel KinoSearch cnick Kino;
+
+/** Writer for a term dictionary.
+ */
+class KinoSearch::Index::LexiconWriter cnick LexWriter
+    inherits KinoSearch::Index::DataWriter {
+
+    TermStepper      *term_stepper;
+    TermStepper      *tinfo_stepper;
+    CharBuf          *dat_file;
+    CharBuf          *ix_file;
+    CharBuf          *ixix_file;
+    OutStream        *dat_out;
+    OutStream        *ix_out;
+    OutStream        *ixix_out;
+    Hash             *counts;
+    Hash             *ix_counts;
+    bool_t            temp_mode;
+    int32_t           index_interval;
+    int32_t           skip_interval;
+    int32_t           count;
+    int32_t           ix_count;
+
+    inert int32_t current_file_format;
+
+    inert incremented LexiconWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader);
+
+    inert LexiconWriter* 
+    init(LexiconWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    /** Prepare to write the .lex and .lexx files for a field.
+     */
+    void
+    Start_Field(LexiconWriter *self, int32_t field_num);
+
+    /** Finish writing the current field.  Close files, generate metadata.
+     */
+    void
+    Finish_Field(LexiconWriter *self, int32_t field_num);
+
+    /** Prepare to write terms to a temporary file.
+     */
+    void
+    Enter_Temp_Mode(LexiconWriter *self, const CharBuf *field, 
+                    OutStream *temp_outstream);
+
+    /** Stop writing terms to temp file.  Abandon (but don't close) the file.
+     */
+    void
+    Leave_Temp_Mode(LexiconWriter *self);
+
+    /** Add a Term's text and its associated TermInfo (which has the Term's 
+     * field number).
+     */
+    void
+    Add_Term(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo);
+
+    public void
+    Add_Segment(LexiconWriter *self, SegReader *reader, 
+                I32Array *doc_map = NULL);
+
+    public incremented Hash*
+    Metadata(LexiconWriter *self);
+
+    public int32_t
+    Format(LexiconWriter *self);
+
+    public void
+    Finish(LexiconWriter *self);
+
+    public void
+    Destroy(LexiconWriter *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

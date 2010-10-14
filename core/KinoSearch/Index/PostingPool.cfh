@@ -1,0 +1,94 @@
+parcel KinoSearch cnick Kino;
+
+/**
+ * External sorter for raw postings.
+ */
+class KinoSearch::Index::PostingPool cnick PostPool
+    inherits KinoSearch::Util::SortExternal {
+
+    Schema            *schema;
+    Snapshot          *snapshot;
+    Segment           *segment;
+    PolyReader        *polyreader;
+    CharBuf           *field;
+    LexiconWriter     *lex_writer;
+    Lexicon           *lexicon;
+    PostingList       *plist;
+    MemoryPool        *mem_pool;
+    I32Array          *doc_map;
+    int32_t            field_num;
+    int32_t            doc_base;
+    int32_t            last_doc_id;
+    uint32_t           post_count;
+    OutStream         *lex_temp_out;
+    OutStream         *post_temp_out;
+    OutStream         *skip_out;
+    InStream          *lex_temp_in;
+    InStream          *post_temp_in;
+    FieldType         *type;
+    Posting           *posting;
+    SkipStepper       *skip_stepper;
+    int64_t            lex_start;
+    int64_t            post_start;
+    int64_t            lex_end;
+    int64_t            post_end;
+
+    inert incremented PostingPool*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment, 
+        PolyReader *polyreader, const CharBuf *field, 
+        LexiconWriter *lex_writer, MemoryPool *mem_pool, 
+        OutStream *lex_temp_out, OutStream *post_temp_out, 
+        OutStream *skip_out);
+
+    inert PostingPool*
+    init(PostingPool *self, Schema *schema, Snapshot *snapshot, 
+         Segment *segment, PolyReader *polyreader, const CharBuf *field, 
+         LexiconWriter *lex_writer, MemoryPool *mem_pool, 
+         OutStream *lex_temp_out, OutStream *post_temp_out, 
+         OutStream *skip_out);
+
+    /** Add a field's inverted content.
+     */
+    void
+    Add_Inversion(PostingPool *self, Inversion *inversion, int32_t doc_id, 
+                  float doc_boost, float length_norm);
+
+    /** Reduce RAM footprint as much as possible. 
+     */
+    void
+    Shrink(PostingPool *self);
+
+    MemoryPool*
+    Get_Mem_Pool(PostingPool *self);
+
+    void
+    Add_Segment(PostingPool *self, SegReader *reader, I32Array *doc_map, 
+                int32_t doc_base);
+
+    void
+    Flip(PostingPool *self);
+
+    uint32_t
+    Refill(PostingPool *self);
+
+    /** Compares two non-NULL RawPosting objects.
+     */
+    int
+    Compare(PostingPool *self, void *va, void *vb);
+
+    void
+    Finish(PostingPool *self);
+
+    void
+    Flush(PostingPool *self);
+
+    public void
+    Destroy(PostingPool *self);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

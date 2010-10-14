@@ -1,0 +1,50 @@
+parcel KinoSearch cnick Kino;
+
+/** Test case object for QueryParser unit tests. 
+ */
+
+class KinoSearch::Test::TestQueryParser cnick TestQP
+    inherits KinoSearch::Object::Obj {
+
+    CharBuf *query_string;
+    Query   *tree;
+    Query   *expanded;
+    uint32_t num_hits;
+
+    /** Note that unlike most KS constructors, this routine will consume one
+     * reference count each for <code>tree</code>, and <code>expanded</code>.
+     */
+    inert incremented TestQueryParser*
+    new(const char *query_string = NULL, Query *tree = NULL, 
+        Query *expanded = NULL, uint32_t num_hits);
+
+    inert TestQueryParser*
+    init(TestQueryParser *self, const char *query_string = NULL, 
+         Query *tree = NULL, Query *expanded = NULL, uint32_t num_hits);
+
+    nullable CharBuf*
+    Get_Query_String(TestQueryParser *self);
+
+    nullable Query*
+    Get_Tree(TestQueryParser *self);
+
+    nullable Query*
+    Get_Expanded(TestQueryParser *self);
+
+    uint32_t
+    Get_Num_Hits(TestQueryParser *self);
+
+    public void
+    Destroy(TestQueryParser *self);
+}
+
+__C__
+
+__END_C__
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

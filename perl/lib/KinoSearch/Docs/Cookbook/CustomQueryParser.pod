@@ -1,0 +1,350 @@
+=head1 NAME
+
+KinoSearch::Docs::Cookbook::CustomQueryParser - Sample subclass of
+QueryParser.
+
+=head1 ABSTRACT
+
+Implement a custom search query language using
+L<KinoSearch::Search::QueryParser> and L<Parse::RecDescent>.
+
+=head1 Grammar-based vs. hand-rolled
+
+There are two classic strategies for writing a text parser.
+
+=over
+
+=item 1
+
+Create a grammar-based parser using Perl modules like Parse::RecDescent or
+Parse::YAPP, C utilities like lex and yacc, etc.
+
+=item 2
+
+Hand-roll your own parser.
+
+=back
+
+We'll start off with hand-rolling, but we'll ultimately move to the
+grammar-based parsing technique because of its superior flexibility.
+
+=head1 The language
+
+At first, our query language will support only simple term queries and phrases
+delimited by double quotes.  For simplicity's sake, it will not support
+parenthetical groupings, boolean operators, or prepended plus/minus.  The
+results for all subqueries will be unioned together -- i.e. joined using an OR
+-- which is usually the best approach for small-to-medium-sized document
+collections.
+
+Later, we'll add support for trailing wildcards.
+
+=head1 Single-field regex-based parser
+
+Hand-rolling a parser can be labor-intensive, but our proposed query language
+is simple enough that chewing up the query string with some simple regular
+expressions will do the trick.
+
+We'll use a fixed field name of "content", and a fixed choice of English
+PolyAnalyzer.
+
+    package FlatQueryParser;
+    use KinoSearch::Search::TermQuery;
+    use KinoSearch::Search::PhraseQuery;
+    use KinoSearch::Search::ORQuery;
+    use Carp;
+    
+    sub new { 
+        my $analyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+            language => 'en',
+        );
+        return bless { 
+            field    => 'content',
+            analyzer => $analyzer,
+        }, __PACKAGE__;
+    }
+
+Some private helper subs for creating TermQuery and PhraseQuery objects will
+help keep the size of our main parse() subroutine down:
+
+    sub _make_term_query {
+        my ( $self, $term ) = @_;
+        return KinoSearch::Search::TermQuery->new(
+            field => $self->{field},
+            term  => $term,
+        );
+    }
+    
+    sub _make_phrase_query {
+        my ( $self, $terms ) = @_;
+        return KinoSearch::Search::PhraseQuery->new(
+            field => $self->{field},
+            terms => $terms,
+        );
+    }
+
+Our private _tokenize() method treats double-quote delimited material as a
+single token and splits on whitespace everywhere else.
+
+    sub _tokenize {
+        my ( $self, $query_string ) = @_;
+        my @tokens;
+        while ( length $query_string ) {
+            if ( $query_string =~ s/^\s*// ) {
+                next;    # skip whitespace
+            }
+            elsif ( $query_string =~ s/^("[^"]*(?:"|$))// ) {
+                push @tokens, $1;    # double-quoted phrase
+            }
+            else {
+                $query_string =~ s/(\S+)//;
+                push @tokens, $1;    # single word
+            }
+        }
+        return \@tokens;
+    }
+
+The main parsing routine creates an array of tokens by calling _tokenize(),
+runs the tokens through through the PolyAnalyzer, creates TermQuery or
+PhraseQuery objects according to how many tokens emerge from the
+PolyAnalyzer's split() method, and adds each of the sub-queries to the primary
+ORQuery.
+
+    sub parse {
+        my ( $self, $query_string ) = @_;
+        my $tokens   = $self->_tokenize($query_string);
+        my $analyzer = $self->{analyzer};
+        my $or_query = KinoSearch::Search::ORQuery->new;
+    
+        for my $token (@$tokens) {
+            if ( $token =~ s/^"// ) {
+                $token =~ s/"$//;
+                my $terms = $analyzer->split($token);
+                my $query = $self->_make_phrase_query($terms);
+                $or_query->add_child($phrase_query);
+            }
+            else {
+                my $terms = $analyzer->split($token);
+                if ( @$terms == 1 ) {
+                    my $query = $self->_make_term_query( $terms->[0] );
+                    $or_query->add_child($query);
+                }
+                elsif ( @$terms > 1 ) {
+                    my $query = $self->_make_phrase_query($terms);
+                    $or_query->add_child($query);
+                }
+            }
+        }
+    
+        return $or_query;
+    }
+
+=head1 Single-field Parse::RecDescent-based parser
+
+Instead of using regular expressions to tokenize the string, we can use
+Parse::RecDescent.
+
+    my $grammar = <<'END_GRAMMAR';
+    
+    leaf_queries:
+        leaf_query(s?)
+        { $item{'leaf_query(s?)'} }
+    
+    leaf_query:
+          phrase_query
+        | term_query
+    
+    term_query:
+        /(\S+)/
+        { $1 }
+    
+    phrase_query:
+        /("[^"]*(?:"|$))/   # terminated by either quote or end of string
+        { $1 }
+    
+    END_GRAMMAR
+    
+    sub new { 
+        my $analyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+            language => 'en',
+        );
+        my $rd_parser = Parse::RecDescent->new($grammar);
+        return bless { 
+            field     => 'content',
+            analyzer  => $analyzer,
+            rd_parser => $rd_parser,
+        }, __PACKAGE__;
+    }
+
+The behavior of a Parse::RecDescent parser based on the grammar above is
+exactly the same as that of our regex-based tokenization routine from before,
+so we can leave parse() intact and simply change _tokenize():
+
+    sub _tokenize {
+        my ( $self, $query_string ) = @_;
+        return $self->{rd_parser}->leaf_queries($query_string);
+    }
+
+=head1 Multi-field Parse::RecDescent-based parser
+
+Most often, the end user will want their search query to match not only a
+single 'content' field, but also 'title' and so on.  To make that happen, we
+have to turn queries such as this...
+
+    foo AND NOT bar
+
+... into the logical equivalent of this:
+
+    (title:foo OR content:foo) AND NOT (title:bar OR content:bar)
+
+Rather than continue with our own from-scratch parser class and write the
+routines to accomplish that expansion, we're now going to subclass QueryParser
+and take advantage of some of its existing methods.
+
+Our first parser implementation had the "content" field name and the choice of
+English PolyAnalyzer hard-coded for simplicity, but we don't need to do that
+this time -- QueryParser's constructor requires a Schema which conveys field
+and Analyzer information, so we can just defer to that.
+
+    package FlatQueryParser;
+    use base qw( KinoSearch::Search::QueryParser );
+    use KinoSearch::Search::TermQuery;
+    use KinoSearch::Search::PhraseQuery;
+    use KinoSearch::Search::ORQuery;
+    use KinoSearch::Search::NoMatchQuery;
+    use PrefixQuery;
+    use Parse::RecDescent;
+    use Carp;
+    
+    our %rd_parser;
+    
+    sub new { 
+        my $class = shift;
+        my $self = $class->SUPER::new(@_);
+        $rd_parser{$$self} = Parse::RecDescent->new($grammar);
+        return $self;
+    }
+    
+    sub DESTROY {
+        my $self = shift;
+        delete $rd_parser{$$self};
+        $self->SUPER::DESTROY;
+    }
+
+If we modify our Parse::RecDescent grammar slightly, we can eliminate the
+_tokenize(), _make_term_query(), and _make_phrase_query() helper subs, and our
+parse() subroutine can be chopped way down.  We'll have the C<term_query> and
+C<phrase_query> productions generate LeafQuery objects, and add a C<tree>
+production which joins the leaves together with an ORQuery.
+
+    my $grammar = <<'END_GRAMMAR';
+    
+    tree:
+        leaf_queries
+        { 
+            $return = KinoSearch::Search::ORQuery->new;
+            $return->add_child($_) for @{ $item[1] };
+        }
+    
+    leaf_queries:
+        leaf_query(s?)
+        { $item{'leaf_query(s)'} }
+    
+    leaf_query:
+          phrase_query
+        | term_query
+    
+    term_query:
+        /(\S+)/
+        { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+    
+    phrase_query:
+        /("[^"]*(?:"|$))/   # terminated by either quote or end of string
+        { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+    
+    END_GRAMMAR
+    
+    ...
+    
+    sub parse {
+        my ( $self, $query_string ) = @_; 
+        my $tree = $self->tree($query_string);
+        return $tree ? $self->expand($tree) :
+        KinoSearch::Search::NoMatchQuery->new;
+    }
+    
+    sub tree {
+        my ( $self, $query_string ) = @_; 
+        return $rd_parser{$$self}->tree($query_string);
+    }
+
+
+The magic happens in QueryParser's expand() method, which walks the ORQuery
+object we supply to it looking for LeafQuery objects, and calls expand_leaf()
+for each one it finds.  expand_leaf() performs field-specific analysis,
+decides whether each query should be a TermQuery or a PhraseQuery, and if
+multiple fields are required, creates an ORQuery which mults out e.g.  C<foo>
+into C<(title:foo OR content:foo)>.
+
+=head1 Extending the query language
+
+To add support for trailing wildcards to our query language, first we need to
+modify our grammar, adding a C<prefix_query> production and tweaking the
+C<leaf_query> production to accommodate it.
+
+    leaf_query:
+          phrase_query
+        | prefix_query
+        | term_query
+    
+    prefix_query:
+        /(\w+\*)/
+        { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+
+Second, we need to override expand_leaf() to accommodate PrefixQuery,
+while deferring to its original implementation on TermQuery and
+PhraseQuery.
+
+    sub expand_leaf {
+        my ( $self, $leaf_query ) = @_;
+        my $text = $leaf_query->get_text;
+        if ( $text =~ /\*$/ ) {
+            my $or_query = KinoSearch::Search::ORQuery->new;
+            for my $field ( @{ $self->get_fields } ) {
+                my $prefix_query = PrefixQuery->new(
+                    field        => $field,
+                    query_string => $text,
+                );
+                $or_query->add_child($prefix_query);
+            }
+            return $or_query;
+        }
+        else {
+            return $self->SUPER::expand_leaf($leaf_query);
+        }
+    }
+
+=head1 Usage
+
+Insert any of our custom parsers into the search.cgi sample app to get a feel
+for how they behave:
+
+    my $parser = FlatQueryParser->new( schema => $searcher->get_schema );
+    my $query  = $parser->parse( $cgi->param('q') || '' );
+    my $hits   = $searcher->hits(
+        query      => $query,
+        offset     => $offset,
+        num_wanted => $hits_per_page,
+    );
+    ...
+
+=head1 COPYRIGHT
+
+Copyright 2008-2010 Marvin Humphrey
+
+=head1 LICENSE, DISCLAIMER, BUGS, etc.
+
+See L<KinoSearch> version 0.30.
+
+=cut
+

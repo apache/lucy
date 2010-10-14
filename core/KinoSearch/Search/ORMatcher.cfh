@@ -1,0 +1,92 @@
+parcel KinoSearch cnick Kino;
+
+__C__
+#include "KinoSearch/Search/Matcher.h"
+
+/* A wrapper for a Matcher which caches the result of Matcher_Get_Doc_ID().
+ */
+typedef struct kino_HeapedMatcherDoc {
+    kino_Matcher *matcher;
+    int32_t   doc;
+} kino_HeapedMatcherDoc;
+
+#ifdef KINO_USE_SHORT_NAMES
+  #define HeapedMatcherDoc              kino_HeapedMatcherDoc
+#endif
+
+__END_C__
+
+/** Matcher which unions the doc id sets of other Matchers using a priority
+ * queue.
+ */
+
+class KinoSearch::Search::ORMatcher inherits KinoSearch::Search::PolyMatcher {
+
+    HeapedMatcherDoc **heap;
+    HeapedMatcherDoc **pool;    /* Pool of HMDs to minimize mallocs */
+    char              *blob;    /* single allocation for all HMDs */
+    HeapedMatcherDoc  *top_hmd; /* cached top elem */
+    uint32_t           size;
+    uint32_t           max_size;
+
+    inert incremented ORMatcher*
+    new(VArray *children);
+
+    /** 
+     * @param children An array of Matchers.
+     */
+    inert incremented ORMatcher*
+    init(ORMatcher *self, VArray *children);
+
+    public void
+    Destroy(ORMatcher *self);
+
+    public int32_t
+    Next(ORMatcher *self);
+
+    public int32_t
+    Advance(ORMatcher *self, int32_t target);
+
+    public int32_t 
+    Get_Doc_ID(ORMatcher *self);
+}
+
+/**
+ * Union results of multiple Matchers.
+ * 
+ * ORScorer collates the output of multiple subscorers, summing their scores
+ * whenever they match the same document.
+ */
+class KinoSearch::Search::ORScorer inherits KinoSearch::Search::ORMatcher {
+
+    float            *scores;
+    int32_t           doc_id;
+
+    inert incremented ORScorer* 
+    new(VArray *children, Similarity *similarity);
+
+    inert ORScorer* 
+    init(ORScorer *self, VArray *children, Similarity *similarity);
+
+    public void
+    Destroy(ORScorer *self);
+
+    public int32_t
+    Next(ORScorer *self);
+
+    public int32_t
+    Advance(ORScorer *self, int32_t target);
+
+    public float
+    Score(ORScorer *self);
+
+    public int32_t 
+    Get_Doc_ID(ORScorer *self);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

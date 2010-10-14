@@ -1,0 +1,23 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Search::NoMatchScorer inherits KinoSearch::Search::Matcher {
+
+    inert incremented NoMatchScorer*
+    new();
+
+    inert NoMatchScorer*
+    init(NoMatchScorer *self);
+
+    public int32_t
+    Next(NoMatchScorer* self);
+
+    public int32_t
+    Advance(NoMatchScorer* self, int32_t target);
+}
+
+/* Copyright 2008-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

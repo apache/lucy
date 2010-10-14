@@ -1,0 +1,38 @@
+parcel KinoSearch cnick Kino;
+
+/** SortCache for TextType fields.
+ */
+class KinoSearch::Index::SortCache::TextSortCache 
+    inherits KinoSearch::Index::SortCache {
+
+    InStream  *ord_in;
+    InStream  *ix_in;
+    InStream  *dat_in;
+
+    inert incremented TextSortCache*
+    new(const CharBuf *field, FieldType *type, int32_t cardinality, 
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width, 
+        InStream *ord_in, InStream *ix_in, InStream *dat_in);
+
+    inert TextSortCache*
+    init(TextSortCache *self, const CharBuf *field, FieldType *type, 
+         int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+         int32_t ord_width, InStream *ord_in, InStream *ix_in, 
+         InStream *dat_in);
+
+    public nullable Obj*
+    Value(TextSortCache *self, int32_t ord, Obj *blank);
+
+    public incremented CharBuf*
+    Make_Blank(TextSortCache *self);
+
+    public void
+    Destroy(TextSortCache *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

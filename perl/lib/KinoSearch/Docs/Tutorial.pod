@@ -1,0 +1,81 @@
+=head1 NAME
+
+KinoSearch::Docs::Tutorial - Step-by-step introduction to KinoSearch toolset.
+
+=head1 ABSTRACT 
+
+Explore KinoSearch's basic functionality by starting with a minimalist CGI
+search app based on L<KSx::Simple> and transforming it, step by step, into an
+"advanced search" interface utilizing more flexible core modules like
+L<KinoSearch::Index::Indexer> and L<KinoSearch::Search::IndexSearcher>.
+
+=head1 DESCRIPTION
+
+=head2 Chapters
+
+=over
+
+=item *
+
+L<KinoSearch::Docs::Tutorial::Simple> - Build a bare-bones search app using
+L<KSx::Simple>.
+
+=item *
+
+L<KinoSearch::Docs::Tutorial::BeyondSimple> - Rebuild the app using core
+classes like L<Indexer|KinoSearch::Index::Indexer> and
+L<IndexSearcher|KinoSearch::Search::IndexSearcher> in place of KSx::Simple.
+
+=item *
+
+L<KinoSearch::Docs::Tutorial::FieldType> - Experiment with different field
+characteristics using subclasses of L<KinoSearch::Plan::FieldType>.
+
+=item *
+
+L<KinoSearch::Docs::Tutorial::Analysis> - Examine how the choice of
+L<KinoSearch::Analysis::Analyzer> subclass affects search results.
+
+=item *
+
+L<KinoSearch::Docs::Tutorial::Highlighter> - Augment search results with
+highlighted excerpts.
+
+=item *
+
+L<KinoSearch::Docs::Tutorial::QueryObjects> - Unlock advanced search features
+by using Query objects instead of query strings.
+
+=back
+
+=head2 Source materials
+
+The source material used by the tutorial app -- an html presentation of the
+United States constitution -- can be found in the C<sample>
+directory at the root of the KinoSearch distribution, along with finished
+indexing and search apps.
+
+    sample/indexer.pl        # indexing app
+    sample/search.cgi        # search app
+    sample/us_constitution   # html documents
+
+=head2 Conventions
+
+The user is expected to be familiar with OO Perl and basic CGI programming.
+
+The code in this tutorial assumes a Unix-flavored operating system and the
+Apache webserver, but will work with minor modifications on other setups.
+
+=head1 SEE ALSO
+
+More advanced and esoteric subjects are covered in
+L<KinoSearch::Docs::Cookbook>.
+
+=head1 COPYRIGHT
+
+Copyright 2005-2010 Marvin Humphrey
+
+=head1 LICENSE, DISCLAIMER, BUGS, etc.
+
+See L<KinoSearch> version 0.30.
+

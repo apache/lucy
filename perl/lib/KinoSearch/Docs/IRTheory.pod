@@ -1,0 +1,87 @@
+=head1 NAME
+
+KinoSearch::Docs::IRTheory - Crash course in information retrieval.
+
+=head1 ABSTRACT
+
+Just enough Information Retrieval theory to find your way around KinoSearch.
+
+=head1 Terminology
+
+KinoSearch uses some terminology from the field of information retrieval which
+may be unfamiliar to many users.  "Document" and "term" mean pretty much what
+you'd expect them to, but others such as "posting" and "inverted index" need a
+formal introduction:
+
+=over
+
+=item *
+
+I<document> - An atomic unit of retrieval.
+
+=item *
+
+I<term> - An attribute which describes a document.
+
+=item *
+
+I<posting> - One term indexing one document.
+
+=item *
+
+I<term list> - The complete list of terms which describe a document.
+
+=item *
+
+I<posting list> - The complete list of documents which a term indexes.
+
+=item *
+
+I<inverted index> - A data structure which maps from terms to documents.
+
+=back
+
+Since KinoSearch is a practical implementation of IR theory, it loads these
+abstract, distilled definitions down with useful traits.  For instance, a
+"posting" in its most rarefied form is simply a term-document pairing; in
+KinoSearch, the class L<KinoSearch::Index::Posting::MatchPosting> fills this
+role.  However, by associating additional information with a posting like the
+number of times the term occurs in the document, we can turn it into a
+L<ScorePosting|KinoSearch::Index::Posting::ScorePosting>, making it possible
+to rank documents by relevance rather than just list documents which happen to
+match in no particular order.
+
+=head1 TF/IDF ranking algorithm
+
+KinoSearch uses a variant of the well-established "Term Frequency / Inverse
+Document Frequency" weighting scheme.  A thorough treatment of TF/IDF is too
+ambitious for our present purposes, but in a nutshell, it means that...
+
+=over
+
+=item
+
+in a search for C<skate park>, documents which score well for the
+comparatively rare term C<skate> will rank higher than documents which score
+well for the more common term C<park>.  
+
+=item
+
+a 10-word text which has one occurrence each of both C<skate> and C<park> will
+rank higher than a 1000-word text which also contains one occurrence of each.
+
+=back
+
+A web search for "tf idf" will turn up many excellent explanations of the
+algorithm.
+
+=head1 COPYRIGHT
+
+Copyright 2007-2010 Marvin Humphrey
+
+=head1 LICENSE, DISCLAIMER, BUGS, etc.
+
+See L<KinoSearch> version 0.30.
+
+=cut
+

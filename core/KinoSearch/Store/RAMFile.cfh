@@ -1,0 +1,44 @@
+parcel KinoSearch cnick Kino;
+
+/** Backing storage used by RAMFolder and RAMFileHandle.
+ */
+class KinoSearch::Store::RAMFile inherits KinoSearch::Object::Obj {
+
+    bool_t   read_only;
+    ByteBuf *contents;
+
+    inert incremented RAMFile*
+    new(ByteBuf *contents = NULL, bool_t read_only = false);
+
+    /**
+     * @param contents Existing file contents, if any.
+     * @param read_only Indicate that the file contents may not be modified.
+     */
+    inert RAMFile*
+    init(RAMFile *self, ByteBuf *contents = NULL, bool_t read_only = false);
+
+    /** Accessor for the file's contents.
+     */
+    ByteBuf*
+    Get_Contents(RAMFile *self);
+
+    /** Accessor for <code>read_only</code> property.
+     */
+    bool_t
+    Read_Only(RAMFile *self);
+
+    /** Set the object's <code>read_only</code> property.
+     */
+    void
+    Set_Read_Only(RAMFile *self, bool_t read_only);
+
+    public void
+    Destroy(RAMFile *self);
+}
+
+/* Copyright 2009-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

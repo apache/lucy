@@ -1,0 +1,43 @@
+parcel KinoSearch cnick Kino;
+
+/** Access search results.
+ *
+ * Hits objects are iterators used to access the results of a search.
+ */
+class KinoSearch::Search::Hits inherits KinoSearch::Object::Obj {
+
+    Searcher   *searcher;
+    TopDocs    *top_docs;
+    VArray     *match_docs;
+    uint32_t    offset;
+
+    inert incremented Hits*
+    new(Searcher *searcher, TopDocs *top_docs, uint32_t offset = 0);
+
+    inert Hits*
+    init(Hits *self, Searcher *searcher, TopDocs *top_docs,
+         uint32_t offset = 0);
+
+    /** Return the next hit, or NULL when the iterator is exhausted.
+     */
+    public incremented nullable Obj*
+    Next(Hits *self);
+
+    /** Return the total number of documents which matched the Query used to
+     * produce the Hits object.  Note that this is the total number of
+     * matches, not just the number of matches represented by the Hits
+     * iterator.
+     */
+    public uint32_t
+    Total_Hits(Hits *self);
+
+    public void
+    Destroy(Hits *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

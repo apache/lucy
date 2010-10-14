@@ -1,0 +1,64 @@
+parcel KinoSearch cnick Kino;
+
+/** Match a set of document ids.
+ *
+ * A Matcher iterates over an ascending set of document ids.  Some Matchers
+ * implement Score() and can assign relevance scores to the docs that they
+ * match.  Other implementations may be match-only.
+ */
+
+abstract class KinoSearch::Search::Matcher inherits KinoSearch::Object::Obj {
+
+    /** Abstract constructor. 
+     */
+    public inert Matcher*
+    init(Matcher* self);
+
+    /** Proceed to the next doc id.
+     * 
+     * @return A positive doc id, or 0 once the iterator is exhausted.
+     */
+    public abstract int32_t
+    Next(Matcher *self);
+
+    /** Advance the iterator to the first doc id greater than or equal to
+     * <code>target</code>. The default implementation simply calls Next()
+     * over and over, but subclasses have the option of doing something more
+     * efficient.
+     * 
+     * @param target A positive doc id, which must be greater than the current
+     * doc id once the iterator has been initialized.
+     * @return A positive doc id, or 0 once the iterator is exhausted.
+     */
+    public int32_t
+    Advance(Matcher *self, int32_t target);
+
+    /** Return the current doc id.  Valid only after a successful call to
+     * Next() or Advance() and must not be called otherwise.
+     */
+    public abstract int32_t
+    Get_Doc_ID(Matcher *self);
+
+    /** Return the score of the current document.
+     *
+     * Only Matchers which are used for scored search need implement Score().
+     */
+    public abstract float
+    Score(Matcher *self);
+
+    /** Collect hits.
+     *
+     * @param collector The Collector to collect hits with.
+     * @param deletions A deletions iterator.
+     */
+    void
+    Collect(Matcher *self, Collector *collector, 
+            Matcher *deletions = NULL);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

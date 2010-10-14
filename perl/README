@@ -1,0 +1,24 @@
+KinoSearch
+
+Search engine library.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+XS CODE
+
+KinoSearch is a Perl/XS distribution, despite the apparent lack of .xs files.  
+KinoSearch.xs gets written on the fly when 'perl Build.PL' is invoked.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2010 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

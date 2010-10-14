@@ -1,0 +1,16 @@
+--maximum-line-length=78       # 78 cols
+--indent-columns=4             # 4 spaces
+--continuation-indentation=4   # 4 spaces
+--vertical-tightness=2         # maximum
+--closing-token-indentation=0  # none
+--paren-tightness=1            # medium
+--brace-tightness=1            # medium
+--square-bracket-tightness=1   # medium
+--block-brace-tightness=1      # medium
+--no-space-for-semicolon 
+--no-outdent-long-quotes 
+--noblanks-before-comments 
+--noblanks-before-subs 
+# all operators except ** << >> ! ~ ^
+--want-break-before="%  +  -  *  /  x  &  |  &&  ||  . %= += -= *= /= x= &= |= &&= ||= .= **= >>= <<= ^=  = < > == >= <= != =~ !~"
+

@@ -1,0 +1,34 @@
+parcel KinoSearch cnick Kino;
+
+inert class KinoSearch::Util::Freezer {
+
+    /** Store an arbitrary object to the outstream.
+     */
+    inert void
+    freeze(Obj *obj, OutStream *outstream);
+
+    /** Retrieve an arbitrary object from the instream.
+     */
+    inert incremented Obj*
+    thaw(InStream *instream);
+}
+
+__C__
+#define KINO_FREEZE(_obj, _outstream) \
+    kino_Freezer_freeze((Obj*)(_obj), (outstream))
+
+#define KINO_THAW(_instream) \
+    kino_Freezer_thaw(instream)
+
+#ifdef KINO_USE_SHORT_NAMES
+  #define FREEZE                KINO_FREEZE 
+  #define THAW                  KINO_THAW
+#endif
+__END_C__
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

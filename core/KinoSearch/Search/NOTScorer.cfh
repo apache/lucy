@@ -1,0 +1,40 @@
+parcel KinoSearch cnick Kino;
+
+/** Return the inverse of a Matcher's set.  Scores are always 0.
+ */
+
+class KinoSearch::Search::NOTScorer inherits KinoSearch::Search::PolyMatcher {
+
+    Matcher       *negated_matcher; 
+    int32_t        doc_id;
+    int32_t        doc_max;
+    int32_t        next_negation;
+
+    inert incremented NOTScorer* 
+    new(Matcher* negated_matcher, int32_t doc_max);
+
+    inert NOTScorer* 
+    init(NOTScorer *self, Matcher *negated_matcher, int32_t doc_max);
+
+    public void
+    Destroy(NOTScorer *self);
+
+    public int32_t
+    Next(NOTScorer *self);
+
+    public int32_t
+    Advance(NOTScorer *self, int32_t target);
+
+    public float
+    Score(NOTScorer *self);
+
+    public int32_t 
+    Get_Doc_ID(NOTScorer *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

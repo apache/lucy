@@ -1,0 +1,45 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Index::LexIndex inherits KinoSearch::Index::Lexicon {
+
+    FieldType   *field_type;
+    InStream    *ixix_in;
+    InStream    *ix_in;
+    int64_t     *offsets;
+    int32_t      tick;
+    int32_t      size;
+    int32_t      index_interval;
+    int32_t      skip_interval;
+    TermStepper *term_stepper;
+    TermInfo    *tinfo;
+
+    inert incremented LexIndex*
+    new(Schema *schema, Folder *folder, Segment *segment, 
+        const CharBuf *field);
+
+    inert LexIndex*
+    init(LexIndex *self, Schema *schema, Folder *folder, Segment *segment, 
+         const CharBuf *field);
+
+    public void
+    Seek(LexIndex *self, Obj *target = NULL);
+
+    int32_t
+    Get_Term_Num(LexIndex *self);
+
+    nullable TermInfo* 
+    Get_Term_Info(LexIndex *self);
+
+    public nullable Obj*
+    Get_Term(LexIndex *self);
+
+    public void
+    Destroy(LexIndex *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

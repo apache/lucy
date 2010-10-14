@@ -1,0 +1,46 @@
+=head1 NAME
+
+KinoSearch::Docs::Cookbook - KinoSearch recipes.
+
+=head1 DESCRIPTION
+
+The Cookbook provides thematic documentation covering some of KinoSearch's
+more sophisticated features.  For a step-by-step introduction to KinoSearch,
+see L<KinoSearch::Docs::Tutorial>.
+
+=head2 Chapters
+
+=over
+
+=item *
+
+L<KinoSearch::Docs::Cookbook::CustomQuery> - Explore KinoSearch's support for
+custom query types by creating a "PrefixQuery" class to handle trailing
+wildcards.
+
+=item *
+
+L<KinoSearch::Docs::Cookbook::CustomQueryParser> - Define your own custom
+search query syntax using KinoSearch::Search::QueryParser and
+L<Parse::RecDescent>.
+
+=back
+
+=head2 Materials
+
+Some of the recipes in the Cookbook reference the completed
+L<Tutorial|KinoSearch::Docs::Tutorial> application.  These materials can be
+found in the C<sample> directory at the root of the KinoSearch distribution:
+
+    sample/indexer.pl        # indexing app
+    sample/search.cgi        # search app
+    sample/us_constitution   # html documents
+
+=head1 COPYRIGHT
+
+Copyright 2005-2010 Marvin Humphrey
+
+=head1 LICENSE, DISCLAIMER, BUGS, etc.
+
+See L<KinoSearch> version 0.30.
+

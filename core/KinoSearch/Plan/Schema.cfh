@@ -1,0 +1,107 @@
+parcel KinoSearch cnick Kino;
+
+/** User-created specification for an inverted index.
+ *
+ * A Schema is a blueprint specifying how other entities should interpret the
+ * raw data in an inverted index and interact with it.  It's akin to an SQL
+ * table definition.
+ *
+ * Once an actual index has been created using a particular Schema, existing
+ * field definitions may not be changed.  However, it is possible to add new
+ * fields during subsequent indexing sessions.
+ */
+class KinoSearch::Plan::Schema inherits KinoSearch::Object::Obj {
+
+    Architecture      *arch;
+    Similarity        *sim;
+    Hash              *types;
+    Hash              *sims;
+    Hash              *analyzers;
+    VArray            *uniq_analyzers;
+
+    public inert incremented Schema*
+    new();
+
+    /** Constructor.  Takes no arguments.
+     */
+    public inert Schema*
+    init(Schema *self);
+
+    /** Factory method which returns the Architecture for this index. 
+     */
+    public incremented Architecture*
+    Architecture(Schema *self);
+
+    /** Define the behavior of a field by associating it with a FieldType.
+     *
+     * If this method has already been called for the supplied
+     * <code>field</code>, it will merely test to verify that the supplied
+     * FieldType Equals() the existing one, then return.
+     *
+     * @param name The name of the field.
+     * @param type A FieldType.
+     */
+    public void
+    Spec_Field(Schema *self, const CharBuf *name, FieldType *type);
+
+    /** Return the FieldType for the specified field.  If the field can't be
+     * found, return NULL.
+     */
+    public nullable FieldType*
+    Fetch_Type(Schema *self, const CharBuf *field);
+
+    /** Return the Analyzer for the specified field.
+     */
+    nullable Analyzer*
+    Fetch_Analyzer(Schema *self, const CharBuf *field = NULL);
+
+    /** Return the Similarity for the specified field, or NULL if either the
+     * field can't be found or it isn't associated with a Similarity.
+     */
+    public nullable Similarity*
+    Fetch_Sim(Schema *self, const CharBuf *field = NULL);
+
+    /** Return the number of fields currently defined.
+     */
+    public uint32_t
+    Num_Fields(Schema *self);
+
+    /** Return all the Schema's field names.
+     */
+    public incremented VArray*
+    All_Fields(Schema *self);
+
+    /** Return the Schema instance's internal Architecture object.
+     */
+    public Architecture* 
+    Get_Architecture(Schema *self);
+
+    /** Return the Schema instance's internal Similarity object.
+     */
+    public Similarity* 
+    Get_Similarity(Schema *self);
+
+    public incremented Hash*
+    Dump(Schema *self);
+
+    public incremented Schema*
+    Load(Schema *self, Obj *dump);
+    
+    /** Absorb the field definitions of another Schema, verify compatibility.
+     */
+    void
+    Eat(Schema *self, Schema *other);
+
+    void
+    Write(Schema *self, Folder *folder, const CharBuf *filename = NULL);
+
+    public void
+    Destroy(Schema *self);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

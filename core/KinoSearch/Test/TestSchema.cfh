@@ -1,0 +1,28 @@
+parcel KinoSearch cnick Kino;
+
+/** Schema for use by the test suite.  
+ * 
+ * Exposes problems faced by much larger indexes by using an TestArchitecture,
+ * which returns absurdly low values for Index_Interval() and Skip_Interval().
+ */
+
+class KinoSearch::Test::TestSchema inherits KinoSearch::Plan::Schema {
+    inert incremented TestSchema* 
+    new();
+
+    inert TestSchema*
+    init(TestSchema *self);
+
+    public incremented Architecture*
+    Architecture(TestSchema *self);
+
+    inert void
+    run_tests();
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

@@ -1,0 +1,99 @@
+parcel KinoSearch cnick Kino;
+
+
+/** Query which matches individual terms.
+ *
+ * TermQuery is a subclass of L<KinoSearch::Search::Query> for matching
+ * individual terms in a specific field.
+ */
+
+class KinoSearch::Search::TermQuery inherits KinoSearch::Search::Query 
+    : dumpable {
+
+    CharBuf *field;
+    Obj     *term;
+
+    inert incremented TermQuery*
+    new(const CharBuf *field, const Obj *term);
+
+    /**
+     * @param field Field name.
+     * @param term Term text.
+     */
+    public inert TermQuery*
+    init(TermQuery *self, const CharBuf *field, const Obj *term);
+
+    /** Accessor for object's <code>field</code> member. 
+     */
+    CharBuf*
+    Get_Field(TermQuery *self);
+
+    /** Accessor for object's <code>term</code> member. 
+     */
+    Obj*
+    Get_Term(TermQuery *self);
+
+    public incremented Compiler*
+    Make_Compiler(TermQuery *self, Searcher *searcher, float boost);
+
+    public incremented CharBuf*
+    To_String(TermQuery *self);
+
+    public void
+    Serialize(TermQuery *self, OutStream *outstream);
+
+    public incremented TermQuery*
+    Deserialize(TermQuery *self, InStream *instream);
+
+    public bool_t
+    Equals(TermQuery *self, Obj *other);
+
+    public void
+    Destroy(TermQuery *self);
+}
+
+class KinoSearch::Search::TermCompiler inherits KinoSearch::Search::Compiler {
+    float idf;
+    float raw_weight;
+    float query_norm_factor;
+    float normalized_weight;
+
+    inert incremented TermCompiler*
+    new(Query *parent, Searcher *searcher, float boost);
+
+    inert TermCompiler*
+    init(TermCompiler *self, Query *parent, Searcher *searcher, 
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(TermCompiler *self, SegReader *reader, bool_t need_score);
+
+    public float
+    Get_Weight(TermCompiler *self);
+
+    public float
+    Sum_Of_Squared_Weights(TermCompiler *self);
+
+    public void
+    Apply_Norm_Factor(TermCompiler *self, float factor);
+
+    public incremented VArray*
+    Highlight_Spans(TermCompiler *self, Searcher *searcher, 
+                    DocVector *doc_vec, const CharBuf *field);
+
+    public bool_t
+    Equals(TermCompiler *self, Obj *other);
+
+    public void
+    Serialize(TermCompiler *self, OutStream *outstream);
+
+    public incremented TermCompiler*
+    Deserialize(TermCompiler *self, InStream *instream);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

@@ -1,0 +1,48 @@
+parcel KinoSearch cnick Kino;
+
+/** Track highest sorting hits.
+ *
+ * HitQueue sorts MatchDoc objects according to a SortSpec.  Good matches
+ * float to the top of the queue and poor matches fall out the bottom.
+ */
+
+class KinoSearch::Search::HitQueue cnick HitQ
+    inherits KinoSearch::Util::PriorityQueue {
+
+    FieldType     **field_types;
+    uint8_t        *actions;
+    uint32_t        num_actions;
+    bool_t          need_values;
+
+    inert incremented HitQueue*
+    new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
+
+    /** 
+     * @param schema A Schema.  Required if <code>sort_spec</code> supplied.
+     * @param sort_spec A SortSpec.  If not supplied, the HitQueue will sort
+     * by descending score first and ascending doc id second.
+     * @param wanted Max elements the queue can hold.
+     */
+    inert HitQueue*
+    init(HitQueue *self, Schema *schema = NULL, SortSpec *sort_spec = NULL, 
+         uint32_t wanted);
+
+    public void
+    Destroy(HitQueue *self);
+
+    /** If sorting on fields, first verifies that the MatchDoc has a valid
+     * values array, then invokes parent method.
+     */
+    incremented nullable Obj*
+    Jostle(HitQueue *self, decremented Obj *element); 
+
+    bool_t
+    Less_Than(HitQueue *self, Obj *a, Obj *b);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

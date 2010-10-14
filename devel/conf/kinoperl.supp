@@ -1,0 +1,88 @@
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:kino_Memory_wrapped_calloc
+   fun:kino_VTable_make_obj
+   fun:kino_LFReg_new
+   fun:kino_VTable_init_registry
+   fun:*
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:kino_Memory_wrapped_malloc
+   fun:kino_LFReg_register
+   fun:kino_VTable_add_to_registry
+   fun:kino_VTable_singleton
+   fun:*
+}
+
+{
+   <Class name key for VTable_registry (malloc)>
+   Memcheck:Leak
+   fun:malloc
+   fun:kino_Memory_wrapped_malloc
+   fun:kino_CB_new_from_trusted_utf8
+   fun:kino_CB_clone
+   fun:kino_VTable_add_to_registry
+   fun:*
+}
+
+{
+   <Class name key for VTable_registry (calloc)>
+   Memcheck:Leak
+   fun:calloc
+   fun:kino_Memory_wrapped_calloc
+   fun:kino_VTable_make_obj
+   fun:kino_CB_new_from_trusted_utf8
+   fun:kino_CB_clone
+   fun:kino_VTable_add_to_registry
+   fun:*
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:kino_Memory_wrapped_calloc
+   fun:kino_VTable_clone
+   fun:kino_VTable_singleton
+   fun:*
+}
+
+{
+   <Add class name to child VTable (malloc)>
+   Memcheck:Leak
+   fun:malloc
+   fun:kino_Memory_wrapped_malloc
+   fun:kino_CB_new_from_trusted_utf8
+   fun:kino_CB_clone
+   fun:kino_VTable_singleton
+   fun:*
+}
+
+{
+   <Add class name to child VTable (calloc)>
+   Memcheck:Leak
+   fun:calloc
+   fun:kino_Memory_wrapped_calloc
+   fun:kino_VTable_make_obj
+   fun:kino_CB_new_from_trusted_utf8
+   fun:kino_CB_clone
+   fun:kino_VTable_singleton
+   fun:*
+}
+
+{
+   <Snowball XS constructor>
+   Memcheck:Leak
+   fun:calloc
+   fun:Perl_safesyscalloc
+   fun:XS_Lingua__Stem__Snowball__Stemmifier_new
+   fun:*
+}
+
+

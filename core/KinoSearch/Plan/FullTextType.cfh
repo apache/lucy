@@ -1,0 +1,79 @@
+parcel KinoSearch cnick Kino;
+
+/** Full-text search field type.
+ * 
+ * KinoSearch::Plan::FullTextType is an implementation of
+ * L<KinoSearch::Plan::FieldType> tuned for "full text search".  
+ *
+ * Full text fields are associated with an Analyzer, which is used to tokenize
+ * and normalize the text so that it can be searched for individual words.
+ * 
+ * For an exact-match, single value field type using character data, see
+ * L<StringType|KinoSearch::Plan::StringType>.
+ */
+class KinoSearch::Plan::FullTextType 
+    inherits KinoSearch::Plan::TextType : dumpable {
+
+    bool_t      highlightable;
+    Analyzer   *analyzer;
+
+    /** 
+     * @param analyzer An Analyzer.
+     * @param boost floating point per-field boost.
+     * @param indexed boolean indicating whether the field should be indexed.
+     * @param stored boolean indicating whether the field should be stored.
+     * @param sortable boolean indicating whether the field should be sortable.
+     * @param highlightable boolean indicating whether the field should be
+     * highlightable.
+     */
+    public inert FullTextType* 
+    init(FullTextType *self, Analyzer *analyzer);
+
+    inert FullTextType* 
+    init2(FullTextType *self, Analyzer *analyzer, float boost = 1.0,
+          bool_t indexed = true, bool_t stored = true, 
+          bool_t sortable = false, bool_t highlightable = false);
+
+    public inert incremented FullTextType* 
+    new(Analyzer *analyzer);
+
+    /** Indicate whether to store data required by
+     * L<KinoSearch::Highlight::Highlighter> for excerpt selection and search
+     * term highlighting. 
+     */ 
+    public void
+    Set_Highlightable(FullTextType *self, bool_t highlightable);
+
+    /** Accessor for "highlightable" property. 
+     */
+    public bool_t
+    Highlightable(FullTextType *self);
+
+    public Analyzer*
+    Get_Analyzer(FullTextType *self);
+
+    public incremented Similarity*
+    Make_Similarity(FullTextType *self);
+
+    incremented Hash*
+    Dump_For_Schema(FullTextType *self);
+
+    public incremented Hash*
+    Dump(FullTextType *self);
+
+    public incremented FullTextType*
+    Load(FullTextType *self, Obj *dump);
+
+    public bool_t
+    Equals(FullTextType *self, Obj *other);
+
+    public void
+    Destroy(FullTextType *self);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

@@ -1,0 +1,41 @@
+parcel KinoSearch cnick Kino;
+
+/** File system DirHandle.
+ */
+class KinoSearch::Store::FSDirHandle cnick FSDH 
+    inherits KinoSearch::Store::DirHandle {
+    
+    void    *sys_dirhandle;
+    void    *sys_dir_entry;
+    CharBuf *fullpath;
+    Err     *saved_error;
+    bool_t   delayed_iter;
+
+    inert incremented nullable FSDirHandle*
+    open(const CharBuf *path);
+
+    inert nullable FSDirHandle*
+    do_open(FSDirHandle *self, const CharBuf *path);
+
+    bool_t
+    Next(FSDirHandle *self);
+
+    bool_t
+    Entry_Is_Dir(FSDirHandle *self);
+
+    bool_t
+    Entry_Is_Symlink(FSDirHandle *self);
+
+    bool_t
+    Close(FSDirHandle *self);
+
+    public void
+    Destroy(FSDirHandle *self);
+}
+
+/* Copyright 2009-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

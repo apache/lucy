@@ -1,0 +1,59 @@
+parcel KinoSearch cnick Kino;
+
+/** Term-Document pairings.
+ * 
+ * PostingList is an iterator which supplies a list of document ids that match
+ * a given term.  
+ * 
+ * See L<KinoSearch::Docs::IRTheory> for definitions of "posting" and "posting
+ * list".
+ */
+class KinoSearch::Index::PostingList cnick PList
+    inherits KinoSearch::Search::Matcher {
+
+    public inert PostingList*
+    init(PostingList *self);
+
+    /** Return the iterator's current Posting.  Should not be called before
+     * the iterator is initialized or after it empties.
+     */
+    abstract Posting*
+    Get_Posting(PostingList *self);
+
+    /** Return the number of documents that the PostingList contains.  (This
+     * number will include any documents which have been marked as deleted but
+     * not yet purged.)
+     */
+    public abstract uint32_t
+    Get_Doc_Freq(PostingList *self);
+
+    /** Prepare the PostingList object to iterate over matches for documents
+     * that match <code>target</code>.
+     * 
+     * @param target The term to match.  If NULL, the iterator will be empty.
+     */
+    public abstract void
+    Seek(PostingList *self, Obj *target = NULL);
+
+    abstract void
+    Seek_Lex(PostingList *self, Lexicon *lexicon);
+
+    /** Invoke Post_Make_Matcher() for this PostingList's posting.
+     */
+    abstract Matcher*
+    Make_Matcher(PostingList *self, Similarity *similarity,
+                 Compiler *compiler, bool_t need_score);
+
+    /** Indexing helper function.
+     */
+    abstract RawPosting*
+    Read_Raw(PostingList *self, int32_t last_doc_id, CharBuf *term_text,
+             MemoryPool *mem_pool);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

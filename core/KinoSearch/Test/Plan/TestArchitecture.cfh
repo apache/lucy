@@ -1,0 +1,28 @@
+parcel KinoSearch cnick Kino;
+
+/** 
+ * Returns absurdly low values for Index_Interval() and Skip_Interval().
+ */
+
+class KinoSearch::Test::Plan::TestArchitecture cnick TestArch
+    inherits KinoSearch::Plan::Architecture {
+
+    inert incremented TestArchitecture* 
+    new();
+
+    inert TestArchitecture*
+    init(TestArchitecture *self);
+
+    public int32_t
+    Index_Interval(TestArchitecture *self);
+
+    public int32_t 
+    Skip_Interval(TestArchitecture *self);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

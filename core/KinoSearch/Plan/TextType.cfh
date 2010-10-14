@@ -1,0 +1,50 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Plan::TextType inherits KinoSearch::Plan::FieldType { 
+    incremented CharBuf*
+    Make_Blank(TextType *self);
+
+    incremented TermStepper*
+    Make_Term_Stepper(TextType *self);
+
+    int8_t
+    Primitive_ID(TextType *self);
+} 
+
+class KinoSearch::Index::TermStepper::TextTermStepper
+    inherits KinoSearch::Index::TermStepper {
+
+    inert incremented TextTermStepper*
+    new();
+
+    inert TextTermStepper*
+    init(TextTermStepper *self);
+
+    public void 
+    Reset(TextTermStepper *self);
+
+    /** 
+     * @param value A CharBuf. 
+     */
+    public void
+    Set_Value(TextTermStepper *self, Obj *value = NULL);
+
+    public void
+    Write_Key_Frame(TextTermStepper *self, OutStream *outstream, Obj *value);
+
+    public void
+    Write_Delta(TextTermStepper *self, OutStream *outstream, Obj *value);
+
+    public void
+    Read_Key_Frame(TextTermStepper *self, InStream *instream);
+
+    public void
+    Read_Delta(TextTermStepper *self, InStream *instream);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

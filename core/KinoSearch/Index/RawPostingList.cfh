@@ -1,0 +1,36 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Index::RawPostingList cnick RawPList
+    inherits KinoSearch::Index::PostingList {
+    
+    Posting       *posting;
+    InStream      *instream;
+    int64_t        start;
+    int64_t        end;
+    int64_t        len;
+
+    inert incremented RawPostingList*
+    new(Schema *schema, const CharBuf *field, InStream *instream, 
+        int64_t start, int64_t end);
+
+    inert RawPostingList*
+    init(RawPostingList *self, Schema *schema, const CharBuf *field, 
+         InStream *instream, int64_t lex_start, int64_t lex_end);
+
+    public void
+    Destroy(RawPostingList *self);
+
+    RawPosting*
+    Read_Raw(RawPostingList *self, int32_t last_doc_id, CharBuf *term_text,
+             MemoryPool *mem_pool);
+
+    Posting*
+    Get_Posting(RawPostingList *self);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

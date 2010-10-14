@@ -1,0 +1,36 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Object::I32Array cnick I32Arr inherits KinoSearch::Object::Obj {
+    int32_t  *ints;
+    uint32_t  size;
+
+    inert incremented I32Array*
+    new(int32_t *ints, uint32_t size);
+
+    inert incremented I32Array*
+    new_steal(int32_t *ints, uint32_t size);
+
+    inert I32Array*
+    init(I32Array *self, int32_t *ints, uint32_t size);
+
+    /** Return the value at <code>tick</code>, or throw an error if
+     * <code>tick</code> is out of bounds.
+     */
+    int32_t
+    Get(I32Array *self, uint32_t tick);
+
+    /** Accessor for 'size' member.
+     */
+    uint32_t 
+    Get_Size(I32Array *self);
+
+    public void
+    Destroy(I32Array *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

@@ -1,0 +1,71 @@
+parcel KinoSearch cnick Kino;
+
+/** Default posting type.
+ *
+ * ScorePosting is the default posting format in KinoSearch.  The
+ * term-document pairing used by MatchPosting is supplemented by additional
+ * frequency, position, and weighting information.
+ */ 
+class KinoSearch::Index::Posting::ScorePosting cnick ScorePost
+    inherits KinoSearch::Index::Posting::MatchPosting {
+
+    float     weight;
+    float    *norm_decoder;
+    uint32_t *prox;
+    uint32_t  prox_cap;
+
+    inert incremented ScorePosting*
+    new(Similarity *similarity);
+
+    inert ScorePosting*
+    init(ScorePosting *self, Similarity *similarity);
+
+    public void
+    Destroy(ScorePosting *self);
+
+    void
+    Read_Record(ScorePosting *self, InStream *instream);
+
+    incremented RawPosting*
+    Read_Raw(ScorePosting *self, InStream *instream, int32_t last_doc_id, 
+             CharBuf *term_text, MemoryPool *mem_pool);
+
+    void
+    Add_Inversion_To_Pool(ScorePosting *self, PostingPool *post_pool, 
+                          Inversion *inversion, FieldType *type, 
+                          int32_t doc_id, float doc_boost, 
+                          float length_norm);
+
+    public void
+    Reset(ScorePosting *self);
+
+    incremented ScorePostingScorer*
+    Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist, 
+                 Compiler *compiler, bool_t need_score);
+
+    nullable uint32_t*
+    Get_Prox(ScorePosting *self);
+}
+
+class KinoSearch::Index::Posting::ScorePostingScorer cnick ScorePostScorer
+    inherits KinoSearch::Search::TermScorer {
+
+    float *score_cache;
+
+    inert ScorePostingScorer*
+    init(ScorePostingScorer *self, Similarity *sim, PostingList *plist, 
+         Compiler *compiler);
+
+    public float
+    Score(ScorePostingScorer* self);
+
+    public void
+    Destroy(ScorePostingScorer *self);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

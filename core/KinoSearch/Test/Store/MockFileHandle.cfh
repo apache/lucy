@@ -1,0 +1,33 @@
+parcel KinoSearch cnick Kino;
+
+/** Mock-object FileHandle for testing InStream/OutStream.
+ */ 
+class KinoSearch::Store::MockFileHandle inherits KinoSearch::Store::FileHandle {
+
+    int64_t len;
+
+    inert incremented MockFileHandle*
+    new(const CharBuf *path = NULL, int64_t length);
+
+    inert MockFileHandle*
+    init(MockFileHandle *self, const CharBuf *path = NULL, int64_t length);
+
+    bool_t
+    Window(MockFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
+
+    bool_t 
+    Release_Window(MockFileHandle *self, FileWindow *window);
+
+    int64_t
+    Length(MockFileHandle *self);
+
+    bool_t
+    Close(MockFileHandle *self);
+}
+
+/* Copyright 2009-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

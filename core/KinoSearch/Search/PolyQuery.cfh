@@ -1,0 +1,83 @@
+parcel KinoSearch cnick Kino;
+
+/** Base class for composite Query objects.
+ *
+ * PolyQuery serves as a shared base class for ANDQuery, ORQuery, NOTQuery,
+ * and RequiredOptionalQuery.  All of these classes may serve as nodes in
+ * composite Query with a tree structure which may be walked.
+ */
+abstract class KinoSearch::Search::PolyQuery
+    inherits KinoSearch::Search::Query : dumpable {
+
+    VArray    *children;
+
+    /**
+     * @param children An array of child Queries.
+     */
+    public inert PolyQuery*
+    init(PolyQuery *self, VArray *children = NULL);
+
+    /** Add a child Query node.
+     */
+    public void
+    Add_Child(PolyQuery *self, Query *query);
+
+    void
+    Set_Children(PolyQuery *self, VArray *children);
+
+    VArray*
+    Get_Children(PolyQuery *self);
+
+    public void
+    Serialize(PolyQuery *self, OutStream *outstream);
+
+    public incremented PolyQuery*
+    Deserialize(PolyQuery *self, InStream *instream);
+
+    public bool_t
+    Equals(PolyQuery *self, Obj *other);
+
+    public void
+    Destroy(PolyQuery *self);
+}
+
+class KinoSearch::Search::PolyCompiler inherits KinoSearch::Search::Compiler {
+
+    VArray *children;
+
+    inert incremented PolyCompiler*
+    new(PolyQuery *parent, Searcher *searcher, float boost);
+
+    /** Initialize the Compiler, creating a Compiler child for each child
+     * Query.  Normalization is left to the subclass.
+     */
+    inert PolyCompiler*
+    init(PolyCompiler *self, PolyQuery *parent, Searcher *searcher,
+         float boost);
+
+    public float
+    Sum_Of_Squared_Weights(PolyCompiler *self);
+
+    public void
+    Apply_Norm_Factor(PolyCompiler *self, float factor);
+
+    public incremented VArray*
+    Highlight_Spans(PolyCompiler *self, Searcher *searcher, 
+                    DocVector *doc_vec, const CharBuf *field);
+
+    public void
+    Destroy(PolyCompiler *self);
+
+    public void
+    Serialize(PolyCompiler *self, OutStream *outstream);
+
+    public incremented PolyCompiler*
+    Deserialize(PolyCompiler *self, InStream *instream);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

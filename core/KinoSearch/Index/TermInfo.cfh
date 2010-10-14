@@ -1,0 +1,71 @@
+parcel KinoSearch cnick Kino;
+
+/** Filepointer/statistical data for a Term.
+ * 
+ * The TermInfo contains pointer data indicating where information about a
+ * term can be found in various files, plus the document frequency of the
+ * term.
+ * 
+ * The lex_filepos member variable is only used if the TermInfo is part of the
+ * .lexx stream; it is a filepointer to a locations in the main .lex file.
+ */
+
+class KinoSearch::Index::TermInfo cnick TInfo inherits KinoSearch::Object::Obj {
+
+    int32_t doc_freq;
+    int64_t post_filepos;
+    int64_t skip_filepos;
+    int64_t lex_filepos;
+
+
+    inert incremented TermInfo*
+    new(int32_t doc_freq = 0);
+
+    inert TermInfo* 
+    init(TermInfo *self, int32_t doc_freq = 0);
+
+    public int32_t
+    Get_Doc_Freq(TermInfo *self);
+
+    public int64_t
+    Get_Lex_FilePos(TermInfo *self);
+
+    public int64_t
+    Get_Post_FilePos(TermInfo *self);
+
+    public int64_t
+    Get_Skip_FilePos(TermInfo *self);
+
+    public void
+    Set_Doc_Freq(TermInfo *self, int32_t doc_freq);
+
+    public void
+    Set_Lex_FilePos(TermInfo *self, int64_t filepos);
+
+    public void
+    Set_Post_FilePos(TermInfo *self, int64_t filepos);
+
+    public void
+    Set_Skip_FilePos(TermInfo *self, int64_t filepos);
+
+    /** "Zero out" the TermInfo.
+     */
+    void
+    Reset(TermInfo *self);
+
+    public void
+    Mimic(TermInfo *self, Obj *other);
+
+    public incremented TermInfo*
+    Clone(TermInfo *self);
+
+    public incremented CharBuf*
+    To_String(TermInfo *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

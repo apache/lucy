@@ -1,0 +1,55 @@
+parcel KinoSearch cnick Kino;
+
+/** Matcher for a ProximityQuery. 
+ */
+
+class KSx::Search::ProximityScorer inherits KinoSearch::Search::Matcher {
+
+    int32_t         doc_id;
+    uint32_t        num_elements;
+    Similarity     *sim;
+    PostingList   **plists;
+    ByteBuf        *anchor_set;
+    float           proximity_freq;
+    float           proximity_boost;
+    Compiler       *compiler;
+    float           weight;
+    bool_t          first_time;
+    bool_t          more;
+    uint32_t        within;
+
+    inert incremented ProximityScorer*
+    new(Similarity *similarity, VArray *posting_lists, Compiler *compiler,
+        uint32_t within);
+
+    inert ProximityScorer*
+    init(ProximityScorer *self, Similarity *similarity, VArray *posting_lists, 
+         Compiler *compiler, uint32_t within);
+
+    public void
+    Destroy(ProximityScorer *self);
+
+    public int32_t
+    Next(ProximityScorer *self);
+
+    public int32_t
+    Advance(ProximityScorer *self, int32_t target);
+
+    public int32_t 
+    Get_Doc_ID(ProximityScorer *self);
+
+    public float
+    Score(ProximityScorer *self);
+
+    /** Calculate how often the phrase occurs in the current document.
+     */
+    float
+    Calc_Proximity_Freq(ProximityScorer *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

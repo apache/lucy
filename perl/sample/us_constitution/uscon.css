@@ -1,0 +1,29 @@
+body,table,textarea {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    font-size: 90%; 
+    background: #fff;
+    margin: 0 0 0 0;
+}
+
+div#navigation {
+    background: #ddfff6;
+    padding: 10px;
+    border-bottom: 1px solid #555;
+}
+
+div#bodytext {
+    margin: 10px 10px 10px 10px;
+}
+
+form#usconSearch {
+    display: inline;
+    margin-bottom: 0px;
+}
+
+span.excerptURL {
+    color: green;
+}
+

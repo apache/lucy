@@ -1,0 +1,149 @@
+=head1 NAME
+
+KinoSearch::Docs::Tutorial::BeyondSimple - A more flexible app structure.
+
+=head1 DESCRIPTION
+
+=head2 Goal
+
+In this tutorial chapter, we'll refactor the apps we built in
+L<KinoSearch::Docs::Tutorial::Simple> so that they look exactly the same from
+the end user's point of view, but offer the developer greater possibilites for
+expansion.  
+
+To achieve this, we'll ditch KSx::Simple and replace it with the
+classes that it uses internally:
+
+=over
+
+=item *
+
+L<KinoSearch::Plan::Schema> - Plan out your index.
+
+=item *
+
+L<KinoSearch::Plan::FullTextType> - Field type for full text search.
+
+=item *
+
+L<KinoSearch::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
+
+=item *
+
+L<KinoSearch::Index::Indexer> - Manipulate index content.
+
+=item *
+
+L<KinoSearch::Search::IndexSearcher> - Search an index.
+
+=item *
+
+L<KinoSearch::Search::Hits> - Iterate over hits returned by a Searcher.
+
+=back
+
+=head2 Adaptations to indexer.pl
+
+After we load our modules...
+
+    use KinoSearch::Plan::Schema;
+    use KinoSearch::Plan::FullTextType;
+    use KinoSearch::Analysis::PolyAnalyzer;
+    use KinoSearch::Index::Indexer;
+
+... the first item we're going need is a L<Schema|KinoSearch::Plan::Schema>. 
+
+A Schema is analogous to an SQL table definition.  It instructs other entities
+on how they should interpret the raw data in an inverted index and interact
+with it.  
+
+The primary job of a Schema is to specify what fields are available and how
+they're defined.  We'll start off with three fields: title, content and url.
+
+    # Create Schema.
+    my $schema = KinoSearch::Plan::Schema->new;
+    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+        language => 'en',
+    );
+    my $type = KinoSearch::Plan::FullTextType->new(
+        analyzer => $polyanalyzer,
+    );
+    $schema->spec_field( name => 'title',   type => $type );
+    $schema->spec_field( name => 'content', type => $type );
+    $schema->spec_field( name => 'url',     type => $type );
+
+All of the fields are spec'd out using the "FullTextType" FieldType,
+indicating that they will be searchable as "full text" -- which means that
+they can be searched for individual words.  The "analyzer", which is unique to
+FullTextType fields, is what breaks up the text into searchable tokens.
+
+Next, we'll swap our KSx::Simple object out for a KinoSearch::Index::Indexer.
+The substitution will be straightforward because Simple has merely been
+serving as a thin wrapper around an inner Indexer, and we'll just be peeling
+away the wrapper.
+
+First, replace the constructor:
+
+    # Create Indexer.
+    my $indexer = KinoSearch::Index::Indexer->new(
+        index    => $path_to_index,
+        schema   => $schema,
+        create   => 1,
+        truncate => 1,
+    );
+
+Next, have the C<$indexer> object C<add_doc> where we were having the
+C<$simple> object C<add_doc> before:
+
+    foreach my $filename (@filenames) {
+        my $doc = slurp_and_parse_file($filename);
+        $indexer->add_doc($doc);
+    }
+
+There's only one extra step required: at the end of the app, you must call
+commit() explicitly to close the indexing session and commit your changes.
+(KSx::Simple hides this detail, calling commit() implicitly when it needs to).
+
+    $indexer->commit;
+
+=head2 Adaptations to search.cgi
+
+In our search app as in our indexing app, KSx::Simple has served as a
+thin wrapper -- this time around L<KinoSearch::Search::IndexSearcher> and
+L<KinoSearch::Search::Hits>.  Swapping out Simple for these two classes is
+also straightforward:
+
+    use KinoSearch::Search::IndexSearcher;
+    
+    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+        index => $path_to_index,
+    );
+    my $hits = $searcher->hits(    # returns a Hits object, not a hit count
+        query      => $q,
+        offset     => $offset,
+        num_wanted => $hits_per_page,
+    );
+    my $hit_count = $hits->total_hits;  # get the hit count here
+    
+    ...
+    
+    while ( my $hit = $hits->next ) {
+        ...
+    }
+
+=head2 Hooray!
+
+Congratulations!  Your apps do the same thing as before... but now they'll be
+easier to customize.  
+
+In our next chapter, L<KinoSearch::Docs::Tutorial::FieldType>, we'll explore
+how to assign different behaviors to different fields.
+
+=head1 COPYRIGHT
+
+Copyright 2005-2010 Marvin Humphrey
+
+=head1 LICENSE, DISCLAIMER, BUGS, etc.
+
+See L<KinoSearch> version 0.30.
+

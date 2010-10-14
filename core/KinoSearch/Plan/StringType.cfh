@@ -1,0 +1,48 @@
+parcel KinoSearch cnick Kino;
+
+/** Non-tokenized text type.
+ * 
+ * KinoSearch::Plan::StringType is used for "exact-match" strings.
+ */
+class KinoSearch::Plan::StringType 
+    inherits KinoSearch::Plan::TextType : dumpable {
+
+    /** 
+     * @param boost floating point per-field boost.
+     * @param indexed boolean indicating whether the field should be indexed.
+     * @param stored boolean indicating whether the field should be stored.
+     * @param sortable boolean indicating whether the field should be
+     * sortable.
+     */
+    public inert StringType* 
+    init(StringType *self);
+
+    inert StringType* 
+    init2(StringType *self, float boost = 1.0, bool_t indexed = true, 
+          bool_t stored = true, bool_t sortable = false);
+
+    public inert incremented StringType* 
+    new();
+
+    public incremented Similarity*
+    Make_Similarity(StringType *self);
+
+    incremented Hash*
+    Dump_For_Schema(StringType *self);
+
+    public incremented Hash*
+    Dump(StringType *self);
+
+    public incremented StringType*
+    Load(StringType *self, Obj *dump);
+
+    public bool_t
+    Equals(StringType *self, Obj *other);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

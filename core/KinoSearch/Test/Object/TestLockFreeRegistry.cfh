@@ -1,0 +1,24 @@
+parcel KinoSearch cnick Kino;
+
+inert class KinoSearch::Test::Object::TestLockFreeRegistry cnick TestLFReg {
+    inert void
+    run_tests();
+}
+
+/** Private test-only class for stressing LockFreeRegistry. 
+ */
+class KinoSearch::Test::Object::StupidHashCharBuf inherits KinoSearch::Object::CharBuf {
+    inert incremented StupidHashCharBuf*
+    new(char *text);
+
+    /** Always returns 1, guaranteeing collisions. */
+    public int32_t
+    Hash_Sum(StupidHashCharBuf *self);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

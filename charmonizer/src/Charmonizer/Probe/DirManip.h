@@ -1,0 +1,61 @@
+/* Charmonizer/Probe/DirManip.h
+ */
+
+#ifndef H_CHAZ_DIRMANIP
+#define H_CHAZ_DIRMANIP 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* The DirManip module exports or aliases symbols related to directory and file
+ * manipulation.
+ *
+ * Defined if the header files dirent.h and direct.h are available, respectively:
+ *
+ * HAS_DIRENT_H
+ * HAS_DIRECT_H
+ *
+ * Defined if struct dirent has these members.
+ * 
+ * HAS_DIRENT_D_NAMLEN
+ * HAS_DIRENT_D_TYPE
+ *
+ * The "makedir" macro will be aliased to the POSIX-specified two-argument
+ * "mkdir" interface:  
+ * 
+ * makedir 
+ *
+ * On some systems, the second argument to makedir will be ignored, in which
+ * case this symbol will be true; otherwise, it will be false: (TODO: This
+ * isn't verified and may sometimes be incorrect.)
+ * 
+ * MAKEDIR_MODE_IGNORED
+ *
+ * String representing the system's directory separator:
+ * 
+ * DIR_SEP
+ *
+ * True if the remove() function removes directories, false otherwise:
+ *
+ * REMOVE_ZAPS_DIRS
+ */
+void chaz_DirManip_run(void);
+
+#ifdef CHAZ_USE_SHORT_NAMES
+  #define DirManip_run    chaz_DirManip_run
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CHAZ_DIR_SEP */
+
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

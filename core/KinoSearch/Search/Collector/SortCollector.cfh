@@ -1,0 +1,73 @@
+parcel KinoSearch cnick Kino;
+
+/** Collect top-sorting documents.
+ * 
+ * A SortCollector sorts hits according to a SortSpec, keeping the highest
+ * ranking N documents in a priority queue.
+ */ 
+class KinoSearch::Search::Collector::SortCollector cnick SortColl
+    inherits KinoSearch::Search::Collector {
+
+    uint32_t        wanted;
+    uint32_t        total_hits;
+    HitQueue       *hit_q;
+    MatchDoc       *bumped;
+    VArray         *rules;
+    SortCache     **sort_caches;
+    void          **ord_arrays;
+    uint8_t        *actions;
+    uint8_t        *auto_actions;
+    uint8_t        *derived_actions;
+    uint32_t        num_rules;
+    uint32_t        num_actions;
+    float           bubble_score;
+    int32_t         bubble_doc;
+    int32_t         seg_doc_max;
+    bool_t          need_score;
+    bool_t          need_values;
+
+    inert incremented SortCollector* 
+    new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
+
+    /**
+     * @param schema A Schema.  Required if <code>sort_spec</code> provided.
+     * @param sort_spec A SortSpec.  If NULL, sort by descending score first
+     * and ascending doc id second.  
+     * @param wanted Maximum number of hits to collect.
+     */
+    inert SortCollector* 
+    init(SortCollector *self, Schema *schema = NULL, 
+         SortSpec *sort_spec = NULL, uint32_t wanted);
+
+    /** Keep highest ranking docs.
+     */
+    public void 
+    Collect(SortCollector *self, int32_t doc_id);
+
+    /** Empty out the HitQueue and return an array of sorted MatchDocs.
+     */
+    incremented VArray*
+    Pop_Match_Docs(SortCollector *self);
+
+    /** Accessor for "total_hits" member, which tracks the number of times
+     * that Collect() was called.
+     */
+    uint32_t
+    Get_Total_Hits(SortCollector *self);
+
+    public void
+    Set_Reader(SortCollector *self, SegReader *reader);
+
+    public bool_t
+    Need_Score(SortCollector *self);
+
+    public void
+    Destroy(SortCollector *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

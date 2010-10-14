@@ -1,0 +1,23 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Index::BitVecDelDocs inherits KinoSearch::Object::BitVector {
+
+    InStream  *instream;
+    CharBuf   *filename;
+
+    inert incremented BitVecDelDocs*
+    new(Folder *folder, const CharBuf *filename);
+
+    inert BitVecDelDocs*
+    init(BitVecDelDocs *self, Folder *folder, const CharBuf *filename);
+
+    public void
+    Destroy(BitVecDelDocs *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

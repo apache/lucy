@@ -1,0 +1,34 @@
+parcel KinoSearch cnick Kino;
+
+/** Iterator for deleted document ids.
+ */
+class KinoSearch::Search::BitVecMatcher inherits KinoSearch::Search::Matcher {
+
+    BitVector *bit_vec;
+    int32_t    doc_id;
+
+    public inert incremented BitVecMatcher*
+    new(BitVector *bit_vector);
+
+    public inert BitVecMatcher*
+    init(BitVecMatcher *self, BitVector *bit_vector);
+
+    public int32_t
+    Next(BitVecMatcher *self);
+
+    public int32_t
+    Advance(BitVecMatcher *self, int32_t target);
+
+    public int32_t
+    Get_Doc_ID(BitVecMatcher *self);
+
+    public void
+    Destroy(BitVecMatcher *self);
+}
+
+/* Copyright 2008-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

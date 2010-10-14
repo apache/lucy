@@ -1,0 +1,53 @@
+parcel KinoSearch cnick Kino;
+
+/** Matcher for a PhraseQuery. 
+ */
+
+class KinoSearch::Search::PhraseScorer inherits KinoSearch::Search::Matcher {
+
+    int32_t         doc_id;
+    uint32_t        num_elements;
+    Similarity     *sim;
+    PostingList   **plists;
+    ByteBuf        *anchor_set;
+    float           phrase_freq;
+    float           phrase_boost;
+    Compiler       *compiler;
+    float           weight;
+    bool_t          first_time;
+    bool_t          more;
+
+    inert incremented PhraseScorer*
+    new(Similarity *similarity, VArray *posting_lists, Compiler *compiler);
+
+    inert PhraseScorer*
+    init(PhraseScorer *self, Similarity *similarity, VArray *posting_lists, 
+         Compiler *compiler);
+
+    public void
+    Destroy(PhraseScorer *self);
+
+    public int32_t
+    Next(PhraseScorer *self);
+
+    public int32_t
+    Advance(PhraseScorer *self, int32_t target);
+
+    public int32_t 
+    Get_Doc_ID(PhraseScorer *self);
+
+    public float
+    Score(PhraseScorer *self);
+
+    /** Calculate how often the phrase occurs in the current document.
+     */
+    float
+    Calc_Phrase_Freq(PhraseScorer *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

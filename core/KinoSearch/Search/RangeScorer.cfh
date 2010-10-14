@@ -1,0 +1,40 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Search::RangeScorer inherits KinoSearch::Search::Matcher {
+
+    int32_t    doc_id;
+    int32_t    doc_max;
+    int32_t    lower_bound;
+    int32_t    upper_bound;
+    SortCache *sort_cache;
+
+    inert incremented RangeScorer*
+    new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache, 
+        int32_t doc_max);
+
+    inert RangeScorer*
+    init(RangeScorer *self, int32_t lower_bound, int32_t upper_bound, 
+         SortCache *sort_cache, int32_t doc_max);
+
+    public int32_t
+    Next(RangeScorer *self);
+
+    public int32_t
+    Advance(RangeScorer *self, int32_t target);
+
+    public float
+    Score(RangeScorer* self);
+
+    public int32_t 
+    Get_Doc_ID(RangeScorer* self);
+
+    public void
+    Destroy(RangeScorer *self);
+}
+
+/* Copyright 2008-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

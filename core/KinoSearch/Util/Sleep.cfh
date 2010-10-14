@@ -1,0 +1,23 @@
+parcel KinoSearch cnick Kino;
+
+/** Provide platform-compatible sleep() functions.
+ */
+inert class KinoSearch::Util::Sleep {
+    
+    /** Sleep for <code>seconds</code> seconds.  
+     */
+    inert void
+    sleep(uint32_t seconds);
+
+    /** Sleep for <code>milliseconds</code> milliseconds.  
+     */
+    inert void
+    millisleep(uint32_t milliseconds);
+}
+
+/* Copyright 2009-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

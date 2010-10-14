@@ -1,0 +1,54 @@
+parcel KinoSearch cnick Kino;
+
+/** Term freq and positional data.
+ */
+
+class KinoSearch::Index::TermVector cnick TV
+    inherits KinoSearch::Object::Obj {
+
+    CharBuf *field;
+    CharBuf *text;
+    uint32_t num_pos;
+    I32Array  *positions;
+    I32Array  *start_offsets;
+    I32Array  *end_offsets;
+
+    /** Constructor.  The object will assume ownership of the positions,
+     * start_offsets, and end_offsets arrays.
+     */
+    inert incremented TermVector*
+    new(const CharBuf *field, const CharBuf *text, I32Array *positions, 
+        I32Array *start_offsets, I32Array *end_offsets);
+
+    inert TermVector*
+    init(TermVector *self, const CharBuf *field, const CharBuf *text,
+         I32Array *positions, I32Array *start_offsets, I32Array *end_offsets);
+
+    I32Array*
+    Get_Positions(TermVector *self);
+
+    I32Array*
+    Get_Start_Offsets(TermVector *self);
+
+    I32Array*
+    Get_End_Offsets(TermVector *self);
+
+    public incremented TermVector*
+    Deserialize(TermVector *self, InStream *instream);
+
+    public bool_t
+    Equals(TermVector *self, Obj *other);
+
+    public void
+    Destroy(TermVector *self);
+
+    public void
+    Serialize(TermVector *self, OutStream *outstream);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

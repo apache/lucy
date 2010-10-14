@@ -1,0 +1,50 @@
+parcel KinoSearch cnick Kino;
+
+/** Intersect multiple result sets.
+ *
+ * ANDQuery matches only when all of its children match, so its result set is
+ * the intersection of their result sets.  Those lucky documents which match
+ * receive a summed score.
+ */
+class KinoSearch::Search::ANDQuery inherits KinoSearch::Search::PolyQuery 
+    : dumpable {
+
+    inert incremented ANDQuery*
+    new(VArray *children = NULL);
+
+    /**
+     * @param children An array of child Queries.
+     */
+    public inert ANDQuery*
+    init(ANDQuery *self, VArray *children = NULL);
+
+    public incremented Compiler*
+    Make_Compiler(ANDQuery *self, Searcher *searcher, float boost);
+
+    public incremented CharBuf*
+    To_String(ANDQuery *self);
+
+    public bool_t
+    Equals(ANDQuery *self, Obj *other);
+}
+
+class KinoSearch::Search::ANDCompiler 
+    inherits KinoSearch::Search::PolyCompiler {
+
+    inert incremented ANDCompiler*
+    new(ANDQuery *parent, Searcher *searcher, float boost);
+
+    inert ANDCompiler*
+    init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher, 
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(ANDCompiler *self, SegReader *reader, bool_t need_score);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

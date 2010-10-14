@@ -1,0 +1,62 @@
+parcel KinoSearch cnick Kino;
+
+/** In-memory Folder implementation.
+ * 
+ * RAMFolder is an entirely in-memory implementation of
+ * KinoSearch::Store::Folder, primarily used for testing and development.
+ */
+
+class KinoSearch::Store::RAMFolder inherits KinoSearch::Store::Folder {
+
+    inert incremented RAMFolder*
+    new(const CharBuf *path = NULL);
+
+    /**
+     * @param path Relative path, used for subfolders.
+     */
+    public inert RAMFolder*
+    init(RAMFolder *self, const CharBuf *path = NULL);
+
+    public void
+    Initialize(RAMFolder *self);
+
+    public bool_t 
+    Check(RAMFolder *self);
+
+    public void
+    Close(RAMFolder *self);
+
+    incremented nullable FileHandle*
+    Local_Open_FileHandle(RAMFolder *self, const CharBuf *name, uint32_t flags);
+
+    incremented nullable DirHandle*
+    Local_Open_Dir(RAMFolder *self);
+
+    bool_t 
+    Local_MkDir(RAMFolder *self, const CharBuf *name);
+
+    bool_t
+    Local_Exists(RAMFolder *self, const CharBuf *name);
+
+    bool_t
+    Local_Is_Directory(RAMFolder *self, const CharBuf *name);
+
+    nullable Folder*
+    Local_Find_Folder(RAMFolder *self, const CharBuf *name);
+
+    bool_t
+    Local_Delete(RAMFolder *self, const CharBuf *name);
+
+    public bool_t 
+    Rename(RAMFolder *self, const CharBuf* from, const CharBuf *to);
+
+    public bool_t
+    Hard_Link(RAMFolder *self, const CharBuf *from, const CharBuf *to);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

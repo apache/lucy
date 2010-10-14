@@ -1,0 +1,69 @@
+=head1 NAME
+
+KinoSearch::Docs::Tutorial::Highlighter - Augment search results with
+highlighted excerpts.
+
+=head1 DESCRIPTION
+
+Adding relevant excerpts with highlighted search terms to your search results
+display makes it much easier for end users to scan the page and assess which
+hits look promising, dramatically improving their search experience.
+
+=head2 Adaptations to indexer.pl
+
+L<KinoSearch::Highlight::Highlighter> uses information generated at index
+time.  To save resources, highlighting is disabled by default and must be
+turned on for individual fields.
+
+    my $highlightable = KinoSearch::Plan::FullTextType->new(
+        analyzer      => $polyanalyzer,
+        highlightable => 1,
+    );
+    $schema->spec_field( name => 'content', type => $highlightable );
+
+=head2 Adaptations to search.cgi
+
+To add highlighting and excerpting to the search.cgi sample app, create a
+C<$highlighter> object outside the hits iterating loop...
+
+    my $highlighter = KinoSearch::Highlight::Highlighter->new(
+        searcher => $searcher,
+        query    => $q,
+        field    => 'content'
+    );
+
+... then modify the loop and the per-hit display to generate and include the
+excerpt.
+
+    # Create result list.
+    my $report = '';
+    while ( my $hit = $hits->next ) {
+        my $score   = sprintf( "%0.3f", $hit->get_score );
+        my $title   = encode_entities( $hit->{title} );
+        my $excerpt = $highlighter->create_excerpt($hit);
+        $report .= qq|
+            <p>
+              <a href="$hit->{url}"><strong>$title</strong></a>
+              <em>$score</em>
+              <br />
+              $excerpt
+              <br />
+              <span class="excerptURL">$hit->{url}</span>
+            </p>
+        |;
+    }
+
+=head2 Next chapter: Query objects
+
+Our next tutorial chapter, L<KinoSearch::Docs::Tutorial::QueryObjects>,
+illustrates how to build an "advanced search" interface using
+L<Query|KinoSearch::Search::Query> objects instead of query strings.
+
+=head1 COPYRIGHT
+
+Copyright 2008-2010 Marvin Humphrey
+
+=head1 LICENSE, DISCLAIMER, BUGS, etc.
+
+See L<KinoSearch> version 0.30.
+

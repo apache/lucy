@@ -1,0 +1,51 @@
+parcel KinoSearch cnick Kino;
+
+/** Representation of a document being evaluated as a hit.
+ */
+
+class KinoSearch::Search::MatchDoc inherits KinoSearch::Object::Obj {
+
+    int32_t  doc_id;
+    float    score;
+    VArray  *values;
+
+    inert incremented MatchDoc*
+    new(int32_t doc_id, float score, VArray *values = NULL);
+
+    inert MatchDoc*
+    init(MatchDoc *self, int32_t doc_id, float score, VArray *values = NULL);
+
+    public void
+    Serialize(MatchDoc *self, OutStream *outstream);
+
+    public incremented MatchDoc*
+    Deserialize(MatchDoc *self, InStream *instream);
+
+    int32_t
+    Get_Doc_ID(MatchDoc *self);
+
+    void
+    Set_Doc_ID(MatchDoc *self, int32_t doc_id);
+
+    float
+    Get_Score(MatchDoc *self);
+
+    void
+    Set_Score(MatchDoc *self, float score);
+
+    nullable VArray* 
+    Get_Values(MatchDoc *self);
+
+    void
+    Set_Values(MatchDoc *self, VArray *values);
+
+    public void
+    Destroy(MatchDoc *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

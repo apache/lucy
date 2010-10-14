@@ -1,0 +1,91 @@
+parcel KinoSearch cnick Kino;
+
+class KinoSearch::Index::SortFieldWriter 
+    inherits KinoSearch::Util::SortExternal {
+    CharBuf    *field;
+    Hash       *uniq_vals;
+    Schema     *schema;
+    Snapshot   *snapshot;
+    Segment    *segment;
+    PolyReader *polyreader;
+    FieldType  *type;
+    I32Array   *doc_map;
+    MemoryPool *mem_pool;
+    int32_t     field_num;
+    int32_t     null_ord;
+    int8_t      prim_id;
+    int32_t     count;
+    OutStream  *temp_ord_out;
+    OutStream  *temp_ix_out;
+    OutStream  *temp_dat_out;
+    InStream   *ord_in;
+    InStream   *ix_in;
+    InStream   *dat_in;
+    SortCache  *sort_cache;
+    int64_t     ord_start;
+    int64_t     ord_end;
+    int64_t     ix_start;
+    int64_t     ix_end;
+    int64_t     dat_start;
+    int64_t     dat_end;
+    int32_t     run_cardinality;
+    int32_t     run_max;
+    bool_t      var_width;
+    int32_t    *sorted_ids;
+    int32_t     run_ord;
+    int32_t     run_tick;
+    int32_t     ord_width;
+
+    inert incremented SortFieldWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment, 
+        PolyReader *polyreader, const CharBuf *field, MemoryPool *memory_pool,
+        size_t mem_thresh, OutStream *temp_ord_out, OutStream *temp_ix_out,
+        OutStream *temp_dat_out);
+
+    inert SortFieldWriter*
+    init(SortFieldWriter *self, Schema *schema, Snapshot *snapshot, 
+         Segment *segment, PolyReader *polyreader, const CharBuf *field,
+         MemoryPool *memory_pool, size_t mem_thresh, OutStream *temp_ord_out, 
+         OutStream *temp_ix_out, OutStream *temp_dat_out);
+
+    void
+    Add(SortFieldWriter *self, int32_t doc_id, Obj *value);
+
+    void
+    Add_Segment(SortFieldWriter *self, SegReader *reader, I32Array *doc_map, 
+                SortCache *sort_cache);
+
+    void
+    Flush(SortFieldWriter *self);
+
+    void
+    Flip(SortFieldWriter *self);
+
+    uint32_t
+    Refill(SortFieldWriter *self);
+
+    int32_t
+    Finish(SortFieldWriter *self);
+
+    int
+    Compare(SortFieldWriter *self, void *va, void *vb);
+
+    void
+    Clear_Cache(SortFieldWriter *self);
+
+    int32_t
+    Get_Null_Ord(SortFieldWriter *self);
+
+    int32_t
+    Get_Ord_Width(SortFieldWriter *self);
+
+    public void
+    Destroy(SortFieldWriter *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

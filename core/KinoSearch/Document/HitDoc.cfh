@@ -1,0 +1,58 @@
+parcel KinoSearch cnick Kino;
+
+/**
+ * A document read from an index.
+ * 
+ * HitDoc is the search-time relative of the index-time class Doc; it is
+ * augmented by a numeric score attribute that Doc doesn't have.
+ */
+
+class KinoSearch::Document::HitDoc inherits KinoSearch::Document::Doc {
+
+    float score;
+
+    inert incremented HitDoc* 
+    new(void *fields = NULL, int32_t doc_id = 0, float score = 0.0);
+
+    /** Constructor.
+     *
+     * @param fields A hash of field name / field value pairs.
+     * @param doc_id Internal document id.
+     * @param score Number indicating how well the doc scored against a query.
+     */
+    inert HitDoc* 
+    init(HitDoc *self, void *fields = NULL, int32_t doc_id = 0, 
+         float score = 0.0);
+
+    /** Set score attribute.
+     */
+    public void
+    Set_Score(HitDoc *self, float score);
+
+    /** Get score attribute.
+     */
+    public float
+    Get_Score(HitDoc *self);
+
+    public bool_t
+    Equals(HitDoc *self, Obj *other);
+
+    public incremented Hash*
+    Dump(HitDoc *self);
+
+    public incremented HitDoc*
+    Load(HitDoc *self, Obj *dump);
+
+    public void
+    Serialize(HitDoc *self, OutStream *outstream);
+
+    public incremented HitDoc*
+    Deserialize(HitDoc *self, InStream *instream);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

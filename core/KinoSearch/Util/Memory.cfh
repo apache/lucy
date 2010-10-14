@@ -1,0 +1,62 @@
+parcel KinoSearch cnick Kino;
+
+inert class KinoSearch::Util::Memory {
+
+    /** Attempt to allocate memory with malloc, but print an error and exit if the
+     * call fails.
+     */
+    inert nullable void*
+    wrapped_malloc(size_t count);
+
+    /** Attempt to allocate memory with calloc, but print an error and exit if the
+     * call fails.
+     */
+    inert nullable void*
+    wrapped_calloc(size_t count, size_t size);
+
+    /** Attempt to allocate memory with realloc, but print an error and exit if 
+     * the call fails.
+     */
+    inert nullable void*
+    wrapped_realloc(void *ptr, size_t size);
+
+    /** Free memory.  (Wrapping is necessary in cases where memory allocated
+     * within the KinoSearch library has to be freed in an external environment where
+     * "free" may have been redefined.)
+     */
+    inert void
+    wrapped_free(void *ptr);
+
+    /** Provide a number which is somewhat larger than the supplied number, so
+     * that incremental array growth does not trigger pathological
+     * reallocation.
+     * 
+     * @param minimum The minimum number of array elements.
+     * @param width The size of each array element in bytes.
+     */
+    inert size_t 
+    oversize(size_t minimum, size_t width);
+}
+
+__C__
+
+#define KINO_MALLOCATE    kino_Memory_wrapped_malloc
+#define KINO_CALLOCATE    kino_Memory_wrapped_calloc
+#define KINO_REALLOCATE   kino_Memory_wrapped_realloc
+#define KINO_FREEMEM      kino_Memory_wrapped_free
+
+#ifdef KINO_USE_SHORT_NAMES
+  #define MALLOCATE                       KINO_MALLOCATE
+  #define CALLOCATE                       KINO_CALLOCATE
+  #define REALLOCATE                      KINO_REALLOCATE
+  #define FREEMEM                         KINO_FREEMEM
+#endif
+
+__END_C__
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

@@ -1,0 +1,54 @@
+parcel KinoSearch cnick Kino;
+
+/** Default behaviors for binary fields.
+ * 
+ * BlobType is an implementation of FieldType tuned for use with fields
+ * containing binary data, which cannot be indexed or searched -- only stored.
+ */
+class KinoSearch::Plan::BlobType inherits KinoSearch::Plan::FieldType 
+    : dumpable {
+
+    /** 
+     * @param stored boolean indicating whether the field should be stored.
+     */
+    public inert BlobType* 
+    init(BlobType *self, bool_t stored);
+
+    public inert incremented BlobType* 
+    new(bool_t stored);
+
+    /** Returns true. 
+     */
+    public bool_t
+    Binary(BlobType *self);
+
+    /** Throws an error unless <code>sortable</code> is false.
+     */
+    public void
+    Set_Sortable(BlobType *self, bool_t sortable);
+
+    incremented ViewByteBuf*
+    Make_Blank(BlobType *self);
+
+    int8_t
+    Primitive_ID(BlobType *self);
+
+    incremented Hash*
+    Dump_For_Schema(BlobType *self);
+
+    public incremented Hash*
+    Dump(BlobType *self);
+
+    public incremented BlobType*
+    Load(BlobType *self, Obj *dump);
+
+    public bool_t
+    Equals(BlobType *self, Obj *other);
+}
+
+/* Copyright 2007-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

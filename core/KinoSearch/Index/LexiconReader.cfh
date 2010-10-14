@@ -1,0 +1,108 @@
+parcel KinoSearch cnick Kino;
+
+/** Read Lexicon data.
+ *
+ * LexiconReader reads term dictionary information.
+ */
+abstract class KinoSearch::Index::LexiconReader cnick LexReader 
+    inherits KinoSearch::Index::DataReader {
+
+    inert LexiconReader*
+    init(LexiconReader *self, Schema *schema = NULL, Folder *folder = NULL,
+        Snapshot *snapshot = NULL, VArray *segments = NULL, 
+        int32_t seg_tick = -1);
+
+    /** Return a new Lexicon for the given <code>field</code>.  Will return
+     * NULL if either the field is not indexed, or if no documents contain a
+     * value for the field.
+     *
+     * @param field Field name.
+     * @param term Pre-locate the Lexicon to this term.
+     */
+    public abstract incremented nullable Lexicon*
+    Lexicon(LexiconReader *self, const CharBuf *field, Obj *term = NULL);
+
+    /** Return the number of documents where the specified term is present.
+     */
+    public abstract uint32_t
+    Doc_Freq(LexiconReader *self, const CharBuf *field, Obj *term);
+
+    /** If the term can be found, return a term info, otherwise return NULL.
+     */
+    abstract incremented nullable TermInfo*
+    Fetch_Term_Info(LexiconReader *self, const CharBuf *field, Obj *term);
+
+    /** Return a LexiconReader which merges the output of other
+     * LexiconReaders.
+     * 
+     * @param readers An array of LexiconReaders.
+     * @param offsets Doc id start offsets for each reader.
+     */
+    public incremented nullable LexiconReader*
+    Aggregator(LexiconReader *self, VArray *readers, I32Array *offsets);
+}
+
+class KinoSearch::Index::PolyLexiconReader cnick PolyLexReader
+    inherits KinoSearch::Index::LexiconReader {
+
+    VArray   *readers;
+    I32Array *offsets;
+
+    inert incremented PolyLexiconReader*
+    new(VArray *readers, I32Array *offsets);
+
+    inert PolyLexiconReader*
+    init(PolyLexiconReader *self, VArray *readers, I32Array *offsets);
+
+    public incremented nullable Lexicon*
+    Lexicon(PolyLexiconReader *self, const CharBuf *field, Obj *term = NULL);
+
+    public uint32_t
+    Doc_Freq(PolyLexiconReader *self, const CharBuf *field, Obj *term);
+
+    public void
+    Close(PolyLexiconReader *self);
+
+    public void
+    Destroy(PolyLexiconReader *self);
+}
+
+class KinoSearch::Index::DefaultLexiconReader cnick DefLexReader 
+    inherits KinoSearch::Index::LexiconReader {
+
+    VArray *lexicons;
+
+    inert incremented DefaultLexiconReader*
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+        int32_t seg_tick);
+
+    inert DefaultLexiconReader*
+    init(DefaultLexiconReader *self, Schema *schema, Folder *folder, 
+         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+
+    public incremented nullable Lexicon*
+    Lexicon(DefaultLexiconReader *self, const CharBuf *field, 
+            Obj *term = NULL);
+
+    /** Return the number of documents in which the term appears.
+     */
+    public uint32_t
+    Doc_Freq(DefaultLexiconReader *self, const CharBuf *field, Obj *term);
+
+    incremented nullable TermInfo*
+    Fetch_Term_Info(DefaultLexiconReader *self, const CharBuf *field, 
+                    Obj *term);
+
+    public void
+    Close(DefaultLexiconReader *self);
+
+    public void
+    Destroy(DefaultLexiconReader *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

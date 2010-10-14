@@ -1,0 +1,46 @@
+parcel KinoSearch cnick Kino;
+
+/** 
+ * Base class for TermScorers.
+ *
+ * Each subclass of Posting is associated with a corresponding subclass of
+ * TermScorer.
+ */
+class KinoSearch::Search::TermScorer inherits KinoSearch::Search::Matcher {
+
+    float           weight;
+    Compiler       *compiler;
+    Similarity     *sim;
+    PostingList    *plist;
+    Posting        *posting;
+
+    inert TermScorer*
+    init(TermScorer *self, Similarity *similarity, PostingList *posting_list,
+         Compiler *compiler);
+
+    public void
+    Destroy(TermScorer *self);
+
+    public int32_t
+    Next(TermScorer* self);
+
+    public int32_t
+    Advance(TermScorer* self, int32_t target);
+
+    public int32_t 
+    Get_Doc_ID(TermScorer* self);
+}
+
+__C__
+#define KINO_TERMSCORER_SCORE_CACHE_SIZE 32
+#ifdef KINO_USE_SHORT_NAMES
+  #define TERMSCORER_SCORE_CACHE_SIZE KINO_TERMSCORER_SCORE_CACHE_SIZE
+#endif
+__END_C__
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

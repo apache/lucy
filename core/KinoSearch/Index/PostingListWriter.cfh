@@ -1,0 +1,57 @@
+parcel KinoSearch cnick Kino;
+
+/** Write postings data to an index.
+ * 
+ * PostingListWriter writes frequency and positional data files, plus feeds
+ * data to LexiconWriter.
+ */ 
+
+class KinoSearch::Index::PostingListWriter cnick PListWriter
+    inherits KinoSearch::Index::DataWriter {
+
+    LexiconWriter   *lex_writer;
+    VArray          *pools;
+    MemoryPool      *mem_pool;
+    OutStream       *lex_temp_out;
+    OutStream       *post_temp_out;
+    OutStream       *skip_out;
+    uint32_t         mem_thresh;
+
+    inert int32_t current_file_format;
+
+    inert incremented PostingListWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader, LexiconWriter *lex_writer); 
+
+    inert PostingListWriter*
+    init(PostingListWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader, LexiconWriter *lex_writer);
+
+    /** Test only. */
+    inert void
+    set_default_mem_thresh(size_t mem_thresh);
+
+    public void
+    Add_Inverted_Doc(PostingListWriter *self, Inverter *inverter, 
+                     int32_t doc_id);
+
+    public void
+    Add_Segment(PostingListWriter *self, SegReader *reader,
+                I32Array *doc_map = NULL);
+
+    public void
+    Finish(PostingListWriter *self);
+
+    public int32_t 
+    Format(PostingListWriter *self);
+
+    public void
+    Destroy(PostingListWriter *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

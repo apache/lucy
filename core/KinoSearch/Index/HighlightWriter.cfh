@@ -1,0 +1,47 @@
+parcel KinoSearch cnick Kino;
+
+/**  Add highlighting data to index.
+ */
+
+class KinoSearch::Index::HighlightWriter cnick HLWriter
+    inherits KinoSearch::Index::DataWriter {
+
+    OutStream *ix_out;
+    OutStream *dat_out;
+
+    inert int32_t current_file_format;
+
+    inert incremented HighlightWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader);
+
+    inert HighlightWriter*
+    init(HighlightWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    incremented ByteBuf*
+    TV_Buf(HighlightWriter *self, Inversion *inversion);
+
+    public void
+    Add_Inverted_Doc(HighlightWriter *self, Inverter *inverter, int32_t doc_id);
+
+    public void
+    Add_Segment(HighlightWriter *self, SegReader *reader, 
+                I32Array *doc_map = NULL);
+
+    public void
+    Finish(HighlightWriter *self);
+
+    public int32_t
+    Format(HighlightWriter *self);
+
+    public void
+    Destroy(HighlightWriter *self);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

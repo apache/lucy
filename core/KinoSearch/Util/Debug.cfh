@@ -1,0 +1,132 @@
+parcel KinoSearch cnick Kino;
+
+/** The Debug module provides multiple levels of debugging verbosity.  Code for
+ * debug statements is only compiled "#ifdef KINO_DEBUG" at compile-time.
+ * Some statements will then always print; additional output can be enabled
+ * using the environment variable KINO_DEBUG.  Examples:
+ * 
+ *   KINO_DEBUG=file.C      -> all debug statements in path/file.C
+ *   KINO_DEBUG=func        -> all in functions named exactly 'func'
+ *   KINO_DEBUG=f*          -> all in functions (or files) starting with 'f' 
+ *   KINO_DEBUG=file*       -> all in files (or functions) ending with file*'
+ *   KINO_DEBUG=func1,func2 -> either in func1 or in func2
+ *   KINO_DEBUG=*           -> just print all debug statements
+ * 
+ * The wildcard character '*' can only go at the end of an identifier.
+ */
+
+inert class KinoSearch::Util::Debug {
+
+    /** Private function, used only by the DEBUG macros. 
+     */
+    inert void
+    print_mess(const char *file, int line, const char *func, 
+               const char *pat, ...);
+
+    /** Private function, used only by the DEBUG macros. 
+     */
+    inert int 
+    debug_should_print(const char *path, const char *func);
+
+    /** Force override in cached value of KINO_DEBUG environment variable.
+     */
+    inert void
+    set_env_cache(char *override);
+
+    /* Under KINO_DEBUG, track the number of objects allocated, the number
+     * freed, and the number of global objects.  If, after all non-global
+     * objects should have been cleaned up, these numbers don't balance out,
+     * there's a memory leak somewhere.
+     */
+    inert int32_t num_allocated;
+    inert int32_t num_freed;
+    inert int32_t num_globals;
+}
+
+__C__
+#ifdef KINO_DEBUG
+
+#undef KINO_DEBUG   // undef prior to redefining the command line argument 
+#define KINO_DEBUG_ENABLED 1
+
+#include <stdio.h>
+#include <stdlib.h>
+
+/** Unconditionally print debug statement prepending file and line info. 
+ */
+#define KINO_DEBUG_PRINT(args...)                                         \
+    kino_Debug_print_mess(__FILE__, __LINE__, __func__, ##args)
+
+/** Conditionally execute code if debugging enabled via KINO_DEBUG environment
+ * variable.
+ */
+#define KINO_DEBUG_DO(actions)                                            \
+    do {                                                                  \
+        static int initialized = 0;                                       \
+        static int do_it       = 0;                                       \
+        if (!initialized) {                                               \
+            initialized = 1;                                              \
+            do_it = kino_Debug_debug_should_print(__FILE__, __func__);    \
+        }                                                                 \
+        if (do_it) { actions; }                                           \
+    } while (0)
+
+/** Execute code so long as KINO_DEBUG was defined during compilation.
+ */
+#define KINO_IFDEF_DEBUG(actions) do { actions; } while (0)
+
+/** Conditionally print debug statement depending on KINO_DEBUG env variable.
+ */
+#define KINO_DEBUG(args...)                                            \
+        KINO_DEBUG_DO(KINO_DEBUG_PRINT(args));                  
+
+/** Abort on error if test fails.
+ *
+ * Note: unlike the system assert(), this ASSERT() is #ifdef KINO_DEBUG.
+ */
+#define KINO_ASSERT(test , args...)                                    \
+    do {                                                               \
+        if (!(test)) {                                                 \
+            KINO_DEBUG_PRINT("ASSERT FAILED (" #test ")\n" args);      \
+            abort();                                                   \
+        }                                                              \
+    } while (0) 
+
+#elif defined(CHY_HAS_GNUC_VARIADIC_MACROS) // not KINO_DEBUG 
+
+#undef KINO_DEBUG
+#define KINO_DEBUG_ENABLED 0
+#define KINO_DEBUG_DO(actions)
+#define KINO_IFDEF_DEBUG(actions)
+#define KINO_DEBUG_PRINT(args...)
+#define KINO_DEBUG(args...)
+#define KINO_ASSERT(test, args...)
+
+#else  // also not KINO_DEBUG 
+
+#undef KINO_DEBUG
+#define KINO_DEBUG_ENABLED 0
+#define KINO_DEBUG_DO(actions)
+#define KINO_IFDEF_DEBUG(actions)
+static void KINO_DEBUG_PRINT(char *_ignore_me, ...) { }
+static void KINO_DEBUG(char *_ignore_me, ...) { }
+static void KINO_ASSERT(int _ignore_me, ...) { }
+
+#endif // KINO_DEBUG 
+
+#ifdef KINO_USE_SHORT_NAMES
+  #define DEBUG_ENABLED             KINO_DEBUG_ENABLED
+  #define DEBUG_PRINT               KINO_DEBUG_PRINT
+  #define DEBUG_DO                  KINO_DEBUG_DO
+  #define IFDEF_DEBUG               KINO_IFDEF_DEBUG
+  #define DEBUG                     KINO_DEBUG
+  #define ASSERT                    KINO_ASSERT
+#endif
+__END_C__
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

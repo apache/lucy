@@ -1,0 +1,16 @@
+parcel KinoSearch cnick Kino;
+
+/** Tests for logical structure of Query objects output by QueryParser.
+ */
+
+inert class KinoSearch::Test::TestQueryParserSyntax cnick TestQPSyntax {
+    inert void
+    run_tests(Folder *index);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

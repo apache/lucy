@@ -1,0 +1,38 @@
+parcel KinoSearch cnick Kino;
+
+/** Utilities for parsing, interpreting and generating index file names.
+ */
+inert class KinoSearch::Util::IndexFileNames cnick IxFileNames {
+
+    /** Skip past the first instance of an underscore in the CharBuf, then
+     * attempt to decode a base 36 number.  For example, "snapshot_5.json"
+     * yields 5, and "seg_a1" yields 27.
+     *
+     * @return a generation number, or 0 if no number can be extracted.
+     */
+    inert uint64_t
+    extract_gen(const CharBuf *name);
+
+    /** Return the name of the latest generation snapshot file in the Folder,
+     * or NULL if no such file exists.
+     */
+    inert incremented nullable CharBuf*
+    latest_snapshot(Folder *folder);
+
+    /** Split the <code>path</code> on '/' and assign the last component to
+     * <code>target</code>, which will remain valid only as long as
+     * <code>path</code> is unmodified.  Trailing slashes will be stripped.  
+     *
+     * @param target The target string to assign to.
+     * @return target, allowing an assignment idiom.
+     */
+    inert incremented ZombieCharBuf*
+    local_part(const CharBuf *path, ZombieCharBuf *target);
+}
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

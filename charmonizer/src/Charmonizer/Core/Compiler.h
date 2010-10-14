@@ -1,0 +1,79 @@
+/* Charmonizer/Core/Compiler.h
+ */
+
+#ifndef H_CHAZ_COMPILER
+#define H_CHAZ_COMPILER
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stddef.h>
+#include "Charmonizer/Core/Defines.h"
+
+/* Attempt to compile and link an executable.  Return true if the executable
+ * file exists after the attempt.
+ */
+chaz_bool_t
+chaz_CC_compile_exe(const char *source_path, const char *exe_path, 
+                    const char *code, size_t code_len);
+
+/* Attempt to compile an object file.  Return true if the object file
+ * exists after the attempt.
+ */
+chaz_bool_t
+chaz_CC_compile_obj(const char *source_path, const char *obj_path, 
+                    const char *code, size_t code_len);
+
+/* Attempt to compile the supplied source code and return true if the
+ * effort succeeds.
+ */
+chaz_bool_t
+chaz_CC_test_compile(char *source, size_t source_len);
+
+/* Attempt to compile the supplied source code.  If successful, capture the 
+ * output of the program and return a pointer to a newly allocated buffer.
+ * If the compilation fails, return NULL.  The length of the captured 
+ * output will be placed into the integer pointed to by [output_len].
+ */
+char*
+chaz_CC_capture_output(char *source, size_t source_len, size_t *output_len);
+
+/* Add an include directory which will be used for all future compilation
+ * attempts.
+ */
+void
+chaz_CC_add_inc_dir(const char *dir);
+
+/** Initialize the compiler environment.
+ */
+void
+chaz_CC_init(const char *cc_command, const char *cc_flags);
+
+/* Clean up the environment.
+ */
+void
+chaz_CC_clean_up();
+
+#ifdef CHAZ_USE_SHORT_NAMES
+  #define CC_compile_exe              chaz_CC_compile_exe
+  #define CC_compile_obj              chaz_CC_compile_obj
+  #define CC_add_inc_dir              chaz_CC_add_inc_dir
+  #define CC_clean_up                 chaz_CC_clean_up
+  #define CC_test_compile             chaz_CC_test_compile
+  #define CC_capture_output           chaz_CC_capture_output
+  #define CC_init                     chaz_CC_init
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CHAZ_COMPILER */
+
+/* Copyright 2006-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

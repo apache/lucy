@@ -1,0 +1,43 @@
+parcel KinoSearch cnick Kino;
+
+/** Default doc writer. 
+ */
+class KinoSearch::Index::DocWriter inherits KinoSearch::Index::DataWriter {
+
+    OutStream    *ix_out;
+    OutStream    *dat_out;
+
+    inert int32_t current_file_format;
+
+    /** Constructors.
+     */
+    inert incremented DocWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader);
+
+    inert DocWriter*
+    init(DocWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    public void
+    Add_Inverted_Doc(DocWriter *self, Inverter *inverter, int32_t doc_id);
+
+    public void
+    Add_Segment(DocWriter *self, SegReader *reader, I32Array *doc_map = NULL);
+
+    public void
+    Finish(DocWriter *self);
+
+    public int32_t
+    Format(DocWriter *self);
+
+    public void 
+    Destroy(DocWriter *self);
+}
+
+/* Copyright 2005-2010 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+
