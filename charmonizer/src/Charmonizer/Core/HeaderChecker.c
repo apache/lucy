@@ -198,9 +198,4 @@ S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists)
     }
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

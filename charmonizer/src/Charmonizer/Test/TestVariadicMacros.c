@@ -52,9 +52,4 @@ TestVariadicMacros_run(TestBatch *batch)
     TEST_TRUE(batch, really_has_var_macs, "either ISO or GNUC");
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 
