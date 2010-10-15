@@ -339,9 +339,4 @@ void
 IxManager_set_deletion_lock_interval(IndexManager *self, uint32_t interval)
     { self->deletion_lock_interval = interval; }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

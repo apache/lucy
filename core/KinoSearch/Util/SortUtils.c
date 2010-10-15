@@ -443,9 +443,4 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
     S_qsort8(elems, i, right, compare, context);  // Sort greater_than. 
 } 
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

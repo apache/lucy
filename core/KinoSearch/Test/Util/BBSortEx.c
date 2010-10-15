@@ -157,9 +157,4 @@ BBSortEx_compare(BBSortEx *self, void *va, void *vb)
     return BB_compare( (ByteBuf**)va, (ByteBuf**)vb );
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

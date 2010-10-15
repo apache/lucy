@@ -108,9 +108,4 @@ Obj_get_vtable(Obj *self) { return self->vtable; }
 CharBuf*
 Obj_get_class_name(Obj *self) { return VTable_Get_Name(self->vtable); }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

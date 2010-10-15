@@ -169,9 +169,4 @@ kino_FType_null_back_compare_values(kino_FieldType *self,
 
 __END_C__
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

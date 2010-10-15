@@ -611,9 +611,4 @@ FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len)
 
 #endif // CHY_HAS_SYS_MMAN_H vs. CHY_HAS_WINDOWS_H 
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

@@ -65,9 +65,4 @@ kino_PID_active(int pid)
   #error "Can't find a known process ID API."
 #endif // OS switch. 
 
-/* Copyright 2009-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

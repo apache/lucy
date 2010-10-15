@@ -46,9 +46,4 @@ I32Arr_get(I32Array *self, uint32_t tick)
 uint32_t
 I32Arr_get_size(I32Array *self) { return self->size; }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

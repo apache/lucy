@@ -64,9 +64,4 @@ FilterScorer_get_doc_id(FilterScorer* self)
     return self->doc_id;
 }
 
-/* Copyright 2005-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

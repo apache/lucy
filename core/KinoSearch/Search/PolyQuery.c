@@ -189,9 +189,4 @@ PolyCompiler_deserialize(PolyCompiler *self, InStream *instream)
     return (PolyCompiler*)Compiler_deserialize((Compiler*)self, instream);
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

@@ -34,9 +34,4 @@ NoMatchScorer_advance(NoMatchScorer* self, int32_t target)
     return 0;
 }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

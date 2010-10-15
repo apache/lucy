@@ -216,9 +216,4 @@ class KinoSearch::Object::Integer64 cnick Int64
     Mimic(Integer64 *self, Obj *other);
 }
 
-/* Copyright 2005-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

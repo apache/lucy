@@ -195,9 +195,4 @@ HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans)
 VArray*
 HeatMap_get_spans(HeatMap *self) { return self->spans; }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

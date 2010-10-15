@@ -54,9 +54,4 @@ RawPList_read_raw(RawPostingList *self, int32_t last_doc_id, CharBuf *term_text,
         last_doc_id, term_text, mem_pool);
 }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

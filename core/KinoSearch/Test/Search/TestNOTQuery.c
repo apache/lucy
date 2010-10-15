@@ -47,9 +47,4 @@ TestNOTQuery_run_tests()
     DECREF(batch);
 }
 
-/* Copyright 2005-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

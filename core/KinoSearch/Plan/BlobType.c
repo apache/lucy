@@ -109,9 +109,4 @@ BlobType_load(BlobType *self, Obj *dump)
     return loaded;
 }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

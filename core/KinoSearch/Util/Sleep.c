@@ -43,9 +43,4 @@ kino_Sleep_millisleep(uint32_t milliseconds)
   #error "Can't find a known sleep API."
 #endif // OS switch. 
 
-/* Copyright 2009-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

@@ -33,9 +33,4 @@ void
 RAMFile_set_read_only(RAMFile *self, bool_t read_only)
     { self->read_only = read_only; }
 
-/* Copyright 2009-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

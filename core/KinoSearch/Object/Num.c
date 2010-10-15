@@ -362,9 +362,4 @@ Int64_deserialize(Integer64 *self, InStream *instream)
     return self ? Int64_init(self, value) : Int64_new(value);
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

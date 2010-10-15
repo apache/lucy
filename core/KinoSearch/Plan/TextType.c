@@ -149,9 +149,4 @@ TextTermStepper_read_delta(TextTermStepper *self, InStream *instream)
     ptr[total_text_len] = '\0';
 }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

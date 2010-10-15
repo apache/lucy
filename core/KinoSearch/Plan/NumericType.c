@@ -301,9 +301,4 @@ Int64Type_equals(Int64Type *self, Obj *other)
     return super_equals(self, other);
 }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

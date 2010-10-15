@@ -26,9 +26,4 @@ DH_get_dir(DirHandle *self)   { return self->dir; }
 CharBuf*
 DH_get_entry(DirHandle *self) { return self->entry; }
 
-/* Copyright 2009-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

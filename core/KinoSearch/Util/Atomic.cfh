@@ -80,9 +80,4 @@ kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 
 __END_C__
 
-/* Copyright 2005-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

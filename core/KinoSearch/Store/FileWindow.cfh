@@ -21,9 +21,4 @@ class KinoSearch::Store::FileWindow inherits KinoSearch::Object::Obj {
     Set_Window(FileWindow *self, char *buf, int64_t offset, int64_t len);
 }
 
-/* Copyright 2008-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

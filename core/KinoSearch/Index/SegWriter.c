@@ -220,9 +220,4 @@ SegWriter_set_del_writer(SegWriter *self, DeletionsWriter *del_writer)
 DeletionsWriter*
 SegWriter_get_del_writer(SegWriter *self) { return self->del_writer; }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

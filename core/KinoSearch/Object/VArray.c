@@ -364,9 +364,4 @@ VA_gather(VArray *self, VA_gather_test_t test, void *data)
     return gathered;
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

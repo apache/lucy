@@ -225,9 +225,4 @@ DefHLReader_read_record(DefaultHighlightReader *self, int32_t doc_id,
     }
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

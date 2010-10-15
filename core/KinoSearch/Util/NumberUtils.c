@@ -16,9 +16,4 @@ const uint8_t NumUtil_u2masks[4]  = { 0x3, 0xC, 0x30, 0xC0 };
 const uint8_t NumUtil_u4shifts[2] = { 0x00, 0x04 };
 const uint8_t NumUtil_u4masks[2]  = { 0x0F, 0xF0 };
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

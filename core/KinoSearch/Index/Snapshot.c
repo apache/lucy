@@ -190,9 +190,4 @@ Snapshot_write_file(Snapshot *self, Folder *folder, const CharBuf *path)
     DECREF(all_data);
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

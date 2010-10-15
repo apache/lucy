@@ -43,9 +43,4 @@ BitVecMatcher_advance(BitVecMatcher *self, int32_t target)
 int32_t
 BitVecMatcher_get_doc_id(BitVecMatcher *self) { return self->doc_id; }
 
-/* Copyright 2007-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

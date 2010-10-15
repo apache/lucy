@@ -396,9 +396,4 @@ BitVec_to_array(BitVector *self)
     return I32Arr_new_steal((int32_t*)array, count);
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

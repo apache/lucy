@@ -243,9 +243,4 @@ DefLexReader_doc_freq(DefaultLexiconReader *self, const CharBuf *field,
     return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

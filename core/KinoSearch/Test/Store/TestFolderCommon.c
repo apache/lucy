@@ -520,9 +520,4 @@ TestFolderCommon_run_tests(void *test_batch, set_up_t set_up,
     test_Close(batch, set_up, tear_down);
 }
 
-/* Copyright 2005-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

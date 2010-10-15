@@ -142,9 +142,4 @@ SortCache_get_null_ord(SortCache *self)    { return self->null_ord; }
 int32_t
 SortCache_get_ord_width(SortCache *self)   { return self->ord_width; }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 
