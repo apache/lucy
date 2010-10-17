@@ -311,5 +311,10 @@ Please report any other bugs or feature requests to
 C<bug-kinosearch@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=KinoSearch>.
 
+=head1 COPYRIGHT
+
+KinoSearch is distributed under the Apache License, Version 2.0, as
+described in the file C<LICENSE> included with the distribution.
+
 =cut
 
