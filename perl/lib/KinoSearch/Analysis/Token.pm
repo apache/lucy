@@ -97,13 +97,5 @@ KinoSearch::Analysis::Token - Redacted.
 
 Token's public API has been redacted.
 
-=head1 COPYRIGHT
-
-Copyright 2005-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
 

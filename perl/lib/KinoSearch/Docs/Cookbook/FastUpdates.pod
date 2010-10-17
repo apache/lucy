@@ -135,13 +135,5 @@ resolve conflicts, but if it's not acceptable to miss an insert, you probably
 want to catch LockErr exceptions thrown by Indexer.  In contrast, a LockErr
 from BackgroundMerger probably just needs to be logged.
 
-=head1 COPYRIGHT
-
-Copyright 2009-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
 

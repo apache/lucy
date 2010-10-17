@@ -295,13 +295,5 @@ prefix conflation -- is not perfectly compatible with prefix searches.
         ],
     );
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
 

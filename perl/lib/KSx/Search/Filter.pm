@@ -245,12 +245,4 @@ object belonging to a subclass of L<KinoSearch::Search::Query>.
 Filters do not cache when used in a search cluster with KSx::Remote's
 SearchServer and SearchClient.
 
-=head1 COPYRIGHT
-
-Copyright 2005-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut

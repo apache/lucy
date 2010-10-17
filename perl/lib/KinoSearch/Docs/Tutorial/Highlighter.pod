@@ -59,11 +59,4 @@ Our next tutorial chapter, L<KinoSearch::Docs::Tutorial::QueryObjects>,
 illustrates how to build an "advanced search" interface using
 L<Query|KinoSearch::Search::Query> objects instead of query strings.
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

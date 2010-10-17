@@ -75,13 +75,5 @@ rank higher than a 1000-word text which also contains one occurrence of each.
 A web search for "tf idf" will turn up many excellent explanations of the
 algorithm.
 
-=head1 COPYRIGHT
-
-Copyright 2007-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
 

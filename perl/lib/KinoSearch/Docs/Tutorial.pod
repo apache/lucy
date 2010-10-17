@@ -71,11 +71,4 @@ Apache webserver, but will work with minor modifications on other setups.
 More advanced and esoteric subjects are covered in
 L<KinoSearch::Docs::Cookbook>.
 
-=head1 COPYRIGHT
-
-Copyright 2005-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

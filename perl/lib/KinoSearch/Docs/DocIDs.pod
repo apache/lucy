@@ -28,13 +28,5 @@ primary key field, you must define it and populate it yourself.
 Furthermore, the order of document ids does not tell you anything about the
 sequence in which documents were added to the index.
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
 

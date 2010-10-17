@@ -36,11 +36,4 @@ found in the C<sample> directory at the root of the KinoSearch distribution:
     sample/search.cgi        # search app
     sample/us_constitution   # html documents
 
-=head1 COPYRIGHT
-
-Copyright 2005-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

@@ -254,12 +254,4 @@ taken into account.
 
 Not thread-safe.
 
-=head1 COPYRIGHT
-
-Copyright 2007-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut

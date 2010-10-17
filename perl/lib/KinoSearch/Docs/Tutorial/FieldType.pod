@@ -56,11 +56,4 @@ Analyzers play a crucial role in the behavior of FullTextType fields.  In our
 next tutorial chapter, L<KinoSearch::Docs::Tutorial::Analysis>, we'll see how
 changing up the Analyzer changes search results.
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

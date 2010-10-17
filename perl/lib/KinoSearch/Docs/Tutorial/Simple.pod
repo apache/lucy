@@ -291,11 +291,4 @@ indexing and search scripts using the classes that KSx::Simple hides
 from view, opening up the possibilities for expansion; then, we'll spend the
 rest of the tutorial chapters exploring these possibilities.
 
-=head1 COPYRIGHT
-
-Copyright 2005-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

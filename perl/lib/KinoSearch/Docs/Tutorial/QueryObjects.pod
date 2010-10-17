@@ -140,11 +140,4 @@ ANDQuery has a companion class, L<ORQuery|KinoSearch::Search::ORQuery>, and a
 close relative,
 L<RequiredOptionalQuery|KinoSearch::Searh::RequiredOptionalQuery>.
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

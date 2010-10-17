@@ -216,12 +216,4 @@ B<password> - a password which must be supplied by clients.
 
 Open a listening socket on localhost and wait for SearchClients to connect.
 
-=head1 COPYRIGHT
-
-Copyright 2006-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut

@@ -139,11 +139,4 @@ easier to customize.
 In our next chapter, L<KinoSearch::Docs::Tutorial::FieldType>, we'll explore
 how to assign different behaviors to different fields.
 
-=head1 COPYRIGHT
-
-Copyright 2005-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

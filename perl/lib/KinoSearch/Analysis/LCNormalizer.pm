@@ -17,13 +17,5 @@ KinoSearch::Analysis::LCNormalizer - Replaced by CaseFolder.
 As of KinoSearch version 0.30, LCNormalizer has been replaced by
 L<CaseFolder|KinoSearch::Analysis::CaseFolder>.
 
-=head1 COPYRIGHT
-
-Copyright 2005-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
 

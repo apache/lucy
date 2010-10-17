@@ -75,11 +75,4 @@ To specify that there should be no analysis performed at all, use StringType:
 In our next tutorial chapter, L<KinoSearch::Docs::Tutorial::Highlighter>,
 we'll add highlighted excerpts from the "content" field to our search results.
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
 

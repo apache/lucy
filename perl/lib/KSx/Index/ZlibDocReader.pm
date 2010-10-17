@@ -132,12 +132,4 @@ KSx::Index::ZlibDocReader - Compressed doc storage.
 This is a proof-of-concept class to demonstrate alternate implementations for
 fetching documents.  It is unsupported.
 
-=head1 COPYRIGHT
-
-Copyright 2009-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
