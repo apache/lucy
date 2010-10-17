@@ -193,5 +193,10 @@ whose name is the same as the .cfh file, but with an extension of ".h".  C
 code should pound-include "Crustacean/Lobster.h" for a class defined in
 "Crustacean/Lobster.cfh".
 
+=head1 COPYRIGHT 
+ 
+Clownfish is distributed under the Apache License, Version 2.0, as 
+described in the file C<LICENSE> included with the distribution. 
+
 =cut
 
