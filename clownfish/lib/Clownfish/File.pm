@@ -179,11 +179,4 @@ Return a string opening the include guard.
 Return a string closing the include guard.  Other classes count on being able
 to match this string.
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2008-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut

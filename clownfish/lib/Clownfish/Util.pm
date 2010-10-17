@@ -153,12 +153,5 @@ Test whether there's a file at C<$path> which already matches C<$content>
 exactly.  If something has changed, write the file.  Otherwise do nothing (and
 avoid bumping the file's modification time).
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2008-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut
 

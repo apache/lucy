@@ -93,11 +93,4 @@ Parcel's prefix will be prepended to the specifier:
     foo_t         -> foo_t                # no prefix prepending
     Lobster_foo_t -> crust_Lobster_foo_t  # prefix prepended
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2008-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut

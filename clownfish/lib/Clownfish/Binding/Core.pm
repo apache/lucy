@@ -224,12 +224,5 @@ Call C<< $hierarchy->propagate_modified >> to establish which classes do not
 have up-to-date generated .c and .h files, then traverse the hierarchy writing
 all necessary files.
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2008-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut
 

@@ -541,11 +541,4 @@ Fully qualified vtable variable name, including the parcel prefix.
 
 Fully qualified struct symbol, including the parcel prefix.
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2008-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut

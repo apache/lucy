@@ -347,12 +347,5 @@ want an entry for each Clownfish type so that we can differentiate between
 them when checking arguments.  Keeping the entries up-to-date manually as
 classes come and go would be a pain.
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2008-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut
 

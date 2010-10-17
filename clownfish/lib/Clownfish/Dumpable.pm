@@ -268,12 +268,5 @@ Constructor.  Takes no arguments.
 Analyze a class with the attribute "dumpable" and add Dump() or Load() methods
 as necessary.
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2006-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut
 

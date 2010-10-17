@@ -128,12 +128,5 @@ Returns C code appropriate for declaring the variable in a local scope, such
 as within a struct definition, or as an automatic variable within a C
 function.  
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2008-2010 Marvin Humphrey
-
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =cut
 
