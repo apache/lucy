@@ -49,7 +49,7 @@ END_WARNING
 
 my $builder = KinoSearch::Build->new(
     module_name       => 'KinoSearch',
-    license           => 'perl',
+    license           => 'apache',
     dist_author       => 'Marvin Humphrey <marvin at rectangular dot com>',
     dist_version_from => 'lib/KinoSearch.pm',
     requires          => {
