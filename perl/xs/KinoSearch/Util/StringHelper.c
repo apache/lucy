@@ -9,9 +9,4 @@ kino_StrHelp_utf8_valid(const char *ptr, size_t size)
     return is_utf8_string(uptr, size);
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

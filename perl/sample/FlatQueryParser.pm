@@ -112,12 +112,5 @@ FlatQueryParser - Simple query parser, with no boolean operators.
 
 See L<KinoSearch::Docs::Cookbook::CustomQueryParser>.
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
+

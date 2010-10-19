@@ -395,9 +395,4 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
     va_end(args);
 }
 
-/* Copyright 2005-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

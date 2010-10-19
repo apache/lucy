@@ -174,12 +174,5 @@ wildcards.
 
 Seek L<KinoSearch::Docs::Cookbook::CustomQuery>.
 
-=head1 COPYRIGHT
-
-Copyright 2008-2010 Marvin Humphrey
-
-=head1 LICENSE, DISCLAIMER, BUGS, etc.
-
-See L<KinoSearch> version 0.30.
-
 =cut
+

@@ -64,9 +64,4 @@ kino_Err_warn_mess(kino_CharBuf *message)
     SvREFCNT_dec(error_sv);
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 

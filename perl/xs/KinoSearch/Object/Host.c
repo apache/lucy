@@ -238,9 +238,4 @@ S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args)
     return return_val;
 }
 
-/* Copyright 2006-2010 Marvin Humphrey
- *
- * This program is free software; you can redistribute it and/or modify
- * under the same terms as Perl itself.
- */
 
