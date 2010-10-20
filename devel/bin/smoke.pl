@@ -131,9 +131,5 @@ if all tests pass, specify a true 'verbose' flag in your config file.
 
 SVN::Class, JSON::XS, FindBin, Carp
 
-=head1 AUTHOR
-
-Peter Karman < perl at peknet dot com >
-
 =cut
 
