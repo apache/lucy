@@ -1,0 +1,70 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel KinoSearch cnick Kino;
+
+/** Suppress a "stoplist" of common words.
+ * 
+ * A "stoplist" is collection of "stopwords": words which are common enough to
+ * be of little value when determining search results.  For example, so many
+ * documents in English contain "the", "if", and "maybe" that it may improve
+ * both performance and relevance to block them.
+ * 
+ * Before filtering stopwords:
+ * 
+ *     ( "i", "am", "the", "walrus" ) 
+ *     
+ * After filtering stopwords:
+ * 
+ *     ( "walrus" );
+ *
+ * Stopalizer provides default stoplists for several languages, courtesy of
+ * the Snowball project (<http://snowball.tartarus.org>), or you may supply
+ * your own.
+ */
+
+class KinoSearch::Analysis::Stopalizer 
+    inherits KinoSearch::Analysis::Analyzer : dumpable {
+
+    Hash *stoplist;
+    
+    inert incremented Stopalizer* 
+    new(const CharBuf *language = NULL, Hash *stoplist = NULL);
+
+    /**
+     * @param stoplist A hash with stopwords as the keys.
+     * @param language The ISO code for a supported language.
+     */
+    public inert Stopalizer* 
+    init(Stopalizer *self, const CharBuf *language = NULL, 
+         Hash *stoplist = NULL);
+
+    /** Return a Hash with the Snowball stoplist for the supplied language.
+     */
+    inert incremented Hash*
+    gen_stoplist(const CharBuf *language);
+
+    public incremented Inversion*
+    Transform(Stopalizer *self, Inversion *inversion);
+
+    public bool_t
+    Equals(Stopalizer *self, Obj *other);
+
+    public void
+    Destroy(Stopalizer *self);
+}
+
+

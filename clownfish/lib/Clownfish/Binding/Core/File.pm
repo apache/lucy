@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -119,15 +134,15 @@ sub write_c {
 $args{header}
 
 $c_file_syms
-#define C_LUCY_VTABLE
-#define C_LUCY_ZOMBIECHARBUF
+#define C_KINO_VTABLE
+#define C_KINO_ZOMBIECHARBUF
 #include "boil.h"
-#include "Lucy/Object/VTable.h"
-#include "Lucy/Object/CharBuf.h"
-#include "Lucy/Object/Err.h"
-#include "Lucy/Object/Hash.h"
-#include "Lucy/Object/Host.h"
-#include "Lucy/Object/VArray.h"
+#include "KinoSearch/Object/VTable.h"
+#include "KinoSearch/Object/CharBuf.h"
+#include "KinoSearch/Object/Err.h"
+#include "KinoSearch/Object/Hash.h"
+#include "KinoSearch/Object/Host.h"
+#include "KinoSearch/Object/VArray.h"
 
 $content
 
@@ -195,24 +210,6 @@ typically copyright information.
     );
 
 Generate a C file containing code needed by the class implementations.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

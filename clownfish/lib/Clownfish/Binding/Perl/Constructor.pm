@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -80,7 +95,7 @@ sub xsub_def {
         else {
             my $assignment
                 = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) {
-           THROW(LUCY_ERR, "Missing required param '$name'");
+           THROW(KINO_ERR, "Missing required param '$name'");
         }
         $statement#;
             push @var_assignments, $assignment;
@@ -88,7 +103,7 @@ sub xsub_def {
 
         # Compensate for the fact that the method will swallow a refcount.
         if ( $type->is_object and $type->decremented ) {
-            push @refcount_mods, "if ($name) { LUCY_INCREF($name); }";
+            push @refcount_mods, "if ($name) { KINO_INCREF($name); }";
         }
     }
     $allot_params .= "            NULL);\n";
@@ -106,24 +121,22 @@ sub xsub_def {
     my $refcount_mods = join( "\n        ", @refcount_mods );
 
     return <<END_STUFF;
-XS($c_name); /* -Wmissing-prototypes */
+XS($c_name);
 XS($c_name)
 {
     dXSARGS;
     CHY_UNUSED_VAR(cv);
     CHY_UNUSED_VAR(ax);
-    if (items < 1)
-        THROW(LUCY_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv)));
+    if (items < 1) { THROW(KINO_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
     SP -= items;
-
     {
         $var_declarations
         $var_assignments
         $refcount_mods
         retval = $func_sym($name_list);
         if (retval) {
-            ST(0) = (SV*)Lucy_Obj_To_Host((lucy_Obj*)retval);
-            Lucy_Obj_Dec_RefCount((lucy_Obj*)retval);
+            ST(0) = (SV*)Kino_Obj_To_Host((kino_Obj*)retval);
+            Kino_Obj_Dec_RefCount((kino_Obj*)retval);
         }
         else {
             ST(0) = newSV(0);
@@ -131,7 +144,6 @@ XS($c_name)
         sv_2mortal( ST(0) );
         XSRETURN(1);
     }
-
     PUTBACK;
 }
 
@@ -180,24 +192,6 @@ should be bound.  The default function is "init".
 =head2 xsub_def
 
 Generate the XSUB code.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

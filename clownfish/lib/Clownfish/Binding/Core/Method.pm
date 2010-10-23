@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -86,7 +101,7 @@ END_STUFF
 sub callback_dec {
     my ( undef, $method ) = @_;
     my $callback_sym = $method->full_callback_sym;
-    return qq|extern lucy_Callback $callback_sym;\n|;
+    return qq|extern kino_Callback $callback_sym;\n|;
 }
 
 sub callback_obj_def {
@@ -97,8 +112,8 @@ sub callback_obj_def {
     my $len          = length($macro_sym);
     my $func_sym     = $method->full_override_sym;
     my $callback_sym = $method->full_callback_sym;
-    return qq|lucy_Callback $callback_sym = |
-        . qq|{"$macro_sym", $len, (lucy_method_t)$func_sym, $offset};\n|;
+    return qq|kino_Callback $callback_sym = |
+        . qq|{"$macro_sym", $len, (kino_method_t)$func_sym, $offset};\n|;
 }
 
 sub callback_def {
@@ -126,8 +141,8 @@ sub callback_def {
 # to Host's callback interface.  For instance, (int32_t foo, Obj *bar)
 # produces the following:
 # 
-#   LUCY_ARG_I32("foo", foo),
-#   LUCY_ARG_OBJ("bar", bar)
+#   KINO_ARG_I32("foo", foo),
+#   KINO_ARG_OBJ("bar", bar)
 #
 sub _callback_params {
     my $method     = shift;
@@ -188,7 +203,7 @@ void
 $override_sym($params)
 {
     $unused;
-    LUCY_THROW(LUCY_ERR, "Can't override $full_method_sym via binding");
+    KINO_THROW(KINO_ERR, "Can't override $full_method_sym via binding");
 }
 END_CALLBACK_DEF
 }
@@ -249,14 +264,14 @@ sub _obj_callback_def {
     if ( !$return_type->nullable ) {
         my $macro_sym = $method->get_macro_sym;
         $nullable_check
-            = qq|if (!retval) { LUCY_THROW(LUCY_ERR, |
+            = qq|if (!retval) { KINO_THROW(KINO_ERR, |
             . qq|"$macro_sym() for class '%o' cannot return NULL", |
-            . qq|Lucy_Obj_Get_Class_Name((lucy_Obj*)self)); }\n    |;
+            . qq|Kino_Obj_Get_Class_Name((kino_Obj*)self)); }\n    |;
     }
 
     my $decrement = "";
     if ( !$return_type->incremented ) {
-        $decrement = "LUCY_DECREF(retval);\n    ";
+        $decrement = "KINO_DECREF(retval);\n    ";
     }
 
     return <<END_CALLBACK_DEF;
@@ -300,8 +315,8 @@ sub abstract_method_def {
 $return_type_str
 $full_func_sym($params)
 {
-    lucy_CharBuf *klass = self ? Lucy_Obj_Get_Class_Name((lucy_Obj*)self) : $vtable->name;$unused
-    LUCY_THROW(LUCY_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
+    kino_CharBuf *klass = self ? Kino_Obj_Get_Class_Name((kino_Obj*)self) : $vtable->name;$unused
+    KINO_THROW(KINO_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
 }
 END_ABSTRACT_DEF
 }
@@ -376,24 +391,6 @@ is used when a Host method has overridden a method in a Clownfish class.
 
 Return C code implementing a version of the method which throws an "abstract
 method" error at runtime.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

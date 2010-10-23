@@ -1,3 +1,19 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/HeaderChecker.h"
@@ -76,7 +92,7 @@ Integers_run(void)
 
     ConfWriter_start_module("Integers");
 
-    /* document endian-ness */
+    /* Document endian-ness. */
     if (S_machine_is_big_endian())
         ConfWriter_append_conf("#define CHY_BIG_END\n");
     else 
@@ -98,7 +114,7 @@ Integers_run(void)
         sizeof_ptr   = strtol(output, &end_ptr, 10);
     }
 
-    /* determine whether long longs are available */
+    /* Determine whether long longs are available. */
     sprintf(code_buf, type64_code, "long long");
     output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
@@ -106,7 +122,7 @@ Integers_run(void)
         sizeof_long_long = strtol(output, NULL, 10);
     }
 
-    /* determine whether the __int64 type is available */
+    /* Determine whether the __int64 type is available. */
     sprintf(code_buf, type64_code, "__int64");
     output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
@@ -114,7 +130,7 @@ Integers_run(void)
         sizeof___int64 = strtol(output, NULL, 10);
     }
 
-    /* figure out which integer types are available */
+    /* Figure out which integer types are available. */
     if (sizeof_char == 1) {
         has_8 = true;
     }
@@ -146,7 +162,7 @@ Integers_run(void)
         strcpy(i64_t_type, "__int64");
     }
 
-    /* probe for 64-bit literal syntax */
+    /* Probe for 64-bit literal syntax. */
     if (has_64 && sizeof_long == 8) {
         strcpy(i64_t_postfix, "L");
         strcpy(u64_t_postfix, "UL");
@@ -180,7 +196,7 @@ Integers_run(void)
         }
     }
 
-    /* write out some conditional defines */
+    /* Write out some conditional defines. */
     if (has_inttypes)
         ConfWriter_append_conf("#define CHY_HAS_INTTYPES_H\n");
     if (has_stdint)
@@ -190,7 +206,7 @@ Integers_run(void)
     if (has___int64)
         ConfWriter_append_conf("#define CHY_HAS___INT64\n");
 
-    /* write out sizes */
+    /* Write out sizes. */
     ConfWriter_append_conf("#define CHY_SIZEOF_CHAR %d\n",  sizeof_char);
     ConfWriter_append_conf("#define CHY_SIZEOF_SHORT %d\n", sizeof_short);
     ConfWriter_append_conf("#define CHY_SIZEOF_INT %d\n",   sizeof_int);
@@ -203,7 +219,7 @@ Integers_run(void)
         ConfWriter_append_conf("#define CHY_SIZEOF___INT64 %d\n", sizeof___int64);
     }
 
-    /* write affirmations, typedefs and maximums/minimums */
+    /* Write affirmations, typedefs and maximums/minimums. */
     ConfWriter_append_conf("typedef int chy_bool_t;\n");
     if (has_stdint) {
         ConfWriter_append_conf("#include <stdint.h>\n");
@@ -289,7 +305,7 @@ Integers_run(void)
             u64_t_postfix, u64_t_postfix);
     }
 
-    /* create the I64P and U64P printf macros */
+    /* Create the I64P and U64P printf macros. */
     if (has_64) {
         int i;
         char *options[] = {
@@ -301,7 +317,7 @@ Integers_run(void)
             NULL,
         };
 
-        /* buffer to hold the code, and its start and end */
+        /* Buffer to hold the code, and its start and end. */
         static char format_64_code[] = 
             QUOTE(  #include "_charm.h"                           )
             QUOTE(  int main() {                                  )
@@ -311,7 +327,7 @@ Integers_run(void)
             QUOTE( }                                              );
 
         for (i = 0; options[i] != NULL; i++) {
-            /* try to print 2**64-1, and see if we get it back intact */
+            /* Try to print 2**64-1, and see if we get it back intact. */
             sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
             output = CC_capture_output(code_buf, strlen(code_buf),
                 &output_len);
@@ -327,7 +343,7 @@ Integers_run(void)
 
     }
 
-    /* write out the 32-bit and 64-bit literal macros */
+    /* Write out the 32-bit and 64-bit literal macros. */
     if (has_32) {
         if (strcmp(i32_t_postfix, "") == 0) {
             ConfWriter_append_conf("#define CHY_I32_C(n) n\n");
@@ -346,16 +362,16 @@ Integers_run(void)
     /* Create macro for promoting pointers to integers. */
     if (has_64) {
         if (sizeof_ptr == 8) {
-            ConfWriter_append_conf("#define CHY_PTR2I64(ptr) "
+            ConfWriter_append_conf("#define CHY_PTR_TO_I64(ptr) "
                 "((chy_i64_t)(chy_u64_t)(ptr))\n");
         }
         else {
-            ConfWriter_append_conf("#define CHY_PTR2I64(ptr) "
+            ConfWriter_append_conf("#define CHY_PTR_TO_I64(ptr) "
                 "((chy_i64_t)(chy_u32_t)(ptr))\n");
         }
     }
 
-    /* true and false */
+    /* True and false. */
     ConfWriter_append_conf(
         "#ifndef true\n"
         "  #define true 1\n"
@@ -365,7 +381,7 @@ Integers_run(void)
         "#endif\n"
     );
 
-    /* shorten */
+    /* Shorten. */
     ConfWriter_start_short_names();
     if ( S_machine_is_big_endian() ) {
         ConfWriter_shorten_macro("BIG_END");
@@ -426,7 +442,7 @@ Integers_run(void)
         ConfWriter_shorten_macro("U64P");
         ConfWriter_shorten_macro("I64_C");
         ConfWriter_shorten_macro("U64_C");
-        ConfWriter_shorten_macro("PTR2I64");
+        ConfWriter_shorten_macro("PTR_TO_I64");
     }
     ConfWriter_end_short_names();
     
@@ -440,19 +456,4 @@ S_machine_is_big_endian()
     return !(*((char *)(&one)));
 }
 
-/**
- * Copyright 2006 The Apache Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 

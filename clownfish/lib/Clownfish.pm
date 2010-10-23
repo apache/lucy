@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -13,7 +28,7 @@ languages.
 
 =head1 PRIVATE API
 
-Clownfish is a Lucy implementation detail.  This documentation is partial --
+Clownfish is a KinoSearch implementation detail.  This documentation is partial --
 enough for the curious hacker, but not a full API.
 
 =head1 DESCRIPTION
@@ -61,33 +76,43 @@ Subclasses may be created either at compile time or at run time.
 Methods are differentiated from functions via capitalization:
 Boat_capsize() is a function, Boat_Capsize() is a method.
 
-    /* Base method. */
+    // Base method.
     void
     Boat_capsize(Boat *self)
     {
         self->upside_down = true;
     }
 
-    /* Implementing function, in Boat/Battleship.c */
+    // Implementing function, in Boat/Battleship.c
     void
     Battleship_capsize(Battleship *self) 
     {
-        Boat_capsize((Boat*)self);  /* Superclass method invocation. */
+        // Superclass method invocation.
+        Boat_capsize_t capsize = (Boat_capsize_t)SUPER_METHOD(
+            BATTLESHIP, Battleship, Capsize);
+        capsize((Boat*)self);  
+
+        // Subclass-specific behavior.
         Battleship_Sink(self);
     }
 
-    /* Implementing function, in Boat/RubberDinghy.c */
+    // Implementing function, in Boat/RubberDinghy.c
     void
     RubDing_capsize(RubberDinghy *self) 
     {
-        Boat_capsize((Boat*)self);  /* Superclass method invocation. */
+        // Superclass method invocation.
+        Boat_capsize_t capsize = (Boat_capsize_t)SUPER_METHOD(
+            RUBBERDINGHY, RubDing, Capsize);
+        capsize((Boat*)self);  
+
+        // Subclass-specific behavior.
         RubDing_Drift(self);
     }
 
 =head2 Class declaration syntax
 
     [final] [inert] class CLASSNAME [cnick CNICK] 
-        [extends PARENT] [ : ATTRIBUTE ]* {
+        [inherits PARENT] [ : ATTRIBUTE ]* {
     
         [declarations]
     
@@ -95,7 +120,7 @@ Boat_capsize() is a function, Boat_Capsize() is a method.
 
 Example:
 
-    class Boat::RubberDinghy cnick RubDing extends Boat {
+    class Boat::RubberDinghy cnick RubDing inherits Boat {
         
         public inert incremented RubberDinghy*
         new();
@@ -130,8 +155,8 @@ inherently part of Clownfish.
 There are two levels of namespacing in Clownfish: parcels and classes.
 
 Clownfish classes intended to be published as a single unit may be grouped
-together using a "parcel" (akin to a "package" in Java).  Parcel directives
-need to go at the top of each class file.
+together using a "parcel".  Parcel directives need to go at the top of each
+class file.
 
     parcel Crustacean cnick Crust;
 
@@ -142,7 +167,7 @@ order to avoid namespace collisions with other projects.
 Within a parcel, the last part of each class name must be unique.
 
     class Crustacean::Lobster::Claw { ... }
-    class Crustacean::Crab::Claw    { ... } /* Illegal, "Claw" already used */
+    class Crustacean::Crab::Claw    { ... } // Illegal, "Claw" already used
 
 "Short names" -- names minus the parcel prefix -- will be auto-generated for
 all class symbols.  When there is no danger of namespace collision, typically
@@ -154,10 +179,10 @@ short names can be used after a USE_SHORT_NAMES directive:
 The USE_SHORT_NAMES directives do not affect class prefixes, only parcel
 prefixes.
 
-    /* No short names. */
+    // No short names.
     crust_LobsterClaw *claw = crust_LobClaw_new();
     
-    /* With short names. */
+    // With short names.
     #define CRUST_USE_SHORT_NAMES
     LobsterClaw *claw = LobClaw_new();
 
@@ -168,23 +193,10 @@ whose name is the same as the .cfh file, but with an extension of ".h".  C
 code should pound-include "Crustacean/Lobster.h" for a class defined in
 "Crustacean/Lobster.cfh".
 
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
+=head1 COPYRIGHT 
+ 
+Clownfish is distributed under the Apache License, Version 2.0, as 
+described in the file C<LICENSE> included with the distribution. 
 
 =cut
 

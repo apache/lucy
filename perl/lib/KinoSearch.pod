@@ -1,0 +1,320 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+KinoSearch - Search engine library.
+
+=head1 VERSION
+
+0.30_12
+
+=head1 SYNOPSIS
+
+First, plan out your index structure, create the index, and add documents:
+
+    # indexer.pl
+    
+    use KinoSearch::Index::Indexer;
+    use KinoSearch::Plan::Schema;
+    use KinoSearch::Analysis::PolyAnalyzer;
+    use KinoSearch::Plan::FullTextType;
+    
+    # Create a Schema which defines index fields.
+    my $schema = KinoSearch::Plan::Schema->new;
+    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new( 
+        language => 'en',
+    );
+    my $type = KinoSearch::Plan::FullTextType->new(
+        analyzer => $polyanalyzer,
+    );
+    $schema->spec_field( name => 'title',   type => $type );
+    $schema->spec_field( name => 'content', type => $type );
+    
+    # Create the index and add documents.
+    my $indexer = KinoSearch::Index::Indexer->new(
+        schema => $schema,   
+        index  => '/path/to/index',
+        create => 1,
+    );
+    while ( my ( $title, $content ) = each %source_docs ) {
+        $indexer->add_doc({
+            title   => $title,
+            content => $content,
+        });
+    }
+    $indexer->commit;
+
+Then, search the index:
+
+    # search.pl
+    
+    use KinoSearch::Search::IndexSearcher;
+    
+    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+        index => '/path/to/index' 
+    );
+    my $hits = $searcher->hits( query => "foo bar" );
+    while ( my $hit = $hits->next ) {
+        print "$hit->{title}\n";
+    }
+
+=head1 DESCRIPTION
+
+KinoSearch is a high-performance, modular search engine library.
+
+=head2 Features
+
+=over
+
+=item *
+
+Extremely fast.  A single machine can handle millions of documents.
+
+=item *
+
+Scalable to multiple machines.
+
+=item *
+
+Incremental indexing (addition/deletion of documents to/from an existing
+index).
+
+=item *
+
+UTF-8 support.
+
+=item *
+
+Support for boolean operators AND, OR, and AND NOT; parenthetical groupings;
+and prepended +plus and -minus.
+
+=item *
+
+Algorithmic selection of relevant excerpts and highlighting of search terms
+within excerpts.
+
+=item *
+
+Highly customizable query and indexing APIs.
+
+=item *
+
+Customizable sorting.
+
+=item *
+
+Phrase matching.
+
+=item *
+
+Stemming.
+
+=item *
+
+Stoplists.
+
+=back
+
+=head2 Getting Started
+
+L<KSx::Simple> provides a stripped down API which may suffice for many
+tasks.
+
+L<KinoSearch::Docs::Tutorial> demonstrates how to build a basic CGI search
+application.  
+
+The tutorial spends most of its time on these five classes:
+
+=over 
+
+=item *
+
+L<KinoSearch::Plan::Schema> - Plan out your index.
+
+=item *
+
+L<KinoSearch::Plan::FieldType> - Define index fields.
+
+=item *
+
+L<KinoSearch::Index::Indexer> - Manipulate index content.
+
+=item *
+
+L<KinoSearch::Search::IndexSearcher> - Search an index.
+
+=item *
+
+L<KinoSearch::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
+
+=back
+
+=head2 Supported Languages and Encodings
+
+As of version 0.20, KinoSearch supports Unicode in addition to Latin-1.  All
+output strings use Perl's internal Unicode encoding.  For use of KinoSearch
+with non-Latin-1 material, see L<Encode>.
+
+KinoSearch provides "native support" for 15 languages, meaning that
+PolyAnalyzer supports them.
+
+=over
+
+=item *
+
+Danish
+
+=item *
+
+Dutch
+
+=item *
+
+English
+
+=item *
+
+Finnish
+
+=item *
+
+French
+
+=item *
+
+German
+
+=item *
+
+Hungarian
+
+=item *
+
+Italian
+
+=item *
+
+Norwegian
+
+=item *
+
+Portuguese
+
+=item *
+
+Romanian
+
+=item *
+
+Russian
+
+=item *
+
+Spanish
+
+=item *
+
+Swedish
+
+=item *
+
+Turkish
+
+=back
+
+=head2 Delving Deeper
+
+L<KinoSearch::Docs::CookBook> augments the tutorial with more advanced
+recipes.
+
+For creating complex queries, see L<KinoSearch::Search::Query> and its
+subclasses L<TermQuery|KinoSearch::Search::TermQuery>,
+L<PhraseQuery|KinoSearch::Search::PhraseQuery>,
+L<ANDQuery|KinoSearch::Search::ANDQuery>,
+L<ORQuery|KinoSearch::Search::ORQuery>,
+L<NOTQuery|KinoSearch::Search::NOTQuery>,
+L<RequiredOptionalQuery|KinoSearch::Search::RequiredOptionalQuery>,
+L<MatchAllQuery|KinoSearch::Search::MatchAllQuery>, and
+L<NoMatchQuery|KinoSearch::Search::NoMatchQuery>, plus
+L<KinoSearch::Search::QueryParser>.
+
+For distributed searching, see L<KSx::Remote::SearchServer>,
+L<KSx::Remote::SearchClient>, and L<KinoSearch::Search::PolySearcher>.
+
+=head2 Backwards Compatibility Policy
+
+KinoSearch spins off stable forks into new namespaces periodically.  As of
+this release, the latest is "KinoSearch1", forked from version 0.165.  Users
+who require strong backwards compatibility should use a stable fork.
+
+The main namespace, "KinoSearch", is an unstable development branch (as hinted
+at by its version number).  Superficial API changes are frequent.  Hard file
+format compatibility breaks which require reindexing are rare, as we generally
+try to provide continuity across multiple releases, but they happen every once
+in a while.
+
+=head1 CLASS METHODS
+
+The KinoSearch module itself does not do much.
+
+=head2 error
+
+    my $instream = $folder->open_in( file => 'foo' ) or die KinoSearch->error;
+
+Access a shared variable which is set by some routines on failure.  It will
+always be either a L<KinoSearch::Object::Err> or undef.
+
+=head1 SEE ALSO 
+
+The KinoSearch homepage, where you'll find links to the mailing list and so
+on, is L<http://www.rectangular.com/kinosearch>.
+
+The Lucene homepage is L<http://lucene.apache.org>.
+
+=head2 History 
+
+Search::Kinosearch 0.02x, now dead and removed from CPAN, was this suite's
+forerunner.  L<Plucene> is a pure-Perl port of Lucene 1.3. KinoSearch is a
+from-scratch project which attempts to draws on the lessons of both. 
+
+KinoSearch is named for Kino, the main character in John Steinbeck's novella,
+"The Pearl".
+
+=head1 SUPPORT
+
+Please direct support questions to the kinosearch mailing list: subscription
+information at L<http://www.rectangular.com/kinosearch>.
+
+=head1 BUGS
+
+Not thread-safe.
+
+Some exceptions leak memory.
+
+Won't work on esoteric architectures where a char is more than one byte,
+or where floats don't conform to IEEE 754.
+
+Please report any other bugs or feature requests to
+C<bug-kinosearch@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=KinoSearch>.
+
+=head1 COPYRIGHT
+
+KinoSearch is distributed under the Apache License, Version 2.0, as
+described in the file C<LICENSE> included with the distribution.
+
+=cut
+

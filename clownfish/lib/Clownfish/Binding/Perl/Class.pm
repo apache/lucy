@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -296,8 +311,22 @@ sub create_pod {
 
     # Put it all together.
     my $pod = <<END_POD;
-
 # Auto-generated file -- DO NOT EDIT!!!!!
+
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 ==head1 NAME
 
@@ -316,24 +345,6 @@ $methods_pod
 $abstract_methods_pod
 
 $inheritance_pod
-
-==head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 ==cut
 
@@ -362,8 +373,8 @@ sub _perlify_doc_text {
     # Change all instances of NULL to 'undef'
     $documentation =~ s/NULL/undef/g;
 
-    # Change "Err_error" to "Lucy->error".
-    $documentation =~ s/Err_error/Lucy->error/g;
+    # Change "Err_error" to "KinoSearch->error".
+    $documentation =~ s/Err_error/KinoSearch->error/g;
 
     return $documentation;
 }
@@ -460,24 +471,6 @@ the C<bind_methods> spec.
     my $pod = $class_binding->create_pod;
 
 Auto-generate POD according to the make_pod spec, if such a spec was supplied.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

@@ -1,3 +1,19 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* Charmonizer/Test.h - test Charmonizer's output.
  */
 
@@ -54,14 +70,13 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 /* Note: maybe add line numbers later.
  */
 #define CHAZ_TEST_PLAN              chaz_Test_plan
-#define CHAZ_TEST_ASSERT_TRUE       chaz_Test_assert_true
-#define CHAZ_TEST_ASSERT_FALSE      chaz_Test_assert_false
-#define CHAZ_TEST_ASSERT_STR_EQ     chaz_Test_assert_str_eq
-#define CHAZ_TEST_ASSERT_STR_NEQ    chaz_Test_assert_str_neq
+#define CHAZ_TEST_TEST_TRUE         chaz_Test_test_true
+#define CHAZ_TEST_TEST_FALSE        chaz_Test_test_false
+#define CHAZ_TEST_TEST_STR_EQ       chaz_Test_test_str_eq
 #define CHAZ_TEST_PASS              chaz_Test_pass
 #define CHAZ_TEST_FAIL              chaz_Test_fail
-#define CHAZ_TEST_ASSERT_INT_EQ     chaz_Test_assert_int_eq
-#define CHAZ_TEST_ASSERT_FLOAT_EQ   chaz_Test_assert_float_eq
+#define CHAZ_TEST_TEST_INT_EQ       chaz_Test_test_int_eq
+#define CHAZ_TEST_TEST_FLOAT_EQ     chaz_Test_test_float_eq
 
 /* Print a message indicating that a test was skipped and update batch.
  */
@@ -81,20 +96,16 @@ void
 chaz_Test_plan(chaz_TestBatch *batch);
 
 void 
-chaz_Test_assert_true(chaz_TestBatch *batch, int expression, 
-                          const char *pat, ...);
+chaz_Test_test_true(chaz_TestBatch *batch, int expression, 
+                    const char *pat, ...);
 
 void 
-chaz_Test_assert_false(chaz_TestBatch *batch, int expression, 
-                           const char *pat, ...);
+chaz_Test_test_false(chaz_TestBatch *batch, int expression, 
+                     const char *pat, ...);
 
 void 
-chaz_Test_assert_str_eq(chaz_TestBatch *batch, const char *got, 
-                            const char *expected, const char *pat, ...);
-
-void 
-chaz_Test_assert_str_neq(chaz_TestBatch *batch, const char *got,
-                             const char *expected, const char *pat, ...);
+chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got, 
+                      const char *expected, const char *pat, ...);
 
 void 
 chaz_Test_pass(chaz_TestBatch *batch, const char *pat, ...);
@@ -103,19 +114,19 @@ void
 chaz_Test_fail(chaz_TestBatch *batch, const char *pat, ...);
 
 void 
-chaz_Test_assert_int_eq(chaz_TestBatch *batch, long got, long expected, 
-                            const char *pat, ...);
+chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected, 
+                      const char *pat, ...);
 
 void 
-chaz_Test_assert_float_eq(chaz_TestBatch *batch, double got, 
-                              double expected, const char *pat, ...);
+chaz_Test_test_float_eq(chaz_TestBatch *batch, double got, 
+                        double expected, const char *pat, ...);
 
 void
 chaz_Test_skip(chaz_TestBatch *batch, const char *pat, ...);
 
 void
 chaz_Test_report_skip_remaining(chaz_TestBatch* batch, 
-                                    const char *pat, ...);
+                                const char *pat, ...);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define TestBatch_destroy_t          chaz_TestBatch_destroy_t
@@ -126,22 +137,20 @@ chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
   #define Test_new_batch               chaz_Test_new_batch
   #define Test_plan                    chaz_Test_plan
   #define PLAN                         CHAZ_TEST_PLAN
-  #define Test_assert_true             chaz_Test_assert_true
-  #define ASSERT_TRUE                  CHAZ_TEST_ASSERT_TRUE
-  #define Test_assert_false            chaz_Test_assert_false
-  #define ASSERT_FALSE                 CHAZ_TEST_ASSERT_FALSE
-  #define Test_assert_str_eq           chaz_Test_assert_str_eq
-  #define ASSERT_STR_EQ                CHAZ_TEST_ASSERT_STR_EQ
-  #define Test_assert_str_neq          chaz_Test_assert_str_neq
-  #define ASSERT_STR_NEQ               CHAZ_TEST_ASSERT_STR_NEQ
+  #define Test_test_true               chaz_Test_test_true
+  #define TEST_TRUE                    CHAZ_TEST_TEST_TRUE
+  #define Test_test_false              chaz_Test_test_false
+  #define TEST_FALSE                   CHAZ_TEST_TEST_FALSE
+  #define Test_test_str_eq             chaz_Test_test_str_eq
+  #define TEST_STR_EQ                  CHAZ_TEST_TEST_STR_EQ
   #define Test_pass                    chaz_Test_pass
   #define PASS                         CHAZ_TEST_PASS
   #define Test_fail                    chaz_Test_fail
   #define FAIL                         CHAZ_TEST_FAIL
-  #define Test_assert_int_eq           chaz_Test_assert_int_eq
-  #define ASSERT_INT_EQ                CHAZ_TEST_ASSERT_INT_EQ
-  #define Test_assert_float_eq         chaz_Test_assert_float_eq
-  #define ASSERT_FLOAT_EQ              CHAZ_TEST_ASSERT_FLOAT_EQ
+  #define Test_test_int_eq             chaz_Test_test_int_eq
+  #define TEST_INT_EQ                  CHAZ_TEST_TEST_INT_EQ
+  #define Test_test_float_eq           chaz_Test_test_float_eq
+  #define TEST_FLOAT_EQ                CHAZ_TEST_TEST_FLOAT_EQ
   #define Test_skip                    chaz_Test_skip
   #define SKIP                         CHAZ_TEST_SKIP
   #define Test_report_skip_remaining   chaz_Test_report_skip_remaining
@@ -155,19 +164,4 @@ chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
 #endif /* H_CHAZ_TEST */
 
 
-/**
- * Copyright 2006 The Apache Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 

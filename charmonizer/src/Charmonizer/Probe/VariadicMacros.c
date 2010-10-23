@@ -1,3 +1,19 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/Compiler.h"
@@ -8,7 +24,7 @@
 #include <stdio.h>
 
 
-/* code for verifying ISO-style variadic macros */
+/* Code for verifying ISO-style variadic macros. */
 static char iso_code[] = 
     QUOTE(  #include "_charm.h"                                   )
     QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
@@ -19,7 +35,7 @@ static char iso_code[] =
     QUOTE(      return 0;                                         )
     QUOTE(  }                                                     );
 
-/* code for verifying GNU-style variadic macros */
+/* Code for verifying GNU-style variadic macros. */
 static char gnuc_code[] = 
     QUOTE(  #include "_charm.h"                                   )
     QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
@@ -40,7 +56,7 @@ VariadicMacros_run(void)
 
     ConfWriter_start_module("VariadicMacros");
 
-    /* test for ISO-style variadic macros */
+    /* Test for ISO-style variadic macros. */
     output = CC_capture_output(iso_code, strlen(iso_code), &output_len);
     if (output != NULL) {
         has_varmacros = true;
@@ -49,7 +65,7 @@ VariadicMacros_run(void)
         ConfWriter_append_conf("#define CHY_HAS_ISO_VARIADIC_MACROS\n");
     }
 
-    /* test for GNU-style variadic macros */
+    /* Test for GNU-style variadic macros. */
     output = CC_capture_output(gnuc_code, strlen(gnuc_code), &output_len);
     if (output != NULL) {
         has_gnuc_varmacros = true;
@@ -60,7 +76,7 @@ VariadicMacros_run(void)
         ConfWriter_append_conf("#define CHY_HAS_GNUC_VARIADIC_MACROS\n");
     }
 
-    /* shorten */
+    /* Shorten. */
     ConfWriter_start_short_names();
     if (has_varmacros)
         ConfWriter_shorten_macro("HAS_VARIADIC_MACROS");
@@ -74,19 +90,4 @@ VariadicMacros_run(void)
 }
 
 
-/**
- * Copyright 2006 The Apache Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 

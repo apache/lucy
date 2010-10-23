@@ -1,22 +1,38 @@
-/* XSBind.h -- Functions to help bind Lucy to Perl XS api.
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-#ifndef H_LUCY_XSBIND
-#define H_LUCY_XSBIND 1
+/* XSBind.h -- Functions to help bind KinoSearch to Perl XS api.
+ */
+
+#ifndef H_KINO_XSBIND
+#define H_KINO_XSBIND 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "charmony.h"
-#include "Lucy/Object/Obj.h"
-#include "Lucy/Object/ByteBuf.h"
-#include "Lucy/Object/CharBuf.h"
-#include "Lucy/Object/Err.h"
-#include "Lucy/Object/Hash.h"
-#include "Lucy/Object/Num.h"
-#include "Lucy/Object/VArray.h"
-#include "Lucy/Object/VTable.h"
+#include "KinoSearch/Object/Obj.h"
+#include "KinoSearch/Object/ByteBuf.h"
+#include "KinoSearch/Object/CharBuf.h"
+#include "KinoSearch/Object/Err.h"
+#include "KinoSearch/Object/Hash.h"
+#include "KinoSearch/Object/Num.h"
+#include "KinoSearch/Object/VArray.h"
+#include "KinoSearch/Object/VTable.h"
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -26,16 +42,16 @@ extern "C" {
 #include "ppport.h"
 
 /** Given either a class name or a perl object, manufacture a new KS
- * object suitable for supplying to a lucy_Foo_init() function.
+ * object suitable for supplying to a kino_Foo_init() function.
  */
-lucy_Obj*
-lucy_XSBind_new_blank_obj(SV *either_sv);
+kino_Obj*
+kino_XSBind_new_blank_obj(SV *either_sv);
 
 /** Test whether an SV is defined.  Handles "get" magic, unlike SvOK on its
  * own.
  */
 static CHY_INLINE chy_bool_t
-lucy_XSBind_sv_defined(SV *sv)
+kino_XSBind_sv_defined(SV *sv)
 {
     if (!sv || !SvANY(sv)) { return false; }
     if (SvGMAGICAL(sv)) { mg_get(sv); }
@@ -49,44 +65,44 @@ lucy_XSBind_sv_defined(SV *sv)
  * <code>allocation</code>, assign the SV's string to it, and return that
  * instead.  If all else fails, throw an exception.
  */
-lucy_Obj*
-lucy_XSBind_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable, void *allocation);
+kino_Obj*
+kino_XSBind_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation);
 
-/** As XSBind_sv_to_lucy_obj above, but returns NULL instead of throwing an
+/** As XSBind_sv_to_kino_obj above, but returns NULL instead of throwing an
  * exception.
  */
-lucy_Obj*
-lucy_XSBind_maybe_sv_to_lucy_obj(SV *sv, lucy_VTable *vtable,
+kino_Obj*
+kino_XSBind_maybe_sv_to_kino_obj(SV *sv, kino_VTable *vtable,
                                  void *allocation);
 
 
-/** Derive an SV from a Lucy object.  If the KS object is NULL, the SV
+/** Derive an SV from a KinoSearch object.  If the KS object is NULL, the SV
  * will be undef.
  *
  * The new SV has single refcount for which the caller must take
  * responsibility.
  */
 static CHY_INLINE SV*
-lucy_XSBind_lucy_obj_to_sv(lucy_Obj *obj)
+kino_XSBind_kino_obj_to_sv(kino_Obj *obj)
 {
-    return obj ? (SV*)Lucy_Obj_To_Host(obj) : newSV(0);
+    return obj ? (SV*)Kino_Obj_To_Host(obj) : newSV(0);
 }
 
-/** XSBind_lucy_obj_to_sv, with a cast. 
+/** XSBind_kino_obj_to_sv, with a cast. 
  */
-#define LUCY_OBJ_TO_SV(_obj) lucy_XSBind_lucy_obj_to_sv((lucy_Obj*)_obj)
+#define KINO_OBJ_TO_SV(_obj) kino_XSBind_kino_obj_to_sv((kino_Obj*)_obj)
 
-/** As XSBind_lucy_obj_to_sv above, except decrements the object's refcount
+/** As XSBind_kino_obj_to_sv above, except decrements the object's refcount
  * after creating the SV. This is useful when the KS expression creates a new
  * refcount, e.g.  a call to a constructor.
  */
 static CHY_INLINE SV*
-lucy_XSBind_lucy_obj_to_sv_noinc(lucy_Obj *obj)
+kino_XSBind_kino_obj_to_sv_noinc(kino_Obj *obj)
 {
     SV *retval;
     if (obj) {
-        retval = (SV*)Lucy_Obj_To_Host(obj);
-        Lucy_Obj_Dec_RefCount(obj);
+        retval = (SV*)Kino_Obj_To_Host(obj);
+        Kino_Obj_Dec_RefCount(obj);
     }
     else {
         retval = newSV(0);
@@ -94,46 +110,46 @@ lucy_XSBind_lucy_obj_to_sv_noinc(lucy_Obj *obj)
     return retval;
 }
 
-/** XSBind_lucy_obj_to_sv_noinc, with a cast. 
+/** XSBind_kino_obj_to_sv_noinc, with a cast. 
  */
-#define LUCY_OBJ_TO_SV_NOINC(_obj) \
-    lucy_XSBind_lucy_obj_to_sv_noinc((lucy_Obj*)_obj)
+#define KINO_OBJ_TO_SV_NOINC(_obj) \
+    kino_XSBind_kino_obj_to_sv_noinc((kino_Obj*)_obj)
 
 /** Deep conversion of KS objects to Perl objects -- CharBufs to UTF-8 SVs,
  * ByteBufs to SVs, VArrays to Perl array refs, Hashes to Perl hashrefs, and
  * any other object to a Perl object wrapping the KS Obj.
  */
 SV*
-lucy_XSBind_lucy_to_perl(lucy_Obj *obj);
+kino_XSBind_kino_to_perl(kino_Obj *obj);
 
 /** Deep conversion of Perl data structures to KS objects -- Perl hash to
- * Hash*, Perl array to VArray*, Lucy objects stripped of their
+ * Hash*, Perl array to VArray*, KinoSearch objects stripped of their
  * wrappers, and everything else stringified and turned to a CharBuf.
  */
-lucy_Obj*
-lucy_XSBind_perl_to_lucy(SV *sv);
+kino_Obj*
+kino_XSBind_perl_to_kino(SV *sv);
 
 /** Convert a ByteBuf into a new string SV.
  */
 SV*
-lucy_XSBind_bb_to_sv(const lucy_ByteBuf *bb);
+kino_XSBind_bb_to_sv(const kino_ByteBuf *bb);
 
 /** Convert a CharBuf into a new UTF-8 string SV.
  */
 SV*
-lucy_XSBind_cb_to_sv(const lucy_CharBuf *cb);
+kino_XSBind_cb_to_sv(const kino_CharBuf *cb);
 
 /** Turn on overloading for the supplied Perl object and its class.
  */
 void
-lucy_XSBind_enable_overload(void *pobj);
+kino_XSBind_enable_overload(void *pobj);
 
 /** Process hash-style params passed to an XS subroutine.  The varargs must
  * come batched in groups of three: an SV**, the name of the parameter, and
  * length of the paramter name.  A NULL pointer terminates the list:
  *
- *     lucy_XSBind_allot_params(stack, start, num_stack_elems, 
- *         "Lucy::Search::TermQuery::new_PARAMS", 
+ *     kino_XSBind_allot_params(stack, start, num_stack_elems, 
+ *         "KinoSearch::Search::TermQuery::new_PARAMS", 
  *          &field_sv, "field", 5,
  *          &term_sv, "term", 4,
  *          NULL);
@@ -150,7 +166,7 @@ lucy_XSBind_enable_overload(void *pobj);
  * labels which are not present in this hash will trigger an exception.
  */
 void
-lucy_XSBind_allot_params(SV** stack, int32_t start, 
+kino_XSBind_allot_params(SV** stack, int32_t start, 
                          int32_t num_stack_elems, 
                          char* params_hash_name, ...);
 
@@ -160,46 +176,30 @@ lucy_XSBind_allot_params(SV** stack, int32_t start,
  * full symbols nevertheless in case someone else defines e.g. a function
  * named "XSBind_sv_defined".)
  */
-#define XSBind_new_blank_obj        lucy_XSBind_new_blank_obj
-#define XSBind_sv_defined           lucy_XSBind_sv_defined
-#define XSBind_sv_to_lucy_obj       lucy_XSBind_sv_to_lucy_obj
-#define XSBind_maybe_sv_to_lucy_obj lucy_XSBind_maybe_sv_to_lucy_obj
-#define XSBind_lucy_obj_to_sv       lucy_XSBind_lucy_obj_to_sv
-#define XSBind_lucy_obj_to_sv_noinc lucy_XSBind_lucy_obj_to_sv_noinc
-#define XSBind_lucy_to_perl         lucy_XSBind_lucy_to_perl
-#define XSBind_perl_to_lucy         lucy_XSBind_perl_to_lucy
-#define XSBind_bb_to_sv             lucy_XSBind_bb_to_sv
-#define XSBind_cb_to_sv             lucy_XSBind_cb_to_sv
-#define XSBind_enable_overload      lucy_XSBind_enable_overload
-#define XSBind_allot_params         lucy_XSBind_allot_params
+#define XSBind_new_blank_obj        kino_XSBind_new_blank_obj
+#define XSBind_sv_defined           kino_XSBind_sv_defined
+#define XSBind_sv_to_kino_obj       kino_XSBind_sv_to_kino_obj
+#define XSBind_maybe_sv_to_kino_obj kino_XSBind_maybe_sv_to_kino_obj
+#define XSBind_kino_obj_to_sv       kino_XSBind_kino_obj_to_sv
+#define XSBind_kino_obj_to_sv_noinc kino_XSBind_kino_obj_to_sv_noinc
+#define XSBind_kino_to_perl         kino_XSBind_kino_to_perl
+#define XSBind_perl_to_kino         kino_XSBind_perl_to_kino
+#define XSBind_bb_to_sv             kino_XSBind_bb_to_sv
+#define XSBind_cb_to_sv             kino_XSBind_cb_to_sv
+#define XSBind_enable_overload      kino_XSBind_enable_overload
+#define XSBind_allot_params         kino_XSBind_allot_params
 
-/* Strip the prefix from some common lucy_ symbols where we know there's no
+/* Strip the prefix from some common kino_ symbols where we know there's no
  * conflict with Perl.  It's a little inconsistent to do this rather than
  * leave all symbols at full size, but the succinctness is worth it.
  */
-#define THROW            LUCY_THROW
-#define WARN             LUCY_WARN
-#define OVERRIDDEN       LUCY_OVERRIDDEN
+#define THROW            KINO_THROW
+#define WARN             KINO_WARN
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // H_LUCY_XSBIND 
+#endif // H_KINO_XSBIND 
 
-/**
- * Copyright 2009 The Apache Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 

@@ -1,3 +1,19 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/ConfWriter.h"
@@ -14,7 +30,6 @@ DirManip_run(void)
 {
     FILE *f;
     char dir_sep[3];
-    chaz_bool_t dir_sep_is_valid = false;
     chaz_bool_t remove_zaps_dirs = false;
     chaz_bool_t has_dirent_h = HeadCheck_check_header("dirent.h");
     chaz_bool_t has_direct_h = HeadCheck_check_header("direct.h");
@@ -75,16 +90,20 @@ DirManip_run(void)
     if ( (f = fopen("_charm_test_dir_mod\\backslash", "r")) != NULL) {
         fclose(f);
         strcpy(dir_sep, "\\\\");
-        dir_sep_is_valid = true;
     }
     else if ( (f = fopen("_charm_test_dir_mod/slash", "r")) != NULL) {
         fclose(f);
         strcpy(dir_sep, "/");
-        dir_sep_is_valid = true;
     }
-    if (dir_sep_is_valid) {
-        ConfWriter_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
+    else {
+        /* Punt based on OS. */
+        #ifdef _WIN32
+        strcpy(dir_sep, "\\\\");
+        #else
+        strcpy(dir_sep, "/");
+        #endif
     }
+    ConfWriter_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
 
     /* Clean up - delete all possible files without verifying. */
     remove("_charm_test_dir_mod/slash");
@@ -104,7 +123,7 @@ DirManip_run(void)
 
     /* Shorten. */
     ConfWriter_start_short_names();
-    if (dir_sep_is_valid) { ConfWriter_shorten_macro("DIR_SEP"); }
+    ConfWriter_shorten_macro("DIR_SEP");
     if (has_dirent_h)     { ConfWriter_shorten_macro("HAS_DIRENT_H"); }
     if (has_direct_h)     { ConfWriter_shorten_macro("HAS_DIRECT_H"); }
     if (has_dirent_d_namlen) { ConfWriter_shorten_macro("HAS_DIRENT_D_NAMLEN"); }
@@ -119,19 +138,4 @@ DirManip_run(void)
 }
 
 
-/**
- * Copyright 2006 The Apache Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 

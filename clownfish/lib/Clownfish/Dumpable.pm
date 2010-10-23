@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -94,24 +109,24 @@ sub _add_dump_method {
     my $parent = $class->get_parent;
 
     if ( $parent and $parent->has_attribute('dumpable') ) {
-        my $super_dump = 'lucy_' . $parent->get_cnick . '_dump';
+        my $super_dump = 'kino_' . $parent->get_cnick . '_dump';
         my $super_type = $parent->full_struct_sym;
         $autocode = <<END_STUFF;
-lucy_Obj*
+kino_Obj*
 $full_func_sym($full_struct *self)
 {
-    lucy_Hash *dump = (lucy_Hash*)$super_dump(($super_type*)self);
+    kino_Hash *dump = (kino_Hash*)$super_dump(($super_type*)self);
 END_STUFF
         @members = $class->novel_member_vars;
     }
     else {
         $autocode = <<END_STUFF;
-lucy_Obj*
+kino_Obj*
 $full_func_sym($full_struct *self)
 {
-    lucy_Hash *dump = lucy_Hash_new(0);
-    Lucy_Hash_Store_Str(dump, "_class", 6,
-        (lucy_Obj*)Lucy_CB_Clone(Lucy_Obj_Get_Class_Name((lucy_Obj*)self)));
+    kino_Hash *dump = kino_Hash_new(0);
+    Kino_Hash_Store_Str(dump, "_class", 6,
+        (kino_Obj*)Kino_CB_Clone(Kino_Obj_Get_Class_Name((kino_Obj*)self)));
 END_STUFF
         @members = $class->member_vars;
         shift @members;    # skip self->vtable
@@ -121,7 +136,7 @@ END_STUFF
     for my $member_var (@members) {
         $autocode .= $self->_process_dump_member( $class, $member_var );
     }
-    $autocode .= "    return (lucy_Obj*)dump;\n}\n\n";
+    $autocode .= "    return (kino_Obj*)dump;\n}\n\n";
     $class->append_autocode($autocode);
 }
 
@@ -131,17 +146,17 @@ sub _process_dump_member {
     my $name = $member->micro_sym;
     my $len  = length($name);
     if ( $type->is_integer ) {
-        return qq|    Lucy_Hash_Store_Str(dump, "$name", $len, |
-            . qq|(lucy_Obj*)lucy_CB_newf("%i64", (int64_t)self->$name));\n|;
+        return qq|    Kino_Hash_Store_Str(dump, "$name", $len, |
+            . qq|(kino_Obj*)kino_CB_newf("%i64", (int64_t)self->$name));\n|;
     }
     elsif ( $type->is_floating ) {
-        return qq|    Lucy_Hash_Store_Str(dump, "$name", $len, |
-            . qq|(lucy_Obj*)lucy_CB_newf("%f64", (double)self->$name));\n|;
+        return qq|    Kino_Hash_Store_Str(dump, "$name", $len, |
+            . qq|(kino_Obj*)kino_CB_newf("%f64", (double)self->$name));\n|;
     }
     elsif ( $type->is_object ) {
         return <<END_STUFF;
     if (self->$name) {
-         Lucy_Hash_Store_Str(dump, "$name", $len, Lucy_Obj_Dump((lucy_Obj*)self->$name));
+         Kino_Hash_Store_Str(dump, "$name", $len, Kino_Obj_Dump((kino_Obj*)self->$name));
     }
 END_STUFF
     }
@@ -161,13 +176,13 @@ sub _add_load_method {
     my $parent = $class->get_parent;
 
     if ( $parent and $parent->has_attribute('dumpable') ) {
-        my $super_load = 'lucy_' . $parent->get_cnick . '_load';
+        my $super_load = 'kino_' . $parent->get_cnick . '_load';
         my $super_type = $parent->full_struct_sym;
         $autocode = <<END_STUFF;
-lucy_Obj*
-$full_func_sym($full_struct *self, lucy_Obj *dump)
+kino_Obj*
+$full_func_sym($full_struct *self, kino_Obj *dump)
 {
-    lucy_Hash *source = (lucy_Hash*)LUCY_CERTIFY(dump, LUCY_HASH);
+    kino_Hash *source = (kino_Hash*)KINO_CERTIFY(dump, KINO_HASH);
     $full_struct *loaded 
         = ($full_struct*)$super_load(($super_type*)self, dump);
     CHY_UNUSED_VAR(self);
@@ -176,14 +191,14 @@ END_STUFF
     }
     else {
         $autocode = <<END_STUFF;
-lucy_Obj*
-$full_func_sym($full_struct *self, lucy_Obj *dump)
+kino_Obj*
+$full_func_sym($full_struct *self, kino_Obj *dump)
 {
-    lucy_Hash *source = (lucy_Hash*)LUCY_CERTIFY(dump, LUCY_HASH);
-    lucy_CharBuf *class_name = (lucy_CharBuf*)LUCY_CERTIFY(
-        Lucy_Hash_Fetch_Str(source, "_class", 6), LUCY_CHARBUF);
-    lucy_VTable *vtable = lucy_VTable_singleton(class_name, NULL);
-    $full_struct *loaded = ($full_struct*)Lucy_VTable_Make_Obj(vtable);
+    kino_Hash *source = (kino_Hash*)KINO_CERTIFY(dump, KINO_HASH);
+    kino_CharBuf *class_name = (kino_CharBuf*)KINO_CERTIFY(
+        Kino_Hash_Fetch_Str(source, "_class", 6), KINO_CHARBUF);
+    kino_VTable *vtable = kino_VTable_singleton(class_name, NULL);
+    $full_struct *loaded = ($full_struct*)Kino_VTable_Make_Obj(vtable);
     CHY_UNUSED_VAR(self);
 END_STUFF
         @members = $class->member_vars;
@@ -194,7 +209,7 @@ END_STUFF
     for my $member_var (@members) {
         $autocode .= $self->_process_load_member( $class, $member_var );
     }
-    $autocode .= "    return (lucy_Obj*)loaded;\n}\n\n";
+    $autocode .= "    return (kino_Obj*)loaded;\n}\n\n";
     $class->append_autocode($autocode);
 }
 
@@ -207,14 +222,14 @@ sub _process_load_member {
     my $struct_sym = $type->get_specifier;
     my $vtable_var = uc($struct_sym);
     my $extraction
-        = $type->is_integer  ? qq|($type_str)Lucy_Obj_To_I64(var)|
-        : $type->is_floating ? qq|($type_str)Lucy_Obj_To_F64(var)|
+        = $type->is_integer  ? qq|($type_str)Kino_Obj_To_I64(var)|
+        : $type->is_floating ? qq|($type_str)Kino_Obj_To_F64(var)|
         : $type->is_object
-        ? qq|($struct_sym*)LUCY_CERTIFY(Lucy_Obj_Load(var, var), $vtable_var)|
+        ? qq|($struct_sym*)KINO_CERTIFY(Kino_Obj_Load(var, var), $vtable_var)|
         : confess( "Don't know how to load " . $type->get_specifier );
     return <<END_STUFF;
     {
-        lucy_Obj *var = Lucy_Hash_Fetch_Str(source, "$name", $len);
+        kino_Obj *var = Kino_Hash_Fetch_Str(source, "$name", $len);
         if (var) { loaded->$name = $extraction; }
     }
 END_STUFF
@@ -243,7 +258,7 @@ If a class declares that it has the attribute "dumpable", but does not declare
 either Dump or Load(), Clownfish::Dumpable will attempt to auto-generate
 those methods if methods inherited from the parent class do not suffice.
 
-    class Foo::Bar extends Foo : dumpable {
+    class Foo::Bar inherits Foo : dumpable {
         Thing *thing;
 
         public inert incremented Bar*
@@ -267,24 +282,6 @@ Constructor.  Takes no arguments.
 
 Analyze a class with the attribute "dumpable" and add Dump() or Load() methods
 as necessary.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

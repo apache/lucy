@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -73,16 +88,16 @@ sub _sv_to_cf_obj {
         # Share buffers rather than copy between Perl scalars and Clownfish
         # string types.  Assume that the appropriate ZombieCharBuf has been
         # declared on the stack.
-        return "$cf_var = ($struct_sym*)XSBind_sv_to_lucy_obj($xs_var, "
-            . "$vtable, alloca(lucy_ZCB_size()));"
+        return "$cf_var = ($struct_sym*)XSBind_sv_to_kino_obj($xs_var, "
+            . "$vtable, alloca(kino_ZCB_size()));"
     }
     else {
-        return "$cf_var = ($struct_sym*)XSBind_sv_to_lucy_obj($xs_var, "
+        return "$cf_var = ($struct_sym*)XSBind_sv_to_kino_obj($xs_var, "
             . "$vtable, NULL);";
     }
 }
 
-sub _void_star_to_lucy {
+sub _void_star_to_kino {
     my ( $type, $cf_var, $xs_var ) = @_;
     # Assume that void* is a reference SV -- either a hashref or an arrayref.
     return qq|if (SvROK($xs_var)) {
@@ -90,7 +105,7 @@ sub _void_star_to_lucy {
         }
         else {
             $cf_var = NULL; /* avoid uninitialized compiler warning */
-            LUCY_THROW(LUCY_ERR, "$cf_var is not a reference");
+            KINO_THROW(KINO_ERR, "$cf_var is not a reference");
         }\n|;
 }
 
@@ -109,7 +124,7 @@ sub from_perl {
     }
     elsif ( $type->is_composite ) {
         if ( $type->to_c eq 'void*' ) {
-            return _void_star_to_lucy( $type, $cf_var, $xs_var );
+            return _void_star_to_kino( $type, $cf_var, $xs_var );
         }
     }
 
@@ -124,7 +139,7 @@ sub to_perl {
 
     if ( $type->is_object ) {
         return "$xs_var = $cf_var == NULL ? newSV(0) : "
-            . "XSBind_lucy_to_perl((lucy_Obj*)$cf_var);";
+            . "XSBind_kino_to_perl((kino_Obj*)$cf_var);";
     }
     elsif ( $type->is_primitive ) {
         if ( my $sub = $primitives_to_perl{$type_str} ) {
@@ -157,14 +172,14 @@ sub write_xs_typemap {
         $typemap_start .= "$full_struct_sym*\t$label\n";
         $typemap_input .= <<END_INPUT;
 $label
-    \$var = ($full_struct_sym*)XSBind_sv_to_lucy_obj(\$arg, $vtable, NULL);
+    \$var = ($full_struct_sym*)XSBind_sv_to_kino_obj(\$arg, $vtable, NULL);
 
 END_INPUT
 
         $typemap_output .= <<END_OUTPUT;
 $label
-    \$arg = (SV*)Lucy_Obj_To_Host((lucy_Obj*)\$var);
-    LUCY_DECREF(\$var);
+    \$arg = (SV*)Kino_Obj_To_Host((kino_Obj*)\$var);
+    KINO_DECREF(\$var);
 
 END_OUTPUT
     }
@@ -191,7 +206,7 @@ uint16_t\tCHY_UNSIGNED_INT
 uint32_t\tCHY_UNSIGNED_INT
 uint64_t\tCHY_BIG_UNSIGNED_INT
 
-const lucy_CharBuf*\tCONST_CHARBUF
+const kino_CharBuf*\tCONST_CHARBUF
 END_STUFF
 
     return $content;
@@ -227,7 +242,7 @@ CHY_BIG_UNSIGNED_INT
     $big_unsigned_convert
 
 CONST_CHARBUF
-    \$var = (const lucy_CharBuf*)LUCY_ZCB_WRAP_STR(SvPVutf8_nolen(\$arg), SvCUR(\$arg));
+    \$var = (const kino_CharBuf*)KINO_ZCB_WRAP_STR(SvPVutf8_nolen(\$arg), SvCUR(\$arg));
 
 END_STUFF
 }
@@ -346,24 +361,6 @@ We generate this file on the fly rather than maintain a static copy because we
 want an entry for each Clownfish type so that we can differentiate between
 them when checking arguments.  Keeping the entries up-to-date manually as
 classes come and go would be a pain.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

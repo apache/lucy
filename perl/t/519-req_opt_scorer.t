@@ -1,14 +1,28 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More skip_all => 'requires SortCollector';
-# use Test::More tests => 726;
-use Lucy::Test;
-use LucyX::Search::MockScorer;
-use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
+use Test::More tests => 726;
+use KinoSearch::Test;
+use KSx::Search::MockScorer;
+use KinoSearch::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
-my $sim = Lucy::Index::Similarity::LuceneSimilarity->new;
+my $sim = KinoSearch::Index::Similarity->new;
 
 for my $req_interval ( 1 .. 10, 75 ) {
     for my $opt_interval ( 1 .. 10, 75 ) {
@@ -21,21 +35,21 @@ sub check_scorer {
     my ( $req_interval, $opt_interval ) = @_;
     my $req_docs = modulo_set( $req_interval, 100 );
     my $opt_docs = modulo_set( $opt_interval, 100 );
-    my $req_mock = LucyX::Search::MockScorer->new(
+    my $req_mock = KSx::Search::MockScorer->new(
         doc_ids => $req_docs,
         scores  => [ (1) x scalar @$req_docs ],
     );
-    my $opt_mock = LucyX::Search::MockScorer->new(
+    my $opt_mock = KSx::Search::MockScorer->new(
         doc_ids => $opt_docs,
         scores  => [ (1) x scalar @$opt_docs ],
     );
-    my $req_opt_scorer = Lucy::Search::RequiredOptionalScorer->new(
+    my $req_opt_scorer = KinoSearch::Search::RequiredOptionalScorer->new(
         similarity       => $sim,
         required_matcher => $req_mock,
         optional_matcher => $opt_mock,
     );
     my $collector
-        = Lucy::Search::Collector::SortCollector->new( wanted => 1000 );
+        = KinoSearch::Search::Collector::SortCollector->new( wanted => 1000 );
     $req_opt_scorer->collect( collector => $collector );
     my ( $got_by_score, $got_by_id ) = doc_ids_from_td_coll($collector);
     my ( $expected_by_count, $expected_by_id )

@@ -1,3 +1,19 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/HeaderChecker.h"
@@ -11,7 +27,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/* sets of symbols which might provide large file support */
+/* Sets of symbols which might provide large file support. */
 typedef struct off64_combo {
     const char *includes;
     const char *fopen_command;
@@ -23,6 +39,7 @@ static off64_combo off64_combos[] = {
     { "#include <sys/types.h>\n", "fopen64",   "ftello64",  "fseeko64",  "off64_t" },
     { "#include <sys/types.h>\n", "fopen",     "ftello64",  "fseeko64",  "off64_t" },
     { "#include <sys/types.h>\n", "fopen",     "ftello",    "fseeko",    "off_t"   },
+    { "",                         "fopen",     "ftell",     "fseek",     "off_t"   },
     { "",                         "fopen",     "_ftelli64", "_fseeki64", "__int64" },
     { "",                         "fopen",     "ftell",     "fseek",     "long"    },
     { NULL, NULL, NULL, NULL, NULL }
@@ -71,7 +88,7 @@ S_test_sparse_file(long offset, Stat *st);
 static chaz_bool_t
 S_can_create_big_files();
 
-/* vars for holding lfs commands, once they're discovered */
+/* Vars for holding lfs commands, once they're discovered. */
 static char fopen_command[10];
 static char fseek_command[10];
 static char ftell_command[10];
@@ -89,7 +106,7 @@ LargeFiles_run(void)
 
     ConfWriter_start_module("LargeFiles");
 
-    /* see if off64_t and friends exist or have synonyms */
+    /* See if off64_t and friends exist or have synonyms. */
     for (i = 0; off64_combos[i].includes != NULL; i++) {
         off64_combo combo = off64_combos[i];
         success = S_probe_off64(&combo);
@@ -102,10 +119,10 @@ LargeFiles_run(void)
         }
     }
 
-    /* write the affirmations/definitions */
+    /* Write the affirmations/definitions. */
     if (success) {
         ConfWriter_append_conf("#define CHY_HAS_LARGE_FILE_SUPPORT\n");
-        /* alias these only if they're not already provided and correct */
+        /* Alias these only if they're not already provided and correct. */
         if (strcmp(off64_type, "off64_t") != 0) {
             ConfWriter_append_conf("#define chy_off64_t %s\n",  off64_type);
             ConfWriter_append_conf("#define chy_fopen64 %s\n",  fopen_command);
@@ -137,10 +154,10 @@ LargeFiles_run(void)
         }
     }
 
-    /* check for sparse files */
+    /* Check for sparse files. */
     if (S_check_sparse_files()) {
         ConfWriter_append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
-        /* see if we can create a 5 GB file without crashing */
+        /* See if we can create a 5 GB file without crashing. */
         if (success && S_can_create_big_files())
             ConfWriter_append_conf("#define CHAZ_CAN_CREATE_BIG_FILES\n");
     }
@@ -148,12 +165,12 @@ LargeFiles_run(void)
         ConfWriter_append_conf("#define CHAZ_NO_SPARSE_FILES\n");
     }
 
-    /* short names */
+    /* Short names. */
     if (success) {
         ConfWriter_start_short_names();
         ConfWriter_shorten_macro("HAS_LARGE_FILE_SUPPORT");
 
-        /* alias these only if they're not already provided and correct */
+        /* Alias these only if they're not already provided and correct. */
         if (strcmp(off64_type, "off64_t") != 0) {
             ConfWriter_shorten_typedef("off64_t");
             ConfWriter_shorten_function("fopen64");
@@ -172,7 +189,7 @@ LargeFiles_run(void)
     ConfWriter_end_module();
 }
 
-/* code for checking ftello64 and friends */
+/* Code for checking ftello64 and friends. */
 static char off64_code[] = 
     QUOTE(  %s                                         )
     QUOTE(  #include "_charm.h"                        )
@@ -208,7 +225,7 @@ S_probe_off64(off64_combo *combo)
         combo->fopen_command, combo->offset64_type, combo->ftell_command, 
         combo->fseek_command);
 
-    /* verify compilation and that the offset type has 8 bytes */
+    /* Verify compilation and that the offset type has 8 bytes. */
     output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
         long size = strtol(output, NULL, 10);
@@ -306,11 +323,11 @@ S_check_sparse_files()
 {
     Stat st_a, st_b;
 
-    /* bail out if we can't stat() a file */
+    /* Bail out if we can't stat() a file. */
     if (!HeadCheck_check_header("sys/stat.h"))
         return false;
 
-    /* write and stat a 1 MB file and a 2 MB file, both of them sparse */
+    /* Write and stat a 1 MB file and a 2 MB file, both of them sparse. */
     S_test_sparse_file(1000000, &st_a);
     S_test_sparse_file(2000000, &st_b);
     if (!(st_a.valid && st_b.valid))
@@ -320,7 +337,7 @@ S_check_sparse_files()
     if (st_b.size != 2000001)
         Util_die("Expected size of 2000001 but got %ld", (long)st_b.size);
 
-    /* see if two files with very different lengths have the same block size */
+    /* See if two files with very different lengths have the same block size. */
     if (st_a.blocks == st_b.blocks)
         return true;
     else
@@ -332,12 +349,12 @@ S_test_sparse_file(long offset, Stat *st)
 {
     FILE *sparse_fh;
 
-    /* make sure the file's not there, then open */
+    /* Make sure the file's not there, then open. */
     Util_remove_and_verify("_charm_sparse");
     if ( (sparse_fh = fopen("_charm_sparse", "w+")) == NULL )
         Util_die("Couldn't open file '_charm_sparse'");
 
-    /* seek fh to [offset], write a byte, close file */
+    /* Seek fh to [offset], write a byte, close file. */
     if ( (fseek(sparse_fh, offset, SEEK_SET)) == -1)
         Util_die("seek failed: %s", strerror(errno));
     if ( (fprintf(sparse_fh, "X")) != 1 )
@@ -345,29 +362,29 @@ S_test_sparse_file(long offset, Stat *st)
     if (fclose(sparse_fh))
         Util_die("Error closing file '_charm_sparse': %s", strerror(errno));
 
-    /* stat the file */
+    /* Stat the file. */
     Stat_stat("_charm_sparse", st);
 
     remove("_charm_sparse");
 }
 
-/* open a file, seek to a loc, print a char, and communicate success */
+/* Open a file, seek to a loc, print a char, and communicate success. */
 static char create_bigfile_code[] = 
     QUOTE(  #include "_charm.h"                                      )
     QUOTE(  int main() {                                             )
     QUOTE(      FILE *fh = fopen("_charm_large_file_test", "w+");    )
     QUOTE(      int check_seek;                                      )
     QUOTE(      Charm_Setup;                                         )
-                /* bail unless seek succeeds */
+                /* Bail unless seek succeeds. */
     QUOTE(      check_seek = %s(fh, 5000000000, SEEK_SET);           )
     QUOTE(      if (check_seek == -1)                                )
     QUOTE(          exit(1);                                         )
-                /* bail unless we write successfully */
+                /* Bail unless we write successfully. */
     QUOTE(      if (fprintf(fh, "X") != 1)                           )
     QUOTE(          exit(1);                                         )
     QUOTE(      if (fclose(fh))                                      )
     QUOTE(          exit(1);                                         )
-                /* communicate success to Charmonizer */
+                /* Communicate success to Charmonizer. */
     QUOTE(      printf("1");                                         )
     QUOTE(      return 0;                                            )
     QUOTE(  }                                                        );
@@ -383,35 +400,20 @@ S_can_create_big_files()
                   + 10;
     char *code_buf = (char*)malloc(needed);
 
-    /* concat the source strings, compile the file, capture output */
+    /* Concat the source strings, compile the file, capture output. */
     sprintf(code_buf, create_bigfile_code, fseek_command);
     output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
 
-    /* truncate, just in case the call to remove fails */
+    /* Truncate, just in case the call to remove fails. */
     truncating_fh = fopen("_charm_large_file_test", "w");
     if (truncating_fh != NULL)
         fclose(truncating_fh);
     Util_remove_and_verify("_charm_large_file_test");
 
-    /* return true if the test app made it to the finish line */
+    /* Return true if the test app made it to the finish line. */
     free(code_buf);
     return output == NULL ? false : true;
 }
 
 
-/**
- * Copyright 2006 The Apache Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 

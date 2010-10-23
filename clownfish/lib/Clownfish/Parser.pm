@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -53,13 +68,13 @@ class_declaration:
     docucomment(?)
     exposure_specifier(?) class_modifier(s?) 'class' class_name 
         cnick(?)
-        class_extension(?)
+        class_inheritance(?)
         class_attribute(s?)
     '{'
         declaration_statement[
             class  => $item{class_name}, 
             cnick  => $item{'cnick(?)'}[0],
-            parent => $item{'class_extension(?)'}[0],
+            parent => $item{'class_inheritance(?)'}[0],
         ](s?)
     '}'
     { Clownfish::Parser->new_class( \%item, \%arg ) }
@@ -70,8 +85,8 @@ class_modifier:
     | 'final'
     { $item[1] }
 
-class_extension:
-    'extends' class_name
+class_inheritance:
+    'inherits' class_name
     { $item[2] }
 
 class_attribute:
@@ -486,7 +501,7 @@ sub new_class {
         parcel            => $parcel,
         class_name        => $item->{class_name},
         cnick             => $item->{'cnick(?)'}[0],
-        parent_class_name => $item->{'class_extension(?)'}[0],
+        parent_class_name => $item->{'class_inheritance(?)'}[0],
         member_vars       => \@member_vars,
         functions         => \@functions,
         methods           => \@methods,
@@ -554,24 +569,6 @@ of lines is consistent between before and after.
 JavaDoc-syntax "DocuComments", which begin with "/**" are left alone.  
 
 This is a sloppy implementation which will mangle quoted comments and such.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

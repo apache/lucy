@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -130,11 +145,11 @@ is_deeply(
 ok( $parser->class_modifier($_), "class_modifier: $_" )
     for (qw( abstract inert ));
 
-ok( $parser->class_extension($_), "class_extension: $_" )
-    for ( 'extends Foo', 'extends Foo::FooJr::FooIII' );
+ok( $parser->class_inheritance($_), "class_inheritance: $_" )
+    for ( 'inherits Foo', 'inherits Foo::FooJr::FooIII' );
 
 my $class_content
-    = 'public class Foo::FooJr cnick FooJr extends Foo { private int num; }';
+    = 'public class Foo::FooJr cnick FooJr inherits Foo { private int num; }';
 my $class = $parser->class_declaration($class_content);
 isa_ok( $class, "Clownfish::Class", "class_declaration FooJr" );
 ok( ( scalar grep { $_->micro_sym eq 'num' } $class->member_vars ),
@@ -146,7 +161,7 @@ $class_content = q|
      *
      * Wow wow wow.
      */
-    public class Animal::Dog extends Animal : lovable : drooly {
+    public class Animal::Dog inherits Animal : lovable : drooly {
         public inert Dog* init(Dog *self, CharBuf *name, CharBuf *fave_food);
         inert uint32_t count();
         inert uint64_t num_dogs;

@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -60,7 +75,7 @@ sub _xsub_body {
         next unless $arg_type->is_object;
         next unless $arg_type->decremented;
         my $var_name = $arg_var->micro_sym;
-        $body .= "if ($var_name) (void)LUCY_INCREF($var_name);\n        ";
+        $body .= "if ($var_name) (void)KINO_INCREF($var_name);\n        ";
     }
 
     if ( $method->void ) {
@@ -73,7 +88,7 @@ sub _xsub_body {
         my $retval_assignment = to_perl( $return_type, 'ST(0)', 'retval' );
         my $decrement         = "";
         if ( $return_type->is_object and $return_type->incremented ) {
-            $decrement = "LUCY_DECREF(retval);\n";
+            $decrement = "KINO_DECREF(retval);\n";
         }
         $body .= qq|retval = $full_func_sym($name_list);
         $retval_assignment$decrement
@@ -108,13 +123,13 @@ sub _xsub_def_positional_args {
     if ( $min_required < $num_args ) {
         $num_args_check
             = qq|if (items < $min_required) { |
-            . qq|THROW(LUCY_ERR, "Usage: %s(%s)",  GvNAME(CvGV(cv)),|
+            . qq|THROW(KINO_ERR, "Usage: %s(%s)",  GvNAME(CvGV(cv)),|
             . qq| "$xs_name_list"); }|;
     }
     else {
         $num_args_check
             = qq|if (items != $num_args) { |
-            . qq| THROW(LUCY_ERR, "Usage: %s(%s)",  GvNAME(CvGV(cv)), |
+            . qq| THROW(KINO_ERR, "Usage: %s(%s)",  GvNAME(CvGV(cv)), |
             . qq|"$xs_name_list"); }|;
     }
 
@@ -148,7 +163,7 @@ sub _xsub_def_positional_args {
     my $var_assignments = join "\n    ", @var_assignments;
 
     return <<END_STUFF;
-XS($c_name); /* -Wmissing-prototypes */
+XS($c_name);
 XS($c_name)
 {
     dXSARGS;
@@ -156,7 +171,6 @@ XS($c_name)
     CHY_UNUSED_VAR(ax);
     SP -= items;
     $num_args_check;
-
     {
         /* Extract vars from Perl stack. */
         $var_declarations
@@ -165,7 +179,6 @@ XS($c_name)
         /* Execute */
         $body
     }
-
     PUTBACK;
 }
 END_STUFF
@@ -184,7 +197,7 @@ sub _xsub_def_labeled_params {
     my $name_list = $arg_vars->[0]->micro_sym . ", ...";
     my $num_args_check
         = qq|if (items < 1) { |
-        . qq|THROW(LUCY_ERR, "Usage: %s(%s)",  GvNAME(CvGV(cv)), |
+        . qq|THROW(KINO_ERR, "Usage: %s(%s)",  GvNAME(CvGV(cv)), |
         . qq|"$name_list"); }|;
 
     # Create code for allocating labeled parameters.
@@ -225,7 +238,7 @@ sub _xsub_def_labeled_params {
         else {
             my $assignment
                 = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) { #
-                . qq#THROW(LUCY_ERR, "Missing required param '$name'"); }\n#
+                . qq#THROW(KINO_ERR, "Missing required param '$name'"); }\n#
                 . qq#         $statement;#;
             push @var_assignments, $assignment;
         }
@@ -235,7 +248,7 @@ sub _xsub_def_labeled_params {
         $self_assignment, $allot_params, @var_assignments, );
 
     return <<END_STUFF;
-XS($c_name); /* -Wmissing-prototypes */
+XS($c_name);
 XS($c_name)
 {
     dXSARGS;
@@ -243,7 +256,6 @@ XS($c_name)
     CHY_UNUSED_VAR(ax);
     $num_args_check;
     SP -= items;
-
     {
         /* Extract vars from Perl stack. */
         $var_declarations
@@ -252,7 +264,6 @@ XS($c_name)
         /* Execute */
         $body
     }
-
     PUTBACK;
 }
 END_STUFF
@@ -269,8 +280,8 @@ sub _self_assign_statement {
     # a class method.
     my $binding_func
         = $method_name eq 'deserialize'
-        ? 'XSBind_maybe_sv_to_lucy_obj'
-        : 'XSBind_sv_to_lucy_obj';
+        ? 'XSBind_maybe_sv_to_kino_obj'
+        : 'XSBind_sv_to_kino_obj';
     return "self = ($type_c)$binding_func(ST(0), $vtable, NULL);";
 }
 
@@ -310,24 +321,6 @@ will be set up to accept a single positional argument.
 =head2 xsub_def
 
 Generate the XSUB code.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

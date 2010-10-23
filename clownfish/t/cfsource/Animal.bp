@@ -1,3 +1,0 @@
-parcel Animal;
-
-abstract class Animal { }

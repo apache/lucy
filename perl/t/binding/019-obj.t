@@ -1,12 +1,27 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
 use Test::More tests => 20;
 
 package TestObj;
-use base qw( Lucy::Object::Obj );
+use base qw( KinoSearch::Object::Obj );
 
-our $version = $Lucy::VERSION;
+our $version = $KinoSearch::VERSION;
 
 package SonOfTestObj;
 use base qw( TestObj );
@@ -31,13 +46,13 @@ use base qw( TestObj );
 }
 
 package BadSerialize;
-use base qw( Lucy::Object::Obj );
+use base qw( KinoSearch::Object::Obj );
 {
     sub serialize { }
 }
 
 package BadDump;
-use base qw( Lucy::Object::Obj );
+use base qw( KinoSearch::Object::Obj );
 {
     sub dump { }
 }
@@ -47,24 +62,24 @@ use Storable qw( freeze thaw );
 
 ok( defined $TestObj::version,
     "Using base class should grant access to "
-        . "package globals in the Lucy:: namespace"
+        . "package globals in the KinoSearch:: namespace"
 );
 
 # TODO: Port this test to C.
-eval { my $foo = Lucy::Object::Obj->new };
+eval { my $foo = KinoSearch::Object::Obj->new };
 like( $@, qr/abstract/i, "Obj is an abstract class" );
 
 my $object = TestObj->new;
-isa_ok( $object, "Lucy::Object::Obj",
-    "Lucy objects can be subclassed outside the Lucy hierarchy" );
+isa_ok( $object, "KinoSearch::Object::Obj",
+    "KinoSearch objects can be subclassed outside the KinoSearch hierarchy" );
 
 # TODO: Port this test to C.
 eval { my $evil_twin = $object->clone };
 like( $@, qr/abstract/i, "clone throws an abstract method exception" );
 
-ok( $object->is_a("Lucy::Object::Obj"), "custom is_a correct" );
-ok( !$object->is_a("Lucy::Object"),     "custom is_a too long" );
-ok( !$object->is_a("Lucy"),             "custom is_a substring" );
+ok( $object->is_a("KinoSearch::Object::Obj"), "custom is_a correct" );
+ok( !$object->is_a("KinoSearch::Object"),     "custom is_a too long" );
+ok( !$object->is_a("KinoSearch"),             "custom is_a substring" );
 ok( !$object->is_a(""),                       "custom is_a blank" );
 ok( !$object->is_a("thing"),                  "custom is_a wrong" );
 
@@ -72,8 +87,8 @@ eval { my $another_obj = TestObj->new( kill_me_now => 1 ) };
 like( $@, qr/kill_me_now/, "reject bad param" );
 
 my $stringified_perl_obj = "$object";
-require Lucy::Object::Hash;
-my $hash = Lucy::Object::Hash->new;
+require KinoSearch::Object::Hash;
+my $hash = KinoSearch::Object::Hash->new;
 $hash->store( foo => $object );
 is( $object->get_refcount, 2, "refcount increased via C code" );
 is( $object->get_refcount, 2, "refcount increased via C code" );
@@ -97,7 +112,7 @@ my $dupe   = thaw($frozen);
 is( ref($dupe), ref($object), "override serialize/deserialize" );
 
 SKIP: {
-    skip( "Invalid serialization causes leaks", 1 ) if $ENV{LUCY_VALGRIND};
+    skip( "Invalid serialization causes leaks", 1 ) if $ENV{KINO_VALGRIND};
     my $bad = BadSerialize->new;
     eval { my $froze = freeze($bad); };
     like( $@, qr/empty/i,
@@ -106,8 +121,8 @@ SKIP: {
 
 SKIP: {
     skip( "Exception thrown within callback leaks", 1 )
-        if $ENV{LUCY_VALGRIND};
-    $hash = Lucy::Object::Hash->new;
+        if $ENV{KINO_VALGRIND};
+    $hash = KinoSearch::Object::Hash->new;
     $hash->store( foo => BadDump->new );
     eval { $hash->dump };
     like( $@, qr/NULL/,

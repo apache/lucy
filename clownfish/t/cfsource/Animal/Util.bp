@@ -1,7 +1,0 @@
-parcel Animal;
-
-inert class Animal::Util {
-    inert void
-    groom(Animal *animal);
-}
-

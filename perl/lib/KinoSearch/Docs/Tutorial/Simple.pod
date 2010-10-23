@@ -1,0 +1,309 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+KinoSearch::Docs::Tutorial::Simple - Bare-bones search app.
+
+=head2 Setup
+
+Copy the html presentation of the US Constitution from the C<sample> directory
+of the KinoSearch distribution to the base level of your web server's
+C<htdocs> directory.
+
+    $ cp -R sample/us_constitution /usr/local/apache2/htdocs/
+
+=head2 Indexing: indexer.pl
+
+Our first task will be to create an application called C<indexer.pl> which
+builds a searchable "inverted index" from a collection of documents.  
+
+After we specify some configuration variables and load all necessary
+modules...
+
+    #!/usr/local/bin/perl
+    use strict;
+    use warnings;
+    
+    # (Change configuration variables as needed.)
+    my $path_to_index = '/path/to/index';
+    my $uscon_source  = '/usr/local/apache2/htdocs/us_constitution';
+
+    use KSx::Simple;
+    use File::Spec::Functions qw( catfile );
+    use HTML::TreeBuilder;
+
+... we'll start by creating a KSx::Simple object, telling it where we'd
+like the index to be located and the language of the source material.
+
+    my $simple = KSx::Simple->new(
+        path     => $path_to_index,
+        language => 'en',
+    );
+
+Next, we'll add a subroutine which extracts plain text from an HTML source
+file.  
+
+KSx::Simple won't be of any help with the task of text extraction, because
+it's not equipped to deal with source files directly.  As a matter of
+principle, KinoSearch remains deliberately ignorant on the vast subject of
+file formats, preferring to focus instead on its core competencies of indexing
+and search.  There are many excellent dedicated parsing modules available on
+CPAN; we'll use HTML::TreeBuilder.
+
+    # Parse an HTML file from our US Constitution collection and return a
+    # hashref with three keys: title, body, and url.
+    sub parse_file {
+        my $filename = shift;
+        my $filepath = catfile( $uscon_source, $filename );
+        my $tree     = HTML::TreeBuilder->new;
+        $tree->parse_file($filepath);
+        my $title_node = $tree->look_down( _tag => 'title' )
+            or die "No title element in $filepath";
+        my $bodytext_node = $tree->look_down( id => 'bodytext' )
+            or die "No div with id 'bodytext' in $filepath";
+        return {
+            title   => $title_node->as_trimmed_text,
+            content => $bodytext_node->as_trimmed_text,
+            url     => "/us_constitution/$filename"
+        };
+    }
+
+Add some elementary directory reading code...
+
+    # Collect names of source html files.
+    opendir( my $dh, $uscon_source )
+        or die "Couldn't opendir '$uscon_source': $!";
+    my @filenames = grep { $_ =~ /\.html/ && $_ ne 'index.html' } readdir $dh;
+
+... and now we're ready for the meat of indexer.pl -- which occupies exactly
+one line of code.
+
+    foreach my $filename (@filenames) {
+        my $doc = parse_file($filename);
+        $simple->add_doc($doc);  # ta-da!
+    }
+
+=head2 Search: search.cgi
+
+As with our indexing app, the bulk of the code in our search script won't be
+KinoSearch-specific.  
+
+The beginning is dedicated to CGI processing and configuration.
+
+    #!/usr/local/bin/perl -T
+    use strict;
+    use warnings;
+    
+    # (Change configuration variables as needed.)
+    my $path_to_index = '/path/to/index';
+
+    use CGI;
+    use Data::Pageset;
+    use HTML::Entities qw( encode_entities );
+    use KSx::Simple;
+    
+    my $cgi           = CGI->new;
+    my $q             = $cgi->param('q') || '';
+    my $offset        = $cgi->param('offset') || 0;
+    my $hits_per_page = 10;
+
+Once that's out of the way, we create our KSx::Simple object and feed
+it a query string.
+
+    my $simple = KSx::Simple->new(
+        path     => $path_to_index,
+        language => 'en',
+    );
+    my $hit_count = $simple->search(
+        query      => $q,
+        offset     => $offset,
+        num_wanted => $hits_per_page,
+    );
+
+The value returned by search() is the total number of documents in the
+collection which matched the query.  We'll show this hit count to the user,
+and also use it in conjunction with the parameters C<offset> and C<num_wanted>
+to break up results into "pages" of manageable size.
+
+Calling search() on our Simple object turns it into an iterator. Invoking
+next() now returns hits one at a time as L<KinoSearch::Document::HitDoc>
+objects, starting with the most relevant.
+
+    # Create result list.
+    my $report = '';
+    while ( my $hit = $simple->next ) {
+        my $score = sprintf( "%0.3f", $hit->get_score );
+        my $title = encode_entities( $hit->{title} );
+        $report .= qq|
+            <p>
+              <a href="$hit->{url}"><strong>$title</strong></a>
+              <em>$score</em>
+              <br>
+              <span class="excerptURL">$hit->{url}</span>
+            </p>
+            |;
+    }
+
+The rest of the script is just text wrangling.  Notable aspects include the
+use of L<Data::Pageset> to create paging links, and the L<encode_entities>
+function from L<HTML::Entities> to guard against cross-site scripting attacks.
+
+    #---------------------------------------------------------------#
+    # No tutorial material below this point - just html generation. #
+    #---------------------------------------------------------------#
+    
+    # Generate paging links and hit count, print and exit.
+    my $paging_links = generate_paging_info( $q, $hit_count );
+    blast_out_content( $q, $report, $paging_links );
+    
+    # Create html fragment with links for paging through results n-at-a-time.
+    sub generate_paging_info {
+        my ( $query_string, $total_hits ) = @_;
+        $query_string = encode_entities($query_string);
+        my $paging_info;
+        if ( !length $query_string ) {
+            # No query?  No display.
+            $paging_info = '';
+        }
+        elsif ( $total_hits == 0 ) {
+            # Alert the user that their search failed.
+            $paging_info
+                = qq|<p>No matches for <strong>$query_string</strong></p>|;
+        }
+        else {
+            my $current_page = ( $offset / $hits_per_page ) + 1;
+            my $pager        = Data::Pageset->new(
+                {   total_entries    => $total_hits,
+                    entries_per_page => $hits_per_page,
+                    current_page     => $current_page,
+                    pages_per_set    => 10,
+                    mode             => 'slide',
+                }
+            );
+            my $last_result  = $pager->last;
+            my $first_result = $pager->first;
+    
+            # Display the result nums, start paging info.
+            $paging_info = qq|
+                <p>
+                    Results <strong>$first_result-$last_result</strong> 
+                    of <strong>$total_hits</strong> 
+                    for <strong>$query_string</strong>.
+                </p>
+                <p>
+                    Results Page:
+                |;
+    
+            # Create a url for use in paging links.
+            my $href = $cgi->url( -relative => 1 ) . "?" . $cgi->query_string;
+            $href .= ";offset=0" unless $href =~ /offset=/;
+    
+            # Generate the "Prev" link.
+            if ( $current_page > 1 ) {
+                my $new_offset = ( $current_page - 2 ) * $hits_per_page;
+                $href =~ s/(?<=offset=)\d+/$new_offset/;
+                $paging_info .= qq|<a href="$href">&lt;= Prev</a>\n|;
+            }
+    
+            # Generate paging links.
+            for my $page_num ( @{ $pager->pages_in_set } ) {
+                if ( $page_num == $current_page ) {
+                    $paging_info .= qq|$page_num \n|;
+                }
+                else {
+                    my $new_offset = ( $page_num - 1 ) * $hits_per_page;
+                    $href =~ s/(?<=offset=)\d+/$new_offset/;
+                    $paging_info .= qq|<a href="$href">$page_num</a>\n|;
+                }
+            }
+    
+            # Generate the "Next" link.
+            if ( $current_page != $pager->last_page ) {
+                my $new_offset = $current_page * $hits_per_page;
+                $href =~ s/(?<=offset=)\d+/$new_offset/;
+                $paging_info .= qq|<a href="$href">Next =&gt;</a>\n|;
+            }
+    
+            # Close tag.
+            $paging_info .= "</p>\n";
+        }
+    
+        return $paging_info;
+    }
+    
+    # Print content to output.
+    sub blast_out_content {
+        my ( $query_string, $hit_list, $paging_info ) = @_;
+        $query_string = encode_entities($query_string);
+        print "Content-type: text/html\n\n";
+        print qq|
+    <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+    <html>
+    <head>
+      <meta http-equiv="Content-type" 
+        content="text/html;charset=ISO-8859-1">
+      <link rel="stylesheet" type="text/css" 
+        href="/us_constitution/uscon.css">
+      <title>KinoSearch: $query_string</title>
+    </head>
+    
+    <body>
+    
+      <div id="navigation">
+        <form id="usconSearch" action="">
+          <strong>
+            Search the 
+            <a href="/us_constitution/index.html">US Constitution</a>:
+          </strong>
+          <input type="text" name="q" id="q" value="$query_string">
+          <input type="submit" value="=&gt;">
+        </form>
+      </div><!--navigation-->
+    
+      <div id="bodytext">
+    
+      $hit_list
+    
+      $paging_info
+    
+        <p style="font-size: smaller; color: #666">
+          <em>
+            Powered by 
+            <a href="http://www.rectangular.com/kinosearch/">KinoSearch</a>
+          </em>
+        </p>
+      </div><!--bodytext-->
+    
+    </body>
+    
+    </html>
+    |;
+    }
+
+=head2 OK... now what?
+
+KSx::Simple is perfectly adequate for some tasks, but it's not very flexible.
+Many people find that it doesn't do at least one or two things they can't live
+without.
+
+In our next tutorial chapter,
+L<BeyondSimple|KinoSearch::Docs::Tutorial::BeyondSimple>, we'll rewrite our
+indexing and search scripts using the classes that KSx::Simple hides
+from view, opening up the possibilities for expansion; then, we'll spend the
+rest of the tutorial chapters exploring these possibilities.
+
+

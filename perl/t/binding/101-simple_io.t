@@ -1,10 +1,25 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 use lib 'buildlib';
 
-use Lucy;
-use Test::More tests => 27;
-use Encode qw( _utf8_off );
+use Test::More tests => 28;
+use KinoSearch::Test::TestUtils qw( utf8_test_strings );
+use KinoSearch::Util::StringHelper qw( utf8ify utf8_flag_off );
 use bytes;
 no bytes;
 
@@ -14,13 +29,13 @@ sub check_round_trip {
     my ( $type, $expected ) = @_;
     my $write_method = "write_$type";
     my $read_method  = "read_$type";
-    my $file         = Lucy::Store::RAMFile->new;
-    my $outstream    = Lucy::Store::OutStream->open( file => $file )
-        or die Lucy->error;
+    my $file         = KinoSearch::Store::RAMFile->new;
+    my $outstream    = KinoSearch::Store::OutStream->open( file => $file )
+        or die KinoSearch->error;
     $outstream->$write_method($_) for @$expected;
     $outstream->close;
-    my $instream = Lucy::Store::InStream->open( file => $file )
-        or die Lucy->error;
+    my $instream = KinoSearch::Store::InStream->open( file => $file )
+        or die KinoSearch->error;
     my @got;
     push @got, $instream->$read_method for @$expected;
     is_deeply( \@got, $expected, $type );
@@ -29,15 +44,15 @@ sub check_round_trip {
 
 sub check_round_trip_bytes {
     my ( $message, $expected ) = @_;
-    my $file = Lucy::Store::RAMFile->new;
-    my $outstream = Lucy::Store::OutStream->open( file => $file );
+    my $file = KinoSearch::Store::RAMFile->new;
+    my $outstream = KinoSearch::Store::OutStream->open( file => $file );
     for (@$expected) {
         $outstream->write_c32( bytes::length($_) );
         $outstream->print($_);
     }
     $outstream->close;
-    my $instream = Lucy::Store::InStream->open( file => $file )
-        or die Lucy->error;
+    my $instream = KinoSearch::Store::InStream->open( file => $file )
+        or die KinoSearch->error;
     my @got;
     for (@$expected) {
         my $buf;
@@ -128,11 +143,14 @@ for ( 0, 22, 300 ) {
     check_round_trip_bytes( "50 binary bufs", \@items );
 }
 
+my ( $smiley, $not_a_smiley, $frowny ) = utf8_test_strings();
+check_round_trip( "string", [ $smiley, $frowny ] );
+
 my $latin = "ma\x{f1}ana";
 $ram_file = check_round_trip( "string", [$latin] );
 my $unibytes = $latin;
-utf8::upgrade($unibytes);
-_utf8_off($unibytes);
+utf8ify($unibytes);
+utf8_flag_off($unibytes);
 my $slurped = $ram_file->get_contents;
 substr( $slurped, 0, 1, "" );    # ditch c32 at head of string;
 is( $slurped, $unibytes, "write_string upgrades to utf8" );

@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -98,62 +113,62 @@ $typedefs
 typedef union {
     size_t  count;
     void   *host_obj;
-} lucy_ref_t;
+} kino_ref_t;
 
 /* Generic method pointer.
  */
 typedef void
-(*lucy_method_t)(const void *vself);
+(*kino_method_t)(const void *vself);
 
 /* Access the function pointer for a given method from the vtable.
  */
-#define LUCY_METHOD(_vtable, _class_nick, _meth_name) \\
-     lucy_method(_vtable, \\
-     Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
+#define KINO_METHOD(_vtable, _class_nick, _meth_name) \\
+     kino_method(_vtable, \\
+     Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
-static CHY_INLINE lucy_method_t
-lucy_method(const void *vtable, size_t offset) 
+static CHY_INLINE kino_method_t
+kino_method(const void *vtable, size_t offset) 
 {
-    union { char *cptr; lucy_method_t *fptr; } ptr;
+    union { char *cptr; kino_method_t *fptr; } ptr;
     ptr.cptr = (char*)vtable + offset;
     return ptr.fptr[0];
 }
 
 /* Access the function pointer for the given method in the superclass's
  * vtable. */
-#define LUCY_SUPER_METHOD(_vtable, _class_nick, _meth_name) \\
-     lucy_super_method(_vtable, \\
-     Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
+#define KINO_SUPER_METHOD(_vtable, _class_nick, _meth_name) \\
+     kino_super_method(_vtable, \\
+     Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
-extern size_t lucy_VTable_offset_of_parent;
-static CHY_INLINE lucy_method_t
-lucy_super_method(const void *vtable, size_t offset) 
+extern size_t kino_VTable_offset_of_parent;
+static CHY_INLINE kino_method_t
+kino_super_method(const void *vtable, size_t offset) 
 {
     char *vt_as_char = (char*)vtable;
-    lucy_VTable **parent_ptr 
-        = (lucy_VTable**)(vt_as_char + lucy_VTable_offset_of_parent);
-    return lucy_method(*parent_ptr, offset);
+    kino_VTable **parent_ptr 
+        = (kino_VTable**)(vt_as_char + kino_VTable_offset_of_parent);
+    return kino_method(*parent_ptr, offset);
 }
 
 /* Return a boolean indicating whether a method has been overridden.
  */
-#define LUCY_OVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\
-        (lucy_method(*((lucy_VTable**)_self), \\
-            Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET )\\
-            != (lucy_method_t)lucy_ ## _class_nick ## _ ## _micro_name )
+#define KINO_OVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\
+        (kino_method(*((kino_VTable**)_self), \\
+            Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET )\\
+            != (kino_method_t)kino_ ## _class_nick ## _ ## _micro_name )
 
-#ifdef LUCY_USE_SHORT_NAMES
-  #define METHOD                   LUCY_METHOD
-  #define SUPER_METHOD             LUCY_SUPER_METHOD
-  #define OVERRIDDEN               LUCY_OVERRIDDEN
+#ifdef KINO_USE_SHORT_NAMES
+  #define METHOD                   KINO_METHOD
+  #define SUPER_METHOD             KINO_SUPER_METHOD
+  #define OVERRIDDEN               KINO_OVERRIDDEN
 #endif
 
-typedef struct lucy_Callback {
+typedef struct kino_Callback {
     const char    *name;
     size_t         name_len;
-    lucy_method_t  func;
+    kino_method_t  func;
     size_t         offset;
-} lucy_Callback;
+} kino_Callback;
 
 #endif /* BOIL_H */
 
@@ -223,24 +238,6 @@ typically copyright information.
 Call C<< $hierarchy->propagate_modified >> to establish which classes do not
 have up-to-date generated .c and .h files, then traverse the hierarchy writing
 all necessary files.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
 

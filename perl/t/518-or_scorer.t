@@ -1,14 +1,28 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More skip_all => 'Requires SortCollector';
-# use Test::More tests => 900;
-use Lucy::Test;
-use LucyX::Search::MockScorer;
-use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
+use Test::More tests => 900;
+use KinoSearch::Test;
+use KSx::Search::MockScorer;
+use KinoSearch::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
-my $sim = Lucy::Index::Similarity::LuceneSimilarity->new;
+my $sim = KinoSearch::Index::Similarity->new;
 
 for my $interval_a ( 1 .. 10 ) {
     for my $interval_b ( 5 .. 10 ) {
@@ -24,21 +38,21 @@ sub check_scorer {
     my @intervals = @_;
     my @doc_id_arrays = map { modulo_set( $_, 100 ) } @intervals;
     my $subscorers
-        = Lucy::Object::VArray->new( capacity => scalar @intervals );
+        = KinoSearch::Object::VArray->new( capacity => scalar @intervals );
     for my $doc_id_array (@doc_id_arrays) {
-        my $mock = LucyX::Search::MockScorer->new(
+        my $mock = KSx::Search::MockScorer->new(
             doc_ids => $doc_id_array,
             scores  => [ (1) x scalar @$doc_id_array ],
         );
         $subscorers->push($mock);
     }
 
-    my $or_scorer = Lucy::Search::ORScorer->new(
+    my $or_scorer = KinoSearch::Search::ORScorer->new(
         similarity => $sim,
         children   => $subscorers,
     );
     my $collector
-        = Lucy::Search::Collector::SortCollector->new( wanted => 100 );
+        = KinoSearch::Search::Collector::SortCollector->new( wanted => 100 );
     $or_scorer->collect( collector => $collector );
     my ( $got_by_score, $got_by_id ) = doc_ids_from_td_coll($collector);
     my ( $expected_by_count, $expected_by_id )

@@ -1,3 +1,18 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 use strict;
 use warnings;
 
@@ -66,7 +81,7 @@ sub _parse_cf_files {
     my @all_source_paths;
     find(
         {   wanted => sub {
-                if ( $File::Find::name =~ /\.bp$/ ) {
+                if ( $File::Find::name =~ /\.cfh$/ ) {
                     push @all_source_paths, $File::Find::name
                         unless /#/;    # skip emacs .#filename.h lock files
                 }
@@ -82,7 +97,7 @@ sub _parse_cf_files {
     for my $source_path (@all_source_paths) {
         # Derive the name of the class that owns the module file.
         my $source_class = $source_path;
-        $source_class =~ s/\.bp$//;
+        $source_class =~ s/\.cfh$//;
         $source_class =~ s/^\Q$source\E\W*//
             or die "'$source_path' doesn't start with '$source'";
         $source_class =~ s/\W/::/g;
@@ -133,7 +148,7 @@ sub propagate_modified {
 sub _propagate_modified {
     my ( $self, $class, $modified ) = @_;
     my $file        = $self->{files}{ $class->get_source_class };
-    my $source_path = $file->bp_path( $self->{source} );
+    my $source_path = $file->cfh_path( $self->{source} );
     my $h_path      = $file->h_path( $self->{dest} );
 
     if ( !current( $source_path, $h_path ) ) {
@@ -222,23 +237,5 @@ If the supplied argument is true, mark all Files as modified.
 =head2 get_source get_dest
 
 Accessors.
-
-=head1 COPYRIGHT AND LICENSE
-
-    /**
-     * Copyright 2009 The Apache Software Foundation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-     * implied.  See the License for the specific language governing
-     * permissions and limitations under the License.
-     */
 
 =cut
