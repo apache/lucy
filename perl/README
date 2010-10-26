@@ -11,10 +11,14 @@ To install this module, run the following commands:
     perl Build test
     perl Build install
 
+Module::Build is required.  Since Perl 5.10.0, Module::Build has been bundled
+with the Perl core, but on older systems it may be necessary to install it
+from CPAN first.
+
 XS CODE
 
-KinoSearch is a Perl/XS distribution, despite the apparent lack of .xs files.  
-KinoSearch.xs gets written on the fly when 'perl Build.PL' is invoked.
+KinoSearch is a Perl/XS distribution, despite the apparent lack of .xs 
+files -- KinoSearch.xs gets written on the fly during the build.
 
 COPYRIGHT AND LICENCE
 
@@ -22,3 +26,4 @@ Copyright (C) 2005-2010 Marvin Humphrey
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
