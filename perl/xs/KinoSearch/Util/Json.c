@@ -63,7 +63,7 @@ Json_encode_string(CharBuf *string)
 CharBuf*
 Json_decode_string(CharBuf *json)
 {
-    return Host_callback_obj(JSON, "decode_string", 1, 
+    return (CharBuf*)Host_callback_obj(JSON, "decode_string", 1, 
         ARG_STR("json", json));
 }
 
