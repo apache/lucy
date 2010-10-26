@@ -39,6 +39,7 @@ Memory_run(void)
     chaz_bool_t has_malloc_h  = false;
     chaz_bool_t need_stdlib_h = false;
     chaz_bool_t has_alloca    = false;
+    chaz_bool_t has_builtin_alloca    = false;
     chaz_bool_t has_underscore_alloca = false;
     char code_buf[sizeof(alloca_code) + 100];
 
@@ -52,7 +53,7 @@ Memory_run(void)
         ConfWriter_append_conf("#define CHY_HAS_ALLOCA_H\n");
         ConfWriter_append_conf("#define chy_alloca alloca\n");
     }
-    else {
+    if (!has_alloca) {
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_alloca    = true;
@@ -61,9 +62,17 @@ Memory_run(void)
             ConfWriter_append_conf("#define chy_alloca alloca\n");
         }
     }
+    if (!has_alloca) {
+        sprintf(code_buf, alloca_code, "stdio.h", /* stdio.h is filler */
+            "__builtin_alloca");
+        if (CC_test_compile(code_buf, strlen(code_buf))) {
+            has_builtin_alloca = true;
+            ConfWriter_append_conf("#define chy_alloca __builtin_alloca\n");
+        }
+    }
 
     /* Windows. */
-    if (!has_alloca) {
+    if (!has_alloca || has_builtin_alloca) {
         sprintf(code_buf, alloca_code, "malloc.h", "alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_malloc_h = true;
@@ -72,7 +81,7 @@ Memory_run(void)
             ConfWriter_append_conf("#define chy_alloca alloca\n");
         }
     }
-    if (!has_alloca) {
+    if (!has_alloca || has_builtin_alloca) {
         sprintf(code_buf, alloca_code, "malloc.h", "_alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_malloc_h = true;
@@ -95,6 +104,9 @@ Memory_run(void)
     }
     if (need_stdlib_h) {
         ConfWriter_shorten_macro("ALLOCA_IN_STDLIB_H");
+    }
+    if (!has_alloca && has_builtin_alloca) {
+        ConfWriter_shorten_function("alloca");
     }
     ConfWriter_end_short_names();
 
