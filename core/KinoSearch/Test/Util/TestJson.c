@@ -33,6 +33,113 @@ S_make_dump()
     return (Obj*)dump;
 }
 
+// Test escapes for control characters ASCII 0-31.
+static char* control_escapes[] = {
+    "\\u0000",
+    "\\u0001",
+    "\\u0002",
+    "\\u0003",
+    "\\u0004",
+    "\\u0005",
+    "\\u0006",
+    "\\u0007",
+    "\\b",
+    "\\t",
+    "\\n",
+    "\\u000b",
+    "\\f",
+    "\\r",
+    "\\u000e",
+    "\\u000f",
+    "\\u0010",
+    "\\u0011",
+    "\\u0012",
+    "\\u0013",
+    "\\u0014",
+    "\\u0015",
+    "\\u0016",
+    "\\u0017",
+    "\\u0018",
+    "\\u0019",
+    "\\u001a",
+    "\\u001b",
+    "\\u001c",
+    "\\u001d",
+    "\\u001e",
+    "\\u001f",
+    NULL
+};
+
+// Test quote and backslash escape in isolation, then in context.
+static char* quote_escapes_source[] = {
+    "\"",
+    "\\",
+    "abc\"",
+    "abc\\",
+    "\"xyz",
+    "\\xyz",
+    "\\\"",
+    "\"\\",
+    NULL
+};
+static char* quote_escapes_json[] = {
+    "\\\"",
+    "\\\\",
+    "abc\\\"",
+    "abc\\\\",
+    "\\\"xyz",
+    "\\\\xyz",
+    "\\\\\\\"",
+    "\\\"\\\\",
+    NULL
+};
+
+static void
+test_escapes(TestBatch *batch)
+{
+    CharBuf *string      = CB_new(10);
+    CharBuf *json_wanted = CB_new(10);
+
+    for (int i = 0; control_escapes[i] != NULL; i++) {
+        CB_Truncate(string, 0);
+        CB_Cat_Char(string, i);
+        char    *escaped = control_escapes[i];
+        CharBuf *json    = Json_encode_string(string);
+        CharBuf *decoded = Json_decode_string(json);
+
+        CB_setf(json_wanted, "\"%s\"", escaped);
+        TEST_TRUE(batch, json != NULL && CB_Equals(json_wanted, (Obj*)json),
+            "encode control escape: %s", escaped);
+
+        TEST_TRUE(batch, decoded != NULL && CB_Equals(string, (Obj*)decoded), 
+            "decode control escape: %s", escaped);
+
+        DECREF(json);
+        DECREF(decoded);
+    }
+
+    for (int i = 0; quote_escapes_source[i] != NULL; i++) {
+        char *source  = quote_escapes_source[i];
+        char *escaped = quote_escapes_json[i];
+        CB_setf(string, source, strlen(source));
+        CharBuf *json    = Json_encode_string(string);
+        CharBuf *decoded = Json_decode_string(json);
+
+        CB_setf(json_wanted, "\"%s\"", escaped);
+        TEST_TRUE(batch, json != NULL && CB_Equals(json_wanted, (Obj*)json),
+            "encode quote/backslash escapes: %s", source);
+
+        TEST_TRUE(batch, decoded != NULL && CB_Equals(string, (Obj*)decoded), 
+            "decode quote/backslash escapes: %s", source);
+
+        DECREF(json);
+        DECREF(decoded);
+    }
+
+    DECREF(json_wanted);
+    DECREF(string);
+}
+
 static void
 test_to_and_from(TestBatch *batch)
 {
@@ -99,10 +206,11 @@ test_spew_and_slurp(TestBatch *batch)
 void
 TestJson_run_tests()
 {
-    TestBatch *batch = TestBatch_new(10);
+    TestBatch *batch = TestBatch_new(90);
 
     TestBatch_Plan(batch);
     test_to_and_from(batch);
+    test_escapes(batch);
     test_spew_and_slurp(batch);
 
     DECREF(batch);

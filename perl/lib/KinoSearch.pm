@@ -634,6 +634,17 @@ sub error {$KinoSearch::Object::Err::error}
     sub from_json {
         return to_kino( $json_encoder->decode( $_[1] ) );
     }
+
+    my $loose_encoder = JSON::XS->new->pretty(1)->canonical(1)->allow_nonref(1);
+
+    sub encode_string {
+        my ( undef, $string ) = @_;
+        return $loose_encoder->encode($string);
+    }
+
+    sub decode_string {
+        return to_kino( $loose_encoder->decode( $_[1] ) );
+    }
 }
 
 {

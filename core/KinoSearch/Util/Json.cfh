@@ -47,6 +47,16 @@ class KinoSearch::Util::Json inherits KinoSearch::Object::Obj {
      */
     inert incremented nullable Obj* 
     slurp_json(Folder *folder, const CharBuf *path);
+
+    /** Testing only.
+     */
+    inert incremented CharBuf*
+    encode_string(CharBuf *string);
+
+    /** Testing only.
+     */
+    inert incremented CharBuf* 
+    decode_string(CharBuf *json);
 }
 
 
