@@ -108,6 +108,7 @@ test_escapes(TestBatch *batch)
         CharBuf *decoded = Json_decode_string(json);
 
         CB_setf(json_wanted, "\"%s\"", escaped);
+        CB_Trim(json);
         TEST_TRUE(batch, json != NULL && CB_Equals(json_wanted, (Obj*)json),
             "encode control escape: %s", escaped);
 
@@ -126,6 +127,7 @@ test_escapes(TestBatch *batch)
         CharBuf *decoded = Json_decode_string(json);
 
         CB_setf(json_wanted, "\"%s\"", escaped);
+        CB_Trim(json);
         TEST_TRUE(batch, json != NULL && CB_Equals(json_wanted, (Obj*)json),
             "encode quote/backslash escapes: %s", source);
 
