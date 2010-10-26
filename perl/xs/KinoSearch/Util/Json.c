@@ -53,17 +53,10 @@ Json_from_json(CharBuf *json)
         ARG_STR("json", json));
 }
 
-CharBuf*
-Json_encode_string(CharBuf *string)
+void
+Json_set_tolerant(bool_t tolerant)
 {
-    return Host_callback_str(JSON, "encode_string", 1,
-        ARG_STR("string", string));
-}
-
-CharBuf*
-Json_decode_string(CharBuf *json)
-{
-    return (CharBuf*)Host_callback_obj(JSON, "decode_string", 1, 
-        ARG_STR("json", json));
+    Host_callback(JSON, "set_tolerant", 1,
+        ARG_I32("tolerant", tolerant));
 }
 

@@ -104,8 +104,8 @@ test_escapes(TestBatch *batch)
         CB_Truncate(string, 0);
         CB_Cat_Char(string, i);
         char    *escaped = control_escapes[i];
-        CharBuf *json    = Json_encode_string(string);
-        CharBuf *decoded = Json_decode_string(json);
+        CharBuf *json    = Json_to_json((Obj*)string);
+        CharBuf *decoded = (CharBuf*)Json_from_json(json);
 
         CB_setf(json_wanted, "\"%s\"", escaped);
         CB_Trim(json);
@@ -123,8 +123,8 @@ test_escapes(TestBatch *batch)
         char *source  = quote_escapes_source[i];
         char *escaped = quote_escapes_json[i];
         CB_setf(string, source, strlen(source));
-        CharBuf *json    = Json_encode_string(string);
-        CharBuf *decoded = Json_decode_string(json);
+        CharBuf *json    = Json_to_json((Obj*)string);
+        CharBuf *decoded = (CharBuf*)Json_from_json(json);
 
         CB_setf(json_wanted, "\"%s\"", escaped);
         CB_Trim(json);
@@ -140,6 +140,25 @@ test_escapes(TestBatch *batch)
 
     DECREF(json_wanted);
     DECREF(string);
+}
+
+static void
+test_numbers(TestBatch *batch)
+{
+    Integer64 *i64  = Int64_new(33);
+    CharBuf   *json = Json_to_json((Obj*)i64);
+    CB_Trim(json);
+    TEST_TRUE(batch, json && CB_Equals_Str(json, "33", 2), "Integer");
+    DECREF(json);
+
+    Float64 *f64 = Float64_new(33.33);
+    json = Json_to_json((Obj*)f64);
+    CB_Trim(json);
+    TEST_TRUE(batch, json && CB_Equals_Str(json, "33.33", 5), "Float");
+    DECREF(json);
+
+    DECREF(i64);
+    DECREF(f64);
 }
 
 static void
@@ -208,11 +227,15 @@ test_spew_and_slurp(TestBatch *batch)
 void
 TestJson_run_tests()
 {
-    TestBatch *batch = TestBatch_new(90);
+    TestBatch *batch = TestBatch_new(92);
+
+    // Liberalize for testing.
+    Json_set_tolerant(true);
 
     TestBatch_Plan(batch);
     test_to_and_from(batch);
     test_escapes(batch);
+    test_numbers(batch);
     test_spew_and_slurp(batch);
 
     DECREF(batch);
