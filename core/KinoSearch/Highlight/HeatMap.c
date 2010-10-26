@@ -81,7 +81,7 @@ S_flattened_but_empty_spans(VArray *spans)
     Sort_quicksort(bounds, num_spans * 2, sizeof(uint32_t), 
         S_compare_i32, NULL);
     uint32_t num_bounds = 0;
-    int32_t  last       = U32_MAX;
+    int32_t  last       = I32_MAX;
     for (uint32_t i = 0; i < num_spans * 2; i++) {
         if (bounds[i] != last) {
             bounds[num_bounds++] = bounds[i];
