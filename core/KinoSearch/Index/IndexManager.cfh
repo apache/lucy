@@ -89,6 +89,14 @@ class KinoSearch::Index::IndexManager cnick IxManager
             DeletionsWriter *del_writer, int64_t cutoff, 
             bool_t optimize = false);
 
+    /** Return a tick.  All segments below that tick will be merged.
+     * Exposed for testing purposes only.
+     *
+     * @param doc_counts Segment doc counts, in ascending order.
+     */
+    uint32_t
+    Choose_Sparse(IndexManager *self, I32Array *doc_counts);
+
     /** Create the Lock which controls access to modifying the logical content
      * of the index. 
      */

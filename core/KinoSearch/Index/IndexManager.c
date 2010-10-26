@@ -151,43 +151,32 @@ IxManager_recycle(IndexManager *self, PolyReader *reader,
     VArray *seg_readers = PolyReader_Get_Seg_Readers(reader);
     VArray *candidates  = VA_Gather(seg_readers, S_check_cutoff, &cutoff);
     VArray *recyclables = VA_new(VA_Get_Size(candidates));
-    uint32_t i;
-    uint32_t total_docs = 0;
-    uint32_t threshold = 0;
     const uint32_t num_candidates = VA_Get_Size(candidates);
-    UNUSED_VAR(self);
 
     if (optimize) { 
         DECREF(recyclables);
         return candidates; 
     }
 
-    // Sort by ascending size in docs. 
+    // Sort by ascending size in docs, choose sparsely populated segments.
     VA_Sort(candidates, S_compare_doc_count, NULL);
-
-    // Find sparsely populated segments. 
-    for (i = 0; i < num_candidates; i++) {
-        uint32_t num_segs_when_done = num_candidates - threshold + 1;
-        SegReader *seg_reader = (SegReader*)VA_Fetch(candidates, i);
-        total_docs += SegReader_Doc_Count(seg_reader);
-        if (total_docs < S_fibonacci(num_segs_when_done + 5)) {
-            threshold = i + 1;
-        }
+    int32_t *counts = (int32_t*)MALLOCATE(num_candidates * sizeof(int32_t));
+    for (uint32_t i = 0; i < num_candidates; i++) {
+        SegReader *seg_reader = (SegReader*)CERTIFY(
+            VA_Fetch(candidates, i), SEGREADER);
+        counts[i] = SegReader_Doc_Count(seg_reader);
     }
-
-    // If recycling, always merge at least two segments so that we don't get
-    // stuck merging the same big segment over and over on small commits.
-    if (threshold == 1 && num_candidates > 2) {
-        threshold = 2;
-    }
+    I32Array *doc_counts = I32Arr_new_steal(counts, num_candidates);
+    uint32_t threshold = IxManager_Choose_Sparse(self, doc_counts);
+    DECREF(doc_counts);
 
     // Move SegReaders to be recycled.
-    for (i = 0; i < threshold; i++) {
+    for (uint32_t i = 0; i < threshold; i++) {
         VA_Store(recyclables, i, VA_Delete(candidates, i));
     }
 
     // Find segments where at least 10% of all docs have been deleted. 
-    for (i = threshold; i < num_candidates; i++) {
+    for (uint32_t i = threshold; i < num_candidates; i++) {
         SegReader *seg_reader = (SegReader*)VA_Delete(candidates, i);
         CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         double doc_max = SegReader_Doc_Max(seg_reader);
@@ -203,6 +192,32 @@ IxManager_recycle(IndexManager *self, PolyReader *reader,
 
     DECREF(candidates);
     return recyclables;
+}
+
+uint32_t
+IxManager_choose_sparse(IndexManager *self, I32Array *doc_counts)
+{
+    UNUSED_VAR(self);
+    uint32_t threshold  = 0;
+    uint32_t total_docs = 0;
+    const uint32_t num_candidates = I32Arr_Get_Size(doc_counts);
+
+    // Find sparsely populated segments. 
+    for (uint32_t i = 0; i < num_candidates; i++) {
+        uint32_t num_segs_when_done = num_candidates - threshold + 1;
+        total_docs += I32Arr_Get(doc_counts, i);
+        if (total_docs < S_fibonacci(num_segs_when_done + 5)) {
+            threshold = i + 1;
+        }
+    }
+
+    // If recycling, always merge at least two segments so that we don't get
+    // stuck merging the same big segment over and over on small commits.
+    if (threshold == 1 && num_candidates > 2) {
+        threshold = 2;
+    }
+
+    return threshold;
 }
 
 static LockFactory*
