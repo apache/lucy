@@ -32,11 +32,6 @@
   #include <unistd.h>
 #endif
 
-// For CreateHardLink. 
-#ifdef CHY_HAS_WINDOWS_H
-  #include <windows.h>
-#endif
-
 // For mkdir, rmdir. 
 #ifdef CHY_HAS_DIRECT_H
   #include <direct.h>
@@ -66,6 +61,10 @@ S_create_dir(const CharBuf *path);
 // Return true unless the supplied path contains a slash. 
 bool_t
 S_is_local_entry(const CharBuf *path);
+
+// Create a hard link.
+bool_t
+S_hard_link(CharBuf *from_path, CharBuf *to_path);
 
 FSFolder*
 FSFolder_new(const CharBuf *path) 
@@ -185,29 +184,7 @@ FSFolder_hard_link(FSFolder *self, const CharBuf *from,
 {
     CharBuf *from_path = S_fullpath(self, from);
     CharBuf *to_path   = S_fullpath(self, to);
-    char    *from8     = (char*)CB_Get_Ptr8(from_path);
-    char    *to8       = (char*)CB_Get_Ptr8(to_path);
-#ifdef CHY_HAS_UNISTD_H
-    bool_t retval;
-    if (-1 == link(from8, to8)) {
-        retval = false;
-        Err_set_error(Err_new(CB_newf(
-            "hard link for new file '%o' from '%o' failed: %s",
-                to_path, from_path, strerror(errno))));
-    }
-    else {
-        retval = true;
-    }
-#elif defined(CHY_HAS_WINDOWS_H)
-    bool_t retval = !!CreateHardLink(to8, from8, NULL);
-    if (!retval) {
-        char *win_error = Err_win_error();
-        Err_set_error(Err_new(CB_newf(
-            "CreateHardLink for new file '%o' from '%o' failed: %s",
-                to_path, from_path, win_error)));
-        FREEMEM(win_error);
-    }
-#endif
+    bool_t   retval    = S_hard_link(from_path, to_path);
     DECREF(from_path);
     DECREF(to_path);
     return retval;
@@ -324,4 +301,59 @@ S_is_local_entry(const CharBuf *path)
     return true;
 }
 
+/***************************************************************************/
+
+#ifdef CHY_HAS_UNISTD_H
+
+bool_t
+S_hard_link(CharBuf *from_path, CharBuf *to_path)
+{
+    char *from8 = (char*)CB_Get_Ptr8(from_path);
+    char *to8   = (char*)CB_Get_Ptr8(to_path);
+
+    if (-1 == link(from8, to8)) {
+        Err_set_error(Err_new(CB_newf(
+            "hard link for new file '%o' from '%o' failed: %s",
+                to_path, from_path, strerror(errno))));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+#elif defined(CHY_HAS_WINDOWS_H)
+
+// Windows.h defines INCREF and DECREF, so we include it only at the end of
+// this file and undef those symbols.
+#undef INCREF
+#undef DECREF
+
+// For CreateHardLink. 
+#ifdef CHY_HAS_WINDOWS_H
+  #include <windows.h>
+#endif
+
+#include <windows.h>
+
+bool_t
+S_hard_link(CharBuf *from_path, CharBuf *to_path)
+{
+    char *from8 = (char*)CB_Get_Ptr8(from_path);
+    char *to8   = (char*)CB_Get_Ptr8(to_path);
+
+    if (CreateHardLink(to8, from8, NULL)) {
+        return true;
+    }
+    else {
+        char *win_error = Err_win_error();
+        Err_set_error(Err_new(CB_newf(
+            "CreateHardLink for new file '%o' from '%o' failed: %s",
+                to_path, from_path, win_error)));
+        FREEMEM(win_error);
+        return false;
+    }
+}
+
+#endif /* CHY_HAS_UNISTD_H vs. CHY_HAS_WINDOWS_H */
 
