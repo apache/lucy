@@ -640,8 +640,8 @@ sub _gen_pause_exclusion_list {
 
     my @excluded_files;
     for my $entry (@manifest_entries) {
-        # Allow README.
-        next if $entry =~ m#^README#;
+        # Allow README and Changes.
+        next if $entry =~ m#^(README|Changes)#;
 
         # Allow public modules.
         if ( $entry =~ m#^lib.+\.(pm|pod)$# ) {
