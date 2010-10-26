@@ -29,6 +29,14 @@ I32Arr_new(int32_t *ints, uint32_t size)
 }
 
 I32Array*
+I32Arr_new_blank(uint32_t size) 
+{
+    I32Array *self = (I32Array*)VTable_Make_Obj(I32ARRAY);
+    int32_t *ints = (int32_t*)CALLOCATE(size, sizeof(int32_t));
+    return I32Arr_init(self, ints, size);
+}
+
+I32Array*
 I32Arr_new_steal(int32_t *ints, uint32_t size) 
 {
     I32Array *self = (I32Array*)VTable_Make_Obj(I32ARRAY);
@@ -48,6 +56,15 @@ I32Arr_destroy(I32Array *self)
 {
     FREEMEM(self->ints);
     SUPER_DESTROY(self, I32ARRAY);
+}
+
+void
+I32Arr_set(I32Array *self, uint32_t tick, int32_t value)
+{
+    if (tick >= self->size) {
+        THROW(ERR, "Out of bounds: %u32 >= %u32", tick, self->size);
+    }
+    self->ints[tick] = value;
 }
 
 int32_t 

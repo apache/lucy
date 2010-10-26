@@ -26,8 +26,17 @@ class KinoSearch::Object::I32Array cnick I32Arr inherits KinoSearch::Object::Obj
     inert incremented I32Array*
     new_steal(int32_t *ints, uint32_t size);
 
+    inert incremented I32Array*
+    new_blank(uint32_t size);
+
     inert I32Array*
     init(I32Array *self, int32_t *ints, uint32_t size);
+
+    /** Set the value at <code>tick</code>, or throw an error if
+     * <code>tick</code> is out of bounds.
+     */
+    void
+    Set(I32Array *self, uint32_t tick, int32_t value);
 
     /** Return the value at <code>tick</code>, or throw an error if
      * <code>tick</code> is out of bounds.
