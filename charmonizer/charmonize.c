@@ -65,9 +65,6 @@ int main(int argc, char **argv)
     chaz_VariadicMacros_run();
 
     /* Write custom postamble. */
-    if (chaz_HeadCheck_check_header("sys/mman.h")) {
-        chaz_ConfWriter_append_conf("#define CHY_HAS_SYS_MMAN_H\n\n");
-    }
     chaz_ConfWriter_append_conf(
         "#ifdef CHY_HAS_SYS_TYPES_H\n"
         "  #include <sys/types.h>\n"

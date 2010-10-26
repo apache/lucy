@@ -32,6 +32,7 @@ extern "C" {
  * These following symbols will be defined if the associated headers are
  * available:
  * 
+ * HAS_SYS_MMAN_H          <sys/mman.h>
  * HAS_ALLOCA_H            <alloca.h> 
  * HAS_MALLOC_H            <malloc.h>
  *
