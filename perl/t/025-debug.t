@@ -30,11 +30,14 @@ use KinoSearch::Util::Debug qw(
 use KinoSearch::Test::TestUtils qw( working_dir );
 
 BEGIN {
-    if ( DEBUG_ENABLED() ) {
-        plan( tests => 7 );
+    if ( !DEBUG_ENABLED() ) {
+        plan( skip_all => 'DEBUG not enabled' );
+    }
+    elsif ( $ENV{KINO_VALGRIND} ) {
+        plan( skip_all => 'Tests disabled under valgrind' );
     }
     else {
-        plan( skip_all => 'DEBUG not enabled' );
+        plan( tests => 7 );
     }
 }
 
