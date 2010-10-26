@@ -653,9 +653,7 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
 
     // Open the temp files for reading.
     CharBuf *seg_name = Seg_Get_Name(run->segment);
-    size_t   size     = ZCB_size() + CB_Get_Size(seg_name) + 100;
-    CharBuf *alias    = (CharBuf*)ZCB_newf(alloca(size), size, "");
-    CB_setf(alias, "%o/sort_ord_temp-%i64-to-%i64", seg_name, 
+    CharBuf *alias    = CB_newf("%o/sort_ord_temp-%i64-to-%i64", seg_name, 
         run->ord_start, run->ord_end);
     InStream *ord_in_dupe = InStream_Reopen(ord_in, alias,
         run->ord_start, run->ord_end - run->ord_start);
@@ -670,6 +668,7 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
         run->dat_start, run->dat_end);
     InStream *dat_in_dupe = InStream_Reopen(dat_in, alias,
         run->dat_start, run->dat_end - run->dat_start);
+    DECREF(alias);
 
     // Get a SortCache.
     CharBuf *field = Seg_Field_Name(run->segment, run->field_num);

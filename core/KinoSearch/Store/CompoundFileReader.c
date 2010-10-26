@@ -199,12 +199,10 @@ CFReader_local_open_in(CompoundFileReader *self, const CharBuf *name)
             return NULL;
         }
         else if (CB_Get_Size(self->path)) {
-            size_t size = ZCB_size() + CB_Get_Size(self->path) 
-                + CB_Get_Size(name) + 10;
-            CharBuf *fullpath = (CharBuf*)ZCB_newf(alloca(size), size,
-                "%o/%o", self->path, name);
+            CharBuf *fullpath = CB_newf("%o/%o", self->path, name);
             InStream *instream = InStream_Reopen(self->instream, 
                 fullpath, Obj_To_I64(offset), Obj_To_I64(len));
+            DECREF(fullpath);
             return instream;
         }
         else {

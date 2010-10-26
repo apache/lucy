@@ -68,8 +68,7 @@ bool_t
 Seg_valid_seg_name(const CharBuf *name)
 {
     if (CB_Starts_With_Str(name, "seg_", 4)) {
-        size_t size = ZCB_size() + CB_Get_Size(name) + 1;
-        ZombieCharBuf *scratch = ZCB_wrap(alloca(size), name);
+        ZombieCharBuf *scratch = ZCB_WRAP(name);
         ZCB_Nip(scratch, 4);
         uint32_t code_point;
         while (0 != (code_point = ZCB_Nip_One(scratch))) {

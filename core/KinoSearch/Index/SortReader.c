@@ -178,8 +178,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field)
     Folder    *folder    = DefSortReader_Get_Folder(self);
     Segment   *segment   = DefSortReader_Get_Segment(self);
     CharBuf   *seg_name  = Seg_Get_Name(segment);
-    size_t     size      = ZCB_size() + CB_Get_Size(seg_name) + 40;
-    CharBuf   *path      = (CharBuf*)ZCB_newf(alloca(size), size, "");
+    CharBuf   *path      = CB_new(40);
     int32_t    field_num = Seg_Field_Num(segment, field);
     int8_t     prim_id   = FType_Primitive_ID(type);
     bool_t     var_width = (prim_id == FType_TEXT || prim_id == FType_BLOB)
@@ -188,6 +187,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field)
     CB_setf(path, "%o/sort-%i32.ord", seg_name, field_num);
     InStream *ord_in = Folder_Open_In(folder, path);
     if (!ord_in) {
+        DECREF(path);
         THROW(ERR, "Error building sort cache for '%o': %o", 
             field, Err_get_error());
     }
@@ -196,6 +196,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field)
         CB_setf(path, "%o/sort-%i32.ix", seg_name, field_num);
         ix_in = Folder_Open_In(folder, path);
         if (!ix_in) {
+            DECREF(path);
             THROW(ERR, "Error building sort cache for '%o': %o", 
                 field, Err_get_error());
         }
@@ -203,9 +204,11 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field)
     CB_setf(path, "%o/sort-%i32.dat", seg_name, field_num);
     InStream *dat_in = Folder_Open_In(folder, path);
     if (!dat_in) {
+        DECREF(path);
         THROW(ERR, "Error building sort cache for '%o': %o", 
             field, Err_get_error());
     }
+    DECREF(path);
 
     Obj     *null_ord_obj = Hash_Fetch(self->null_ords, (Obj*)field);
     int32_t  null_ord = null_ord_obj ? (int32_t)Obj_To_I64(null_ord_obj) : -1;
