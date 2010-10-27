@@ -22,7 +22,7 @@ chy_bool_t
 kino_StrHelp_utf8_valid(const char *ptr, size_t size)
 {
     const U8 *uptr = (const U8*)ptr;
-    return is_utf8_string(uptr, size);
+    return size == 0 ? true : !!is_utf8_string(uptr, size);
 }
 
 
