@@ -55,7 +55,7 @@ Clownfish::Binding::Perl::Class->register(
     bind_constructors => ['new'],
     bind_methods      => [qw( Set_Doc_ID Get_Doc_ID Set_Fields )],
     make_pod          => {
-        methods     => [qw( get_fields )],
+        methods     => [qw( get_fields get_doc_id )],
         synopsis    => $synopsis,
         constructor => { sample => $constructor },
     }
