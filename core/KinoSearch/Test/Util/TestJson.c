@@ -153,9 +153,16 @@ test_numbers(TestBatch *batch)
 
     Float64 *f64 = Float64_new(33.33);
     json = Json_to_json((Obj*)f64);
-    CB_Trim(json);
-    TEST_TRUE(batch, json && CB_Equals_Str(json, "33.33", 5), "Float");
-    DECREF(json);
+    if (json) {
+        double value = CB_To_F64(json);
+        double diff = 33.33 - value;
+        if (diff < 0.0) { diff = 0.0 - diff; }
+        TEST_TRUE(batch, diff < 0.0001, "Float");
+        DECREF(json);
+    }
+    else {
+        FAIL(batch, "Float conversion to  json  failed.");
+    }
 
     DECREF(i64);
     DECREF(f64);
