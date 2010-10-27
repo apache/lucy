@@ -36,10 +36,13 @@
 
 // Helper function for throwing invalid UTF-8 error. Since THROW uses
 // a CharBuf internally, calling THROW with invalid UTF-8 would create an
-// infinite loop -- so we fwrite some of the bogus text to stderr invoke
-// THROW with a generic message.
+// infinite loop -- so we fwrite some of the bogus text to stderr and 
+// invoke THROW with a generic message.
+#define DIE_INVALID_UTF8(text, size) \
+    S_die_invalid_utf8(text, size, __FILE__, __LINE__, KINO_ERR_FUNC_MACRO)
 static void
-S_die_invalid_utf8(const char *text, size_t size);
+S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
+                   const char *func);
 
 // Helper function for throwing invalid pattern error. 
 static void
@@ -74,7 +77,7 @@ CharBuf*
 CB_new_from_utf8(const char *ptr, size_t size) 
 {
     if (!StrHelp_utf8_valid(ptr, size))
-        S_die_invalid_utf8(ptr, size);
+        DIE_INVALID_UTF8(ptr, size);
     return CB_new_from_trusted_utf8(ptr, size);
 }
 
@@ -168,13 +171,14 @@ CB_grow(CharBuf *self, size_t size)
 }
 
 static void
-S_die_invalid_utf8(const char *text, size_t size)
+S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
+                   const char *func)
 {
     fprintf(stderr, "Invalid UTF-8, aborting: '");
     fwrite(text, sizeof(char), size < 200 ? size : 200, stderr);
     if (size > 200) fwrite("[...]", sizeof(char), 5, stderr);
-    fprintf(stderr, "'\n");
-    THROW(ERR, "Invalid UTF-8.");
+    fprintf(stderr, "' (length %lu)\n", (unsigned long)size);
+    Err_throw_at(ERR, file, line, func, "Invalid UTF-8");
 }
 
 static void
@@ -482,7 +486,7 @@ CB_deserialize(CharBuf *self, InStream *instream)
     self->size = size;
     self->ptr[size] = '\0';
     if (!StrHelp_utf8_valid(self->ptr, size)) {
-        S_die_invalid_utf8(self->ptr, size);
+        DIE_INVALID_UTF8(self->ptr, size);
     }
     return self;
 }
@@ -491,7 +495,7 @@ void
 CB_mimic_str(CharBuf *self, const char* ptr, size_t size) 
 {
     if (!StrHelp_utf8_valid(ptr, size)) {
-        S_die_invalid_utf8(ptr, size);
+        DIE_INVALID_UTF8(ptr, size);
     }
     if (size >= self->cap) { S_grow(self, size); }
     memmove(self->ptr, ptr, size);
@@ -513,7 +517,7 @@ void
 CB_cat_str(CharBuf *self, const char* ptr, size_t size) 
 {
     if (!StrHelp_utf8_valid(ptr, size))
-        S_die_invalid_utf8(ptr, size);
+        DIE_INVALID_UTF8(ptr, size);
     CB_cat_trusted_str(self, ptr, size);
 }
 
@@ -800,7 +804,7 @@ ViewCharBuf*
 ViewCB_new_from_utf8(const char *utf8, size_t size)
 {
     if (!StrHelp_utf8_valid(utf8, size))
-        S_die_invalid_utf8(utf8, size);
+        DIE_INVALID_UTF8(utf8, size);
     return ViewCB_new_from_trusted_utf8(utf8, size);
 }
 
@@ -839,7 +843,7 @@ void
 ViewCB_assign_str(ViewCharBuf *self, const char *utf8, size_t size)
 {
     if (!StrHelp_utf8_valid(utf8, size))
-        S_die_invalid_utf8(utf8, size);
+        DIE_INVALID_UTF8(utf8, size);
     self->ptr  = (char*)utf8;
     self->size = size;
 }
