@@ -85,11 +85,14 @@ PPCODE:
         kino_TestSchema_run_tests();
     }
     // KinoSearch::Index 
+    else if (strEQ(package, "TestDocWriter")) {
+        kino_TestDocWriter_run_tests();
+    }
     else if (strEQ(package, "TestHighlightWriter")) {
         kino_TestHLWriter_run_tests();
     }
-    else if (strEQ(package, "TestDocWriter")) {
-        kino_TestDocWriter_run_tests();
+    else if (strEQ(package, "TestIndexManager")) {
+        kino_TestIxManager_run_tests();
     }
     else if (strEQ(package, "TestPostingListWriter")) {
         kino_TestPListWriter_run_tests();

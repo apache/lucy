@@ -211,10 +211,16 @@ IxManager_choose_sparse(IndexManager *self, I32Array *doc_counts)
         }
     }
 
-    // If recycling, always merge at least two segments so that we don't get
-    // stuck merging the same big segment over and over on small commits.
+    // If recycling, try not to get stuck merging the same big segment over
+    // and over on small commits.
     if (threshold == 1 && num_candidates > 2) {
-        threshold = 2;
+        int32_t this_seg_doc_count = I32Arr_Get(doc_counts, 0);
+        int32_t next_seg_doc_count = I32Arr_Get(doc_counts, 1);
+        // Try to merge 2 segments worth of stuff, so long as the next segment
+        // is less than double the size.
+        if (next_seg_doc_count / 2 < this_seg_doc_count) {
+            threshold = 2;
+        }
     }
 
     return threshold;
