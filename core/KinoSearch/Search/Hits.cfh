@@ -36,7 +36,7 @@ class KinoSearch::Search::Hits inherits KinoSearch::Object::Obj {
 
     /** Return the next hit, or NULL when the iterator is exhausted.
      */
-    public incremented nullable Obj*
+    public incremented nullable HitDoc*
     Next(Hits *self);
 
     /** Return the total number of documents which matched the Query used to

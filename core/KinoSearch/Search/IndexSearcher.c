@@ -19,6 +19,7 @@
 
 #include "KinoSearch/Search/IndexSearcher.h"
 
+#include "KinoSearch/Document/HitDoc.h"
 #include "KinoSearch/Index/DeletionsReader.h"
 #include "KinoSearch/Index/DocReader.h"
 #include "KinoSearch/Index/DocVector.h"
@@ -82,7 +83,7 @@ IxSearcher_destroy(IndexSearcher *self)
     SUPER_DESTROY(self, INDEXSEARCHER);
 }
 
-Obj*
+HitDoc*
 IxSearcher_fetch_doc(IndexSearcher *self, int32_t doc_id, float score, int32_t offset)
 {
     if (!self->doc_reader) { THROW(ERR, "No DocReader"); }

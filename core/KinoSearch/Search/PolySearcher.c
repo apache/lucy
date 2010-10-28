@@ -78,7 +78,7 @@ PolySearcher_destroy(PolySearcher *self)
     SUPER_DESTROY(self, POLYSEARCHER);
 }
 
-Obj*
+HitDoc*
 PolySearcher_fetch_doc(PolySearcher *self, int32_t doc_id, float score, 
                        int32_t offset)
 {

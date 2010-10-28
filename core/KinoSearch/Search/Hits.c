@@ -51,7 +51,7 @@ Hits_destroy(Hits *self)
     SUPER_DESTROY(self, HITS);
 }
 
-Obj*
+HitDoc*
 Hits_next(Hits *self)
 {
     MatchDoc *match_doc = (MatchDoc*)VA_Fetch(self->match_docs, self->offset);
@@ -64,7 +64,7 @@ Hits_next(Hits *self)
     }
     else {
         // Lazily fetch HitDoc, set score. 
-        Obj *doc = Searcher_Fetch_Doc(self->searcher,
+        HitDoc *doc = Searcher_Fetch_Doc(self->searcher,
             match_doc->doc_id, match_doc->score, 0);
 
         return doc;

@@ -100,7 +100,7 @@ class KinoSearch::Search::Searcher inherits KinoSearch::Object::Obj {
      * @param offset Amount to be added to the doc_id if this Searcher is a
      * subcomponent of another.
      */
-    public abstract incremented Obj*
+    public abstract incremented HitDoc*
     Fetch_Doc(Searcher *self, int32_t doc_id, float score = 0.0, 
               int32_t offset = 0);
 

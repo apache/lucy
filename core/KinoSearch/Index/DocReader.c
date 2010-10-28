@@ -20,6 +20,7 @@
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/DocReader.h"
+#include "KinoSearch/Document/HitDoc.h"
 #include "KinoSearch/Index/DocWriter.h"
 #include "KinoSearch/Index/PolyReader.h"
 #include "KinoSearch/Index/Segment.h"
@@ -84,22 +85,22 @@ PolyDocReader_destroy(PolyDocReader *self)
     SUPER_DESTROY(self, POLYDOCREADER);
 }
 
-Obj*
+HitDoc*
 PolyDocReader_fetch(PolyDocReader *self, int32_t doc_id, float score, 
                     int32_t offset)
 {
     uint32_t seg_tick  = PolyReader_sub_tick(self->offsets, doc_id);
     int32_t my_offset = I32Arr_Get(self->offsets, seg_tick);
     DocReader *doc_reader = (DocReader*)VA_Fetch(self->readers, seg_tick);
-    Obj *hit = NULL;
+    HitDoc *hit_doc = NULL;
     if (!doc_reader) { 
         THROW(ERR, "Invalid doc_id: %i32", doc_id); 
     }
     else {
-        hit = DocReader_Fetch(doc_reader, doc_id - my_offset, score, 
+        hit_doc = DocReader_Fetch(doc_reader, doc_id - my_offset, score, 
             offset + my_offset);
     }
-    return hit;
+    return hit_doc;
 }
 
 DefaultDocReader*

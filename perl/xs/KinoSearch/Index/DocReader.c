@@ -29,7 +29,7 @@
 #include "KinoSearch/Object/Host.h"
 #include "KinoSearch/Store/InStream.h"
 
-kino_Obj*
+kino_HitDoc*
 kino_DefDocReader_fetch(kino_DefaultDocReader *self, int32_t doc_id, 
                         float score, int32_t offset)
 {
@@ -122,7 +122,7 @@ kino_DefDocReader_fetch(kino_DefaultDocReader *self, int32_t doc_id,
     {
         kino_HitDoc *retval = kino_HitDoc_new(fields, doc_id + offset, score);
         SvREFCNT_dec((SV*)fields);
-        return (kino_Obj*)retval;
+        return retval;
     }
 }
 

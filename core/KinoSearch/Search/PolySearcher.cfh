@@ -57,7 +57,7 @@ class KinoSearch::Search::PolySearcher
     Top_Docs(PolySearcher *self, Query *query, uint32_t num_wanted,
              SortSpec *sort_spec = NULL);
 
-    public incremented Obj*
+    public incremented HitDoc*
     Fetch_Doc(PolySearcher *self, int32_t doc_id, float score = 0.0, 
               int32_t offset = 0);
 
