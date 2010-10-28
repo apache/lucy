@@ -68,10 +68,6 @@ After we load our modules...
 
 ... the first item we're going need is a L<Schema|KinoSearch::Plan::Schema>. 
 
-A Schema is analogous to an SQL table definition.  It instructs other entities
-on how they should interpret the raw data in an inverted index and interact
-with it.  
-
 The primary job of a Schema is to specify what fields are available and how
 they're defined.  We'll start off with three fields: title, content and url.
 
