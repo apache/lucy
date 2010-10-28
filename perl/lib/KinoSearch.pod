@@ -85,7 +85,7 @@ Extremely fast.  A single machine can handle millions of documents.
 
 =item *
 
-Scalable to multiple machines.
+Scalability to multiple machines.
 
 =item *
 
@@ -94,7 +94,11 @@ index).
 
 =item *
 
-UTF-8 support.
+Configurable near-real-time index updates.
+
+=item *
+
+Unicode support.
 
 =item *
 
@@ -164,9 +168,9 @@ L<KinoSearch::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
 
 =head2 Supported Languages and Encodings
 
-As of version 0.20, KinoSearch supports Unicode in addition to Latin-1.  All
-output strings use Perl's internal Unicode encoding.  For use of KinoSearch
-with non-Latin-1 material, see L<Encode>.
+As of version 0.2x, KinoSearch supports Unicode in addition to Latin-1.
+All output strings use Perl's internal Unicode encoding.  For use of
+KinoSearch with non-Latin-1 material, see L<Encode>.
 
 KinoSearch provides "native support" for 15 languages, meaning that
 PolyAnalyzer supports them.
@@ -237,7 +241,7 @@ Turkish
 
 =head2 Delving Deeper
 
-L<KinoSearch::Docs::CookBook> augments the tutorial with more advanced
+L<KinoSearch::Docs::Cookbook> augments the tutorial with more advanced
 recipes.
 
 For creating complex queries, see L<KinoSearch::Search::Query> and its
@@ -257,8 +261,9 @@ L<KSx::Remote::SearchClient>, and L<KinoSearch::Search::PolySearcher>.
 =head2 Backwards Compatibility Policy
 
 KinoSearch spins off stable forks into new namespaces periodically.  As of
-this release, the latest is "KinoSearch1", forked from version 0.165.  Users
-who require strong backwards compatibility should use a stable fork.
+this release, the latest is L<KinoSearch1>, forked from version 0.165; the
+next will be KinoSearch3, forked from a future release of 0.3x.  Users who
+require strong backwards compatibility should use a stable fork.
 
 The main namespace, "KinoSearch", is an unstable development branch (as hinted
 at by its version number).  Superficial API changes are frequent.  Hard file
@@ -303,9 +308,6 @@ information at L<http://www.rectangular.com/kinosearch>.
 Not thread-safe.
 
 Some exceptions leak memory.
-
-Won't work on esoteric architectures where a char is more than one byte,
-or where floats don't conform to IEEE 754.
 
 Please report any other bugs or feature requests to
 C<bug-kinosearch@rt.cpan.org>, or through the web interface at
