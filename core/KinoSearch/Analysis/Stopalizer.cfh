@@ -26,10 +26,10 @@ parcel KinoSearch cnick Kino;
  * Before filtering stopwords:
  * 
  *     ( "i", "am", "the", "walrus" ) 
- *     
+ *
  * After filtering stopwords:
- * 
- *     ( "walrus" );
+ *
+ *     ( "walrus" )
  *
  * Stopalizer provides default stoplists for several languages, courtesy of
  * the Snowball project (<http://snowball.tartarus.org>), or you may supply

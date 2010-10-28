@@ -19,7 +19,7 @@ parcel KinoSearch cnick Kino;
 /** Quick-start guide to hacking on KinoSearch.
  *
  * The KinoSearch code base is organized into roughly four layers:
- *  
+ *
  *    * Charmonizer - compiler and OS configuration probing.
  *    * Clownfish - header files.
  *    * C - implementation files.
