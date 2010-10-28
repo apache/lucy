@@ -29,6 +29,13 @@ see L<KinoSearch::Docs::Tutorial>.
 
 =item *
 
+L<KinoSearch::Docs::Cookbook::FastUpdates> - While index updates are fast on
+average, worst-case update performance may be significantly slower. To make
+index updates consistently quick, we must manually intervene to control the
+process of index segment consolidation.
+
+=item *
+
 L<KinoSearch::Docs::Cookbook::CustomQuery> - Explore KinoSearch's support for
 custom query types by creating a "PrefixQuery" class to handle trailing
 wildcards.
