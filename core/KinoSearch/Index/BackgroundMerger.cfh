@@ -23,8 +23,8 @@ parcel KinoSearch cnick Kino;
  * complete.  See L<KinoSearch::Docs::Cookbook::FastUpdates> for how to use
  * this class to control worst-case index update performance.
  *
- * As with Indexer, see L<KinoSearch::Docs::FileLocking> if your index is on a
- * shared volume.
+ * As with L<Indexer|KinoSearch::Index::Indexer>, see
+ * L<KinoSearch::Docs::FileLocking> if your index is on a shared volume.
  */
 class KinoSearch::Index::BackgroundMerger cnick BGMerger
     inherits KinoSearch::Object::Obj {
