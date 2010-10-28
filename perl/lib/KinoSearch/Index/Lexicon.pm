@@ -23,7 +23,8 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $lexicon = $index_reader->lexicon( field => 'content' );
+    my $lex_reader = $seg_reader->obtain('KinoSearch::Index::LexiconReader');
+    my $lexicon = $lex_reader->lexicon( field => 'content' );
     while ( $lexicon->next ) {
        print $lexicon->get_term . "\n";
     }
