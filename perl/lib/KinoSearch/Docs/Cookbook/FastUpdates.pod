@@ -131,7 +131,6 @@ operate simultaneously:
     }
 
     # Background merge process.
-    use Scalar::Util qw( blessed );
     my $manager = KinoSearch::Index::IndexManager->new;
     $index_manager->set_write_lock_timeout(60_000);
     my $bg_merger = KinoSearch::Index::BackgroundMerger->new(
