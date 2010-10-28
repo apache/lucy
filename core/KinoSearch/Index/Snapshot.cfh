@@ -41,7 +41,7 @@ class KinoSearch::Index::Snapshot inherits KinoSearch::Object::Obj : dumpable {
     public inert Snapshot* 
     init(Snapshot *self);
 
-    /** Return a list of all entries.
+    /** Return an array of all entries.
      */
     public incremented VArray*
     List(Snapshot *self);
@@ -76,8 +76,8 @@ class KinoSearch::Index::Snapshot inherits KinoSearch::Object::Obj : dumpable {
     Read_File(Snapshot *self, Folder *folder, const CharBuf *path = NULL);
 
     /** Write a snapshot file.  The caller must lock the index while this
-     * operation takes place, and the operation will fail if the file already
-     * exists.
+     * operation takes place, and the operation will fail if the snapshot file
+     * already exists.
      * 
      * @param folder A Folder.
      * @param path The path of the file to write.  If NULL, a file name will
