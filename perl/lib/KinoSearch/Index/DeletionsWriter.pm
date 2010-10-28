@@ -49,10 +49,10 @@ Clownfish::Binding::Perl::Class->register(
         synopsis => $synopsis,
         methods  => [
             qw(
-                Delete_By_Term
-                Delete_By_Query
-                Updated
-                Seg_Del_Count
+                delete_by_term
+                delete_by_query
+                updated
+                seg_del_count
                 )
         ],
     },
