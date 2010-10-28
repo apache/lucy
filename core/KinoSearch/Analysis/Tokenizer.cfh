@@ -29,7 +29,7 @@ parcel KinoSearch cnick Kino;
  *     "Eats, Shoots and Leaves."
  * 
  * ... then a "whitespace tokenizer" with a <code>pattern</code> of
- * <code>\S+</code> produces...
+ * <code>"\\S+"</code> produces...
  * 
  *     Eats, 
  *     Shoots 
@@ -37,7 +37,7 @@ parcel KinoSearch cnick Kino;
  *     Leaves.
  * 
  * ... while a "word character tokenizer" with a <code>pattern</code> of
- * <code>\w+</code> produces...
+ * <code>"\\w+"</code> produces...
  * 
  *     Eats 
  *     Shoots 
