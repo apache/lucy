@@ -207,7 +207,7 @@ PrefixCompiler is make_matcher().
         return PrefixScorer->new( posting_lists => \@posting_lists );
     }
 
-PrefixCompiler gets access to a L<SegReader|KinoSearch::Search::SegReader>
+PrefixCompiler gets access to a L<SegReader|KinoSearch::Index::SegReader>
 object when make_matcher() gets called.  From the SegReader and its
 sub-components L<LexiconReader|KinoSearch::Index::LexiconReader> and
 L<PostingListReader|KinoSearch::Index::PostingListReader>, we acquire a
