@@ -18,13 +18,13 @@ parcel KinoSearch cnick Kino;
 
 /** Policies governing index updating, locking, and file deletion. 
  * 
- * IndexManager is an advanced-usage class for controlling index locking,
+ * IndexManager is an advanced-use class for controlling index locking,
  * updating, merging, and deletion behaviors.
  *
- * IndexManager and Architecture are complementary classes: Architecture is
- * used to define traits and behaviors which cannot change for the life of an
- * index; IndexManager is used for defining rules which may change from
- * process to process.
+ * IndexManager and L<Architecture|KinoSearch::Plan::Architecture> are
+ * complementary classes: Architecture is used to define traits and behaviors
+ * which cannot change for the life of an index; IndexManager is used for
+ * defining rules which may change from process to process.
  */
 class KinoSearch::Index::IndexManager cnick IxManager 
     inherits KinoSearch::Object::Obj {
@@ -54,9 +54,8 @@ class KinoSearch::Index::IndexManager cnick IxManager
     Destroy(IndexManager *self);
 
     /**
-     * Setter for <code>folder</code> member, needed by several methods.
-     * Typical clients (Indexer, IndexReader) will use this method to install
-     * their own Folder instance.
+     * Setter for <code>folder</code> member.  Typical clients (Indexer,
+     * IndexReader) will use this method to install their own Folder instance.
      */
     public void
     Set_Folder(IndexManager *self, Folder *folder = NULL);

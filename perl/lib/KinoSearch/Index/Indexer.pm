@@ -132,8 +132,8 @@ it.
 ==item *
 
 B<truncate> - If true, proceed with the intention of discarding all previous
-indexing data.  The old data will remain intact and visible until commit() is
-called.
+indexing data.  The old data will remain intact and visible until commit()
+succeeds.
 
 ==item *
 
@@ -151,7 +151,7 @@ my $add_doc_pod = <<'END_ADD_DOC_POD';
     $indexer->add_doc( { field_name => $field_value } );
     $indexer->add_doc(
         doc   => { field_name => $field_value },
-        boost => 2.5,         #: default 1.0
+        boost => 2.5,         # default: 1.0
     );
 
 Add a document to the index.  Accepts either a single argument or labeled

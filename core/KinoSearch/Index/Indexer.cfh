@@ -94,7 +94,7 @@ class KinoSearch::Index::Indexer inherits KinoSearch::Object::Obj {
     /** Mark documents which contain the supplied term as deleted, so that
      * they will be excluded from search results and eventually removed
      * altogether.  The change is not apparent to search apps until after
-     * Commit() is called.
+     * Commit() succeeds.
      *
      * @param field The name of an indexed field. (If it is not spec'd as
      * <code>indexed</code>, an error will occur.)
