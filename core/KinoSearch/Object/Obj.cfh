@@ -171,7 +171,7 @@ class KinoSearch::Object::Obj {
     Dump(Obj *self);
 
     /** Create an object from the output of a call to Dump().  Implementations
-     * should not reference the caller.
+     * must not reference the caller.
      * 
      * @param dump The output of Dump().  
      */
