@@ -66,7 +66,7 @@ my $foo_jr = Clownfish::Class->create(
 );
 
 ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
-is( $foo_jr->get_struct_sym,  'FooJr',      "struct_sym" );
+is( $foo_jr->get_struct_sym,  'FooJr',       "struct_sym" );
 is( $foo_jr->full_struct_sym, 'neato_FooJr', "full_struct_sym" );
 
 my $final_foo = Clownfish::Class->create(
@@ -204,10 +204,11 @@ ok( ( scalar grep { $_->micro_sym eq 'bury' } $class->methods ),
     "parsed public method" );
 ok( ( scalar grep { $_->micro_sym eq 'scratch' } $class->methods ),
     "parsed public abstract nullable method" );
-for my $method ($class->methods) {
-    if ($method->micro_sym eq 'scratch') {
-        ok( $method->{return_type}->nullable, 
-            "public abstract incremented nullable flagged as nullable");
+
+for my $method ( $class->methods ) {
+    if ( $method->micro_sym eq 'scratch' ) {
+        ok( $method->{return_type}->nullable,
+            "public abstract incremented nullable flagged as nullable" );
     }
 }
 is( ( scalar grep { $_->public } $class->methods ),
@@ -231,4 +232,3 @@ $class_content = qq|
     }|;
 $class = $parser->class_declaration($class_content);
 ok( $class->final, "final class_declaration" );
-

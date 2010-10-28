@@ -104,18 +104,14 @@ is( $parser->scalar_constant($_), $_, "scalar_constant: $_" )
 my @composites = ( 'int[]', "i32_t **", "Foo **", "Foo ***", "const void *" );
 for my $composite (@composites) {
     my $parsed = $parser->type($composite);
-    isa_ok(
-        $parsed,
-        "Clownfish::Type::Composite",
-        "composite_type: $composite"
-    );
+    isa_ok( $parsed, "Clownfish::Type::Composite",
+        "composite_type: $composite" );
 }
 
 my @object_types = ( 'Obj *', "incremented Foo*", "decremented CharBuf *" );
 for my $object_type (@object_types) {
     my $parsed = $parser->object_type($object_type);
-    isa_ok( $parsed, "Clownfish::Type::Object",
-        "object_type: $object_type" );
+    isa_ok( $parsed, "Clownfish::Type::Object", "object_type: $object_type" );
 }
 
 my %param_lists = (
@@ -160,4 +156,3 @@ is( $parser->cnick(qq|cnick $_|), $_, "cnick: $_" ) for (qw( Foo FF ));
 
 ok( !$parser->cnick(qq|cnick $_|), "Illegal cnick: $_" )
     for (qw( foo fOO 1Foo ));
-

@@ -46,7 +46,7 @@ sub new {
 sub get_class_name     { shift->{class_name} }
 sub use_labeled_params { shift->{use_labeled_params} }
 
-sub perl_name { 
+sub perl_name {
     my $self = shift;
     return "$self->{class_name}::$self->{alias}";
 }
@@ -99,8 +99,8 @@ sub params_hash_def {
 }
 
 sub var_declarations {
-    my $self     = shift;
-    my $arg_vars = $self->{param_list}->get_variables;
+    my $self             = shift;
+    my $arg_vars         = $self->{param_list}->get_variables;
     my @var_declarations = map { $_->local_declaration } @$arg_vars;
     if ( !$self->{retval_type}->is_void ) {
         my $return_type = $self->{retval_type}->to_c;
@@ -200,4 +200,3 @@ names of labeled params.  The hash's name consists of the the binding's
 perl_name() plus "_PARAMS".
 
 =cut
-

@@ -22,9 +22,9 @@ use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
-our %new_PARAMS = ( 
+our %new_PARAMS = (
     const     => undef,
-    specifier => 'void', 
+    specifier => 'void',
 );
 
 sub new {
@@ -81,4 +81,3 @@ context of C<const void*>).
 =back
 
 =cut
-

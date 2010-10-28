@@ -73,9 +73,9 @@ my %primitives_to_perl = (
             ? "$_[0] = newSViv( $_[1] );"
             : "$_[0] = newSVnv( (NV)$_[1] );";
     },
-    int32_t   => sub {"$_[0] = newSViv( $_[1] );"},
-    int16_t   => sub {"$_[0] = newSViv( $_[1] );"},
-    int8_t    => sub {"$_[0] = newSViv( $_[1] );"},
+    int32_t    => sub {"$_[0] = newSViv( $_[1] );"},
+    int16_t    => sub {"$_[0] = newSViv( $_[1] );"},
+    int8_t     => sub {"$_[0] = newSViv( $_[1] );"},
     chy_bool_t => sub {"$_[0] = newSViv( $_[1] );"},
 );
 
@@ -89,7 +89,7 @@ sub _sv_to_cf_obj {
         # string types.  Assume that the appropriate ZombieCharBuf has been
         # declared on the stack.
         return "$cf_var = ($struct_sym*)XSBind_sv_to_kino_obj($xs_var, "
-            . "$vtable, alloca(kino_ZCB_size()));"
+            . "$vtable, alloca(kino_ZCB_size()));";
     }
     else {
         return "$cf_var = ($struct_sym*)XSBind_sv_to_kino_obj($xs_var, "
@@ -363,4 +363,3 @@ them when checking arguments.  Keeping the entries up-to-date manually as
 classes come and go would be a pain.
 
 =cut
-

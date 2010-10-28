@@ -60,9 +60,9 @@ sub local_c {
 }
 
 sub global_c {
-    my $self = shift;
-    my $type = $self->{type};
-    my $name = $self->full_sym;
+    my $self    = shift;
+    my $type    = $self->{type};
+    my $name    = $self->full_sym;
     my $postfix = '';
     if ( $type->is_composite ) {
         $postfix = $type->get_array || '';
@@ -144,4 +144,3 @@ as within a struct definition, or as an automatic variable within a C
 function.  
 
 =cut
-

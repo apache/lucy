@@ -49,12 +49,9 @@ my $parser = Clownfish::Parser->new;
 for my $specifier (qw( foo_t Sort_compare_t )) {
     is( $parser->arbitrary_type_specifier($specifier),
         $specifier, 'arbitrary_type_specifier' );
-    isa_ok(
-        $parser->arbitrary_type($specifier),
-        "Clownfish::Type::Arbitrary"
-    );
+    isa_ok( $parser->arbitrary_type($specifier),
+        "Clownfish::Type::Arbitrary" );
     ok( !$parser->arbitrary_type_specifier( $specifier . "_y_p_e" ),
         "arbitrary_type_specifier guards against partial word matches"
     );
 }
-

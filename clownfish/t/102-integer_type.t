@@ -64,14 +64,11 @@ for my $chy_specifier (@chy_specifiers) {
 for my $c_specifier (@c_specifiers) {
     is( $parser->c_integer_specifier($c_specifier),
         $c_specifier, "c_integer_specifier: $c_specifier" );
-    isa_ok(
-        $parser->c_integer_type($c_specifier),
-        "Clownfish::Type::Integer"
-    );
+    isa_ok( $parser->c_integer_type($c_specifier),
+        "Clownfish::Type::Integer" );
     isa_ok( $parser->c_integer_type("const $c_specifier"),
         "Clownfish::Type::Integer" );
     my $bogus = $c_specifier . "y";
     ok( !$parser->c_integer_specifier($bogus),
         "c_integer_specifier guards against partial word matches" );
 }
-

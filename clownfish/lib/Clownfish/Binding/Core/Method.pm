@@ -140,7 +140,7 @@ sub callback_def {
 # Return a string which maps arguments to various arg wrappers conforming
 # to Host's callback interface.  For instance, (int32_t foo, Obj *bar)
 # produces the following:
-# 
+#
 #   KINO_ARG_I32("foo", foo),
 #   KINO_ARG_OBJ("bar", bar)
 #
@@ -176,7 +176,7 @@ sub _callback_params {
         }
         else {
             # Can't map variable type.  Signal to caller.
-            return undef
+            return undef;
         }
         push @params, $param;
     }
@@ -393,4 +393,3 @@ Return C code implementing a version of the method which throws an "abstract
 method" error at runtime.
 
 =cut
-

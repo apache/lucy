@@ -26,7 +26,7 @@ use Config;
 my %cc;
 
 sub new {
-    my ($class, %args) = @_;
+    my ( $class, %args ) = @_;
     require ExtUtils::CBuilder;
     my $self = $class->SUPER::new(%args);
     $cc{"$self"} = $args{'config'}->{'cc'};
@@ -88,7 +88,8 @@ sub extra_ccflags {
     if ( defined $ENV{KINO_DEBUG} ) {
         if ( defined $gcc_version ) {
             $extra_ccflags .= "-DKINO_DEBUG ";
-            $extra_ccflags .= "-DPERL_GCC_PEDANTIC -std=gnu99 -pedantic -Wall ";
+            $extra_ccflags
+                .= "-DPERL_GCC_PEDANTIC -std=gnu99 -pedantic -Wall ";
             $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct
             $extra_ccflags .= "-Wno-variadic-macros "
                 if $gcc_version > 3.4;    # at least not on gcc 3.4
@@ -155,9 +156,8 @@ sub ACTION_charmonizer {
 
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
 
-    my $cbuilder = KinoSearch::Build::CBuilder->new( 
-        config => { cc => $self->config('cc') },
-    );
+    my $cbuilder = KinoSearch::Build::CBuilder->new(
+        config => { cc => $self->config('cc') }, );
 
     my @o_files;
     for (@all_source) {
@@ -198,7 +198,7 @@ sub ACTION_charmony {
     $self->add_to_cleanup($charmony_path);
 
     # Prepare arguments to charmonize.
-    my $cc        = $self->config('cc'); 
+    my $cc        = $self->config('cc');
     my $flags     = $self->config('ccflags') . ' ' . $self->extra_ccflags;
     my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
     $flags =~ s/"/\\"/g;
@@ -473,8 +473,7 @@ sub ACTION_compile_custom_xs {
     require ExtUtils::ParseXS;
 
     my $cbuilder = KinoSearch::Build::CBuilder->new(
-        config => { cc => $self->config('cc') },
-    );
+        config => { cc => $self->config('cc') }, );
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'KinoSearch', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
@@ -671,5 +670,3 @@ sub _gen_pause_exclusion_list {
 1;
 
 __END__
-
-

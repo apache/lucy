@@ -635,7 +635,7 @@ sub error {$KinoSearch::Object::Err::error}
         return to_kino( $json_encoder->decode( $_[1] ) );
     }
 
-	sub set_tolerant { $json_encoder->allow_nonref( $_[1] ) }
+    sub set_tolerant { $json_encoder->allow_nonref( $_[1] ) }
 }
 
 {

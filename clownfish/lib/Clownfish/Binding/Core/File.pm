@@ -58,8 +58,7 @@ sub write_h {
         if ( a_isa_b( $block, 'Clownfish::Parcel' ) ) { }
         elsif ( a_isa_b( $block, 'Clownfish::Class' ) ) {
             my $class_binding
-                = Clownfish::Binding::Core::Class->new( client => $block,
-                );
+                = Clownfish::Binding::Core::Class->new( client => $block, );
             $content .= $class_binding->to_c_header . "\n";
         }
         elsif ( a_isa_b( $block, 'Clownfish::CBlock' ) ) {
@@ -116,13 +115,14 @@ sub write_c {
         or confess("Can't open '$c_path' for writing");
 
     # Aggregate content.
-    my $content = "";
+    my $content     = "";
     my $c_file_syms = "";
     for my $block ( $file->blocks ) {
         if ( blessed($block) ) {
             if ( $block->isa('Clownfish::Class') ) {
-                my $bound = Clownfish::Binding::Core::Class->new(
-                    client => $block, );
+                my $bound
+                    = Clownfish::Binding::Core::Class->new( client => $block,
+                    );
                 $content .= $bound->to_c . "\n";
                 my $c_file_sym = "C_" . uc( $block->full_struct_sym );
                 $c_file_syms .= "#define $c_file_sym\n";
@@ -212,4 +212,3 @@ typically copyright information.
 Generate a C file containing code needed by the class implementations.
 
 =cut
-

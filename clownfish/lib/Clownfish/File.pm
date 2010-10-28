@@ -68,8 +68,7 @@ sub blocks { @{ shift->{blocks} } }
 sub classes {
     my $self = shift;
     return
-        grep { ref $_ and $_->isa('Clownfish::Class') }
-        @{ $self->{blocks} };
+        grep { ref $_ and $_->isa('Clownfish::Class') } @{ $self->{blocks} };
 }
 
 # Return a string used for an include guard, unique per file.

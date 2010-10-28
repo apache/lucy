@@ -43,8 +43,7 @@ my @composite_type_strings = (
 );
 
 for my $input (@composite_type_strings) {
-    isa_ok( $parser->type($input),
-        "Clownfish::Type::Composite", $input );
+    isa_ok( $parser->type($input), "Clownfish::Type::Composite", $input );
 }
 
 eval { my $type = Clownfish::Type::Composite->new };

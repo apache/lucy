@@ -25,7 +25,7 @@ sub func_declaration {
         unless a_isa_b( $function, "Clownfish::Function" );
     my $return_type = $function->get_return_type;
     my $param_list  = $function->get_param_list;
-    my $dec = $function->inline ? 'static CHY_INLINE ' : '';
+    my $dec         = $function->inline ? 'static CHY_INLINE ' : '';
     $dec .= $return_type->to_c . "\n";
     $dec .= $function->full_func_sym;
     $dec .= "(" . $param_list->to_c . ");";

@@ -69,8 +69,7 @@ sub _make_method_obj {
 
     my $param_list;
     if ( $dump_or_load eq 'Dump' ) {
-        $param_list
-            = Clownfish::ParamList->new( variables => [$self_var], );
+        $param_list = Clownfish::ParamList->new( variables => [$self_var], );
     }
     else {
         my $dump_type = Clownfish::Type::Object->new(
@@ -284,4 +283,3 @@ Analyze a class with the attribute "dumpable" and add Dump() or Load() methods
 as necessary.
 
 =cut
-

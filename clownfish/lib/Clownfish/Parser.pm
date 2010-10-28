@@ -388,8 +388,8 @@ sub simple_or_composite_type {
     if ( !@$postfixes ) {
         if ($nullable) {
             my $type_class = ref($simple_type);
-            confess "$type_class can't be 'nullable'" unless
-                $simple_type->isa("Clownfish::Type::Object");
+            confess "$type_class can't be 'nullable'"
+                unless $simple_type->isa("Clownfish::Type::Object");
             $simple_type->set_nullable($nullable);
         }
         return $simple_type;
@@ -571,4 +571,3 @@ JavaDoc-syntax "DocuComments", which begin with "/**" are left alone.
 This is a sloppy implementation which will mangle quoted comments and such.
 
 =cut
-
