@@ -41,10 +41,10 @@ Clownfish::Binding::Perl::Class->register(
             )
     ],
     bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => "    # TODO.\n",
-        constructor => { sample => $constructor },
-    },
+    #make_pod          => {
+    #    synopsis    => "    # TODO.\n",
+    #    constructor => { sample => $constructor },
+    #},
 );
 
 
