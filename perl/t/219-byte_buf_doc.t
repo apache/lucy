@@ -26,7 +26,7 @@ sub register_doc_writer {
     my ( $self, $seg_writer ) = @_;
     my $doc_writer = KSx::Index::ByteBufDocWriter->new(
         width      => 1,
-        field      => 'id',
+        field      => 'value',
         schema     => $seg_writer->get_schema,
         snapshot   => $seg_writer->get_snapshot,
         segment    => $seg_writer->get_segment,
@@ -43,6 +43,7 @@ sub register_doc_reader {
     my ( $self, $seg_reader ) = @_;
     my $doc_reader = KSx::Index::ByteBufDocReader->new(
         width    => 1,
+        field    => 'value',
         schema   => $seg_reader->get_schema,
         folder   => $seg_reader->get_folder,
         segments => $seg_reader->get_segments,
@@ -64,7 +65,7 @@ sub new {
     my $self      = shift->SUPER::new(@_);
     my $tokenizer = KinoSearch::Analysis::Tokenizer->new;
     my $type = KinoSearch::Plan::FullTextType->new( analyzer => $tokenizer );
-    $self->spec_field( name => 'id', type => $type );
+    $self->spec_field( name => 'value', type => $type );
     return $self;
 }
 
@@ -80,7 +81,7 @@ sub add_to_index {
         index  => $folder,
         schema => $schema,
     );
-    $indexer->add_doc( { id => $_ } ) for @_;
+    $indexer->add_doc( { value => $_ } ) for @_;
     $indexer->commit;
 }
 
@@ -88,20 +89,20 @@ add_to_index(qw( a b c ));
 
 my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
 my $hits = $searcher->hits( query => 'b' );
-is( $hits->next, 'b', "single segment, single hit" );
+is( $hits->next->{value}, 'b', "single segment, single hit" );
 
 add_to_index(qw( d e f g h ));
 add_to_index(qw( i j k l m ));
 
 $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
 $hits = $searcher->hits( query => 'f' );
-is( $hits->next, 'f', "multiple segments, single hit" );
+is( $hits->next->{value}, 'f', "multiple segments, single hit" );
 
 my $indexer = KinoSearch::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
-$indexer->delete_by_term( field => 'id', term => $_ ) for qw( b f l );
+$indexer->delete_by_term( field => 'value', term => $_ ) for qw( b f l );
 $indexer->optimize;
 $indexer->commit;
 
@@ -110,4 +111,4 @@ $hits = $searcher->hits( query => 'b' );
 is( $hits->next, undef, "doc deleted" );
 
 $hits = $searcher->hits( query => 'c' );
-is( $hits->next, 'c', "map around deleted doc" );
+is( $hits->next->{value}, 'c', "map around deleted doc" );

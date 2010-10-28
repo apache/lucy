@@ -137,7 +137,7 @@ register_doc_reader():
         my ( $self, $seg_writer ) = @_; 
         my $doc_writer = KSx::Index::ByteBufDocWriter->new(
             width      => 16,
-            field      => 'id',
+            field      => 'value',
             snapshot   => $seg_writer->get_snapshot,
             segment    => $seg_writer->get_segment,
             polyreader => $seg_writer->get_polyreader,
@@ -153,6 +153,7 @@ register_doc_reader():
         my ( $self, $seg_reader ) = @_; 
         my $doc_reader = KSx::Index::ByteBufDocReader->new(
             width    => 16,
+            field    => 'value',
             schema   => $seg_reader->get_schema,
             folder   => $seg_reader->get_folder,
             segments => $seg_reader->get_segments,
@@ -186,8 +187,7 @@ Then, in your search app:
     );
     my $hits = $searcher->hits( query => $query );
     while ( my $id = $hits->next ) {
-        # $id is a plain old 16-byte Perl scalar instead of a Hit object
-        my $real_doc = $external_document_source->fetch($id);
+        my $real_doc = $external_document_source->fetch( $doc->{value} );
         ...
     }
 

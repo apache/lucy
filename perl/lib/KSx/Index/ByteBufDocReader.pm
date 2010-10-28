@@ -18,20 +18,24 @@ use warnings;
 
 package KSx::Index::ByteBufDocReader;
 use base qw( KinoSearch::Index::DocReader );
-use KinoSearch::Object::ByteBuf;
+use KinoSearch::Document::HitDoc;
 use Carp;
 
 # Inside-out member vars.
 our %width;
+our %field;
 our %instream;
 
 sub new {
     my ( $either, %args ) = @_;
     my $width = delete $args{width};
+    my $field = delete $args{field};
     my $self  = $either->SUPER::new(%args);
     confess("Missing required param 'width'") unless defined $width;
+    confess("Missing required param 'field'") unless $field;
     if ( $width < 1 ) { confess("'width' must be at least 1") }
     $width{$$self} = $width;
+    $field{$$self} = $field;
 
     my $segment  = $self->get_segment;
     my $metadata = $self->get_segment->fetch_metadata("bytebufdocs");
@@ -49,11 +53,16 @@ sub new {
 
 sub fetch {
     my ( $self, %args ) = @_;
+    my $field  = $field{$$self};
     my $doc_id = delete $args{doc_id};
-    my $buf;
-    $self->read_record( $doc_id, \$buf );
-    if ($buf) {
-        return KinoSearch::Object::ByteBuf->new($buf);
+    my $offset = delete $args{offset} || 0;
+    my %fields = ( $field => '' );
+    $self->read_record( $doc_id, \$fields{$field} );
+    if ( defined $fields{$field} ) {
+        return KinoSearch::Document::HitDoc->new(
+            doc_id => $doc_id + $offset,
+            fields => \%fields,
+        );
     }
     else {
         return undef;
@@ -79,6 +88,7 @@ sub close {
 sub DESTROY {
     my $self = shift;
     delete $width{$$self};
+    delete $field{$$self};
     delete $instream{$$self};
     $self->SUPER::DESTROY;
 }
