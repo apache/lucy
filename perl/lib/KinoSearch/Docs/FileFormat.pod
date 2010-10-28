@@ -67,16 +67,16 @@ Old segments become obsolete and can be removed when their data has been
 consolidated into new segments during the process of segment merging and
 optimization.  A fully-optimized index has only one segment.
 
-=head1 Top-level files
+=head1 Top-level entries
 
-There are a handful of "top-level" files which belong to the entire index
-rather than to a particular segment.
+There are a handful of "top-level" files and directories which belong to the
+entire index rather than to a particular segment.
 
 =head2 snapshot_XXX.json
 
-A "snapshot" file, e.g. C<snapshot_m7p.json>, is list of index files.  Because
-index files, once written, are never modified, the list of files in a snapshot
-defines a point-in-time view of the data in an index.
+A "snapshot" file, e.g. C<snapshot_m7p.json>, is list of index files and
+directories.  Because index files, once written, are never modified, the list
+of entries in a snapshot defines a point-in-time view of the data in an index.
 
 Like segment directories, snapshot files also utilize the
 unique-base-36-number naming convention; the higher the number, the more
@@ -91,11 +91,12 @@ The schema file is a Schema object describing the index's format, serialized
 as JSON.  It, too, is versioned, and a given snapshot file will reference one
 and only one schema file.
 
-=head2 write.lock
+=head2 locks 
 
 By default, only one indexing process may safely modify the index at any given
-time.  Processes reserve an index by laying claim to the C<write.lock> file.
-A smattering of other lock files may be used from time to time, as well.
+time.  Processes reserve an index by laying claim to the C<write.lock> file
+within the C<locks/> directory.  A smattering of other lock files may be used
+from time to time, as well.
 
 =head1 A segment's component parts
 
@@ -122,7 +123,7 @@ facilitate fast lookups.
 
 =head2 Postings
 
-L<Posting|KinoSearch::Index::Posting> is a technical term from the field of
+"Posting" is a technical term from the field of 
 L<information retrieval|KinoSearch::Docs::IRTheory>, defined as a single
 instance of a one term indexing one document.  If you are looking at the index
 in the back of a book, and you see that "freedom" is referenced on pages 8,
@@ -149,7 +150,7 @@ The document storage section is a simple database, organized into two files:
 
 =item * 
 
-B<ocuments.dat> - Serialized documents.
+B<documents.dat> - Serialized documents.
 
 =item *
 
