@@ -149,10 +149,10 @@ You've made it to the end of the tutorial.
 =head1 SEE ALSO
 
 For additional thematic documentation, see the KinoSearch
-L<Cookbook|KinoSearch::Docs::CookBook>.
+L<Cookbook|KinoSearch::Docs::Cookbook>.
 
 ANDQuery has a companion class, L<ORQuery|KinoSearch::Search::ORQuery>, and a
 close relative,
-L<RequiredOptionalQuery|KinoSearch::Searh::RequiredOptionalQuery>.
+L<RequiredOptionalQuery|KinoSearch::Search::RequiredOptionalQuery>.
 
 
