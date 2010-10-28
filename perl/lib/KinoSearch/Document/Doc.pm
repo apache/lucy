@@ -38,8 +38,12 @@ my $synopsis = <<'END_SYNOPSIS';
     my $doc = KinoSearch::Document::Doc->new(
         fields => { foo => 'foo foo', bar => 'bar bar' },
     );
-    $doc->{foo} = 'new value for field "foo"';
     $indexer->add_doc($doc);
+
+Doc objects allow access to field values via hashref overloading:
+
+    $doc->{foo} = 'new value for field "foo"';
+    print "foo: $doc->{foo}\n";
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
