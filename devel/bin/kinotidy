@@ -17,12 +17,14 @@
 
 use strict;
 use warnings;
-
-use File::Spec::Functions qw( catfile updir );
 use Perl::Tidy;
 
-my $rc_filepath = catfile( updir(), 'devel', 'conf', 'kinotidyrc' );
-die "can't find kinotidyrc" unless -f $rc_filepath;
+my $perltidyrc
+    = '--perl-best-practices '
+    . '--nostandard-output '
+    . '--nostandard-error-output '
+    . '--noblanks-before-comments '
+    . '--noblanks-before-subs';
 
-Perl::Tidy::perltidy( perltidyrc => $rc_filepath );
+Perl::Tidy::perltidy( perltidyrc => \$perltidyrc );
 

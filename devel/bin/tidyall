@@ -19,12 +19,18 @@ use strict;
 use warnings;
 
 use File::Find qw( find );
-use File::Spec::Functions qw( updir catfile );
 use Text::Diff;
 use Perl::Tidy;
 
 my $source_dir = shift @ARGV;
 die "usage: tidyall DIR" unless defined $source_dir;
+
+my $perltidyrc
+    = '--perl-best-practices '
+    . '--nostandard-output '
+    . '--nostandard-error-output '
+    . '--noblanks-before-comments '
+    . '--noblanks-before-subs';
 
 # Grab all perl filepaths
 my @paths;
@@ -38,9 +44,6 @@ find(
     $source_dir
 );
 
-my $rc_filepath = catfile( updir(), 'devel', 'conf', 'kinotidyrc' );
-die "can't find kinotidyrc" unless -f $rc_filepath;
-
 for my $path (@paths) {
     # Grab orig text
     print "$path\n";
@@ -53,7 +56,7 @@ for my $path (@paths) {
     Perl::Tidy::perltidy(
         source      => \$orig_text,
         destination => \$tidied,
-        perltidyrc  => $rc_filepath,
+        perltidyrc  => \$perltidyrc,
     );
 
     if ( index( $orig_text, $tidied ) != 0 ) {
