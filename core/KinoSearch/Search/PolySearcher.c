@@ -79,15 +79,15 @@ PolySearcher_destroy(PolySearcher *self)
 }
 
 HitDoc*
-PolySearcher_fetch_doc(PolySearcher *self, int32_t doc_id, float score, 
-                       int32_t offset)
+PolySearcher_fetch_doc(PolySearcher *self, int32_t doc_id, float score)
 {
     uint32_t    tick       = PolyReader_sub_tick(self->starts, doc_id);
     Searcher   *searcher   = (Searcher*)VA_Fetch(self->searchers, tick);
-    int32_t     start      = I32Arr_Get(self->starts, tick);
+    int32_t     offset     = I32Arr_Get(self->starts, tick);
     if (!searcher) { THROW(ERR, "Invalid doc id: %i32", doc_id); }
-    return Searcher_Fetch_Doc(searcher, doc_id - start, score, 
-        offset + start);
+    HitDoc *hit_doc = Searcher_Fetch_Doc(searcher, doc_id - offset, score);
+    HitDoc_Set_Doc_ID(hit_doc, doc_id);
+    return hit_doc;
 }
 
 DocVector*

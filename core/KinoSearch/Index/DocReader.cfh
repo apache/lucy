@@ -32,7 +32,7 @@ class KinoSearch::Index::DocReader inherits KinoSearch::Index::DataReader {
     /** Returns the document identified by <code>doc_id</code>.
      */
     public abstract incremented HitDoc*
-    Fetch(DocReader *self, int32_t doc_id, float score = 0.0, int32_t offset = 0);
+    Fetch(DocReader *self, int32_t doc_id, float score = 0.0);
 
     /** Returns a DocReader which divvies up requests to its sub-readers
      * according to the offset range.
@@ -58,8 +58,7 @@ class KinoSearch::Index::PolyDocReader inherits KinoSearch::Index::DocReader {
     init(PolyDocReader *self, VArray *readers, I32Array *offsets);
 
     public incremented HitDoc*
-    Fetch(PolyDocReader *self, int32_t doc_id, float score = 0.0, 
-          int32_t offset = 0);
+    Fetch(PolyDocReader *self, int32_t doc_id, float score = 0.0);
 
     public void
     Close(PolyDocReader *self);
@@ -83,8 +82,7 @@ class KinoSearch::Index::DefaultDocReader cnick DefDocReader
          Snapshot *snapshot, VArray *segments, int32_t seg_tick);
 
     public incremented HitDoc*
-    Fetch(DefaultDocReader *self, int32_t doc_id, float score = 0.0, 
-          int32_t offset = 0);
+    Fetch(DefaultDocReader *self, int32_t doc_id, float score = 0.0);
 
     /** Read the raw byte content for the specified doc into the supplied
      * buffer.

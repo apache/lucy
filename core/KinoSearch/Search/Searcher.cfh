@@ -97,12 +97,9 @@ class KinoSearch::Search::Searcher inherits KinoSearch::Object::Obj {
      *
      * @param doc_id A document id.
      * @param score A floating point score.
-     * @param offset Amount to be added to the doc_id if this Searcher is a
-     * subcomponent of another.
      */
     public abstract incremented HitDoc*
-    Fetch_Doc(Searcher *self, int32_t doc_id, float score = 0.0, 
-              int32_t offset = 0);
+    Fetch_Doc(Searcher *self, int32_t doc_id, float score = 0.0);
 
     /** Return the DocVector identified by the supplied doc id.  Throws an
      * error if the doc id is out of range.

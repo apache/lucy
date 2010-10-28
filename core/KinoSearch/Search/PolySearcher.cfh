@@ -58,8 +58,7 @@ class KinoSearch::Search::PolySearcher
              SortSpec *sort_spec = NULL);
 
     public incremented HitDoc*
-    Fetch_Doc(PolySearcher *self, int32_t doc_id, float score = 0.0, 
-              int32_t offset = 0);
+    Fetch_Doc(PolySearcher *self, int32_t doc_id, float score = 0.0);
 
     incremented DocVector*
     Fetch_Doc_Vec(PolySearcher *self, int32_t doc_id);

@@ -55,12 +55,11 @@ sub fetch {
     my ( $self, %args ) = @_;
     my $field  = $field{$$self};
     my $doc_id = delete $args{doc_id};
-    my $offset = delete $args{offset} || 0;
     my %fields = ( $field => '' );
     $self->read_record( $doc_id, \$fields{$field} );
     if ( defined $fields{$field} ) {
         return KinoSearch::Document::HitDoc->new(
-            doc_id => $doc_id + $offset,
+            doc_id => $doc_id,
             fields => \%fields,
         );
     }

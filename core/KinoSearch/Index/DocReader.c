@@ -86,19 +86,18 @@ PolyDocReader_destroy(PolyDocReader *self)
 }
 
 HitDoc*
-PolyDocReader_fetch(PolyDocReader *self, int32_t doc_id, float score, 
-                    int32_t offset)
+PolyDocReader_fetch(PolyDocReader *self, int32_t doc_id, float score)
 {
-    uint32_t seg_tick  = PolyReader_sub_tick(self->offsets, doc_id);
-    int32_t my_offset = I32Arr_Get(self->offsets, seg_tick);
+    uint32_t seg_tick = PolyReader_sub_tick(self->offsets, doc_id);
+    int32_t  offset   = I32Arr_Get(self->offsets, seg_tick);
     DocReader *doc_reader = (DocReader*)VA_Fetch(self->readers, seg_tick);
     HitDoc *hit_doc = NULL;
     if (!doc_reader) { 
         THROW(ERR, "Invalid doc_id: %i32", doc_id); 
     }
     else {
-        hit_doc = DocReader_Fetch(doc_reader, doc_id - my_offset, score, 
-            offset + my_offset);
+        hit_doc = DocReader_Fetch(doc_reader, doc_id - offset, score);
+        HitDoc_Set_Doc_ID(hit_doc, doc_id);
     }
     return hit_doc;
 }

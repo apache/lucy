@@ -84,10 +84,10 @@ IxSearcher_destroy(IndexSearcher *self)
 }
 
 HitDoc*
-IxSearcher_fetch_doc(IndexSearcher *self, int32_t doc_id, float score, int32_t offset)
+IxSearcher_fetch_doc(IndexSearcher *self, int32_t doc_id, float score)
 {
     if (!self->doc_reader) { THROW(ERR, "No DocReader"); }
-    return DocReader_Fetch(self->doc_reader, doc_id, score, offset);
+    return DocReader_Fetch(self->doc_reader, doc_id, score);
 }
 
 DocVector*
