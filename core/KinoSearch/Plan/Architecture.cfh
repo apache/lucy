@@ -22,13 +22,16 @@ parcel KinoSearch cnick Kino;
  * postings, stored documents, deletions, and highlight data.  The readers and
  * writers for that data are spawned by Architecture.  Each component operates
  * at the segment level; Architecture's factory methods are used to build up
- * SegWriter and SegReader.
+ * L<SegWriter|KinoSearch::Index::SegWriter> and
+ * L<SegReader|KinoSearch::Index::SegReader>.
  */
 class KinoSearch::Plan::Architecture cnick Arch inherits KinoSearch::Object::Obj {
 
     public inert incremented Architecture*
     new();
 
+    /** Constructor.  Takes no arguments.
+     */
     public inert Architecture*
     init(Architecture *self);
 
