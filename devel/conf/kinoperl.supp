@@ -25,13 +25,23 @@
 }
 
 {
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:kino_Memory_wrapped_calloc
+   fun:kino_LFReg_init
+   fun:kino_LFReg_new
+   fun:kino_VTable_init_registry
+   fun:*
+}
+
+{
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
    fun:kino_Memory_wrapped_malloc
    fun:kino_LFReg_register
    fun:kino_VTable_add_to_registry
-   fun:kino_VTable_singleton
    fun:*
 }
 
