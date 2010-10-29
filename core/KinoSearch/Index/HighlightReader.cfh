@@ -31,7 +31,7 @@ class KinoSearch::Index::HighlightReader cnick HLReader
     /** Return the DocVector object for the given doc id.
      */
     public abstract incremented DocVector*
-    Fetch(HighlightReader *self, int32_t doc_id);
+    Fetch_Doc_Vec(HighlightReader *self, int32_t doc_id);
 
     public incremented nullable HighlightReader*
     Aggregator(HighlightReader *self, VArray *readers, I32Array *offsets);
@@ -50,7 +50,7 @@ class KinoSearch::Index::PolyHighlightReader cnick PolyHLReader
     init(PolyHighlightReader *self, VArray *readers, I32Array *offsets);
 
     public incremented DocVector*
-    Fetch(PolyHighlightReader *self, int32_t doc_id);
+    Fetch_Doc_Vec(PolyHighlightReader *self, int32_t doc_id);
 
     public void
     Close(PolyHighlightReader *self);
@@ -78,7 +78,7 @@ class KinoSearch::Index::DefaultHighlightReader cnick DefHLReader
     /** Return the DocVector object for the given doc id.
      */
     public incremented DocVector*
-    Fetch(DefaultHighlightReader *self, int32_t doc_id);
+    Fetch_Doc_Vec(DefaultHighlightReader *self, int32_t doc_id);
 
     /** Return the raw bytes of an entry.
      */

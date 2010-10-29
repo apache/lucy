@@ -94,7 +94,7 @@ DocVector*
 IxSearcher_fetch_doc_vec(IndexSearcher *self, int32_t doc_id)
 {
     if (!self->hl_reader) { THROW(ERR, "No HighlightReader"); }
-    return HLReader_Fetch(self->hl_reader, doc_id);
+    return HLReader_Fetch_Doc_Vec(self->hl_reader, doc_id);
 }
 
 int32_t 

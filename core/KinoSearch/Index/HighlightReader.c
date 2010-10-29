@@ -96,14 +96,14 @@ PolyHLReader_destroy(PolyHighlightReader *self)
 }
 
 DocVector*
-PolyHLReader_fetch(PolyHighlightReader *self, int32_t doc_id)
+PolyHLReader_fetch_doc_vec(PolyHighlightReader *self, int32_t doc_id)
 {
     uint32_t seg_tick = PolyReader_sub_tick(self->offsets, doc_id);
     int32_t offset   = I32Arr_Get(self->offsets, seg_tick);
     HighlightReader *sub_reader 
         = (HighlightReader*)VA_Fetch(self->readers, seg_tick);
     if (!sub_reader) { THROW(ERR, "Invalid doc_id: %i32", doc_id); }
-    return HLReader_Fetch(sub_reader, doc_id - offset);
+    return HLReader_Fetch_Doc_Vec(sub_reader, doc_id - offset);
 }
 
 DefaultHighlightReader*
@@ -198,7 +198,7 @@ DefHLReader_destroy(DefaultHighlightReader *self)
 }
 
 DocVector*
-DefHLReader_fetch(DefaultHighlightReader *self, int32_t doc_id)
+DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id)
 {
     DocVector *doc_vec = DocVec_new();
     int64_t file_pos;
