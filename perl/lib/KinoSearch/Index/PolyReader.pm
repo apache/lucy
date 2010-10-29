@@ -28,7 +28,7 @@ my $synopsis = <<'END_SYNOPSIS';
     );
     my $doc_reader = $polyreader->obtain("KinoSearch::Index::DocReader");
     for my $doc_id ( 1 .. $polyreader->doc_max ) {
-        my $doc = $doc_reader->fetch($doc_id);
+        my $doc = $doc_reader->fetch_doc($doc_id);
         print " $doc_id: $doc->{title}\n";
     }
 END_SYNOPSIS

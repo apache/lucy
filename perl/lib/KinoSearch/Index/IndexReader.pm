@@ -53,7 +53,7 @@ my $synopsis = <<'END_SYNOPSIS';
         print "Segment $seg_name ($num_docs documents):\n";
         my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
         for my $doc_id ( 1 .. $num_docs ) {
-            my $doc = $doc_reader->fetch($doc_id);
+            my $doc = $doc_reader->fetch_doc($doc_id);
             print "  $doc_id: $doc->{title}\n";
         }
     }

@@ -24,17 +24,17 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
-    my $doc        = $doc_reader->fetch( doc_id => $doc_id );
+    my $doc        = $doc_reader->fetch_doc($doc_id);
 END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
     parcel            => "KinoSearch",
     class_name        => "KinoSearch::Index::DocReader",
     bind_constructors => ["new"],
-    bind_methods      => [qw( Fetch )],
+    bind_methods      => [qw( Fetch_Doc )],
     make_pod          => {
         synopsis => $synopsis,
-        methods  => [qw( fetch aggregator )],
+        methods  => [qw( fetch_doc aggregator )],
     },
 );
 Clownfish::Binding::Perl::Class->register(

@@ -120,7 +120,7 @@ for my $field (qw( name speed weight home cat wheels )) {
     my $sort_cache = $sort_reader->fetch_sort_cache($field);
     for ( 1 .. $seg_reader->doc_max ) {
         is( $sort_cache->value( ord => $sort_cache->ordinal($_) ),
-            $doc_reader->fetch($_)->{$field},
+            $doc_reader->fetch_doc($_)->{$field},
             "correct cached value doc $_ "
         );
     }
@@ -167,7 +167,7 @@ for my $field (qw( name speed weight home cat wheels )) {
     my $sort_cache = $sort_reader->fetch_sort_cache($field);
     for ( 1 .. $seg_reader->doc_max ) {
         is( $sort_cache->value( ord => $sort_cache->ordinal($_) ),
-            $doc_reader->fetch($_)->{$field},
+            $doc_reader->fetch_doc($_)->{$field},
             "correct cached value field $field doc $_ "
         );
     }

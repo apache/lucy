@@ -51,7 +51,7 @@ sub new {
     return $self;
 }
 
-sub fetch {
+sub fetch_doc {
     my ( $self, $doc_id ) = @_;
     my $field = $field{$$self};
     my %fields = ( $field => '' );

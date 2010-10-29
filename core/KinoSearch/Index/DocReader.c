@@ -86,7 +86,7 @@ PolyDocReader_destroy(PolyDocReader *self)
 }
 
 HitDoc*
-PolyDocReader_fetch(PolyDocReader *self, int32_t doc_id)
+PolyDocReader_fetch_doc(PolyDocReader *self, int32_t doc_id)
 {
     uint32_t seg_tick = PolyReader_sub_tick(self->offsets, doc_id);
     int32_t  offset   = I32Arr_Get(self->offsets, seg_tick);
@@ -96,7 +96,7 @@ PolyDocReader_fetch(PolyDocReader *self, int32_t doc_id)
         THROW(ERR, "Invalid doc_id: %i32", doc_id); 
     }
     else {
-        hit_doc = DocReader_Fetch(doc_reader, doc_id - offset);
+        hit_doc = DocReader_Fetch_Doc(doc_reader, doc_id - offset);
         HitDoc_Set_Doc_ID(hit_doc, doc_id);
     }
     return hit_doc;

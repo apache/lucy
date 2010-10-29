@@ -60,7 +60,7 @@ sub new {
     return $self;
 }
 
-sub fetch {
+sub fetch_doc {
     my ( $self, $doc_id ) = @_;
     my $dat_in     = $dat_in{$$self};
     my $ix_in      = $ix_in{$$self};
