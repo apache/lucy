@@ -45,6 +45,7 @@ Clownfish::Binding::Perl::Class->register(
     make_pod          => {
         synopsis    => $synopsis,
         constructor => { sample => $constructor },
+        methods     => [qw( get_field get_term )],
     },
 );
 Clownfish::Binding::Perl::Class->register(

@@ -41,12 +41,12 @@ class KinoSearch::Search::TermQuery inherits KinoSearch::Search::Query
 
     /** Accessor for object's <code>field</code> member. 
      */
-    CharBuf*
+    public CharBuf*
     Get_Field(TermQuery *self);
 
     /** Accessor for object's <code>term</code> member. 
      */
-    Obj*
+    public Obj*
     Get_Term(TermQuery *self);
 
     public incremented Compiler*
