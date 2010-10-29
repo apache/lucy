@@ -18,9 +18,9 @@ parcel KinoSearch cnick Kino;
 
 /** Intersect multiple result sets.
  *
- * ANDQuery matches only when all of its children match, so its result set is
- * the intersection of their result sets.  Those lucky documents which match
- * receive a summed score.
+ * ANDQuery is a composite Query which matches only when all of its children
+ * match, so its result set is the intersection of their result sets.
+ * Documents which match receive a summed score.
  */
 class KinoSearch::Search::ANDQuery inherits KinoSearch::Search::PolyQuery 
     : dumpable {

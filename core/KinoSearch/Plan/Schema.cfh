@@ -42,7 +42,7 @@ class KinoSearch::Plan::Schema inherits KinoSearch::Object::Obj {
     public inert Schema*
     init(Schema *self);
 
-    /** Factory method which returns the Architecture for this index. 
+    /** Factory method which creates an Architecture object for this index. 
      */
     public incremented Architecture*
     Architecture(Schema *self);
@@ -51,7 +51,7 @@ class KinoSearch::Plan::Schema inherits KinoSearch::Object::Obj {
      *
      * If this method has already been called for the supplied
      * <code>field</code>, it will merely test to verify that the supplied
-     * FieldType Equals() the existing one, then return.
+     * FieldType Equals() the existing one.
      *
      * @param name The name of the field.
      * @param type A FieldType.
@@ -81,7 +81,7 @@ class KinoSearch::Plan::Schema inherits KinoSearch::Object::Obj {
     public uint32_t
     Num_Fields(Schema *self);
 
-    /** Return all the Schema's field names.
+    /** Return all the Schema's field names as an array.
      */
     public incremented VArray*
     All_Fields(Schema *self);
