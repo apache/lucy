@@ -19,8 +19,8 @@ parcel KinoSearch cnick Kino;
 /** Retrieve stored documents.
  * 
  * DocReader defines the interface by which documents (with all stored fields)
- * are retrieved from the index.  The default implementation returns HitDoc
- * objects.
+ * are retrieved from the index.  The default implementation returns
+ * L<HitDoc|KinoSearch::Document::HitDoc> objects.
  */
 class KinoSearch::Index::DocReader inherits KinoSearch::Index::DataReader {
 

@@ -22,7 +22,8 @@ parcel KinoSearch cnick Kino;
  * written, are never modified, a Snapshot defines a point-in-time view of the
  * data in an index.
  *
- * IndexReader objects interpret the data associated with a single Snapshot.
+ * L<IndexReader|KinoSearch::Index::IndexReader> objects interpret the data
+ * associated with a single Snapshot.
  */
 
 class KinoSearch::Index::Snapshot inherits KinoSearch::Object::Obj : dumpable {

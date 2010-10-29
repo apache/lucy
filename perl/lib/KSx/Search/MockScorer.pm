@@ -59,9 +59,9 @@ KSx::Search::MockScorer - Matcher with arbitrary docs and scores.
 
 =head1 DESCRIPTION 
 
-Used for testing combining scorers such as ANDScorer, MockScorer allows
-arbitrary match criteria to be supplied, obviating the need for clever index
-construction to cover corner cases.
+Used for testing combining L<Matchers|KinoSearch::Search::Matcher> such as
+ANDScorer, MockScorer allows arbitrary match criteria to be supplied,
+obviating the need for clever index construction to cover corner cases.
 
 MockScorer is a testing and demonstration class; it is unsupported.
 

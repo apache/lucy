@@ -18,8 +18,9 @@ parcel KinoSearch cnick Kino;
 
 /** Abstract base class for reading index data.
  * 
- * DataReader is the companion class to DataWriter.  Every index
- * component will implement one of each.
+ * DataReader is the companion class to
+ * L<DataWriter|KinoSearch::Index::DataWriter>.  Every index component will
+ * implement one of each.
  */
 
 class KinoSearch::Index::DataReader inherits KinoSearch::Object::Obj {

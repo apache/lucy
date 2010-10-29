@@ -18,11 +18,13 @@ parcel KinoSearch cnick Kino;
 
 /** Invert the result set of another Query.
  * 
- * A NOTQuery wraps another Query and matches against its inverse document
- * set.  All matching docs recieve a score of 0.0.
+ * A NOTQuery wraps another L<Query|KinoSearch::Search::Query> and matches
+ * against its inverse document set.  All matching docs recieve a score of
+ * 0.0.
  *
- * NOTQuery is often used in conjunction with ANDQuery to provide 
- * "a AND NOT b" semantics.
+ * NOTQuery is often used in conjunction with
+ * L<ANDQuery|KinoSearch::Search::ANDQuery> to provide "a AND NOT b"
+ * semantics.
  */
 
 class KinoSearch::Search::NOTQuery inherits KinoSearch::Search::PolyQuery 

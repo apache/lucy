@@ -30,7 +30,7 @@ my $synopsis = <<'END_SYNOPSIS';
         analyzers => [ $case_folder, $tokenizer, $stopalizer, $stemmer ],
     );
 
-This class uses Lingua::StopWords for its default stoplists, so it supports
+This class uses L<Lingua::StopWords> for its default stoplists, so it supports
 the same set of languages.
 END_SYNOPSIS
 

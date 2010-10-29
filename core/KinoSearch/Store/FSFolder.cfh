@@ -18,7 +18,7 @@ parcel KinoSearch cnick Kino;
 
 /** File System implementation of Folder.
  *
- * Implementation of KinoSearch::Store::Folder using a single file system 
+ * Implementation of L<KinoSearch::Store::Folder> using a single file system
  * directory and multiple files.
  */
 

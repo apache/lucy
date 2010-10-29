@@ -125,8 +125,8 @@ KSx::Index::ByteBufDocWriter - Write a Doc as a fixed-width byte array.
 
 =head1 SYNOPSIS
 
-Create an Architecture subclass which overrides register_doc_writer() and
-register_doc_reader():
+Create an L<Architecture|KinoSearch::Plan::Architecture> subclass which
+overrides register_doc_writer() and register_doc_reader():
 
     package MyArchitecture;
     use base qw( KinoSearch::Plan::Architecture );

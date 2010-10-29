@@ -20,8 +20,10 @@ parcel KinoSearch cnick Kino;
 /** Write one segment of an index.
  *
  * SegWriter is a conduit through which information fed to Indexer passes.  It
- * manages Segment and Inverter, invokes the Analyzer chain, and feeds low
- * level DataWriters such as PostingListWriter and DocWriter.  
+ * manages L<Segment|KinoSearch::Index::Segment> and Inverter, invokes the
+ * L<Analyzer|KinoSearch::Analysis::Analyzer> chain, and feeds low
+ * level L<DataWriters|KinoSearch::Index::DataWriter> such as
+ * PostingListWriter and DocWriter.
  * 
  * The sub-components of a SegWriter are determined by
  * L<Architecture|KinoSearch::Plan::Architecture>.  DataWriter components

@@ -22,15 +22,16 @@ parcel KinoSearch cnick Kino;
  * necessary to define a search query.  
  * 
  * The most common way to generate Query objects is to feed a search string
- * such as 'foo AND bar' to a QueryParser's Parse() method, which outputs an
- * abstract syntax tree built up from various Query subclasses such as
- * ANDQuery and TermQuery.  However, it is also possible to use custom Query
- * objects to build a search specification which cannot be easily represented
- * using a search string.
+ * such as 'foo AND bar' to a L<QueryParser's|KinoSearch::Search::QueryParser>
+ * Parse() method, which outputs an abstract syntax tree built up from various
+ * Query subclasses such as L<ANDQuery|KinoSearch::Search::ANDQuery> and
+ * L<TermQuery|KinoSearch::Search::TermQuery>.  However, it is also possible
+ * to use custom Query objects to build a search specification which cannot be
+ * easily represented using a search string.
  * 
  * Subclasses of Query must implement Make_Compiler(), which is the first step
- * in compiling a Query down to a Matcher which can actually match and score
- * documents. 
+ * in compiling a Query down to a L<Matcher|KinoSearch::Search::Matcher> which
+ * can actually match and score documents. 
  */
 
 class KinoSearch::Search::Query inherits KinoSearch::Object::Obj : dumpable {

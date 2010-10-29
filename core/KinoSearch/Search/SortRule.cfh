@@ -18,9 +18,10 @@ parcel KinoSearch cnick Kino;
 
 /** Element of a SortSpec.
  *
- * SortRules are the building blocks used to assemble SortSpecs; each SortRule
- * defines a single level of sorting.  For example, sorting first by
- * "category" then by score requires a SortSpec with two SortRule elements.
+ * SortRules are the building blocks used to assemble
+ * L<SortSpecs|KinoSearch::Search::SortSpec>; each SortRule defines a single
+ * level of sorting.  For example, sorting first by "category" then by score
+ * requires a SortSpec with two SortRule elements.
  */
 class KinoSearch::Search::SortRule inherits KinoSearch::Object::Obj {
 

@@ -18,9 +18,13 @@ parcel KinoSearch cnick Kino;
 
 /** Base class for composite Query objects.
  *
- * PolyQuery serves as a shared base class for ANDQuery, ORQuery, NOTQuery,
- * and RequiredOptionalQuery.  All of these classes may serve as nodes in
- * composite Query with a tree structure which may be walked.
+ * PolyQuery serves as a shared base class for
+ * L<ANDQuery|KinoSearch::Search::ANDQuery>,
+ * L<ORQuery|KinoSearch::Search::ORQuery>,
+ * L<NOTQuery|KinoSearch::Search::NOTQuery>, and
+ * L<RequiredOptionalQuery|KinoSearch::Search::RequiredOptionalQuery>.  All of
+ * these classes may serve as nodes in composite Query with a tree structure
+ * which may be walked.
  */
 abstract class KinoSearch::Search::PolyQuery
     inherits KinoSearch::Search::Query : dumpable {

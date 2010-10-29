@@ -18,9 +18,10 @@ parcel KinoSearch cnick Kino;
 
 /** Union multiple result sets.
  *
- * ORQuery is a composite Query which matches when any of its children match,
- * so its result set is the union of their result sets.  Matching documents
- * recieve a summed score from all matching child Queries.
+ * ORQuery is a composite L<Query|KinoSearch::Search::Query> which matches
+ * when any of its children match, so its result set is the union of their
+ * result sets.  Matching documents recieve a summed score from all matching
+ * child Queries.
  */
 
 class KinoSearch::Search::ORQuery inherits KinoSearch::Search::PolyQuery 

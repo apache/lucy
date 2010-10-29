@@ -19,7 +19,7 @@ parcel KinoSearch cnick Kino;
 /** In-memory Folder implementation.
  * 
  * RAMFolder is an entirely in-memory implementation of
- * KinoSearch::Store::Folder, primarily used for testing and development.
+ * L<KinoSearch::Store::Folder>, primarily used for testing and development.
  */
 
 class KinoSearch::Store::RAMFolder inherits KinoSearch::Store::Folder {

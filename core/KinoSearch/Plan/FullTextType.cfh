@@ -21,8 +21,9 @@ parcel KinoSearch cnick Kino;
  * KinoSearch::Plan::FullTextType is an implementation of
  * L<KinoSearch::Plan::FieldType> tuned for "full text search".  
  *
- * Full text fields are associated with an Analyzer, which is used to tokenize
- * and normalize the text so that it can be searched for individual words.
+ * Full text fields are associated with an
+ * L<Analyzer|KinoSearch::Analysis::Analyzer>, which is used to tokenize and
+ * normalize the text so that it can be searched for individual words.
  * 
  * For an exact-match, single value field type using character data, see
  * L<StringType|KinoSearch::Plan::StringType>.

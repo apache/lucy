@@ -20,10 +20,11 @@ parcel KinoSearch cnick Kino;
  * 
  * DataWriter is an abstract base class for writing index data, generally in
  * segment-sized chunks. Each component of an index -- e.g. stored fields,
- * lexicon, postings, deletions -- is represented by a DataWriter/DataReader
- * pair.
+ * lexicon, postings, deletions -- is represented by a
+ * DataWriter/L<DataReader|KinoSearch::Index::DataReader> pair.
  *
- * Components may be specified per index by subclassing Architecture.
+ * Components may be specified per index by subclassing
+ * L<Architecture|KinoSearch::Plan::Architecture>.
  */
 
 public class KinoSearch::Index::DataWriter inherits KinoSearch::Object::Obj {

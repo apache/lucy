@@ -22,8 +22,9 @@ parcel KinoSearch cnick Kino;
  * an index contains three segments with 10 documents each, PolyReader's
  * Doc_Max() method will return 30.
  * 
- * Some of PolyReader's DataReader components may be less efficient or
- * complete than the single-segment implementations accessed via SegReader.
+ * Some of PolyReader's L<DataReader|KinoSearch::Index::DataReader> components
+ * may be less efficient or complete than the single-segment implementations
+ * accessed via L<SegReader|KinoSearch::Index::SegReader>.
  */
 class KinoSearch::Index::PolyReader inherits KinoSearch::Index::IndexReader {
 

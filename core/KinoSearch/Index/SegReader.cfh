@@ -24,7 +24,8 @@ parcel KinoSearch cnick Kino;
  * data at the segment level need to deal with the SegReader API directly.  
  * 
  * Nearly all of SegReader's functionality is implemented by pluggable
- * components spawned by Architecture's factory methods.
+ * components spawned by L<Architecture|KinoSearch::Plan::Architecture>'s
+ * factory methods.
  */
 
 class KinoSearch::Index::SegReader inherits KinoSearch::Index::IndexReader {

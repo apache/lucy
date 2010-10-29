@@ -19,7 +19,8 @@ parcel KinoSearch cnick Kino;
 /** Query-to-Matcher compiler.
  *
  * The purpose of the Compiler class is to take a specification in the form of
- * a Query object and compile a Matcher object that can do real work.  
+ * a L<Query|KinoSearch::Search::Query> object and compile a
+ * L<Matcher|KinoSearch::Search::Matcher> object that can do real work.  
  * 
  * The simplest Compiler subclasses -- such as those associated with
  * constant-scoring Query types -- might simply implement a Make_Matcher()
@@ -35,25 +36,26 @@ parcel KinoSearch cnick Kino;
  * Compiling a Matcher is a two stage process. 
  *
  * The first stage takes place during the Compiler's constructor, which is
- * where the Query object meets a Searcher object for the first time.
- * Searchers operate on a specific document collection and they can tell you
- * certain statistical information about the collection -- such as how many
- * total documents are in the collection, or how many documents in the
- * collection a particular term is present in.  KinoSearch's core Compiler
- * classes plug this information into the classic TF/IDF weighting algorithm
- * to adjust the Compiler's weight; custom subclasses might do something
- * similar.
+ * where the Query object meets a L<Searcher|KinoSearch::Search::Searcher>
+ * object for the first time.  Searchers operate on a specific document
+ * collection and they can tell you certain statistical information about the
+ * collection -- such as how many total documents are in the collection, or
+ * how many documents in the collection a particular term is present in.
+ * KinoSearch's core Compiler classes plug this information into the classic
+ * TF/IDF weighting algorithm to adjust the Compiler's weight; custom
+ * subclasses might do something similar.
  *
  * The second stage of compilation is Make_Matcher(), method, which is where
- * the Compiler meets a SegReader object.  SegReaders are associated with a
- * single segment within a single index on a single machine, and are thus
- * lower-level than Searchers, which may represent a document collection
- * spread out over a search cluster (comprising several indexes and many
- * segments).  The Compiler object can use new information supplied by the
- * SegReader -- such as whether a term is missing from the local index even
- * though it is present within the larger collection represented by the
- * Searcher -- when figuring out what to feed to the Matchers's constructor,
- * or whether Make_Matcher() should return a Matcher at all.
+ * the Compiler meets a L<SegReader|KinoSearch::Index::SegReader> object.
+ * SegReaders are associated with a single segment within a single index on a
+ * single machine, and are thus lower-level than Searchers, which may
+ * represent a document collection spread out over a search cluster
+ * (comprising several indexes and many segments).  The Compiler object can
+ * use new information supplied by the SegReader -- such as whether a term is
+ * missing from the local index even though it is present within the larger
+ * collection represented by the Searcher -- when figuring out what to feed to
+ * the Matchers's constructor, or whether Make_Matcher() should return a
+ * Matcher at all.
  */
 class KinoSearch::Search::Compiler inherits KinoSearch::Search::Query {
 

@@ -18,8 +18,9 @@ parcel KinoSearch cnick Kino;
 
 /** Read from an inverted index.
  * 
- * IndexReader is the interface through which Searchers access the content of
- * an index.
+ * IndexReader is the interface through which
+ * L<IndexSearcher|KinoSearch::Search::IndexSearcher> objects access the
+ * content of an index.
  * 
  * IndexReader objects always represent a point-in-time view of an index as it
  * existed at the moment the reader was created.  If you want search results

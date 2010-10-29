@@ -20,7 +20,8 @@ parcel KinoSearch cnick Kino;
  *
  * NoMatchQuery is a utility class representing a query which matches nothing.
  * Typical usage might include e.g. returning a NoMatchQuery when a
- * QueryParser is asked to parse an empty string.
+ * L<QueryParser|KinoSearch::Search::QueryParser> is asked to parse an empty
+ * string.
  */
 class KinoSearch::Search::NoMatchQuery inherits KinoSearch::Search::Query
     : dumpable {

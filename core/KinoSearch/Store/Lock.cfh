@@ -157,8 +157,8 @@ class KinoSearch::Store::LockFileLock cnick LFLock
 
 /** Lock exception. 
  *
- * LockErr is a subclass of Err which indicates that a file locking problem
- * occurred.
+ * LockErr is a subclass of L<Err|KinoSearch::Object::Err> which indicates
+ * that a file locking problem occurred.
  */
 class KinoSearch::Store::LockErr inherits KinoSearch::Object::Err {
     
