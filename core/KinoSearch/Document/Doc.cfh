@@ -39,7 +39,9 @@ public class KinoSearch::Document::Doc inherits KinoSearch::Object::Obj
     public inert Doc* 
     init(Doc *self, void *fields = NULL, int32_t doc_id = 0);
 
-    void
+    /** Set internal KinoSearch document id. 
+     */
+    public void
     Set_Doc_ID(Doc *self, int32_t doc_id);
 
     /** Retrieve internal KinoSearch document id. 
