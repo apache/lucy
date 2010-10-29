@@ -61,9 +61,7 @@ sub new {
 }
 
 sub fetch {
-    my ( $self, %args ) = @_;
-    my $doc_id     = delete $args{doc_id};
-    my $score      = delete $args{score} || 0;
+    my ( $self, $doc_id ) = @_;
     my $dat_in     = $dat_in{$$self};
     my $ix_in      = $ix_in{$$self};
     my $bin_fields = $binary_fields{$$self};
@@ -97,7 +95,6 @@ sub fetch {
     return KinoSearch::Document::HitDoc->new(
         fields => \%fields,
         doc_id => $doc_id,
-        score  => $score,
     );
 }
 

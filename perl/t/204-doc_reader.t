@@ -80,7 +80,7 @@ my $doc_reader = KinoSearch::Index::DefaultDocReader->new(
     seg_tick => 0,
 );
 
-my $doc = $doc_reader->fetch( doc_id => 0 );
+my $doc = $doc_reader->fetch(0);
 
 is( $doc->{text},     $val,     "text" );
 is( $doc->{bin},      $bin_val, "bin" );

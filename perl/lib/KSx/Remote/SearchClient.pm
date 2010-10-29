@@ -106,8 +106,8 @@ sub terminate {
 }
 
 sub fetch_doc {
-    my $self = shift;
-    return $self->_rpc( 'fetch_doc', {@_} );
+    my ( $self, $doc_id ) = @_;
+    return $self->_rpc( 'fetch_doc', { doc_id => $doc_id } );
 }
 
 sub fetch_doc_vec {

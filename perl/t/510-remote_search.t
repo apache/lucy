@@ -100,7 +100,7 @@ my $searchclient = KSx::Remote::SearchClient->new(
 is( $searchclient->doc_freq( field => 'content', term => 'x' ),
     3, "doc_freq" );
 is( $searchclient->doc_max, 3, "doc_max" );
-isa_ok( $searchclient->fetch_doc( doc_id => 1 ),
+isa_ok( $searchclient->fetch_doc(1),
     "KinoSearch::Document::HitDoc", "fetch_doc" );
 isa_ok(
     $searchclient->fetch_doc_vec(1),

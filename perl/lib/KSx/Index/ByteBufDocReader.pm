@@ -52,20 +52,14 @@ sub new {
 }
 
 sub fetch {
-    my ( $self, %args ) = @_;
-    my $field  = $field{$$self};
-    my $doc_id = delete $args{doc_id};
+    my ( $self, $doc_id ) = @_;
+    my $field = $field{$$self};
     my %fields = ( $field => '' );
     $self->read_record( $doc_id, \$fields{$field} );
-    if ( defined $fields{$field} ) {
-        return KinoSearch::Document::HitDoc->new(
-            doc_id => $doc_id,
-            fields => \%fields,
-        );
-    }
-    else {
-        return undef;
-    }
+    return KinoSearch::Document::HitDoc->new(
+        doc_id => $doc_id,
+        fields => \%fields,
+    );
 }
 
 sub read_record {

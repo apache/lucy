@@ -30,8 +30,7 @@
 #include "KinoSearch/Store/InStream.h"
 
 kino_HitDoc*
-kino_DefDocReader_fetch(kino_DefaultDocReader *self, int32_t doc_id, 
-                        float score)
+kino_DefDocReader_fetch(kino_DefaultDocReader *self, int32_t doc_id)
 {
     kino_Schema   *const schema = self->schema;
     kino_InStream *const dat_in = self->dat_in;
@@ -120,7 +119,7 @@ kino_DefDocReader_fetch(kino_DefaultDocReader *self, int32_t doc_id,
     SvREFCNT_dec(field_name_sv);
 
     {
-        kino_HitDoc *retval = kino_HitDoc_new(fields, doc_id, score);
+        kino_HitDoc *retval = kino_HitDoc_new(fields, doc_id, 0.0);
         SvREFCNT_dec((SV*)fields);
         return retval;
     }

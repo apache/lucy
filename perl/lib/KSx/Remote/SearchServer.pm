@@ -155,7 +155,7 @@ sub do_doc_max {
 
 sub do_fetch_doc {
     my ( $self, $args ) = @_;
-    my $doc = $searcher{$$self}->fetch_doc(%$args);
+    my $doc = $searcher{$$self}->fetch_doc( $args->{doc_id} );
     return { retval => $doc };
 }
 

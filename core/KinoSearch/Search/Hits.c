@@ -64,10 +64,11 @@ Hits_next(Hits *self)
     }
     else {
         // Lazily fetch HitDoc, set score. 
-        HitDoc *doc = Searcher_Fetch_Doc(self->searcher,
-            match_doc->doc_id, match_doc->score);
+        HitDoc *hit_doc = Searcher_Fetch_Doc(self->searcher,
+            match_doc->doc_id);
+        HitDoc_Set_Score(hit_doc, match_doc->score);
 
-        return doc;
+        return hit_doc;
     }
 }
 

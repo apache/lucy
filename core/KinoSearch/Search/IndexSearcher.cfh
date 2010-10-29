@@ -61,7 +61,7 @@ class KinoSearch::Search::IndexSearcher cnick IxSearcher
              SortSpec *sort_spec = NULL);
 
     public incremented HitDoc*
-    Fetch_Doc(IndexSearcher *self, int32_t doc_id, float score = 0.0);
+    Fetch_Doc(IndexSearcher *self, int32_t doc_id);
 
     incremented DocVector*
     Fetch_Doc_Vec(IndexSearcher *self, int32_t doc_id);
