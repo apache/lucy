@@ -1,5 +1,347 @@
 Revision history for KinoSearch
 
+0.31  2010-10-27
+
+  Overview of changes since release 0.165:
+
+    KinoSearch 0.31 is a major upgrade, adding numerous features and
+    improvements:
+
+    * Greatly increased speed.
+    * Near-real-time indexing.
+    * Sorting by field value.
+    * Range queries.
+    * Robust Unicode support.
+    * Improved subclassing support.
+    * "Lightweight Searchers", which open quickly and have low process RAM
+      requirements.
+    * Expanded public API (increasing from 33 to 78 public classes)
+    * Refined and improved schema, query-building, and document APIs.
+    * Expanded tutorial and cookbook documentation.
+
+    Release 0.31 is not backwards compatible with the 0.1x branch in terms of
+    either file format or API.  Users who require the functionality of 0.1x
+    should consider the stable fork "KinoSearch1".
+
+  Major internal changes:
+
+    * Almost all core module code ported to C.
+    * Greatly increased integration with the OS file system cache.
+    * Schema data serialized and stored with index.
+    * New internal object model ("Clownfish").
+
+  New classes:
+
+    * KinoSearch::Document::HitDoc
+    * KinoSearch::Index::BackgroundMerger
+    * KinoSearch::Index::DataReader
+    * KinoSearch::Index::DataWriter
+    * KinoSearch::Index::DeletionsWriter
+    * KinoSearch::Index::DocReader
+    * KinoSearch::Index::IndexManager
+    * KinoSearch::Index::IndexReader
+    * KinoSearch::Index::Lexicon
+    * KinoSearch::Index::LexiconReader
+    * KinoSearch::Index::PolyReader
+    * KinoSearch::Index::PostingList
+    * KinoSearch::Index::PostingListReader
+    * KinoSearch::Index::Segment
+    * KinoSearch::Index::SegReader
+    * KinoSearch::Index::SegWriter
+    * KinoSearch::Index::Similarity
+    * KinoSearch::Index::Snapshot
+    * KinoSearch::Object::BitVector
+    * KinoSearch::Object::Err
+    * KinoSearch::Object::Obj
+    * KinoSearch::Plan::Architecture
+    * KinoSearch::Plan::BlobType
+    * KinoSearch::Plan::FieldType
+    * KinoSearch::Plan::FullTextType
+    * KinoSearch::Plan::Schema
+    * KinoSearch::Plan::StringType
+    * KinoSearch::Search::ANDQuery
+    * KinoSearch::Search::Collector
+    * KinoSearch::Search::Collector::BitCollector
+    * KinoSearch::Search::Compiler
+    * KinoSearch::Search::LeafQuery
+    * KinoSearch::Search::MatchAllQuery
+    * KinoSearch::Search::Matcher
+    * KinoSearch::Search::NoMatchQuery
+    * KinoSearch::Search::NOTQuery
+    * KinoSearch::Search::ORQuery
+    * KinoSearch::Search::PolyQuery
+    * KinoSearch::Search::QueryParser
+    * KinoSearch::Search::RangeQuery
+    * KinoSearch::Search::RequiredOptionalQuery
+    * KinoSearch::Search::Searcher
+    * KinoSearch::Search::SortRule
+    * KinoSearch::Search::SortSpec
+    * KinoSearch::Search::Span
+    * KinoSearch::Store::Lock
+    * KinoSearch::Store::LockErr
+    * KinoSearch::Store::LockFactory
+    * KSx::Index::ByteBufDocReader
+    * KSx::Index::ByteBufDocWriter
+    * KSx::Index::LongFieldSim
+    * KSx::Index::ZlibDocReader
+    * KSx::Index::ZlibDocWriter
+    * KSx::Search::MockScorer
+    * KSx::Search::ProximityQuery
+    * KSx::Simple
+
+  New documentation:
+
+    * KinoSearch::Docs::Cookbook
+    * KinoSearch::Docs::Cookbook::CustomQuery
+    * KinoSearch::Docs::Cookbook::CustomQueryParser
+    * KinoSearch::Docs::Cookbook::FastUpdates
+    * KinoSearch::Docs::DocIDs
+    * KinoSearch::Docs::FileLocking
+    * KinoSearch::Docs::IRTheory
+    * KinoSearch::Docs::Tutorial::Analysis
+    * KinoSearch::Docs::Tutorial::BeyondSimple
+    * KinoSearch::Docs::Tutorial::FieldType
+    * KinoSearch::Docs::Tutorial::Highlighter
+    * KinoSearch::Docs::Tutorial::QueryObjects
+    * KinoSearch::Docs::Tutorial::Simple
+
+  Moved classes:
+
+    * KinoSearch::InvIndexer               -> KinoSearch::Index::Indexer
+    * KinoSearch::Searcher                 -> KinoSearch::Search::IndexSearcher
+    * KinoSearch::Analysis::LCNormalizer   -> KinoSearch::Analysis::CaseFolder
+    * KinoSearch::QueryParser::QueryParser -> KinoSearch::Search::QueryParser
+    * KinoSearch::Search::MultiSearcher    -> KinoSearch::Search::PolySearcher
+    * KinoSearch::Search::QueryFilter      -> KSx::Search::Filter
+    * KinoSearch::Search::SearchClient     -> KSx::Remote::SearchClient
+    * KinoSearch::Search::SearchServer     -> KSx::Remote::SearchServer
+    * KinoSearch::Store::InvIndex          -> KinoSearch::Store::Folder
+    * KinoSearch::Store::FSInvIndex        -> KinoSearch::Store::FSFolder
+    * KinoSearch::Store::RAMInvIndex       -> KinoSearch::Store::RAMFolder
+    
+  Removed/redacted classes:
+  
+    * KinoSearch::Analysis::Token - Redacted.
+    * KinoSearch::Analysis::TokenBatch - Redacted.
+    * KinoSearch::Document::Field - Removed.
+    * KinoSearch::Highlight::Encoder - See Highlighter.
+    * KinoSearch::Highlight::Formatter - See Highlighter.
+    * KinoSearch::Highlight::SimpleHTMLEncoder - See Highlighter.
+    * KinoSearch::Highlight::SimpleHTMLFormatter - See Highlighter.
+    * KinoSearch::Index::Term - Removed.
+    * KinoSearch::Search::BooleanQuery - See ANDQuery, ORQuery,
+      NOTQuery, RequiredOptionalQuery, and PolyQuery.
+    * KinoSearch::Search::Hit - See HitDoc.
+ 
+  API Changes:
+
+    * KinoSearch::Index::Indexer (formerly KinoSearch::InvIndexer)
+      o Modified:
+        * new() - Args changed.  
+          o Replaced: "invindex" -> "index".
+          o Added: "schema", "truncate", "manager".
+          o Removed: "analyzer".
+      o Removed:
+        * spec_field() - See Schema.
+        * new_doc() - See Doc->new.
+        * finish() - see commit(), prepare_commit(), optimize().
+        * delete_docs_by_term() - see delete_by_term()
+        * add_invindexes() - see add_index()
+      o Added:
+        * commit()
+        * prepare_commit()
+        * optimize()
+        * add_index()
+        * delete_by_term()
+        * delete_by_query()
+
+    * KinoSearch::Search::IndexSearcher (formerly KinoSearch::Searcher)
+      o New behaviors:
+        * Searcher objects are now "lightweight" (or rather, the IndexReader
+          objects they wrap are lightweight) -- they cache index data via the
+          OS file system cache rather than in process RAM, allowing them to
+          open quickly and share memory across multiple objects.
+      o Modified:
+        * new() - Args changed.
+          o Removed: "analyzer", "invindex".
+          o Added: "index".
+      o Renamed:
+        * search() -> hits()
+      o Added:
+        * collect()
+        * doc_max()
+        * doc_freq()
+        * get_schema()
+        * get_reader()
+
+    * KinoSearch::Analysis::CaseFolder (formerly LCNormalizer)
+      o Modified:
+        * new() - no-op parameter "language" removed.
+
+    * KinoSearch::Analysis::Stopalizer
+      o Modified:
+        * new() - The values of a supplied "stoplist" hash are now ignored.
+
+    * KinoSearch::Analysis::Tokenizer
+      o Modified:
+        * new() - parameter "token_re" replaced by "pattern".
+
+    * KinoSearch::Document::Doc
+      o New behavior: field values accessible via hashref overloading.
+      o Removed:
+        * set_value()
+        * get_value()
+      o Added:
+        * new()
+        * get_fields()
+        * get_doc_id()
+
+    * KinoSearch::Highlight::Highlighter
+      o Modified:
+        * new() - Args changed.  
+          o Added: "query", "searcher".
+          o Removed: "formatter", "encoder", "pre_tag", "post_tag".
+          o Replaced: "excerpt_field" -> "field".
+      o Added:
+        * set_pre_tag()
+        * get_pre_tag()
+        * set_post_tag()
+        * get_post_tag()
+        * get_searcher()
+        * get_query()
+        * get_compiler()
+        * get_excerpt_length()
+        * get_field()
+
+    * KinoSearch::Search::QueryParser 
+      (formerly KinoSearch::QueryParser::QueryParser)
+      o Changed behaviors: 
+        * Parsing of 'fieldname:value' constructs disabled by
+          default, enabled via set_heed_colons().
+      o Modified:
+        * new() - Args changed.  
+          o Added: "schema".
+          o Removed: "default_field".
+      o Added:
+        * parse()
+        * tree()
+        * expand()
+        * expand_leaf()
+        * prune()
+        * set_heed_colons()
+        * make_term_query()
+        * make_phrase_query()
+        * make_and_query()
+        * make_or_query()
+        * make_not_query()
+        * make_req_opt_query()
+
+    * KinoSearch::Search::PolySearcher 
+      (formerly KinoSearch::Search::MultiSearcher)
+      o Modified:
+        * new() - Args changed.  
+          o Added: "schema".
+          o Removed: "analyzer".
+          o Renamed: "searchables" -> "searchers"
+      o Added:
+        * doc_max()
+        * doc_freq()
+        * fetch_doc()
+        * get_schema()
+      o Renamed: search() -> hits()
+
+    * KinoSearch::Search::Query 
+      o Added:
+        * make_compiler()
+
+    * KinoSearch::Search::PhraseQuery 
+      o Modified:
+        * new() - Args changed.  
+          o Added: "terms", "field".
+      o Added:
+        * get_field()
+        * get_terms()
+      o Removed:
+        * add_term()
+
+    * KinoSearch::Search::TermQuery
+      o Modified:
+        * new() - now accepts "field" and a text "term" as arguments, rather
+          than a "term" which is Term object combining field and term text.
+
+    * KinoSearch::Store::FSFolder
+      o Modified:
+        * new() - Args changed.
+          o Removed: "create".
+
+    * KSx::Remote::SearchClient (formerly KinoSearch::Search::SearchClient)
+      o Modified:
+        * new() - Args changed.  
+          o Removed: "analyzer".
+
+    * KSx::Remote::SearchServer (formerly KinoSearch::Search::SearchServer)
+      o Modified:
+        * new() - Args changed.  
+          o Replaced: "searchable" -> "searcher".
+
+
+0.30_13 2010-10-25
+
+  API changes:
+
+    * KinoSearch::Search::Searcher and its subclasses (IndexSearcher,
+        PolySearcher, SearchClient)
+      o Modified:
+        * fetch_doc() - Args changed.
+          o Now takes one argument, a doc id, instead of three labeled params.
+
+    * KinoSearch::Index::DocReader
+      o Replaced:
+        * fetch() -> fetch_doc()
+
+    * KinoSearch::Plan::Architecture:
+      o Added:
+        * new()
+
+    * KinoSearch::Search::TermQuery:
+      o Added:
+        * get_term()
+        * get_field()
+
+    * KinoSearch::Document::Doc
+      o Added:
+        * set_doc_id()
+        * get_doc_id()
+
+  Redacted:
+
+    * KinoSearch::Highlight::HeatMap.
+
+  Bugfixes:
+
+    * Spurious failure on Indexer commit() when some docs contain field values
+      of empty string eliminated.
+
+  Improvements:
+
+    * Documentation brought up to date and corrected in a few places.
+
+
+0.30_122 2010-10-06
+
+  Bugfixes:
+
+    * Tune merge algorithm to avoid another situation where too much content
+      would be recycled.
+
+
+0.30_121 2010-09-29
+
+  Bugfixes:
+
+    * Improve build portability for various systems.
+
+
 0.30_12  2010-09-24
 
   Backwards-incompatible API changes:
