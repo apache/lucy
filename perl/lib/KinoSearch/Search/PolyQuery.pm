@@ -22,12 +22,27 @@ __END__
 
 __BINDING__
 
+my $synopsis = <<'END_SYNOPSIS';
+    sub walk {
+        my $query = shift;
+        if ( $query->isa("KinoSearch::Search::PolyQuery") ) {
+            if    ( $query->isa("KinoSearch::Search::ORQuery") )  { ... }
+            elsif ( $query->isa("KinoSearch::Search::ANDQuery") ) { ... }
+            elsif ( $query->isa("KinoSearch::Search::RequiredOptionalQuery") ) {
+                ...
+            }
+            elsif ( $query->isa("KinoSearch::Search::NOTQuery") ) { ... }
+        }
+        else { ... }
+    }
+END_SYNOPSIS
+
 Clownfish::Binding::Perl::Class->register(
     parcel            => "KinoSearch",
     class_name        => "KinoSearch::Search::PolyQuery",
     bind_methods      => [qw( Add_Child Set_Children Get_Children )],
     bind_constructors => ["new"],
-    make_pod          => {}
+    make_pod          => { synopsis => $synopsis, },
 );
 
 
