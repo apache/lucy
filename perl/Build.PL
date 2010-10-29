@@ -38,8 +38,8 @@ if ( $conflict and !$ENV{KINO_DEBUG} ) {
 
 *** WARNING ***
 An existing installation of KinoSearch version $existing has been detected.
-This release breaks backwards compatibility with versions of KinoSearch prior
-to 0.20.  Both the file format and the API have changed.
+This release breaks backwards compatibility with the 0.1x branch.  Both the
+file format and the API have changed.
 
 END_WARNING
 
