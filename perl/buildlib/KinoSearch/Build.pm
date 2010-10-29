@@ -28,6 +28,11 @@ my %cc;
 sub new {
     my ( $class, %args ) = @_;
     require ExtUtils::CBuilder;
+    if ( $ENV{KINO_VALGRIND} ) {
+        $args{config} ||= {};
+        $args{config}{optimize} ||= $Config{optimize};
+        $args{config}{optimize} =~ s/\-O\d+/-O1/g;
+    }
     my $self = $class->SUPER::new(%args);
     $cc{"$self"} = $args{'config'}->{'cc'};
     return $self;
@@ -384,8 +389,8 @@ sub ACTION_suppressions {
     my $suppressions = `$command`;
     $suppressions =~ s/^==.*?\n//mg;
     my $rule_number = 1;
-    while ( $suppressions =~ /<insert a.*?>/ ) {
-        $suppressions =~ s/^\s*<insert a.*?>/{\n  <core_perl_$rule_number>/m;
+    while ( $suppressions =~ /<insert.a.*?>/ ) {
+        $suppressions =~ s/^\s*<insert.a.*?>/{\n  <core_perl_$rule_number>/m;
         $rule_number++;
     }
 
