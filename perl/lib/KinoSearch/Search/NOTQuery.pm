@@ -26,9 +26,9 @@ my $synopsis = <<'END_SYNOPSIS';
     my $not_bar_query = KinoSearch::Search::NOTQuery->new( 
         negated_query => $bar_query,
     );
-    my $foo_and_not_bar_query = KinoSearch::Search::ANDQuery->new;
-    $foo_and_not_bar_query->add_child($foo_query);
-    $foo_and_not_bar_query->add_child($not_bar_query);
+    my $foo_and_not_bar_query = KinoSearch::Search::ANDQuery->new(
+        children => [ $foo_query, $not_bar_query ].
+    );
     my $hits = $searcher->hits( query => $foo_and_not_bar_query );
     ...
 END_SYNOPSIS
