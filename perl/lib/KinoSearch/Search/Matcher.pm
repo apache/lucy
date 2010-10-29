@@ -23,8 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    # Matcher is an abstract base class -- see MockScorer for an example
-    # implementation.
+    # abstract base class
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR_CODE_SAMPLE';
