@@ -39,7 +39,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $schema = MySchema->new;
+    my $schema = KinoSearch::Plan::Schema->new;
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
