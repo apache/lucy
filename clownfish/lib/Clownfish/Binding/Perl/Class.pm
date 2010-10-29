@@ -340,9 +340,9 @@ $description
 
 $constructor_pod
 
-$methods_pod
-
 $abstract_methods_pod
+
+$methods_pod
 
 $inheritance_pod
 
