@@ -18,12 +18,13 @@ parcel KinoSearch cnick Kino;
 
 /** Process hits.
  *
- * A Collector decides what to do with the hits that a Matcher iterates
- * through, based on how the abstract Collect() method is implemented.
+ * A Collector decides what to do with the hits that a
+ * L<Matcher|KinoSearch::Search::Matcher> iterates through, based on how the
+ * abstract Collect() method is implemented.
  * 
  * Collectors operate on individual segments, but must operate within the
  * context of a larger collection.  Each time the collector moves to a new
- * segment, Set_Reader(), Set_Base() and Set_Matcher() must be called, and the
+ * segment, Set_Reader(), Set_Base() and Set_Matcher() will be called, and the
  * collector must take the updated information into account.
  */
 
@@ -76,8 +77,8 @@ abstract class KinoSearch::Search::Collector cnick Coll
 /** Collector which records doc nums in a BitVector.
  *
  * BitCollector is a Collector which saves matching document ids in a
- * BitVector while ignoring scores.  It is useful for recording the entire set
- * of documents which matches a query.
+ * L<BitVector|KinoSearch::Object::BitVector>.  It is useful for recording the
+ * entire set of documents which matches a query.
  */
 class KinoSearch::Search::Collector::BitCollector cnick BitColl
     inherits KinoSearch::Search::Collector {
