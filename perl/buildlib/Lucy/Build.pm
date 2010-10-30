@@ -90,7 +90,7 @@ sub extra_ccflags {
         $gcc_version = $1;
     }
 
-    if ( defined $ENV{KINO_DEBUG} ) {
+    if ( defined $ENV{LUCY_DEBUG} ) {
         if ( defined $gcc_version ) {
             $extra_ccflags .= "-DKINO_DEBUG ";
             $extra_ccflags

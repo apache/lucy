@@ -17,16 +17,16 @@
 parcel KinoSearch cnick Kino;
 
 /** The Debug module provides multiple levels of debugging verbosity.  Code for
- * debug statements is only compiled "#ifdef KINO_DEBUG" at compile-time.
+ * debug statements is only compiled "#ifdef LUCY_DEBUG" at compile-time.
  * Some statements will then always print; additional output can be enabled
- * using the environment variable KINO_DEBUG.  Examples:
+ * using the environment variable LUCY_DEBUG.  Examples:
  * 
- *   KINO_DEBUG=file.C      -> all debug statements in path/file.C
- *   KINO_DEBUG=func        -> all in functions named exactly 'func'
- *   KINO_DEBUG=f*          -> all in functions (or files) starting with 'f' 
- *   KINO_DEBUG=file*       -> all in files (or functions) ending with file*'
- *   KINO_DEBUG=func1,func2 -> either in func1 or in func2
- *   KINO_DEBUG=*           -> just print all debug statements
+ *   LUCY_DEBUG=file.C      -> all debug statements in path/file.C
+ *   LUCY_DEBUG=func        -> all in functions named exactly 'func'
+ *   LUCY_DEBUG=f*          -> all in functions (or files) starting with 'f' 
+ *   LUCY_DEBUG=file*       -> all in files (or functions) ending with file*'
+ *   LUCY_DEBUG=func1,func2 -> either in func1 or in func2
+ *   LUCY_DEBUG=*           -> just print all debug statements
  * 
  * The wildcard character '*' can only go at the end of an identifier.
  */
@@ -44,12 +44,12 @@ inert class KinoSearch::Util::Debug {
     inert int 
     debug_should_print(const char *path, const char *func);
 
-    /** Force override in cached value of KINO_DEBUG environment variable.
+    /** Force override in cached value of LUCY_DEBUG environment variable.
      */
     inert void
     set_env_cache(char *override);
 
-    /* Under KINO_DEBUG, track the number of objects allocated, the number
+    /* Under LUCY_DEBUG, track the number of objects allocated, the number
      * freed, and the number of global objects.  If, after all non-global
      * objects should have been cleaned up, these numbers don't balance out,
      * there's a memory leak somewhere.
@@ -60,23 +60,23 @@ inert class KinoSearch::Util::Debug {
 }
 
 __C__
-#ifdef KINO_DEBUG
+#ifdef LUCY_DEBUG
 
-#undef KINO_DEBUG   // undef prior to redefining the command line argument 
-#define KINO_DEBUG_ENABLED 1
+#undef LUCY_DEBUG   // undef prior to redefining the command line argument 
+#define LUCY_DEBUG_ENABLED 1
 
 #include <stdio.h>
 #include <stdlib.h>
 
 /** Unconditionally print debug statement prepending file and line info. 
  */
-#define KINO_DEBUG_PRINT(args...)                                         \
+#define LUCY_DEBUG_PRINT(args...)                                         \
     kino_Debug_print_mess(__FILE__, __LINE__, __func__, ##args)
 
-/** Conditionally execute code if debugging enabled via KINO_DEBUG environment
+/** Conditionally execute code if debugging enabled via LUCY_DEBUG environment
  * variable.
  */
-#define KINO_DEBUG_DO(actions)                                            \
+#define LUCY_DEBUG_DO(actions)                                            \
     do {                                                                  \
         static int initialized = 0;                                       \
         static int do_it       = 0;                                       \
@@ -87,56 +87,56 @@ __C__
         if (do_it) { actions; }                                           \
     } while (0)
 
-/** Execute code so long as KINO_DEBUG was defined during compilation.
+/** Execute code so long as LUCY_DEBUG was defined during compilation.
  */
-#define KINO_IFDEF_DEBUG(actions) do { actions; } while (0)
+#define LUCY_IFDEF_DEBUG(actions) do { actions; } while (0)
 
-/** Conditionally print debug statement depending on KINO_DEBUG env variable.
+/** Conditionally print debug statement depending on LUCY_DEBUG env variable.
  */
-#define KINO_DEBUG(args...)                                            \
-        KINO_DEBUG_DO(KINO_DEBUG_PRINT(args));                  
+#define LUCY_DEBUG(args...)                                            \
+        LUCY_DEBUG_DO(LUCY_DEBUG_PRINT(args));                  
 
 /** Abort on error if test fails.
  *
- * Note: unlike the system assert(), this ASSERT() is #ifdef KINO_DEBUG.
+ * Note: unlike the system assert(), this ASSERT() is #ifdef LUCY_DEBUG.
  */
-#define KINO_ASSERT(test , args...)                                    \
+#define LUCY_ASSERT(test , args...)                                    \
     do {                                                               \
         if (!(test)) {                                                 \
-            KINO_DEBUG_PRINT("ASSERT FAILED (" #test ")\n" args);      \
+            LUCY_DEBUG_PRINT("ASSERT FAILED (" #test ")\n" args);      \
             abort();                                                   \
         }                                                              \
     } while (0) 
 
-#elif defined(CHY_HAS_GNUC_VARIADIC_MACROS) // not KINO_DEBUG 
+#elif defined(CHY_HAS_GNUC_VARIADIC_MACROS) // not LUCY_DEBUG 
 
-#undef KINO_DEBUG
-#define KINO_DEBUG_ENABLED 0
-#define KINO_DEBUG_DO(actions)
-#define KINO_IFDEF_DEBUG(actions)
-#define KINO_DEBUG_PRINT(args...)
-#define KINO_DEBUG(args...)
-#define KINO_ASSERT(test, args...)
+#undef LUCY_DEBUG
+#define LUCY_DEBUG_ENABLED 0
+#define LUCY_DEBUG_DO(actions)
+#define LUCY_IFDEF_DEBUG(actions)
+#define LUCY_DEBUG_PRINT(args...)
+#define LUCY_DEBUG(args...)
+#define LUCY_ASSERT(test, args...)
 
-#else  // also not KINO_DEBUG 
+#else  // also not LUCY_DEBUG 
 
-#undef KINO_DEBUG
-#define KINO_DEBUG_ENABLED 0
-#define KINO_DEBUG_DO(actions)
-#define KINO_IFDEF_DEBUG(actions)
-static void KINO_DEBUG_PRINT(char *_ignore_me, ...) { }
-static void KINO_DEBUG(char *_ignore_me, ...) { }
-static void KINO_ASSERT(int _ignore_me, ...) { }
+#undef LUCY_DEBUG
+#define LUCY_DEBUG_ENABLED 0
+#define LUCY_DEBUG_DO(actions)
+#define LUCY_IFDEF_DEBUG(actions)
+static void LUCY_DEBUG_PRINT(char *_ignore_me, ...) { }
+static void LUCY_DEBUG(char *_ignore_me, ...) { }
+static void LUCY_ASSERT(int _ignore_me, ...) { }
 
-#endif // KINO_DEBUG 
+#endif // LUCY_DEBUG 
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define DEBUG_ENABLED             KINO_DEBUG_ENABLED
-  #define DEBUG_PRINT               KINO_DEBUG_PRINT
-  #define DEBUG_DO                  KINO_DEBUG_DO
-  #define IFDEF_DEBUG               KINO_IFDEF_DEBUG
-  #define DEBUG                     KINO_DEBUG
-  #define ASSERT                    KINO_ASSERT
+  #define DEBUG_ENABLED             LUCY_DEBUG_ENABLED
+  #define DEBUG_PRINT               LUCY_DEBUG_PRINT
+  #define DEBUG_DO                  LUCY_DEBUG_DO
+  #define IFDEF_DEBUG               LUCY_IFDEF_DEBUG
+  #define DEBUG                     LUCY_DEBUG
+  #define ASSERT                    LUCY_ASSERT
 #endif
 __END_C__
 

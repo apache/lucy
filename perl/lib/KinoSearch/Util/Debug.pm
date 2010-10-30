@@ -34,18 +34,18 @@ void
 DEBUG_PRINT(message)
     char *message;
 PPCODE:
-    KINO_DEBUG_PRINT("%s", message);
+    LUCY_DEBUG_PRINT("%s", message);
 
 void
 DEBUG(message)
     char *message;
 PPCODE:
-    KINO_DEBUG("%s", message);
+    LUCY_DEBUG("%s", message);
 
 chy_bool_t
 DEBUG_ENABLED()
 CODE:
-    RETVAL = KINO_DEBUG_ENABLED;
+    RETVAL = LUCY_DEBUG_ENABLED;
 OUTPUT: RETVAL
 
 =for comment
@@ -61,7 +61,7 @@ track_globals(...)
 PPCODE:
 {
     CHY_UNUSED_VAR(items);
-    KINO_IFDEF_DEBUG(kino_Debug_num_globals++;);
+    LUCY_IFDEF_DEBUG(kino_Debug_num_globals++;);
 }
 
 void
@@ -74,7 +74,7 @@ void
 ASSERT(maybe)
     int maybe;
 PPCODE:
-    KINO_ASSERT(maybe, "XS ASSERT binding test");
+    LUCY_ASSERT(maybe, "XS ASSERT binding test");
 
 IV
 num_allocated()
