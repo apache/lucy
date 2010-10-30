@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Lucy::Build;
 
 my $builder = Lucy::Build->new(
-    module_name => 'KinoSearch',
+    module_name => 'Lucy',
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
@@ -45,7 +45,7 @@ my $builder = Lucy::Build->new(
     },
     add_to_cleanup => [
         qw(
-            KinoSearch-*
+            Lucy-*
             MANIFEST.bak
             perltidy.ERR
             *.pdb
