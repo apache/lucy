@@ -27,14 +27,14 @@ __C__
  * <code>new_value</code> and return true.  Otherwise, return false.
  */
 static CHY_INLINE chy_bool_t
-kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
 
 /************************** Mac OS X 10.4 and later ***********************/
 #ifdef CHY_HAS_OSATOMIC_CAS_PTR
 #include <libkern/OSAtomic.h>
 
 static CHY_INLINE chy_bool_t
-kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 {
     return OSAtomicCompareAndSwapPtr(old_value, new_value, target);
 }
@@ -43,13 +43,13 @@ kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 #elif defined(CHY_HAS_WINDOWS_H)
 
 chy_bool_t
-kino_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value, 
+lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value, 
                             void *new_value);
 
 static CHY_INLINE chy_bool_t
-kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 {
-    return kino_Atomic_wrapped_cas_ptr(target, old_value, new_value);
+    return lucy_Atomic_wrapped_cas_ptr(target, old_value, new_value);
 }
 
 /**************************** Solaris 10 and later ************************/
@@ -57,7 +57,7 @@ kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 #include <sys/atomic.h>
 
 static CHY_INLINE chy_bool_t
-kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 {
     return atomic_cas_ptr(target, old_value, new_value) == old_value;
 }
@@ -66,19 +66,19 @@ kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 #elif defined(CHY_HAS_PTHREAD_H)
 #include <pthread.h>
 
-extern pthread_mutex_t kino_Atomic_mutex;
+extern pthread_mutex_t lucy_Atomic_mutex;
 
 static CHY_INLINE chy_bool_t
-kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 {
-    pthread_mutex_lock(&kino_Atomic_mutex);
+    pthread_mutex_lock(&lucy_Atomic_mutex);
     if (*target == old_value) {
         *target = new_value;
-        pthread_mutex_unlock(&kino_Atomic_mutex);
+        pthread_mutex_unlock(&lucy_Atomic_mutex);
         return true;
     }
     else {
-        pthread_mutex_unlock(&kino_Atomic_mutex);
+        pthread_mutex_unlock(&lucy_Atomic_mutex);
         return false;
     }
 }
@@ -91,7 +91,7 @@ kino_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 #endif // Big platform if-else chain. 
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define Atomic_cas_ptr kino_Atomic_cas_ptr
+  #define Atomic_cas_ptr lucy_Atomic_cas_ptr
 #endif
 
 __END_C__

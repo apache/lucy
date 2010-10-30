@@ -23,7 +23,7 @@
 #include <windows.h>
 
 chy_bool_t
-kino_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value, 
+lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value, 
                             void *new_value)
 {
     return InterlockedCompareExchangePointer(target, new_value, old_value) 
@@ -34,7 +34,7 @@ kino_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
 #elif defined(CHY_HAS_PTHREAD_H)
 
 #include <pthread.h>
-pthread_mutex_t kino_Atomic_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t lucy_Atomic_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #endif
 
