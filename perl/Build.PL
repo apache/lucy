@@ -20,9 +20,10 @@ use lib 'buildlib';
 use KinoSearch::Build;
 
 my $builder = KinoSearch::Build->new(
-    module_name       => 'KinoSearch',
-    license           => 'apache',
-    dist_author       => 'Marvin Humphrey <marvin at rectangular dot com>',
+    module_name => 'KinoSearch',
+    license     => 'apache',
+    dist_author =>
+        'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
     dist_version_from => 'lib/KinoSearch.pm',
     requires          => {
         'Lingua::Stem::Snowball' => 0.952,
@@ -35,11 +36,11 @@ my $builder = KinoSearch::Build->new(
         'ExtUtils::ParseXS'  => 2.16,
         'Devel::PPPort'      => 3.13,
     },
-    meta_merge         => { keywords => [qw( search lucene )], },
-    meta_add           => {
+    meta_merge => { keywords => [qw( search lucy lucene )], },
+    meta_add   => {
         resources => {
-            homepage   => 'http://www.rectangular.com/kinosearch',
-            repository => 'http://www.rectangular.com/svn/kinosearch/trunk',
+            homepage   => 'http://incubator.apache.org/lucy',
+            repository => 'http://svn.apache.org/repos/asf/incubator/lucy',
         },
     },
     add_to_cleanup => [
