@@ -40,14 +40,14 @@ PPCODE:
     if (!new_sv_ptr || !delete_sv_ptr || !stem_sv_ptr || !length_sv_ptr) {
         THROW(KINO_ERR, "Failed to retrieve one or more Snowball symbols");
     }
-    kino_Stemmer_sb_stemmer_new 
-        = (kino_Stemmer_sb_stemmer_new_t)SvIV(*new_sv_ptr);
-    kino_Stemmer_sb_stemmer_delete 
-        = (kino_Stemmer_sb_stemmer_delete_t)SvIV(*delete_sv_ptr);
-    kino_Stemmer_sb_stemmer_stem 
-        = (kino_Stemmer_sb_stemmer_stem_t)SvIV(*stem_sv_ptr);
-    kino_Stemmer_sb_stemmer_length 
-        = (kino_Stemmer_sb_stemmer_length_t)SvIV(*length_sv_ptr);
+    lucy_Stemmer_sb_stemmer_new 
+        = (lucy_Stemmer_sb_stemmer_new_t)SvIV(*new_sv_ptr);
+    lucy_Stemmer_sb_stemmer_delete 
+        = (lucy_Stemmer_sb_stemmer_delete_t)SvIV(*delete_sv_ptr);
+    lucy_Stemmer_sb_stemmer_stem 
+        = (lucy_Stemmer_sb_stemmer_stem_t)SvIV(*stem_sv_ptr);
+    lucy_Stemmer_sb_stemmer_length 
+        = (lucy_Stemmer_sb_stemmer_length_t)SvIV(*length_sv_ptr);
 }
 END_XS
 

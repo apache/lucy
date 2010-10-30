@@ -47,7 +47,7 @@ Stemmer_init(Stemmer *self, const CharBuf *language)
     lang_buf[0] = tolower(CB_Code_Point_At(language, 0));
     lang_buf[1] = tolower(CB_Code_Point_At(language, 1));
     lang_buf[2] = '\0';
-    self->snowstemmer = kino_Stemmer_sb_stemmer_new(lang_buf, "UTF_8");
+    self->snowstemmer = lucy_Stemmer_sb_stemmer_new(lang_buf, "UTF_8");
     if (!self->snowstemmer) 
         THROW(ERR, "Can't find a Snowball stemmer for %o", language);
 
@@ -58,7 +58,7 @@ void
 Stemmer_destroy(Stemmer *self)
 {
     if (self->snowstemmer) {
-        kino_Stemmer_sb_stemmer_delete((struct sb_stemmer*)self->snowstemmer);
+        lucy_Stemmer_sb_stemmer_delete((struct sb_stemmer*)self->snowstemmer);
     }
     DECREF(self->language);
     SUPER_DESTROY(self, STEMMER);
@@ -72,9 +72,9 @@ Stemmer_transform(Stemmer *self, Inversion *inversion)
         = (struct sb_stemmer*)self->snowstemmer;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        sb_symbol *stemmed_text = kino_Stemmer_sb_stemmer_stem(snowstemmer, 
+        sb_symbol *stemmed_text = lucy_Stemmer_sb_stemmer_stem(snowstemmer, 
             (sb_symbol*)token->text, token->len);
-        size_t len = kino_Stemmer_sb_stemmer_length(snowstemmer);
+        size_t len = lucy_Stemmer_sb_stemmer_length(snowstemmer);
         if (len > token->len) {
             FREEMEM(token->text);
             token->text = (char*)MALLOCATE(len + 1);
