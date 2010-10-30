@@ -174,7 +174,7 @@ __C__
  */
 #ifdef CHY_HAS_VARIADIC_MACROS
  #ifdef CHY_HAS_ISO_VARIADIC_MACROS
-  #define KINO_THROW(_vtable, ...) \
+  #define CFISH_THROW(_vtable, ...) \
     kino_Err_throw_at(_vtable, __FILE__, __LINE__, KINO_ERR_FUNC_MACRO, \
         __VA_ARGS__)
   #define KINO_WARN(...) \
@@ -183,7 +183,7 @@ __C__
     kino_Err_make_mess(__FILE__, __LINE__, KINO_ERR_FUNC_MACRO, \
         __VA_ARGS__)
  #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS)
-  #define KINO_THROW(_vtable, args...) \
+  #define CFISH_THROW(_vtable, args...) \
     kino_Err_throw_at(_vtable, __FILE__, __LINE__, \
         KINO_ERR_FUNC_MACRO, ##args)
   #define KINO_WARN(args...) \
@@ -193,7 +193,7 @@ __C__
  #endif
 #else
   void 
-  KINO_THROW(kino_VTable *vtable, char* format, ...);
+  CFISH_THROW(kino_VTable *vtable, char* format, ...);
   void 
   KINO_WARN(char* format, ...);
   void 
@@ -225,7 +225,7 @@ kino_Err_abstract_class_check(kino_Obj *obj, kino_VTable *vtable)
     kino_Err_abstract_class_check(((kino_Obj*)_obj), _vtable)
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define THROW                 KINO_THROW
+  #define THROW                 CFISH_THROW
   #define RETHROW               KINO_RETHROW
   #define WARN                  KINO_WARN
   #define MAKE_MESS             KINO_MAKE_MESS

@@ -61,7 +61,7 @@ PPCODE:
         }
     }
     else if (items == 1) {
-        KINO_THROW(KINO_ERR, "Missing required argument 'doc'");
+        CFISH_THROW(KINO_ERR, "Missing required argument 'doc'");
     }
 
     // Either get a Doc or use the stock doc. 

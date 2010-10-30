@@ -202,7 +202,7 @@ void
 $override_sym($params)
 {
     $unused;
-    KINO_THROW(KINO_ERR, "Can't override $full_method_sym via binding");
+    CFISH_THROW(KINO_ERR, "Can't override $full_method_sym via binding");
 }
 END_CALLBACK_DEF
 }
@@ -263,7 +263,7 @@ sub _obj_callback_def {
     if ( !$return_type->nullable ) {
         my $macro_sym = $method->get_macro_sym;
         $nullable_check
-            = qq|if (!retval) { KINO_THROW(KINO_ERR, |
+            = qq|if (!retval) { CFISH_THROW(KINO_ERR, |
             . qq|"$macro_sym() for class '%o' cannot return NULL", |
             . qq|Kino_Obj_Get_Class_Name((kino_Obj*)self)); }\n    |;
     }
@@ -315,7 +315,7 @@ $return_type_str
 $full_func_sym($params)
 {
     kino_CharBuf *klass = self ? Kino_Obj_Get_Class_Name((kino_Obj*)self) : $vtable->name;$unused
-    KINO_THROW(KINO_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
+    CFISH_THROW(KINO_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
 }
 END_ABSTRACT_DEF
 }

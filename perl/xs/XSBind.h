@@ -193,7 +193,7 @@ kino_XSBind_allot_params(SV** stack, int32_t start,
  * conflict with Perl.  It's a little inconsistent to do this rather than
  * leave all symbols at full size, but the succinctness is worth it.
  */
-#define THROW            KINO_THROW
+#define THROW            CFISH_THROW
 #define WARN             KINO_WARN
 
 #ifdef __cplusplus

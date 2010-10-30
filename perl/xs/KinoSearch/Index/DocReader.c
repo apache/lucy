@@ -110,7 +110,7 @@ kino_DefDocReader_fetch_doc(kino_DefaultDocReader *self, int32_t doc_id)
                 break;
             default:
                 value_sv = NULL; 
-                KINO_THROW(KINO_ERR, "Unrecognized type: %o", type);
+                CFISH_THROW(KINO_ERR, "Unrecognized type: %o", type);
         }
 
         // Store the value. 

@@ -108,7 +108,7 @@ PPCODE:
 {
     STRLEN len;
     char *ptr = SvPV(catted, len);
-    if (SvUTF8(sv)) { KINO_THROW(KINO_ERR, "Can't cat_bytes onto a UTF-8 SV"); }
+    if (SvUTF8(sv)) { CFISH_THROW(KINO_ERR, "Can't cat_bytes onto a UTF-8 SV"); }
     sv_catpvn(sv, ptr, len);
 }
 END_XS_CODE

@@ -105,7 +105,7 @@ sub _void_star_to_kino {
         }
         else {
             $cf_var = NULL; /* avoid uninitialized compiler warning */
-            KINO_THROW(KINO_ERR, "$cf_var is not a reference");
+            CFISH_THROW(KINO_ERR, "$cf_var is not a reference");
         }\n|;
 }
 

@@ -99,7 +99,7 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
             }
             break;
         default:
-            KINO_THROW(KINO_ERR, "Unrecognized arg type: %u32", arg_type);
+            CFISH_THROW(KINO_ERR, "Unrecognized arg type: %u32", arg_type);
         }
     }
 
@@ -118,7 +118,7 @@ kino_Host_callback(void *vobj, char *method, uint32_t num_args, ...)
     {
         int count = call_method(method, G_VOID|G_DISCARD);
         if (count != 0) {
-            KINO_THROW(KINO_ERR, "callback '%s' returned too many values: %i32", 
+            CFISH_THROW(KINO_ERR, "callback '%s' returned too many values: %i32", 
                 method, (int32_t)count);
         }
         FREETMPS;
@@ -245,7 +245,7 @@ S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args)
         int num_returned = call_method(method, G_SCALAR);
         dSP;
         if (num_returned != 1) {
-            KINO_THROW(KINO_ERR, "Bad number of return vals from %s: %i32", method,
+            CFISH_THROW(KINO_ERR, "Bad number of return vals from %s: %i32", method,
                 (int32_t)num_returned);
         }
         return_val = POPs;

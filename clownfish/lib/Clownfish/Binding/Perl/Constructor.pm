@@ -95,7 +95,7 @@ sub xsub_def {
         else {
             my $assignment
                 = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) {
-           THROW(KINO_ERR, "Missing required param '$name'");
+           CFISH_THROW(KINO_ERR, "Missing required param '$name'");
         }
         $statement#;
             push @var_assignments, $assignment;
@@ -127,7 +127,7 @@ XS($c_name)
     dXSARGS;
     CHY_UNUSED_VAR(cv);
     CHY_UNUSED_VAR(ax);
-    if (items < 1) { THROW(KINO_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
+    if (items < 1) { CFISH_THROW(KINO_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
     SP -= items;
     {
         $var_declarations

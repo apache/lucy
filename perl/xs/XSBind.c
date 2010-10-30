@@ -327,7 +327,7 @@ S_kino_hash_to_perl_hash(kino_Hash *hash)
         // Recurse for each value. 
         SV *val_sv = XSBind_kino_to_perl(val);
         if (!Kino_Obj_Is_A((kino_Obj*)key, KINO_CHARBUF)) {
-            KINO_THROW(KINO_ERR, 
+            CFISH_THROW(KINO_ERR, 
                 "Can't convert a key of class %o to a Perl hash key",
                 Kino_Obj_Get_Class_Name((kino_Obj*)key));
         }
