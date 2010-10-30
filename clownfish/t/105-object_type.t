@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 49;
+use Test::More tests => 57;
 use Clownfish::Type::Object;
 use Clownfish::Parser;
 
@@ -43,8 +43,12 @@ for my $bad_specifier (qw( foo fooBar Foo_Bar FOOBAR 1Foo 1FOO )) {
 for my $specifier (qw( Foo FooJr FooIII Foo4th )) {
     is( $parser->object_type_specifier($specifier),
         $specifier, "object_type_specifier: $specifier" );
+    is( $parser->object_type_specifier("neato_$specifier"),
+        "neato_$specifier", "object_type_specifier: neato_$specifier" );
     isa_ok( $parser->object_type("$specifier*"),
         "Clownfish::Type::Object", "$specifier*" );
+    isa_ok( $parser->object_type("neato_$specifier*"),
+        "Clownfish::Type::Object", "neato_$specifier*" );
     isa_ok( $parser->object_type("const $specifier*"),
         "Clownfish::Type::Object", "const $specifier*" );
     isa_ok( $parser->object_type("incremented $specifier*"),

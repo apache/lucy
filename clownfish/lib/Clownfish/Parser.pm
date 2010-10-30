@@ -260,7 +260,7 @@ arbitrary_type_specifier:
     /\w+_t(?!\w)/
 
 object_type_specifier:
-    /[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/
+    /([a-z]+[a-z0-9]*_)?[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/
 
 declarator:
     identifier 
