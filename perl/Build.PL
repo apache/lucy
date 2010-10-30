@@ -16,36 +16,8 @@
 use 5.008003;
 use strict;
 use warnings;
-
-my $conflict = 0;
-my $existing;
-
-BEGIN {
-    eval 'use KinoSearch;';
-    if ( !$@ ) {
-        $existing = eval $KinoSearch::VERSION;
-        if ( $existing < 0.20 ) {
-            $conflict = 1;
-        }
-    }
-}
-
 use lib 'buildlib';
 use KinoSearch::Build;
-
-if ( $conflict and !$ENV{KINO_DEBUG} ) {
-    print <<END_WARNING;
-
-*** WARNING ***
-An existing installation of KinoSearch version $existing has been detected.
-This release breaks backwards compatibility with the 0.1x branch.  Both the
-file format and the API have changed.
-
-END_WARNING
-
-    my $response = Module::Build->y_n("Continue? (y/n) ");
-    exit unless $response;
-}
 
 my $builder = KinoSearch::Build->new(
     module_name       => 'KinoSearch',
