@@ -24,7 +24,7 @@ my $builder = Lucy::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
-    dist_version_from => 'lib/KinoSearch.pm',
+    dist_version      => '0.001',
     requires          => {
         'Lingua::Stem::Snowball' => 0.952,
         'Lingua::StopWords'      => 0.09,

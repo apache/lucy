@@ -19,7 +19,7 @@ KinoSearch - Search engine library.
 
 =head1 VERSION
 
-0.30_12
+0.001
 
 =head1 SYNOPSIS
 
