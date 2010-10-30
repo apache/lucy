@@ -308,13 +308,13 @@ kino_NumUtil_decode_bigend_f64(void *source)
     return duo.d;
 }
 
-#define KINO_NUMUTIL_C32_MAX_BYTES  ((sizeof(uint32_t) * 8 / 7) + 1) // 5 
-#define KINO_NUMUTIL_C64_MAX_BYTES ((sizeof(uint64_t) * 8 / 7) + 1)  // 10 
+#define LUCY_NUMUTIL_C32_MAX_BYTES  ((sizeof(uint32_t) * 8 / 7) + 1) // 5 
+#define LUCY_NUMUTIL_C64_MAX_BYTES ((sizeof(uint64_t) * 8 / 7) + 1)  // 10 
 
 static CHY_INLINE void
 kino_NumUtil_encode_c32(uint32_t value, char **out_buf)
 {
-    uint8_t   buf[KINO_NUMUTIL_C32_MAX_BYTES];
+    uint8_t   buf[LUCY_NUMUTIL_C32_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
     int       num_bytes;
@@ -334,7 +334,7 @@ kino_NumUtil_encode_c32(uint32_t value, char **out_buf)
 static CHY_INLINE void
 kino_NumUtil_encode_c64(uint64_t value, char **out_buf)
 {
-    uint8_t   buf[KINO_NUMUTIL_C64_MAX_BYTES];
+    uint8_t   buf[LUCY_NUMUTIL_C64_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
     int       num_bytes;
@@ -354,7 +354,7 @@ kino_NumUtil_encode_c64(uint64_t value, char **out_buf)
 static CHY_INLINE void
 kino_NumUtil_encode_padded_c32(uint32_t value, char **out_buf)
 {
-    uint8_t buf[KINO_NUMUTIL_C32_MAX_BYTES]
+    uint8_t buf[LUCY_NUMUTIL_C32_MAX_BYTES]
         = { 0x80, 0x80, 0x80, 0x80, 0x80 };
     uint8_t *const limit = buf + sizeof(buf);
     uint8_t *ptr         = limit - 1;
@@ -366,7 +366,7 @@ kino_NumUtil_encode_padded_c32(uint32_t value, char **out_buf)
         *--ptr = ((value & 0x7f) | 0x80);
         value >>= 7;
     }
-    memcpy(*out_buf, buf, KINO_NUMUTIL_C32_MAX_BYTES);
+    memcpy(*out_buf, buf, LUCY_NUMUTIL_C32_MAX_BYTES);
     *out_buf += sizeof(buf);
 }
 
@@ -487,8 +487,8 @@ kino_NumUtil_u4set(void *array, uint32_t tick, uint8_t value)
 }
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define C32_MAX_BYTES                KINO_NUMUTIL_C32_MAX_BYTES
-  #define C64_MAX_BYTES                KINO_NUMUTIL_C64_MAX_BYTES
+  #define C32_MAX_BYTES                LUCY_NUMUTIL_C32_MAX_BYTES
+  #define C64_MAX_BYTES                LUCY_NUMUTIL_C64_MAX_BYTES
 #endif
 
 __END_C__
