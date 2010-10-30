@@ -54,7 +54,7 @@ void*
 kino_Err_to_host(kino_Err *self)
 {
     kino_Err_to_host_t super_to_host 
-        = (kino_Err_to_host_t)KINO_SUPER_METHOD(KINO_ERR, Err, To_Host);
+        = (kino_Err_to_host_t)LUCY_SUPER_METHOD(KINO_ERR, Err, To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;
@@ -63,7 +63,7 @@ kino_Err_to_host(kino_Err *self)
 void
 kino_Err_throw_mess(kino_VTable *vtable, kino_CharBuf *message) 
 {
-    kino_Err_make_t make = (kino_Err_make_t)KINO_METHOD(
+    kino_Err_make_t make = (kino_Err_make_t)LUCY_METHOD(
         KINO_CERTIFY(vtable, KINO_VTABLE), Err, Make);
     kino_Err *err = (kino_Err*)KINO_CERTIFY(make(NULL), KINO_ERR);
     Kino_Err_Cat_Mess(err, message);

@@ -190,7 +190,7 @@ static CHY_INLINE void
 kino_Obj_super_destroy(kino_Obj *self, kino_VTable *vtable)
 {
     kino_Obj_destroy_t super_destroy 
-        = (kino_Obj_destroy_t)KINO_SUPER_METHOD(vtable, Obj, Destroy);
+        = (kino_Obj_destroy_t)LUCY_SUPER_METHOD(vtable, Obj, Destroy);
     super_destroy(self);
 }
 

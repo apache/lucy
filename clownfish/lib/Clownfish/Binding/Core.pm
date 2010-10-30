@@ -122,7 +122,7 @@ typedef void
 
 /* Access the function pointer for a given method from the vtable.
  */
-#define KINO_METHOD(_vtable, _class_nick, _meth_name) \\
+#define LUCY_METHOD(_vtable, _class_nick, _meth_name) \\
      kino_method(_vtable, \\
      Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
@@ -136,7 +136,7 @@ kino_method(const void *vtable, size_t offset)
 
 /* Access the function pointer for the given method in the superclass's
  * vtable. */
-#define KINO_SUPER_METHOD(_vtable, _class_nick, _meth_name) \\
+#define LUCY_SUPER_METHOD(_vtable, _class_nick, _meth_name) \\
      kino_super_method(_vtable, \\
      Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
@@ -152,15 +152,15 @@ kino_super_method(const void *vtable, size_t offset)
 
 /* Return a boolean indicating whether a method has been overridden.
  */
-#define KINO_OVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\
+#define LUCY_OVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\
         (kino_method(*((kino_VTable**)_self), \\
             Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET )\\
             != (kino_method_t)kino_ ## _class_nick ## _ ## _micro_name )
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define METHOD                   KINO_METHOD
-  #define SUPER_METHOD             KINO_SUPER_METHOD
-  #define OVERRIDDEN               KINO_OVERRIDDEN
+  #define METHOD                   LUCY_METHOD
+  #define SUPER_METHOD             LUCY_SUPER_METHOD
+  #define OVERRIDDEN               LUCY_OVERRIDDEN
 #endif
 
 typedef struct kino_Callback {

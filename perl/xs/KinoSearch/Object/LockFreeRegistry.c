@@ -26,7 +26,7 @@ kino_LFReg_to_host(kino_LockFreeRegistry *self)
 {
     chy_bool_t first_time = self->ref.count < 4 ? true : false;
     kino_LFReg_to_host_t to_host = (kino_LFReg_to_host_t)
-        KINO_SUPER_METHOD(KINO_LOCKFREEREGISTRY, LFReg, To_Host);
+        LUCY_SUPER_METHOD(KINO_LOCKFREEREGISTRY, LFReg, To_Host);
     SV *host_obj = (SV*)to_host(self);
     if (first_time) {
         SvSHARE((SV*)self->ref.host_obj);

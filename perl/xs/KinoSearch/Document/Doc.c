@@ -118,7 +118,7 @@ void*
 kino_Doc_to_host(kino_Doc *self)
 {
     kino_Doc_to_host_t super_to_host 
-        = (kino_Doc_to_host_t)KINO_SUPER_METHOD(KINO_DOC, Doc, To_Host);
+        = (kino_Doc_to_host_t)LUCY_SUPER_METHOD(KINO_DOC, Doc, To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;
