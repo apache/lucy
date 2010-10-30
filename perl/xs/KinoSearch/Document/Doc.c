@@ -73,7 +73,7 @@ kino_Doc_serialize(kino_Doc *self, kino_OutStream *outstream)
 {
     Kino_OutStream_Write_C32(outstream, self->doc_id);
     kino_Host_callback(self, "serialize_fields", 1, 
-        KINO_ARG_OBJ("outstream", outstream));
+        CFISH_ARG_OBJ("outstream", outstream));
 }
 
 kino_Doc*
@@ -84,7 +84,7 @@ kino_Doc_deserialize(kino_Doc *self, kino_InStream *instream)
     self = self ? self : (kino_Doc*)Kino_VTable_Make_Obj(KINO_DOC);
     kino_Doc_init(self, NULL, doc_id);
     kino_Host_callback(self, "deserialize_fields", 1, 
-        KINO_ARG_OBJ("instream", instream));
+        CFISH_ARG_OBJ("instream", instream));
     
     return self;
 }

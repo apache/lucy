@@ -30,7 +30,7 @@ void
 kino_Err_set_error(kino_Err *error)
 {
     kino_Host_callback(KINO_ERR, "set_error", 1, 
-        KINO_ARG_OBJ("error", error));
+        CFISH_ARG_OBJ("error", error));
     LUCY_DECREF(error);
 }
 

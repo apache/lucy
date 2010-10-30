@@ -45,7 +45,7 @@ kino_Tokenizer_init(kino_Tokenizer *self, const kino_CharBuf *pattern)
 
     // Acquire a compiled regex engine for matching one token. 
     token_re_sv = (SV*)kino_Host_callback_host(KINO_TOKENIZER,
-        "compile_token_re", 1, KINO_ARG_STR("pattern", self->pattern));
+        "compile_token_re", 1, CFISH_ARG_STR("pattern", self->pattern));
     S_set_token_re_but_not_pattern(self, SvRV(token_re_sv));
 
     return self;

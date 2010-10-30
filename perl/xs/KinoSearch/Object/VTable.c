@@ -39,21 +39,21 @@ kino_VTable_register_with_host(kino_VTable *singleton, kino_VTable *parent)
 {
     // Register class with host. 
     kino_Host_callback(KINO_VTABLE, "_register", 2, 
-        KINO_ARG_OBJ("singleton", singleton), KINO_ARG_OBJ("parent", parent));
+        CFISH_ARG_OBJ("singleton", singleton), CFISH_ARG_OBJ("parent", parent));
 }
 
 kino_VArray*
 kino_VTable_novel_host_methods(const kino_CharBuf *class_name)
 {
     return (kino_VArray*)kino_Host_callback_obj(KINO_VTABLE, 
-        "novel_host_methods", 1, KINO_ARG_STR("class_name", class_name));
+        "novel_host_methods", 1, CFISH_ARG_STR("class_name", class_name));
 }
 
 kino_CharBuf*
 kino_VTable_find_parent_class(const kino_CharBuf *class_name)
 {
     return kino_Host_callback_str(KINO_VTABLE, "find_parent_class", 1, 
-        KINO_ARG_STR("class_name", class_name));
+        CFISH_ARG_STR("class_name", class_name));
 }
 
 void*

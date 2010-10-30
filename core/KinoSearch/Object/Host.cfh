@@ -17,34 +17,34 @@
 parcel KinoSearch cnick Kino;
 
 __C__
-#define KINO_HOST_ARGTYPE_I32    (int32_t)0x00000001
-#define KINO_HOST_ARGTYPE_I64    (int32_t)0x00000002
-#define KINO_HOST_ARGTYPE_F32    (int32_t)0x00000003
-#define KINO_HOST_ARGTYPE_F64    (int32_t)0x00000004
-#define KINO_HOST_ARGTYPE_STR    (int32_t)0x00000006
-#define KINO_HOST_ARGTYPE_OBJ    (int32_t)0x00000007
-#define KINO_HOST_ARGTYPE_MASK            0x00000007
+#define CFISH_HOST_ARGTYPE_I32    (int32_t)0x00000001
+#define CFISH_HOST_ARGTYPE_I64    (int32_t)0x00000002
+#define CFISH_HOST_ARGTYPE_F32    (int32_t)0x00000003
+#define CFISH_HOST_ARGTYPE_F64    (int32_t)0x00000004
+#define CFISH_HOST_ARGTYPE_STR    (int32_t)0x00000006
+#define CFISH_HOST_ARGTYPE_OBJ    (int32_t)0x00000007
+#define CFISH_HOST_ARGTYPE_MASK            0x00000007
 
-#define KINO_ARG_I32(_label, _value) \
-    KINO_HOST_ARGTYPE_I32, (_label), ((int32_t)_value)
-#define KINO_ARG_I64(_label, _value) \
-    KINO_HOST_ARGTYPE_I64, (_label), ((int64_t)_value)
-#define KINO_ARG_F32(_label, _value) \
-    KINO_HOST_ARGTYPE_F32, (_label), ((double)_value)
-#define KINO_ARG_F64(_label, _value) \
-    KINO_HOST_ARGTYPE_F64, (_label), ((double)_value)
-#define KINO_ARG_STR(_label, _value) \
-    KINO_HOST_ARGTYPE_STR, (_label), ((kino_CharBuf*)_value)
-#define KINO_ARG_OBJ(_label, _value) \
-    KINO_HOST_ARGTYPE_OBJ, (_label), ((kino_Obj*)_value)
+#define CFISH_ARG_I32(_label, _value) \
+    CFISH_HOST_ARGTYPE_I32, (_label), ((int32_t)_value)
+#define CFISH_ARG_I64(_label, _value) \
+    CFISH_HOST_ARGTYPE_I64, (_label), ((int64_t)_value)
+#define CFISH_ARG_F32(_label, _value) \
+    CFISH_HOST_ARGTYPE_F32, (_label), ((double)_value)
+#define CFISH_ARG_F64(_label, _value) \
+    CFISH_HOST_ARGTYPE_F64, (_label), ((double)_value)
+#define CFISH_ARG_STR(_label, _value) \
+    CFISH_HOST_ARGTYPE_STR, (_label), ((kino_CharBuf*)_value)
+#define CFISH_ARG_OBJ(_label, _value) \
+    CFISH_HOST_ARGTYPE_OBJ, (_label), ((kino_Obj*)_value)
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define ARG_I32                 KINO_ARG_I32
-  #define ARG_I64                 KINO_ARG_I64
-  #define ARG_F32                 KINO_ARG_F32
-  #define ARG_F64                 KINO_ARG_F64
-  #define ARG_STR                 KINO_ARG_STR
-  #define ARG_OBJ                 KINO_ARG_OBJ
+  #define ARG_I32                 CFISH_ARG_I32
+  #define ARG_I64                 CFISH_ARG_I64
+  #define ARG_F32                 CFISH_ARG_F32
+  #define ARG_F64                 CFISH_ARG_F64
+  #define ARG_STR                 CFISH_ARG_STR
+  #define ARG_OBJ                 CFISH_ARG_OBJ
 #endif
 
 __END_C__

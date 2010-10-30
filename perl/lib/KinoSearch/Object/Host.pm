@@ -57,8 +57,8 @@ PPCODE:
 {
     kino_ZombieCharBuf *blank = KINO_ZCB_BLANK(); 
     kino_Host_callback(obj, "_test", 2, 
-        KINO_ARG_OBJ("nothing", (kino_CharBuf*)blank),
-        KINO_ARG_I32("foo", 3));
+        CFISH_ARG_OBJ("nothing", (kino_CharBuf*)blank),
+        CFISH_ARG_I32("foo", 3));
 }
 
 int64_t
@@ -68,8 +68,8 @@ CODE:
 {
     kino_ZombieCharBuf *blank = KINO_ZCB_BLANK();
     RETVAL = kino_Host_callback_i64(obj, "_test", 2, 
-        KINO_ARG_OBJ("nothing", (kino_CharBuf*)blank), 
-        KINO_ARG_I32("foo", 3));
+        CFISH_ARG_OBJ("nothing", (kino_CharBuf*)blank), 
+        CFISH_ARG_I32("foo", 3));
 }
 OUTPUT: RETVAL
 
@@ -80,8 +80,8 @@ CODE:
 {
     kino_ZombieCharBuf *blank = KINO_ZCB_BLANK();
     RETVAL = kino_Host_callback_f64(obj, "_test", 2, 
-        KINO_ARG_OBJ("nothing", (kino_CharBuf*)blank), 
-        KINO_ARG_I32("foo", 3));
+        CFISH_ARG_OBJ("nothing", (kino_CharBuf*)blank), 
+        CFISH_ARG_I32("foo", 3));
 }
 OUTPUT: RETVAL
 

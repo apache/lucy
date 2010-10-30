@@ -141,8 +141,8 @@ sub callback_def {
 # to Host's callback interface.  For instance, (int32_t foo, Obj *bar)
 # produces the following:
 #
-#   KINO_ARG_I32("foo", foo),
-#   KINO_ARG_OBJ("bar", bar)
+#   CFISH_ARG_I32("foo", foo),
+#   CFISH_ARG_OBJ("bar", bar)
 #
 sub _callback_params {
     my $method     = shift;
@@ -150,7 +150,6 @@ sub _callback_params {
     my $param_list = $method->get_param_list;
     my $num_params = $param_list->num_vars - 1;
     my $arg_vars   = $param_list->get_variables;
-    my $PREFIX     = $method->get_PREFIX;
     my @params;
 
     # Iterate over arguments, mapping them to various arg wrappers which
@@ -160,19 +159,19 @@ sub _callback_params {
         my $type = $var->get_type;
         my $param;
         if ( $type->is_string_type ) {
-            $param = qq|${PREFIX}ARG_STR("$name", $name)|;
+            $param = qq|CFISH_ARG_STR("$name", $name)|;
         }
         elsif ( $type->is_object ) {
-            $param = qq|${PREFIX}ARG_OBJ("$name", $name)|;
+            $param = qq|CFISH_ARG_OBJ("$name", $name)|;
         }
         elsif ( $type->is_integer ) {
             $param
                 = $type->sizeof > 4
-                ? qq|${PREFIX}ARG_I64("$name", $name)|
-                : qq|${PREFIX}ARG_I32("$name", $name)|;
+                ? qq|CFISH_ARG_I64("$name", $name)|
+                : qq|CFISH_ARG_I32("$name", $name)|;
         }
         elsif ( $type->is_floating ) {
-            $param = qq|${PREFIX}ARG_F64("$name", $name)|;
+            $param = qq|CFISH_ARG_F64("$name", $name)|;
         }
         else {
             # Can't map variable type.  Signal to caller.

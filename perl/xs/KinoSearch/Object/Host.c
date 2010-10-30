@@ -61,13 +61,13 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
         if (num_args > 1) {
             PUSHs( sv_2mortal( newSVpvn(label, strlen(label)) ) );
         }
-        switch (arg_type & KINO_HOST_ARGTYPE_MASK) {
-        case KINO_HOST_ARGTYPE_I32: {
+        switch (arg_type & CFISH_HOST_ARGTYPE_MASK) {
+        case CFISH_HOST_ARGTYPE_I32: {
                 int32_t value = va_arg(args, int32_t);
                 PUSHs( sv_2mortal( newSViv(value) ) );
             }
             break;
-        case KINO_HOST_ARGTYPE_I64: {
+        case CFISH_HOST_ARGTYPE_I64: {
                 int64_t value = va_arg(args, int64_t);
                 if (sizeof(IV) == 8) {
                     PUSHs( sv_2mortal( newSViv((IV)value) ) );
@@ -78,19 +78,19 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
                 }
             }
             break;
-        case KINO_HOST_ARGTYPE_F32:
-        case KINO_HOST_ARGTYPE_F64: {
+        case CFISH_HOST_ARGTYPE_F32:
+        case CFISH_HOST_ARGTYPE_F64: {
                 // Floats are promoted to doubles by variadic calling. 
                 double value = va_arg(args, double);
                 PUSHs( sv_2mortal( newSVnv(value) ) );
             }
             break;
-        case KINO_HOST_ARGTYPE_STR: {
+        case CFISH_HOST_ARGTYPE_STR: {
                 kino_CharBuf *string = va_arg(args, kino_CharBuf*);
                 PUSHs( sv_2mortal( XSBind_cb_to_sv(string) ) );
             }
             break;
-        case KINO_HOST_ARGTYPE_OBJ: {
+        case CFISH_HOST_ARGTYPE_OBJ: {
                 kino_Obj* anObj = va_arg(args, kino_Obj*);
                 SV *arg_sv = anObj == NULL
                     ? newSV(0)
