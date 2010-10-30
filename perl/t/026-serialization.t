@@ -76,7 +76,7 @@ my $bb = KinoSearch::Object::ByteBuf->new("foo");
 run_test_cycle( $bb, sub { shift->to_perl } );
 
 SKIP: {
-    skip( "Invalid deserialization causes leaks", 1 ) if $ENV{KINO_VALGRIND};
+    skip( "Invalid deserialization causes leaks", 1 ) if $ENV{LUCY_VALGRIND};
     my $bad_obj = BadObj->new("Royale With Cheese");
     eval {
         run_test_cycle( $bad_obj, sub { ref( $_[0] ) } );

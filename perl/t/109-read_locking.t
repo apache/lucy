@@ -73,7 +73,7 @@ is( $num_snap_files, 2, "didn't zap the old snap file" );
 my $reader;
 SKIP: {
     skip( "IndexReader opening failure leaks", 1 )
-        if $ENV{KINO_VALGRIND};
+        if $ENV{LUCY_VALGRIND};
     eval {
         $reader = KinoSearch::Index::IndexReader->open(
             index   => $folder,

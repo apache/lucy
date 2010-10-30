@@ -33,7 +33,7 @@ BEGIN {
     if ( !DEBUG_ENABLED() ) {
         plan( skip_all => 'DEBUG not enabled' );
     }
-    elsif ( $ENV{KINO_VALGRIND} ) {
+    elsif ( $ENV{LUCY_VALGRIND} ) {
         plan( skip_all => 'Tests disabled under valgrind' );
     }
     else {

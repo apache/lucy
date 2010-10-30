@@ -112,7 +112,7 @@ my $dupe   = thaw($frozen);
 is( ref($dupe), ref($object), "override serialize/deserialize" );
 
 SKIP: {
-    skip( "Invalid serialization causes leaks", 1 ) if $ENV{KINO_VALGRIND};
+    skip( "Invalid serialization causes leaks", 1 ) if $ENV{LUCY_VALGRIND};
     my $bad = BadSerialize->new;
     eval { my $froze = freeze($bad); };
     like( $@, qr/empty/i,
@@ -121,7 +121,7 @@ SKIP: {
 
 SKIP: {
     skip( "Exception thrown within callback leaks", 1 )
-        if $ENV{KINO_VALGRIND};
+        if $ENV{LUCY_VALGRIND};
     $hash = KinoSearch::Object::Hash->new;
     $hash->store( foo => BadDump->new );
     eval { $hash->dump };

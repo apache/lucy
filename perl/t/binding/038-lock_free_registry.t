@@ -19,7 +19,7 @@ use warnings;
 use Config;
 use Test::More;
 BEGIN {
-    if ( $ENV{KINO_VALGRIND} ) {
+    if ( $ENV{LUCY_VALGRIND} ) {
         plan( skip_all => 'Known leaks' );
     }
     elsif ( $Config{usethreads} ) {

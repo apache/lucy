@@ -25,7 +25,7 @@ BEGIN {
     if ( $^O =~ /mswin/i ) {
         plan( 'skip_all', "fork on Windows not supported by KS" );
     }
-    elsif ( $ENV{KINO_VALGRIND} ) {
+    elsif ( $ENV{LUCY_VALGRIND} ) {
         plan( 'skip_all', "time outs cause probs under valgrind" );
     }
 }

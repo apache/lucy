@@ -39,7 +39,7 @@ $indexer->add_doc( { content => 'foo' } );
 pass("Indexer ignores garbage from interrupted session");
 
 SKIP: {
-    skip( "Known leak, though might be fixable", 2 ) if $ENV{KINO_VALGRIND};
+    skip( "Known leak, though might be fixable", 2 ) if $ENV{LUCY_VALGRIND};
     eval {
         my $manager
             = KinoSearch::Index::IndexManager->new( host => 'somebody_else' );

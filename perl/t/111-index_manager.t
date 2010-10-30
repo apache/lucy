@@ -119,7 +119,7 @@ is( $manager->get_deletion_lock_interval,
     6, "set/get deletion lock interval" );
 
 SKIP: {
-    skip( "Known leak", 1 ) if $ENV{KINO_VALGRIND};
+    skip( "Known leak", 1 ) if $ENV{LUCY_VALGRIND};
     my $indexer = KinoSearch::Index::Indexer->new(
         index   => $folder,
         manager => BogusManager->new,

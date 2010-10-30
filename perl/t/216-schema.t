@@ -32,7 +32,7 @@ pass("Stub class KinoSearch::Schema passed by eat()");
 
 my $schema;
 SKIP: {
-    skip( "constructor bailouts cause leaks", 1 ) if $ENV{KINO_VALGRIND};
+    skip( "constructor bailouts cause leaks", 1 ) if $ENV{LUCY_VALGRIND};
 
     $schema = KinoSearch::Test::TestSchema->new;
     eval { $schema->spec_field( name => 'foo', type => 'NotAType' ) };

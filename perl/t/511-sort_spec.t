@@ -215,7 +215,7 @@ my $results = test_sorted_search( 'vehicle', 100, name => 0 );
 is_deeply( $results, [qw( airplane bike car )], "sort by one criteria" );
 
 SKIP: {
-    skip( "known leaks", 2 ) if $ENV{KINO_VALGRIND};
+    skip( "known leaks", 2 ) if $ENV{LUCY_VALGRIND};
     eval { $results = test_sorted_search( 'vehicle', 100, nope => 0 ) };
     like( $@, qr/sortable/,
         "sorting on a non-sortable field throws an error" );

@@ -28,7 +28,7 @@ my %cc;
 sub new {
     my ( $class, %args ) = @_;
     require ExtUtils::CBuilder;
-    if ( $ENV{KINO_VALGRIND} ) {
+    if ( $ENV{LUCY_VALGRIND} ) {
         $args{config} ||= {};
         $args{config}{optimize} ||= $Config{optimize};
         $args{config}{optimize} =~ s/\-O\d+/-O1/g;
@@ -101,7 +101,7 @@ sub extra_ccflags {
         }
     }
 
-    if ( $ENV{KINO_VALGRIND} and defined $gcc_version ) {
+    if ( $ENV{LUCY_VALGRIND} and defined $gcc_version ) {
         $extra_ccflags .= "-fno-inline-functions ";
     }
 
@@ -405,7 +405,7 @@ sub ACTION_suppressions {
 
 sub _valgrind_base_command {
     return
-          "PERL_DESTRUCT_LEVEL=2 KINO_VALGRIND=1 valgrind "
+          "PERL_DESTRUCT_LEVEL=2 LUCY_VALGRIND=1 valgrind "
         . "--leak-check=yes "
         . "--show-reachable=yes "
         . "--num-callers=10 "
