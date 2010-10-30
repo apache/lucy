@@ -25,8 +25,8 @@
 #include "KinoSearch/Store/InStream.h"
 #include "KinoSearch/Store/OutStream.h"
 
-#define set_up_t    kino_TestFolderCommon_set_up_t
-#define tear_down_t kino_TestFolderCommon_tear_down_t
+#define set_up_t    lucy_TestFolderCommon_set_up_t
+#define tear_down_t lucy_TestFolderCommon_tear_down_t
 
 static CharBuf foo           = ZCB_LITERAL("foo");
 static CharBuf bar           = ZCB_LITERAL("bar");
