@@ -409,7 +409,7 @@ sub _valgrind_base_command {
         . "--leak-check=yes "
         . "--show-reachable=yes "
         . "--num-callers=10 "
-        . "--suppressions=../devel/conf/kinoperl.supp ";
+        . "--suppressions=../devel/conf/lucyperl.supp ";
 }
 
 sub ACTION_test_valgrind {
