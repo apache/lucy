@@ -56,16 +56,16 @@ inert class KinoSearch::Util::Memory {
 
 __C__
 
-#define KINO_MALLOCATE    kino_Memory_wrapped_malloc
-#define KINO_CALLOCATE    kino_Memory_wrapped_calloc
-#define KINO_REALLOCATE   kino_Memory_wrapped_realloc
-#define KINO_FREEMEM      kino_Memory_wrapped_free
+#define LUCY_MALLOCATE    kino_Memory_wrapped_malloc
+#define LUCY_CALLOCATE    kino_Memory_wrapped_calloc
+#define LUCY_REALLOCATE   kino_Memory_wrapped_realloc
+#define LUCY_FREEMEM      kino_Memory_wrapped_free
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define MALLOCATE                       KINO_MALLOCATE
-  #define CALLOCATE                       KINO_CALLOCATE
-  #define REALLOCATE                      KINO_REALLOCATE
-  #define FREEMEM                         KINO_FREEMEM
+  #define MALLOCATE                       LUCY_MALLOCATE
+  #define CALLOCATE                       LUCY_CALLOCATE
+  #define REALLOCATE                      LUCY_REALLOCATE
+  #define FREEMEM                         LUCY_FREEMEM
 #endif
 
 __END_C__

@@ -30,15 +30,15 @@ inert class KinoSearch::Util::Freezer {
 }
 
 __C__
-#define KINO_FREEZE(_obj, _outstream) \
+#define LUCY_FREEZE(_obj, _outstream) \
     kino_Freezer_freeze((Obj*)(_obj), (outstream))
 
-#define KINO_THAW(_instream) \
+#define LUCY_THAW(_instream) \
     kino_Freezer_thaw(instream)
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define FREEZE                KINO_FREEZE 
-  #define THAW                  KINO_THAW
+  #define FREEZE                LUCY_FREEZE 
+  #define THAW                  LUCY_THAW
 #endif
 __END_C__
 

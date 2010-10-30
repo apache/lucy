@@ -73,8 +73,8 @@ kino_CaseFolder_transform(kino_CaseFolder *self, kino_Inversion *inversion)
         size_t size = S_lc_to_work_buf(self, (uint8_t*)token->text, 
             token->len, &buf, &limit);
         if (size > token->len) {
-            KINO_FREEMEM(token->text);
-            token->text = (char*)KINO_MALLOCATE(size + 1);
+            LUCY_FREEMEM(token->text);
+            token->text = (char*)LUCY_MALLOCATE(size + 1);
         }
         memcpy(token->text, buf, size);
         token->text[size] = '\0';
