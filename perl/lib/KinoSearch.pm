@@ -74,46 +74,8 @@ sub error {$KinoSearch::Object::Err::error}
 
 {
     # Temporary back compat.
-    package KinoSearch::Doc;
-    BEGIN { our @ISA = qw( KinoSearch::Document::Doc ) }
-    package KinoSearch::Architecture;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::Architecture ) }
-    package KinoSearch::FieldType;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::FieldType ) }
-    package KinoSearch::FieldType::BlobType;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::BlobType ) }
-    package KinoSearch::FieldType::Float32Type;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::Float32Type ) }
-    package KinoSearch::FieldType::Float64Type;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::Float64Type ) }
-    package KinoSearch::FieldType::Int32Type;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::Int32Type ) }
-    package KinoSearch::FieldType::Int64Type;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::Int64Type ) }
-    package KinoSearch::FieldType::FullTextType;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::FullTextType ) }
-    package KinoSearch::FieldType::StringType;
-    BEGIN { our @ISA = qw( KinoSearch::Plan::StringType ) }
-    package KinoSearch::Indexer;
-    BEGIN { our @ISA = qw( KinoSearch::Index::Indexer ) }
-    package KinoSearch::Obj::BitVector;
-    BEGIN { our @ISA = qw( KinoSearch::Object::BitVector ) }
-    package KinoSearch::QueryParser;
-    BEGIN { our @ISA = qw( KinoSearch::Search::QueryParser ) }
-    package KinoSearch::Search::HitCollector;
-    BEGIN { our @ISA = qw( KinoSearch::Search::Collector ) }
-    package KinoSearch::Search::HitCollector::BitCollector;
-    BEGIN { our @ISA = qw( KinoSearch::Search::Collector::BitCollector ) }
-    package KinoSearch::Search::Searchable;
-    BEGIN { our @ISA = qw( KinoSearch::Search::Searcher ) }
-    package KinoSearch::Search::Similarity;
-    BEGIN { our @ISA = qw( KinoSearch::Index::Similarity ) }
     package KinoSearch::Schema;
     BEGIN { our @ISA = qw( KinoSearch::Plan::Schema ) }
-    package KinoSearch::Searcher;
-    BEGIN { our @ISA = qw( KinoSearch::Search::IndexSearcher ) }
-    package KinoSearch::Util::BitVector;
-    BEGIN { our @ISA = qw( KinoSearch::Object::BitVector ) }
 }
 
 {
