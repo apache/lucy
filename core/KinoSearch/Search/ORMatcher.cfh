@@ -38,12 +38,12 @@ __END_C__
 
 class KinoSearch::Search::ORMatcher inherits KinoSearch::Search::PolyMatcher {
 
-    HeapedMatcherDoc **heap;
-    HeapedMatcherDoc **pool;    /* Pool of HMDs to minimize mallocs */
-    char              *blob;    /* single allocation for all HMDs */
-    HeapedMatcherDoc  *top_hmd; /* cached top elem */
-    uint32_t           size;
-    uint32_t           max_size;
+    kino_HeapedMatcherDoc **heap;
+    kino_HeapedMatcherDoc **pool;    /* Pool of HMDs to minimize mallocs */
+    char                   *blob;    /* single allocation for all HMDs */
+    kino_HeapedMatcherDoc  *top_hmd; /* cached top elem */
+    uint32_t                size;
+    uint32_t                max_size;
 
     inert incremented ORMatcher*
     new(VArray *children);
