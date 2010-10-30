@@ -339,7 +339,7 @@ S_default_compare(void *context, const void *va, const void *vb)
 }
 
 void
-VA_sort(VArray *self, kino_Sort_compare_t compare, void *context)
+VA_sort(VArray *self, lucy_Sort_compare_t compare, void *context)
 {
     if (!compare) { compare = S_default_compare; }
     Sort_quicksort(self->elems, self->size, sizeof(void*), compare, context);
@@ -367,7 +367,7 @@ VA_equals(VArray *self, Obj *other)
 }
 
 VArray*
-VA_gather(VArray *self, kino_VA_gather_test_t test, void *data)
+VA_gather(VArray *self, lucy_VA_gather_test_t test, void *data)
 {
     uint32_t i, max;
     VArray *gathered = VA_new(self->size);

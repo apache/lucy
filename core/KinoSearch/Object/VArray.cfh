@@ -20,10 +20,10 @@ __C__
 #include "KinoSearch/Util/SortUtils.h"
 
 typedef chy_bool_t
-(*kino_VA_gather_test_t)(kino_VArray *self, uint32_t tick, void *data);
+(*lucy_VA_gather_test_t)(kino_VArray *self, uint32_t tick, void *data);
 
 #ifdef KINO_USE_SHORT_NAMES
-  #define kino_VA_gather_test_t kino_VA_gather_test_t
+  #define lucy_VA_gather_test_t lucy_VA_gather_test_t
 #endif
 __END_C__
 
@@ -119,7 +119,7 @@ class KinoSearch::Object::VArray cnick VA inherits KinoSearch::Object::Obj {
      * @param context Argument supplied to the comparison routine.
      */
     void
-    Sort(VArray *self, kino_Sort_compare_t compare = NULL, 
+    Sort(VArray *self, lucy_Sort_compare_t compare = NULL, 
          void *context = NULL);
 
     /** Set the size for the VArray.  If the new size is larger than the
@@ -147,7 +147,7 @@ class KinoSearch::Object::VArray cnick VA inherits KinoSearch::Object::Obj {
     /** Return all elements for which <code>test</code> returns true.
      */
     public incremented VArray*
-    Gather(VArray *self, kino_VA_gather_test_t test, void *data);
+    Gather(VArray *self, lucy_VA_gather_test_t test, void *data);
 
     public bool_t
     Equals(VArray *self, Obj *other);

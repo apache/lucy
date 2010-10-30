@@ -18,7 +18,7 @@ parcel KinoSearch cnick Kino;
 
 __C__
 typedef int 
-(*kino_Sort_compare_t)(void *context, const void *va, const void *vb);
+(*lucy_Sort_compare_t)(void *context, const void *va, const void *vb);
 __END_C__
 
 /** Specialized sorting routines.
@@ -38,7 +38,7 @@ inert class KinoSearch::Util::SortUtils cnick Sort {
      */
     inert void
     mergesort(void *elems, void *scratch, uint32_t num_elems, uint32_t width,
-              kino_Sort_compare_t compare, void *context);
+              lucy_Sort_compare_t compare, void *context);
 
     /** Merge two source arrays together using the classic mergesort merge
      * algorithm, storing the result in <code>dest</code>.
@@ -56,13 +56,13 @@ inert class KinoSearch::Util::SortUtils cnick Sort {
     inert void
     merge(void *left_ptr,  uint32_t left_num_elems,
           void *right_ptr, uint32_t right_num_elems,
-          void *dest, size_t width, kino_Sort_compare_t compare, void *context);
+          void *dest, size_t width, lucy_Sort_compare_t compare, void *context);
 
     /** Quicksort. 
      */
     inert void
     quicksort(void *elems, size_t num_elems, size_t width, 
-              kino_Sort_compare_t compare, void *context);
+              lucy_Sort_compare_t compare, void *context);
 }
 
 
