@@ -95,7 +95,7 @@ kino_Tokenizer_set_token_re(kino_Tokenizer *self, void *token_re)
 void
 kino_Tokenizer_destroy(kino_Tokenizer *self)
 {
-    KINO_DECREF(self->pattern);
+    LUCY_DECREF(self->pattern);
     ReREFCNT_dec(((REGEXP*)self->token_re));
     KINO_SUPER_DESTROY(self, KINO_TOKENIZER);
 }

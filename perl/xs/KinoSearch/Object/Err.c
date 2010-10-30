@@ -22,7 +22,7 @@ kino_Err_get_error()
 {
     kino_Err *error 
         = (kino_Err*)kino_Host_callback_obj(KINO_ERR, "get_error", 0);
-    KINO_DECREF(error); // Cancel out incref from callback. 
+    LUCY_DECREF(error); // Cancel out incref from callback. 
     return error;
 }
 
@@ -31,7 +31,7 @@ kino_Err_set_error(kino_Err *error)
 {
     kino_Host_callback(KINO_ERR, "set_error", 1, 
         KINO_ARG_OBJ("error", error));
-    KINO_DECREF(error);
+    LUCY_DECREF(error);
 }
 
 void
@@ -39,7 +39,7 @@ kino_Err_do_throw(kino_Err *err)
 {
     dSP;
     SV *error_sv = (SV*)Kino_Err_To_Host(err);
-    KINO_DECREF(err);
+    LUCY_DECREF(err);
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
@@ -67,7 +67,7 @@ kino_Err_throw_mess(kino_VTable *vtable, kino_CharBuf *message)
         KINO_CERTIFY(vtable, KINO_VTABLE), Err, Make);
     kino_Err *err = (kino_Err*)KINO_CERTIFY(make(NULL), KINO_ERR);
     Kino_Err_Cat_Mess(err, message);
-    KINO_DECREF(message);
+    LUCY_DECREF(message);
     kino_Err_do_throw(err);
 }
 
@@ -75,7 +75,7 @@ void
 kino_Err_warn_mess(kino_CharBuf *message) 
 {
     SV *error_sv = XSBind_cb_to_sv(message);
-    KINO_DECREF(message);
+    LUCY_DECREF(message);
     warn(SvPV_nolen(error_sv));
     SvREFCNT_dec(error_sv);
 }

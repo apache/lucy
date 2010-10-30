@@ -33,7 +33,7 @@ CODE:
     void *address = Kino_BBSortEx_Fetch(self);
     if (address) {
         RETVAL = XSBind_kino_to_perl(*(kino_Obj**)address);
-        KINO_DECREF(*(kino_Obj**)address);
+        LUCY_DECREF(*(kino_Obj**)address);
     }
     else {
         RETVAL = newSV(0);
@@ -61,7 +61,7 @@ feed(self, bb)
     kino_BBSortEx *self;
     kino_ByteBuf *bb;
 CODE:
-    KINO_INCREF(bb);
+    LUCY_INCREF(bb);
     Kino_BBSortEx_Feed(self, &bb);
 
 END_XS_CODE

@@ -39,7 +39,7 @@ CODE:
 {
     kino_CharBuf *latest = kino_IxFileNames_latest_snapshot(folder);
     RETVAL = XSBind_cb_to_sv(latest);   
-    KINO_DECREF(latest);
+    LUCY_DECREF(latest);
 }
 OUTPUT: RETVAL
 END_XS_CODE

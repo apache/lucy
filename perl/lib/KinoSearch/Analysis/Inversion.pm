@@ -45,7 +45,7 @@ CODE:
     }
         
     RETVAL = KINO_OBJ_TO_SV_NOINC(kino_Inversion_new(starter_token));
-    KINO_DECREF(starter_token);
+    LUCY_DECREF(starter_token);
 }
 OUTPUT: RETVAL
 END_XS

@@ -75,7 +75,7 @@ sub _xsub_body {
         next unless $arg_type->is_object;
         next unless $arg_type->decremented;
         my $var_name = $arg_var->micro_sym;
-        $body .= "if ($var_name) (void)KINO_INCREF($var_name);\n        ";
+        $body .= "if ($var_name) (void)LUCY_INCREF($var_name);\n        ";
     }
 
     if ( $method->void ) {
@@ -88,7 +88,7 @@ sub _xsub_body {
         my $retval_assignment = to_perl( $return_type, 'ST(0)', 'retval' );
         my $decrement         = "";
         if ( $return_type->is_object and $return_type->incremented ) {
-            $decrement = "KINO_DECREF(retval);\n";
+            $decrement = "LUCY_DECREF(retval);\n";
         }
         $body .= qq|retval = $full_func_sym($name_list);
         $retval_assignment$decrement

@@ -204,7 +204,7 @@ kino_Obj_incref(kino_Obj *self)
     else { return NULL; }
 }
 
-#define KINO_INCREF(_self) kino_Obj_incref((kino_Obj*)_self)
+#define LUCY_INCREF(_self) kino_Obj_incref((kino_Obj*)_self)
 
 static CHY_INLINE uint32_t 
 kino_Obj_decref(kino_Obj *self)
@@ -213,12 +213,12 @@ kino_Obj_decref(kino_Obj *self)
     else { return 0; }
 }
 
-#define KINO_DECREF(_self) kino_Obj_decref((kino_Obj*)_self)
+#define LUCY_DECREF(_self) kino_Obj_decref((kino_Obj*)_self)
 
 #ifdef KINO_USE_SHORT_NAMES
   #define SUPER_DESTROY(_self, _vtable)   KINO_SUPER_DESTROY(_self, _vtable)
-  #define INCREF(_self)                   KINO_INCREF(_self)
-  #define DECREF(_self)                   KINO_DECREF(_self)
+  #define INCREF(_self)                   LUCY_INCREF(_self)
+  #define DECREF(_self)                   LUCY_DECREF(_self)
 #endif
 
 __END_C__

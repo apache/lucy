@@ -81,7 +81,7 @@ kino_CaseFolder_transform(kino_CaseFolder *self, kino_Inversion *inversion)
         token->len = size;
     }
     Kino_Inversion_Reset(inversion);
-    return (kino_Inversion*)KINO_INCREF(inversion);
+    return (kino_Inversion*)LUCY_INCREF(inversion);
 }
 
 kino_Inversion*
@@ -95,7 +95,7 @@ kino_CaseFolder_transform_text(kino_CaseFolder *self, kino_CharBuf *text)
         Kino_CB_Get_Size(text), &buf, &limit);
     token = kino_Token_new((char*)buf, size, 0, size, 1.0f, 1);
     retval = kino_Inversion_new(token);
-    KINO_DECREF(token);
+    LUCY_DECREF(token);
     return retval;
 }
 

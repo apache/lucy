@@ -77,7 +77,7 @@ store(self, tick, value);
     kino_Obj    *value;
 PPCODE:
 {
-    if (value) { KINO_INCREF(value); }
+    if (value) { LUCY_INCREF(value); }
     kino_VA_store(self, tick, value);
 }
 

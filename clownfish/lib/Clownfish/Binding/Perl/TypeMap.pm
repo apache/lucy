@@ -179,7 +179,7 @@ END_INPUT
         $typemap_output .= <<END_OUTPUT;
 $label
     \$arg = (SV*)Kino_Obj_To_Host((kino_Obj*)\$var);
-    KINO_DECREF(\$var);
+    LUCY_DECREF(\$var);
 
 END_OUTPUT
     }

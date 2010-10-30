@@ -55,8 +55,8 @@ PPCODE:
         serialized_bb = Kino_RAMFile_Get_Contents(
             Kino_RAMFH_Get_File(file_handle));
         retval = XSBind_bb_to_sv(serialized_bb);
-        KINO_DECREF(file_handle);
-        KINO_DECREF(target);
+        LUCY_DECREF(file_handle);
+        LUCY_DECREF(target);
 
         if (SvCUR(retval) == 0) { // Thwart Storable bug 
             THROW(KINO_ERR, "Calling serialize produced an empty string");
@@ -97,10 +97,10 @@ PPCODE:
     kino_Obj *deserialized = Kino_Obj_Deserialize(self, instream);
 
     CHY_UNUSED_VAR(cloning);
-    KINO_DECREF(contents);
-    KINO_DECREF(ram_file);
-    KINO_DECREF(file_handle);
-    KINO_DECREF(instream);
+    LUCY_DECREF(contents);
+    LUCY_DECREF(ram_file);
+    LUCY_DECREF(file_handle);
+    LUCY_DECREF(instream);
 
     // Catch bad deserialize() override. 
     if (deserialized != self) {

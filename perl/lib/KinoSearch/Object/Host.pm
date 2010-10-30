@@ -45,7 +45,7 @@ CODE:
     SV *pack_var = get_sv("KinoSearch::Object::Host::testobj", 1);
     RETVAL = (SV*)Kino_BB_To_Host(test_obj);
     SvSetSV_nosteal(pack_var, RETVAL);
-    KINO_DECREF(test_obj);
+    LUCY_DECREF(test_obj);
     CHY_UNUSED_VAR(items);
 }
 OUTPUT: RETVAL
@@ -92,7 +92,7 @@ CODE:
 {
     kino_Obj *other = kino_Host_callback_obj(obj, "_test_obj", 0);
     RETVAL = (SV*)Kino_Obj_To_Host(other);
-    KINO_DECREF(other);
+    LUCY_DECREF(other);
 }
 OUTPUT: RETVAL
 END_XS_CODE

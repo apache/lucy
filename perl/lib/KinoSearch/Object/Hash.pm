@@ -49,7 +49,7 @@ store(self, key, value);
     kino_Obj           *value;
 PPCODE:
 {
-    if (value) { KINO_INCREF(value); }
+    if (value) { LUCY_INCREF(value); }
     kino_Hash_store(self, (kino_Obj*)key, value);
 }
 

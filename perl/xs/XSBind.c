@@ -115,7 +115,7 @@ XSBind_maybe_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation)
                 // dangerous, but is the only way to avoid requiring that the
                 // caller take responsibility for a refcount.
                 SV *mortal = (SV*)Kino_Obj_To_Host(retval);
-                KINO_DECREF(retval);
+                LUCY_DECREF(retval);
                 sv_2mortal(mortal);
             }
         }
@@ -182,7 +182,7 @@ XSBind_perl_to_kino(SV *sv)
             ) {
                 IV tmp = SvIV(inner);
                 retval = INT2PTR(kino_Obj*, tmp);
-                (void)KINO_INCREF(retval);
+                (void)LUCY_INCREF(retval);
             }
         }
 

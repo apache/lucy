@@ -271,7 +271,7 @@ sub _obj_callback_def {
 
     my $decrement = "";
     if ( !$return_type->incremented ) {
-        $decrement = "KINO_DECREF(retval);\n    ";
+        $decrement = "LUCY_DECREF(retval);\n    ";
     }
 
     return <<END_CALLBACK_DEF;
