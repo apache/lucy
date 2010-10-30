@@ -74,9 +74,9 @@ __C__
 /** The maximum number of bytes encoded by to_base36(), including the
  * terminating NULL.
  */
-#define kino_StrHelp_MAX_BASE36_BYTES 14
+#define lucy_StrHelp_MAX_BASE36_BYTES 14
 #ifdef KINO_USE_SHORT_NAMES
-  #define StrHelp_MAX_BASE36_BYTES kino_StrHelp_MAX_BASE36_BYTES
+  #define StrHelp_MAX_BASE36_BYTES lucy_StrHelp_MAX_BASE36_BYTES
 #endif
 __END_C__
 
