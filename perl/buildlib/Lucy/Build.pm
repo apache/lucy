@@ -19,7 +19,7 @@ use warnings;
 use lib '../clownfish/lib';
 use lib 'clownfish/lib';
 
-package KinoSearch::Build::CBuilder;
+package Lucy::Build::CBuilder;
 BEGIN { our @ISA = "ExtUtils::CBuilder"; }
 use Config;
 
@@ -59,7 +59,7 @@ sub link_executable {
     }
 }
 
-package KinoSearch::Build;
+package Lucy::Build;
 use base qw( Module::Build );
 
 use File::Spec::Functions
@@ -161,7 +161,7 @@ sub ACTION_charmonizer {
 
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
 
-    my $cbuilder = KinoSearch::Build::CBuilder->new(
+    my $cbuilder = Lucy::Build::CBuilder->new(
         config => { cc => $self->config('cc') }, );
 
     my @o_files;
@@ -477,7 +477,7 @@ sub ACTION_compile_custom_xs {
 
     require ExtUtils::ParseXS;
 
-    my $cbuilder = KinoSearch::Build::CBuilder->new(
+    my $cbuilder = Lucy::Build::CBuilder->new(
         config => { cc => $self->config('cc') }, );
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'KinoSearch', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;

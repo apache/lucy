@@ -17,9 +17,9 @@ use 5.008003;
 use strict;
 use warnings;
 use lib 'buildlib';
-use KinoSearch::Build;
+use Lucy::Build;
 
-my $builder = KinoSearch::Build->new(
+my $builder = Lucy::Build->new(
     module_name => 'KinoSearch',
     license     => 'apache',
     dist_author =>
