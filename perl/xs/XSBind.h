@@ -194,7 +194,7 @@ kino_XSBind_allot_params(SV** stack, int32_t start,
  * leave all symbols at full size, but the succinctness is worth it.
  */
 #define THROW            CFISH_THROW
-#define WARN             KINO_WARN
+#define WARN             CFISH_WARN
 
 #ifdef __cplusplus
 }

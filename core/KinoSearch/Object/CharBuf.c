@@ -39,7 +39,7 @@
 // infinite loop -- so we fwrite some of the bogus text to stderr and 
 // invoke THROW with a generic message.
 #define DIE_INVALID_UTF8(text, size) \
-    S_die_invalid_utf8(text, size, __FILE__, __LINE__, KINO_ERR_FUNC_MACRO)
+    S_die_invalid_utf8(text, size, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 static void
 S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
                    const char *func);

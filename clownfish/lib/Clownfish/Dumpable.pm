@@ -181,7 +181,7 @@ sub _add_load_method {
 kino_Obj*
 $full_func_sym($full_struct *self, kino_Obj *dump)
 {
-    kino_Hash *source = (kino_Hash*)KINO_CERTIFY(dump, KINO_HASH);
+    kino_Hash *source = (kino_Hash*)CFISH_CERTIFY(dump, KINO_HASH);
     $full_struct *loaded 
         = ($full_struct*)$super_load(($super_type*)self, dump);
     CHY_UNUSED_VAR(self);
@@ -193,8 +193,8 @@ END_STUFF
 kino_Obj*
 $full_func_sym($full_struct *self, kino_Obj *dump)
 {
-    kino_Hash *source = (kino_Hash*)KINO_CERTIFY(dump, KINO_HASH);
-    kino_CharBuf *class_name = (kino_CharBuf*)KINO_CERTIFY(
+    kino_Hash *source = (kino_Hash*)CFISH_CERTIFY(dump, KINO_HASH);
+    kino_CharBuf *class_name = (kino_CharBuf*)CFISH_CERTIFY(
         Kino_Hash_Fetch_Str(source, "_class", 6), KINO_CHARBUF);
     kino_VTable *vtable = kino_VTable_singleton(class_name, NULL);
     $full_struct *loaded = ($full_struct*)Kino_VTable_Make_Obj(vtable);
@@ -224,7 +224,7 @@ sub _process_load_member {
         = $type->is_integer  ? qq|($type_str)Kino_Obj_To_I64(var)|
         : $type->is_floating ? qq|($type_str)Kino_Obj_To_F64(var)|
         : $type->is_object
-        ? qq|($struct_sym*)KINO_CERTIFY(Kino_Obj_Load(var, var), $vtable_var)|
+        ? qq|($struct_sym*)CFISH_CERTIFY(Kino_Obj_Load(var, var), $vtable_var)|
         : confess( "Don't know how to load " . $type->get_specifier );
     return <<END_STUFF;
     {

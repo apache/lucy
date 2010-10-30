@@ -87,7 +87,7 @@ THROW(VTable *vtable, char *pattern, ...)
     Err_do_throw(err);
 }
 void
-KINO_WARN(char *pattern, ...)
+CFISH_WARN(char *pattern, ...)
 {
     va_list args;
     CharBuf *const message = CB_new(strlen(pattern) + 10);
@@ -99,7 +99,7 @@ KINO_WARN(char *pattern, ...)
     Err_warn_mess(message);
 }
 CharBuf*
-KINO_MAKE_MESS(char *pattern, ...)
+CFISH_MAKE_MESS(char *pattern, ...)
 {
     va_list args;
     CharBuf *const message = CB_new(strlen(pattern) + 10);

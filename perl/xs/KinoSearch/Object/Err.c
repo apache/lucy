@@ -64,8 +64,8 @@ void
 kino_Err_throw_mess(kino_VTable *vtable, kino_CharBuf *message) 
 {
     kino_Err_make_t make = (kino_Err_make_t)LUCY_METHOD(
-        KINO_CERTIFY(vtable, KINO_VTABLE), Err, Make);
-    kino_Err *err = (kino_Err*)KINO_CERTIFY(make(NULL), KINO_ERR);
+        CFISH_CERTIFY(vtable, KINO_VTABLE), Err, Make);
+    kino_Err *err = (kino_Err*)CFISH_CERTIFY(make(NULL), KINO_ERR);
     Kino_Err_Cat_Mess(err, message);
     LUCY_DECREF(message);
     kino_Err_do_throw(err);

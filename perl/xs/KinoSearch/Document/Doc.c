@@ -140,14 +140,14 @@ kino_Doc_dump(kino_Doc *self)
 kino_Doc*
 kino_Doc_load(kino_Doc *self, kino_Obj *dump)
 {
-    kino_Hash *source = (kino_Hash*)KINO_CERTIFY(dump, KINO_HASH);
-    kino_CharBuf *class_name = (kino_CharBuf*)KINO_CERTIFY(
+    kino_Hash *source = (kino_Hash*)CFISH_CERTIFY(dump, KINO_HASH);
+    kino_CharBuf *class_name = (kino_CharBuf*)CFISH_CERTIFY(
         Kino_Hash_Fetch_Str(source, "_class", 6), KINO_CHARBUF);
     kino_VTable *vtable = kino_VTable_singleton(class_name, NULL);
     kino_Doc *loaded = (kino_Doc*)Kino_VTable_Make_Obj(vtable);
-    kino_Obj *doc_id = KINO_CERTIFY(
+    kino_Obj *doc_id = CFISH_CERTIFY(
         Kino_Hash_Fetch_Str(source, "doc_id", 7), KINO_OBJ);
-    kino_Hash *fields = (kino_Hash*)KINO_CERTIFY(
+    kino_Hash *fields = (kino_Hash*)CFISH_CERTIFY(
         Kino_Hash_Fetch_Str(source, "fields", 6), KINO_HASH);
     SV *fields_sv = XSBind_kino_to_perl((kino_Obj*)fields);
     CHY_UNUSED_VAR(self);

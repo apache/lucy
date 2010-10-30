@@ -156,18 +156,18 @@ class KinoSearch::Object::Err inherits KinoSearch::Object::Obj {
 
 __C__
 #ifdef CHY_HAS_FUNC_MACRO
- #define KINO_ERR_FUNC_MACRO CHY_FUNC_MACRO
+ #define CFISH_ERR_FUNC_MACRO CHY_FUNC_MACRO
 #else
- #define KINO_ERR_FUNC_MACRO NULL
+ #define CFISH_ERR_FUNC_MACRO NULL
 #endif
 
-#define KINO_ERR_ADD_FRAME(_error) \
+#define CFISH_ERR_ADD_FRAME(_error) \
     Kino_Err_Add_Frame(_error, __FILE__, __LINE__, \
-        KINO_ERR_FUNC_MACRO)
+        CFISH_ERR_FUNC_MACRO)
 
-#define KINO_RETHROW(_error) \
+#define CFISH_RETHROW(_error) \
     kino_Err_rethrow((kino_Err*)_error, __FILE__, __LINE__, \
-        KINO_ERR_FUNC_MACRO)
+        CFISH_ERR_FUNC_MACRO)
 
 /** Macro version of kino_Err_throw_at which inserts contextual information
  * automatically, provided that the compiler supports the necessary features.
@@ -175,65 +175,65 @@ __C__
 #ifdef CHY_HAS_VARIADIC_MACROS
  #ifdef CHY_HAS_ISO_VARIADIC_MACROS
   #define CFISH_THROW(_vtable, ...) \
-    kino_Err_throw_at(_vtable, __FILE__, __LINE__, KINO_ERR_FUNC_MACRO, \
+    kino_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
         __VA_ARGS__)
-  #define KINO_WARN(...) \
-    kino_Err_warn_at(__FILE__, __LINE__, KINO_ERR_FUNC_MACRO, __VA_ARGS__)
-  #define KINO_MAKE_MESS(...) \
-    kino_Err_make_mess(__FILE__, __LINE__, KINO_ERR_FUNC_MACRO, \
+  #define CFISH_WARN(...) \
+    kino_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, __VA_ARGS__)
+  #define CFISH_MAKE_MESS(...) \
+    kino_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
         __VA_ARGS__)
  #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS)
   #define CFISH_THROW(_vtable, args...) \
     kino_Err_throw_at(_vtable, __FILE__, __LINE__, \
-        KINO_ERR_FUNC_MACRO, ##args)
-  #define KINO_WARN(args...) \
-    kino_Err_warn_at(__FILE__, __LINE__, KINO_ERR_FUNC_MACRO, ##args)
-  #define KINO_MAKE_MESS(args...) \
-    kino_Err_make_mess(__FILE__, __LINE__, KINO_ERR_FUNC_MACRO, ##args)
+        CFISH_ERR_FUNC_MACRO, ##args)
+  #define CFISH_WARN(args...) \
+    kino_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
+  #define CFISH_MAKE_MESS(args...) \
+    kino_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
  #endif
 #else
   void 
   CFISH_THROW(kino_VTable *vtable, char* format, ...);
   void 
-  KINO_WARN(char* format, ...);
+  CFISH_WARN(char* format, ...);
   void 
-  KINO_MAKE_MESS(char* format, ...);
+  CFISH_MAKE_MESS(char* format, ...);
 #endif
 
-#define KINO_DOWNCAST(_obj, _vtable) \
+#define CFISH_DOWNCAST(_obj, _vtable) \
     kino_Err_downcast((kino_Obj*)(_obj), (_vtable), \
-        __FILE__, __LINE__, KINO_ERR_FUNC_MACRO)
+        __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 
-#define KINO_CERTIFY(_obj, _vtable) \
+#define CFISH_CERTIFY(_obj, _vtable) \
     kino_Err_certify((kino_Obj*)(_obj), (_vtable), \
-        __FILE__, __LINE__, KINO_ERR_FUNC_MACRO)
+        __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 static CHY_INLINE void
 kino_Err_abstract_class_check(kino_Obj *obj, kino_VTable *vtable)
 {
     kino_VTable *const my_vtable = *(kino_VTable**)obj;
     if (my_vtable == vtable) {
-        kino_CharBuf *mess = KINO_MAKE_MESS("%o is an abstract class",
+        kino_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
             Kino_Obj_Get_Class_Name(obj));
         Kino_Obj_Dec_RefCount(obj);
         kino_Err_throw_mess(KINO_ERR, mess);
     }
 }
 
-#define KINO_ABSTRACT_CLASS_CHECK(_obj, _vtable) \
+#define CFISH_ABSTRACT_CLASS_CHECK(_obj, _vtable) \
     kino_Err_abstract_class_check(((kino_Obj*)_obj), _vtable)
 
 #ifdef KINO_USE_SHORT_NAMES
   #define THROW                 CFISH_THROW
-  #define RETHROW               KINO_RETHROW
-  #define WARN                  KINO_WARN
-  #define MAKE_MESS             KINO_MAKE_MESS
-  #define ERR_ADD_FRAME         KINO_ERR_ADD_FRAME
-  #define ERR_FUNC_MACRO        KINO_ERR_FUNC_MACRO
-  #define DOWNCAST              KINO_DOWNCAST
-  #define CERTIFY               KINO_CERTIFY
-  #define ABSTRACT_CLASS_CHECK  KINO_ABSTRACT_CLASS_CHECK
+  #define RETHROW               CFISH_RETHROW
+  #define WARN                  CFISH_WARN
+  #define MAKE_MESS             CFISH_MAKE_MESS
+  #define ERR_ADD_FRAME         CFISH_ERR_ADD_FRAME
+  #define ERR_FUNC_MACRO        CFISH_ERR_FUNC_MACRO
+  #define DOWNCAST              CFISH_DOWNCAST
+  #define CERTIFY               CFISH_CERTIFY
+  #define ABSTRACT_CLASS_CHECK  CFISH_ABSTRACT_CLASS_CHECK
 #endif
 __END_C__
 
