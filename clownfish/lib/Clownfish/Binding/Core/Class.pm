@@ -37,24 +37,6 @@ sub new {
     return $self;
 }
 
-sub file_path {
-    my ( $self, $base_dir, $ext ) = @_;
-    my $source_class = $self->{client}->get_source_class;
-    my @components = split( '::', $source_class );
-    unshift @components, $base_dir
-        if defined $base_dir;
-    $components[-1] .= $ext;
-    return catfile(@components);
-}
-
-sub include_h {
-    my $self         = shift;
-    my $source_class = $self->{client}->get_source_class;
-    my @components   = split( '::', $source_class );
-    $components[-1] .= '.h';
-    return join( '/', @components );
-}
-
 sub _full_callbacks_var { shift->{client}->full_vtable_var . '_CALLBACKS' }
 sub _full_name_var      { shift->{client}->full_vtable_var . '_CLASS_NAME' }
 sub _short_names_macro  { shift->{client}->get_PREFIX . 'USE_SHORT_NAMES' }
@@ -308,7 +290,7 @@ sub to_c {
 
     return $client->get_autocode if $client->inert;
 
-    my $include_h      = $self->include_h;
+    my $include_h      = $client->include_h;
     my $autocode       = $client->get_autocode;
     my $offsets        = '';
     my $abstract_funcs = '';
@@ -412,21 +394,6 @@ autogenerates the C code with implements that specification.
 =item * B<client> - A L<Clownfish::Class>.
 
 =back
-
-=head2 file_path
-
-    # /path/to/Foo/Bar.c, if source class is Foo::Bar.
-    my $path = $class->file_path( '/path/to', '.c' );
-
-Provide an OS-specific path where a file relating to this class could be
-found, by joining together the components of the "source class" name.
-
-=head2 include_h
-
-    print q|#include "| . $class->include_h . q|"|;
-
-Return a relative path to a C header file, appropriately formatted for a
-pound-include directive.
 
 =head2 to_c_header
 
