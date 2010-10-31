@@ -64,12 +64,11 @@ sub include_h {
     return join( '/', @components );
 }
 
-sub vtable_var       { uc( shift->{struct_sym} ) }
-sub full_vtable_var  { $_[0]->get_PREFIX . uc( $_[0]->{struct_sym} ) }
-sub callbacks_var    { shift->vtable_var . '_CALLBACKS' }
-sub name_var         { shift->vtable_var . '_CLASS_NAME' }
-sub full_name_var    { shift->full_vtable_var . '_CLASS_NAME' }
-sub full_vtable_type { shift->{client}->full_vtable_type }
+sub vtable_var         { uc( shift->{struct_sym} ) }
+sub full_vtable_var    { $_[0]->get_PREFIX . uc( $_[0]->{struct_sym} ) }
+sub full_callbacks_var { shift->full_vtable_var . '_CALLBACKS' }
+sub full_name_var      { shift->full_vtable_var . '_CLASS_NAME' }
+sub full_vtable_type   { shift->{client}->full_vtable_type }
 
 sub name_var_definition {
     my $self           = shift;
@@ -95,6 +94,7 @@ sub vtable_definition {
     my $name_var   = $self->full_name_var;
     my $vtable_var = $self->full_vtable_var;
     my $vt         = $vtable_var . "_vt";
+    my $cb_var     = $self->full_callbacks_var;
     my $vt_type    = $self->full_vtable_type;
     my $cnick      = $self->{cnick};
     my $prefix     = $self->get_prefix;
@@ -124,7 +124,7 @@ $vt_type $vt = {
     sizeof($self->{full_struct_sym}), /* obj_alloc_size */
     offsetof(kino_VTable, methods) 
         + $num_methods * sizeof(kino_method_t), /* vt_alloc_size */
-    (cfish_Callback**)&${vtable_var}_CALLBACKS,  /* callbacks */
+    &$cb_var,  /* callbacks */
     {
         $method_string
     }
@@ -293,7 +293,7 @@ typedef struct $vt_type {
     void *x;
     size_t obj_alloc_size;
     size_t vt_alloc_size;
-    cfish_Callback **callbacks;
+    void *callbacks;
     kino_method_t methods[$num_methods];
 } $vt_type;
 $vt
@@ -373,7 +373,7 @@ sub to_c {
     # doesn't allow us to initialize a pointer to an anonymous array inside a
     # global struct, we have to give it a real symbol and then store a pointer
     # to that symbol inside the VTable struct.
-    my $callbacks_var = $self->full_vtable_var . "_CALLBACKS";
+    my $callbacks_var = $self->full_callbacks_var;
     $callbacks .= "cfish_Callback *$callbacks_var" . "[] = {\n    ";
     $callbacks .= join( ",\n    ", @class_callbacks, "NULL" );
     $callbacks .= "\n};\n";
@@ -455,13 +455,9 @@ Return C code defining the class's VTable.
 
 Create the definition for the instantiable object struct.
 
-=head2 callbacks_var
+=head2 full_callbacks_var
 
-Return the name of the global Callbacks list for this class.
-
-=head2 name_var 
-
-The name of the global class name var for this class.
+Return the fully qualified name of the global Callbacks list for this class.
 
 =head2 name_var_definition
 
