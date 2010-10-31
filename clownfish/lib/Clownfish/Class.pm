@@ -181,12 +181,10 @@ sub final                 { shift->{final} }
 
 sub set_parent { $_[0]->{parent} = $_[1] }
 
-sub vtable_var  { uc( shift->{struct_sym} ) }
-sub vtable_type { shift->vtable_var . '_VT' }
-
 sub full_struct_sym  { $_[0]->get_prefix . $_[0]->{struct_sym} }
-sub full_vtable_var  { $_[0]->get_PREFIX . $_[0]->vtable_var }
-sub full_vtable_type { $_[0]->get_PREFIX . $_[0]->vtable_type }
+sub short_vtable_var { uc( shift->{struct_sym} ) }
+sub full_vtable_var  { $_[0]->get_PREFIX . $_[0]->short_vtable_var }
+sub full_vtable_type { shift->full_vtable_var . '_VT' }
 
 sub append_autocode { $_[0]->{autocode} .= $_[1] }
 
@@ -538,16 +536,9 @@ pound-include directive.
 
 Append auxiliary C code.
 
-=head2 vtable_var
+=head2 short_vtable_var
 
-The name of the global VTable object for this class.
-
-=head2 vtable_type
-
-The C type specifier for this class's vtable.  Each vtable needs to have its
-own type because each has a variable number of methods at the end of the
-struct, and it's not possible to initialize a static struct with a flexible
-array at the end under C89.
+The short name of the global VTable object for this class.
 
 =head2 full_vtable_var
 
@@ -555,7 +546,10 @@ Fully qualified vtable variable name, including the parcel prefix.
 
 =head2 full_vtable_type
 
-Fully qualified vtable type name, including the parcel prefix.
+The fully qualified C type specifier for this class's vtable, including the
+parcel prefix.  Each vtable needs to have its own type because each has a
+variable number of methods at the end of the struct, and it's not possible to
+initialize a static struct with a flexible array at the end under C89.
 
 =head2 full_struct_sym
 

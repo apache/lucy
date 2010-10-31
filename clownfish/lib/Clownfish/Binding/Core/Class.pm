@@ -44,10 +44,6 @@ sub new {
     return $self;
 }
 
-sub get_prefix { shift->{client}->get_prefix }
-sub get_Prefix { shift->{client}->get_Prefix }
-sub get_PREFIX { shift->{client}->get_PREFIX }
-
 sub file_path {
     my ( $self, $base_dir, $ext ) = @_;
     my @components = split( '::', $self->{source_class} );
@@ -64,15 +60,13 @@ sub include_h {
     return join( '/', @components );
 }
 
-sub vtable_var         { uc( shift->{struct_sym} ) }
-sub full_vtable_var    { $_[0]->get_PREFIX . uc( $_[0]->{struct_sym} ) }
-sub full_callbacks_var { shift->full_vtable_var . '_CALLBACKS' }
-sub full_name_var      { shift->full_vtable_var . '_CLASS_NAME' }
-sub full_vtable_type   { shift->{client}->full_vtable_type }
+sub _full_callbacks_var { shift->{client}->full_vtable_var . '_CALLBACKS' }
+sub _full_name_var      { shift->{client}->full_vtable_var . '_CLASS_NAME' }
+sub _short_names_macro  { shift->{client}->get_PREFIX . 'USE_SHORT_NAMES' }
 
 sub name_var_definition {
     my $self           = shift;
-    my $full_var_name  = $self->full_name_var;
+    my $full_var_name  = _full_name_var($self);
     my $class_name_len = length( $self->{class_name} );
     return <<END_STUFF;
 kino_ZombieCharBuf $full_var_name = {
@@ -91,14 +85,12 @@ sub vtable_definition {
     my $client     = $self->{client};
     my $parent     = $client->get_parent;
     my @methods    = $client->methods;
-    my $name_var   = $self->full_name_var;
-    my $vtable_var = $self->full_vtable_var;
+    my $name_var   = _full_name_var($self);
+    my $vtable_var = $self->{client}->full_vtable_var;
     my $vt         = $vtable_var . "_vt";
-    my $cb_var     = $self->full_callbacks_var;
-    my $vt_type    = $self->full_vtable_type;
+    my $cb_var     = _full_callbacks_var($self);
+    my $vt_type    = $self->{client}->full_vtable_type;
     my $cnick      = $self->{cnick};
-    my $prefix     = $self->get_prefix;
-    my $PREFIX     = $self->get_PREFIX;
 
     # Create a pointer to the parent class's vtable.
     my $parent_ref
@@ -134,13 +126,9 @@ END_VTABLE
 }
 
 sub struct_definition {
-    my $self   = shift;
-    my $prefix = $self->get_prefix;
-
-    # Add a line for each member var.
+    my $self = shift;
     my $member_declarations = join( "\n    ",
         map { $_->local_declaration } $self->{client}->member_vars );
-
     return <<END_STRUCT
 struct $self->{full_struct_sym} {
     $member_declarations
@@ -156,10 +144,9 @@ sub to_c_header {
     my @methods       = $client->methods;
     my @novel_methods = $client->novel_methods;
     my @inert_vars    = $client->inert_vars;
-    my $vtable_var    = $self->vtable_var;
+    my $vtable_var    = $self->{client}->full_vtable_var;
+    my $short_vt_var  = $self->{client}->short_vtable_var;
     my $struct_def    = $self->struct_definition;
-    my $prefix        = $self->get_prefix;
-    my $PREFIX        = $self->get_PREFIX;
     my $c_file_sym    = "C_" . uc( $client->full_struct_sym );
 
     # If class inherits from something, include the parent class's header.
@@ -200,10 +187,10 @@ sub to_c_header {
     }
 
     # Declare the virtual table singleton object.
-    my $vt_type       = $self->full_vtable_type;
-    my $vt            = "extern struct $vt_type $PREFIX${vtable_var}_vt;";
-    my $vtable_object = "#define $PREFIX$vtable_var "
-        . "((kino_VTable*)&$PREFIX${vtable_var}_vt)";
+    my $vt_type = $self->{client}->full_vtable_type;
+    my $vt      = "extern struct $vt_type ${vtable_var}_vt;";
+    my $vtable_object
+        = "#define $vtable_var ((kino_VTable*)&${vtable_var}_vt)";
     my $num_methods = scalar @methods;
 
     # Declare cfish_Callback objects.
@@ -216,14 +203,16 @@ sub to_c_header {
 
     # Define short names.
     my $short_names = '';
+    my $short_names_macro = _short_names_macro($self);
     for my $function (@functions) {
         my $short_func_sym = $function->short_sym;
         my $full_func_sym  = $function->full_sym;
         $short_names .= "  #define $short_func_sym $full_func_sym\n";
     }
     for my $inert_var (@inert_vars) {
-        my $short_name = "$self->{cnick}_" . $inert_var->micro_sym;
-        $short_names .= "  #define $short_name $prefix$short_name\n";
+        my $short_sym = $inert_var->short_sym;
+        my $full_sym = $inert_var->full_sym;
+        $short_names .= "  #define $short_sym $full_sym\n";
     }
     if ( !$client->inert ) {
         for my $method (@novel_methods) {
@@ -257,9 +246,9 @@ $inert_vars
 
 $sub_declarations
 
-#ifdef ${PREFIX}USE_SHORT_NAMES
+#ifdef $short_names_macro
 $short_names
-#endif /* ${PREFIX}USE_SHORT_NAMES */
+#endif /* $short_names_macro */
 
 END_INERT
     }
@@ -299,11 +288,11 @@ typedef struct $vt_type {
 $vt
 $vtable_object
 
-#ifdef ${PREFIX}USE_SHORT_NAMES
+#ifdef $short_names_macro
   #define $self->{struct_sym} $self->{full_struct_sym} 
-  #define $vtable_var $PREFIX$vtable_var
+  #define $short_vt_var $vtable_var
 $short_names
-#endif /* ${PREFIX}USE_SHORT_NAMES */
+#endif /* $short_names_macro */
 
 END_STUFF
 }
@@ -322,9 +311,7 @@ sub to_c {
     my $abstract_funcs = '';
     my $callback_funcs = '';
     my $callbacks      = '';
-    my $prefix         = $self->get_prefix;
-    my $PREFIX         = $self->get_PREFIX;
-    my $vt_type        = $self->full_vtable_type;
+    my $vt_type        = $self->{client}->full_vtable_type;
     my $meth_num       = 0;
     my @class_callbacks;
 
@@ -373,7 +360,7 @@ sub to_c {
     # doesn't allow us to initialize a pointer to an anonymous array inside a
     # global struct, we have to give it a real symbol and then store a pointer
     # to that symbol inside the VTable struct.
-    my $callbacks_var = $self->full_callbacks_var;
+    my $callbacks_var = _full_callbacks_var($self);
     $callbacks .= "cfish_Callback *$callbacks_var" . "[] = {\n    ";
     $callbacks .= join( ",\n    ", @class_callbacks, "NULL" );
     $callbacks .= "\n};\n";
@@ -420,10 +407,6 @@ autogenerates the C code with implements that specification.
 
 =back
 
-=head2 get_prefix get_Prefix get_PREFIX
-
-Forwards to the client's methods of the same name.
-
 =head2 file_path
 
     # /path/to/Foo/Bar.c, if source class is Foo::Bar.
@@ -439,14 +422,6 @@ found, by joining together the components of the "source class" name.
 Return a relative path to a C header file, appropriately formatted for a
 pound-include directive.
 
-=head2 vtable_var
-
-Return the name of the global VTable object for this class.
-
-=head2 full_vtable_type
-
-Fully qualified vtable type name, including the parcel prefix.
-
 =head2 vtable_definition
 
 Return C code defining the class's VTable.
@@ -454,10 +429,6 @@ Return C code defining the class's VTable.
 =head2 struct_definition
 
 Create the definition for the instantiable object struct.
-
-=head2 full_callbacks_var
-
-Return the fully qualified name of the global Callbacks list for this class.
 
 =head2 name_var_definition
 
