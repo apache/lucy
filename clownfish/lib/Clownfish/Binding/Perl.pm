@@ -339,7 +339,6 @@ sub _write_boot_c {
         my $include_h = $class->include_h;
         $pound_includes .= qq|#include "$include_h"\n|;
         next if $class->inert;
-        my $prefix  = $class->get_prefix;
         my $PREFIX  = $class->get_PREFIX;
         my $vt_type = $PREFIX . $class->vtable_type;
 
@@ -347,7 +346,7 @@ sub _write_boot_c {
         # multiple threads contend for adding these permanent VTables and some
         # fail.
         $registrations
-            .= qq|    ${prefix}VTable_add_to_registry($PREFIX|
+            .= qq|    kino_VTable_add_to_registry($PREFIX|
             . $class->vtable_var
             . qq|);\n|;
 

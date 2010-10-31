@@ -64,19 +64,21 @@ sub include_h {
     return join( '/', @components );
 }
 
-sub vtable_var    { uc( shift->{struct_sym} ) }
-sub callbacks_var { shift->vtable_var . '_CALLBACKS' }
-sub name_var      { shift->vtable_var . '_CLASS_NAME' }
+sub vtable_var      { uc( shift->{struct_sym} ) }
+sub full_vtable_var { $_[0]->get_PREFIX . uc( $_[0]->{struct_sym} ) }
+sub callbacks_var   { shift->vtable_var . '_CALLBACKS' }
+sub name_var        { shift->vtable_var . '_CLASS_NAME' }
+sub full_name_var   { shift->full_vtable_var . '_CLASS_NAME' }
 
 sub name_var_definition {
     my $self           = shift;
     my $prefix         = $self->get_prefix;
     my $PREFIX         = $self->get_PREFIX;
-    my $full_var_name  = $PREFIX . $self->name_var;
+    my $full_var_name  = $self->full_name_var;
     my $class_name_len = length( $self->{class_name} );
     return <<END_STUFF;
-${prefix}ZombieCharBuf $full_var_name = {
-    ${PREFIX}ZOMBIECHARBUF,
+kino_ZombieCharBuf $full_var_name = {
+    KINO_ZOMBIECHARBUF,
     {1}, /* ref.count */
     "$self->{class_name}",
     $class_name_len,
@@ -93,8 +95,8 @@ sub vtable_definition {
     my $client     = $self->{client};
     my $parent     = $client->get_parent;
     my @methods    = $client->methods;
-    my $name_var   = $self->name_var;
-    my $vtable_var = $self->vtable_var;
+    my $name_var   = $self->full_name_var;
+    my $vtable_var = $self->full_vtable_var;
     my $vt         = $vtable_var . "_vt";
     my $vt_type    = $self->vtable_type;
     my $cnick      = $self->{cnick};
@@ -104,7 +106,7 @@ sub vtable_definition {
     # Create a pointer to the parent class's vtable.
     my $parent_ref
         = defined $parent
-        ? "$PREFIX" . $parent->vtable_var
+        ? $parent->full_vtable_var
         : "NULL";    # No parent, e.g. Obj or inert classes.
 
     # Spec functions which implement the methods, casting to quiet compiler.
@@ -115,17 +117,17 @@ sub vtable_definition {
 
     return <<END_VTABLE
 
-$PREFIX$vt_type $PREFIX$vt = {
-    ${PREFIX}VTABLE, /* vtable vtable */
+$PREFIX$vt_type $vt = {
+    KINO_VTABLE, /* vtable vtable */
     {1}, /* ref.count */
     $parent_ref, /* parent */
-    (${prefix}CharBuf*)&${PREFIX}$name_var,
+    (kino_CharBuf*)&$name_var,
     0, /* flags */
     NULL, /* "void *x" member reserved for future use */
     sizeof($self->{full_struct_sym}), /* obj_alloc_size */
-    offsetof(${prefix}VTable, methods) 
+    offsetof(kino_VTable, methods) 
         + $num_methods * sizeof(kino_method_t), /* vt_alloc_size */
-    (${prefix}Callback**)&${PREFIX}${vtable_var}_CALLBACKS,  /* callbacks */
+    (kino_Callback**)&${vtable_var}_CALLBACKS,  /* callbacks */
     {
         $method_string
     }
@@ -204,7 +206,7 @@ sub to_c_header {
     my $vt_type       = $PREFIX . $self->vtable_type;
     my $vt            = "extern struct $vt_type $PREFIX${vtable_var}_vt;";
     my $vtable_object = "#define $PREFIX$vtable_var "
-        . "((${prefix}VTable*)&$PREFIX${vtable_var}_vt)";
+        . "((kino_VTable*)&$PREFIX${vtable_var}_vt)";
     my $num_methods = scalar @methods;
 
     # Declare Callback objects.
@@ -286,15 +288,15 @@ $method_typedefs
 $method_defs
 
 typedef struct $vt_type {
-    ${prefix}VTable *vtable;
+    kino_VTable *vtable;
     kino_ref_t ref;
-    ${prefix}VTable *parent;
-    ${prefix}CharBuf *name;
+    kino_VTable *parent;
+    kino_CharBuf *name;
     uint32_t flags;
     void *x;
     size_t obj_alloc_size;
     size_t vt_alloc_size;
-    ${prefix}Callback **callbacks;
+    kino_Callback **callbacks;
     kino_method_t methods[$num_methods];
 } $vt_type;
 $vt
@@ -374,8 +376,8 @@ sub to_c {
     # allow us to initialize a pointer to an anonymous array inside a global
     # struct, we have to give it a real symbol and then store a pointer to
     # that symbol inside the VTable struct.
-    my $callbacks_var = $PREFIX . $self->vtable_var . "_CALLBACKS";
-    $callbacks .= "${prefix}Callback *$callbacks_var" . "[] = {\n    ";
+    my $callbacks_var = $self->full_vtable_var . "_CALLBACKS";
+    $callbacks .= "kino_Callback *$callbacks_var" . "[] = {\n    ";
     $callbacks .= join( ",\n    ", @class_callbacks, "NULL" );
     $callbacks .= "\n};\n";
 

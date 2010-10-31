@@ -44,7 +44,6 @@ sub _virtual_method_def {
     my $full_method_sym = $method->full_method_sym($cnick);
     my $full_offset_sym = $method->full_offset_sym($cnick);
     my $typedef         = $method->full_typedef;
-    my $prefix          = $method->get_prefix;
     my $arg_names       = $param_list->name_list;
     $arg_names =~ s/\s*\w+/self/;
 
@@ -88,7 +87,6 @@ END_STUFF
 
 sub typedef_dec {
     my ( undef, $method ) = @_;
-    my $prefix      = $method->get_prefix;
     my $params      = $method->get_param_list->to_c;
     my $return_type = $method->get_return_type->to_c;
     my $typedef     = $method->full_typedef;
@@ -191,7 +189,6 @@ sub _invalid_callback_def {
         = $method->full_method_sym( $method->get_class_cnick );
     my $override_sym = $method->full_override_sym;
     my $params       = $method->get_param_list->to_c;
-    my $prefix       = $method->get_prefix;
     my $unused       = '';
     for my $var ( @{ $method->get_param_list->get_variables } ) {
         my $var_name = $var->micro_sym;
@@ -212,12 +209,11 @@ sub _void_callback_def {
     my ( $method, $callback_params ) = @_;
     my $override_sym = $method->full_override_sym;
     my $params       = $method->get_param_list->to_c;
-    my $prefix       = $method->get_prefix;
     return <<END_CALLBACK_DEF;
 void
 $override_sym($params)
 {
-    ${prefix}Host_callback($callback_params);
+    kino_Host_callback($callback_params);
 }
 END_CALLBACK_DEF
 }
@@ -229,11 +225,10 @@ sub _primitive_callback_def {
     my $params          = $method->get_param_list->to_c;
     my $return_type     = $method->get_return_type;
     my $return_type_str = $return_type->to_c;
-    my $prefix          = $method->get_prefix;
     my $nat_func
-        = $return_type->is_floating ? "${prefix}Host_callback_f64"
-        : $return_type->is_integer  ? "${prefix}Host_callback_i64"
-        : $return_type_str eq 'void*' ? "${prefix}Host_callback_host"
+        = $return_type->is_floating ? "kino_Host_callback_f64"
+        : $return_type->is_integer  ? "kino_Host_callback_i64"
+        : $return_type_str eq 'void*' ? "kino_Host_callback_host"
         :   confess("unrecognized type: $return_type_str");
     return <<END_CALLBACK_DEF;
 $return_type_str
@@ -252,12 +247,10 @@ sub _obj_callback_def {
     my $params          = $method->get_param_list->to_c;
     my $return_type     = $method->get_return_type;
     my $return_type_str = $return_type->to_c;
-    my $prefix          = $method->get_prefix;
-    my $PREFIX          = $method->get_PREFIX;
     my $cb_func_name
         = $return_type->is_string_type
-        ? "${prefix}Host_callback_str"
-        : "${prefix}Host_callback_obj";
+        ? "kino_Host_callback_str"
+        : "kino_Host_callback_obj";
 
     my $nullable_check = "";
     if ( !$return_type->nullable ) {
@@ -293,8 +286,6 @@ sub abstract_method_def {
     my $vtable          = uc( $method->self_type->get_specifier );
     my $return_type     = $method->get_return_type;
     my $return_type_str = $return_type->to_c;
-    my $prefix          = $method->get_prefix;
-    my $Prefix          = $method->get_Prefix;
     my $macro_sym       = $method->get_macro_sym;
 
     # Build list of unused params and create an unreachable return statement
