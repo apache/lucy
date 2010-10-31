@@ -64,16 +64,15 @@ sub include_h {
     return join( '/', @components );
 }
 
-sub vtable_var      { uc( shift->{struct_sym} ) }
-sub full_vtable_var { $_[0]->get_PREFIX . uc( $_[0]->{struct_sym} ) }
-sub callbacks_var   { shift->vtable_var . '_CALLBACKS' }
-sub name_var        { shift->vtable_var . '_CLASS_NAME' }
-sub full_name_var   { shift->full_vtable_var . '_CLASS_NAME' }
+sub vtable_var       { uc( shift->{struct_sym} ) }
+sub full_vtable_var  { $_[0]->get_PREFIX . uc( $_[0]->{struct_sym} ) }
+sub callbacks_var    { shift->vtable_var . '_CALLBACKS' }
+sub name_var         { shift->vtable_var . '_CLASS_NAME' }
+sub full_name_var    { shift->full_vtable_var . '_CLASS_NAME' }
+sub full_vtable_type { shift->{client}->full_vtable_type }
 
 sub name_var_definition {
     my $self           = shift;
-    my $prefix         = $self->get_prefix;
-    my $PREFIX         = $self->get_PREFIX;
     my $full_var_name  = $self->full_name_var;
     my $class_name_len = length( $self->{class_name} );
     return <<END_STUFF;
@@ -88,8 +87,6 @@ kino_ZombieCharBuf $full_var_name = {
 END_STUFF
 }
 
-sub vtable_type { shift->vtable_var . '_VT' }
-
 sub vtable_definition {
     my $self       = shift;
     my $client     = $self->{client};
@@ -98,7 +95,7 @@ sub vtable_definition {
     my $name_var   = $self->full_name_var;
     my $vtable_var = $self->full_vtable_var;
     my $vt         = $vtable_var . "_vt";
-    my $vt_type    = $self->vtable_type;
+    my $vt_type    = $self->full_vtable_type;
     my $cnick      = $self->{cnick};
     my $prefix     = $self->get_prefix;
     my $PREFIX     = $self->get_PREFIX;
@@ -117,7 +114,7 @@ sub vtable_definition {
 
     return <<END_VTABLE
 
-$PREFIX$vt_type $vt = {
+$vt_type $vt = {
     KINO_VTABLE, /* vtable vtable */
     {1}, /* ref.count */
     $parent_ref, /* parent */
@@ -203,7 +200,7 @@ sub to_c_header {
     }
 
     # Declare the virtual table singleton object.
-    my $vt_type       = $PREFIX . $self->vtable_type;
+    my $vt_type       = $self->full_vtable_type;
     my $vt            = "extern struct $vt_type $PREFIX${vtable_var}_vt;";
     my $vtable_object = "#define $PREFIX$vtable_var "
         . "((kino_VTable*)&$PREFIX${vtable_var}_vt)";
@@ -327,7 +324,7 @@ sub to_c {
     my $callbacks      = '';
     my $prefix         = $self->get_prefix;
     my $PREFIX         = $self->get_PREFIX;
-    my $vt_type        = $PREFIX . $self->vtable_type;
+    my $vt_type        = $self->full_vtable_type;
     my $meth_num       = 0;
     my @class_callbacks;
 
@@ -446,12 +443,9 @@ pound-include directive.
 
 Return the name of the global VTable object for this class.
 
-=head2 vtable_type
+=head2 full_vtable_type
 
-Return the C type specifier for this class's vtable.  Each vtable needs to
-have its own type because each has a variable number of methods at the end of
-the struct, and it's not possible to initialize a static struct with a
-flexible array at the end under C89.
+Fully qualified vtable type name, including the parcel prefix.
 
 =head2 vtable_definition
 

@@ -184,8 +184,9 @@ sub set_parent { $_[0]->{parent} = $_[1] }
 sub vtable_var  { uc( shift->{struct_sym} ) }
 sub vtable_type { shift->vtable_var . '_VT' }
 
-sub full_struct_sym { $_[0]->get_prefix . $_[0]->{struct_sym} }
-sub full_vtable_var { $_[0]->get_PREFIX . $_[0]->vtable_var }
+sub full_struct_sym  { $_[0]->get_prefix . $_[0]->{struct_sym} }
+sub full_vtable_var  { $_[0]->get_PREFIX . $_[0]->vtable_var }
+sub full_vtable_type { $_[0]->get_PREFIX . $_[0]->vtable_type }
 
 sub append_autocode { $_[0]->{autocode} .= $_[1] }
 
@@ -551,6 +552,10 @@ array at the end under C89.
 =head2 full_vtable_var
 
 Fully qualified vtable variable name, including the parcel prefix.
+
+=head2 full_vtable_type
+
+Fully qualified vtable type name, including the parcel prefix.
 
 =head2 full_struct_sym
 
