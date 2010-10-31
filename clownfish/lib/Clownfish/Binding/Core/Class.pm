@@ -127,7 +127,7 @@ $PREFIX$vt_type $vt = {
     sizeof($self->{full_struct_sym}), /* obj_alloc_size */
     offsetof(kino_VTable, methods) 
         + $num_methods * sizeof(kino_method_t), /* vt_alloc_size */
-    (kino_Callback**)&${vtable_var}_CALLBACKS,  /* callbacks */
+    (cfish_Callback**)&${vtable_var}_CALLBACKS,  /* callbacks */
     {
         $method_string
     }
@@ -209,7 +209,7 @@ sub to_c_header {
         . "((kino_VTable*)&$PREFIX${vtable_var}_vt)";
     my $num_methods = scalar @methods;
 
-    # Declare Callback objects.
+    # Declare cfish_Callback objects.
     my $callback_declarations = "";
     for my $method (@novel_methods) {
         next unless $method->public || $method->abstract;
@@ -296,7 +296,7 @@ typedef struct $vt_type {
     void *x;
     size_t obj_alloc_size;
     size_t vt_alloc_size;
-    kino_Callback **callbacks;
+    cfish_Callback **callbacks;
     kino_method_t methods[$num_methods];
 } $vt_type;
 $vt
@@ -372,12 +372,12 @@ sub to_c {
         $meth_num++;
     }
 
-    # Create a NULL-terminated array of Callback vars.  Since C89 doesn't
-    # allow us to initialize a pointer to an anonymous array inside a global
-    # struct, we have to give it a real symbol and then store a pointer to
-    # that symbol inside the VTable struct.
+    # Create a NULL-terminated array of cfish_Callback vars.  Since C89
+    # doesn't allow us to initialize a pointer to an anonymous array inside a
+    # global struct, we have to give it a real symbol and then store a pointer
+    # to that symbol inside the VTable struct.
     my $callbacks_var = $self->full_vtable_var . "_CALLBACKS";
-    $callbacks .= "kino_Callback *$callbacks_var" . "[] = {\n    ";
+    $callbacks .= "cfish_Callback *$callbacks_var" . "[] = {\n    ";
     $callbacks .= join( ",\n    ", @class_callbacks, "NULL" );
     $callbacks .= "\n};\n";
 

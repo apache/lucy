@@ -162,8 +162,10 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent)
                 S_scrunch_charbuf(meth, scrunched);
                 Hash_Store(meths, (Obj*)scrunched, INCREF(&EMPTY));
             }
-            for (i = 0; singleton->callbacks[i] != NULL; i++) {
-                kino_Callback *const callback = singleton->callbacks[i];
+            cfish_Callback **callbacks
+                = (cfish_Callback**)singleton->callbacks;
+            for (i = 0; callbacks[i] != NULL; i++) {
+                cfish_Callback *const callback = callbacks[i];
                 ZCB_Assign_Str(callback_name, callback->name,
                     callback->name_len);
                 S_scrunch_charbuf((CharBuf*)callback_name, scrunched);

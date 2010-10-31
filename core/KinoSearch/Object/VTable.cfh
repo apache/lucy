@@ -31,7 +31,7 @@ class KinoSearch::Object::VTable inherits KinoSearch::Object::Obj {
     void              *x;            /* Reserved for future expansion */
     size_t             obj_alloc_size;
     size_t             vt_alloc_size;
-    Callback         **callbacks;
+    void              *callbacks;
     kino_method_t[1]   methods; /* flexible array */
 
     inert LockFreeRegistry *registry;

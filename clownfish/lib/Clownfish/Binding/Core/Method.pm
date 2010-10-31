@@ -99,7 +99,7 @@ END_STUFF
 sub callback_dec {
     my ( undef, $method ) = @_;
     my $callback_sym = $method->full_callback_sym;
-    return qq|extern kino_Callback $callback_sym;\n|;
+    return qq|extern cfish_Callback $callback_sym;\n|;
 }
 
 sub callback_obj_def {
@@ -110,7 +110,7 @@ sub callback_obj_def {
     my $len          = length($macro_sym);
     my $func_sym     = $method->full_override_sym;
     my $callback_sym = $method->full_callback_sym;
-    return qq|kino_Callback $callback_sym = |
+    return qq|cfish_Callback $callback_sym = |
         . qq|{"$macro_sym", $len, (kino_method_t)$func_sym, $offset};\n|;
 }
 

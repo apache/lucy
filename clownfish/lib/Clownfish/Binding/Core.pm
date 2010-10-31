@@ -163,12 +163,12 @@ kino_super_method(const void *vtable, size_t offset)
   #define OVERRIDDEN               LUCY_OVERRIDDEN
 #endif
 
-typedef struct kino_Callback {
+typedef struct cfish_Callback {
     const char    *name;
     size_t         name_len;
     kino_method_t  func;
     size_t         offset;
-} kino_Callback;
+} cfish_Callback;
 
 #endif /* BOIL_H */
 
