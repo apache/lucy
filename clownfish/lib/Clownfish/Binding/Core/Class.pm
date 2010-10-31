@@ -34,19 +34,13 @@ sub new {
     confess("Not a Clownfish::Class")
         unless a_isa_b( $client, "Clownfish::Class" );
 
-    # Cache some vars.
-    $self->{class_name}      = $client->get_class_name;
-    $self->{full_struct_sym} = $client->full_struct_sym;
-    $self->{struct_sym}      = $client->get_struct_sym;
-    $self->{cnick}           = $client->get_cnick;
-    $self->{source_class}    = $client->get_source_class;
-
     return $self;
 }
 
 sub file_path {
     my ( $self, $base_dir, $ext ) = @_;
-    my @components = split( '::', $self->{source_class} );
+    my $source_class = $self->{client}->get_source_class;
+    my @components = split( '::', $source_class );
     unshift @components, $base_dir
         if defined $base_dir;
     $components[-1] .= $ext;
@@ -54,8 +48,9 @@ sub file_path {
 }
 
 sub include_h {
-    my $self = shift;
-    my @components = split( '::', $self->{source_class} );
+    my $self         = shift;
+    my $source_class = $self->{client}->get_source_class;
+    my @components   = split( '::', $source_class );
     $components[-1] .= '.h';
     return join( '/', @components );
 }
@@ -64,15 +59,18 @@ sub _full_callbacks_var { shift->{client}->full_vtable_var . '_CALLBACKS' }
 sub _full_name_var      { shift->{client}->full_vtable_var . '_CLASS_NAME' }
 sub _short_names_macro  { shift->{client}->get_PREFIX . 'USE_SHORT_NAMES' }
 
-sub name_var_definition {
+# C code defining the ZombieCharBuf which contains the class name for this
+# class.
+sub _name_var_definition {
     my $self           = shift;
     my $full_var_name  = _full_name_var($self);
-    my $class_name_len = length( $self->{class_name} );
+    my $class_name     = $self->{client}->get_class_name;
+    my $class_name_len = length($class_name);
     return <<END_STUFF;
 kino_ZombieCharBuf $full_var_name = {
     KINO_ZOMBIECHARBUF,
     {1}, /* ref.count */
-    "$self->{class_name}",
+    "$class_name",
     $class_name_len,
     0
 };
@@ -80,17 +78,19 @@ kino_ZombieCharBuf $full_var_name = {
 END_STUFF
 }
 
-sub vtable_definition {
+# Return C code defining the class's VTable.
+sub _vtable_definition {
     my $self       = shift;
     my $client     = $self->{client};
     my $parent     = $client->get_parent;
     my @methods    = $client->methods;
-    my $name_var   = _full_name_var($self);
-    my $vtable_var = $self->{client}->full_vtable_var;
+    my $vt_type    = $client->full_vtable_type;
+    my $cnick      = $client->get_cnick;
+    my $vtable_var = $client->full_vtable_var;
+    my $struct_sym = $client->full_struct_sym;
     my $vt         = $vtable_var . "_vt";
+    my $name_var   = _full_name_var($self);
     my $cb_var     = _full_callbacks_var($self);
-    my $vt_type    = $self->{client}->full_vtable_type;
-    my $cnick      = $self->{cnick};
 
     # Create a pointer to the parent class's vtable.
     my $parent_ref
@@ -113,7 +113,7 @@ $vt_type $vt = {
     (kino_CharBuf*)&$name_var,
     0, /* flags */
     NULL, /* "void *x" member reserved for future use */
-    sizeof($self->{full_struct_sym}), /* obj_alloc_size */
+    sizeof($struct_sym), /* obj_alloc_size */
     offsetof(kino_VTable, methods) 
         + $num_methods * sizeof(kino_method_t), /* vt_alloc_size */
     &$cb_var,  /* callbacks */
@@ -125,12 +125,15 @@ $vt_type $vt = {
 END_VTABLE
 }
 
-sub struct_definition {
+
+# Create the definition for the instantiable object struct.
+sub _struct_definition {
     my $self = shift;
+    my $struct_sym = $self->{client}->full_struct_sym;
     my $member_declarations = join( "\n    ",
         map { $_->local_declaration } $self->{client}->member_vars );
     return <<END_STRUCT
-struct $self->{full_struct_sym} {
+struct $struct_sym {
     $member_declarations
 };
 END_STRUCT
@@ -139,15 +142,17 @@ END_STRUCT
 sub to_c_header {
     my $self          = shift;
     my $client        = $self->{client};
-    my $cnick         = $self->{cnick};
+    my $cnick         = $client->get_cnick;
     my @functions     = $client->functions;
     my @methods       = $client->methods;
     my @novel_methods = $client->novel_methods;
     my @inert_vars    = $client->inert_vars;
-    my $vtable_var    = $self->{client}->full_vtable_var;
-    my $short_vt_var  = $self->{client}->short_vtable_var;
-    my $struct_def    = $self->struct_definition;
-    my $c_file_sym    = "C_" . uc( $client->full_struct_sym );
+    my $vtable_var    = $client->full_vtable_var;
+    my $short_vt_var  = $client->short_vtable_var;
+    my $short_struct  = $client->get_struct_sym;
+    my $full_struct   = $client->full_struct_sym;
+    my $c_file_sym    = "C_" . uc($full_struct);
+    my $struct_def    = _struct_definition($self);
 
     # If class inherits from something, include the parent class's header.
     my $parent_include = "";
@@ -289,7 +294,7 @@ $vt
 $vtable_object
 
 #ifdef $short_names_macro
-  #define $self->{struct_sym} $self->{full_struct_sym} 
+  #define $short_struct $full_struct 
   #define $short_vt_var $vtable_var
 $short_names
 #endif /* $short_names_macro */
@@ -304,22 +309,23 @@ sub to_c {
     return $client->get_autocode if $client->inert;
 
     my $include_h      = $self->include_h;
-    my $class_name_def = $self->name_var_definition;
-    my $vtable_def     = $self->vtable_definition;
     my $autocode       = $client->get_autocode;
     my $offsets        = '';
     my $abstract_funcs = '';
     my $callback_funcs = '';
     my $callbacks      = '';
-    my $vt_type        = $self->{client}->full_vtable_type;
+    my $vt_type        = $client->full_vtable_type;
     my $meth_num       = 0;
+    my $cnick          = $client->get_cnick;
+    my $class_name_def = _name_var_definition($self);
+    my $vtable_def     = _vtable_definition($self);
     my @class_callbacks;
 
     # Prepare to identify novel methods.
     my %novel = map { ( $_->micro_sym => $_ ) } $client->novel_methods;
 
     for my $method ( $client->methods ) {
-        my $var_name = $method->full_offset_sym( $self->{cnick} );
+        my $var_name = $method->full_offset_sym($cnick);
 
         # Create offset in bytes for the method from the top of the VTable
         # object.
@@ -421,19 +427,6 @@ found, by joining together the components of the "source class" name.
 
 Return a relative path to a C header file, appropriately formatted for a
 pound-include directive.
-
-=head2 vtable_definition
-
-Return C code defining the class's VTable.
-
-=head2 struct_definition
-
-Create the definition for the instantiable object struct.
-
-=head2 name_var_definition
-
-C code defining the ZombieCharBuf which contains the class name for this
-class.
 
 =head2 to_c_header
 
