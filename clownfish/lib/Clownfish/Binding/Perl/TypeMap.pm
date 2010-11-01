@@ -88,11 +88,11 @@ sub _sv_to_cf_obj {
         # Share buffers rather than copy between Perl scalars and Clownfish
         # string types.  Assume that the appropriate ZombieCharBuf has been
         # declared on the stack.
-        return "$cf_var = ($struct_sym*)XSBind_sv_to_kino_obj($xs_var, "
+        return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
             . "$vtable, alloca(kino_ZCB_size()));";
     }
     else {
-        return "$cf_var = ($struct_sym*)XSBind_sv_to_kino_obj($xs_var, "
+        return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
             . "$vtable, NULL);";
     }
 }
@@ -139,7 +139,7 @@ sub to_perl {
 
     if ( $type->is_object ) {
         return "$xs_var = $cf_var == NULL ? newSV(0) : "
-            . "XSBind_kino_to_perl((kino_Obj*)$cf_var);";
+            . "XSBind_cfish_to_perl((kino_Obj*)$cf_var);";
     }
     elsif ( $type->is_primitive ) {
         if ( my $sub = $primitives_to_perl{$type_str} ) {
@@ -172,7 +172,7 @@ sub write_xs_typemap {
         $typemap_start .= "$full_struct_sym*\t$label\n";
         $typemap_input .= <<END_INPUT;
 $label
-    \$var = ($full_struct_sym*)XSBind_sv_to_kino_obj(\$arg, $vtable, NULL);
+    \$var = ($full_struct_sym*)XSBind_sv_to_cfish_obj(\$arg, $vtable, NULL);
 
 END_INPUT
 

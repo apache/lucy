@@ -133,7 +133,7 @@ kino_Doc_dump(kino_Doc *self)
     Kino_Hash_Store_Str(dump, "doc_id", 7, 
         (kino_Obj*)kino_CB_newf("%i32", self->doc_id));
     Kino_Hash_Store_Str(dump, "fields", 6, 
-        XSBind_perl_to_kino((SV*)self->fields));
+        XSBind_perl_to_cfish((SV*)self->fields));
     return dump;
 }
 
@@ -149,7 +149,7 @@ kino_Doc_load(kino_Doc *self, kino_Obj *dump)
         Kino_Hash_Fetch_Str(source, "doc_id", 7), KINO_OBJ);
     kino_Hash *fields = (kino_Hash*)CFISH_CERTIFY(
         Kino_Hash_Fetch_Str(source, "fields", 6), KINO_HASH);
-    SV *fields_sv = XSBind_kino_to_perl((kino_Obj*)fields);
+    SV *fields_sv = XSBind_cfish_to_perl((kino_Obj*)fields);
     CHY_UNUSED_VAR(self);
 
     loaded->doc_id = (int32_t)Kino_Obj_To_I64(doc_id);

@@ -280,8 +280,8 @@ sub _self_assign_statement {
     # a class method.
     my $binding_func
         = $method_name eq 'deserialize'
-        ? 'XSBind_maybe_sv_to_kino_obj'
-        : 'XSBind_sv_to_kino_obj';
+        ? 'XSBind_maybe_sv_to_cfish_obj'
+        : 'XSBind_sv_to_cfish_obj';
     return "self = ($type_c)$binding_func(ST(0), $vtable, NULL);";
 }
 

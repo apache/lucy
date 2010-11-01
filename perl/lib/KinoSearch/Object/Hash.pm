@@ -31,7 +31,7 @@ _deserialize(either_sv, instream)
     kino_InStream *instream;
 CODE:
     CHY_UNUSED_VAR(either_sv);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(kino_Hash_deserialize(NULL, instream));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_Hash_deserialize(NULL, instream));
 OUTPUT: RETVAL
 
 SV*
@@ -39,7 +39,7 @@ _fetch(self, key)
     kino_Hash *self;
     const kino_CharBuf *key;
 CODE:
-    RETVAL = KINO_OBJ_TO_SV(kino_Hash_fetch(self, (kino_Obj*)key));
+    RETVAL = CFISH_OBJ_TO_SV(kino_Hash_fetch(self, (kino_Obj*)key));
 OUTPUT: RETVAL
 
 void

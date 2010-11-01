@@ -19,24 +19,24 @@
 #include "XSBind.h"
 #include "KinoSearch/Util/StringHelper.h"
 
-// Convert a Perl hash into a KS Hash.  Caller takes responsibility for a
-// refcount.
+// Convert a Perl hash into a Clownfish Hash.  Caller takes responsibility for
+// a refcount.
 static kino_Hash*
-S_perl_hash_to_kino_hash(HV *phash);
+S_perl_hash_to_cfish_hash(HV *phash);
 
-// Convert a Perl array into a KS VArray.  Caller takes responsibility for a
-// refcount.
+// Convert a Perl array into a Clownfish VArray.  Caller takes responsibility
+// for a refcount.
 static kino_VArray*
-S_perl_array_to_kino_array(AV *parray);
+S_perl_array_to_cfish_array(AV *parray);
 
 // Convert a VArray to a Perl array.  Caller takes responsibility for a
 // refcount.
 static SV*
-S_kino_array_to_perl_array(kino_VArray *varray);
+S_cfish_array_to_perl_array(kino_VArray *varray);
 
 // Convert a Hash to a Perl hash.  Caller takes responsibility for a refcount.
 static SV*
-S_kino_hash_to_perl_hash(kino_Hash *hash);
+S_cfish_hash_to_perl_hash(kino_Hash *hash);
 
 kino_Obj*
 XSBind_new_blank_obj(SV *either_sv)
@@ -65,9 +65,9 @@ XSBind_new_blank_obj(SV *either_sv)
 }
 
 kino_Obj*
-XSBind_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation)
+XSBind_sv_to_cfish_obj(SV *sv, kino_VTable *vtable, void *allocation)
 {
-    kino_Obj *retval = XSBind_maybe_sv_to_kino_obj(sv, vtable, allocation);
+    kino_Obj *retval = XSBind_maybe_sv_to_cfish_obj(sv, vtable, allocation);
     if (!retval) {
         THROW(KINO_ERR, "Not a %o", Kino_VTable_Get_Name(vtable));
     }
@@ -75,7 +75,7 @@ XSBind_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation)
 }
 
 kino_Obj*
-XSBind_maybe_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation)
+XSBind_maybe_sv_to_cfish_obj(SV *sv, kino_VTable *vtable, void *allocation)
 {
     kino_Obj *retval = NULL;
     if (XSBind_sv_defined(sv)) {
@@ -104,10 +104,10 @@ XSBind_maybe_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation)
             // analogues.
             SV *inner = SvRV(sv);
             if (SvTYPE(inner) == SVt_PVAV && vtable == KINO_VARRAY) {
-                retval = (kino_Obj*)S_perl_array_to_kino_array((AV*)inner);
+                retval = (kino_Obj*)S_perl_array_to_cfish_array((AV*)inner);
             }
             else if (SvTYPE(inner) == SVt_PVHV && vtable == KINO_HASH) {
-                retval = (kino_Obj*)S_perl_hash_to_kino_hash((HV*)inner);
+                retval = (kino_Obj*)S_perl_hash_to_cfish_hash((HV*)inner);
             }
 
             if(retval) {
@@ -125,7 +125,7 @@ XSBind_maybe_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation)
 }
 
 SV*
-XSBind_kino_to_perl(kino_Obj *obj)
+XSBind_cfish_to_perl(kino_Obj *obj)
 {
     if (obj == NULL) {
         return newSV(0);
@@ -137,10 +137,10 @@ XSBind_kino_to_perl(kino_Obj *obj)
         return XSBind_bb_to_sv((kino_ByteBuf*)obj);
     }
     else if (Kino_Obj_Is_A(obj, KINO_VARRAY)) {
-        return S_kino_array_to_perl_array((kino_VArray*)obj);
+        return S_cfish_array_to_perl_array((kino_VArray*)obj);
     }
     else if (Kino_Obj_Is_A(obj, KINO_HASH)) {
-        return S_kino_hash_to_perl_hash((kino_Hash*)obj);
+        return S_cfish_hash_to_perl_hash((kino_Hash*)obj);
     }
     else if (Kino_Obj_Is_A(obj, KINO_FLOATNUM)) {
         return newSVnv(Kino_Obj_To_F64(obj));
@@ -163,7 +163,7 @@ XSBind_kino_to_perl(kino_Obj *obj)
 }
 
 kino_Obj*
-XSBind_perl_to_kino(SV *sv)
+XSBind_perl_to_cfish(SV *sv)
 {
     kino_Obj *retval = NULL;
 
@@ -172,10 +172,10 @@ XSBind_perl_to_kino(SV *sv)
             // Deep conversion of references. 
             SV *inner = SvRV(sv);
             if (SvTYPE(inner) == SVt_PVAV) {
-                retval = (kino_Obj*)S_perl_array_to_kino_array((AV*)inner);
+                retval = (kino_Obj*)S_perl_array_to_cfish_array((AV*)inner);
             }
             else if (SvTYPE(inner) == SVt_PVHV) {
-                retval = (kino_Obj*)S_perl_hash_to_kino_hash((HV*)inner);
+                retval = (kino_Obj*)S_perl_hash_to_cfish_hash((HV*)inner);
             }
             else if (   sv_isobject(sv) 
                      && sv_derived_from(sv, "KinoSearch::Object::Obj")
@@ -197,10 +197,10 @@ XSBind_perl_to_kino(SV *sv)
     else if (sv) {
         // Deep conversion of raw AVs and HVs. 
         if (SvTYPE(sv) == SVt_PVAV) {
-            retval = (kino_Obj*)S_perl_array_to_kino_array((AV*)sv);
+            retval = (kino_Obj*)S_perl_array_to_cfish_array((AV*)sv);
         }
         else if (SvTYPE(sv) == SVt_PVHV) {
-            retval = (kino_Obj*)S_perl_hash_to_kino_hash((HV*)sv);
+            retval = (kino_Obj*)S_perl_hash_to_cfish_hash((HV*)sv);
         }
     }
 
@@ -229,7 +229,7 @@ XSBind_cb_to_sv(const kino_CharBuf *cb)
 }
 
 static kino_Hash*
-S_perl_hash_to_kino_hash(HV *phash)
+S_perl_hash_to_cfish_hash(HV *phash)
 {
     uint32_t  num_keys = hv_iterinit(phash);
     kino_Hash *retval   = kino_Hash_new(num_keys);
@@ -257,14 +257,14 @@ S_perl_hash_to_kino_hash(HV *phash)
 
         // Recurse for each value. 
         Kino_Hash_Store_Str(retval, key, key_len, 
-            XSBind_perl_to_kino(value_sv));
+            XSBind_perl_to_cfish(value_sv));
     }
 
     return retval;
 }
 
 static kino_VArray*
-S_perl_array_to_kino_array(AV *parray)
+S_perl_array_to_cfish_array(AV *parray)
 {
     const uint32_t size = av_len(parray) + 1;
     kino_VArray *retval = kino_VA_new(size);
@@ -274,7 +274,7 @@ S_perl_array_to_kino_array(AV *parray)
     for (i = 0; i < size; i++) {
         SV **elem_sv = av_fetch(parray, i, false);
         if (elem_sv) {
-            kino_Obj *elem = XSBind_perl_to_kino(*elem_sv);
+            kino_Obj *elem = XSBind_perl_to_cfish(*elem_sv);
             if (elem) { Kino_VA_Store(retval, i, elem); }
         }
     }
@@ -284,7 +284,7 @@ S_perl_array_to_kino_array(AV *parray)
 }
 
 static SV*
-S_kino_array_to_perl_array(kino_VArray *varray)
+S_cfish_array_to_perl_array(kino_VArray *varray)
 {
     AV *perl_array = newAV();
     uint32_t num_elems = Kino_VA_Get_Size(varray);
@@ -300,7 +300,7 @@ S_kino_array_to_perl_array(kino_VArray *varray)
             }
             else {
                 // Recurse for each value. 
-                SV *const val_sv = XSBind_kino_to_perl(val);
+                SV *const val_sv = XSBind_cfish_to_perl(val);
                 av_store(perl_array, i, val_sv);
             }
         }
@@ -310,7 +310,7 @@ S_kino_array_to_perl_array(kino_VArray *varray)
 }
 
 static SV*
-S_kino_hash_to_perl_hash(kino_Hash *hash)
+S_cfish_hash_to_perl_hash(kino_Hash *hash)
 {
     HV *perl_hash = newHV();
     SV *key_sv    = newSV(1);
@@ -325,7 +325,7 @@ S_kino_hash_to_perl_hash(kino_Hash *hash)
     Kino_Hash_Iterate(hash);
     while (Kino_Hash_Next(hash, (kino_Obj**)&key, &val)) {
         // Recurse for each value. 
-        SV *val_sv = XSBind_kino_to_perl(val);
+        SV *val_sv = XSBind_cfish_to_perl(val);
         if (!Kino_Obj_Is_A((kino_Obj*)key, KINO_CHARBUF)) {
             CFISH_THROW(KINO_ERR, 
                 "Can't convert a key of class %o to a Perl hash key",

@@ -94,7 +94,7 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
                 kino_Obj* anObj = va_arg(args, kino_Obj*);
                 SV *arg_sv = anObj == NULL
                     ? newSV(0)
-                    : XSBind_kino_to_perl(anObj);
+                    : XSBind_cfish_to_perl(anObj);
                 PUSHs( sv_2mortal(arg_sv) );
             }
             break;
@@ -187,7 +187,7 @@ kino_Host_callback_obj(void *vobj, char *method,
     temp_retval = S_do_callback_sv(vobj, method, num_args, args);
     va_end(args);
 
-    retval = XSBind_perl_to_kino(temp_retval);
+    retval = XSBind_perl_to_cfish(temp_retval);
 
     FREETMPS;
     LEAVE;

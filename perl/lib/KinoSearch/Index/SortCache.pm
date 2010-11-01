@@ -43,7 +43,7 @@ CODE:
     {
         kino_Obj *blank = Kino_SortCache_Make_Blank(self);
         kino_Obj *value = Kino_SortCache_Value(self, ord, blank);
-        RETVAL = XSBind_kino_to_perl(value);
+        RETVAL = XSBind_cfish_to_perl(value);
         LUCY_DECREF(blank);
     }
 }

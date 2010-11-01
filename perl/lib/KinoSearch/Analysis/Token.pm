@@ -64,7 +64,7 @@ CODE:
     kino_Token *self   = (kino_Token*)XSBind_new_blank_obj(either_sv);
     kino_Token_init(self, text, len, start_off, end_off, boost, 
         pos_inc);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(self);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 

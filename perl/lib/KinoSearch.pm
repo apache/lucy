@@ -633,8 +633,8 @@ to_kino(sv)
     SV *sv;
 CODE:
 {
-    kino_Obj *obj = XSBind_perl_to_kino(sv);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(obj);
+    kino_Obj *obj = XSBind_perl_to_cfish(sv);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
 }
 OUTPUT: RETVAL
 
@@ -646,7 +646,7 @@ CODE:
     if (sv_isobject(sv) && sv_derived_from(sv, "KinoSearch::Object::Obj")) {
         IV tmp = SvIV(SvRV(sv));
         kino_Obj* obj = INT2PTR(kino_Obj*, tmp);
-        RETVAL = XSBind_kino_to_perl(obj);
+        RETVAL = XSBind_cfish_to_perl(obj);
     }
     else {
         RETVAL = newSVsv(sv);

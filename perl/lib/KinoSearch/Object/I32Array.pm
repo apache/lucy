@@ -60,7 +60,7 @@ CODE:
         THROW(KINO_ERR, "Required param 'ints' isn't an arrayref");
     }
     
-    RETVAL = KINO_OBJ_TO_SV_NOINC(self);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 

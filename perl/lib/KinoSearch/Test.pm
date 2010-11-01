@@ -32,7 +32,7 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Test::TestUtils
 SV*
 doc_set()
 CODE:
-    RETVAL = KINO_OBJ_TO_SV_NOINC(kino_TestUtils_doc_set());
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_TestUtils_doc_set());
 OUTPUT: RETVAL
 
 MODULE = KinoSearch   PACKAGE = KinoSearch::Test

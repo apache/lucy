@@ -36,7 +36,7 @@ CODE:
     kino_ByteBuf *self = (kino_ByteBuf*)XSBind_new_blank_obj(either_sv);
     kino_BB_init(self, size);
     Kino_BB_Mimic_Bytes(self, ptr, size);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(self);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 
@@ -46,7 +46,7 @@ _deserialize(either_sv, instream)
     kino_InStream *instream;
 CODE:
     CHY_UNUSED_VAR(either_sv);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(kino_BB_deserialize(NULL, instream));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_BB_deserialize(NULL, instream));
 OUTPUT: RETVAL
 END_XS_CODE
 

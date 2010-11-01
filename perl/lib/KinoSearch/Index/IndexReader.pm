@@ -31,7 +31,7 @@ set_race_condition_debug1(val_sv)
 PPCODE:
     LUCY_DECREF(kino_PolyReader_race_condition_debug1);
     kino_PolyReader_race_condition_debug1 = (kino_CharBuf*)
-        XSBind_maybe_sv_to_kino_obj(val_sv, KINO_CHARBUF, NULL);
+        XSBind_maybe_sv_to_cfish_obj(val_sv, KINO_CHARBUF, NULL);
     if (kino_PolyReader_race_condition_debug1)
         (void)LUCY_INCREF(kino_PolyReader_race_condition_debug1);
 

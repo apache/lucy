@@ -66,14 +66,14 @@ kino_XSBind_sv_defined(SV *sv)
  * instead.  If all else fails, throw an exception.
  */
 kino_Obj*
-kino_XSBind_sv_to_kino_obj(SV *sv, kino_VTable *vtable, void *allocation);
+kino_XSBind_sv_to_cfish_obj(SV *sv, kino_VTable *vtable, void *allocation);
 
-/** As XSBind_sv_to_kino_obj above, but returns NULL instead of throwing an
+/** As XSBind_sv_to_cfish_obj above, but returns NULL instead of throwing an
  * exception.
  */
 kino_Obj*
-kino_XSBind_maybe_sv_to_kino_obj(SV *sv, kino_VTable *vtable,
-                                 void *allocation);
+kino_XSBind_maybe_sv_to_cfish_obj(SV *sv, kino_VTable *vtable,
+                                  void *allocation);
 
 
 /** Derive an SV from a KinoSearch object.  If the KS object is NULL, the SV
@@ -83,21 +83,21 @@ kino_XSBind_maybe_sv_to_kino_obj(SV *sv, kino_VTable *vtable,
  * responsibility.
  */
 static CHY_INLINE SV*
-kino_XSBind_kino_obj_to_sv(kino_Obj *obj)
+kino_XSBind_cfish_obj_to_sv(kino_Obj *obj)
 {
     return obj ? (SV*)Kino_Obj_To_Host(obj) : newSV(0);
 }
 
-/** XSBind_kino_obj_to_sv, with a cast. 
+/** XSBind_cfish_obj_to_sv, with a cast. 
  */
-#define KINO_OBJ_TO_SV(_obj) kino_XSBind_kino_obj_to_sv((kino_Obj*)_obj)
+#define CFISH_OBJ_TO_SV(_obj) kino_XSBind_cfish_obj_to_sv((kino_Obj*)_obj)
 
-/** As XSBind_kino_obj_to_sv above, except decrements the object's refcount
+/** As XSBind_cfish_obj_to_sv above, except decrements the object's refcount
  * after creating the SV. This is useful when the KS expression creates a new
  * refcount, e.g.  a call to a constructor.
  */
 static CHY_INLINE SV*
-kino_XSBind_kino_obj_to_sv_noinc(kino_Obj *obj)
+kino_XSBind_cfish_obj_to_sv_noinc(kino_Obj *obj)
 {
     SV *retval;
     if (obj) {
@@ -110,24 +110,24 @@ kino_XSBind_kino_obj_to_sv_noinc(kino_Obj *obj)
     return retval;
 }
 
-/** XSBind_kino_obj_to_sv_noinc, with a cast. 
+/** XSBind_cfish_obj_to_sv_noinc, with a cast. 
  */
-#define KINO_OBJ_TO_SV_NOINC(_obj) \
-    kino_XSBind_kino_obj_to_sv_noinc((kino_Obj*)_obj)
+#define CFISH_OBJ_TO_SV_NOINC(_obj) \
+    kino_XSBind_cfish_obj_to_sv_noinc((kino_Obj*)_obj)
 
-/** Deep conversion of KS objects to Perl objects -- CharBufs to UTF-8 SVs,
- * ByteBufs to SVs, VArrays to Perl array refs, Hashes to Perl hashrefs, and
- * any other object to a Perl object wrapping the KS Obj.
+/** Deep conversion of Clownfish objects to Perl objects -- CharBufs to UTF-8
+ * SVs, ByteBufs to SVs, VArrays to Perl array refs, Hashes to Perl hashrefs,
+ * and any other object to a Perl object wrapping the Clownfish Obj.
  */
 SV*
-kino_XSBind_kino_to_perl(kino_Obj *obj);
+kino_XSBind_cfish_to_perl(kino_Obj *obj);
 
-/** Deep conversion of Perl data structures to KS objects -- Perl hash to
- * Hash*, Perl array to VArray*, KinoSearch objects stripped of their
+/** Deep conversion of Perl data structures to Clownfish objects -- Perl hash
+ * to Hash, Perl array to VArray, Clownfish objects stripped of their
  * wrappers, and everything else stringified and turned to a CharBuf.
  */
 kino_Obj*
-kino_XSBind_perl_to_kino(SV *sv);
+kino_XSBind_perl_to_cfish(SV *sv);
 
 /** Convert a ByteBuf into a new string SV.
  */
@@ -176,21 +176,21 @@ kino_XSBind_allot_params(SV** stack, int32_t start,
  * full symbols nevertheless in case someone else defines e.g. a function
  * named "XSBind_sv_defined".)
  */
-#define XSBind_new_blank_obj        kino_XSBind_new_blank_obj
-#define XSBind_sv_defined           kino_XSBind_sv_defined
-#define XSBind_sv_to_kino_obj       kino_XSBind_sv_to_kino_obj
-#define XSBind_maybe_sv_to_kino_obj kino_XSBind_maybe_sv_to_kino_obj
-#define XSBind_kino_obj_to_sv       kino_XSBind_kino_obj_to_sv
-#define XSBind_kino_obj_to_sv_noinc kino_XSBind_kino_obj_to_sv_noinc
-#define XSBind_kino_to_perl         kino_XSBind_kino_to_perl
-#define XSBind_perl_to_kino         kino_XSBind_perl_to_kino
-#define XSBind_bb_to_sv             kino_XSBind_bb_to_sv
-#define XSBind_cb_to_sv             kino_XSBind_cb_to_sv
-#define XSBind_enable_overload      kino_XSBind_enable_overload
-#define XSBind_allot_params         kino_XSBind_allot_params
+#define XSBind_new_blank_obj           kino_XSBind_new_blank_obj
+#define XSBind_sv_defined              kino_XSBind_sv_defined
+#define XSBind_sv_to_cfish_obj         kino_XSBind_sv_to_cfish_obj
+#define XSBind_maybe_sv_to_cfish_obj   kino_XSBind_maybe_sv_to_cfish_obj
+#define XSBind_cfish_obj_to_sv         kino_XSBind_cfish_obj_to_sv
+#define XSBind_cfish_obj_to_sv_noinc   kino_XSBind_cfish_obj_to_sv_noinc
+#define XSBind_cfish_to_perl           kino_XSBind_cfish_to_perl
+#define XSBind_perl_to_cfish           kino_XSBind_perl_to_cfish
+#define XSBind_bb_to_sv                kino_XSBind_bb_to_sv
+#define XSBind_cb_to_sv                kino_XSBind_cb_to_sv
+#define XSBind_enable_overload         kino_XSBind_enable_overload
+#define XSBind_allot_params            kino_XSBind_allot_params
 
-/* Strip the prefix from some common kino_ symbols where we know there's no
- * conflict with Perl.  It's a little inconsistent to do this rather than
+/* Strip the prefix from some common ClownFish symbols where we know there's
+ * no conflict with Perl.  It's a little inconsistent to do this rather than
  * leave all symbols at full size, but the succinctness is worth it.
  */
 #define THROW            CFISH_THROW

@@ -36,7 +36,7 @@ CODE:
     kino_CharBuf *self = (kino_CharBuf*)XSBind_new_blank_obj(either_sv);
     kino_CB_init(self, size);
     Kino_CB_Cat_Trusted_Str(self, ptr, size);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(self);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 
@@ -44,7 +44,7 @@ SV*
 _clone(self)
     kino_CharBuf *self;
 CODE:
-    RETVAL = KINO_OBJ_TO_SV_NOINC(kino_CB_clone(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_CB_clone(self));
 OUTPUT: RETVAL
 
 SV*
@@ -53,7 +53,7 @@ _deserialize(either_sv, instream)
     kino_InStream *instream;
 CODE:
     CHY_UNUSED_VAR(either_sv);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(kino_CB_deserialize(NULL, instream));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_CB_deserialize(NULL, instream));
 OUTPUT: RETVAL
 
 SV*
@@ -76,7 +76,7 @@ CODE:
     kino_ViewCharBuf *self 
         = kino_ViewCB_new_from_trusted_utf8(ptr, size);
     CHY_UNUSED_VAR(unused);
-    RETVAL = KINO_OBJ_TO_SV_NOINC(self);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 END_XS_CODE
