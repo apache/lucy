@@ -24,8 +24,8 @@ my $builder = Lucy::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
-    dist_version      => '0.001',
-    requires          => {
+    dist_version => '0.001',
+    requires     => {
         'Lingua::Stem::Snowball' => 0.952,
         'Lingua::StopWords'      => 0.09,
         'Parse::RecDescent'      => 0,
@@ -57,4 +57,3 @@ my $builder = Lucy::Build->new(
 $builder->create_build_script();
 
 __END__
-

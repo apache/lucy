@@ -161,8 +161,9 @@ sub ACTION_charmonizer {
 
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
 
-    my $cbuilder = Lucy::Build::CBuilder->new(
-        config => { cc => $self->config('cc') }, );
+    my $cbuilder
+        = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
+        );
 
     my @o_files;
     for (@all_source) {
@@ -477,8 +478,9 @@ sub ACTION_compile_custom_xs {
 
     require ExtUtils::ParseXS;
 
-    my $cbuilder = Lucy::Build::CBuilder->new(
-        config => { cc => $self->config('cc') }, );
+    my $cbuilder
+        = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
+        );
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'KinoSearch', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (

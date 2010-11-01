@@ -33,7 +33,7 @@ my $poly_searcher = KinoSearch::Search::PolySearcher->new(
 
 is( $poly_searcher->doc_freq( field => 'content', term => 'b' ),
     2, 'doc_freq' );
-is( $poly_searcher->doc_max, 6, 'doc_max' );
+is( $poly_searcher->doc_max,                 6,     'doc_max' );
 is( $poly_searcher->fetch_doc(1)->{content}, 'x a', "fetch_doc" );
 isa_ok( $poly_searcher->fetch_doc_vec(1), 'KinoSearch::Index::DocVector' );
 

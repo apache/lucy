@@ -107,11 +107,10 @@ $vt_type $vt = {
 END_VTABLE
 }
 
-
 # Create the definition for the instantiable object struct.
 sub _struct_definition {
-    my $self = shift;
-    my $struct_sym = $self->{client}->full_struct_sym;
+    my $self                = shift;
+    my $struct_sym          = $self->{client}->full_struct_sym;
     my $member_declarations = join( "\n    ",
         map { $_->local_declaration } $self->{client}->member_vars );
     return <<END_STRUCT
@@ -189,7 +188,7 @@ sub to_c_header {
     }
 
     # Define short names.
-    my $short_names = '';
+    my $short_names       = '';
     my $short_names_macro = _short_names_macro($self);
     for my $function (@functions) {
         my $short_func_sym = $function->short_sym;
@@ -198,7 +197,7 @@ sub to_c_header {
     }
     for my $inert_var (@inert_vars) {
         my $short_sym = $inert_var->short_sym;
-        my $full_sym = $inert_var->full_sym;
+        my $full_sym  = $inert_var->full_sym;
         $short_names .= "  #define $short_sym $full_sym\n";
     }
     if ( !$client->inert ) {
