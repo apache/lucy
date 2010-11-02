@@ -73,7 +73,7 @@ Then, search the index:
 
 =head1 DESCRIPTION
 
-KinoSearch is a high-performance, modular search engine library.
+Apache Lucy is a high-performance, modular search engine library.
 
 =head2 Features
 
@@ -168,11 +168,7 @@ L<Lucy::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
 
 =head2 Supported Languages and Encodings
 
-As of version 0.2x, KinoSearch supports Unicode in addition to Latin-1.
-All output strings use Perl's internal Unicode encoding.  For use of
-KinoSearch with non-Latin-1 material, see L<Encode>.
-
-KinoSearch provides "native support" for 15 languages, meaning that
+Apache Lucy provides "native support" for 15 languages, meaning that
 PolyAnalyzer supports them.
 
 =over
@@ -260,16 +256,15 @@ L<LucyX::Remote::SearchClient>, and L<Lucy::Search::PolySearcher>.
 
 =head2 Backwards Compatibility Policy
 
-KinoSearch spins off stable forks into new namespaces periodically.  As of
-this release, the latest is L<KinoSearch1>, forked from version 0.165; the
-next will be KinoSearch3, forked from a future release of 0.3x.  Users who
-require strong backwards compatibility should use a stable fork.
+Lucy will spin off stable forks into new namespaces periodically.  The first
+will be named "Lucy1".  Users who require strong backwards compatibility
+should use a stable fork.
 
-The main namespace, "KinoSearch", is an unstable development branch (as hinted
-at by its version number).  Superficial API changes are frequent.  Hard file
-format compatibility breaks which require reindexing are rare, as we generally
-try to provide continuity across multiple releases, but they happen every once
-in a while.
+The main namespace, "Lucy", is an unstable development branch (as hinted at by
+its version number).  Superficial API changes are frequent.  Hard file format
+compatibility breaks which require reindexing are rare, as we generally try to
+provide continuity across multiple releases, but they happen every once in a
+while.
 
 =head1 CLASS METHODS
 
@@ -284,24 +279,13 @@ always be either a L<Lucy::Object::Err> or undef.
 
 =head1 SEE ALSO 
 
-The KinoSearch homepage, where you'll find links to the mailing list and so
-on, is L<http://www.rectangular.com/kinosearch>.
-
-The Lucene homepage is L<http://lucene.apache.org>.
-
-=head2 History 
-
-Search::Kinosearch 0.02x, now dead and removed from CPAN, was this suite's
-forerunner.  L<Plucene> is a pure-Perl port of Lucene 1.3. KinoSearch is a
-from-scratch project which attempts to draws on the lessons of both. 
-
-KinoSearch is named for Kino, the main character in John Steinbeck's novella,
-"The Pearl".
+The Apache Lucy homepage, where you'll find links to the mailing list and so
+on, is L<http://incubator.apache.org/lucy>.
 
 =head1 SUPPORT
 
-Please direct support questions to the kinosearch mailing list: subscription
-information at L<http://www.rectangular.com/kinosearch>.
+Please direct support questions to the Lucy users mailing list: subscription
+information at L<http://incubator.apache.org/lucy>.
 
 =head1 BUGS
 
@@ -309,13 +293,24 @@ Not thread-safe.
 
 Some exceptions leak memory.
 
-Please report any other bugs or feature requests to
-C<bug-kinosearch@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=KinoSearch>.
+If you find a bug, please inquire on the Lucy users mailing list about it,
+then report it on the Lucy issue tracker once it has been confirmed:
+L<https://issues.apache.org/jira/browse/LUCY>.
+
+=head1 DISCLAIMER
+
+Apache Lucy is an effort undergoing incubation at The Apache Software
+Foundation (ASF), sponsored by the name of sponsor. Incubation is required of
+all newly accepted projects until a further review indicates that the
+infrastructure, communications, and decision making process have stabilized in
+a manner consistent with other successful ASF projects. While incubation
+status is not necessarily a reflection of the completeness or stability of the
+code, it does indicate that the project has yet to be fully endorsed by the
+ASF.
 
 =head1 COPYRIGHT
 
-KinoSearch is distributed under the Apache License, Version 2.0, as
+Apache Lucy is distributed under the Apache License, Version 2.0, as
 described in the file C<LICENSE> included with the distribution.
 
 =cut
