@@ -174,8 +174,8 @@ __POD__
 
 =head1 SAMPLE CLASS
 
-PrefixQuery - Sample subclass of KinoSearch::Search::Query, supporting
-trailing wildcards.
+PrefixQuery - Sample subclass of KinoSearch::Query, supporting trailing
+wildcards.
 
 =head1 SYNOPSIS
 
@@ -187,7 +187,7 @@ trailing wildcards.
 
 =head1 DESCRIPTION
 
-Seek L<KinoSearch::Docs::Cookbook::CustomQuery>.
+See L<KinoSearch::Docs::Cookbook::CustomQuery>.
 
 =cut
 
