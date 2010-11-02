@@ -15,14 +15,14 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Tutorial::FieldType - Specify per-field properties and
+Lucy::Docs::Tutorial::FieldType - Specify per-field properties and
 behaviors.
 
 =head1 DESCRIPTION
 
 The Schema we used in the last chapter specifies three fields: 
 
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer => $polyanalyzer,
     );
     $schema->spec_field( name => 'title',   type => $type );
@@ -41,11 +41,11 @@ to assign the C<url> field to a different FieldType.
 =head2 StringType
 
 Instead of FullTextType, we'll use a
-L<StringType|KinoSearch::Plan::StringType>, which doesn't use an
+L<StringType|Lucy::Plan::StringType>, which doesn't use an
 Analyzer to break up text into individual fields.  Furthermore, we'll mark
 this StringType as unindexed, so that its content won't be searchable at all.
 
-    my $url_type = KinoSearch::Plan::StringType( indexed => 0 );
+    my $url_type = Lucy::Plan::StringType( indexed => 0 );
     $schema->spec_field( name => 'url', type => $url_type );
 
 To observe the change in behavior, try searching for C<us_constitution> both
@@ -56,7 +56,7 @@ before and after changing the Schema and re-indexing.
 For a taste of other FieldType possibilities, try turning off C<stored> for
 one or more fields.
 
-    my $content_type = KinoSearch::Plan::FullTextType->new(
+    my $content_type = Lucy::Plan::FullTextType->new(
         analyzer => $polyanalyzer,
         stored   => 0,
     );
@@ -68,7 +68,7 @@ no effect -- except on index size.
 =head2 Analyzers up next
 
 Analyzers play a crucial role in the behavior of FullTextType fields.  In our
-next tutorial chapter, L<KinoSearch::Docs::Tutorial::Analysis>, we'll see how
+next tutorial chapter, L<Lucy::Docs::Tutorial::Analysis>, we'll see how
 changing up the Analyzer changes search results.
 
 

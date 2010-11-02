@@ -15,15 +15,15 @@
 
 =head1 NAME
 
-KinoSearch::Docs::IRTheory - Crash course in information retrieval.
+Lucy::Docs::IRTheory - Crash course in information retrieval.
 
 =head1 ABSTRACT
 
-Just enough Information Retrieval theory to find your way around KinoSearch.
+Just enough Information Retrieval theory to find your way around Apache Lucy.
 
 =head1 Terminology
 
-KinoSearch uses some terminology from the field of information retrieval which
+Lucy uses some terminology from the field of information retrieval which
 may be unfamiliar to many users.  "Document" and "term" mean pretty much what
 you'd expect them to, but others such as "posting" and "inverted index" need a
 formal introduction:
@@ -56,19 +56,19 @@ I<inverted index> - A data structure which maps from terms to documents.
 
 =back
 
-Since KinoSearch is a practical implementation of IR theory, it loads these
+Since Lucy is a practical implementation of IR theory, it loads these
 abstract, distilled definitions down with useful traits.  For instance, a
 "posting" in its most rarefied form is simply a term-document pairing; in
-KinoSearch, the class L<KinoSearch::Index::Posting::MatchPosting> fills this
+Lucy, the class L<Lucy::Index::Posting::MatchPosting> fills this
 role.  However, by associating additional information with a posting like the
 number of times the term occurs in the document, we can turn it into a
-L<ScorePosting|KinoSearch::Index::Posting::ScorePosting>, making it possible
+L<ScorePosting|Lucy::Index::Posting::ScorePosting>, making it possible
 to rank documents by relevance rather than just list documents which happen to
 match in no particular order.
 
 =head1 TF/IDF ranking algorithm
 
-KinoSearch uses a variant of the well-established "Term Frequency / Inverse
+Lucy uses a variant of the well-established "Term Frequency / Inverse
 Document Frequency" weighting scheme.  A thorough treatment of TF/IDF is too
 ambitious for our present purposes, but in a nutshell, it means that...
 

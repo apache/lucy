@@ -15,13 +15,13 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Cookbook - KinoSearch recipes.
+Lucy::Docs::Cookbook - Apache Lucy recipes.
 
 =head1 DESCRIPTION
 
-The Cookbook provides thematic documentation covering some of KinoSearch's
-more sophisticated features.  For a step-by-step introduction to KinoSearch,
-see L<KinoSearch::Docs::Tutorial>.
+The Cookbook provides thematic documentation covering some of Apache Lucy's
+more sophisticated features.  For a step-by-step introduction to Lucy,
+see L<Lucy::Docs::Tutorial>.
 
 =head2 Chapters
 
@@ -29,21 +29,21 @@ see L<KinoSearch::Docs::Tutorial>.
 
 =item *
 
-L<KinoSearch::Docs::Cookbook::FastUpdates> - While index updates are fast on
+L<Lucy::Docs::Cookbook::FastUpdates> - While index updates are fast on
 average, worst-case update performance may be significantly slower. To make
 index updates consistently quick, we must manually intervene to control the
 process of index segment consolidation.
 
 =item *
 
-L<KinoSearch::Docs::Cookbook::CustomQuery> - Explore KinoSearch's support for
+L<Lucy::Docs::Cookbook::CustomQuery> - Explore Lucy's support for
 custom query types by creating a "PrefixQuery" class to handle trailing
 wildcards.
 
 =item *
 
-L<KinoSearch::Docs::Cookbook::CustomQueryParser> - Define your own custom
-search query syntax using KinoSearch::Search::QueryParser and
+L<Lucy::Docs::Cookbook::CustomQueryParser> - Define your own custom
+search query syntax using Lucy::Search::QueryParser and
 L<Parse::RecDescent>.
 
 =back
@@ -51,8 +51,8 @@ L<Parse::RecDescent>.
 =head2 Materials
 
 Some of the recipes in the Cookbook reference the completed
-L<Tutorial|KinoSearch::Docs::Tutorial> application.  These materials can be
-found in the C<sample> directory at the root of the KinoSearch distribution:
+L<Tutorial|Lucy::Docs::Tutorial> application.  These materials can be
+found in the C<sample> directory at the root of the Lucy distribution:
 
     sample/indexer.pl        # indexing app
     sample/search.cgi        # search app

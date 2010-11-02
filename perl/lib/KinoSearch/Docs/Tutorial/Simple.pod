@@ -15,12 +15,12 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Tutorial::Simple - Bare-bones search app.
+Lucy::Docs::Tutorial::Simple - Bare-bones search app.
 
 =head2 Setup
 
 Copy the html presentation of the US Constitution from the C<sample> directory
-of the KinoSearch distribution to the base level of your web server's
+of the Apache Lucy distribution to the base level of your web server's
 C<htdocs> directory.
 
     $ cp -R sample/us_constitution /usr/local/apache2/htdocs/
@@ -41,14 +41,14 @@ modules...
     my $path_to_index = '/path/to/index';
     my $uscon_source  = '/usr/local/apache2/htdocs/us_constitution';
 
-    use KSx::Simple;
+    use LucyX::Simple;
     use File::Spec::Functions qw( catfile );
     use HTML::TreeBuilder;
 
-... we'll start by creating a KSx::Simple object, telling it where we'd
+... we'll start by creating a LucyX::Simple object, telling it where we'd
 like the index to be located and the language of the source material.
 
-    my $simple = KSx::Simple->new(
+    my $simple = LucyX::Simple->new(
         path     => $path_to_index,
         language => 'en',
     );
@@ -56,9 +56,9 @@ like the index to be located and the language of the source material.
 Next, we'll add a subroutine which extracts plain text from an HTML source
 file.  
 
-KSx::Simple won't be of any help with the task of text extraction, because
+LucyX::Simple won't be of any help with the task of text extraction, because
 it's not equipped to deal with source files directly.  As a matter of
-principle, KinoSearch remains deliberately ignorant on the vast subject of
+principle, Lucy remains deliberately ignorant on the vast subject of
 file formats, preferring to focus instead on its core competencies of indexing
 and search.  There are many excellent dedicated parsing modules available on
 CPAN; we'll use HTML::TreeBuilder.
@@ -99,7 +99,7 @@ one line of code.
 =head2 Search: search.cgi
 
 As with our indexing app, the bulk of the code in our search script won't be
-KinoSearch-specific.  
+Lucy-specific.  
 
 The beginning is dedicated to CGI processing and configuration.
 
@@ -113,17 +113,17 @@ The beginning is dedicated to CGI processing and configuration.
     use CGI;
     use Data::Pageset;
     use HTML::Entities qw( encode_entities );
-    use KSx::Simple;
+    use LucyX::Simple;
     
     my $cgi           = CGI->new;
     my $q             = $cgi->param('q') || '';
     my $offset        = $cgi->param('offset') || 0;
     my $hits_per_page = 10;
 
-Once that's out of the way, we create our KSx::Simple object and feed
+Once that's out of the way, we create our LucyX::Simple object and feed
 it a query string.
 
-    my $simple = KSx::Simple->new(
+    my $simple = LucyX::Simple->new(
         path     => $path_to_index,
         language => 'en',
     );
@@ -139,7 +139,7 @@ and also use it in conjunction with the parameters C<offset> and C<num_wanted>
 to break up results into "pages" of manageable size.
 
 Calling search() on our Simple object turns it into an iterator. Invoking
-next() now returns hits one at a time as L<KinoSearch::Document::HitDoc>
+next() now returns hits one at a time as L<Lucy::Document::HitDoc>
 objects, starting with the most relevant.
 
     # Create result list.
@@ -258,7 +258,7 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
         content="text/html;charset=ISO-8859-1">
       <link rel="stylesheet" type="text/css" 
         href="/us_constitution/uscon.css">
-      <title>KinoSearch: $query_string</title>
+      <title>Lucy: $query_string</title>
     </head>
     
     <body>
@@ -282,8 +282,8 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
     
         <p style="font-size: smaller; color: #666">
           <em>
-            Powered by 
-            <a href="http://www.rectangular.com/kinosearch/">KinoSearch</a>
+            Powered by <a href="http://incubator.apache.org/lucy/"
+            >Apache Lucy<small><sup>TM</sup></small></a>
           </em>
         </p>
       </div><!--bodytext-->
@@ -296,13 +296,13 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
 
 =head2 OK... now what?
 
-KSx::Simple is perfectly adequate for some tasks, but it's not very flexible.
+LucyX::Simple is perfectly adequate for some tasks, but it's not very flexible.
 Many people find that it doesn't do at least one or two things they can't live
 without.
 
 In our next tutorial chapter,
-L<BeyondSimple|KinoSearch::Docs::Tutorial::BeyondSimple>, we'll rewrite our
-indexing and search scripts using the classes that KSx::Simple hides
+L<BeyondSimple|Lucy::Docs::Tutorial::BeyondSimple>, we'll rewrite our
+indexing and search scripts using the classes that LucyX::Simple hides
 from view, opening up the possibilities for expansion; then, we'll spend the
 rest of the tutorial chapters exploring these possibilities.
 

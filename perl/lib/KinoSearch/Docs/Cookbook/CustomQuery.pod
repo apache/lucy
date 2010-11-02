@@ -15,11 +15,11 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Cookbook::CustomQuery - Sample subclass of Query.
+Lucy::Docs::Cookbook::CustomQuery - Sample subclass of Query.
 
 =head1 ABSTRACT
 
-Explore KinoSearch's support for custom query types by creating a
+Explore Apache Lucy's support for custom query types by creating a
 "PrefixQuery" class to handle trailing wildcards.
 
     my $prefix_query = PrefixQuery->new(
@@ -38,17 +38,17 @@ Compiler, and a Matcher.
 
 =item *
 
-PrefixQuery - a subclass of L<KinoSearch::Search::Query>, and the only class
+PrefixQuery - a subclass of L<Lucy::Search::Query>, and the only class
 that client code will deal with directly.
 
 =item *
 
-PrefixCompiler - a subclass of L<KinoSearch::Search::Compiler>, whose primary 
+PrefixCompiler - a subclass of L<Lucy::Search::Compiler>, whose primary 
 role is to compile a PrefixQuery to a PrefixScorer.
 
 =item *
 
-PrefixScorer - a subclass of L<KinoSearch::Search::Matcher>, which does the
+PrefixScorer - a subclass of L<Lucy::Search::Matcher>, which does the
 heavy lifting: it applies the query to individual documents and assigns a
 score to each match.
 
@@ -79,7 +79,7 @@ Our PrefixQuery class will have two attributes: a query string and a field
 name.
 
     package PrefixQuery;
-    use base qw( KinoSearch::Search::Query );
+    use base qw( Lucy::Search::Query );
     use Carp;
     use Scalar::Util qw( blessed );
     
@@ -128,7 +128,7 @@ The equals() method determines whether two Queries are logically equivalent:
     }
 
 The last thing we'll need is a make_compiler() factory method which kicks out
-a subclass of L<Compiler|KinoSearch::Search::Compiler>.
+a subclass of L<Compiler|Lucy::Search::Compiler>.
 
     sub make_compiler {
         my $self = shift;
@@ -138,13 +138,13 @@ a subclass of L<Compiler|KinoSearch::Search::Compiler>.
 =head2 PrefixCompiler
 
 PrefixQuery's make_compiler() method will be called internally at search-time
-by objects which subclass L<KinoSearch::Search::Searcher> -- such as
-L<IndexSearchers|KinoSearch::Search::IndexSearcher>.
+by objects which subclass L<Lucy::Search::Searcher> -- such as
+L<IndexSearchers|Lucy::Search::IndexSearcher>.
 
 A Searcher is associated with a particular collection of documents.   These
 documents may all reside in one index, as with IndexSearcher, or they may be
 spread out across multiple indexes on one or more machines, as with
-L<KinoSearch::Search::PolySearcher>.  
+L<Lucy::Search::PolySearcher>.  
 
 Searcher objects have access to certain statistical information about the
 collections they represent; for instance, a Searcher can tell you how many
@@ -165,11 +165,11 @@ not going to bother with weighting for this demo; we'll just assign a fixed
 score of 1.0 to each matching document.
 
 We don't need to write a constructor, as it will suffice to inherit new() from
-KinoSearch::Search::Compiler.  The only method we need to implement for
+Lucy::Search::Compiler.  The only method we need to implement for
 PrefixCompiler is make_matcher().
 
     package PrefixCompiler;
-    use base qw( KinoSearch::Search::Compiler );
+    use base qw( Lucy::Search::Compiler );
 
     sub make_matcher {
         my ( $self, %args ) = @_;
@@ -177,9 +177,9 @@ PrefixCompiler is make_matcher().
 
         # Retrieve low-level components LexiconReader and PostingListReader.
         my $lex_reader
-            = $seg_reader->obtain("KinoSearch::Index::LexiconReader");
+            = $seg_reader->obtain("Lucy::Index::LexiconReader");
         my $plist_reader
-            = $seg_reader->obtain("KinoSearch::Index::PostingListReader");
+            = $seg_reader->obtain("Lucy::Index::PostingListReader");
         
         # Acquire a Lexicon and seek it to our query string.
         my $substring = $self->get_parent->get_query_string;
@@ -207,12 +207,12 @@ PrefixCompiler is make_matcher().
         return PrefixScorer->new( posting_lists => \@posting_lists );
     }
 
-PrefixCompiler gets access to a L<SegReader|KinoSearch::Index::SegReader>
+PrefixCompiler gets access to a L<SegReader|Lucy::Index::SegReader>
 object when make_matcher() gets called.  From the SegReader and its
-sub-components L<LexiconReader|KinoSearch::Index::LexiconReader> and
-L<PostingListReader|KinoSearch::Index::PostingListReader>, we acquire a
-L<Lexicon|KinoSearch::Index::Lexicon>, scan through the Lexicon's unique
-terms, and acquire a L<PostingList|KinoSearch::Index::PostingList> for each
+sub-components L<LexiconReader|Lucy::Index::LexiconReader> and
+L<PostingListReader|Lucy::Index::PostingListReader>, we acquire a
+L<Lexicon|Lucy::Index::Lexicon>, scan through the Lexicon's unique
+terms, and acquire a L<PostingList|Lucy::Index::PostingList> for each
 term that matches our prefix.
 
 Each of these PostingList objects represents a set of documents which match
@@ -223,7 +223,7 @@ the query.
 The Matcher subclass is the most involved.  
 
     package PrefixScorer;
-    use base qw( KinoSearch::Search::Matcher );
+    use base qw( Lucy::Search::Matcher );
     
     # Inside-out member vars.
     my %doc_ids;
@@ -274,7 +274,7 @@ next() advances the Matcher to the next valid matching doc.
     }
 
 get_doc_id() returns the current document id, or 0 if the Matcher is
-exhausted.  (L<Document numbers|KinoSearch::Docs::DocIDs> start at 1, so 0 is
+exhausted.  (L<Document numbers|Lucy::Docs::DocIDs> start at 1, so 0 is
 a sentinel.)
 
     sub get_doc_id {
@@ -292,7 +292,7 @@ fixed score of 1.0:
 =head1 Usage 
 
 To get a basic feel for PrefixQuery, insert the FlatQueryParser module
-described in L<KinoSearch::Docs::Cookbook::CustomQueryParser> (which supports
+described in L<Lucy::Docs::Cookbook::CustomQueryParser> (which supports
 PrefixQuery) into the search.cgi sample app.
 
     my $parser = FlatQueryParser->new( schema => $searcher->get_schema );
@@ -303,10 +303,10 @@ change up analyzers to avoid stemming, because stemming -- another approach to
 prefix conflation -- is not perfectly compatible with prefix searches.
 
     # Polyanalyzer with no Stemmer.
-    my $analyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [
-            KinoSearch::Analysis::Tokenizer->new,
-            KinoSearch::Analysis::CaseFolder->new,
+            Lucy::Analysis::Tokenizer->new,
+            Lucy::Analysis::CaseFolder->new,
         ],
     );
 

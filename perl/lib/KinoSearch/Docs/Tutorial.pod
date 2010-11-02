@@ -15,14 +15,14 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Tutorial - Step-by-step introduction to KinoSearch toolset.
+Lucy::Docs::Tutorial - Step-by-step introduction to Apache Lucy.
 
 =head1 ABSTRACT 
 
-Explore KinoSearch's basic functionality by starting with a minimalist CGI
-search app based on L<KSx::Simple> and transforming it, step by step, into an
+Explore Apache Lucy's basic functionality by starting with a minimalist CGI
+search app based on L<LucyX::Simple> and transforming it, step by step, into an
 "advanced search" interface utilizing more flexible core modules like
-L<KinoSearch::Index::Indexer> and L<KinoSearch::Search::IndexSearcher>.
+L<Lucy::Index::Indexer> and L<Lucy::Search::IndexSearcher>.
 
 =head1 DESCRIPTION
 
@@ -32,33 +32,33 @@ L<KinoSearch::Index::Indexer> and L<KinoSearch::Search::IndexSearcher>.
 
 =item *
 
-L<KinoSearch::Docs::Tutorial::Simple> - Build a bare-bones search app using
-L<KSx::Simple>.
+L<Lucy::Docs::Tutorial::Simple> - Build a bare-bones search app using
+L<LucyX::Simple>.
 
 =item *
 
-L<KinoSearch::Docs::Tutorial::BeyondSimple> - Rebuild the app using core
-classes like L<Indexer|KinoSearch::Index::Indexer> and
-L<IndexSearcher|KinoSearch::Search::IndexSearcher> in place of KSx::Simple.
+L<Lucy::Docs::Tutorial::BeyondSimple> - Rebuild the app using core
+classes like L<Indexer|Lucy::Index::Indexer> and
+L<IndexSearcher|Lucy::Search::IndexSearcher> in place of LucyX::Simple.
 
 =item *
 
-L<KinoSearch::Docs::Tutorial::FieldType> - Experiment with different field
-characteristics using subclasses of L<KinoSearch::Plan::FieldType>.
+L<Lucy::Docs::Tutorial::FieldType> - Experiment with different field
+characteristics using subclasses of L<Lucy::Plan::FieldType>.
 
 =item *
 
-L<KinoSearch::Docs::Tutorial::Analysis> - Examine how the choice of
-L<KinoSearch::Analysis::Analyzer> subclass affects search results.
+L<Lucy::Docs::Tutorial::Analysis> - Examine how the choice of
+L<Lucy::Analysis::Analyzer> subclass affects search results.
 
 =item *
 
-L<KinoSearch::Docs::Tutorial::Highlighter> - Augment search results with
+L<Lucy::Docs::Tutorial::Highlighter> - Augment search results with
 highlighted excerpts.
 
 =item *
 
-L<KinoSearch::Docs::Tutorial::QueryObjects> - Unlock advanced search features
+L<Lucy::Docs::Tutorial::QueryObjects> - Unlock advanced search features
 by using Query objects instead of query strings.
 
 =back
@@ -67,7 +67,7 @@ by using Query objects instead of query strings.
 
 The source material used by the tutorial app -- an html presentation of the
 United States constitution -- can be found in the C<sample>
-directory at the root of the KinoSearch distribution, along with finished
+directory at the root of the Lucy distribution, along with finished
 indexing and search apps.
 
     sample/indexer.pl        # indexing app
@@ -84,6 +84,6 @@ Apache webserver, but will work with minor modifications on other setups.
 =head1 SEE ALSO
 
 More advanced and esoteric subjects are covered in
-L<KinoSearch::Docs::Cookbook>.
+L<Lucy::Docs::Cookbook>.
 
 

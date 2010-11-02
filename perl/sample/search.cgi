@@ -24,11 +24,11 @@ my $path_to_index = '/path/to/index';
 use CGI;
 use Data::Pageset;
 use HTML::Entities qw( encode_entities );
-use KinoSearch::Search::IndexSearcher;
-use KinoSearch::Highlight::Highlighter;
-use KinoSearch::Search::QueryParser;
-use KinoSearch::Search::TermQuery;
-use KinoSearch::Search::ANDQuery;
+use Lucy::Search::IndexSearcher;
+use Lucy::Highlight::Highlighter;
+use Lucy::Search::QueryParser;
+use Lucy::Search::TermQuery;
+use Lucy::Search::ANDQuery;
 
 my $cgi           = CGI->new;
 my $q             = $cgi->param('q') || '';
@@ -37,21 +37,21 @@ my $category      = $cgi->param('category') || '';
 my $hits_per_page = 10;
 
 # Create an IndexSearcher and a QueryParser.
-my $searcher = KinoSearch::Search::IndexSearcher->new( 
+my $searcher = Lucy::Search::IndexSearcher->new( 
     index => $path_to_index,
 );
-my $qparser = KinoSearch::Search::QueryParser->new( 
+my $qparser = Lucy::Search::QueryParser->new( 
     schema => $searcher->get_schema,
 );
 
 # Build up a Query.
 my $query = $qparser->parse($q);
 if ($category) {
-    my $category_query = KinoSearch::Search::TermQuery->new(
+    my $category_query = Lucy::Search::TermQuery->new(
         field => 'category', 
         term  => $category,
     );
-    $query = KinoSearch::Search::ANDQuery->new(
+    $query = Lucy::Search::ANDQuery->new(
         children => [ $query, $category_query ]
     );
 }
@@ -65,7 +65,7 @@ my $hits = $searcher->hits(
 my $hit_count = $hits->total_hits;
 
 # Arrange for highlighted excerpts to be created.
-my $highlighter = KinoSearch::Highlight::Highlighter->new(
+my $highlighter = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
     query    => $q,
     field    => 'content'
@@ -89,9 +89,9 @@ while ( my $hit = $hits->next ) {
     |;
 }
 
-#--------------------------------------------------------------------------#
-# No KinoSearch tutorial material below this point - just html generation. #
-#--------------------------------------------------------------------------#
+#--------------------------------------------------------------------#
+# No Lucy tutorial material below this point - just html generation. #
+#--------------------------------------------------------------------#
 
 # Generate html, print and exit.
 my $paging_links = generate_paging_info( $q, $hit_count );
@@ -202,7 +202,7 @@ sub blast_out_content {
     content="text/html;charset=ISO-8859-1">
   <link rel="stylesheet" type="text/css" 
     href="/us_constitution/uscon.css">
-  <title>KinoSearch: $query_string</title>
+  <title>Lucy: $query_string</title>
 </head>
 
 <body>
@@ -225,10 +225,11 @@ sub blast_out_content {
 
   $paging_info
 
+  </div><!--bodytext-->
     <p style="font-size: smaller; color: #666">
       <em>
-        Powered by 
-        <a href="http://www.rectangular.com/kinosearch/">KinoSearch</a>
+        Powered by <a href="http://incubator.apache.org/lucy/"
+        >Apache Lucy<small><sup>TM</sup></small></a>
       </em>
     </p>
   </div><!--bodytext-->

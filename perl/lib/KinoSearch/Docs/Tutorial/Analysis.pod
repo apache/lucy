@@ -15,14 +15,14 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Tutorial::Analysis - How to choose and use Analyzers.
+Lucy::Docs::Tutorial::Analysis - How to choose and use Analyzers.
 
 =head1 DESCRIPTION
 
 Try swapping out the PolyAnalyzer in our Schema for a Tokenizer:
 
-    my $tokenizer = KinoSearch::Analysis::Tokenizer->new;
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $tokenizer = Lucy::Analysis::Tokenizer->new;
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer => $tokenizer,
     );
 
@@ -44,10 +44,10 @@ PolyAnalyzer is actually multiple Analyzers wrapped up in a single package.
 In this case, it's three-in-one, since specifying a PolyAnalyzer with 
 C<< language => 'en' >> is equivalent to this snippet:
 
-    my $case_folder  = KinoSearch::Analysis::CaseFolder->new;
-    my $tokenizer    = KinoSearch::Analysis::Tokenizer->new;
-    my $stemmer      = KinoSearch::Analysis::Stemmer->new( language => 'en' );
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $case_folder  = Lucy::Analysis::CaseFolder->new;
+    my $tokenizer    = Lucy::Analysis::Tokenizer->new;
+    my $stemmer      = Lucy::Analysis::Stemmer->new( language => 'en' );
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stemmer ], 
     );
 
@@ -55,16 +55,16 @@ You can add or subtract Analyzers from there if you like.  Try adding a fourth
 Analyzer, a Stopalizer for suppressing "stopwords" like "the", "if",
 and "maybe".
 
-    my $stopalizer = KinoSearch::Analysis::Stopalizer->new( 
+    my $stopalizer = Lucy::Analysis::Stopalizer->new( 
         language => 'en',
     );
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stopalizer, $stemmer ], 
     );
 
 Also, try removing the Stemmer.
 
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer ], 
     );
 
@@ -82,12 +82,12 @@ you may not want to conflate results for "Humphrey" and "Humphries").
 
 To specify that there should be no analysis performed at all, use StringType:
 
-    my $type = KinoSearch::Plan::StringType->new;
+    my $type = Lucy::Plan::StringType->new;
     $schema->spec_field( name => 'category', type => $type );
 
 =head2 Highlighting up next
 
-In our next tutorial chapter, L<KinoSearch::Docs::Tutorial::Highlighter>,
+In our next tutorial chapter, L<Lucy::Docs::Tutorial::Highlighter>,
 we'll add highlighted excerpts from the "content" field to our search results.
 
 

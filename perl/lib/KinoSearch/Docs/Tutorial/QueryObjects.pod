@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Tutorial::QueryObjects - Use Query objects instead of query
+Lucy::Docs::Tutorial::QueryObjects - Use Query objects instead of query
 strings.
 
 =head1 DESCRIPTION
@@ -28,17 +28,17 @@ chapter, we'll move towards an "advanced search" interface, by adding a
 
 =item *
 
-L<QueryParser|KinoSearch::Search::QueryParser> - Turn a query string into a
-L<Query|KinoSearch::Search::Query> object.
+L<QueryParser|Lucy::Search::QueryParser> - Turn a query string into a
+L<Query|Lucy::Search::Query> object.
 
 =item *
 
-L<TermQuery|KinoSearch::Search::TermQuery> - Query for a specific term within
+L<TermQuery|Lucy::Search::TermQuery> - Query for a specific term within
 a specific field.
 
 =item *
 
-L<ANDQuery|KinoSearch::Search::ANDQuery> - "AND" together multiple Query
+L<ANDQuery|Lucy::Search::ANDQuery> - "AND" together multiple Query
 objects to produce an intersected result set.
 
 =back
@@ -49,7 +49,7 @@ Our new "category" field will be a StringType field rather than a FullTextType
 field, because we will only be looking for exact matches.  It needs to be
 indexed, but since we won't display its value, it doesn't need to be stored.
 
-    my $cat_type = KinoSearch::Plan::StringType->new( stored => 0 );
+    my $cat_type = Lucy::Plan::StringType->new( stored => 0 );
     $schema->spec_field( name => 'category', type => $cat_type );
 
 There will be three possible values: "article", "amendment", and "preamble",
@@ -91,9 +91,9 @@ The "category" constraint will be added to our search interface using an HTML
 We'll start off by loading our new modules and extracting our new CGI
 parameter.
 
-    use KinoSearch::Search::QueryParser;
-    use KinoSearch::Search::TermQuery;
-    use KinoSearch::Search::ANDQuery;
+    use Lucy::Search::QueryParser;
+    use Lucy::Search::TermQuery;
+    use Lucy::Search::ANDQuery;
     
     ... 
     
@@ -103,10 +103,10 @@ QueryParser's constructor requires a "schema" argument.  We can get that from
 our IndexSearcher:
 
     # Create an IndexSearcher and a QueryParser.
-    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+    my $searcher = Lucy::Search::IndexSearcher->new( 
         index => $path_to_index, 
     );
-    my $qparser  = KinoSearch::Search::QueryParser->new( 
+    my $qparser  = Lucy::Search::QueryParser->new( 
         schema => $searcher->get_schema,
     );
 
@@ -121,11 +121,11 @@ If the user has specified a category, we'll use an ANDQuery to join our parsed
 query together with a TermQuery representing the category.
 
     if ($category) {
-        my $category_query = KinoSearch::Search::TermQuery->new(
+        my $category_query = Lucy::Search::TermQuery->new(
             field => 'category', 
             term  => $category,
         );
-        $query = KinoSearch::Search::ANDQuery->new(
+        $query = Lucy::Search::ANDQuery->new(
             children => [ $query, $category_query ]
         );
     }
@@ -148,11 +148,11 @@ You've made it to the end of the tutorial.
 
 =head1 SEE ALSO
 
-For additional thematic documentation, see the KinoSearch
-L<Cookbook|KinoSearch::Docs::Cookbook>.
+For additional thematic documentation, see the Apache Lucy
+L<Cookbook|Lucy::Docs::Cookbook>.
 
-ANDQuery has a companion class, L<ORQuery|KinoSearch::Search::ORQuery>, and a
+ANDQuery has a companion class, L<ORQuery|Lucy::Search::ORQuery>, and a
 close relative,
-L<RequiredOptionalQuery|KinoSearch::Search::RequiredOptionalQuery>.
+L<RequiredOptionalQuery|Lucy::Search::RequiredOptionalQuery>.
 
 

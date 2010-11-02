@@ -15,12 +15,12 @@
 
 =head1 NAME
 
-KinoSearch::Docs::FileFormat - Overview of index file format.
+Lucy::Docs::FileFormat - Overview of index file format.
 
 =head1 OVERVIEW
 
 It is not necessary to understand the current implementation details of the
-index file format in order to use KinoSearch effectively, but it may be
+index file format in order to use Apache Lucy effectively, but it may be
 helpful if you are interested in tweaking for high performance, exotic usage,
 or debugging and development.  
 
@@ -124,7 +124,7 @@ facilitate fast lookups.
 =head2 Postings
 
 "Posting" is a technical term from the field of 
-L<information retrieval|KinoSearch::Docs::IRTheory>, defined as a single
+L<information retrieval|Lucy::Docs::IRTheory>, defined as a single
 instance of a one term indexing one document.  If you are looking at the index
 in the back of a book, and you see that "freedom" is referenced on pages 8,
 86, and 240, that would be three postings, which taken together form a

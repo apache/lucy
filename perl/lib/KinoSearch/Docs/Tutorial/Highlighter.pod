@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Tutorial::Highlighter - Augment search results with
+Lucy::Docs::Tutorial::Highlighter - Augment search results with
 highlighted excerpts.
 
 =head1 DESCRIPTION
@@ -26,11 +26,11 @@ hits look promising, dramatically improving their search experience.
 
 =head2 Adaptations to indexer.pl
 
-L<KinoSearch::Highlight::Highlighter> uses information generated at index
+L<Lucy::Highlight::Highlighter> uses information generated at index
 time.  To save resources, highlighting is disabled by default and must be
 turned on for individual fields.
 
-    my $highlightable = KinoSearch::Plan::FullTextType->new(
+    my $highlightable = Lucy::Plan::FullTextType->new(
         analyzer      => $polyanalyzer,
         highlightable => 1,
     );
@@ -41,7 +41,7 @@ turned on for individual fields.
 To add highlighting and excerpting to the search.cgi sample app, create a
 C<$highlighter> object outside the hits iterating loop...
 
-    my $highlighter = KinoSearch::Highlight::Highlighter->new(
+    my $highlighter = Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
         query    => $q,
         field    => 'content'
@@ -70,8 +70,8 @@ excerpt.
 
 =head2 Next chapter: Query objects
 
-Our next tutorial chapter, L<KinoSearch::Docs::Tutorial::QueryObjects>,
+Our next tutorial chapter, L<Lucy::Docs::Tutorial::QueryObjects>,
 illustrates how to build an "advanced search" interface using
-L<Query|KinoSearch::Search::Query> objects instead of query strings.
+L<Query|Lucy::Search::Query> objects instead of query strings.
 
 

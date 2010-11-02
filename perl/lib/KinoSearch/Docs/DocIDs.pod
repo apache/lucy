@@ -15,13 +15,13 @@
 
 =head1 NAME
 
-KinoSearch::Docs::DocIDs - Characteristics of KinoSearch document ids.
+Lucy::Docs::DocIDs - Characteristics of Apache Lucy document ids.
 
 =head1 DESCRIPTION
 
 =head2 Document ids are signed 32-bit integers
 
-Document ids in KinoSearch start at 1.  Because 0 is never a valid doc id, we
+Document ids in Apache Lucy start at 1.  Because 0 is never a valid doc id, we
 can use it as a sentinel value:
 
     while ( my $doc_id = $posting_list->next ) {
@@ -30,13 +30,13 @@ can use it as a sentinel value:
 
 =head2 Document ids are ephemeral
 
-The document ids used by KinoSearch are associated with a single index
+The document ids used by Lucy are associated with a single index
 snapshot.  The moment an index is updated, the mapping of document ids to
 documents is subject to change.
 
 Since IndexReader objects represent a point-in-time view of an index, document
 ids are guaranteed to remain static for the life of the reader.  However,
-because they are not permanent, KinoSearch document ids cannot be used as
+because they are not permanent, Lucy document ids cannot be used as
 foreign keys to locate records in external data sources.  If you truly need a
 primary key field, you must define it and populate it yourself.
 

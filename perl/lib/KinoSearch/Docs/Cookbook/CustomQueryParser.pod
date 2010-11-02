@@ -15,13 +15,12 @@
 
 =head1 NAME
 
-KinoSearch::Docs::Cookbook::CustomQueryParser - Sample subclass of
-QueryParser.
+Lucy::Docs::Cookbook::CustomQueryParser - Sample subclass of QueryParser.
 
 =head1 ABSTRACT
 
 Implement a custom search query language using
-L<KinoSearch::Search::QueryParser> and L<Parse::RecDescent>.
+L<Lucy::Search::QueryParser> and L<Parse::RecDescent>.
 
 =head1 Grammar-based vs. hand-rolled
 
@@ -64,13 +63,13 @@ We'll use a fixed field name of "content", and a fixed choice of English
 PolyAnalyzer.
 
     package FlatQueryParser;
-    use KinoSearch::Search::TermQuery;
-    use KinoSearch::Search::PhraseQuery;
-    use KinoSearch::Search::ORQuery;
+    use Lucy::Search::TermQuery;
+    use Lucy::Search::PhraseQuery;
+    use Lucy::Search::ORQuery;
     use Carp;
     
     sub new { 
-        my $analyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+        my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
             language => 'en',
         );
         return bless { 
@@ -84,7 +83,7 @@ help keep the size of our main parse() subroutine down:
 
     sub _make_term_query {
         my ( $self, $term ) = @_;
-        return KinoSearch::Search::TermQuery->new(
+        return Lucy::Search::TermQuery->new(
             field => $self->{field},
             term  => $term,
         );
@@ -92,7 +91,7 @@ help keep the size of our main parse() subroutine down:
     
     sub _make_phrase_query {
         my ( $self, $terms ) = @_;
-        return KinoSearch::Search::PhraseQuery->new(
+        return Lucy::Search::PhraseQuery->new(
             field => $self->{field},
             terms => $terms,
         );
@@ -129,7 +128,7 @@ ORQuery.
         my ( $self, $query_string ) = @_;
         my $tokens   = $self->_tokenize($query_string);
         my $analyzer = $self->{analyzer};
-        my $or_query = KinoSearch::Search::ORQuery->new;
+        my $or_query = Lucy::Search::ORQuery->new;
     
         for my $token (@$tokens) {
             if ( $token =~ s/^"// ) {
@@ -180,7 +179,7 @@ Parse::RecDescent.
     END_GRAMMAR
     
     sub new { 
-        my $analyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+        my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
             language => 'en',
         );
         my $rd_parser = Parse::RecDescent->new($grammar);
@@ -222,11 +221,11 @@ this time -- QueryParser's constructor requires a Schema which conveys field
 and Analyzer information, so we can just defer to that.
 
     package FlatQueryParser;
-    use base qw( KinoSearch::Search::QueryParser );
-    use KinoSearch::Search::TermQuery;
-    use KinoSearch::Search::PhraseQuery;
-    use KinoSearch::Search::ORQuery;
-    use KinoSearch::Search::NoMatchQuery;
+    use base qw( Lucy::Search::QueryParser );
+    use Lucy::Search::TermQuery;
+    use Lucy::Search::PhraseQuery;
+    use Lucy::Search::ORQuery;
+    use Lucy::Search::NoMatchQuery;
     use PrefixQuery;
     use Parse::RecDescent;
     use Carp;
@@ -257,7 +256,7 @@ production which joins the leaves together with an ORQuery.
     tree:
         leaf_queries
         { 
-            $return = KinoSearch::Search::ORQuery->new;
+            $return = Lucy::Search::ORQuery->new;
             $return->add_child($_) for @{ $item[1] };
         }
     
@@ -271,11 +270,11 @@ production which joins the leaves together with an ORQuery.
     
     term_query:
         /(\S+)/
-        { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+        { Lucy::Search::LeafQuery->new( text => $1 ) }
     
     phrase_query:
         /("[^"]*(?:"|$))/   # terminated by either quote or end of string
-        { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+        { Lucy::Search::LeafQuery->new( text => $1 ) }
     
     END_GRAMMAR
     
@@ -285,7 +284,7 @@ production which joins the leaves together with an ORQuery.
         my ( $self, $query_string ) = @_; 
         my $tree = $self->tree($query_string);
         return $tree ? $self->expand($tree) :
-        KinoSearch::Search::NoMatchQuery->new;
+        Lucy::Search::NoMatchQuery->new;
     }
     
     sub tree {
@@ -314,7 +313,7 @@ C<leaf_query> production to accommodate it.
     
     prefix_query:
         /(\w+\*)/
-        { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+        { Lucy::Search::LeafQuery->new( text => $1 ) }
 
 Second, we need to override expand_leaf() to accommodate PrefixQuery,
 while deferring to its original implementation on TermQuery and
@@ -324,7 +323,7 @@ PhraseQuery.
         my ( $self, $leaf_query ) = @_;
         my $text = $leaf_query->get_text;
         if ( $text =~ /\*$/ ) {
-            my $or_query = KinoSearch::Search::ORQuery->new;
+            my $or_query = Lucy::Search::ORQuery->new;
             for my $field ( @{ $self->get_fields } ) {
                 my $prefix_query = PrefixQuery->new(
                     field        => $field,

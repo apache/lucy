@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package PrefixQuery;
-use base qw( KinoSearch::Search::Query );
+use base qw( Lucy::Search::Query );
 use Carp;
 use Scalar::Util qw( blessed );
 
@@ -70,7 +70,7 @@ sub make_compiler {
 }
 
 package PrefixCompiler;
-use base qw( KinoSearch::Search::Compiler );
+use base qw( Lucy::Search::Compiler );
 
 sub make_matcher {
     my ( $self, %args ) = @_;
@@ -78,9 +78,9 @@ sub make_matcher {
 
     # Retrieve low-level components LexiconReader and PostingListReader.
     my $lex_reader
-        = $seg_reader->obtain("KinoSearch::Index::LexiconReader");
+        = $seg_reader->obtain("Lucy::Index::LexiconReader");
     my $plist_reader
-        = $seg_reader->obtain("KinoSearch::Index::PostingListReader");
+        = $seg_reader->obtain("Lucy::Index::PostingListReader");
     
     # Acquire a Lexicon and seek it to our query string.
     my $substring = $self->get_parent->get_query_string;
@@ -109,7 +109,7 @@ sub make_matcher {
 }
 
 package PrefixScorer;
-use base qw( KinoSearch::Search::Matcher );
+use base qw( Lucy::Search::Matcher );
 
 # Inside-out member vars.
 my %doc_ids;
@@ -132,7 +132,7 @@ sub new {
     $doc_ids{$$self} = \@doc_ids;
 
     $tick{$$self}  = -1;
-    $tally{$$self} = KinoSearch::Search::Tally->new;
+    $tally{$$self} = Lucy::Search::Tally->new;
     $tally{$$self}->set_score(1.0);    # fixed score of 1.0
 
     return $self;
@@ -174,7 +174,7 @@ __POD__
 
 =head1 SAMPLE CLASS
 
-PrefixQuery - Sample subclass of KinoSearch::Query, supporting trailing
+PrefixQuery - Sample subclass of Lucy::Query, supporting trailing
 wildcards.
 
 =head1 SYNOPSIS
@@ -187,7 +187,7 @@ wildcards.
 
 =head1 DESCRIPTION
 
-See L<KinoSearch::Docs::Cookbook::CustomQuery>.
+See L<Lucy::Docs::Cookbook::CustomQuery>.
 
 =cut
 

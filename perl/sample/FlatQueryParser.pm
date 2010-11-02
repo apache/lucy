@@ -17,11 +17,11 @@ use strict;
 use warnings;
 
 package FlatQueryParser;
-use base qw( KinoSearch::Search::QueryParser );
-use KinoSearch::Search::TermQuery;
-use KinoSearch::Search::PhraseQuery;
-use KinoSearch::Search::ORQuery;
-use KinoSearch::Search::NoMatchQuery;
+use base qw( Lucy::Search::QueryParser );
+use Lucy::Search::TermQuery;
+use Lucy::Search::PhraseQuery;
+use Lucy::Search::ORQuery;
+use Lucy::Search::NoMatchQuery;
 use PrefixQuery;
 use Parse::RecDescent;
 use Carp;
@@ -33,7 +33,7 @@ my $grammar = <<'END_GRAMMAR';
 tree:
     leaf_queries
     { 
-        $return = KinoSearch::Search::ORQuery->new;
+        $return = Lucy::Search::ORQuery->new;
         $return->add_child($_) for @{ $item[1] };
     }
 
@@ -48,15 +48,15 @@ leaf_query:
     
 term_query:
     /(\S+)/
-    { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+    { Lucy::Search::LeafQuery->new( text => $1 ) }
 
 phrase_query:
     /("[^"]*(?:"|$))/   # terminated by either quote or end of string
-    { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+    { Lucy::Search::LeafQuery->new( text => $1 ) }
     
 prefix_query:
     /(\w+\*)/
-    { KinoSearch::Search::LeafQuery->new( text => $1 ) }
+    { Lucy::Search::LeafQuery->new( text => $1 ) }
 
 END_GRAMMAR
 
@@ -78,7 +78,7 @@ sub parse {
     my $tree = $self->tree($query_string);
     return $tree
         ? $self->expand($tree)
-        : KinoSearch::Search::NoMatchQuery->new;
+        : Lucy::Search::NoMatchQuery->new;
 }
 
 sub tree {
@@ -90,7 +90,7 @@ sub expand_leaf {
     my ( $self, $leaf_query ) = @_;
     my $text = $leaf_query->get_text;
     if ( $text =~ /\*$/ ) {
-        my $or_query = KinoSearch::Search::ORQuery->new;
+        my $or_query = Lucy::Search::ORQuery->new;
         for my $field ( @{ $self->get_fields } ) {
             my $prefix_query = PrefixQuery->new(
                 field        => $field,
@@ -115,7 +115,7 @@ FlatQueryParser - Simple query parser, with no boolean operators.
 
 =head1 SYNOPSIS
 
-    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+    my $searcher = Lucy::Search::IndexSearcher->new( 
         index => '/path/to/index' 
     );
     my $parser = FlatQueryParser->new( $searcher->get_schema );
@@ -125,7 +125,7 @@ FlatQueryParser - Simple query parser, with no boolean operators.
 
 =head1 DESCRIPTION
 
-See L<KinoSearch::Docs::Cookbook::CustomQueryParser>.
+See L<Lucy::Docs::Cookbook::CustomQueryParser>.
 
 =cut
 

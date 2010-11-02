@@ -16,9 +16,9 @@
 
 parcel KinoSearch cnick Kino;
 
-/** Quick-start guide to hacking on KinoSearch.
+/** Quick-start guide to hacking on Apache Lucy.
  *
- * The KinoSearch code base is organized into roughly four layers:
+ * The Apache Lucy code base is organized into roughly four layers:
  *
  *    * Charmonizer - compiler and OS configuration probing.
  *    * Clownfish - header files.
@@ -30,7 +30,7 @@ parcel KinoSearch cnick Kino;
  * cross-platform development.  It's similar to Autoconf or Metaconfig, but
  * written in pure C.
  *
- * The ".cfh" files within the KinoSearch core are Clownfish header files.
+ * The ".cfh" files within the Lucy core are Clownfish header files.
  * Clownfish is a purpose-built, declaration-only language which superimposes
  * a single-inheritance object model on top of C which is specifically
  * designed to co-exist happily with variety of "host" languages and to allow
@@ -42,7 +42,7 @@ parcel KinoSearch cnick Kino;
  *     Indexer_Add_Doc   <-- Method, typically uses dynamic dispatch.
  *     Indexer_add_doc   <-- Function, always a direct invocation.
  * 
- * The C files within the KinoSearch core are where most of KinoSearch's low-level
+ * The C files within the Lucy core are where most of Lucy's low-level
  * functionality lies.  They implement the interface defined by the Clownfish
  * header files.
  *
