@@ -111,21 +111,21 @@ sub _add_dump_method {
         my $super_dump = 'kino_' . $parent->get_cnick . '_dump';
         my $super_type = $parent->full_struct_sym;
         $autocode = <<END_STUFF;
-kino_Obj*
+cfish_Obj*
 $full_func_sym($full_struct *self)
 {
-    kino_Hash *dump = (kino_Hash*)$super_dump(($super_type*)self);
+    cfish_Hash *dump = (cfish_Hash*)$super_dump(($super_type*)self);
 END_STUFF
         @members = $class->novel_member_vars;
     }
     else {
         $autocode = <<END_STUFF;
-kino_Obj*
+cfish_Obj*
 $full_func_sym($full_struct *self)
 {
-    kino_Hash *dump = kino_Hash_new(0);
-    Kino_Hash_Store_Str(dump, "_class", 6,
-        (kino_Obj*)Kino_CB_Clone(Kino_Obj_Get_Class_Name((kino_Obj*)self)));
+    cfish_Hash *dump = cfish_Hash_new(0);
+    Cfish_Hash_Store_Str(dump, "_class", 6,
+        (cfish_Obj*)Cfish_CB_Clone(Cfish_Obj_Get_Class_Name((cfish_Obj*)self)));
 END_STUFF
         @members = $class->member_vars;
         shift @members;    # skip self->vtable
@@ -135,7 +135,7 @@ END_STUFF
     for my $member_var (@members) {
         $autocode .= $self->_process_dump_member( $class, $member_var );
     }
-    $autocode .= "    return (kino_Obj*)dump;\n}\n\n";
+    $autocode .= "    return (cfish_Obj*)dump;\n}\n\n";
     $class->append_autocode($autocode);
 }
 
@@ -145,17 +145,17 @@ sub _process_dump_member {
     my $name = $member->micro_sym;
     my $len  = length($name);
     if ( $type->is_integer ) {
-        return qq|    Kino_Hash_Store_Str(dump, "$name", $len, |
-            . qq|(kino_Obj*)kino_CB_newf("%i64", (int64_t)self->$name));\n|;
+        return qq|    Cfish_Hash_Store_Str(dump, "$name", $len, |
+            . qq|(cfish_Obj*)cfish_CB_newf("%i64", (int64_t)self->$name));\n|;
     }
     elsif ( $type->is_floating ) {
-        return qq|    Kino_Hash_Store_Str(dump, "$name", $len, |
-            . qq|(kino_Obj*)kino_CB_newf("%f64", (double)self->$name));\n|;
+        return qq|    Cfish_Hash_Store_Str(dump, "$name", $len, |
+            . qq|(cfish_Obj*)cfish_CB_newf("%f64", (double)self->$name));\n|;
     }
     elsif ( $type->is_object ) {
         return <<END_STUFF;
     if (self->$name) {
-         Kino_Hash_Store_Str(dump, "$name", $len, Kino_Obj_Dump((kino_Obj*)self->$name));
+         Cfish_Hash_Store_Str(dump, "$name", $len, Cfish_Obj_Dump((cfish_Obj*)self->$name));
     }
 END_STUFF
     }
@@ -178,10 +178,10 @@ sub _add_load_method {
         my $super_load = 'kino_' . $parent->get_cnick . '_load';
         my $super_type = $parent->full_struct_sym;
         $autocode = <<END_STUFF;
-kino_Obj*
-$full_func_sym($full_struct *self, kino_Obj *dump)
+cfish_Obj*
+$full_func_sym($full_struct *self, cfish_Obj *dump)
 {
-    kino_Hash *source = (kino_Hash*)CFISH_CERTIFY(dump, KINO_HASH);
+    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);
     $full_struct *loaded 
         = ($full_struct*)$super_load(($super_type*)self, dump);
     CHY_UNUSED_VAR(self);
@@ -190,14 +190,14 @@ END_STUFF
     }
     else {
         $autocode = <<END_STUFF;
-kino_Obj*
-$full_func_sym($full_struct *self, kino_Obj *dump)
+cfish_Obj*
+$full_func_sym($full_struct *self, cfish_Obj *dump)
 {
-    kino_Hash *source = (kino_Hash*)CFISH_CERTIFY(dump, KINO_HASH);
-    kino_CharBuf *class_name = (kino_CharBuf*)CFISH_CERTIFY(
-        Kino_Hash_Fetch_Str(source, "_class", 6), KINO_CHARBUF);
-    kino_VTable *vtable = kino_VTable_singleton(class_name, NULL);
-    $full_struct *loaded = ($full_struct*)Kino_VTable_Make_Obj(vtable);
+    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);
+    cfish_CharBuf *class_name = (cfish_CharBuf*)CFISH_CERTIFY(
+        Cfish_Hash_Fetch_Str(source, "_class", 6), CFISH_CHARBUF);
+    cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);
+    $full_struct *loaded = ($full_struct*)Cfish_VTable_Make_Obj(vtable);
     CHY_UNUSED_VAR(self);
 END_STUFF
         @members = $class->member_vars;
@@ -208,7 +208,7 @@ END_STUFF
     for my $member_var (@members) {
         $autocode .= $self->_process_load_member( $class, $member_var );
     }
-    $autocode .= "    return (kino_Obj*)loaded;\n}\n\n";
+    $autocode .= "    return (cfish_Obj*)loaded;\n}\n\n";
     $class->append_autocode($autocode);
 }
 
@@ -221,14 +221,14 @@ sub _process_load_member {
     my $struct_sym = $type->get_specifier;
     my $vtable_var = uc($struct_sym);
     my $extraction
-        = $type->is_integer  ? qq|($type_str)Kino_Obj_To_I64(var)|
-        : $type->is_floating ? qq|($type_str)Kino_Obj_To_F64(var)|
+        = $type->is_integer  ? qq|($type_str)Cfish_Obj_To_I64(var)|
+        : $type->is_floating ? qq|($type_str)Cfish_Obj_To_F64(var)|
         : $type->is_object
-        ? qq|($struct_sym*)CFISH_CERTIFY(Kino_Obj_Load(var, var), $vtable_var)|
+        ? qq|($struct_sym*)CFISH_CERTIFY(Cfish_Obj_Load(var, var), $vtable_var)|
         : confess( "Don't know how to load " . $type->get_specifier );
     return <<END_STUFF;
     {
-        kino_Obj *var = Kino_Hash_Fetch_Str(source, "$name", $len);
+        cfish_Obj *var = Cfish_Hash_Fetch_Str(source, "$name", $len);
         if (var) { loaded->$name = $extraction; }
     }
 END_STUFF

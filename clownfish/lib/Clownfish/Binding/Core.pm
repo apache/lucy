@@ -19,6 +19,7 @@ use warnings;
 package Clownfish::Binding::Core;
 use Clownfish::Util qw( a_isa_b verify_args );
 use Clownfish::Binding::Core::File;
+use Clownfish::Binding::Core::Aliases;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
 
@@ -95,6 +96,9 @@ sub _write_boil_h {
         $typedefs .= "typedef struct $full_struct $full_struct;\n";
     }
 
+    # Create Clownfish aliases if necessary.
+    my $aliases = Clownfish::Binding::Core::Aliases->c_aliases;
+
     my $filepath = catfile( $self->{dest}, "boil.h" );
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
@@ -107,29 +111,30 @@ $self->{header}
 #include <stddef.h>
 #include "charmony.h"
 
+$aliases
 $typedefs
 
 /* Refcount / host object */
 typedef union {
     size_t  count;
     void   *host_obj;
-} kino_ref_t;
+} cfish_ref_t;
 
 /* Generic method pointer.
  */
 typedef void
-(*kino_method_t)(const void *vself);
+(*cfish_method_t)(const void *vself);
 
 /* Access the function pointer for a given method from the vtable.
  */
 #define LUCY_METHOD(_vtable, _class_nick, _meth_name) \\
-     kino_method(_vtable, \\
+     cfish_method(_vtable, \\
      Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
-static CHY_INLINE kino_method_t
-kino_method(const void *vtable, size_t offset) 
+static CHY_INLINE cfish_method_t
+cfish_method(const void *vtable, size_t offset) 
 {
-    union { char *cptr; kino_method_t *fptr; } ptr;
+    union { char *cptr; cfish_method_t *fptr; } ptr;
     ptr.cptr = (char*)vtable + offset;
     return ptr.fptr[0];
 }
@@ -137,27 +142,27 @@ kino_method(const void *vtable, size_t offset)
 /* Access the function pointer for the given method in the superclass's
  * vtable. */
 #define LUCY_SUPER_METHOD(_vtable, _class_nick, _meth_name) \\
-     kino_super_method(_vtable, \\
+     cfish_super_method(_vtable, \\
      Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
-extern size_t kino_VTable_offset_of_parent;
-static CHY_INLINE kino_method_t
-kino_super_method(const void *vtable, size_t offset) 
+extern size_t cfish_VTable_offset_of_parent;
+static CHY_INLINE cfish_method_t
+cfish_super_method(const void *vtable, size_t offset) 
 {
     char *vt_as_char = (char*)vtable;
-    kino_VTable **parent_ptr 
-        = (kino_VTable**)(vt_as_char + kino_VTable_offset_of_parent);
-    return kino_method(*parent_ptr, offset);
+    cfish_VTable **parent_ptr 
+        = (cfish_VTable**)(vt_as_char + cfish_VTable_offset_of_parent);
+    return cfish_method(*parent_ptr, offset);
 }
 
 /* Return a boolean indicating whether a method has been overridden.
  */
 #define LUCY_OVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\
-        (kino_method(*((kino_VTable**)_self), \\
+        (cfish_method(*((cfish_VTable**)_self), \\
             Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET )\\
-            != (kino_method_t)kino_ ## _class_nick ## _ ## _micro_name )
+            != (cfish_method_t)kino_ ## _class_nick ## _ ## _micro_name )
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define METHOD                   LUCY_METHOD
   #define SUPER_METHOD             LUCY_SUPER_METHOD
   #define OVERRIDDEN               LUCY_OVERRIDDEN
@@ -166,7 +171,7 @@ kino_super_method(const void *vtable, size_t offset)
 typedef struct cfish_Callback {
     const char    *name;
     size_t         name_len;
-    kino_method_t  func;
+    cfish_method_t func;
     size_t         offset;
 } cfish_Callback;
 

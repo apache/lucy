@@ -344,7 +344,7 @@ sub _write_boot_c {
         # multiple threads contend for adding these permanent VTables and some
         # fail.
         $registrations
-            .= qq|    kino_VTable_add_to_registry(|
+            .= qq|    cfish_VTable_add_to_registry(|
             . $class->full_vtable_var
             . qq|);\n|;
 

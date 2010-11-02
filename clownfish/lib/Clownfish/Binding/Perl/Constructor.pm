@@ -95,7 +95,7 @@ sub xsub_def {
         else {
             my $assignment
                 = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) {
-           CFISH_THROW(KINO_ERR, "Missing required param '$name'");
+           CFISH_THROW(CFISH_ERR, "Missing required param '$name'");
         }
         $statement#;
             push @var_assignments, $assignment;
@@ -127,7 +127,7 @@ XS($c_name)
     dXSARGS;
     CHY_UNUSED_VAR(cv);
     CHY_UNUSED_VAR(ax);
-    if (items < 1) { CFISH_THROW(KINO_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
+    if (items < 1) { CFISH_THROW(CFISH_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
     SP -= items;
     {
         $var_declarations
@@ -135,8 +135,8 @@ XS($c_name)
         $refcount_mods
         retval = $func_sym($name_list);
         if (retval) {
-            ST(0) = (SV*)Kino_Obj_To_Host((kino_Obj*)retval);
-            Kino_Obj_Dec_RefCount((kino_Obj*)retval);
+            ST(0) = (SV*)Cfish_Obj_To_Host((cfish_Obj*)retval);
+            Cfish_Obj_Dec_RefCount((cfish_Obj*)retval);
         }
         else {
             ST(0) = newSV(0);

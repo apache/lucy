@@ -111,7 +111,7 @@ sub callback_obj_def {
     my $func_sym     = $method->full_override_sym;
     my $callback_sym = $method->full_callback_sym;
     return qq|cfish_Callback $callback_sym = |
-        . qq|{"$macro_sym", $len, (kino_method_t)$func_sym, $offset};\n|;
+        . qq|{"$macro_sym", $len, (cfish_method_t)$func_sym, $offset};\n|;
 }
 
 sub callback_def {
@@ -199,7 +199,7 @@ void
 $override_sym($params)
 {
     $unused;
-    CFISH_THROW(KINO_ERR, "Can't override $full_method_sym via binding");
+    CFISH_THROW(CFISH_ERR, "Can't override $full_method_sym via binding");
 }
 END_CALLBACK_DEF
 }
@@ -213,7 +213,7 @@ sub _void_callback_def {
 void
 $override_sym($params)
 {
-    kino_Host_callback($callback_params);
+    cfish_Host_callback($callback_params);
 }
 END_CALLBACK_DEF
 }
@@ -226,9 +226,9 @@ sub _primitive_callback_def {
     my $return_type     = $method->get_return_type;
     my $return_type_str = $return_type->to_c;
     my $nat_func
-        = $return_type->is_floating ? "kino_Host_callback_f64"
-        : $return_type->is_integer  ? "kino_Host_callback_i64"
-        : $return_type_str eq 'void*' ? "kino_Host_callback_host"
+        = $return_type->is_floating ? "cfish_Host_callback_f64"
+        : $return_type->is_integer  ? "cfish_Host_callback_i64"
+        : $return_type_str eq 'void*' ? "cfish_Host_callback_host"
         :   confess("unrecognized type: $return_type_str");
     return <<END_CALLBACK_DEF;
 $return_type_str
@@ -249,16 +249,16 @@ sub _obj_callback_def {
     my $return_type_str = $return_type->to_c;
     my $cb_func_name
         = $return_type->is_string_type
-        ? "kino_Host_callback_str"
-        : "kino_Host_callback_obj";
+        ? "cfish_Host_callback_str"
+        : "cfish_Host_callback_obj";
 
     my $nullable_check = "";
     if ( !$return_type->nullable ) {
         my $macro_sym = $method->get_macro_sym;
         $nullable_check
-            = qq|if (!retval) { CFISH_THROW(KINO_ERR, |
+            = qq|if (!retval) { CFISH_THROW(CFISH_ERR, |
             . qq|"$macro_sym() for class '%o' cannot return NULL", |
-            . qq|Kino_Obj_Get_Class_Name((kino_Obj*)self)); }\n    |;
+            . qq|Cfish_Obj_Get_Class_Name((cfish_Obj*)self)); }\n    |;
     }
 
     my $decrement = "";
@@ -305,8 +305,8 @@ sub abstract_method_def {
 $return_type_str
 $full_func_sym($params)
 {
-    kino_CharBuf *klass = self ? Kino_Obj_Get_Class_Name((kino_Obj*)self) : $vtable->name;$unused
-    CFISH_THROW(KINO_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
+    cfish_CharBuf *klass = self ? Cfish_Obj_Get_Class_Name((cfish_Obj*)self) : $vtable->name;$unused
+    CFISH_THROW(CFISH_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
 }
 END_ABSTRACT_DEF
 }

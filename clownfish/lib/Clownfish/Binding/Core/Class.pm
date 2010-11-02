@@ -49,8 +49,8 @@ sub _name_var_definition {
     my $class_name     = $self->{client}->get_class_name;
     my $class_name_len = length($class_name);
     return <<END_STUFF;
-kino_ZombieCharBuf $full_var_name = {
-    KINO_ZOMBIECHARBUF,
+cfish_ZombieCharBuf $full_var_name = {
+    CFISH_ZOMBIECHARBUF,
     {1}, /* ref.count */
     "$class_name",
     $class_name_len,
@@ -82,22 +82,22 @@ sub _vtable_definition {
 
     # Spec functions which implement the methods, casting to quiet compiler.
     my @implementing_funcs
-        = map { "(kino_method_t)" . $_->full_func_sym } @methods;
+        = map { "(cfish_method_t)" . $_->full_func_sym } @methods;
     my $method_string = join( ",\n        ", @implementing_funcs );
     my $num_methods = scalar @implementing_funcs;
 
     return <<END_VTABLE
 
 $vt_type $vt = {
-    KINO_VTABLE, /* vtable vtable */
+    CFISH_VTABLE, /* vtable vtable */
     {1}, /* ref.count */
     $parent_ref, /* parent */
-    (kino_CharBuf*)&$name_var,
+    (cfish_CharBuf*)&$name_var,
     0, /* flags */
     NULL, /* "void *x" member reserved for future use */
     sizeof($struct_sym), /* obj_alloc_size */
-    offsetof(kino_VTable, methods) 
-        + $num_methods * sizeof(kino_method_t), /* vt_alloc_size */
+    offsetof(cfish_VTable, methods) 
+        + $num_methods * sizeof(cfish_method_t), /* vt_alloc_size */
     &$cb_var,  /* callbacks */
     {
         $method_string
@@ -176,7 +176,7 @@ sub to_c_header {
     my $vt_type = $self->{client}->full_vtable_type;
     my $vt      = "extern struct $vt_type ${vtable_var}_vt;";
     my $vtable_object
-        = "#define $vtable_var ((kino_VTable*)&${vtable_var}_vt)";
+        = "#define $vtable_var ((cfish_VTable*)&${vtable_var}_vt)";
     my $num_methods = scalar @methods;
 
     # Declare cfish_Callback objects.
@@ -260,16 +260,16 @@ $method_typedefs
 $method_defs
 
 typedef struct $vt_type {
-    kino_VTable *vtable;
-    kino_ref_t ref;
-    kino_VTable *parent;
-    kino_CharBuf *name;
+    cfish_VTable *vtable;
+    cfish_ref_t ref;
+    cfish_VTable *parent;
+    cfish_CharBuf *name;
     uint32_t flags;
     void *x;
     size_t obj_alloc_size;
     size_t vt_alloc_size;
     void *callbacks;
-    kino_method_t methods[$num_methods];
+    cfish_method_t methods[$num_methods];
 } $vt_type;
 $vt
 $vtable_object
@@ -311,7 +311,7 @@ sub to_c {
         # Create offset in bytes for the method from the top of the VTable
         # object.
         my $offset = "(offsetof($vt_type, methods)"
-            . " + $meth_num * sizeof(kino_method_t))";
+            . " + $meth_num * sizeof(cfish_method_t))";
         $offsets .= "size_t $var_name = $offset;\n";
 
         # Create a default implementation for abstract methods.
