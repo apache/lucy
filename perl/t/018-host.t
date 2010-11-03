@@ -18,7 +18,7 @@ use warnings;
 
 use Test::More tests => 8;
 use KinoSearch::Test;
-use KinoSearch qw( to_perl to_kino );
+use KinoSearch qw( to_perl to_clownfish );
 
 my $object = KinoSearch::Object::Host->new();
 isa_ok( $object, "KinoSearch::Object::Host" );
@@ -34,7 +34,7 @@ my %complex_data_structure = (
     a => [ 1, 2, 3, { ooga => 'booga' } ],
     b => { foo => 'foofoo', bar => 'barbar' },
 );
-my $kobj = to_kino( \%complex_data_structure );
+my $kobj = to_clownfish( \%complex_data_structure );
 isa_ok( $kobj, 'KinoSearch::Object::Obj' );
 my $transformed = to_perl($kobj);
 is_deeply( $transformed, \%complex_data_structure,
@@ -47,7 +47,7 @@ my $salt_and_pepper = KinoSearch::Object::Hash->new;
 $salt_and_pepper->store( 'salt', KinoSearch::Object::ByteBuf->new('pepper') );
 $complex_data_structure{c} = $bread_and_butter;
 $complex_data_structure{d} = $salt_and_pepper;
-$transformed               = to_perl( to_kino( \%complex_data_structure ) );
+$transformed               = to_perl( to_clownfish( \%complex_data_structure ) );
 $complex_data_structure{c} = { bread => 'butter' };
 $complex_data_structure{d} = { salt => 'pepper' };
 is_deeply( $transformed, \%complex_data_structure,

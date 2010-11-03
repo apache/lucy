@@ -97,7 +97,7 @@ sub _sv_to_cf_obj {
     }
 }
 
-sub _void_star_to_kino {
+sub _void_star_to_clownfish {
     my ( $type, $cf_var, $xs_var ) = @_;
     # Assume that void* is a reference SV -- either a hashref or an arrayref.
     return qq|if (SvROK($xs_var)) {
@@ -124,7 +124,7 @@ sub from_perl {
     }
     elsif ( $type->is_composite ) {
         if ( $type->to_c eq 'void*' ) {
-            return _void_star_to_kino( $type, $cf_var, $xs_var );
+            return _void_star_to_clownfish( $type, $cf_var, $xs_var );
         }
     }
 

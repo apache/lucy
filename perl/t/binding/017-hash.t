@@ -19,7 +19,7 @@ use warnings;
 use Test::More tests => 4;
 use Storable qw( nfreeze thaw );
 use KinoSearch::Test;
-use KinoSearch qw( to_perl to_kino );
+use KinoSearch qw( to_perl to_clownfish );
 
 my $hash = KinoSearch::Object::Hash->new( capacity => 10 );
 $hash->store( "foo", KinoSearch::Object::CharBuf->new("bar") );
@@ -43,6 +43,6 @@ my $deserialized = $hash->deserialize($instream);
 is_deeply( $hash->to_perl, $deserialized->to_perl, "serialize/deserialize" );
 
 my %hash_with_utf8_keys = ( "\x{263a}" => "foo" );
-my $round_tripped = to_perl( to_kino( \%hash_with_utf8_keys ) );
+my $round_tripped = to_perl( to_clownfish( \%hash_with_utf8_keys ) );
 is_deeply( $round_tripped, \%hash_with_utf8_keys,
     "Round trip conversion of hash with UTF-8 keys" );
