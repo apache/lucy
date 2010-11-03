@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch cnick Kino;
+parcel KinoSearch;
 
 /** Hash which creates keys allocated from a MemoryPool rather than malloc.
  */

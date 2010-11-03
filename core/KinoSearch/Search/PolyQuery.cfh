@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch cnick Kino;
+parcel KinoSearch;
 
 /** Base class for composite Query objects.
  *

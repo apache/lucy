@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch cnick Kino;
+parcel KinoSearch;
 
 /** Tests for basic functionality of InStream using both memory-mapped and
  * streamed sources.

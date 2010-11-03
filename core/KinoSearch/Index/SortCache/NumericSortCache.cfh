@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch cnick Kino;
+parcel KinoSearch;
 
 class KinoSearch::Index::SortCache::NumericSortCache cnick NumSortCache
     inherits KinoSearch::Index::SortCache {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch cnick Kino;
+parcel KinoSearch;
 
 inert class KinoSearch::Test::Store::TestFSFileHandle cnick TestFSFH {
     inert void
