@@ -194,7 +194,7 @@ void
 kino_Doc_destroy(kino_Doc *self)
 {
     if (self->fields) SvREFCNT_dec((SV*)self->fields);
-    KINO_SUPER_DESTROY(self, KINO_DOC);
+    LUCY_SUPER_DESTROY(self, KINO_DOC);
 }
 
 

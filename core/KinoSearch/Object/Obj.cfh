@@ -194,7 +194,7 @@ kino_Obj_super_destroy(kino_Obj *self, kino_VTable *vtable)
     super_destroy(self);
 }
 
-#define KINO_SUPER_DESTROY(_self, _vtable) \
+#define LUCY_SUPER_DESTROY(_self, _vtable) \
     kino_Obj_super_destroy((kino_Obj*)_self, _vtable)
 
 static CHY_INLINE kino_Obj* 
@@ -216,7 +216,7 @@ kino_Obj_decref(kino_Obj *self)
 #define LUCY_DECREF(_self) kino_Obj_decref((kino_Obj*)_self)
 
 #ifdef LUCY_USE_SHORT_NAMES
-  #define SUPER_DESTROY(_self, _vtable)   KINO_SUPER_DESTROY(_self, _vtable)
+  #define SUPER_DESTROY(_self, _vtable)   LUCY_SUPER_DESTROY(_self, _vtable)
   #define INCREF(_self)                   LUCY_INCREF(_self)
   #define DECREF(_self)                   LUCY_DECREF(_self)
 #endif

@@ -97,7 +97,7 @@ kino_Tokenizer_destroy(kino_Tokenizer *self)
 {
     LUCY_DECREF(self->pattern);
     ReREFCNT_dec(((REGEXP*)self->token_re));
-    KINO_SUPER_DESTROY(self, KINO_TOKENIZER);
+    LUCY_SUPER_DESTROY(self, KINO_TOKENIZER);
 }
 
 void

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef H_KINO_TOOLSET
-#define H_KINO_TOOLSET 1
+#ifndef H_CFISH_TOOLSET
+#define H_CFISH_TOOLSET 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,6 +54,6 @@ extern "C" {
 }
 #endif
 
-#endif // H_KINO_TOOLSET 
+#endif // H_CFISH_TOOLSET 
 
 
