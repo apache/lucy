@@ -28,7 +28,7 @@ my $config = {
     verbose       => 0,
     email_to      => undef,
     email_from    => getpwuid($<) . '@' . hostname(),
-    email_subject => 'KinoSearch Smoke Test Report ' . localtime(),
+    email_subject => 'Lucy Smoke Test Report ' . localtime(),
     test_target => 'test',    # could also be 'test_valgrind' if on Linux
 };
 
@@ -104,7 +104,7 @@ __END__
 
 =head1 NAME
 
-smoke.pl - KinoSearch smoke test script
+smoke.pl - Lucy smoke test script
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,7 @@ system and test summary is printed to stdout.
 You may specify an alternate path to test in a JSON-formatted config file. 
 Use the 'src' config option to specify a path. Example:
 
- { 'src' : '/path/to/checked/out/kinosearch/branch' }
+ { 'src' : '/path/to/checked/out/lucy/branch' }
 
 By default, smoke.pl will only print output if there are errors. To see output
 if all tests pass, specify a true 'verbose' flag in your config file.
