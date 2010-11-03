@@ -51,7 +51,7 @@ is( $index->search( query => 'cream' ),
     4, "search uses correct PolyAnalyzer" );
 
 SKIP: {
-    skip( "fork on Windows not supported by KS", 1 ) if $^O =~ /mswin/i;
+    skip( "fork on Windows not supported by Lucy", 1 ) if $^O =~ /mswin/i;
 
     # We need another one:
     my $test_index_loc = init_test_index_loc();

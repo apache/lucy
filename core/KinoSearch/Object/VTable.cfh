@@ -18,7 +18,7 @@ parcel KinoSearch;
 
 /** Virtual method dispatch table.
  *
- * VTables, which are the first element in any KS object, are actually
+ * VTables, which are the first element in any Clownfish object, are actually
  * objects themselves.  (Their first element is a VTable which describes the
  * behavior of VTables.)
  */

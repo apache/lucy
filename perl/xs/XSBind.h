@@ -41,7 +41,7 @@ extern "C" {
 #define NEED_newRV_noinc_GLOBAL
 #include "ppport.h"
 
-/** Given either a class name or a perl object, manufacture a new KS
+/** Given either a class name or a perl object, manufacture a new Clownfish
  * object suitable for supplying to a cfish_Foo_init() function.
  */
 cfish_Obj*
@@ -58,7 +58,7 @@ cfish_XSBind_sv_defined(SV *sv)
     return SvOK(sv);
 }
 
-/** If the SV contains a KS object which passes an "isa" test against the
+/** If the SV contains a Clownfish object which passes an "isa" test against the
  * passed-in VTable, return a pointer to it.  If not, but
  * <code>allocation</code> is non-NULL and a ZombieCharBuf would satisfy the
  * "isa" test, stringify the SV, create a ZombieCharBuf using
@@ -76,7 +76,7 @@ cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
                                    void *allocation);
 
 
-/** Derive an SV from a KinoSearch object.  If the KS object is NULL, the SV
+/** Derive an SV from a KinoSearch object.  If the Clownfish object is NULL, the SV
  * will be undef.
  *
  * The new SV has single refcount for which the caller must take
@@ -93,7 +93,7 @@ cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj)
 #define CFISH_OBJ_TO_SV(_obj) cfish_XSBind_cfish_obj_to_sv((cfish_Obj*)_obj)
 
 /** As XSBind_cfish_obj_to_sv above, except decrements the object's refcount
- * after creating the SV. This is useful when the KS expression creates a new
+ * after creating the SV. This is useful when the Clownfish expression creates a new
  * refcount, e.g.  a call to a constructor.
  */
 static CHY_INLINE SV*

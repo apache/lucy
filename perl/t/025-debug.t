@@ -53,7 +53,7 @@ ASSERT(1);
 pass("ASSERT(true) didn't die");
 
 SKIP: {
-    skip( "Windows fork not supported by KS", 3 ) if $^O =~ /mswin/i;
+    skip( "Windows fork not supported by Lucy", 3 ) if $^O =~ /mswin/i;
 
     my $stderr_out = capture_debug( 'KinoSearch.xs', 'Borax' );
     like( $stderr_out, qr/Borax/, "DEBUG - file name" );
