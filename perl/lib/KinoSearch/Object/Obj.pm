@@ -46,7 +46,7 @@ PPCODE:
         SV *retval;
         kino_ByteBuf *serialized_bb;
         kino_RAMFileHandle *file_handle = kino_RAMFH_open(NULL, 
-            KINO_FH_WRITE_ONLY | KINO_FH_CREATE, NULL);
+            LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
         kino_OutStream *target = kino_OutStream_open((kino_Obj*)file_handle);
 
         Kino_Obj_Serialize(self, target);
@@ -91,7 +91,7 @@ PPCODE:
     kino_ViewByteBuf *contents = kino_ViewBB_new(ptr, len);
     kino_RAMFile *ram_file = kino_RAMFile_new((kino_ByteBuf*)contents, true);
     kino_RAMFileHandle *file_handle 
-        = kino_RAMFH_open(NULL, KINO_FH_READ_ONLY, ram_file);
+        = kino_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
     kino_InStream *instream = kino_InStream_open((kino_Obj*)file_handle);
     kino_Obj *self = Kino_VTable_Foster_Obj(vtable, blank_obj);
     kino_Obj *deserialized = Kino_Obj_Deserialize(self, instream);

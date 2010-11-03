@@ -34,25 +34,25 @@ For testing purposes only.  Track number of FileHandle objects in existence.
 uint32_t
 FH_READ_ONLY()
 CODE:
-    RETVAL = KINO_FH_READ_ONLY;
+    RETVAL = LUCY_FH_READ_ONLY;
 OUTPUT: RETVAL
 
 uint32_t
 FH_WRITE_ONLY()
 CODE:
-    RETVAL = KINO_FH_WRITE_ONLY;
+    RETVAL = LUCY_FH_WRITE_ONLY;
 OUTPUT: RETVAL
 
 uint32_t
 FH_CREATE()
 CODE:
-    RETVAL = KINO_FH_CREATE;
+    RETVAL = LUCY_FH_CREATE;
 OUTPUT: RETVAL
 
 uint32_t
 FH_EXCLUSIVE()
 CODE:
-    RETVAL = KINO_FH_EXCLUSIVE;
+    RETVAL = LUCY_FH_EXCLUSIVE;
 OUTPUT: RETVAL
 
 
@@ -71,7 +71,7 @@ For testing purposes only.  Used to help produce buffer alignment tests.
 IV
 _BUF_SIZE()
 CODE:
-   RETVAL = KINO_IO_STREAM_BUF_SIZE;
+   RETVAL = LUCY_IO_STREAM_BUF_SIZE;
 OUTPUT: RETVAL
 END_XS_CODE
 
