@@ -30,8 +30,8 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Highlight::HeatMap",
+    parcel       => "KinoSearch",
+    class_name   => "KinoSearch::Highlight::HeatMap",
     bind_methods => [
         qw(
             Calc_Proximity_Boost
