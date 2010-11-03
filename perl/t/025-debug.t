@@ -62,7 +62,7 @@ SKIP: {
         = capture_debug( 'XS_KinoSearch__Util__Debug_DEBUG', "Strychnine" );
     like( $stderr_out, qr/Strychnine/, "DEBUG - function name" );
 
-    $stderr_out = capture_debug( 'KinoS*', 'Raid' );
+    $stderr_out = capture_debug( 'Lucy*', 'Raid' );
     like( $stderr_out, qr/Raid/, "DEBUG - wildcard" );
 
     my $pid = fork();

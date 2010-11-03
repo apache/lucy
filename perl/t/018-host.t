@@ -38,7 +38,7 @@ my $kobj = to_clownfish( \%complex_data_structure );
 isa_ok( $kobj, 'KinoSearch::Object::Obj' );
 my $transformed = to_perl($kobj);
 is_deeply( $transformed, \%complex_data_structure,
-    "transform from Perl to Kino data structures and back" );
+    "transform from Perl to Clownfish data structures and back" );
 
 my $bread_and_butter = KinoSearch::Object::Hash->new;
 $bread_and_butter->store( 'bread',

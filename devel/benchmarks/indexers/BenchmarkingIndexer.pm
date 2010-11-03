@@ -159,7 +159,7 @@ sub new {
     );
     $schema->spec_field( name => 'body', type => $body_type );
 
-    $self->{index_dir} = 'kinosearch_index';
+    $self->{index_dir} = 'lucy_index';
     $self->{engine}    = 'KinoSearch';
     $self->{version}   = $KinoSearch::VERSION;
 

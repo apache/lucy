@@ -24,7 +24,7 @@ optional command line arguments:
   * The increment, or number of docs to add during each index writer instance.
   * Whether or not the main text should be stored and highlightable.
 
-    $ perl -Mblib indexers/kinosearch_indexer.plx \
+    $ perl -Mblib indexers/lucy_indexer.plx \
     > --docs=1000 --reps=6 --increment=10 --store=1
 
     $ java -server -Xmx500M -XX:CompileThreshold=100 LuceneIndexer \
