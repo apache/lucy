@@ -31,7 +31,7 @@
 #include "KinoSearch/Util/StringHelper.h"
 
 RawPosting RAWPOSTING_BLANK = { 
-    KINO_RAWPOSTING, 
+    RAWPOSTING, 
     {1},                   // ref.count 
     0,                     // doc_id 
     1,                     // freq 

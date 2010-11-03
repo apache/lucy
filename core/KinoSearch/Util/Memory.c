@@ -56,7 +56,7 @@ Memory_wrapped_realloc(void *ptr, size_t size)
 }
 
 void
-kino_Memory_wrapped_free(void *ptr)
+Memory_wrapped_free(void *ptr)
 {
     free(ptr);
 }
@@ -66,7 +66,7 @@ kino_Memory_wrapped_free(void *ptr)
 #endif
 
 size_t
-kino_Memory_oversize(size_t minimum, size_t width)
+Memory_oversize(size_t minimum, size_t width)
 {
     // For larger arrays, grow by an excess of 1/8; grow faster when the array
     // is small.
