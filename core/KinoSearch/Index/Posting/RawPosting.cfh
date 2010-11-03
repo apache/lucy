@@ -93,7 +93,7 @@ class KinoSearch::Index::Posting::RawPostingWriter cnick RawPostWriter
 }
 
 __C__
-extern kino_RawPosting LUCY_RAWPOSTING_BLANK;
+extern lucy_RawPosting LUCY_RAWPOSTING_BLANK;
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define RAWPOSTING_BLANK         LUCY_RAWPOSTING_BLANK

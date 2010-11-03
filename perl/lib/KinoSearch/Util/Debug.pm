@@ -61,14 +61,14 @@ track_globals(...)
 PPCODE:
 {
     CHY_UNUSED_VAR(items);
-    LUCY_IFDEF_DEBUG(kino_Debug_num_globals++;);
+    LUCY_IFDEF_DEBUG(lucy_Debug_num_globals++;);
 }
 
 void
 set_env_cache(str)
     char *str;
 PPCODE:
-    kino_Debug_set_env_cache(str);
+    lucy_Debug_set_env_cache(str);
 
 void
 ASSERT(maybe)
@@ -79,19 +79,19 @@ PPCODE:
 IV
 num_allocated()
 CODE:
-    RETVAL = kino_Debug_num_allocated;
+    RETVAL = lucy_Debug_num_allocated;
 OUTPUT: RETVAL
 
 IV
 num_freed()
 CODE:
-    RETVAL = kino_Debug_num_freed;
+    RETVAL = lucy_Debug_num_freed;
 OUTPUT: RETVAL
 
 IV
 num_globals()
 CODE:
-    RETVAL = kino_Debug_num_globals;
+    RETVAL = lucy_Debug_num_globals;
 OUTPUT: RETVAL
 END_XS_CODE
 

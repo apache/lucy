@@ -27,13 +27,13 @@ MODULE = KinoSearch    PACKAGE = KinoSearch::Test::Util::BBSortEx
 
 SV*
 fetch(self)
-    kino_BBSortEx *self;
+    lucy_BBSortEx *self;
 CODE:
 {
-    void *address = Kino_BBSortEx_Fetch(self);
+    void *address = Lucy_BBSortEx_Fetch(self);
     if (address) {
-        RETVAL = XSBind_cfish_to_perl(*(kino_Obj**)address);
-        LUCY_DECREF(*(kino_Obj**)address);
+        RETVAL = XSBind_cfish_to_perl(*(lucy_Obj**)address);
+        LUCY_DECREF(*(lucy_Obj**)address);
     }
     else {
         RETVAL = newSV(0);
@@ -43,12 +43,12 @@ OUTPUT: RETVAL
 
 SV*
 peek(self)
-    kino_BBSortEx *self;
+    lucy_BBSortEx *self;
 CODE:
 {
-    void *address = Kino_BBSortEx_Peek(self);
+    void *address = Lucy_BBSortEx_Peek(self);
     if (address) {
-        RETVAL = XSBind_cfish_to_perl(*(kino_Obj**)address);
+        RETVAL = XSBind_cfish_to_perl(*(lucy_Obj**)address);
     }
     else {
         RETVAL = newSV(0);
@@ -58,11 +58,11 @@ OUTPUT: RETVAL
 
 void
 feed(self, bb)
-    kino_BBSortEx *self;
-    kino_ByteBuf *bb;
+    lucy_BBSortEx *self;
+    lucy_ByteBuf *bb;
 CODE:
     LUCY_INCREF(bb);
-    Kino_BBSortEx_Feed(self, &bb);
+    Lucy_BBSortEx_Feed(self, &bb);
 
 END_XS_CODE
 

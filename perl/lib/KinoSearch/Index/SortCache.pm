@@ -27,7 +27,7 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Index::SortCache
 
 SV*
 value(self, ...)
-    kino_SortCache *self;
+    lucy_SortCache *self;
 CODE:
 {
     SV *ord_sv = NULL;
@@ -38,11 +38,11 @@ CODE:
         &ord_sv, "ord", 3, 
         NULL);
     if (ord_sv) { ord = SvIV(ord_sv); }
-    else { THROW(KINO_ERR, "Missing required param 'ord'"); }
+    else { THROW(LUCY_ERR, "Missing required param 'ord'"); }
 
     {
-        kino_Obj *blank = Kino_SortCache_Make_Blank(self);
-        kino_Obj *value = Kino_SortCache_Value(self, ord, blank);
+        lucy_Obj *blank = Lucy_SortCache_Make_Blank(self);
+        lucy_Obj *value = Lucy_SortCache_Value(self, ord, blank);
         RETVAL = XSBind_cfish_to_perl(value);
         LUCY_DECREF(blank);
     }

@@ -31,7 +31,7 @@ S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args);
 static CHY_INLINE void
 SI_push_args(void *vobj, va_list args, uint32_t num_args)
 {
-    kino_Obj *obj = (kino_Obj*)vobj;
+    lucy_Obj *obj = (lucy_Obj*)vobj;
     SV *invoker;
     uint32_t i;
     dSP;
@@ -41,13 +41,13 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
                                 : (num_args * 2) + 1;
     EXTEND(SP, stack_slots_needed);
     
-    if (Kino_Obj_Is_A(obj, KINO_VTABLE)) {
-        kino_VTable *vtable = (kino_VTable*)obj;
+    if (Lucy_Obj_Is_A(obj, LUCY_VTABLE)) {
+        lucy_VTable *vtable = (lucy_VTable*)obj;
         // TODO: Creating a new class name SV every time is wasteful. 
-        invoker = XSBind_cb_to_sv(Kino_VTable_Get_Name(vtable));
+        invoker = XSBind_cb_to_sv(Lucy_VTable_Get_Name(vtable));
     }
     else {
-        invoker = (SV*)Kino_Obj_To_Host(obj);
+        invoker = (SV*)Lucy_Obj_To_Host(obj);
     }
 
     ENTER;
@@ -86,12 +86,12 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
             }
             break;
         case CFISH_HOST_ARGTYPE_STR: {
-                kino_CharBuf *string = va_arg(args, kino_CharBuf*);
+                lucy_CharBuf *string = va_arg(args, lucy_CharBuf*);
                 PUSHs( sv_2mortal( XSBind_cb_to_sv(string) ) );
             }
             break;
         case CFISH_HOST_ARGTYPE_OBJ: {
-                kino_Obj* anObj = va_arg(args, kino_Obj*);
+                lucy_Obj* anObj = va_arg(args, lucy_Obj*);
                 SV *arg_sv = anObj == NULL
                     ? newSV(0)
                     : XSBind_cfish_to_perl(anObj);
@@ -99,7 +99,7 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
             }
             break;
         default:
-            CFISH_THROW(KINO_ERR, "Unrecognized arg type: %u32", arg_type);
+            CFISH_THROW(LUCY_ERR, "Unrecognized arg type: %u32", arg_type);
         }
     }
 
@@ -107,7 +107,7 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
 }
 
 void
-kino_Host_callback(void *vobj, char *method, uint32_t num_args, ...) 
+lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) 
 {
     va_list args;
     
@@ -118,7 +118,7 @@ kino_Host_callback(void *vobj, char *method, uint32_t num_args, ...)
     {
         int count = call_method(method, G_VOID|G_DISCARD);
         if (count != 0) {
-            CFISH_THROW(KINO_ERR, "callback '%s' returned too many values: %i32", 
+            CFISH_THROW(LUCY_ERR, "callback '%s' returned too many values: %i32", 
                 method, (int32_t)count);
         }
         FREETMPS;
@@ -127,7 +127,7 @@ kino_Host_callback(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 int64_t
-kino_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...) 
+lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...) 
 {
     va_list args;
     SV *return_sv;
@@ -158,7 +158,7 @@ kino_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 double
-kino_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...) 
+lucy_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...) 
 {
     va_list args;
     SV *return_sv;
@@ -175,13 +175,13 @@ kino_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...)
     return retval;
 }
 
-kino_Obj*
-kino_Host_callback_obj(void *vobj, char *method, 
+lucy_Obj*
+lucy_Host_callback_obj(void *vobj, char *method, 
                          uint32_t num_args, ...) 
 {
     va_list args;
     SV *temp_retval;
-    kino_Obj *retval = NULL;
+    lucy_Obj *retval = NULL;
 
     va_start(args, num_args);
     temp_retval = S_do_callback_sv(vobj, method, num_args, args);
@@ -195,12 +195,12 @@ kino_Host_callback_obj(void *vobj, char *method,
     return retval;
 }
 
-kino_CharBuf*
-kino_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
+lucy_CharBuf*
+lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
 {
     va_list args;
     SV *temp_retval;
-    kino_CharBuf *retval = NULL;
+    lucy_CharBuf *retval = NULL;
 
     va_start(args, num_args);
     temp_retval = S_do_callback_sv(vobj, method, num_args, args);
@@ -210,7 +210,7 @@ kino_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
     if (temp_retval && XSBind_sv_defined(temp_retval)) {
         STRLEN len;
         char *ptr = SvPVutf8(temp_retval, len);
-        retval = kino_CB_new_from_trusted_utf8(ptr, len);
+        retval = lucy_CB_new_from_trusted_utf8(ptr, len);
     }
 
     FREETMPS;
@@ -220,7 +220,7 @@ kino_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 void*
-kino_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...)
+lucy_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...)
 {
     va_list args;
     SV *retval;
@@ -245,7 +245,7 @@ S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args)
         int num_returned = call_method(method, G_SCALAR);
         dSP;
         if (num_returned != 1) {
-            CFISH_THROW(KINO_ERR, "Bad number of return vals from %s: %i32", method,
+            CFISH_THROW(LUCY_ERR, "Bad number of return vals from %s: %i32", method,
                 (int32_t)num_returned);
         }
         return_val = POPs;

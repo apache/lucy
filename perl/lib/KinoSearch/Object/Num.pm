@@ -31,8 +31,8 @@ new(either_sv, value)
     float  value;
 CODE:
 {
-    kino_Float32 *self = (kino_Float32*)XSBind_new_blank_obj(either_sv);
-    kino_Float32_init(self, value);
+    lucy_Float32 *self = (lucy_Float32*)XSBind_new_blank_obj(either_sv);
+    lucy_Float32_init(self, value);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -47,8 +47,8 @@ new(either_sv, value)
     double  value;
 CODE:
 {
-    kino_Float64 *self = (kino_Float64*)XSBind_new_blank_obj(either_sv);
-    kino_Float64_init(self, value);
+    lucy_Float64 *self = (lucy_Float64*)XSBind_new_blank_obj(either_sv);
+    lucy_Float64_init(self, value);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL

@@ -27,7 +27,7 @@ MODULE = KinoSearch    PACKAGE = KinoSearch::Store::InStream
 
 void
 read(self, buffer_sv, len, ...)
-    kino_InStream *self;
+    lucy_InStream *self;
     SV *buffer_sv;
     size_t len;
 PPCODE:
@@ -38,7 +38,7 @@ PPCODE:
     SvUPGRADE(buffer_sv, SVt_PV);
     if (!SvPOK(buffer_sv)) { SvCUR_set(buffer_sv, 0); }
     ptr = SvGROW(buffer_sv, total_len + 1);
-    Kino_InStream_Read_Bytes(self, ptr + offset, len);
+    Lucy_InStream_Read_Bytes(self, ptr + offset, len);
     SvPOK_on(buffer_sv);
     if (SvCUR(buffer_sv) < total_len) {
         SvCUR_set(buffer_sv, total_len);
@@ -48,31 +48,31 @@ PPCODE:
 
 SV*
 read_string(self)
-    kino_InStream *self;
+    lucy_InStream *self;
 CODE:
 {
     char *ptr;
-    size_t len = Kino_InStream_Read_C32(self);
+    size_t len = Lucy_InStream_Read_C32(self);
     RETVAL = newSV(len + 1);
     SvCUR_set(RETVAL, len);
     SvPOK_on(RETVAL);
     SvUTF8_on(RETVAL); // Trust source.  Reconsider if API goes public. 
     *SvEND(RETVAL) = '\0';
     ptr = SvPVX(RETVAL);
-    Kino_InStream_Read_Bytes(self, ptr, len);
+    Lucy_InStream_Read_Bytes(self, ptr, len);
 }
 OUTPUT: RETVAL
 
 int
 read_raw_c64(self, buffer_sv)
-    kino_InStream *self;
+    lucy_InStream *self;
     SV *buffer_sv;
 CODE:
 {
     char *ptr;
     SvUPGRADE(buffer_sv, SVt_PV);
     ptr = SvGROW(buffer_sv, 10 + 1);
-    RETVAL = Kino_InStream_Read_Raw_C64(self, ptr);
+    RETVAL = Lucy_InStream_Read_Raw_C64(self, ptr);
     SvPOK_on(buffer_sv);
     SvCUR_set(buffer_sv, RETVAL);
 }

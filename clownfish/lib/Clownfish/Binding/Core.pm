@@ -129,7 +129,7 @@ typedef void
  */
 #define LUCY_METHOD(_vtable, _class_nick, _meth_name) \\
      cfish_method(_vtable, \\
-     Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
+     Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
 static CHY_INLINE cfish_method_t
 cfish_method(const void *vtable, size_t offset) 
@@ -143,7 +143,7 @@ cfish_method(const void *vtable, size_t offset)
  * vtable. */
 #define LUCY_SUPER_METHOD(_vtable, _class_nick, _meth_name) \\
      cfish_super_method(_vtable, \\
-     Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
+     Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
 extern size_t cfish_VTable_offset_of_parent;
 static CHY_INLINE cfish_method_t
@@ -159,8 +159,8 @@ cfish_super_method(const void *vtable, size_t offset)
  */
 #define LUCY_OVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\
         (cfish_method(*((cfish_VTable**)_self), \\
-            Kino_ ## _class_nick ## _ ## _meth_name ## _OFFSET )\\
-            != (cfish_method_t)kino_ ## _class_nick ## _ ## _micro_name )
+            Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET )\\
+            != (cfish_method_t)lucy_ ## _class_nick ## _ ## _micro_name )
 
 #ifdef CFISH_USE_SHORT_NAMES
   #define METHOD                   LUCY_METHOD

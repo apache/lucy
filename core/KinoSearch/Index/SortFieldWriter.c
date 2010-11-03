@@ -49,11 +49,11 @@ static int32_t
 S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
               OutStream *dat_out);
 
-typedef struct kino_SFWriterElem {
+typedef struct lucy_SFWriterElem {
     Obj *value;
     int32_t doc_id;
-} kino_SFWriterElem;
-#define SFWriterElem kino_SFWriterElem
+} lucy_SFWriterElem;
+#define SFWriterElem lucy_SFWriterElem
 
 SortFieldWriter*
 SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment, 

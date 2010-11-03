@@ -108,7 +108,7 @@ sub _add_dump_method {
     my $parent = $class->get_parent;
 
     if ( $parent and $parent->has_attribute('dumpable') ) {
-        my $super_dump = 'kino_' . $parent->get_cnick . '_dump';
+        my $super_dump = 'lucy_' . $parent->get_cnick . '_dump';
         my $super_type = $parent->full_struct_sym;
         $autocode = <<END_STUFF;
 cfish_Obj*
@@ -175,7 +175,7 @@ sub _add_load_method {
     my $parent = $class->get_parent;
 
     if ( $parent and $parent->has_attribute('dumpable') ) {
-        my $super_load = 'kino_' . $parent->get_cnick . '_load';
+        my $super_load = 'lucy_' . $parent->get_cnick . '_load';
         my $super_type = $parent->full_struct_sym;
         $autocode = <<END_STUFF;
 cfish_Obj*

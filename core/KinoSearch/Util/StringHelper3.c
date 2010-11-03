@@ -62,7 +62,7 @@ trademarks mentioned herein are the property of their respective owners.
 */
 
 chy_bool_t
-kino_StrHelp_is_whitespace(uint32_t code_point)
+lucy_StrHelp_is_whitespace(uint32_t code_point)
 {
     switch (code_point) {
                  // <control-0009>..<control-000D> 

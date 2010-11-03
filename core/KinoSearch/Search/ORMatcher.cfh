@@ -21,13 +21,13 @@ __C__
 
 /* A wrapper for a Matcher which caches the result of Matcher_Get_Doc_ID().
  */
-typedef struct kino_HeapedMatcherDoc {
-    kino_Matcher *matcher;
+typedef struct lucy_HeapedMatcherDoc {
+    lucy_Matcher *matcher;
     int32_t   doc;
-} kino_HeapedMatcherDoc;
+} lucy_HeapedMatcherDoc;
 
 #ifdef LUCY_USE_SHORT_NAMES
-  #define HeapedMatcherDoc              kino_HeapedMatcherDoc
+  #define HeapedMatcherDoc              lucy_HeapedMatcherDoc
 #endif
 
 __END_C__
@@ -38,10 +38,10 @@ __END_C__
 
 class KinoSearch::Search::ORMatcher inherits KinoSearch::Search::PolyMatcher {
 
-    kino_HeapedMatcherDoc **heap;
-    kino_HeapedMatcherDoc **pool;    /* Pool of HMDs to minimize mallocs */
+    lucy_HeapedMatcherDoc **heap;
+    lucy_HeapedMatcherDoc **pool;    /* Pool of HMDs to minimize mallocs */
     char                   *blob;    /* single allocation for all HMDs */
-    kino_HeapedMatcherDoc  *top_hmd; /* cached top elem */
+    lucy_HeapedMatcherDoc  *top_hmd; /* cached top elem */
     uint32_t                size;
     uint32_t                max_size;
 

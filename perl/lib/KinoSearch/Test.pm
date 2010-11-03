@@ -32,7 +32,7 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Test::TestUtils
 SV*
 doc_set()
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_TestUtils_doc_set());
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_TestUtils_doc_set());
 OUTPUT: RETVAL
 
 MODULE = KinoSearch   PACKAGE = KinoSearch::Test
@@ -44,187 +44,187 @@ PPCODE:
 {
     // Lucy::Analysis 
     if (strEQ(package, "TestCaseFolder")) {
-        kino_TestCaseFolder_run_tests();
+        lucy_TestCaseFolder_run_tests();
     }
     else if (strEQ(package, "TestPolyAnalyzer")) {
-        kino_TestPolyAnalyzer_run_tests();
+        lucy_TestPolyAnalyzer_run_tests();
     }
     else if (strEQ(package, "TestStopalizer")) {
-        kino_TestStopalizer_run_tests();
+        lucy_TestStopalizer_run_tests();
     }
     else if (strEQ(package, "TestStemmer")) {
-        kino_TestStemmer_run_tests();
+        lucy_TestStemmer_run_tests();
     }
     else if (strEQ(package, "TestTokenizer")) {
-        kino_TestTokenizer_run_tests();
+        lucy_TestTokenizer_run_tests();
     }
     // Lucy::Object 
     else if (strEQ(package, "TestObj")) {
-        kino_TestObj_run_tests();
+        lucy_TestObj_run_tests();
     }
     else if (strEQ(package, "TestI32Array")) {
-        kino_TestI32Arr_run_tests();
+        lucy_TestI32Arr_run_tests();
     }
     else if (strEQ(package, "TestByteBuf")) {
-        kino_TestBB_run_tests();
+        lucy_TestBB_run_tests();
     }
     else if (strEQ(package, "TestLockFreeRegistry")) {
-        kino_TestLFReg_run_tests();
+        lucy_TestLFReg_run_tests();
     }
     // Lucy::Plan 
     else if (strEQ(package, "TestBlobType")) {
-        kino_TestBlobType_run_tests();
+        lucy_TestBlobType_run_tests();
     }
     else if (strEQ(package, "TestFullTextType")) {
-        kino_TestFullTextType_run_tests();
+        lucy_TestFullTextType_run_tests();
     }
     else if (strEQ(package, "TestNumericType")) {
-        kino_TestNumericType_run_tests();
+        lucy_TestNumericType_run_tests();
     }
     else if (strEQ(package, "TestSchema")) {
-        kino_TestSchema_run_tests();
+        lucy_TestSchema_run_tests();
     }
     // Lucy::Index 
     else if (strEQ(package, "TestDocWriter")) {
-        kino_TestDocWriter_run_tests();
+        lucy_TestDocWriter_run_tests();
     }
     else if (strEQ(package, "TestHighlightWriter")) {
-        kino_TestHLWriter_run_tests();
+        lucy_TestHLWriter_run_tests();
     }
     else if (strEQ(package, "TestIndexManager")) {
-        kino_TestIxManager_run_tests();
+        lucy_TestIxManager_run_tests();
     }
     else if (strEQ(package, "TestPostingListWriter")) {
-        kino_TestPListWriter_run_tests();
+        lucy_TestPListWriter_run_tests();
     }
     else if (strEQ(package, "TestSegment")) {
-        kino_TestSeg_run_tests();
+        lucy_TestSeg_run_tests();
     }
     else if (strEQ(package, "TestSegWriter")) {
-        kino_TestSegWriter_run_tests();
+        lucy_TestSegWriter_run_tests();
     }
     else if (strEQ(package, "TestSnapshot")) {
-        kino_TestSnapshot_run_tests();
+        lucy_TestSnapshot_run_tests();
     }
     // Lucy::Search 
     else if (strEQ(package, "TestANDQuery")) {
-        kino_TestANDQuery_run_tests();
+        lucy_TestANDQuery_run_tests();
     }
     else if (strEQ(package, "TestLeafQuery")) {
-        kino_TestLeafQuery_run_tests();
+        lucy_TestLeafQuery_run_tests();
     }
     else if (strEQ(package, "TestMatchAllQuery")) {
-        kino_TestMatchAllQuery_run_tests();
+        lucy_TestMatchAllQuery_run_tests();
     }
     else if (strEQ(package, "TestNoMatchQuery")) {
-        kino_TestNoMatchQuery_run_tests();
+        lucy_TestNoMatchQuery_run_tests();
     }
     else if (strEQ(package, "TestNOTQuery")) {
-        kino_TestNOTQuery_run_tests();
+        lucy_TestNOTQuery_run_tests();
     }
     else if (strEQ(package, "TestORQuery")) {
-        kino_TestORQuery_run_tests();
+        lucy_TestORQuery_run_tests();
     }
     else if (strEQ(package, "TestPhraseQuery")) {
-        kino_TestPhraseQuery_run_tests();
+        lucy_TestPhraseQuery_run_tests();
     }
     else if (strEQ(package, "TestQueryParserLogic")) {
-        kino_TestQPLogic_run_tests();
+        lucy_TestQPLogic_run_tests();
     }
     else if (strEQ(package, "TestSeriesMatcher")) {
-        kino_TestSeriesMatcher_run_tests();
+        lucy_TestSeriesMatcher_run_tests();
     }
     else if (strEQ(package, "TestRangeQuery")) {
-        kino_TestRangeQuery_run_tests();
+        lucy_TestRangeQuery_run_tests();
     }
     else if (strEQ(package, "TestReqOptQuery")) {
-        kino_TestReqOptQuery_run_tests();
+        lucy_TestReqOptQuery_run_tests();
     }
     else if (strEQ(package, "TestTermQuery")) {
-        kino_TestTermQuery_run_tests();
+        lucy_TestTermQuery_run_tests();
     }
     // Lucy::Store 
     else if (strEQ(package, "TestCompoundFileReader")) {
-        kino_TestCFReader_run_tests();
+        lucy_TestCFReader_run_tests();
     }
     else if (strEQ(package, "TestCompoundFileWriter")) {
-        kino_TestCFWriter_run_tests();
+        lucy_TestCFWriter_run_tests();
     }
     else if (strEQ(package, "TestFileHandle")) {
-        kino_TestFH_run_tests();
+        lucy_TestFH_run_tests();
     }
     else if (strEQ(package, "TestFolder")) {
-        kino_TestFolder_run_tests();
+        lucy_TestFolder_run_tests();
     }
     else if (strEQ(package, "TestFSDirHandle")) {
-        kino_TestFSDH_run_tests();
+        lucy_TestFSDH_run_tests();
     }
     else if (strEQ(package, "TestFSFolder")) {
-        kino_TestFSFolder_run_tests();
+        lucy_TestFSFolder_run_tests();
     }
     else if (strEQ(package, "TestFSFileHandle")) {
-        kino_TestFSFH_run_tests();
+        lucy_TestFSFH_run_tests();
     }
     else if (strEQ(package, "TestInStream")) {
-        kino_TestInStream_run_tests();
+        lucy_TestInStream_run_tests();
     }
     else if (strEQ(package, "TestIOChunks")) {
-        kino_TestIOChunks_run_tests();
+        lucy_TestIOChunks_run_tests();
     }
     else if (strEQ(package, "TestIOPrimitives")) {
-        kino_TestIOPrimitives_run_tests();
+        lucy_TestIOPrimitives_run_tests();
     }
     else if (strEQ(package, "TestRAMDirHandle")) {
-        kino_TestRAMDH_run_tests();
+        lucy_TestRAMDH_run_tests();
     }
     else if (strEQ(package, "TestRAMFileHandle")) {
-        kino_TestRAMFH_run_tests();
+        lucy_TestRAMFH_run_tests();
     }
     else if (strEQ(package, "TestRAMFolder")) {
-        kino_TestRAMFolder_run_tests();
+        lucy_TestRAMFolder_run_tests();
     }
     // Lucy::Util 
     else if (strEQ(package, "TestAtomic")) {
-        kino_TestAtomic_run_tests();
+        lucy_TestAtomic_run_tests();
     }
     else if (strEQ(package, "TestBitVector")) {
-        kino_TestBitVector_run_tests();
+        lucy_TestBitVector_run_tests();
     }
     else if (strEQ(package, "TestCharBuf")) {
-        kino_TestCB_run_tests();
+        lucy_TestCB_run_tests();
     }
     else if (strEQ(package, "TestHash")) {
-        kino_TestHash_run_tests();
+        lucy_TestHash_run_tests();
     }
     else if (strEQ(package, "TestJson")) {
-        kino_TestJson_run_tests();
+        lucy_TestJson_run_tests();
     }
     else if (strEQ(package, "TestMemory")) {
-        kino_TestMemory_run_tests();
+        lucy_TestMemory_run_tests();
     }
     else if (strEQ(package, "TestIndexFileNames")) {
-        kino_TestIxFileNames_run_tests();
+        lucy_TestIxFileNames_run_tests();
     }
     else if (strEQ(package, "TestNumberUtils")) {
-        kino_TestNumUtil_run_tests();
+        lucy_TestNumUtil_run_tests();
     }
     else if (strEQ(package, "TestNum")) {
-        kino_TestNum_run_tests();
+        lucy_TestNum_run_tests();
     }
     else if (strEQ(package, "TestPriorityQueue")) {
-        kino_TestPriQ_run_tests();
+        lucy_TestPriQ_run_tests();
     }
     else if (strEQ(package, "TestStringHelper")) {
-        kino_TestStrHelp_run_tests();
+        lucy_TestStrHelp_run_tests();
     }
     else if (strEQ(package, "TestMemoryPool")) {
-        kino_TestMemPool_run_tests();
+        lucy_TestMemPool_run_tests();
     }
     else if (strEQ(package, "TestVArray")) {
-        kino_TestVArray_run_tests();
+        lucy_TestVArray_run_tests();
     }
     else {
-        THROW(KINO_ERR, "Unknown test id: %s", package);
+        THROW(LUCY_ERR, "Unknown test id: %s", package);
     }
 }
 
@@ -232,9 +232,9 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Test::TestQueryParserSyntax
 
 void
 run_tests(index);
-    kino_Folder *index;
+    lucy_Folder *index;
 PPCODE:
-    kino_TestQPSyntax_run_tests(index);
+    lucy_TestQPSyntax_run_tests(index);
 END_XS_CODE
 
 my $charm_xs_code = <<'END_XS_CODE';
@@ -270,7 +270,7 @@ PPCODE:
         batch = chaz_TestVariadicMacros_prepare();
     }
     else {
-        THROW(KINO_ERR, "Unknown test identifier: '%s'", which);
+        THROW(LUCY_ERR, "Unknown test identifier: '%s'", which);
     }
 
     batch->run_test(batch);

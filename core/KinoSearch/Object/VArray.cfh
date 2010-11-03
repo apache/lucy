@@ -20,7 +20,7 @@ __C__
 #include "KinoSearch/Util/SortUtils.h"
 
 typedef chy_bool_t
-(*lucy_VA_gather_test_t)(kino_VArray *self, uint32_t tick, void *data);
+(*lucy_VA_gather_test_t)(lucy_VArray *self, uint32_t tick, void *data);
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define lucy_VA_gather_test_t lucy_VA_gather_test_t

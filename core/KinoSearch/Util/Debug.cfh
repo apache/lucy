@@ -71,7 +71,7 @@ __C__
 /** Unconditionally print debug statement prepending file and line info. 
  */
 #define LUCY_DEBUG_PRINT(args...)                                         \
-    kino_Debug_print_mess(__FILE__, __LINE__, __func__, ##args)
+    lucy_Debug_print_mess(__FILE__, __LINE__, __func__, ##args)
 
 /** Conditionally execute code if debugging enabled via LUCY_DEBUG environment
  * variable.
@@ -82,7 +82,7 @@ __C__
         static int do_it       = 0;                                       \
         if (!initialized) {                                               \
             initialized = 1;                                              \
-            do_it = kino_Debug_debug_should_print(__FILE__, __func__);    \
+            do_it = lucy_Debug_debug_should_print(__FILE__, __func__);    \
         }                                                                 \
         if (do_it) { actions; }                                           \
     } while (0)

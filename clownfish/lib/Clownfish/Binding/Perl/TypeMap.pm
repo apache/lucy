@@ -206,7 +206,7 @@ uint16_t\tCHY_UNSIGNED_INT
 uint32_t\tCHY_UNSIGNED_INT
 uint64_t\tCHY_BIG_UNSIGNED_INT
 
-const kino_CharBuf*\tCONST_CHARBUF
+const lucy_CharBuf*\tCONST_CHARBUF
 END_STUFF
 
     return $content;

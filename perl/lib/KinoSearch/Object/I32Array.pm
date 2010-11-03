@@ -32,7 +32,7 @@ CODE:
 {
     SV *ints_sv = NULL;
     AV *ints_av = NULL;
-    kino_I32Array *self = NULL;
+    lucy_I32Array *self = NULL;
 
     XSBind_allot_params( &(ST(0)), 1, items, 
         "KinoSearch::Object::I32Array::new_PARAMS",
@@ -53,11 +53,11 @@ CODE:
                     ? SvIV(*sv_ptr) 
                     : 0;
         }
-        self = (kino_I32Array*)XSBind_new_blank_obj(either_sv);
-        kino_I32Arr_init(self, ints, size);
+        self = (lucy_I32Array*)XSBind_new_blank_obj(either_sv);
+        lucy_I32Arr_init(self, ints, size);
     }
     else {
-        THROW(KINO_ERR, "Required param 'ints' isn't an arrayref");
+        THROW(LUCY_ERR, "Required param 'ints' isn't an arrayref");
     }
     
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
@@ -66,16 +66,16 @@ OUTPUT: RETVAL
 
 SV*
 to_arrayref(self)
-    kino_I32Array *self;
+    lucy_I32Array *self;
 CODE:
 {
     AV *out_av = newAV();
     uint32_t i;
-    uint32_t size = Kino_I32Arr_Get_Size(self);
+    uint32_t size = Lucy_I32Arr_Get_Size(self);
 
     av_extend(out_av, size);
     for (i = 0; i < size; i++) {
-        int32_t result = Kino_I32Arr_Get(self, i);
+        int32_t result = Lucy_I32Arr_Get(self, i);
         SV* result_sv = result == -1 ? newSV(0) : newSViv(result);
         av_push(out_av, result_sv);
     }

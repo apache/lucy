@@ -33,9 +33,9 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPV(sv, size);
-    kino_ByteBuf *self = (kino_ByteBuf*)XSBind_new_blank_obj(either_sv);
-    kino_BB_init(self, size);
-    Kino_BB_Mimic_Bytes(self, ptr, size);
+    lucy_ByteBuf *self = (lucy_ByteBuf*)XSBind_new_blank_obj(either_sv);
+    lucy_BB_init(self, size);
+    Lucy_BB_Mimic_Bytes(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -43,10 +43,10 @@ OUTPUT: RETVAL
 SV*
 _deserialize(either_sv, instream)
     SV *either_sv;
-    kino_InStream *instream;
+    lucy_InStream *instream;
 CODE:
     CHY_UNUSED_VAR(either_sv);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_BB_deserialize(NULL, instream));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_BB_deserialize(NULL, instream));
 OUTPUT: RETVAL
 END_XS_CODE
 

@@ -24,13 +24,13 @@
 #include "KinoSearch/Util/Atomic.h"
 #include "KinoSearch/Util/Memory.h"
 
-typedef struct kino_LFRegEntry {
+typedef struct lucy_LFRegEntry {
     Obj *key;
     Obj *value;
     int32_t hash_sum;
-    struct kino_LFRegEntry *volatile next;
-} kino_LFRegEntry;
-#define LFRegEntry kino_LFRegEntry
+    struct lucy_LFRegEntry *volatile next;
+} lucy_LFRegEntry;
+#define LFRegEntry lucy_LFRegEntry
 
 LockFreeRegistry*
 LFReg_new(size_t capacity)

@@ -29,7 +29,7 @@ void
 set_default_mem_thresh(mem_thresh)
     size_t mem_thresh;
 PPCODE:
-    kino_PListWriter_set_default_mem_thresh(mem_thresh);
+    lucy_PListWriter_set_default_mem_thresh(mem_thresh);
 END_XS
 
 Clownfish::Binding::Perl::Class->register(

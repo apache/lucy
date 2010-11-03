@@ -43,9 +43,9 @@
 #include "KinoSearch/Search/RequiredOptionalQuery.h"
 #include "KinoSearch/Store/RAMFolder.h"
 
-#define make_leaf_query   (Query*)kino_TestUtils_make_leaf_query
-#define make_not_query    (Query*)kino_TestUtils_make_not_query
-#define make_poly_query   (Query*)kino_TestUtils_make_poly_query
+#define make_leaf_query   (Query*)lucy_TestUtils_make_leaf_query
+#define make_not_query    (Query*)lucy_TestUtils_make_not_query
+#define make_poly_query   (Query*)lucy_TestUtils_make_poly_query
 
 static TestQueryParser*
 logical_test_empty_phrase(uint32_t boolop)
@@ -559,9 +559,9 @@ prune_test_not_and_not()
 /***************************************************************************/
 
 typedef TestQueryParser*
-(*kino_TestQPLogic_logical_test_t)(uint32_t boolop_sym);
+(*lucy_TestQPLogic_logical_test_t)(uint32_t boolop_sym);
 
-static kino_TestQPLogic_logical_test_t logical_test_funcs[] = {
+static lucy_TestQPLogic_logical_test_t logical_test_funcs[] = {
     logical_test_empty_phrase,
     logical_test_empty_parens,
     logical_test_nested_empty_parens,
@@ -607,9 +607,9 @@ static kino_TestQPLogic_logical_test_t logical_test_funcs[] = {
 };
 
 typedef TestQueryParser*
-(*kino_TestQPLogic_prune_test_t)();
+(*lucy_TestQPLogic_prune_test_t)();
 
-static kino_TestQPLogic_prune_test_t prune_test_funcs[] = {
+static lucy_TestQPLogic_prune_test_t prune_test_funcs[] = {
     prune_test_null_querystring,
     prune_test_matchall,
     prune_test_nomatch,
@@ -665,7 +665,7 @@ TestQPLogic_run_tests()
 
     // Run logical tests with default boolop of OR. 
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
-        kino_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
+        lucy_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case = test_func(BOOLOP_OR);
         Query *tree     = QParser_Tree(or_parser, test_case->query_string);
         Query *parsed   = QParser_Parse(or_parser, test_case->query_string);
@@ -683,7 +683,7 @@ TestQPLogic_run_tests()
 
     // Run logical tests with default boolop of AND. 
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
-        kino_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
+        lucy_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case = test_func(BOOLOP_AND);
         Query *tree     = QParser_Tree(and_parser, test_case->query_string);
         Query *parsed   = QParser_Parse(and_parser, test_case->query_string);
@@ -701,7 +701,7 @@ TestQPLogic_run_tests()
 
     // Run tests for QParser_Prune(). 
     for (i = 0; prune_test_funcs[i] != NULL; i++) {
-        kino_TestQPLogic_prune_test_t test_func = prune_test_funcs[i];
+        lucy_TestQPLogic_prune_test_t test_func = prune_test_funcs[i];
         TestQueryParser *test_case = test_func();
         CharBuf *qstring = test_case->tree 
                          ? Query_To_String(test_case->tree)

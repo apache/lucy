@@ -59,7 +59,7 @@ OUTPUT: RETVAL
 int32_t
 object_count()
 CODE:
-    RETVAL = kino_FH_object_count;
+    RETVAL = lucy_FH_object_count;
 OUTPUT: RETVAL
 
 =for comment

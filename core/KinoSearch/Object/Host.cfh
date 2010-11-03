@@ -34,9 +34,9 @@ __C__
 #define CFISH_ARG_F64(_label, _value) \
     CFISH_HOST_ARGTYPE_F64, (_label), ((double)_value)
 #define CFISH_ARG_STR(_label, _value) \
-    CFISH_HOST_ARGTYPE_STR, (_label), ((kino_CharBuf*)_value)
+    CFISH_HOST_ARGTYPE_STR, (_label), ((lucy_CharBuf*)_value)
 #define CFISH_ARG_OBJ(_label, _value) \
-    CFISH_HOST_ARGTYPE_OBJ, (_label), ((kino_Obj*)_value)
+    CFISH_HOST_ARGTYPE_OBJ, (_label), ((lucy_Obj*)_value)
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define ARG_I32                 CFISH_ARG_I32

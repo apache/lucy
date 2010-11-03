@@ -27,9 +27,9 @@ MODULE = KinoSearch    PACKAGE = KinoSearch::Index::Similarity
 
 SV*
 get_norm_decoder(self)
-    kino_Similarity *self;
+    lucy_Similarity *self;
 CODE:
-    RETVAL = newSVpvn( (char*)Kino_Sim_Get_Norm_Decoder(self), 
+    RETVAL = newSVpvn( (char*)Lucy_Sim_Get_Norm_Decoder(self), 
         (256 * sizeof(float)) );
 OUTPUT: RETVAL
 END_XS_CODE

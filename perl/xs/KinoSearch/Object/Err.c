@@ -17,28 +17,28 @@
 #include "xs/XSBind.h"
 #include "KinoSearch/Object/Host.h"
 
-kino_Err*
-kino_Err_get_error()
+lucy_Err*
+lucy_Err_get_error()
 {
-    kino_Err *error 
-        = (kino_Err*)kino_Host_callback_obj(KINO_ERR, "get_error", 0);
+    lucy_Err *error 
+        = (lucy_Err*)lucy_Host_callback_obj(LUCY_ERR, "get_error", 0);
     LUCY_DECREF(error); // Cancel out incref from callback. 
     return error;
 }
 
 void
-kino_Err_set_error(kino_Err *error)
+lucy_Err_set_error(lucy_Err *error)
 {
-    kino_Host_callback(KINO_ERR, "set_error", 1, 
+    lucy_Host_callback(LUCY_ERR, "set_error", 1, 
         CFISH_ARG_OBJ("error", error));
     LUCY_DECREF(error);
 }
 
 void
-kino_Err_do_throw(kino_Err *err)
+lucy_Err_do_throw(lucy_Err *err)
 {
     dSP;
-    SV *error_sv = (SV*)Kino_Err_To_Host(err);
+    SV *error_sv = (SV*)Lucy_Err_To_Host(err);
     LUCY_DECREF(err);
     ENTER;
     SAVETMPS;
@@ -51,28 +51,28 @@ kino_Err_do_throw(kino_Err *err)
 }
 
 void*
-kino_Err_to_host(kino_Err *self)
+lucy_Err_to_host(lucy_Err *self)
 {
-    kino_Err_to_host_t super_to_host 
-        = (kino_Err_to_host_t)LUCY_SUPER_METHOD(KINO_ERR, Err, To_Host);
+    lucy_Err_to_host_t super_to_host 
+        = (lucy_Err_to_host_t)LUCY_SUPER_METHOD(LUCY_ERR, Err, To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;
 }
 
 void
-kino_Err_throw_mess(kino_VTable *vtable, kino_CharBuf *message) 
+lucy_Err_throw_mess(lucy_VTable *vtable, lucy_CharBuf *message) 
 {
-    kino_Err_make_t make = (kino_Err_make_t)LUCY_METHOD(
-        CFISH_CERTIFY(vtable, KINO_VTABLE), Err, Make);
-    kino_Err *err = (kino_Err*)CFISH_CERTIFY(make(NULL), KINO_ERR);
-    Kino_Err_Cat_Mess(err, message);
+    lucy_Err_make_t make = (lucy_Err_make_t)LUCY_METHOD(
+        CFISH_CERTIFY(vtable, LUCY_VTABLE), Err, Make);
+    lucy_Err *err = (lucy_Err*)CFISH_CERTIFY(make(NULL), LUCY_ERR);
+    Lucy_Err_Cat_Mess(err, message);
     LUCY_DECREF(message);
-    kino_Err_do_throw(err);
+    lucy_Err_do_throw(err);
 }
 
 void
-kino_Err_warn_mess(kino_CharBuf *message) 
+lucy_Err_warn_mess(lucy_CharBuf *message) 
 {
     SV *error_sv = XSBind_cb_to_sv(message);
     LUCY_DECREF(message);

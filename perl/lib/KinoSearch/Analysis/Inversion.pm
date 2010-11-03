@@ -29,7 +29,7 @@ SV*
 new(...)
 CODE:
 {
-    kino_Token *starter_token = NULL;
+    lucy_Token *starter_token = NULL;
     // parse params, only if there's more than one arg 
     if (items > 1) {
         SV *text_sv = NULL;
@@ -40,11 +40,11 @@ CODE:
         if (XSBind_sv_defined(text_sv)) {
             STRLEN len;
             char *text = SvPVutf8(text_sv, len);
-            starter_token = kino_Token_new(text, len, 0, len, 1.0, 1);
+            starter_token = lucy_Token_new(text, len, 0, len, 1.0, 1);
         }
     }
         
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_Inversion_new(starter_token));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_Inversion_new(starter_token));
     LUCY_DECREF(starter_token);
 }
 OUTPUT: RETVAL

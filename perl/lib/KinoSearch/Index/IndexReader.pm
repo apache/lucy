@@ -29,16 +29,16 @@ void
 set_race_condition_debug1(val_sv)
     SV *val_sv;
 PPCODE:
-    LUCY_DECREF(kino_PolyReader_race_condition_debug1);
-    kino_PolyReader_race_condition_debug1 = (kino_CharBuf*)
-        XSBind_maybe_sv_to_cfish_obj(val_sv, KINO_CHARBUF, NULL);
-    if (kino_PolyReader_race_condition_debug1)
-        (void)LUCY_INCREF(kino_PolyReader_race_condition_debug1);
+    LUCY_DECREF(lucy_PolyReader_race_condition_debug1);
+    lucy_PolyReader_race_condition_debug1 = (lucy_CharBuf*)
+        XSBind_maybe_sv_to_cfish_obj(val_sv, LUCY_CHARBUF, NULL);
+    if (lucy_PolyReader_race_condition_debug1)
+        (void)LUCY_INCREF(lucy_PolyReader_race_condition_debug1);
 
 int32_t
 debug1_num_passes()
 CODE: 
-    RETVAL = kino_PolyReader_debug1_num_passes;
+    RETVAL = lucy_PolyReader_debug1_num_passes;
 OUTPUT: RETVAL
 END_XS_CODE
 

@@ -27,14 +27,14 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Index::Posting::ScorePosting
 
 SV*
 get_prox(self)
-    kino_ScorePosting *self;
+    lucy_ScorePosting *self;
 CODE:
 {
     AV *out_av            = newAV();
-    uint32_t *positions  = Kino_ScorePost_Get_Prox(self);
+    uint32_t *positions  = Lucy_ScorePost_Get_Prox(self);
     uint32_t i, max;
 
-    for (i = 0, max = Kino_ScorePost_Get_Freq(self); i < max; i++) {
+    for (i = 0, max = Lucy_ScorePost_Get_Freq(self); i < max; i++) {
         SV *pos_sv = newSVuv(positions[i]);
         av_push(out_av, pos_sv);
     }

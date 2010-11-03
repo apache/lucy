@@ -28,19 +28,19 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Search::SortRule
 int32_t
 FIELD()
 CODE:
-    RETVAL = kino_SortRule_FIELD;
+    RETVAL = lucy_SortRule_FIELD;
 OUTPUT: RETVAL
 
 int32_t
 SCORE()
 CODE:
-    RETVAL = kino_SortRule_SCORE;
+    RETVAL = lucy_SortRule_SCORE;
 OUTPUT: RETVAL
 
 int32_t
 DOC_ID()
 CODE:
-    RETVAL = kino_SortRule_DOC_ID;
+    RETVAL = lucy_SortRule_DOC_ID;
 OUTPUT: RETVAL
 END_XS_CODE
 

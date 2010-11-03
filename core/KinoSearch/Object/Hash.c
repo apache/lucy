@@ -38,7 +38,7 @@ static HashTombStone TOMBSTONE = {
     {1}
 };
 
-#define HashEntry kino_HashEntry
+#define HashEntry lucy_HashEntry
 
 typedef struct HashEntry {
     Obj     *key;

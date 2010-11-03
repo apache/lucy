@@ -27,17 +27,17 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Util::IndexFileNames
 
 uint64_t
 extract_gen(name)
-    const kino_CharBuf *name;
+    const lucy_CharBuf *name;
 CODE:
-    RETVAL = kino_IxFileNames_extract_gen(name);
+    RETVAL = lucy_IxFileNames_extract_gen(name);
 OUTPUT: RETVAL
 
 SV*
 latest_snapshot(folder)
-    kino_Folder *folder;
+    lucy_Folder *folder;
 CODE:
 {
-    kino_CharBuf *latest = kino_IxFileNames_latest_snapshot(folder);
+    lucy_CharBuf *latest = lucy_IxFileNames_latest_snapshot(folder);
     RETVAL = XSBind_cb_to_sv(latest);   
     LUCY_DECREF(latest);
 }

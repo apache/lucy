@@ -29,22 +29,22 @@ int32_t
 CREATE(...)
 CODE:
     CHY_UNUSED_VAR(items);
-    RETVAL = kino_Indexer_CREATE;
+    RETVAL = lucy_Indexer_CREATE;
 OUTPUT: RETVAL
 
 int32_t
 TRUNCATE(...)
 CODE:
     CHY_UNUSED_VAR(items);
-    RETVAL = kino_Indexer_TRUNCATE;
+    RETVAL = lucy_Indexer_TRUNCATE;
 OUTPUT: RETVAL
 
 void
 add_doc(self, ...)
-    kino_Indexer *self;
+    lucy_Indexer *self;
 PPCODE:
 {
-    kino_Doc *doc = NULL;
+    lucy_Doc *doc = NULL;
     SV *doc_sv = NULL;
     float boost = 1.0;
 
@@ -61,7 +61,7 @@ PPCODE:
         }
     }
     else if (items == 1) {
-        CFISH_THROW(KINO_ERR, "Missing required argument 'doc'");
+        CFISH_THROW(LUCY_ERR, "Missing required argument 'doc'");
     }
 
     // Either get a Doc or use the stock doc. 
@@ -69,21 +69,21 @@ PPCODE:
         && sv_derived_from(doc_sv, "KinoSearch::Document::Doc")
     ) {
         IV tmp = SvIV( SvRV(doc_sv) );
-        doc = INT2PTR(kino_Doc*, tmp);
+        doc = INT2PTR(lucy_Doc*, tmp);
     }
     else if (XSBind_sv_defined(doc_sv) && SvROK(doc_sv)) {
         HV *maybe_fields = (HV*)SvRV(doc_sv);
         if (SvTYPE((SV*)maybe_fields) == SVt_PVHV) {
-            doc = Kino_Indexer_Get_Stock_Doc(self);
-            Kino_Doc_Set_Fields(doc, maybe_fields);
+            doc = Lucy_Indexer_Get_Stock_Doc(self);
+            Lucy_Doc_Set_Fields(doc, maybe_fields);
         }
     }
     if (!doc) {
-        THROW(KINO_ERR, "Need either a hashref or a %o",
-            Kino_VTable_Get_Name(KINO_DOC));
+        THROW(LUCY_ERR, "Need either a hashref or a %o",
+            Lucy_VTable_Get_Name(LUCY_DOC));
     }
 
-    Kino_Indexer_Add_Doc(self, doc, boost);
+    Lucy_Indexer_Add_Doc(self, doc, boost);
 }
 END_XS_CODE
 

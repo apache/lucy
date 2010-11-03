@@ -32,7 +32,7 @@ class KinoSearch::Object::VTable inherits KinoSearch::Object::Obj {
     size_t             obj_alloc_size;
     size_t             vt_alloc_size;
     void              *callbacks;
-    kino_method_t[1]   methods; /* flexible array */
+    lucy_method_t[1]   methods; /* flexible array */
 
     inert LockFreeRegistry *registry;
     inert size_t offset_of_parent;
@@ -88,7 +88,7 @@ class KinoSearch::Object::VTable inherits KinoSearch::Object::Obj {
     /** Replace a function pointer in the VTable. 
      */
     void
-    Override(VTable *self, kino_method_t method_ptr, size_t offset);
+    Override(VTable *self, lucy_method_t method_ptr, size_t offset);
 
     /** Create an empty object of the type defined by the VTable: allocate,
      * assign its vtable and give it an initial refcount of 1.  The caller is

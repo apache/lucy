@@ -46,13 +46,13 @@ CODE:
         NULL);
 
     if (!XSBind_sv_defined(text_sv)) { 
-        THROW(KINO_ERR, "Missing required param 'text'"); 
+        THROW(LUCY_ERR, "Missing required param 'text'"); 
     }
     if (!XSBind_sv_defined(start_offset_sv)) { 
-        THROW(KINO_ERR, "Missing required param 'start_offset'"); 
+        THROW(LUCY_ERR, "Missing required param 'start_offset'"); 
     }
     if (!XSBind_sv_defined(end_offset_sv)) { 
-        THROW(KINO_ERR, "Missing required param 'end_offset'"); 
+        THROW(LUCY_ERR, "Missing required param 'end_offset'"); 
     }
 
     STRLEN      len;
@@ -61,8 +61,8 @@ CODE:
     uint32_t    end_off   = SvUV(end_offset_sv);
     int32_t     pos_inc   = pos_inc_sv ? SvIV(pos_inc_sv) : 1;
     float       boost     = boost_sv ? (float)SvNV(boost_sv) : 1.0f;
-    kino_Token *self   = (kino_Token*)XSBind_new_blank_obj(either_sv);
-    kino_Token_init(self, text, len, start_off, end_off, boost, 
+    lucy_Token *self   = (lucy_Token*)XSBind_new_blank_obj(either_sv);
+    lucy_Token_init(self, text, len, start_off, end_off, boost, 
         pos_inc);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
@@ -70,21 +70,21 @@ OUTPUT: RETVAL
 
 SV*
 get_text(self)
-    kino_Token *self;
+    lucy_Token *self;
 CODE:
-    RETVAL = newSVpvn(Kino_Token_Get_Text(self), Kino_Token_Get_Len(self));
+    RETVAL = newSVpvn(Lucy_Token_Get_Text(self), Lucy_Token_Get_Len(self));
     SvUTF8_on(RETVAL);
 OUTPUT: RETVAL
 
 void
 set_text(self, sv)
-    kino_Token *self;
+    lucy_Token *self;
     SV *sv;
 PPCODE:
 {
     STRLEN len;
     char *ptr = SvPVutf8(sv, len);
-    Kino_Token_Set_Text(self, ptr, len);
+    Lucy_Token_Set_Text(self, ptr, len);
 }
 END_XS
 

@@ -38,7 +38,7 @@ PPCODE:
     SV **const length_sv_ptr = hv_fetch(PL_modglobal,
         "Lingua::Stem::Snowball::sb_stemmer_length", 41, 0);
     if (!new_sv_ptr || !delete_sv_ptr || !stem_sv_ptr || !length_sv_ptr) {
-        THROW(KINO_ERR, "Failed to retrieve one or more Snowball symbols");
+        THROW(LUCY_ERR, "Failed to retrieve one or more Snowball symbols");
     }
     lucy_Stemmer_sb_stemmer_new 
         = (lucy_Stemmer_sb_stemmer_new_t)SvIV(*new_sv_ptr);

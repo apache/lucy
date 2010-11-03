@@ -27,10 +27,10 @@
 #include "KinoSearch/Util/StringHelper.h"
 
 static size_t
-S_lc_to_work_buf(kino_CaseFolder *self, uint8_t *source, size_t len,
+S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
                  uint8_t **buf, uint8_t **limit)
 {
-    kino_ByteBuf *const  work_buf   = self->work_buf;
+    lucy_ByteBuf *const  work_buf   = self->work_buf;
     uint8_t            *dest       = *buf;
     uint8_t            *dest_start = dest;
     uint8_t *const      end        = source + len;
@@ -44,32 +44,32 @@ S_lc_to_work_buf(kino_CaseFolder *self, uint8_t *source, size_t len,
         if (((STRLEN)(*limit - dest)) < buf_utf8_len) {
             size_t    bytes_so_far = dest - dest_start;
             size_t    amount       = bytes_so_far + (end - source) + 10; 
-            Kino_BB_Set_Size(work_buf, bytes_so_far);
-            *buf       = (uint8_t*)Kino_BB_Grow(work_buf, amount);
+            Lucy_BB_Set_Size(work_buf, bytes_so_far);
+            *buf       = (uint8_t*)Lucy_BB_Grow(work_buf, amount);
             dest_start = *buf;
             dest       = dest_start + bytes_so_far;
             *limit     = dest_start + work_buf->cap;
         }
         memcpy(dest, utf8_buf, buf_utf8_len);
 
-        source += kino_StrHelp_UTF8_COUNT[*source];
+        source += lucy_StrHelp_UTF8_COUNT[*source];
         dest += buf_utf8_len;
     }
 
     {
         size_t size = dest - dest_start;
-        Kino_BB_Set_Size(work_buf, size);
+        Lucy_BB_Set_Size(work_buf, size);
         return size;
     }
 }
 
-kino_Inversion*
-kino_CaseFolder_transform(kino_CaseFolder *self, kino_Inversion *inversion)
+lucy_Inversion*
+lucy_CaseFolder_transform(lucy_CaseFolder *self, lucy_Inversion *inversion)
 {
-    kino_Token *token;
-    uint8_t *buf   = (uint8_t*)Kino_BB_Get_Buf(self->work_buf);
-    uint8_t *limit = buf + Kino_BB_Get_Capacity(self->work_buf);
-    while (NULL != (token = Kino_Inversion_Next(inversion))) {
+    lucy_Token *token;
+    uint8_t *buf   = (uint8_t*)Lucy_BB_Get_Buf(self->work_buf);
+    uint8_t *limit = buf + Lucy_BB_Get_Capacity(self->work_buf);
+    while (NULL != (token = Lucy_Inversion_Next(inversion))) {
         size_t size = S_lc_to_work_buf(self, (uint8_t*)token->text, 
             token->len, &buf, &limit);
         if (size > token->len) {
@@ -80,21 +80,21 @@ kino_CaseFolder_transform(kino_CaseFolder *self, kino_Inversion *inversion)
         token->text[size] = '\0';
         token->len = size;
     }
-    Kino_Inversion_Reset(inversion);
-    return (kino_Inversion*)LUCY_INCREF(inversion);
+    Lucy_Inversion_Reset(inversion);
+    return (lucy_Inversion*)LUCY_INCREF(inversion);
 }
 
-kino_Inversion*
-kino_CaseFolder_transform_text(kino_CaseFolder *self, kino_CharBuf *text)
+lucy_Inversion*
+lucy_CaseFolder_transform_text(lucy_CaseFolder *self, lucy_CharBuf *text)
 {
-    kino_Inversion *retval;
-    kino_Token *token;
-    uint8_t *buf   = (uint8_t*)Kino_BB_Get_Buf(self->work_buf);
-    uint8_t *limit = buf + Kino_BB_Get_Capacity(self->work_buf);
-    size_t size = S_lc_to_work_buf(self, Kino_CB_Get_Ptr8(text), 
-        Kino_CB_Get_Size(text), &buf, &limit);
-    token = kino_Token_new((char*)buf, size, 0, size, 1.0f, 1);
-    retval = kino_Inversion_new(token);
+    lucy_Inversion *retval;
+    lucy_Token *token;
+    uint8_t *buf   = (uint8_t*)Lucy_BB_Get_Buf(self->work_buf);
+    uint8_t *limit = buf + Lucy_BB_Get_Capacity(self->work_buf);
+    size_t size = S_lc_to_work_buf(self, Lucy_CB_Get_Ptr8(text), 
+        Lucy_CB_Get_Size(text), &buf, &limit);
+    token = lucy_Token_new((char*)buf, size, 0, size, 1.0f, 1);
+    retval = lucy_Inversion_new(token);
     LUCY_DECREF(token);
     return retval;
 }

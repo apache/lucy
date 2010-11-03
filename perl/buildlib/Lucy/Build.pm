@@ -92,7 +92,7 @@ sub extra_ccflags {
 
     if ( defined $ENV{LUCY_DEBUG} ) {
         if ( defined $gcc_version ) {
-            $extra_ccflags .= "-DKINO_DEBUG ";
+            $extra_ccflags .= "-DLUCY_DEBUG ";
             $extra_ccflags
                 .= "-DPERL_GCC_PEDANTIC -std=gnu99 -pedantic -Wall ";
             $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct

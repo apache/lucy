@@ -28,9 +28,9 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Object::VTable
 SV*
 _get_registry()
 CODE:
-    if (kino_VTable_registry == NULL)
-        kino_VTable_init_registry();
-    RETVAL = (SV*)Kino_Obj_To_Host((kino_Obj*)kino_VTable_registry);
+    if (lucy_VTable_registry == NULL)
+        lucy_VTable_init_registry();
+    RETVAL = (SV*)Lucy_Obj_To_Host((lucy_Obj*)lucy_VTable_registry);
 OUTPUT: RETVAL
 END_XS_CODE
 

@@ -27,10 +27,10 @@ MODULE = KinoSearch     PACKAGE = KinoSearch::Document::Doc
 
 SV*
 get_fields(self, ...)
-    kino_Doc *self;
+    lucy_Doc *self;
 CODE:
     CHY_UNUSED_VAR(items);
-    RETVAL = newRV_inc( (SV*)Kino_Doc_Get_Fields(self) );
+    RETVAL = newRV_inc( (SV*)Lucy_Doc_Get_Fields(self) );
 OUTPUT: RETVAL
 END_XS_CODE
 

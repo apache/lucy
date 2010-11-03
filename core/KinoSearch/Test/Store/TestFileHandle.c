@@ -39,7 +39,7 @@ S_new_filehandle()
     if (!vtable) {
         vtable = VTable_singleton((CharBuf*)klass, FILEHANDLE);
     }   
-    VTable_Override(vtable, S_no_op_method, Kino_FH_Close_OFFSET);
+    VTable_Override(vtable, S_no_op_method, Lucy_FH_Close_OFFSET);
     fh = (FileHandle*)VTable_Make_Obj(vtable);
     return FH_do_open(fh, NULL, 0);
 }

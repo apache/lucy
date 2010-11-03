@@ -95,14 +95,14 @@ class KinoSearch::Test::TestBatch inherits KinoSearch::Object::Obj {
 
 __C__
 #ifdef LUCY_USE_SHORT_NAMES
-  #define TEST_TRUE                    kino_TestBatch_test_true
-  #define TEST_FALSE                   kino_TestBatch_test_false
-  #define TEST_INT_EQ                  kino_TestBatch_test_int_equals
-  #define TEST_FLOAT_EQ                kino_TestBatch_test_float_equals
-  #define TEST_STR_EQ                  kino_TestBatch_test_string_equals
-  #define PASS                         kino_TestBatch_pass
-  #define FAIL                         kino_TestBatch_fail
-  #define SKIP                         kino_TestBatch_skip
+  #define TEST_TRUE                    lucy_TestBatch_test_true
+  #define TEST_FALSE                   lucy_TestBatch_test_false
+  #define TEST_INT_EQ                  lucy_TestBatch_test_int_equals
+  #define TEST_FLOAT_EQ                lucy_TestBatch_test_float_equals
+  #define TEST_STR_EQ                  lucy_TestBatch_test_string_equals
+  #define PASS                         lucy_TestBatch_pass
+  #define FAIL                         lucy_TestBatch_fail
+  #define SKIP                         lucy_TestBatch_skip
 #endif
 __END_C__
 

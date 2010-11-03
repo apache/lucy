@@ -41,7 +41,7 @@ BEGIN {
     }
 }
 
-my $stderr_dumpfile = catfile( working_dir(), 'kino_garbage' );
+my $stderr_dumpfile = catfile( working_dir(), 'lucy_garbage' );
 unlink $stderr_dumpfile;
 sysopen( STDERR, $stderr_dumpfile, O_CREAT | O_WRONLY | O_EXCL )
     or die "Failed to redirect STDERR";

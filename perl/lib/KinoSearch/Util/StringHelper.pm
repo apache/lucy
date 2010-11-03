@@ -56,7 +56,7 @@ to_base36(num)
 CODE:
 {
     char base36[lucy_StrHelp_MAX_BASE36_BYTES];
-    size_t size = kino_StrHelp_to_base36(num, &base36);
+    size_t size = lucy_StrHelp_to_base36(num, &base36);
     RETVAL = newSVpvn(base36, size);
 }
 OUTPUT: RETVAL
@@ -88,7 +88,7 @@ CODE:
 {
     STRLEN len;
     char *ptr = SvPV(sv, len);
-    RETVAL = kino_StrHelp_utf8_valid(ptr, len);
+    RETVAL = lucy_StrHelp_utf8_valid(ptr, len);
 }
 OUTPUT: RETVAL
 
@@ -108,7 +108,7 @@ PPCODE:
 {
     STRLEN len;
     char *ptr = SvPV(catted, len);
-    if (SvUTF8(sv)) { CFISH_THROW(KINO_ERR, "Can't cat_bytes onto a UTF-8 SV"); }
+    if (SvUTF8(sv)) { CFISH_THROW(LUCY_ERR, "Can't cat_bytes onto a UTF-8 SV"); }
     sv_catpvn(sv, ptr, len);
 }
 END_XS_CODE

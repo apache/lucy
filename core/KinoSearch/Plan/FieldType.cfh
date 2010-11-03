@@ -168,8 +168,8 @@ abstract class KinoSearch::Plan::FieldType cnick FType
 __C__
 
 static CHY_INLINE int32_t
-kino_FType_null_back_compare_values(kino_FieldType *self, 
-                                    kino_Obj *a, kino_Obj *b)
+lucy_FType_null_back_compare_values(lucy_FieldType *self, 
+                                    lucy_Obj *a, lucy_Obj *b)
 {
     if (a == NULL) {
         if (b == NULL) { return 0; }
@@ -179,7 +179,7 @@ kino_FType_null_back_compare_values(kino_FieldType *self,
         return -1;
     }
     else {
-        return Kino_FType_Compare_Values(self, a, b);
+        return Lucy_FType_Compare_Values(self, a, b);
     }
 }
 

@@ -56,10 +56,10 @@ inert class KinoSearch::Util::Memory {
 
 __C__
 
-#define LUCY_MALLOCATE    kino_Memory_wrapped_malloc
-#define LUCY_CALLOCATE    kino_Memory_wrapped_calloc
-#define LUCY_REALLOCATE   kino_Memory_wrapped_realloc
-#define LUCY_FREEMEM      kino_Memory_wrapped_free
+#define LUCY_MALLOCATE    lucy_Memory_wrapped_malloc
+#define LUCY_CALLOCATE    lucy_Memory_wrapped_calloc
+#define LUCY_REALLOCATE   lucy_Memory_wrapped_realloc
+#define LUCY_FREEMEM      lucy_Memory_wrapped_free
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define MALLOCATE                       LUCY_MALLOCATE

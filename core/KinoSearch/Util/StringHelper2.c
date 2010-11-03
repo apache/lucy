@@ -38,7 +38,7 @@ this Software without prior written authorization of the copyright holder.
 All trademarks and registered trademarks mentioned herein are the property of their respective owners.
 */
 
-const uint8_t kino_StrHelp_UTF8_COUNT[] = {
+const uint8_t lucy_StrHelp_UTF8_COUNT[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

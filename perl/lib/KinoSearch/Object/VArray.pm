@@ -27,66 +27,66 @@ MODULE = KinoSearch   PACKAGE = KinoSearch::Object::VArray
 
 SV*
 shallow_copy(self)
-    kino_VArray *self;
+    lucy_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Kino_VA_Shallow_Copy(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Shallow_Copy(self));
 OUTPUT: RETVAL
 
 SV*
 _deserialize(either_sv, instream)
     SV *either_sv;
-    kino_InStream *instream;
+    lucy_InStream *instream;
 CODE:
     CHY_UNUSED_VAR(either_sv);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_VA_deserialize(NULL, instream));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_VA_deserialize(NULL, instream));
 OUTPUT: RETVAL
 
 SV*
 _clone(self)
-    kino_VArray *self;
+    lucy_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Kino_VA_Clone(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Clone(self));
 OUTPUT: RETVAL
 
 SV*
 shift(self)
-    kino_VArray *self;
+    lucy_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Kino_VA_Shift(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Shift(self));
 OUTPUT: RETVAL
 
 SV*
 pop(self)
-    kino_VArray *self;
+    lucy_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Kino_VA_Pop(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Pop(self));
 OUTPUT: RETVAL
 
 SV*
 delete(self, tick)
-    kino_VArray *self;
+    lucy_VArray *self;
     uint32_t    tick;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Kino_VA_Delete(self, tick));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Delete(self, tick));
 OUTPUT: RETVAL
 
 void
 store(self, tick, value);
-    kino_VArray *self; 
+    lucy_VArray *self; 
     uint32_t     tick;
-    kino_Obj    *value;
+    lucy_Obj    *value;
 PPCODE:
 {
     if (value) { LUCY_INCREF(value); }
-    kino_VA_store(self, tick, value);
+    lucy_VA_store(self, tick, value);
 }
 
 SV*
 fetch(self, tick)
-    kino_VArray *self;
+    lucy_VArray *self;
     uint32_t     tick;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV(Kino_VA_Fetch(self, tick));
+    RETVAL = CFISH_OBJ_TO_SV(Lucy_VA_Fetch(self, tick));
 OUTPUT: RETVAL
 END_XS_CODE
 

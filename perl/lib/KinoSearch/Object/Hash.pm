@@ -28,42 +28,42 @@ MODULE =  KinoSearch    PACKAGE = KinoSearch::Object::Hash
 SV*
 _deserialize(either_sv, instream)
     SV *either_sv;
-    kino_InStream *instream;
+    lucy_InStream *instream;
 CODE:
     CHY_UNUSED_VAR(either_sv);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_Hash_deserialize(NULL, instream));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_Hash_deserialize(NULL, instream));
 OUTPUT: RETVAL
 
 SV*
 _fetch(self, key)
-    kino_Hash *self;
-    const kino_CharBuf *key;
+    lucy_Hash *self;
+    const lucy_CharBuf *key;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV(kino_Hash_fetch(self, (kino_Obj*)key));
+    RETVAL = CFISH_OBJ_TO_SV(lucy_Hash_fetch(self, (lucy_Obj*)key));
 OUTPUT: RETVAL
 
 void
 store(self, key, value);
-    kino_Hash          *self; 
-    const kino_CharBuf *key;
-    kino_Obj           *value;
+    lucy_Hash          *self; 
+    const lucy_CharBuf *key;
+    lucy_Obj           *value;
 PPCODE:
 {
     if (value) { LUCY_INCREF(value); }
-    kino_Hash_store(self, (kino_Obj*)key, value);
+    lucy_Hash_store(self, (lucy_Obj*)key, value);
 }
 
 void
 next(self)
-    kino_Hash *self;
+    lucy_Hash *self;
 PPCODE:
 {
-    kino_Obj *key;
-    kino_Obj *val;
+    lucy_Obj *key;
+    lucy_Obj *val;
 
-    if (Kino_Hash_Next(self, &key, &val)) {
-        SV *key_sv = (SV*)Kino_Obj_To_Host(key);
-        SV *val_sv = (SV*)Kino_Obj_To_Host(val);
+    if (Lucy_Hash_Next(self, &key, &val)) {
+        SV *key_sv = (SV*)Lucy_Obj_To_Host(key);
+        SV *val_sv = (SV*)Lucy_Obj_To_Host(val);
 
         XPUSHs(sv_2mortal( key_sv ));
         XPUSHs(sv_2mortal( val_sv ));

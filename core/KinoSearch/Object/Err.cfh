@@ -162,38 +162,38 @@ __C__
 #endif
 
 #define CFISH_ERR_ADD_FRAME(_error) \
-    Kino_Err_Add_Frame(_error, __FILE__, __LINE__, \
+    Lucy_Err_Add_Frame(_error, __FILE__, __LINE__, \
         CFISH_ERR_FUNC_MACRO)
 
 #define CFISH_RETHROW(_error) \
-    kino_Err_rethrow((kino_Err*)_error, __FILE__, __LINE__, \
+    lucy_Err_rethrow((lucy_Err*)_error, __FILE__, __LINE__, \
         CFISH_ERR_FUNC_MACRO)
 
-/** Macro version of kino_Err_throw_at which inserts contextual information
+/** Macro version of lucy_Err_throw_at which inserts contextual information
  * automatically, provided that the compiler supports the necessary features.
  */
 #ifdef CHY_HAS_VARIADIC_MACROS
  #ifdef CHY_HAS_ISO_VARIADIC_MACROS
   #define CFISH_THROW(_vtable, ...) \
-    kino_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
+    lucy_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
         __VA_ARGS__)
   #define CFISH_WARN(...) \
-    kino_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, __VA_ARGS__)
+    lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, __VA_ARGS__)
   #define CFISH_MAKE_MESS(...) \
-    kino_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
+    lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
         __VA_ARGS__)
  #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS)
   #define CFISH_THROW(_vtable, args...) \
-    kino_Err_throw_at(_vtable, __FILE__, __LINE__, \
+    lucy_Err_throw_at(_vtable, __FILE__, __LINE__, \
         CFISH_ERR_FUNC_MACRO, ##args)
   #define CFISH_WARN(args...) \
-    kino_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
+    lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
   #define CFISH_MAKE_MESS(args...) \
-    kino_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
+    lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
  #endif
 #else
   void 
-  CFISH_THROW(kino_VTable *vtable, char* format, ...);
+  CFISH_THROW(lucy_VTable *vtable, char* format, ...);
   void 
   CFISH_WARN(char* format, ...);
   void 
@@ -201,28 +201,28 @@ __C__
 #endif
 
 #define CFISH_DOWNCAST(_obj, _vtable) \
-    kino_Err_downcast((kino_Obj*)(_obj), (_vtable), \
+    lucy_Err_downcast((lucy_Obj*)(_obj), (_vtable), \
         __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 
 #define CFISH_CERTIFY(_obj, _vtable) \
-    kino_Err_certify((kino_Obj*)(_obj), (_vtable), \
+    lucy_Err_certify((lucy_Obj*)(_obj), (_vtable), \
         __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 static CHY_INLINE void
-kino_Err_abstract_class_check(kino_Obj *obj, kino_VTable *vtable)
+lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable)
 {
-    kino_VTable *const my_vtable = *(kino_VTable**)obj;
+    lucy_VTable *const my_vtable = *(lucy_VTable**)obj;
     if (my_vtable == vtable) {
-        kino_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
-            Kino_Obj_Get_Class_Name(obj));
-        Kino_Obj_Dec_RefCount(obj);
-        kino_Err_throw_mess(KINO_ERR, mess);
+        lucy_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
+            Lucy_Obj_Get_Class_Name(obj));
+        Lucy_Obj_Dec_RefCount(obj);
+        lucy_Err_throw_mess(LUCY_ERR, mess);
     }
 }
 
 #define CFISH_ABSTRACT_CLASS_CHECK(_obj, _vtable) \
-    kino_Err_abstract_class_check(((kino_Obj*)_obj), _vtable)
+    lucy_Err_abstract_class_check(((lucy_Obj*)_obj), _vtable)
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define THROW                 CFISH_THROW

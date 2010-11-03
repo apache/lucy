@@ -249,7 +249,7 @@ S_perl_hash_to_cfish_hash(HV *phash)
         else {
             key = HeKEY(entry);
             key_len = he_key_len;
-            if (!kino_StrHelp_utf8_valid(key, key_len)) {
+            if (!lucy_StrHelp_utf8_valid(key, key_len)) {
                 SV *key_sv = HeSVKEY_force(entry);
                 key = SvPVutf8(key_sv, key_len);
             }

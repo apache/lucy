@@ -91,9 +91,9 @@ VTable_get_refcount(VTable *self)
 }
 
 void
-VTable_override(VTable *self, kino_method_t method, size_t offset) 
+VTable_override(VTable *self, lucy_method_t method, size_t offset) 
 {
-    union { char *char_ptr; kino_method_t *func_ptr; } pointer;
+    union { char *char_ptr; lucy_method_t *func_ptr; } pointer;
     pointer.char_ptr = ((char*)self) + offset;
     pointer.func_ptr[0] = method;
 }

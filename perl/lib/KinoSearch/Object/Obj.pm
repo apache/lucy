@@ -27,39 +27,39 @@ MODULE = KinoSearch     PACKAGE = KinoSearch::Object::Obj
 
 chy_bool_t
 is_a(self, class_name)
-    kino_Obj *self;
-    const kino_CharBuf *class_name;
+    lucy_Obj *self;
+    const lucy_CharBuf *class_name;
 CODE:
 {
-    kino_VTable *target = kino_VTable_fetch_vtable(class_name);
-    RETVAL = Kino_Obj_Is_A(self, target);
+    lucy_VTable *target = lucy_VTable_fetch_vtable(class_name);
+    RETVAL = Lucy_Obj_Is_A(self, target);
 }
 OUTPUT: RETVAL
 
 void
 STORABLE_freeze(self, ...)
-    kino_Obj *self;
+    lucy_Obj *self;
 PPCODE:
 {
     CHY_UNUSED_VAR(self);
     if (items < 2 || !SvTRUE(ST(1))) {
         SV *retval;
-        kino_ByteBuf *serialized_bb;
-        kino_RAMFileHandle *file_handle = kino_RAMFH_open(NULL, 
+        lucy_ByteBuf *serialized_bb;
+        lucy_RAMFileHandle *file_handle = lucy_RAMFH_open(NULL, 
             LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
-        kino_OutStream *target = kino_OutStream_open((kino_Obj*)file_handle);
+        lucy_OutStream *target = lucy_OutStream_open((lucy_Obj*)file_handle);
 
-        Kino_Obj_Serialize(self, target);
+        Lucy_Obj_Serialize(self, target);
 
-        Kino_OutStream_Close(target);
-        serialized_bb = Kino_RAMFile_Get_Contents(
-            Kino_RAMFH_Get_File(file_handle));
+        Lucy_OutStream_Close(target);
+        serialized_bb = Lucy_RAMFile_Get_Contents(
+            Lucy_RAMFH_Get_File(file_handle));
         retval = XSBind_bb_to_sv(serialized_bb);
         LUCY_DECREF(file_handle);
         LUCY_DECREF(target);
 
         if (SvCUR(retval) == 0) { // Thwart Storable bug 
-            THROW(KINO_ERR, "Calling serialize produced an empty string");
+            THROW(LUCY_ERR, "Calling serialize produced an empty string");
         }
         ST(0) = sv_2mortal(retval);
         XSRETURN(1);
@@ -82,19 +82,19 @@ STORABLE_thaw(blank_obj, cloning, serialized_sv)
 PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
-    kino_ZombieCharBuf *klass 
+    lucy_ZombieCharBuf *klass 
         = CFISH_ZCB_WRAP_STR(class_name, strlen(class_name));
-    kino_VTable *vtable = (kino_VTable*)kino_VTable_singleton(
-        (kino_CharBuf*)klass, NULL);
+    lucy_VTable *vtable = (lucy_VTable*)lucy_VTable_singleton(
+        (lucy_CharBuf*)klass, NULL);
     STRLEN len;
     char *ptr = SvPV(serialized_sv, len);
-    kino_ViewByteBuf *contents = kino_ViewBB_new(ptr, len);
-    kino_RAMFile *ram_file = kino_RAMFile_new((kino_ByteBuf*)contents, true);
-    kino_RAMFileHandle *file_handle 
-        = kino_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
-    kino_InStream *instream = kino_InStream_open((kino_Obj*)file_handle);
-    kino_Obj *self = Kino_VTable_Foster_Obj(vtable, blank_obj);
-    kino_Obj *deserialized = Kino_Obj_Deserialize(self, instream);
+    lucy_ViewByteBuf *contents = lucy_ViewBB_new(ptr, len);
+    lucy_RAMFile *ram_file = lucy_RAMFile_new((lucy_ByteBuf*)contents, true);
+    lucy_RAMFileHandle *file_handle 
+        = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
+    lucy_InStream *instream = lucy_InStream_open((lucy_Obj*)file_handle);
+    lucy_Obj *self = Lucy_VTable_Foster_Obj(vtable, blank_obj);
+    lucy_Obj *deserialized = Lucy_Obj_Deserialize(self, instream);
 
     CHY_UNUSED_VAR(cloning);
     LUCY_DECREF(contents);
@@ -104,13 +104,13 @@ PPCODE:
 
     // Catch bad deserialize() override. 
     if (deserialized != self) {
-        THROW(KINO_ERR, "Error when deserializing obj of class %o", klass);
+        THROW(LUCY_ERR, "Error when deserializing obj of class %o", klass);
     }
 }
 
 void
 DESTROY(self)
-    kino_Obj *self;
+    lucy_Obj *self;
 PPCODE:
     /*
     {
@@ -118,7 +118,7 @@ PPCODE:
         warn("Destroying: 0x%x %s", (unsigned)self, perl_class);
     }
     */
-    Kino_Obj_Destroy(self);
+    Lucy_Obj_Destroy(self);
 END_XS_CODE
 
 my $synopsis = <<'END_SYNOPSIS';

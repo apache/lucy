@@ -43,8 +43,8 @@ sub singleton {
 
     # Temporary hack.
     if ( $name eq 'KinoSearch' ) {
-        $cnick = 'Kino';
-        $args{cnick} = 'Kino';
+        $cnick = 'Lucy';
+        $args{cnick} = 'Lucy';
     }
 
     # Return the default parcel for either a blank name or an undefined name.

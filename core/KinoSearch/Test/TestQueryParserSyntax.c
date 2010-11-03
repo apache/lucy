@@ -35,11 +35,11 @@
 #include "KinoSearch/Search/ORQuery.h"
 #include "KinoSearch/Store/Folder.h"
 
-#define make_term_query   (Query*)kino_TestUtils_make_term_query
-#define make_phrase_query (Query*)kino_TestUtils_make_phrase_query
-#define make_leaf_query   (Query*)kino_TestUtils_make_leaf_query
-#define make_not_query    (Query*)kino_TestUtils_make_not_query
-#define make_poly_query   (Query*)kino_TestUtils_make_poly_query
+#define make_term_query   (Query*)lucy_TestUtils_make_term_query
+#define make_phrase_query (Query*)lucy_TestUtils_make_phrase_query
+#define make_leaf_query   (Query*)lucy_TestUtils_make_leaf_query
+#define make_not_query    (Query*)lucy_TestUtils_make_not_query
+#define make_poly_query   (Query*)lucy_TestUtils_make_poly_query
 
 static TestQueryParser*
 leaf_test_simple_term()
@@ -244,9 +244,9 @@ syntax_test_escaped_quotes_inside()
 /***************************************************************************/
 
 typedef TestQueryParser*
-(*kino_TestQPSyntax_test_t)();
+(*lucy_TestQPSyntax_test_t)();
 
-static kino_TestQPSyntax_test_t leaf_test_funcs[] = {
+static lucy_TestQPSyntax_test_t leaf_test_funcs[] = {
     leaf_test_simple_term,
     leaf_test_simple_phrase,
     leaf_test_unclosed_quote,
@@ -264,7 +264,7 @@ static kino_TestQPSyntax_test_t leaf_test_funcs[] = {
     NULL
 };
 
-static kino_TestQPSyntax_test_t syntax_test_funcs[] = {
+static lucy_TestQPSyntax_test_t syntax_test_funcs[] = {
     syntax_test_minus_plus,
     syntax_test_plus_minus,
     syntax_test_minus_minus,
@@ -289,7 +289,7 @@ TestQPSyntax_run_tests(Folder *index)
     TestBatch_Plan(batch);
 
     for (i = 0; leaf_test_funcs[i] != NULL; i++) {
-        kino_TestQPSyntax_test_t test_func = leaf_test_funcs[i];
+        lucy_TestQPSyntax_test_t test_func = leaf_test_funcs[i];
         TestQueryParser *test_case = test_func();
         Query *tree     = QParser_Tree(qparser, test_case->query_string);
         Query *expanded = QParser_Expand_Leaf(qparser, test_case->tree);
@@ -310,7 +310,7 @@ TestQPSyntax_run_tests(Folder *index)
     }
 
     for (i = 0; syntax_test_funcs[i] != NULL; i++) {
-        kino_TestQPSyntax_test_t test_func = syntax_test_funcs[i];
+        lucy_TestQPSyntax_test_t test_func = syntax_test_funcs[i];
         TestQueryParser *test_case = test_func();
         Query *tree   = QParser_Tree(qparser, test_case->query_string);
         Query *parsed = QParser_Parse(qparser, test_case->query_string);

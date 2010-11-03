@@ -33,32 +33,32 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPVutf8(sv, size);
-    kino_CharBuf *self = (kino_CharBuf*)XSBind_new_blank_obj(either_sv);
-    kino_CB_init(self, size);
-    Kino_CB_Cat_Trusted_Str(self, ptr, size);
+    lucy_CharBuf *self = (lucy_CharBuf*)XSBind_new_blank_obj(either_sv);
+    lucy_CB_init(self, size);
+    Lucy_CB_Cat_Trusted_Str(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 
 SV*
 _clone(self)
-    kino_CharBuf *self;
+    lucy_CharBuf *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_CB_clone(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_CB_clone(self));
 OUTPUT: RETVAL
 
 SV*
 _deserialize(either_sv, instream)
     SV *either_sv;
-    kino_InStream *instream;
+    lucy_InStream *instream;
 CODE:
     CHY_UNUSED_VAR(either_sv);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(kino_CB_deserialize(NULL, instream));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_CB_deserialize(NULL, instream));
 OUTPUT: RETVAL
 
 SV*
 to_perl(self)
-    kino_CharBuf *self;
+    lucy_CharBuf *self;
 CODE:
     RETVAL = XSBind_cb_to_sv(self);
 OUTPUT: RETVAL
@@ -73,8 +73,8 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPVutf8(sv, size);
-    kino_ViewCharBuf *self 
-        = kino_ViewCB_new_from_trusted_utf8(ptr, size);
+    lucy_ViewCharBuf *self 
+        = lucy_ViewCB_new_from_trusted_utf8(ptr, size);
     CHY_UNUSED_VAR(unused);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }

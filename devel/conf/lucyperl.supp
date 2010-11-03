@@ -17,10 +17,10 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:calloc
-   fun:kino_Memory_wrapped_calloc
-   fun:kino_VTable_make_obj
-   fun:kino_LFReg_new
-   fun:kino_VTable_init_registry
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_VTable_make_obj
+   fun:lucy_LFReg_new
+   fun:lucy_VTable_init_registry
    fun:*
 }
 
@@ -28,10 +28,10 @@
    <insert_a_suppression_name_here>
    Memcheck:Leak
    fun:calloc
-   fun:kino_Memory_wrapped_calloc
-   fun:kino_LFReg_init
-   fun:kino_LFReg_new
-   fun:kino_VTable_init_registry
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_LFReg_init
+   fun:lucy_LFReg_new
+   fun:lucy_VTable_init_registry
    fun:*
 }
 
@@ -39,9 +39,9 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   fun:kino_Memory_wrapped_malloc
-   fun:kino_LFReg_register
-   fun:kino_VTable_add_to_registry
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_LFReg_register
+   fun:lucy_VTable_add_to_registry
    fun:*
 }
 
@@ -49,10 +49,10 @@
    <Class name key for VTable_registry (malloc)>
    Memcheck:Leak
    fun:malloc
-   fun:kino_Memory_wrapped_malloc
-   fun:kino_CB_new_from_trusted_utf8
-   fun:kino_CB_clone
-   fun:kino_VTable_add_to_registry
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_CB_clone
+   fun:lucy_VTable_add_to_registry
    fun:*
 }
 
@@ -60,11 +60,11 @@
    <Class name key for VTable_registry (calloc)>
    Memcheck:Leak
    fun:calloc
-   fun:kino_Memory_wrapped_calloc
-   fun:kino_VTable_make_obj
-   fun:kino_CB_new_from_trusted_utf8
-   fun:kino_CB_clone
-   fun:kino_VTable_add_to_registry
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_VTable_make_obj
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_CB_clone
+   fun:lucy_VTable_add_to_registry
    fun:*
 }
 
@@ -72,9 +72,9 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:calloc
-   fun:kino_Memory_wrapped_calloc
-   fun:kino_VTable_clone
-   fun:kino_VTable_singleton
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_VTable_clone
+   fun:lucy_VTable_singleton
    fun:*
 }
 
@@ -82,10 +82,10 @@
    <Add class name to child VTable (malloc)>
    Memcheck:Leak
    fun:malloc
-   fun:kino_Memory_wrapped_malloc
-   fun:kino_CB_new_from_trusted_utf8
-   fun:kino_CB_clone
-   fun:kino_VTable_singleton
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_CB_clone
+   fun:lucy_VTable_singleton
    fun:*
 }
 
@@ -93,11 +93,11 @@
    <Add class name to child VTable (calloc)>
    Memcheck:Leak
    fun:calloc
-   fun:kino_Memory_wrapped_calloc
-   fun:kino_VTable_make_obj
-   fun:kino_CB_new_from_trusted_utf8
-   fun:kino_CB_clone
-   fun:kino_VTable_singleton
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_VTable_make_obj
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_CB_clone
+   fun:lucy_VTable_singleton
    fun:*
 }
 
