@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-/* XSBind.h -- Functions to help bind KinoSearch to Perl XS api.
+/* XSBind.h -- Functions to help bind Clownfish to Perl XS api.
  */
 
-#ifndef H_KINO_XSBIND
-#define H_KINO_XSBIND 1
+#ifndef H_CFISH_XSBIND
+#define H_CFISH_XSBIND 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,16 +42,16 @@ extern "C" {
 #include "ppport.h"
 
 /** Given either a class name or a perl object, manufacture a new KS
- * object suitable for supplying to a kino_Foo_init() function.
+ * object suitable for supplying to a cfish_Foo_init() function.
  */
-kino_Obj*
-kino_XSBind_new_blank_obj(SV *either_sv);
+cfish_Obj*
+cfish_XSBind_new_blank_obj(SV *either_sv);
 
 /** Test whether an SV is defined.  Handles "get" magic, unlike SvOK on its
  * own.
  */
 static CHY_INLINE chy_bool_t
-kino_XSBind_sv_defined(SV *sv)
+cfish_XSBind_sv_defined(SV *sv)
 {
     if (!sv || !SvANY(sv)) { return false; }
     if (SvGMAGICAL(sv)) { mg_get(sv); }
@@ -65,15 +65,15 @@ kino_XSBind_sv_defined(SV *sv)
  * <code>allocation</code>, assign the SV's string to it, and return that
  * instead.  If all else fails, throw an exception.
  */
-kino_Obj*
-kino_XSBind_sv_to_cfish_obj(SV *sv, kino_VTable *vtable, void *allocation);
+cfish_Obj*
+cfish_XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation);
 
 /** As XSBind_sv_to_cfish_obj above, but returns NULL instead of throwing an
  * exception.
  */
-kino_Obj*
-kino_XSBind_maybe_sv_to_cfish_obj(SV *sv, kino_VTable *vtable,
-                                  void *allocation);
+cfish_Obj*
+cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
+                                   void *allocation);
 
 
 /** Derive an SV from a KinoSearch object.  If the KS object is NULL, the SV
@@ -83,26 +83,26 @@ kino_XSBind_maybe_sv_to_cfish_obj(SV *sv, kino_VTable *vtable,
  * responsibility.
  */
 static CHY_INLINE SV*
-kino_XSBind_cfish_obj_to_sv(kino_Obj *obj)
+cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj)
 {
-    return obj ? (SV*)Kino_Obj_To_Host(obj) : newSV(0);
+    return obj ? (SV*)Cfish_Obj_To_Host(obj) : newSV(0);
 }
 
 /** XSBind_cfish_obj_to_sv, with a cast. 
  */
-#define CFISH_OBJ_TO_SV(_obj) kino_XSBind_cfish_obj_to_sv((kino_Obj*)_obj)
+#define CFISH_OBJ_TO_SV(_obj) cfish_XSBind_cfish_obj_to_sv((cfish_Obj*)_obj)
 
 /** As XSBind_cfish_obj_to_sv above, except decrements the object's refcount
  * after creating the SV. This is useful when the KS expression creates a new
  * refcount, e.g.  a call to a constructor.
  */
 static CHY_INLINE SV*
-kino_XSBind_cfish_obj_to_sv_noinc(kino_Obj *obj)
+cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj)
 {
     SV *retval;
     if (obj) {
-        retval = (SV*)Kino_Obj_To_Host(obj);
-        Kino_Obj_Dec_RefCount(obj);
+        retval = (SV*)Cfish_Obj_To_Host(obj);
+        Cfish_Obj_Dec_RefCount(obj);
     }
     else {
         retval = newSV(0);
@@ -113,42 +113,42 @@ kino_XSBind_cfish_obj_to_sv_noinc(kino_Obj *obj)
 /** XSBind_cfish_obj_to_sv_noinc, with a cast. 
  */
 #define CFISH_OBJ_TO_SV_NOINC(_obj) \
-    kino_XSBind_cfish_obj_to_sv_noinc((kino_Obj*)_obj)
+    cfish_XSBind_cfish_obj_to_sv_noinc((cfish_Obj*)_obj)
 
 /** Deep conversion of Clownfish objects to Perl objects -- CharBufs to UTF-8
  * SVs, ByteBufs to SVs, VArrays to Perl array refs, Hashes to Perl hashrefs,
  * and any other object to a Perl object wrapping the Clownfish Obj.
  */
 SV*
-kino_XSBind_cfish_to_perl(kino_Obj *obj);
+cfish_XSBind_cfish_to_perl(cfish_Obj *obj);
 
 /** Deep conversion of Perl data structures to Clownfish objects -- Perl hash
  * to Hash, Perl array to VArray, Clownfish objects stripped of their
  * wrappers, and everything else stringified and turned to a CharBuf.
  */
-kino_Obj*
-kino_XSBind_perl_to_cfish(SV *sv);
+cfish_Obj*
+cfish_XSBind_perl_to_cfish(SV *sv);
 
 /** Convert a ByteBuf into a new string SV.
  */
 SV*
-kino_XSBind_bb_to_sv(const kino_ByteBuf *bb);
+cfish_XSBind_bb_to_sv(const cfish_ByteBuf *bb);
 
 /** Convert a CharBuf into a new UTF-8 string SV.
  */
 SV*
-kino_XSBind_cb_to_sv(const kino_CharBuf *cb);
+cfish_XSBind_cb_to_sv(const cfish_CharBuf *cb);
 
 /** Turn on overloading for the supplied Perl object and its class.
  */
 void
-kino_XSBind_enable_overload(void *pobj);
+cfish_XSBind_enable_overload(void *pobj);
 
 /** Process hash-style params passed to an XS subroutine.  The varargs must
  * come batched in groups of three: an SV**, the name of the parameter, and
  * length of the paramter name.  A NULL pointer terminates the list:
  *
- *     kino_XSBind_allot_params(stack, start, num_stack_elems, 
+ *     cfish_XSBind_allot_params(stack, start, num_stack_elems, 
  *         "KinoSearch::Search::TermQuery::new_PARAMS", 
  *          &field_sv, "field", 5,
  *          &term_sv, "term", 4,
@@ -166,9 +166,9 @@ kino_XSBind_enable_overload(void *pobj);
  * labels which are not present in this hash will trigger an exception.
  */
 void
-kino_XSBind_allot_params(SV** stack, int32_t start, 
-                         int32_t num_stack_elems, 
-                         char* params_hash_name, ...);
+cfish_XSBind_allot_params(SV** stack, int32_t start, 
+                          int32_t num_stack_elems, 
+                          char* params_hash_name, ...);
 
 /* Define short names for all the functions in this file.  Note that these
  * short names are ALWAYS in effect, since they are only used for Perl and we
@@ -176,18 +176,18 @@ kino_XSBind_allot_params(SV** stack, int32_t start,
  * full symbols nevertheless in case someone else defines e.g. a function
  * named "XSBind_sv_defined".)
  */
-#define XSBind_new_blank_obj           kino_XSBind_new_blank_obj
-#define XSBind_sv_defined              kino_XSBind_sv_defined
-#define XSBind_sv_to_cfish_obj         kino_XSBind_sv_to_cfish_obj
-#define XSBind_maybe_sv_to_cfish_obj   kino_XSBind_maybe_sv_to_cfish_obj
-#define XSBind_cfish_obj_to_sv         kino_XSBind_cfish_obj_to_sv
-#define XSBind_cfish_obj_to_sv_noinc   kino_XSBind_cfish_obj_to_sv_noinc
-#define XSBind_cfish_to_perl           kino_XSBind_cfish_to_perl
-#define XSBind_perl_to_cfish           kino_XSBind_perl_to_cfish
-#define XSBind_bb_to_sv                kino_XSBind_bb_to_sv
-#define XSBind_cb_to_sv                kino_XSBind_cb_to_sv
-#define XSBind_enable_overload         kino_XSBind_enable_overload
-#define XSBind_allot_params            kino_XSBind_allot_params
+#define XSBind_new_blank_obj           cfish_XSBind_new_blank_obj
+#define XSBind_sv_defined              cfish_XSBind_sv_defined
+#define XSBind_sv_to_cfish_obj         cfish_XSBind_sv_to_cfish_obj
+#define XSBind_maybe_sv_to_cfish_obj   cfish_XSBind_maybe_sv_to_cfish_obj
+#define XSBind_cfish_obj_to_sv         cfish_XSBind_cfish_obj_to_sv
+#define XSBind_cfish_obj_to_sv_noinc   cfish_XSBind_cfish_obj_to_sv_noinc
+#define XSBind_cfish_to_perl           cfish_XSBind_cfish_to_perl
+#define XSBind_perl_to_cfish           cfish_XSBind_perl_to_cfish
+#define XSBind_bb_to_sv                cfish_XSBind_bb_to_sv
+#define XSBind_cb_to_sv                cfish_XSBind_cb_to_sv
+#define XSBind_enable_overload         cfish_XSBind_enable_overload
+#define XSBind_allot_params            cfish_XSBind_allot_params
 
 /* Strip the prefix from some common ClownFish symbols where we know there's
  * no conflict with Perl.  It's a little inconsistent to do this rather than
@@ -200,6 +200,6 @@ kino_XSBind_allot_params(SV** stack, int32_t start,
 }
 #endif
 
-#endif // H_KINO_XSBIND 
+#endif // H_CFISH_XSBIND 
 
 
