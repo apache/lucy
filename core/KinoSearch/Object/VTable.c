@@ -31,7 +31,7 @@
 #include "KinoSearch/Util/Atomic.h"
 #include "KinoSearch/Util/Memory.h"
 
-size_t kino_VTable_offset_of_parent = offsetof(kino_VTable, parent);
+size_t VTable_offset_of_parent = offsetof(VTable, parent);
 
 // Remove spaces and underscores, convert to lower case. 
 static void

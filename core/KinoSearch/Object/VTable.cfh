@@ -35,6 +35,7 @@ class KinoSearch::Object::VTable inherits KinoSearch::Object::Obj {
     kino_method_t[1]   methods; /* flexible array */
 
     inert LockFreeRegistry *registry;
+    inert size_t offset_of_parent;
 
     /** Return a singleton.  If a VTable can be found in the registry based on
      * the subclass name, it will be returned.  Otherwise, a new VTable will
