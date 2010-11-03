@@ -19,7 +19,7 @@ parcel KinoSearch cnick Kino;
 /** Matcher for a ProximityQuery. 
  */
 
-class KSx::Search::ProximityScorer inherits KinoSearch::Search::Matcher {
+class LucyX::Search::ProximityScorer inherits KinoSearch::Search::Matcher {
 
     int32_t         doc_id;
     uint32_t        num_elements;

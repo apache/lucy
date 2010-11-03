@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KSx::Index::ZlibDocReader;
+package LucyX::Index::ZlibDocReader;
 use base qw( KinoSearch::Index::DocReader );
 use KinoSearch::Util::StringHelper qw( utf8_valid utf8_flag_on );
 use Compress::Zlib qw( uncompress );

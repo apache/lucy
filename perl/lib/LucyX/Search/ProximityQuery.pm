@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package KSx::Search::ProximityQuery;
+package LucyX::Search::ProximityQuery;
 use KinoSearch;
 
 1;
@@ -33,7 +33,7 @@ END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
     parcel            => "KinoSearch",
-    class_name        => "KSx::Search::ProximityQuery",
+    class_name        => "LucyX::Search::ProximityQuery",
     bind_methods      => [qw( Get_Field Get_Terms )],
     bind_constructors => ["new"],
     make_pod          => {
@@ -44,7 +44,7 @@ Clownfish::Binding::Perl::Class->register(
 );
 Clownfish::Binding::Perl::Class->register(
     parcel            => "KinoSearch",
-    class_name        => "KSx::Search::ProximityCompiler",
+    class_name        => "LucyX::Search::ProximityCompiler",
     bind_constructors => ["do_new"],
 );
 

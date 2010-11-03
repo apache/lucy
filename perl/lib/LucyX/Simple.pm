@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KSx::Simple;
+package LucyX::Simple;
 use Carp;
 use Scalar::Util qw( weaken reftype refaddr );
 

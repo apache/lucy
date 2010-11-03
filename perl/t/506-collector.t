@@ -18,7 +18,7 @@ use warnings;
 
 use Test::More tests => 5;
 use KinoSearch::Test;
-use KSx::Search::MockScorer;
+use LucyX::Search::MockScorer;
 
 my @docs   = ( 1, 5, 10, 1000 );
 my @scores = ( 2, 0, 0,  1 );
@@ -59,7 +59,7 @@ is_deeply( $bit_vec->to_arrayref, [ 11, 15, 20, 1010 ], "Offset collector" );
 
 sub test_collect {
     my $collector = shift;
-    my $matcher   = KSx::Search::MockScorer->new(
+    my $matcher   = LucyX::Search::MockScorer->new(
         doc_ids => \@docs,
         scores  => \@scores,
     );

@@ -15,7 +15,7 @@
 
 use strict;
 
-package KSx::Index::ZlibDocWriter;
+package LucyX::Index::ZlibDocWriter;
 use base qw( KinoSearch::Index::DataWriter );
 use Carp;
 use Scalar::Util qw( blessed );
@@ -95,7 +95,7 @@ sub add_segment {
     my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
     confess("Not a ZlibDocReader")
         unless ( blessed($doc_reader)
-        and $doc_reader->isa("KSx::Index::ZlibDocReader") );
+        and $doc_reader->isa("LucyX::Index::ZlibDocReader") );
 
     for ( my $i = 1; $i <= $doc_max; $i++ ) {
         next unless $doc_map->get($i);

@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KSx::Index::ByteBufDocReader;
+package LucyX::Index::ByteBufDocReader;
 use base qw( KinoSearch::Index::DocReader );
 use KinoSearch::Document::HitDoc;
 use Carp;

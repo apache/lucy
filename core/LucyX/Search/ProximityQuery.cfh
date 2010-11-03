@@ -22,7 +22,7 @@ parcel KinoSearch cnick Kino;
  * against an ordered sequence of terms.  
  */
 
-class KSx::Search::ProximityQuery inherits KinoSearch::Search::Query
+class LucyX::Search::ProximityQuery inherits KinoSearch::Search::Query
     : dumpable {
 
     CharBuf       *field;
@@ -73,7 +73,7 @@ class KSx::Search::ProximityQuery inherits KinoSearch::Search::Query
     Destroy(ProximityQuery *self);
 }
 
-class KSx::Search::ProximityCompiler 
+class LucyX::Search::ProximityCompiler 
     inherits KinoSearch::Search::Compiler {
 
     float    idf;

@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KSx::Search::Filter;
+package LucyX::Search::Filter;
 BEGIN { our @ISA = qw( KinoSearch::Search::Query ) }
 use Carp;
 use Storable qw( nfreeze thaw );
@@ -50,7 +50,7 @@ sub DESTROY {
 
 sub make_compiler {
     my $self = shift;
-    return KSx::Search::FilterCompiler->new( @_, parent => $self );
+    return LucyX::Search::FilterCompiler->new( @_, parent => $self );
 }
 
 sub serialize {
@@ -160,7 +160,7 @@ sub _cached_count {
         keys %{ $cached_bits{$$self} };
 }
 
-package KSx::Search::FilterCompiler;
+package LucyX::Search::FilterCompiler;
 BEGIN { our @ISA = qw( KinoSearch::Search::Compiler ) }
 
 sub new {
@@ -173,13 +173,13 @@ sub make_matcher {
     my ( $self, %args ) = @_;
     my $seg_reader = $args{reader};
     my $bits       = $self->get_parent->_bits($seg_reader);
-    return KSx::Search::FilterScorer->new(
+    return LucyX::Search::FilterScorer->new(
         bits    => $bits,
         doc_max => $seg_reader->doc_max,
     );
 }
 
-package KSx::Search::FilterScorer;
+package LucyX::Search::FilterScorer;
 BEGIN { our @ISA = qw( KinoSearch::Search::Matcher ) }
 
 1;
@@ -190,7 +190,7 @@ __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
     parcel            => "KinoSearch",
-    class_name        => "KSx::Search::FilterScorer",
+    class_name        => "LucyX::Search::FilterScorer",
     bind_constructors => ["new"],
 );
 

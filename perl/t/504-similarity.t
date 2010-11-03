@@ -18,9 +18,9 @@ use warnings;
 
 package MySchema::LongTextField;
 use base qw( KinoSearch::Plan::FullTextType );
-use KSx::Index::LongFieldSim;
+use LucyX::Index::LongFieldSim;
 
-sub make_similarity { KSx::Index::LongFieldSim->new }
+sub make_similarity { LucyX::Index::LongFieldSim->new }
 
 package MySchema;
 use base qw( KinoSearch::Plan::Schema );

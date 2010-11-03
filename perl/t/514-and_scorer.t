@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 1362;
 use KinoSearch::Test;
-use KSx::Search::MockScorer;
+use LucyX::Search::MockScorer;
 use KinoSearch::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
 my $sim = KinoSearch::Index::Similarity->new;
@@ -39,7 +39,7 @@ sub check_scorer {
     my @intervals     = @_;
     my @doc_id_arrays = map { modulo_set( $_, 100 ) } @intervals;
     my @children      = map {
-        KSx::Search::MockScorer->new(
+        LucyX::Search::MockScorer->new(
             doc_ids => $_,
             scores  => [ (0) x scalar @$_ ],
             )

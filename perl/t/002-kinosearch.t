@@ -47,7 +47,7 @@ plan( tests => scalar @modules );
 
 for (@modules) {
     s/^.*?KinoSearch/KinoSearch/;
-    s/^.*?KSx/KSx/;
+    s/^.*?LucyX/LucyX/;
     s/\.pm$//;
     s/\W+/::/g;
     if ( $excluded{$_} ) {

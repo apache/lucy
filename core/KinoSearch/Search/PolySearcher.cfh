@@ -20,7 +20,7 @@ parcel KinoSearch cnick Kino;
  *
  * The primary use for PolySearcher is to aggregate results from several
  * remote L<Searchers|KinoSearch::Search::Searcher> via
- * L<KSx::Remote::SearchClient>, diffusing the cost of searching a large
+ * L<LucyX::Remote::SearchClient>, diffusing the cost of searching a large
  * corpus over multiple machines.  It is also possible to aggregate results
  * from multiple Searchers on a single machine.
  */

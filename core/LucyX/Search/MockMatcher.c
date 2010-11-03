@@ -17,7 +17,7 @@
 #define C_KINO_MOCKMATCHER
 #include "KinoSearch/Util/ToolSet.h"
 
-#include "KSx/Search/MockMatcher.h"
+#include "LucyX/Search/MockMatcher.h"
 
 MockMatcher*
 MockMatcher_new(I32Array *doc_ids, ByteBuf *scores)

@@ -16,7 +16,7 @@
 
 parcel KinoSearch cnick Kino;
 
-class KSx::Search::MockMatcher inherits KinoSearch::Search::Matcher {
+class LucyX::Search::MockMatcher inherits KinoSearch::Search::Matcher {
 
     size_t    size;
     I32Array *doc_ids;

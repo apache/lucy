@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 61;
 use Storable qw( freeze thaw );
 use KinoSearch::Test::TestUtils qw( create_index );
-use KSx::Search::MockScorer;
+use LucyX::Search::MockScorer;
 
 my @got;
 
@@ -76,7 +76,7 @@ for my $num_negated ( 1 .. 26 ) {
         push @mock_ids, splice( @source_ids, $tick, 1 );
     }
     @mock_ids = sort { $a <=> $b } @mock_ids;
-    my $mock_scorer = KSx::Search::MockScorer->new(
+    my $mock_scorer = LucyX::Search::MockScorer->new(
         doc_ids => \@mock_ids,
         scores  => [ (1) x scalar @mock_ids ],
     );

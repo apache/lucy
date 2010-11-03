@@ -47,8 +47,8 @@ sub new {
 package main;
 
 use KinoSearch::Test;
-use KSx::Remote::SearchServer;
-use KSx::Remote::SearchClient;
+use LucyX::Remote::SearchServer;
+use LucyX::Remote::SearchClient;
 
 my $kid;
 $kid = fork;
@@ -70,7 +70,7 @@ else {
     $indexer->commit;
 
     my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
-    my $server = KSx::Remote::SearchServer->new(
+    my $server = LucyX::Remote::SearchServer->new(
         port     => $PORT_NUM,
         searcher => $searcher,
         password => 'foo',
@@ -91,7 +91,7 @@ else {
     plan( 'skip_all', "Can't get a socket: $!" );
 }
 
-my $searchclient = KSx::Remote::SearchClient->new(
+my $searchclient = LucyX::Remote::SearchClient->new(
     schema       => SortSchema->new,
     peer_address => "localhost:$PORT_NUM",
     password     => 'foo',

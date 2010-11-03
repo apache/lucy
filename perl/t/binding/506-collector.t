@@ -46,10 +46,10 @@ package main;
 
 use Test::More tests => 1;
 use KinoSearch::Test;
-use KSx::Search::MockScorer;
+use LucyX::Search::MockScorer;
 
 my $collector = EvensOnlyCollector->new;
-my $matcher = KSx::Search::MockScorer->new( doc_ids => [ 1, 5, 10, 1000 ], );
+my $matcher = LucyX::Search::MockScorer->new( doc_ids => [ 1, 5, 10, 1000 ], );
 $collector->set_matcher($matcher);
 while ( my $doc_id = $matcher->next ) {
     $collector->collect($doc_id);

@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KSx::Remote::SearchServer;
+package LucyX::Remote::SearchServer;
 BEGIN { our @ISA = qw( KinoSearch::Object::Obj ) }
 use Carp;
 use Storable qw( nfreeze thaw );

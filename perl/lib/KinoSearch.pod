@@ -134,7 +134,7 @@ Stoplists.
 
 =head2 Getting Started
 
-L<KSx::Simple> provides a stripped down API which may suffice for many
+L<LucyX::Simple> provides a stripped down API which may suffice for many
 tasks.
 
 L<KinoSearch::Docs::Tutorial> demonstrates how to build a basic CGI search
@@ -255,8 +255,8 @@ L<MatchAllQuery|KinoSearch::Search::MatchAllQuery>, and
 L<NoMatchQuery|KinoSearch::Search::NoMatchQuery>, plus
 L<KinoSearch::Search::QueryParser>.
 
-For distributed searching, see L<KSx::Remote::SearchServer>,
-L<KSx::Remote::SearchClient>, and L<KinoSearch::Search::PolySearcher>.
+For distributed searching, see L<LucyX::Remote::SearchServer>,
+L<LucyX::Remote::SearchClient>, and L<KinoSearch::Search::PolySearcher>.
 
 =head2 Backwards Compatibility Policy
 

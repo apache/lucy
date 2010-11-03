@@ -20,7 +20,7 @@
 
 #include "KinoSearch/Util/ToolSet.h"
 
-#include "KSx/Search/ProximityQuery.h"
+#include "LucyX/Search/ProximityQuery.h"
 #include "KinoSearch/Index/DocVector.h"
 #include "KinoSearch/Index/Posting.h"
 #include "KinoSearch/Index/Posting/ScorePosting.h"
@@ -31,7 +31,7 @@
 #include "KinoSearch/Index/Similarity.h"
 #include "KinoSearch/Index/TermVector.h"
 #include "KinoSearch/Plan/Schema.h"
-#include "KSx/Search/ProximityScorer.h"
+#include "LucyX/Search/ProximityScorer.h"
 #include "KinoSearch/Search/Searcher.h"
 #include "KinoSearch/Search/Span.h"
 #include "KinoSearch/Search/TermQuery.h"

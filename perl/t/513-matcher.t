@@ -24,7 +24,7 @@ package main;
 
 use Test::More tests => 22;
 
-use KSx::Search::MockScorer;
+use LucyX::Search::MockScorer;
 use KinoSearch::Test;
 
 my $matcher = MyMatcher->new;
@@ -101,7 +101,7 @@ sub test_search {
     my $dels = delete $args{dels} || [];
     my $del_enum;
 
-    my $matcher = KSx::Search::MockScorer->new(
+    my $matcher = LucyX::Search::MockScorer->new(
         doc_ids => $docs,
         scores  => [ (0) x scalar @$docs ],
     );

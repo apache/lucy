@@ -16,7 +16,7 @@
 
 parcel KinoSearch cnick Kino;
 
-class KSx::Search::FilterScorer inherits KinoSearch::Search::Matcher {
+class LucyX::Search::FilterScorer inherits KinoSearch::Search::Matcher {
 
     BitVector   *bits;
     int32_t      doc_max;

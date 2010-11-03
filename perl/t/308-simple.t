@@ -18,12 +18,12 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 8;
-use KSx::Simple;
+use LucyX::Simple;
 use KinoSearch::Test::TestUtils qw( init_test_index_loc );
 
 my $test_index_loc = init_test_index_loc();
 
-my $index = KSx::Simple->new(
+my $index = LucyX::Simple->new(
     language => 'en',
     path     => $test_index_loc,
 );
@@ -36,7 +36,7 @@ is( $index->search( query => 'creamed' ), 2, "search returns total hits" );
 
 $index->add_doc( { food => 'creamed broccoli' } );
 undef $index;
-$index = KSx::Simple->new(
+$index = LucyX::Simple->new(
     language => 'en',
     path     => $test_index_loc,
 );
@@ -62,7 +62,7 @@ SKIP: {
     my $pid = fork();
     if ( $pid == 0 ) {    # child
         our               # This *has* to be 'our' for the test to work
-            $index = KSx::Simple->new(
+            $index = LucyX::Simple->new(
             language => 'en',
             path     => $test_index_loc,
             );
@@ -74,7 +74,7 @@ SKIP: {
         waitpid( $pid, 0 );
     }
 
-    my $index = KSx::Simple->new(
+    my $index = LucyX::Simple->new(
         language => 'en',
         path     => $test_index_loc,
     );

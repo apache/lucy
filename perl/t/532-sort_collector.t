@@ -19,7 +19,7 @@ use warnings;
 use Test::More tests => 32;
 use KinoSearch::Test;
 use List::Util qw( shuffle );
-use KSx::Search::MockScorer;
+use LucyX::Search::MockScorer;
 
 my $schema = KinoSearch::Plan::Schema->new;
 my $type = KinoSearch::Plan::StringType->new( sortable => 1 );
@@ -90,7 +90,7 @@ my @doc_ids = map { $_->[0] } @docs_and_scores;
 my @scores  = map { $_->[1] } @docs_and_scores;
 
 for my $size ( 0 .. @doc_ids ) {
-    my $matcher = KSx::Search::MockScorer->new(
+    my $matcher = LucyX::Search::MockScorer->new(
         doc_ids => \@doc_ids,
         scores  => \@scores,
     );

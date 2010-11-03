@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KSx::Index::LongFieldSim;
+package LucyX::Index::LongFieldSim;
 use base qw( KinoSearch::Index::Similarity );
 
 sub length_norm {

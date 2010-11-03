@@ -21,7 +21,7 @@ use Test::More tests => 11;
 use Storable qw( freeze thaw );
 use KinoSearch::Test;
 use KinoSearch::Test::TestUtils qw( create_index );
-use KSx::Search::ProximityQuery;
+use LucyX::Search::ProximityQuery;
 
 # this is better than 'x a b c d a b c d' because its
 # posting weight is higher, presumably because
@@ -39,14 +39,14 @@ my @docs = (
 my $folder = create_index(@docs);
 my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
 
-my $proximity_query = KSx::Search::ProximityQuery->new(
+my $proximity_query = LucyX::Search::ProximityQuery->new(
     field  => 'content',
     terms  => [],
     within => 10,
 );
 is( $proximity_query->to_string, 'content:""~10',
     "empty ProximityQuery to_string" );
-$proximity_query = KSx::Search::ProximityQuery->new(
+$proximity_query = LucyX::Search::ProximityQuery->new(
     field  => 'content',
     terms  => [qw( d a )],
     within => 10,
@@ -65,7 +65,7 @@ ok( $first_hit->get_score > $second_hit->get_score,
         . $second_hit->get_score
 );
 
-$proximity_query = KSx::Search::ProximityQuery->new(
+$proximity_query = LucyX::Search::ProximityQuery->new(
     field  => 'content',
     terms  => [qw( c a )],
     within => 10,
@@ -73,7 +73,7 @@ $proximity_query = KSx::Search::ProximityQuery->new(
 $hits = $searcher->hits( query => $proximity_query );
 is( $hits->total_hits, 3, 'avoid underflow when subtracting offset' );
 
-$proximity_query = KSx::Search::ProximityQuery->new(
+$proximity_query = LucyX::Search::ProximityQuery->new(
     field  => 'content',
     terms  => [qw( b d )],
     within => 10,
@@ -92,14 +92,14 @@ $frozen = freeze($proximity_compiler);
 $thawed = thaw($frozen);
 ok( $proximity_compiler->equals($thawed), "freeze/thaw compiler" );
 
-$proximity_query = KSx::Search::ProximityQuery->new(
+$proximity_query = LucyX::Search::ProximityQuery->new(
     field  => 'content',
     terms  => [qw( x d )],
     within => 4,
 );
 $hits = $searcher->hits( query => $proximity_query );
 is( $hits->total_hits, 2, 'within range is exclusive' );
-$proximity_query = KSx::Search::ProximityQuery->new(
+$proximity_query = LucyX::Search::ProximityQuery->new(
     field  => 'content',
     terms  => [qw( x d )],
     within => 3,

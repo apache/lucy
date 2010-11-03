@@ -19,12 +19,12 @@ use warnings;
 package MyArchitecture;
 use base qw( KinoSearch::Plan::Architecture );
 
-use KSx::Index::ByteBufDocWriter;
-use KSx::Index::ByteBufDocReader;
+use LucyX::Index::ByteBufDocWriter;
+use LucyX::Index::ByteBufDocReader;
 
 sub register_doc_writer {
     my ( $self, $seg_writer ) = @_;
-    my $doc_writer = KSx::Index::ByteBufDocWriter->new(
+    my $doc_writer = LucyX::Index::ByteBufDocWriter->new(
         width      => 1,
         field      => 'value',
         schema     => $seg_writer->get_schema,
@@ -41,7 +41,7 @@ sub register_doc_writer {
 
 sub register_doc_reader {
     my ( $self, $seg_reader ) = @_;
-    my $doc_reader = KSx::Index::ByteBufDocReader->new(
+    my $doc_reader = LucyX::Index::ByteBufDocReader->new(
         width    => 1,
         field    => 'value',
         schema   => $seg_reader->get_schema,

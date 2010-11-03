@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KSx::Index::ByteBufDocWriter;
+package LucyX::Index::ByteBufDocWriter;
 use base qw( KinoSearch::Index::DataWriter );
 use Carp;
 use Scalar::Util qw( blessed );
@@ -80,7 +80,7 @@ sub add_segment {
     my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
     confess("Not a ByteBufDocReader")
         unless ( blessed($doc_reader)
-        and $doc_reader->isa("KSx::Index::ByteBufDocReader") );
+        and $doc_reader->isa("LucyX::Index::ByteBufDocReader") );
 
     for ( my $i = 1; $i <= $doc_max; $i++ ) {
         next unless $doc_map->get($i);

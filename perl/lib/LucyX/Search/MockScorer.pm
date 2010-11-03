@@ -17,8 +17,8 @@ use strict;
 use warnings;
 use KinoSearch;
 
-package KSx::Search::MockScorer;
-BEGIN { our @ISA = qw( KSx::Search::MockMatcher ) }
+package LucyX::Search::MockScorer;
+BEGIN { our @ISA = qw( LucyX::Search::MockMatcher ) }
 
 sub new {
     my ( $either, %args ) = @_;
@@ -47,7 +47,7 @@ __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
     parcel       => "KinoSearch",
-    class_name   => "KSx::Search::MockMatcher",
+    class_name   => "LucyX::Search::MockMatcher",
     bind_constructors => ["_new|init"],
 );
 

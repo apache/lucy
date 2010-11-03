@@ -19,7 +19,7 @@
 #define C_KINO_SCOREPOSTING
 #include "KinoSearch/Util/ToolSet.h"
 
-#include "KSx/Search/ProximityScorer.h"
+#include "LucyX/Search/ProximityScorer.h"
 #include "KinoSearch/Index/Posting/ScorePosting.h"
 #include "KinoSearch/Index/PostingList.h"
 #include "KinoSearch/Index/Similarity.h"

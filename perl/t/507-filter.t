@@ -21,7 +21,7 @@ use Test::More tests => 24;
 use Storable qw( nfreeze thaw );
 use KinoSearch::Test;
 use KinoSearch::Test::TestUtils qw( create_index );
-use KSx::Search::Filter;
+use LucyX::Search::Filter;
 
 my $query_parser = KinoSearch::Search::QueryParser->new(
     schema => KinoSearch::Test::TestSchema->new );
@@ -44,8 +44,8 @@ my ( $filter_1, $filter_2 );
         field => 'content',
         term  => 'a',
     );
-    $filter_1 = KSx::Search::Filter->new( query => $only_a_query );
-    $filter_2 = KSx::Search::Filter->new( query => $only_a_query );
+    $filter_1 = LucyX::Search::Filter->new( query => $only_a_query );
+    $filter_2 = LucyX::Search::Filter->new( query => $only_a_query );
 
     ## Test index 1, filter 1.
     my $hits = $searcher_1->hits( query => filt_query( $filter_1, 'x y z' ) );
