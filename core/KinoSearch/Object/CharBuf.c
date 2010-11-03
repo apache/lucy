@@ -17,7 +17,7 @@
 #define C_LUCY_CHARBUF
 #define C_LUCY_VIEWCHARBUF
 #define C_LUCY_ZOMBIECHARBUF
-#define KINO_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <string.h>

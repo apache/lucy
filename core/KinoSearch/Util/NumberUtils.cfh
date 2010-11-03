@@ -486,7 +486,7 @@ kino_NumUtil_u4set(void *array, uint32_t tick, uint8_t value)
     ints[(tick >> 1)]  = (ints[(tick >> 1)] & ~mask) | new_bits;
 }
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define C32_MAX_BYTES                LUCY_NUMUTIL_C32_MAX_BYTES
   #define C64_MAX_BYTES                LUCY_NUMUTIL_C64_MAX_BYTES
 #endif

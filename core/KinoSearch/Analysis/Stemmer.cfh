@@ -33,7 +33,7 @@ extern lucy_Stemmer_sb_stemmer_new_t    lucy_Stemmer_sb_stemmer_new;
 extern lucy_Stemmer_sb_stemmer_delete_t lucy_Stemmer_sb_stemmer_delete;
 extern lucy_Stemmer_sb_stemmer_stem_t   lucy_Stemmer_sb_stemmer_stem;
 extern lucy_Stemmer_sb_stemmer_length_t lucy_Stemmer_sb_stemmer_length;
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define Stemmer_sb_stemmer_new_t    lucy_Stemmer_sb_stemmer_new_t
   #define Stemmer_sb_stemmer_delete_t lucy_Stemmer_sb_stemmer_delete_t
   #define Stemmer_sb_stemmer_stem_t   lucy_Stemmer_sb_stemmer_stem_t

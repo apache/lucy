@@ -141,7 +141,7 @@ extern int32_t kino_FH_object_count;
 // Default size for the memory buffer used by both InStream and OutStream.
 #define KINO_IO_STREAM_BUF_SIZE 1024
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define FH_object_count             kino_FH_object_count
   #define IO_STREAM_BUF_SIZE          KINO_IO_STREAM_BUF_SIZE
   #define FH_READ_ONLY                KINO_FH_READ_ONLY

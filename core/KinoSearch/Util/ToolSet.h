@@ -28,7 +28,7 @@ extern "C" {
  * header files, so that the header files remain as sparse as possible.
  */
 
-#define KINO_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "charmony.h"

@@ -21,7 +21,7 @@
 #define C_LUCY_INTEGER64
 #define C_LUCY_FLOAT32
 #define C_LUCY_FLOAT64
-#define KINO_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "KinoSearch/Object/Num.h"

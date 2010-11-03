@@ -65,7 +65,7 @@ our %aliases = (
     cfish_Host_callback_obj  => 'kino_Host_callback_obj',
     cfish_Host_callback_str  => 'kino_Host_callback_str',
 
-    CFISH_USE_SHORT_NAMES => 'KINO_USE_SHORT_NAMES',
+    CFISH_USE_SHORT_NAMES => 'LUCY_USE_SHORT_NAMES',
 );
 
 sub c_aliases {

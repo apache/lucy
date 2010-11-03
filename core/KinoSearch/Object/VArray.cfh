@@ -22,7 +22,7 @@ __C__
 typedef chy_bool_t
 (*lucy_VA_gather_test_t)(kino_VArray *self, uint32_t tick, void *data);
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define lucy_VA_gather_test_t lucy_VA_gather_test_t
 #endif
 __END_C__

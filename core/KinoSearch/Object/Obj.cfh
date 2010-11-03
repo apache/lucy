@@ -215,7 +215,7 @@ kino_Obj_decref(kino_Obj *self)
 
 #define LUCY_DECREF(_self) kino_Obj_decref((kino_Obj*)_self)
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define SUPER_DESTROY(_self, _vtable)   KINO_SUPER_DESTROY(_self, _vtable)
   #define INCREF(_self)                   LUCY_INCREF(_self)
   #define DECREF(_self)                   LUCY_DECREF(_self)

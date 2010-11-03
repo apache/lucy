@@ -26,7 +26,7 @@ __C__
 #define kino_FType_FLOAT64 6
 #define kino_FType_PRIMITIVE_ID_MASK 0x7
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define FType_TEXT              kino_FType_TEXT
   #define FType_BLOB              kino_FType_BLOB
   #define FType_INT32             kino_FType_INT32

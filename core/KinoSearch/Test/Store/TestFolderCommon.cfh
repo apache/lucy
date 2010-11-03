@@ -21,7 +21,7 @@ typedef kino_Folder*
 lucy_TestFolderCommon_set_up_t(void);
 typedef void
 lucy_TestFolderCommon_tear_down_t(void);
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define TestFolderCommon_set_up_t    lucy_TestFolderCommon_set_up_t
   #define TestFolderCommon_tear_down_t lucy_TestFolderCommon_tear_down_t
 #endif

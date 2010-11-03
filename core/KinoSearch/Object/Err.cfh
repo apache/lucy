@@ -224,7 +224,7 @@ kino_Err_abstract_class_check(kino_Obj *obj, kino_VTable *vtable)
 #define CFISH_ABSTRACT_CLASS_CHECK(_obj, _vtable) \
     kino_Err_abstract_class_check(((kino_Obj*)_obj), _vtable)
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define THROW                 CFISH_THROW
   #define RETHROW               CFISH_RETHROW
   #define WARN                  CFISH_WARN

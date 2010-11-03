@@ -16,7 +16,7 @@
 
 #define C_LUCY_BYTEBUF
 #define C_LUCY_VIEWBYTEBUF
-#define KINO_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <stdlib.h>

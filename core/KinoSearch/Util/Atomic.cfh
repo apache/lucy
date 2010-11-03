@@ -90,7 +90,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 
 #endif // Big platform if-else chain. 
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define Atomic_cas_ptr lucy_Atomic_cas_ptr
 #endif
 

@@ -39,7 +39,14 @@ sub new {
 
 sub _full_callbacks_var { shift->{client}->full_vtable_var . '_CALLBACKS' }
 sub _full_name_var      { shift->{client}->full_vtable_var . '_CLASS_NAME' }
-sub _short_names_macro  { shift->{client}->get_PREFIX . 'USE_SHORT_NAMES' }
+#sub _short_names_macro  { shift->{client}->get_PREFIX . 'USE_SHORT_NAMES' }
+
+# Temporary hack.
+sub _short_names_macro  { 
+    my $macro = shift->{client}->get_PREFIX . 'USE_SHORT_NAMES';
+    $macro =~ s/KINO/LUCY/;
+    return $macro;
+}
 
 # C code defining the ZombieCharBuf which contains the class name for this
 # class.

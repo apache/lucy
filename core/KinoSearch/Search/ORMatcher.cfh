@@ -26,7 +26,7 @@ typedef struct kino_HeapedMatcherDoc {
     int32_t   doc;
 } kino_HeapedMatcherDoc;
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define HeapedMatcherDoc              kino_HeapedMatcherDoc
 #endif
 

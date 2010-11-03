@@ -75,7 +75,7 @@ __C__
  * terminating NULL.
  */
 #define lucy_StrHelp_MAX_BASE36_BYTES 14
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define StrHelp_MAX_BASE36_BYTES lucy_StrHelp_MAX_BASE36_BYTES
 #endif
 __END_C__

@@ -61,7 +61,7 @@ __C__
 #define LUCY_REALLOCATE   kino_Memory_wrapped_realloc
 #define LUCY_FREEMEM      kino_Memory_wrapped_free
 
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define MALLOCATE                       LUCY_MALLOCATE
   #define CALLOCATE                       LUCY_CALLOCATE
   #define REALLOCATE                      LUCY_REALLOCATE

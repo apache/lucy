@@ -94,7 +94,7 @@ class KinoSearch::Test::TestBatch inherits KinoSearch::Object::Obj {
 }
 
 __C__
-#ifdef KINO_USE_SHORT_NAMES
+#ifdef LUCY_USE_SHORT_NAMES
   #define TEST_TRUE                    kino_TestBatch_test_true
   #define TEST_FALSE                   kino_TestBatch_test_false
   #define TEST_INT_EQ                  kino_TestBatch_test_int_equals

@@ -17,7 +17,7 @@
 #define C_LUCY_STRINGHELPER
 #include <string.h>
 
-#define KINO_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "KinoSearch/Util/StringHelper.h"

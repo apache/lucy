@@ -17,7 +17,7 @@
 #define C_LUCY_ERR
 #define C_LUCY_OBJ
 #define C_LUCY_VTABLE
-#define KINO_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <string.h>
