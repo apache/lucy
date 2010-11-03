@@ -40,11 +40,11 @@ static HashTombStone TOMBSTONE = {
 
 #define HashEntry kino_HashEntry
 
-typedef struct kino_HashEntry {
+typedef struct HashEntry {
     Obj     *key;
     Obj     *value;
     int32_t  hash_sum;
-} kino_HashEntry;
+} HashEntry;
 
 // Reset the iterator.  Hash_Iterate must be called to restart iteration.
 static INLINE void
@@ -259,8 +259,8 @@ Hash_clear(Hash *self)
 }
 
 void
-kino_Hash_do_store(Hash *self, Obj *key, Obj *value, 
-                   int32_t hash_sum, bool_t use_this_key)
+Hash_do_store(Hash *self, Obj *key, Obj *value, 
+              int32_t hash_sum, bool_t use_this_key)
 {
     HashEntry *entries = self->size >= self->threshold
                        ? SI_rebuild_hash(self)
@@ -298,14 +298,14 @@ kino_Hash_do_store(Hash *self, Obj *key, Obj *value,
 void
 Hash_store(Hash *self, Obj *key, Obj *value) 
 {
-    kino_Hash_do_store(self, key, value, Obj_Hash_Sum(key), false);
+    Hash_do_store(self, key, value, Obj_Hash_Sum(key), false);
 }
 
 void
 Hash_store_str(Hash *self, const char *key, size_t key_len, Obj *value)
 {
     ZombieCharBuf *key_buf = ZCB_WRAP_STR((char*)key, key_len);
-    kino_Hash_do_store(self, (Obj*)key_buf, value, 
+    Hash_do_store(self, (Obj*)key_buf, value, 
         ZCB_Hash_Sum(key_buf), false);
 }
 
@@ -490,7 +490,7 @@ SI_rebuild_hash(Hash *self)
         if (!entry->key || entry->key == (Obj*)&TOMBSTONE) {
             continue; 
         }
-        kino_Hash_do_store(self, entry->key, entry->value, 
+        Hash_do_store(self, entry->key, entry->value, 
             entry->hash_sum, true);
     }
 
