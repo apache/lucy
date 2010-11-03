@@ -25,7 +25,7 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     # Index-time.
     package MyDataWriter;
-    use base qw( KinoSearch::Index::DataWriter );
+    use base qw( Lucy::Index::DataWriter );
 
     sub finish {
         my $self     = shift;
@@ -40,7 +40,7 @@ my $synopsis = <<'END_SYNOPSIS';
 
     # Search-time.
     package MyDataReader;
-    use base qw( KinoSearch::Index::DataReader );
+    use base qw( Lucy::Index::DataReader );
 
     sub new {
         my $self     = shift->SUPER::new(@_);

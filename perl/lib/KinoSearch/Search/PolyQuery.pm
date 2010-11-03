@@ -25,13 +25,13 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     sub walk {
         my $query = shift;
-        if ( $query->isa("KinoSearch::Search::PolyQuery") ) {
-            if    ( $query->isa("KinoSearch::Search::ORQuery") )  { ... }
-            elsif ( $query->isa("KinoSearch::Search::ANDQuery") ) { ... }
-            elsif ( $query->isa("KinoSearch::Search::RequiredOptionalQuery") ) {
+        if ( $query->isa("Lucy::Search::PolyQuery") ) {
+            if    ( $query->isa("Lucy::Search::ORQuery") )  { ... }
+            elsif ( $query->isa("Lucy::Search::ANDQuery") ) { ... }
+            elsif ( $query->isa("Lucy::Search::RequiredOptionalQuery") ) {
                 ...
             }
-            elsif ( $query->isa("KinoSearch::Search::NOTQuery") ) { ... }
+            elsif ( $query->isa("Lucy::Search::NOTQuery") ) { ... }
         }
         else { ... }
     }

@@ -24,7 +24,7 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     package MyQueryParser;
-    use base qw( KinoSearch::Search::QueryParser );
+    use base qw( Lucy::Search::QueryParser );
 
     sub expand_leaf {
         my ( $self, $leaf_query ) = @_;
@@ -41,7 +41,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $leaf_query = KinoSearch::Search::LeafQuery->new(
+    my $leaf_query = Lucy::Search::LeafQuery->new(
         text  => '"three blind mice"',    # required
         field => 'content',               # default: undef
     );

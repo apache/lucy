@@ -50,9 +50,9 @@ OUTPUT: RETVAL
 
 =for comment
 
-Keep track of any KS objects that have been assigned to global Perl variables.
-This is useful when accounting how many objects should have been destroyed and
-diagnosing memory leaks.
+Keep track of any Lucy objects that have been assigned to global Perl
+variables.  This is useful when accounting how many objects should have been
+destroyed and diagnosing memory leaks.
 
 =cut
 

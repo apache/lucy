@@ -23,10 +23,10 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $not_bar_query = KinoSearch::Search::NOTQuery->new( 
+    my $not_bar_query = Lucy::Search::NOTQuery->new( 
         negated_query => $bar_query,
     );
-    my $foo_and_not_bar_query = KinoSearch::Search::ANDQuery->new(
+    my $foo_and_not_bar_query = Lucy::Search::ANDQuery->new(
         children => [ $foo_query, $not_bar_query ].
     );
     my $hits = $searcher->hits( query => $foo_and_not_bar_query );
@@ -34,7 +34,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $not_query = KinoSearch::Search::NOTQuery->new( 
+    my $not_query = Lucy::Search::NOTQuery->new( 
         negated_query => $query,
     );
 END_CONSTRUCTOR

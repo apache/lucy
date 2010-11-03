@@ -42,7 +42,7 @@ run_tests(package)
     char *package;
 PPCODE:
 {
-    // KinoSearch::Analysis 
+    // Lucy::Analysis 
     if (strEQ(package, "TestCaseFolder")) {
         kino_TestCaseFolder_run_tests();
     }
@@ -58,7 +58,7 @@ PPCODE:
     else if (strEQ(package, "TestTokenizer")) {
         kino_TestTokenizer_run_tests();
     }
-    // KinoSearch::Object 
+    // Lucy::Object 
     else if (strEQ(package, "TestObj")) {
         kino_TestObj_run_tests();
     }
@@ -71,7 +71,7 @@ PPCODE:
     else if (strEQ(package, "TestLockFreeRegistry")) {
         kino_TestLFReg_run_tests();
     }
-    // KinoSearch::Plan 
+    // Lucy::Plan 
     else if (strEQ(package, "TestBlobType")) {
         kino_TestBlobType_run_tests();
     }
@@ -84,7 +84,7 @@ PPCODE:
     else if (strEQ(package, "TestSchema")) {
         kino_TestSchema_run_tests();
     }
-    // KinoSearch::Index 
+    // Lucy::Index 
     else if (strEQ(package, "TestDocWriter")) {
         kino_TestDocWriter_run_tests();
     }
@@ -106,7 +106,7 @@ PPCODE:
     else if (strEQ(package, "TestSnapshot")) {
         kino_TestSnapshot_run_tests();
     }
-    // KinoSearch::Search 
+    // Lucy::Search 
     else if (strEQ(package, "TestANDQuery")) {
         kino_TestANDQuery_run_tests();
     }
@@ -143,7 +143,7 @@ PPCODE:
     else if (strEQ(package, "TestTermQuery")) {
         kino_TestTermQuery_run_tests();
     }
-    // KinoSearch::Store 
+    // Lucy::Store 
     else if (strEQ(package, "TestCompoundFileReader")) {
         kino_TestCFReader_run_tests();
     }
@@ -183,7 +183,7 @@ PPCODE:
     else if (strEQ(package, "TestRAMFolder")) {
         kino_TestRAMFolder_run_tests();
     }
-    // KinoSearch::Util 
+    // Lucy::Util 
     else if (strEQ(package, "TestAtomic")) {
         kino_TestAtomic_run_tests();
     }

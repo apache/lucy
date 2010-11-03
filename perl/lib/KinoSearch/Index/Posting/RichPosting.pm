@@ -25,10 +25,10 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     # RichPosting is used indirectly, by specifying in FieldType subclass.
     package MySchema::Category;
-    use base qw( KinoSearch::Plan::FullTextType );
+    use base qw( Lucy::Plan::FullTextType );
     sub posting {
         my $self = shift;
-        return KinoSearch::Index::Posting::RichPosting->new(@_);
+        return Lucy::Index::Posting::RichPosting->new(@_);
     }
 END_SYNOPSIS
 

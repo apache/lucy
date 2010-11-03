@@ -24,7 +24,7 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     my $posting_list_reader 
-        = $seg_reader->obtain("KinoSearch::Index::PostingListReader");
+        = $seg_reader->obtain("Lucy::Index::PostingListReader");
     my $posting_list = $posting_list_reader->posting_list( 
         field => 'content',
         term  => 'foo',

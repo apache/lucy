@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $term_query = KinoSearch::Search::TermQuery->new(
+    my $term_query = Lucy::Search::TermQuery->new(
         field => 'content',
         term  => 'foo', 
     );
@@ -31,7 +31,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $term_query = KinoSearch::Search::TermQuery->new(
+    my $term_query = Lucy::Search::TermQuery->new(
         field => 'content',    # required
         term  => 'foo',        # required
     );

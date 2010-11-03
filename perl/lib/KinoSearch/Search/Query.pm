@@ -25,7 +25,7 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     # Query is an abstract base class.
     package MyQuery;
-    use base qw( KinoSearch::Search::Query );
+    use base qw( Lucy::Search::Query );
     
     sub make_compiler {
         my $self = shift;
@@ -33,7 +33,7 @@ my $synopsis = <<'END_SYNOPSIS';
     }
     
     package MyCompiler;
-    use base ( KinoSearch::Search::Compiler );
+    use base ( Lucy::Search::Compiler );
     ...
 END_SYNOPSIS
 

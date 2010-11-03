@@ -23,14 +23,14 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $snapshot = KinoSearch::Index::Snapshot->new;
+    my $snapshot = Lucy::Index::Snapshot->new;
     $snapshot->read_file( folder => $folder );    # load most recent snapshot
     my $files = $snapshot->list;
     print "$_\n" for @$files;
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $snapshot = KinoSearch::Index::Snapshot->new;
+    my $snapshot = Lucy::Index::Snapshot->new;
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

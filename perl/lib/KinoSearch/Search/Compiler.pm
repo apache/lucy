@@ -25,7 +25,7 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     # (Compiler is an abstract base class.)
     package MyCompiler;
-    use base qw( KinoSearch::Search::Compiler );
+    use base qw( Lucy::Search::Compiler );
 
     sub make_matcher {
         my $self = shift;

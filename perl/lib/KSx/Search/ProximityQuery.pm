@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $proximity_query = KSx::Search::ProximityQuery->new( 
+    my $proximity_query = LucyX::Search::ProximityQuery->new( 
         field  => 'content',
         terms  => [qw( the who )],
         within => 10,    # match within 10 positions

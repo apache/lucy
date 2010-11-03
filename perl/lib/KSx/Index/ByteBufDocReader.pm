@@ -94,11 +94,11 @@ __POD__
 
 =head1 NAME
 
-KSx::Index::ByteBufDocReader - Read a Doc as a fixed-width byte array.
+LucyX::Index::ByteBufDocReader - Read a Doc as a fixed-width byte array.
 
 =head1 SYNOPSIS
 
-    # See KSx::Index::ByteBufDocWriter
+    # See LucyX::Index::ByteBufDocWriter
 
 =head1 DESCRIPTION
 

@@ -23,15 +23,15 @@ __END__
 __BINDING__
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $heat_map = KinoSearch::Highlight::HeatMap->new(
+    my $heat_map = Lucy::Highlight::HeatMap->new(
         spans  => \@highlight_spans,
         window => 100,
     );
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
-    class_name   => "KinoSearch::Highlight::HeatMap",
+    parcel       => "Lucy",
+    class_name   => "Lucy::Highlight::HeatMap",
     bind_methods => [
         qw(
             Calc_Proximity_Boost

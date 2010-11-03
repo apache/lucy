@@ -24,7 +24,7 @@ __BINDING__
 
 my $constructor = <<'END_CONSTRUCTOR';
     package MyCollector;
-    use base qw( KinoSearch::Search::Collector );
+    use base qw( Lucy::Search::Collector );
     our %foo;
     sub new {
         my $self = shift->SUPER::new;

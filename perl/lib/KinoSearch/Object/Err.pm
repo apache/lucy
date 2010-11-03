@@ -27,10 +27,10 @@ my $synopsis = <<'END_SYNOPSIS';
     my $bg_merger;
     while (1) {
         $bg_merger = eval {
-            KinoSearch::Index::BackgroundMerger->new( index => $index );
+            Lucy::Index::BackgroundMerger->new( index => $index );
         };
         last if $bg_merger;
-        if ( blessed($@) and $@->isa("KinoSearch::Store::LockErr") ) {
+        if ( blessed($@) and $@->isa("Lucy::Store::LockErr") ) {
             warn "Retrying...\n";
         }
         else {

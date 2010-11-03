@@ -33,7 +33,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $lock = KinoSearch::Store::Lock->new(
+    my $lock = Lucy::Store::Lock->new(
         name     => 'commit',     # required
         folder   => $folder,      # required
         host     => $hostname,    # required

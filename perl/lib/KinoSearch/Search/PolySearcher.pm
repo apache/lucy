@@ -25,13 +25,13 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     my $schema = MySchema->new;
     for my $server_name (@server_names) {
-        push @searchers, KSx::Remote::SearchClient->new(
+        push @searchers, LucyX::Remote::SearchClient->new(
             peer_address => "$server_name:$port",
             password     => $pass,
             schema       => $schema,
         );
     }
-    my $poly_searcher = KinoSearch::Search::PolySearcher->new(
+    my $poly_searcher = Lucy::Search::PolySearcher->new(
         schema    => $schema,
         searchers => \@searchers,
     );
@@ -39,7 +39,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $poly_searcher = KinoSearch::Search::PolySearcher->new(
+    my $poly_searcher = Lucy::Search::PolySearcher->new(
         schema    => $schema,
         searchers => \@searchers,
     );

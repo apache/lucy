@@ -25,10 +25,10 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     # MatchPosting is used indirectly, by specifying in FieldType subclass.
     package MySchema::Category;
-    use base qw( KinoSearch::Plan::FullTextType );
+    use base qw( Lucy::Plan::FullTextType );
     sub posting {
         my $self = shift;
-        return KinoSearch::Index::Posting::MatchPosting->new(@_);
+        return Lucy::Index::Posting::MatchPosting->new(@_);
     }
 END_SYNOPSIS
 

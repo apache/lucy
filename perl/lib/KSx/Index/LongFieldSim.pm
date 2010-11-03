@@ -33,21 +33,21 @@ __POD__
 
 =head1 NAME
 
-KSx::Index::LongFieldSim - Similarity optimized for long fields.
+LucyX::Index::LongFieldSim - Similarity optimized for long fields.
 
 =head1 SYNOPSIS
 
     package MySchema::body;
-    use base qw( KinoSearch::Plan::FullTextType );
-    use KSx::Index::LongFieldSim;
-    sub make_similarity { KSx::Index::LongFieldSim->new }
+    use base qw( Lucy::Plan::FullTextType );
+    use LucyX::Index::LongFieldSim;
+    sub make_similarity { LucyX::Index::LongFieldSim->new }
 
 =head1 DESCRIPTION
 
-KinoSearch's default L<Similarity|KinoSearch::Index::Similarity>
+Apache Lucy's default L<Similarity|Lucy::Index::Similarity>
 implmentation produces a bias towards extremely short fields.
 
-    KinoSearch::Index::Similarity
+    Lucy::Index::Similarity
     
     | more weight
     | *
@@ -62,7 +62,7 @@ implmentation produces a bias towards extremely short fields.
 
 LongFieldSim eliminates this bias.
 
-    KSx::Index::LongFieldSim
+    LucyX::Index::LongFieldSim
     
     | more weight
     | 

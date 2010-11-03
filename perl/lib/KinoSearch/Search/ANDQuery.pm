@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $foo_and_bar_query = KinoSearch::Search::ANDQuery->new(
+    my $foo_and_bar_query = Lucy::Search::ANDQuery->new(
         children => [ $foo_query, $bar_query ],
     );
     my $hits = $searcher->hits( query => $foo_and_bar_query );
@@ -31,7 +31,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $foo_and_bar_query = KinoSearch::Search::ANDQuery->new(
+    my $foo_and_bar_query = Lucy::Search::ANDQuery->new(
         children => [ $foo_query, $bar_query ],
     );
 END_CONSTRUCTOR

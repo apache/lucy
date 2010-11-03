@@ -145,13 +145,13 @@ __POD__
 
 =head1 NAME
 
-KSx::Simple - Basic search engine.
+LucyX::Simple - Basic search engine.
 
 =head1 SYNOPSIS
 
 First, build an index of your documents.
 
-    my $index = KSx::Simple->new(
+    my $index = LucyX::Simple->new(
         path     => '/path/to/index/'
         language => 'en',
     );
@@ -178,19 +178,19 @@ Later, search the index.
 
 =head1 DESCRIPTION
 
-KSx::Simple is a stripped-down interface for the L<KinoSearch> search
+LucyX::Simple is a stripped-down interface for the L<Apache Lucy|Lucy> search
 engine library.  
 
 =head1 METHODS 
 
 =head2 new
 
-    my $index = KSx::Simple->new(
+    my $index = LucyX::Simple->new(
         path     => '/path/to/index/',
         language => 'en',
     );
 
-Create a KSx::Simple object, which can be used for both indexing and
+Create a LucyX::Simple object, which can be used for both indexing and
 searching.  Two hash-style parameters are required.
 
 =over 

@@ -24,20 +24,20 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     package MyArchitecture;
-    use base qw( KinoSearch::Plan::Architecture );
+    use base qw( Lucy::Plan::Architecture );
 
-    use KSx::Index::ZlibDocWriter;
-    use KSx::Index::ZlibDocReader;
+    use LucyX::Index::ZlibDocWriter;
+    use LucyX::Index::ZlibDocReader;
 
     sub register_doc_writer {
         my ( $self, $seg_writer ) = @_; 
-        my $doc_writer = KSx::Index::ZlibDocWriter->new(
+        my $doc_writer = LucyX::Index::ZlibDocWriter->new(
             snapshot   => $seg_writer->get_snapshot,
             segment    => $seg_writer->get_segment,
             polyreader => $seg_writer->get_polyreader,
         );  
         $seg_writer->register(
-            api       => "KinoSearch::Index::DocReader",
+            api       => "Lucy::Index::DocReader",
             component => $doc_writer,
         );  
         $seg_writer->add_writer($doc_writer);
@@ -45,7 +45,7 @@ my $synopsis = <<'END_SYNOPSIS';
 
     sub register_doc_reader {
         my ( $self, $seg_reader ) = @_; 
-        my $doc_reader = KSx::Index::ZlibDocReader->new(
+        my $doc_reader = LucyX::Index::ZlibDocReader->new(
             schema   => $seg_reader->get_schema,
             folder   => $seg_reader->get_folder,
             segments => $seg_reader->get_segments,
@@ -53,13 +53,13 @@ my $synopsis = <<'END_SYNOPSIS';
             snapshot => $seg_reader->get_snapshot,
         );  
         $seg_reader->register(
-            api       => 'KinoSearch::Index::DocReader',
+            api       => 'Lucy::Index::DocReader',
             component => $doc_reader,
         );  
     }
  
     package MySchema;
-    use base qw( KinoSearch::Plan::Schema );
+    use base qw( Lucy::Plan::Schema );
     
     sub architecture { 
         shift;
@@ -68,7 +68,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $arch = KinoSearch::Plan::Architecture->new;
+    my $arch = Lucy::Plan::Architecture->new;
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $highlighter = KinoSearch::Highlight::Highlighter->new(
+    my $highlighter = Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
         query    => $query,
         field    => 'body'
@@ -36,7 +36,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $highlighter = KinoSearch::Highlight::Highlighter->new(
+    my $highlighter = Lucy::Highlight::Highlighter->new(
         searcher       => $searcher,    # required
         query          => $query,       # required
         field          => 'content',    # required

@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $polyreader = KinoSearch::Index::IndexReader->open(
+    my $polyreader = Lucy::Index::IndexReader->open(
         index => '/path/to/index',
     );
     my $seg_readers = $polyreader->seg_readers;
@@ -31,7 +31,7 @@ my $synopsis = <<'END_SYNOPSIS';
         my $seg_name = $seg_reader->get_seg_name;
         my $num_docs = $seg_reader->doc_max;
         print "Segment $seg_name ($num_docs documents):\n";
-        my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
+        my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
         for my $doc_id ( 1 .. $num_docs ) {
             my $doc = $doc_reader->fetch_doc($doc_id);
             print "  $doc_id: $doc->{title}\n";

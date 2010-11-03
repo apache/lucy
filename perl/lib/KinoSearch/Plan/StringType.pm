@@ -23,13 +23,13 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $type   = KinoSearch::Plan::StringType->new;
-    my $schema = KinoSearch::Plan::Schema->new;
+    my $type   = Lucy::Plan::StringType->new;
+    my $schema = Lucy::Plan::Schema->new;
     $schema->spec_field( name => 'category', type => $type );
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $type = KinoSearch::Plan::StringType->new(
+    my $type = Lucy::Plan::StringType->new(
         boost    => 0.1,    # default: 1.0
         indexed  => 1,      # default: true
         stored   => 1,      # default: true

@@ -171,14 +171,14 @@ __END__
 
 =head1 NAME
 
-KSx::Remote::SearchServer - Make a Searcher remotely accessible.
+LucyX::Remote::SearchServer - Make a Searcher remotely accessible.
 
 =head1 SYNOPSIS
 
-    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+    my $searcher = Lucy::Search::IndexSearcher->new( 
         index => '/path/to/index' 
     );
-    my $search_server = KSx::Remote::SearchServer->new(
+    my $search_server = LucyX::Remote::SearchServer->new(
         searcher => $searcher,
         port       => 7890,
         password   => $pass,
@@ -188,11 +188,11 @@ KSx::Remote::SearchServer - Make a Searcher remotely accessible.
 =head1 DESCRIPTION 
 
 The SearchServer class, in conjunction with
-L<SearchClient|KSx::Remote::SearchClient>, makes it possible to run
+L<SearchClient|LucyX::Remote::SearchClient>, makes it possible to run
 a search on one machine and report results on another.  
 
 By aggregating several SearchClients under a
-L<PolySearcher|KinoSearch::Search::PolySearcher>, the cost of searching
+L<PolySearcher|Lucy::Search::PolySearcher>, the cost of searching
 what might have been a prohibitively large monolithic index can be distributed
 across multiple nodes, each with its own, smaller index.
 
@@ -200,7 +200,7 @@ across multiple nodes, each with its own, smaller index.
 
 =head2 new
 
-    my $search_server = KSx::Remote::SearchServer->new(
+    my $search_server = LucyX::Remote::SearchServer->new(
         searcher => $searcher, # required
         port       => 7890,      # required
         password   => $pass,     # required
@@ -212,7 +212,7 @@ Constructor.  Takes hash-style parameters.
 
 =item *
 
-B<searcher> - the L<Searcher|KinoSearch::Search::IndexSearcher> that the SearchServer
+B<searcher> - the L<Searcher|Lucy::Search::IndexSearcher> that the SearchServer
 will wrap.
 
 =item *

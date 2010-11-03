@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $no_match_query = KinoSearch::Search::NoMatchQuery->new;
+    my $no_match_query = Lucy::Search::NoMatchQuery->new;
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

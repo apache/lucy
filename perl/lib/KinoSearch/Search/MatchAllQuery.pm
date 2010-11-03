@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $match_all_query = KinoSearch::Search::MatchAllQuery->new;
+    my $match_all_query = Lucy::Search::MatchAllQuery->new;
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

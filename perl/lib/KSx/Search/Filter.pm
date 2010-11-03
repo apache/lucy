@@ -198,17 +198,17 @@ __POD__
 
 =head1 NAME
 
-KSx::Search::Filter - Build a caching filter based on results of a Query.
+LucyX::Search::Filter - Build a caching filter based on results of a Query.
 
 =head1 SYNOPSIS
 
     my %category_filters;
     for my $category (qw( sweet sour salty bitter )) {
-        my $cat_query = KinoSearch::Search::TermQuery->new(
+        my $cat_query = Lucy::Search::TermQuery->new(
             field => 'category',
             term  => $category,
         );
-        $category_filters{$category} = KSx::Search::Filter->new( 
+        $category_filters{$category} = LucyX::Search::Filter->new( 
             query => $cat_query, 
         );
     }
@@ -216,7 +216,7 @@ KSx::Search::Filter - Build a caching filter based on results of a Query.
     while ( my $cgi = CGI::Fast->new ) {
         my $user_query = $cgi->param('q');
         my $filter     = $category_filters{ $cgi->param('category') };
-        my $and_query  = KinoSearch::Search::ANDQuery->new;
+        my $and_query  = Lucy::Search::ANDQuery->new;
         $and_query->add_child($user_query);
         $and_query->add_child($filter);
         my $hits = $searcher->hits( query => $and_query );
@@ -224,7 +224,7 @@ KSx::Search::Filter - Build a caching filter based on results of a Query.
 
 =head1 DESCRIPTION 
 
-A Filter is a L<KinoSearch::Search::Query> subclass that can be used to filter
+A Filter is a L<Lucy::Search::Query> subclass that can be used to filter
 the results of another Query.  The effect is very similar to simply using the
 wrapped inner query, but there are two important differences:
 
@@ -248,16 +248,16 @@ substitute the wrapped query but use set_boost() to set its C<boost> to 0.
 
 =head2 new
 
-    my $filter = KSx::Search::Filter->new(
+    my $filter = LucyX::Search::Filter->new(
         query => $query;
     );
 
 Constructor.  Takes one hash-style parameter, C<query>, which must be an
-object belonging to a subclass of L<KinoSearch::Search::Query>.
+object belonging to a subclass of L<Lucy::Search::Query>.
 
 =head1 BUGS
 
-Filters do not cache when used in a search cluster with KSx::Remote's
+Filters do not cache when used in a search cluster with LucyX::Remote's
 SearchServer and SearchClient.
 
 =cut

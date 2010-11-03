@@ -121,21 +121,21 @@ __POD__
 
 =head1 NAME
 
-KSx::Index::ByteBufDocWriter - Write a Doc as a fixed-width byte array.
+LucyX::Index::ByteBufDocWriter - Write a Doc as a fixed-width byte array.
 
 =head1 SYNOPSIS
 
-Create an L<Architecture|KinoSearch::Plan::Architecture> subclass which
+Create an L<Architecture|Lucy::Plan::Architecture> subclass which
 overrides register_doc_writer() and register_doc_reader():
 
     package MyArchitecture;
-    use base qw( KinoSearch::Plan::Architecture );
-    use KSx::Index::ByteBufDocReader;
-    use KSx::Index::ByteBufDocWriter;
+    use base qw( Lucy::Plan::Architecture );
+    use LucyX::Index::ByteBufDocReader;
+    use LucyX::Index::ByteBufDocWriter;
 
     sub register_doc_writer {
         my ( $self, $seg_writer ) = @_; 
-        my $doc_writer = KSx::Index::ByteBufDocWriter->new(
+        my $doc_writer = LucyX::Index::ByteBufDocWriter->new(
             width      => 16,
             field      => 'value',
             snapshot   => $seg_writer->get_snapshot,
@@ -143,7 +143,7 @@ overrides register_doc_writer() and register_doc_reader():
             polyreader => $seg_writer->get_polyreader,
         );  
         $seg_writer->register(
-            api       => "KinoSearch::Index::DocReader",
+            api       => "Lucy::Index::DocReader",
             component => $doc_writer,
         );  
         $seg_writer->add_writer($doc_writer);
@@ -151,7 +151,7 @@ overrides register_doc_writer() and register_doc_reader():
 
     sub register_doc_reader {
         my ( $self, $seg_reader ) = @_; 
-        my $doc_reader = KSx::Index::ByteBufDocReader->new(
+        my $doc_reader = LucyX::Index::ByteBufDocReader->new(
             width    => 16,
             field    => 'value',
             schema   => $seg_reader->get_schema,
@@ -161,13 +161,13 @@ overrides register_doc_writer() and register_doc_reader():
             snapshot => $seg_reader->get_snapshot,
         );  
         $seg_reader->register(
-            api       => 'KinoSearch::Index::DocReader',
+            api       => 'Lucy::Index::DocReader',
             component => $doc_reader,
         );  
     }
 
     package MySchema;
-    use base qw( KinoSearch::Plan::Schema );
+    use base qw( Lucy::Plan::Schema );
 
     sub architecture { MyArchitecture->new }
 
@@ -182,7 +182,7 @@ document supplies a valid value for the field in question:
 
 Then, in your search app:
 
-    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+    my $searcher = Lucy::Search::IndexSearcher->new( 
         index => '/path/to/index',
     );
     my $hits = $searcher->hits( query => $query );

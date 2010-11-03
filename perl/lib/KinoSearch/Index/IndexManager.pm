@@ -25,26 +25,26 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
     my $hostname = hostname() or die "Can't get unique hostname";
-    my $manager = KinoSearch::Index::IndexManager->new( 
+    my $manager = Lucy::Index::IndexManager->new( 
         host => $hostname,
     );
 
     # Index time:
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         index => '/path/to/index',
         manager => $manager,
     );
 
     # Search time:
-    my $reader = KinoSearch::Index::IndexReader->open(
+    my $reader = Lucy::Index::IndexReader->open(
         index   => '/path/to/index',
         manager => $manager,
     );
-    my $searcher = KinoSearch::Search::IndexSearcher->new( index => $reader );
+    my $searcher = Lucy::Search::IndexSearcher->new( index => $reader );
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $manager = KinoSearch::Index::IndexManager->new(
+    my $manager = Lucy::Index::IndexManager->new(
         host => $hostname,    # default: ""
     );
 END_CONSTRUCTOR

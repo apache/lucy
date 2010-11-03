@@ -23,10 +23,10 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $sort_spec = KinoSearch::Search::SortSpec->new(
+    my $sort_spec = Lucy::Search::SortSpec->new(
         rules => [
-            KinoSearch::Search::SortRule->new( field => 'date' ),
-            KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+            Lucy::Search::SortRule->new( field => 'date' ),
+            Lucy::Search::SortRule->new( type  => 'doc_id' ),
         ],
     );
     my $hits = $searcher->hits(
@@ -36,7 +36,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $sort_spec = KinoSearch::Search::SortSpec->new( rules => \@rules );
+    my $sort_spec = Lucy::Search::SortSpec->new( rules => \@rules );
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

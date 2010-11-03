@@ -23,16 +23,16 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $folder = KinoSearch::Store::RAMFolder->new;
+    my $folder = Lucy::Store::RAMFolder->new;
     
     # or sometimes...
-    my $folder = KinoSearch::Store::RAMFolder->new(
+    my $folder = Lucy::Store::RAMFolder->new(
         path => $relative_path,
     );
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $folder = KinoSearch::Store::RAMFolder->new(
+    my $folder = Lucy::Store::RAMFolder->new(
         path => $relative_path,   # default: empty string
     );
 END_CONSTRUCTOR

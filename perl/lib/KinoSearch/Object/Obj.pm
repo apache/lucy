@@ -123,7 +123,7 @@ END_XS_CODE
 
 my $synopsis = <<'END_SYNOPSIS';
     package MyObj;
-    use base qw( KinoSearch::Object::Obj );
+    use base qw( Lucy::Object::Obj );
     
     # Inside-out member var.
     my %foo;
@@ -149,13 +149,13 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $description = <<'END_DESCRIPTION';
-All objects in the KinoSearch:: hierarchy descend from
-KinoSearch::Object::Obj.  All classes are implemented as blessed scalar
+All objects in the Lucy:: hierarchy descend from
+Lucy::Object::Obj.  All classes are implemented as blessed scalar
 references, with the scalar storing a pointer to a C struct.
 
 ==head2 Subclassing
 
-The recommended way to subclass KinoSearch::Object::Obj and its descendants is
+The recommended way to subclass Lucy::Object::Obj and its descendants is
 to use the inside-out design pattern.  (See L<Class::InsideOut> for an
 introduction to inside-out techniques.)
 
@@ -176,7 +176,7 @@ Caveats:
 ==item *
 
 Inside-out aficionados will have noted that the "cached scalar id" stratagem
-recommended above isn't compatible with ithreads -- but KinoSearch doesn't
+recommended above isn't compatible with ithreads -- but Lucy doesn't
 support ithreads anyway, so it doesn't matter.
 
 ==item *
@@ -192,7 +192,7 @@ results in a segfault rather than an exception.)
 ==head2 new()
 
 Abstract constructor -- must be invoked via a subclass.  Attempting to
-instantiate objects of class "KinoSearch::Object::Obj" directly causes an
+instantiate objects of class "Lucy::Object::Obj" directly causes an
 error.
 
 Takes no arguments; if any are supplied, an error will be reported.
@@ -201,7 +201,7 @@ Takes no arguments; if any are supplied, an error will be reported.
 
 ==head2 DESTROY
 
-All KinoSearch classes implement a DESTROY method; if you override it in a
+All Lucy classes implement a DESTROY method; if you override it in a
 subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.
 END_DESCRIPTION
 

@@ -23,12 +23,12 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $schema       = KinoSearch::Plan::Schema->new;
-    my $float64_type = KinoSearch::Plan::FloatType->new;
+    my $schema       = Lucy::Plan::Schema->new;
+    my $float64_type = Lucy::Plan::FloatType->new;
     $schema->spec_field( name => 'intensity', type => $float64_type );
 END_SYNOPSIS
 my $constructor = <<'END_CONSTRUCTOR';
-    my $float64_type = KinoSearch::Plan::Float64Type->new(
+    my $float64_type = Lucy::Plan::Float64Type->new(
         indexed  => 0     # default true
         stored   => 0,    # default true
         sortable => 1,    # default false

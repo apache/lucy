@@ -24,16 +24,16 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     # Match all articles by "Foo" published since the year 2000.
-    my $range_query = KinoSearch::Search::RangeQuery->new(
+    my $range_query = Lucy::Search::RangeQuery->new(
         field         => 'publication_date',
         lower_term    => '2000-01-01',
         include_lower => 1,
     );
-    my $author_query = KinoSearch::Search::TermQuery->new(
+    my $author_query = Lucy::Search::TermQuery->new(
         field => 'author_last_name',
         text  => 'Foo',
     );
-    my $and_query = KinoSearch::Search::ANDQuery->new(
+    my $and_query = Lucy::Search::ANDQuery->new(
         children => [ $range_query, $author_query ],
     );
     my $hits = $searcher->hits( query => $and_query );
@@ -41,7 +41,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $range_query = KinoSearch::Search::RangeQuery->new(
+    my $range_query = Lucy::Search::RangeQuery->new(
         field         => 'product_number', # required
         lower_term    => '003',            # see below
         upper_term    => '060',            # see below

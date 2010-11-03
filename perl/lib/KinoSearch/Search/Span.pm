@@ -25,7 +25,7 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     my $combined_length = $upper_span->get_length
         + ( $upper_span->get_offset - $lower_span->get_offset );
-    my $combined_span = KinoSearch::Search::Span->new(
+    my $combined_span = Lucy::Search::Span->new(
         offset => $lower_span->get_offset,
         length => $combined_length,
     );
@@ -33,7 +33,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $span = KinoSearch::Search::Span->new(
+    my $span = Lucy::Search::Span->new(
         offset => 75,     # required
         length => 7,      # required
         weight => 1.0,    # default 0.0

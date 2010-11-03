@@ -24,22 +24,22 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     my $whitespace_tokenizer
-        = KinoSearch::Analysis::Tokenizer->new( pattern => '\S+' );
+        = Lucy::Analysis::Tokenizer->new( pattern => '\S+' );
 
     # or...
     my $word_char_tokenizer
-        = KinoSearch::Analysis::Tokenizer->new( pattern => '\w+' );
+        = Lucy::Analysis::Tokenizer->new( pattern => '\w+' );
 
     # or...
-    my $apostrophising_tokenizer = KinoSearch::Analysis::Tokenizer->new;
+    my $apostrophising_tokenizer = Lucy::Analysis::Tokenizer->new;
 
     # Then... once you have a tokenizer, put it into a PolyAnalyzer:
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $word_char_tokenizer, $stemmer ], );
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $word_char_tokenizer = KinoSearch::Analysis::Tokenizer->new(
+    my $word_char_tokenizer = Lucy::Analysis::Tokenizer->new(
         pattern => '\w+',    # required
     );
 END_CONSTRUCTOR

@@ -40,12 +40,12 @@ my $synopsis = <<'END_SYNOPSIS';
     sub length_norm { return 1.0 }    # disable length normalization
 
     package MyFullTextType;
-    use base qw( KinoSearch::Plan::FullTextType );
+    use base qw( Lucy::Plan::FullTextType );
 
     sub make_similarity { MySimilarity->new }
 END_SYNOPSIS
 
-my $constructor = qq|    my \$sim = KinoSearch::Index::Similarity->new;\n|;
+my $constructor = qq|    my \$sim = Lucy::Index::Similarity->new;\n|;
 
 Clownfish::Binding::Perl::Class->register(
     parcel       => "KinoSearch",

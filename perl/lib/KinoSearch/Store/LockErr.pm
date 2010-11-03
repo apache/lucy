@@ -25,9 +25,9 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     while (1) {
         my $bg_merger = eval {
-            KinoSearch::Index::BackgroundMerger->new( index => $index );
+            Lucy::Index::BackgroundMerger->new( index => $index );
         };
-        if ( blessed($@) and $@->isa("KinoSearch::Store::LockErr") ) {
+        if ( blessed($@) and $@->isa("Lucy::Store::LockErr") ) {
             warn "Retrying...\n";
         }
         elsif (!$bg_merger) {

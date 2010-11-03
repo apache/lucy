@@ -143,7 +143,7 @@ __POD__
 
 =head1 NAME
 
-KSx::Index::ZlibDocWriter - Compressed doc storage.
+LucyX::Index::ZlibDocWriter - Compressed doc storage.
 
 =head1 DESCRIPTION
 

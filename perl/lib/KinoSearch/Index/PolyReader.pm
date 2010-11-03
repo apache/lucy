@@ -23,10 +23,10 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $polyreader = KinoSearch::Index::IndexReader->open( 
+    my $polyreader = Lucy::Index::IndexReader->open( 
         index => '/path/to/index',
     );
-    my $doc_reader = $polyreader->obtain("KinoSearch::Index::DocReader");
+    my $doc_reader = $polyreader->obtain("Lucy::Index::DocReader");
     for my $doc_id ( 1 .. $polyreader->doc_max ) {
         my $doc = $doc_reader->fetch_doc($doc_id);
         print " $doc_id: $doc->{title}\n";

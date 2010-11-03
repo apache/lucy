@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+    my $searcher = Lucy::Search::IndexSearcher->new( 
         index => '/path/to/index' 
     );
     my $hits = $searcher->hits(
@@ -34,7 +34,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+    my $searcher = Lucy::Search::IndexSearcher->new( 
         index => '/path/to/index' 
     );
 END_CONSTRUCTOR

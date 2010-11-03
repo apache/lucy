@@ -23,12 +23,12 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $schema     = KinoSearch::Plan::Schema->new;
-    my $int32_type = KinoSearch::Plan::Int32Type->new;
+    my $schema     = Lucy::Plan::Schema->new;
+    my $int32_type = Lucy::Plan::Int32Type->new;
     $schema->spec_field( name => 'count', type => $int32_type );
 END_SYNOPSIS
 my $constructor = <<'END_CONSTRUCTOR';
-    my $int32_type = KinoSearch::Plan::Int32Type->new(
+    my $int32_type = Lucy::Plan::Int32Type->new(
         indexed  => 0,    # default true
         stored   => 0,    # default true
         sortable => 1,    # default false

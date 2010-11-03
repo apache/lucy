@@ -35,7 +35,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $doc = KinoSearch::Document::Doc->new(
+    my $doc = Lucy::Document::Doc->new(
         fields => { foo => 'foo foo', bar => 'bar bar' },
     );
     $indexer->add_doc($doc);
@@ -47,7 +47,7 @@ Doc objects allow access to field values via hashref overloading:
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $doc = KinoSearch::Document::Doc->new(
+    my $doc = Lucy::Document::Doc->new(
         fields => { foo => 'foo foo', bar => 'bar bar' },
     );
 END_CONSTRUCTOR

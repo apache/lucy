@@ -23,15 +23,15 @@ __END__
 __BINDING__
 
 my $synopsis    = <<'END_SYNOPSIS';
-    my $bit_vec = KinoSearch::Object::BitVector->new( capacity => 8 );
-    my $other   = KinoSearch::Object::BitVector->new( capacity => 8 );
+    my $bit_vec = Lucy::Object::BitVector->new( capacity => 8 );
+    my $other   = Lucy::Object::BitVector->new( capacity => 8 );
     $bit_vec->set($_) for ( 0, 2, 4, 6 );
     $other->set($_)   for ( 1, 3, 5, 7 );
     $bit_vec->or($other);
     print "$_\n" for @{ $bit_vec->to_array };    # prints 0 through 7.
 END_SYNOPSIS
 my $constructor = <<'END_CONSTRUCTOR';
-    my $bit_vec = KinoSearch::Object::BitVector->new( 
+    my $bit_vec = Lucy::Object::BitVector->new( 
         capacity => $doc_max + 1,   # default 0,
     );
 END_CONSTRUCTOR

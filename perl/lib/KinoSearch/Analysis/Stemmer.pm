@@ -52,9 +52,9 @@ PPCODE:
 END_XS
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $stemmer = KinoSearch::Analysis::Stemmer->new( language => 'es' );
+    my $stemmer = Lucy::Analysis::Stemmer->new( language => 'es' );
     
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stemmer ],
     );
 
@@ -63,7 +63,7 @@ same languages.
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $stemmer = KinoSearch::Analysis::Stemmer->new( language => 'es' );
+    my $stemmer = Lucy::Analysis::Stemmer->new( language => 'es' );
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
+    my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
     my $doc        = $doc_reader->fetch_doc($doc_id);
 END_SYNOPSIS
 

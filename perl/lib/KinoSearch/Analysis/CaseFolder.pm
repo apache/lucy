@@ -23,15 +23,15 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $case_folder = KinoSearch::Analysis::CaseFolder->new;
+    my $case_folder = Lucy::Analysis::CaseFolder->new;
 
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stemmer ],
     );
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $case_folder = KinoSearch::Analysis::CaseFolder->new;
+    my $case_folder = Lucy::Analysis::CaseFolder->new;
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

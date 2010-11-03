@@ -55,11 +55,11 @@ __POD__
 
 =head1 NAME
 
-KSx::Search::MockScorer - Matcher with arbitrary docs and scores.
+LucyX::Search::MockScorer - Matcher with arbitrary docs and scores.
 
 =head1 DESCRIPTION 
 
-Used for testing combining L<Matchers|KinoSearch::Search::Matcher> such as
+Used for testing combining L<Matchers|Lucy::Search::Matcher> such as
 ANDScorer, MockScorer allows arbitrary match criteria to be supplied,
 obviating the need for clever index construction to cover corner cases.
 
@@ -73,7 +73,7 @@ MockScorer is a testing and demonstration class; it is unsupported.
 
 =item *
 
-B<doc_ids> - A sorted array of L<doc_ids|KinoSearch::Docs::DocIDs>.
+B<doc_ids> - A sorted array of L<doc_ids|Lucy::Docs::DocIDs>.
 
 =item *
 

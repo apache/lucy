@@ -45,19 +45,19 @@ OUTPUT: RETVAL
 END_XS_CODE
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $sort_spec = KinoSearch::Search::SortSpec->new(
+    my $sort_spec = Lucy::Search::SortSpec->new(
         rules => [
-            KinoSearch::Search::SortRule->new( field => 'date' ),
-            KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+            Lucy::Search::SortRule->new( field => 'date' ),
+            Lucy::Search::SortRule->new( type  => 'doc_id' ),
         ],
     );
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $by_title   = KinoSearch::Search::SortRule->new( field => 'title' );
-    my $by_score   = KinoSearch::Search::SortRule->new( type  => 'score' );
-    my $by_doc_id  = KinoSearch::Search::SortRule->new( type  => 'doc_id' );
-    my $reverse_date = KinoSearch::Search::SortRule->new(
+    my $by_title   = Lucy::Search::SortRule->new( field => 'title' );
+    my $by_score   = Lucy::Search::SortRule->new( type  => 'score' );
+    my $by_doc_id  = Lucy::Search::SortRule->new( type  => 'doc_id' );
+    my $reverse_date = Lucy::Search::SortRule->new(
         field   => 'date',
         reverse => 1,
     );

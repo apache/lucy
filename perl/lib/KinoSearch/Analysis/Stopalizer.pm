@@ -23,10 +23,10 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $stopalizer = KinoSearch::Analysis::Stopalizer->new(
+    my $stopalizer = Lucy::Analysis::Stopalizer->new(
         language => 'fr',
     );
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stopalizer, $stemmer ],
     );
 
@@ -35,12 +35,12 @@ the same set of languages.
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $stopalizer = KinoSearch::Analysis::Stopalizer->new(
+    my $stopalizer = Lucy::Analysis::Stopalizer->new(
         language => 'de',
     );
     
     # or...
-    my $stopalizer = KinoSearch::Analysis::Stopalizer->new(
+    my $stopalizer = Lucy::Analysis::Stopalizer->new(
         stoplist => \%stoplist,
     );
 END_CONSTRUCTOR

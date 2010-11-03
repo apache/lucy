@@ -23,15 +23,15 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    use KinoSearch::Plan::Schema;
-    use KinoSearch::Plan::FullTextType;
-    use KinoSearch::Analysis::PolyAnalyzer;
+    use Lucy::Plan::Schema;
+    use Lucy::Plan::FullTextType;
+    use Lucy::Analysis::PolyAnalyzer;
     
-    my $schema = KinoSearch::Plan::Schema->new;
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new( 
+    my $schema = Lucy::Plan::Schema->new;
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
         language => 'en',
     );
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer => $polyanalyzer,
     );
     $schema->spec_field( name => 'title',   type => $type );
@@ -39,7 +39,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $schema = KinoSearch::Plan::Schema->new;
+    my $schema = Lucy::Plan::Schema->new;
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(

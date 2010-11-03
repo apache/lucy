@@ -23,10 +23,10 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $bit_vec = KinoSearch::Object::BitVector->new(
+    my $bit_vec = Lucy::Object::BitVector->new(
         capacity => $searcher->doc_max + 1,
     );
-    my $bit_collector = KinoSearch::Search::Collector::BitCollector->new(
+    my $bit_collector = Lucy::Search::Collector::BitCollector->new(
         bit_vector => $bit_vec, 
     );
     $searcher->collect(
@@ -36,7 +36,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $bit_collector = KinoSearch::Search::Collector::BitCollector->new(
+    my $bit_collector = Lucy::Search::Collector::BitCollector->new(
         bit_vector => $bit_vec,    # required
     );
 END_CONSTRUCTOR

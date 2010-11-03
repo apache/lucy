@@ -88,7 +88,7 @@ PPCODE:
 END_XS_CODE
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => '/path/to/index',
         create => 1,
@@ -105,7 +105,7 @@ END_SYNOPSIS
 my $constructor = <<'END_NEW';
 ==head2 new( I<[labeled params]> )
 
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         schema   => $schema,             # required at index creation
         index    => '/path/to/index',    # required
         create   => 1,                   # default: 0
@@ -161,8 +161,8 @@ params.
 
 ==item *
 
-B<doc> - Either a KinoSearch::Document::Doc object, or a hashref (which will
-be attached to a KinoSearch::Document::Doc object internally).
+B<doc> - Either a Lucy::Document::Doc object, or a hashref (which will
+be attached to a Lucy::Document::Doc object internally).
 
 ==item *
 

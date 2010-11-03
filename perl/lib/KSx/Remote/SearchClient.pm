@@ -144,11 +144,11 @@ __END__
 
 =head1 NAME
 
-KSx::Remote::SearchClient - Connect to a remote SearchServer.
+LucyX::Remote::SearchClient - Connect to a remote SearchServer.
 
 =head1 SYNOPSIS
 
-    my $client = KSx::Remote::SearchClient->new(
+    my $client = LucyX::Remote::SearchClient->new(
         peer_address => 'searchserver1:7890',
         password     => $pass,
     );
@@ -156,9 +156,9 @@ KSx::Remote::SearchClient - Connect to a remote SearchServer.
 
 =head1 DESCRIPTION
 
-SearchClient is a subclass of L<KinoSearch::Search::Searcher> which can be
+SearchClient is a subclass of L<Lucy::Search::Searcher> which can be
 used to search an index on a remote machine made accessible via
-L<SearchServer|KSx::Remote::SearchServer>.
+L<SearchServer|LucyX::Remote::SearchServer>.
 
 =head1 METHODS
 

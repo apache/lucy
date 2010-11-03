@@ -25,10 +25,10 @@ __BINDING__
 my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
     my $hostname = hostname() or die "Can't get unique hostname";
-    my $folder = KinoSearch::Store::FSFolder->new( 
+    my $folder = Lucy::Store::FSFolder->new( 
         path => '/path/to/index', 
     );
-    my $lock_factory = KinoSearch::Store::LockFactory->new(
+    my $lock_factory = Lucy::Store::LockFactory->new(
         folder => $folder,
         host   => $hostname,
     );
@@ -40,7 +40,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $lock_factory = KinoSearch::Store::LockFactory->new(
+    my $lock_factory = Lucy::Store::LockFactory->new(
         folder => $folder,      # required
         host   => $hostname,    # required
     );

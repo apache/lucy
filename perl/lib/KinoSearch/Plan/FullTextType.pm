@@ -23,19 +23,19 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         language => 'en',
     );
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer => $polyanalyzer,
     );
-    my $schema = KinoSearch::Plan::Schema->new;
+    my $schema = Lucy::Plan::Schema->new;
     $schema->spec_field( name => 'title',   type => $type );
     $schema->spec_field( name => 'content', type => $type );
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer      => $analyzer,    # required
         boost         => 2.0,          # default: 1.0
         indexed       => 1,            # default: true

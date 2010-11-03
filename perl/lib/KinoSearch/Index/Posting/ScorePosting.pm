@@ -47,11 +47,11 @@ END_XS_CODE
 my $synopsis = <<'END_SYNOPSIS';
     # ScorePosting is used indirectly, by specifying in FieldType subclass.
     package MySchema::Category;
-    use base qw( KinoSearch::Plan::FullTextType );
+    use base qw( Lucy::Plan::FullTextType );
     # (It's the default, so you don't need to spec it.)
     # sub posting {
     #     my $self = shift;
-    #     return KinoSearch::Index::Posting::ScorePosting->new(@_);
+    #     return Lucy::Index::Posting::ScorePosting->new(@_);
     # }
 END_SYNOPSIS
 

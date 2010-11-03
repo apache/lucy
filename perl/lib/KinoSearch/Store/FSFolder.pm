@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $folder = KinoSearch::Store::FSFolder->new(
+    my $folder = Lucy::Store::FSFolder->new(
         path   => '/path/to/folder',
     );
 END_SYNOPSIS

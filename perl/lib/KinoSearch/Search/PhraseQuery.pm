@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $phrase_query = KinoSearch::Search::PhraseQuery->new( 
+    my $phrase_query = Lucy::Search::PhraseQuery->new( 
         field => 'content',
         terms => [qw( the who )],
     );

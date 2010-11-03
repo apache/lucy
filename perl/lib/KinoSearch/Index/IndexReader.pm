@@ -43,7 +43,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $reader = KinoSearch::Index::IndexReader->open(
+    my $reader = Lucy::Index::IndexReader->open(
         index => '/path/to/index',
     );
     my $seg_readers = $reader->seg_readers;
@@ -51,7 +51,7 @@ my $synopsis = <<'END_SYNOPSIS';
         my $seg_name = $seg_reader->get_segment->get_name;
         my $num_docs = $seg_reader->doc_max;
         print "Segment $seg_name ($num_docs documents):\n";
-        my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
+        my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
         for my $doc_id ( 1 .. $num_docs ) {
             my $doc = $doc_reader->fetch_doc($doc_id);
             print "  $doc_id: $doc->{title}\n";
@@ -60,7 +60,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $reader = KinoSearch::Index::IndexReader->open(
+    my $reader = Lucy::Index::IndexReader->open(
         index    => '/path/to/index', # required
         snapshot => $snapshot,
         manager  => $index_manager,

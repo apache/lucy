@@ -23,11 +23,11 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $schema = KinoSearch::Plan::Schema->new;
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new( 
+    my $schema = Lucy::Plan::Schema->new;
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
         language => 'en',
     );
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer => $polyanalyzer,
     );
     $schema->spec_field( name => 'title',   type => $type );
@@ -35,16 +35,16 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $analyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
         language  => 'es',
     );
     
     # or...
 
-    my $case_folder  = KinoSearch::Analysis::CaseFolder->new;
-    my $tokenizer    = KinoSearch::Analysis::Tokenizer->new;
-    my $stemmer      = KinoSearch::Analysis::Stemmer->new( language => 'en' );
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+    my $case_folder  = Lucy::Analysis::CaseFolder->new;
+    my $tokenizer    = Lucy::Analysis::Tokenizer->new;
+    my $stemmer      = Lucy::Analysis::Stemmer->new( language => 'en' );
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $whitespace_tokenizer, $stemmer, ], );
 END_CONSTRUCTOR
 

@@ -23,14 +23,14 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $bg_merger = KinoSearch::Index::BackgroundMerger->new(
+    my $bg_merger = Lucy::Index::BackgroundMerger->new(
         index  => '/path/to/index',
     );
     $bg_merger->commit;
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $bg_merger = KinoSearch::Index::BackgroundMerger->new(
+    my $bg_merger = Lucy::Index::BackgroundMerger->new(
         index   => '/path/to/index',    # required
         manager => $manager             # default: created internally
     );

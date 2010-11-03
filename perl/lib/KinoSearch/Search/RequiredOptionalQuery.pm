@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $foo_and_maybe_bar = KinoSearch::Search::RequiredOptionalQuery->new(
+    my $foo_and_maybe_bar = Lucy::Search::RequiredOptionalQuery->new(
         required_query => $foo_query,
         optional_query => $bar_query,
     );
@@ -32,7 +32,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $reqopt_query = KinoSearch::Search::RequiredOptionalQuery->new(
+    my $reqopt_query = Lucy::Search::RequiredOptionalQuery->new(
         required_query => $foo_query,    # required
         optional_query => $bar_query,    # required
     );

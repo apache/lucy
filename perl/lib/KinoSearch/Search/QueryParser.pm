@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
-    my $query_parser = KinoSearch::Search::QueryParser->new(
+    my $query_parser = Lucy::Search::QueryParser->new(
         schema => $searcher->get_schema,
         fields => ['body'],
     );
@@ -32,7 +32,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $query_parser = KinoSearch::Search::QueryParser->new(
+    my $query_parser = Lucy::Search::QueryParser->new(
         schema         => $searcher->get_schema,    # required
         analyzer       => $analyzer,                # overrides schema
         fields         => ['bodytext'],             # default: indexed fields

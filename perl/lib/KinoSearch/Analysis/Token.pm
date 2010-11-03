@@ -102,15 +102,3 @@ Clownfish::Binding::Perl::Class->register(
     xs_code => $xs,
 );
 
-__POD__
-
-=head1 NAME
-
-KinoSearch::Analysis::Token - Redacted.
-
-=head1 REDACTED
-
-Token's public API has been redacted.
-
-=cut
-
