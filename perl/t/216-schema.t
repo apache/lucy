@@ -22,7 +22,6 @@ use KinoSearch::Test;
 package main;
 use Test::More tests => 3;
 
-require KinoSearch::Schema;
 my $old_schema = KinoSearch::Schema->new;
 my $new_schema = KinoSearch::Plan::Schema->new;
 
