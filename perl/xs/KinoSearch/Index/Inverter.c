@@ -99,28 +99,28 @@ kino_Inverter_invert_doc(kino_Inverter *self, kino_Doc *doc)
 
         // Get the field value, forcing text fields to UTF-8. 
         switch (
-            Kino_FType_Primitive_ID(type) & kino_FType_PRIMITIVE_ID_MASK
+            Kino_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK
         ) {
-            case kino_FType_TEXT: {
+            case lucy_FType_TEXT: {
                 STRLEN val_len;
                 char *val_ptr = SvPVutf8(value_sv, val_len);
                 kino_ViewCharBuf *value = (kino_ViewCharBuf*)inv_entry->value;
                 Kino_ViewCB_Assign_Str(value, val_ptr, val_len);
                 break;
             }
-            case kino_FType_BLOB: {
+            case lucy_FType_BLOB: {
                 STRLEN val_len;
                 char *val_ptr = SvPV(value_sv, val_len);
                 kino_ViewByteBuf *value = (kino_ViewByteBuf*)inv_entry->value;
                 Kino_ViewBB_Assign_Bytes(value, val_ptr, val_len);
                 break;
             }
-            case kino_FType_INT32: {
+            case lucy_FType_INT32: {
                 kino_Integer32* value = (kino_Integer32*)inv_entry->value;
                 Kino_Int32_Set_Value(value, SvIV(value_sv));
                 break;
             }
-            case kino_FType_INT64: {
+            case lucy_FType_INT64: {
                 kino_Integer64* value = (kino_Integer64*)inv_entry->value;
                 int64_t val = sizeof(IV) == 8 
                               ? SvIV(value_sv) 
@@ -128,12 +128,12 @@ kino_Inverter_invert_doc(kino_Inverter *self, kino_Doc *doc)
                 Kino_Int64_Set_Value(value, val);
                 break;
             }
-            case kino_FType_FLOAT32: {
+            case lucy_FType_FLOAT32: {
                 kino_Float32* value = (kino_Float32*)inv_entry->value;
                 Kino_Float32_Set_Value(value, (float)SvNV(value_sv));
                 break;
             }
-            case kino_FType_FLOAT64: {
+            case lucy_FType_FLOAT64: {
                 kino_Float64* value = (kino_Float64*)inv_entry->value;
                 Kino_Float64_Set_Value(value, SvNV(value_sv));
                 break;

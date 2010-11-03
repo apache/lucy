@@ -18,22 +18,22 @@ parcel KinoSearch;
 
 __C__
 
-#define kino_FType_TEXT    1
-#define kino_FType_BLOB    2
-#define kino_FType_INT32   3
-#define kino_FType_INT64   4
-#define kino_FType_FLOAT32 5
-#define kino_FType_FLOAT64 6
-#define kino_FType_PRIMITIVE_ID_MASK 0x7
+#define lucy_FType_TEXT    1
+#define lucy_FType_BLOB    2
+#define lucy_FType_INT32   3
+#define lucy_FType_INT64   4
+#define lucy_FType_FLOAT32 5
+#define lucy_FType_FLOAT64 6
+#define lucy_FType_PRIMITIVE_ID_MASK 0x7
 
 #ifdef LUCY_USE_SHORT_NAMES
-  #define FType_TEXT              kino_FType_TEXT
-  #define FType_BLOB              kino_FType_BLOB
-  #define FType_INT32             kino_FType_INT32
-  #define FType_INT64             kino_FType_INT64
-  #define FType_FLOAT32           kino_FType_FLOAT32
-  #define FType_FLOAT64           kino_FType_FLOAT64
-  #define FType_PRIMITIVE_ID_MASK kino_FType_PRIMITIVE_ID_MASK
+  #define FType_TEXT              lucy_FType_TEXT
+  #define FType_BLOB              lucy_FType_BLOB
+  #define FType_INT32             lucy_FType_INT32
+  #define FType_INT64             lucy_FType_INT64
+  #define FType_FLOAT32           lucy_FType_FLOAT32
+  #define FType_FLOAT64           lucy_FType_FLOAT64
+  #define FType_PRIMITIVE_ID_MASK lucy_FType_PRIMITIVE_ID_MASK
 #endif
 
 __END_C__

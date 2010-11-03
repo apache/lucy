@@ -69,8 +69,8 @@ kino_DefDocReader_fetch_doc(kino_DefaultDocReader *self, int32_t doc_id)
         type = Kino_Schema_Fetch_Type(schema, (kino_CharBuf*)field_name_zcb);
 
         // Read the field value. 
-        switch(Kino_FType_Primitive_ID(type) & kino_FType_PRIMITIVE_ID_MASK) {
-            case kino_FType_TEXT: {
+        switch(Kino_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
+            case lucy_FType_TEXT: {
                 STRLEN  value_len = Kino_InStream_Read_C32(dat_in);
                 value_sv  = newSV((value_len ? value_len : 1));
                 Kino_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
@@ -80,7 +80,7 @@ kino_DefDocReader_fetch_doc(kino_DefaultDocReader *self, int32_t doc_id)
                 SvUTF8_on(value_sv);
                 break;
             }
-            case kino_FType_BLOB: {
+            case lucy_FType_BLOB: {
                 STRLEN  value_len = Kino_InStream_Read_C32(dat_in);
                 value_sv  = newSV((value_len ? value_len : 1));
                 Kino_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
@@ -89,16 +89,16 @@ kino_DefDocReader_fetch_doc(kino_DefaultDocReader *self, int32_t doc_id)
                 SvPOK_on(value_sv);
                 break;
             }
-            case kino_FType_FLOAT32:
+            case lucy_FType_FLOAT32:
                 value_sv = newSVnv(Kino_InStream_Read_F32(dat_in));
                 break;
-            case kino_FType_FLOAT64:
+            case lucy_FType_FLOAT64:
                 value_sv = newSVnv(Kino_InStream_Read_F64(dat_in));
                 break;
-            case kino_FType_INT32:
+            case lucy_FType_INT32:
                 value_sv = newSViv((int32_t)Kino_InStream_Read_C32(dat_in));
                 break;
-            case kino_FType_INT64:
+            case lucy_FType_INT64:
                 if (sizeof(IV) == 8) {
                     int64_t val = (int64_t)Kino_InStream_Read_C64(dat_in);
                     value_sv = newSViv((IV)val);
