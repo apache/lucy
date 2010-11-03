@@ -51,7 +51,7 @@ S_fetch_entry(kino_Inverter *self, HE *hash_entry)
         }
     }
 
-    kino_ZombieCharBuf *field = KINO_ZCB_WRAP_STR(key, key_len);
+    kino_ZombieCharBuf *field = CFISH_ZCB_WRAP_STR(key, key_len);
     int32_t field_num 
         = Kino_Seg_Field_Num(self->segment, (kino_CharBuf*)field);
     if (!field_num) {

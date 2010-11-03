@@ -379,25 +379,25 @@ class KinoSearch::Object::ZombieCharBuf cnick ZCB
 
 __C__
 
-#define KINO_ZCB_BLANK() kino_ZCB_new(alloca(kino_ZCB_size()))
+#define CFISH_ZCB_BLANK() kino_ZCB_new(alloca(kino_ZCB_size()))
 
-#define KINO_ZCB_LITERAL(string) \
+#define CFISH_ZCB_LITERAL(string) \
     { KINO_ZOMBIECHARBUF, {1}, string "", sizeof(string) -1, sizeof(string) }
 
-#define KINO_ZCB_WRAP(source) \
+#define CFISH_ZCB_WRAP(source) \
     kino_ZCB_wrap(alloca(kino_ZCB_size()), source)
     
-#define KINO_ZCB_WRAP_STR(ptr, size) \
+#define CFISH_ZCB_WRAP_STR(ptr, size) \
     kino_ZCB_wrap_str(alloca(kino_ZCB_size()), ptr, size)
 
-extern kino_ZombieCharBuf KINO_ZCB_EMPTY;
+extern kino_ZombieCharBuf CFISH_ZCB_EMPTY;
 
 #ifdef LUCY_USE_SHORT_NAMES
-  #define ZCB_BLANK             KINO_ZCB_BLANK
-  #define ZCB_LITERAL(_string)  KINO_ZCB_LITERAL(_string)
-  #define EMPTY                 KINO_ZCB_EMPTY
-  #define ZCB_WRAP              KINO_ZCB_WRAP
-  #define ZCB_WRAP_STR          KINO_ZCB_WRAP_STR
+  #define ZCB_BLANK             CFISH_ZCB_BLANK
+  #define ZCB_LITERAL(_string)  CFISH_ZCB_LITERAL(_string)
+  #define EMPTY                 CFISH_ZCB_EMPTY
+  #define ZCB_WRAP              CFISH_ZCB_WRAP
+  #define ZCB_WRAP_STR          CFISH_ZCB_WRAP_STR
 #endif
 __END_C__
 

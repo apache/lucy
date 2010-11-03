@@ -56,7 +56,7 @@ XSBind_new_blank_obj(SV *either_sv)
         // Use the supplied class name string to find a VTable. 
         STRLEN len;
         char *ptr = SvPVutf8(either_sv, len);
-        kino_ZombieCharBuf *klass = KINO_ZCB_WRAP_STR(ptr, len);
+        kino_ZombieCharBuf *klass = CFISH_ZCB_WRAP_STR(ptr, len);
         vtable = kino_VTable_singleton((kino_CharBuf*)klass, NULL);
     }
 

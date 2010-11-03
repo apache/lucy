@@ -83,7 +83,7 @@ PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
     kino_ZombieCharBuf *klass 
-        = KINO_ZCB_WRAP_STR(class_name, strlen(class_name));
+        = CFISH_ZCB_WRAP_STR(class_name, strlen(class_name));
     kino_VTable *vtable = (kino_VTable*)kino_VTable_singleton(
         (kino_CharBuf*)klass, NULL);
     STRLEN len;

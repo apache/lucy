@@ -41,7 +41,6 @@ our %aliases = (
     cfish_ZombieCharBuf => 'kino_ZombieCharBuf',
     CFISH_ZOMBIECHARBUF => 'KINO_ZOMBIECHARBUF',
     cfish_ZCB_size      => 'kino_ZCB_size',
-    CFISH_ZCB_WRAP_STR  => 'KINO_ZCB_WRAP_STR',
 
     CFISH_ERR => 'KINO_ERR',
 

@@ -64,7 +64,7 @@ kino_DefDocReader_fetch_doc(kino_DefaultDocReader *self, int32_t doc_id)
 
         // Find the Field's FieldType. 
         kino_ZombieCharBuf *field_name_zcb 
-            = KINO_ZCB_WRAP_STR(field_name_ptr, field_name_len);
+            = CFISH_ZCB_WRAP_STR(field_name_ptr, field_name_len);
         Kino_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
         type = Kino_Schema_Fetch_Type(schema, (kino_CharBuf*)field_name_zcb);
 
