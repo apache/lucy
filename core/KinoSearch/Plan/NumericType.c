@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_NUMERICTYPE
+#define C_LUCY_NUMERICTYPE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Plan/NumericType.h"

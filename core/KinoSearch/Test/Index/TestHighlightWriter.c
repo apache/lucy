@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTHIGHLIGHTWRITER
+#define C_LUCY_TESTHIGHLIGHTWRITER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

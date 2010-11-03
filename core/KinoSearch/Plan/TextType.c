@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_TEXTTYPE
-#define C_KINO_TEXTTERMSTEPPER
+#define C_LUCY_TEXTTYPE
+#define C_LUCY_TEXTTERMSTEPPER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Plan/TextType.h"

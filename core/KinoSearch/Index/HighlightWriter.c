@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_HIGHLIGHTWRITER
-#define C_KINO_DEFAULTHIGHLIGHTWRITER
-#define C_KINO_TOKEN
+#define C_LUCY_HIGHLIGHTWRITER
+#define C_LUCY_DEFAULTHIGHLIGHTWRITER
+#define C_LUCY_TOKEN
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <stdio.h>

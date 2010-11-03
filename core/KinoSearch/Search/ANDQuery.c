@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_ANDQUERY
-#define C_KINO_ANDCOMPILER
+#define C_LUCY_ANDQUERY
+#define C_LUCY_ANDCOMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/ANDQuery.h"

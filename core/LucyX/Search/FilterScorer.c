@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_FILTERSCORER
+#define C_LUCY_FILTERSCORER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "LucyX/Search/FilterScorer.h"

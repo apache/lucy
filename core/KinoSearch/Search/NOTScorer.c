@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_NOTSCORER
+#define C_LUCY_NOTSCORER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/NOTScorer.h"

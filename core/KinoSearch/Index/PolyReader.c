@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_POLYREADER
+#define C_LUCY_POLYREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/PolyReader.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTNUMBERUTILS
+#define C_LUCY_TESTNUMBERUTILS
 #include "KinoSearch/Util/ToolSet.h"
 #include <stdlib.h>
 #include <time.h>

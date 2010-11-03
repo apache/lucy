@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_DATAREADER
+#define C_LUCY_DATAREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/DataReader.h"

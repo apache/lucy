@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_ZOMBIEKEYEDHASH
+#define C_LUCY_ZOMBIEKEYEDHASH
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/ZombieKeyedHash.h"

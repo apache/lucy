@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_I32ARRAY
+#define C_LUCY_I32ARRAY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Object/I32Array.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_POLYLEXICON
+#define C_LUCY_POLYLEXICON
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/PolyLexicon.h"

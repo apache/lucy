@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_STRINGTYPE
+#define C_LUCY_STRINGTYPE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Plan/StringType.h"

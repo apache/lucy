@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_LOCKFACTORY
+#define C_LUCY_LOCKFACTORY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <errno.h>

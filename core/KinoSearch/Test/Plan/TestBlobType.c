@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTBLOBTYPE
+#define C_LUCY_TESTBLOBTYPE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

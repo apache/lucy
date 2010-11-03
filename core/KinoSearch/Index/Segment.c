@@ -16,7 +16,7 @@
 
 #include <ctype.h>
 
-#define C_KINO_SEGMENT
+#define C_LUCY_SEGMENT
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/Segment.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_INDEXREADER
+#define C_LUCY_INDEXREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/IndexReader.h"

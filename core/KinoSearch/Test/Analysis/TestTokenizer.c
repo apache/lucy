@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTTOKENIZER
+#define C_LUCY_TESTTOKENIZER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

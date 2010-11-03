@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_BITVECMATCHER
+#define C_LUCY_BITVECMATCHER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/BitVecMatcher.h"

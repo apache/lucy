@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_BYTEBUF
-#define C_KINO_VIEWBYTEBUF
+#define C_LUCY_BYTEBUF
+#define C_LUCY_VIEWBYTEBUF
 #define KINO_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

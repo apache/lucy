@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_CASEFOLDER
-#define C_KINO_BYTEBUF
-#define C_KINO_TOKEN
+#define C_LUCY_CASEFOLDER
+#define C_LUCY_BYTEBUF
+#define C_LUCY_TOKEN
 #include "xs/XSBind.h"
 
 #include "KinoSearch/Analysis/CaseFolder.h"

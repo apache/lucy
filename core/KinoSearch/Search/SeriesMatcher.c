@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SERIESMATCHER
+#define C_LUCY_SERIESMATCHER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/SeriesMatcher.h"

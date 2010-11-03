@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_DOC
+#define C_LUCY_DOC
 #include "xs/XSBind.h"
 #include "KinoSearch/Document/Doc.h"
 #include "KinoSearch/Object/Host.h"

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_DELETIONSREADER
-#define C_KINO_POLYDELETIONSREADER
-#define C_KINO_DEFAULTDELETIONSREADER
+#define C_LUCY_DELETIONSREADER
+#define C_LUCY_POLYDELETIONSREADER
+#define C_LUCY_DEFAULTDELETIONSREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/DeletionsReader.h"

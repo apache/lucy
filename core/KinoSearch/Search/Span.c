@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SPAN
+#define C_LUCY_SPAN
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/Span.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_HITDOC
+#define C_LUCY_HITDOC
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Document/HitDoc.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_POLYMATCHER
+#define C_LUCY_POLYMATCHER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/PolyMatcher.h"

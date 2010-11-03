@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_INVERTER
-#define C_KINO_ZOMBIECHARBUF
-#define C_KINO_INVERTERENTRY
+#define C_LUCY_INVERTER
+#define C_LUCY_ZOMBIECHARBUF
+#define C_LUCY_INVERTERENTRY
 #include "xs/XSBind.h"
 #include "KinoSearch/Index/Inverter.h"
 #include "KinoSearch/Document/Doc.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_STRINGHELPER
+#define C_LUCY_STRINGHELPER
 #include <string.h>
 
 #define KINO_USE_SHORT_NAMES

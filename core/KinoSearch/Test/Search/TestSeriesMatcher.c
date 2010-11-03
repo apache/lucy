@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTSERIESMATCHER
+#define C_LUCY_TESTSERIESMATCHER
 #include "KinoSearch/Util/ToolSet.h"
 #include <math.h>
 

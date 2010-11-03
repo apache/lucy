@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_PROXIMITYQUERY
-#define C_KINO_PROXIMITYCOMPILER
+#define C_LUCY_PROXIMITYQUERY
+#define C_LUCY_PROXIMITYCOMPILER
 #include <stdarg.h>
 
 #include "KinoSearch/Util/ToolSet.h"

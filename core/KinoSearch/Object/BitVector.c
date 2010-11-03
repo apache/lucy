@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_BITVECTOR
+#define C_LUCY_BITVECTOR
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <math.h>

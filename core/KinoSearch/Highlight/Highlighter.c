@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_HIGHLIGHTER
-#define C_KINO_SPAN
+#define C_LUCY_HIGHLIGHTER
+#define C_LUCY_SPAN
 #include <ctype.h>
 #include "KinoSearch/Util/ToolSet.h"
 

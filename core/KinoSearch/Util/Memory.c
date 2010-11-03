@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_MEMORY
+#define C_LUCY_MEMORY
 #include <stdlib.h>
 #include <stdio.h>
 #define KINO_USE_SHORT_NAMES

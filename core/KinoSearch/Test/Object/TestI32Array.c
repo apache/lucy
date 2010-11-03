@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTI32ARRAY
+#define C_LUCY_TESTI32ARRAY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

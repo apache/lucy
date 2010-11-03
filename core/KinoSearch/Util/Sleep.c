@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SLEEP
+#define C_LUCY_SLEEP
 #include "KinoSearch/Util/Sleep.h"
 
 /********************************* WINDOWS ********************************/

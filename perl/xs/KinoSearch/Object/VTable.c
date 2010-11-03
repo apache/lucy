@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_OBJ
-#define C_KINO_VTABLE
+#define C_LUCY_OBJ
+#define C_LUCY_VTABLE
 #include "xs/XSBind.h"
 
 #include "KinoSearch/Object/VTable.h"

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_DOCREADER
-#define C_KINO_POLYDOCREADER
-#define C_KINO_DEFAULTDOCREADER
+#define C_LUCY_DOCREADER
+#define C_LUCY_POLYDOCREADER
+#define C_LUCY_DEFAULTDOCREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/DocReader.h"

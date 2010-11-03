@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_POLYANALYZER
+#define C_LUCY_POLYANALYZER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Analysis/PolyAnalyzer.h"

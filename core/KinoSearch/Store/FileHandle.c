@@ -16,7 +16,7 @@
 
 #include <stdarg.h>
 
-#define C_KINO_FILEHANDLE
+#define C_LUCY_FILEHANDLE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Store/FileHandle.h"

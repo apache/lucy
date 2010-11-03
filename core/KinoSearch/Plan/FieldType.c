@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_FIELDTYPE
+#define C_LUCY_FIELDTYPE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Plan/FieldType.h"

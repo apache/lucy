@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#define C_KINO_QUERYPARSER
-#define C_KINO_PARSERCLAUSE
-#define C_KINO_PARSERTOKEN
-#define C_KINO_VIEWCHARBUF
+#define C_LUCY_QUERYPARSER
+#define C_LUCY_PARSERCLAUSE
+#define C_LUCY_PARSERTOKEN
+#define C_LUCY_VIEWCHARBUF
 #include <stdlib.h>
 #include <ctype.h>
 #include "KinoSearch/Util/ToolSet.h"

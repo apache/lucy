@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_LOCKFREEREGISTRY
+#define C_LUCY_LOCKFREEREGISTRY
 #define KINO_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

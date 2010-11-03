@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_ORMATCHER
-#define C_KINO_ORSCORER
+#define C_LUCY_ORMATCHER
+#define C_LUCY_ORSCORER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/ORMatcher.h"

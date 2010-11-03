@@ -16,9 +16,9 @@
 
 #include <stdio.h> // for remove() 
 
-#define C_KINO_CHARBUF
-#define C_KINO_FSFILEHANDLE
-#define C_KINO_FILEWINDOW
+#define C_LUCY_CHARBUF
+#define C_LUCY_FSFILEHANDLE
+#define C_LUCY_FILEWINDOW
 #include "KinoSearch/Util/ToolSet.h"
 
 #ifdef CHY_HAS_UNISTD_H 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_DIRHANDLE
+#define C_LUCY_DIRHANDLE
 #include <stdarg.h>
 #include "KinoSearch/Util/ToolSet.h"
 #include "KinoSearch/Store/DirHandle.h"

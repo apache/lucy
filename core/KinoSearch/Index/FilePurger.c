@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_FILEPURGER
+#define C_LUCY_FILEPURGER
 #include <ctype.h>
 #include "KinoSearch/Util/ToolSet.h"
 

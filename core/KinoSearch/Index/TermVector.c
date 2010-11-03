@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_TERMVECTOR
-#define C_KINO_I32ARRAY
+#define C_LUCY_TERMVECTOR
+#define C_LUCY_I32ARRAY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/TermVector.h"

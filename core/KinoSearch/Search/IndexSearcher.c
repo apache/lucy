@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_INDEXSEARCHER
+#define C_LUCY_INDEXSEARCHER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/IndexSearcher.h"

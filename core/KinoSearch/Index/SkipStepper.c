@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SKIPSTEPPER
+#define C_LUCY_SKIPSTEPPER
 #include <stdio.h>
 
 #include "KinoSearch/Util/ToolSet.h"

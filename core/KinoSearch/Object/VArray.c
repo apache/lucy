@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_VARRAY
+#define C_LUCY_VARRAY
 #include <string.h>
 #include <stdlib.h>
 

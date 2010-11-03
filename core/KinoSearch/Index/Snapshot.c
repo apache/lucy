@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SNAPSHOT
+#define C_LUCY_SNAPSHOT
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/Snapshot.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_POSTINGLISTWRITER
+#define C_LUCY_POSTINGLISTWRITER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/PostingListWriter.h"

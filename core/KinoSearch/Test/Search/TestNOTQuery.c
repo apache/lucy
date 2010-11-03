@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTNOTQUERY
+#define C_LUCY_TESTNOTQUERY
 #include "KinoSearch/Util/ToolSet.h"
 #include <math.h>
 

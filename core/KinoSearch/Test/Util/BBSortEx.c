@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_BBSORTEX
+#define C_LUCY_BBSORTEX
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test/Util/BBSortEx.h"

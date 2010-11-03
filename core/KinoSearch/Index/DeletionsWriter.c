@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_DELETIONSWRITER
-#define C_KINO_DEFAULTDELETIONSWRITER
+#define C_LUCY_DELETIONSWRITER
+#define C_LUCY_DEFAULTDELETIONSWRITER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <math.h>

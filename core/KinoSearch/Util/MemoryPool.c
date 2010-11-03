@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_MEMORYPOOL
+#define C_LUCY_MEMORYPOOL
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Util/MemoryPool.h"

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_REQUIREDOPTIONALQUERY
-#define C_KINO_REQUIREDOPTIONALCOMPILER
+#define C_LUCY_REQUIREDOPTIONALQUERY
+#define C_LUCY_REQUIREDOPTIONALCOMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/RequiredOptionalQuery.h"

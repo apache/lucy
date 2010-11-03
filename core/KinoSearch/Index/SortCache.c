@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTCACHE
+#define C_LUCY_SORTCACHE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/SortCache.h"

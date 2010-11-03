@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_FULLTEXTTYPE
+#define C_LUCY_FULLTEXTTYPE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Plan/FullTextType.h"

@@ -125,6 +125,10 @@ sub write_c {
                     );
                 $content .= $bound->to_c . "\n";
                 my $c_file_sym = "C_" . uc( $block->full_struct_sym );
+
+                # Temporary hack.
+                $c_file_sym =~ s/KINO/LUCY/;
+
                 $c_file_syms .= "#define $c_file_sym\n";
             }
         }
@@ -134,8 +138,8 @@ sub write_c {
 $args{header}
 
 $c_file_syms
-#define C_KINO_VTABLE
-#define C_KINO_ZOMBIECHARBUF
+#define C_LUCY_VTABLE
+#define C_LUCY_ZOMBIECHARBUF
 #include "boil.h"
 #include "KinoSearch/Object/VTable.h"
 #include "KinoSearch/Object/CharBuf.h"

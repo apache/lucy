@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TERMSTEPPER
+#define C_LUCY_TERMSTEPPER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/TermStepper.h"

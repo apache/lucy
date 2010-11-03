@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_PHRASEQUERY
-#define C_KINO_PHRASECOMPILER
+#define C_LUCY_PHRASEQUERY
+#define C_LUCY_PHRASECOMPILER
 #include <stdarg.h>
 
 #include "KinoSearch/Util/ToolSet.h"

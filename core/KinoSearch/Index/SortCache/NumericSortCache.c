@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#define C_KINO_NUMERICSORTCACHE
-#define C_KINO_INT32SORTCACHE
-#define C_KINO_INT64SORTCACHE
-#define C_KINO_FLOAT32SORTCACHE
-#define C_KINO_FLOAT64SORTCACHE
+#define C_LUCY_NUMERICSORTCACHE
+#define C_LUCY_INT32SORTCACHE
+#define C_LUCY_INT64SORTCACHE
+#define C_LUCY_FLOAT32SORTCACHE
+#define C_LUCY_FLOAT64SORTCACHE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/SortCache/NumericSortCache.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTFIELDWRITER
+#define C_LUCY_SORTFIELDWRITER
 #include "KinoSearch/Util/ToolSet.h"
 #include <math.h>
 

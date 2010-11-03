@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SCHEMA
+#define C_LUCY_SCHEMA
 #include <string.h>
 #include <ctype.h>
 #include "KinoSearch/Util/ToolSet.h"

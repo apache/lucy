@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TERMSCORER
+#define C_LUCY_TERMSCORER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/TermScorer.h"

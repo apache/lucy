@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_LEXICON
+#define C_LUCY_LEXICON
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/Lexicon.h"

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_HIGHLIGHTREADER
-#define C_KINO_POLYHIGHLIGHTREADER
-#define C_KINO_DEFAULTHIGHLIGHTREADER
+#define C_LUCY_HIGHLIGHTREADER
+#define C_LUCY_POLYHIGHLIGHTREADER
+#define C_LUCY_DEFAULTHIGHLIGHTREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/HighlightReader.h"

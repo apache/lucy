@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTSTOPALIZER
+#define C_LUCY_TESTSTOPALIZER
 #include "KinoSearch/Util/ToolSet.h"
 #include <stdarg.h>
 

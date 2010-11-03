@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#define C_KINO_POSTINGPOOL
-#define C_KINO_RAWPOSTING
-#define C_KINO_MEMORYPOOL
-#define C_KINO_TERMINFO
-#define C_KINO_SKIPSTEPPER
+#define C_LUCY_POSTINGPOOL
+#define C_LUCY_RAWPOSTING
+#define C_LUCY_MEMORYPOOL
+#define C_LUCY_TERMINFO
+#define C_LUCY_SKIPSTEPPER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/PostingPool.h"

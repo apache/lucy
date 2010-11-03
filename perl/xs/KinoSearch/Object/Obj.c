@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_OBJ
+#define C_LUCY_OBJ
 
 #include "EXTERN.h"
 #include "perl.h"

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_INVERSION
-#define C_KINO_TOKEN
+#define C_LUCY_INVERSION
+#define C_LUCY_TOKEN
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Analysis/Inversion.h"

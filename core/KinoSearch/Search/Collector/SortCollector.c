@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTCOLLECTOR
-#define C_KINO_MATCHDOC
+#define C_LUCY_SORTCOLLECTOR
+#define C_LUCY_MATCHDOC
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/Collector/SortCollector.h"

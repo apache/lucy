@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTPOLYANALYZER
+#define C_LUCY_TESTPOLYANALYZER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

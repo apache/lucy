@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTBYTEBUF
+#define C_LUCY_TESTBYTEBUF
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

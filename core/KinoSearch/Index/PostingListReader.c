@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_POSTINGLISTREADER
-#define C_KINO_POLYPOSTINGLISTREADER
-#define C_KINO_DEFAULTPOSTINGLISTREADER
+#define C_LUCY_POSTINGLISTREADER
+#define C_LUCY_POLYPOSTINGLISTREADER
+#define C_LUCY_DEFAULTPOSTINGLISTREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/PostingListReader.h"

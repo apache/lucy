@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define C_KINO_TESTBATCH
+#define C_LUCY_TESTBATCH
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

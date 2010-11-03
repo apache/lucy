@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#define C_KINO_RICHPOSTING
-#define C_KINO_RICHPOSTINGSCORER
-#define C_KINO_RAWPOSTING
-#define C_KINO_TOKEN
+#define C_LUCY_RICHPOSTING
+#define C_LUCY_RICHPOSTINGSCORER
+#define C_LUCY_RAWPOSTING
+#define C_LUCY_TOKEN
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/Posting/RichPosting.h"

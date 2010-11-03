@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SEGREADER
+#define C_LUCY_SEGREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/SegReader.h"

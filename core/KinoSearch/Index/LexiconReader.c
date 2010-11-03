@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_LEXICONREADER
-#define C_KINO_POLYLEXICONREADER
-#define C_KINO_DEFAULTLEXICONREADER
+#define C_LUCY_LEXICONREADER
+#define C_LUCY_POLYLEXICONREADER
+#define C_LUCY_DEFAULTLEXICONREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/LexiconReader.h"

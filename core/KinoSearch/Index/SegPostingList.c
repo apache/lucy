@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_SEGPOSTINGLIST
-#define C_KINO_POSTING
-#define C_KINO_SKIPSTEPPER
+#define C_LUCY_SEGPOSTINGLIST
+#define C_LUCY_POSTING
+#define C_LUCY_SKIPSTEPPER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/SegPostingList.h"

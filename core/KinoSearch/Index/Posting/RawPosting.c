@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_RAWPOSTING
-#define C_KINO_RAWPOSTINGWRITER
-#define C_KINO_TERMINFO
+#define C_LUCY_RAWPOSTING
+#define C_LUCY_RAWPOSTINGWRITER
+#define C_LUCY_TERMINFO
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <string.h>

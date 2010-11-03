@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_FSDIRHANDLE
+#define C_LUCY_FSDIRHANDLE
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

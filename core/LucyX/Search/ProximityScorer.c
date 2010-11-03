@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_PROXIMITYSCORER
-#define C_KINO_POSTING
-#define C_KINO_SCOREPOSTING
+#define C_LUCY_PROXIMITYSCORER
+#define C_LUCY_POSTING
+#define C_LUCY_SCOREPOSTING
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "LucyX/Search/ProximityScorer.h"

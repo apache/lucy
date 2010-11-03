@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_ARCHITECTURE
+#define C_LUCY_ARCHITECTURE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Plan/Architecture.h"

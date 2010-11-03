@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_RAMFOLDER
-#define C_KINO_RAMDIRHANDLE
+#define C_LUCY_RAMFOLDER
+#define C_LUCY_RAMDIRHANDLE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Store/RAMDirHandle.h"

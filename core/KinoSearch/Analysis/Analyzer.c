@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_ANALYZER
-#define C_KINO_TOKEN
+#define C_LUCY_ANALYZER
+#define C_LUCY_TOKEN
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Analysis/Analyzer.h"

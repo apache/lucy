@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#define C_KINO_MATCHPOSTING
-#define C_KINO_MATCHPOSTINGSCORER
-#define C_KINO_MATCHPOSTINGWRITER
-#define C_KINO_MATCHTERMINFOSTEPPER
-#define C_KINO_RAWPOSTING
-#define C_KINO_TERMINFO
-#define C_KINO_TOKEN
+#define C_LUCY_MATCHPOSTING
+#define C_LUCY_MATCHPOSTINGSCORER
+#define C_LUCY_MATCHPOSTINGWRITER
+#define C_LUCY_MATCHTERMINFOSTEPPER
+#define C_LUCY_RAWPOSTING
+#define C_LUCY_TERMINFO
+#define C_LUCY_TOKEN
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/Posting/MatchPosting.h"

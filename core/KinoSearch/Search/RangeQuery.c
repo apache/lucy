@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_RANGEQUERY
-#define C_KINO_RANGECOMPILER
+#define C_LUCY_RANGEQUERY
+#define C_LUCY_RANGECOMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/RangeQuery.h"

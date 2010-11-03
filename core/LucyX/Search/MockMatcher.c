@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_MOCKMATCHER
+#define C_LUCY_MOCKMATCHER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "LucyX/Search/MockMatcher.h"

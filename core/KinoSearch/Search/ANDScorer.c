@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_ANDSCORER
+#define C_LUCY_ANDSCORER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/ANDScorer.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_DATAWRITER
+#define C_LUCY_DATAWRITER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/DataWriter.h"

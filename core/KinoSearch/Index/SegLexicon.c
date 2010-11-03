@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SEGLEXICON
+#define C_LUCY_SEGLEXICON
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/SegLexicon.h"

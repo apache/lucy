@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_FSFILEHANDLE
-#define C_KINO_FILEWINDOW
+#define C_LUCY_FSFILEHANDLE
+#define C_LUCY_FILEWINDOW
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <errno.h>

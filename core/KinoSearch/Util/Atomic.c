@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_ATOMIC
+#define C_LUCY_ATOMIC
 #define KINO_USE_SHORT_NAMES
 #include "KinoSearch/Util/Atomic.h"
 

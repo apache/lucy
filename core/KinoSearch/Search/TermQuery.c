@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_TERMQUERY
-#define C_KINO_TERMCOMPILER
+#define C_LUCY_TERMQUERY
+#define C_LUCY_TERMCOMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/TermQuery.h"

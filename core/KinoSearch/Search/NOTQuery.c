@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_NOTQUERY
-#define C_KINO_NOTCOMPILER
+#define C_LUCY_NOTQUERY
+#define C_LUCY_NOTCOMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/NOTQuery.h"

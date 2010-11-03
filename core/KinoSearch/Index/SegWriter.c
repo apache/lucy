@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SEGWRITER
+#define C_LUCY_SEGWRITER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/SegWriter.h"

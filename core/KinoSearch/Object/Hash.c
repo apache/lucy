@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_HASH
-#define C_KINO_HASHTOMBSTONE
+#define C_LUCY_HASH
+#define C_LUCY_HASHTOMBSTONE
 #define KINO_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_TOPDOCS
+#define C_LUCY_TOPDOCS
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/TopDocs.h"

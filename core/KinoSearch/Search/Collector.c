@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_COLLECTOR
-#define C_KINO_BITCOLLECTOR
-#define C_KINO_OFFSETCOLLECTOR
+#define C_LUCY_COLLECTOR
+#define C_LUCY_BITCOLLECTOR
+#define C_LUCY_OFFSETCOLLECTOR
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/Collector.h"

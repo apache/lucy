@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_FSFOLDER
+#define C_LUCY_FSFOLDER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <ctype.h>

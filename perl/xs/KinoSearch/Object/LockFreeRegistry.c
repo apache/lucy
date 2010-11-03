@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_OBJ
-#define C_KINO_LOCKFREEREGISTRY
+#define C_LUCY_OBJ
+#define C_LUCY_LOCKFREEREGISTRY
 #include "xs/XSBind.h"
 
 #include "KinoSearch/Object/LockFreeRegistry.h"

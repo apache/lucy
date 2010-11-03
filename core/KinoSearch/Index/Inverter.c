@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_INVERTER
-#define C_KINO_INVERTERENTRY
+#define C_LUCY_INVERTER
+#define C_LUCY_INVERTERENTRY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/Inverter.h"

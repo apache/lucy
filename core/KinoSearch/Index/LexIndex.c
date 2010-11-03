@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_LEXINDEX
-#define C_KINO_TERMINFO
+#define C_LUCY_LEXINDEX
+#define C_LUCY_TERMINFO
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/LexIndex.h"

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_COMPOUNDFILEREADER
-#define C_KINO_CFREADERDIRHANDLE
+#define C_LUCY_COMPOUNDFILEREADER
+#define C_LUCY_CFREADERDIRHANDLE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Store/CompoundFileReader.h"

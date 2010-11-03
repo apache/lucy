@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTREADER
-#define C_KINO_DEFAULTSORTREADER
+#define C_LUCY_SORTREADER
+#define C_LUCY_DEFAULTSORTREADER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/SortReader.h"

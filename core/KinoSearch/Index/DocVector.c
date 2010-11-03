@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_DOCVECTOR
+#define C_LUCY_DOCVECTOR
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/DocVector.h"

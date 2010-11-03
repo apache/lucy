@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_LEAFQUERY
+#define C_LUCY_LEAFQUERY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/LeafQuery.h"

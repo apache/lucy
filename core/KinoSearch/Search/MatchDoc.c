@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_MATCHDOC
+#define C_LUCY_MATCHDOC
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/MatchDoc.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTUTILS
+#define C_LUCY_SORTUTILS
 #define KINO_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

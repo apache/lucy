@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_RAWLEXICON
+#define C_LUCY_RAWLEXICON
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/RawLexicon.h"

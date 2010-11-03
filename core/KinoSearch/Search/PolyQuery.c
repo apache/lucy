@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_POLYQUERY
-#define C_KINO_POLYCOMPILER
+#define C_LUCY_POLYQUERY
+#define C_LUCY_POLYCOMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/PolyQuery.h"

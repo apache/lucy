@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SIMILARITY
+#define C_LUCY_SIMILARITY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "math.h"

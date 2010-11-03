@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTSPEC
+#define C_LUCY_SORTSPEC
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/SortSpec.h"

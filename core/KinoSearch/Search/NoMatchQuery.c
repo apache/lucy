@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_NOMATCHQUERY
+#define C_LUCY_NOMATCHQUERY
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/NoMatchQuery.h"

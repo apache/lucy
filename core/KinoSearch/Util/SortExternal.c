@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTEXTERNAL
+#define C_LUCY_SORTEXTERNAL
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Util/SortExternal.h"

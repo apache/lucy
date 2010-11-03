@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_STEMMER
-#define C_KINO_TOKEN
+#define C_LUCY_STEMMER
+#define C_LUCY_TOKEN
 #include <ctype.h>
 #include "KinoSearch/Util/ToolSet.h"
 

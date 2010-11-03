@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_ZOMBIECHARBUF
-#define C_KINO_RAMFOLDER
+#define C_LUCY_ZOMBIECHARBUF
+#define C_LUCY_RAMFOLDER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Test.h"

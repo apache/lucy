@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_KINO_ORQUERY
-#define C_KINO_ORCOMPILER
+#define C_LUCY_ORQUERY
+#define C_LUCY_ORCOMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/ORQuery.h"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_SORTRULE
+#define C_LUCY_SORTRULE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/SortRule.h"

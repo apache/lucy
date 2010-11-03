@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_POSTINGLIST
+#define C_LUCY_POSTINGLIST
 #include <string.h>
 
 #include "KinoSearch/Util/ToolSet.h"

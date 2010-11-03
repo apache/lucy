@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_CASEFOLDER
+#define C_LUCY_CASEFOLDER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Analysis/CaseFolder.h"

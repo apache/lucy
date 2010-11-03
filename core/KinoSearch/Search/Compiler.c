@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_COMPILER
+#define C_LUCY_COMPILER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/Compiler.h"

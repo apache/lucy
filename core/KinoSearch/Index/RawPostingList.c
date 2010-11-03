@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_RAWPOSTINGLIST
+#define C_LUCY_RAWPOSTINGLIST
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Index/RawPostingList.h"

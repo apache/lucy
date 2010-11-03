@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_RANGESCORER
+#define C_LUCY_RANGESCORER
 #include "KinoSearch/Util/ToolSet.h"
 
 #include "KinoSearch/Search/RangeScorer.h"

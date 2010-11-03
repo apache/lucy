@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_KINO_TESTINSTREAM
-#define C_KINO_INSTREAM
-#define C_KINO_FILEWINDOW
+#define C_LUCY_TESTINSTREAM
+#define C_LUCY_INSTREAM
+#define C_LUCY_FILEWINDOW
 #include <stdlib.h>
 #include <time.h>
 

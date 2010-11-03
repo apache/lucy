@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_KINO_PRIORITYQUEUE
+#define C_LUCY_PRIORITYQUEUE
 #include "KinoSearch/Util/ToolSet.h"
 
 #include <string.h>
