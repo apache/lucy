@@ -25,7 +25,7 @@ parcel KinoSearch;
  * the compound file.  
  * 
  * Each of the InStreams spawned maintains its own memory buffer; however,
- * they all share a single filehandle.  This allows KinoSearch to get around
+ * they all share a single filehandle.  This allows Lucy to get around
  * the limitations that many operating systems place on the number of
  * available filehandles.
  */

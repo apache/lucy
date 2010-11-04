@@ -41,7 +41,7 @@ parcel KinoSearch;
  * collection and they can tell you certain statistical information about the
  * collection -- such as how many total documents are in the collection, or
  * how many documents in the collection a particular term is present in.
- * KinoSearch's core Compiler classes plug this information into the classic
+ * Lucy's core Compiler classes plug this information into the classic
  * TF/IDF weighting algorithm to adjust the Compiler's weight; custom
  * subclasses might do something similar.
  *

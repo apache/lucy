@@ -19,12 +19,12 @@ parcel KinoSearch;
 /** 
  * Exception.
  * 
- * Most of the time when KinoSearch encounters an error, it tries to raise a
+ * Most of the time when Lucy encounters an error, it tries to raise a
  * KinoSearch::Object::Err exception with an error message and context
  * information.
  * 
  * At present, it is only safe to catch exceptions which are specifically
- * documented as catchable; most times when an Err is raised, KinoSearch leaks
+ * documented as catchable; most times when an Err is raised, Lucy leaks
  * memory.
  *
  * The Err module also provides access to a per-thread Err shared variable via

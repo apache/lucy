@@ -19,7 +19,7 @@ parcel KinoSearch;
 /** 
  * Abstract encoder/decoder.
  * 
- * Many KinoSearch files consist of a single variable length record type
+ * Many Lucy files consist of a single variable length record type
  * repeated over and over.  A Stepper both reads and writes such a file.
  * 
  * Since the write algorithms for different Stepper types may require

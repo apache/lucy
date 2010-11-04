@@ -76,7 +76,7 @@ cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
                                    void *allocation);
 
 
-/** Derive an SV from a KinoSearch object.  If the Clownfish object is NULL, the SV
+/** Derive an SV from a Clownfish object.  If the Clownfish object is NULL, the SV
  * will be undef.
  *
  * The new SV has single refcount for which the caller must take

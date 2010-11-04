@@ -16,7 +16,7 @@
 
 parcel KinoSearch;
 
-/** Base class for all KinoSearch objects.
+/** Base class for all Lucy objects.
  */
 
 class KinoSearch::Object::Obj {

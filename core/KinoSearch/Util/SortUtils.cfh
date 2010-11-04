@@ -49,7 +49,7 @@ inert class KinoSearch::Util::SortUtils cnick Sort {
      * source arrays.  Copying the results back into the source array is the
      * responsibility of the caller.
      * 
-     * KinoSearch's external sort takes advantage of this when it is reading
+     * Lucy's external sort takes advantage of this when it is reading
      * back pre-sorted runs from disk and merging the streams into a
      * consolidated buffer.
      */

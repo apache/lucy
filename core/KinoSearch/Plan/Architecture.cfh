@@ -18,7 +18,7 @@ parcel KinoSearch;
 
 /** Configure major components of an index.
  *
- * By default, a KinoSearch index consists of several main parts: lexicon,
+ * By default, a Lucy index consists of several main parts: lexicon,
  * postings, stored documents, deletions, and highlight data.  The readers and
  * writers for that data are spawned by Architecture.  Each component operates
  * at the segment level; Architecture's factory methods are used to build up

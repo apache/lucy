@@ -18,7 +18,7 @@ parcel KinoSearch;
 
 /** Unit of text.
  *
- * Token is the fundamental unit used by KinoSearch's Analyzer subclasses.
+ * Token is the fundamental unit used by Apache Lucy's Analyzer subclasses.
  * Each Token has 5 attributes: <code>text</code>, <code>start_offset</code>,
  * <code>end_offset</code>, <code>boost</code>, and <code>pos_inc</code>.
  * 

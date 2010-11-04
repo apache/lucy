@@ -18,7 +18,7 @@ parcel KinoSearch;
 
 /** Vessel holding statistical data for a posting.
  *
- * A Posting, in KinoSearch, is a vessel which stores information about a
+ * A Posting, in Apache Lucy, is a vessel which stores information about a
  * term-document match.  (See L<KinoSearch::Docs::IRTheory> for the
  * academic definition of "posting".)
  * 

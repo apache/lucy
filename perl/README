@@ -1,4 +1,4 @@
-KinoSearch
+Lucy
 
 Search engine library.
 
@@ -17,6 +17,6 @@ from CPAN first.
 
 XS CODE
 
-KinoSearch is a Perl/XS distribution, despite the apparent lack of .xs 
-files -- KinoSearch.xs gets written on the fly during the build.
+Apache Lucy is a Perl/XS distribution, despite the apparent lack of .xs 
+files -- Lucy.xs gets written on the fly during the build.
 

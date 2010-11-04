@@ -58,7 +58,7 @@ __END_C__
  *        ARG_I32("length", len),  ARG_I32("width", width) );
  * 
  * The first argument is void* to avoid the need for tiresome casting to Obj*,
- * but must always be a KinoSearch object.
+ * but must always be a Clownfish object.
  * 
  * If the invoker is a VTable, it will be used to make a class
  * callback rather than an object callback.

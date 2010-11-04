@@ -33,18 +33,18 @@ public class KinoSearch::Document::Doc inherits KinoSearch::Object::Obj
 
     /** 
      * @param fields Field-value pairs.
-     * @param doc_id Internal KinoSearch document id.  Default of 0 (an
+     * @param doc_id Internal Lucy document id.  Default of 0 (an
      * invalid doc id).
      */
     public inert Doc* 
     init(Doc *self, void *fields = NULL, int32_t doc_id = 0);
 
-    /** Set internal KinoSearch document id. 
+    /** Set internal Lucy document id. 
      */
     public void
     Set_Doc_ID(Doc *self, int32_t doc_id);
 
-    /** Retrieve internal KinoSearch document id. 
+    /** Retrieve internal Lucy document id. 
      */
     public int32_t
     Get_Doc_ID(Doc *self);

@@ -109,7 +109,7 @@ class KinoSearch::Object::CharBuf cnick CB
      * floats:   %f64
      * hex:      %x32 
      * 
-     * Note that all KinoSearch Objects, including CharBufs, are printed via
+     * Note that all Clownfish Objects, including CharBufs, are printed via
      * %o (which invokes Obj_To_String()). 
      */
     void
