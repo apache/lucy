@@ -17,13 +17,13 @@
 #define C_LUCY_PROXIMITYSCORER
 #define C_LUCY_POSTING
 #define C_LUCY_SCOREPOSTING
-#include "KinoSearch/Util/ToolSet.h"
+#include "Lucy/Util/ToolSet.h"
 
 #include "LucyX/Search/ProximityScorer.h"
-#include "KinoSearch/Index/Posting/ScorePosting.h"
-#include "KinoSearch/Index/PostingList.h"
-#include "KinoSearch/Index/Similarity.h"
-#include "KinoSearch/Search/Compiler.h"
+#include "Lucy/Index/Posting/ScorePosting.h"
+#include "Lucy/Index/PostingList.h"
+#include "Lucy/Index/Similarity.h"
+#include "Lucy/Search/Compiler.h"
 
 
 ProximityScorer*

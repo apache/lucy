@@ -16,31 +16,31 @@
 use strict;
 use warnings;
 
-use KinoSearch::Test;
+use Lucy::Test;
 
 package PolyAnalyzerSpec;
-use base qw( KinoSearch::Plan::FullTextType );
-sub analyzer { KinoSearch::Analysis::PolyAnalyzer->new( language => 'en' ) }
+use base qw( Lucy::Plan::FullTextType );
+sub analyzer { Lucy::Analysis::PolyAnalyzer->new( language => 'en' ) }
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self      = shift->SUPER::new(@_);
-    my $tokenizer = KinoSearch::Analysis::Tokenizer->new;
+    my $tokenizer = Lucy::Analysis::Tokenizer->new;
     my $polyanalyzer
-        = KinoSearch::Analysis::PolyAnalyzer->new( language => 'en' );
+        = Lucy::Analysis::PolyAnalyzer->new( language => 'en' );
     my $plain
-        = KinoSearch::Plan::FullTextType->new( analyzer => $tokenizer, );
+        = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
     my $polyanalyzed
-        = KinoSearch::Plan::FullTextType->new( analyzer => $polyanalyzer );
-    my $string_spec          = KinoSearch::Plan::StringType->new;
-    my $unindexedbutanalyzed = KinoSearch::Plan::FullTextType->new(
+        = Lucy::Plan::FullTextType->new( analyzer => $polyanalyzer );
+    my $string_spec          = Lucy::Plan::StringType->new;
+    my $unindexedbutanalyzed = Lucy::Plan::FullTextType->new(
         analyzer => $tokenizer,
         indexed  => 0,
     );
     my $unanalyzedunindexed
-        = KinoSearch::Plan::StringType->new( indexed => 0, );
+        = Lucy::Plan::StringType->new( indexed => 0, );
     $self->spec_field( name => 'analyzed',     type => $plain );
     $self->spec_field( name => 'polyanalyzed', type => $polyanalyzed );
     $self->spec_field( name => 'string',       type => $string_spec );
@@ -58,9 +58,9 @@ sub new {
 package main;
 use Test::More tests => 10;
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = MySchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -77,11 +77,11 @@ $indexer->commit;
 
 sub check {
     my ( $field, $query_text, $expected_num_hits ) = @_;
-    my $query = KinoSearch::Search::TermQuery->new(
+    my $query = Lucy::Search::TermQuery->new(
         field => $field,
         term  => $query_text,
     );
-    my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+    my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
     my $hits = $searcher->hits( query => $query );
 
     is( $hits->total_hits, $expected_num_hits, "$field correct num hits " );

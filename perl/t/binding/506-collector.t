@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package EvensOnlyCollector;
-use base qw( KinoSearch::Search::Collector );
+use base qw( Lucy::Search::Collector );
 
 our %doc_ids;
 
@@ -45,7 +45,7 @@ sub DESTROY {
 package main;
 
 use Test::More tests => 1;
-use KinoSearch::Test;
+use Lucy::Test;
 use LucyX::Search::MockScorer;
 
 my $collector = EvensOnlyCollector->new;

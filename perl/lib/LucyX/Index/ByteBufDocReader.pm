@@ -17,8 +17,8 @@ use strict;
 use warnings;
 
 package LucyX::Index::ByteBufDocReader;
-use base qw( KinoSearch::Index::DocReader );
-use KinoSearch::Document::HitDoc;
+use base qw( Lucy::Index::DocReader );
+use Lucy::Document::HitDoc;
 use Carp;
 
 # Inside-out member vars.
@@ -45,7 +45,7 @@ sub new {
         }
         my $filename = $segment->get_name . "/bytebufdocs.dat";
         $instream{$$self} = $self->get_folder->open_in($filename)
-            or confess KinoSearch->error;
+            or confess Lucy->error;
     }
 
     return $self;
@@ -56,7 +56,7 @@ sub fetch_doc {
     my $field = $field{$$self};
     my %fields = ( $field => '' );
     $self->read_record( $doc_id, \$fields{$field} );
-    return KinoSearch::Document::HitDoc->new(
+    return Lucy::Document::HitDoc->new(
         doc_id => $doc_id,
         fields => \%fields,
     );

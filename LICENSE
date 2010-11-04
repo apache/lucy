@@ -201,7 +201,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-Some code in core/KinoSearch/Util/StringHelper2.c was derived from ICU4C,
+Some code in core/Lucy/Util/StringHelper2.c was derived from ICU4C,
 available from <http://icu-project.org/>.  Here is the license for those
 materials:
 
@@ -240,7 +240,7 @@ materials:
     of their respective owners.
 
 
-Some code in core/KinoSearch/Util/StringHelper3.c was derived using data files
+Some code in core/Lucy/Util/StringHelper3.c was derived using data files
 from the Unicode Consortium under <http://www.unicode.org/Public/>.  Here is
 the license for those materials:
 

@@ -15,7 +15,7 @@
  */
 
 #define C_LUCY_MOCKMATCHER
-#include "KinoSearch/Util/ToolSet.h"
+#include "Lucy/Util/ToolSet.h"
 
 #include "LucyX/Search/MockMatcher.h"
 

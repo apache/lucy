@@ -19,9 +19,9 @@ use warnings;
 use Test::More tests => 20;
 
 package TestObj;
-use base qw( KinoSearch::Object::Obj );
+use base qw( Lucy::Object::Obj );
 
-our $version = $KinoSearch::VERSION;
+our $version = $Lucy::VERSION;
 
 package SonOfTestObj;
 use base qw( TestObj );
@@ -46,13 +46,13 @@ use base qw( TestObj );
 }
 
 package BadSerialize;
-use base qw( KinoSearch::Object::Obj );
+use base qw( Lucy::Object::Obj );
 {
     sub serialize { }
 }
 
 package BadDump;
-use base qw( KinoSearch::Object::Obj );
+use base qw( Lucy::Object::Obj );
 {
     sub dump { }
 }
@@ -62,24 +62,24 @@ use Storable qw( freeze thaw );
 
 ok( defined $TestObj::version,
     "Using base class should grant access to "
-        . "package globals in the KinoSearch:: namespace"
+        . "package globals in the Lucy:: namespace"
 );
 
 # TODO: Port this test to C.
-eval { my $foo = KinoSearch::Object::Obj->new };
+eval { my $foo = Lucy::Object::Obj->new };
 like( $@, qr/abstract/i, "Obj is an abstract class" );
 
 my $object = TestObj->new;
-isa_ok( $object, "KinoSearch::Object::Obj",
-    "Clownfish objects can be subclassed outside the KinoSearch hierarchy" );
+isa_ok( $object, "Lucy::Object::Obj",
+    "Clownfish objects can be subclassed outside the Lucy hierarchy" );
 
 # TODO: Port this test to C.
 eval { my $evil_twin = $object->clone };
 like( $@, qr/abstract/i, "clone throws an abstract method exception" );
 
-ok( $object->is_a("KinoSearch::Object::Obj"), "custom is_a correct" );
-ok( !$object->is_a("KinoSearch::Object"),     "custom is_a too long" );
-ok( !$object->is_a("KinoSearch"),             "custom is_a substring" );
+ok( $object->is_a("Lucy::Object::Obj"), "custom is_a correct" );
+ok( !$object->is_a("Lucy::Object"),     "custom is_a too long" );
+ok( !$object->is_a("Lucy"),             "custom is_a substring" );
 ok( !$object->is_a(""),                       "custom is_a blank" );
 ok( !$object->is_a("thing"),                  "custom is_a wrong" );
 
@@ -87,8 +87,8 @@ eval { my $another_obj = TestObj->new( kill_me_now => 1 ) };
 like( $@, qr/kill_me_now/, "reject bad param" );
 
 my $stringified_perl_obj = "$object";
-require KinoSearch::Object::Hash;
-my $hash = KinoSearch::Object::Hash->new;
+require Lucy::Object::Hash;
+my $hash = Lucy::Object::Hash->new;
 $hash->store( foo => $object );
 is( $object->get_refcount, 2, "refcount increased via C code" );
 is( $object->get_refcount, 2, "refcount increased via C code" );
@@ -122,7 +122,7 @@ SKIP: {
 SKIP: {
     skip( "Exception thrown within callback leaks", 1 )
         if $ENV{LUCY_VALGRIND};
-    $hash = KinoSearch::Object::Hash->new;
+    $hash = Lucy::Object::Hash->new;
     $hash->store( foo => BadDump->new );
     eval { $hash->dump };
     like( $@, qr/NULL/,

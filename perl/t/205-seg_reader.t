@@ -25,25 +25,25 @@ my $folder = create_index(
     "What's he building in there?",
     "We have a right to know."
 );
-my $polyreader = KinoSearch::Index::IndexReader->open( index => $folder );
+my $polyreader = Lucy::Index::IndexReader->open( index => $folder );
 my $reader = $polyreader->get_seg_readers->[0];
 
-isa_ok( $reader, 'KinoSearch::Index::SegReader' );
+isa_ok( $reader, 'Lucy::Index::SegReader' );
 
 is( $reader->doc_max, 3, "doc_max returns correct number" );
 
-my $lex_reader = $reader->fetch("KinoSearch::Index::LexiconReader");
+my $lex_reader = $reader->fetch("Lucy::Index::LexiconReader");
 isa_ok(
     $lex_reader,
-    'KinoSearch::Index::LexiconReader',
+    'Lucy::Index::LexiconReader',
     "fetch() a component"
 );
 ok( !defined( $reader->fetch("nope") ),
     "fetch() returns undef when component can't be found" );
-$lex_reader = $reader->obtain("KinoSearch::Index::LexiconReader");
+$lex_reader = $reader->obtain("Lucy::Index::LexiconReader");
 isa_ok(
     $lex_reader,
-    'KinoSearch::Index::LexiconReader',
+    'Lucy::Index::LexiconReader',
     "obtain() a component"
 );
 eval { $reader->obtain("boom."); };

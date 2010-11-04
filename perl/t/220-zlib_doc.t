@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package MyArchitecture;
-use base qw( KinoSearch::Plan::Architecture );
+use base qw( Lucy::Plan::Architecture );
 
 use LucyX::Index::ZlibDocWriter;
 use LucyX::Index::ZlibDocReader;
@@ -31,7 +31,7 @@ sub register_doc_writer {
         polyreader => $seg_writer->get_polyreader,
     );
     $seg_writer->register(
-        api       => "KinoSearch::Index::DocReader",
+        api       => "Lucy::Index::DocReader",
         component => $doc_writer,
     );
     $seg_writer->add_writer($doc_writer);
@@ -47,26 +47,26 @@ sub register_doc_reader {
         snapshot => $seg_reader->get_snapshot,
     );
     $seg_reader->register(
-        api       => 'KinoSearch::Index::DocReader',
+        api       => 'Lucy::Index::DocReader',
         component => $doc_reader,
     );
 }
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub architecture { MyArchitecture->new }
 
 sub new {
     my $self      = shift->SUPER::new(@_);
-    my $tokenizer = KinoSearch::Analysis::Tokenizer->new;
+    my $tokenizer = Lucy::Analysis::Tokenizer->new;
     my $main_type
-        = KinoSearch::Plan::FullTextType->new( analyzer => $tokenizer );
-    my $unstored_type = KinoSearch::Plan::FullTextType->new(
+        = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
+    my $unstored_type = Lucy::Plan::FullTextType->new(
         analyzer => $tokenizer,
         stored   => 0,
     );
-    my $blob_type = KinoSearch::Plan::BlobType->new( stored => 1 );
+    my $blob_type = Lucy::Plan::BlobType->new( stored => 1 );
     $self->spec_field( name => 'content',  type => $main_type );
     $self->spec_field( name => 'smiley',   type => $main_type );
     $self->spec_field( name => 'unstored', type => $unstored_type );
@@ -76,16 +76,16 @@ sub new {
 
 package main;
 use Test::More tests => 7;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $folder = KinoSearch::Store::RAMFolder->new;
+my $folder = Lucy::Store::RAMFolder->new;
 my $schema = MySchema->new;
 
 my $smiley = "\x{263a}";
 my $binary = pack( 'b4', 1, 2, 3, 4 );
 
 sub add_to_index {
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         index  => $folder,
         schema => $schema,
     );
@@ -103,7 +103,7 @@ sub add_to_index {
 
 add_to_index(qw( a b c ));
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $hits = $searcher->hits( query => 'b' );
 my $hit = $hits->next;
 is( $hit->{content}, 'b',     "single segment, single hit" );
@@ -114,11 +114,11 @@ ok( !defined( $hit->{unstored} ), "unstored" );
 add_to_index(qw( d e f g h ));
 add_to_index(qw( i j k l m ));
 
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 $hits = $searcher->hits( query => 'f' );
 is( $hits->next->{content}, 'f', "multiple segments, single hit" );
 
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -126,7 +126,7 @@ $indexer->delete_by_term( field => 'content', term => $_ ) for qw( b f l );
 $indexer->optimize;
 $indexer->commit;
 
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 $hits = $searcher->hits( query => 'b' );
 is( $hits->next, undef, "doc deleted" );
 

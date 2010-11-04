@@ -33,9 +33,9 @@ use threads;
 use threads::shared;
 use Time::HiRes qw( time usleep );
 use List::Util qw( shuffle );
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $registry = KinoSearch::Object::LockFreeRegistry->new( capacity => 32 );
+my $registry = Lucy::Object::LockFreeRegistry->new( capacity => 32 );
 
 sub register_many {
     my ( $nums, $delay ) = @_;
@@ -47,7 +47,7 @@ sub register_many {
 
     my $succeeded = 0;
     for my $number (@$nums) {
-        my $obj = KinoSearch::Object::CharBuf->new($number);
+        my $obj = Lucy::Object::CharBuf->new($number);
         $succeeded += $registry->register( key => $obj, value => $obj );
     }
 

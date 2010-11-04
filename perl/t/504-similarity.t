@@ -17,20 +17,20 @@ use strict;
 use warnings;
 
 package MySchema::LongTextField;
-use base qw( KinoSearch::Plan::FullTextType );
+use base qw( Lucy::Plan::FullTextType );
 use LucyX::Index::LongFieldSim;
 
 sub make_similarity { LucyX::Index::LongFieldSim->new }
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self     = shift->SUPER::new(@_);
-    my $analyzer = KinoSearch::Analysis::Tokenizer->new;
+    my $analyzer = Lucy::Analysis::Tokenizer->new;
     my $plain_type
-        = KinoSearch::Plan::FullTextType->new( analyzer => $analyzer, );
+        = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
     my $long_field_type
         = MySchema::LongTextField->new( analyzer => $analyzer, );
     $self->spec_field( name => 'title', type => $plain_type );
@@ -40,11 +40,11 @@ sub new {
 
 package main;
 use Test::More tests => 9;
-use KinoSearch::Test;
+use Lucy::Test;
 use bytes;
 no bytes;
 
-my $sim       = KinoSearch::Index::Similarity->new;
+my $sim       = Lucy::Index::Similarity->new;
 my $evil_twin = $sim->load( $sim->dump );
 ok( $sim->equals($evil_twin), "Dump/Load" );
 
@@ -80,8 +80,8 @@ for ( 0 .. 255 ) {
 is_deeply( \@transformed, \@floats,
     "using the norm_decoder produces desired results" );
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $folder  = Lucy::Store::RAMFolder->new;
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => MySchema->new,
 );
@@ -100,10 +100,10 @@ while ( my ( $title, $body ) = each %source_docs ) {
 $indexer->commit;
 undef $indexer;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $hits = $searcher->hits(
-    query => KinoSearch::Search::TermQuery->new(
+    query => Lucy::Search::TermQuery->new(
         field => 'title',
         term  => 'spam',
     )
@@ -112,7 +112,7 @@ is( $hits->next->{'title'},
     'spam', "Default Similarity biased towards short fields" );
 
 $hits = $searcher->hits(
-    query => KinoSearch::Search::TermQuery->new(
+    query => Lucy::Search::TermQuery->new(
         field => 'body',
         term  => 'spam',
     )

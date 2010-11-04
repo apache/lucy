@@ -17,11 +17,11 @@ use strict;
 use warnings;
 
 use Test::More tests => 14;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $folder = KinoSearch::Store::RAMFolder->new;
+my $folder = Lucy::Store::RAMFolder->new;
 
-my $lock = KinoSearch::Store::SharedLock->new(
+my $lock = Lucy::Store::SharedLock->new(
     folder  => $folder,
     name    => 'ness',
     timeout => 0,
@@ -34,7 +34,7 @@ ok( $lock->obtain,                        "obtain" );
 ok( $lock->is_locked,                     "is_locked" );
 ok( $folder->exists('locks/ness-1.lock'), "lockfile exists" );
 
-my $another_lock = KinoSearch::Store::SharedLock->new(
+my $another_lock = Lucy::Store::SharedLock->new(
     folder  => $folder,
     name    => 'ness',
     timeout => 0,
@@ -46,7 +46,7 @@ $lock->release;
 ok( $lock->is_locked,
     "first lock released but still is_locked because of other lock" );
 
-my $ya_lock = KinoSearch::Store::SharedLock->new(
+my $ya_lock = Lucy::Store::SharedLock->new(
     folder  => $folder,
     name    => 'ness',
     timeout => 0,
@@ -63,7 +63,7 @@ my $content = $folder->slurp_file("locks/ness-3.lock");
 $content =~ s/$$/123456789/;
 $folder->delete('locks/ness-3.lock') or die "Can't delete 'ness-3.lock'";
 my $outstream = $folder->open_out('locks/ness-3.lock')
-    or die KinoSearch->error;
+    or die Lucy->error;
 $outstream->print($content);
 $outstream->close;
 
@@ -82,7 +82,7 @@ ok( $lock->is_locked, "it's locked" );
 $content = $folder->slurp_file("locks/ness-1.lock");
 $content =~ s/nessie/sting/;
 $folder->delete('locks/ness-1.lock') or die "Can't delete 'ness-1.lock'";
-$outstream = $folder->open_out('locks/ness-1.lock') or die KinoSearch->error;
+$outstream = $folder->open_out('locks/ness-1.lock') or die Lucy->error;
 $outstream->print($content);
 $outstream->close;
 

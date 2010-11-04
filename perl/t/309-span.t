@@ -19,10 +19,10 @@ use lib 'buildlib';
 
 use Test::More tests => 6;
 
-use KinoSearch::Test;
-use KinoSearch::Search::Span;
+use Lucy::Test;
+use Lucy::Search::Span;
 
-my $span = KinoSearch::Search::Span->new(
+my $span = Lucy::Search::Span->new(
     offset => 2,
     length => 3,
     weight => 7,

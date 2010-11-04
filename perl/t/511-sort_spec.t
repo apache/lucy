@@ -21,7 +21,7 @@ use Test::More tests => 18;
 use List::Util qw( shuffle );
 
 package ReverseType;
-use base qw( KinoSearch::Plan::Int32Type );
+use base qw( Lucy::Plan::Int32Type );
 
 sub new {
     return shift->SUPER::new( indexed => 0, sortable => 1, @_ );
@@ -33,26 +33,26 @@ sub compare_values {
 }
 
 package SortSchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self       = shift->SUPER::new(@_);
-    my $unsortable = KinoSearch::Plan::FullTextType->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new, );
-    my $string_type = KinoSearch::Plan::StringType->new( sortable => 1 );
-    my $int32_type = KinoSearch::Plan::Int32Type->new(
+    my $unsortable = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::Tokenizer->new, );
+    my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
+    my $int32_type = Lucy::Plan::Int32Type->new(
         indexed  => 0,
         sortable => 1,
     );
-    my $int64_type = KinoSearch::Plan::Int64Type->new(
+    my $int64_type = Lucy::Plan::Int64Type->new(
         indexed  => 0,
         sortable => 1,
     );
-    my $float32_type = KinoSearch::Plan::Float32Type->new(
+    my $float32_type = Lucy::Plan::Float32Type->new(
         indexed  => 0,
         sortable => 1,
     );
-    my $float64_type = KinoSearch::Plan::Float64Type->new(
+    my $float64_type = Lucy::Plan::Float64Type->new(
         indexed  => 0,
         sortable => 1,
     );
@@ -72,7 +72,7 @@ sub new {
 }
 
 package main;
-use KinoSearch::Test;
+use Lucy::Test;
 
 my $airplane = {
     name   => 'airplane',
@@ -99,13 +99,13 @@ my $car = {
     cat    => 'vehicle',
 };
 
-my $folder = KinoSearch::Store::RAMFolder->new;
+my $folder = Lucy::Store::RAMFolder->new;
 my $schema = SortSchema->new;
 my $indexer;
 
 sub refresh_indexer {
     $indexer->commit if $indexer;
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         index  => $folder,
         schema => $schema,
     );
@@ -209,7 +209,7 @@ for ( shuffle( 0 .. 99 ) ) {
 }
 
 $indexer->commit;
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $results = test_sorted_search( 'vehicle', 100, name => 0 );
 is_deeply( $results, [qw( airplane bike car )], "sort by one criteria" );
@@ -279,7 +279,7 @@ is_deeply( $ten_results, \@first_ten_of_thirty,
 
 # Add another seg to index.
 undef $indexer;
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     schema => $schema,
     index  => $folder,
 );
@@ -292,7 +292,7 @@ $indexer->add_doc(
     }
 );
 $indexer->commit;
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 $results = test_sorted_search( 'vehicle', 100, name => 0 );
 is_deeply( $results, [qw( airplane bike car )], "Multi-segment sort" );
@@ -307,13 +307,13 @@ sub test_sorted_search {
         my $field = shift @criteria;
         my $rev   = shift @criteria;
         push @rules,
-            KinoSearch::Search::SortRule->new(
+            Lucy::Search::SortRule->new(
             field   => $field,
             reverse => $rev,
             );
     }
-    push @rules, KinoSearch::Search::SortRule->new( type => 'doc_id' );
-    my $sort_spec = KinoSearch::Search::SortSpec->new( rules => \@rules );
+    push @rules, Lucy::Search::SortRule->new( type => 'doc_id' );
+    my $sort_spec = Lucy::Search::SortSpec->new( rules => \@rules );
     my $hits = $searcher->hits(
         query      => $query,
         sort_spec  => $sort_spec,

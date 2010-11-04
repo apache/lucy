@@ -18,11 +18,11 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 1362;
-use KinoSearch::Test;
+use Lucy::Test;
 use LucyX::Search::MockScorer;
 use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
-my $sim = KinoSearch::Index::Similarity->new;
+my $sim = Lucy::Index::Similarity->new;
 
 for my $interval_a ( reverse 1 .. 17 ) {
     for my $interval_b ( reverse 10 .. 17 ) {
@@ -44,13 +44,13 @@ sub check_scorer {
             scores  => [ (0) x scalar @$_ ],
             )
     } @doc_id_arrays;
-    my $and_scorer = KinoSearch::Search::ANDScorer->new(
+    my $and_scorer = Lucy::Search::ANDScorer->new(
         children   => \@children,
         similarity => $sim,
     );
     my @expected = intersect(@doc_id_arrays);
     my $collector
-        = KinoSearch::Search::Collector::SortCollector->new( wanted => 1000 );
+        = Lucy::Search::Collector::SortCollector->new( wanted => 1000 );
     $and_scorer->collect( collector => $collector );
     is( $collector->get_total_hits,
         scalar @expected,

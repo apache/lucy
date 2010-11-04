@@ -17,24 +17,24 @@ use strict;
 use warnings;
 
 use lib 'buildlib';
-use KinoSearch::Test;
+use Lucy::Test;
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $tokenizer = KinoSearch::Analysis::Tokenizer->new( pattern => '\S+' );
+    my $tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '\S+' );
     my $wordchar_tokenizer
-        = KinoSearch::Analysis::Tokenizer->new( pattern => '\w+', );
+        = Lucy::Analysis::Tokenizer->new( pattern => '\w+', );
     my $stopalizer
-        = KinoSearch::Analysis::Stopalizer->new( stoplist => { x => 1 } );
-    my $fancy_analyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+        = Lucy::Analysis::Stopalizer->new( stoplist => { x => 1 } );
+    my $fancy_analyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $wordchar_tokenizer, $stopalizer, ], );
 
-    my $plain = KinoSearch::Plan::FullTextType->new( analyzer => $tokenizer );
+    my $plain = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
     my $fancy
-        = KinoSearch::Plan::FullTextType->new( analyzer => $fancy_analyzer );
+        = Lucy::Plan::FullTextType->new( analyzer => $fancy_analyzer );
     $self->spec_field( name => 'plain', type => $plain );
     $self->spec_field( name => 'fancy', type => $fancy );
     return $self;
@@ -44,9 +44,9 @@ package main;
 
 # Build index.
 my $doc_set = Lucy::Test::TestUtils::doc_set()->to_perl;
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = MySchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     schema => $schema,
     index  => $folder,
 );
@@ -59,5 +59,5 @@ for my $content_string (@$doc_set) {
 }
 $indexer->commit;
 
-KinoSearch::Test::TestQueryParserSyntax::run_tests($folder);
+Lucy::Test::TestQueryParserSyntax::run_tests($folder);
 

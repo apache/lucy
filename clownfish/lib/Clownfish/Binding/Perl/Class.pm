@@ -373,8 +373,8 @@ sub _perlify_doc_text {
     # Change all instances of NULL to 'undef'
     $documentation =~ s/NULL/undef/g;
 
-    # Change "Err_error" to "KinoSearch->error".
-    $documentation =~ s/Err_error/KinoSearch->error/g;
+    # Change "Err_error" to "Lucy->error".
+    $documentation =~ s/Err_error/Lucy->error/g;
 
     return $documentation;
 }

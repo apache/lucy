@@ -17,9 +17,9 @@ use strict;
 use warnings;
 
 use Test::More tests => 13;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $heat_map = KinoSearch::Highlight::HeatMap->new( spans => [], );
+my $heat_map = Lucy::Highlight::HeatMap->new( spans => [], );
 
 my $big_boost = $heat_map->calc_proximity_boost(
     span1 => make_span( 0,  10, 1.0 ),
@@ -117,7 +117,7 @@ $boosts = $heat_map->generate_proximity_boosts($spans);
 is( scalar @$boosts, 2 + 1, "boosts not generated for out of range span" );
 
 sub make_span {
-    return KinoSearch::Search::Span->new(
+    return Lucy::Search::Span->new(
         offset => $_[0],
         length => $_[1],
         weight => $_[2],

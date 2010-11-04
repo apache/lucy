@@ -26,22 +26,22 @@ my @got;
 
 my $folder = create_index( 'a' .. 'z' );
 
-my $b_query = KinoSearch::Search::TermQuery->new(
+my $b_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'b'
 );
-my $c_query = KinoSearch::Search::TermQuery->new(
+my $c_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'c'
 );
 my $not_b_query
-    = KinoSearch::Search::NOTQuery->new( negated_query => $b_query );
+    = Lucy::Search::NOTQuery->new( negated_query => $b_query );
 my $not_c_query
-    = KinoSearch::Search::NOTQuery->new( negated_query => $c_query );
+    = Lucy::Search::NOTQuery->new( negated_query => $c_query );
 
 is( $not_b_query->to_string, "-content:b", "to_string" );
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $reader   = $searcher->get_reader;
 my $hits     = $searcher->hits(
     query      => $not_b_query,
@@ -80,12 +80,12 @@ for my $num_negated ( 1 .. 26 ) {
         doc_ids => \@mock_ids,
         scores  => [ (1) x scalar @mock_ids ],
     );
-    my $not_scorer = KinoSearch::Search::NOTScorer->new(
+    my $not_scorer = Lucy::Search::NOTScorer->new(
         doc_max         => $reader->doc_max,
         negated_matcher => $mock_scorer,
     );
-    my $bit_vec = KinoSearch::Object::BitVector->new( capacity => 30 );
-    my $collector = KinoSearch::Search::Collector::BitCollector->new(
+    my $bit_vec = Lucy::Object::BitVector->new( capacity => 30 );
+    my $collector = Lucy::Search::Collector::BitCollector->new(
         bit_vector => $bit_vec, );
     $not_scorer->collect( collector => $collector );
     my $got = $bit_vec->to_arrayref;
@@ -93,15 +93,15 @@ for my $num_negated ( 1 .. 26 ) {
     is_deeply( $got, \@source_ids, "correct retrieval ($num_negated)" );
 }
 
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
-    schema => KinoSearch::Test::TestSchema->new,
+    schema => Lucy::Test::TestSchema->new,
 );
 $indexer->delete_by_term( field => 'content', term => 'b' );
 $indexer->commit;
 
 @got      = ();
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 $hits     = $searcher->hits( query => $not_b_query, num_wanted => 100 );
 is( $hits->total_hits, 25, "still correct after deletion" );
 while ( my $hit = $hits->next ) {

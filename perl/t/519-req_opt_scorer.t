@@ -18,11 +18,11 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 726;
-use KinoSearch::Test;
+use Lucy::Test;
 use LucyX::Search::MockScorer;
 use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
-my $sim = KinoSearch::Index::Similarity->new;
+my $sim = Lucy::Index::Similarity->new;
 
 for my $req_interval ( 1 .. 10, 75 ) {
     for my $opt_interval ( 1 .. 10, 75 ) {
@@ -43,13 +43,13 @@ sub check_scorer {
         doc_ids => $opt_docs,
         scores  => [ (1) x scalar @$opt_docs ],
     );
-    my $req_opt_scorer = KinoSearch::Search::RequiredOptionalScorer->new(
+    my $req_opt_scorer = Lucy::Search::RequiredOptionalScorer->new(
         similarity       => $sim,
         required_matcher => $req_mock,
         optional_matcher => $opt_mock,
     );
     my $collector
-        = KinoSearch::Search::Collector::SortCollector->new( wanted => 1000 );
+        = Lucy::Search::Collector::SortCollector->new( wanted => 1000 );
     $req_opt_scorer->collect( collector => $collector );
     my ( $got_by_score, $got_by_id ) = doc_ids_from_td_coll($collector);
     my ( $expected_by_count, $expected_by_id )

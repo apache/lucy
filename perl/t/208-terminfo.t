@@ -17,9 +17,9 @@ use strict;
 use warnings;
 
 use Test::More tests => 11;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $tinfo = KinoSearch::Index::TermInfo->new( doc_freq => 10, );
+my $tinfo = Lucy::Index::TermInfo->new( doc_freq => 10, );
 $tinfo->set_post_filepos(20);
 $tinfo->set_skip_filepos(40);
 $tinfo->set_lex_filepos(50);

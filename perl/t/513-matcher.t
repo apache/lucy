@@ -18,14 +18,14 @@ use warnings;
 use lib 'buildlib';
 
 package MyMatcher;
-use base qw( KinoSearch::Search::Matcher );
+use base qw( Lucy::Search::Matcher );
 
 package main;
 
 use Test::More tests => 22;
 
 use LucyX::Search::MockScorer;
-use KinoSearch::Test;
+use Lucy::Test;
 
 my $matcher = MyMatcher->new;
 for (qw( score get_doc_id next )) {
@@ -106,17 +106,17 @@ sub test_search {
         scores  => [ (0) x scalar @$docs ],
     );
     if (@$dels) {
-        my $bit_vec = KinoSearch::Object::BitVector->new(
+        my $bit_vec = Lucy::Object::BitVector->new(
             capacity => $dels->[-1] + 1 );
         $bit_vec->set($_) for @$dels;
-        $del_enum = KinoSearch::Search::BitVecMatcher->new(
+        $del_enum = Lucy::Search::BitVecMatcher->new(
             bit_vector => $bit_vec );
     }
 
     my $collector
-        = KinoSearch::Search::Collector::SortCollector->new( wanted => 100 );
+        = Lucy::Search::Collector::SortCollector->new( wanted => 100 );
     $matcher->collect(
-        %KinoSearch::Search::Matcher::collect_PARAMS,
+        %Lucy::Search::Matcher::collect_PARAMS,
         collector => $collector,
         deletions => $del_enum,
         %args,

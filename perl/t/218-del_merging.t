@@ -16,10 +16,10 @@
 use strict;
 use warnings;
 
-use KinoSearch::Test;
+use Lucy::Test;
 
 package NoMergeSeg1Manager;
-use base qw( KinoSearch::Index::IndexManager );
+use base qw( Lucy::Index::IndexManager );
 sub recycle {
     my $seg_readers = shift->SUPER::recycle(@_);
     @$seg_readers = grep { $_->get_seg_num != 1 } @$seg_readers;
@@ -27,12 +27,12 @@ sub recycle {
 }
 
 package DelSchema;
-use base 'KinoSearch::Plan::Schema';
+use base 'Lucy::Plan::Schema';
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = KinoSearch::Plan::FullTextType->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new, );
+    my $type = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::Tokenizer->new, );
     $self->spec_field( name => 'foo', type => $type );
     $self->spec_field( name => 'bar', type => $type );
     return $self;
@@ -42,9 +42,9 @@ package main;
 
 use Test::More tests => 70;
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = DelSchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -55,7 +55,7 @@ for my $iter ( 1 .. 10 ) {
     is( search_doc('foo'), 3, "match all docs prior to deletion $iter" );
     is( search_doc('x'),   1, "match doc to be deleted $iter" );
 
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => $folder,
     );
@@ -66,7 +66,7 @@ for my $iter ( 1 .. 10 ) {
     is( search_doc('x'),   0, "deletion successful $iter" );
     is( search_doc('foo'), 2, "match all docs after deletion $iter" );
 
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => $folder,
     );
@@ -75,9 +75,9 @@ for my $iter ( 1 .. 10 ) {
     $indexer->commit;
 }
 
-$folder  = KinoSearch::Store::RAMFolder->new;
+$folder  = Lucy::Store::RAMFolder->new;
 $schema  = DelSchema->new;
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -86,7 +86,7 @@ $indexer->add_doc( { foo => 'foo', bar => $_ } ) for @dox;
 $indexer->commit;
 
 for ( 1 .. 10 ) {
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         manager => NoMergeSeg1Manager->new,
         schema  => $schema,
         index   => $folder,
@@ -97,7 +97,7 @@ for ( 1 .. 10 ) {
     is( scalar @num_seg_1_bv_files,
         1, "seg_1 deletions file carried forward" );
 
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         manager => NoMergeSeg1Manager->new,
         schema  => $schema,
         index   => $folder,
@@ -114,7 +114,7 @@ for ( 1 .. 10 ) {
 
 sub search_doc {
     my $query_string = shift;
-    my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+    my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
     my $hits = $searcher->hits( query => $query_string );
     return $hits->total_hits;
 }

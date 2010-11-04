@@ -20,10 +20,10 @@ package LucyX::Simple;
 use Carp;
 use Scalar::Util qw( weaken reftype refaddr );
 
-use KinoSearch::Plan::Schema;
-use KinoSearch::Analysis::PolyAnalyzer;
-use KinoSearch::Index::Indexer;
-use KinoSearch::Search::IndexSearcher;
+use Lucy::Plan::Schema;
+use Lucy::Analysis::PolyAnalyzer;
+use Lucy::Index::Indexer;
+use Lucy::Search::IndexSearcher;
 
 my %obj_cache;
 
@@ -49,10 +49,10 @@ sub new {
 
     # Get type and schema.
     my $analyzer
-        = KinoSearch::Analysis::PolyAnalyzer->new( language => $language );
+        = Lucy::Analysis::PolyAnalyzer->new( language => $language );
     $self->{type}
-        = KinoSearch::Plan::FullTextType->new( analyzer => $analyzer, );
-    my $schema = $self->{schema} = KinoSearch::Plan::Schema->new;
+        = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
+    my $schema = $self->{schema} = Lucy::Plan::Schema->new;
 
     # Cache the object for later clean-up.
     weaken( $obj_cache{ refaddr $self } = $self );
@@ -63,7 +63,7 @@ sub new {
 sub _lazily_create_indexer {
     my $self = shift;
     if ( !defined $self->{indexer} ) {
-        $self->{indexer} = KinoSearch::Index::Indexer->new(
+        $self->{indexer} = Lucy::Index::Indexer->new(
             schema => $self->{schema},
             index  => $self->{path},
         );
@@ -100,7 +100,7 @@ sub search {
     # Flush recent adds; lazily create searcher.
     $self->_finish_indexing;
     if ( !defined $self->{searcher} ) {
-        $self->{searcher} = KinoSearch::Search::IndexSearcher->new(
+        $self->{searcher} = Lucy::Search::IndexSearcher->new(
             index => $self->{path} );
     }
 

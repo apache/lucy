@@ -17,18 +17,18 @@ use strict;
 use warnings;
 
 use Test::More tests => 32;
-use KinoSearch::Test;
+use Lucy::Test;
 use List::Util qw( shuffle );
 use LucyX::Search::MockScorer;
 
-my $schema = KinoSearch::Plan::Schema->new;
-my $type = KinoSearch::Plan::StringType->new( sortable => 1 );
+my $schema = Lucy::Plan::Schema->new;
+my $type = Lucy::Plan::StringType->new( sortable => 1 );
 $schema->spec_field( name => 'letter', type => $type );
 $schema->spec_field( name => 'number', type => $type );
 $schema->spec_field( name => 'id',     type => $type );
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $folder  = Lucy::Store::RAMFolder->new;
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -51,17 +51,17 @@ for my $id ( 4 .. 100 ) {
 $indexer->add_doc($_) for @docs;
 $indexer->commit;
 
-my $polyreader = KinoSearch::Index::IndexReader->open( index => $folder );
+my $polyreader = Lucy::Index::IndexReader->open( index => $folder );
 my $seg_reader = $polyreader->get_seg_readers->[0];
 
-my $by_letter = KinoSearch::Search::SortSpec->new(
+my $by_letter = Lucy::Search::SortSpec->new(
     rules => [
-        KinoSearch::Search::SortRule->new( field => 'letter' ),
-        KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        Lucy::Search::SortRule->new( field => 'letter' ),
+        Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ]
 );
 
-my $collector = KinoSearch::Search::Collector::SortCollector->new(
+my $collector = Lucy::Search::Collector::SortCollector->new(
     sort_spec => $by_letter,
     schema    => $schema,
     wanted    => 1,
@@ -95,7 +95,7 @@ for my $size ( 0 .. @doc_ids ) {
         scores  => \@scores,
     );
     my $collector
-        = KinoSearch::Search::Collector::SortCollector->new( wanted => $size,
+        = Lucy::Search::Collector::SortCollector->new( wanted => $size,
         );
     $collector->set_matcher($matcher);
     $matcher->collect( collector => $collector );

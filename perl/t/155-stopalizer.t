@@ -20,11 +20,11 @@ use lib 'buildlib';
 use Test::More tests => 6;
 use Lucy::Test::TestUtils qw( test_analyzer );
 
-my $stopalizer = KinoSearch::Analysis::Stopalizer->new( language => 'en' );
+my $stopalizer = Lucy::Analysis::Stopalizer->new( language => 'en' );
 test_analyzer( $stopalizer, 'the', [], "single stopword stopalized" );
 
-my $tokenizer    = KinoSearch::Analysis::Tokenizer->new;
-my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+my $tokenizer    = Lucy::Analysis::Tokenizer->new;
+my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
     analyzers => [ $tokenizer, $stopalizer ], );
 test_analyzer( $polyanalyzer, 'i am the walrus',
     ['walrus'], "multiple stopwords stopalized" );

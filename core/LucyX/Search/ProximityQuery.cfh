@@ -18,11 +18,11 @@ parcel Lucy;
 
 /** Query matching an ordered list of terms.  
  *
- * ProximityQuery is a subclass of L<KinoSearch::Search::Query> for matching
+ * ProximityQuery is a subclass of L<Lucy::Search::Query> for matching
  * against an ordered sequence of terms.  
  */
 
-class LucyX::Search::ProximityQuery inherits KinoSearch::Search::Query
+class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
     : dumpable {
 
     CharBuf       *field;
@@ -74,7 +74,7 @@ class LucyX::Search::ProximityQuery inherits KinoSearch::Search::Query
 }
 
 class LucyX::Search::ProximityCompiler 
-    inherits KinoSearch::Search::Compiler {
+    inherits Lucy::Search::Compiler {
 
     float    idf;
     float    raw_weight;

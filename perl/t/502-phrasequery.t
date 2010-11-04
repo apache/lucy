@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 9;
 use Storable qw( freeze thaw );
-use KinoSearch::Test;
+use Lucy::Test;
 use Lucy::Test::TestUtils qw( create_index );
 
 my $best_match = 'x a b c d a b c d';
@@ -33,14 +33,14 @@ my @docs = (
 );
 
 my $folder = create_index(@docs);
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
-my $phrase_query = KinoSearch::Search::PhraseQuery->new(
+my $phrase_query = Lucy::Search::PhraseQuery->new(
     field => 'content',
     terms => [],
 );
 is( $phrase_query->to_string, 'content:""', "empty PhraseQuery to_string" );
-$phrase_query = KinoSearch::Search::PhraseQuery->new(
+$phrase_query = Lucy::Search::PhraseQuery->new(
     field => 'content',
     terms => [qw( a b c d )],
 );
@@ -58,7 +58,7 @@ ok( $first_hit->get_score > $second_hit->get_score,
         . $second_hit->get_score
 );
 
-$phrase_query = KinoSearch::Search::PhraseQuery->new(
+$phrase_query = Lucy::Search::PhraseQuery->new(
     field => 'content',
     terms => [qw( c a )],
 );
@@ -66,7 +66,7 @@ $hits = $searcher->hits( query => $phrase_query );
 is( $hits->total_hits, 1, 'avoid underflow when subtracting offset' );
 
 # "a b c"
-$phrase_query = KinoSearch::Search::PhraseQuery->new(
+$phrase_query = Lucy::Search::PhraseQuery->new(
     field => 'content',
     terms => [qw( a b c )],
 );

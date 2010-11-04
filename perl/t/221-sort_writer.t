@@ -18,23 +18,23 @@ use warnings;
 use lib 'buildlib';
 
 package NonMergingIndexManager;
-use base qw( KinoSearch::Index::IndexManager );
+use base qw( Lucy::Index::IndexManager );
 
 sub recycle {
-    return KinoSearch::Object::VArray->new( capacity => 0 );
+    return Lucy::Object::VArray->new( capacity => 0 );
 }
 
 package SortSchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self          = shift->SUPER::new(@_);
-    my $fulltext_type = KinoSearch::Plan::FullTextType->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new,
+    my $fulltext_type = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::Tokenizer->new,
         sortable => 1,
     );
-    my $string_type = KinoSearch::Plan::StringType->new( sortable => 1 );
-    my $unsortable = KinoSearch::Plan::StringType->new;
+    my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
+    my $unsortable = Lucy::Plan::StringType->new;
     $self->spec_field( name => 'name',   type => $fulltext_type );
     $self->spec_field( name => 'speed',  type => $string_type );
     $self->spec_field( name => 'weight', type => $string_type );
@@ -47,11 +47,11 @@ sub new {
 }
 
 package main;
-use KinoSearch::Test;
+use Lucy::Test;
 use Test::More tests => 57;
 
 # Force frequent flushes.
-KinoSearch::Index::SortWriter::set_default_mem_thresh(100);
+Lucy::Index::SortWriter::set_default_mem_thresh(100);
 
 my $airplane = {
     name   => 'airplane',
@@ -95,9 +95,9 @@ my $elephant = {
     # no "wheels" field -- test NULL/undef
 };
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = SortSchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -107,10 +107,10 @@ $indexer->add_doc($_) for ( $airplane, $bike, $car );
 
 $indexer->commit;
 
-my $polyreader  = KinoSearch::Index::IndexReader->open( index => $folder );
+my $polyreader  = Lucy::Index::IndexReader->open( index => $folder );
 my $seg_reader  = $polyreader->get_seg_readers->[0];
-my $sort_reader = $seg_reader->obtain("KinoSearch::Index::SortReader");
-my $doc_reader  = $seg_reader->obtain("KinoSearch::Index::DocReader");
+my $sort_reader = $seg_reader->obtain("Lucy::Index::SortReader");
+my $doc_reader  = $seg_reader->obtain("Lucy::Index::DocReader");
 my $segment     = $seg_reader->get_segment;
 
 for my $field (qw( name speed weight home cat wheels )) {
@@ -133,7 +133,7 @@ for my $field (qw( unused nope )) {
 }
 
 # Add a second segment.
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     index   => $folder,
     schema  => $schema,
     manager => NonMergingIndexManager->new,
@@ -142,7 +142,7 @@ $indexer->add_doc($dirigible);
 $indexer->commit;
 
 # Consolidate everything, to test merging.
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -154,10 +154,10 @@ $indexer->commit;
 my $num_old_seg_files = scalar grep {m/seg_[12]/} @{ $folder->list_r };
 is( $num_old_seg_files, 0, "all files from earlier segments zapped" );
 
-$polyreader  = KinoSearch::Index::IndexReader->open( index => $folder );
+$polyreader  = Lucy::Index::IndexReader->open( index => $folder );
 $seg_reader  = $polyreader->get_seg_readers->[0];
-$sort_reader = $seg_reader->obtain("KinoSearch::Index::SortReader");
-$doc_reader  = $seg_reader->obtain("KinoSearch::Index::DocReader");
+$sort_reader = $seg_reader->obtain("Lucy::Index::SortReader");
+$doc_reader  = $seg_reader->obtain("Lucy::Index::DocReader");
 $segment     = $seg_reader->get_segment;
 
 for my $field (qw( name speed weight home cat wheels )) {

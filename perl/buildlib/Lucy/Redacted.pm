@@ -28,34 +28,34 @@ BEGIN {
 
 sub redacted {
     return qw(
-        KinoSearch::Analysis::LCNormalizer
-        KinoSearch::Analysis::Token
-        KinoSearch::Analysis::TokenBatch
-        KinoSearch::Index::Term
-        KinoSearch::InvIndex
-        KinoSearch::InvIndexer
-        KinoSearch::QueryParser::QueryParser
-        KinoSearch::Search::BooleanQuery
-        KinoSearch::Search::QueryFilter
-        KinoSearch::Search::SearchServer
-        KinoSearch::Search::SearchClient
+        Lucy::Analysis::LCNormalizer
+        Lucy::Analysis::Token
+        Lucy::Analysis::TokenBatch
+        Lucy::Index::Term
+        Lucy::InvIndex
+        Lucy::InvIndexer
+        Lucy::QueryParser::QueryParser
+        Lucy::Search::BooleanQuery
+        Lucy::Search::QueryFilter
+        Lucy::Search::SearchServer
+        Lucy::Search::SearchClient
     );
 }
 
 # Hide additional stuff from PAUSE and search.cpan.org.
 sub hidden {
     return qw(
-        KinoSearch::Analysis::Inversion
-        KinoSearch::Object::Num
-        KinoSearch::Plan::Int32Type
-        KinoSearch::Plan::Int64Type
-        KinoSearch::Plan::Float32Type
-        KinoSearch::Plan::Float64Type
+        Lucy::Analysis::Inversion
+        Lucy::Object::Num
+        Lucy::Plan::Int32Type
+        Lucy::Plan::Int64Type
+        Lucy::Plan::Float32Type
+        Lucy::Plan::Float64Type
         Lucy::Redacted
-        KinoSearch::Test::Object::TestCharBuf
+        Lucy::Test::Object::TestCharBuf
         Lucy::Test::TestUtils
         Lucy::Test::USConSchema
-        KinoSearch::Util::BitVector
+        Lucy::Util::BitVector
     );
 }
 

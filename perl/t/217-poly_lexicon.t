@@ -17,22 +17,22 @@ use strict;
 use warnings;
 
 use lib 'buildlib';
-use KinoSearch::Test;
+use Lucy::Test;
 
 use strict;
 use warnings;
 
 package MyArchitecture;
-use base qw( KinoSearch::Plan::Architecture );
+use base qw( Lucy::Plan::Architecture );
 
 sub index_interval { confess("should be displaced via local() below") }
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = KinoSearch::Plan::StringType->new( sortable => 1 );
+    my $type = Lucy::Plan::StringType->new( sortable => 1 );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }
@@ -72,12 +72,12 @@ for my $index_interval ( 1, 2, 3, 4, 7, 128, 1024 ) {
     no warnings 'redefine';
     local *MyArchitecture::index_interval = sub {$index_interval};
 
-    my $folder = KinoSearch::Store::RAMFolder->new;
+    my $folder = Lucy::Store::RAMFolder->new;
     my $schema = MySchema->new;
 
     my @docs_copy = @docs;
     while (@docs_copy) {
-        my $indexer = KinoSearch::Index::Indexer->new(
+        my $indexer = Lucy::Index::Indexer->new(
             index  => $folder,
             schema => $schema,
         );
@@ -93,11 +93,11 @@ for my $index_interval ( 1, 2, 3, 4, 7, 128, 1024 ) {
         $indexer->commit;
     }
 
-    my $reader = KinoSearch::Index::IndexReader->open( index => $folder, );
+    my $reader = Lucy::Index::IndexReader->open( index => $folder, );
 
-    my $lexicon = $reader->obtain("KinoSearch::Index::LexiconReader")
+    my $lexicon = $reader->obtain("Lucy::Index::LexiconReader")
         ->lexicon( field => 'content' );
-    isa_ok( $lexicon, "KinoSearch::Index::PolyLexicon" );
+    isa_ok( $lexicon, "Lucy::Index::PolyLexicon" );
 
     $lexicon->next;
     is( $lexicon->get_term, $correct[0],

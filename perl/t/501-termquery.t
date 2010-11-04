@@ -19,14 +19,14 @@ use lib 'buildlib';
 
 use Test::More tests => 12;
 use Storable qw( freeze thaw );
-use KinoSearch::Test;
+use Lucy::Test;
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( 'a', 'b', 'c c c d', 'c d', 'd' .. 'z', );
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $term_query
-    = KinoSearch::Search::TermQuery->new( field => 'content', term => 'c' );
+    = Lucy::Search::TermQuery->new( field => 'content', term => 'c' );
 is( $term_query->to_string, "content:c", "to_string" );
 
 my $hits = $searcher->hits( query => $term_query );
@@ -47,11 +47,11 @@ is( $thawed->get_boost, $term_query->get_boost,
 ok( $thawed->equals($term_query), "equals" );
 $thawed->set_boost(10);
 ok( !$thawed->equals($term_query), "!equals (boost)" );
-my $different_term = KinoSearch::Search::TermQuery->new(
+my $different_term = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'd'
 );
-my $different_field = KinoSearch::Search::TermQuery->new(
+my $different_field = Lucy::Search::TermQuery->new(
     field => 'title',
     term  => 'c'
 );

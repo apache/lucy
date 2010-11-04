@@ -22,22 +22,22 @@ use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( 'a' .. 'z' );
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
-my $match_all_query = KinoSearch::Search::MatchAllQuery->new;
+my $match_all_query = Lucy::Search::MatchAllQuery->new;
 is( $match_all_query->to_string, "[MATCHALL]", "to_string" );
 
 my $hits = $searcher->hits( query => $match_all_query );
 is( $hits->total_hits, 26, "match all" );
 
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
-    schema => KinoSearch::Test::TestSchema->new,
+    schema => Lucy::Test::TestSchema->new,
 );
 $indexer->delete_by_term( field => 'content', term => 'b' );
 $indexer->commit;
 
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 $hits = $searcher->hits( query => $match_all_query, num_wanted => 100 );
 is( $hits->total_hits, 25, "match all minus a deletion" );
 my @got;

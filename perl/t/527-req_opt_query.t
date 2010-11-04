@@ -22,23 +22,23 @@ use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( 'a', 'b', 'b c', 'c', 'c d', 'd', 'e' );
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $reader = $searcher->get_reader->get_seg_readers->[0];
 
-my $b_query = KinoSearch::Search::TermQuery->new(
+my $b_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'b'
 );
-my $c_query = KinoSearch::Search::TermQuery->new(
+my $c_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'c'
 );
-my $x_query = KinoSearch::Search::TermQuery->new(
+my $x_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'x'
 );
 
-my $req_opt_query = KinoSearch::Search::RequiredOptionalQuery->new(
+my $req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
     required_query => $b_query,
     optional_query => $c_query,
 );
@@ -49,9 +49,9 @@ my $frozen   = freeze($compiler);
 my $thawed   = thaw($frozen);
 ok( $thawed->equals($compiler), "freeze/thaw compiler" );
 my $matcher = $compiler->make_matcher( reader => $reader, need_score => 1 );
-isa_ok( $matcher, 'KinoSearch::Search::RequiredOptionalScorer' );
+isa_ok( $matcher, 'Lucy::Search::RequiredOptionalScorer' );
 
-$req_opt_query = KinoSearch::Search::RequiredOptionalQuery->new(
+$req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
     required_query => $b_query,
     optional_query => $x_query,
 );
@@ -59,11 +59,11 @@ $matcher = $req_opt_query->make_compiler( searcher => $searcher )
     ->make_matcher( reader => $reader, need_score => 0 );
 isa_ok(
     $matcher,
-    'KinoSearch::Search::TermScorer',
+    'Lucy::Search::TermScorer',
     "return required matcher only when opt matcher doesn't match"
 );
 
-$req_opt_query = KinoSearch::Search::RequiredOptionalQuery->new(
+$req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
     required_query => $x_query,
     optional_query => $b_query,
 );

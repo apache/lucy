@@ -22,15 +22,15 @@ use File::Find 'find';
 my @modules;
 
 my %excluded = map { ( $_ => 1 ) } qw(
-    KinoSearch::Analysis::LCNormalizer
-    KinoSearch::Index::Term
-    KinoSearch::InvIndex
-    KinoSearch::InvIndexer
-    KinoSearch::QueryParser::QueryParser
-    KinoSearch::Search::BooleanQuery
-    KinoSearch::Search::Scorer
-    KinoSearch::Search::SearchClient
-    KinoSearch::Search::SearchServer
+    Lucy::Analysis::LCNormalizer
+    Lucy::Index::Term
+    Lucy::InvIndex
+    Lucy::InvIndexer
+    Lucy::QueryParser::QueryParser
+    Lucy::Search::BooleanQuery
+    Lucy::Search::Scorer
+    Lucy::Search::SearchClient
+    Lucy::Search::SearchServer
 );
 
 find(
@@ -46,7 +46,7 @@ find(
 plan( tests => scalar @modules );
 
 for (@modules) {
-    s/^.*?KinoSearch/KinoSearch/;
+    s/^.*?Lucy/Lucy/;
     s/^.*?LucyX/LucyX/;
     s/\.pm$//;
     s/\W+/::/g;

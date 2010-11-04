@@ -15,7 +15,7 @@
 
 use strict;
 use warnings;
-use KinoSearch;
+use Lucy;
 
 package LucyX::Search::MockScorer;
 BEGIN { our @ISA = qw( LucyX::Search::MockMatcher ) }
@@ -23,13 +23,13 @@ BEGIN { our @ISA = qw( LucyX::Search::MockMatcher ) }
 sub new {
     my ( $either, %args ) = @_;
     confess("Missing doc_ids") unless ref( $args{doc_ids} ) eq 'ARRAY';
-    my $doc_ids = KinoSearch::Object::I32Array->new( ints => $args{doc_ids} );
+    my $doc_ids = Lucy::Object::I32Array->new( ints => $args{doc_ids} );
     my $size = $doc_ids->get_size;
     my $scores;
     if ( ref( $args{scores} ) eq 'ARRAY' ) {
         confess("Mismatch between scores and doc_ids array sizes")
             unless scalar @{ $args{scores} } == $size;
-        $scores = KinoSearch::Object::ByteBuf->new(
+        $scores = Lucy::Object::ByteBuf->new(
             pack( "f$size", @{ $args{scores} } ) );
     }
 

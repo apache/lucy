@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class LucyX::Search::FilterScorer inherits KinoSearch::Search::Matcher {
+class LucyX::Search::FilterScorer inherits Lucy::Search::Matcher {
 
     BitVector   *bits;
     int32_t      doc_max;

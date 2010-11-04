@@ -122,23 +122,23 @@ END_REPORT
 }
 
 package BenchSchema::WhiteSpaceTokenizer;
-use base qw( KinoSearch::Analysis::Tokenizer );
+use base qw( Lucy::Analysis::Tokenizer );
 
 sub new { return shift->SUPER::new( pattern => '\S+' ) }
 
 package BenchSchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self = shift->SUPER::new;
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer => BenchSchema::WhiteSpaceTokenizer->new, );
     $self->spec_field( name => 'title', type => $type );
     return $self;
 }
 
-package BenchmarkingIndexer::KinoSearch;
+package BenchmarkingIndexer::Lucy;
 use base qw( BenchmarkingIndexer );
 
 use Time::HiRes qw( gettimeofday );
@@ -147,12 +147,12 @@ sub new {
     my $class = shift;
     my $self  = $class->SUPER::new(@_);
 
-    require KinoSearch;
-    require KinoSearch::Index::Indexer;
+    require Lucy;
+    require Lucy::Index::Indexer;
 
     # Provide runtime flexibility.
     my $schema = $self->{schema} = BenchSchema->new;
-    my $body_type = KinoSearch::Plan::FullTextType->new(
+    my $body_type = Lucy::Plan::FullTextType->new(
         analyzer      => BenchSchema::WhiteSpaceTokenizer->new,
         highlightable => $self->{store} ? 1 : 0,
         stored        => $self->{store} ? 1 : 0,
@@ -160,8 +160,8 @@ sub new {
     $schema->spec_field( name => 'body', type => $body_type );
 
     $self->{index_dir} = 'lucy_index';
-    $self->{engine}    = 'KinoSearch';
-    $self->{version}   = $KinoSearch::VERSION;
+    $self->{engine}    = 'Lucy';
+    $self->{version}   = $Lucy::VERSION;
 
     return $self;
 }
@@ -169,7 +169,7 @@ sub new {
 sub init_indexer {
     my ( $self, $count ) = @_;
     my $truncate = $count == 0 ? 1 : 0;
-    return KinoSearch::Index::Indexer->new(
+    return Lucy::Index::Indexer->new(
         schema   => $self->{schema},
         index    => $self->{index_dir},
         truncate => $truncate,

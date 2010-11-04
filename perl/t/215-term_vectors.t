@@ -17,15 +17,15 @@ use strict;
 use warnings;
 
 use lib 'buildlib';
-use KinoSearch::Test;
+use Lucy::Test;
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = KinoSearch::Plan::FullTextType->new(
-        analyzer      => KinoSearch::Analysis::Tokenizer->new,
+    my $type = Lucy::Plan::FullTextType->new(
+        analyzer      => Lucy::Analysis::Tokenizer->new,
         highlightable => 1,
     );
     $self->spec_field( name => 'content', type => $type );
@@ -38,8 +38,8 @@ use Test::More tests => 5;
 use Storable qw( freeze thaw );
 
 my $schema  = MySchema->new;
-my $folder  = KinoSearch::Store::RAMFolder->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $folder  = Lucy::Store::RAMFolder->new;
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -50,7 +50,7 @@ for ( 'a b c foo foo bar', $hasta ) {
 }
 $indexer->commit;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $doc_vec = $searcher->fetch_doc_vec(1);
 
 my $term_vector = $doc_vec->term_vector( field => "content", term => "foo" );
@@ -68,12 +68,12 @@ is( $term_vector->get_end_offsets->get(0),
 # Reopen the Folder under a new Schema with two fields.  The new field ("aux")
 # sorts lexically before "content" so that "content" will have a new field
 # num.  This tests the field num mapping during merging.
-my $alt_folder = KinoSearch::Store::RAMFolder->new;
+my $alt_folder = Lucy::Store::RAMFolder->new;
 my $alt_schema = MySchema->new;
 my $type       = $alt_schema->fetch_type('content');
 $alt_schema->spec_field( name => 'aux', type => $type );
 
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     schema => $alt_schema,
     index  => $alt_folder,
 );
@@ -86,14 +86,14 @@ for ( 'blah blah blah ', 'yada yada yada ' ) {
 }
 $indexer->commit;
 
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     schema => $alt_schema,
     index  => $alt_folder,
 );
 $indexer->add_index($folder);
 $indexer->commit;
 
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $alt_folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $alt_folder );
 my $hits = $searcher->hits( query => $hasta );
 my $hit_id = $hits->next->get_doc_id;
 $doc_vec = $searcher->fetch_doc_vec($hit_id);

@@ -36,7 +36,7 @@ GetOptions(
 );
 $num_reps = 1 unless defined $num_reps;
 
-my $bencher = BenchmarkingIndexer::KinoSearch->new(
+my $bencher = BenchmarkingIndexer::Lucy->new(
     docs      => $max_to_index,
     increment => $increment,
     store     => $store,

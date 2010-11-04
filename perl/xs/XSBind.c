@@ -17,7 +17,7 @@
 #define C_LUCY_OBJ
 #define NEED_newRV_noinc
 #include "XSBind.h"
-#include "KinoSearch/Util/StringHelper.h"
+#include "Lucy/Util/StringHelper.h"
 
 // Convert a Perl hash into a Clownfish Hash.  Caller takes responsibility for
 // a refcount.
@@ -45,7 +45,7 @@ XSBind_new_blank_obj(SV *either_sv)
 
     // Get a VTable. 
     if (   sv_isobject(either_sv) 
-        && sv_derived_from(either_sv, "KinoSearch::Object::Obj")
+        && sv_derived_from(either_sv, "Lucy::Object::Obj")
     ) {
         // Use the supplied object's VTable. 
         IV iv_ptr = SvIV(SvRV(either_sv));
@@ -178,7 +178,7 @@ XSBind_perl_to_cfish(SV *sv)
                 retval = (cfish_Obj*)S_perl_hash_to_cfish_hash((HV*)inner);
             }
             else if (   sv_isobject(sv) 
-                     && sv_derived_from(sv, "KinoSearch::Object::Obj")
+                     && sv_derived_from(sv, "Lucy::Object::Obj")
             ) {
                 IV tmp = SvIV(inner);
                 retval = INT2PTR(cfish_Obj*, tmp);

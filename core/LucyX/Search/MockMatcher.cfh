@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class LucyX::Search::MockMatcher inherits KinoSearch::Search::Matcher {
+class LucyX::Search::MockMatcher inherits Lucy::Search::Matcher {
 
     size_t    size;
     I32Array *doc_ids;

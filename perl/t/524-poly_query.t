@@ -22,21 +22,21 @@ use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( 'a', 'b', 'c c c d', 'c d', 'd' .. 'z', );
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $reader = $searcher->get_reader->get_seg_readers->[0];
 
-my $a_query = KinoSearch::Search::TermQuery->new(
+my $a_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'a'
 );
 
-my $b_query = KinoSearch::Search::TermQuery->new(
+my $b_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'b'
 );
 
 for my $conjunction (qw( AND OR )) {
-    my $class = "KinoSearch::Search::${conjunction}Query";
+    my $class = "Lucy::Search::${conjunction}Query";
     my $polyquery = $class->new( children => [ $a_query, $b_query ] );
 
     my $frozen = freeze($polyquery);
@@ -53,7 +53,7 @@ for my $conjunction (qw( AND OR )) {
     ok( !$polyquery->equals($one_child), '!equals (too few children)' );
 
     my $compiler = $polyquery->make_compiler( searcher => $searcher );
-    isa_ok( $compiler, "KinoSearch::Search::${conjunction}Compiler",
+    isa_ok( $compiler, "Lucy::Search::${conjunction}Compiler",
         "make_compiler" );
     $frozen = freeze($compiler);
     $thawed = thaw($frozen);
@@ -63,7 +63,7 @@ for my $conjunction (qw( AND OR )) {
         = $compiler->make_matcher( reader => $reader, need_score => 1 );
     isa_ok(
         $matcher,
-        "KinoSearch::Search::${conjunction}Scorer",
+        "Lucy::Search::${conjunction}Scorer",
         "make_matcher with need_score"
     );
 
@@ -71,15 +71,15 @@ for my $conjunction (qw( AND OR )) {
         ->make_matcher( reader => $reader, need_score => 0 );
     isa_ok(
         $term_matcher,
-        "KinoSearch::Search::TermScorer",
+        "Lucy::Search::TermScorer",
         "make_matcher compiles to child's scorer if there's only one child"
     );
 
-    my $hopeless_query = KinoSearch::Search::TermQuery->new(
+    my $hopeless_query = Lucy::Search::TermQuery->new(
         field => 'nyet',
         term  => 'nein',
     );
-    my $doomed_query = KinoSearch::Search::TermQuery->new(
+    my $doomed_query = Lucy::Search::TermQuery->new(
         field => 'luckless',
         term  => 'zero',
     );

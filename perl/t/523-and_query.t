@@ -22,20 +22,20 @@ use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( 'a', 'b', 'c c c d', 'c d', 'd' .. 'z', );
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $reader = $searcher->get_reader->get_seg_readers->[0];
 
-my $a_query = KinoSearch::Search::TermQuery->new(
+my $a_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'a'
 );
 
-my $b_query = KinoSearch::Search::TermQuery->new(
+my $b_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'b'
 );
 
-my $and_query = KinoSearch::Search::ANDQuery->new;
+my $and_query = Lucy::Search::ANDQuery->new;
 is( $and_query->to_string, "()", "to_string (empty)" );
 $and_query->add_child($a_query);
 $and_query->add_child($b_query);
@@ -47,17 +47,17 @@ ok( $and_query->equals($thawed), "equals" );
 $thawed->set_boost(10);
 ok( !$and_query->equals($thawed), '!equals (boost)' );
 
-my $different_children = KinoSearch::Search::ANDQuery->new(
+my $different_children = Lucy::Search::ANDQuery->new(
     children => [ $a_query, $a_query ],    # a_query added twice
 );
 ok( !$and_query->equals($different_children),
     '!equals (different children)' );
 
-my $one_child = KinoSearch::Search::ANDQuery->new( children => [$a_query] );
+my $one_child = Lucy::Search::ANDQuery->new( children => [$a_query] );
 ok( !$and_query->equals($one_child), '!equals (too few children)' );
 
 my $and_compiler = $and_query->make_compiler( searcher => $searcher );
-isa_ok( $and_compiler, "KinoSearch::Search::ANDCompiler", "make_compiler" );
+isa_ok( $and_compiler, "Lucy::Search::ANDCompiler", "make_compiler" );
 $frozen = freeze($and_compiler);
 $thawed = thaw($frozen);
 ok( $thawed->equals($and_compiler), "freeze/thaw compiler" );
@@ -66,17 +66,17 @@ my $and_scorer = $and_compiler->make_matcher(
     reader     => $reader,
     need_score => 0,
 );
-isa_ok( $and_scorer, "KinoSearch::Search::ANDScorer", "make_matcher" );
+isa_ok( $and_scorer, "Lucy::Search::ANDScorer", "make_matcher" );
 
 my $term_scorer = $one_child->make_compiler( searcher => $searcher )
     ->make_matcher( reader => $reader, need_score => 0 );
 isa_ok(
     $term_scorer,
-    "KinoSearch::Search::TermScorer",
+    "Lucy::Search::TermScorer",
     "make_matcher compiles to child's scorer if there's only one child"
 );
 
-my $hopeless_query = KinoSearch::Search::TermQuery->new(
+my $hopeless_query = Lucy::Search::TermQuery->new(
     field => 'nyet',
     term  => 'nein',
 );

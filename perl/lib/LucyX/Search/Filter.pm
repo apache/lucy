@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package LucyX::Search::Filter;
-BEGIN { our @ISA = qw( KinoSearch::Search::Query ) }
+BEGIN { our @ISA = qw( Lucy::Search::Query ) }
 use Carp;
 use Storable qw( nfreeze thaw );
 use Scalar::Util qw( blessed weaken );
@@ -31,9 +31,9 @@ our %cached_bits;
 sub new {
     my ( $either, %args ) = @_;
     my $query = delete $args{query};
-    confess("required parameter query is not a KinoSearch::Search::Query")
+    confess("required parameter query is not a Lucy::Search::Query")
         unless ( blessed($query)
-        && $query->isa('KinoSearch::Search::Query') );
+        && $query->isa('Lucy::Search::Query') );
     my $self = $either->SUPER::new(%args);
     $self->_init_cache;
     $query{$$self} = $query;
@@ -91,21 +91,21 @@ sub _bits {
 
     # Fill the cache.
     if ( !defined $cached_bits ) {
-        $cached_bits = KinoSearch::Object::BitVector->new(
+        $cached_bits = Lucy::Object::BitVector->new(
             capacity => $seg_reader->doc_max + 1 );
         $self->_store_cached_bits( $seg_reader, $cached_bits );
 
-        my $collector = KinoSearch::Search::Collector::BitCollector->new(
+        my $collector = Lucy::Search::Collector::BitCollector->new(
             bit_vector => $cached_bits );
 
-        my $polyreader = KinoSearch::Index::PolyReader->new(
+        my $polyreader = Lucy::Index::PolyReader->new(
             schema      => $seg_reader->get_schema,
             folder      => $seg_reader->get_folder,
             snapshot    => $seg_reader->get_snapshot,
             sub_readers => [$seg_reader],
         );
         my $searcher
-            = KinoSearch::Search::IndexSearcher->new( index => $polyreader );
+            = Lucy::Search::IndexSearcher->new( index => $polyreader );
 
         # Perform the search.
         $searcher->collect(
@@ -161,7 +161,7 @@ sub _cached_count {
 }
 
 package LucyX::Search::FilterCompiler;
-BEGIN { our @ISA = qw( KinoSearch::Search::Compiler ) }
+BEGIN { our @ISA = qw( Lucy::Search::Compiler ) }
 
 sub new {
     my ( $class, %args ) = @_;
@@ -180,7 +180,7 @@ sub make_matcher {
 }
 
 package LucyX::Search::FilterScorer;
-BEGIN { our @ISA = qw( KinoSearch::Search::Matcher ) }
+BEGIN { our @ISA = qw( Lucy::Search::Matcher ) }
 
 1;
 

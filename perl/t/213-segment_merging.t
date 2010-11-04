@@ -17,13 +17,13 @@ use strict;
 use warnings;
 
 use lib 'buildlib';
-use KinoSearch::Test;
+use Lucy::Test;
 
 package NonMergingIndexManager;
-use base qw( KinoSearch::Index::IndexManager );
+use base qw( Lucy::Index::IndexManager );
 
 sub recycle {
-    return KinoSearch::Object::VArray->new( capacity => 0 );
+    return Lucy::Object::VArray->new( capacity => 0 );
 }
 
 # BiggerSchema is like TestSchema, but it has an extra field named "aux".
@@ -31,12 +31,12 @@ sub recycle {
 # when an index created under TestSchema is opened/modified under
 # BiggerSchema.
 package BiggerSchema;
-use base qw( KinoSearch::Test::TestSchema );
+use base qw( Lucy::Test::TestSchema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = KinoSearch::Plan::FullTextType->new(
-        analyzer      => KinoSearch::Analysis::Tokenizer->new,
+    my $type = Lucy::Plan::FullTextType->new(
+        analyzer      => Lucy::Analysis::Tokenizer->new,
         highlightable => 1,
     );
     $self->spec_field( name => 'content', type => $type );
@@ -54,9 +54,9 @@ my $index_loc = init_test_index_loc();
 my $num_reps;
 {
     # Verify that optimization truly cuts down on the number of segments.
-    my $schema = KinoSearch::Test::TestSchema->new;
+    my $schema = Lucy::Test::TestSchema->new;
     for ( $num_reps = 1;; $num_reps++ ) {
-        my $indexer = KinoSearch::Index::Indexer->new(
+        my $indexer = Lucy::Index::Indexer->new(
             index  => $index_loc,
             schema => $schema,
         );
@@ -78,7 +78,7 @@ my $num_reps;
 my @correct;
 for my $num_letters ( reverse 1 .. 10 ) {
     my $truncate = $num_letters == 10 ? 1 : 0;
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         index    => $index_loc,
         truncate => $truncate,
     );
@@ -93,7 +93,7 @@ for my $num_letters ( reverse 1 .. 10 ) {
 
 {
     my $searcher
-        = KinoSearch::Search::IndexSearcher->new( index => $index_loc );
+        = Lucy::Search::IndexSearcher->new( index => $index_loc );
     my $hits = $searcher->hits( query => 'b' );
     is( $hits->total_hits, 10, "correct total_hits from merged index" );
     my @got;
@@ -105,8 +105,8 @@ for my $num_letters ( reverse 1 .. 10 ) {
 {
     # Reopen index under BiggerSchema and add some content.
     my $schema  = BiggerSchema->new;
-    my $folder  = KinoSearch::Store::FSFolder->new( path => $index_loc );
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $folder  = Lucy::Store::FSFolder->new( path => $index_loc );
+    my $indexer = Lucy::Index::Indexer->new(
         schema  => $schema,
         index   => $folder,
         manager => NonMergingIndexManager->new,
@@ -125,7 +125,7 @@ for my $num_letters ( reverse 1 .. 10 ) {
 
 {
     my $searcher
-        = KinoSearch::Search::IndexSearcher->new( index => $index_loc );
+        = Lucy::Search::IndexSearcher->new( index => $index_loc );
     my $hits = $searcher->hits( query => 'fish' );
     is( $hits->total_hits, 1, "correct total_hits after add_index" );
     is( $hits->next->{content},
@@ -136,9 +136,9 @@ for my $num_letters ( reverse 1 .. 10 ) {
     # Open an IndexReader, to prevent the deletion of files on Windows and
     # verify the file purging mechanism.
     my $schema  = BiggerSchema->new;
-    my $folder  = KinoSearch::Store::FSFolder->new( path => $index_loc );
-    my $reader  = KinoSearch::Index::IndexReader->open( index => $folder );
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $folder  = Lucy::Store::FSFolder->new( path => $index_loc );
+    my $reader  = Lucy::Index::IndexReader->open( index => $folder );
+    my $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => $folder,
     );
@@ -146,7 +146,7 @@ for my $num_letters ( reverse 1 .. 10 ) {
     $indexer->commit;
     $reader->close;
     undef $reader;
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => $folder,
     );
@@ -157,11 +157,11 @@ for my $num_letters ( reverse 1 .. 10 ) {
 is( num_segmeta($index_loc), 1, "merged segment files successfully deleted" );
 
 {
-    my $folder = KinoSearch::Store::RAMFolder->new;
-    my $schema = KinoSearch::Test::TestSchema->new;
+    my $folder = Lucy::Store::RAMFolder->new;
+    my $schema = Lucy::Test::TestSchema->new;
     my $number = 1;
     for ( 1 .. 3 ) {
-        my $indexer = KinoSearch::Index::Indexer->new(
+        my $indexer = Lucy::Index::Indexer->new(
             index   => $folder,
             schema  => $schema,
             manager => NonMergingIndexManager->new,
@@ -169,7 +169,7 @@ is( num_segmeta($index_loc), 1, "merged segment files successfully deleted" );
         $indexer->add_doc( { content => $number++ } ) for 1 .. 20;
         $indexer->commit;
     }
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         index  => $folder,
         schema => $schema,
     );
@@ -185,7 +185,7 @@ is( num_segmeta($index_loc), 1, "merged segment files successfully deleted" );
     );
 }
 
-is( KinoSearch::Store::FileHandle::object_count(),
+is( Lucy::Store::FileHandle::object_count(),
     0, "All FileHandle objects have been cleaned up" );
 
 sub num_segmeta {

@@ -43,13 +43,13 @@ my $folder = create_index(
     "A CANAL",
     "PANAMA"
 );
-my $schema = KinoSearch::Test::TestSchema->new;
+my $schema = Lucy::Test::TestSchema->new;
 
 my $snapshot
-    = KinoSearch::Index::Snapshot->new->read_file( folder => $folder );
-my $segment = KinoSearch::Index::Segment->new( number => 1 );
+    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $segment = Lucy::Index::Segment->new( number => 1 );
 $segment->read_file($folder);
-my $lex_reader = KinoSearch::Index::DefaultLexiconReader->new(
+my $lex_reader = Lucy::Index::DefaultLexiconReader->new(
     schema   => $schema,
     folder   => $folder,
     snapshot => $snapshot,

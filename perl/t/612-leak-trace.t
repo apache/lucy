@@ -22,13 +22,13 @@ use Test::More ( HAS_LEAKTRACE && USE_LEAKTRACE )
     ? ( tests => 1 )
     : ( skip_all => 'require Test::LeakTrace' );
 use Test::LeakTrace;
-use KinoSearch::Test;
+use Lucy::Test;
 
 leaks_cmp_ok {
-    my $folder = KinoSearch::Store::RAMFolder->new;
-    my $schema = KinoSearch::Test::TestSchema->new;
+    my $folder = Lucy::Store::RAMFolder->new;
+    my $schema = Lucy::Test::TestSchema->new;
 
-    my $indexer = KinoSearch::Indexer->new(
+    my $indexer = Lucy::Indexer->new(
         index  => $folder,
         schema => $schema,
     );

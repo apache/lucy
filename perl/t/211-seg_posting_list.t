@@ -21,9 +21,9 @@ use Test::More tests => 2004;
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( qw( a b c ), 'c c d' );
-my $polyreader   = KinoSearch::Index::IndexReader->open( index => $folder );
+my $polyreader   = Lucy::Index::IndexReader->open( index => $folder );
 my $reader       = $polyreader->get_seg_readers->[0];
-my $plist_reader = $reader->fetch("KinoSearch::Index::PostingListReader");
+my $plist_reader = $reader->fetch("Lucy::Index::PostingListReader");
 
 my $plist = $plist_reader->posting_list( field => 'content', term => 'c' );
 
@@ -42,11 +42,11 @@ $plist->seek('c');
 $plist->next;
 is( $plist->get_posting->get_doc_id, 3, "seek" );
 
-$folder = KinoSearch::Store::RAMFolder->new;
+$folder = Lucy::Store::RAMFolder->new;
 
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
-    schema => KinoSearch::Test::TestSchema->new,
+    schema => Lucy::Test::TestSchema->new,
 );
 for ( 0 .. 100 ) {
     my $content = 'a ';
@@ -57,9 +57,9 @@ for ( 0 .. 100 ) {
     $indexer->add_doc( { content => $content } );
 }
 $indexer->commit;
-$polyreader   = KinoSearch::Index::IndexReader->open( index => $folder );
+$polyreader   = Lucy::Index::IndexReader->open( index => $folder );
 $reader       = $polyreader->get_seg_readers->[0];
-$plist_reader = $reader->fetch("KinoSearch::Index::PostingListReader");
+$plist_reader = $reader->fetch("Lucy::Index::PostingListReader");
 
 for my $letter (qw( a b c d e )) {
     my $skipping_plist = $plist_reader->posting_list(

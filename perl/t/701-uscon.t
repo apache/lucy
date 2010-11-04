@@ -21,9 +21,9 @@ use Test::More tests => 9;
 use Lucy::Test::TestUtils qw( persistent_test_index_loc );
 use Lucy::Test::USConSchema;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new(
+my $searcher = Lucy::Search::IndexSearcher->new(
     index => persistent_test_index_loc() );
-isa_ok( $searcher, 'KinoSearch::Search::IndexSearcher' );
+isa_ok( $searcher, 'Lucy::Search::IndexSearcher' );
 
 my %searches = (
     'United'              => 34,

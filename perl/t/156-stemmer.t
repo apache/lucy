@@ -20,12 +20,12 @@ use lib 'buildlib';
 use Test::More tests => 9;
 use Lucy::Test::TestUtils qw( test_analyzer );
 
-my $stemmer = KinoSearch::Analysis::Stemmer->new( language => 'en' );
+my $stemmer = Lucy::Analysis::Stemmer->new( language => 'en' );
 test_analyzer( $stemmer, 'ponies', ['poni'], "single word stemmed" );
 test_analyzer( $stemmer, 'pony',   ['poni'], "stem, not just truncate" );
 
-my $tokenizer    = KinoSearch::Analysis::Tokenizer->new;
-my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+my $tokenizer    = Lucy::Analysis::Tokenizer->new;
+my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
     analyzers => [ $tokenizer, $stemmer ], );
 test_analyzer(
     $polyanalyzer,

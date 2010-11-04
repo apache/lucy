@@ -25,14 +25,14 @@ extern "C" {
 #endif
 
 #include "charmony.h"
-#include "KinoSearch/Object/Obj.h"
-#include "KinoSearch/Object/ByteBuf.h"
-#include "KinoSearch/Object/CharBuf.h"
-#include "KinoSearch/Object/Err.h"
-#include "KinoSearch/Object/Hash.h"
-#include "KinoSearch/Object/Num.h"
-#include "KinoSearch/Object/VArray.h"
-#include "KinoSearch/Object/VTable.h"
+#include "Lucy/Object/Obj.h"
+#include "Lucy/Object/ByteBuf.h"
+#include "Lucy/Object/CharBuf.h"
+#include "Lucy/Object/Err.h"
+#include "Lucy/Object/Hash.h"
+#include "Lucy/Object/Num.h"
+#include "Lucy/Object/VArray.h"
+#include "Lucy/Object/VTable.h"
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -149,7 +149,7 @@ cfish_XSBind_enable_overload(void *pobj);
  * length of the paramter name.  A NULL pointer terminates the list:
  *
  *     cfish_XSBind_allot_params(stack, start, num_stack_elems, 
- *         "KinoSearch::Search::TermQuery::new_PARAMS", 
+ *         "Lucy::Search::TermQuery::new_PARAMS", 
  *          &field_sv, "field", 5,
  *          &term_sv, "term", 4,
  *          NULL);

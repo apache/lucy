@@ -31,14 +31,14 @@ BEGIN {
 }
 
 package SortSchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
-    my $plain_type = KinoSearch::Plan::FullTextType->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new );
-    my $string_type = KinoSearch::Plan::StringType->new( sortable => 1 );
+    my $plain_type = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::Tokenizer->new );
+    my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
     $self->spec_field( name => 'content', type => $plain_type );
     $self->spec_field( name => 'number',  type => $string_type );
     return $self;
@@ -46,7 +46,7 @@ sub new {
 
 package main;
 
-use KinoSearch::Test;
+use Lucy::Test;
 use LucyX::Remote::SearchServer;
 use LucyX::Remote::SearchClient;
 
@@ -57,8 +57,8 @@ if ($kid) {
     die "Failed fork: $!" unless defined $kid;
 }
 else {
-    my $folder  = KinoSearch::Store::RAMFolder->new;
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $folder  = Lucy::Store::RAMFolder->new;
+    my $indexer = Lucy::Index::Indexer->new(
         index  => $folder,
         schema => SortSchema->new,
     );
@@ -69,7 +69,7 @@ else {
     }
     $indexer->commit;
 
-    my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+    my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
     my $server = LucyX::Remote::SearchServer->new(
         port     => $PORT_NUM,
         searcher => $searcher,
@@ -101,10 +101,10 @@ is( $searchclient->doc_freq( field => 'content', term => 'x' ),
     3, "doc_freq" );
 is( $searchclient->doc_max, 3, "doc_max" );
 isa_ok( $searchclient->fetch_doc(1),
-    "KinoSearch::Document::HitDoc", "fetch_doc" );
+    "Lucy::Document::HitDoc", "fetch_doc" );
 isa_ok(
     $searchclient->fetch_doc_vec(1),
-    "KinoSearch::Index::DocVector",
+    "Lucy::Index::DocVector",
     "fetch_doc_vec"
 );
 
@@ -114,10 +114,10 @@ is( $hits->total_hits, 3, "retrieved hits from search server" );
 $hits = $searchclient->hits( query => 'a' );
 is( $hits->total_hits, 1, "retrieved hit from search server" );
 
-my $folder_b = KinoSearch::Store::RAMFolder->new;
+my $folder_b = Lucy::Store::RAMFolder->new;
 my $number   = 6;
 for (qw( a b c )) {
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         index  => $folder_b,
         schema => SortSchema->new,
     );
@@ -128,10 +128,10 @@ for (qw( a b c )) {
 }
 
 my $searcher_b
-    = KinoSearch::Search::IndexSearcher->new( index => $folder_b, );
-is( ref( $searcher_b->get_reader ), 'KinoSearch::Index::PolyReader', );
+    = Lucy::Search::IndexSearcher->new( index => $folder_b, );
+is( ref( $searcher_b->get_reader ), 'Lucy::Index::PolyReader', );
 
-my $poly_searcher = KinoSearch::Search::PolySearcher->new(
+my $poly_searcher = Lucy::Search::PolySearcher->new(
     schema    => SortSchema->new,
     searchers => [ $searcher_b, $searchclient ],
 );
@@ -146,10 +146,10 @@ my %expected = ( 'x b' => 1, 'y b' => 1, );
 
 is_deeply( \%results, \%expected, "docs fetched from both local and remote" );
 
-my $sort_spec = KinoSearch::Search::SortSpec->new(
+my $sort_spec = Lucy::Search::SortSpec->new(
     rules => [
-        KinoSearch::Search::SortRule->new( field => 'number' ),
-        KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        Lucy::Search::SortRule->new( field => 'number' ),
+        Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ],
 );
 $hits = $poly_searcher->hits(
@@ -161,10 +161,10 @@ my @got;
 while ( my $hit = $hits->next ) {
     push @got, $hit->{content};
 }
-$sort_spec = KinoSearch::Search::SortSpec->new(
+$sort_spec = Lucy::Search::SortSpec->new(
     rules => [
-        KinoSearch::Search::SortRule->new( field => 'number', reverse => 1 ),
-        KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        Lucy::Search::SortRule->new( field => 'number', reverse => 1 ),
+        Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ],
 );
 $hits = $poly_searcher->hits(

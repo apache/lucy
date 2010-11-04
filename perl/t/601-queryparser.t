@@ -17,57 +17,57 @@ use strict;
 use warnings;
 
 use lib 'buildlib';
-use KinoSearch::Test;
+use Lucy::Test;
 
 package PlainSchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $tokenizer = KinoSearch::Analysis::Tokenizer->new( pattern => '\S+' );
-    my $type = KinoSearch::Plan::FullTextType->new( analyzer => $tokenizer, );
+    my $tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '\S+' );
+    my $type = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }
 
 package StopSchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
     my $whitespace_tokenizer
-        = KinoSearch::Analysis::Tokenizer->new( token_re => qr/\S+/ );
+        = Lucy::Analysis::Tokenizer->new( token_re => qr/\S+/ );
     my $stopalizer
-        = KinoSearch::Analysis::Stopalizer->new( stoplist => { x => 1 } );
-    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+        = Lucy::Analysis::Stopalizer->new( stoplist => { x => 1 } );
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $whitespace_tokenizer, $stopalizer, ], );
     my $type
-        = KinoSearch::Plan::FullTextType->new( analyzer => $polyanalyzer, );
+        = Lucy::Plan::FullTextType->new( analyzer => $polyanalyzer, );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }
 
 package MyTermQuery;
-use base qw( KinoSearch::Search::TermQuery );
+use base qw( Lucy::Search::TermQuery );
 
 package MyPhraseQuery;
-use base qw( KinoSearch::Search::PhraseQuery );
+use base qw( Lucy::Search::PhraseQuery );
 
 package MyANDQuery;
-use base qw( KinoSearch::Search::ANDQuery );
+use base qw( Lucy::Search::ANDQuery );
 
 package MyORQuery;
-use base qw( KinoSearch::Search::ORQuery );
+use base qw( Lucy::Search::ORQuery );
 
 package MyNOTQuery;
-use base qw( KinoSearch::Search::NOTQuery );
+use base qw( Lucy::Search::NOTQuery );
 
 package MyReqOptQuery;
-use base qw( KinoSearch::Search::RequiredOptionalQuery );
+use base qw( Lucy::Search::RequiredOptionalQuery );
 
 package MyQueryParser;
-use base qw( KinoSearch::Search::QueryParser );
+use base qw( Lucy::Search::QueryParser );
 
 sub make_term_query    { shift; MyTermQuery->new(@_) }
 sub make_phrase_query  { shift; MyPhraseQuery->new(@_) }
@@ -78,20 +78,20 @@ sub make_req_opt_query { shift; MyReqOptQuery->new(@_) }
 
 package main;
 use Test::More tests => 224;
-use KinoSearch::Util::StringHelper qw( utf8_flag_on utf8ify );
+use Lucy::Util::StringHelper qw( utf8_flag_on utf8ify );
 use Lucy::Test::TestUtils qw( create_index );
 
-my $folder       = KinoSearch::Store::RAMFolder->new;
-my $stop_folder  = KinoSearch::Store::RAMFolder->new;
+my $folder       = Lucy::Store::RAMFolder->new;
+my $stop_folder  = Lucy::Store::RAMFolder->new;
 my $plain_schema = PlainSchema->new;
 my $stop_schema  = StopSchema->new;
 
 my @docs = ( 'x', 'y', 'z', 'x a', 'x a b', 'x a b c', 'x foo a b c d', );
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $plain_schema,
 );
-my $stop_indexer = KinoSearch::Index::Indexer->new(
+my $stop_indexer = Lucy::Index::Indexer->new(
     index  => $stop_folder,
     schema => $stop_schema,
 );
@@ -104,8 +104,8 @@ $indexer->commit;
 $stop_indexer->commit;
 
 my $OR_parser
-    = KinoSearch::Search::QueryParser->new( schema => $plain_schema, );
-my $AND_parser = KinoSearch::Search::QueryParser->new(
+    = Lucy::Search::QueryParser->new( schema => $plain_schema, );
+my $AND_parser = Lucy::Search::QueryParser->new(
     schema         => $plain_schema,
     default_boolop => 'AND',
 );
@@ -113,17 +113,17 @@ $OR_parser->set_heed_colons(1);
 $AND_parser->set_heed_colons(1);
 
 my $OR_stop_parser
-    = KinoSearch::Search::QueryParser->new( schema => $stop_schema, );
-my $AND_stop_parser = KinoSearch::Search::QueryParser->new(
+    = Lucy::Search::QueryParser->new( schema => $stop_schema, );
+my $AND_stop_parser = Lucy::Search::QueryParser->new(
     schema         => $stop_schema,
     default_boolop => 'AND',
 );
 $OR_stop_parser->set_heed_colons(1);
 $AND_stop_parser->set_heed_colons(1);
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $stop_searcher
-    = KinoSearch::Search::IndexSearcher->new( index => $stop_folder );
+    = Lucy::Search::IndexSearcher->new( index => $stop_folder );
 
 my @logical_tests = (
 
@@ -227,7 +227,7 @@ my $motorhead = "Mot\xF6rhead";
 utf8ify($motorhead);
 my $unicode_folder = create_index($motorhead);
 $searcher
-    = KinoSearch::Search::IndexSearcher->new( index => $unicode_folder );
+    = Lucy::Search::IndexSearcher->new( index => $unicode_folder );
 
 my $hits = $searcher->hits( query => 'Mot' );
 is( $hits->total_hits, 0, "Pre-test - indexing worked properly" );

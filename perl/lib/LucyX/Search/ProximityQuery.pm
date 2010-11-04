@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package LucyX::Search::ProximityQuery;
-use KinoSearch;
+use Lucy;
 
 1;
 

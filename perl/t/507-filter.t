@@ -19,12 +19,12 @@ use lib 'buildlib';
 
 use Test::More tests => 24;
 use Storable qw( nfreeze thaw );
-use KinoSearch::Test;
+use Lucy::Test;
 use Lucy::Test::TestUtils qw( create_index );
 use LucyX::Search::Filter;
 
-my $query_parser = KinoSearch::Search::QueryParser->new(
-    schema => KinoSearch::Test::TestSchema->new );
+my $query_parser = Lucy::Search::QueryParser->new(
+    schema => Lucy::Test::TestSchema->new );
 
 ## Set up main objects.
 my ( $filter_1, $filter_2 );
@@ -33,14 +33,14 @@ my ( $filter_1, $filter_2 );
     my $folder_2 = create_index( 'a w', 'b w', 'c w', 'a z', 'b z', 'c z' );
 
     my $searcher_1
-        = KinoSearch::Search::IndexSearcher->new( index => $folder_1 );
+        = Lucy::Search::IndexSearcher->new( index => $folder_1 );
     my $searcher_2
-        = KinoSearch::Search::IndexSearcher->new( index => $folder_2 );
+        = Lucy::Search::IndexSearcher->new( index => $folder_2 );
 
     my $reader_1 = $searcher_1->get_reader->get_seg_readers->[0];
     my $reader_2 = $searcher_2->get_reader->get_seg_readers->[0];
 
-    my $only_a_query = KinoSearch::Search::TermQuery->new(
+    my $only_a_query = Lucy::Search::TermQuery->new(
         field => 'content',
         term  => 'a',
     );
@@ -115,7 +115,7 @@ my ( $filter_1, $filter_2 );
 
 sub filt_query {
     my ( $filter, $query_string ) = @_;
-    return KinoSearch::Search::ANDQuery->new(
+    return Lucy::Search::ANDQuery->new(
         children => [ $filter, $query_parser->parse($query_string) ], );
 }
 

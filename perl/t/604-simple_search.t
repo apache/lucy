@@ -17,13 +17,13 @@ use strict;
 use warnings;
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = KinoSearch::Plan::FullTextType->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new, );
+    my $type = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::Tokenizer->new, );
     $self->spec_field( name => 'title', type => $type );
     $self->spec_field( name => 'body',  type => $type );
     return $self;
@@ -32,11 +32,11 @@ sub new {
 package main;
 
 use Test::More tests => 12;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = MySchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -54,15 +54,15 @@ while ( my ( $title, $body ) = each %docs ) {
 }
 $indexer->commit;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
-my $tokenizer = KinoSearch::Analysis::Tokenizer->new;
-my $or_parser = KinoSearch::Search::QueryParser->new(
+my $tokenizer = Lucy::Analysis::Tokenizer->new;
+my $or_parser = Lucy::Search::QueryParser->new(
     schema   => $schema,
     analyzer => $tokenizer,
     fields   => [ 'title', 'body', ],
 );
-my $and_parser = KinoSearch::Search::QueryParser->new(
+my $and_parser = Lucy::Search::QueryParser->new(
     schema         => $schema,
     analyzer       => $tokenizer,
     fields         => [ 'title', 'body', ],

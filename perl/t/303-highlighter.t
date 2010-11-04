@@ -18,18 +18,18 @@ use warnings;
 use lib 'buildlib';
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $class      = shift;
     my $self       = $class->SUPER::new(@_);
-    my $tokenizer  = KinoSearch::Analysis::Tokenizer->new;
-    my $plain_type = KinoSearch::Plan::FullTextType->new(
+    my $tokenizer  = Lucy::Analysis::Tokenizer->new;
+    my $plain_type = Lucy::Plan::FullTextType->new(
         analyzer      => $tokenizer,
         highlightable => 1,
     );
-    my $dunked_type = KinoSearch::Plan::FullTextType->new(
+    my $dunked_type = Lucy::Plan::FullTextType->new(
         analyzer      => $tokenizer,
         highlightable => 1,
         boost         => 0.1,
@@ -40,7 +40,7 @@ sub new {
 }
 
 package MyHighlighter;
-use base qw( KinoSearch::Highlight::Highlighter );
+use base qw( Lucy::Highlight::Highlighter );
 
 sub encode {
     my ( $self, $text ) = @_;
@@ -56,7 +56,7 @@ sub highlight {
 package main;
 
 use Test::More tests => 34;
-use KinoSearch::Test;
+use Lucy::Test;
 
 binmode( STDOUT, ":utf8" );
 
@@ -68,8 +68,8 @@ $string .= "$phi a b c d x y z h i j k ";
 $string .= '6 7 8 9 0 ' x 20;
 my $with_quotes = '"I see," said the blind man.';
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $folder  = Lucy::Store::RAMFolder->new;
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => MySchema->new,
 );
@@ -82,18 +82,18 @@ $indexer->add_doc(
 );
 $indexer->commit;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $q    = qq|"x y z" AND $phi|;
 my $hits = $searcher->hits( query => $q );
-my $hl   = KinoSearch::Highlight::Highlighter->new(
+my $hl   = Lucy::Highlight::Highlighter->new(
     searcher       => $searcher,
     query          => $q,
     field          => 'content',
     excerpt_length => 3,
 );
 
-my $target = KinoSearch::Object::ViewCharBuf->_new("");
+my $target = Lucy::Object::ViewCharBuf->_new("");
 
 my $field_val = make_cb("a $phi $phi b c");
 my $top       = $hl->_find_best_fragment(
@@ -137,7 +137,7 @@ is( $target->to_perl,
 is( $top, 0, "correct offset" );
 undef $target;
 
-$hl = KinoSearch::Highlight::Highlighter->new(
+$hl = Lucy::Highlight::Highlighter->new(
     searcher       => $searcher,
     query          => $q,
     field          => 'content',
@@ -196,7 +196,7 @@ $top       = $hl->_raw_excerpt(
 is( $target->to_perl, "Iz no\x{2026}", "Ellipsis at end" );
 is( $top, 6, "top trimmed" );
 
-$hl = KinoSearch::Highlight::Highlighter->new(
+$hl = Lucy::Highlight::Highlighter->new(
     searcher       => $searcher,
     query          => $q,
     field          => 'content',
@@ -238,7 +238,7 @@ like(
     "Highlight_Excerpt pays attention to offset"
 );
 
-$hl = KinoSearch::Highlight::Highlighter->new(
+$hl = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
     query    => $q,
     field    => 'content',
@@ -267,7 +267,7 @@ like( $hl->create_excerpt( $hits->next() ),
     "excerpt field with partial hit doesn't cause highlighter freakout" );
 
 $hits = $searcher->hits( query => $q = 'x "x y z" AND b' );
-$hl = KinoSearch::Highlight::Highlighter->new(
+$hl = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
     query    => $q,
     field    => 'content',
@@ -279,7 +279,7 @@ like( $excerpt, qr/x y z/,
 
 $hits = $searcher->hits( query => $q = 'blind' );
 like(
-    KinoSearch::Highlight::Highlighter->new(
+    Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
         query    => $q,
         field    => 'content',
@@ -290,7 +290,7 @@ like(
 
 $hits = $searcher->hits( query => $q = 'why' );
 unlike(
-    KinoSearch::Highlight::Highlighter->new(
+    Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
         query    => $q,
         field    => 'content',
@@ -299,14 +299,14 @@ unlike(
     "no ellipsis for short excerpt"
 );
 
-my $term_query = KinoSearch::Search::TermQuery->new(
+my $term_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'x',
 );
 $hits = $searcher->hits( query => $term_query );
 $hit = $hits->next();
 like(
-    KinoSearch::Highlight::Highlighter->new(
+    Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
         query    => $term_query,
         field    => 'content',
@@ -315,7 +315,7 @@ like(
     "specify field highlights correct field..."
 );
 unlike(
-    KinoSearch::Highlight::Highlighter->new(
+    Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
         query    => $term_query,
         field    => 'alt',
@@ -325,7 +325,7 @@ unlike(
 );
 
 my $sentence_text = 'This is a sentence. ' x 15;
-$hl = KinoSearch::Highlight::Highlighter->new(
+$hl = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
     query    => $q,
     field    => 'content',
@@ -375,15 +375,15 @@ like( $hl->create_excerpt($hit),
     qr/\*wise\*/, "override both Encode() and Highlight()" );
 
 sub make_cb {
-    return KinoSearch::Object::CharBuf->new(shift);
+    return Lucy::Object::CharBuf->new(shift);
 }
 
 sub make_heat_map {
-    return KinoSearch::Highlight::HeatMap->new( spans => make_spans(@_) );
+    return Lucy::Highlight::HeatMap->new( spans => make_spans(@_) );
 }
 
 sub make_span {
-    return KinoSearch::Search::Span->new(
+    return Lucy::Search::Span->new(
         offset => $_[0],
         length => $_[1],
         weight => $_[2],
@@ -391,7 +391,7 @@ sub make_span {
 }
 
 sub make_spans {
-    my $spans = KinoSearch::Object::VArray->new( capacity => scalar @_ );
+    my $spans = Lucy::Object::VArray->new( capacity => scalar @_ );
     for my $span_spec (@_) {
         $spans->push( make_span( @{$span_spec}[ 0 .. 2 ] ) );
     }

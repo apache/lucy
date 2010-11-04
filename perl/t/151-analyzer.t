@@ -21,7 +21,7 @@ use Test::More tests => 5;
 use Lucy::Test::TestUtils qw( utf8_test_strings test_analyzer );
 
 package TestAnalyzer;
-use base qw( KinoSearch::Analysis::Analyzer );
+use base qw( Lucy::Analysis::Analyzer );
 sub transform { $_[1] }    # satisfy mandatory override
 
 package main;

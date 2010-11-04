@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package LucyX::Remote::SearchServer;
-BEGIN { our @ISA = qw( KinoSearch::Object::Obj ) }
+BEGIN { our @ISA = qw( Lucy::Object::Obj ) }
 use Carp;
 use Storable qw( nfreeze thaw );
 use bytes;

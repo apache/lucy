@@ -18,12 +18,12 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 9;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $schema  = KinoSearch::Test::TestSchema->new;
+my $schema  = Lucy::Test::TestSchema->new;
 my $type    = $schema->fetch_type('content');
-my $folder  = KinoSearch::Store::RAMFolder->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $folder  = Lucy::Store::RAMFolder->new;
+my $indexer = Lucy::Index::Indexer->new(
     schema => $schema,
     index  => $folder,
 );
@@ -54,7 +54,7 @@ $indexer->add_doc( \%three_fields );
 pass('Add another field');
 $indexer->commit;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 my $hits = $searcher->hits( query => 'x', num_wanted => 100 );
 is( $hits->total_hits, 3,
     "disparate docs successfully indexed and retrieved" );
@@ -62,10 +62,10 @@ my $top_hit = $hits->next;
 is_deeply( $top_hit->get_fields, \%three_fields,
     "all fields stored successfully" );
 
-my $schema2 = KinoSearch::Test::TestSchema->new;
-my $folder2 = KinoSearch::Store::RAMFolder->new;
+my $schema2 = Lucy::Test::TestSchema->new;
+my $folder2 = Lucy::Store::RAMFolder->new;
 $schema2->spec_field( name => 'foo', type => $type );
-my $indexer2 = KinoSearch::Index::Indexer->new(
+my $indexer2 = Lucy::Index::Indexer->new(
     schema => $schema2,
     index  => $folder2,
 );
@@ -73,7 +73,7 @@ $indexer2->add_doc( \%foo_doc );
 $indexer2->commit;
 
 undef $indexer;
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     schema => $schema,
     index  => $folder,
 );
@@ -86,7 +86,7 @@ $indexer->add_doc( \%five_fields );
 pass('successfully absorbed new field def during add_index');
 $indexer->commit;
 
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 $hits = $searcher->hits( query => 'stuff', num_wanted => 100 );
 is( $hits->total_hits, 1,
     "successfully aborbed unknown field during add_index" );

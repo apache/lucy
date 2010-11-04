@@ -138,12 +138,12 @@ $c_file_syms
 #define C_LUCY_VTABLE
 #define C_LUCY_ZOMBIECHARBUF
 #include "boil.h"
-#include "KinoSearch/Object/VTable.h"
-#include "KinoSearch/Object/CharBuf.h"
-#include "KinoSearch/Object/Err.h"
-#include "KinoSearch/Object/Hash.h"
-#include "KinoSearch/Object/Host.h"
-#include "KinoSearch/Object/VArray.h"
+#include "Lucy/Object/VTable.h"
+#include "Lucy/Object/CharBuf.h"
+#include "Lucy/Object/Err.h"
+#include "Lucy/Object/Hash.h"
+#include "Lucy/Object/Host.h"
+#include "Lucy/Object/VArray.h"
 
 $content
 

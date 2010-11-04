@@ -18,12 +18,12 @@ use warnings;
 use lib 'buildlib';
 
 package MyTokenizer;
-use base qw( KinoSearch::Analysis::Analyzer );
-use KinoSearch::Analysis::Inversion;
+use base qw( Lucy::Analysis::Analyzer );
+use Lucy::Analysis::Inversion;
 
 sub transform {
     my ( $self, $inversion ) = @_;
-    my $new_inversion = KinoSearch::Analysis::Inversion->new;
+    my $new_inversion = Lucy::Analysis::Inversion->new;
 
     while ( my $token = $inversion->next ) {
         for ( $token->get_text ) {
@@ -33,7 +33,7 @@ sub transform {
                 # Special boost just for one doc.
                 my $boost = ( $1 eq 'a' and $this_time ) ? 100 : 1;
                 $new_inversion->append(
-                    KinoSearch::Analysis::Token->new(
+                    Lucy::Analysis::Token->new(
                         text         => "$1",
                         start_offset => $-[0],
                         end_offset   => $+[0],
@@ -54,26 +54,26 @@ sub equals {
 }
 
 package RichSim;
-use base qw( KinoSearch::Index::Similarity );
-use KinoSearch::Index::Posting::RichPosting;
+use base qw( Lucy::Index::Similarity );
+use Lucy::Index::Posting::RichPosting;
 
 sub make_posting {
-    KinoSearch::Index::Posting::RichPosting->new( similarity => shift );
+    Lucy::Index::Posting::RichPosting->new( similarity => shift );
 }
 
 package MySchema::boosted;
-use base qw( KinoSearch::Plan::FullTextType );
+use base qw( Lucy::Plan::FullTextType );
 
 sub make_similarity { RichSim->new }
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
-    my $plain_type = KinoSearch::Plan::FullTextType->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new );
+    my $plain_type = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::Tokenizer->new );
     my $boosted_type
         = MySchema::boosted->new( analyzer => MyTokenizer->new, );
     $self->spec_field( name => 'plain',   type => $plain_type );
@@ -91,8 +91,8 @@ my $best    = "x x x a a a a a a a a a a";
 my $boosted = "z x x a x x x x x x x x x";
 
 my $schema  = MySchema->new;
-my $folder  = KinoSearch::Store::RAMFolder->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $folder  = Lucy::Store::RAMFolder->new;
+my $indexer = Lucy::Index::Indexer->new(
     schema => $schema,
     index  => $folder,
 );
@@ -102,9 +102,9 @@ for ( $good, $better, $best, $boosted ) {
 }
 $indexer->commit;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
-my $q_for_plain = KinoSearch::Search::TermQuery->new(
+my $q_for_plain = Lucy::Search::TermQuery->new(
     field => 'plain',
     term  => 'a',
 );
@@ -112,7 +112,7 @@ my $hits = $searcher->hits( query => $q_for_plain );
 is( $hits->next->{plain},
     $best, "verify that search on unboosted field returns best match" );
 
-my $q_for_boosted = KinoSearch::Search::TermQuery->new(
+my $q_for_boosted = Lucy::Search::TermQuery->new(
     field => 'boosted',
     term  => 'a',
 );

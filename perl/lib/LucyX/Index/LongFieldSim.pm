@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package LucyX::Index::LongFieldSim;
-use base qw( KinoSearch::Index::Similarity );
+use base qw( Lucy::Index::Similarity );
 
 sub length_norm {
     my ( $self, $num_tokens ) = @_;

@@ -33,26 +33,26 @@ my $dir      = init_test_index_loc();
 my $filename = 'hogus_bogus';
 my $filepath = catfile( $dir, $filename );
 my ( $outstream, $instream );
-my $folder = KinoSearch::Store::FSFolder->new( path => $dir );
+my $folder = Lucy::Store::FSFolder->new( path => $dir );
 my $foo;
 
 sub new_outstream {
     undef $outstream;
     unlink $filepath;
-    my $fh = KinoSearch::Store::FSFileHandle->open(
+    my $fh = Lucy::Store::FSFileHandle->open(
         path       => $filepath,
         create     => 1,
         write_only => 1,
         exclusive  => 1,
     );
-    my $outstream = KinoSearch::Store::OutStream->open( file => $fh )
-        or confess KinoSearch->error;
+    my $outstream = Lucy::Store::OutStream->open( file => $fh )
+        or confess Lucy->error;
     return $outstream;
 }
 
 sub new_instream {
     undef $instream;
-    return $folder->open_in($filename) || confess KinoSearch->error;
+    return $folder->open_in($filename) || confess Lucy->error;
 }
 
 $outstream = new_outstream();

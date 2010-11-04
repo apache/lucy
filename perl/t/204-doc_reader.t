@@ -19,24 +19,24 @@ use warnings;
 use Test::More tests => 5;
 
 package TestAnalyzer;
-use base qw( KinoSearch::Analysis::Analyzer );
+use base qw( Lucy::Analysis::Analyzer );
 sub transform { $_[1] }
 
 package main;
 use Encode qw( _utf8_on );
-use KinoSearch::Test;
+use Lucy::Test;
 
 sub new_schema {
-    my $schema   = KinoSearch::Plan::Schema->new;
+    my $schema   = Lucy::Plan::Schema->new;
     my $analyzer = TestAnalyzer->new;
     my $fulltext
-        = KinoSearch::Plan::FullTextType->new( analyzer => $analyzer );
-    my $bin = KinoSearch::Plan::BlobType->new( stored => 1 );
-    my $not_stored = KinoSearch::Plan::FullTextType->new(
+        = Lucy::Plan::FullTextType->new( analyzer => $analyzer );
+    my $bin = Lucy::Plan::BlobType->new( stored => 1 );
+    my $not_stored = Lucy::Plan::FullTextType->new(
         analyzer => $analyzer,
         stored   => 0,
     );
-    my $float64 = KinoSearch::Plan::Float64Type->new( indexed => 0 );
+    my $float64 = Lucy::Plan::Float64Type->new( indexed => 0 );
     $schema->spec_field( name => 'text',     type => $fulltext );
     $schema->spec_field( name => 'bin',      type => $bin );
     $schema->spec_field( name => 'unstored', type => $not_stored );
@@ -50,10 +50,10 @@ sub new_schema {
 my $bin_val = my $val = "a b c \xe2\x98\xA0 \0a";
 _utf8_on($val);
 
-my $folder = KinoSearch::Store::RAMFolder->new;
+my $folder = Lucy::Store::RAMFolder->new;
 my $schema = new_schema();
 
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
     create => 1,
@@ -69,10 +69,10 @@ $indexer->add_doc(
 $indexer->commit;
 
 my $snapshot
-    = KinoSearch::Index::Snapshot->new->read_file( folder => $folder );
-my $segment = KinoSearch::Index::Segment->new( number => 1 );
+    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $segment = Lucy::Index::Segment->new( number => 1 );
 $segment->read_file($folder);
-my $doc_reader = KinoSearch::Index::DefaultDocReader->new(
+my $doc_reader = Lucy::Index::DefaultDocReader->new(
     schema   => $schema,
     folder   => $folder,
     snapshot => $snapshot,

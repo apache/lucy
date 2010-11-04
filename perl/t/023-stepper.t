@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 package MyStepper;
-use base qw( KinoSearch::Util::Stepper );
+use base qw( Lucy::Util::Stepper );
 
 our %number;
 
@@ -43,13 +43,13 @@ sub read_record {
 
 package main;
 use Test::More tests => 1;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $folder = KinoSearch::Store::RAMFolder->new;
-my $outstream = $folder->open_out("foo") or die KinoSearch->error;
+my $folder = Lucy::Store::RAMFolder->new;
+my $outstream = $folder->open_out("foo") or die Lucy->error;
 $outstream->write_c32(10) for 1 .. 5;
 $outstream->close;
-my $instream = $folder->open_in("foo") or die KinoSearch->error;
+my $instream = $folder->open_in("foo") or die Lucy->error;
 my $stepper = MyStepper->new;
 
 my @got;

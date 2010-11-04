@@ -22,9 +22,9 @@ use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( 'a' .. 'z' );
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
-my $no_match_query = KinoSearch::Search::NoMatchQuery->new;
+my $no_match_query = Lucy::Search::NoMatchQuery->new;
 is( $no_match_query->to_string, "[NOMATCH]", "to_string" );
 
 my $hits = $searcher->hits( query => $no_match_query );

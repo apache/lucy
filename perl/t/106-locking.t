@@ -40,10 +40,10 @@ Dead_locks_are_removed: {
     unlink $lock_path;
     die "Can't unlink '$lock_path'" if -e $lock_path;
 
-    my $folder = KinoSearch::Store::FSFolder->new( path => $path );
+    my $folder = Lucy::Store::FSFolder->new( path => $path );
 
     sub make_lock {
-        my $lock = KinoSearch::Store::LockFileLock->new(
+        my $lock = Lucy::Store::LockFileLock->new(
             timeout => 0,
             name    => 'foo',
             host    => '',

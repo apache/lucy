@@ -16,6 +16,6 @@
 use strict;
 use warnings;
 
-use KinoSearch::Test;
-KinoSearch::Test::TestCharmonizer::run_tests("unused_vars");
+use Lucy::Test;
+Lucy::Test::TestCharmonizer::run_tests("unused_vars");
 

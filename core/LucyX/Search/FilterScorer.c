@@ -15,7 +15,7 @@
  */
 
 #define C_LUCY_FILTERSCORER
-#include "KinoSearch/Util/ToolSet.h"
+#include "Lucy/Util/ToolSet.h"
 
 #include "LucyX/Search/FilterScorer.h"
 

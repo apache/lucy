@@ -17,28 +17,28 @@ use strict;
 use warnings;
 
 use lib 'buildlib';
-use KinoSearch::Test;
+use Lucy::Test;
 
 package main;
 use Test::More tests => 3;
 
-my $old_schema = KinoSearch::Schema->new;
-my $new_schema = KinoSearch::Plan::Schema->new;
+my $old_schema = Lucy::Schema->new;
+my $new_schema = Lucy::Plan::Schema->new;
 
 $old_schema->eat($new_schema);
 $new_schema->eat($old_schema);
-pass("Stub class KinoSearch::Schema passed by eat()");
+pass("Stub class Lucy::Schema passed by eat()");
 
 my $schema;
 SKIP: {
     skip( "constructor bailouts cause leaks", 1 ) if $ENV{LUCY_VALGRIND};
 
-    $schema = KinoSearch::Test::TestSchema->new;
+    $schema = Lucy::Test::TestSchema->new;
     eval { $schema->spec_field( name => 'foo', type => 'NotAType' ) };
     Test::More::like( $@, qr/FieldType/, "bogus FieldType fails to load" );
 }
 
-$schema = KinoSearch::Test::TestSchema->new;
+$schema = Lucy::Test::TestSchema->new;
 my $type = $schema->fetch_type('content');
 $schema->spec_field( name => 'new_field', type => $type );
 my $got = grep { $_ eq 'new_field' } @{ $schema->all_fields };

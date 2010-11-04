@@ -74,8 +74,8 @@ use Carp;
 
 BEGIN { unshift @PATH, curdir() }
 
-sub xs_filepath { catfile( 'lib', "KinoSearch.xs" ) }
-sub autobind_pm_path { catfile( 'lib', 'KinoSearch', 'Autobinding.pm' ); }
+sub xs_filepath { catfile( 'lib', "Lucy.xs" ) }
+sub autobind_pm_path { catfile( 'lib', 'Lucy', 'Autobinding.pm' ); }
 
 sub extra_ccflags {
     my $self = shift;
@@ -254,7 +254,7 @@ sub _compile_clownfish {
         parcel     => 'Lucy',
         hierarchy  => $hierarchy,
         lib_dir    => 'lib',
-        boot_class => 'KinoSearch',
+        boot_class => 'Lucy',
         header     => $self->autogen_header,
         footer     => '',
     );
@@ -481,7 +481,7 @@ sub ACTION_compile_custom_xs {
     my $cbuilder
         = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
         );
-    my $archdir = catdir( $self->blib, 'arch', 'auto', 'KinoSearch', );
+    my $archdir = catdir( $self->blib, 'arch', 'auto', 'Lucy', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
         curdir(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
@@ -509,7 +509,7 @@ sub ACTION_compile_custom_xs {
     }
 
     # .xs => .c
-    my $perl_binding_c_file = "lib/KinoSearch.c";
+    my $perl_binding_c_file = "lib/Lucy.c";
     $self->add_to_cleanup($perl_binding_c_file);
     if ( !$self->up_to_date( $xs_filepath, $perl_binding_c_file ) ) {
         ExtUtils::ParseXS::process_file(
@@ -521,7 +521,7 @@ sub ACTION_compile_custom_xs {
 
     # .c => .o
     my $version = $self->dist_version;
-    my $perl_binding_o_file = catfile( 'lib', "KinoSearch$Config{_o}" );
+    my $perl_binding_o_file = catfile( 'lib', "Lucy$Config{_o}" );
     unshift @objects, $perl_binding_o_file;
     $self->add_to_cleanup($perl_binding_o_file);
     if ( !$self->up_to_date( $perl_binding_c_file, $perl_binding_o_file ) ) {
@@ -543,7 +543,7 @@ sub ACTION_compile_custom_xs {
     }
 
     # Create .bs bootstrap file, needed by Dynaloader.
-    my $bs_file = catfile( $archdir, "KinoSearch.bs" );
+    my $bs_file = catfile( $archdir, "Lucy.bs" );
     $self->add_to_cleanup($bs_file);
     if ( !$self->up_to_date( $perl_binding_o_file, $bs_file ) ) {
         require ExtUtils::Mkbootstrap;
@@ -557,10 +557,10 @@ sub ACTION_compile_custom_xs {
     }
 
     # .o => .(a|bundle)
-    my $lib_file = catfile( $archdir, "KinoSearch.$Config{dlext}" );
+    my $lib_file = catfile( $archdir, "Lucy.$Config{dlext}" );
     if ( !$self->up_to_date( [ @objects, $AUTOGEN_DIR ], $lib_file ) ) {
         $cbuilder->link(
-            module_name => 'KinoSearch',
+            module_name => 'Lucy',
             objects     => \@objects,
             lib_file    => $lib_file,
         );
@@ -661,7 +661,7 @@ sub _gen_pause_exclusion_list {
     }
 
     # Exclude redacted modules.
-    if ( eval { require "buildlib/KinoSearch/Redacted.pm" } ) {
+    if ( eval { require "buildlib/Lucy/Redacted.pm" } ) {
         my @redacted = map {
             my @parts = split( /\W+/, $_ );
             catfile( 'lib', @parts ) . '.pm'

@@ -17,12 +17,12 @@ use strict;
 use warnings;
 
 package MyHash;
-use base qw( KinoSearch::Object::Hash );
+use base qw( Lucy::Object::Hash );
 
 sub oodle { }
 
 package RAMFolderOfDeath;
-use base qw( KinoSearch::Store::RAMFolder );
+use base qw( Lucy::Store::RAMFolder );
 
 sub open_in {
     my ( $self, $filename ) = @_;
@@ -30,7 +30,7 @@ sub open_in {
 }
 
 package OnceRemoved;
-use base qw( KinoSearch::Object::Obj );
+use base qw( Lucy::Object::Obj );
 
 our $serialize_was_called = 0;
 sub serialize {
@@ -44,7 +44,7 @@ use base qw( OnceRemoved );
 
 package main;
 
-use KinoSearch::Test;
+use Lucy::Test;
 use Test::More tests => 9;
 use Storable qw( nfreeze );
 
@@ -61,7 +61,7 @@ use Storable qw( nfreeze );
 }
 
 my $stringified;
-my $storage = KinoSearch::Object::Hash->new;
+my $storage = Lucy::Object::Hash->new;
 
 {
     my $subclassed_hash = MyHash->new;
@@ -81,13 +81,13 @@ isa_ok( $resurrected, "MyHash", "subclass name survived Perl destruction" );
 is( $resurrected->to_string, $stringified,
     "It's the same Hash from earlier (though a different Perl object)" );
 
-my $booga = KinoSearch::Object::CharBuf->new("booga");
+my $booga = Lucy::Object::CharBuf->new("booga");
 $resurrected->store( "ooga", $booga );
 
 is( $resurrected->fetch("ooga"),
     "booga", "subclassed object still performs correctly at the C level" );
 
-my $methods = KinoSearch::Object::VTable->novel_host_methods('MyHash');
+my $methods = Lucy::Object::VTable->novel_host_methods('MyHash');
 is_deeply( $methods->to_perl, ['oodle'], "novel_host_methods" );
 
 my $folder = RAMFolderOfDeath->new;

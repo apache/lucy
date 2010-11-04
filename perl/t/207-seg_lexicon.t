@@ -18,18 +18,18 @@ use warnings;
 use utf8;
 
 use Test::More tests => 5;
-use KinoSearch::Test;
+use Lucy::Test;
 
 package TestAnalyzer;
-use base qw( KinoSearch::Analysis::Analyzer );
+use base qw( Lucy::Analysis::Analyzer );
 sub transform { $_[1] }
 
 package MySchema;
-use base qw( KinoSearch::Plan::Schema );
+use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = KinoSearch::Plan::FullTextType->new(
+    my $type = Lucy::Plan::FullTextType->new(
         analyzer => TestAnalyzer->new );
     $self->spec_field( name => 'a', type => $type );
     $self->spec_field( name => 'b', type => $type );
@@ -39,9 +39,9 @@ sub new {
 
 package main;
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = MySchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     create => 1,
     index  => $folder,
     schema => $schema,
@@ -61,10 +61,10 @@ for my $animal (@animals) {
 $indexer->commit;
 
 my $snapshot
-    = KinoSearch::Index::Snapshot->new->read_file( folder => $folder );
-my $segment = KinoSearch::Index::Segment->new( number => 1 );
+    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $segment = Lucy::Index::Segment->new( number => 1 );
 $segment->read_file($folder);
-my $lex_reader = KinoSearch::Index::DefaultLexiconReader->new(
+my $lex_reader = Lucy::Index::DefaultLexiconReader->new(
     schema   => $schema,
     folder   => $folder,
     snapshot => $snapshot,

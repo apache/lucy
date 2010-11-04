@@ -35,8 +35,8 @@ our @EXPORT_OK = qw(
     modulo_set
 );
 
-use KinoSearch;
-use KinoSearch::Test;
+use Lucy;
+use Lucy::Test;
 
 use lib 'sample';
 use Lucy::Test::USConSchema;
@@ -91,10 +91,10 @@ sub init_test_index_loc {
 # Build a RAM index, using the supplied array of strings as source material.
 # The index will have a single field: "content".
 sub create_index {
-    my $folder  = KinoSearch::Store::RAMFolder->new;
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $folder  = Lucy::Store::RAMFolder->new;
+    my $indexer = Lucy::Index::Indexer->new(
         index  => $folder,
-        schema => KinoSearch::Test::TestSchema->new,
+        schema => Lucy::Test::TestSchema->new,
     );
     $indexer->add_doc( { content => $_ } ) for @_;
     $indexer->commit;
@@ -144,10 +144,10 @@ sub get_uscon_docs {
 }
 
 sub create_uscon_index {
-    my $folder = KinoSearch::Store::FSFolder->new(
+    my $folder = Lucy::Store::FSFolder->new(
         path => persistent_test_index_loc() );
     my $schema  = Lucy::Test::USConSchema->new;
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         schema   => $schema,
         index    => $folder,
         truncate => 1,
@@ -158,7 +158,7 @@ sub create_uscon_index {
     $indexer->commit;
     undef $indexer;
 
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => $folder,
     );
@@ -168,7 +168,7 @@ sub create_uscon_index {
     $indexer->commit;
     undef $indexer;
 
-    $indexer = KinoSearch::Index::Indexer->new(
+    $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => $folder,
     );
@@ -201,7 +201,7 @@ sub utf8_test_strings {
 sub test_analyzer {
     my ( $analyzer, $source, $expected, $message ) = @_;
 
-    my $inversion = KinoSearch::Analysis::Inversion->new( text => $source );
+    my $inversion = Lucy::Analysis::Inversion->new( text => $source );
     $inversion = $analyzer->transform($inversion);
     my @got;
     while ( my $token = $inversion->next ) {

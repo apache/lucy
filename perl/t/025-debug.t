@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
-use KinoSearch::Util::Debug qw(
+use Lucy::Util::Debug qw(
     DEBUG_ENABLED
     DEBUG_PRINT
     DEBUG
@@ -55,11 +55,11 @@ pass("ASSERT(true) didn't die");
 SKIP: {
     skip( "Windows fork not supported by Lucy", 3 ) if $^O =~ /mswin/i;
 
-    my $stderr_out = capture_debug( 'KinoSearch.xs', 'Borax' );
+    my $stderr_out = capture_debug( 'Lucy.xs', 'Borax' );
     like( $stderr_out, qr/Borax/, "DEBUG - file name" );
 
     $stderr_out
-        = capture_debug( 'XS_KinoSearch__Util__Debug_DEBUG', "Strychnine" );
+        = capture_debug( 'XS_Lucy__Util__Debug_DEBUG', "Strychnine" );
     like( $stderr_out, qr/Strychnine/, "DEBUG - function name" );
 
     $stderr_out = capture_debug( 'Lucy*', 'Raid' );

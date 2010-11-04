@@ -16,10 +16,10 @@
 use strict;
 use warnings;
 use Test::More tests => 4;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $folder   = KinoSearch::Store::RAMFolder->new;
-my $snapshot = KinoSearch::Index::Snapshot->new;
+my $folder   = Lucy::Store::RAMFolder->new;
+my $snapshot = Lucy::Index::Snapshot->new;
 $snapshot->add_entry("foo");
 $snapshot->add_entry("bar");
 ok( $snapshot->delete_entry("bar"), "delete_entry" );

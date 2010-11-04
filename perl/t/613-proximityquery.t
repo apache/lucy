@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 11;
 use Storable qw( freeze thaw );
-use KinoSearch::Test;
+use Lucy::Test;
 use Lucy::Test::TestUtils qw( create_index );
 use LucyX::Search::ProximityQuery;
 
@@ -37,7 +37,7 @@ my @docs = (
 );
 
 my $folder = create_index(@docs);
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $proximity_query = LucyX::Search::ProximityQuery->new(
     field  => 'content',

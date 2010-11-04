@@ -16,6 +16,6 @@
 use strict;
 use warnings;
 
-use KinoSearch::Test;
-KinoSearch::Test::run_tests("TestSeriesMatcher");
+use Lucy::Test;
+Lucy::Test::run_tests("TestSeriesMatcher");
 

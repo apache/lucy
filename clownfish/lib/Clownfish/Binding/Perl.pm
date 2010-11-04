@@ -196,16 +196,16 @@ sub _xs_file_contents {
 #include "boil.h"
 #include "$self->{boot_h_file}"
 
-#include "KinoSearch/Object/Host.h"
-#include "KinoSearch/Util/Memory.h"
-#include "KinoSearch/Util/StringHelper.h"
+#include "Lucy/Object/Host.h"
+#include "Lucy/Util/Memory.h"
+#include "Lucy/Util/StringHelper.h"
 
 #include "Charmonizer/Test.h"
 #include "Charmonizer/Test/AllTests.h"
 
 $generated_xs
 
-MODULE = KinoSearch   PACKAGE = KinoSearch::Autobinding
+MODULE = Lucy   PACKAGE = Lucy::Autobinding
 
 void
 init_autobindings()
@@ -244,7 +244,7 @@ sub _pm_file_contents {
 use strict;
 use warnings;
 
-package KinoSearch::Autobinding;
+package Lucy::Autobinding;
 
 init_autobindings();
 

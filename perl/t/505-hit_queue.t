@@ -17,10 +17,10 @@ use strict;
 use warnings;
 
 use Test::More tests => 36;
-use KinoSearch::Test;
+use Lucy::Test;
 use List::Util qw( shuffle );
 
-my $hit_q = KinoSearch::Search::HitQueue->new( wanted => 10 );
+my $hit_q = Lucy::Search::HitQueue->new( wanted => 10 );
 
 my @docs_and_scores = (
     [ 0,    1.0 ],
@@ -32,7 +32,7 @@ my @docs_and_scores = (
 );
 
 my @match_docs = map {
-    KinoSearch::Search::MatchDoc->new(
+    Lucy::Search::MatchDoc->new(
         doc_id => $_->[0],
         score  => $_->[1],
         )
@@ -54,14 +54,14 @@ is_deeply( \@scores, \@correct_scores, "rank by scores first" );
 my @doc_ids = map { $_->get_doc_id } @$got;
 is_deeply( \@doc_ids, \@correct_docs, "rank by doc_id after score" );
 
-my $schema = KinoSearch::Plan::Schema->new;
-my $type = KinoSearch::Plan::StringType->new( sortable => 1 );
+my $schema = Lucy::Plan::Schema->new;
+my $type = Lucy::Plan::StringType->new( sortable => 1 );
 $schema->spec_field( name => 'letter', type => $type );
 $schema->spec_field( name => 'number', type => $type );
 $schema->spec_field( name => 'id',     type => $type );
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $folder  = Lucy::Store::RAMFolder->new;
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -79,21 +79,21 @@ for my $id ( 1 .. 100 ) {
     $indexer->add_doc($doc);
 }
 $indexer->commit;
-my $seg_reader = KinoSearch::Index::IndexReader->open( index => $folder );
+my $seg_reader = Lucy::Index::IndexReader->open( index => $folder );
 
-my $by_letter = KinoSearch::Search::SortSpec->new(
+my $by_letter = Lucy::Search::SortSpec->new(
     rules => [
-        KinoSearch::Search::SortRule->new( field => 'letter' ),
-        KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        Lucy::Search::SortRule->new( field => 'letter' ),
+        Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ]
 );
-$hit_q = KinoSearch::Search::HitQueue->new(
+$hit_q = Lucy::Search::HitQueue->new(
     wanted    => 100,
     schema    => $schema,
     sort_spec => $by_letter,
 );
 for my $doc_id ( shuffle( 1 .. 100 ) ) {
-    my $match_doc = KinoSearch::Search::MatchDoc->new(
+    my $match_doc = Lucy::Search::MatchDoc->new(
         doc_id => $doc_id,
         score  => 1.0,
         values => [ $docs[ $doc_id - 1 ]{letter} ],
@@ -105,21 +105,21 @@ my @wanted = map { $_->{id} }
 my @got = map { $_->get_doc_id } @{ $hit_q->pop_all };
 is_deeply( \@got, \@wanted, "sort by letter then doc id" );
 
-my $by_num_then_letter = KinoSearch::Search::SortSpec->new(
+my $by_num_then_letter = Lucy::Search::SortSpec->new(
     rules => [
-        KinoSearch::Search::SortRule->new( field => 'number' ),
-        KinoSearch::Search::SortRule->new( field => 'letter', reverse => 1 ),
-        KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        Lucy::Search::SortRule->new( field => 'number' ),
+        Lucy::Search::SortRule->new( field => 'letter', reverse => 1 ),
+        Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ]
 );
-$hit_q = KinoSearch::Search::HitQueue->new(
+$hit_q = Lucy::Search::HitQueue->new(
     wanted    => 100,
     schema    => $schema,
     sort_spec => $by_num_then_letter,
 );
 for my $doc_id ( shuffle( 1 .. 100 ) ) {
     my $doc       = $docs[ $doc_id - 1 ];
-    my $match_doc = KinoSearch::Search::MatchDoc->new(
+    my $match_doc = Lucy::Search::MatchDoc->new(
         doc_id => $doc_id,
         score  => 1.0,
         values => [ $doc->{number}, $doc->{letter} ],
@@ -135,21 +135,21 @@ for my $doc_id ( shuffle( 1 .. 100 ) ) {
 @got = map { $_->get_doc_id } @{ $hit_q->pop_all };
 is_deeply( \@got, \@wanted, "sort by num then letter reversed then doc id" );
 
-my $by_num_then_score = KinoSearch::Search::SortSpec->new(
+my $by_num_then_score = Lucy::Search::SortSpec->new(
     rules => [
-        KinoSearch::Search::SortRule->new( field => 'number' ),
-        KinoSearch::Search::SortRule->new( type  => 'score' ),
-        KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        Lucy::Search::SortRule->new( field => 'number' ),
+        Lucy::Search::SortRule->new( type  => 'score' ),
+        Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ]
 );
-$hit_q = KinoSearch::Search::HitQueue->new(
+$hit_q = Lucy::Search::HitQueue->new(
     wanted    => 100,
     schema    => $schema,
     sort_spec => $by_num_then_score,
 );
 
 for my $doc_id ( shuffle( 1 .. 100 ) ) {
-    my $match_doc = KinoSearch::Search::MatchDoc->new(
+    my $match_doc = Lucy::Search::MatchDoc->new(
         doc_id => $doc_id,
         score  => $doc_id,
         values => [ $docs[ $doc_id - 1 ]{number} ],
@@ -161,7 +161,7 @@ for my $doc_id ( shuffle( 1 .. 100 ) ) {
 @got = map { $_->get_doc_id } @{ $hit_q->pop_all };
 is_deeply( \@got, \@wanted, "sort by num then score then doc id" );
 
-$hit_q = KinoSearch::Search::HitQueue->new(
+$hit_q = Lucy::Search::HitQueue->new(
     wanted    => 100,
     schema    => $schema,
     sort_spec => $by_num_then_score,
@@ -169,9 +169,9 @@ $hit_q = KinoSearch::Search::HitQueue->new(
 
 for my $doc_id ( shuffle( 1 .. 100 ) ) {
     my $fields = $docs[ $doc_id - 1 ];
-    my $values = KinoSearch::Object::VArray->new( capacity => 1 );
-    $values->push( KinoSearch::Object::CharBuf->new( $fields->{number} ) );
-    my $match_doc = KinoSearch::Search::MatchDoc->new(
+    my $values = Lucy::Object::VArray->new( capacity => 1 );
+    $values->push( Lucy::Object::CharBuf->new( $fields->{number} ) );
+    my $match_doc = Lucy::Search::MatchDoc->new(
         doc_id => $doc_id,
         score  => $doc_id,
         values => $values,
@@ -191,14 +191,14 @@ for ( 1 .. 30 ) {
 @doc_ids         = map  { $_->[0] } @docs_and_scores;
 
 @match_docs = map {
-    KinoSearch::Search::MatchDoc->new(
+    Lucy::Search::MatchDoc->new(
         doc_id => $_->[0],
         score  => $_->[1],
         )
 } sort { $a->[0] <=> $b->[0] } @docs_and_scores;
 
 for my $size ( 0 .. $#match_docs ) {
-    $hit_q = KinoSearch::Search::HitQueue->new( wanted => $size, );
+    $hit_q = Lucy::Search::HitQueue->new( wanted => $size, );
     $hit_q->insert($_) for @match_docs;
 
     if ($size) {

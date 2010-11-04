@@ -21,16 +21,16 @@ use Test::More tests => 25;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
 use Lucy::Test::TestUtils qw( init_test_index_loc );
-use KinoSearch::Util::StringHelper qw( to_base36 );
+use Lucy::Util::StringHelper qw( to_base36 );
 
 my $fs_index_loc = init_test_index_loc();
-my $fs_folder    = KinoSearch::Store::FSFolder->new( path => $fs_index_loc, );
-my $ram_folder   = KinoSearch::Store::RAMFolder->new;
+my $fs_folder    = Lucy::Store::FSFolder->new( path => $fs_index_loc, );
+my $ram_folder   = Lucy::Store::RAMFolder->new;
 
 my $king = "I'm the king of rock.";
 for my $folder ( $fs_folder, $ram_folder ) {
     my $outstream = $folder->open_out('king_of_rock')
-        or die KinoSearch->error;
+        or die Lucy->error;
     $outstream->print($king);
     $outstream->close;
 }
@@ -46,13 +46,13 @@ for my $folder ( $fs_folder, $ram_folder ) {
     my $slurped = $folder->slurp_file('king_of_rock');
     is( $slurped, $king, "slurp_file works" );
 
-    my $lock = KinoSearch::Store::LockFileLock->new(
+    my $lock = Lucy::Store::LockFileLock->new(
         host    => '',
         folder  => $folder,
         name    => 'lock_robster',
         timeout => 0,
     );
-    my $competing_lock = KinoSearch::Store::LockFileLock->new(
+    my $competing_lock = Lucy::Store::LockFileLock->new(
         host    => '',
         folder  => $folder,
         name    => 'lock_robster',
@@ -82,7 +82,7 @@ for my $folder ( $fs_folder, $ram_folder ) {
 
     isa_ok(
         $folder->open_out("lockit"),
-        "KinoSearch::Store::OutStream",
+        "Lucy::Store::OutStream",
         "open_out succeeds when file doesn't exist"
     );
 
@@ -100,10 +100,10 @@ for ( $foo_path, $cf_path ) {
     print $fh 'stuff';
 }
 
-$fs_folder = KinoSearch::Store::FSFolder->new( path => $fs_index_loc, );
+$fs_folder = Lucy::Store::FSFolder->new( path => $fs_index_loc, );
 ok( -e $foo_path, "creating an FSFolder shouldn't wipe an unrelated file" );
 
 for ( 0 .. 100 ) {
     my $filename = '_1-' . to_base36($_) . '.stuff';
-    $ram_folder->open_out($filename) or die KinoSearch->error;
+    $ram_folder->open_out($filename) or die Lucy->error;
 }

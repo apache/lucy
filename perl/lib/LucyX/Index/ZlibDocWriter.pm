@@ -16,12 +16,12 @@
 use strict;
 
 package LucyX::Index::ZlibDocWriter;
-use base qw( KinoSearch::Index::DataWriter );
+use base qw( Lucy::Index::DataWriter );
 use Carp;
 use Scalar::Util qw( blessed );
 use Compress::Zlib qw( compress );
-use KinoSearch::Util::StringHelper qw( cat_bytes );
-use KinoSearch qw( to_perl );
+use Lucy::Util::StringHelper qw( cat_bytes );
+use Lucy qw( to_perl );
 use bytes;
 no bytes;
 
@@ -39,9 +39,9 @@ sub _lazy_init {
     my $ix_file  = $self->get_segment->get_name . "/zdocs.ix";
     my $dat_file = $self->get_segment->get_name . "/zdocs.dat";
     $ix_out{$$self} = $folder->open_out($ix_file)
-        or confess KinoSearch->error;
+        or confess Lucy->error;
     $dat_out{$$self} = $folder->open_out($dat_file)
-        or confess KinoSearch->error;
+        or confess Lucy->error;
     $ix_out{$$self}->write_i64(0);
 }
 
@@ -92,7 +92,7 @@ sub add_segment {
     _lazy_init($self) unless $ix_out{$$self};
     my $ix_out     = $ix_out{$$self};
     my $dat_out    = $dat_out{$$self};
-    my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
+    my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
     confess("Not a ZlibDocReader")
         unless ( blessed($doc_reader)
         and $doc_reader->isa("LucyX::Index::ZlibDocReader") );

@@ -18,14 +18,14 @@ use warnings;
 use lib 'buildlib';
 
 package MultiFieldSchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
-    my $plain_type = KinoSearch::Plan::FullTextType->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new );
-    my $not_analyzed_type = KinoSearch::Plan::StringType->new;
+    my $plain_type = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::Tokenizer->new );
+    my $not_analyzed_type = Lucy::Plan::StringType->new;
     $self->spec_field( name => 'a', type => $plain_type );
     $self->spec_field( name => 'b', type => $plain_type );
     $self->spec_field( name => 'c', type => $not_analyzed_type );
@@ -35,9 +35,9 @@ sub new {
 package main;
 use Test::More tests => 13;
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = MultiFieldSchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -48,17 +48,17 @@ $indexer->add_doc( { a => 'unit state' } );
 $indexer->add_doc( { c => 'unit' } );
 $indexer->commit;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $hits = $searcher->hits( query => 'foo' );
 is( $hits->total_hits, 2, "Searcher's default is to find all fields" );
 
-my $qparser = KinoSearch::Search::QueryParser->new( schema => $schema );
+my $qparser = Lucy::Search::QueryParser->new( schema => $schema );
 
-my $foo_leaf = KinoSearch::Search::LeafQuery->new( text => 'foo' );
-my $multi_field_foo = KinoSearch::Search::ORQuery->new;
+my $foo_leaf = Lucy::Search::LeafQuery->new( text => 'foo' );
+my $multi_field_foo = Lucy::Search::ORQuery->new;
 $multi_field_foo->add_child(
-    KinoSearch::Search::TermQuery->new(
+    Lucy::Search::TermQuery->new(
         field => $_,
         term  => 'foo'
     )
@@ -66,18 +66,18 @@ $multi_field_foo->add_child(
 my $expanded = $qparser->expand($foo_leaf);
 ok( $multi_field_foo->equals($expanded), "Expand LeafQuery" );
 
-my $multi_field_bar = KinoSearch::Search::ORQuery->new;
+my $multi_field_bar = Lucy::Search::ORQuery->new;
 $multi_field_bar->add_child(
-    KinoSearch::Search::TermQuery->new(
+    Lucy::Search::TermQuery->new(
         field => $_,
         term  => 'bar'
     )
 ) for qw( a b c );
 my $not_multi_field_bar
-    = KinoSearch::Search::NOTQuery->new( negated_query => $multi_field_bar );
-my $bar_leaf = KinoSearch::Search::LeafQuery->new( text => 'bar' );
+    = Lucy::Search::NOTQuery->new( negated_query => $multi_field_bar );
+my $bar_leaf = Lucy::Search::LeafQuery->new( text => 'bar' );
 my $not_bar_leaf
-    = KinoSearch::Search::NOTQuery->new( negated_query => $bar_leaf );
+    = Lucy::Search::NOTQuery->new( negated_query => $bar_leaf );
 $expanded = $qparser->expand($not_bar_leaf);
 ok( $not_multi_field_bar->equals($expanded), "Expand NOTQuery" );
 
@@ -109,7 +109,7 @@ $hits = $searcher->hits( query => $query );
 is( $hits->total_hits, 0,
     "no crash for non-existent fields under heed_colons" );
 
-$qparser = KinoSearch::Search::QueryParser->new(
+$qparser = Lucy::Search::QueryParser->new(
     schema => $schema,
     fields => ['a'],
 );
@@ -117,9 +117,9 @@ $query = $qparser->parse('foo');
 $hits = $searcher->hits( query => $query );
 is( $hits->total_hits, 1, "QueryParser fields param works" );
 
-my $analyzer_parser = KinoSearch::Search::QueryParser->new(
+my $analyzer_parser = Lucy::Search::QueryParser->new(
     schema   => $schema,
-    analyzer => KinoSearch::Analysis::PolyAnalyzer->new( language => 'en' ),
+    analyzer => Lucy::Analysis::PolyAnalyzer->new( language => 'en' ),
 );
 
 $hits = $searcher->hits( query => 'United States' );

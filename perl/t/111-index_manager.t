@@ -17,11 +17,11 @@ use strict;
 use warnings;
 
 package NonMergingIndexManager;
-use base qw( KinoSearch::Index::IndexManager );
+use base qw( Lucy::Index::IndexManager );
 sub recycle { [] }
 
 package BogusManager;
-use base qw( KinoSearch::Index::IndexManager );
+use base qw( Lucy::Index::IndexManager );
 
 # Adds a bogus dupe.
 sub recycle {
@@ -33,11 +33,11 @@ sub recycle {
 package main;
 
 use Test::More tests => 16;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $folder = KinoSearch::Store::RAMFolder->new;
+my $folder = Lucy::Store::RAMFolder->new;
 
-my $lock_factory = KinoSearch::Store::LockFactory->new(
+my $lock_factory = Lucy::Store::LockFactory->new(
     folder => $folder,
     host   => 'me',
 );
@@ -46,7 +46,7 @@ my $lock = $lock_factory->make_lock(
     name    => 'angie',
     timeout => 1000,
 );
-isa_ok( $lock, 'KinoSearch::Store::Lock', "make_lock" );
+isa_ok( $lock, 'Lucy::Store::Lock', "make_lock" );
 is( $lock->get_name, "angie", "correct lock name" );
 is( $lock->get_host, "me",    "correct host" );
 
@@ -54,15 +54,15 @@ $lock = $lock_factory->make_shared_lock(
     name    => 'fred',
     timeout => 0,
 );
-is( ref($lock),      'KinoSearch::Store::SharedLock', "make_shared_lock" );
+is( ref($lock),      'Lucy::Store::SharedLock', "make_shared_lock" );
 is( $lock->get_name, "fred",                          "correct lock name" );
 is( $lock->get_host, "me",                            "correct host" );
 
-my $schema = KinoSearch::Test::TestSchema->new;
-$folder = KinoSearch::Store::RAMFolder->new;
+my $schema = Lucy::Test::TestSchema->new;
+$folder = Lucy::Store::RAMFolder->new;
 
 for ( 1 .. 20 ) {
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         schema  => $schema,
         index   => $folder,
         manager => NonMergingIndexManager->new,
@@ -76,14 +76,14 @@ for ( 1 .. 20 ) {
 my $num_segs = grep {m/segmeta.json/} @{ $folder->list_r };
 is( $num_segs, 20, "no merging" );
 
-my $manager = KinoSearch::Index::IndexManager->new;
+my $manager = Lucy::Index::IndexManager->new;
 $manager->set_folder($folder);
 
-my $polyreader = KinoSearch::Index::PolyReader->open( index => $folder );
-my $segment = KinoSearch::Index::Segment->new( number => 22 );
+my $polyreader = Lucy::Index::PolyReader->open( index => $folder );
+my $segment = Lucy::Index::Segment->new( number => 22 );
 my $snapshot
-    = KinoSearch::Index::Snapshot->new->read_file( folder => $folder );
-my $deletions_writer = KinoSearch::Index::DefaultDeletionsWriter->new(
+    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $deletions_writer = Lucy::Index::DefaultDeletionsWriter->new(
     schema     => $schema,
     segment    => $segment,
     snapshot   => $snapshot,
@@ -120,7 +120,7 @@ is( $manager->get_deletion_lock_interval,
 
 SKIP: {
     skip( "Known leak", 1 ) if $ENV{LUCY_VALGRIND};
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $indexer = Lucy::Index::Indexer->new(
         index   => $folder,
         manager => BogusManager->new,
     );

@@ -20,15 +20,15 @@ use lib 'buildlib';
 use Test::More tests => 63;
 use List::Util qw( shuffle );
 use Storable qw( nfreeze thaw );
-use KinoSearch::Test;
+use Lucy::Test;
 
 package RangeSchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = KinoSearch::Plan::StringType->new( sortable => 1 );
+    my $type = Lucy::Plan::StringType->new( sortable => 1 );
     $self->spec_field( name => 'name',   type => $type );
     $self->spec_field( name => 'cat',    type => $type );
     $self->spec_field( name => 'unused', type => $type );
@@ -37,9 +37,9 @@ sub new {
 
 package main;
 
-my $folder  = KinoSearch::Store::RAMFolder->new;
+my $folder  = Lucy::Store::RAMFolder->new;
 my $schema  = RangeSchema->new;
-my $indexer = KinoSearch::Index::Indexer->new(
+my $indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -57,7 +57,7 @@ for my $letter ( shuffle @letters ) {
 }
 $indexer->commit;
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $results = test_range_search(
     field         => 'name',
@@ -254,7 +254,7 @@ like( $@, qr/lower_term/,
     "Failing to supply either lower_term or upper_term throws an exception" );
 
 # Add more docs, test multi-segment searches.
-$indexer = KinoSearch::Index::Indexer->new(
+$indexer = Lucy::Index::Indexer->new(
     index  => $folder,
     schema => $schema,
 );
@@ -265,7 +265,7 @@ $indexer->add_doc(
 );
 $indexer->commit;
 $letters{'mh'} = ++$count;
-$searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 $results = test_range_search(
     field         => 'name',
@@ -281,7 +281,7 @@ test_results( $results, [ 'i' .. 'm', 'mh' ], "multi-segment range query" );
 sub test_range_search {
     my %args   = @_;
     my $string = delete $args{string};
-    my $query  = KinoSearch::Search::RangeQuery->new(%args);
+    my $query  = Lucy::Search::RangeQuery->new(%args);
     if ( defined $string ) {
         is( $query->to_string, $string );
     }

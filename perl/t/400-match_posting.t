@@ -18,28 +18,28 @@ use warnings;
 use lib 'buildlib';
 
 package MatchOnlySim;
-use base qw( KinoSearch::Index::Similarity );
+use base qw( Lucy::Index::Similarity );
 
 sub make_posting {
     my $self = shift;
-    return KinoSearch::Index::Posting::MatchPosting->new(
+    return Lucy::Index::Posting::MatchPosting->new(
         similarity => $self );
 }
 
 package MatchSchema::MatchOnly;
-use base qw( KinoSearch::Plan::FullTextType );
-use KinoSearch::Index::Posting::MatchPosting;
+use base qw( Lucy::Plan::FullTextType );
+use Lucy::Index::Posting::MatchPosting;
 
 sub make_similarity { MatchOnlySim->new }
 
 package MatchSchema;
-use base qw( KinoSearch::Plan::Schema );
-use KinoSearch::Analysis::Tokenizer;
+use base qw( Lucy::Plan::Schema );
+use Lucy::Analysis::Tokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);
     my $type = MatchSchema::MatchOnly->new(
-        analyzer => KinoSearch::Analysis::Tokenizer->new );
+        analyzer => Lucy::Analysis::Tokenizer->new );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }
@@ -52,12 +52,12 @@ use Test::More tests => 6;
 my $uscon_docs = get_uscon_docs();
 my $match_folder = make_index( MatchSchema->new, $uscon_docs );
 my $score_folder
-    = make_index( KinoSearch::Test::TestSchema->new, $uscon_docs );
+    = make_index( Lucy::Test::TestSchema->new, $uscon_docs );
 
 my $match_searcher
-    = KinoSearch::Search::IndexSearcher->new( index => $match_folder );
+    = Lucy::Search::IndexSearcher->new( index => $match_folder );
 my $score_searcher
-    = KinoSearch::Search::IndexSearcher->new( index => $score_folder );
+    = Lucy::Search::IndexSearcher->new( index => $score_folder );
 
 for (qw( land of the free )) {
     my $match_got = hit_ids_array( $match_searcher, $_ );
@@ -73,8 +73,8 @@ ok( !scalar @$should_be_empty, "no hits matched for phrase $qstring" );
 
 sub make_index {
     my ( $schema, $docs ) = @_;
-    my $folder  = KinoSearch::Store::RAMFolder->new;
-    my $indexer = KinoSearch::Index::Indexer->new(
+    my $folder  = Lucy::Store::RAMFolder->new;
+    my $indexer = Lucy::Index::Indexer->new(
         schema => $schema,
         index  => $folder,
     );
@@ -87,9 +87,9 @@ sub hit_ids_array {
     my ( $searcher, $query_string ) = @_;
     my $query = $searcher->glean_query($query_string);
 
-    my $bit_vec = KinoSearch::Object::BitVector->new(
+    my $bit_vec = Lucy::Object::BitVector->new(
         capacity => $searcher->doc_max + 1 );
-    my $bit_collector = KinoSearch::Search::Collector::BitCollector->new(
+    my $bit_collector = Lucy::Search::Collector::BitCollector->new(
         bit_vector => $bit_vec, );
     $searcher->collect( query => $query, collector => $bit_collector );
     return $bit_vec->to_array->to_arrayref;

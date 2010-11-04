@@ -18,11 +18,11 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 900;
-use KinoSearch::Test;
+use Lucy::Test;
 use LucyX::Search::MockScorer;
 use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
-my $sim = KinoSearch::Index::Similarity->new;
+my $sim = Lucy::Index::Similarity->new;
 
 for my $interval_a ( 1 .. 10 ) {
     for my $interval_b ( 5 .. 10 ) {
@@ -38,7 +38,7 @@ sub check_scorer {
     my @intervals = @_;
     my @doc_id_arrays = map { modulo_set( $_, 100 ) } @intervals;
     my $subscorers
-        = KinoSearch::Object::VArray->new( capacity => scalar @intervals );
+        = Lucy::Object::VArray->new( capacity => scalar @intervals );
     for my $doc_id_array (@doc_id_arrays) {
         my $mock = LucyX::Search::MockScorer->new(
             doc_ids => $doc_id_array,
@@ -47,12 +47,12 @@ sub check_scorer {
         $subscorers->push($mock);
     }
 
-    my $or_scorer = KinoSearch::Search::ORScorer->new(
+    my $or_scorer = Lucy::Search::ORScorer->new(
         similarity => $sim,
         children   => $subscorers,
     );
     my $collector
-        = KinoSearch::Search::Collector::SortCollector->new( wanted => 100 );
+        = Lucy::Search::Collector::SortCollector->new( wanted => 100 );
     $or_scorer->collect( collector => $collector );
     my ( $got_by_score, $got_by_id ) = doc_ids_from_td_coll($collector);
     my ( $expected_by_count, $expected_by_id )

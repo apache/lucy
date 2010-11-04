@@ -17,8 +17,8 @@ use strict;
 use warnings;
 
 package LucyX::Index::ZlibDocReader;
-use base qw( KinoSearch::Index::DocReader );
-use KinoSearch::Util::StringHelper qw( utf8_valid utf8_flag_on );
+use base qw( Lucy::Index::DocReader );
+use Lucy::Util::StringHelper qw( utf8_valid utf8_flag_on );
 use Compress::Zlib qw( uncompress );
 use Carp;
 
@@ -45,9 +45,9 @@ sub new {
         my $ix_filename  = $segment->get_name . "/zdocs.ix";
         my $folder       = $self->get_folder;
         $ix_in{$$self} = $folder->open_in($ix_filename)
-            or confess KinoSearch->error;
+            or confess Lucy->error;
         $dat_in{$$self} = $folder->open_in($dat_filename)
-            or confess KinoSearch->error;
+            or confess Lucy->error;
 
         # Remember which fields are binary.
         my $schema = $self->get_schema;
@@ -92,7 +92,7 @@ sub fetch_doc {
             unless utf8_valid( $fields{$field} );
     }
 
-    return KinoSearch::Document::HitDoc->new(
+    return Lucy::Document::HitDoc->new(
         fields => \%fields,
         doc_id => $doc_id,
     );

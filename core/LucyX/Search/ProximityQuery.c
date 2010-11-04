@@ -18,26 +18,26 @@
 #define C_LUCY_PROXIMITYCOMPILER
 #include <stdarg.h>
 
-#include "KinoSearch/Util/ToolSet.h"
+#include "Lucy/Util/ToolSet.h"
 
 #include "LucyX/Search/ProximityQuery.h"
-#include "KinoSearch/Index/DocVector.h"
-#include "KinoSearch/Index/Posting.h"
-#include "KinoSearch/Index/Posting/ScorePosting.h"
-#include "KinoSearch/Index/PostingList.h"
-#include "KinoSearch/Index/PostingListReader.h"
-#include "KinoSearch/Index/SegPostingList.h"
-#include "KinoSearch/Index/SegReader.h"
-#include "KinoSearch/Index/Similarity.h"
-#include "KinoSearch/Index/TermVector.h"
-#include "KinoSearch/Plan/Schema.h"
+#include "Lucy/Index/DocVector.h"
+#include "Lucy/Index/Posting.h"
+#include "Lucy/Index/Posting/ScorePosting.h"
+#include "Lucy/Index/PostingList.h"
+#include "Lucy/Index/PostingListReader.h"
+#include "Lucy/Index/SegPostingList.h"
+#include "Lucy/Index/SegReader.h"
+#include "Lucy/Index/Similarity.h"
+#include "Lucy/Index/TermVector.h"
+#include "Lucy/Plan/Schema.h"
 #include "LucyX/Search/ProximityScorer.h"
-#include "KinoSearch/Search/Searcher.h"
-#include "KinoSearch/Search/Span.h"
-#include "KinoSearch/Search/TermQuery.h"
-#include "KinoSearch/Store/InStream.h"
-#include "KinoSearch/Store/OutStream.h"
-#include "KinoSearch/Util/Freezer.h"
+#include "Lucy/Search/Searcher.h"
+#include "Lucy/Search/Span.h"
+#include "Lucy/Search/TermQuery.h"
+#include "Lucy/Store/InStream.h"
+#include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 // Shared initialization routine which assumes that it's ok to assume control
 // over [field] and [terms], eating their refcounts.

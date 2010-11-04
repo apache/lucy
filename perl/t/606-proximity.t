@@ -25,7 +25,7 @@ my $better = "x x x x a x b x c x x x x";
 my $best   = "x x x x x a b c x x x x x";
 my $folder = create_index( $good, $better, $best );
 
-my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
 my $hits = $searcher->hits( query => 'a b c' );
 

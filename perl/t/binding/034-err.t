@@ -17,9 +17,9 @@ use strict;
 use warnings;
 
 use Test::More tests => 1;
-use KinoSearch::Test;
+use Lucy::Test;
 
-my $err = KinoSearch::Object::Err->new("Bad stuff happened");
+my $err = Lucy::Object::Err->new("Bad stuff happened");
 
-isa_ok( $err, 'KinoSearch::Object::Err', "new" );
+isa_ok( $err, 'Lucy::Object::Err', "new" );
 

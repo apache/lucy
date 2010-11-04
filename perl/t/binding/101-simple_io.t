@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 28;
 use Lucy::Test::TestUtils qw( utf8_test_strings );
-use KinoSearch::Util::StringHelper qw( utf8ify utf8_flag_off );
+use Lucy::Util::StringHelper qw( utf8ify utf8_flag_off );
 use bytes;
 no bytes;
 
@@ -29,13 +29,13 @@ sub check_round_trip {
     my ( $type, $expected ) = @_;
     my $write_method = "write_$type";
     my $read_method  = "read_$type";
-    my $file         = KinoSearch::Store::RAMFile->new;
-    my $outstream    = KinoSearch::Store::OutStream->open( file => $file )
-        or die KinoSearch->error;
+    my $file         = Lucy::Store::RAMFile->new;
+    my $outstream    = Lucy::Store::OutStream->open( file => $file )
+        or die Lucy->error;
     $outstream->$write_method($_) for @$expected;
     $outstream->close;
-    my $instream = KinoSearch::Store::InStream->open( file => $file )
-        or die KinoSearch->error;
+    my $instream = Lucy::Store::InStream->open( file => $file )
+        or die Lucy->error;
     my @got;
     push @got, $instream->$read_method for @$expected;
     is_deeply( \@got, $expected, $type );
@@ -44,15 +44,15 @@ sub check_round_trip {
 
 sub check_round_trip_bytes {
     my ( $message, $expected ) = @_;
-    my $file = KinoSearch::Store::RAMFile->new;
-    my $outstream = KinoSearch::Store::OutStream->open( file => $file );
+    my $file = Lucy::Store::RAMFile->new;
+    my $outstream = Lucy::Store::OutStream->open( file => $file );
     for (@$expected) {
         $outstream->write_c32( bytes::length($_) );
         $outstream->print($_);
     }
     $outstream->close;
-    my $instream = KinoSearch::Store::InStream->open( file => $file )
-        or die KinoSearch->error;
+    my $instream = Lucy::Store::InStream->open( file => $file )
+        or die Lucy->error;
     my @got;
     for (@$expected) {
         my $buf;

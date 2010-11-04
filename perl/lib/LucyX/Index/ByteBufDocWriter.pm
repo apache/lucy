@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package LucyX::Index::ByteBufDocWriter;
-use base qw( KinoSearch::Index::DataWriter );
+use base qw( Lucy::Index::DataWriter );
 use Carp;
 use Scalar::Util qw( blessed );
 use bytes;
@@ -48,7 +48,7 @@ sub _lazy_init {
     my $folder    = $self->get_folder;
     my $filename  = $self->get_segment->get_name . "/bytebufdocs.dat";
     my $outstream = $outstream{$$self} = $folder->open_out($filename)
-        or confess KinoSearch->error;
+        or confess Lucy->error;
     my $nulls = "\0" x $width{$$self};
     $outstream->print($nulls);
 
@@ -77,7 +77,7 @@ sub add_segment {
     return unless $doc_max;
 
     my $outstream = $outstream{$$self} || _lazy_init($self);
-    my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
+    my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
     confess("Not a ByteBufDocReader")
         unless ( blessed($doc_reader)
         and $doc_reader->isa("LucyX::Index::ByteBufDocReader") );
