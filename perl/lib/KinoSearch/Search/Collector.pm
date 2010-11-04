@@ -35,7 +35,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Search::Collector",
     bind_methods => [
         qw(
@@ -54,7 +54,7 @@ Clownfish::Binding::Perl::Class->register(
     },
 );
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::Collector::OffsetCollector",
     bind_constructors => ["new"],
 );

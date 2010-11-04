@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::Collector::SortCollector",
     bind_methods      => [qw( Pop_Match_Docs Get_Total_Hits )],
     bind_constructors => ["new"],

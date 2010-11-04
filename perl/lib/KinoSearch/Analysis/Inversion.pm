@@ -51,7 +51,7 @@ OUTPUT: RETVAL
 END_XS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Analysis::Inversion",
     bind_methods => [qw( Append Reset Invert Next )],
     xs_code      => $xs,

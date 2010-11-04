@@ -48,7 +48,7 @@ END_SYNOPSIS
 my $constructor = qq|    my \$sim = Lucy::Index::Similarity->new;\n|;
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Index::Similarity",
     xs_code      => $xs_code,
     bind_methods => [

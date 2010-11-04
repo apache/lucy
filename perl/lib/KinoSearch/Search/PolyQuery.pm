@@ -38,7 +38,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::PolyQuery",
     bind_methods      => [qw( Add_Child Set_Children Get_Children )],
     bind_constructors => ["new"],

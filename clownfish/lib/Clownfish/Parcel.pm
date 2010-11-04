@@ -41,12 +41,6 @@ sub singleton {
     verify_args( \%singleton_PARAMS, %args ) or confess $@;
     my ( $name, $cnick ) = @args{qw( name cnick )};
 
-    # Temporary hack.
-    if ( $name eq 'KinoSearch' ) {
-        $cnick = 'Lucy';
-        $args{cnick} = 'Lucy';
-    }
-
     # Return the default parcel for either a blank name or an undefined name.
     return $default_parcel unless $name;
 

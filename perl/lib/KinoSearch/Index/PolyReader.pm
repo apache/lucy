@@ -34,7 +34,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Index::PolyReader",
     bind_constructors => [ 'new', 'open|do_open' ],
     bind_methods      => [qw( Get_Seg_Readers )],

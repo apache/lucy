@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** Abstract class for reading and writing to files.
  * 

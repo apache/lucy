@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** Base class for all Lucy objects.
  */

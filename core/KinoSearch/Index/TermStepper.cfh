@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 abstract class KinoSearch::Index::TermStepper
     inherits KinoSearch::Util::Stepper {

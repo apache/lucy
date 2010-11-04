@@ -46,7 +46,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Plan::FullTextType",
     bind_constructors => ["new|init2"],
     bind_methods      => [

@@ -51,7 +51,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::RangeQuery",
     bind_constructors => ["new"],
     make_pod          => {

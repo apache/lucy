@@ -55,13 +55,13 @@ OUTPUT: RETVAL
 END_XS_CODE
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Object::Float32",
     xs_code      => $float32_xs_code,
     bind_methods => [qw( Set_Value Get_Value )],
 );
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Object::Float64",
     xs_code      => $float64_xs_code,
     bind_methods => [qw( Set_Value Get_Value )],

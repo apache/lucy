@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** Normalize case, facilitating case-insensitive search.
  *

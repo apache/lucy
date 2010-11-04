@@ -251,7 +251,7 @@ sub _compile_clownfish {
     }
 
     my $binding = Clownfish::Binding::Perl->new(
-        parcel     => 'KinoSearch',
+        parcel     => 'Lucy',
         hierarchy  => $hierarchy,
         lib_dir    => 'lib',
         boot_class => 'KinoSearch',

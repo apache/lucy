@@ -98,7 +98,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
 Clownfish::Binding::Perl::Class->register(
-    parcel     => "KinoSearch",
+    parcel     => "Lucy",
     class_name => "KinoSearch::Object::Host",
     xs_code    => $xs_code,
 );

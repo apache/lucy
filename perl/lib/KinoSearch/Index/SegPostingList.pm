@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Index::SegPostingList",
     bind_methods      => [qw( Get_Post_Stream Get_Count )],
     bind_constructors => ["new"],

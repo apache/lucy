@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** Retrieve stored documents.
  * 

@@ -173,7 +173,7 @@ B<boost> - A floating point weight which affects how this document scores.
 END_ADD_DOC_POD
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Index::Indexer",
     xs_code      => $xs_code,
     bind_methods => [

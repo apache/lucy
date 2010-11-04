@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Index::Posting",
     bind_methods => [qw( Get_Doc_ID )],
 #    make_pod => {

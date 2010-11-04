@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** Tests for basic functionality of InStream using both memory-mapped and
  * streamed sources.

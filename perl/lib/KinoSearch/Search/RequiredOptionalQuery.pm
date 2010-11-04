@@ -39,7 +39,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Search::RequiredOptionalQuery",
     bind_methods => [
         qw( Get_Required_Query Set_Required_Query

@@ -57,7 +57,7 @@ my $synopsis = <<'END_SYNOPSIS';    # Don't use this yet.
 END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Store::OutStream",
     xs_code      => $xs_code,
     bind_methods => [

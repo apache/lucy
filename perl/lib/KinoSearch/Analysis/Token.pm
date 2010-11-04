@@ -89,7 +89,7 @@ PPCODE:
 END_XS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Analysis::Token",
     bind_methods => [
         qw(

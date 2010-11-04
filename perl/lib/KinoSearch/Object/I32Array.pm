@@ -85,7 +85,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Object::I32Array",
     xs_code      => $xs_code,
     bind_methods => [qw( Get Get_Size )],

@@ -34,7 +34,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Search::Hits",
     bind_methods => [
         qw(

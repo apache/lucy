@@ -43,7 +43,7 @@ my $constructor = <<'END_CONSTRUCTOR_CODE_SAMPLE';
 END_CONSTRUCTOR_CODE_SAMPLE
 
 Clownfish::Binding::Perl::Class->register(
-    parcel       => "KinoSearch",
+    parcel       => "Lucy",
     class_name   => "KinoSearch::Search::Compiler",
     bind_methods => [
         qw(

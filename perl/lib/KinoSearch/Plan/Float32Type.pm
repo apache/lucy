@@ -36,7 +36,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Plan::Float32Type",
     bind_constructors => ["new|init2"],
     #make_pod          => {

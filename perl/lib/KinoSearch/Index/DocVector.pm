@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Index::DocVector",
     bind_methods      => [qw( Term_Vector Field_Buf Add_Field_Buf )],
     bind_constructors => ["new"],

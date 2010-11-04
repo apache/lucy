@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** Backing storage used by RAMFolder and RAMFileHandle.
  */

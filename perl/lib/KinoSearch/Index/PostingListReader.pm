@@ -32,7 +32,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Index::PostingListReader",
     bind_constructors => ["new"],
     bind_methods      => [qw( Posting_List Get_Lex_Reader )],
@@ -42,7 +42,7 @@ Clownfish::Binding::Perl::Class->register(
     },
 );
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Index::DefaultPostingListReader",
     bind_constructors => ["new"],
 );

@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::ORScorer",
     bind_constructors => ["new"],
 );

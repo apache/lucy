@@ -189,7 +189,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "LucyX::Search::FilterScorer",
     bind_constructors => ["new"],
 );

@@ -47,7 +47,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Store::LockFactory",
     bind_methods      => [qw( Make_Lock Make_Shared_Lock )],
     bind_constructors => ["new"],

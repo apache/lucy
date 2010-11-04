@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** Return the inverse of a Matcher's set.  Scores are always 0.
  */

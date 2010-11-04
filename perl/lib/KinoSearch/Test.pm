@@ -279,19 +279,19 @@ PPCODE:
 END_XS_CODE
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Test::TestSchema",
     bind_constructors => ["new"],
 );
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Test",
     xs_code           => $xs_code,
 );
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Test::TestCharmonizer",
     xs_code           => $charm_xs_code,
 );

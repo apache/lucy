@@ -54,7 +54,7 @@ sub _make_method_obj {
         incremented => 1,
         specifier   => 'Obj',
         indirection => 1,
-        parcel      => 'KinoSearch',
+        parcel      => 'Lucy',
     );
     my $self_type = Clownfish::Type::Object->new(
         specifier   => $class->get_struct_sym,
@@ -75,7 +75,7 @@ sub _make_method_obj {
         my $dump_type = Clownfish::Type::Object->new(
             specifier   => 'Obj',
             indirection => 1,
-            parcel      => 'KinoSearch',
+            parcel      => 'Lucy',
         );
         my $dump_var = Clownfish::Variable->new(
             type      => $dump_type,

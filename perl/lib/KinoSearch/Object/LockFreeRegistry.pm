@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Object::LockFreeRegistry",
     bind_methods      => [qw( Register Fetch )],
     bind_constructors => ["new"],

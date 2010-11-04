@@ -23,7 +23,7 @@ __END__
 __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Index::SegLexicon",
     bind_methods      => [qw( Get_Term_Info Get_Field_Num )],
     bind_constructors => ["new"],

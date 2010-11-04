@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
-parcel KinoSearch;
+parcel Lucy;
+parcel Lucy;
 
 class KinoSearch::Test::Object::TestCharBuf cnick TestCB
     inherits KinoSearch::Object::Obj {

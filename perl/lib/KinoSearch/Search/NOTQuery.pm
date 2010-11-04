@@ -40,7 +40,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::NOTQuery",
     bind_constructors => ["new"],
     bind_methods      => [qw( Get_Negated_Query Set_Negated_Query )],

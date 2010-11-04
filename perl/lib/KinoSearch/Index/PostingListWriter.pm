@@ -33,7 +33,7 @@ PPCODE:
 END_XS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Index::PostingListWriter",
     xs_code           => $xs_code,
     bind_constructors => ["new"],

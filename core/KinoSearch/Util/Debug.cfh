@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel KinoSearch;
+parcel Lucy;
 
 /** The Debug module provides multiple levels of debugging verbosity.  Code for
  * debug statements is only compiled "#ifdef LUCY_DEBUG" at compile-time.

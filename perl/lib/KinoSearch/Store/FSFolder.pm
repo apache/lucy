@@ -31,7 +31,7 @@ END_SYNOPSIS
 my $constructor = $synopsis;
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Store::FSFolder",
     bind_constructors => ["new"],
     make_pod          => {

@@ -31,7 +31,7 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::PhraseQuery",
     bind_methods      => [qw( Get_Field Get_Terms )],
     bind_constructors => ["new"],
@@ -42,7 +42,7 @@ Clownfish::Binding::Perl::Class->register(
     },
 );
 Clownfish::Binding::Perl::Class->register(
-    parcel            => "KinoSearch",
+    parcel            => "Lucy",
     class_name        => "KinoSearch::Search::PhraseCompiler",
     bind_constructors => ["do_new"],
 );
