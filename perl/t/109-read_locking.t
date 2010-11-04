@@ -34,7 +34,7 @@ sub recycle { [] }
 
 package main;
 
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 use KinoSearch::Util::IndexFileNames qw( latest_snapshot );
 
 my $folder  = create_index(qw( a b c ));

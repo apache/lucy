@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 9;
-use KinoSearch::Test::TestUtils qw( test_analyzer );
+use Lucy::Test::TestUtils qw( test_analyzer );
 
 my $stemmer = KinoSearch::Analysis::Stemmer->new( language => 'en' );
 test_analyzer( $stemmer, 'ponies', ['poni'], "single word stemmed" );

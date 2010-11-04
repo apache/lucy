@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 2;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my $doc_1
     = 'a a a a a a a a a a a a a a a a a a a b c d x y ' . ( 'z ' x 100 );

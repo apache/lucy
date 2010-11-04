@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 1362;
 use KinoSearch::Test;
 use LucyX::Search::MockScorer;
-use KinoSearch::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
+use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
 my $sim = KinoSearch::Index::Similarity->new;
 

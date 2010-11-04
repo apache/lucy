@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 4;
 use File::Spec::Functions qw( catfile );
 use File::Find qw( find );
-use KinoSearch::Test::TestUtils qw(
+use Lucy::Test::TestUtils qw(
     working_dir
     create_working_dir
     remove_working_dir

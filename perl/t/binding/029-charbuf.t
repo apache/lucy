@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 6;
 use Storable qw( freeze thaw );
-use KinoSearch::Test::TestUtils qw( utf8_test_strings );
+use Lucy::Test::TestUtils qw( utf8_test_strings );
 
 my ( $smiley, $not_a_smiley, $frowny ) = utf8_test_strings();
 

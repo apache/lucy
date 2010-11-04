@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 12;
 use Storable qw( freeze thaw );
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( 'a', 'b', 'b c', 'c', 'c d', 'd', 'e' );
 my $searcher = KinoSearch::Search::IndexSearcher->new( index => $folder );

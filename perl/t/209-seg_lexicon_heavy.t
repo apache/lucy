@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 3;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my @docs;
 my @chars = ( 'a' .. 'z', 'B' .. 'E', 'G' .. 'Z' );

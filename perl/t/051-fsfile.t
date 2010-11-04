@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 5;
 use Carp;
 use File::Spec::Functions qw( tmpdir catdir catfile );
-use KinoSearch::Test::TestUtils qw( init_test_index_loc );
+use Lucy::Test::TestUtils qw( init_test_index_loc );
 
 sub slurp_file {
     my $path = shift;

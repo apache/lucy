@@ -46,7 +46,7 @@ sub new {
 
 package main;
 use Test::More tests => 10;
-use KinoSearch::Test::TestUtils qw( create_index init_test_index_loc );
+use Lucy::Test::TestUtils qw( create_index init_test_index_loc );
 use File::Find qw( find );
 
 my $index_loc = init_test_index_loc();

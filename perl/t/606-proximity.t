@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 1;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my $good   = "x a x x x x b x x x x c x";
 my $better = "x x x x a x b x c x x x x";

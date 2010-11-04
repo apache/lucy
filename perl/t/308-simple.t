@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 8;
 use LucyX::Simple;
-use KinoSearch::Test::TestUtils qw( init_test_index_loc );
+use Lucy::Test::TestUtils qw( init_test_index_loc );
 
 my $test_index_loc = init_test_index_loc();
 

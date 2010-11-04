@@ -79,7 +79,7 @@ sub make_req_opt_query { shift; MyReqOptQuery->new(@_) }
 package main;
 use Test::More tests => 224;
 use KinoSearch::Util::StringHelper qw( utf8_flag_on utf8ify );
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my $folder       = KinoSearch::Store::RAMFolder->new;
 my $stop_folder  = KinoSearch::Store::RAMFolder->new;

@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 9;
 use Storable qw( freeze thaw );
 use KinoSearch::Test;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my $best_match = 'x a b c d a b c d';
 

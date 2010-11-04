@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 24;
 use Storable qw( nfreeze thaw );
 use KinoSearch::Test;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 use LucyX::Search::Filter;
 
 my $query_parser = KinoSearch::Search::QueryParser->new(

@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 25;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
-use KinoSearch::Test::TestUtils qw( init_test_index_loc );
+use Lucy::Test::TestUtils qw( init_test_index_loc );
 use KinoSearch::Util::StringHelper qw( to_base36 );
 
 my $fs_index_loc = init_test_index_loc();

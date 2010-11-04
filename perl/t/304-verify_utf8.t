@@ -32,7 +32,7 @@ sub new {
 package main;
 use Test::More tests => 14;
 use KinoSearch::Test;
-use KinoSearch::Test::TestUtils qw( utf8_test_strings );
+use Lucy::Test::TestUtils qw( utf8_test_strings );
 
 my ( $smiley, $not_a_smiley, $frowny ) = utf8_test_strings();
 

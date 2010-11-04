@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 9;
 use KinoSearch::Test;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my @docs     = ( 'a b', 'a a b', 'a a a b', 'x' );
 my $folder   = create_index(@docs);

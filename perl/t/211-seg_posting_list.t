@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 2004;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my $folder = create_index( qw( a b c ), 'c c d' );
 my $polyreader   = KinoSearch::Index::IndexReader->open( index => $folder );

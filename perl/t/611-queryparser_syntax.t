@@ -43,7 +43,7 @@ sub new {
 package main;
 
 # Build index.
-my $doc_set = KinoSearch::Test::TestUtils::doc_set()->to_perl;
+my $doc_set = Lucy::Test::TestUtils::doc_set()->to_perl;
 my $folder  = KinoSearch::Store::RAMFolder->new;
 my $schema  = MySchema->new;
 my $indexer = KinoSearch::Index::Indexer->new(

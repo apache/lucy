@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KinoSearch::Redacted;
+package Lucy::Redacted;
 use Exporter;
 BEGIN {
     our @ISA       = qw( Exporter );
@@ -51,10 +51,10 @@ sub hidden {
         KinoSearch::Plan::Int64Type
         KinoSearch::Plan::Float32Type
         KinoSearch::Plan::Float64Type
-        KinoSearch::Redacted
+        Lucy::Redacted
         KinoSearch::Test::Object::TestCharBuf
-        KinoSearch::Test::TestUtils
-        KinoSearch::Test::USConSchema
+        Lucy::Test::TestUtils
+        Lucy::Test::USConSchema
         KinoSearch::Util::BitVector
     );
 }

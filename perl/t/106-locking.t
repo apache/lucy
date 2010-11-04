@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Time::HiRes qw( sleep );
 use Test::More;
 use File::Spec::Functions qw( catfile );
-use KinoSearch::Test::TestUtils qw( init_test_index_loc );
+use Lucy::Test::TestUtils qw( init_test_index_loc );
 
 BEGIN {
     if ( $^O =~ /mswin/i ) {

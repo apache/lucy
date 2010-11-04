@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KinoSearch::Test::TestUtils;
+package Lucy::Test::TestUtils;
 use base qw( Exporter );
 
 our @EXPORT_OK = qw(
@@ -39,7 +39,7 @@ use KinoSearch;
 use KinoSearch::Test;
 
 use lib 'sample';
-use KinoSearch::Test::USConSchema;
+use Lucy::Test::USConSchema;
 
 use File::Spec::Functions qw( catdir catfile curdir );
 use Encode qw( _utf8_off );
@@ -146,7 +146,7 @@ sub get_uscon_docs {
 sub create_uscon_index {
     my $folder = KinoSearch::Store::FSFolder->new(
         path => persistent_test_index_loc() );
-    my $schema  = KinoSearch::Test::USConSchema->new;
+    my $schema  = Lucy::Test::USConSchema->new;
     my $indexer = KinoSearch::Index::Indexer->new(
         schema   => $schema,
         index    => $folder,

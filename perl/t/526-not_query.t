@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 61;
 use Storable qw( freeze thaw );
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 use LucyX::Search::MockScorer;
 
 my @got;

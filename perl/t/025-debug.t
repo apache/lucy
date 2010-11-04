@@ -27,7 +27,7 @@ use KinoSearch::Util::Debug qw(
     ASSERT
     set_env_cache
 );
-use KinoSearch::Test::TestUtils qw( working_dir );
+use Lucy::Test::TestUtils qw( working_dir );
 
 BEGIN {
     if ( !DEBUG_ENABLED() ) {

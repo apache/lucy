@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 4;
-use KinoSearch::Test::TestUtils qw( utf8_test_strings );
+use Lucy::Test::TestUtils qw( utf8_test_strings );
 
 my $inversion = KinoSearch::Analysis::Inversion->new;
 $inversion->append(

@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 16;
-use KinoSearch::Test::TestUtils qw( test_analyzer );
+use Lucy::Test::TestUtils qw( test_analyzer );
 
 my $source_text = 'Eats, shoots and leaves.';
 

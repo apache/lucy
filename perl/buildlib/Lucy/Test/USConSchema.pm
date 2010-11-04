@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package KinoSearch::Test::USConSchema;
+package Lucy::Test::USConSchema;
 use base 'KinoSearch::Plan::Schema';
 use KinoSearch::Analysis::PolyAnalyzer;
 use KinoSearch::Plan::FullTextType;

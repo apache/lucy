@@ -27,7 +27,7 @@ __END__
 __BINDING__
 
 my $xs_code = <<'END_XS_CODE';
-MODULE = KinoSearch   PACKAGE = KinoSearch::Test::TestUtils
+MODULE = KinoSearch   PACKAGE = Lucy::Test::TestUtils
 
 SV*
 doc_set()

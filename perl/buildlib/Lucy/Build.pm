@@ -665,7 +665,7 @@ sub _gen_pause_exclusion_list {
         my @redacted = map {
             my @parts = split( /\W+/, $_ );
             catfile( 'lib', @parts ) . '.pm'
-        } KinoSearch::Redacted->redacted, KinoSearch::Redacted->hidden;
+        } Lucy::Redacted->redacted, Lucy::Redacted->hidden;
         push @excluded_files, @redacted;
     }
 

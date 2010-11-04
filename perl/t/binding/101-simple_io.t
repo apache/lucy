@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 28;
-use KinoSearch::Test::TestUtils qw( utf8_test_strings );
+use Lucy::Test::TestUtils qw( utf8_test_strings );
 use KinoSearch::Util::StringHelper qw( utf8ify utf8_flag_off );
 use bytes;
 no bytes;

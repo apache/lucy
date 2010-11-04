@@ -18,7 +18,7 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 6;
-use KinoSearch::Test::TestUtils qw( test_analyzer );
+use Lucy::Test::TestUtils qw( test_analyzer );
 
 my $stopalizer = KinoSearch::Analysis::Stopalizer->new( language => 'en' );
 test_analyzer( $stopalizer, 'the', [], "single stopword stopalized" );

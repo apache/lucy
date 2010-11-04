@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 8;
 use KinoSearch::Test;
-use KinoSearch::Test::TestUtils qw( create_index );
+use Lucy::Test::TestUtils qw( create_index );
 
 my $folder_a = create_index( 'x a', 'x b', 'x c' );
 my $folder_b = create_index( 'y b', 'y c', 'y d' );
