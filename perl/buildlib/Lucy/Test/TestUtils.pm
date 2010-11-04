@@ -46,7 +46,7 @@ use Encode qw( _utf8_off );
 use File::Path qw( rmtree );
 use Carp;
 
-my $working_dir = catfile( curdir(), 'kinosearch_test' );
+my $working_dir = catfile( curdir(), 'lucy_test' );
 
 # Return a directory within the system's temp directory where we will put all
 # testing scratch files.
