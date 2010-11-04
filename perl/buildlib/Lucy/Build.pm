@@ -125,9 +125,9 @@ sub extra_ccflags {
 
 =for Rationale
 
-When the distribution tarball for the Perl binding of KinoSearch is built, core/,
+When the distribution tarball for the Perl binding of Lucy is built, core/,
 charmonizer/, and any other needed files/directories are copied into the
-perl/ directory within the main KinoSearch directory.  Then the distro is built from
+perl/ directory within the main Lucy directory.  Then the distro is built from
 the contents of the perl/ directory, leaving out all the files in ruby/, etc.
 However, during development, the files are accessed from their original
 locations.

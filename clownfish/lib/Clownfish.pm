@@ -28,7 +28,7 @@ languages.
 
 =head1 PRIVATE API
 
-Clownfish is a KinoSearch implementation detail.  This documentation is partial --
+Clownfish is an Apache Lucy implementation detail.  This documentation is partial --
 enough for the curious hacker, but not a full API.
 
 =head1 DESCRIPTION

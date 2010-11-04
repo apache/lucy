@@ -75,16 +75,16 @@ uint32_t
 VTable_get_refcount(VTable *self)
 {
     UNUSED_VAR(self);
-    /* VTable_Get_RefCount() lies to other KinoSearch code about the refcount
+    /* VTable_Get_RefCount() lies to other Lucy code about the refcount
      * because we don't want to have to synchronize access to the cached host
      * object to which we have delegated responsibility for keeping refcounts.
-     * It always returns 1 because 1 is a positive number, and thus other KinoSearch
+     * It always returns 1 because 1 is a positive number, and thus other Lucy 
      * code will be fooled into believing it never needs to take action such
      * as initiating a destructor.
      * 
      * It's possible that the host has in fact increased the refcount of the
      * cached host object if there are multiple refs to it on the other side
-     * of the KinoSearch/host border, but returning 1 is good enough to fool KinoSearch
+     * of the Lucy/host border, but returning 1 is good enough to fool Lucy 
      * code.
      */
     return 1;

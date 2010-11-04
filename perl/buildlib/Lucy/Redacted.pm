@@ -23,7 +23,7 @@ BEGIN {
     our @EXPORT_OK = qw( list );
 }
 
-# Return a partial list of KinoSearch classes which were once public but are
+# Return a partial list of Lucy classes which were once public but are
 # now either deprecated, removed, or moved.
 
 sub redacted {

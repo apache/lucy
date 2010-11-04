@@ -71,7 +71,7 @@ like( $@, qr/abstract/i, "Obj is an abstract class" );
 
 my $object = TestObj->new;
 isa_ok( $object, "KinoSearch::Object::Obj",
-    "KinoSearch objects can be subclassed outside the KinoSearch hierarchy" );
+    "Clownfish objects can be subclassed outside the KinoSearch hierarchy" );
 
 # TODO: Port this test to C.
 eval { my $evil_twin = $object->clone };
