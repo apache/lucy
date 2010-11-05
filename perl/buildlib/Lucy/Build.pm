@@ -674,6 +674,18 @@ sub _gen_pause_exclusion_list {
     return { file => \@excluded_files };
 }
 
+sub ACTION_semiclean {
+    my $self = shift;
+    print "Cleaning up most build files.\n";
+    my @candidates
+        = grep { $_ !~ /(charmonizer|^_charm|charmony|charmonize)/ } $self->cleanup;
+    for my $path ( map { glob($_) } @candidates ) {
+        next unless -e $path;
+        rmtree($path);
+        confess("Failed to remove '$path'") if -e $path;
+    }
+}
+
 1;
 
 __END__
