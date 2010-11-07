@@ -76,11 +76,10 @@ my $highlighter = Lucy::Highlight::Highlighter->new(
 my $report = '';
 while ( my $hit = $hits->next ) {
     my $score   = sprintf( "%0.3f", $hit->get_score );
-    my $title   = encode_entities( $hit->{title} );
     my $excerpt = $highlighter->create_excerpt($hit);
     $report .= qq|
         <p>
-          <a href="$hit->{url}"><strong>$title</strong></a>
+          <a href="$hit->{url}"><strong>$hit->{title}</strong></a>
           <em>$score</em>
           <br />
           $excerpt
