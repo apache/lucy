@@ -266,9 +266,9 @@ must be overridden.
 next() advances the Matcher to the next valid matching doc.  
 
     sub next {
-        my $self     = shift;
+        my $self    = shift;
         my $doc_ids = $doc_ids{$$self};
-        my $tick     = ++$tick{$$self};
+        my $tick    = ++$tick{$$self};
         return 0 if $tick >= scalar @$doc_ids;
         return $doc_ids->[$tick];
     }
@@ -278,8 +278,8 @@ exhausted.  (L<Document numbers|Lucy::Docs::DocIDs> start at 1, so 0 is
 a sentinel.)
 
     sub get_doc_id {
-        my $self     = shift;
-        my $tick     = $tick{$$self};
+        my $self    = shift;
+        my $tick    = $tick{$$self};
         my $doc_ids = $doc_ids{$$self};
         return $tick < scalar @$doc_ids ? $doc_ids->[$tick] : 0;
     }
