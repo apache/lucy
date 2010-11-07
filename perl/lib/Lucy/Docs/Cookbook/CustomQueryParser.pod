@@ -348,7 +348,7 @@ for how they behave:
     my $hits   = $searcher->hits(
         query      => $query,
         offset     => $offset,
-        num_wanted => $hits_per_page,
+        num_wanted => $page_size,
     );
     ...
 

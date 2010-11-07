@@ -30,11 +30,11 @@ use Lucy::Search::QueryParser;
 use Lucy::Search::TermQuery;
 use Lucy::Search::ANDQuery;
 
-my $cgi           = CGI->new;
-my $q             = decode( "UTF-8", $cgi->param('q') || '' );
-my $offset        = decode( "UTF-8", $cgi->param('offset') || 0 );
-my $category      = decode( "UTF-8", $cgi->param('category') || '' );
-my $hits_per_page = 10;
+my $cgi       = CGI->new;
+my $q         = decode( "UTF-8", $cgi->param('q') || '' );
+my $offset    = decode( "UTF-8", $cgi->param('offset') || 0 );
+my $category  = decode( "UTF-8", $cgi->param('category') || '' );
+my $page_size = 10;
 
 # Create an IndexSearcher and a QueryParser.
 my $searcher = Lucy::Search::IndexSearcher->new( 
@@ -60,7 +60,7 @@ if ($category) {
 my $hits = $searcher->hits(
     query      => $query,
     offset     => $offset,
-    num_wanted => $hits_per_page,
+    num_wanted => $page_size,
 );
 my $hit_count = $hits->total_hits;
 
@@ -112,10 +112,10 @@ sub generate_paging_info {
             = qq|<p>No matches for <strong>$escaped_q</strong></p>|;
     }
     else {
-        my $current_page = ( $offset / $hits_per_page ) + 1;
+        my $current_page = ( $offset / $page_size ) + 1;
         my $pager        = Data::Pageset->new(
             {   total_entries    => $total_hits,
-                entries_per_page => $hits_per_page,
+                entries_per_page => $page_size,
                 current_page     => $current_page,
                 pages_per_set    => 10,
                 mode             => 'slide',
@@ -143,7 +143,7 @@ sub generate_paging_info {
 
         # Generate the "Prev" link.
         if ( $current_page > 1 ) {
-            my $new_offset = ( $current_page - 2 ) * $hits_per_page;
+            my $new_offset = ( $current_page - 2 ) * $page_size;
             $href =~ s/(?<=offset=)\d+/$new_offset/;
             $paging_info .= qq|<a href="$href">&lt;= Prev</a>\n|;
         }
@@ -154,7 +154,7 @@ sub generate_paging_info {
                 $paging_info .= qq|$page_num \n|;
             }
             else {
-                my $new_offset = ( $page_num - 1 ) * $hits_per_page;
+                my $new_offset = ( $page_num - 1 ) * $page_size;
                 $href =~ s/(?<=offset=)\d+/$new_offset/;
                 $paging_info .= qq|<a href="$href">$page_num</a>\n|;
             }
@@ -162,7 +162,7 @@ sub generate_paging_info {
 
         # Generate the "Next" link.
         if ( $current_page != $pager->last_page ) {
-            my $new_offset = $current_page * $hits_per_page;
+            my $new_offset = $current_page * $page_size;
             $href =~ s/(?<=offset=)\d+/$new_offset/;
             $paging_info .= qq|<a href="$href">Next =&gt;</a>\n|;
         }

@@ -136,7 +136,7 @@ Now when we execute the query...
     my $hits = $searcher->hits(
         query      => $query,
         offset     => $offset,
-        num_wanted => $hits_per_page,
+        num_wanted => $page_size,
     );
 
 ... we'll get a result set which is the intersection of the parsed query and

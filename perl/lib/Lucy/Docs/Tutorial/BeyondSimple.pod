@@ -132,7 +132,7 @@ also straightforward:
     my $hits = $searcher->hits(    # returns a Hits object, not a hit count
         query      => $q,
         offset     => $offset,
-        num_wanted => $hits_per_page,
+        num_wanted => $page_size,
     );
     my $hit_count = $hits->total_hits;  # get the hit count here
     
