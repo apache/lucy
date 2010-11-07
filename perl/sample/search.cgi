@@ -24,7 +24,6 @@ my $path_to_index = '/path/to/index';
 use CGI;
 use Encode qw( decode );
 use Data::Pageset;
-use HTML::Entities qw( encode_entities );
 use Lucy::Search::IndexSearcher;
 use Lucy::Highlight::Highlighter;
 use Lucy::Search::QueryParser;
@@ -101,7 +100,7 @@ blast_out_content( $q, $report, $paging_links, $cat_select );
 # Create html fragment with links for paging through results n-at-a-time.
 sub generate_paging_info {
     my ( $query_string, $total_hits ) = @_;
-    $query_string = encode_entities($query_string);
+    my $escaped_q = CGI::escapeHTML($query_string);
     my $paging_info;
     if ( !length $query_string ) {
         # No query?  No display.
@@ -110,7 +109,7 @@ sub generate_paging_info {
     elsif ( $total_hits == 0 ) {
         # Alert the user that their search failed.
         $paging_info
-            = qq|<p>No matches for <strong>$query_string</strong></p>|;
+            = qq|<p>No matches for <strong>$escaped_q</strong></p>|;
     }
     else {
         my $current_page = ( $offset / $hits_per_page ) + 1;
@@ -130,15 +129,17 @@ sub generate_paging_info {
             <p>
                 Results <strong>$first_result-$last_result</strong> 
                 of <strong>$total_hits</strong> 
-                for <strong>$query_string</strong>.
+                for <strong>$escaped_q</strong>.
             </p>
             <p>
                 Results Page:
             |;
 
         # Create a url for use in paging links.
-        my $href = $cgi->url( -relative => 1 ) . "?" . $cgi->query_string;
-        $href .= ";offset=0" unless $href =~ /offset=/;
+        my $href = $cgi->url( -relative => 1 );
+        $href .= "?q=" . CGI::escape($query_string);
+        $href .= ";category=" . CGI::escape($category);
+        $href .= ";offset=" . CGI::escape($offset);
 
         # Generate the "Prev" link.
         if ( $current_page > 1 ) {
@@ -191,7 +192,7 @@ sub generate_category_select {
 # Print content to output.
 sub blast_out_content {
     my ( $query_string, $hit_list, $paging_info, $category_select ) = @_;
-    $query_string = encode_entities($query_string);
+    my $escaped_q = CGI::escapeHTML($query_string);
     binmode( STDOUT, ":encoding(UTF-8)" );
     print qq|Content-type: text/html; charset=UTF-8\n\n|;
     print qq|
@@ -203,7 +204,7 @@ sub blast_out_content {
     content="text/html;charset=UTF-8">
   <link rel="stylesheet" type="text/css" 
     href="/us_constitution/uscon.css">
-  <title>Lucy: $query_string</title>
+  <title>Lucy: $escaped_q</title>
 </head>
 
 <body>
@@ -214,7 +215,7 @@ sub blast_out_content {
         Search the 
         <a href="/us_constitution/index.html">US Constitution</a>:
       </strong>
-      <input type="text" name="q" id="q" value="$query_string">
+      <input type="text" name="q" id="q" value="$escaped_q">
       $category_select
       <input type="submit" value="=&gt;">
     </form>

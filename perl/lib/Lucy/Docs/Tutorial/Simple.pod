@@ -113,7 +113,6 @@ The beginning is dedicated to CGI processing and configuration.
     use CGI;
     use Encode qw( decode );
     use Data::Pageset;
-    use HTML::Entities qw( encode_entities );
     use LucyX::Simple;
     
     my $cgi           = CGI->new;
@@ -147,10 +146,9 @@ objects, starting with the most relevant.
     my $report = '';
     while ( my $hit = $simple->next ) {
         my $score = sprintf( "%0.3f", $hit->get_score );
-        my $title = encode_entities( $hit->{title} );
         $report .= qq|
             <p>
-              <a href="$hit->{url}"><strong>$title</strong></a>
+              <a href="$hit->{url}"><strong>$hit->{title}</strong></a>
               <em>$score</em>
               <br>
               <span class="excerptURL">$hit->{url}</span>
@@ -158,9 +156,7 @@ objects, starting with the most relevant.
             |;
     }
 
-The rest of the script is just text wrangling.  Notable aspects include the
-use of L<Data::Pageset> to create paging links, and the L<encode_entities>
-function from L<HTML::Entities> to guard against cross-site scripting attacks.
+The rest of the script is just text wrangling. 
 
     #---------------------------------------------------------------#
     # No tutorial material below this point - just html generation. #
@@ -173,7 +169,7 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
     # Create html fragment with links for paging through results n-at-a-time.
     sub generate_paging_info {
         my ( $query_string, $total_hits ) = @_;
-        $query_string = encode_entities($query_string);
+        my $escaped_q = CGI::escapeHTML($query_string);
         my $paging_info;
         if ( !length $query_string ) {
             # No query?  No display.
@@ -182,7 +178,7 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
         elsif ( $total_hits == 0 ) {
             # Alert the user that their search failed.
             $paging_info
-                = qq|<p>No matches for <strong>$query_string</strong></p>|;
+                = qq|<p>No matches for <strong>$escaped_q</strong></p>|;
         }
         else {
             my $current_page = ( $offset / $hits_per_page ) + 1;
@@ -202,15 +198,17 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
                 <p>
                     Results <strong>$first_result-$last_result</strong> 
                     of <strong>$total_hits</strong> 
-                    for <strong>$query_string</strong>.
+                    for <strong>$escaped_q</strong>.
                 </p>
                 <p>
                     Results Page:
                 |;
     
             # Create a url for use in paging links.
-            my $href = $cgi->url( -relative => 1 ) . "?" . $cgi->query_string;
-            $href .= ";offset=0" unless $href =~ /offset=/;
+            my $href = $cgi->url( -relative => 1 );
+            $href .= "?q=" . CGI::escape($query_string);
+            $href .= ";category=" . CGI::escape($category);
+            $href .= ";offset=" . CGI::escape($offset);
     
             # Generate the "Prev" link.
             if ( $current_page > 1 ) {
@@ -248,7 +246,7 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
     # Print content to output.
     sub blast_out_content {
         my ( $query_string, $hit_list, $paging_info ) = @_;
-        $query_string = encode_entities($query_string);
+        my $escaped_q = CGI::escapeHTML($query_string);
         binmode( STDOUT, ":encoding(UTF-8)" );
         print qq|Content-type: text/html; charset=UTF-8\n\n|;
         print qq|
@@ -260,7 +258,7 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
         content="text/html;charset=UTF-8">
       <link rel="stylesheet" type="text/css" 
         href="/us_constitution/uscon.css">
-      <title>Lucy: $query_string</title>
+      <title>Lucy: $escaped_q</title>
     </head>
     
     <body>
@@ -271,7 +269,7 @@ function from L<HTML::Entities> to guard against cross-site scripting attacks.
             Search the 
             <a href="/us_constitution/index.html">US Constitution</a>:
           </strong>
-          <input type="text" name="q" id="q" value="$query_string">
+          <input type="text" name="q" id="q" value="$escaped_q">
           <input type="submit" value="=&gt;">
         </form>
       </div><!--navigation-->
