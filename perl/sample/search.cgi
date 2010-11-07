@@ -22,6 +22,7 @@ use warnings;
 my $path_to_index = '/path/to/index';
 
 use CGI;
+use Encode qw( decode );
 use Data::Pageset;
 use HTML::Entities qw( encode_entities );
 use Lucy::Search::IndexSearcher;
@@ -31,9 +32,9 @@ use Lucy::Search::TermQuery;
 use Lucy::Search::ANDQuery;
 
 my $cgi           = CGI->new;
-my $q             = $cgi->param('q') || '';
-my $offset        = $cgi->param('offset') || 0;
-my $category      = $cgi->param('category') || '';
+my $q             = decode( "UTF-8", $cgi->param('q') || '' );
+my $offset        = decode( "UTF-8", $cgi->param('offset') || 0 );
+my $category      = decode( "UTF-8", $cgi->param('category') || '' );
 my $hits_per_page = 10;
 
 # Create an IndexSearcher and a QueryParser.
@@ -192,14 +193,15 @@ sub generate_category_select {
 sub blast_out_content {
     my ( $query_string, $hit_list, $paging_info, $category_select ) = @_;
     $query_string = encode_entities($query_string);
-    print "Content-type: text/html\n\n";
+    binmode( STDOUT, ":encoding(UTF-8)" );
+    print qq|Content-type: text/html; charset=UTF-8\n\n|;
     print qq|
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
   <meta http-equiv="Content-type" 
-    content="text/html;charset=ISO-8859-1">
+    content="text/html;charset=UTF-8">
   <link rel="stylesheet" type="text/css" 
     href="/us_constitution/uscon.css">
   <title>Lucy: $query_string</title>

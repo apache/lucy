@@ -344,7 +344,7 @@ Insert any of our custom parsers into the search.cgi sample app to get a feel
 for how they behave:
 
     my $parser = FlatQueryParser->new( schema => $searcher->get_schema );
-    my $query  = $parser->parse( $cgi->param('q') || '' );
+    my $query  = $parser->parse( decode( 'UTF-8', $cgi->param('q') || '' ) );
     my $hits   = $searcher->hits(
         query      => $query,
         offset     => $offset,

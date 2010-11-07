@@ -97,7 +97,7 @@ parameter.
     
     ... 
     
-    my $category = $cgi->param('category') || '';
+    my $category = decode( "UTF-8", $cgi->param('category') || '' );
 
 QueryParser's constructor requires a "schema" argument.  We can get that from
 our IndexSearcher:
