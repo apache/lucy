@@ -26,10 +26,9 @@ my $builder = Lucy::Build->new(
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
     dist_version => '0.001',
     requires     => {
-        'Lingua::Stem::Snowball' => 0.952,
-        'Lingua::StopWords'      => 0.09,
-        'Parse::RecDescent'      => 0,
-        'JSON::XS'               => 1.53,
+        'Lingua::StopWords' => 0.09,
+        'Parse::RecDescent' => 0,
+        'JSON::XS'          => 1.53,
     },
     build_requires => {
         'ExtUtils::CBuilder' => 0.18,

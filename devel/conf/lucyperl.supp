@@ -101,13 +101,4 @@
    fun:*
 }
 
-{
-   <Snowball XS constructor>
-   Memcheck:Leak
-   fun:calloc
-   fun:Perl_safesyscalloc
-   fun:XS_Lingua__Stem__Snowball__Stemmifier_new
-   fun:*
-}
-
 

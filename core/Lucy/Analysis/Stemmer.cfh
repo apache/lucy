@@ -16,35 +16,6 @@
 
 parcel Lucy;
 
-__C__
-typedef unsigned char sb_symbol;
-struct sb_stemmer;
-
-typedef struct sb_stemmer*
-(*lucy_Stemmer_sb_stemmer_new_t)(const char *algorithm, const char *encoding);
-typedef void
-(*lucy_Stemmer_sb_stemmer_delete_t)(struct sb_stemmer *snowstemmer);
-typedef sb_symbol*
-(*lucy_Stemmer_sb_stemmer_stem_t)(struct sb_stemmer *snowstemmer, 
-    const sb_symbol *text, int len);
-typedef int
-(*lucy_Stemmer_sb_stemmer_length_t)(struct sb_stemmer *snowstemmer);
-extern lucy_Stemmer_sb_stemmer_new_t    lucy_Stemmer_sb_stemmer_new;
-extern lucy_Stemmer_sb_stemmer_delete_t lucy_Stemmer_sb_stemmer_delete;
-extern lucy_Stemmer_sb_stemmer_stem_t   lucy_Stemmer_sb_stemmer_stem;
-extern lucy_Stemmer_sb_stemmer_length_t lucy_Stemmer_sb_stemmer_length;
-#ifdef LUCY_USE_SHORT_NAMES
-  #define Stemmer_sb_stemmer_new_t    lucy_Stemmer_sb_stemmer_new_t
-  #define Stemmer_sb_stemmer_delete_t lucy_Stemmer_sb_stemmer_delete_t
-  #define Stemmer_sb_stemmer_stem_t   lucy_Stemmer_sb_stemmer_stem_t
-  #define Stemmer_sb_stemmer_length_t lucy_Stemmer_sb_stemmer_length_t
-  #define Stemmer_sb_stemmer_new      lucy_Stemmer_sb_stemmer_new
-  #define Stemmer_sb_stemmer_delete   lucy_Stemmer_sb_stemmer_delete
-  #define Stemmer_sb_stemmer_stem     lucy_Stemmer_sb_stemmer_stem
-  #define Stemmer_sb_stemmer_length   lucy_Stemmer_sb_stemmer_length
-#endif
-__END_C__
-
 /** Reduce related words to a shared root.
  * 
  * Stemmer is an L<Analyzer|Lucy::Analysis::Analyzer> which reduces
@@ -81,11 +52,6 @@ class Lucy::Analysis::Stemmer inherits Lucy::Analysis::Analyzer
 
     public bool_t
     Equals(Stemmer *self, Obj *other);
-
-    /** Load the Snowball stemming library.  Called by the constructor.
-     */
-    inert void
-    load_snowball();
 
     public void
     Destroy(Stemmer *self);

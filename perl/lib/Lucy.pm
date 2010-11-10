@@ -88,14 +88,6 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Analysis::Stemmer;
-    sub lazy_load_snowball {
-        require Lingua::Stem::Snowball;
-        Lucy::Analysis::Stemmer::_copy_snowball_symbols();
-    }
-}
-
-{
     package Lucy::Analysis::Stopalizer;
     use Lucy qw( to_clownfish );
 

@@ -23,10 +23,7 @@
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 
-Stemmer_sb_stemmer_new_t    Stemmer_sb_stemmer_new    = NULL;
-Stemmer_sb_stemmer_delete_t Stemmer_sb_stemmer_delete = NULL;
-Stemmer_sb_stemmer_stem_t   Stemmer_sb_stemmer_stem   = NULL;
-Stemmer_sb_stemmer_length_t Stemmer_sb_stemmer_length = NULL;
+#include "libstemmer.h"
 
 Stemmer*
 Stemmer_new(const CharBuf *language)
@@ -43,11 +40,10 @@ Stemmer_init(Stemmer *self, const CharBuf *language)
     self->language = CB_Clone(language);
 
     // Get a Snowball stemmer.  Be case-insensitive. 
-    Stemmer_load_snowball();
     lang_buf[0] = tolower(CB_Code_Point_At(language, 0));
     lang_buf[1] = tolower(CB_Code_Point_At(language, 1));
     lang_buf[2] = '\0';
-    self->snowstemmer = lucy_Stemmer_sb_stemmer_new(lang_buf, "UTF_8");
+    self->snowstemmer = sb_stemmer_new(lang_buf, "UTF_8");
     if (!self->snowstemmer) 
         THROW(ERR, "Can't find a Snowball stemmer for %o", language);
 
@@ -58,7 +54,7 @@ void
 Stemmer_destroy(Stemmer *self)
 {
     if (self->snowstemmer) {
-        lucy_Stemmer_sb_stemmer_delete((struct sb_stemmer*)self->snowstemmer);
+        sb_stemmer_delete((struct sb_stemmer*)self->snowstemmer);
     }
     DECREF(self->language);
     SUPER_DESTROY(self, STEMMER);
@@ -72,9 +68,9 @@ Stemmer_transform(Stemmer *self, Inversion *inversion)
         = (struct sb_stemmer*)self->snowstemmer;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        sb_symbol *stemmed_text = lucy_Stemmer_sb_stemmer_stem(snowstemmer, 
+        const sb_symbol *stemmed_text = sb_stemmer_stem(snowstemmer, 
             (sb_symbol*)token->text, token->len);
-        size_t len = lucy_Stemmer_sb_stemmer_length(snowstemmer);
+        size_t len = sb_stemmer_length(snowstemmer);
         if (len > token->len) {
             FREEMEM(token->text);
             token->text = (char*)MALLOCATE(len + 1);
