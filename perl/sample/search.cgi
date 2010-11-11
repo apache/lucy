@@ -30,14 +30,11 @@ use Lucy::Search::QueryParser;
 use Lucy::Search::TermQuery;
 use Lucy::Search::ANDQuery;
 
-# Extract CGI parameters.
-my $cgi        = CGI->new;
-my $cgi_params = {
-    q        => decode( "UTF-8", $cgi->param('q')        || '' ),
-    offset   => decode( "UTF-8", $cgi->param('offset')   || 0 ),
-    category => decode( "UTF-8", $cgi->param('category') || '' ),
-    page_size => 10,
-};
+my $cgi       = CGI->new;
+my $q         = decode( "UTF-8", $cgi->param('q') || '' );
+my $offset    = decode( "UTF-8", $cgi->param('offset') || 0 );
+my $category  = decode( "UTF-8", $cgi->param('category') || '' );
+my $page_size = 10;
 
 # Create an IndexSearcher and a QueryParser.
 my $searcher = Lucy::Search::IndexSearcher->new( 
@@ -48,29 +45,29 @@ my $qparser = Lucy::Search::QueryParser->new(
 );
 
 # Build up a Query.
-my $query = $qparser->parse( $cgi_params->{q} );
-if ( $cgi_params->{category} ) {
+my $query = $qparser->parse($q);
+if ($category) {
     my $category_query = Lucy::Search::TermQuery->new(
-        field => 'category',
-        term  => $cgi_params->{category},
+        field => 'category', 
+        term  => $category,
     );
-    $query = Lucy::Search::ANDQuery->new( 
-        children => [ $query, $category_query ] 
+    $query = Lucy::Search::ANDQuery->new(
+        children => [ $query, $category_query ]
     );
 }
 
 # Execute the Query and get a Hits object.
 my $hits = $searcher->hits(
     query      => $query,
-    offset     => $cgi_params->{offset},
-    num_wanted => $cgi_params->{page_size},
+    offset     => $offset,
+    num_wanted => $page_size,
 );
 my $hit_count = $hits->total_hits;
 
 # Arrange for highlighted excerpts to be created.
 my $highlighter = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
-    query    => $cgi_params->{q},
+    query    => $q,
     field    => 'content'
 );
 
@@ -96,31 +93,29 @@ while ( my $hit = $hits->next ) {
 #--------------------------------------------------------------------#
 
 # Generate html, print and exit.
-my $paging_links = generate_paging_info( $cgi_params, $hit_count );
-my $cat_select = generate_category_select( $cgi_params );
-blast_out_content( $cgi_params, $report, $paging_links, $cat_select );
+my $paging_links = generate_paging_info( $q, $hit_count );
+my $cat_select = generate_category_select($category);
+blast_out_content( $q, $report, $paging_links, $cat_select );
 
 # Create html fragment with links for paging through results n-at-a-time.
 sub generate_paging_info {
-    my ( $params, $total_hits ) = @_;
-    my $escaped_q = CGI::escapeHTML( $params->{q} );
+    my ( $query_string, $total_hits ) = @_;
+    my $escaped_q = CGI::escapeHTML($query_string);
     my $paging_info;
-    if ( !length $escaped_q ) {
-
+    if ( !length $query_string ) {
         # No query?  No display.
         $paging_info = '';
     }
     elsif ( $total_hits == 0 ) {
-
         # Alert the user that their search failed.
-        $paging_info = qq|<p>No matches for <strong>$escaped_q</strong></p>|;
+        $paging_info
+            = qq|<p>No matches for <strong>$escaped_q</strong></p>|;
     }
     else {
-        my $current_page = ( $params->{offset} / $params->{page_size} ) + 1;
+        my $current_page = ( $offset / $page_size ) + 1;
         my $pager        = Data::Pageset->new(
-            {
-                total_entries    => $total_hits,
-                entries_per_page => $params->{page_size},
+            {   total_entries    => $total_hits,
+                entries_per_page => $page_size,
                 current_page     => $current_page,
                 pages_per_set    => 10,
                 mode             => 'slide',
@@ -142,13 +137,13 @@ sub generate_paging_info {
 
         # Create a url for use in paging links.
         my $href = $cgi->url( -relative => 1 );
-        $href .= "?q=" . CGI::escape( $params->{q} );
-        $href .= ";category=" . CGI::escape( $params->{category} );
-        $href .= ";offset=" . CGI::escape( $params->{offset} );
+        $href .= "?q=" . CGI::escape($query_string);
+        $href .= ";category=" . CGI::escape($category);
+        $href .= ";offset=" . CGI::escape($offset);
 
         # Generate the "Prev" link.
         if ( $current_page > 1 ) {
-            my $new_offset = ( $current_page - 2 ) * $params->{page_size};
+            my $new_offset = ( $current_page - 2 ) * $page_size;
             $href =~ s/(?<=offset=)\d+/$new_offset/;
             $paging_info .= qq|<a href="$href">&lt;= Prev</a>\n|;
         }
@@ -159,7 +154,7 @@ sub generate_paging_info {
                 $paging_info .= qq|$page_num \n|;
             }
             else {
-                my $new_offset = ( $page_num - 1 ) * $params->{page_size};
+                my $new_offset = ( $page_num - 1 ) * $page_size;
                 $href =~ s/(?<=offset=)\d+/$new_offset/;
                 $paging_info .= qq|<a href="$href">$page_num</a>\n|;
             }
@@ -167,7 +162,7 @@ sub generate_paging_info {
 
         # Generate the "Next" link.
         if ( $current_page != $pager->last_page ) {
-            my $new_offset = $current_page * $params->{page_size};
+            my $new_offset = $current_page * $page_size;
             $href =~ s/(?<=offset=)\d+/$new_offset/;
             $paging_info .= qq|<a href="$href">Next =&gt;</a>\n|;
         }
@@ -181,8 +176,7 @@ sub generate_paging_info {
 
 # Build up the HTML "select" object for the "category" field.
 sub generate_category_select {
-    my $params = shift;
-    my $cat    = $params->{category};
+    my $cat = shift;
     my $select = qq|
       <select name="category">
         <option value="">All Sections</option>
@@ -197,8 +191,8 @@ sub generate_category_select {
 
 # Print content to output.
 sub blast_out_content {
-    my ( $params, $hit_list, $paging_info, $category_select ) = @_;
-    my $escaped_q = CGI::escapeHTML( $params->{q} );
+    my ( $query_string, $hit_list, $paging_info, $category_select ) = @_;
+    my $escaped_q = CGI::escapeHTML($query_string);
     binmode( STDOUT, ":encoding(UTF-8)" );
     print qq|Content-type: text/html; charset=UTF-8\n\n|;
     print qq|
