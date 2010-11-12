@@ -56,6 +56,6 @@ found in the C<sample> directory at the root of the Lucy distribution:
 
     sample/indexer.pl        # indexing app
     sample/search.cgi        # search app
-    sample/us_constitution   # html documents
+    sample/us_constitution   # corpus
 
 

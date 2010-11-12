@@ -107,13 +107,12 @@ sub get_uscon_docs {
     my $uscon_dir = catdir( 'sample', 'us_constitution' );
     opendir( my $uscon_dh, $uscon_dir )
         or die "couldn't opendir '$uscon_dir': $!";
-    my @filenames = grep {/\.html$/} sort readdir $uscon_dh;
+    my @filenames = grep {/\.txt$/} sort readdir $uscon_dh;
     closedir $uscon_dh or die "couldn't closedir '$uscon_dir': $!";
 
     my %docs;
 
     for my $filename (@filenames) {
-        next if $filename eq 'index.html';
         my $filepath = catfile( $uscon_dir, $filename );
         open( my $fh, '<', $filepath )
             or die "couldn't open file '$filepath': $!";

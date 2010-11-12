@@ -33,7 +33,7 @@ Since they are all defined as "full text" fields, they are all searchable --
 including the C<url> field, a dubious choice.  Some URLs contain meaningful
 information, but these don't, really:
 
-    http://example.com/us_constitution/amend1.html
+    http://example.com/us_constitution/amend1.txt
 
 We may as well not bother indexing the URL content.  To achieve that we need
 to assign the C<url> field to a different FieldType.  

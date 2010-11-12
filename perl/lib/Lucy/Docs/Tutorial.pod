@@ -65,14 +65,14 @@ by using Query objects instead of query strings.
 
 =head2 Source materials
 
-The source material used by the tutorial app -- an html presentation of the
-United States constitution -- can be found in the C<sample>
-directory at the root of the Lucy distribution, along with finished
-indexing and search apps.
+The source material used by the tutorial app -- a multi-text-file presentation
+of the United States constitution -- can be found in the C<sample> directory
+at the root of the Lucy distribution, along with finished indexing and search
+apps.
 
     sample/indexer.pl        # indexing app
     sample/search.cgi        # search app
-    sample/us_constitution   # html documents
+    sample/us_constitution   # corpus
 
 =head2 Conventions
 

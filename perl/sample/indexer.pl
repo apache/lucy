@@ -23,7 +23,6 @@ my $path_to_index = '/path/to/index';
 my $uscon_source  = '/usr/local/apache2/htdocs/us_constitution';
 
 use File::Spec::Functions qw( catfile );
-use HTML::TreeBuilder;
 use Lucy::Plan::Schema;
 use Lucy::Plan::FullTextType;
 use Lucy::Analysis::PolyAnalyzer;
@@ -56,10 +55,10 @@ my $indexer = Lucy::Index::Indexer->new(
     truncate => 1,
 );
 
-# Collect names of source html files.
+# Collect names of source files.
 opendir( my $dh, $uscon_source )
     or die "Couldn't opendir '$uscon_source': $!";
-my @filenames = grep { $_ =~ /\.html/ && $_ ne 'index.html' } readdir $dh;
+my @filenames = grep { $_ =~ /\.txt/ } readdir $dh;
 
 # Iterate over list of source files.
 for my $filename (@filenames) {
@@ -72,26 +71,27 @@ for my $filename (@filenames) {
 $indexer->commit;
 print "Finished.\n";
 
-# Parse an HTML file from our US Constitution collection and return a
-# hashref with the fields title, body, url, and category.
+# Parse a file from our US Constitution collection and return a hashref with
+# the fields title, body, url, and category.
 sub parse_file {
     my $filename = shift;
     my $filepath = catfile( $uscon_source, $filename );
-    my $tree     = HTML::TreeBuilder->new;
-    $tree->parse_file($filepath);
-    my $title_node = $tree->look_down( _tag => 'title' )
-        or die "No title element in $filepath";
-    my $bodytext_node = $tree->look_down( id => 'bodytext' )
-        or die "No div with id 'bodytext' in $filepath";
+    open( my $fh, '<', $filepath ) or die "Can't open '$filepath': $!";
+    my $text = do { local $/; <$fh> };    # slurp file content
+    $text =~ /(.*?)\n\n(.*)/s
+        or die "Can't extract title/bodytext from '$filepath'";
+    my $title    = $1;
+    my $bodytext = $2;
     my $category
         = $filename =~ /art/      ? 'article'
         : $filename =~ /amend/    ? 'amendment'
         : $filename =~ /preamble/ ? 'preamble'
         :                           die "Can't derive category for $filename";
     return {
-        title    => $title_node->as_trimmed_text,
-        content  => $bodytext_node->as_trimmed_text,
+        title    => $title,
+        content  => $bodytext,
         url      => "/us_constitution/$filename",
         category => $category,
     };
 }
+

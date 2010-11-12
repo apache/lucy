@@ -19,7 +19,7 @@ Lucy::Docs::Tutorial::Simple - Bare-bones search app.
 
 =head2 Setup
 
-Copy the html presentation of the US Constitution from the C<sample> directory
+Copy the text presentation of the US Constitution from the C<sample> directory
 of the Apache Lucy distribution to the base level of your web server's
 C<htdocs> directory.
 
@@ -43,7 +43,6 @@ modules...
 
     use LucyX::Simple;
     use File::Spec::Functions qw( catfile );
-    use HTML::TreeBuilder;
 
 ... we'll start by creating a LucyX::Simple object, telling it where we'd
 like the index to be located and the language of the source material.
@@ -53,40 +52,33 @@ like the index to be located and the language of the source material.
         language => 'en',
     );
 
-Next, we'll add a subroutine which extracts plain text from an HTML source
-file.  
+Next, we'll add a subroutine which parses our sample documents.
 
-LucyX::Simple won't be of any help with the task of text extraction, because
-it's not equipped to deal with source files directly.  As a matter of
-principle, Lucy remains deliberately ignorant on the vast subject of
-file formats, preferring to focus instead on its core competencies of indexing
-and search.  There are many excellent dedicated parsing modules available on
-CPAN; we'll use HTML::TreeBuilder.
-
-    # Parse an HTML file from our US Constitution collection and return a
-    # hashref with three keys: title, body, and url.
+    # Parse a file from our US Constitution collection and return a hashref with
+    # the fields title, body, and url.
     sub parse_file {
         my $filename = shift;
         my $filepath = catfile( $uscon_source, $filename );
-        my $tree     = HTML::TreeBuilder->new;
-        $tree->parse_file($filepath);
-        my $title_node = $tree->look_down( _tag => 'title' )
-            or die "No title element in $filepath";
-        my $bodytext_node = $tree->look_down( id => 'bodytext' )
-            or die "No div with id 'bodytext' in $filepath";
+        open( my $fh, '<', $filepath ) or die "Can't open '$filepath': $!";
+        my $text = do { local $/; <$fh> };    # slurp file content
+        $text =~ /(.*?)\n\n(.*)/s
+            or die "Can't extract title/bodytext from '$filepath'";
+        my $title    = $1;
+        my $bodytext = $2;
         return {
-            title   => $title_node->as_trimmed_text,
-            content => $bodytext_node->as_trimmed_text,
-            url     => "/us_constitution/$filename"
+            title    => $title,
+            content  => $bodytext,
+            url      => "/us_constitution/$filename",
+            category => $category,
         };
     }
 
 Add some elementary directory reading code...
 
-    # Collect names of source html files.
+    # Collect names of source files.
     opendir( my $dh, $uscon_source )
         or die "Couldn't opendir '$uscon_source': $!";
-    my @filenames = grep { $_ =~ /\.html/ && $_ ne 'index.html' } readdir $dh;
+    my @filenames = grep { $_ =~ /\.txt/ } readdir $dh;
 
 ... and now we're ready for the meat of indexer.pl -- which occupies exactly
 one line of code.
