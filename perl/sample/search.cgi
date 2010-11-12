@@ -22,8 +22,9 @@ use warnings;
 my $path_to_index = '/path/to/index';
 
 use CGI;
+use List::Util qw( max min );
+use POSIX qw( ceil );
 use Encode qw( decode );
-use Data::Pageset;
 use Lucy::Search::IndexSearcher;
 use Lucy::Highlight::Highlighter;
 use Lucy::Search::QueryParser;
@@ -112,17 +113,9 @@ sub generate_paging_info {
             = qq|<p>No matches for <strong>$escaped_q</strong></p>|;
     }
     else {
-        my $current_page = ( $offset / $page_size ) + 1;
-        my $pager        = Data::Pageset->new(
-            {   total_entries    => $total_hits,
-                entries_per_page => $page_size,
-                current_page     => $current_page,
-                pages_per_set    => 10,
-                mode             => 'slide',
-            }
-        );
-        my $last_result  = $pager->last;
-        my $first_result = $pager->first;
+        # Calculate the nums for the first and last hit to display.
+        my $last_result = min( ( $offset + $hits_per_page ), $total_hits );
+        my $first_result = min( ( $offset + 1 ), $last_result );
 
         # Display the result nums, start paging info.
         $paging_info = qq|
@@ -134,6 +127,12 @@ sub generate_paging_info {
             <p>
                 Results Page:
             |;
+
+        # Calculate first and last hits pages to display / link to.
+        my $current_page = int( $first_result / $hits_per_page ) + 1;
+        my $last_page    = ceil( $total_hits / $hits_per_page );
+        my $first_page   = max( 1, ( $current_page - 9 ) );
+        $last_page = min( $last_page, ( $current_page + 10 ) );
 
         # Create a url for use in paging links.
         my $href = $cgi->url( -relative => 1 );
@@ -149,7 +148,7 @@ sub generate_paging_info {
         }
 
         # Generate paging links.
-        for my $page_num ( @{ $pager->pages_in_set } ) {
+        for my $page_num ( $first_page .. $last_page ) {
             if ( $page_num == $current_page ) {
                 $paging_info .= qq|$page_num \n|;
             }
@@ -161,7 +160,7 @@ sub generate_paging_info {
         }
 
         # Generate the "Next" link.
-        if ( $current_page != $pager->last_page ) {
+        if ( $current_page != $last_page ) {
             my $new_offset = $current_page * $page_size;
             $href =~ s/(?<=offset=)\d+/$new_offset/;
             $paging_info .= qq|<a href="$href">Next =&gt;</a>\n|;

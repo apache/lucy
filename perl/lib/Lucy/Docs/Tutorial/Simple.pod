@@ -103,8 +103,9 @@ The beginning is dedicated to CGI processing and configuration.
     my $path_to_index = '/path/to/index';
 
     use CGI;
+    use List::Util qw( max min );
+    use POSIX qw( ceil );
     use Encode qw( decode );
-    use Data::Pageset;
     use LucyX::Simple;
     
     my $cgi       = CGI->new;
@@ -173,18 +174,10 @@ The rest of the script is just text wrangling.
                 = qq|<p>No matches for <strong>$escaped_q</strong></p>|;
         }
         else {
-            my $current_page = ( $offset / $page_size ) + 1;
-            my $pager        = Data::Pageset->new(
-                {   total_entries    => $total_hits,
-                    entries_per_page => $page_size,
-                    current_page     => $current_page,
-                    pages_per_set    => 10,
-                    mode             => 'slide',
-                }
-            );
-            my $last_result  = $pager->last;
-            my $first_result = $pager->first;
-    
+            # Calculate the nums for the first and last hit to display.
+            my $last_result = min( ( $offset + $hits_per_page ), $total_hits );
+            my $first_result = min( ( $offset + 1 ), $last_result );
+
             # Display the result nums, start paging info.
             $paging_info = qq|
                 <p>
@@ -195,22 +188,28 @@ The rest of the script is just text wrangling.
                 <p>
                     Results Page:
                 |;
-    
+
+            # Calculate first and last hits pages to display / link to.
+            my $current_page = int( $first_result / $hits_per_page ) + 1;
+            my $last_page    = ceil( $total_hits / $hits_per_page );
+            my $first_page   = max( 1, ( $current_page - 9 ) );
+            $last_page = min( $last_page, ( $current_page + 10 ) );
+
             # Create a url for use in paging links.
             my $href = $cgi->url( -relative => 1 );
             $href .= "?q=" . CGI::escape($query_string);
             $href .= ";category=" . CGI::escape($category);
             $href .= ";offset=" . CGI::escape($offset);
-    
+
             # Generate the "Prev" link.
             if ( $current_page > 1 ) {
                 my $new_offset = ( $current_page - 2 ) * $page_size;
                 $href =~ s/(?<=offset=)\d+/$new_offset/;
                 $paging_info .= qq|<a href="$href">&lt;= Prev</a>\n|;
             }
-    
+
             # Generate paging links.
-            for my $page_num ( @{ $pager->pages_in_set } ) {
+            for my $page_num ( $first_page .. $last_page ) {
                 if ( $page_num == $current_page ) {
                     $paging_info .= qq|$page_num \n|;
                 }
@@ -220,21 +219,21 @@ The rest of the script is just text wrangling.
                     $paging_info .= qq|<a href="$href">$page_num</a>\n|;
                 }
             }
-    
+
             # Generate the "Next" link.
-            if ( $current_page != $pager->last_page ) {
+            if ( $current_page != $last_page ) {
                 my $new_offset = $current_page * $page_size;
                 $href =~ s/(?<=offset=)\d+/$new_offset/;
                 $paging_info .= qq|<a href="$href">Next =&gt;</a>\n|;
             }
-    
+
             # Close tag.
             $paging_info .= "</p>\n";
         }
-    
+
         return $paging_info;
     }
-    
+
     # Print content to output.
     sub blast_out_content {
         my ( $query_string, $hit_list, $paging_info ) = @_;
