@@ -117,13 +117,10 @@ sub get_uscon_docs {
         open( my $fh, '<', $filepath )
             or die "couldn't open file '$filepath': $!";
         my $content = do { local $/; <$fh> };
-        $content =~ m#<title>(.*?)</title>#s
-            or die "couldn't isolate title in '$filepath'";
-        my $title = $1;
-        $content =~ m#<div id="bodytext">(.*?)</div><!--bodytext-->#s
-            or die "couldn't isolate bodytext in '$filepath'";
-        my $bodytext = $1;
-        $bodytext =~ s/<.*?>//sg;
+        $content =~ /(.*?)\n\n(.*)/s
+            or die "Can't extract title/bodytext from '$filepath'";
+        my $title    = $1; 
+        my $bodytext = $2; 
         $bodytext =~ s/\s+/ /sg;
         my $category
             = $filename =~ /art/      ? 'article'

@@ -114,7 +114,7 @@ sub generate_paging_info {
     }
     else {
         # Calculate the nums for the first and last hit to display.
-        my $last_result = min( ( $offset + $hits_per_page ), $total_hits );
+        my $last_result = min( ( $offset + $page_size ), $total_hits );
         my $first_result = min( ( $offset + 1 ), $last_result );
 
         # Display the result nums, start paging info.
@@ -129,8 +129,8 @@ sub generate_paging_info {
             |;
 
         # Calculate first and last hits pages to display / link to.
-        my $current_page = int( $first_result / $hits_per_page ) + 1;
-        my $last_page    = ceil( $total_hits / $hits_per_page );
+        my $current_page = int( $first_result / $page_size ) + 1;
+        my $last_page    = ceil( $total_hits / $page_size );
         my $first_page   = max( 1, ( $current_page - 9 ) );
         $last_page = min( $last_page, ( $current_page + 10 ) );
 
