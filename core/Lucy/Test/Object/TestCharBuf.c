@@ -201,6 +201,13 @@ test_To_F64(TestBatch *batch)
     if (difference < 0) { difference = 0 - difference; }
     TEST_TRUE(batch, difference < 0.001, "To_F64 negative");
 
+    CB_setf(charbuf, "1.59");
+    double value_full = CB_To_F64(charbuf);
+    CB_Set_Size(charbuf, 3);
+    double value_short = CB_To_F64(charbuf);
+    TEST_TRUE(batch, value_short < value_full, 
+        "TO_F64 doesn't run past end of string");
+
     DECREF(charbuf);
 }
 
@@ -394,7 +401,7 @@ test_serialization(TestBatch *batch)
 void
 TestCB_run_tests()
 {
-    TestBatch *batch = TestBatch_new(49);
+    TestBatch *batch = TestBatch_new(50);
     TestBatch_Plan(batch);
 
     test_vcatf_s(batch);
