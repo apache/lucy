@@ -88,23 +88,6 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Analysis::Stopalizer;
-    use Lucy qw( to_clownfish );
-
-    sub gen_stoplist {
-        my ( undef, $language ) = @_;
-        require Lingua::StopWords;
-        $language = lc($language);
-        if ( $language =~ /^(?:da|de|en|es|fi|fr|hu|it|nl|no|pt|ru|sv)$/ ) {
-            my $stoplist
-                = Lingua::StopWords::getStopWords( $language, 'UTF-8' );
-            return to_clownfish($stoplist);
-        }
-        return undef;
-    }
-}
-
-{
     package Lucy::Analysis::Token;
 
     our %new_PARAMS = (

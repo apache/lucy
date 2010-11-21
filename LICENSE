@@ -299,7 +299,8 @@ the license for those materials:
     trademarks mentioned herein are the property of their respective owners.
 
 Portions of the Snowball stemming library are bundled with this distribution
-under modules/analysis/snowstem.  Here is the license for those materials:
+under modules/analysis/snowstem and modules/analysis/snowstop.  Here is the
+license for those materials:
 
     Copyright (c) 2001, Dr Martin Porter
     Copyright (c) 2002, Richard Boulton

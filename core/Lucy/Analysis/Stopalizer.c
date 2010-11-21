@@ -17,6 +17,7 @@
 #define C_LUCY_STOPALIZER
 #define C_LUCY_TOKEN
 #include "Lucy/Util/ToolSet.h"
+#include <ctype.h>
 
 #include "Lucy/Analysis/Stopalizer.h"
 #include "Lucy/Analysis/Token.h"
@@ -85,4 +86,62 @@ Stopalizer_equals(Stopalizer *self, Obj *other)
     return true;
 }
 
+Hash*
+Stopalizer_gen_stoplist(const CharBuf *language) 
+{
+    CharBuf *lang = CB_new(3);
+    CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 0)));
+    CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 1)));
+    const uint8_t **words = NULL;
+    if      (CB_Equals_Str(lang, "da", 2)) { words = Stopalizer_snow_da; }
+    else if (CB_Equals_Str(lang, "de", 2)) { words = Stopalizer_snow_de; }
+    else if (CB_Equals_Str(lang, "en", 2)) { words = Stopalizer_snow_en; }
+    else if (CB_Equals_Str(lang, "es", 2)) { words = Stopalizer_snow_es; }
+    else if (CB_Equals_Str(lang, "fi", 2)) { words = Stopalizer_snow_fi; }
+    else if (CB_Equals_Str(lang, "fr", 2)) { words = Stopalizer_snow_fr; }
+    else if (CB_Equals_Str(lang, "hu", 2)) { words = Stopalizer_snow_hu; }
+    else if (CB_Equals_Str(lang, "it", 2)) { words = Stopalizer_snow_it; }
+    else if (CB_Equals_Str(lang, "nl", 2)) { words = Stopalizer_snow_nl; }
+    else if (CB_Equals_Str(lang, "no", 2)) { words = Stopalizer_snow_no; }
+    else if (CB_Equals_Str(lang, "pt", 2)) { words = Stopalizer_snow_pt; }
+    else if (CB_Equals_Str(lang, "ru", 2)) { words = Stopalizer_snow_ru; }
+    else if (CB_Equals_Str(lang, "sv", 2)) { words = Stopalizer_snow_sv; }
+    else {
+        DECREF(lang);
+        return NULL;
+    }
+    size_t num_stopwords = 0;
+    for (uint32_t i = 0; words[i] != NULL; i++) { num_stopwords++; }
+    NoCloneHash *stoplist = NoCloneHash_new(num_stopwords); 
+    for (uint32_t i = 0; words[i] != NULL; i++) {
+        char *word = (char*)words[i];
+        ViewCharBuf *stop = ViewCB_new_from_trusted_utf8(word, strlen(word));
+        NoCloneHash_Store(stoplist, (Obj*)stop, INCREF(&EMPTY));
+    }
+    DECREF(lang);
+    return (Hash*)stoplist;
+}
+
+/***************************************************************************/
+
+NoCloneHash*
+NoCloneHash_new(uint32_t capacity)
+{
+    NoCloneHash *self = (NoCloneHash*)VTable_Make_Obj(NOCLONEHASH);
+    return NoCloneHash_init(self, capacity);
+}
+
+NoCloneHash*
+NoCloneHash_init(NoCloneHash *self, uint32_t capacity)
+{
+    return (NoCloneHash*)Hash_init((Hash*)self, capacity);
+}
+
+Obj*
+NoCloneHash_make_key(NoCloneHash *self, Obj *key, int32_t hash_sum)
+{
+    UNUSED_VAR(self);
+    UNUSED_VAR(hash_sum);
+    return INCREF(key);
+}
 

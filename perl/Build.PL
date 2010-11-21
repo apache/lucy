@@ -26,7 +26,6 @@ my $builder = Lucy::Build->new(
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
     dist_version => '0.001',
     requires     => {
-        'Lingua::StopWords' => 0.09,
         'Parse::RecDescent' => 0,
         'JSON::XS'          => 1.53,
     },

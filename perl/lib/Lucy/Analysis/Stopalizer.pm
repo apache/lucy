@@ -29,9 +29,6 @@ my $synopsis = <<'END_SYNOPSIS';
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stopalizer, $stemmer ],
     );
-
-This class uses L<Lingua::StopWords> for its default stoplists, so it supports
-the same set of languages.
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';

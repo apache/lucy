@@ -142,6 +142,7 @@ my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
 my $CHARMONIZER_SRC_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
 my $SNOWSTEM_SRC_DIR     = catdir( $base_dir, qw( modules analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR     = catdir( $SNOWSTEM_SRC_DIR, 'include' );
+my $SNOWSTOP_SRC_DIR     = catdir( $base_dir, qw( modules analysis snowstop source ) );
 my $CORE_SOURCE_DIR      = catdir( $base_dir, 'core' );
 my $AUTOGEN_DIR          = 'autogen';
 my $XS_SOURCE_DIR        = 'xs';
@@ -498,6 +499,7 @@ sub ACTION_compile_custom_xs {
     push @$c_files, @{ $self->rscan_dir( $CHARMONIZER_SRC_DIR, qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,         qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR,    qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR,    qr/\.c$/ ) };
     for my $c_file (@$c_files) {
         my $o_file = $c_file;
         $o_file =~ s/\.c/$Config{_o}/;

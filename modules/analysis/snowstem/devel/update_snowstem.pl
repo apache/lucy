@@ -20,7 +20,7 @@ use File::Copy qw( copy );
 use Cwd qw( getcwd );
 
 if ( @ARGV != 2 ) {
-    die "Usage: perl update_snowstem.pl SNOWBALL_SVN_CO LUCY_SNOWBALL_DIR";
+    die "Usage: perl update_snowstem.pl SNOWBALL_SVN_CO LUCY_SNOWSTEM_DIR";
 }
 
 my ( $snow_co_dir, $dest_dir ) = @ARGV;
