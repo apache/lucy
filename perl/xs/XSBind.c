@@ -231,33 +231,46 @@ XSBind_cb_to_sv(const cfish_CharBuf *cb)
 static cfish_Hash*
 S_perl_hash_to_cfish_hash(HV *phash)
 {
-    uint32_t    num_keys = hv_iterinit(phash);
-    cfish_Hash *retval   = cfish_Hash_new(num_keys);
+    uint32_t             num_keys = hv_iterinit(phash);
+    cfish_Hash          *retval   = cfish_Hash_new(num_keys);
+    cfish_ZombieCharBuf *key      = CFISH_ZCB_WRAP_STR("", 0);
 
     while (num_keys--) {
-        char *key;
-        STRLEN key_len;
-        HE *entry = hv_iternext(phash);
-        STRLEN he_key_len = HeKLEN(entry);
-        SV *value_sv = HeVAL(entry);
+        HE        *entry    = hv_iternext(phash);
+        STRLEN     key_len  = HeKLEN(entry);
+        SV        *value_sv = HeVAL(entry);
+        cfish_Obj *value    = XSBind_perl_to_cfish(value_sv); // Recurse.
 
         // Force key to UTF-8 if necessary.
-        if (he_key_len == (STRLEN)HEf_SVKEY) {
-            SV *key_sv = HeKEY_sv(entry);
-            key = SvPVutf8(key_sv, key_len);
+        if (key_len == (STRLEN)HEf_SVKEY) {
+            // Key is stored as an SV.  Use its UTF-8 flag?  Not sure about
+            // this.
+            SV   *key_sv  = HeKEY_sv(entry);
+            char *key_str = SvPVutf8(key_sv, key_len);
+            Cfish_ZCB_Assign_Trusted_Str(key, key_str, key_len);
+            Cfish_Hash_Store(retval, (cfish_Obj*)key, value);
+        }
+        else if (HeUTF8(entry)) {
+            Cfish_ZCB_Assign_Trusted_Str(key, HeKEY(entry), key_len);
+            Cfish_Hash_Store(retval, (cfish_Obj*)key, value);
         }
         else {
-            key = HeKEY(entry);
-            key_len = he_key_len;
-            if (!lucy_StrHelp_utf8_valid(key, key_len)) {
+            char *key_str = HeKEY(entry);
+            chy_bool_t pure_ascii = true;
+            for (STRLEN i = 0; i < key_len; i++) {
+                if ((key_str[i] & 0x80) == 0x80) { pure_ascii = false; }
+            }
+            if (pure_ascii) {
+                Cfish_ZCB_Assign_Trusted_Str(key, key_str, key_len);
+                Cfish_Hash_Store(retval, (cfish_Obj*)key, value);
+            }
+            else {
                 SV *key_sv = HeSVKEY_force(entry);
-                key = SvPVutf8(key_sv, key_len);
+                key_str = SvPVutf8(key_sv, key_len);
+                Cfish_ZCB_Assign_Trusted_Str(key, key_str, key_len);
+                Cfish_Hash_Store(retval, (cfish_Obj*)key, value);
             }
         }
-
-        // Recurse for each value. 
-        Cfish_Hash_Store_Str(retval, key, key_len, 
-            XSBind_perl_to_cfish(value_sv));
     }
 
     return retval;

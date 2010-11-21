@@ -864,6 +864,13 @@ ViewCB_assign_str(ViewCharBuf *self, const char *utf8, size_t size)
     self->size = size;
 }
 
+void
+ViewCB_assign_trusted_str(ViewCharBuf *self, const char *utf8, size_t size)
+{
+    self->ptr  = (char*)utf8;
+    self->size = size;
+}
+
 uint32_t
 ViewCB_trim_top(ViewCharBuf *self)
 {

@@ -51,6 +51,8 @@ our %aliases = (
     CFISH_VIEWCHARBUF              => 'LUCY_VIEWCHARBUF',
     cfish_ZCB_size                 => 'lucy_ZCB_size',
     cfish_ZCB_wrap_str             => 'lucy_ZCB_wrap_str',
+    Cfish_ZCB_Assign_Str           => 'Lucy_ZCB_Assign_Str',
+    Cfish_ZCB_Assign_Trusted_Str   => 'Lucy_ZCB_Assign_Trusted_Str',
     Cfish_CB_Get_Ptr8              => 'Lucy_CB_Get_Ptr8',
     Cfish_CB_Get_Size              => 'Lucy_CB_Get_Size',
 
@@ -70,6 +72,7 @@ our %aliases = (
     Cfish_Hash_Next      => 'Lucy_Hash_Next',
     Cfish_Hash_Fetch_Str => 'Lucy_Hash_Fetch_Str',
     Cfish_Hash_Store_Str => 'Lucy_Hash_Store_Str',
+    Cfish_Hash_Store     => 'Lucy_Hash_Store',
 
     cfish_VArray      => 'lucy_VArray',
     CFISH_VARRAY      => 'LUCY_VARRAY',

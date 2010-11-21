@@ -326,6 +326,9 @@ class Lucy::Object::ViewCharBuf cnick ViewCB
     void
     Assign_Str(ViewCharBuf *self, const char *utf8, size_t size);
 
+    void
+    Assign_Trusted_Str(ViewCharBuf *self, const char *utf8, size_t size);
+
     uint32_t
     Trim_Top(ViewCharBuf *self);
 

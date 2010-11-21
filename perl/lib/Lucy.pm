@@ -530,19 +530,26 @@ sub error {$Lucy::Object::Err::error}
     package Lucy::Util::Json;
     use Scalar::Util qw( blessed );
     use Lucy qw( to_clownfish );
-
+    use Lucy::Util::StringHelper qw( utf8_valid utf8_flag_on );
     use JSON::XS qw();
 
     my $json_encoder = JSON::XS->new->pretty(1)->canonical(1);
 
     sub slurp_json {
         my ( undef, %args ) = @_;
+        my $result;
         my $instream = $args{folder}->open_in( $args{path} )
             or return;
         my $len = $instream->length;
         my $json;
         $instream->read( $json, $len );
-        my $result = eval { to_clownfish( $json_encoder->decode($json) ) };
+        if ( utf8_valid($json) ) {
+            utf8_flag_on($json);
+            $result = eval { to_clownfish( $json_encoder->decode($json) ) };
+        }
+        else {
+            $@ = "Invalid UTF-8";
+        }
         if ( $@ or !$result ) {
             Lucy::Object::Err->set_error(
                 Lucy::Object::Err->new( $@ || "Failed to decode JSON" )
