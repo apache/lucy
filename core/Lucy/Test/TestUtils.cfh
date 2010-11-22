@@ -101,6 +101,12 @@ inert class Lucy::Test::TestUtils  {
      */
     inert incremented Obj*
     freeze_thaw(Obj *object);
+
+    /** Verify an Analyzer's transform, transform_text, and split methods.
+     */
+    inert void
+    test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
+                  VArray *expected, char *message);
 }
 
 __C__
