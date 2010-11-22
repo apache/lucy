@@ -43,7 +43,10 @@ run_tests(package)
 PPCODE:
 {
     // Lucy::Analysis 
-    if (strEQ(package, "TestCaseFolder")) {
+    if (strEQ(package, "TestAnalyzer")) {
+        lucy_TestAnalyzer_run_tests();
+    }
+    else if (strEQ(package, "TestCaseFolder")) {
         lucy_TestCaseFolder_run_tests();
     }
     else if (strEQ(package, "TestPolyAnalyzer")) {
