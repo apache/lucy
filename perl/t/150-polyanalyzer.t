@@ -17,48 +17,21 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 16;
+use Test::More tests => 7;
 use Lucy::Test::TestUtils qw( test_analyzer );
 
 my $source_text = 'Eats, shoots and leaves.';
-
 my $case_folder = Lucy::Analysis::CaseFolder->new;
-my $tokenizer   = Lucy::Analysis::Tokenizer->new;
-my $stopalizer  = Lucy::Analysis::Stopalizer->new( language => 'en' );
-my $stemmer     = Lucy::Analysis::Stemmer->new( language => 'en' );
-
 my $polyanalyzer
-    = Lucy::Analysis::PolyAnalyzer->new( analyzers => [], );
-test_analyzer( $polyanalyzer, $source_text, [$source_text],
-    'no sub analyzers' );
-
-$polyanalyzer
     = Lucy::Analysis::PolyAnalyzer->new( analyzers => [$case_folder], );
 test_analyzer(
     $polyanalyzer, $source_text,
     ['eats, shoots and leaves.'],
-    'with CaseFolder'
+    '"analyzers" constructor arg'
 );
-
-$polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-    analyzers => [ $case_folder, $tokenizer ], );
-test_analyzer(
-    $polyanalyzer, $source_text,
-    [ 'eats', 'shoots', 'and', 'leaves' ],
-    'with Tokenizer'
-);
-
-$polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-    analyzers => [ $case_folder, $tokenizer, $stopalizer ], );
-test_analyzer(
-    $polyanalyzer, $source_text,
-    [ 'eats', 'shoots', 'leaves' ],
-    'with Stopalizer'
-);
-
-$polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-    analyzers => [ $case_folder, $tokenizer, $stopalizer, $stemmer, ], );
-test_analyzer( $polyanalyzer, $source_text, [ 'eat', 'shoot', 'leav' ],
-    'with Stemmer' );
+$polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( language => 'en', );
+test_analyzer( $polyanalyzer, $source_text, [qw( eat shoot and leav )],
+    '"language" constructor arg' );
 
 ok( $polyanalyzer->get_analyzers(), "get_analyzers method" );
+
