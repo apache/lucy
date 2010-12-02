@@ -16,7 +16,7 @@
 
 #define C_LUCY_TOKENIZER
 #define C_LUCY_TOKEN
-#include "xs/XSBind.h"
+#include "XSBind.h"
 
 #include "Lucy/Analysis/Tokenizer.h"
 #include "Lucy/Analysis/Token.h"

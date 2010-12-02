@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "xs/XSBind.h"
+#include "XSBind.h"
 #include "Lucy/Util/StringHelper.h"
 
 // TODO: replace with code from ICU in common/ucnv_u8.c.

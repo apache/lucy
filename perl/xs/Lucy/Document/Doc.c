@@ -15,7 +15,7 @@
  */
 
 #define C_LUCY_DOC
-#include "xs/XSBind.h"
+#include "XSBind.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Object/Host.h"
 #include "Lucy/Store/InStream.h"

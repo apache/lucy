@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "xs/XSBind.h"
+#include "XSBind.h"
 #include "Lucy/Object/Host.h"
 
 lucy_Err*

@@ -16,7 +16,7 @@
 
 #define C_LUCY_OBJ
 #define C_LUCY_LOCKFREEREGISTRY
-#include "xs/XSBind.h"
+#include "XSBind.h"
 
 #include "Lucy/Object/LockFreeRegistry.h"
 #include "Lucy/Object/Host.h"

@@ -17,7 +17,7 @@
 #define C_LUCY_CASEFOLDER
 #define C_LUCY_BYTEBUF
 #define C_LUCY_TOKEN
-#include "xs/XSBind.h"
+#include "XSBind.h"
 
 #include "Lucy/Analysis/CaseFolder.h"
 #include "Lucy/Analysis/Token.h"

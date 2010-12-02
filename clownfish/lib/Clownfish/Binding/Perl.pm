@@ -192,7 +192,7 @@ sub _xs_file_contents {
  * limitations under the License.
  */
 
-#include "xs/XSBind.h"
+#include "XSBind.h"
 #include "boil.h"
 #include "$self->{boot_h_file}"
 
