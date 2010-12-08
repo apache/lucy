@@ -116,22 +116,27 @@ FSDH_entry_is_dir(FSDirHandle *self)
     struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
     if (!sys_dir_entry) { return false; }
 
+    // If d_type is available, try to avoid a stat() call.  If it's not, or if
+    // the type comes back as unknown, fall back to stat().
     #ifdef CHY_HAS_DIRENT_D_TYPE
-    return sys_dir_entry->d_type == DT_DIR ? true : false;
-    #else 
-    {
-        struct stat stat_buf;
-        if (!self->fullpath) { 
-            self->fullpath = CB_new(CB_Get_Size(self->dir) + 20);
-        }
-        CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
-            self->entry);
-        if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
-            if (stat_buf.st_mode & S_IFDIR) return true;
-        }
+    if (sys_dir_entry->d_type == DT_DIR) {
+        return true;
+    }
+    else if (sys_dir_entry->d_type != DT_UNKNOWN) {
         return false;
     }
-    #endif // CHY_HAS_DIRENT_D_TYPE 
+    #endif
+
+    struct stat stat_buf;
+    if (!self->fullpath) { 
+        self->fullpath = CB_new(CB_Get_Size(self->dir) + 20);
+    }
+    CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
+        self->entry);
+    if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
+        if (stat_buf.st_mode & S_IFDIR) { return true; }
+    }
+    return false;
 }
 
 bool_t
