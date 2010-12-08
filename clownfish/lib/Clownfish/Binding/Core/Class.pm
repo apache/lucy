@@ -135,9 +135,6 @@ sub to_c_header {
     my $c_file_sym    = "C_" . uc($full_struct);
     my $struct_def    = _struct_definition($self);
     
-    # Temporary hack.
-    $c_file_sym =~ s/LUCY_/LUCY_/g;
-
     # If class inherits from something, include the parent class's header.
     my $parent_include = "";
     if ( my $parent = $client->get_parent ) {

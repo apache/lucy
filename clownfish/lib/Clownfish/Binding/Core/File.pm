@@ -125,7 +125,6 @@ sub write_c {
                     );
                 $content .= $bound->to_c . "\n";
                 my $c_file_sym = "C_" . uc( $block->full_struct_sym );
-
                 $c_file_syms .= "#define $c_file_sym\n";
             }
         }
