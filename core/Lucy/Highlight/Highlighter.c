@@ -314,7 +314,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
             else {
                 uint32_t chars_left = last_edge - start;
                 if (   chars_left > min_len 
-                    && S_has_heat(heat_map, start, last_edge)
+                    && S_has_heat(heat_map, start, chars_left)
                 ) {
                     found_ending_edge = true;
                     end = last_edge;
