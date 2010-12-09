@@ -57,6 +57,9 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     inert bool_t
     add_to_registry(VTable *vtable);
 
+    inert bool_t
+    add_alias_to_registry(VTable *vtable, CharBuf *alias);
+
     /** Initialize the registry.
      */
     inert void

@@ -259,6 +259,24 @@ VTable_add_to_registry(VTable *vtable)
     }
 }
 
+bool_t
+VTable_add_alias_to_registry(VTable *vtable, CharBuf *alias)
+{
+    if (VTable_registry == NULL) {
+        VTable_init_registry();
+    }
+    if (LFReg_Fetch(VTable_registry, (Obj*)alias)) {
+        return false;
+    }
+    else {
+        CharBuf *klass = CB_Clone(alias);
+        bool_t retval 
+            = LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable);
+        DECREF(klass);
+        return retval;
+    }
+}
+
 VTable*
 VTable_fetch_vtable(const CharBuf *class_name)
 {

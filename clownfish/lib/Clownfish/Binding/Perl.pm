@@ -326,6 +326,27 @@ $self->{footer}
 END_STUFF
 }
 
+my %ks_compat = (
+    'Lucy::Plan::Schema' => [qw( KinoSearch::Plan::Schema KinoSearch::Schema )],
+    'Lucy::Plan::FieldType' =>
+      [qw( KinoSearch::Plan::FieldType KinoSearch::FieldType )],
+    'Lucy::Plan::FullTextType' => [
+        qw( KinoSearch::Plan::FullTextType KinoSearch::FieldType::FullTextType )
+    ],
+    'Lucy::Plan::StringType' =>
+      [ qw( KinoSearch::Plan::StringType KinoSearch::FieldType::StringType ) ],
+    'Lucy::Plan::BlobType' =>
+      [ qw( KinoSearch::Plan::BlobType KinoSearch::FieldType::BlobType ) ],
+    'Lucy::Analysis::PolyAnalyzer' =>
+      [qw( KinoSearch::Analysis::PolyAnalyzer )],
+    'Lucy::Analysis::Tokenizer'  => [qw( KinoSearch::Analysis::Tokenizer )],
+    'Lucy::Analysis::CaseFolder' => [
+        qw( KinoSearch::Analysis::CaseFolder KinoSearch::Analysis::LCNormalizer )
+    ],
+    'Lucy::Analysis::Stopalizer' => [qw( KinoSearch::Analysis::Stopalizer )],
+    'Lucy::Analysis::Stemmer'    => [qw( KinoSearch::Analysis::Stemmer )],
+);
+
 sub _write_boot_c {
     my $self           = shift;
     my $hierarchy      = $self->{hierarchy};
@@ -348,10 +369,24 @@ sub _write_boot_c {
             . $class->full_vtable_var
             . qq|);\n|;
 
+        # Add aliases for selected KinoSearch classes which allow old indexes
+        # to be read.
+        my $class_name = $class->get_class_name;
+        my $aliases    = $ks_compat{$class_name};
+        if ($aliases) {
+            my $vtable_var = $class->full_vtable_var;
+            for my $alias (@$aliases) {
+                my $len = length($alias);
+                $registrations
+                    .= qq|    Cfish_ZCB_Assign_Str(alias, "$alias", $len);\n|
+                    . qq|    cfish_VTable_add_alias_to_registry($vtable_var,\n|
+                    . qq|        (cfish_CharBuf*)alias);\n|;
+            }
+        }
+
         my $parent = $class->get_parent;
         next unless $parent;
         my $parent_class = $parent->get_class_name;
-        my $class_name   = $class->get_class_name;
         $isa_pushes .= qq|    isa = get_av("$class_name\::ISA", 1);\n|;
         $isa_pushes .= qq|    av_push(isa, newSVpv("$parent_class", 0));\n|;
     }
@@ -373,6 +408,7 @@ void
 $self->{boot_func}()
 {
     AV *isa;
+    cfish_ZombieCharBuf *alias = CFISH_ZCB_WRAP_STR("", 0);
 $registrations
 $isa_pushes
 }
