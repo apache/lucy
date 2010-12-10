@@ -621,7 +621,7 @@ sub ACTION_dist {
     # Because some items we need are outside this directory, we need to copy a
     # bunch of stuff.  After the tarball is packaged up, we delete the copied
     # directories.
-    my @dirs_to_copy = qw( core charmonizer devel clownfish );
+    my @dirs_to_copy = qw( core modules charmonizer devel clownfish );
     print "Copying files...\n";
     for my $dir (@dirs_to_copy) {
         confess("'$dir' already exists") if -e $dir;
