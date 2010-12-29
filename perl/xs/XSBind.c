@@ -250,7 +250,7 @@ S_perl_hash_to_cfish_hash(HV *phash)
             Cfish_ZCB_Assign_Trusted_Str(key, key_str, key_len);
             Cfish_Hash_Store(retval, (cfish_Obj*)key, value);
         }
-        else if (HeUTF8(entry)) {
+        else if (HeKUTF8(entry)) {
             Cfish_ZCB_Assign_Trusted_Str(key, HeKEY(entry), key_len);
             Cfish_Hash_Store(retval, (cfish_Obj*)key, value);
         }
