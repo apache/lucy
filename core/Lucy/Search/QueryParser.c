@@ -812,7 +812,18 @@ QParser_expand(QueryParser *self, Query *query)
         for (uint32_t i = 0, max = VA_Get_Size(children); i < max; i++) {
             Query *child = (Query*)VA_Fetch(children, i);
             Query *new_child = QParser_Expand(self, child); // recurse 
-            if (new_child) VA_Push(new_kids, (Obj*)new_child);
+            if (new_child) {
+                if (Query_Is_A(new_child, NOMATCHQUERY)) {
+                    bool_t fails = NoMatchQuery_Get_Fails_To_Match(
+                        (NoMatchQuery*)new_child);
+                    if (fails) {
+                        VA_Push(new_kids, (Obj*)new_child);
+                    }
+                }
+                else {
+                    VA_Push(new_kids, (Obj*)new_child);
+                }
+            }
         }
         
         if (VA_Get_Size(new_kids) == 0) {
@@ -907,6 +918,7 @@ QParser_expand_leaf(QueryParser *self, Query *query)
     Schema        *schema      = self->schema; 
     ZombieCharBuf *source_text = ZCB_BLANK();
     bool_t         is_phrase   = false;
+    bool_t         ambiguous   = false;
 
     // Determine whether we can actually process the input. 
     if (!Query_Is_A(query, LEAFQUERY)) return NULL;
@@ -964,6 +976,11 @@ QParser_expand_leaf(QueryParser *self, Query *query)
                 }
             }
 
+            if (VA_Get_Size(token_texts) == 0) {
+                /* Query might include stop words.  Who knows? */
+                ambiguous = true;
+            } 
+
             // Add either a TermQuery or a PhraseQuery. 
             if (is_phrase || VA_Get_Size(token_texts) > 1) {
                 VA_Push(queries, (Obj*)
@@ -982,6 +999,9 @@ QParser_expand_leaf(QueryParser *self, Query *query)
     Query *retval;
     if (VA_Get_Size(queries) == 0) {
         retval = (Query*)NoMatchQuery_new();
+        if (ambiguous) {
+            NoMatchQuery_Set_Fails_To_Match((NoMatchQuery*)retval, false);
+        }
     }
     else if (VA_Get_Size(queries) == 1) {
         retval = (Query*)INCREF(VA_Fetch(queries, 0));

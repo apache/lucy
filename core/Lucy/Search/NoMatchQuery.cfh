@@ -26,6 +26,8 @@ parcel Lucy;
 class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
     : dumpable {
 
+    bool_t fails_to_match;
+
     inert incremented NoMatchQuery*
     new();
 
@@ -33,6 +35,24 @@ class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
      */
     public inert NoMatchQuery*
     init(NoMatchQuery *self);
+
+    void
+    Set_Fails_To_Match(NoMatchQuery *self, bool_t fails_to_match);
+
+    bool_t
+    Get_Fails_To_Match(NoMatchQuery *self);
+
+    public incremented Obj*
+    Dump(NoMatchQuery *self);
+
+    public incremented NoMatchQuery*
+    Load(NoMatchQuery *self, Obj *dump);
+
+    public void
+    Serialize(NoMatchQuery *self, OutStream *outstream);
+
+    public incremented NoMatchQuery*
+    Deserialize(NoMatchQuery *self, InStream *instream);
 
     public bool_t
     Equals(NoMatchQuery *self, Obj *other);
