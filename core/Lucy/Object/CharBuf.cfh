@@ -177,6 +177,15 @@ class Lucy::Object::CharBuf cnick CB
     bool_t
     Ends_With_Str(CharBuf *self, const char *postfix, size_t size);
 
+    /** Return the location of the substring within the CharBuf (measured in
+     * code points), or -1 if the substring does not match.
+     */
+    int64_t
+    Find(CharBuf *self, const CharBuf *substring);
+
+    int64_t
+    Find_Str(CharBuf *self, const char *ptr, size_t size);
+
     /** Test whether the CharBuf matches the passed-in string.
      */
     bool_t

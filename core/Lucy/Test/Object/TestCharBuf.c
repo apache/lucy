@@ -84,6 +84,26 @@ test_Mimic_and_Clone(TestBatch *batch)
 }
 
 static void
+test_Find(TestBatch *batch)
+{
+    CharBuf *string = CB_new(10);
+    CharBuf *substring = S_get_cb("foo");
+
+    TEST_TRUE(batch, CB_Find(string, substring) == -1, "Not in empty string");
+    CB_setf(string, "foo");
+    TEST_TRUE(batch, CB_Find(string, substring) == 0, "Find complete string");
+    CB_setf(string, "afoo");
+    TEST_TRUE(batch, CB_Find(string, substring) == 1, "Find after first");
+    CB_Set_Size(string, 3);
+    TEST_TRUE(batch, CB_Find(string, substring) == -1, "Don't overrun");
+    CB_setf(string, "afood");
+    TEST_TRUE(batch, CB_Find(string, substring) == 1, "Find in middle");
+
+    DECREF(substring);
+    DECREF(string);
+}
+
+static void
 test_Code_Point_At_and_From(TestBatch *batch)
 {
     uint32_t code_points[] = { 'a', 0x263A, 0x263A, 'b', 0x263A, 'c' }; 
@@ -401,7 +421,7 @@ test_serialization(TestBatch *batch)
 void
 TestCB_run_tests()
 {
-    TestBatch *batch = TestBatch_new(50);
+    TestBatch *batch = TestBatch_new(55);
     TestBatch_Plan(batch);
 
     test_vcatf_s(batch);
@@ -420,6 +440,7 @@ TestCB_run_tests()
     test_Cat(batch);
     test_Mimic_and_Clone(batch);
     test_Code_Point_At_and_From(batch);
+    test_Find(batch);
     test_SubString(batch);
     test_Nip_and_Chop(batch);
     test_Truncate(batch);

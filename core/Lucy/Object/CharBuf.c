@@ -624,6 +624,29 @@ CB_ends_with_str(CharBuf *self, const char *postfix, size_t postfix_len)
     return false;
 }
 
+int64_t 
+CB_find(CharBuf *self, const CharBuf *substring)
+{  
+    return CB_Find_Str(self, substring->ptr, substring->size);
+}
+
+int64_t 
+CB_find_str(CharBuf *self, const char *ptr, size_t size)
+{
+    ZombieCharBuf *iterator = ZCB_WRAP(self);
+    int64_t location = 0;
+
+    while (iterator->size) {
+        if (ZCB_Starts_With_Str(iterator, ptr, size)) {
+            return location;
+        }
+        ZCB_Nip(iterator, 1);
+        location++;
+    }
+    
+    return -1;
+}
+
 uint32_t
 CB_trim(CharBuf *self)
 {
