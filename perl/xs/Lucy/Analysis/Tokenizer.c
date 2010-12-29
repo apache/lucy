@@ -38,10 +38,19 @@ lucy_Tokenizer_init(lucy_Tokenizer *self, const lucy_CharBuf *pattern)
 
     lucy_Analyzer_init((lucy_Analyzer*)self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
-    self->pattern = pattern 
-                  ? Lucy_CB_Clone(pattern)
-                  : lucy_CB_new_from_trusted_utf8(DEFAULT_PATTERN,
-                      sizeof(DEFAULT_PATTERN) - 1);
+    if (pattern) {
+        if (   Lucy_CB_Find_Str(pattern, "\\p", 2) != -1
+            || Lucy_CB_Find_Str(pattern, "\\P", 2) != -1
+        ) {
+            LUCY_DECREF(self);
+            THROW(LUCY_ERR, "\\p and \\P constructs forbidden");
+        }
+        self->pattern = Lucy_CB_Clone(pattern);
+    }
+    else {
+        self->pattern = lucy_CB_new_from_trusted_utf8(DEFAULT_PATTERN,
+            sizeof(DEFAULT_PATTERN) - 1);
+    }
 
     // Acquire a compiled regex engine for matching one token. 
     token_re_sv = (SV*)lucy_Host_callback_host(LUCY_TOKENIZER,

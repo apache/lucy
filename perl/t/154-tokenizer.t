@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 15;
 use Lucy::Test;
 
 my $tokenizer   = Lucy::Analysis::Tokenizer->new;
@@ -76,3 +76,27 @@ is_deeply(
 $tokenizer = Lucy::Analysis::Tokenizer->new( token_re => qr/../ );
 is_deeply( $tokenizer->split('aabbcc'),
     [qw( aa bb cc )], "back compat with token_re argument" );
+
+eval {
+    my $toke
+        = Lucy::Analysis::Tokenizer->new(
+        pattern => '\\p{Carp::confess}' );
+};
+like( $@, qr/\\p/, "\\p forbidden in pattern" );
+
+eval {
+    my $toke
+        = Lucy::Analysis::Tokenizer->new(
+        pattern => '\\P{Carp::confess}' );
+};
+like( $@, qr/\\P/, "\\P forbidden in pattern" );
+
+$tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '\\w+' );
+my $dump = $tokenizer->dump;
+$dump->{pattern} = "\\p{Carp::confess}";
+eval { $tokenizer->load($dump) };
+like( $@, qr/\\p/, "\\p forbidden during load" );
+
+$dump->{pattern} = "\\P{Carp::confess}";
+eval { $tokenizer->load($dump) };
+like( $@, qr/\\P/, "\\P forbidden during load" );
