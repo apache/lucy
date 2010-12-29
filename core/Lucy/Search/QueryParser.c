@@ -819,6 +819,9 @@ QParser_expand(QueryParser *self, Query *query)
                     if (fails) {
                         VA_Push(new_kids, (Obj*)new_child);
                     }
+                    else {
+                        DECREF(new_child);
+                    }
                 }
                 else {
                     VA_Push(new_kids, (Obj*)new_child);
