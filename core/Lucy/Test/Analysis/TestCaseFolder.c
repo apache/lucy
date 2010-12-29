@@ -50,6 +50,9 @@ test_analysis(TestBatch *batch)
     VA_Push(wanted, (Obj*)CB_newf("capital offense"));
     TestUtils_test_analyzer(batch, (Analyzer*)case_folder, source, wanted, 
         "lowercase plain text");
+    DECREF(wanted);
+    DECREF(source);
+    DECREF(case_folder);
 }
 
 void

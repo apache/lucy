@@ -242,6 +242,7 @@ TestUtils_test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
 
     DECREF(got);
     DECREF(starter);
+    DECREF(seed);
 }
 
 

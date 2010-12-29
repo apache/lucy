@@ -51,6 +51,9 @@ test_analysis(TestBatch *batch)
     VA_Push(wanted, (Obj*)CB_newf("foo bar baz"));
     TestUtils_test_analyzer(batch, (Analyzer*)analyzer, source, wanted, 
         "test basic analysis");
+    DECREF(wanted);
+    DECREF(source);
+    DECREF(analyzer);
 }
 
 void
