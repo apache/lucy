@@ -124,9 +124,9 @@ S_vcat_mess(CharBuf *message, const char *file, int line, const char *func,
     CB_Grow(message, guess_len);
     CB_VCatF(message, pattern, args);
     if (func != NULL)
-        CB_catf(message, ", %s at %s line %i32\n", func, file, (int32_t)line);
+        CB_catf(message, ",\n\t%s at %s line %i32\n", func, file, (int32_t)line);
     else 
-        CB_catf(message, " at %s line %i32\n", file, (int32_t)line);
+        CB_catf(message, "\n\t%s line %i32\n", file, (int32_t)line);
 }
 
 CharBuf*
