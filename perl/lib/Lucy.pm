@@ -407,7 +407,9 @@ sub error {$Lucy::Object::Err::error}
 
     sub do_throw {
         my $err = shift;
-        $err->cat_mess( longmess() );
+        my $longmess = longmess();
+        $longmess =~ s/^\s*/\t/;
+        $err->cat_mess($longmess);
         die $err;
     }
 
