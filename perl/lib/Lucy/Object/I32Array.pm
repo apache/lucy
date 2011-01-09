@@ -34,10 +34,13 @@ CODE:
     AV *ints_av = NULL;
     lucy_I32Array *self = NULL;
 
-    XSBind_allot_params( &(ST(0)), 1, items, 
-        "Lucy::Object::I32Array::new_PARAMS",
+    chy_bool_t args_ok = XSBind_allot_params(
+        &(ST(0)), 1, items, "Lucy::Object::I32Array::new_PARAMS",
         &ints_sv, "ints", 4,
         NULL);
+    if (!args_ok) {
+        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+    }
     if (XSBind_sv_defined(ints_sv) && SvROK(ints_sv)) {
         ints_av = (AV*)SvRV(ints_sv);
     }

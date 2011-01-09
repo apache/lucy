@@ -36,14 +36,17 @@ CODE:
     SV *pos_inc_sv      = NULL;
     SV *boost_sv        = NULL;
 
-    XSBind_allot_params( &(ST(0)), 1, items, 
-        "Lucy::Analysis::Token::new_PARAMS",
+    chy_bool_t args_ok = XSBind_allot_params(
+        &(ST(0)), 1, items, "Lucy::Analysis::Token::new_PARAMS",
         &text_sv, "text", 4,
         &start_offset_sv, "start_offset", 12, 
         &end_offset_sv, "end_offset", 10, 
         &pos_inc_sv, "pos_inc", 7, 
         &boost_sv, "boost", 5, 
         NULL);
+    if (!args_ok) {
+        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+    }
 
     if (!XSBind_sv_defined(text_sv)) { 
         THROW(LUCY_ERR, "Missing required param 'text'"); 

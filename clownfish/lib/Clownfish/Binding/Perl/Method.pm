@@ -208,8 +208,8 @@ sub _xsub_def_labeled_params {
     my $self_assignment
         = _self_assign_statement( $self_type, $self->{method}->micro_sym );
     my @var_assignments;
-    my $allot_params
-        = qq|XSBind_allot_params( &(ST(0)), 1, items, "$params_hash_name", |;
+    my $allot_params = qq|chy_bool_t args_ok = XSBind_allot_params(\n|
+        . qq|            &(ST(0)), 1, items, "$params_hash_name",\n|;
 
     # Iterate over args in param list.
     for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
@@ -243,9 +243,9 @@ sub _xsub_def_labeled_params {
             push @var_assignments, $assignment;
         }
     }
-    $allot_params .= " NULL);\n";
-    my $var_assignments = join( "\n        ",
-        $self_assignment, $allot_params, @var_assignments, );
+    $allot_params .= "            NULL);";
+    my $var_assignments
+        = join( "\n        ", $self_assignment, @var_assignments, );
 
     return <<END_STUFF;
 XS($c_name);
@@ -259,6 +259,10 @@ XS($c_name)
     {
         /* Extract vars from Perl stack. */
         $var_declarations
+        $allot_params
+        if (!args_ok) {
+            CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+        }
         $var_assignments
 
         /* Execute */

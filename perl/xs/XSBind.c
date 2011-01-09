@@ -371,7 +371,7 @@ XSBind_enable_overload(void *pobj)
     SvAMAGIC_on(perl_obj);
 }
 
-void
+chy_bool_t
 XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, 
                     char* params_hash_name, ...)
 {
@@ -383,13 +383,20 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
 
     // Retrieve the params hash, which must be a package global. 
     if (params_hash == NULL) {
-        THROW(CFISH_ERR, "Can't find hash named %s", params_hash_name);
+        cfish_CharBuf *mess = CFISH_MAKE_MESS(
+            "Can't find hash named %s", params_hash_name);
+        cfish_Err_set_error(cfish_Err_new(mess));
+        return false;
     }
 
-    // Verify that our args come in pairs. Bail if there are no args. 
-    if (num_stack_elems == start) { return; }
+    // Verify that our args come in pairs. Return success if there are no
+    // args. 
+    if (num_stack_elems == start) { return true; }
     if ((num_stack_elems - start) % 2 != 0) {
-        THROW(CFISH_ERR, "Expecting hash-style params, got odd number of args");
+        cfish_CharBuf *mess = CFISH_MAKE_MESS(
+            "Expecting hash-style params, got odd number of args");
+        cfish_Err_set_error(cfish_Err_new(mess));
+        return false;
     }
 
     // Validate param names. 
@@ -398,7 +405,10 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         STRLEN key_len;
         const char *key = SvPV(key_sv, key_len); // assume ASCII labels 
         if (!hv_exists(params_hash, key, key_len)) {
-            THROW(CFISH_ERR, "Invalid parameter: '%s'", key);
+            cfish_CharBuf *mess = CFISH_MAKE_MESS(
+                "Invalid parameter: '%s'", key);
+            cfish_Err_set_error(cfish_Err_new(mess));
+            return false;
         }
     }
 
@@ -422,6 +432,8 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         }
     }
     va_end(args);
+
+    return true;
 }
 
 

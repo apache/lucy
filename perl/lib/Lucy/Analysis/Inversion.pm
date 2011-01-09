@@ -33,10 +33,13 @@ CODE:
     // parse params, only if there's more than one arg 
     if (items > 1) {
         SV *text_sv = NULL;
-        XSBind_allot_params( &(ST(0)), 1, items, 
-            "Lucy::Analysis::Inversion::new_PARAMS",
+        chy_bool_t args_ok = XSBind_allot_params(
+            &(ST(0)), 1, items, "Lucy::Analysis::Inversion::new_PARAMS",
             &text_sv, "text", 4,
             NULL);
+        if (!args_ok) {
+            CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+        }
         if (XSBind_sv_defined(text_sv)) {
             STRLEN len;
             char *text = SvPVutf8(text_sv, len);

@@ -63,7 +63,10 @@ our %aliases = (
     CFISH_FLOAT32   => 'LUCY_FLOAT32',
     CFISH_FLOAT64   => 'LUCY_FLOAT64',
 
-    CFISH_ERR => 'LUCY_ERR',
+    CFISH_ERR           => 'LUCY_ERR',
+    cfish_Err_new       => 'lucy_Err_new',
+    cfish_Err_set_error => 'lucy_Err_set_error',
+    cfish_Err_get_error => 'lucy_Err_get_error',
 
     cfish_Hash           => 'lucy_Hash',
     CFISH_HASH           => 'LUCY_HASH',

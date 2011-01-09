@@ -33,10 +33,13 @@ CODE:
     SV *ord_sv = NULL;
     int32_t ord = 0;
 
-    XSBind_allot_params( &(ST(0)), 1, items, 
-        "Lucy::Index::SortCache::value_PARAMS",
+    chy_bool_t args_ok = XSBind_allot_params(
+        &(ST(0)), 1, items, "Lucy::Index::SortCache::value_PARAMS",
         &ord_sv, "ord", 3, 
         NULL);
+    if (!args_ok) {
+        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+    }
     if (ord_sv) { ord = SvIV(ord_sv); }
     else { THROW(LUCY_ERR, "Missing required param 'ord'"); }
 

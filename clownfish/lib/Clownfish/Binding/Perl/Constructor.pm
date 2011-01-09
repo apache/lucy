@@ -66,8 +66,8 @@ sub xsub_def {
     my $params_hash_name = $self->perl_name . "_PARAMS";
     my @var_assignments;
     my @refcount_mods;
-    my $allot_params
-        = qq|XSBind_allot_params( &(ST(0)), 1, items, "$params_hash_name",\n|;
+    my $allot_params = qq|chy_bool_t args_ok = XSBind_allot_params(\n|
+        . qq|            &(ST(0)), 1, items, "$params_hash_name",\n|;
 
     # Iterate over args in param list.
     for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
@@ -106,7 +106,7 @@ sub xsub_def {
             push @refcount_mods, "if ($name) { LUCY_INCREF($name); }";
         }
     }
-    $allot_params .= "            NULL);\n";
+    $allot_params .= "            NULL);";
 
     # Last, so that earlier exceptions while fetching params don't trigger bad
     # DESTROY.
@@ -116,9 +116,8 @@ sub xsub_def {
         qq|self = ($self_type)XSBind_new_blank_obj( ST(0) );|;
 
     # Bundle up variable assignment statments.
-    my $var_assignments
-        = join( "\n        ", $allot_params, @var_assignments );
-    my $refcount_mods = join( "\n        ", @refcount_mods );
+    my $var_assignments = join( "\n        ", @var_assignments );
+    my $refcount_mods   = join( "\n        ", @refcount_mods );
 
     return <<END_STUFF;
 XS($c_name);
@@ -131,6 +130,10 @@ XS($c_name)
     SP -= items;
     {
         $var_declarations
+        $allot_params
+        if (!args_ok) {
+            CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+        }
         $var_assignments
         $refcount_mods
         retval = $func_sym($name_list);

@@ -164,8 +164,9 @@ cfish_XSBind_enable_overload(void *pobj);
  * (generally, the XS variable "items").
  * @param params_hash_name The name of a package global hash.  Any param
  * labels which are not present in this hash will trigger an exception.
+ * @return true on success, false on failure (sets Err_error).
  */
-void
+chy_bool_t
 cfish_XSBind_allot_params(SV** stack, int32_t start, 
                           int32_t num_stack_elems, 
                           char* params_hash_name, ...);
