@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+use strict;
+use warnings;
+use FindBin qw( $Bin );
+
+# make sure we are at the top-level dir
+if ( !-d 'perl' and !-d 'core' ) {
+    chdir("$Bin/../../");
+}
+
+my $usage = "$0 version\n";
+my $version = shift(@ARGV) or die $usage;
+
+# standardize version strings
+my $x_y_z_version    = "";
+my $x_yyyzzz_version = "";
+if ( $version =~ m/^(\d+)\.(\d+)\.(\d+)$/ ) {
+    $x_yyyzzz_version = sprintf( "%d.%03d%03d", $1, $2, $3 );
+    $x_y_z_version = $version;
+}
+elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)$/ ) {
+    $x_y_z_version = sprintf( "%d.%d.%d", $1, $2, $3 );
+    $x_yyyzzz_version = $version;
+}
+else {
+    die "Unknown version syntax. Try X.Y.Z or X.YYYZZZ\n";
+}
+
+print "Using version: $x_y_z_version ( $x_yyyzzz_version )\n";
+
+my $buf;
+
+# the actual work
+$buf = read_file('perl/lib/Lucy.pm');
+$buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/;
+write_file( 'perl/lib/Lucy.pm', $buf );
+$buf = read_file('perl/Build.PL');
+$buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_version'/;
+write_file( 'perl/Build.PL', $buf );
+
+# utility functions
+sub read_file {
+    my ($file) = @_;
+    local $/;
+    open( F, "< $file" ) or die "Cannot read $file: $!\n";
+    my $buf = <F>;
+    close(F) or die "Cannot close $file: $!\n";
+    return $buf;
+}
+
+sub write_file {
+    my ( $file, $buf ) = @_;
+    open( F, "> $file" ) or die "Cannot write $file: $!\n";
+    print F $buf;
+    close(F) or die "Cannot close $file: $!\n";
+}
+
+exit();
+
+__END__
+
+=head1 NAME
+
+update_version - update Lucy version strings in source files
+
+=head1 SYNOPSIS
+
+ perl devel/bin/update_version version
+
+=head1 DESCRIPTION
+
+Updates key source files with I<version>, using correct syntax
+depending on the file format and type.
+
+I<version> may be specified in either format:
+
+ X.Y.Z
+ X.YYYZZZ
+
+and update_version will convert the specified string into the 
+correct format for each relevant file.
+
+=cut
