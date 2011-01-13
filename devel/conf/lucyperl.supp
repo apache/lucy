@@ -101,4 +101,39 @@
    fun:*
 }
 
+{
+   <Add aliased class name for VTable (malloc)>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_CB_clone
+   fun:lucy_VTable_add_alias_to_registry
+   fun:*
+}
+
+{
+   <Add aliased class name for VTable (calloc)>
+   Memcheck:Leak
+   fun:calloc
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_VTable_make_obj
+   fun:lucy_CB_new_from_trusted_utf8
+   fun:lucy_CB_clone
+   fun:lucy_VTable_add_alias_to_registry
+   fun:*
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:lucy_Memory_wrapped_malloc
+   fun:lucy_LFReg_register
+   fun:lucy_VTable_add_alias_to_registry
+   fun:*
+}
+
+
+
 
