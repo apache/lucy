@@ -47,7 +47,6 @@ END_CONSTRUCTOR
 Clownfish::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Analysis::Tokenizer",
-    bind_methods      => [qw( Set_Token_RE )],
     bind_constructors => ["_new"],
     make_pod          => {
         constructor => { sample => $constructor },
