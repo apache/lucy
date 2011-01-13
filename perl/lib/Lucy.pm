@@ -118,6 +118,11 @@ sub error {$Lucy::Object::Err::error}
     use bytes;
     no bytes;
 
+    our %new_PARAMS = (
+        fields => undef,
+        doc_id => 0,
+    );
+
     use overload
         fallback => 1,
         '%{}'    => \&get_fields;
@@ -136,6 +141,16 @@ sub error {$Lucy::Object::Err::error}
         $instream->read( $buf, $len );
         $self->set_fields( thaw($buf) );
     }
+}
+
+{
+    package Lucy::Document::HitDoc;
+
+    our %new_PARAMS = (
+        fields => undef,
+        score  => 0,
+        doc_id => 0,
+    );
 }
 
 {

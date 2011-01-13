@@ -97,18 +97,6 @@ sub _sv_to_cf_obj {
     }
 }
 
-sub _void_star_to_clownfish {
-    my ( $type, $cf_var, $xs_var ) = @_;
-    # Assume that void* is a reference SV -- either a hashref or an arrayref.
-    return qq|if (SvROK($xs_var)) {
-            $cf_var = SvRV($xs_var);
-        }
-        else {
-            $cf_var = NULL; /* avoid uninitialized compiler warning */
-            CFISH_THROW(CFISH_ERR, "$cf_var is not a reference");
-        }\n|;
-}
-
 sub from_perl {
     my ( $type, $cf_var, $xs_var ) = @_;
     confess("Not a Clownfish::Type")
@@ -120,11 +108,6 @@ sub from_perl {
     elsif ( $type->is_primitive ) {
         if ( my $sub = $primitives_from_perl{ $type->to_c } ) {
             return $sub->( $cf_var, $xs_var );
-        }
-    }
-    elsif ( $type->is_composite ) {
-        if ( $type->to_c eq 'void*' ) {
-            return _void_star_to_clownfish( $type, $cf_var, $xs_var );
         }
     }
 

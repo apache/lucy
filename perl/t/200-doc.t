@@ -16,13 +16,16 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Storable qw( nfreeze thaw );
 use Lucy::Test;
 
 my $doc = Lucy::Document::Doc->new;
 is_deeply( $doc->get_fields, {}, "get_fields" );
 is( $doc->get_doc_id, 0, "default doc_id of 0" );
+
+$doc->set_fields( { foo => 'oink' } );
+is_deeply( $doc->get_fields, { foo => 'oink' }, "set_fields" );
 
 $doc->{foo} = "blah";
 is_deeply( $doc->get_fields, { foo => 'blah' }, "overloading" );
