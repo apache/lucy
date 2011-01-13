@@ -117,6 +117,7 @@ Stopalizer_gen_stoplist(const CharBuf *language)
         char *word = (char*)words[i];
         ViewCharBuf *stop = ViewCB_new_from_trusted_utf8(word, strlen(word));
         NoCloneHash_Store(stoplist, (Obj*)stop, INCREF(&EMPTY));
+        DECREF(stop);
     }
     DECREF(lang);
     return (Hash*)stoplist;
