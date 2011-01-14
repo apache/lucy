@@ -84,10 +84,11 @@ sub _xsub_body {
     }
     else {
         # Return a value for method invoked in a scalar context.
-        my $return_type       = $method->get_return_type;
-        my $type_str          = $return_type->to_c;
-        my $retval_assignment = to_perl( $return_type, 'ST(0)', 'retval' );
-        my $decrement         = "";
+        my $return_type = $method->get_return_type;
+        my $type_str    = $return_type->to_c;
+        my $retval_assignment
+            = "ST(0) = " . to_perl( $return_type, 'retval' ) . ';';
+        my $decrement = "";
         if ( $return_type->is_object and $return_type->incremented ) {
             $decrement = "LUCY_DECREF(retval);\n";
         }
@@ -148,7 +149,8 @@ sub _xsub_def_positional_args {
                 = _self_assign_statement( $var_type, $method->micro_sym );
         }
         else {
-            $statement = from_perl( $var_type, $var_name, "ST($i)" );
+            $statement
+                = "$var_name = " . from_perl( $var_type, "ST($i)" ) . ";";
         }
         if ( defined $val ) {
             $statement
@@ -222,7 +224,7 @@ sub _xsub_def_labeled_params {
         $allot_params .= qq|        &$sv_name, "$name", $len,\n|;
 
         # Code for determining and validating value.
-        my $statement = from_perl( $type, $name, $sv_name );
+        my $statement = "$name = " . from_perl( $type, $sv_name ) . ";";
         if ( defined $val ) {
             my $assignment
             = qq|if ( $sv_name && XSBind_sv_defined($sv_name) ) {

@@ -26,54 +26,54 @@ our @EXPORT_OK = qw( from_perl to_perl );
 
 # Convert from a Perl scalar to a primitive type.
 my %primitives_from_perl = (
-    double => sub {"$_[0] = SvNV( $_[1] );"},
-    float  => sub {"$_[0] = (float)SvNV( $_[1] );"},
-    int    => sub {"$_[0] = (int)SvIV( $_[1] );"},
-    short  => sub {"$_[0] = (short)SvIV( $_[1] );"},
+    double => sub {"SvNV( $_[0] )"},
+    float  => sub {"(float)SvNV( $_[0] )"},
+    int    => sub {"(int)SvIV( $_[0] )"},
+    short  => sub {"(short)SvIV( $_[0] )"},
     long   => sub {
-        "$_[0] = (sizeof(long) <= sizeof(IV)) ? "
-            . "(long)SvIV($_[1]) : (long)SvNV($_[1]);";
+        "((sizeof(long) <= sizeof(IV)) ? "
+            . "(long)SvIV($_[0]) : (long)SvNV($_[0]))"
     },
-    size_t     => sub {"$_[0] = (size_t)SvIV( $_[1] );"},
-    uint64_t   => sub {"$_[0] = (uint64_t)SvNV( $_[1] );"},
-    uint32_t   => sub {"$_[0] = (uint32_t)SvUV( $_[1] );"},
-    uint16_t   => sub {"$_[0] = (uint16_t)SvUV( $_[1] );"},
-    uint8_t    => sub {"$_[0] = (uint8_t)SvUV( $_[1] );"},
-    int64_t    => sub {"$_[0] = (int64_t)SvNV( $_[1] );"},
-    int32_t    => sub {"$_[0] = (int32_t)SvIV( $_[1] );"},
-    int16_t    => sub {"$_[0] = (int16_t)SvIV( $_[1] );"},
-    int8_t     => sub {"$_[0] = (int8_t)SvIV( $_[1] );"},
-    chy_bool_t => sub {"$_[0] = SvTRUE( $_[1] ) ? 1 : 0;"},
+    size_t     => sub {"(size_t)SvIV( $_[0] )"},
+    uint64_t   => sub {"(uint64_t)SvNV( $_[0] )"},
+    uint32_t   => sub {"(uint32_t)SvUV( $_[0] )"},
+    uint16_t   => sub {"(uint16_t)SvUV( $_[0] )"},
+    uint8_t    => sub {"(uint8_t)SvUV( $_[0] )"},
+    int64_t    => sub {"(int64_t)SvNV( $_[0] )"},
+    int32_t    => sub {"(int32_t)SvIV( $_[0] )"},
+    int16_t    => sub {"(int16_t)SvIV( $_[0] )"},
+    int8_t     => sub {"(int8_t)SvIV( $_[0] )"},
+    chy_bool_t => sub {"SvTRUE( $_[0] ) ? 1 : 0"},
 );
 
 # Convert from a primitive type to a Perl scalar.
 my %primitives_to_perl = (
-    double => sub {"$_[0] = newSVnv( $_[1] );"},
-    float  => sub {"$_[0] = newSVnv( $_[1] );"},
-    int    => sub {"$_[0] = newSViv( $_[1] );"},
-    short  => sub {"$_[0] = newSViv( $_[1] );"},
+    double => sub {"newSVnv( $_[0] )"},
+    float  => sub {"newSVnv( $_[0] )"},
+    int    => sub {"newSViv( $_[0] )"},
+    short  => sub {"newSViv( $_[0] )"},
     long   => sub {
-        "$_[0] = (sizeof(long) <= sizeof(IV)) ? "
-            . "newSViv($_[1]) : newSVnv((NV)$_[1]);";
+        "((sizeof(long) <= sizeof(IV)) ? "
+            . "newSViv($_[0]) : newSVnv((NV)$_[0]))";
     },
-    size_t   => sub {"$_[0] = newSViv( $_[1] );"},
+    size_t   => sub {"newSViv( $_[0] )"},
     uint64_t => sub {
-        "$_[0] = sizeof(UV) == 8 ? newSVuv($_[1]) : newSVnv((NV)$_[1]);";
+        "sizeof(UV) == 8 ? newSVuv($_[0]) : newSVnv((NV)$_[0])";
     },
-    uint32_t => sub {"$_[0] = newSVuv( $_[1] );"},
-    uint16_t => sub {"$_[0] = newSVuv( $_[1] );"},
-    uint8_t  => sub {"$_[0] = newSVuv( $_[1] );"},
+    uint32_t => sub {"newSVuv( $_[0] )"},
+    uint16_t => sub {"newSVuv( $_[0] )"},
+    uint8_t  => sub {"newSVuv( $_[0] )"},
     int64_t  => sub {
-        "$_[0] = sizeof(IV) == 8 ? newSViv($_[1]) : newSVnv((NV)$_[1]);";
+        "sizeof(IV) == 8 ? newSViv($_[0]) : newSVnv((NV)$_[0])";
     },
-    int32_t    => sub {"$_[0] = newSViv( $_[1] );"},
-    int16_t    => sub {"$_[0] = newSViv( $_[1] );"},
-    int8_t     => sub {"$_[0] = newSViv( $_[1] );"},
-    chy_bool_t => sub {"$_[0] = newSViv( $_[1] );"},
+    int32_t    => sub {"newSViv( $_[0] )"},
+    int16_t    => sub {"newSViv( $_[0] )"},
+    int8_t     => sub {"newSViv( $_[0] )"},
+    chy_bool_t => sub {"newSViv( $_[0] )"},
 );
 
 sub from_perl {
-    my ( $type, $cf_var, $xs_var ) = @_;
+    my ( $type, $xs_var ) = @_;
     confess("Not a Clownfish::Type")
         unless blessed($type) && $type->isa('Clownfish::Type');
 
@@ -83,17 +83,17 @@ sub from_perl {
         if ( $struct_sym =~ /^[a-z_]*(Obj|CharBuf)$/ ) {
             # Share buffers rather than copy between Perl scalars and
             # Clownfish string types.
-            return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
-                . "$vtable, alloca(cfish_ZCB_size()));";
+            return "($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
+                . "$vtable, alloca(cfish_ZCB_size()))";
         }
         else {
-            return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
-                . "$vtable, NULL);";
+            return "($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
+                . "$vtable, NULL)";
         }
     }
     elsif ( $type->is_primitive ) {
         if ( my $sub = $primitives_from_perl{ $type->to_c } ) {
-            return $sub->( $cf_var, $xs_var );
+            return $sub->($xs_var);
         }
     }
 
@@ -101,25 +101,25 @@ sub from_perl {
 }
 
 sub to_perl {
-    my ( $type, $xs_var, $cf_var ) = @_;
+    my ( $type, $cf_var ) = @_;
     confess("Not a Clownfish::Type")
         unless ref($type) && $type->isa('Clownfish::Type');
     my $type_str = $type->to_c;
 
     if ( $type->is_object ) {
-        return "$xs_var = $cf_var == NULL ? newSV(0) : "
-            . "XSBind_cfish_to_perl((cfish_Obj*)$cf_var);";
+        return "($cf_var == NULL ? newSV(0) : "
+            . "XSBind_cfish_to_perl((cfish_Obj*)$cf_var))";
     }
     elsif ( $type->is_primitive ) {
         if ( my $sub = $primitives_to_perl{$type_str} ) {
-            return $sub->( $xs_var, $cf_var );
+            return $sub->($cf_var);
         }
     }
     elsif ( $type->is_composite ) {
         if ( $type_str eq 'void*' ) {
             # Assume that void* is a reference SV -- either a hashref or an
             # arrayref.
-            return "$xs_var = newRV_inc( (SV*)($cf_var) );";
+            return "newRV_inc( (SV*)($cf_var) )";
         }
     }
 
@@ -242,19 +242,15 @@ types using the XS "typemap" format documented in C<perlxs>.
 
 =head2 from_perl
 
-    my $c_code = from_perl( $type, $cf_var, $xs_var );
+    my $expression = from_perl( $type, $xs_var );
 
-Return C code which converts from a Perl scalar to a variable of type $type.
-
-Variable declarations must precede the returned code, as from_perl() won't
-make any declarations itself.
+Return an expression which converts from a Perl scalar to a variable of type
+$type.
 
 =over
 
 =item * B<type> - A Clownfish::Type, which will be used to select the
 mapping code.
-
-=item * B<cf_var> - The name of the variable being assigned to.
 
 =item * B<xs_var> - The C name of the Perl scalar from which we are extracting
 a value.
@@ -263,19 +259,14 @@ a value.
 
 =head2 to_perl
 
-    my $c_code = to_perl( $type, $xs_var, $cf_var );
+    my $c_code = to_perl( $type, $cf_var );
 
-Return C code which converts from a variable of type $type to a Perl scalar.
-
-Variable declarations must precede the returned code, as to_perl() won't make
-any declarations itself.
+Return an expression converts from a variable of type $type to a Perl scalar.
 
 =over
 
 =item * B<type> - A Clownfish::Type, which will be used to select the
 mapping code.
-
-=item * B<xs_var> - The C name of the Perl scalar being assigned to.
 
 =item * B<cf_var> - The name of the variable from which we are extracting a
 value.

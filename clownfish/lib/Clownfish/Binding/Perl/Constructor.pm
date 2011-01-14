@@ -82,7 +82,7 @@ sub xsub_def {
         $allot_params .= qq|        &$sv_name, "$name", $len,\n|;
 
         # Create code for determining and validating value.
-        my $statement = from_perl( $type, $name, $sv_name );
+        my $statement = "$name = " . from_perl( $type, $sv_name ) . ";";
         if ( defined $val ) {
             my $assignment = qq|if ($sv_name && XSBind_sv_defined($sv_name)) {
         $statement
