@@ -90,7 +90,7 @@ sub _xsub_body {
             = "ST(0) = " . to_perl( $return_type, 'retval' ) . ';';
         my $decrement = "";
         if ( $return_type->is_object and $return_type->incremented ) {
-            $decrement = "LUCY_DECREF(retval);\n";
+            $decrement = "\n    LUCY_DECREF(retval);";
         }
         $body .= qq|$type_str retval = $full_func_sym($name_list);
     $retval_assignment$decrement
@@ -136,30 +136,30 @@ sub _xsub_def_positional_args {
     }
 
     # Var assignments.
-    my $var_declarations = $self->var_declarations;
     my @var_assignments;
     for ( my $i = 0; $i < @$arg_vars; $i++ ) {
         my $var      = $arg_vars->[$i];
         my $val      = $arg_inits->[$i];
         my $var_name = $var->micro_sym;
         my $var_type = $var->get_type;
+        my $type_c   = $var_type->to_c;
         my $statement;
         if ( $i == 0 ) {    # $self
             $statement
                 = _self_assign_statement( $var_type, $method->micro_sym );
         }
         else {
-            $statement
-                = "$var_name = " . from_perl( $var_type, "ST($i)" ) . ";";
-        }
-        if ( defined $val ) {
-            $statement
-                = qq|    if ( items >= $i && XSBind_sv_defined(ST($i)) ) {
-        $statement
-    }
-    else { 
-        $var_name = $val;
-    }|;
+            if ( defined $val ) {
+                $statement
+                    = "$type_c $var_name = "
+                    . "( items >= $i && XSBind_sv_defined(ST($i)) ) ? "
+                    . from_perl( $var_type, "ST($i)" )
+                    . " : $val;";
+            }
+            else {
+                $statement = "$type_c $var_name = "
+                    . from_perl( $var_type, "ST($i)" ) . ';';
+            }
         }
         push @var_assignments, $statement;
     }
@@ -175,7 +175,6 @@ XS($c_name)
     $num_args_check;
 
     /* Extract vars from Perl stack. */
-    $var_declarations
     $var_assignments
 
     /* Execute */
