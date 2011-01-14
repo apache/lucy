@@ -124,7 +124,6 @@ XS($c_name)
 {
     dXSARGS;
     CHY_UNUSED_VAR(cv);
-    CHY_UNUSED_VAR(ax);
     if (items < 1) { CFISH_THROW(CFISH_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
     SP -= items;
 

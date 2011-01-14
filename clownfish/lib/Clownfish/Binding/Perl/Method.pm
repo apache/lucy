@@ -168,7 +168,6 @@ XS($c_name)
 {
     dXSARGS;
     CHY_UNUSED_VAR(cv);
-    CHY_UNUSED_VAR(ax);
     SP -= items;
     $num_args_check;
 
@@ -251,7 +250,6 @@ XS($c_name)
 {
     dXSARGS;
     CHY_UNUSED_VAR(cv);
-    CHY_UNUSED_VAR(ax);
     $num_args_check;
     SP -= items;
 
