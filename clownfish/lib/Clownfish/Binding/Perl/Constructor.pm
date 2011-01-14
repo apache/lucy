@@ -67,7 +67,7 @@ sub xsub_def {
     my @var_assignments;
     my @refcount_mods;
     my $allot_params = qq|chy_bool_t args_ok = XSBind_allot_params(\n|
-        . qq|            &(ST(0)), 1, items, "$params_hash_name",\n|;
+        . qq|        &(ST(0)), 1, items, "$params_hash_name",\n|;
 
     # Iterate over args in param list.
     for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
@@ -79,25 +79,25 @@ sub xsub_def {
         my $len     = length $name;
 
         # Create snippet for extracting sv from stack, if supplied.
-        $allot_params .= qq|            &$sv_name, "$name", $len,\n|;
+        $allot_params .= qq|        &$sv_name, "$name", $len,\n|;
 
         # Create code for determining and validating value.
         my $statement = from_perl( $type, $name, $sv_name );
         if ( defined $val ) {
             my $assignment = qq|if ($sv_name && XSBind_sv_defined($sv_name)) {
-            $statement
-        }
-        else {
-            $name = $val;
-        }|;
+        $statement
+    }
+    else {
+        $name = $val;
+    }|;
             push @var_assignments, $assignment;
         }
         else {
             my $assignment
                 = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) {
-           CFISH_THROW(CFISH_ERR, "Missing required param '$name'");
-        }
-        $statement#;
+       CFISH_THROW(CFISH_ERR, "Missing required param '$name'");
+    }
+    $statement#;
             push @var_assignments, $assignment;
         }
 
@@ -106,7 +106,7 @@ sub xsub_def {
             push @refcount_mods, "if ($name) { LUCY_INCREF($name); }";
         }
     }
-    $allot_params .= "            NULL);";
+    $allot_params .= "        NULL);";
 
     # Last, so that earlier exceptions while fetching params don't trigger bad
     # DESTROY.
@@ -115,9 +115,8 @@ sub xsub_def {
     push @var_assignments,
         qq|self = ($self_type)XSBind_new_blank_obj( ST(0) );|;
 
-    # Bundle up variable assignment statments.
-    my $var_assignments = join( "\n        ", @var_assignments );
-    my $refcount_mods   = join( "\n        ", @refcount_mods );
+    # Bundle up variable assignment statments and refcount modifications.
+    my $var_assignments = join( "\n    ", @var_assignments, @refcount_mods );
 
     return <<END_STUFF;
 XS($c_name);
@@ -128,25 +127,24 @@ XS($c_name)
     CHY_UNUSED_VAR(ax);
     if (items < 1) { CFISH_THROW(CFISH_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
     SP -= items;
-    {
-        $var_declarations
-        $allot_params
-        if (!args_ok) {
-            CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
-        }
-        $var_assignments
-        $refcount_mods
-        retval = $func_sym($name_list);
-        if (retval) {
-            ST(0) = (SV*)Cfish_Obj_To_Host((cfish_Obj*)retval);
-            Cfish_Obj_Dec_RefCount((cfish_Obj*)retval);
-        }
-        else {
-            ST(0) = newSV(0);
-        }
-        sv_2mortal( ST(0) );
-        XSRETURN(1);
+
+    $var_declarations
+    $allot_params
+    if (!args_ok) {
+        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }
+    $var_assignments
+
+    retval = $func_sym($name_list);
+    if (retval) {
+        ST(0) = (SV*)Cfish_Obj_To_Host((cfish_Obj*)retval);
+        Cfish_Obj_Dec_RefCount((cfish_Obj*)retval);
+    }
+    else {
+        ST(0) = newSV(0);
+    }
+    sv_2mortal( ST(0) );
+    XSRETURN(1);
 }
 
 END_STUFF

@@ -75,12 +75,12 @@ sub _xsub_body {
         next unless $arg_type->is_object;
         next unless $arg_type->decremented;
         my $var_name = $arg_var->micro_sym;
-        $body .= "if ($var_name) (void)LUCY_INCREF($var_name);\n        ";
+        $body .= "if ($var_name) (void)LUCY_INCREF($var_name);\n    ";
     }
 
     if ( $method->void ) {
         # Invoke method in void context.
-        $body .= qq|$full_func_sym($name_list);\n| . qq|        XSRETURN(0);|;
+        $body .= qq|$full_func_sym($name_list);\n| . qq|    XSRETURN(0);|;
     }
     else {
         # Return a value for method invoked in a scalar context.
@@ -91,9 +91,9 @@ sub _xsub_body {
             $decrement = "LUCY_DECREF(retval);\n";
         }
         $body .= qq|retval = $full_func_sym($name_list);
-        $retval_assignment$decrement
-        sv_2mortal( ST(0) );
-        XSRETURN(1);|
+    $retval_assignment$decrement
+    sv_2mortal( ST(0) );
+    XSRETURN(1);|
     }
 
     return $body;
@@ -152,11 +152,11 @@ sub _xsub_def_positional_args {
         if ( defined $val ) {
             $statement
                 = qq|    if ( items >= $i && XSBind_sv_defined(ST($i)) ) {
-            $statement
-        }
-        else { 
-            $var_name = $val;
-        }|;
+        $statement
+    }
+    else { 
+        $var_name = $val;
+    }|;
         }
         push @var_assignments, $statement;
     }
@@ -171,14 +171,13 @@ XS($c_name)
     CHY_UNUSED_VAR(ax);
     SP -= items;
     $num_args_check;
-    {
-        /* Extract vars from Perl stack. */
-        $var_declarations
-        $var_assignments
 
-        /* Execute */
-        $body
-    }
+    /* Extract vars from Perl stack. */
+    $var_declarations
+    $var_assignments
+
+    /* Execute */
+    $body
 }
 END_STUFF
 }
@@ -208,7 +207,7 @@ sub _xsub_def_labeled_params {
         = _self_assign_statement( $self_type, $self->{method}->micro_sym );
     my @var_assignments;
     my $allot_params = qq|chy_bool_t args_ok = XSBind_allot_params(\n|
-        . qq|            &(ST(0)), 1, items, "$params_hash_name",\n|;
+        . qq|        &(ST(0)), 1, items, "$params_hash_name",\n|;
 
     # Iterate over args in param list.
     for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
@@ -220,31 +219,31 @@ sub _xsub_def_labeled_params {
         my $len     = length $name;
 
         # Code for extracting sv from stack, if supplied.
-        $allot_params .= qq|            &$sv_name, "$name", $len,\n|;
+        $allot_params .= qq|        &$sv_name, "$name", $len,\n|;
 
         # Code for determining and validating value.
         my $statement = from_perl( $type, $name, $sv_name );
         if ( defined $val ) {
             my $assignment
-                = qq|if ( $sv_name && XSBind_sv_defined($sv_name) ) {
-            $statement;
-        }
-        else {
-            $name = $val;
-        }|;
+            = qq|if ( $sv_name && XSBind_sv_defined($sv_name) ) {
+        $statement;
+    }
+    else {
+        $name = $val;
+    }|;
             push @var_assignments, $assignment;
         }
         else {
             my $assignment
                 = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) { #
                 . qq#CFISH_THROW(CFISH_ERR, "Missing required param '$name'"); }\n#
-                . qq#         $statement;#;
+                . qq#     $statement;#;
             push @var_assignments, $assignment;
         }
     }
-    $allot_params .= "            NULL);";
+    $allot_params .= "        NULL);";
     my $var_assignments
-        = join( "\n        ", $self_assignment, @var_assignments, );
+        = join( "\n    ", $self_assignment, @var_assignments, );
 
     return <<END_STUFF;
 XS($c_name);
@@ -255,18 +254,17 @@ XS($c_name)
     CHY_UNUSED_VAR(ax);
     $num_args_check;
     SP -= items;
-    {
-        /* Extract vars from Perl stack. */
-        $var_declarations
-        $allot_params
-        if (!args_ok) {
-            CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
-        }
-        $var_assignments
 
-        /* Execute */
-        $body
+    /* Extract vars from Perl stack. */
+    $var_declarations
+    $allot_params
+    if (!args_ok) {
+        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }
+    $var_assignments
+
+    /* Execute */
+    $body
 }
 END_STUFF
 }

@@ -111,7 +111,7 @@ sub var_declarations {
             map { "SV* " . $_->micro_sym . "_sv = NULL;" }
             @$arg_vars[ 1 .. $#$arg_vars ];
     }
-    return join( "\n        ", @var_declarations );
+    return join( "\n    ", @var_declarations );
 }
 
 sub xsub_def { confess "Abstract method" }
