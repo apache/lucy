@@ -72,31 +72,24 @@ my %primitives_to_perl = (
     chy_bool_t => sub {"$_[0] = newSViv( $_[1] );"},
 );
 
-# Extract a Clownfish object from a Perl SV.
-sub _sv_to_cf_obj {
-    my ( $type, $cf_var, $xs_var ) = @_;
-    my $struct_sym = $type->get_specifier;
-    my $vtable     = uc($struct_sym);
-    if ( $struct_sym =~ /^[a-z_]*(Obj|CharBuf)$/ ) {
-        # Share buffers rather than copy between Perl scalars and Clownfish
-        # string types.  Assume that the appropriate ZombieCharBuf has been
-        # declared on the stack.
-        return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
-            . "$vtable, alloca(cfish_ZCB_size()));";
-    }
-    else {
-        return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
-            . "$vtable, NULL);";
-    }
-}
-
 sub from_perl {
     my ( $type, $cf_var, $xs_var ) = @_;
     confess("Not a Clownfish::Type")
         unless blessed($type) && $type->isa('Clownfish::Type');
 
     if ( $type->is_object ) {
-        return _sv_to_cf_obj( $type, $cf_var, $xs_var );
+        my $struct_sym = $type->get_specifier;
+        my $vtable     = uc($struct_sym);
+        if ( $struct_sym =~ /^[a-z_]*(Obj|CharBuf)$/ ) {
+            # Share buffers rather than copy between Perl scalars and
+            # Clownfish string types.
+            return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
+                . "$vtable, alloca(cfish_ZCB_size()));";
+        }
+        else {
+            return "$cf_var = ($struct_sym*)XSBind_sv_to_cfish_obj($xs_var, "
+                . "$vtable, NULL);";
+        }
     }
     elsif ( $type->is_primitive ) {
         if ( my $sub = $primitives_from_perl{ $type->to_c } ) {
@@ -137,22 +130,22 @@ sub write_xs_typemap {
     my ( undef, %args ) = @_;
     my $hierarchy = $args{hierarchy};
 
-    my $typemap_start  = _typemap_start();
-    my $typemap_input  = _typemap_input_start();
-    my $typemap_output = _typemap_output_start();
+    my $class_typemap_start  = "";
+    my $class_typemap_input  = "";
+    my $class_typemap_output = "";
 
     for my $class ( $hierarchy->ordered_classes ) {
         my $full_struct_sym = $class->full_struct_sym;
         my $vtable          = $class->full_vtable_var;
         my $label           = $vtable . "_";
-        $typemap_start .= "$full_struct_sym*\t$label\n";
-        $typemap_input .= <<END_INPUT;
+        $class_typemap_start .= "$full_struct_sym*\t$label\n";
+        $class_typemap_input .= <<END_INPUT;
 $label
     \$var = ($full_struct_sym*)XSBind_sv_to_cfish_obj(\$arg, $vtable, NULL);
 
 END_INPUT
 
-        $typemap_output .= <<END_OUTPUT;
+        $class_typemap_output .= <<END_OUTPUT;
 $label
     \$arg = (SV*)Cfish_Obj_To_Host((cfish_Obj*)\$var);
     LUCY_DECREF(\$var);
@@ -163,12 +156,7 @@ END_OUTPUT
     # Blast it out.
     sysopen( my $typemap_fh, 'typemap', O_CREAT | O_WRONLY | O_EXCL )
         or die "Couldn't open 'typemap' for writing: $!";
-    print $typemap_fh "$typemap_start $typemap_input $typemap_output"
-        or die "Print to 'typemap' failed: $!";
-}
-
-sub _typemap_start {
-    my $content = <<END_STUFF;
+    print $typemap_fh <<END_STUFF;
 # Auto-generated file.
 
 TYPEMAP
@@ -183,14 +171,8 @@ uint32_t\tCHY_UNSIGNED_INT
 uint64_t\tCHY_BIG_UNSIGNED_INT
 
 const lucy_CharBuf*\tCONST_CHARBUF
-END_STUFF
+$class_typemap_start
 
-    return $content;
-}
-
-sub _typemap_input_start {
-    return <<END_STUFF;
-    
 INPUT
 
 CHY_BOOL
@@ -211,11 +193,7 @@ CHY_BIG_UNSIGNED_INT
 CONST_CHARBUF
     \$var = (const cfish_CharBuf*)CFISH_ZCB_WRAP_STR(SvPVutf8_nolen(\$arg), SvCUR(\$arg));
 
-END_STUFF
-}
-
-sub _typemap_output_start {
-    return <<END_STUFF;
+$class_typemap_input
 
 OUTPUT
 
@@ -236,7 +214,11 @@ CHY_BIG_UNSIGNED_INT
     if (sizeof(UV) == 8) { sv_setuv(\$arg, (UV)\$var); }
     else                 { sv_setnv(\$arg, (NV)\$var); }
 
+$class_typemap_output
+
 END_STUFF
+
+    close $typemap_fh or die $!;
 }
 
 1;
