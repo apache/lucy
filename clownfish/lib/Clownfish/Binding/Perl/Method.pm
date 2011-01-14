@@ -80,7 +80,7 @@ sub _xsub_body {
 
     if ( $method->void ) {
         # Invoke method in void context.
-        $body .= qq|$full_func_sym($name_list);|;
+        $body .= qq|$full_func_sym($name_list);\n| . qq|        XSRETURN(0);|;
     }
     else {
         # Return a value for method invoked in a scalar context.
@@ -179,7 +179,6 @@ XS($c_name)
         /* Execute */
         $body
     }
-    PUTBACK;
 }
 END_STUFF
 }
@@ -268,7 +267,6 @@ XS($c_name)
         /* Execute */
         $body
     }
-    PUTBACK;
 }
 END_STUFF
 }

@@ -147,7 +147,6 @@ XS($c_name)
         sv_2mortal( ST(0) );
         XSRETURN(1);
     }
-    PUTBACK;
 }
 
 END_STUFF
