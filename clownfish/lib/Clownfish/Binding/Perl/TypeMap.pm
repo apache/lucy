@@ -21,7 +21,6 @@ use base qw( Exporter );
 use Scalar::Util qw( blessed );
 use Carp;
 use Fcntl;
-use Config;
 
 our @EXPORT_OK = qw( from_perl to_perl );
 
@@ -32,9 +31,8 @@ my %primitives_from_perl = (
     int    => sub {"$_[0] = (int)SvIV( $_[1] );"},
     short  => sub {"$_[0] = (short)SvIV( $_[1] );"},
     long   => sub {
-        $Config{longsize} <= $Config{ivsize}
-            ? "$_[0] = (long)SvIV( $_[1] );"
-            : "$_[0] = (long)SvNV( $_[1] );";
+        "$_[0] = (sizeof(long) <= sizeof(IV)) ? "
+            . "(long)SvIV($_[1]) : (long)SvNV($_[1]);";
     },
     size_t     => sub {"$_[0] = (size_t)SvIV( $_[1] );"},
     uint64_t   => sub {"$_[0] = (uint64_t)SvNV( $_[1] );"},
@@ -55,23 +53,18 @@ my %primitives_to_perl = (
     int    => sub {"$_[0] = newSViv( $_[1] );"},
     short  => sub {"$_[0] = newSViv( $_[1] );"},
     long   => sub {
-        $Config{longsize} <= $Config{ivsize}
-            ? "$_[0] = newSViv( $_[1] );"
-            : "$_[0] = newSVnv( (NV)$_[1] );";
+        "$_[0] = (sizeof(long) <= sizeof(IV)) ? "
+            . "newSViv($_[1]) : newSVnv((NV)$_[1]);";
     },
     size_t   => sub {"$_[0] = newSViv( $_[1] );"},
     uint64_t => sub {
-        $Config{uvsize} == 8
-            ? "$_[0] = newSVuv( $_[1] );"
-            : "$_[0] = newSVnv( (NV)$_[1] );";
+        "$_[0] = sizeof(UV) == 8 ? newSVuv($_[1]) : newSVnv((NV)$_[1]);";
     },
     uint32_t => sub {"$_[0] = newSVuv( $_[1] );"},
     uint16_t => sub {"$_[0] = newSVuv( $_[1] );"},
     uint8_t  => sub {"$_[0] = newSVuv( $_[1] );"},
     int64_t  => sub {
-        $Config{ivsize} == 8
-            ? "$_[0] = newSViv( $_[1] );"
-            : "$_[0] = newSVnv( (NV)$_[1] );";
+        "$_[0] = sizeof(IV) == 8 ? newSViv($_[1]) : newSVnv((NV)$_[1]);";
     },
     int32_t    => sub {"$_[0] = newSViv( $_[1] );"},
     int16_t    => sub {"$_[0] = newSViv( $_[1] );"},
@@ -196,15 +189,6 @@ END_STUFF
 }
 
 sub _typemap_input_start {
-    my ( $big_signed_convert, $big_unsigned_convert );
-    if ( $Config{ivsize} == 8 ) {
-        $big_signed_convert   = '$var = ($type)SvIV($arg);';
-        $big_unsigned_convert = '$var = ($type)SvUV($arg);';
-    }
-    else {
-        $big_signed_convert   = '$var   = ($type)SvNV($arg);';
-        $big_unsigned_convert = '$var = ($type)SvNV($arg);';
-    }
     return <<END_STUFF;
     
 INPUT
@@ -219,10 +203,10 @@ CHY_UNSIGNED_INT
     \$var = (\$type)SvUV(\$arg);
 
 CHY_BIG_SIGNED_INT 
-    $big_signed_convert
+    \$var = (sizeof(IV) == 8) ? (\$type)SvIV(\$arg) : (\$type)SvNV(\$arg);
 
 CHY_BIG_UNSIGNED_INT 
-    $big_unsigned_convert
+    \$var = (sizeof(UV) == 8) ? (\$type)SvUV(\$arg) : (\$type)SvNV(\$arg);
 
 CONST_CHARBUF
     \$var = (const cfish_CharBuf*)CFISH_ZCB_WRAP_STR(SvPVutf8_nolen(\$arg), SvCUR(\$arg));
@@ -231,15 +215,6 @@ END_STUFF
 }
 
 sub _typemap_output_start {
-    my ( $big_signed_convert, $big_unsigned_convert );
-    if ( $Config{ivsize} == 8 ) {
-        $big_signed_convert   = 'sv_setiv($arg, (IV)$var);';
-        $big_unsigned_convert = 'sv_setuv($arg, (UV)$var);';
-    }
-    else {
-        $big_signed_convert   = 'sv_setnv($arg, (NV)$var);';
-        $big_unsigned_convert = 'sv_setnv($arg, (NV)$var);';
-    }
     return <<END_STUFF;
 
 OUTPUT
@@ -254,10 +229,12 @@ CHY_UNSIGNED_INT
     sv_setuv(\$arg, (UV)\$var);
 
 CHY_BIG_SIGNED_INT
-    $big_signed_convert
+    if (sizeof(IV) == 8) { sv_setiv(\$arg, (IV)\$var); }
+    else                 { sv_setnv(\$arg, (NV)\$var); }
 
 CHY_BIG_UNSIGNED_INT
-    $big_unsigned_convert
+    if (sizeof(UV) == 8) { sv_setuv(\$arg, (UV)\$var); }
+    else                 { sv_setnv(\$arg, (NV)\$var); }
 
 END_STUFF
 }
