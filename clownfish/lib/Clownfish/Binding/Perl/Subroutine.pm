@@ -99,13 +99,10 @@ sub params_hash_def {
 }
 
 sub var_declarations {
-    my $self             = shift;
-    my $arg_vars         = $self->{param_list}->get_variables;
-    my @var_declarations = map { $_->local_declaration } @$arg_vars;
-    if ( !$self->{retval_type}->is_void ) {
-        my $return_type = $self->{retval_type}->to_c;
-        push @var_declarations, "$return_type retval;";
-    }
+    my $self     = shift;
+    my $arg_vars = $self->{param_list}->get_variables;
+    my @var_declarations
+        = map { $_->local_declaration } @$arg_vars[ 1 .. $#$arg_vars ];
     if ( $self->{use_labeled_params} ) {
         push @var_declarations,
             map { "SV* " . $_->micro_sym . "_sv = NULL;" }

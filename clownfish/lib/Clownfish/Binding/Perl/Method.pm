@@ -85,12 +85,13 @@ sub _xsub_body {
     else {
         # Return a value for method invoked in a scalar context.
         my $return_type       = $method->get_return_type;
+        my $type_str          = $return_type->to_c;
         my $retval_assignment = to_perl( $return_type, 'ST(0)', 'retval' );
         my $decrement         = "";
         if ( $return_type->is_object and $return_type->incremented ) {
             $decrement = "LUCY_DECREF(retval);\n";
         }
-        $body .= qq|retval = $full_func_sym($name_list);
+        $body .= qq|$type_str retval = $full_func_sym($name_list);
     $retval_assignment$decrement
     sv_2mortal( ST(0) );
     XSRETURN(1);|
@@ -280,7 +281,7 @@ sub _self_assign_statement {
         = $method_name eq 'deserialize'
         ? 'XSBind_maybe_sv_to_cfish_obj'
         : 'XSBind_sv_to_cfish_obj';
-    return "self = ($type_c)$binding_func(ST(0), $vtable, NULL);";
+    return "$type_c self = ($type_c)$binding_func(ST(0), $vtable, NULL);";
 }
 
 1;

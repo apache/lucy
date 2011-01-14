@@ -113,7 +113,7 @@ sub xsub_def {
     my $self_var  = $arg_vars->[0];
     my $self_type = $self_var->get_type->to_c;
     push @var_assignments,
-        qq|self = ($self_type)XSBind_new_blank_obj( ST(0) );|;
+        qq|$self_type self = ($self_type)XSBind_new_blank_obj( ST(0) );|;
 
     # Bundle up variable assignment statments and refcount modifications.
     my $var_assignments = join( "\n    ", @var_assignments, @refcount_mods );
@@ -134,7 +134,7 @@ XS($c_name)
     }
     $var_assignments
 
-    retval = $func_sym($name_list);
+    $self_type retval = $func_sym($name_list);
     if (retval) {
         ST(0) = (SV*)Cfish_Obj_To_Host((cfish_Obj*)retval);
         Cfish_Obj_Dec_RefCount((cfish_Obj*)retval);
