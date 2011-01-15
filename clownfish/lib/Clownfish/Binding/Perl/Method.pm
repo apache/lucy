@@ -75,7 +75,7 @@ sub _xsub_body {
         next unless $arg_type->is_object;
         next unless $arg_type->decremented;
         my $var_name = $arg_var->micro_sym;
-        $body .= "if ($var_name) (void)LUCY_INCREF($var_name);\n    ";
+        $body .= "LUCY_INCREF($var_name);\n    ";
     }
 
     if ( $method->void ) {

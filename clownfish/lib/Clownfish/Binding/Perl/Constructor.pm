@@ -103,7 +103,7 @@ sub xsub_def {
 
         # Compensate for the fact that the method will swallow a refcount.
         if ( $type->is_object and $type->decremented ) {
-            push @refcount_mods, "if ($name) { LUCY_INCREF($name); }";
+            push @refcount_mods, "LUCY_INCREF($name);";
         }
     }
     $allot_params .= "        NULL);";
