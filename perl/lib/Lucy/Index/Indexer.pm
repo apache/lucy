@@ -52,17 +52,13 @@ PPCODE:
         doc_sv = ST(1);
     }
     else if (items > 2) {
-        SV* boost_sv = NULL; 
         chy_bool_t args_ok = XSBind_allot_params(
             &(ST(0)), 1, items, "Lucy::Index::Indexer::add_doc_PARAMS", 
-            &doc_sv, "doc", 3,
-            &boost_sv, "boost", 5, 
+            ALLOT_SV(&doc_sv, "doc", 3, true),
+            ALLOT_F32(&boost, "boost", 5, false),
             NULL);
         if (!args_ok) {
             CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
-        }
-        if (boost_sv) {
-            boost = (float)SvNV(boost_sv);
         }
     }
     else if (items == 1) {

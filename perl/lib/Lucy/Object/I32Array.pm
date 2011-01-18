@@ -31,20 +31,20 @@ new(either_sv, ...)
 CODE:
 {
     SV *ints_sv = NULL;
-    AV *ints_av = NULL;
     lucy_I32Array *self = NULL;
 
     chy_bool_t args_ok = XSBind_allot_params(
         &(ST(0)), 1, items, "Lucy::Object::I32Array::new_PARAMS",
-        &ints_sv, "ints", 4,
+        ALLOT_SV(&ints_sv, "ints", 4, true),
         NULL);
     if (!args_ok) {
         CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }
-    if (XSBind_sv_defined(ints_sv) && SvROK(ints_sv)) {
+
+    AV *ints_av = NULL;
+    if (SvROK(ints_sv)) {
         ints_av = (AV*)SvRV(ints_sv);
     }
-
     if (ints_av && SvTYPE(ints_av) == SVt_PVAV) {
         int32_t size  = av_len(ints_av) + 1;
         int32_t *ints = (int32_t*)LUCY_MALLOCATE(size * sizeof(int32_t));

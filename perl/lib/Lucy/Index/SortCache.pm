@@ -30,19 +30,14 @@ value(self, ...)
     lucy_SortCache *self;
 CODE:
 {
-    SV *ord_sv = NULL;
     int32_t ord = 0;
-
     chy_bool_t args_ok = XSBind_allot_params(
         &(ST(0)), 1, items, "Lucy::Index::SortCache::value_PARAMS",
-        &ord_sv, "ord", 3, 
+        ALLOT_I32(&ord, "ord", 3, false),
         NULL);
     if (!args_ok) {
         CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }
-    if (ord_sv) { ord = SvIV(ord_sv); }
-    else { THROW(LUCY_ERR, "Missing required param 'ord'"); }
-
     {
         lucy_Obj *blank = Lucy_SortCache_Make_Blank(self);
         lucy_Obj *value = Lucy_SortCache_Value(self, ord, blank);

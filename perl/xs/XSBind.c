@@ -371,14 +371,119 @@ XSBind_enable_overload(void *pobj)
     SvAMAGIC_on(perl_obj);
 }
 
+static chy_bool_t
+S_extract_from_sv(SV *value, void *target, const char *label, int label_len,
+                  chy_bool_t required, int type, cfish_VTable *vtable, 
+                  void *allocation)
+{
+    chy_bool_t valid_assignment = false;
+
+    if (XSBind_sv_defined(value)) {
+        switch (type) {
+            case XSBIND_WANT_I8:
+                *((int8_t*)target) = (int8_t)SvIV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_I16:
+                *((int16_t*)target) = (int16_t)SvIV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_I32:
+                *((int32_t*)target) = (int32_t)SvIV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_I64:
+                if (sizeof(IV) == 8) {
+                    *((int64_t*)target) = (int64_t)SvIV(value);
+                }
+                else { // sizeof(IV) == 4
+                    // lossy.
+                    *((int64_t*)target) = (int64_t)SvNV(value);
+                }
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_U8:
+                *((uint8_t*)target) = (uint8_t)SvUV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_U16:
+                *((uint16_t*)target) = (uint16_t)SvUV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_U32:
+                *((uint32_t*)target) = (uint32_t)SvUV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_U64:
+                if (sizeof(UV) == 8) {
+                    *((uint64_t*)target) = (uint64_t)SvUV(value);
+                }
+                else { // sizeof(UV) == 4
+                    // lossy.
+                    *((uint64_t*)target) = (uint64_t)SvNV(value);
+                }
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_BOOL:
+                *((chy_bool_t*)target) = !!SvTRUE(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_F32:
+                *((float*)target) = (float)SvNV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_F64:
+                *((double*)target) = SvNV(value);
+                valid_assignment = true;
+                break;
+            case XSBIND_WANT_OBJ: {
+                    cfish_Obj *object = XSBind_maybe_sv_to_cfish_obj(value, 
+                        vtable, allocation);
+                    if (object) {
+                        *((cfish_Obj**)target) = object;
+                        valid_assignment = true;
+                    }
+                    else {
+                        cfish_CharBuf *mess = CFISH_MAKE_MESS(
+                            "Invalid value for '%s' - not a %o", label,
+                            Cfish_VTable_Get_Name(vtable));
+                        cfish_Err_set_error(cfish_Err_new(mess));
+                        return false;
+                    }
+                }
+                break;
+            case XSBIND_WANT_SV:
+                *((SV**)target) = value;
+                valid_assignment = true;
+            break;
+            default: {
+                    cfish_CharBuf *mess = CFISH_MAKE_MESS(
+                        "Unrecognized type: %i32 for param '%s'", 
+                        (int32_t)type, label);
+                    cfish_Err_set_error(cfish_Err_new(mess));
+                    return false;
+                }
+        }
+    }
+
+    // Enforce that required params cannot be undef and must present valid
+    // values.
+    if (required && !valid_assignment) {
+        cfish_CharBuf *mess = CFISH_MAKE_MESS(
+            "Missing required param %s", label);
+        cfish_Err_set_error(cfish_Err_new(mess));
+        return false;
+    }
+
+    return true;
+}
+
 chy_bool_t
 XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, 
                     char* params_hash_name, ...)
 {
     va_list args;
     HV *params_hash = get_hv(params_hash_name, 0);
-    SV **target;
-    int32_t i;
     int32_t args_left = (num_stack_elems - start) / 2;
 
     // Retrieve the params hash, which must be a package global. 
@@ -400,7 +505,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
     }
 
     // Validate param names. 
-    for (i = start; i < num_stack_elems; i += 2) {
+    for (int32_t i = start; i < num_stack_elems; i += 2) {
         SV *const key_sv = stack[i];
         STRLEN key_len;
         const char *key = SvPV(key_sv, key_len); // assume ASCII labels 
@@ -412,23 +517,43 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         }
     }
 
+    void *target;
     va_start(args, params_hash_name); 
-    while (args_left && NULL != (target = va_arg(args, SV**))) {
-        char *label = va_arg(args, char*);
-        int label_len = va_arg(args, int);
+    while (args_left && NULL != (target = va_arg(args, void*))) {
+        char *label     = va_arg(args, char*);
+        int   label_len = va_arg(args, int);
+        int   required  = va_arg(args, int);
+        int   type      = va_arg(args, int);
+        cfish_VTable *vtable = va_arg(args, cfish_VTable*);
+        void *allocation = va_arg(args, void*);
 
         // Iterate through stack looking for a label match. Work backwards so
         // that if the label is doubled up we get the last one.
-        for (i = num_stack_elems; i >= start + 2; i -= 2) {
+        chy_bool_t got_arg = false;
+        for (int32_t i = num_stack_elems; i >= start + 2; i -= 2) {
             int32_t tick = i - 2;
             SV *const key_sv = stack[tick];
             if (SvCUR(key_sv) == (STRLEN)label_len) {
                 if (memcmp(SvPVX(key_sv), label, label_len) == 0) {
-                    *target = stack[tick + 1];
+                    SV *value = stack[tick + 1];
+                    got_arg = S_extract_from_sv(value, target, label, 
+                        label_len, required, type, vtable, allocation);
+                    if (!got_arg) {
+                        CFISH_ERR_ADD_FRAME(cfish_Err_get_error());
+                        return false;
+                    }
                     args_left--;
                     break;
                 }
             }
+        }
+
+        // Enforce required params.
+        if (required && !got_arg) {
+            cfish_CharBuf *mess = CFISH_MAKE_MESS(
+                "Missing required parameter: '%s'", label);
+            cfish_Err_set_error(cfish_Err_new(mess));
+            return false;
         }
     }
     va_end(args);

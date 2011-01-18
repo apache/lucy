@@ -184,67 +184,23 @@ END_STUFF
 }
 
 sub _xsub_def_labeled_params {
-    my $self       = shift;
-    my $c_name     = $self->c_name;
-    my $param_list = $self->{param_list};
-    my $arg_inits  = $param_list->get_initial_values;
-    my $num_args   = $param_list->num_vars;
-    my $arg_vars   = $param_list->get_variables;
-    my $body       = $self->_xsub_body;
+    my $self        = shift;
+    my $c_name      = $self->c_name;
+    my $param_list  = $self->{param_list};
+    my $arg_inits   = $param_list->get_initial_values;
+    my $arg_vars    = $param_list->get_variables;
+    my $self_var    = $arg_vars->[0];
+    my $self_assign = _self_assign_statement( $self_var->get_type,
+        $self->{method}->micro_sym );
+    my $allot_params = $self->build_allot_params;
+    my $body         = $self->_xsub_body;
 
     # Prepare error message for incorrect args.
-    my $name_list = $arg_vars->[0]->micro_sym . ", ...";
+    my $name_list = $self_var->micro_sym . ", ...";
     my $num_args_check
         = qq|if (items < 1) { |
         . qq|CFISH_THROW(CFISH_ERR, "Usage: %s(%s)",  GvNAME(CvGV(cv)), |
         . qq|"$name_list"); }|;
-
-    # Create code for allocating labeled parameters.
-    my $var_declarations = $self->var_declarations;
-    my $self_var         = $arg_vars->[0];
-    my $self_type        = $self_var->get_type;
-    my $params_hash_name = $self->perl_name . "_PARAMS";
-    my $self_assignment
-        = _self_assign_statement( $self_type, $self->{method}->micro_sym );
-    my @var_assignments;
-    my $allot_params = qq|chy_bool_t args_ok = XSBind_allot_params(\n|
-        . qq|        &(ST(0)), 1, items, "$params_hash_name",\n|;
-
-    # Iterate over args in param list.
-    for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
-        my $var     = $arg_vars->[$i];
-        my $val     = $arg_inits->[$i];
-        my $name    = $var->micro_sym;
-        my $sv_name = $name . "_sv";
-        my $type    = $var->get_type;
-        my $len     = length $name;
-
-        # Code for extracting sv from stack, if supplied.
-        $allot_params .= qq|        &$sv_name, "$name", $len,\n|;
-
-        # Code for determining and validating value.
-        my $statement = "$name = " . from_perl( $type, $sv_name ) . ";";
-        if ( defined $val ) {
-            my $assignment
-            = qq|if ( $sv_name && XSBind_sv_defined($sv_name) ) {
-        $statement;
-    }
-    else {
-        $name = $val;
-    }|;
-            push @var_assignments, $assignment;
-        }
-        else {
-            my $assignment
-                = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) { #
-                . qq#CFISH_THROW(CFISH_ERR, "Missing required param '$name'"); }\n#
-                . qq#     $statement;#;
-            push @var_assignments, $assignment;
-        }
-    }
-    $allot_params .= "        NULL);";
-    my $var_assignments
-        = join( "\n    ", $self_assignment, @var_assignments, );
 
     return <<END_STUFF;
 XS($c_name);
@@ -256,12 +212,8 @@ XS($c_name)
     SP -= items;
 
     /* Extract vars from Perl stack. */
-    $var_declarations
     $allot_params
-    if (!args_ok) {
-        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
-    }
-    $var_assignments
+    $self_assign
 
     /* Execute */
     $body

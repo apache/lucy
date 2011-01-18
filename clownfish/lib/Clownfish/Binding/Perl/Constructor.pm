@@ -19,7 +19,6 @@ use warnings;
 package Clownfish::Binding::Perl::Constructor;
 use base qw( Clownfish::Binding::Perl::Subroutine );
 use Carp;
-use Clownfish::Binding::Perl::TypeMap qw( from_perl );
 use Clownfish::ParamList;
 
 sub new {
@@ -57,66 +56,26 @@ sub xsub_def {
     my $param_list = $self->{param_list};
     my $name_list  = $param_list->name_list;
     my $arg_inits  = $param_list->get_initial_values;
-    my $num_args   = $param_list->num_vars;
     my $arg_vars   = $param_list->get_variables;
     my $func_sym   = $self->{init_func}->full_func_sym;
+    my $allot_params = $self->build_allot_params;
 
-    # Create code for allocating labeled parameters.
-    my $var_declarations = $self->var_declarations;
-    my $params_hash_name = $self->perl_name . "_PARAMS";
-    my @var_assignments;
-    my @refcount_mods;
-    my $allot_params = qq|chy_bool_t args_ok = XSBind_allot_params(\n|
-        . qq|        &(ST(0)), 1, items, "$params_hash_name",\n|;
-
-    # Iterate over args in param list.
+    # Compensate for swallowed refcounts.
+    my $refcount_mods = "";
     for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
-        my $var     = $arg_vars->[$i];
-        my $val     = $arg_inits->[$i];
-        my $name    = $var->micro_sym;
-        my $sv_name = $name . "_sv";
-        my $type    = $var->get_type;
-        my $len     = length $name;
-
-        # Create snippet for extracting sv from stack, if supplied.
-        $allot_params .= qq|        &$sv_name, "$name", $len,\n|;
-
-        # Create code for determining and validating value.
-        my $statement = "$name = " . from_perl( $type, $sv_name ) . ";";
-        if ( defined $val ) {
-            my $assignment = qq|if ($sv_name && XSBind_sv_defined($sv_name)) {
-        $statement
-    }
-    else {
-        $name = $val;
-    }|;
-            push @var_assignments, $assignment;
-        }
-        else {
-            my $assignment
-                = qq#if ( !$sv_name || !XSBind_sv_defined($sv_name) ) {
-       CFISH_THROW(CFISH_ERR, "Missing required param '$name'");
-    }
-    $statement#;
-            push @var_assignments, $assignment;
-        }
-
-        # Compensate for the fact that the method will swallow a refcount.
+        my $var      = $arg_vars->[$i];
+        my $type     = $var->get_type;
         if ( $type->is_object and $type->decremented ) {
-            push @refcount_mods, "LUCY_INCREF($name);";
+            my $name     = $var->micro_sym;
+            $refcount_mods .= "\n    LUCY_INCREF($name);";
         }
     }
-    $allot_params .= "        NULL);";
 
     # Last, so that earlier exceptions while fetching params don't trigger bad
     # DESTROY.
-    my $self_var  = $arg_vars->[0];
-    my $self_type = $self_var->get_type->to_c;
-    push @var_assignments,
-        qq|$self_type self = ($self_type)XSBind_new_blank_obj( ST(0) );|;
-
-    # Bundle up variable assignment statments and refcount modifications.
-    my $var_assignments = join( "\n    ", @var_assignments, @refcount_mods );
+    my $self_var    = $arg_vars->[0];
+    my $self_type   = $self_var->get_type->to_c;
+    my $self_assign = qq|$self_type self = ($self_type)XSBind_new_blank_obj( ST(0) );|;
 
     return <<END_STUFF;
 XS($c_name);
@@ -127,12 +86,8 @@ XS($c_name)
     if (items < 1) { CFISH_THROW(CFISH_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
     SP -= items;
 
-    $var_declarations
     $allot_params
-    if (!args_ok) {
-        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
-    }
-    $var_assignments
+    $self_assign$refcount_mods
 
     $self_type retval = $func_sym($name_list);
     if (retval) {

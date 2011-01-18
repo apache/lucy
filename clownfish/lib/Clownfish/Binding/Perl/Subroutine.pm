@@ -18,6 +18,7 @@ use warnings;
 
 package Clownfish::Binding::Perl::Subroutine;
 use Carp;
+use Scalar::Util qw( blessed );
 use Clownfish::Class;
 use Clownfish::Function;
 use Clownfish::Method;
@@ -98,17 +99,91 @@ sub params_hash_def {
     }
 }
 
-sub var_declarations {
-    my $self     = shift;
-    my $arg_vars = $self->{param_list}->get_variables;
-    my @var_declarations
-        = map { $_->local_declaration } @$arg_vars[ 1 .. $#$arg_vars ];
-    if ( $self->{use_labeled_params} ) {
-        push @var_declarations,
-            map { "SV* " . $_->micro_sym . "_sv = NULL;" }
-            @$arg_vars[ 1 .. $#$arg_vars ];
+
+my %prim_type_to_allot_macro = (
+    double     => 'ALLOT_F64',
+    float      => 'ALLOT_F32',
+    int        => 'ALLOT_INT',
+    short      => 'ALLOT_SHORT',
+    long       => 'ALLOT_LONG',
+    size_t     => 'ALLOT_SIZE_T',
+    uint64_t   => 'ALLOT_U64',
+    uint32_t   => 'ALLOT_U32',
+    uint16_t   => 'ALLOT_U16',
+    uint8_t    => 'ALLOT_U8',
+    int64_t    => 'ALLOT_I64',
+    int32_t    => 'ALLOT_I32',
+    int16_t    => 'ALLOT_I16',
+    int8_t     => 'ALLOT_I8',
+    chy_bool_t => 'ALLOT_BOOL',
+);
+
+sub _allot_params_arg {
+    my ( $type, $label, $required ) = @_;
+    confess("Not a Clownfish::Type")
+        unless blessed($type) && $type->isa('Clownfish::Type');
+    my $len = length($label);
+    my $req_string = $required ? 'true' : 'false';
+
+    if ( $type->is_object ) {
+        my $struct_sym = $type->get_specifier;
+        my $vtable     = uc($struct_sym);
+        if ( $struct_sym =~ /^[a-z_]*(Obj|CharBuf)$/ ) {
+            # Share buffers rather than copy between Perl scalars and
+            # Clownfish string types.
+            return qq|ALLOT_OBJ(\&$label, "$label", $len, $req_string, |
+                . qq|$vtable, alloca(cfish_ZCB_size()))|;
+        }
+        else {
+            return qq|ALLOT_OBJ(\&$label, "$label", $len, $req_string, |
+                . qq|$vtable, NULL)|;
+        }
     }
-    return join( "\n    ", @var_declarations );
+    elsif ( $type->is_primitive ) {
+        if ( my $allot = $prim_type_to_allot_macro{ $type->to_c } ) {
+            return qq|$allot(\&$label, "$label", $len, $req_string)|;
+        }
+    }
+
+    confess( "Missing typemap for " . $type->to_c );
+}
+
+sub build_allot_params {
+    my $self         = shift;
+    my $param_list   = $self->{param_list};
+    my $arg_inits    = $param_list->get_initial_values;
+    my $arg_vars     = $param_list->get_variables;
+    my $params_hash  = $self->perl_name . "_PARAMS";
+    my $allot_params = "";
+
+    # Declare variables and assign default values.
+    for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
+        my $arg_var = $arg_vars->[$i];
+        my $val     = $arg_inits->[$i];
+        if ( !defined($val) ) {
+            $val = $arg_var->get_type->is_object ? 'NULL' : '0';
+        }
+        $allot_params .= $arg_var->local_c . " = $val;\n    ";
+    }
+
+    # Iterate over args in param list.
+    $allot_params .= qq|chy_bool_t args_ok = XSBind_allot_params(\n|
+        . qq|        &(ST(0)), 1, items, "$params_hash",\n|;
+    for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
+        my $var      = $arg_vars->[$i];
+        my $val      = $arg_inits->[$i];
+        my $required = defined $val ? 0 : 1;
+        my $name     = $var->micro_sym;
+        my $type     = $var->get_type;
+        $allot_params .= "        "
+            . _allot_params_arg( $type, $name, $required ) . ",\n";
+    }
+    $allot_params .= qq|        NULL);
+    if (!args_ok) {
+        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+    }|;
+
+    return $allot_params;
 }
 
 sub xsub_def { confess "Abstract method" }
@@ -167,11 +242,6 @@ labeled parameters, false if it should take positional arguments.
 =head2 xsub_def
 
 Abstract method which must return C code (not XS code) defining the Perl XSUB.
-
-=head2 var_declarations
-
-Generate C code containing declarations for subroutine-specific automatic
-variables needed by the XSUB.
 
 =head2 get_class_name use_labeled_params
 

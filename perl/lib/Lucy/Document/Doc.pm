@@ -31,18 +31,17 @@ new(either_sv, ...)
 CODE:
 {
     SV* fields_sv = NULL; 
-    SV* doc_id_sv = NULL; 
+    int32_t doc_id = 0;
     chy_bool_t args_ok = XSBind_allot_params(
         &(ST(0)), 1, items, "Lucy::Document::Doc::new_PARAMS",
-        &fields_sv, "fields", 6,
-        &doc_id_sv, "doc_id", 6,
+        ALLOT_SV(&fields_sv, "fields", 6, false),
+        ALLOT_I32(&doc_id, "doc_id", 6, false),
         NULL);
     if (!args_ok) {
         CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }     
 
-    HV      *fields = NULL;
-    int32_t  doc_id = 0;
+    HV *fields = NULL;
     if (fields_sv && XSBind_sv_defined(fields_sv)) {
         if (SvROK(fields_sv)) {
             fields = (HV*)SvRV(fields_sv);
@@ -50,9 +49,6 @@ CODE:
         if (!fields || SvTYPE((SV*)fields) != SVt_PVHV) {
             CFISH_THROW(CFISH_ERR, "fields is not a hashref");
         }
-    }     
-    if (doc_id_sv && XSBind_sv_defined(doc_id_sv)) {
-        doc_id = (int32_t)SvIV( doc_id_sv );
     }     
 
     lucy_Doc *self = (lucy_Doc*)XSBind_new_blank_obj(either_sv);
