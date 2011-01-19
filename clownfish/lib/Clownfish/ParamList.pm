@@ -43,7 +43,7 @@ sub new {
     # Validate or init initial_values.
     if ( defined $self->{initial_values} ) {
         confess "variables must be an arrayref"
-            unless ref( $self->{variables} ) eq 'ARRAY';
+            unless ref( $self->{initial_values} ) eq 'ARRAY';
         my $num_init = scalar @{ $self->{initial_values} };
         my $num_vars = $self->num_vars;
         confess("mismatch of num vars and init values: $num_vars $num_init")
