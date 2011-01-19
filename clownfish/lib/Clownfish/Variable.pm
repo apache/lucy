@@ -36,7 +36,7 @@ sub new {
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = $either->SUPER::new( %new_PARAMS, @_ );
     confess "invalid type"
-        unless a_isa_b( $self->{type}, "Clownfish::Type" );
+        unless a_isa_b( $self->get_type, "Clownfish::Type" );
     return $self;
 }
 
@@ -44,24 +44,24 @@ sub get_type { shift->{type} }
 
 sub equals {
     my ( $self, $other ) = @_;
-    return 0 unless $self->{type}->equals( $other->{type} );
+    return 0 unless $self->get_type->equals( $other->get_type );
     return $self->SUPER::equals($other);
 }
 
 sub local_c {
     my $self      = shift;
-    my $type      = $self->{type};
+    my $type      = $self->get_type;
     my $array_str = '';
     if ( $type->is_composite ) {
         $array_str = $type->get_array || '';
     }
     my $type_str = $array_str ? $type->to_c : $type->to_c;
-    return "$type_str $self->{micro_sym}$array_str";
+    return "$type_str " . $self->micro_sym . $array_str;
 }
 
 sub global_c {
     my $self    = shift;
-    my $type    = $self->{type};
+    my $type    = $self->get_type;
     my $name    = $self->full_sym;
     my $postfix = '';
     if ( $type->is_composite ) {

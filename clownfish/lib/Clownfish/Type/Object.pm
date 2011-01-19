@@ -41,35 +41,38 @@ sub new {
     my $nullable    = delete $args{nullable}    || 0;
     my $indirection = delete $args{indirection};
     $indirection = 1 unless defined $indirection;
+    $args{parcel} ||= Clownfish::Parcel->default_parcel;
     my $self = $either->SUPER::new(%args);
     $self->{incremented} = $incremented;
     $self->{decremented} = $decremented;
     $self->{indirection} = $indirection;
     $self->{nullable}    = $nullable;
-    $self->{parcel} ||= Clownfish::Parcel->default_parcel;
-    my $prefix = $self->{parcel}->get_prefix;
+    my $prefix    = $self->get_parcel->get_prefix;
+    my $specifier = $self->get_specifier;
 
     # Validate params.
-    confess("Indirection must be 1") unless $self->{indirection} == 1;
+    confess("Indirection must be 1") unless $indirection == 1;
     confess("Can't be both incremented and decremented")
         if ( $incremented && $decremented );
     confess("Missing required param 'specifier'")
-        unless defined $self->{specifier};
-    confess("Illegal specifier: '$self->{specifier}")
-        unless $self->{specifier}
+        unless defined $specifier;
+    confess("Illegal specifier: '$specifier'")
+        unless $specifier
             =~ /^(?:$prefix)?[A-Z][A-Za-z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/;
 
     # Add $prefix if necessary.
-    $self->{specifier} = $prefix . $self->{specifier}
-        unless $self->{specifier} =~ /^$prefix/;
+    if ( $specifier !~ /^$prefix/ ) {
+        $specifier = $prefix . $specifier;
+        $self->{specifier} = $specifier;
+    }
 
     # Cache C representation.
     my $string = $self->const ? 'const ' : '';
-    $string .= "$self->{specifier}*";
+    $string .= "$specifier*";
     $self->set_c_string($string);
 
     # Cache boolean indicating whether this type is a string type.
-    $self->{is_string_type} = $self->{specifier} =~ /CharBuf/ ? 1 : 0;
+    $self->{is_string_type} = $specifier =~ /CharBuf/ ? 1 : 0;
 
     return $self;
 }
@@ -92,7 +95,7 @@ sub similar {
 sub equals {
     my ( $self, $other ) = @_;
     return 0 unless $self->similar($other);
-    return 0 unless $self->{specifier} eq $other->{specifier};
+    return 0 unless $self->get_specifier eq $other->get_specifier;
     return 1;
 }
 

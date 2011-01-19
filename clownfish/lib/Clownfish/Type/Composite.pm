@@ -43,12 +43,12 @@ sub new {
     $self->{nullable} = $nullable;
 
     # Default indirection to 0.
-    $self->{indirection} ||= 0;
+    my $indirection = $self->{indirection} ||= 0;
 
     # Cache C representation.
     # NOTE: Array postfixes are NOT included.
-    my $string = $self->{child}->to_c;
-    for ( my $i = 0; $i < $self->{indirection}; $i++ ) {
+    my $string = $child->to_c;
+    for ( my $i = 0; $i < $indirection; $i++ ) {
         $string .= '*';
     }
     $self->set_c_string($string);
@@ -56,16 +56,18 @@ sub new {
     return $self;
 }
 
-sub get_specifier { shift->{child}->get_specifier }
-sub get_array     { shift->{array} }
-sub is_composite  {1}
+sub get_specifier    { shift->_get_child->get_specifier }
+sub get_array        { shift->{array} }
+sub _get_child       { shift->{child} }
+sub _get_indirection { shift->{indirection} }
+sub is_composite     {1}
 
 sub equals {
     my ( $self, $other ) = @_;
-    return 0 unless $self->{indirection} == $other->{indirection};
-    return 0 unless $self->{child}->equals( $other->{child} );
-    return 0 if ( $self->{array} xor $other->{array} );
-    return 0 if ( $self->{array} and $self->{array} ne $other->{array} );
+    return 0 unless $self->_get_indirection == $other->_get_indirection;
+    return 0 unless $self->_get_child->equals( $other->_get_child );
+    return 0 if ( $self->get_array xor $other->get_array );
+    return 0 if ( $self->get_array and $self->get_array ne $other->get_array );
     return 1;
 }
 

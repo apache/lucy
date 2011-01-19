@@ -37,13 +37,13 @@ sub new {
         if $package eq __PACKAGE__;
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = bless { %new_PARAMS, @_, }, $package;
-    if ( defined $self->{parcel} ) {
-        if ( !blessed( $self->{parcel} ) ) {
+    if ( defined $self->get_parcel ) {
+        if ( !blessed( $self->get_parcel ) ) {
             $self->{parcel}
-                = Clownfish::Parcel->singleton( name => $self->{parcel} );
+                = Clownfish::Parcel->singleton( name => $self->get_parcel );
         }
         confess("Not a Clownfish::Parcel")
-            unless $self->{parcel}->isa('Clownfish::Parcel');
+            unless $self->get_parcel->isa('Clownfish::Parcel');
     }
     return $self;
 }

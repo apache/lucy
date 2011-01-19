@@ -30,24 +30,25 @@ our %new_PARAMS = (
 );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    my $parcel = $args{parcel};
+    if ( defined $parcel ) {
+        if ( !blessed($parcel) ) {
+            $parcel = Clownfish::Parcel->singleton( name => $parcel );
+        }
+        confess("Not a Clownfish::Parcel")
+            unless $parcel->isa('Clownfish::Parcel');
+    }
     my $self = bless {
         %new_PARAMS,
         blocks       => [],
         source_class => undef,
         modified     => 0,
-        @_,
+        %args,
+        parcel => $parcel,
         },
         ref($either) || $either;
-    if ( defined $self->{parcel} ) {
-        if ( !blessed( $self->{parcel} ) ) {
-            $self->{parcel}
-                = Clownfish::Parcel->singleton( name => $self->{parcel} );
-        }
-        confess("Not a Clownfish::Parcel")
-            unless $self->{parcel}->isa('Clownfish::Parcel');
-    }
     for my $block ( @{ $self->{blocks} } ) {
         next if a_isa_b( $block, "Clownfish::Parcel" );
         next if a_isa_b( $block, "Clownfish::Class" );
@@ -55,7 +56,7 @@ sub new {
         confess("Invalid block: $block");
     }
     confess("Missing required param 'source_class'")
-        unless $self->{source_class};
+        unless $self->get_source_class;
     return $self;
 }
 
@@ -74,7 +75,7 @@ sub classes {
 # Return a string used for an include guard, unique per file.
 sub guard_name {
     my $self       = shift;
-    my $guard_name = "H_" . uc( $self->{source_class} );
+    my $guard_name = "H_" . uc( $self->get_source_class );
     $guard_name =~ s/\W+/_/g;
     return $guard_name;
 }
@@ -100,7 +101,7 @@ sub cfh_path { return $_[0]->_some_path( $_[1], '.cfh' ) }
 
 sub _some_path {
     my ( $self, $base_dir, $ext ) = @_;
-    my @components = split( '::', $self->{source_class} );
+    my @components = split( '::', $self->get_source_class );
     unshift @components, $base_dir
         if defined $base_dir;
     $components[-1] .= $ext;

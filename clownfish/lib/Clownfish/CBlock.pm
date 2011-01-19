@@ -27,7 +27,7 @@ sub new {
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = bless { %new_PARAMS, @_ }, ref($either) || $either;
     confess("Missing required param 'contents'")
-        unless defined $self->{contents};
+        unless defined $self->get_contents;
     return $self;
 }
 

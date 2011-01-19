@@ -65,17 +65,15 @@ sub new {
     # Verify that the first element in the arg list is a self.
     my $args = $self->get_param_list->get_variables;
     confess "Not enough args" unless @$args;
-    my $specifier = $args->[0]->get_type->get_specifier;
-    my ($struct_sym) = $self->{class_name} =~ /(\w+)$/;
-    confess
-        "First arg type doesn't match class: $self->{class_name} $specifier"
+    my $specifier  = $args->[0]->get_type->get_specifier;
+    my $class_name = $self->get_class_name;
+    my ($struct_sym) = $class_name =~ /(\w+)$/;
+    confess "First arg type doesn't match class: $class_name $specifier"
         unless $specifier eq $self->get_prefix . $struct_sym;
 
     # Cache typedef.
     $self->{short_typedef}
-        = defined $short_typedef
-        ? $short_typedef
-        : "$self->{class_cnick}_$self->{micro_sym}_t";
+        = defined $short_typedef ? $short_typedef : $self->short_sym . "_t";
 
     return $self;
 }
@@ -90,7 +88,7 @@ sub self_type { shift->get_param_list->get_variables->[0]->get_type }
 sub short_method_sym {
     my ( $self, $invoker ) = @_;
     confess("Missing invoker") unless $invoker;
-    return $invoker . "_$self->{macro_sym}";
+    return $invoker . '_' . $self->get_macro_sym;
 }
 
 sub full_method_sym {
@@ -102,7 +100,7 @@ sub full_method_sym {
 sub full_offset_sym {
     my ( $self, $invoker ) = @_;
     confess("Missing invoker") unless $invoker;
-    return $self->get_Prefix . "$invoker\_$self->{macro_sym}_OFFSET";
+    return $self->full_method_sym($invoker) . '_OFFSET';
 }
 
 sub full_callback_sym { shift->full_func_sym . "_CALLBACK" }
@@ -111,16 +109,20 @@ sub full_override_sym { shift->full_func_sym . "_OVERRIDE" }
 sub short_typedef { shift->{short_typedef} }
 sub full_typedef {
     my $self = shift;
-    return $self->get_prefix . $self->{short_typedef};
+    return $self->get_prefix . $self->short_typedef;
 }
 
 sub override {
     my ( $self, $orig ) = @_;
 
     # Check that the override attempt is legal.
-    confess(  "Attempt to override final method '$orig->{micro_sym}' from "
-            . "$orig->{class_cnick} by $self->{class_cnick}" )
-        if $orig->final;
+    if ( $orig->final ) {
+        my $orig_micro_sym = $orig->micro_sym;
+        my $orig_class     = $orig->get_class_name;
+        my $class_name     = $self->get_class_name;
+        confess(  "Attempt to override final method '$orig_micro_sym' "
+                . " from $orig_class by $class_name" );
+    }
     if ( !$self->compatible($orig) ) {
         my $func_name = $self->full_func_sym;
         my $orig_func = $orig->full_func_sym;
@@ -133,7 +135,7 @@ sub override {
 
 sub compatible {
     my ( $self, $other ) = @_;
-    return 0 unless $self->{macro_sym} eq $other->{macro_sym};
+    return 0 unless $self->get_macro_sym eq $other->get_macro_sym;
     return 0 if ( $self->public xor $other->public );
     my $param_list       = $self->get_param_list;
     my $other_param_list = $other->get_param_list;
@@ -159,8 +161,8 @@ sub compatible {
     }
 
     # Weak validation of return type to allow covariant object return types.
-    my $return_type       = $self->{return_type};
-    my $other_return_type = $other->{return_type};
+    my $return_type       = $self->get_return_type;
+    my $other_return_type = $other->get_return_type;
     if ( $return_type->is_object ) {
         return 0 unless $return_type->similar($other_return_type);
     }

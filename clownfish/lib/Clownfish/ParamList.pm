@@ -34,24 +34,24 @@ sub new {
 
     # Validate variables.
     confess "variables must be an arrayref"
-        unless ref( $self->{variables} ) eq 'ARRAY';
-    for my $var ( @{ $self->{variables} } ) {
+        unless ref( $self->get_variables ) eq 'ARRAY';
+    for my $var ( @{ $self->get_variables } ) {
         confess "invalid variable: '$var'"
             unless ref($var) && $var->isa("Clownfish::Variable");
     }
 
     # Validate or init initial_values.
-    if ( defined $self->{initial_values} ) {
+    if ( defined $self->get_initial_values ) {
         confess "variables must be an arrayref"
-            unless ref( $self->{initial_values} ) eq 'ARRAY';
-        my $num_init = scalar @{ $self->{initial_values} };
+            unless ref( $self->get_initial_values ) eq 'ARRAY';
+        my $num_init = scalar @{ $self->get_initial_values };
         my $num_vars = $self->num_vars;
         confess("mismatch of num vars and init values: $num_vars $num_init")
             unless $num_init == $num_vars;
     }
     else {
         my @initial_values;
-        $#initial_values = $#{ $self->{variables} };
+        $#initial_values = $#{ $self->get_variables };
         $self->{initial_values} = \@initial_values;
     }
 
@@ -61,18 +61,18 @@ sub new {
 sub get_variables      { shift->{variables} }
 sub get_initial_values { shift->{initial_values} }
 sub variadic           { shift->{variadic} }
-sub num_vars           { scalar @{ shift->{variables} } }
+sub num_vars           { scalar @{ shift->get_variables } }
 
 sub to_c {
     my $self = shift;
-    my $string = join( ', ', map { $_->local_c } @{ $self->{variables} } );
-    $string .= ", ..." if $self->{variadic};
+    my $string = join( ', ', map { $_->local_c } @{ $self->get_variables } );
+    $string .= ", ..." if $self->variadic;
     return $string;
 }
 
 sub name_list {
     my $self = shift;
-    return join( ', ', map { $_->micro_sym } @{ $self->{variables} } );
+    return join( ', ', map { $_->micro_sym } @{ $self->get_variables } );
 }
 
 1;

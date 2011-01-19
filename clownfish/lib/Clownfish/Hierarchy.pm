@@ -50,32 +50,35 @@ sub new {
 }
 
 # Accessors.
-sub get_source { shift->{source} }
-sub get_dest   { shift->{dest} }
+sub get_source  { shift->{source} }
+sub get_dest    { shift->{dest} }
+sub _get_trees  { shift->{trees} }
+sub _get_files  { shift->{files} }
+sub _get_parser { shift->{parser} }
 
 # Return flattened hierarchies.
 sub ordered_classes {
     my $self = shift;
     my @all;
-    for my $tree ( values %{ $self->{trees} } ) {
+    for my $tree ( values %{ $self->_get_trees } ) {
         push @all, $tree->tree_to_ladder;
     }
     return @all;
 }
 
-sub files { values %{ shift->{files} } }
+sub files { values %{ shift->_get_files } }
 
 # Slurp all Clownfish header files.
 # Arrange the class objects into inheritance trees.
 sub build {
     my $self = shift;
     $self->_parse_cf_files;
-    $_->grow_tree for values %{ $self->{trees} };
+    $_->grow_tree for values %{ $self->_get_trees };
 }
 
 sub _parse_cf_files {
     my $self   = shift;
-    my $source = $self->{source};
+    my $source = $self->get_source;
 
     # Collect filenames.
     my @all_source_paths;
@@ -104,11 +107,11 @@ sub _parse_cf_files {
 
         # Slurp, parse, add parsed file to pool.
         my $content = slurp_file($source_path);
-        $content = $self->{parser}->strip_plain_comments($content);
-        my $file = $self->{parser}
+        $content = $self->_get_parser->strip_plain_comments($content);
+        my $file = $self->_get_parser
             ->file( $content, 0, source_class => $source_class, );
         confess("parse error for $source_path") unless defined $file;
-        $self->{files}{$source_class} = $file;
+        $self->_get_files->{$source_class} = $file;
         for my $class ( $file->classes ) {
             my $class_name = $class->get_class_name;
             confess "$class_name already defined"
@@ -128,7 +131,7 @@ sub _parse_cf_files {
             $classes{$parent_name}->add_child($class);
         }
         else {
-            $self->{trees}{$class_name} = $class;
+            $self->_get_trees->{$class_name} = $class;
         }
     }
 }
@@ -137,7 +140,7 @@ sub propagate_modified {
     my ( $self, $modified ) = @_;
     # Seed the recursive write.
     my $somebody_is_modified;
-    for my $tree ( values %{ $self->{trees} } ) {
+    for my $tree ( values %{ $self->_get_trees } ) {
         next unless $self->_propagate_modified( $tree, $modified );
         $somebody_is_modified = 1;
     }
@@ -147,9 +150,9 @@ sub propagate_modified {
 # Recursive helper function.
 sub _propagate_modified {
     my ( $self, $class, $modified ) = @_;
-    my $file        = $self->{files}{ $class->get_source_class };
-    my $source_path = $file->cfh_path( $self->{source} );
-    my $h_path      = $file->h_path( $self->{dest} );
+    my $file        = $self->_get_files->{ $class->get_source_class };
+    my $source_path = $file->cfh_path( $self->get_source );
+    my $h_path      = $file->h_path( $self->get_dest );
 
     if ( !current( $source_path, $h_path ) ) {
         $modified = 1;

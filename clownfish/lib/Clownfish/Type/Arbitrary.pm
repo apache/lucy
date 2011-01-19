@@ -33,19 +33,20 @@ sub new {
     my $self = $either->SUPER::new(@_);
 
     # Validate specifier.
-    confess("illegal specifier: '$self->{specifier}")
-        unless $self->{specifier} =~ /^\w+$/;
-
-    if ( $self->{specifier} =~ /^[A-Z]/ and $self->{parcel} ) {
-        my $prefix = $self->{parcel}->get_prefix;
+    my $specifier = $self->get_specifier;
+    my $parcel    = $self->get_parcel;
+    confess("illegal specifier: '$specifier'")
+        unless $specifier =~ /^\w+$/;
+    if ( $specifier =~ /^[A-Z]/ and $parcel ) {
+        my $prefix = $parcel->get_prefix;
         # Add $prefix to what appear to be namespaced types.
-        $self->{specifier} = $prefix . $self->{specifier}
-            unless $self->{specifier} =~ /^$prefix/;
+        $specifier = $self->{specifier} = $prefix . $specifier
+            unless $specifier =~ /^$prefix/;
     }
 
     # Cache C representation.
     my $string = $self->const ? 'const ' : '';
-    $string .= $self->{specifier};
+    $string .= $specifier;
     $self->set_c_string($string);
 
     return $self;
@@ -55,7 +56,7 @@ sub equals {
     my ( $self, $other ) = @_;
     return 0 unless blessed($other);
     return 0 unless $other->isa(__PACKAGE__);
-    return 0 unless $self->{specifier} eq $other->{specifier};
+    return 0 unless $self->get_specifier eq $other->get_specifier;
     return 1;
 }
 

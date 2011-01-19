@@ -44,12 +44,12 @@ sub new {
     for (qw( return_type class_name param_list )) {
         confess("$_ is mandatory") unless defined $self->{$_};
     }
-    confess("Invalid micro_sym: '$self->{micro_sym}'")
-        unless $self->{micro_sym} =~ /^[a-z0-9_]+$/;
+    confess( "Invalid micro_sym: '" . $self->micro_sym . "'" )
+        unless $self->micro_sym =~ /^[a-z0-9_]+$/;
     confess 'param_list must be a ParamList object'
-        unless a_isa_b( $self->{param_list}, "Clownfish::ParamList" );
+        unless a_isa_b( $self->get_param_list, "Clownfish::ParamList" );
     confess 'return_type must be a Type object'
-        unless a_isa_b( $self->{return_type}, "Clownfish::Type" );
+        unless a_isa_b( $self->get_return_type, "Clownfish::Type" );
 
     return $self;
 }
@@ -59,7 +59,7 @@ sub get_param_list  { shift->{param_list} }
 sub get_docucomment { shift->{docucomment} }
 sub inline          { shift->{inline} }
 
-sub void { shift->{return_type}->is_void }
+sub void { shift->get_return_type->is_void }
 
 sub full_func_sym  { shift->SUPER::full_sym }
 sub short_func_sym { shift->SUPER::short_sym }

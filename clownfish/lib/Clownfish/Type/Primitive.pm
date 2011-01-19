@@ -42,8 +42,8 @@ sub equals {
     my ( $self, $other ) = @_;
     return 0 unless blessed($other);
     return 0 unless $other->isa(__PACKAGE__);
-    return 0 unless $self->{specifier} eq $other->{specifier};
-    return 0 if ( $self->{const} xor $other->{const} );
+    return 0 unless $self->get_specifier eq $other->get_specifier;
+    return 0 if ( $self->const xor $other->const );
     return 1;
 }
 

@@ -47,22 +47,23 @@ sub singleton {
     # Return an existing singleton if the parcel has already been registered.
     my $existing = $parcels{$name};
     if ($existing) {
-        if ( $cnick and $cnick ne $existing->{cnick} ) {
-            confess(  "cnick '$cnick' for parcel '$name' conflicts with "
-                    . "'$existing->{cnick}'" );
+        if ( $cnick and $cnick ne $existing->get_cnick ) {
+            confess(  "cnick '$cnick' for parcel '$name' conflicts with '"
+                    . $existing->get_cnick
+                    . "'" );
         }
         return $existing;
     }
 
     # Register new parcel.  Default cnick to name.
     my $self = bless { %singleton_PARAMS, %args, }, ref($either) || $either;
-    defined $self->{cnick} or $self->{cnick} = $self->{name};
+    defined $self->get_cnick or $self->{cnick} = $self->get_name;
     $parcels{$name} = $self;
 
     # Pre-generate prefixes.
-    $self->{Prefix} = length $self->{cnick} ? "$self->{cnick}_" : "";
-    $self->{prefix} = lc( $self->{Prefix} );
-    $self->{PREFIX} = uc( $self->{Prefix} );
+    $self->{Prefix} = length $self->get_cnick ? $self->get_cnick . '_' : "";
+    $self->{prefix} = lc( $self->get_Prefix );
+    $self->{PREFIX} = uc( $self->get_Prefix );
 
     return $self;
 }
@@ -76,8 +77,8 @@ sub get_cnick  { shift->{cnick} }
 
 sub equals {
     my ( $self, $other ) = @_;
-    return 0 unless $self->{name}  eq $other->{name};
-    return 0 unless $self->{cnick} eq $other->{cnick};
+    return 0 unless $self->get_name  eq $other->get_name;
+    return 0 unless $self->get_cnick eq $other->get_cnick;
     return 1;
 }
 

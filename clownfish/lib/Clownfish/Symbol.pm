@@ -35,9 +35,13 @@ my $class_name_regex = qr/^$struct_regex(::$struct_regex)*$/;
 
 sub new {
     my ( $either, %args ) = @_;
+    my $class_name  = $args{class_name};
+    my $class_cnick = $args{class_cnick};
+    my $micro_sym   = $args{micro_sym};
+    my $parcel      = $args{parcel};
+    my $exposure    = $args{exposure};
 
     # Acquire a Parcel.
-    my $parcel = $args{parcel};
     if ( !defined $parcel ) {
         $parcel = Clownfish::Parcel->default_parcel;
     }
@@ -49,34 +53,42 @@ sub new {
         $parcel = Clownfish::Parcel->singleton( name => $args{parcel} );
     }
 
-    # Create the object.
-    my $self = bless { %new_PARAMS, %args, parcel => $parcel },
-        ref($either) || $either;
-
     # Validate micro_sym.
-    confess "micro_sym is required" unless $self->{micro_sym};
-    confess("Invalid micro_sym: '$self->{micro_sym}'")
-        unless $self->{micro_sym} =~ /^[A-Za-z_][A-Za-z0-9_]*$/;
+    confess "micro_sym is required" unless $micro_sym;
+    confess("Invalid micro_sym: '$micro_sym'")
+        unless $micro_sym =~ /^[A-Za-z_][A-Za-z0-9_]*$/;
 
     # Validate exposure.
-    confess("Invalid value for 'exposure': $self->{exposure}")
-        unless $self->{exposure} =~ /^(?:public|parcel|private|local)$/;
+    confess("Invalid value for 'exposure': $exposure")
+        unless $exposure =~ /^(?:public|parcel|private|local)$/;
 
     # Validate class name, validate or derive class_cnick.
-    if ( defined $self->{class_name} ) {
-        confess("Invalid class name: $self->{class_name}")
-            unless $self->{class_name} =~ $class_name_regex;
-        if ( !defined $self->{class_cnick} ) {
-            $self->{class_name} =~ /(\w+)$/;
-            $self->{class_cnick} = $1;
+    if ( defined $class_name ) {
+        confess("Invalid class name: $class_name")
+            unless $class_name =~ $class_name_regex;
+        if ( !defined $class_cnick ) {
+            $class_name =~ /(\w+)$/;
+            $class_cnick = $1;
         }
-        confess("Invalid class_cnick: $self->{class_cnick}")
-            unless $self->{class_cnick} =~ /^[A-Z]+[A-Za-z0-9]*$/;
+        confess("Invalid class_cnick: $class_cnick")
+            unless $class_cnick =~ /^[A-Z]+[A-Za-z0-9]*$/;
     }
-    elsif ( defined $self->{class_cnick} ) {
+    elsif ( defined $class_cnick ) {
         # Sanity check class_cnick without class_name.
         confess("Can't supply class_cnick without class_name");
     }
+
+    # Create the object.
+    my $self = bless {
+        %new_PARAMS,
+        %args,
+        parcel      => $parcel,
+        micro_sym   => $micro_sym,
+        exposure    => $exposure,
+        class_name  => $class_name,
+        class_cnick => $class_cnick,
+        },
+        ref($either) || $either;
 
     return $self;
 }
@@ -84,46 +96,46 @@ sub new {
 sub get_parcel      { shift->{parcel} }
 sub get_class_name  { shift->{class_name} }
 sub get_class_cnick { shift->{class_cnick} }
+sub get_exposure    { shift->{exposure} }
 sub micro_sym       { shift->{micro_sym} }
 
-sub get_prefix { shift->{parcel}->get_prefix; }
-sub get_Prefix { shift->{parcel}->get_Prefix; }
-sub get_PREFIX { shift->{parcel}->get_PREFIX; }
+sub get_prefix { shift->get_parcel->get_prefix; }
+sub get_Prefix { shift->get_parcel->get_Prefix; }
+sub get_PREFIX { shift->get_parcel->get_PREFIX; }
 
-sub public  { shift->{exposure} eq 'public' }
-sub private { shift->{exposure} eq 'private' }
-sub parcel  { shift->{exposure} eq 'parcel' }
-sub local   { shift->{exposure} eq 'local' }
+sub public  { shift->get_exposure eq 'public' }
+sub private { shift->get_exposure eq 'private' }
+sub parcel  { shift->get_exposure eq 'parcel' }
+sub local   { shift->get_exposure eq 'local' }
 
 sub full_sym {
     my $self   = shift;
-    my $prefix = $self->get_prefix;
-    return "$prefix$self->{class_cnick}_$self->{micro_sym}";
+    return $self->get_prefix . $self->short_sym;
 }
 
 sub short_sym {
     my $self = shift;
-    return "$self->{class_cnick}_$self->{micro_sym}";
+    return $self->get_class_cnick . '_' . $self->micro_sym;
 }
 
 sub equals {
     my ( $self, $other ) = @_;
     return 0 unless a_isa_b( $other, __PACKAGE__ );
-    return 0 unless $self->{micro_sym} eq $other->{micro_sym};
-    return 0 unless $self->{parcel}->equals( $other->{parcel} );
-    if ( defined $self->{exposure} ) {
-        return 0 unless defined $other->{exposure};
-        return 0 unless $self->{exposure} eq $other->{exposure};
+    return 0 unless $self->micro_sym eq $other->micro_sym;
+    return 0 unless $self->get_parcel->equals( $other->get_parcel );
+    if ( defined $self->get_exposure ) {
+        return 0 unless defined $other->get_exposure;
+        return 0 unless $self->get_exposure eq $other->get_exposure;
     }
     else {
-        return 0 if defined $other->{exposure};
+        return 0 if defined $other->get_exposure;
     }
-    if ( defined $self->{class_name} ) {
-        return 0 unless defined $other->{class_name};
-        return 0 unless $self->{class_name} eq $other->{class_name};
+    if ( defined $self->get_class_name ) {
+        return 0 unless defined $other->get_class_name;
+        return 0 unless $self->get_class_name eq $other->get_class_name;
     }
     else {
-        return 0 if defined $other->{class_name};
+        return 0 if defined $other->get_class_name;
     }
     return 1;
 }
@@ -177,7 +189,7 @@ extracting the last class name component.
 
 =head1 OBJECT METHODS
 
-=head2 get_parcel get_class_name get_class_cnick micro_sym
+=head2 get_parcel get_class_name get_class_cnick get_exposure micro_sym
 
 Getters.
 
