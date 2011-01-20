@@ -105,8 +105,8 @@ sub create {
     $self->{cnick} ||= $self->{class_cnick};
 
     # Make it possible to look up methods and functions by name.
-    $self->{meth_by_name}{ $_->micro_sym } = $_ for $self->methods;
-    $self->{func_by_name}{ $_->micro_sym } = $_ for $self->functions;
+    $self->{meth_by_name}{ $_->micro_sym } = $_ for @{ $self->methods };
+    $self->{func_by_name}{ $_->micro_sym } = $_ for @{ $self->functions };
 
     # Derive struct name.
     confess("Missing required param 'class_name'") unless $self->{class_name};
@@ -188,23 +188,26 @@ sub full_vtable_type { shift->full_vtable_var . '_VT' }
 
 sub append_autocode { $_[0]->{autocode} .= $_[1] }
 
-sub functions   { @{ shift->{functions} } }
-sub methods     { @{ shift->{methods} } }
-sub member_vars { @{ shift->{member_vars} } }
-sub inert_vars  { @{ shift->{inert_vars} } }
-sub children    { @{ shift->{children} } }
+sub functions   { shift->{functions} }
+sub methods     { shift->{methods} }
+sub member_vars { shift->{member_vars} }
+sub inert_vars  { shift->{inert_vars} }
+sub children    { shift->{children} }
 
 sub novel_methods {
     my $self = shift;
-    return
-        grep { $_->get_class_cnick eq $self->{cnick} } @{ $self->{methods} };
+    my @methods
+        = grep { $_->get_class_cnick eq $self->{cnick} }
+        @{ $self->{methods} };
+    return \@methods;
 }
 
 sub novel_member_vars {
     my $self = shift;
-    return
-        grep { $_->get_class_cnick eq $self->{cnick} }
+    my @member_vars
+        = grep { $_->get_class_cnick eq $self->{cnick} }
         @{ $self->{member_vars} };
+    return \@member_vars;
 }
 
 sub function {
@@ -334,9 +337,9 @@ sub tree_to_ladder {
     my $self   = shift;
     my @ladder = ($self);
     for my $child ( @{ $self->{children} } ) {
-        push @ladder, $child->tree_to_ladder;
+        push @ladder, @{ $child->tree_to_ladder };
     }
-    return @ladder;
+    return \@ladder;
 }
 
 1;
@@ -462,45 +465,45 @@ novel.
 
 =head2 children 
 
-    my @child_classes = $class->children;
+    my $child_classes = $class->children;
 
-Return all child classes as a list.
+Return an array of all child classes.
 
 =head2 functions
 
-    my @functions = $class->functions;
+    my $functions = $class->functions;
 
-Return all (inert) functions as a list.
+Return an array of all (inert) functions.
 
 =head2 methods
 
-    my @methods = $class->methods;
+    my $methods = $class->methods;
 
-Return all methods as a list.
+Return an array of all methods.
 
 =head2 inert_vars
 
-    my @inert_vars = $class->inert_vars;
+    my $inert_vars = $class->inert_vars;
 
-Return all inert (shared, class) variables as a list.
+Return an array of all inert (shared, class) variables.
 
 =head2 member_vars
 
-    my @members = $class->member_vars;
+    my $members = $class->member_vars;
 
-Return all member variables as a list.
+Return an array of all member variables.
 
 =head2 novel_methods
 
-    my @novel_methods = $class->novel_methods;
+    my $novel_methods = $class->novel_methods;
 
-Return all novel methods as a list.
+Return an array of all novel methods.
 
 =head2 novel_member_vars
 
-    my @new_members = $class->novel_member_vars;
+    my $new_members = $class->novel_member_vars;
 
-Return all novel member variables as a list.
+Return an array of all novel member variables.
 
 =head2 grow_tree
 
@@ -510,7 +513,7 @@ Bequeath all inherited methods and members to children.
 
 =head2 tree_to_ladder
 
-    my @ordered = $class->tree_to_ladder;
+    my $ordered = $class->tree_to_ladder;
 
 Return this class and all its child classes as an array, where all children
 appear after their parent nodes.

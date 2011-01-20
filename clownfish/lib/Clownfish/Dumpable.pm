@@ -36,7 +36,7 @@ sub add_dumpables {
     # Inherit Dump/Load from parent if no novel member vars.
     my $parent = $class->get_parent;
     if ( $parent and $parent->has_attribute('dumpable') ) {
-        return unless scalar $class->novel_member_vars;
+        return unless scalar @{ $class->novel_member_vars };
     }
 
     if ( !$class->novel_method('Dump') ) {
@@ -116,7 +116,7 @@ $full_func_sym($full_struct *self)
 {
     cfish_Hash *dump = (cfish_Hash*)$super_dump(($super_type*)self);
 END_STUFF
-        @members = $class->novel_member_vars;
+        @members = @{ $class->novel_member_vars };
     }
     else {
         $autocode = <<END_STUFF;
@@ -127,7 +127,7 @@ $full_func_sym($full_struct *self)
     Cfish_Hash_Store_Str(dump, "_class", 6,
         (cfish_Obj*)Cfish_CB_Clone(Cfish_Obj_Get_Class_Name((cfish_Obj*)self)));
 END_STUFF
-        @members = $class->member_vars;
+        @members = @{ $class->member_vars };
         shift @members;    # skip self->vtable
         shift @members;    # skip refcount self->ref
     }
@@ -186,7 +186,7 @@ $full_func_sym($full_struct *self, cfish_Obj *dump)
         = ($full_struct*)$super_load(($super_type*)self, dump);
     CHY_UNUSED_VAR(self);
 END_STUFF
-        @members = $class->novel_member_vars;
+        @members = @{ $class->novel_member_vars };
     }
     else {
         $autocode = <<END_STUFF;
@@ -200,7 +200,7 @@ $full_func_sym($full_struct *self, cfish_Obj *dump)
     $full_struct *loaded = ($full_struct*)Cfish_VTable_Make_Obj(vtable);
     CHY_UNUSED_VAR(self);
 END_STUFF
-        @members = $class->member_vars;
+        @members = @{ $class->member_vars };
         shift @members;    # skip self->vtable
         shift @members;    # skip refcount self->ref
     }

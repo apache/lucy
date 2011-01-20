@@ -30,7 +30,7 @@ sub new {
 
     # Find the implementing function.
     my $func;
-    for my $function ( $class->functions ) {
+    for my $function ( @{ $class->functions } ) {
         next unless $function->micro_sym eq $init_func_name;
         $func = $function;
         last;

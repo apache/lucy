@@ -99,7 +99,7 @@ sub method_bindings {
 
     # Iterate over all this class's methods, stopping to bind each one that
     # was spec'd.
-    for my $method ( $client->methods ) {
+    for my $method ( @{ $client->methods } ) {
         my $meth_name = $method->get_macro_sym;
         my $bind_args = delete $meth_to_bind{$meth_name};
         next unless $bind_args;
@@ -119,7 +119,7 @@ sub method_bindings {
         # calls the implementing function, rather than invokes the method on
         # the object using VTable method dispatch.  Doing things this way
         # allows SUPER:: invocations from Perl-space to work properly.
-        for my $descendant ( $client->tree_to_ladder ) {    # includes self
+        for my $descendant ( @{ $client->tree_to_ladder } ) {    # includes self
             my $real_method = $descendant->novel_method( lc($meth_name) );
             next unless $real_method;
 

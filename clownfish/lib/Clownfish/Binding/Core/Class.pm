@@ -65,7 +65,7 @@ sub _vtable_definition {
     my $self       = shift;
     my $client     = $self->{client};
     my $parent     = $client->get_parent;
-    my @methods    = $client->methods;
+    my $methods    = $client->methods;
     my $vt_type    = $client->full_vtable_type;
     my $cnick      = $client->get_cnick;
     my $vtable_var = $client->full_vtable_var;
@@ -82,7 +82,7 @@ sub _vtable_definition {
 
     # Spec functions which implement the methods, casting to quiet compiler.
     my @implementing_funcs
-        = map { "(cfish_method_t)" . $_->full_func_sym } @methods;
+        = map { "(cfish_method_t)" . $_->full_func_sym } @$methods;
     my $method_string = join( ",\n        ", @implementing_funcs );
     my $num_methods = scalar @implementing_funcs;
 
@@ -112,7 +112,7 @@ sub _struct_definition {
     my $self                = shift;
     my $struct_sym          = $self->{client}->full_struct_sym;
     my $member_declarations = join( "\n    ",
-        map { $_->local_declaration } $self->{client}->member_vars );
+        map { $_->local_declaration } @{ $self->{client}->member_vars } );
     return <<END_STRUCT
 struct $struct_sym {
     $member_declarations
@@ -124,10 +124,10 @@ sub to_c_header {
     my $self          = shift;
     my $client        = $self->{client};
     my $cnick         = $client->get_cnick;
-    my @functions     = $client->functions;
-    my @methods       = $client->methods;
-    my @novel_methods = $client->novel_methods;
-    my @inert_vars    = $client->inert_vars;
+    my $functions     = $client->functions;
+    my $methods       = $client->methods;
+    my $novel_methods = $client->novel_methods;
+    my $inert_vars    = $client->inert_vars;
     my $vtable_var    = $client->full_vtable_var;
     my $short_vt_var  = $client->short_vtable_var;
     my $short_struct  = $client->get_struct_sym;
@@ -144,28 +144,28 @@ sub to_c_header {
 
     # Add a C function definition for each method and each function.
     my $sub_declarations = "";
-    for my $sub ( @functions, @novel_methods ) {
+    for my $sub ( @$functions, @$novel_methods ) {
         $sub_declarations
             .= Clownfish::Binding::Core::Function->func_declaration($sub)
             . "\n\n";
     }
 
     # Declare class (a.k.a. "inert") variables.
-    my $inert_vars = "";
-    for my $inert_var ( $client->inert_vars ) {
-        $inert_vars .= "extern " . $inert_var->global_c . ";\n";
+    my $inert_var_defs = "";
+    for my $inert_var (@$inert_vars) {
+        $inert_var_defs .= "extern " . $inert_var->global_c . ";\n";
     }
 
     # Declare typedefs for novel methods, to ease casting.
     my $method_typedefs = '';
-    for my $method (@novel_methods) {
+    for my $method (@$novel_methods) {
         $method_typedefs
             .= Clownfish::Binding::Core::Method->typedef_dec($method) . "\n";
     }
 
     # Define method invocation syntax.
     my $method_defs = '';
-    for my $method (@methods) {
+    for my $method (@$methods) {
         $method_defs .= Clownfish::Binding::Core::Method->method_def(
             method => $method,
             class  => $self->{client},
@@ -177,11 +177,11 @@ sub to_c_header {
     my $vt      = "extern struct $vt_type ${vtable_var}_vt;";
     my $vtable_object
         = "#define $vtable_var ((cfish_VTable*)&${vtable_var}_vt)";
-    my $num_methods = scalar @methods;
+    my $num_methods = scalar @$methods;
 
     # Declare cfish_Callback objects.
     my $callback_declarations = "";
-    for my $method (@novel_methods) {
+    for my $method (@$novel_methods) {
         next unless $method->public || $method->abstract;
         $callback_declarations
             .= Clownfish::Binding::Core::Method->callback_dec($method);
@@ -190,18 +190,18 @@ sub to_c_header {
     # Define short names.
     my $short_names       = '';
     my $short_names_macro = _short_names_macro($self);
-    for my $function (@functions) {
+    for my $function (@$functions) {
         my $short_func_sym = $function->short_sym;
         my $full_func_sym  = $function->full_sym;
         $short_names .= "  #define $short_func_sym $full_func_sym\n";
     }
-    for my $inert_var (@inert_vars) {
+    for my $inert_var (@$inert_vars) {
         my $short_sym = $inert_var->short_sym;
         my $full_sym  = $inert_var->full_sym;
         $short_names .= "  #define $short_sym $full_sym\n";
     }
     if ( !$client->inert ) {
-        for my $method (@novel_methods) {
+        for my $method (@$novel_methods) {
             if ( !$method->isa("Clownfish::Method::Overridden") ) {
                 my $short_typedef = $method->short_typedef;
                 my $full_typedef  = $method->full_typedef;
@@ -211,7 +211,7 @@ sub to_c_header {
             my $full_func_sym  = $method->full_func_sym;
             $short_names .= "  #define $short_func_sym $full_func_sym\n";
         }
-        for my $method (@methods) {
+        for my $method (@$methods) {
             my $short_method_sym = $method->short_method_sym($cnick);
             my $full_method_sym  = $method->full_method_sym($cnick);
             $short_names .= "  #define $short_method_sym $full_method_sym\n";
@@ -228,7 +228,7 @@ sub to_c_header {
 #include "boil.h"
 $parent_include
 
-$inert_vars
+$inert_var_defs
 
 $sub_declarations
 
@@ -250,7 +250,7 @@ $parent_include
 $struct_def
 #endif /* $c_file_sym */
 
-$inert_vars
+$inert_var_defs
 
 $sub_declarations
 $callback_declarations
@@ -303,9 +303,9 @@ sub to_c {
     my @class_callbacks;
 
     # Prepare to identify novel methods.
-    my %novel = map { ( $_->micro_sym => $_ ) } $client->novel_methods;
+    my %novel = map { ( $_->micro_sym => $_ ) } @{ $client->novel_methods };
 
-    for my $method ( $client->methods ) {
+    for my $method ( @{ $client->methods } ) {
         my $var_name = $method->full_offset_sym($cnick);
 
         # Create offset in bytes for the method from the top of the VTable

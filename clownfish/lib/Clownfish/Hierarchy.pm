@@ -61,7 +61,7 @@ sub ordered_classes {
     my $self = shift;
     my @all;
     for my $tree ( values %{ $self->_get_trees } ) {
-        push @all, $tree->tree_to_ladder;
+        push @all, @{ $tree->tree_to_ladder };
     }
     return @all;
 }
@@ -164,7 +164,7 @@ sub _propagate_modified {
 
     # Proceed to the next generation.
     my $somebody_is_modified = $modified;
-    for my $kid ( $class->children ) {
+    for my $kid ( @{ $class->children } ) {
         if ( $class->final ) {
             confess(  "Attempt to inherit from final class "
                     . $class->get_class_name . " by "
