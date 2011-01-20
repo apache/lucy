@@ -16,8 +16,10 @@
 use strict;
 use warnings;
 
-use lib '../clownfish/lib';
-use lib 'clownfish/lib';
+use lib '../clownfish/blib/arch';
+use lib '../clownfish/blib/lib';
+use lib 'clownfish/blib/arch';
+use lib 'clownfish/blib/lib';
 
 package Lucy::Build::CBuilder;
 BEGIN { our @ISA = "ExtUtils::CBuilder"; }
@@ -71,6 +73,7 @@ use Config;
 use Env qw( @PATH );
 use Fcntl;
 use Carp;
+use Cwd qw( getcwd );
 
 BEGIN { unshift @PATH, curdir() }
 
@@ -141,6 +144,7 @@ my $SNOWSTEM_SRC_DIR     = catdir( $base_dir, qw( modules analysis snowstem sour
 my $SNOWSTEM_INC_DIR     = catdir( $SNOWSTEM_SRC_DIR, 'include' );
 my $SNOWSTOP_SRC_DIR     = catdir( $base_dir, qw( modules analysis snowstop source ) );
 my $CORE_SOURCE_DIR      = catdir( $base_dir, 'core' );
+my $CLOWNFISH_DIR        = catdir( $base_dir, 'clownfish' );
 my $AUTOGEN_DIR          = 'autogen';
 my $XS_SOURCE_DIR        = 'xs';
 my $LIB_DIR              = 'lib';
@@ -283,10 +287,24 @@ sub _write_pod {
     }
 }
 
+sub ACTION_build_clownfish {
+    my $self    = shift;
+    my $old_dir = getcwd();
+    chdir($CLOWNFISH_DIR);
+    if ( !-f 'Build' ) {
+        print "\nBuilding Clownfish compiler... \n";
+        system("$^X Build.PL");
+        system("$^X Build code");
+        print "\nFinished building Clownfish compiler.\n\n";
+    }
+    chdir($old_dir);
+}
+
 sub ACTION_clownfish {
     my $self = shift;
 
     $self->dispatch('charmony');
+    $self->dispatch('build_clownfish');
 
     # Create destination dir, copy xs helper files.
     if ( !-d $AUTOGEN_DIR ) {
