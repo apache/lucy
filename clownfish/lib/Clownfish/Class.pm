@@ -87,73 +87,89 @@ sub create {
     my ( $class_class, %args ) = @_;
     verify_args( \%create_PARAMS, %args ) or confess $@;
     $args{class_cnick} = $args{cnick};
-    my $self = $class_class->SUPER::new(
-        %create_PARAMS,
-        micro_sym   => 'class',
-        struct_sym  => undef,
-        methods     => [],
-        overridden  => {},
-        functions   => [],
-        member_vars => [],
-        children    => [],
-        parent      => undef,
-        attributes  => {},
-        autocode    => '',
-        tree_grown  => 0,
-        %args,
-    );
-    $self->{cnick} ||= $self->{class_cnick};
-
-    # Make it possible to look up methods and functions by name.
-    $self->{meth_by_name}{ $_->micro_sym } = $_ for @{ $self->methods };
-    $self->{func_by_name}{ $_->micro_sym } = $_ for @{ $self->functions };
+    my $class_name     = $args{class_name};
+    confess("Missing required param 'class_name'") unless $class_name;
 
     # Derive struct name.
-    confess("Missing required param 'class_name'") unless $self->{class_name};
-    $self->{class_name} =~ /(\w+)$/;
-    $self->{struct_sym} = $1;
+    $class_name =~ /(\w+)$/ or confess("Invalid class_name: '$class_name'");
+    my $struct_sym = $1;
+
+    # Assume that Foo::Bar should be found in Foo/Bar.h.
+    $args{source_class} = $class_name
+        unless defined $args{source_class};
 
     # Verify that members of supplied arrays meet "is a" requirements.
-    for ( @{ $self->{functions} } ) {
+    for (qw( functions methods member_vars inert_vars )) {
+        next unless defined $args{$_};
+        next if reftype( $args{$_} ) eq 'ARRAY';
+        confess("Supplied parameter '$_' is not an arrayref");
+    }
+    my $functions   = $args{functions}   || [];
+    my $methods     = $args{methods}     || [];
+    my $member_vars = $args{member_vars} || [];
+    my $inert_vars  = $args{inert_vars}  || [];
+    for (@$functions) {
         confess("Not a Clownfish::Function")
             unless a_isa_b( $_, 'Clownfish::Function' );
     }
-    for ( @{ $self->{methods} } ) {
+    for (@$methods) {
         confess("Not a Clownfish::Method")
             unless a_isa_b( $_, 'Clownfish::Method' );
     }
-    for ( @{ $self->{member_vars} }, @{ $self->{inert_vars} } ) {
+    for ( @$member_vars, @$inert_vars ) {
         confess("Not a Clownfish::Variable")
             unless a_isa_b( $_, 'Clownfish::Variable' );
     }
 
-    # Assume that Foo::Bar should be found in Foo/Bar.h.
-    $self->{source_class} = $self->{class_name}
-        unless defined $self->{source_class};
+    # Make it possible to look up methods and functions by name.
+    my %meth_by_name = map { ( $_->micro_sym => $_ ) } @$methods;
+    my %func_by_name = map { ( $_->micro_sym => $_ ) } @$functions;
 
     # Validate attributes.
+    my $attributes = $args{attributes} || {};
     confess("Param 'attributes' not a hashref")
-        unless reftype( $self->{attributes} ) eq 'HASH';
+        unless reftype($attributes) eq 'HASH';
+
+    # Validate inert param.
+    confess("Inert classes can't have methods")
+        if ( $args{inert} and scalar @$methods );
+
+    my $self = $class_class->SUPER::new(
+        %create_PARAMS,
+        %args,
+        micro_sym    => 'class',
+        struct_sym   => $struct_sym,
+        methods      => $methods,
+        overridden   => {},
+        functions    => $functions,
+        member_vars  => $member_vars,
+        inert_vars   => $inert_vars,
+        children     => [],
+        parent       => undef,
+        attributes   => $attributes,
+        autocode     => '',
+        tree_grown   => 0,
+        meth_by_name => \%meth_by_name,
+        func_by_name => \%func_by_name,
+    );
+    $self->{cnick} ||= $self->{class_cnick};
 
     # Store in registry.
     my $key      = $self->full_struct_sym;
     my $existing = $registry{$key};
     if ($existing) {
-        confess(  "New class $self->{class_name} conflicts with previously "
-                . "compiled class $existing->{class_name}" );
+        my $existing_class_name = $existing->get_class_name;
+        confess(  "New class $class_name conflicts with previously "
+                . "compiled class $existing_class_name" );
     }
     $registry{$key} = $self;
-
-    # Validate inert param.
-    confess("Inert classes can't have methods")
-        if ( $self->{inert} and @{ $self->{methods} } );
 
     return $self;
 }
 
 sub file_path {
     my ( $self, $base_dir, $ext ) = @_;
-    my @components = split( '::', $self->{source_class} );
+    my @components = split( '::', $self->get_source_class );
     unshift @components, $base_dir
         if defined $base_dir;
     $components[-1] .= $ext;
@@ -162,12 +178,12 @@ sub file_path {
 
 sub include_h {
     my $self = shift;
-    my @components = split( '::', $self->{source_class} );
+    my @components = split( '::', $self->get_source_class );
     $components[-1] .= '.h';
     return join( '/', @components );
 }
 
-sub has_attribute { exists $_[0]->{attributes}{ $_[1] } }
+sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
 
 sub get_cnick             { shift->{cnick} }
 sub get_struct_sym        { shift->{struct_sym} }
@@ -178,11 +194,15 @@ sub get_parent            { shift->{parent} }
 sub get_autocode          { shift->{autocode} }
 sub inert                 { shift->{inert} }
 sub final                 { shift->{final} }
+sub _get_attributes       { shift->{attributes} }
+sub _meth_by_name         { shift->{meth_by_name} }
+sub _func_by_name         { shift->{func_by_name} }
+sub _tree_grown           { shift->{tree_grown} }
 
 sub set_parent { $_[0]->{parent} = $_[1] }
 
-sub full_struct_sym  { $_[0]->get_prefix . $_[0]->{struct_sym} }
-sub short_vtable_var { uc( shift->{struct_sym} ) }
+sub full_struct_sym  { $_[0]->get_prefix . $_[0]->get_struct_sym }
+sub short_vtable_var { uc( shift->get_struct_sym ) }
 sub full_vtable_var  { $_[0]->get_PREFIX . $_[0]->short_vtable_var }
 sub full_vtable_type { shift->full_vtable_var . '_VT' }
 
@@ -195,34 +215,33 @@ sub inert_vars  { shift->{inert_vars} }
 sub children    { shift->{children} }
 
 sub novel_methods {
-    my $self = shift;
-    my @methods
-        = grep { $_->get_class_cnick eq $self->{cnick} }
-        @{ $self->{methods} };
+    my $self    = shift;
+    my $cnick   = $self->get_cnick;
+    my @methods = grep { $_->get_class_cnick eq $cnick } @{ $self->methods };
     return \@methods;
 }
 
 sub novel_member_vars {
-    my $self = shift;
-    my @member_vars
-        = grep { $_->get_class_cnick eq $self->{cnick} }
-        @{ $self->{member_vars} };
-    return \@member_vars;
+    my $self  = shift;
+    my $cnick = $self->get_cnick;
+    my @novel
+        = grep { $_->get_class_cnick eq $cnick } @{ $self->member_vars };
+    return \@novel;
 }
 
 sub function {
     my ( $self, $micro_sym ) = @_;
-    return $self->{func_by_name}{ lc($micro_sym) };
+    return $self->_func_by_name->{ lc($micro_sym) };
 }
 
 sub method {
     my ( $self, $micro_sym ) = @_;
-    return $self->{meth_by_name}{ lc($micro_sym) };
+    return $self->_meth_by_name->{ lc($micro_sym) };
 }
 
 sub novel_method {
     my ( $self, $micro_sym ) = @_;
-    my $method = $self->{meth_by_name}{ lc($micro_sym) };
+    my $method = $self->_meth_by_name->{ lc($micro_sym) };
     if ( defined $method
         and $method->get_class_cnick eq $self->get_class_cnick )
     {
@@ -235,17 +254,17 @@ sub novel_method {
 
 sub add_child {
     my ( $self, $child ) = @_;
-    confess("Can't call add_child after grow_tree") if $self->{tree_grown};
-    push @{ $self->{children} }, $child;
+    confess("Can't call add_child after grow_tree") if $self->_tree_grown;
+    push @{ $self->children }, $child;
 }
 
 sub add_method {
     my ( $self, $method ) = @_;
     confess("Not a Method") unless a_isa_b( $method, "Clownfish::Method" );
-    confess("Can't call add_method after grow_tree") if $self->{tree_grown};
-    confess("Can't add_method to an inert class")    if $self->{inert};
-    push @{ $self->{methods} }, $method;
-    $self->{meth_by_name}{ $method->micro_sym } = $method;
+    confess("Can't call add_method after grow_tree") if $self->_tree_grown;
+    confess("Can't add_method to an inert class")    if $self->inert;
+    push @{ $self->methods }, $method;
+    $self->_meth_by_name->{ $method->micro_sym } = $method;
 }
 
 # Create dumpable functions unless hand coded versions were supplied.
@@ -256,7 +275,7 @@ sub _create_dumpables {
 
 sub grow_tree {
     my $self = shift;
-    confess("Can't call grow_tree more than once") if $self->{tree_grown};
+    confess("Can't call grow_tree more than once") if $self->_tree_grown;
     $self->_establish_ancestry;
     $self->_bequeath_member_vars;
     $self->_generate_automethods;
@@ -267,7 +286,7 @@ sub grow_tree {
 # Let the children know who their parent class is.
 sub _establish_ancestry {
     my $self = shift;
-    for my $child ( @{ $self->{children} } ) {
+    for my $child ( @{ $self->children } ) {
         # This is a circular reference and thus a memory leak, but we don't
         # care, because we have to have everything in memory at once anyway.
         $child->{parent} = $self;
@@ -278,8 +297,8 @@ sub _establish_ancestry {
 # Pass down member vars to from parent to children.
 sub _bequeath_member_vars {
     my $self = shift;
-    for my $child ( @{ $self->{children} } ) {
-        unshift @{ $child->{member_vars} }, @{ $self->{member_vars} };
+    for my $child ( @{ $self->children } ) {
+        unshift @{ $child->member_vars }, @{ $self->member_vars };
         $child->_bequeath_member_vars;
     }
 }
@@ -289,7 +308,7 @@ sub _bequeath_member_vars {
 sub _generate_automethods {
     my $self = shift;
     $self->_create_dumpables;
-    for my $child ( @{ $self->{children} } ) {
+    for my $child ( @{ $self->children } ) {
         $child->_generate_automethods;
     }
 }
@@ -297,18 +316,18 @@ sub _generate_automethods {
 sub _bequeath_methods {
     my $self = shift;
 
-    for my $child ( @{ $self->{children} } ) {
+    for my $child ( @{ $self->children } ) {
         # Pass down methods, with some being overridden.
         my @common_methods;    # methods which child inherits or overrides
-        for my $method ( @{ $self->{methods} } ) {
-            if ( exists $child->{meth_by_name}{ $method->micro_sym } ) {
+        for my $method ( @{ $self->methods } ) {
+            if ( exists $child->_meth_by_name->{ $method->micro_sym } ) {
                 my $child_method
-                    = $child->{meth_by_name}{ $method->micro_sym };
+                    = $child->_meth_by_name->{ $method->micro_sym };
                 $child_method->override($method);
                 push @common_methods, $child_method;
             }
             else {
-                $child->{meth_by_name}{ $method->micro_sym } = $method;
+                $child->_meth_by_name->{ $method->micro_sym } = $method;
                 push @common_methods, $method;
             }
         }
@@ -316,12 +335,12 @@ sub _bequeath_methods {
         # Create array of methods, preserving exact order so vtables match up.
         my @new_method_set;
         my %seen;
-        for my $meth ( @common_methods, @{ $child->{methods} } ) {
+        for my $meth ( @common_methods, @{ $child->methods } ) {
             next if $seen{ $meth->micro_sym };
             $seen{ $meth->micro_sym } = 1;
             if ( $child->final ) {
                 $meth = $meth->finalize if $child->final;
-                $child->{meth_by_name}{ $meth->micro_sym } = $meth;
+                $child->_meth_by_name->{ $meth->micro_sym } = $meth;
             }
             push @new_method_set, $meth;
         }
@@ -336,7 +355,7 @@ sub _bequeath_methods {
 sub tree_to_ladder {
     my $self   = shift;
     my @ladder = ($self);
-    for my $child ( @{ $self->{children} } ) {
+    for my $child ( @{ $self->children } ) {
         push @ladder, @{ $child->tree_to_ladder };
     }
     return \@ladder;
