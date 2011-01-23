@@ -51,23 +51,37 @@
 MODULE = Clownfish    PACKAGE = Clownfish::Type
 
 SV*
-_new(klass, parcel, specifier, indirection, c_string)
+_new(klass, flags, parcel, specifier, indirection, c_string)
     const char *klass;
+    int flags;
     SV *parcel;
     const char *specifier;
     int indirection;
     const char *c_string;
 CODE:
-    CFCType *self = CFCType_new(parcel, specifier, indirection, c_string);
+    CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
+        c_string);
     RETVAL = newSV(0);
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
 void
-_destroy(self)
+DESTROY(self)
     CFCType *self;
 PPCODE:
     CFCType_destroy(self);
+
+bool
+CONST(...)
+CODE:
+    RETVAL = CFCTYPE_CONST;
+OUTPUT: RETVAL
+
+bool
+NULLABLE(...)
+CODE:
+    RETVAL = CFCTYPE_NULLABLE;
+OUTPUT: RETVAL
 
 void
 _set_or_get(self, ...)
@@ -79,6 +93,9 @@ ALIAS:
     get_indirection = 6
     set_c_string    = 7
     to_c            = 8
+    const           = 10 
+    set_nullable    = 11
+    nullable        = 12
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -102,6 +119,15 @@ PPCODE:
                 const char *c_string = CFCType_to_c(self);
                 retval = newSVpvn(c_string, strlen(c_string));
             }
+            break;
+        case 10:
+            retval = newSViv(CFCType_const(self));
+            break;
+        case 11:
+            CFCType_set_nullable(self, !!SvTRUE(ST(1)));
+            break;
+        case 12:
+            retval = newSViv(CFCType_nullable(self));
             break;
     END_SET_OR_GET_SWITCH
 }

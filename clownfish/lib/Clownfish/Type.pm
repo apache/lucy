@@ -24,8 +24,6 @@ use Scalar::Util qw( blessed );
 use Carp;
 
 # Inside-out member vars.
-our %const;
-our %nullable;
 
 our %new_PARAMS = (
     const       => undef,
@@ -42,6 +40,10 @@ sub new {
         if $package eq __PACKAGE__;
     verify_args( \%new_PARAMS, %args ) or confess $@;
 
+    my $flags = 0;
+    $flags |= CONST    if $args{const};
+    $flags |= NULLABLE if $args{nullable};
+
     my $parcel = $args{parcel};
     if ( defined $parcel ) {
         if ( !blessed($parcel) ) {
@@ -51,27 +53,13 @@ sub new {
             unless $parcel->isa('Clownfish::Parcel');
     }
 
-    my $const       = $args{const}       || 0;
     my $indirection = $args{indirection} || 0;
     my $specifier   = $args{specifier}   || '';
     my $c_string    = $args{c_string}    || '';
 
-    my $self = $package->_new( $parcel, $specifier, $indirection, $c_string );
-    $const{$self} = $const;
-    return $self;
+    return $package->_new( $flags, $parcel, $specifier, $indirection,
+        $c_string );
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $const{$self};
-    delete $nullable{$self};
-    _destroy($self);
-}
-
-sub const           { $const{ +shift } }
-sub nullable        { $nullable{ +shift } }
-
-sub set_nullable  { $nullable{ $_[0] }  = $_[1] }
 
 sub is_object      {0}
 sub is_primitive   {0}

@@ -30,18 +30,20 @@ struct CFCType {
 };
 
 CFCType*
-CFCType_new(void *parcel, const char *specifier, int indirection,
+CFCType_new(int flags, void *parcel, const char *specifier, int indirection,
             const char *c_string)
 {
     CFCType *self = (CFCType*)malloc(sizeof(CFCType));
     if (!self) { croak("malloc failed"); }
-    return CFCType_init(self, parcel, specifier, indirection, c_string);
+    return CFCType_init(self, flags, parcel, specifier, indirection, 
+        c_string);
 }
 
 CFCType*
-CFCType_init(CFCType *self, void *parcel, const char *specifier,
+CFCType_init(CFCType *self, int flags, void *parcel, const char *specifier,
              int indirection, const char *c_string)
 {
+    self->flags       = flags;
     self->parcel      = newSVsv((SV*)parcel);
     self->specifier   = savepv(specifier);
     self->indirection = indirection;
@@ -96,3 +98,25 @@ CFCType_to_c(CFCType *self)
     return self->c_string;
 }
 
+int
+CFCType_const(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_CONST);
+}
+
+int
+CFCType_set_nullable(CFCType *self, int nullable)
+{
+    if (nullable) {
+        self->flags |= CFCTYPE_NULLABLE;
+    }
+    else {
+        self->flags &= ~CFCTYPE_NULLABLE;
+    }
+}
+
+int
+CFCType_nullable(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_NULLABLE);
+}

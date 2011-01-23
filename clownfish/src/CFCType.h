@@ -16,12 +16,15 @@
 
 typedef struct CFCType CFCType;
 
+#define CFCTYPE_CONST    0x1
+#define CFCTYPE_NULLABLE 0x2
+
 CFCType*
-CFCType_new(void *parcel, const char *specifier, int indirection,
+CFCType_new(int flags, void *parcel, const char *specifier, int indirection,
             const char *c_string);
 
 CFCType*
-CFCType_init(CFCType *self, void *parcel, const char *specifier,
+CFCType_init(CFCType *self, int flags, void *parcel, const char *specifier,
              int indirection, const char *c_string);
 
 void
@@ -44,4 +47,10 @@ CFCType_set_c_string(CFCType *self, const char *c_string);
 
 const char*
 CFCType_to_c(CFCType *self);
+
+int
+CFCType_set_nullable(CFCType *self, int nullable);
+
+int
+CFCType_nullable(CFCType *self);
 
