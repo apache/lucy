@@ -17,6 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Type;
+use Clownfish;
 use Clownfish::Parcel;
 use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
@@ -44,8 +45,7 @@ sub new {
     confess( __PACKAGE__ . "is an abstract class" )
         if $package eq __PACKAGE__;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $blank = '';
-    my $self = bless \$blank, $package;
+    my $self = $package->_new();
 
     my $parcel = $args{parcel};
     if ( defined $parcel ) {
@@ -73,6 +73,7 @@ sub DESTROY {
     delete $indirection{$self};
     delete $c_string{$self};
     delete $nullable{$self};
+    _destroy($self);
 }
 
 sub get_specifier   { $specifier{ +shift } }

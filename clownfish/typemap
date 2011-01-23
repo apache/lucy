@@ -1,0 +1,19 @@
+TYPEMAP
+CFCType*	CLOWNFISH_TYPE
+
+INPUT
+
+CLOWNFISH_TYPE
+	if (sv_derived_from($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+	else {
+		croak(\"Not a ${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\");
+	}
+
+OUTPUT
+
+CLOWNFISH_TYPE
+	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\", (void*)$var);
+

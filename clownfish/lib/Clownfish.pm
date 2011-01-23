@@ -19,6 +19,9 @@ use warnings;
 package Clownfish;
 our $VERSION = '0.01';
 
+use XSLoader;
+BEGIN { XSLoader::load( 'Clownfish', '0.01' ) } 
+
 1;
 
 =head1 NAME

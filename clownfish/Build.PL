@@ -23,13 +23,15 @@ my $builder = Module::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
-    dist_version   => '0.001',
+    dist_version_from => 'lib/Clownfish.pm',
     requires       => { 'Parse::RecDescent' => 0, },
     build_requires => {
         'ExtUtils::CBuilder' => 0.18,
         'ExtUtils::ParseXS'  => 2.16,
         'Devel::PPPort'      => 3.13,
     },
+    include_dirs   => 'include',
+    c_source       => 'src',
     add_to_cleanup => [
         qw(
             MANIFEST.bak
