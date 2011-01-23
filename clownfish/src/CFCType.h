@@ -17,8 +17,31 @@
 typedef struct CFCType CFCType;
 
 CFCType*
-CFCType_new();
+CFCType_new(void *parcel, const char *specifier, int indirection,
+            const char *c_string);
+
+CFCType*
+CFCType_init(CFCType *self, void *parcel, const char *specifier,
+             int indirection, const char *c_string);
 
 void
 CFCType_destroy(CFCType *self);
+
+void
+CFCType_set_specifier(CFCType *self, const char *specifier);
+
+const char*
+CFCType_get_specifier(CFCType *self);
+
+int
+CFCType_get_indirection(CFCType *self);
+
+void*
+CFCType_get_parcel(CFCType *self);
+
+void
+CFCType_set_c_string(CFCType *self, const char *c_string);
+
+const char*
+CFCType_to_c(CFCType *self);
 

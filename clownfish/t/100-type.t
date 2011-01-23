@@ -29,7 +29,7 @@ my $type = MyType->new( parcel => 'Neato', specifier => 'mytype_t' );
 is( $type->get_parcel, $neato_parcel,
     "constructor changes parcel name to Parcel singleton" );
 
-ok( !defined $type->to_c, "to_c()" );
+is( $type->to_c, '', "to_c()" );
 $type->set_c_string("mytype_t");
 is( $type->to_c, "mytype_t", "set_c_string()" );
 ok( !$type->const, "const() is off by default" );

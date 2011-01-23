@@ -25,10 +25,6 @@ use Carp;
 
 # Inside-out member vars.
 our %const;
-our %specifier;
-our %indirection;
-our %parcel;
-our %c_string;
 our %nullable;
 
 our %new_PARAMS = (
@@ -45,7 +41,6 @@ sub new {
     confess( __PACKAGE__ . "is an abstract class" )
         if $package eq __PACKAGE__;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $self = $package->_new();
 
     my $parcel = $args{parcel};
     if ( defined $parcel ) {
@@ -55,34 +50,27 @@ sub new {
         confess("Not a Clownfish::Parcel")
             unless $parcel->isa('Clownfish::Parcel');
     }
-    $parcel{$self} = $parcel;
 
-    $const{$self}       = $args{const};
-    $specifier{$self}   = $args{specifier};
-    $indirection{$self} = $args{indirection};
-    $c_string{$self}    = $args{c_string};
+    my $const       = $args{const}       || 0;
+    my $indirection = $args{indirection} || 0;
+    my $specifier   = $args{specifier}   || '';
+    my $c_string    = $args{c_string}    || '';
 
+    my $self = $package->_new( $parcel, $specifier, $indirection, $c_string );
+    $const{$self} = $const;
     return $self;
 }
 
 sub DESTROY {
     my $self = shift;
-    delete $parcel{$self};
     delete $const{$self};
-    delete $specifier{$self};
-    delete $indirection{$self};
-    delete $c_string{$self};
     delete $nullable{$self};
     _destroy($self);
 }
 
-sub get_specifier   { $specifier{ +shift } }
-sub get_parcel      { $parcel{ +shift } }
-sub get_indirection { $indirection{ +shift } }
 sub const           { $const{ +shift } }
 sub nullable        { $nullable{ +shift } }
 
-sub set_specifier { $specifier{ $_[0] } = $_[1] }
 sub set_nullable  { $nullable{ $_[0] }  = $_[1] }
 
 sub is_object      {0}
@@ -99,9 +87,6 @@ sub equals {
     return 0 unless $other->isa(__PACKAGE__);
     return 1;
 }
-
-sub to_c { $c_string{ +shift } }
-sub set_c_string { $c_string{ $_[0] } = $_[1] }
 
 1;
 
