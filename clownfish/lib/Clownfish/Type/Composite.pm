@@ -22,6 +22,10 @@ use Clownfish::Util qw( verify_args a_isa_b );
 use Scalar::Util qw( blessed );
 use Carp;
 
+# Inside-out member vars.
+our %array;
+our %child;
+
 our %new_PARAMS = (
     child       => undef,
     indirection => undef,
@@ -34,21 +38,19 @@ sub new {
     my $array    = delete $args{array};
     my $child    = delete $args{child};
     my $nullable = delete $args{nullable};
+    $args{indirection} ||= 0;
     confess("Missing required param 'child'")
         unless a_isa_b( $child, "Clownfish::Type" );
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $self = $either->SUPER::new(%args);
-    $self->{child}    = $child;
-    $self->{array}    = $array;
-    $self->{nullable} = $nullable;
-
-    # Default indirection to 0.
-    my $indirection = $self->{indirection} ||= 0;
+    $child{$self} = $child;
+    $array{$self} = $array;
+    $self->set_nullable($nullable);
 
     # Cache C representation.
     # NOTE: Array postfixes are NOT included.
     my $string = $child->to_c;
-    for ( my $i = 0; $i < $indirection; $i++ ) {
+    for ( my $i = 0; $i < $self->get_indirection; $i++ ) {
         $string .= '*';
     }
     $self->set_c_string($string);
@@ -56,15 +58,21 @@ sub new {
     return $self;
 }
 
-sub get_specifier    { shift->_get_child->get_specifier }
-sub get_array        { shift->{array} }
-sub _get_child       { shift->{child} }
-sub _get_indirection { shift->{indirection} }
-sub is_composite     {1}
+sub DESTROY {
+    my $self = shift;
+    delete $array{$self};
+    delete $child{$self};
+    $self->SUPER::DESTROY;
+}
+
+sub get_specifier { shift->_get_child->get_specifier }
+sub get_array     { $array{ +shift } }
+sub _get_child    { $child{ +shift } }
+sub is_composite  {1}
 
 sub equals {
     my ( $self, $other ) = @_;
-    return 0 unless $self->_get_indirection == $other->_get_indirection;
+    return 0 unless $self->get_indirection == $other->get_indirection;
     return 0 unless $self->_get_child->equals( $other->_get_child );
     return 0 if ( $self->get_array xor $other->get_array );
     return 0 if ( $self->get_array and $self->get_array ne $other->get_array );

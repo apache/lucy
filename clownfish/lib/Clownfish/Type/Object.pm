@@ -23,6 +23,11 @@ use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
+# Inside-out member vars.
+our %incremented;
+our %decremented;
+our %is_string_type;
+
 our %new_PARAMS = (
     const       => undef,
     specifier   => undef,
@@ -39,14 +44,13 @@ sub new {
     my $incremented = delete $args{incremented} || 0;
     my $decremented = delete $args{decremented} || 0;
     my $nullable    = delete $args{nullable}    || 0;
-    my $indirection = delete $args{indirection};
-    $indirection = 1 unless defined $indirection;
+    $args{indirection} = 1 unless defined $args{indirection};
+    my $indirection = $args{indirection};
     $args{parcel} ||= Clownfish::Parcel->default_parcel;
     my $self = $either->SUPER::new(%args);
-    $self->{incremented} = $incremented;
-    $self->{decremented} = $decremented;
-    $self->{indirection} = $indirection;
-    $self->{nullable}    = $nullable;
+    $incremented{$self} = $incremented;
+    $decremented{$self} = $decremented;
+    $self->set_nullable($nullable);
     my $prefix    = $self->get_parcel->get_prefix;
     my $specifier = $self->get_specifier;
 
@@ -63,7 +67,7 @@ sub new {
     # Add $prefix if necessary.
     if ( $specifier !~ /^$prefix/ ) {
         $specifier = $prefix . $specifier;
-        $self->{specifier} = $specifier;
+        $self->set_specifier($specifier);
     }
 
     # Cache C representation.
@@ -72,22 +76,28 @@ sub new {
     $self->set_c_string($string);
 
     # Cache boolean indicating whether this type is a string type.
-    $self->{is_string_type} = $specifier =~ /CharBuf/ ? 1 : 0;
+    $is_string_type{$self} = $specifier =~ /CharBuf/ ? 1 : 0;
 
     return $self;
 }
 
-sub is_object      {1}
-sub incremented    { shift->{incremented} }
-sub decremented    { shift->{decremented} }
-sub is_string_type { shift->{is_string_type} }
+sub DESTROY {
+    my $self = shift;
+    delete $incremented{$self};
+    delete $decremented{$self};
+    delete $is_string_type{$self};
+    $self->SUPER::DESTROY;
+}
 
-sub set_nullable { $_[0]->{nullable} = $_[1] }
+sub is_object      {1}
+sub incremented    { $incremented{ +shift } }
+sub decremented    { $decremented{ +shift } }
+sub is_string_type { $is_string_type{ +shift } }
 
 sub similar {
     my ( $self, $other ) = @_;
     for (qw( const incremented decremented nullable )) {
-        return 0 if ( $self->{$_} xor $other->{$_} );
+        return 0 if ( $self->$_ xor $other->$_ );
     }
     return 1;
 }

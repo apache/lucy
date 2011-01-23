@@ -40,8 +40,10 @@ sub new {
     if ( $specifier =~ /^[A-Z]/ and $parcel ) {
         my $prefix = $parcel->get_prefix;
         # Add $prefix to what appear to be namespaced types.
-        $specifier = $self->{specifier} = $prefix . $specifier
-            unless $specifier =~ /^$prefix/;
+        if ( $specifier !~ /^$prefix/ ) {
+            $specifier = $prefix . $specifier;
+            $self->set_specifier($specifier);
+        }
     }
 
     # Cache C representation.

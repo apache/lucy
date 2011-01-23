@@ -22,6 +22,9 @@ use Clownfish::Util qw( verify_args );
 use Carp;
 use Config;
 
+# Inside-out member vars.
+our %sizeof;
+
 our %new_PARAMS = (
     const     => undef,
     specifier => undef,
@@ -58,12 +61,18 @@ sub new {
     $c_string .= $args{specifier};
 
     my $self = $either->SUPER::new( %args, c_string => $c_string );
-    $self->{sizeof} = $sizeof;
+    $sizeof{$self} = $sizeof;
     return $self;
 }
 
+sub DESTROY {
+    my $self = shift;
+    delete $sizeof{$self};
+    $self->SUPER::DESTROY;
+}
+
 sub is_integer {1}
-sub sizeof     { shift->{sizeof} }
+sub sizeof     { $sizeof{ +shift } }
 
 1;
 

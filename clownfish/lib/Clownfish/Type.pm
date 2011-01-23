@@ -22,6 +22,14 @@ use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
+# Inside-out member vars.
+our %const;
+our %specifier;
+our %indirection;
+our %parcel;
+our %c_string;
+our %nullable;
+
 our %new_PARAMS = (
     const       => undef,
     specifier   => undef,
@@ -31,27 +39,50 @@ our %new_PARAMS = (
 );
 
 sub new {
-    my $either = shift;
+    my ( $either, %args ) = @_;
     my $package = ref($either) || $either;
     confess( __PACKAGE__ . "is an abstract class" )
         if $package eq __PACKAGE__;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless { %new_PARAMS, @_, }, $package;
-    if ( defined $self->get_parcel ) {
-        if ( !blessed( $self->get_parcel ) ) {
-            $self->{parcel}
-                = Clownfish::Parcel->singleton( name => $self->get_parcel );
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    my $blank = '';
+    my $self = bless \$blank, $package;
+
+    my $parcel = $args{parcel};
+    if ( defined $parcel ) {
+        if ( !blessed($parcel) ) {
+            $parcel = Clownfish::Parcel->singleton( name => $parcel );
         }
         confess("Not a Clownfish::Parcel")
-            unless $self->get_parcel->isa('Clownfish::Parcel');
+            unless $parcel->isa('Clownfish::Parcel');
     }
+    $parcel{$self} = $parcel;
+
+    $const{$self}       = $args{const};
+    $specifier{$self}   = $args{specifier};
+    $indirection{$self} = $args{indirection};
+    $c_string{$self}    = $args{c_string};
+
     return $self;
 }
 
-sub get_specifier { shift->{specifier} }
-sub get_parcel    { shift->{parcel} }
-sub const         { shift->{const} }
-sub nullable      { shift->{nullable} }
+sub DESTROY {
+    my $self = shift;
+    delete $parcel{$self};
+    delete $const{$self};
+    delete $specifier{$self};
+    delete $indirection{$self};
+    delete $c_string{$self};
+    delete $nullable{$self};
+}
+
+sub get_specifier   { $specifier{ +shift } }
+sub get_parcel      { $parcel{ +shift } }
+sub get_indirection { $indirection{ +shift } }
+sub const           { $const{ +shift } }
+sub nullable        { $nullable{ +shift } }
+
+sub set_specifier { $specifier{ $_[0] } = $_[1] }
+sub set_nullable  { $nullable{ $_[0] }  = $_[1] }
 
 sub is_object      {0}
 sub is_primitive   {0}
@@ -68,8 +99,8 @@ sub equals {
     return 1;
 }
 
-sub to_c { shift->{c_string} }
-sub set_c_string { $_[0]->{c_string} = $_[1] }
+sub to_c { $c_string{ +shift } }
+sub set_c_string { $c_string{ $_[0] } = $_[1] }
 
 1;
 
@@ -140,7 +171,7 @@ Return the C representation of the type.
 
 Set the C representation of the type.
 
-=head2 get_specifier get_parcel const nullable
+=head2 get_specifier get_parcel get_indirection const nullable set_specifier set_nullable
 
 Accessors.
 

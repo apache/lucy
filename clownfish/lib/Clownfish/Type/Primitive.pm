@@ -33,7 +33,7 @@ sub new {
     my $package = ref($either) || $either;
     confess( __PACKAGE__ . " is abstract" ) if $package eq __PACKAGE__;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    return bless { %new_PARAMS, %args }, $package;
+    return $package->SUPER::new( %new_PARAMS, %args );
 }
 
 sub is_primitive {1}
