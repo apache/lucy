@@ -48,6 +48,49 @@
         XSRETURN(0); \
     } 
 
+MODULE = Clownfish    PACKAGE = Clownfish::ParamList
+
+SV*
+_new(klass, variables, values, variadic)
+    const char *klass;
+    SV *variables;
+    SV *values;
+    int variadic;
+CODE:
+    CFCParamList *self = CFCParamList_new(variables, values, variadic);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCParamList *self;
+PPCODE:
+    CFCParamList_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCParamList *self;
+ALIAS:
+    get_variables      = 2
+    get_initial_values = 4
+    variadic           = 6
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2:
+            retval = newSVsv((SV*)CFCParamList_get_variables(self));
+            break;
+        case 4:
+            retval = newSVsv((SV*)CFCParamList_get_initial_values(self));
+            break;
+        case 6:
+            retval = newSViv(CFCParamList_variadic(self));
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
+
 MODULE = Clownfish    PACKAGE = Clownfish::Type
 
 SV*

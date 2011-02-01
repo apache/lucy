@@ -28,39 +28,39 @@ our %new_PARAMS = (
 );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless { %new_PARAMS, @_, }, ref($either) || $either;
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    my $class_name = ref($either) || $either;
+    my $variables  = delete $args{variables};
+    my $values     = delete $args{initial_values};
+    my $variadic   = delete $args{variadic} || 0;
 
     # Validate variables.
     confess "variables must be an arrayref"
-        unless ref( $self->get_variables ) eq 'ARRAY';
-    for my $var ( @{ $self->get_variables } ) {
+        unless ref($variables) eq 'ARRAY';
+    for my $var (@$variables) {
         confess "invalid variable: '$var'"
             unless ref($var) && $var->isa("Clownfish::Variable");
     }
 
     # Validate or init initial_values.
-    if ( defined $self->get_initial_values ) {
+    if ( defined $values ) {
         confess "variables must be an arrayref"
-            unless ref( $self->get_initial_values ) eq 'ARRAY';
-        my $num_init = scalar @{ $self->get_initial_values };
-        my $num_vars = $self->num_vars;
+            unless ref($values) eq 'ARRAY';
+        my $num_init = scalar @$values;
+        my $num_vars = scalar @$variables;
         confess("mismatch of num vars and init values: $num_vars $num_init")
             unless $num_init == $num_vars;
     }
     else {
         my @initial_values;
-        $#initial_values = $#{ $self->get_variables };
-        $self->{initial_values} = \@initial_values;
+        $#initial_values = $#$variables;
+        $values          = \@initial_values;
     }
 
-    return $self;
+    return $class_name->_new( $variables, $values, $variadic );
 }
 
-sub get_variables      { shift->{variables} }
-sub get_initial_values { shift->{initial_values} }
-sub variadic           { shift->{variadic} }
 sub num_vars           { scalar @{ shift->get_variables } }
 
 sub to_c {

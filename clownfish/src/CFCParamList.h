@@ -14,6 +14,24 @@
  * limitations under the License.
  */
 
-#include "CFCType.h"
-#include "CFCParamList.h"
+typedef struct CFCParamList CFCParamList;
+
+CFCParamList*
+CFCParamList_new(void *variables, void *initial_values, int variadic);
+
+CFCParamList*
+CFCParamList_init(CFCParamList *self, void *variables, void *initial_values,
+                  int variadic);
+
+void
+CFCParamList_destroy(CFCParamList *self);
+
+void*
+CFCParamList_get_variables(CFCParamList *self);
+
+void*
+CFCParamList_get_initial_values(CFCParamList *self);
+
+int
+CFCParamList_variadic(CFCParamList *self);
 
