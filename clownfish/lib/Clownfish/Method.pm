@@ -175,12 +175,21 @@ sub compatible {
 
 sub finalize {
     my $self = shift;
-    my %args;
-    $args{$_} = $self->{$_} for keys %new_PARAMS;    # including short_typedef
-    $args{final} = 1;
-    my $finalized = $self->new(%args);
-    $finalized->{novel} = $self->{novel};
-    return $finalized;
+    return $self->new(
+        return_type   => $self->get_return_type,
+        class_name    => $self->get_class_name,
+        class_cnick   => $self->get_class_cnick,
+        param_list    => $self->get_param_list,
+        macro_sym     => $self->get_macro_sym,
+        docucomment   => $self->get_docucomment,
+        parcel        => $self->get_parcel,
+        abstract      => $self->abstract,
+        final         => $self->final,
+        exposure      => $self->get_exposure,
+        novel         => $self->novel,
+        short_typedef => $self->short_typedef,
+        final         => 1,
+    );
 }
 
 1;
