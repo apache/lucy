@@ -23,6 +23,11 @@ use Clownfish::Util qw( verify_args a_isa_b );
 use Clownfish::Type;
 use Clownfish::ParamList;
 
+our %return_type;
+our %param_list;
+our %docucomment;
+our %inline;
+
 my %new_PARAMS = (
     return_type => undef,
     class_name  => undef,
@@ -36,28 +41,45 @@ my %new_PARAMS = (
 );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = $either->SUPER::new( %new_PARAMS, @_ );
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    my $return_type = delete $args{return_type};
+    my $param_list  = delete $args{param_list};
+    my $docucomment = delete $args{docucomment};
+    my $inline      = delete $args{inline} || 0;
+    my $self        = $either->SUPER::new( %new_PARAMS, %args );
+    $return_type{$self} = $return_type;
+    $param_list{$self}  = $param_list;
+    $docucomment{$self} = $docucomment;
+    $inline{$self}      = $inline;
 
     # Validate.
     for (qw( return_type class_name param_list )) {
-        confess("$_ is mandatory") unless defined $self->{$_};
+        my $meth_name = "get_$_";
+        confess("$_ is mandatory") unless defined $self->$meth_name;
     }
     confess( "Invalid micro_sym: '" . $self->micro_sym . "'" )
         unless $self->micro_sym =~ /^[a-z0-9_]+$/;
     confess 'param_list must be a ParamList object'
-        unless a_isa_b( $self->get_param_list, "Clownfish::ParamList" );
+        unless a_isa_b( $param_list, "Clownfish::ParamList" );
     confess 'return_type must be a Type object'
-        unless a_isa_b( $self->get_return_type, "Clownfish::Type" );
+        unless a_isa_b( $return_type, "Clownfish::Type" );
 
     return $self;
 }
 
-sub get_return_type { shift->{return_type} }
-sub get_param_list  { shift->{param_list} }
-sub get_docucomment { shift->{docucomment} }
-sub inline          { shift->{inline} }
+sub DESTROY {
+    my $self = shift;
+    delete $return_type{$self};
+    delete $param_list{$self};
+    delete $docucomment{$self};
+    delete $inline{$self};
+}
+
+sub get_return_type { $return_type{ +shift } }
+sub get_param_list  { $param_list{ +shift } }
+sub get_docucomment { $docucomment{ +shift } }
+sub inline          { $inline{ +shift } }
 
 sub void { shift->get_return_type->is_void }
 

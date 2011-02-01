@@ -91,6 +91,7 @@ sub DESTROY {
     delete $final{$self};
     delete $novel{$self};
     delete $short_typedef{$self};
+    $self->SUPER::DESTROY;
 }
 
 sub abstract      { $abstract{ +shift } }

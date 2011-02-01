@@ -204,7 +204,7 @@ ok( ( scalar grep { $_->micro_sym eq 'scratch' } @{ $class->methods } ),
 
 for my $method ( @{ $class->methods } ) {
     if ( $method->micro_sym eq 'scratch' ) {
-        ok( $method->{return_type}->nullable,
+        ok( $method->get_return_type->nullable,
             "public abstract incremented nullable flagged as nullable" );
     }
 }
