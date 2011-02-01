@@ -28,24 +28,9 @@ our %new_PARAMS = (
     retval      => undef,
 );
 
-sub _new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ );
-    return bless { \%new_PARAMS, @_ };
-}
-
 sub parse {
     my ( $either, $text ) = @_;
-
-    my ( @param_names, @param_docs );
-    my $self = bless {
-        brief       => undef,
-        long        => undef,
-        param_names => \@param_names,
-        param_docs  => \@param_docs,
-        retval      => undef,
-        },
-        ref($either) || $either;
+    my $class_name = ref($either) || $either;
 
     # Strip comment open, close, and left border.
     $text =~ s/\A\s*\/\*\*\s+//;
@@ -55,12 +40,13 @@ sub parse {
     # Extract the brief description.
     $text =~ /^(.+?\.)(\s+|\Z)/s
         or confess("Can't find at least one descriptive sentence in '$text'");
-    $self->{brief} = $1;
+    my $brief = $1;
 
     # terminated by @, empty line, or string end.
     my $terminator = qr/((?=\@)|\n\s*\n|\Z)/;
 
     # Extract @param, @return directives.
+    my ( @param_names, @param_docs );
     while (
         $text =~ s/^\s*
         \@param\s+
@@ -75,27 +61,22 @@ sub parse {
         push @param_names, $1;
         push @param_docs,  $2;
     }
+    my $retval;
     if ( $text =~ s/^\s*\@return\s+(.*?)$terminator//sm ) {
-        $self->{retval} = $1;
+        $retval = $1;
     }
 
     $text =~ s/^\s*//;
     $text =~ s/\s*$//;
-    $self->{description} = $text;
+    my $description = $text;
 
     $text =~ s/^(.+?\.)(\s+|\Z)//s;    # zap brief
     $text =~ s/^\s*//;
-    $self->{long} = $text;
+    my $long = $text;
 
-    return $self;
+    return $class_name->_new( $description, $brief, $long, \@param_names,
+        \@param_docs, $retval );
 }
-
-sub get_param_names { shift->{param_names} }
-sub get_param_docs  { shift->{param_docs} }
-sub get_retval      { shift->{retval} }
-sub get_brief       { shift->{brief} }
-sub get_long        { shift->{long} }
-sub get_description { shift->{description} }
 
 1;
 

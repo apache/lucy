@@ -14,8 +14,9 @@
 # limitations under the License.
 
 TYPEMAP
-CFCType*	CLOWNFISH_TYPE
+CFCDocuComment*	CLOWNFISH_TYPE
 CFCParamList*	CLOWNFISH_TYPE
+CFCType*	CLOWNFISH_TYPE
 
 INPUT
 

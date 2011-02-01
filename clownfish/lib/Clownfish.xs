@@ -48,6 +48,74 @@
         XSRETURN(0); \
     } 
 
+MODULE = Clownfish    PACKAGE = Clownfish::DocuComment
+
+SV*
+_new(klass, description, brief, long_description, param_names, param_docs, retval_sv)
+    const char *klass;
+    const char *description;
+    const char *brief;
+    const char *long_description;
+    SV *param_names;
+    SV *param_docs;
+    SV *retval_sv;
+CODE:
+    const char *retval = SvOK(retval_sv) ? SvPV_nolen(retval_sv) : NULL;
+    CFCDocuComment *self = CFCDocuComment_new(description, brief,
+        long_description, param_names, param_docs, retval);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCDocuComment *self;
+PPCODE:
+    CFCDocuComment_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCDocuComment *self;
+ALIAS:
+    get_description = 2
+    get_brief       = 4
+    get_long        = 6
+    get_param_names = 8
+    get_param_docs  = 10
+    get_retval      = 12
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *description = CFCDocuComment_get_description(self);
+                retval = newSVpvn(description, strlen(description));
+            }
+            break;
+        case 4: {
+                const char *brief = CFCDocuComment_get_brief(self);
+                retval = newSVpvn(brief, strlen(brief));
+            }
+            break;
+        case 6: {
+                const char *long_description = CFCDocuComment_get_long(self);
+                retval = newSVpvn(long_description, strlen(long_description));
+            }
+            break;
+        case 8:
+            retval = newSVsv((SV*)CFCDocuComment_get_param_names(self));
+            break;
+        case 10:
+            retval = newSVsv((SV*)CFCDocuComment_get_param_docs(self));
+            break;
+        case 12: {
+                const char *rv = CFCDocuComment_get_retval(self);
+                retval = rv ? newSVpvn(rv, strlen(rv)) : newSV(0);
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
+
 MODULE = Clownfish    PACKAGE = Clownfish::ParamList
 
 SV*
