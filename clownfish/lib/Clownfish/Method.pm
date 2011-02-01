@@ -21,6 +21,12 @@ use base qw( Clownfish::Function );
 use Clownfish::Util qw( verify_args );
 use Carp;
 
+our %macro_sym;
+our %abstract;
+our %final;
+our %novel;
+our %short_typedef;
+
 my %new_PARAMS = (
     return_type => undef,
     class_name  => undef,
@@ -54,13 +60,13 @@ sub new {
 
     # Create self, add in novel member vars.
     my $self = $class->SUPER::new(%args);
-    $self->{macro_sym} = $macro_sym;
-    $self->{abstract}  = $abstract;
-    $self->{final}     = $final;
+    $macro_sym{$self} = $macro_sym;
+    $abstract{$self}  = $abstract;
+    $final{$self}     = $final;
 
     # Assume that this method is novel until we discover when applying
     # inheritance that it was overridden.
-    $self->{novel} = defined $novel ? $novel : 1;
+    $novel{$self} = defined $novel ? $novel : 1;
 
     # Verify that the first element in the arg list is a self.
     my $args = $self->get_param_list->get_variables;
@@ -72,16 +78,26 @@ sub new {
         unless $specifier eq $self->get_prefix . $struct_sym;
 
     # Cache typedef.
-    $self->{short_typedef}
+    $short_typedef{$self}
         = defined $short_typedef ? $short_typedef : $self->short_sym . "_t";
 
     return $self;
 }
 
-sub abstract      { shift->{abstract} }
-sub novel         { shift->{novel} }
-sub final         { shift->{final} }
-sub get_macro_sym { shift->{macro_sym} }
+sub DESTROY {
+    my $self = shift;
+    delete $macro_sym{$self};
+    delete $abstract{$self};
+    delete $final{$self};
+    delete $novel{$self};
+    delete $short_typedef{$self};
+}
+
+sub abstract      { $abstract{ +shift } }
+sub novel         { $novel{ +shift } }
+sub final         { $final{ +shift } }
+sub get_macro_sym { $macro_sym{ +shift } }
+sub _set_novel    { $novel{ $_[0] } = $_[1] }
 
 sub self_type { shift->get_param_list->get_variables->[0]->get_type }
 
@@ -106,7 +122,7 @@ sub full_offset_sym {
 sub full_callback_sym { shift->full_func_sym . "_CALLBACK" }
 sub full_override_sym { shift->full_func_sym . "_OVERRIDE" }
 
-sub short_typedef { shift->{short_typedef} }
+sub short_typedef { $short_typedef{ +shift } }
 sub full_typedef {
     my $self = shift;
     return $self->get_prefix . $self->short_typedef;
@@ -130,7 +146,7 @@ sub override {
     }
 
     # Mark the Method as no longer novel.
-    $self->{novel} = 0;
+    $self->_set_novel(0);
 }
 
 sub compatible {
