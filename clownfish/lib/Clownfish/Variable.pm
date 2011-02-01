@@ -22,6 +22,8 @@ use Clownfish::Type;
 use Clownfish::Util qw( verify_args a_isa_b );
 use Carp;
 
+our %type;
+
 our %new_PARAMS = (
     type        => undef,
     micro_sym   => undef,
@@ -32,15 +34,22 @@ our %new_PARAMS = (
 );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = $either->SUPER::new( %new_PARAMS, @_ );
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    my $type = delete $args{type};
     confess "invalid type"
-        unless a_isa_b( $self->get_type, "Clownfish::Type" );
+        unless a_isa_b( $type, "Clownfish::Type" );
+    my $self = $either->SUPER::new( %new_PARAMS, %args );
+    $type{$self} = $type;
     return $self;
 }
 
-sub get_type { shift->{type} }
+sub DESTROY {
+    my $self = shift;
+    delete $type{$self};
+}
+
+sub get_type { $type{ +shift } }
 
 sub equals {
     my ( $self, $other ) = @_;
