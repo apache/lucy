@@ -220,6 +220,7 @@ sub DESTROY {
     delete $member_vars{$self};
     delete $inert_vars{$self};
     delete $overridden{$self};
+    $self->SUPER::DESTROY;
 }
 
 sub file_path {

@@ -16,5 +16,6 @@
 
 #include "CFCDocuComment.h"
 #include "CFCParamList.h"
+#include "CFCSymbol.h"
 #include "CFCType.h"
 

@@ -47,7 +47,8 @@ sub new {
     my $param_list  = delete $args{param_list};
     my $docucomment = delete $args{docucomment};
     my $inline      = delete $args{inline} || 0;
-    my $self        = $either->SUPER::new( %new_PARAMS, %args );
+    $args{exposure} ||= 'parcel';
+    my $self = $either->SUPER::new(%args);
     $return_type{$self} = $return_type;
     $param_list{$self}  = $param_list;
     $docucomment{$self} = $docucomment;
@@ -74,6 +75,7 @@ sub DESTROY {
     delete $param_list{$self};
     delete $docucomment{$self};
     delete $inline{$self};
+    $self->SUPER::DESTROY;
 }
 
 sub get_return_type { $return_type{ +shift } }

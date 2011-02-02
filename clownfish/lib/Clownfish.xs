@@ -159,6 +159,76 @@ PPCODE:
 }
 
 
+MODULE = Clownfish    PACKAGE = Clownfish::Symbol
+
+SV*
+_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym)
+    const char *klass;
+    SV *parcel;
+    const char *exposure;
+    SV *class_name_sv;
+    SV *class_cnick_sv;
+    const char *micro_sym;
+CODE:
+    const char *class_name = SvOK(class_name_sv) 
+                           ? SvPV_nolen(class_name_sv) : NULL;
+    const char *class_cnick = SvOK(class_cnick_sv) 
+                            ? SvPV_nolen(class_cnick_sv) : NULL;
+    CFCSymbol *self = CFCSymbol_new(parcel, exposure, class_name, class_cnick,
+        micro_sym);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCSymbol *self;
+PPCODE:
+    CFCSymbol_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCSymbol *self;
+ALIAS:
+    get_parcel      = 2
+    get_class_name  = 4
+    get_class_cnick = 6
+    get_exposure    = 8
+    micro_sym       = 10
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2:
+            retval = newSVsv((SV*)CFCSymbol_get_parcel(self));
+            break;
+        case 4: {
+                const char *class_name = CFCSymbol_get_class_name(self);
+                retval = class_name 
+                       ? newSVpvn(class_name, strlen(class_name))
+                       : newSV(0);
+            }
+            break;
+        case 6: {
+                const char *class_cnick = CFCSymbol_get_class_cnick(self);
+                retval = class_cnick 
+                       ? newSVpvn(class_cnick, strlen(class_cnick))
+                       : newSV(0);
+            }
+            break;
+        case 8: {
+                const char *exposure = CFCSymbol_get_exposure(self);
+                retval = newSVpvn(exposure, strlen(exposure));
+            }
+            break;
+        case 10: {
+                const char *micro_sym = CFCSymbol_micro_sym(self);
+                retval = newSVpvn(micro_sym, strlen(micro_sym));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
+
 MODULE = Clownfish    PACKAGE = Clownfish::Type
 
 SV*

@@ -106,9 +106,7 @@ my $final     = $not_final->finalize;
 eval { $method->override($final); };
 like( $@, qr/final/i, "Can't override final method" );
 
-delete $not_final->{final};
-delete $final->{final};
-is_deeply( $not_final, $final, "Finalize clones properly" );
+ok( $not_final->compatible($final), "Finalize clones properly" );
 
 for my $meth_meth (qw( short_method_sym full_method_sym full_offset_sym)) {
     eval { my $blah = $method->$meth_meth; };

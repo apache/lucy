@@ -39,7 +39,7 @@ sub new {
     my $type = delete $args{type};
     confess "invalid type"
         unless a_isa_b( $type, "Clownfish::Type" );
-    my $self = $either->SUPER::new( %new_PARAMS, %args );
+    my $self = $either->SUPER::new( exposure => 'local', %args );
     $type{$self} = $type;
     return $self;
 }
@@ -47,6 +47,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
     delete $type{$self};
+    $self->SUPER::DESTROY;
 }
 
 sub get_type { $type{ +shift } }

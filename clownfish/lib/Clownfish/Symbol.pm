@@ -17,8 +17,9 @@ use strict;
 use warnings;
 
 package Clownfish::Symbol;
+use Clownfish;
 use Clownfish::Parcel;
-use Clownfish::Util qw( a_isa_b );
+use Clownfish::Util qw( a_isa_b verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
@@ -35,11 +36,12 @@ my $class_name_regex = qr/^$struct_regex(::$struct_regex)*$/;
 
 sub new {
     my ( $either, %args ) = @_;
-    my $class_name  = $args{class_name};
-    my $class_cnick = $args{class_cnick};
-    my $micro_sym   = $args{micro_sym};
-    my $parcel      = $args{parcel};
-    my $exposure    = $args{exposure};
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    my $class_name  = delete $args{class_name};
+    my $class_cnick = delete $args{class_cnick};
+    my $micro_sym   = delete $args{micro_sym};
+    my $parcel      = delete $args{parcel};
+    my $exposure    = delete $args{exposure};
 
     # Acquire a Parcel.
     if ( !defined $parcel ) {
@@ -50,7 +52,7 @@ sub new {
             unless $parcel->isa('Clownfish::Parcel');
     }
     else {
-        $parcel = Clownfish::Parcel->singleton( name => $args{parcel} );
+        $parcel = Clownfish::Parcel->singleton( name => $parcel );
     }
 
     # Validate micro_sym.
@@ -79,25 +81,10 @@ sub new {
     }
 
     # Create the object.
-    my $self = bless {
-        %new_PARAMS,
-        %args,
-        parcel      => $parcel,
-        micro_sym   => $micro_sym,
-        exposure    => $exposure,
-        class_name  => $class_name,
-        class_cnick => $class_cnick,
-        },
-        ref($either) || $either;
-
-    return $self;
+    my $class_class = ref($either) || $either;
+    return $class_class->_new( $parcel, $exposure, $class_name, $class_cnick,
+        $micro_sym );
 }
-
-sub get_parcel      { shift->{parcel} }
-sub get_class_name  { shift->{class_name} }
-sub get_class_cnick { shift->{class_cnick} }
-sub get_exposure    { shift->{exposure} }
-sub micro_sym       { shift->{micro_sym} }
 
 sub get_prefix { shift->get_parcel->get_prefix; }
 sub get_Prefix { shift->get_parcel->get_Prefix; }
