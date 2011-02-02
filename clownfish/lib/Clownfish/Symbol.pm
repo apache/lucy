@@ -55,31 +55,6 @@ sub new {
         $parcel = Clownfish::Parcel->singleton( name => $parcel );
     }
 
-    # Validate micro_sym.
-    confess "micro_sym is required" unless $micro_sym;
-    confess("Invalid micro_sym: '$micro_sym'")
-        unless $micro_sym =~ /^[A-Za-z_][A-Za-z0-9_]*$/;
-
-    # Validate exposure.
-    confess("Invalid value for 'exposure': $exposure")
-        unless $exposure =~ /^(?:public|parcel|private|local)$/;
-
-    # Validate class name, validate or derive class_cnick.
-    if ( defined $class_name ) {
-        confess("Invalid class name: $class_name")
-            unless $class_name =~ $class_name_regex;
-        if ( !defined $class_cnick ) {
-            $class_name =~ /(\w+)$/;
-            $class_cnick = $1;
-        }
-        confess("Invalid class_cnick: $class_cnick")
-            unless $class_cnick =~ /^[A-Z]+[A-Za-z0-9]*$/;
-    }
-    elsif ( defined $class_cnick ) {
-        # Sanity check class_cnick without class_name.
-        confess("Can't supply class_cnick without class_name");
-    }
-
     # Create the object.
     my $class_class = ref($either) || $either;
     return $class_class->_new( $parcel, $exposure, $class_name, $class_cnick,

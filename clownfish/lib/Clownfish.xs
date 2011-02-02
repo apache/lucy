@@ -162,18 +162,20 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Symbol
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym)
+_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
     const char *klass;
     SV *parcel;
     const char *exposure;
     SV *class_name_sv;
     SV *class_cnick_sv;
-    const char *micro_sym;
+    SV *micro_sym_sv;
 CODE:
     const char *class_name = SvOK(class_name_sv) 
                            ? SvPV_nolen(class_name_sv) : NULL;
     const char *class_cnick = SvOK(class_cnick_sv) 
                             ? SvPV_nolen(class_cnick_sv) : NULL;
+    const char *micro_sym = SvOK(micro_sym_sv) 
+                            ? SvPV_nolen(micro_sym_sv) : NULL;
     CFCSymbol *self = CFCSymbol_new(parcel, exposure, class_name, class_cnick,
         micro_sym);
     RETVAL = newSV(0);

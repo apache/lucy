@@ -28,10 +28,10 @@ use Test::More tests => 44;
 
 for (qw( foo FOO 1Foo Foo_Bar FOOBAR 1FOOBAR )) {
     eval { my $thing = ClownfishyThing->new( class_name => $_ ) };
-    like( $@, qr/class name/, "Reject invalid class name $_" );
+    like( $@, qr/class_name/, "Reject invalid class name $_" );
     my $bogus_middle = "Foo::" . $_ . "::Bar";
     eval { my $thing = ClownfishyThing->new( class_name => $bogus_middle ) };
-    like( $@, qr/class name/, "Reject invalid class name $bogus_middle" );
+    like( $@, qr/class_name/, "Reject invalid class name $bogus_middle" );
 }
 
 my @exposures = qw( public private parcel local );
