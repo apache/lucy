@@ -30,6 +30,26 @@ use Clownfish::Dumpable;
 use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
+our %cnick;
+our %struct_sym;
+our %parent_class_name;
+our %source_class;
+our %docucomment;
+our %parent;
+our %children;
+our %autocode;
+our %inert;
+our %final;
+our %attributes;
+our %meth_by_name;
+our %func_by_name;
+our %tree_grown;
+our %functions;
+our %methods;
+our %member_vars;
+our %inert_vars;
+our %overridden;
+
 our %create_PARAMS = (
     source_class      => undef,
     class_name        => undef,
@@ -86,28 +106,34 @@ sub new { confess("The constructor for Clownfish::Class is create()") }
 sub create {
     my ( $class_class, %args ) = @_;
     verify_args( \%create_PARAMS, %args ) or confess $@;
-    $args{class_cnick} = $args{cnick};
-    my $class_name     = $args{class_name};
+    $args{class_cnick} = delete $args{cnick};
+    my $class_name = $args{class_name};
     confess("Missing required param 'class_name'") unless $class_name;
+    my $parent_class_name = delete $args{parent_class_name};
+    my $docucomment       = delete $args{docucomment};
+    my $inert             = delete $args{inert};
+    my $final             = delete $args{final};
 
     # Derive struct name.
     $class_name =~ /(\w+)$/ or confess("Invalid class_name: '$class_name'");
     my $struct_sym = $1;
 
     # Assume that Foo::Bar should be found in Foo/Bar.h.
-    $args{source_class} = $class_name
-        unless defined $args{source_class};
+    my $source_class
+        = defined $args{source_class}
+        ? delete $args{source_class}
+        : $class_name;
 
     # Verify that members of supplied arrays meet "is a" requirements.
+    my $functions   = delete $args{functions}   || [];
+    my $methods     = delete $args{methods}     || [];
+    my $member_vars = delete $args{member_vars} || [];
+    my $inert_vars  = delete $args{inert_vars}  || [];
     for (qw( functions methods member_vars inert_vars )) {
         next unless defined $args{$_};
         next if reftype( $args{$_} ) eq 'ARRAY';
         confess("Supplied parameter '$_' is not an arrayref");
     }
-    my $functions   = $args{functions}   || [];
-    my $methods     = $args{methods}     || [];
-    my $member_vars = $args{member_vars} || [];
-    my $inert_vars  = $args{inert_vars}  || [];
     for (@$functions) {
         confess("Not a Clownfish::Function")
             unless a_isa_b( $_, 'Clownfish::Function' );
@@ -122,37 +148,43 @@ sub create {
     }
 
     # Make it possible to look up methods and functions by name.
-    my %meth_by_name = map { ( $_->micro_sym => $_ ) } @$methods;
-    my %func_by_name = map { ( $_->micro_sym => $_ ) } @$functions;
+    my %methods_by_name   = map { ( $_->micro_sym => $_ ) } @$methods;
+    my %functions_by_name = map { ( $_->micro_sym => $_ ) } @$functions;
 
     # Validate attributes.
-    my $attributes = $args{attributes} || {};
+    my $attributes = delete $args{attributes} || {};
     confess("Param 'attributes' not a hashref")
         unless reftype($attributes) eq 'HASH';
 
     # Validate inert param.
     confess("Inert classes can't have methods")
-        if ( $args{inert} and scalar @$methods );
+        if ( $inert and scalar @$methods );
 
     my $self = $class_class->SUPER::new(
-        %create_PARAMS,
+        exposure => 'parcel',
         %args,
-        micro_sym    => 'class',
-        struct_sym   => $struct_sym,
-        methods      => $methods,
-        overridden   => {},
-        functions    => $functions,
-        member_vars  => $member_vars,
-        inert_vars   => $inert_vars,
-        children     => [],
-        parent       => undef,
-        attributes   => $attributes,
-        autocode     => '',
-        tree_grown   => 0,
-        meth_by_name => \%meth_by_name,
-        func_by_name => \%func_by_name,
+        micro_sym => 'class',
     );
-    $self->{cnick} ||= $self->{class_cnick};
+
+    $cnick{$self}             = $self->get_class_cnick;
+    $struct_sym{$self}        = $struct_sym;
+    $parent_class_name{$self} = $parent_class_name;
+    $source_class{$self}      = $source_class;
+    $docucomment{$self}       = $docucomment;
+    $children{$self}          = [];
+    $parent{$self}            = undef;
+    $autocode{$self}          = '';
+    $tree_grown{$self}        = 0;
+    $inert{$self}             = $inert;
+    $final{$self}             = $final;
+    $attributes{$self}        = $attributes;
+    $meth_by_name{$self}      = \%methods_by_name;
+    $func_by_name{$self}      = \%functions_by_name;
+    $functions{$self}         = $functions;
+    $methods{$self}           = $methods;
+    $member_vars{$self}       = $member_vars;
+    $inert_vars{$self}        = $inert_vars;
+    $overridden{$self}        = {};
 
     # Store in registry.
     my $key      = $self->full_struct_sym;
@@ -165,6 +197,29 @@ sub create {
     $registry{$key} = $self;
 
     return $self;
+}
+
+sub DESTROY {
+    my $self = shift;
+    delete $cnick{$self};
+    delete $struct_sym{$self};
+    delete $parent_class_name{$self};
+    delete $source_class{$self};
+    delete $docucomment{$self};
+    delete $parent{$self};
+    delete $children{$self};
+    delete $autocode{$self};
+    delete $inert{$self};
+    delete $final{$self};
+    delete $attributes{$self};
+    delete $meth_by_name{$self};
+    delete $func_by_name{$self};
+    delete $tree_grown{$self};
+    delete $functions{$self};
+    delete $methods{$self};
+    delete $member_vars{$self};
+    delete $inert_vars{$self};
+    delete $overridden{$self};
 }
 
 sub file_path {
@@ -185,34 +240,36 @@ sub include_h {
 
 sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
 
-sub get_cnick             { shift->{cnick} }
-sub get_struct_sym        { shift->{struct_sym} }
-sub get_parent_class_name { shift->{parent_class_name} }
-sub get_source_class      { shift->{source_class} }
-sub get_docucomment       { shift->{docucomment} }
-sub get_parent            { shift->{parent} }
-sub get_autocode          { shift->{autocode} }
-sub inert                 { shift->{inert} }
-sub final                 { shift->{final} }
-sub _get_attributes       { shift->{attributes} }
-sub _meth_by_name         { shift->{meth_by_name} }
-sub _func_by_name         { shift->{func_by_name} }
-sub _tree_grown           { shift->{tree_grown} }
+sub get_cnick             { $cnick{ +shift } }
+sub get_struct_sym        { $struct_sym{ +shift } }
+sub get_parent_class_name { $parent_class_name{ +shift } }
+sub get_source_class      { $source_class{ +shift } }
+sub get_docucomment       { $docucomment{ +shift } }
+sub get_parent            { $parent{ +shift } }
+sub get_autocode          { $autocode{ +shift } }
+sub inert                 { $inert{ +shift } }
+sub final                 { $final{ +shift } }
+sub _get_attributes       { $attributes{ +shift } }
+sub _meth_by_name         { $meth_by_name{ +shift } }
+sub _func_by_name         { $func_by_name{ +shift } }
+sub _tree_grown           { $tree_grown{ +shift } }
 
-sub set_parent { $_[0]->{parent} = $_[1] }
+sub set_parent      { $parent{ $_[0] }     = $_[1] }
+sub _set_tree_grown { $tree_grown{ $_[0] } = $_[1] }
+sub _set_methods    { $methods{ $_[0] }    = $_[1] }
 
 sub full_struct_sym  { $_[0]->get_prefix . $_[0]->get_struct_sym }
 sub short_vtable_var { uc( shift->get_struct_sym ) }
 sub full_vtable_var  { $_[0]->get_PREFIX . $_[0]->short_vtable_var }
 sub full_vtable_type { shift->full_vtable_var . '_VT' }
 
-sub append_autocode { $_[0]->{autocode} .= $_[1] }
+sub append_autocode { $autocode{ $_[0] } .= $_[1] }
 
-sub functions   { shift->{functions} }
-sub methods     { shift->{methods} }
-sub member_vars { shift->{member_vars} }
-sub inert_vars  { shift->{inert_vars} }
-sub children    { shift->{children} }
+sub functions   { $functions{ +shift } }
+sub methods     { $methods{ +shift } }
+sub member_vars { $member_vars{ +shift } }
+sub inert_vars  { $inert_vars{ +shift } }
+sub children    { $children{ +shift } }
 
 sub novel_methods {
     my $self    = shift;
@@ -280,7 +337,7 @@ sub grow_tree {
     $self->_bequeath_member_vars;
     $self->_generate_automethods;
     $self->_bequeath_methods;
-    $self->{tree_grown} = 1;
+    $self->_set_tree_grown(1);
 }
 
 # Let the children know who their parent class is.
@@ -289,7 +346,7 @@ sub _establish_ancestry {
     for my $child ( @{ $self->children } ) {
         # This is a circular reference and thus a memory leak, but we don't
         # care, because we have to have everything in memory at once anyway.
-        $child->{parent} = $self;
+        $child->set_parent($self);
         $child->_establish_ancestry;
     }
 }
@@ -344,11 +401,11 @@ sub _bequeath_methods {
             }
             push @new_method_set, $meth;
         }
-        $child->{methods} = \@new_method_set;
+        $child->_set_methods(\@new_method_set);
 
         # Pass it all down to the next generation.
         $child->_bequeath_methods;
-        $child->{tree_grown} = 1;
+        $child->_set_tree_grown(1);
     }
 }
 
