@@ -260,6 +260,14 @@ CODE:
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
+int
+equals(self, other)
+    CFCSymbol *self;
+    CFCSymbol *other;
+CODE:
+    RETVAL = CFCSymbol_equals(self, other);
+OUTPUT: RETVAL
+
 void
 DESTROY(self)
     CFCSymbol *self;

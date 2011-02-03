@@ -61,28 +61,6 @@ sub new {
         $micro_sym );
 }
 
-sub equals {
-    my ( $self, $other ) = @_;
-    return 0 unless a_isa_b( $other, __PACKAGE__ );
-    return 0 unless $self->micro_sym eq $other->micro_sym;
-    return 0 unless $self->get_parcel->equals( $other->get_parcel );
-    if ( defined $self->get_exposure ) {
-        return 0 unless defined $other->get_exposure;
-        return 0 unless $self->get_exposure eq $other->get_exposure;
-    }
-    else {
-        return 0 if defined $other->get_exposure;
-    }
-    if ( defined $self->get_class_name ) {
-        return 0 unless defined $other->get_class_name;
-        return 0 unless $self->get_class_name eq $other->get_class_name;
-    }
-    else {
-        return 0 if defined $other->get_class_name;
-    }
-    return 1;
-}
-
 1;
 
 __END__

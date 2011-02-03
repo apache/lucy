@@ -41,6 +41,9 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel, const char *exposure,
 void
 CFCSymbol_destroy(CFCSymbol *self);
 
+int
+CFCSymbol_equals(CFCSymbol *self, CFCSymbol *other);
+
 struct CFCParcel*
 CFCSymbol_get_parcel(CFCSymbol *self);
 

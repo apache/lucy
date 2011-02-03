@@ -207,6 +207,24 @@ CFCSymbol_destroy(CFCSymbol *self)
 }
 
 int
+CFCSymbol_equals(CFCSymbol *self, CFCSymbol *other)
+{
+    if (strcmp(self->micro_sym, other->micro_sym) != 0) { return false; }
+    if (!CFCParcel_equals(self->parcel, other->parcel)) { return false; }
+    if (strcmp(self->exposure, other->exposure) != 0) { return false; }
+    if (self->class_name) {
+        if (!other->class_name) { return false; }
+        if (strcmp(self->class_name, other->class_name) != 0) { 
+            return false;
+        }
+    }
+    else if (other->class_name) {
+        return false; 
+    }
+    return true;
+}
+
+int
 CFCSymbol_public(CFCSymbol *self)
 {
     return !strcmp(self->exposure, "public");
