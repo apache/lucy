@@ -53,6 +53,18 @@ CFCSymbol_get_class_cnick(CFCSymbol *self);
 const char*
 CFCSymbol_get_exposure(CFCSymbol *self);
 
+int
+CFCSymbol_public(CFCSymbol *self);
+
+int
+CFCSymbol_parcel(CFCSymbol *self);
+
+int
+CFCSymbol_private(CFCSymbol *self);
+
+int
+CFCSymbol_local(CFCSymbol *self);
+
 const char*
 CFCSymbol_micro_sym(CFCSymbol *self);
 

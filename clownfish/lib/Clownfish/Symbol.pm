@@ -61,11 +61,6 @@ sub new {
         $micro_sym );
 }
 
-sub public  { shift->get_exposure eq 'public' }
-sub private { shift->get_exposure eq 'private' }
-sub parcel  { shift->get_exposure eq 'parcel' }
-sub local   { shift->get_exposure eq 'local' }
-
 sub full_sym {
     my $self   = shift;
     return $self->get_prefix . $self->short_sym;

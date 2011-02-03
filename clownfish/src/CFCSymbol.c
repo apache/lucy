@@ -179,6 +179,32 @@ CFCSymbol_destroy(CFCSymbol *self)
     free(self);
 }
 
+int
+CFCSymbol_public(CFCSymbol *self)
+{
+    return !strcmp(self->exposure, "public");
+}
+
+int
+CFCSymbol_parcel(CFCSymbol *self)
+{
+    return !strcmp(self->exposure, "parcel");
+}
+
+int
+CFCSymbol_private(CFCSymbol *self)
+{
+    return !strcmp(self->exposure, "private");
+}
+
+int
+CFCSymbol_local(CFCSymbol *self)
+{
+    return !strcmp(self->exposure, "local");
+}
+
+
+
 struct CFCParcel*
 CFCSymbol_get_parcel(CFCSymbol *self)
 {

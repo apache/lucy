@@ -278,6 +278,10 @@ ALIAS:
     get_prefix      = 12
     get_Prefix      = 14
     get_PREFIX      = 16
+    public          = 18
+    private         = 20
+    parcel          = 22
+    local           = 24
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -324,6 +328,18 @@ PPCODE:
                 const char *value = CFCSymbol_get_PREFIX(self);
                 retval = newSVpvn(value, strlen(value));
             }
+            break;
+        case 18:
+            retval = newSViv(CFCSymbol_public(self));
+            break;
+        case 20:
+            retval = newSViv(CFCSymbol_private(self));
+            break;
+        case 22:
+            retval = newSViv(CFCSymbol_parcel(self));
+            break;
+        case 24:
+            retval = newSViv(CFCSymbol_local(self));
             break;
     END_SET_OR_GET_SWITCH
 }
