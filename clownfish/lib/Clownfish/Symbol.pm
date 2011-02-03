@@ -61,16 +61,6 @@ sub new {
         $micro_sym );
 }
 
-sub full_sym {
-    my $self   = shift;
-    return $self->get_prefix . $self->short_sym;
-}
-
-sub short_sym {
-    my $self = shift;
-    return $self->get_class_cnick . '_' . $self->micro_sym;
-}
-
 sub equals {
     my ( $self, $other ) = @_;
     return 0 unless a_isa_b( $other, __PACKAGE__ );

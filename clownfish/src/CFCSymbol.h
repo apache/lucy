@@ -24,6 +24,8 @@ struct CFCSymbol {
     const char *class_name;
     const char *class_cnick;
     const char *micro_sym;
+    const char *short_sym;
+    const char *full_sym;
 };
 #endif
 
@@ -67,6 +69,12 @@ CFCSymbol_local(CFCSymbol *self);
 
 const char*
 CFCSymbol_micro_sym(CFCSymbol *self);
+
+const char*
+CFCSymbol_short_sym(CFCSymbol *self);
+
+const char*
+CFCSymbol_full_sym(CFCSymbol *self);
 
 const char*
 CFCSymbol_get_prefix(CFCSymbol *self);

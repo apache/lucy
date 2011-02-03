@@ -282,6 +282,8 @@ ALIAS:
     private         = 20
     parcel          = 22
     local           = 24
+    short_sym       = 26
+    full_sym        = 28
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -340,6 +342,16 @@ PPCODE:
             break;
         case 24:
             retval = newSViv(CFCSymbol_local(self));
+            break;
+        case 26: {
+                const char *short_sym = CFCSymbol_short_sym(self);
+                retval = newSVpvn(short_sym, strlen(short_sym));
+            }
+            break;
+        case 28: {
+                const char *full_sym = CFCSymbol_full_sym(self);
+                retval = newSVpvn(full_sym, strlen(full_sym));
+            }
             break;
     END_SET_OR_GET_SWITCH
 }
