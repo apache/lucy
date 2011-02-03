@@ -20,6 +20,7 @@ package Clownfish::Parcel;
 use base qw( Exporter );
 use Clownfish;
 use Clownfish::Util qw( verify_args );
+use Scalar::Util qw( blessed );
 use Carp;
 
 our %singleton_PARAMS = (
@@ -32,6 +33,21 @@ sub singleton {
     verify_args( \%singleton_PARAMS, %args ) or confess $@;
     my $package = ref($either) || $either;
     return $package->_singleton( @args{qw( name cnick )} );
+}
+
+sub acquire {
+    my ( undef, $thing ) = @_;
+    if ( !defined $thing ) {
+        return Clownfish::Parcel->default_parcel;
+    }
+    elsif ( blessed($thing) ) {
+        confess("Not a Clownfish::Parcel")
+            unless $thing->isa('Clownfish::Parcel');
+        return $thing;
+    }
+    else {
+        return Clownfish::Parcel->singleton( name => $thing );
+    }
 }
 
 1;
@@ -95,6 +111,14 @@ Return the singleton for default parcel, which has no prefix.
 =head2 get_prefix get_Prefix get_PREFIX
 
 Return one of the three capitalization variants for the parcel's prefix.
+
+=head2 acquire
+
+    $parcel = Clownfish::Parcel->aquire($parcel_name_or_parcel_object);
+
+Aquire a parcel one way or another.  If the supplied argument is a Parcel,
+return it.  If it's not defined, return the default Parcel.  If it's a name,
+invoke singleton().
 
 =head2 get_name get_cnick
 

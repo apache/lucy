@@ -19,8 +19,7 @@ use warnings;
 package Clownfish::Symbol;
 use Clownfish;
 use Clownfish::Parcel;
-use Clownfish::Util qw( a_isa_b verify_args );
-use Scalar::Util qw( blessed );
+use Clownfish::Util qw( verify_args );
 use Carp;
 
 my %new_PARAMS = (
@@ -31,34 +30,13 @@ my %new_PARAMS = (
     micro_sym   => undef,
 );
 
-my $struct_regex     = qr/[A-Z]+[A-Z0-9]*[a-z]+[A-Za-z0-9]*/;
-my $class_name_regex = qr/^$struct_regex(::$struct_regex)*$/;
-
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $class_name  = delete $args{class_name};
-    my $class_cnick = delete $args{class_cnick};
-    my $micro_sym   = delete $args{micro_sym};
-    my $parcel      = delete $args{parcel};
-    my $exposure    = delete $args{exposure};
-
-    # Acquire a Parcel.
-    if ( !defined $parcel ) {
-        $parcel = Clownfish::Parcel->default_parcel;
-    }
-    elsif ( blessed($parcel) ) {
-        confess("Not a Clownfish::Parcel")
-            unless $parcel->isa('Clownfish::Parcel');
-    }
-    else {
-        $parcel = Clownfish::Parcel->singleton( name => $parcel );
-    }
-
-    # Create the object.
+    $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
     my $class_class = ref($either) || $either;
-    return $class_class->_new( $parcel, $exposure, $class_name, $class_cnick,
-        $micro_sym );
+    return $class_class->_new(
+        @args{qw( parcel exposure class_name class_cnick micro_sym )} );
 }
 
 1;
