@@ -22,8 +22,6 @@ use Clownfish;
 use Clownfish::Util qw( verify_args );
 use Carp;
 
-our %parcels;
-
 our %singleton_PARAMS = (
     name  => undef,
     cnick => undef,
@@ -32,28 +30,8 @@ our %singleton_PARAMS = (
 sub singleton {
     my ( $either, %args ) = @_;
     verify_args( \%singleton_PARAMS, %args ) or confess $@;
-    my ( $name, $cnick ) = @args{qw( name cnick )};
-
-    # Return the default parcel for either a blank name or an undefined name.
-    return __PACKAGE__->default_parcel unless $name;
-
-    # Return an existing singleton if the parcel has already been registered.
-    my $existing = $parcels{$name};
-    if ($existing) {
-        if ( $cnick and $cnick ne $existing->get_cnick ) {
-            confess(  "cnick '$cnick' for parcel '$name' conflicts with '"
-                    . $existing->get_cnick
-                    . "'" );
-        }
-        return $existing;
-    }
-
-    # Register new parcel.  Default cnick to name.
     my $package = ref($either) || $either;
-    my $self = $package->_new($name, $cnick);
-    $parcels{$name} = $self;
-
-    return $self;
+    return $package->_singleton( @args{qw( name cnick )} );
 }
 
 1;

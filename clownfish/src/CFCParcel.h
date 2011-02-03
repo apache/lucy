@@ -17,6 +17,9 @@
 typedef struct CFCParcel CFCParcel;
 
 CFCParcel*
+CFCParcel_singleton(const char *name, const char *cnick);
+
+CFCParcel*
 CFCParcel_new(const char *name, const char *cnick);
 
 CFCParcel*
@@ -45,4 +48,7 @@ CFCParcel_get_Prefix(CFCParcel *self);
 
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self);
+
+void*
+CFCParcel_get_perl_object(CFCParcel *self);
 

@@ -162,16 +162,16 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Parcel
 
 SV*
-_new(klass, name_sv, cnick_sv)
+_singleton(klass, name_sv, cnick_sv)
     const char *klass;
     SV *name_sv;
     SV *cnick_sv;
 CODE:
     const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
     const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
-    CFCParcel *self = CFCParcel_new(name, cnick);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    CFCParcel *self = CFCParcel_singleton(name, cnick);
+    SV *inner_object = SvRV((SV*)CFCParcel_get_perl_object(self));
+    RETVAL = newRV(inner_object);
 OUTPUT: RETVAL
 
 void
@@ -191,14 +191,9 @@ OUTPUT: RETVAL
 SV*
 default_parcel(...)
 CODE:
-    static SV *default_parcel_sv = NULL;
-    if (default_parcel_sv == NULL) {
-        // This leaks, but that's OK.
-        CFCParcel *default_parcel = CFCParcel_default_parcel();
-        default_parcel_sv = newSV(0);
-        sv_setref_pv(default_parcel_sv, "Clownfish::Parcel", (void*)default_parcel);
-    }
-    RETVAL = newSVsv(default_parcel_sv);
+    CFCParcel *default_parcel = CFCParcel_default_parcel();
+    SV *inner_obj = SvRV((SV*)CFCParcel_get_perl_object(default_parcel));
+    RETVAL = newRV(inner_obj);
 OUTPUT: RETVAL
 
 void

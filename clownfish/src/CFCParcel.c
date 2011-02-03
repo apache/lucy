@@ -32,7 +32,50 @@ struct CFCParcel {
     const char *prefix;
     const char *Prefix;
     const char *PREFIX;
+    void       *perl_object;
 };
+
+#define MAX_PARCELS 100
+static CFCParcel *registry[MAX_PARCELS + 1];
+static int first_time = true;
+
+CFCParcel*
+CFCParcel_singleton(const char *name, const char *cnick)
+{
+    // Set up registry.
+    if (first_time) {
+        size_t i;
+        for (i = 1; i < MAX_PARCELS; i++) { registry[i] = NULL; }
+        first_time = false;
+    }
+
+    // Return the default parcel for either a blank name or a NULL name.
+    if (!name || !strlen(name)) {
+        return CFCParcel_default_parcel();
+    }
+
+    // Return an existing singleton if the parcel has already been registered.
+    size_t i;
+    for (i = 1; registry[i] != NULL; i++) {
+        CFCParcel *existing = registry[i];
+        if (strcmp(existing->name, name) == 0) {
+            if (cnick && strcmp(existing->cnick, cnick) != 0) {
+                croak("cnick '%s' for parcel '%s' conflicts with '%s'", 
+                    cnick, name, existing->cnick);
+            }
+            return existing;
+        }
+    }
+    if (i == MAX_PARCELS) {
+        croak("Exceeded maximum number of parcels (%d)", MAX_PARCELS);
+    }
+
+    // Register new parcel.
+    CFCParcel *singleton = CFCParcel_new(name, cnick);
+    registry[i] = singleton;
+
+    return singleton;
+}
 
 static int
 S_validate_name_or_cnick(const char *orig)
@@ -68,7 +111,8 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
         }
         self->cnick = savepv(cnick);
     }
-    else {
+    else {  
+        // Default cnick to name.
         self->cnick = savepv(name);
     }
     
@@ -95,6 +139,9 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
     *((char*)&self->Prefix[prefix_len]) = '\0';
     *((char*)&self->PREFIX[prefix_len]) = '\0';
 
+    self->perl_object = newSV(0);
+	sv_setref_pv(self->perl_object, "Clownfish::Parcel", (void*)self);
+
     return self;
 }
 
@@ -116,6 +163,7 @@ CFCParcel_default_parcel(void)
 {
     if (default_parcel == NULL) {
         default_parcel = CFCParcel_new("DEFAULT", "");
+        registry[0] = default_parcel;
     }
     return default_parcel;
 }
@@ -158,4 +206,9 @@ CFCParcel_get_PREFIX(CFCParcel *self)
     return self->PREFIX;
 }
 
+void*
+CFCParcel_get_perl_object(CFCParcel *self)
+{
+    return self->perl_object;
+}
 
