@@ -29,21 +29,13 @@ our %singleton_PARAMS = (
     cnick => undef,
 );
 
-# Create the default parcel.
-our $default_parcel = __PACKAGE__->singleton(
-    name  => 'DEFAULT',
-    cnick => '',
-);
-
-sub default_parcel {$default_parcel}
-
 sub singleton {
     my ( $either, %args ) = @_;
     verify_args( \%singleton_PARAMS, %args ) or confess $@;
     my ( $name, $cnick ) = @args{qw( name cnick )};
 
     # Return the default parcel for either a blank name or an undefined name.
-    return $default_parcel unless $name;
+    return __PACKAGE__->default_parcel unless $name;
 
     # Return an existing singleton if the parcel has already been registered.
     my $existing = $parcels{$name};
@@ -62,13 +54,6 @@ sub singleton {
     $parcels{$name} = $self;
 
     return $self;
-}
-
-sub equals {
-    my ( $self, $other ) = @_;
-    return 0 unless $self->get_name  eq $other->get_name;
-    return 0 unless $self->get_cnick eq $other->get_cnick;
-    return 1;
 }
 
 1;

@@ -180,6 +180,27 @@ DESTROY(self)
 PPCODE:
     CFCParcel_destroy(self);
 
+int
+equals(self, other)
+    CFCParcel *self;
+    CFCParcel *other;
+CODE:
+    RETVAL = CFCParcel_equals(self, other);
+OUTPUT: RETVAL
+
+SV*
+default_parcel(...)
+CODE:
+    static SV *default_parcel_sv = NULL;
+    if (default_parcel_sv == NULL) {
+        // This leaks, but that's OK.
+        CFCParcel *default_parcel = CFCParcel_default_parcel();
+        default_parcel_sv = newSV(0);
+        sv_setref_pv(default_parcel_sv, "Clownfish::Parcel", (void*)default_parcel);
+    }
+    RETVAL = newSVsv(default_parcel_sv);
+OUTPUT: RETVAL
+
 void
 _set_or_get(self, ...)
     CFCParcel *self;

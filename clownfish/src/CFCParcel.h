@@ -25,6 +25,12 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick);
 void
 CFCParcel_destroy(CFCParcel *self);
 
+CFCParcel*
+CFCParcel_default_parcel(void);
+
+int
+CFCParcel_equals(CFCParcel *self, CFCParcel *other);
+
 const char*
 CFCParcel_get_name(CFCParcel *self);
 

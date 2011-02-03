@@ -109,6 +109,24 @@ CFCParcel_destroy(CFCParcel *self)
     free(self);
 }
 
+static CFCParcel *default_parcel = NULL;
+
+CFCParcel*
+CFCParcel_default_parcel(void)
+{
+    if (default_parcel == NULL) {
+        default_parcel = CFCParcel_new("DEFAULT", "");
+    }
+    return default_parcel;
+}
+
+int
+CFCParcel_equals(CFCParcel *self, CFCParcel *other)
+{
+    if (strcmp(self->name, other->name)) { return false; }
+    if (strcmp(self->cnick, other->cnick)) { return false; }
+    return true;
+}
 
 const char*
 CFCParcel_get_name(CFCParcel *self)
