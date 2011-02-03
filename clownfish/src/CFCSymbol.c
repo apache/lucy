@@ -28,14 +28,12 @@
 
 #define CFC_NEED_SYMBOL_STRUCT_DEF
 #include "CFCSymbol.h"
+#include "CFCParcel.h"
 
 CFCSymbol*
-CFCSymbol_new(void *parcel, const char *exposure, const char *class_name, 
-              const char *class_cnick, const char *micro_sym);
-
-CFCSymbol*
-CFCSymbol_new(void *parcel, const char *exposure, const char *class_name, 
-              const char *class_cnick, const char *micro_sym)
+CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, 
+              const char *class_name, const char *class_cnick, 
+              const char *micro_sym)
 {
     CFCSymbol *self = (CFCSymbol*)malloc(sizeof(CFCSymbol));
     if (!self) { croak("malloc failed"); }
@@ -122,11 +120,11 @@ S_validate_identifier(const char *identifier)
 }
 
 CFCSymbol*
-CFCSymbol_init(CFCSymbol *self, void *parcel, const char *exposure, 
-               const char *class_name, const char *class_cnick, 
-               const char *micro_sym)
+CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel, 
+               const char *exposure, const char *class_name, 
+               const char *class_cnick, const char *micro_sym)
 {
-    self->parcel = newSVsv((SV*)parcel);
+    self->parcel = parcel;
 
     // Validate exposure.
     if (!S_validate_exposure(exposure)) {
@@ -173,7 +171,7 @@ CFCSymbol_init(CFCSymbol *self, void *parcel, const char *exposure,
 void
 CFCSymbol_destroy(CFCSymbol *self)
 {
-    SvREFCNT_dec((SV*)self->parcel);
+    // SvREFCNT_dec((SV*)self->parcel);
     Safefree(self->exposure);
     Safefree(self->class_name);
     Safefree(self->class_cnick);
@@ -181,7 +179,7 @@ CFCSymbol_destroy(CFCSymbol *self)
     free(self);
 }
 
-void*
+struct CFCParcel*
 CFCSymbol_get_parcel(CFCSymbol *self)
 {
     return self->parcel;
@@ -209,5 +207,23 @@ const char*
 CFCSymbol_micro_sym(CFCSymbol *self)
 {
     return self->micro_sym;
+}
+
+const char*
+CFCSymbol_get_prefix(CFCSymbol *self)
+{
+    return CFCParcel_get_prefix(self->parcel);
+}
+
+const char*
+CFCSymbol_get_Prefix(CFCSymbol *self)
+{
+    return CFCParcel_get_Prefix(self->parcel);
+}
+
+const char*
+CFCSymbol_get_PREFIX(CFCSymbol *self)
+{
+    return CFCParcel_get_PREFIX(self->parcel);
 }
 

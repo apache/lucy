@@ -242,7 +242,7 @@ MODULE = Clownfish    PACKAGE = Clownfish::Symbol
 SV*
 _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
     const char *klass;
-    SV *parcel;
+    CFCParcel *parcel;
     const char *exposure;
     SV *class_name_sv;
     SV *class_cnick_sv;
@@ -275,11 +275,16 @@ ALIAS:
     get_class_cnick = 6
     get_exposure    = 8
     micro_sym       = 10
+    get_prefix      = 12
+    get_Prefix      = 14
+    get_PREFIX      = 16
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
-        case 2:
-            retval = newSVsv((SV*)CFCSymbol_get_parcel(self));
+        case 2: {
+                struct CFCParcel *parcel = CFCSymbol_get_parcel(self);
+                retval = newSVsv((SV*)CFCParcel_get_perl_object(parcel));
+            }
             break;
         case 4: {
                 const char *class_name = CFCSymbol_get_class_name(self);
@@ -303,6 +308,21 @@ PPCODE:
         case 10: {
                 const char *micro_sym = CFCSymbol_micro_sym(self);
                 retval = newSVpvn(micro_sym, strlen(micro_sym));
+            }
+            break;
+        case 12: {
+                const char *value = CFCSymbol_get_prefix(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 14: {
+                const char *value = CFCSymbol_get_Prefix(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 16: {
+                const char *value = CFCSymbol_get_PREFIX(self);
+                retval = newSVpvn(value, strlen(value));
             }
             break;
     END_SET_OR_GET_SWITCH

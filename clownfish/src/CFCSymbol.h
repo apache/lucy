@@ -15,10 +15,11 @@
  */
 
 typedef struct CFCSymbol CFCSymbol;
+struct CFCParcel;
 
 #ifdef CFC_NEED_SYMBOL_STRUCT_DEF
 struct CFCSymbol {
-    void *parcel;
+    struct CFCParcel *parcel;
     const char *exposure;
     const char *class_name;
     const char *class_cnick;
@@ -27,18 +28,18 @@ struct CFCSymbol {
 #endif
 
 CFCSymbol*
-CFCSymbol_new(void *parcel, const char *exposure, const char *class_name, 
+CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, const char *class_name, 
               const char *class_cnick, const char *micro_sym);
 
 CFCSymbol*
-CFCSymbol_init(CFCSymbol *self, void *parcel, const char *exposure, 
+CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel, const char *exposure, 
                const char *class_name, const char *class_cnick, 
                const char *micro_sym);
 
 void
 CFCSymbol_destroy(CFCSymbol *self);
 
-void*
+struct CFCParcel*
 CFCSymbol_get_parcel(CFCSymbol *self);
 
 // May be NULL.
@@ -54,4 +55,13 @@ CFCSymbol_get_exposure(CFCSymbol *self);
 
 const char*
 CFCSymbol_micro_sym(CFCSymbol *self);
+
+const char*
+CFCSymbol_get_prefix(CFCSymbol *self);
+
+const char*
+CFCSymbol_get_Prefix(CFCSymbol *self);
+
+const char*
+CFCSymbol_get_PREFIX(CFCSymbol *self);
 

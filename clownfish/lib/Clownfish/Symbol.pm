@@ -61,10 +61,6 @@ sub new {
         $micro_sym );
 }
 
-sub get_prefix { shift->get_parcel->get_prefix; }
-sub get_Prefix { shift->get_parcel->get_Prefix; }
-sub get_PREFIX { shift->get_parcel->get_PREFIX; }
-
 sub public  { shift->get_exposure eq 'public' }
 sub private { shift->get_exposure eq 'private' }
 sub parcel  { shift->get_exposure eq 'parcel' }
