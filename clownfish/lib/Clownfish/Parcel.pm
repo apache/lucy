@@ -18,6 +18,7 @@ use warnings;
 
 package Clownfish::Parcel;
 use base qw( Exporter );
+use Clownfish;
 use Clownfish::Util qw( verify_args );
 use Carp;
 
@@ -56,24 +57,12 @@ sub singleton {
     }
 
     # Register new parcel.  Default cnick to name.
-    my $self = bless { %singleton_PARAMS, %args, }, ref($either) || $either;
-    defined $self->get_cnick or $self->{cnick} = $self->get_name;
+    my $package = ref($either) || $either;
+    my $self = $package->_new($name, $cnick);
     $parcels{$name} = $self;
-
-    # Pre-generate prefixes.
-    $self->{Prefix} = length $self->get_cnick ? $self->get_cnick . '_' : "";
-    $self->{prefix} = lc( $self->get_Prefix );
-    $self->{PREFIX} = uc( $self->get_Prefix );
 
     return $self;
 }
-
-# Accessors.
-sub get_prefix { shift->{prefix} }
-sub get_Prefix { shift->{Prefix} }
-sub get_PREFIX { shift->{PREFIX} }
-sub get_name   { shift->{name} }
-sub get_cnick  { shift->{cnick} }
 
 sub equals {
     my ( $self, $other ) = @_;

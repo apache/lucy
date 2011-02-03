@@ -14,9 +14,29 @@
  * limitations under the License.
  */
 
-#include "CFCDocuComment.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
+typedef struct CFCParcel CFCParcel;
+
+CFCParcel*
+CFCParcel_new(const char *name, const char *cnick);
+
+CFCParcel*
+CFCParcel_init(CFCParcel *self, const char *name, const char *cnick);
+
+void
+CFCParcel_destroy(CFCParcel *self);
+
+const char*
+CFCParcel_get_name(CFCParcel *self);
+
+const char*
+CFCParcel_get_cnick(CFCParcel *self);
+
+const char*
+CFCParcel_get_prefix(CFCParcel *self);
+
+const char*
+CFCParcel_get_Prefix(CFCParcel *self);
+
+const char*
+CFCParcel_get_PREFIX(CFCParcel *self);
 

@@ -159,6 +159,68 @@ PPCODE:
 }
 
 
+MODULE = Clownfish    PACKAGE = Clownfish::Parcel
+
+SV*
+_new(klass, name_sv, cnick_sv)
+    const char *klass;
+    SV *name_sv;
+    SV *cnick_sv;
+CODE:
+    const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
+    const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
+    CFCParcel *self = CFCParcel_new(name, cnick);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCParcel *self;
+PPCODE:
+    CFCParcel_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCParcel *self;
+ALIAS:
+    get_name   = 2
+    get_cnick  = 4
+    get_prefix = 6
+    get_Prefix = 8
+    get_PREFIX = 10
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *name = CFCParcel_get_name(self);
+                retval = newSVpvn(name, strlen(name));
+            }
+            break;
+        case 4: {
+                const char *cnick = CFCParcel_get_cnick(self);
+                retval = newSVpvn(cnick, strlen(cnick));
+            }
+            break;
+        case 6: {
+                const char *value = CFCParcel_get_prefix(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 8: {
+                const char *value = CFCParcel_get_Prefix(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 10: {
+                const char *value = CFCParcel_get_PREFIX(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
+
 MODULE = Clownfish    PACKAGE = Clownfish::Symbol
 
 SV*
