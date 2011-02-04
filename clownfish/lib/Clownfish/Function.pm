@@ -48,7 +48,10 @@ sub new {
     my $docucomment = delete $args{docucomment};
     my $inline      = delete $args{inline} || 0;
     $args{exposure} ||= 'parcel';
-    my $self = $either->SUPER::new(%args);
+    $args{parcel} = Clownfish::Parcel->acquire($args{parcel});
+    my $class_class = ref($either) || $either;
+    my $self = $class_class->_new(
+        @args{ qw( parcel exposure class_name class_cnick micro_sym ) } );
     $return_type{$self} = $return_type;
     $param_list{$self}  = $param_list;
     $docucomment{$self} = $docucomment;
@@ -75,7 +78,7 @@ sub DESTROY {
     delete $param_list{$self};
     delete $docucomment{$self};
     delete $inline{$self};
-    $self->SUPER::DESTROY;
+    $self->_destroy;
 }
 
 sub get_return_type { $return_type{ +shift } }

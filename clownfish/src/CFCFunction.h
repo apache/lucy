@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
-#include "CFCDocuComment.h"
-#include "CFCFunction.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
+typedef struct CFCFunction CFCFunction;
+
+#ifdef CFC_NEED_FUNCTION_STRUCT_DEF
+    #define CFC_NEED_SYMBOL_STRUCT_DEF
+    #include "CFCSymbol.h"
+    struct CFCFunction {
+        CFCSymbol symbol;
+    };
+#endif
+
+
+CFCFunction*
+CFCFunction_new(void *parcel, const char *exposure, const char *class_name, 
+                const char *class_cnick, const char *micro_sym);
+
+CFCFunction*
+CFCFunction_init(CFCFunction *self, void *parcel, const char *exposure, 
+               const char *class_name, const char *class_cnick, 
+               const char *micro_sym);
+
+void
+CFCFunction_destroy(CFCFunction *self);
 
