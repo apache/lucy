@@ -24,27 +24,61 @@
 
 CFCFunction*
 CFCFunction_new(void *parcel, const char *exposure, const char *class_name, 
-                const char *class_cnick, const char *micro_sym)
+                const char *class_cnick, const char *micro_sym, 
+                void *return_type, void *param_list, void *docucomment, 
+                int is_inline)
 {
     CFCFunction *self = (CFCFunction*)malloc(sizeof(CFCFunction));
     if (!self) { croak("malloc failed"); }
     return CFCFunction_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym);
+        micro_sym, return_type, param_list, docucomment, is_inline);
 }
 
 CFCFunction*
 CFCFunction_init(CFCFunction *self, void *parcel, const char *exposure, 
                const char *class_name, const char *class_cnick, 
-               const char *micro_sym)
+               const char *micro_sym, void *return_type, void *param_list, 
+               void *docucomment, int is_inline)
 {
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
         class_cnick, micro_sym);
+    self->return_type = newSVsv((SV*)return_type);
+    self->param_list  = newSVsv((SV*)param_list);
+    self->docucomment = docucomment ? newSVsv((SV*)docucomment) : NULL;
+    self->is_inline   = is_inline;
     return self;
 }
 
 void
 CFCFunction_destroy(CFCFunction *self)
 {
+    SvREFCNT_dec((SV*)self->return_type);
+    SvREFCNT_dec((SV*)self->param_list);
+    SvREFCNT_dec((SV*)self->docucomment);
     CFCSymbol_destroy((CFCSymbol*)self);
+}
+
+void*
+CFCFunction_get_return_type(CFCFunction *self)
+{
+    return self->return_type;
+}
+
+void*
+CFCFunction_get_param_list(CFCFunction *self)
+{
+    return self->param_list;
+}
+
+void*
+CFCFunction_get_docucomment(CFCFunction *self)
+{
+    return self->docucomment;
+}
+
+int
+CFCFunction_inline(CFCFunction *self)
+{
+    return self->is_inline;
 }
 

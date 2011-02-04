@@ -23,11 +23,6 @@ use Clownfish::Util qw( verify_args a_isa_b );
 use Clownfish::Type;
 use Clownfish::ParamList;
 
-our %return_type;
-our %param_list;
-our %docucomment;
-our %inline;
-
 my %new_PARAMS = (
     return_type => undef,
     class_name  => undef,
@@ -43,19 +38,13 @@ my %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $return_type = delete $args{return_type};
-    my $param_list  = delete $args{param_list};
-    my $docucomment = delete $args{docucomment};
-    my $inline      = delete $args{inline} || 0;
+    $args{inline} ||= 0;
     $args{exposure} ||= 'parcel';
     $args{parcel} = Clownfish::Parcel->acquire($args{parcel});
     my $class_class = ref($either) || $either;
     my $self = $class_class->_new(
-        @args{ qw( parcel exposure class_name class_cnick micro_sym ) } );
-    $return_type{$self} = $return_type;
-    $param_list{$self}  = $param_list;
-    $docucomment{$self} = $docucomment;
-    $inline{$self}      = $inline;
+        @args{ qw( parcel exposure class_name class_cnick micro_sym
+            return_type param_list docucomment inline ) } );
 
     # Validate.
     for (qw( return_type class_name param_list )) {
@@ -65,26 +54,12 @@ sub new {
     confess( "Invalid micro_sym: '" . $self->micro_sym . "'" )
         unless $self->micro_sym =~ /^[a-z0-9_]+$/;
     confess 'param_list must be a ParamList object'
-        unless a_isa_b( $param_list, "Clownfish::ParamList" );
+        unless a_isa_b( $self->get_param_list, "Clownfish::ParamList" );
     confess 'return_type must be a Type object'
-        unless a_isa_b( $return_type, "Clownfish::Type" );
+        unless a_isa_b( $self->get_return_type, "Clownfish::Type" );
 
     return $self;
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $return_type{$self};
-    delete $param_list{$self};
-    delete $docucomment{$self};
-    delete $inline{$self};
-    $self->_destroy;
-}
-
-sub get_return_type { $return_type{ +shift } }
-sub get_param_list  { $param_list{ +shift } }
-sub get_docucomment { $docucomment{ +shift } }
-sub inline          { $inline{ +shift } }
 
 sub void { shift->get_return_type->is_void }
 

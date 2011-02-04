@@ -119,13 +119,17 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Function
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
+_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, is_inline)
     const char *klass;
     CFCParcel *parcel;
     const char *exposure;
     SV *class_name_sv;
     SV *class_cnick_sv;
     SV *micro_sym_sv;
+    SV *return_type;
+    SV *param_list;
+    SV *docucomment;
+    int is_inline;
 CODE:
     const char *class_name = SvOK(class_name_sv) 
                            ? SvPV_nolen(class_name_sv) : NULL;
@@ -134,16 +138,42 @@ CODE:
     const char *micro_sym = SvOK(micro_sym_sv) 
                             ? SvPV_nolen(micro_sym_sv) : NULL;
     CFCFunction *self = CFCFunction_new(parcel, exposure, class_name, class_cnick,
-        micro_sym);
+        micro_sym, return_type, param_list, docucomment, is_inline);
     RETVAL = newSV(0);
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
 void
-_destroy(self)
+DESTROY(self)
     CFCFunction *self;
 PPCODE:
     CFCFunction_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCFunction *self;
+ALIAS:
+    get_return_type    = 2
+    get_param_list     = 4
+    get_docucomment    = 6
+    inline             = 8
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2:
+            retval = newSVsv((SV*)CFCFunction_get_return_type(self));
+            break;
+        case 4:
+            retval = newSVsv((SV*)CFCFunction_get_param_list(self));
+            break;
+        case 6:
+            retval = newSVsv((SV*)CFCFunction_get_docucomment(self));
+            break;
+        case 8:
+            retval = newSViv(CFCFunction_inline(self));
+            break;
+    END_SET_OR_GET_SWITCH
+}
 
 
 MODULE = Clownfish    PACKAGE = Clownfish::ParamList
