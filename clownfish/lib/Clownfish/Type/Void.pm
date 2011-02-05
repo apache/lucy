@@ -35,11 +35,10 @@ sub new {
         %new_PARAMS,
         %args,
         specifier => 'void',
-        c_string  => $c_string
+        c_string  => $c_string,
+        void      => 1,
     );
 }
-
-sub is_void {1}
 
 sub equals {
     my ( $self, $other ) = @_;

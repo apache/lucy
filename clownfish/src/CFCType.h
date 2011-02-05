@@ -18,6 +18,7 @@ typedef struct CFCType CFCType;
 
 #define CFCTYPE_CONST    0x1
 #define CFCTYPE_NULLABLE 0x2
+#define CFCTYPE_VOID     0x4
 
 CFCType*
 CFCType_new(int flags, void *parcel, const char *specifier, int indirection,
@@ -53,4 +54,7 @@ CFCType_set_nullable(CFCType *self, int nullable);
 
 int
 CFCType_nullable(CFCType *self);
+
+int
+CFCType_is_void(CFCType *self);
 

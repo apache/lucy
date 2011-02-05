@@ -120,3 +120,10 @@ CFCType_nullable(CFCType *self)
 {
     return !!(self->flags & CFCTYPE_NULLABLE);
 }
+
+int
+CFCType_is_void(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_VOID);
+}
+

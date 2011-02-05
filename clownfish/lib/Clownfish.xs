@@ -460,6 +460,12 @@ CODE:
     RETVAL = CFCTYPE_NULLABLE;
 OUTPUT: RETVAL
 
+unsigned
+VOID(...)
+CODE:
+    RETVAL = CFCTYPE_VOID;
+OUTPUT: RETVAL
+
 void
 _set_or_get(self, ...)
     CFCType *self;
@@ -473,6 +479,7 @@ ALIAS:
     const           = 10 
     set_nullable    = 11
     nullable        = 12
+    is_void         = 14
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -505,6 +512,9 @@ PPCODE:
             break;
         case 12:
             retval = newSViv(CFCType_nullable(self));
+            break;
+        case 14:
+            retval = newSViv(CFCType_is_void(self));
             break;
     END_SET_OR_GET_SWITCH
 }

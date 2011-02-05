@@ -31,6 +31,7 @@ our %new_PARAMS = (
     indirection => undef,
     parcel      => undef,
     c_string    => undef,
+    void        => undef,
 );
 
 sub new {
@@ -43,6 +44,7 @@ sub new {
     my $flags = 0;
     $flags |= CONST    if $args{const};
     $flags |= NULLABLE if $args{nullable};
+    $flags |= VOID     if $args{void};
 
     my $parcel = $args{parcel};
     if ( defined $parcel ) {
@@ -65,7 +67,6 @@ sub is_object      {0}
 sub is_primitive   {0}
 sub is_integer     {0}
 sub is_floating    {0}
-sub is_void        {0}
 sub is_composite   {0}
 sub is_string_type {0}
 
