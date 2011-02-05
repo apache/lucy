@@ -60,7 +60,11 @@ sub new {
     }
     $c_string .= $args{specifier};
 
-    my $self = $either->SUPER::new( %args, c_string => $c_string );
+    my $self = $either->SUPER::new(
+        %args,
+        c_string => $c_string,
+        integer  => 1,
+    );
     $sizeof{$self} = $sizeof;
     return $self;
 }
@@ -71,8 +75,7 @@ sub DESTROY {
     $self->SUPER::DESTROY;
 }
 
-sub is_integer {1}
-sub sizeof     { $sizeof{ +shift } }
+sub sizeof { $sizeof{ +shift } }
 
 1;
 

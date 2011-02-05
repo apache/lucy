@@ -26,6 +26,8 @@ our %new_PARAMS = (
     const     => undef,
     specifier => undef,
     c_string  => undef,
+    integer   => undef,
+    floating  => undef,
 );
 
 sub new {
@@ -33,10 +35,8 @@ sub new {
     my $package = ref($either) || $either;
     confess( __PACKAGE__ . " is abstract" ) if $package eq __PACKAGE__;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    return $package->SUPER::new( %new_PARAMS, %args );
+    return $package->SUPER::new( %new_PARAMS, %args, primitive => 1 );
 }
-
-sub is_primitive {1}
 
 sub equals {
     my ( $self, $other ) = @_;

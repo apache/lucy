@@ -466,6 +466,54 @@ CODE:
     RETVAL = CFCTYPE_VOID;
 OUTPUT: RETVAL
 
+unsigned
+OBJECT(...)
+CODE:
+    RETVAL = CFCTYPE_OBJECT;
+OUTPUT: RETVAL
+
+unsigned
+PRIMITIVE(...)
+CODE:
+    RETVAL = CFCTYPE_PRIMITIVE;
+OUTPUT: RETVAL
+
+unsigned
+INTEGER(...)
+CODE:
+    RETVAL = CFCTYPE_INTEGER;
+OUTPUT: RETVAL
+
+unsigned
+FLOATING(...)
+CODE:
+    RETVAL = CFCTYPE_FLOATING;
+OUTPUT: RETVAL
+
+unsigned
+STRING_TYPE(...)
+CODE:
+    RETVAL = CFCTYPE_STRING_TYPE;
+OUTPUT: RETVAL
+
+unsigned
+VA_LIST(...)
+CODE:
+    RETVAL = CFCTYPE_VA_LIST;
+OUTPUT: RETVAL
+
+unsigned
+ARBITRARY(...)
+CODE:
+    RETVAL = CFCTYPE_ARBITRARY;
+OUTPUT: RETVAL
+
+unsigned
+COMPOSITE(...)
+CODE:
+    RETVAL = CFCTYPE_COMPOSITE;
+OUTPUT: RETVAL
+
 void
 _set_or_get(self, ...)
     CFCType *self;
@@ -480,6 +528,14 @@ ALIAS:
     set_nullable    = 11
     nullable        = 12
     is_void         = 14
+    is_object       = 16
+    is_primitive    = 18
+    is_integer      = 20
+    is_floating     = 22
+    is_string_type  = 24
+    is_va_list      = 26
+    is_arbitrary    = 28
+    is_composite    = 30
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -515,6 +571,30 @@ PPCODE:
             break;
         case 14:
             retval = newSViv(CFCType_is_void(self));
+            break;
+        case 16:
+            retval = newSViv(CFCType_is_object(self));
+            break;
+        case 18:
+            retval = newSViv(CFCType_is_primitive(self));
+            break;
+        case 20:
+            retval = newSViv(CFCType_is_integer(self));
+            break;
+        case 22:
+            retval = newSViv(CFCType_is_floating(self));
+            break;
+        case 24:
+            retval = newSViv(CFCType_is_string_type(self));
+            break;
+        case 26:
+            retval = newSViv(CFCType_is_va_list(self));
+            break;
+        case 28:
+            retval = newSViv(CFCType_is_arbitrary(self));
+            break;
+        case 30:
+            retval = newSViv(CFCType_is_composite(self));
             break;
     END_SET_OR_GET_SWITCH
 }

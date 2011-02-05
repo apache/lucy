@@ -26,7 +26,6 @@ use Carp;
 # Inside-out member vars.
 our %incremented;
 our %decremented;
-our %is_string_type;
 
 our %new_PARAMS = (
     const       => undef,
@@ -47,7 +46,17 @@ sub new {
     $args{indirection} = 1 unless defined $args{indirection};
     my $indirection = $args{indirection};
     $args{parcel} ||= Clownfish::Parcel->default_parcel;
-    my $self = $either->SUPER::new(%args);
+    confess("Missing required param 'specifier'")
+        unless defined $args{specifier};
+
+    # Derive boolean indicating whether this type is a string type.
+    my $is_string_type = $args{specifier} =~ /CharBuf/ ? 1 : 0;
+
+    my $self = $either->SUPER::new(
+        %args,
+        object      => 1,
+        string_type => $is_string_type,
+    );
     $incremented{$self} = $incremented;
     $decremented{$self} = $decremented;
     $self->set_nullable($nullable);
@@ -58,8 +67,6 @@ sub new {
     confess("Indirection must be 1") unless $indirection == 1;
     confess("Can't be both incremented and decremented")
         if ( $incremented && $decremented );
-    confess("Missing required param 'specifier'")
-        unless defined $specifier;
     confess("Illegal specifier: '$specifier'")
         unless $specifier
             =~ /^(?:$prefix)?[A-Z][A-Za-z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/;
@@ -75,8 +82,6 @@ sub new {
     $string .= "$specifier*";
     $self->set_c_string($string);
 
-    # Cache boolean indicating whether this type is a string type.
-    $is_string_type{$self} = $specifier =~ /CharBuf/ ? 1 : 0;
 
     return $self;
 }
@@ -85,14 +90,11 @@ sub DESTROY {
     my $self = shift;
     delete $incremented{$self};
     delete $decremented{$self};
-    delete $is_string_type{$self};
     $self->SUPER::DESTROY;
 }
 
-sub is_object      {1}
 sub incremented    { $incremented{ +shift } }
 sub decremented    { $decremented{ +shift } }
-sub is_string_type { $is_string_type{ +shift } }
 
 sub similar {
     my ( $self, $other ) = @_;

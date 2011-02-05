@@ -40,10 +40,12 @@ sub new {
     # Cache the C representation of this type.
     my $c_string = $args{const} ? "const $args{specifier}" : $args{specifier};
 
-    return $either->SUPER::new( %args, c_string => $c_string );
+    return $either->SUPER::new(
+        %args,
+        c_string => $c_string,
+        floating => 1,
+    );
 }
-
-sub is_floating {1}
 
 1;
 

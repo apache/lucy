@@ -16,9 +16,17 @@
 
 typedef struct CFCType CFCType;
 
-#define CFCTYPE_CONST    0x1
-#define CFCTYPE_NULLABLE 0x2
-#define CFCTYPE_VOID     0x4
+#define CFCTYPE_CONST       0x00000001
+#define CFCTYPE_NULLABLE    0x00000002
+#define CFCTYPE_VOID        0x00000004
+#define CFCTYPE_OBJECT      0x00000008
+#define CFCTYPE_PRIMITIVE   0x00000010
+#define CFCTYPE_INTEGER     0x00000020
+#define CFCTYPE_FLOATING    0x00000040
+#define CFCTYPE_STRING_TYPE 0x00000080
+#define CFCTYPE_VA_LIST     0x00000100
+#define CFCTYPE_ARBITRARY   0x00000200
+#define CFCTYPE_COMPOSITE   0x00000400
 
 CFCType*
 CFCType_new(int flags, void *parcel, const char *specifier, int indirection,
@@ -57,4 +65,28 @@ CFCType_nullable(CFCType *self);
 
 int
 CFCType_is_void(CFCType *self);
+
+int
+CFCType_is_object(CFCType *self);
+
+int
+CFCType_is_primitive(CFCType *self);
+
+int
+CFCType_is_integer(CFCType *self);
+
+int
+CFCType_is_floating(CFCType *self);
+
+int
+CFCType_is_string_type(CFCType *self);
+
+int
+CFCType_is_va_list(CFCType *self);
+
+int
+CFCType_is_arbitrary(CFCType *self);
+
+int
+CFCType_is_composite(CFCType *self);
 

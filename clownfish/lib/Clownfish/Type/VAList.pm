@@ -29,7 +29,8 @@ sub new {
     verify_args( \%new_PARAMS, %args ) or confess $@;
     return $either->SUPER::new(
         specifier => 'va_list',
-        c_string  => 'va_list'
+        c_string  => 'va_list',
+        va_list   => 1,
     );
 }
 

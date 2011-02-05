@@ -127,3 +127,51 @@ CFCType_is_void(CFCType *self)
     return !!(self->flags & CFCTYPE_VOID);
 }
 
+int
+CFCType_is_object(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_OBJECT);
+}
+
+int
+CFCType_is_primitive(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_PRIMITIVE);
+}
+
+int
+CFCType_is_integer(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_INTEGER);
+}
+
+int
+CFCType_is_floating(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_FLOATING);
+}
+
+int
+CFCType_is_string_type(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_STRING_TYPE);
+}
+
+int
+CFCType_is_va_list(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_VA_LIST);
+}
+
+int
+CFCType_is_arbitrary(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_ARBITRARY);
+}
+
+int
+CFCType_is_composite(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_COMPOSITE);
+}
+

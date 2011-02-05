@@ -32,6 +32,14 @@ our %new_PARAMS = (
     parcel      => undef,
     c_string    => undef,
     void        => undef,
+    object      => undef,
+    primitive   => undef,
+    integer     => undef,
+    floating    => undef,
+    string_type => undef,
+    va_list     => undef,
+    arbitrary   => undef,
+    composite   => undef,
 );
 
 sub new {
@@ -42,9 +50,17 @@ sub new {
     verify_args( \%new_PARAMS, %args ) or confess $@;
 
     my $flags = 0;
-    $flags |= CONST    if $args{const};
-    $flags |= NULLABLE if $args{nullable};
-    $flags |= VOID     if $args{void};
+    $flags |= CONST       if $args{const};
+    $flags |= NULLABLE    if $args{nullable};
+    $flags |= VOID        if $args{void};
+    $flags |= OBJECT      if $args{object};
+    $flags |= PRIMITIVE   if $args{primitive};
+    $flags |= INTEGER     if $args{integer};
+    $flags |= FLOATING    if $args{floating};
+    $flags |= STRING_TYPE if $args{string_type};
+    $flags |= VA_LIST     if $args{va_list};
+    $flags |= ARBITRARY   if $args{arbitrary};
+    $flags |= COMPOSITE   if $args{composite};
 
     my $parcel = $args{parcel};
     if ( defined $parcel ) {
@@ -62,13 +78,6 @@ sub new {
     return $package->_new( $flags, $parcel, $specifier, $indirection,
         $c_string );
 }
-
-sub is_object      {0}
-sub is_primitive   {0}
-sub is_integer     {0}
-sub is_floating    {0}
-sub is_composite   {0}
-sub is_string_type {0}
 
 sub equals {
     my ( $self, $other ) = @_;

@@ -30,7 +30,7 @@ our %new_PARAMS = (
 sub new {
     my $either = shift;
     verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = $either->SUPER::new(@_);
+    my $self = $either->SUPER::new( @_, arbitrary => 1 );
 
     # Validate specifier.
     my $specifier = $self->get_specifier;
