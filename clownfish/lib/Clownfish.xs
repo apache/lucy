@@ -448,13 +448,13 @@ DESTROY(self)
 PPCODE:
     CFCType_destroy(self);
 
-bool
+unsigned
 CONST(...)
 CODE:
     RETVAL = CFCTYPE_CONST;
 OUTPUT: RETVAL
 
-bool
+unsigned
 NULLABLE(...)
 CODE:
     RETVAL = CFCTYPE_NULLABLE;
