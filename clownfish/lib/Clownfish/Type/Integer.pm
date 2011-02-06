@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Type::Integer;
-use base qw( Clownfish::Type::Primitive );
+use base qw( Clownfish::Type );
 use Clownfish::Util qw( verify_args );
 use Carp;
 use Config;
@@ -62,8 +62,9 @@ sub new {
 
     my $self = $either->SUPER::new(
         %args,
-        c_string => $c_string,
-        integer  => 1,
+        c_string  => $c_string,
+        integer   => 1,
+        primitive => 1,
     );
     $sizeof{$self} = $sizeof;
     return $self;

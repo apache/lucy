@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Type::Float;
-use base qw( Clownfish::Type::Primitive );
+use base qw( Clownfish::Type );
 use Clownfish::Util qw( verify_args );
 use Carp;
 
@@ -42,8 +42,9 @@ sub new {
 
     return $either->SUPER::new(
         %args,
-        c_string => $c_string,
-        floating => 1,
+        c_string  => $c_string,
+        floating  => 1,
+        primitive => 1,
     );
 }
 

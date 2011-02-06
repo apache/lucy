@@ -160,7 +160,7 @@ Shorthand for various $type->isa($package) calls.
 
 =item * is_object: Clownfish::Type::Object
 
-=item * is_primitive: Clownfish::Type::Primitive
+=item * is_primitive: primitive, concrete type, i.e. not an object or composite.
 
 =item * is_integer: Clownfish::Type::Integer
 

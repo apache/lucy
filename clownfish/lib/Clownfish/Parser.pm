@@ -21,7 +21,6 @@ use base qw( Parse::RecDescent );
 
 use Clownfish::Parcel;
 use Clownfish::Type;
-use Clownfish::Type::Primitive;
 use Clownfish::Type::Integer;
 use Clownfish::Type::Float;
 use Clownfish::Type::Void;

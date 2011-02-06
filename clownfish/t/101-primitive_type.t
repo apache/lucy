@@ -17,7 +17,12 @@ use strict;
 use warnings;
 
 package MyPrimitiveType;
-use base qw( Clownfish::Type::Primitive );
+use base qw( Clownfish::Type );
+
+sub new {
+    my $either = shift;
+    return $either->SUPER::new( @_, primitive => 1, );
+}
 
 package main;
 use Test::More tests => 4;
