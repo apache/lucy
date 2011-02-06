@@ -54,14 +54,6 @@ sub new {
     return $self;
 }
 
-sub equals {
-    my ( $self, $other ) = @_;
-    return 0 unless blessed($other);
-    return 0 unless $other->isa(__PACKAGE__);
-    return 0 unless $self->get_specifier eq $other->get_specifier;
-    return 1;
-}
-
 1;
 
 __END__

@@ -34,13 +34,6 @@ sub new {
     );
 }
 
-sub equals {
-    my ( $self, $other ) = @_;
-    return 0 unless blessed($other);
-    return 0 unless $other->isa(__PACKAGE__);
-    return 1;
-}
-
 1;
 
 __END__

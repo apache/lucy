@@ -68,6 +68,21 @@ CFCType_destroy(CFCType *self)
 int
 CFCType_equals(CFCType *self, CFCType *other)
 {
+    if (   (CFCType_const(self)        ^ CFCType_const(other))
+        || (CFCType_nullable(self)     ^ CFCType_nullable(other))
+        || (CFCType_is_void(self)      ^ CFCType_is_void(other))
+        || (CFCType_is_object(self)    ^ CFCType_is_object(other))
+        || (CFCType_is_primitive(self) ^ CFCType_is_primitive(other))
+        || (CFCType_is_integer(self)   ^ CFCType_is_integer(other))
+        || (CFCType_is_floating(self)  ^ CFCType_is_floating(other))
+        || (CFCType_is_va_list(self)   ^ CFCType_is_va_list(other))
+        || (CFCType_is_arbitrary(self) ^ CFCType_is_arbitrary(other))
+        || (CFCType_is_composite(self) ^ CFCType_is_composite(other))
+    ) { 
+        return false; 
+    }
+    if (self->indirection != other->indirection) { return false; }
+    if (strcmp(self->specifier, other->specifier) != 0) { return false; }
     return true;
 }
 

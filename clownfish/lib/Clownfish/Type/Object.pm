@@ -107,8 +107,7 @@ sub similar {
 sub equals {
     my ( $self, $other ) = @_;
     return 0 unless $self->similar($other);
-    return 0 unless $self->get_specifier eq $other->get_specifier;
-    return 1;
+    return $self->SUPER::equals($other);
 }
 
 1;

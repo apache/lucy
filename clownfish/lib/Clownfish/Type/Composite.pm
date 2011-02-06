@@ -71,11 +71,10 @@ sub _get_child    { $child{ +shift } }
 
 sub equals {
     my ( $self, $other ) = @_;
-    return 0 unless $self->get_indirection == $other->get_indirection;
     return 0 unless $self->_get_child->equals( $other->_get_child );
     return 0 if ( $self->get_array xor $other->get_array );
     return 0 if ( $self->get_array and $self->get_array ne $other->get_array );
-    return 1;
+    return $self->SUPER::equals($other);
 }
 
 1;

@@ -38,15 +38,6 @@ sub new {
     return $package->SUPER::new( %new_PARAMS, %args, primitive => 1 );
 }
 
-sub equals {
-    my ( $self, $other ) = @_;
-    return 0 unless blessed($other);
-    return 0 unless $other->isa(__PACKAGE__);
-    return 0 unless $self->get_specifier eq $other->get_specifier;
-    return 0 if ( $self->const xor $other->const );
-    return 1;
-}
-
 1;
 
 __END__

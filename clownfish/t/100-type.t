@@ -20,7 +20,7 @@ package MyType;
 use base qw( Clownfish::Type );
 
 package main;
-use Test::More tests => 12;
+use Test::More tests => 11;
 use Clownfish::Parcel;
 
 my $neato_parcel = Clownfish::Parcel->singleton( name => 'Neato' );
@@ -41,6 +41,4 @@ ok( !$type->is_floating,    "is_floating() false by default" );
 ok( !$type->is_void,        "is_void() false by default" );
 ok( !$type->is_composite,   "is_composite() false by default" );
 ok( !$type->is_string_type, "is_string_type() false by default" );
-
-ok( $type->equals( MyType->new ), "equals() depends solely on class" );
 
