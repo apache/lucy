@@ -19,6 +19,11 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef true
+  #define true 1
+  #define false 0
+#endif
+
 #include "CFCType.h"
 
 struct CFCType {
@@ -58,6 +63,12 @@ CFCType_destroy(CFCType *self)
     Safefree(self->c_string);
     SvREFCNT_dec(self->parcel);
     free(self);
+}
+
+int
+CFCType_equals(CFCType *self, CFCType *other)
+{
+    return true;
 }
 
 void

@@ -448,6 +448,14 @@ DESTROY(self)
 PPCODE:
     CFCType_destroy(self);
 
+int
+equals(self, other)
+    CFCType *self;
+    CFCType *other;
+CODE:
+    RETVAL = CFCType_equals(self, other);
+OUTPUT: RETVAL
+
 unsigned
 CONST(...)
 CODE:

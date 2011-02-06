@@ -79,13 +79,6 @@ sub new {
         $c_string );
 }
 
-sub equals {
-    my ( $self, $other ) = @_;
-    return 0 unless blessed($other);
-    return 0 unless $other->isa(__PACKAGE__);
-    return 1;
-}
-
 1;
 
 __END__
@@ -140,9 +133,7 @@ B<c_string> - The C representation of the type.
 
     do_stuff() if $type->equals($other);
 
-Returns true if two Clownfish::Type objects are equivalent.  The default
-implementation merely checks that C<$other> is a Clownfish::Type object, so
-it should be overridden in all subclasses.
+Returns true if two Clownfish::Type objects are equivalent.
 
 =head2 to_c
 

@@ -39,6 +39,9 @@ CFCType_init(CFCType *self, int flags, void *parcel, const char *specifier,
 void
 CFCType_destroy(CFCType *self);
 
+int
+CFCType_equals(CFCType *self, CFCType *other);
+
 void
 CFCType_set_specifier(CFCType *self, const char *specifier);
 
