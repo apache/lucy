@@ -163,10 +163,19 @@ sub _callback_params {
             $param = qq|CFISH_ARG_OBJ("$name", $name)|;
         }
         elsif ( $type->is_integer ) {
-            $param
-                = $type->sizeof > 4
-                ? qq|CFISH_ARG_I64("$name", $name)|
-                : qq|CFISH_ARG_I32("$name", $name)|;
+            my $sizeof = $type->sizeof;
+            if ( defined($sizeof) ) {
+                if ($sizeof <= 4) {
+                    $param = qq|CFISH_ARG_I32("$name", $name)|;
+                }
+                else {
+                    $param = qq|CFISH_ARG_I64("$name", $name)|;
+                }
+            }
+            else {
+                my $c_type = $type->to_c;
+                $param = qq|CFISH_ARG_I($c_type, "$name", $name)|;
+            }
         }
         elsif ( $type->is_floating ) {
             $param = qq|CFISH_ARG_F64("$name", $name)|;

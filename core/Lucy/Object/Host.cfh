@@ -29,6 +29,9 @@ __C__
     CFISH_HOST_ARGTYPE_I32, (_label), ((int32_t)_value)
 #define CFISH_ARG_I64(_label, _value) \
     CFISH_HOST_ARGTYPE_I64, (_label), ((int64_t)_value)
+#define CFISH_ARG_I(_type, _label, _value) \
+    (sizeof(_type) <= 4 ? CFISH_HOST_ARGTYPE_I32 : CFISH_HOST_ARGTYPE_I64), \
+    (_label), (sizeof(_type) <= 4 ? (int32_t)_value : (int64_t)_value)
 #define CFISH_ARG_F32(_label, _value) \
     CFISH_HOST_ARGTYPE_F32, (_label), ((double)_value)
 #define CFISH_ARG_F64(_label, _value) \

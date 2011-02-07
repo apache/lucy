@@ -20,7 +20,6 @@ package Clownfish::Type::Integer;
 use base qw( Clownfish::Type );
 use Clownfish::Util qw( verify_args );
 use Carp;
-use Config;
 
 # Inside-out member vars.
 our %sizeof;
@@ -31,7 +30,7 @@ our %new_PARAMS = (
 );
 
 our %specifiers = (
-    bool_t   => $Config{intsize},
+    bool_t   => undef,
     int8_t   => 1,
     int16_t  => 2,
     int32_t  => 4,
@@ -41,17 +40,17 @@ our %specifiers = (
     uint32_t => 4,
     uint64_t => 8,
     char     => 1,
-    int      => $Config{intsize},
-    short    => $Config{shortsize},
-    long     => $Config{longsize},
-    size_t   => $Config{sizesize},
+    int      => undef,
+    short    => undef,
+    long     => undef,
+    size_t   => undef,
 );
 
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $sizeof = $specifiers{ $args{specifier} }
-        or confess("Unknown specifier: '$args{specifier}'");
+    confess("Unknown specifier: '$args{specifier}'")
+        unless exists $specifiers{ $args{specifier} };
 
     # Cache the C representation of this type.
     my $c_string = $args{const} ? 'const ' : '';
@@ -66,7 +65,7 @@ sub new {
         integer   => 1,
         primitive => 1,
     );
-    $sizeof{$self} = $sizeof;
+    $sizeof{$self} = $specifiers{ $args{specifier} };
     return $self;
 }
 
