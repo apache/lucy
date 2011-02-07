@@ -58,8 +58,8 @@ Clownfish::Type::Void - The void Type.
 =head1 DESCRIPTION
 
 Clownfish::Type::Void is used to represent a void return type.  It is also
-used in conjuction with with L<Clownfish::Type::Composite> to support the
-C<void*> opaque pointer type.
+used in conjuction with with C<< Clownfish::Type->new_composite >> to support
+the C<void*> opaque pointer type.
 
 =head1 METHODS
 

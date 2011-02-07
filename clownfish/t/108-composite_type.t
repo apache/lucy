@@ -43,21 +43,22 @@ my @composite_type_strings = (
 );
 
 for my $input (@composite_type_strings) {
-    isa_ok( $parser->type($input), "Clownfish::Type::Composite", $input );
+    my $type = $parser->type($input);
+    ok( $type && $type->is_composite, $input );
 }
 
-eval { my $type = Clownfish::Type::Composite->new };
+eval { my $type = Clownfish::Type->new_composite };
 like( $@, qr/child/i, "child required" );
 
 my $foo_type = Clownfish::Type::Object->new( specifier => 'Foo' );
-my $composite_type = Clownfish::Type::Composite->new(
+my $composite_type = Clownfish::Type->new_composite(
     child       => $foo_type,
     indirection => 1,
 );
 is( $composite_type->get_specifier,
     'Foo', "get_specifier delegates to child" );
 
-my $other = Clownfish::Type::Composite->new(
+my $other = Clownfish::Type->new_composite(
     child       => $foo_type,
     indirection => 1,
 );
@@ -65,7 +66,7 @@ ok( $composite_type->equals($other), "equals" );
 ok( $composite_type->is_composite,   "is_composite" );
 
 my $bar_type = Clownfish::Type::Object->new( specifier => 'Bar' );
-my $bar_composite = Clownfish::Type::Composite->new(
+my $bar_composite = Clownfish::Type->new_composite(
     child       => $bar_type,
     indirection => 1,
 );

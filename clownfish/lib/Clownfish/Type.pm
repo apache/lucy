@@ -19,11 +19,13 @@ use warnings;
 package Clownfish::Type;
 use Clownfish;
 use Clownfish::Parcel;
-use Clownfish::Util qw( verify_args );
+use Clownfish::Util qw( verify_args a_isa_b );
 use Scalar::Util qw( blessed );
 use Carp;
 
 # Inside-out member vars.
+our %array;
+our %child;
 
 our %new_PARAMS = (
     const       => undef,
@@ -45,8 +47,6 @@ our %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     my $package = ref($either) || $either;
-    confess( __PACKAGE__ . "is an abstract class" )
-        if $package eq __PACKAGE__;
     verify_args( \%new_PARAMS, %args ) or confess $@;
 
     my $flags = 0;
@@ -79,6 +79,65 @@ sub new {
         $c_string );
 }
 
+
+our %new_composite_PARAMS = (
+    child       => undef,
+    indirection => undef,
+    array       => undef,
+    nullable    => undef,
+);
+
+sub new_composite {
+    my ( $either, %args ) = @_;
+    my $array    = delete $args{array};
+    my $child    = delete $args{child};
+    my $nullable = delete $args{nullable};
+    $args{indirection} ||= 0;
+    confess("Missing required param 'child'")
+        unless a_isa_b( $child, "Clownfish::Type" );
+    verify_args( \%new_composite_PARAMS, %args ) or confess $@;
+    my $self = $either->new(
+        %args,
+        specifier => $child->get_specifier,
+        composite => 1
+    );
+    $child{$self} = $child;
+    $array{$self} = $array;
+    $self->set_nullable($nullable);
+
+    # Cache C representation.
+    # NOTE: Array postfixes are NOT included.
+    my $string = $child->to_c;
+    for ( my $i = 0; $i < $self->get_indirection; $i++ ) {
+        $string .= '*';
+    }
+    $self->set_c_string($string);
+
+    return $self;
+}
+
+sub DESTROY {
+    my $self = shift;
+    delete $array{$self};
+    delete $child{$self};
+    $self->_destroy;
+}
+
+sub get_array     { $array{ +shift } }
+sub _get_child    { $child{ +shift } }
+
+sub equals {
+    my ( $self, $other ) = @_;
+    my $child = $self->_get_child;
+    if ($child) {
+        return 0 unless $other->_get_child;
+        return 0 unless $child->equals( $other->_get_child );
+    }
+    return 0 if ( $self->get_array xor $other->get_array );
+    return 0 if ( $self->get_array and $self->get_array ne $other->get_array );
+    return $self->_equals($other);
+}
+
 1;
 
 __END__
@@ -101,7 +160,7 @@ Clownfish::Type - A variable's type.
         c_string    => undef,     # default undef
     );
 
-Abstract constructor.
+Generic constructor.
 
 =over
 
@@ -127,6 +186,37 @@ B<parcel> - A Clownfish::Parcel or a parcel name.
 
 B<c_string> - The C representation of the type.
 
+=head2 new_composite
+
+    my $type = Clownfish::Type->new_composite(
+        child       => $char_type,    # required
+        indirection => undef,         # default 0
+        array       => '[]',          # default undef,
+        const       => 1,             # default undef
+    );
+
+Constructor for a composite type which is made up of repetitions of a single,
+uniform subtype.
+
+=over
+
+=item *
+
+B<child> - The Type which the composite is comprised of.
+
+=item *
+
+B<indirection> - integer indicating level of indirection. Example: the C type
+"float**" has indirection 2.
+
+=item *
+
+B<array> - A string describing an array postfix.  
+
+=item *
+
+B<const> - should be 1 if the type is const.
+
 =back
 
 =head2 equals
@@ -146,7 +236,7 @@ Return the C representation of the type.
 
 Set the C representation of the type.
 
-=head2 get_specifier get_parcel get_indirection const nullable set_specifier set_nullable
+=head2 get_specifier get_parcel get_indirection get_array const nullable set_specifier set_nullable
 
 Accessors.
 
@@ -168,7 +258,7 @@ Shorthand for various $type->isa($package) calls.
 
 =item * is_void: Clownfish::Type::Void
 
-=item * is_composite: Clownfish::Type::Composite
+=item * is_composite: constructed via new_composite().
 
 =back
 

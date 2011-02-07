@@ -443,13 +443,13 @@ CODE:
 OUTPUT: RETVAL
 
 void
-DESTROY(self)
+_destroy(self)
     CFCType *self;
 PPCODE:
     CFCType_destroy(self);
 
 int
-equals(self, other)
+_equals(self, other)
     CFCType *self;
     CFCType *other;
 CODE:

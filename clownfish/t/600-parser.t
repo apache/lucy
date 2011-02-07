@@ -104,8 +104,7 @@ is( $parser->scalar_constant($_), $_, "scalar_constant: $_" )
 my @composites = ( 'int[]', "i32_t **", "Foo **", "Foo ***", "const void *" );
 for my $composite (@composites) {
     my $parsed = $parser->type($composite);
-    isa_ok( $parsed, "Clownfish::Type::Composite",
-        "composite_type: $composite" );
+    ok( $parsed && $parsed->is_composite, "composite_type: $composite" );
 }
 
 my @object_types = ( 'Obj *', "incremented Foo*", "decremented CharBuf *" );

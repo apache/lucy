@@ -27,7 +27,6 @@ use Clownfish::Type::Void;
 use Clownfish::Type::VAList;
 use Clownfish::Type::Arbitrary;
 use Clownfish::Type::Object;
-use Clownfish::Type::Composite;
 use Clownfish::Variable;
 use Clownfish::DocuComment;
 use Clownfish::Function;
@@ -408,7 +407,7 @@ sub simple_or_composite_type {
                 $args{indirection}++;
             }
         }
-        return Clownfish::Type::Composite->new(%args);
+        return Clownfish::Type->new_composite(%args);
     }
 }
 
