@@ -26,7 +26,6 @@ use Clownfish::Type::Float;
 use Clownfish::Type::Void;
 use Clownfish::Type::VAList;
 use Clownfish::Type::Arbitrary;
-use Clownfish::Type::Object;
 use Clownfish::Variable;
 use Clownfish::DocuComment;
 use Clownfish::Function;
@@ -373,7 +372,7 @@ sub new_object_type {
         parcel    => $parcel,
     );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Clownfish::Type::Object->new(%args);
+    return Clownfish::Type->new_object(%args);
 }
 
 sub simple_or_composite_type {
@@ -387,7 +386,7 @@ sub simple_or_composite_type {
         if ($nullable) {
             my $type_class = ref($simple_type);
             confess "$type_class can't be 'nullable'"
-                unless $simple_type->isa("Clownfish::Type::Object");
+                unless $simple_type->is_object;
             $simple_type->set_nullable($nullable);
         }
         return $simple_type;

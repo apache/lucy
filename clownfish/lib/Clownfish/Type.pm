@@ -24,6 +24,8 @@ use Scalar::Util qw( blessed );
 use Carp;
 
 # Inside-out member vars.
+our %incremented;
+our %decremented;
 our %array;
 our %child;
 
@@ -79,6 +81,63 @@ sub new {
         $c_string );
 }
 
+our %new_object_PARAMS = (
+    const       => undef,
+    specifier   => undef,
+    indirection => 1,
+    parcel      => undef,
+    incremented => 0,
+    decremented => 0,
+    nullable    => 0,
+);
+
+sub new_object {
+    my ( $either, %args ) = @_;
+    verify_args( \%new_object_PARAMS, %args ) or confess $@;
+    my $incremented = delete $args{incremented} || 0;
+    my $decremented = delete $args{decremented} || 0;
+    my $nullable    = delete $args{nullable}    || 0;
+    $args{indirection} = 1 unless defined $args{indirection};
+    my $indirection = $args{indirection};
+    $args{parcel} ||= Clownfish::Parcel->default_parcel;
+    confess("Missing required param 'specifier'")
+        unless defined $args{specifier};
+
+    # Derive boolean indicating whether this type is a string type.
+    my $is_string_type = $args{specifier} =~ /CharBuf/ ? 1 : 0;
+
+    my $self = $either->new(
+        %args,
+        object      => 1,
+        string_type => $is_string_type,
+    );
+    $incremented{$self} = $incremented;
+    $decremented{$self} = $decremented;
+    $self->set_nullable($nullable);
+    my $prefix    = $self->get_parcel->get_prefix;
+    my $specifier = $self->get_specifier;
+
+    # Validate params.
+    confess("Indirection must be 1") unless $indirection == 1;
+    confess("Can't be both incremented and decremented")
+        if ( $incremented && $decremented );
+    confess("Illegal specifier: '$specifier'")
+        unless $specifier
+            =~ /^(?:$prefix)?[A-Z][A-Za-z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/;
+
+    # Add $prefix if necessary.
+    if ( $specifier !~ /^$prefix/ ) {
+        $specifier = $prefix . $specifier;
+        $self->set_specifier($specifier);
+    }
+
+    # Cache C representation.
+    my $string = $self->const ? 'const ' : '';
+    $string .= "$specifier*";
+    $self->set_c_string($string);
+
+    return $self;
+}
 
 our %new_composite_PARAMS = (
     child       => undef,
@@ -120,11 +179,24 @@ sub DESTROY {
     my $self = shift;
     delete $array{$self};
     delete $child{$self};
+    delete $incremented{$self};
+    delete $decremented{$self};
     $self->_destroy;
 }
 
 sub get_array     { $array{ +shift } }
 sub _get_child    { $child{ +shift } }
+sub incremented   { $incremented{ +shift } }
+sub decremented   { $decremented{ +shift } }
+
+sub similar {
+    my ( $self, $other ) = @_;
+    confess("Not an object type") unless $self->is_object;
+    for (qw( is_object const incremented decremented nullable )) {
+        return 0 if ( $self->$_ xor $other->$_ );
+    }
+    return 1;
+}
 
 sub equals {
     my ( $self, $other ) = @_;
@@ -133,6 +205,8 @@ sub equals {
         return 0 unless $other->_get_child;
         return 0 unless $child->equals( $other->_get_child );
     }
+    return 0 if ( $self->incremented xor $other->incremented );
+    return 0 if ( $self->decremented xor $other->decremented );
     return 0 if ( $self->get_array xor $other->get_array );
     return 0 if ( $self->get_array and $self->get_array ne $other->get_array );
     return $self->_equals($other);
@@ -186,6 +260,8 @@ B<parcel> - A Clownfish::Parcel or a parcel name.
 
 B<c_string> - The C representation of the type.
 
+=back
+
 =head2 new_composite
 
     my $type = Clownfish::Type->new_composite(
@@ -219,11 +295,59 @@ B<const> - should be 1 if the type is const.
 
 =back
 
+=head2 new_object
+
+    my $type = Clownfish::Type->new_object(
+        specifier   => "Lobster",       # required
+        parcel      => "Crustacean",    # default: the default Parcel.
+        const       => undef,           # default undef
+        indirection => 1,               # default 1
+        incremented => 1,               # default 0
+        decremented => 0,               # default 0
+        nullable    => 1,               # default 0
+    );
+
+Create a Type representing an object.  The Type's C<specifier> must match the
+last component of the class name -- i.e. for the class "Crustacean::Lobster"
+it must be "Lobster".
+
+=over
+
+=item * B<specifier> - Required.  Must follow the rules for
+L<Clownfish::Class> class name components.
+
+=item * B<parcel> - A L<Clownfish::Parcel> or a parcel name.
+
+=item * B<const> - Should be true if the Type is const.  Note that this refers
+to the object itself and not the pointer.
+
+=item * B<indirection> - Level of indirection.  Must be 1 if supplied.
+
+=item * B<incremented> - Indicate whether the caller must take responsibility
+for an added refcount.
+
+=item * B<decremented> - Indicate whether the caller must account for
+for a refcount decrement.
+
+=item * B<nullable> - Indicate whether the object specified by this type may
+be NULL.
+
+=back
+
+The Parcel's prefix will be prepended to the specifier by new_object().
+
 =head2 equals
 
     do_stuff() if $type->equals($other);
 
 Returns true if two Clownfish::Type objects are equivalent.
+
+=head2 similar
+
+    do_stuff() if $type->similar($other_type);
+
+Weak checking of type which allows for covariant return types.  Calling this
+method on anything other than an object type is an error.
 
 =head2 to_c
 
@@ -244,21 +368,23 @@ Accessors.
 
     do_stuff() if $type->is_object;
 
-Shorthand for various $type->isa($package) calls.  
+Identify the flavor of Type, which is determined by the constructor which was
+used to create it.
 
 =over
 
-=item * is_object: Clownfish::Type::Object
+=item * is_object: Clownfish::Type->new_object
 
-=item * is_primitive: primitive, concrete type, i.e. not an object or composite.
+=item * is_primitive: Either Clownfish::Type::Integer->new or
+Clownfish::Type::Float->new
 
-=item * is_integer: Clownfish::Type::Integer
+=item * is_integer: Clownfish::Type::Integer->new
 
-=item * is_floating: Clownfish::Type::Float
+=item * is_floating: Clownfish::Type::Float->new
 
-=item * is_void: Clownfish::Type::Void
+=item * is_void: Clownfish::Type::Void->new
 
-=item * is_composite: constructed via new_composite().
+=item * is_composite: Clownfish::Type->new_composite
 
 =back
 
@@ -266,6 +392,14 @@ Shorthand for various $type->isa($package) calls.
 
 Returns true if $type represents a Clownfish type which holds unicode
 strings.
+
+=head2 incremented
+
+Returns true if the Type is incremented.  Only applicable to object Types.
+
+=head2 decremented
+
+Returns true if the Type is decremented.  Only applicable to object Types.
 
 =cut
 

@@ -110,7 +110,7 @@ for my $composite (@composites) {
 my @object_types = ( 'Obj *', "incremented Foo*", "decremented CharBuf *" );
 for my $object_type (@object_types) {
     my $parsed = $parser->object_type($object_type);
-    isa_ok( $parsed, "Clownfish::Type::Object", "object_type: $object_type" );
+    ok( $parsed && $parsed->is_object, "object_type: $object_type" );
 }
 
 my %param_lists = (

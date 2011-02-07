@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 24;
-use Clownfish::Type::Object;
+use Clownfish::Type;
 use Clownfish::Parser;
 
 my $parser = Clownfish::Parser->new;
@@ -50,7 +50,7 @@ for my $input (@composite_type_strings) {
 eval { my $type = Clownfish::Type->new_composite };
 like( $@, qr/child/i, "child required" );
 
-my $foo_type = Clownfish::Type::Object->new( specifier => 'Foo' );
+my $foo_type = Clownfish::Type->new_object( specifier => 'Foo' );
 my $composite_type = Clownfish::Type->new_composite(
     child       => $foo_type,
     indirection => 1,
@@ -65,7 +65,7 @@ my $other = Clownfish::Type->new_composite(
 ok( $composite_type->equals($other), "equals" );
 ok( $composite_type->is_composite,   "is_composite" );
 
-my $bar_type = Clownfish::Type::Object->new( specifier => 'Bar' );
+my $bar_type = Clownfish::Type->new_object( specifier => 'Bar' );
 my $bar_composite = Clownfish::Type->new_composite(
     child       => $bar_type,
     indirection => 1,

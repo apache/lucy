@@ -50,13 +50,13 @@ sub add_dumpables {
 # Create a Clownfish::Method object for either Dump() or Load().
 sub _make_method_obj {
     my ( $self, $class, $dump_or_load ) = @_;
-    my $return_type = Clownfish::Type::Object->new(
+    my $return_type = Clownfish::Type->new_object(
         incremented => 1,
         specifier   => 'Obj',
         indirection => 1,
         parcel      => 'Lucy',
     );
-    my $self_type = Clownfish::Type::Object->new(
+    my $self_type = Clownfish::Type->new_object(
         specifier   => $class->get_struct_sym,
         indirection => 1,
         parcel      => $class->get_parcel,
@@ -72,7 +72,7 @@ sub _make_method_obj {
         $param_list = Clownfish::ParamList->new( variables => [$self_var], );
     }
     else {
-        my $dump_type = Clownfish::Type::Object->new(
+        my $dump_type = Clownfish::Type->new_object(
             specifier   => 'Obj',
             indirection => 1,
             parcel      => 'Lucy',
