@@ -175,6 +175,19 @@ sub new_composite {
     return $self;
 }
 
+
+our %new_va_list_PARAMS = ( specifier => 'va_list' );
+
+sub new_va_list {
+    my ( $either, %args ) = @_;
+    verify_args( \%new_va_list_PARAMS, %args ) or confess $@;
+    return $either->new(
+        specifier => 'va_list',
+        c_string  => 'va_list',
+        va_list   => 1,
+    );
+}
+
 sub DESTROY {
     my $self = shift;
     delete $array{$self};
@@ -335,6 +348,22 @@ be NULL.
 =back
 
 The Parcel's prefix will be prepended to the specifier by new_object().
+
+=head2 new_va_list
+
+    my $type = Clownfish::Type->new_va_list(
+        specifier => 'va_list',    # default: va_list
+    );
+
+=head1 DESCRIPTION
+
+Create a Type representing C's va_list, from stdarg.h.
+
+=over
+
+=item * B<specifier>.  Must be "va_list" if supplied.
+
+=back
 
 =head2 equals
 

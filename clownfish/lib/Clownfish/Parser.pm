@@ -24,7 +24,6 @@ use Clownfish::Type;
 use Clownfish::Type::Integer;
 use Clownfish::Type::Float;
 use Clownfish::Type::Void;
-use Clownfish::Type::VAList;
 use Clownfish::Type::Arbitrary;
 use Clownfish::Variable;
 use Clownfish::DocuComment;
@@ -194,7 +193,7 @@ void_type:
 
 va_list_type:
     va_list_type_specifier
-    { Clownfish::Type::VAList->new }
+    { Clownfish::Type->new_va_list }
 
 arbitrary_type:
     arbitrary_type_specifier
