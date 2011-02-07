@@ -42,7 +42,11 @@ sub new {
     confess("Missing required param 'child'")
         unless a_isa_b( $child, "Clownfish::Type" );
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $self = $either->SUPER::new( %args, composite => 1 );
+    my $self = $either->SUPER::new(
+        %args,
+        specifier => $child->get_specifier,
+        composite => 1
+    );
     $child{$self} = $child;
     $array{$self} = $array;
     $self->set_nullable($nullable);
@@ -65,7 +69,6 @@ sub DESTROY {
     $self->SUPER::DESTROY;
 }
 
-sub get_specifier { shift->_get_child->get_specifier }
 sub get_array     { $array{ +shift } }
 sub _get_child    { $child{ +shift } }
 
