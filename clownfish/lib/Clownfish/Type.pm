@@ -188,6 +188,38 @@ sub new_va_list {
     );
 }
 
+our %new_arbitrary_PARAMS = (
+    parcel    => undef,
+    specifier => undef,
+);
+
+sub new_arbitrary {
+    my $either = shift;
+    verify_args( \%new_arbitrary_PARAMS, @_ ) or confess $@;
+    my $self = $either->new( @_, arbitrary => 1 );
+
+    # Validate specifier.
+    my $specifier = $self->get_specifier;
+    my $parcel    = $self->get_parcel;
+    confess("illegal specifier: '$specifier'")
+        unless $specifier =~ /^\w+$/;
+    if ( $specifier =~ /^[A-Z]/ and $parcel ) {
+        my $prefix = $parcel->get_prefix;
+        # Add $prefix to what appear to be namespaced types.
+        if ( $specifier !~ /^$prefix/ ) {
+            $specifier = $prefix . $specifier;
+            $self->set_specifier($specifier);
+        }
+    }
+
+    # Cache C representation.
+    my $string = $self->const ? 'const ' : '';
+    $string .= $specifier;
+    $self->set_c_string($string);
+
+    return $self;
+}
+
 sub DESTROY {
     my $self = shift;
     delete $array{$self};
@@ -355,8 +387,6 @@ The Parcel's prefix will be prepended to the specifier by new_object().
         specifier => 'va_list',    # default: va_list
     );
 
-=head1 DESCRIPTION
-
 Create a Type representing C's va_list, from stdarg.h.
 
 =over
@@ -364,6 +394,43 @@ Create a Type representing C's va_list, from stdarg.h.
 =item * B<specifier>.  Must be "va_list" if supplied.
 
 =back
+
+=head2 new_arbitrary
+
+    my $type = Clownfish::Type->new_arbitrary(
+        specifier => 'floatint_t',    # required
+        parcel    => 'Crustacean',    # default: undef
+    );
+
+"Arbitrary" types are a hack that spares us from having to support C types
+with complex declaration syntaxes -- such as unions, structs, enums, or
+function pointers -- from within Clownfish itself.
+
+The only constraint is that the C<specifier> must end in "_t".  This allows us
+to create complex types in a C header file...
+
+    typedef union { float f; int i; } floatint_t;
+
+... pound-include the C header, then use the resulting typedef in a Clownfish
+header file and have it parse as an "arbitrary" type.
+
+    floatint_t floatint;
+
+=over
+
+=item * B<specifier> - The name of the type, which must end in "_t".
+
+=item * B<parcel> - A L<Clownfish::Parcel> or a parcel name.
+
+=back
+
+If C<parcel> is supplied and C<specifier> begins with a capital letter, the
+Parcel's prefix will be prepended to the specifier:
+
+    foo_t         -> foo_t                # no prefix prepending
+    Lobster_foo_t -> crust_Lobster_foo_t  # prefix prepended
+
+=cut
 
 =head2 equals
 

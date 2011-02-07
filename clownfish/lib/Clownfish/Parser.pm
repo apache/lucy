@@ -24,7 +24,6 @@ use Clownfish::Type;
 use Clownfish::Type::Integer;
 use Clownfish::Type::Float;
 use Clownfish::Type::Void;
-use Clownfish::Type::Arbitrary;
 use Clownfish::Variable;
 use Clownfish::DocuComment;
 use Clownfish::Function;
@@ -358,7 +357,7 @@ sub new_void_type {
 
 sub new_arbitrary_type {
     my ( undef, $item ) = @_;
-    return Clownfish::Type::Arbitrary->new(
+    return Clownfish::Type->new_arbitrary(
         specifier => $item->{arbitrary_type_specifier},
         parcel    => $parcel,
     );
