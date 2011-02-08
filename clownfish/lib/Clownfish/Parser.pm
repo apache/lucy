@@ -21,7 +21,6 @@ use base qw( Parse::RecDescent );
 
 use Clownfish::Parcel;
 use Clownfish::Type;
-use Clownfish::Type::Integer;
 use Clownfish::Type::Float;
 use Clownfish::Variable;
 use Clownfish::DocuComment;
@@ -337,7 +336,7 @@ sub new_integer_type {
         || $item->{chy_integer_specifier};
     my %args = ( specifier => $specifier );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Clownfish::Type::Integer->new(%args);
+    return Clownfish::Type->new_integer(%args);
 }
 
 sub new_float_type {

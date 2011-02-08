@@ -28,6 +28,7 @@ our %incremented;
 our %decremented;
 our %array;
 our %child;
+our %sizeof;
 
 our %new_PARAMS = (
     const       => undef,
@@ -79,6 +80,51 @@ sub new {
 
     return $package->_new( $flags, $parcel, $specifier, $indirection,
         $c_string );
+}
+
+our %int_specifiers = (
+    bool_t   => undef,
+    int8_t   => 1,
+    int16_t  => 2,
+    int32_t  => 4,
+    int64_t  => 8,
+    uint8_t  => 1,
+    uint16_t => 2,
+    uint32_t => 4,
+    uint64_t => 8,
+    char     => 1,
+    int      => undef,
+    short    => undef,
+    long     => undef,
+    size_t   => undef,
+);
+
+our %new_integer_PARAMS = (
+    const     => undef,
+    specifier => undef,
+);
+
+sub new_integer {
+    my ( $either, %args ) = @_;
+    verify_args( \%new_integer_PARAMS, %args ) or confess $@;
+    confess("Unknown specifier: '$args{specifier}'")
+        unless exists $int_specifiers{ $args{specifier} };
+
+    # Cache the C representation of this type.
+    my $c_string = $args{const} ? 'const ' : '';
+    if ( $args{specifier} eq 'bool_t' ) {
+        $c_string .= "chy_";
+    }
+    $c_string .= $args{specifier};
+
+    my $self = $either->new(
+        %args,
+        c_string  => $c_string,
+        integer   => 1,
+        primitive => 1,
+    );
+    $sizeof{$self} = $int_specifiers{ $args{specifier} };
+    return $self;
 }
 
 our %new_object_PARAMS = (
@@ -243,6 +289,7 @@ sub DESTROY {
     delete $child{$self};
     delete $incremented{$self};
     delete $decremented{$self};
+    delete $sizeof{$self};
     $self->_destroy;
 }
 
@@ -250,6 +297,7 @@ sub get_array     { $array{ +shift } }
 sub _get_child    { $child{ +shift } }
 sub incremented   { $incremented{ +shift } }
 sub decremented   { $decremented{ +shift } }
+sub sizeof        { $sizeof{ +shift } }
 
 sub similar {
     my ( $self, $other ) = @_;
@@ -321,6 +369,46 @@ B<parcel> - A Clownfish::Parcel or a parcel name.
 =item *
 
 B<c_string> - The C representation of the type.
+
+=back
+
+=head2 new_integer
+
+    my $type = Clownfish::Type->new_integer(
+        const     => 1,       # default: undef
+        specifier => 'char',  # required
+    );
+
+Return a Type representing an integer primitive.
+
+Support is limited to a subset of the standard C integer types:
+
+    int8_t
+    int16_t
+    int32_t
+    int64_t
+    uint8_t
+    uint16_t
+    uint32_t
+    uint64_t
+    char
+    short
+    int
+    long
+    size_t
+
+Many others are not supported: "signed" or "unsigned" anything, "long long",
+"ptrdiff_t", "off_t", etc.  
+
+The following Charmonizer typedefs are supported:
+
+    bool_t
+
+=over
+
+=item * B<const> - Should be true if the type is const.
+
+=item * B<specifier> - Must match one of the supported types.
 
 =back
 
@@ -508,10 +596,10 @@ used to create it.
 
 =item * is_object: Clownfish::Type->new_object
 
-=item * is_primitive: Either Clownfish::Type::Integer->new or
+=item * is_primitive: Either Clownfish::Type->new_integer or
 Clownfish::Type::Float->new
 
-=item * is_integer: Clownfish::Type::Integer->new
+=item * is_integer: Clownfish::Type->new_integer
 
 =item * is_floating: Clownfish::Type::Float->new
 
