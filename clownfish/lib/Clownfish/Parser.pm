@@ -23,7 +23,6 @@ use Clownfish::Parcel;
 use Clownfish::Type;
 use Clownfish::Type::Integer;
 use Clownfish::Type::Float;
-use Clownfish::Type::Void;
 use Clownfish::Variable;
 use Clownfish::DocuComment;
 use Clownfish::Function;
@@ -352,7 +351,7 @@ sub new_void_type {
     my ( undef, $item ) = @_;
     my %args = ( specifier => $item->{void_type_specifier} );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Clownfish::Type::Void->new(%args);
+    return Clownfish::Type->new_void(%args);
 }
 
 sub new_arbitrary_type {

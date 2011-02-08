@@ -175,6 +175,23 @@ sub new_composite {
     return $self;
 }
 
+our %new_void_PARAMS = (
+    const     => undef,
+    specifier => 'void',
+);
+
+sub new_void {
+    my ( $either, %args ) = @_;
+    verify_args( \%new_void_PARAMS, %args ) or confess $@;
+    my $c_string = $args{const} ? "const void" : "void";
+    return $either->new(
+        %new_PARAMS,
+        %args,
+        specifier => 'void',
+        c_string  => $c_string,
+        void      => 1,
+    );
+}
 
 our %new_va_list_PARAMS = ( specifier => 'va_list' );
 
@@ -381,6 +398,26 @@ be NULL.
 
 The Parcel's prefix will be prepended to the specifier by new_object().
 
+=head2 new_void
+
+    my $type = Clownfish::Type->new_void(
+        specifier => 'void',    # default: void
+        const     => 1,         # default: undef
+    );
+
+Return a Type representing a the 'void' keyword in C.  It can be used either
+for a void return type, or in conjuction with with new_composite() to support
+the C<void*> opaque pointer type.
+
+=over
+
+=item * B<specifier> - Must be "void" if supplied.
+
+=item * B<const> - Should be true if the type is const.  (Useful in the
+context of C<const void*>).
+
+=back
+
 =head2 new_va_list
 
     my $type = Clownfish::Type->new_va_list(
@@ -478,7 +515,7 @@ Clownfish::Type::Float->new
 
 =item * is_floating: Clownfish::Type::Float->new
 
-=item * is_void: Clownfish::Type::Void->new
+=item * is_void: Clownfish::Type->new_void
 
 =item * is_composite: Clownfish::Type->new_composite
 
