@@ -137,6 +137,34 @@ our %new_object_PARAMS = (
     nullable    => 0,
 );
 
+
+our %new_float_PARAMS = (
+    const     => undef,
+    specifier => undef,
+);
+
+our %float_specifiers = (
+    float  => undef,
+    double => undef,
+);
+
+sub new_float {
+    my ( $either, %args ) = @_;
+    verify_args( \%new_float_PARAMS, %args ) or confess $@;
+    confess("Unknown specifier: '$args{specifier}'")
+        unless exists $float_specifiers{ $args{specifier} };
+
+    # Cache the C representation of this type.
+    my $c_string = $args{const} ? "const $args{specifier}" : $args{specifier};
+
+    return $either->new(
+        %args,
+        c_string  => $c_string,
+        floating  => 1,
+        primitive => 1,
+    );
+}
+
 sub new_object {
     my ( $either, %args ) = @_;
     verify_args( \%new_object_PARAMS, %args ) or confess $@;
@@ -412,6 +440,30 @@ The following Charmonizer typedefs are supported:
 
 =back
 
+=head2 new_float
+
+    my $type = Clownfish::Type->new_float(
+        const     => 1,           # default: undef
+        specifier => 'double',    # required
+    );
+
+Return a Type representing a floating point primitive.
+
+Two specifiers are supported:
+
+    float
+    double
+
+=over
+
+=item * B<const> - Should be true if the type is const.
+
+=item * B<specifier> - Must match one of the supported types.
+
+=back
+
+=cut
+
 =head2 new_composite
 
     my $type = Clownfish::Type->new_composite(
@@ -597,11 +649,11 @@ used to create it.
 =item * is_object: Clownfish::Type->new_object
 
 =item * is_primitive: Either Clownfish::Type->new_integer or
-Clownfish::Type::Float->new
+Clownfish::Type->new_float
 
 =item * is_integer: Clownfish::Type->new_integer
 
-=item * is_floating: Clownfish::Type::Float->new
+=item * is_floating: Clownfish::Type->new_float
 
 =item * is_void: Clownfish::Type->new_void
 

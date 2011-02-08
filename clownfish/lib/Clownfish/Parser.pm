@@ -21,7 +21,6 @@ use base qw( Parse::RecDescent );
 
 use Clownfish::Parcel;
 use Clownfish::Type;
-use Clownfish::Type::Float;
 use Clownfish::Variable;
 use Clownfish::DocuComment;
 use Clownfish::Function;
@@ -343,7 +342,7 @@ sub new_float_type {
     my ( undef, $item ) = @_;
     my %args = ( specifier => $item->{c_float_specifier} );
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
-    return Clownfish::Type::Float->new(%args);
+    return Clownfish::Type->new_float(%args);
 }
 
 sub new_void_type {

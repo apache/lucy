@@ -16,11 +16,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
-use Clownfish::Type::Float;
+use Test::More tests => 17;
+use Clownfish::Type;
 use Clownfish::Parser;
 
-my $float_type = Clownfish::Type::Float->new(
+my $float_type = Clownfish::Type->new_float(
     specifier => 'float',
     const     => 1,
 );
@@ -33,9 +33,13 @@ my $parser = Clownfish::Parser->new;
 for my $specifier (qw( float double)) {
     is( $parser->c_float_specifier($specifier),
         $specifier, "c_float_specifier: $specifier" );
-    isa_ok( $parser->float_type($specifier), "Clownfish::Type::Float" );
-    isa_ok( $parser->float_type("const $specifier"),
-        "Clownfish::Type::Float" );
+    my $type = $parser->float_type($specifier);
+    isa_ok( $type, "Clownfish::Type" );
+    ok( $type && $type->is_floating, "parsed specifier is_floating()" );
+    $type = $parser->float_type("const $specifier");
+    isa_ok( $type, "Clownfish::Type" );
+    ok( $type && $type->is_floating, "parsed const specifier is_floating()" );
+    ok( $type && $type->const,    "parsed const specifier is_floating()" );
     my $bogus = $specifier . "y";
     ok( !$parser->c_float_specifier($bogus),
         "c_float_specifier guards against partial word matches" );
