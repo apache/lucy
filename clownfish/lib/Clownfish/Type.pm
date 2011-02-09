@@ -250,33 +250,21 @@ sub new_composite {
 }
 
 our %new_void_PARAMS = (
-    const     => undef,
-    specifier => 'void',
+    const => undef,
 );
 
 sub new_void {
     my ( $either, %args ) = @_;
     verify_args( \%new_void_PARAMS, %args ) or confess $@;
-    my $c_string = $args{const} ? "const void" : "void";
-    return $either->new(
-        %new_PARAMS,
-        %args,
-        specifier => 'void',
-        c_string  => $c_string,
-        void      => 1,
-    );
+    my $package = ref($either) || $either;
+    return $package->_new_void( !!$args{const} );
 }
 
-our %new_va_list_PARAMS = ( specifier => 'va_list' );
-
 sub new_va_list {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_va_list_PARAMS, %args ) or confess $@;
-    return $either->new(
-        specifier => 'va_list',
-        c_string  => 'va_list',
-        va_list   => 1,
-    );
+    my $either = shift;
+    verify_args( {}, @_ ) or confess $@;
+    my $package = ref($either) || $either;
+    return $either->_new_va_list();
 }
 
 our %new_arbitrary_PARAMS = (

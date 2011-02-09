@@ -56,6 +56,21 @@ CFCType_init(CFCType *self, int flags, void *parcel, const char *specifier,
     return self;
 }
 
+CFCType*
+CFCType_new_void(int is_const)
+{
+    int flags = CFCTYPE_VOID;
+    const char *c_string = is_const ? "const void" : "void";
+    if (is_const) { flags |= CFCTYPE_CONST; }
+    return CFCType_new(flags, NULL, "void", 0, c_string);
+}
+
+CFCType*
+CFCType_new_va_list(void)
+{
+    return CFCType_new(CFCTYPE_VA_LIST, NULL, "va_list", 0, "va_list");
+}
+
 void
 CFCType_destroy(CFCType *self)
 {

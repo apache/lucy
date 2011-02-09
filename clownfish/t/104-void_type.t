@@ -25,10 +25,7 @@ is( $void_type->get_specifier, "void", "specifier defaults to 'void'" );
 is( $void_type->to_c,          "void", "to_c" );
 ok( $void_type->is_void, "is_void" );
 
-$void_type = Clownfish::Type->new_void(
-    specifier => 'void',
-    const     => 1,
-);
+$void_type = Clownfish::Type->new_void( const => 1 );
 ok( $void_type->const, "const" );
 like( $void_type->to_c, qr/const/, "'const' in C representation" );
 

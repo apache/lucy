@@ -347,7 +347,7 @@ sub new_float_type {
 
 sub new_void_type {
     my ( undef, $item ) = @_;
-    my %args = ( specifier => $item->{void_type_specifier} );
+    my %args;
     $args{$_} = 1 for @{ $item->{'type_qualifier(s?)'} };
     return Clownfish::Type->new_void(%args);
 }

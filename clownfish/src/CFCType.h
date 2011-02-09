@@ -36,6 +36,12 @@ CFCType*
 CFCType_init(CFCType *self, int flags, void *parcel, const char *specifier,
              int indirection, const char *c_string);
 
+CFCType*
+CFCType_new_void(int is_const);
+
+CFCType*
+CFCType_new_va_list(void);
+
 void
 CFCType_destroy(CFCType *self);
 

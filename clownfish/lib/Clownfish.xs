@@ -442,6 +442,25 @@ CODE:
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
+SV*
+_new_void(klass, is_const)
+    const char *klass;
+    int is_const;
+CODE:
+    CFCType *self = CFCType_new_void(is_const);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+SV*
+_new_va_list(klass)
+    const char *klass;
+CODE:
+    CFCType *self = CFCType_new_va_list();
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
 void
 _destroy(self)
     CFCType *self;
