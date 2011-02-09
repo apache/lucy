@@ -428,14 +428,19 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Type
 
 SV*
-_new(klass, flags, parcel, specifier, indirection, c_string)
+_new(klass, flags, parcel_sv, specifier, indirection, c_string)
     const char *klass;
     int flags;
-    SV *parcel;
+    SV *parcel_sv;
     const char *specifier;
     int indirection;
     const char *c_string;
 CODE:
+    CFCParcel *parcel = NULL;
+    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
+        IV objint = SvIV((SV*)SvRV(parcel_sv));
+        parcel = INT2PTR(CFCParcel*, objint);
+    }   
     CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
         c_string);
     RETVAL = newSV(0);
@@ -574,8 +579,12 @@ PPCODE:
                 retval = newSVpvn(specifier, strlen(specifier));
             }
             break;
-        case 4:
-            retval = newSVsv((SV*)CFCType_get_parcel(self));
+        case 4: {
+                CFCParcel *parcel = CFCType_get_parcel(self);
+                retval = parcel
+                       ? newSVsv((SV*)CFCParcel_get_perl_object(parcel))
+                       : newSV(0);
+            }
             break;
         case 6:
             retval = newSViv(CFCType_get_indirection(self));

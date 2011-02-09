@@ -15,6 +15,7 @@
  */
 
 typedef struct CFCType CFCType;
+struct CFCParcel;
 
 #define CFCTYPE_CONST       0x00000001
 #define CFCTYPE_NULLABLE    0x00000002
@@ -29,12 +30,12 @@ typedef struct CFCType CFCType;
 #define CFCTYPE_COMPOSITE   0x00000400
 
 CFCType*
-CFCType_new(int flags, void *parcel, const char *specifier, int indirection,
-            const char *c_string);
+CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
+            int indirection, const char *c_string);
 
 CFCType*
-CFCType_init(CFCType *self, int flags, void *parcel, const char *specifier,
-             int indirection, const char *c_string);
+CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel, 
+             const char *specifier, int indirection, const char *c_string);
 
 CFCType*
 CFCType_new_void(int is_const);
@@ -57,7 +58,7 @@ CFCType_get_specifier(CFCType *self);
 int
 CFCType_get_indirection(CFCType *self);
 
-void*
+struct CFCParcel*
 CFCType_get_parcel(CFCType *self);
 
 void

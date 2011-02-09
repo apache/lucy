@@ -30,13 +30,13 @@ struct CFCType {
     int   flags;
     char *specifier;
     int   indirection;
-    void *parcel;
+    struct CFCParcel *parcel;
     char *c_string;
 };
 
 CFCType*
-CFCType_new(int flags, void *parcel, const char *specifier, int indirection,
-            const char *c_string)
+CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
+            int indirection, const char *c_string)
 {
     CFCType *self = (CFCType*)malloc(sizeof(CFCType));
     if (!self) { croak("malloc failed"); }
@@ -45,11 +45,11 @@ CFCType_new(int flags, void *parcel, const char *specifier, int indirection,
 }
 
 CFCType*
-CFCType_init(CFCType *self, int flags, void *parcel, const char *specifier,
-             int indirection, const char *c_string)
+CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel, 
+             const char *specifier, int indirection, const char *c_string)
 {
     self->flags       = flags;
-    self->parcel      = newSVsv((SV*)parcel);
+    self->parcel      = parcel;
     self->specifier   = savepv(specifier);
     self->indirection = indirection;
     self->c_string    = c_string ? savepv(c_string) : savepv("");
@@ -76,7 +76,6 @@ CFCType_destroy(CFCType *self)
 {
     Safefree(self->specifier);
     Safefree(self->c_string);
-    SvREFCNT_dec(self->parcel);
     free(self);
 }
 
@@ -120,7 +119,7 @@ CFCType_get_indirection(CFCType *self)
     return self->indirection;
 }
 
-void*
+struct CFCParcel*
 CFCType_get_parcel(CFCType *self)
 {
     return self->parcel;
