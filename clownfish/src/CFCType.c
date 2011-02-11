@@ -15,6 +15,7 @@
  */
 
 #include <stdlib.h>
+#include <ctype.h>
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -25,6 +26,7 @@
 #endif
 
 #include "CFCType.h"
+#include "CFCParcel.h"
 
 struct CFCType {
     int   flags;
@@ -69,6 +71,41 @@ CFCType*
 CFCType_new_va_list(void)
 {
     return CFCType_new(CFCTYPE_VA_LIST, NULL, "va_list", 0, "va_list");
+}
+
+
+CFCType*
+CFCType_new_arbitrary(CFCParcel *parcel, const char *specifier)
+{
+    const size_t MAX_SPECIFIER_LEN = 256;
+
+    // Add parcel prefix to what appear to be namespaced types.
+    char full_specifier[MAX_SPECIFIER_LEN + 1];
+    if (isupper(*specifier) && parcel != NULL) {
+        const char *prefix = CFCParcel_get_prefix(parcel);
+        size_t full_len = strlen(prefix) + strlen(specifier);
+        if (full_len > MAX_SPECIFIER_LEN) {
+            croak("Illegal specifier: '%s'", specifier); 
+        }
+        sprintf(full_specifier, "%s%s", prefix, specifier);
+    }
+    else {
+        if (strlen(specifier) > MAX_SPECIFIER_LEN) {
+            croak("Illegal specifier: '%s'", specifier); 
+        }
+        strcpy(full_specifier, specifier);
+    }
+
+    // Validate specifier.
+    size_t i, max;
+    for (i = 0, max = strlen(full_specifier); i < max; i++) {
+        if (!isalnum(full_specifier[i]) && full_specifier[i] != '_') {
+            croak("Illegal specifier: '%s'", full_specifier); 
+        }
+    }
+
+    return CFCType_new(CFCTYPE_ARBITRARY, parcel, full_specifier, 0, 
+        full_specifier);
 }
 
 void

@@ -273,30 +273,11 @@ our %new_arbitrary_PARAMS = (
 );
 
 sub new_arbitrary {
-    my $either = shift;
-    verify_args( \%new_arbitrary_PARAMS, @_ ) or confess $@;
-    my $self = $either->new( @_, arbitrary => 1 );
-
-    # Validate specifier.
-    my $specifier = $self->get_specifier;
-    my $parcel    = $self->get_parcel;
-    confess("illegal specifier: '$specifier'")
-        unless $specifier =~ /^\w+$/;
-    if ( $specifier =~ /^[A-Z]/ and $parcel ) {
-        my $prefix = $parcel->get_prefix;
-        # Add $prefix to what appear to be namespaced types.
-        if ( $specifier !~ /^$prefix/ ) {
-            $specifier = $prefix . $specifier;
-            $self->set_specifier($specifier);
-        }
-    }
-
-    # Cache C representation.
-    my $string = $self->const ? 'const ' : '';
-    $string .= $specifier;
-    $self->set_c_string($string);
-
-    return $self;
+    my ( $either, %args ) = @_;
+    verify_args( \%new_arbitrary_PARAMS, %args ) or confess $@;
+    my $package = ref($either) || $either;
+    my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
+    return $package->_new_arbitrary( $parcel, $args{specifier} );
 }
 
 sub DESTROY {

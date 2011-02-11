@@ -43,6 +43,9 @@ CFCType_new_void(int is_const);
 CFCType*
 CFCType_new_va_list(void);
 
+CFCType*
+CFCType_new_arbitrary(struct CFCParcel *parcel, const char *specifier);
+
 void
 CFCType_destroy(CFCType *self);
 

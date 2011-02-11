@@ -466,6 +466,22 @@ CODE:
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
+SV*
+_new_arbitrary(klass, parcel_sv, specifier)
+    const char *klass;
+    SV *parcel_sv;
+    const char *specifier;
+CODE:
+    CFCParcel *parcel = NULL;
+    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
+        IV objint = SvIV((SV*)SvRV(parcel_sv));
+        parcel = INT2PTR(CFCParcel*, objint);
+    }   
+    CFCType *self = CFCType_new_arbitrary(parcel, specifier);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
 void
 _destroy(self)
     CFCType *self;
