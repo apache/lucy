@@ -488,6 +488,30 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_new_composite(klass, flags, child_sv, indirection, array)
+    const char *klass;
+    int flags;
+    SV *child_sv;
+    int indirection;
+    const char *array;
+CODE:
+    CFCType *child = NULL;
+    if (SvOK(child_sv) && sv_derived_from(child_sv, "Clownfish::Type")) {
+        IV objint = SvIV((SV*)SvRV(child_sv));
+        child = INT2PTR(CFCType*, objint);
+        // Intentionally leak a refcount for child type so that it does not
+        // get destroyed.
+        SvREFCNT_inc(SvRV(child_sv));
+    }
+    else {
+        croak("Param 'child' not a Clownfish::Type");
+    }
+    CFCType *self = CFCType_new_composite(flags, child, indirection, array);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+SV*
 _new_void(klass, is_const)
     const char *klass;
     int is_const;
@@ -639,6 +663,7 @@ ALIAS:
     get_width       = 32
     incremented     = 34
     decremented     = 36
+    get_array       = 38
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -711,6 +736,13 @@ PPCODE:
             break;
         case 36:
             retval = newSVuv(CFCType_decremented(self));
+            break;
+        case 38: {
+                const char *array = CFCType_get_array(self);
+                retval = array 
+                       ? newSVpvn(array, strlen(array))
+                       : newSV(0);
+            }
             break;
     END_SET_OR_GET_SWITCH
 }

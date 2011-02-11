@@ -50,6 +50,10 @@ CFCType_new_object(int flags, struct CFCParcel *parcel, const char *specifier,
                    int indirection);
 
 CFCType*
+CFCType_new_composite(int flags, CFCType *child, int indirection, 
+                      const char *array);
+
+CFCType*
 CFCType_new_void(int is_const);
 
 CFCType*
@@ -84,6 +88,9 @@ CFCType_to_c(CFCType *self);
 
 size_t
 CFCType_get_width(CFCType *self);
+
+const char*
+CFCType_get_array(CFCType *self);
 
 int
 CFCType_set_nullable(CFCType *self, int nullable);

@@ -35,6 +35,8 @@ struct CFCType {
     struct CFCParcel *parcel;
     char *c_string;
     size_t width;
+    char *array;
+    struct CFCType *child;
 };
 
 CFCType*
@@ -57,6 +59,8 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
     self->indirection = indirection;
     self->c_string    = c_string ? savepv(c_string) : savepv("");
     self->width       = 0;
+    self->array       = NULL;
+    self->child       = NULL;
     return self;
 }
 
@@ -209,6 +213,44 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
 }
 
 CFCType*
+CFCType_new_composite(int flags, CFCType *child, int indirection, 
+                      const char *array)
+{
+    if (!child) {
+        croak("Missing required param 'child'");
+    }
+    flags |= CFCTYPE_COMPOSITE;
+
+    // Cache C representation.
+    // NOTE: Array postfixes are NOT included.
+    const size_t MAX_LEN = 256;
+    const char *child_c_string = CFCType_to_c(child);
+    size_t child_c_len = strlen(child_c_string);
+    size_t amount = child_c_len + indirection;
+    if (amount > MAX_LEN) {
+        croak("C representation too long");
+    }
+    char c_string[MAX_LEN + 1];
+    strcpy(c_string, child_c_string);
+    size_t i;
+    for (i = 0; i < indirection; i++) {
+        strncat(c_string, "*", 1);
+    }
+
+    CFCType *self = CFCType_new(flags, NULL, CFCType_get_specifier(child),
+        indirection, c_string);
+
+    // Record array spec.
+    const char *array_spec = array ? array : "";
+    size_t array_spec_size = strlen(array_spec) + 1;
+    self->array = (char*)malloc(array_spec_size);
+    if (!self->array) { croak("Malloc failed"); }
+    strcpy(self->array, array_spec);
+
+    return self;
+}
+
+CFCType*
 CFCType_new_void(int is_const)
 {
     int flags = CFCTYPE_VOID;
@@ -281,11 +323,19 @@ CFCType_equals(CFCType *self, CFCType *other)
         || (CFCType_is_composite(self) ^ CFCType_is_composite(other))
         || (CFCType_incremented(self)  ^ CFCType_incremented(other))
         || (CFCType_decremented(self)  ^ CFCType_decremented(other))
+        || !!self->child ^ !!other->child
+        || !!self->array ^ !!other->array
     ) { 
         return false; 
     }
     if (self->indirection != other->indirection) { return false; }
     if (strcmp(self->specifier, other->specifier) != 0) { return false; }
+    if (self->child) {
+        if (!CFCType_equals(self->child, other->child)) { return false; }
+    }
+    if (self->array) {
+        if (strcmp(self->array, other->array) != 0) { return false; }
+    }
     return true;
 }
 
@@ -331,6 +381,12 @@ size_t
 CFCType_get_width(CFCType *self)
 {
     return self->width;
+}
+
+const char*
+CFCType_get_array(CFCType *self)
+{
+    return self->array;
 }
 
 int

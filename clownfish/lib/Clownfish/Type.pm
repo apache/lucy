@@ -23,10 +23,6 @@ use Clownfish::Util qw( verify_args a_isa_b );
 use Scalar::Util qw( blessed );
 use Carp;
 
-# Inside-out member vars.
-our %array;
-our %child;
-
 our %new_PARAMS = (
     const       => undef,
     specifier   => undef,
@@ -143,31 +139,14 @@ our %new_composite_PARAMS = (
 
 sub new_composite {
     my ( $either, %args ) = @_;
-    my $array    = delete $args{array};
-    my $child    = delete $args{child};
-    my $nullable = delete $args{nullable};
-    $args{indirection} ||= 0;
-    confess("Missing required param 'child'")
-        unless a_isa_b( $child, "Clownfish::Type" );
     verify_args( \%new_composite_PARAMS, %args ) or confess $@;
-    my $self = $either->new(
-        %args,
-        specifier => $child->get_specifier,
-        composite => 1
-    );
-    $child{$self} = $child;
-    $array{$self} = $array;
-    $self->set_nullable($nullable);
-
-    # Cache C representation.
-    # NOTE: Array postfixes are NOT included.
-    my $string = $child->to_c;
-    for ( my $i = 0; $i < $self->get_indirection; $i++ ) {
-        $string .= '*';
-    }
-    $self->set_c_string($string);
-
-    return $self;
+    my $flags = 0;
+    $flags |= NULLABLE if $args{nullable};
+    my $indirection = $args{indirection} || 0;
+    my $array = defined $args{array} ? $args{array} : "";
+    my $package = ref($either) || $either;
+    return $package->_new_composite( $flags, $args{child}, $indirection,
+        $array );
 }
 
 our %new_void_PARAMS = (
@@ -203,13 +182,8 @@ sub new_arbitrary {
 
 sub DESTROY {
     my $self = shift;
-    delete $array{$self};
-    delete $child{$self};
     $self->_destroy;
 }
-
-sub get_array     { $array{ +shift } }
-sub _get_child    { $child{ +shift } }
 
 sub similar {
     my ( $self, $other ) = @_;
@@ -222,13 +196,6 @@ sub similar {
 
 sub equals {
     my ( $self, $other ) = @_;
-    my $child = $self->_get_child;
-    if ($child) {
-        return 0 unless $other->_get_child;
-        return 0 unless $child->equals( $other->_get_child );
-    }
-    return 0 if ( $self->get_array xor $other->get_array );
-    return 0 if ( $self->get_array and $self->get_array ne $other->get_array );
     return $self->_equals($other);
 }
 
