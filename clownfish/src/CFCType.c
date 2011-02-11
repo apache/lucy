@@ -34,6 +34,7 @@ struct CFCType {
     int   indirection;
     struct CFCParcel *parcel;
     char *c_string;
+    size_t width;
 };
 
 CFCType*
@@ -55,6 +56,64 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
     self->specifier   = savepv(specifier);
     self->indirection = indirection;
     self->c_string    = c_string ? savepv(c_string) : savepv("");
+    self->width       = 0;
+    return self;
+}
+
+CFCType*
+CFCType_new_integer(int flags, const char *specifier)
+{
+    // Validate specifier, find width.
+    size_t width; 
+    if (!strcmp(specifier, "int8_t") || !strcmp(specifier, "uint8_t")) {
+        width = 1;
+    }
+    else if (!strcmp(specifier, "int16_t") || !strcmp(specifier, "uint16_t")) {
+        width = 2;
+    }
+    else if (!strcmp(specifier, "int32_t") || !strcmp(specifier, "uint32_t")) {
+        width = 4;
+    }
+    else if (!strcmp(specifier, "int64_t") || !strcmp(specifier, "uint64_t")) {
+        width = 8;
+    }
+    else if (   !strcmp(specifier, "char") 
+             || !strcmp(specifier, "short")
+             || !strcmp(specifier, "int")
+             || !strcmp(specifier, "long")
+             || !strcmp(specifier, "size_t")
+             || !strcmp(specifier, "bool_t") // Charmonizer type.
+    ) {
+        width = 0;
+    }
+    else {
+        croak("Unknown integer specifier: '%s'", specifier);
+    }
+
+    // Add Charmonizer prefix if necessary.
+    char full_specifier[32];
+    if (strcmp(specifier, "bool_t") == 0) {
+        strcpy(full_specifier, "chy_bool_t");
+    }
+    else {
+        strcpy(full_specifier, specifier);
+    }
+
+    // Cache the C representation of this type.
+    char c_string[32];
+    if (flags & CFCTYPE_CONST) {
+        sprintf(c_string, "const %s", full_specifier);
+    }
+    else {
+        strcpy(c_string, full_specifier);
+    }
+
+    // Add flags.
+    flags |= CFCTYPE_PRIMITIVE;
+    flags |= CFCTYPE_INTEGER;
+
+    CFCType *self = CFCType_new(flags, NULL, full_specifier, 0, c_string);
+    self->width = width;
     return self;
 }
 
@@ -208,6 +267,12 @@ const char*
 CFCType_to_c(CFCType *self)
 {
     return self->c_string;
+}
+
+size_t
+CFCType_get_width(CFCType *self)
+{
+    return self->width;
 }
 
 int

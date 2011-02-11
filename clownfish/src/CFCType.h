@@ -38,6 +38,9 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
              const char *specifier, int indirection, const char *c_string);
 
 CFCType*
+CFCType_new_integer(int flags, const char *specifier);
+
+CFCType*
 CFCType_new_float(int flags, const char *specifier);
 
 CFCType*
@@ -72,6 +75,9 @@ CFCType_set_c_string(CFCType *self, const char *c_string);
 
 const char*
 CFCType_to_c(CFCType *self);
+
+size_t
+CFCType_get_width(CFCType *self);
 
 int
 CFCType_set_nullable(CFCType *self, int nullable);

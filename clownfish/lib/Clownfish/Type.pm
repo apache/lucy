@@ -28,7 +28,6 @@ our %incremented;
 our %decremented;
 our %array;
 our %child;
-our %sizeof;
 
 our %new_PARAMS = (
     const       => undef,
@@ -82,23 +81,6 @@ sub new {
         $c_string );
 }
 
-our %int_specifiers = (
-    bool_t   => undef,
-    int8_t   => 1,
-    int16_t  => 2,
-    int32_t  => 4,
-    int64_t  => 8,
-    uint8_t  => 1,
-    uint16_t => 2,
-    uint32_t => 4,
-    uint64_t => 8,
-    char     => 1,
-    int      => undef,
-    short    => undef,
-    long     => undef,
-    size_t   => undef,
-);
-
 our %new_integer_PARAMS = (
     const     => undef,
     specifier => undef,
@@ -107,24 +89,10 @@ our %new_integer_PARAMS = (
 sub new_integer {
     my ( $either, %args ) = @_;
     verify_args( \%new_integer_PARAMS, %args ) or confess $@;
-    confess("Unknown specifier: '$args{specifier}'")
-        unless exists $int_specifiers{ $args{specifier} };
-
-    # Cache the C representation of this type.
-    my $c_string = $args{const} ? 'const ' : '';
-    if ( $args{specifier} eq 'bool_t' ) {
-        $c_string .= "chy_";
-    }
-    $c_string .= $args{specifier};
-
-    my $self = $either->new(
-        %args,
-        c_string  => $c_string,
-        integer   => 1,
-        primitive => 1,
-    );
-    $sizeof{$self} = $int_specifiers{ $args{specifier} };
-    return $self;
+    my $flags = 0;
+    $flags |= CONST if $args{const};
+    my $package = ref($either) || $either;
+    return $package->_new_integer( $flags, $args{specifier} );
 }
 
 our %new_object_PARAMS = (
@@ -273,7 +241,6 @@ sub DESTROY {
     delete $child{$self};
     delete $incremented{$self};
     delete $decremented{$self};
-    delete $sizeof{$self};
     $self->_destroy;
 }
 
@@ -281,7 +248,6 @@ sub get_array     { $array{ +shift } }
 sub _get_child    { $child{ +shift } }
 sub incremented   { $incremented{ +shift } }
 sub decremented   { $decremented{ +shift } }
-sub sizeof        { $sizeof{ +shift } }
 
 sub similar {
     my ( $self, $other ) = @_;

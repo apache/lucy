@@ -448,6 +448,17 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_new_integer(klass, flags, specifier)
+    const char *klass;
+    int flags;
+    const char *specifier;
+CODE:
+    CFCType *self = CFCType_new_integer(flags, specifier);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+SV*
 _new_float(klass, flags, specifier)
     const char *klass;
     int flags;
@@ -595,6 +606,7 @@ ALIAS:
     is_va_list      = 26
     is_arbitrary    = 28
     is_composite    = 30
+    get_width       = 32
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -658,6 +670,9 @@ PPCODE:
             break;
         case 30:
             retval = newSViv(CFCType_is_composite(self));
+            break;
+        case 32:
+            retval = newSVuv(CFCType_get_width(self));
             break;
     END_SET_OR_GET_SWITCH
 }
