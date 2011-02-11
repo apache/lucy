@@ -24,8 +24,6 @@ use Scalar::Util qw( blessed );
 use Carp;
 
 # Inside-out member vars.
-our %incremented;
-our %decremented;
 our %array;
 our %child;
 
@@ -95,17 +93,6 @@ sub new_integer {
     return $package->_new_integer( $flags, $args{specifier} );
 }
 
-our %new_object_PARAMS = (
-    const       => undef,
-    specifier   => undef,
-    indirection => 1,
-    parcel      => undef,
-    incremented => 0,
-    decremented => 0,
-    nullable    => 0,
-);
-
-
 our %new_float_PARAMS = (
     const     => undef,
     specifier => undef,
@@ -120,52 +107,31 @@ sub new_float {
     return $package->_new_float( $flags, $args{specifier} );
 }
 
+our %new_object_PARAMS = (
+    const       => undef,
+    specifier   => undef,
+    indirection => 1,
+    parcel      => undef,
+    incremented => 0,
+    decremented => 0,
+    nullable    => 0,
+);
+
 sub new_object {
     my ( $either, %args ) = @_;
     verify_args( \%new_object_PARAMS, %args ) or confess $@;
-    my $incremented = delete $args{incremented} || 0;
-    my $decremented = delete $args{decremented} || 0;
-    my $nullable    = delete $args{nullable}    || 0;
+    my $flags = 0;
+    $flags |= INCREMENTED if $args{incremented};
+    $flags |= DECREMENTED if $args{decremented};
+    $flags |= NULLABLE    if $args{nullable};
+    $flags |= CONST       if $args{const};
     $args{indirection} = 1 unless defined $args{indirection};
-    my $indirection = $args{indirection};
-    $args{parcel} ||= Clownfish::Parcel->default_parcel;
+    my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
+    my $package = ref($either) || $either;
     confess("Missing required param 'specifier'")
         unless defined $args{specifier};
-
-    # Derive boolean indicating whether this type is a string type.
-    my $is_string_type = $args{specifier} =~ /CharBuf/ ? 1 : 0;
-
-    my $self = $either->new(
-        %args,
-        object      => 1,
-        string_type => $is_string_type,
-    );
-    $incremented{$self} = $incremented;
-    $decremented{$self} = $decremented;
-    $self->set_nullable($nullable);
-    my $prefix    = $self->get_parcel->get_prefix;
-    my $specifier = $self->get_specifier;
-
-    # Validate params.
-    confess("Indirection must be 1") unless $indirection == 1;
-    confess("Can't be both incremented and decremented")
-        if ( $incremented && $decremented );
-    confess("Illegal specifier: '$specifier'")
-        unless $specifier
-            =~ /^(?:$prefix)?[A-Z][A-Za-z0-9]*[a-z]+[A-Za-z0-9]*(?!\w)/;
-
-    # Add $prefix if necessary.
-    if ( $specifier !~ /^$prefix/ ) {
-        $specifier = $prefix . $specifier;
-        $self->set_specifier($specifier);
-    }
-
-    # Cache C representation.
-    my $string = $self->const ? 'const ' : '';
-    $string .= "$specifier*";
-    $self->set_c_string($string);
-
-    return $self;
+    return $package->_new_object( $flags, $parcel, $args{specifier},
+        $args{indirection} );
 }
 
 our %new_composite_PARAMS = (
@@ -239,15 +205,11 @@ sub DESTROY {
     my $self = shift;
     delete $array{$self};
     delete $child{$self};
-    delete $incremented{$self};
-    delete $decremented{$self};
     $self->_destroy;
 }
 
 sub get_array     { $array{ +shift } }
 sub _get_child    { $child{ +shift } }
-sub incremented   { $incremented{ +shift } }
-sub decremented   { $decremented{ +shift } }
 
 sub similar {
     my ( $self, $other ) = @_;
@@ -265,8 +227,6 @@ sub equals {
         return 0 unless $other->_get_child;
         return 0 unless $child->equals( $other->_get_child );
     }
-    return 0 if ( $self->incremented xor $other->incremented );
-    return 0 if ( $self->decremented xor $other->decremented );
     return 0 if ( $self->get_array xor $other->get_array );
     return 0 if ( $self->get_array and $self->get_array ne $other->get_array );
     return $self->_equals($other);

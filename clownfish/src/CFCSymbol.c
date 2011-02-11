@@ -89,6 +89,14 @@ S_validate_class_name(const char *class_name)
     return true;
 }
 
+int
+CFCSymbol_validate_class_name_component(const char *name)
+{
+    if (!S_validate_class_name(name)) { return false; }
+    if (strchr(name, ':') != NULL) { return false; }
+    return true;
+}
+
 static int
 S_validate_class_cnick(const char *class_cnick)
 {
@@ -103,9 +111,7 @@ S_validate_class_cnick(const char *class_cnick)
     }
 
     // Same as one component of a class name.
-    if (!S_validate_class_name(class_cnick)) { return false; }
-    if (strchr(class_cnick, ':') != NULL) { return false; }
-    return true;
+    return CFCSymbol_validate_class_name_component(class_cnick);
 }
 
 static int

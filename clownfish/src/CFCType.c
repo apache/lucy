@@ -153,6 +153,62 @@ CFCType_new_float(int flags, const char *specifier)
 }
 
 CFCType*
+CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier, 
+                   int indirection)
+{
+    // Validate params.
+    if (indirection != 1) {
+        croak("Parameter 'indirection' can only be 1");
+    }
+    if (!specifier || !strlen(specifier)) {
+        croak("Missing required param 'specifier'");
+    }
+    if ((flags & CFCTYPE_INCREMENTED) && (flags & CFCTYPE_DECREMENTED)) {
+        croak("Can't be both incremented and decremented");
+    }
+    if (!parcel) {
+        croak("Missing required param 'parcel'");
+    }
+
+    // Add flags.
+    flags |= CFCTYPE_OBJECT;
+    if (strstr(specifier, "CharBuf")) {
+        // Determine whether this type is a string type.
+        flags |= CFCTYPE_STRING_TYPE;
+    }
+
+    const char *prefix = CFCParcel_get_prefix(parcel);
+    const size_t MAX_SPECIFIER_LEN = 256;
+    char full_specifier[MAX_SPECIFIER_LEN + 1];
+    char small_specifier[MAX_SPECIFIER_LEN + 1];
+    if (strlen(prefix) + strlen(specifier) > MAX_SPECIFIER_LEN) {
+        croak("Specifier and/or parcel prefix too long");
+    }
+    if (strstr(specifier, prefix) != specifier) {
+        sprintf(full_specifier, "%s%s", prefix, specifier);
+        strcpy(small_specifier, specifier);
+    }
+    else {
+        strcpy(full_specifier, specifier);
+        strcpy(small_specifier, specifier + strlen(prefix));
+    }
+    if (!CFCSymbol_validate_class_name_component(small_specifier)) {
+        croak("Invalid specifier: '%s'", specifier);
+    }
+    
+    // Cache C representation.
+    char c_string[MAX_SPECIFIER_LEN + 10];
+    if (flags & CFCTYPE_CONST) {
+        sprintf(c_string, "const %s*", full_specifier);
+    }
+    else {
+        sprintf(c_string, "%s*", full_specifier);
+    }
+
+    return CFCType_new(flags, parcel, full_specifier, 1, c_string);
+}
+
+CFCType*
 CFCType_new_void(int is_const)
 {
     int flags = CFCTYPE_VOID;
@@ -223,6 +279,8 @@ CFCType_equals(CFCType *self, CFCType *other)
         || (CFCType_is_va_list(self)   ^ CFCType_is_va_list(other))
         || (CFCType_is_arbitrary(self) ^ CFCType_is_arbitrary(other))
         || (CFCType_is_composite(self) ^ CFCType_is_composite(other))
+        || (CFCType_incremented(self)  ^ CFCType_incremented(other))
+        || (CFCType_decremented(self)  ^ CFCType_decremented(other))
     ) { 
         return false; 
     }
@@ -296,6 +354,18 @@ int
 CFCType_nullable(CFCType *self)
 {
     return !!(self->flags & CFCTYPE_NULLABLE);
+}
+
+int
+CFCType_incremented(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_INCREMENTED);
+}
+
+int
+CFCType_decremented(CFCType *self)
+{
+    return !!(self->flags & CFCTYPE_DECREMENTED);
 }
 
 int

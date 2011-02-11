@@ -20,14 +20,16 @@ struct CFCParcel;
 #define CFCTYPE_CONST       0x00000001
 #define CFCTYPE_NULLABLE    0x00000002
 #define CFCTYPE_VOID        0x00000004
-#define CFCTYPE_OBJECT      0x00000008
-#define CFCTYPE_PRIMITIVE   0x00000010
-#define CFCTYPE_INTEGER     0x00000020
-#define CFCTYPE_FLOATING    0x00000040
-#define CFCTYPE_STRING_TYPE 0x00000080
-#define CFCTYPE_VA_LIST     0x00000100
-#define CFCTYPE_ARBITRARY   0x00000200
-#define CFCTYPE_COMPOSITE   0x00000400
+#define CFCTYPE_INCREMENTED 0x00000008
+#define CFCTYPE_DECREMENTED 0x00000010
+#define CFCTYPE_OBJECT      0x00000020
+#define CFCTYPE_PRIMITIVE   0x00000040
+#define CFCTYPE_INTEGER     0x00000080
+#define CFCTYPE_FLOATING    0x00000100
+#define CFCTYPE_STRING_TYPE 0x00000200
+#define CFCTYPE_VA_LIST     0x00000400
+#define CFCTYPE_ARBITRARY   0x00000800
+#define CFCTYPE_COMPOSITE   0x00001000
 
 CFCType*
 CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
@@ -42,6 +44,10 @@ CFCType_new_integer(int flags, const char *specifier);
 
 CFCType*
 CFCType_new_float(int flags, const char *specifier);
+
+CFCType*
+CFCType_new_object(int flags, struct CFCParcel *parcel, const char *specifier,
+                   int indirection);
 
 CFCType*
 CFCType_new_void(int is_const);
@@ -84,6 +90,12 @@ CFCType_set_nullable(CFCType *self, int nullable);
 
 int
 CFCType_nullable(CFCType *self);
+
+int
+CFCType_incremented(CFCType *self);
+
+int
+CFCType_decremented(CFCType *self);
 
 int
 CFCType_is_void(CFCType *self);

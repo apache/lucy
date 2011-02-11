@@ -29,6 +29,13 @@ struct CFCSymbol {
 };
 #endif
 
+/** Return true if the supplied string is comprised solely of alphanumeric
+ * characters, begins with an uppercase letter, and contains at least one
+ * lower case letter.
+ */
+int
+CFCSymbol_validate_class_name_component(const char *name);
+
 CFCSymbol*
 CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, const char *class_name, 
               const char *class_cnick, const char *micro_sym);

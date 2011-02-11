@@ -470,6 +470,24 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_new_object(klass, flags, parcel_sv, specifier, indirection)
+    const char *klass;
+    int flags;
+    SV *parcel_sv;
+    const char *specifier;
+    int indirection;
+CODE:
+    CFCParcel *parcel = NULL;
+    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
+        IV objint = SvIV((SV*)SvRV(parcel_sv));
+        parcel = INT2PTR(CFCParcel*, objint);
+    }   
+    CFCType *self = CFCType_new_object(flags, parcel, specifier, indirection);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+SV*
 _new_void(klass, is_const)
     const char *klass;
     int is_const;
@@ -528,6 +546,18 @@ unsigned
 NULLABLE(...)
 CODE:
     RETVAL = CFCTYPE_NULLABLE;
+OUTPUT: RETVAL
+
+unsigned
+INCREMENTED(...)
+CODE:
+    RETVAL = CFCTYPE_INCREMENTED;
+OUTPUT: RETVAL
+
+unsigned
+DECREMENTED(...)
+CODE:
+    RETVAL = CFCTYPE_DECREMENTED;
 OUTPUT: RETVAL
 
 unsigned
@@ -607,6 +637,8 @@ ALIAS:
     is_arbitrary    = 28
     is_composite    = 30
     get_width       = 32
+    incremented     = 34
+    decremented     = 36
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -673,6 +705,12 @@ PPCODE:
             break;
         case 32:
             retval = newSVuv(CFCType_get_width(self));
+            break;
+        case 34:
+            retval = newSVuv(CFCType_incremented(self));
+            break;
+        case 36:
+            retval = newSVuv(CFCType_decremented(self));
             break;
     END_SET_OR_GET_SWITCH
 }
