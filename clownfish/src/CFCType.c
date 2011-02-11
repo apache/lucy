@@ -58,6 +58,41 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
     return self;
 }
 
+static const char *float_specifiers[] = { 
+    "float", 
+    "double", 
+    NULL 
+};
+
+CFCType*
+CFCType_new_float(int flags, const char *specifier)
+{
+    // Validate specifier.
+    size_t i;
+    for (i = 0; ; i++) {
+        if (!float_specifiers[i]) {
+            croak("Unknown float specifier: '%s'", specifier);
+        }
+        if (strcmp(float_specifiers[i], specifier) == 0) {
+            break;
+        }
+    }
+
+    // Cache the C representation of this type.
+    char c_string[32];
+    if (flags & CFCTYPE_CONST) {
+        sprintf(c_string, "const %s", specifier);
+    }
+    else {
+        strcpy(c_string, specifier);
+    }
+
+    flags |= CFCTYPE_PRIMITIVE;
+    flags |= CFCTYPE_FLOATING;
+
+    return CFCType_new(flags, NULL, specifier, 0, c_string);
+}
+
 CFCType*
 CFCType_new_void(int is_const)
 {

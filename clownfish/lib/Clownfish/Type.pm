@@ -143,26 +143,13 @@ our %new_float_PARAMS = (
     specifier => undef,
 );
 
-our %float_specifiers = (
-    float  => undef,
-    double => undef,
-);
-
 sub new_float {
     my ( $either, %args ) = @_;
     verify_args( \%new_float_PARAMS, %args ) or confess $@;
-    confess("Unknown specifier: '$args{specifier}'")
-        unless exists $float_specifiers{ $args{specifier} };
-
-    # Cache the C representation of this type.
-    my $c_string = $args{const} ? "const $args{specifier}" : $args{specifier};
-
-    return $either->new(
-        %args,
-        c_string  => $c_string,
-        floating  => 1,
-        primitive => 1,
-    );
+    my $flags = 0;
+    $flags |= CONST if $args{const};
+    my $package = ref($either) || $either;
+    return $package->_new_float( $flags, $args{specifier} );
 }
 
 sub new_object {

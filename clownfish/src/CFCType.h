@@ -38,6 +38,9 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
              const char *specifier, int indirection, const char *c_string);
 
 CFCType*
+CFCType_new_float(int flags, const char *specifier);
+
+CFCType*
 CFCType_new_void(int is_const);
 
 CFCType*

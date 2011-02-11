@@ -448,6 +448,17 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_new_float(klass, flags, specifier)
+    const char *klass;
+    int flags;
+    const char *specifier;
+CODE:
+    CFCType *self = CFCType_new_float(flags, specifier);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+SV*
 _new_void(klass, is_const)
     const char *klass;
     int is_const;
