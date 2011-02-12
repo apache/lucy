@@ -130,6 +130,10 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
     memcpy(self->Prefix, self->cnick, cnick_len);
     if (cnick_len) {
         self->Prefix[cnick_len]  = '_';
+        self->Prefix[cnick_len + 1]  = '\0';
+    }
+    else {
+        self->Prefix[cnick_len] = '\0';
     }
     size_t i;
     for (i = 0; i < amount; i++) {
