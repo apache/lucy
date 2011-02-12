@@ -28,12 +28,12 @@
 #include "CFCParcel.h"
 
 struct CFCParcel {
-    const char *name;
-    const char *cnick;
-    const char *prefix;
-    const char *Prefix;
-    const char *PREFIX;
-    void       *perl_object;
+    char *name;
+    char *cnick;
+    char *prefix;
+    char *Prefix;
+    char *PREFIX;
+    void *perl_object;
 };
 
 #define MAX_PARCELS 100
@@ -121,24 +121,24 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
     size_t cnick_len  = strlen(self->cnick);
     size_t prefix_len = cnick_len ? cnick_len + 1 : 0;
     size_t amount     = prefix_len + 1;
-    self->prefix = (const char*)malloc(amount);
-    self->Prefix = (const char*)malloc(amount);
-    self->PREFIX = (const char*)malloc(amount);
+    self->prefix = (char*)malloc(amount);
+    self->Prefix = (char*)malloc(amount);
+    self->PREFIX = (char*)malloc(amount);
     if (!self->prefix || !self->Prefix || !self->PREFIX) {
         croak("malloc failed");
     }
-    memcpy((char*)self->Prefix, self->cnick, cnick_len);
+    memcpy(self->Prefix, self->cnick, cnick_len);
     if (cnick_len) {
-        *((char*)&self->Prefix[cnick_len])  = '_';
+        self->Prefix[cnick_len]  = '_';
     }
     size_t i;
     for (i = 0; i < amount; i++) {
-        *((char*)&self->prefix[i]) = tolower(self->Prefix[i]);
-        *((char*)&self->PREFIX[i]) = toupper(self->Prefix[i]);
+        self->prefix[i] = tolower(self->Prefix[i]);
+        self->PREFIX[i] = toupper(self->Prefix[i]);
     }
-    *((char*)&self->prefix[prefix_len]) = '\0';
-    *((char*)&self->Prefix[prefix_len]) = '\0';
-    *((char*)&self->PREFIX[prefix_len]) = '\0';
+    self->prefix[prefix_len] = '\0';
+    self->Prefix[prefix_len] = '\0';
+    self->PREFIX[prefix_len] = '\0';
 
     self->perl_object = newSV(0);
 	sv_setref_pv(self->perl_object, "Clownfish::Parcel", (void*)self);
@@ -151,9 +151,9 @@ CFCParcel_destroy(CFCParcel *self)
 {
     Safefree(self->name);
     Safefree(self->cnick);
-    free((void*)self->prefix);
-    free((void*)self->Prefix);
-    free((void*)self->PREFIX);
+    free(self->prefix);
+    free(self->Prefix);
+    free(self->PREFIX);
     free(self);
 }
 
