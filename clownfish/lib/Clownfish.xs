@@ -755,4 +755,88 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish   PACKAGE = Clownfish::Variable
+
+SV*
+_new(klass, parcel_sv, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_sv)
+    const char *klass;
+    SV *parcel_sv;
+    const char *exposure;
+    SV *class_name_sv;
+    SV *class_cnick_sv;
+    SV *micro_sym_sv;
+    SV *type_sv;
+CODE:
+    const char *class_name = SvOK(class_name_sv) 
+                           ? SvPV_nolen(class_name_sv) : NULL;
+    const char *class_cnick = SvOK(class_cnick_sv) 
+                            ? SvPV_nolen(class_cnick_sv) : NULL;
+    const char *micro_sym = SvOK(micro_sym_sv) 
+                            ? SvPV_nolen(micro_sym_sv) : NULL;
+    CFCParcel *parcel = NULL;
+    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
+        IV objint = SvIV((SV*)SvRV(parcel_sv));
+        parcel = INT2PTR(CFCParcel*, objint);
+    }
+    CFCType *type = NULL;
+    if (SvOK(type_sv) && sv_derived_from(type_sv, "Clownfish::Type")) {
+        IV objint = SvIV((SV*)SvRV(type_sv));
+        type = INT2PTR(CFCType*, objint);
+    }
+    else {
+        croak("Param 'type' is not a Clownfish::Type");
+    }
+    CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
+        class_cnick, micro_sym, type, type_sv);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCVariable *self;
+PPCODE:
+    CFCVariable_destroy(self);
+
+int
+equals(self, other)
+    CFCVariable *self;
+    CFCVariable *other;
+CODE:
+    RETVAL = CFCVariable_equals(self, other);
+OUTPUT: RETVAL
+
+void
+_set_or_get(self, ...)
+    CFCVariable *self;
+ALIAS:
+    get_type          = 2
+    local_c           = 4
+    global_c          = 6
+    local_declaration = 8
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                SV *type_perl_obj = (SV*)CFCVariable_type_perl_obj(self);
+                retval = newSVsv(type_perl_obj);
+            }
+            break;
+        case 4: {
+                const char *local_c = CFCVariable_local_c(self);
+                retval = newSVpvn(local_c, strlen(local_c));
+            }
+            break;
+        case 6: {
+                const char *global_c = CFCVariable_global_c(self);
+                retval = newSVpvn(global_c, strlen(global_c));
+            }
+            break;
+        case 8: {
+                const char *local_dec = CFCVariable_local_declaration(self);
+                retval = newSVpvn(local_dec, strlen(local_dec));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
 
