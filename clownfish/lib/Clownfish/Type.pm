@@ -58,14 +58,10 @@ sub new {
     $flags |= ARBITRARY   if $args{arbitrary};
     $flags |= COMPOSITE   if $args{composite};
 
-    my $parcel = $args{parcel};
-    if ( defined $parcel ) {
-        if ( !blessed($parcel) ) {
-            $parcel = Clownfish::Parcel->singleton( name => $parcel );
-        }
-        confess("Not a Clownfish::Parcel")
-            unless $parcel->isa('Clownfish::Parcel');
-    }
+    my $parcel
+        = $args{parcel}
+        ? Clownfish::Parcel->acquire( $args{parcel} )
+        : $args{parcel};
 
     my $indirection = $args{indirection} || 0;
     my $specifier   = $args{specifier}   || '';
@@ -178,25 +174,6 @@ sub new_arbitrary {
     my $package = ref($either) || $either;
     my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
     return $package->_new_arbitrary( $parcel, $args{specifier} );
-}
-
-sub DESTROY {
-    my $self = shift;
-    $self->_destroy;
-}
-
-sub similar {
-    my ( $self, $other ) = @_;
-    confess("Not an object type") unless $self->is_object;
-    for (qw( is_object const incremented decremented nullable )) {
-        return 0 if ( $self->$_ xor $other->$_ );
-    }
-    return 1;
-}
-
-sub equals {
-    my ( $self, $other ) = @_;
-    return $self->_equals($other);
 }
 
 1;

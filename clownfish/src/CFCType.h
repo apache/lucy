@@ -68,6 +68,9 @@ CFCType_destroy(CFCType *self);
 int
 CFCType_equals(CFCType *self, CFCType *other);
 
+int
+CFCType_similar(CFCType *self, CFCType *other);
+
 void
 CFCType_set_specifier(CFCType *self, const char *specifier);
 

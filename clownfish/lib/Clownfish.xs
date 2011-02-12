@@ -547,17 +547,25 @@ CODE:
 OUTPUT: RETVAL
 
 void
-_destroy(self)
+DESTROY(self)
     CFCType *self;
 PPCODE:
     CFCType_destroy(self);
 
 int
-_equals(self, other)
+equals(self, other)
     CFCType *self;
     CFCType *other;
 CODE:
     RETVAL = CFCType_equals(self, other);
+OUTPUT: RETVAL
+
+int
+similar(self, other)
+    CFCType *self;
+    CFCType *other;
+CODE:
+    RETVAL = CFCType_similar(self, other);
 OUTPUT: RETVAL
 
 unsigned

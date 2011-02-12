@@ -339,6 +339,23 @@ CFCType_equals(CFCType *self, CFCType *other)
     return true;
 }
 
+int
+CFCType_similar(CFCType *self, CFCType *other)
+{
+    if (!CFCType_is_object(self)) {
+        croak("Attempt to call 'similar' on a non-object type");
+    }
+    if (   (CFCType_const(self)        ^ CFCType_const(other))
+        || (CFCType_nullable(self)     ^ CFCType_nullable(other))
+        || (CFCType_incremented(self)  ^ CFCType_incremented(other))
+        || (CFCType_decremented(self)  ^ CFCType_decremented(other))
+        || (CFCType_is_object(self)    ^ CFCType_is_object(other))
+    ) {
+        return false;
+    }
+    return true;
+}
+
 void
 CFCType_set_specifier(CFCType *self, const char *specifier)
 {
