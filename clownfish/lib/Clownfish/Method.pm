@@ -38,9 +38,6 @@ my %new_PARAMS = (
     abstract    => undef,
     final       => undef,
     exposure    => 'parcel',
-    # Private, used only by finalize().
-    novel         => undef,
-    short_typedef => undef,
 );
 
 sub new {
@@ -133,6 +130,7 @@ sub full_callback_sym { shift->full_func_sym . "_CALLBACK" }
 sub full_override_sym { shift->full_func_sym . "_OVERRIDE" }
 
 sub short_typedef { $short_typedef{ +shift } }
+sub _set_short_typedef { $short_typedef{ $_[0] } = $_[1] }
 sub full_typedef {
     my $self = shift;
     return $self->get_prefix . $self->short_typedef;
@@ -200,22 +198,23 @@ sub compatible {
 }
 
 sub finalize {
-    my $self = shift;
-    return $self->new(
-        return_type   => $self->get_return_type,
-        class_name    => $self->get_class_name,
-        class_cnick   => $self->get_class_cnick,
-        param_list    => $self->get_param_list,
-        macro_sym     => $self->get_macro_sym,
-        docucomment   => $self->get_docucomment,
-        parcel        => $self->get_parcel,
-        abstract      => $self->abstract,
-        final         => $self->final,
-        exposure      => $self->get_exposure,
-        novel         => $self->novel,
-        short_typedef => $self->short_typedef,
-        final         => 1,
+    my $self      = shift;
+    my $finalized = $self->new(
+        return_type => $self->get_return_type,
+        class_name  => $self->get_class_name,
+        class_cnick => $self->get_class_cnick,
+        param_list  => $self->get_param_list,
+        macro_sym   => $self->get_macro_sym,
+        docucomment => $self->get_docucomment,
+        parcel      => $self->get_parcel,
+        abstract    => $self->abstract,
+        final       => $self->final,
+        exposure    => $self->get_exposure,
+        final       => 1,
     );
+    $finalized->_set_short_typedef( $self->short_typedef );
+    $finalized->_set_novel( $self->final );
+    return $finalized;
 }
 
 1;
