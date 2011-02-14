@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCFunction.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+typedef struct CFCClass CFCClass;
+struct CFCParcel;
+
+CFCClass*
+CFCClass_new(struct CFCParcel *parcel, const char *exposure, const char *class_name, 
+             const char *class_cnick, const char *micro_sym);
+
+CFCClass*
+CFCClass_init(CFCClass *self, struct CFCParcel *parcel, const char *exposure, 
+              const char *class_name, const char *class_cnick, 
+              const char *micro_sym);
+
+void
+CFCClass_destroy(CFCClass *self);
 

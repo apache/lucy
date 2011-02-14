@@ -104,7 +104,7 @@ sub fetch_singleton {
 sub new { confess("The constructor for Clownfish::Class is create()") }
 
 sub create {
-    my ( $class_class, %args ) = @_;
+    my ( $either, %args ) = @_;
     verify_args( \%create_PARAMS, %args ) or confess $@;
     $args{class_cnick} = delete $args{cnick};
     my $class_name = $args{class_name};
@@ -160,11 +160,12 @@ sub create {
     confess("Inert classes can't have methods")
         if ( $inert and scalar @$methods );
 
-    my $self = $class_class->SUPER::new(
-        exposure => 'parcel',
-        %args,
-        micro_sym => 'class',
-    );
+    my $package = ref($either) || $either;
+    $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+    $args{exposure}  ||= 'parcel';
+    $args{micro_sym} ||= 'class';
+    my $self = $either->_new(
+        @args{qw( parcel exposure class_name class_cnick micro_sym )} );
 
     $cnick{$self}             = $self->get_class_cnick;
     $struct_sym{$self}        = $struct_sym;
@@ -220,7 +221,7 @@ sub DESTROY {
     delete $member_vars{$self};
     delete $inert_vars{$self};
     delete $overridden{$self};
-    $self->SUPER::DESTROY;
+    $self->_destroy;
 }
 
 sub file_path {
