@@ -44,13 +44,16 @@ my %new_PARAMS = (
 );
 
 sub new {
-    my ( $class, %args ) = @_;
+    my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $abstract      = delete $args{abstract};
     my $final         = delete $args{final};
     my $macro_sym     = delete $args{macro_sym};
     my $novel         = delete $args{novel};
     my $short_typedef = delete $args{short_typedef};
+    $args{inline} = 0;
+    $args{exposure} ||= 'parcel';
+    $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
 
     # Validate macro_sym, derive micro_sym.
     confess("macro_sym is required") unless defined $macro_sym;
@@ -59,7 +62,13 @@ sub new {
     $args{micro_sym} = lc($macro_sym);
 
     # Create self, add in novel member vars.
-    my $self = $class->SUPER::new(%args);
+    my $package = ref($either) || $either;
+    my $self = $package->_new(
+        @args{
+            qw( parcel exposure class_name class_cnick micro_sym
+                return_type param_list docucomment inline )
+            }
+    );
     $macro_sym{$self} = $macro_sym;
     $abstract{$self}  = $abstract;
     $final{$self}     = $final;
@@ -91,7 +100,7 @@ sub DESTROY {
     delete $final{$self};
     delete $novel{$self};
     delete $short_typedef{$self};
-    $self->SUPER::DESTROY;
+    $self->_destroy;
 }
 
 sub abstract      { $abstract{ +shift } }

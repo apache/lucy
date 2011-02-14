@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-#include "CFCDocuComment.h"
-#include "CFCFunction.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+typedef struct CFCMethod CFCMethod;
+
+CFCMethod*
+CFCMethod_new(void *parcel, const char *exposure, const char *class_name, 
+              const char *class_cnick, const char *micro_sym, 
+              void *return_type, void *param_list, void *docucomment, 
+              int is_inline);
+
+CFCMethod*
+CFCMethod_init(CFCMethod *self, void *parcel, const char *exposure, 
+               const char *class_name, const char *class_cnick, 
+               const char *micro_sym, void *return_type, void *param_list,
+               void *docucomment, int is_inline);
+
+void
+CFCMethod_destroy(CFCMethod *self);
+
 
