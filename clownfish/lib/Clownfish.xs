@@ -180,6 +180,24 @@ PPCODE:
 }
 
 
+MODULE = Clownfish    PACKAGE = Clownfish::File
+
+SV*
+_new(klass)
+    const char *klass;
+CODE:
+    CFCFile *self = CFCFile_new();
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+void
+_destroy(self)
+    CFCFile *self;
+PPCODE:
+    CFCFile_destroy(self);
+
+
 MODULE = Clownfish    PACKAGE = Clownfish::Function
 
 SV*

@@ -23,6 +23,12 @@ use Scalar::Util qw( blessed );
 use File::Spec::Functions qw( catfile );
 use Carp;
 
+# Inside out member vars.
+our %blocks;
+our %source_class;
+our %parcel;
+our %modified;
+
 our %new_PARAMS = (
     blocks       => undef,
     source_class => undef,
@@ -32,24 +38,13 @@ our %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $parcel = $args{parcel};
-    if ( defined $parcel ) {
-        if ( !blessed($parcel) ) {
-            $parcel = Clownfish::Parcel->singleton( name => $parcel );
-        }
-        confess("Not a Clownfish::Parcel")
-            unless $parcel->isa('Clownfish::Parcel');
-    }
-    my $self = bless {
-        %new_PARAMS,
-        blocks       => [],
-        source_class => undef,
-        modified     => 0,
-        %args,
-        parcel => $parcel,
-        },
-        ref($either) || $either;
-    for my $block ( @{ $self->{blocks} } ) {
+    my $package = ref($either) || $either;
+    my $self = $either->_new();
+    $parcel{$self} = Clownfish::Parcel->acquire( $args{parcel} );
+    $blocks{$self} = $args{blocks} || [];
+    $source_class{$self} = $args{source_class};
+    $modified{$self} = 0;
+    for my $block ( $self->blocks ) {
         next if a_isa_b( $block, "Clownfish::Parcel" );
         next if a_isa_b( $block, "Clownfish::Class" );
         next if a_isa_b( $block, "Clownfish::CBlock" );
@@ -60,16 +55,25 @@ sub new {
     return $self;
 }
 
-sub get_modified     { shift->{modified} }
-sub set_modified     { $_[0]->{modified} = $_[1] }
-sub get_source_class { shift->{source_class} }
+sub DESTROY {
+    my $self = shift;
+    delete $parcel{$self};
+    delete $blocks{$self};
+    delete $source_class{$self};
+    delete $modified{$self};
+    $self->_destroy;
+}
 
-sub blocks { @{ shift->{blocks} } }
+sub get_modified     { $modified{ +shift } }
+sub set_modified     { $modified{ $_[0] } = $_[1] }
+sub get_source_class { $source_class{ +shift } }
+
+sub blocks { @{ $blocks{+shift} } }
 
 sub classes {
     my $self = shift;
     return
-        grep { ref $_ and $_->isa('Clownfish::Class') } @{ $self->{blocks} };
+        grep { ref $_ and $_->isa('Clownfish::Class') } $self->blocks;
 }
 
 # Return a string used for an include guard, unique per file.

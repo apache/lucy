@@ -14,15 +14,34 @@
  * limitations under the License.
  */
 
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
+#include <stdlib.h>
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
 #include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+
+struct CFCFile {
+    int dummy;
+};
+
+CFCFile*
+CFCFile_new(void)
+{
+    CFCFile *self = (CFCFile*)malloc(sizeof(CFCFile));
+    if (!self) { croak("malloc failed"); }
+    return CFCFile_init(self);
+}
+
+CFCFile*
+CFCFile_init(CFCFile *self) 
+{
+    return self;
+}
+
+void
+CFCFile_destroy(CFCFile *self)
+{
+    free(self);
+}
 

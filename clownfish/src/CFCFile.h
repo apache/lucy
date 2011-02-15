@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+typedef struct CFCFile CFCFile;
+
+CFCFile*
+CFCFile_new(void);
+
+CFCFile*
+CFCFile_init(CFCFile *self);
+
+void
+CFCFile_destroy(CFCFile *self);
+
 
