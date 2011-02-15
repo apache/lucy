@@ -25,36 +25,97 @@
 
 struct CFCMethod {
     CFCFunction function;
+    const char *macro_sym;
+    const char *short_typedef;
+    int is_final;
+    int is_abstract;
+    int is_novel;
 };
 
 CFCMethod*
 CFCMethod_new(void *parcel, const char *exposure, const char *class_name, 
               const char *class_cnick, const char *micro_sym, 
               void *return_type, void *param_list, void *docucomment, 
-              int is_inline)
+              int is_inline, const char *macro_sym, int is_final, 
+              int is_abstract)
 {
     CFCMethod *self = (CFCMethod*)malloc(sizeof(CFCMethod));
     if (!self) { croak("malloc failed"); }
     return CFCMethod_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym, return_type, param_list, docucomment, is_inline);
+        micro_sym, return_type, param_list, docucomment, is_inline, macro_sym,
+        is_final, is_abstract);
 }
 
 CFCMethod*
 CFCMethod_init(CFCMethod *self, void *parcel, const char *exposure, 
                const char *class_name, const char *class_cnick, 
                const char *micro_sym, void *return_type, void *param_list, 
-               void *docucomment, int is_inline)
+               void *docucomment, int is_inline, const char *macro_sym, 
+               int is_final, int is_abstract)
 {
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
         class_cnick, micro_sym, return_type, param_list, docucomment,
         is_inline);
+    self->macro_sym     = savepv(macro_sym);
+    self->short_typedef = NULL;
+    self->is_final      = is_final;
+    self->is_abstract   = is_abstract;
+
+    // Assume that this method is novel until we discover when applying
+    // inheritance that it was overridden.
+    self->is_novel = 1;
+
     return self;
 }
 
 void
 CFCMethod_destroy(CFCMethod *self)
 {
+    Safefree(self->macro_sym);
+    Safefree(self->short_typedef);
     CFCFunction_destroy((CFCFunction*)self);
 }
 
+const char*
+CFCMethod_get_macro_sym(CFCMethod *self)
+{
+    return self->macro_sym;
+}
+
+void
+CFCMethod_set_short_typedef(CFCMethod *self, const char *short_typedef)
+{
+    Safefree(self->short_typedef);
+    self->short_typedef = short_typedef ? savepv(short_typedef) : NULL;
+}
+
+const char*
+CFCMethod_short_typedef(CFCMethod *self)
+{
+    return self->short_typedef;
+}
+
+int
+CFCMethod_final(CFCMethod *self)
+{
+    return self->is_final;
+}
+
+int
+CFCMethod_abstract(CFCMethod *self)
+{
+    return self->is_abstract;
+}
+
+void
+CFCMethod_set_novel(CFCMethod *self, int is_novel)
+{
+    self->is_novel = !!is_novel;
+}
+
+int
+CFCMethod_novel(CFCMethod *self)
+{
+    return self->is_novel;
+}
 

@@ -21,12 +21,6 @@ use base qw( Clownfish::Function );
 use Clownfish::Util qw( verify_args );
 use Carp;
 
-our %macro_sym;
-our %abstract;
-our %final;
-our %novel;
-our %short_typedef;
-
 my %new_PARAMS = (
     return_type => undef,
     class_name  => undef,
@@ -43,16 +37,14 @@ my %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $abstract      = delete $args{abstract};
-    my $final         = delete $args{final};
-    my $macro_sym     = delete $args{macro_sym};
-    my $novel         = delete $args{novel};
-    my $short_typedef = delete $args{short_typedef};
     $args{inline} = 0;
+    $args{abstract} ||= 0;
     $args{exposure} ||= 'parcel';
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+    $args{final} = 0 unless defined $args{final};
 
     # Validate macro_sym, derive micro_sym.
+    my $macro_sym = $args{macro_sym};
     confess("macro_sym is required") unless defined $macro_sym;
     confess("Invalid macro_sym: '$macro_sym'")
         unless $macro_sym =~ /^[A-Z][A-Za-z0-9]*(?:_[A-Z0-9][A-Za-z0-9]*)*$/;
@@ -63,16 +55,10 @@ sub new {
     my $self = $package->_new(
         @args{
             qw( parcel exposure class_name class_cnick micro_sym
-                return_type param_list docucomment inline )
+                return_type param_list docucomment inline macro_sym 
+                final abstract )
             }
     );
-    $macro_sym{$self} = $macro_sym;
-    $abstract{$self}  = $abstract;
-    $final{$self}     = $final;
-
-    # Assume that this method is novel until we discover when applying
-    # inheritance that it was overridden.
-    $novel{$self} = defined $novel ? $novel : 1;
 
     # Verify that the first element in the arg list is a self.
     my $args = $self->get_param_list->get_variables;
@@ -84,27 +70,10 @@ sub new {
         unless $specifier eq $self->get_prefix . $struct_sym;
 
     # Cache typedef.
-    $short_typedef{$self}
-        = defined $short_typedef ? $short_typedef : $self->short_sym . "_t";
+    $self->_set_short_typedef( $self->short_sym . "_t" );
 
     return $self;
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $macro_sym{$self};
-    delete $abstract{$self};
-    delete $final{$self};
-    delete $novel{$self};
-    delete $short_typedef{$self};
-    $self->_destroy;
-}
-
-sub abstract      { $abstract{ +shift } }
-sub novel         { $novel{ +shift } }
-sub final         { $final{ +shift } }
-sub get_macro_sym { $macro_sym{ +shift } }
-sub _set_novel    { $novel{ $_[0] } = $_[1] }
 
 sub self_type { shift->get_param_list->get_variables->[0]->get_type }
 
@@ -129,8 +98,6 @@ sub full_offset_sym {
 sub full_callback_sym { shift->full_func_sym . "_CALLBACK" }
 sub full_override_sym { shift->full_func_sym . "_OVERRIDE" }
 
-sub short_typedef { $short_typedef{ +shift } }
-sub _set_short_typedef { $short_typedef{ $_[0] } = $_[1] }
 sub full_typedef {
     my $self = shift;
     return $self->get_prefix . $self->short_typedef;

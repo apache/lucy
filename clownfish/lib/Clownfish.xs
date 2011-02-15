@@ -209,7 +209,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Method
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, is_inline)
+_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, is_inline, macro_sym, is_final, is_abstract)
     const char *klass;
     CFCParcel *parcel;
     const char *exposure;
@@ -220,6 +220,9 @@ _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, retur
     SV *param_list;
     SV *docucomment;
     int is_inline;
+    const char *macro_sym;
+    int is_final;
+    int is_abstract;
 CODE:
     const char *class_name = SvOK(class_name_sv) 
                            ? SvPV_nolen(class_name_sv) : NULL;
@@ -228,16 +231,59 @@ CODE:
     const char *micro_sym = SvOK(micro_sym_sv) 
                             ? SvPV_nolen(micro_sym_sv) : NULL;
     CFCMethod *self = CFCMethod_new(parcel, exposure, class_name, class_cnick,
-        micro_sym, return_type, param_list, docucomment, is_inline);
+        micro_sym, return_type, param_list, docucomment, is_inline, macro_sym, 
+        is_final, is_abstract);
     RETVAL = newSV(0);
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
 void
-_destroy(self)
+DESTROY(self)
     CFCMethod *self;
 PPCODE:
     CFCMethod_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCMethod *self;
+ALIAS:
+    get_macro_sym      = 2
+    _set_short_typedef = 3
+    short_typedef      = 4
+    abstract           = 6
+    _set_novel         = 7
+    novel              = 8
+    final              = 10;
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *macro_sym = CFCMethod_get_macro_sym(self);
+                retval = newSVpvn(macro_sym, strlen(macro_sym));
+            }
+            break;
+        case 3:
+            CFCMethod_set_short_typedef(self, SvPV_nolen(ST(1)));
+            break;
+        case 4: {
+                const char *short_typedef = CFCMethod_short_typedef(self);
+                retval = newSVpvn(short_typedef, strlen(short_typedef));
+            }
+            break;
+        case 6:
+            retval = newSViv(CFCMethod_abstract(self));
+            break;
+        case 7:
+            CFCMethod_set_novel(self, !!SvIV(ST(1)));
+            break;
+        case 8:
+            retval = newSViv(CFCMethod_novel(self));
+            break;
+        case 10:
+            retval = newSViv(CFCMethod_final(self));
+            break;
+    END_SET_OR_GET_SWITCH
+}
 
 
 MODULE = Clownfish    PACKAGE = Clownfish::ParamList
