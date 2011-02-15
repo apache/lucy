@@ -14,6 +14,7 @@
 # limitations under the License.
 
 TYPEMAP
+CFCCBlock*	CLOWNFISH_TYPE
 CFCClass*	CLOWNFISH_TYPE
 CFCDocuComment*	CLOWNFISH_TYPE
 CFCFunction*	CLOWNFISH_TYPE

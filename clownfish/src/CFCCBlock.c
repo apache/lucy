@@ -14,14 +14,43 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
 #include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCFunction.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+
+struct CFCCBlock {
+    const char *contents;
+};
+
+CFCCBlock*
+CFCCBlock_new(const char *contents)
+{
+    CFCCBlock *self = (CFCCBlock*)malloc(sizeof(CFCCBlock));
+    if (!self) { croak("malloc failed"); }
+    return CFCCBlock_init(self, contents);
+}
+
+CFCCBlock*
+CFCCBlock_init(CFCCBlock *self, const char *contents) 
+{
+    self->contents = savepv(contents);
+    return self;
+}
+
+void
+CFCCBlock_destroy(CFCCBlock *self)
+{
+    Safefree(self->contents);
+    free(self);
+}
+
+
+const char*
+CFCCBlock_get_contents(CFCCBlock *self)
+{
+    return self->contents;
+}
 

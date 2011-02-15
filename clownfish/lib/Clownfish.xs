@@ -48,6 +48,40 @@
         XSRETURN(0); \
     } 
 
+MODULE = Clownfish    PACKAGE = Clownfish::CBlock
+
+SV*
+_new(klass, contents)
+    const char *klass;
+    const char *contents;
+CODE:
+    CFCCBlock *self = CFCCBlock_new(contents);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCCBlock *self;
+PPCODE:
+    CFCCBlock_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCCBlock *self;
+ALIAS:
+    get_contents = 2
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *contents = CFCCBlock_get_contents(self);
+                retval = newSVpvn(contents, strlen(contents));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
 MODULE = Clownfish    PACKAGE = Clownfish::Class
 
 SV*

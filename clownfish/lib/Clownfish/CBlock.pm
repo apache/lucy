@@ -23,16 +23,12 @@ use Carp;
 our %new_PARAMS = ( contents => undef, );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless { %new_PARAMS, @_ }, ref($either) || $either;
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
     confess("Missing required param 'contents'")
-        unless defined $self->get_contents;
-    return $self;
+        unless defined $args{contents};
+    return $either->_new( $args{contents} );
 }
-
-# Accessors.
-sub get_contents { shift->{contents} }
 
 1;
 

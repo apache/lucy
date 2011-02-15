@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCFunction.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+typedef struct CFCCBlock CFCCBlock;
+
+CFCCBlock*
+CFCCBlock_new(const char *contents);
+
+CFCCBlock*
+CFCCBlock_init(CFCCBlock *self, const char *contents);
+
+void
+CFCCBlock_destroy(CFCCBlock *self);
+
+const char*
+CFCCBlock_get_contents(CFCCBlock *self);
+
 
