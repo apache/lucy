@@ -26,12 +26,10 @@ use Carp;
 # Inside out member vars.
 our %blocks;
 our %source_class;
-our %parcel;
 our %modified;
 
 our %new_PARAMS = (
     source_class => undef,
-    parcel       => undef,
 );
 
 sub new {
@@ -39,7 +37,6 @@ sub new {
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $package = ref($either) || $either;
     my $self = $either->_new();
-    $parcel{$self} = Clownfish::Parcel->acquire( $args{parcel} );
     $blocks{$self} = [];
     $source_class{$self} = $args{source_class};
     $modified{$self} = 0;
@@ -50,7 +47,6 @@ sub new {
 
 sub DESTROY {
     my $self = shift;
-    delete $parcel{$self};
     delete $blocks{$self};
     delete $source_class{$self};
     delete $modified{$self};
@@ -141,7 +137,6 @@ An abstraction representing a file which contains Clownfish code.
 
     my $file_obj = Clownfish::File->new(
         source_class => 'Crustacean::Lobster',    # required
-        parcel       => 'Crustacean',             # default: special
     );
 
 =over
@@ -151,8 +146,6 @@ regardless of how what classes are defined in the source file. Example: If
 source_class is "Foo::Bar", that implies that the source file could be found
 at 'Foo/Bar.cfh' within the source directory and that the output C header file
 should be 'Foo/Bar.h' within the target include directory.
-
-=item * B<parcel> - A Clownfish::Parcel or parcel name.
 
 =back
 
