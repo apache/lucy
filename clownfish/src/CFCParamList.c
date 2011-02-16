@@ -20,11 +20,13 @@
 #include "XSUB.h"
 
 #include "CFCParamList.h"
+#include "CFCVariable.h"
 
 struct CFCParamList {
-    void *variables;
-    void *values;
-    int   variadic;
+    CFCVariable **variables;
+    char        **values;
+    int           variadic;
+    size_t        num_vars;
 };
 
 CFCParamList*
@@ -38,37 +40,60 @@ CFCParamList_new(int variadic)
 CFCParamList*
 CFCParamList_init(CFCParamList *self, int variadic)
 {
-    self->variables   = newAV();
-    self->values      = newAV();
-    self->variadic    = variadic;
+    self->variadic  = variadic;
+    self->num_vars  = 0;
+    self->variables = (CFCVariable**)calloc(1, sizeof(void*));
+    self->values    = (char**)calloc(1, sizeof(char*));
     return self;
 }
 
 void
-CFCParamList_add_param(CFCParamList *self, void *variable, void *value)
+CFCParamList_add_param(CFCParamList *self, CFCVariable *variable, 
+                       const char *value)
 {
-    av_push((AV*)self->variables, newSVsv((SV*)variable));
-    av_push((AV*)self->values,    newSVsv((SV*)value));
+    self->num_vars++;
+    size_t amount = (self->num_vars + 1) * sizeof(void*);
+    self->variables = (CFCVariable**)realloc(self->variables, amount);
+    self->values    = (char**)realloc(self->values, amount);
+    if (!self->variables || !self->values) {
+        croak("realloc failed.");
+    }
+    self->variables[self->num_vars - 1] = variable;
+    self->values[self->num_vars - 1] = value ? savepv(value) : NULL;
+    SvREFCNT_inc(CFCVariable_get_perl_obj(variable));
+    self->variables[self->num_vars] = NULL;
+    self->values[self->num_vars] = NULL;
 }
 
 void
 CFCParamList_destroy(CFCParamList *self)
 {
-    SvREFCNT_dec((SV*)self->variables);
-    SvREFCNT_dec((SV*)self->values);
+    size_t i;
+    for (i = 0; i < self->num_vars; i++) {
+        SvREFCNT_dec(CFCVariable_get_perl_obj(self->variables[i]));
+        Safefree(self->values[i]);
+    }
+    free(self->variables);
+    free(self->values);
     free(self);
 }
 
-void*
+CFCVariable**
 CFCParamList_get_variables(CFCParamList *self)
 {
     return self->variables;
 }
 
-void*
+const char**
 CFCParamList_get_initial_values(CFCParamList *self)
 {
-    return self->values;
+    return (const char**)self->values;
+}
+
+size_t
+CFCParamList_num_vars(CFCParamList *self)
+{
+    return self->num_vars;
 }
 
 int

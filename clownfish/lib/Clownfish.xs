@@ -357,11 +357,12 @@ PPCODE:
     CFCParamList_destroy(self);
 
 void
-add_param(self, variable, value)
+add_param(self, variable, value_sv)
     CFCParamList *self;
-    SV *variable;
-    SV *value;
+    CFCVariable  *variable;
+    SV *value_sv;
 PPCODE:
+    const char *value = SvOK(value_sv) ? SvPV_nolen(value_sv) : NULL;
     CFCParamList_add_param(self, variable, value);
 
 void
@@ -371,17 +372,46 @@ ALIAS:
     get_variables      = 2
     get_initial_values = 4
     variadic           = 6
+    num_vars           = 8
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
-        case 2:
-            retval = newRV((SV*)CFCParamList_get_variables(self));
+        case 2: {
+            AV *av = newAV();
+            CFCVariable **vars = CFCParamList_get_variables(self);
+            size_t i;
+            size_t num_vars = CFCParamList_num_vars(self);
+            for (i = 0; i < num_vars; i++) {
+                SV *ref = newRV((SV*)CFCVariable_get_perl_obj(vars[i]));
+                av_store(av, i, ref);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
             break;
-        case 4:
-            retval = newRV((SV*)CFCParamList_get_initial_values(self));
+        }
+        case 4: {
+            AV *av = newAV();
+            const char **values = CFCParamList_get_initial_values(self);
+            size_t i;
+            size_t num_vars = CFCParamList_num_vars(self);
+            for (i = 0; i < num_vars; i++) {
+                if (values[i] != NULL) {
+                    SV *val_sv = newSVpvn(values[i], strlen(values[i]));
+                    av_store(av, i, val_sv);
+                }
+                else {
+                    av_store(av, i, newSV(0));
+                }
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
             break;
+        }
         case 6:
             retval = newSViv(CFCParamList_variadic(self));
+            break;
+        case 8:
+            retval = newSViv(CFCParamList_num_vars(self));
             break;
     END_SET_OR_GET_SWITCH
 }

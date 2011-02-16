@@ -15,6 +15,7 @@
  */
 
 typedef struct CFCParamList CFCParamList;
+struct CFCVariable;
 
 CFCParamList*
 CFCParamList_new(int variadic);
@@ -26,14 +27,18 @@ void
 CFCParamList_destroy(CFCParamList *self);
 
 void
-CFCParamList_add_param(CFCParamList *self, void *variable, void *value);
+CFCParamList_add_param(CFCParamList *self, struct CFCVariable *variable,  
+                       const char *value);
 
-void*
+struct CFCVariable**
 CFCParamList_get_variables(CFCParamList *self);
 
-void*
+const char**
 CFCParamList_get_initial_values(CFCParamList *self);
 
 int
 CFCParamList_variadic(CFCParamList *self);
+
+size_t
+CFCParamList_num_vars(CFCParamList *self);
 

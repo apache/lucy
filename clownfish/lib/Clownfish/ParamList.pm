@@ -31,8 +31,6 @@ sub new {
     return $class_name->_new($variadic);
 }
 
-sub num_vars           { scalar @{ shift->get_variables } }
-
 sub to_c {
     my $self = shift;
     my $string = join( ', ', map { $_->local_c } @{ $self->get_variables } );
