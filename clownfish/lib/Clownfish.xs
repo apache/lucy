@@ -305,7 +305,7 @@ ALIAS:
     abstract           = 6
     _set_novel         = 7
     novel              = 8
-    final              = 10;
+    final              = 10
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -605,8 +605,7 @@ CODE:
     }   
     CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
         c_string);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 SV*
@@ -616,8 +615,7 @@ _new_integer(klass, flags, specifier)
     const char *specifier;
 CODE:
     CFCType *self = CFCType_new_integer(flags, specifier);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 SV*
@@ -627,8 +625,7 @@ _new_float(klass, flags, specifier)
     const char *specifier;
 CODE:
     CFCType *self = CFCType_new_float(flags, specifier);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 SV*
@@ -645,8 +642,7 @@ CODE:
         parcel = INT2PTR(CFCParcel*, objint);
     }   
     CFCType *self = CFCType_new_object(flags, parcel, specifier, indirection);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 SV*
@@ -669,8 +665,7 @@ CODE:
         croak("Param 'child' not a Clownfish::Type");
     }
     CFCType *self = CFCType_new_composite(flags, child, indirection, array);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 SV*
@@ -679,8 +674,7 @@ _new_void(klass, is_const)
     int is_const;
 CODE:
     CFCType *self = CFCType_new_void(is_const);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 SV*
@@ -688,8 +682,7 @@ _new_va_list(klass)
     const char *klass;
 CODE:
     CFCType *self = CFCType_new_va_list();
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 SV*
@@ -704,8 +697,7 @@ CODE:
         parcel = INT2PTR(CFCParcel*, objint);
     }   
     CFCType *self = CFCType_new_arbitrary(parcel, specifier);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
 OUTPUT: RETVAL
 
 void

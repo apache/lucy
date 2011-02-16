@@ -134,3 +134,6 @@ CFCType_is_arbitrary(CFCType *self);
 int
 CFCType_is_composite(CFCType *self);
 
+void*
+CFCType_get_perl_obj(CFCType *self);
+
