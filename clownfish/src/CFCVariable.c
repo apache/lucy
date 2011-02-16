@@ -31,6 +31,7 @@
 #include "CFCVariable.h"
 #include "CFCParcel.h"
 #include "CFCType.h"
+#include "CFCUtil.h"
 
 struct CFCVariable {
     struct CFCSymbol symbol;
@@ -38,6 +39,7 @@ struct CFCVariable {
     char *local_c;
     char *global_c;
     char *local_dec;
+    void *perl_obj;
 };
 
 CFCVariable*
@@ -62,6 +64,9 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
 
     CFCSymbol_init((CFCSymbol*)self, parcel, real_exposure, class_name,
         class_cnick, micro_sym);
+
+    // Cache perl object SV.
+    self->perl_obj = CFCUtil_make_perl_obj(self, "Clownfish::Variable");
 
     // Assign type.
     self->type = type;
@@ -101,6 +106,22 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
 void
 CFCVariable_destroy(CFCVariable *self)
 {
+    if (self->perl_obj) {
+        int refcount = SvREFCNT((SV*)self->perl_obj);
+        if (refcount > 0) {
+            if (refcount == 1) {
+                // Trigger Perl destructor, which causes recursion.
+                SV *perl_obj = (SV*)self->perl_obj;
+                self->perl_obj = NULL;
+                SvREFCNT_dec((SV*)self->perl_obj);
+                return;
+            }
+            else {
+                SvREFCNT_dec((SV*)self->perl_obj);
+                return;
+            }
+        }
+    }
     SV *type_sv = CFCType_get_perl_obj(self->type);
     SvREFCNT_dec(type_sv);
     free(self->local_c);
@@ -138,5 +159,11 @@ const char*
 CFCVariable_local_declaration(CFCVariable *self)
 {
     return self->local_dec;
+}
+
+void*
+CFCVariable_get_perl_obj(CFCVariable *self)
+{
+    return self->perl_obj;
 }
 

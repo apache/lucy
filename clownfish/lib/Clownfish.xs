@@ -939,8 +939,7 @@ CODE:
     }
     CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
         class_cnick, micro_sym, type);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV(CFCVariable_get_perl_obj(self));
 OUTPUT: RETVAL
 
 void

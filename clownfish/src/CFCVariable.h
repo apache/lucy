@@ -47,3 +47,6 @@ CFCVariable_global_c(CFCVariable *self);
 const char*
 CFCVariable_local_declaration(CFCVariable *self);
 
+void*
+CFCVariable_get_perl_obj(CFCVariable *self);
+
