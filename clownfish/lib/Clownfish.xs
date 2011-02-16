@@ -938,7 +938,7 @@ CODE:
         croak("Param 'type' is not a Clownfish::Type");
     }
     CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
-        class_cnick, micro_sym, type, type_sv);
+        class_cnick, micro_sym, type);
     RETVAL = newSV(0);
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
@@ -969,8 +969,8 @@ PPCODE:
 {
     START_SET_OR_GET_SWITCH
         case 2: {
-                SV *type_perl_obj = (SV*)CFCVariable_type_perl_obj(self);
-                retval = newSVsv(type_perl_obj);
+                CFCType *type = CFCVariable_get_type(self);
+                retval = newRV(CFCType_get_perl_obj(type));
             }
             break;
         case 4: {

@@ -21,14 +21,13 @@ struct CFCType;
 CFCVariable*
 CFCVariable_new(struct CFCParcel *parcel, const char *exposure, 
                 const char *class_name, const char *class_cnick, 
-                const char *micro_sym, struct CFCType *type,
-                void *type_sv);
+                const char *micro_sym, struct CFCType *type);
 
 CFCVariable*
 CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel, 
                  const char *exposure, const char *class_name, 
                  const char *class_cnick, const char *micro_sym, 
-                 struct CFCType *type, void *type_sv);
+                 struct CFCType *type);
 
 void
 CFCVariable_destroy(CFCVariable *self);
@@ -47,7 +46,4 @@ CFCVariable_global_c(CFCVariable *self);
 
 const char*
 CFCVariable_local_declaration(CFCVariable *self);
-
-void*
-CFCVariable_type_perl_obj(CFCVariable *self);
 

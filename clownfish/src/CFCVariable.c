@@ -35,7 +35,6 @@
 struct CFCVariable {
     struct CFCSymbol symbol;
     CFCType *type;
-    void *type_sv;
     char *local_c;
     char *global_c;
     char *local_dec;
@@ -44,20 +43,19 @@ struct CFCVariable {
 CFCVariable*
 CFCVariable_new(struct CFCParcel *parcel, const char *exposure, 
                 const char *class_name, const char *class_cnick, 
-                const char *micro_sym, struct CFCType *type,
-                void *type_sv)
+                const char *micro_sym, struct CFCType *type)
 {
     CFCVariable *self = (CFCVariable*)calloc(sizeof(CFCVariable), 1);
     if (!self) { croak("malloc failed"); }
     return CFCVariable_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym, type, type_sv);
+        micro_sym, type);
 }
 
 CFCVariable*
 CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel, 
                  const char *exposure, const char *class_name, 
                  const char *class_cnick, const char *micro_sym, 
-                 struct CFCType *type, void *type_sv)
+                 struct CFCType *type)
 {
     // Default exposure to "local".
     const char *real_exposure = exposure ? exposure : "local";
@@ -67,13 +65,8 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
 
     // Assign type.
     self->type = type;
-    if (type_sv) {
-        self->type_sv = newSVsv((SV*)type_sv);
-    }
-    else {
-        self->type_sv = newSV(0);
-	    sv_setref_pv((SV*)self->type_sv, "Clownfish::Variable", (void*)self);
-    }
+    SV *type_sv = CFCType_get_perl_obj(type);
+    SvREFCNT_inc(type_sv);
 
     // Cache various C string representations.
     const char *type_str = CFCType_to_c(type);
@@ -108,7 +101,8 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
 void
 CFCVariable_destroy(CFCVariable *self)
 {
-    SvREFCNT_dec((SV*)self->type_sv);
+    SV *type_sv = CFCType_get_perl_obj(self->type);
+    SvREFCNT_dec(type_sv);
     free(self->local_c);
     free(self->global_c);
     free(self->local_dec);
@@ -144,11 +138,5 @@ const char*
 CFCVariable_local_declaration(CFCVariable *self)
 {
     return self->local_dec;
-}
-
-void*
-CFCVariable_type_perl_obj(CFCVariable *self)
-{
-    return self->type_sv;
 }
 
