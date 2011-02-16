@@ -657,9 +657,6 @@ CODE:
     if (SvOK(child_sv) && sv_derived_from(child_sv, "Clownfish::Type")) {
         IV objint = SvIV((SV*)SvRV(child_sv));
         child = INT2PTR(CFCType*, objint);
-        // Intentionally leak a refcount for child type so that it does not
-        // get destroyed.
-        SvREFCNT_inc(SvRV(child_sv));
     }
     else {
         croak("Param 'child' not a Clownfish::Type");

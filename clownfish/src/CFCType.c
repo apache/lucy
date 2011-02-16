@@ -242,6 +242,8 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
 
     CFCType *self = CFCType_new(flags, NULL, CFCType_get_specifier(child),
         indirection, c_string);
+    self->child = child;
+    SvREFCNT_inc((SV*)child->perl_obj);
 
     // Record array spec.
     const char *array_spec = array ? array : "";
@@ -321,6 +323,9 @@ CFCType_destroy(CFCType *self)
                 return;
             }
         }
+    }
+    if (self->child) {
+        SvREFCNT_dec((SV*)self->child->perl_obj);
     }
     Safefree(self->specifier);
     Safefree(self->c_string);
