@@ -21,44 +21,14 @@ use Clownfish::Variable;
 use Clownfish::Util qw( verify_args );
 use Carp;
 
-our %new_PARAMS = (
-    variables      => undef,
-    initial_values => undef,
-    variadic       => undef,
-);
+our %new_PARAMS = ( variadic => undef, );
 
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $class_name = ref($either) || $either;
-    my $variables  = delete $args{variables};
-    my $values     = delete $args{initial_values};
     my $variadic   = delete $args{variadic} || 0;
-
-    # Validate variables.
-    confess "variables must be an arrayref"
-        unless ref($variables) eq 'ARRAY';
-    for my $var (@$variables) {
-        confess "invalid variable: '$var'"
-            unless ref($var) && $var->isa("Clownfish::Variable");
-    }
-
-    # Validate or init initial_values.
-    if ( defined $values ) {
-        confess "variables must be an arrayref"
-            unless ref($values) eq 'ARRAY';
-        my $num_init = scalar @$values;
-        my $num_vars = scalar @$variables;
-        confess("mismatch of num vars and init values: $num_vars $num_init")
-            unless $num_init == $num_vars;
-    }
-    else {
-        my @initial_values;
-        $#initial_values = $#$variables;
-        $values          = \@initial_values;
-    }
-
-    return $class_name->_new( $variables, $values, $variadic );
+    return $class_name->_new($variadic);
 }
 
 sub num_vars           { scalar @{ shift->get_variables } }
@@ -91,21 +61,28 @@ Clownfish::ParamList - parameter list.
 
 =head2 new
 
-    my $type = Clownfish::ParamList->new(
-        variables      => \@vars,    # required
-        initial_values => \@vals,    # default: undef
-        variadic       => 1,         # default: false
+    my $param_list = Clownfish::ParamList->new(
+        variadic => 1,    # default: false
     );
 
 =over
 
-=item * B<variables> - An array where each element is a
-L<Clownfish::Variable>. 
-
-=item * B<initial_values> - If supplied, an array of default values, one for
-each variable.
-
 =item * B<variadic> - Should be true if the function is variadic.
+
+=back
+
+=head2 add_param
+
+    $param_list->add_param( $variable, $value );
+
+Add a parameter to the ParamList.
+
+=over
+
+=item * B<variable> - A L<Clownfish::Variable>. 
+
+=item * B<value> - The default value for the parameter, which should be undef
+if there is no such value and the parameter is required.
 
 =back
 

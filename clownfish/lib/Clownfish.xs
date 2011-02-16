@@ -341,13 +341,11 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::ParamList
 
 SV*
-_new(klass, variables, values, variadic)
+_new(klass, variadic)
     const char *klass;
-    SV *variables;
-    SV *values;
     int variadic;
 CODE:
-    CFCParamList *self = CFCParamList_new(variables, values, variadic);
+    CFCParamList *self = CFCParamList_new(variadic);
     RETVAL = newSV(0);
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
@@ -357,6 +355,14 @@ DESTROY(self)
     CFCParamList *self;
 PPCODE:
     CFCParamList_destroy(self);
+
+void
+add_param(self, variable, value)
+    CFCParamList *self;
+    SV *variable;
+    SV *value;
+PPCODE:
+    CFCParamList_add_param(self, variable, value);
 
 void
 _set_or_get(self, ...)
@@ -369,10 +375,10 @@ PPCODE:
 {
     START_SET_OR_GET_SWITCH
         case 2:
-            retval = newSVsv((SV*)CFCParamList_get_variables(self));
+            retval = newRV((SV*)CFCParamList_get_variables(self));
             break;
         case 4:
-            retval = newSVsv((SV*)CFCParamList_get_initial_values(self));
+            retval = newRV((SV*)CFCParamList_get_initial_values(self));
             break;
         case 6:
             retval = newSViv(CFCParamList_variadic(self));

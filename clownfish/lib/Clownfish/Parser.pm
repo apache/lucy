@@ -423,13 +423,11 @@ sub new_var {
 
 sub new_param_list {
     my ( undef, $param_list_elems, $variadic ) = @_;
-    my @vars = map { $_->[0] } @$param_list_elems;
-    my @vals = map { $_->[1] } @$param_list_elems;
-    return Clownfish::ParamList->new(
-        variables      => \@vars,
-        initial_values => \@vals,
-        variadic       => $variadic,
-    );
+    my $param_list = Clownfish::ParamList->new( variadic => $variadic, );
+    for my $param (@$param_list_elems) {
+        $param_list->add_param( $param->[0], $param->[1] );
+    }
+    return $param_list;
 }
 
 sub new_sub {

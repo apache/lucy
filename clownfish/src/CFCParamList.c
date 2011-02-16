@@ -28,21 +28,27 @@ struct CFCParamList {
 };
 
 CFCParamList*
-CFCParamList_new(void *variables, void *values, int variadic)
+CFCParamList_new(int variadic)
 {
     CFCParamList *self = (CFCParamList*)malloc(sizeof(CFCParamList));
     if (!self) { croak("malloc failed"); }
-    return CFCParamList_init(self, variables, values, variadic);
+    return CFCParamList_init(self, variadic);
 }
 
 CFCParamList*
-CFCParamList_init(CFCParamList *self, void *variables, void *values, 
-                  int variadic)
+CFCParamList_init(CFCParamList *self, int variadic)
 {
-    self->variables   = newSVsv((SV*)variables);
-    self->values      = newSVsv((SV*)values);
+    self->variables   = newAV();
+    self->values      = newAV();
     self->variadic    = variadic;
     return self;
+}
+
+void
+CFCParamList_add_param(CFCParamList *self, void *variable, void *value)
+{
+    av_push((AV*)self->variables, newSVsv((SV*)variable));
+    av_push((AV*)self->values,    newSVsv((SV*)value));
 }
 
 void

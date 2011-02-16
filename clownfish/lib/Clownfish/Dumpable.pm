@@ -69,7 +69,8 @@ sub _make_method_obj {
 
     my $param_list;
     if ( $dump_or_load eq 'Dump' ) {
-        $param_list = Clownfish::ParamList->new( variables => [$self_var], );
+        $param_list = Clownfish::ParamList->new;
+        $param_list->add_param( $self_var, undef );
     }
     else {
         my $dump_type = Clownfish::Type->new_object(
@@ -82,8 +83,9 @@ sub _make_method_obj {
             parcel    => $class->get_parcel,
             micro_sym => 'dump',
         );
-        $param_list = Clownfish::ParamList->new(
-            variables => [ $self_var, $dump_var ], );
+        $param_list = Clownfish::ParamList->new;
+        $param_list->add_param( $self_var, undef );
+        $param_list->add_param( $dump_var, undef );
     }
 
     return Clownfish::Method->new(
