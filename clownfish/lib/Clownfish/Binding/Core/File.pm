@@ -54,7 +54,7 @@ sub write_h {
 
     # Aggregate block content.
     my $content = "";
-    for my $block ( $file->blocks ) {
+    for my $block ( @{ $file->blocks } ) {
         if ( a_isa_b( $block, 'Clownfish::Parcel' ) ) { }
         elsif ( a_isa_b( $block, 'Clownfish::Class' ) ) {
             my $class_binding
@@ -117,7 +117,7 @@ sub write_c {
     # Aggregate content.
     my $content     = "";
     my $c_file_syms = "";
-    for my $block ( $file->blocks ) {
+    for my $block ( @{ $file->blocks } ) {
         if ( blessed($block) ) {
             if ( $block->isa('Clownfish::Class') ) {
                 my $bound

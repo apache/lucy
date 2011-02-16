@@ -51,22 +51,22 @@ is( $file->cfh_path('/path/to'), "/path/to/Stuff/Thing.cfh", "cfh_path" );
 is( $file->c_path('/path/to'),   "/path/to/Stuff/Thing.c",   "c_path" );
 is( $file->h_path('/path/to'),   "/path/to/Stuff/Thing.h",   "h_path" );
 
-my @classes = $file->classes;
-is( scalar @classes, 1, "classes() filters blocks" );
-my $class = $classes[0];
+my $classes = $file->classes;
+is( scalar @$classes, 1, "classes() filters blocks" );
+my $class = $classes->[0];
 my ( $foo, $bar ) = @{ $class->member_vars };
 is( $foo->get_type->get_specifier,
     'stuff_Foo', 'file production picked up parcel def' );
 is( $bar->get_type->get_specifier, 'stuff_Bar', 'parcel def is sticky' );
 
-my @blocks = $file->blocks;
-is( scalar @blocks, 3, "all three blocks" );
-isa_ok( $blocks[0], "Clownfish::Parcel" );
-isa_ok( $blocks[1], "Clownfish::Class" );
-isa_ok( $blocks[2], "Clownfish::CBlock" );
+my $blocks = $file->blocks;
+is( scalar @$blocks, 3, "all three blocks" );
+isa_ok( $blocks->[0], "Clownfish::Parcel" );
+isa_ok( $blocks->[1], "Clownfish::Class" );
+isa_ok( $blocks->[2], "Clownfish::CBlock" );
 
 $file = $parser->file( $class_content, 0, source_class => 'Stuff::Thing' );
-($class) = $file->classes;
+($class) = @{ $file->classes };
 ( $foo, $bar ) = @{ $class->member_vars };
 is( $foo->get_type->get_specifier, 'Foo', 'file production resets parcel' );
 

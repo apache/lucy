@@ -30,7 +30,6 @@ our %parcel;
 our %modified;
 
 our %new_PARAMS = (
-    blocks       => undef,
     source_class => undef,
     parcel       => undef,
 );
@@ -41,15 +40,9 @@ sub new {
     my $package = ref($either) || $either;
     my $self = $either->_new();
     $parcel{$self} = Clownfish::Parcel->acquire( $args{parcel} );
-    $blocks{$self} = $args{blocks} || [];
+    $blocks{$self} = [];
     $source_class{$self} = $args{source_class};
     $modified{$self} = 0;
-    for my $block ( $self->blocks ) {
-        next if a_isa_b( $block, "Clownfish::Parcel" );
-        next if a_isa_b( $block, "Clownfish::Class" );
-        next if a_isa_b( $block, "Clownfish::CBlock" );
-        confess("Invalid block: $block");
-    }
     confess("Missing required param 'source_class'")
         unless $self->get_source_class;
     return $self;
@@ -64,16 +57,31 @@ sub DESTROY {
     $self->_destroy;
 }
 
+our %block_types = (
+    'Clownfish::Parcel' => 1,
+    'Clownfish::Class'  => 1,
+    'Clownfish::CBlock' => 1,
+);
+
+sub add_block {
+    my ( $self, $block ) = @_;
+    my $block_class = ref($block);
+    confess("Invalid block type: $block_class")
+        unless $block_types{$block_class};
+    push @{ $blocks{$self} }, $block;
+}
+
 sub get_modified     { $modified{ +shift } }
 sub set_modified     { $modified{ $_[0] } = $_[1] }
 sub get_source_class { $source_class{ +shift } }
 
-sub blocks { @{ $blocks{+shift} } }
+sub blocks { $blocks{ +shift } }
 
 sub classes {
     my $self = shift;
-    return
-        grep { ref $_ and $_->isa('Clownfish::Class') } $self->blocks;
+    my @classes
+        = grep { ref $_ and $_->isa('Clownfish::Class') } @{ $self->blocks };
+    return \@classes;
 }
 
 # Return a string used for an include guard, unique per file.
@@ -132,15 +140,11 @@ An abstraction representing a file which contains Clownfish code.
 =head2 new
 
     my $file_obj = Clownfish::File->new(
-        blocks       => \@blocks,                 # required
         source_class => 'Crustacean::Lobster',    # required
         parcel       => 'Crustacean',             # default: special
     );
 
 =over
-
-=item * B<blocks> - An arrayref.  Each element must be either a
-Clownfish::Class, a Clownfish::Parcel, or a Clownfish::CBlock.
 
 =item * B<source_class> - The class name associated with the source file,
 regardless of how what classes are defined in the source file. Example: If
@@ -152,17 +156,24 @@ should be 'Foo/Bar.h' within the target include directory.
 
 =back
 
+=head2 add_block
+
+    $file_obj->add_block($block);
+
+Add an element to the blocks array.  The block must be either a
+Clownfish::Class, a Clownfish::Parcel, or a Clownfish::CBlock.
+
 =head2 blocks
 
-    my @blocks = $file->blocks;
+    my $blocks = $file->blocks;
 
-Return all blocks as a list.
+Return all blocks as an arrayref.
 
 =head2 classes
 
-    my @classes = $file->classes;
+    my $classes = $file->classes;
 
-Return all Clownfish::Class blocks from the file as a list.
+Return all Clownfish::Class blocks from the file as an arrayref.
 
 =head2 get_modified set_modified
 

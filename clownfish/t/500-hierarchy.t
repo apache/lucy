@@ -48,7 +48,8 @@ my %files;
 for my $file (@files) {
     die "not a File" unless isa_ok( $file, "Clownfish::File" );
     ok( !$file->get_modified, "start off not modified" );
-    my ($class) = grep { a_isa_b( $_, "Clownfish::Class" ) } $file->blocks;
+    my ($class)
+        = grep { a_isa_b( $_, "Clownfish::Class" ) } @{ $file->blocks };
     die "no class" unless $class;
     $files{ $class->get_class_name } = $file;
 }

@@ -112,7 +112,7 @@ sub _parse_cf_files {
             ->file( $content, 0, source_class => $source_class, );
         confess("parse error for $source_path") unless defined $file;
         $self->_get_files->{$source_class} = $file;
-        for my $class ( $file->classes ) {
+        for my $class ( @{ $file->classes } ) {
             my $class_name = $class->get_class_name;
             confess "$class_name already defined"
                 if exists $classes{$class_name};

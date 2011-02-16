@@ -508,12 +508,14 @@ sub new_class {
 
 sub new_file {
     my ( undef, $item, $arg ) = @_;
-
-    return Clownfish::File->new(
+    my $file = Clownfish::File->new(
         parcel       => $parcel,
-        blocks       => $item->{'major_block(s)'},
         source_class => $arg->{source_class},
     );
+    for my $block ( @{ $item->{'major_block(s)'} } ) {
+        $file->add_block( $block, ref($block) );
+    }
+    return $file;
 }
 
 sub new_parcel {
