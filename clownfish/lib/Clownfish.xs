@@ -642,6 +642,7 @@ CODE:
     CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
         c_string);
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 SV*
@@ -652,6 +653,7 @@ _new_integer(klass, flags, specifier)
 CODE:
     CFCType *self = CFCType_new_integer(flags, specifier);
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 SV*
@@ -662,6 +664,7 @@ _new_float(klass, flags, specifier)
 CODE:
     CFCType *self = CFCType_new_float(flags, specifier);
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 SV*
@@ -679,6 +682,7 @@ CODE:
     }   
     CFCType *self = CFCType_new_object(flags, parcel, specifier, indirection);
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 SV*
@@ -699,6 +703,7 @@ CODE:
     }
     CFCType *self = CFCType_new_composite(flags, child, indirection, array);
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 SV*
@@ -708,6 +713,7 @@ _new_void(klass, is_const)
 CODE:
     CFCType *self = CFCType_new_void(is_const);
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 SV*
@@ -716,6 +722,7 @@ _new_va_list(klass)
 CODE:
     CFCType *self = CFCType_new_va_list();
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 SV*
@@ -731,6 +738,7 @@ CODE:
     }   
     CFCType *self = CFCType_new_arbitrary(parcel, specifier);
     RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 void
@@ -976,6 +984,7 @@ CODE:
     CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
         class_cnick, micro_sym, type);
     RETVAL = newRV(CFCVariable_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 void
