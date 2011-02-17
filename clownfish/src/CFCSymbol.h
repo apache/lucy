@@ -20,12 +20,12 @@ struct CFCParcel;
 #ifdef CFC_NEED_SYMBOL_STRUCT_DEF
 struct CFCSymbol {
     struct CFCParcel *parcel;
-    const char *exposure;
-    const char *class_name;
-    const char *class_cnick;
-    const char *micro_sym;
-    const char *short_sym;
-    const char *full_sym;
+    char *exposure;
+    char *class_name;
+    char *class_cnick;
+    char *micro_sym;
+    char *short_sym;
+    char *full_sym;
 };
 #endif
 

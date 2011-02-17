@@ -57,9 +57,9 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
 {
     self->flags       = flags;
     self->parcel      = parcel;
-    self->specifier   = savepv(specifier);
+    self->specifier   = CFCUtil_strdup(specifier);
     self->indirection = indirection;
-    self->c_string    = c_string ? savepv(c_string) : savepv("");
+    self->c_string    = c_string ? CFCUtil_strdup(c_string) : CFCUtil_strdup("");
     self->width       = 0;
     self->array       = NULL;
     self->child       = NULL;
@@ -327,8 +327,8 @@ CFCType_destroy(CFCType *self)
     if (self->child) {
         SvREFCNT_dec((SV*)self->child->perl_obj);
     }
-    Safefree(self->specifier);
-    Safefree(self->c_string);
+    free(self->specifier);
+    free(self->c_string);
     free(self);
 }
 
@@ -383,8 +383,8 @@ CFCType_similar(CFCType *self, CFCType *other)
 void
 CFCType_set_specifier(CFCType *self, const char *specifier)
 {
-    Safefree(self->specifier);
-    self->specifier = savepv(specifier);
+    free(self->specifier);
+    self->specifier = CFCUtil_strdup(specifier);
 }
 
 const char*
@@ -408,8 +408,8 @@ CFCType_get_parcel(CFCType *self)
 void
 CFCType_set_c_string(CFCType *self, const char *c_string)
 {
-    Safefree(self->c_string);
-    self->c_string = savepv(c_string);
+    free(self->c_string);
+    self->c_string = CFCUtil_strdup(c_string);
 }
 
 const char*

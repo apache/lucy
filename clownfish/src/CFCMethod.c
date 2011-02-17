@@ -22,11 +22,12 @@
 #define CFC_NEED_FUNCTION_STRUCT_DEF
 #include "CFCFunction.h"
 #include "CFCMethod.h"
+#include "CFCUtil.h"
 
 struct CFCMethod {
     CFCFunction function;
-    const char *macro_sym;
-    const char *short_typedef;
+    char *macro_sym;
+    char *short_typedef;
     int is_final;
     int is_abstract;
     int is_novel;
@@ -56,7 +57,7 @@ CFCMethod_init(CFCMethod *self, void *parcel, const char *exposure,
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
         class_cnick, micro_sym, return_type, param_list, docucomment,
         is_inline);
-    self->macro_sym     = savepv(macro_sym);
+    self->macro_sym     = CFCUtil_strdup(macro_sym);
     self->short_typedef = NULL;
     self->is_final      = is_final;
     self->is_abstract   = is_abstract;
@@ -71,8 +72,8 @@ CFCMethod_init(CFCMethod *self, void *parcel, const char *exposure,
 void
 CFCMethod_destroy(CFCMethod *self)
 {
-    Safefree(self->macro_sym);
-    Safefree(self->short_typedef);
+    free(self->macro_sym);
+    free(self->short_typedef);
     CFCFunction_destroy((CFCFunction*)self);
 }
 
@@ -85,8 +86,8 @@ CFCMethod_get_macro_sym(CFCMethod *self)
 void
 CFCMethod_set_short_typedef(CFCMethod *self, const char *short_typedef)
 {
-    Safefree(self->short_typedef);
-    self->short_typedef = short_typedef ? savepv(short_typedef) : NULL;
+    free(self->short_typedef);
+    self->short_typedef = short_typedef ? CFCUtil_strdup(short_typedef) : NULL;
 }
 
 const char*

@@ -20,9 +20,10 @@
 #include "XSUB.h"
 
 #include "CFCCBlock.h"
+#include "CFCUtil.h"
 
 struct CFCCBlock {
-    const char *contents;
+    char *contents;
 };
 
 CFCCBlock*
@@ -36,17 +37,16 @@ CFCCBlock_new(const char *contents)
 CFCCBlock*
 CFCCBlock_init(CFCCBlock *self, const char *contents) 
 {
-    self->contents = savepv(contents);
+    self->contents = CFCUtil_strdup(contents);
     return self;
 }
 
 void
 CFCCBlock_destroy(CFCCBlock *self)
 {
-    Safefree(self->contents);
+    free(self->contents);
     free(self);
 }
-
 
 const char*
 CFCCBlock_get_contents(CFCCBlock *self)

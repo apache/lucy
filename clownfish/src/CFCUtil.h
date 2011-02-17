@@ -20,6 +20,16 @@
 void*
 CFCUtil_make_perl_obj(void *ptr, const char *klass);
 
+/** Portable, NULL-safe implementation of strdup().
+ */
+char*
+CFCUtil_strdup(const char *string);
+
+/** Portable, NULL-safe implementation of strndup().
+ */
+char*
+CFCUtil_strndup(const char *string, size_t len);
+
 /** Trim whitespace from the beginning and the end of a string.
  */
 void

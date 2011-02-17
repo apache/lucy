@@ -29,6 +29,7 @@
 #define CFC_NEED_SYMBOL_STRUCT_DEF
 #include "CFCSymbol.h"
 #include "CFCParcel.h"
+#include "CFCUtil.h"
 
 CFCSymbol*
 CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, 
@@ -136,23 +137,23 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     if (!S_validate_exposure(exposure)) {
         croak("Invalid exposure: '%s'", exposure ? exposure : "[NULL]");
     }
-    self->exposure = savepv(exposure);
+    self->exposure = CFCUtil_strdup(exposure);
 
     // Validate class name (if supplied);
     if (class_name && !S_validate_class_name(class_name)) {
         croak("Invalid class_name: '%s'", class_name);
     }
-    self->class_name = savepv(class_name);
+    self->class_name = CFCUtil_strdup(class_name);
 
     // Derive class_cnick if necessary, then validate.
     if (class_name) {
         if (class_cnick) {
-            self->class_cnick = savepv(class_cnick);
+            self->class_cnick = CFCUtil_strdup(class_cnick);
         }
         else {
             const char *last_colon = strrchr(class_name, ':');
             const char *cnick = last_colon ? last_colon + 1 : class_name;
-            self->class_cnick = savepv(cnick);
+            self->class_cnick = CFCUtil_strdup(cnick);
         }
     }
     else if (class_cnick) {
@@ -169,7 +170,7 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     if (!micro_sym || !S_validate_identifier(micro_sym)) {
         croak("Invalid micro_sym: '%s'",  micro_sym ? micro_sym : "[NULL]");
     }
-    self->micro_sym = savepv(micro_sym);
+    self->micro_sym = CFCUtil_strdup(micro_sym);
 
     // Derive short_sym.
     size_t class_cnick_len = self->class_cnick 
@@ -178,7 +179,7 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     size_t short_sym_len = class_cnick_len
                          + strlen("_") 
                          + strlen(self->micro_sym);
-    self->short_sym = (const char*)malloc(short_sym_len + 1);
+    self->short_sym = (char*)malloc(short_sym_len + 1);
     if (self->class_cnick) {
         memcpy((void*)self->short_sym, self->class_cnick, class_cnick_len);
     }
@@ -191,7 +192,7 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     const char *prefix = CFCParcel_get_prefix(self->parcel);
     size_t prefix_len = strlen(prefix);
     size_t full_sym_len = prefix_len + short_sym_len;
-    self->full_sym = (const char*)malloc(full_sym_len + 1);
+    self->full_sym = (char*)malloc(full_sym_len + 1);
     memcpy((void*)self->full_sym, prefix, prefix_len);
     memcpy((void*)&self->full_sym[prefix_len], self->short_sym, short_sym_len);
     *((char*)&self->full_sym[full_sym_len]) = '\0';
@@ -203,10 +204,10 @@ void
 CFCSymbol_destroy(CFCSymbol *self)
 {
     // SvREFCNT_dec((SV*)self->parcel);
-    Safefree(self->exposure);
-    Safefree(self->class_name);
-    Safefree(self->class_cnick);
-    Safefree(self->micro_sym);
+    free(self->exposure);
+    free(self->class_name);
+    free(self->class_cnick);
+    free(self->micro_sym);
     free((void*)self->short_sym);
     free((void*)self->full_sym);
     free(self);

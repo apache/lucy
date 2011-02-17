@@ -26,6 +26,7 @@
 #endif
 
 #include "CFCParcel.h"
+#include "CFCUtil.h"
 
 struct CFCParcel {
     char *name;
@@ -103,18 +104,18 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
     if (!name || !S_validate_name_or_cnick(name)) {
         croak("Invalid name: '%s'", name ? name : "[NULL]");
     }
-    self->name = savepv(name);
+    self->name = CFCUtil_strdup(name);
 
     // Validate or derive cnick.
     if (cnick) {
         if (!S_validate_name_or_cnick(cnick)) {
             croak("Invalid cnick: '%s'", cnick);
         }
-        self->cnick = savepv(cnick);
+        self->cnick = CFCUtil_strdup(cnick);
     }
     else {  
         // Default cnick to name.
-        self->cnick = savepv(name);
+        self->cnick = CFCUtil_strdup(name);
     }
     
     // Derive prefix, Prefix, PREFIX.
@@ -153,8 +154,8 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
 void
 CFCParcel_destroy(CFCParcel *self)
 {
-    Safefree(self->name);
-    Safefree(self->cnick);
+    free(self->name);
+    free(self->cnick);
     free(self->prefix);
     free(self->Prefix);
     free(self->PREFIX);

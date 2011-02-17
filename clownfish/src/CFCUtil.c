@@ -39,6 +39,24 @@ CFCUtil_make_perl_obj(void *ptr, const char *klass)
     return  inner_obj;
 }
 
+char*
+CFCUtil_strdup(const char *string)
+{
+    if (!string) { return NULL; }
+    return CFCUtil_strndup(string, strlen(string));
+}
+
+char*
+CFCUtil_strndup(const char *string, size_t len)
+{
+    if (!string) { return NULL; }
+    char *copy = (char*)malloc(len + 1);
+    if (!copy) { croak("malloc failed"); }
+    memcpy(copy, string, len);
+    copy[len] = '\0';
+    return copy;
+}
+
 void
 CFCUtil_trim_whitespace(char *text)
 {
