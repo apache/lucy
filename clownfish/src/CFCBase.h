@@ -14,16 +14,44 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+typedef struct CFCBase CFCBase;
+
+#ifdef CFC_NEED_BASE_STRUCT_DEF
+struct CFCBase {
+    void *perl_obj;
+};
+#endif
+
+/** Allocate a new CFC object.
+ *
+ * @param size Size of the desired allocation in bytes.
+ * @param klass Class name.
+ */
+CFCBase*
+CFCBase_allocate(size_t size, const char *klass);
+
+/** Clean up CFCBase member variables as necessary and free the object blob
+ * itself.
+ */
+void
+CFCBase_destroy(CFCBase *self);
+
+/** Increment the refcount of the object.
+ * 
+ * @return the object itself, allowing an assignment idiom.
+ */
+CFCBase*
+CFCBase_incref(CFCBase *self);
+
+/** Decrement the refcount of the object.
+ * 
+ * @return the modified refcount.
+ */
+unsigned
+CFCBase_decref(CFCBase *self);
+
+/** Return the CFC object's cached Perl object.
+ */
+void*
+CFCBase_get_perl_obj(CFCBase *self);
 

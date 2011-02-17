@@ -19,23 +19,25 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define CFC_NEED_BASE_STRUCT_DEF
+#include "CFCBase.h"
 #include "CFCParamList.h"
 #include "CFCVariable.h"
 #include "CFCUtil.h"
 
 struct CFCParamList {
+    CFCBase       base;
     CFCVariable **variables;
     char        **values;
     int           variadic;
     size_t        num_vars;
-    void         *perl_obj;
 };
 
 CFCParamList*
 CFCParamList_new(int variadic)
 {
-    CFCParamList *self = (CFCParamList*)malloc(sizeof(CFCParamList));
-    if (!self) { croak("malloc failed"); }
+    CFCParamList *self = (CFCParamList*)CFCBase_allocate(sizeof(CFCParamList), 
+        "Clownfish::ParamList");
     return CFCParamList_init(self, variadic);
 }
 
@@ -46,7 +48,6 @@ CFCParamList_init(CFCParamList *self, int variadic)
     self->num_vars  = 0;
     self->variables = (CFCVariable**)calloc(1, sizeof(void*));
     self->values    = (char**)calloc(1, sizeof(char*));
-    self->perl_obj  = CFCUtil_make_perl_obj(self, "Clownfish::ParamList");
     return self;
 }
 
@@ -78,28 +79,7 @@ CFCParamList_destroy(CFCParamList *self)
     }
     free(self->variables);
     free(self->values);
-    free(self);
-}
-
-CFCParamList*
-CFCParamList_incref(CFCParamList *self)
-{
-    SvREFCNT_inc((SV*)self->perl_obj);
-    return self;
-}
-
-unsigned
-CFCParamList_decref(CFCParamList *self)
-{
-    unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
-    SvREFCNT_dec((SV*)self->perl_obj);
-    return modified_refcount;
-}
-
-void*
-CFCParamList_get_perl_obj(CFCParamList *self)
-{
-    return self->perl_obj;
+    CFCBase_destroy((CFCBase*)self);
 }
 
 CFCVariable**

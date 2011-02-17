@@ -20,17 +20,19 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define CFC_NEED_BASE_STRUCT_DEF
+#include "CFCBase.h"
 #include "CFCDocuComment.h"
 #include "CFCUtil.h"
 
 struct CFCDocuComment {
+    CFCBase base;
     char *description;
     char *brief;
     char *long_des;
     char **param_names;
     char **param_docs;
     char *retval;
-    void *perl_obj;
 };
 
 /** Remove comment open, close, and left border from raw comment text.
@@ -87,9 +89,8 @@ CFCDocuComment*
 CFCDocuComment_parse(const char *raw_text)
 {
     char *text = CFCUtil_strdup(raw_text);
-    CFCDocuComment *self = (CFCDocuComment*)calloc(1, sizeof(CFCDocuComment));
-    if (!self) { croak("calloc failed"); }
-    self->perl_obj = CFCUtil_make_perl_obj(self, "Clownfish::DocuComment");
+    CFCDocuComment *self = (CFCDocuComment*)CFCBase_allocate(
+        sizeof(CFCDocuComment), "Clownfish::DocuComment");
 
     // Strip whitespace, comment open, close, and left border.
     CFCUtil_trim_whitespace(text);
@@ -240,28 +241,7 @@ CFCDocuComment_destroy(CFCDocuComment *self)
     free(self->brief);
     free(self->long_des);
     free(self->retval);
-    free(self);
-}
-
-CFCDocuComment*
-CFCDocuComment_incref(CFCDocuComment *self)
-{
-    SvREFCNT_inc((SV*)self->perl_obj);
-    return self;
-}
-
-unsigned
-CFCDocuComment_decref(CFCDocuComment *self)
-{
-    unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
-    SvREFCNT_dec((SV*)self->perl_obj);
-    return modified_refcount;
-}
-
-void*
-CFCDocuComment_get_perl_obj(CFCDocuComment *self)
-{
-    return self->perl_obj;
+    CFCBase_destroy((CFCBase*)self);
 }
 
 const char*

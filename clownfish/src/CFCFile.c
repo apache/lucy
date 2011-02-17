@@ -19,52 +19,32 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define CFC_NEED_BASE_STRUCT_DEF
+#include "CFCBase.h"
 #include "CFCFile.h"
 #include "CFCUtil.h"
 
 struct CFCFile {
-    void *perl_obj;
+    CFCBase base;
 };
 
 CFCFile*
 CFCFile_new(void)
 {
-    CFCFile *self = (CFCFile*)malloc(sizeof(CFCFile));
-    if (!self) { croak("malloc failed"); }
+    CFCFile *self = (CFCFile*)CFCBase_allocate(sizeof(CFCFile),
+        "Clownfish::File");
     return CFCFile_init(self);
 }
 
 CFCFile*
 CFCFile_init(CFCFile *self) 
 {
-    self->perl_obj = CFCUtil_make_perl_obj(self, "Clownfish::File");
     return self;
 }
 
 void
 CFCFile_destroy(CFCFile *self)
 {
-    free(self);
-}
-
-CFCFile*
-CFCFile_incref(CFCFile *self)
-{
-    SvREFCNT_inc((SV*)self->perl_obj);
-    return self;
-}
-
-unsigned
-CFCFile_decref(CFCFile *self)
-{
-    unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
-    SvREFCNT_dec((SV*)self->perl_obj);
-    return modified_refcount;
-}
-
-void*
-CFCFile_get_perl_obj(CFCFile *self)
-{
-    return self->perl_obj;
+    CFCBase_destroy((CFCBase*)self);
 }
 

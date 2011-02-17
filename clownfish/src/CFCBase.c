@@ -21,39 +21,47 @@
 
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
-#include "CFCCBlock.h"
 #include "CFCUtil.h"
 
-struct CFCCBlock {
-    CFCBase base;
-    char *contents;
-};
-
-CFCCBlock*
-CFCCBlock_new(const char *contents)
+CFCBase*
+CFCBase_allocate(size_t size, const char *klass)
 {
-    CFCCBlock *self = (CFCCBlock*)CFCBase_allocate(sizeof(CFCCBlock),
-        "Clownfish::CBlock");
-    return CFCCBlock_init(self, contents);
-}
-
-CFCCBlock*
-CFCCBlock_init(CFCCBlock *self, const char *contents) 
-{
-    self->contents = CFCUtil_strdup(contents);
+    CFCBase *self = (CFCBase*)calloc(size, 1);
+    if (!self) {
+        croak("Failed to calloc %" UVuf " bytes", (UV)size);
+    }
+    self->perl_obj = CFCUtil_make_perl_obj(self, klass);
     return self;
 }
 
 void
-CFCCBlock_destroy(CFCCBlock *self)
+CFCBase_destroy(CFCBase *self)
 {
-    free(self->contents);
-    CFCBase_destroy((CFCBase*)self);
+    free(self);
 }
 
-const char*
-CFCCBlock_get_contents(CFCCBlock *self)
+CFCBase*
+CFCBase_incref(CFCBase *self)
 {
-    return self->contents;
+    SvREFCNT_inc((SV*)self->perl_obj);
+    return self;
+}
+
+unsigned
+CFCBase_decref(CFCBase *self)
+{
+    unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
+    /* When the SvREFCNT for this Perl object falls to zero, DESTROY will be
+     * invoked from Perl space for the class that the Perl object was blessed
+     * into.  Thus even though the very simple CFC object model does not
+     * generally support polymorphism, we get it for object destruction. */
+    SvREFCNT_dec((SV*)self->perl_obj);
+    return modified_refcount;
+}
+
+void*
+CFCBase_get_perl_obj(CFCBase *self)
+{
+    return self->perl_obj;
 }
 

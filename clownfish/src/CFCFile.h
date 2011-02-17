@@ -25,12 +25,3 @@ CFCFile_init(CFCFile *self);
 void
 CFCFile_destroy(CFCFile *self);
 
-CFCFile*
-CFCFile_incref(CFCFile *self);
-
-unsigned
-CFCFile_decref(CFCFile *self);
-
-void*
-CFCFile_get_perl_obj(CFCFile *self);
-
