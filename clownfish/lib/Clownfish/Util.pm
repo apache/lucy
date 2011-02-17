@@ -17,6 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Util;
+use Clownfish;
 use base qw( Exporter );
 use Scalar::Util qw( blessed );
 use Carp;
@@ -29,6 +30,7 @@ our @EXPORT_OK = qw(
     verify_args
     a_isa_b
     write_if_changed
+    trim_whitespace
 );
 
 sub slurp_file {

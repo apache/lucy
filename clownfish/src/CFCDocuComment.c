@@ -34,6 +34,8 @@ struct CFCDocuComment {
 void
 CFCDocuComment_strip(char *comment)
 {
+    CFCUtil_trim_whitespace(comment);
+
     size_t len = strlen(comment);
     char *scratch = (char*)malloc(len + 1);
     if (!scratch) {

@@ -190,7 +190,6 @@ CODE:
     SvCUR_set(RETVAL, strlen(ptr));
 OUTPUT: RETVAL
 
-
 MODULE = Clownfish    PACKAGE = Clownfish::File
 
 SV*
@@ -960,6 +959,21 @@ PPCODE:
             break;
     END_SET_OR_GET_SWITCH
 }
+
+
+MODULE = Clownfish   PACKAGE = Clownfish::Util
+
+SV*
+trim_whitespace(text)
+    SV *text;
+CODE:
+    RETVAL = newSVsv(text);
+    STRLEN len;
+    char *ptr = SvPV(RETVAL, len);
+    CFCUtil_trim_whitespace(ptr);
+    SvCUR_set(RETVAL, strlen(ptr));
+OUTPUT: RETVAL
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::Variable
 

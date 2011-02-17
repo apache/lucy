@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+#include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -35,5 +37,30 @@ CFCUtil_make_perl_obj(void *ptr, const char *klass)
     SvSTASH_set(inner_obj, (HV*)SvREFCNT_inc(stash));
 
     return  inner_obj;
+}
+
+void
+CFCUtil_trim_whitespace(char *text)
+{
+    if (!text) {
+        return;
+    }
+
+    // Find start.
+    char *ptr = text;
+    while (*ptr != '\0' && isspace(*ptr)) { ptr++; }
+
+    // Find end.
+    size_t orig_len = strlen(text);
+    char *limit = text + orig_len;
+    for ( ; limit > text; limit--) {
+        if (!isspace(*(limit - 1))) { break; }
+    }
+
+    // Modify string in place and NULL-terminate.
+    while (ptr < limit) {
+        *text++ = *ptr++;
+    }
+    *text = '\0';
 }
 

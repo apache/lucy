@@ -20,3 +20,8 @@
 void*
 CFCUtil_make_perl_obj(void *ptr, const char *klass);
 
+/** Trim whitespace from the beginning and the end of a string.
+ */
+void
+CFCUtil_trim_whitespace(char *text);
+

@@ -17,6 +17,8 @@ use strict;
 use warnings;
 
 package Clownfish::DocuComment;
+use Clownfish;
+use Clownfish::Util qw( trim_whitespace );
 use Carp;
 
 our %new_PARAMS = (
@@ -33,8 +35,6 @@ sub parse {
     my $class_name = ref($either) || $either;
 
     # Strip comment open, close, and left border.
-    $text =~ s/^\s*//;
-    $text =~ s/\s*$//;
     $text = strip($text);
 
     # Extract the brief description.
@@ -66,8 +66,7 @@ sub parse {
         $retval = $1;
     }
 
-    $text =~ s/^\s*//;
-    $text =~ s/\s*$//;
+    $text = trim_whitespace($text);
     my $description = $text;
 
     $text =~ s/^(.+?\.)(\s+|\Z)//s;    # zap brief
