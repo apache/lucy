@@ -24,6 +24,7 @@
 
 struct CFCCBlock {
     char *contents;
+    void *perl_obj;
 };
 
 CFCCBlock*
@@ -38,6 +39,7 @@ CFCCBlock*
 CFCCBlock_init(CFCCBlock *self, const char *contents) 
 {
     self->contents = CFCUtil_strdup(contents);
+    self->perl_obj = CFCUtil_make_perl_obj(self, "Clownfish::CBlock");
     return self;
 }
 
@@ -46,6 +48,27 @@ CFCCBlock_destroy(CFCCBlock *self)
 {
     free(self->contents);
     free(self);
+}
+
+CFCCBlock*
+CFCCBlock_incref(CFCCBlock *self)
+{
+    SvREFCNT_inc((SV*)self->perl_obj);
+    return self;
+}
+
+unsigned
+CFCCBlock_decref(CFCCBlock *self)
+{
+    unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
+    SvREFCNT_dec((SV*)self->perl_obj);
+    return modified_refcount;
+}
+
+void*
+CFCCBlock_get_perl_obj(CFCCBlock *self)
+{
+    return self->perl_obj;
 }
 
 const char*

@@ -56,8 +56,8 @@ _new(klass, contents)
     const char *contents;
 CODE:
     CFCCBlock *self = CFCCBlock_new(contents);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV(CFCCBlock_get_perl_obj(self));
+    CFCCBlock_decref(self);
 OUTPUT: RETVAL
 
 void
@@ -120,8 +120,8 @@ parse(klass, text)
     const char *text;
 CODE:
     CFCDocuComment *self = CFCDocuComment_parse(text);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV(CFCDocuComment_get_perl_obj(self));
+    CFCDocuComment_decref(self);
 OUTPUT: RETVAL
 
 void
@@ -198,8 +198,8 @@ _new(klass)
     const char *klass;
 CODE:
     CFCFile *self = CFCFile_new();
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV(CFCFile_get_perl_obj(self));
+    CFCFile_decref(self);
 OUTPUT: RETVAL
 
 void
@@ -358,7 +358,7 @@ _new(klass, variadic)
 CODE:
     CFCParamList *self = CFCParamList_new(variadic);
     RETVAL = newRV((SV*)CFCParamList_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    CFCParamList_decref(self);
 OUTPUT: RETVAL
 
 void

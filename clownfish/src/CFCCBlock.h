@@ -25,7 +25,15 @@ CFCCBlock_init(CFCCBlock *self, const char *contents);
 void
 CFCCBlock_destroy(CFCCBlock *self);
 
+CFCCBlock*
+CFCCBlock_incref(CFCCBlock *self);
+
+unsigned
+CFCCBlock_decref(CFCCBlock *self);
+
+void*
+CFCCBlock_get_perl_obj(CFCCBlock *self);
+
 const char*
 CFCCBlock_get_contents(CFCCBlock *self);
-
 

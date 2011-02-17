@@ -20,9 +20,10 @@
 #include "XSUB.h"
 
 #include "CFCFile.h"
+#include "CFCUtil.h"
 
 struct CFCFile {
-    int dummy;
+    void *perl_obj;
 };
 
 CFCFile*
@@ -36,6 +37,7 @@ CFCFile_new(void)
 CFCFile*
 CFCFile_init(CFCFile *self) 
 {
+    self->perl_obj = CFCUtil_make_perl_obj(self, "Clownfish::File");
     return self;
 }
 
@@ -43,5 +45,26 @@ void
 CFCFile_destroy(CFCFile *self)
 {
     free(self);
+}
+
+CFCFile*
+CFCFile_incref(CFCFile *self)
+{
+    SvREFCNT_inc((SV*)self->perl_obj);
+    return self;
+}
+
+unsigned
+CFCFile_decref(CFCFile *self)
+{
+    unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
+    SvREFCNT_dec((SV*)self->perl_obj);
+    return modified_refcount;
+}
+
+void*
+CFCFile_get_perl_obj(CFCFile *self)
+{
+    return self->perl_obj;
 }
 

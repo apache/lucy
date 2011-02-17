@@ -26,6 +26,15 @@ CFCParamList_init(CFCParamList *self, int variadic);
 void
 CFCParamList_destroy(CFCParamList *self);
 
+CFCParamList*
+CFCParamList_incref(CFCParamList *self);
+
+unsigned
+CFCParamList_decref(CFCParamList *self);
+
+void*
+CFCParamList_get_perl_obj(CFCParamList *self);
+
 void
 CFCParamList_add_param(CFCParamList *self, struct CFCVariable *variable,  
                        const char *value);
@@ -41,7 +50,4 @@ CFCParamList_variadic(CFCParamList *self);
 
 size_t
 CFCParamList_num_vars(CFCParamList *self);
-
-void*
-CFCParamList_get_perl_obj(CFCParamList *self);
 

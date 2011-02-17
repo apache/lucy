@@ -22,6 +22,15 @@ CFCDocuComment_parse(const char *raw_text);
 void
 CFCDocuComment_destroy(CFCDocuComment *self);
 
+CFCDocuComment*
+CFCDocuComment_incref(CFCDocuComment *self);
+
+unsigned
+CFCDocuComment_decref(CFCDocuComment *self);
+
+void*
+CFCDocuComment_get_perl_obj(CFCDocuComment *self);
+
 const char*
 CFCDocuComment_get_description(CFCDocuComment *self);
 
