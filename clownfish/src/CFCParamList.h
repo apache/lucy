@@ -42,3 +42,6 @@ CFCParamList_variadic(CFCParamList *self);
 size_t
 CFCParamList_num_vars(CFCParamList *self);
 
+void*
+CFCParamList_get_perl_obj(CFCParamList *self);
+

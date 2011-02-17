@@ -357,8 +357,8 @@ _new(klass, variadic)
     int variadic;
 CODE:
     CFCParamList *self = CFCParamList_new(variadic);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV((SV*)CFCParamList_get_perl_obj(self));
+    SvREFCNT_dec(SvRV(RETVAL));
 OUTPUT: RETVAL
 
 void

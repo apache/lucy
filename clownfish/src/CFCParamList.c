@@ -28,6 +28,7 @@ struct CFCParamList {
     char        **values;
     int           variadic;
     size_t        num_vars;
+    void         *perl_obj;
 };
 
 CFCParamList*
@@ -45,6 +46,7 @@ CFCParamList_init(CFCParamList *self, int variadic)
     self->num_vars  = 0;
     self->variables = (CFCVariable**)calloc(1, sizeof(void*));
     self->values    = (char**)calloc(1, sizeof(char*));
+    self->perl_obj  = CFCUtil_make_perl_obj(self, "Clownfish::ParamList");
     return self;
 }
 
@@ -69,6 +71,22 @@ CFCParamList_add_param(CFCParamList *self, CFCVariable *variable,
 void
 CFCParamList_destroy(CFCParamList *self)
 {
+    if (self->perl_obj) {
+        int refcount = SvREFCNT((SV*)self->perl_obj);
+        if (refcount > 0) {
+            if (refcount == 1) {
+                // Trigger Perl destructor, which causes recursion.
+                SV *perl_obj = (SV*)self->perl_obj;
+                self->perl_obj = NULL;
+                SvREFCNT_dec((SV*)self->perl_obj);
+                return;
+            }
+            else {
+                SvREFCNT_dec((SV*)self->perl_obj);
+                return;
+            }
+        }
+    }
     size_t i;
     for (i = 0; i < self->num_vars; i++) {
         SvREFCNT_dec(CFCVariable_get_perl_obj(self->variables[i]));
@@ -101,5 +119,11 @@ int
 CFCParamList_variadic(CFCParamList *self)
 {
     return self->variadic;
+}
+
+void*
+CFCParamList_get_perl_obj(CFCParamList *self)
+{
+    return self->perl_obj;
 }
 
