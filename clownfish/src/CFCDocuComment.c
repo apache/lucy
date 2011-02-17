@@ -23,19 +23,19 @@
 #include "CFCDocuComment.h"
 
 struct CFCDocuComment {
-    const char *description;
-    const char *brief;
-    const char *long_des;
-    void *param_names;
-    void *param_docs;
+    char *description;
+    char *brief;
+    char *long_des;
+    char **param_names;
+    char **param_docs;
     const char *retval;
 };
 
-void
-CFCDocuComment_strip(char *comment)
+/** Remove comment open, close, and left border from raw comment text.
+ */
+static void
+S_strip(char *comment)
 {
-    CFCUtil_trim_whitespace(comment);
-
     size_t len = strlen(comment);
     char *scratch = (char*)malloc(len + 1);
     if (!scratch) {
@@ -85,13 +85,14 @@ CFCDocuComment*
 CFCDocuComment_parse(const char *raw_text)
 {
     char *text = savepv(raw_text);
+    CFCDocuComment *self = (CFCDocuComment*)calloc(1, sizeof(CFCDocuComment));
+    if (!self) { croak("calloc failed"); }
 
     // Strip whitespace, comment open, close, and left border.
     CFCUtil_trim_whitespace(text);
-    CFCDocuComment_strip(text);
+    S_strip(text);
 
     // Extract the brief description.
-    char *brief = NULL;
     {
         char *ptr = text;
         size_t len = strlen(text);
@@ -105,26 +106,23 @@ CFCDocuComment_parse(const char *raw_text)
             ) {
                 ptr++;
                 size_t brief_len = ptr - text;
-                brief = (char*)malloc(brief_len + 1);
-                if (!brief) { croak("malloc failed"); }
-                memcpy(brief, text, brief_len);
-                brief[brief_len] = '\0';
+                self->brief = savepv(text);
+                self->brief[brief_len] = '\0';
                 break;
             }
             ptr++;
         }
     }
-    if (!brief) {
-        // croak("Can't find at least one sentence in '%s'", raw_text);
-        brief = (char*)calloc(1, sizeof(char));
+    if (!self->brief) {
+        self->brief = savepv("");
     }
 
     // Extract @param directives.
     size_t num_params = 0;
-    char **param_names = (char**)calloc(num_params, sizeof(char*));
-    char **param_docs  = (char**)calloc(num_params, sizeof(char*));
-    if (!param_names || !param_docs) { 
-        croak("malloc failed"); 
+    self->param_names = (char**)calloc(num_params + 1, sizeof(char*));
+    self->param_docs  = (char**)calloc(num_params + 1, sizeof(char*));
+    if (!self->param_names || !self->param_docs) { 
+        croak("calloc failed"); 
     }
     {
         char *candidate = strstr(text, "@param");
@@ -164,15 +162,17 @@ CFCDocuComment_parse(const char *raw_text)
 
             num_params++;
             size_t size = (num_params + 1) * sizeof(char*);
-            param_names = realloc(param_names, size);
-            param_docs  = realloc(param_docs, size);
-            if (!param_names || !param_docs) { 
+            self->param_names = realloc(self->param_names, size);
+            self->param_docs  = realloc(self->param_docs, size);
+            if (!self->param_names || !self->param_docs) { 
                 croak("realloc failed"); 
             }
-            param_names[num_params - 1] = savepvn(param_name, param_name_len);
-            param_docs[num_params - 1]  = savepvn(param_doc, param_doc_len);
-            CFCUtil_trim_whitespace(param_names[num_params - 1]);
-            CFCUtil_trim_whitespace(param_docs[num_params - 1]);
+            self->param_names[num_params - 1] = savepvn(param_name, param_name_len);
+            self->param_docs[num_params - 1]  = savepvn(param_doc, param_doc_len);
+            CFCUtil_trim_whitespace(self->param_names[num_params - 1]);
+            CFCUtil_trim_whitespace(self->param_docs[num_params - 1]);
+            self->param_names[num_params] = NULL;
+            self->param_docs[num_params]  = NULL;
             
             if (ptr == limit) {
                 break;
@@ -185,103 +185,58 @@ CFCDocuComment_parse(const char *raw_text)
     }
 
     // Extract full description.
-    char *full_description = savepv(text);
+    self->description = savepv(text);
     {
-        char *terminus = strstr(full_description, "@param");
+        char *terminus = strstr(self->description, "@param");
         if (!terminus) {
-            terminus = strstr(full_description, "@return");
+            terminus = strstr(self->description, "@return");
         }
         if (terminus) {
             *terminus = '\0';
         }
     }
-    CFCUtil_trim_whitespace(full_description);
+    CFCUtil_trim_whitespace(self->description);
 
     // Extract long description.
-    char *long_description = savepv(full_description + strlen(brief));
-    CFCUtil_trim_whitespace(long_description);
+    self->long_des = savepv(self->description + strlen(self->brief));
+    CFCUtil_trim_whitespace(self->long_des);
 
-    char *retval = strstr(text, "@return ");
-    if (retval) {
-        retval = savepv(retval + sizeof("@return ") - 1);
-        char *terminus = strchr(retval, '@');
+    // Extract @return directive.
+    char *maybe_retval = strstr(text, "@return ");
+    if (maybe_retval) {
+        self->retval = savepv(maybe_retval + sizeof("@return ") - 1);
+        char *terminus = strchr(self->retval, '@');
         if (terminus) {
             *terminus = '\0';
         }
-        CFCUtil_trim_whitespace(retval);
+        CFCUtil_trim_whitespace(self->retval);
     }
 
-    // Wrap param names and param docs in Perl arrays for now.
-    AV *param_names_av = newAV();
-    AV *param_docs_av  = newAV();
-    {
-        size_t i;
-        for (i = 0; i < num_params; i++) {
-            SV *name = newSVpvn(param_names[i], strlen(param_names[i]));
-            av_store(param_names_av, i, name);
-            SV *doc = newSVpvn(param_docs[i], strlen(param_docs[i]));
-            av_store(param_docs_av, i, doc);
-            Safefree(param_names[i]);
-            Safefree(param_docs[i]);
-        }
-        free(param_names);
-        free(param_docs);
-    }
-
-    SV *param_names_ref = newRV((SV*)param_names_av);
-    SV *param_docs_ref = newRV((SV*)param_docs_av);
-    CFCDocuComment *self = CFCDocuComment_new(full_description, brief, 
-        long_description, param_names_ref, param_docs_ref, retval);
-    Safefree(full_description);
-    free(brief);
-    Safefree(long_description);
-    Safefree(retval);
-    Safefree(text);
-    SvREFCNT_dec((SV*)param_names_av);
-    SvREFCNT_dec((SV*)param_docs_av);
-    SvREFCNT_dec(param_names_ref);
-    SvREFCNT_dec(param_docs_ref);
-
-    return self;
-}
-
-CFCDocuComment*
-CFCDocuComment_new(const char *description, const char *brief, 
-                   const char *long_description, void *param_names, 
-                   void *param_docs, const char *retval)
-{
-    CFCDocuComment *self = (CFCDocuComment*)malloc(sizeof(CFCDocuComment));
-    if (!self) { croak("malloc failed"); }
-    return CFCDocuComment_init(self, description, brief, long_description,
-        param_names, param_docs, retval);
-}
-
-CFCDocuComment*
-CFCDocuComment_init(CFCDocuComment *self, const char *description, 
-                    const char *brief, const char *long_description, 
-                    void *param_names, void *param_docs, const char *retval)
-{
-    self->description = savepv(description);
-    self->brief       = savepv(brief);
-    self->long_des    = savepv(long_description);
-    self->param_names = newSVsv((SV*)param_names);
-    self->param_docs  = newSVsv((SV*)param_docs);
-    self->retval      = retval ? savepv(retval) : NULL;
     return self;
 }
 
 void
 CFCDocuComment_destroy(CFCDocuComment *self)
 {
+    size_t i;
+    if (self->param_names) {
+        for (i = 0; self->param_names[i] != NULL; i++) {
+            Safefree(self->param_names[i]);
+        }
+        free(self->param_names);
+    }
+    if (self->param_docs) {
+        for (i = 0; self->param_docs[i] != NULL; i++) {
+            Safefree(self->param_docs[i]);
+        }
+        free(self->param_docs);
+    }
     Safefree(self->description);
     Safefree(self->brief);
     Safefree(self->long_des);
-    SvREFCNT_dec((SV*)self->param_names);
-    SvREFCNT_dec((SV*)self->param_docs);
     Safefree(self->retval);
     free(self);
 }
-
 
 const char*
 CFCDocuComment_get_description(CFCDocuComment *self)
@@ -301,16 +256,16 @@ CFCDocuComment_get_long(CFCDocuComment *self)
     return self->long_des;
 }
 
-void*
+const char**
 CFCDocuComment_get_param_names(CFCDocuComment *self)
 {
-    return self->param_names;
+    return (const char**)self->param_names;
 }
 
-void*
+const char**
 CFCDocuComment_get_param_docs(CFCDocuComment *self)
 {
-    return self->param_docs;
+    return (const char**)self->param_docs;
 }
 
 const char*

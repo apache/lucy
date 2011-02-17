@@ -16,23 +16,8 @@
 
 typedef struct CFCDocuComment CFCDocuComment;
 
-/** Remove comment open, close, and left border from raw comment text.
- */
-void
-CFCDocuComment_strip(char *comment);
-
 CFCDocuComment*
 CFCDocuComment_parse(const char *raw_text);
-
-CFCDocuComment*
-CFCDocuComment_new(const char *description, const char *brief, 
-                   const char *long_description, void *param_names, 
-                   void *param_docs, const char *retval);
-
-CFCDocuComment*
-CFCDocuComment_init(CFCDocuComment *self, const char *description, 
-                    const char *brief, const char *long_description, 
-                    void *param_names, void *param_docs, const char *retval);
 
 void
 CFCDocuComment_destroy(CFCDocuComment *self);
@@ -46,10 +31,10 @@ CFCDocuComment_get_brief(CFCDocuComment *self);
 const char*
 CFCDocuComment_get_long(CFCDocuComment *self);
 
-void*
+const char**
 CFCDocuComment_get_param_names(CFCDocuComment *self);
 
-void*
+const char**
 CFCDocuComment_get_param_docs(CFCDocuComment *self);
 
 // May be NULL.

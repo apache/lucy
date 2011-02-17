@@ -115,23 +115,6 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::DocuComment
 
 SV*
-_new(klass, description, brief, long_description, param_names, param_docs, retval_sv)
-    const char *klass;
-    const char *description;
-    const char *brief;
-    const char *long_description;
-    SV *param_names;
-    SV *param_docs;
-    SV *retval_sv;
-CODE:
-    const char *retval = SvOK(retval_sv) ? SvPV_nolen(retval_sv) : NULL;
-    CFCDocuComment *self = CFCDocuComment_new(description, brief,
-        long_description, param_names, param_docs, retval);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
-OUTPUT: RETVAL
-
-SV*
 parse(klass, text)
     const char *klass;
     const char *text;
@@ -175,12 +158,30 @@ PPCODE:
                 retval = newSVpvn(long_description, strlen(long_description));
             }
             break;
-        case 8:
-            retval = newSVsv((SV*)CFCDocuComment_get_param_names(self));
+        case 8: {
+            AV *av = newAV();
+            const char **names = CFCDocuComment_get_param_names(self);
+            size_t i;
+            for (i = 0; names[i] != NULL; i++) {
+                SV *val_sv = newSVpvn(names[i], strlen(names[i]));
+                av_store(av, i, val_sv);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
             break;
-        case 10:
-            retval = newSVsv((SV*)CFCDocuComment_get_param_docs(self));
+        }
+        case 10: {
+            AV *av = newAV();
+            const char **docs = CFCDocuComment_get_param_docs(self);
+            size_t i;
+            for (i = 0; docs[i] != NULL; i++) {
+                SV *val_sv = newSVpvn(docs[i], strlen(docs[i]));
+                av_store(av, i, val_sv);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
             break;
+        }
         case 12: {
                 const char *rv = CFCDocuComment_get_retval(self);
                 retval = rv ? newSVpvn(rv, strlen(rv)) : newSV(0);
@@ -189,16 +190,6 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-SV*
-strip(text)
-    SV *text;
-CODE:
-    RETVAL = newSVsv(text);
-    STRLEN len;
-    char *ptr = SvPV(RETVAL, len);
-    CFCDocuComment_strip(ptr);
-    SvCUR_set(RETVAL, strlen(ptr));
-OUTPUT: RETVAL
 
 MODULE = Clownfish    PACKAGE = Clownfish::File
 
