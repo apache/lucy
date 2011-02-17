@@ -64,9 +64,7 @@ CFCDocuComment_strip(char *comment)
                 i++;
             }
             if (comment[i] == '*') { i++; }
-            while (isspace(comment[i]) && comment[i] != '\n' && i < max) { 
-                i++; 
-            }
+            if (comment[i] == ' ') { i++; }
         }
         if (i < max) {
             scratch[j++] = comment[i];
