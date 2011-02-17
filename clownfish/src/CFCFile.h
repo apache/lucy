@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCFILE
+#define H_CFCFILE
+
 typedef struct CFCFile CFCFile;
 
 CFCFile*
@@ -24,4 +27,6 @@ CFCFile_init(CFCFile *self);
 
 void
 CFCFile_destroy(CFCFile *self);
+
+#endif /* H_CFCFILE */
 

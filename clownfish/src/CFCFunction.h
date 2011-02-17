@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCFUNCTION
+#define H_CFCFUNCTION
+
 typedef struct CFCFunction CFCFunction;
 
 #ifdef CFC_NEED_FUNCTION_STRUCT_DEF
@@ -55,4 +58,6 @@ CFCFunction_get_docucomment(CFCFunction *self);
 
 int
 CFCFunction_inline(CFCFunction *self);
+
+#endif /* H_CFCFUNCTION */
 

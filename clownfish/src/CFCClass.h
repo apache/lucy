@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCCLASS
+#define H_CFCCLASS
+
 typedef struct CFCClass CFCClass;
 struct CFCParcel;
 
@@ -28,4 +31,6 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel, const char *exposure,
 
 void
 CFCClass_destroy(CFCClass *self);
+
+#endif /* H_CFCCLASS */
 

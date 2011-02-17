@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCTYPE
+#define H_CFCTYPE
+
 typedef struct CFCType CFCType;
 struct CFCParcel;
 
@@ -133,4 +136,6 @@ CFCType_is_arbitrary(CFCType *self);
 
 int
 CFCType_is_composite(CFCType *self);
+
+#endif /* H_CFCTYPE */
 

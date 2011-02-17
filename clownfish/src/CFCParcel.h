@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCPARCEL
+#define H_CFCPARCEL
+
 typedef struct CFCParcel CFCParcel;
 
 CFCParcel*
@@ -48,4 +51,6 @@ CFCParcel_get_Prefix(CFCParcel *self);
 
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self);
+
+#endif /* H_CFCPARCEL */
 

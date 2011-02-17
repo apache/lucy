@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCUTIL
+#define H_CFCUTIL
+
 /** Create an inner Perl object with a refcount of 1.  For use in actual
  * Perl-space, it is necessary to wrap this inner object in an RV.
  */
@@ -34,4 +37,6 @@ CFCUtil_strndup(const char *string, size_t len);
  */
 void
 CFCUtil_trim_whitespace(char *text);
+
+#endif /* H_CFCUTIL */
 

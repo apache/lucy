@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCPARAMLIST
+#define H_CFCPARAMLIST
+
 typedef struct CFCParamList CFCParamList;
 struct CFCVariable;
 
@@ -41,4 +44,6 @@ CFCParamList_variadic(CFCParamList *self);
 
 size_t
 CFCParamList_num_vars(CFCParamList *self);
+
+#endif /* H_CFCPARAMLIST */
 

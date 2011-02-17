@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCCBLOCK
+#define H_CFCCBLOCK
+
 typedef struct CFCCBlock CFCCBlock;
 
 CFCCBlock*
@@ -27,4 +30,6 @@ CFCCBlock_destroy(CFCCBlock *self);
 
 const char*
 CFCCBlock_get_contents(CFCCBlock *self);
+
+#endif /* H_CFCCBLOCK */
 

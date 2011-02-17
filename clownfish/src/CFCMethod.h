@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCMETHOD
+#define H_CFCMETHOD
+
 typedef struct CFCMethod CFCMethod;
 
 CFCMethod*
@@ -54,4 +57,6 @@ CFCMethod_set_novel(CFCMethod *self, int is_novel);
 
 int
 CFCMethod_novel(CFCMethod *self);
+
+#endif /* H_CFCMETHOD */
 

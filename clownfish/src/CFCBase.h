@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCBASE
+#define H_CFCBASE
+
 typedef struct CFCBase CFCBase;
 
 #ifdef CFC_NEED_BASE_STRUCT_DEF
@@ -54,4 +57,6 @@ CFCBase_decref(CFCBase *self);
  */
 void*
 CFCBase_get_perl_obj(CFCBase *self);
+
+#endif /* H_CFCBASE */
 

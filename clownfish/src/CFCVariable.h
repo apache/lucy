@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCVARIABLE
+#define H_CFCVARIABLE
+
 typedef struct CFCVariable CFCVariable;
 struct CFCParcel;
 struct CFCType;
@@ -49,4 +52,6 @@ CFCVariable_local_declaration(CFCVariable *self);
 
 void*
 CFCVariable_get_perl_obj(CFCVariable *self);
+
+#endif /* H_CFCVARIABLE */
 

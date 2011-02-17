@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCSYMBOL
+#define H_CFCSYMBOL
+
 typedef struct CFCSymbol CFCSymbol;
 struct CFCParcel;
 
@@ -94,4 +97,6 @@ CFCSymbol_get_Prefix(CFCSymbol *self);
 
 const char*
 CFCSymbol_get_PREFIX(CFCSymbol *self);
+
+#endif /* H_CFCSYMBOL */
 
