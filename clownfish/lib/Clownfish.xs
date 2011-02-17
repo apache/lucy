@@ -179,6 +179,17 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+SV*
+strip(text)
+    SV *text;
+CODE:
+    RETVAL = newSVsv(text);
+    STRLEN len;
+    char *ptr = SvPV(RETVAL, len);
+    CFCDocuComment_strip(ptr);
+    SvCUR_set(RETVAL, strlen(ptr));
+OUTPUT: RETVAL
+
 
 MODULE = Clownfish    PACKAGE = Clownfish::File
 

@@ -15,6 +15,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -29,6 +30,56 @@ struct CFCDocuComment {
     void *param_docs;
     const char *retval;
 };
+
+void
+CFCDocuComment_strip(char *comment)
+{
+    size_t len = strlen(comment);
+    char *scratch = (char*)malloc(len + 1);
+    if (!scratch) {
+        croak("malloc failed");
+    }
+
+    // Establish that comment text begins with "/**" and ends with "*/".
+    if (   strstr(comment, "/**") != comment
+        || strstr(comment, "*/") != (comment + len - 2)
+    ) {
+        croak("Malformed comment");
+    }
+
+    // Capture text minus beginning "/**", ending "*/", and left border.
+    size_t i = 3;
+    size_t max = len - 2;
+    while ((isspace(comment[i]) || comment[i] == '*') && i < max) { 
+        i++; 
+    }
+    size_t j = 0;
+    for ( ; i < max; i++) {
+        while (comment[i] == '\n' && i < max) {
+            scratch[j++] = comment[i];
+            i++;
+            while (isspace(comment[i]) && comment[i] != '\n' && i < max) { 
+                i++;
+            }
+            if (comment[i] == '*') { i++; }
+            while (isspace(comment[i]) && comment[i] != '\n' && i < max) { 
+                i++; 
+            }
+        }
+        if (i < max) {
+            scratch[j++] = comment[i];
+        }
+    }
+
+    // Modify original string in place.
+    for (i = 0; i < j; i++) {
+        comment[i] = scratch[i];
+    }
+    comment[j] = '\0';
+
+    // Clean up.
+    free(scratch);
+}
 
 CFCDocuComment*
 CFCDocuComment_new(const char *description, const char *brief, 

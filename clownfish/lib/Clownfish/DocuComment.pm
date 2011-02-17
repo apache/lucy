@@ -33,9 +33,9 @@ sub parse {
     my $class_name = ref($either) || $either;
 
     # Strip comment open, close, and left border.
-    $text =~ s/\A\s*\/\*\*\s+//;
-    $text =~ s/\s+\*\/\s*\Z//;
-    $text =~ s/^\s*\* ?//gm;
+    $text =~ s/^\s*//;
+    $text =~ s/\s*$//;
+    $text = strip($text);
 
     # Extract the brief description.
     $text =~ /^(.+?\.)(\s+|\Z)/s
