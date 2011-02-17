@@ -439,8 +439,7 @@ CODE:
     const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
     const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
     CFCParcel *self = CFCParcel_singleton(name, cnick);
-    SV *inner_object = SvRV((SV*)CFCParcel_get_perl_object(self));
-    RETVAL = newRV(inner_object);
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
 OUTPUT: RETVAL
 
 void
@@ -461,8 +460,7 @@ SV*
 default_parcel(...)
 CODE:
     CFCParcel *default_parcel = CFCParcel_default_parcel();
-    SV *inner_obj = SvRV((SV*)CFCParcel_get_perl_object(default_parcel));
-    RETVAL = newRV(inner_obj);
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)default_parcel));
 OUTPUT: RETVAL
 
 void
@@ -566,7 +564,7 @@ PPCODE:
     START_SET_OR_GET_SWITCH
         case 2: {
                 struct CFCParcel *parcel = CFCSymbol_get_parcel(self);
-                retval = newSVsv((SV*)CFCParcel_get_perl_object(parcel));
+                retval = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)parcel));
             }
             break;
         case 4: {
@@ -892,7 +890,7 @@ PPCODE:
         case 4: {
                 CFCParcel *parcel = CFCType_get_parcel(self);
                 retval = parcel
-                       ? newSVsv((SV*)CFCParcel_get_perl_object(parcel))
+                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)parcel))
                        : newSV(0);
             }
             break;

@@ -49,6 +49,3 @@ CFCParcel_get_Prefix(CFCParcel *self);
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self);
 
-void*
-CFCParcel_get_perl_object(CFCParcel *self);
-

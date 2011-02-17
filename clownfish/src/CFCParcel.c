@@ -25,16 +25,18 @@
   #define false 0
 #endif
 
+#define CFC_NEED_BASE_STRUCT_DEF
+#include "CFCBase.h"
 #include "CFCParcel.h"
 #include "CFCUtil.h"
 
 struct CFCParcel {
+    CFCBase base;
     char *name;
     char *cnick;
     char *prefix;
     char *Prefix;
     char *PREFIX;
-    void *perl_object;
 };
 
 #define MAX_PARCELS 100
@@ -92,8 +94,8 @@ S_validate_name_or_cnick(const char *orig)
 CFCParcel*
 CFCParcel_new(const char *name, const char *cnick)
 {
-    CFCParcel *self = (CFCParcel*)calloc(sizeof(CFCParcel), 1);
-    if (!self) { croak("malloc failed"); }
+    CFCParcel *self = (CFCParcel*)CFCBase_allocate(sizeof(CFCParcel),
+        "Clownfish::Parcel");
     return CFCParcel_init(self, name, cnick);
 }
 
@@ -145,9 +147,6 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
     self->Prefix[prefix_len] = '\0';
     self->PREFIX[prefix_len] = '\0';
 
-    self->perl_object = newSV(0);
-	sv_setref_pv(self->perl_object, "Clownfish::Parcel", (void*)self);
-
     return self;
 }
 
@@ -159,7 +158,7 @@ CFCParcel_destroy(CFCParcel *self)
     free(self->prefix);
     free(self->Prefix);
     free(self->PREFIX);
-    free(self);
+    CFCBase_destroy((CFCBase*)self);
 }
 
 static CFCParcel *default_parcel = NULL;
@@ -210,11 +209,5 @@ const char*
 CFCParcel_get_PREFIX(CFCParcel *self)
 {
     return self->PREFIX;
-}
-
-void*
-CFCParcel_get_perl_object(CFCParcel *self)
-{
-    return self->perl_object;
 }
 
