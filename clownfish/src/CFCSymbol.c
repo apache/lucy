@@ -36,8 +36,8 @@ CFCSymbol_new(struct CFCParcel *parcel, const char *exposure,
               const char *class_name, const char *class_cnick, 
               const char *micro_sym)
 {
-    CFCSymbol *self = (CFCSymbol*)malloc(sizeof(CFCSymbol));
-    if (!self) { croak("malloc failed"); }
+    CFCSymbol *self = (CFCSymbol*)CFCBase_allocate(sizeof(CFCSymbol),
+        "Clownfish::Symbol");
     return CFCSymbol_init(self, parcel, exposure, class_name, class_cnick,
         micro_sym);
 }
@@ -210,7 +210,7 @@ CFCSymbol_destroy(CFCSymbol *self)
     free(self->micro_sym);
     free((void*)self->short_sym);
     free((void*)self->full_sym);
-    free(self);
+    CFCBase_destroy((CFCBase*)self);
 }
 
 int

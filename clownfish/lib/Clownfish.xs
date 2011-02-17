@@ -393,7 +393,7 @@ PPCODE:
             size_t i;
             size_t num_vars = CFCParamList_num_vars(self);
             for (i = 0; i < num_vars; i++) {
-                SV *ref = newRV((SV*)CFCVariable_get_perl_obj(vars[i]));
+                SV *ref = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)vars[i]));
                 av_store(av, i, ref);
             }
             retval = newRV((SV*)av);
@@ -1007,8 +1007,8 @@ CODE:
     }
     CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
         class_cnick, micro_sym, type);
-    RETVAL = newRV(CFCVariable_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void

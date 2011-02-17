@@ -62,9 +62,9 @@ CFCParamList_add_param(CFCParamList *self, CFCVariable *variable,
     if (!self->variables || !self->values) {
         croak("realloc failed.");
     }
-    self->variables[self->num_vars - 1] = variable;
+    self->variables[self->num_vars - 1] 
+        = (CFCVariable*)CFCBase_incref((CFCBase*)variable);
     self->values[self->num_vars - 1] = value ? CFCUtil_strdup(value) : NULL;
-    SvREFCNT_inc(CFCVariable_get_perl_obj(variable));
     self->variables[self->num_vars] = NULL;
     self->values[self->num_vars] = NULL;
 }
@@ -74,7 +74,7 @@ CFCParamList_destroy(CFCParamList *self)
 {
     size_t i;
     for (i = 0; i < self->num_vars; i++) {
-        SvREFCNT_dec(CFCVariable_get_perl_obj(self->variables[i]));
+        CFCBase_decref((CFCBase*)self->variables[i]);
         free(self->values[i]);
     }
     free(self->variables);

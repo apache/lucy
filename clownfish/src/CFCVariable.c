@@ -27,7 +27,6 @@
 #endif
 
 #define CFC_NEED_SYMBOL_STRUCT_DEF
-#include "CFCBase.h"
 #include "CFCSymbol.h"
 #include "CFCVariable.h"
 #include "CFCParcel.h"
@@ -40,7 +39,6 @@ struct CFCVariable {
     char *local_c;
     char *global_c;
     char *local_dec;
-    void *perl_obj;
 };
 
 CFCVariable*
@@ -48,8 +46,8 @@ CFCVariable_new(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *class_cnick, 
                 const char *micro_sym, struct CFCType *type)
 {
-    CFCVariable *self = (CFCVariable*)calloc(sizeof(CFCVariable), 1);
-    if (!self) { croak("malloc failed"); }
+    CFCVariable *self = (CFCVariable*)CFCBase_allocate(sizeof(CFCVariable), 
+        "Clownfish::Variable");
     return CFCVariable_init(self, parcel, exposure, class_name, class_cnick,
         micro_sym, type);
 }
@@ -65,9 +63,6 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
 
     CFCSymbol_init((CFCSymbol*)self, parcel, real_exposure, class_name,
         class_cnick, micro_sym);
-
-    // Cache perl object SV.
-    self->perl_obj = CFCUtil_make_perl_obj(self, "Clownfish::Variable");
 
     // Assign type.
     self->type = (CFCType*)CFCBase_incref((CFCBase*)type);
@@ -105,22 +100,6 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
 void
 CFCVariable_destroy(CFCVariable *self)
 {
-    if (self->perl_obj) {
-        int refcount = SvREFCNT((SV*)self->perl_obj);
-        if (refcount > 0) {
-            if (refcount == 1) {
-                // Trigger Perl destructor, which causes recursion.
-                SV *perl_obj = (SV*)self->perl_obj;
-                self->perl_obj = NULL;
-                SvREFCNT_dec((SV*)self->perl_obj);
-                return;
-            }
-            else {
-                SvREFCNT_dec((SV*)self->perl_obj);
-                return;
-            }
-        }
-    }
     CFCBase_decref((CFCBase*)self->type);
     free(self->local_c);
     free(self->global_c);
@@ -157,11 +136,5 @@ const char*
 CFCVariable_local_declaration(CFCVariable *self)
 {
     return self->local_dec;
-}
-
-void*
-CFCVariable_get_perl_obj(CFCVariable *self)
-{
-    return self->perl_obj;
 }
 

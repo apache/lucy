@@ -21,7 +21,10 @@ typedef struct CFCSymbol CFCSymbol;
 struct CFCParcel;
 
 #ifdef CFC_NEED_SYMBOL_STRUCT_DEF
+#define CFC_NEED_BASE_STRUCT_DEF
+#include "CFCBase.h"
 struct CFCSymbol {
+    CFCBase base;
     struct CFCParcel *parcel;
     char *exposure;
     char *class_name;
