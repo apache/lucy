@@ -652,8 +652,8 @@ CODE:
     }   
     CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
         c_string);
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
@@ -663,8 +663,8 @@ _new_integer(klass, flags, specifier)
     const char *specifier;
 CODE:
     CFCType *self = CFCType_new_integer(flags, specifier);
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
@@ -674,8 +674,8 @@ _new_float(klass, flags, specifier)
     const char *specifier;
 CODE:
     CFCType *self = CFCType_new_float(flags, specifier);
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
@@ -692,8 +692,8 @@ CODE:
         parcel = INT2PTR(CFCParcel*, objint);
     }   
     CFCType *self = CFCType_new_object(flags, parcel, specifier, indirection);
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
@@ -713,8 +713,8 @@ CODE:
         croak("Param 'child' not a Clownfish::Type");
     }
     CFCType *self = CFCType_new_composite(flags, child, indirection, array);
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
@@ -723,8 +723,8 @@ _new_void(klass, is_const)
     int is_const;
 CODE:
     CFCType *self = CFCType_new_void(is_const);
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
@@ -732,8 +732,8 @@ _new_va_list(klass)
     const char *klass;
 CODE:
     CFCType *self = CFCType_new_va_list();
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
@@ -748,8 +748,8 @@ CODE:
         parcel = INT2PTR(CFCParcel*, objint);
     }   
     CFCType *self = CFCType_new_arbitrary(parcel, specifier);
-    RETVAL = newRV((SV*)CFCType_get_perl_obj(self));
-    SvREFCNT_dec(SvRV(RETVAL));
+    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void
@@ -1040,7 +1040,7 @@ PPCODE:
     START_SET_OR_GET_SWITCH
         case 2: {
                 CFCType *type = CFCVariable_get_type(self);
-                retval = newRV(CFCType_get_perl_obj(type));
+                retval = newRV(CFCBase_get_perl_obj((CFCBase*)type));
             }
             break;
         case 4: {

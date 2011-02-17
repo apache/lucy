@@ -25,11 +25,14 @@
   #define false 0
 #endif
 
+#define CFC_NEED_BASE_STRUCT_DEF
+#include "CFCBase.h"
 #include "CFCType.h"
 #include "CFCParcel.h"
 #include "CFCUtil.h"
 
 struct CFCType {
+    CFCBase base;
     int   flags;
     char *specifier;
     int   indirection;
@@ -38,15 +41,14 @@ struct CFCType {
     size_t width;
     char *array;
     struct CFCType *child;
-    void *perl_obj;
 };
 
 CFCType*
 CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
             int indirection, const char *c_string)
 {
-    CFCType *self = (CFCType*)malloc(sizeof(CFCType));
-    if (!self) { croak("malloc failed"); }
+    CFCType *self = (CFCType*)CFCBase_allocate(sizeof(CFCType),
+        "Clownfish::Type");
     return CFCType_init(self, flags, parcel, specifier, indirection, 
         c_string);
 }
@@ -63,7 +65,6 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
     self->width       = 0;
     self->array       = NULL;
     self->child       = NULL;
-    self->perl_obj    = CFCUtil_make_perl_obj(self, "Clownfish::Type");
     return self;
 }
 
@@ -242,8 +243,7 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
 
     CFCType *self = CFCType_new(flags, NULL, CFCType_get_specifier(child),
         indirection, c_string);
-    self->child = child;
-    SvREFCNT_inc((SV*)child->perl_obj);
+    self->child = (CFCType*)CFCBase_incref((CFCBase*)child);
 
     // Record array spec.
     const char *array_spec = array ? array : "";
@@ -308,28 +308,12 @@ CFCType_new_arbitrary(CFCParcel *parcel, const char *specifier)
 void
 CFCType_destroy(CFCType *self)
 {
-    if (self->perl_obj) {
-        int refcount = SvREFCNT((SV*)self->perl_obj);
-        if (refcount > 0) {
-            if (refcount == 1) {
-                // Trigger Perl destructor, which causes recursion.
-                SV *perl_obj = (SV*)self->perl_obj;
-                self->perl_obj = NULL;
-                SvREFCNT_dec((SV*)self->perl_obj);
-                return;
-            }
-            else {
-                SvREFCNT_dec((SV*)self->perl_obj);
-                return;
-            }
-        }
-    }
     if (self->child) {
-        SvREFCNT_dec((SV*)self->child->perl_obj);
+        CFCBase_decref((CFCBase*)self->child);
     }
     free(self->specifier);
     free(self->c_string);
-    free(self);
+    CFCBase_destroy((CFCBase*)self);
 }
 
 int
@@ -517,11 +501,5 @@ int
 CFCType_is_composite(CFCType *self)
 {
     return !!(self->flags & CFCTYPE_COMPOSITE);
-}
-
-void*
-CFCType_get_perl_obj(CFCType *self)
-{
-    return self->perl_obj;
 }
 

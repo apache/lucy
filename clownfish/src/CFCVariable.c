@@ -27,6 +27,7 @@
 #endif
 
 #define CFC_NEED_SYMBOL_STRUCT_DEF
+#include "CFCBase.h"
 #include "CFCSymbol.h"
 #include "CFCVariable.h"
 #include "CFCParcel.h"
@@ -69,9 +70,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     self->perl_obj = CFCUtil_make_perl_obj(self, "Clownfish::Variable");
 
     // Assign type.
-    self->type = type;
-    SV *type_sv = CFCType_get_perl_obj(type);
-    SvREFCNT_inc(type_sv);
+    self->type = (CFCType*)CFCBase_incref((CFCBase*)type);
 
     // Cache various C string representations.
     const char *type_str = CFCType_to_c(type);
@@ -122,8 +121,7 @@ CFCVariable_destroy(CFCVariable *self)
             }
         }
     }
-    SV *type_sv = CFCType_get_perl_obj(self->type);
-    SvREFCNT_dec(type_sv);
+    CFCBase_decref((CFCBase*)self->type);
     free(self->local_c);
     free(self->global_c);
     free(self->local_dec);
