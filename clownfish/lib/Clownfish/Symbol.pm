@@ -47,17 +47,16 @@ __POD__
 
 =head1 NAME
 
-Clownfish::Symbol - Abstract base class for Clownfish symbols.
+Clownfish::Symbol - Base class for Clownfish symbols.
 
 =head1 DESCRIPTION
 
-Clownfish::Symbol serves as an abstract parent class for entities which may
-live in the global namespace, such as classes, functions, methods, and
-variables.
+Clownfish::Symbol serves as a parent class for entities which may live in the
+global namespace, such as classes, functions, methods, and variables.
 
 =head1 CONSTRUCTOR
 
-    my $symbol = MySymbol->new(
+    my $symbol = Clownfish::Symbol->new(
         parcel      => 'Crustacean',             # default: special
         exposure    => 'parcel',                 # required
         class_name  => 'Crustacean::Lobster',    # default: undef
