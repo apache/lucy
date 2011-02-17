@@ -101,8 +101,8 @@ CODE:
                             ? SvPV_nolen(micro_sym_sv) : NULL;
     CFCClass *self = CFCClass_new(parcel, exposure, class_name, class_cnick,
         micro_sym);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void
@@ -232,8 +232,8 @@ CODE:
                             ? SvPV_nolen(micro_sym_sv) : NULL;
     CFCFunction *self = CFCFunction_new(parcel, exposure, class_name, class_cnick,
         micro_sym, return_type, param_list, docucomment, is_inline);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void
@@ -296,8 +296,8 @@ CODE:
     CFCMethod *self = CFCMethod_new(parcel, exposure, class_name, class_cnick,
         micro_sym, return_type, param_list, docucomment, is_inline, macro_sym, 
         is_final, is_abstract);
-    RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void

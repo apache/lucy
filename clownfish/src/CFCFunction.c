@@ -28,8 +28,8 @@ CFCFunction_new(void *parcel, const char *exposure, const char *class_name,
                 void *return_type, void *param_list, void *docucomment, 
                 int is_inline)
 {
-    CFCFunction *self = (CFCFunction*)malloc(sizeof(CFCFunction));
-    if (!self) { croak("malloc failed"); }
+    CFCFunction *self = (CFCFunction*)CFCBase_allocate(sizeof(CFCFunction),
+        "Clownfish::Function");
     return CFCFunction_init(self, parcel, exposure, class_name, class_cnick,
         micro_sym, return_type, param_list, docucomment, is_inline);
 }

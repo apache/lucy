@@ -40,7 +40,8 @@ CFCClass_new(struct CFCParcel *parcel, const char *exposure,
               const char *class_name, const char *class_cnick, 
               const char *micro_sym)
 {
-    CFCClass *self = (CFCClass*)malloc(sizeof(CFCClass));
+    CFCClass *self = (CFCClass*)CFCBase_allocate(sizeof(CFCClass),
+        "Clownfish::Class");
     if (!self) { croak("malloc failed"); }
     return CFCClass_init(self, parcel, exposure, class_name, class_cnick,
         micro_sym);

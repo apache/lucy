@@ -40,8 +40,8 @@ CFCMethod_new(void *parcel, const char *exposure, const char *class_name,
               int is_inline, const char *macro_sym, int is_final, 
               int is_abstract)
 {
-    CFCMethod *self = (CFCMethod*)malloc(sizeof(CFCMethod));
-    if (!self) { croak("malloc failed"); }
+    CFCMethod *self = (CFCMethod*)CFCBase_allocate(sizeof(CFCMethod),
+        "Clownfish::Method");
     return CFCMethod_init(self, parcel, exposure, class_name, class_cnick,
         micro_sym, return_type, param_list, docucomment, is_inline, macro_sym,
         is_final, is_abstract);
