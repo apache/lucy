@@ -131,6 +131,16 @@ CODE:
 	sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
+SV*
+parse(klass, text)
+    const char *klass;
+    const char *text;
+CODE:
+    CFCDocuComment *self = CFCDocuComment_parse(text);
+    RETVAL = newSV(0);
+	sv_setref_pv(RETVAL, klass, (void*)self);
+OUTPUT: RETVAL
+
 void
 DESTROY(self)
     CFCDocuComment *self;

@@ -82,6 +82,170 @@ CFCDocuComment_strip(char *comment)
 }
 
 CFCDocuComment*
+CFCDocuComment_parse(const char *raw_text)
+{
+    char *text = savepv(raw_text);
+
+    // Strip whitespace, comment open, close, and left border.
+    CFCUtil_trim_whitespace(text);
+    CFCDocuComment_strip(text);
+
+    // Extract the brief description.
+    char *brief = NULL;
+    {
+        char *ptr = text;
+        size_t len = strlen(text);
+        char *limit = strchr(ptr, '@');
+        if (!limit) {
+            limit = text + len;
+        }
+        while (ptr < limit) {
+            if (   *ptr == '.' 
+                && ((ptr == limit - 1) || isspace(*(ptr + 1)))
+            ) {
+                ptr++;
+                size_t brief_len = ptr - text;
+                brief = (char*)malloc(brief_len + 1);
+                if (!brief) { croak("malloc failed"); }
+                memcpy(brief, text, brief_len);
+                brief[brief_len] = '\0';
+                break;
+            }
+            ptr++;
+        }
+    }
+    if (!brief) {
+        // croak("Can't find at least one sentence in '%s'", raw_text);
+        brief = (char*)calloc(1, sizeof(char));
+    }
+
+    // Extract @param directives.
+    size_t num_params = 0;
+    char **param_names = (char**)calloc(num_params, sizeof(char*));
+    char **param_docs  = (char**)calloc(num_params, sizeof(char*));
+    if (!param_names || !param_docs) { 
+        croak("malloc failed"); 
+    }
+    {
+        char *candidate = strstr(text, "@param");
+        size_t len = strlen(text);
+        char *limit = text + len;
+        while (candidate) {
+            // Extract param name.
+            char *ptr = candidate + sizeof("@param") - 1;
+            if (!isspace(*ptr) || ptr > limit) {
+                croak("Malformed @param directive in '%s'", raw_text);
+            }
+            while (isspace(*ptr) && ptr < limit) { ptr++; }
+            char *param_name = ptr;
+            while ((isalnum(*ptr) || *ptr == '_') && ptr < limit) { ptr++; }
+            size_t param_name_len = ptr - param_name;
+            if (!param_name_len) {
+                croak("Malformed @param directive in '%s'", raw_text);
+            }
+
+            // Extract param description.
+            while (isspace(*ptr) && ptr < limit) { ptr++; }
+            char *param_doc = ptr;
+            while (ptr < limit) {
+                if (*ptr == '@') { break; }
+                else if (*ptr == '\n' && ptr < limit) {
+                    ptr++;
+                    while (ptr < limit && *ptr != '\n' && isspace(*ptr)) {
+                        ptr++;
+                    }
+                    if (*ptr == '\n' || *ptr == '@') { break; }
+                }
+                else {
+                    ptr++;
+                }
+            }
+            size_t param_doc_len = ptr - param_doc;
+
+            num_params++;
+            size_t size = (num_params + 1) * sizeof(char*);
+            param_names = realloc(param_names, size);
+            param_docs  = realloc(param_docs, size);
+            if (!param_names || !param_docs) { 
+                croak("realloc failed"); 
+            }
+            param_names[num_params - 1] = savepvn(param_name, param_name_len);
+            param_docs[num_params - 1]  = savepvn(param_doc, param_doc_len);
+            CFCUtil_trim_whitespace(param_names[num_params - 1]);
+            CFCUtil_trim_whitespace(param_docs[num_params - 1]);
+            
+            if (ptr == limit) {
+                break;
+            }
+            else if (ptr > limit) {
+                croak("Overran end of string while parsing '%s'", raw_text);
+            }
+            candidate = strstr(ptr, "@param");
+        }
+    }
+
+    // Extract full description.
+    char *full_description = savepv(text);
+    {
+        char *terminus = strstr(full_description, "@param");
+        if (!terminus) {
+            terminus = strstr(full_description, "@return");
+        }
+        if (terminus) {
+            *terminus = '\0';
+        }
+    }
+    CFCUtil_trim_whitespace(full_description);
+
+    // Extract long description.
+    char *long_description = savepv(full_description + strlen(brief));
+    CFCUtil_trim_whitespace(long_description);
+
+    char *retval = strstr(text, "@return ");
+    if (retval) {
+        retval = savepv(retval + sizeof("@return ") - 1);
+        char *terminus = strchr(retval, '@');
+        if (terminus) {
+            *terminus = '\0';
+        }
+        CFCUtil_trim_whitespace(retval);
+    }
+
+    // Wrap param names and param docs in Perl arrays for now.
+    AV *param_names_av = newAV();
+    AV *param_docs_av  = newAV();
+    {
+        size_t i;
+        for (i = 0; i < num_params; i++) {
+            SV *name = newSVpvn(param_names[i], strlen(param_names[i]));
+            av_store(param_names_av, i, name);
+            SV *doc = newSVpvn(param_docs[i], strlen(param_docs[i]));
+            av_store(param_docs_av, i, doc);
+            Safefree(param_names[i]);
+            Safefree(param_docs[i]);
+        }
+        free(param_names);
+        free(param_docs);
+    }
+
+    SV *param_names_ref = newRV((SV*)param_names_av);
+    SV *param_docs_ref = newRV((SV*)param_docs_av);
+    CFCDocuComment *self = CFCDocuComment_new(full_description, brief, 
+        long_description, param_names_ref, param_docs_ref, retval);
+    Safefree(full_description);
+    free(brief);
+    Safefree(long_description);
+    Safefree(retval);
+    Safefree(text);
+    SvREFCNT_dec((SV*)param_names_av);
+    SvREFCNT_dec((SV*)param_docs_av);
+    SvREFCNT_dec(param_names_ref);
+    SvREFCNT_dec(param_docs_ref);
+
+    return self;
+}
+
+CFCDocuComment*
 CFCDocuComment_new(const char *description, const char *brief, 
                    const char *long_description, void *param_names, 
                    void *param_docs, const char *retval)

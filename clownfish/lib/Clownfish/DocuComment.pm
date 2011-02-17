@@ -18,64 +18,6 @@ use warnings;
 
 package Clownfish::DocuComment;
 use Clownfish;
-use Clownfish::Util qw( trim_whitespace );
-use Carp;
-
-our %new_PARAMS = (
-    description => undef,
-    brief       => undef,
-    long        => undef,
-    param_names => undef,
-    param_docs  => undef,
-    retval      => undef,
-);
-
-sub parse {
-    my ( $either, $text ) = @_;
-    my $class_name = ref($either) || $either;
-
-    # Strip comment open, close, and left border.
-    $text = strip($text);
-
-    # Extract the brief description.
-    $text =~ /^(.+?\.)(\s+|\Z)/s
-        or confess("Can't find at least one descriptive sentence in '$text'");
-    my $brief = $1;
-
-    # terminated by @, empty line, or string end.
-    my $terminator = qr/((?=\@)|\n\s*\n|\Z)/;
-
-    # Extract @param, @return directives.
-    my ( @param_names, @param_docs );
-    while (
-        $text =~ s/^\s*
-        \@param\s+
-        (\w+)   # param name
-        \s+
-        (.*?)   # param description
-        \s*
-        $terminator
-      //xsm
-        )
-    {
-        push @param_names, $1;
-        push @param_docs,  $2;
-    }
-    my $retval;
-    if ( $text =~ s/^\s*\@return\s+(.*?)$terminator//sm ) {
-        $retval = $1;
-    }
-
-    $text = trim_whitespace($text);
-    my $description = $text;
-
-    $text =~ s/^(.+?\.)(\s+|\Z)//s;    # zap brief
-    $text =~ s/^\s*//;
-    my $long = $text;
-
-    return $class_name->_new( $description, $brief, $long, \@param_names,
-        \@param_docs, $retval );
-}
 
 1;
 
