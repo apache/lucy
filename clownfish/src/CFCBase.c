@@ -43,13 +43,16 @@ CFCBase_destroy(CFCBase *self)
 CFCBase*
 CFCBase_incref(CFCBase *self)
 {
-    SvREFCNT_inc((SV*)self->perl_obj);
+    if (self) {
+        SvREFCNT_inc((SV*)self->perl_obj);
+    }
     return self;
 }
 
 unsigned
 CFCBase_decref(CFCBase *self)
 {
+    if (!self) { return 0; }
     unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
     /* When the SvREFCNT for this Perl object falls to zero, DESTROY will be
      * invoked from Perl space for the class that the Perl object was blessed
