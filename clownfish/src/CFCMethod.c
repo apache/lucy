@@ -23,6 +23,7 @@
 #include "CFCFunction.h"
 #include "CFCMethod.h"
 #include "CFCUtil.h"
+#include "CFCParcel.h"
 
 struct CFCMethod {
     CFCFunction function;
@@ -34,7 +35,7 @@ struct CFCMethod {
 };
 
 CFCMethod*
-CFCMethod_new(void *parcel, const char *exposure, const char *class_name, 
+CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *micro_sym, 
               void *return_type, void *param_list, void *docucomment, 
               int is_inline, const char *macro_sym, int is_final, 
@@ -48,7 +49,7 @@ CFCMethod_new(void *parcel, const char *exposure, const char *class_name,
 }
 
 CFCMethod*
-CFCMethod_init(CFCMethod *self, void *parcel, const char *exposure, 
+CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure, 
                const char *class_name, const char *class_cnick, 
                const char *micro_sym, void *return_type, void *param_list, 
                void *docucomment, int is_inline, const char *macro_sym, 

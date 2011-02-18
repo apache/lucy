@@ -18,6 +18,7 @@
 #define H_CFCFUNCTION
 
 typedef struct CFCFunction CFCFunction;
+struct CFCParcel;
 
 #ifdef CFC_NEED_FUNCTION_STRUCT_DEF
     #define CFC_NEED_SYMBOL_STRUCT_DEF
@@ -33,16 +34,17 @@ typedef struct CFCFunction CFCFunction;
 
 
 CFCFunction*
-CFCFunction_new(void *parcel, const char *exposure, const char *class_name, 
-                const char *class_cnick, const char *micro_sym, 
-                void *return_type, void *param_list, void *docucomment, 
-                int is_inline);
+CFCFunction_new(struct CFCParcel *parcel, const char *exposure, 
+                const char *class_name, const char *class_cnick, 
+                const char *micro_sym, void *return_type, void *param_list, 
+                void *docucomment, int is_inline);
 
 CFCFunction*
-CFCFunction_init(CFCFunction *self, void *parcel, const char *exposure, 
-                 const char *class_name, const char *class_cnick, 
-                 const char *micro_sym, void *return_type, void *param_list,
-                 void *docucomment, int is_inline);
+CFCFunction_init(CFCFunction *self, struct CFCParcel *parcel, 
+                 const char *exposure, const char *class_name, 
+                 const char *class_cnick, const char *micro_sym, 
+                 void *return_type, void *param_list, void *docucomment, 
+                 int is_inline);
 
 void
 CFCFunction_destroy(CFCFunction *self);

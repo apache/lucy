@@ -18,24 +18,25 @@
 #define H_CFCMETHOD
 
 typedef struct CFCMethod CFCMethod;
+struct CFCParcel;
 
 CFCMethod*
-CFCMethod_new(void *parcel, const char *exposure, const char *class_name, 
-              const char *class_cnick, const char *micro_sym, 
-              void *return_type, void *param_list, void *docucomment, 
-              int is_inline, const char *macro_sym, int is_final, 
-              int is_abstract);
+CFCMethod_new(struct CFCParcel *parcel, const char *exposure, 
+              const char *class_name, const char *class_cnick, 
+              const char *micro_sym, void *return_type, void *param_list, 
+              void *docucomment, int is_inline, const char *macro_sym, 
+              int is_final, int is_abstract);
 
 CFCMethod*
-CFCMethod_init(CFCMethod *self, void *parcel, const char *exposure, 
-               const char *class_name, const char *class_cnick, 
-               const char *micro_sym, void *return_type, void *param_list, 
-               void *docucomment, int is_inline, const char *macro_sym, 
-               int is_final, int is_abstract);
+CFCMethod_init(CFCMethod *self, struct CFCParcel *parcel,
+               const char *exposure, const char *class_name, 
+               const char *class_cnick, const char *micro_sym, 
+               void *return_type, void *param_list, void *docucomment, 
+               int is_inline, const char *macro_sym, int is_final, 
+               int is_abstract);
 
 void
 CFCMethod_destroy(CFCMethod *self);
-
 
 const char*
 CFCMethod_get_macro_sym(CFCMethod *self);

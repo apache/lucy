@@ -21,12 +21,13 @@
 
 #define CFC_NEED_FUNCTION_STRUCT_DEF
 #include "CFCFunction.h"
+#include "CFCParcel.h"
 
 CFCFunction*
-CFCFunction_new(void *parcel, const char *exposure, const char *class_name, 
-                const char *class_cnick, const char *micro_sym, 
-                void *return_type, void *param_list, void *docucomment, 
-                int is_inline)
+CFCFunction_new(CFCParcel *parcel, const char *exposure,
+                const char *class_name, const char *class_cnick,
+                const char *micro_sym, void *return_type, void *param_list,
+                void *docucomment, int is_inline)
 {
     CFCFunction *self = (CFCFunction*)CFCBase_allocate(sizeof(CFCFunction),
         "Clownfish::Function");
@@ -35,7 +36,7 @@ CFCFunction_new(void *parcel, const char *exposure, const char *class_name,
 }
 
 CFCFunction*
-CFCFunction_init(CFCFunction *self, void *parcel, const char *exposure, 
+CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
                const char *class_name, const char *class_cnick, 
                const char *micro_sym, void *return_type, void *param_list, 
                void *docucomment, int is_inline)
