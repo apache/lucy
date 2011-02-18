@@ -131,6 +131,7 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
                const char *exposure, const char *class_name, 
                const char *class_cnick, const char *micro_sym)
 {
+    CFCUTIL_NULL_CHECK(parcel);
     self->parcel = parcel;
 
     // Validate exposure.

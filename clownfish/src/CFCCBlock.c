@@ -40,6 +40,7 @@ CFCCBlock_new(const char *contents)
 CFCCBlock*
 CFCCBlock_init(CFCCBlock *self, const char *contents) 
 {
+    CFCUTIL_NULL_CHECK(contents);
     self->contents = CFCUtil_strdup(contents);
     return self;
 }

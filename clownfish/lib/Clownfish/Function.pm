@@ -47,16 +47,10 @@ sub new {
             return_type param_list docucomment inline ) } );
 
     # Validate.
-    for (qw( return_type class_name param_list )) {
-        my $meth_name = "get_$_";
-        confess("$_ is mandatory") unless defined $self->$meth_name;
-    }
+    confess("class_name is mandatory")
+        unless defined $self->get_class_name;
     confess( "Invalid micro_sym: '" . $self->micro_sym . "'" )
         unless $self->micro_sym =~ /^[a-z0-9_]+$/;
-    confess 'param_list must be a ParamList object'
-        unless a_isa_b( $self->get_param_list, "Clownfish::ParamList" );
-    confess 'return_type must be a Type object'
-        unless a_isa_b( $self->get_return_type, "Clownfish::Type" );
 
     return $self;
 }

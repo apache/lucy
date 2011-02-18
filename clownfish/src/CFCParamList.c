@@ -55,6 +55,7 @@ void
 CFCParamList_add_param(CFCParamList *self, CFCVariable *variable, 
                        const char *value)
 {
+    CFCUTIL_NULL_CHECK(variable);
     self->num_vars++;
     size_t amount = (self->num_vars + 1) * sizeof(void*);
     self->variables = (CFCVariable**)realloc(self->variables, amount);

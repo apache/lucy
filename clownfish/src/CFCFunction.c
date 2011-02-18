@@ -25,6 +25,7 @@
 #include "CFCType.h"
 #include "CFCParamList.h"
 #include "CFCDocuComment.h"
+#include "CFCUtil.h"
 
 CFCFunction*
 CFCFunction_new(CFCParcel *parcel, const char *exposure,
@@ -48,6 +49,8 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
 {
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
         class_cnick, micro_sym);
+    CFCUTIL_NULL_CHECK(return_type);
+    CFCUTIL_NULL_CHECK(param_list);
     self->return_type = (CFCType*)CFCBase_incref((CFCBase*)return_type);
     self->param_list  = (CFCParamList*)CFCBase_incref((CFCBase*)param_list);
     self->docucomment = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);

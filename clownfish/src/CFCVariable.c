@@ -65,6 +65,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
         class_cnick, micro_sym);
 
     // Assign type.
+    CFCUTIL_NULL_CHECK(type);
     self->type = (CFCType*)CFCBase_incref((CFCBase*)type);
 
     // Cache various C string representations.

@@ -39,6 +39,14 @@ CFCUtil_make_perl_obj(void *ptr, const char *klass)
     return  inner_obj;
 }
 
+void
+CFCUtil_null_check(const void *arg, const char *name, const char *file, int line)
+{
+    if (!arg) {
+        croak("%s cannot be NULL at %s line %d", name, file, line);
+    }
+}
+
 char*
 CFCUtil_strdup(const char *string)
 {

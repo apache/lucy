@@ -23,6 +23,13 @@
 void*
 CFCUtil_make_perl_obj(void *ptr, const char *klass);
 
+/** Throw an error if the supplied argument is NULL.
+ */
+void
+CFCUtil_null_check(const void *arg, const char *name, const char *file, int line);
+#define CFCUTIL_NULL_CHECK(arg) \
+    CFCUtil_null_check(arg, #arg, __FILE__, __LINE__)
+
 /** Portable, NULL-safe implementation of strdup().
  */
 char*
