@@ -218,6 +218,7 @@ CFCDocuComment_parse(const char *raw_text)
         CFCUtil_trim_whitespace(self->retval);
     }
 
+    free(text);
     return self;
 }
 
