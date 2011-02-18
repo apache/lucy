@@ -24,6 +24,7 @@
 #include "CFCMethod.h"
 #include "CFCUtil.h"
 #include "CFCParcel.h"
+#include "CFCDocuComment.h"
 
 struct CFCMethod {
     CFCFunction function;
@@ -37,9 +38,9 @@ struct CFCMethod {
 CFCMethod*
 CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *micro_sym, 
-              void *return_type, void *param_list, void *docucomment, 
-              int is_inline, const char *macro_sym, int is_final, 
-              int is_abstract)
+              void *return_type, void *param_list, 
+              CFCDocuComment *docucomment, int is_inline, 
+              const char *macro_sym, int is_final, int is_abstract)
 {
     CFCMethod *self = (CFCMethod*)CFCBase_allocate(sizeof(CFCMethod),
         "Clownfish::Method");
@@ -52,8 +53,8 @@ CFCMethod*
 CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure, 
                const char *class_name, const char *class_cnick, 
                const char *micro_sym, void *return_type, void *param_list, 
-               void *docucomment, int is_inline, const char *macro_sym, 
-               int is_final, int is_abstract)
+               CFCDocuComment *docucomment, int is_inline,
+               const char *macro_sym, int is_final, int is_abstract)
 {
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
         class_cnick, micro_sym, return_type, param_list, docucomment,

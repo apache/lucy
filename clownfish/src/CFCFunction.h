@@ -19,6 +19,7 @@
 
 typedef struct CFCFunction CFCFunction;
 struct CFCParcel;
+struct CFCDocuComment;
 
 #ifdef CFC_NEED_FUNCTION_STRUCT_DEF
     #define CFC_NEED_SYMBOL_STRUCT_DEF
@@ -27,7 +28,7 @@ struct CFCParcel;
         CFCSymbol symbol;
         void *return_type;
         void *param_list;
-        void *docucomment;
+        struct CFCDocuComment *docucomment;
         int   is_inline;
     };
 #endif
@@ -37,14 +38,14 @@ CFCFunction*
 CFCFunction_new(struct CFCParcel *parcel, const char *exposure, 
                 const char *class_name, const char *class_cnick, 
                 const char *micro_sym, void *return_type, void *param_list, 
-                void *docucomment, int is_inline);
+                struct CFCDocuComment *docucomment, int is_inline);
 
 CFCFunction*
 CFCFunction_init(CFCFunction *self, struct CFCParcel *parcel, 
                  const char *exposure, const char *class_name, 
                  const char *class_cnick, const char *micro_sym, 
-                 void *return_type, void *param_list, void *docucomment, 
-                 int is_inline);
+                 void *return_type, void *param_list,
+                 struct CFCDocuComment *docucomment, int is_inline);
 
 void
 CFCFunction_destroy(CFCFunction *self);
@@ -55,7 +56,7 @@ CFCFunction_get_return_type(CFCFunction *self);
 void*
 CFCFunction_get_param_list(CFCFunction *self);
 
-void*
+struct CFCDocuComment*
 CFCFunction_get_docucomment(CFCFunction *self);
 
 int

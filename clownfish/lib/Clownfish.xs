@@ -221,7 +221,7 @@ _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, retur
     SV *micro_sym_sv;
     SV *return_type;
     SV *param_list;
-    SV *docucomment;
+    CFCDocuComment *docucomment;
     int is_inline;
 CODE:
     const char *class_name = SvOK(class_name_sv) 
@@ -259,8 +259,13 @@ PPCODE:
         case 4:
             retval = newSVsv((SV*)CFCFunction_get_param_list(self));
             break;
-        case 6:
-            retval = newSVsv((SV*)CFCFunction_get_docucomment(self));
+        case 6: {
+                CFCDocuComment *docucomment 
+                    = CFCFunction_get_docucomment(self);
+                retval = docucomment 
+                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self))
+                       : newSV(0);
+            }
             break;
         case 8:
             retval = newSViv(CFCFunction_inline(self));
@@ -281,7 +286,7 @@ _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, retur
     SV *micro_sym_sv;
     SV *return_type;
     SV *param_list;
-    SV *docucomment;
+    CFCDocuComment *docucomment;
     int is_inline;
     const char *macro_sym;
     int is_final;
