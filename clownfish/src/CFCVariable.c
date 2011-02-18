@@ -58,6 +58,9 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
                  const char *class_cnick, const char *micro_sym, 
                  struct CFCType *type)
 {
+    // Validate type.
+    CFCUTIL_NULL_CHECK(type);
+
     // Default exposure to "local".
     const char *real_exposure = exposure ? exposure : "local";
 
@@ -65,7 +68,6 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
         class_cnick, micro_sym);
 
     // Assign type.
-    CFCUTIL_NULL_CHECK(type);
     self->type = (CFCType*)CFCBase_incref((CFCBase*)type);
 
     // Cache various C string representations.

@@ -131,30 +131,27 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
                const char *exposure, const char *class_name, 
                const char *class_cnick, const char *micro_sym)
 {
-    // Validate parcel.
+    // Validate.
     CFCUTIL_NULL_CHECK(parcel);
-
-    // Validate exposure.
     if (!S_validate_exposure(exposure)) {
         croak("Invalid exposure: '%s'", exposure ? exposure : "[NULL]");
     }
-    self->exposure = CFCUtil_strdup(exposure);
-
-    // Validate class name (if supplied);
     if (class_name && !S_validate_class_name(class_name)) {
         croak("Invalid class_name: '%s'", class_name);
     }
-    self->class_name = CFCUtil_strdup(class_name);
+    if (!micro_sym || !S_validate_identifier(micro_sym)) {
+        croak("Invalid micro_sym: '%s'",  micro_sym ? micro_sym : "[NULL]");
+    }
 
     // Derive class_cnick if necessary, then validate.
+    const char *real_cnick = NULL;
     if (class_name) {
         if (class_cnick) {
-            self->class_cnick = CFCUtil_strdup(class_cnick);
+            real_cnick = class_cnick;
         }
         else {
             const char *last_colon = strrchr(class_name, ':');
-            const char *cnick = last_colon ? last_colon + 1 : class_name;
-            self->class_cnick = CFCUtil_strdup(cnick);
+            real_cnick = last_colon ? last_colon + 1 : class_name;
         }
     }
     else if (class_cnick) {
@@ -162,19 +159,18 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
         croak("Can't supply class_cnick without class_name");
     }
     else {
-        self->class_cnick = NULL;
+        real_cnick = NULL;
     }
-    if (self->class_cnick && !S_validate_class_cnick(self->class_cnick)) {
-        croak("Invalid class_cnick: '%s'", self->class_cnick);
+    if (real_cnick && !S_validate_class_cnick(real_cnick)) {
+        croak("Invalid class_cnick: '%s'", real_cnick);
     }
 
-    if (!micro_sym || !S_validate_identifier(micro_sym)) {
-        croak("Invalid micro_sym: '%s'",  micro_sym ? micro_sym : "[NULL]");
-    }
-    self->micro_sym = CFCUtil_strdup(micro_sym);
-
-    // Assign parcel.
-    self->parcel = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
+    // Assign.
+    self->parcel      = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
+    self->exposure    = CFCUtil_strdup(exposure);
+    self->class_name  = CFCUtil_strdup(class_name);
+    self->class_cnick = CFCUtil_strdup(real_cnick);
+    self->micro_sym   = CFCUtil_strdup(micro_sym);
 
     // Derive short_sym.
     size_t class_cnick_len = self->class_cnick 
