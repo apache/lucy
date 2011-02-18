@@ -22,7 +22,9 @@
 #define CFC_NEED_FUNCTION_STRUCT_DEF
 #include "CFCFunction.h"
 #include "CFCMethod.h"
+#include "CFCType.h"
 #include "CFCUtil.h"
+#include "CFCParamList.h"
 #include "CFCParcel.h"
 #include "CFCDocuComment.h"
 
@@ -38,7 +40,7 @@ struct CFCMethod {
 CFCMethod*
 CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *micro_sym, 
-              void *return_type, void *param_list, 
+              CFCType *return_type, CFCParamList *param_list, 
               CFCDocuComment *docucomment, int is_inline, 
               const char *macro_sym, int is_final, int is_abstract)
 {
@@ -52,9 +54,10 @@ CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
 CFCMethod*
 CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure, 
                const char *class_name, const char *class_cnick, 
-               const char *micro_sym, void *return_type, void *param_list, 
-               CFCDocuComment *docucomment, int is_inline,
-               const char *macro_sym, int is_final, int is_abstract)
+               const char *micro_sym, CFCType *return_type, 
+               CFCParamList *param_list, CFCDocuComment *docucomment, 
+               int is_inline, const char *macro_sym, int is_final, 
+               int is_abstract)
 {
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
         class_cnick, micro_sym, return_type, param_list, docucomment,

@@ -22,13 +22,16 @@
 #define CFC_NEED_FUNCTION_STRUCT_DEF
 #include "CFCFunction.h"
 #include "CFCParcel.h"
+#include "CFCType.h"
+#include "CFCParamList.h"
 #include "CFCDocuComment.h"
 
 CFCFunction*
 CFCFunction_new(CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *class_cnick,
-                const char *micro_sym, void *return_type, void *param_list,
-                CFCDocuComment *docucomment, int is_inline)
+                const char *micro_sym, CFCType *return_type, 
+                CFCParamList *param_list, CFCDocuComment *docucomment, 
+                int is_inline)
 {
     CFCFunction *self = (CFCFunction*)CFCBase_allocate(sizeof(CFCFunction),
         "Clownfish::Function");
@@ -39,13 +42,14 @@ CFCFunction_new(CFCParcel *parcel, const char *exposure,
 CFCFunction*
 CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
                const char *class_name, const char *class_cnick, 
-               const char *micro_sym, void *return_type, void *param_list, 
-               CFCDocuComment *docucomment, int is_inline)
+               const char *micro_sym, CFCType *return_type, 
+               CFCParamList *param_list, CFCDocuComment *docucomment, 
+               int is_inline)
 {
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
         class_cnick, micro_sym);
-    self->return_type = newSVsv((SV*)return_type);
-    self->param_list  = newSVsv((SV*)param_list);
+    self->return_type = (CFCType*)CFCBase_incref((CFCBase*)return_type);
+    self->param_list  = (CFCParamList*)CFCBase_incref((CFCBase*)param_list);
     self->docucomment = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);
     self->is_inline   = is_inline;
     return self;
@@ -54,19 +58,19 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
 void
 CFCFunction_destroy(CFCFunction *self)
 {
-    SvREFCNT_dec((SV*)self->return_type);
-    SvREFCNT_dec((SV*)self->param_list);
+    CFCBase_decref((CFCBase*)self->return_type);
+    CFCBase_decref((CFCBase*)self->param_list);
     CFCBase_decref((CFCBase*)self->docucomment);
     CFCSymbol_destroy((CFCSymbol*)self);
 }
 
-void*
+CFCType*
 CFCFunction_get_return_type(CFCFunction *self)
 {
     return self->return_type;
 }
 
-void*
+CFCParamList*
 CFCFunction_get_param_list(CFCFunction *self)
 {
     return self->param_list;

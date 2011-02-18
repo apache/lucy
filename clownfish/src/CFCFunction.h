@@ -19,15 +19,17 @@
 
 typedef struct CFCFunction CFCFunction;
 struct CFCParcel;
+struct CFCType;
 struct CFCDocuComment;
+struct CFCParamList;
 
 #ifdef CFC_NEED_FUNCTION_STRUCT_DEF
     #define CFC_NEED_SYMBOL_STRUCT_DEF
     #include "CFCSymbol.h"
     struct CFCFunction {
         CFCSymbol symbol;
-        void *return_type;
-        void *param_list;
+        struct CFCType *return_type;
+        struct CFCParamList *param_list;
         struct CFCDocuComment *docucomment;
         int   is_inline;
     };
@@ -37,23 +39,24 @@ struct CFCDocuComment;
 CFCFunction*
 CFCFunction_new(struct CFCParcel *parcel, const char *exposure, 
                 const char *class_name, const char *class_cnick, 
-                const char *micro_sym, void *return_type, void *param_list, 
+                const char *micro_sym, struct CFCType *return_type, 
+                struct CFCParamList *param_list, 
                 struct CFCDocuComment *docucomment, int is_inline);
 
 CFCFunction*
 CFCFunction_init(CFCFunction *self, struct CFCParcel *parcel, 
                  const char *exposure, const char *class_name, 
                  const char *class_cnick, const char *micro_sym, 
-                 void *return_type, void *param_list,
+                 struct CFCType *return_type, struct CFCParamList *param_list,
                  struct CFCDocuComment *docucomment, int is_inline);
 
 void
 CFCFunction_destroy(CFCFunction *self);
 
-void*
+struct CFCType*
 CFCFunction_get_return_type(CFCFunction *self);
 
-void*
+struct CFCParamList*
 CFCFunction_get_param_list(CFCFunction *self);
 
 struct CFCDocuComment*

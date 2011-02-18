@@ -219,8 +219,8 @@ _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, retur
     SV *class_name_sv;
     SV *class_cnick_sv;
     SV *micro_sym_sv;
-    SV *return_type;
-    SV *param_list;
+    CFCType *return_type;
+    CFCParamList *param_list;
     CFCDocuComment *docucomment;
     int is_inline;
 CODE:
@@ -253,11 +253,19 @@ ALIAS:
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
-        case 2:
-            retval = newSVsv((SV*)CFCFunction_get_return_type(self));
+        case 2: {
+                CFCType *type = CFCFunction_get_return_type(self);
+                retval = type 
+                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)type))
+                       : newSV(0);
+            }
             break;
-        case 4:
-            retval = newSVsv((SV*)CFCFunction_get_param_list(self));
+        case 4: {
+                CFCParamList *param_list = CFCFunction_get_param_list(self);
+                retval = param_list 
+                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)param_list))
+                       : newSV(0);
+            }
             break;
         case 6: {
                 CFCDocuComment *docucomment 
@@ -284,8 +292,8 @@ _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, retur
     SV *class_name_sv;
     SV *class_cnick_sv;
     SV *micro_sym_sv;
-    SV *return_type;
-    SV *param_list;
+    CFCType *return_type;
+    CFCParamList *param_list;
     CFCDocuComment *docucomment;
     int is_inline;
     const char *macro_sym;
