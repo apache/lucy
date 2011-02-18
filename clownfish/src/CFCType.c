@@ -314,6 +314,7 @@ CFCType_destroy(CFCType *self)
     CFCBase_decref((CFCBase*)self->parcel);
     free(self->specifier);
     free(self->c_string);
+    free(self->array);
     CFCBase_destroy((CFCBase*)self);
 }
 
