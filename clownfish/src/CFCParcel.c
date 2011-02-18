@@ -81,6 +81,20 @@ CFCParcel_singleton(const char *name, const char *cnick)
     return singleton;
 }
 
+void
+CFCParcel_reap_singletons(void)
+{
+    if (registry[0]) {
+        // default parcel.
+        CFCBase_decref((CFCBase*)registry[0]);
+    }
+    int i;
+    for (i = 1; registry[i] != NULL; i++) {
+        CFCParcel *parcel = registry[i];
+        CFCBase_decref((CFCBase*)parcel);
+    }
+}
+
 static int
 S_validate_name_or_cnick(const char *orig)
 {

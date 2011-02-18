@@ -23,6 +23,10 @@ use Clownfish::Util qw( verify_args );
 use Scalar::Util qw( blessed );
 use Carp;
 
+END {
+    __PACKAGE__->reap_singletons();
+}
+
 our %singleton_PARAMS = (
     name  => undef,
     cnick => undef,

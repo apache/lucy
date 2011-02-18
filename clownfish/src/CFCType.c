@@ -58,7 +58,7 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
              const char *specifier, int indirection, const char *c_string)
 {
     self->flags       = flags;
-    self->parcel      = parcel;
+    self->parcel      = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
     self->specifier   = CFCUtil_strdup(specifier);
     self->indirection = indirection;
     self->c_string    = c_string ? CFCUtil_strdup(c_string) : CFCUtil_strdup("");
@@ -311,6 +311,7 @@ CFCType_destroy(CFCType *self)
     if (self->child) {
         CFCBase_decref((CFCBase*)self->child);
     }
+    CFCBase_decref((CFCBase*)self->parcel);
     free(self->specifier);
     free(self->c_string);
     CFCBase_destroy((CFCBase*)self);

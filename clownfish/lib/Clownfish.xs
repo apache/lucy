@@ -480,6 +480,11 @@ CODE:
 OUTPUT: RETVAL
 
 void
+reap_singletons(...)
+PPCODE:
+    CFCParcel_reap_singletons();
+
+void
 _set_or_get(self, ...)
     CFCParcel *self;
 ALIAS:
@@ -651,19 +656,14 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Type
 
 SV*
-_new(klass, flags, parcel_sv, specifier, indirection, c_string)
+_new(klass, flags, parcel, specifier, indirection, c_string)
     const char *klass;
     int flags;
-    SV *parcel_sv;
+    CFCParcel *parcel;
     const char *specifier;
     int indirection;
     const char *c_string;
 CODE:
-    CFCParcel *parcel = NULL;
-    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
-        IV objint = SvIV((SV*)SvRV(parcel_sv));
-        parcel = INT2PTR(CFCParcel*, objint);
-    }   
     CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
         c_string);
     RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
@@ -693,18 +693,13 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_object(klass, flags, parcel_sv, specifier, indirection)
+_new_object(klass, flags, parcel, specifier, indirection)
     const char *klass;
     int flags;
-    SV *parcel_sv;
+    CFCParcel *parcel;
     const char *specifier;
     int indirection;
 CODE:
-    CFCParcel *parcel = NULL;
-    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
-        IV objint = SvIV((SV*)SvRV(parcel_sv));
-        parcel = INT2PTR(CFCParcel*, objint);
-    }   
     CFCType *self = CFCType_new_object(flags, parcel, specifier, indirection);
     RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
     CFCBase_decref((CFCBase*)self);
@@ -751,16 +746,11 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_arbitrary(klass, parcel_sv, specifier)
+_new_arbitrary(klass, parcel, specifier)
     const char *klass;
-    SV *parcel_sv;
+    CFCParcel *parcel;
     const char *specifier;
 CODE:
-    CFCParcel *parcel = NULL;
-    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
-        IV objint = SvIV((SV*)SvRV(parcel_sv));
-        parcel = INT2PTR(CFCParcel*, objint);
-    }   
     CFCType *self = CFCType_new_arbitrary(parcel, specifier);
     RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
     CFCBase_decref((CFCBase*)self);
@@ -993,9 +983,9 @@ OUTPUT: RETVAL
 MODULE = Clownfish   PACKAGE = Clownfish::Variable
 
 SV*
-_new(klass, parcel_sv, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_sv)
+_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_sv)
     const char *klass;
-    SV *parcel_sv;
+    CFCParcel *parcel;
     const char *exposure;
     SV *class_name_sv;
     SV *class_cnick_sv;
@@ -1008,11 +998,6 @@ CODE:
                             ? SvPV_nolen(class_cnick_sv) : NULL;
     const char *micro_sym = SvOK(micro_sym_sv) 
                             ? SvPV_nolen(micro_sym_sv) : NULL;
-    CFCParcel *parcel = NULL;
-    if (SvOK(parcel_sv) && sv_derived_from(parcel_sv, "Clownfish::Parcel")) {
-        IV objint = SvIV((SV*)SvRV(parcel_sv));
-        parcel = INT2PTR(CFCParcel*, objint);
-    }
     CFCType *type = NULL;
     if (SvOK(type_sv) && sv_derived_from(type_sv, "Clownfish::Type")) {
         IV objint = SvIV((SV*)SvRV(type_sv));

@@ -131,8 +131,8 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
                const char *exposure, const char *class_name, 
                const char *class_cnick, const char *micro_sym)
 {
+    // Validate parcel.
     CFCUTIL_NULL_CHECK(parcel);
-    self->parcel = parcel;
 
     // Validate exposure.
     if (!S_validate_exposure(exposure)) {
@@ -173,6 +173,9 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     }
     self->micro_sym = CFCUtil_strdup(micro_sym);
 
+    // Assign parcel.
+    self->parcel = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
+
     // Derive short_sym.
     size_t class_cnick_len = self->class_cnick 
                            ? strlen(self->class_cnick) 
@@ -204,7 +207,7 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
 void
 CFCSymbol_destroy(CFCSymbol *self)
 {
-    // SvREFCNT_dec((SV*)self->parcel);
+    CFCBase_decref((CFCBase*)self->parcel);
     free(self->exposure);
     free(self->class_name);
     free(self->class_cnick);

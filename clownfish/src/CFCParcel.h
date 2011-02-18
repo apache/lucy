@@ -22,6 +22,11 @@ typedef struct CFCParcel CFCParcel;
 CFCParcel*
 CFCParcel_singleton(const char *name, const char *cnick);
 
+/** Decref all singletons at shutdown.
+ */
+void
+CFCParcel_reap_singletons(void);
+
 CFCParcel*
 CFCParcel_new(const char *name, const char *cnick);
 
