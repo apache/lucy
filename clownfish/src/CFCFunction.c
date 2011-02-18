@@ -47,6 +47,7 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
                CFCParamList *param_list, CFCDocuComment *docucomment, 
                int is_inline)
 {
+    exposure = exposure ? exposure : "parcel";
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
         class_cnick, micro_sym);
     CFCUTIL_NULL_CHECK(return_type);

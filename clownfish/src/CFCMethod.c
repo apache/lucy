@@ -28,6 +28,11 @@
 #include "CFCParcel.h"
 #include "CFCDocuComment.h"
 
+#ifndef true
+    #define true 1
+    #define false 0
+#endif
+
 struct CFCMethod {
     CFCFunction function;
     char *macro_sym;
@@ -41,13 +46,13 @@ CFCMethod*
 CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *micro_sym, 
               CFCType *return_type, CFCParamList *param_list, 
-              CFCDocuComment *docucomment, int is_inline, 
-              const char *macro_sym, int is_final, int is_abstract)
+              CFCDocuComment *docucomment, const char *macro_sym, int is_final, 
+              int is_abstract)
 {
     CFCMethod *self = (CFCMethod*)CFCBase_allocate(sizeof(CFCMethod),
         "Clownfish::Method");
     return CFCMethod_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym, return_type, param_list, docucomment, is_inline, macro_sym,
+        micro_sym, return_type, param_list, docucomment, macro_sym,
         is_final, is_abstract);
 }
 
@@ -56,12 +61,11 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
                const char *class_name, const char *class_cnick, 
                const char *micro_sym, CFCType *return_type, 
                CFCParamList *param_list, CFCDocuComment *docucomment, 
-               int is_inline, const char *macro_sym, int is_final, 
-               int is_abstract)
+               const char *macro_sym, int is_final, int is_abstract)
 {
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
         class_cnick, micro_sym, return_type, param_list, docucomment,
-        is_inline);
+        false);
     self->macro_sym     = CFCUtil_strdup(macro_sym);
     self->short_typedef = NULL;
     self->is_final      = is_final;

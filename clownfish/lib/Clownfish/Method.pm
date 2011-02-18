@@ -37,9 +37,7 @@ my %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    $args{inline} = 0;
     $args{abstract} ||= 0;
-    $args{exposure} ||= 'parcel';
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
     $args{final} = 0 unless defined $args{final};
 
@@ -55,7 +53,7 @@ sub new {
     my $self = $package->_new(
         @args{
             qw( parcel exposure class_name class_cnick micro_sym
-                return_type param_list docucomment inline macro_sym 
+                return_type param_list docucomment macro_sym 
                 final abstract )
             }
     );

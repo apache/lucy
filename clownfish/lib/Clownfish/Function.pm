@@ -39,7 +39,6 @@ sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     $args{inline} ||= 0;
-    $args{exposure} ||= 'parcel';
     $args{parcel} = Clownfish::Parcel->acquire($args{parcel});
     my $class_class = ref($either) || $either;
     my $self = $class_class->_new(
