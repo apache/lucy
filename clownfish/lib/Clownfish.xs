@@ -216,6 +216,9 @@ ALIAS:
     set_modified       = 1
     get_modified       = 2
     get_source_class   = 4
+    guard_name         = 6
+    guard_start        = 8
+    guard_close        = 10 
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -227,6 +230,21 @@ PPCODE:
             break;
         case 4: {
                 const char *value = CFCFile_get_source_class(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 6: {
+                const char *value = CFCFile_guard_name(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 8: {
+                const char *value = CFCFile_guard_start(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 10: {
+                const char *value = CFCFile_guard_close(self);
                 retval = newSVpv(value, strlen(value));
             }
             break;

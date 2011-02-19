@@ -68,29 +68,6 @@ sub classes {
     return \@classes;
 }
 
-# Return a string used for an include guard, unique per file.
-sub guard_name {
-    my $self       = shift;
-    my $guard_name = "H_" . uc( $self->get_source_class );
-    $guard_name =~ s/\W+/_/g;
-    return $guard_name;
-}
-
-# Return a string opening the include guard.
-sub guard_start {
-    my $self       = shift;
-    my $guard_name = $self->guard_name;
-    return "#ifndef $guard_name\n#define $guard_name 1\n";
-}
-
-# Return a string closing the include guard.  Other classes count on being
-# able to match this string.
-sub guard_close {
-    my $self       = shift;
-    my $guard_name = $self->guard_name;
-    return "#endif /\* $guard_name \*/\n";
-}
-
 sub c_path   { return $_[0]->_some_path( $_[1], '.c' ) }
 sub h_path   { return $_[0]->_some_path( $_[1], '.h' ) }
 sub cfh_path { return $_[0]->_some_path( $_[1], '.cfh' ) }

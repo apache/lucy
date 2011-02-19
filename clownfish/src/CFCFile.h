@@ -37,5 +37,14 @@ CFCFile_get_modified(CFCFile *self);
 const char*
 CFCFile_get_source_class(CFCFile *self);
 
+const char*
+CFCFile_guard_name(CFCFile *self);
+
+const char*
+CFCFile_guard_start(CFCFile *self);
+
+const char*
+CFCFile_guard_close(CFCFile *self);
+
 #endif /* H_CFCFILE */
 
