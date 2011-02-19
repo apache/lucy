@@ -183,19 +183,19 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     if (self->class_cnick) {
         memcpy((void*)self->short_sym, self->class_cnick, class_cnick_len);
     }
-    *((char*)&self->short_sym[class_cnick_len]) = '_';
-    memcpy((void*)&self->short_sym[class_cnick_len + 1], 
+    self->short_sym[class_cnick_len] = '_';
+    memcpy(&self->short_sym[class_cnick_len + 1], 
         self->micro_sym, strlen(micro_sym));
-    *((char*)&self->short_sym[short_sym_len]) = '\0';
+    self->short_sym[short_sym_len] = '\0';
 
     // Derive full_sym;
     const char *prefix = CFCParcel_get_prefix(self->parcel);
     size_t prefix_len = strlen(prefix);
     size_t full_sym_len = prefix_len + short_sym_len;
     self->full_sym = (char*)malloc(full_sym_len + 1);
-    memcpy((void*)self->full_sym, prefix, prefix_len);
-    memcpy((void*)&self->full_sym[prefix_len], self->short_sym, short_sym_len);
-    *((char*)&self->full_sym[full_sym_len]) = '\0';
+    memcpy(self->full_sym, prefix, prefix_len);
+    memcpy(&self->full_sym[prefix_len], self->short_sym, short_sym_len);
+    self->full_sym[full_sym_len] = '\0';
 
     return self;
 }
@@ -208,8 +208,8 @@ CFCSymbol_destroy(CFCSymbol *self)
     free(self->class_name);
     free(self->class_cnick);
     free(self->micro_sym);
-    free((void*)self->short_sym);
-    free((void*)self->full_sym);
+    free(self->short_sym);
+    free(self->full_sym);
     CFCBase_destroy((CFCBase*)self);
 }
 
