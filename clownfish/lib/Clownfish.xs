@@ -194,10 +194,11 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::File
 
 SV*
-_new(klass)
+_new(klass, source_class)
     const char *klass;
+    const char *source_class;
 CODE:
-    CFCFile *self = CFCFile_new();
+    CFCFile *self = CFCFile_new(source_class);
     RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -208,6 +209,29 @@ _destroy(self)
 PPCODE:
     CFCFile_destroy(self);
 
+void
+_set_or_get(self, ...)
+    CFCFile *self;
+ALIAS:
+    set_modified       = 1
+    get_modified       = 2
+    get_source_class   = 4
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 1: 
+            CFCFile_set_modified(self, !!SvTRUE(ST(1)));
+            break;
+        case 2: 
+            retval = newSViv(CFCFile_get_modified(self));
+            break;
+        case 4: {
+                const char *value = CFCFile_get_source_class(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
 
 MODULE = Clownfish    PACKAGE = Clownfish::Function
 

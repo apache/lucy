@@ -19,6 +19,11 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef true
+    #define true 1
+    #define false 0
+#endif
+
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCFile.h"
@@ -26,25 +31,50 @@
 
 struct CFCFile {
     CFCBase base;
+    int modified;
+    char *source_class;
 };
 
 CFCFile*
-CFCFile_new(void)
+CFCFile_new(const char *source_class)
 {
+
     CFCFile *self = (CFCFile*)CFCBase_allocate(sizeof(CFCFile),
         "Clownfish::File");
-    return CFCFile_init(self);
+    return CFCFile_init(self, source_class);
 }
 
 CFCFile*
-CFCFile_init(CFCFile *self) 
+CFCFile_init(CFCFile *self, const char *source_class) 
 {
+    CFCUTIL_NULL_CHECK(source_class);
+    self->modified = false;
+    self->source_class = CFCUtil_strdup(source_class);
     return self;
 }
 
 void
 CFCFile_destroy(CFCFile *self)
 {
+    free(self->source_class);
     CFCBase_destroy((CFCBase*)self);
+}
+
+void
+CFCFile_set_modified(CFCFile *self, int modified)
+{
+    self->modified = !!modified;
+}
+
+int
+CFCFile_get_modified(CFCFile *self)
+{
+    return self->modified;
+}
+
+const char*
+CFCFile_get_source_class(CFCFile *self)
+{
+    return self->source_class;
 }
 

@@ -25,8 +25,6 @@ use Carp;
 
 # Inside out member vars.
 our %blocks;
-our %source_class;
-our %modified;
 
 our %new_PARAMS = (
     source_class => undef,
@@ -36,20 +34,14 @@ sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $package = ref($either) || $either;
-    my $self = $either->_new();
+    my $self = $either->_new($args{source_class});
     $blocks{$self} = [];
-    $source_class{$self} = $args{source_class};
-    $modified{$self} = 0;
-    confess("Missing required param 'source_class'")
-        unless $self->get_source_class;
     return $self;
 }
 
 sub DESTROY {
     my $self = shift;
     delete $blocks{$self};
-    delete $source_class{$self};
-    delete $modified{$self};
     $self->_destroy;
 }
 
@@ -66,10 +58,6 @@ sub add_block {
         unless $block_types{$block_class};
     push @{ $blocks{$self} }, $block;
 }
-
-sub get_modified     { $modified{ +shift } }
-sub set_modified     { $modified{ $_[0] } = $_[1] }
-sub get_source_class { $source_class{ +shift } }
 
 sub blocks { $blocks{ +shift } }
 

@@ -20,13 +20,22 @@
 typedef struct CFCFile CFCFile;
 
 CFCFile*
-CFCFile_new(void);
+CFCFile_new(const char *source_class);
 
 CFCFile*
-CFCFile_init(CFCFile *self);
+CFCFile_init(CFCFile *self, const char *source_class);
 
 void
 CFCFile_destroy(CFCFile *self);
+
+void
+CFCFile_set_modified(CFCFile *self, int modified);
+
+int
+CFCFile_get_modified(CFCFile *self);
+
+const char*
+CFCFile_get_source_class(CFCFile *self);
 
 #endif /* H_CFCFILE */
 
