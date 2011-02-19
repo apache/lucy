@@ -273,7 +273,7 @@ PPCODE:
                 CFCDocuComment *docucomment 
                     = CFCFunction_get_docucomment(self);
                 retval = docucomment 
-                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self))
+                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)docucomment))
                        : newSV(0);
             }
             break;
