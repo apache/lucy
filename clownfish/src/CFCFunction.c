@@ -19,6 +19,11 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef true;
+    #define true 1
+    #define false 0
+#endif
+
 #define CFC_NEED_FUNCTION_STRUCT_DEF
 #include "CFCFunction.h"
 #include "CFCParcel.h"
@@ -40,6 +45,19 @@ CFCFunction_new(CFCParcel *parcel, const char *exposure,
         micro_sym, return_type, param_list, docucomment, is_inline);
 }
 
+static int
+S_validate_micro_sym(const char *micro_sym)
+{
+    size_t i;
+    size_t len = strlen(micro_sym);
+    if (!len) { return false; }
+    for (i = 0; i < len; i++) {
+        char c = micro_sym[i];
+        if (!islower(c) && !isdigit(c) && c != '_') { return false; }
+    }
+    return true;
+}
+
 CFCFunction*
 CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
                const char *class_name, const char *class_cnick, 
@@ -47,11 +65,16 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
                CFCParamList *param_list, CFCDocuComment *docucomment, 
                int is_inline)
 {
+
     exposure = exposure ? exposure : "parcel";
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
         class_cnick, micro_sym);
+    CFCUTIL_NULL_CHECK(class_name);
     CFCUTIL_NULL_CHECK(return_type);
     CFCUTIL_NULL_CHECK(param_list);
+    if (!S_validate_micro_sym(micro_sym)) {
+        croak("Invalid micro_sym: '%s'", micro_sym);
+    }
     self->return_type = (CFCType*)CFCBase_incref((CFCBase*)return_type);
     self->param_list  = (CFCParamList*)CFCBase_incref((CFCBase*)param_list);
     self->docucomment = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);
@@ -90,5 +113,23 @@ int
 CFCFunction_inline(CFCFunction *self)
 {
     return self->is_inline;
+}
+
+int
+CFCFunction_void(CFCFunction *self)
+{
+    return CFCType_is_void(self->return_type);
+}
+
+const char*
+CFCFunction_full_func_sym(CFCFunction *self)
+{
+    return CFCSymbol_full_sym((CFCSymbol*)self);
+}
+
+const char*
+CFCFunction_short_func_sym(CFCFunction *self)
+{
+    return CFCSymbol_short_sym((CFCSymbol*)self);
 }
 

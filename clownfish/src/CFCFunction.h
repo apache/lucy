@@ -65,5 +65,14 @@ CFCFunction_get_docucomment(CFCFunction *self);
 int
 CFCFunction_inline(CFCFunction *self);
 
+int
+CFCFunction_void(CFCFunction *self);
+
+const char*
+CFCFunction_full_func_sym(CFCFunction *self);
+
+const char*
+CFCFunction_short_func_sym(CFCFunction *self);
+
 #endif /* H_CFCFUNCTION */
 

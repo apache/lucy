@@ -31,33 +31,23 @@ my %new_PARAMS = (
     micro_sym   => undef,
     docucomment => undef,
     parcel      => undef,
-    inline      => 0,
-    exposure    => 'parcel',
+    inline      => undef,
+    exposure    => undef,
 );
 
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     $args{inline} ||= 0;
-    $args{parcel} = Clownfish::Parcel->acquire($args{parcel});
-    my $class_class = ref($either) || $either;
-    my $self = $class_class->_new(
-        @args{ qw( parcel exposure class_name class_cnick micro_sym
-            return_type param_list docucomment inline ) } );
-
-    # Validate.
-    confess("class_name is mandatory")
-        unless defined $self->get_class_name;
-    confess( "Invalid micro_sym: '" . $self->micro_sym . "'" )
-        unless $self->micro_sym =~ /^[a-z0-9_]+$/;
-
-    return $self;
+    $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+    my $package = ref($either) || $either;
+    return $package->_new(
+        @args{
+            qw( parcel exposure class_name class_cnick micro_sym
+                return_type param_list docucomment inline )
+            }
+    );
 }
-
-sub void { shift->get_return_type->is_void }
-
-sub full_func_sym  { shift->SUPER::full_sym }
-sub short_func_sym { shift->SUPER::short_sym }
 
 1;
 

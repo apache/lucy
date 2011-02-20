@@ -360,6 +360,9 @@ ALIAS:
     get_param_list     = 4
     get_docucomment    = 6
     inline             = 8
+    void               = 10
+    full_func_sym      = 12
+    short_func_sym     = 14
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -387,6 +390,19 @@ PPCODE:
             break;
         case 8:
             retval = newSViv(CFCFunction_inline(self));
+            break;
+        case 10:
+            retval = newSViv(CFCFunction_void(self));
+            break;
+        case 12: {
+                const char *full_sym = CFCFunction_full_func_sym(self);
+                retval = newSVpv(full_sym, strlen(full_sym));
+            }
+            break;
+        case 14: {
+                const char *short_sym = CFCFunction_short_func_sym(self);
+                retval = newSVpv(short_sym, strlen(short_sym));
+            }
             break;
     END_SET_OR_GET_SWITCH
 }
