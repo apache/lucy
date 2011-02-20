@@ -111,6 +111,22 @@ _destroy(self)
 PPCODE:
     CFCClass_destroy(self);
 
+void
+_set_or_get(self, ...)
+    CFCClass *self;
+ALIAS:
+    get_cnick = 2
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *value = CFCClass_get_cnick(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
 
 MODULE = Clownfish    PACKAGE = Clownfish::DocuComment
 

@@ -63,3 +63,9 @@ CFCClass_destroy(CFCClass *self)
     CFCSymbol_destroy((CFCSymbol*)self);
 }
 
+const char*
+CFCClass_get_cnick(CFCClass *self)
+{
+    return CFCSymbol_get_class_cnick((CFCSymbol*)self);
+}
+

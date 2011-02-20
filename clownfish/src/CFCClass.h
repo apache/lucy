@@ -32,5 +32,8 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel, const char *exposure,
 void
 CFCClass_destroy(CFCClass *self);
 
+const char*
+CFCClass_get_cnick(CFCClass *self);
+
 #endif /* H_CFCCLASS */
 

@@ -167,7 +167,6 @@ sub create {
     my $self = $either->_new(
         @args{qw( parcel exposure class_name class_cnick micro_sym )} );
 
-    $cnick{$self}             = $self->get_class_cnick;
     $struct_sym{$self}        = $struct_sym;
     $parent_class_name{$self} = $parent_class_name;
     $source_class{$self}      = $source_class;
@@ -202,7 +201,6 @@ sub create {
 
 sub DESTROY {
     my $self = shift;
-    delete $cnick{$self};
     delete $struct_sym{$self};
     delete $parent_class_name{$self};
     delete $source_class{$self};
@@ -242,7 +240,6 @@ sub include_h {
 
 sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
 
-sub get_cnick             { $cnick{ +shift } }
 sub get_struct_sym        { $struct_sym{ +shift } }
 sub get_parent_class_name { $parent_class_name{ +shift } }
 sub get_source_class      { $source_class{ +shift } }
