@@ -13,36 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TYPEMAP
-CFCBase*	CLOWNFISH_TYPE
-CFCCBlock*	CLOWNFISH_TYPE
-CFCClass*	CLOWNFISH_TYPE
-CFCDocuComment*	CLOWNFISH_TYPE
-CFCFile*	CLOWNFISH_TYPE
-CFCFunction*	CLOWNFISH_TYPE
-CFCMethod*	CLOWNFISH_TYPE
-CFCParamList*	CLOWNFISH_TYPE
-CFCParcel*	CLOWNFISH_TYPE
-CFCSymbol*	CLOWNFISH_TYPE
-CFCType*	CLOWNFISH_TYPE
-CFCVariable*	CLOWNFISH_TYPE
+use strict;
+use warnings;
 
-INPUT
+package Clownfish::Base;
+use Clownfish;
 
-CLOWNFISH_TYPE
-	if (!SvOK($arg)) {
-        $var = NULL;
-    }
-	else if (sv_derived_from($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\")) {
-		IV objint = SvIV((SV*)SvRV($arg));
-		$var = INT2PTR($type, objint);
-	}
-    else {
-		croak(\"Not a ${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\");
-	}
+1;
 
-OUTPUT
+__END__
 
-CLOWNFISH_TYPE
-	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\", (void*)$var);
+__POD__
+
+=head1 NAME
+
+Clownfish::Base - Base class for all CFC objects.
+
+=head1 DESCRIPTION
+
+    # TODO
+
+=cut
 

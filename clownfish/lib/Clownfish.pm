@@ -17,7 +17,17 @@ use strict;
 use warnings;
 
 package Clownfish;
+use Clownfish::Base;
 our $VERSION = '0.01';
+
+BEGIN {
+    push @Clownfish::CBlock::ISA,      "Clownfish::Base";
+    push @Clownfish::DocuComment::ISA, "Clownfish::Base";
+    push @Clownfish::File::ISA,        "Clownfish::Base";
+    push @Clownfish::Parcel::ISA,      "Clownfish::Base";
+    push @Clownfish::Symbol::ISA,      "Clownfish::Base";
+    push @Clownfish::Type::ISA,        "Clownfish::Base";
+}
 
 use XSLoader;
 BEGIN { XSLoader::load( 'Clownfish', '0.01' ) } 

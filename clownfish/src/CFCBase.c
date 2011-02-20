@@ -68,3 +68,10 @@ CFCBase_get_perl_obj(CFCBase *self)
     return self->perl_obj;
 }
 
+const char*
+CFCBase_get_cfc_class(CFCBase *self)
+{
+    return HvNAME(SvSTASH((SV*)self->perl_obj));
+}
+
+

@@ -58,5 +58,11 @@ CFCBase_decref(CFCBase *self);
 void*
 CFCBase_get_perl_obj(CFCBase *self);
 
+/** Return the class name of the CFC object.  (Not the class name of any
+ * parsed object the CFC object might represent.)
+ */
+const char*
+CFCBase_get_cfc_class(CFCBase *self);
+
 #endif /* H_CFCBASE */
 
