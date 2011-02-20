@@ -23,6 +23,7 @@
 #include "CFCBase.h"
 #include "CFCParamList.h"
 #include "CFCVariable.h"
+#include "CFCSymbol.h"
 #include "CFCUtil.h"
 
 struct CFCParamList {
@@ -31,7 +32,13 @@ struct CFCParamList {
     char        **values;
     int           variadic;
     size_t        num_vars;
+    char         *c_string;
+    char         *name_list;
 };
+
+// 
+static void
+S_generate_c_strings(CFCParamList *self);
 
 CFCParamList*
 CFCParamList_new(int variadic)
@@ -48,6 +55,7 @@ CFCParamList_init(CFCParamList *self, int variadic)
     self->num_vars  = 0;
     self->variables = (CFCVariable**)calloc(1, sizeof(void*));
     self->values    = (char**)calloc(1, sizeof(char*));
+    S_generate_c_strings(self);
     return self;
 }
 
@@ -68,6 +76,8 @@ CFCParamList_add_param(CFCParamList *self, CFCVariable *variable,
     self->values[self->num_vars - 1] = value ? CFCUtil_strdup(value) : NULL;
     self->variables[self->num_vars] = NULL;
     self->values[self->num_vars] = NULL;
+
+    S_generate_c_strings(self);
 }
 
 void
@@ -80,7 +90,52 @@ CFCParamList_destroy(CFCParamList *self)
     }
     free(self->variables);
     free(self->values);
+    free(self->c_string);
+    free(self->name_list);
     CFCBase_destroy((CFCBase*)self);
+}
+
+static void
+S_generate_c_strings(CFCParamList *self)
+{
+    size_t c_string_size = 1;
+    size_t name_list_size = 1;
+    size_t i;
+
+    // Calc space requirements and allocate memory.
+    for (i = 0; i < self->num_vars; i++) {
+        CFCVariable *var = self->variables[i];
+        c_string_size += sizeof(", ");
+        c_string_size += strlen(CFCVariable_local_c(var));
+        name_list_size += sizeof(", ");
+        name_list_size += strlen(CFCSymbol_micro_sym((CFCSymbol*)var));
+    }
+    if (self->variadic) {
+        c_string_size += sizeof(", ...");
+    }
+    free(self->c_string);
+    free(self->name_list);
+    self->c_string  = malloc(c_string_size);
+    self->name_list = malloc(name_list_size);
+    if (!self->c_string || !self->name_list) { croak("malloc failed"); }
+    self->c_string[0] = '\0';
+    self->name_list[0] = '\0';
+
+    // Build the strings.
+    for (i = 0; i < self->num_vars; i++) {
+        CFCVariable *var = self->variables[i];
+        strcat(self->c_string, CFCVariable_local_c(var));
+        strcat(self->name_list, CFCSymbol_micro_sym((CFCSymbol*)var));
+        if (i == self->num_vars - 1) {
+            if (self->variadic) {
+                strcat(self->c_string, ", ...");
+            }
+        }
+        else {
+            strcat(self->c_string, ", ");
+            strcat(self->name_list, ", ");
+        }
+    }
 }
 
 CFCVariable**
@@ -105,5 +160,17 @@ int
 CFCParamList_variadic(CFCParamList *self)
 {
     return self->variadic;
+}
+
+const char*
+CFCParamList_to_c(CFCParamList *self)
+{
+    return self->c_string;
+}
+
+const char*
+CFCParamList_name_list(CFCParamList *self)
+{
+    return self->name_list;
 }
 

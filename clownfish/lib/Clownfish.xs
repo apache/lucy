@@ -524,6 +524,8 @@ ALIAS:
     get_initial_values = 4
     variadic           = 6
     num_vars           = 8
+    to_c               = 10
+    name_list          = 12
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -563,6 +565,16 @@ PPCODE:
             break;
         case 8:
             retval = newSViv(CFCParamList_num_vars(self));
+            break;
+        case 10: {
+                const char *value = CFCParamList_to_c(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 12: {
+                const char *value = CFCParamList_name_list(self);
+                retval = newSVpv(value, strlen(value));
+            }
             break;
     END_SET_OR_GET_SWITCH
 }

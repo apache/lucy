@@ -31,18 +31,6 @@ sub new {
     return $class_name->_new($variadic);
 }
 
-sub to_c {
-    my $self = shift;
-    my $string = join( ', ', map { $_->local_c } @{ $self->get_variables } );
-    $string .= ", ..." if $self->variadic;
-    return $string;
-}
-
-sub name_list {
-    my $self = shift;
-    return join( ', ', map { $_->micro_sym } @{ $self->get_variables } );
-}
-
 1;
 
 __END__

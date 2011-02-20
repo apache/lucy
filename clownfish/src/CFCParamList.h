@@ -45,5 +45,11 @@ CFCParamList_variadic(CFCParamList *self);
 size_t
 CFCParamList_num_vars(CFCParamList *self);
 
+const char*
+CFCParamList_to_c(CFCParamList *self);
+
+const char*
+CFCParamList_name_list(CFCParamList *self);
+
 #endif /* H_CFCPARAMLIST */
 
