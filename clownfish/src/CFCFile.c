@@ -24,18 +24,30 @@
     #define false 0
 #endif
 
+#ifdef _WIN32
+#define PATH_SEP "\\"
+#define PATH_SEP_CHAR '\\' 
+#else
+#define PATH_SEP "/"
+#define PATH_SEP_CHAR '/' 
+#endif
+
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCFile.h"
 #include "CFCUtil.h"
+#include "CFCClass.h"
 
 struct CFCFile {
     CFCBase base;
+    CFCBase **blocks;
+    CFCClass **classes;
     int modified;
     char *source_class;
     char *guard_name;
     char *guard_start;
     char *guard_close;
+    char *path_part;
 };
 
 CFCFile*
@@ -53,6 +65,9 @@ CFCFile_init(CFCFile *self, const char *source_class)
     CFCUTIL_NULL_CHECK(source_class);
     self->modified = false;
     self->source_class = CFCUtil_strdup(source_class);
+    self->blocks = (CFCBase**)calloc(1, sizeof(CFCBase*));
+    self->classes = (CFCClass**)calloc(1, sizeof(CFCBase*));
+    if (!self->blocks || !self->classes) { croak("malloc failed"); }
 
     // Derive include guard name, plus C code for opening and closing the
     // guard.
@@ -72,7 +87,7 @@ CFCFile_init(CFCFile *self, const char *source_class)
             i++;
         }
         else {
-            self->guard_name[j] = toupper(source_class[i]);
+            self->guard_name[j] = toupper(c);
         }
     }
     self->guard_name[j] = '\0';
@@ -83,17 +98,154 @@ CFCFile_init(CFCFile *self, const char *source_class)
         self->guard_name);
     if (check < 0) { croak("sprintf failed"); }
 
+    // Cache partial path derived from source_class.
+    self->path_part = malloc(len + 1);
+    if (!self->path_part) { croak("malloc failed"); }
+    for (i = 0, j = 0; i < len; i++, j++) {
+        char c = source_class[i];
+        if (c == ':') {
+            self->path_part[j] = PATH_SEP_CHAR;
+            i++;
+        }
+        else {
+            self->path_part[j] = c;
+        }
+    }
+    self->path_part[j] = '\0';
+
     return self;
 }
 
 void
 CFCFile_destroy(CFCFile *self)
 {
+    size_t i;
+    /*
+    for (i = 0; self->blocks[i] != NULL; i++) {
+        CFCBase_decref(self->blocks[i]);
+    }
+    free(self->blocks);
+    for (i = 0; self->classes[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->classes[i]);
+    }
+    */
+    free(self->classes);
     free(self->guard_name);
     free(self->guard_start);
     free(self->guard_close);
     free(self->source_class);
+    free(self->path_part);
     CFCBase_destroy((CFCBase*)self);
+}
+
+void
+CFCFile_add_block(CFCFile *self, CFCBase *block)
+{
+    CFCUTIL_NULL_CHECK(block);
+    const char *cfc_class = CFCBase_get_cfc_class(block);
+
+    // Add to classes array if the block is a CFCClass.
+    if (strcmp(cfc_class, "Clownfish::Class") == 0) {
+        size_t num_class_blocks = 0;
+        while (self->classes[num_class_blocks] != NULL) { 
+            num_class_blocks++;
+        }
+        num_class_blocks++;
+        size_t size = (num_class_blocks + 1) * sizeof(CFCClass*);
+        self->classes = (CFCClass**)realloc(self->classes, size);
+        if (!self->classes) { croak("realloc failed"); }
+        self->classes[num_class_blocks - 1] 
+            = (CFCClass*)CFCBase_incref(block);
+        self->classes[num_class_blocks] = NULL;
+    }
+
+    // Add to blocks array.
+    if (   strcmp(cfc_class, "Clownfish::Class") == 0
+        || strcmp(cfc_class, "Clownfish::Parcel") == 0
+        || strcmp(cfc_class, "Clownfish::CBlock") == 0
+    ) {
+        size_t num_blocks = 0;
+        while (self->blocks[num_blocks] != NULL) { 
+            num_blocks++;
+        }
+        num_blocks++;
+        size_t size = (num_blocks + 1) * sizeof(CFCBase*);
+        self->blocks = (CFCBase**)realloc(self->blocks, size);
+        if (!self->blocks) { croak("realloc failed"); }
+        self->blocks[num_blocks - 1] = CFCBase_incref(block);
+        self->blocks[num_blocks] = NULL;
+    }
+    else {
+        croak("Wrong kind of object: '%s'", cfc_class);
+    }
+}
+
+static void
+S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir, 
+            const char *ext)
+{
+    size_t needed = CFCFile_path_buf_size(self, base_dir);
+    if (strlen(ext) > 4) {
+        croak("ext cannot be more than 4 characters.");
+    }
+    if (needed > buf_size) {
+        croak("Need buf_size of %lu, but got %lu", needed, buf_size);
+    }
+    if (base_dir) {
+        int check = sprintf(buf, "%s" PATH_SEP "%s%s", base_dir, 
+            self->path_part, ext);
+        if (check < 0) { croak("sprintf failed"); }
+    }
+    else {
+        int check = sprintf(buf, "%s%s", self->path_part, ext);
+        if (check < 0) { croak("sprintf failed"); }
+    }
+}
+
+size_t
+CFCFile_path_buf_size(CFCFile *self, const char *base_dir)
+{
+    size_t size = strlen(self->path_part);
+    size += 4; // Max extension length.
+    size += 1; // NULL-termination.
+    if (base_dir) { 
+        size += strlen(base_dir);
+        size += strlen(PATH_SEP);
+    }
+    return size;
+}
+
+void
+CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size, 
+               const char *base_dir)
+{
+    S_some_path(self, buf, buf_size, base_dir, ".c");
+}
+
+void
+CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size, 
+               const char *base_dir)
+{
+    S_some_path(self, buf, buf_size, base_dir, ".h");
+}
+
+void
+CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size, 
+                 const char *base_dir)
+{
+    S_some_path(self, buf, buf_size, base_dir, ".cfh");
+}
+
+CFCBase**
+CFCFile_blocks(CFCFile *self)
+{
+    return self->blocks;
+}
+
+CFCClass**
+CFCFile_classes(CFCFile *self)
+{
+    return self->classes;
 }
 
 void

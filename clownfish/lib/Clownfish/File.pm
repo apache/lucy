@@ -17,68 +17,16 @@ use strict;
 use warnings;
 
 package Clownfish::File;
-use Clownfish::Util qw( verify_args a_isa_b );
-use Clownfish::Parcel;
-use Scalar::Util qw( blessed );
-use File::Spec::Functions qw( catfile );
+use Clownfish::Util qw( verify_args );
 use Carp;
 
-# Inside out member vars.
-our %blocks;
-
-our %new_PARAMS = (
-    source_class => undef,
-);
+our %new_PARAMS = ( source_class => undef, );
 
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $package = ref($either) || $either;
-    my $self = $either->_new($args{source_class});
-    $blocks{$self} = [];
-    return $self;
-}
-
-sub DESTROY {
-    my $self = shift;
-    delete $blocks{$self};
-    $self->_destroy;
-}
-
-our %block_types = (
-    'Clownfish::Parcel' => 1,
-    'Clownfish::Class'  => 1,
-    'Clownfish::CBlock' => 1,
-);
-
-sub add_block {
-    my ( $self, $block ) = @_;
-    my $block_class = ref($block);
-    confess("Invalid block type: $block_class")
-        unless $block_types{$block_class};
-    push @{ $blocks{$self} }, $block;
-}
-
-sub blocks { $blocks{ +shift } }
-
-sub classes {
-    my $self = shift;
-    my @classes
-        = grep { ref $_ and $_->isa('Clownfish::Class') } @{ $self->blocks };
-    return \@classes;
-}
-
-sub c_path   { return $_[0]->_some_path( $_[1], '.c' ) }
-sub h_path   { return $_[0]->_some_path( $_[1], '.h' ) }
-sub cfh_path { return $_[0]->_some_path( $_[1], '.cfh' ) }
-
-sub _some_path {
-    my ( $self, $base_dir, $ext ) = @_;
-    my @components = split( '::', $self->get_source_class );
-    unshift @components, $base_dir
-        if defined $base_dir;
-    $components[-1] .= $ext;
-    return catfile(@components);
+    return $either->_new( $args{source_class} );
 }
 
 1;

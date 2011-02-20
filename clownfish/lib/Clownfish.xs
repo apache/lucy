@@ -210,6 +210,13 @@ PPCODE:
     CFCFile_destroy(self);
 
 void
+add_block(self, block)
+    CFCFile *self;
+    CFCBase *block;
+PPCODE:
+    CFCFile_add_block(self, block);
+
+void
 _set_or_get(self, ...)
     CFCFile *self;
 ALIAS:
@@ -219,6 +226,8 @@ ALIAS:
     guard_name         = 6
     guard_start        = 8
     guard_close        = 10 
+    blocks             = 12
+    classes            = 14
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -248,8 +257,65 @@ PPCODE:
                 retval = newSVpv(value, strlen(value));
             }
             break;
+        case 12: {
+            AV *av = newAV();
+            CFCBase **blocks = CFCFile_blocks(self);
+            size_t i;
+            for (i = 0; blocks[i] != NULL; i++) {
+                SV *ref = newRV((SV*)CFCBase_get_perl_obj(blocks[i]));
+                av_store(av, i, ref);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
+        case 14: {
+            AV *av = newAV();
+            CFCClass **classes = CFCFile_classes(self);
+            size_t i;
+            for (i = 0; classes[i] != NULL; i++) {
+                SV *ref = newRV((SV*)CFCBase_get_perl_obj(
+                    (CFCBase*)classes[i]));
+                av_store(av, i, ref);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
     END_SET_OR_GET_SWITCH
 }
+
+SV*
+_gen_path(self, base_dir = NULL)
+    CFCFile *self;
+    const char *base_dir;
+ALIAS:
+    c_path       = 1
+    h_path       = 2
+    cfh_path     = 3
+CODE:
+{
+    size_t buf_size = CFCFile_path_buf_size(self, base_dir);
+    RETVAL = newSV(buf_size);
+    SvPOK_on(RETVAL);
+    char *buf = SvPVX(RETVAL);
+    switch(ix) {
+        case 1: 
+            CFCFile_c_path(self, buf, buf_size, base_dir);
+            break;
+        case 2: 
+            CFCFile_h_path(self, buf, buf_size, base_dir);
+            break;
+        case 3: 
+            CFCFile_cfh_path(self, buf, buf_size, base_dir);
+            break;
+        default:
+            croak("unexpected ix value: %d", ix);
+    }
+    SvCUR_set(RETVAL, strlen(buf));
+}
+OUTPUT: RETVAL
+
 
 MODULE = Clownfish    PACKAGE = Clownfish::Function
 

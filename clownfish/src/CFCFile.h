@@ -18,6 +18,8 @@
 #define H_CFCFILE
 
 typedef struct CFCFile CFCFile;
+struct CFCBase;
+struct CFCClass;
 
 CFCFile*
 CFCFile_new(const char *source_class);
@@ -27,6 +29,33 @@ CFCFile_init(CFCFile *self, const char *source_class);
 
 void
 CFCFile_destroy(CFCFile *self);
+
+void
+CFCFile_add_block(CFCFile *self, CFCBase *block);
+
+/** Calculate the size of the buffer needed for a call to c_path(), h_path(),
+ * or cfh_path().
+ */
+size_t
+CFCFile_path_buf_size(CFCFile *self, const char *base_dir);
+
+void
+CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size, 
+               const char *base_dir);
+
+void
+CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size, 
+               const char *base_dir);
+
+void
+CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size, 
+                 const char *base_dir);
+
+struct CFCBase**
+CFCFile_blocks(CFCFile *self);
+
+struct CFCClass**
+CFCFile_classes(CFCFile *self);
 
 void
 CFCFile_set_modified(CFCFile *self, int modified);

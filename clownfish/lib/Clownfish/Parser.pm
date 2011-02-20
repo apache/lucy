@@ -508,7 +508,7 @@ sub new_file {
     my ( undef, $item, $arg ) = @_;
     my $file = Clownfish::File->new( source_class => $arg->{source_class}, );
     for my $block ( @{ $item->{'major_block(s)'} } ) {
-        $file->add_block( $block, ref($block) );
+        $file->add_block($block);
     }
     return $file;
 }
