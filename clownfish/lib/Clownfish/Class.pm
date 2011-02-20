@@ -32,12 +32,8 @@ use Scalar::Util qw( reftype );
 
 our %cnick;
 our %struct_sym;
-our %parent_class_name;
-our %source_class;
 our %docucomment;
 our %children;
-our %inert;
-our %final;
 our %attributes;
 our %meth_by_name;
 our %func_by_name;
@@ -106,20 +102,13 @@ sub create {
     $args{class_cnick} = delete $args{cnick};
     my $class_name = $args{class_name};
     confess("Missing required param 'class_name'") unless $class_name;
-    my $parent_class_name = delete $args{parent_class_name};
     my $docucomment       = delete $args{docucomment};
-    my $inert             = delete $args{inert};
-    my $final             = delete $args{final};
+    $args{inert} ||= 0;
+    $args{final} ||= 0;
 
     # Derive struct name.
     $class_name =~ /(\w+)$/ or confess("Invalid class_name: '$class_name'");
     my $struct_sym = $1;
-
-    # Assume that Foo::Bar should be found in Foo/Bar.h.
-    my $source_class
-        = defined $args{source_class}
-        ? delete $args{source_class}
-        : $class_name;
 
     # Verify that members of supplied arrays meet "is a" requirements.
     my $functions   = delete $args{functions}   || [];
@@ -155,22 +144,19 @@ sub create {
 
     # Validate inert param.
     confess("Inert classes can't have methods")
-        if ( $inert and scalar @$methods );
+        if ( $args{inert} and scalar @$methods );
 
     my $package = ref($either) || $either;
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
     $args{exposure}  ||= 'parcel';
     $args{micro_sym} ||= 'class';
     my $self = $either->_new(
-        @args{qw( parcel exposure class_name class_cnick micro_sym )} );
+        @args{qw( parcel exposure class_name class_cnick micro_sym
+        source_class parent_class_name final inert )} );
 
     $struct_sym{$self}        = $struct_sym;
-    $parent_class_name{$self} = $parent_class_name;
-    $source_class{$self}      = $source_class;
     $docucomment{$self}       = $docucomment;
     $children{$self}          = [];
-    $inert{$self}             = $inert;
-    $final{$self}             = $final;
     $attributes{$self}        = $attributes;
     $meth_by_name{$self}      = \%methods_by_name;
     $func_by_name{$self}      = \%functions_by_name;
@@ -196,12 +182,8 @@ sub create {
 sub DESTROY {
     my $self = shift;
     delete $struct_sym{$self};
-    delete $parent_class_name{$self};
-    delete $source_class{$self};
     delete $docucomment{$self};
     delete $children{$self};
-    delete $inert{$self};
-    delete $final{$self};
     delete $attributes{$self};
     delete $meth_by_name{$self};
     delete $func_by_name{$self};
@@ -232,11 +214,7 @@ sub include_h {
 sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
 
 sub get_struct_sym        { $struct_sym{ +shift } }
-sub get_parent_class_name { $parent_class_name{ +shift } }
-sub get_source_class      { $source_class{ +shift } }
 sub get_docucomment       { $docucomment{ +shift } }
-sub inert                 { $inert{ +shift } }
-sub final                 { $final{ +shift } }
 sub _get_attributes       { $attributes{ +shift } }
 sub _meth_by_name         { $meth_by_name{ +shift } }
 sub _func_by_name         { $func_by_name{ +shift } }

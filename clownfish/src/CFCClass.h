@@ -21,13 +21,17 @@ typedef struct CFCClass CFCClass;
 struct CFCParcel;
 
 CFCClass*
-CFCClass_new(struct CFCParcel *parcel, const char *exposure, const char *class_name, 
-             const char *class_cnick, const char *micro_sym);
+CFCClass_new(struct CFCParcel *parcel, const char *exposure, 
+              const char *class_name, const char *class_cnick, 
+              const char *micro_sym, const char *source_class,
+              const char *parent_class_name, int is_final, int is_inert);
 
 CFCClass*
-CFCClass_init(CFCClass *self, struct CFCParcel *parcel, const char *exposure, 
-              const char *class_name, const char *class_cnick, 
-              const char *micro_sym);
+CFCClass_init(CFCClass *self, struct CFCParcel *parcel, 
+               const char *exposure, const char *class_name, 
+               const char *class_cnick, const char *micro_sym,
+               const char *source_class, const char *parent_class_name, 
+               int is_final, int is_inert);
 
 void
 CFCClass_destroy(CFCClass *self);
@@ -52,6 +56,18 @@ CFCClass_append_autocode(CFCClass *self, const char *autocode);
 
 const char*
 CFCClass_get_autocode(CFCClass *self);
+
+const char*
+CFCClass_get_source_class(CFCClass *self);
+
+const char*
+CFCClass_get_parent_class_name(CFCClass *self);
+
+int
+CFCClass_final(CFCClass *self);
+
+int
+CFCClass_inert(CFCClass *self);
 
 #endif /* H_CFCCLASS */
 

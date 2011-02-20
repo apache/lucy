@@ -85,13 +85,17 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Class
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
+_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, source_class_sv, parent_class_name_sv, is_final, is_inert)
     const char *klass;
     CFCParcel *parcel;
     const char *exposure;
     SV *class_name_sv;
     SV *class_cnick_sv;
     SV *micro_sym_sv;
+    SV *source_class_sv;
+    SV *parent_class_name_sv;
+    int is_final;
+    int is_inert;
 CODE:
     const char *class_name = SvOK(class_name_sv) 
                            ? SvPV_nolen(class_name_sv) : NULL;
@@ -99,8 +103,12 @@ CODE:
                             ? SvPV_nolen(class_cnick_sv) : NULL;
     const char *micro_sym = SvOK(micro_sym_sv) 
                             ? SvPV_nolen(micro_sym_sv) : NULL;
+    const char *source_class = SvOK(source_class_sv) 
+                            ? SvPV_nolen(source_class_sv) : NULL;
+    const char *parent_class_name = SvOK(parent_class_name_sv) 
+                                  ? SvPV_nolen(parent_class_name_sv) : NULL;
     CFCClass *self = CFCClass_new(parcel, exposure, class_name, class_cnick,
-        micro_sym);
+        micro_sym, source_class, parent_class_name, is_final, is_inert);
     RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -122,12 +130,16 @@ void
 _set_or_get(self, ...)
     CFCClass *self;
 ALIAS:
-    get_cnick       = 2
-    _set_tree_grown = 3
-    _tree_grown     = 4
-    set_parent      = 5
-    get_parent      = 6
-    get_autocode    = 8
+    get_cnick             = 2
+    _set_tree_grown       = 3
+    _tree_grown           = 4
+    set_parent            = 5
+    get_parent            = 6
+    get_autocode          = 8
+    get_source_class      = 10
+    get_parent_class_name = 12
+    final                 = 14
+    inert                 = 16
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -164,6 +176,22 @@ PPCODE:
                 const char *value = CFCClass_get_autocode(self);
                 retval = newSVpvn(value, strlen(value));
             }
+            break;
+        case 10: {
+                const char *value = CFCClass_get_source_class(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 12: {
+                const char *value = CFCClass_get_parent_class_name(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
+        case 14:
+            retval = newSViv(CFCClass_final(self));
+            break;
+        case 16:
+            retval = newSViv(CFCClass_inert(self));
             break;
     END_SET_OR_GET_SWITCH
 }
