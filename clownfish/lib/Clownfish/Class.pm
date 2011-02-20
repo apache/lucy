@@ -35,15 +35,12 @@ our %struct_sym;
 our %parent_class_name;
 our %source_class;
 our %docucomment;
-our %parent;
 our %children;
-our %autocode;
 our %inert;
 our %final;
 our %attributes;
 our %meth_by_name;
 our %func_by_name;
-our %tree_grown;
 our %functions;
 our %methods;
 our %member_vars;
@@ -172,9 +169,6 @@ sub create {
     $source_class{$self}      = $source_class;
     $docucomment{$self}       = $docucomment;
     $children{$self}          = [];
-    $parent{$self}            = undef;
-    $autocode{$self}          = '';
-    $tree_grown{$self}        = 0;
     $inert{$self}             = $inert;
     $final{$self}             = $final;
     $attributes{$self}        = $attributes;
@@ -205,15 +199,12 @@ sub DESTROY {
     delete $parent_class_name{$self};
     delete $source_class{$self};
     delete $docucomment{$self};
-    delete $parent{$self};
     delete $children{$self};
-    delete $autocode{$self};
     delete $inert{$self};
     delete $final{$self};
     delete $attributes{$self};
     delete $meth_by_name{$self};
     delete $func_by_name{$self};
-    delete $tree_grown{$self};
     delete $functions{$self};
     delete $methods{$self};
     delete $member_vars{$self};
@@ -244,25 +235,18 @@ sub get_struct_sym        { $struct_sym{ +shift } }
 sub get_parent_class_name { $parent_class_name{ +shift } }
 sub get_source_class      { $source_class{ +shift } }
 sub get_docucomment       { $docucomment{ +shift } }
-sub get_parent            { $parent{ +shift } }
-sub get_autocode          { $autocode{ +shift } }
 sub inert                 { $inert{ +shift } }
 sub final                 { $final{ +shift } }
 sub _get_attributes       { $attributes{ +shift } }
 sub _meth_by_name         { $meth_by_name{ +shift } }
 sub _func_by_name         { $func_by_name{ +shift } }
-sub _tree_grown           { $tree_grown{ +shift } }
 
-sub set_parent      { $parent{ $_[0] }     = $_[1] }
-sub _set_tree_grown { $tree_grown{ $_[0] } = $_[1] }
 sub _set_methods    { $methods{ $_[0] }    = $_[1] }
 
 sub full_struct_sym  { $_[0]->get_prefix . $_[0]->get_struct_sym }
 sub short_vtable_var { uc( shift->get_struct_sym ) }
 sub full_vtable_var  { $_[0]->get_PREFIX . $_[0]->short_vtable_var }
 sub full_vtable_type { shift->full_vtable_var . '_VT' }
-
-sub append_autocode { $autocode{ $_[0] } .= $_[1] }
 
 sub functions   { $functions{ +shift } }
 sub methods     { $methods{ +shift } }

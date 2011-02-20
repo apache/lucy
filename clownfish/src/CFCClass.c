@@ -33,6 +33,9 @@
 
 struct CFCClass {
     CFCSymbol symbol;
+    int tree_grown;
+    struct CFCClass *parent;
+    char *autocode;
 };
 
 CFCClass*
@@ -54,12 +57,17 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel,
 {
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name, 
         class_cnick, micro_sym);
+    self->parent     = NULL;
+    self->tree_grown = false;
+    self->autocode   = (char*)calloc(1, sizeof(char));
     return self;
 }
 
 void
 CFCClass_destroy(CFCClass *self)
 {
+    CFCBase_decref((CFCBase*)self->parent);
+    free(self->autocode);
     CFCSymbol_destroy((CFCSymbol*)self);
 }
 
@@ -67,5 +75,45 @@ const char*
 CFCClass_get_cnick(CFCClass *self)
 {
     return CFCSymbol_get_class_cnick((CFCSymbol*)self);
+}
+
+void
+CFCClass_set_tree_grown(CFCClass *self, int tree_grown)
+{
+    self->tree_grown = !!tree_grown;
+}
+
+int
+CFCClass_tree_grown(CFCClass *self)
+{
+    return self->tree_grown;
+}
+
+void
+CFCClass_set_parent(CFCClass *self, CFCClass *parent)
+{
+    CFCBase_decref((CFCBase*)self->parent);
+    self->parent = (CFCClass*)CFCBase_incref((CFCBase*)parent);
+}
+
+CFCClass*
+CFCClass_get_parent(CFCClass *self)
+{
+    return self->parent;
+}
+
+void
+CFCClass_append_autocode(CFCClass *self, const char *autocode)
+{
+    size_t size = strlen(self->autocode) + strlen(autocode) + 1;
+    self->autocode = (char*)realloc(self->autocode, size);
+    if (!self->autocode) { croak("realloc failed"); }
+    strcat(self->autocode, autocode);
+}
+
+const char*
+CFCClass_get_autocode(CFCClass *self)
+{
+    return self->autocode;
 }
 

@@ -112,15 +112,56 @@ PPCODE:
     CFCClass_destroy(self);
 
 void
+append_autocode(self, autocode)
+    CFCClass *self;
+    const char *autocode;
+PPCODE:
+    CFCClass_append_autocode(self, autocode);
+
+void
 _set_or_get(self, ...)
     CFCClass *self;
 ALIAS:
-    get_cnick = 2
+    get_cnick       = 2
+    _set_tree_grown = 3
+    _tree_grown     = 4
+    set_parent      = 5
+    get_parent      = 6
+    get_autocode    = 8
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
         case 2: {
                 const char *value = CFCClass_get_cnick(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 3:
+            CFCClass_set_tree_grown(self, !!SvTRUE(ST(1)));
+            break;
+        case 4:
+            retval = newSViv(CFCClass_tree_grown(self));
+            break;
+        case 5: {
+                CFCClass *parent = NULL;
+                if (   SvOK(ST(1))
+                    && sv_derived_from(ST(1), "Clownfish::Class")
+                ) {
+                    IV objint = SvIV((SV*)SvRV(ST(1)));
+                    parent = INT2PTR(CFCClass*, objint);
+                }
+                CFCClass_set_parent(self, parent);
+                break;
+            }
+        case 6: {
+                CFCClass *parent = CFCClass_get_parent(self);
+                retval = parent 
+                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)parent))
+                       : newSV(0);
+                break;
+            }
+        case 8: {
+                const char *value = CFCClass_get_autocode(self);
                 retval = newSVpvn(value, strlen(value));
             }
             break;

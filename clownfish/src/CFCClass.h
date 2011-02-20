@@ -35,5 +35,23 @@ CFCClass_destroy(CFCClass *self);
 const char*
 CFCClass_get_cnick(CFCClass *self);
 
+void
+CFCClass_set_tree_grown(CFCClass *self, int tree_grown);
+
+int
+CFCClass_tree_grown(CFCClass *self);
+
+void
+CFCClass_set_parent(CFCClass *self, CFCClass *parent);
+
+CFCClass*
+CFCClass_get_parent(CFCClass *self);
+
+void
+CFCClass_append_autocode(CFCClass *self, const char *autocode);
+
+const char*
+CFCClass_get_autocode(CFCClass *self);
+
 #endif /* H_CFCCLASS */
 
