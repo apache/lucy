@@ -195,15 +195,6 @@ sub DESTROY {
     $self->_destroy;
 }
 
-sub file_path {
-    my ( $self, $base_dir, $ext ) = @_;
-    my @components = split( '::', $self->get_source_class );
-    unshift @components, $base_dir
-        if defined $base_dir;
-    $components[-1] .= $ext;
-    return catfile(@components);
-}
-
 sub include_h {
     my $self = shift;
     my @components = split( '::', $self->get_source_class );
@@ -554,14 +545,6 @@ Bequeath all inherited methods and members to children.
 
 Return this class and all its child classes as an array, where all children
 appear after their parent nodes.
-
-=head2 file_path
-
-    # /path/to/Foo/Bar.c, if source class is Foo::Bar.
-    my $path = $class->file_path( '/path/to', '.c' );
-
-Provide an OS-specific path for a file relating to this class could be found,
-by joining together the components of the C<source_class> name.
 
 =head2 include_h
 

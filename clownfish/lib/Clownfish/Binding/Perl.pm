@@ -277,8 +277,6 @@ sub prepare_pod {
         # Compare against existing file; rewrite if changed.
         my $pod_file_path
             = catfile( $lib_dir, split( '::', $class_name ) ) . ".pod";
-
-        $class->file_path( $lib_dir, ".pod" );
         my $existing = "";
         if ( -e $pod_file_path ) {
             open( my $pod_fh, "<", $pod_file_path )

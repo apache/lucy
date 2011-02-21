@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 53;
+use Test::More tests => 52;
 use Clownfish::Class;
 use Clownfish::Parser;
 
@@ -78,8 +78,6 @@ my $final_foo = Clownfish::Class->create(
     attributes        => { dumpable => 1 },
 );
 ok( $final_foo->final, "final" );
-is( $final_foo->file_path( '/path/to', '.c', ),
-    '/path/to/Foo/FooJr.c', "file_path" );
 is( $final_foo->include_h, 'Foo/FooJr.h', "inlude_h uses source_class" );
 is( $final_foo->get_parent_class_name, 'Foo::FooJr',
     "get_parent_class_name" );
