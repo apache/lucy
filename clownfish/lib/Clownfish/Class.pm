@@ -31,7 +31,6 @@ use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
 our %cnick;
-our %docucomment;
 our %children;
 our %attributes;
 our %meth_by_name;
@@ -101,7 +100,6 @@ sub create {
     $args{class_cnick} = delete $args{cnick};
     my $class_name = $args{class_name};
     confess("Missing required param 'class_name'") unless $class_name;
-    my $docucomment       = delete $args{docucomment};
     $args{inert} ||= 0;
     $args{final} ||= 0;
 
@@ -147,9 +145,8 @@ sub create {
     $args{micro_sym} ||= 'class';
     my $self = $either->_new(
         @args{qw( parcel exposure class_name class_cnick micro_sym
-        source_class parent_class_name final inert )} );
+        docucomment source_class parent_class_name final inert )} );
 
-    $docucomment{$self}       = $docucomment;
     $children{$self}          = [];
     $attributes{$self}        = $attributes;
     $meth_by_name{$self}      = \%methods_by_name;
@@ -175,7 +172,6 @@ sub create {
 
 sub DESTROY {
     my $self = shift;
-    delete $docucomment{$self};
     delete $children{$self};
     delete $attributes{$self};
     delete $meth_by_name{$self};
@@ -188,16 +184,8 @@ sub DESTROY {
     $self->_destroy;
 }
 
-sub include_h {
-    my $self = shift;
-    my @components = split( '::', $self->get_source_class );
-    $components[-1] .= '.h';
-    return join( '/', @components );
-}
-
 sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
 
-sub get_docucomment       { $docucomment{ +shift } }
 sub _get_attributes       { $attributes{ +shift } }
 sub _meth_by_name         { $meth_by_name{ +shift } }
 sub _func_by_name         { $func_by_name{ +shift } }

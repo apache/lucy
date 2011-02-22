@@ -85,13 +85,14 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Class
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, source_class_sv, parent_class_name_sv, is_final, is_inert)
+_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
     const char *klass;
     CFCParcel *parcel;
     const char *exposure;
     SV *class_name_sv;
     SV *class_cnick_sv;
     SV *micro_sym_sv;
+    CFCDocuComment *docucomment;
     SV *source_class_sv;
     SV *parent_class_name_sv;
     int is_final;
@@ -108,7 +109,8 @@ CODE:
     const char *parent_class_name = SvOK(parent_class_name_sv) 
                                   ? SvPV_nolen(parent_class_name_sv) : NULL;
     CFCClass *self = CFCClass_new(parcel, exposure, class_name, class_cnick,
-        micro_sym, source_class, parent_class_name, is_final, is_inert);
+        micro_sym, docucomment, source_class, parent_class_name, is_final, 
+        is_inert);
     RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -145,6 +147,8 @@ ALIAS:
     short_vtable_var      = 22
     full_vtable_var       = 24
     full_vtable_type      = 26
+    include_h             = 28
+    get_docucomment       = 30
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -221,6 +225,18 @@ PPCODE:
         case 26: {
                 const char *value = CFCClass_full_vtable_type(self);
                 retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
+        case 28: {
+                const char *value = CFCClass_include_h(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
+        case 30: {
+                CFCDocuComment *docucomment = CFCClass_get_docucomment(self);
+                retval = docucomment 
+                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)docucomment))
+                       : newSV(0);
             }
             break;
     END_SET_OR_GET_SWITCH
