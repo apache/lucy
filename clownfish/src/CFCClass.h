@@ -69,5 +69,20 @@ CFCClass_final(CFCClass *self);
 int
 CFCClass_inert(CFCClass *self);
 
+const char*
+CFCClass_get_struct_sym(CFCClass *self);
+
+const char*
+CFCClass_full_struct_sym(CFCClass *self);
+
+const char*
+CFCClass_short_vtable_var(CFCClass *self);
+
+const char*
+CFCClass_full_vtable_var(CFCClass *self);
+
+const char*
+CFCClass_full_vtable_type(CFCClass *self);
+
 #endif /* H_CFCCLASS */
 

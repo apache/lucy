@@ -140,6 +140,11 @@ ALIAS:
     get_parent_class_name = 12
     final                 = 14
     inert                 = 16
+    get_struct_sym        = 18
+    full_struct_sym       = 20 
+    short_vtable_var      = 22
+    full_vtable_var       = 24
+    full_vtable_type      = 26
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -192,6 +197,31 @@ PPCODE:
             break;
         case 16:
             retval = newSViv(CFCClass_inert(self));
+            break;
+        case 18: {
+                const char *value = CFCClass_get_struct_sym(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
+        case 20: {
+                const char *value = CFCClass_full_struct_sym(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
+        case 22: {
+                const char *value = CFCClass_short_vtable_var(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
+        case 24: {
+                const char *value = CFCClass_full_vtable_var(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
+        case 26: {
+                const char *value = CFCClass_full_vtable_type(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
             break;
     END_SET_OR_GET_SWITCH
 }

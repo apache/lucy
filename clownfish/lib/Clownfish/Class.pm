@@ -31,7 +31,6 @@ use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
 our %cnick;
-our %struct_sym;
 our %docucomment;
 our %children;
 our %attributes;
@@ -106,10 +105,6 @@ sub create {
     $args{inert} ||= 0;
     $args{final} ||= 0;
 
-    # Derive struct name.
-    $class_name =~ /(\w+)$/ or confess("Invalid class_name: '$class_name'");
-    my $struct_sym = $1;
-
     # Verify that members of supplied arrays meet "is a" requirements.
     my $functions   = delete $args{functions}   || [];
     my $methods     = delete $args{methods}     || [];
@@ -154,7 +149,6 @@ sub create {
         @args{qw( parcel exposure class_name class_cnick micro_sym
         source_class parent_class_name final inert )} );
 
-    $struct_sym{$self}        = $struct_sym;
     $docucomment{$self}       = $docucomment;
     $children{$self}          = [];
     $attributes{$self}        = $attributes;
@@ -181,7 +175,6 @@ sub create {
 
 sub DESTROY {
     my $self = shift;
-    delete $struct_sym{$self};
     delete $docucomment{$self};
     delete $children{$self};
     delete $attributes{$self};
@@ -204,18 +197,12 @@ sub include_h {
 
 sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
 
-sub get_struct_sym        { $struct_sym{ +shift } }
 sub get_docucomment       { $docucomment{ +shift } }
 sub _get_attributes       { $attributes{ +shift } }
 sub _meth_by_name         { $meth_by_name{ +shift } }
 sub _func_by_name         { $func_by_name{ +shift } }
 
 sub _set_methods    { $methods{ $_[0] }    = $_[1] }
-
-sub full_struct_sym  { $_[0]->get_prefix . $_[0]->get_struct_sym }
-sub short_vtable_var { uc( shift->get_struct_sym ) }
-sub full_vtable_var  { $_[0]->get_PREFIX . $_[0]->short_vtable_var }
-sub full_vtable_type { shift->full_vtable_var . '_VT' }
 
 sub functions   { $functions{ +shift } }
 sub methods     { $methods{ +shift } }
