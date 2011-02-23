@@ -65,19 +65,15 @@ CFCFile_init(CFCFile *self, const char *source_class)
     CFCUTIL_NULL_CHECK(source_class);
     self->modified = false;
     self->source_class = CFCUtil_strdup(source_class);
-    self->blocks = (CFCBase**)calloc(1, sizeof(CFCBase*));
-    self->classes = (CFCClass**)calloc(1, sizeof(CFCBase*));
-    if (!self->blocks || !self->classes) { croak("malloc failed"); }
+    self->blocks = (CFCBase**)CALLOCATE(1, sizeof(CFCBase*));
+    self->classes = (CFCClass**)CALLOCATE(1, sizeof(CFCBase*));
 
     // Derive include guard name, plus C code for opening and closing the
     // guard.
     size_t len = strlen(source_class);
-    self->guard_name = (char*)malloc(len + sizeof("H_") + 1);
-    self->guard_start = (char*)malloc(len * 2 + 40);
-    self->guard_close = (char*)malloc(len + 20);
-    if (!self->guard_name || !self->guard_start || !self->guard_close) {
-        croak("malloc failed");
-    }
+    self->guard_name = (char*)MALLOCATE(len + sizeof("H_") + 1);
+    self->guard_start = (char*)MALLOCATE(len * 2 + 40);
+    self->guard_close = (char*)MALLOCATE(len + 20);
     memcpy(self->guard_name, "H_", 2);
     size_t i, j;
     for (i = 0, j = 2; i < len; i++, j++) {
@@ -99,8 +95,7 @@ CFCFile_init(CFCFile *self, const char *source_class)
     if (check < 0) { croak("sprintf failed"); }
 
     // Cache partial path derived from source_class.
-    self->path_part = malloc(len + 1);
-    if (!self->path_part) { croak("malloc failed"); }
+    self->path_part = MALLOCATE(len + 1);
     for (i = 0, j = 0; i < len; i++, j++) {
         char c = source_class[i];
         if (c == ':') {
@@ -124,17 +119,17 @@ CFCFile_destroy(CFCFile *self)
     for (i = 0; self->blocks[i] != NULL; i++) {
         CFCBase_decref(self->blocks[i]);
     }
-    free(self->blocks);
+    FREEMEM(self->blocks);
     for (i = 0; self->classes[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->classes[i]);
     }
     */
-    free(self->classes);
-    free(self->guard_name);
-    free(self->guard_start);
-    free(self->guard_close);
-    free(self->source_class);
-    free(self->path_part);
+    FREEMEM(self->classes);
+    FREEMEM(self->guard_name);
+    FREEMEM(self->guard_start);
+    FREEMEM(self->guard_close);
+    FREEMEM(self->source_class);
+    FREEMEM(self->path_part);
     CFCBase_destroy((CFCBase*)self);
 }
 
@@ -152,8 +147,7 @@ CFCFile_add_block(CFCFile *self, CFCBase *block)
         }
         num_class_blocks++;
         size_t size = (num_class_blocks + 1) * sizeof(CFCClass*);
-        self->classes = (CFCClass**)realloc(self->classes, size);
-        if (!self->classes) { croak("realloc failed"); }
+        self->classes = (CFCClass**)REALLOCATE(self->classes, size);
         self->classes[num_class_blocks - 1] 
             = (CFCClass*)CFCBase_incref(block);
         self->classes[num_class_blocks] = NULL;
@@ -170,8 +164,7 @@ CFCFile_add_block(CFCFile *self, CFCBase *block)
         }
         num_blocks++;
         size_t size = (num_blocks + 1) * sizeof(CFCBase*);
-        self->blocks = (CFCBase**)realloc(self->blocks, size);
-        if (!self->blocks) { croak("realloc failed"); }
+        self->blocks = (CFCBase**)REALLOCATE(self->blocks, size);
         self->blocks[num_blocks - 1] = CFCBase_incref(block);
         self->blocks[num_blocks] = NULL;
     }

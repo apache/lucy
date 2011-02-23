@@ -248,8 +248,7 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
     // Record array spec.
     const char *array_spec = array ? array : "";
     size_t array_spec_size = strlen(array_spec) + 1;
-    self->array = (char*)malloc(array_spec_size);
-    if (!self->array) { croak("Malloc failed"); }
+    self->array = (char*)MALLOCATE(array_spec_size);
     strcpy(self->array, array_spec);
 
     return self;
@@ -312,9 +311,9 @@ CFCType_destroy(CFCType *self)
         CFCBase_decref((CFCBase*)self->child);
     }
     CFCBase_decref((CFCBase*)self->parcel);
-    free(self->specifier);
-    free(self->c_string);
-    free(self->array);
+    FREEMEM(self->specifier);
+    FREEMEM(self->c_string);
+    FREEMEM(self->array);
     CFCBase_destroy((CFCBase*)self);
 }
 
@@ -369,7 +368,7 @@ CFCType_similar(CFCType *self, CFCType *other)
 void
 CFCType_set_specifier(CFCType *self, const char *specifier)
 {
-    free(self->specifier);
+    FREEMEM(self->specifier);
     self->specifier = CFCUtil_strdup(specifier);
 }
 
@@ -394,7 +393,7 @@ CFCType_get_parcel(CFCType *self)
 void
 CFCType_set_c_string(CFCType *self, const char *c_string)
 {
-    free(self->c_string);
+    FREEMEM(self->c_string);
     self->c_string = CFCUtil_strdup(c_string);
 }
 

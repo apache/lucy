@@ -41,10 +41,7 @@ static void
 S_strip(char *comment)
 {
     size_t len = strlen(comment);
-    char *scratch = (char*)malloc(len + 1);
-    if (!scratch) {
-        croak("malloc failed");
-    }
+    char *scratch = (char*)MALLOCATE(len + 1);
 
     // Establish that comment text begins with "/**" and ends with "*/".
     if (   strstr(comment, "/**") != comment
@@ -82,7 +79,7 @@ S_strip(char *comment)
     comment[j] = '\0';
 
     // Clean up.
-    free(scratch);
+    FREEMEM(scratch);
 }
 
 CFCDocuComment*
@@ -123,11 +120,8 @@ CFCDocuComment_parse(const char *raw_text)
 
     // Extract @param directives.
     size_t num_params = 0;
-    self->param_names = (char**)calloc(num_params + 1, sizeof(char*));
-    self->param_docs  = (char**)calloc(num_params + 1, sizeof(char*));
-    if (!self->param_names || !self->param_docs) { 
-        croak("calloc failed"); 
-    }
+    self->param_names = (char**)CALLOCATE(num_params + 1, sizeof(char*));
+    self->param_docs  = (char**)CALLOCATE(num_params + 1, sizeof(char*));
     {
         char *candidate = strstr(text, "@param");
         size_t len = strlen(text);
@@ -166,11 +160,8 @@ CFCDocuComment_parse(const char *raw_text)
 
             num_params++;
             size_t size = (num_params + 1) * sizeof(char*);
-            self->param_names = realloc(self->param_names, size);
-            self->param_docs  = realloc(self->param_docs, size);
-            if (!self->param_names || !self->param_docs) { 
-                croak("realloc failed"); 
-            }
+            self->param_names = REALLOCATE(self->param_names, size);
+            self->param_docs  = REALLOCATE(self->param_docs, size);
             self->param_names[num_params - 1] 
                 = CFCUtil_strndup(param_name, param_name_len);
             self->param_docs[num_params - 1] 
@@ -218,7 +209,7 @@ CFCDocuComment_parse(const char *raw_text)
         CFCUtil_trim_whitespace(self->retval);
     }
 
-    free(text);
+    FREEMEM(text);
     return self;
 }
 
@@ -228,20 +219,20 @@ CFCDocuComment_destroy(CFCDocuComment *self)
     size_t i;
     if (self->param_names) {
         for (i = 0; self->param_names[i] != NULL; i++) {
-            free(self->param_names[i]);
+            FREEMEM(self->param_names[i]);
         }
-        free(self->param_names);
+        FREEMEM(self->param_names);
     }
     if (self->param_docs) {
         for (i = 0; self->param_docs[i] != NULL; i++) {
-            free(self->param_docs[i]);
+            FREEMEM(self->param_docs[i]);
         }
-        free(self->param_docs);
+        FREEMEM(self->param_docs);
     }
-    free(self->description);
-    free(self->brief);
-    free(self->long_des);
-    free(self->retval);
+    FREEMEM(self->description);
+    FREEMEM(self->brief);
+    FREEMEM(self->long_des);
+    FREEMEM(self->retval);
     CFCBase_destroy((CFCBase*)self);
 }
 

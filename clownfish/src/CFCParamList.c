@@ -53,8 +53,8 @@ CFCParamList_init(CFCParamList *self, int variadic)
 {
     self->variadic  = variadic;
     self->num_vars  = 0;
-    self->variables = (CFCVariable**)calloc(1, sizeof(void*));
-    self->values    = (char**)calloc(1, sizeof(char*));
+    self->variables = (CFCVariable**)CALLOCATE(1, sizeof(void*));
+    self->values    = (char**)CALLOCATE(1, sizeof(char*));
     S_generate_c_strings(self);
     return self;
 }
@@ -66,11 +66,8 @@ CFCParamList_add_param(CFCParamList *self, CFCVariable *variable,
     CFCUTIL_NULL_CHECK(variable);
     self->num_vars++;
     size_t amount = (self->num_vars + 1) * sizeof(void*);
-    self->variables = (CFCVariable**)realloc(self->variables, amount);
-    self->values    = (char**)realloc(self->values, amount);
-    if (!self->variables || !self->values) {
-        croak("realloc failed.");
-    }
+    self->variables = (CFCVariable**)REALLOCATE(self->variables, amount);
+    self->values    = (char**)REALLOCATE(self->values, amount);
     self->variables[self->num_vars - 1] 
         = (CFCVariable*)CFCBase_incref((CFCBase*)variable);
     self->values[self->num_vars - 1] = value ? CFCUtil_strdup(value) : NULL;
@@ -86,12 +83,12 @@ CFCParamList_destroy(CFCParamList *self)
     size_t i;
     for (i = 0; i < self->num_vars; i++) {
         CFCBase_decref((CFCBase*)self->variables[i]);
-        free(self->values[i]);
+        FREEMEM(self->values[i]);
     }
-    free(self->variables);
-    free(self->values);
-    free(self->c_string);
-    free(self->name_list);
+    FREEMEM(self->variables);
+    FREEMEM(self->values);
+    FREEMEM(self->c_string);
+    FREEMEM(self->name_list);
     CFCBase_destroy((CFCBase*)self);
 }
 
@@ -113,11 +110,10 @@ S_generate_c_strings(CFCParamList *self)
     if (self->variadic) {
         c_string_size += sizeof(", ...");
     }
-    free(self->c_string);
-    free(self->name_list);
-    self->c_string  = malloc(c_string_size);
-    self->name_list = malloc(name_list_size);
-    if (!self->c_string || !self->name_list) { croak("malloc failed"); }
+    FREEMEM(self->c_string);
+    FREEMEM(self->name_list);
+    self->c_string  = MALLOCATE(c_string_size);
+    self->name_list = MALLOCATE(name_list_size);
     self->c_string[0] = '\0';
     self->name_list[0] = '\0';
 

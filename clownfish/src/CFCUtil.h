@@ -45,5 +45,39 @@ CFCUtil_strndup(const char *string, size_t len);
 void
 CFCUtil_trim_whitespace(char *text);
 
+/** Attempt to allocate memory with malloc, but print an error and exit if the
+ * call fails.
+ */
+void*
+CFCUtil_wrapped_malloc(size_t count, const char *file, int line);
+
+/** Attempt to allocate memory with calloc, but print an error and exit if the
+ * call fails.
+ */
+void*
+CFCUtil_wrapped_calloc(size_t count, size_t size, const char *file, int line);
+
+/** Attempt to allocate memory with realloc, but print an error and exit if 
+ * the call fails.
+ */
+void*
+CFCUtil_wrapped_realloc(void *ptr, size_t size, const char *file, int line);
+
+/** Free memory.  (Wrapping is necessary in cases where memory allocated
+ * within Clownfish has to be freed in an external environment where "free"
+ * may have been redefined.)
+ */
+void
+CFCUtil_wrapped_free(void *ptr);
+
+#define MALLOCATE(_count) \
+    CFCUtil_wrapped_malloc((_count), __FILE__, __LINE__)
+#define CALLOCATE(_count, _size) \
+    CFCUtil_wrapped_calloc((_count), (_size), __FILE__, __LINE__)
+#define REALLOCATE(_ptr, _count) \
+    CFCUtil_wrapped_realloc((_ptr), (_count), __FILE__, __LINE__)
+#define FREEMEM(_ptr) \
+    CFCUtil_wrapped_free(_ptr)
+
 #endif /* H_CFCUTIL */
 

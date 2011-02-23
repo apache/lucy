@@ -26,10 +26,7 @@
 CFCBase*
 CFCBase_allocate(size_t size, const char *klass)
 {
-    CFCBase *self = (CFCBase*)calloc(size, 1);
-    if (!self) {
-        croak("Failed to calloc %" UVuf " bytes", (UV)size);
-    }
+    CFCBase *self = (CFCBase*)CALLOCATE(size, 1);
     self->perl_obj = CFCUtil_make_perl_obj(self, klass);
     return self;
 }
@@ -37,7 +34,7 @@ CFCBase_allocate(size_t size, const char *klass)
 void
 CFCBase_destroy(CFCBase *self)
 {
-    free(self);
+    FREEMEM(self);
 }
 
 CFCBase*

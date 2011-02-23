@@ -79,21 +79,18 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     {
         size_t size = strlen(type_str) + sizeof(" ") + strlen(micro_sym) +
             strlen(postfix) + 1;
-        self->local_c = (char*)malloc(size);
-        if (!self->local_c) { croak("malloc failed"); }
+        self->local_c = (char*)MALLOCATE(size);
         sprintf(self->local_c, "%s %s%s", type_str, micro_sym, postfix);
     }
     {
-        self->local_dec = (char*)malloc(strlen(self->local_c) + sizeof(";\0"));
-        if (!self->local_dec) { croak("malloc failed"); }
+        self->local_dec = (char*)MALLOCATE(strlen(self->local_c) + sizeof(";\0"));
         sprintf(self->local_dec, "%s;", self->local_c);
     }
     {
         const char *full_sym = CFCSymbol_full_sym((CFCSymbol*)self);
         size_t size = strlen(type_str) + sizeof(" ") + strlen(full_sym) +
             strlen(postfix) + 1;
-        self->global_c = (char*)malloc(size);
-        if (!self->global_c) { croak("malloc failed"); }
+        self->global_c = (char*)MALLOCATE(size);
         sprintf(self->global_c, "%s %s%s", type_str, full_sym, postfix);
     }
 
@@ -104,9 +101,9 @@ void
 CFCVariable_destroy(CFCVariable *self)
 {
     CFCBase_decref((CFCBase*)self->type);
-    free(self->local_c);
-    free(self->global_c);
-    free(self->local_dec);
+    FREEMEM(self->local_c);
+    FREEMEM(self->global_c);
+    FREEMEM(self->local_dec);
     CFCSymbol_destroy((CFCSymbol*)self);
 }
 

@@ -48,7 +48,7 @@ CFCCBlock_init(CFCCBlock *self, const char *contents)
 void
 CFCCBlock_destroy(CFCCBlock *self)
 {
-    free(self->contents);
+    FREEMEM(self->contents);
     CFCBase_destroy((CFCBase*)self);
 }
 

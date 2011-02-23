@@ -138,12 +138,9 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
     size_t cnick_len  = strlen(self->cnick);
     size_t prefix_len = cnick_len ? cnick_len + 1 : 0;
     size_t amount     = prefix_len + 1;
-    self->prefix = (char*)malloc(amount);
-    self->Prefix = (char*)malloc(amount);
-    self->PREFIX = (char*)malloc(amount);
-    if (!self->prefix || !self->Prefix || !self->PREFIX) {
-        croak("malloc failed");
-    }
+    self->prefix = (char*)MALLOCATE(amount);
+    self->Prefix = (char*)MALLOCATE(amount);
+    self->PREFIX = (char*)MALLOCATE(amount);
     memcpy(self->Prefix, self->cnick, cnick_len);
     if (cnick_len) {
         self->Prefix[cnick_len]  = '_';
@@ -167,11 +164,11 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
 void
 CFCParcel_destroy(CFCParcel *self)
 {
-    free(self->name);
-    free(self->cnick);
-    free(self->prefix);
-    free(self->Prefix);
-    free(self->PREFIX);
+    FREEMEM(self->name);
+    FREEMEM(self->cnick);
+    FREEMEM(self->prefix);
+    FREEMEM(self->Prefix);
+    FREEMEM(self->PREFIX);
     CFCBase_destroy((CFCBase*)self);
 }
 

@@ -90,3 +90,62 @@ CFCUtil_trim_whitespace(char *text)
     *text = '\0';
 }
 
+void*
+CFCUtil_wrapped_malloc(size_t count, const char *file, int line)
+{
+    void *pointer = malloc(count);
+    if (pointer == NULL && count != 0) {
+        if (sizeof(long) >= sizeof(size_t)) {
+            fprintf(stderr, "Can't malloc %lu bytes at %s line %d\n", 
+                (unsigned long)count, file, line);
+        }
+        else {
+            fprintf(stderr, "malloc failed at %s line %d\n", file, line);
+        }
+        exit(1);
+    }
+    return pointer;
+}
+
+void*
+CFCUtil_wrapped_calloc(size_t count, size_t size, const char *file, int line)
+{
+    void *pointer = calloc(count, size);
+    if (pointer == NULL && count != 0) {
+        if (sizeof(long) >= sizeof(size_t)) {
+            fprintf(stderr, 
+                "Can't calloc %lu elements of size %lu at %s line %d\n", 
+                (unsigned long)count, (unsigned long)size, file, line);
+        }
+        else {
+            fprintf(stderr, "calloc failed at %s line %d\n", file, line);
+        }
+        exit(1);
+    }
+    return pointer;
+}
+
+void*
+CFCUtil_wrapped_realloc(void *ptr, size_t size, const char *file, int line)
+{
+    void *pointer = realloc(ptr, size);
+    if (pointer == NULL && size != 0) {
+        if (sizeof(long) >= sizeof(size_t)) {
+            fprintf(stderr, "Can't realloc %lu bytes at %s line %d\n", 
+                (unsigned long)size, file, line);
+        }
+        else {
+            fprintf(stderr, "realloc failed at %s line %d\n", file, line);
+        }
+        exit(1);
+    }
+    return pointer;
+}
+
+void
+CFCUtil_wrapped_free(void *ptr)
+{
+    free(ptr);
+}
+
+

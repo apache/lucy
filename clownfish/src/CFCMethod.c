@@ -103,7 +103,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
         class_cnick, micro_sym, return_type, param_list, docucomment,
         false);
-    free(micro_sym);
+    FREEMEM(micro_sym);
 
     // Verify that the first element in the arg list is a self.
     CFCVariable **args = CFCParamList_get_variables(param_list);
@@ -113,11 +113,10 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     const char *prefix    = CFCSymbol_get_prefix((CFCSymbol*)self);
     const char *last_colon = strrchr(class_name, ':');
     const char *struct_sym = last_colon ? last_colon + 1 : class_name;
-    char *wanted = (char*)malloc(strlen(prefix) + strlen(struct_sym) + 1);
-    if (!wanted) { croak("malloc failed"); }
+    char *wanted = (char*)MALLOCATE(strlen(prefix) + strlen(struct_sym) + 1);
     sprintf(wanted, "%s%s", prefix, struct_sym);
     int mismatch = strcmp(wanted, specifier);
-    free(wanted);
+    FREEMEM(wanted);
     if (mismatch) { 
         croak("First arg type doesn't match class: '%s' '%s", class_name,
             specifier);
@@ -132,11 +131,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     // Derive more symbols.
     const char *full_func_sym = CFCFunction_full_func_sym((CFCFunction*)self);
     size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
-    self->full_callback_sym = (char*)malloc(amount);
-    self->full_override_sym = (char*)malloc(amount);
-    if (!self->full_callback_sym || !self->full_override_sym) {
-        croak("malloc failed");
-    }
+    self->full_callback_sym = (char*)MALLOCATE(amount);
+    self->full_override_sym = (char*)MALLOCATE(amount);
     int check = sprintf(self->full_callback_sym, "%s_CALLBACK", 
         full_func_sym);
     if (check < 0) { croak("sprintf failed"); }
@@ -149,10 +145,10 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 
     // Cache typedef.
     const char *short_sym = CFCSymbol_short_sym((CFCSymbol*)self);
-    char *short_typedef = (char*)malloc(strlen(short_sym) + 3);
+    char *short_typedef = (char*)MALLOCATE(strlen(short_sym) + 3);
     sprintf(short_typedef, "%s_t", short_sym);
     CFCMethod_set_short_typedef(self, short_typedef);
-    free(short_typedef);
+    FREEMEM(short_typedef);
 
     return self;
 }
@@ -160,11 +156,11 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 void
 CFCMethod_destroy(CFCMethod *self)
 {
-    free(self->macro_sym);
-    free(self->short_typedef);
-    free(self->full_typedef);
-    free(self->full_callback_sym);
-    free(self->full_override_sym);
+    FREEMEM(self->macro_sym);
+    FREEMEM(self->short_typedef);
+    FREEMEM(self->full_typedef);
+    FREEMEM(self->full_callback_sym);
+    FREEMEM(self->full_override_sym);
     CFCFunction_destroy((CFCFunction*)self);
 }
 
@@ -219,14 +215,13 @@ CFCMethod_get_macro_sym(CFCMethod *self)
 void
 CFCMethod_set_short_typedef(CFCMethod *self, const char *short_typedef)
 {
-    free(self->short_typedef);
-    free(self->full_typedef);
+    FREEMEM(self->short_typedef);
+    FREEMEM(self->full_typedef);
     if (short_typedef) {
         self->short_typedef = CFCUtil_strdup(short_typedef);
         const char *prefix = CFCSymbol_get_prefix((CFCSymbol*)self);
         size_t amount = strlen(prefix) + strlen(short_typedef) + 1;
-        self->full_typedef = (char*)malloc(amount);
-        if (!self->full_typedef) { croak("malloc failed"); }
+        self->full_typedef = (char*)MALLOCATE(amount);
         int check = sprintf(self->full_typedef, "%s%s", prefix,
             short_typedef);
         if (check < 0) { croak("sprintf failed"); }
