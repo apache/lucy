@@ -42,6 +42,27 @@ CFCMethod_init(CFCMethod *self, struct CFCParcel *parcel,
 void
 CFCMethod_destroy(CFCMethod *self);
 
+/** 
+ * @return the number of bytes which the symbol would occupy.
+ */
+size_t
+CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf, 
+                           size_t buf_size);
+
+/** 
+ * @return the number of bytes which the symbol would occupy.
+ */
+size_t
+CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf, 
+                          size_t buf_size);
+
+/** 
+ * @return the number of bytes which the symbol would occupy.
+ */
+size_t
+CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf, 
+                          size_t buf_size);
+
 const char*
 CFCMethod_get_macro_sym(CFCMethod *self);
 

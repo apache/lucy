@@ -577,6 +577,40 @@ DESTROY(self)
 PPCODE:
     CFCMethod_destroy(self);
 
+SV*
+_various_method_syms(self, invoker)
+    CFCMethod *self;
+    const char *invoker;
+ALIAS:
+    short_method_sym  = 1
+    full_method_sym   = 2
+    full_offset_sym   = 3
+CODE:
+    size_t size = 0;
+    switch(ix) {
+        case 1: size = CFCMethod_short_method_sym(self, invoker, NULL, 0);
+                break;
+        case 2: size = CFCMethod_full_method_sym(self, invoker, NULL, 0);
+                break;
+        case 3: size = CFCMethod_full_offset_sym(self, invoker, NULL, 0);
+                break;
+        default: croak("Unexpected ix: %d", ix);
+    }
+    RETVAL = newSV(size);
+    SvPOK_on(RETVAL);
+    char *buf = SvPVX(RETVAL);
+    switch(ix) {
+        case 1: CFCMethod_short_method_sym(self, invoker, buf, size);
+                break;
+        case 2: CFCMethod_full_method_sym(self, invoker, buf, size);
+                break;
+        case 3: CFCMethod_full_offset_sym(self, invoker, buf, size);
+                break;
+        default: croak("Unexpected ix: %d", ix);
+    }
+    SvCUR_set(RETVAL, strlen(buf));
+OUTPUT: RETVAL
+
 void
 _set_or_get(self, ...)
     CFCMethod *self;

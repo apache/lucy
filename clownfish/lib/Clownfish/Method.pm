@@ -73,24 +73,6 @@ sub new {
     return $self;
 }
 
-sub short_method_sym {
-    my ( $self, $invoker ) = @_;
-    confess("Missing invoker") unless $invoker;
-    return $invoker . '_' . $self->get_macro_sym;
-}
-
-sub full_method_sym {
-    my ( $self, $invoker ) = @_;
-    return $self->get_Prefix . $self->short_method_sym($invoker);
-}
-
-# The name of the variable which stores the method's vtable offset.
-sub full_offset_sym {
-    my ( $self, $invoker ) = @_;
-    confess("Missing invoker") unless $invoker;
-    return $self->full_method_sym($invoker) . '_OFFSET';
-}
-
 sub override {
     my ( $self, $orig ) = @_;
 

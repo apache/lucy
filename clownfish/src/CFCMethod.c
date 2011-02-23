@@ -107,6 +107,48 @@ CFCMethod_destroy(CFCMethod *self)
     CFCFunction_destroy((CFCFunction*)self);
 }
 
+size_t
+CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf, 
+                           size_t buf_size)
+{
+    CFCUTIL_NULL_CHECK(invoker);
+    size_t needed = strlen(invoker) + 1 + strlen(self->macro_sym) + 1;
+    if (buf_size >= needed) {
+        int check = sprintf(buf, "%s_%s", invoker, self->macro_sym);
+        if (check < 0) { croak("sprintf failed"); }
+    }
+    return needed;
+}
+
+size_t
+CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf, 
+                          size_t buf_size)
+{
+    CFCUTIL_NULL_CHECK(invoker);
+    const char *Prefix = CFCSymbol_get_Prefix((CFCSymbol*)self);
+    size_t needed = strlen(Prefix) + strlen(invoker) + 1 
+                  + strlen(self->macro_sym) + 1;
+    if (buf_size >= needed) {
+        int check = sprintf(buf, "%s%s_%s", Prefix, invoker, self->macro_sym);
+        if (check < 0) { croak("sprintf failed"); }
+    }
+    return needed;
+}
+
+size_t
+CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf, 
+                          size_t buf_size)
+{
+    CFCUTIL_NULL_CHECK(invoker);
+    size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0) 
+                  + strlen("_OFFSET");
+    if (buf_size >= needed) {
+        CFCMethod_full_method_sym(self, invoker, buf, buf_size);
+        strcat(buf, "_OFFSET");
+    }
+    return needed;
+}
+
 const char*
 CFCMethod_get_macro_sym(CFCMethod *self)
 {
