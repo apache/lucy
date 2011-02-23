@@ -584,10 +584,14 @@ ALIAS:
     get_macro_sym      = 2
     _set_short_typedef = 3
     short_typedef      = 4
-    abstract           = 6
-    _set_novel         = 7
-    novel              = 8
-    final              = 10
+    full_typedef       = 6
+    full_callback_sym  = 8
+    full_override_sym  = 10
+    abstract           = 12
+    _set_novel         = 13
+    novel              = 14
+    final              = 16
+    self_type          = 18
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -604,17 +608,37 @@ PPCODE:
                 retval = newSVpvn(short_typedef, strlen(short_typedef));
             }
             break;
-        case 6:
+        case 6: {
+                const char *value = CFCMethod_full_typedef(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 8: {
+                const char *value = CFCMethod_full_callback_sym(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 10: {
+                const char *value = CFCMethod_full_override_sym(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 12:
             retval = newSViv(CFCMethod_abstract(self));
             break;
-        case 7:
+        case 13:
             CFCMethod_set_novel(self, !!SvIV(ST(1)));
             break;
-        case 8:
+        case 14:
             retval = newSViv(CFCMethod_novel(self));
             break;
-        case 10:
+        case 16:
             retval = newSViv(CFCMethod_final(self));
+            break;
+        case 18: {
+                CFCType *type = CFCMethod_self_type(self);
+                retval = newRV(CFCBase_get_perl_obj((CFCBase*)type));
+            }
             break;
     END_SET_OR_GET_SWITCH
 }

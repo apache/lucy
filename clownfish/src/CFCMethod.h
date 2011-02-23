@@ -51,6 +51,15 @@ CFCMethod_set_short_typedef(CFCMethod *self, const char *short_typedef);
 const char*
 CFCMethod_short_typedef(CFCMethod *self);
 
+const char*
+CFCMethod_full_typedef(CFCMethod *self);
+
+const char*
+CFCMethod_full_callback_sym(CFCMethod *self);
+
+const char*
+CFCMethod_full_override_sym(CFCMethod *self);
+
 int
 CFCMethod_final(CFCMethod *self);
 
@@ -62,6 +71,9 @@ CFCMethod_set_novel(CFCMethod *self, int is_novel);
 
 int
 CFCMethod_novel(CFCMethod *self);
+
+struct CFCType*
+CFCMethod_self_type(CFCMethod *self);
 
 #endif /* H_CFCMETHOD */
 

@@ -73,8 +73,6 @@ sub new {
     return $self;
 }
 
-sub self_type { shift->get_param_list->get_variables->[0]->get_type }
-
 sub short_method_sym {
     my ( $self, $invoker ) = @_;
     confess("Missing invoker") unless $invoker;
@@ -91,14 +89,6 @@ sub full_offset_sym {
     my ( $self, $invoker ) = @_;
     confess("Missing invoker") unless $invoker;
     return $self->full_method_sym($invoker) . '_OFFSET';
-}
-
-sub full_callback_sym { shift->full_func_sym . "_CALLBACK" }
-sub full_override_sym { shift->full_func_sym . "_OVERRIDE" }
-
-sub full_typedef {
-    my $self = shift;
-    return $self->get_prefix . $self->short_typedef;
 }
 
 sub override {

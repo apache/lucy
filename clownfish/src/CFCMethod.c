@@ -27,6 +27,7 @@
 #include "CFCParamList.h"
 #include "CFCParcel.h"
 #include "CFCDocuComment.h"
+#include "CFCVariable.h"
 
 #ifndef true
     #define true 1
@@ -37,6 +38,9 @@ struct CFCMethod {
     CFCFunction function;
     char *macro_sym;
     char *short_typedef;
+    char *full_typedef;
+    char *full_callback_sym;
+    char *full_override_sym;
     int is_final;
     int is_abstract;
     int is_novel;
@@ -68,8 +72,22 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
         false);
     self->macro_sym     = CFCUtil_strdup(macro_sym);
     self->short_typedef = NULL;
+    self->full_typedef  = NULL;
     self->is_final      = is_final;
     self->is_abstract   = is_abstract;
+
+    const char *full_func_sym = CFCFunction_full_func_sym((CFCFunction*)self);
+    size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
+    self->full_callback_sym = (char*)malloc(amount);
+    self->full_override_sym = (char*)malloc(amount);
+    if (!self->full_callback_sym || !self->full_override_sym) {
+        croak("malloc failed");
+    }
+    int check = sprintf(self->full_callback_sym, "%s_CALLBACK", 
+        full_func_sym);
+    if (check < 0) { croak("sprintf failed"); }
+    check = sprintf(self->full_override_sym, "%s_OVERRIDE", full_func_sym);
+    if (check < 0) { croak("sprintf failed"); }
 
     // Assume that this method is novel until we discover when applying
     // inheritance that it was overridden.
@@ -83,6 +101,9 @@ CFCMethod_destroy(CFCMethod *self)
 {
     free(self->macro_sym);
     free(self->short_typedef);
+    free(self->full_typedef);
+    free(self->full_callback_sym);
+    free(self->full_override_sym);
     CFCFunction_destroy((CFCFunction*)self);
 }
 
@@ -96,13 +117,45 @@ void
 CFCMethod_set_short_typedef(CFCMethod *self, const char *short_typedef)
 {
     free(self->short_typedef);
-    self->short_typedef = short_typedef ? CFCUtil_strdup(short_typedef) : NULL;
+    free(self->full_typedef);
+    if (short_typedef) {
+        self->short_typedef = CFCUtil_strdup(short_typedef);
+        const char *prefix = CFCSymbol_get_prefix((CFCSymbol*)self);
+        size_t amount = strlen(prefix) + strlen(short_typedef) + 1;
+        self->full_typedef = (char*)malloc(amount);
+        if (!self->full_typedef) { croak("malloc failed"); }
+        int check = sprintf(self->full_typedef, "%s%s", prefix,
+            short_typedef);
+        if (check < 0) { croak("sprintf failed"); }
+    }
+    else {
+        self->short_typedef = NULL;
+        self->full_typedef = NULL;
+    }
 }
 
 const char*
 CFCMethod_short_typedef(CFCMethod *self)
 {
     return self->short_typedef;
+}
+
+const char*
+CFCMethod_full_typedef(CFCMethod *self)
+{
+    return self->full_typedef;
+}
+
+const char*
+CFCMethod_full_callback_sym(CFCMethod *self)
+{
+    return self->full_callback_sym;
+}
+
+const char*
+CFCMethod_full_override_sym(CFCMethod *self)
+{
+    return self->full_override_sym;
 }
 
 int
@@ -127,5 +180,12 @@ int
 CFCMethod_novel(CFCMethod *self)
 {
     return self->is_novel;
+}
+
+CFCType*
+CFCMethod_self_type(CFCMethod *self)
+{
+    CFCVariable **vars = CFCParamList_get_variables(self->function.param_list);
+    return CFCVariable_get_type(vars[0]);
 }
 
