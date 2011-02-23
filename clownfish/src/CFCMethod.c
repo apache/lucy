@@ -48,34 +48,88 @@ struct CFCMethod {
 
 CFCMethod*
 CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
-              const char *class_cnick, const char *micro_sym, 
+              const char *class_cnick, const char *macro_sym, 
               CFCType *return_type, CFCParamList *param_list, 
-              CFCDocuComment *docucomment, const char *macro_sym, int is_final, 
-              int is_abstract)
+              CFCDocuComment *docucomment, int is_final, int is_abstract)
 {
     CFCMethod *self = (CFCMethod*)CFCBase_allocate(sizeof(CFCMethod),
         "Clownfish::Method");
     return CFCMethod_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym, return_type, param_list, docucomment, macro_sym,
-        is_final, is_abstract);
+        macro_sym, return_type, param_list, docucomment, is_final, 
+        is_abstract);
+}
+
+static int
+S_validate_macro_sym(const char *macro_sym)
+{
+    if (!macro_sym || !strlen(macro_sym)) { return false; }
+
+    int need_upper  = true;
+    int need_letter = true;
+    for (;; macro_sym++) {
+        if (need_upper  && !isupper(*macro_sym)) { return false; }
+        if (need_letter && !isalpha(*macro_sym)) { return false; }
+        need_upper  = false;
+        need_letter = false;
+
+        // We've reached NULL-termination without problems, so succeed.
+        if (!*macro_sym) { return true; } 
+
+        if (!isalnum(*macro_sym)) {
+            if (*macro_sym != '_') { return false; }
+            need_upper  = true;
+        }
+    }
 }
 
 CFCMethod*
 CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure, 
                const char *class_name, const char *class_cnick, 
-               const char *micro_sym, CFCType *return_type, 
+               const char *macro_sym, CFCType *return_type, 
                CFCParamList *param_list, CFCDocuComment *docucomment, 
-               const char *macro_sym, int is_final, int is_abstract)
+               int is_final, int is_abstract)
 {
+    // Validate macro_sym, derive micro_sym.
+    if (!S_validate_macro_sym(macro_sym)) {
+        croak("Invalid macro_sym: '%s'", macro_sym ? macro_sym : "[NULL]");
+    }
+    char *micro_sym = CFCUtil_strdup(macro_sym);
+    size_t i;
+    for (i = 0; micro_sym[i] != '\0'; i++) {
+        micro_sym[i] = tolower(micro_sym[i]);
+    }
+
+    // Super-init and clean up derived micro_sym.
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
         class_cnick, micro_sym, return_type, param_list, docucomment,
         false);
+    free(micro_sym);
+
+    // Verify that the first element in the arg list is a self.
+    CFCVariable **args = CFCParamList_get_variables(param_list);
+    if (!args[0]) { croak("Missing 'self' argument"); }
+    CFCType *type = CFCVariable_get_type(args[0]);
+    const char *specifier = CFCType_get_specifier(type);
+    const char *prefix    = CFCSymbol_get_prefix((CFCSymbol*)self);
+    const char *last_colon = strrchr(class_name, ':');
+    const char *struct_sym = last_colon ? last_colon + 1 : class_name;
+    char *wanted = (char*)malloc(strlen(prefix) + strlen(struct_sym) + 1);
+    if (!wanted) { croak("malloc failed"); }
+    sprintf(wanted, "%s%s", prefix, struct_sym);
+    int mismatch = strcmp(wanted, specifier);
+    free(wanted);
+    if (mismatch) { 
+        croak("First arg type doesn't match class: '%s' '%s", class_name,
+            specifier);
+    }
+
     self->macro_sym     = CFCUtil_strdup(macro_sym);
     self->short_typedef = NULL;
     self->full_typedef  = NULL;
     self->is_final      = is_final;
     self->is_abstract   = is_abstract;
 
+    // Derive more symbols.
     const char *full_func_sym = CFCFunction_full_func_sym((CFCFunction*)self);
     size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
     self->full_callback_sym = (char*)malloc(amount);
@@ -92,6 +146,13 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     // Assume that this method is novel until we discover when applying
     // inheritance that it was overridden.
     self->is_novel = 1;
+
+    // Cache typedef.
+    const char *short_sym = CFCSymbol_short_sym((CFCSymbol*)self);
+    char *short_typedef = (char*)malloc(strlen(short_sym) + 3);
+    sprintf(short_typedef, "%s_t", short_sym);
+    CFCMethod_set_short_typedef(self, short_typedef);
+    free(short_typedef);
 
     return self;
 }

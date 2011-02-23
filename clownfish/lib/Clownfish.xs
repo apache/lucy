@@ -542,17 +542,16 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Method
 
 SV*
-_new(klass, parcel, exposure_sv, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, macro_sym, is_final, is_abstract)
+_new(klass, parcel, exposure_sv, class_name_sv, class_cnick_sv, macro_sym, return_type, param_list, docucomment, is_final, is_abstract)
     const char *klass;
     CFCParcel *parcel;
     SV *exposure_sv;
     SV *class_name_sv;
     SV *class_cnick_sv;
-    SV *micro_sym_sv;
+    const char *macro_sym;
     CFCType *return_type;
     CFCParamList *param_list;
     CFCDocuComment *docucomment;
-    const char *macro_sym;
     int is_final;
     int is_abstract;
 CODE:
@@ -562,11 +561,9 @@ CODE:
                            ? SvPV_nolen(class_name_sv) : NULL;
     const char *class_cnick = SvOK(class_cnick_sv) 
                             ? SvPV_nolen(class_cnick_sv) : NULL;
-    const char *micro_sym = SvOK(micro_sym_sv) 
-                            ? SvPV_nolen(micro_sym_sv) : NULL;
     CFCMethod *self = CFCMethod_new(parcel, exposure, class_name, class_cnick,
-        micro_sym, return_type, param_list, docucomment, macro_sym, 
-        is_final, is_abstract);
+        macro_sym, return_type, param_list, docucomment, is_final, 
+        is_abstract);
     RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL

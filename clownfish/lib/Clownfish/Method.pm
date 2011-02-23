@@ -39,38 +39,14 @@ sub new {
     verify_args( \%new_PARAMS, %args ) or confess $@;
     $args{abstract} ||= 0;
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-    $args{final} = 0 unless defined $args{final};
-
-    # Validate macro_sym, derive micro_sym.
-    my $macro_sym = $args{macro_sym};
-    confess("macro_sym is required") unless defined $macro_sym;
-    confess("Invalid macro_sym: '$macro_sym'")
-        unless $macro_sym =~ /^[A-Z][A-Za-z0-9]*(?:_[A-Z0-9][A-Za-z0-9]*)*$/;
-    $args{micro_sym} = lc($macro_sym);
-
-    # Create self, add in novel member vars.
+    $args{final} ||= 0;
     my $package = ref($either) || $either;
-    my $self = $package->_new(
+    return $package->_new(
         @args{
-            qw( parcel exposure class_name class_cnick micro_sym
-                return_type param_list docucomment macro_sym 
-                final abstract )
+            qw( parcel exposure class_name class_cnick macro_sym
+                return_type param_list docucomment final abstract )
             }
     );
-
-    # Verify that the first element in the arg list is a self.
-    my $args = $self->get_param_list->get_variables;
-    confess "Not enough args" unless @$args;
-    my $specifier  = $args->[0]->get_type->get_specifier;
-    my $class_name = $self->get_class_name;
-    my ($struct_sym) = $class_name =~ /(\w+)$/;
-    confess "First arg type doesn't match class: $class_name $specifier"
-        unless $specifier eq $self->get_prefix . $struct_sym;
-
-    # Cache typedef.
-    $self->_set_short_typedef( $self->short_sym . "_t" );
-
-    return $self;
 }
 
 sub override {

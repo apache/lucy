@@ -26,18 +26,18 @@ struct CFCDocuComment;
 CFCMethod*
 CFCMethod_new(struct CFCParcel *parcel, const char *exposure, 
               const char *class_name, const char *class_cnick, 
-              const char *micro_sym, struct CFCType *return_type, 
+              const char *macro_sym, struct CFCType *return_type, 
               struct CFCParamList *param_list, 
-              struct CFCDocuComment *docucomment, const char *macro_sym, 
-              int is_final, int is_abstract);
+              struct CFCDocuComment *docucomment, int is_final, 
+              int is_abstract);
 
 CFCMethod*
 CFCMethod_init(CFCMethod *self, struct CFCParcel *parcel,
                const char *exposure, const char *class_name, 
-               const char *class_cnick, const char *micro_sym, 
+               const char *class_cnick, const char *macro_sym, 
                struct CFCType *return_type, struct CFCParamList *param_list,
-               struct CFCDocuComment *docucomment, const char *macro_sym, 
-               int is_final, int is_abstract);
+               struct CFCDocuComment *docucomment, int is_final, 
+               int is_abstract);
 
 void
 CFCMethod_destroy(CFCMethod *self);
