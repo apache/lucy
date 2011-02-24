@@ -49,47 +49,6 @@ sub new {
     );
 }
 
-sub override {
-    my ( $self, $orig ) = @_;
-
-    # Check that the override attempt is legal.
-    if ( $orig->final ) {
-        my $orig_micro_sym = $orig->micro_sym;
-        my $orig_class     = $orig->get_class_name;
-        my $class_name     = $self->get_class_name;
-        confess(  "Attempt to override final method '$orig_micro_sym' "
-                . " from $orig_class by $class_name" );
-    }
-    if ( !$self->compatible($orig) ) {
-        my $func_name = $self->full_func_sym;
-        my $orig_func = $orig->full_func_sym;
-        confess("Non-matching signatures for $func_name and $orig_func");
-    }
-
-    # Mark the Method as no longer novel.
-    $self->_set_novel(0);
-}
-
-sub finalize {
-    my $self      = shift;
-    my $finalized = $self->new(
-        return_type => $self->get_return_type,
-        class_name  => $self->get_class_name,
-        class_cnick => $self->get_class_cnick,
-        param_list  => $self->get_param_list,
-        macro_sym   => $self->get_macro_sym,
-        docucomment => $self->get_docucomment,
-        parcel      => $self->get_parcel,
-        abstract    => $self->abstract,
-        final       => $self->final,
-        exposure    => $self->get_exposure,
-        final       => 1,
-    );
-    $finalized->_set_short_typedef( $self->short_typedef );
-    $finalized->_set_novel( $self->final );
-    return $finalized;
-}
-
 1;
 
 __END__

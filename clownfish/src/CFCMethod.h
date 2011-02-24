@@ -42,6 +42,15 @@ CFCMethod_init(CFCMethod *self, struct CFCParcel *parcel,
 void
 CFCMethod_destroy(CFCMethod *self);
 
+int
+CFCMethod_compatible(CFCMethod *self, CFCMethod *other);
+
+void
+CFCMethod_override(CFCMethod *self, CFCMethod *orig);
+
+CFCMethod*
+CFCMethod_finalize(CFCMethod *self);
+
 /** 
  * @return the number of bytes which the symbol would occupy.
  */
@@ -66,9 +75,6 @@ CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf,
 const char*
 CFCMethod_get_macro_sym(CFCMethod *self);
 
-void
-CFCMethod_set_short_typedef(CFCMethod *self, const char *short_typedef);
-
 const char*
 CFCMethod_short_typedef(CFCMethod *self);
 
@@ -86,9 +92,6 @@ CFCMethod_final(CFCMethod *self);
 
 int
 CFCMethod_abstract(CFCMethod *self);
-
-void
-CFCMethod_set_novel(CFCMethod *self, int is_novel);
 
 int
 CFCMethod_novel(CFCMethod *self);

@@ -582,6 +582,22 @@ CODE:
     RETVAL = CFCMethod_compatible(self, other);
 OUTPUT: RETVAL
 
+void
+override(self, other)
+    CFCMethod *self;
+    CFCMethod *other;
+PPCODE:
+    CFCMethod_override(self, other);
+
+SV*
+finalize(self)
+    CFCMethod *self;
+CODE:
+    CFCMethod *finalized = CFCMethod_finalize(self);
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)finalized));
+    CFCBase_decref((CFCBase*)finalized);
+OUTPUT: RETVAL
+
 SV*
 _various_method_syms(self, invoker)
     CFCMethod *self;
@@ -621,13 +637,11 @@ _set_or_get(self, ...)
     CFCMethod *self;
 ALIAS:
     get_macro_sym      = 2
-    _set_short_typedef = 3
     short_typedef      = 4
     full_typedef       = 6
     full_callback_sym  = 8
     full_override_sym  = 10
     abstract           = 12
-    _set_novel         = 13
     novel              = 14
     final              = 16
     self_type          = 18
@@ -638,9 +652,6 @@ PPCODE:
                 const char *macro_sym = CFCMethod_get_macro_sym(self);
                 retval = newSVpvn(macro_sym, strlen(macro_sym));
             }
-            break;
-        case 3:
-            CFCMethod_set_short_typedef(self, SvPV_nolen(ST(1)));
             break;
         case 4: {
                 const char *short_typedef = CFCMethod_short_typedef(self);
@@ -664,9 +675,6 @@ PPCODE:
             break;
         case 12:
             retval = newSViv(CFCMethod_abstract(self));
-            break;
-        case 13:
-            CFCMethod_set_novel(self, !!SvIV(ST(1)));
             break;
         case 14:
             retval = newSViv(CFCMethod_novel(self));

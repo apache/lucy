@@ -46,6 +46,9 @@ struct CFCMethod {
     int is_novel;
 };
 
+static void
+S_update_typedefs(CFCMethod *self, const char *short_sym);
+
 CFCMethod*
 CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *macro_sym, 
@@ -143,12 +146,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     // inheritance that it was overridden.
     self->is_novel = 1;
 
-    // Cache typedef.
-    const char *short_sym = CFCSymbol_short_sym((CFCSymbol*)self);
-    char *short_typedef = (char*)MALLOCATE(strlen(short_sym) + 3);
-    sprintf(short_typedef, "%s_t", short_sym);
-    CFCMethod_set_short_typedef(self, short_typedef);
-    FREEMEM(short_typedef);
+    // Cache typedefs.
+    S_update_typedefs(self, CFCSymbol_short_sym((CFCSymbol*)self));
 
     return self;
 }
@@ -212,6 +211,43 @@ CFCMethod_compatible(CFCMethod *self, CFCMethod *other)
     return true;
 }
 
+void
+CFCMethod_override(CFCMethod *self, CFCMethod *orig)
+{
+    // Check that the override attempt is legal.
+    if (CFCMethod_final(orig)) {
+        const char *orig_class = CFCSymbol_get_class_name((CFCSymbol*)orig);
+        const char *my_class   = CFCSymbol_get_class_name((CFCSymbol*)self);
+        croak("Attempt to override final method '%s' from '%s' by '%s'",
+            orig->macro_sym, orig_class, my_class);
+    }
+    if (!CFCMethod_compatible(self, orig)) {
+        const char *func      = CFCFunction_full_func_sym((CFCFunction*)self);
+        const char *orig_func = CFCFunction_full_func_sym((CFCFunction*)orig);
+        croak("Non-matching signatures for %s and %s", func, orig_func);
+    }
+
+    // Mark the Method as no longer novel.
+    self->is_novel = false;
+}
+
+CFCMethod*
+CFCMethod_finalize(CFCMethod *self)
+{
+    CFCSymbol *self_sym = (CFCSymbol*)self;
+    CFCParcel *parcel = CFCSymbol_get_parcel(self_sym);
+    const char *exposure = CFCSymbol_get_exposure(self_sym);
+    const char *class_name = CFCSymbol_get_class_name(self_sym);
+    const char *class_cnick = CFCSymbol_get_class_cnick(self_sym);
+    CFCMethod *finalized = CFCMethod_new(parcel, exposure, class_name,
+        class_cnick, self->macro_sym, self->function.return_type,
+        self->function.param_list, self->function.docucomment, true,
+        self->is_abstract);
+    finalized->is_novel = self->is_final; // Is this right?
+    S_update_typedefs(finalized, CFCSymbol_short_sym((CFCSymbol*)self));
+    return finalized;
+}
+
 size_t
 CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf, 
                            size_t buf_size)
@@ -260,18 +296,20 @@ CFCMethod_get_macro_sym(CFCMethod *self)
     return self->macro_sym;
 }
 
-void
-CFCMethod_set_short_typedef(CFCMethod *self, const char *short_typedef)
+static void
+S_update_typedefs(CFCMethod *self, const char *short_sym)
 {
     FREEMEM(self->short_typedef);
     FREEMEM(self->full_typedef);
-    if (short_typedef) {
-        self->short_typedef = CFCUtil_strdup(short_typedef);
+    if (short_sym) {
         const char *prefix = CFCSymbol_get_prefix((CFCSymbol*)self);
-        size_t amount = strlen(prefix) + strlen(short_typedef) + 1;
+        size_t amount = strlen(short_sym) + 3;
+        self->short_typedef = (char*)MALLOCATE(amount);
+        int check = sprintf(self->short_typedef, "%s_t", short_sym);
+        if (check < 0) { croak("sprintf failed"); }
+        amount += strlen(prefix);
         self->full_typedef = (char*)MALLOCATE(amount);
-        int check = sprintf(self->full_typedef, "%s%s", prefix,
-            short_typedef);
+        check = sprintf(self->full_typedef, "%s%s_t", prefix, short_sym);
         if (check < 0) { croak("sprintf failed"); }
     }
     else {
@@ -314,12 +352,6 @@ int
 CFCMethod_abstract(CFCMethod *self)
 {
     return self->is_abstract;
-}
-
-void
-CFCMethod_set_novel(CFCMethod *self, int is_novel)
-{
-    self->is_novel = !!is_novel;
 }
 
 int
