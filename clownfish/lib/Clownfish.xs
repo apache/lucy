@@ -574,6 +574,14 @@ DESTROY(self)
 PPCODE:
     CFCMethod_destroy(self);
 
+int
+compatible(self, other)
+    CFCMethod *self;
+    CFCMethod *other;
+CODE:
+    RETVAL = CFCMethod_compatible(self, other);
+OUTPUT: RETVAL
+
 SV*
 _various_method_syms(self, invoker)
     CFCMethod *self;

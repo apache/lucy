@@ -164,6 +164,54 @@ CFCMethod_destroy(CFCMethod *self)
     CFCFunction_destroy((CFCFunction*)self);
 }
 
+int
+CFCMethod_compatible(CFCMethod *self, CFCMethod *other)
+{
+    if (!other) { return false; }
+    if (strcmp(self->macro_sym, other->macro_sym)) { return false; }
+    int my_public = CFCSymbol_public((CFCSymbol*)self);
+    int other_public = CFCSymbol_public((CFCSymbol*)self);
+    if (!!my_public != !!other_public) { return false; }
+
+    // Check arguments and initial values.
+    CFCParamList *my_param_list    = self->function.param_list;
+    CFCParamList *other_param_list = other->function.param_list;
+    CFCVariable **my_args    = CFCParamList_get_variables(my_param_list);
+    CFCVariable **other_args = CFCParamList_get_variables(other_param_list);
+    const char  **my_vals    = CFCParamList_get_initial_values(my_param_list);
+    const char  **other_vals = CFCParamList_get_initial_values(other_param_list);
+    size_t i;
+    for (i = 1; ; i++) {  // start at 1, skipping self
+        if (!!my_args[i] != !!other_args[i]) { return false; }
+        if (!!my_vals[i] != !!other_vals[i]) { return false; }
+        if (my_vals[i]) {
+            if (strcmp(my_vals[i], other_vals[i])) { return false; }
+        }
+        if (my_args[i]) {
+            if (!CFCVariable_equals(my_args[i], other_args[i])) { 
+                return false; 
+            }
+        }
+        else {
+            break;
+        }
+    }
+
+    // Check return types.
+    CFCType *type       = CFCFunction_get_return_type((CFCFunction*)self);
+    CFCType *other_type = CFCFunction_get_return_type((CFCFunction*)other);
+    if (CFCType_is_object(type)) {
+        // Weak validation to allow covariant object return types.
+        if (!CFCType_is_object(other_type)) { return false; }
+        if (!CFCType_similar(type, other_type)) { return false; }
+    }
+    else {
+        if (!CFCType_equals(type, other_type)) { return false; }
+    }
+
+    return true;
+}
+
 size_t
 CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf, 
                            size_t buf_size)

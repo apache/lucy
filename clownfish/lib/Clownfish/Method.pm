@@ -70,46 +70,6 @@ sub override {
     $self->_set_novel(0);
 }
 
-sub compatible {
-    my ( $self, $other ) = @_;
-    return 0 unless $self->get_macro_sym eq $other->get_macro_sym;
-    return 0 if ( $self->public xor $other->public );
-    my $param_list       = $self->get_param_list;
-    my $other_param_list = $other->get_param_list;
-    my $arg_vars         = $param_list->get_variables;
-    my $other_vars       = $other_param_list->get_variables;
-    my $initial_vals     = $param_list->get_initial_values;
-    my $other_vals       = $other_param_list->get_initial_values;
-    return 0 unless @$arg_vars == @$other_vars;
-    return 0 unless @$initial_vals == @$other_vals;
-
-    # Validate initial values.
-    for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
-        return 0 unless $other_vars->[$i]->equals( $arg_vars->[$i] );
-        my $val       = $initial_vals->[$i];
-        my $other_val = $other_vals->[$i];
-        if ( defined $val ) {
-            return 0 unless defined $other_val;
-            return 0 unless $val eq $other_val;
-        }
-        else {
-            return 0 if defined $other_val;
-        }
-    }
-
-    # Weak validation of return type to allow covariant object return types.
-    my $return_type       = $self->get_return_type;
-    my $other_return_type = $other->get_return_type;
-    if ( $return_type->is_object ) {
-        return 0 unless $return_type->similar($other_return_type);
-    }
-    else {
-        return 0 unless $return_type->equals($other_return_type);
-    }
-
-    return 1;
-}
-
 sub finalize {
     my $self      = shift;
     my $finalized = $self->new(
