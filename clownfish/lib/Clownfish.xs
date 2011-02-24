@@ -129,6 +129,13 @@ PPCODE:
     CFCClass_append_autocode(self, autocode);
 
 void
+add_child(self, child)
+    CFCClass *self;
+    CFCClass *child;
+PPCODE:
+    CFCClass_add_child(self, child);
+
+void
 _set_or_get(self, ...)
     CFCClass *self;
 ALIAS:
@@ -149,6 +156,7 @@ ALIAS:
     full_vtable_type      = 26
     include_h             = 28
     get_docucomment       = 30
+    children              = 32
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -239,6 +247,18 @@ PPCODE:
                        : newSV(0);
             }
             break;
+        case 32: {
+            AV *av = newAV();
+            CFCClass **children = CFCClass_children(self);
+            size_t i;
+            for (i = 0; children[i] != NULL; i++) {
+                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)children[i]));
+                av_store(av, i, val);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
     END_SET_OR_GET_SWITCH
 }
 

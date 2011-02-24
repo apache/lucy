@@ -31,7 +31,6 @@ use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
 our %cnick;
-our %children;
 our %attributes;
 our %meth_by_name;
 our %func_by_name;
@@ -147,7 +146,6 @@ sub create {
         @args{qw( parcel exposure class_name class_cnick micro_sym
         docucomment source_class parent_class_name final inert )} );
 
-    $children{$self}          = [];
     $attributes{$self}        = $attributes;
     $meth_by_name{$self}      = \%methods_by_name;
     $func_by_name{$self}      = \%functions_by_name;
@@ -172,7 +170,6 @@ sub create {
 
 sub DESTROY {
     my $self = shift;
-    delete $children{$self};
     delete $attributes{$self};
     delete $meth_by_name{$self};
     delete $func_by_name{$self};
@@ -196,7 +193,6 @@ sub functions   { $functions{ +shift } }
 sub methods     { $methods{ +shift } }
 sub member_vars { $member_vars{ +shift } }
 sub inert_vars  { $inert_vars{ +shift } }
-sub children    { $children{ +shift } }
 
 sub novel_methods {
     my $self    = shift;
@@ -234,12 +230,6 @@ sub novel_method {
     else {
         return;
     }
-}
-
-sub add_child {
-    my ( $self, $child ) = @_;
-    confess("Can't call add_child after grow_tree") if $self->_tree_grown;
-    push @{ $self->children }, $child;
 }
 
 sub add_method {

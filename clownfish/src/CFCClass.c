@@ -38,6 +38,8 @@ struct CFCClass {
     int tree_grown;
     CFCDocuComment *docucomment;
     struct CFCClass *parent;
+    struct CFCClass **children;
+    size_t num_kids;
     char *autocode;
     char *source_class;
     char *parent_class_name;
@@ -77,6 +79,8 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel,
     self->parent     = NULL;
     self->tree_grown = false;
     self->autocode   = (char*)CALLOCATE(1, sizeof(char));
+    self->children   = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
+    self->num_kids   = 0;
     self->parent_class_name = CFCUtil_strdup(parent_class_name);
     self->docucomment 
         = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);
@@ -140,6 +144,11 @@ CFCClass_destroy(CFCClass *self)
 {
     CFCBase_decref((CFCBase*)self->docucomment);
     CFCBase_decref((CFCBase*)self->parent);
+    size_t i;
+    for (i = 0; self->children[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->children[i]);
+    }
+    FREEMEM(self->children);
     FREEMEM(self->autocode);
     FREEMEM(self->source_class);
     FREEMEM(self->parent_class_name);
@@ -149,6 +158,25 @@ CFCClass_destroy(CFCClass *self)
     FREEMEM(self->full_vtable_var);
     FREEMEM(self->full_vtable_type);
     CFCSymbol_destroy((CFCSymbol*)self);
+}
+
+void
+CFCClass_add_child(CFCClass *self, CFCClass *child)
+{
+    CFCUTIL_NULL_CHECK(child);
+    if (self->tree_grown) { croak("Can't call add_child after grow_tree"); }
+    self->num_kids++;
+    size_t size = (self->num_kids + 1) * sizeof(CFCClass*);
+    self->children = (CFCClass**)REALLOCATE(self->children, size);
+    self->children[self->num_kids - 1] 
+        = (CFCClass*)CFCBase_incref((CFCBase*)child);
+    self->children[self->num_kids] = NULL;
+}
+
+CFCClass**
+CFCClass_children(CFCClass *self)
+{
+    return self->children;
 }
 
 const char*

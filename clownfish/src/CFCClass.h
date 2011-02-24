@@ -39,6 +39,12 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel,
 void
 CFCClass_destroy(CFCClass *self);
 
+void
+CFCClass_add_child(CFCClass *self, CFCClass *child);
+
+CFCClass**
+CFCClass_children(CFCClass *self);
+
 const char*
 CFCClass_get_cnick(CFCClass *self);
 
