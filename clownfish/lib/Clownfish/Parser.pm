@@ -487,21 +487,22 @@ sub new_class {
         }
     }
 
-    return Clownfish::Class->create(
+    my $class = Clownfish::Class->create(
         parcel            => $parcel,
         class_name        => $item->{class_name},
         cnick             => $item->{'cnick(?)'}[0],
         parent_class_name => $item->{'class_inheritance(?)'}[0],
-        member_vars       => \@member_vars,
-        functions         => \@functions,
-        methods           => \@methods,
-        inert_vars        => \@inert_vars,
         docucomment       => $item->{'docucomment(?)'}[0],
         source_class      => $source_class,
         inert             => $class_modifiers{inert},
         final             => $class_modifiers{final},
         attributes        => \%class_attributes,
     );
+    $class->add_method($_)     for @methods;
+    $class->add_function($_)   for @functions;
+    $class->add_member_var($_) for @member_vars;
+    $class->add_inert_var($_)  for @inert_vars;
+    return $class;
 }
 
 sub new_file {

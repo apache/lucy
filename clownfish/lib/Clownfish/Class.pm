@@ -45,10 +45,6 @@ our %create_PARAMS = (
     class_name        => undef,
     cnick             => undef,
     parent_class_name => undef,
-    methods           => undef,
-    functions         => undef,
-    member_vars       => undef,
-    inert_vars        => undef,
     docucomment       => undef,
     inert             => undef,
     final             => undef,
@@ -102,41 +98,10 @@ sub create {
     $args{inert} ||= 0;
     $args{final} ||= 0;
 
-    # Verify that members of supplied arrays meet "is a" requirements.
-    my $functions   = delete $args{functions}   || [];
-    my $methods     = delete $args{methods}     || [];
-    my $member_vars = delete $args{member_vars} || [];
-    my $inert_vars  = delete $args{inert_vars}  || [];
-    for (qw( functions methods member_vars inert_vars )) {
-        next unless defined $args{$_};
-        next if reftype( $args{$_} ) eq 'ARRAY';
-        confess("Supplied parameter '$_' is not an arrayref");
-    }
-    for (@$functions) {
-        confess("Not a Clownfish::Function")
-            unless a_isa_b( $_, 'Clownfish::Function' );
-    }
-    for (@$methods) {
-        confess("Not a Clownfish::Method")
-            unless a_isa_b( $_, 'Clownfish::Method' );
-    }
-    for ( @$member_vars, @$inert_vars ) {
-        confess("Not a Clownfish::Variable")
-            unless a_isa_b( $_, 'Clownfish::Variable' );
-    }
-
-    # Make it possible to look up methods and functions by name.
-    my %methods_by_name   = map { ( $_->micro_sym => $_ ) } @$methods;
-    my %functions_by_name = map { ( $_->micro_sym => $_ ) } @$functions;
-
     # Validate attributes.
     my $attributes = delete $args{attributes} || {};
     confess("Param 'attributes' not a hashref")
         unless reftype($attributes) eq 'HASH';
-
-    # Validate inert param.
-    confess("Inert classes can't have methods")
-        if ( $args{inert} and scalar @$methods );
 
     my $package = ref($either) || $either;
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
@@ -147,12 +112,12 @@ sub create {
         docucomment source_class parent_class_name final inert )} );
 
     $attributes{$self}        = $attributes;
-    $meth_by_name{$self}      = \%methods_by_name;
-    $func_by_name{$self}      = \%functions_by_name;
-    $functions{$self}         = $functions;
-    $methods{$self}           = $methods;
-    $member_vars{$self}       = $member_vars;
-    $inert_vars{$self}        = $inert_vars;
+    $meth_by_name{$self}      = {};
+    $func_by_name{$self}      = {};
+    $functions{$self}         = [];
+    $methods{$self}           = [];
+    $member_vars{$self}       = [];
+    $inert_vars{$self}        = [];
     $overridden{$self}        = {};
 
     # Store in registry.
@@ -239,6 +204,28 @@ sub add_method {
     confess("Can't add_method to an inert class")    if $self->inert;
     push @{ $self->methods }, $method;
     $self->_meth_by_name->{ $method->micro_sym } = $method;
+}
+
+sub add_function {
+    my ( $self, $function ) = @_;
+    confess("Not a Function") unless a_isa_b( $function, "Clownfish::Function" );
+    confess("Can't call add_function after grow_tree") if $self->_tree_grown;
+    push @{ $self->functions }, $function;
+    $self->_func_by_name->{ $function->micro_sym } = $function;
+}
+
+sub add_member_var {
+    my ( $self, $var ) = @_;
+    confess("Not a Variable") unless a_isa_b( $var, "Clownfish::Variable" );
+    confess("Can't call add_member_var after grow_tree") if $self->_tree_grown;
+    push @{ $self->member_vars }, $var;
+}
+
+sub add_inert_var {
+    my ( $self, $var ) = @_;
+    confess("Not a Variable") unless a_isa_b( $var, "Clownfish::Variable" );
+    confess("Can't call add_inert_var after grow_tree") if $self->_tree_grown;
+    push @{ $self->inert_vars }, $var;
 }
 
 # Create dumpable functions unless hand coded versions were supplied.
@@ -369,10 +356,6 @@ Retrieve a Class, if one has already been created.
         source_class      => undef,              # default: same as class_name
         parent_class_name => 'Crustacean::Claw', # default: undef
         inert             => undef,              # default: undef
-        methods           => \@methods,          # default: []
-        functions         => \@funcs,            # default: []
-        member_vars       => \@members,          # default: []
-        inert_vars        => \@inert_vars,       # default: []
         docucomment       => $documcom,          # default: undef,
         attributes        => \%attributes,       # default: {}
     );
@@ -394,17 +377,6 @@ in order to establish the class hierarchy.
 
 =item * B<inert> - Should be true if the class is inert, i.e. cannot be
 instantiated.
-
-=item * B<methods> - An array where each element is a Clownfish::Method.
-
-=item * B<functions> - An array where each element is a Clownfish::Method.
-
-=item * B<member_vars> - An array where each element is a
-Clownfish::Variable and should be a member variable in each instantiated
-object.
-
-=item * B<inert_vars> - An array where each element is a
-Clownfish::Variable and should be a shared (class) variable.
 
 =item * B<docucomment> - A Clownfish::DocuComment describing this Class.
 
@@ -436,6 +408,25 @@ Add a child class.
     $class->add_method($method);
 
 Add a Method to the class.  Valid only before grow_tree() is called.
+
+=head2 add_function
+
+    $class->add_function($function);
+
+Add a Function to the class.  Valid only before grow_tree() is called.
+
+=head2 add_member_var
+
+    $class->add_member_var($var);
+
+Add a member variable to the class.  Valid only before grow_tree() is called.
+
+=head2 add_inert_var
+
+    $class->add_inert_var($var);
+
+Add an inert (class) variable to the class.  Valid only before grow_tree() is
+called.
 
 =head2 function 
 

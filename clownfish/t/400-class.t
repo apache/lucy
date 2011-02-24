@@ -41,14 +41,14 @@ my $tread_water = Clownfish::Function->new(
     param_list  => $parser->param_list('()'),
 );
 my %foo_create_args = (
-    parcel      => 'Neato',
-    class_name  => 'Foo',
-    member_vars => [$thing],
-    inert_vars  => [$widget],
-    functions   => [$tread_water],
+    parcel     => 'Neato',
+    class_name => 'Foo',
 );
 
 my $foo = Clownfish::Class->create(%foo_create_args);
+$foo->add_function($tread_water);
+$foo->add_member_var($thing);
+$foo->add_inert_var($widget);
 eval { Clownfish::Class->create(%foo_create_args) };
 like( $@, qr/conflict/i,
     "Can't call create for the same class more than once" );
@@ -99,7 +99,8 @@ my %inert_args = (
     inert      => 1,
 );
 eval {
-    Clownfish::Class->create( %inert_args, methods => [$inert_do_stuff] );
+    my $class = Clownfish::Class->create(%inert_args);
+    $class->add_method($inert_do_stuff);
 };
 like(
     $@,
