@@ -223,6 +223,9 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
 
             // DON'T obtain the lock -- only see whether another
             // entity holds a lock on the snapshot file.
+            if (lock) {
+                Lock_Clear_Stale(lock);
+            }
             if (lock && Lock_Is_Locked(lock)) {
                 // The snapshot file is locked, which means someone's using
                 // that version of the index -- protect all of its entries.
