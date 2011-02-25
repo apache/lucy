@@ -116,7 +116,9 @@ IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
                     SortSpec *sort_spec)
 {
     Schema        *schema    = IxSearcher_Get_Schema(self);
-    SortCollector *collector = SortColl_new(schema, sort_spec, num_wanted);
+    uint32_t       doc_max   = IxSearcher_Doc_Max(self);
+    uint32_t       wanted    = num_wanted > doc_max ? doc_max : num_wanted;
+    SortCollector *collector = SortColl_new(schema, sort_spec, wanted);
     IxSearcher_Collect(self, query, (Collector*)collector);
     {
         VArray  *match_docs = SortColl_Pop_Match_Docs(collector);

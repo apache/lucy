@@ -52,8 +52,12 @@ Searcher_hits(Searcher *self, Obj *query, uint32_t offset, uint32_t num_wanted,
               SortSpec *sort_spec)
 {
     Query   *real_query = Searcher_Glean_Query(self, query);
-    TopDocs *top_docs   = Searcher_Top_Docs(self, real_query, 
-                                offset + num_wanted, sort_spec);
+    uint32_t doc_max    = Searcher_Doc_Max(self);
+    uint32_t wanted     = offset + num_wanted > doc_max 
+                        ? doc_max 
+                        : offset + num_wanted;
+    TopDocs *top_docs   = Searcher_Top_Docs(self, real_query, wanted, 
+                                            sort_spec);
     Hits    *hits       = Hits_new(self, top_docs, offset);
     DECREF(top_docs);
     DECREF(real_query);
