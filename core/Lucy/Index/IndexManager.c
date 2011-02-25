@@ -275,7 +275,7 @@ IxManager_write_merge_data(IndexManager *self, int64_t cutoff)
     success = Json_spew_json((Obj*)data, self->folder, (CharBuf*)merge_json);
     DECREF(data);
     if (!success) {
-        THROW(ERR, "Failed to write to %o", &merge_json);
+        THROW(ERR, "Failed to write to %o", merge_json);
     }
 }
 
