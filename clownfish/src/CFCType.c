@@ -29,6 +29,7 @@
 #include "CFCBase.h"
 #include "CFCType.h"
 #include "CFCParcel.h"
+#include "CFCSymbol.h"
 #include "CFCUtil.h"
 
 struct CFCType {
@@ -236,7 +237,7 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
     }
     char c_string[MAX_LEN + 1];
     strcpy(c_string, child_c_string);
-    size_t i;
+    int i;
     for (i = 0; i < indirection; i++) {
         strncat(c_string, "*", 1);
     }
@@ -421,7 +422,7 @@ CFCType_const(CFCType *self)
     return !!(self->flags & CFCTYPE_CONST);
 }
 
-int
+void
 CFCType_set_nullable(CFCType *self, int nullable)
 {
     if (nullable) {

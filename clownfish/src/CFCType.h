@@ -99,6 +99,9 @@ const char*
 CFCType_get_array(CFCType *self);
 
 int
+CFCType_const(CFCType *self);
+
+void
 CFCType_set_nullable(CFCType *self, int nullable);
 
 int

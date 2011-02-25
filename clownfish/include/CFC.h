@@ -26,5 +26,6 @@
 #include "CFCParcel.h"
 #include "CFCSymbol.h"
 #include "CFCType.h"
+#include "CFCUtil.h"
 #include "CFCVariable.h"
 
