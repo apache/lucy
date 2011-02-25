@@ -115,7 +115,6 @@ void
 CFCFile_destroy(CFCFile *self)
 {
     size_t i;
-    /*
     for (i = 0; self->blocks[i] != NULL; i++) {
         CFCBase_decref(self->blocks[i]);
     }
@@ -123,7 +122,6 @@ CFCFile_destroy(CFCFile *self)
     for (i = 0; self->classes[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->classes[i]);
     }
-    */
     FREEMEM(self->classes);
     FREEMEM(self->guard_name);
     FREEMEM(self->guard_start);
