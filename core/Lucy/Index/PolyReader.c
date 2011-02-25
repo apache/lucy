@@ -485,28 +485,37 @@ PolyReader_get_seg_readers(PolyReader *self) { return self->sub_readers; }
 uint32_t
 PolyReader_sub_tick(I32Array *offsets, int32_t doc_id)
 {
-    uint32_t lo = 0;
-    uint32_t hi_tick = I32Arr_Get_Size(offsets) - 1;
-    uint32_t hi = hi_tick;
+    int32_t size = I32Arr_Get_Size(offsets);
+    if (size == 0) {
+        return 0;
+    }
     
-    while (hi >= lo) {
-        uint32_t mid = lo + ((hi - lo) / 2);
-        int32_t mid_start = I32Arr_Get(offsets, mid) + 1;
-        if (doc_id < mid_start) {
-            hi = mid - 1;
-        }
-        else if (doc_id > mid_start) {
-            lo = mid + 1;
+    int32_t lo     = -1; 
+    int32_t hi     = size;
+    while (hi - lo > 1) {
+        int32_t mid = lo + ((hi - lo) / 2); 
+        int32_t offset = I32Arr_Get(offsets, mid);
+        if (doc_id <= offset) {
+            hi = mid;
+        }   
+        else {
+            lo = mid;
+        }   
+    }
+    if (hi == size) {
+        hi--;
+    }
+
+    while (hi > 0) {
+        int32_t offset = I32Arr_Get(offsets, hi);
+        if (doc_id <= offset) {
+            hi--;
         }
         else {
-            while (   mid < hi_tick 
-                   && I32Arr_Get(offsets, mid + 1) == mid_start
-            ) {
-                mid++;
-            }
-            return mid;
+            break;
         }
     }
+
     return hi;
 }
     

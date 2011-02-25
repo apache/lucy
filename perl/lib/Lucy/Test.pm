@@ -97,6 +97,9 @@ PPCODE:
     else if (strEQ(package, "TestIndexManager")) {
         lucy_TestIxManager_run_tests();
     }
+    else if (strEQ(package, "TestPolyReader")) {
+        lucy_TestPolyReader_run_tests();
+    }
     else if (strEQ(package, "TestPostingListWriter")) {
         lucy_TestPListWriter_run_tests();
     }
