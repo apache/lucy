@@ -16,9 +16,17 @@
 use strict;
 use warnings;
 use lib 'buildlib';
-use Test::More tests => 1;
+use Test::More;
 use File::Spec::Functions qw( catfile catdir );
 use File::Path qw( rmtree );
+
+system("$^X -MJSON::XS -e1");
+if ($?) {
+    plan( skip_all => 'complicated @INC issue' );
+}
+else {
+    plan( tests => 1 );
+}
 
 my $search_cgi_orig_path = catfile(qw( sample search.cgi ));
 my $indexer_pl_orig_path = catfile(qw( sample indexer.pl ));
