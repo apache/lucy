@@ -27,34 +27,50 @@ use Clownfish::Util qw( slurp_file current verify_args );
 use Clownfish::Class;
 use Clownfish::Parser;
 
+# Inside-out member vars.
+our %source;
+our %dest;
+our %parser;
+our %trees;
+our %files;
+
 our %new_PARAMS = (
     source => undef,
     dest   => undef,
 );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless {
-        parser => Clownfish::Parser->new,
-        trees  => {},
-        files  => {},
-        %new_PARAMS,
-        @_,
-        },
-        ref($either) || $either;
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
     for (qw( source dest)) {
-        confess("Missing required param '$_'") unless $self->{$_};
+        confess("Missing required param '$_'") unless $args{$_};
     }
+    my $package = ref($either) || $either;
+    my $self = $package->_new();
+    $source{$self} = $args{source};
+    $dest{$self}   = $args{dest};
+    $parser{$self} = Clownfish::Parser->new;
+    $trees{$self}  = {};
+    $files{$self}  = {};
     return $self;
 }
 
+sub DESTROY {
+    my $self = shift;
+    delete $parser{$self};
+    delete $trees{$self};
+    delete $files{$self};
+    delete $source{$self};
+    delete $dest{$self};
+    $self->_destroy;
+}
+
 # Accessors.
-sub get_source  { shift->{source} }
-sub get_dest    { shift->{dest} }
-sub _get_trees  { shift->{trees} }
-sub _get_files  { shift->{files} }
-sub _get_parser { shift->{parser} }
+sub get_source  { $source{ +shift } }
+sub get_dest    { $dest{ +shift } }
+sub _get_trees  { $trees{ +shift } }
+sub _get_files  { $files{ +shift } }
+sub _get_parser { $parser{ +shift } }
 
 # Return flattened hierarchies.
 sub ordered_classes {

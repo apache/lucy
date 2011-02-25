@@ -558,6 +558,22 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish    PACKAGE = Clownfish::Hierarchy
+
+SV*
+_new(klass)
+    const char *klass;
+CODE:
+    CFCHierarchy *self = CFCHierarchy_new();
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_destroy(self)
+    CFCHierarchy *self;
+PPCODE:
+    CFCHierarchy_destroy(self);
 
 MODULE = Clownfish    PACKAGE = Clownfish::Method
 

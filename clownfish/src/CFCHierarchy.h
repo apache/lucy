@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+#ifndef H_CFCHIERARCHY
+#define H_CFCHIERARCHY
+
+typedef struct CFCHierarchy CFCHierarchy;
+
+CFCHierarchy*
+CFCHierarchy_new(void);
+
+CFCHierarchy*
+CFCHierarchy_init(CFCHierarchy *self);
+
+void
+CFCHierarchy_destroy(CFCHierarchy *self);
+
+#endif /* H_CFCHIERARCHY */
 

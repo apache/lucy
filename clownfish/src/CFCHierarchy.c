@@ -14,17 +14,37 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
 #include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCVariable.h"
+#include "CFCUtil.h"
+
+struct CFCHierarchy {
+    CFCBase base;
+};
+
+CFCHierarchy*
+CFCHierarchy_new(void)
+{
+    CFCHierarchy *self = (CFCHierarchy*)CFCBase_allocate(sizeof(CFCHierarchy),
+        "Clownfish::Hierarchy");
+    return CFCHierarchy_init(self);
+}
+
+CFCHierarchy*
+CFCHierarchy_init(CFCHierarchy *self) 
+{
+    return self;
+}
+
+void
+CFCHierarchy_destroy(CFCHierarchy *self)
+{
+    CFCBase_destroy((CFCBase*)self);
+}
 
