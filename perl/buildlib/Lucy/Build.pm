@@ -672,7 +672,7 @@ sub _gen_pause_exclusion_list {
         next if $entry =~ m#^(README|Changes)#;
 
         # Allow public modules.
-        if ( $entry =~ m#\blib\b.+\.(pm|pod)$# ) {
+        if ( $entry =~ m#^(perl/)?lib\b.+\.(pm|pod)$# ) {
             open( my $fh, '<', $entry ) or die "Can't open '$entry': $!";
             my $content = do { local $/; <$fh> };
             next if $content =~ /=head1\s*NAME/;
