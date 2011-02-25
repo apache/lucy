@@ -20,13 +20,19 @@
 typedef struct CFCHierarchy CFCHierarchy;
 
 CFCHierarchy*
-CFCHierarchy_new(void);
+CFCHierarchy_new(const char *source, const char *dest);
 
 CFCHierarchy*
-CFCHierarchy_init(CFCHierarchy *self);
+CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest);
 
 void
 CFCHierarchy_destroy(CFCHierarchy *self);
+
+const char*
+CFCHierarchy_get_source(CFCHierarchy *self);
+
+const char*
+CFCHierarchy_get_dest(CFCHierarchy *self);
 
 #endif /* H_CFCHIERARCHY */
 

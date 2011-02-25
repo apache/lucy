@@ -561,10 +561,12 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Hierarchy
 
 SV*
-_new(klass)
+_new(klass, source, dest)
     const char *klass;
+    const char *source;
+    const char *dest;
 CODE:
-    CFCHierarchy *self = CFCHierarchy_new();
+    CFCHierarchy *self = CFCHierarchy_new(source, dest);
     RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -574,6 +576,29 @@ _destroy(self)
     CFCHierarchy *self;
 PPCODE:
     CFCHierarchy_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCHierarchy *self;
+ALIAS:
+    get_source        = 2
+    get_dest          = 4
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *value = CFCHierarchy_get_source(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 4: {
+                const char *value = CFCHierarchy_get_dest(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
 
 MODULE = Clownfish    PACKAGE = Clownfish::Method
 

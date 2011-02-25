@@ -28,8 +28,6 @@ use Clownfish::Class;
 use Clownfish::Parser;
 
 # Inside-out member vars.
-our %source;
-our %dest;
 our %parser;
 our %trees;
 our %files;
@@ -42,13 +40,8 @@ our %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    for (qw( source dest)) {
-        confess("Missing required param '$_'") unless $args{$_};
-    }
     my $package = ref($either) || $either;
-    my $self = $package->_new();
-    $source{$self} = $args{source};
-    $dest{$self}   = $args{dest};
+    my $self = $package->_new( @args{qw( source dest )} );
     $parser{$self} = Clownfish::Parser->new;
     $trees{$self}  = {};
     $files{$self}  = {};
@@ -60,14 +53,10 @@ sub DESTROY {
     delete $parser{$self};
     delete $trees{$self};
     delete $files{$self};
-    delete $source{$self};
-    delete $dest{$self};
     $self->_destroy;
 }
 
 # Accessors.
-sub get_source  { $source{ +shift } }
-sub get_dest    { $dest{ +shift } }
 sub _get_trees  { $trees{ +shift } }
 sub _get_files  { $files{ +shift } }
 sub _get_parser { $parser{ +shift } }
