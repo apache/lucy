@@ -36,8 +36,6 @@ our %meth_by_name;
 our %func_by_name;
 our %functions;
 our %methods;
-our %member_vars;
-our %inert_vars;
 our %overridden;
 
 our %create_PARAMS = (
@@ -116,8 +114,6 @@ sub create {
     $func_by_name{$self}      = {};
     $functions{$self}         = [];
     $methods{$self}           = [];
-    $member_vars{$self}       = [];
-    $inert_vars{$self}        = [];
     $overridden{$self}        = {};
 
     # Store in registry.
@@ -140,8 +136,6 @@ sub DESTROY {
     delete $func_by_name{$self};
     delete $functions{$self};
     delete $methods{$self};
-    delete $member_vars{$self};
-    delete $inert_vars{$self};
     delete $overridden{$self};
     $self->_destroy;
 }
@@ -156,8 +150,6 @@ sub _set_methods    { $methods{ $_[0] }    = $_[1] }
 
 sub functions   { $functions{ +shift } }
 sub methods     { $methods{ +shift } }
-sub member_vars { $member_vars{ +shift } }
-sub inert_vars  { $inert_vars{ +shift } }
 
 sub novel_methods {
     my $self    = shift;
@@ -214,20 +206,6 @@ sub add_function {
     $self->_func_by_name->{ $function->micro_sym } = $function;
 }
 
-sub add_member_var {
-    my ( $self, $var ) = @_;
-    confess("Not a Variable") unless a_isa_b( $var, "Clownfish::Variable" );
-    confess("Can't call add_member_var after grow_tree") if $self->_tree_grown;
-    push @{ $self->member_vars }, $var;
-}
-
-sub add_inert_var {
-    my ( $self, $var ) = @_;
-    confess("Not a Variable") unless a_isa_b( $var, "Clownfish::Variable" );
-    confess("Can't call add_inert_var after grow_tree") if $self->_tree_grown;
-    push @{ $self->inert_vars }, $var;
-}
-
 # Create dumpable functions unless hand coded versions were supplied.
 sub _create_dumpables {
     my $self = shift;
@@ -252,15 +230,6 @@ sub _establish_ancestry {
         # care, because we have to have everything in memory at once anyway.
         $child->set_parent($self);
         $child->_establish_ancestry;
-    }
-}
-
-# Pass down member vars to from parent to children.
-sub _bequeath_member_vars {
-    my $self = shift;
-    for my $child ( @{ $self->children } ) {
-        unshift @{ $child->member_vars }, @{ $self->member_vars };
-        $child->_bequeath_member_vars;
     }
 }
 

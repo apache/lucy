@@ -32,6 +32,7 @@
 #include "CFCParcel.h"
 #include "CFCDocuComment.h"
 #include "CFCUtil.h"
+#include "CFCVariable.h"
 
 struct CFCClass {
     CFCSymbol symbol;
@@ -40,6 +41,10 @@ struct CFCClass {
     struct CFCClass *parent;
     struct CFCClass **children;
     size_t num_kids;
+    CFCVariable **member_vars;
+    size_t num_member_vars;
+    CFCVariable **inert_vars;
+    size_t num_inert_vars;
     char *autocode;
     char *source_class;
     char *parent_class_name;
@@ -79,8 +84,12 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel,
     self->parent     = NULL;
     self->tree_grown = false;
     self->autocode   = (char*)CALLOCATE(1, sizeof(char));
-    self->children   = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
-    self->num_kids   = 0;
+    self->children        = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
+    self->num_kids        = 0;
+    self->member_vars     = (CFCVariable**)CALLOCATE(1, sizeof(CFCVariable*));
+    self->num_member_vars = 0;
+    self->inert_vars      = (CFCVariable**)CALLOCATE(1, sizeof(CFCVariable*));
+    self->num_inert_vars  = 0;
     self->parent_class_name = CFCUtil_strdup(parent_class_name);
     self->docucomment 
         = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);
@@ -148,7 +157,15 @@ CFCClass_destroy(CFCClass *self)
     for (i = 0; self->children[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->children[i]);
     }
+    for (i = 0; self->member_vars[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->member_vars[i]);
+    }
+    for (i = 0; self->inert_vars[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->inert_vars[i]);
+    }
     FREEMEM(self->children);
+    FREEMEM(self->member_vars);
+    FREEMEM(self->inert_vars);
     FREEMEM(self->autocode);
     FREEMEM(self->source_class);
     FREEMEM(self->parent_class_name);
@@ -173,10 +190,78 @@ CFCClass_add_child(CFCClass *self, CFCClass *child)
     self->children[self->num_kids] = NULL;
 }
 
+void
+CFCClass_add_member_var(CFCClass *self, CFCVariable *var)
+{
+    CFCUTIL_NULL_CHECK(var);
+    if (self->tree_grown) { 
+        croak("Can't call add_member_var after grow_tree"); 
+    }
+    self->num_member_vars++;
+    size_t size = (self->num_member_vars + 1) * sizeof(CFCVariable*);
+    self->member_vars = (CFCVariable**)REALLOCATE(self->member_vars, size);
+    self->member_vars[self->num_member_vars - 1] 
+        = (CFCVariable*)CFCBase_incref((CFCBase*)var);
+    self->member_vars[self->num_member_vars] = NULL;
+}
+
+void
+CFCClass_add_inert_var(CFCClass *self, CFCVariable *var)
+{
+    CFCUTIL_NULL_CHECK(var);
+    if (self->tree_grown) { 
+        croak("Can't call add_inert_var after grow_tree"); 
+    }
+    self->num_inert_vars++;
+    size_t size = (self->num_inert_vars + 1) * sizeof(CFCVariable*);
+    self->inert_vars = (CFCVariable**)REALLOCATE(self->inert_vars, size);
+    self->inert_vars[self->num_inert_vars - 1] 
+        = (CFCVariable*)CFCBase_incref((CFCBase*)var);
+    self->inert_vars[self->num_inert_vars] = NULL;
+}
+
+// Pass down member vars to from parent to children.
+void
+CFCClass_bequeath_member_vars(CFCClass *self)
+{
+    size_t i;
+    for (i = 0; self->children[i] != NULL; i++) {
+        CFCClass *child = self->children[i];
+        size_t num_vars = self->num_member_vars + child->num_member_vars;
+        size_t size = (num_vars + 1) * sizeof(CFCVariable*);
+        child->member_vars 
+            = (CFCVariable**)REALLOCATE(child->member_vars, size);
+        memmove(child->member_vars + self->num_member_vars,
+            child->member_vars, 
+            child->num_member_vars * sizeof(CFCVariable*));
+        memcpy(child->member_vars, self->member_vars, 
+            self->num_member_vars * sizeof(CFCVariable*));
+        size_t j;
+        for (j = 0; self->member_vars[j] != NULL; j++) {
+            CFCBase_incref((CFCBase*)child->member_vars[j]);
+        }
+        child->num_member_vars = num_vars;
+        child->member_vars[num_vars] = NULL;
+        CFCClass_bequeath_member_vars(child);
+    }
+}
+
 CFCClass**
 CFCClass_children(CFCClass *self)
 {
     return self->children;
+}
+
+CFCVariable**
+CFCClass_member_vars(CFCClass *self)
+{
+    return self->member_vars;
+}
+
+CFCVariable**
+CFCClass_inert_vars(CFCClass *self)
+{
+    return self->inert_vars;
 }
 
 const char*

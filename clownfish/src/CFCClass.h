@@ -20,6 +20,7 @@
 typedef struct CFCClass CFCClass;
 struct CFCParcel;
 struct CFCDocuComment;
+struct CFCVariable;
 
 CFCClass*
 CFCClass_new(struct CFCParcel *parcel, const char *exposure, 
@@ -42,8 +43,25 @@ CFCClass_destroy(CFCClass *self);
 void
 CFCClass_add_child(CFCClass *self, CFCClass *child);
 
+void
+CFCClass_add_member_var(CFCClass *self, struct CFCVariable *var);
+
+void
+CFCClass_add_inert_var(CFCClass *self, struct CFCVariable *var);
+
+/** Pass down member vars to from parent to children.
+ */
+void
+CFCClass_bequeath_member_vars(CFCClass *self);
+
 CFCClass**
 CFCClass_children(CFCClass *self);
+
+struct CFCVariable**
+CFCClass_member_vars(CFCClass *self);
+
+struct CFCVariable**
+CFCClass_inert_vars(CFCClass *self);
 
 const char*
 CFCClass_get_cnick(CFCClass *self);

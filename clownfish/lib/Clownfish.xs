@@ -136,6 +136,26 @@ PPCODE:
     CFCClass_add_child(self, child);
 
 void
+add_member_var(self, var)
+    CFCClass *self;
+    CFCVariable *var;
+PPCODE:
+    CFCClass_add_member_var(self, var);
+
+void
+_bequeath_member_vars(self)
+    CFCClass *self;
+PPCODE:
+    CFCClass_bequeath_member_vars(self);
+
+void
+add_inert_var(self, var)
+    CFCClass *self;
+    CFCVariable *var;
+PPCODE:
+    CFCClass_add_inert_var(self, var);
+
+void
 _set_or_get(self, ...)
     CFCClass *self;
 ALIAS:
@@ -157,6 +177,8 @@ ALIAS:
     include_h             = 28
     get_docucomment       = 30
     children              = 32
+    member_vars           = 34
+    inert_vars            = 36
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -253,6 +275,30 @@ PPCODE:
             size_t i;
             for (i = 0; children[i] != NULL; i++) {
                 SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)children[i]));
+                av_store(av, i, val);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
+        case 34: {
+            AV *av = newAV();
+            CFCVariable **vars = CFCClass_member_vars(self);
+            size_t i;
+            for (i = 0; vars[i] != NULL; i++) {
+                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)vars[i]));
+                av_store(av, i, val);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
+        case 36: {
+            AV *av = newAV();
+            CFCVariable **vars = CFCClass_inert_vars(self);
+            size_t i;
+            for (i = 0; vars[i] != NULL; i++) {
+                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)vars[i]));
                 av_store(av, i, val);
             }
             retval = newRV((SV*)av);
