@@ -32,7 +32,6 @@ use Scalar::Util qw( reftype );
 
 our %cnick;
 our %attributes;
-our %functions;
 our %methods;
 our %overridden;
 
@@ -108,7 +107,6 @@ sub create {
         docucomment source_class parent_class_name final inert )} );
 
     $attributes{$self}        = $attributes;
-    $functions{$self}         = [];
     $methods{$self}           = [];
     $overridden{$self}        = {};
 
@@ -128,7 +126,6 @@ sub create {
 sub DESTROY {
     my $self = shift;
     delete $attributes{$self};
-    delete $functions{$self};
     delete $methods{$self};
     delete $overridden{$self};
     $self->_destroy;
@@ -140,7 +137,6 @@ sub _get_attributes       { $attributes{ +shift } }
 
 sub _set_methods    { $methods{ $_[0] }    = $_[1] }
 
-sub functions   { $functions{ +shift } }
 sub methods     { $methods{ +shift } }
 
 sub novel_methods {
@@ -156,13 +152,6 @@ sub novel_member_vars {
     my @novel
         = grep { $_->get_class_cnick eq $cnick } @{ $self->member_vars };
     return \@novel;
-}
-
-sub function {
-    my ( $self, $micro_sym ) = @_;
-    $micro_sym = lc($micro_sym);
-    my ($match) = grep { $_->micro_sym eq $micro_sym } @{ $self->functions };
-    return $match;
 }
 
 sub method {
@@ -191,13 +180,6 @@ sub add_method {
     confess("Can't call add_method after grow_tree") if $self->_tree_grown;
     confess("Can't add_method to an inert class")    if $self->inert;
     push @{ $self->methods }, $method;
-}
-
-sub add_function {
-    my ( $self, $function ) = @_;
-    confess("Not a Function") unless a_isa_b( $function, "Clownfish::Function" );
-    confess("Can't call add_function after grow_tree") if $self->_tree_grown;
-    push @{ $self->functions }, $function;
 }
 
 # Create dumpable functions unless hand coded versions were supplied.

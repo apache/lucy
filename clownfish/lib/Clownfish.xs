@@ -143,6 +143,13 @@ PPCODE:
     CFCClass_add_member_var(self, var);
 
 void
+add_function(self, func)
+    CFCClass *self;
+    CFCFunction *func;
+PPCODE:
+    CFCClass_add_function(self, func);
+
+void
 _bequeath_member_vars(self)
     CFCClass *self;
 PPCODE:
@@ -154,6 +161,17 @@ add_inert_var(self, var)
     CFCVariable *var;
 PPCODE:
     CFCClass_add_inert_var(self, var);
+
+SV*
+function(self, sym)
+    CFCClass *self;
+    const char *sym;
+CODE:
+    CFCFunction *func = CFCClass_function(self, sym);
+    RETVAL = func 
+           ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)func)) 
+           : newSV(0);
+OUTPUT: RETVAL
 
 void
 _set_or_get(self, ...)
@@ -177,8 +195,9 @@ ALIAS:
     include_h             = 28
     get_docucomment       = 30
     children              = 32
-    member_vars           = 34
-    inert_vars            = 36
+    functions             = 34
+    member_vars           = 38
+    inert_vars            = 40
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -283,6 +302,18 @@ PPCODE:
         }
         case 34: {
             AV *av = newAV();
+            CFCFunction **funcs = CFCClass_functions(self);
+            size_t i;
+            for (i = 0; funcs[i] != NULL; i++) {
+                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)funcs[i]));
+                av_store(av, i, val);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
+        case 38: {
+            AV *av = newAV();
             CFCVariable **vars = CFCClass_member_vars(self);
             size_t i;
             for (i = 0; vars[i] != NULL; i++) {
@@ -293,7 +324,7 @@ PPCODE:
             SvREFCNT_dec(av);
             break;
         }
-        case 36: {
+        case 40: {
             AV *av = newAV();
             CFCVariable **vars = CFCClass_inert_vars(self);
             size_t i;

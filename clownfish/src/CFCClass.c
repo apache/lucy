@@ -29,6 +29,7 @@
 #define CFC_NEED_SYMBOL_STRUCT_DEF
 #include "CFCSymbol.h"
 #include "CFCClass.h"
+#include "CFCFunction.h"
 #include "CFCParcel.h"
 #include "CFCDocuComment.h"
 #include "CFCUtil.h"
@@ -41,6 +42,8 @@ struct CFCClass {
     struct CFCClass *parent;
     struct CFCClass **children;
     size_t num_kids;
+    CFCFunction **functions;
+    size_t num_functions;
     CFCVariable **member_vars;
     size_t num_member_vars;
     CFCVariable **inert_vars;
@@ -86,6 +89,8 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel,
     self->autocode   = (char*)CALLOCATE(1, sizeof(char));
     self->children        = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
     self->num_kids        = 0;
+    self->functions       = (CFCFunction**)CALLOCATE(1, sizeof(CFCFunction*));
+    self->num_functions   = 0;
     self->member_vars     = (CFCVariable**)CALLOCATE(1, sizeof(CFCVariable*));
     self->num_member_vars = 0;
     self->inert_vars      = (CFCVariable**)CALLOCATE(1, sizeof(CFCVariable*));
@@ -157,6 +162,9 @@ CFCClass_destroy(CFCClass *self)
     for (i = 0; self->children[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->children[i]);
     }
+    for (i = 0; self->functions[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->functions[i]);
+    }
     for (i = 0; self->member_vars[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->member_vars[i]);
     }
@@ -164,6 +172,7 @@ CFCClass_destroy(CFCClass *self)
         CFCBase_decref((CFCBase*)self->inert_vars[i]);
     }
     FREEMEM(self->children);
+    FREEMEM(self->functions);
     FREEMEM(self->member_vars);
     FREEMEM(self->inert_vars);
     FREEMEM(self->autocode);
@@ -188,6 +197,21 @@ CFCClass_add_child(CFCClass *self, CFCClass *child)
     self->children[self->num_kids - 1] 
         = (CFCClass*)CFCBase_incref((CFCBase*)child);
     self->children[self->num_kids] = NULL;
+}
+
+void
+CFCClass_add_function(CFCClass *self, CFCFunction *func)
+{
+    CFCUTIL_NULL_CHECK(func);
+    if (self->tree_grown) { 
+        croak("Can't call add_function after grow_tree"); 
+    }
+    self->num_functions++;
+    size_t size = (self->num_functions + 1) * sizeof(CFCFunction*);
+    self->functions = (CFCFunction**)REALLOCATE(self->functions, size);
+    self->functions[self->num_functions - 1] 
+        = (CFCFunction*)CFCBase_incref((CFCBase*)func);
+    self->functions[self->num_functions] = NULL;
 }
 
 void
@@ -220,6 +244,27 @@ CFCClass_add_inert_var(CFCClass *self, CFCVariable *var)
     self->inert_vars[self->num_inert_vars] = NULL;
 }
 
+CFCFunction*
+CFCClass_function(CFCClass *self, const char *sym)
+{
+    const size_t MAX_LEN = 128;
+    char lcsym[MAX_LEN + 1];
+    size_t sym_len = strlen(sym);
+    if (sym_len > MAX_LEN) { croak("sym too long: '%s'", sym); }
+    size_t i;
+    for (i = 0; i <= sym_len; i++) {
+        lcsym[i] = tolower(sym[i]);
+    }
+    for (i = 0; self->functions[i] != NULL; i++) {
+        CFCFunction *func = self->functions[i];
+        const char *func_micro_sym = CFCSymbol_micro_sym((CFCSymbol*)func);
+        if (strcmp(lcsym, func_micro_sym) == 0) {
+            return func;
+        }
+    }
+    return NULL;
+}
+
 // Pass down member vars to from parent to children.
 void
 CFCClass_bequeath_member_vars(CFCClass *self)
@@ -250,6 +295,12 @@ CFCClass**
 CFCClass_children(CFCClass *self)
 {
     return self->children;
+}
+
+CFCFunction**
+CFCClass_functions(CFCClass *self)
+{
+    return self->functions;
 }
 
 CFCVariable**
