@@ -170,7 +170,7 @@ CFCDumpable_process_load_member(CFCVariable *member, char *buf,
         if (check < 0) { croak("sprintf failed"); }
     }
     else if (CFCType_is_floating(type)) {
-        int check = sprintf(extraction, "(%s)Cfish_Obj_To_I64(var)", type_str);
+        int check = sprintf(extraction, "(%s)Cfish_Obj_To_F64(var)", type_str);
         if (check < 0) { croak("sprintf failed"); }
     }
     else if (CFCType_is_object(type)) {
