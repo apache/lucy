@@ -32,8 +32,6 @@ use Scalar::Util qw( reftype );
 
 our %cnick;
 our %attributes;
-our %meth_by_name;
-our %func_by_name;
 our %functions;
 our %methods;
 our %overridden;
@@ -110,8 +108,6 @@ sub create {
         docucomment source_class parent_class_name final inert )} );
 
     $attributes{$self}        = $attributes;
-    $meth_by_name{$self}      = {};
-    $func_by_name{$self}      = {};
     $functions{$self}         = [];
     $methods{$self}           = [];
     $overridden{$self}        = {};
@@ -132,8 +128,6 @@ sub create {
 sub DESTROY {
     my $self = shift;
     delete $attributes{$self};
-    delete $meth_by_name{$self};
-    delete $func_by_name{$self};
     delete $functions{$self};
     delete $methods{$self};
     delete $overridden{$self};
@@ -143,8 +137,6 @@ sub DESTROY {
 sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
 
 sub _get_attributes       { $attributes{ +shift } }
-sub _meth_by_name         { $meth_by_name{ +shift } }
-sub _func_by_name         { $func_by_name{ +shift } }
 
 sub _set_methods    { $methods{ $_[0] }    = $_[1] }
 
@@ -168,17 +160,21 @@ sub novel_member_vars {
 
 sub function {
     my ( $self, $micro_sym ) = @_;
-    return $self->_func_by_name->{ lc($micro_sym) };
+    $micro_sym = lc($micro_sym);
+    my ($match) = grep { $_->micro_sym eq $micro_sym } @{ $self->functions };
+    return $match;
 }
 
 sub method {
     my ( $self, $micro_sym ) = @_;
-    return $self->_meth_by_name->{ lc($micro_sym) };
+    $micro_sym = lc($micro_sym);
+    my ($match) = grep { $_->micro_sym eq $micro_sym } @{ $self->methods };
+    return $match;
 }
 
 sub novel_method {
     my ( $self, $micro_sym ) = @_;
-    my $method = $self->_meth_by_name->{ lc($micro_sym) };
+    my $method = $self->method($micro_sym);
     if ( defined $method
         and $method->get_class_cnick eq $self->get_class_cnick )
     {
@@ -195,7 +191,6 @@ sub add_method {
     confess("Can't call add_method after grow_tree") if $self->_tree_grown;
     confess("Can't add_method to an inert class")    if $self->inert;
     push @{ $self->methods }, $method;
-    $self->_meth_by_name->{ $method->micro_sym } = $method;
 }
 
 sub add_function {
@@ -203,7 +198,6 @@ sub add_function {
     confess("Not a Function") unless a_isa_b( $function, "Clownfish::Function" );
     confess("Can't call add_function after grow_tree") if $self->_tree_grown;
     push @{ $self->functions }, $function;
-    $self->_func_by_name->{ $function->micro_sym } = $function;
 }
 
 # Create dumpable functions unless hand coded versions were supplied.
@@ -250,14 +244,11 @@ sub _bequeath_methods {
         # Pass down methods, with some being overridden.
         my @common_methods;    # methods which child inherits or overrides
         for my $method ( @{ $self->methods } ) {
-            if ( exists $child->_meth_by_name->{ $method->micro_sym } ) {
-                my $child_method
-                    = $child->_meth_by_name->{ $method->micro_sym };
+            if ( my $child_method = $child->method( $method->micro_sym ) ) {
                 $child_method->override($method);
                 push @common_methods, $child_method;
             }
             else {
-                $child->_meth_by_name->{ $method->micro_sym } = $method;
                 push @common_methods, $method;
             }
         }
@@ -270,7 +261,6 @@ sub _bequeath_methods {
             $seen{ $meth->micro_sym } = 1;
             if ( $child->final ) {
                 $meth = $meth->finalize if $child->final;
-                $child->_meth_by_name->{ $meth->micro_sym } = $meth;
             }
             push @new_method_set, $meth;
         }
