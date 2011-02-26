@@ -184,6 +184,12 @@ CFCParcel_default_parcel(void)
     return default_parcel;
 }
 
+CFCParcel*
+CFCParcel_clownfish_parcel(void)
+{
+    return CFCParcel_singleton("Lucy", "Lucy");
+}
+
 int
 CFCParcel_equals(CFCParcel *self, CFCParcel *other)
 {

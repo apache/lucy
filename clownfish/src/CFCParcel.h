@@ -39,6 +39,13 @@ CFCParcel_destroy(CFCParcel *self);
 CFCParcel*
 CFCParcel_default_parcel(void);
 
+/** Return the Parcel under which Obj, CharBuf, VArray, Hash, etc. live.  At
+ * some point in the future, these core object types may move to the
+ * "Clownfish" Parcel, but for now they are within "Lucy".
+ */
+CFCParcel*
+CFCParcel_clownfish_parcel(void);
+
 int
 CFCParcel_equals(CFCParcel *self, CFCParcel *other);
 
