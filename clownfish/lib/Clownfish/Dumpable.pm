@@ -48,58 +48,6 @@ sub add_dumpables {
     }
 }
 
-# Create a Clownfish::Method object for either Dump() or Load().
-sub _make_method_obj {
-    my ( $self, $class, $dump_or_load ) = @_;
-    my $return_type = Clownfish::Type->new_object(
-        incremented => 1,
-        specifier   => 'Obj',
-        indirection => 1,
-        parcel      => 'Lucy',
-    );
-    my $self_type = Clownfish::Type->new_object(
-        specifier   => $class->get_struct_sym,
-        indirection => 1,
-        parcel      => $class->get_parcel,
-    );
-    my $self_var = Clownfish::Variable->new(
-        type      => $self_type,
-        parcel    => $class->get_parcel,
-        micro_sym => 'self',
-    );
-
-    my $param_list;
-    if ( $dump_or_load eq 'Dump' ) {
-        $param_list = Clownfish::ParamList->new;
-        $param_list->add_param( $self_var, undef );
-    }
-    else {
-        my $dump_type = Clownfish::Type->new_object(
-            specifier   => 'Obj',
-            indirection => 1,
-            parcel      => 'Lucy',
-        );
-        my $dump_var = Clownfish::Variable->new(
-            type      => $dump_type,
-            parcel    => $class->get_parcel,
-            micro_sym => 'dump',
-        );
-        $param_list = Clownfish::ParamList->new;
-        $param_list->add_param( $self_var, undef );
-        $param_list->add_param( $dump_var, undef );
-    }
-
-    return Clownfish::Method->new(
-        parcel      => $class->get_parcel,
-        return_type => $return_type,
-        class_name  => $class->get_class_name,
-        class_cnick => $class->get_cnick,
-        param_list  => $param_list,
-        macro_sym   => $dump_or_load,
-        exposure    => 'public',
-    );
-}
-
 sub _add_dump_method {
     my ( $self, $class ) = @_;
     my $method = $self->_make_method_obj( $class, 'Dump' );
@@ -136,35 +84,10 @@ END_STUFF
     }
 
     for my $member_var (@members) {
-        $autocode .= $self->_process_dump_member( $class, $member_var );
+        $autocode .= _process_dump_member($member_var);
     }
     $autocode .= "    return (cfish_Obj*)dump;\n}\n\n";
     $class->append_autocode($autocode);
-}
-
-sub _process_dump_member {
-    my ( $self, $class, $member ) = @_;
-    my $type = $member->get_type;
-    my $name = $member->micro_sym;
-    my $len  = length($name);
-    if ( $type->is_integer ) {
-        return qq|    Cfish_Hash_Store_Str(dump, "$name", $len, |
-            . qq|(cfish_Obj*)cfish_CB_newf("%i64", (int64_t)self->$name));\n|;
-    }
-    elsif ( $type->is_floating ) {
-        return qq|    Cfish_Hash_Store_Str(dump, "$name", $len, |
-            . qq|(cfish_Obj*)cfish_CB_newf("%f64", (double)self->$name));\n|;
-    }
-    elsif ( $type->is_object ) {
-        return <<END_STUFF;
-    if (self->$name) {
-         Cfish_Hash_Store_Str(dump, "$name", $len, Cfish_Obj_Dump((cfish_Obj*)self->$name));
-    }
-END_STUFF
-    }
-    else {
-        confess( "Don't know how to dump a " . $type->get_specifier );
-    }
 }
 
 sub _add_load_method {
@@ -209,32 +132,10 @@ END_STUFF
     }
 
     for my $member_var (@members) {
-        $autocode .= $self->_process_load_member( $class, $member_var );
+        $autocode .= _process_load_member($member_var);
     }
     $autocode .= "    return (cfish_Obj*)loaded;\n}\n\n";
     $class->append_autocode($autocode);
-}
-
-sub _process_load_member {
-    my ( $self, $class, $member ) = @_;
-    my $type       = $member->get_type;
-    my $type_str   = $type->to_c;
-    my $name       = $member->micro_sym;
-    my $len        = length($name);
-    my $struct_sym = $type->get_specifier;
-    my $vtable_var = uc($struct_sym);
-    my $extraction
-        = $type->is_integer  ? qq|($type_str)Cfish_Obj_To_I64(var)|
-        : $type->is_floating ? qq|($type_str)Cfish_Obj_To_F64(var)|
-        : $type->is_object
-        ? qq|($struct_sym*)CFISH_CERTIFY(Cfish_Obj_Load(var, var), $vtable_var)|
-        : confess( "Don't know how to load " . $type->get_specifier );
-    return <<END_STUFF;
-    {
-        cfish_Obj *var = Cfish_Hash_Fetch_Str(source, "$name", $len);
-        if (var) { loaded->$name = $extraction; }
-    }
-END_STUFF
 }
 
 1;

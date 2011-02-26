@@ -404,6 +404,39 @@ DESTROY(self)
 PPCODE:
     CFCDumpable_destroy(self);
 
+SV*
+_make_method_obj(self, klass, method_name)
+    CFCDumpable *self;
+    CFCClass    *klass;
+    const char  *method_name;
+CODE:
+    CFCMethod *method = CFCDumpable_make_method_obj(self, klass, method_name);
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)method));
+    CFCBase_decref((CFCBase*)method);
+OUTPUT: RETVAL
+
+SV*
+_process_dump_member(member)
+    CFCVariable *member;
+CODE:
+    RETVAL = newSV(400);
+    SvPOK_on(RETVAL);
+    char *buf = SvPVX(RETVAL);
+    CFCDumpable_process_dump_member(member, buf, 400);
+    SvCUR_set(RETVAL, strlen(buf));
+OUTPUT: RETVAL
+
+SV*
+_process_load_member(member)
+    CFCVariable *member;
+CODE:
+    RETVAL = newSV(400);
+    SvPOK_on(RETVAL);
+    char *buf = SvPVX(RETVAL);
+    CFCDumpable_process_load_member(member, buf, 400);
+    SvCUR_set(RETVAL, strlen(buf));
+OUTPUT: RETVAL
+
 
 MODULE = Clownfish    PACKAGE = Clownfish::File
 
