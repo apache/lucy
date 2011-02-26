@@ -387,6 +387,23 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish    PACKAGE = Clownfish::Dumpable
+
+SV*
+_new(klass)
+    const char *klass;
+CODE:
+    CFCDumpable *self = CFCDumpable_new();
+    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCDumpable *self;
+PPCODE:
+    CFCDumpable_destroy(self);
+
 
 MODULE = Clownfish    PACKAGE = Clownfish::File
 

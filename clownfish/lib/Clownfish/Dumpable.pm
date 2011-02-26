@@ -25,7 +25,8 @@ use Clownfish::Variable;
 
 sub new {
     my $either = shift;
-    return bless {}, ref($either) || $either;
+    my $package = ref($either) || $either;
+    return $either->_new();
 }
 
 sub add_dumpables {

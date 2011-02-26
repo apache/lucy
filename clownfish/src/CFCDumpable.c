@@ -14,19 +14,37 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
 #include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
 #include "CFCUtil.h"
-#include "CFCVariable.h"
+
+struct CFCDumpable {
+    CFCBase base;
+};
+
+CFCDumpable*
+CFCDumpable_new(void)
+{
+    CFCDumpable *self = (CFCDumpable*)CFCBase_allocate(sizeof(CFCDumpable),
+        "Clownfish::Dumpable");
+    return CFCDumpable_init(self);
+}
+
+CFCDumpable*
+CFCDumpable_init(CFCDumpable *self)
+{
+    return self;
+}
+
+void
+CFCDumpable_destroy(CFCDumpable *self)
+{
+    CFCBase_destroy((CFCBase*)self);
+}
 

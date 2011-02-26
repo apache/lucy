@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
+#ifndef H_CFCDUMPABLE
+#define H_CFCDUMPABLE
+
+typedef struct CFCDumpable CFCDumpable;
+
+CFCDumpable*
+CFCDumpable_new(void);
+
+CFCDumpable*
+CFCDumpable_init(CFCDumpable *self);
+
+void
+CFCDumpable_destroy(CFCDumpable *self);
+
+#endif /* H_CFCDUMPABLE */
 
