@@ -129,14 +129,6 @@ sub novel_methods {
     return \@methods;
 }
 
-sub novel_member_vars {
-    my $self  = shift;
-    my $cnick = $self->get_cnick;
-    my @novel
-        = grep { $_->get_class_cnick eq $cnick } @{ $self->member_vars };
-    return \@novel;
-}
-
 sub method {
     my ( $self, $micro_sym ) = @_;
     $micro_sym = lc($micro_sym);

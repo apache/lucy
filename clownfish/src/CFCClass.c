@@ -387,6 +387,25 @@ CFCClass_tree_to_ladder(CFCClass *self)
     return ladder;
 }
 
+CFCVariable**
+CFCClass_novel_member_vars(CFCClass *self)
+{
+    const char *cnick = CFCSymbol_get_class_cnick((CFCSymbol*)self);
+    size_t amount = (self->num_member_vars + 1) * sizeof(CFCVariable*);
+    CFCVariable **novel = (CFCVariable**)MALLOCATE(amount);
+    size_t i;
+    size_t num_novel = 0;
+    for (i = 0; i < self->num_member_vars; i++) {
+        CFCVariable *var = self->member_vars[i];
+        const char *var_cnick = CFCSymbol_get_class_cnick((CFCSymbol*)var);
+        if (strcmp(var_cnick, cnick) == 0) {
+            novel[num_novel++] = var;
+        }
+    }
+    novel[num_novel] = NULL;
+    return novel;
+}
+
 CFCClass**
 CFCClass_children(CFCClass *self)
 {

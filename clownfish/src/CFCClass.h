@@ -73,6 +73,9 @@ CFCClass_establish_ancestry(CFCClass *self);
 CFCClass**
 CFCClass_tree_to_ladder(CFCClass *self);
 
+struct CFCVariable**
+CFCClass_novel_member_vars(CFCClass *self);
+
 CFCClass**
 CFCClass_children(CFCClass *self);
 

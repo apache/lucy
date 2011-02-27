@@ -222,6 +222,7 @@ ALIAS:
     member_vars           = 38
     inert_vars            = 40
     tree_to_ladder        = 42
+    novel_member_vars     = 44
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -369,6 +370,19 @@ PPCODE:
                 av_store(av, i, val);
             }
             FREEMEM(ladder);
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
+        case 44: {
+            AV *av = newAV();
+            CFCVariable **novel = CFCClass_novel_member_vars(self);
+            size_t i;
+            for (i = 0; novel[i] != NULL; i++) {
+                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)novel[i]));
+                av_store(av, i, val);
+            }
+            FREEMEM(novel);
             retval = newRV((SV*)av);
             SvREFCNT_dec(av);
             break;
