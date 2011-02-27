@@ -54,23 +54,25 @@ sub _add_dump_method {
     $class->add_method($method);
     my $full_func_sym = $method->full_func_sym;
     my $full_struct   = $class->full_struct_sym;
-    my $autocode;
     my @members;
     my $parent = $class->get_parent;
 
     if ( $parent and $parent->has_attribute('dumpable') ) {
-        my $super_dump = 'lucy_' . $parent->get_cnick . '_dump';
-        my $super_type = $parent->full_struct_sym;
-        $autocode = <<END_STUFF;
+        my $vtable_var = $class->full_vtable_var;
+        my $typedef    = $method->full_typedef;
+        my $cnick      = $class->get_cnick;
+        my $autocode   = <<END_STUFF;
 cfish_Obj*
 $full_func_sym($full_struct *self)
 {
-    cfish_Hash *dump = (cfish_Hash*)$super_dump(($super_type*)self);
+    $typedef super_dump = ($typedef)SUPER_METHOD($vtable_var, $cnick, Dump);
+    cfish_Hash *dump = (cfish_Hash*)super_dump(self);
 END_STUFF
+        $class->append_autocode($autocode);
         @members = @{ $class->novel_member_vars };
     }
     else {
-        $autocode = <<END_STUFF;
+        my $autocode = <<END_STUFF;
 cfish_Obj*
 $full_func_sym($full_struct *self)
 {
@@ -78,16 +80,16 @@ $full_func_sym($full_struct *self)
     Cfish_Hash_Store_Str(dump, "_class", 6,
         (cfish_Obj*)Cfish_CB_Clone(Cfish_Obj_Get_Class_Name((cfish_Obj*)self)));
 END_STUFF
+        $class->append_autocode($autocode);
         @members = @{ $class->member_vars };
         shift @members;    # skip self->vtable
         shift @members;    # skip refcount self->ref
     }
 
     for my $member_var (@members) {
-        $autocode .= _process_dump_member($member_var);
+        $class->append_autocode( _process_dump_member($member_var) );
     }
-    $autocode .= "    return (cfish_Obj*)dump;\n}\n\n";
-    $class->append_autocode($autocode);
+    $class->append_autocode("    return (cfish_Obj*)dump;\n}\n\n");
 }
 
 sub _add_load_method {
@@ -96,26 +98,26 @@ sub _add_load_method {
     $class->add_method($method);
     my $full_func_sym = $method->full_func_sym;
     my $full_struct   = $class->full_struct_sym;
-    my $autocode;
     my @members;
     my $parent = $class->get_parent;
 
     if ( $parent and $parent->has_attribute('dumpable') ) {
-        my $super_load = 'lucy_' . $parent->get_cnick . '_load';
-        my $super_type = $parent->full_struct_sym;
-        $autocode = <<END_STUFF;
+        my $vtable_var = $class->full_vtable_var;
+        my $typedef    = $method->full_typedef;
+        my $cnick      = $class->get_cnick;
+        my $autocode   = <<END_STUFF;
 cfish_Obj*
 $full_func_sym($full_struct *self, cfish_Obj *dump)
 {
     cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);
-    $full_struct *loaded 
-        = ($full_struct*)$super_load(($super_type*)self, dump);
-    CHY_UNUSED_VAR(self);
+    $typedef super_load = ($typedef)SUPER_METHOD($vtable_var, $cnick, Load);
+    $full_struct *loaded = ($full_struct*)super_load(self, dump);
 END_STUFF
+        $class->append_autocode($autocode);
         @members = @{ $class->novel_member_vars };
     }
     else {
-        $autocode = <<END_STUFF;
+        my $autocode = <<END_STUFF;
 cfish_Obj*
 $full_func_sym($full_struct *self, cfish_Obj *dump)
 {
@@ -126,16 +128,16 @@ $full_func_sym($full_struct *self, cfish_Obj *dump)
     $full_struct *loaded = ($full_struct*)Cfish_VTable_Make_Obj(vtable);
     CHY_UNUSED_VAR(self);
 END_STUFF
+        $class->append_autocode($autocode);
         @members = @{ $class->member_vars };
         shift @members;    # skip self->vtable
         shift @members;    # skip refcount self->ref
     }
 
     for my $member_var (@members) {
-        $autocode .= _process_load_member($member_var);
+        $class->append_autocode( _process_load_member($member_var) );
     }
-    $autocode .= "    return (cfish_Obj*)loaded;\n}\n\n";
-    $class->append_autocode($autocode);
+    $class->append_autocode("    return (cfish_Obj*)loaded;\n}\n\n");
 }
 
 1;
