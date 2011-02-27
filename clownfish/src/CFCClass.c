@@ -35,6 +35,11 @@
 #include "CFCUtil.h"
 #include "CFCVariable.h"
 
+typedef struct CFCClassAttribute {
+    char *name;
+    char *value;
+} CFCClassAttribute;
+
 struct CFCClass {
     CFCSymbol symbol;
     int tree_grown;
@@ -48,6 +53,8 @@ struct CFCClass {
     size_t num_member_vars;
     CFCVariable **inert_vars;
     size_t num_inert_vars;
+    CFCClassAttribute **attributes;
+    size_t num_attributes;
     char *autocode;
     char *source_class;
     char *parent_class_name;
@@ -95,6 +102,8 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel,
     self->num_member_vars = 0;
     self->inert_vars      = (CFCVariable**)CALLOCATE(1, sizeof(CFCVariable*));
     self->num_inert_vars  = 0;
+    self->attributes      = (CFCClassAttribute**)CALLOCATE(1, sizeof(CFCClassAttribute*));
+    self->num_attributes  = 0;
     self->parent_class_name = CFCUtil_strdup(parent_class_name);
     self->docucomment 
         = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);
@@ -171,10 +180,17 @@ CFCClass_destroy(CFCClass *self)
     for (i = 0; self->inert_vars[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->inert_vars[i]);
     }
+    for (i = 0; self->attributes[i] != NULL; i++) {
+        CFCClassAttribute *attribute = self->attributes[i];
+        FREEMEM(attribute->name);
+        FREEMEM(attribute->value);
+        FREEMEM(attribute);
+    }
     FREEMEM(self->children);
     FREEMEM(self->functions);
     FREEMEM(self->member_vars);
     FREEMEM(self->inert_vars);
+    FREEMEM(self->attributes);
     FREEMEM(self->autocode);
     FREEMEM(self->source_class);
     FREEMEM(self->parent_class_name);
@@ -242,6 +258,38 @@ CFCClass_add_inert_var(CFCClass *self, CFCVariable *var)
     self->inert_vars[self->num_inert_vars - 1] 
         = (CFCVariable*)CFCBase_incref((CFCBase*)var);
     self->inert_vars[self->num_inert_vars] = NULL;
+}
+
+void
+CFCClass_add_attribute(CFCClass *self, const char *name, const char *value)
+{
+    if (!name || !strlen(name)) { croak("'name' is required"); }
+    if (CFCClass_has_attribute(self, name)) { 
+        croak("Attribute '%s' already registered");
+    }
+    CFCClassAttribute *attribute 
+        = (CFCClassAttribute*)MALLOCATE(sizeof(CFCClassAttribute));
+    attribute->name  = CFCUtil_strdup(name);
+    attribute->value = CFCUtil_strdup(value);
+    self->num_attributes++;
+    size_t size = (self->num_attributes + 1) * sizeof(CFCClassAttribute*);
+    self->attributes = (CFCClassAttribute**)REALLOCATE(self->attributes, size);
+    self->attributes[self->num_attributes - 1] = attribute;
+    self->attributes[self->num_attributes] = NULL;
+
+}
+
+int
+CFCClass_has_attribute(CFCClass *self, const char *name)
+{
+    CFCUTIL_NULL_CHECK(name);
+    size_t i;
+    for (i = 0; i < self->num_attributes; i++) {
+        if (strcmp(name, self->attributes[i]->name) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 CFCFunction*

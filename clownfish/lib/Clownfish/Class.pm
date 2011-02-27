@@ -30,7 +30,6 @@ use Clownfish::Dumpable;
 use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
-our %attributes;
 our %methods;
 our %overridden;
 
@@ -96,7 +95,6 @@ sub create {
         @args{qw( parcel exposure class_name class_cnick micro_sym
         docucomment source_class parent_class_name final inert )} );
 
-    $attributes{$self}        = {};
     $methods{$self}           = [];
     $overridden{$self}        = {};
 
@@ -115,20 +113,10 @@ sub create {
 
 sub DESTROY {
     my $self = shift;
-    delete $attributes{$self};
     delete $methods{$self};
     delete $overridden{$self};
     $self->_destroy;
 }
-
-sub add_attribute { 
-    my ($self, $var, $value ) = @_;
-    $attributes{$self}->{$var} = $value; 
-}
-
-sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
-
-sub _get_attributes       { $attributes{ +shift } }
 
 sub _set_methods    { $methods{ $_[0] }    = $_[1] }
 

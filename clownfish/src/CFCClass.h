@@ -53,6 +53,12 @@ CFCClass_add_member_var(CFCClass *self, struct CFCVariable *var);
 void
 CFCClass_add_inert_var(CFCClass *self, struct CFCVariable *var);
 
+void
+CFCClass_add_attribute(CFCClass *self, const char *name, const char *value);
+
+int
+CFCClass_has_attribute(CFCClass *self, const char *name);
+
 struct CFCFunction*
 CFCClass_function(CFCClass *self, const char *sym);
 
