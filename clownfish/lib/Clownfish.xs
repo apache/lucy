@@ -189,6 +189,12 @@ CODE:
 OUTPUT: RETVAL
 
 void
+_bequeath_methods(self)
+    CFCClass *self;
+PPCODE:
+    CFCClass_bequeath_methods(self);
+
+void
 _bequeath_member_vars(self)
     CFCClass *self;
 PPCODE:
@@ -229,6 +235,17 @@ CODE:
            : newSV(0);
 OUTPUT: RETVAL
 
+SV*
+novel_method(self, sym)
+    CFCClass *self;
+    const char *sym;
+CODE:
+    CFCMethod *method = CFCClass_novel_method(self, sym);
+    RETVAL = method 
+           ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)method)) 
+           : newSV(0);
+OUTPUT: RETVAL
+
 void
 _zap_methods(self)
     CFCClass *self;
@@ -262,7 +279,8 @@ ALIAS:
     member_vars           = 38
     inert_vars            = 40
     tree_to_ladder        = 42
-    novel_member_vars     = 44
+    novel_methods         = 44
+    novel_member_vars     = 46
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -380,6 +398,12 @@ PPCODE:
             break;
         }
         case 44: {
+            CFCMethod **novel = CFCClass_novel_methods(self);
+            retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
+            FREEMEM(novel);
+            break;
+        }
+        case 46: {
             CFCVariable **novel = CFCClass_novel_member_vars(self);
             retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
             FREEMEM(novel);

@@ -72,6 +72,14 @@ CFCClass_function(CFCClass *self, const char *sym);
 struct CFCMethod*
 CFCClass_method(CFCClass *self, const char *sym);
 
+struct CFCMethod*
+CFCClass_novel_method(CFCClass *self, const char *sym);
+
+/** Pass down methods to from parent to children.
+ */
+void
+CFCClass_bequeath_methods(CFCClass *self);
+
 /** Pass down member vars to from parent to children.
  */
 void
@@ -82,6 +90,9 @@ CFCClass_establish_ancestry(CFCClass *self);
 
 CFCClass**
 CFCClass_tree_to_ladder(CFCClass *self);
+
+struct CFCMethod**
+CFCClass_novel_methods(CFCClass *self);
 
 struct CFCVariable**
 CFCClass_novel_member_vars(CFCClass *self);

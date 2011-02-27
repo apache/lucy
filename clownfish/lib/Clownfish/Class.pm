@@ -105,26 +105,6 @@ sub create {
     return $self;
 }
 
-sub novel_methods {
-    my $self    = shift;
-    my $cnick   = $self->get_cnick;
-    my @methods = grep { $_->get_class_cnick eq $cnick } @{ $self->methods };
-    return \@methods;
-}
-
-sub novel_method {
-    my ( $self, $micro_sym ) = @_;
-    my $method = $self->method($micro_sym);
-    if ( defined $method
-        and $method->get_class_cnick eq $self->get_class_cnick )
-    {
-        return $method;
-    }
-    else {
-        return;
-    }
-}
-
 # Create dumpable functions unless hand coded versions were supplied.
 sub _create_dumpables {
     my $self = shift;
@@ -148,42 +128,6 @@ sub _generate_automethods {
     $self->_create_dumpables;
     for my $child ( @{ $self->children } ) {
         $child->_generate_automethods;
-    }
-}
-
-sub _bequeath_methods {
-    my $self = shift;
-
-    for my $child ( @{ $self->children } ) {
-        # Pass down methods, with some being overridden.
-        my @common_methods;    # methods which child inherits or overrides
-        for my $method ( @{ $self->methods } ) {
-            if ( my $child_method = $child->method( $method->micro_sym ) ) {
-                $child_method->override($method);
-                push @common_methods, $child_method;
-            }
-            else {
-                push @common_methods, $method;
-            }
-        }
-
-        # Create array of methods, preserving exact order so vtables match up.
-        my @new_method_set;
-        my %seen;
-        for my $meth ( @common_methods, @{ $child->methods } ) {
-            next if $seen{ $meth->micro_sym };
-            $seen{ $meth->micro_sym } = 1;
-            if ( $child->final ) {
-                $meth = $meth->finalize if $child->final;
-            }
-            push @new_method_set, $meth;
-        }
-        $child->_zap_methods;
-        $child->add_method($_) for @new_method_set;
-
-        # Pass it all down to the next generation.
-        $child->_bequeath_methods;
-        $child->_set_tree_grown(1);
     }
 }
 

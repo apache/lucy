@@ -363,6 +363,21 @@ CFCClass_method(CFCClass *self, const char *sym)
     return (CFCMethod*)S_find_func((CFCFunction**)self->methods, sym);
 }
 
+CFCMethod*
+CFCClass_novel_method(CFCClass *self, const char *sym)
+{
+    CFCMethod *method = CFCClass_method(self, sym);
+    if (method) {
+        const char *cnick = CFCClass_get_cnick(self);
+        const char *meth_cnick 
+            = CFCSymbol_get_class_cnick((CFCSymbol*)method);
+        if (strcmp(cnick, meth_cnick) == 0) {
+            return method;
+        }
+    }
+    return NULL;
+}
+
 // Pass down member vars to from parent to children.
 void
 CFCClass_bequeath_member_vars(CFCClass *self)
@@ -386,6 +401,69 @@ CFCClass_bequeath_member_vars(CFCClass *self)
         child->num_member_vars = num_vars;
         child->member_vars[num_vars] = NULL;
         CFCClass_bequeath_member_vars(child);
+    }
+}
+
+void
+CFCClass_bequeath_methods(CFCClass *self)
+{
+    size_t child_num;
+    for (child_num = 0; self->children[child_num] != NULL; child_num++) {
+        CFCClass *child = self->children[child_num];
+
+        // Create array of methods, preserving exact order so vtables match up.
+        size_t num_methods = 0;
+        size_t max_methods = self->num_methods + child->num_methods;
+        CFCMethod **methods = (CFCMethod**)MALLOCATE(
+            (max_methods + 1) * sizeof(CFCMethod*));
+
+        // Gather methods which child inherits or overrides.
+        size_t i;
+        for (i = 0; i < self->num_methods; i++) {
+            CFCMethod *method = self->methods[i];
+            const char *micro_sym = CFCSymbol_micro_sym((CFCSymbol*)method);
+            CFCMethod *child_method = CFCClass_method(child, micro_sym);
+            if (child_method) {
+                CFCMethod_override(child_method, method);
+                methods[num_methods++] = child_method;
+            }
+            else {
+                methods[num_methods++] = method;
+            }
+        }
+
+        // Append novel child methods to array.  Child methods which were just
+        // marked via CFCMethod_override() a moment ago are skipped.
+        for (i = 0; i < child->num_methods; i++) {
+            CFCMethod *method = child->methods[i];
+            if (CFCMethod_novel(method)) {
+                methods[num_methods++] = method;
+            }
+        }
+        methods[num_methods] = NULL;
+        
+        // Manage refcounts and assign new array.  Transform to final methods
+        // if child class is a final class.
+        if (child->is_final) {
+            for (i = 0; i < num_methods; i++) {
+                methods[i] = CFCMethod_finalize(methods[i]);
+            }
+        }
+        else {
+            for (i = 0; i < num_methods; i++) {
+                CFCBase_incref((CFCBase*)methods[i]);
+            }
+        }
+        for (i = 0; i < child->num_methods; i++) {
+            CFCBase_decref((CFCBase*)child->methods[i]);
+        }
+        FREEMEM(child->methods);
+        child->methods     = methods;
+        child->num_methods = num_methods;
+
+        // Pass it all down to the next generation.
+        CFCClass_bequeath_methods(child);
+        CFCClass_set_tree_grown(child, true);
     }
 }
 
@@ -437,23 +515,37 @@ CFCClass_tree_to_ladder(CFCClass *self)
     return ladder;
 }
 
-CFCVariable**
-CFCClass_novel_member_vars(CFCClass *self)
+static CFCSymbol**
+S_novel_syms(CFCClass *self, CFCSymbol **syms)
 {
     const char *cnick = CFCSymbol_get_class_cnick((CFCSymbol*)self);
-    size_t amount = (self->num_member_vars + 1) * sizeof(CFCVariable*);
-    CFCVariable **novel = (CFCVariable**)MALLOCATE(amount);
-    size_t i;
+    size_t count = 0;
+    while (syms[count] != NULL) { count++; }
+    size_t amount = (count + 1) * sizeof(CFCSymbol*);
+    CFCSymbol **novel = (CFCSymbol**)MALLOCATE(amount);
     size_t num_novel = 0;
-    for (i = 0; i < self->num_member_vars; i++) {
-        CFCVariable *var = self->member_vars[i];
-        const char *var_cnick = CFCSymbol_get_class_cnick((CFCSymbol*)var);
-        if (strcmp(var_cnick, cnick) == 0) {
-            novel[num_novel++] = var;
+    size_t i;
+    for (i = 0; i < count; i++) {
+        CFCSymbol *sym = syms[i];
+        const char *sym_cnick = CFCSymbol_get_class_cnick((CFCSymbol*)sym);
+        if (strcmp(sym_cnick, cnick) == 0) {
+            novel[num_novel++] = sym;
         }
     }
     novel[num_novel] = NULL;
     return novel;
+}
+
+CFCMethod**
+CFCClass_novel_methods(CFCClass *self)
+{
+    return (CFCMethod**)S_novel_syms(self, (CFCSymbol**)self->methods);
+}
+
+CFCVariable**
+CFCClass_novel_member_vars(CFCClass *self)
+{
+    return (CFCVariable**)S_novel_syms(self, (CFCSymbol**)self->member_vars);
 }
 
 CFCClass**
