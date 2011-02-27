@@ -116,7 +116,7 @@ CODE:
 OUTPUT: RETVAL
 
 void
-_destroy(self)
+DESTROY(self)
     CFCClass *self;
 PPCODE:
     CFCClass_destroy(self);
@@ -148,6 +148,13 @@ add_function(self, func)
     CFCFunction *func;
 PPCODE:
     CFCClass_add_function(self, func);
+
+void
+add_method(self, method)
+    CFCClass *self;
+    CFCMethod *method;
+PPCODE:
+    CFCClass_add_method(self, method);
 
 void
 add_attribute(self, name, value_sv)
@@ -196,6 +203,23 @@ CODE:
            : newSV(0);
 OUTPUT: RETVAL
 
+SV*
+method(self, sym)
+    CFCClass *self;
+    const char *sym;
+CODE:
+    CFCMethod *method = CFCClass_method(self, sym);
+    RETVAL = method 
+           ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)method)) 
+           : newSV(0);
+OUTPUT: RETVAL
+
+void
+_zap_methods(self)
+    CFCClass *self;
+PPCODE:
+    CFCClass_zap_methods(self);
+
 void
 _set_or_get(self, ...)
     CFCClass *self;
@@ -219,6 +243,7 @@ ALIAS:
     get_docucomment       = 30
     children              = 32
     functions             = 34
+    methods               = 36
     member_vars           = 38
     inert_vars            = 40
     tree_to_ladder        = 42
@@ -331,6 +356,18 @@ PPCODE:
             size_t i;
             for (i = 0; funcs[i] != NULL; i++) {
                 SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)funcs[i]));
+                av_store(av, i, val);
+            }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
+        case 36: {
+            AV *av = newAV();
+            CFCMethod **methods = CFCClass_methods(self);
+            size_t i;
+            for (i = 0; methods[i] != NULL; i++) {
+                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)methods[i]));
                 av_store(av, i, val);
             }
             retval = newRV((SV*)av);

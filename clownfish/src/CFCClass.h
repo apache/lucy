@@ -21,6 +21,7 @@ typedef struct CFCClass CFCClass;
 struct CFCParcel;
 struct CFCDocuComment;
 struct CFCFunction;
+struct CFCMethod;
 struct CFCVariable;
 
 CFCClass*
@@ -48,6 +49,12 @@ void
 CFCClass_add_function(CFCClass *self, struct CFCFunction *func);
 
 void
+CFCClass_add_method(CFCClass *self, struct CFCMethod *method);
+
+void
+CFCClass_zap_methods(CFCClass *self);
+
+void
 CFCClass_add_member_var(CFCClass *self, struct CFCVariable *var);
 
 void
@@ -61,6 +68,9 @@ CFCClass_has_attribute(CFCClass *self, const char *name);
 
 struct CFCFunction*
 CFCClass_function(CFCClass *self, const char *sym);
+
+struct CFCMethod*
+CFCClass_method(CFCClass *self, const char *sym);
 
 /** Pass down member vars to from parent to children.
  */
@@ -81,6 +91,9 @@ CFCClass_children(CFCClass *self);
 
 struct CFCFunction**
 CFCClass_functions(CFCClass *self);
+
+struct CFCMethod**
+CFCClass_methods(CFCClass *self);
 
 struct CFCVariable**
 CFCClass_member_vars(CFCClass *self);

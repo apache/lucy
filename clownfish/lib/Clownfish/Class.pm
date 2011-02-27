@@ -30,8 +30,6 @@ use Clownfish::Dumpable;
 use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
-our %methods;
-
 our %create_PARAMS = (
     source_class      => undef,
     class_name        => undef,
@@ -94,8 +92,6 @@ sub create {
         @args{qw( parcel exposure class_name class_cnick micro_sym
         docucomment source_class parent_class_name final inert )} );
 
-    $methods{$self}           = [];
-
     # Store in registry.
     my $key      = $self->full_struct_sym;
     my $existing = $registry{$key};
@@ -109,28 +105,11 @@ sub create {
     return $self;
 }
 
-sub DESTROY {
-    my $self = shift;
-    delete $methods{$self};
-    $self->_destroy;
-}
-
-sub _set_methods    { $methods{ $_[0] }    = $_[1] }
-
-sub methods     { $methods{ +shift } }
-
 sub novel_methods {
     my $self    = shift;
     my $cnick   = $self->get_cnick;
     my @methods = grep { $_->get_class_cnick eq $cnick } @{ $self->methods };
     return \@methods;
-}
-
-sub method {
-    my ( $self, $micro_sym ) = @_;
-    $micro_sym = lc($micro_sym);
-    my ($match) = grep { $_->micro_sym eq $micro_sym } @{ $self->methods };
-    return $match;
 }
 
 sub novel_method {
@@ -144,14 +123,6 @@ sub novel_method {
     else {
         return;
     }
-}
-
-sub add_method {
-    my ( $self, $method ) = @_;
-    confess("Not a Method") unless a_isa_b( $method, "Clownfish::Method" );
-    confess("Can't call add_method after grow_tree") if $self->_tree_grown;
-    confess("Can't add_method to an inert class")    if $self->inert;
-    push @{ $self->methods }, $method;
 }
 
 # Create dumpable functions unless hand coded versions were supplied.
@@ -207,7 +178,8 @@ sub _bequeath_methods {
             }
             push @new_method_set, $meth;
         }
-        $child->_set_methods(\@new_method_set);
+        $child->_zap_methods;
+        $child->add_method($_) for @new_method_set;
 
         # Pass it all down to the next generation.
         $child->_bequeath_methods;
