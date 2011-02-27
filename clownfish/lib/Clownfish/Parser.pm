@@ -496,12 +496,14 @@ sub new_class {
         source_class      => $source_class,
         inert             => $class_modifiers{inert},
         final             => $class_modifiers{final},
-        attributes        => \%class_attributes,
     );
     $class->add_method($_)     for @methods;
     $class->add_function($_)   for @functions;
     $class->add_member_var($_) for @member_vars;
     $class->add_inert_var($_)  for @inert_vars;
+    while ( my ( $var, $val ) = each %class_attributes ) {
+        $class->add_attribute( $var, $val );
+    }
     return $class;
 }
 

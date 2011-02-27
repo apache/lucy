@@ -43,7 +43,6 @@ our %create_PARAMS = (
     inert             => undef,
     final             => undef,
     parcel            => undef,
-    attributes        => undef,
     exposure          => 'parcel',
 );
 
@@ -89,11 +88,6 @@ sub create {
     $args{inert} ||= 0;
     $args{final} ||= 0;
 
-    # Validate attributes.
-    my $attributes = delete $args{attributes} || {};
-    confess("Param 'attributes' not a hashref")
-        unless reftype($attributes) eq 'HASH';
-
     my $package = ref($either) || $either;
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
     $args{exposure}  ||= 'parcel';
@@ -102,7 +96,7 @@ sub create {
         @args{qw( parcel exposure class_name class_cnick micro_sym
         docucomment source_class parent_class_name final inert )} );
 
-    $attributes{$self}        = $attributes;
+    $attributes{$self}        = {};
     $methods{$self}           = [];
     $overridden{$self}        = {};
 
@@ -125,6 +119,11 @@ sub DESTROY {
     delete $methods{$self};
     delete $overridden{$self};
     $self->_destroy;
+}
+
+sub add_attribute { 
+    my ($self, $var, $value ) = @_;
+    $attributes{$self}->{$var} = $value; 
 }
 
 sub has_attribute { exists $_[0]->_get_attributes->{ $_[1] } }
@@ -274,7 +273,6 @@ Retrieve a Class, if one has already been created.
         parent_class_name => 'Crustacean::Claw', # default: undef
         inert             => undef,              # default: undef
         docucomment       => $documcom,          # default: undef,
-        attributes        => \%attributes,       # default: {}
     );
 
 Create and register a quasi-singleton.  May only be called once for each
@@ -296,8 +294,6 @@ in order to establish the class hierarchy.
 instantiated.
 
 =item * B<docucomment> - A Clownfish::DocuComment describing this Class.
-
-=item * B<attributes> - An arbitrary hash of attributes.
 
 =back
 
@@ -344,6 +340,12 @@ Add a member variable to the class.  Valid only before grow_tree() is called.
 
 Add an inert (class) variable to the class.  Valid only before grow_tree() is
 called.
+
+=head2 add_attribute
+
+    $class->add_attribute($var, $value);
+
+Add an arbitrary attribute to the class.
 
 =head2 function 
 

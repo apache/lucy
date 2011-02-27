@@ -62,8 +62,8 @@ my $foo_jr = Clownfish::Class->create(
     parcel            => 'Neato',
     class_name        => 'Foo::FooJr',
     parent_class_name => 'Foo',
-    attributes        => { dumpable => 1 },
 );
+$foo_jr->add_attribute( dumpable => 1 );
 
 ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
 is( $foo_jr->get_struct_sym,  'FooJr',       "struct_sym" );
@@ -75,8 +75,8 @@ my $final_foo = Clownfish::Class->create(
     parent_class_name => 'Foo::FooJr',
     source_class      => 'Foo::FooJr',
     final             => 1,
-    attributes        => { dumpable => 1 },
 );
+$final_foo->add_attribute( dumpable => 1 );
 ok( $final_foo->final, "final" );
 is( $final_foo->include_h, 'Foo/FooJr.h', "inlude_h uses source_class" );
 is( $final_foo->get_parent_class_name, 'Foo::FooJr',
