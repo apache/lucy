@@ -30,7 +30,6 @@ use Clownfish::Dumpable;
 use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
-our %cnick;
 our %attributes;
 our %methods;
 our %overridden;
@@ -51,9 +50,6 @@ our %create_PARAMS = (
 my $dumpable = Clownfish::Dumpable->new;
 
 our %registry;
-
-# Testing only.
-sub _zap { delete $registry{ +shift } }
 
 our %fetch_singleton_PARAMS = (
     parcel     => undef,
