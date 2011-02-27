@@ -31,7 +31,6 @@ use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
 our %methods;
-our %overridden;
 
 our %create_PARAMS = (
     source_class      => undef,
@@ -96,7 +95,6 @@ sub create {
         docucomment source_class parent_class_name final inert )} );
 
     $methods{$self}           = [];
-    $overridden{$self}        = {};
 
     # Store in registry.
     my $key      = $self->full_struct_sym;
@@ -114,7 +112,6 @@ sub create {
 sub DESTROY {
     my $self = shift;
     delete $methods{$self};
-    delete $overridden{$self};
     $self->_destroy;
 }
 
