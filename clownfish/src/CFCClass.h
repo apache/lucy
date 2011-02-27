@@ -42,6 +42,15 @@ CFCClass_init(CFCClass *self, struct CFCParcel *parcel,
 void
 CFCClass_destroy(CFCClass *self);
 
+CFCClass*
+CFCClass_fetch_from_registry(const char *key);
+
+void
+CFCClass_register(CFCClass *self);
+
+void
+CFCClass_clear_registry(void);
+
 void
 CFCClass_add_child(CFCClass *self, CFCClass *child);
 

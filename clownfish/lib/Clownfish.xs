@@ -136,6 +136,27 @@ DESTROY(self)
 PPCODE:
     CFCClass_destroy(self);
 
+SV*
+_fetch_from_registry(key)
+    const char *key;
+CODE:
+    CFCClass *klass = CFCClass_fetch_from_registry(key);
+    RETVAL = klass
+           ? newRV(CFCBase_get_perl_obj((CFCBase*)klass))
+           : newSV(0);
+OUTPUT: RETVAL
+
+void
+_register(self)
+    CFCClass *self;
+PPCODE:
+    CFCClass_register(self);
+
+void
+_clear_registry(...)
+PPCODE: 
+    CFCClass_clear_registry();
+
 void
 append_autocode(self, autocode)
     CFCClass *self;

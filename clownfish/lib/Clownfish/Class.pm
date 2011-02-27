@@ -30,6 +30,8 @@ use Clownfish::Dumpable;
 use File::Spec::Functions qw( catfile );
 use Scalar::Util qw( reftype );
 
+END { __PACKAGE__->_clear_registry() }
+
 our %create_PARAMS = (
     source_class      => undef,
     class_name        => undef,
@@ -43,8 +45,6 @@ our %create_PARAMS = (
 );
 
 my $dumpable = Clownfish::Dumpable->new;
-
-our %registry;
 
 our %fetch_singleton_PARAMS = (
     parcel     => undef,
@@ -69,8 +69,7 @@ sub fetch_singleton {
         }
         $key = $parcel->get_prefix . $key;
     }
-
-    return $registry{$key};
+    return _fetch_from_registry($key);
 }
 
 sub new { confess("The constructor for Clownfish::Class is create()") }
@@ -93,14 +92,7 @@ sub create {
         docucomment source_class parent_class_name final inert )} );
 
     # Store in registry.
-    my $key      = $self->full_struct_sym;
-    my $existing = $registry{$key};
-    if ($existing) {
-        my $existing_class_name = $existing->get_class_name;
-        confess(  "New class $class_name conflicts with previously "
-                . "compiled class $existing_class_name" );
-    }
-    $registry{$key} = $self;
+    $self->_register;
 
     return $self;
 }

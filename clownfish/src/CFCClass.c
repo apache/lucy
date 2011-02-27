@@ -41,6 +41,15 @@ typedef struct CFCClassAttribute {
     char *value;
 } CFCClassAttribute;
 
+typedef struct CFCClassRegEntry {
+    char *key;
+    struct CFCClass *klass;
+} CFCClassRegEntry;
+
+static CFCClassRegEntry *registry = NULL;
+static size_t registry_size = 0;
+static size_t registry_cap  = 0;
+
 struct CFCClass {
     CFCSymbol symbol;
     int tree_grown;
@@ -209,6 +218,58 @@ CFCClass_destroy(CFCClass *self)
     FREEMEM(self->full_vtable_var);
     FREEMEM(self->full_vtable_type);
     CFCSymbol_destroy((CFCSymbol*)self);
+}
+
+void
+CFCClass_register(CFCClass *self)
+{
+    const char *key = self->full_struct_sym;
+    if (registry_size == registry_cap) {
+        size_t new_cap = registry_cap + 10;
+        registry = (CFCClassRegEntry*)REALLOCATE(registry,
+            (new_cap + 1) * sizeof(CFCClassRegEntry));
+        size_t i;
+        for (i = registry_cap; i <= new_cap; i++) {
+            registry[i].key = NULL;
+            registry[i].klass = NULL;
+        }
+        registry_cap = new_cap;
+    }
+    CFCClass *existing = CFCClass_fetch_from_registry(key);
+    if (existing) {
+        croak("New class %s conflicts with existing class %s", 
+             CFCSymbol_get_class_name((CFCSymbol*)self),
+             CFCSymbol_get_class_name((CFCSymbol*)existing));
+    }
+    registry[registry_size].key   = CFCUtil_strdup(key);
+    registry[registry_size].klass = (CFCClass*)CFCBase_incref((CFCBase*)self);
+    registry_size++;
+}
+
+CFCClass*
+CFCClass_fetch_from_registry(const char *key)
+{
+    if (!key) { return NULL; }
+    size_t i;
+    for (i = 0; i < registry_size; i++) {
+        if (strcmp(registry[i].key, key) == 0) {
+            return registry[i].klass;
+        }
+    }
+    return NULL;
+}
+
+void
+CFCClass_clear_registry(void)
+{
+    size_t i;
+    for (i = 0; i < registry_size; i++) {
+        CFCBase_decref((CFCBase*)registry[i].klass);
+    }
+    FREEMEM(registry);
+    registry_size = 0;
+    registry_cap  = 0;
+    registry      = NULL;
 }
 
 void
