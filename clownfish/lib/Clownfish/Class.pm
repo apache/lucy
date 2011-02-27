@@ -194,17 +194,6 @@ sub grow_tree {
     $self->_set_tree_grown(1);
 }
 
-# Let the children know who their parent class is.
-sub _establish_ancestry {
-    my $self = shift;
-    for my $child ( @{ $self->children } ) {
-        # This is a circular reference and thus a memory leak, but we don't
-        # care, because we have to have everything in memory at once anyway.
-        $child->set_parent($self);
-        $child->_establish_ancestry;
-    }
-}
-
 # Create auto-generated methods.  This must be called after member vars are
 # passed down but before methods are passed down.
 sub _generate_automethods {
@@ -248,15 +237,6 @@ sub _bequeath_methods {
         $child->_bequeath_methods;
         $child->_set_tree_grown(1);
     }
-}
-
-sub tree_to_ladder {
-    my $self   = shift;
-    my @ladder = ($self);
-    for my $child ( @{ $self->children } ) {
-        push @ladder, @{ $child->tree_to_ladder };
-    }
-    return \@ladder;
 }
 
 1;

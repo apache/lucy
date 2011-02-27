@@ -291,6 +291,54 @@ CFCClass_bequeath_member_vars(CFCClass *self)
     }
 }
 
+// Let the children know who their parent class is.
+void
+CFCClass_establish_ancestry(CFCClass *self)
+{
+    size_t i;
+    for (i = 0; i < self->num_kids; i++) {
+        CFCClass *child = self->children[i];
+        // This is a circular reference and thus a memory leak, but we don't
+        // care, because we have to have everything in memory at once anyway.
+        CFCClass_set_parent(child, self);
+        CFCClass_establish_ancestry(child);
+    }
+}
+
+static size_t
+S_family_tree_size(CFCClass *self)
+{
+    size_t count = 1; // self
+    size_t i;
+    for (i = 0; i < self->num_kids; i++) {
+        count += S_family_tree_size(self->children[i]);
+    }
+    return count;
+}
+
+// Return value is valid only so long as object persists (elements are not
+// refcounted).
+CFCClass**
+CFCClass_tree_to_ladder(CFCClass *self)
+{
+    size_t ladder_len = S_family_tree_size(self);
+    CFCClass **ladder = MALLOCATE((ladder_len + 1) * sizeof(CFCClass*));
+    ladder[ladder_len] = NULL;
+    size_t step = 0;
+    ladder[step++] = self;
+    size_t i;
+    for (i = 0; i < self->num_kids; i++) {
+        CFCClass *child = self->children[i];
+        CFCClass **child_ladder = CFCClass_tree_to_ladder(child);
+        size_t j;
+        for (j = 0; child_ladder[j] != NULL; j++) {
+            ladder[step++] = child_ladder[j];
+        }
+        FREEMEM(child_ladder);
+    }
+    return ladder;
+}
+
 CFCClass**
 CFCClass_children(CFCClass *self)
 {

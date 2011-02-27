@@ -61,6 +61,12 @@ CFCClass_function(CFCClass *self, const char *sym);
 void
 CFCClass_bequeath_member_vars(CFCClass *self);
 
+void
+CFCClass_establish_ancestry(CFCClass *self);
+
+CFCClass**
+CFCClass_tree_to_ladder(CFCClass *self);
+
 CFCClass**
 CFCClass_children(CFCClass *self);
 

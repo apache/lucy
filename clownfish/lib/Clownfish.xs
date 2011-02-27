@@ -156,6 +156,12 @@ PPCODE:
     CFCClass_bequeath_member_vars(self);
 
 void
+_establish_ancestry(self)
+    CFCClass *self;
+PPCODE:
+    CFCClass_establish_ancestry(self);
+
+void
 add_inert_var(self, var)
     CFCClass *self;
     CFCVariable *var;
@@ -198,6 +204,7 @@ ALIAS:
     functions             = 34
     member_vars           = 38
     inert_vars            = 40
+    tree_to_ladder        = 42
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -332,6 +339,19 @@ PPCODE:
                 SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)vars[i]));
                 av_store(av, i, val);
             }
+            retval = newRV((SV*)av);
+            SvREFCNT_dec(av);
+            break;
+        }
+        case 42: {
+            AV *av = newAV();
+            CFCClass **ladder = CFCClass_tree_to_ladder(self);
+            size_t i;
+            for (i = 0; ladder[i] != NULL; i++) {
+                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)ladder[i]));
+                av_store(av, i, val);
+            }
+            FREEMEM(ladder);
             retval = newRV((SV*)av);
             SvREFCNT_dec(av);
             break;
