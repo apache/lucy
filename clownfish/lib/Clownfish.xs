@@ -48,6 +48,21 @@
         XSRETURN(0); \
     } 
 
+// Transform a NULL-terminated array of CFCBase* into a Perl arrayref.
+static SV*
+S_array_of_cfcbase_to_av(CFCBase **things)
+{
+    AV *av = newAV();
+    size_t i;
+    for (i = 0; things[i] != NULL; i++) {
+        SV *val = newRV(CFCBase_get_perl_obj(things[i]));
+        av_store(av, i, val);
+    }
+    SV *retval = newRV((SV*)av);
+    SvREFCNT_dec(av);
+    return retval;
+}
+
 MODULE = Clownfish    PACKAGE = Clownfish::CBlock
 
 SV*
@@ -338,90 +353,36 @@ PPCODE:
                        : newSV(0);
             }
             break;
-        case 32: {
-            AV *av = newAV();
-            CFCClass **children = CFCClass_children(self);
-            size_t i;
-            for (i = 0; children[i] != NULL; i++) {
-                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)children[i]));
-                av_store(av, i, val);
-            }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
+        case 32: 
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCClass_children(self));
             break;
-        }
-        case 34: {
-            AV *av = newAV();
-            CFCFunction **funcs = CFCClass_functions(self);
-            size_t i;
-            for (i = 0; funcs[i] != NULL; i++) {
-                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)funcs[i]));
-                av_store(av, i, val);
-            }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
+        case 34: 
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCClass_functions(self));
             break;
-        }
-        case 36: {
-            AV *av = newAV();
-            CFCMethod **methods = CFCClass_methods(self);
-            size_t i;
-            for (i = 0; methods[i] != NULL; i++) {
-                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)methods[i]));
-                av_store(av, i, val);
-            }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
+        case 36:
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCClass_methods(self));
             break;
-        }
-        case 38: {
-            AV *av = newAV();
-            CFCVariable **vars = CFCClass_member_vars(self);
-            size_t i;
-            for (i = 0; vars[i] != NULL; i++) {
-                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)vars[i]));
-                av_store(av, i, val);
-            }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
+        case 38:
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCClass_member_vars(self));
             break;
-        }
-        case 40: {
-            AV *av = newAV();
-            CFCVariable **vars = CFCClass_inert_vars(self);
-            size_t i;
-            for (i = 0; vars[i] != NULL; i++) {
-                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)vars[i]));
-                av_store(av, i, val);
-            }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
+        case 40:
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCClass_inert_vars(self));
             break;
-        }
         case 42: {
-            AV *av = newAV();
             CFCClass **ladder = CFCClass_tree_to_ladder(self);
-            size_t i;
-            for (i = 0; ladder[i] != NULL; i++) {
-                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)ladder[i]));
-                av_store(av, i, val);
-            }
+            retval = S_array_of_cfcbase_to_av((CFCBase**)ladder);
             FREEMEM(ladder);
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
             break;
         }
         case 44: {
-            AV *av = newAV();
             CFCVariable **novel = CFCClass_novel_member_vars(self);
-            size_t i;
-            for (i = 0; novel[i] != NULL; i++) {
-                SV *val = newRV(CFCBase_get_perl_obj((CFCBase*)novel[i]));
-                av_store(av, i, val);
-            }
+            retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
             FREEMEM(novel);
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
             break;
         }
     END_SET_OR_GET_SWITCH
@@ -623,31 +584,13 @@ PPCODE:
                 retval = newSVpv(value, strlen(value));
             }
             break;
-        case 12: {
-            AV *av = newAV();
-            CFCBase **blocks = CFCFile_blocks(self);
-            size_t i;
-            for (i = 0; blocks[i] != NULL; i++) {
-                SV *ref = newRV((SV*)CFCBase_get_perl_obj(blocks[i]));
-                av_store(av, i, ref);
-            }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
+        case 12:
+            retval = S_array_of_cfcbase_to_av(CFCFile_blocks(self));
             break;
-        }
-        case 14: {
-            AV *av = newAV();
-            CFCClass **classes = CFCFile_classes(self);
-            size_t i;
-            for (i = 0; classes[i] != NULL; i++) {
-                SV *ref = newRV((SV*)CFCBase_get_perl_obj(
-                    (CFCBase*)classes[i]));
-                av_store(av, i, ref);
-            }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
+        case 14:
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCFile_classes(self));
             break;
-        }
     END_SET_OR_GET_SWITCH
 }
 
