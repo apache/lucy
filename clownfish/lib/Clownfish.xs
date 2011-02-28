@@ -100,7 +100,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Class
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
+_create(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
     const char *klass;
     CFCParcel *parcel;
     const char *exposure;
@@ -123,7 +123,7 @@ CODE:
                             ? SvPV_nolen(source_class_sv) : NULL;
     const char *parent_class_name = SvOK(parent_class_name_sv) 
                                   ? SvPV_nolen(parent_class_name_sv) : NULL;
-    CFCClass *self = CFCClass_new(parcel, exposure, class_name, class_cnick,
+    CFCClass *self = CFCClass_create(parcel, exposure, class_name, class_cnick,
         micro_sym, docucomment, source_class, parent_class_name, is_final, 
         is_inert);
     RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));

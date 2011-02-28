@@ -83,7 +83,7 @@ sub create {
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
     $args{exposure}  ||= 'parcel';
     $args{micro_sym} ||= 'class';
-    my $self = $either->_new(
+    my $self = $either->_create(
         @args{qw( parcel exposure class_name class_cnick micro_sym
         docucomment source_class parent_class_name final inert )} );
 

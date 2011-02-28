@@ -25,19 +25,19 @@ struct CFCMethod;
 struct CFCVariable;
 
 CFCClass*
-CFCClass_new(struct CFCParcel *parcel, const char *exposure, 
-              const char *class_name, const char *class_cnick, 
-              const char *micro_sym, struct CFCDocuComment *docucomment,
-              const char *source_class, const char *parent_class_name, 
-              int is_final, int is_inert);
+CFCClass_create(struct CFCParcel *parcel, const char *exposure, 
+                const char *class_name, const char *class_cnick, 
+                const char *micro_sym, struct CFCDocuComment *docucomment,
+                const char *source_class, const char *parent_class_name, 
+                int is_final, int is_inert);
 
 CFCClass*
-CFCClass_init(CFCClass *self, struct CFCParcel *parcel, 
-               const char *exposure, const char *class_name, 
-               const char *class_cnick, const char *micro_sym,
-               struct CFCDocuComment *docucomment, 
-               const char *source_class, const char *parent_class_name, 
-               int is_final, int is_inert);
+CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel, 
+                   const char *exposure, const char *class_name, 
+                   const char *class_cnick, const char *micro_sym,
+                   struct CFCDocuComment *docucomment, 
+                   const char *source_class, const char *parent_class_name, 
+                   int is_final, int is_inert);
 
 void
 CFCClass_destroy(CFCClass *self);

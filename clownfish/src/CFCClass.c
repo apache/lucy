@@ -104,25 +104,25 @@ static void
 S_bequeath_methods(CFCClass *self);
 
 CFCClass*
-CFCClass_new(struct CFCParcel *parcel, const char *exposure, 
-              const char *class_name, const char *class_cnick, 
-              const char *micro_sym, CFCDocuComment *docucomment, 
-              const char *source_class, const char *parent_class_name, 
-              int is_final, int is_inert)
+CFCClass_create(struct CFCParcel *parcel, const char *exposure, 
+                const char *class_name, const char *class_cnick, 
+                const char *micro_sym, CFCDocuComment *docucomment, 
+                const char *source_class, const char *parent_class_name, 
+                int is_final, int is_inert)
 {
     CFCClass *self = (CFCClass*)CFCBase_allocate(sizeof(CFCClass),
         "Clownfish::Class");
-    return CFCClass_init(self, parcel, exposure, class_name, class_cnick,
+    return CFCClass_do_create(self, parcel, exposure, class_name, class_cnick,
         micro_sym, docucomment, source_class, parent_class_name, is_final, 
         is_inert);
 }
 
 CFCClass*
-CFCClass_init(CFCClass *self, struct CFCParcel *parcel, 
-               const char *exposure, const char *class_name, 
-               const char *class_cnick, const char *micro_sym, 
-               CFCDocuComment *docucomment, const char *source_class, 
-               const char *parent_class_name, int is_final, int is_inert)
+CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel, 
+                   const char *exposure, const char *class_name, 
+                   const char *class_cnick, const char *micro_sym, 
+                   CFCDocuComment *docucomment, const char *source_class, 
+                   const char *parent_class_name, int is_final, int is_inert)
 {
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name, 
         class_cnick, micro_sym);
