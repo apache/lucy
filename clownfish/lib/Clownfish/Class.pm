@@ -27,8 +27,6 @@ use Clownfish::Util qw(
     a_isa_b
 );
 use Clownfish::Dumpable;
-use File::Spec::Functions qw( catfile );
-use Scalar::Util qw( reftype );
 
 END { __PACKAGE__->_clear_registry() }
 
@@ -43,8 +41,6 @@ our %create_PARAMS = (
     parcel            => undef,
     exposure          => 'parcel',
 );
-
-my $dumpable = Clownfish::Dumpable->new;
 
 our %fetch_singleton_PARAMS = (
     parcel     => undef,
@@ -95,32 +91,6 @@ sub create {
     $self->_register;
 
     return $self;
-}
-
-# Create dumpable functions unless hand coded versions were supplied.
-sub _create_dumpables {
-    my $self = shift;
-    $dumpable->add_dumpables($self) if $self->has_attribute('dumpable');
-}
-
-sub grow_tree {
-    my $self = shift;
-    confess("Can't call grow_tree more than once") if $self->_tree_grown;
-    $self->_establish_ancestry;
-    $self->_bequeath_member_vars;
-    $self->_generate_automethods;
-    $self->_bequeath_methods;
-    $self->_set_tree_grown(1);
-}
-
-# Create auto-generated methods.  This must be called after member vars are
-# passed down but before methods are passed down.
-sub _generate_automethods {
-    my $self = shift;
-    $self->_create_dumpables;
-    for my $child ( @{ $self->children } ) {
-        $child->_generate_automethods;
-    }
 }
 
 1;

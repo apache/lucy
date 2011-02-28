@@ -210,22 +210,10 @@ CODE:
 OUTPUT: RETVAL
 
 void
-_bequeath_methods(self)
+grow_tree(self)
     CFCClass *self;
 PPCODE:
-    CFCClass_bequeath_methods(self);
-
-void
-_bequeath_member_vars(self)
-    CFCClass *self;
-PPCODE:
-    CFCClass_bequeath_member_vars(self);
-
-void
-_establish_ancestry(self)
-    CFCClass *self;
-PPCODE:
-    CFCClass_establish_ancestry(self);
+    CFCClass_grow_tree(self);
 
 void
 add_inert_var(self, var)
@@ -278,8 +266,6 @@ _set_or_get(self, ...)
     CFCClass *self;
 ALIAS:
     get_cnick             = 2
-    _set_tree_grown       = 3
-    _tree_grown           = 4
     set_parent            = 5
     get_parent            = 6
     get_autocode          = 8
@@ -309,12 +295,6 @@ PPCODE:
                 const char *value = CFCClass_get_cnick(self);
                 retval = newSVpvn(value, strlen(value));
             }
-            break;
-        case 3:
-            CFCClass_set_tree_grown(self, !!SvTRUE(ST(1)));
-            break;
-        case 4:
-            retval = newSViv(CFCClass_tree_grown(self));
             break;
         case 5: {
                 CFCClass *parent = NULL;

@@ -29,6 +29,7 @@
 #define CFC_NEED_SYMBOL_STRUCT_DEF
 #include "CFCSymbol.h"
 #include "CFCClass.h"
+#include "CFCDumpable.h"
 #include "CFCFunction.h"
 #include "CFCMethod.h"
 #include "CFCParcel.h"
@@ -49,6 +50,7 @@ typedef struct CFCClassRegEntry {
 static CFCClassRegEntry *registry = NULL;
 static size_t registry_size = 0;
 static size_t registry_cap  = 0;
+
 
 struct CFCClass {
     CFCSymbol symbol;
@@ -79,6 +81,27 @@ struct CFCClass {
     char *full_vtable_type;
     char *include_h;
 };
+
+// Link up parents and kids.
+static void
+S_establish_ancestry(CFCClass *self);
+
+// Pass down member vars to from parent to children.
+static void
+S_bequeath_member_vars(CFCClass *self);
+
+// Create auto-generated methods.  This must be called after member vars are
+// passed down but before methods are passed down.
+static void
+S_generate_automethods(CFCClass *self);
+
+// Create dumpable functions unless hand coded versions were supplied.
+static void
+S_create_dumpables(CFCClass *self);
+
+// Pass down methods to from parent to children.
+static void
+S_bequeath_methods(CFCClass *self);
 
 CFCClass*
 CFCClass_new(struct CFCParcel *parcel, const char *exposure, 
@@ -319,17 +342,6 @@ CFCClass_add_method(CFCClass *self, CFCMethod *method)
 }
 
 void
-CFCClass_zap_methods(CFCClass *self)
-{
-    size_t i;
-    for (i = 0; self->methods[i] != NULL; i++) {
-        CFCBase_decref((CFCBase*)self->methods[i]);
-    }
-    self->methods[0] = NULL;
-    self->num_methods = 0;
-}
-
-void
 CFCClass_add_member_var(CFCClass *self, CFCVariable *var)
 {
     CFCUTIL_NULL_CHECK(var);
@@ -440,8 +452,8 @@ CFCClass_novel_method(CFCClass *self, const char *sym)
 }
 
 // Pass down member vars to from parent to children.
-void
-CFCClass_bequeath_member_vars(CFCClass *self)
+static void
+S_bequeath_member_vars(CFCClass *self)
 {
     size_t i;
     for (i = 0; self->children[i] != NULL; i++) {
@@ -461,12 +473,12 @@ CFCClass_bequeath_member_vars(CFCClass *self)
         }
         child->num_member_vars = num_vars;
         child->member_vars[num_vars] = NULL;
-        CFCClass_bequeath_member_vars(child);
+        S_bequeath_member_vars(child);
     }
 }
 
-void
-CFCClass_bequeath_methods(CFCClass *self)
+static void
+S_bequeath_methods(CFCClass *self)
 {
     size_t child_num;
     for (child_num = 0; self->children[child_num] != NULL; child_num++) {
@@ -523,14 +535,14 @@ CFCClass_bequeath_methods(CFCClass *self)
         child->num_methods = num_methods;
 
         // Pass it all down to the next generation.
-        CFCClass_bequeath_methods(child);
-        CFCClass_set_tree_grown(child, true);
+        S_bequeath_methods(child);
+        child->tree_grown = true;
     }
 }
 
 // Let the children know who their parent class is.
-void
-CFCClass_establish_ancestry(CFCClass *self)
+static void
+S_establish_ancestry(CFCClass *self)
 {
     size_t i;
     for (i = 0; i < self->num_kids; i++) {
@@ -538,7 +550,7 @@ CFCClass_establish_ancestry(CFCClass *self)
         // This is a circular reference and thus a memory leak, but we don't
         // care, because we have to have everything in memory at once anyway.
         CFCClass_set_parent(child, self);
-        CFCClass_establish_ancestry(child);
+        S_establish_ancestry(child);
     }
 }
 
@@ -551,6 +563,39 @@ S_family_tree_size(CFCClass *self)
         count += S_family_tree_size(self->children[i]);
     }
     return count;
+}
+
+static void
+S_create_dumpables(CFCClass *self)
+{
+    if (CFCClass_has_attribute(self, "dumpable")) {
+        CFCDumpable *dumpable = CFCDumpable_new();
+        CFCDumpable_add_dumpables(dumpable, self);
+        CFCBase_decref((CFCBase*)dumpable);
+    }
+}
+
+void
+CFCClass_grow_tree(CFCClass *self)
+{
+    if (self->tree_grown) {
+        croak("Can't call grow_tree more than once");
+    }
+    S_establish_ancestry(self);
+    S_bequeath_member_vars(self);
+    S_generate_automethods(self);
+    S_bequeath_methods(self);
+    self->tree_grown = 1;
+}
+
+static void
+S_generate_automethods(CFCClass *self) 
+{
+    S_create_dumpables(self);
+    size_t i;
+    for (i = 0; i < self->num_kids; i++) {
+        S_generate_automethods(self->children[i]);
+    }
 }
 
 // Return value is valid only so long as object persists (elements are not
@@ -643,18 +688,6 @@ const char*
 CFCClass_get_cnick(CFCClass *self)
 {
     return CFCSymbol_get_class_cnick((CFCSymbol*)self);
-}
-
-void
-CFCClass_set_tree_grown(CFCClass *self, int tree_grown)
-{
-    self->tree_grown = !!tree_grown;
-}
-
-int
-CFCClass_tree_grown(CFCClass *self)
-{
-    return self->tree_grown;
 }
 
 void
