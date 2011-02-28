@@ -19,8 +19,6 @@
 
 typedef struct CFCDumpable CFCDumpable;
 struct CFCClass;
-struct CFCMethod;
-struct CFCVariable;
 
 CFCDumpable*
 CFCDumpable_new(void);
@@ -31,20 +29,8 @@ CFCDumpable_init(CFCDumpable *self);
 void
 CFCDumpable_destroy(CFCDumpable *self);
 
-
-/** Create a Clownfish::Method object for either Dump() or Load().
- */
-struct CFCMethod*
-CFCDumpable_make_method_obj(CFCDumpable *self, struct CFCClass *klass, 
-                            const char *method_name);
-
 void
-CFCDumpable_process_dump_member(struct CFCVariable *member, char *buf,
-                                size_t buf_size);
-
-void
-CFCDumpable_process_load_member(struct CFCVariable *member, char *buf,
-                                size_t buf_size);
+CFCDumpable_add_dumpables(CFCDumpable *self, struct CFCClass *klass);
 
 #endif /* H_CFCDUMPABLE */
 
