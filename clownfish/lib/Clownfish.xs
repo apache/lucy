@@ -100,30 +100,32 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Class
 
 SV*
-_create(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
+_create(klass, parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
     const char *klass;
     CFCParcel *parcel;
-    const char *exposure;
+    SV *exposure_sv;
     SV *class_name_sv;
-    SV *class_cnick_sv;
+    SV *cnick_sv;
     SV *micro_sym_sv;
     CFCDocuComment *docucomment;
     SV *source_class_sv;
     SV *parent_class_name_sv;
-    int is_final;
-    int is_inert;
+    bool is_final;
+    bool is_inert;
 CODE:
+    const char *exposure = SvOK(exposure_sv)
+                         ? SvPV_nolen(exposure_sv) : NULL;
     const char *class_name = SvOK(class_name_sv) 
                            ? SvPV_nolen(class_name_sv) : NULL;
-    const char *class_cnick = SvOK(class_cnick_sv) 
-                            ? SvPV_nolen(class_cnick_sv) : NULL;
+    const char *cnick = SvOK(cnick_sv) 
+                      ? SvPV_nolen(cnick_sv) : NULL;
     const char *micro_sym = SvOK(micro_sym_sv) 
                             ? SvPV_nolen(micro_sym_sv) : NULL;
     const char *source_class = SvOK(source_class_sv) 
                             ? SvPV_nolen(source_class_sv) : NULL;
     const char *parent_class_name = SvOK(parent_class_name_sv) 
                                   ? SvPV_nolen(parent_class_name_sv) : NULL;
-    CFCClass *self = CFCClass_create(parcel, exposure, class_name, class_cnick,
+    CFCClass *self = CFCClass_create(parcel, exposure, class_name, cnick,
         micro_sym, docucomment, source_class, parent_class_name, is_final, 
         is_inert);
     RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
@@ -137,10 +139,11 @@ PPCODE:
     CFCClass_destroy(self);
 
 SV*
-_fetch_from_registry(key)
-    const char *key;
+_fetch_singleton(parcel, class_name)
+    CFCParcel *parcel;
+    const char *class_name;
 CODE:
-    CFCClass *klass = CFCClass_fetch_from_registry(key);
+    CFCClass *klass = CFCClass_fetch_singleton(parcel, class_name);
     RETVAL = klass
            ? newRV(CFCBase_get_perl_obj((CFCBase*)klass))
            : newSV(0);

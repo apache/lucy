@@ -105,14 +105,14 @@ S_bequeath_methods(CFCClass *self);
 
 CFCClass*
 CFCClass_create(struct CFCParcel *parcel, const char *exposure, 
-                const char *class_name, const char *class_cnick, 
+                const char *class_name, const char *cnick, 
                 const char *micro_sym, CFCDocuComment *docucomment, 
                 const char *source_class, const char *parent_class_name, 
                 int is_final, int is_inert)
 {
     CFCClass *self = (CFCClass*)CFCBase_allocate(sizeof(CFCClass),
         "Clownfish::Class");
-    return CFCClass_do_create(self, parcel, exposure, class_name, class_cnick,
+    return CFCClass_do_create(self, parcel, exposure, class_name, cnick,
         micro_sym, docucomment, source_class, parent_class_name, is_final, 
         is_inert);
 }
@@ -120,12 +120,15 @@ CFCClass_create(struct CFCParcel *parcel, const char *exposure,
 CFCClass*
 CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel, 
                    const char *exposure, const char *class_name, 
-                   const char *class_cnick, const char *micro_sym, 
+                   const char *cnick, const char *micro_sym, 
                    CFCDocuComment *docucomment, const char *source_class, 
                    const char *parent_class_name, int is_final, int is_inert)
 {
-    CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name, 
-        class_cnick, micro_sym);
+    CFCUTIL_NULL_CHECK(class_name);
+    exposure  = exposure  ? exposure  : "parcel";
+    micro_sym = micro_sym ? micro_sym : "class";
+    CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name, cnick, 
+        micro_sym);
     self->parent     = NULL;
     self->tree_grown = false;
     self->autocode   = (char*)CALLOCATE(1, sizeof(char));
@@ -196,6 +199,9 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->is_final = !!is_final;
     self->is_inert = !!is_inert;
 
+    // Store in registry.
+    CFCClass_register(self);
+
     return self;
 }
 
@@ -246,7 +252,6 @@ CFCClass_destroy(CFCClass *self)
 void
 CFCClass_register(CFCClass *self)
 {
-    const char *key = self->full_struct_sym;
     if (registry_size == registry_cap) {
         size_t new_cap = registry_cap + 10;
         registry = (CFCClassRegEntry*)REALLOCATE(registry,
@@ -258,7 +263,10 @@ CFCClass_register(CFCClass *self)
         }
         registry_cap = new_cap;
     }
-    CFCClass *existing = CFCClass_fetch_from_registry(key);
+    CFCParcel *parcel = CFCSymbol_get_parcel((CFCSymbol*)self);
+    const char *class_name = CFCSymbol_get_class_name((CFCSymbol*)self);
+    CFCClass *existing = CFCClass_fetch_singleton(parcel, class_name);
+    const char *key = self->full_struct_sym;
     if (existing) {
         croak("New class %s conflicts with existing class %s", 
              CFCSymbol_get_class_name((CFCSymbol*)self),
@@ -270,9 +278,25 @@ CFCClass_register(CFCClass *self)
 }
 
 CFCClass*
-CFCClass_fetch_from_registry(const char *key)
+CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name)
 {
-    if (!key) { return NULL; }
+    CFCUTIL_NULL_CHECK(class_name);
+
+    // Build up the key.
+    const char *last_colon = strrchr(class_name, ':');
+    const char *struct_sym = last_colon 
+                           ? last_colon + 1
+                           : class_name;
+    const char *prefix = parcel ? CFCParcel_get_prefix(parcel) : "";
+    size_t prefix_len = strlen(prefix);
+    size_t struct_sym_len = strlen(struct_sym);
+    const size_t MAX_LEN = 256;
+    if (prefix_len + struct_sym_len > MAX_LEN) {
+        croak("names too long: '%s', '%s'", prefix, struct_sym);
+    }
+    char key[MAX_LEN + 1];
+    int check = sprintf(key, "%s%s", prefix, struct_sym);
+    if (check < 0) { croak("sprintf failed"); }
     size_t i;
     for (i = 0; i < registry_size; i++) {
         if (strcmp(registry[i].key, key) == 0) {

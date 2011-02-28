@@ -50,22 +50,14 @@ our %fetch_singleton_PARAMS = (
 sub fetch_singleton {
     my ( undef, %args ) = @_;
     verify_args( \%fetch_singleton_PARAMS, %args ) or confess $@;
-
-    # Start with the class identifier.
-    my $class_name = $args{class_name};
-    confess("Missing required param 'class_name'") unless defined $class_name;
-    $class_name =~ /(\w+)$/ or confess("Invalid class name: '$class_name'");
-    my $key = $1;
-
     # Maybe prepend parcel prefix.
     my $parcel = $args{parcel};
     if ( defined $parcel ) {
         if ( !a_isa_b( $parcel, "Clownfish::Parcel" ) ) {
             $parcel = Clownfish::Parcel->singleton( name => $parcel );
         }
-        $key = $parcel->get_prefix . $key;
     }
-    return _fetch_from_registry($key);
+    return _fetch_singleton( $parcel, $args{class_name} );
 }
 
 sub new { confess("The constructor for Clownfish::Class is create()") }
@@ -73,24 +65,11 @@ sub new { confess("The constructor for Clownfish::Class is create()") }
 sub create {
     my ( $either, %args ) = @_;
     verify_args( \%create_PARAMS, %args ) or confess $@;
-    $args{class_cnick} = delete $args{cnick};
-    my $class_name = $args{class_name};
-    confess("Missing required param 'class_name'") unless $class_name;
-    $args{inert} ||= 0;
-    $args{final} ||= 0;
-
-    my $package = ref($either) || $either;
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-    $args{exposure}  ||= 'parcel';
-    $args{micro_sym} ||= 'class';
-    my $self = $either->_create(
-        @args{qw( parcel exposure class_name class_cnick micro_sym
+    my $package = ref($either) || $either;
+    return _create( $package, 
+        @args{qw( parcel exposure class_name cnick micro_sym
         docucomment source_class parent_class_name final inert )} );
-
-    # Store in registry.
-    $self->_register;
-
-    return $self;
 }
 
 1;

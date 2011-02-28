@@ -26,7 +26,7 @@ struct CFCVariable;
 
 CFCClass*
 CFCClass_create(struct CFCParcel *parcel, const char *exposure, 
-                const char *class_name, const char *class_cnick, 
+                const char *class_name, const char *cnick, 
                 const char *micro_sym, struct CFCDocuComment *docucomment,
                 const char *source_class, const char *parent_class_name, 
                 int is_final, int is_inert);
@@ -34,7 +34,7 @@ CFCClass_create(struct CFCParcel *parcel, const char *exposure,
 CFCClass*
 CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel, 
                    const char *exposure, const char *class_name, 
-                   const char *class_cnick, const char *micro_sym,
+                   const char *cnick, const char *micro_sym,
                    struct CFCDocuComment *docucomment, 
                    const char *source_class, const char *parent_class_name, 
                    int is_final, int is_inert);
@@ -43,7 +43,7 @@ void
 CFCClass_destroy(CFCClass *self);
 
 CFCClass*
-CFCClass_fetch_from_registry(const char *key);
+CFCClass_fetch_singleton(struct CFCParcel *parcel, const char *class_name);
 
 void
 CFCClass_register(CFCClass *self);
