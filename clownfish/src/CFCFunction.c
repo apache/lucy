@@ -19,7 +19,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#ifndef true;
+#ifndef true
     #define true 1
     #define false 0
 #endif

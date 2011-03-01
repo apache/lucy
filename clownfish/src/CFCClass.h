@@ -85,6 +85,9 @@ CFCClass_method(CFCClass *self, const char *sym);
 struct CFCMethod*
 CFCClass_novel_method(CFCClass *self, const char *sym);
 
+void
+CFCClass_grow_tree(CFCClass *self);
+
 CFCClass**
 CFCClass_tree_to_ladder(CFCClass *self);
 
