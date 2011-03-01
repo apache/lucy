@@ -17,6 +17,11 @@ use 5.008003;
 use strict;
 use warnings;
 use Module::Build;
+use Config;
+my $extra_cc_flags = '';
+if ( $Config{cc} eq 'cl' ) {
+    $extra_cc_flags .= '/TP ';
+}
 
 my $builder = Module::Build->new(
     module_name => 'Clownfish',
@@ -40,6 +45,7 @@ my $builder = Module::Build->new(
             *.manifest
             ),
     ],
+    extra_compiler_flags => $extra_cc_flags,
 );
 
 $builder->create_build_script();
