@@ -17,6 +17,10 @@
 #ifndef H_CFCCBLOCK
 #define H_CFCCBLOCK
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCCBlock CFCCBlock;
 
 CFCCBlock*
@@ -30,6 +34,10 @@ CFCCBlock_destroy(CFCCBlock *self);
 
 const char*
 CFCCBlock_get_contents(CFCCBlock *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCCBLOCK */
 

@@ -17,6 +17,10 @@
 #ifndef H_CFCFUNCTION
 #define H_CFCFUNCTION
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCFunction CFCFunction;
 struct CFCParcel;
 struct CFCType;
@@ -73,6 +77,10 @@ CFCFunction_full_func_sym(CFCFunction *self);
 
 const char*
 CFCFunction_short_func_sym(CFCFunction *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCFUNCTION */
 

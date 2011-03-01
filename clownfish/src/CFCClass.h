@@ -17,6 +17,10 @@
 #ifndef H_CFCCLASS
 #define H_CFCCLASS
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCClass CFCClass;
 struct CFCParcel;
 struct CFCDocuComment;
@@ -152,6 +156,10 @@ CFCClass_include_h(CFCClass *self);
 
 struct CFCDocuComment*
 CFCClass_get_docucomment(CFCClass *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCCLASS */
 

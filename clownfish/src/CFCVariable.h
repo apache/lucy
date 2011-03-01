@@ -17,6 +17,10 @@
 #ifndef H_CFCVARIABLE
 #define H_CFCVARIABLE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCVariable CFCVariable;
 struct CFCParcel;
 struct CFCType;
@@ -49,6 +53,10 @@ CFCVariable_global_c(CFCVariable *self);
 
 const char*
 CFCVariable_local_declaration(CFCVariable *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCVARIABLE */
 

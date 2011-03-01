@@ -17,6 +17,10 @@
 #ifndef H_CFCMETHOD
 #define H_CFCMETHOD
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCMethod CFCMethod;
 struct CFCParcel;
 struct CFCType;
@@ -98,6 +102,10 @@ CFCMethod_novel(CFCMethod *self);
 
 struct CFCType*
 CFCMethod_self_type(CFCMethod *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCMETHOD */
 

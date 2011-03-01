@@ -17,6 +17,10 @@
 #ifndef H_CFCHIERARCHY
 #define H_CFCHIERARCHY
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCHierarchy CFCHierarchy;
 
 CFCHierarchy*
@@ -33,6 +37,10 @@ CFCHierarchy_get_source(CFCHierarchy *self);
 
 const char*
 CFCHierarchy_get_dest(CFCHierarchy *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCHIERARCHY */
 

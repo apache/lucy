@@ -17,6 +17,10 @@
 #ifndef H_CFCBASE
 #define H_CFCBASE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCBase CFCBase;
 
 #ifdef CFC_NEED_BASE_STRUCT_DEF
@@ -63,6 +67,10 @@ CFCBase_get_perl_obj(CFCBase *self);
  */
 const char*
 CFCBase_get_cfc_class(CFCBase *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCBASE */
 

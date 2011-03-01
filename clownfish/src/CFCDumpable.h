@@ -17,6 +17,10 @@
 #ifndef H_CFCDUMPABLE
 #define H_CFCDUMPABLE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCDumpable CFCDumpable;
 struct CFCClass;
 
@@ -31,6 +35,10 @@ CFCDumpable_destroy(CFCDumpable *self);
 
 void
 CFCDumpable_add_dumpables(CFCDumpable *self, struct CFCClass *klass);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCDUMPABLE */
 

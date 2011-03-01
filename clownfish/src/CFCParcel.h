@@ -17,6 +17,10 @@
 #ifndef H_CFCPARCEL
 #define H_CFCPARCEL
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCParcel CFCParcel;
 
 CFCParcel*
@@ -63,6 +67,10 @@ CFCParcel_get_Prefix(CFCParcel *self);
 
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCPARCEL */
 

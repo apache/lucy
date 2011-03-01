@@ -17,6 +17,10 @@
 #ifndef H_CFCPARAMLIST
 #define H_CFCPARAMLIST
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCParamList CFCParamList;
 struct CFCVariable;
 
@@ -50,6 +54,10 @@ CFCParamList_to_c(CFCParamList *self);
 
 const char*
 CFCParamList_name_list(CFCParamList *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCPARAMLIST */
 

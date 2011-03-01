@@ -17,6 +17,10 @@
 #ifndef H_CFCTYPE
 #define H_CFCTYPE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCType CFCType;
 struct CFCParcel;
 
@@ -139,6 +143,10 @@ CFCType_is_arbitrary(CFCType *self);
 
 int
 CFCType_is_composite(CFCType *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCTYPE */
 

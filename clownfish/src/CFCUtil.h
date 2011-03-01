@@ -17,6 +17,10 @@
 #ifndef H_CFCUTIL
 #define H_CFCUTIL
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Create an inner Perl object with a refcount of 1.  For use in actual
  * Perl-space, it is necessary to wrap this inner object in an RV.
  */
@@ -107,6 +111,10 @@ CFCUtil_die(const char *format, ...);
  */
 void
 CFCUtil_warn(const char *format, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCUTIL */
 

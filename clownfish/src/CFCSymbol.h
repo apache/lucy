@@ -17,6 +17,10 @@
 #ifndef H_CFCSYMBOL
 #define H_CFCSYMBOL
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCSymbol CFCSymbol;
 struct CFCParcel;
 
@@ -100,6 +104,10 @@ CFCSymbol_get_Prefix(CFCSymbol *self);
 
 const char*
 CFCSymbol_get_PREFIX(CFCSymbol *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCSYMBOL */
 

@@ -17,6 +17,10 @@
 #ifndef H_CFCFILE
 #define H_CFCFILE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCFile CFCFile;
 struct CFCBase;
 struct CFCClass;
@@ -74,6 +78,10 @@ CFCFile_guard_start(CFCFile *self);
 
 const char*
 CFCFile_guard_close(CFCFile *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H_CFCFILE */
 
