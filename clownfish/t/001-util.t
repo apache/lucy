@@ -16,13 +16,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 15;
 use File::stat qw( stat );
 use Clownfish::Util qw(
     slurp_file
     current
     verify_args
-    strip_c_comments
     a_isa_b
     write_if_changed
 );
@@ -52,10 +51,6 @@ ok( stat($foo_txt)->mtime != $one_second_ago,
 );
 
 unlink $foo_txt;
-
-my $comment    = "/* I have nothing to say to you, world. */\n";
-my $no_comment = "\n";
-is( strip_c_comments($comment), $no_comment, "strip_c_comments" );
 
 my %defaults = ( foo => undef );
 sub test_verify_args { return verify_args( \%defaults, @_ ) }

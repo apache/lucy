@@ -61,12 +61,6 @@ sub current {
     return 1;
 }
 
-sub strip_c_comments {
-    my $c_code = shift;
-    $c_code =~ s#/\*.*?\*/##gsm;
-    return $c_code;
-}
-
 sub verify_args {
     my $defaults = shift;    # leave the rest of @_ intact
 

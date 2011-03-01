@@ -26,8 +26,6 @@
     #define false 0
 #endif
 
-#define CHAZ_USE_SHORT_NAMES
-
 #include "CFCUtil.h"
 
 void*
