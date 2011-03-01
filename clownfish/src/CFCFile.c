@@ -191,6 +191,14 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
         int check = sprintf(buf, "%s%s", self->path_part, ext);
         if (check < 0) { croak("sprintf failed"); }
     }
+    size_t i;
+    for (i = 0; buf[i] != '\0'; i++) {
+        #ifdef _WIN32
+        if (buf[i] == '/') { buf[i] = '\\'; }
+        #else
+        if (buf[i] == '\\') { buf[i] = '/'; }
+        #endif
+    }
 }
 
 size_t
