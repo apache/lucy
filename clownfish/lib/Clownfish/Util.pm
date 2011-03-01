@@ -33,13 +33,6 @@ our @EXPORT_OK = qw(
     trim_whitespace
 );
 
-sub slurp_file {
-    my $path = shift;
-    open( my $fh, '<', $path ) or confess("Can't open '$path': $!");
-    local $/;
-    return <$fh>;
-}
-
 sub current {
     my ( $orig, $dest ) = @_;
     my $bubble_time = time;
@@ -100,20 +93,6 @@ sub a_isa_b {
     my ( $thing, $class ) = @_;
     return 0 unless blessed($thing);
     return $thing->isa($class);
-}
-
-sub write_if_changed {
-    my ( $path, $content ) = @_;
-    my $write = 1;
-    if ( -e $path ) {
-        open( my $fh, '<', $path ) or confess "Can't open '$path': $!";
-        my $orig = do { local $/; <$fh> };
-        return if $orig eq $content;
-    }
-    unlink $path;
-    sysopen( my $fh, $path, O_CREAT | O_EXCL | O_WRONLY )
-        or confess "Can't open '$path': $!";
-    print $fh $content;
 }
 
 1;

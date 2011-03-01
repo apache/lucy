@@ -1538,6 +1538,25 @@ CODE:
     SvCUR_set(RETVAL, strlen(ptr));
 OUTPUT: RETVAL
 
+SV*
+slurp_file(path)
+    const char *path;
+CODE:
+    size_t len;
+    char *contents = CFCUtil_slurp_file(path, &len);
+    RETVAL = newSVpvn(contents, len);
+    FREEMEM(contents);
+OUTPUT: RETVAL
+
+void
+write_if_changed(path, content_sv)
+    const char *path;
+    SV *content_sv;
+PPCODE:
+    STRLEN len;
+    char *content = SvPV(content_sv, len);
+    CFCUtil_write_if_changed(path, content, len);
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::Variable
 

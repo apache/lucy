@@ -83,7 +83,10 @@ CFCUtil_wrapped_free(void *ptr);
  * an error occurs.
  */
 void
-CFCUtil_write_file(const char *filename, const char *content);
+CFCUtil_write_file(const char *filename, const char *content, size_t len);
+
+void
+CFCUtil_write_if_changed(const char *path, const char *content, size_t len);
 
 /* Read an entire file into memory.
  */

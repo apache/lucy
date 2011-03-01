@@ -21,6 +21,11 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef true
+    #define true 1
+    #define false 0
+#endif
+
 #define CHAZ_USE_SHORT_NAMES
 
 #include "CFCUtil.h"
@@ -151,14 +156,13 @@ CFCUtil_wrapped_free(void *ptr)
 }
 
 void
-CFCUtil_write_file(const char *filename, const char *content)
+CFCUtil_write_file(const char *filename, const char *content, size_t len)
 {
     FILE *fh = fopen(filename, "w+");
-    size_t content_len = strlen(content);
     if (fh == NULL) {
         CFCUtil_die("Couldn't open '%s': %s", filename, strerror(errno));
     }
-    fwrite(content, sizeof(char), content_len, fh);
+    fwrite(content, sizeof(char), len, fh);
     if (fclose(fh)) {
         CFCUtil_die("Error when closing '%s': %s", filename, strerror(errno));
     }
@@ -207,6 +211,28 @@ CFCUtil_slurp_file(const char *file_path, size_t *len_ptr)
     }
 
     return contents;
+}
+
+void
+CFCUtil_write_if_changed(const char *path, const char *content, size_t len)
+{
+    FILE *f = fopen(path, "r");
+    if (f) { // Does file exist?
+        if (fclose(f)) { 
+            CFCUtil_die("Error closing file '%s': %s", path, strerror(errno));
+        }
+        size_t existing_len;
+        char *existing = CFCUtil_slurp_file(path, &existing_len);
+        int changed = true;
+        if (existing_len == len && strcmp(content, existing) == 0) {
+            changed = false;
+        }
+        FREEMEM(existing);
+        if (changed == false) {
+            return;
+        }
+    }
+    CFCUtil_write_file(path, content, len);
 }
 
 long 
