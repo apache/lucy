@@ -17,9 +17,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 #ifndef true
     #define true 1
@@ -28,27 +27,11 @@
 
 #include "CFCUtil.h"
 
-void*
-CFCUtil_make_perl_obj(void *ptr, const char *klass)
-{
-    SV *inner_obj = newSV(0);
-    SvOBJECT_on(inner_obj);
-    PL_sv_objcount++;
-    SvUPGRADE(inner_obj, SVt_PVMG);
-    sv_setiv(inner_obj, PTR2IV(ptr));
-
-    // Connect class association.
-    HV *stash = gv_stashpvn((char*)klass, strlen(klass), TRUE);
-    SvSTASH_set(inner_obj, (HV*)SvREFCNT_inc(stash));
-
-    return  inner_obj;
-}
-
 void
 CFCUtil_null_check(const void *arg, const char *name, const char *file, int line)
 {
     if (!arg) {
-        croak("%s cannot be NULL at %s line %d", name, file, line);
+        CFCUtil_die("%s cannot be NULL at %s line %d", name, file, line);
     }
 }
 
@@ -63,8 +46,7 @@ char*
 CFCUtil_strndup(const char *string, size_t len)
 {
     if (!string) { return NULL; }
-    char *copy = (char*)malloc(len + 1);
-    if (!copy) { croak("malloc failed"); }
+    char *copy = (char*)MALLOCATE(len + 1);
     memcpy(copy, string, len);
     copy[len] = '\0';
     return copy;
@@ -187,10 +169,7 @@ CFCUtil_slurp_file(const char *file_path, size_t *len_ptr)
     }
 
     /* Allocate memory and read the file. */
-    contents = (char*)malloc(len * sizeof(char) + 1);
-    if (contents == NULL) {
-        CFCUtil_die("Out of memory at %d, %s", __FILE__, __LINE__);
-    }
+    contents = (char*)MALLOCATE(len * sizeof(char) + 1);
     contents[len] = '\0';
     check_val = fread(contents, sizeof(char), len, file);
 
@@ -237,14 +216,14 @@ long
 CFCUtil_flength(void *file) 
 {
     FILE *f = (FILE*)file;
-    const long bookmark = ftell(f);
+    const long bookmark = (long)ftell(f);
     long check_val;
     long len;
 
     /* Seek to end of file and check length. */
     check_val = fseek(f, 0, SEEK_END);
     if (check_val == -1) { CFCUtil_die("fseek error : %s\n", strerror(errno)); }
-    len = ftell(f);
+    len = (long)ftell(f);
     if (len == -1) { CFCUtil_die("ftell error : %s\n", strerror(errno)); }
 
     /* Return to where we were. */
@@ -273,5 +252,25 @@ CFCUtil_warn(const char* format, ...)
     vfprintf(stderr, format, args);
     va_end(args);
     fprintf(stderr, "\n");
+}
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+void*
+CFCUtil_make_perl_obj(void *ptr, const char *klass)
+{
+    SV *inner_obj = newSV(0);
+    SvOBJECT_on(inner_obj);
+    PL_sv_objcount++;
+    SvUPGRADE(inner_obj, SVt_PVMG);
+    sv_setiv(inner_obj, PTR2IV(ptr));
+
+    // Connect class association.
+    HV *stash = gv_stashpvn((char*)klass, strlen(klass), TRUE);
+    SvSTASH_set(inner_obj, (HV*)SvREFCNT_inc(stash));
+
+    return  inner_obj;
 }
 
