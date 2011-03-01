@@ -48,6 +48,18 @@
         XSRETURN(0); \
     } 
 
+static SV*
+S_cfcbase_to_perlref(void *thing)
+{
+    if (thing) {
+        SV *perl_obj = (SV*)CFCBase_get_perl_obj((CFCBase*)thing);
+        return newRV(perl_obj);
+    }
+    else {
+        return newSV(0);
+    }
+}
+
 // Transform a NULL-terminated array of CFCBase* into a Perl arrayref.
 static SV*
 S_array_of_cfcbase_to_av(CFCBase **things)
@@ -55,7 +67,7 @@ S_array_of_cfcbase_to_av(CFCBase **things)
     AV *av = newAV();
     size_t i;
     for (i = 0; things[i] != NULL; i++) {
-        SV *val = newRV(CFCBase_get_perl_obj(things[i]));
+        SV *val = S_cfcbase_to_perlref(things[i]);
         av_store(av, i, val);
     }
     SV *retval = newRV((SV*)av);
@@ -71,7 +83,7 @@ _new(klass, contents)
     const char *contents;
 CODE:
     CFCCBlock *self = CFCCBlock_new(contents);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -128,7 +140,7 @@ CODE:
     CFCClass *self = CFCClass_create(parcel, exposure, class_name, cnick,
         micro_sym, docucomment, source_class, parent_class_name, is_final, 
         is_inert);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -144,9 +156,7 @@ _fetch_singleton(parcel, class_name)
     const char *class_name;
 CODE:
     CFCClass *klass = CFCClass_fetch_singleton(parcel, class_name);
-    RETVAL = klass
-           ? newRV(CFCBase_get_perl_obj((CFCBase*)klass))
-           : newSV(0);
+    RETVAL = S_cfcbase_to_perlref(klass);
 OUTPUT: RETVAL
 
 void
@@ -231,9 +241,7 @@ function(self, sym)
     const char *sym;
 CODE:
     CFCFunction *func = CFCClass_function(self, sym);
-    RETVAL = func 
-           ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)func)) 
-           : newSV(0);
+    RETVAL = S_cfcbase_to_perlref(func);
 OUTPUT: RETVAL
 
 SV*
@@ -242,9 +250,7 @@ method(self, sym)
     const char *sym;
 CODE:
     CFCMethod *method = CFCClass_method(self, sym);
-    RETVAL = method 
-           ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)method)) 
-           : newSV(0);
+    RETVAL = S_cfcbase_to_perlref(method);
 OUTPUT: RETVAL
 
 SV*
@@ -253,16 +259,8 @@ novel_method(self, sym)
     const char *sym;
 CODE:
     CFCMethod *method = CFCClass_novel_method(self, sym);
-    RETVAL = method 
-           ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)method)) 
-           : newSV(0);
+    RETVAL = S_cfcbase_to_perlref(method);
 OUTPUT: RETVAL
-
-void
-_zap_methods(self)
-    CFCClass *self;
-PPCODE:
-    CFCClass_zap_methods(self);
 
 void
 _set_or_get(self, ...)
@@ -312,9 +310,7 @@ PPCODE:
             }
         case 6: {
                 CFCClass *parent = CFCClass_get_parent(self);
-                retval = parent 
-                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)parent))
-                       : newSV(0);
+                retval = S_cfcbase_to_perlref(parent);
                 break;
             }
         case 8: {
@@ -370,9 +366,7 @@ PPCODE:
             break;
         case 30: {
                 CFCDocuComment *docucomment = CFCClass_get_docucomment(self);
-                retval = docucomment 
-                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)docucomment))
-                       : newSV(0);
+                retval = S_cfcbase_to_perlref(docucomment);
             }
             break;
         case 32: 
@@ -425,7 +419,7 @@ parse(klass, text)
     const char *text;
 CODE:
     CFCDocuComment *self = CFCDocuComment_parse(text);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -502,7 +496,7 @@ _new(klass)
     const char *klass;
 CODE:
     CFCDumpable *self = CFCDumpable_new();
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -528,7 +522,7 @@ _new(klass, source_class)
     const char *source_class;
 CODE:
     CFCFile *self = CFCFile_new(source_class);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -653,7 +647,7 @@ CODE:
                             ? SvPV_nolen(micro_sym_sv) : NULL;
     CFCFunction *self = CFCFunction_new(parcel, exposure, class_name, class_cnick,
         micro_sym, return_type, param_list, docucomment, is_inline);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -679,24 +673,18 @@ PPCODE:
     START_SET_OR_GET_SWITCH
         case 2: {
                 CFCType *type = CFCFunction_get_return_type(self);
-                retval = type 
-                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)type))
-                       : newSV(0);
+                retval = S_cfcbase_to_perlref(type);
             }
             break;
         case 4: {
                 CFCParamList *param_list = CFCFunction_get_param_list(self);
-                retval = param_list 
-                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)param_list))
-                       : newSV(0);
+                retval = S_cfcbase_to_perlref(param_list);
             }
             break;
         case 6: {
                 CFCDocuComment *docucomment 
                     = CFCFunction_get_docucomment(self);
-                retval = docucomment 
-                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)docucomment))
-                       : newSV(0);
+                retval = S_cfcbase_to_perlref(docucomment);
             }
             break;
         case 8:
@@ -727,7 +715,7 @@ _new(klass, source, dest)
     const char *dest;
 CODE:
     CFCHierarchy *self = CFCHierarchy_new(source, dest);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -785,7 +773,7 @@ CODE:
     CFCMethod *self = CFCMethod_new(parcel, exposure, class_name, class_cnick,
         macro_sym, return_type, param_list, docucomment, is_final, 
         is_abstract);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -815,7 +803,7 @@ finalize(self)
     CFCMethod *self;
 CODE:
     CFCMethod *finalized = CFCMethod_finalize(self);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)finalized));
+    RETVAL = S_cfcbase_to_perlref(finalized);
     CFCBase_decref((CFCBase*)finalized);
 OUTPUT: RETVAL
 
@@ -905,7 +893,7 @@ PPCODE:
             break;
         case 18: {
                 CFCType *type = CFCMethod_self_type(self);
-                retval = newRV(CFCBase_get_perl_obj((CFCBase*)type));
+                retval = S_cfcbase_to_perlref(type);
             }
             break;
     END_SET_OR_GET_SWITCH
@@ -920,7 +908,7 @@ _new(klass, variadic)
     int variadic;
 CODE:
     CFCParamList *self = CFCParamList_new(variadic);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -958,7 +946,7 @@ PPCODE:
             size_t i;
             size_t num_vars = CFCParamList_num_vars(self);
             for (i = 0; i < num_vars; i++) {
-                SV *ref = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)vars[i]));
+                SV *ref = S_cfcbase_to_perlref(vars[i]);
                 av_store(av, i, ref);
             }
             retval = newRV((SV*)av);
@@ -1014,7 +1002,7 @@ CODE:
     const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
     const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
     CFCParcel *self = CFCParcel_singleton(name, cnick);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
 OUTPUT: RETVAL
 
 void
@@ -1035,7 +1023,7 @@ SV*
 default_parcel(...)
 CODE:
     CFCParcel *default_parcel = CFCParcel_default_parcel();
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)default_parcel));
+    RETVAL = S_cfcbase_to_perlref(default_parcel);
 OUTPUT: RETVAL
 
 void
@@ -1144,7 +1132,7 @@ PPCODE:
     START_SET_OR_GET_SWITCH
         case 2: {
                 struct CFCParcel *parcel = CFCSymbol_get_parcel(self);
-                retval = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)parcel));
+                retval = S_cfcbase_to_perlref(parcel);
             }
             break;
         case 4: {
@@ -1225,7 +1213,7 @@ _new(klass, flags, parcel, specifier, indirection, c_string)
 CODE:
     CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
         c_string);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1236,7 +1224,7 @@ _new_integer(klass, flags, specifier)
     const char *specifier;
 CODE:
     CFCType *self = CFCType_new_integer(flags, specifier);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1247,7 +1235,7 @@ _new_float(klass, flags, specifier)
     const char *specifier;
 CODE:
     CFCType *self = CFCType_new_float(flags, specifier);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1260,7 +1248,7 @@ _new_object(klass, flags, parcel, specifier, indirection)
     int indirection;
 CODE:
     CFCType *self = CFCType_new_object(flags, parcel, specifier, indirection);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1281,7 +1269,7 @@ CODE:
         croak("Param 'child' not a Clownfish::Type");
     }
     CFCType *self = CFCType_new_composite(flags, child, indirection, array);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1291,7 +1279,7 @@ _new_void(klass, is_const)
     int is_const;
 CODE:
     CFCType *self = CFCType_new_void(is_const);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1300,7 +1288,7 @@ _new_va_list(klass)
     const char *klass;
 CODE:
     CFCType *self = CFCType_new_va_list();
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1311,7 +1299,7 @@ _new_arbitrary(klass, parcel, specifier)
     const char *specifier;
 CODE:
     CFCType *self = CFCType_new_arbitrary(parcel, specifier);
-    RETVAL = newRV((SV*)CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1454,9 +1442,7 @@ PPCODE:
             break;
         case 4: {
                 CFCParcel *parcel = CFCType_get_parcel(self);
-                retval = parcel
-                       ? newRV((SV*)CFCBase_get_perl_obj((CFCBase*)parcel))
-                       : newSV(0);
+                retval = S_cfcbase_to_perlref(parcel);
             }
             break;
         case 6:
@@ -1586,7 +1572,7 @@ CODE:
     }
     CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
         class_cnick, micro_sym, type);
-    RETVAL = newRV(CFCBase_get_perl_obj((CFCBase*)self));
+    RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
@@ -1617,7 +1603,7 @@ PPCODE:
     START_SET_OR_GET_SWITCH
         case 2: {
                 CFCType *type = CFCVariable_get_type(self);
-                retval = newRV(CFCBase_get_perl_obj((CFCBase*)type));
+                retval = S_cfcbase_to_perlref(type);
             }
             break;
         case 4: {
