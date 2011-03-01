@@ -178,7 +178,7 @@ S_add_dump_method(CFCClass *klass)
                       + strlen(full_func_sym)
                       + strlen(full_struct)
                       + strlen(full_typedef) * 2
-                      + strlen(vtable_var);
+                      + strlen(vtable_var)
                       + strlen(cnick)
                       + 50;
         char *autocode = (char*)MALLOCATE(amount);
@@ -203,7 +203,7 @@ S_add_dump_method(CFCClass *klass)
             "    Cfish_Hash_Store_Str(dump, \"_class\", 6,\n"
             "        (cfish_Obj*)Cfish_CB_Clone(Cfish_Obj_Get_Class_Name((cfish_Obj*)self)));\n";
         size_t amount = sizeof(pattern)
-                      + strlen(full_func_sym);
+                      + strlen(full_func_sym)
                       + strlen(full_struct)
                       + 50;
         char *autocode = (char*)MALLOCATE(amount);
