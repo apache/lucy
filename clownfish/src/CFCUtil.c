@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <errno.h>
 
 #ifndef true
     #define true 1
