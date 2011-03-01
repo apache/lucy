@@ -17,6 +17,8 @@
 #ifndef H_CFCUTIL
 #define H_CFCUTIL
 
+#include <stdio.h>
+
 /** Create an inner Perl object with a refcount of 1.  For use in actual
  * Perl-space, it is necessary to wrap this inner object in an RV.
  */
@@ -78,6 +80,40 @@ CFCUtil_wrapped_free(void *ptr);
     CFCUtil_wrapped_realloc((_ptr), (_count), __FILE__, __LINE__)
 #define FREEMEM(_ptr) \
     CFCUtil_wrapped_free(_ptr)
+
+/* Open a file (truncating if necessary) and write [content] to it.  Util_die() if
+ * an error occurs.
+ */
+void
+chaz_Util_write_file(const char *filename, const char *content);
+
+/* Read an entire file into memory.
+ */
+char* 
+chaz_Util_slurp_file(const char *file_path, size_t *len_ptr);
+
+/* Get the length of a file (may overshoot on text files under DOS).
+ */
+long  
+chaz_Util_flength(FILE *f);
+
+/* Print an error message to stderr and exit.
+ */
+void  
+chaz_Util_die(const char *format, ...);
+
+/* Print an error message to stderr.
+ */
+void
+chaz_Util_warn(const char *format, ...);
+
+#ifdef CHAZ_USE_SHORT_NAMES
+  #define Util_write_file             chaz_Util_write_file 
+  #define Util_slurp_file             chaz_Util_slurp_file 
+  #define Util_flength                chaz_Util_flength 
+  #define Util_die                    chaz_Util_die 
+  #define Util_warn                   chaz_Util_warn 
+#endif
 
 #endif /* H_CFCUTIL */
 

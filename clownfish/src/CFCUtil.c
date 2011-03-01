@@ -21,6 +21,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define CHAZ_USE_SHORT_NAMES
+
 #include "CFCUtil.h"
 
 void*
@@ -148,4 +150,103 @@ CFCUtil_wrapped_free(void *ptr)
     free(ptr);
 }
 
+void
+Util_write_file(const char *filename, const char *content)
+{
+    FILE *fh = fopen(filename, "w+");
+    size_t content_len = strlen(content);
+    if (fh == NULL) {
+        Util_die("Couldn't open '%s': %s", filename, strerror(errno));
+    }
+    fwrite(content, sizeof(char), content_len, fh);
+    if (fclose(fh)) {
+        Util_die("Error when closing '%s': %s", filename, strerror(errno));
+    }
+}
+
+char*
+Util_slurp_file(const char *file_path, size_t *len_ptr) 
+{
+    FILE   *const file = fopen(file_path, "r");
+    char   *contents;
+    size_t  len;
+    long    check_val;
+
+    /* Sanity check. */
+    if (file == NULL) {
+        Util_die("Error opening file '%s': %s", file_path, strerror(errno));
+    }
+
+    /* Find length; return NULL if the file has a zero-length. */
+    len = Util_flength(file);
+    if (len == 0) {
+        *len_ptr = 0;
+        return NULL;
+    }
+
+    /* Allocate memory and read the file. */
+    contents = (char*)malloc(len * sizeof(char) + 1);
+    if (contents == NULL) {
+        Util_die("Out of memory at %d, %s", __FILE__, __LINE__);
+    }
+    contents[len] = '\0';
+    check_val = fread(contents, sizeof(char), len, file);
+
+    /* Weak error check, because CRLF might result in fewer chars read. */
+    if (check_val <= 0) {
+        Util_die("Tried to read %d characters of '%s', got %d", (int)len,
+            file_path, check_val);
+    }
+
+    /* Set length pointer for benefit of caller. */
+    *len_ptr = check_val;
+
+    /* Clean up. */
+    if (fclose(file)) {
+        Util_die("Error closing file '%s': %s", file_path, strerror(errno));
+    }
+
+    return contents;
+}
+
+long 
+Util_flength(FILE *f) 
+{
+    const long bookmark = ftell(f);
+    long check_val;
+    long len;
+
+    /* Seek to end of file and check length. */
+    check_val = fseek(f, 0, SEEK_END);
+    if (check_val == -1) { Util_die("fseek error : %s\n", strerror(errno)); }
+    len = ftell(f);
+    if (len == -1) { Util_die("ftell error : %s\n", strerror(errno)); }
+
+    /* Return to where we were. */
+    check_val = fseek(f, bookmark, SEEK_SET);
+    if (check_val == -1) { Util_die("fseek error : %s\n", strerror(errno)); }
+
+    return len;
+}
+
+void 
+Util_die(const char* format, ...) 
+{
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
+void 
+Util_warn(const char* format, ...) 
+{
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+}
 
