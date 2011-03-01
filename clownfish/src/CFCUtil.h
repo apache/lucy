@@ -17,8 +17,6 @@
 #ifndef H_CFCUTIL
 #define H_CFCUTIL
 
-#include <stdio.h>
-
 /** Create an inner Perl object with a refcount of 1.  For use in actual
  * Perl-space, it is necessary to wrap this inner object in an RV.
  */
@@ -95,7 +93,7 @@ chaz_Util_slurp_file(const char *file_path, size_t *len_ptr);
 /* Get the length of a file (may overshoot on text files under DOS).
  */
 long  
-chaz_Util_flength(FILE *f);
+chaz_Util_flength(void *file);
 
 /* Print an error message to stderr and exit.
  */

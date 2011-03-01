@@ -210,8 +210,9 @@ Util_slurp_file(const char *file_path, size_t *len_ptr)
 }
 
 long 
-Util_flength(FILE *f) 
+Util_flength(void *file) 
 {
+    FILE *f = (FILE*)file;
     const long bookmark = ftell(f);
     long check_val;
     long len;

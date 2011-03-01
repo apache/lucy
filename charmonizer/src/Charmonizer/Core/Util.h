@@ -49,7 +49,7 @@ chaz_Util_strdup(const char *string);
 /* Get the length of a file (may overshoot on text files under DOS).
  */
 long  
-chaz_Util_flength(FILE *f);
+chaz_Util_flength(void *file);
 
 /* Print an error message to stderr and exit.
  */
