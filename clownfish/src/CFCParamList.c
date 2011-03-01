@@ -112,8 +112,8 @@ S_generate_c_strings(CFCParamList *self)
     }
     FREEMEM(self->c_string);
     FREEMEM(self->name_list);
-    self->c_string  = MALLOCATE(c_string_size);
-    self->name_list = MALLOCATE(name_list_size);
+    self->c_string  = (char*)MALLOCATE(c_string_size);
+    self->name_list = (char*)MALLOCATE(name_list_size);
     self->c_string[0] = '\0';
     self->name_list[0] = '\0';
 

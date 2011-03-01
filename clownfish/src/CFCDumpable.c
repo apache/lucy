@@ -168,13 +168,13 @@ S_add_dump_method(CFCClass *klass)
     char buf[BUF_SIZE];
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
-        const char template[] =
+        const char pattern[] =
             "cfish_Obj*\n"
             "%s(%s *self)\n"
             "{\n"
             "    %s super_dump = (%s)SUPER_METHOD(%s, %s, Dump);\n"
             "    cfish_Hash *dump = (cfish_Hash*)super_dump(self);\n";
-        size_t amount = sizeof(template)
+        size_t amount = sizeof(pattern)
                       + strlen(full_func_sym)
                       + strlen(full_struct)
                       + strlen(full_typedef) * 2
@@ -182,7 +182,7 @@ S_add_dump_method(CFCClass *klass)
                       + strlen(cnick)
                       + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, template, full_func_sym, full_struct, 
+        int check = sprintf(autocode, pattern, full_func_sym, full_struct, 
             full_typedef, full_typedef, vtable_var, cnick);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
@@ -195,19 +195,19 @@ S_add_dump_method(CFCClass *klass)
         FREEMEM(novel);
     }
     else {
-        const char template[] = 
+        const char pattern[] = 
             "cfish_Obj*\n"
             "%s(%s *self)\n"
             "{\n"
             "    cfish_Hash *dump = cfish_Hash_new(0);\n"
             "    Cfish_Hash_Store_Str(dump, \"_class\", 6,\n"
             "        (cfish_Obj*)Cfish_CB_Clone(Cfish_Obj_Get_Class_Name((cfish_Obj*)self)));\n";
-        size_t amount = sizeof(template)
+        size_t amount = sizeof(pattern)
                       + strlen(full_func_sym);
                       + strlen(full_struct)
                       + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, template, full_func_sym, full_struct);
+        int check = sprintf(autocode, pattern, full_func_sym, full_struct);
         if (check < 0) { croak("sprintf failed"); }
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
@@ -239,14 +239,14 @@ S_add_load_method(CFCClass *klass)
     char buf[BUF_SIZE];
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
-        const char template[] = 
+        const char pattern[] = 
             "cfish_Obj*\n"
             "%s(%s *self, cfish_Obj *dump)\n"
             "{\n"
             "    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);\n"
             "    %s super_load = (%s)SUPER_METHOD(%s, %s, Load);\n"
             "    %s *loaded = (%s*)super_load(self, dump);\n";
-        size_t amount = sizeof(template) 
+        size_t amount = sizeof(pattern) 
                       + strlen(full_func_sym)
                       + strlen(full_struct) * 3
                       + strlen(full_typedef) * 2
@@ -254,7 +254,7 @@ S_add_load_method(CFCClass *klass)
                       + strlen(cnick)
                       + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, template, full_func_sym, full_struct,
+        int check = sprintf(autocode, pattern, full_func_sym, full_struct,
             full_typedef, full_typedef, vtable_var, cnick, full_struct,
             full_struct);
         if (check < 0) { croak("sprintf failed"); }
@@ -269,7 +269,7 @@ S_add_load_method(CFCClass *klass)
         FREEMEM(novel);
     }
     else {
-        const char template[] = 
+        const char pattern[] = 
             "cfish_Obj*\n"
             "%s(%s *self, cfish_Obj *dump)\n"
             "{\n"
@@ -279,12 +279,12 @@ S_add_load_method(CFCClass *klass)
             "    cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);\n"
             "    %s *loaded = (%s*)Cfish_VTable_Make_Obj(vtable);\n"
             "    CHY_UNUSED_VAR(self);\n";
-        size_t amount = sizeof(template)
+        size_t amount = sizeof(pattern)
                       + strlen(full_func_sym)
                       + strlen(full_struct) * 3
                       + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, template, full_func_sym, full_struct, 
+        int check = sprintf(autocode, pattern, full_func_sym, full_struct, 
             full_struct, full_struct);
         if (check < 0) { croak("sprintf failed"); }
         CFCClass_append_autocode(klass, autocode);
@@ -310,33 +310,33 @@ S_process_dump_member(CFCVariable *member, char *buf, size_t buf_size)
     unsigned name_len = (unsigned)strlen(name);
 
     if (CFCType_is_integer(type) || CFCType_is_floating(type)) {
-        char int_template[] = 
+        char int_pattern[] = 
             "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%i64\", (int64_t)self->%s));\n";
-        char float_template[] = 
+        char float_pattern[] = 
             "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%f64\", (double)self->%s));\n";
-        const char *template = CFCType_is_integer(type) 
-                             ? int_template : float_template;
-        size_t needed = strlen(template) + name_len * 2 + 20;
+        const char *pattern = CFCType_is_integer(type) 
+                             ? int_pattern : float_pattern;
+        size_t needed = strlen(pattern) + name_len * 2 + 20;
         if (buf_size < needed) {
             croak("Buffer not big enough (%lu < %lu)", 
                 (unsigned long)buf_size, (unsigned long)needed);
         }
-        int check = sprintf(buf, template, name, name_len, name);
+        int check = sprintf(buf, pattern, name, name_len, name);
         if (check < 0) { croak("sprintf failed"); }
         return;
     }
     else if (CFCType_is_object(type)) {
-        char template[] = 
+        char pattern[] = 
             "    if (self->%s) {\n"
             "        Cfish_Hash_Store_Str(dump, \"%s\", %u, Cfish_Obj_Dump((cfish_Obj*)self->%s));\n"
             "    }\n";
 
-        size_t needed = strlen(template) + name_len * 3 + 20;
+        size_t needed = strlen(pattern) + name_len * 3 + 20;
         if (buf_size < needed) {
             croak("Buffer not big enough (%lu < %lu)", 
                 (unsigned long)buf_size, (unsigned long)needed);
         }
-        int check = sprintf(buf, template, name, name, name_len, name);
+        int check = sprintf(buf, pattern, name, name, name_len, name);
         if (check < 0) { croak("sprintf failed"); }
         return;
     }
@@ -385,12 +385,12 @@ S_process_load_member(CFCVariable *member, char *buf, size_t buf_size)
         croak("Don't know how to load %s", CFCType_get_specifier(type));
     }
     
-    const char *template = 
+    const char *pattern = 
     "    {\n"
     "        cfish_Obj *var = Cfish_Hash_Fetch_Str(source, \"%s\", %u);\n"
     "        if (var) { loaded->%s = %s; }\n"
     "    }\n";
-    size_t needed = sizeof(template) 
+    size_t needed = sizeof(pattern) 
                   + (name_len * 2) 
                   + strlen(extraction) 
                   + 20;
@@ -398,7 +398,7 @@ S_process_load_member(CFCVariable *member, char *buf, size_t buf_size)
         croak("Buffer not big enough (%lu < %lu)", (unsigned long)buf_size,
             (unsigned long)needed);
     }
-    int check = sprintf(buf, template, name, name_len, name, extraction);
+    int check = sprintf(buf, pattern, name, name_len, name, extraction);
     if (check < 0) { croak("sprintf failed"); }
 }
 

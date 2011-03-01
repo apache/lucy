@@ -628,7 +628,7 @@ CFCClass**
 CFCClass_tree_to_ladder(CFCClass *self)
 {
     size_t ladder_len = S_family_tree_size(self);
-    CFCClass **ladder = MALLOCATE((ladder_len + 1) * sizeof(CFCClass*));
+    CFCClass **ladder = (CFCClass**)MALLOCATE((ladder_len + 1) * sizeof(CFCClass*));
     ladder[ladder_len] = NULL;
     size_t step = 0;
     ladder[step++] = self;

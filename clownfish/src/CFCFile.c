@@ -95,7 +95,7 @@ CFCFile_init(CFCFile *self, const char *source_class)
     if (check < 0) { croak("sprintf failed"); }
 
     // Cache partial path derived from source_class.
-    self->path_part = MALLOCATE(len + 1);
+    self->path_part = (char*)MALLOCATE(len + 1);
     for (i = 0, j = 0; i < len; i++, j++) {
         char c = source_class[i];
         if (c == ':') {

@@ -160,8 +160,8 @@ CFCDocuComment_parse(const char *raw_text)
 
             num_params++;
             size_t size = (num_params + 1) * sizeof(char*);
-            self->param_names = REALLOCATE(self->param_names, size);
-            self->param_docs  = REALLOCATE(self->param_docs, size);
+            self->param_names = (char**)REALLOCATE(self->param_names, size);
+            self->param_docs  = (char**)REALLOCATE(self->param_docs, size);
             self->param_names[num_params - 1] 
                 = CFCUtil_strndup(param_name, param_name_len);
             self->param_docs[num_params - 1] 
