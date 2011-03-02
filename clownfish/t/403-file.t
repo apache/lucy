@@ -47,7 +47,7 @@ ok( !$file->get_modified, "modified false at start" );
 $file->set_modified(1);
 ok( $file->get_modified, "set_modified, get_modified" );
 
-my $path_sep = $^O =~ /^win/i ? '\\' : '/';
+my $path_sep = $^O =~ /^mswin/i ? '\\' : '/';
 my $path_to_stuff_thing = join($path_sep, qw( path to Stuff Thing ) );
 is( $file->cfh_path('path/to'), "$path_to_stuff_thing.cfh", "cfh_path" );
 is( $file->c_path('path/to'),   "$path_to_stuff_thing.c",   "c_path" );
