@@ -51,11 +51,13 @@ S_make_method_obj(CFCClass *klass, const char *method_name);
 
 // Generate code for dumping a single member var.
 static void
-S_process_dump_member(CFCVariable *member, char *buf, size_t buf_size);
+S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
+                      size_t buf_size);
 
 // Generate code for loading a single member var.
 static void
-S_process_load_member(CFCVariable *member, char *buf, size_t buf_size);
+S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
+                      size_t buf_size);
 
 struct CFCDumpable {
     CFCBase base;
@@ -189,8 +191,7 @@ S_add_dump_method(CFCClass *klass)
         CFCVariable **novel = CFCClass_novel_member_vars(klass);
         size_t i;
         for (i = 0; novel[i] != NULL; i++) {
-            S_process_dump_member(novel[i], buf, BUF_SIZE);
-            CFCClass_append_autocode(klass, buf);
+            S_process_dump_member(klass, novel[i], buf, BUF_SIZE);
         }
         FREEMEM(novel);
     }
@@ -212,11 +213,9 @@ S_add_dump_method(CFCClass *klass)
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
-        // skip self->vtable and self->ref.
         size_t i;
-        for (i = 2; members[i] != NULL; i++) {
-            S_process_dump_member(members[i], buf, BUF_SIZE);
-            CFCClass_append_autocode(klass, buf);
+        for (i = 0; members[i] != NULL; i++) {
+            S_process_dump_member(klass, members[i], buf, BUF_SIZE);
         }
     }
 
@@ -263,8 +262,7 @@ S_add_load_method(CFCClass *klass)
         CFCVariable **novel = CFCClass_novel_member_vars(klass);
         size_t i;
         for (i = 0; novel[i] != NULL; i++) {
-            S_process_load_member(novel[i], buf, BUF_SIZE);
-            CFCClass_append_autocode(klass, buf);
+            S_process_load_member(klass, novel[i], buf, BUF_SIZE);
         }
         FREEMEM(novel);
     }
@@ -290,11 +288,9 @@ S_add_load_method(CFCClass *klass)
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
-        // skip self->vtable and self->ref.
         size_t i;
-        for (i = 2; members[i] != NULL; i++) {
-            S_process_load_member(members[i], buf, BUF_SIZE);
-            CFCClass_append_autocode(klass, buf);
+        for (i = 0; members[i] != NULL; i++) {
+            S_process_load_member(klass, members[i], buf, BUF_SIZE);
         }
     }
 
@@ -302,12 +298,21 @@ S_add_load_method(CFCClass *klass)
 }
 
 static void
-S_process_dump_member(CFCVariable *member, char *buf, size_t buf_size)
+S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
+                      size_t buf_size)
 {
     CFCUTIL_NULL_CHECK(member);
     CFCType *type = CFCVariable_get_type(member);
     const char *name = CFCSymbol_micro_sym((CFCSymbol*)member);
     unsigned name_len = (unsigned)strlen(name);
+    const char *specifier = CFCType_get_specifier(type);
+
+    // Skip the VTable and the refcount/host-object.
+    if (   strcmp(specifier, "lucy_VTable") == 0
+        || strcmp(specifier, "lucy_ref_t") == 0
+    ) {
+        return; 
+    }
 
     if (CFCType_is_integer(type) || CFCType_is_floating(type)) {
         char int_pattern[] = 
@@ -323,7 +328,6 @@ S_process_dump_member(CFCVariable *member, char *buf, size_t buf_size)
         }
         int check = sprintf(buf, pattern, name, name_len, name);
         if (check < 0) { croak("sprintf failed"); }
-        return;
     }
     else if (CFCType_is_object(type)) {
         char pattern[] = 
@@ -338,15 +342,17 @@ S_process_dump_member(CFCVariable *member, char *buf, size_t buf_size)
         }
         int check = sprintf(buf, pattern, name, name, name_len, name);
         if (check < 0) { croak("sprintf failed"); }
-        return;
     }
     else {
         croak("Don't know how to dump a %s", CFCType_get_specifier(type));
     }
+
+    CFCClass_append_autocode(klass, buf);
 }
 
 static void
-S_process_load_member(CFCVariable *member, char *buf, size_t buf_size)
+S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
+                      size_t buf_size)
 {
     CFCUTIL_NULL_CHECK(member);
     CFCType *type = CFCVariable_get_type(member);
@@ -354,6 +360,16 @@ S_process_load_member(CFCVariable *member, char *buf, size_t buf_size)
     const char *name = CFCSymbol_micro_sym((CFCSymbol*)member);
     unsigned name_len = (unsigned)strlen(name);
     char extraction[200];
+    const char *specifier = CFCType_get_specifier(type);
+    size_t specifier_len = strlen(specifier);
+
+    // Skip the VTable and the refcount/host-object.
+    if (   strcmp(specifier, "lucy_VTable") == 0
+        || strcmp(specifier, "lucy_ref_t") == 0
+    ) {
+        return; 
+    }
+
     if (strlen(type_str) + 100 > sizeof(extraction)) { // play it safe
         croak("type_str too long: '%s'", type_str);
     }
@@ -366,8 +382,6 @@ S_process_load_member(CFCVariable *member, char *buf, size_t buf_size)
         if (check < 0) { croak("sprintf failed"); }
     }
     else if (CFCType_is_object(type)) {
-        const char *specifier = CFCType_get_specifier(type);
-        size_t specifier_len = strlen(specifier);
         char vtable_var[50];
         if (specifier_len > sizeof(vtable_var) - 2) {
             croak("specifier too long: '%s'", specifier);
@@ -382,7 +396,7 @@ S_process_load_member(CFCVariable *member, char *buf, size_t buf_size)
         if (check < 0) { croak("sprintf failed"); }
     }
     else {
-        croak("Don't know how to load %s", CFCType_get_specifier(type));
+        croak("Don't know how to load %s", specifier);
     }
     
     const char *pattern = 
@@ -400,6 +414,8 @@ S_process_load_member(CFCVariable *member, char *buf, size_t buf_size)
     }
     int check = sprintf(buf, pattern, name, name_len, name, extraction);
     if (check < 0) { croak("sprintf failed"); }
+
+    CFCClass_append_autocode(klass, buf);
 }
 
 
