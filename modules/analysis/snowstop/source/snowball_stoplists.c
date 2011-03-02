@@ -6,7 +6,7 @@
 
 #include "Lucy/Analysis/Stopalizer.h"
 
-static const uint8_t *words_da[] = {
+static const char *words_da[] = {
     "og", "i", "jeg", "det", "at", "en", "den", "til", "er", "som",
     "p\303\245", "de", "med", "han", "af", "for", "ikke", "der", "var",
     "mig", "sig", "men", "et", "har", "om", "vi", "min", "havde", "ham",
@@ -19,9 +19,9 @@ static const uint8_t *words_da[] = {
     "hvis", "din", "nogle", "hos", "blive", "mange", "ad", "bliver",
     "hendes", "v\303\246ret", "thi", "jer", "s\303\245dan", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_da = words_da;
+const uint8_t **lucy_Stopalizer_snow_da = (const uint8_t**)words_da;
 
-static const uint8_t *words_de[] = {
+static const char *words_de[] = {
     "aber", "alle", "allem", "allen", "aller", "alles", "als", "also", "am",
     "an", "ander", "andere", "anderem", "anderen", "anderer", "anderes",
     "anderm", "andern", "anderr", "anders", "auch", "auf", "aus", "bei",
@@ -54,9 +54,9 @@ static const uint8_t *words_de[] = {
     "w\303\274rde", "w\303\274rden", "zu", "zum", "zur", "zwar", "zwischen",
     NULL
 };
-const uint8_t **lucy_Stopalizer_snow_de = words_de;
+const uint8_t **lucy_Stopalizer_snow_de = (const uint8_t**)words_de;
 
-static const uint8_t *words_en[] = {
+static const char *words_en[] = {
     "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you",
     "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself",
     "she", "her", "hers", "herself", "it", "its", "itself", "they", "them",
@@ -79,9 +79,9 @@ static const uint8_t *words_en[] = {
     "each", "few", "more", "most", "other", "some", "such", "no", "nor",
     "not", "only", "own", "same", "so", "than", "too", "very", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_en = words_en;
+const uint8_t **lucy_Stopalizer_snow_en = (const uint8_t**)words_en;
 
-static const uint8_t *words_es[] = {
+static const char *words_es[] = {
     "de", "la", "que", "el", "en", "y", "a", "los", "del", "se", "las",
     "por", "un", "para", "con", "no", "una", "su", "al", "lo", "como",
     "m\303\241s", "pero", "sus", "le", "ya", "o", "este", "s\303\255",
@@ -137,9 +137,9 @@ static const uint8_t *words_es[] = {
     "tuviesen", "teniendo", "tenido", "tenida", "tenidos", "tenidas",
     "tened", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_es = words_es;
+const uint8_t **lucy_Stopalizer_snow_es = (const uint8_t**)words_es;
 
-static const uint8_t *words_fi[] = {
+static const char *words_fi[] = {
     "olla", "olen", "olet", "on", "olemme", "olette", "ovat", "ole", "oli",
     "olisi", "olisit", "olisin", "olisimme", "olisitte", "olisivat", "olit",
     "olin", "olimme", "olitte", "olivat", "ollut", "olleet", "en", "et",
@@ -185,9 +185,9 @@ static const uint8_t *words_fi[] = {
     "sill\303\244", "tai", "vaan", "vai", "vaikka", "kanssa", "mukaan",
     "noin", "poikki", "yli", "kun", "niin", "nyt", "itse", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_fi = words_fi;
+const uint8_t **lucy_Stopalizer_snow_fi = (const uint8_t**)words_fi;
 
-static const uint8_t *words_fr[] = {
+static const char *words_fr[] = {
     "au", "aux", "avec", "ce", "ces", "dans", "de", "des", "du", "elle",
     "en", "et", "eux", "il", "je", "la", "le", "leur", "lui", "ma", "mais",
     "me", "m\303\252me", "mes", "moi", "mon", "ne", "nos", "notre", "nous",
@@ -211,9 +211,9 @@ static const uint8_t *words_fr[] = {
     "ils", "les", "leurs", "quel", "quels", "quelle", "quelles", "sans",
     "soi", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_fr = words_fr;
+const uint8_t **lucy_Stopalizer_snow_fr = (const uint8_t**)words_fr;
 
-static const uint8_t *words_hu[] = {
+static const char *words_hu[] = {
     "a", "ahogy", "ahol", "aki", "akik", "akkor", "alatt", "\303\241ltal",
     "\303\241ltal\303\241ban", "amely", "amelyek", "amelyekben", "amelyeket",
     "amelyet", "amelynek", "ami", "amit", "amolyan", "am\303\255g", "amikor",
@@ -248,9 +248,9 @@ static const uint8_t *words_hu[] = {
     "vannak", "volt", "voltam", "voltak", "voltunk", "vissza", "vele",
     "viszont", "volna", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_hu = words_hu;
+const uint8_t **lucy_Stopalizer_snow_hu = (const uint8_t**)words_hu;
 
-static const uint8_t *words_it[] = {
+static const char *words_it[] = {
     "ad", "al", "allo", "ai", "agli", "all", "agl", "alla", "alle", "con",
     "col", "coi", "da", "dal", "dallo", "dai", "dagli", "dall", "dagl",
     "dalla", "dalle", "di", "del", "dello", "dei", "degli", "dell", "degl",
@@ -289,9 +289,9 @@ static const uint8_t *words_it[] = {
     "stette", "stemmo", "steste", "stettero", "stessi", "stesse", "stessimo",
     "stessero", "stando", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_it = words_it;
+const uint8_t **lucy_Stopalizer_snow_it = (const uint8_t**)words_it;
 
-static const uint8_t *words_nl[] = {
+static const char *words_nl[] = {
     "de", "en", "van", "ik", "te", "dat", "die", "in", "een", "hij", "het",
     "niet", "zijn", "is", "was", "op", "aan", "met", "als", "voor", "had",
     "er", "maar", "om", "hem", "dan", "zou", "of", "wat", "mijn", "men",
@@ -304,9 +304,9 @@ static const uint8_t *words_nl[] = {
     "wezen", "kunnen", "ons", "zelf", "tegen", "na", "reeds", "wil", "kon",
     "niets", "uw", "iemand", "geweest", "andere", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_nl = words_nl;
+const uint8_t **lucy_Stopalizer_snow_nl = (const uint8_t**)words_nl;
 
-static const uint8_t *words_no[] = {
+static const char *words_no[] = {
     "og", "i", "jeg", "det", "at", "en", "et", "den", "til", "er", "som",
     "p\303\245", "de", "med", "han", "av", "ikke", "ikkje", "der",
     "s\303\245", "var", "meg", "seg", "men", "ett", "har", "om", "vi", "min",
@@ -330,9 +330,9 @@ static const uint8_t *words_no[] = {
     "sidan", "so", "somt", "somme", "um", "upp", "vere", "vore", "verte",
     "vort", "varte", "vart", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_no = words_no;
+const uint8_t **lucy_Stopalizer_snow_no = (const uint8_t**)words_no;
 
-static const uint8_t *words_pt[] = {
+static const char *words_pt[] = {
     "de", "a", "o", "que", "e", "do", "da", "em", "um", "para", "com",
     "n\303\243o", "uma", "os", "no", "se", "na", "por", "mais", "as", "dos",
     "como", "mas", "ao", "ele", "das", "\303\240", "seu", "sua", "ou",
@@ -365,9 +365,9 @@ static const uint8_t *words_pt[] = {
     "tivermos", "tiverem", "terei", "ter\303\241", "teremos", "ter\303\243o",
     "teria", "ter\303\255amos", "teriam", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_pt = words_pt;
+const uint8_t **lucy_Stopalizer_snow_pt = (const uint8_t**)words_pt;
 
-static const uint8_t *words_ru[] = {
+static const char *words_ru[] = {
     "\320\270", "\320\262", "\320\262\320\276", "\320\275\320\265",
     "\321\207\321\202\320\276", "\320\276\320\275", "\320\275\320\260",
     "\321\217", "\321\201", "\321\201\320\276", "\320\272\320\260\320\272",
@@ -465,9 +465,9 @@ static const uint8_t *words_ru[] = {
     "\320\262\321\201\321\216", "\320\274\320\265\320\266\320\264\321\203",
     NULL
 };
-const uint8_t **lucy_Stopalizer_snow_ru = words_ru;
+const uint8_t **lucy_Stopalizer_snow_ru = (const uint8_t**)words_ru;
 
-static const uint8_t *words_sv[] = {
+static const char *words_sv[] = {
     "och", "det", "att", "i", "en", "jag", "hon", "som", "han", "p\303\245",
     "den", "med", "var", "sig", "f\303\266r", "s\303\245", "till",
     "\303\244r", "men", "ett", "om", "hade", "de", "av", "icke", "mig", "du",
@@ -484,5 +484,5 @@ static const uint8_t *words_sv[] = {
     "ditt", "vem", "vilket", "sitta", "s\303\245dana", "vart", "dina",
     "vars", "v\303\245rt", "v\303\245ra", "ert", "era", "vilkas", NULL
 };
-const uint8_t **lucy_Stopalizer_snow_sv = words_sv;
+const uint8_t **lucy_Stopalizer_snow_sv = (const uint8_t**)words_sv;
 

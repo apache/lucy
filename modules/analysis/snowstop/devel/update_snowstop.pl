@@ -87,10 +87,10 @@ for my $iso ( sort keys %languages ) {
     my $joined = join( ', ', @escaped, 'NULL' );
     my $wrapped = wrap( '    ', '    ', $joined );
     print $out_fh <<END_STUFF;
-static const uint8_t *words_${iso}[] = {
+static const char *words_${iso}[] = {
 $wrapped
 };
-const uint8_t **lucy_Stopalizer_snow_${iso} = words_$iso;
+const uint8_t **lucy_Stopalizer_snow_${iso} = (const uint8_t**)words_$iso;
 
 END_STUFF
 }
