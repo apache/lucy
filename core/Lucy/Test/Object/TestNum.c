@@ -76,7 +76,7 @@ test_accessors(TestBatch *batch)
     TEST_TRUE(batch, Float32_To_I64(f32) == 1, "Float32_To_I64");
     TEST_TRUE(batch, Float64_To_I64(f64) == 1, "Float64_To_I64");
 
-    got32 = Float32_To_F64(f32);
+    got32 = (float)Float32_To_F64(f32);
     TEST_TRUE(batch, *(int32_t*)&got32 == *(int32_t*)&wanted32, 
         "Float32_To_F64");
 
