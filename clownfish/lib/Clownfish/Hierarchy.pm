@@ -29,7 +29,6 @@ use Clownfish::Parser;
 
 # Inside-out member vars.
 our %parser;
-our %files;
 
 our %new_PARAMS = (
     source => undef,
@@ -42,35 +41,17 @@ sub new {
     my $package = ref($either) || $either;
     my $self = $package->_new( @args{qw( source dest )} );
     $parser{$self} = Clownfish::Parser->new;
-    $files{$self}  = [];
     return $self;
 }
 
 sub DESTROY {
     my $self = shift;
     delete $parser{$self};
-    delete $files{$self};
     $self->_destroy;
 }
 
 # Accessors.
 sub _get_parser { $parser{ +shift } }
-
-sub _store_file {
-    my ( $self, $file ) = @_;
-    my $source_class = $file->get_source_class;
-    if ( $self->_fetch_file($source_class) ) {
-        confess("File for '$source_class' already registered");
-    }
-    push @{ $files{$self} }, $file;
-}
-
-sub _fetch_file {
-    my ( $self, $source_class ) = @_;
-    my ($file)
-        = grep { $_->get_source_class eq $source_class } @{ $files{$self} };
-    return $file;
-}
 
 # Return flattened hierarchies.
 sub ordered_classes {
@@ -82,7 +63,7 @@ sub ordered_classes {
     return @all;
 }
 
-sub files { return @{ $files{ +shift } } }
+sub files {  @{ shift->_files } }
 
 # Slurp all Clownfish header files.
 # Arrange the class objects into inheritance trees.
@@ -127,7 +108,7 @@ sub _parse_cf_files {
         my $file = $self->_get_parser
             ->file( $content, 0, source_class => $source_class, );
         confess("parse error for $source_path") unless defined $file;
-        $self->_store_file($file);
+        $self->_add_file($file);
         
         for my $class ( @{ $file->classes } ) {
             my $class_name = $class->get_class_name;

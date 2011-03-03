@@ -23,6 +23,7 @@ extern "C" {
 
 typedef struct CFCHierarchy CFCHierarchy;
 struct CFCClass;
+struct CFCFile;
 
 CFCHierarchy*
 CFCHierarchy_new(const char *source, const char *dest);
@@ -38,6 +39,15 @@ CFCHierarchy_add_tree(CFCHierarchy *self, struct CFCClass *klass);
 
 struct CFCClass**
 CFCHierarchy_trees(CFCHierarchy *self);
+
+struct CFCFile*
+CFCHierarchy_fetch_file(CFCHierarchy *self, const char *source_class);
+
+void
+CFCHierarchy_add_file(CFCHierarchy *self, struct CFCFile *file);
+
+struct CFCFile**
+CFCHierarchy_files(CFCHierarchy *self);
 
 const char*
 CFCHierarchy_get_source(CFCHierarchy *self);

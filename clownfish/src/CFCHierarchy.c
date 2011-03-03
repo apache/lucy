@@ -23,6 +23,7 @@
 #include "CFCBase.h"
 #include "CFCHierarchy.h"
 #include "CFCClass.h"
+#include "CFCFile.h"
 #include "CFCUtil.h"
 
 struct CFCHierarchy {
@@ -31,6 +32,8 @@ struct CFCHierarchy {
     char *dest;
     CFCClass **trees;
     size_t num_trees;
+    CFCFile **files;
+    size_t num_files;
 };
 
 CFCHierarchy*
@@ -51,6 +54,8 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest)
     self->dest      = CFCUtil_strdup(dest);
     self->trees     = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
     self->num_trees = 0;
+    self->files     = (CFCFile**)CALLOCATE(1, sizeof(CFCFile*));
+    self->num_files = 0;
     return self;
 }
 
@@ -61,7 +66,11 @@ CFCHierarchy_destroy(CFCHierarchy *self)
     for (i = 0; self->trees[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->trees[i]);
     }
+    for (i = 0; self->files[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->files[i]);
+    }
     FREEMEM(self->trees);
+    FREEMEM(self->files);
     FREEMEM(self->source);
     FREEMEM(self->dest);
     CFCBase_destroy((CFCBase*)self);
@@ -91,6 +100,41 @@ CFCClass**
 CFCHierarchy_trees(CFCHierarchy *self)
 {
     return self->trees;
+}
+
+CFCFile*
+CFCHierarchy_fetch_file(CFCHierarchy *self, const char *source_class)
+{
+    size_t i;
+    for (i = 0; self->files[i] != NULL; i++) {
+        const char *existing = CFCFile_get_source_class(self->files[i]);
+        if (strcmp(source_class, existing) == 0) {
+            return self->files[i];
+        }
+    }
+    return NULL;
+}
+
+void
+CFCHierarchy_add_file(CFCHierarchy *self, CFCFile *file)
+{
+    CFCUTIL_NULL_CHECK(file);
+    const char *source_class = CFCFile_get_source_class(file);
+    if (CFCHierarchy_fetch_file(self, source_class)) {
+        Util_die("File for source class %s already registered", source_class);
+    }
+    self->num_files++;
+    size_t size = (self->num_files + 1) * sizeof(CFCFile*);
+    self->files = (CFCFile**)REALLOCATE(self->files, size);
+    self->files[self->num_files - 1] 
+        = (CFCFile*)CFCBase_incref((CFCBase*)file);
+    self->files[self->num_files] = NULL;
+}
+
+struct CFCFile**
+CFCHierarchy_files(CFCHierarchy *self)
+{
+    return self->files;
 }
 
 const char*

@@ -733,12 +733,29 @@ PPCODE:
     CFCHierarchy_add_tree(self, klass);
 
 void
+_add_file(self, file)
+    CFCHierarchy *self;
+    CFCFile *file;
+PPCODE:
+    CFCHierarchy_add_file(self, file);
+
+SV*
+_fetch_file(self, source_class)
+    CFCHierarchy *self;
+    const char *source_class;
+CODE:
+    CFCFile *file = CFCHierarchy_fetch_file(self, source_class);
+    RETVAL = S_cfcbase_to_perlref(file);
+OUTPUT: RETVAL
+
+void
 _set_or_get(self, ...)
     CFCHierarchy *self;
 ALIAS:
     get_source        = 2
     get_dest          = 4
     _trees            = 6
+    _files            = 8
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -755,6 +772,10 @@ PPCODE:
         case 6:
             retval = S_array_of_cfcbase_to_av(
                 (CFCBase**)CFCHierarchy_trees(self));
+            break;
+        case 8:
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCHierarchy_files(self));
             break;
     END_SET_OR_GET_SWITCH
 }
