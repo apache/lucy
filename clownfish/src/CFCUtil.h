@@ -83,6 +83,9 @@ CFCUtil_wrapped_free(void *ptr);
 #define FREEMEM(_ptr) \
     CFCUtil_wrapped_free(_ptr)
 
+int
+CFCUtil_current(const char *orig, const char *dest);
+
 /* Open a file (truncating if necessary) and write [content] to it.  CFCUtil_die() if
  * an error occurs.
  */

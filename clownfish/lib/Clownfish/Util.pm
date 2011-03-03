@@ -33,34 +33,6 @@ our @EXPORT_OK = qw(
     trim_whitespace
 );
 
-sub current {
-    my ( $orig, $dest ) = @_;
-    my $bubble_time = time;
-    $orig = [$orig] unless ref($orig) eq 'ARRAY';
-    $dest = [$dest] unless ref($dest) eq 'ARRAY';
-
-    # If a destination file doesn't exist, we're not current.
-    for (@$dest) {
-        return 0 unless -e $_;
-    }
-
-    # Find the oldest file from the destination group.
-    for (@$dest) {
-        my $candidate = ( stat($_) )[9];
-        $bubble_time = $candidate if $candidate < $bubble_time;
-    }
-
-    # If any source file is newer than the oldest dest, we're not current.
-    for (@$orig) {
-        confess "Missing source file '$_'" unless -e $_;
-        my $candidate = ( stat($_) )[9];
-        return 0 if $candidate > $bubble_time;
-    }
-
-    # Current!
-    return 1;
-}
-
 sub verify_args {
     my $defaults = shift;    # leave the rest of @_ intact
 

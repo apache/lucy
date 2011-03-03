@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 #ifndef true
     #define true 1
@@ -134,6 +135,28 @@ void
 CFCUtil_wrapped_free(void *ptr)
 {
     free(ptr);
+}
+
+int
+CFCUtil_current(const char *orig, const char *dest)
+{
+    // If the destination file doesn't exist, we're not current.
+    struct stat dest_stat;
+    if (stat(dest, &dest_stat) == -1) { 
+        return false;
+    }   
+
+    // If the source file is newer than the dest, we're not current.
+    struct stat orig_stat;
+    if (stat(orig, &orig_stat) == -1) { 
+        Util_die("Missing source file '%s'", orig);
+    }
+    if (orig_stat.st_mtime > dest_stat.st_mtime) {
+        return false;
+    }
+
+    // Current!
+    return 1;
 }
 
 void

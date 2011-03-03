@@ -1546,6 +1546,14 @@ CODE:
     FREEMEM(contents);
 OUTPUT: RETVAL
 
+int
+current(orig, dest)
+    const char *orig;
+    const char *dest;
+CODE:
+    RETVAL = CFCUtil_current(orig, dest);
+OUTPUT: RETVAL
+
 void
 write_if_changed(path, content_sv)
     const char *path;
