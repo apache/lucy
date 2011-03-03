@@ -42,7 +42,7 @@ sub new {
     my $package = ref($either) || $either;
     my $self = $package->_new( @args{qw( source dest )} );
     $parser{$self} = Clownfish::Parser->new;
-    $files{$self}  = {};
+    $files{$self}  = [];
     return $self;
 }
 
@@ -54,8 +54,23 @@ sub DESTROY {
 }
 
 # Accessors.
-sub _get_files  { $files{ +shift } }
 sub _get_parser { $parser{ +shift } }
+
+sub _store_file {
+    my ( $self, $file ) = @_;
+    my $source_class = $file->get_source_class;
+    if ( $self->_fetch_file($source_class) ) {
+        confess("File for '$source_class' already registered");
+    }
+    push @{ $files{$self} }, $file;
+}
+
+sub _fetch_file {
+    my ( $self, $source_class ) = @_;
+    my ($file)
+        = grep { $_->get_source_class eq $source_class } @{ $files{$self} };
+    return $file;
+}
 
 # Return flattened hierarchies.
 sub ordered_classes {
@@ -67,7 +82,7 @@ sub ordered_classes {
     return @all;
 }
 
-sub files { values %{ shift->_get_files } }
+sub files { return @{ $files{ +shift } } }
 
 # Slurp all Clownfish header files.
 # Arrange the class objects into inheritance trees.
@@ -112,7 +127,8 @@ sub _parse_cf_files {
         my $file = $self->_get_parser
             ->file( $content, 0, source_class => $source_class, );
         confess("parse error for $source_path") unless defined $file;
-        $self->_get_files->{$source_class} = $file;
+        $self->_store_file($file);
+        
         for my $class ( @{ $file->classes } ) {
             my $class_name = $class->get_class_name;
             confess "$class_name already defined"
@@ -151,7 +167,7 @@ sub propagate_modified {
 # Recursive helper function.
 sub _propagate_modified {
     my ( $self, $class, $modified ) = @_;
-    my $file        = $self->_get_files->{ $class->get_source_class };
+    my $file        = $self->_fetch_file( $class->get_source_class );
     my $source_path = $file->cfh_path( $self->get_source );
     my $h_path      = $file->h_path( $self->get_dest );
 
