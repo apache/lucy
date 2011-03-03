@@ -22,12 +22,15 @@
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCHierarchy.h"
+#include "CFCClass.h"
 #include "CFCUtil.h"
 
 struct CFCHierarchy {
     CFCBase base;
     char *source;
     char *dest;
+    CFCClass **trees;
+    size_t num_trees;
 };
 
 CFCHierarchy*
@@ -44,17 +47,50 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest)
     if (!source || !strlen(source) || !dest || !strlen(dest)) {
         croak("Both 'source' and 'dest' are required");
     }
-    self->source   = CFCUtil_strdup(source);
-    self->dest     = CFCUtil_strdup(dest);
+    self->source    = CFCUtil_strdup(source);
+    self->dest      = CFCUtil_strdup(dest);
+    self->trees     = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
+    self->num_trees = 0;
     return self;
 }
 
 void
 CFCHierarchy_destroy(CFCHierarchy *self)
 {
+    size_t i;
+    for (i = 0; self->trees[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->trees[i]);
+    }
+    FREEMEM(self->trees);
     FREEMEM(self->source);
     FREEMEM(self->dest);
     CFCBase_destroy((CFCBase*)self);
+}
+
+void
+CFCHierarchy_add_tree(CFCHierarchy *self, CFCClass *klass)
+{
+    CFCUTIL_NULL_CHECK(klass);
+    const char *full_struct_sym = CFCClass_full_struct_sym(klass);
+    size_t i;
+    for (i = 0; self->trees[i] != NULL; i++) {
+        const char *existing = CFCClass_full_struct_sym(self->trees[i]);
+        if (strcmp(full_struct_sym, existing) == 0) {
+            Util_die("Tree '%s' alread added", full_struct_sym);
+        }
+    }
+    self->num_trees++;
+    size_t size = (self->num_trees + 1) * sizeof(CFCClass*);
+    self->trees = (CFCClass**)REALLOCATE(self->trees, size);
+    self->trees[self->num_trees - 1] 
+        = (CFCClass*)CFCBase_incref((CFCBase*)klass);
+    self->trees[self->num_trees] = NULL;
+}
+
+CFCClass**
+CFCHierarchy_trees(CFCHierarchy *self)
+{
+    return self->trees;
 }
 
 const char*

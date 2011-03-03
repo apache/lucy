@@ -29,7 +29,6 @@ use Clownfish::Parser;
 
 # Inside-out member vars.
 our %parser;
-our %trees;
 our %files;
 
 our %new_PARAMS = (
@@ -43,7 +42,6 @@ sub new {
     my $package = ref($either) || $either;
     my $self = $package->_new( @args{qw( source dest )} );
     $parser{$self} = Clownfish::Parser->new;
-    $trees{$self}  = {};
     $files{$self}  = {};
     return $self;
 }
@@ -51,13 +49,11 @@ sub new {
 sub DESTROY {
     my $self = shift;
     delete $parser{$self};
-    delete $trees{$self};
     delete $files{$self};
     $self->_destroy;
 }
 
 # Accessors.
-sub _get_trees  { $trees{ +shift } }
 sub _get_files  { $files{ +shift } }
 sub _get_parser { $parser{ +shift } }
 
@@ -65,7 +61,7 @@ sub _get_parser { $parser{ +shift } }
 sub ordered_classes {
     my $self = shift;
     my @all;
-    for my $tree ( values %{ $self->_get_trees } ) {
+    for my $tree ( @{ $self->_trees } ) {
         push @all, @{ $tree->tree_to_ladder };
     }
     return @all;
@@ -78,7 +74,7 @@ sub files { values %{ shift->_get_files } }
 sub build {
     my $self = shift;
     $self->_parse_cf_files;
-    $_->grow_tree for values %{ $self->_get_trees };
+    $_->grow_tree for @{ $self->_trees };
 }
 
 sub _parse_cf_files {
@@ -136,7 +132,7 @@ sub _parse_cf_files {
             $classes{$parent_name}->add_child($class);
         }
         else {
-            $self->_get_trees->{$class_name} = $class;
+            $self->_add_tree($class);
         }
     }
 }
@@ -145,7 +141,7 @@ sub propagate_modified {
     my ( $self, $modified ) = @_;
     # Seed the recursive write.
     my $somebody_is_modified;
-    for my $tree ( values %{ $self->_get_trees } ) {
+    for my $tree ( @{ $self->_trees } ) {
         next unless $self->_propagate_modified( $tree, $modified );
         $somebody_is_modified = 1;
     }

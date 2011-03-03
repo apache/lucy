@@ -726,11 +726,19 @@ PPCODE:
     CFCHierarchy_destroy(self);
 
 void
+_add_tree(self, klass)
+    CFCHierarchy *self;
+    CFCClass *klass;
+PPCODE:
+    CFCHierarchy_add_tree(self, klass);
+
+void
 _set_or_get(self, ...)
     CFCHierarchy *self;
 ALIAS:
     get_source        = 2
     get_dest          = 4
+    _trees            = 6
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -743,6 +751,10 @@ PPCODE:
                 const char *value = CFCHierarchy_get_dest(self);
                 retval = newSVpv(value, strlen(value));
             }
+            break;
+        case 6:
+            retval = S_array_of_cfcbase_to_av(
+                (CFCBase**)CFCHierarchy_trees(self));
             break;
     END_SET_OR_GET_SWITCH
 }
