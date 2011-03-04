@@ -153,7 +153,7 @@ CFCHierarchy_add_tree(CFCHierarchy *self, CFCClass *klass)
     for (i = 0; self->trees[i] != NULL; i++) {
         const char *existing = CFCClass_full_struct_sym(self->trees[i]);
         if (strcmp(full_struct_sym, existing) == 0) {
-            Util_die("Tree '%s' alread added", full_struct_sym);
+            CFCUtil_die("Tree '%s' alread added", full_struct_sym);
         }
     }
     self->num_trees++;
@@ -189,7 +189,8 @@ CFCHierarchy_add_file(CFCHierarchy *self, CFCFile *file)
     CFCUTIL_NULL_CHECK(file);
     const char *source_class = CFCFile_get_source_class(file);
     if (CFCHierarchy_fetch_file(self, source_class)) {
-        Util_die("File for source class %s already registered", source_class);
+        CFCUtil_die("File for source class %s already registered", 
+            source_class);
     }
     self->num_files++;
     size_t size = (self->num_files + 1) * sizeof(CFCFile*);
