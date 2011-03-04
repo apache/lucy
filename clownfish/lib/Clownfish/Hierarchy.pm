@@ -134,48 +134,6 @@ sub _parse_cf_files {
     }
 }
 
-sub propagate_modified {
-    my ( $self, $modified ) = @_;
-    # Seed the recursive write.
-    my $somebody_is_modified;
-    for my $tree ( @{ $self->_trees } ) {
-        next unless $self->_propagate_modified( $tree, $modified );
-        $somebody_is_modified = 1;
-    }
-    return $somebody_is_modified || $modified;
-}
-
-# Recursive helper function.
-sub _propagate_modified {
-    my ( $self, $class, $modified ) = @_;
-    my $file        = $self->_fetch_file( $class->get_source_class );
-    my $source_path = $file->cfh_path( $self->get_source );
-    my $h_path      = $file->h_path( $self->get_dest );
-
-    if ( !current( $source_path, $h_path ) ) {
-        $modified = 1;
-    }
-
-    if ($modified) {
-        $file->set_modified($modified);
-    }
-
-    # Proceed to the next generation.
-    my $somebody_is_modified = $modified;
-    for my $kid ( @{ $class->children } ) {
-        if ( $class->final ) {
-            confess(  "Attempt to inherit from final class "
-                    . $class->get_class_name . " by "
-                    . $kid->get_class_name );
-        }
-        if ( $self->_propagate_modified( $kid, $modified ) ) {
-            $somebody_is_modified = 1;
-        }
-    }
-
-    return $somebody_is_modified;
-}
-
 1;
 
 __END__

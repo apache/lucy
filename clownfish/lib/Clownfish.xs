@@ -725,6 +725,14 @@ _destroy(self)
 PPCODE:
     CFCHierarchy_destroy(self);
 
+int
+propagate_modified(self, ...)
+    CFCHierarchy *self;
+CODE:
+    int modified = items > 1 ? !!SvTRUE(ST(1)) : 0;
+    RETVAL = CFCHierarchy_propagate_modified(self, modified);
+OUTPUT: RETVAL
+
 void
 _add_tree(self, klass)
     CFCHierarchy *self;

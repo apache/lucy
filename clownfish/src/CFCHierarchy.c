@@ -19,11 +19,17 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef true
+    #define true 1
+    #define false 0
+#endif
+
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCHierarchy.h"
 #include "CFCClass.h"
 #include "CFCFile.h"
+#include "CFCSymbol.h"
 #include "CFCUtil.h"
 
 struct CFCHierarchy {
@@ -35,6 +41,10 @@ struct CFCHierarchy {
     CFCFile **files;
     size_t num_files;
 };
+
+// Recursive helper function for CFCUtil_propagate_modified.
+int
+S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified);
 
 CFCHierarchy*
 CFCHierarchy_new(const char *source, const char *dest)
@@ -74,6 +84,64 @@ CFCHierarchy_destroy(CFCHierarchy *self)
     FREEMEM(self->source);
     FREEMEM(self->dest);
     CFCBase_destroy((CFCBase*)self);
+}
+
+int
+CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified)
+{
+    // Seed the recursive write.
+    int somebody_is_modified = false;
+    size_t i;
+    for (i = 0; self->trees[i] != NULL; i++) {
+        CFCClass *tree = self->trees[i];
+        if (S_do_propagate_modified(self, tree, modified)) {
+            somebody_is_modified = true;
+        }
+    }
+    if (somebody_is_modified || modified) { 
+        return true; 
+    }
+    else {
+        return false;
+    }
+}
+
+int
+S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified)
+{
+    const char *source_class = CFCClass_get_source_class(klass);
+    CFCFile *file = CFCHierarchy_fetch_file(self, source_class);
+    size_t cfh_buf_size = CFCFile_path_buf_size(file, self->source);
+    char *source_path = (char*)MALLOCATE(cfh_buf_size);
+    CFCFile_cfh_path(file, source_path, cfh_buf_size, self->source);
+    size_t h_buf_size = CFCFile_path_buf_size(file, self->dest);
+    char *h_path = (char*)MALLOCATE(h_buf_size);
+    CFCFile_h_path(file, h_path, h_buf_size, self->dest);
+
+    if (!CFCUtil_current(source_path, h_path)) {
+        modified = true;
+    }
+    if (modified) {
+        CFCFile_set_modified(file, modified);
+    }
+
+    // Proceed to the next generation.
+    int somebody_is_modified = modified;
+    size_t i;
+    CFCClass **children = CFCClass_children(klass);
+    for (i = 0; children[i] != NULL; i++) {
+        CFCClass *kid = children[i];
+        if (CFCClass_final(klass)) {
+            CFCUtil_die("Attempt to inherit from final class '%s' by '%s'",
+                CFCSymbol_get_class_name((CFCSymbol*)klass),
+                CFCSymbol_get_class_name((CFCSymbol*)kid));
+        }
+        if (S_do_propagate_modified(self, kid, modified)) {
+            somebody_is_modified = 1;
+        }
+    }
+
+    return somebody_is_modified;
 }
 
 void
