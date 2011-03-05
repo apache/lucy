@@ -86,6 +86,42 @@ CFCHierarchy_destroy(CFCHierarchy *self)
     CFCBase_destroy((CFCBase*)self);
 }
 
+CFCFile*
+CFCHierarchy_parse_file(CFCHierarchy *self, void *parser, 
+                        const char *content, const char *source_class)
+{
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVsv((SV*)parser)));
+    XPUSHs(sv_2mortal(newSVpvn(content, strlen(content))));
+    XPUSHs(sv_2mortal(newSVpvn(source_class, strlen(source_class))));
+    PUTBACK;
+
+    int count = call_pv("Clownfish::Hierarchy::_do_parse_file", G_SCALAR);
+
+    SPAGAIN;
+
+    if (count != 1) {
+        CFCUtil_die("call to _do_parse_file failed\n");
+    }
+
+    SV *got = POPs;
+    CFCFile *file = NULL;
+    if (sv_derived_from(got, "Clownfish::File")) {
+        IV tmp = SvIV(SvRV(got));
+        file = INT2PTR(CFCFile*, tmp);
+        CFCBase_incref((CFCBase*)file);
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return file;
+}
+
 int
 CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified)
 {

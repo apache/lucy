@@ -23,7 +23,7 @@ use File::Spec::Functions qw( catfile splitpath );
 use File::Path qw( mkpath );
 use Fcntl;
 
-use Clownfish::Util qw( slurp_file current verify_args );
+use Clownfish::Util qw( slurp_file current verify_args a_isa_b );
 use Clownfish::Class;
 use Clownfish::Parser;
 
@@ -73,6 +73,12 @@ sub build {
     $_->grow_tree for @{ $self->_trees };
 }
 
+sub _do_parse_file {
+    my ( $parser, $content, $source_class ) = @_;
+    $content = $parser->strip_plain_comments($content);
+    return $parser->file( $content, 0, source_class => $source_class, );
+}
+
 sub _parse_cf_files {
     my $self   = shift;
     my $source = $self->get_source;
@@ -104,10 +110,10 @@ sub _parse_cf_files {
 
         # Slurp, parse, add parsed file to pool.
         my $content = slurp_file($source_path);
-        $content = $self->_get_parser->strip_plain_comments($content);
-        my $file = $self->_get_parser
-            ->file( $content, 0, source_class => $source_class, );
-        confess("parse error for $source_path") unless defined $file;
+        my $file = $self->_parse_file( $self->_get_parser, $content,
+            $source_class );
+        confess("parse error for $source_path")
+            unless a_isa_b( $file, "Clownfish::File" );
         $self->_add_file($file);
         
         for my $class ( @{ $file->classes } ) {
