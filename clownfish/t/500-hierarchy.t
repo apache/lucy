@@ -42,7 +42,7 @@ is( $hierarchy->get_dest,   $args{dest},   "get_dest" );
 
 $hierarchy->build;
 
-my @files = $hierarchy->files;
+my @files = @{ $hierarchy->files };
 is( scalar @files, 3, "recursed and found all three files" );
 my %files;
 for my $file (@files) {
@@ -57,9 +57,9 @@ my $animal = $files{'Animal'}       or die "No Animal";
 my $dog    = $files{'Animal::Dog'}  or die "No Dog";
 my $util   = $files{'Animal::Util'} or die "No Util";
 
-my @classes = $hierarchy->ordered_classes;
-is( scalar @classes, 3, "all classes" );
-for my $class (@classes) {
+my $classes = $hierarchy->ordered_classes;
+is( scalar @$classes, 3, "all classes" );
+for my $class (@$classes) {
     die "not a Class" unless isa_ok( $class, "Clownfish::Class" );
 }
 

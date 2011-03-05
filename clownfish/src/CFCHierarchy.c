@@ -206,6 +206,31 @@ CFCHierarchy_trees(CFCHierarchy *self)
     return self->trees;
 }
 
+CFCClass**
+CFCHierarchy_ordered_classes(CFCHierarchy *self)
+{
+    size_t num_classes = 0;
+    size_t max_classes = 10;
+    CFCClass **ladder = (CFCClass**)MALLOCATE((max_classes + 1) * sizeof(CFCClass*));
+    size_t i;
+    for (i = 0; self->trees[i] != NULL; i++) {
+        CFCClass *tree = self->trees[i];
+        CFCClass **child_ladder = CFCClass_tree_to_ladder(tree);
+        size_t j;
+        for (j = 0; child_ladder[j] != NULL; j++) {
+            if (num_classes == max_classes) {
+                max_classes += 10;
+                ladder = (CFCClass**)REALLOCATE(ladder, 
+                    (max_classes + 1) * sizeof(CFCClass*));
+            }
+            ladder[num_classes++] = child_ladder[j];
+        }
+        FREEMEM(child_ladder);
+    }
+    ladder[num_classes] = NULL;
+    return ladder;
+}
+
 CFCFile*
 CFCHierarchy_fetch_file(CFCHierarchy *self, const char *source_class)
 {

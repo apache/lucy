@@ -134,7 +134,7 @@ sub write_xs_typemap {
     my $class_typemap_input  = "";
     my $class_typemap_output = "";
 
-    for my $class ( $hierarchy->ordered_classes ) {
+    for my $class ( @{ $hierarchy->ordered_classes } ) {
         my $full_struct_sym = $class->full_struct_sym;
         my $vtable          = $class->full_vtable_var;
         my $label           = $vtable . "_";

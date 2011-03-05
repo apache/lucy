@@ -57,7 +57,7 @@ sub write_all_modified {
     # Iterate over all File objects, writing out those which don't have
     # up-to-date auto-generated files.
     my %written;
-    for my $file ( $hierarchy->files ) {
+    for my $file ( @{ $hierarchy->files } ) {
         next unless $file->get_modified;
         my $source_class = $file->get_source_class;
         next if $written{$source_class};
@@ -86,11 +86,11 @@ sub write_all_modified {
 # classes, plus typedefs for all class structs.
 sub _write_boil_h {
     my $self     = shift;
-    my @ordered  = $self->{hierarchy}->ordered_classes;
+    my $ordered  = $self->{hierarchy}->ordered_classes;
     my $typedefs = "";
 
     # Declare object structs for all instantiable classes.
-    for my $class (@ordered) {
+    for my $class (@$ordered) {
         next if $class->inert;
         my $full_struct = $class->full_struct_sym;
         $typedefs .= "typedef struct $full_struct $full_struct;\n";

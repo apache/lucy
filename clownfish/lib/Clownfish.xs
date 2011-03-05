@@ -775,7 +775,8 @@ ALIAS:
     get_source        = 2
     get_dest          = 4
     _trees            = 6
-    _files            = 8
+    files             = 8
+    ordered_classes   = 10
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -796,6 +797,12 @@ PPCODE:
         case 8:
             retval = S_array_of_cfcbase_to_av(
                 (CFCBase**)CFCHierarchy_files(self));
+            break;
+        case 10: {
+                CFCClass **ladder = CFCHierarchy_ordered_classes(self);
+                retval = S_array_of_cfcbase_to_av((CFCBase**)ladder);
+                FREEMEM(ladder);
+            }
             break;
     END_SET_OR_GET_SWITCH
 }

@@ -79,7 +79,7 @@ sub new {
 
 sub write_bindings {
     my $self           = shift;
-    my @ordered        = $self->{hierarchy}->ordered_classes;
+    my $ordered        = $self->{hierarchy}->ordered_classes;
     my $registry       = Clownfish::Binding::Perl::Class->registry;
     my $hand_rolled_xs = "";
     my $generated_xs   = "";
@@ -100,14 +100,14 @@ sub write_bindings {
     }
 
     # Pound-includes for generated headers.
-    for my $class (@ordered) {
+    for my $class (@$ordered) {
         my $include_h = $class->include_h;
         $generated_xs .= qq|#include "$include_h"\n|;
     }
     $generated_xs .= "\n";
 
     # Constructors.
-    for my $class (@ordered) {
+    for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
         next unless delete $has_constructors{$class_name};
         my $class_binding = $registry->{$class_name};
@@ -117,7 +117,7 @@ sub write_bindings {
     }
 
     # Methods.
-    for my $class (@ordered) {
+    for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
         next unless delete $has_methods{$class_name};
         my $class_binding = $registry->{$class_name};
@@ -258,7 +258,7 @@ END_STUFF
 sub prepare_pod {
     my $self    = shift;
     my $lib_dir = $self->{lib_dir};
-    my @ordered = $self->{hierarchy}->ordered_classes;
+    my $ordered = $self->{hierarchy}->ordered_classes;
     my @files_written;
     my %has_pod;
     my %modified;
@@ -267,7 +267,7 @@ sub prepare_pod {
     $has_pod{ $_->get_class_name } = 1
         for grep { $_->get_make_pod } values %$registry;
 
-    for my $class (@ordered) {
+    for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
         my $class_binding = $registry->{$class_name} or next;
         next unless delete $has_pod{$class_name};
@@ -348,13 +348,13 @@ my %ks_compat = (
 sub _write_boot_c {
     my $self           = shift;
     my $hierarchy      = $self->{hierarchy};
-    my @ordered        = $hierarchy->ordered_classes;
-    my $num_classes    = scalar @ordered;
+    my $ordered        = $hierarchy->ordered_classes;
+    my $num_classes    = scalar @$ordered;
     my $pound_includes = "";
     my $registrations  = "";
     my $isa_pushes     = "";
 
-    for my $class (@ordered) {
+    for my $class (@$ordered) {
         my $include_h = $class->include_h;
         $pound_includes .= qq|#include "$include_h"\n|;
         next if $class->inert;

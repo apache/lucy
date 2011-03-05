@@ -53,18 +53,6 @@ sub DESTROY {
 # Accessors.
 sub _get_parser { $parser{ +shift } }
 
-# Return flattened hierarchies.
-sub ordered_classes {
-    my $self = shift;
-    my @all;
-    for my $tree ( @{ $self->_trees } ) {
-        push @all, @{ $tree->tree_to_ladder };
-    }
-    return @all;
-}
-
-sub files {  @{ shift->_files } }
-
 # Slurp all Clownfish header files.
 # Arrange the class objects into inheritance trees.
 sub build {
@@ -183,9 +171,9 @@ up the object hierarchy.
 
 =head2 ordered_classes
 
-    my @classes = $hierarchy->ordered_classes;
+    my $classes = $hierarchy->ordered_classes;
 
-Return all Classes as a list with the property that every parent class will
+Return all Classes as an array with the property that every parent class will
 precede all of its children.
 
 =head2 propagate_modified

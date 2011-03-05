@@ -47,6 +47,9 @@ CFCHierarchy_add_tree(CFCHierarchy *self, struct CFCClass *klass);
 struct CFCClass**
 CFCHierarchy_trees(CFCHierarchy *self);
 
+struct CFCClass**
+CFCHierarchy_ordered_classes(CFCHierarchy *self);
+
 struct CFCFile*
 CFCHierarchy_fetch_file(CFCHierarchy *self, const char *source_class);
 
