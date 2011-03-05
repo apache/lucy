@@ -709,18 +709,19 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Hierarchy
 
 SV*
-_new(klass, source, dest)
+_new(klass, source, dest, parser)
     const char *klass;
     const char *source;
     const char *dest;
+    SV *parser;
 CODE:
-    CFCHierarchy *self = CFCHierarchy_new(source, dest);
+    CFCHierarchy *self = CFCHierarchy_new(source, dest, parser);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void
-_destroy(self)
+DESTROY(self)
     CFCHierarchy *self;
 PPCODE:
     CFCHierarchy_destroy(self);
@@ -734,14 +735,12 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_parse_file(self, parser, content, source_class)
+_parse_file(self, content, source_class)
     CFCHierarchy *self;
-    SV *parser;
     const char *content;
     const char *source_class;
 CODE:
-    CFCFile *file = CFCHierarchy_parse_file(self, parser, content,
-        source_class);
+    CFCFile *file = CFCHierarchy_parse_file(self, content, source_class);
     RETVAL = S_cfcbase_to_perlref(file);
 OUTPUT: RETVAL
 

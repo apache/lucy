@@ -26,17 +26,18 @@ struct CFCClass;
 struct CFCFile;
 
 CFCHierarchy*
-CFCHierarchy_new(const char *source, const char *dest);
+CFCHierarchy_new(const char *source, const char *dest, void *parser);
 
 CFCHierarchy*
-CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest);
+CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest, 
+                  void *parser);
 
 void
 CFCHierarchy_destroy(CFCHierarchy *self);
 
 struct CFCFile*
-CFCHierarchy_parse_file(CFCHierarchy *self, void *parser, 
-                        const char *content, const char *source_class);
+CFCHierarchy_parse_file(CFCHierarchy *self, const char *content, 
+                        const char *source_class);
 
 int
 CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified);

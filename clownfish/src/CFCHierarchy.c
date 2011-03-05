@@ -36,6 +36,7 @@ struct CFCHierarchy {
     CFCBase base;
     char *source;
     char *dest;
+    void *parser;
     CFCClass **trees;
     size_t num_trees;
     CFCFile **files;
@@ -47,15 +48,16 @@ int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified);
 
 CFCHierarchy*
-CFCHierarchy_new(const char *source, const char *dest)
+CFCHierarchy_new(const char *source, const char *dest, void *parser)
 {
     CFCHierarchy *self = (CFCHierarchy*)CFCBase_allocate(sizeof(CFCHierarchy),
         "Clownfish::Hierarchy");
-    return CFCHierarchy_init(self, source, dest);
+    return CFCHierarchy_init(self, source, dest, parser);
 }
 
 CFCHierarchy*
-CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest) 
+CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
+                  void *parser) 
 {
     if (!source || !strlen(source) || !dest || !strlen(dest)) {
         croak("Both 'source' and 'dest' are required");
@@ -66,6 +68,7 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest)
     self->num_trees = 0;
     self->files     = (CFCFile**)CALLOCATE(1, sizeof(CFCFile*));
     self->num_files = 0;
+    self->parser    = newSVsv((SV*)parser);
     return self;
 }
 
@@ -83,18 +86,19 @@ CFCHierarchy_destroy(CFCHierarchy *self)
     FREEMEM(self->files);
     FREEMEM(self->source);
     FREEMEM(self->dest);
+    SvREFCNT_dec((SV*)self->parser);
     CFCBase_destroy((CFCBase*)self);
 }
 
 CFCFile*
-CFCHierarchy_parse_file(CFCHierarchy *self, void *parser, 
-                        const char *content, const char *source_class)
+CFCHierarchy_parse_file(CFCHierarchy *self, const char *content, 
+                        const char *source_class)
 {
     dSP;
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVsv((SV*)parser)));
+    XPUSHs(sv_2mortal(newSVsv((SV*)self->parser)));
     XPUSHs(sv_2mortal(newSVpvn(content, strlen(content))));
     XPUSHs(sv_2mortal(newSVpvn(source_class, strlen(source_class))));
     PUTBACK;

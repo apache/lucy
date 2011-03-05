@@ -27,9 +27,6 @@ use Clownfish::Util qw( slurp_file current verify_args a_isa_b );
 use Clownfish::Class;
 use Clownfish::Parser;
 
-# Inside-out member vars.
-our %parser;
-
 our %new_PARAMS = (
     source => undef,
     dest   => undef,
@@ -39,19 +36,9 @@ sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     my $package = ref($either) || $either;
-    my $self = $package->_new( @args{qw( source dest )} );
-    $parser{$self} = Clownfish::Parser->new;
-    return $self;
+    my $parser = Clownfish::Parser->new;
+    return $package->_new( @args{qw( source dest )}, $parser );
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $parser{$self};
-    $self->_destroy;
-}
-
-# Accessors.
-sub _get_parser { $parser{ +shift } }
 
 # Slurp all Clownfish header files.
 # Arrange the class objects into inheritance trees.
@@ -98,8 +85,7 @@ sub _parse_cf_files {
 
         # Slurp, parse, add parsed file to pool.
         my $content = slurp_file($source_path);
-        my $file = $self->_parse_file( $self->_get_parser, $content,
-            $source_class );
+        my $file = $self->_parse_file( $content, $source_class );
         confess("parse error for $source_path")
             unless a_isa_b( $file, "Clownfish::File" );
         $self->_add_file($file);
