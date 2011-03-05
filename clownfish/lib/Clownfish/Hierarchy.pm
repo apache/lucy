@@ -118,8 +118,6 @@ sub _parse_cf_files {
         
         for my $class ( @{ $file->classes } ) {
             my $class_name = $class->get_class_name;
-            confess "$class_name already defined"
-                if exists $classes{$class_name};
             $classes{$class_name} = $class;
         }
     }

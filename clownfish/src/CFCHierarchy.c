@@ -224,9 +224,30 @@ CFCHierarchy_add_file(CFCHierarchy *self, CFCFile *file)
 {
     CFCUTIL_NULL_CHECK(file);
     const char *source_class = CFCFile_get_source_class(file);
-    if (CFCHierarchy_fetch_file(self, source_class)) {
-        CFCUtil_die("File for source class %s already registered", 
-            source_class);
+    CFCClass **classes = CFCFile_classes(file);
+    size_t i;
+    for (i = 0; self->files[i] != NULL; i++) {
+        CFCFile *existing = self->files[i];
+        const char *old_source_class = CFCFile_get_source_class(existing);
+        if (strcmp(source_class, old_source_class) == 0) {
+            CFCUtil_die("File for source class %s already registered", 
+                source_class);
+        }
+        CFCClass **existing_classes = CFCFile_classes(existing);
+        size_t j;
+        for (j = 0; classes[j] != NULL; j++) {
+            const char *new_class_name
+                = CFCSymbol_get_class_name((CFCSymbol*)classes[j]);
+            size_t k; 
+            for (k = 0; existing_classes[k] != NULL; k++) {
+                const char *existing_class_name
+                    = CFCSymbol_get_class_name((CFCSymbol*)existing_classes[k]);
+                if (strcmp(new_class_name, existing_class_name) == 0) {
+                    CFCUtil_die("Class '%s' already registered",
+                        new_class_name);
+                }
+            }
+        }
     }
     self->num_files++;
     size_t size = (self->num_files + 1) * sizeof(CFCFile*);
