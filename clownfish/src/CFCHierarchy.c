@@ -135,7 +135,8 @@ CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths)
     size_t num_classes     = 0;
     CFCClass **all_classes = (CFCClass**)MALLOCATE(
         (all_classes_cap + 1) * sizeof(CFCClass*));
-    char source_class[512];
+    char *source_class = NULL;
+    size_t source_class_max = 0;
 
     // Process any file that has at least one class declaration.
     int i;
@@ -150,6 +151,10 @@ CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths)
         }
         size_t j;
         size_t source_class_len = 0;
+        if (source_class_max < source_path_len * 2 + 1) {
+            source_class_max = source_path_len * 2 + 1;
+            source_class = (char*)REALLOCATE(source_class, source_class_max);
+        }
         for (j = source_dir_len; j < source_path_len - strlen(".cfh"); j++) {
             char c = source_path[j];
             if (isalnum(c)) {
@@ -210,6 +215,7 @@ CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths)
     }
 
     FREEMEM(all_classes);
+    FREEMEM(source_class);
 }
 
 int
