@@ -734,16 +734,6 @@ CODE:
     RETVAL = CFCHierarchy_propagate_modified(self, modified);
 OUTPUT: RETVAL
 
-SV*
-_parse_file(self, content, source_class)
-    CFCHierarchy *self;
-    const char *content;
-    const char *source_class;
-CODE:
-    CFCFile *file = CFCHierarchy_parse_file(self, content, source_class);
-    RETVAL = S_cfcbase_to_perlref(file);
-OUTPUT: RETVAL
-
 void
 _add_tree(self, klass)
     CFCHierarchy *self;
@@ -766,6 +756,13 @@ CODE:
     CFCFile *file = CFCHierarchy_fetch_file(self, source_class);
     RETVAL = S_cfcbase_to_perlref(file);
 OUTPUT: RETVAL
+
+void
+_parse_cf_files(self, paths)
+    CFCHierarchy *self;
+    SV *paths;
+PPCODE:
+    CFCHierarchy_parse_cf_files(self, paths);
 
 void
 _set_or_get(self, ...)

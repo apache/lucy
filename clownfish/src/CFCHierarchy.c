@@ -90,15 +90,14 @@ CFCHierarchy_destroy(CFCHierarchy *self)
     CFCBase_destroy((CFCBase*)self);
 }
 
-CFCFile*
-CFCHierarchy_parse_file(CFCHierarchy *self, const char *content, 
-                        const char *source_class)
+static CFCFile*
+S_parse_file(void *parser, const char *content, const char *source_class)
 {
     dSP;
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVsv((SV*)self->parser)));
+    XPUSHs(sv_2mortal(newSVsv((SV*)parser)));
     XPUSHs(sv_2mortal(newSVpvn(content, strlen(content))));
     XPUSHs(sv_2mortal(newSVpvn(source_class, strlen(source_class))));
     PUTBACK;
@@ -124,6 +123,93 @@ CFCHierarchy_parse_file(CFCHierarchy *self, const char *content,
     LEAVE;
 
     return file;
+}
+
+void
+CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths)
+{
+    AV *all_source_paths   = (AV*)SvRV((SV*)all_paths);
+    const char *source_dir = self->source;
+    size_t source_dir_len  = strlen(source_dir);
+    size_t all_classes_cap = 10;
+    size_t num_classes     = 0;
+    CFCClass **all_classes = (CFCClass**)MALLOCATE(
+        (all_classes_cap + 1) * sizeof(CFCClass*));
+    char source_class[512];
+
+    // Process any file that has at least one class declaration.
+    int i;
+    for (i = 0; i <= av_len(all_source_paths); i++) {
+        // Derive the name of the class that owns the module file.
+        SV **source_path_sv = av_fetch(all_source_paths, i, false);
+        STRLEN source_path_len;
+        char *source_path = SvPV(*source_path_sv, source_path_len);
+        if (strncmp(source_path, source_dir, source_dir_len) != 0) {
+            CFCUtil_die("'%s' doesn't start with '%s'", source_path,
+                source_dir);
+        }
+        size_t j;
+        size_t source_class_len = 0;
+        for (j = source_dir_len; j < source_path_len - strlen(".cfh"); j++) {
+            char c = source_path[j];
+            if (isalnum(c)) {
+                source_class[source_class_len++] = c;
+            }
+            else {
+                if (source_class_len != 0) {
+                    source_class[source_class_len++] = ':';
+                    source_class[source_class_len++] = ':';
+                }
+            }
+        }
+        source_class[source_class_len] = '\0';
+
+        // Slurp, parse, add parsed file to pool.
+        size_t unused;
+        char *content = CFCUtil_slurp_file(source_path, &unused);
+        CFCFile *file = S_parse_file(self->parser, content, source_class);
+        if (!file) {
+            croak("parser error for %s", source_path);
+        }
+        CFCHierarchy_add_file(self, file);
+        
+        CFCClass **classes_in_file = CFCFile_classes(file);
+        for (j = 0; classes_in_file[j] != NULL; j++) {
+            if (num_classes == all_classes_cap) {
+                all_classes_cap += 10;
+                all_classes = (CFCClass**)REALLOCATE(all_classes, 
+                    (all_classes_cap + 1) * sizeof(CFCClass*));
+            }
+            all_classes[num_classes++] = classes_in_file[j];
+        }
+    }
+    all_classes[num_classes] = NULL;
+
+    // Wrangle the classes into hierarchies and figure out inheritance.
+    for (i = 0; all_classes[i] != NULL; i++) {
+        CFCClass *klass = all_classes[i];
+        const char *parent_name = CFCClass_get_parent_class_name(klass);
+        if (parent_name) {
+            size_t j;
+            for (j = 0; ; j++) {
+                CFCClass *maybe_parent = all_classes[j];
+                if (!maybe_parent) {
+                    CFCUtil_die("Parent class '%s' not defined", parent_name);
+                }
+                const char *maybe_parent_name 
+                    = CFCSymbol_get_class_name((CFCSymbol*)maybe_parent);
+                if (strcmp(parent_name, maybe_parent_name) == 0) {
+                    CFCClass_add_child(maybe_parent, klass);
+                    break;
+                }
+            }
+        }
+        else {
+            CFCHierarchy_add_tree(self, klass);
+        }
+    }
+
+    FREEMEM(all_classes);
 }
 
 int

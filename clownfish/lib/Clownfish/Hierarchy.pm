@@ -44,7 +44,20 @@ sub new {
 # Arrange the class objects into inheritance trees.
 sub build {
     my $self = shift;
-    $self->_parse_cf_files;
+    my @all_source_paths;
+    find(
+        {   wanted => sub {
+                if ( $File::Find::name =~ /\.cfh$/ ) {
+                    push @all_source_paths, "$File::Find::name"
+                        unless /#/;    # skip emacs .#filename.h lock files
+                }
+            },
+            no_chdir => 1,
+            follow   => 1,    # follow symlinks if possible (noop on Windows)
+        },
+        $self->get_source,
+    );
+    $self->_parse_cf_files( \@all_source_paths );
     $_->grow_tree for @{ $self->_trees };
 }
 
@@ -52,64 +65,6 @@ sub _do_parse_file {
     my ( $parser, $content, $source_class ) = @_;
     $content = $parser->strip_plain_comments($content);
     return $parser->file( $content, 0, source_class => $source_class, );
-}
-
-sub _parse_cf_files {
-    my $self   = shift;
-    my $source = $self->get_source;
-
-    # Collect filenames.
-    my @all_source_paths;
-    find(
-        {   wanted => sub {
-                if ( $File::Find::name =~ /\.cfh$/ ) {
-                    push @all_source_paths, $File::Find::name
-                        unless /#/;    # skip emacs .#filename.h lock files
-                }
-            },
-            no_chdir => 1,
-            follow   => 1,    # follow symlinks if possible (noop on Windows)
-        },
-        $source,
-    );
-
-    # Process any file that has at least one class declaration.
-    my %classes;
-    for my $source_path (@all_source_paths) {
-        # Derive the name of the class that owns the module file.
-        my $source_class = $source_path;
-        $source_class =~ s/\.cfh$//;
-        $source_class =~ s/^\Q$source\E\W*//
-            or die "'$source_path' doesn't start with '$source'";
-        $source_class =~ s/\W/::/g;
-
-        # Slurp, parse, add parsed file to pool.
-        my $content = slurp_file($source_path);
-        my $file = $self->_parse_file( $content, $source_class );
-        confess("parse error for $source_path")
-            unless a_isa_b( $file, "Clownfish::File" );
-        $self->_add_file($file);
-        
-        for my $class ( @{ $file->classes } ) {
-            my $class_name = $class->get_class_name;
-            $classes{$class_name} = $class;
-        }
-    }
-
-    # Wrangle the classes into hierarchies and figure out inheritance.
-    while ( my ( $class_name, $class ) = each %classes ) {
-        my $parent_name = $class->get_parent_class_name;
-        if ( defined $parent_name ) {
-            if ( not exists $classes{$parent_name} ) {
-                confess(  "parent class '$parent_name' not defined "
-                        . "for class '$class_name'" );
-            }
-            $classes{$parent_name}->add_child($class);
-        }
-        else {
-            $self->_add_tree($class);
-        }
-    }
 }
 
 1;

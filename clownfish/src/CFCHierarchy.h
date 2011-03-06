@@ -35,9 +35,8 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
 void
 CFCHierarchy_destroy(CFCHierarchy *self);
 
-struct CFCFile*
-CFCHierarchy_parse_file(CFCHierarchy *self, const char *content, 
-                        const char *source_class);
+void
+CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths);
 
 int
 CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified);
