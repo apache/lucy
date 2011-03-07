@@ -175,7 +175,7 @@ CFCUtil_write_file(const char *filename, const char *content, size_t len)
 char*
 CFCUtil_slurp_file(const char *file_path, size_t *len_ptr) 
 {
-    FILE   *const file = fopen(file_path, "r");
+    FILE   *const file = fopen(file_path, "rb");
     char   *contents;
     size_t  len;
     long    check_val;
