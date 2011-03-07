@@ -15,13 +15,19 @@
  */
 
 #include <stdlib.h>
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
 
 #ifndef true
     #define true 1
     #define false 0
+#endif
+
+#ifdef WIN32
+    #define PATH_SEP "\\"
+#else
+    #define PATH_SEP "/"
 #endif
 
 #define CFC_NEED_BASE_STRUCT_DEF
@@ -46,6 +52,37 @@ struct CFCHierarchy {
 // Recursive helper function for CFCUtil_propagate_modified.
 int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified);
+
+// Platform-agnostic opendir wrapper.
+static void*
+S_opendir(const char *dir);
+
+// Platform-agnostic readdir wrapper.
+static const char*
+S_next_entry(void *dirhandle);
+
+// Platform-agnostic closedir wrapper.
+static void
+S_closedir(void *dirhandle, const char *dir);
+
+// Indicate whether a path is a directory.
+// Note: this has to be defined before including the Perl headers because they
+// redefine stat() in an incompatible way on certain systems (Windows).
+static int
+S_is_dir(const char *path)
+{
+    struct stat stat_buf;
+    int stat_check = stat(path, &stat_buf);
+    if (stat_check == -1) {
+        CFCUtil_die("Stat failed for '%s': %s", path,
+            strerror(errno));
+    }
+    return (stat_buf.st_mode & S_IFDIR) ? true : false;
+}
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
 
 CFCHierarchy*
 CFCHierarchy_new(const char *source, const char *dest, void *parser)
@@ -125,10 +162,54 @@ S_parse_file(void *parser, const char *content, const char *source_class)
     return file;
 }
 
-void
-CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths)
+static char**
+S_find_cfh(char *dir, char **cfh_list, size_t num_cfh)
 {
-    AV *all_source_paths   = (AV*)SvRV((SV*)all_paths);
+    void *dirhandle = S_opendir(dir);
+    size_t full_path_cap = strlen(dir) * 2;
+    char *full_path = (char*)MALLOCATE(full_path_cap);
+    const char *entry = NULL;
+    while (NULL != (entry = S_next_entry(dirhandle))) {
+        // Ignore updirs and hidden files.
+        if (strncmp(entry, ".", 1) == 0) {
+            continue;
+        }
+
+        size_t name_len = strlen(entry);
+        size_t needed = strlen(dir) + 1 + name_len + 1;
+        if (needed > full_path_cap) {
+            full_path_cap = needed;
+            full_path = (char*)MALLOCATE(full_path_cap);
+        }
+        int full_path_len = sprintf(full_path, "%s" PATH_SEP "%s", dir, entry);
+        if (full_path_len < 0) { CFCUtil_die("sprintf failed"); }
+        const char *cfh_suffix = strstr(full_path, ".cfh");
+
+        if (cfh_suffix == full_path + (full_path_len - 4)) {
+            cfh_list = (char**)REALLOCATE(cfh_list, 
+                (num_cfh + 2) * sizeof(char*));
+            cfh_list[num_cfh++] = CFCUtil_strdup(full_path);
+            cfh_list[num_cfh] = NULL;
+        }
+        else if (S_is_dir(full_path)) {
+            cfh_list = S_find_cfh(full_path, cfh_list, num_cfh);
+            num_cfh = 0;
+            if (cfh_list) {
+                while (cfh_list[num_cfh] != NULL) { num_cfh++; }
+            }
+        }
+    }
+
+    FREEMEM(full_path);
+    S_closedir(dirhandle, dir);
+    return cfh_list;
+}
+
+void
+CFCHierarchy_parse_cf_files(CFCHierarchy *self)
+{
+    char **all_source_paths = (char**)CALLOCATE(1, sizeof(char*));
+    all_source_paths = S_find_cfh(self->source, all_source_paths, 0);
     const char *source_dir = self->source;
     size_t source_dir_len  = strlen(source_dir);
     size_t all_classes_cap = 10;
@@ -140,11 +221,10 @@ CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths)
 
     // Process any file that has at least one class declaration.
     int i;
-    for (i = 0; i <= av_len(all_source_paths); i++) {
+    for (i = 0; all_source_paths[i] != NULL; i++) {
         // Derive the name of the class that owns the module file.
-        SV **source_path_sv = av_fetch(all_source_paths, i, false);
-        STRLEN source_path_len;
-        char *source_path = SvPV(*source_path_sv, source_path_len);
+        char *source_path = all_source_paths[i];
+        size_t source_path_len = strlen(source_path);
         if (strncmp(source_path, source_dir, source_dir_len) != 0) {
             CFCUtil_die("'%s' doesn't start with '%s'", source_path,
                 source_dir);
@@ -215,6 +295,10 @@ CFCHierarchy_parse_cf_files(CFCHierarchy *self, void *all_paths)
     }
 
     FREEMEM(all_classes);
+    for (i = 0; all_source_paths[i] != NULL; i++) {
+        FREEMEM(all_source_paths[i]);
+    }
+    FREEMEM(all_source_paths);
     FREEMEM(source_class);
 }
 
@@ -396,3 +480,99 @@ CFCHierarchy_get_dest(CFCHierarchy *self)
     return self->dest;
 }
 
+/******************************** WINDOWS **********************************/
+#ifdef WIN32
+
+#include <windows.h>
+
+typedef struct WinDH {
+    HANDLE handle;
+    WIN32_FIND_DATA *find_data;
+    char path[MAX_PATH + 1];
+    int first_time;
+} WinDH;
+
+static void*
+S_opendir(const char *dir)
+{
+    size_t dirlen = strlen(dir);
+    if (dirlen >= MAX_PATH - 2) {
+        CFCUtil_die("Exceeded MAX_PATH(%d): %s", (int)MAX_PATH, dir);
+    }
+    WinDH *dh = (WinDH*)CALLOCATE(1, sizeof(WinDH));
+    dh->find_data = (WIN32_FIND_DATA*)MALLOCATE(sizeof(WIN32_FIND_DATA));
+
+    // Tack on wildcard needed by FindFirstFile.
+    int check = sprintf(dh->path, "%s\\*", dir);
+    if (check < 0) { CFCUtil_die("sprintf failed"); }
+
+    dh->handle = FindFirstFile(dh->path, dh->find_data);
+    if (dh->handle == INVALID_HANDLE_VALUE) {
+        CFCUtil_die("Can't open dir '%s'", dh->path);
+    }
+    dh->first_time = true;
+
+    return dh;
+}
+
+static const char*
+S_next_entry(void *dirhandle)
+{
+    WinDH *dh = (WinDH*)dirhandle;
+    if (dh->first_time) {
+        dh->first_time = false;
+    }
+    else {
+        if ((FindNextFile(dh->handle, dh->find_data) == 0)) {
+            if (GetLastError() != ERROR_NO_MORE_FILES) {
+                CFCUtil_die("Error occurred while reading '%s'", 
+                    dh->path);
+            }
+            return NULL;
+        }
+    }
+    return dh->find_data->cFileName;
+}
+
+static void
+S_closedir(void *dirhandle, const char *dir)
+{
+    WinDH *dh = (WinDH*)dirhandle;
+    if (!FindClose(dh->handle)) {
+        CFCUtil_die("Error occurred while closing dir '%s'", dir);
+    }
+    FREEMEM(dh->find_data);
+    FREEMEM(dh);
+}
+
+/******************************** UNIXEN ***********************************/
+#else 
+
+#include <dirent.h>
+
+static void*
+S_opendir(const char *dir)
+{
+    DIR *dirhandle = opendir(dir);
+    if (!dirhandle) {
+        CFCUtil_die("Failed to opendir for '%s': %s", dir, strerror(errno));
+    }
+    return dirhandle;
+}
+
+static const char*
+S_next_entry(void *dirhandle)
+{
+    struct dirent *entry = readdir((DIR*)dirhandle);
+    return entry ? entry->d_name : NULL;
+}
+
+static void
+S_closedir(void *dirhandle, const char *dir)
+{
+    if (closedir(dirhandle) == -1) {
+        CFCUtil_die("Error closing dir '%s': %s", dir, strerror(errno));
+    }
+}
+
+#endif

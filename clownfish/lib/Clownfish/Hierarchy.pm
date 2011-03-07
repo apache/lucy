@@ -18,12 +18,8 @@ use warnings;
 
 package Clownfish::Hierarchy;
 use Carp;
-use File::Find qw( find );
-use File::Spec::Functions qw( catfile splitpath );
-use File::Path qw( mkpath );
-use Fcntl;
 
-use Clownfish::Util qw( slurp_file current verify_args a_isa_b );
+use Clownfish::Util qw( verify_args );
 use Clownfish::Class;
 use Clownfish::Parser;
 
@@ -44,20 +40,7 @@ sub new {
 # Arrange the class objects into inheritance trees.
 sub build {
     my $self = shift;
-    my @all_source_paths;
-    find(
-        {   wanted => sub {
-                if ( $File::Find::name =~ /\.cfh$/ ) {
-                    push @all_source_paths, "$File::Find::name"
-                        unless /#/;    # skip emacs .#filename.h lock files
-                }
-            },
-            no_chdir => 1,
-            follow   => 1,    # follow symlinks if possible (noop on Windows)
-        },
-        $self->get_source,
-    );
-    $self->_parse_cf_files( \@all_source_paths );
+    $self->_parse_cf_files();
     $_->grow_tree for @{ $self->_trees };
 }
 

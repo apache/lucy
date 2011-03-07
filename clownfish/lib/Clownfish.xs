@@ -758,11 +758,10 @@ CODE:
 OUTPUT: RETVAL
 
 void
-_parse_cf_files(self, paths)
+_parse_cf_files(self)
     CFCHierarchy *self;
-    SV *paths;
 PPCODE:
-    CFCHierarchy_parse_cf_files(self, paths);
+    CFCHierarchy_parse_cf_files(self);
 
 void
 _set_or_get(self, ...)
