@@ -726,6 +726,12 @@ DESTROY(self)
 PPCODE:
     CFCHierarchy_destroy(self);
 
+void
+build(self)
+    CFCHierarchy *self;
+PPCODE:
+    CFCHierarchy_build(self);
+
 int
 propagate_modified(self, ...)
     CFCHierarchy *self;
@@ -735,41 +741,11 @@ CODE:
 OUTPUT: RETVAL
 
 void
-_add_tree(self, klass)
-    CFCHierarchy *self;
-    CFCClass *klass;
-PPCODE:
-    CFCHierarchy_add_tree(self, klass);
-
-void
-_add_file(self, file)
-    CFCHierarchy *self;
-    CFCFile *file;
-PPCODE:
-    CFCHierarchy_add_file(self, file);
-
-SV*
-_fetch_file(self, source_class)
-    CFCHierarchy *self;
-    const char *source_class;
-CODE:
-    CFCFile *file = CFCHierarchy_fetch_file(self, source_class);
-    RETVAL = S_cfcbase_to_perlref(file);
-OUTPUT: RETVAL
-
-void
-_parse_cf_files(self)
-    CFCHierarchy *self;
-PPCODE:
-    CFCHierarchy_parse_cf_files(self);
-
-void
 _set_or_get(self, ...)
     CFCHierarchy *self;
 ALIAS:
     get_source        = 2
     get_dest          = 4
-    _trees            = 6
     files             = 8
     ordered_classes   = 10
 PPCODE:
@@ -784,10 +760,6 @@ PPCODE:
                 const char *value = CFCHierarchy_get_dest(self);
                 retval = newSVpv(value, strlen(value));
             }
-            break;
-        case 6:
-            retval = S_array_of_cfcbase_to_av(
-                (CFCBase**)CFCHierarchy_trees(self));
             break;
         case 8:
             retval = S_array_of_cfcbase_to_av(

@@ -35,26 +35,11 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
 void
 CFCHierarchy_destroy(CFCHierarchy *self);
 
-void
-CFCHierarchy_parse_cf_files(CFCHierarchy *self);
-
 int
 CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified);
 
-void
-CFCHierarchy_add_tree(CFCHierarchy *self, struct CFCClass *klass);
-
-struct CFCClass**
-CFCHierarchy_trees(CFCHierarchy *self);
-
 struct CFCClass**
 CFCHierarchy_ordered_classes(CFCHierarchy *self);
-
-struct CFCFile*
-CFCHierarchy_fetch_file(CFCHierarchy *self, const char *source_class);
-
-void
-CFCHierarchy_add_file(CFCHierarchy *self, struct CFCFile *file);
 
 struct CFCFile**
 CFCHierarchy_files(CFCHierarchy *self);

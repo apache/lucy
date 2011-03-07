@@ -36,14 +36,6 @@ sub new {
     return $package->_new( @args{qw( source dest )}, $parser );
 }
 
-# Slurp all Clownfish header files.
-# Arrange the class objects into inheritance trees.
-sub build {
-    my $self = shift;
-    $self->_parse_cf_files();
-    $_->grow_tree for @{ $self->_trees };
-}
-
 sub _do_parse_file {
     my ( $parser, $content, $source_class ) = @_;
     $content = $parser->strip_plain_comments($content);
