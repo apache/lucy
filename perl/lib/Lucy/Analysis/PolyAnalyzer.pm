@@ -43,7 +43,7 @@ my $constructor = <<'END_CONSTRUCTOR';
 
     my $case_folder  = Lucy::Analysis::CaseFolder->new;
     my $tokenizer    = Lucy::Analysis::Tokenizer->new;
-    my $stemmer      = Lucy::Analysis::Stemmer->new( language => 'en' );
+    my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $whitespace_tokenizer, $stemmer, ], );
 END_CONSTRUCTOR

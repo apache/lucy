@@ -325,24 +325,26 @@ END_STUFF
 }
 
 my %ks_compat = (
-    'Lucy::Plan::Schema' => [qw( KinoSearch::Plan::Schema KinoSearch::Schema )],
+    'Lucy::Plan::Schema' =>
+        [qw( KinoSearch::Plan::Schema KinoSearch::Schema )],
     'Lucy::Plan::FieldType' =>
-      [qw( KinoSearch::Plan::FieldType KinoSearch::FieldType )],
+        [qw( KinoSearch::Plan::FieldType KinoSearch::FieldType )],
     'Lucy::Plan::FullTextType' => [
         qw( KinoSearch::Plan::FullTextType KinoSearch::FieldType::FullTextType )
     ],
-    'Lucy::Plan::StringType' =>
-      [ qw( KinoSearch::Plan::StringType KinoSearch::FieldType::StringType ) ],
+    'Lucy::Plan::StringType' => [
+        qw( KinoSearch::Plan::StringType KinoSearch::FieldType::StringType )],
     'Lucy::Plan::BlobType' =>
-      [ qw( KinoSearch::Plan::BlobType KinoSearch::FieldType::BlobType ) ],
+        [qw( KinoSearch::Plan::BlobType KinoSearch::FieldType::BlobType )],
     'Lucy::Analysis::PolyAnalyzer' =>
-      [qw( KinoSearch::Analysis::PolyAnalyzer )],
+        [qw( KinoSearch::Analysis::PolyAnalyzer )],
     'Lucy::Analysis::Tokenizer'  => [qw( KinoSearch::Analysis::Tokenizer )],
     'Lucy::Analysis::CaseFolder' => [
         qw( KinoSearch::Analysis::CaseFolder KinoSearch::Analysis::LCNormalizer )
     ],
     'Lucy::Analysis::Stopalizer' => [qw( KinoSearch::Analysis::Stopalizer )],
-    'Lucy::Analysis::Stemmer'    => [qw( KinoSearch::Analysis::Stemmer )],
+    'Lucy::Analysis::SnowballStemmer' =>
+        [qw( KinoSearch::Analysis::Stemmer )],
 );
 
 sub _write_boot_c {

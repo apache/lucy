@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 9;
 use Lucy::Test::TestUtils qw( test_analyzer );
 
-my $stemmer = Lucy::Analysis::Stemmer->new( language => 'en' );
+my $stemmer = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
 test_analyzer( $stemmer, 'ponies', ['poni'], "single word stemmed" );
 test_analyzer( $stemmer, 'pony',   ['poni'], "stem, not just truncate" );
 

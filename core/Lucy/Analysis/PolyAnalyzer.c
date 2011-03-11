@@ -21,7 +21,7 @@
 #include "Lucy/Analysis/CaseFolder.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
-#include "Lucy/Analysis/Stemmer.h"
+#include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Analysis/Tokenizer.h"
 
 PolyAnalyzer*
@@ -46,7 +46,7 @@ PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language,
         self->analyzers = VA_new(3);
         VA_Push(self->analyzers, (Obj*)CaseFolder_new());
         VA_Push(self->analyzers, (Obj*)Tokenizer_new(NULL));
-        VA_Push(self->analyzers, (Obj*)Stemmer_new(language));
+        VA_Push(self->analyzers, (Obj*)SnowStemmer_new(language));
     }
     else {
         THROW(ERR, "Must specify either 'language' or 'analyzers'");

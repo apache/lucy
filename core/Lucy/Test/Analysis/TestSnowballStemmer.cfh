@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestStemmer {
+inert class Lucy::Test::Analysis::TestSnowballStemmer cnick TestSnowStemmer {
     inert void
     run_tests();
 }

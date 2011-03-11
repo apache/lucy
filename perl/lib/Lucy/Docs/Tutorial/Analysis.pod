@@ -46,7 +46,7 @@ C<< language => 'en' >> is equivalent to this snippet:
 
     my $case_folder  = Lucy::Analysis::CaseFolder->new;
     my $tokenizer    = Lucy::Analysis::Tokenizer->new;
-    my $stemmer      = Lucy::Analysis::Stemmer->new( language => 'en' );
+    my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stemmer ], 
     );
@@ -62,7 +62,7 @@ and "maybe".
         analyzers => [ $case_folder, $tokenizer, $stopalizer, $stemmer ], 
     );
 
-Also, try removing the Stemmer.
+Also, try removing the SnowballStemmer.
 
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer ], 

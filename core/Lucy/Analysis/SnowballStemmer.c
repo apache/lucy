@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-#define C_LUCY_STEMMER
+#define C_LUCY_SNOWBALLSTEMMER
 #define C_LUCY_TOKEN
 #include <ctype.h>
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Analysis/Stemmer.h"
+#include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 
 #include "libstemmer.h"
 
-Stemmer*
-Stemmer_new(const CharBuf *language)
+SnowballStemmer*
+SnowStemmer_new(const CharBuf *language)
 {
-    Stemmer *self = (Stemmer*)VTable_Make_Obj(STEMMER);
-    return Stemmer_init(self, language);
+    SnowballStemmer *self = (SnowballStemmer*)VTable_Make_Obj(SNOWBALLSTEMMER);
+    return SnowStemmer_init(self, language);
 }
 
-Stemmer*
-Stemmer_init(Stemmer *self, const CharBuf *language)
+SnowballStemmer*
+SnowStemmer_init(SnowballStemmer *self, const CharBuf *language)
 {
     char lang_buf[3];
     Analyzer_init((Analyzer*)self);
@@ -51,17 +51,17 @@ Stemmer_init(Stemmer *self, const CharBuf *language)
 }
 
 void
-Stemmer_destroy(Stemmer *self)
+SnowStemmer_destroy(SnowballStemmer *self)
 {
     if (self->snowstemmer) {
         sb_stemmer_delete((struct sb_stemmer*)self->snowstemmer);
     }
     DECREF(self->language);
-    SUPER_DESTROY(self, STEMMER);
+    SUPER_DESTROY(self, SNOWBALLSTEMMER);
 }
 
 Inversion*
-Stemmer_transform(Stemmer *self, Inversion *inversion)
+SnowStemmer_transform(SnowballStemmer *self, Inversion *inversion)
 {
     Token *token;
     struct sb_stemmer *const snowstemmer 
@@ -83,33 +83,33 @@ Stemmer_transform(Stemmer *self, Inversion *inversion)
 }
 
 Hash*
-Stemmer_dump(Stemmer *self)
+SnowStemmer_dump(SnowballStemmer *self)
 {
-    Stemmer_dump_t super_dump 
-        = (Stemmer_dump_t)SUPER_METHOD(STEMMER, Stemmer, Dump);
+    SnowStemmer_dump_t super_dump 
+        = (SnowStemmer_dump_t)SUPER_METHOD(SNOWBALLSTEMMER, SnowStemmer, Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(self->language));
     return dump;
 }
 
-Stemmer*
-Stemmer_load(Stemmer *self, Obj *dump)
+SnowballStemmer*
+SnowStemmer_load(SnowballStemmer *self, Obj *dump)
 {
-    Stemmer_load_t super_load 
-        = (Stemmer_load_t)SUPER_METHOD(STEMMER, Stemmer, Load);
-    Stemmer *loaded = super_load(self, dump);
+    SnowStemmer_load_t super_load 
+        = (SnowStemmer_load_t)SUPER_METHOD(SNOWBALLSTEMMER, SnowStemmer, Load);
+    SnowballStemmer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *language = (CharBuf*)CERTIFY(
         Hash_Fetch_Str(source, "language", 8), CHARBUF);
-    return Stemmer_init(loaded, language);
+    return SnowStemmer_init(loaded, language);
 }
 
 bool_t
-Stemmer_equals(Stemmer *self, Obj *other)
+SnowStemmer_equals(SnowballStemmer *self, Obj *other)
 {
-    Stemmer *const evil_twin = (Stemmer*)other;
+    SnowballStemmer *const evil_twin = (SnowballStemmer*)other;
     if (evil_twin == self) return true;
-    if (!Obj_Is_A(other, STEMMER)) return false;
+    if (!Obj_Is_A(other, SNOWBALLSTEMMER)) return false;
     if (!CB_Equals(evil_twin->language, (Obj*)self->language)) return false;
     return true;
 } 

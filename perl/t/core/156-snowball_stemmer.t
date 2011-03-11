@@ -17,5 +17,5 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestStemmer");
+Lucy::Test::run_tests("TestSnowStemmer");
 

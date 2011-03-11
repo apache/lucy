@@ -302,7 +302,7 @@ If you're planning on using PrefixQuery in earnest, though, you may want to
 change up analyzers to avoid stemming, because stemming -- another approach to
 prefix conflation -- is not perfectly compatible with prefix searches.
 
-    # Polyanalyzer with no Stemmer.
+    # Polyanalyzer with no SnowballStemmer.
     my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [
             Lucy::Analysis::Tokenizer->new,

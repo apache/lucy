@@ -18,43 +18,43 @@ parcel Lucy;
 
 /** Reduce related words to a shared root.
  * 
- * Stemmer is an L<Analyzer|Lucy::Analysis::Analyzer> which reduces
+ * SnowballStemmer is an L<Analyzer|Lucy::Analysis::Analyzer> which reduces
  * related words to a root form (using the "Snowball" stemming library).  For
  * instance, "horse", "horses", and "horsing" all become "hors" -- so that a
  * search for 'horse' will also match documents containing 'horses' and
  * 'horsing'.
  */ 
 
-class Lucy::Analysis::Stemmer inherits Lucy::Analysis::Analyzer 
-    : dumpable {
+class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
+    inherits Lucy::Analysis::Analyzer : dumpable {
 
     void *snowstemmer;
     CharBuf *language;
 
-    inert incremented Stemmer* 
+    inert incremented SnowballStemmer* 
     new(const CharBuf *language);
 
     /**
      * @param language A two-letter ISO code identifying a language supported
      * by Snowball.
      */
-    public inert Stemmer* 
-    init(Stemmer *self, const CharBuf *language);
+    public inert SnowballStemmer* 
+    init(SnowballStemmer *self, const CharBuf *language);
 
     public incremented Inversion*
-    Transform(Stemmer *self, Inversion *inversion);
+    Transform(SnowballStemmer *self, Inversion *inversion);
 
     public incremented Hash*
-    Dump(Stemmer *self);
+    Dump(SnowballStemmer *self);
 
-    public incremented Stemmer*
-    Load(Stemmer *self, Obj *dump);
+    public incremented SnowballStemmer*
+    Load(SnowballStemmer *self, Obj *dump);
 
     public bool_t
-    Equals(Stemmer *self, Obj *other);
+    Equals(SnowballStemmer *self, Obj *other);
 
     public void
-    Destroy(Stemmer *self);
+    Destroy(SnowballStemmer *self);
 }
 
 

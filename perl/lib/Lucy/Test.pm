@@ -55,8 +55,8 @@ PPCODE:
     else if (strEQ(package, "TestStopalizer")) {
         lucy_TestStopalizer_run_tests();
     }
-    else if (strEQ(package, "TestStemmer")) {
-        lucy_TestStemmer_run_tests();
+    else if (strEQ(package, "TestSnowStemmer")) {
+        lucy_TestSnowStemmer_run_tests();
     }
     else if (strEQ(package, "TestTokenizer")) {
         lucy_TestTokenizer_run_tests();

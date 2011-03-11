@@ -23,7 +23,7 @@
 #include "Lucy/Analysis/PolyAnalyzer.h"
 #include "Lucy/Analysis/CaseFolder.h"
 #include "Lucy/Analysis/Stopalizer.h"
-#include "Lucy/Analysis/Stemmer.h"
+#include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Analysis/Tokenizer.h"
 
 static void
@@ -62,7 +62,7 @@ test_analysis(TestBatch *batch)
     CaseFolder   *case_folder = CaseFolder_new();
     Tokenizer    *tokenizer   = Tokenizer_new(NULL);
     Stopalizer   *stopalizer  = Stopalizer_new(EN, NULL);
-    Stemmer      *stemmer     = Stemmer_new(EN);
+    SnowballStemmer *stemmer  = SnowStemmer_new(EN);
 
     {
         VArray       *analyzers    = VA_new(0);
@@ -135,7 +135,7 @@ test_analysis(TestBatch *batch)
         VA_Push(expected, (Obj*)CB_newf("shoot"));
         VA_Push(expected, (Obj*)CB_newf("leav"));
         TestUtils_test_analyzer(batch, (Analyzer*)polyanalyzer, source_text,
-            expected, "With Stemmer");
+            expected, "With SnowballStemmer");
         DECREF(expected);
         DECREF(polyanalyzer);
         DECREF(analyzers);

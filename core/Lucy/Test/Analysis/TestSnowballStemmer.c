@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTSTEMMER
+#define C_LUCY_TESTSNOWBALLSTEMMER
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
-#include "Lucy/Test/Analysis/TestStemmer.h"
-#include "Lucy/Analysis/Stemmer.h"
+#include "Lucy/Test/Analysis/TestSnowballStemmer.h"
+#include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Util/Json.h"
 
 static void
 test_Dump_Load_and_Equals(TestBatch *batch)
 {
-    CharBuf *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2); 
-    CharBuf *ES          = (CharBuf*)ZCB_WRAP_STR("es", 2); 
-    Stemmer *stemmer     = Stemmer_new(EN);
-    Stemmer *other       = Stemmer_new(ES);
-    Obj     *dump        = (Obj*)Stemmer_Dump(stemmer);
-    Obj     *other_dump  = (Obj*)Stemmer_Dump(other);
-    Stemmer *clone       = (Stemmer*)Stemmer_Load(other, dump);
-    Stemmer *other_clone = (Stemmer*)Stemmer_Load(other, other_dump);
+    CharBuf *EN = (CharBuf*)ZCB_WRAP_STR("en", 2); 
+    CharBuf *ES = (CharBuf*)ZCB_WRAP_STR("es", 2); 
+    SnowballStemmer *stemmer = SnowStemmer_new(EN);
+    SnowballStemmer *other   = SnowStemmer_new(ES);
+    Obj *dump       = (Obj*)SnowStemmer_Dump(stemmer);
+    Obj *other_dump = (Obj*)SnowStemmer_Dump(other);
+    SnowballStemmer *clone       = (SnowballStemmer*)SnowStemmer_Load(other, dump);
+    SnowballStemmer *other_clone = (SnowballStemmer*)SnowStemmer_Load(other, other_dump);
 
-    TEST_FALSE(batch, Stemmer_Equals(stemmer,
+    TEST_FALSE(batch, SnowStemmer_Equals(stemmer,
         (Obj*)other), "Equals() false with different language");
-    TEST_TRUE(batch, Stemmer_Equals(stemmer,
+    TEST_TRUE(batch, SnowStemmer_Equals(stemmer,
         (Obj*)clone), "Dump => Load round trip");
-    TEST_TRUE(batch, Stemmer_Equals(other,
+    TEST_TRUE(batch, SnowStemmer_Equals(other,
         (Obj*)other_clone), "Dump => Load round trip");
 
     DECREF(stemmer);
@@ -73,10 +73,10 @@ test_stemming(TestBatch *batch)
     while (Hash_Next(tests, (Obj**)&iso, (Obj**)&lang_data)) {
         VArray  *words   = (VArray*)Hash_Fetch_Str(lang_data, "words", 5);
         VArray  *stems   = (VArray*)Hash_Fetch_Str(lang_data, "stems", 5);
-        Stemmer *stemmer = Stemmer_new(iso);
+        SnowballStemmer *stemmer = SnowStemmer_new(iso);
         for (uint32_t i = 0, max = VA_Get_Size(words); i < max; i++) {
             CharBuf *word  = (CharBuf*)VA_Fetch(words, i);
-            VArray  *got   = Stemmer_Split(stemmer, word);
+            VArray  *got   = SnowStemmer_Split(stemmer, word);
             CharBuf *stem  = (CharBuf*)VA_Fetch(got, 0);
             TEST_TRUE(batch,
                    stem
@@ -95,7 +95,7 @@ test_stemming(TestBatch *batch)
 }
 
 void
-TestStemmer_run_tests()
+TestSnowStemmer_run_tests()
 {
     TestBatch *batch = TestBatch_new(153);
 

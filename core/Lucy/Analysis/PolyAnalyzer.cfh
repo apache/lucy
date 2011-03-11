@@ -24,7 +24,7 @@ parcel Lucy;
  * language, in which case a PolyAnalyzer consisting of a
  * L<CaseFolder|Lucy::Analysis::CaseFolder>, a
  * L<Tokenizer|Lucy::Analysis::Tokenizer>, and a
- * L<Stemmer|Lucy::Analysis::Stemmer> will be generated for you.  
+ * L<SnowballStemmer|Lucy::Analysis::SnowballStemmer> will be generated for you.  
  * 
  * Supported languages:
  * 
@@ -55,9 +55,9 @@ class Lucy::Analysis::PolyAnalyzer
     /** 
      * @param language An ISO code from the list of supported languages.
      * @param analyzers An array of Analyzers.  The order of the analyzers
-     * matters.  Don't put a Stemmer before a Tokenizer (can't stem whole
+     * matters.  Don't put a SnowballStemmer before a Tokenizer (can't stem whole
      * documents or paragraphs -- just individual words), or a Stopalizer
-     * after a Stemmer (stemmed words, e.g. "themselv", will not appear in a
+     * after a SnowballStemmer (stemmed words, e.g. "themselv", will not appear in a
      * stoplist).  In general, the sequence should be: normalize, tokenize,
      * stopalize, stem.  
      */
