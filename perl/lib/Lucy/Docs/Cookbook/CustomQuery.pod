@@ -305,7 +305,7 @@ prefix conflation -- is not perfectly compatible with prefix searches.
     # Polyanalyzer with no SnowballStemmer.
     my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [
-            Lucy::Analysis::Tokenizer->new,
+            Lucy::Analysis::RegexTokenizer->new,
             Lucy::Analysis::CaseFolder->new,
         ],
     );

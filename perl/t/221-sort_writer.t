@@ -30,7 +30,7 @@ use base qw( Lucy::Plan::Schema );
 sub new {
     my $self          = shift->SUPER::new(@_);
     my $fulltext_type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::Tokenizer->new,
+        analyzer => Lucy::Analysis::RegexTokenizer->new,
         sortable => 1,
     );
     my $string_type = Lucy::Plan::StringType->new( sortable => 1 );

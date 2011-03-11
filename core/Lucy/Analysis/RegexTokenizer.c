@@ -14,71 +14,72 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TOKENIZER
+#define C_LUCY_REGEXTOKENIZER
 #define C_LUCY_TOKEN
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Analysis/Tokenizer.h"
+#include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 
-Tokenizer*
-Tokenizer_new(const CharBuf *pattern)
+RegexTokenizer*
+RegexTokenizer_new(const CharBuf *pattern)
 {
-    Tokenizer *self = (Tokenizer*)VTable_Make_Obj(TOKENIZER);
-    return Tokenizer_init(self, pattern);
+    RegexTokenizer *self = (RegexTokenizer*)VTable_Make_Obj(REGEXTOKENIZER);
+    return RegexTokenizer_init(self, pattern);
 }
 
 Inversion*
-Tokenizer_transform(Tokenizer *self, Inversion *inversion)
+RegexTokenizer_transform(RegexTokenizer *self, Inversion *inversion)
 {
     Inversion *new_inversion = Inversion_new(NULL);
     Token *token;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        Tokenizer_Tokenize_Str(self, token->text, token->len, new_inversion);
+        RegexTokenizer_Tokenize_Str(self, token->text, token->len, 
+                                    new_inversion);
     }
 
     return new_inversion;
 }
 
 Inversion*
-Tokenizer_transform_text(Tokenizer *self, CharBuf *text)
+RegexTokenizer_transform_text(RegexTokenizer *self, CharBuf *text)
 {
     Inversion *new_inversion = Inversion_new(NULL);
-    Tokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text), CB_Get_Size(text), 
-        new_inversion);
+    RegexTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text), 
+        CB_Get_Size(text), new_inversion);
     return new_inversion;
 }
 
 Obj*
-Tokenizer_dump(Tokenizer *self)
+RegexTokenizer_dump(RegexTokenizer *self)
 {
-    Tokenizer_dump_t super_dump
-        = (Tokenizer_dump_t)SUPER_METHOD(TOKENIZER, Tokenizer, Dump);
+    RegexTokenizer_dump_t super_dump
+        = (RegexTokenizer_dump_t)SUPER_METHOD(REGEXTOKENIZER, RegexTokenizer, Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "pattern", 7, CB_Dump(self->pattern));
     return (Obj*)dump;
 }
 
-Tokenizer*
-Tokenizer_load(Tokenizer *self, Obj *dump)
+RegexTokenizer*
+RegexTokenizer_load(RegexTokenizer *self, Obj *dump)
 {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    Tokenizer_load_t super_load 
-        = (Tokenizer_load_t)SUPER_METHOD(TOKENIZER, Tokenizer, Load);
-    Tokenizer *loaded = super_load(self, dump);
+    RegexTokenizer_load_t super_load 
+        = (RegexTokenizer_load_t)SUPER_METHOD(REGEXTOKENIZER, RegexTokenizer, Load);
+    RegexTokenizer *loaded = super_load(self, dump);
     CharBuf *pattern = (CharBuf*)CERTIFY(
         Hash_Fetch_Str(source, "pattern", 7), CHARBUF);
-    return Tokenizer_init(loaded, pattern);
+    return RegexTokenizer_init(loaded, pattern);
 }
 
 bool_t
-Tokenizer_equals(Tokenizer *self, Obj *other)
+RegexTokenizer_equals(RegexTokenizer *self, Obj *other)
 {
-    Tokenizer *const evil_twin = (Tokenizer*)other;
+    RegexTokenizer *const evil_twin = (RegexTokenizer*)other;
     if (evil_twin == self) return true;
-    if (!Obj_Is_A(other, TOKENIZER)) return false;
+    if (!Obj_Is_A(other, REGEXTOKENIZER)) return false;
     if (!CB_Equals(evil_twin->pattern, (Obj*)self->pattern)) return false;
     return true;
 }

@@ -34,12 +34,12 @@ sub make_similarity { MatchOnlySim->new }
 
 package MatchSchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);
     my $type = MatchSchema::MatchOnly->new(
-        analyzer => Lucy::Analysis::Tokenizer->new );
+        analyzer => Lucy::Analysis::RegexTokenizer->new );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }

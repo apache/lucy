@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TOKENIZER
+#define C_LUCY_REGEXTOKENIZER
 #define C_LUCY_TOKEN
 #include "XSBind.h"
 
-#include "Lucy/Analysis/Tokenizer.h"
+#include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Object/Host.h"
@@ -26,13 +26,14 @@
 #include "Lucy/Util/StringHelper.h"
 
 static void
-S_set_token_re_but_not_pattern(lucy_Tokenizer *self, void *token_re);
+S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re);
 
 static void
-S_set_pattern_from_token_re(lucy_Tokenizer *self, void *token_re);
+S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re);
 
-lucy_Tokenizer*
-lucy_Tokenizer_init(lucy_Tokenizer *self, const lucy_CharBuf *pattern)
+lucy_RegexTokenizer*
+lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
+                         const lucy_CharBuf *pattern)
 {
     SV    *token_re_sv;
 
@@ -53,7 +54,7 @@ lucy_Tokenizer_init(lucy_Tokenizer *self, const lucy_CharBuf *pattern)
     }
 
     // Acquire a compiled regex engine for matching one token. 
-    token_re_sv = (SV*)lucy_Host_callback_host(LUCY_TOKENIZER,
+    token_re_sv = (SV*)lucy_Host_callback_host(LUCY_REGEXTOKENIZER,
         "compile_token_re", 1, CFISH_ARG_STR("pattern", self->pattern));
     S_set_token_re_but_not_pattern(self, SvRV(token_re_sv));
 
@@ -61,7 +62,7 @@ lucy_Tokenizer_init(lucy_Tokenizer *self, const lucy_CharBuf *pattern)
 }
 
 static void
-S_set_token_re_but_not_pattern(lucy_Tokenizer *self, void *token_re)
+S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re)
 {
     MAGIC *magic = NULL;
     REGEXP *rx;
@@ -84,7 +85,7 @@ S_set_token_re_but_not_pattern(lucy_Tokenizer *self, void *token_re)
 }
 
 static void
-S_set_pattern_from_token_re(lucy_Tokenizer *self, void *token_re)
+S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re)
 {
     SV *rv = newRV((SV*)token_re);
     STRLEN len = 0;
@@ -94,7 +95,7 @@ S_set_pattern_from_token_re(lucy_Tokenizer *self, void *token_re)
 }
 
 void
-lucy_Tokenizer_set_token_re(lucy_Tokenizer *self, void *token_re)
+lucy_RegexTokenizer_set_token_re(lucy_RegexTokenizer *self, void *token_re)
 {
     S_set_token_re_but_not_pattern(self, token_re);
     // Set pattern as a side effect. 
@@ -102,16 +103,17 @@ lucy_Tokenizer_set_token_re(lucy_Tokenizer *self, void *token_re)
 }
 
 void
-lucy_Tokenizer_destroy(lucy_Tokenizer *self)
+lucy_RegexTokenizer_destroy(lucy_RegexTokenizer *self)
 {
     LUCY_DECREF(self->pattern);
     ReREFCNT_dec(((REGEXP*)self->token_re));
-    LUCY_SUPER_DESTROY(self, LUCY_TOKENIZER);
+    LUCY_SUPER_DESTROY(self, LUCY_REGEXTOKENIZER);
 }
 
 void
-lucy_Tokenizer_tokenize_str(lucy_Tokenizer *self, const char *string, 
-                            size_t string_len, lucy_Inversion *inversion)
+lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
+                                 const char *string, size_t string_len, 
+                                 lucy_Inversion *inversion)
 {
     uint32_t   num_code_points = 0;
     SV        *wrapper    = sv_newmortal();

@@ -26,7 +26,7 @@
 #include "Lucy/Test/TestSchema.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Analysis/Analyzer.h"
-#include "Lucy/Analysis/Tokenizer.h"
+#include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/Indexer.h"
 #include "Lucy/Search/Hits.h"

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTTOKENIZER
+#define C_LUCY_TESTREGEXTOKENIZER
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
-#include "Lucy/Test/Analysis/TestTokenizer.h"
-#include "Lucy/Analysis/Tokenizer.h"
+#include "Lucy/Test/Analysis/TestRegexTokenizer.h"
+#include "Lucy/Analysis/RegexTokenizer.h"
 
 
 static void
@@ -27,22 +27,22 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 {
     ZombieCharBuf *word_char_pattern  = ZCB_WRAP_STR("\\w+", 3);  
     ZombieCharBuf *whitespace_pattern = ZCB_WRAP_STR("\\S+", 3);
-    Tokenizer *word_char_tokenizer =
-        Tokenizer_new((CharBuf*)word_char_pattern);
-    Tokenizer *whitespace_tokenizer =
-        Tokenizer_new((CharBuf*)whitespace_pattern);
-    Obj *word_char_dump  = Tokenizer_Dump(word_char_tokenizer);
-    Obj *whitespace_dump = Tokenizer_Dump(whitespace_tokenizer);
-    Tokenizer *word_char_clone 
-        = Tokenizer_Load(whitespace_tokenizer, word_char_dump);
-    Tokenizer *whitespace_clone 
-        = Tokenizer_Load(whitespace_tokenizer, whitespace_dump);
+    RegexTokenizer *word_char_tokenizer =
+        RegexTokenizer_new((CharBuf*)word_char_pattern);
+    RegexTokenizer *whitespace_tokenizer =
+        RegexTokenizer_new((CharBuf*)whitespace_pattern);
+    Obj *word_char_dump  = RegexTokenizer_Dump(word_char_tokenizer);
+    Obj *whitespace_dump = RegexTokenizer_Dump(whitespace_tokenizer);
+    RegexTokenizer *word_char_clone 
+        = RegexTokenizer_Load(whitespace_tokenizer, word_char_dump);
+    RegexTokenizer *whitespace_clone 
+        = RegexTokenizer_Load(whitespace_tokenizer, whitespace_dump);
 
-    TEST_FALSE(batch, Tokenizer_Equals(word_char_tokenizer,
+    TEST_FALSE(batch, RegexTokenizer_Equals(word_char_tokenizer,
         (Obj*)whitespace_tokenizer), "Equals() false with different pattern");
-    TEST_TRUE(batch, Tokenizer_Equals(word_char_tokenizer,
+    TEST_TRUE(batch, RegexTokenizer_Equals(word_char_tokenizer,
         (Obj*)word_char_clone), "Dump => Load round trip");
-    TEST_TRUE(batch, Tokenizer_Equals(whitespace_tokenizer,
+    TEST_TRUE(batch, RegexTokenizer_Equals(whitespace_tokenizer,
         (Obj*)whitespace_clone), "Dump => Load round trip");
 
     DECREF(word_char_tokenizer);
@@ -54,7 +54,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 void
-TestTokenizer_run_tests()
+TestRegexTokenizer_run_tests()
 {
     TestBatch *batch = TestBatch_new(3);
 

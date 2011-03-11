@@ -36,7 +36,7 @@ use base qw( Lucy::Test::TestSchema );
 sub new {
     my $self = shift->SUPER::new(@_);
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer      => Lucy::Analysis::Tokenizer->new,
+        analyzer      => Lucy::Analysis::RegexTokenizer->new,
         highlightable => 1,
     );
     $self->spec_field( name => 'content', type => $type );

@@ -58,8 +58,8 @@ PPCODE:
     else if (strEQ(package, "TestSnowStemmer")) {
         lucy_TestSnowStemmer_run_tests();
     }
-    else if (strEQ(package, "TestTokenizer")) {
-        lucy_TestTokenizer_run_tests();
+    else if (strEQ(package, "TestRegexTokenizer")) {
+        lucy_TestRegexTokenizer_run_tests();
     }
     // Lucy::Object 
     else if (strEQ(package, "TestObj")) {

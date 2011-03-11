@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Analysis::Tokenizer;
+package Lucy::Analysis::RegexTokenizer;
 use Lucy;
 
 1;
@@ -24,14 +24,14 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     my $whitespace_tokenizer
-        = Lucy::Analysis::Tokenizer->new( pattern => '\S+' );
+        = Lucy::Analysis::RegexTokenizer->new( pattern => '\S+' );
 
     # or...
     my $word_char_tokenizer
-        = Lucy::Analysis::Tokenizer->new( pattern => '\w+' );
+        = Lucy::Analysis::RegexTokenizer->new( pattern => '\w+' );
 
     # or...
-    my $apostrophising_tokenizer = Lucy::Analysis::Tokenizer->new;
+    my $apostrophising_tokenizer = Lucy::Analysis::RegexTokenizer->new;
 
     # Then... once you have a tokenizer, put it into a PolyAnalyzer:
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
@@ -39,14 +39,14 @@ my $synopsis = <<'END_SYNOPSIS';
 END_SYNOPSIS
 
 my $constructor = <<'END_CONSTRUCTOR';
-    my $word_char_tokenizer = Lucy::Analysis::Tokenizer->new(
+    my $word_char_tokenizer = Lucy::Analysis::RegexTokenizer->new(
         pattern => '\w+',    # required
     );
 END_CONSTRUCTOR
 
 Clownfish::Binding::Perl::Class->register(
     parcel            => "Lucy",
-    class_name        => "Lucy::Analysis::Tokenizer",
+    class_name        => "Lucy::Analysis::RegexTokenizer",
     bind_constructors => ["_new"],
     make_pod          => {
         constructor => { sample => $constructor },

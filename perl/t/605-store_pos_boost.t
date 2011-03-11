@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-package MyTokenizer;
+package MyRegexTokenizer;
 use base qw( Lucy::Analysis::Analyzer );
 use Lucy::Analysis::Inversion;
 
@@ -68,14 +68,14 @@ sub make_similarity { RichSim->new }
 
 package MySchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
     my $plain_type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::Tokenizer->new );
+        analyzer => Lucy::Analysis::RegexTokenizer->new );
     my $boosted_type
-        = MySchema::boosted->new( analyzer => MyTokenizer->new, );
+        = MySchema::boosted->new( analyzer => MyRegexTokenizer->new, );
     $self->spec_field( name => 'plain',   type => $plain_type );
     $self->spec_field( name => 'boosted', type => $boosted_type );
     return $self;

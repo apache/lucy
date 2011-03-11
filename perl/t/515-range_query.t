@@ -24,7 +24,7 @@ use Lucy::Test;
 
 package RangeSchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);

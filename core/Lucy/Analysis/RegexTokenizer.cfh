@@ -22,7 +22,7 @@ parcel Lucy;
  * array of "tokens".  For instance, the string "three blind mice" might be
  * tokenized into "three", "blind", "mice".
  * 
- * Lucy::Analysis::Tokenizer decides where it should break up the text
+ * Lucy::Analysis::RegexTokenizer decides where it should break up the text
  * based on a regular expression compiled from a supplied <code>pattern</code>
  * matching one token.  If our source string is...
  * 
@@ -47,13 +47,13 @@ parcel Lucy;
  * ... the difference being that the word character tokenizer skips over
  * punctuation as well as whitespace when determining token boundaries.
  */
-class Lucy::Analysis::Tokenizer 
+class Lucy::Analysis::RegexTokenizer 
     inherits Lucy::Analysis::Analyzer {
 
     CharBuf *pattern;
     void    *token_re;
 
-    inert incremented Tokenizer* 
+    inert incremented RegexTokenizer* 
     new(const CharBuf *pattern = NULL);
 
     /**
@@ -62,39 +62,39 @@ class Lucy::Analysis::Tokenizer
      * <code>\w+(?:[\x{2019}']\w+)*</code>, which matches "it's" as well as
      * "it" and "O'Henry's" as well as "Henry".
      */
-    public inert Tokenizer* 
-    init(Tokenizer *self, const CharBuf *pattern = NULL);
+    public inert RegexTokenizer* 
+    init(RegexTokenizer *self, const CharBuf *pattern = NULL);
 
     public incremented Inversion*
-    Transform(Tokenizer *self, Inversion *inversion);
+    Transform(RegexTokenizer *self, Inversion *inversion);
 
     public incremented Inversion*
-    Transform_Text(Tokenizer *self, CharBuf *text);
+    Transform_Text(RegexTokenizer *self, CharBuf *text);
 
     /** Tokenize the supplied string and add any Tokens generated to the
      * supplied Inversion.
      */
     void
-    Tokenize_Str(Tokenizer *self, const char *text, size_t len, 
+    Tokenize_Str(RegexTokenizer *self, const char *text, size_t len, 
                  Inversion *inversion);
 
     /** Set the compiled regular expression for matching a token.  Also sets
      * <code>pattern</code> as a side effect.
      */
     void
-    Set_Token_RE(Tokenizer *self, void *token_re);
+    Set_Token_RE(RegexTokenizer *self, void *token_re);
 
     public incremented Obj*
-    Dump(Tokenizer *self);
+    Dump(RegexTokenizer *self);
 
-    public incremented Tokenizer*
-    Load(Tokenizer *self, Obj *dump);
+    public incremented RegexTokenizer*
+    Load(RegexTokenizer *self, Obj *dump);
 
     public bool_t
-    Equals(Tokenizer *self, Obj *other);
+    Equals(RegexTokenizer *self, Obj *other);
 
     public void
-    Destroy(Tokenizer *self);
+    Destroy(RegexTokenizer *self);
 }
 
 

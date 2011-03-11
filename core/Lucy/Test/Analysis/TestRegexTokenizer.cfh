@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestTokenizer {
+inert class Lucy::Test::Analysis::TestRegexTokenizer {
     inert void
     run_tests();
 }

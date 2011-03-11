@@ -100,7 +100,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Analysis::Tokenizer;
+    package Lucy::Analysis::RegexTokenizer;
 
     sub compile_token_re { return qr/$_[1]/ }
 

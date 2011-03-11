@@ -19,9 +19,9 @@ Lucy::Docs::Tutorial::Analysis - How to choose and use Analyzers.
 
 =head1 DESCRIPTION
 
-Try swapping out the PolyAnalyzer in our Schema for a Tokenizer:
+Try swapping out the PolyAnalyzer in our Schema for a RegexTokenizer:
 
-    my $tokenizer = Lucy::Analysis::Tokenizer->new;
+    my $tokenizer = Lucy::Analysis::RegexTokenizer->new;
     my $type = Lucy::Plan::FullTextType->new(
         analyzer => $tokenizer,
     );
@@ -30,13 +30,13 @@ Search for C<senate>, C<Senate>, and C<Senator> before and after making the
 change and re-indexing.
 
 Under PolyAnalyzer, the results are identical for all three searches, but
-under Tokenizer, searches are case-sensitive, and the result sets for
+under RegexTokenizer, searches are case-sensitive, and the result sets for
 C<Senate> and C<Senator> are distinct.
 
 =head2 PolyAnalyzer
 
 What's happening is that PolyAnalyzer is performing more aggressive processing
-than Tokenizer.  In addition to tokenizing, it's also converting all text to
+than RegexTokenizer.  In addition to tokenizing, it's also converting all text to
 lower case so that searches are case-insensitive, and using a "stemming"
 algorithm to reduce related words to a common stem (C<senat>, in this case).
 
@@ -45,7 +45,7 @@ In this case, it's three-in-one, since specifying a PolyAnalyzer with
 C<< language => 'en' >> is equivalent to this snippet:
 
     my $case_folder  = Lucy::Analysis::CaseFolder->new;
-    my $tokenizer    = Lucy::Analysis::Tokenizer->new;
+    my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
     my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stemmer ], 

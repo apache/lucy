@@ -21,11 +21,11 @@ use Lucy::Test;
 
 package PlainSchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '\S+' );
+    my $tokenizer = Lucy::Analysis::RegexTokenizer->new( pattern => '\S+' );
     my $type = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
     $self->spec_field( name => 'content', type => $type );
     return $self;
@@ -37,7 +37,7 @@ use base qw( Lucy::Plan::Schema );
 sub new {
     my $self = shift->SUPER::new(@_);
     my $whitespace_tokenizer
-        = Lucy::Analysis::Tokenizer->new( token_re => qr/\S+/ );
+        = Lucy::Analysis::RegexTokenizer->new( token_re => qr/\S+/ );
     my $stopfilter
         = Lucy::Analysis::SnowballStopFilter->new( stoplist => { x => 1 } );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(

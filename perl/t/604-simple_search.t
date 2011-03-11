@@ -18,12 +18,12 @@ use warnings;
 
 package MySchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $self = shift->SUPER::new(@_);
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::Tokenizer->new, );
+        analyzer => Lucy::Analysis::RegexTokenizer->new, );
     $self->spec_field( name => 'title', type => $type );
     $self->spec_field( name => 'body',  type => $type );
     return $self;
@@ -56,7 +56,7 @@ $indexer->commit;
 
 my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
 
-my $tokenizer = Lucy::Analysis::Tokenizer->new;
+my $tokenizer = Lucy::Analysis::RegexTokenizer->new;
 my $or_parser = Lucy::Search::QueryParser->new(
     schema   => $schema,
     analyzer => $tokenizer,

@@ -122,13 +122,13 @@ END_REPORT
 }
 
 package BenchSchema::WhiteSpaceTokenizer;
-use base qw( Lucy::Analysis::Tokenizer );
+use base qw( Lucy::Analysis::RegexTokenizer );
 
 sub new { return shift->SUPER::new( pattern => '\S+' ) }
 
 package BenchSchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $self = shift->SUPER::new;

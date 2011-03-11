@@ -19,12 +19,12 @@ use lib 'buildlib';
 
 package MySchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $class      = shift;
     my $self       = $class->SUPER::new(@_);
-    my $tokenizer  = Lucy::Analysis::Tokenizer->new;
+    my $tokenizer  = Lucy::Analysis::RegexTokenizer->new;
     my $plain_type = Lucy::Plan::FullTextType->new(
         analyzer      => $tokenizer,
         highlightable => 1,

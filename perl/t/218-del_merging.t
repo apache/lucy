@@ -32,7 +32,7 @@ use base 'Lucy::Plan::Schema';
 sub new {
     my $self = shift->SUPER::new(@_);
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::Tokenizer->new, );
+        analyzer => Lucy::Analysis::RegexTokenizer->new, );
     $self->spec_field( name => 'foo', type => $type );
     $self->spec_field( name => 'bar', type => $type );
     return $self;

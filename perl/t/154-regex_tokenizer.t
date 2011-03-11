@@ -19,9 +19,9 @@ use warnings;
 use Test::More tests => 15;
 use Lucy::Test;
 
-my $tokenizer   = Lucy::Analysis::Tokenizer->new;
-my $other       = Lucy::Analysis::Tokenizer->new( pattern => '\w+' );
-my $yet_another = Lucy::Analysis::Tokenizer->new( pattern => '\w+' );
+my $tokenizer   = Lucy::Analysis::RegexTokenizer->new;
+my $other       = Lucy::Analysis::RegexTokenizer->new( pattern => '\w+' );
+my $yet_another = Lucy::Analysis::RegexTokenizer->new( pattern => '\w+' );
 ok( $other->equals($yet_another), "Equals" );
 ok( !$tokenizer->equals($other),  "different patterns foil Equals" );
 
@@ -41,7 +41,7 @@ is_deeply( \@token_texts, [qw( a b c )], "correct texts" );
 is_deeply( \@start_offsets, [ 0, 2, 4, ], "correctstart offsets" );
 is_deeply( \@end_offsets,   [ 1, 3, 5, ], "correct end offsets" );
 
-$tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '.' );
+$tokenizer = Lucy::Analysis::RegexTokenizer->new( pattern => '.' );
 $inversion = Lucy::Analysis::Inversion->new( text    => "a b c" );
 $inversion = $tokenizer->transform($inversion);
 
@@ -73,25 +73,25 @@ is_deeply(
     "no freakout when fed multiple tokens"
 );
 
-$tokenizer = Lucy::Analysis::Tokenizer->new( token_re => qr/../ );
+$tokenizer = Lucy::Analysis::RegexTokenizer->new( token_re => qr/../ );
 is_deeply( $tokenizer->split('aabbcc'),
     [qw( aa bb cc )], "back compat with token_re argument" );
 
 eval {
     my $toke
-        = Lucy::Analysis::Tokenizer->new(
+        = Lucy::Analysis::RegexTokenizer->new(
         pattern => '\\p{Carp::confess}' );
 };
 like( $@, qr/\\p/, "\\p forbidden in pattern" );
 
 eval {
     my $toke
-        = Lucy::Analysis::Tokenizer->new(
+        = Lucy::Analysis::RegexTokenizer->new(
         pattern => '\\P{Carp::confess}' );
 };
 like( $@, qr/\\P/, "\\P forbidden in pattern" );
 
-$tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '\\w+' );
+$tokenizer = Lucy::Analysis::RegexTokenizer->new( pattern => '\\w+' );
 my $dump = $tokenizer->dump;
 $dump->{pattern} = "\\p{Carp::confess}";
 eval { $tokenizer->load($dump) };

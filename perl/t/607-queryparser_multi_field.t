@@ -19,12 +19,12 @@ use lib 'buildlib';
 
 package MultiFieldSchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::Tokenizer;
+use Lucy::Analysis::RegexTokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
     my $plain_type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::Tokenizer->new );
+        analyzer => Lucy::Analysis::RegexTokenizer->new );
     my $not_analyzed_type = Lucy::Plan::StringType->new;
     $self->spec_field( name => 'a', type => $plain_type );
     $self->spec_field( name => 'b', type => $plain_type );

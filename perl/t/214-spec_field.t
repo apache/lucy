@@ -27,7 +27,7 @@ use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self      = shift->SUPER::new(@_);
-    my $tokenizer = Lucy::Analysis::Tokenizer->new;
+    my $tokenizer = Lucy::Analysis::RegexTokenizer->new;
     my $polyanalyzer
         = Lucy::Analysis::PolyAnalyzer->new( language => 'en' );
     my $plain

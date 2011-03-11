@@ -24,9 +24,9 @@ use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '\S+' );
+    my $tokenizer = Lucy::Analysis::RegexTokenizer->new( pattern => '\S+' );
     my $wordchar_tokenizer
-        = Lucy::Analysis::Tokenizer->new( pattern => '\w+', );
+        = Lucy::Analysis::RegexTokenizer->new( pattern => '\w+', );
     my $stopfilter
         = Lucy::Analysis::SnowballStopFilter->new( stoplist => { x => 1 } );
     my $fancy_analyzer = Lucy::Analysis::PolyAnalyzer->new(
