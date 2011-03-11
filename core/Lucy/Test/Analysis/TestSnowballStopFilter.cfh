@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestStopalizer {
+inert class Lucy::Test::Analysis::TestSnowballStopFilter cnick TestSnowStop {
     inert void
     run_tests();
 }

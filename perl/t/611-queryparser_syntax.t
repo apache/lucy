@@ -27,10 +27,10 @@ sub new {
     my $tokenizer = Lucy::Analysis::Tokenizer->new( pattern => '\S+' );
     my $wordchar_tokenizer
         = Lucy::Analysis::Tokenizer->new( pattern => '\w+', );
-    my $stopalizer
-        = Lucy::Analysis::Stopalizer->new( stoplist => { x => 1 } );
+    my $stopfilter
+        = Lucy::Analysis::SnowballStopFilter->new( stoplist => { x => 1 } );
     my $fancy_analyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $wordchar_tokenizer, $stopalizer, ], );
+        analyzers => [ $wordchar_tokenizer, $stopfilter, ], );
 
     my $plain = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
     my $fancy

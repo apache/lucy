@@ -31,7 +31,7 @@ parcel Lucy;
  *
  *     ( "walrus" )
  *
- * Stopalizer provides default stoplists for several languages, courtesy of
+ * SnowballStopFilter provides default stoplists for several languages, courtesy of
  * the Snowball project (<http://snowball.tartarus.org>), or you may supply
  * your own.
  * 
@@ -54,7 +54,7 @@ parcel Lucy;
  *     |-----------------------|
  */
 
-class Lucy::Analysis::Stopalizer 
+class Lucy::Analysis::SnowballStopFilter cnick SnowStop
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     Hash *stoplist;
@@ -73,15 +73,15 @@ class Lucy::Analysis::Stopalizer
     inert const uint8_t** snow_ru;
     inert const uint8_t** snow_sv;
     
-    inert incremented Stopalizer* 
+    inert incremented SnowballStopFilter* 
     new(const CharBuf *language = NULL, Hash *stoplist = NULL);
 
     /**
      * @param stoplist A hash with stopwords as the keys.
      * @param language The ISO code for a supported language.
      */
-    public inert Stopalizer* 
-    init(Stopalizer *self, const CharBuf *language = NULL, 
+    public inert SnowballStopFilter* 
+    init(SnowballStopFilter *self, const CharBuf *language = NULL, 
          Hash *stoplist = NULL);
 
     /** Return a Hash with the Snowball stoplist for the supplied language.
@@ -90,16 +90,16 @@ class Lucy::Analysis::Stopalizer
     gen_stoplist(const CharBuf *language);
 
     public incremented Inversion*
-    Transform(Stopalizer *self, Inversion *inversion);
+    Transform(SnowballStopFilter *self, Inversion *inversion);
 
     public bool_t
-    Equals(Stopalizer *self, Obj *other);
+    Equals(SnowballStopFilter *self, Obj *other);
 
     public void
-    Destroy(Stopalizer *self);
+    Destroy(SnowballStopFilter *self);
 }
 
-class Lucy::Analysis::Stopalizer::NoCloneHash inherits Lucy::Object::Hash {
+class Lucy::Analysis::SnowballStopFilter::NoCloneHash inherits Lucy::Object::Hash {
     inert incremented NoCloneHash*
     new(uint32_t capacity = 0);
 

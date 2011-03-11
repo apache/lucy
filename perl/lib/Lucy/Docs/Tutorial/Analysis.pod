@@ -52,14 +52,14 @@ C<< language => 'en' >> is equivalent to this snippet:
     );
 
 You can add or subtract Analyzers from there if you like.  Try adding a fourth
-Analyzer, a Stopalizer for suppressing "stopwords" like "the", "if",
+Analyzer, a SnowballStopFilter for suppressing "stopwords" like "the", "if",
 and "maybe".
 
-    my $stopalizer = Lucy::Analysis::Stopalizer->new( 
+    my $stopfilter = Lucy::Analysis::SnowballStopFilter->new( 
         language => 'en',
     );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stopalizer, $stemmer ], 
+        analyzers => [ $case_folder, $tokenizer, $stopfilter, $stemmer ], 
     );
 
 Also, try removing the SnowballStemmer.

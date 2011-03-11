@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-#define C_LUCY_STOPALIZER
+#define C_LUCY_SNOWBALLSTOPFILTER
 #define C_LUCY_TOKEN
 #include "Lucy/Util/ToolSet.h"
 #include <ctype.h>
 
-#include "Lucy/Analysis/Stopalizer.h"
+#include "Lucy/Analysis/SnowballStopFilter.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 
-Stopalizer*
-Stopalizer_new(const CharBuf *language, Hash *stoplist)
+SnowballStopFilter*
+SnowStop_new(const CharBuf *language, Hash *stoplist)
 {
-    Stopalizer *self = (Stopalizer*)VTable_Make_Obj(STOPALIZER);
-    return Stopalizer_init(self, language, stoplist);
+    SnowballStopFilter *self = (SnowballStopFilter*)VTable_Make_Obj(SNOWBALLSTOPFILTER);
+    return SnowStop_init(self, language, stoplist);
 }
 
-Stopalizer*
-Stopalizer_init(Stopalizer *self, const CharBuf *language, Hash *stoplist)
+SnowballStopFilter*
+SnowStop_init(SnowballStopFilter *self, const CharBuf *language, Hash *stoplist)
 {
     Analyzer_init((Analyzer*)self);
 
@@ -40,7 +40,7 @@ Stopalizer_init(Stopalizer *self, const CharBuf *language, Hash *stoplist)
         self->stoplist = (Hash*)INCREF(stoplist);
     }
     else if (language) {
-        self->stoplist = Stopalizer_gen_stoplist(language);
+        self->stoplist = SnowStop_gen_stoplist(language);
         if (!self->stoplist)
             THROW(ERR, "Can't get a stoplist for '%o'", language);
     }
@@ -52,14 +52,14 @@ Stopalizer_init(Stopalizer *self, const CharBuf *language, Hash *stoplist)
 }
 
 void
-Stopalizer_destroy(Stopalizer *self)
+SnowStop_destroy(SnowballStopFilter *self)
 {
     DECREF(self->stoplist);
-    SUPER_DESTROY(self, STOPALIZER);
+    SUPER_DESTROY(self, SNOWBALLSTOPFILTER);
 }
 
 Inversion*
-Stopalizer_transform(Stopalizer *self, Inversion *inversion)
+SnowStop_transform(SnowballStopFilter *self, Inversion *inversion)
 {
     Token *token;
     Inversion *new_inversion = Inversion_new(NULL);
@@ -75,11 +75,11 @@ Stopalizer_transform(Stopalizer *self, Inversion *inversion)
 }
 
 bool_t
-Stopalizer_equals(Stopalizer *self, Obj *other)
+SnowStop_equals(SnowballStopFilter *self, Obj *other)
 {
-    Stopalizer *const evil_twin = (Stopalizer*)other;
+    SnowballStopFilter *const evil_twin = (SnowballStopFilter*)other;
     if (evil_twin == self) return true;
-    if (!Obj_Is_A(other, STOPALIZER)) return false;
+    if (!Obj_Is_A(other, SNOWBALLSTOPFILTER)) return false;
     if (!Hash_Equals(evil_twin->stoplist, (Obj*)self->stoplist)) {
         return false;
     }
@@ -87,25 +87,25 @@ Stopalizer_equals(Stopalizer *self, Obj *other)
 }
 
 Hash*
-Stopalizer_gen_stoplist(const CharBuf *language) 
+SnowStop_gen_stoplist(const CharBuf *language) 
 {
     CharBuf *lang = CB_new(3);
     CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 0)));
     CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 1)));
     const uint8_t **words = NULL;
-    if      (CB_Equals_Str(lang, "da", 2)) { words = Stopalizer_snow_da; }
-    else if (CB_Equals_Str(lang, "de", 2)) { words = Stopalizer_snow_de; }
-    else if (CB_Equals_Str(lang, "en", 2)) { words = Stopalizer_snow_en; }
-    else if (CB_Equals_Str(lang, "es", 2)) { words = Stopalizer_snow_es; }
-    else if (CB_Equals_Str(lang, "fi", 2)) { words = Stopalizer_snow_fi; }
-    else if (CB_Equals_Str(lang, "fr", 2)) { words = Stopalizer_snow_fr; }
-    else if (CB_Equals_Str(lang, "hu", 2)) { words = Stopalizer_snow_hu; }
-    else if (CB_Equals_Str(lang, "it", 2)) { words = Stopalizer_snow_it; }
-    else if (CB_Equals_Str(lang, "nl", 2)) { words = Stopalizer_snow_nl; }
-    else if (CB_Equals_Str(lang, "no", 2)) { words = Stopalizer_snow_no; }
-    else if (CB_Equals_Str(lang, "pt", 2)) { words = Stopalizer_snow_pt; }
-    else if (CB_Equals_Str(lang, "ru", 2)) { words = Stopalizer_snow_ru; }
-    else if (CB_Equals_Str(lang, "sv", 2)) { words = Stopalizer_snow_sv; }
+    if      (CB_Equals_Str(lang, "da", 2)) { words = SnowStop_snow_da; }
+    else if (CB_Equals_Str(lang, "de", 2)) { words = SnowStop_snow_de; }
+    else if (CB_Equals_Str(lang, "en", 2)) { words = SnowStop_snow_en; }
+    else if (CB_Equals_Str(lang, "es", 2)) { words = SnowStop_snow_es; }
+    else if (CB_Equals_Str(lang, "fi", 2)) { words = SnowStop_snow_fi; }
+    else if (CB_Equals_Str(lang, "fr", 2)) { words = SnowStop_snow_fr; }
+    else if (CB_Equals_Str(lang, "hu", 2)) { words = SnowStop_snow_hu; }
+    else if (CB_Equals_Str(lang, "it", 2)) { words = SnowStop_snow_it; }
+    else if (CB_Equals_Str(lang, "nl", 2)) { words = SnowStop_snow_nl; }
+    else if (CB_Equals_Str(lang, "no", 2)) { words = SnowStop_snow_no; }
+    else if (CB_Equals_Str(lang, "pt", 2)) { words = SnowStop_snow_pt; }
+    else if (CB_Equals_Str(lang, "ru", 2)) { words = SnowStop_snow_ru; }
+    else if (CB_Equals_Str(lang, "sv", 2)) { words = SnowStop_snow_sv; }
     else {
         DECREF(lang);
         return NULL;

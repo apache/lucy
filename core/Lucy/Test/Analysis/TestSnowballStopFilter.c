@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTSTOPALIZER
+#define C_LUCY_TESTSNOWBALLSTOPFILTER
 #include "Lucy/Util/ToolSet.h"
 #include <stdarg.h>
 
 #include "Lucy/Test.h"
-#include "Lucy/Test/Analysis/TestStopalizer.h"
-#include "Lucy/Analysis/Stopalizer.h"
+#include "Lucy/Test/Analysis/TestSnowballStopFilter.h"
+#include "Lucy/Analysis/SnowballStopFilter.h"
 
-static Stopalizer* 
-S_make_stopalizer(void *unused, ...)
+static SnowballStopFilter* 
+S_make_stopfilter(void *unused, ...)
 {
     va_list args;
-    Stopalizer *self = (Stopalizer*)VTable_Make_Obj(STOPALIZER);
+    SnowballStopFilter *self = (SnowballStopFilter*)VTable_Make_Obj(SNOWBALLSTOPFILTER);
     Hash *stoplist = Hash_new(0);
     char *stopword;
 
@@ -36,7 +36,7 @@ S_make_stopalizer(void *unused, ...)
     }
     va_end(args);
 
-    self = Stopalizer_init(self, NULL, stoplist);
+    self = SnowStop_init(self, NULL, stoplist);
     DECREF(stoplist);
     return self;
 }
@@ -44,22 +44,22 @@ S_make_stopalizer(void *unused, ...)
 static void
 test_Dump_Load_and_Equals(TestBatch *batch)
 {
-    Stopalizer *stopalizer 
-        = S_make_stopalizer(NULL, "foo", "bar", "baz", NULL);
-    Stopalizer *other       = S_make_stopalizer(NULL, "foo", "bar", NULL);
-    Obj        *dump        = Stopalizer_Dump(stopalizer);
-    Obj        *other_dump  = Stopalizer_Dump(other);
-    Stopalizer *clone       = (Stopalizer*)Stopalizer_Load(other, dump);
-    Stopalizer *other_clone = (Stopalizer*)Stopalizer_Load(other, other_dump);
+    SnowballStopFilter *stopfilter = S_make_stopfilter(NULL, "foo", "bar", 
+                                                       "baz", NULL);
+    SnowballStopFilter *other = S_make_stopfilter(NULL, "foo", "bar", NULL);
+    Obj *dump       = SnowStop_Dump(stopfilter);
+    Obj *other_dump = SnowStop_Dump(other);
+    SnowballStopFilter *clone       = (SnowballStopFilter*)SnowStop_Load(other, dump);
+    SnowballStopFilter *other_clone = (SnowballStopFilter*)SnowStop_Load(other, other_dump);
 
-    TEST_FALSE(batch, Stopalizer_Equals(stopalizer,
+    TEST_FALSE(batch, SnowStop_Equals(stopfilter,
         (Obj*)other), "Equals() false with different stoplist");
-    TEST_TRUE(batch, Stopalizer_Equals(stopalizer,
+    TEST_TRUE(batch, SnowStop_Equals(stopfilter,
         (Obj*)clone), "Dump => Load round trip");
-    TEST_TRUE(batch, Stopalizer_Equals(other,
+    TEST_TRUE(batch, SnowStop_Equals(other,
         (Obj*)other_clone), "Dump => Load round trip");
 
-    DECREF(stopalizer);
+    DECREF(stopfilter);
     DECREF(dump);
     DECREF(clone);
     DECREF(other);
@@ -68,7 +68,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 void
-TestStopalizer_run_tests()
+TestSnowStop_run_tests()
 {
     TestBatch *batch = TestBatch_new(3);
 

@@ -38,10 +38,10 @@ sub new {
     my $self = shift->SUPER::new(@_);
     my $whitespace_tokenizer
         = Lucy::Analysis::Tokenizer->new( token_re => qr/\S+/ );
-    my $stopalizer
-        = Lucy::Analysis::Stopalizer->new( stoplist => { x => 1 } );
+    my $stopfilter
+        = Lucy::Analysis::SnowballStopFilter->new( stoplist => { x => 1 } );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $whitespace_tokenizer, $stopalizer, ], );
+        analyzers => [ $whitespace_tokenizer, $stopfilter, ], );
     my $type
         = Lucy::Plan::FullTextType->new( analyzer => $polyanalyzer, );
     $self->spec_field( name => 'content', type => $type );

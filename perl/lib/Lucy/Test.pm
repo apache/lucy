@@ -52,8 +52,8 @@ PPCODE:
     else if (strEQ(package, "TestPolyAnalyzer")) {
         lucy_TestPolyAnalyzer_run_tests();
     }
-    else if (strEQ(package, "TestStopalizer")) {
-        lucy_TestStopalizer_run_tests();
+    else if (strEQ(package, "TestSnowballStopFilter")) {
+        lucy_TestSnowStop_run_tests();
     }
     else if (strEQ(package, "TestSnowStemmer")) {
         lucy_TestSnowStemmer_run_tests();

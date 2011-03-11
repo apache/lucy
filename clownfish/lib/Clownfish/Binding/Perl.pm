@@ -342,7 +342,8 @@ my %ks_compat = (
     'Lucy::Analysis::CaseFolder' => [
         qw( KinoSearch::Analysis::CaseFolder KinoSearch::Analysis::LCNormalizer )
     ],
-    'Lucy::Analysis::Stopalizer' => [qw( KinoSearch::Analysis::Stopalizer )],
+    'Lucy::Analysis::SnowballStopFilter' =>
+        [qw( KinoSearch::Analysis::Stopalizer )],
     'Lucy::Analysis::SnowballStemmer' =>
         [qw( KinoSearch::Analysis::Stemmer )],
 );

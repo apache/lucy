@@ -43,7 +43,7 @@ print $out_fh <<'END_STUFF';
  * project.
  */
 
-#include "Lucy/Analysis/Stopalizer.h"
+#include "Lucy/Analysis/SnowballStopFilter.h"
 
 END_STUFF
 
@@ -90,7 +90,7 @@ for my $iso ( sort keys %languages ) {
 static const char *words_${iso}[] = {
 $wrapped
 };
-const uint8_t **lucy_Stopalizer_snow_${iso} = (const uint8_t**)words_$iso;
+const uint8_t **lucy_SnowStop_snow_${iso} = (const uint8_t**)words_$iso;
 
 END_STUFF
 }

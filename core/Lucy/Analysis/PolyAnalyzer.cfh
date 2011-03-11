@@ -56,7 +56,7 @@ class Lucy::Analysis::PolyAnalyzer
      * @param language An ISO code from the list of supported languages.
      * @param analyzers An array of Analyzers.  The order of the analyzers
      * matters.  Don't put a SnowballStemmer before a Tokenizer (can't stem whole
-     * documents or paragraphs -- just individual words), or a Stopalizer
+     * documents or paragraphs -- just individual words), or a SnowballStopFilter
      * after a SnowballStemmer (stemmed words, e.g. "themselv", will not appear in a
      * stoplist).  In general, the sequence should be: normalize, tokenize,
      * stopalize, stem.  
