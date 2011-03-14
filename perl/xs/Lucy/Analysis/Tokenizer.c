@@ -57,6 +57,7 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
     token_re_sv = (SV*)lucy_Host_callback_host(LUCY_REGEXTOKENIZER,
         "compile_token_re", 1, CFISH_ARG_STR("pattern", self->pattern));
     S_set_token_re_but_not_pattern(self, SvRV(token_re_sv));
+    SvREFCNT_dec(token_re_sv);
 
     return self;
 }
