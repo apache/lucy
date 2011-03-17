@@ -21,69 +21,38 @@ use base qw( Lucy::Search::QueryParser );
 use Lucy::Search::TermQuery;
 use Lucy::Search::PhraseQuery;
 use Lucy::Search::ORQuery;
-use Lucy::Search::NoMatchQuery;
 use PrefixQuery;
-use Parse::RecDescent;
 use Carp;
 
-our %rd_parser;
-
-my $grammar = <<'END_GRAMMAR';
-
-tree:
-    leaf_queries
-    { 
-        $return = Lucy::Search::ORQuery->new;
-        $return->add_child($_) for @{ $item[1] };
-    }
-
-leaf_queries:
-    leaf_query(s?)
-    { $item{'leaf_query(s?)'} }
-
-leaf_query:
-      phrase_query
-    | prefix_query
-    | term_query
-    
-term_query:
-    /(\S+)/
-    { Lucy::Search::LeafQuery->new( text => $1 ) }
-
-phrase_query:
-    /("[^"]*(?:"|$))/   # terminated by either quote or end of string
-    { Lucy::Search::LeafQuery->new( text => $1 ) }
-    
-prefix_query:
-    /(\w+\*)/
-    { Lucy::Search::LeafQuery->new( text => $1 ) }
-
-END_GRAMMAR
-
-sub new {
-    my $class = shift;
-    my $self  = $class->SUPER::new(@_);
-    $rd_parser{$$self} = Parse::RecDescent->new($grammar);
-    return $self;
-}
-
-sub DESTROY {
-    my $self = shift;
-    delete $rd_parser{$$self};
-    $self->SUPER::DESTROY;
-}
+# Inherit new()
 
 sub parse {
     my ( $self, $query_string ) = @_;
-    my $tree = $self->tree($query_string);
-    return $tree
-        ? $self->expand($tree)
-        : Lucy::Search::NoMatchQuery->new;
+    my $tokens = $self->_tokenize($query_string);
+    my $or_query = Lucy::Search::ORQuery->new;
+    for my $token (@$tokens) {
+        my $leaf_query = Lucy::Search::LeafQuery->new( text => $token );
+        $or_query->add_child($leaf_query);
+    }
+    return $self->expand($or_query);
 }
 
-sub tree {
+sub _tokenize {
     my ( $self, $query_string ) = @_;
-    return $rd_parser{$$self}->tree($query_string);
+    my @tokens;
+    while ( length $query_string ) {
+        if ( $query_string =~ s/^\s+// ) {
+            next;    # skip whitespace
+        }
+        elsif ( $query_string =~ s/^("[^"]*(?:"|$))// ) {
+            push @tokens, $1;    # double-quoted phrase
+        }
+        else {
+            $query_string =~ s/(\S+)//;
+            push @tokens, $1;    # single word
+        }
+    }
+    return \@tokens;
 }
 
 sub expand_leaf {

@@ -19,28 +19,8 @@ Lucy::Docs::Cookbook::CustomQueryParser - Sample subclass of QueryParser.
 
 =head1 ABSTRACT
 
-Implement a custom search query language using
-L<Lucy::Search::QueryParser> and L<Parse::RecDescent>.
-
-=head1 Grammar-based vs. hand-rolled
-
-There are two classic strategies for writing a text parser.
-
-=over
-
-=item 1
-
-Create a grammar-based parser using Perl modules like Parse::RecDescent or
-Parse::YAPP, C utilities like lex and yacc, etc.
-
-=item 2
-
-Hand-roll your own parser.
-
-=back
-
-We'll start off with hand-rolling, but we'll ultimately move to the
-grammar-based parsing technique because of its superior flexibility.
+Implement a custom search query language using a subclass of
+L<Lucy::Search::QueryParser>.
 
 =head1 The language
 
@@ -53,14 +33,11 @@ collections.
 
 Later, we'll add support for trailing wildcards.
 
-=head1 Single-field regex-based parser
+=head1 Single-field parser
 
-Hand-rolling a parser can be labor-intensive, but our proposed query language
-is simple enough that chewing up the query string with some simple regular
-expressions will do the trick.
-
-We'll use a fixed field name of "content", and a fixed choice of English
-PolyAnalyzer.
+Our initial parser implentation will generate queries against a single fixed
+field, "content", and it will analyze text using a fixed choice of English
+PolyAnalyzer.  We won't subclass Lucy::Search::QueryParser just yet.
 
     package FlatQueryParser;
     use Lucy::Search::TermQuery;
@@ -104,7 +81,7 @@ single token and splits on whitespace everywhere else.
         my ( $self, $query_string ) = @_;
         my @tokens;
         while ( length $query_string ) {
-            if ( $query_string =~ s/^\s*// ) {
+            if ( $query_string =~ s/^\s+// ) {
                 next;    # skip whitespace
             }
             elsif ( $query_string =~ s/^("[^"]*(?:"|$))// ) {
@@ -153,53 +130,7 @@ ORQuery.
         return $or_query;
     }
 
-=head1 Single-field Parse::RecDescent-based parser
-
-Instead of using regular expressions to tokenize the string, we can use
-Parse::RecDescent.
-
-    my $grammar = <<'END_GRAMMAR';
-    
-    leaf_queries:
-        leaf_query(s?)
-        { $item{'leaf_query(s?)'} }
-    
-    leaf_query:
-          phrase_query
-        | term_query
-    
-    term_query:
-        /(\S+)/
-        { $1 }
-    
-    phrase_query:
-        /("[^"]*(?:"|$))/   # terminated by either quote or end of string
-        { $1 }
-    
-    END_GRAMMAR
-    
-    sub new { 
-        my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
-            language => 'en',
-        );
-        my $rd_parser = Parse::RecDescent->new($grammar);
-        return bless { 
-            field     => 'content',
-            analyzer  => $analyzer,
-            rd_parser => $rd_parser,
-        }, __PACKAGE__;
-    }
-
-The behavior of a Parse::RecDescent parser based on the grammar above is
-exactly the same as that of our regex-based tokenization routine from before,
-so we can leave parse() intact and simply change _tokenize():
-
-    sub _tokenize {
-        my ( $self, $query_string ) = @_;
-        return $self->{rd_parser}->leaf_queries($query_string);
-    }
-
-=head1 Multi-field Parse::RecDescent-based parser
+=head1 Multi-field parser
 
 Most often, the end user will want their search query to match not only a
 single 'content' field, but also 'title' and so on.  To make that happen, we
@@ -212,12 +143,14 @@ have to turn queries such as this...
     (title:foo OR content:foo) AND NOT (title:bar OR content:bar)
 
 Rather than continue with our own from-scratch parser class and write the
-routines to accomplish that expansion, we're now going to subclass QueryParser
+routines to accomplish that expansion, we're now going to subclass Lucy::Search::QueryParser
 and take advantage of some of its existing methods.
 
 Our first parser implementation had the "content" field name and the choice of
 English PolyAnalyzer hard-coded for simplicity, but we don't need to do that
-this time -- QueryParser's constructor requires a Schema which conveys field
+once we subclass Lucy::Search::QueryParser.  QueryParser's constructor --
+which we will inherit, allowing us to eliminate our own constructor --
+requires a Schema which conveys field
 and Analyzer information, so we can just defer to that.
 
     package FlatQueryParser;
@@ -225,73 +158,26 @@ and Analyzer information, so we can just defer to that.
     use Lucy::Search::TermQuery;
     use Lucy::Search::PhraseQuery;
     use Lucy::Search::ORQuery;
-    use Lucy::Search::NoMatchQuery;
     use PrefixQuery;
-    use Parse::RecDescent;
     use Carp;
     
-    our %rd_parser;
-    
-    sub new { 
-        my $class = shift;
-        my $self = $class->SUPER::new(@_);
-        $rd_parser{$$self} = Parse::RecDescent->new($grammar);
-        return $self;
-    }
-    
-    sub DESTROY {
-        my $self = shift;
-        delete $rd_parser{$$self};
-        $self->SUPER::DESTROY;
-    }
+    # Inherit new()
 
-If we modify our Parse::RecDescent grammar slightly, we can eliminate the
-_tokenize(), _make_term_query(), and _make_phrase_query() helper subs, and our
-parse() subroutine can be chopped way down.  We'll have the C<term_query> and
-C<phrase_query> productions generate LeafQuery objects, and add a C<tree>
-production which joins the leaves together with an ORQuery.
+We're also going to jettison our _make_term_query() and _make_phrase_query()
+helper subs and chop our parse() subroutine way down.  Our revised parse()
+routine will generate Lucy::Search::LeafQuery objects instead of TermQueries
+and PhraseQueries:
 
-    my $grammar = <<'END_GRAMMAR';
-    
-    tree:
-        leaf_queries
-        { 
-            $return = Lucy::Search::ORQuery->new;
-            $return->add_child($_) for @{ $item[1] };
-        }
-    
-    leaf_queries:
-        leaf_query(s?)
-        { $item{'leaf_query(s)'} }
-    
-    leaf_query:
-          phrase_query
-        | term_query
-    
-    term_query:
-        /(\S+)/
-        { Lucy::Search::LeafQuery->new( text => $1 ) }
-    
-    phrase_query:
-        /("[^"]*(?:"|$))/   # terminated by either quote or end of string
-        { Lucy::Search::LeafQuery->new( text => $1 ) }
-    
-    END_GRAMMAR
-    
-    ...
-    
     sub parse {
-        my ( $self, $query_string ) = @_; 
-        my $tree = $self->tree($query_string);
-        return $tree ? $self->expand($tree) :
-        Lucy::Search::NoMatchQuery->new;
+        my ( $self, $query_string ) = @_;
+        my $tokens = $self->_tokenize($query_string);
+        my $or_query = Lucy::Search::ORQuery->new;
+        for my $token (@$tokens) {
+            my $leaf_query = Lucy::Search::LeafQuery->new( text => $token );
+            $or_query->add_child($leaf_query);
+        }
+        return $self->expand($or_query);
     }
-    
-    sub tree {
-        my ( $self, $query_string ) = @_; 
-        return $rd_parser{$$self}->tree($query_string);
-    }
-
 
 The magic happens in QueryParser's expand() method, which walks the ORQuery
 object we supply to it looking for LeafQuery objects, and calls expand_leaf()
@@ -302,22 +188,9 @@ into C<(title:foo OR content:foo)>.
 
 =head1 Extending the query language
 
-To add support for trailing wildcards to our query language, first we need to
-modify our grammar, adding a C<prefix_query> production and tweaking the
-C<leaf_query> production to accommodate it.
-
-    leaf_query:
-          phrase_query
-        | prefix_query
-        | term_query
-    
-    prefix_query:
-        /(\w+\*)/
-        { Lucy::Search::LeafQuery->new( text => $1 ) }
-
-Second, we need to override expand_leaf() to accommodate PrefixQuery,
-while deferring to its original implementation on TermQuery and
-PhraseQuery.
+To add support for trailing wildcards to our query language, we need to
+override expand_leaf() to accommodate PrefixQuery, while deferring to the
+parent class implementation on TermQuery and PhraseQuery.
 
     sub expand_leaf {
         my ( $self, $leaf_query ) = @_;
@@ -338,10 +211,17 @@ PhraseQuery.
         }
     }
 
+Ordinarily, those asterisks would have been stripped when running tokens
+through the PolyAnalyzer -- query strings containing "foo*" would produce
+TermQueries for the term "foo".  Our override intercepts tokens with trailing
+asterisks and processes them as PrefixQueries before C<SUPER::expand_leaf> can
+discard them, so that a search for "foo*" can match "food", "foosball", and so
+on.
+
 =head1 Usage
 
-Insert any of our custom parsers into the search.cgi sample app to get a feel
-for how they behave:
+Insert our custom parser into the search.cgi sample app to get a feel for how
+it behaves:
 
     my $parser = FlatQueryParser->new( schema => $searcher->get_schema );
     my $query  = $parser->parse( decode( 'UTF-8', $cgi->param('q') || '' ) );
