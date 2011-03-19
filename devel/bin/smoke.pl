@@ -18,26 +18,35 @@
 use strict;
 use warnings;
 use Carp;
-use SVN::Class;
 use FindBin;
-use JSON::XS;
-use Email::Stuff;
 use Sys::Hostname;
+use File::Spec::Functions qw( catdir canonpath );
+use Net::SMTP;
 
 my $config = {
-    src =>
-        Path::Class::Dir->new( $FindBin::Bin, '../../' )->absolute->stringify,
+    src           => canonpath( catdir( $FindBin::Bin, '../../' ) ),
     verbose       => 0,
     email_to      => undef,
     email_from    => getpwuid($<) . '@' . hostname(),
     email_subject => 'Lucy Smoke Test Report ' . localtime(),
+    mailhost      => 'localhost',
     test_target => 'test',    # could also be 'test_valgrind' if on Linux
 };
 
 if (@ARGV) {
-    my $config_file   = Path::Class::File->new( shift @ARGV );
-    my $supplied_conf = decode_json( $config_file->slurp );
-    $config = { %$config, %$supplied_conf };
+    my $config_file = shift @ARGV;
+    open( my $fh, '<', $config_file ) or die "Can't open '$config_file': $!";
+    while ( defined( my $line = <$fh> ) ) {
+        $line =~ s/#.*//;
+        next unless $line =~ /^(.*?)=(.*)$/;
+        my ( $key, $value ) = ( $1, $2 );
+        for ( $key, $value ) {
+            s/^\s*//;
+            s/\s*$//;
+        }
+        $config->{$key} = $value;
+    }
+    close $fh or die "Can't close '$config_file': $!";
 }
 
 if ( !$config->{src} ) {
@@ -48,10 +57,10 @@ if ( !-d $config->{src} ) {
 }
 
 my $test_target = $config->{test_target};
-my $dir         = svn_dir( $config->{src} );
+my $dir         = $config->{src};
 my $perl_info   = get_out("$^X -V");
 my $sys_info    = get_out('uname -a');
-$dir->update or croak "can't svn update $dir:\n" . $dir->errstr;
+system( 'svn', 'up', $dir ) and croak "can't svn update $dir:\n";
 chdir "$dir" or croak "can't chdir to $dir: $!";
 chdir 'perl' or croak "can't chdir to perl: $!";
 run_quiet("./Build clean") if -f 'Build';
@@ -67,19 +76,24 @@ $test_info
 $sys_info
 $perl_info
 EOF
-    $msg .= $dir->info->dump;
+    $msg .= `svn info $dir`;
 
     if ( $ENV{SMOKE_TEST} ) {
         print $msg . "\n";
     }
     elsif ( $config->{email_to} ) {
-        Email::Stuff->from( $config->{email_from} )->to( $config->{email_to} )
-            ->subject( $config->{email_subject} )->text_body($msg)->send;
+        my $smtp = Net::SMTP->new( $config->{mailhost} );
+        $smtp->mail( $config->{email_from} );
+        $smtp->to( $config->{email_to} );
+        $smtp->data();
+        $smtp->datasend("$msg\n");
+        $smtp->dataend();
+        $smtp->quit;
     }
 }
 elsif ( $config->{verbose} ) {
     print "All tests pass.\n";
-    print $dir->info->dump;
+    print `svn info $dir`;
 }
 
 exit;
@@ -115,20 +129,17 @@ By default, smoke.pl updates to the latest SVN version of the branch within whic
 and runs a clean build and test suite. If there are any test failures, a full
 system and test summary is printed to stdout.
 
-You may specify an alternate path to test in a JSON-formatted config file. 
+You may specify an alternate path to test in an ini-formatted config file. 
 Use the 'src' config option to specify a path. Example:
 
- { 'src' : '/path/to/checked/out/lucy/branch' }
+ src = /path/to/checked/out/lucy/branch
+ email_to = me@example.com
+ email_from = me@example.com
 
 By default, smoke.pl will only print output if there are errors. To see output
 if all tests pass, specify a true 'verbose' flag in your config file.
 
- { 'verbose' : 1 }
-
-
-=head1 REQUIREMENTS
-
-SVN::Class, JSON::XS, FindBin, Carp
+ verbose = 1
 
 =cut
 
