@@ -88,14 +88,12 @@ Lock_get_host(Lock *self)     { return self->host; }
 bool_t
 Lock_obtain(Lock *self)
 {
-    float sleep_count = self->interval == 0 
-                      ? 0.0f
-                      : (float)self->timeout / self->interval;
+    int32_t time_left = self->interval == 0 ? 0 : self->timeout;
     bool_t locked = Lock_Request(self);
     
     while (!locked) {
-        sleep_count -= self->interval;
-        if (sleep_count < 0) { break; }
+        time_left -= self->interval;
+        if (time_left <= 0) { break; }
         Sleep_millisleep(self->interval);
         locked = Lock_Request(self);
     }
