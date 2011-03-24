@@ -16,20 +16,19 @@
 use strict;
 use warnings;
 use lib 'buildlib';
-use Test::More;
+use Test::More tests => 1;
 use File::Spec::Functions qw( catfile catdir );
 use File::Path qw( rmtree );
 
-system("$^X -MJSON::XS -e1");
-if ($?) {
-    plan( skip_all => 'complicated @INC issue' );
-}
-else {
-    plan( tests => 1 );
-}
-
 my $search_cgi_orig_path = catfile(qw( sample search.cgi ));
 my $indexer_pl_orig_path = catfile(qw( sample indexer.pl ));
+
+# Ensure that all @INC dirs make it into the scripts.  We can't use PERL5LIB
+# because search.cgi runs with taint mode and environment vars are tainted.
+my $blib_arch = catdir(qw( blib arch ));
+my $blib_lib  = catdir(qw( blib lib ));
+my @inc_dirs  = map {"use lib '$_';"} ( $blib_arch, $blib_lib, @INC );
+my $use_dirs  = join( "\n", @inc_dirs );
 
 for my $filename (qw( search.cgi indexer.pl )) {
     my $orig_path = catfile( 'sample', $filename );
@@ -40,10 +39,7 @@ for my $filename (qw( search.cgi indexer.pl )) {
         or die "no match";
     my $uscon_source = catdir(qw( sample us_constitution ));
     $content =~ s/(uscon_source\s+=\s+).*?;/$1'$uscon_source';/;
-    my $blib_arch = catdir(qw( blib arch ));
-    my $blib_lib  = catdir(qw( blib lib ));
-    my $blib      = "use lib '$blib_arch';\nuse lib '$blib_lib'\n";
-    $content =~ s/^use/$blib;\nuse/m;
+    $content =~ s/^use/$use_dirs;\nuse/m;
     open( $fh, '>', "_$filename" ) or die $!;
     print $fh $content;
     close $fh or die "Close failed: $!";
