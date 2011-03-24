@@ -87,6 +87,7 @@ FType_equals(FieldType *self, Obj *other)
 {
     FieldType *evil_twin = (FieldType*)other;
     if (evil_twin == self) return true;
+    if (FType_Get_VTable(self) != FType_Get_VTable(evil_twin)) return false;
     if (self->boost != evil_twin->boost) return false;
     if (!!self->indexed    != !!evil_twin->indexed)    return false;
     if (!!self->stored     != !!evil_twin->stored)     return false;

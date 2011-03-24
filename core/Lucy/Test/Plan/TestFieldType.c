@@ -26,7 +26,16 @@ DummyFieldType*
 DummyFieldType_new()
 {
     DummyFieldType *self = (DummyFieldType*)VTable_Make_Obj(DUMMYFIELDTYPE);
-    return (DummyFieldType*)FType_init(self);
+    return (DummyFieldType*)FType_init((FieldType*)self);
+}
+
+static FieldType*
+S_alt_field_type()
+{
+    ZombieCharBuf *name = ZCB_WRAP_STR("DummyFieldType2", 15);
+    VTable *vtable = VTable_singleton((CharBuf*)name, DUMMYFIELDTYPE);
+    FieldType *self = (FieldType*)VTable_Make_Obj(vtable);
+    return FType_init(self);
 }
 
 static void
@@ -34,6 +43,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 {
     FieldType   *type          = (FieldType*)DummyFieldType_new();
     FieldType   *other         = (FieldType*)DummyFieldType_new();
+    FieldType   *class_differs = S_alt_field_type();
     FieldType   *boost_differs = (FieldType*)DummyFieldType_new();
     FieldType   *indexed       = (FieldType*)DummyFieldType_new();
     FieldType   *stored        = (FieldType*)DummyFieldType_new();
@@ -48,6 +58,10 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 
     TEST_TRUE(batch, FType_Equals(type, (Obj*)other),
         "Equals() true with identical stats");
+    TEST_FALSE(batch, FType_Equals(type, (Obj*)class_differs),
+        "Equals() false with subclass");
+    TEST_FALSE(batch, FType_Equals(type, (Obj*)class_differs),
+        "Equals() false with super class");
     TEST_FALSE(batch, FType_Equals(type, (Obj*)boost_differs),
         "Equals() false with different boost");
     TEST_FALSE(batch, FType_Equals(type, (Obj*)indexed),
@@ -85,7 +99,7 @@ test_Compare_Values(TestBatch *batch)
 void
 TestFType_run_tests()
 {
-    TestBatch *batch = TestBatch_new(7);
+    TestBatch *batch = TestBatch_new(9);
     TestBatch_Plan(batch);
     test_Dump_Load_and_Equals(batch);
     test_Compare_Values(batch);
