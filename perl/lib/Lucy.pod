@@ -166,75 +166,6 @@ L<Lucy::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
 
 =back
 
-=head2 Supported Languages and Encodings
-
-Apache Lucy provides "native support" for 15 languages, meaning that
-PolyAnalyzer supports them.
-
-=over
-
-=item *
-
-Danish
-
-=item *
-
-Dutch
-
-=item *
-
-English
-
-=item *
-
-Finnish
-
-=item *
-
-French
-
-=item *
-
-German
-
-=item *
-
-Hungarian
-
-=item *
-
-Italian
-
-=item *
-
-Norwegian
-
-=item *
-
-Portuguese
-
-=item *
-
-Romanian
-
-=item *
-
-Russian
-
-=item *
-
-Spanish
-
-=item *
-
-Swedish
-
-=item *
-
-Turkish
-
-=back
-
 =head2 Delving Deeper
 
 L<Lucy::Docs::Cookbook> augments the tutorial with more advanced
@@ -261,14 +192,15 @@ will be named "Lucy1".  Users who require strong backwards compatibility
 should use a stable fork.
 
 The main namespace, "Lucy", is an unstable development branch (as hinted at by
-its version number).  Superficial API changes are frequent.  Hard file format
-compatibility breaks which require reindexing are rare, as we generally try to
-provide continuity across multiple releases, but they happen every once in a
-while.
+its 0.x.x version number).  Superficial API changes are frequent.  Hard file
+format compatibility breaks which require reindexing are rare, as we generally
+try to provide continuity across multiple releases, but they happen every once
+in a while.
 
 =head1 CLASS METHODS
 
-The Lucy module itself does not do much.
+The Lucy module itself does not have a large interface, providing only a
+single public class method.
 
 =head2 error
 
