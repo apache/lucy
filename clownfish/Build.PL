@@ -35,7 +35,7 @@ my $builder = Module::Build->new(
         'ExtUtils::ParseXS'  => 2.16,
         'Devel::PPPort'      => 3.13,
     },
-    include_dirs   => 'include',
+    include_dirs   => ['include'],
     c_source       => 'src',
     add_to_cleanup => [
         qw(
