@@ -35,6 +35,9 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
 void
 CFCHierarchy_destroy(CFCHierarchy *self);
 
+void
+CFCHierarchy_build(CFCHierarchy *self);
+
 int
 CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified);
 
