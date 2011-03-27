@@ -54,17 +54,17 @@ my %primitives_to_perl = (
     short  => sub {"newSViv( $_[0] )"},
     long   => sub {
         "((sizeof(long) <= sizeof(IV)) ? "
-            . "newSViv($_[0]) : newSVnv((NV)$_[0]))";
+            . "newSViv((IV)$_[0]) : newSVnv((NV)$_[0]))";
     },
     size_t   => sub {"newSViv( $_[0] )"},
     uint64_t => sub {
-        "sizeof(UV) == 8 ? newSVuv($_[0]) : newSVnv((NV)$_[0])";
+        "sizeof(UV) == 8 ? newSVuv((UV)$_[0]) : newSVnv((NV)$_[0])";
     },
     uint32_t => sub {"newSVuv( $_[0] )"},
     uint16_t => sub {"newSVuv( $_[0] )"},
     uint8_t  => sub {"newSVuv( $_[0] )"},
     int64_t  => sub {
-        "sizeof(IV) == 8 ? newSViv($_[0]) : newSVnv((NV)$_[0])";
+        "sizeof(IV) == 8 ? newSViv((IV)$_[0]) : newSVnv((NV)$_[0])";
     },
     int32_t    => sub {"newSViv( $_[0] )"},
     int16_t    => sub {"newSViv( $_[0] )"},
