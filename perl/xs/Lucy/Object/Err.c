@@ -76,7 +76,7 @@ lucy_Err_warn_mess(lucy_CharBuf *message)
 {
     SV *error_sv = XSBind_cb_to_sv(message);
     LUCY_DECREF(message);
-    warn(SvPV_nolen(error_sv));
+    warn("%s", SvPV_nolen(error_sv));
     SvREFCNT_dec(error_sv);
 }
 

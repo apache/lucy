@@ -196,7 +196,7 @@ FSFH_write(FSFileHandle *self, const void *data, size_t len)
         // Write data, track file length, check for errors. 
         int64_t check_val = write(self->fd, data, len);
         self->len += check_val;
-        if (check_val != len) {
+        if ((size_t)check_val != len) {
             if (check_val == -1) {
                 Err_set_error(Err_new(CB_newf(
                     "Error when writing %u64 bytes: %s",

@@ -63,7 +63,7 @@ lucy_Doc_store(lucy_Doc *self, const lucy_CharBuf *field, lucy_Obj *value)
                ? XSBind_cb_to_sv((lucy_CharBuf*)value)
                : (SV*)Lucy_Obj_To_Host(value);
     SvUTF8_on(key_sv);
-    hv_store_ent((HV*)self->fields, key_sv, val_sv, 0);
+    (void)hv_store_ent((HV*)self->fields, key_sv, val_sv, 0);
     // TODO: make this a thread-local instead of creating it every time? 
     SvREFCNT_dec(key_sv);
 }

@@ -350,7 +350,7 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash)
             memcpy(key_sv_ptr, Cfish_CB_Get_Ptr8(key), key_size);
             SvCUR_set(key_sv, key_size);
             *SvEND(key_sv) = '\0';
-            hv_store_ent(perl_hash, key_sv, val_sv, 0);
+            (void)hv_store_ent(perl_hash, key_sv, val_sv, 0);
         }
     }
     SvREFCNT_dec(key_sv);
@@ -372,7 +372,7 @@ XSBind_enable_overload(void *pobj)
 }
 
 static chy_bool_t
-S_extract_from_sv(SV *value, void *target, const char *label, int label_len,
+S_extract_from_sv(SV *value, void *target, const char *label,
                   chy_bool_t required, int type, cfish_VTable *vtable, 
                   void *allocation)
 {
@@ -537,7 +537,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
                 if (memcmp(SvPVX(key_sv), label, label_len) == 0) {
                     SV *value = stack[tick + 1];
                     got_arg = S_extract_from_sv(value, target, label, 
-                        label_len, required, type, vtable, allocation);
+                        required, type, vtable, allocation);
                     if (!got_arg) {
                         CFISH_ERR_ADD_FRAME(cfish_Err_get_error());
                         return false;

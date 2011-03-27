@@ -346,7 +346,7 @@ SI_read_bytes(InStream *self, char* buf, size_t len)
         if (len < IO_STREAM_BUF_SIZE) {
             // Ensure that we have enough mapped, then copy the rest. 
             int64_t got = S_refill(self);
-            if (got < len) {
+            if (got < (int64_t)len) {
                 int64_t orig_pos = SI_tell(self) - available;
                 int64_t orig_len = len + available;
                 THROW(ERR,  "Read past EOF of %o (pos: %i64 len: %i64 "

@@ -89,9 +89,9 @@ static void
 S_grow(Inversion *self, size_t size) 
 {
     if (size > self->cap) {
-        int64_t amount = size * sizeof(Token*);
+        uint64_t amount = size * sizeof(Token*);
         // Clip rather than wrap. 
-        if (amount > SIZE_MAX) { amount = SIZE_MAX; }
+        if (amount > SIZE_MAX || amount < size) { amount = SIZE_MAX; }
         self->tokens = (Token**)REALLOCATE(self->tokens, (size_t)amount);
         self->cap    = size;
         memset(self->tokens + self->size, 0,
