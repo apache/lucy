@@ -25,6 +25,16 @@
 }
 
 {
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:lucy_Memory_wrapped_calloc
+   fun:lucy_VTable_make_obj
+   fun:S_alt_field_type
+   fun:*
+}
+
+{
    <insert_a_suppression_name_here>
    Memcheck:Leak
    fun:calloc
