@@ -88,7 +88,7 @@ Memory_run(void)
     }
 
     /* Windows. */
-    if (!has_alloca || has_builtin_alloca) {
+    if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_malloc_h = true;
@@ -97,7 +97,7 @@ Memory_run(void)
             ConfWriter_append_conf("#define chy_alloca alloca\n");
         }
     }
-    if (!has_alloca || has_builtin_alloca) {
+    if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "_alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_malloc_h = true;
