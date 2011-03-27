@@ -36,6 +36,7 @@ test_sub_tick(TestBatch *batch)
   }
   TEST_INT_EQ(batch, i, num_segs, "got all sub_tick() calls right");
   DECREF(offsets);
+  FREEMEM(ints);
 }
 
 void
