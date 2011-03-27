@@ -86,6 +86,8 @@ CFCDumpable_destroy(CFCDumpable *self)
 void
 CFCDumpable_add_dumpables(CFCDumpable *self, CFCClass *klass)
 {
+    (void)self;
+
     if (!CFCClass_has_attribute(klass, "dumpable")) {
         croak("Class %s isn't dumpable", 
             CFCSymbol_get_class_name((CFCSymbol*)klass));
@@ -186,6 +188,7 @@ S_add_dump_method(CFCClass *klass)
         char *autocode = (char*)MALLOCATE(amount);
         int check = sprintf(autocode, pattern, full_func_sym, full_struct, 
             full_typedef, full_typedef, vtable_var, cnick);
+        if (check < 0) { CFCUtil_die("sprintf failed"); }
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **novel = CFCClass_novel_member_vars(klass);
