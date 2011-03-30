@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-Lucy - Search engine library.
+Lucy - Apache Lucy search engine library.
 
 =head1 VERSION
 
@@ -191,11 +191,11 @@ Lucy will spin off stable forks into new namespaces periodically.  The first
 will be named "Lucy1".  Users who require strong backwards compatibility
 should use a stable fork.
 
-The main namespace, "Lucy", is an unstable development branch (as hinted at by
-its 0.x.x version number).  Superficial API changes are frequent.  Hard file
-format compatibility breaks which require reindexing are rare, as we generally
-try to provide continuity across multiple releases, but they happen every once
-in a while.
+The main namespace, "Lucy", is an API-unstable development branch (as hinted
+at by its 0.x.x version number).  Superficial interface changes are frequent.
+Hard file format compatibility breaks which require reindexing are rare, as we
+generally try to provide continuity across multiple releases, but they happen
+every once in a while.
 
 =head1 CLASS METHODS
 
@@ -209,15 +209,11 @@ single public class method.
 Access a shared variable which is set by some routines on failure.  It will
 always be either a L<Lucy::Object::Err> or undef.
 
-=head1 SEE ALSO 
-
-The Apache Lucy homepage, where you'll find links to the mailing list and so
-on, is L<http://incubator.apache.org/lucy>.
-
 =head1 SUPPORT
 
-Please direct support questions to the Lucy users mailing list: subscription
-information at L<http://incubator.apache.org/lucy>.
+The Apache Lucy homepage, where you'll find links to our mailing lists and so
+on, is L<http://incubator.apache.org/lucy>.  Please direct support questions
+to the Lucy users mailing list.
 
 =head1 BUGS
 
