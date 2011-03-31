@@ -19,7 +19,7 @@ parcel Lucy;
 /** Test case object for QueryParser unit tests. 
  */
 
-class Lucy::Test::TestQueryParser cnick TestQP
+class Lucy::Test::Search::TestQueryParser cnick TestQP
     inherits Lucy::Object::Obj {
 
     CharBuf *query_string;

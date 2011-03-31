@@ -21,8 +21,8 @@
 #include <string.h>
 
 #include "Lucy/Test.h"
-#include "Lucy/Test/TestQueryParserLogic.h"
-#include "Lucy/Test/TestQueryParser.h"
+#include "Lucy/Test/Search/TestQueryParserLogic.h"
+#include "Lucy/Test/Search/TestQueryParser.h"
 #include "Lucy/Test/TestSchema.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Analysis/Analyzer.h"

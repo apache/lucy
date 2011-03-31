@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "Lucy/Test/TestQueryParser.h"
+#include "Lucy/Test/Search/TestQueryParser.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/TermQuery.h"
 #include "Lucy/Search/PhraseQuery.h"

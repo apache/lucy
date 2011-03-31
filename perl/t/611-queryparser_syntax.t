@@ -59,5 +59,5 @@ for my $content_string (@$doc_set) {
 }
 $indexer->commit;
 
-Lucy::Test::TestQueryParserSyntax::run_tests($folder);
+Lucy::Test::Search::TestQueryParserSyntax::run_tests($folder);
 

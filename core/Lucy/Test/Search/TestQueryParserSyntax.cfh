@@ -19,7 +19,7 @@ parcel Lucy;
 /** Tests for logical structure of Query objects output by QueryParser.
  */
 
-inert class Lucy::Test::TestQueryParserSyntax cnick TestQPSyntax {
+inert class Lucy::Test::Search::TestQueryParserSyntax cnick TestQPSyntax {
     inert void
     run_tests(Folder *index);
 }

@@ -237,7 +237,7 @@ PPCODE:
     }
 }
 
-MODULE = Lucy   PACKAGE = Lucy::Test::TestQueryParserSyntax
+MODULE = Lucy   PACKAGE = Lucy::Test::Search::TestQueryParserSyntax
 
 void
 run_tests(index);
