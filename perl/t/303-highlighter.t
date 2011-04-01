@@ -55,7 +55,7 @@ sub highlight {
 
 package main;
 
-use Test::More tests => 34;
+use Test::More tests => 35;
 use Lucy::Test;
 
 binmode( STDOUT, ":utf8" );
@@ -214,15 +214,25 @@ is( $target->to_perl, "a <strong>b</strong> c", "basic Highlight_Excerpt" );
 
 $target = make_cb("");
 $hl->_highlight_excerpt(
-    raw_excerpt => "$phi $phi $phi",
-    spans       => make_spans( [ 2, 1, 1.0 ] ),
+    raw_excerpt => "$phi",
+    spans       => make_spans( [ 0, 1, 1.0 ], [ 10, 10, 1.0 ] ),
     top         => 0,
+    highlighted => $target,
+);
+unlike( $target->to_perl, qr#<strong></strong>#,
+    "don't surround spans off end of raw excerpt." );
+
+$target = make_cb("");
+$hl->_highlight_excerpt(
+    raw_excerpt => "$phi $phi $phi",
+    spans       => make_spans( [ 3, 1, 1.0 ] ),
+    top         => 1,
     highlighted => $target,
 );
 like(
     $target->to_perl,
-    qr#$encoded_phi <strong>$encoded_phi</strong> $encoded_phi#i,
-    "encode invoked by Highlight_Excerpt"
+    qr#^$encoded_phi <strong>$encoded_phi</strong> $encoded_phi$#i,
+    "Highlight_Excerpt pays attention to offset"
 );
 
 $target = make_cb("");

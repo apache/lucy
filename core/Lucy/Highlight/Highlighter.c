@@ -428,11 +428,15 @@ Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
     int32_t last_end = 0;
     ZombieCharBuf *temp = ZCB_WRAP(raw_excerpt);
     CharBuf *encode_buf = NULL;
+    int32_t raw_excerpt_end = top + CB_Length(raw_excerpt);
 
     for (uint32_t i = 0, max = VA_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)VA_Fetch(spans, i);
         if (span->offset < top) {
             continue;
+        }
+        else if (span->offset >= raw_excerpt_end) {
+            break;
         }
         else {
             int32_t relative_start = span->offset - top;
@@ -466,7 +470,7 @@ Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
     }
 
     // Last text, beyond last highlight span. 
-    {
+    if (ZCB_Get_Size(temp)) {
         CharBuf *encoded = S_do_encode(self, (CharBuf*)temp, &encode_buf);
         CB_Cat(highlighted, encoded);
         DECREF(encoded);
