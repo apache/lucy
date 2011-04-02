@@ -49,8 +49,8 @@ StringType_init2(StringType *self, float boost, bool_t indexed,
 bool_t
 StringType_equals(StringType *self, Obj *other)
 {
-    StringType *evil_twin = (StringType*)other;
-    if (evil_twin == self) return true;
+    StringType *twin = (StringType*)other;
+    if (twin == self) return true;
     if (!FType_equals((FieldType*)self, other)) return false;
     return true;
 }

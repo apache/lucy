@@ -134,23 +134,23 @@ InStream_reopen(InStream *self, const CharBuf *filename, int64_t offset,
             offset, len, FH_Length(self->file_handle));
     }
 
-    InStream *evil_twin = (InStream*)VTable_Make_Obj(self->vtable);
-    InStream_do_open(evil_twin, (Obj*)self->file_handle);
-    if (filename != NULL) { CB_Mimic(evil_twin->filename, (Obj*)filename); }
-    evil_twin->offset = offset;
-    evil_twin->len    = len;
-    InStream_Seek(evil_twin, 0);
+    InStream *twin = (InStream*)VTable_Make_Obj(self->vtable);
+    InStream_do_open(twin, (Obj*)self->file_handle);
+    if (filename != NULL) { CB_Mimic(twin->filename, (Obj*)filename); }
+    twin->offset = offset;
+    twin->len    = len;
+    InStream_Seek(twin, 0);
 
-    return evil_twin;
+    return twin;
 }
 
 InStream*
 InStream_clone(InStream *self)
 {
-    InStream *evil_twin = (InStream*)VTable_Make_Obj(self->vtable);
-    InStream_do_open(evil_twin, (Obj*)self->file_handle);
-    InStream_Seek(evil_twin, SI_tell(self));
-    return evil_twin;
+    InStream *twin = (InStream*)VTable_Make_Obj(self->vtable);
+    InStream_do_open(twin, (Obj*)self->file_handle);
+    InStream_Seek(twin, SI_tell(self));
+    return twin;
 }
 
 CharBuf*

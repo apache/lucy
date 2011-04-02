@@ -55,8 +55,8 @@ Arch_init(Architecture *self)
 bool_t
 Arch_equals(Architecture *self, Obj *other)
 {
-    Architecture *evil_twin = (Architecture*)other;
-    if (evil_twin == self) return true;
+    Architecture *twin = (Architecture*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, ARCHITECTURE)) return false;
     return true;
 }

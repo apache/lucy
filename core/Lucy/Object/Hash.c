@@ -451,17 +451,17 @@ Hash_values(Hash *self)
 bool_t
 Hash_equals(Hash *self, Obj *other)
 {
-    Hash    *evil_twin = (Hash*)other;
+    Hash    *twin = (Hash*)other;
     Obj     *key;
     Obj     *val;
 
-    if (evil_twin == self) return true;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, HASH)) return false;
-    if (self->size != evil_twin->size) return false;
+    if (self->size != twin->size) return false;
 
     Hash_Iterate(self);
     while (Hash_Next(self, &key, &val)) {
-        Obj *other_val = Hash_Fetch(evil_twin, key);
+        Obj *other_val = Hash_Fetch(twin, key);
         if (!other_val || !Obj_Equals(other_val, val)) return false;
     }
 

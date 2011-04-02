@@ -522,11 +522,11 @@ CB_mimic_str(CharBuf *self, const char* ptr, size_t size)
 void
 CB_mimic(CharBuf *self, Obj *other)
 {
-    CharBuf *evil_twin = (CharBuf*)CERTIFY(other, CHARBUF);
-    if (evil_twin->size >= self->cap) { S_grow(self, evil_twin->size); }
-    memmove(self->ptr, evil_twin->ptr, evil_twin->size);
-    self->size = evil_twin->size;
-    self->ptr[evil_twin->size] = '\0';
+    CharBuf *twin = (CharBuf*)CERTIFY(other, CHARBUF);
+    if (twin->size >= self->cap) { S_grow(self, twin->size); }
+    memmove(self->ptr, twin->ptr, twin->size);
+    self->size = twin->size;
+    self->ptr[twin->size] = '\0';
 }
 
 void 
@@ -585,10 +585,10 @@ CB_starts_with_str(CharBuf *self, const char *prefix, size_t size)
 bool_t
 CB_equals(CharBuf *self, Obj *other)
 {
-    CharBuf *const evil_twin = (CharBuf*)other;
-    if (evil_twin == self) return true;
+    CharBuf *const twin = (CharBuf*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, CHARBUF)) return false;
-    return CB_equals_str(self, evil_twin->ptr, evil_twin->size);
+    return CB_equals_str(self, twin->ptr, twin->size);
 }
 
 int32_t

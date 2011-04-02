@@ -141,40 +141,40 @@ VArray*
 VA_clone(VArray *self)
 {
     uint32_t i;
-    VArray *evil_twin = VA_new(self->size);
+    VArray *twin = VA_new(self->size);
 
     // Clone each element. 
     for (i = 0; i < self->size; i++) {
         Obj *elem = self->elems[i];
         if (elem) {
-            evil_twin->elems[i] = Obj_Clone(elem);
+            twin->elems[i] = Obj_Clone(elem);
         }
     }
 
     // Ensure that size is the same if NULL elems at end. 
-    evil_twin->size = self->size;
+    twin->size = self->size;
 
-    return evil_twin;
+    return twin;
 }
 
 VArray*
 VA_shallow_copy(VArray *self)
 {
     uint32_t i;
-    VArray *evil_twin;
+    VArray *twin;
     Obj **elems;
 
     // Dupe, then increment refcounts. 
-    evil_twin = VA_new(self->size);
-    elems = evil_twin->elems;
+    twin = VA_new(self->size);
+    elems = twin->elems;
     memcpy(elems, self->elems, self->size * sizeof(Obj*));
-    evil_twin->size = self->size;
+    twin->size = self->size;
     for (i = 0; i < self->size; i++) {
         if (elems[i] != NULL)
             (void)INCREF(elems[i]);
     }
 
-    return evil_twin;
+    return twin;
 }
 
 void
@@ -348,17 +348,17 @@ VA_sort(VArray *self, lucy_Sort_compare_t compare, void *context)
 bool_t
 VA_equals(VArray *self, Obj *other)
 { 
-    VArray *evil_twin = (VArray*)other;
-    if (evil_twin == self) return true;
+    VArray *twin = (VArray*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, VARRAY)) return false;
-    if (evil_twin->size != self->size) {
+    if (twin->size != self->size) {
         return false;
     }
     else {
         uint32_t i, max; 
         for (i = 0, max = self->size; i < max; i++) {
             Obj *val       = self->elems[i];
-            Obj *other_val = evil_twin->elems[i];
+            Obj *other_val = twin->elems[i];
             if ((val && !other_val) || (other_val && !val)) return false;
             if (val && !Obj_Equals(val, other_val)) return false;
         }

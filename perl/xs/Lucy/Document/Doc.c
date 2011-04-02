@@ -162,19 +162,19 @@ lucy_Doc_load(lucy_Doc *self, lucy_Obj *dump)
 chy_bool_t
 lucy_Doc_equals(lucy_Doc *self, lucy_Obj *other)
 {
-    lucy_Doc *evil_twin = (lucy_Doc*)other;
+    lucy_Doc *twin = (lucy_Doc*)other;
     HV *my_fields;
     HV *other_fields;
     I32 num_fields;
 
-    if (evil_twin == self)                    { return true;  }
+    if (twin == self)                    { return true;  }
     if (!Lucy_Obj_Is_A(other, LUCY_DOC))      { return false; }
-    if (!self->doc_id == evil_twin->doc_id)   { return false; }
-    if (!!self->fields ^ !!evil_twin->fields) { return false; }
+    if (!self->doc_id == twin->doc_id)   { return false; }
+    if (!!self->fields ^ !!twin->fields) { return false; }
 
     // Verify fields.  Don't allow any deep data structures. 
     my_fields    = (HV*)self->fields;
-    other_fields = (HV*)evil_twin->fields;
+    other_fields = (HV*)twin->fields;
     if (HvKEYS(my_fields) != HvKEYS(other_fields)) { return false; }
     num_fields = hv_iterinit(my_fields);
     while(num_fields--) {

@@ -373,22 +373,22 @@ test_Clone(TestBatch *batch)
 {
     int i;
     BitVector *self = BitVec_new(30);
-    BitVector *evil_twin;
+    BitVector *twin;
 
     BitVec_Set(self, 2);
     BitVec_Set(self, 3);
     BitVec_Set(self, 10);
     BitVec_Set(self, 20);
 
-    evil_twin = BitVec_Clone(self);
+    twin = BitVec_Clone(self);
     for (i = 0; i < 50; i++) {
-        if (BitVec_Get(self, i) != BitVec_Get(evil_twin, i)) { break; }
+        if (BitVec_Get(self, i) != BitVec_Get(twin, i)) { break; }
     }
     TEST_INT_EQ(batch, i, 50, "Clone");
-    TEST_INT_EQ(batch, BitVec_Count(evil_twin), 4, "clone Count");
+    TEST_INT_EQ(batch, BitVec_Count(twin), 4, "clone Count");
 
     DECREF(self);
-    DECREF(evil_twin);
+    DECREF(twin);
 }
 
 static int

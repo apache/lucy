@@ -227,25 +227,25 @@ static void
 test_Clone_and_Shallow_Copy(TestBatch *batch)
 {
     VArray *array  = VA_new(0);
-    VArray *evil_twin;
+    VArray *twin;
     uint32_t i;
 
     for (i = 0; i < 10; i++) {
         VA_Push(array, (Obj*)CB_newf("%u32", i));
     }
-    evil_twin = VA_Shallow_Copy(array);
-    TEST_TRUE(batch, VA_Equals(array, (Obj*)evil_twin), "Shallow_Copy");
-    TEST_TRUE(batch, VA_Fetch(array, 1) == VA_Fetch(evil_twin, 1), 
+    twin = VA_Shallow_Copy(array);
+    TEST_TRUE(batch, VA_Equals(array, (Obj*)twin), "Shallow_Copy");
+    TEST_TRUE(batch, VA_Fetch(array, 1) == VA_Fetch(twin, 1), 
         "Shallow_Copy doesn't clone elements");
-    DECREF(evil_twin);
+    DECREF(twin);
 
-    evil_twin = VA_Clone(array);
-    TEST_TRUE(batch, VA_Equals(array, (Obj*)evil_twin), "Clone");
-    TEST_TRUE(batch, VA_Fetch(array, 1) != VA_Fetch(evil_twin, 1), 
+    twin = VA_Clone(array);
+    TEST_TRUE(batch, VA_Equals(array, (Obj*)twin), "Clone");
+    TEST_TRUE(batch, VA_Fetch(array, 1) != VA_Fetch(twin, 1), 
         "Clone performs deep clone");
 
     DECREF(array);
-    DECREF(evil_twin);
+    DECREF(twin);
 }
 
 static void

@@ -127,20 +127,20 @@ TV_deserialize(TermVector *self, InStream *instream)
 bool_t
 TV_equals(TermVector *self, Obj *other)
 {
-    TermVector *const evil_twin = (TermVector*)other;
+    TermVector *const twin = (TermVector*)other;
     uint32_t i;
     int32_t *const posits       = self->positions->ints;
     int32_t *const starts       = self->start_offsets->ints;
     int32_t *const ends         = self->start_offsets->ints;
-    int32_t *const other_posits = evil_twin->positions->ints;
-    int32_t *const other_starts = evil_twin->start_offsets->ints;
-    int32_t *const other_ends   = evil_twin->start_offsets->ints;
+    int32_t *const other_posits = twin->positions->ints;
+    int32_t *const other_starts = twin->start_offsets->ints;
+    int32_t *const other_ends   = twin->start_offsets->ints;
 
-    if (evil_twin == self) return true;
+    if (twin == self) return true;
 
-    if (!CB_Equals(self->field, (Obj*)evil_twin->field)) return false;
-    if (!CB_Equals(self->text, (Obj*)evil_twin->text))   return false;
-    if (self->num_pos != evil_twin->num_pos)             return false;
+    if (!CB_Equals(self->field, (Obj*)twin->field)) return false;
+    if (!CB_Equals(self->text, (Obj*)twin->text))   return false;
+    if (self->num_pos != twin->num_pos)             return false;
 
     for (i = 0; i < self->num_pos; i++) {
         if (posits[i] != other_posits[i]) return false;

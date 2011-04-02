@@ -46,8 +46,8 @@ CaseFolder_destroy(CaseFolder *self)
 bool_t
 CaseFolder_equals(CaseFolder *self, Obj *other)
 {
-    CaseFolder *const evil_twin = (CaseFolder*)other;
-    if (evil_twin == self) return true;
+    CaseFolder *const twin = (CaseFolder*)other;
+    if (twin == self) return true;
     UNUSED_VAR(self);
     if (!Obj_Is_A(other, CASEFOLDER)) return false;
     return true;

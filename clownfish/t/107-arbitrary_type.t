@@ -35,11 +35,11 @@ is( $compare_t_type->get_specifier,
     "neato_Sort_compare_t", "Prepend prefix to specifier" );
 is( $compare_t_type->to_c, "neato_Sort_compare_t", "to_c" );
 
-my $evil_twin = Clownfish::Type->new_arbitrary(
+my $twin = Clownfish::Type->new_arbitrary(
     parcel    => 'Neato',
     specifier => "foo_t",
 );
-ok( $foo_type->equals($evil_twin), "equals" );
+ok( $foo_type->equals($twin), "equals" );
 ok( !$foo_type->equals($compare_t_type),
     "equals spoiled by different specifier"
 );

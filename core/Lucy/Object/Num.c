@@ -41,25 +41,25 @@ Num_init(Num *self)
 bool_t
 Num_equals(Num *self, Obj *other)
 {
-    Num *evil_twin = (Num*)other;
-    if (evil_twin == self) { return true; }
+    Num *twin = (Num*)other;
+    if (twin == self) { return true; }
     if (!Obj_Is_A(other, NUM)) { return false; }
-    if (Num_To_F64(self) != Num_To_F64(evil_twin)) { return false; }
-    if (Num_To_I64(self) != Num_To_I64(evil_twin)) { return false; }
+    if (Num_To_F64(self) != Num_To_F64(twin)) { return false; }
+    if (Num_To_I64(self) != Num_To_I64(twin)) { return false; }
     return true;
 }
 
 int32_t
 Num_compare_to(Num *self, Obj *other)
 {
-    Num *evil_twin = (Num*)CERTIFY(other, NUM);
-    double f64_diff = Num_To_F64(self) - Num_To_F64(evil_twin);
+    Num *twin = (Num*)CERTIFY(other, NUM);
+    double f64_diff = Num_To_F64(self) - Num_To_F64(twin);
     if (f64_diff) {
         if      (f64_diff < 0) { return -1; }
         else if (f64_diff > 0) { return 1;  }
     }
     else {
-        int64_t i64_diff = Num_To_I64(self) - Num_To_I64(evil_twin);
+        int64_t i64_diff = Num_To_I64(self) - Num_To_I64(twin);
         if (i64_diff) { 
             if      (i64_diff < 0) { return -1; }
             else if (i64_diff > 0) { return 1;  }
@@ -146,8 +146,8 @@ Float32_clone(Float32 *self)
 void
 Float32_mimic(Float32 *self, Obj *other)
 {
-    Float32 *evil_twin = (Float32*)CERTIFY(other, FLOAT32);
-    self->value = evil_twin->value;
+    Float32 *twin = (Float32*)CERTIFY(other, FLOAT32);
+    self->value = twin->value;
 }
 
 void
@@ -205,8 +205,8 @@ Float64_clone(Float64 *self)
 void
 Float64_mimic(Float64 *self, Obj *other)
 {
-    Float64 *evil_twin = (Float64*)CERTIFY(other, FLOAT64);
-    self->value = evil_twin->value;
+    Float64 *twin = (Float64*)CERTIFY(other, FLOAT64);
+    self->value = twin->value;
 }
 
 int32_t
@@ -271,8 +271,8 @@ Int32_clone(Integer32 *self)
 void
 Int32_mimic(Integer32 *self, Obj *other)
 {
-    Integer32 *evil_twin = (Integer32*)CERTIFY(other, INTEGER32);
-    self->value = evil_twin->value;
+    Integer32 *twin = (Integer32*)CERTIFY(other, INTEGER32);
+    self->value = twin->value;
 }
 
 int32_t
@@ -336,8 +336,8 @@ Int64_clone(Integer64 *self)
 void
 Int64_mimic(Integer64 *self, Obj *other)
 {
-    Integer64 *evil_twin = (Integer64*)CERTIFY(other, INTEGER64);
-    self->value = evil_twin->value;
+    Integer64 *twin = (Integer64*)CERTIFY(other, INTEGER64);
+    self->value = twin->value;
 }
 
 int32_t
@@ -350,17 +350,17 @@ Int64_hash_sum(Integer64 *self)
 bool_t
 Int64_equals(Integer64 *self, Obj *other)
 {
-    Num *evil_twin = (Num*)other;
-    if (evil_twin == (Num*)self)         { return true; }
+    Num *twin = (Num*)other;
+    if (twin == (Num*)self)         { return true; }
     if (!Obj_Is_A(other, NUM)) { return false; }
-    if (Num_Is_A(evil_twin, FLOATNUM)) {
-        double  floating_val = Num_To_F64(evil_twin);
+    if (Num_Is_A(twin, FLOATNUM)) {
+        double  floating_val = Num_To_F64(twin);
         int64_t int_val      = (int64_t)floating_val;
         if ((double)int_val != floating_val) { return false; }
         if (int_val != self->value)          { return false; }
     }
     else {
-        if (self->value != Num_To_I64(evil_twin)) { return false; }
+        if (self->value != Num_To_I64(twin)) { return false; }
     }
     return true;
 }

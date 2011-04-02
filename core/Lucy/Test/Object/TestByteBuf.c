@@ -68,10 +68,10 @@ static void
 test_Clone(TestBatch *batch)
 {
     ByteBuf *bb = BB_new_bytes("foo", 3);
-    ByteBuf *evil_twin = BB_Clone(bb);
-    TEST_TRUE(batch, BB_Equals(bb, (Obj*)evil_twin), "Clone");
+    ByteBuf *twin = BB_Clone(bb);
+    TEST_TRUE(batch, BB_Equals(bb, (Obj*)twin), "Clone");
     DECREF(bb);
-    DECREF(evil_twin);
+    DECREF(twin);
 }
 
 static void

@@ -55,15 +55,15 @@ LeafQuery_get_text(LeafQuery *self)  { return self->text; }
 bool_t
 LeafQuery_equals(LeafQuery *self, Obj *other)
 {
-    LeafQuery *evil_twin = (LeafQuery*)other;
-    if (evil_twin == self) return true;
+    LeafQuery *twin = (LeafQuery*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, LEAFQUERY)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (!!self->field ^ !!evil_twin->field) return false;
+    if (self->boost != twin->boost) return false;
+    if (!!self->field ^ !!twin->field) return false;
     if (self->field) {
-        if (!CB_Equals(self->field, (Obj*)evil_twin->field)) return false;
+        if (!CB_Equals(self->field, (Obj*)twin->field)) return false;
     }
-    if (!CB_Equals(self->text, (Obj*)evil_twin->text)) return false;
+    if (!CB_Equals(self->text, (Obj*)twin->text)) return false;
     return true;
 }
 

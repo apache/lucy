@@ -85,14 +85,14 @@ FType_compare_values(FieldType *self, Obj *a, Obj *b)
 bool_t
 FType_equals(FieldType *self, Obj *other)
 {
-    FieldType *evil_twin = (FieldType*)other;
-    if (evil_twin == self) return true;
-    if (FType_Get_VTable(self) != FType_Get_VTable(evil_twin)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (!!self->indexed    != !!evil_twin->indexed)    return false;
-    if (!!self->stored     != !!evil_twin->stored)     return false;
-    if (!!self->sortable   != !!evil_twin->sortable)   return false;
-    if (!!FType_Binary(self) != !!FType_Binary(evil_twin)) return false;
+    FieldType *twin = (FieldType*)other;
+    if (twin == self) return true;
+    if (FType_Get_VTable(self) != FType_Get_VTable(twin)) return false;
+    if (self->boost != twin->boost) return false;
+    if (!!self->indexed    != !!twin->indexed)    return false;
+    if (!!self->stored     != !!twin->stored)     return false;
+    if (!!self->sortable   != !!twin->sortable)   return false;
+    if (!!FType_Binary(self) != !!FType_Binary(twin)) return false;
     return true;
 }
 

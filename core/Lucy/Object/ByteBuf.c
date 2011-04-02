@@ -112,10 +112,10 @@ SI_equals_bytes(ByteBuf *self, const void *bytes, size_t size)
 bool_t
 BB_equals(ByteBuf *self, Obj *other)
 {
-    ByteBuf *const evil_twin = (ByteBuf*)other;
-    if (evil_twin == self) return true;
+    ByteBuf *const twin = (ByteBuf*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, BYTEBUF)) return false;
-    return SI_equals_bytes(self, evil_twin->buf, evil_twin->size);
+    return SI_equals_bytes(self, twin->buf, twin->size);
 }
 
 bool_t
@@ -154,8 +154,8 @@ BB_mimic_bytes(ByteBuf *self, const void *bytes, size_t size)
 void
 BB_mimic(ByteBuf *self, Obj *other)
 {
-    ByteBuf *evil_twin = (ByteBuf*)CERTIFY(other, BYTEBUF);
-    SI_mimic_bytes(self, evil_twin->buf, evil_twin->size);
+    ByteBuf *twin = (ByteBuf*)CERTIFY(other, BYTEBUF);
+    SI_mimic_bytes(self, twin->buf, twin->size);
 }
 
 static INLINE void 

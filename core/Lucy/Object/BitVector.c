@@ -81,7 +81,7 @@ BitVec_destroy(BitVector* self)
 BitVector*
 BitVec_clone(BitVector *self) 
 {
-    BitVector *evil_twin = BitVec_new(self->cap);
+    BitVector *twin = BitVec_new(self->cap);
     uint32_t   byte_size = (uint32_t)ceil(self->cap / 8.0);
 
     // Forbid inheritance. 
@@ -90,9 +90,9 @@ BitVec_clone(BitVector *self)
             BitVec_Get_Class_Name(self));
     }
 
-    memcpy(evil_twin->bits, self->bits, byte_size * sizeof(uint8_t));
+    memcpy(twin->bits, self->bits, byte_size * sizeof(uint8_t));
 
-    return evil_twin;
+    return twin;
 }
 
 uint8_t*
@@ -103,17 +103,17 @@ BitVec_get_capacity(BitVector *self) { return self->cap; }
 void
 BitVec_mimic(BitVector *self, Obj *other)
 {
-    BitVector *evil_twin = (BitVector*)CERTIFY(other, BITVECTOR);
+    BitVector *twin = (BitVector*)CERTIFY(other, BITVECTOR);
     const uint32_t my_byte_size = (uint32_t)ceil(self->cap / 8.0);
-    const uint32_t evil_twin_byte_size = (uint32_t)ceil(evil_twin->cap / 8.0);
-    if (my_byte_size > evil_twin_byte_size) {
-        uint32_t space = my_byte_size - evil_twin_byte_size;
-        memset(self->bits + evil_twin_byte_size, 0, space);
+    const uint32_t twin_byte_size = (uint32_t)ceil(twin->cap / 8.0);
+    if (my_byte_size > twin_byte_size) {
+        uint32_t space = my_byte_size - twin_byte_size;
+        memset(self->bits + twin_byte_size, 0, space);
     }
-    else if (my_byte_size < evil_twin_byte_size) {
-        BitVec_Grow(self, evil_twin->cap - 1);
+    else if (my_byte_size < twin_byte_size) {
+        BitVec_Grow(self, twin->cap - 1);
     }
-    memcpy(self->bits, evil_twin->bits, evil_twin_byte_size);
+    memcpy(self->bits, twin->bits, twin_byte_size);
 }
 
 void

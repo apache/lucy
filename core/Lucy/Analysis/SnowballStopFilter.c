@@ -77,10 +77,10 @@ SnowStop_transform(SnowballStopFilter *self, Inversion *inversion)
 bool_t
 SnowStop_equals(SnowballStopFilter *self, Obj *other)
 {
-    SnowballStopFilter *const evil_twin = (SnowballStopFilter*)other;
-    if (evil_twin == self) return true;
+    SnowballStopFilter *const twin = (SnowballStopFilter*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, SNOWBALLSTOPFILTER)) return false;
-    if (!Hash_Equals(evil_twin->stoplist, (Obj*)self->stoplist)) {
+    if (!Hash_Equals(twin->stoplist, (Obj*)self->stoplist)) {
         return false;
     }
     return true;

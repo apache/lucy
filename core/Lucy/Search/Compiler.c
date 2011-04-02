@@ -115,12 +115,12 @@ Compiler_to_string(Compiler *self)
 bool_t
 Compiler_equals(Compiler *self, Obj *other)
 {
-    Compiler *evil_twin = (Compiler*)other;
-    if (evil_twin == self) return true;
+    Compiler *twin = (Compiler*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, COMPILER)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (!Query_Equals(self->parent, (Obj*)evil_twin->parent)) return false;
-    if (!Sim_Equals(self->sim, (Obj*)evil_twin->sim)) return false;
+    if (self->boost != twin->boost) return false;
+    if (!Query_Equals(self->parent, (Obj*)twin->parent)) return false;
+    if (!Sim_Equals(self->sim, (Obj*)twin->sim)) return false;
     return true;
 }
 

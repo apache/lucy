@@ -63,13 +63,13 @@ FullTextType_destroy(FullTextType *self)
 bool_t
 FullTextType_equals(FullTextType *self, Obj *other)
 {
-    FullTextType *evil_twin = (FullTextType*)other;
-    if (evil_twin == self) return true;
+    FullTextType *twin = (FullTextType*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, FULLTEXTTYPE)) return false;
     if (!FType_equals((FieldType*)self, other)) return false;
-    if (!!self->sortable != !!evil_twin->sortable) return false;
-    if (!!self->highlightable != !!evil_twin->highlightable) return false;
-    if (!Analyzer_Equals(self->analyzer, (Obj*)evil_twin->analyzer)) {
+    if (!!self->sortable != !!twin->sortable) return false;
+    if (!!self->highlightable != !!twin->highlightable) return false;
+    if (!Analyzer_Equals(self->analyzer, (Obj*)twin->analyzer)) {
         return false;
     }
     return true;

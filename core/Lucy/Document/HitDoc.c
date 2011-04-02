@@ -80,11 +80,11 @@ HitDoc_load(HitDoc *self, Obj *dump)
 bool_t
 HitDoc_equals(HitDoc *self, Obj *other)
 {
-    HitDoc *evil_twin = (HitDoc*)other;
-    if (evil_twin == self)                { return true;  }
+    HitDoc *twin = (HitDoc*)other;
+    if (twin == self)                { return true;  }
     if (!Obj_Is_A(other, HITDOC))         { return false; }
     if (!Doc_equals((Doc*)self, other))   { return false; }
-    if (self->score != evil_twin->score)  { return false; }
+    if (self->score != twin->score)  { return false; }
     return true;
 }
 

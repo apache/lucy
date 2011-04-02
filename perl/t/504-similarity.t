@@ -44,9 +44,9 @@ use Lucy::Test;
 use bytes;
 no bytes;
 
-my $sim       = Lucy::Index::Similarity->new;
-my $evil_twin = $sim->load( $sim->dump );
-ok( $sim->equals($evil_twin), "Dump/Load" );
+my $sim  = Lucy::Index::Similarity->new;
+my $twin = $sim->load( $sim->dump );
+ok( $sim->equals($twin), "Dump/Load" );
 
 cmp_ok( $sim->tf(10) - $sim->tf(9), '<', 1, "TF is damped" );
 

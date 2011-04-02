@@ -99,11 +99,11 @@ PolyQuery_deserialize(PolyQuery *self, InStream *instream)
 bool_t
 PolyQuery_equals(PolyQuery *self, Obj *other)
 {
-    PolyQuery *evil_twin = (PolyQuery*)other;
-    if (evil_twin == self) return true;
+    PolyQuery *twin = (PolyQuery*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, POLYQUERY)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (!VA_Equals(evil_twin->children, (Obj*)self->children)) return false;
+    if (self->boost != twin->boost) return false;
+    if (!VA_Equals(twin->children, (Obj*)self->children)) return false;
     return true;
 }
 

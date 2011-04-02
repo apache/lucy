@@ -99,15 +99,15 @@ PhraseQuery_deserialize(PhraseQuery *self, InStream *instream)
 bool_t
 PhraseQuery_equals(PhraseQuery *self, Obj *other)
 {
-    PhraseQuery *evil_twin = (PhraseQuery*)other;
-    if (evil_twin == self) return true;
+    PhraseQuery *twin = (PhraseQuery*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, PHRASEQUERY)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (self->field && !evil_twin->field) return false;
-    if (!self->field && evil_twin->field) return false;
-    if (self->field && !CB_Equals(self->field, (Obj*)evil_twin->field)) 
+    if (self->boost != twin->boost) return false;
+    if (self->field && !twin->field) return false;
+    if (!self->field && twin->field) return false;
+    if (self->field && !CB_Equals(self->field, (Obj*)twin->field)) 
         return false;
-    if (!VA_Equals(evil_twin->terms, (Obj*)self->terms)) return false;
+    if (!VA_Equals(twin->terms, (Obj*)self->terms)) return false;
     return true;
 }
 
@@ -223,13 +223,13 @@ PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream)
 bool_t
 PhraseCompiler_equals(PhraseCompiler *self, Obj *other)
 {
-    PhraseCompiler *evil_twin = (PhraseCompiler*)other;
+    PhraseCompiler *twin = (PhraseCompiler*)other;
     if (!Obj_Is_A(other, PHRASECOMPILER)) return false;
     if (!Compiler_equals((Compiler*)self, other)) return false;
-    if (self->idf != evil_twin->idf) return false;
-    if (self->raw_weight != evil_twin->raw_weight) return false;
-    if (self->query_norm_factor != evil_twin->query_norm_factor) return false;
-    if (self->normalized_weight != evil_twin->normalized_weight) return false;
+    if (self->idf != twin->idf) return false;
+    if (self->raw_weight != twin->raw_weight) return false;
+    if (self->query_norm_factor != twin->query_norm_factor) return false;
+    if (self->normalized_weight != twin->normalized_weight) return false;
     return true;
 }
 

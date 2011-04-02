@@ -20,7 +20,7 @@ use Test::More tests => 3;
 use Storable qw( nfreeze thaw );
 use Lucy::Test;
 
-my ( $varray, $evil_twin );
+my ( $varray, $twin );
 
 $varray = Lucy::Object::VArray->new( capacity => 5 );
 $varray->push( Lucy::Object::CharBuf->new($_) ) for 1 .. 5;
@@ -40,6 +40,6 @@ my $deserialized = $varray->deserialize($instream);
 is_deeply( $varray->to_perl, $deserialized->to_perl,
     "serialize/deserialize" );
 
-$evil_twin = $varray->_clone;
-is_deeply( $evil_twin->to_perl, $varray->to_perl, "clone" );
+$twin = $varray->_clone;
+is_deeply( $twin->to_perl, $varray->to_perl, "clone" );
 

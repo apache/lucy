@@ -40,11 +40,11 @@ TInfo_init(TermInfo *self, int32_t doc_freq)
 TermInfo*
 TInfo_clone(TermInfo *self) 
 {
-    TermInfo *evil_twin = TInfo_new(self->doc_freq);
-    evil_twin->post_filepos = self->post_filepos;
-    evil_twin->skip_filepos = self->skip_filepos;
-    evil_twin->lex_filepos  = self->lex_filepos;
-    return evil_twin;
+    TermInfo *twin = TInfo_new(self->doc_freq);
+    twin->post_filepos = self->post_filepos;
+    twin->skip_filepos = self->skip_filepos;
+    twin->lex_filepos  = self->lex_filepos;
+    return twin;
 }
 
 int32_t
@@ -87,11 +87,11 @@ TInfo_to_string(TermInfo *self)
 void
 TInfo_mimic(TermInfo *self, Obj *other) 
 {
-    TermInfo *evil_twin = (TermInfo*)CERTIFY(other, TERMINFO);
-    self->doc_freq      = evil_twin->doc_freq;
-    self->post_filepos  = evil_twin->post_filepos;
-    self->skip_filepos  = evil_twin->skip_filepos;
-    self->lex_filepos   = evil_twin->lex_filepos;
+    TermInfo *twin = (TermInfo*)CERTIFY(other, TERMINFO);
+    self->doc_freq      = twin->doc_freq;
+    self->post_filepos  = twin->post_filepos;
+    self->skip_filepos  = twin->skip_filepos;
+    self->lex_filepos   = twin->lex_filepos;
 }
 
 void

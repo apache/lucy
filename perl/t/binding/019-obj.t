@@ -74,7 +74,7 @@ isa_ok( $object, "Lucy::Object::Obj",
     "Clownfish objects can be subclassed outside the Lucy hierarchy" );
 
 # TODO: Port this test to C.
-eval { my $evil_twin = $object->clone };
+eval { my $twin = $object->clone };
 like( $@, qr/abstract/i, "clone throws an abstract method exception" );
 
 ok( $object->is_a("Lucy::Object::Obj"), "custom is_a correct" );

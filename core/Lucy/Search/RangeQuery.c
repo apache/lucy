@@ -79,21 +79,21 @@ RangeQuery_destroy(RangeQuery *self)
 bool_t
 RangeQuery_equals(RangeQuery *self, Obj *other)
 {
-    RangeQuery *evil_twin = (RangeQuery*)other;
-    if (evil_twin == self) return true;
+    RangeQuery *twin = (RangeQuery*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, RANGEQUERY)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (!CB_Equals(self->field, (Obj*)evil_twin->field)) return false;
-    if (self->lower_term && !evil_twin->lower_term) return false;
-    if (self->upper_term && !evil_twin->upper_term) return false;
-    if (!self->lower_term && evil_twin->lower_term) return false;
-    if (!self->upper_term && evil_twin->upper_term) return false;
+    if (self->boost != twin->boost) return false;
+    if (!CB_Equals(self->field, (Obj*)twin->field)) return false;
+    if (self->lower_term && !twin->lower_term) return false;
+    if (self->upper_term && !twin->upper_term) return false;
+    if (!self->lower_term && twin->lower_term) return false;
+    if (!self->upper_term && twin->upper_term) return false;
     if (   self->lower_term 
-        && !Obj_Equals(self->lower_term, evil_twin->lower_term)) return false;
+        && !Obj_Equals(self->lower_term, twin->lower_term)) return false;
     if (   self->upper_term 
-        && !Obj_Equals(self->upper_term, evil_twin->upper_term)) return false;
-    if (self->include_lower != evil_twin->include_lower) return false;
-    if (self->include_upper != evil_twin->include_upper) return false;
+        && !Obj_Equals(self->upper_term, twin->upper_term)) return false;
+    if (self->include_lower != twin->include_lower) return false;
+    if (self->include_upper != twin->include_upper) return false;
     return true;
 }
 

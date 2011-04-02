@@ -29,12 +29,12 @@ test_Dump_And_Load(TestBatch *batch)
     PhraseQuery *query 
         = TestUtils_make_phrase_query("content", "a", "b", "c", NULL);
     Obj         *dump  = (Obj*)PhraseQuery_Dump(query);
-    PhraseQuery *evil_twin = (PhraseQuery*)Obj_Load(dump, dump);
-    TEST_TRUE(batch, PhraseQuery_Equals(query, (Obj*)evil_twin), 
+    PhraseQuery *twin = (PhraseQuery*)Obj_Load(dump, dump);
+    TEST_TRUE(batch, PhraseQuery_Equals(query, (Obj*)twin), 
         "Dump => Load round trip");
     DECREF(query);
     DECREF(dump);
-    DECREF(evil_twin);
+    DECREF(twin);
 }
 
 void

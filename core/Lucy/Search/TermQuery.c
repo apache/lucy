@@ -84,12 +84,12 @@ TermQuery_get_term(TermQuery *self)  { return self->term; }
 bool_t
 TermQuery_equals(TermQuery *self, Obj *other)
 {
-    TermQuery *evil_twin = (TermQuery*)other;
-    if (evil_twin == self) return true;
+    TermQuery *twin = (TermQuery*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, TERMQUERY)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (!CB_Equals(self->field, (Obj*)evil_twin->field)) return false;
-    if (!Obj_Equals(self->term, evil_twin->term)) return false;
+    if (self->boost != twin->boost) return false;
+    if (!CB_Equals(self->field, (Obj*)twin->field)) return false;
+    if (!Obj_Equals(self->term, twin->term)) return false;
     return true;
 }
 
@@ -161,13 +161,13 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
 bool_t
 TermCompiler_equals(TermCompiler *self, Obj *other)
 {
-    TermCompiler *evil_twin = (TermCompiler*)other;
+    TermCompiler *twin = (TermCompiler*)other;
     if (!Compiler_equals((Compiler*)self, other)) return false;
     if (!Obj_Is_A(other, TERMCOMPILER)) return false;
-    if (self->idf != evil_twin->idf) return false;
-    if (self->raw_weight != evil_twin->raw_weight) return false;
-    if (self->query_norm_factor != evil_twin->query_norm_factor) return false;
-    if (self->normalized_weight != evil_twin->normalized_weight) return false;
+    if (self->idf != twin->idf) return false;
+    if (self->raw_weight != twin->raw_weight) return false;
+    if (self->query_norm_factor != twin->query_norm_factor) return false;
+    if (self->normalized_weight != twin->normalized_weight) return false;
     return true;
 }
 

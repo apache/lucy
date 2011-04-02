@@ -48,14 +48,14 @@ VTable_destroy(VTable *self)
 VTable*
 VTable_clone(VTable *self)
 {
-    VTable *evil_twin 
+    VTable *twin 
         = (VTable*)Memory_wrapped_calloc(self->vt_alloc_size, 1);
 
-    memcpy(evil_twin, self, self->vt_alloc_size);
-    evil_twin->name = CB_Clone(self->name);
-    evil_twin->ref.count = 1; 
+    memcpy(twin, self, self->vt_alloc_size);
+    twin->name = CB_Clone(self->name);
+    twin->ref.count = 1; 
 
-    return evil_twin;
+    return twin;
 }
 
 Obj*

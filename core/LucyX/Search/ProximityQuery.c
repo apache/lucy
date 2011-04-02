@@ -105,16 +105,16 @@ ProximityQuery_deserialize(ProximityQuery *self, InStream *instream)
 bool_t
 ProximityQuery_equals(ProximityQuery *self, Obj *other)
 {
-    ProximityQuery *evil_twin = (ProximityQuery*)other;
-    if (evil_twin == self) return true;
+    ProximityQuery *twin = (ProximityQuery*)other;
+    if (twin == self) return true;
     if (!Obj_Is_A(other, PROXIMITYQUERY)) return false;
-    if (self->boost != evil_twin->boost) return false;
-    if (self->field && !evil_twin->field) return false;
-    if (!self->field && evil_twin->field) return false;
-    if (self->field && !CB_Equals(self->field, (Obj*)evil_twin->field)) 
+    if (self->boost != twin->boost) return false;
+    if (self->field && !twin->field) return false;
+    if (!self->field && twin->field) return false;
+    if (self->field && !CB_Equals(self->field, (Obj*)twin->field)) 
         return false;
-    if (!VA_Equals(evil_twin->terms, (Obj*)self->terms)) return false;
-    if (self->within != evil_twin->within) return false;
+    if (!VA_Equals(twin->terms, (Obj*)self->terms)) return false;
+    if (self->within != twin->within) return false;
     return true;
 }
 
@@ -238,14 +238,14 @@ ProximityCompiler_deserialize(ProximityCompiler *self, InStream *instream)
 bool_t
 ProximityCompiler_equals(ProximityCompiler *self, Obj *other)
 {
-    ProximityCompiler *evil_twin = (ProximityCompiler*)other;
+    ProximityCompiler *twin = (ProximityCompiler*)other;
     if (!Obj_Is_A(other, PROXIMITYCOMPILER)) return false;
     if (!Compiler_equals((Compiler*)self, other)) return false;
-    if (self->idf != evil_twin->idf) return false;
-    if (self->raw_weight != evil_twin->raw_weight) return false;
-    if (self->query_norm_factor != evil_twin->query_norm_factor) return false;
-    if (self->normalized_weight != evil_twin->normalized_weight) return false;
-    if (self->within            != evil_twin->within) return false;
+    if (self->idf != twin->idf) return false;
+    if (self->raw_weight != twin->raw_weight) return false;
+    if (self->query_norm_factor != twin->query_norm_factor) return false;
+    if (self->normalized_weight != twin->normalized_weight) return false;
+    if (self->within            != twin->within) return false;
     return true;
 }
 
