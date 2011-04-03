@@ -60,7 +60,7 @@ LucyX::Search::MockScorer - Matcher with arbitrary docs and scores.
 =head1 DESCRIPTION 
 
 Used for testing combining L<Matchers|Lucy::Search::Matcher> such as
-ANDScorer, MockScorer allows arbitrary match criteria to be supplied,
+ANDMatcher, MockScorer allows arbitrary match criteria to be supplied,
 obviating the need for clever index construction to cover corner cases.
 
 MockScorer is a testing and demonstration class; it is unsupported.

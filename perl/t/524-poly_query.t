@@ -61,11 +61,11 @@ for my $conjunction (qw( AND OR )) {
 
     my $matcher
         = $compiler->make_matcher( reader => $reader, need_score => 1 );
-    isa_ok(
-        $matcher,
-        "Lucy::Search::${conjunction}Scorer",
-        "make_matcher with need_score"
-    );
+    my $wanted_class
+        = $conjunction eq 'AND'
+        ? 'Lucy::Search::ANDMatcher'
+        : 'Lucy::Search::ORScorer';
+    isa_ok( $matcher, $wanted_class, "make_matcher with need_score" );
 
     my $term_matcher = $one_child->make_compiler( searcher => $searcher )
         ->make_matcher( reader => $reader, need_score => 0 );

@@ -96,7 +96,7 @@ lib/Lucy/Plan/Int64Type.pm
 lib/Lucy/Plan/Schema.pm
 lib/Lucy/Plan/StringType.pm
 lib/Lucy/Search/ANDQuery.pm
-lib/Lucy/Search/ANDScorer.pm
+lib/Lucy/Search/ANDMatcher.pm
 lib/Lucy/Search/BitVecMatcher.pm
 lib/Lucy/Search/Collector.pm
 lib/Lucy/Search/Collector/BitCollector.pm
@@ -288,7 +288,7 @@ t/509-poly_searcher.t
 t/510-remote_search.t
 t/511-sort_spec.t
 t/513-matcher.t
-t/514-and_scorer.t
+t/514-and_matcher.t
 t/515-range_query.t
 t/518-or_scorer.t
 t/519-req_opt_scorer.t

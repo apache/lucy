@@ -19,32 +19,32 @@ parcel Lucy;
 /** Intersect multiple required Matchers.
  */
 
-class Lucy::Search::ANDScorer inherits Lucy::Search::PolyMatcher {
+class Lucy::Search::ANDMatcher inherits Lucy::Search::PolyMatcher {
 
     Matcher     **kids;
     bool_t        more;
     bool_t        first_time;
 
-    inert incremented ANDScorer* 
+    inert incremented ANDMatcher* 
     new(VArray *children, Similarity *sim);
 
-    inert ANDScorer* 
-    init(ANDScorer *self, VArray *children, Similarity *similarity);
+    inert ANDMatcher* 
+    init(ANDMatcher *self, VArray *children, Similarity *similarity);
 
     public void
-    Destroy(ANDScorer *self);
+    Destroy(ANDMatcher *self);
 
     public int32_t
-    Next(ANDScorer *self);
+    Next(ANDMatcher *self);
 
     public int32_t
-    Advance(ANDScorer *self, int32_t target);
+    Advance(ANDMatcher *self, int32_t target);
 
     public float
-    Score(ANDScorer *self);
+    Score(ANDMatcher *self);
 
     public int32_t 
-    Get_Doc_ID(ANDScorer *self);
+    Get_Doc_ID(ANDMatcher *self);
 }
 
 

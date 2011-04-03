@@ -52,10 +52,10 @@ is( $parser->chy_integer_specifier($_), $_, "Charmony integer specifier $_" )
     for qw( bool_t );
 
 is( $parser->object_type_specifier($_), $_, "object_type_specifier $_" )
-    for qw( ByteBuf Obj ANDScorer );
+    for qw( ByteBuf Obj ANDMatcher );
 
 is( $parser->type_specifier($_), $_, "type_specifier $_" )
-    for qw( uint32_t char int short long float double void ANDScorer );
+    for qw( uint32_t char int short long float double void ANDMatcher );
 
 is( $parser->type_qualifier($_), $_, "type_qualifier $_" ) for qw( const );
 

@@ -44,14 +44,14 @@ sub check_scorer {
             scores  => [ (0) x scalar @$_ ],
             )
     } @doc_id_arrays;
-    my $and_scorer = Lucy::Search::ANDScorer->new(
+    my $and_matcher = Lucy::Search::ANDMatcher->new(
         children   => \@children,
         similarity => $sim,
     );
     my @expected = intersect(@doc_id_arrays);
     my $collector
         = Lucy::Search::Collector::SortCollector->new( wanted => 1000 );
-    $and_scorer->collect( collector => $collector );
+    $and_matcher->collect( collector => $collector );
     is( $collector->get_total_hits,
         scalar @expected,
         "correct num hits @intervals"

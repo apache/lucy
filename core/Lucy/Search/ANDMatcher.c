@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-#define C_LUCY_ANDSCORER
+#define C_LUCY_ANDMATCHER
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Search/ANDScorer.h"
+#include "Lucy/Search/ANDMatcher.h"
 #include "Lucy/Index/Similarity.h"
 
-ANDScorer*
-ANDScorer_new(VArray *children, Similarity *sim) 
+ANDMatcher*
+ANDMatcher_new(VArray *children, Similarity *sim) 
 {
-    ANDScorer *self = (ANDScorer*)VTable_Make_Obj(ANDSCORER);
-    return ANDScorer_init(self, children, sim);
+    ANDMatcher *self = (ANDMatcher*)VTable_Make_Obj(ANDMATCHER);
+    return ANDMatcher_init(self, children, sim);
 }
 
-ANDScorer*
-ANDScorer_init(ANDScorer *self, VArray *children, Similarity *sim) 
+ANDMatcher*
+ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) 
 {
     uint32_t i;
 
@@ -52,21 +52,21 @@ ANDScorer_init(ANDScorer *self, VArray *children, Similarity *sim)
 }
 
 void
-ANDScorer_destroy(ANDScorer *self) 
+ANDMatcher_destroy(ANDMatcher *self) 
 {
     FREEMEM(self->kids);
-    SUPER_DESTROY(self, ANDSCORER);
+    SUPER_DESTROY(self, ANDMATCHER);
 }
 
 int32_t
-ANDScorer_next(ANDScorer *self)
+ANDMatcher_next(ANDMatcher *self)
 {
     if (self->first_time) {
-        return ANDScorer_Advance(self, 1);
+        return ANDMatcher_Advance(self, 1);
     }
     if (self->more) {
         const int32_t target = Matcher_Get_Doc_ID(self->kids[0]) + 1;
-        return ANDScorer_Advance(self, target);
+        return ANDMatcher_Advance(self, target);
     }
     else {
         return 0;
@@ -74,7 +74,7 @@ ANDScorer_next(ANDScorer *self)
 }
 
 int32_t
-ANDScorer_advance(ANDScorer *self, int32_t target)
+ANDMatcher_advance(ANDMatcher *self, int32_t target)
 {
     Matcher **const kids = self->kids;
     const uint32_t  num_kids   = self->num_kids;
@@ -143,13 +143,13 @@ ANDScorer_advance(ANDScorer *self, int32_t target)
 }
 
 int32_t
-ANDScorer_get_doc_id(ANDScorer *self)
+ANDMatcher_get_doc_id(ANDMatcher *self)
 {
     return Matcher_Get_Doc_ID(self->kids[0]);
 }
 
 float
-ANDScorer_score(ANDScorer *self)
+ANDMatcher_score(ANDMatcher *self)
 {
     uint32_t i;
     Matcher **const kids = self->kids;

@@ -23,7 +23,7 @@
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Plan/Schema.h"
-#include "Lucy/Search/ANDScorer.h"
+#include "Lucy/Search/ANDMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/Span.h"
 #include "Lucy/Store/InStream.h"
@@ -131,7 +131,7 @@ ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
         }
 
         { 
-            Matcher *retval = (Matcher*)ANDScorer_new(child_matchers, 
+            Matcher *retval = (Matcher*)ANDMatcher_new(child_matchers, 
                 ANDCompiler_Get_Similarity(self));
             DECREF(child_matchers);
             return retval;

@@ -62,11 +62,11 @@ $frozen = freeze($and_compiler);
 $thawed = thaw($frozen);
 ok( $thawed->equals($and_compiler), "freeze/thaw compiler" );
 
-my $and_scorer = $and_compiler->make_matcher(
+my $and_matcher = $and_compiler->make_matcher(
     reader     => $reader,
     need_score => 0,
 );
-isa_ok( $and_scorer, "Lucy::Search::ANDScorer", "make_matcher" );
+isa_ok( $and_matcher, "Lucy::Search::ANDMatcher", "make_matcher" );
 
 my $term_matcher = $one_child->make_compiler( searcher => $searcher )
     ->make_matcher( reader => $reader, need_score => 0 );
