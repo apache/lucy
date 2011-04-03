@@ -136,9 +136,11 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
     public void
     Normalize(Compiler *self);
     
-    /** Return an array of Span objects, indicating where in the given
-     * field the text that matches the parent query occurs.  In this case,
-     * the span's offset and length are measured in Unicode code points.
+    /** Return an array of Span objects, indicating where in the given field
+     * the text that matches the parent Query occurs and how well each snippet
+     * matches.  The Span's offset and length are measured in Unicode code
+     * points.  
+     *
      * The default implementation returns an empty array.       
      * 
      * @param searcher A Searcher.

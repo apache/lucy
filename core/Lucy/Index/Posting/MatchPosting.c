@@ -15,7 +15,7 @@
  */
 
 #define C_LUCY_MATCHPOSTING
-#define C_LUCY_MATCHPOSTINGSCORER
+#define C_LUCY_MATCHPOSTINGMATCHER
 #define C_LUCY_MATCHPOSTINGWRITER
 #define C_LUCY_MATCHTERMINFOSTEPPER
 #define C_LUCY_RAWPOSTING
@@ -138,30 +138,30 @@ MatchPost_add_inversion_to_pool(MatchPosting *self, PostingPool *post_pool,
     }
 }
 
-MatchPostingScorer*
+MatchPostingMatcher*
 MatchPost_make_matcher(MatchPosting *self, Similarity *sim, 
                        PostingList *plist, Compiler *compiler,
                        bool_t need_score)
 {
-    MatchPostingScorer *matcher 
-        = (MatchPostingScorer*)VTable_Make_Obj(MATCHPOSTINGSCORER);
+    MatchPostingMatcher *matcher 
+        = (MatchPostingMatcher*)VTable_Make_Obj(MATCHPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
-    return MatchPostScorer_init(matcher, sim, plist, compiler);
+    return MatchPostMatcher_init(matcher, sim, plist, compiler);
 }
 
 /***************************************************************************/
 
-MatchPostingScorer*
-MatchPostScorer_init(MatchPostingScorer *self, Similarity *sim,
-                     PostingList *plist, Compiler *compiler)
+MatchPostingMatcher*
+MatchPostMatcher_init(MatchPostingMatcher *self, Similarity *sim,
+                      PostingList *plist, Compiler *compiler)
 {
-    TermScorer_init((TermScorer*)self, sim, plist, compiler);
+    TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
     return self;
 }
 
 float
-MatchPostScorer_score(MatchPostingScorer* self) 
+MatchPostMatcher_score(MatchPostingMatcher* self) 
 {
     return self->weight;
 }

@@ -71,7 +71,7 @@ for my $conjunction (qw( AND OR )) {
         ->make_matcher( reader => $reader, need_score => 0 );
     isa_ok(
         $term_matcher,
-        "Lucy::Search::TermScorer",
+        "Lucy::Search::TermMatcher",
         "make_matcher compiles to child's scorer if there's only one child"
     );
 

@@ -68,12 +68,12 @@ my $and_scorer = $and_compiler->make_matcher(
 );
 isa_ok( $and_scorer, "Lucy::Search::ANDScorer", "make_matcher" );
 
-my $term_scorer = $one_child->make_compiler( searcher => $searcher )
+my $term_matcher = $one_child->make_compiler( searcher => $searcher )
     ->make_matcher( reader => $reader, need_score => 0 );
 isa_ok(
-    $term_scorer,
-    "Lucy::Search::TermScorer",
-    "make_matcher compiles to child's scorer if there's only one child"
+    $term_matcher,
+    "Lucy::Search::TermMatcher",
+    "make_matcher compiles to child's Matcher if there's only one child"
 );
 
 my $hopeless_query = Lucy::Search::TermQuery->new(
@@ -84,5 +84,5 @@ $and_query->add_child($hopeless_query);
 my $nope = $and_query->make_compiler( searcher => $searcher )
     ->make_matcher( reader => $reader, need_score => 0 );
 ok( !defined $nope,
-    "If scorer wouldn't return any docs, make_matcher returns undef" );
+    "If matcher wouldn't return any docs, make_matcher returns undef" );
 

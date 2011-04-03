@@ -55,16 +55,16 @@ class Lucy::Index::Posting::RichPosting cnick RichPost
                           int32_t doc_id, float doc_boost, 
                           float length_norm);
 
-    incremented RichPostingScorer*
+    incremented RichPostingMatcher*
     Make_Matcher(RichPosting *self, Similarity *sim, PostingList *plist, 
                  Compiler *compiler, bool_t need_score);
 }
 
-class Lucy::Index::Posting::RichPostingScorer cnick RichPostScorer
-    inherits Lucy::Index::Posting::ScorePostingScorer {
+class Lucy::Index::Posting::RichPostingMatcher cnick RichPostMatcher
+    inherits Lucy::Index::Posting::ScorePostingMatcher {
 
-    inert RichPostingScorer*
-    init(RichPostingScorer *self, Similarity *similarity, 
+    inert RichPostingMatcher*
+    init(RichPostingMatcher *self, Similarity *similarity, 
          PostingList *posting_list, Compiler *compiler);
 }
 

@@ -29,7 +29,7 @@
 #include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/Span.h"
-#include "Lucy/Search/TermScorer.h"
+#include "Lucy/Search/TermMatcher.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"

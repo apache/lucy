@@ -15,7 +15,7 @@
  */
 
 #define C_LUCY_RICHPOSTING
-#define C_LUCY_RICHPOSTINGSCORER
+#define C_LUCY_RICHPOSTINGMATCHER
 #define C_LUCY_RAWPOSTING
 #define C_LUCY_TOKEN
 #include "Lucy/Util/ToolSet.h"
@@ -190,24 +190,24 @@ RichPost_read_raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
     return raw_posting;
 }
 
-RichPostingScorer*
+RichPostingMatcher*
 RichPost_make_matcher(RichPosting *self, Similarity *sim, 
                       PostingList *plist, Compiler *compiler,
                       bool_t need_score)
 {
-    RichPostingScorer* matcher
-        = (RichPostingScorer*)VTable_Make_Obj(RICHPOSTINGSCORER);
+    RichPostingMatcher* matcher
+        = (RichPostingMatcher*)VTable_Make_Obj(RICHPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
-    return RichPostScorer_init(matcher, sim, plist, compiler);
+    return RichPostMatcher_init(matcher, sim, plist, compiler);
 }
 
-RichPostingScorer*
-RichPostScorer_init(RichPostingScorer *self, Similarity *sim, 
-                    PostingList *plist, Compiler *compiler)
+RichPostingMatcher*
+RichPostMatcher_init(RichPostingMatcher *self, Similarity *sim, 
+                     PostingList *plist, Compiler *compiler)
 {
-    return (RichPostingScorer*)ScorePostScorer_init(
-        (ScorePostingScorer*)self, sim, plist, compiler);
+    return (RichPostingMatcher*)ScorePostMatcher_init(
+        (ScorePostingMatcher*)self, sim, plist, compiler);
 }
 
 

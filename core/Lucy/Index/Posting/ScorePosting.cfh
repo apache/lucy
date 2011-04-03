@@ -55,7 +55,7 @@ class Lucy::Index::Posting::ScorePosting cnick ScorePost
     public void
     Reset(ScorePosting *self);
 
-    incremented ScorePostingScorer*
+    incremented ScorePostingMatcher*
     Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist, 
                  Compiler *compiler, bool_t need_score);
 
@@ -63,20 +63,20 @@ class Lucy::Index::Posting::ScorePosting cnick ScorePost
     Get_Prox(ScorePosting *self);
 }
 
-class Lucy::Index::Posting::ScorePostingScorer cnick ScorePostScorer
-    inherits Lucy::Search::TermScorer {
+class Lucy::Index::Posting::ScorePostingMatcher cnick ScorePostMatcher
+    inherits Lucy::Search::TermMatcher {
 
     float *score_cache;
 
-    inert ScorePostingScorer*
-    init(ScorePostingScorer *self, Similarity *sim, PostingList *plist, 
+    inert ScorePostingMatcher*
+    init(ScorePostingMatcher *self, Similarity *sim, PostingList *plist, 
          Compiler *compiler);
 
     public float
-    Score(ScorePostingScorer* self);
+    Score(ScorePostingMatcher* self);
 
     public void
-    Destroy(ScorePostingScorer *self);
+    Destroy(ScorePostingMatcher *self);
 }
 
 

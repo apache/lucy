@@ -57,20 +57,20 @@ class Lucy::Index::Posting::MatchPosting cnick MatchPost
     public void
     Reset(MatchPosting *self);
 
-    incremented MatchPostingScorer*
+    incremented MatchPostingMatcher*
     Make_Matcher(MatchPosting *self, Similarity *sim, PostingList *plist, 
                  Compiler *compiler, bool_t need_score);
 }
 
-class Lucy::Index::Posting::MatchPostingScorer cnick MatchPostScorer
-    inherits Lucy::Search::TermScorer {
+class Lucy::Index::Posting::MatchPostingMatcher cnick MatchPostMatcher
+    inherits Lucy::Search::TermMatcher {
 
-    inert MatchPostingScorer*
-    init(MatchPostingScorer *self, Similarity *similarity, 
+    inert MatchPostingMatcher*
+    init(MatchPostingMatcher *self, Similarity *similarity, 
          PostingList *posting_list, Compiler *compiler);
 
     public float
-    Score(MatchPostingScorer *self);
+    Score(MatchPostingMatcher *self);
 }
 
 class Lucy::Index::Posting::MatchPostingWriter cnick MatchPostWriter

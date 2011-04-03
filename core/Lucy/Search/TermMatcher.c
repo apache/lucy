@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TERMSCORER
+#define C_LUCY_TERMMATCHER
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Search/TermScorer.h"
+#include "Lucy/Search/TermMatcher.h"
 #include "Lucy/Index/Posting.h"
 #include "Lucy/Index/PostingList.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Search/Compiler.h"
 
-TermScorer*
-TermScorer_init(TermScorer *self, Similarity *similarity, PostingList *plist, 
-                Compiler *compiler)
+TermMatcher*
+TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist, 
+                 Compiler *compiler)
 {
     Matcher_init((Matcher*)self);
 
@@ -42,16 +42,16 @@ TermScorer_init(TermScorer *self, Similarity *similarity, PostingList *plist,
 }
 
 void
-TermScorer_destroy(TermScorer *self) 
+TermMatcher_destroy(TermMatcher *self) 
 {
     DECREF(self->sim);
     DECREF(self->plist);
     DECREF(self->compiler);
-    SUPER_DESTROY(self, TERMSCORER);
+    SUPER_DESTROY(self, TERMMATCHER);
 }
 
 int32_t
-TermScorer_next(TermScorer* self) 
+TermMatcher_next(TermMatcher* self) 
 {
     PostingList *const plist = self->plist;
     if (plist) {
@@ -71,7 +71,7 @@ TermScorer_next(TermScorer* self)
 }
 
 int32_t
-TermScorer_advance(TermScorer *self, int32_t target)
+TermMatcher_advance(TermMatcher *self, int32_t target)
 {
     PostingList *const plist = self->plist;
     if (plist) {
@@ -91,7 +91,7 @@ TermScorer_advance(TermScorer *self, int32_t target)
 }
 
 int32_t 
-TermScorer_get_doc_id(TermScorer* self) 
+TermMatcher_get_doc_id(TermMatcher* self) 
 {
     return Post_Get_Doc_ID(self->posting);
 }

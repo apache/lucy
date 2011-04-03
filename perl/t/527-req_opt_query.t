@@ -59,7 +59,7 @@ $matcher = $req_opt_query->make_compiler( searcher => $searcher )
     ->make_matcher( reader => $reader, need_score => 0 );
 isa_ok(
     $matcher,
-    'Lucy::Search::TermScorer',
+    'Lucy::Search::TermMatcher',
     "return required matcher only when opt matcher doesn't match"
 );
 

@@ -17,12 +17,12 @@
 parcel Lucy;
 
 /** 
- * Base class for TermScorers.
+ * Base class for TermMatchers.
  *
  * Each subclass of Posting is associated with a corresponding subclass of
- * TermScorer.
+ * TermMatcher.
  */
-class Lucy::Search::TermScorer inherits Lucy::Search::Matcher {
+class Lucy::Search::TermMatcher inherits Lucy::Search::Matcher {
 
     float           weight;
     Compiler       *compiler;
@@ -30,27 +30,27 @@ class Lucy::Search::TermScorer inherits Lucy::Search::Matcher {
     PostingList    *plist;
     Posting        *posting;
 
-    inert TermScorer*
-    init(TermScorer *self, Similarity *similarity, PostingList *posting_list,
+    inert TermMatcher*
+    init(TermMatcher *self, Similarity *similarity, PostingList *posting_list,
          Compiler *compiler);
 
     public void
-    Destroy(TermScorer *self);
+    Destroy(TermMatcher *self);
 
     public int32_t
-    Next(TermScorer* self);
+    Next(TermMatcher* self);
 
     public int32_t
-    Advance(TermScorer* self, int32_t target);
+    Advance(TermMatcher* self, int32_t target);
 
     public int32_t 
-    Get_Doc_ID(TermScorer* self);
+    Get_Doc_ID(TermMatcher* self);
 }
 
 __C__
-#define LUCY_TERMSCORER_SCORE_CACHE_SIZE 32
+#define LUCY_TERMMATCHER_SCORE_CACHE_SIZE 32
 #ifdef LUCY_USE_SHORT_NAMES
-  #define TERMSCORER_SCORE_CACHE_SIZE LUCY_TERMSCORER_SCORE_CACHE_SIZE
+  #define TERMMATCHER_SCORE_CACHE_SIZE LUCY_TERMMATCHER_SCORE_CACHE_SIZE
 #endif
 __END_C__
 

@@ -15,7 +15,7 @@
  */
 
 #define C_LUCY_SCOREPOSTING
-#define C_LUCY_SCOREPOSTINGSCORER
+#define C_LUCY_SCOREPOSTINGMATCHER
 #define C_LUCY_RAWPOSTING
 #define C_LUCY_TOKEN
 #include "Lucy/Util/ToolSet.h"
@@ -206,30 +206,30 @@ ScorePost_read_raw(ScorePosting *self, InStream *instream,
     return raw_posting;
 }
 
-ScorePostingScorer*
+ScorePostingMatcher*
 ScorePost_make_matcher(ScorePosting *self, Similarity *sim, 
                        PostingList *plist, Compiler *compiler,
                        bool_t need_score)
 {
-    ScorePostingScorer *matcher
-        = (ScorePostingScorer*)VTable_Make_Obj(SCOREPOSTINGSCORER);
+    ScorePostingMatcher *matcher
+        = (ScorePostingMatcher*)VTable_Make_Obj(SCOREPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
-    return ScorePostScorer_init(matcher, sim, plist, compiler);
+    return ScorePostMatcher_init(matcher, sim, plist, compiler);
 }
 
-ScorePostingScorer*
-ScorePostScorer_init(ScorePostingScorer *self, Similarity *sim, 
-                     PostingList *plist, Compiler *compiler)
+ScorePostingMatcher*
+ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim, 
+                      PostingList *plist, Compiler *compiler)
 {
     uint32_t i;
 
     // Init. 
-    TermScorer_init((TermScorer*)self, sim, plist, compiler);
+    TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
 
     // Fill score cache. 
-    self->score_cache = (float*)MALLOCATE(TERMSCORER_SCORE_CACHE_SIZE * sizeof(float));
-    for (i = 0; i < TERMSCORER_SCORE_CACHE_SIZE; i++) {
+    self->score_cache = (float*)MALLOCATE(TERMMATCHER_SCORE_CACHE_SIZE * sizeof(float));
+    for (i = 0; i < TERMMATCHER_SCORE_CACHE_SIZE; i++) {
         self->score_cache[i] = Sim_TF(sim, (float)i) * self->weight;
     }
 
@@ -237,13 +237,13 @@ ScorePostScorer_init(ScorePostingScorer *self, Similarity *sim,
 }   
 
 float
-ScorePostScorer_score(ScorePostingScorer* self) 
+ScorePostMatcher_score(ScorePostingMatcher* self) 
 {
     ScorePosting *const posting = (ScorePosting*)self->posting;
     const uint32_t freq = posting->freq;
     
     // Calculate initial score based on frequency of term. 
-    float score = (freq < TERMSCORER_SCORE_CACHE_SIZE) 
+    float score = (freq < TERMMATCHER_SCORE_CACHE_SIZE) 
         ? self->score_cache[freq] // cache hit 
         : Sim_TF(self->sim, (float)freq) * self->weight;
 
@@ -254,10 +254,10 @@ ScorePostScorer_score(ScorePostingScorer* self)
 }
 
 void
-ScorePostScorer_destroy(ScorePostingScorer *self)
+ScorePostMatcher_destroy(ScorePostingMatcher *self)
 {
     FREEMEM(self->score_cache);
-    SUPER_DESTROY(self, SCOREPOSTINGSCORER);
+    SUPER_DESTROY(self, SCOREPOSTINGMATCHER);
 }
 
 
