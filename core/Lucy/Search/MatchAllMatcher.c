@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-#define C_LUCY_MATCHALLSCORER
+#define C_LUCY_MATCHALLMATCHER
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Search/MatchAllScorer.h"
+#include "Lucy/Search/MatchAllMatcher.h"
 
-MatchAllScorer*
-MatchAllScorer_new(float score, int32_t doc_max)
+MatchAllMatcher*
+MatchAllMatcher_new(float score, int32_t doc_max)
 {
-    MatchAllScorer *self 
-        = (MatchAllScorer*)VTable_Make_Obj(MATCHALLSCORER);
-    return MatchAllScorer_init(self, score, doc_max);
+    MatchAllMatcher *self 
+        = (MatchAllMatcher*)VTable_Make_Obj(MATCHALLMATCHER);
+    return MatchAllMatcher_init(self, score, doc_max);
 }
 
-MatchAllScorer*
-MatchAllScorer_init(MatchAllScorer *self, float score, int32_t doc_max)
+MatchAllMatcher*
+MatchAllMatcher_init(MatchAllMatcher *self, float score, int32_t doc_max)
 {
     Matcher_init((Matcher*)self);
     self->doc_id        = 0;
@@ -38,7 +38,7 @@ MatchAllScorer_init(MatchAllScorer *self, float score, int32_t doc_max)
 }
 
 int32_t
-MatchAllScorer_next(MatchAllScorer* self) 
+MatchAllMatcher_next(MatchAllMatcher* self) 
 {
     if (++self->doc_id <= self->doc_max) {
         return self->doc_id;
@@ -50,20 +50,20 @@ MatchAllScorer_next(MatchAllScorer* self)
 }
 
 int32_t
-MatchAllScorer_advance(MatchAllScorer* self, int32_t target) 
+MatchAllMatcher_advance(MatchAllMatcher* self, int32_t target) 
 {
     self->doc_id = target - 1;
-    return MatchAllScorer_next(self);
+    return MatchAllMatcher_next(self);
 }
 
 float
-MatchAllScorer_score(MatchAllScorer* self) 
+MatchAllMatcher_score(MatchAllMatcher* self) 
 {
     return self->score;
 }
 
 int32_t 
-MatchAllScorer_get_doc_id(MatchAllScorer* self) 
+MatchAllMatcher_get_doc_id(MatchAllMatcher* self) 
 {
     return self->doc_id;
 }

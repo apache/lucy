@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Search::MatchAllScorer inherits Lucy::Search::Matcher {
+class Lucy::Search::MatchAllMatcher inherits Lucy::Search::Matcher {
 
     int32_t        doc_id;
     int32_t        doc_max;
@@ -26,23 +26,23 @@ class Lucy::Search::MatchAllScorer inherits Lucy::Search::Matcher {
      * @param score Fixed score to be added to each matching document's score.
      * @param reader An IndexReader.
      */
-    inert incremented MatchAllScorer*
+    inert incremented MatchAllMatcher*
     new(float score, int32_t doc_max);
 
-    inert MatchAllScorer*
-    init(MatchAllScorer *self, float score, int32_t doc_max);
+    inert MatchAllMatcher*
+    init(MatchAllMatcher *self, float score, int32_t doc_max);
 
     public int32_t
-    Next(MatchAllScorer* self);
+    Next(MatchAllMatcher* self);
 
     public int32_t
-    Advance(MatchAllScorer* self, int32_t target);
+    Advance(MatchAllMatcher* self, int32_t target);
 
     public float
-    Score(MatchAllScorer* self);
+    Score(MatchAllMatcher* self);
 
     public int32_t 
-    Get_Doc_ID(MatchAllScorer* self);
+    Get_Doc_ID(MatchAllMatcher* self);
 }
 
 

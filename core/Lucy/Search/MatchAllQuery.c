@@ -23,7 +23,7 @@
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
-#include "Lucy/Search/MatchAllScorer.h"
+#include "Lucy/Search/MatchAllMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
@@ -99,7 +99,7 @@ MatchAllCompiler_make_matcher(MatchAllCompiler *self, SegReader *reader,
 {
     float weight = MatchAllCompiler_Get_Weight(self);
     UNUSED_VAR(need_score);
-    return (Matcher*)MatchAllScorer_new(weight, SegReader_Doc_Max(reader));
+    return (Matcher*)MatchAllMatcher_new(weight, SegReader_Doc_Max(reader));
 }
 
 

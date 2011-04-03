@@ -21,7 +21,7 @@
 #include "Lucy/Search/NOTQuery.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/SegReader.h"
-#include "Lucy/Search/MatchAllScorer.h"
+#include "Lucy/Search/MatchAllMatcher.h"
 #include "Lucy/Search/NOTMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
@@ -128,9 +128,9 @@ NOTCompiler_make_matcher(NOTCompiler *self, SegReader *reader,
     if (negated_matcher == NULL) {
         float weight = NOTCompiler_Get_Weight(self);
         int32_t doc_max = SegReader_Doc_Max(reader);
-        return (Matcher*)MatchAllScorer_new(weight, doc_max);
+        return (Matcher*)MatchAllMatcher_new(weight, doc_max);
     }
-    else if (Obj_Is_A((Obj*)negated_matcher, MATCHALLSCORER)) {
+    else if (Obj_Is_A((Obj*)negated_matcher, MATCHALLMATCHER)) {
         DECREF(negated_matcher);
         return NULL;
     }
