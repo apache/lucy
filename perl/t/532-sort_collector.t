@@ -19,7 +19,7 @@ use warnings;
 use Test::More tests => 32;
 use Lucy::Test;
 use List::Util qw( shuffle );
-use LucyX::Search::MockScorer;
+use LucyX::Search::MockMatcher;
 
 my $schema = Lucy::Plan::Schema->new;
 my $type = Lucy::Plan::StringType->new( sortable => 1 );
@@ -90,7 +90,7 @@ my @doc_ids = map { $_->[0] } @docs_and_scores;
 my @scores  = map { $_->[1] } @docs_and_scores;
 
 for my $size ( 0 .. @doc_ids ) {
-    my $matcher = LucyX::Search::MockScorer->new(
+    my $matcher = LucyX::Search::MockMatcher->new(
         doc_ids => \@doc_ids,
         scores  => \@scores,
     );

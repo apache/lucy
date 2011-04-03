@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More tests => 61;
 use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( create_index );
-use LucyX::Search::MockScorer;
+use LucyX::Search::MockMatcher;
 
 my @got;
 
@@ -76,7 +76,7 @@ for my $num_negated ( 1 .. 26 ) {
         push @mock_ids, splice( @source_ids, $tick, 1 );
     }
     @mock_ids = sort { $a <=> $b } @mock_ids;
-    my $mock_scorer = LucyX::Search::MockScorer->new(
+    my $mock_scorer = LucyX::Search::MockMatcher->new(
         doc_ids => \@mock_ids,
         scores  => [ (1) x scalar @mock_ids ],
     );

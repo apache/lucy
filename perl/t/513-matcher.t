@@ -24,7 +24,7 @@ package main;
 
 use Test::More tests => 22;
 
-use LucyX::Search::MockScorer;
+use LucyX::Search::MockMatcher;
 use Lucy::Test;
 
 my $matcher = MyMatcher->new;
@@ -101,7 +101,7 @@ sub test_search {
     my $dels = delete $args{dels} || [];
     my $del_enum;
 
-    my $matcher = LucyX::Search::MockScorer->new(
+    my $matcher = LucyX::Search::MockMatcher->new(
         doc_ids => $docs,
         scores  => [ (0) x scalar @$docs ],
     );

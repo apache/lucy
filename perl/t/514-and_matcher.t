@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 1362;
 use Lucy::Test;
-use LucyX::Search::MockScorer;
+use LucyX::Search::MockMatcher;
 use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
 my $sim = Lucy::Index::Similarity->new;
@@ -39,7 +39,7 @@ sub check_scorer {
     my @intervals     = @_;
     my @doc_id_arrays = map { modulo_set( $_, 100 ) } @intervals;
     my @children      = map {
-        LucyX::Search::MockScorer->new(
+        LucyX::Search::MockMatcher->new(
             doc_ids => $_,
             scores  => [ (0) x scalar @$_ ],
             )

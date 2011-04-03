@@ -159,7 +159,7 @@ lib/LucyX/Index/ZlibDocWriter.pm
 lib/LucyX/Remote/SearchClient.pm
 lib/LucyX/Remote/SearchServer.pm
 lib/LucyX/Search/Filter.pm
-lib/LucyX/Search/MockScorer.pm
+lib/LucyX/Search/MockMatcher.pm
 lib/LucyX/Search/ProximityQuery.pm
 lib/LucyX/Simple.pm
 MANIFEST			This list of files

@@ -17,8 +17,7 @@ use strict;
 use warnings;
 use Lucy;
 
-package LucyX::Search::MockScorer;
-BEGIN { our @ISA = qw( LucyX::Search::MockMatcher ) }
+package LucyX::Search::MockMatcher;
 
 sub new {
     my ( $either, %args ) = @_;
@@ -55,15 +54,15 @@ __POD__
 
 =head1 NAME
 
-LucyX::Search::MockScorer - Matcher with arbitrary docs and scores.
+LucyX::Search::MockMatcher - Matcher with arbitrary docs and scores.
 
 =head1 DESCRIPTION 
 
 Used for testing combining L<Matchers|Lucy::Search::Matcher> such as
-ANDMatcher, MockScorer allows arbitrary match criteria to be supplied,
+ANDMatcher, MockMatcher allows arbitrary match criteria to be supplied,
 obviating the need for clever index construction to cover corner cases.
 
-MockScorer is a testing and demonstration class; it is unsupported.
+MockMatcher is a testing and demonstration class; it is unsupported.
 
 =head1 CONSTRUCTORS
 
