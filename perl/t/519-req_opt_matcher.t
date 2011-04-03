@@ -43,14 +43,14 @@ sub check_scorer {
         doc_ids => $opt_docs,
         scores  => [ (1) x scalar @$opt_docs ],
     );
-    my $req_opt_scorer = Lucy::Search::RequiredOptionalScorer->new(
+    my $req_opt_matcher = Lucy::Search::RequiredOptionalMatcher->new(
         similarity       => $sim,
         required_matcher => $req_mock,
         optional_matcher => $opt_mock,
     );
     my $collector
         = Lucy::Search::Collector::SortCollector->new( wanted => 1000 );
-    $req_opt_scorer->collect( collector => $collector );
+    $req_opt_matcher->collect( collector => $collector );
     my ( $got_by_score, $got_by_id ) = doc_ids_from_td_coll($collector);
     my ( $expected_by_count, $expected_by_id )
         = calc_result_sets( $req_interval, $opt_interval );

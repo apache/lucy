@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-#define C_LUCY_REQUIREDOPTIONALSCORER
+#define C_LUCY_REQUIREDOPTIONALMATCHER
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Search/RequiredOptionalScorer.h"
+#include "Lucy/Search/RequiredOptionalMatcher.h"
 #include "Lucy/Index/Similarity.h"
 
-RequiredOptionalScorer*
-ReqOptScorer_new(Similarity *similarity, Matcher *required_matcher, 
-                 Matcher *optional_matcher) 
+RequiredOptionalMatcher*
+ReqOptMatcher_new(Similarity *similarity, Matcher *required_matcher, 
+                  Matcher *optional_matcher) 
 {
-    RequiredOptionalScorer *self 
-        = (RequiredOptionalScorer*)VTable_Make_Obj(REQUIREDOPTIONALSCORER);
-    return ReqOptScorer_init(self, similarity, required_matcher, 
+    RequiredOptionalMatcher *self 
+        = (RequiredOptionalMatcher*)VTable_Make_Obj(REQUIREDOPTIONALMATCHER);
+    return ReqOptMatcher_init(self, similarity, required_matcher, 
         optional_matcher);
 }
 
-RequiredOptionalScorer*
-ReqOptScorer_init(RequiredOptionalScorer *self, Similarity *similarity, 
-                  Matcher *required_matcher, Matcher *optional_matcher) 
+RequiredOptionalMatcher*
+ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity, 
+                   Matcher *required_matcher, Matcher *optional_matcher) 
 {
     VArray *children = VA_new(2);
     VA_Push(children, INCREF(required_matcher));
@@ -51,33 +51,33 @@ ReqOptScorer_init(RequiredOptionalScorer *self, Similarity *similarity,
 }
 
 void
-ReqOptScorer_destroy(RequiredOptionalScorer *self) 
+ReqOptMatcher_destroy(RequiredOptionalMatcher *self) 
 {
     DECREF(self->req_matcher);
     DECREF(self->opt_matcher);
-    SUPER_DESTROY(self, REQUIREDOPTIONALSCORER);
+    SUPER_DESTROY(self, REQUIREDOPTIONALMATCHER);
 }
 
 int32_t
-ReqOptScorer_next(RequiredOptionalScorer *self)
+ReqOptMatcher_next(RequiredOptionalMatcher *self)
 {
     return Matcher_Next(self->req_matcher);
 }
 
 int32_t
-ReqOptScorer_advance(RequiredOptionalScorer *self, int32_t target)
+ReqOptMatcher_advance(RequiredOptionalMatcher *self, int32_t target)
 {
     return Matcher_Advance(self->req_matcher, target);
 }
 
 int32_t
-ReqOptScorer_get_doc_id(RequiredOptionalScorer *self)
+ReqOptMatcher_get_doc_id(RequiredOptionalMatcher *self)
 {
     return Matcher_Get_Doc_ID(self->req_matcher);
 }
 
 float
-ReqOptScorer_score(RequiredOptionalScorer *self)
+ReqOptMatcher_score(RequiredOptionalMatcher *self)
 {
     int32_t const current_doc = Matcher_Get_Doc_ID(self->req_matcher);
 

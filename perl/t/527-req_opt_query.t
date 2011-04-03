@@ -49,7 +49,7 @@ my $frozen   = freeze($compiler);
 my $thawed   = thaw($frozen);
 ok( $thawed->equals($compiler), "freeze/thaw compiler" );
 my $matcher = $compiler->make_matcher( reader => $reader, need_score => 1 );
-isa_ok( $matcher, 'Lucy::Search::RequiredOptionalScorer' );
+isa_ok( $matcher, 'Lucy::Search::RequiredOptionalMatcher' );
 
 $req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
     required_query => $b_query,

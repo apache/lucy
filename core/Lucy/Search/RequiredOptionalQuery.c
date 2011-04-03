@@ -22,7 +22,7 @@
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Plan/Schema.h"
-#include "Lucy/Search/RequiredOptionalScorer.h"
+#include "Lucy/Search/RequiredOptionalMatcher.h"
 #include "Lucy/Search/Searcher.h"
 
 RequiredOptionalQuery*
@@ -140,7 +140,7 @@ ReqOptCompiler_make_matcher(RequiredOptionalCompiler *self, SegReader *reader,
     }
     else {
         Matcher *retval 
-            = (Matcher*)ReqOptScorer_new(sim, req_matcher, opt_matcher);
+            = (Matcher*)ReqOptMatcher_new(sim, req_matcher, opt_matcher);
         DECREF(opt_matcher);
         DECREF(req_matcher);
         return retval;

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Search::RequiredOptionalScorer;
+package Lucy::Search::RequiredOptionalMatcher;
 use Lucy;
 
 1;
@@ -24,7 +24,7 @@ __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
     parcel            => "Lucy",
-    class_name        => "Lucy::Search::RequiredOptionalScorer",
+    class_name        => "Lucy::Search::RequiredOptionalMatcher",
     bind_constructors => ["new"],
 );
 

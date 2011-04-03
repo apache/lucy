@@ -19,35 +19,35 @@ parcel Lucy;
 /** Intersect required and optional scorers.
  */
 
-class Lucy::Search::RequiredOptionalScorer cnick ReqOptScorer
+class Lucy::Search::RequiredOptionalMatcher cnick ReqOptMatcher
     inherits Lucy::Search::PolyMatcher {
 
     Matcher      *req_matcher;
     Matcher      *opt_matcher;
     bool_t        opt_matcher_first_time;
 
-    inert incremented RequiredOptionalScorer* 
+    inert incremented RequiredOptionalMatcher* 
     new(Similarity *similarity, Matcher *required_matcher, 
         Matcher *optional_matcher);
 
-    inert RequiredOptionalScorer* 
-    init(RequiredOptionalScorer *self, Similarity *similarity, 
+    inert RequiredOptionalMatcher* 
+    init(RequiredOptionalMatcher *self, Similarity *similarity, 
          Matcher *required_matcher, Matcher *optional_matcher);
 
     public void
-    Destroy(RequiredOptionalScorer *self);
+    Destroy(RequiredOptionalMatcher *self);
 
     public int32_t
-    Next(RequiredOptionalScorer *self);
+    Next(RequiredOptionalMatcher *self);
 
     public int32_t
-    Advance(RequiredOptionalScorer *self, int32_t target);
+    Advance(RequiredOptionalMatcher *self, int32_t target);
 
     public float
-    Score(RequiredOptionalScorer *self);
+    Score(RequiredOptionalMatcher *self);
 
     public int32_t 
-    Get_Doc_ID(RequiredOptionalScorer *self);
+    Get_Doc_ID(RequiredOptionalMatcher *self);
 }
 
 

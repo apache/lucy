@@ -122,7 +122,7 @@ lib/Lucy/Search/Query.pm
 lib/Lucy/Search/QueryParser.pm
 lib/Lucy/Search/RangeQuery.pm
 lib/Lucy/Search/RequiredOptionalQuery.pm
-lib/Lucy/Search/RequiredOptionalScorer.pm
+lib/Lucy/Search/RequiredOptionalMatcher.pm
 lib/Lucy/Search/Searcher.pm
 lib/Lucy/Search/SortRule.pm
 lib/Lucy/Search/SortSpec.pm
@@ -291,7 +291,7 @@ t/513-matcher.t
 t/514-and_matcher.t
 t/515-range_query.t
 t/518-or_scorer.t
-t/519-req_opt_scorer.t
+t/519-req_opt_matcher.t
 t/520-match_doc.t
 t/523-and_query.t
 t/524-poly_query.t
