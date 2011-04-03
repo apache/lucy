@@ -111,7 +111,7 @@ lib/Lucy/Search/MatchDoc.pm
 lib/Lucy/Search/Matcher.pm
 lib/Lucy/Search/NoMatchQuery.pm
 lib/Lucy/Search/NOTQuery.pm
-lib/Lucy/Search/NOTScorer.pm
+lib/Lucy/Search/NOTMatcher.pm
 lib/Lucy/Search/ORQuery.pm
 lib/Lucy/Search/ORScorer.pm
 lib/Lucy/Search/PhraseQuery.pm

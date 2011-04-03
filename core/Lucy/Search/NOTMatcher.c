@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-#define C_LUCY_NOTSCORER
+#define C_LUCY_NOTMATCHER
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Search/NOTScorer.h"
+#include "Lucy/Search/NOTMatcher.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Plan/Schema.h"
 
-NOTScorer*
-NOTScorer_new(Matcher *negated_matcher, int32_t doc_max) 
+NOTMatcher*
+NOTMatcher_new(Matcher *negated_matcher, int32_t doc_max) 
 {
-    NOTScorer *self = (NOTScorer*)VTable_Make_Obj(NOTSCORER);
-    return NOTScorer_init(self, negated_matcher, doc_max);
+    NOTMatcher *self = (NOTMatcher*)VTable_Make_Obj(NOTMATCHER);
+    return NOTMatcher_init(self, negated_matcher, doc_max);
 }
 
-NOTScorer*
-NOTScorer_init(NOTScorer *self, Matcher *negated_matcher, int32_t doc_max)
+NOTMatcher*
+NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max)
 {
     VArray *children = VA_new(1);
     VA_Push(children, INCREF(negated_matcher));
@@ -49,14 +49,14 @@ NOTScorer_init(NOTScorer *self, Matcher *negated_matcher, int32_t doc_max)
 }
 
 void
-NOTScorer_destroy(NOTScorer *self) 
+NOTMatcher_destroy(NOTMatcher *self) 
 {
     DECREF(self->negated_matcher);
-    SUPER_DESTROY(self, NOTSCORER);
+    SUPER_DESTROY(self, NOTMATCHER);
 }
 
 int32_t
-NOTScorer_next(NOTScorer *self)
+NOTMatcher_next(NOTMatcher *self)
 {
     while (1) {
         self->doc_id++;
@@ -84,20 +84,20 @@ NOTScorer_next(NOTScorer *self)
 }
 
 int32_t
-NOTScorer_advance(NOTScorer *self, int32_t target)
+NOTMatcher_advance(NOTMatcher *self, int32_t target)
 {
     self->doc_id = target - 1;
-    return NOTScorer_next(self);
+    return NOTMatcher_next(self);
 }
 
 int32_t
-NOTScorer_get_doc_id(NOTScorer *self)
+NOTMatcher_get_doc_id(NOTMatcher *self)
 {
     return self->doc_id;
 }
 
 float
-NOTScorer_score(NOTScorer *self)
+NOTMatcher_score(NOTMatcher *self)
 {
     UNUSED_VAR(self);
     return 0.0f;

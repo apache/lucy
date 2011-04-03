@@ -19,33 +19,33 @@ parcel Lucy;
 /** Return the inverse of a Matcher's set.  Scores are always 0.
  */
 
-class Lucy::Search::NOTScorer inherits Lucy::Search::PolyMatcher {
+class Lucy::Search::NOTMatcher inherits Lucy::Search::PolyMatcher {
 
     Matcher       *negated_matcher; 
     int32_t        doc_id;
     int32_t        doc_max;
     int32_t        next_negation;
 
-    inert incremented NOTScorer* 
+    inert incremented NOTMatcher* 
     new(Matcher* negated_matcher, int32_t doc_max);
 
-    inert NOTScorer* 
-    init(NOTScorer *self, Matcher *negated_matcher, int32_t doc_max);
+    inert NOTMatcher* 
+    init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max);
 
     public void
-    Destroy(NOTScorer *self);
+    Destroy(NOTMatcher *self);
 
     public int32_t
-    Next(NOTScorer *self);
+    Next(NOTMatcher *self);
 
     public int32_t
-    Advance(NOTScorer *self, int32_t target);
+    Advance(NOTMatcher *self, int32_t target);
 
     public float
-    Score(NOTScorer *self);
+    Score(NOTMatcher *self);
 
     public int32_t 
-    Get_Doc_ID(NOTScorer *self);
+    Get_Doc_ID(NOTMatcher *self);
 }
 
 

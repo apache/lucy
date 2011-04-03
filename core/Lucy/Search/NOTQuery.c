@@ -22,7 +22,7 @@
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Search/MatchAllScorer.h"
-#include "Lucy/Search/NOTScorer.h"
+#include "Lucy/Search/NOTMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
@@ -136,7 +136,7 @@ NOTCompiler_make_matcher(NOTCompiler *self, SegReader *reader,
     }
     else {
         int32_t doc_max = SegReader_Doc_Max(reader);
-        Matcher *retval = (Matcher*)NOTScorer_new(negated_matcher, doc_max);
+        Matcher *retval = (Matcher*)NOTMatcher_new(negated_matcher, doc_max);
         DECREF(negated_matcher);
         return retval;
     }

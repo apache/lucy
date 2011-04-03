@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Search::NOTScorer;
+package Lucy::Search::NOTMatcher;
 use Lucy;
 
 1;
@@ -24,7 +24,7 @@ __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
     parcel            => "Lucy",
-    class_name        => "Lucy::Search::NOTScorer",
+    class_name        => "Lucy::Search::NOTMatcher",
     bind_constructors => ["new"],
 );
 
