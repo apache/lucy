@@ -31,7 +31,7 @@
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Plan/Schema.h"
-#include "LucyX/Search/ProximityScorer.h"
+#include "LucyX/Search/ProximityMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/Span.h"
 #include "Lucy/Search/TermQuery.h"
@@ -311,7 +311,7 @@ ProximityCompiler_make_matcher(ProximityCompiler *self, SegReader *reader,
     }
 
     Matcher *retval 
-        = (Matcher*)ProximityScorer_new(sim, plists, (Compiler*)self, self->within);
+        = (Matcher*)ProximityMatcher_new(sim, plists, (Compiler*)self, self->within);
     DECREF(plists);
     return retval;
 }

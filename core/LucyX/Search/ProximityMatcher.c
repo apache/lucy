@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-#define C_LUCY_PROXIMITYSCORER
+#define C_LUCY_PROXIMITYMATCHER
 #define C_LUCY_POSTING
 #define C_LUCY_SCOREPOSTING
 #include "Lucy/Util/ToolSet.h"
 
-#include "LucyX/Search/ProximityScorer.h"
+#include "LucyX/Search/ProximityMatcher.h"
 #include "Lucy/Index/Posting/ScorePosting.h"
 #include "Lucy/Index/PostingList.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Search/Compiler.h"
 
 
-ProximityScorer*
-ProximityScorer_new(Similarity *sim, VArray *plists, Compiler *compiler, 
-                    uint32_t within)
+ProximityMatcher*
+ProximityMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler, 
+                     uint32_t within)
 {
-    ProximityScorer *self = (ProximityScorer*)VTable_Make_Obj(PROXIMITYSCORER);
-    return ProximityScorer_init(self, sim, plists, compiler, within);
+    ProximityMatcher *self = (ProximityMatcher*)VTable_Make_Obj(PROXIMITYMATCHER);
+    return ProximityMatcher_init(self, sim, plists, compiler, within);
 
 }
 
-ProximityScorer*
-ProximityScorer_init(ProximityScorer *self, Similarity *similarity, VArray *plists,
-                  Compiler *compiler, uint32_t within)
+ProximityMatcher*
+ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity, VArray *plists,
+                      Compiler *compiler, uint32_t within)
 {
     Matcher_init((Matcher*)self);
 
@@ -70,7 +70,7 @@ ProximityScorer_init(ProximityScorer *self, Similarity *similarity, VArray *plis
 }
 
 void
-ProximityScorer_destroy(ProximityScorer *self) 
+ProximityMatcher_destroy(ProximityMatcher *self) 
 {
     if (self->plists) {
         for (size_t i = 0; i < self->num_elements; i++) {
@@ -81,18 +81,18 @@ ProximityScorer_destroy(ProximityScorer *self)
     DECREF(self->sim);
     DECREF(self->anchor_set);
     DECREF(self->compiler);
-    SUPER_DESTROY(self, PROXIMITYSCORER);
+    SUPER_DESTROY(self, PROXIMITYMATCHER);
 }
 
 int32_t
-ProximityScorer_next(ProximityScorer *self)
+ProximityMatcher_next(ProximityMatcher *self)
 {
     if (self->first_time) {
-        return ProximityScorer_Advance(self, 1);
+        return ProximityMatcher_Advance(self, 1);
     }
     else if (self->more) {
         const int32_t target = PList_Get_Doc_ID(self->plists[0]) + 1;
-        return ProximityScorer_Advance(self, target);
+        return ProximityMatcher_Advance(self, target);
     }
     else {
         return 0;
@@ -100,7 +100,7 @@ ProximityScorer_next(ProximityScorer *self)
 }
 
 int32_t
-ProximityScorer_advance(ProximityScorer *self, int32_t target) 
+ProximityMatcher_advance(ProximityMatcher *self, int32_t target) 
 {
     PostingList **const plists       = self->plists;
     const uint32_t      num_elements = self->num_elements;
@@ -181,7 +181,7 @@ ProximityScorer_advance(ProximityScorer *self, int32_t target)
         // If we've found a doc with all terms in it, see if they form a
         // phrase.
         if (agreement && highest >= target) {
-            self->proximity_freq = ProximityScorer_Calc_Proximity_Freq(self);
+            self->proximity_freq = ProximityMatcher_Calc_Proximity_Freq(self);
             if (self->proximity_freq == 0.0) {
                 // No phrase.  Move on to another doc.
                 target += 1;
@@ -249,7 +249,7 @@ SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
 }
 
 float
-ProximityScorer_calc_proximity_freq(ProximityScorer *self) 
+ProximityMatcher_calc_proximity_freq(ProximityMatcher *self) 
 {
     PostingList **const plists   = self->plists;
 
@@ -310,13 +310,13 @@ ProximityScorer_calc_proximity_freq(ProximityScorer *self)
 }
 
 int32_t
-ProximityScorer_get_doc_id(ProximityScorer *self) 
+ProximityMatcher_get_doc_id(ProximityMatcher *self) 
 {
     return self->doc_id;
 }
 
 float
-ProximityScorer_score(ProximityScorer *self) 
+ProximityMatcher_score(ProximityMatcher *self) 
 {
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(self->plists[0]);
     float score = Sim_TF(self->sim, self->proximity_freq) 

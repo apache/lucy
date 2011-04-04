@@ -19,7 +19,7 @@ parcel Lucy;
 /** Matcher for a ProximityQuery. 
  */
 
-class LucyX::Search::ProximityScorer inherits Lucy::Search::Matcher {
+class LucyX::Search::ProximityMatcher inherits Lucy::Search::Matcher {
 
     int32_t         doc_id;
     uint32_t        num_elements;
@@ -34,33 +34,33 @@ class LucyX::Search::ProximityScorer inherits Lucy::Search::Matcher {
     bool_t          more;
     uint32_t        within;
 
-    inert incremented ProximityScorer*
+    inert incremented ProximityMatcher*
     new(Similarity *similarity, VArray *posting_lists, Compiler *compiler,
         uint32_t within);
 
-    inert ProximityScorer*
-    init(ProximityScorer *self, Similarity *similarity, VArray *posting_lists, 
+    inert ProximityMatcher*
+    init(ProximityMatcher *self, Similarity *similarity, VArray *posting_lists, 
          Compiler *compiler, uint32_t within);
 
     public void
-    Destroy(ProximityScorer *self);
+    Destroy(ProximityMatcher *self);
 
     public int32_t
-    Next(ProximityScorer *self);
+    Next(ProximityMatcher *self);
 
     public int32_t
-    Advance(ProximityScorer *self, int32_t target);
+    Advance(ProximityMatcher *self, int32_t target);
 
     public int32_t 
-    Get_Doc_ID(ProximityScorer *self);
+    Get_Doc_ID(ProximityMatcher *self);
 
     public float
-    Score(ProximityScorer *self);
+    Score(ProximityMatcher *self);
 
     /** Calculate how often the phrase occurs in the current document.
      */
     float
-    Calc_Proximity_Freq(ProximityScorer *self);
+    Calc_Proximity_Freq(ProximityMatcher *self);
 }
 
 
