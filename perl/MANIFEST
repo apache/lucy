@@ -95,8 +95,8 @@ lib/Lucy/Plan/Int32Type.pm
 lib/Lucy/Plan/Int64Type.pm
 lib/Lucy/Plan/Schema.pm
 lib/Lucy/Plan/StringType.pm
-lib/Lucy/Search/ANDQuery.pm
 lib/Lucy/Search/ANDMatcher.pm
+lib/Lucy/Search/ANDQuery.pm
 lib/Lucy/Search/BitVecMatcher.pm
 lib/Lucy/Search/Collector.pm
 lib/Lucy/Search/Collector/BitCollector.pm
@@ -110,8 +110,8 @@ lib/Lucy/Search/MatchAllQuery.pm
 lib/Lucy/Search/MatchDoc.pm
 lib/Lucy/Search/Matcher.pm
 lib/Lucy/Search/NoMatchQuery.pm
-lib/Lucy/Search/NOTQuery.pm
 lib/Lucy/Search/NOTMatcher.pm
+lib/Lucy/Search/NOTQuery.pm
 lib/Lucy/Search/ORQuery.pm
 lib/Lucy/Search/ORScorer.pm
 lib/Lucy/Search/PhraseQuery.pm
@@ -121,14 +121,15 @@ lib/Lucy/Search/PolySearcher.pm
 lib/Lucy/Search/Query.pm
 lib/Lucy/Search/QueryParser.pm
 lib/Lucy/Search/RangeQuery.pm
-lib/Lucy/Search/RequiredOptionalQuery.pm
 lib/Lucy/Search/RequiredOptionalMatcher.pm
+lib/Lucy/Search/RequiredOptionalQuery.pm
 lib/Lucy/Search/Searcher.pm
 lib/Lucy/Search/SortRule.pm
 lib/Lucy/Search/SortSpec.pm
 lib/Lucy/Search/Span.pm
 lib/Lucy/Search/TermQuery.pm
 lib/Lucy/Search/TopDocs.pm
+lib/Lucy/Simple.pm
 lib/Lucy/Store/FileHandle.pm
 lib/Lucy/Store/Folder.pm
 lib/Lucy/Store/FSFileHandle.pm
@@ -161,7 +162,6 @@ lib/LucyX/Remote/SearchServer.pm
 lib/LucyX/Search/Filter.pm
 lib/LucyX/Search/MockMatcher.pm
 lib/LucyX/Search/ProximityQuery.pm
-lib/Lucy/Simple.pm
 MANIFEST			This list of files
 README
 sample/FlatQueryParser.pm
@@ -306,7 +306,6 @@ t/602-boosts.t
 t/603-query_boosts.t
 t/604-simple_search.t
 t/605-store_pos_boost.t
-t/606-proximity.t
 t/607-queryparser_multi_field.t
 t/610-queryparser_logic.t
 t/611-queryparser_syntax.t
