@@ -19,7 +19,7 @@ parcel Lucy;
 /** Matcher for a PhraseQuery. 
  */
 
-class Lucy::Search::PhraseScorer inherits Lucy::Search::Matcher {
+class Lucy::Search::PhraseMatcher inherits Lucy::Search::Matcher {
 
     int32_t         doc_id;
     uint32_t        num_elements;
@@ -33,32 +33,32 @@ class Lucy::Search::PhraseScorer inherits Lucy::Search::Matcher {
     bool_t          first_time;
     bool_t          more;
 
-    inert incremented PhraseScorer*
+    inert incremented PhraseMatcher*
     new(Similarity *similarity, VArray *posting_lists, Compiler *compiler);
 
-    inert PhraseScorer*
-    init(PhraseScorer *self, Similarity *similarity, VArray *posting_lists, 
+    inert PhraseMatcher*
+    init(PhraseMatcher *self, Similarity *similarity, VArray *posting_lists, 
          Compiler *compiler);
 
     public void
-    Destroy(PhraseScorer *self);
+    Destroy(PhraseMatcher *self);
 
     public int32_t
-    Next(PhraseScorer *self);
+    Next(PhraseMatcher *self);
 
     public int32_t
-    Advance(PhraseScorer *self, int32_t target);
+    Advance(PhraseMatcher *self, int32_t target);
 
     public int32_t 
-    Get_Doc_ID(PhraseScorer *self);
+    Get_Doc_ID(PhraseMatcher *self);
 
     public float
-    Score(PhraseScorer *self);
+    Score(PhraseMatcher *self);
 
     /** Calculate how often the phrase occurs in the current document.
      */
     float
-    Calc_Phrase_Freq(PhraseScorer *self);
+    Calc_Phrase_Freq(PhraseMatcher *self);
 }
 
 

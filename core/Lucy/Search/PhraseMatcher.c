@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-#define C_LUCY_PHRASESCORER
+#define C_LUCY_PHRASEMATCHER
 #define C_LUCY_POSTING
 #define C_LUCY_SCOREPOSTING
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Search/PhraseScorer.h"
+#include "Lucy/Search/PhraseMatcher.h"
 #include "Lucy/Index/Posting/ScorePosting.h"
 #include "Lucy/Index/PostingList.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Search/Compiler.h"
 
-PhraseScorer*
-PhraseScorer_new(Similarity *sim, VArray *plists, Compiler *compiler)
+PhraseMatcher*
+PhraseMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler)
 {
-    PhraseScorer *self = (PhraseScorer*)VTable_Make_Obj(PHRASESCORER);
-    return PhraseScorer_init(self, sim, plists, compiler);
+    PhraseMatcher *self = (PhraseMatcher*)VTable_Make_Obj(PHRASEMATCHER);
+    return PhraseMatcher_init(self, sim, plists, compiler);
 
 }
 
-PhraseScorer*
-PhraseScorer_init(PhraseScorer *self, Similarity *similarity, VArray *plists,
+PhraseMatcher*
+PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
                   Compiler *compiler)
 {
     Matcher_init((Matcher*)self);
@@ -67,7 +67,7 @@ PhraseScorer_init(PhraseScorer *self, Similarity *similarity, VArray *plists,
 }
 
 void
-PhraseScorer_destroy(PhraseScorer *self) 
+PhraseMatcher_destroy(PhraseMatcher *self) 
 {
     if (self->plists) {
         for (size_t i = 0; i < self->num_elements; i++) {
@@ -78,18 +78,18 @@ PhraseScorer_destroy(PhraseScorer *self)
     DECREF(self->sim);
     DECREF(self->anchor_set);
     DECREF(self->compiler);
-    SUPER_DESTROY(self, PHRASESCORER);
+    SUPER_DESTROY(self, PHRASEMATCHER);
 }
 
 int32_t
-PhraseScorer_next(PhraseScorer *self)
+PhraseMatcher_next(PhraseMatcher *self)
 {
     if (self->first_time) {
-        return PhraseScorer_Advance(self, 1);
+        return PhraseMatcher_Advance(self, 1);
     }
     else if (self->more) {
         const int32_t target = PList_Get_Doc_ID(self->plists[0]) + 1;
-        return PhraseScorer_Advance(self, target);
+        return PhraseMatcher_Advance(self, target);
     }
     else {
         return 0;
@@ -97,7 +97,7 @@ PhraseScorer_next(PhraseScorer *self)
 }
 
 int32_t
-PhraseScorer_advance(PhraseScorer *self, int32_t target) 
+PhraseMatcher_advance(PhraseMatcher *self, int32_t target) 
 {
     PostingList **const plists       = self->plists;
     const uint32_t      num_elements = self->num_elements;
@@ -178,7 +178,7 @@ PhraseScorer_advance(PhraseScorer *self, int32_t target)
         // If we've found a doc with all terms in it, see if they form a
         // phrase.
         if (agreement && highest >= target) {
-            self->phrase_freq = PhraseScorer_Calc_Phrase_Freq(self);
+            self->phrase_freq = PhraseMatcher_Calc_Phrase_Freq(self);
             if (self->phrase_freq == 0.0) {
                 // No phrase.  Move on to another doc.
                 target += 1;
@@ -245,7 +245,7 @@ SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
 }
 
 float
-PhraseScorer_calc_phrase_freq(PhraseScorer *self) 
+PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) 
 {
     PostingList **const plists   = self->plists;
 
@@ -300,13 +300,13 @@ PhraseScorer_calc_phrase_freq(PhraseScorer *self)
 }
 
 int32_t
-PhraseScorer_get_doc_id(PhraseScorer *self) 
+PhraseMatcher_get_doc_id(PhraseMatcher *self) 
 {
     return self->doc_id;
 }
 
 float
-PhraseScorer_score(PhraseScorer *self) 
+PhraseMatcher_score(PhraseMatcher *self) 
 {
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(self->plists[0]);
     float score = Sim_TF(self->sim, self->phrase_freq) 

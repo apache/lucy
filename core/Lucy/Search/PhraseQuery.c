@@ -31,7 +31,7 @@
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Plan/Schema.h"
-#include "Lucy/Search/PhraseScorer.h"
+#include "Lucy/Search/PhraseMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/Span.h"
 #include "Lucy/Search/TermQuery.h"
@@ -295,7 +295,7 @@ PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
     }
 
     Matcher *retval 
-        = (Matcher*)PhraseScorer_new(sim, plists, (Compiler*)self);
+        = (Matcher*)PhraseMatcher_new(sim, plists, (Compiler*)self);
     DECREF(plists);
     return retval;
 }
