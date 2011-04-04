@@ -25,7 +25,7 @@
 #include "Lucy/Index/SortReader.h"
 #include "Lucy/Index/SortCache.h"
 #include "Lucy/Plan/Schema.h"
-#include "Lucy/Search/RangeScorer.h"
+#include "Lucy/Search/RangeMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/Span.h"
 #include "Lucy/Store/InStream.h"
@@ -219,7 +219,7 @@ RangeCompiler_make_matcher(RangeCompiler *self, SegReader *reader,
         }
         else {
             int32_t doc_max = SegReader_Doc_Max(reader);
-            return (Matcher*)RangeScorer_new(lower, upper, sort_cache, 
+            return (Matcher*)RangeMatcher_new(lower, upper, sort_cache, 
                 doc_max);
         }
     }

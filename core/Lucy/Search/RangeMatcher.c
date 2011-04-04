@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-#define C_LUCY_RANGESCORER
+#define C_LUCY_RANGEMATCHER
 #include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Search/RangeScorer.h"
+#include "Lucy/Search/RangeMatcher.h"
 #include "Lucy/Index/SortCache.h"
 
-RangeScorer*
-RangeScorer_new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache,
-                int32_t doc_max)
+RangeMatcher*
+RangeMatcher_new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache,
+                 int32_t doc_max)
 {
-    RangeScorer *self = (RangeScorer*)VTable_Make_Obj(RANGESCORER);
-    return RangeScorer_init(self, lower_bound, upper_bound, sort_cache,
+    RangeMatcher *self = (RangeMatcher*)VTable_Make_Obj(RANGEMATCHER);
+    return RangeMatcher_init(self, lower_bound, upper_bound, sort_cache,
         doc_max);
 }
 
-RangeScorer*
-RangeScorer_init(RangeScorer *self, int32_t lower_bound, int32_t upper_bound,
-                 SortCache *sort_cache, int32_t doc_max)
+RangeMatcher*
+RangeMatcher_init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
+                  SortCache *sort_cache, int32_t doc_max)
 {
     Matcher_init((Matcher*)self);
 
@@ -50,14 +50,14 @@ RangeScorer_init(RangeScorer *self, int32_t lower_bound, int32_t upper_bound,
 }   
 
 void
-RangeScorer_destroy(RangeScorer *self)
+RangeMatcher_destroy(RangeMatcher *self)
 {
     DECREF(self->sort_cache);
-    SUPER_DESTROY(self, RANGESCORER);
+    SUPER_DESTROY(self, RANGEMATCHER);
 }
 
 int32_t
-RangeScorer_next(RangeScorer* self) 
+RangeMatcher_next(RangeMatcher* self) 
 {
     while(1) {
         if (++self->doc_id > self->doc_max) {
@@ -79,21 +79,21 @@ RangeScorer_next(RangeScorer* self)
 }
 
 int32_t
-RangeScorer_advance(RangeScorer* self, int32_t target) 
+RangeMatcher_advance(RangeMatcher* self, int32_t target) 
 {
     self->doc_id = target - 1;
-    return RangeScorer_next(self);
+    return RangeMatcher_next(self);
 }
 
 float
-RangeScorer_score(RangeScorer* self) 
+RangeMatcher_score(RangeMatcher* self) 
 {
     UNUSED_VAR(self);
     return 0.0f;
 }
 
 int32_t 
-RangeScorer_get_doc_id(RangeScorer* self) 
+RangeMatcher_get_doc_id(RangeMatcher* self) 
 {
     return self->doc_id;
 }

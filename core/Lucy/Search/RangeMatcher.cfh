@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Search::RangeScorer inherits Lucy::Search::Matcher {
+class Lucy::Search::RangeMatcher inherits Lucy::Search::Matcher {
 
     int32_t    doc_id;
     int32_t    doc_max;
@@ -24,28 +24,28 @@ class Lucy::Search::RangeScorer inherits Lucy::Search::Matcher {
     int32_t    upper_bound;
     SortCache *sort_cache;
 
-    inert incremented RangeScorer*
+    inert incremented RangeMatcher*
     new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache, 
         int32_t doc_max);
 
-    inert RangeScorer*
-    init(RangeScorer *self, int32_t lower_bound, int32_t upper_bound, 
+    inert RangeMatcher*
+    init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound, 
          SortCache *sort_cache, int32_t doc_max);
 
     public int32_t
-    Next(RangeScorer *self);
+    Next(RangeMatcher *self);
 
     public int32_t
-    Advance(RangeScorer *self, int32_t target);
+    Advance(RangeMatcher *self, int32_t target);
 
     public float
-    Score(RangeScorer* self);
+    Score(RangeMatcher* self);
 
     public int32_t 
-    Get_Doc_ID(RangeScorer* self);
+    Get_Doc_ID(RangeMatcher* self);
 
     public void
-    Destroy(RangeScorer *self);
+    Destroy(RangeMatcher *self);
 }
 
 
