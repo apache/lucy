@@ -120,13 +120,3 @@ $hits = $searcher->hits( query => $q_for_boosted );
 is( $hits->next->{boosted},
     $boosted, "artificially boosted token overrides better match" );
 
-__END__
-
-TODO: {
-    local $TODO = "positions not passed to boolscorer correctly yet";
-    is_deeply(
-        \@contents,
-        [ $best, $better, $good ],
-        "proximity helps boost scores"
-    );
-}
