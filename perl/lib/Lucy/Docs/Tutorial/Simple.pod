@@ -41,13 +41,13 @@ modules...
     my $path_to_index = '/path/to/index';
     my $uscon_source  = '/usr/local/apache2/htdocs/us_constitution';
 
-    use LucyX::Simple;
+    use Lucy::Simple;
     use File::Spec::Functions qw( catfile );
 
-... we'll start by creating a LucyX::Simple object, telling it where we'd
+... we'll start by creating a Lucy::Simple object, telling it where we'd
 like the index to be located and the language of the source material.
 
-    my $simple = LucyX::Simple->new(
+    my $lucy = Lucy::Simple->new(
         path     => $path_to_index,
         language => 'en',
     );
@@ -85,7 +85,7 @@ one line of code.
 
     foreach my $filename (@filenames) {
         my $doc = parse_file($filename);
-        $simple->add_doc($doc);  # ta-da!
+        $lucy->add_doc($doc);  # ta-da!
     }
 
 =head2 Search: search.cgi
@@ -106,21 +106,21 @@ The beginning is dedicated to CGI processing and configuration.
     use List::Util qw( max min );
     use POSIX qw( ceil );
     use Encode qw( decode );
-    use LucyX::Simple;
+    use Lucy::Simple;
     
     my $cgi       = CGI->new;
     my $q         = decode( "UTF-8", $cgi->param('q') || '' );
     my $offset    = decode( "UTF-8", $cgi->param('offset') || 0 );
     my $page_size = 10;
 
-Once that's out of the way, we create our LucyX::Simple object and feed
+Once that's out of the way, we create our Lucy::Simple object and feed
 it a query string.
 
-    my $simple = LucyX::Simple->new(
+    my $lucy = Lucy::Simple->new(
         path     => $path_to_index,
         language => 'en',
     );
-    my $hit_count = $simple->search(
+    my $hit_count = $lucy->search(
         query      => $q,
         offset     => $offset,
         num_wanted => $page_size,
@@ -137,7 +137,7 @@ objects, starting with the most relevant.
 
     # Create result list.
     my $report = '';
-    while ( my $hit = $simple->next ) {
+    while ( my $hit = $lucy->next ) {
         my $score = sprintf( "%0.3f", $hit->get_score );
         $report .= qq|
             <p>
@@ -287,13 +287,13 @@ The rest of the script is just text wrangling.
 
 =head2 OK... now what?
 
-LucyX::Simple is perfectly adequate for some tasks, but it's not very flexible.
+Lucy::Simple is perfectly adequate for some tasks, but it's not very flexible.
 Many people find that it doesn't do at least one or two things they can't live
 without.
 
 In our next tutorial chapter,
 L<BeyondSimple|Lucy::Docs::Tutorial::BeyondSimple>, we'll rewrite our
-indexing and search scripts using the classes that LucyX::Simple hides
+indexing and search scripts using the classes that Lucy::Simple hides
 from view, opening up the possibilities for expansion; then, we'll spend the
 rest of the tutorial chapters exploring these possibilities.
 

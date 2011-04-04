@@ -161,7 +161,7 @@ lib/LucyX/Remote/SearchServer.pm
 lib/LucyX/Search/Filter.pm
 lib/LucyX/Search/MockMatcher.pm
 lib/LucyX/Search/ProximityQuery.pm
-lib/LucyX/Simple.pm
+lib/Lucy/Simple.pm
 MANIFEST			This list of files
 README
 sample/FlatQueryParser.pm

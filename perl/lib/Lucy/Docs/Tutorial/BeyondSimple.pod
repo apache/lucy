@@ -26,7 +26,7 @@ L<Lucy::Docs::Tutorial::Simple> so that they look exactly the same from
 the end user's point of view, but offer the developer greater possibilites for
 expansion.  
 
-To achieve this, we'll ditch LucyX::Simple and replace it with the
+To achieve this, we'll ditch Lucy::Simple and replace it with the
 classes that it uses internally:
 
 =over
@@ -88,7 +88,7 @@ indicating that they will be searchable as "full text" -- which means that
 they can be searched for individual words.  The "analyzer", which is unique to
 FullTextType fields, is what breaks up the text into searchable tokens.
 
-Next, we'll swap our LucyX::Simple object out for a Lucy::Index::Indexer.
+Next, we'll swap our Lucy::Simple object out for a Lucy::Index::Indexer.
 The substitution will be straightforward because Simple has merely been
 serving as a thin wrapper around an inner Indexer, and we'll just be peeling
 away the wrapper.
@@ -104,7 +104,7 @@ First, replace the constructor:
     );
 
 Next, have the C<$indexer> object C<add_doc> where we were having the
-C<$simple> object C<add_doc> before:
+C<$lucy> object C<add_doc> before:
 
     foreach my $filename (@filenames) {
         my $doc = slurp_and_parse_file($filename);
@@ -113,13 +113,13 @@ C<$simple> object C<add_doc> before:
 
 There's only one extra step required: at the end of the app, you must call
 commit() explicitly to close the indexing session and commit your changes.
-(LucyX::Simple hides this detail, calling commit() implicitly when it needs to).
+(Lucy::Simple hides this detail, calling commit() implicitly when it needs to).
 
     $indexer->commit;
 
 =head2 Adaptations to search.cgi
 
-In our search app as in our indexing app, LucyX::Simple has served as a
+In our search app as in our indexing app, Lucy::Simple has served as a
 thin wrapper -- this time around L<Lucy::Search::IndexSearcher> and
 L<Lucy::Search::Hits>.  Swapping out Simple for these two classes is
 also straightforward:

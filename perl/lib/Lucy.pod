@@ -134,7 +134,7 @@ Stoplists.
 
 =head2 Getting Started
 
-L<LucyX::Simple> provides a stripped down API which may suffice for many
+L<Lucy::Simple> provides a stripped down API which may suffice for many
 tasks.
 
 L<Lucy::Docs::Tutorial> demonstrates how to build a basic CGI search

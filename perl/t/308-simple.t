@@ -18,36 +18,36 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 8;
-use LucyX::Simple;
+use Lucy::Simple;
 use Lucy::Test::TestUtils qw( init_test_index_loc );
 
 my $test_index_loc = init_test_index_loc();
 
-my $index = LucyX::Simple->new(
+my $lucy = Lucy::Simple->new(
     language => 'en',
     path     => $test_index_loc,
 );
 
-$index->add_doc( { food => 'creamed corn' } );
-is( $index->search( query => 'creamed' ), 1, "search warks right after add" );
+$lucy->add_doc( { food => 'creamed corn' } );
+is( $lucy->search( query => 'creamed' ), 1, "search warks right after add" );
 
-$index->add_doc( { food => 'creamed spinach' } );
-is( $index->search( query => 'creamed' ), 2, "search returns total hits" );
+$lucy->add_doc( { food => 'creamed spinach' } );
+is( $lucy->search( query => 'creamed' ), 2, "search returns total hits" );
 
-$index->add_doc( { food => 'creamed broccoli' } );
-undef $index;
-$index = LucyX::Simple->new(
+$lucy->add_doc( { food => 'creamed broccoli' } );
+undef $lucy;
+$lucy = Lucy::Simple->new(
     language => 'en',
     path     => $test_index_loc,
 );
-is( $index->search( query => 'cream' ), 3, "commit upon destroy" );
+is( $lucy->search( query => 'cream' ), 3, "commit upon destroy" );
 
-while ( my $hit = $index->next ) {
+while ( my $hit = $lucy->next ) {
     like( $hit->{food}, qr/cream/, 'next' );
 }
 
-$index->add_doc( { band => 'Cream' } );
-is( $index->search( query => 'cream' ),
+$lucy->add_doc( { band => 'Cream' } );
+is( $lucy->search( query => 'cream' ),
     4, "search uses correct PolyAnalyzer" );
 
 SKIP: {
@@ -62,25 +62,25 @@ SKIP: {
     my $pid = fork();
     if ( $pid == 0 ) {    # child
         our               # This *has* to be 'our' for the test to work
-            $index = LucyX::Simple->new(
+            $lucy = Lucy::Simple->new(
             language => 'en',
             path     => $test_index_loc,
             );
 
-        $index->add_doc( { food => 'creamed corn' } );
+        $lucy->add_doc( { food => 'creamed corn' } );
         exit;
     }
     else {
         waitpid( $pid, 0 );
     }
 
-    my $index = LucyX::Simple->new(
+    my $lucy = Lucy::Simple->new(
         language => 'en',
         path     => $test_index_loc,
     );
 
     ok eval {    # This should die if the index wasn't finished.
-        $index->search( query => 'creamed' );
+        $lucy->search( query => 'creamed' );
         1;
     }, 'Simple finishes indexing during END block (apparently)';
 

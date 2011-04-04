@@ -20,7 +20,7 @@ Lucy::Docs::Tutorial - Step-by-step introduction to Apache Lucy.
 =head1 ABSTRACT 
 
 Explore Apache Lucy's basic functionality by starting with a minimalist CGI
-search app based on L<LucyX::Simple> and transforming it, step by step, into an
+search app based on L<Lucy::Simple> and transforming it, step by step, into an
 "advanced search" interface utilizing more flexible core modules like
 L<Lucy::Index::Indexer> and L<Lucy::Search::IndexSearcher>.
 
@@ -33,13 +33,13 @@ L<Lucy::Index::Indexer> and L<Lucy::Search::IndexSearcher>.
 =item *
 
 L<Lucy::Docs::Tutorial::Simple> - Build a bare-bones search app using
-L<LucyX::Simple>.
+L<Lucy::Simple>.
 
 =item *
 
 L<Lucy::Docs::Tutorial::BeyondSimple> - Rebuild the app using core
 classes like L<Indexer|Lucy::Index::Indexer> and
-L<IndexSearcher|Lucy::Search::IndexSearcher> in place of LucyX::Simple.
+L<IndexSearcher|Lucy::Search::IndexSearcher> in place of Lucy::Simple.
 
 =item *
 

@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package LucyX::Simple;
+package Lucy::Simple;
 use Carp;
 use Scalar::Util qw( weaken reftype refaddr );
 
@@ -145,13 +145,13 @@ __POD__
 
 =head1 NAME
 
-LucyX::Simple - Basic search engine.
+Lucy::Simple - Basic search engine.
 
 =head1 SYNOPSIS
 
 First, build an index of your documents.
 
-    my $index = LucyX::Simple->new(
+    my $index = Lucy::Simple->new(
         path     => '/path/to/index/'
         language => 'en',
     );
@@ -178,19 +178,19 @@ Later, search the index.
 
 =head1 DESCRIPTION
 
-LucyX::Simple is a stripped-down interface for the L<Apache Lucy|Lucy> search
+Lucy::Simple is a stripped-down interface for the L<Apache Lucy|Lucy> search
 engine library.  
 
 =head1 METHODS 
 
 =head2 new
 
-    my $index = LucyX::Simple->new(
+    my $lucy = Lucy::Simple->new(
         path     => '/path/to/index/',
         language => 'en',
     );
 
-Create a LucyX::Simple object, which can be used for both indexing and
+Create a Lucy::Simple object, which can be used for both indexing and
 searching.  Two hash-style parameters are required.
 
 =over 
@@ -226,7 +226,7 @@ by a two-letter ISO code.  12 languages are supported:
 
 =head2 add_doc 
 
-    $index->add_doc({
+    $lucy->add_doc({
         location => $url,
         title    => $title,
         content  => $content,
@@ -237,7 +237,7 @@ field names as keys and content as values.
 
 =head2 search
 
-    my $total_hits = $index->search( 
+    my $total_hits = $lucy->search( 
         query      => $query_string,    # required
         offset     => 40,               # default 0
         num_wanted => 20,               # default 10
