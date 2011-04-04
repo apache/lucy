@@ -14,21 +14,40 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+#define C_LUCY_NOMATCHMATCHER
+#include "Lucy/Util/ToolSet.h"
 
-class Lucy::Search::NoMatchScorer inherits Lucy::Search::Matcher {
+#include "Lucy/Search/NoMatchMatcher.h"
+#include "Lucy/Index/IndexReader.h"
+#include "Lucy/Index/Similarity.h"
+#include "Lucy/Plan/Schema.h"
 
-    inert incremented NoMatchScorer*
-    new();
+NoMatchMatcher*
+NoMatchMatcher_new()
+{
+    NoMatchMatcher *self = (NoMatchMatcher*)VTable_Make_Obj(NOMATCHMATCHER);
+    return NoMatchMatcher_init(self);
+}
 
-    inert NoMatchScorer*
-    init(NoMatchScorer *self);
+NoMatchMatcher*
+NoMatchMatcher_init(NoMatchMatcher *self)
+{
+    return (NoMatchMatcher*)Matcher_init((Matcher*)self);
+}   
 
-    public int32_t
-    Next(NoMatchScorer* self);
+int32_t
+NoMatchMatcher_next(NoMatchMatcher* self) 
+{
+    UNUSED_VAR(self);
+    return 0;
+}
 
-    public int32_t
-    Advance(NoMatchScorer* self, int32_t target);
+int32_t
+NoMatchMatcher_advance(NoMatchMatcher* self, int32_t target) 
+{
+    UNUSED_VAR(self);
+    UNUSED_VAR(target);
+    return 0;
 }
 
 

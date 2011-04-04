@@ -21,7 +21,7 @@
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Plan/Schema.h"
-#include "Lucy/Search/NoMatchScorer.h"
+#include "Lucy/Search/NoMatchMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
@@ -149,7 +149,7 @@ NoMatchCompiler_make_matcher(NoMatchCompiler *self, SegReader *reader,
     UNUSED_VAR(self);
     UNUSED_VAR(reader);
     UNUSED_VAR(need_score);
-    return (Matcher*)NoMatchScorer_new();
+    return (Matcher*)NoMatchMatcher_new();
 }
 
 
