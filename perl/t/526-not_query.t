@@ -76,13 +76,13 @@ for my $num_negated ( 1 .. 26 ) {
         push @mock_ids, splice( @source_ids, $tick, 1 );
     }
     @mock_ids = sort { $a <=> $b } @mock_ids;
-    my $mock_scorer = LucyX::Search::MockMatcher->new(
+    my $mock_matcher = LucyX::Search::MockMatcher->new(
         doc_ids => \@mock_ids,
         scores  => [ (1) x scalar @mock_ids ],
     );
     my $not_matcher = Lucy::Search::NOTMatcher->new(
         doc_max         => $reader->doc_max,
-        negated_matcher => $mock_scorer,
+        negated_matcher => $mock_matcher,
     );
     my $bit_vec = Lucy::Object::BitVector->new( capacity => 30 );
     my $collector = Lucy::Search::Collector::BitCollector->new(

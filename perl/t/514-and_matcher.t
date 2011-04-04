@@ -26,16 +26,16 @@ my $sim = Lucy::Index::Similarity->new;
 
 for my $interval_a ( reverse 1 .. 17 ) {
     for my $interval_b ( reverse 10 .. 17 ) {
-        check_scorer( $interval_a, $interval_b );
+        check_matcher( $interval_a, $interval_b );
         for my $interval_c ( 30, 75 ) {
-            check_scorer( $interval_a, $interval_b, $interval_c );
-            check_scorer( $interval_c, $interval_b, $interval_a );
+            check_matcher( $interval_a, $interval_b, $interval_c );
+            check_matcher( $interval_c, $interval_b, $interval_a );
         }
     }
 }
-check_scorer(1000);
+check_matcher(1000);
 
-sub check_scorer {
+sub check_matcher {
     my @intervals     = @_;
     my @doc_id_arrays = map { modulo_set( $_, 100 ) } @intervals;
     my @children      = map {

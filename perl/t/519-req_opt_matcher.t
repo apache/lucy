@@ -26,12 +26,12 @@ my $sim = Lucy::Index::Similarity->new;
 
 for my $req_interval ( 1 .. 10, 75 ) {
     for my $opt_interval ( 1 .. 10, 75 ) {
-        check_scorer( $req_interval, $opt_interval );
-        check_scorer( $opt_interval, $req_interval );
+        check_matcher( $req_interval, $opt_interval );
+        check_matcher( $opt_interval, $req_interval );
     }
 }
 
-sub check_scorer {
+sub check_matcher {
     my ( $req_interval, $opt_interval ) = @_;
     my $req_docs = modulo_set( $req_interval, 100 );
     my $opt_docs = modulo_set( $opt_interval, 100 );

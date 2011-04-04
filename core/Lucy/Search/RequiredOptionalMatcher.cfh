@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Intersect required and optional scorers.
+/** Intersect required and optional Matchers.
  */
 
 class Lucy::Search::RequiredOptionalMatcher cnick ReqOptMatcher

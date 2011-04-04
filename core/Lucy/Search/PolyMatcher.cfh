@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Base class for composite scorers.
+/** Base class for composite Matchers.
  */
 
 class Lucy::Search::PolyMatcher inherits Lucy::Search::Matcher {

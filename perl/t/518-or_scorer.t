@@ -26,30 +26,30 @@ my $sim = Lucy::Index::Similarity->new;
 
 for my $interval_a ( 1 .. 10 ) {
     for my $interval_b ( 5 .. 10 ) {
-        check_scorer( $interval_a, $interval_b );
+        check_matcher( $interval_a, $interval_b );
         for my $interval_c ( 30, 75 ) {
-            check_scorer( $interval_a, $interval_b, $interval_c );
-            check_scorer( $interval_c, $interval_b, $interval_a );
+            check_matcher( $interval_a, $interval_b, $interval_c );
+            check_matcher( $interval_c, $interval_b, $interval_a );
         }
     }
 }
 
-sub check_scorer {
+sub check_matcher {
     my @intervals = @_;
     my @doc_id_arrays = map { modulo_set( $_, 100 ) } @intervals;
-    my $subscorers
+    my $child_matchers
         = Lucy::Object::VArray->new( capacity => scalar @intervals );
     for my $doc_id_array (@doc_id_arrays) {
         my $mock = LucyX::Search::MockMatcher->new(
             doc_ids => $doc_id_array,
             scores  => [ (1) x scalar @$doc_id_array ],
         );
-        $subscorers->push($mock);
+        $child_matchers->push($mock);
     }
 
     my $or_scorer = Lucy::Search::ORScorer->new(
         similarity => $sim,
-        children   => $subscorers,
+        children   => $child_matchers,
     );
     my $collector
         = Lucy::Search::Collector::SortCollector->new( wanted => 100 );

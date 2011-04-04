@@ -44,11 +44,11 @@ that client code will deal with directly.
 =item *
 
 PrefixCompiler - a subclass of L<Lucy::Search::Compiler>, whose primary 
-role is to compile a PrefixQuery to a PrefixScorer.
+role is to compile a PrefixQuery to a PrefixMatcher.
 
 =item *
 
-PrefixScorer - a subclass of L<Lucy::Search::Matcher>, which does the
+PrefixMatcher - a subclass of L<Lucy::Search::Matcher>, which does the
 heavy lifting: it applies the query to individual documents and assigns a
 score to each match.
 
@@ -204,7 +204,7 @@ PrefixCompiler is make_matcher().
         }
         return unless @posting_lists;
         
-        return PrefixScorer->new( posting_lists => \@posting_lists );
+        return PrefixMatcher->new( posting_lists => \@posting_lists );
     }
 
 PrefixCompiler gets access to a L<SegReader|Lucy::Index::SegReader>
@@ -218,11 +218,11 @@ term that matches our prefix.
 Each of these PostingList objects represents a set of documents which match
 the query.
 
-=head2 PrefixScorer
+=head2 PrefixMatcher
 
 The Matcher subclass is the most involved.  
 
-    package PrefixScorer;
+    package PrefixMatcher;
     use base qw( Lucy::Search::Matcher );
     
     # Inside-out member vars.

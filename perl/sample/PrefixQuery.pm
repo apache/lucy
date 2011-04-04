@@ -105,10 +105,10 @@ sub make_matcher {
     }
     return unless @posting_lists;
     
-    return PrefixScorer->new( posting_lists => \@posting_lists );
+    return PrefixMatcher->new( posting_lists => \@posting_lists );
 }
 
-package PrefixScorer;
+package PrefixMatcher;
 use base qw( Lucy::Search::Matcher );
 
 # Inside-out member vars.

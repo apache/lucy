@@ -70,8 +70,8 @@ class Lucy::Search::ORMatcher inherits Lucy::Search::PolyMatcher {
 /**
  * Union results of multiple Matchers.
  * 
- * ORScorer collates the output of multiple subscorers, summing their scores
- * whenever they match the same document.
+ * ORScorer collates the output of multiple scoring child Matchers, summing
+ * their scores whenever they match the same document.
  */
 class Lucy::Search::ORScorer inherits Lucy::Search::ORMatcher {
 

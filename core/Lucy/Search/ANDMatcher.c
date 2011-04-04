@@ -99,7 +99,7 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target)
         uint32_t i;
         bool_t agreement = true;
 
-        // Scoot all scorers up. 
+        // Scoot all Matchers up. 
         for (i = 0; i < num_kids; i++) {
             Matcher *const child = kids[i];
             int32_t candidate = Matcher_Get_Doc_ID(child);
@@ -108,13 +108,13 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target)
             if (highest < candidate)
                 highest = candidate;
 
-            // If least doc scorers can agree on exceeds target, raise bar. 
+            // If least doc Matchers can agree on exceeds target, raise bar. 
             if (target < highest)
                 target = highest;
 
-            // Scoot this scorer up if not already at highest. 
+            // Scoot this Matcher up if not already at highest. 
             if (candidate < target) {
-                // This scorer is definitely the highest right now. 
+                // This Matcher is definitely the highest right now. 
                 highest = Matcher_Advance(child, target);
                 if (!highest) {
                     self->more = false;
@@ -123,7 +123,7 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target)
             }
         }
 
-        // If scorers don't agree, send back through the loop. 
+        // If Matchers don't agree, send back through the loop. 
         for (i = 0; i < num_kids; i++) {
             Matcher *const child = kids[i];
             const int32_t candidate = Matcher_Get_Doc_ID(child);

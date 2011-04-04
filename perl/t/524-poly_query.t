@@ -72,7 +72,7 @@ for my $conjunction (qw( AND OR )) {
     isa_ok(
         $term_matcher,
         "Lucy::Search::TermMatcher",
-        "make_matcher compiles to child's scorer if there's only one child"
+        "make_matcher compiles to child's Matcher if there's only one child"
     );
 
     my $hopeless_query = Lucy::Search::TermQuery->new(
@@ -88,6 +88,6 @@ for my $conjunction (qw( AND OR )) {
     my $nope = $polyquery->make_compiler( searcher => $searcher )
         ->make_matcher( reader => $reader, need_score => 0 );
     ok( !defined $nope,
-        "If scorer wouldn't return any docs, make_matcher returns undef" );
+        "If Matcher wouldn't return any docs, make_matcher returns undef" );
 }
 
