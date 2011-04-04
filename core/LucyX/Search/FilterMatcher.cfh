@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class LucyX::Search::FilterScorer inherits Lucy::Search::Matcher {
+class LucyX::Search::FilterMatcher inherits Lucy::Search::Matcher {
 
     BitVector   *bits;
     int32_t      doc_max;
@@ -27,26 +27,26 @@ class LucyX::Search::FilterScorer inherits Lucy::Search::Matcher {
      * true.
      * @param doc_max The largest doc id that could possibly match.
      */
-    inert incremented FilterScorer*
+    inert incremented FilterMatcher*
     new(BitVector *bits, int32_t doc_max);
 
-    inert FilterScorer*
-    init(FilterScorer *self, BitVector *bits, int32_t doc_max);
+    inert FilterMatcher*
+    init(FilterMatcher *self, BitVector *bits, int32_t doc_max);
 
     public void
-    Destroy(FilterScorer *self);
+    Destroy(FilterMatcher *self);
 
     public int32_t
-    Next(FilterScorer* self);
+    Next(FilterMatcher* self);
 
     public int32_t
-    Skip_To(FilterScorer* self, int32_t target);
+    Skip_To(FilterMatcher* self, int32_t target);
 
     public float
-    Score(FilterScorer* self);
+    Score(FilterMatcher* self);
 
     public int32_t 
-    Get_Doc_ID(FilterScorer* self);
+    Get_Doc_ID(FilterMatcher* self);
 }
 
 

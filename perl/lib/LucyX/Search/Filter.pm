@@ -173,13 +173,13 @@ sub make_matcher {
     my ( $self, %args ) = @_;
     my $seg_reader = $args{reader};
     my $bits       = $self->get_parent->_bits($seg_reader);
-    return LucyX::Search::FilterScorer->new(
+    return LucyX::Search::FilterMatcher->new(
         bits    => $bits,
         doc_max => $seg_reader->doc_max,
     );
 }
 
-package LucyX::Search::FilterScorer;
+package LucyX::Search::FilterMatcher;
 BEGIN { our @ISA = qw( Lucy::Search::Matcher ) }
 
 1;
@@ -190,7 +190,7 @@ __BINDING__
 
 Clownfish::Binding::Perl::Class->register(
     parcel            => "Lucy",
-    class_name        => "LucyX::Search::FilterScorer",
+    class_name        => "LucyX::Search::FilterMatcher",
     bind_constructors => ["new"],
 );
 

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-#define C_LUCY_FILTERSCORER
+#define C_LUCY_FILTERMATCHER
 #include "Lucy/Util/ToolSet.h"
 
-#include "LucyX/Search/FilterScorer.h"
+#include "LucyX/Search/FilterMatcher.h"
 
-FilterScorer*
-FilterScorer_new(BitVector *bits, int32_t doc_max)
+FilterMatcher*
+FilterMatcher_new(BitVector *bits, int32_t doc_max)
 {
-    FilterScorer *self = (FilterScorer*)VTable_Make_Obj(FILTERSCORER);
-    return FilterScorer_init(self, bits, doc_max);
+    FilterMatcher *self = (FilterMatcher*)VTable_Make_Obj(FILTERMATCHER);
+    return FilterMatcher_init(self, bits, doc_max);
 }
 
-FilterScorer*
-FilterScorer_init(FilterScorer *self, BitVector *bits, int32_t doc_max)
+FilterMatcher*
+FilterMatcher_init(FilterMatcher *self, BitVector *bits, int32_t doc_max)
 {
     Matcher_init((Matcher*)self);
 
@@ -42,14 +42,14 @@ FilterScorer_init(FilterScorer *self, BitVector *bits, int32_t doc_max)
 }   
 
 void
-FilterScorer_destroy(FilterScorer *self) 
+FilterMatcher_destroy(FilterMatcher *self) 
 {
     DECREF(self->bits);
-    SUPER_DESTROY(self, FILTERSCORER);
+    SUPER_DESTROY(self, FILTERMATCHER);
 }
 
 int32_t
-FilterScorer_next(FilterScorer* self) 
+FilterMatcher_next(FilterMatcher* self) 
 {
     do {
         if (++self->doc_id > self->doc_max) {
@@ -61,21 +61,21 @@ FilterScorer_next(FilterScorer* self)
 }
 
 int32_t
-FilterScorer_skip_to(FilterScorer* self, int32_t target) 
+FilterMatcher_skip_to(FilterMatcher* self, int32_t target) 
 {
     self->doc_id = target - 1;
-    return FilterScorer_next(self);
+    return FilterMatcher_next(self);
 }
 
 float
-FilterScorer_score(FilterScorer* self) 
+FilterMatcher_score(FilterMatcher* self) 
 {
     UNUSED_VAR(self);
     return 0.0f;
 }
 
 int32_t 
-FilterScorer_get_doc_id(FilterScorer* self) 
+FilterMatcher_get_doc_id(FilterMatcher* self) 
 {
     return self->doc_id;
 }
