@@ -21,17 +21,8 @@ use File::Find 'find';
 
 my @modules;
 
-my %excluded = map { ( $_ => 1 ) } qw(
-    Lucy::Analysis::LCNormalizer
-    Lucy::Index::Term
-    Lucy::InvIndex
-    Lucy::InvIndexer
-    Lucy::QueryParser::QueryParser
-    Lucy::Search::BooleanQuery
-    Lucy::Search::Scorer
-    Lucy::Search::SearchClient
-    Lucy::Search::SearchServer
-);
+# None for now -- until we remove a module.
+my %excluded = map { ( $_ => 1 ) } qw();
 
 find(
     {   no_chdir => 1,
