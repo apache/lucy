@@ -69,6 +69,7 @@ use File::Spec::Functions
 use File::Path qw( mkpath rmtree );
 use File::Copy qw( copy move );
 use File::Find qw( find );
+use Module::Build::ModuleInfo;
 use Config;
 use Env qw( @PATH );
 use Fcntl;
@@ -542,7 +543,9 @@ sub ACTION_compile_custom_xs {
     }
 
     # .c => .o
-    my $version = $self->dist_version;
+    my $lucy_pm_file = catfile( $LIB_DIR, 'Lucy.pm' );
+    my $info = Module::Build::ModuleInfo->new_from_file($lucy_pm_file);
+    my $version = $info->version;
     my $perl_binding_o_file = catfile( $LIB_DIR, "Lucy$Config{_o}" );
     unshift @objects, $perl_binding_o_file;
     $self->add_to_cleanup($perl_binding_o_file);
