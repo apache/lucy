@@ -29,13 +29,13 @@ TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
 {
     Matcher_init((Matcher*)self);
 
-    // Assign. 
+    // Assign.
     self->sim           = (Similarity*)INCREF(similarity);
     self->plist         = (PostingList*)INCREF(plist);
     self->compiler      = (Compiler*)INCREF(compiler);
     self->weight        = Compiler_Get_Weight(compiler);
 
-    // Init. 
+    // Init.
     self->posting        = NULL;
 
     return self;
@@ -61,7 +61,7 @@ TermMatcher_next(TermMatcher* self)
             return doc_id;
         }
         else {
-            // Reclaim resources a little early. 
+            // Reclaim resources a little early.
             DECREF(plist);
             self->plist = NULL;
             return 0;
@@ -81,7 +81,7 @@ TermMatcher_advance(TermMatcher *self, int32_t target)
             return doc_id;
         }
         else {
-            // Reclaim resources a little early. 
+            // Reclaim resources a little early.
             DECREF(plist);
             self->plist = NULL;
             return 0;

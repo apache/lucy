@@ -101,7 +101,7 @@ Snapshot_get_path(Snapshot *self) { return self->path; }
 Snapshot*
 Snapshot_read_file(Snapshot *self, Folder *folder, const CharBuf *path)
 {
-    // Eliminate all prior data. Pick a snapshot file. 
+    // Eliminate all prior data. Pick a snapshot file.
     S_zero_out(self);
     self->path = path ? CB_Clone(path) : IxFileNames_latest_snapshot(folder);
 
@@ -116,13 +116,13 @@ Snapshot_read_file(Snapshot *self, Folder *folder, const CharBuf *path)
                           ? (int32_t)Obj_To_I64(subformat_obj) 
                           : 0;
 
-        // Verify that we can read the index properly. 
+        // Verify that we can read the index properly.
         if (format > Snapshot_current_file_format) {
             THROW(ERR, "Snapshot format too recent: %i32, %i32",
                 format, Snapshot_current_file_format);
         }
 
-        // Build up list of entries. 
+        // Build up list of entries.
         VArray *list = (VArray*)CERTIFY(
             Hash_Fetch_Str(snap_data, "entries", 7), VARRAY);
         INCREF(list);
@@ -171,7 +171,7 @@ Snapshot_write_file(Snapshot *self, Folder *folder, const CharBuf *path)
     Hash   *all_data = Hash_new(0);
     VArray *list     = Snapshot_List(self);
 
-    // Update path. 
+    // Update path.
     DECREF(self->path);
     if (path) {
         self->path = CB_Clone(path);
@@ -185,22 +185,22 @@ Snapshot_write_file(Snapshot *self, Folder *folder, const CharBuf *path)
         DECREF(latest);
     }
 
-    // Don't overwrite. 
+    // Don't overwrite.
     if (Folder_Exists(folder, self->path)) {
         THROW(ERR, "Snapshot file '%o' already exists", self->path);
     }
 
-    // Sort, then store file names. 
+    // Sort, then store file names.
     VA_Sort(list, NULL, NULL);
     Hash_Store_Str(all_data, "entries", 7, (Obj*)list);
 
-    // Create a JSON-izable data structure. 
+    // Create a JSON-izable data structure.
     Hash_Store_Str(all_data, "format", 6, 
         (Obj*)CB_newf("%i32", (int32_t)Snapshot_current_file_format) );
     Hash_Store_Str(all_data, "subformat", 9, 
         (Obj*)CB_newf("%i32", (int32_t)Snapshot_current_file_subformat) );
 
-    // Write out JSON-ized data to the new file. 
+    // Write out JSON-ized data to the new file.
     Json_spew_json((Obj*)all_data, folder, self->path);
 
     DECREF(all_data);

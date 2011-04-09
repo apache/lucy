@@ -35,22 +35,22 @@ Seg_new(int64_t number)
 Segment*
 Seg_init(Segment *self, int64_t number)
 {
-    // Validate. 
+    // Validate.
     if (number < 0) { THROW(ERR, "Segment number %i64 less than 0", number); }
 
-    // Init. 
+    // Init.
     self->metadata  = Hash_new(0);
     self->count     = 0;
     self->by_num    = VA_new(2);
     self->by_name   = Hash_new(0);
 
-    // Start field numbers at 1, not 0. 
+    // Start field numbers at 1, not 0.
     VA_Push(self->by_num, INCREF(&EMPTY));
 
-    // Assign. 
+    // Assign.
     self->number = number;
 
-    // Derive. 
+    // Derive.
     self->name = Seg_num_to_name(number);
 
     return self;
@@ -96,18 +96,18 @@ Seg_read_file(Segment *self, Folder *folder)
     Hash    *metadata = (Hash*)Json_slurp_json(folder, filename);
     Hash    *my_metadata;
 
-    // Bail unless the segmeta file was read successfully. 
+    // Bail unless the segmeta file was read successfully.
     DECREF(filename);
     if (!metadata) { return false; }
     CERTIFY(metadata, HASH);
 
-    // Grab metadata for the Segment object itself. 
+    // Grab metadata for the Segment object itself.
     DECREF(self->metadata);
     self->metadata = metadata;
     my_metadata = (Hash*)CERTIFY(
         Hash_Fetch_Str(self->metadata, "segmeta", 7), HASH);
 
-    // Assign. 
+    // Assign.
     {
         Obj *count = Hash_Fetch_Str(my_metadata, "count", 5);
         if (!count) { count = Hash_Fetch_Str(my_metadata, "doc_count", 9); }
@@ -115,7 +115,7 @@ Seg_read_file(Segment *self, Folder *folder)
         else { self->count = Obj_To_I64(count); }
     }
 
-    // Get list of field nums. 
+    // Get list of field nums.
     {
         uint32_t i;
         VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata, 
@@ -125,13 +125,13 @@ Seg_read_file(Segment *self, Folder *folder)
             THROW(ERR, "Failed to extract 'field_names' from metadata");
         }
 
-        // Init. 
+        // Init.
         DECREF(self->by_num);
         DECREF(self->by_name);
         self->by_num  = VA_new(num_fields);
         self->by_name = Hash_new(num_fields);
 
-        // Copy the list of fields from the source. 
+        // Copy the list of fields from the source.
         for (i = 0; i < num_fields; i++) {
             CharBuf *name = (CharBuf*)VA_Fetch(source_by_num, i);
             Seg_Add_Field(self, name);
@@ -146,7 +146,7 @@ Seg_write_file(Segment *self, Folder *folder)
 {
     Hash *my_metadata = Hash_new(16);
 
-    // Store metadata specific to this Segment object. 
+    // Store metadata specific to this Segment object.
     Hash_Store_Str(my_metadata, "count", 5, 
         (Obj*)CB_newf("%i64", self->count) );
     Hash_Store_Str(my_metadata, "name", 4, (Obj*)CB_Clone(self->name));

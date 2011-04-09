@@ -149,11 +149,11 @@ S_has_data(Schema *schema, Folder *folder, Segment *segment, CharBuf *field)
     FieldType *type = Schema_Fetch_Type(schema, field);
 
     if ( !type || !FType_Indexed(type)) {
-        // If the field isn't indexed, bail out. 
+        // If the field isn't indexed, bail out.
         return false;
     }
     else {
-        // Bail out if there are no terms for this field in this segment. 
+        // Bail out if there are no terms for this field in this segment.
         int32_t field_num   = Seg_Field_Num(segment, field);
         CharBuf *seg_name = Seg_Get_Name(segment);
         CharBuf *file = CB_newf("%o/lexicon-%i32.dat", seg_name, field_num);
@@ -170,12 +170,12 @@ DefLexReader_init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
     Segment *segment;
     uint32_t i, max;
 
-    // Init. 
+    // Init.
     LexReader_init((LexiconReader*)self, schema, folder, snapshot, segments,
         seg_tick);
     segment = DefLexReader_Get_Segment(self);
 
-    // Build an array of SegLexicon objects. 
+    // Build an array of SegLexicon objects.
     self->lexicons = VA_new(Schema_Num_Fields(schema));
     for (i = 1, max = Schema_Num_Fields(schema) + 1; i < max; i++) {
         CharBuf *field = Seg_Field_Name(segment, i);
@@ -210,7 +210,7 @@ DefLexReader_lexicon(DefaultLexiconReader *self, const CharBuf *field,
     SegLexicon *orig      = (SegLexicon*)VA_Fetch(self->lexicons, field_num);
     SegLexicon *lexicon   = NULL;
 
-    if (orig) { // i.e. has data 
+    if (orig) { // i.e. has data
         lexicon 
             = SegLex_new(self->schema, self->folder, self->segment, field);
         SegLex_Seek(lexicon, term);
@@ -228,10 +228,10 @@ S_find_tinfo(DefaultLexiconReader *self, const CharBuf *field, Obj *target)
             = (SegLexicon*)VA_Fetch(self->lexicons, field_num);
 
         if (lexicon) {
-            // Iterate until the result is ge the term.  
+            // Iterate until the result is ge the term.
             SegLex_Seek(lexicon, target);
 
-            //if found matches target, return info; otherwise NULL 
+            //if found matches target, return info; otherwise NULL
             {
                 Obj *found = SegLex_Get_Term(lexicon);
                 if (found && Obj_Equals(target, found)) {

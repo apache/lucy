@@ -45,10 +45,10 @@ StrHelp_to_base36(uint64_t num, void *buffer)
     char *buf = my_buf + StrHelp_MAX_BASE36_BYTES - 1;
     char *end = buf;
 
-    // Null terminate. 
+    // Null terminate.
     *buf = '\0';
 
-    // Convert to base 36 characters. 
+    // Convert to base 36 characters.
     do {
         *(--buf) = base36_chars[ num % 36 ];
         num /= 36;
@@ -65,22 +65,22 @@ uint32_t
 StrHelp_encode_utf8_char(uint32_t code_point, void *buffer)
 {
     uint8_t *buf = (uint8_t*)buffer;
-    if (code_point <= 0x7F) { // ASCII 
+    if (code_point <= 0x7F) { // ASCII
         buf[0] = (uint8_t)code_point;
         return 1;
     }
-    else if (code_point <= 0x07FF) { // 2 byte range 
+    else if (code_point <= 0x07FF) { // 2 byte range
         buf[0] = (uint8_t)(0xC0 | (code_point >> 6));
         buf[1] = (uint8_t)(0x80 | (code_point & 0x3f));
         return 2;
     }
-    else if (code_point <= 0xFFFF) { // 3 byte range 
+    else if (code_point <= 0xFFFF) { // 3 byte range
         buf[0] = (uint8_t)(0xE0 | ( code_point >> 12       ));
         buf[1] = (uint8_t)(0x80 | ((code_point >> 6) & 0x3F));
         buf[2] = (uint8_t)(0x80 | ( code_point       & 0x3f));
         return 3;
     }
-    else if (code_point <= 0x10FFFF) { // 4 byte range 
+    else if (code_point <= 0x10FFFF) { // 4 byte range
         buf[0] = (uint8_t)(0xF0 | ( code_point >> 18        ));
         buf[1] = (uint8_t)(0x80 | ((code_point >> 12) & 0x3F));
         buf[2] = (uint8_t)(0x80 | ((code_point >> 6 ) & 0x3F));

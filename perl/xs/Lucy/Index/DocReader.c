@@ -40,20 +40,20 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id)
     uint32_t num_fields;
     SV *field_name_sv = newSV(1);
 
-    // Get data file pointer from index, read number of fields. 
+    // Get data file pointer from index, read number of fields.
     Lucy_InStream_Seek(ix_in, (int64_t)doc_id * 8);
     start = Lucy_InStream_Read_U64(ix_in);
     Lucy_InStream_Seek(dat_in, start);
     num_fields = Lucy_InStream_Read_C32(dat_in);
 
-    // Decode stored data and build up the doc field by field. 
+    // Decode stored data and build up the doc field by field.
     while (num_fields--) {
         STRLEN  field_name_len;
         char   *field_name_ptr;
         SV     *value_sv;
         lucy_FieldType *type;
 
-        // Read field name. 
+        // Read field name.
         field_name_len = Lucy_InStream_Read_C32(dat_in);
         field_name_ptr = SvGROW(field_name_sv, field_name_len + 1);
         Lucy_InStream_Read_Bytes(dat_in, field_name_ptr, field_name_len);
@@ -62,13 +62,13 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id)
         SvUTF8_on(field_name_sv);
         *SvEND(field_name_sv) = '\0';
 
-        // Find the Field's FieldType. 
+        // Find the Field's FieldType.
         lucy_ZombieCharBuf *field_name_zcb 
             = CFISH_ZCB_WRAP_STR(field_name_ptr, field_name_len);
         Lucy_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
         type = Lucy_Schema_Fetch_Type(schema, (lucy_CharBuf*)field_name_zcb);
 
-        // Read the field value. 
+        // Read the field value.
         switch(Lucy_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
             case lucy_FType_TEXT: {
                 STRLEN  value_len = Lucy_InStream_Read_C32(dat_in);
@@ -103,7 +103,7 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id)
                     int64_t val = (int64_t)Lucy_InStream_Read_C64(dat_in);
                     value_sv = newSViv((IV)val);
                 }
-                else { // (lossy) 
+                else { // (lossy)
                     int64_t val = (int64_t)Lucy_InStream_Read_C64(dat_in);
                     value_sv = newSVnv((double)val);
                 }
@@ -113,7 +113,7 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id)
                 CFISH_THROW(LUCY_ERR, "Unrecognized type: %o", type);
         }
 
-        // Store the value. 
+        // Store the value.
         (void)hv_store_ent(fields, field_name_sv, value_sv, 0);
     }
     SvREFCNT_dec(field_name_sv);

@@ -292,11 +292,11 @@ PhraseMatcher_calc_phrase_freq(PhraseMatcher *self)
             candidates_start, candidates_end, i);
         if (!anchors_remaining) { return 0.0f; }
 
-        // Adjust end for number of anchors that remain. 
+        // Adjust end for number of anchors that remain.
         anchors_end = anchors_start + anchors_remaining;
     }
 
-    // The number of anchors left is the phrase freq. 
+    // The number of anchors left is the phrase freq.
     return (float)anchors_remaining;
 }
 

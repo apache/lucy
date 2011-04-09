@@ -40,16 +40,16 @@ RawLex_init(RawLexicon *self, Schema *schema, const CharBuf *field,
     FieldType *type = Schema_Fetch_Type(schema, field);
     Lex_init((Lexicon*)self, field);
     
-    // Assign 
+    // Assign
     self->start = start;
     self->end   = end;
     self->len   = end - start;
     self->instream = (InStream*)INCREF(instream);
 
-    // Get ready to begin. 
+    // Get ready to begin.
     InStream_Seek(self->instream, self->start);
 
-    // Get steppers. 
+    // Get steppers.
     self->term_stepper  = FType_Make_Term_Stepper(type);
     self->tinfo_stepper = (TermStepper*)MatchTInfoStepper_new(schema);
 

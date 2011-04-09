@@ -27,12 +27,12 @@
   #include <sys/types.h>
 #endif
 
-// For rmdir, (hard) link. 
+// For rmdir, (hard) link.
 #ifdef CHY_HAS_UNISTD_H
   #include <unistd.h>
 #endif
 
-// For mkdir, rmdir. 
+// For mkdir, rmdir.
 #ifdef CHY_HAS_DIRECT_H
   #include <direct.h>
 #endif
@@ -50,15 +50,15 @@
 static CharBuf*
 S_fullpath(FSFolder *self, const CharBuf *path);
 
-// Return true if the supplied path is a directory. 
+// Return true if the supplied path is a directory.
 static bool_t
 S_dir_ok(const CharBuf *path);
 
-// Create a directory, or set Err_error and return false. 
+// Create a directory, or set Err_error and return false.
 bool_t
 S_create_dir(const CharBuf *path);
 
-// Return true unless the supplied path contains a slash. 
+// Return true unless the supplied path contains a slash.
 bool_t
 S_is_local_entry(const CharBuf *path);
 
@@ -150,7 +150,7 @@ FSFolder_local_exists(FSFolder *self, const CharBuf *name)
 bool_t
 FSFolder_local_is_directory(FSFolder *self, const CharBuf *name)
 {
-    // Check for a cached object, then fall back to a system call. 
+    // Check for a cached object, then fall back to a system call.
     Obj *elem = Hash_Fetch(self->entries, (Obj*)name);
     if (elem && Obj_Is_A(elem, FOLDER)) { 
         return true; 
@@ -217,7 +217,7 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name)
 {
     Folder *subfolder = NULL;
     if (!name || !CB_Get_Size(name)) {
-        // No entity can be identified by NULL or empty string. 
+        // No entity can be identified by NULL or empty string.
         return NULL;
     }
     else if (!S_is_local_entry(name)) {
@@ -330,7 +330,7 @@ S_hard_link(CharBuf *from_path, CharBuf *to_path)
 #undef INCREF
 #undef DECREF
 
-// For CreateHardLink. 
+// For CreateHardLink.
 #ifdef CHY_HAS_WINDOWS_H
   #include <windows.h>
 #endif

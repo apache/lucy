@@ -60,10 +60,10 @@ SortSpec_deserialize(SortSpec *self, InStream *instream)
     VArray *rules = VA_new(num_rules);
     uint32_t i;
 
-    // Create base object. 
+    // Create base object.
     self = self ? self : (SortSpec*)VTable_Make_Obj(SORTSPEC);
 
-    // Add rules. 
+    // Add rules.
     for (i = 0; i < num_rules; i++) {
         VA_Push(rules, (Obj*)SortRule_deserialize(NULL, instream));
     }

@@ -34,7 +34,7 @@ TermVector*
 TV_init(TermVector *self, const CharBuf *field, const CharBuf *text, 
         I32Array *positions, I32Array *start_offsets, I32Array *end_offsets)
 {
-    // Assign. 
+    // Assign.
     self->field          = CB_Clone(field);
     self->text           = CB_Clone(text);
     self->num_pos        = I32Arr_Get_Size(positions);
@@ -99,7 +99,7 @@ TV_deserialize(TermVector *self, InStream *instream)
     int32_t *posits, *starts, *ends;
     I32Array *positions, *start_offsets, *end_offsets;
 
-    // Read positional data. 
+    // Read positional data.
     posits    = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     starts    = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     ends      = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));

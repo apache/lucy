@@ -86,7 +86,7 @@ BitColl_destroy(BitCollector *self)
 void
 BitColl_collect(BitCollector *self, int32_t doc_id) 
 {
-    // Add the doc_id to the BitVector. 
+    // Add the doc_id to the BitVector.
     BitVec_Set(self->bit_vec, (self->base + doc_id));
 }
 

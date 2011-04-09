@@ -28,7 +28,7 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 
-// Read the data we've arrived at after a seek operation. 
+// Read the data we've arrived at after a seek operation.
 static void
 S_read_entry(LexIndex *self);
 
@@ -50,12 +50,12 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
     CharBuf *ix_file   = CB_newf("%o/lexicon-%i32.ix", seg_name, field_num);
     Architecture *arch = Schema_Get_Architecture(schema);
 
-    // Init. 
+    // Init.
     Lex_init((Lexicon*)self, field);
     self->tinfo        = TInfo_new(0);
     self->tick         = 0;
 
-    // Derive 
+    // Derive
     self->field_type = Schema_Fetch_Type(schema, field);
     if (!self->field_type) {
         CharBuf *mess = MAKE_MESS("Unknown field: '%o'", field);
@@ -163,7 +163,7 @@ LexIndex_seek(LexIndex *self, Obj *target)
         */
     }
 
-    // Divide and conquer. 
+    // Divide and conquer.
     while (hi >= lo) {
         const int32_t mid = lo + ((hi - lo) / 2);
         const int64_t offset 
@@ -188,9 +188,9 @@ LexIndex_seek(LexIndex *self, Obj *target)
         }
     }
 
-    // Record the index of the entry we've seeked to, then read entry. 
-    self->tick = hi == -1   ? 0  // indicating that target lt first entry 
-           : result == -100 ? hi // if result is still -100, it wasn't set 
+    // Record the index of the entry we've seeked to, then read entry.
+    self->tick = hi == -1   ? 0  // indicating that target lt first entry
+           : result == -100 ? hi // if result is still -100, it wasn't set
            : result;
     S_read_entry(self);
 }

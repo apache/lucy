@@ -145,7 +145,7 @@ ProximityQuery_make_compiler(ProximityQuery *self, Searcher *searcher,
                           float boost)
 {
     if (VA_Get_Size(self->terms) == 1) {
-        // Optimize for one-term "phrases". 
+        // Optimize for one-term "phrases".
         Obj *term = VA_Fetch(self->terms, 0);
         TermQuery *term_query = TermQuery_new(self->field, term);
         TermCompiler *term_compiler;
@@ -188,13 +188,13 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
     
     self->within = within;
 
-    // Try harder to find a Similarity if necessary. 
+    // Try harder to find a Similarity if necessary.
     if (!sim) { sim = Schema_Get_Similarity(schema); }
 
-    // Init. 
+    // Init.
     Compiler_init((Compiler*)self, (Query*)parent, searcher, sim, boost);
 
-    // Store IDF for the phrase. 
+    // Store IDF for the phrase.
     self->idf = 0;
     for (i = 0, max = VA_Get_Size(terms); i < max; i++) {
         Obj *term = VA_Fetch(terms, i);
@@ -203,10 +203,10 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
         self->idf += Sim_IDF(sim, doc_freq, doc_max);
     }
 
-    // Calculate raw weight. 
+    // Calculate raw weight.
     self->raw_weight = self->idf * self->boost;
 
-    // Make final preparations. 
+    // Make final preparations.
     ProximityCompiler_Normalize(self);
 
     return self;
@@ -278,10 +278,10 @@ ProximityCompiler_make_matcher(ProximityCompiler *self, SegReader *reader,
     VArray *const      terms     = parent->terms;
     uint32_t           num_terms = VA_Get_Size(terms);
 
-    // Bail if there are no terms. 
+    // Bail if there are no terms.
     if (!num_terms) return NULL;
 
-    // Bail unless field is valid and posting type supports positions. 
+    // Bail unless field is valid and posting type supports positions.
     Similarity *sim     = ProximityCompiler_Get_Similarity(self);
     Posting    *posting = Sim_Make_Posting(sim);
     if (posting == NULL || !Obj_Is_A((Obj*)posting, SCOREPOSTING)) {
@@ -290,19 +290,19 @@ ProximityCompiler_make_matcher(ProximityCompiler *self, SegReader *reader,
     }
     DECREF(posting);
 
-    // Bail if there's no PostingListReader for this segment. 
+    // Bail if there's no PostingListReader for this segment.
     PostingListReader *const plist_reader = (PostingListReader*)SegReader_Fetch(
         reader, VTable_Get_Name(POSTINGLISTREADER));
     if (!plist_reader) { return NULL; }
 
-    // Look up each term. 
+    // Look up each term.
     VArray  *plists = VA_new(num_terms);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(terms, i);
         PostingList *plist 
             = PListReader_Posting_List(plist_reader, parent->field, term);
 
-        // Bail if any one of the terms isn't in the index. 
+        // Bail if any one of the terms isn't in the index.
         if (!plist || !PList_Get_Doc_Freq(plist)) {
             DECREF(plist);
             DECREF(plists);
@@ -332,7 +332,7 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
     uint32_t        num_tvs;
     UNUSED_VAR(searcher);
 
-    // Bail if no terms or field doesn't match. 
+    // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
     if (!CB_Equals(field, (Obj*)parent->field)) { return spans; }
 
@@ -344,7 +344,7 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
         TermVector *term_vector 
             = DocVec_Term_Vector(doc_vec, field, (CharBuf*)term);
 
-        // Bail if any term is missing. 
+        // Bail if any term is missing.
         if (!term_vector) {
             break;
         }
@@ -352,7 +352,7 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
         VA_Push(term_vectors, (Obj*)term_vector);
 
         if (i == 0) {
-            // Set initial positions from first term. 
+            // Set initial positions from first term.
             uint32_t j;
             I32Array *positions = TV_Get_Positions(term_vector);
             for (j = I32Arr_Get_Size(positions); j > 0; j--) {
@@ -360,7 +360,7 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
             }
         }
         else {
-            // Filter positions using logical "and". 
+            // Filter positions using logical "and".
             uint32_t j;
             I32Array *positions = TV_Get_Positions(term_vector);
 
@@ -375,7 +375,7 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
         }
     }
 
-    // Proceed only if all terms are present. 
+    // Proceed only if all terms are present.
     num_tvs = VA_Get_Size(term_vectors);
     if (num_tvs == num_terms) {
         TermVector *first_tv = (TermVector*)VA_Fetch(term_vectors, 0);
@@ -393,7 +393,7 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
         float     weight = ProximityCompiler_Get_Weight(self);
         i = 0;
 
-        // Add only those starts/ends that belong to a valid position. 
+        // Add only those starts/ends that belong to a valid position.
         for (posit_tick = 0; posit_tick < num_valid_posits; posit_tick++) {
             int32_t valid_start_posit = I32Arr_Get(valid_posits, posit_tick);
             int32_t valid_end_posit   = valid_start_posit + terms_max;

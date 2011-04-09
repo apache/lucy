@@ -42,18 +42,18 @@ Inverter_new(Schema *schema, Segment *segment)
 Inverter*
 Inverter_init(Inverter *self, Schema *schema, Segment *segment)
 {
-    // Init. 
+    // Init.
     self->tick       = -1;
     self->doc        = NULL;
     self->sorted     = false;
     self->blank      = InvEntry_new(NULL, NULL, 0);
     self->current    = self->blank;
     
-    // Derive. 
+    // Derive.
     self->entry_pool = VA_new(Schema_Num_Fields(schema));
     self->entries    = VA_new(Schema_Num_Fields(schema));
 
-    // Assign. 
+    // Assign.
     self->schema  = (Schema*)INCREF(schema);
     self->segment = (Segment*)INCREF(segment);
 
@@ -87,14 +87,14 @@ int32_t
 Inverter_next(Inverter *self)
 {
     self->current = (InverterEntry*)VA_Fetch(self->entries, ++self->tick);
-    if (!self->current) { self->current = self->blank; } // Exhausted. 
+    if (!self->current) { self->current = self->blank; } // Exhausted.
     return self->current->field_num; 
 }
 
 void
 Inverter_set_doc(Inverter *self, Doc *doc)
 {
-    Inverter_Clear(self); // Zap all cached field values and Inversions. 
+    Inverter_Clear(self); // Zap all cached field values and Inversions.
     self->doc = (Doc*)INCREF(doc);
 }
 
@@ -138,7 +138,7 @@ Inverter_get_inversion(Inverter *self)
 void
 Inverter_add_field(Inverter *self, InverterEntry *entry)
 {
-    // Get an Inversion, going through analyzer if appropriate. 
+    // Get an Inversion, going through analyzer if appropriate.
     if (entry->analyzer) {
         DECREF(entry->inversion);
         entry->inversion = Analyzer_Transform_Text(entry->analyzer, 
@@ -153,10 +153,10 @@ Inverter_add_field(Inverter *self, InverterEntry *entry)
         DECREF(entry->inversion);
         entry->inversion = Inversion_new(seed);
         DECREF(seed);
-        Inversion_Invert(entry->inversion); // Nearly a no-op. 
+        Inversion_Invert(entry->inversion); // Nearly a no-op.
     }
 
-    // Prime the iterator. 
+    // Prime the iterator.
     VA_Push(self->entries, INCREF(entry));
     self->sorted = false;
 }

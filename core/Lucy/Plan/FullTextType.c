@@ -81,7 +81,7 @@ FullTextType_dump_for_schema(FullTextType *self)
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("fulltext"));
 
-    // Store attributes that override the defaults. 
+    // Store attributes that override the defaults.
     if (self->boost != 1.0) {
         Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
     }
@@ -140,7 +140,7 @@ FullTextType_load(FullTextType *self, Obj *dump)
     bool_t sortable = sort_dump    ? (bool_t)Obj_To_I64(sort_dump)    : false;
     bool_t hl       = hl_dump      ? (bool_t)Obj_To_I64(hl_dump)      : false;
 
-    // Extract an Analyzer.  
+    // Extract an Analyzer.
     Obj *analyzer_dump = Hash_Fetch_Str(source, "analyzer", 8);
     Analyzer *analyzer = NULL;
     if (analyzer_dump) {

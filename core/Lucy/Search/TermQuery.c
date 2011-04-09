@@ -125,15 +125,15 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
     TermQuery  *tparent = (TermQuery*)parent;
     Similarity *sim     = Schema_Fetch_Sim(schema, tparent->field);
 
-    // Try harder to get a Similarity if necessary. 
+    // Try harder to get a Similarity if necessary.
     if (!sim) { sim = Schema_Get_Similarity(schema); }
 
-    // Init. 
+    // Init.
     Compiler_init((Compiler*)self, parent, searcher, sim, boost);
     self->normalized_weight = 0.0f;
     self->query_norm_factor = 0.0f;
 
-    // Derive. 
+    // Derive.
     int32_t doc_max  = Searcher_Doc_Max(searcher);
     int32_t doc_freq = Searcher_Doc_Freq(searcher, tparent->field, 
         tparent->term);
@@ -152,7 +152,7 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
      */
     self->raw_weight = self->idf * self->boost;
 
-    // Make final preparations. 
+    // Make final preparations.
     TermCompiler_Normalize(self);
 
     return self;
@@ -256,7 +256,7 @@ TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher,
 
     if (!CB_Equals(parent->field, (Obj*)field)) return spans;
 
-    // Add all starts and ends. 
+    // Add all starts and ends.
     term_vector = DocVec_Term_Vector(doc_vec, field, (CharBuf*)parent->term);
     if (!term_vector) return spans;
 

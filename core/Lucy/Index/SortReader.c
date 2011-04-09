@@ -69,7 +69,7 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
     segment = DefSortReader_Get_Segment(self);
     metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "sort", 4);
     
-    // Check format. 
+    // Check format.
     self->format = 0;
     if (metadata) {
         Obj *format = Hash_Fetch_Str(metadata, "format", 6);
@@ -83,7 +83,7 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
         }
     }
 
-    // Init. 
+    // Init.
     self->caches = Hash_new(0);
 
     // Either extract or fake up the "counts", "null_ords", and "ord_widths"
@@ -162,19 +162,19 @@ S_calc_ord_width(int32_t cardinality)
 static SortCache*
 S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field)
 {
-    // See if we have any values. 
+    // See if we have any values.
     Obj *count_obj = Hash_Fetch(self->counts, (Obj*)field);
     int32_t count = count_obj ? (int32_t)Obj_To_I64(count_obj) : 0;
     if (!count) { return NULL; }
 
-    // Get a FieldType and sanity check that the field is sortable. 
+    // Get a FieldType and sanity check that the field is sortable.
     Schema    *schema = DefSortReader_Get_Schema(self);
     FieldType *type   = Schema_Fetch_Type(schema, field);
     if (!type || !FType_Sortable(type)) {
         THROW(ERR, "'%o' isn't a sortable field", field);
     }
 
-    // Open streams. 
+    // Open streams.
     Folder    *folder    = DefSortReader_Get_Folder(self);
     Segment   *segment   = DefSortReader_Get_Segment(self);
     CharBuf   *seg_name  = Seg_Get_Name(segment);

@@ -40,7 +40,7 @@ SortRule_init(SortRule *self, int32_t type, const CharBuf *field,
     self->type     = type;
     self->reverse  = reverse;
 
-    // Validate. 
+    // Validate.
     if (type == SortRule_FIELD) {
         if (!field) { 
             THROW(ERR, "When sorting by field, param 'field' is required"); 

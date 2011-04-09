@@ -188,7 +188,7 @@ syntax_test_minus_plus()
 static TestQueryParser*
 syntax_test_plus_minus()
 {
-    // Not a perfect result, but then it's not a good query string. 
+    // Not a perfect result, but then it's not a good query string.
     Query *leaf = make_leaf_query(NULL, "a");
     Query *tree = make_not_query(leaf);
     return TestQP_new("+-a", tree, NULL, 0);
@@ -197,7 +197,7 @@ syntax_test_plus_minus()
 static TestQueryParser*
 syntax_test_minus_minus()
 {
-    // Not a perfect result, but then it's not a good query string. 
+    // Not a perfect result, but then it's not a good query string.
     Query *tree = make_leaf_query(NULL, "a");
     return TestQP_new("--a", tree, NULL, 4);
 }
@@ -212,7 +212,7 @@ syntax_test_not_minus()
 static TestQueryParser*
 syntax_test_not_plus()
 {
-    // Not a perfect result, but then it's not a good query string. 
+    // Not a perfect result, but then it's not a good query string.
     Query *leaf = make_leaf_query(NULL, "a");
     Query *tree = make_not_query(leaf);
     return TestQP_new("NOT +a", tree, NULL, 0);
@@ -221,7 +221,7 @@ syntax_test_not_plus()
 static TestQueryParser*
 syntax_test_unclosed_parens()
 {
-    // Not a perfect result, but then it's not a good query string. 
+    // Not a perfect result, but then it's not a good query string.
     Query *inner = make_poly_query(BOOLOP_OR, NULL);
     Query *tree = make_poly_query(BOOLOP_OR, inner, NULL);
     return TestQP_new("((", tree, NULL, 0);

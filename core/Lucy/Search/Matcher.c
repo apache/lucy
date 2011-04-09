@@ -49,7 +49,7 @@ Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions)
 
     Coll_Set_Matcher(collector, self);
 
-    // Execute scoring loop. 
+    // Execute scoring loop.
     while (1) {
         if (doc_id > next_deletion) {
             next_deletion = Matcher_Advance(deletions, doc_id);
@@ -57,15 +57,15 @@ Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions)
             continue;
         }
         else if (doc_id == next_deletion) {
-            // Skip past deletions. 
+            // Skip past deletions.
             while (doc_id == next_deletion) {
-                // Artifically advance matcher. 
+                // Artifically advance matcher.
                 while (doc_id == next_deletion) {
                     doc_id++;
                     next_deletion = Matcher_Advance(deletions, doc_id);
                     if (next_deletion == 0) { next_deletion = I32_MAX; }
                 }
-                // Verify that the artificial advance actually worked. 
+                // Verify that the artificial advance actually worked.
                 doc_id = Matcher_Advance(self, doc_id);
                 if (doc_id > next_deletion) {
                     next_deletion = Matcher_Advance(deletions, doc_id);

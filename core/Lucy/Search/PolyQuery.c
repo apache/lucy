@@ -120,7 +120,7 @@ PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
     Compiler_init((Compiler*)self, (Query*)parent, searcher, NULL, boost);
     self->children = VA_new(num_kids);
 
-    // Iterate over the children, creating a Compiler for each one. 
+    // Iterate over the children, creating a Compiler for each one.
     for (i = 0; i < num_kids; i++) {
         Query *child_query = (Query*)VA_Fetch(parent->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
@@ -150,7 +150,7 @@ PolyCompiler_sum_of_squared_weights(PolyCompiler *self)
         sum += Compiler_Sum_Of_Squared_Weights(child);
     }
 
-    // Compound the weight of each child. 
+    // Compound the weight of each child.
     sum *= my_boost * my_boost;
 
     return sum;

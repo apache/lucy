@@ -663,7 +663,7 @@ TestQPLogic_run_tests()
 
     TestBatch_Plan(batch);
 
-    // Run logical tests with default boolop of OR. 
+    // Run logical tests with default boolop of OR.
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
         lucy_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case = test_func(BOOLOP_OR);
@@ -681,7 +681,7 @@ TestQPLogic_run_tests()
         DECREF(test_case);
     }
 
-    // Run logical tests with default boolop of AND. 
+    // Run logical tests with default boolop of AND.
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
         lucy_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case = test_func(BOOLOP_AND);
@@ -699,7 +699,7 @@ TestQPLogic_run_tests()
         DECREF(test_case);
     }
 
-    // Run tests for QParser_Prune(). 
+    // Run tests for QParser_Prune().
     for (i = 0; prune_test_funcs[i] != NULL; i++) {
         lucy_TestQPLogic_prune_test_t test_func = prune_test_funcs[i];
         TestQueryParser *test_case = test_func();

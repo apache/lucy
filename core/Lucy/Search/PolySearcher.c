@@ -43,7 +43,7 @@ PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers)
 
     Searcher_init((Searcher*)self, schema);
     self->searchers = (VArray*)INCREF(searchers);
-    self->starts = NULL; // Safe cleanup. 
+    self->starts = NULL; // Safe cleanup.
 
     for (i = 0; i < num_searchers; i++) {
         Searcher *searcher 
@@ -52,14 +52,14 @@ PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers)
         VTable *orig_vt      = Schema_Get_VTable(schema);
         VTable *candidate_vt = Schema_Get_VTable(candidate);
 
-        // Confirm that searchers all use the same schema. 
+        // Confirm that searchers all use the same schema.
         if (orig_vt != candidate_vt) {
             THROW(ERR, "Conflicting schemas: '%o', '%o'",
                 Schema_Get_Class_Name(schema), 
                 Schema_Get_Class_Name(candidate));
         }
 
-        // Derive doc_max and relative start offsets. 
+        // Derive doc_max and relative start offsets.
         starts_array[i] = (int32_t)doc_max;
         doc_max += Searcher_Doc_Max(searcher);
     }

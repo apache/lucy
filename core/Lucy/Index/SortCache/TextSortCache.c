@@ -40,19 +40,19 @@ TextSortCache_init(TextSortCache *self, const CharBuf *field,
                    int32_t doc_max, int32_t null_ord, int32_t ord_width, 
                    InStream *ord_in, InStream *ix_in, InStream *dat_in)
 {
-    // Validate. 
+    // Validate.
     if (!type || !FType_Sortable(type)) {
         DECREF(self);
         THROW(ERR, "'%o' isn't a sortable field", field);
     }
 
-    // Memory map ords and super-init. 
+    // Memory map ords and super-init.
     int64_t ord_len = InStream_Length(ord_in);
     void *ords = InStream_Buf(ord_in, (size_t)ord_len);
     SortCache_init((SortCache*)self, field, type, ords, cardinality, doc_max,
         null_ord, ord_width);
 
-    // Validate ords file length. 
+    // Validate ords file length.
     double  bytes_per_doc = self->ord_width / 8.0;
     double  max_ords      = ord_len / bytes_per_doc;
     if (max_ords < self->doc_max + 1) {
@@ -61,7 +61,7 @@ TextSortCache_init(TextSortCache *self, const CharBuf *field,
             "field %o", max_ords, doc_max, field);
     }
 
-    // Assign. 
+    // Assign.
     self->ord_in = (InStream*)INCREF(ord_in);
     self->ix_in  = (InStream*)INCREF(ix_in);
     self->dat_in = (InStream*)INCREF(dat_in);
@@ -110,7 +110,7 @@ TextSortCache_value(TextSortCache *self, int32_t ord, Obj *blank)
             next_ord++;
         }
 
-        // Read character data into CharBuf. 
+        // Read character data into CharBuf.
         CERTIFY(blank, CHARBUF);
         int64_t len = next_offset - offset;
         char *ptr = CB_Grow((CharBuf*)blank, (size_t)len);

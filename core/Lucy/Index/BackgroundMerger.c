@@ -36,7 +36,7 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
-// Verify a Folder or derive an FSFolder from a CharBuf path. 
+// Verify a Folder or derive an FSFolder from a CharBuf path.
 static Folder*
 S_init_folder(Obj *index);
 
@@ -48,11 +48,11 @@ S_obtain_write_lock(BackgroundMerger *self);
 static void
 S_obtain_merge_lock(BackgroundMerger *self);
 
-// Release the write lock - if it's there. 
+// Release the write lock - if it's there.
 static void
 S_release_write_lock(BackgroundMerger *self);
 
-// Release the merge lock - if it's there. 
+// Release the merge lock - if it's there.
 static void
 S_release_merge_lock(BackgroundMerger *self);
 
@@ -69,14 +69,14 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
 {
     Folder *folder = S_init_folder(index);
 
-    // Init. 
+    // Init.
     self->optimize      = false;
     self->prepared      = false;
     self->needs_commit  = false;
     self->snapfile      = NULL;
     self->doc_maps      = Hash_new(0);
 
-    // Assign. 
+    // Assign.
     self->folder = folder;
     if (manager) {
         self->manager = (IndexManager*)INCREF(manager);
@@ -87,7 +87,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
     }
     IxManager_Set_Folder(self->manager, folder);
 
-    // Obtain write lock (which we'll only hold briefly), then merge lock. 
+    // Obtain write lock (which we'll only hold briefly), then merge lock.
     S_obtain_write_lock(self);
     if (!self->write_lock) {
         DECREF(self);
@@ -99,7 +99,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
         RETHROW(INCREF(Err_get_error()));
     }
 
-    // Find the latest snapshot.  If there's no index content, bail early. 
+    // Find the latest snapshot.  If there's no index content, bail early.
     self->snapshot = Snapshot_Read_File(Snapshot_new(), folder, NULL);
     if (!Snapshot_Get_Path(self->snapshot)) {
         S_release_write_lock(self);
@@ -107,7 +107,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
         return self;
     }
 
-    // Create FilePurger. Zap detritus from previous sessions. 
+    // Create FilePurger. Zap detritus from previous sessions.
     self->file_purger = FilePurger_new(folder, self->snapshot, self->manager);
     FilePurger_Purge(self->file_purger);
 
@@ -116,7 +116,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
     // we're operating in the background.
     self->polyreader = PolyReader_open((Obj*)folder, NULL, self->manager);
 
-    // Clone the PolyReader's schema. 
+    // Clone the PolyReader's schema.
     {
         Hash *dump = Schema_Dump(PolyReader_Get_Schema(self->polyreader));
         self->schema = (Schema*)CERTIFY(
@@ -124,7 +124,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
         DECREF(dump);
     }
 
-    // Create new Segment. 
+    // Create new Segment.
     {
         int64_t new_seg_num 
             = IxManager_Highest_Seg_Num(self->manager, self->snapshot) + 1;
@@ -149,7 +149,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
     self->seg_writer = SegWriter_new(self->schema, self->snapshot,
         self->segment, self->polyreader); 
 
-    // Grab a local ref to the DeletionsWriter. 
+    // Grab a local ref to the DeletionsWriter.
     self->del_writer = (DeletionsWriter*)INCREF(
         SegWriter_Get_Del_Writer(self->seg_writer));
 
@@ -185,7 +185,7 @@ S_init_folder(Obj *index)
 {
     Folder *folder = NULL;
 
-    // Validate or acquire a Folder. 
+    // Validate or acquire a Folder.
     if (Obj_Is_A(index, FOLDER)) {
         folder = (Folder*)INCREF(index);
     }
@@ -196,7 +196,7 @@ S_init_folder(Obj *index)
         THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
     }
 
-    // Validate index directory. 
+    // Validate index directory.
     if (!Folder_Check(folder)) {
         THROW(ERR, "Folder '%o' failed check", Folder_Get_Path(folder));
     }
@@ -232,10 +232,10 @@ S_maybe_merge(BackgroundMerger *self)
         return 0;
     }
 
-    // Now that we're sure we're writing a new segment, prep the seg dir. 
+    // Now that we're sure we're writing a new segment, prep the seg dir.
     SegWriter_Prep_Seg_Dir(self->seg_writer);
 
-    // Consolidate segments. 
+    // Consolidate segments.
     for (i = 0, max = num_to_merge; i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(to_merge, i);
         CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
@@ -279,13 +279,13 @@ S_merge_updated_deletions(BackgroundMerger *self)
             SegReader *seg_reader = (SegReader*)VA_Fetch(old_seg_readers, i);
             CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
 
-            // If this segment was merged away... 
+            // If this segment was merged away...
             if (Hash_Fetch(self->doc_maps, (Obj*)seg_name)) {
                 SegReader *new_seg_reader = (SegReader*)CERTIFY(
                     Hash_Fetch(new_segs, (Obj*)seg_name), SEGREADER);
                 int32_t old_del_count = SegReader_Del_Count(seg_reader);
                 int32_t new_del_count = SegReader_Del_Count(new_seg_reader);
-                // ... were any new deletions applied against it? 
+                // ... were any new deletions applied against it?
                 if (old_del_count != new_del_count) {
                     DeletionsReader *del_reader = (DeletionsReader*)
                         SegReader_Obtain(new_seg_reader, 
@@ -361,7 +361,7 @@ S_merge_updated_deletions(BackgroundMerger *self)
             }
         }
 
-        // Finish the segment and clean up. 
+        // Finish the segment and clean up.
         DelWriter_Finish(del_writer);
         SegWriter_Finish(seg_writer);
         DECREF(seg_writer);
@@ -385,39 +385,39 @@ BGMerger_prepare_commit(BackgroundMerger *self)
         THROW(ERR, "Can't call Prepare_Commit() more than once");
     }
 
-    // Maybe merge existing index data. 
+    // Maybe merge existing index data.
     if (num_seg_readers) { 
         segs_merged = S_maybe_merge(self);
     }
 
     if (!segs_merged) {
-        // Nothing merged.  Leave self->needs_commit false and bail out. 
+        // Nothing merged.  Leave self->needs_commit false and bail out.
         self->prepared = true;
         return;
     }
-    // Finish the segment and write a new snapshot file. 
+    // Finish the segment and write a new snapshot file.
     else {
         Folder   *folder   = self->folder;
         Snapshot *snapshot = self->snapshot;
 
-        // Write out new deletions. 
+        // Write out new deletions.
         if (DelWriter_Updated(self->del_writer)) {
-            // Only write out if they haven't all been applied. 
+            // Only write out if they haven't all been applied.
             if (segs_merged != num_seg_readers) {
                 DelWriter_Finish(self->del_writer);
             }
         }
 
-        // Finish the segment. 
+        // Finish the segment.
         SegWriter_Finish(self->seg_writer);
 
-        // Grab the write lock. 
+        // Grab the write lock.
         S_obtain_write_lock(self);
         if (!self->write_lock) {
             RETHROW(INCREF(Err_get_error()));
         }
 
-        // Write temporary snapshot file. 
+        // Write temporary snapshot file.
         DECREF(self->snapfile);
         self->snapfile = IxManager_Make_Snapshot_Filename(self->manager);
         CB_Cat_Trusted_Str(self->snapfile, ".temp", 5);
@@ -474,7 +474,7 @@ BGMerger_prepare_commit(BackgroundMerger *self)
         self->needs_commit = true;
     }
 
-    // Close reader, so that we can delete its files if appropriate. 
+    // Close reader, so that we can delete its files if appropriate.
     PolyReader_Close(self->polyreader);
 
     self->prepared = true;
@@ -483,7 +483,7 @@ BGMerger_prepare_commit(BackgroundMerger *self)
 void
 BGMerger_commit(BackgroundMerger *self)
 {
-    // Safety check. 
+    // Safety check.
     if ( !self->merge_lock ) {
         THROW(ERR, "Can't call commit() more than once");
     }
@@ -496,7 +496,7 @@ BGMerger_commit(BackgroundMerger *self)
         bool_t success = false;
         CharBuf *temp_snapfile = CB_Clone(self->snapfile);
 
-        // Rename temp snapshot file. 
+        // Rename temp snapshot file.
         CB_Chop(self->snapfile, sizeof(".temp") - 1);
         success = Folder_Hard_Link(self->folder, temp_snapfile,
             self->snapfile);
@@ -515,16 +515,16 @@ BGMerger_commit(BackgroundMerger *self)
         DECREF(temp_snapfile);
     }
 
-    // Release the merge lock and remove the merge data file. 
+    // Release the merge lock and remove the merge data file.
     S_release_merge_lock(self);
     IxManager_Remove_Merge_Data(self->manager);
 
     if (self->needs_commit) {
-        // Purge obsolete files. 
+        // Purge obsolete files.
         FilePurger_Purge(self->file_purger);
     }
 
-    // Release the write lock. 
+    // Release the write lock.
     S_release_write_lock(self);
 }
 
@@ -534,7 +534,7 @@ S_obtain_write_lock(BackgroundMerger *self)
     Lock *write_lock = IxManager_Make_Write_Lock(self->manager);
     Lock_Clear_Stale(write_lock);
     if (Lock_Obtain(write_lock)) {
-        // Only assign if successful, otherwise DESTROY unlocks -- bad! 
+        // Only assign if successful, otherwise DESTROY unlocks -- bad!
         self->write_lock = write_lock;
     }
     else {
@@ -548,7 +548,7 @@ S_obtain_merge_lock(BackgroundMerger *self)
     Lock *merge_lock = IxManager_Make_Merge_Lock(self->manager);
     Lock_Clear_Stale(merge_lock);
     if (Lock_Obtain(merge_lock)) {
-        // Only assign if successful, same rationale as above. 
+        // Only assign if successful, same rationale as above.
         self->merge_lock = merge_lock;
     }
     else {

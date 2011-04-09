@@ -71,7 +71,7 @@ PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion)
     VArray *const analyzers = self->analyzers;
     (void)INCREF(inversion);
 
-    // Iterate through each of the analyzers in order. 
+    // Iterate through each of the analyzers in order.
     for (uint32_t i = 0, max = VA_Get_Size(analyzers); i < max; i++) {
         Analyzer *analyzer = (Analyzer*)VA_Fetch(analyzers, i);
         Inversion *new_inversion = Analyzer_Transform(analyzer, inversion);

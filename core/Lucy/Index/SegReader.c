@@ -53,7 +53,7 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
     self->seg_num    = Seg_Get_Number(segment);
     mess = SegReader_Try_Init_Components(self);
     if (mess) {
-        // An error occurred, so clean up self and throw an exception. 
+        // An error occurred, so clean up self and throw an exception.
         DECREF(self);
         Err_throw_mess(ERR, mess);
     }

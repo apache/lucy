@@ -35,23 +35,23 @@ NumSortCache_init(NumericSortCache *self, const CharBuf *field,
                   int32_t null_ord, int32_t ord_width, InStream *ord_in, 
                   InStream *dat_in)
 {
-    // Validate. 
+    // Validate.
     if (!type || !FType_Sortable(type) || !FType_Is_A(type, NUMERICTYPE)) {
         DECREF(self);
         THROW(ERR, "'%o' isn't a sortable NumericType field", field);
     }
 
-    // Mmap ords and super-init. 
+    // Mmap ords and super-init.
     int64_t  ord_len = InStream_Length(ord_in);
     void    *ords    = InStream_Buf(ord_in, (size_t)ord_len);
     SortCache_init((SortCache*)self, field, type, ords, cardinality, doc_max,
         null_ord, ord_width);
 
-    // Assign. 
+    // Assign.
     self->ord_in = (InStream*)INCREF(ord_in);
     self->dat_in = (InStream*)INCREF(dat_in);
     
-    // Validate ord file length. 
+    // Validate ord file length.
     double BITS_PER_BYTE = 8.0;
     double docs_per_byte = BITS_PER_BYTE / self->ord_width;
     double max_ords      = ord_len * docs_per_byte;

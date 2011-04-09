@@ -57,11 +57,11 @@
 #define AUTO_TIE                     0x17
 #define ACTIONS_MASK                 0x1F
 
-// Pick an action based on a SortRule and if needed, a SortCache. 
+// Pick an action based on a SortRule and if needed, a SortCache.
 static int8_t
 S_derive_action(SortRule *rule, SortCache *sort_cache);
 
-// Decide whether a doc should be inserted into the HitQueue. 
+// Decide whether a doc should be inserted into the HitQueue.
 static INLINE bool_t
 SI_competitive(SortCollector *self, int32_t doc_id);
 
@@ -72,7 +72,7 @@ SortColl_new(Schema *schema, SortSpec *sort_spec, uint32_t wanted)
     return SortColl_init(self, schema, sort_spec, wanted);
 }
 
-// Default to sort-by-score-then-doc-id. 
+// Default to sort-by-score-then-doc-id.
 static VArray*
 S_default_sort_rules()
 {
@@ -92,7 +92,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     uint32_t num_rules = VA_Get_Size(rules);
     uint32_t i;
 
-    // Validate. 
+    // Validate.
     if (sort_spec && !schema) {
         THROW(ERR, "Can't supply a SortSpec without a Schema.");
     }
@@ -100,19 +100,19 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
         THROW(ERR, "Can't supply a SortSpec with no SortRules.");
     }
 
-    // Init. 
+    // Init.
     Coll_init((Collector*)self);
     self->total_hits    = 0;
     self->bubble_doc    = I32_MAX;
     self->bubble_score  = F32_NEGINF;
     self->seg_doc_max   = 0;
 
-    // Assign. 
+    // Assign.
     self->wanted        = wanted;
 
-    // Derive. 
+    // Derive.
     self->hit_q         = HitQ_new(schema, sort_spec, wanted);
-    self->rules         = rules; // absorb refcount. 
+    self->rules         = rules; // absorb refcount.
     self->num_rules     = num_rules;
     self->sort_caches   = (SortCache**)CALLOCATE(num_rules, sizeof(SortCache*));
     self->ord_arrays    = (void**)CALLOCATE(num_rules, sizeof(void*));
@@ -156,7 +156,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     self->actions         = self->auto_actions;
 
 
-    // Prepare a MatchDoc-in-waiting. 
+    // Prepare a MatchDoc-in-waiting.
     {
         VArray *values = self->need_values ? VA_new(num_rules) : NULL;
         float   score  = self->need_score  ? F32_NEGINF : F32_NAN;
@@ -233,14 +233,14 @@ SortColl_set_reader(SortCollector *self, SegReader *reader)
     SortReader *sort_reader 
         = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
 
-    // Reset threshold variables and trigger auto-action behavior. 
+    // Reset threshold variables and trigger auto-action behavior.
     self->bumped->doc_id = I32_MAX;
     self->bubble_doc     = I32_MAX;
     self->bumped->score  = self->need_score ? F32_NEGINF : F32_NAN;
     self->bubble_score   = self->need_score ? F32_NEGINF : F32_NAN;
     self->actions        = self->auto_actions;
 
-    // Obtain sort caches. Derive actions array for this segment. 
+    // Obtain sort caches. Derive actions array for this segment.
     if (self->need_values && sort_reader) {
         uint32_t i, max;
         for (i = 0, max = self->num_rules; i < max; i++) {
@@ -277,10 +277,10 @@ SortColl_need_score(SortCollector *self)
 void
 SortColl_collect(SortCollector *self, int32_t doc_id) 
 {
-    // Add to the total number of hits. 
+    // Add to the total number of hits.
     self->total_hits++;
     
-    // Collect this hit if it's competitive. 
+    // Collect this hit if it's competitive.
     if (SI_competitive(self, doc_id)) {
         MatchDoc *const match_doc = self->bumped;
         match_doc->doc_id = doc_id + self->base;
@@ -289,7 +289,7 @@ SortColl_collect(SortCollector *self, int32_t doc_id)
             match_doc->score = Matcher_Score(self->matcher);
         }
 
-        // Fetch values so that cross-segment sorting can work. 
+        // Fetch values so that cross-segment sorting can work.
         if (self->need_values) {
             VArray *values = match_doc->values;
             uint32_t i, max;
@@ -309,7 +309,7 @@ SortColl_collect(SortCollector *self, int32_t doc_id)
             }
         }
 
-        // Insert the new MatchDoc. 
+        // Insert the new MatchDoc.
         self->bumped = (MatchDoc*)HitQ_Jostle(self->hit_q, (Obj*)match_doc);
 
         if (self->bumped) {
@@ -323,11 +323,11 @@ SortColl_collect(SortCollector *self, int32_t doc_id)
                 self->actions       = self->derived_actions;
             }
 
-            // Recycle. 
+            // Recycle.
             self->bumped->score = self->need_score ? F32_NEGINF : F32_NAN;
         }
         else {
-            // The queue isn't full yet, so create a fresh MatchDoc. 
+            // The queue isn't full yet, so create a fresh MatchDoc.
             VArray *values = self->need_values 
                            ? VA_new(self->num_rules)
                            : NULL;
@@ -413,7 +413,7 @@ SI_compare_by_native_ord32(SortCollector *self, uint32_t tick,
 static INLINE int32_t
 SI_validate_doc_id(SortCollector *self, int32_t doc_id)
 {
-    // Check as uint32_t since we're using these doc ids as array indexes. 
+    // Check as uint32_t since we're using these doc ids as array indexes.
     if ((uint32_t)doc_id > (uint32_t)self->seg_doc_max) {
         THROW(ERR, "Doc ID %i32 greater than doc max %i32", doc_id, 
             self->seg_doc_max);

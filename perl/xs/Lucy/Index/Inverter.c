@@ -58,7 +58,7 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry)
         // This field seems not to be in the segment yet.  Try to find it in
         // the Schema.
         if (Lucy_Schema_Fetch_Type(schema, (lucy_CharBuf*)field)) {
-            // The field is in the Schema.  Get a field num from the Segment. 
+            // The field is in the Schema.  Get a field num from the Segment.
             field_num = Lucy_Seg_Add_Field(self->segment,
                 (lucy_CharBuf*)field);
         }
@@ -87,17 +87,17 @@ lucy_Inverter_invert_doc(lucy_Inverter *self, lucy_Doc *doc)
     HV  *const fields = (HV*)Lucy_Doc_Get_Fields(doc);
     I32  num_keys     = hv_iterinit(fields);
 
-    // Prepare for the new doc. 
+    // Prepare for the new doc.
     Lucy_Inverter_Set_Doc(self, doc);
 
-    // Extract and invert the doc's fields. 
+    // Extract and invert the doc's fields.
     while (num_keys--) {
         HE *hash_entry = hv_iternext(fields);
         lucy_InverterEntry *inv_entry = S_fetch_entry(self, hash_entry);
         SV *value_sv = HeVAL(hash_entry);
         lucy_FieldType *type = inv_entry->type;
 
-        // Get the field value, forcing text fields to UTF-8. 
+        // Get the field value, forcing text fields to UTF-8.
         switch (
             Lucy_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK
         ) {
@@ -124,7 +124,7 @@ lucy_Inverter_invert_doc(lucy_Inverter *self, lucy_Doc *doc)
                 lucy_Integer64* value = (lucy_Integer64*)inv_entry->value;
                 int64_t val = sizeof(IV) == 8 
                               ? SvIV(value_sv) 
-                              : (int64_t)SvNV(value_sv); // lossy 
+                              : (int64_t)SvNV(value_sv); // lossy
                 Lucy_Int64_Set_Value(value, val);
                 break;
             }

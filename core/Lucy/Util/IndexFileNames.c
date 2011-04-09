@@ -74,14 +74,14 @@ IxFileNames_local_part(const CharBuf *path, ZombieCharBuf *target)
 
     ZCB_Assign(target, path);
 
-    // Trim trailing slash. 
+    // Trim trailing slash.
     while (ZCB_Code_Point_From(target, 1) == '/') {
         ZCB_Chop(target, 1);
         ZCB_Chop(scratch, 1);
         local_part_start--;
     }
 
-    // Substring should start after last slash. 
+    // Substring should start after last slash.
     while (0 != (code_point = ZCB_Code_Point_From(scratch, 1))) {
         if (code_point == '/') {
             ZCB_Nip(target, local_part_start);

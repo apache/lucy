@@ -42,7 +42,7 @@ run_tests(package)
     char *package;
 PPCODE:
 {
-    // Lucy::Analysis 
+    // Lucy::Analysis
     if (strEQ(package, "TestAnalyzer")) {
         lucy_TestAnalyzer_run_tests();
     }
@@ -61,7 +61,7 @@ PPCODE:
     else if (strEQ(package, "TestRegexTokenizer")) {
         lucy_TestRegexTokenizer_run_tests();
     }
-    // Lucy::Object 
+    // Lucy::Object
     else if (strEQ(package, "TestObj")) {
         lucy_TestObj_run_tests();
     }
@@ -74,7 +74,7 @@ PPCODE:
     else if (strEQ(package, "TestLockFreeRegistry")) {
         lucy_TestLFReg_run_tests();
     }
-    // Lucy::Plan 
+    // Lucy::Plan
     else if (strEQ(package, "TestBlobType")) {
         lucy_TestBlobType_run_tests();
     }
@@ -90,7 +90,7 @@ PPCODE:
     else if (strEQ(package, "TestSchema")) {
         lucy_TestSchema_run_tests();
     }
-    // Lucy::Index 
+    // Lucy::Index
     else if (strEQ(package, "TestDocWriter")) {
         lucy_TestDocWriter_run_tests();
     }
@@ -115,7 +115,7 @@ PPCODE:
     else if (strEQ(package, "TestSnapshot")) {
         lucy_TestSnapshot_run_tests();
     }
-    // Lucy::Search 
+    // Lucy::Search
     else if (strEQ(package, "TestANDQuery")) {
         lucy_TestANDQuery_run_tests();
     }
@@ -152,7 +152,7 @@ PPCODE:
     else if (strEQ(package, "TestTermQuery")) {
         lucy_TestTermQuery_run_tests();
     }
-    // Lucy::Store 
+    // Lucy::Store
     else if (strEQ(package, "TestCompoundFileReader")) {
         lucy_TestCFReader_run_tests();
     }
@@ -192,7 +192,7 @@ PPCODE:
     else if (strEQ(package, "TestRAMFolder")) {
         lucy_TestRAMFolder_run_tests();
     }
-    // Lucy::Util 
+    // Lucy::Util
     else if (strEQ(package, "TestAtomic")) {
         lucy_TestAtomic_run_tests();
     }

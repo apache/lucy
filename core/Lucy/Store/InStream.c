@@ -25,19 +25,19 @@
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Store/RAMFileHandle.h"
 
-// Inlined version of InStream_Tell. 
+// Inlined version of InStream_Tell.
 static INLINE int64_t
 SI_tell(InStream *self);
 
-// Inlined version of InStream_Read_Bytes. 
+// Inlined version of InStream_Read_Bytes.
 static INLINE void
 SI_read_bytes(InStream *self, char* buf, size_t len);
 
-// Inlined version of InStream_Read_U8. 
+// Inlined version of InStream_Read_U8.
 static INLINE uint8_t
 SI_read_u8(InStream *self);
 
-// Ensure that the buffer contains exactly the specified amount of data. 
+// Ensure that the buffer contains exactly the specified amount of data.
 static void
 S_fill(InStream *self, int64_t amount);
 
@@ -57,13 +57,13 @@ InStream_open(Obj *file)
 InStream*
 InStream_do_open(InStream *self, Obj *file)
 {
-    // Init. 
+    // Init.
     self->buf           = NULL;
     self->limit         = NULL;
     self->offset        = 0;
     self->window        = FileWindow_new();
 
-    // Obtain a FileHandle. 
+    // Obtain a FileHandle.
     if (Obj_Is_A(file, FILEHANDLE)) {
         self->file_handle = (FileHandle*)INCREF(file);
     }
@@ -87,7 +87,7 @@ InStream_do_open(InStream *self, Obj *file)
         return NULL;
     }
 
-    // Get length and filename from the FileHandle.  
+    // Get length and filename from the FileHandle.
     self->filename      = CB_Clone(FH_Get_Path(self->file_handle));
     self->len           = FH_Length(self->file_handle);
     if (self->len == -1) {
@@ -159,7 +159,7 @@ InStream_get_filename(InStream *self) { return self->filename; }
 static int64_t 
 S_refill(InStream *self) 
 {
-    // Determine the amount to request. 
+    // Determine the amount to request.
     const int64_t sub_file_pos = SI_tell(self);
     const int64_t remaining    = self->len - sub_file_pos;
     const int64_t amount       = remaining < IO_STREAM_BUF_SIZE 
@@ -170,7 +170,7 @@ S_refill(InStream *self)
             self->filename, self->offset, self->len);
     }
 
-    // Make the request. 
+    // Make the request.
     S_fill(self, amount);
 
     return amount;
@@ -190,19 +190,19 @@ S_fill(InStream *self, int64_t amount)
     const int64_t real_file_pos    = virtual_file_pos + self->offset;
     const int64_t remaining        = self->len - virtual_file_pos;
 
-    // Throw an error if the requested amount would take us beyond EOF. 
+    // Throw an error if the requested amount would take us beyond EOF.
     if (amount > remaining) {
         THROW(ERR,  "Read past EOF of %o (pos: %u64 len: %u64 request: %u64)",
             self->filename, virtual_file_pos, self->len, amount);
     }
 
-    // Make the request. 
+    // Make the request.
     if (FH_Window(self->file_handle, window, real_file_pos, amount) ) {
         char *const window_limit = window->buf + window->len;
         self->buf = window->buf 
-                  - window->offset    // theoretical start of real file 
-                  + self->offset      // top of virtual file 
-                  + virtual_file_pos; // position within virtual file 
+                  - window->offset    // theoretical start of real file
+                  + self->offset      // top of virtual file
+                  + virtual_file_pos; // position within virtual file
         self->limit = window_limit - self->buf > remaining
                     ? self->buf + remaining
                     : window_limit;
@@ -231,7 +231,7 @@ InStream_seek(InStream *self, int64_t target)
         THROW(ERR, "Can't Seek '%o' to negative target %i64", self->filename,
             target);
     }
-    // Seek within window if possible. 
+    // Seek within window if possible.
     else if (   target >= virtual_window_top
              && target <= virtual_window_end
     ) {
@@ -286,10 +286,10 @@ InStream_buf(InStream *self, size_t request)
         const int64_t remaining_in_file = self->len - SI_tell(self);
         int64_t amount = request;
 
-        // Try to bump up small requests. 
+        // Try to bump up small requests.
         if (amount < IO_STREAM_BUF_SIZE) { amount = IO_STREAM_BUF_SIZE; }
 
-        // Don't read past EOF. 
+        // Don't read past EOF.
         if (remaining_in_file < amount) { amount = remaining_in_file; }
 
         // Only fill if the recalculated, possibly smaller request exceeds the
@@ -330,12 +330,12 @@ SI_read_bytes(InStream *self, char* buf, size_t len)
 {
     const int64_t available = PTR_TO_I64(self->limit) - PTR_TO_I64(self->buf);
     if (available >= (int64_t)len) {
-        // Request is entirely within buffer, so copy. 
+        // Request is entirely within buffer, so copy.
         memcpy(buf, self->buf, len);
         self->buf += len;
     }
     else { 
-        // Pass along whatever we've got in the buffer. 
+        // Pass along whatever we've got in the buffer.
         if (available > 0) {
             memcpy(buf, self->buf, (size_t)available);
             buf += available;
@@ -344,7 +344,7 @@ SI_read_bytes(InStream *self, char* buf, size_t len)
         }
 
         if (len < IO_STREAM_BUF_SIZE) {
-            // Ensure that we have enough mapped, then copy the rest. 
+            // Ensure that we have enough mapped, then copy the rest.
             int64_t got = S_refill(self);
             if (got < (int64_t)len) {
                 int64_t orig_pos = SI_tell(self) - available;

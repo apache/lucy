@@ -114,13 +114,13 @@ ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
         uint32_t i;
         VArray *child_matchers = VA_new(num_kids);
 
-        // Add child matchers one by one. 
+        // Add child matchers one by one.
         for (i = 0; i < num_kids; i++) {
             Compiler *child = (Compiler*)VA_Fetch(self->children, i);
             Matcher *child_matcher 
                 = Compiler_Make_Matcher(child, reader, need_score);
 
-            // If any required clause fails, the whole thing fails. 
+            // If any required clause fails, the whole thing fails.
             if (child_matcher == NULL) {
                 DECREF(child_matchers);
                 return NULL;

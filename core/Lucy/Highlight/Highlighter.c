@@ -40,7 +40,7 @@ const uint32_t ELLIPSIS_CODE_POINT = 0x2026;
 static CharBuf*
 S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf);
 
-// Place HTML entity encoded version of [text] into [encoded]. 
+// Place HTML entity encoded version of [text] into [encoded].
 static CharBuf*
 S_encode_entities(CharBuf *text, CharBuf *encoded);
 
@@ -127,7 +127,7 @@ Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc)
         return NULL;
     }
     else if (!ZCB_Get_Size(field_val)) {
-        // Empty string yields empty string. 
+        // Empty string yields empty string.
         return CB_new(0);
     }
     else {
@@ -182,7 +182,7 @@ int32_t
 Highlighter_find_best_fragment(Highlighter *self, const CharBuf *field_val,
                                ViewCharBuf *fragment, HeatMap *heat_map)
 {
-    // Window is 1.66 * excerpt_length, with the loc in the middle. 
+    // Window is 1.66 * excerpt_length, with the loc in the middle.
     int32_t best_location = S_hottest(heat_map);
 
     if (best_location < (int32_t)self->slop) {
@@ -203,7 +203,7 @@ Highlighter_find_best_fragment(Highlighter *self, const CharBuf *field_val,
         int32_t overrun = self->excerpt_length - chars_left;
 
         if (!overrun) {
-            // We've found an acceptable window. 
+            // We've found an acceptable window.
             ViewCB_Assign(fragment, (CharBuf*)field_val);
             ViewCB_Nip(fragment, top);
             top += ViewCB_Trim_Top(fragment);
@@ -217,7 +217,7 @@ Highlighter_find_best_fragment(Highlighter *self, const CharBuf *field_val,
             return ViewCB_Trim_Top(fragment);
         }
         else {
-            // The fragment is too close to the end, so slide it back. 
+            // The fragment is too close to the end, so slide it back.
             top -= overrun;
             ViewCB_Assign(fragment, (CharBuf*)field_val);
             ViewCB_Nip(fragment, top);
@@ -268,7 +268,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
                    ? (uint32_t)field_len 
                    : (uint32_t)(self->excerpt_length * 0.6666);
 
-    // Try to find a starting sentence boundary. 
+    // Try to find a starting sentence boundary.
     const uint32_t num_sentences = VA_Get_Size(sentences);
     if (num_sentences) {
         for (uint32_t i = 0; i < num_sentences; i++) {
@@ -296,7 +296,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
         }
     }
 
-    // Try to end on a sentence boundary (but don't try very hard). 
+    // Try to end on a sentence boundary (but don't try very hard).
     if (num_sentences) {
         ZombieCharBuf *start_trimmed = ZCB_WRAP(fragment);
         ZCB_Nip(start_trimmed, start - top);
@@ -325,7 +325,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
                     ZCB_Nip(temp, chars_left);
                     ZCB_Trim_Tail(temp);
                     if (ZCB_Get_Size(temp) == 0) {
-                        // Short, but ending on a boundary already. 
+                        // Short, but ending on a boundary already.
                         found_ending_edge = true;
                         end = last_edge;
                         break;
@@ -345,10 +345,10 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
         ZCB_Truncate(temp, this_excerpt_len);
         CB_Mimic(raw_excerpt, (Obj*)temp);
     }
-    // If not starting on a sentence boundary, prepend an ellipsis. 
+    // If not starting on a sentence boundary, prepend an ellipsis.
     else {
         ZombieCharBuf *temp = ZCB_WRAP((CharBuf*)field_val);
-        const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space. 
+        const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
         
         // If the excerpt is already shorter than the spec'd length, we might
         // not need to make room.
@@ -386,7 +386,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
         start -= ELLIPSIS_LEN;
     }
 
-    // If excerpt doesn't end on a sentence boundary, tack on an ellipsis. 
+    // If excerpt doesn't end on a sentence boundary, tack on an ellipsis.
     if (found_ending_edge) {
         CB_Truncate(raw_excerpt, end - start);
     }
@@ -397,7 +397,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
             if (StrHelp_is_whitespace(code_point)) {
                 CB_Trim_Tail(raw_excerpt);
 
-                // Strip punctuation that collides with an ellipsis. 
+                // Strip punctuation that collides with an ellipsis.
                 code_point = CB_Code_Point_From(raw_excerpt, 1);
                 while (code_point == '.' 
                     || code_point == ','
@@ -469,7 +469,7 @@ Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
         }
     }
 
-    // Last text, beyond last highlight span. 
+    // Last text, beyond last highlight span.
     if (ZCB_Get_Size(temp)) {
         CharBuf *encoded = S_do_encode(self, (CharBuf*)temp, &encode_buf);
         CB_Cat(highlighted, encoded);
@@ -491,7 +491,7 @@ S_close_sentence(VArray *sentences, Span **sentence_ptr, int32_t sentence_end)
 {
     Span *sentence = *sentence_ptr;
     int32_t length = sentence_end - Span_Get_Offset(sentence);
-    const int32_t MIN_SENTENCE_LENGTH = 3; // e.g. "OK.", but not "2." 
+    const int32_t MIN_SENTENCE_LENGTH = 3; // e.g. "OK.", but not "2."
     if (length >= MIN_SENTENCE_LENGTH) {
         Span_Set_Length(sentence, length);
         VA_Push(sentences, (Obj*)sentence);
@@ -526,7 +526,7 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
      * starts based on a sentence end that has just passed by.
      */
     if (offset <= pos) {
-        // Assume that first non-whitespace character begins a sentence. 
+        // Assume that first non-whitespace character begins a sentence.
         if (pos < stop && ZCB_Get_Size(fragment) > 0) {
             sentence = S_start_sentence(pos);
         }
@@ -546,10 +546,10 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
         }
         else if (code_point == '.') {
             uint32_t whitespace_count;
-            pos += ZCB_Nip(fragment, 1); // advance past "." 
+            pos += ZCB_Nip(fragment, 1); // advance past "."
 
             if (pos == stop && ZCB_Get_Size(fragment) == 0) {
-                // Period ending the field string. 
+                // Period ending the field string.
                 if (sentence) S_close_sentence(sentences, &sentence, pos);
                 break;
             }
@@ -558,7 +558,7 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
                 // existing sentence, if there is one. */
                 if (sentence) S_close_sentence(sentences, &sentence, pos);
 
-                // Advance past whitespace. 
+                // Advance past whitespace.
                 pos += whitespace_count;
                 if (pos < stop && ZCB_Get_Size(fragment) > 0) {
                     // Not at the end of the string? Then we've found a
@@ -607,9 +607,9 @@ S_encode_entities(CharBuf *text, CharBuf *encoded)
 {
     ZombieCharBuf *temp = ZCB_WRAP(text);
     size_t space = 0;
-    const int MAX_ENTITY_BYTES = 9; // &#dddddd; 
+    const int MAX_ENTITY_BYTES = 9; // &#dddddd;
 
-    // Scan first so that we only allocate once. 
+    // Scan first so that we only allocate once.
     uint32_t code_point;
     while (0 != (code_point = ZCB_Nip_One(temp))) {
         if (   code_point > 127

@@ -43,7 +43,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
 
     Folder_init((Folder*)self, Folder_Get_Path(folder));
 
-    // Parse metadata file. 
+    // Parse metadata file.
     if (!metadata || !Hash_Is_A(metadata, HASH)) {
         error = Err_new(CB_newf("Can't read '%o' in '%o'", cfmeta_file,
             Folder_Get_Path(folder)));
@@ -74,7 +74,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
         return NULL;
     }
 
-    // Open an instream which we'll clone over and over. 
+    // Open an instream which we'll clone over and over.
     CharBuf *cf_file = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
     self->instream = Folder_Open_In(folder, cf_file);
     if(!self->instream) {
@@ -83,10 +83,10 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder)
         return NULL;
     }
 
-    // Assign. 
+    // Assign.
     self->real_folder = (Folder*)INCREF(folder);
 
-    // Strip directory name from filepaths for old format. 
+    // Strip directory name from filepaths for old format.
     if (self->format == 1) {
         VArray *files = Hash_Keys(self->records);
         ZombieCharBuf *filename = ZCB_BLANK();
@@ -161,7 +161,7 @@ CFReader_local_delete(CompoundFileReader *self, const CharBuf *name)
         return Folder_Local_Delete(self->real_folder, name);
     }
     else { 
-        // Once the number of virtual files falls to 0, remove the compound 
+        // Once the number of virtual files falls to 0, remove the compound
         // files.
         if (Hash_Get_Size(self->records) == 0) {
             CharBuf *cf_file = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
@@ -279,7 +279,7 @@ CFReaderDH_init(CFReaderDirHandle *self, CompoundFileReader *cf_reader)
     self->elems  = Hash_Keys(self->cf_reader->records);
     self->tick   = -1;
     {
-        // Accumulate entries from real Folder. 
+        // Accumulate entries from real Folder.
         DirHandle *dh = Folder_Local_Open_Dir(self->cf_reader->real_folder);
         CharBuf *entry = DH_Get_Entry(dh);
         while (DH_Next(dh)) {

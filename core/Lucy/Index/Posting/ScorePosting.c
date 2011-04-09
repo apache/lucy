@@ -98,11 +98,11 @@ ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
         uint32_t last_prox = 0;
         uint32_t i;
 
-        // Field_boost. 
+        // Field_boost.
         *((uint8_t*)dest) = field_boost_byte;
         dest++;
 
-        // Positions. 
+        // Positions.
         for (i = 0; i < freq; i++) {
             Token *const t = tokens[i];
             const uint32_t prox_delta = t->pos - last_prox;
@@ -110,7 +110,7 @@ ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
             last_prox = t->pos; 
         }
 
-        // Resize raw posting memory allocation. 
+        // Resize raw posting memory allocation.
         raw_posting->aux_len = dest - start;
         raw_post_bytes = dest - (char*)raw_posting;
         MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);
@@ -137,7 +137,7 @@ ScorePost_read_record(ScorePosting *self, InStream *instream)
     const uint32_t doc_code = NumUtil_decode_c32(&buf);
     const uint32_t doc_delta = doc_code >> 1;
 
-    // Apply delta doc and retrieve freq. 
+    // Apply delta doc and retrieve freq.
     self->doc_id   += doc_delta;
     if (doc_code & 1) {
         self->freq = 1;
@@ -146,11 +146,11 @@ ScorePost_read_record(ScorePosting *self, InStream *instream)
         self->freq = NumUtil_decode_c32(&buf);
     }
 
-    // Decode boost/norm byte. 
+    // Decode boost/norm byte.
     self->weight = self->norm_decoder[ *(uint8_t*)buf ];
     buf++;
 
-    // Read positions. 
+    // Read positions.
     num_prox = self->freq;
     if (num_prox > self->prox_cap) {
         self->prox = (uint32_t*)REALLOCATE(self->prox, 
@@ -191,16 +191,16 @@ ScorePost_read_raw(ScorePosting *self, InStream *instream,
     char *dest        = start;
     UNUSED_VAR(self);
 
-    // Field_boost. 
+    // Field_boost.
     *((uint8_t*)dest) = InStream_Read_U8(instream);
     dest++;
 
-    // Read positions. 
+    // Read positions.
     while (num_prox--) {
         dest += InStream_Read_Raw_C64(instream, dest);
     }
 
-    // Resize raw posting memory allocation. 
+    // Resize raw posting memory allocation.
     raw_posting->aux_len = dest - start;
     raw_post_bytes       = dest - (char*)raw_posting;
     MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);
@@ -226,10 +226,10 @@ ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim,
 {
     uint32_t i;
 
-    // Init. 
+    // Init.
     TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
 
-    // Fill score cache. 
+    // Fill score cache.
     self->score_cache = (float*)MALLOCATE(TERMMATCHER_SCORE_CACHE_SIZE * sizeof(float));
     for (i = 0; i < TERMMATCHER_SCORE_CACHE_SIZE; i++) {
         self->score_cache[i] = Sim_TF(sim, (float)i) * self->weight;
@@ -244,12 +244,12 @@ ScorePostMatcher_score(ScorePostingMatcher* self)
     ScorePosting *const posting = (ScorePosting*)self->posting;
     const uint32_t freq = posting->freq;
     
-    // Calculate initial score based on frequency of term. 
+    // Calculate initial score based on frequency of term.
     float score = (freq < TERMMATCHER_SCORE_CACHE_SIZE) 
-        ? self->score_cache[freq] // cache hit 
+        ? self->score_cache[freq] // cache hit
         : Sim_TF(self->sim, (float)freq) * self->weight;
 
-    // Factor in field-length normalization and doc/field/prox boost. 
+    // Factor in field-length normalization and doc/field/prox boost.
     score *= posting->weight;
 
     return score;

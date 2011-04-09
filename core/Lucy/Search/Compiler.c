@@ -80,13 +80,13 @@ Compiler_apply_norm_factor(Compiler *self, float factor)
 void
 Compiler_normalize(Compiler *self)
 {
-    // factor = ( tf_q * idf_t ) 
+    // factor = ( tf_q * idf_t )
     float factor = Compiler_Sum_Of_Squared_Weights(self); 
 
-    // factor /= norm_q 
+    // factor /= norm_q
     factor = Sim_Query_Norm(self->sim, factor);
 
-    // weight *= factor 
+    // weight *= factor
     Compiler_Apply_Norm_Factor(self, factor); 
 }
 

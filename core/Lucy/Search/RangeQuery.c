@@ -32,11 +32,11 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"
 
-// Determine the lowest ordinal that should match. 
+// Determine the lowest ordinal that should match.
 static int32_t
 S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache);
 
-// Determine the highest ordinal that should match. 
+// Determine the highest ordinal that should match.
 static int32_t
 S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache);
 
@@ -143,7 +143,7 @@ RangeQuery_serialize(RangeQuery *self, OutStream *outstream)
 RangeQuery*
 RangeQuery_deserialize(RangeQuery *self, InStream *instream)
 {
-    // Deserialize components. 
+    // Deserialize components.
     float boost     = InStream_Read_F32(instream);
     CharBuf *field  = CB_deserialize(NULL, instream);
     Obj *lower_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
@@ -151,7 +151,7 @@ RangeQuery_deserialize(RangeQuery *self, InStream *instream)
     bool_t include_lower = InStream_Read_U8(instream);
     bool_t include_upper = InStream_Read_U8(instream);
 
-    // Init object. 
+    // Init object.
     self = self ? self : (RangeQuery*)VTable_Make_Obj(RANGEQUERY);
     RangeQuery_init(self, field, lower_term, upper_term, include_lower,
         include_upper);
@@ -235,7 +235,7 @@ S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache)
     if (lower_term) {
         int32_t low_ord = SortCache_Find(sort_cache, lower_term);
         if (low_ord < 0) {
-            // The supplied term is lower than all terms in the field. 
+            // The supplied term is lower than all terms in the field.
             lower_bound = 0;
         }
         else {
@@ -266,7 +266,7 @@ S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache)
     if (upper_term) {
         int32_t hi_ord = SortCache_Find(sort_cache, upper_term);
         if (hi_ord < 0) {
-            // The supplied term is lower than all terms in the field. 
+            // The supplied term is lower than all terms in the field.
             retval = -1;
         }
         else {

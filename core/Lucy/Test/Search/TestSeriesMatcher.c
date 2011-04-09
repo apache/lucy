@@ -32,7 +32,7 @@ S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max)
     int32_t  tick         = 0;
     int32_t  i;
 
-    // Divvy up doc_ids by segment into BitVectors. 
+    // Divvy up doc_ids by segment into BitVectors.
     for (i = 0; i < num_matchers; i++) {
         int32_t offset = I32Arr_Get(offsets, i);
         int32_t max    = i == num_matchers - 1

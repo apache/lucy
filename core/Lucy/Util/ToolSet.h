@@ -54,6 +54,6 @@ extern "C" {
 }
 #endif
 
-#endif // H_CFISH_TOOLSET 
+#endif // H_CFISH_TOOLSET
 
 

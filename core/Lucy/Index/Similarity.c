@@ -73,7 +73,7 @@ float*
 Sim_get_norm_decoder(Similarity *self)
 { 
     if (!self->norm_decoder) {
-        // Cache decoded boost bytes. 
+        // Cache decoded boost bytes.
         self->norm_decoder = (float*)MALLOCATE(256 * sizeof(float));
         for (uint32_t i = 0; i < 256; i++) {
             self->norm_decoder[i] = Sim_Decode_Norm(self, i);
@@ -106,7 +106,7 @@ Sim_load(Similarity *self, Obj *dump)
 void
 Sim_serialize(Similarity *self, OutStream *target)
 {
-    // Only the class name. 
+    // Only the class name.
     CB_Serialize(Sim_Get_Class_Name(self), target);
 }
 
@@ -140,7 +140,7 @@ Sim_idf(Similarity *self, int64_t doc_freq, int64_t total_docs)
 {
     UNUSED_VAR(self);
     if (total_docs == 0) {
-        // Guard against log of zero error, return meaningless number. 
+        // Guard against log of zero error, return meaningless number.
         return 1;
     }
     else {
@@ -209,7 +209,7 @@ float
 Sim_length_norm(Similarity *self, uint32_t num_tokens)
 {
     UNUSED_VAR(self);
-    if (num_tokens == 0) { // guard against div by zero 
+    if (num_tokens == 0) { // guard against div by zero
         return 0;
     }
     else {
@@ -221,7 +221,7 @@ float
 Sim_query_norm(Similarity *self, float sum_of_squared_weights)
 {
     UNUSED_VAR(self);
-    if (sum_of_squared_weights == 0.0f) { // guard against div by zero 
+    if (sum_of_squared_weights == 0.0f) { // guard against div by zero
         return 0;
     }
     else {

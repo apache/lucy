@@ -66,7 +66,7 @@ S_lazy_init(DocWriter *self)
         Folder   *folder    = self->folder;
         CharBuf  *seg_name  = Seg_Get_Name(self->segment);
 
-        // Get streams. 
+        // Get streams.
         {
             CharBuf *ix_file = CB_newf("%o/documents.ix", seg_name);
             self->ix_out = Folder_Open_Out(folder, ix_file);
@@ -80,7 +80,7 @@ S_lazy_init(DocWriter *self)
             if (!self->dat_out) { RETHROW(INCREF(Err_get_error())); }
         }
 
-        // Go past non-doc #0. 
+        // Go past non-doc #0.
         OutStream_Write_I64(self->ix_out, 0);
     }
 
@@ -97,12 +97,12 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
     int64_t    start           = OutStream_Tell(dat_out);
     int64_t    expected        = OutStream_Tell(ix_out) / 8;
 
-    // Verify doc id. 
+    // Verify doc id.
     if (doc_id != expected) {
         THROW(ERR, "Expected doc id %i64 but got %i32", expected, doc_id);
     }
 
-    // Write the number of stored fields. 
+    // Write the number of stored fields.
     Inverter_Iterate(inverter);
     while (Inverter_Next(inverter)) {
         FieldType *type = Inverter_Get_Type(inverter);
@@ -112,7 +112,7 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
 
     Inverter_Iterate(inverter);
     while (Inverter_Next(inverter)) {
-        // Only store fields marked as "stored". 
+        // Only store fields marked as "stored".
         FieldType *type = Inverter_Get_Type(inverter);
         if (FType_Stored(type)) {
             CharBuf *field = Inverter_Get_Field_Name(inverter);
@@ -122,7 +122,7 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
         }
     }
 
-    // Write file pointer. 
+    // Write file pointer.
     OutStream_Write_I64(ix_out, start);
 }
 
@@ -133,7 +133,7 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
     int32_t doc_max = SegReader_Doc_Max(reader);
 
     if (doc_max == 0) {
-        // Bail if the supplied segment is empty. 
+        // Bail if the supplied segment is empty.
         return;
     }
     else {
@@ -151,13 +151,13 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
                 char    *buf;
                 size_t   size;
 
-                // Copy record over.  
+                // Copy record over.
                 DefDocReader_Read_Record(doc_reader, buffer, i);
                 buf  = BB_Get_Buf(buffer);
                 size = BB_Get_Size(buffer);
                 OutStream_Write_Bytes(dat_out, buf, size);
 
-                // Write file pointer. 
+                // Write file pointer.
                 OutStream_Write_I64(ix_out, start);
             }
         }
@@ -175,7 +175,7 @@ DocWriter_finish(DocWriter *self)
         int64_t end = OutStream_Tell(self->dat_out);
         OutStream_Write_I64(self->ix_out, end);
         
-        // Close down output streams. 
+        // Close down output streams.
         OutStream_Close(self->dat_out);
         OutStream_Close(self->ix_out);
         Seg_Store_Metadata_Str(self->segment, "documents", 9, 

@@ -50,7 +50,7 @@ NumType_dump_for_schema(NumericType *self)
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)NumType_Specifier(self));
 
-    // Store attributes that override the defaults. 
+    // Store attributes that override the defaults.
     if (self->boost != 1.0) {
         Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
     }

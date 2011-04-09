@@ -74,20 +74,20 @@ RichPost_read_record(RichPosting *self, InStream *instream)
     float    *prox_boosts;
     float     aggregate_weight = 0.0;
 
-    // Decode delta doc. 
+    // Decode delta doc.
     doc_code = InStream_Read_C32(instream);
     self->doc_id   += doc_code >> 1;
 
-    // If the stored num was odd, the freq is 1.  
+    // If the stored num was odd, the freq is 1.
     if (doc_code & 1) {
         self->freq = 1;
     }
-    // Otherwise, freq was stored as a C32. 
+    // Otherwise, freq was stored as a C32.
     else {
         self->freq = InStream_Read_C32(instream);
     } 
 
-    // Read positions, aggregate per-position boost byte into weight. 
+    // Read positions, aggregate per-position boost byte into weight.
     num_prox = self->freq;
     if (num_prox > self->prox_cap) {
         self->prox 
@@ -133,7 +133,7 @@ RichPost_add_inversion_to_pool(RichPosting *self, PostingPool *post_pool,
         uint32_t last_prox = 0;
         uint32_t i;
 
-        // Positions and boosts. 
+        // Positions and boosts.
         for (i = 0; i < freq; i++) {
             Token *const t = tokens[i];
             const uint32_t prox_delta = t->pos - last_prox;
@@ -146,7 +146,7 @@ RichPost_add_inversion_to_pool(RichPosting *self, PostingPool *post_pool,
             dest++;
         }
 
-        // Resize raw posting memory allocation. 
+        // Resize raw posting memory allocation.
         raw_posting->aux_len = dest - start;
         raw_post_bytes = dest - (char*)raw_posting;
         MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);
@@ -175,14 +175,14 @@ RichPost_read_raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
     char *      dest  = start;
     UNUSED_VAR(self);
 
-    // Read positions and per-position boosts. 
+    // Read positions and per-position boosts.
     while (num_prox--) {
         dest += InStream_Read_Raw_C64(instream, dest);
         *((uint8_t*)dest) = InStream_Read_U8(instream);
         dest++;
     }
 
-    // Resize raw posting memory allocation. 
+    // Resize raw posting memory allocation.
     raw_posting->aux_len = dest - start;
     raw_post_bytes       = dest - (char*)raw_posting;
     MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);

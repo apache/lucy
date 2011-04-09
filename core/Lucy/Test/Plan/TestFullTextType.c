@@ -44,7 +44,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
     FullTextType_Set_Stored(not_stored, false);
     FullTextType_Set_Highlightable(highlightable, true);
 
-    // (This step is normally performed by Schema_Load() internally.) 
+    // (This step is normally performed by Schema_Load() internally.)
     Hash_Store_Str((Hash*)another_dump, "analyzer", 8, INCREF(tokenizer));
     FullTextType *another_clone = FullTextType_load(NULL, another_dump);
 

@@ -409,7 +409,7 @@ test_To_Array(TestBatch *batch)
     long       num_unique = 0;
     long       i;
 
-    // Unique the random ints. 
+    // Unique the random ints.
     Sort_quicksort(source_ints, 20, sizeof(uint64_t), 
         S_compare_u64s, NULL);
     for (i = 0; i < 19; i++) {
@@ -419,12 +419,12 @@ test_To_Array(TestBatch *batch)
         }
     }
 
-    // Set bits. 
+    // Set bits.
     for (i = 0; i < num_unique; i++) {
         BitVec_Set(bit_vec, (uint32_t)source_ints[i]);
     }
 
-    // Create the array and compare it to the source. 
+    // Create the array and compare it to the source.
     array = BitVec_To_Array(bit_vec);
     for (i = 0; i < num_unique; i++) {
         if (I32Arr_Get(array, i) != (int32_t)source_ints[i]) { break; }
@@ -438,7 +438,7 @@ test_To_Array(TestBatch *batch)
 }
 
 
-// Valgrind only - detect off-by-one error. 
+// Valgrind only - detect off-by-one error.
 static void
 test_off_by_one_error()
 {

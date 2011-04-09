@@ -40,7 +40,7 @@ ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name,
 {
     LFLock_init((LockFileLock*)self, folder, name, host, timeout, interval);
 
-    // Override. 
+    // Override.
     DECREF(self->lock_path);
     self->lock_path = (CharBuf*)INCREF(&EMPTY);
 
@@ -57,11 +57,11 @@ ShLock_request(SharedLock *self)
     ShLock_request_t super_request 
         = (ShLock_request_t)SUPER_METHOD(SHAREDLOCK, ShLock, Request);
 
-    // EMPTY lock_path indicates whether this particular instance is locked. 
+    // EMPTY lock_path indicates whether this particular instance is locked.
     if (   self->lock_path != (CharBuf*)&EMPTY 
         && Folder_Exists(self->folder, self->lock_path)
     ) {
-        // Don't allow double obtain. 
+        // Don't allow double obtain.
         Err_set_error((Err*)LockErr_new(CB_newf(
             "Lock already obtained via '%o'", self->lock_path)));
         return false;
@@ -86,7 +86,7 @@ ShLock_release(SharedLock *self)
             = (ShLock_release_t)SUPER_METHOD(SHAREDLOCK, ShLock, Release);
         super_release(self);
 
-        // Empty out lock_path. 
+        // Empty out lock_path.
         DECREF(self->lock_path);
         self->lock_path = (CharBuf*)INCREF(&EMPTY);
     }
@@ -110,7 +110,7 @@ ShLock_clear_stale(SharedLock *self)
         return;
     }
 
-    // Take a stab at any file that begins with our lock name. 
+    // Take a stab at any file that begins with our lock name.
     while (DH_Next(dh)) {
         if (   CB_Starts_With(entry, self->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
@@ -142,7 +142,7 @@ ShLock_is_locked(SharedLock *self)
     }
     
     while (DH_Next(dh)) {
-        // Translation:  $locked = 1 if $entry =~ /^\Q$name-\d+\.lock$/ 
+        // Translation:  $locked = 1 if $entry =~ /^\Q$name-\d+\.lock$/
         if (   CB_Starts_With(entry, self->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
         ) {

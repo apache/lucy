@@ -53,7 +53,7 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
             sizeof(DEFAULT_PATTERN) - 1);
     }
 
-    // Acquire a compiled regex engine for matching one token. 
+    // Acquire a compiled regex engine for matching one token.
     token_re_sv = (SV*)lucy_Host_callback_host(LUCY_REGEXTOKENIZER,
         "compile_token_re", 1, CFISH_ARG_STR("pattern", self->pattern));
     S_set_token_re_but_not_pattern(self, SvRV(token_re_sv));
@@ -101,7 +101,7 @@ void
 lucy_RegexTokenizer_set_token_re(lucy_RegexTokenizer *self, void *token_re)
 {
     S_set_token_re_but_not_pattern(self, token_re);
-    // Set pattern as a side effect. 
+    // Set pattern as a side effect.
     S_set_pattern_from_token_re(self, token_re);
 }
 
@@ -132,13 +132,13 @@ lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
     char      *string_arg = string_beg;
 
 
-    // Fake up an SV wrapper to feed to the regex engine. 
+    // Fake up an SV wrapper to feed to the regex engine.
     sv_upgrade(wrapper, SVt_PV);
     SvREADONLY_on(wrapper);
     SvLEN(wrapper) = 0;
     SvUTF8_on(wrapper);
 
-    // Wrap the string in an SV to please the regex engine. 
+    // Wrap the string in an SV to please the regex engine.
     SvPVX(wrapper) = string_beg;
     SvCUR_set(wrapper, string_len);
     SvPOK_on(wrapper);
@@ -155,7 +155,7 @@ lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
 #endif
         uint32_t start, end;
 
-        // Get start and end offsets in Unicode code points. 
+        // Get start and end offsets in Unicode code points.
         for( ; string_arg < start_ptr; num_code_points++) {
             string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)*string_arg];
             if (string_arg > string_end) {
@@ -171,15 +171,15 @@ lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
         }
         end = num_code_points;
 
-        // Add a token to the new inversion. 
+        // Add a token to the new inversion.
         Lucy_Inversion_Append(inversion,
             lucy_Token_new(
                 start_ptr,
                 (end_ptr - start_ptr),
                 start,
                 end,
-                1.0f,   // boost always 1 for now 
-                1       // position increment 
+                1.0f,   // boost always 1 for now
+                1       // position increment
             )
         );
     }

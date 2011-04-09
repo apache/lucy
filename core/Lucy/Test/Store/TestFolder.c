@@ -429,7 +429,7 @@ test_Delete_Tree(TestBatch *batch)
     FileHandle *fh;
     bool_t result;
 
-    // Create tree to be deleted. 
+    // Create tree to be deleted.
     Folder_MkDir(folder, &foo);
     Folder_MkDir(folder, &foo_bar);
     Folder_MkDir(folder, &foo_bar_baz);
@@ -437,7 +437,7 @@ test_Delete_Tree(TestBatch *batch)
         FH_CREATE | FH_WRITE_ONLY);
     DECREF(fh);
 
-    // Create bystanders. 
+    // Create bystanders.
     Folder_MkDir(folder, &bar);
     fh = Folder_Open_FileHandle(folder, &baz, FH_CREATE | FH_WRITE_ONLY);
     DECREF(fh);
@@ -451,13 +451,13 @@ test_Delete_Tree(TestBatch *batch)
     TEST_TRUE(batch, Folder_Exists(folder, &baz), 
         "local file with same name as nested dir left intact");
 
-    // Kill off the bystanders. 
+    // Kill off the bystanders.
     result = Folder_Delete_Tree(folder, &bar);
     TEST_TRUE(batch, result, "Delete_Tree() on empty dir");
     result = Folder_Delete_Tree(folder, &baz);
     TEST_TRUE(batch, result, "Delete_Tree() on file");
 
-    // Create new tree to be deleted. 
+    // Create new tree to be deleted.
     Folder_MkDir(folder, &foo);
     Folder_MkDir(folder, &foo_bar);
     Folder_MkDir(folder, &foo_bar_baz);
@@ -465,7 +465,7 @@ test_Delete_Tree(TestBatch *batch)
         FH_CREATE | FH_WRITE_ONLY);
     DECREF(fh);
 
-    // Remove tree in subdir. 
+    // Remove tree in subdir.
     result = Folder_Delete_Tree(folder, &foo_bar);
     TEST_TRUE(batch, result, "Delete_Tree() of subdir succeeded");
     TEST_FALSE(batch, Folder_Exists(folder, &foo_bar), 

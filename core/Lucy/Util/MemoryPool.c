@@ -22,7 +22,7 @@
 static void
 S_init_arena(MemoryPool *self, size_t amount);
 
-#define DEFAULT_BUF_SIZE 0x100000 // 1 MiB 
+#define DEFAULT_BUF_SIZE 0x100000 // 1 MiB
 
 // Enlarge amount so pointers will always be aligned.
 #define INCREASE_TO_WORD_MULTIPLE(_amount) \
@@ -67,11 +67,11 @@ S_init_arena(MemoryPool *self, size_t amount)
     ByteBuf *bb;
     int32_t i;
 
-    // Indicate which arena we're using at present. 
+    // Indicate which arena we're using at present.
     self->tick++;
 
     if (self->tick < (int32_t)VA_Get_Size(self->arenas)) {
-        // In recycle mode, use previously acquired memory. 
+        // In recycle mode, use previously acquired memory.
         bb = (ByteBuf*)VA_Fetch(self->arenas, self->tick);
         if (amount >= BB_Get_Size(bb)) {
             BB_Grow(bb, amount);
@@ -79,7 +79,7 @@ S_init_arena(MemoryPool *self, size_t amount)
         }
     }
     else {
-        // In add mode, get more mem from system. 
+        // In add mode, get more mem from system.
         size_t buf_size = (amount + 1) > self->arena_size 
             ? (amount + 1)
             : self->arena_size;
@@ -88,7 +88,7 @@ S_init_arena(MemoryPool *self, size_t amount)
         VA_Push(self->arenas, (Obj*)bb);
     }
 
-    // Recalculate consumption to take into account blocked off space. 
+    // Recalculate consumption to take into account blocked off space.
     self->consumed = 0;
     for (i = 0; i < self->tick; i++) {
         ByteBuf *bb = (ByteBuf*)VA_Fetch(self->arenas, i);
@@ -108,16 +108,16 @@ MemPool_grab(MemoryPool *self, size_t amount)
     INCREASE_TO_WORD_MULTIPLE(amount);
     self->last_buf = self->buf;
 
-    // Verify that we have enough stocked up, otherwise get more. 
+    // Verify that we have enough stocked up, otherwise get more.
     self->buf += amount;
     if (self->buf >= self->limit) {
-        // Get enough mem from system or die trying. 
+        // Get enough mem from system or die trying.
         S_init_arena(self, amount);
         self->last_buf = self->buf;
         self->buf += amount;
     }
 
-    // Track bytes we've allocated from this pool. 
+    // Track bytes we've allocated from this pool.
     self->consumed += amount;
 
     return self->last_buf;
@@ -161,10 +161,10 @@ MemPool_eat(MemoryPool *self, MemoryPool *other) {
         THROW(ERR, "Memory pool is not empty");
     }
 
-    // Move active arenas from other to self. 
+    // Move active arenas from other to self.
     for (i = 0; i <= other->tick; i++) {
         ByteBuf *arena = (ByteBuf*)VA_Shift(other->arenas);
-        // Maybe displace existing arena. 
+        // Maybe displace existing arena.
         VA_Store(self->arenas, i, (Obj*)arena); 
     }
     self->tick     = other->tick;

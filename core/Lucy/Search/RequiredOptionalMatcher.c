@@ -39,11 +39,11 @@ ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity,
     VA_Push(children, INCREF(optional_matcher));
     PolyMatcher_init((PolyMatcher*)self, children, similarity);
 
-    // Assign. 
+    // Assign.
     self->req_matcher       = (Matcher*)INCREF(required_matcher);
     self->opt_matcher       = (Matcher*)INCREF(optional_matcher);
 
-    // Init. 
+    // Init.
     self->opt_matcher_first_time = true;
 
     DECREF(children);

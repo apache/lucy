@@ -30,7 +30,7 @@ new(...)
 CODE:
 {
     lucy_Token *starter_token = NULL;
-    // parse params, only if there's more than one arg 
+    // parse params, only if there's more than one arg
     if (items > 1) {
         SV *text_sv = NULL;
         chy_bool_t args_ok = XSBind_allot_params(

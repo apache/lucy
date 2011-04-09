@@ -84,7 +84,7 @@ MatchPost_read_record(MatchPosting *self, InStream *instream)
     const uint32_t doc_code = InStream_Read_C32(instream);
     const uint32_t doc_delta = doc_code >> 1;
 
-    // Apply delta doc and retrieve freq. 
+    // Apply delta doc and retrieve freq.
     self->doc_id   += doc_delta;
     if (doc_code & 1) {
         self->freq = 1;
@@ -269,13 +269,13 @@ MatchTInfoStepper_write_key_frame(MatchTermInfoStepper *self,
     TermInfo *tinfo    = (TermInfo*)CERTIFY(value, TERMINFO);
     int32_t   doc_freq = TInfo_Get_Doc_Freq(tinfo);
 
-    // Write doc_freq. 
+    // Write doc_freq.
     OutStream_Write_C32(outstream, doc_freq);
 
-    // Write postings file pointer. 
+    // Write postings file pointer.
     OutStream_Write_C64(outstream, tinfo->post_filepos);
 
-    // Write skip file pointer (maybe). 
+    // Write skip file pointer (maybe).
     if (doc_freq >= self->skip_interval) {
         OutStream_Write_C64(outstream, tinfo->skip_filepos);
     }
@@ -292,13 +292,13 @@ MatchTInfoStepper_write_delta(MatchTermInfoStepper *self,
     int32_t   doc_freq   = TInfo_Get_Doc_Freq(tinfo);
     int64_t   post_delta = tinfo->post_filepos - last_tinfo->post_filepos;
 
-    // Write doc_freq. 
+    // Write doc_freq.
     OutStream_Write_C32(outstream, doc_freq);
 
-    // Write postings file pointer delta. 
+    // Write postings file pointer delta.
     OutStream_Write_C64(outstream, post_delta);
 
-    // Write skip file pointer (maybe). 
+    // Write skip file pointer (maybe).
     if (doc_freq >= self->skip_interval) {
         OutStream_Write_C64(outstream, tinfo->skip_filepos);
     }
@@ -312,13 +312,13 @@ MatchTInfoStepper_read_key_frame(MatchTermInfoStepper *self,
 { 
     TermInfo *const tinfo = (TermInfo*)self->value;
 
-    // Read doc freq. 
+    // Read doc freq.
     tinfo->doc_freq = InStream_Read_C32(instream);
 
-    // Read postings file pointer. 
+    // Read postings file pointer.
     tinfo->post_filepos = InStream_Read_C64(instream);
 
-    // Maybe read skip pointer. 
+    // Maybe read skip pointer.
     if (tinfo->doc_freq >= self->skip_interval) {
         tinfo->skip_filepos = InStream_Read_C64(instream);
     }
@@ -332,13 +332,13 @@ MatchTInfoStepper_read_delta(MatchTermInfoStepper *self, InStream *instream)
 { 
     TermInfo *const tinfo = (TermInfo*)self->value;
 
-    // Read doc freq. 
+    // Read doc freq.
     tinfo->doc_freq = InStream_Read_C32(instream);
 
-    // Adjust postings file pointer. 
+    // Adjust postings file pointer.
     tinfo->post_filepos += InStream_Read_C64(instream);
 
-    // Maybe read skip pointer. 
+    // Maybe read skip pointer.
     if (tinfo->doc_freq >= self->skip_interval) {
         tinfo->skip_filepos = InStream_Read_C64(instream);
     }

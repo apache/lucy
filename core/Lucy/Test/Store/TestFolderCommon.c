@@ -274,7 +274,7 @@ test_Rename(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
     OutStream_Close(outstream);
     DECREF(outstream);
 
-    // Move files. 
+    // Move files.
 
     result = Folder_Rename(folder, &boffo, &banana); 
     TEST_TRUE(batch, result, "Rename succeeds and returns true");
@@ -317,7 +317,7 @@ test_Rename(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
         Folder_Delete(folder, &boffo);
     }
 
-    // Move Dirs. 
+    // Move Dirs.
 
     Folder_MkDir(folder, &baz);
     result = Folder_Rename(folder, &baz, &boffo); 
@@ -341,7 +341,7 @@ test_Rename(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
     TEST_FALSE(batch, Folder_Exists(folder, &foo_foo), 
         "Folder no longer exists at old path");
     
-    // Test failed clobbers. 
+    // Test failed clobbers.
 
     Err_set_error(NULL);
     result = Folder_Rename(folder, &foo_boffo, &foo_bar); 
@@ -363,7 +363,7 @@ test_Rename(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
     TEST_TRUE(batch, Folder_Exists(folder, &foo_boffo), 
         "File still exists after failed clobber");
 
-    // Test that "renaming" succeeds where to and from are the same. 
+    // Test that "renaming" succeeds where to and from are the same.
 
     result = Folder_Rename(folder, &foo_boffo, &foo_boffo); 
     TEST_TRUE(batch, result, "Renaming file to itself succeeds");
@@ -375,7 +375,7 @@ test_Rename(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
     TEST_TRUE(batch, Folder_Exists(folder, &foo_bar), 
         "Dir still exists");
 
-    // Invalid filepaths. 
+    // Invalid filepaths.
 
     Err_set_error(NULL);
     result = Folder_Rename(folder, &foo_boffo, &nope_nyet); 
@@ -411,7 +411,7 @@ test_Hard_Link(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
     outstream = Folder_Open_Out(folder, &boffo);
     DECREF(outstream);
 
-    // Link files. 
+    // Link files.
 
     result = Folder_Hard_Link(folder, &boffo, &banana); 
     TEST_TRUE(batch, result, "Hard_Link succeeds and returns true");
@@ -437,7 +437,7 @@ test_Hard_Link(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
         "File still exists at old path");
     Folder_Delete(folder, &foo_bar_boffo);
 
-    // Invalid clobbers. 
+    // Invalid clobbers.
 
     outstream = Folder_Open_Out(folder, &boffo);
     DECREF(outstream);
@@ -458,7 +458,7 @@ test_Hard_Link(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
         "File still exists at old path");
     Folder_Delete(folder, &baz);
 
-    // Invalid Hard_Link of dir. 
+    // Invalid Hard_Link of dir.
 
     Folder_MkDir(folder, &baz);
     result = Folder_Hard_Link(folder, &baz, &banana); 
@@ -469,14 +469,14 @@ test_Hard_Link(TestBatch *batch, set_up_t set_up, tear_down_t tear_down)
         "Folder still exists at old path");
     Folder_Delete(folder, &baz);
 
-    // Test that linking to yourself fails. 
+    // Test that linking to yourself fails.
 
     result = Folder_Hard_Link(folder, &foo_boffo, &foo_boffo); 
     TEST_FALSE(batch, result, "Hard_Link file to itself fails");
     TEST_TRUE(batch, Folder_Exists(folder, &foo_boffo), 
         "File still exists");
 
-    // Invalid filepaths. 
+    // Invalid filepaths.
 
     Err_set_error(NULL);
     result = Folder_Rename(folder, &foo_boffo, &nope_nyet); 

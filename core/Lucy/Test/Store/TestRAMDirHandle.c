@@ -36,7 +36,7 @@ test_all(TestBatch *batch)
     bool_t     boffo_was_dir = false; 
     int        count         = 0;
 
-    // Set up folder contents. 
+    // Set up folder contents.
     RAMFolder_MkDir(folder, foo);
     FileHandle *fh = RAMFolder_Open_FileHandle(folder, boffo, 
         FH_CREATE | FH_WRITE_ONLY);

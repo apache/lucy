@@ -32,19 +32,19 @@ Token*
 Token_init(Token *self, const char* text, size_t len, uint32_t start_offset,
            uint32_t end_offset, float boost, int32_t pos_inc) 
 {
-    // Allocate and assign. 
+    // Allocate and assign.
     self->text = (char*)MALLOCATE(len + 1);
     self->text[len] = '\0';
     memcpy(self->text, text, len);
 
-    // Assign. 
+    // Assign.
     self->len          = len;
     self->start_offset = start_offset;
     self->end_offset   = end_offset;
     self->boost        = boost;
     self->pos_inc      = pos_inc;
 
-    // Init. 
+    // Init.
     self->pos = -1;
 
     return self;

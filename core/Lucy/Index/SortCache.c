@@ -25,10 +25,10 @@ SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
                void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord,
                int32_t ord_width)
 {
-    // Init. 
+    // Init.
     self->native_ords = false;
 
-    // Assign. 
+    // Assign.
     if (!FType_Sortable(type)) { 
         THROW(ERR, "Non-sortable FieldType for %o", field); 
     }
@@ -117,7 +117,7 @@ SortCache_find(SortCache *self, Obj *term)
             Obj_Get_Class_Name(blank));
     }
 
-    // Binary search. 
+    // Binary search.
     while (hi >= lo) {
         const int32_t mid = lo + ((hi - lo) / 2);
         Obj *val = SortCache_Value(self, mid, blank);
@@ -137,11 +137,11 @@ SortCache_find(SortCache *self, Obj *term)
     DECREF(blank);
 
     if (hi < 0) { 
-        // Target is "less than" the first cache entry. 
+        // Target is "less than" the first cache entry.
         return -1;
     }
     else if (result == -100) {
-        // If result is still -100, it wasn't set. 
+        // If result is still -100, it wasn't set.
         return hi;
     }
     else {

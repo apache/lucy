@@ -51,12 +51,12 @@ lucy_Sleep_millisleep(uint32_t milliseconds)
     uint32_t seconds = milliseconds / 1000;
     milliseconds  = milliseconds % 1000;
     sleep(seconds);
-    // TODO: probe for usleep. 
+    // TODO: probe for usleep.
     usleep(milliseconds * 1000);
 }
 
 #else
   #error "Can't find a known sleep API."
-#endif // OS switch. 
+#endif // OS switch.
 
 

@@ -35,16 +35,16 @@ RangeMatcher_init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
 {
     Matcher_init((Matcher*)self);
 
-    // Init. 
+    // Init.
     self->doc_id       = 0;
 
-    // Assign. 
+    // Assign.
     self->lower_bound  = lower_bound;
     self->upper_bound  = upper_bound;
     self->sort_cache   = (SortCache*)INCREF(sort_cache);
     self->doc_max      = doc_max;
 
-    // Derive. 
+    // Derive.
 
     return self;
 }   
@@ -65,7 +65,7 @@ RangeMatcher_next(RangeMatcher* self)
             return 0;
         }
         else {
-            // Check if ord for this document is within the specied range. 
+            // Check if ord for this document is within the specied range.
             // TODO: Unroll? i.e. use SortCache_Get_Ords at constructor time
             // and save ourselves some method call overhead.
             const int32_t ord 

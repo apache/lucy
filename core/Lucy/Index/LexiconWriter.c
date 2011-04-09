@@ -49,11 +49,11 @@ LexWriter_init(LexiconWriter *self, Schema *schema, Snapshot *snapshot,
 
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
 
-    // Assign. 
+    // Assign.
     self->index_interval = Arch_Index_Interval(arch);
     self->skip_interval  = Arch_Skip_Interval(arch);
 
-    // Init. 
+    // Init.
     self->ix_out             = NULL;
     self->ixix_out           = NULL;
     self->dat_out            = NULL;
@@ -90,7 +90,7 @@ LexWriter_destroy(LexiconWriter *self)
 static void
 S_add_last_term_to_ix(LexiconWriter *self)
 {
-    // Write file pointer to index record. 
+    // Write file pointer to index record.
     OutStream_Write_I64(self->ixix_out, OutStream_Tell(self->ix_out));
 
     // Write term and file pointer to main record.  Track count of terms added
@@ -111,14 +111,14 @@ LexWriter_add_term(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo)
     if (    (self->count % self->index_interval == 0)
          && !self->temp_mode
     ) {
-        // Write a subset of entries to lexicon.ix. 
+        // Write a subset of entries to lexicon.ix.
         S_add_last_term_to_ix(self);
     }
 
     TermStepper_Write_Delta(self->term_stepper, dat_out, (Obj*)term_text);
     TermStepper_Write_Delta(self->tinfo_stepper, dat_out, (Obj*)tinfo);
 
-    // Track number of terms. 
+    // Track number of terms.
     self->count++;
 }
 
@@ -132,7 +132,7 @@ LexWriter_start_field(LexiconWriter *self, int32_t field_num)
     CharBuf   *const field    = Seg_Field_Name(segment, field_num);
     FieldType *const type    = Schema_Fetch_Type(schema, field);
 
-    // Open outstreams. 
+    // Open outstreams.
     CB_setf(self->dat_file,  "%o/lexicon-%i32.dat",  seg_name, field_num);
     CB_setf(self->ix_file,   "%o/lexicon-%i32.ix",   seg_name, field_num);
     CB_setf(self->ixix_file, "%o/lexicon-%i32.ixix", seg_name, field_num);
@@ -143,7 +143,7 @@ LexWriter_start_field(LexiconWriter *self, int32_t field_num)
     self->ixix_out = Folder_Open_Out(folder, self->ixix_file);
     if (!self->ixix_out) { RETHROW(INCREF(Err_get_error())); }
 
-    // Initialize count and ix_count, term stepper and term info stepper. 
+    // Initialize count and ix_count, term stepper and term info stepper.
     self->count    = 0;
     self->ix_count = 0;
     self->term_stepper = FType_Make_Term_Stepper(type);
@@ -155,13 +155,13 @@ LexWriter_finish_field(LexiconWriter *self, int32_t field_num)
 {
     CharBuf *field = Seg_Field_Name(self->segment, field_num);
     
-    // Store count of terms for this field as metadata. 
+    // Store count of terms for this field as metadata.
     Hash_Store(self->counts, (Obj*)field, 
         (Obj*)CB_newf("%i32", self->count));
     Hash_Store(self->ix_counts, (Obj*)field, 
         (Obj*)CB_newf("%i32", self->ix_count));
 
-    // Close streams. 
+    // Close streams.
     OutStream_Close(self->dat_out);
     OutStream_Close(self->ix_out);
     OutStream_Close(self->ixix_out);
@@ -172,7 +172,7 @@ LexWriter_finish_field(LexiconWriter *self, int32_t field_num)
     self->ix_out   = NULL;
     self->ixix_out = NULL;
 
-    // Close term stepper. 
+    // Close term stepper.
     DECREF(self->term_stepper);
     self->term_stepper = NULL;
 }
@@ -184,19 +184,19 @@ LexWriter_enter_temp_mode(LexiconWriter *self, const CharBuf *field,
     Schema    *schema = LexWriter_Get_Schema(self);
     FieldType *type   = Schema_Fetch_Type(schema, field);
 
-    // Assign outstream. 
+    // Assign outstream.
     if (self->dat_out != NULL) {
         THROW(ERR, "Can't enter temp mode (filename: %o) ", self->dat_file);
     }
     self->dat_out = (OutStream*)INCREF(temp_outstream);
 
-    // Initialize count and ix_count, term stepper and term info stepper. 
+    // Initialize count and ix_count, term stepper and term info stepper.
     self->count    = 0;
     self->ix_count = 0;
     self->term_stepper = FType_Make_Term_Stepper(type);
     TermStepper_Reset(self->tinfo_stepper);
 
-    // Remember that we're in temp mode. 
+    // Remember that we're in temp mode.
     self->temp_mode = true;
 }
 
@@ -225,7 +225,7 @@ LexWriter_finish(LexiconWriter *self)
         THROW(ERR, "File '%o' never closed", self->ix_file);
     }
 
-    // Store metadata. 
+    // Store metadata.
     Seg_Store_Metadata_Str(self->segment, "lexicon", 7,
         (Obj*)LexWriter_Metadata(self));
 }
@@ -237,7 +237,7 @@ LexWriter_metadata(LexiconWriter *self)
     Hash *const counts    = (Hash*)INCREF(self->counts);
     Hash *const ix_counts = (Hash*)INCREF(self->ix_counts);
 
-    // Placeholders. 
+    // Placeholders.
     if (Hash_Get_Size(counts) == 0) {
         Hash_Store_Str(counts, "none", 4, (Obj*)CB_newf("%i32", (int32_t)0) );
         Hash_Store_Str(ix_counts, "none", 4, 
@@ -254,7 +254,7 @@ void
 LexWriter_add_segment(LexiconWriter *self, SegReader *reader, 
                       I32Array *doc_map)
 {
-    // No-op, since the data gets added via PostingListWriter. 
+    // No-op, since the data gets added via PostingListWriter.
     UNUSED_VAR(self);
     UNUSED_VAR(reader);
     UNUSED_VAR(doc_map);

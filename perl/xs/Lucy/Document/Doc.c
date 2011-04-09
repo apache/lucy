@@ -25,7 +25,7 @@
 lucy_Doc*
 lucy_Doc_init(lucy_Doc *self, void *fields, int32_t doc_id)
 {
-    // Assign. 
+    // Assign.
     if (fields) {
         if (SvTYPE((SV*)fields) != SVt_PVHV) THROW(LUCY_ERR, "Not a hash");
         self->fields = SvREFCNT_inc((SV*)fields);
@@ -64,7 +64,7 @@ lucy_Doc_store(lucy_Doc *self, const lucy_CharBuf *field, lucy_Obj *value)
                : (SV*)Lucy_Obj_To_Host(value);
     SvUTF8_on(key_sv);
     (void)hv_store_ent((HV*)self->fields, key_sv, val_sv, 0);
-    // TODO: make this a thread-local instead of creating it every time? 
+    // TODO: make this a thread-local instead of creating it every time?
     SvREFCNT_dec(key_sv);
 }
 
@@ -172,7 +172,7 @@ lucy_Doc_equals(lucy_Doc *self, lucy_Obj *other)
     if (!self->doc_id == twin->doc_id)   { return false; }
     if (!!self->fields ^ !!twin->fields) { return false; }
 
-    // Verify fields.  Don't allow any deep data structures. 
+    // Verify fields.  Don't allow any deep data structures.
     my_fields    = (HV*)self->fields;
     other_fields = (HV*)twin->fields;
     if (HvKEYS(my_fields) != HvKEYS(other_fields)) { return false; }

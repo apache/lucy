@@ -65,7 +65,7 @@ PPCODE:
         CFISH_THROW(LUCY_ERR, "Missing required argument 'doc'");
     }
 
-    // Either get a Doc or use the stock doc. 
+    // Either get a Doc or use the stock doc.
     if (   sv_isobject(doc_sv) 
         && sv_derived_from(doc_sv, "Lucy::Document::Doc")
     ) {

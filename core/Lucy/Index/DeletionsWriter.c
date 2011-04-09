@@ -57,7 +57,7 @@ DelWriter_generate_doc_map(DeletionsWriter *self, Matcher *deletions,
     int32_t  next_deletion = deletions ? Matcher_Next(deletions) : I32_MAX;
     UNUSED_VAR(self);
 
-    // 0 for a deleted doc, a new number otherwise 
+    // 0 for a deleted doc, a new number otherwise
     for (i = 1, new_doc_id = 1; i <= doc_max; i++) {
         if (i == next_deletion) {
             next_deletion = Matcher_Next(deletions);
@@ -98,7 +98,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
     self->searcher          = IxSearcher_new((Obj*)polyreader);
     self->name_to_tick      = Hash_new(num_seg_readers);
 
-    // Materialize a BitVector of deletions for each segment. 
+    // Materialize a BitVector of deletions for each segment.
     for (i = 0; i < num_seg_readers; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(self->seg_readers, i);
         BitVector *bit_vec    = BitVec_new(SegReader_Doc_Max(seg_reader));
@@ -160,10 +160,10 @@ DefDelWriter_finish(DefaultDeletionsWriter *self)
             OutStream *outstream = Folder_Open_Out(folder, filename);
             if (!outstream) { RETHROW(INCREF(Err_get_error())); }
 
-            // Ensure that we have 1 bit for each doc in segment. 
+            // Ensure that we have 1 bit for each doc in segment.
             BitVec_Grow(deldocs, new_max);
 
-            // Write deletions data and clean up. 
+            // Write deletions data and clean up.
             OutStream_Write_Bytes(outstream,
                 (char*)BitVec_Get_Raw_Bits(deldocs), byte_size);
             OutStream_Close(outstream);
@@ -230,7 +230,7 @@ DefDelWriter_seg_deletions(DefaultDeletionsWriter *self,
             deletions = (Matcher*)BitVecMatcher_new(deldocs);
         }
     }
-    else { // Sanity check. 
+    else { // Sanity check.
         THROW(ERR, "Couldn't find SegReader %o", seg_reader);
     }
 
@@ -264,7 +264,7 @@ DefDelWriter_delete_by_term(DefaultDeletionsWriter *self,
         int32_t doc_id;
         int32_t num_zapped = 0;
 
-        // Iterate through postings, marking each doc as deleted. 
+        // Iterate through postings, marking each doc as deleted.
         if (plist) {
             while (0 != (doc_id = PList_Next(plist))) {
                 num_zapped += !BitVec_Get(bit_vec, doc_id);
@@ -292,7 +292,7 @@ DefDelWriter_delete_by_query(DefaultDeletionsWriter *self, Query *query)
             int32_t doc_id;
             int32_t num_zapped = 0;
 
-            // Iterate through matches, marking each doc as deleted. 
+            // Iterate through matches, marking each doc as deleted.
             while (0 != (doc_id = Matcher_Next(matcher))) {
                 num_zapped += !BitVec_Get(bit_vec, doc_id);
                 BitVec_Set(bit_vec, doc_id);

@@ -131,7 +131,7 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
         metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "term_vectors", 12);
     }
     
-    // Check format. 
+    // Check format.
     if (metadata) {
         Obj     *format    = Hash_Fetch_Str(metadata, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
@@ -144,7 +144,7 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
     }
 
 
-    // Open instreams. 
+    // Open instreams.
     {
         CharBuf *seg_name = Seg_Get_Name(segment);
         CharBuf *ix_file  = CB_newf("%o/highlight.ix", seg_name);
@@ -230,7 +230,7 @@ DefHLReader_read_record(DefaultHighlightReader *self, int32_t doc_id,
     InStream_Seek(ix_in, doc_id * 8);
 
     {
-        // Copy the whole record. 
+        // Copy the whole record.
         int64_t  filepos = InStream_Read_I64(ix_in);
         int64_t  end     = InStream_Read_I64(ix_in);
         size_t   size    = (size_t)(end - filepos);

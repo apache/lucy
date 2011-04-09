@@ -70,7 +70,7 @@ LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
         slot = &(entry->next);
     }
 
-    // We've found an empty slot. Create the new entry.  
+    // We've found an empty slot. Create the new entry.
     if (!new_entry) {
         new_entry = (LFRegEntry*)MALLOCATE(sizeof(LFRegEntry));
         new_entry->hash_sum  = hash_sum;

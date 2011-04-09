@@ -87,7 +87,7 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec, uint32_t wanted)
                     self->need_values = true;
                 }
                 else { 
-                    // Skip over fields we don't know how to sort on. 
+                    // Skip over fields we don't know how to sort on.
                     continue; 
                 } 
             }
@@ -151,7 +151,7 @@ HitQ_less_than(HitQueue *self, Obj *obj_a, Obj *obj_b)
     do {
         switch (actions[i] & ACTIONS_MASK) {
             case COMPARE_BY_SCORE:
-                // Prefer high scores. 
+                // Prefer high scores.
                 if      (a->score > b->score) { return false;   }
                 else if (a->score < b->score) { return true;    }
                 break;
@@ -160,7 +160,7 @@ HitQ_less_than(HitQueue *self, Obj *obj_a, Obj *obj_b)
                 else if (a->score < b->score) { return false;   }
                 break;
             case COMPARE_BY_DOC_ID:
-                // Prefer low doc ids. 
+                // Prefer low doc ids.
                 if      (a->doc_id > b->doc_id) { return true;    }
                 else if (a->doc_id < b->doc_id) { return false;   }
                 break;

@@ -95,17 +95,17 @@ TextTermStepper_write_delta(TextTermStepper *self, OutStream *outstream,
     char    *last_text = (char*)CB_Get_Ptr8(last_value);
     size_t   last_size = CB_Get_Size(last_value);
 
-    // Count how many bytes the strings share at the top.  
+    // Count how many bytes the strings share at the top.
     const int32_t overlap = StrHelp_overlap(last_text, new_text,
         last_size, new_size);
     const char *const diff_start_str = new_text + overlap;
     const size_t diff_len            = new_size - overlap;
 
-    // Write number of common bytes and common bytes. 
+    // Write number of common bytes and common bytes.
     OutStream_Write_C32(outstream, overlap);
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
-    // Update value. 
+    // Update value.
     CB_Mimic((CharBuf*)self->value, value);
 }
 
@@ -116,14 +116,14 @@ TextTermStepper_read_key_frame(TextTermStepper *self, InStream *instream)
     CharBuf *value;
     char *ptr;
 
-    // Allocate space. 
+    // Allocate space.
     if (self->value == NULL) {
         self->value = (Obj*)CB_new(text_len);
     }
     value = (CharBuf*)self->value;
     ptr   = CB_Grow(value, text_len);
 
-    // Set the value text. 
+    // Set the value text.
     InStream_Read_Bytes(instream, ptr, text_len);
     CB_Set_Size(value, text_len);
     if (!StrHelp_utf8_valid(ptr, text_len)) {
@@ -132,7 +132,7 @@ TextTermStepper_read_key_frame(TextTermStepper *self, InStream *instream)
             InStream_Tell(instream) - text_len);
     }
 
-    // Null-terminate. 
+    // Null-terminate.
     ptr[text_len] = '\0';
 }
 
@@ -145,14 +145,14 @@ TextTermStepper_read_delta(TextTermStepper *self, InStream *instream)
     CharBuf *value;
     char *ptr;
 
-    // Allocate space. 
+    // Allocate space.
     if (self->value == NULL) {
         self->value = (Obj*)CB_new(total_text_len);
     }
     value = (CharBuf*)self->value;
     ptr   = CB_Grow(value, total_text_len);
 
-    // Set the value text. 
+    // Set the value text.
     InStream_Read_Bytes(instream, ptr + text_overlap, finish_chars_len);
     CB_Set_Size(value, total_text_len);
     if (!StrHelp_utf8_valid(ptr, total_text_len)) {
@@ -161,7 +161,7 @@ TextTermStepper_read_delta(TextTermStepper *self, InStream *instream)
             InStream_Tell(instream) - finish_chars_len);
     }
 
-    // Null-terminate. 
+    // Null-terminate.
     ptr[total_text_len] = '\0';
 }
 

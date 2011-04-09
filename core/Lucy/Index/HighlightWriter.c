@@ -75,7 +75,7 @@ S_lazy_init(HighlightWriter *self)
         Folder   *folder   = self->folder;
         CharBuf  *seg_name = Seg_Get_Name(segment);
 
-        // Open outstreams. 
+        // Open outstreams.
         {
             CharBuf *ix_file = CB_newf("%o/highlight.ix", seg_name);
             self->ix_out = Folder_Open_Out(folder, ix_file);
@@ -89,7 +89,7 @@ S_lazy_init(HighlightWriter *self)
             if (!self->dat_out) { RETHROW(INCREF(Err_get_error())); }
         }
 
-        // Go past invalid doc 0. 
+        // Go past invalid doc 0.
         OutStream_Write_I64(self->ix_out, 0);
     }
 
@@ -106,15 +106,15 @@ HLWriter_add_inverted_doc(HighlightWriter *self, Inverter *inverter,
     uint32_t num_highlightable = 0;
     int32_t expected = (int32_t)(OutStream_Tell(ix_out) / 8);
 
-    // Verify doc id. 
+    // Verify doc id.
     if (doc_id != expected) {
         THROW(ERR, "Expected doc id %i32 but got %i32", expected, doc_id);
     }
 
-    // Write index data. 
+    // Write index data.
     OutStream_Write_I64(ix_out, filepos);
 
-    // Count, then write number of highlightable fields. 
+    // Count, then write number of highlightable fields.
     Inverter_Iterate(inverter);
     while (Inverter_Next(inverter)) {
         FieldType *type = Inverter_Get_Type(inverter);
@@ -154,7 +154,7 @@ HLWriter_tv_buf(HighlightWriter *self, Inversion *inversion)
     uint32_t    freq;
     UNUSED_VAR(self);
 
-    // Leave space for a c32 indicating the number of postings. 
+    // Leave space for a c32 indicating the number of postings.
     BB_Set_Size(tv_buf, C32_MAX_BYTES);
 
     Inversion_Reset(inversion);
@@ -166,46 +166,46 @@ HLWriter_tv_buf(HighlightWriter *self, Inversion *inversion)
         char *orig;
         size_t old_size = BB_Get_Size(tv_buf);
         size_t new_size =   old_size
-                          + C32_MAX_BYTES      // overlap 
-                          + C32_MAX_BYTES      // length of string diff 
-                          + (token->len - overlap) // diff char data 
-                          + C32_MAX_BYTES                // num prox 
-                          + (C32_MAX_BYTES * freq * 3);  // pos data 
+                          + C32_MAX_BYTES      // overlap
+                          + C32_MAX_BYTES      // length of string diff
+                          + (token->len - overlap) // diff char data
+                          + C32_MAX_BYTES                // num prox
+                          + (C32_MAX_BYTES * freq * 3);  // pos data
 
-        // Allocate for worst-case scenario. 
+        // Allocate for worst-case scenario.
         ptr  = BB_Grow(tv_buf, new_size);
         orig = ptr;
         ptr += old_size;
 
-        // Track number of postings. 
+        // Track number of postings.
         num_postings += 1;
         
-        // Append the string diff to the tv_buf. 
+        // Append the string diff to the tv_buf.
         NumUtil_encode_c32(overlap, &ptr);
         NumUtil_encode_c32( (token->len - overlap), &ptr);
         memcpy(ptr, (token->text + overlap), (token->len - overlap));
         ptr += token->len - overlap;
 
-        // Save text and text_len for comparison next loop. 
+        // Save text and text_len for comparison next loop.
         last_text = token->text;
         last_len  = token->len;
 
-        // Append the number of positions for this term. 
+        // Append the number of positions for this term.
         NumUtil_encode_c32(freq, &ptr);
 
         do {
-            // Add position, start_offset, and end_offset to tv_buf. 
+            // Add position, start_offset, and end_offset to tv_buf.
             NumUtil_encode_c32(token->pos, &ptr);
             NumUtil_encode_c32(token->start_offset, &ptr);
             NumUtil_encode_c32(token->end_offset, &ptr);
 
         } while (--freq && (token = *++tokens));
 
-        // Set new byte length. 
+        // Set new byte length.
         BB_Set_Size(tv_buf, ptr - orig); 
     }
     
-    // Go back and start the term vector string with the posting count. 
+    // Go back and start the term vector string with the posting count.
     dest = BB_Get_Buf(tv_buf);
     NumUtil_encode_padded_c32(num_postings, &dest);
 
@@ -219,7 +219,7 @@ HLWriter_add_segment(HighlightWriter *self, SegReader *reader,
     int32_t doc_max = SegReader_Doc_Max(reader);
 
     if (doc_max == 0) {
-        // Bail if the supplied segment is empty. 
+        // Bail if the supplied segment is empty.
         return;
     }
     else {
@@ -232,15 +232,15 @@ HLWriter_add_segment(HighlightWriter *self, SegReader *reader,
         ByteBuf   *bb = BB_new(0);
 
         for (orig = 1; orig <= doc_max; orig++) {
-            // Skip deleted docs. 
+            // Skip deleted docs.
             if (doc_map && !I32Arr_Get(doc_map, orig)) {
                 continue;
             }
 
-            // Write file pointer. 
+            // Write file pointer.
             OutStream_Write_I64( ix_out, OutStream_Tell(dat_out) );
             
-            // Copy the raw record. 
+            // Copy the raw record.
             DefHLReader_Read_Record(hl_reader, orig, bb);
             OutStream_Write_Bytes(dat_out, BB_Get_Buf(bb), BB_Get_Size(bb));
 
@@ -259,7 +259,7 @@ HLWriter_finish(HighlightWriter *self)
         int64_t end = OutStream_Tell(self->dat_out);
         OutStream_Write_I64(self->ix_out, end);
         
-        // Close down the output streams. 
+        // Close down the output streams.
         OutStream_Close(self->dat_out);
         OutStream_Close(self->ix_out);
         Seg_Store_Metadata_Str(self->segment, "highlight", 9, 

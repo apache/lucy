@@ -54,7 +54,7 @@ SI_kill_iter(Hash *self);
 static INLINE HashEntry*
 SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum);
 
-// Double the number of buckets and redistribute all entries. 
+// Double the number of buckets and redistribute all entries.
 static INLINE HashEntry*
 SI_rebuild_hash(Hash *self);
 
@@ -79,11 +79,11 @@ Hash_init(Hash *self, uint32_t capacity)
         capacity *= 2;
     }
 
-    // Init. 
+    // Init.
     self->size         = 0;
     self->iter_tick    = -1;
 
-    // Derive. 
+    // Derive.
     self->capacity     = capacity;
     self->entries      = (HashEntry*)CALLOCATE(capacity, sizeof(HashEntry));
     self->threshold    = threshold;
@@ -145,20 +145,20 @@ Hash_load(Hash *self, Obj *dump)
             }
         }
 
-        // Dispatch to an alternate Load() method. 
+        // Dispatch to an alternate Load() method.
         if (vtable) {
             Obj_load_t load = (Obj_load_t)METHOD(vtable, Obj, Load);
             if (load == Obj_load) {
                 THROW(ERR, "Abstract method Load() not defined for %o", 
                     VTable_Get_Name(vtable));
             }
-            else if (load != (Obj_load_t)Hash_load) { // stop inf loop 
+            else if (load != (Obj_load_t)Hash_load) { // stop inf loop
                 return load(NULL, dump);
             }
         }
     }
 
-    // It's an ordinary Hash. 
+    // It's an ordinary Hash.
     {
         Hash *loaded = Hash_new(source->size);
         Obj *key;
@@ -197,7 +197,7 @@ Hash_serialize(Hash *self, OutStream *outstream)
         }
     }
 
-    // Punt on the classes of the remaining keys. 
+    // Punt on the classes of the remaining keys.
     Hash_Iterate(self);
     while (Hash_Next(self, &key, &val)) {
         if (!Obj_Is_A(key, CHARBUF)) { 
@@ -218,7 +218,7 @@ Hash_deserialize(Hash *self, InStream *instream)
     if (self) Hash_init(self, size);
     else self = Hash_new(size);
  
-    // Read key-value pairs with CharBuf keys. 
+    // Read key-value pairs with CharBuf keys.
     while (num_charbufs--) {
         uint32_t len = InStream_Read_C32(instream);
         char *key_buf = CB_Grow(key, len);
@@ -229,7 +229,7 @@ Hash_deserialize(Hash *self, InStream *instream)
     }
     DECREF(key);
     
-    // Read remaining key/value pairs. 
+    // Read remaining key/value pairs.
     while (num_other--) {
         Obj *k = THAW(instream);
         Hash_Store(self, k, THAW(instream));
@@ -245,7 +245,7 @@ Hash_clear(Hash *self)
     HashEntry *entry       = (HashEntry*)self->entries;
     HashEntry *const limit = entry + self->capacity;
 
-    // Iterate through all entries. 
+    // Iterate through all entries.
     for ( ; entry < limit; entry++) {
         if (!entry->key) { continue; }
         DECREF(entry->key);
@@ -273,7 +273,7 @@ Hash_do_store(Hash *self, Obj *key, Obj *value,
         HashEntry *entry = entries + tick;
         if (entry->key == (Obj*)&TOMBSTONE || !entry->key) {
             if (entry->key == (Obj*)&TOMBSTONE) { 
-                // Take note of diminished tombstone clutter. 
+                // Take note of diminished tombstone clutter.
                 self->threshold++; 
             }
             entry->key       = use_this_key 
@@ -291,7 +291,7 @@ Hash_do_store(Hash *self, Obj *key, Obj *value,
             entry->value = value;
             break;
         }
-        tick++; // linear scan 
+        tick++; // linear scan
     }
 }
 
@@ -335,7 +335,7 @@ SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum)
         tick &= self->capacity - 1;
         entry = entries + tick;
         if (!entry->key) { 
-            // Failed to find the key, so return NULL. 
+            // Failed to find the key, so return NULL.
             return NULL; 
         }
         else if (   entry->hash_sum  == hash_sum
@@ -365,7 +365,7 @@ Hash_delete(Hash *self, const Obj *key)
         entry->value     = NULL;
         entry->hash_sum  = 0;
         self->size--;
-        self->threshold--; // limit number of tombstones 
+        self->threshold--; // limit number of tombstones
         return value;
     }
     else {
@@ -398,7 +398,7 @@ Hash_next(Hash *self, Obj **key, Obj **value)
 {
     while (1) {
         if (++self->iter_tick >= (int32_t)self->capacity) {
-            // Bail since we've completed the iteration. 
+            // Bail since we've completed the iteration.
             --self->iter_tick;
             *key   = NULL;
             *value = NULL;
@@ -408,7 +408,7 @@ Hash_next(Hash *self, Obj **key, Obj **value)
             HashEntry *const entry 
                 = (HashEntry*)self->entries + self->iter_tick;
             if (entry->key && entry->key != (Obj*)&TOMBSTONE) {
-                // Success! 
+                // Success!
                 *key   = entry->key;
                 *value = entry->value;
                 return true;

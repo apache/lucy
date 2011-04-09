@@ -51,7 +51,7 @@ static void
 S_fresh_flip(PostingPool *self, InStream *lex_temp_in, 
              InStream *post_temp_in);
 
-// Main loop. 
+// Main loop.
 static void
 S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                            OutStream *skip_stream);
@@ -75,7 +75,7 @@ PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
               OutStream *lex_temp_out, OutStream *post_temp_out, 
               OutStream *skip_out)
 {
-    // Init. 
+    // Init.
     SortEx_init((SortExternal*)self, sizeof(Obj*));
     self->doc_base         = 0;
     self->last_doc_id      = 0;
@@ -91,7 +91,7 @@ PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
     self->post_end         = 0;
     self->skip_stepper     = SkipStepper_new();
 
-    // Assign. 
+    // Assign.
     self->schema         = (Schema*)INCREF(schema);
     self->snapshot       = (Snapshot*)INCREF(snapshot);
     self->segment        = (Segment*)INCREF(segment);
@@ -103,7 +103,7 @@ PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
     self->post_temp_out  = (OutStream*)INCREF(post_temp_out);
     self->skip_out       = (OutStream*)INCREF(skip_out);
 
-    // Derive. 
+    // Derive.
     Similarity *sim = Schema_Fetch_Sim(schema, field);
     self->posting   = Sim_Make_Posting(sim);
     self->type      = (FieldType*)INCREF(Schema_Fetch_Type(schema, field));
@@ -148,10 +148,10 @@ PostPool_compare(PostingPool *self, void *va, void *vb)
     UNUSED_VAR(self);
 
     if (comparison == 0) {
-        // If a is a substring of b, it's less than b, so return a neg num. 
+        // If a is a substring of b, it's less than b, so return a neg num.
         comparison = a_len - b_len;
 
-        // Break ties by doc id. 
+        // Break ties by doc id.
         if (comparison == 0) {
             comparison = a->doc_id - b->doc_id;
         }
@@ -192,7 +192,7 @@ PostPool_flip(PostingPool *self)
     PostPool_Sort_Cache(self);
     if (num_runs && (self->cache_max - self->cache_tick) > 0) {
         uint32_t num_items = PostPool_Cache_Count(self);
-        // Cheap imitation of flush. FIXME. 
+        // Cheap imitation of flush. FIXME.
         PostingPool *run = PostPool_new(self->schema, self->snapshot, 
             self->segment, self->polyreader, self->field, self->lex_writer, 
             self->mem_pool, self->lex_temp_out, self->post_temp_out, 
@@ -206,7 +206,7 @@ PostPool_flip(PostingPool *self)
         self->cache_max = 0;
     }
 
-    // Assign. 
+    // Assign.
     for (i = 0; i < num_runs; i++) {
         PostingPool *run = (PostingPool*)VA_Fetch(self->runs, i);
         if (run != NULL) {
@@ -286,7 +286,7 @@ PostPool_shrink(PostingPool *self)
 void 
 PostPool_flush(PostingPool *self)
 {
-    // Don't add a run unless we have data to put in it. 
+    // Don't add a run unless we have data to put in it.
     if (PostPool_Cache_Count(self) == 0) { return; }
 
     PostingPool *run = PostPool_new(self->schema, self->snapshot, 
@@ -303,7 +303,7 @@ PostPool_flush(PostingPool *self)
     run->cache_max  = self->cache_max;
     run->cache_cap  = self->cache_cap;
 
-    // Write to temp files. 
+    // Write to temp files.
     LexWriter_Enter_Temp_Mode(self->lex_writer, self->field, 
         self->lex_temp_out);
     run->lex_start  = OutStream_Tell(self->lex_temp_out);
@@ -322,7 +322,7 @@ PostPool_flush(PostingPool *self)
     run->cache_cap  = 0;
     PostPool_Clear_Cache(self);
 
-    // Add the run to the array. 
+    // Add the run to the array.
     PostPool_Add_Run(self, (SortExternal*)run);
 
     DECREF(post_writer);
@@ -331,7 +331,7 @@ PostPool_flush(PostingPool *self)
 void
 PostPool_finish(PostingPool *self)
 {
-    // Bail if there's no data. 
+    // Bail if there's no data.
     if (!PostPool_Peek(self)) { return; }
 
     Similarity *sim = Schema_Fetch_Sim(self->schema, self->field);
@@ -359,7 +359,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
     const int32_t  skip_interval
         = Arch_Skip_Interval(Schema_Get_Architecture(self->schema));
 
-    // Prime heldover variables. 
+    // Prime heldover variables.
     RawPosting *posting = (RawPosting*)CERTIFY(
         (*(RawPosting**)PostPool_Fetch(self)), RAWPOSTING);
     CB_Mimic_Str(last_term_text, posting->blob, posting->content_len);
@@ -377,7 +377,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             same_text_as_last = false;
         }
         else {
-            // Compare once. 
+            // Compare once.
             if (   posting->content_len != last_text_size
                 || memcmp(&posting->blob, last_text_buf, last_text_size) != 0
             ) {
@@ -385,51 +385,51 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             }
         }
 
-        // If the term text changes, process the last term. 
+        // If the term text changes, process the last term.
         if ( !same_text_as_last ) {
-            // Hand off to LexiconWriter. 
+            // Hand off to LexiconWriter.
             LexWriter_Add_Term(lex_writer, last_term_text, tinfo);
 
-            // Start each term afresh. 
+            // Start each term afresh.
             TInfo_Reset(tinfo);
             PostWriter_Start_Term(post_writer, tinfo);
 
-            // Init skip data in preparation for the next term. 
+            // Init skip data in preparation for the next term.
             skip_stepper->doc_id  = 0;
             skip_stepper->filepos = tinfo->post_filepos;
             last_skip_doc         = 0;
             last_skip_filepos     = tinfo->post_filepos;
 
-            // Remember the term_text so we can write string diffs. 
+            // Remember the term_text so we can write string diffs.
             CB_Mimic_Str(last_term_text, posting->blob, 
                 posting->content_len);
             last_text_buf  = (char*)CB_Get_Ptr8(last_term_text);
             last_text_size = CB_Get_Size(last_term_text);
 
-            // Starting a new term, thus a new delta doc sequence at 0. 
+            // Starting a new term, thus a new delta doc sequence at 0.
             last_doc_id = 0;
         }
 
-        // Bail on last iter before writing invalid posting data. 
+        // Bail on last iter before writing invalid posting data.
         if (posting == &RAWPOSTING_BLANK) { break; }
 
-        // Write posting data. 
+        // Write posting data.
         PostWriter_Write_Posting(post_writer, posting);
 
-        // Doc freq lags by one iter. 
+        // Doc freq lags by one iter.
         tinfo->doc_freq++;
 
-        //  Write skip data. 
+        //  Write skip data.
         if (   skip_stream != NULL
             && same_text_as_last   
             && tinfo->doc_freq % skip_interval == 0
             && tinfo->doc_freq != 0
         ) {
-            // If first skip group, save skip stream pos for term info. 
+            // If first skip group, save skip stream pos for term info.
             if (tinfo->doc_freq == skip_interval) {
                 tinfo->skip_filepos = OutStream_Tell(skip_stream); 
             }
-            // Write deltas. 
+            // Write deltas.
             last_skip_doc         = skip_stepper->doc_id;
             last_skip_filepos     = skip_stepper->filepos;
             skip_stepper->doc_id  = posting->doc_id;
@@ -439,11 +439,11 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                  last_skip_doc, last_skip_filepos);
         }
 
-        // Remember last doc id because we need it for delta encoding. 
+        // Remember last doc id because we need it for delta encoding.
         last_doc_id = posting->doc_id;
 
-        // Retrieve the next posting from the sort pool. 
-        // DECREF(posting);  // No!!  DON'T destroy!!!  
+        // Retrieve the next posting from the sort pool.
+        // DECREF(posting);  // No!!  DON'T destroy!!!
 
         void *address = PostPool_Fetch(self);
         posting = address 
@@ -451,7 +451,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                 : NULL;
     }
 
-    // Clean up. 
+    // Clean up.
     DECREF(last_term_text);
     DECREF(skip_tinfo);
     DECREF(tinfo);
@@ -465,14 +465,14 @@ PostPool_refill(PostingPool *self)
     I32Array    *const doc_map     = self->doc_map;
     const uint32_t     mem_thresh  = self->mem_thresh;
     const int32_t      doc_base    = self->doc_base;
-    uint32_t           num_elems   = 0; // number of items recovered 
+    uint32_t           num_elems   = 0; // number of items recovered
     MemoryPool        *mem_pool;
     CharBuf           *term_text   = NULL;
 
     if (self->lexicon == NULL) { return 0; }
     else { term_text = (CharBuf*)Lex_Get_Term(lexicon); }
 
-    // Make sure cache is empty. 
+    // Make sure cache is empty.
     if (self->cache_max - self->cache_tick > 0) {
         THROW(ERR, "Refill called but cache contains %u32 items",
             self->cache_max - self->cache_tick);
@@ -480,7 +480,7 @@ PostPool_refill(PostingPool *self)
     self->cache_max  = 0;
     self->cache_tick = 0;
 
-    // Ditch old MemoryPool and get another. 
+    // Ditch old MemoryPool and get another.
     DECREF(self->mem_pool);
     self->mem_pool = MemPool_new(0);
     mem_pool       = self->mem_pool;
@@ -489,7 +489,7 @@ PostPool_refill(PostingPool *self)
         RawPosting *raw_posting;
 
         if (self->post_count == 0) {
-            // Read a term. 
+            // Read a term.
             if (Lex_Next(lexicon)) {
                 self->post_count = Lex_Doc_Freq(lexicon);
                 term_text = (CharBuf*)Lex_Get_Term(lexicon);
@@ -502,24 +502,24 @@ PostPool_refill(PostingPool *self)
                     self->last_doc_id = doc_base;
                 }
             }
-            // Bail if we've read everything in this run. 
+            // Bail if we've read everything in this run.
             else {
                 break;
             }
         }
 
-        // Bail if we've hit the ceiling for this run's cache. 
+        // Bail if we've hit the ceiling for this run's cache.
         if (mem_pool->consumed >= mem_thresh && num_elems > 0) {
             break;
         }
 
-        // Read a posting from the input stream. 
+        // Read a posting from the input stream.
         raw_posting = PList_Read_Raw(plist, self->last_doc_id, term_text, 
             mem_pool);
         self->last_doc_id = raw_posting->doc_id;
         self->post_count--;
 
-        // Skip deletions. 
+        // Skip deletions.
         if (doc_map != NULL) {
             const int32_t remapped = I32Arr_Get(doc_map, 
                 raw_posting->doc_id - doc_base);
@@ -529,7 +529,7 @@ PostPool_refill(PostingPool *self)
             raw_posting->doc_id = remapped;
         }
 
-        // Add to the run's cache. 
+        // Add to the run's cache.
         if (num_elems >= self->cache_cap) {
             size_t new_cap = Memory_oversize(num_elems + 1, sizeof(Obj*));
             PostPool_Grow_Cache(self, new_cap);
@@ -539,7 +539,7 @@ PostPool_refill(PostingPool *self)
         num_elems++;
     }
 
-    // Reset the cache array position and length; remember file pos. 
+    // Reset the cache array position and length; remember file pos.
     self->cache_max   = num_elems;
     self->cache_tick  = 0;
 
@@ -561,13 +561,13 @@ S_fresh_flip(PostingPool *self, InStream *lex_temp_in,
     if (self->flipped) { THROW(ERR, "Can't Flip twice"); }
     self->flipped = true;
 
-    // Sort RawPostings in cache, if any. 
+    // Sort RawPostings in cache, if any.
     PostPool_Sort_Cache(self);
 
-    // Bail if never flushed. 
+    // Bail if never flushed.
     if (self->lex_end == 0) { return; }
 
-    // Get a Lexicon. 
+    // Get a Lexicon.
     CharBuf *lex_alias = CB_newf("%o-%i64-to-%i64",
         InStream_Get_Filename(lex_temp_in), self->lex_start, self->lex_end);
     InStream *lex_temp_in_dupe = InStream_Reopen(lex_temp_in, 
@@ -577,7 +577,7 @@ S_fresh_flip(PostingPool *self, InStream *lex_temp_in,
     DECREF(lex_alias);
     DECREF(lex_temp_in_dupe);
 
-    // Get a PostingList. 
+    // Get a PostingList.
     CharBuf *post_alias = CB_newf("%o-%i64-to-%i64",
         InStream_Get_Filename(post_temp_in), self->post_start, 
         self->post_end);

@@ -69,7 +69,7 @@ Err_cat_mess(Err *self, const CharBuf *mess)
     CB_Cat(self->mess, mess);
 }
 
-// Fallbacks in case variadic macros aren't available. 
+// Fallbacks in case variadic macros aren't available.
 #ifndef CHY_HAS_VARIADIC_MACROS
 void
 THROW(VTable *vtable, char *pattern, ...)
@@ -197,7 +197,7 @@ Err_throw_at(VTable *vtable, const char *file, int line,
     Err_do_throw(err);
 }
 
-// Inlined, slightly optimized version of Obj_is_a. 
+// Inlined, slightly optimized version of Obj_is_a.
 static INLINE bool_t
 SI_obj_is_a(Obj *obj, VTable *target_vtable)
 {
@@ -249,12 +249,12 @@ Err_win_error()
     size_t buf_size = 256;
     char *buf = (char*)MALLOCATE(buf_size);
     size_t message_len = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 
-        NULL,       // message source table 
+        NULL,       // message source table
         GetLastError(),
-        0,          // language id 
+        0,          // language id
         buf,
         buf_size,
-        NULL        // empty va_list 
+        NULL        // empty va_list
     );
     if (message_len == 0) {
         char unknown[] = "Unknown error";
@@ -262,7 +262,7 @@ Err_win_error()
         strncpy(buf, unknown, len);
     }
     else if (message_len > 1) {
-        // Kill stupid newline. 
+        // Kill stupid newline.
         buf[message_len - 2] = '\0';
     }
     return buf;
@@ -273,9 +273,9 @@ Err_win_error()
 char*
 Err_win_error()
 {
-    return NULL; // Never called. 
+    return NULL; // Never called.
 }
 
-#endif // CHY_HAS_WINDOWS_H 
+#endif // CHY_HAS_WINDOWS_H
 
 

@@ -62,7 +62,7 @@ inert class Lucy::Util::Debug {
 __C__
 #ifdef LUCY_DEBUG
 
-#undef LUCY_DEBUG   // undef prior to redefining the command line argument 
+#undef LUCY_DEBUG   // undef prior to redefining the command line argument
 #define LUCY_DEBUG_ENABLED 1
 
 #include <stdio.h>
@@ -108,7 +108,7 @@ __C__
         }                                                              \
     } while (0) 
 
-#elif defined(CHY_HAS_GNUC_VARIADIC_MACROS) // not LUCY_DEBUG 
+#elif defined(CHY_HAS_GNUC_VARIADIC_MACROS) // not LUCY_DEBUG
 
 #undef LUCY_DEBUG
 #define LUCY_DEBUG_ENABLED 0
@@ -118,7 +118,7 @@ __C__
 #define LUCY_DEBUG(args...)
 #define LUCY_ASSERT(test, args...)
 
-#else  // also not LUCY_DEBUG 
+#else  // also not LUCY_DEBUG
 
 #undef LUCY_DEBUG
 #define LUCY_DEBUG_ENABLED 0
@@ -128,7 +128,7 @@ static void LUCY_DEBUG_PRINT(char *_ignore_me, ...) { }
 static void LUCY_DEBUG(char *_ignore_me, ...) { }
 static void LUCY_ASSERT(int _ignore_me, ...) { }
 
-#endif // LUCY_DEBUG 
+#endif // LUCY_DEBUG
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define DEBUG_ENABLED             LUCY_DEBUG_ENABLED

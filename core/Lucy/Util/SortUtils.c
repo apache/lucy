@@ -30,7 +30,7 @@
 
 /***************************** mergesort ************************************/
 
-// Recursive merge sorting functions. 
+// Recursive merge sorting functions.
 static void
 S_msort4(void *velems, void *vscratch, uint32_t left, uint32_t right, 
          lucy_Sort_compare_t compare, void *context);
@@ -50,16 +50,16 @@ void
 Sort_mergesort(void *elems, void *scratch, uint32_t num_elems, uint32_t width,
                lucy_Sort_compare_t compare, void *context) 
 {
-    // Arrays of 0 or 1 items are already sorted. 
+    // Arrays of 0 or 1 items are already sorted.
     if (num_elems < 2) { return; }
 
-    // Validate. 
+    // Validate.
     if (num_elems >= I32_MAX) {
         THROW(ERR, "Provided %u64 elems, but can't handle more than %i32",
             (uint64_t)num_elems, I32_MAX);
     }
 
-    // Dispatch by element size. 
+    // Dispatch by element size.
     switch (width) {
         case 0:  THROW(ERR, "Parameter 'width' cannot be 0");
                  break;
@@ -190,7 +190,7 @@ static void
 S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
          lucy_Sort_compare_t compare, void *context);
 
-// Swap two elements. 
+// Swap two elements.
 static INLINE void
 SI_exchange4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right);
 static INLINE void
@@ -227,10 +227,10 @@ void
 Sort_quicksort(void *elems, size_t num_elems, size_t width, 
                lucy_Sort_compare_t compare, void *context)
 {
-    // Arrays of 0 or 1 items are already sorted. 
+    // Arrays of 0 or 1 items are already sorted.
     if (num_elems < 2) { return; }
 
-    // Validate. 
+    // Validate.
     if (num_elems >= I32_MAX) {
         THROW(ERR, "Provided %u64 elems, but can't handle more than %i32",
             (uint64_t)num_elems, I32_MAX);
@@ -310,7 +310,7 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
             if (j == left)         { break; }
         }
 
-        // Bail out of loop when we meet in the middle. 
+        // Bail out of loop when we meet in the middle.
         if (i >= j) { break; }
 
         // Swap the elements we found, so the lesser element moves left and
@@ -348,9 +348,9 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
         for (k = right - 1; k > q; k--, i++) { SI_exchange4(elems, i, k); }
     }
 
-    // Recurse. 
-    S_qsort4(elems, left, j, compare, context);   // Sort less_than. 
-    S_qsort4(elems, i, right, compare, context);  // Sort greater_than. 
+    // Recurse.
+    S_qsort4(elems, left, j, compare, context);   // Sort less_than.
+    S_qsort4(elems, i, right, compare, context);  // Sort greater_than.
 } 
 
 /************************* quicksort 8 byte *********************************/
@@ -416,7 +416,7 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
             if (j == left)         { break; }
         }
 
-        // Bail out of loop when we meet in the middle. 
+        // Bail out of loop when we meet in the middle.
         if (i >= j) { break; }
 
         // Swap the elements we found, so the lesser element moves left and
@@ -454,9 +454,9 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
         for (k = right - 1; k > q; k--, i++) { SI_exchange8(elems, i, k); }
     }
 
-    // Recurse. 
-    S_qsort8(elems, left, j, compare, context);   // Sort less_than. 
-    S_qsort8(elems, i, right, compare, context);  // Sort greater_than. 
+    // Recurse.
+    S_qsort8(elems, left, j, compare, context);   // Sort less_than.
+    S_qsort8(elems, i, right, compare, context);  // Sort greater_than.
 } 
 
 

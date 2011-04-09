@@ -22,7 +22,7 @@ lucy_Err_get_error()
 {
     lucy_Err *error 
         = (lucy_Err*)lucy_Host_callback_obj(LUCY_ERR, "get_error", 0);
-    LUCY_DECREF(error); // Cancel out incref from callback. 
+    LUCY_DECREF(error); // Cancel out incref from callback.
     return error;
 }
 

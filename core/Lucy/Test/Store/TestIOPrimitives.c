@@ -89,7 +89,7 @@ test_i32(TestBatch *batch)
     InStream   *instream;
     uint32_t i;
     
-    // Test boundaries. 
+    // Test boundaries.
     ints[0] = I32_MIN;
     ints[1] = I32_MIN + 1;
     ints[2] = I32_MAX;
@@ -128,7 +128,7 @@ test_u32(TestBatch *batch)
     InStream   *instream;
     uint32_t i;
     
-    // Test boundaries. 
+    // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
     ints[2] = U32_MAX;
@@ -167,7 +167,7 @@ test_i64(TestBatch *batch)
     InStream   *instream;
     uint32_t i;
     
-    // Test boundaries. 
+    // Test boundaries.
     ints[0] = I64_MIN;
     ints[1] = I64_MIN + 1;
     ints[2] = I64_MAX;
@@ -207,7 +207,7 @@ test_u64(TestBatch *batch)
     InStream   *instream;
     uint32_t i;
     
-    // Test boundaries. 
+    // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
     ints[2] = U64_MAX;
@@ -246,7 +246,7 @@ test_c32(TestBatch *batch)
     InStream   *instream;
     uint32_t i;
     
-    // Test boundaries. 
+    // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
     ints[2] = U32_MAX;
@@ -288,7 +288,7 @@ test_c64(TestBatch *batch)
     InStream   *raw_instream;
     uint32_t i;
     
-    // Test boundaries. 
+    // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
     ints[2] = U64_MAX;
@@ -350,12 +350,12 @@ test_f32(TestBatch *batch)
     InStream   *instream;
     uint32_t i;
     
-    // Truncate. 
+    // Truncate.
     for (i = 0; i < 1000; i++) {
         values[i] = (float)f64s[i];
     }
 
-    // Test boundaries. 
+    // Test boundaries.
     values[0] = 0.0f;
     values[1] = 1.0f;
 
@@ -392,7 +392,7 @@ test_f64(TestBatch *batch)
     InStream   *instream;
     uint32_t i;
     
-    // Test boundaries. 
+    // Test boundaries.
     values[0] = 0.0;
     values[1] = 1.0;
 

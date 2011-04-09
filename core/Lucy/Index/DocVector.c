@@ -97,19 +97,19 @@ DocVec_term_vector(DocVector *self, const CharBuf *field,
     ByteBuf *tv_buf;
     Hash *field_vector = (Hash*)Hash_Fetch(self->field_vectors, (Obj*)field);
     
-    // If no cache hit, try to fill cache. 
+    // If no cache hit, try to fill cache.
     if (field_vector == NULL) {
         ByteBuf *field_buf 
             = (ByteBuf*)Hash_Fetch(self->field_bufs, (Obj*)field);
 
-        // Bail if there's no content or the field isn't highlightable. 
+        // Bail if there's no content or the field isn't highlightable.
         if (field_buf == NULL) return NULL;
 
         field_vector = S_extract_tv_cache(field_buf);
         Hash_Store(self->field_vectors, (Obj*)field, (Obj*)field_vector);
     }
 
-    // Get a buf for the term text or bail. 
+    // Get a buf for the term text or bail.
     tv_buf = (ByteBuf*)Hash_Fetch(field_vector, (Obj*)term_text);
     if (tv_buf == NULL) {
         return NULL;
@@ -127,30 +127,30 @@ S_extract_tv_cache(ByteBuf *field_buf)
     CharBuf       *text      = CB_new(0);
     int32_t        i;
     
-    // Read the number of highlightable terms in the field. 
+    // Read the number of highlightable terms in the field.
     for (i = 0; i < num_terms; i++) {
         char         *bookmark_ptr;
         size_t        overlap = NumUtil_decode_c32(&tv_string);
         size_t        len     = NumUtil_decode_c32(&tv_string);
         int32_t       num_positions;
 
-        // Decompress the term text. 
+        // Decompress the term text.
         CB_Set_Size(text, overlap);
         CB_Cat_Trusted_Str(text, tv_string, len);
         tv_string += len;
 
-        // Get positions & offsets string. 
+        // Get positions & offsets string.
         bookmark_ptr  = tv_string;
         num_positions = NumUtil_decode_c32(&tv_string);
         while(num_positions--) {
-            // Leave nums compressed to save a little mem. 
+            // Leave nums compressed to save a little mem.
             NumUtil_skip_cint(&tv_string);
             NumUtil_skip_cint(&tv_string);
             NumUtil_skip_cint(&tv_string);
         }
         len = tv_string - bookmark_ptr;
 
-        // Store the $text => $posdata pair in the output hash. 
+        // Store the $text => $posdata pair in the output hash.
         Hash_Store(tv_cache, (Obj*)text,
             (Obj*)BB_new_bytes(bookmark_ptr, len));
     }
@@ -179,7 +179,7 @@ S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text,
         ends      = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     }
 
-    // Expand C32s. 
+    // Expand C32s.
     for (i = 0; i < num_pos; i++) {
         positions[i] = NumUtil_decode_c32(&posdata);
         starts[i]    = NumUtil_decode_c32(&posdata);

@@ -55,7 +55,7 @@ SortWriter_init(SortWriter *self, Schema *schema, Snapshot *snapshot,
     uint32_t field_max = Schema_Num_Fields(schema) + 1;
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
 
-    // Init. 
+    // Init.
     self->field_writers   = VA_new(field_max);
     self->counts          = Hash_new(0);
     self->null_ords       = Hash_new(0);
@@ -97,7 +97,7 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num)
         = (SortFieldWriter*)VA_Fetch(self->field_writers, field_num);
     if (!field_writer) {
 
-        // Open temp files. 
+        // Open temp files.
         if (!self->temp_ord_out) {
             Folder  *folder   = self->folder;
             CharBuf *seg_name = Seg_Get_Name(self->segment);
@@ -167,7 +167,7 @@ SortWriter_add_segment(SortWriter *self, SegReader *reader, I32Array *doc_map)
 {
     VArray *fields  = Schema_All_Fields(self->schema);
 
-    // Proceed field-at-a-time, rather than doc-at-a-time. 
+    // Proceed field-at-a-time, rather than doc-at-a-time.
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         CharBuf *field = (CharBuf*)VA_Fetch(fields, i);
         SortReader *sort_reader = (SortReader*)SegReader_Fetch(reader, 
@@ -234,11 +234,11 @@ SortWriter_finish(SortWriter *self)
     }
     VA_Clear(field_writers);
 
-    // Store metadata. 
+    // Store metadata.
     Seg_Store_Metadata_Str(self->segment, "sort", 4,
         (Obj*)SortWriter_Metadata(self));
 
-    // Clean up. 
+    // Clean up.
     Folder  *folder   = self->folder;
     CharBuf *seg_name = Seg_Get_Name(self->segment);
     CharBuf *path     = CB_newf("%o/sort_ord_temp", seg_name);

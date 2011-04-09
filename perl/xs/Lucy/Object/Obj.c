@@ -69,14 +69,14 @@ lucy_Obj_inc_refcount(lucy_Obj *self)
     switch (self->ref.count) {
         case 0:
             CFISH_THROW(LUCY_ERR, "Illegal refcount of 0");
-            break; // useless 
+            break; // useless
         case 1:
         case 2:
             self->ref.count++;
             break;
         case 3:
             S_lazy_init_host_obj(self);
-            // fall through 
+            // fall through
         default:
             SvREFCNT_inc_simple_void_NN((SV*)self->ref.host_obj);
     }
@@ -90,7 +90,7 @@ lucy_Obj_dec_refcount(lucy_Obj *self)
     switch (self->ref.count) {
         case 0:
             CFISH_THROW(LUCY_ERR, "Illegal refcount of 0");
-            break; // useless 
+            break; // useless
         case 1:
             modified_refcount = 0;
             Lucy_Obj_Destroy(self);

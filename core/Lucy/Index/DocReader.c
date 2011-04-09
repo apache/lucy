@@ -152,7 +152,7 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
         CharBuf *dat_file  = CB_newf("%o/documents.dat", seg_name);
         Obj     *format    = Hash_Fetch_Str(metadata, "format", 6);
 
-        // Check format. 
+        // Check format.
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
             int64_t format_val = Obj_To_I64(format);
@@ -165,7 +165,7 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
             }
         }
 
-        // Get streams. 
+        // Get streams.
         if (Folder_Exists(folder, ix_file)) {
             self->ix_in = Folder_Open_In(folder, ix_file);
             if (!self->ix_in) {
@@ -200,13 +200,13 @@ DefDocReader_read_record(DefaultDocReader *self, ByteBuf *buffer,
     size_t   size;
     char    *buf;
 
-    // Find start and length of variable length record. 
+    // Find start and length of variable length record.
     InStream_Seek(self->ix_in, (int64_t)doc_id * 8);
     start = InStream_Read_I64(self->ix_in);
     end   = InStream_Read_I64(self->ix_in);
     size  = (size_t)(end - start);
 
-    // Read in the record. 
+    // Read in the record.
     buf = BB_Grow(buffer, size);
     InStream_Seek(self->dat_in, start);
     InStream_Read_Bytes(self->dat_in, buf, size);

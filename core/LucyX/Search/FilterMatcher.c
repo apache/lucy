@@ -31,10 +31,10 @@ FilterMatcher_init(FilterMatcher *self, BitVector *bits, int32_t doc_max)
 {
     Matcher_init((Matcher*)self);
 
-    // Init. 
+    // Init.
     self->doc_id       = 0;
 
-    // Assign. 
+    // Assign.
     self->bits         = (BitVector*)INCREF(bits);
     self->doc_max      = doc_max;
 

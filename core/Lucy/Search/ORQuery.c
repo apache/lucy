@@ -111,7 +111,7 @@ ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
         uint32_t i;
         uint32_t num_submatchers = 0;
 
-        // Accumulate sub-matchers. 
+        // Accumulate sub-matchers.
         for (i = 0; i < num_kids; i++) {
             Compiler *child = (Compiler*)VA_Fetch(self->children, i);
             Matcher *submatcher 
@@ -123,12 +123,12 @@ ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
         }
 
         if (num_submatchers == 0) {
-            // No possible matches, so return null. 
+            // No possible matches, so return null.
             DECREF(submatchers);
             return NULL;
         }
         else if (num_submatchers == 1) {
-            // Only one submatcher, so no need for ORScorer wrapper. 
+            // Only one submatcher, so no need for ORScorer wrapper.
             Matcher *submatcher = (Matcher*)INCREF(VA_Fetch(submatchers, 0));
             DECREF(submatchers);
             return submatcher;

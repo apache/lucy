@@ -31,18 +31,18 @@ SeriesMatcher_init(SeriesMatcher *self, VArray *matchers, I32Array *offsets)
 {
     Matcher_init((Matcher*)self);
 
-    // Init. 
+    // Init.
     self->current_matcher = NULL;
     self->current_offset  = 0;
     self->next_offset     = 0;
     self->doc_id          = 0;
     self->tick            = 0;
 
-    // Assign. 
+    // Assign.
     self->matchers        = (VArray*)INCREF(matchers);
     self->offsets         = (I32Array*)INCREF(offsets);
 
-    // Derive. 
+    // Derive.
     self->num_matchers    = (int32_t)I32Arr_Get_Size(offsets);
 
     return self;
@@ -66,7 +66,7 @@ int32_t
 SeriesMatcher_advance(SeriesMatcher *self, int32_t target) 
 {
     if (target >= self->next_offset) {
-        // Proceed to next matcher or bail. 
+        // Proceed to next matcher or bail.
         if (self->tick < self->num_matchers) {
             while (1) {
                 uint32_t next_offset = self->tick + 1 == self->num_matchers
@@ -84,10 +84,10 @@ SeriesMatcher_advance(SeriesMatcher *self, int32_t target)
                     break;
                 }
             } 
-            return SeriesMatcher_advance(self, target); // Recurse. 
+            return SeriesMatcher_advance(self, target); // Recurse.
         }
         else {
-            // We're done. 
+            // We're done.
             self->doc_id = 0;
             return 0;
         }
@@ -101,7 +101,7 @@ SeriesMatcher_advance(SeriesMatcher *self, int32_t target)
             return self->doc_id;
         }
         else {
-            // Recurse. 
+            // Recurse.
             return SeriesMatcher_advance(self, self->next_offset);
         }
     }

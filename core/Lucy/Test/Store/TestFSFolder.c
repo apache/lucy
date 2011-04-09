@@ -16,17 +16,17 @@
 
 #include "Lucy/Util/ToolSet.h"
 
-// mkdir, rmdir 
+// mkdir, rmdir
 #ifdef CHY_HAS_DIRECT_H
   #include <direct.h>
 #endif
 
-// rmdir 
+// rmdir
 #ifdef CHY_HAS_UNISTD_H
   #include <unistd.h>
 #endif
 
-// mkdir, stat 
+// mkdir, stat
 #ifdef CHY_HAS_SYS_STAT_H
   #include <sys/stat.h>
 #endif
@@ -125,13 +125,13 @@ test_protect_symlinks(TestBatch *batch)
     DECREF(folder);
     S_tear_down();
 #else
-    // TODO: Add test for Windows. 
+    // TODO: Add test for Windows.
     SKIP(batch, "No symlink() function");
     SKIP(batch, "No symlink() function");
     SKIP(batch, "No symlink() function");
     SKIP(batch, "No symlink() function");
     SKIP(batch, "No symlink() function");
-#endif // CHY_HAS_UNISTD_H 
+#endif // CHY_HAS_UNISTD_H
 }
 
 void

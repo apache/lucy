@@ -78,7 +78,7 @@ BlobType_dump_for_schema(BlobType *self)
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("blob"));
 
     // Store attributes that override the defaults -- even if they're
-    // meaningless. 
+    // meaningless.
     if (self->boost != 1.0) {
         Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
     }

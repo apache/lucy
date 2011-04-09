@@ -131,7 +131,7 @@ ReqOptCompiler_make_matcher(RequiredOptionalCompiler *self, SegReader *reader,
         = Compiler_Make_Matcher(opt_compiler, reader, need_score);
 
     if (req_matcher == NULL) {
-        // No required matcher, ergo no matches possible. 
+        // No required matcher, ergo no matches possible.
         DECREF(opt_matcher);
         return NULL;
     }

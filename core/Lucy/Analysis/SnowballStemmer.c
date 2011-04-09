@@ -39,7 +39,7 @@ SnowStemmer_init(SnowballStemmer *self, const CharBuf *language)
     Analyzer_init((Analyzer*)self);
     self->language = CB_Clone(language);
 
-    // Get a Snowball stemmer.  Be case-insensitive. 
+    // Get a Snowball stemmer.  Be case-insensitive.
     lang_buf[0] = tolower(CB_Code_Point_At(language, 0));
     lang_buf[1] = tolower(CB_Code_Point_At(language, 1));
     lang_buf[2] = '\0';

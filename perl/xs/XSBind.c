@@ -43,24 +43,24 @@ XSBind_new_blank_obj(SV *either_sv)
 {
     cfish_VTable *vtable;
 
-    // Get a VTable. 
+    // Get a VTable.
     if (   sv_isobject(either_sv) 
         && sv_derived_from(either_sv, "Lucy::Object::Obj")
     ) {
-        // Use the supplied object's VTable. 
+        // Use the supplied object's VTable.
         IV iv_ptr = SvIV(SvRV(either_sv));
         cfish_Obj *self = INT2PTR(cfish_Obj*, iv_ptr);
         vtable = self->vtable;
     }
     else {
-        // Use the supplied class name string to find a VTable. 
+        // Use the supplied class name string to find a VTable.
         STRLEN len;
         char *ptr = SvPVutf8(either_sv, len);
         cfish_ZombieCharBuf *klass = CFISH_ZCB_WRAP_STR(ptr, len);
         vtable = cfish_VTable_singleton((cfish_CharBuf*)klass, NULL);
     }
 
-    // Use the VTable to allocate a new blank object of the right size. 
+    // Use the VTable to allocate a new blank object of the right size.
     return Cfish_VTable_Make_Obj(vtable);
 }
 
@@ -83,7 +83,7 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation)
             && sv_derived_from(sv, 
                  (char*)Cfish_CB_Get_Ptr8(Cfish_VTable_Get_Name(vtable)))
         ) {
-            // Unwrap a real Clownfish object. 
+            // Unwrap a real Clownfish object.
             IV tmp = SvIV( SvRV(sv) );
             retval = INT2PTR(cfish_Obj*, tmp);
         }
@@ -155,7 +155,7 @@ XSBind_cfish_to_perl(cfish_Obj *obj)
     }
     else if (sizeof(IV) == 4 && Cfish_Obj_Is_A(obj, CFISH_INTEGER64)) {
         int64_t num = Cfish_Obj_To_I64(obj);
-        return newSVnv((double)num); // lossy 
+        return newSVnv((double)num); // lossy
     }
     else {
         return (SV*)Cfish_Obj_To_Host(obj);
@@ -169,7 +169,7 @@ XSBind_perl_to_cfish(SV *sv)
 
     if (XSBind_sv_defined(sv)) {
         if (SvROK(sv)) {
-            // Deep conversion of references. 
+            // Deep conversion of references.
             SV *inner = SvRV(sv);
             if (SvTYPE(inner) == SVt_PVAV) {
                 retval = (cfish_Obj*)S_perl_array_to_cfish_array((AV*)inner);
@@ -195,7 +195,7 @@ XSBind_perl_to_cfish(SV *sv)
         }
     }
     else if (sv) {
-        // Deep conversion of raw AVs and HVs. 
+        // Deep conversion of raw AVs and HVs.
         if (SvTYPE(sv) == SVt_PVAV) {
             retval = (cfish_Obj*)S_perl_array_to_cfish_array((AV*)sv);
         }
@@ -283,7 +283,7 @@ S_perl_array_to_cfish_array(AV *parray)
     cfish_VArray   *retval = cfish_VA_new(size);
     uint32_t i;
 
-    // Iterate over array elems. 
+    // Iterate over array elems.
     for (i = 0; i < size; i++) {
         SV **elem_sv = av_fetch(parray, i, false);
         if (elem_sv) {
@@ -291,7 +291,7 @@ S_perl_array_to_cfish_array(AV *parray)
             if (elem) { Cfish_VA_Store(retval, i, elem); }
         }
     }
-    Cfish_VA_Resize(retval, size); // needed if last elem is NULL 
+    Cfish_VA_Resize(retval, size); // needed if last elem is NULL
 
     return retval;
 }
@@ -302,7 +302,7 @@ S_cfish_array_to_perl_array(cfish_VArray *varray)
     AV *perl_array = newAV();
     uint32_t num_elems = Cfish_VA_Get_Size(varray);
 
-    // Iterate over array elems. 
+    // Iterate over array elems.
     if (num_elems) {
         uint32_t i;
         av_fill(perl_array, num_elems - 1);
@@ -312,7 +312,7 @@ S_cfish_array_to_perl_array(cfish_VArray *varray)
                 continue;
             }
             else {
-                // Recurse for each value. 
+                // Recurse for each value.
                 SV *const val_sv = XSBind_cfish_to_perl(val);
                 av_store(perl_array, i, val_sv);
             }
@@ -330,14 +330,14 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash)
     cfish_CharBuf *key;
     cfish_Obj     *val;
 
-    // Prepare the SV key. 
+    // Prepare the SV key.
     SvPOK_on(key_sv);
     SvUTF8_on(key_sv);
 
-    // Iterate over key-value pairs. 
+    // Iterate over key-value pairs.
     Cfish_Hash_Iterate(hash);
     while (Cfish_Hash_Next(hash, (cfish_Obj**)&key, &val)) {
-        // Recurse for each value. 
+        // Recurse for each value.
         SV *val_sv = XSBind_cfish_to_perl(val);
         if (!Cfish_Obj_Is_A((cfish_Obj*)key, CFISH_CHARBUF)) {
             CFISH_THROW(CFISH_ERR, 
@@ -486,7 +486,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
     HV *params_hash = get_hv(params_hash_name, 0);
     int32_t args_left = (num_stack_elems - start) / 2;
 
-    // Retrieve the params hash, which must be a package global. 
+    // Retrieve the params hash, which must be a package global.
     if (params_hash == NULL) {
         cfish_CharBuf *mess = CFISH_MAKE_MESS(
             "Can't find hash named %s", params_hash_name);
@@ -495,7 +495,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
     }
 
     // Verify that our args come in pairs. Return success if there are no
-    // args. 
+    // args.
     if (num_stack_elems == start) { return true; }
     if ((num_stack_elems - start) % 2 != 0) {
         cfish_CharBuf *mess = CFISH_MAKE_MESS(
@@ -504,11 +504,11 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         return false;
     }
 
-    // Validate param names. 
+    // Validate param names.
     for (int32_t i = start; i < num_stack_elems; i += 2) {
         SV *const key_sv = stack[i];
         STRLEN key_len;
-        const char *key = SvPV(key_sv, key_len); // assume ASCII labels 
+        const char *key = SvPV(key_sv, key_len); // assume ASCII labels
         if (!hv_exists(params_hash, key, key_len)) {
             cfish_CharBuf *mess = CFISH_MAKE_MESS(
                 "Invalid parameter: '%s'", key);

@@ -70,10 +70,10 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
         segments, seg_tick);
     Segment *segment = DefPListReader_Get_Segment(self);
 
-    // Derive. 
+    // Derive.
     self->lex_reader = (LexiconReader*)INCREF(lex_reader);
 
-    // Check format. 
+    // Check format.
     {
         Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "postings", 8);
         if (!my_meta) { 
@@ -119,7 +119,7 @@ DefPListReader_posting_list(DefaultPostingListReader *self,
 {
     FieldType *type  = Schema_Fetch_Type(self->schema, field);
 
-    // Only return an object if we've got an indexed field. 
+    // Only return an object if we've got an indexed field.
     if (type != NULL && FType_Indexed(type)) {
         SegPostingList *plist = SegPList_new((PostingListReader*)self, field);
         if (target) SegPList_Seek(plist, target);

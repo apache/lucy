@@ -26,11 +26,11 @@
 
 int32_t CFWriter_current_file_format = 2;
 
-// Helper which does the heavy lifting for CFWriter_consolidate. 
+// Helper which does the heavy lifting for CFWriter_consolidate.
 static void
 S_do_consolidate(CompoundFileWriter *self);
 
-// Clean up files which may be left over from previous merge attempts. 
+// Clean up files which may be left over from previous merge attempts.
 static void
 S_clean_up_old_temp_files(CompoundFileWriter *self);
 
@@ -104,7 +104,7 @@ S_do_consolidate(CompoundFileWriter *self)
 
     if (!outstream) { RETHROW(INCREF(Err_get_error())); }
 
-    // Start metadata. 
+    // Start metadata.
     Hash_Store_Str(metadata, "files", 5, INCREF(sub_files));
     Hash_Store_Str(metadata, "format", 6, 
         (Obj*)CB_newf("%i32", CFWriter_current_file_format) );
@@ -122,12 +122,12 @@ S_do_consolidate(CompoundFileWriter *self)
 
             if (!instream) { RETHROW(INCREF(Err_get_error())); }
 
-            // Absorb the file. 
+            // Absorb the file.
             offset = OutStream_Tell(outstream);
             OutStream_Absorb(outstream, instream);
             len = OutStream_Tell(outstream) - offset;
 
-            // Record offset and length. 
+            // Record offset and length.
             Hash_Store_Str(file_data, "offset", 6, 
                 (Obj*)CB_newf("%i64", offset) );
             Hash_Store_Str(file_data, "length", 6, 
@@ -147,14 +147,14 @@ S_do_consolidate(CompoundFileWriter *self)
     }
     DECREF(infilepath);
 
-    // Write metadata to cfmeta file. 
+    // Write metadata to cfmeta file.
     CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
     CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
     Json_spew_json((Obj*)metadata, (Folder*)self->folder, cfmeta_temp);
     rename_success = Folder_Rename(self->folder, cfmeta_temp, cfmeta_file);
     if (!rename_success) { RETHROW(INCREF(Err_get_error())); }
 
-    // Clean up. 
+    // Clean up.
     OutStream_Close(outstream);
     DECREF(outstream);
     DECREF(files);

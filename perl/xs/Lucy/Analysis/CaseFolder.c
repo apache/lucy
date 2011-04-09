@@ -40,7 +40,7 @@ S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
         STRLEN buf_utf8_len;
         (void)to_utf8_lower(source, utf8_buf, &buf_utf8_len);
 
-        // Grow if necessary. 
+        // Grow if necessary.
         if (((STRLEN)(*limit - dest)) < buf_utf8_len) {
             size_t    bytes_so_far = dest - dest_start;
             size_t    amount       = bytes_so_far + (end - source) + 10; 

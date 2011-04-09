@@ -24,7 +24,7 @@
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Util/PriorityQueue.h"
 
-// Empty out, then refill the Queue, seeking all elements to [target]. 
+// Empty out, then refill the Queue, seeking all elements to [target].
 static void
 S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target);
 
@@ -42,12 +42,12 @@ PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers)
     uint32_t num_sub_readers = VA_Get_Size(sub_readers);
     VArray *seg_lexicons  = VA_new(num_sub_readers);
 
-    // Init. 
+    // Init.
     Lex_init((Lexicon*)self, field);
     self->term            = NULL;
     self->lex_q           = SegLexQ_new(num_sub_readers);
 
-    // Derive. 
+    // Derive.
     for (i = 0; i < num_sub_readers; i++) {
         LexiconReader *lex_reader = (LexiconReader*)VA_Fetch(sub_readers, i);
         if (lex_reader && CERTIFY(lex_reader, LEXICONREADER)) {
@@ -78,14 +78,14 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target)
 {
     uint32_t i, max;
 
-    // Empty out the queue. 
+    // Empty out the queue.
     while (1) {
         SegLexicon *seg_lex = (SegLexicon*)SegLexQ_Pop(lex_q);
         if (seg_lex == NULL) break;
         DECREF(seg_lex);
     }
 
-    // Refill the queue. 
+    // Refill the queue.
     for (i = 0, max = VA_Get_Size(seg_lexicons); i < max; i++) {
         SegLexicon *const seg_lexicon 
             = (SegLexicon*)VA_Fetch(seg_lexicons, i);
@@ -104,14 +104,14 @@ PolyLex_reset(PolyLexicon *self)
     uint32_t   num_segs     = VA_Get_Size(seg_lexicons);
     SegLexQueue *lex_q  = self->lex_q;
 
-    // Empty out the queue. 
+    // Empty out the queue.
     while (1) {
         SegLexicon *seg_lex = (SegLexicon*)SegLexQ_Pop(lex_q);
         if (seg_lex == NULL) break;
         DECREF(seg_lex);
     }
 
-    // Fill the queue with valid SegLexicons. 
+    // Fill the queue with valid SegLexicons.
     for (i = 0; i < num_segs; i++) {
         SegLexicon *const seg_lexicon 
             = (SegLexicon*)VA_Fetch(seg_lexicons, i);
@@ -133,13 +133,13 @@ PolyLex_next(PolyLexicon *self)
     SegLexQueue *lex_q   = self->lex_q;
     SegLexicon *top_seg_lexicon = (SegLexicon*)SegLexQ_Peek(lex_q);
     
-    // Churn through queue items with equal terms. 
+    // Churn through queue items with equal terms.
     while (top_seg_lexicon != NULL) {
         Obj *const candidate = SegLex_Get_Term(top_seg_lexicon); 
         if (   (candidate && !self->term)
             || Obj_Compare_To(self->term, candidate) != 0 
         ) {
-            // Succeed if the next item in the queue has a different term. 
+            // Succeed if the next item in the queue has a different term.
             DECREF(self->term);
             self->term = Obj_Clone(candidate);
             return true;
@@ -154,7 +154,7 @@ PolyLex_next(PolyLexicon *self)
         }
     }
 
-    // If queue is empty, iterator is finished. 
+    // If queue is empty, iterator is finished.
     DECREF(self->term);
     self->term = NULL;
     return false;
@@ -171,7 +171,7 @@ PolyLex_seek(PolyLexicon *self, Obj *target)
         return;
     }
 
-    // Refresh the queue, set vars. 
+    // Refresh the queue, set vars.
     S_refresh_lex_q(lex_q, seg_lexicons, target);
     {
         SegLexicon *least = (SegLexicon*)SegLexQ_Peek(lex_q);
@@ -183,7 +183,7 @@ PolyLex_seek(PolyLexicon *self, Obj *target)
         }
     }
 
-    // Scan up to the real target. 
+    // Scan up to the real target.
     do {
         if (self->term) {
             const int32_t comparison = Obj_Compare_To(self->term, target);

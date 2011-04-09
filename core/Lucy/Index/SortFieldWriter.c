@@ -77,7 +77,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      OutStream *temp_ord_out, OutStream *temp_ix_out, 
                      OutStream *temp_dat_out)
 {
-    // Init. 
+    // Init.
     SortEx_init((SortExternal*)self, sizeof(SFWriterElem));
     self->null_ord        = -1;
     self->count           = 0;
@@ -96,7 +96,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     self->run_tick        = 0;
     self->ord_width       = 0;
 
-    // Assign. 
+    // Assign.
     self->field        = CB_Clone(field);
     self->schema       = (Schema*)INCREF(schema);
     self->snapshot     = (Snapshot*)INCREF(snapshot);
@@ -108,7 +108,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     self->temp_dat_out = (OutStream*)INCREF(temp_dat_out);
     self->mem_thresh   = mem_thresh;
 
-    // Derive. 
+    // Derive.
     self->field_num = Seg_Field_Num(segment, field);
     FieldType *type = (FieldType*)CERTIFY(
         Schema_Fetch_Type(self->schema, field), FIELDTYPE);
@@ -181,7 +181,7 @@ S_find_unique_value(Hash *uniq_vals, Obj *val)
 void
 SortFieldWriter_add(SortFieldWriter *self, int32_t doc_id, Obj *value)
 {
-    // Uniq-ify the value, and record it for this document. 
+    // Uniq-ify the value, and record it for this document.
     SFWriterElem elem;
     elem.value = S_find_unique_value(self->uniq_vals, value);
     elem.doc_id = doc_id;
@@ -506,7 +506,7 @@ SortFieldWriter_flip(SortFieldWriter *self)
         if (!self->dat_in) { RETHROW(INCREF(Err_get_error())); }
         DECREF(filepath);
 
-        // Assign streams and a slice of mem_thresh. 
+        // Assign streams and a slice of mem_thresh.
         size_t sub_thresh = self->mem_thresh / num_runs;
         if (sub_thresh < 65536) { sub_thresh = 65536; }
         for (uint32_t i = 0; i < num_runs; i++) {
@@ -607,7 +607,7 @@ SortFieldWriter_finish(SortFieldWriter *self)
     CharBuf *seg_name  = Seg_Get_Name(self->segment);
     CharBuf *path      = CB_newf("%o/sort-%i32.ord", seg_name, field_num);
 
-    // Open streams. 
+    // Open streams.
     OutStream *ord_out = Folder_Open_Out(folder, path);
     if (!ord_out) { RETHROW(INCREF(Err_get_error())); }
     OutStream *ix_out = NULL;
@@ -623,7 +623,7 @@ SortFieldWriter_finish(SortFieldWriter *self)
 
     int32_t cardinality = S_write_files(self, ord_out, ix_out, dat_out);
 
-    // Close streams. 
+    // Close streams.
     OutStream_Close(ord_out);
     if (ix_out) { OutStream_Close(ix_out); }
     OutStream_Close(dat_out);

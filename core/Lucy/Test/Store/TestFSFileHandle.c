@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <stdio.h> // for remove() 
+#include <stdio.h> // for remove()
 
 #define C_LUCY_CHARBUF
 #define C_LUCY_FSFILEHANDLE
@@ -22,9 +22,9 @@
 #include "Lucy/Util/ToolSet.h"
 
 #ifdef CHY_HAS_UNISTD_H 
-  #include <unistd.h> // close 
+  #include <unistd.h> // close
 #elif defined(CHY_HAS_IO_H)
-  #include <io.h> // close 
+  #include <io.h> // close
 #endif
 
 #include "Lucy/Test.h"
@@ -124,7 +124,7 @@ test_Read_Write(TestBatch *batch)
     if (!FSFH_Close(fh)) { RETHROW(INCREF(Err_get_error())); }
     DECREF(fh);
 
-    // Reopen for reading. 
+    // Reopen for reading.
     Err_set_error(NULL);
     fh = FSFH_open(test_filename, FH_READ_ONLY);
 
@@ -206,7 +206,7 @@ test_Window(TestBatch *batch)
     }
     if (!FSFH_Close(fh)) { RETHROW(INCREF(Err_get_error())); }
 
-    // Reopen for reading. 
+    // Reopen for reading.
     DECREF(fh);
     fh = FSFH_open(test_filename, FH_READ_ONLY);
     if (!fh) { RETHROW(INCREF(Err_get_error())); }

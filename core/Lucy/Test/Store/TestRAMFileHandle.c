@@ -64,7 +64,7 @@ test_Read_Write(TestBatch *batch)
     TEST_TRUE(batch, Err_get_error() != NULL, 
         "Reading from a write-only handle sets error");
 
-    // Reopen for reading. 
+    // Reopen for reading.
     DECREF(fh);
     fh = RAMFH_open(NULL, FH_READ_ONLY, file);
     TEST_TRUE(batch, RAMFile_Read_Only(file), 
@@ -131,7 +131,7 @@ test_Window(TestBatch *batch)
     }
     RAMFH_Close(fh);
 
-    // Reopen for reading. 
+    // Reopen for reading.
     DECREF(fh);
     fh = RAMFH_open(NULL, FH_READ_ONLY, file);
 

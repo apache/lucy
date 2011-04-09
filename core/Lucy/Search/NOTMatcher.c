@@ -35,11 +35,11 @@ NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max)
     VA_Push(children, INCREF(negated_matcher));
     PolyMatcher_init((PolyMatcher*)self, children, NULL);
 
-    // Init. 
+    // Init.
     self->doc_id           = 0;
     self->next_negation    = 0;
 
-    // Assign. 
+    // Assign.
     self->negated_matcher   = (Matcher*)INCREF(negated_matcher);
     self->doc_max          = doc_max;
 
@@ -61,7 +61,7 @@ NOTMatcher_next(NOTMatcher *self)
     while (1) {
         self->doc_id++;
 
-        // Get next negated doc id. 
+        // Get next negated doc id.
         if (self->next_negation < self->doc_id) {
             self->next_negation 
                 = Matcher_Advance(self->negated_matcher, self->doc_id);
@@ -73,11 +73,11 @@ NOTMatcher_next(NOTMatcher *self)
         }
 
         if (self->doc_id > self->doc_max) {
-            self->doc_id = self->doc_max; // halt advance 
+            self->doc_id = self->doc_max; // halt advance
             return 0;
         }
         else if (self->doc_id != self->next_negation) {
-            // Success! 
+            // Success!
             return self->doc_id;
         }
     }

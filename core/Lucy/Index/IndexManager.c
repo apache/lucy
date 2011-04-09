@@ -175,7 +175,7 @@ IxManager_recycle(IndexManager *self, PolyReader *reader,
         VA_Store(recyclables, i, VA_Delete(candidates, i));
     }
 
-    // Find segments where at least 10% of all docs have been deleted. 
+    // Find segments where at least 10% of all docs have been deleted.
     for (uint32_t i = threshold; i < num_candidates; i++) {
         SegReader *seg_reader = (SegReader*)VA_Delete(candidates, i);
         CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
@@ -202,7 +202,7 @@ IxManager_choose_sparse(IndexManager *self, I32Array *doc_counts)
     uint32_t total_docs = 0;
     const uint32_t num_candidates = I32Arr_Get_Size(doc_counts);
 
-    // Find sparsely populated segments. 
+    // Find sparsely populated segments.
     for (uint32_t i = 0; i < num_candidates; i++) {
         uint32_t num_segs_when_done = num_candidates - threshold + 1;
         total_docs += I32Arr_Get(doc_counts, i);
@@ -318,7 +318,7 @@ IxManager_make_snapshot_read_lock(IndexManager *self, const CharBuf *filename)
         THROW(ERR, "Not a snapshot filename: %o", filename);
     }
         
-    // Truncate ".json" from end of snapshot file name. 
+    // Truncate ".json" from end of snapshot file name.
     ZCB_Chop(lock_name, sizeof(".json") - 1);
 
     return LockFact_Make_Shared_Lock(lock_factory, (CharBuf*)lock_name, 1000, 100);

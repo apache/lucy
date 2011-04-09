@@ -36,7 +36,7 @@ struct CFCParamList {
     char         *name_list;
 };
 
-// 
+//
 static void
 S_generate_c_strings(CFCParamList *self);
 

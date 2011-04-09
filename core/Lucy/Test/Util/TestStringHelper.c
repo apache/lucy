@@ -72,11 +72,11 @@ test_utf8_round_trip(TestBatch *batch)
 {
     uint32_t code_points[] = { 
         0, 
-        0xA,      // newline 
+        0xA,      // newline
         'a', 
-        128,      // two-byte 
-        0x263A,   // smiley (three-byte)  
-        0x10FFFF, // Max legal code point (four-byte). 
+        128,      // two-byte
+        0x263A,   // smiley (three-byte)
+        0x10FFFF, // Max legal code point (four-byte).
     };
     uint32_t num_code_points = sizeof(code_points) / sizeof(uint32_t);
     uint32_t i;

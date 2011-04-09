@@ -32,12 +32,12 @@
 
 RawPosting RAWPOSTING_BLANK = { 
     RAWPOSTING, 
-    {1},                   // ref.count 
-    0,                     // doc_id 
-    1,                     // freq 
-    0,                     // content_len 
-    0,                     // aux_len 
-    { '\0' }               // blob 
+    {1},                   // ref.count
+    0,                     // doc_id
+    1,                     // freq
+    0,                     // content_len
+    0,                     // aux_len
+    { '\0' }               // blob
 };
 
 
@@ -47,7 +47,7 @@ RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
 {
     RawPosting *self    = (RawPosting*)pre_allocated_memory;
     self->vtable        = RAWPOSTING;
-    self->ref.count     = 1; // never used 
+    self->ref.count     = 1; // never used
     self->doc_id        = doc_id;
     self->freq          = freq;
     self->content_len   = term_text_len;

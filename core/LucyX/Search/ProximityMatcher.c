@@ -302,11 +302,11 @@ ProximityMatcher_calc_proximity_freq(ProximityMatcher *self)
         }
         if (!anchors_remaining) { return 0.0f; }
 
-        // Adjust end for number of anchors that remain. 
+        // Adjust end for number of anchors that remain.
         anchors_end = anchors_start + anchors_remaining;
     }
 
-    // The number of anchors left is the proximity freq. 
+    // The number of anchors left is the proximity freq.
     return (float)anchors_remaining;
 }
 

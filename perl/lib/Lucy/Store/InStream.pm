@@ -56,7 +56,7 @@ CODE:
     RETVAL = newSV(len + 1);
     SvCUR_set(RETVAL, len);
     SvPOK_on(RETVAL);
-    SvUTF8_on(RETVAL); // Trust source.  Reconsider if API goes public. 
+    SvUTF8_on(RETVAL); // Trust source.  Reconsider if API goes public.
     *SvEND(RETVAL) = '\0';
     ptr = SvPVX(RETVAL);
     Lucy_InStream_Read_Bytes(self, ptr, len);

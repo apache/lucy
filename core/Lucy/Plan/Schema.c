@@ -253,7 +253,7 @@ static VTable *old_full_text_type_vtable = NULL;
 static VTable *old_string_type_vtable = NULL;
 static VTable *old_blob_type_vtable = NULL;
 
-// 
+//
 static void
 S_lazy_init_old_type_vtables(void) 
 {

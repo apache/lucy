@@ -202,7 +202,7 @@ test_bigend_u16(TestBatch *batch)
     uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U16_MAX + 1);
     size_t    amount    = (count + 1) * sizeof(uint16_t);
     char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
-    char     *encoded   = allocated + 1; // Intentionally misaligned. 
+    char     *encoded   = allocated + 1; // Intentionally misaligned.
     char     *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
@@ -232,7 +232,7 @@ test_bigend_u32(TestBatch *batch)
     uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_C(1) + U32_MAX);
     size_t    amount    = (count + 1) * sizeof(uint32_t);
     char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
-    char     *encoded   = allocated + 1; // Intentionally misaligned. 
+    char     *encoded   = allocated + 1; // Intentionally misaligned.
     char     *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
@@ -262,7 +262,7 @@ test_bigend_u64(TestBatch *batch)
     uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_MAX);
     size_t    amount    = (count + 1) * sizeof(uint64_t);
     char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
-    char     *encoded   = allocated + 1; // Intentionally misaligned. 
+    char     *encoded   = allocated + 1; // Intentionally misaligned.
     char     *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
@@ -292,7 +292,7 @@ test_bigend_f32(TestBatch *batch)
     size_t   count     = 3;
     size_t   amount    = (count + 1) * sizeof(float);
     uint8_t *allocated = (uint8_t*)CALLOCATE(amount, sizeof(uint8_t));
-    uint8_t *encoded   = allocated + 1; // Intentionally misaligned. 
+    uint8_t *encoded   = allocated + 1; // Intentionally misaligned.
     uint8_t *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
@@ -327,7 +327,7 @@ test_bigend_f64(TestBatch *batch)
     size_t   count     = 3;
     size_t   amount    = (count + 1) * sizeof(double);
     uint8_t *allocated = (uint8_t*)CALLOCATE(amount, sizeof(uint8_t));
-    uint8_t *encoded   = allocated + 1; // Intentionally misaligned. 
+    uint8_t *encoded   = allocated + 1; // Intentionally misaligned.
     uint8_t *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {

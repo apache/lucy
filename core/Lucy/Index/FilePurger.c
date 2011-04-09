@@ -93,7 +93,7 @@ FilePurger_purge(FilePurger *self)
 
         // Attempt to delete entries -- if failure, no big deal, just try
         // again later.  Proceed in reverse lexical order so that directories
-        // get deleted after they've been emptied. 
+        // get deleted after they've been emptied.
         VA_Sort(purgables, NULL, NULL);
         for (uint32_t i = VA_Get_Size(purgables); i--; ) {
             CharBuf *entry = (CharBuf*)VA_fetch(purgables, i);
@@ -110,7 +110,7 @@ FilePurger_purge(FilePurger *self)
             bool_t snapshot_has_failures = false;
             if (Hash_Get_Size(failures)) {
                 // Only delete snapshot files if all of their entries were
-                // successfully deleted.  
+                // successfully deleted.
                 VArray *entries = Snapshot_List(snapshot);
                 for (uint32_t j = VA_Get_Size(entries); j--; ) {
                     CharBuf *entry = (CharBuf*)VA_Fetch(entries, j);
