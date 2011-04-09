@@ -16,11 +16,11 @@
 
 parcel Lucy;
 
-/** 
+/**
  * A collection of Tokens.
  *
  * An Inversion is a collection of Token objects which you can add to, then
- * iterate over. 
+ * iterate over.
  */
 class Lucy::Analysis::Inversion inherits Lucy::Object::Obj {
 
@@ -32,7 +32,7 @@ class Lucy::Analysis::Inversion inherits Lucy::Object::Obj {
     uint32_t  *cluster_counts;        /* counts per unique text */
     uint32_t   cluster_counts_size;   /* num unique texts */
 
-    /** 
+    /**
      * @param seed An initial Token to start things off, which may be NULL.
      */
     inert incremented Inversion* 

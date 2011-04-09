@@ -62,12 +62,12 @@ static unbuff_combo unbuff_combos[] = {
 static chaz_bool_t
 S_probe_off64(off64_combo *combo);
 
-/* Check for a 64-bit lseek. 
+/* Check for a 64-bit lseek.
  */
 static chaz_bool_t
 S_probe_lseek(unbuff_combo *combo);
 
-/* Check for a 64-bit pread. 
+/* Check for a 64-bit pread.
  */
 static chaz_bool_t
 S_probe_pread64(unbuff_combo *combo);
@@ -77,7 +77,7 @@ S_probe_pread64(unbuff_combo *combo);
 static chaz_bool_t 
 S_check_sparse_files();
 
-/* Helper for check_sparse_files().  
+/* Helper for check_sparse_files().
  */
 static void
 S_test_sparse_file(long offset, Stat *st);

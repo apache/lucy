@@ -29,7 +29,7 @@ class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
     inert incremented RequiredOptionalQuery*
     new(Query *required_query, Query *optional_query);
 
-    /** 
+    /**
      * @param required_query Query must must match.
      * @param optional_query Query which should match.
      */

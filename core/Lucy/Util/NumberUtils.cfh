@@ -42,7 +42,7 @@ inert class Lucy::Util::NumberUtils cnick NumUtil {
     encode_bigend_u32(uint32_t value, void *dest);
 
     /** Encode an unsigned 64-bit integer as 8 bytes in the buffer provided,
-     * using big-endian byte order. 
+     * using big-endian byte order.
      */
     inert inline void
     encode_bigend_u64(uint64_t value, void *dest);
@@ -63,13 +63,13 @@ inert class Lucy::Util::NumberUtils cnick NumUtil {
     decode_bigend_u64(void *source);
 
     /** Encode a 32-bit floating point number as 4 bytes in the buffer
-     * provided, using big-endian byte order. 
+     * provided, using big-endian byte order.
      */
     inert inline void 
     encode_bigend_f32(float value, void *dest);
 
     /** Encode a 64-bit floating point number as 8 bytes in the buffer
-     * provided, using big-endian byte order. 
+     * provided, using big-endian byte order.
      */
     inert inline void 
     encode_bigend_f64(double value, void *dest);

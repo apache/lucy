@@ -44,14 +44,14 @@ void
 CFCBase_destroy(CFCBase *self);
 
 /** Increment the refcount of the object.
- * 
+ *
  * @return the object itself, allowing an assignment idiom.
  */
 CFCBase*
 CFCBase_incref(CFCBase *self);
 
 /** Decrement the refcount of the object.
- * 
+ *
  * @return the modified refcount.
  */
 unsigned

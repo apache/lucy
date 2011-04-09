@@ -17,11 +17,11 @@
 parcel Lucy;
 
 /** Filepointer/statistical data for a Term.
- * 
+ *
  * The TermInfo contains pointer data indicating where information about a
  * term can be found in various files, plus the document frequency of the
  * term.
- * 
+ *
  * The lex_filepos member variable is only used if the TermInfo is part of the
  * .lexx stream; it is a filepointer to a locations in the main .lex file.
  */

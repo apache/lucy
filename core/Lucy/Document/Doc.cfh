@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** A document.
- * 
+ *
  * A Doc object is akin to a row in a database, in that it is made up of one
  * or more fields, each of which has a value.
  */
@@ -31,7 +31,7 @@ public class Lucy::Document::Doc inherits Lucy::Object::Obj
     inert incremented Doc*
     new(void *fields = NULL, int32_t doc_id = 0);
 
-    /** 
+    /**
      * @param fields Field-value pairs.
      * @param doc_id Internal Lucy document id.  Default of 0 (an
      * invalid doc id).
@@ -39,12 +39,12 @@ public class Lucy::Document::Doc inherits Lucy::Object::Obj
     public inert Doc* 
     init(Doc *self, void *fields = NULL, int32_t doc_id = 0);
 
-    /** Set internal Lucy document id. 
+    /** Set internal Lucy document id.
      */
     public void
     Set_Doc_ID(Doc *self, int32_t doc_id);
 
-    /** Retrieve internal Lucy document id. 
+    /** Retrieve internal Lucy document id.
      */
     public int32_t
     Get_Doc_ID(Doc *self);

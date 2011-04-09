@@ -20,13 +20,13 @@ parcel Lucy;
  *
  * InStream objects are the primary interface for reading from index files.
  * They are high-level (relatively speaking), media-agnostic wrappers
- * around low-level, media-specific FileHandle objects.  
- * 
+ * around low-level, media-specific FileHandle objects.
+ *
  * InStreams provide a number of routines for safely decoding common constructs
  * such as big-endian or compressed integers; for the most part, these
  * routines throw exceptions rather than require manual checking of return
  * values for error conditions.
- * 
+ *
  * Multiple InStream objects often share the same underlying FileHandle; this
  * practice is safe because InStreams do not modify or rely upon the file
  * position or other state within the FileHandle.
@@ -54,7 +54,7 @@ class Lucy::Store::InStream inherits Lucy::Object::Obj {
     /** Clone the instream, but specify a new offset, length, and possibly
      * filename.  Initial file position will be set to the top of the file
      * (taking <code>offset</code> into account).
-     * 
+     *
      * @param filename An alias filename.  If NULL, the filename of the
      * underlying FileHandle will be used.
      * @param offset Top of the file as seen by the new InStream, in bytes
@@ -111,7 +111,7 @@ class Lucy::Store::InStream inherits Lucy::Object::Obj {
      * bytes are already in the buffer.  If not, fill the buffer with either
      * <code>request</code> bytes or the number of bytes remaining before EOF,
      * whichever is smaller.
-     * 
+     *
      * @param request Advisory byte size request.
      * @return Pointer to the InStream's internal buffer.
      */
@@ -125,7 +125,7 @@ class Lucy::Store::InStream inherits Lucy::Object::Obj {
     final void
     Advance_Buf(InStream *self, char *buf);
 
-    /** Read <code>len</code> bytes from the InStream into <code>buf</code>. 
+    /** Read <code>len</code> bytes from the InStream into <code>buf</code>.
      */
     final void 
     Read_Bytes(InStream *self, char *buf, size_t len);
@@ -188,7 +188,7 @@ class Lucy::Store::InStream inherits Lucy::Object::Obj {
     final int 
     Read_Raw_C64(InStream *self, char *buf);
 
-    /** Accessor for filename member. 
+    /** Accessor for filename member.
      */
     CharBuf*
     Get_Filename(InStream *self);

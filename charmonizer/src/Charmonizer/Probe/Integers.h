@@ -18,12 +18,12 @@
  *
  * One or the other of these will be defined, depending on whether the
  * processor is big-endian or little-endian.
- * 
+ *
  * BIG_END
  * LITTLE_END
- * 
+ *
  * These will always be defined:
- * 
+ *
  * SIZEOF_CHAR
  * SIZEOF_SHORT
  * SIZEOF_INT
@@ -31,10 +31,10 @@
  * SIZEOF_PTR
  *
  * If long longs are available these symbols will be defined:
- * 
+ *
  * HAS_LONG_LONG
- * SIZEOF_LONG_LONG 
- * 
+ * SIZEOF_LONG_LONG
+ *
  * Similarly, with the __int64 type (the sizeof is included for completeness):
  *
  * HAS___INT64
@@ -42,7 +42,7 @@
  *
  * If the inttypes.h or stdint.h header files are available, these may be
  * defined:
- * 
+ *
  * HAS_INTTYPES_H
  * HAS_STDINT_H
  *
@@ -57,12 +57,12 @@
  * uint16_t
  * uint32_t
  * uint64_t
- * 
+ *
  * The following typedefs will be created if a suitable integer type exists,
  * as will most often be the case.  However, if for example a char is 64 bits
  * (as on certain Crays), no 8-bit types will be defined, or if no 64-bit
  * integer type is available, no 64-bit types will be defined, etc.
- * 
+ *
  * bool_t
  * i8_t
  * u8_t
@@ -72,18 +72,18 @@
  * u32_t
  * i64_t
  * u64_t
- * 
+ *
  * Availability of the preceding integer typedefs is indicated by which of
  * these are defined:
- * 
+ *
  * HAS_I8_T
  * HAS_I16_T
  * HAS_I32_T
  * HAS_I64_T
- * 
+ *
  * Maximums will be defined for all available integer types (save bool_t), and
  * minimums for all available signed types.
- * 
+ *
  * I8_MAX
  * U8_MAX
  * I16_MAX
@@ -99,7 +99,7 @@
  *
  * If 64-bit integers are available, this macro will promote pointers to i64_t
  * safely.
- * 
+ *
  * PTR_TO_I64(ptr)
  *
  * If 64-bit integers are available, these macros will expand to the printf
@@ -111,14 +111,14 @@
  *
  * 32-bit and 64-bit literals can be spec'd via these macros, which append the
  * appropriate postfix:
- * 
+ *
  * I32_C(n)
  * U32_C(n)
  * I64_C(n)
  * U64_C(n)
  *
- * These symbols will be defined if they are not already: 
- * 
+ * These symbols will be defined if they are not already:
+ *
  * true
  * false
  */

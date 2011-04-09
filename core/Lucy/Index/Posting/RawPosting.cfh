@@ -16,20 +16,20 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Sortable, serialized Posting.
- * 
+ *
  * RawPosting is a specialized subclass of Posting for private use only.  It
  * is used at index-time for fast reading, writing, sorting and merging of
  * index posting data by PostingPool.
- * 
+ *
  * RawPosting's Destroy method throws an error.  All RawPosting objects belong
- * to a particular MemoryPool, which takes responsibility for freeing them.  
- * 
+ * to a particular MemoryPool, which takes responsibility for freeing them.
+ *
  * The last struct member, [blob], is a "flexible array" member.  RawPosting
  * objects are assigned one continuous memory block of variable size,
- * depending on how much data needs to fit in blob. 
- * 
+ * depending on how much data needs to fit in blob.
+ *
  * The first part of blob is the term's text content, the length of which is
  * indicated by [content_len].  At the end of the content, encoded auxilliary
  * posting information begins, ready to be blasted out verbatim to a postings

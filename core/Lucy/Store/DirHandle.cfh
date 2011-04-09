@@ -24,8 +24,8 @@ abstract class Lucy::Store::DirHandle cnick DH
     CharBuf  *dir;
     CharBuf  *entry;
 
-    /** Abstract constructor. 
-     * 
+    /** Abstract constructor.
+     *
      * @param dir The path to the directory.
      */
     inert DirHandle*
@@ -67,7 +67,7 @@ abstract class Lucy::Store::DirHandle cnick DH
     abstract bool_t
     Entry_Is_Symlink(DirHandle *self);
 
-    /** Invokes Close(), but ignores any errors. 
+    /** Invokes Close(), but ignores any errors.
      */
     public void
     Destroy(DirHandle *self);

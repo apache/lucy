@@ -61,7 +61,7 @@ CFCUtil_wrapped_malloc(size_t count, const char *file, int line);
 void*
 CFCUtil_wrapped_calloc(size_t count, size_t size, const char *file, int line);
 
-/** Attempt to allocate memory with realloc, but print an error and exit if 
+/** Attempt to allocate memory with realloc, but print an error and exit if
  * the call fails.
  */
 void*

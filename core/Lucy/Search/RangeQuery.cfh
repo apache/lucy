@@ -35,10 +35,10 @@ class Lucy::Search::RangeQuery inherits Lucy::Search::Query
     new(const CharBuf *field, Obj *lower_term = NULL, Obj *upper_term = NULL,
         bool_t include_lower = true, bool_t include_upper = true);
 
-    /** Takes 5 parameters; <code>field</code> is required, as 
-     * is at least one of either <code>lower_term</code> or 
+    /** Takes 5 parameters; <code>field</code> is required, as
+     * is at least one of either <code>lower_term</code> or
      * <code>upper_term</code>.
-     * 
+     *
      * @param field The name of a <code>sortable</code> field.
      * @param lower_term Lower delimiter.  If not supplied, all values
      * less than <code>upper_term</code> will pass.

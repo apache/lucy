@@ -19,8 +19,8 @@ parcel Lucy;
 /** A specification for a search query.
  *
  * Query objects are simple containers which contain the minimum information
- * necessary to define a search query.  
- * 
+ * necessary to define a search query.
+ *
  * The most common way to generate Query objects is to feed a search string
  * such as 'foo AND bar' to a L<QueryParser's|Lucy::Search::QueryParser>
  * Parse() method, which outputs an abstract syntax tree built up from various
@@ -28,10 +28,10 @@ parcel Lucy;
  * L<TermQuery|Lucy::Search::TermQuery>.  However, it is also possible
  * to use custom Query objects to build a search specification which cannot be
  * easily represented using a search string.
- * 
+ *
  * Subclasses of Query must implement Make_Compiler(), which is the first step
  * in compiling a Query down to a L<Matcher|Lucy::Search::Matcher> which
- * can actually match and score documents. 
+ * can actually match and score documents.
  */
 
 class Lucy::Search::Query inherits Lucy::Object::Obj : dumpable {

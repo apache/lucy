@@ -18,7 +18,7 @@ parcel Lucy;
 
 /**
  * A document read from an index.
- * 
+ *
  * HitDoc is the search-time relative of the index-time class Doc; it is
  * augmented by a numeric score attribute that Doc doesn't have.
  */

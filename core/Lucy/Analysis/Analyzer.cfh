@@ -45,7 +45,7 @@ abstract class Lucy::Analysis::Analyzer
     public incremented Inversion*
     Transform_Text(Analyzer *self, CharBuf *text);
 
-    /** Analyze text and return an array of token texts. 
+    /** Analyze text and return an array of token texts.
      */
     public incremented VArray*
     Split(Analyzer *self, CharBuf *text);

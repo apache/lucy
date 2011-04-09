@@ -33,7 +33,7 @@ class Lucy::Search::HitQueue cnick HitQ
     inert incremented HitQueue*
     new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
 
-    /** 
+    /**
      * @param schema A Schema.  Required if <code>sort_spec</code> supplied.
      * @param sort_spec A SortSpec.  If not supplied, the HitQueue will sort
      * by descending score first and ascending doc id second.

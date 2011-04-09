@@ -25,13 +25,13 @@ parcel Lucy;
 
 abstract class Lucy::Search::Matcher inherits Lucy::Object::Obj {
 
-    /** Abstract constructor. 
+    /** Abstract constructor.
      */
     public inert Matcher*
     init(Matcher* self);
 
     /** Proceed to the next doc id.
-     * 
+     *
      * @return A positive doc id, or 0 once the iterator is exhausted.
      */
     public abstract int32_t
@@ -41,7 +41,7 @@ abstract class Lucy::Search::Matcher inherits Lucy::Object::Obj {
      * <code>target</code>. The default implementation simply calls Next()
      * over and over, but subclasses have the option of doing something more
      * efficient.
-     * 
+     *
      * @param target A positive doc id, which must be greater than the current
      * doc id once the iterator has been initialized.
      * @return A positive doc id, or 0 once the iterator is exhausted.

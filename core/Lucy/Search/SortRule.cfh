@@ -47,17 +47,17 @@ class Lucy::Search::SortRule inherits Lucy::Object::Obj {
     init(SortRule *self, int32_t type = 0, const CharBuf *field = NULL, 
          bool_t reverse = false);
 
-    /** Accessor for "field" member. 
+    /** Accessor for "field" member.
      */
     public nullable CharBuf*
     Get_Field(SortRule *self);
 
-    /** Accessor for "type" member. 
+    /** Accessor for "type" member.
      */
     public int32_t
     Get_Type(SortRule *self);
 
-    /** Accessor for "reverse" member. 
+    /** Accessor for "reverse" member.
      */
     public bool_t
     Get_Reverse(SortRule *self);

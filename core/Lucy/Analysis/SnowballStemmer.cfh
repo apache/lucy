@@ -17,13 +17,13 @@
 parcel Lucy;
 
 /** Reduce related words to a shared root.
- * 
+ *
  * SnowballStemmer is an L<Analyzer|Lucy::Analysis::Analyzer> which reduces
  * related words to a root form (using the "Snowball" stemming library).  For
  * instance, "horse", "horses", and "horsing" all become "hors" -- so that a
  * search for 'horse' will also match documents containing 'horses' and
  * 'horsing'.
- */ 
+ */
 
 class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
     inherits Lucy::Analysis::Analyzer : dumpable {

@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Multi-segment Lexicon. 
+/** Multi-segment Lexicon.
  *
  * Interleaves the output of multiple SegLexicons.
  */

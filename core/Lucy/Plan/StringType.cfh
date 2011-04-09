@@ -17,13 +17,13 @@
 parcel Lucy;
 
 /** Non-tokenized text type.
- * 
+ *
  * Lucy::Plan::StringType is used for "exact-match" strings.
  */
 class Lucy::Plan::StringType 
     inherits Lucy::Plan::TextType : dumpable {
 
-    /** 
+    /**
      * @param boost floating point per-field boost.
      * @param indexed boolean indicating whether the field should be indexed.
      * @param stored boolean indicating whether the field should be stored.

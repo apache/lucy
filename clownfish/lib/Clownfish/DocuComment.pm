@@ -35,7 +35,7 @@ Clownfish::DocuComment - Formatted comment a la Doxygen.
     /** Brief description.
      *
      * Start the long description.  More long description.
-     * 
+     *
      * @param foo A Foo.
      * @param bar A Bar.
      * @return a return value.

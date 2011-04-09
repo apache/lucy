@@ -16,9 +16,9 @@
 
 parcel Lucy;
 
-/** 
- * Growable buffer holding arbitrary bytes. 
- */ 
+/**
+ * Growable buffer holding arbitrary bytes.
+ */
 
 class Lucy::Object::ByteBuf cnick BB inherits Lucy::Object::Obj {
 
@@ -26,7 +26,7 @@ class Lucy::Object::ByteBuf cnick BB inherits Lucy::Object::Obj {
     size_t   size;  /* number of valid bytes */
     size_t   cap;   /* allocated bytes, including terminating null */
 
-    /** 
+    /**
      * @param capacity initial capacity of the ByteBuf, in bytes.
      */
     inert incremented ByteBuf*
@@ -128,8 +128,8 @@ class Lucy::Object::ByteBuf cnick BB inherits Lucy::Object::Obj {
 }
 
 /**
- * A ByteBuf that doesn't own its own string.  
- */ 
+ * A ByteBuf that doesn't own its own string.
+ */
 class Lucy::Object::ViewByteBuf cnick ViewBB
     inherits Lucy::Object::ByteBuf {
 

@@ -22,11 +22,11 @@ parcel Lucy;
  * are media-agnostic wrappers around low-level, media-specific, unbuffered
  * FileHandle objects, providing output buffering and routines for writing
  * common constructs such as big-endian or compressed integers.
- * 
+ *
  * OutStreams are write-once and cannot seek -- they must write all their data
  * in order.  Furthermore, each OutStream is associated with exactly one,
  * unique FileHandle -- unlike InStreams, which can share a common FileHandle.
- */ 
+ */
 class Lucy::Store::OutStream inherits Lucy::Object::Obj {
 
     char          *buf;
@@ -43,12 +43,12 @@ class Lucy::Store::OutStream inherits Lucy::Object::Obj {
     inert nullable OutStream* 
     do_open(OutStream *self, Obj *file);
     
-    /** Accessor for <code>path</code> member. 
+    /** Accessor for <code>path</code> member.
      */
     CharBuf*
     Get_Path(OutStream *self);
 
-    /** Return the current file position. 
+    /** Return the current file position.
      */
     final int64_t 
     Tell(OutStream *self);
@@ -82,12 +82,12 @@ class Lucy::Store::OutStream inherits Lucy::Object::Obj {
     final void
     Write_Bytes(OutStream *self, const void *buf, size_t len);
 
-    /** Write a signed 8-bit integer. 
+    /** Write a signed 8-bit integer.
      */
     final void
     Write_I8(OutStream *self, int8_t value);
 
-    /** Write an unsigned 8-bit integer. 
+    /** Write an unsigned 8-bit integer.
      */
     final void
     Write_U8(OutStream *self, uint8_t value);

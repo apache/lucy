@@ -16,12 +16,12 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Abstract class representing an interprocess mutex lock.
  *
  * The Lock class produces an interprocess mutex lock.  The default subclass
  * uses dot-lock files, but alternative implementations are possible.
- * 
+ *
  * Each lock must have a name which is unique per resource to be locked.  Each
  * lock also has a "host" id which should be unique per machine; it is used to
  * help clear away stale locks.
@@ -57,13 +57,13 @@ abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
 
     /** Call Request() once per <code>interval</code> until Request() returns
      * success or the <code>timeout</code> has been reached.
-     * 
+     *
      * @return true on success, false on failure (sets Err_error).
      */
     public bool_t
     Obtain(Lock *self);
 
-    /** Make one attempt to acquire the lock. 
+    /** Make one attempt to acquire the lock.
      *
      * The semantics of Request() differ depending on whether Shared() returns
      * true.  If the Lock is Shared(), then Request() should not fail if
@@ -71,7 +71,7 @@ abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
      * <code>name</code> (though it might fail for other reasons).  If it is
      * not Shared() -- i.e. it's an exclusive (write) lock -- then other locks
      * should cause Request() to fail.
-     * 
+     *
      * @return true on success, false on failure (sets Err_error).
      */
     public abstract bool_t
@@ -155,7 +155,7 @@ class Lucy::Store::LockFileLock cnick LFLock
     Destroy(LockFileLock *self);
 }
 
-/** Lock exception. 
+/** Lock exception.
  *
  * LockErr is a subclass of L<Err|Lucy::Object::Err> which indicates
  * that a file locking problem occurred.

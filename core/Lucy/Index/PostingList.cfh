@@ -17,10 +17,10 @@
 parcel Lucy;
 
 /** Term-Document pairings.
- * 
+ *
  * PostingList is an iterator which supplies a list of document ids that match
- * a given term.  
- * 
+ * a given term.
+ *
  * See L<Lucy::Docs::IRTheory> for definitions of "posting" and "posting
  * list".
  */
@@ -45,7 +45,7 @@ class Lucy::Index::PostingList cnick PList
 
     /** Prepare the PostingList object to iterate over matches for documents
      * that match <code>target</code>.
-     * 
+     *
      * @param target The term to match.  If NULL, the iterator will be empty.
      */
     public abstract void

@@ -24,7 +24,7 @@ parcel Lucy;
  * L<Analyzer|Lucy::Analysis::Analyzer> chain, and feeds low
  * level L<DataWriters|Lucy::Index::DataWriter> such as
  * PostingListWriter and DocWriter.
- * 
+ *
  * The sub-components of a SegWriter are determined by
  * L<Architecture|Lucy::Plan::Architecture>.  DataWriter components
  * which are added to the stack of writers via Add_Writer() have
@@ -55,11 +55,11 @@ class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
     init(SegWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader);
 
-    /** 
+    /**
      * Register a DataWriter component with the SegWriter.  (Note that
      * registration simply makes the writer available via Fetch(), so you may
      * also want to call Add_Writer()).
-     * 
+     *
      * @param api The name of the DataWriter api which <code>writer</code>
      * implements.
      * @param component A DataWriter.
@@ -68,7 +68,7 @@ class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
     Register(SegWriter *self, const CharBuf *api, 
              decremented DataWriter *component);
 
-    /** Retrieve a registered component. 
+    /** Retrieve a registered component.
      *
      * @param api The name of the DataWriter api which the component
      * implements.

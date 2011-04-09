@@ -17,11 +17,11 @@
 parcel Lucy;
 
 /** Read from an inverted index.
- * 
+ *
  * IndexReader is the interface through which
  * L<IndexSearcher|Lucy::Search::IndexSearcher> objects access the
  * content of an index.
- * 
+ *
  * IndexReader objects always represent a point-in-time view of an index as it
  * existed at the moment the reader was created.  If you want search results
  * to reflect modifications to an index, you must create a new IndexReader
@@ -54,7 +54,7 @@ class Lucy::Index::IndexReader cnick IxReader
     /** IndexReader is an abstract base class; open() returns the IndexReader
      * subclass PolyReader, which channels the output of 0 or more SegReaders.
      *
-     * @param index Either a string filepath or a Folder.  
+     * @param index Either a string filepath or a Folder.
      * @param snapshot A Snapshot.  If not supplied, the most recent snapshot
      * file will be used.
      * @param manager An L<IndexManager|Lucy::Index::IndexManager>.
@@ -96,7 +96,7 @@ class Lucy::Index::IndexReader cnick IxReader
     public abstract incremented VArray*
     Seg_Readers(IndexReader *self);
 
-    /** Fetch a component, or throw an error if the component can't be found. 
+    /** Fetch a component, or throw an error if the component can't be found.
      *
      * @param api The name of the DataReader subclass that the desired
      * component must implement.
@@ -104,8 +104,8 @@ class Lucy::Index::IndexReader cnick IxReader
     public DataReader*
     Obtain(IndexReader *self, const CharBuf *api);
 
-    /** Fetch a component, or return NULL if the component can't be found. 
-     * 
+    /** Fetch a component, or return NULL if the component can't be found.
+     *
      * @param api The name of the DataReader subclass that the desired
      * component must implement.
      */

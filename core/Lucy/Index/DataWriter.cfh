@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Write data to an index.
- * 
+ *
  * DataWriter is an abstract base class for writing index data, generally in
  * segment-sized chunks. Each component of an index -- e.g. stored fields,
  * lexicon, postings, deletions -- is represented by a
@@ -57,7 +57,7 @@ public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
     Add_Inverted_Doc(DataWriter *self, Inverter *inverter, int32_t doc_id);
 
     /** Add content from an existing segment into the one currently being
-     * written.  
+     * written.
      *
      * @param reader The SegReader containing content to add.
      * @param doc_map An array of integers mapping old document ids to
@@ -82,7 +82,7 @@ public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
 
     /** Move content from an existing segment into the one currently being
      * written.
-     * 
+     *
      * The default implementation calls Add_Segment() then Delete_Segment().
      *
      * @param reader The SegReader containing content to merge, which must
@@ -114,27 +114,27 @@ public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
     public abstract int32_t
     Format(DataWriter *self);
 
-    /** Accessor for "snapshot" member var. 
+    /** Accessor for "snapshot" member var.
      */
     public Snapshot*
     Get_Snapshot(DataWriter *self);
   
-    /** Accessor for "segment" member var. 
+    /** Accessor for "segment" member var.
      */
     public Segment*
     Get_Segment(DataWriter *self);
 
-    /** Accessor for "polyreader" member var. 
+    /** Accessor for "polyreader" member var.
      */
     public PolyReader*
     Get_PolyReader(DataWriter *self);
 
-    /** Accessor for "schema" member var. 
+    /** Accessor for "schema" member var.
      */
     public Schema*
     Get_Schema(DataWriter *self);
 
-    /** Accessor for "folder" member var. 
+    /** Accessor for "folder" member var.
      */
     public Folder*
     Get_Folder(DataWriter *self);

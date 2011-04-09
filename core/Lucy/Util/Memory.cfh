@@ -30,7 +30,7 @@ inert class Lucy::Util::Memory {
     inert nullable void*
     wrapped_calloc(size_t count, size_t size);
 
-    /** Attempt to allocate memory with realloc, but print an error and exit if 
+    /** Attempt to allocate memory with realloc, but print an error and exit if
      * the call fails.
      */
     inert nullable void*
@@ -46,7 +46,7 @@ inert class Lucy::Util::Memory {
     /** Provide a number which is somewhat larger than the supplied number, so
      * that incremental array growth does not trigger pathological
      * reallocation.
-     * 
+     *
      * @param minimum The minimum number of array elements.
      * @param width The size of each array element in bytes.
      */

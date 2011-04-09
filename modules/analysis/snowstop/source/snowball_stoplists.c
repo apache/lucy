@@ -1,4 +1,4 @@
-/* Auto-generated file -- DO NOT EDIT! 
+/* Auto-generated file -- DO NOT EDIT!
  *
  * The words in this file are taken from stoplists provided by the Snowball
  * project.

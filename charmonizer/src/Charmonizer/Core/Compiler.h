@@ -47,9 +47,9 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_path,
 chaz_bool_t
 chaz_CC_test_compile(char *source, size_t source_len);
 
-/* Attempt to compile the supplied source code.  If successful, capture the 
+/* Attempt to compile the supplied source code.  If successful, capture the
  * output of the program and return a pointer to a newly allocated buffer.
- * If the compilation fails, return NULL.  The length of the captured 
+ * If the compilation fails, return NULL.  The length of the captured
  * output will be placed into the integer pointed to by [output_len].
  */
 char*

@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Execute searches against a single index.
- * 
+ *
  * Use the IndexSearcher class to perform search queries against an index.
  * (For searching multiple indexes at once, see
  * L<PolySearcher|Lucy::Search::PolySearcher>).
@@ -38,7 +38,7 @@ class Lucy::Search::IndexSearcher cnick IxSearcher
     inert incremented IndexSearcher*
     new(Obj *index);
 
-    /** 
+    /**
      * @param index Either a string filepath, a Folder, or an IndexReader.
      */
     public inert IndexSearcher*

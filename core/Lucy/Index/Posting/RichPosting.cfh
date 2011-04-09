@@ -23,11 +23,11 @@ parcel Lucy;
  * per-position rather than per-field.  To exploit this, you need a custom
  * L<Analyzer|Lucy::Analysis::Analyzer> which assigns varying boosts to
  * individual L<Token|Lucy::Analysis::Token> objects.
- * 
+ *
  * A typical application for RichPosting is an HTMLAnalyzer which assigns
  * boost based on the visual size and weight of the marked up text: H1
  * blocks get the greatest weight, H2 blocks almost as much, etc.
- */ 
+ */
 class Lucy::Index::Posting::RichPosting cnick RichPost
     inherits Lucy::Index::Posting::ScorePosting {
 

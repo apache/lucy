@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Matcher for a PhraseQuery. 
+/** Matcher for a PhraseQuery.
  */
 
 class Lucy::Search::PhraseMatcher inherits Lucy::Search::Matcher {

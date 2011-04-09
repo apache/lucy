@@ -4,7 +4,7 @@
 // The list of code points in this function is chosen based on the White_Space
 // property in http://www.unicode.org/Public/UNIDATA/PropList.txt
 
-/* 
+/*
 
 EXHIBIT 1 UNICODE, INC. LICENSE AGREEMENT - DATA FILES AND SOFTWARE
 

@@ -26,7 +26,7 @@ extern "C" {
 
 /* Set up the Charmonizer environment.  This should be called before anything
  * else.
- * 
+ *
  * @param cc_command the string used to invoke the C compiler via system()
  * @param cc_flags flags which will be passed on to the C compiler
  * @param charmony_start Code to prepend onto the front of charmony.h
@@ -41,7 +41,7 @@ chaz_Probe_init(const char *cc_command, const char *cc_flags,
 void
 chaz_Probe_clean_up();
 
-/* Determine how much feedback Charmonizer provides.  
+/* Determine how much feedback Charmonizer provides.
  * 0 - silent
  * 1 - normal
  * 2 - debugging

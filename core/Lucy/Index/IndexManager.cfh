@@ -16,8 +16,8 @@
 
 parcel Lucy;
 
-/** Policies governing index updating, locking, and file deletion. 
- * 
+/** Policies governing index updating, locking, and file deletion.
+ *
  * IndexManager is an advanced-use class for controlling index locking,
  * updating, merging, and deletion behaviors.
  *
@@ -75,7 +75,7 @@ class Lucy::Index::IndexManager cnick IxManager
      * search-time degradation due to segment proliferation. The default
      * implementation prefers small segments or segments with a high
      * proportion of deletions.
-     * 
+     *
      * @param reader A PolyReader.
      * @param del_writer A DeletionsWriter.
      * @param cutoff A segment number which all returned SegReaders must
@@ -97,7 +97,7 @@ class Lucy::Index::IndexManager cnick IxManager
     Choose_Sparse(IndexManager *self, I32Array *doc_counts);
 
     /** Create the Lock which controls access to modifying the logical content
-     * of the index. 
+     * of the index.
      */
     public incremented Lock*
     Make_Write_Lock(IndexManager *self);
@@ -151,7 +151,7 @@ class Lucy::Index::IndexManager cnick IxManager
     public void
     Set_Write_Lock_Timeout(IndexManager *self, uint32_t timeout);
 
-    /** Getter for write lock timeout. 
+    /** Getter for write lock timeout.
      */
     public uint32_t
     Get_Write_Lock_Timeout(IndexManager *self);
@@ -161,7 +161,7 @@ class Lucy::Index::IndexManager cnick IxManager
     public void
     Set_Write_Lock_Interval(IndexManager *self, uint32_t timeout);
 
-    /** Getter for write lock retry interval. 
+    /** Getter for write lock retry interval.
      */
     public uint32_t
     Get_Write_Lock_Interval(IndexManager *self);
@@ -171,7 +171,7 @@ class Lucy::Index::IndexManager cnick IxManager
     public void
     Set_Merge_Lock_Timeout(IndexManager *self, uint32_t timeout);
 
-    /** Getter for merge lock timeout. 
+    /** Getter for merge lock timeout.
      */
     public uint32_t
     Get_Merge_Lock_Timeout(IndexManager *self);
@@ -181,7 +181,7 @@ class Lucy::Index::IndexManager cnick IxManager
     public void
     Set_Merge_Lock_Interval(IndexManager *self, uint32_t timeout);
 
-    /** Getter for merge lock retry interval. 
+    /** Getter for merge lock retry interval.
      */
     public uint32_t
     Get_Merge_Lock_Interval(IndexManager *self);
@@ -191,7 +191,7 @@ class Lucy::Index::IndexManager cnick IxManager
     public void
     Set_Deletion_Lock_Timeout(IndexManager *self, uint32_t timeout);
 
-    /** Getter for deletion lock timeout. 
+    /** Getter for deletion lock timeout.
      */
     public uint32_t
     Get_Deletion_Lock_Timeout(IndexManager *self);
@@ -201,7 +201,7 @@ class Lucy::Index::IndexManager cnick IxManager
     public void
     Set_Deletion_Lock_Interval(IndexManager *self, uint32_t timeout);
 
-    /** Getter for deletion lock retry interval. 
+    /** Getter for deletion lock retry interval.
      */
     public uint32_t
     Get_Deletion_Lock_Interval(IndexManager *self);

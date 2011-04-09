@@ -69,7 +69,7 @@ class Lucy::Index::PostingPool cnick PostPool
     Add_Inversion(PostingPool *self, Inversion *inversion, int32_t doc_id, 
                   float doc_boost, float length_norm);
 
-    /** Reduce RAM footprint as much as possible. 
+    /** Reduce RAM footprint as much as possible.
      */
     void
     Shrink(PostingPool *self);

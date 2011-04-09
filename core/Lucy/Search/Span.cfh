@@ -17,15 +17,15 @@
 parcel Lucy;
 
 /** An offset, a length, and a weight.
- * 
+ *
  * Span objects store information about a span across an array of...
  * something. The unit is context-dependent.
  *
  * Text is one possibility, in which case offset and length might be measured
  * in Unicode code points.  However, the Span could also refer to a span
  * within an array of tokens, for example -- in which case the start and
- * offset might be measured in token positions.  
- */ 
+ * offset might be measured in token positions.
+ */
 class Lucy::Search::Span inherits Lucy::Object::Obj {
 
     int32_t offset;

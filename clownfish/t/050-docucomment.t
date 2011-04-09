@@ -25,11 +25,11 @@ my $parser = Clownfish::Parser->new;
 isa_ok( $parser->docucomment('/** foo. */'), "Clownfish::DocuComment" );
 
 my $text = <<'END_COMMENT';
-/** 
- * Brief description.  Long description. 
- * 
+/**
+ * Brief description.  Long description.
+ *
  * More long description.
- * 
+ *
  * @param foo A foo.
  * @param bar A bar.
  *

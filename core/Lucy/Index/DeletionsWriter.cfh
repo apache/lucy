@@ -20,16 +20,16 @@ parcel Lucy;
  *
  * Subclasses of DeletionsWriter provide a low-level mechanism for declaring a
  * document deleted from an index.
- * 
+ *
  * Because files in an index are never modified, and because it is not
  * practical to delete entire segments, a DeletionsWriter does not actually
  * remove documents from the index.  Instead, it communicates to a search-time
  * companion DeletionsReader which documents are deleted in such a way that it
  * can create a Matcher iterator.
- * 
+ *
  * Documents are truly deleted only when the segments which contain them are
  * merged into new ones.
- */ 
+ */
 
 abstract class Lucy::Index::DeletionsWriter cnick DelWriter
     inherits Lucy::Index::DataWriter {
@@ -71,7 +71,7 @@ abstract class Lucy::Index::DeletionsWriter cnick DelWriter
      * represents the new doc id.  Deleted docs are assigned the value - 0, so
      * if you had 4 docs and doc 2 was deleted, the array would have the
      * values...  ( 1, 0, 2, 3 ).
-     * 
+     *
      * @param offset Value which gets added to each valid document id.
      * With an offset of 1000, the array in the previous example would be
      * { 1001, 0, 1002, 1003 }.
@@ -82,21 +82,21 @@ abstract class Lucy::Index::DeletionsWriter cnick DelWriter
 
     /** Return a deletions iterator for the supplied SegReader, which must be
      * a component within the PolyReader that was supplied at
-     * construction-time. 
+     * construction-time.
      */
     public abstract incremented nullable Matcher*
     Seg_Deletions(DeletionsWriter *self, SegReader *seg_reader);
     
     /** Return the number of deletions for a given segment.
      *
-     * @param seg_name The name of the segment. 
+     * @param seg_name The name of the segment.
      */
     public abstract int32_t
     Seg_Del_Count(DeletionsWriter *self, const CharBuf *seg_name);
 }
 
 /** Implements DeletionsWriter using BitVector files.
- */ 
+ */
 class Lucy::Index::DefaultDeletionsWriter cnick DefDelWriter
     inherits Lucy::Index::DeletionsWriter {
 

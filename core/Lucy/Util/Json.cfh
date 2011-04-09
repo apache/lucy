@@ -34,7 +34,7 @@ class Lucy::Util::Json inherits Lucy::Object::Obj {
     from_json(CharBuf *json);
 
     /** Encode <code>dump</code> as JSON and attempt to write to the indicated
-     * file.  
+     * file.
      * @return true if the write succeeds, false on failure (sets Err_error).
      */
     inert bool_t

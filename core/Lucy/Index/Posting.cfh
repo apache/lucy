@@ -21,7 +21,7 @@ parcel Lucy;
  * A Posting, in Apache Lucy, is a vessel which stores information about a
  * term-document match.  (See L<Lucy::Docs::IRTheory> for the
  * academic definition of "posting".)
- * 
+ *
  * Subclasses include
  * L<MatchPosting|Lucy::Index::Posting::MatchPosting>, the simplest
  * posting format, and
@@ -34,7 +34,7 @@ class Lucy::Index::Posting cnick Post inherits Lucy::Util::Stepper {
     public inert Posting*
     init(Posting *self);
 
-    /** Create a RawPosting object, suitable for index-time sorting.  
+    /** Create a RawPosting object, suitable for index-time sorting.
      *
      * Updates the state of the document id, but nothing else.
      */
@@ -79,14 +79,14 @@ abstract class Lucy::Index::Posting::PostingWriter cnick PostWriter
     Write_Posting(PostingWriter *self, RawPosting *posting);
 
     /** Start a new term.  Update the TermInfo to reflect the state of the
-     * PostingWriter. 
+     * PostingWriter.
      */
     abstract void
     Start_Term(PostingWriter *self, TermInfo *tinfo);
 
     /** Update the TermInfo to reflect the internal state of the
-     * PostingWriter so that skip information can be written. 
-     * 
+     * PostingWriter so that skip information can be written.
+     *
      * TODO: This is an ugly hack which needs refactoring.
      */
     abstract void

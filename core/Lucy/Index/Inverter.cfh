@@ -60,8 +60,8 @@ class Lucy::Index::Inverter inherits Lucy::Object::Obj {
     Set_Boost(Inverter *self, float boost);
 
     /** Add a field to the Inverter.  If the field is indexed/analyzed, invert
-     * it.  
-     * 
+     * it.
+     *
      * The InverterEntry's value should have already been set to the field's
      * value when Add_Field() is called.
      */
@@ -75,7 +75,7 @@ class Lucy::Index::Inverter inherits Lucy::Object::Obj {
 
     /** Reset the iterator and prepare to cycle through any fields that have
      * been added.
-     * 
+     *
      * @return the number of fields which will be iterated over.
      */
     public uint32_t 
@@ -137,7 +137,7 @@ class Lucy::Index::Inverter inherits Lucy::Object::Obj {
 }
 
 /** Cached information about fields.
- * 
+ *
  * Inverter needs to check certain field characteristics frequently.  Since
  * field definitions are unchanging, we cache them in an InverterEntry object.
  */

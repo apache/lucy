@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Consolidate segment files.
  *
  * CompoundFileWriter combines all the data files in a directory into a single
@@ -26,7 +26,7 @@ parcel Lucy;
  * Nested subdirectories and files ending in ".json" are excluded from
  * consolidation.
  *
- * Any given directory may only be consolidated once.  
+ * Any given directory may only be consolidated once.
  */
 
 class Lucy::Store::CompoundFileWriter cnick CFWriter

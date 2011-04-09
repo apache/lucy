@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Private scan-only Lexicon helper class. 
+/** Private scan-only Lexicon helper class.
  */
 class Lucy::Index::RawLexicon cnick RawLex
     inherits Lucy::Index::Lexicon {

@@ -24,7 +24,7 @@ parcel Lucy;
  *    * Clownfish - header files.
  *    * C - implementation files.
  *    * Host - binding language.
- * 
+ *
  * Charmonizer is a configuration prober which writes a single header file,
  * "charmony.h", describing the build environment and facilitating
  * cross-platform development.  It's similar to Autoconf or Metaconfig, but
@@ -41,7 +41,7 @@ parcel Lucy;
  *
  *     Indexer_Add_Doc   <-- Method, typically uses dynamic dispatch.
  *     Indexer_add_doc   <-- Function, always a direct invocation.
- * 
+ *
  * The C files within the Lucy core are where most of Lucy's low-level
  * functionality lies.  They implement the interface defined by the Clownfish
  * header files.

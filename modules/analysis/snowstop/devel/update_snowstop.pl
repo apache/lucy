@@ -37,7 +37,7 @@ die "svn update failed" if ( $retval >> 8 );
 my $outpath = catfile( $dest_dir, 'source', 'snowball_stoplists.c' );
 open( my $out_fh, '>', $outpath ) or die "Can't open '$outpath': $!";
 print $out_fh <<'END_STUFF';
-/* Auto-generated file -- DO NOT EDIT! 
+/* Auto-generated file -- DO NOT EDIT!
  *
  * The words in this file are taken from stoplists provided by the Snowball
  * project.

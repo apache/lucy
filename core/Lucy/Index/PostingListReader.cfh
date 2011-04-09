@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Read postings data.
- * 
+ *
  * PostingListReaders produce L<PostingList|Lucy::Index::PostingList>
  * objects which convey document matching information.
  */
@@ -31,11 +31,11 @@ class Lucy::Index::PostingListReader cnick PListReader
 
     /** Returns a PostingList, or NULL if either <code>field</code> is NULL or
      * <code>field</code> is not present in any documents.
-     *   
+     *
      * @param field A field name.
      * @param term If supplied, the PostingList will be pre-located to this
-     * term using Seek(). 
-     */  
+     * term using Seek().
+     */
     public abstract incremented nullable PostingList*
     Posting_List(PostingListReader *self, const CharBuf *field = NULL,
                  Obj *term = NULL);

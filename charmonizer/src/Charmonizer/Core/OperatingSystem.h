@@ -58,7 +58,7 @@ chaz_OS_exe_ext(void);
 const char*
 chaz_OS_obj_ext(void);
 
-/* Return the equivalent of /dev/null on this system. 
+/* Return the equivalent of /dev/null on this system.
  */
 const char*
 chaz_OS_dev_null(void);
@@ -68,7 +68,7 @@ chaz_OS_dev_null(void);
 void
 chaz_OS_init(void);
 
-/* Tear down the Charmonizer/Core/OperatingSystem module. 
+/* Tear down the Charmonizer/Core/OperatingSystem module.
  */
 void
 chaz_OS_clean_up(void);

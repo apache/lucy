@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Test case object for QueryParser unit tests. 
+/** Test case object for QueryParser unit tests.
  */
 
 class Lucy::Test::Search::TestQueryParser cnick TestQP

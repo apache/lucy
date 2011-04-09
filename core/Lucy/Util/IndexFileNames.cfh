@@ -37,7 +37,7 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
 
     /** Split the <code>path</code> on '/' and assign the last component to
      * <code>target</code>, which will remain valid only as long as
-     * <code>path</code> is unmodified.  Trailing slashes will be stripped.  
+     * <code>path</code> is unmodified.  Trailing slashes will be stripped.
      *
      * @param target The target string to assign to.
      * @return target, allowing an assignment idiom.

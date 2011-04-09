@@ -50,7 +50,7 @@ abstract class Lucy::Index::LexiconReader cnick LexReader
 
     /** Return a LexiconReader which merges the output of other
      * LexiconReaders.
-     * 
+     *
      * @param readers An array of LexiconReaders.
      * @param offsets Doc id start offsets for each reader.
      */

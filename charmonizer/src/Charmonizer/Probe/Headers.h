@@ -33,18 +33,18 @@ chaz_bool_t
 chaz_Headers_check(const char *header_name);
 
 /* Run the Headers module.
- * 
- * Exported symbols: 
- * 
+ *
+ * Exported symbols:
+ *
  * If HAS_C89 is declared, this system has all the header files described in
  * Ansi C 1989.  HAS_C90 is a synonym.  (It would be surprising if they are
- * not defined, because Charmonizer itself assumes C89.)  
+ * not defined, because Charmonizer itself assumes C89.)
  *
  * HAS_C89
  * HAS_C90
- * 
+ *
  * One symbol is exported for each C89 header file:
- * 
+ *
  * HAS_ASSERT_H
  * HAS_CTYPE_H
  * HAS_ERRNO_H
@@ -60,12 +60,12 @@ chaz_Headers_check(const char *header_name);
  * HAS_STDLIB_H
  * HAS_STRING_H
  * HAS_TIME_H
- * 
+ *
  * One symbol is exported for every POSIX header present, and HAS_POSIX is
  * exported if they're all there.
  *
  * HAS_POSIX
- * 
+ *
  * HAS_CPIO_H
  * HAS_DIRENT_H
  * HAS_FCNTL_H
@@ -82,7 +82,7 @@ chaz_Headers_check(const char *header_name);
  * HAS_UTIME_H
  *
  * If pthread.h is available, this will be exported:
- * 
+ *
  * HAS_PTHREAD_H
  */
 void 

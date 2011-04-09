@@ -47,7 +47,7 @@ class Lucy::Object::BitVector cnick BitVec
     Get(BitVector *self, uint32_t tick);
 
     /** Set the bit at <code>tick</code> to 1.
-     * 
+     *
      * @param tick The bit to be set.
      */
     public void
@@ -70,7 +70,7 @@ class Lucy::Object::BitVector cnick BitVec
     Next_Hit(BitVector *self, uint32_t tick);
 
     /** Clear the indicated bit. (i.e. set it to 0).
-     * 
+     *
      * @param tick The bit to be cleared.
      */
     public void
@@ -83,7 +83,7 @@ class Lucy::Object::BitVector cnick BitVec
 
     /** If the BitVector does not already have enough room to hold the
      * indicated number of bits, allocate more memory so that it can.
-     * 
+     *
      * @param capacity Least number of bits the BitVector should accomodate.
      */
     public void
@@ -100,7 +100,7 @@ class Lucy::Object::BitVector cnick BitVec
     /** Modify the BitVector so that only bits which remain set are those
      * which 1) were already set in this BitVector, and 2) were also set in
      * the other BitVector.
-     * 
+     *
      * @param other Another BitVector.
      */
     public void
@@ -108,35 +108,35 @@ class Lucy::Object::BitVector cnick BitVec
 
     /** Modify the BitVector, setting all bits which are set in the other
      * BitVector if they were not already set.
-     * 
+     *
      * @param other Another BitVector.
      */
     public void
     Or(BitVector *self, const BitVector *other);
 
     /** Modify the BitVector, performing an XOR operation against the other.
-     * 
+     *
      * @param other Another BitVector.
      */
     public void
     Xor(BitVector *self, const BitVector *other);
 
     /** Modify the BitVector, clearing all bits which are set in the other.
-     * 
+     *
      * @param other Another BitVector.
      */
     public void
     And_Not(BitVector *self, const BitVector *other);
 
     /** Invert the value of a bit.
-     * 
+     *
      * @param tick The bit to invert.
      */
     public void
     Flip(BitVector *self, uint32_t tick); 
 
     /** Invert each bit within a contiguous block.
-     * 
+     *
      * @param offset Lower bound.
      * @param length The number of bits to flip.
      */

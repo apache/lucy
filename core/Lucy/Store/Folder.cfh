@@ -17,14 +17,14 @@
 parcel Lucy;
 
 /** Abstract class representing a directory.
- * 
+ *
  * A "file" within a Folder might be a real file on disk -- or it might be a
  * RAM buffer.  Similarly, Delete() might delete a file from the file system, or
- * a key-value pair from a hash, or something else.  
- * 
+ * a key-value pair from a hash, or something else.
+ *
  * The archetypal implementation of Folder,
  * L<FSFolder|Lucy::Store::FSFolder>, represents a directory on
- * the file system holding a collection of files.  
+ * the file system holding a collection of files.
  */
 abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
 
@@ -37,12 +37,12 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
     public void
     Destroy(Folder *self);
 
-    /** Getter for <code>path</code> member var. 
+    /** Getter for <code>path</code> member var.
      */
     public CharBuf*
     Get_Path(Folder *self);
 
-    /** Setter for <code>path</code> member var. 
+    /** Setter for <code>path</code> member var.
      */
     void
     Set_Path(Folder *self, const CharBuf *path);
@@ -56,7 +56,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
     Open_Out(Folder *self,  const CharBuf *path);
 
     /** Open an InStream, or set Err_error and return NULL on failure.
-     * 
+     *
      * @param path A relative filepath.
      * @return an InStream.
      */
@@ -82,7 +82,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
     Open_Dir(Folder *self, const CharBuf *path = NULL);
 
     /** Create a subdirectory.
-     * 
+     *
      * @param path A relative filepath.
      * @return true on success, false on failure (sets Err_error).
      */
@@ -152,7 +152,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
 
     /** Create a hard link at path <code>to</code> pointing at the existing
      * file <code>from</code>, or set Err_error and return false on failure.
-     * 
+     *
      * @return true on success, false on failure.
      */
     public abstract bool_t
@@ -174,7 +174,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
     /** Given a filepath, return the Folder representing everything except
      * the last component.  E.g. the 'foo/bar' Folder for '/foo/bar/baz.txt',
      * the 'foo' Folder for 'foo/bar', etc.
-     * 
+     *
      * If <code>path</code> is invalid, because an intermediate directory
      * either doesn't exist or isn't a directory, return NULL.
      */
@@ -185,7 +185,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
      * If <code>path</code> is NULL or an empty string, return this Folder.
      * If the entity at <code>path</code> either doesn't exist or isn't a
      * subdirectory, return NULL.
-     * 
+     *
      * @param path A relative filepath specifying a subdirectory.
      * @return A Folder.
      */
@@ -199,7 +199,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
     Initialize(Folder *self);
 
     /** Verify that operations may be performed on this Folder.
-     * 
+     *
      * @return true on success.
      */
     public abstract bool_t 
@@ -217,7 +217,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
     Local_Open_FileHandle(Folder *self, const CharBuf *name, uint32_t flags);
 
     /** Open an InStream for a local file, or set Err_error and return NULL on
-     * failure. 
+     * failure.
      */
     incremented nullable InStream*
     Local_Open_In(Folder *self, const CharBuf *name);
@@ -246,7 +246,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
 
     /** Indicate whether a local subdirectory exists with the supplied
      * <code>name</code>.
-     * 
+     *
      * @param name The name of the local subdirectory.
      */
     abstract bool_t
@@ -254,7 +254,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
 
     /** Return the Folder object representing the specified directory, if such
      * a directory exists.
-     * 
+     *
      * @param name The name of a local directory.
      * @return a Folder.
      */

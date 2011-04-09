@@ -29,8 +29,8 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
     overlap(const char *a, const char *b, size_t a_len,  size_t b_len);
 
     /** Encode a NULL-terminated string representation of a value in base 36
-     * into <code>buffer</code>.  
-     * 
+     * into <code>buffer</code>.
+     *
      * @param value The number to be encoded.
      * @param buffer A buffer at least MAX_BASE36_BYTES bytes long.
      * @return the number of digits encoded (not including the terminating
@@ -49,8 +49,8 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
     inert bool_t
     is_whitespace(uint32_t code_point); 
 
-    /** Encode a Unicode code point to a UTF-8 sequence.  
-     * 
+    /** Encode a Unicode code point to a UTF-8 sequence.
+     *
      * @param code_point A legal unicode code point.
      * @param buffer Write buffer which must hold at least 4 bytes (the
      * maximum legal length for a UTF-8 char).
@@ -58,13 +58,13 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
     inert uint32_t
     encode_utf8_char(uint32_t code_point, void *buffer);
 
-    /** Decode a UTF-8 sequence to a Unicode code point.  Assumes valid UTF-8. 
+    /** Decode a UTF-8 sequence to a Unicode code point.  Assumes valid UTF-8.
      */
     inert uint32_t
     decode_utf8_char(const char *utf8);
 
     /** Return the first non-continuation byte before the supplied pointer.
-     * If backtracking progresses beyond the supplied start, return NULL. 
+     * If backtracking progresses beyond the supplied start, return NULL.
      */
     inert nullable const char*
     back_utf8_char(const char *utf8, char *start);

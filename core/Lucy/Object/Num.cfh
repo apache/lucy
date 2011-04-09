@@ -30,7 +30,7 @@ abstract class Lucy::Object::Num inherits Lucy::Object::Obj {
     Compare_To(Num *self, Obj *other);
 }
 
-/** Abstract base class for floating point numbers. 
+/** Abstract base class for floating point numbers.
  */
 abstract class Lucy::Object::FloatNum inherits Lucy::Object::Num {
 
@@ -42,7 +42,7 @@ abstract class Lucy::Object::FloatNum inherits Lucy::Object::Num {
 }
 
 
-/** Abstract base class for Integers. 
+/** Abstract base class for Integers.
  */
 abstract class Lucy::Object::IntNum inherits Lucy::Object::Num {
 

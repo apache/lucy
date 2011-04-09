@@ -37,7 +37,7 @@ void
 chaz_AllTests_run();
 
 /* These tests all require the file charmony.h.
- * 
+ *
  * Since Charmonizer conditionally defines many symbols, it can be difficult
  * to tell whether a symbol is missing because it should not have been
  * generated, or whether it is missing because an error occurred.  These test

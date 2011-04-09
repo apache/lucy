@@ -29,10 +29,10 @@ import java.util.Vector;
 import java.util.Collections;
 import java.util.Arrays;
 
-/** 
+/**
  * LuceneIndexer - benchmarking app
- * usage: java LuceneIndexer [-docs MAX_TO_INDEX] [-reps NUM_REPETITIONS] 
- * 
+ * usage: java LuceneIndexer [-docs MAX_TO_INDEX] [-reps NUM_REPETITIONS]
+ *
  * Recommended options: -server -Xmx500M -XX:CompileThreshold=100
  */
 

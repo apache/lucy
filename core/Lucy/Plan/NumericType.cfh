@@ -26,7 +26,7 @@ class Lucy::Plan::NumericType cnick NumType
     init2(NumericType *self, float boost = 1.0, bool_t indexed = true, 
           bool_t stored = true, bool_t sortable = false);
 
-    /** Returns true. 
+    /** Returns true.
      */
     public bool_t
     Binary(NumericType *self);

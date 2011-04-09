@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Retrieve stored documents.
- * 
+ *
  * DocReader defines the interface by which documents (with all stored fields)
  * are retrieved from the index.  The default implementation returns
  * L<HitDoc|Lucy::Document::HitDoc> objects.
@@ -30,7 +30,7 @@ class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
          int32_t seg_tick = -1);
 
     /** Retrieve the document identified by <code>doc_id</code>.
-     * 
+     *
      * @return a HitDoc.
      */
     public abstract incremented HitDoc*
@@ -38,7 +38,7 @@ class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
 
     /** Returns a DocReader which divvies up requests to its sub-readers
      * according to the offset range.
-     * 
+     *
      * @param readers An array of DocReaders.
      * @param offsets Doc id start offsets for each reader.
      */
@@ -46,7 +46,7 @@ class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
     Aggregator(DocReader *self, VArray *readers, I32Array *offsets);
 }
 
-/** Aggregate multiple DocReaders. 
+/** Aggregate multiple DocReaders.
  */
 class Lucy::Index::PolyDocReader inherits Lucy::Index::DocReader {
 

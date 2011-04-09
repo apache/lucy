@@ -33,7 +33,7 @@ class Lucy::Index::SegLexicon cnick SegLex
     int32_t          skip_interval;
     int32_t          index_interval;
 
-    /** 
+    /**
      * @param schema A Schema.
      * @param folder A Folder.
      * @param segment A Segment.

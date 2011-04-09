@@ -16,14 +16,14 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Hashtable.
  *
  * Values are stored by reference and may be any kind of Obj. By default, keys
  * are cloned and so must belong to a class that implements Clone(); however,
  * this behavior can be changed by overridding Make_Key(), e.g. to implement
  * efficient hash sets.
- */ 
+ */
 class Lucy::Object::Hash inherits Lucy::Object::Obj {
 
     void          *entries;
@@ -35,7 +35,7 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     inert incremented Hash*
     new(uint32_t capacity = 0);
 
-    /** 
+    /**
      * @param capacity The number of elements that the hash will be asked to
      * hold initially.
      */
@@ -57,8 +57,8 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     Store_Str(Hash *self, const char *str, size_t len, 
               decremented Obj *value);
 
-    /** Fetch the value associated with <code>key</code>.  
-     * 
+    /** Fetch the value associated with <code>key</code>.
+     *
      * @return the value, or NULL if <code>key</code> is not present.
      */
     nullable Obj*
@@ -67,7 +67,7 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     nullable Obj*
     Fetch_Str(Hash *self, const char *key, size_t key_len);
 
-    /** Attempt to delete a key-value pair from the hash.  
+    /** Attempt to delete a key-value pair from the hash.
      *
      * @return the value if <code>key</code> exists and thus deletion
      * succeeds; otherwise NULL.
@@ -86,8 +86,8 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     Iterate(Hash *self);
 
     /** Retrieve the next key-value pair from the hash, setting the supplied
-     * pointers to point at them.  
-     * 
+     * pointers to point at them.
+     *
      * @return true while iterating, false when the iterator has been
      * exhausted.
      */
@@ -121,7 +121,7 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     Get_Capacity(Hash *self);
 
     /** Accessor for Hash's "size" member.
-     * 
+     *
      * @return the number of key-value pairs.
      */
     public uint32_t 

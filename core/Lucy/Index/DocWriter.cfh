@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Default doc writer. 
+/** Default doc writer.
  */
 class Lucy::Index::DocWriter inherits Lucy::Index::DataWriter {
 

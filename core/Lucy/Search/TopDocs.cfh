@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Top-scoring documents.
- * 
+ *
  * A TopDocs object encapsulates the highest-scoring N documents and their
  * associated scores.
  */
@@ -32,22 +32,22 @@ class Lucy::Search::TopDocs inherits Lucy::Object::Obj {
     inert TopDocs*
     init(TopDocs *self, VArray *match_docs, uint32_t total_hits);
 
-    /** Accessor for <code>match_docs</code> member. 
+    /** Accessor for <code>match_docs</code> member.
      */
     VArray*
     Get_Match_Docs(TopDocs *self);
 
-    /** Setter for <code>match_docs</code> member. 
+    /** Setter for <code>match_docs</code> member.
      */
     void
     Set_Match_Docs(TopDocs *self, VArray *match_docs);
 
-    /** Accessor for <code>total_hits</code> member. 
+    /** Accessor for <code>total_hits</code> member.
      */
     uint32_t
     Get_Total_Hits(TopDocs *self);
 
-    /** Setter for <code>total_hits</code> member. 
+    /** Setter for <code>total_hits</code> member.
      */
     void
     Set_Total_Hits(TopDocs *self, uint32_t total_hits);

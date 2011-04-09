@@ -39,8 +39,8 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
 
     /** Return a singleton.  If a VTable can be found in the registry based on
      * the subclass name, it will be returned.  Otherwise, a new VTable will
-     * be created using [parent] as a base.  
-     * 
+     * be created using [parent] as a base.
+     *
      * If [parent] is NULL, an attempt will be made to find it using
      * VTable_find_parent_class().  If the attempt fails, an error will
      * result.
@@ -51,7 +51,7 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     /** Register a vtable, so that it can be retrieved by class name.
      *
      * TODO: Move this functionality to some kind of class loader.
-     * 
+     *
      * @return true on success, false if the class was already registered.
      */
     inert bool_t
@@ -88,7 +88,7 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     inert incremented VArray*
     novel_host_methods(const CharBuf *class_name);
 
-    /** Replace a function pointer in the VTable. 
+    /** Replace a function pointer in the VTable.
      */
     void
     Override(VTable *self, lucy_method_t method_ptr, size_t offset);

@@ -17,14 +17,14 @@
 parcel Lucy;
 
 /** Default behaviors for binary fields.
- * 
+ *
  * BlobType is an implementation of FieldType tuned for use with fields
  * containing binary data, which cannot be indexed or searched -- only stored.
  */
 class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType 
     : dumpable {
 
-    /** 
+    /**
      * @param stored boolean indicating whether the field should be stored.
      */
     public inert BlobType* 
@@ -33,7 +33,7 @@ class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType
     public inert incremented BlobType* 
     new(bool_t stored);
 
-    /** Returns true. 
+    /** Returns true.
      */
     public bool_t
     Binary(BlobType *self);

@@ -28,21 +28,21 @@ extern "C" {
 
 /* The LargeFiles module attempts to detect these symbols or alias them to
  * synonyms:
- * 
+ *
  * off64_t
  * fopen64
  * ftello64
  * fseeko64
- * 
+ *
  * If the attempt succeeds, this will be defined:
- * 
+ *
  * HAS_LARGE_FILE_SUPPORT
  *
  * Additionally, 64-bit versions of lseek and pread may be detected/aliased:
  *
  * lseek64
  * pread64
- * 
+ *
  * Use of the off64_t symbol may require sys/types.h.
  */
 void chaz_LargeFiles_run(void);

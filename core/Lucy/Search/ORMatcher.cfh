@@ -48,7 +48,7 @@ class Lucy::Search::ORMatcher inherits Lucy::Search::PolyMatcher {
     inert incremented ORMatcher*
     new(VArray *children);
 
-    /** 
+    /**
      * @param children An array of Matchers.
      */
     inert incremented ORMatcher*
@@ -69,7 +69,7 @@ class Lucy::Search::ORMatcher inherits Lucy::Search::PolyMatcher {
 
 /**
  * Union results of multiple Matchers.
- * 
+ *
  * ORScorer collates the output of multiple scoring child Matchers, summing
  * their scores whenever they match the same document.
  */

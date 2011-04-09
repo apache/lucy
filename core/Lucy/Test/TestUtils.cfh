@@ -23,7 +23,7 @@ inert class Lucy::Test::TestUtils  {
     inert incremented CharBuf* 
     get_cb(const char *utf8);
 
-    /** Return a random unsigned 64-bit integer. 
+    /** Return a random unsigned 64-bit integer.
      */
     inert uint64_t
     random_u64();
@@ -97,7 +97,7 @@ inert class Lucy::Test::TestUtils  {
     make_poly_query(uint32_t boolop, ...);
 
     /** Return the result of round-tripping the object through FREEZE and
-     * THAW. 
+     * THAW.
      */
     inert incremented Obj*
     freeze_thaw(Obj *object);

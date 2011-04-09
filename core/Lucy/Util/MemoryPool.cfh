@@ -18,10 +18,10 @@ parcel Lucy;
 
 /**
  * Specialized memory allocator.
- * 
+ *
  * Grab memory from the system in 1 MB chunks.  Don't release it until object
- * destruction.  Parcel the memory out on request.  
- * 
+ * destruction.  Parcel the memory out on request.
+ *
  * The release mechanism is fast but extremely crude, limiting the use of this
  * class to specific applications.
  */

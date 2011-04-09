@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Shared (read) lock.
- * 
+ *
  * SharedLock's interface is nearly identical to that of its parent class
  * L<Lucy::Store::Lock>, taking the same constructor arguments and
  * implementing the same list of methods.  It differs from Lock only in the
@@ -25,7 +25,7 @@ parcel Lucy;
  *
  * First, Obtain() will not fail if another lock is held against the resource
  * identified by <code>name</code> (though it might fail for other reasons).
- * 
+ *
  * Second, Is_Locked() returns true so long as some lock, somewhere is holding
  * a lock on <code>name</code>.  That lock could be this instance, or it could
  * be another -- so is entirely possible to call Release() successfully on a

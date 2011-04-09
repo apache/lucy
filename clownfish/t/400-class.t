@@ -152,7 +152,7 @@ ok( ( scalar grep { $_->micro_sym eq 'num' } @{ $class->member_vars } ),
     "parsed private member var" );
 
 $class_content = q|
-    /** 
+    /**
      * Bow wow.
      *
      * Wow wow wow.
@@ -222,7 +222,7 @@ ok( $class->inert, "inert modifier parsed and passed to constructor" );
 
 $class_content = qq|
     final class Ultimo { 
-        /** Throws an error. 
+        /** Throws an error.
          */
         void Say_Never(Ultimo *self); 
     }|;

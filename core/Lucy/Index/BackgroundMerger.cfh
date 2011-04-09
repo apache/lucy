@@ -50,7 +50,7 @@ class Lucy::Index::BackgroundMerger cnick BGMerger
     public inert incremented BackgroundMerger*
     new(Obj *index, IndexManager *manager = NULL);
 
-    /** Open a new BackgroundMerger.  
+    /** Open a new BackgroundMerger.
      *
      * @param index Either a string filepath or a Folder.
      * @param manager An IndexManager.  If not supplied, an IndexManager with
@@ -74,8 +74,8 @@ class Lucy::Index::BackgroundMerger cnick BGMerger
     Commit(BackgroundMerger *self);
 
     /** Perform the expensive setup for Commit() in advance, so that Commit()
-     * completes quickly.  
-     * 
+     * completes quickly.
+     *
      * Towards the end of Prepare_Commit(), the BackgroundMerger attempts to
      * re-acquire the write lock, which is then held until Commit() finishes
      * and releases it.

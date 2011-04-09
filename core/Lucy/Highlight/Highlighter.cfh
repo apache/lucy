@@ -17,11 +17,11 @@
 parcel Lucy;
 
 /** Create and highlight excerpts.
- * 
+ *
  * The Highlighter can be used to select relevant snippets from a document,
  * and to surround search terms with highlighting tags.  It handles both stems
  * and phrases correctly and efficiently, using special-purpose data generated
- * at index-time.  
+ * at index-time.
 */
 class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
 
@@ -40,7 +40,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
         uint32_t excerpt_length = 200);
 
     /**
-     * @param searcher An object which inherits from 
+     * @param searcher An object which inherits from
      * L<Searcher|Lucy::Search::Searcher>, such as an
      * L<IndexSearcher|Lucy::Search::IndexSearcher>.
      * @param query Query object or a query string.
@@ -72,7 +72,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
      * the sentence, and is measured from 0, not from <code>offset</code>.
      * The Span's "length" member indicates the sentence length in code
      * points.
-     * 
+     *
      * @param text The string to scan.
      * @param offset The place to start looking for offsets, measured in
      * Unicode code points from the top of <code>text</code>.
@@ -101,32 +101,32 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
     public void
     Set_Post_Tag(Highlighter *self, const CharBuf *post_tag);
 
-    /** Accessor. 
+    /** Accessor.
      */
     public CharBuf*
     Get_Pre_Tag(Highlighter *self);
 
-    /** Accessor. 
+    /** Accessor.
      */
     public CharBuf*
     Get_Post_Tag(Highlighter *self);
 
-    /** Accessor. 
+    /** Accessor.
      */
     public CharBuf*
     Get_Field(Highlighter *self);
 
-    /** Accessor. 
+    /** Accessor.
      */
     public uint32_t 
     Get_Excerpt_Length(Highlighter *self);
 
-    /** Accessor. 
+    /** Accessor.
      */
     public Searcher*
     Get_Searcher(Highlighter *self);
 
-    /** Accessor. 
+    /** Accessor.
      */
     public Query*
     Get_Query(Highlighter *self);
@@ -159,7 +159,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
                 HeatMap *heat_map, VArray *sentences);
 
     /** Take the text in raw_excerpt, add highlight tags, encode, and place
-     * the result into <code>highlighted</code>. 
+     * the result into <code>highlighted</code>.
      *
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */

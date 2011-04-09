@@ -17,14 +17,14 @@
 parcel Lucy;
 
 /** Full-text search field type.
- * 
+ *
  * Lucy::Plan::FullTextType is an implementation of
- * L<Lucy::Plan::FieldType> tuned for "full text search".  
+ * L<Lucy::Plan::FieldType> tuned for "full text search".
  *
  * Full text fields are associated with an
  * L<Analyzer|Lucy::Analysis::Analyzer>, which is used to tokenize and
  * normalize the text so that it can be searched for individual words.
- * 
+ *
  * For an exact-match, single value field type using character data, see
  * L<StringType|Lucy::Plan::StringType>.
  */
@@ -34,7 +34,7 @@ class Lucy::Plan::FullTextType
     bool_t      highlightable;
     Analyzer   *analyzer;
 
-    /** 
+    /**
      * @param analyzer An Analyzer.
      * @param boost floating point per-field boost.
      * @param indexed boolean indicating whether the field should be indexed.
@@ -56,12 +56,12 @@ class Lucy::Plan::FullTextType
 
     /** Indicate whether to store data required by
      * L<Lucy::Highlight::Highlighter> for excerpt selection and search
-     * term highlighting. 
-     */ 
+     * term highlighting.
+     */
     public void
     Set_Highlightable(FullTextType *self, bool_t highlightable);
 
-    /** Accessor for "highlightable" property. 
+    /** Accessor for "highlightable" property.
      */
     public bool_t
     Highlightable(FullTextType *self);

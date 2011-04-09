@@ -185,7 +185,7 @@ SegPList_advance(SegPostingList *self, int32_t target)
         int64_t new_filepos             = InStream_Tell(post_stream);
 
         /* Assuming the default skip_interval of 16...
-         * 
+         *
          * Say we're currently on the 5th doc matching this term, and we get a
          * request to skip to the 18th doc matching it.  We won't have skipped
          * yet, but we'll have already gone past 5 of the 16 skip docs --

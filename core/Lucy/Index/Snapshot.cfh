@@ -52,7 +52,7 @@ class Lucy::Index::Snapshot inherits Lucy::Object::Obj : dumpable {
     public uint32_t
     Num_Entries(Snapshot *self);
 
-    /** Add a filepath to the snapshot. 
+    /** Add a filepath to the snapshot.
      */
     public void
     Add_Entry(Snapshot *self, const CharBuf *entry);
@@ -79,7 +79,7 @@ class Lucy::Index::Snapshot inherits Lucy::Object::Obj : dumpable {
     /** Write a snapshot file.  The caller must lock the index while this
      * operation takes place, and the operation will fail if the snapshot file
      * already exists.
-     * 
+     *
      * @param folder A Folder.
      * @param path The path of the file to write.  If NULL, a file name will
      * be chosen which supersedes the latest snapshot file in the index

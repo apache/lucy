@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Mock-object FileHandle for testing InStream/OutStream.
- */ 
+ */
 class Lucy::Store::MockFileHandle inherits Lucy::Store::FileHandle {
 
     int64_t len;

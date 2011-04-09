@@ -17,12 +17,12 @@
 parcel Lucy;
 
 /** Single-segment IndexReader.
- * 
+ *
  * SegReader interprets the data within a single segment of an index.
- * 
+ *
  * Generally speaking, only advanced users writing subclasses which manipulate
- * data at the segment level need to deal with the SegReader API directly.  
- * 
+ * data at the segment level need to deal with the SegReader API directly.
+ *
  * Nearly all of SegReader's functionality is implemented by pluggable
  * components spawned by L<Architecture|Lucy::Plan::Architecture>'s
  * factory methods.
@@ -65,7 +65,7 @@ class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
 
     /** Add a component to the SegReader.  Using the same <code>api</code> key
      * twice is an error.
-     * 
+     *
      * @param api The name of the DataReader subclass that defines the
      * interface implemented by <code>component</code>.
      * @param component A DataReader.
@@ -74,12 +74,12 @@ class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
     Register(SegReader *self, const CharBuf *api, 
              decremented DataReader *component);
 
-    /** Return the name of the segment. 
+    /** Return the name of the segment.
      */
     public CharBuf*
     Get_Seg_Name(SegReader *self);
 
-    /** Return the number of the segment. 
+    /** Return the number of the segment.
      */
     public int64_t
     Get_Seg_Num(SegReader *self);

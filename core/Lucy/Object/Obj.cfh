@@ -40,7 +40,7 @@ class Lucy::Object::Obj {
     Get_RefCount(Obj *self);
 
     /** Increment an object's refcount.
-     * 
+     *
      * @return The object, allowing an assignment idiom.
      */
     incremented Obj* 
@@ -55,7 +55,7 @@ class Lucy::Object::Obj {
     incref(Obj *self);
 
     /** Decrement an object's refcount, calling Destroy() if it hits 0.
-     * 
+     *
      * @return the modified refcount.
      */
     uint32_t
@@ -87,7 +87,7 @@ class Lucy::Object::Obj {
 
     /** Invoke the Destroy() method found in <code>vtable</code> on
      * <code>self</code>.
-     * 
+     *
      * TODO: Eliminate this function if we can arrive at a proper SUPER syntax.
      */
     inert inline void
@@ -137,7 +137,7 @@ class Lucy::Object::Obj {
     public incremented CharBuf*
     To_String(Obj *self);
 
-    /** Convert the object to a 64-bit integer. 
+    /** Convert the object to a 64-bit integer.
      */
     public abstract int64_t
     To_I64(Obj *self);
@@ -154,8 +154,8 @@ class Lucy::Object::Obj {
 
     /** Inflate an object by reading the serialized form from the instream.
      * The assumption is that the object has been allocated, assigned a
-     * refcount and a vtable, but that everything else is uninitialized.  
-     * 
+     * refcount and a vtable, but that everything else is uninitialized.
+     *
      * Implementations should also be prepared to handle NULL as an argument,
      * in which case they should create the object from nothing.
      */
@@ -172,14 +172,14 @@ class Lucy::Object::Obj {
 
     /** Create an object from the output of a call to Dump().  Implementations
      * must not reference the caller.
-     * 
-     * @param dump The output of Dump().  
+     *
+     * @param dump The output of Dump().
      */
     public abstract incremented Obj*
     Load(Obj *self, Obj *dump);
 
     /** Update the internal state of the object to mimic that of
-     * <code>other</code>. 
+     * <code>other</code>.
      */
     public abstract void
     Mimic(Obj *self, Obj *other);

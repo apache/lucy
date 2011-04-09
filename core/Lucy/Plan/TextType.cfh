@@ -39,8 +39,8 @@ class Lucy::Index::TermStepper::TextTermStepper
     public void 
     Reset(TextTermStepper *self);
 
-    /** 
-     * @param value A CharBuf. 
+    /**
+     * @param value A CharBuf.
      */
     public void
     Set_Value(TextTermStepper *self, Obj *value = NULL);

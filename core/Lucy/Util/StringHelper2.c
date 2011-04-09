@@ -4,7 +4,7 @@
 // The content of the following table is derived from the
 // "utf8_countTrailBytes" table in ICU4C 4.4.1.
 
-/* 
+/*
 ICU License - ICU 1.8.1 and later
 
 COPYRIGHT AND PERMISSION NOTICE

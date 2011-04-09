@@ -38,7 +38,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     inert incremented VArray*
     new(uint32_t capacity);
 
-    /** 
+    /**
      * @param capacity Initial number of elements that the object will be able
      * to hold before reallocation.
      */
@@ -87,7 +87,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     void
     Store(VArray *self, uint32_t tick, decremented Obj *elem);
 
-    /** Replace an element in the VArray with NULL and return it.  
+    /** Replace an element in the VArray with NULL and return it.
      *
      * @return whatever was stored at <code>tick</code>.
      */
@@ -113,7 +113,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
 
     /** Quicksort the VArry using the supplied comparison routine.  Safety
      * checks are the responsibility of the caller.
-     * 
+     *
      * @param compare Comparison routine.  The default uses Obj_Compare_To and
      * sorts NULL elements towards the end.
      * @param context Argument supplied to the comparison routine.
@@ -129,7 +129,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     void
     Resize(VArray *self, uint32_t size);
 
-    /** Empty the VArray. 
+    /** Empty the VArray.
      */
     void
     Clear(VArray *self);

@@ -21,7 +21,7 @@ parcel Lucy;
  * PolyReader conflates index data from multiple segments.  For instance, if
  * an index contains three segments with 10 documents each, PolyReader's
  * Doc_Max() method will return 30.
- * 
+ *
  * Some of PolyReader's L<DataReader|Lucy::Index::DataReader> components
  * may be less efficient or complete than the single-segment implementations
  * accessed via L<SegReader|Lucy::Index::SegReader>.
@@ -37,12 +37,12 @@ class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
     open(Obj *index, Snapshot *snapshot = NULL, IndexManager *manager = NULL);
 
     /**
-     * @param index Either a string filepath or a L<Lucy::Folder>.  
+     * @param index Either a string filepath or a L<Lucy::Folder>.
      * @param snapshot A Snapshot.  If not supplied, the most recent snapshot
      * file will be used.
      * @param manager An L<IndexManager|Lucy::Index::IndexManager>.
      * Read-locking is off by default; supplying this argument turns it on.
-     */ 
+     */
     public inert nullable PolyReader*
     do_open(PolyReader *self, Obj *index, Snapshot *snapshot = NULL, 
             IndexManager *manager = NULL);

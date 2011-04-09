@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** In-memory Folder implementation.
- * 
+ *
  * RAMFolder is an entirely in-memory implementation of
  * L<Lucy::Store::Folder>, primarily used for testing and development.
  */

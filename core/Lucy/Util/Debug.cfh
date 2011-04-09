@@ -20,26 +20,26 @@ parcel Lucy;
  * debug statements is only compiled "#ifdef LUCY_DEBUG" at compile-time.
  * Some statements will then always print; additional output can be enabled
  * using the environment variable LUCY_DEBUG.  Examples:
- * 
+ *
  *   LUCY_DEBUG=file.C      -> all debug statements in path/file.C
  *   LUCY_DEBUG=func        -> all in functions named exactly 'func'
- *   LUCY_DEBUG=f*          -> all in functions (or files) starting with 'f' 
+ *   LUCY_DEBUG=f*          -> all in functions (or files) starting with 'f'
  *   LUCY_DEBUG=file*       -> all in files (or functions) ending with file*'
  *   LUCY_DEBUG=func1,func2 -> either in func1 or in func2
  *   LUCY_DEBUG=*           -> just print all debug statements
- * 
+ *
  * The wildcard character '*' can only go at the end of an identifier.
  */
 
 inert class Lucy::Util::Debug {
 
-    /** Private function, used only by the DEBUG macros. 
+    /** Private function, used only by the DEBUG macros.
      */
     inert void
     print_mess(const char *file, int line, const char *func, 
                const char *pat, ...);
 
-    /** Private function, used only by the DEBUG macros. 
+    /** Private function, used only by the DEBUG macros.
      */
     inert int 
     debug_should_print(const char *path, const char *func);
@@ -68,7 +68,7 @@ __C__
 #include <stdio.h>
 #include <stdlib.h>
 
-/** Unconditionally print debug statement prepending file and line info. 
+/** Unconditionally print debug statement prepending file and line info.
  */
 #define LUCY_DEBUG_PRINT(args...)                                         \
     lucy_Debug_print_mess(__FILE__, __LINE__, __func__, ##args)

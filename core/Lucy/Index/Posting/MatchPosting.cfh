@@ -22,7 +22,7 @@ parcel Lucy;
  * instance, if you need to determine that that a query matches a particular
  * category, but don't want the match to contribute to the document score, use
  * MatchPosting for the field.
- */ 
+ */
 class Lucy::Index::Posting::MatchPosting cnick MatchPost
     inherits Lucy::Index::Posting {
 

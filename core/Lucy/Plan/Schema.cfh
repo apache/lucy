@@ -42,7 +42,7 @@ class Lucy::Plan::Schema inherits Lucy::Object::Obj {
     public inert Schema*
     init(Schema *self);
 
-    /** Factory method which creates an Architecture object for this index. 
+    /** Factory method which creates an Architecture object for this index.
      */
     public incremented Architecture*
     Architecture(Schema *self);

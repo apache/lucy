@@ -154,7 +154,7 @@ LexIndex_seek(LexIndex *self, Obj *target)
             THROW(ERR, "Target is a %o, and not comparable to a %o",
                 Obj_Get_Class_Name(target), VTable_Get_Name(CHARBUF));
         }
-        /* TODO: 
+        /* TODO:
         Obj *first_obj = VA_Fetch(terms, 0);
         if ( !Obj_Is_A(target, Obj_Get_VTable(first_obj)) ) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",

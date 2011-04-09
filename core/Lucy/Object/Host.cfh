@@ -53,16 +53,16 @@ __C__
 __END_C__
 
 /** Callbacks to the host environment.
- * 
+ *
  * All the callback functions are variadic, and all are designed to take a
  * series of arguments using the ARG_XXX macros.
- * 
- *   int32_t area = (int32_t)Host_callback_i64(self, "calc_area", 2, 
+ *
+ *   int32_t area = (int32_t)Host_callback_i64(self, "calc_area", 2,
  *        ARG_I32("length", len),  ARG_I32("width", width) );
- * 
+ *
  * The first argument is void* to avoid the need for tiresome casting to Obj*,
  * but must always be a Clownfish object.
- * 
+ *
  * If the invoker is a VTable, it will be used to make a class
  * callback rather than an object callback.
  */
@@ -93,7 +93,7 @@ inert class Lucy::Object::Host {
     callback_obj(void *self, char *method, uint32_t num_args, ...);
 
     /** Invoke an object method, expecting a host string of some kind back,
-     * which will be converted into a newly allocated CharBuf.  
+     * which will be converted into a newly allocated CharBuf.
      */
     inert incremented nullable CharBuf*
     callback_str(void *self, char *method, uint32_t num_args, ...);

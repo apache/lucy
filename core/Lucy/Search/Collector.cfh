@@ -21,7 +21,7 @@ parcel Lucy;
  * A Collector decides what to do with the hits that a
  * L<Matcher|Lucy::Search::Matcher> iterates through, based on how the
  * abstract Collect() method is implemented.
- * 
+ *
  * Collectors operate on individual segments, but must operate within the
  * context of a larger collection.  Each time the collector moves to a new
  * segment, Set_Reader(), Set_Base() and Set_Matcher() will be called, and the
@@ -85,7 +85,7 @@ class Lucy::Search::Collector::BitCollector cnick BitColl
 
     BitVector    *bit_vec;
 
-    /** 
+    /**
      * @param bit_vector A Lucy::Object::BitVector.
      */
     public inert BitCollector*

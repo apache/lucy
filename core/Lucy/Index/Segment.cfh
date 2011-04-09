@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Warehouse for information about one segment of an inverted index.
- * 
+ *
  * Apache Lucy's indexes are made up of individual "segments", each of which is
  * is an independent inverted index.  On the file system, each segment is a
  * directory within the main index directory whose name starts with "seg_":
@@ -46,7 +46,7 @@ class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
     public inert Segment*
     init(Segment *self, int64_t number);
 
-    /** Return a segment name with a base-36-encoded segment number. 
+    /** Return a segment name with a base-36-encoded segment number.
      */
     inert incremented CharBuf*
     num_to_name(int64_t number);
@@ -59,7 +59,7 @@ class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
 
     /** Register a new field and assign it a field number.  If the field was
      * already known, nothing happens.
-     * 
+     *
      * @param field Field name.
      * @return the field's field number, which is a positive integer.
      */
@@ -90,8 +90,8 @@ class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
 
     /** Given a field name, return its field number for this segment (which
      * may differ from its number in other segments).  Return 0 (an invalid
-     * field number) if the field name can't be found.  
-     * 
+     * field number) if the field name can't be found.
+     *
      * @param field Field name.
      */
     public int32_t
@@ -108,7 +108,7 @@ class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
     public CharBuf*
     Get_Name(Segment *self);
 
-    /** Getter for the segment number. 
+    /** Getter for the segment number.
      */
     public int64_t
     Get_Number(Segment *self);
@@ -147,7 +147,7 @@ class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
     public bool_t
     Read_File(Segment *self, Folder *folder);
 
-    /** Compare by segment number. 
+    /** Compare by segment number.
      */
     public int32_t
     Compare_To(Segment *self, Obj *other);

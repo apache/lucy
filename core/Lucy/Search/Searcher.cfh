@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Base class for searching collections of documents.
- * 
+ *
  * Abstract base class for objects which search.  Core subclasses include
  * L<Lucy::Search::IndexSearcher> and
  * L<Lucy::Search::PolySearcher>.
@@ -28,7 +28,7 @@ class Lucy::Search::Searcher inherits Lucy::Object::Obj {
     Schema      *schema;
     QueryParser *qparser;
 
-    /** Abstract constructor. 
+    /** Abstract constructor.
      *
      * @param schema A Schema.
      */
@@ -48,7 +48,7 @@ class Lucy::Search::Searcher inherits Lucy::Object::Obj {
 
     /** Return the number of documents which contain the term in the given
      * field.
-     * 
+     *
      * @param field Field name.
      * @param term The term to look up.
      */
@@ -70,7 +70,7 @@ class Lucy::Search::Searcher inherits Lucy::Object::Obj {
      * <code>offset</code> to 20 and <code>num_wanted</code> to 10 retrieves
      * hits 21-30, assuming that 30 hits can be found.
      * @param num_wanted The number of hits you would like to see after
-     * <code>offset</code> is taken into account.  
+     * <code>offset</code> is taken into account.
      * @param sort_spec A L<Lucy::Search::SortSpec>, which will affect
      * how results are ranked and returned.
      */
@@ -80,7 +80,7 @@ class Lucy::Search::Searcher inherits Lucy::Object::Obj {
 
     /** Iterate over hits, feeding them into a
      * L<Collector|Lucy::Search::Collector>.
-     * 
+     *
      * @param query A Query.
      * @param collector A Collector.
      */

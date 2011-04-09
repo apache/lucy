@@ -64,7 +64,7 @@ chaz_Util_warn(const char *format, ...);
 /* Attept to delete a file.  Don't error if the file wasn't there to begin
  * with.  Return 1 if it seems like the file is gone because an attempt to
  * open it for reading fails (this doesn't guarantee that the file is gone,
- * but it works well enough for our purposes).  Return 0 if we can still 
+ * but it works well enough for our purposes).  Return 0 if we can still
  * read the file.
  */
 int

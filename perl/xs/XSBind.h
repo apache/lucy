@@ -88,7 +88,7 @@ cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj)
     return obj ? (SV*)Cfish_Obj_To_Host(obj) : newSV(0);
 }
 
-/** XSBind_cfish_obj_to_sv, with a cast. 
+/** XSBind_cfish_obj_to_sv, with a cast.
  */
 #define CFISH_OBJ_TO_SV(_obj) cfish_XSBind_cfish_obj_to_sv((cfish_Obj*)_obj)
 
@@ -110,7 +110,7 @@ cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj)
     return retval;
 }
 
-/** XSBind_cfish_obj_to_sv_noinc, with a cast. 
+/** XSBind_cfish_obj_to_sv_noinc, with a cast.
  */
 #define CFISH_OBJ_TO_SV_NOINC(_obj) \
     cfish_XSBind_cfish_obj_to_sv_noinc((cfish_Obj*)_obj)
@@ -147,54 +147,54 @@ cfish_XSBind_enable_overload(void *pobj);
 /** Process hash-style params passed to an XS subroutine.  The varargs must be
  * a NULL-terminated series of ALLOT_ macros.
  *
- *     cfish_XSBind_allot_params(stack, start, num_stack_elems, 
- *         "Lucy::Search::TermQuery::new_PARAMS", 
+ *     cfish_XSBind_allot_params(stack, start, num_stack_elems,
+ *         "Lucy::Search::TermQuery::new_PARAMS",
  *          ALLOT_OBJ(&field, "field", 5, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
  *          ALLOT_OBJ(&term, "term", 4, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
  *          NULL);
- * 
+ *
  * The following ALLOT_ macros are available for primitive types:
- * 
- *     ALLOT_I8(ptr, key, keylen, required) 
- *     ALLOT_I16(ptr, key, keylen, required) 
- *     ALLOT_I32(ptr, key, keylen, required) 
- *     ALLOT_I64(ptr, key, keylen, required) 
- *     ALLOT_U8(ptr, key, keylen, required) 
- *     ALLOT_U16(ptr, key, keylen, required) 
- *     ALLOT_U32(ptr, key, keylen, required) 
- *     ALLOT_U64(ptr, key, keylen, required) 
- *     ALLOT_BOOL(ptr, key, keylen, required) 
- *     ALLOT_CHAR(ptr, key, keylen, required) 
- *     ALLOT_SHORT(ptr, key, keylen, required) 
- *     ALLOT_INT(ptr, key, keylen, required) 
- *     ALLOT_LONG(ptr, key, keylen, required) 
- *     ALLOT_SIZE_T(ptr, key, keylen, required) 
- *     ALLOT_F32(ptr, key, keylen, required) 
- *     ALLOT_F64(ptr, key, keylen, required) 
- * 
+ *
+ *     ALLOT_I8(ptr, key, keylen, required)
+ *     ALLOT_I16(ptr, key, keylen, required)
+ *     ALLOT_I32(ptr, key, keylen, required)
+ *     ALLOT_I64(ptr, key, keylen, required)
+ *     ALLOT_U8(ptr, key, keylen, required)
+ *     ALLOT_U16(ptr, key, keylen, required)
+ *     ALLOT_U32(ptr, key, keylen, required)
+ *     ALLOT_U64(ptr, key, keylen, required)
+ *     ALLOT_BOOL(ptr, key, keylen, required)
+ *     ALLOT_CHAR(ptr, key, keylen, required)
+ *     ALLOT_SHORT(ptr, key, keylen, required)
+ *     ALLOT_INT(ptr, key, keylen, required)
+ *     ALLOT_LONG(ptr, key, keylen, required)
+ *     ALLOT_SIZE_T(ptr, key, keylen, required)
+ *     ALLOT_F32(ptr, key, keylen, required)
+ *     ALLOT_F64(ptr, key, keylen, required)
+ *
  * The four arguments to these ALLOT_ macros have the following meanings:
- *   
+ *
  *     ptr -- A pointer to the variable to be extracted.
  *     key -- The name of the parameter as a C string.
  *     keylen -- The length of the parameter name in bytes.
- *     required -- A boolean indicating whether the parameter is required. 
- * 
+ *     required -- A boolean indicating whether the parameter is required.
+ *
  * If a required parameter is not present, allot_params() will immediately
  * cease processing of parameters, set Err_error and return false.
- * 
+ *
  * Use the following macro if a Clownfish object is desired:
- * 
- *     ALLOT_OBJ(ptr, key, keylen, required, vtable, allocation) 
- * 
+ *
+ *     ALLOT_OBJ(ptr, key, keylen, required, vtable, allocation)
+ *
  * The "vtable" argument must be the VTable corresponding to the class of the
  * desired object.  The "allocation" argument must be a blob of memory
  * allocated on the stack sufficient to hold a ZombieCharBuf.  (Use
  * cfish_ZCB_size() to find the allocation size.)
- * 
+ *
  * To extract a Perl scalar, use the following ALLOT_ macro:
  *
- *     ALLOT_SV(ptr, key, keylen, required) 
- * 
+ *     ALLOT_SV(ptr, key, keylen, required)
+ *
  * @param stack The Perl stack.
  * @param start Where on the Perl stack to start looking for params.  For
  * methods, this would typically be 1; for functions, most likely 0.

@@ -17,13 +17,13 @@
 parcel Lucy;
 
 /** Read from a compound file.
- * 
+ *
  * A CompoundFileReader provides access to the files contained within the
  * compound file format written by CompoundFileWriter.  The InStream objects
  * it spits out behave largely like InStreams opened against discrete files --
  * e.g. Seek(0) seeks to the beginning of the sub-file, not the beginning of
- * the compound file.  
- * 
+ * the compound file.
+ *
  * Each of the InStreams spawned maintains its own memory buffer; however,
  * they all share a single filehandle.  This allows Lucy to get around
  * the limitations that many operating systems place on the number of

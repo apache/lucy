@@ -17,14 +17,14 @@
 parcel Lucy;
 
 /** Iterator for a field's terms.
- * 
+ *
  * A Lexicon is an iterator which provides access to all the unique terms for
  * a given field in sorted order.
- * 
+ *
  * If an index consists of two documents with a 'content' field holding "three
  * blind mice" and "three musketeers" respectively, then iterating through the
  * 'content' field's lexicon would produce this list:
- * 
+ *
  *     blind
  *     mice
  *     musketeers
@@ -48,8 +48,8 @@ class Lucy::Index::Lexicon cnick Lex inherits Lucy::Object::Obj {
     public abstract void
     Seek(Lexicon *self, Obj *target = NULL);
 
-    /** Proceed to the next term.  
-     * 
+    /** Proceed to the next term.
+     *
      * @return true until the iterator is exhausted, then false.
      */
     public abstract bool_t
@@ -62,7 +62,7 @@ class Lucy::Index::Lexicon cnick Lex inherits Lucy::Object::Obj {
     Reset(Lexicon *self);
 
     /** Return the number of documents that the current term appears in at
-     * least once.  Deleted documents may be included in the count. 
+     * least once.  Deleted documents may be included in the count.
      */
     public abstract int32_t
     Doc_Freq(Lexicon *self);

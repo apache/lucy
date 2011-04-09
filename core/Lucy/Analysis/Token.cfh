@@ -21,9 +21,9 @@ parcel Lucy;
  * Token is the fundamental unit used by Apache Lucy's Analyzer subclasses.
  * Each Token has 5 attributes: <code>text</code>, <code>start_offset</code>,
  * <code>end_offset</code>, <code>boost</code>, and <code>pos_inc</code>.
- * 
+ *
  * The <code>text</code> attribute is a Unicode string encoded as UTF-8.
- * 
+ *
  * <code>start_offset</code> is the start point of the token text, measured in
  * Unicode code points from the top of the stored field;
  * <code>end_offset</code> delimits the corresponding closing boundary.
@@ -34,13 +34,13 @@ parcel Lucy;
  * after stemming, the text is "beat", but the start_offset is still 0 and the
  * end_offset is still 7.  This allows "beating" to be highlighted correctly
  * after a search matches "beat".
- * 
+ *
  * <code>boost</code> is a per-token weight.  Use this when you want to assign
  * more or less importance to a particular token, as you might for emboldened
  * text within an HTML document, for example.  (Note: The field this token
  * belongs to must be spec'd to use a posting of type
  * L<Lucy::Index::Posting::RichPosting>.)
- * 
+ *
  * <code>pos_inc</code is the POSition INCrement, measured in Tokens.  This
  * attribute, which defaults to 1, is a an advanced tool for manipulating
  * phrase matching.  Ordinarily, Tokens are assigned consecutive position

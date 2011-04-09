@@ -329,14 +329,14 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
         }
     } 
 
-    /* Move "equal" elements from the outside edges to the center. 
-     * 
-     * Before: 
-     * 
+    /* Move "equal" elements from the outside edges to the center.
+     *
+     * Before:
+     *
      *    equal  |  less_than  |  greater_than  |  equal
-     * 
-     * After: 
-     * 
+     *
+     * After:
+     *
      *    less_than  |       equal       |  greater_than
      */
     {
@@ -435,14 +435,14 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
         }
     } 
 
-    /* Move "equal" elements from the outside edges to the center. 
-     * 
-     * Before: 
-     * 
+    /* Move "equal" elements from the outside edges to the center.
+     *
+     * Before:
+     *
      *    equal  |  less_than  |  greater_than  |  equal
-     * 
-     * After: 
-     * 
+     *
+     * After:
+     *
      *    less_than  |       equal       |  greater_than
      */
     {

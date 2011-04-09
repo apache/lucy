@@ -20,9 +20,9 @@ __C__
 #include <stdarg.h>
 __END_C__
 
-/** 
- * Growable buffer holding Unicode characters. 
- */ 
+/**
+ * Growable buffer holding Unicode characters.
+ */
 
 class Lucy::Object::CharBuf cnick CB
     inherits Lucy::Object::Obj {
@@ -61,9 +61,9 @@ class Lucy::Object::CharBuf cnick CB
     inert incremented CharBuf*
     new_steal_from_trusted_str(char *ptr, size_t size, size_t cap);
 
-    /** Return a pointer to a new CharBuf which contains formatted data 
-     * expanded according to CB_VCatF.  
-     * 
+    /** Return a pointer to a new CharBuf which contains formatted data
+     * expanded according to CB_VCatF.
+     *
      * Note: a user-supplied <code>pattern</code> string is a security hole
      * and must not be allowed.
      */
@@ -107,10 +107,10 @@ class Lucy::Object::CharBuf cnick CB
      * char*:    %s
      * integers: %i8 %i32 %i64 %u8 %u32 %u64
      * floats:   %f64
-     * hex:      %x32 
-     * 
+     * hex:      %x32
+     *
      * Note that all Clownfish Objects, including CharBufs, are printed via
-     * %o (which invokes Obj_To_String()). 
+     * %o (which invokes Obj_To_String()).
      */
     void
     VCatF(CharBuf *self, const char *pattern, va_list args);
@@ -151,7 +151,7 @@ class Lucy::Object::CharBuf cnick CB
     /** Assign more memory to the CharBuf, if it doesn't already have enough
      * room to hold a string of <code>size</code> bytes.  Cannot shrink the
      * allocation.
-     * 
+     *
      * @return a pointer to the raw buffer.
      */
     char*
@@ -191,7 +191,7 @@ class Lucy::Object::CharBuf cnick CB
     bool_t
     Equals_Str(CharBuf *self, const char *ptr, size_t size);
 
-    /** Return the number of Unicode code points in the object's string. 
+    /** Return the number of Unicode code points in the object's string.
      */
     size_t
     Length(CharBuf *self);
@@ -363,7 +363,7 @@ class Lucy::Object::ZombieCharBuf cnick ZCB
     inert incremented ZombieCharBuf*
     new(void *allocation);
 
-    /** 
+    /**
      * @param allocation A single block of memory which will be used for both
      * the ZombieCharBuf object and its buffer.
      * @param alloc_size The size of the allocation.
@@ -378,7 +378,7 @@ class Lucy::Object::ZombieCharBuf cnick ZCB
     inert incremented ZombieCharBuf*
     wrap_str(void *allocation, const char *ptr, size_t size);
 
-    /** Return the size for a ZombieCharBuf struct. 
+    /** Return the size for a ZombieCharBuf struct.
      */
     inert size_t
     size();

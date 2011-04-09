@@ -428,7 +428,7 @@ SI_competitive(SortCollector *self, int32_t doc_id)
      * const automatic variables in order to improve code clarity and provide
      * more hints to the compiler about what variables are actually invariant
      * for the duration of this routine:
-     * 
+     *
      *     uint8_t *const actions    = self->actions;
      *     const uint32_t num_rules  = self->num_rules;
      *     const int32_t bubble_doc = self->bubble_doc;

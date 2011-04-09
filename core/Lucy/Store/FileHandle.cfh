@@ -17,14 +17,14 @@
 parcel Lucy;
 
 /** Abstract class for reading and writing to files.
- * 
+ *
  * FileHandle abstracts low-level unbuffered read/write and memory mapping
  * operations.  Implementations might reference data in a local file system, a
  * RAM "file", a custom-constructed compound file, etc.
- * 
+ *
  * Desired behaviors for a FileHandle are expressed via flags supplied to the
  * constructor:
- * 
+ *
  *     * FH_READ_ONLY - Read only.
  *     * FH_WRITE_ONLY - Write only.
  *     * FH_CREATE - Create the file if it does not yet exist.
@@ -55,7 +55,7 @@ abstract class Lucy::Store::FileHandle cnick FH
     do_open(FileHandle *self, const CharBuf *path = NULL, uint32_t flags);
 
     /** Ensure that the FileWindow's buffer provides access to file data for
-     * <code>len</code> bytes starting at <code>offset</code>. 
+     * <code>len</code> bytes starting at <code>offset</code>.
      *
      * @param window A FileWindow.
      * @param offset File position to begin at.

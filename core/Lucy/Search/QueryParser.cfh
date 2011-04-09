@@ -17,28 +17,28 @@
 parcel Lucy;
 
 /** Transform a string into a Query object.
- * 
+ *
  * QueryParser accepts search strings as input and produces
  * L<Lucy::Search::Query> objects, suitable for feeding into
  * L<IndexSearcher|Lucy::Search::IndexSearcher> and other
  * L<Searcher|Lucy::Search::Searcher> subclasses.
- * 
+ *
  * The following syntactical constructs are recognized by QueryParser:
- * 
+ *
  *     * Boolean operators 'AND', 'OR', and 'AND NOT'.
- *     * Prepented +plus and -minus, indicating that the labeled entity 
- *       should be either required or forbidden -- be it a single word, a 
+ *     * Prepented +plus and -minus, indicating that the labeled entity
+ *       should be either required or forbidden -- be it a single word, a
  *       phrase, or a parenthetical group.
- *     * Logical groups, delimited by parentheses.  
+ *     * Logical groups, delimited by parentheses.
  *     * Phrases, delimited by double quotes.
- * 
+ *
  * Additionally, the following syntax can be enabled via Set_Heed_Colons():
- * 
- *     * Field-specific constructs, in the form of 'fieldname:termtext' or 
+ *
+ *     * Field-specific constructs, in the form of 'fieldname:termtext' or
  *       'fieldname:(foo bar)'.  (The field specified by 'fieldname:' will be
  *       used instead of the QueryParser's default fields).
- * 
- * 
+ *
+ *
  */
 class Lucy::Search::QueryParser cnick QParser 
     inherits Lucy::Object::Obj {
@@ -93,7 +93,7 @@ class Lucy::Search::QueryParser cnick QParser
      *
      * The output of Tree() is an intermediate form which must be passed
      * through Expand() before being used to feed a search.
-     * 
+     *
      * @param query_string The string to be parsed.
      * @return a Query.
      */
@@ -128,13 +128,13 @@ class Lucy::Search::QueryParser cnick QParser
      * Query objects built via Tree() and Expand() can generate "return the
      * world" result sets, such as in the case of
      * <code>NOT a_term_not_in_the_index</code>; Prune() walks the hierarchy
-     * and eliminates such branches.  
-     * 
+     * and eliminates such branches.
+     *
      *      'NOT foo'               => [NOMATCH]
      *      'foo OR NOT bar'        => 'foo'
      *      'foo OR (-bar AND -baz) => 'foo'
-     * 
-     * Prune() also eliminates some double-negative constructs -- even though 
+     *
+     * Prune() also eliminates some double-negative constructs -- even though
      * such constructs may not actually return the world:
      *
      *      'foo AND -(-bar)'      => 'foo'
@@ -151,7 +151,7 @@ class Lucy::Search::QueryParser cnick QParser
     public incremented Query*
     Prune(QueryParser *self, Query *query = NULL);
 
-    /** Factory method creating a TermQuery. 
+    /** Factory method creating a TermQuery.
      *
      * @param field Field name.
      * @param term Term text.
@@ -160,7 +160,7 @@ class Lucy::Search::QueryParser cnick QParser
     public incremented Query*
     Make_Term_Query(QueryParser *self, const CharBuf *field, Obj *term);
 
-    /** Factory method creating a PhraseQuery. 
+    /** Factory method creating a PhraseQuery.
      *
      * @param field Field that the phrase must occur in.
      * @param terms Ordered array of terms that must match.
@@ -169,23 +169,23 @@ class Lucy::Search::QueryParser cnick QParser
     public incremented Query*
     Make_Phrase_Query(QueryParser *self, const CharBuf *field, VArray *terms);
 
-    /** Factory method creating an ORQuery. 
-     * 
+    /** Factory method creating an ORQuery.
+     *
      * @param children Array of child Queries.
      * @return A Query.
      */
     public incremented Query*
     Make_OR_Query(QueryParser *self, VArray *children = NULL);
 
-    /** Factory method creating an ANDQuery. 
-     * 
+    /** Factory method creating an ANDQuery.
+     *
      * @param children Array of child Queries.
      * @return A Query.
      */
     public incremented Query*
     Make_AND_Query(QueryParser *self, VArray *children = NULL);
 
-    /** Factory method creating a NOTQuery. 
+    /** Factory method creating a NOTQuery.
      *
      * @param negated_query Query to be inverted.
      * @return A Query.
@@ -193,7 +193,7 @@ class Lucy::Search::QueryParser cnick QParser
     public incremented Query*
     Make_NOT_Query(QueryParser *self, Query *negated_query);
 
-    /** Factory method creating a RequiredOptionalQuery. 
+    /** Factory method creating a RequiredOptionalQuery.
      *
      * @param required_query Query must must match.
      * @param optional_query Query which should match.

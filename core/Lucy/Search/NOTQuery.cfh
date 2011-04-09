@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Invert the result set of another Query.
- * 
+ *
  * A NOTQuery wraps another L<Query|Lucy::Search::Query> and matches
  * against its inverse document set.  All matching docs recieve a score of
  * 0.0.

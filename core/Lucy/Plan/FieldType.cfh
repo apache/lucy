@@ -38,11 +38,11 @@ __C__
 
 __END_C__
 
-/** Define a field's behavior. 
- * 
+/** Define a field's behavior.
+ *
  * FieldType is an abstract class defining a set of traits and behaviors which
- * may be associated with one or more field names. 
- * 
+ * may be associated with one or more field names.
+ *
  * Properties which are common to all field types include <code>boost</code>,
  * <code>indexed</code>, <code>stored</code>, <code>sortable</code>,
  * <code>binary</code>, and <code>similarity</code>.
@@ -50,16 +50,16 @@ __END_C__
  * The <code>boost</code> property is a floating point scoring multiplier
  * which defaults to 1.0.  Values greater than 1.0 cause the field to
  * contribute more to a document's score, lower values, less.
- * 
+ *
  * The <code>indexed</code> property indicates whether the field should be
- * indexed (so that it can be searched). 
- * 
+ * indexed (so that it can be searched).
+ *
  * The <code>stored</code> property indicates whether to store the raw field
  * value, so that it can be retrieved when a document turns up in a search.
- * 
+ *
  * The <code>sortable</code> property indicates whether search results should
  * be sortable based on the contents of the field.
- * 
+ *
  * The <code>binary</code> property indicates whether the field contains
  * binary or text data.  Unlike most other properties, <code>binary</code> is
  * not settable.
@@ -131,19 +131,19 @@ abstract class Lucy::Plan::FieldType cnick FType
 
     /** Compare two values for the field.  The default implementation
      * dispatches to the Compare_To() method of argument <code>a</code>.
-     * 
+     *
      * @return a negative number if a is "less than" b, 0 if they are "equal",
      * and a positive number if a is "greater than" b.
      */
     public int32_t
     Compare_Values(FieldType *self, Obj *a, Obj *b);
 
-    /** NULL-safe comparison wrapper which sorts NULLs towards the back. 
+    /** NULL-safe comparison wrapper which sorts NULLs towards the back.
      */
     inert inline int32_t
     null_back_compare_values(FieldType *self, Obj *a, Obj *b);
 
-    /** Produce a Stepper suitable for use by a Lexicon. 
+    /** Produce a Stepper suitable for use by a Lexicon.
      */
     abstract incremented TermStepper*
     Make_Term_Stepper(FieldType *self);

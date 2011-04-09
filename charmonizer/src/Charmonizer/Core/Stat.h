@@ -22,7 +22,7 @@
  *
  * Since we don't know whether we have 64-bit integers when Charmonizer itself
  * gets compiled, the items in the stat structure are whatever size longs are.
- * 
+ *
  * TODO: probe for which fields are available.
  */
 

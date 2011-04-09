@@ -21,7 +21,7 @@ parcel Lucy;
  * ScorePosting is the default posting format in Apache Lucy.  The
  * term-document pairing used by MatchPosting is supplemented by additional
  * frequency, position, and weighting information.
- */ 
+ */
 class Lucy::Index::Posting::ScorePosting cnick ScorePost
     inherits Lucy::Index::Posting::MatchPosting {
 

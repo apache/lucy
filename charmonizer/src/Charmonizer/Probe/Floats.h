@@ -15,23 +15,23 @@
  */
 
 /* Charmonizer/Probe/Floats.h -- floating point types.
- * 
+ *
  * The following symbols will be created if the platform supports IEEE 754
  * floating point types:
- * 
+ *
  * F32_NAN
  * F32_INF
  * F32_NEGINF
  *
  * The following typedefs will be created if the platform supports IEEE 754
  * floating point types:
- * 
+ *
  * f32_t
  * f64_t
  *
  * Availability of the preceding typedefs is indicated by which of these are
  * defined:
- * 
+ *
  * HAS_F32_T
  * HAS_F64_T
  *

@@ -19,7 +19,7 @@ parcel Lucy;
 /** Writer for sortable fields.
  *
  * Changes for format version 3:
- *    
+ *
  *   * Big-endian byte order instead of native byte order for ".ord" files.
  *   * "ord_widths" key added to metadata.
  *   * In variable-width cache formats, NULL entries get a file pointer in the

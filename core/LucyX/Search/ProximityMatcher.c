@@ -215,7 +215,7 @@ SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
     /* This function is a loop that finds terms that can continue a phrase.
      * It overwrites the anchors in place, and returns the number remaining.
      * The basic algorithm is to alternately increment the candidates' pointer
-     * until it is at or beyond its target position, and then increment the 
+     * until it is at or beyond its target position, and then increment the
      * anchors' pointer until it is at or beyond its target.  The non-standard
      * form is to avoid unnecessary comparisons.  This loop has not been
      * tested for speed, but glancing at the object code produced (objdump -S)
@@ -254,17 +254,17 @@ ProximityMatcher_calc_proximity_freq(ProximityMatcher *self)
 {
     PostingList **const plists   = self->plists;
 
-    /* Create a overwriteable "anchor set" from the first posting.  
+    /* Create a overwriteable "anchor set" from the first posting.
      *
      * Each "anchor" is a position, measured in tokens, corresponding to a a
      * term which might start a phrase.  We start off with an "anchor set"
      * comprised of all positions at which the first term in the phrase occurs
-     * in the field.  
-     * 
+     * in the field.
+     *
      * There can never be more proximity matches than instances of this first
      * term.  There may be fewer however, which we will determine by seeing
      * whether all the other terms line up at subsequent position slots.
-     * 
+     *
      * Every time we eliminate an anchor from the anchor set, we splice it out
      * of the array.  So if we begin with an anchor set of (15, 51, 72) and we
      * discover that matches occur at the first and last instances of the
@@ -321,7 +321,7 @@ ProximityMatcher_score(ProximityMatcher *self)
 {
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(self->plists[0]);
     float score = Sim_TF(self->sim, self->proximity_freq) 
-                * self->weight 
+                * self->weight
                 * posting->weight;
     return score;
 }

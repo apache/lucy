@@ -45,7 +45,7 @@ class Lucy::Highlight::HeatMap inherits Lucy::Object::Obj {
      *   Span 2: positions 16-30, score .5
      *
      * After merging, there will be three.
-     * 
+     *
      *   Span 1: positions 11-16, score .3
      *   Span 2: positions 16-20, score .8
      *   Span 3: positions 20-30, score .5

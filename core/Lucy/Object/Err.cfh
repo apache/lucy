@@ -16,13 +16,13 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Exception.
- * 
+ *
  * Most of the time when Lucy encounters an error, it tries to raise a
  * Lucy::Object::Err exception with an error message and context
  * information.
- * 
+ *
  * At present, it is only safe to catch exceptions which are specifically
  * documented as catchable; most times when an Err is raised, Lucy leaks
  * memory.
@@ -51,7 +51,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
     void*
     To_Host(Err *self);
 
-    /** Concatenate the supplied argument onto the internal "mess". 
+    /** Concatenate the supplied argument onto the internal "mess".
      */
     public void
     Cat_Mess(Err *self, const CharBuf *mess);
@@ -67,7 +67,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
     public incremented Err*
     Make(Err *self);
 
-    /** Set the value of "error", a per-thread Err shared variable. 
+    /** Set the value of "error", a per-thread Err shared variable.
      */
     public inert void
     set_error(decremented Err *error);
@@ -104,7 +104,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
     inert void
     throw_mess(VTable *vtable, decremented CharBuf *message);
 
-    /** Invoke host exception handling.  
+    /** Invoke host exception handling.
      */
     inert void
     do_throw(decremented Err *self);
@@ -126,7 +126,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
 
     /** Verify that <code>obj</code> is either NULL or inherits from
      * the class represented by <code>vtable</code>.
-     * 
+     *
      * @return the object.
      */
     inert nullable Obj*
@@ -135,7 +135,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
 
     /** Verify that <code>obj</code> is not NULL and inherits from the class
      * represented by <code>vtable</code>.
-     * 
+     *
      * @return the object.
      */
     inert Obj*
@@ -148,7 +148,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
     abstract_class_check(Obj *obj, VTable *vtable);
 
     /** On Windows, return a newly allocated buffer containing the string
-     * description for the the last error in the thread. 
+     * description for the the last error in the thread.
      */
     inert char*
     win_error();

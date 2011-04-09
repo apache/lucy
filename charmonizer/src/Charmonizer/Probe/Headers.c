@@ -39,7 +39,7 @@ S_keep(const char *header_name);
 static size_t aff_buf_size = 0;
 static char *aff_buf = NULL;
 
-/* Transform "header.h" into "CHY_HAS_HEADER_H, storing the result in 
+/* Transform "header.h" into "CHY_HAS_HEADER_H, storing the result in
  * [aff_buf].
  */
 static void

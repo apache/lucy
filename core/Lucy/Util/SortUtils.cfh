@@ -22,11 +22,11 @@ typedef int
 __END_C__
 
 /** Specialized sorting routines.
- * 
+ *
  * SortUtils provides a merge sort algorithm which allows access to its
  * internals, enabling specialized functions to jump in and only execute part
  * of the sort.
- * 
+ *
  * SortUtils also provides a quicksort with an additional context argument.
  */
 inert class Lucy::Util::SortUtils cnick Sort {
@@ -42,13 +42,13 @@ inert class Lucy::Util::SortUtils cnick Sort {
 
     /** Merge two source arrays together using the classic mergesort merge
      * algorithm, storing the result in <code>dest</code>.
-     * 
+     *
      * Most merge functions operate on a single contiguous array and copy the
      * merged results results back into the source array before returning.
      * These two differ in that it is possible to operate on two discontiguous
      * source arrays.  Copying the results back into the source array is the
      * responsibility of the caller.
-     * 
+     *
      * Lucy's external sort takes advantage of this when it is reading
      * back pre-sorted runs from disk and merging the streams into a
      * consolidated buffer.
@@ -58,7 +58,7 @@ inert class Lucy::Util::SortUtils cnick Sort {
           void *right_ptr, uint32_t right_num_elems,
           void *dest, size_t width, lucy_Sort_compare_t compare, void *context);
 
-    /** Quicksort. 
+    /** Quicksort.
      */
     inert void
     quicksort(void *elems, size_t num_elems, size_t width, 

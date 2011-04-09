@@ -17,10 +17,10 @@
 parcel Lucy;
 
 /** Write postings data to an index.
- * 
+ *
  * PostingListWriter writes frequency and positional data files, plus feeds
  * data to LexiconWriter.
- */ 
+ */
 
 class Lucy::Index::PostingListWriter cnick PListWriter
     inherits Lucy::Index::DataWriter {

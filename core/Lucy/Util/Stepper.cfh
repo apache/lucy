@@ -16,21 +16,21 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Abstract encoder/decoder.
- * 
+ *
  * Many Lucy files consist of a single variable length record type
  * repeated over and over.  A Stepper both reads and writes such a file.
- * 
+ *
  * Since the write algorithms for different Stepper types may require
  * differing argument lists, it is left to the subclass to define the routine.
- * 
+ *
  * Sometimes it is possible to change a file's format by changing only a
  * Stepper.  In that case, a compatibility version of the old class may be
  * squirreled away as a plugin, to be accessed only when reading files written
  * to the old format.  This cuts down on special-case code in the most current
  * version.
- * 
+ *
  * Furthermore, isolating I/O code within a Stepper typically clarifies the
  * logic of the class which calls Stepper_Read_Record.
  */
@@ -45,7 +45,7 @@ class Lucy::Util::Stepper inherits Lucy::Object::Obj {
 
     /** Update internal state to reflect <code>value</code> and write a frame
      * to <code>outstream</code> that can be read using Read_Key_Frame().
-     * 
+     *
      * @param outstream An OutStream.
      * @param value State information.
      */

@@ -42,7 +42,7 @@ class Lucy::Index::SortCache inherits Lucy::Object::Obj {
     public abstract nullable Obj*
     Value(SortCache *self, int32_t ord, Obj *blank);
 
-    /** Return an object appropriate for use as an argument to Value(). 
+    /** Return an object appropriate for use as an argument to Value().
      */
     public abstract incremented Obj*
     Make_Blank(SortCache *self);

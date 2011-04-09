@@ -24,7 +24,7 @@ parcel Lucy;
  *
  * In general, only one Indexer at a time may write to an index safely.  If a
  * write lock cannot be secured, new() will throw an exception.
- * 
+ *
  * If an index is located on a shared volume, each writer application must
  * identify itself by supplying an
  * L<IndexManager|Lucy::Index::IndexManager> with a unique
@@ -68,13 +68,13 @@ class Lucy::Index::Indexer inherits Lucy::Object::Obj {
      * @param schema A Schema.
      * @param index Either a string filepath or a Folder.
      * @param manager An IndexManager.
-     * @param flags Flags governing behavior.  
+     * @param flags Flags governing behavior.
      */
     public inert Indexer*
     init(Indexer *self, Schema *schema = NULL, Obj *index, 
          IndexManager *manager = NULL, int32_t flags = 0);
 
-    /** Add a document to the index.  
+    /** Add a document to the index.
      *
      * @param doc A Lucy::Document::Doc object.
      * @param boost A floating point weight which affects how this document
@@ -85,7 +85,7 @@ class Lucy::Index::Indexer inherits Lucy::Object::Obj {
 
     /** Absorb an existing index into this one.  The two indexes must
      * have matching Schemas.
-     * 
+     *
      * @param index Either an index path name or a Folder.
      */
     public void

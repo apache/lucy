@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Base class for TermMatchers.
  *
  * Each subclass of Posting is associated with a corresponding subclass of

@@ -205,7 +205,7 @@ TermCompiler_apply_norm_factor(TermCompiler *self, float query_norm_factor)
     self->query_norm_factor = query_norm_factor;
 
     /* Multiply raw weight by the idf and norm_q factors in this:
-     * 
+     *
      *      ( tf_q * idf_q / norm_q )
      *
      * Note: factoring in IDF a second time is correct.  See formula.

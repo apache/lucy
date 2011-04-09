@@ -16,11 +16,11 @@
 
 parcel Lucy;
 
-/** 
+/**
  * Heap sort / priority queue.
  *
  * PriorityQueue implements a textbook heap sort / priority queue algorithm.
- * 
+ *
  * Subclasses must define the abstract method Less_Than.
  */
 
@@ -35,7 +35,7 @@ class Lucy::Util::PriorityQueue cnick PriQ
      */
     Obj **heap;
 
-    /** 
+    /**
      * @param max_size Max elements the queue can hold.
      */
     inert PriorityQueue*
@@ -60,7 +60,7 @@ class Lucy::Util::PriorityQueue cnick PriQ
     incremented nullable Obj*
     Jostle(PriorityQueue *self, decremented Obj *element);
 
-    /** Pop the *least* item off of the priority queue.  
+    /** Pop the *least* item off of the priority queue.
      */
     incremented nullable Obj*
     Pop(PriorityQueue *self);
@@ -75,7 +75,7 @@ class Lucy::Util::PriorityQueue cnick PriQ
     nullable Obj*
     Peek(PriorityQueue *self);
 
-    /** Accessor for "size" member. 
+    /** Accessor for "size" member.
      */
     uint32_t
     Get_Size(PriorityQueue *self);

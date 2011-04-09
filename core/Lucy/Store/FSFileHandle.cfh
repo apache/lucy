@@ -31,7 +31,7 @@ class Lucy::Store::FSFileHandle cnick FSFH
     /** Return a new FSFileHandle, or set Err_error and return NULL if
      * something goes wrong.
      *
-     * @param path Filepath. 
+     * @param path Filepath.
      * @param flags FileHandle constructor flags.
      */
     inert incremented nullable FSFileHandle* 

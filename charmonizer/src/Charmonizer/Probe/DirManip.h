@@ -33,23 +33,23 @@ extern "C" {
  * HAS_DIRECT_H
  *
  * Defined if struct dirent has these members.
- * 
+ *
  * HAS_DIRENT_D_NAMLEN
  * HAS_DIRENT_D_TYPE
  *
  * The "makedir" macro will be aliased to the POSIX-specified two-argument
- * "mkdir" interface:  
- * 
- * makedir 
+ * "mkdir" interface:
+ *
+ * makedir
  *
  * On some systems, the second argument to makedir will be ignored, in which
  * case this symbol will be true; otherwise, it will be false: (TODO: This
  * isn't verified and may sometimes be incorrect.)
- * 
+ *
  * MAKEDIR_MODE_IGNORED
  *
  * String representing the system's directory separator:
- * 
+ *
  * DIR_SEP
  *
  * True if the remove() function removes directories, false otherwise:

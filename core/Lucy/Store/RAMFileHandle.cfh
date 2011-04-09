@@ -17,10 +17,10 @@
 parcel Lucy;
 
 /** In-memory FileHandle.
- * 
+ *
  * RAM-based implementation of FileHandle, to be used in conjunction with
  * RAMFolder.
- */ 
+ */
 class Lucy::Store::RAMFileHandle cnick RAMFH
     inherits Lucy::Store::FileHandle {
 
@@ -30,10 +30,10 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
     inert incremented nullable RAMFileHandle*
     open(const CharBuf *path = NULL, uint32_t flags, RAMFile *file = NULL);
 
-    /** 
+    /**
      * Return a new RAMFileHandle, or set Err_error and return NULL on
      * failure.
-     * 
+     *
      * @param path Filepath.
      * @param flags FileHandle flags.
      * @param file An existing RAMFile; if not supplied, the FH_CREATE flag
@@ -43,7 +43,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
     do_open(RAMFileHandle *self, const CharBuf *path = NULL, uint32_t flags,
             RAMFile *file = NULL);
 
-    /** Access the backing RAMFile. 
+    /** Access the backing RAMFile.
      */
     RAMFile*
     Get_File(RAMFileHandle *self);

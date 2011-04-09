@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Matcher for a ProximityQuery. 
+/** Matcher for a ProximityQuery.
  */
 
 class LucyX::Search::ProximityMatcher inherits Lucy::Search::Matcher {

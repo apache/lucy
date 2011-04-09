@@ -80,8 +80,8 @@ abstract class Lucy::Util::SortExternal cnick SortEx
     abstract void
     Flush(SortExternal *self);
 
-    /** Add data to the sort pool.  
-     * 
+    /** Add data to the sort pool.
+     *
      * @param data Pointer to the data being added, which must be exactly
      * <code>width</code> bytes in size.
      */
@@ -123,7 +123,7 @@ abstract class Lucy::Util::SortExternal cnick SortEx
 
     /** Reset cache variables so that cache gives the appearance of having
      * been initialized.
-     * 
+     *
      * Subclasses may take steps to release items held in cache, if any.
      */
     void

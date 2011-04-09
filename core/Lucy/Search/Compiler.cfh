@@ -20,20 +20,20 @@ parcel Lucy;
  *
  * The purpose of the Compiler class is to take a specification in the form of
  * a L<Query|Lucy::Search::Query> object and compile a
- * L<Matcher|Lucy::Search::Matcher> object that can do real work.  
- * 
+ * L<Matcher|Lucy::Search::Matcher> object that can do real work.
+ *
  * The simplest Compiler subclasses -- such as those associated with
  * constant-scoring Query types -- might simply implement a Make_Matcher()
  * method which passes along information verbatim from the Query to the
  * Matcher's constructor.
- * 
+ *
  * However it is common for the Compiler to perform some calculations which
  * affect it's "weight" -- a floating point multiplier that the Matcher will
  * factor into each document's score.  If that is the case, then the Compiler
  * subclass may wish to override Get_Weight(), Sum_Of_Squared_Weights(), and
  * Apply_Norm_Factor().
- * 
- * Compiling a Matcher is a two stage process. 
+ *
+ * Compiling a Matcher is a two stage process.
  *
  * The first stage takes place during the Compiler's constructor, which is
  * where the Query object meets a L<Searcher|Lucy::Search::Searcher>
@@ -76,7 +76,7 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
          Similarity *similarity = NULL, float boost);
 
     /** Factory method returning a Matcher.
-     * 
+     *
      * @param reader A SegReader.
      * @param need_score Indicate whether the Matcher must implement Score().
      * @return a Matcher, or NULL if the Matcher would have matched no
@@ -110,11 +110,11 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
     /** Apply a floating point normalization multiplier.  For a TermCompiler,
      * this involves multiplying its own weight by the supplied factor;
      * combining classes such as ORCompiler would apply the factor recursively
-     * to their children.  
-     * 
+     * to their children.
+     *
      * The default implementation is a no-op; subclasses may wish to multiply
      * their internal weight by the supplied factor.
-     * 
+     *
      * @param factor The multiplier.
      */
     public void
@@ -125,9 +125,9 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
      * construction.
      *
      * For a TermQuery, the scoring formula is approximately:
-     * 
-     *     ( tf_d * idf_t / norm_d ) * ( tf_q * idf_t / norm_q ) 
-     * 
+     *
+     *     ( tf_d * idf_t / norm_d ) * ( tf_q * idf_t / norm_q )
+     *
      * Normalize() is theoretically concerned with applying the second half of
      * that formula to a the Compiler's weight. What actually happens depends
      * on how the Compiler and Similarity methods called internally are
@@ -139,10 +139,10 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
     /** Return an array of Span objects, indicating where in the given field
      * the text that matches the parent Query occurs and how well each snippet
      * matches.  The Span's offset and length are measured in Unicode code
-     * points.  
+     * points.
      *
-     * The default implementation returns an empty array.       
-     * 
+     * The default implementation returns an empty array.
+     *
      * @param searcher A Searcher.
      * @param doc_vec A DocVector.
      * @param field The name of the field.

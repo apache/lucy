@@ -17,7 +17,7 @@
 parcel Lucy;
 
 /** Abstract base class for reading index data.
- * 
+ *
  * DataReader is the companion class to
  * L<DataWriter|Lucy::Index::DataWriter>.  Every index component will
  * implement one of each.
@@ -49,39 +49,39 @@ class Lucy::Index::DataReader inherits Lucy::Object::Obj {
 
     /** Create a reader which aggregates the output of several lower level
      * readers.  Return NULL if such a reader is not valid.
-     * 
+     *
      * @param readers An array of DataReaders.
      * @param offsets Doc id start offsets for each reader.
      */
     public abstract incremented nullable DataReader*
     Aggregator(DataReader *self, VArray *readers, I32Array *offsets);
 
-    /** Accessor for "schema" member var. 
+    /** Accessor for "schema" member var.
      */
     public nullable Schema*
     Get_Schema(DataReader *self);
 
-    /** Accessor for "folder" member var. 
+    /** Accessor for "folder" member var.
      */
     public nullable Folder*
     Get_Folder(DataReader *self);
 
-    /** Accessor for "snapshot" member var. 
+    /** Accessor for "snapshot" member var.
      */
     public nullable Snapshot*
     Get_Snapshot(DataReader *self);
 
-    /** Accessor for "segments" member var. 
+    /** Accessor for "segments" member var.
      */
     public nullable VArray*
     Get_Segments(DataReader *self);
 
-    /** Accessor for "segment" member var. 
+    /** Accessor for "segment" member var.
      */
     public nullable Segment*
     Get_Segment(DataReader *self);
 
-    /** Accessor for "seg_tick" member var. 
+    /** Accessor for "seg_tick" member var.
      */
     public int32_t
     Get_Seg_Tick(DataReader *self);

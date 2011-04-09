@@ -68,7 +68,7 @@ class Lucy::Index::LexiconWriter cnick LexWriter
     void
     Leave_Temp_Mode(LexiconWriter *self);
 
-    /** Add a Term's text and its associated TermInfo (which has the Term's 
+    /** Add a Term's text and its associated TermInfo (which has the Term's
      * field number).
      */
     void

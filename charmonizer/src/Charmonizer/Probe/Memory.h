@@ -26,14 +26,14 @@ extern "C" {
 
 /* The Memory module attempts to detect these symbols or alias them to
  * synonyms:
- * 
+ *
  * alloca
  *
  * These following symbols will be defined if the associated headers are
  * available:
- * 
+ *
  * HAS_SYS_MMAN_H          <sys/mman.h>
- * HAS_ALLOCA_H            <alloca.h> 
+ * HAS_ALLOCA_H            <alloca.h>
  * HAS_MALLOC_H            <malloc.h>
  *
  * Defined if alloca() is available via stdlib.h:

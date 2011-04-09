@@ -28,7 +28,7 @@ extern "C" {
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
 
-/* Initialize elements needed by ConfWriter.  Must be called before anything 
+/* Initialize elements needed by ConfWriter.  Must be called before anything
  * else, but after os and compiler are initialized.
  */
 void
@@ -40,7 +40,7 @@ chaz_ConfWriter_init();
 void
 chaz_ConfWriter_open_charmony_h(const char *charmony_start);
 
-/* Return the config file's file handle. 
+/* Return the config file's file handle.
  */
 FILE*
 chaz_ConfWriter_get_charmony_fh(void);
@@ -81,7 +81,7 @@ chaz_ConfWriter_shorten_typedef(const char *symbol);
 void
 chaz_ConfWriter_shorten_function(const char *symbol);
 
-/* Print a "chapter heading" comment in the conf file when starting a module. 
+/* Print a "chapter heading" comment in the conf file when starting a module.
  */
 void
 chaz_ConfWriter_start_module(const char *module_name);

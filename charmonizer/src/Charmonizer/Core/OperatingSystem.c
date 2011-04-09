@@ -126,7 +126,7 @@ static char charm_run_code[] =
     QUOTE(      size_t command_len = 1; /* Terminating null. */          )
     QUOTE(      int i;                                                   )
     QUOTE(      int retval;                                              )
-                /* Rebuild command line args. */ 
+                /* Rebuild command line args. */
     QUOTE(      for (i = 1; i < argc; i++) {                             )
     QUOTE(          command_len += strlen(argv[i]) + 1;                  )
     QUOTE(      }                                                        )

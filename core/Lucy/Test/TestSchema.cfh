@@ -16,8 +16,8 @@
 
 parcel Lucy;
 
-/** Schema for use by the test suite.  
- * 
+/** Schema for use by the test suite.
+ *
  * Exposes problems faced by much larger indexes by using an TestArchitecture,
  * which returns absurdly low values for Index_Interval() and Skip_Interval().
  */

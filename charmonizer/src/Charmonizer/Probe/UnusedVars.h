@@ -29,10 +29,10 @@ extern "C" {
 /* Run the UnusedVars module.
  *
  * These symbols are exported:
- * 
+ *
  * UNUSED_VAR(var)
  * UNREACHABLE_RETURN(type)
- * 
+ *
  */
 void chaz_UnusedVars_run(void);
 
