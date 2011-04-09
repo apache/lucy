@@ -293,8 +293,9 @@ Indexer_delete_by_term(Indexer *self, CharBuf *field, Obj *term)
     FieldType *type   = Schema_Fetch_Type(schema, field);
 
     // Raise exception if the field isn't indexed. 
-    if (!type || !FType_Indexed(type)) 
+    if (!type || !FType_Indexed(type)) {
         THROW(ERR, "%o is not an indexed field", field);
+    }
 
     // Analyze term if appropriate, then zap. 
     if (FType_Is_A(type, FULLTEXTTYPE)) {

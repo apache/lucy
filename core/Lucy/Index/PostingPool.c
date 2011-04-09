@@ -509,8 +509,9 @@ PostPool_refill(PostingPool *self)
         }
 
         // Bail if we've hit the ceiling for this run's cache. 
-        if (mem_pool->consumed >= mem_thresh && num_elems > 0)
+        if (mem_pool->consumed >= mem_thresh && num_elems > 0) {
             break;
+        }
 
         // Read a posting from the input stream. 
         raw_posting = PList_Read_Raw(plist, self->last_doc_id, term_text, 
@@ -522,8 +523,9 @@ PostPool_refill(PostingPool *self)
         if (doc_map != NULL) {
             const int32_t remapped = I32Arr_Get(doc_map, 
                 raw_posting->doc_id - doc_base);
-            if ( !remapped )
+            if ( !remapped ) {
                 continue;
+            }
             raw_posting->doc_id = remapped;
         }
 

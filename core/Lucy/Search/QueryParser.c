@@ -566,12 +566,15 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
         // Demux elems into bins. 
         for (i = 0; i < num_elems; i++) {
             ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
-            if (clause->occur == MUST) 
+            if (clause->occur == MUST) {
                 VA_Push(required, INCREF(clause->query));
-            else if (clause->occur == SHOULD) 
+            }
+            else if (clause->occur == SHOULD) {
                 VA_Push(optional, INCREF(clause->query));
-            else if (clause->occur == MUST_NOT)
+            }
+            else if (clause->occur == MUST_NOT) {
                 VA_Push(negated, INCREF(clause->query));
+            }
         }
         num_required = VA_Get_Size(required);
         num_negated  = VA_Get_Size(negated);

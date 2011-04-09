@@ -157,8 +157,9 @@ MemPool_release_all(MemoryPool *self)
 void
 MemPool_eat(MemoryPool *self, MemoryPool *other) {
     int32_t i;
-    if (self->buf != NULL)
+    if (self->buf != NULL) {
         THROW(ERR, "Memory pool is not empty");
+    }
 
     // Move active arenas from other to self. 
     for (i = 0; i <= other->tick; i++) {

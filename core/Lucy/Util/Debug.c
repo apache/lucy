@@ -43,8 +43,9 @@ S_cache_debug_env_var(char *override)
     const char *debug_env = override ? override : getenv("DEBUG");
     if (debug_env != NULL) {
         size_t len = strlen(debug_env);
-        if (len > sizeof(env_cache_buf) - 1) 
+        if (len > sizeof(env_cache_buf) - 1) {
             len = sizeof(env_cache_buf) - 1;
+        }
         strncpy(env_cache_buf, debug_env, len);
         env_cache       = env_cache_buf;
         env_cache_limit = env_cache + len;
@@ -67,8 +68,9 @@ Debug_print_mess(const char *file, int line, const char *func,
 int 
 Debug_debug_should_print(const char *path, const char *func) 
 {
-    if (!env_cache_is_current) 
+    if (!env_cache_is_current) {
         S_cache_debug_env_var(NULL);
+    }
 
     if (!env_cache) {
         // Do not print if DEBUG environment var is not set. 

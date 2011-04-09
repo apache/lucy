@@ -126,15 +126,17 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans)
             // span's offset.
             for ( ; dest_tick < num_raw_flattened; dest_tick++) {
                 Span *dest_span = (Span*)VA_Fetch(flattened, dest_tick);
-                if (dest_span->offset == source_span->offset)
+                if (dest_span->offset == source_span->offset) {
                     break;
+                }
             }
 
             // Fill in scores. 
             for (uint32_t j = dest_tick; j < num_raw_flattened; j++) {
                 Span *dest_span = (Span*)VA_Fetch(flattened, j);
-                if (dest_span->offset == source_span_end)
+                if (dest_span->offset == source_span_end) {
                     break;
+                }
                 else {
                     dest_span->weight += source_span->weight;
                 }

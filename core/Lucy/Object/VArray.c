@@ -170,8 +170,9 @@ VA_shallow_copy(VArray *self)
     memcpy(elems, self->elems, self->size * sizeof(Obj*));
     twin->size = self->size;
     for (i = 0; i < self->size; i++) {
-        if (elems[i] != NULL)
+        if (elems[i] != NULL) {
             (void)INCREF(elems[i]);
+        }
     }
 
     return twin;
@@ -208,8 +209,9 @@ VA_push_varray(VArray *self, VArray *other)
 Obj*
 VA_pop(VArray *self) 
 {
-    if (!self->size) 
+    if (!self->size) {
         return NULL;
+    }
     self->size--;
     return  self->elems[ self->size ];
 }
@@ -245,8 +247,9 @@ VA_shift(VArray *self)
 Obj*
 VA_fetch(VArray *self, uint32_t num) 
 {
-    if (num >= self->size) 
+    if (num >= self->size) {
         return NULL;
+    }
 
     return self->elems[num];
 }

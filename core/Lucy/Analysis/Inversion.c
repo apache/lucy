@@ -74,8 +74,9 @@ Token*
 Inversion_next(Inversion *self) 
 {
     // Kill the iteration if we're out of tokens. 
-    if (self->cur == self->size)
+    if (self->cur == self->size) {
         return NULL;
+    }
     return self->tokens[ self->cur++ ];
 }
 
@@ -124,10 +125,12 @@ Inversion_next_cluster(Inversion *self, uint32_t *count)
     }
 
     // Don't read past the end of the cluster counts array. 
-    if (!self->inverted)
+    if (!self->inverted) {
         THROW(ERR, "Inversion not yet inverted");
-    if (self->cur > self->cluster_counts_size)
+    }
+    if (self->cur > self->cluster_counts_size) {
         THROW(ERR, "Tokens were added after inversion");
+    }
 
     // Place cluster count in passed-in var, advance bookmark. 
     *count = self->cluster_counts[ self->cur ];
@@ -144,8 +147,9 @@ Inversion_invert(Inversion *self)
     int32_t   token_pos = 0;
 
     // Thwart future attempts to append. 
-    if (self->inverted)
+    if (self->inverted) {
         THROW(ERR, "Inversion has already been inverted");
+    }
     self->inverted = true;
 
     // Assign token positions. 

@@ -58,18 +58,23 @@ public class LuceneIndexer {
     int i = 0;
     while (i < (args.length - 1) && args[i].startsWith("-")) {
       arg = args[i++];
-      if (arg.equals("-docs"))
+      if (arg.equals("-docs")) {
          maxToIndex = Integer.parseInt(args[i++]);
-      else if (arg.equals("-reps"))
-        numReps = Integer.parseInt(args[i++]);
-      else if (arg.equals("-increment"))
-        increment = Integer.parseInt(args[i++]);
-      else if (arg.equals("-store")) {
-        if (Integer.parseInt(args[i++]) != 0)
-          store = true;
       }
-      else
+      else if (arg.equals("-reps")) {
+        numReps = Integer.parseInt(args[i++]);
+      }
+      else if (arg.equals("-increment")) {
+        increment = Integer.parseInt(args[i++]);
+      }
+      else if (arg.equals("-store")) {
+        if (Integer.parseInt(args[i++]) != 0) {
+          store = true;
+        }
+      }
+      else {
         throw new Exception("Unknown argument: " + arg);
+      }
     }
     increment = increment == 0 ? maxToIndex + 1 : increment;
 
@@ -164,8 +169,9 @@ public class LuceneIndexer {
         }
 
         docsSoFar++;
-        if (docsSoFar >= maxToIndex)
+        if (docsSoFar >= maxToIndex) {
           break;
+        }
         if (docsSoFar % increment == 0) {
           writer.close();
           writer = initWriter(docsSoFar);

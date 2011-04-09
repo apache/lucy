@@ -230,8 +230,9 @@ S_adjust_root(ORMatcher *self)
         self->pool[ self->size ] = last_hmd;
 
         self->size--;
-        if (self->size == 0) 
+        if (self->size == 0) {
             return 0;
+        }
     }
 
     // Move queue no matter what. 

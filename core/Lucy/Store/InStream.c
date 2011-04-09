@@ -465,8 +465,9 @@ InStream_read_c32(InStream *self)
     while (1) {
         const uint8_t ubyte = SI_read_u8(self);
         retval = (retval << 7) | (ubyte & 0x7f);
-        if ((ubyte & 0x80) == 0)
+        if ((ubyte & 0x80) == 0) {
             break;
+        }
     }
     return retval;
 }
@@ -478,8 +479,9 @@ InStream_read_c64(InStream *self)
     while (1) {
         const uint8_t ubyte = SI_read_u8(self);
         retval = (retval << 7) | (ubyte & 0x7f);
-        if ((ubyte & 0x80) == 0)
+        if ((ubyte & 0x80) == 0) {
             break;
+        }
     }
     return retval;
 }

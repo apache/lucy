@@ -28,8 +28,9 @@ MODULE = Lucy   PACKAGE = Lucy::Object::VTable
 SV*
 _get_registry()
 CODE:
-    if (lucy_VTable_registry == NULL)
+    if (lucy_VTable_registry == NULL) {
         lucy_VTable_init_registry();
+    }
     RETVAL = (SV*)Lucy_Obj_To_Host((lucy_Obj*)lucy_VTable_registry);
 OUTPUT: RETVAL
 END_XS_CODE

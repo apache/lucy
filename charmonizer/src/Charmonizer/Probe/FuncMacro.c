@@ -135,10 +135,12 @@ FuncMacro_run(void)
 
     /* Shorten. */
     ConfWriter_start_short_names();
-    if (has_iso_funcmac) 
+    if (has_iso_funcmac) {
         ConfWriter_shorten_macro("HAS_ISO_FUNC_MACRO");
-    if (has_gnuc_funcmac)
+    }
+    if (has_gnuc_funcmac) {
         ConfWriter_shorten_macro("HAS_GNUC_FUNC_MACRO");
+    }
     if (has_iso_funcmac || has_gnuc_funcmac) {
         ConfWriter_shorten_macro("HAS_FUNC_MACRO");
         ConfWriter_shorten_macro("FUNC_MACRO");

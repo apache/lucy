@@ -41,8 +41,9 @@ SnowStop_init(SnowballStopFilter *self, const CharBuf *language, Hash *stoplist)
     }
     else if (language) {
         self->stoplist = SnowStop_gen_stoplist(language);
-        if (!self->stoplist)
+        if (!self->stoplist) {
             THROW(ERR, "Can't get a stoplist for '%o'", language);
+        }
     }
     else {
         THROW(ERR, "Either stoplist or language is required");

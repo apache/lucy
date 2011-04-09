@@ -105,12 +105,14 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target)
             int32_t candidate = Matcher_Get_Doc_ID(child);
 
             // If this child is highest, others will need to catch up. 
-            if (highest < candidate)
+            if (highest < candidate) {
                 highest = candidate;
+            }
 
             // If least doc Matchers can agree on exceeds target, raise bar. 
-            if (target < highest)
+            if (target < highest) {
                 target = highest;
+            }
 
             // Scoot this Matcher up if not already at highest. 
             if (candidate < target) {
@@ -133,10 +135,12 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target)
             }
         }
 
-        if (!agreement)
+        if (!agreement) {
             continue;
-        if (highest >= target)
+        }
+        if (highest >= target) {
             break;
+        }
     } 
 
     return highest;
@@ -163,5 +167,4 @@ ANDMatcher_score(ANDMatcher *self)
 
     return score;
 }
-
 

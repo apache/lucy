@@ -98,8 +98,9 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
     int64_t    expected        = OutStream_Tell(ix_out) / 8;
 
     // Verify doc id. 
-    if (doc_id != expected)
+    if (doc_id != expected) {
         THROW(ERR, "Expected doc id %i64 but got %i32", expected, doc_id);
+    }
 
     // Write the number of stored fields. 
     Inverter_Iterate(inverter);

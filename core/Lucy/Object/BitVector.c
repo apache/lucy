@@ -143,8 +143,9 @@ BitVec_set(BitVector *self, uint32_t tick)
 void 
 BitVec_clear(BitVector *self, uint32_t tick) 
 {
-    if (tick >= self->cap) 
+    if (tick >= self->cap) {
         return;
+    }
     NumUtil_u1clear(self->bits, tick);
 }
 
@@ -158,8 +159,9 @@ BitVec_clear_all(BitVector *self)
 bool_t
 BitVec_get(BitVector *self, uint32_t tick) 
 {
-    if (tick >= self->cap)
+    if (tick >= self->cap) {
         return false;
+    }
     return NumUtil_u1get(self->bits, tick);
 }
 
@@ -401,11 +403,13 @@ BitVec_to_array(BitVector *self)
         do {
             if (BitVec_Get(self, num)) {
                 array[i++] = num;
-                if (--num_left == 0)
+                if (--num_left == 0) {
                     break;
+                }
             }
-            if (num >= capacity)
+            if (num >= capacity) {
                 THROW(ERR, "Exceeded capacity: %u32 %u32", num, capacity);
+            }
         } while (++num % 8);
     }
 

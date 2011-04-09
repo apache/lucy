@@ -93,10 +93,12 @@ Integers_run(void)
     ConfWriter_start_module("Integers");
 
     /* Document endian-ness. */
-    if (S_machine_is_big_endian())
+    if (S_machine_is_big_endian()) {
         ConfWriter_append_conf("#define CHY_BIG_END\n");
-    else 
+    }
+    else {
         ConfWriter_append_conf("#define CHY_LITTLE_END\n");
+    }
 
     /* Record sizeof() for several common integer types. */
     output = CC_capture_output(sizes_code, strlen(sizes_code), &output_len);
@@ -176,10 +178,12 @@ Integers_run(void)
         else {
             sprintf(code_buf, literal64_code, "i64");
             output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
-            if (output != NULL)
+            if (output != NULL) {
                 strcpy(i64_t_postfix, "i64");
-            else
+            }
+            else {
                 Util_die("64-bit types, but no literal syntax found");
+            }
         }
         sprintf(code_buf, literal64_code, "ULL");
         output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
@@ -189,22 +193,28 @@ Integers_run(void)
         else {
             sprintf(code_buf, literal64_code, "Ui64");
             output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
-            if (output != NULL)
+            if (output != NULL) {
                 strcpy(u64_t_postfix, "Ui64");
-            else
+            }
+            else {
                 Util_die("64-bit types, but no literal syntax found");
+            }
         }
     }
 
     /* Write out some conditional defines. */
-    if (has_inttypes)
+    if (has_inttypes) {
         ConfWriter_append_conf("#define CHY_HAS_INTTYPES_H\n");
-    if (has_stdint)
+    }
+    if (has_stdint) {
         ConfWriter_append_conf("#define CHY_HAS_STDINT_H\n");
-    if (has_long_long)
+    }
+    if (has_long_long) {
         ConfWriter_append_conf("#define CHY_HAS_LONG_LONG\n");
-    if (has___int64)
+    }
+    if (has___int64) {
         ConfWriter_append_conf("#define CHY_HAS___INT64\n");
+    }
 
     /* Write out sizes. */
     ConfWriter_append_conf("#define CHY_SIZEOF_CHAR %d\n",  sizeof_char);
@@ -402,8 +412,9 @@ Integers_run(void)
         ConfWriter_shorten_macro("HAS___INT64");
         ConfWriter_shorten_macro("SIZEOF___INT64");
     }
-    if (has_inttypes)
+    if (has_inttypes) {
         ConfWriter_shorten_macro("HAS_INTTYPES_H");
+    }
     ConfWriter_shorten_typedef("bool_t");
     if (has_8) {
         ConfWriter_shorten_macro("HAS_I8_T");

@@ -86,10 +86,12 @@ MatchPost_read_record(MatchPosting *self, InStream *instream)
 
     // Apply delta doc and retrieve freq. 
     self->doc_id   += doc_delta;
-    if (doc_code & 1) 
+    if (doc_code & 1) {
         self->freq = 1;
-    else
+    }
+    else {
         self->freq = InStream_Read_C32(instream);
+    }
 }
 
 RawPosting*

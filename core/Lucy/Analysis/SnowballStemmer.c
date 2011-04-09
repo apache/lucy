@@ -44,8 +44,9 @@ SnowStemmer_init(SnowballStemmer *self, const CharBuf *language)
     lang_buf[1] = tolower(CB_Code_Point_At(language, 1));
     lang_buf[2] = '\0';
     self->snowstemmer = sb_stemmer_new(lang_buf, "UTF_8");
-    if (!self->snowstemmer) 
+    if (!self->snowstemmer) {
         THROW(ERR, "Can't find a Snowball stemmer for %o", language);
+    }
 
     return self;
 }

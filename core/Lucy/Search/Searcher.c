@@ -76,8 +76,9 @@ Searcher_glean_query(Searcher *self, Obj *query)
         real_query = (Query*)INCREF(query);
     }
     else if (Obj_Is_A(query, CHARBUF)) {
-        if (!self->qparser) 
+        if (!self->qparser) {
             self->qparser = QParser_new(self->schema, NULL, NULL, NULL);
+        }
         real_query = QParser_Parse(self->qparser, (CharBuf*)query);
     }
     else {

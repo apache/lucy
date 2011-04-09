@@ -163,8 +163,9 @@ Sim_encode_norm(Similarity *self, float f)
     uint32_t norm;
     UNUSED_VAR(self);
 
-    if (f < 0.0)
+    if (f < 0.0) {
         f = 0.0;
+    }
 
     if (f == 0.0) {
         norm = 0;
@@ -208,30 +209,36 @@ float
 Sim_length_norm(Similarity *self, uint32_t num_tokens)
 {
     UNUSED_VAR(self);
-    if (num_tokens == 0) // guard against div by zero 
+    if (num_tokens == 0) { // guard against div by zero 
         return 0;
-    else
+    }
+    else {
         return (float)( 1.0 / sqrt((double)num_tokens) );
+    }
 }
 
 float
 Sim_query_norm(Similarity *self, float sum_of_squared_weights)
 {
     UNUSED_VAR(self);
-    if (sum_of_squared_weights == 0.0f) // guard against div by zero 
+    if (sum_of_squared_weights == 0.0f) { // guard against div by zero 
         return 0;
-    else
+    }
+    else {
         return (float)( 1.0 / sqrt(sum_of_squared_weights) );
+    }
 }
 
 float
 Sim_coord(Similarity *self, uint32_t overlap, uint32_t max_overlap) 
 {
     UNUSED_VAR(self);
-    if (max_overlap == 0)
+    if (max_overlap == 0) {
         return 1;
-    else 
+    }
+    else {
         return (float)overlap / (float)max_overlap;
+    }
 }
 
 

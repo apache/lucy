@@ -158,8 +158,9 @@ LargeFiles_run(void)
     if (S_check_sparse_files()) {
         ConfWriter_append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
         /* See if we can create a 5 GB file without crashing. */
-        if (success && S_can_create_big_files())
+        if (success && S_can_create_big_files()) {
             ConfWriter_append_conf("#define CHAZ_CAN_CREATE_BIG_FILES\n");
+        }
     }
     else {
         ConfWriter_append_conf("#define CHAZ_NO_SPARSE_FILES\n");
@@ -229,8 +230,9 @@ S_probe_off64(off64_combo *combo)
     output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
     if (output != NULL) {
         long size = strtol(output, NULL, 10);
-        if (size == 8)
+        if (size == 8) {
             success = true;
+        }
         free(output);
     }
 
@@ -324,24 +326,30 @@ S_check_sparse_files()
     Stat st_a, st_b;
 
     /* Bail out if we can't stat() a file. */
-    if (!HeadCheck_check_header("sys/stat.h"))
+    if (!HeadCheck_check_header("sys/stat.h")) {
         return false;
+    }
 
     /* Write and stat a 1 MB file and a 2 MB file, both of them sparse. */
     S_test_sparse_file(1000000, &st_a);
     S_test_sparse_file(2000000, &st_b);
-    if (!(st_a.valid && st_b.valid))
+    if (!(st_a.valid && st_b.valid)) {
         return false;
-    if (st_a.size != 1000001)
+    }
+    if (st_a.size != 1000001) {
         Util_die("Expected size of 1000001 but got %ld", (long)st_a.size);
-    if (st_b.size != 2000001)
+    }
+    if (st_b.size != 2000001) {
         Util_die("Expected size of 2000001 but got %ld", (long)st_b.size);
+    }
 
     /* See if two files with very different lengths have the same block size. */
-    if (st_a.blocks == st_b.blocks)
+    if (st_a.blocks == st_b.blocks) {
         return true;
-    else
+    }
+    else {
         return false;
+    }
 } 
 
 static void
@@ -355,12 +363,15 @@ S_test_sparse_file(long offset, Stat *st)
         Util_die("Couldn't open file '_charm_sparse'");
 
     /* Seek fh to [offset], write a byte, close file. */
-    if ( (fseek(sparse_fh, offset, SEEK_SET)) == -1)
+    if ( (fseek(sparse_fh, offset, SEEK_SET)) == -1) {
         Util_die("seek failed: %s", strerror(errno));
-    if ( (fprintf(sparse_fh, "X")) != 1 )
+    }
+    if ( (fprintf(sparse_fh, "X")) != 1 ) {
         Util_die("fprintf failed");
-    if (fclose(sparse_fh))
+    }
+    if (fclose(sparse_fh)) {
         Util_die("Error closing file '_charm_sparse': %s", strerror(errno));
+    }
 
     /* Stat the file. */
     Stat_stat("_charm_sparse", st);
@@ -406,8 +417,9 @@ S_can_create_big_files()
 
     /* Truncate, just in case the call to remove fails. */
     truncating_fh = fopen("_charm_large_file_test", "w");
-    if (truncating_fh != NULL)
+    if (truncating_fh != NULL) {
         fclose(truncating_fh);
+    }
     Util_remove_and_verify("_charm_large_file_test");
 
     /* Return true if the test app made it to the finish line. */

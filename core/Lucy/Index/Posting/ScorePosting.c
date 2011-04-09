@@ -139,10 +139,12 @@ ScorePost_read_record(ScorePosting *self, InStream *instream)
 
     // Apply delta doc and retrieve freq. 
     self->doc_id   += doc_delta;
-    if (doc_code & 1) 
+    if (doc_code & 1) {
         self->freq = 1;
-    else
+    }
+    else {
         self->freq = NumUtil_decode_c32(&buf);
+    }
 
     // Decode boost/norm byte. 
     self->weight = self->norm_decoder[ *(uint8_t*)buf ];

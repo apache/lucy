@@ -78,12 +78,15 @@ VariadicMacros_run(void)
 
     /* Shorten. */
     ConfWriter_start_short_names();
-    if (has_varmacros)
+    if (has_varmacros) {
         ConfWriter_shorten_macro("HAS_VARIADIC_MACROS");
-    if (has_iso_varmacros)
+    }
+    if (has_iso_varmacros) {
         ConfWriter_shorten_macro("HAS_ISO_VARIADIC_MACROS");
-    if (has_gnuc_varmacros)
+    }
+    if (has_gnuc_varmacros) {
         ConfWriter_shorten_macro("HAS_GNUC_VARIADIC_MACROS");
+    }
     ConfWriter_end_short_names();
 
     ConfWriter_end_module();

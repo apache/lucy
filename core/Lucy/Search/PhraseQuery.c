@@ -105,8 +105,9 @@ PhraseQuery_equals(PhraseQuery *self, Obj *other)
     if (self->boost != twin->boost) return false;
     if (self->field && !twin->field) return false;
     if (!self->field && twin->field) return false;
-    if (self->field && !CB_Equals(self->field, (Obj*)twin->field)) 
+    if (self->field && !CB_Equals(self->field, (Obj*)twin->field)) {
         return false;
+    }
     if (!VA_Equals(twin->terms, (Obj*)self->terms)) return false;
     return true;
 }
@@ -328,8 +329,9 @@ PhraseCompiler_highlight_spans(PhraseCompiler *self, Searcher *searcher,
             = DocVec_Term_Vector(doc_vec, field, (CharBuf*)term);
 
         // Bail if any term is missing. 
-        if (!term_vector)
+        if (!term_vector) {
             break;
+        }
 
         VA_Push(term_vectors, (Obj*)term_vector);
 

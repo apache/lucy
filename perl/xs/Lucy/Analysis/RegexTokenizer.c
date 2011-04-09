@@ -70,10 +70,12 @@ S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re)
 #if (PERL_VERSION > 10)
     rx = SvRX((SV*)token_re);
 #else
-    if (SvMAGICAL((SV*)token_re))
+    if (SvMAGICAL((SV*)token_re)) {
         magic = mg_find((SV*)token_re, PERL_MAGIC_qr); 
-    if (!magic)
+    }
+    if (!magic) {
         THROW(LUCY_ERR, "token_re is not a qr// entity");
+    }
     rx = (REGEXP*)magic->mg_obj;
 #endif
     if (rx == NULL) {
@@ -156,14 +158,16 @@ lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
         // Get start and end offsets in Unicode code points. 
         for( ; string_arg < start_ptr; num_code_points++) {
             string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)*string_arg];
-            if (string_arg > string_end)
+            if (string_arg > string_end) {
                 THROW(LUCY_ERR, "scanned past end of '%s'", string_beg);
+            }
         }
         start = num_code_points;
         for( ; string_arg < end_ptr; num_code_points++) {
             string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)*string_arg];
-            if (string_arg > string_end)
+            if (string_arg > string_end) {
                 THROW(LUCY_ERR, "scanned past end of '%s'", string_beg);
+            }
         }
         end = num_code_points;
 

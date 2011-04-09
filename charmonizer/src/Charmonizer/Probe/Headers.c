@@ -172,8 +172,9 @@ Headers_run(void)
 
     /* Shorten. */
     ConfWriter_start_short_names();
-    if (has_posix)
+    if (has_posix) {
         ConfWriter_shorten_macro("HAS_POSIX");
+    }
     if (has_c89) {
         ConfWriter_shorten_macro("HAS_C89");
         ConfWriter_shorten_macro("HAS_C90");
@@ -190,8 +191,9 @@ Headers_run(void)
 static void
 S_keep(const char *header_name)
 {
-    if (keeper_count >= MAX_KEEPER_COUNT)
+    if (keeper_count >= MAX_KEEPER_COUNT) {
         Util_die("Too many keepers -- increase MAX_KEEPER_COUNT");
+    }
     keepers[keeper_count++] = header_name;
     keepers[keeper_count]   = NULL;
 }

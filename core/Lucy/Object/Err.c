@@ -123,10 +123,12 @@ S_vcat_mess(CharBuf *message, const char *file, int line, const char *func,
                      + 30;
     CB_Grow(message, guess_len);
     CB_VCatF(message, pattern, args);
-    if (func != NULL)
+    if (func != NULL) {
         CB_catf(message, "\n\t%s at %s line %i32\n", func, file, (int32_t)line);
-    else 
+    }
+    else {
         CB_catf(message, "\n\t%s line %i32\n", file, (int32_t)line);
+    }
 }
 
 CharBuf*
@@ -202,8 +204,9 @@ SI_obj_is_a(Obj *obj, VTable *target_vtable)
     VTable *vtable = obj->vtable;
 
     while (vtable != NULL) {
-        if (vtable == target_vtable)
+        if (vtable == target_vtable) {
             return true;
+        }
         vtable = vtable->parent;
     }
 

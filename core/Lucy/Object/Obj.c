@@ -58,8 +58,9 @@ Obj_is_a(Obj *self, VTable *ancestor)
     VTable *vtable = self ? self->vtable : NULL;
 
     while (vtable != NULL) {
-        if (vtable == ancestor)
+        if (vtable == ancestor) {
             return true;
+        }
         vtable = vtable->parent;
     }
 
@@ -89,8 +90,9 @@ Obj_deserialize(Obj *self, InStream *instream)
     }
     else {
         CharBuf *my_class = VTable_Get_Name(self->vtable);
-        if (!CB_Equals(class_name, (Obj*)my_class)) 
+        if (!CB_Equals(class_name, (Obj*)my_class)) {
             THROW(ERR, "Class mismatch: %o %o", class_name, my_class);
+        }
     }
     DECREF(class_name);
     return Obj_init(self);

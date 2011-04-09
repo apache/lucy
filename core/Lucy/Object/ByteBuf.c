@@ -231,8 +231,9 @@ BB_compare(const void *va, const void *vb)
 
     int32_t comparison = memcmp(a->buf, b->buf, size);
 
-    if (comparison == 0 && a->size != b->size) 
+    if (comparison == 0 && a->size != b->size) {
         comparison = a->size < b->size ? -1 : 1;
+    }
 
     return comparison;
 }

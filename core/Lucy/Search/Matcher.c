@@ -35,8 +35,9 @@ Matcher_advance(Matcher *self, int32_t target)
 {
     while (1) {
         int32_t doc_id = Matcher_Next(self);
-        if (doc_id == 0 || doc_id >= target)
+        if (doc_id == 0 || doc_id >= target) {
             return doc_id; 
+        }
     }
 }
 

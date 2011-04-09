@@ -185,8 +185,9 @@ LexWriter_enter_temp_mode(LexiconWriter *self, const CharBuf *field,
     FieldType *type   = Schema_Fetch_Type(schema, field);
 
     // Assign outstream. 
-    if (self->dat_out != NULL)
+    if (self->dat_out != NULL) {
         THROW(ERR, "Can't enter temp mode (filename: %o) ", self->dat_file);
+    }
     self->dat_out = (OutStream*)INCREF(temp_outstream);
 
     // Initialize count and ix_count, term stepper and term info stepper. 

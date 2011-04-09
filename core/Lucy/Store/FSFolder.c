@@ -139,8 +139,9 @@ FSFolder_local_exists(FSFolder *self, const CharBuf *name)
         struct stat stat_buf;
         CharBuf *fullpath = S_fullpath(self, name);
         bool_t retval = false;
-        if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1)
+        if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1) {
             retval = true;
+        }
         DECREF(fullpath);
         return retval;
     }

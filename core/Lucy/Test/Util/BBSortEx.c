@@ -153,8 +153,9 @@ BBSortEx_flip(BBSortEx *self)
     uint32_t num_runs = VA_Get_Size(self->runs);
     if (num_runs) {
         run_mem_thresh = (self->mem_thresh / 2) / num_runs;
-        if (run_mem_thresh < 65536)
+        if (run_mem_thresh < 65536) {
             run_mem_thresh = 65536;
+        }
     }
 
     for (i = 0; i < num_runs; i++) {

@@ -76,8 +76,9 @@ CB_init(CharBuf *self, size_t size)
 CharBuf*
 CB_new_from_utf8(const char *ptr, size_t size) 
 {
-    if (!StrHelp_utf8_valid(ptr, size))
+    if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
+    }
     return CB_new_from_trusted_utf8(ptr, size);
 }
 
@@ -532,8 +533,9 @@ CB_mimic(CharBuf *self, Obj *other)
 void 
 CB_cat_str(CharBuf *self, const char* ptr, size_t size) 
 {
-    if (!StrHelp_utf8_valid(ptr, size))
+    if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
+    }
     CB_cat_trusted_str(self, ptr, size);
 }
 
@@ -601,8 +603,9 @@ CB_compare_to(CharBuf *self, Obj *other)
 bool_t
 CB_equals_str(CharBuf *self, const char *ptr, size_t size)
 {
-    if (self->size != size)
+    if (self->size != size) {
         return false;
+    }
     return (memcmp(self->ptr, ptr, self->size) == 0);
 }
 
@@ -617,8 +620,9 @@ CB_ends_with_str(CharBuf *self, const char *postfix, size_t postfix_len)
 {
     if (postfix_len <= self->size) { 
         char *start = self->ptr + self->size - postfix_len;
-        if (memcmp(start, postfix, postfix_len) == 0)
+        if (memcmp(start, postfix, postfix_len) == 0) {
             return true;
+        }
     }
 
     return false;
@@ -842,8 +846,9 @@ CB_get_ptr8(CharBuf *self)              { return (uint8_t*)self->ptr; }
 ViewCharBuf*
 ViewCB_new_from_utf8(const char *utf8, size_t size)
 {
-    if (!StrHelp_utf8_valid(utf8, size))
+    if (!StrHelp_utf8_valid(utf8, size)) {
         DIE_INVALID_UTF8(utf8, size);
+    }
     return ViewCB_new_from_trusted_utf8(utf8, size);
 }
 
@@ -881,8 +886,9 @@ ViewCB_assign(ViewCharBuf *self, const CharBuf *other)
 void
 ViewCB_assign_str(ViewCharBuf *self, const char *utf8, size_t size)
 {
-    if (!StrHelp_utf8_valid(utf8, size))
+    if (!StrHelp_utf8_valid(utf8, size)) {
         DIE_INVALID_UTF8(utf8, size);
+    }
     self->ptr  = (char*)utf8;
     self->size = size;
 }

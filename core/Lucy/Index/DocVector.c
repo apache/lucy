@@ -111,8 +111,9 @@ DocVec_term_vector(DocVector *self, const CharBuf *field,
 
     // Get a buf for the term text or bail. 
     tv_buf = (ByteBuf*)Hash_Fetch(field_vector, (Obj*)term_text);
-    if (tv_buf == NULL) 
+    if (tv_buf == NULL) {
         return NULL;
+    }
 
     return S_extract_tv_from_tv_buf(field, term_text, tv_buf);
 }

@@ -107,8 +107,9 @@ HLWriter_add_inverted_doc(HighlightWriter *self, Inverter *inverter,
     int32_t expected = (int32_t)(OutStream_Tell(ix_out) / 8);
 
     // Verify doc id. 
-    if (doc_id != expected)
+    if (doc_id != expected) {
         THROW(ERR, "Expected doc id %i32 but got %i32", expected, doc_id);
+    }
 
     // Write index data. 
     OutStream_Write_I64(ix_out, filepos);
@@ -232,8 +233,9 @@ HLWriter_add_segment(HighlightWriter *self, SegReader *reader,
 
         for (orig = 1; orig <= doc_max; orig++) {
             // Skip deleted docs. 
-            if (doc_map && !I32Arr_Get(doc_map, orig))
+            if (doc_map && !I32Arr_Get(doc_map, orig)) {
                 continue;
+            }
 
             // Write file pointer. 
             OutStream_Write_I64( ix_out, OutStream_Tell(dat_out) );

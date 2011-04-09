@@ -207,8 +207,9 @@ SegPList_advance(SegPostingList *self, int32_t target)
                 num_skipped += skip_interval;
             }
 
-            if (self->skip_count >= self->num_skips)
+            if (self->skip_count >= self->num_skips) {
                 break;
+            }
 
             SkipStepper_Read_Record(skip_stepper, skip_stream);
             self->skip_count++;
@@ -231,8 +232,9 @@ SegPList_advance(SegPostingList *self, int32_t target)
     // Done skipping, so scan. 
     while (1) {
         int32_t doc_id = SegPList_Next(self);
-        if (doc_id == 0 || doc_id >= target)
+        if (doc_id == 0 || doc_id >= target) {
             return doc_id; 
+        }
     }
 }
 

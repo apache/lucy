@@ -53,8 +53,9 @@ PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
     for (size_t i = 0; i < self->num_elements; i++) {
         PostingList *const plist = (PostingList*)CERTIFY(
             VA_Fetch(plists, i), POSTINGLIST);
-        if (plist == NULL)
+        if (plist == NULL) {
             THROW(ERR, "Missing element %u32", i);
+        }
         self->plists[i] = (PostingList*)INCREF(plist);
     }
 
