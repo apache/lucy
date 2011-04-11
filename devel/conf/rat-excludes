@@ -1,3 +1,4 @@
+clownfish/MANIFEST
 core/Lucy/Util/StringHelper2.c
 core/Lucy/Util/StringHelper3.c
 devel/conf/rat-excludes
@@ -13,4 +14,5 @@ modules/analysis/snowstem/source/src_c/*.h
 modules/analysis/snowstem/source/test/tests.json
 modules/analysis/snowstop/source/snowball_stoplists.c
 perl/Changes
+perl/MANIFEST
 perl/sample/us_constitution/*.txt
