@@ -4,6 +4,7 @@ buildlib/Lucy/Redacted.pm
 buildlib/Lucy/Test/TestUtils.pm
 buildlib/Lucy/Test/USConSchema.pm
 Changes
+INSTALL
 lib/Lucy.pm
 lib/Lucy.pod
 lib/Lucy/Analysis/Analyzer.pm
