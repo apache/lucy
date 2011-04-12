@@ -3,7 +3,6 @@ buildlib/Lucy/Build.pm
 buildlib/Lucy/Redacted.pm
 buildlib/Lucy/Test/TestUtils.pm
 buildlib/Lucy/Test/USConSchema.pm
-Changes
 INSTALL
 lib/Lucy.pm
 lib/Lucy.pod
@@ -164,7 +163,6 @@ lib/LucyX/Search/Filter.pm
 lib/LucyX/Search/MockMatcher.pm
 lib/LucyX/Search/ProximityQuery.pm
 MANIFEST			This list of files
-README
 sample/FlatQueryParser.pm
 sample/indexer.pl
 sample/PrefixQuery.pm

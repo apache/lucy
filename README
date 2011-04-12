@@ -1,0 +1,24 @@
+Apache Lucy
+===========
+
+OVERVIEW
+
+Apache Lucy is a fulltext search engine library, written in C and targeted at
+dynamic language users.
+
+DISCLAIMER
+
+Apache Lucy is an effort undergoing incubation at The Apache Software
+Foundation (ASF), sponsored by the Incubator.  Incubation is required of all
+newly accepted projects until a further review indicates that the
+infrastructure, communications, and decision making process have stabilized in
+a manner consistent with other successful ASF projects.  While incubation
+status is not necessarily a reflection of the completeness or stability of the
+code, it does indicate that the project has yet to be fully endorsed by the
+ASF.
+
+INSTALLATION
+
+To build and install Lucy, follow the instructions in the accompanying
+"INSTALL" document.
+
