@@ -257,10 +257,20 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string)
             continue;
         }
         else if (S_consume_ascii(qstring, "+", 1)) {
-            token = ParserToken_new(TOKEN_PLUS, NULL, 0);
+            if (ViewCB_Trim_Top(qstring)) {
+                token = ParserToken_new(TOKEN_QUERY, "+", 1);
+            }
+            else {
+                token = ParserToken_new(TOKEN_PLUS, NULL, 0);
+            }
         }
         else if (S_consume_ascii(qstring, "-", 1)) {
-            token = ParserToken_new(TOKEN_MINUS, NULL, 0);
+            if (ViewCB_Trim_Top(qstring)) {
+                token = ParserToken_new(TOKEN_QUERY, "-", 1);
+            }
+            else {
+                token = ParserToken_new(TOKEN_MINUS, NULL, 0);
+            }
         }
         else if (S_consume_ascii_token(qstring, "AND", 3)) {
             token = ParserToken_new(TOKEN_AND, NULL, 0);

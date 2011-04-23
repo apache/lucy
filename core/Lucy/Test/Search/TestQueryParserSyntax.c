@@ -219,6 +219,24 @@ syntax_test_not_plus()
 }
 
 static TestQueryParser*
+syntax_test_padded_plus()
+{
+    Query *plus = make_leaf_query(NULL, "+");
+    Query *a = make_leaf_query(NULL, "a");
+    Query *tree = make_poly_query(BOOLOP_OR, plus, a, NULL);
+    return TestQP_new("+ a", tree, NULL, 4);
+}
+
+static TestQueryParser*
+syntax_test_padded_minus()
+{
+    Query *minus = make_leaf_query(NULL, "-");
+    Query *a = make_leaf_query(NULL, "a");
+    Query *tree = make_poly_query(BOOLOP_OR, minus, a, NULL);
+    return TestQP_new("- a", tree, NULL, 4);
+}
+
+static TestQueryParser*
 syntax_test_unclosed_parens()
 {
     // Not a perfect result, but then it's not a good query string.
@@ -270,6 +288,8 @@ static lucy_TestQPSyntax_test_t syntax_test_funcs[] = {
     syntax_test_minus_minus,
     syntax_test_not_minus,
     syntax_test_not_plus,
+    syntax_test_padded_plus,
+    syntax_test_padded_minus,
     syntax_test_unclosed_parens,
     syntax_test_escaped_quotes_outside,
     syntax_test_escaped_quotes_inside,
@@ -280,7 +300,7 @@ void
 TestQPSyntax_run_tests(Folder *index)
 {
     uint32_t i;
-    TestBatch     *batch      = TestBatch_new(58);
+    TestBatch     *batch      = TestBatch_new(62);
     IndexSearcher *searcher   = IxSearcher_new((Obj*)index);
     QueryParser   *qparser    = QParser_new(IxSearcher_Get_Schema(searcher), 
         NULL, NULL, NULL);
