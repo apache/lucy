@@ -765,6 +765,7 @@ S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target)
 {
     size_t tick = 0;
 
+    // Field names constructs must start with a letter or underscore.
     uint32_t code_point = ViewCB_Code_Point_At(qstring, tick);
     if (isalpha(code_point) || code_point == '_') {
         tick++;
@@ -773,6 +774,7 @@ S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target)
         return false;
     }
 
+    // Only alphanumerics and underscores are allowed  in field names.
     while (1) {
         code_point = ViewCB_Code_Point_At(qstring, tick);
         if (isalnum(code_point) || code_point == '_') tick++;
@@ -780,20 +782,23 @@ S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target)
         else return false;
     }
 
-    if (tick == 1) { // just the colon
-        return false; 
+    // Field name constructs must be followed by something sensible.
+    uint32_t lookahead = ViewCB_Code_Point_At(qstring, tick);
+    if (!(isalnum(lookahead)
+          || lookahead == '_'
+          || lookahead > 127
+          || lookahead == '"'
+          || lookahead == '('
+         )
+        ) {
+        return false;
     }
-    else {
-        ViewCB_Assign(target, (CharBuf*)qstring);
-        ViewCB_Set_Size(target, tick - 1);
-        if (ViewCB_Starts_With_Str(qstring, "http:", 5)) {
-            return false;
-        }
-        else {
-            ViewCB_Nip(qstring, tick);
-            return true;
-        }
-    }
+
+    // Consume string data.
+    ViewCB_Assign(target, (CharBuf*)qstring);
+    ViewCB_Set_Size(target, tick - 1);
+    ViewCB_Nip(qstring, tick);
+    return true;
 }
 
 static bool_t

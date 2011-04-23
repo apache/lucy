@@ -267,6 +267,13 @@ syntax_test_identifier_field_name()
     return TestQP_new("10:30", tree, NULL, 0);
 }
 
+static TestQueryParser*
+syntax_test_double_colon()
+{
+    Query *tree = make_leaf_query(NULL, "PHP::Interpreter");
+    return TestQP_new("PHP::Interpreter", tree, NULL, 0);
+}
+
 /***************************************************************************/
 
 typedef TestQueryParser*
@@ -302,6 +309,7 @@ static lucy_TestQPSyntax_test_t syntax_test_funcs[] = {
     syntax_test_escaped_quotes_outside,
     syntax_test_escaped_quotes_inside,
     syntax_test_identifier_field_name,
+    syntax_test_double_colon,
     NULL
 };
 
@@ -309,7 +317,7 @@ void
 TestQPSyntax_run_tests(Folder *index)
 {
     uint32_t i;
-    TestBatch     *batch      = TestBatch_new(64);
+    TestBatch     *batch      = TestBatch_new(66);
     IndexSearcher *searcher   = IxSearcher_new((Obj*)index);
     QueryParser   *qparser    = QParser_new(IxSearcher_Get_Schema(searcher), 
         NULL, NULL, NULL);
