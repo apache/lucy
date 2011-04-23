@@ -259,6 +259,14 @@ syntax_test_escaped_quotes_inside()
     return TestQP_new("\"\\\"a\\\"\"", tree, NULL, 4);
 }
 
+static TestQueryParser*
+syntax_test_identifier_field_name()
+{
+    // Field names must be identifiers, i.e. they cannot start with a number.
+    Query *tree = make_leaf_query(NULL, "10:30");
+    return TestQP_new("10:30", tree, NULL, 0);
+}
+
 /***************************************************************************/
 
 typedef TestQueryParser*
@@ -293,6 +301,7 @@ static lucy_TestQPSyntax_test_t syntax_test_funcs[] = {
     syntax_test_unclosed_parens,
     syntax_test_escaped_quotes_outside,
     syntax_test_escaped_quotes_inside,
+    syntax_test_identifier_field_name,
     NULL
 };
 
@@ -300,7 +309,7 @@ void
 TestQPSyntax_run_tests(Folder *index)
 {
     uint32_t i;
-    TestBatch     *batch      = TestBatch_new(62);
+    TestBatch     *batch      = TestBatch_new(64);
     IndexSearcher *searcher   = IxSearcher_new((Obj*)index);
     QueryParser   *qparser    = QParser_new(IxSearcher_Get_Schema(searcher), 
         NULL, NULL, NULL);

@@ -765,8 +765,16 @@ S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target)
 {
     size_t tick = 0;
 
+    uint32_t code_point = ViewCB_Code_Point_At(qstring, tick);
+    if (isalpha(code_point) || code_point == '_') {
+        tick++;
+    }
+    else {
+        return false;
+    }
+
     while (1) {
-        uint32_t code_point = ViewCB_Code_Point_At(qstring, tick);
+        code_point = ViewCB_Code_Point_At(qstring, tick);
         if (isalnum(code_point) || code_point == '_') tick++;
         else if (code_point == ':') { tick++; break; }
         else return false;
