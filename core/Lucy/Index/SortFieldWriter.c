@@ -40,7 +40,7 @@
 
 // Prepare to read back a run.
 static void
-S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in, 
+S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
            InStream *ix_in, InStream *dat_in);
 
 // Write out a sort cache.  Returns the number of unique values in the sort
@@ -56,27 +56,25 @@ typedef struct lucy_SFWriterElem {
 #define SFWriterElem lucy_SFWriterElem
 
 SortFieldWriter*
-SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment, 
+SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                     PolyReader *polyreader, const CharBuf *field,
-                    MemoryPool *memory_pool, size_t mem_thresh, 
-                    OutStream *temp_ord_out, OutStream *temp_ix_out, 
-                    OutStream *temp_dat_out)
-{
-    SortFieldWriter *self 
+                    MemoryPool *memory_pool, size_t mem_thresh,
+                    OutStream *temp_ord_out, OutStream *temp_ix_out,
+                    OutStream *temp_dat_out) {
+    SortFieldWriter *self
         = (SortFieldWriter*)VTable_Make_Obj(SORTFIELDWRITER);
     return SortFieldWriter_init(self, schema, snapshot, segment, polyreader,
-        field, memory_pool, mem_thresh, temp_ord_out, temp_ix_out, 
-        temp_dat_out);
+                                field, memory_pool, mem_thresh, temp_ord_out,
+                                temp_ix_out, temp_dat_out);
 }
 
 SortFieldWriter*
-SortFieldWriter_init(SortFieldWriter *self, Schema *schema, 
-                     Snapshot *snapshot, Segment *segment, 
+SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
+                     Snapshot *snapshot, Segment *segment,
                      PolyReader *polyreader, const CharBuf *field,
-                     MemoryPool *memory_pool, size_t mem_thresh, 
-                     OutStream *temp_ord_out, OutStream *temp_ix_out, 
-                     OutStream *temp_dat_out)
-{
+                     MemoryPool *memory_pool, size_t mem_thresh,
+                     OutStream *temp_ord_out, OutStream *temp_ix_out,
+                     OutStream *temp_dat_out) {
     // Init.
     SortEx_init((SortExternal*)self, sizeof(SFWriterElem));
     self->null_ord        = -1;
@@ -111,7 +109,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     // Derive.
     self->field_num = Seg_Field_Num(segment, field);
     FieldType *type = (FieldType*)CERTIFY(
-        Schema_Fetch_Type(self->schema, field), FIELDTYPE);
+                          Schema_Fetch_Type(self->schema, field), FIELDTYPE);
     self->type    = (FieldType*)INCREF(type);
     self->prim_id = FType_Primitive_ID(type);
     if (self->prim_id == FType_TEXT || self->prim_id == FType_BLOB) {
@@ -126,20 +124,18 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
 }
 
 void
-SortFieldWriter_clear_cache(SortFieldWriter *self)
-{
+SortFieldWriter_clear_cache(SortFieldWriter *self) {
     if (self->uniq_vals) {
         Hash_Clear(self->uniq_vals);
     }
-    SortFieldWriter_clear_cache_t super_clear_cache =
-        (SortFieldWriter_clear_cache_t)SUPER_METHOD(self->vtable, 
-        SortFieldWriter, Clear_Cache);
+    SortFieldWriter_clear_cache_t super_clear_cache
+        = (SortFieldWriter_clear_cache_t)SUPER_METHOD(
+              self->vtable, SortFieldWriter, Clear_Cache);
     super_clear_cache(self);
 }
 
 void
-SortFieldWriter_destroy(SortFieldWriter *self)
-{
+SortFieldWriter_destroy(SortFieldWriter *self) {
     DECREF(self->uniq_vals);
     self->uniq_vals = NULL;
     DECREF(self->field);
@@ -162,25 +158,28 @@ SortFieldWriter_destroy(SortFieldWriter *self)
 }
 
 int32_t
-SortFieldWriter_get_null_ord(SortFieldWriter *self) { return self->null_ord; }
+SortFieldWriter_get_null_ord(SortFieldWriter *self) {
+    return self->null_ord;
+}
+
 int32_t
-SortFieldWriter_get_ord_width(SortFieldWriter *self) { return self->ord_width; }
+SortFieldWriter_get_ord_width(SortFieldWriter *self) {
+    return self->ord_width;
+}
 
 static Obj*
-S_find_unique_value(Hash *uniq_vals, Obj *val)
-{
+S_find_unique_value(Hash *uniq_vals, Obj *val) {
     int32_t  hash_sum  = Obj_Hash_Sum(val);
     Obj     *uniq_val  = Hash_Find_Key(uniq_vals, val, hash_sum);
-    if (!uniq_val) { 
-        Hash_Store(uniq_vals, val, INCREF(&EMPTY)); 
+    if (!uniq_val) {
+        Hash_Store(uniq_vals, val, INCREF(&EMPTY));
         uniq_val = Hash_Find_Key(uniq_vals, val, hash_sum);
     }
     return uniq_val;
 }
 
 void
-SortFieldWriter_add(SortFieldWriter *self, int32_t doc_id, Obj *value)
-{
+SortFieldWriter_add(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     // Uniq-ify the value, and record it for this document.
     SFWriterElem elem;
     elem.value = S_find_unique_value(self->uniq_vals, value);
@@ -191,12 +190,12 @@ SortFieldWriter_add(SortFieldWriter *self, int32_t doc_id, Obj *value)
 
 void
 SortFieldWriter_add_segment(SortFieldWriter *self, SegReader *reader,
-                            I32Array *doc_map, SortCache *sort_cache)
-{
+                            I32Array *doc_map, SortCache *sort_cache) {
     if (!sort_cache) { return; }
-    SortFieldWriter *run = SortFieldWriter_new(self->schema, self->snapshot,
-        self->segment, self->polyreader, self->field, self->mem_pool,
-        self->mem_thresh, NULL, NULL, NULL);
+    SortFieldWriter *run
+        = SortFieldWriter_new(self->schema, self->snapshot, self->segment,
+                              self->polyreader, self->field, self->mem_pool,
+                              self->mem_thresh, NULL, NULL, NULL);
     run->sort_cache = (SortCache*)INCREF(sort_cache);
     run->doc_map    = (I32Array*)INCREF(doc_map);
     run->run_max    = SegReader_Doc_Max(reader);
@@ -207,9 +206,8 @@ SortFieldWriter_add_segment(SortFieldWriter *self, SegReader *reader,
 }
 
 static int32_t
-S_calc_width(int32_t cardinality)
-{
-    if      (cardinality <= 0x00000002) { return 1; }
+S_calc_width(int32_t cardinality) {
+    if (cardinality <= 0x00000002)      { return 1; }
     else if (cardinality <= 0x00000004) { return 2; }
     else if (cardinality <= 0x0000000F) { return 4; }
     else if (cardinality <= 0x000000FF) { return 8; }
@@ -218,82 +216,82 @@ S_calc_width(int32_t cardinality)
 }
 
 static void
-S_write_ord(void *ords, int32_t width, int32_t doc_id, int32_t ord)
-{
+S_write_ord(void *ords, int32_t width, int32_t doc_id, int32_t ord) {
     switch (width) {
-        case 1: if (ord) { NumUtil_u1set(ords, doc_id); }
-                else     { NumUtil_u1clear(ords, doc_id); }
-                break;
-        case 2: NumUtil_u2set(ords, doc_id, ord);
-                break;
-        case 4: NumUtil_u4set(ords, doc_id, ord);
-                break;
+        case 1:
+            if (ord) { NumUtil_u1set(ords, doc_id); }
+            else     { NumUtil_u1clear(ords, doc_id); }
+            break;
+        case 2:
+            NumUtil_u2set(ords, doc_id, ord);
+            break;
+        case 4:
+            NumUtil_u4set(ords, doc_id, ord);
+            break;
         case 8: {
-                    uint8_t *ints = (uint8_t*)ords;
-                    ints[doc_id] = ord;
-                }
-                break;
-        case 16: 
-                {
-                    uint8_t *bytes = (uint8_t*)ords;
-                    bytes += doc_id * sizeof(uint16_t);
-                    NumUtil_encode_bigend_u16(ord, &bytes);
-                }
-                break;
-        case 32: 
-                {
-                    uint8_t *bytes = (uint8_t*)ords;
-                    bytes += doc_id * sizeof(uint32_t);
-                    NumUtil_encode_bigend_u32(ord, &bytes);
-                }
-                break;
-        default: THROW(ERR, "Invalid width: %i32", width);
+                uint8_t *ints = (uint8_t*)ords;
+                ints[doc_id] = ord;
+            }
+            break;
+        case 16: {
+                uint8_t *bytes = (uint8_t*)ords;
+                bytes += doc_id * sizeof(uint16_t);
+                NumUtil_encode_bigend_u16(ord, &bytes);
+            }
+            break;
+        case 32: {
+                uint8_t *bytes = (uint8_t*)ords;
+                bytes += doc_id * sizeof(uint32_t);
+                NumUtil_encode_bigend_u32(ord, &bytes);
+            }
+            break;
+        default:
+            THROW(ERR, "Invalid width: %i32", width);
     }
 }
 
 static void
 S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
-            int64_t dat_start)
-{
+            int64_t dat_start) {
     if (val) {
         switch (prim_id & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT: {
-                CharBuf *string = (CharBuf*)val;
-                int64_t dat_pos = OutStream_Tell(dat_out) - dat_start;
-                OutStream_Write_I64(ix_out, dat_pos);
-                OutStream_Write_Bytes(dat_out, (char*)CB_Get_Ptr8(string),
-                    CB_Get_Size(string));
-                break;
-            }
+                    CharBuf *string = (CharBuf*)val;
+                    int64_t dat_pos = OutStream_Tell(dat_out) - dat_start;
+                    OutStream_Write_I64(ix_out, dat_pos);
+                    OutStream_Write_Bytes(dat_out, (char*)CB_Get_Ptr8(string),
+                                          CB_Get_Size(string));
+                    break;
+                }
             case FType_BLOB: {
-                ByteBuf *byte_buf = (ByteBuf*)val;
-                int64_t dat_pos = OutStream_Tell(dat_out) - dat_start;
-                OutStream_Write_I64(ix_out, dat_pos);
-                OutStream_Write_Bytes(dat_out, BB_Get_Buf(byte_buf),
-                    BB_Get_Size(byte_buf));
-                break;
-            }
+                    ByteBuf *byte_buf = (ByteBuf*)val;
+                    int64_t dat_pos = OutStream_Tell(dat_out) - dat_start;
+                    OutStream_Write_I64(ix_out, dat_pos);
+                    OutStream_Write_Bytes(dat_out, BB_Get_Buf(byte_buf),
+                                          BB_Get_Size(byte_buf));
+                    break;
+                }
             case FType_INT32: {
-                Integer32 *i32 = (Integer32*)val;
-                OutStream_Write_I32(dat_out, Int32_Get_Value(i32));
-                break;
-            }
+                    Integer32 *i32 = (Integer32*)val;
+                    OutStream_Write_I32(dat_out, Int32_Get_Value(i32));
+                    break;
+                }
             case FType_INT64: {
-                Integer64 *i64 = (Integer64*)val;
-                OutStream_Write_I64(dat_out, Int64_Get_Value(i64));
-                break;
-            }
+                    Integer64 *i64 = (Integer64*)val;
+                    OutStream_Write_I64(dat_out, Int64_Get_Value(i64));
+                    break;
+                }
             case FType_FLOAT64: {
-                Float64 *float64 = (Float64*)val;
-                OutStream_Write_F64(dat_out, Float64_Get_Value(float64));
-                break;
-            }
+                    Float64 *float64 = (Float64*)val;
+                    OutStream_Write_F64(dat_out, Float64_Get_Value(float64));
+                    break;
+                }
             case FType_FLOAT32: {
-                Float32 *float32 = (Float32*)val;
-                OutStream_Write_F32(dat_out, Float32_Get_Value(float32));
-                break;
-            }
-            default: 
+                    Float32 *float32 = (Float32*)val;
+                    OutStream_Write_F32(dat_out, Float32_Get_Value(float32));
+                    break;
+                }
+            default:
                 THROW(ERR, "Unrecognized primitive id: %i32", (int32_t)prim_id);
         }
     }
@@ -305,10 +303,10 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
                     OutStream_Write_I64(ix_out, dat_pos);
                 }
                 break;
-            case FType_INT32: 
+            case FType_INT32:
                 OutStream_Write_I32(dat_out, 0);
                 break;
-            case FType_INT64: 
+            case FType_INT64:
                 OutStream_Write_I64(dat_out, 0);
                 break;
             case FType_FLOAT64:
@@ -317,26 +315,24 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
             case FType_FLOAT32:
                 OutStream_Write_F32(dat_out, 0.0f);
                 break;
-            default: 
+            default:
                 THROW(ERR, "Unrecognized primitive id: %i32", (int32_t)prim_id);
         }
     }
 }
 
 int
-SortFieldWriter_compare(SortFieldWriter *self, void *va, void *vb)
-{
+SortFieldWriter_compare(SortFieldWriter *self, void *va, void *vb) {
     SFWriterElem *a = (SFWriterElem*)va;
     SFWriterElem *b = (SFWriterElem*)vb;
-    int32_t comparison 
+    int32_t comparison
         = FType_null_back_compare_values(self->type, a->value, b->value);
     if (comparison == 0) { comparison = b->doc_id - a->doc_id; }
     return comparison;
 }
 
 static int
-S_compare_doc_ids_by_ord_rev(void *context, const void *va, const void *vb)
-{
+S_compare_doc_ids_by_ord_rev(void *context, const void *va, const void *vb) {
     SortCache *sort_cache = (SortCache*)context;
     int32_t a = *(int32_t*)va;
     int32_t b = *(int32_t*)vb;
@@ -346,22 +342,20 @@ S_compare_doc_ids_by_ord_rev(void *context, const void *va, const void *vb)
 }
 
 static void
-S_lazy_init_sorted_ids(SortFieldWriter *self)
-{
+S_lazy_init_sorted_ids(SortFieldWriter *self) {
     if (!self->sorted_ids) {
-        self->sorted_ids 
+        self->sorted_ids
             = (int32_t*)MALLOCATE((self->run_max + 1) * sizeof(int32_t));
         for (int32_t i = 0, max = self->run_max; i <= max; i++) {
             self->sorted_ids[i] = i;
         }
-        Sort_quicksort(self->sorted_ids + 1, self->run_max, sizeof(int32_t), 
-            S_compare_doc_ids_by_ord_rev, self->sort_cache);
+        Sort_quicksort(self->sorted_ids + 1, self->run_max, sizeof(int32_t),
+                       S_compare_doc_ids_by_ord_rev, self->sort_cache);
     }
 }
 
 void
-SortFieldWriter_flush(SortFieldWriter *self)
-{
+SortFieldWriter_flush(SortFieldWriter *self) {
     // Don't add a run unless we have data to put in it.
     if (SortFieldWriter_Cache_Count(self) == 0) { return; }
 
@@ -370,9 +364,10 @@ SortFieldWriter_flush(SortFieldWriter *self)
     OutStream *const temp_dat_out = self->temp_dat_out;
 
     SortFieldWriter_Sort_Cache(self);
-    SortFieldWriter *run = SortFieldWriter_new(self->schema, self->snapshot,
-        self->segment, self->polyreader, self->field, self->mem_pool, 
-        self->mem_thresh, NULL, NULL, NULL);
+    SortFieldWriter *run
+        = SortFieldWriter_new(self->schema, self->snapshot, self->segment,
+                              self->polyreader, self->field, self->mem_pool,
+                              self->mem_thresh, NULL, NULL, NULL);
 
     // Record stream starts and align.
     run->ord_start = OutStream_Align(temp_ord_out, sizeof(int64_t));
@@ -390,7 +385,7 @@ SortFieldWriter_flush(SortFieldWriter *self)
     // Write files, record stats.
     run->run_max = (int32_t)Seg_Get_Count(self->segment);
     run->run_cardinality = S_write_files(run, temp_ord_out, temp_ix_out,
-        temp_dat_out);
+                                         temp_dat_out);
 
     // Reclaim the buffer from the run and empty it.
     run->cache       = NULL;
@@ -412,15 +407,14 @@ SortFieldWriter_flush(SortFieldWriter *self)
 }
 
 uint32_t
-SortFieldWriter_refill(SortFieldWriter *self)
-{
+SortFieldWriter_refill(SortFieldWriter *self) {
     if (!self->sort_cache) { return 0; }
 
     // Sanity check, then reset the cache and prepare to start loading items.
     uint32_t cache_count = SortFieldWriter_Cache_Count(self);
     if (cache_count) {
         THROW(ERR, "Refill called but cache contains %u32 items",
-            cache_count);
+              cache_count);
     }
     SortFieldWriter_Clear_Cache(self);
     MemPool_Release_All(self->mem_pool);
@@ -432,9 +426,9 @@ SortFieldWriter_refill(SortFieldWriter *self)
     SortCache *const sort_cache = self->sort_cache;
     Obj *const       blank      = SortCache_Make_Blank(sort_cache);
 
-    while (   self->run_ord < self->run_cardinality 
+    while (self->run_ord < self->run_cardinality
            && MemPool_Get_Consumed(self->mem_pool) < self->mem_thresh
-    ) {
+          ) {
         Obj *val = SortCache_Value(sort_cache, self->run_ord, blank);
         if (val) {
             Hash_Store(uniq_vals, val, INCREF(&EMPTY));
@@ -447,8 +441,9 @@ SortFieldWriter_refill(SortFieldWriter *self)
         int32_t raw_doc_id = self->sorted_ids[self->run_tick];
         int32_t ord = SortCache_Ordinal(sort_cache, raw_doc_id);
         if (ord != null_ord) {
-            int32_t remapped = doc_map 
-                             ? I32Arr_Get(doc_map, raw_doc_id) : raw_doc_id;
+            int32_t remapped = doc_map
+                               ? I32Arr_Get(doc_map, raw_doc_id)
+                               : raw_doc_id;
             if (remapped) {
                 Obj *val = SortCache_Value(sort_cache, ord, blank);
                 SortFieldWriter_Add(self, remapped, val);
@@ -473,8 +468,7 @@ SortFieldWriter_refill(SortFieldWriter *self)
 }
 
 void
-SortFieldWriter_flip(SortFieldWriter *self)
-{
+SortFieldWriter_flip(SortFieldWriter *self) {
     uint32_t num_items = SortFieldWriter_Cache_Count(self);
     uint32_t num_runs = VA_Get_Size(self->runs);
 
@@ -484,7 +478,7 @@ SortFieldWriter_flip(SortFieldWriter *self)
     // Sanity check.
     if (num_runs && num_items) {
         THROW(ERR, "Sanity check failed: num_runs: %u32 num_items: %u32",
-            num_runs, num_items);
+              num_runs, num_items);
     }
 
     if (num_items) {
@@ -511,8 +505,8 @@ SortFieldWriter_flip(SortFieldWriter *self)
         if (sub_thresh < 65536) { sub_thresh = 65536; }
         for (uint32_t i = 0; i < num_runs; i++) {
             SortFieldWriter *run = (SortFieldWriter*)VA_Fetch(self->runs, i);
-            S_flip_run(run, sub_thresh, self->ord_in, self->ix_in, 
-                self->dat_in);
+            S_flip_run(run, sub_thresh, self->ord_in, self->ix_in,
+                       self->dat_in);
         }
     }
 
@@ -521,8 +515,7 @@ SortFieldWriter_flip(SortFieldWriter *self)
 
 static int32_t
 S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
-              OutStream *dat_out)
-{
+              OutStream *dat_out) {
     int8_t    prim_id   = self->prim_id;
     int32_t   doc_max   = (int32_t)Seg_Get_Count(self->segment);
     bool_t    has_nulls = self->count == doc_max ? false : true;
@@ -548,10 +541,10 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
     while (NULL != (elem = (SFWriterElem*)SortFieldWriter_Fetch(self))) {
         if (elem->value != last_val_address) {
-            int32_t comparison = FType_Compare_Values(self->type, 
-                elem->value, val);
+            int32_t comparison
+                = FType_Compare_Values(self->type, elem->value, val);
             if (comparison != 0) {
-                ord++; 
+                ord++;
                 S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
                 Obj_Mimic(val, elem->value);
             }
@@ -583,12 +576,12 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     const double BITS_PER_BYTE = 8.0;
     double bytes_per_doc = ord_width / BITS_PER_BYTE;
     double byte_count = ceil((doc_max + 1) * bytes_per_doc);
-    char *compressed_ords 
+    char *compressed_ords
         = (char*)CALLOCATE((size_t)byte_count, sizeof(char));
     for (int32_t i = 0; i <= doc_max; i++) {
         int32_t real_ord = ords[i] == -1 ? null_ord : ords[i];
         S_write_ord(compressed_ords, ord_width, i, real_ord);
-    }   
+    }
     OutStream_Write_Bytes(ord_out, compressed_ords, (size_t)byte_count);
     FREEMEM(compressed_ords);
 
@@ -597,8 +590,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
 }
 
 int32_t
-SortFieldWriter_finish(SortFieldWriter *self)
-{
+SortFieldWriter_finish(SortFieldWriter *self) {
     // Bail if there's no data.
     if (!SortFieldWriter_Peek(self)) { return 0; }
 
@@ -635,9 +627,8 @@ SortFieldWriter_finish(SortFieldWriter *self)
 }
 
 static void
-S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in, 
-           InStream *ix_in, InStream *dat_in)
-{
+S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
+           InStream *ix_in, InStream *dat_in) {
     if (run->flipped) { THROW(ERR, "Can't Flip twice"); }
     run->flipped = true;
 
@@ -653,50 +644,60 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
 
     // Open the temp files for reading.
     CharBuf *seg_name = Seg_Get_Name(run->segment);
-    CharBuf *alias    = CB_newf("%o/sort_ord_temp-%i64-to-%i64", seg_name, 
-        run->ord_start, run->ord_end);
-    InStream *ord_in_dupe = InStream_Reopen(ord_in, alias,
-        run->ord_start, run->ord_end - run->ord_start);
+    CharBuf *alias    = CB_newf("%o/sort_ord_temp-%i64-to-%i64", seg_name,
+                                run->ord_start, run->ord_end);
+    InStream *ord_in_dupe = InStream_Reopen(ord_in, alias, run->ord_start,
+                                            run->ord_end - run->ord_start);
     InStream *ix_in_dupe = NULL;
     if (run->var_width) {
-        CB_setf(alias, "%o/sort_ix_temp-%i64-to-%i64", seg_name, 
-            run->ix_start, run->ix_end);
-        ix_in_dupe = InStream_Reopen(ix_in, alias,
-            run->ix_start, run->ix_end - run->ix_start);
+        CB_setf(alias, "%o/sort_ix_temp-%i64-to-%i64", seg_name,
+                run->ix_start, run->ix_end);
+        ix_in_dupe = InStream_Reopen(ix_in, alias, run->ix_start,
+                                     run->ix_end - run->ix_start);
     }
-    CB_setf(alias, "%o/sort_dat_temp-%i64-to-%i64", seg_name, 
-        run->dat_start, run->dat_end);
-    InStream *dat_in_dupe = InStream_Reopen(dat_in, alias,
-        run->dat_start, run->dat_end - run->dat_start);
+    CB_setf(alias, "%o/sort_dat_temp-%i64-to-%i64", seg_name,
+            run->dat_start, run->dat_end);
+    InStream *dat_in_dupe = InStream_Reopen(dat_in, alias, run->dat_start,
+                                            run->dat_end - run->dat_start);
     DECREF(alias);
 
     // Get a SortCache.
     CharBuf *field = Seg_Field_Name(run->segment, run->field_num);
     switch (run->prim_id & FType_PRIMITIVE_ID_MASK) {
         case FType_TEXT:
-            run->sort_cache = (SortCache*)TextSortCache_new(field,
-                run->type, run->run_cardinality, run->run_max, run->null_ord,
-                run->ord_width, ord_in_dupe, ix_in_dupe, dat_in_dupe);
+            run->sort_cache = (SortCache*)TextSortCache_new(
+                                  field, run->type, run->run_cardinality,
+                                  run->run_max, run->null_ord,
+                                  run->ord_width, ord_in_dupe,
+                                  ix_in_dupe, dat_in_dupe);
             break;
         case FType_INT32:
-            run->sort_cache = (SortCache*)I32SortCache_new(field,
-                run->type, run->run_cardinality, run->run_max, run->null_ord,
-                run->ord_width, ord_in_dupe, dat_in_dupe);
+            run->sort_cache = (SortCache*)I32SortCache_new(
+                                  field, run->type, run->run_cardinality,
+                                  run->run_max, run->null_ord,
+                                  run->ord_width, ord_in_dupe,
+                                  dat_in_dupe);
             break;
         case FType_INT64:
-            run->sort_cache = (SortCache*)I64SortCache_new(field,
-                run->type, run->run_cardinality, run->run_max, run->null_ord,
-                run->ord_width, ord_in_dupe, dat_in_dupe);
+            run->sort_cache = (SortCache*)I64SortCache_new(
+                                  field, run->type, run->run_cardinality,
+                                  run->run_max, run->null_ord,
+                                  run->ord_width, ord_in_dupe,
+                                  dat_in_dupe);
             break;
         case FType_FLOAT32:
-            run->sort_cache = (SortCache*)F32SortCache_new(field,
-                run->type, run->run_cardinality, run->run_max, run->null_ord,
-                run->ord_width, ord_in_dupe, dat_in_dupe);
+            run->sort_cache = (SortCache*)F32SortCache_new(
+                                  field, run->type, run->run_cardinality,
+                                  run->run_max, run->null_ord,
+                                  run->ord_width, ord_in_dupe,
+                                  dat_in_dupe);
             break;
         case FType_FLOAT64:
-            run->sort_cache = (SortCache*)F64SortCache_new(field,
-                run->type, run->run_cardinality, run->run_max, run->null_ord,
-                run->ord_width, ord_in_dupe, dat_in_dupe);
+            run->sort_cache = (SortCache*)F64SortCache_new(
+                                  field, run->type, run->run_cardinality,
+                                  run->run_max, run->null_ord,
+                                  run->ord_width, ord_in_dupe,
+                                  dat_in_dupe);
             break;
         default:
             THROW(ERR, "No SortCache class for %o", run->type);

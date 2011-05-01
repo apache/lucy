@@ -26,7 +26,7 @@ class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
 
     inert DocReader*
     init(DocReader *self, Schema *schema = NULL, Folder *folder = NULL,
-         Snapshot *snapshot = NULL, VArray *segments = NULL, 
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
          int32_t seg_tick = -1);
 
     /** Retrieve the document identified by <code>doc_id</code>.
@@ -80,7 +80,7 @@ class Lucy::Index::DefaultDocReader cnick DefDocReader
         int32_t seg_tick);
 
     inert DefaultDocReader*
-    init(DefaultDocReader *self, Schema *schema, Folder *folder, 
+    init(DefaultDocReader *self, Schema *schema, Folder *folder,
          Snapshot *snapshot, VArray *segments, int32_t seg_tick);
 
     public incremented HitDoc*

@@ -17,7 +17,7 @@
 parcel Lucy;
 
 __C__
-typedef int 
+typedef int
 (*lucy_Sort_compare_t)(void *context, const void *va, const void *vb);
 __END_C__
 
@@ -61,7 +61,7 @@ inert class Lucy::Util::SortUtils cnick Sort {
     /** Quicksort.
      */
     inert void
-    quicksort(void *elems, size_t num_elems, size_t width, 
+    quicksort(void *elems, size_t num_elems, size_t width,
               lucy_Sort_compare_t compare, void *context);
 }
 

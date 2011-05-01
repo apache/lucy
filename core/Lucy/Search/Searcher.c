@@ -31,8 +31,7 @@
 #include "Lucy/Search/Compiler.h"
 
 Searcher*
-Searcher_init(Searcher *self, Schema *schema)
-{
+Searcher_init(Searcher *self, Schema *schema) {
     self->schema  = (Schema*)INCREF(schema);
     self->qparser = NULL;
     ABSTRACT_CLASS_CHECK(self, SEARCHER);
@@ -40,23 +39,21 @@ Searcher_init(Searcher *self, Schema *schema)
 }
 
 void
-Searcher_destroy(Searcher *self)
-{
+Searcher_destroy(Searcher *self) {
     DECREF(self->schema);
     DECREF(self->qparser);
     SUPER_DESTROY(self, SEARCHER);
 }
 
 Hits*
-Searcher_hits(Searcher *self, Obj *query, uint32_t offset, uint32_t num_wanted, 
-              SortSpec *sort_spec)
-{
+Searcher_hits(Searcher *self, Obj *query, uint32_t offset, uint32_t num_wanted,
+              SortSpec *sort_spec) {
     Query   *real_query = Searcher_Glean_Query(self, query);
     uint32_t doc_max    = Searcher_Doc_Max(self);
-    uint32_t wanted     = offset + num_wanted > doc_max 
-                        ? doc_max 
-                        : offset + num_wanted;
-    TopDocs *top_docs   = Searcher_Top_Docs(self, real_query, wanted, 
+    uint32_t wanted     = offset + num_wanted > doc_max
+                          ? doc_max
+                          : offset + num_wanted;
+    TopDocs *top_docs   = Searcher_Top_Docs(self, real_query, wanted,
                                             sort_spec);
     Hits    *hits       = Hits_new(self, top_docs, offset);
     DECREF(top_docs);
@@ -65,8 +62,7 @@ Searcher_hits(Searcher *self, Obj *query, uint32_t offset, uint32_t num_wanted,
 }
 
 Query*
-Searcher_glean_query(Searcher *self, Obj *query)
-{
+Searcher_glean_query(Searcher *self, Obj *query) {
     Query *real_query = NULL;
 
     if (!query) {
@@ -83,21 +79,19 @@ Searcher_glean_query(Searcher *self, Obj *query)
     }
     else {
         THROW(ERR, "Invalid type for 'query' param: %o",
-            Obj_Get_Class_Name(query));
+              Obj_Get_Class_Name(query));
     }
 
     return real_query;
 }
 
 Schema*
-Searcher_get_schema(Searcher *self)
-{
+Searcher_get_schema(Searcher *self) {
     return self->schema;
 }
 
 void
-Searcher_close(Searcher *self)
-{
+Searcher_close(Searcher *self) {
     UNUSED_VAR(self);
 }
 

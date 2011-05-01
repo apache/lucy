@@ -35,34 +35,30 @@ static void
 S_clean_up_old_temp_files(CompoundFileWriter *self);
 
 CompoundFileWriter*
-CFWriter_new(Folder *folder)
-{
-    CompoundFileWriter *self 
+CFWriter_new(Folder *folder) {
+    CompoundFileWriter *self
         = (CompoundFileWriter*)VTable_Make_Obj(COMPOUNDFILEWRITER);
     return CFWriter_init(self, folder);
 }
 
 CompoundFileWriter*
-CFWriter_init(CompoundFileWriter *self, Folder *folder)
-{
+CFWriter_init(CompoundFileWriter *self, Folder *folder) {
     self->folder = (Folder*)INCREF(folder);
     return self;
 }
 
 void
-CFWriter_destroy(CompoundFileWriter *self)
-{
+CFWriter_destroy(CompoundFileWriter *self) {
     DECREF(self->folder);
     SUPER_DESTROY(self, COMPOUNDFILEWRITER);
 }
 
 void
-CFWriter_consolidate(CompoundFileWriter *self)
-{
+CFWriter_consolidate(CompoundFileWriter *self) {
     CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
     if (Folder_Exists(self->folder, cfmeta_file)) {
-        THROW(ERR, "Merge already performed for %o", 
-            Folder_Get_Path(self->folder));
+        THROW(ERR, "Merge already performed for %o",
+              Folder_Get_Path(self->folder));
     }
     else {
         S_clean_up_old_temp_files(self);
@@ -71,8 +67,7 @@ CFWriter_consolidate(CompoundFileWriter *self)
 }
 
 static void
-S_clean_up_old_temp_files(CompoundFileWriter *self)
-{
+S_clean_up_old_temp_files(CompoundFileWriter *self) {
     Folder  *folder      = self->folder;
     CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
     CharBuf *cf_file     = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
@@ -90,14 +85,13 @@ S_clean_up_old_temp_files(CompoundFileWriter *self)
 }
 
 static void
-S_do_consolidate(CompoundFileWriter *self)
-{
+S_do_consolidate(CompoundFileWriter *self) {
     Folder    *folder       = self->folder;
     Hash      *metadata     = Hash_new(0);
     Hash      *sub_files    = Hash_new(0);
     VArray    *files        = Folder_List(folder, NULL);
     VArray    *merged       = VA_new(VA_Get_Size(files));
-    CharBuf   *cf_file     = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+    CharBuf   *cf_file      = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
     OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)cf_file);
     uint32_t   i, max;
     bool_t     rename_success;
@@ -106,8 +100,8 @@ S_do_consolidate(CompoundFileWriter *self)
 
     // Start metadata.
     Hash_Store_Str(metadata, "files", 5, INCREF(sub_files));
-    Hash_Store_Str(metadata, "format", 6, 
-        (Obj*)CB_newf("%i32", CFWriter_current_file_format) );
+    Hash_Store_Str(metadata, "format", 6,
+                   (Obj*)CB_newf("%i32", CFWriter_current_file_format));
 
     CharBuf *infilepath = CB_new(30);
     size_t base_len = 0;
@@ -128,10 +122,10 @@ S_do_consolidate(CompoundFileWriter *self)
             len = OutStream_Tell(outstream) - offset;
 
             // Record offset and length.
-            Hash_Store_Str(file_data, "offset", 6, 
-                (Obj*)CB_newf("%i64", offset) );
-            Hash_Store_Str(file_data, "length", 6, 
-                (Obj*)CB_newf("%i64", len) );
+            Hash_Store_Str(file_data, "offset", 6,
+                           (Obj*)CB_newf("%i64", offset));
+            Hash_Store_Str(file_data, "length", 6,
+                           (Obj*)CB_newf("%i64", len));
             CB_Set_Size(infilepath, base_len);
             CB_Cat(infilepath, infilename);
             Hash_Store(sub_files, (Obj*)infilepath, (Obj*)file_data);

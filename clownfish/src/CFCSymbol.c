@@ -32,49 +32,46 @@
 #include "CFCUtil.h"
 
 CFCSymbol*
-CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, 
-              const char *class_name, const char *class_cnick, 
-              const char *micro_sym)
-{
+CFCSymbol_new(struct CFCParcel *parcel, const char *exposure,
+              const char *class_name, const char *class_cnick,
+              const char *micro_sym) {
     CFCSymbol *self = (CFCSymbol*)CFCBase_allocate(sizeof(CFCSymbol),
-        "Clownfish::Symbol");
+                                                   "Clownfish::Symbol");
     return CFCSymbol_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym);
+                          micro_sym);
 }
 
 static int
-S_validate_exposure(const char *exposure)
-{
+S_validate_exposure(const char *exposure) {
     if (!exposure) { return false; }
-    if (   strcmp(exposure, "public")
+    if (strcmp(exposure, "public")
         && strcmp(exposure, "parcel")
         && strcmp(exposure, "private")
         && strcmp(exposure, "local")
-    ) {
+       ) {
         return false;
     }
     return true;
 }
 
 static int
-S_validate_class_name(const char *class_name)
-{
+S_validate_class_name(const char *class_name) {
     const char *ptr;
 
     // Must be UpperCamelCase, separated by "::".
-    for (ptr = class_name; *ptr != 0; ) {
+    for (ptr = class_name; *ptr != 0;) {
         if (!isupper(*ptr)) { return false; }
 
         // Each component must contain lowercase letters.
         const char *substring;
         for (substring = ptr; ; substring++) {
-            if      (*substring == 0)     { return false; }
+            if (*substring == 0)          { return false; }
             else if (*substring == ':')   { return false; }
             else if (islower(*substring)) { break; }
         }
 
-        while(*ptr != 0) {
-            if      (*ptr == 0) { break; }
+        while (*ptr != 0) {
+            if (*ptr == 0) { break; }
             else if (*ptr == ':') {
                 ptr++;
                 if (*ptr != ':') { return false; }
@@ -91,16 +88,14 @@ S_validate_class_name(const char *class_name)
 }
 
 int
-CFCSymbol_validate_class_name_component(const char *name)
-{
+CFCSymbol_validate_class_name_component(const char *name) {
     if (!S_validate_class_name(name)) { return false; }
     if (strchr(name, ':') != NULL) { return false; }
     return true;
 }
 
 static int
-S_validate_class_cnick(const char *class_cnick)
-{
+S_validate_class_cnick(const char *class_cnick) {
     // Allow all caps.
     const char *ptr;
     for (ptr = class_cnick; ; ptr++) {
@@ -116,21 +111,19 @@ S_validate_class_cnick(const char *class_cnick)
 }
 
 static int
-S_validate_identifier(const char *identifier)
-{
+S_validate_identifier(const char *identifier) {
     const char *ptr = identifier;
     if (!isalpha(*ptr) && *ptr != '_') { return false; }
-    for ( ; *ptr != 0; ptr++) {
+    for (; *ptr != 0; ptr++) {
         if (!isalnum(*ptr) && *ptr != '_') { return false; }
     }
     return true;
 }
 
 CFCSymbol*
-CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel, 
-               const char *exposure, const char *class_name, 
-               const char *class_cnick, const char *micro_sym)
-{
+CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
+               const char *exposure, const char *class_name,
+               const char *class_cnick, const char *micro_sym) {
     // Validate.
     CFCUTIL_NULL_CHECK(parcel);
     if (!S_validate_exposure(exposure)) {
@@ -173,25 +166,25 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     self->micro_sym   = CFCUtil_strdup(micro_sym);
 
     // Derive short_sym.
-    size_t class_cnick_len = self->class_cnick 
-                           ? strlen(self->class_cnick) 
-                           : 0;
+    size_t class_cnick_len = self->class_cnick
+                             ? strlen(self->class_cnick)
+                             : 0;
     size_t short_sym_len = class_cnick_len
-                         + strlen("_") 
-                         + strlen(self->micro_sym);
+                           + strlen("_")
+                           + strlen(self->micro_sym);
     self->short_sym = (char*)MALLOCATE(short_sym_len + 1);
     if (self->class_cnick) {
         memcpy((void*)self->short_sym, self->class_cnick, class_cnick_len);
     }
     self->short_sym[class_cnick_len] = '_';
-    memcpy(&self->short_sym[class_cnick_len + 1], 
-        self->micro_sym, strlen(micro_sym));
+    memcpy(&self->short_sym[class_cnick_len + 1],
+           self->micro_sym, strlen(micro_sym));
     self->short_sym[short_sym_len] = '\0';
 
     // Derive full_sym;
-    const char *prefix = CFCParcel_get_prefix(self->parcel);
-    size_t prefix_len = strlen(prefix);
-    size_t full_sym_len = prefix_len + short_sym_len;
+    const char *prefix       = CFCParcel_get_prefix(self->parcel);
+    size_t      prefix_len   = strlen(prefix);
+    size_t      full_sym_len = prefix_len + short_sym_len;
     self->full_sym = (char*)MALLOCATE(full_sym_len + 1);
     memcpy(self->full_sym, prefix, prefix_len);
     memcpy(&self->full_sym[prefix_len], self->short_sym, short_sym_len);
@@ -201,8 +194,7 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
 }
 
 void
-CFCSymbol_destroy(CFCSymbol *self)
-{
+CFCSymbol_destroy(CFCSymbol *self) {
     CFCBase_decref((CFCBase*)self->parcel);
     FREEMEM(self->exposure);
     FREEMEM(self->class_name);
@@ -214,104 +206,89 @@ CFCSymbol_destroy(CFCSymbol *self)
 }
 
 int
-CFCSymbol_equals(CFCSymbol *self, CFCSymbol *other)
-{
+CFCSymbol_equals(CFCSymbol *self, CFCSymbol *other) {
     if (strcmp(self->micro_sym, other->micro_sym) != 0) { return false; }
     if (!CFCParcel_equals(self->parcel, other->parcel)) { return false; }
     if (strcmp(self->exposure, other->exposure) != 0) { return false; }
     if (self->class_name) {
         if (!other->class_name) { return false; }
-        if (strcmp(self->class_name, other->class_name) != 0) { 
+        if (strcmp(self->class_name, other->class_name) != 0) {
             return false;
         }
     }
     else if (other->class_name) {
-        return false; 
+        return false;
     }
     return true;
 }
 
 int
-CFCSymbol_public(CFCSymbol *self)
-{
+CFCSymbol_public(CFCSymbol *self) {
     return !strcmp(self->exposure, "public");
 }
 
 int
-CFCSymbol_parcel(CFCSymbol *self)
-{
+CFCSymbol_parcel(CFCSymbol *self) {
     return !strcmp(self->exposure, "parcel");
 }
 
 int
-CFCSymbol_private(CFCSymbol *self)
-{
+CFCSymbol_private(CFCSymbol *self) {
     return !strcmp(self->exposure, "private");
 }
 
 int
-CFCSymbol_local(CFCSymbol *self)
-{
+CFCSymbol_local(CFCSymbol *self) {
     return !strcmp(self->exposure, "local");
 }
 
 const char*
-CFCSymbol_full_sym(CFCSymbol *self)
-{
+CFCSymbol_full_sym(CFCSymbol *self) {
     return self->full_sym;
 }
 
 const char*
-CFCSymbol_short_sym(CFCSymbol *self)
-{
+CFCSymbol_short_sym(CFCSymbol *self) {
     return self->short_sym;
 }
 
 struct CFCParcel*
-CFCSymbol_get_parcel(CFCSymbol *self)
-{
+CFCSymbol_get_parcel(CFCSymbol *self) {
     return self->parcel;
 }
 
 const char*
-CFCSymbol_get_class_name(CFCSymbol *self)
-{
+CFCSymbol_get_class_name(CFCSymbol *self) {
     return self->class_name;
 }
 
 const char*
-CFCSymbol_get_class_cnick(CFCSymbol *self)
-{
+CFCSymbol_get_class_cnick(CFCSymbol *self) {
     return self->class_cnick;
 }
 
 const char*
-CFCSymbol_get_exposure(CFCSymbol *self)
-{
+CFCSymbol_get_exposure(CFCSymbol *self) {
     return self->exposure;
 }
 
 const char*
-CFCSymbol_micro_sym(CFCSymbol *self)
-{
+CFCSymbol_micro_sym(CFCSymbol *self) {
     return self->micro_sym;
 }
 
 const char*
-CFCSymbol_get_prefix(CFCSymbol *self)
-{
+CFCSymbol_get_prefix(CFCSymbol *self) {
     return CFCParcel_get_prefix(self->parcel);
 }
 
 const char*
-CFCSymbol_get_Prefix(CFCSymbol *self)
-{
+CFCSymbol_get_Prefix(CFCSymbol *self) {
     return CFCParcel_get_Prefix(self->parcel);
 }
 
 const char*
-CFCSymbol_get_PREFIX(CFCSymbol *self)
-{
+CFCSymbol_get_PREFIX(CFCSymbol *self) {
     return CFCParcel_get_PREFIX(self->parcel);
 }
 

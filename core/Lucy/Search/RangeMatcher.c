@@ -22,17 +22,15 @@
 
 RangeMatcher*
 RangeMatcher_new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache,
-                 int32_t doc_max)
-{
+                 int32_t doc_max) {
     RangeMatcher *self = (RangeMatcher*)VTable_Make_Obj(RANGEMATCHER);
     return RangeMatcher_init(self, lower_bound, upper_bound, sort_cache,
-        doc_max);
+                             doc_max);
 }
 
 RangeMatcher*
 RangeMatcher_init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
-                  SortCache *sort_cache, int32_t doc_max)
-{
+                  SortCache *sort_cache, int32_t doc_max) {
     Matcher_init((Matcher*)self);
 
     // Init.
@@ -47,19 +45,17 @@ RangeMatcher_init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
     // Derive.
 
     return self;
-}   
+}
 
 void
-RangeMatcher_destroy(RangeMatcher *self)
-{
+RangeMatcher_destroy(RangeMatcher *self) {
     DECREF(self->sort_cache);
     SUPER_DESTROY(self, RANGEMATCHER);
 }
 
 int32_t
-RangeMatcher_next(RangeMatcher* self) 
-{
-    while(1) {
+RangeMatcher_next(RangeMatcher* self) {
+    while (1) {
         if (++self->doc_id > self->doc_max) {
             self->doc_id--;
             return 0;
@@ -68,7 +64,7 @@ RangeMatcher_next(RangeMatcher* self)
             // Check if ord for this document is within the specied range.
             // TODO: Unroll? i.e. use SortCache_Get_Ords at constructor time
             // and save ourselves some method call overhead.
-            const int32_t ord 
+            const int32_t ord
                 = SortCache_Ordinal(self->sort_cache, self->doc_id);
             if (ord >= self->lower_bound && ord <= self->upper_bound) {
                 break;
@@ -79,22 +75,19 @@ RangeMatcher_next(RangeMatcher* self)
 }
 
 int32_t
-RangeMatcher_advance(RangeMatcher* self, int32_t target) 
-{
+RangeMatcher_advance(RangeMatcher* self, int32_t target) {
     self->doc_id = target - 1;
     return RangeMatcher_next(self);
 }
 
 float
-RangeMatcher_score(RangeMatcher* self) 
-{
+RangeMatcher_score(RangeMatcher* self) {
     UNUSED_VAR(self);
     return 0.0f;
 }
 
-int32_t 
-RangeMatcher_get_doc_id(RangeMatcher* self) 
-{
+int32_t
+RangeMatcher_get_doc_id(RangeMatcher* self) {
     return self->doc_id;
 }
 

@@ -31,59 +31,53 @@ static CharBuf*
 S_fullpath(RAMFolder *self, const CharBuf *path);
 
 RAMFolder*
-RAMFolder_new(const CharBuf *path) 
-{
+RAMFolder_new(const CharBuf *path) {
     RAMFolder *self = (RAMFolder*)VTable_Make_Obj(RAMFOLDER);
     return RAMFolder_init(self, path);
 }
 
 RAMFolder*
-RAMFolder_init(RAMFolder *self, const CharBuf *path)
-{
+RAMFolder_init(RAMFolder *self, const CharBuf *path) {
     Folder_init((Folder*)self, path);
     return self;
 }
 
 void
-RAMFolder_initialize(RAMFolder *self)
-{
+RAMFolder_initialize(RAMFolder *self) {
     UNUSED_VAR(self);
 }
 
 bool_t
-RAMFolder_check(RAMFolder *self)
-{
+RAMFolder_check(RAMFolder *self) {
     UNUSED_VAR(self);
     return true;
 }
 
 bool_t
-RAMFolder_local_mkdir(RAMFolder *self, const CharBuf *name)
-{
+RAMFolder_local_mkdir(RAMFolder *self, const CharBuf *name) {
     if (Hash_Fetch(self->entries, (Obj*)name)) {
-        Err_set_error(Err_new(CB_newf(
-            "Can't MkDir, '%o' already exists", name)));
+        Err_set_error(Err_new(CB_newf("Can't MkDir, '%o' already exists",
+                                      name)));
         return false;
     }
     else {
         CharBuf *fullpath = S_fullpath(self, name);
         Hash_Store(self->entries, (Obj*)name,
-            (Obj*)RAMFolder_new(fullpath));
+                   (Obj*)RAMFolder_new(fullpath));
         DECREF(fullpath);
         return true;
     }
 }
 
 FileHandle*
-RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name, 
-                                uint32_t flags)
-{
+RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name,
+                                uint32_t flags) {
     RAMFileHandle *fh;
     CharBuf *fullpath = S_fullpath(self, name);
     RAMFile *file = (RAMFile*)Hash_Fetch(self->entries, (Obj*)name);
-    bool_t can_create = (flags & (FH_WRITE_ONLY | FH_CREATE))
-                              == (FH_WRITE_ONLY | FH_CREATE)
-                              ? true : false;
+    bool_t can_create
+        = (flags & (FH_WRITE_ONLY | FH_CREATE)) == (FH_WRITE_ONLY | FH_CREATE)
+          ? true : false;
 
     // Make sure the filepath isn't a directory, and that it either exists
     // or we have permission to create it.
@@ -119,22 +113,19 @@ RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name,
 }
 
 DirHandle*
-RAMFolder_local_open_dir(RAMFolder *self)
-{
+RAMFolder_local_open_dir(RAMFolder *self) {
     RAMDirHandle *dh = RAMDH_new(self);
     if (!dh) { ERR_ADD_FRAME(Err_get_error()); }
     return (DirHandle*)dh;
 }
 
 bool_t
-RAMFolder_local_exists(RAMFolder *self, const CharBuf *name)
-{
+RAMFolder_local_exists(RAMFolder *self, const CharBuf *name) {
     return !!Hash_Fetch(self->entries, (Obj*)name);
 }
 
 bool_t
-RAMFolder_local_is_directory(RAMFolder *self, const CharBuf *name)
-{
+RAMFolder_local_is_directory(RAMFolder *self, const CharBuf *name) {
     Obj *entry = Hash_Fetch(self->entries, (Obj*)name);
     if (entry && Obj_Is_A(entry, FOLDER)) { return true; }
     return false;
@@ -147,8 +138,7 @@ static bool_t
 S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
                       Folder *from_folder, Folder *to_folder,
                       ZombieCharBuf *from_name, ZombieCharBuf *to_name,
-                      int op)
-{
+                      int op) {
     Obj       *elem              = NULL;
     RAMFolder *inner_from_folder = NULL;
     RAMFolder *inner_to_folder   = NULL;
@@ -160,45 +150,45 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
         return false;
     }
     if (!to_folder) {
-        Err_set_error(Err_new(CB_newf(
-            "Invalid file path (can't find dir): '%o'", to)));
+        Err_set_error(Err_new(CB_newf("Invalid file path (can't find dir): '%o'",
+                                      to)));
         return false;
     }
 
     // Extract RAMFolders from compound reader wrappers, if necessary.
     if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)) {
         inner_from_folder = (RAMFolder*)CFReader_Get_Real_Folder(
-            (CompoundFileReader*)from_folder);
+                                (CompoundFileReader*)from_folder);
     }
     else {
         inner_from_folder = (RAMFolder*)from_folder;
     }
     if (Folder_Is_A(to_folder, COMPOUNDFILEREADER)) {
         inner_to_folder = (RAMFolder*)CFReader_Get_Real_Folder(
-            (CompoundFileReader*)to_folder);
+                              (CompoundFileReader*)to_folder);
     }
     else {
         inner_to_folder = (RAMFolder*)to_folder;
     }
     if (!RAMFolder_Is_A(inner_from_folder, RAMFOLDER)) {
         Err_set_error(Err_new(CB_newf("Not a RAMFolder, but a '%o'",
-            Obj_Get_Class_Name((Obj*)inner_from_folder))));
+                                      Obj_Get_Class_Name((Obj*)inner_from_folder))));
         return false;
     }
     if (!RAMFolder_Is_A(inner_to_folder, RAMFOLDER)) {
         Err_set_error(Err_new(CB_newf("Not a RAMFolder, but a '%o'",
-            Obj_Get_Class_Name((Obj*)inner_to_folder))));
+                                      Obj_Get_Class_Name((Obj*)inner_to_folder))));
         return false;
     }
 
     // Find the original element.
     elem = Hash_Fetch(inner_from_folder->entries, (Obj*)from_name);
     if (!elem) {
-        if (   Folder_Is_A(from_folder, COMPOUNDFILEREADER)
+        if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)
             && Folder_Local_Exists(from_folder, (CharBuf*)from_name)
-        ) {
-            Err_set_error(Err_new(CB_newf("Source file '%o' is virtual", 
-                from)));
+           ) {
+            Err_set_error(Err_new(CB_newf("Source file '%o' is virtual",
+                                          from)));
         }
         else {
             Err_set_error(Err_new(CB_newf("File not found: '%o'", from)));
@@ -213,9 +203,9 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
             bool_t conflict = false;
 
             // Return success fast if file is copied on top of itself.
-            if (   inner_from_folder == inner_to_folder 
+            if (inner_from_folder == inner_to_folder
                 && ZCB_Equals(from_name, (Obj*)to_name)
-            ) {
+               ) {
                 return true;
             }
 
@@ -232,7 +222,8 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
             }
             if (conflict) {
                 Err_set_error(Err_new(CB_newf("Can't clobber a %o with a %o",
-                    Obj_Get_Class_Name(existing), Obj_Get_Class_Name(elem))));
+                                              Obj_Get_Class_Name(existing),
+                                              Obj_Get_Class_Name(elem))));
                 return false;
             }
         }
@@ -250,19 +241,19 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
     else if (op == OP_HARD_LINK) {
         if (!Obj_Is_A(elem, RAMFILE)) {
             Err_set_error(Err_new(CB_newf("'%o' isn't a file, it's a %o",
-                from, Obj_Get_Class_Name(elem))));
+                                          from, Obj_Get_Class_Name(elem))));
             return false;
         }
         else {
-            Obj *existing 
+            Obj *existing
                 = Hash_Fetch(inner_to_folder->entries, (Obj*)to_name);
             if (existing) {
                 Err_set_error(Err_new(CB_newf("'%o' already exists", to)));
                 return false;
             }
             else {
-                Hash_Store(inner_to_folder->entries, (Obj*)to_name, 
-                    INCREF(elem));
+                Hash_Store(inner_to_folder->entries, (Obj*)to_name,
+                           INCREF(elem));
             }
         }
     }
@@ -274,34 +265,33 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
 }
 
 bool_t
-RAMFolder_rename(RAMFolder *self, const CharBuf* from, const CharBuf *to)
-{
+RAMFolder_rename(RAMFolder *self, const CharBuf* from, const CharBuf *to) {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
     ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
     ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
-    bool_t         result      = S_rename_or_hard_link(self, from, to, 
-        from_folder, to_folder, from_name, to_name, OP_RENAME);
+    bool_t result = S_rename_or_hard_link(self, from, to, from_folder,
+                                          to_folder, from_name, to_name,
+                                          OP_RENAME);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
     return result;
 }
 
 bool_t
-RAMFolder_hard_link(RAMFolder *self, const CharBuf *from, const CharBuf *to)
-{
+RAMFolder_hard_link(RAMFolder *self, const CharBuf *from, const CharBuf *to) {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
     ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
     ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
-    bool_t         result      = S_rename_or_hard_link(self, from, to, 
-        from_folder, to_folder, from_name, to_name, OP_HARD_LINK);
+    bool_t result = S_rename_or_hard_link(self, from, to, from_folder,
+                                          to_folder, from_name, to_name,
+                                          OP_HARD_LINK);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
     return result;
 }
 
 bool_t
-RAMFolder_local_delete(RAMFolder *self, const CharBuf *name)
-{
+RAMFolder_local_delete(RAMFolder *self, const CharBuf *name) {
     Obj *entry = Hash_Fetch(self->entries, (Obj*)name);
     if (entry) {
         if (Obj_Is_A(entry, RAMFILE)) {
@@ -311,8 +301,8 @@ RAMFolder_local_delete(RAMFolder *self, const CharBuf *name)
             RAMFolder *inner_folder;
             if (Obj_Is_A(entry, COMPOUNDFILEREADER)) {
                 inner_folder = (RAMFolder*)CERTIFY(
-                    CFReader_Get_Real_Folder((CompoundFileReader*)entry), 
-                    RAMFOLDER);
+                                   CFReader_Get_Real_Folder((CompoundFileReader*)entry),
+                                   RAMFOLDER);
             }
             else {
                 inner_folder = (RAMFolder*)CERTIFY(entry, RAMFOLDER);
@@ -334,8 +324,7 @@ RAMFolder_local_delete(RAMFolder *self, const CharBuf *name)
 }
 
 Folder*
-RAMFolder_local_find_folder(RAMFolder *self, const CharBuf *path)
-{
+RAMFolder_local_find_folder(RAMFolder *self, const CharBuf *path) {
     Folder *local_folder = (Folder*)Hash_Fetch(self->entries, (Obj*)path);
     if (local_folder && Folder_Is_A(local_folder, FOLDER)) {
         return local_folder;
@@ -344,14 +333,12 @@ RAMFolder_local_find_folder(RAMFolder *self, const CharBuf *path)
 }
 
 void
-RAMFolder_close(RAMFolder *self)
-{
+RAMFolder_close(RAMFolder *self) {
     UNUSED_VAR(self);
 }
 
 static CharBuf*
-S_fullpath(RAMFolder *self, const CharBuf *path)
-{
+S_fullpath(RAMFolder *self, const CharBuf *path) {
     if (CB_Get_Size(self->path)) {
         return CB_newf("%o/%o", self->path, path);
     }

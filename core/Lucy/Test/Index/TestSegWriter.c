@@ -22,8 +22,7 @@
 #include "Lucy/Index/SegWriter.h"
 
 void
-TestSegWriter_run_tests()
-{
+TestSegWriter_run_tests() {
     TestBatch *batch = TestBatch_new(1);
     TestBatch_Plan(batch);
     PASS(batch, "placeholder");

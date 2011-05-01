@@ -47,13 +47,13 @@ parcel Lucy;
  * ... the difference being that the word character tokenizer skips over
  * punctuation as well as whitespace when determining token boundaries.
  */
-class Lucy::Analysis::RegexTokenizer 
+class Lucy::Analysis::RegexTokenizer
     inherits Lucy::Analysis::Analyzer {
 
     CharBuf *pattern;
     void    *token_re;
 
-    inert incremented RegexTokenizer* 
+    inert incremented RegexTokenizer*
     new(const CharBuf *pattern = NULL);
 
     /**
@@ -62,7 +62,7 @@ class Lucy::Analysis::RegexTokenizer
      * <code>\w+(?:[\x{2019}']\w+)*</code>, which matches "it's" as well as
      * "it" and "O'Henry's" as well as "Henry".
      */
-    public inert RegexTokenizer* 
+    public inert RegexTokenizer*
     init(RegexTokenizer *self, const CharBuf *pattern = NULL);
 
     public incremented Inversion*
@@ -75,7 +75,7 @@ class Lucy::Analysis::RegexTokenizer
      * supplied Inversion.
      */
     void
-    Tokenize_Str(RegexTokenizer *self, const char *text, size_t len, 
+    Tokenize_Str(RegexTokenizer *self, const char *text, size_t len,
                  Inversion *inversion);
 
     /** Set the compiled regular expression for matching a token.  Also sets

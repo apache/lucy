@@ -23,11 +23,10 @@
 #include <windows.h>
 
 chy_bool_t
-lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value, 
-                            void *new_value)
-{
-    return InterlockedCompareExchangePointer(target, new_value, old_value) 
-        == old_value;
+lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
+                            void *new_value) {
+    return InterlockedCompareExchangePointer(target, new_value, old_value)
+           == old_value;
 }
 
 /************************** Fall back to ptheads ***************************/

@@ -35,14 +35,14 @@ class Lucy::Store::OutStream inherits Lucy::Object::Obj {
     FileHandle    *file_handle;
     CharBuf       *path;
 
-    inert incremented nullable OutStream* 
+    inert incremented nullable OutStream*
     open(Obj *file);
 
     /** Return a new OutStream or set Err_error and return NULL on failure.
      */
-    inert nullable OutStream* 
+    inert nullable OutStream*
     do_open(OutStream *self, Obj *file);
-    
+
     /** Accessor for <code>path</code> member.
      */
     CharBuf*
@@ -50,7 +50,7 @@ class Lucy::Store::OutStream inherits Lucy::Object::Obj {
 
     /** Return the current file position.
      */
-    final int64_t 
+    final int64_t
     Tell(OutStream *self);
 
     /** Write 0 or more null bytes to the OutStream until its file position is
@@ -68,7 +68,7 @@ class Lucy::Store::OutStream inherits Lucy::Object::Obj {
 
     /** Return the current length of the file in bytes.
      */
-    final int64_t 
+    final int64_t
     Length(OutStream *self);
 
     /** Advisory call informing the OutStream that it should prepare to occupy
@@ -137,20 +137,20 @@ class Lucy::Store::OutStream inherits Lucy::Object::Obj {
     /** Write a string as a C32 indicating length of content in bytes,
      * followed by the content.
      */
-    final void 
+    final void
     Write_String(OutStream *self, const char *buf, size_t len);
 
     /** Write the entire contents of an InStream to the OutStream.
      */
-    void 
+    void
     Absorb(OutStream *self, InStream *instream);
 
     /** Close down the stream.
      */
-    void 
+    void
     Close(OutStream *self);
 
-    public void 
+    public void
     Destroy(OutStream *self);
 }
 

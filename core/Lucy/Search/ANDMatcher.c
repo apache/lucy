@@ -21,15 +21,13 @@
 #include "Lucy/Index/Similarity.h"
 
 ANDMatcher*
-ANDMatcher_new(VArray *children, Similarity *sim) 
-{
+ANDMatcher_new(VArray *children, Similarity *sim) {
     ANDMatcher *self = (ANDMatcher*)VTable_Make_Obj(ANDMATCHER);
     return ANDMatcher_init(self, children, sim);
 }
 
 ANDMatcher*
-ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) 
-{
+ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) {
     uint32_t i;
 
     // Init.
@@ -52,15 +50,13 @@ ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim)
 }
 
 void
-ANDMatcher_destroy(ANDMatcher *self) 
-{
+ANDMatcher_destroy(ANDMatcher *self) {
     FREEMEM(self->kids);
     SUPER_DESTROY(self, ANDMATCHER);
 }
 
 int32_t
-ANDMatcher_next(ANDMatcher *self)
-{
+ANDMatcher_next(ANDMatcher *self) {
     if (self->first_time) {
         return ANDMatcher_Advance(self, 1);
     }
@@ -74,11 +70,10 @@ ANDMatcher_next(ANDMatcher *self)
 }
 
 int32_t
-ANDMatcher_advance(ANDMatcher *self, int32_t target)
-{
-    Matcher **const kids = self->kids;
-    const uint32_t  num_kids   = self->num_kids;
-    int32_t         highest    = 0;
+ANDMatcher_advance(ANDMatcher *self, int32_t target) {
+    Matcher **const kids     = self->kids;
+    const uint32_t  num_kids = self->num_kids;
+    int32_t         highest  = 0;
 
     if (!self->more) return 0;
 
@@ -88,14 +83,14 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target)
     }
     else {
         highest = Matcher_Advance(kids[0], target);
-        if (!highest) { 
+        if (!highest) {
             self->more = false;
             return 0;
         }
     }
 
     // Second step: reconcile.
-    while(1) {
+    while (1) {
         uint32_t i;
         bool_t agreement = true;
 
@@ -141,20 +136,18 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target)
         if (highest >= target) {
             break;
         }
-    } 
+    }
 
     return highest;
 }
 
 int32_t
-ANDMatcher_get_doc_id(ANDMatcher *self)
-{
+ANDMatcher_get_doc_id(ANDMatcher *self) {
     return Matcher_Get_Doc_ID(self->kids[0]);
 }
 
 float
-ANDMatcher_score(ANDMatcher *self)
-{
+ANDMatcher_score(ANDMatcher *self) {
     uint32_t i;
     Matcher **const kids = self->kids;
     float score = 0.0f;
@@ -163,7 +156,7 @@ ANDMatcher_score(ANDMatcher *self)
         score += Matcher_Score(kids[i]);
     }
 
-    score *= self->coord_factors[ self->matching_kids ];
+    score *= self->coord_factors[self->matching_kids];
 
     return score;
 }

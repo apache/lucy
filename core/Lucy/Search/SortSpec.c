@@ -28,15 +28,13 @@
 #include "Lucy/Util/SortUtils.h"
 
 SortSpec*
-SortSpec_new(VArray *rules)
-{
+SortSpec_new(VArray *rules) {
     SortSpec *self = (SortSpec*)VTable_Make_Obj(SORTSPEC);
     return SortSpec_init(self, rules);
 }
 
 SortSpec*
-SortSpec_init(SortSpec *self, VArray *rules)
-{
+SortSpec_init(SortSpec *self, VArray *rules) {
     int32_t i, max;
     self->rules = VA_Shallow_Copy(rules);
     for (i = 0, max = VA_Get_Size(rules); i < max; i++) {
@@ -47,15 +45,13 @@ SortSpec_init(SortSpec *self, VArray *rules)
 }
 
 void
-SortSpec_destroy(SortSpec *self)
-{
+SortSpec_destroy(SortSpec *self) {
     DECREF(self->rules);
     SUPER_DESTROY(self, SORTSPEC);
 }
 
 SortSpec*
-SortSpec_deserialize(SortSpec *self, InStream *instream)
-{
+SortSpec_deserialize(SortSpec *self, InStream *instream) {
     uint32_t num_rules = InStream_Read_C32(instream);
     VArray *rules = VA_new(num_rules);
     uint32_t i;
@@ -74,11 +70,12 @@ SortSpec_deserialize(SortSpec *self, InStream *instream)
 }
 
 VArray*
-SortSpec_get_rules(SortSpec *self) { return self->rules; }
+SortSpec_get_rules(SortSpec *self) {
+    return self->rules;
+}
 
 void
-SortSpec_serialize(SortSpec *self, OutStream *target)
-{
+SortSpec_serialize(SortSpec *self, OutStream *target) {
     uint32_t num_rules = VA_Get_Size(self->rules);
     uint32_t i;
     OutStream_Write_C32(target, num_rules);

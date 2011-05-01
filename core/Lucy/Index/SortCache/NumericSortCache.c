@@ -31,10 +31,9 @@
 
 NumericSortCache*
 NumSortCache_init(NumericSortCache *self, const CharBuf *field,
-                  FieldType *type, int32_t cardinality, int32_t doc_max, 
-                  int32_t null_ord, int32_t ord_width, InStream *ord_in, 
-                  InStream *dat_in)
-{
+                  FieldType *type, int32_t cardinality, int32_t doc_max,
+                  int32_t null_ord, int32_t ord_width, InStream *ord_in,
+                  InStream *dat_in) {
     // Validate.
     if (!type || !FType_Sortable(type) || !FType_Is_A(type, NUMERICTYPE)) {
         DECREF(self);
@@ -45,12 +44,12 @@ NumSortCache_init(NumericSortCache *self, const CharBuf *field,
     int64_t  ord_len = InStream_Length(ord_in);
     void    *ords    = InStream_Buf(ord_in, (size_t)ord_len);
     SortCache_init((SortCache*)self, field, type, ords, cardinality, doc_max,
-        null_ord, ord_width);
+                   null_ord, ord_width);
 
     // Assign.
     self->ord_in = (InStream*)INCREF(ord_in);
     self->dat_in = (InStream*)INCREF(dat_in);
-    
+
     // Validate ord file length.
     double BITS_PER_BYTE = 8.0;
     double docs_per_byte = BITS_PER_BYTE / self->ord_width;
@@ -58,7 +57,7 @@ NumSortCache_init(NumericSortCache *self, const CharBuf *field,
     if (max_ords < self->doc_max + 1) {
         DECREF(self);
         THROW(ERR, "Conflict between ord count max %f64 and doc_max %i32 for "
-            "field %o", max_ords, self->doc_max, field);
+              "field %o", max_ords, self->doc_max, field);
     }
 
     ABSTRACT_CLASS_CHECK(self, NUMERICSORTCACHE);
@@ -66,14 +65,13 @@ NumSortCache_init(NumericSortCache *self, const CharBuf *field,
 }
 
 void
-NumSortCache_destroy(NumericSortCache *self)
-{
-    if (self->ord_in) { 
-        InStream_Close(self->ord_in); 
+NumSortCache_destroy(NumericSortCache *self) {
+    if (self->ord_in) {
+        InStream_Close(self->ord_in);
         InStream_Dec_RefCount(self->ord_in);
     }
-    if (self->dat_in) { 
-        InStream_Close(self->dat_in); 
+    if (self->dat_in) {
+        InStream_Close(self->dat_in);
         InStream_Dec_RefCount(self->dat_in);
     }
     SUPER_DESTROY(self, NUMERICSORTCACHE);
@@ -82,32 +80,29 @@ NumSortCache_destroy(NumericSortCache *self)
 /***************************************************************************/
 
 Float64SortCache*
-F64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality, 
-                 int32_t doc_max, int32_t null_ord, int32_t ord_width, 
-                 InStream *ord_in, InStream *dat_in)
-{
-    Float64SortCache *self 
+F64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+                 int32_t doc_max, int32_t null_ord, int32_t ord_width,
+                 InStream *ord_in, InStream *dat_in) {
+    Float64SortCache *self
         = (Float64SortCache*)VTable_Make_Obj(FLOAT64SORTCACHE);
-    return F64SortCache_init(self, field, type, cardinality, doc_max, 
-        null_ord, ord_width, ord_in, dat_in);
+    return F64SortCache_init(self, field, type, cardinality, doc_max,
+                             null_ord, ord_width, ord_in, dat_in);
 }
 
 Float64SortCache*
 F64SortCache_init(Float64SortCache *self, const CharBuf *field,
-                  FieldType *type, int32_t cardinality, int32_t doc_max, 
-                  int32_t null_ord, int32_t ord_width, InStream *ord_in, 
-                  InStream *dat_in)
-{
+                  FieldType *type, int32_t cardinality, int32_t doc_max,
+                  int32_t null_ord, int32_t ord_width, InStream *ord_in,
+                  InStream *dat_in) {
     NumSortCache_init((NumericSortCache*)self, field, type, cardinality,
-        doc_max, null_ord, ord_width, ord_in, dat_in);
+                      doc_max, null_ord, ord_width, ord_in, dat_in);
     return self;
 }
 
 Obj*
-F64SortCache_value(Float64SortCache *self, int32_t ord, Obj *blank)
-{
-    if (ord == self->null_ord ) {
-        return NULL; 
+F64SortCache_value(Float64SortCache *self, int32_t ord, Obj *blank) {
+    if (ord == self->null_ord) {
+        return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", self->field, ord);
@@ -121,8 +116,7 @@ F64SortCache_value(Float64SortCache *self, int32_t ord, Obj *blank)
 }
 
 Float64*
-F64SortCache_make_blank(Float64SortCache *self)
-{
+F64SortCache_make_blank(Float64SortCache *self) {
     UNUSED_VAR(self);
     return Float64_new(0.0);
 }
@@ -130,32 +124,29 @@ F64SortCache_make_blank(Float64SortCache *self)
 /***************************************************************************/
 
 Float32SortCache*
-F32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality, 
-                 int32_t doc_max, int32_t null_ord, int32_t ord_width, 
-                 InStream *ord_in, InStream *dat_in)
-{
-    Float32SortCache *self 
+F32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+                 int32_t doc_max, int32_t null_ord, int32_t ord_width,
+                 InStream *ord_in, InStream *dat_in) {
+    Float32SortCache *self
         = (Float32SortCache*)VTable_Make_Obj(FLOAT32SORTCACHE);
-    return F32SortCache_init(self, field, type, cardinality, doc_max, 
-        null_ord, ord_width, ord_in, dat_in);
+    return F32SortCache_init(self, field, type, cardinality, doc_max,
+                             null_ord, ord_width, ord_in, dat_in);
 }
 
 Float32SortCache*
 F32SortCache_init(Float32SortCache *self, const CharBuf *field,
-                  FieldType *type, int32_t cardinality, int32_t doc_max, 
-                  int32_t null_ord, int32_t ord_width, InStream *ord_in, 
-                  InStream *dat_in)
-{
+                  FieldType *type, int32_t cardinality, int32_t doc_max,
+                  int32_t null_ord, int32_t ord_width, InStream *ord_in,
+                  InStream *dat_in) {
     NumSortCache_init((NumericSortCache*)self, field, type, cardinality,
-        doc_max, null_ord, ord_width, ord_in, dat_in);
+                      doc_max, null_ord, ord_width, ord_in, dat_in);
     return self;
 }
 
 Obj*
-F32SortCache_value(Float32SortCache *self, int32_t ord, Obj *blank)
-{
-    if (ord == self->null_ord ) {
-        return NULL; 
+F32SortCache_value(Float32SortCache *self, int32_t ord, Obj *blank) {
+    if (ord == self->null_ord) {
+        return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", self->field, ord);
@@ -169,8 +160,7 @@ F32SortCache_value(Float32SortCache *self, int32_t ord, Obj *blank)
 }
 
 Float32*
-F32SortCache_make_blank(Float32SortCache *self)
-{
+F32SortCache_make_blank(Float32SortCache *self) {
     UNUSED_VAR(self);
     return Float32_new(0.0f);
 }
@@ -178,32 +168,29 @@ F32SortCache_make_blank(Float32SortCache *self)
 /***************************************************************************/
 
 Int32SortCache*
-I32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality, 
+I32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
-                 InStream *ord_in, InStream *dat_in)
-{
-    Int32SortCache *self 
+                 InStream *ord_in, InStream *dat_in) {
+    Int32SortCache *self
         = (Int32SortCache*)VTable_Make_Obj(INT32SORTCACHE);
-    return I32SortCache_init(self, field, type, cardinality, doc_max, 
-        null_ord, ord_width, ord_in, dat_in);
+    return I32SortCache_init(self, field, type, cardinality, doc_max,
+                             null_ord, ord_width, ord_in, dat_in);
 }
 
 Int32SortCache*
 I32SortCache_init(Int32SortCache *self, const CharBuf *field,
-                  FieldType *type, int32_t cardinality, int32_t doc_max, 
-                  int32_t null_ord, int32_t ord_width, InStream *ord_in, 
-                  InStream *dat_in)
-{
+                  FieldType *type, int32_t cardinality, int32_t doc_max,
+                  int32_t null_ord, int32_t ord_width, InStream *ord_in,
+                  InStream *dat_in) {
     NumSortCache_init((NumericSortCache*)self, field, type, cardinality,
-        doc_max, null_ord, ord_width, ord_in, dat_in);
+                      doc_max, null_ord, ord_width, ord_in, dat_in);
     return self;
 }
 
 Obj*
-I32SortCache_value(Int32SortCache *self, int32_t ord, Obj *blank)
-{
-    if (ord == self->null_ord ) {
-        return NULL; 
+I32SortCache_value(Int32SortCache *self, int32_t ord, Obj *blank) {
+    if (ord == self->null_ord) {
+        return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", self->field, ord);
@@ -217,8 +204,7 @@ I32SortCache_value(Int32SortCache *self, int32_t ord, Obj *blank)
 }
 
 Integer32*
-I32SortCache_make_blank(Int32SortCache *self)
-{
+I32SortCache_make_blank(Int32SortCache *self) {
     UNUSED_VAR(self);
     return Int32_new(0);
 }
@@ -226,32 +212,29 @@ I32SortCache_make_blank(Int32SortCache *self)
 /***************************************************************************/
 
 Int64SortCache*
-I64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality, 
-                 int32_t doc_max, int32_t null_ord, int32_t ord_width, 
-                 InStream *ord_in, InStream *dat_in)
-{
-    Int64SortCache *self 
+I64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+                 int32_t doc_max, int32_t null_ord, int32_t ord_width,
+                 InStream *ord_in, InStream *dat_in) {
+    Int64SortCache *self
         = (Int64SortCache*)VTable_Make_Obj(INT64SORTCACHE);
-    return I64SortCache_init(self, field, type, cardinality, doc_max, 
-        null_ord, ord_width, ord_in, dat_in);
+    return I64SortCache_init(self, field, type, cardinality, doc_max,
+                             null_ord, ord_width, ord_in, dat_in);
 }
 
 Int64SortCache*
 I64SortCache_init(Int64SortCache *self, const CharBuf *field,
-                  FieldType *type, int32_t cardinality, int32_t doc_max, 
-                  int32_t null_ord, int32_t ord_width, InStream *ord_in, 
-                  InStream *dat_in)
-{
+                  FieldType *type, int32_t cardinality, int32_t doc_max,
+                  int32_t null_ord, int32_t ord_width, InStream *ord_in,
+                  InStream *dat_in) {
     NumSortCache_init((NumericSortCache*)self, field, type, cardinality,
-        doc_max, null_ord, ord_width, ord_in, dat_in);
+                      doc_max, null_ord, ord_width, ord_in, dat_in);
     return self;
 }
 
 Obj*
-I64SortCache_value(Int64SortCache *self, int32_t ord, Obj *blank)
-{
-    if (ord == self->null_ord ) {
-        return NULL; 
+I64SortCache_value(Int64SortCache *self, int32_t ord, Obj *blank) {
+    if (ord == self->null_ord) {
+        return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", self->field, ord);
@@ -265,8 +248,7 @@ I64SortCache_value(Int64SortCache *self, int32_t ord, Obj *blank)
 }
 
 Integer64*
-I64SortCache_make_blank(Int64SortCache *self)
-{
+I64SortCache_make_blank(Int64SortCache *self) {
     UNUSED_VAR(self);
     return Int64_new(0);
 }

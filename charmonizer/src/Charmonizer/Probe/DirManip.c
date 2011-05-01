@@ -26,8 +26,7 @@
 #include <stdlib.h>
 
 void
-DirManip_run(void) 
-{
+DirManip_run(void) {
     FILE *f;
     char dir_sep[3];
     chaz_bool_t remove_zaps_dirs = false;
@@ -49,13 +48,17 @@ DirManip_run(void)
 
     /* Check for members in struct dirent. */
     if (has_dirent_h) {
-        has_dirent_d_namlen = HeadCheck_contains_member("struct dirent", 
-            "d_namlen", "#include <sys/types.h>\n#include <dirent.h>");
+        has_dirent_d_namlen = HeadCheck_contains_member(
+                                  "struct dirent", "d_namlen",
+                                  "#include <sys/types.h>\n#include <dirent.h>"
+                              );
         if (has_dirent_d_namlen) {
             ConfWriter_append_conf("#define CHY_HAS_DIRENT_D_NAMLEN\n", dir_sep);
         }
-        has_dirent_d_type = HeadCheck_contains_member("struct dirent", 
-            "d_type", "#include <sys/types.h>\n#include <dirent.h>");
+        has_dirent_d_type = HeadCheck_contains_member(
+                                "struct dirent", "d_type",
+                                "#include <sys/types.h>\n#include <dirent.h>"
+                            );
         if (has_dirent_d_type) {
             ConfWriter_append_conf("#define CHY_HAS_DIRENT_D_TYPE\n", dir_sep);
         }
@@ -64,13 +67,13 @@ DirManip_run(void)
     if (Dir_mkdir_num_args == 2) {
         /* It's two args, but the command isn't "mkdir". */
         ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir, _mode)\n",
-            Dir_mkdir_command);
+                               Dir_mkdir_command);
         ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 0\n");
     }
     else if (Dir_mkdir_num_args == 1) {
         /* It's one arg... mode arg will be ignored. */
         ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir)\n",
-            Dir_mkdir_command);
+                               Dir_mkdir_command);
         ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 1\n");
     }
 
@@ -78,20 +81,20 @@ DirManip_run(void)
     Dir_mkdir("_charm_test_dir_orig");
 
     /* Try to create files under the new directory. */
-    if ( (f = fopen("_charm_test_dir_orig\\backslash", "w")) != NULL) {
+    if ((f = fopen("_charm_test_dir_orig\\backslash", "w")) != NULL) {
         fclose(f);
     }
-    if ( (f = fopen("_charm_test_dir_orig/slash", "w")) != NULL) {
+    if ((f = fopen("_charm_test_dir_orig/slash", "w")) != NULL) {
         fclose(f);
     }
 
     /* Rename the directory, then see which file we can get to. */
     rename("_charm_test_dir_orig", "_charm_test_dir_mod");
-    if ( (f = fopen("_charm_test_dir_mod\\backslash", "r")) != NULL) {
+    if ((f = fopen("_charm_test_dir_mod\\backslash", "r")) != NULL) {
         fclose(f);
         strcpy(dir_sep, "\\\\");
     }
-    else if ( (f = fopen("_charm_test_dir_mod/slash", "r")) != NULL) {
+    else if ((f = fopen("_charm_test_dir_mod/slash", "r")) != NULL) {
         fclose(f);
         strcpy(dir_sep, "/");
     }

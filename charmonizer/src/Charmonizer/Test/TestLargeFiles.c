@@ -27,14 +27,12 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-TestLargeFiles_prepare()
-{
+TestLargeFiles_prepare() {
     return Test_new_batch("LargeFiles", 10, TestLargeFiles_run);
 }
 
 void
-TestLargeFiles_run(TestBatch *batch)
-{
+TestLargeFiles_run(TestBatch *batch) {
     FILE *fh;
     off64_t offset;
     int check_val;
@@ -43,7 +41,7 @@ TestLargeFiles_run(TestBatch *batch)
     /* A little over 4 GB, and a little over 2 GB. */
     off64_t gb4_plus = ((off64_t)0x7FFFFFFF << 1) + 100;
     off64_t gb2_plus = (off64_t)0x7FFFFFFF + 200;
-    
+
     /* Gb4_plus modulo 4 GB (wrap is intentional). */
     i32_t wrap_gb4 = (i32_t)gb4_plus;
 
@@ -53,7 +51,8 @@ TestLargeFiles_run(TestBatch *batch)
     SKIP_REMAINING(batch, "No large file support");
 #endif
 #ifndef CHAZ_HAS_SPARSE_FILES
-    SKIP_REMAINING(batch, "Can't verify large file support without sparse files");
+    SKIP_REMAINING(batch,
+                   "Can't verify large file support without sparse files");
 #endif
 #ifndef CHAZ_CAN_CREATE_BIG_FILES
     SKIP_REMAINING(batch, "Unsafe to create 5GB sparse files on this system");
@@ -94,8 +93,8 @@ TestLargeFiles_run(TestBatch *batch)
 
     /* Truncate, just in case the call to remove fails. */
     fh = fopen64("_charm_large_file_test", "w+");
-    if (fh != NULL) { 
-        fclose(fh); 
+    if (fh != NULL) {
+        fclose(fh);
     }
     remove("_charm_large_file_test");
 }

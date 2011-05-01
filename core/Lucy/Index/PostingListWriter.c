@@ -50,19 +50,17 @@ S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num);
 
 PostingListWriter*
 PListWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-                PolyReader *polyreader, LexiconWriter *lex_writer)
-{
-    PostingListWriter *self 
+                PolyReader *polyreader, LexiconWriter *lex_writer) {
+    PostingListWriter *self
         = (PostingListWriter*)VTable_Make_Obj(POSTINGLISTWRITER);
     return PListWriter_init(self, schema, snapshot, segment, polyreader,
-        lex_writer);
+                            lex_writer);
 }
 
 PostingListWriter*
 PListWriter_init(PostingListWriter *self, Schema *schema, Snapshot *snapshot,
                  Segment *segment, PolyReader *polyreader,
-                 LexiconWriter *lex_writer)
-{
+                 LexiconWriter *lex_writer) {
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
 
     // Assign.
@@ -79,8 +77,7 @@ PListWriter_init(PostingListWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 static void
-S_lazy_init(PostingListWriter *self)
-{
+S_lazy_init(PostingListWriter *self) {
     if (!self->lex_temp_out) {
         Folder  *folder         = self->folder;
         CharBuf *seg_name       = Seg_Get_Name(self->segment);
@@ -103,22 +100,21 @@ S_lazy_init(PostingListWriter *self)
 }
 
 static PostingPool*
-S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num)
-{
+S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num) {
     PostingPool *pool = (PostingPool*)VA_Fetch(self->pools, field_num);
     if (!pool && field_num != 0) {
         CharBuf *field = Seg_Field_Name(self->segment, field_num);
         pool = PostPool_new(self->schema, self->snapshot, self->segment,
-            self->polyreader, field, self->lex_writer, self->mem_pool, 
-            self->lex_temp_out, self->post_temp_out, self->skip_out);
+                            self->polyreader, field, self->lex_writer,
+                            self->mem_pool, self->lex_temp_out,
+                            self->post_temp_out, self->skip_out);
         VA_Store(self->pools, field_num, (Obj*)pool);
     }
     return pool;
 }
 
 void
-PListWriter_destroy(PostingListWriter *self)
-{
+PListWriter_destroy(PostingListWriter *self) {
     DECREF(self->lex_writer);
     DECREF(self->mem_pool);
     DECREF(self->pools);
@@ -129,22 +125,19 @@ PListWriter_destroy(PostingListWriter *self)
 }
 
 void
-PListWriter_set_default_mem_thresh(size_t mem_thresh)
-{
+PListWriter_set_default_mem_thresh(size_t mem_thresh) {
     default_mem_thresh = mem_thresh;
 }
 
 int32_t
-PListWriter_format(PostingListWriter *self)
-{
+PListWriter_format(PostingListWriter *self) {
     UNUSED_VAR(self);
     return PListWriter_current_file_format;
 }
 
 void
-PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter, 
-                            int32_t doc_id)
-{
+PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter,
+                             int32_t doc_id) {
     S_lazy_init(self);
 
     // Iterate over fields in document, adding the content of indexed fields
@@ -158,10 +151,10 @@ PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter,
             Inversion   *inversion = Inverter_Get_Inversion(inverter);
             Similarity  *sim  = Inverter_Get_Similarity(inverter);
             PostingPool *pool = S_lazy_init_posting_pool(self, field_num);
-            float length_norm 
+            float length_norm
                 = Sim_Length_Norm(sim, Inversion_Get_Size(inversion));
-            PostPool_Add_Inversion(pool, inversion, doc_id, doc_boost, 
-                length_norm);
+            PostPool_Add_Inversion(pool, inversion, doc_id, doc_boost,
+                                   length_norm);
         }
     }
 
@@ -179,27 +172,28 @@ PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter,
 
 void
 PListWriter_add_segment(PostingListWriter *self, SegReader *reader,
-                        I32Array *doc_map)
-{
-    Segment   *other_segment  = SegReader_Get_Segment(reader);
-    Schema    *schema         = self->schema;
-    Segment   *segment        = self->segment;
-    VArray    *all_fields     = Schema_All_Fields(schema);
+                        I32Array *doc_map) {
+    Segment *other_segment = SegReader_Get_Segment(reader);
+    Schema  *schema        = self->schema;
+    Segment *segment       = self->segment;
+    VArray  *all_fields    = Schema_All_Fields(schema);
     S_lazy_init(self);
 
     for (uint32_t i = 0, max = VA_Get_Size(all_fields); i < max; i++) {
-        CharBuf   *field    = (CharBuf*)VA_Fetch(all_fields, i);
-        FieldType *type     = Schema_Fetch_Type(schema, field);
+        CharBuf   *field = (CharBuf*)VA_Fetch(all_fields, i);
+        FieldType *type  = Schema_Fetch_Type(schema, field);
         int32_t old_field_num = Seg_Field_Num(other_segment, field);
         int32_t new_field_num = Seg_Field_Num(segment, field);
 
         if (!FType_Indexed(type)) { continue; }
-        if (!old_field_num) { continue; } // not in old segment
-        if (!new_field_num) { THROW(ERR, "Unrecognized field: %o", field); }
+        if (!old_field_num)       { continue; } // not in old segment
+        if (!new_field_num) {
+            THROW(ERR, "Unrecognized field: %o", field);
+        }
 
         PostingPool *pool = S_lazy_init_posting_pool(self, new_field_num);
-        PostPool_Add_Segment(pool, reader, doc_map, 
-            (int32_t)Seg_Get_Count(segment));
+        PostPool_Add_Segment(pool, reader, doc_map,
+                             (int32_t)Seg_Get_Count(segment));
     }
 
     // Clean up.
@@ -207,8 +201,7 @@ PListWriter_add_segment(PostingListWriter *self, SegReader *reader,
 }
 
 void
-PListWriter_finish(PostingListWriter *self)
-{
+PListWriter_finish(PostingListWriter *self) {
     // If S_lazy_init was never called, we have no data, so bail out.
     if (!self->lex_temp_out) { return; }
 
@@ -230,7 +223,7 @@ PListWriter_finish(PostingListWriter *self)
     // Write postings for each field.
     for (uint32_t i = 0, max = VA_Get_Size(self->pools); i < max; i++) {
         PostingPool *pool = (PostingPool*)VA_Delete(self->pools, i);
-        if (pool) { 
+        if (pool) {
             // Write out content for each PostingPool.  Let each PostingPool
             // use more RAM while finishing.  (This is a little dicy, because if
             // Shrink() was ineffective, we may double the RAM footprint.)
@@ -242,8 +235,8 @@ PListWriter_finish(PostingListWriter *self)
     }
 
     // Store metadata.
-    Seg_Store_Metadata_Str(self->segment, "postings", 8, 
-        (Obj*)PListWriter_Metadata(self));
+    Seg_Store_Metadata_Str(self->segment, "postings", 8,
+                           (Obj*)PListWriter_Metadata(self));
 
     // Close down and clean up.
     OutStream_Close(self->skip_out);
@@ -254,7 +247,7 @@ PListWriter_finish(PostingListWriter *self)
         THROW(ERR, "Couldn't delete %o", post_temp_path);
     }
     DECREF(self->skip_out);
-    self->skip_out     = NULL;
+    self->skip_out = NULL;
     DECREF(post_temp_path);
     DECREF(lex_temp_path);
 

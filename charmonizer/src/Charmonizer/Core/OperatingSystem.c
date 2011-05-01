@@ -50,8 +50,7 @@ static chaz_bool_t charm_run_initialized = false;
 static chaz_bool_t charm_run_ok = false;
 
 void
-OS_init() 
-{
+OS_init() {
     if (Util_verbosity) {
         printf("Initializing Charmonizer/Core/OperatingSystem...\n");
     }
@@ -60,8 +59,7 @@ OS_init()
 }
 
 static void
-S_probe_dev_null(void)
-{
+S_probe_dev_null(void) {
     if (Util_verbosity) {
         printf("Trying to find a bit-bucket a la /dev/null...\n");
     }
@@ -71,8 +69,8 @@ S_probe_dev_null(void)
 #else
     {
         char *const options[] = {
-            "/dev/null", 
-            "/dev/nul", 
+            "/dev/null",
+            "/dev/nul",
             NULL
         };
         int i;
@@ -92,30 +90,26 @@ S_probe_dev_null(void)
 }
 
 void
-OS_clean_up(void)
-{
+OS_clean_up(void) {
     OS_remove_exe("_charm_run");
 }
 
 const char*
-OS_exe_ext(void)
-{
+OS_exe_ext(void) {
     return exe_ext;
 }
 
 const char*
-OS_obj_ext(void)
-{
+OS_obj_ext(void) {
     return obj_ext;
 }
 
 const char*
-OS_dev_null(void)
-{
+OS_dev_null(void) {
     return dev_null;
 }
 
-static char charm_run_code[] = 
+static char charm_run_code[] =
     QUOTE(  #include <stdio.h>                                           )
     QUOTE(  #include <stdlib.h>                                          )
     QUOTE(  #include <string.h>                                          )
@@ -126,7 +120,7 @@ static char charm_run_code[] =
     QUOTE(      size_t command_len = 1; /* Terminating null. */          )
     QUOTE(      int i;                                                   )
     QUOTE(      int retval;                                              )
-                /* Rebuild command line args. */
+    /* Rebuild command line args. */
     QUOTE(      for (i = 1; i < argc; i++) {                             )
     QUOTE(          command_len += strlen(argv[i]) + 1;                  )
     QUOTE(      }                                                        )
@@ -138,29 +132,28 @@ static char charm_run_code[] =
     QUOTE(      for (i = 1; i < argc; i++) {                             )
     QUOTE(          strcat( strcat(command, " "), argv[i] );             )
     QUOTE(      }                                                        )
-                /* Redirect all output to /dev/null or equivalent. */
+    /* Redirect all output to /dev/null or equivalent. */
     QUOTE(      freopen("%s", "w", stdout);                              )
     QUOTE(      freopen("%s", "w", stderr);                              )
-                /* Run commmand and return its value to parent. */
+    /* Run commmand and return its value to parent. */
     QUOTE(      retval = system(command);                                )
     QUOTE(      free(command);                                           )
     QUOTE(      return retval;                                           )
     QUOTE(  }                                                            );
 
 static void
-S_build_charm_run()
-{
+S_build_charm_run() {
     chaz_bool_t compile_succeeded = false;
     const char *dev_null = OS_dev_null();
     size_t needed = sizeof(charm_run_code)
-                  + strlen(dev_null)
-                  + strlen(dev_null)
-                  + 20;
+                    + strlen(dev_null)
+                    + strlen(dev_null)
+                    + 20;
     char *code = (char*)malloc(needed);
 
     sprintf(code, charm_run_code, dev_null, dev_null);
-    compile_succeeded = CC_compile_exe("_charm_run.c", "_charm_run", 
-        code, strlen(code));
+    compile_succeeded = CC_compile_exe("_charm_run.c", "_charm_run",
+                                       code, strlen(code));
     if (!compile_succeeded) {
         Util_die("failed to compile _charm_run helper utility");
     }
@@ -171,8 +164,7 @@ S_build_charm_run()
 }
 
 void
-OS_remove_exe(char *name)
-{
+OS_remove_exe(char *name) {
     char *exe_name = (char*)malloc(strlen(name) + strlen(exe_ext) + 1);
     sprintf(exe_name, "%s%s", name, exe_ext);
     remove(exe_name);
@@ -180,8 +172,7 @@ OS_remove_exe(char *name)
 }
 
 void
-OS_remove_obj(char *name)
-{
+OS_remove_obj(char *name) {
     char *obj_name = (char*)malloc(strlen(name) + strlen(obj_ext) + 1);
     sprintf(obj_name, "%s%s", name, obj_ext);
     remove(obj_name);
@@ -189,8 +180,7 @@ OS_remove_obj(char *name)
 }
 
 int
-OS_run_local(char *arg1, ...)
-{
+OS_run_local(char *arg1, ...) {
     va_list  args;
     size_t   len     = strlen(local_command_start) + strlen(arg1);
     char    *command = (char*)malloc(len + 1);
@@ -214,10 +204,9 @@ OS_run_local(char *arg1, ...)
 }
 
 int
-OS_run_quietly(const char *command)
-{
+OS_run_quietly(const char *command) {
     int retval = 1;
-    
+
     if (!charm_run_initialized) {
         charm_run_initialized = true;
         S_build_charm_run();

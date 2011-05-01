@@ -20,16 +20,14 @@
 #include "Lucy/Search/MatchAllMatcher.h"
 
 MatchAllMatcher*
-MatchAllMatcher_new(float score, int32_t doc_max)
-{
-    MatchAllMatcher *self 
+MatchAllMatcher_new(float score, int32_t doc_max) {
+    MatchAllMatcher *self
         = (MatchAllMatcher*)VTable_Make_Obj(MATCHALLMATCHER);
     return MatchAllMatcher_init(self, score, doc_max);
 }
 
 MatchAllMatcher*
-MatchAllMatcher_init(MatchAllMatcher *self, float score, int32_t doc_max)
-{
+MatchAllMatcher_init(MatchAllMatcher *self, float score, int32_t doc_max) {
     Matcher_init((Matcher*)self);
     self->doc_id        = 0;
     self->score         = score;
@@ -38,8 +36,7 @@ MatchAllMatcher_init(MatchAllMatcher *self, float score, int32_t doc_max)
 }
 
 int32_t
-MatchAllMatcher_next(MatchAllMatcher* self) 
-{
+MatchAllMatcher_next(MatchAllMatcher* self) {
     if (++self->doc_id <= self->doc_max) {
         return self->doc_id;
     }
@@ -50,21 +47,18 @@ MatchAllMatcher_next(MatchAllMatcher* self)
 }
 
 int32_t
-MatchAllMatcher_advance(MatchAllMatcher* self, int32_t target) 
-{
+MatchAllMatcher_advance(MatchAllMatcher* self, int32_t target) {
     self->doc_id = target - 1;
     return MatchAllMatcher_next(self);
 }
 
 float
-MatchAllMatcher_score(MatchAllMatcher* self) 
-{
+MatchAllMatcher_score(MatchAllMatcher* self) {
     return self->score;
 }
 
-int32_t 
-MatchAllMatcher_get_doc_id(MatchAllMatcher* self) 
-{
+int32_t
+MatchAllMatcher_get_doc_id(MatchAllMatcher* self) {
     return self->doc_id;
 }
 

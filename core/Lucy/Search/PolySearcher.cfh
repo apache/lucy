@@ -25,9 +25,9 @@ parcel Lucy;
  * from multiple Searchers on a single machine.
  */
 
-class Lucy::Search::PolySearcher 
+class Lucy::Search::PolySearcher
     inherits Lucy::Search::Searcher {
-    
+
     VArray    *searchers;
     I32Array  *starts;
     int32_t    doc_max;

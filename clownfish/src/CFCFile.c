@@ -26,10 +26,10 @@
 
 #ifdef _WIN32
 #define PATH_SEP "\\"
-#define PATH_SEP_CHAR '\\' 
+#define PATH_SEP_CHAR '\\'
 #else
 #define PATH_SEP "/"
-#define PATH_SEP_CHAR '/' 
+#define PATH_SEP_CHAR '/'
 #endif
 
 #define CFC_NEED_BASE_STRUCT_DEF
@@ -51,17 +51,15 @@ struct CFCFile {
 };
 
 CFCFile*
-CFCFile_new(const char *source_class)
-{
+CFCFile_new(const char *source_class) {
 
     CFCFile *self = (CFCFile*)CFCBase_allocate(sizeof(CFCFile),
-        "Clownfish::File");
+                                               "Clownfish::File");
     return CFCFile_init(self, source_class);
 }
 
 CFCFile*
-CFCFile_init(CFCFile *self, const char *source_class) 
-{
+CFCFile_init(CFCFile *self, const char *source_class) {
     CFCUTIL_NULL_CHECK(source_class);
     self->modified = false;
     self->source_class = CFCUtil_strdup(source_class);
@@ -87,11 +85,11 @@ CFCFile_init(CFCFile *self, const char *source_class)
         }
     }
     self->guard_name[j] = '\0';
-    int check = sprintf(self->guard_start, "#ifndef %s\n#define %s 1\n", 
-        self->guard_name, self->guard_name);
+    int check = sprintf(self->guard_start, "#ifndef %s\n#define %s 1\n",
+                        self->guard_name, self->guard_name);
     if (check < 0) { croak("sprintf failed"); }
-    check = sprintf(self->guard_close, "#endif /* %s */\n", 
-        self->guard_name);
+    check = sprintf(self->guard_close, "#endif /* %s */\n",
+                    self->guard_name);
     if (check < 0) { croak("sprintf failed"); }
 
     // Cache partial path derived from source_class.
@@ -112,8 +110,7 @@ CFCFile_init(CFCFile *self, const char *source_class)
 }
 
 void
-CFCFile_destroy(CFCFile *self)
-{
+CFCFile_destroy(CFCFile *self) {
     size_t i;
     for (i = 0; self->blocks[i] != NULL; i++) {
         CFCBase_decref(self->blocks[i]);
@@ -132,32 +129,31 @@ CFCFile_destroy(CFCFile *self)
 }
 
 void
-CFCFile_add_block(CFCFile *self, CFCBase *block)
-{
+CFCFile_add_block(CFCFile *self, CFCBase *block) {
     CFCUTIL_NULL_CHECK(block);
     const char *cfc_class = CFCBase_get_cfc_class(block);
 
     // Add to classes array if the block is a CFCClass.
     if (strcmp(cfc_class, "Clownfish::Class") == 0) {
         size_t num_class_blocks = 0;
-        while (self->classes[num_class_blocks] != NULL) { 
+        while (self->classes[num_class_blocks] != NULL) {
             num_class_blocks++;
         }
         num_class_blocks++;
         size_t size = (num_class_blocks + 1) * sizeof(CFCClass*);
         self->classes = (CFCClass**)REALLOCATE(self->classes, size);
-        self->classes[num_class_blocks - 1] 
+        self->classes[num_class_blocks - 1]
             = (CFCClass*)CFCBase_incref(block);
         self->classes[num_class_blocks] = NULL;
     }
 
     // Add to blocks array.
-    if (   strcmp(cfc_class, "Clownfish::Class") == 0
+    if (strcmp(cfc_class, "Clownfish::Class") == 0
         || strcmp(cfc_class, "Clownfish::Parcel") == 0
         || strcmp(cfc_class, "Clownfish::CBlock") == 0
-    ) {
+       ) {
         size_t num_blocks = 0;
-        while (self->blocks[num_blocks] != NULL) { 
+        while (self->blocks[num_blocks] != NULL) {
             num_blocks++;
         }
         num_blocks++;
@@ -172,9 +168,8 @@ CFCFile_add_block(CFCFile *self, CFCBase *block)
 }
 
 static void
-S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir, 
-            const char *ext)
-{
+S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
+            const char *ext) {
     size_t needed = CFCFile_path_buf_size(self, base_dir);
     if (strlen(ext) > 4) {
         croak("ext cannot be more than 4 characters.");
@@ -183,8 +178,8 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
         croak("Need buf_size of %lu, but got %lu", needed, buf_size);
     }
     if (base_dir) {
-        int check = sprintf(buf, "%s" PATH_SEP "%s%s", base_dir, 
-            self->path_part, ext);
+        int check = sprintf(buf, "%s" PATH_SEP "%s%s", base_dir,
+                            self->path_part, ext);
         if (check < 0) { croak("sprintf failed"); }
     }
     else {
@@ -202,12 +197,11 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
 }
 
 size_t
-CFCFile_path_buf_size(CFCFile *self, const char *base_dir)
-{
+CFCFile_path_buf_size(CFCFile *self, const char *base_dir) {
     size_t size = strlen(self->path_part);
     size += 4; // Max extension length.
     size += 1; // NULL-termination.
-    if (base_dir) { 
+    if (base_dir) {
         size += strlen(base_dir);
         size += strlen(PATH_SEP);
     }
@@ -215,71 +209,60 @@ CFCFile_path_buf_size(CFCFile *self, const char *base_dir)
 }
 
 void
-CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size, 
-               const char *base_dir)
-{
+CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size,
+               const char *base_dir) {
     S_some_path(self, buf, buf_size, base_dir, ".c");
 }
 
 void
-CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size, 
-               const char *base_dir)
-{
+CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size,
+               const char *base_dir) {
     S_some_path(self, buf, buf_size, base_dir, ".h");
 }
 
 void
-CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size, 
-                 const char *base_dir)
-{
+CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size,
+                 const char *base_dir) {
     S_some_path(self, buf, buf_size, base_dir, ".cfh");
 }
 
 CFCBase**
-CFCFile_blocks(CFCFile *self)
-{
+CFCFile_blocks(CFCFile *self) {
     return self->blocks;
 }
 
 CFCClass**
-CFCFile_classes(CFCFile *self)
-{
+CFCFile_classes(CFCFile *self) {
     return self->classes;
 }
 
 void
-CFCFile_set_modified(CFCFile *self, int modified)
-{
+CFCFile_set_modified(CFCFile *self, int modified) {
     self->modified = !!modified;
 }
 
 int
-CFCFile_get_modified(CFCFile *self)
-{
+CFCFile_get_modified(CFCFile *self) {
     return self->modified;
 }
 
 const char*
-CFCFile_get_source_class(CFCFile *self)
-{
+CFCFile_get_source_class(CFCFile *self) {
     return self->source_class;
 }
 
 const char*
-CFCFile_guard_name(CFCFile *self)
-{
+CFCFile_guard_name(CFCFile *self) {
     return self->guard_name;
 }
 
 const char*
-CFCFile_guard_start(CFCFile *self)
-{
+CFCFile_guard_start(CFCFile *self) {
     return self->guard_start;
 }
 
 const char*
-CFCFile_guard_close(CFCFile *self)
-{
+CFCFile_guard_close(CFCFile *self) {
     return self->guard_close;
 }
 

@@ -49,7 +49,7 @@ class Lucy::Search::MatchDoc inherits Lucy::Object::Obj {
     void
     Set_Score(MatchDoc *self, float score);
 
-    nullable VArray* 
+    nullable VArray*
     Get_Values(MatchDoc *self);
 
     void

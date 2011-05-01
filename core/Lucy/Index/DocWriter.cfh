@@ -47,7 +47,7 @@ class Lucy::Index::DocWriter inherits Lucy::Index::DataWriter {
     public int32_t
     Format(DocWriter *self);
 
-    public void 
+    public void
     Destroy(DocWriter *self);
 }
 

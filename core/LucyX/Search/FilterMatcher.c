@@ -20,15 +20,13 @@
 #include "LucyX/Search/FilterMatcher.h"
 
 FilterMatcher*
-FilterMatcher_new(BitVector *bits, int32_t doc_max)
-{
+FilterMatcher_new(BitVector *bits, int32_t doc_max) {
     FilterMatcher *self = (FilterMatcher*)VTable_Make_Obj(FILTERMATCHER);
     return FilterMatcher_init(self, bits, doc_max);
 }
 
 FilterMatcher*
-FilterMatcher_init(FilterMatcher *self, BitVector *bits, int32_t doc_max)
-{
+FilterMatcher_init(FilterMatcher *self, BitVector *bits, int32_t doc_max) {
     Matcher_init((Matcher*)self);
 
     // Init.
@@ -39,44 +37,39 @@ FilterMatcher_init(FilterMatcher *self, BitVector *bits, int32_t doc_max)
     self->doc_max      = doc_max;
 
     return self;
-}   
+}
 
 void
-FilterMatcher_destroy(FilterMatcher *self) 
-{
+FilterMatcher_destroy(FilterMatcher *self) {
     DECREF(self->bits);
     SUPER_DESTROY(self, FILTERMATCHER);
 }
 
 int32_t
-FilterMatcher_next(FilterMatcher* self) 
-{
+FilterMatcher_next(FilterMatcher* self) {
     do {
         if (++self->doc_id > self->doc_max) {
             self->doc_id--;
             return 0;
         }
-    } while ( !BitVec_Get(self->bits, self->doc_id) );
+    } while (!BitVec_Get(self->bits, self->doc_id));
     return self->doc_id;
 }
 
 int32_t
-FilterMatcher_skip_to(FilterMatcher* self, int32_t target) 
-{
+FilterMatcher_skip_to(FilterMatcher* self, int32_t target) {
     self->doc_id = target - 1;
     return FilterMatcher_next(self);
 }
 
 float
-FilterMatcher_score(FilterMatcher* self) 
-{
+FilterMatcher_score(FilterMatcher* self) {
     UNUSED_VAR(self);
     return 0.0f;
 }
 
-int32_t 
-FilterMatcher_get_doc_id(FilterMatcher* self) 
-{
+int32_t
+FilterMatcher_get_doc_id(FilterMatcher* self) {
     return self->doc_id;
 }
 

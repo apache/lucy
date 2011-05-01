@@ -44,7 +44,7 @@ class Lucy::Index::DataReader inherits Lucy::Object::Obj {
      */
     public inert DataReader*
     init(DataReader *self, Schema *schema = NULL, Folder *folder = NULL,
-         Snapshot *snapshot = NULL, VArray *segments = NULL, 
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
          int32_t seg_tick = -1);
 
     /** Create a reader which aggregates the output of several lower level

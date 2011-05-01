@@ -18,7 +18,7 @@
  */
 
 #ifndef H_CHAZ_DIRMANIP
-#define H_CHAZ_DIRMANIP 
+#define H_CHAZ_DIRMANIP
 
 #ifdef __cplusplus
 extern "C" {

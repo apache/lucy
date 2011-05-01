@@ -42,16 +42,14 @@ static size_t default_mem_thresh = 0x400000; // 4 MB
 
 SortWriter*
 SortWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-               PolyReader *polyreader)
-{
+               PolyReader *polyreader) {
     SortWriter *self = (SortWriter*)VTable_Make_Obj(SORTWRITER);
     return SortWriter_init(self, schema, snapshot, segment, polyreader);
 }
 
 SortWriter*
 SortWriter_init(SortWriter *self, Schema *schema, Snapshot *snapshot,
-                Segment *segment, PolyReader *polyreader)
-{
+                Segment *segment, PolyReader *polyreader) {
     uint32_t field_max = Schema_Num_Fields(schema) + 1;
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
 
@@ -71,8 +69,7 @@ SortWriter_init(SortWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-SortWriter_destroy(SortWriter *self) 
-{
+SortWriter_destroy(SortWriter *self) {
     DECREF(self->field_writers);
     DECREF(self->counts);
     DECREF(self->null_ords);
@@ -85,15 +82,13 @@ SortWriter_destroy(SortWriter *self)
 }
 
 void
-SortWriter_set_default_mem_thresh(size_t mem_thresh)
-{
+SortWriter_set_default_mem_thresh(size_t mem_thresh) {
     default_mem_thresh = mem_thresh;
 }
 
 static SortFieldWriter*
-S_lazy_init_field_writer(SortWriter *self, int32_t field_num)
-{
-    SortFieldWriter *field_writer 
+S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
+    SortFieldWriter *field_writer
         = (SortFieldWriter*)VA_Fetch(self->field_writers, field_num);
     if (!field_writer) {
 
@@ -103,19 +98,19 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num)
             CharBuf *seg_name = Seg_Get_Name(self->segment);
             CharBuf *path     = CB_newf("%o/sort_ord_temp", seg_name);
             self->temp_ord_out = Folder_Open_Out(folder, path);
-            if (!self->temp_ord_out) { 
+            if (!self->temp_ord_out) {
                 DECREF(path);
-                RETHROW(INCREF(Err_get_error())); 
+                RETHROW(INCREF(Err_get_error()));
             }
             CB_setf(path, "%o/sort_ix_temp", seg_name);
             self->temp_ix_out = Folder_Open_Out(folder, path);
-            if (!self->temp_ix_out) { 
+            if (!self->temp_ix_out) {
                 DECREF(path);
-                RETHROW(INCREF(Err_get_error())); 
+                RETHROW(INCREF(Err_get_error()));
             }
             CB_setf(path, "%o/sort_dat_temp", seg_name);
             self->temp_dat_out = Folder_Open_Out(folder, path);
-            if (!self->temp_dat_out) { 
+            if (!self->temp_dat_out) {
                 DECREF(path);
                 RETHROW(INCREF(Err_get_error()));
             }
@@ -123,29 +118,29 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num)
         }
 
         CharBuf *field = Seg_Field_Name(self->segment, field_num);
-        field_writer = SortFieldWriter_new(self->schema, self->snapshot,
-            self->segment, self->polyreader, field, self->mem_pool,
-            self->mem_thresh, self->temp_ord_out, self->temp_ix_out, 
-            self->temp_dat_out);
+        field_writer
+            = SortFieldWriter_new(self->schema, self->snapshot, self->segment,
+                                  self->polyreader, field, self->mem_pool,
+                                  self->mem_thresh, self->temp_ord_out,
+                                  self->temp_ix_out, self->temp_dat_out);
         VA_Store(self->field_writers, field_num, (Obj*)field_writer);
     }
     return field_writer;
 }
 
 void
-SortWriter_add_inverted_doc(SortWriter *self, Inverter *inverter, 
-                            int32_t doc_id)
-{
+SortWriter_add_inverted_doc(SortWriter *self, Inverter *inverter,
+                            int32_t doc_id) {
     int32_t field_num;
 
     Inverter_Iterate(inverter);
     while (0 != (field_num = Inverter_Next(inverter))) {
         FieldType *type = Inverter_Get_Type(inverter);
         if (FType_Sortable(type)) {
-            SortFieldWriter *field_writer 
+            SortFieldWriter *field_writer
                 = S_lazy_init_field_writer(self, field_num);
             SortFieldWriter_Add(field_writer, doc_id,
-                Inverter_Get_Value(inverter));
+                                Inverter_Get_Value(inverter));
         }
     }
 
@@ -153,7 +148,7 @@ SortWriter_add_inverted_doc(SortWriter *self, Inverter *inverter,
     // flush all of them, then release all unique values with a single action.
     if (MemPool_Get_Consumed(self->mem_pool) > self->mem_thresh) {
         for (uint32_t i = 0; i < VA_Get_Size(self->field_writers); i++) {
-            SortFieldWriter *const field_writer 
+            SortFieldWriter *const field_writer
                 = (SortFieldWriter*)VA_Fetch(self->field_writers, i);
             if (field_writer) { SortFieldWriter_Flush(field_writer); }
         }
@@ -163,20 +158,21 @@ SortWriter_add_inverted_doc(SortWriter *self, Inverter *inverter,
 }
 
 void
-SortWriter_add_segment(SortWriter *self, SegReader *reader, I32Array *doc_map)
-{
-    VArray *fields  = Schema_All_Fields(self->schema);
+SortWriter_add_segment(SortWriter *self, SegReader *reader,
+                       I32Array *doc_map) {
+    VArray *fields = Schema_All_Fields(self->schema);
 
     // Proceed field-at-a-time, rather than doc-at-a-time.
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         CharBuf *field = (CharBuf*)VA_Fetch(fields, i);
-        SortReader *sort_reader = (SortReader*)SegReader_Fetch(reader, 
-            VTable_Get_Name(SORTREADER));
-        SortCache *cache = sort_reader 
-            ? SortReader_Fetch_Sort_Cache(sort_reader, field) : NULL;
+        SortReader *sort_reader = (SortReader*)SegReader_Fetch(
+                                      reader, VTable_Get_Name(SORTREADER));
+        SortCache *cache = sort_reader
+                           ? SortReader_Fetch_Sort_Cache(sort_reader, field)
+                           : NULL;
         if (cache) {
             int32_t field_num = Seg_Field_Num(self->segment, field);
-            SortFieldWriter *field_writer 
+            SortFieldWriter *field_writer
                 = S_lazy_init_field_writer(self, field_num);
             SortFieldWriter_Add_Segment(field_writer, reader, doc_map, cache);
             self->flush_at_finish = true;
@@ -187,8 +183,7 @@ SortWriter_add_segment(SortWriter *self, SegReader *reader, I32Array *doc_map)
 }
 
 void
-SortWriter_finish(SortWriter *self)
-{
+SortWriter_finish(SortWriter *self) {
     VArray *const field_writers = self->field_writers;
 
     // If we have no data, bail out.
@@ -198,7 +193,7 @@ SortWriter_finish(SortWriter *self)
     // one field can use the entire margin up to mem_thresh.
     if (self->flush_at_finish) {
         for (uint32_t i = 1, max = VA_Get_Size(field_writers); i < max; i++) {
-            SortFieldWriter *field_writer 
+            SortFieldWriter *field_writer
                 = (SortFieldWriter*)VA_Fetch(field_writers, i);
             if (field_writer) {
                 SortFieldWriter_Flush(field_writer);
@@ -212,22 +207,22 @@ SortWriter_finish(SortWriter *self)
     OutStream_Close(self->temp_dat_out);
 
     for (uint32_t i = 1, max = VA_Get_Size(field_writers); i < max; i++) {
-        SortFieldWriter *field_writer 
+        SortFieldWriter *field_writer
             = (SortFieldWriter*)VA_Delete(field_writers, i);
         if (field_writer) {
             CharBuf *field = Seg_Field_Name(self->segment, i);
             SortFieldWriter_Flip(field_writer);
             int32_t count = SortFieldWriter_Finish(field_writer);
-            Hash_Store(self->counts, (Obj*)field, 
-                (Obj*)CB_newf("%i32", count));
+            Hash_Store(self->counts, (Obj*)field,
+                       (Obj*)CB_newf("%i32", count));
             int32_t null_ord = SortFieldWriter_Get_Null_Ord(field_writer);
             if (null_ord != -1) {
-                Hash_Store(self->null_ords, (Obj*)field, 
-                    (Obj*)CB_newf("%i32", null_ord));
+                Hash_Store(self->null_ords, (Obj*)field,
+                           (Obj*)CB_newf("%i32", null_ord));
             }
             int32_t ord_width = SortFieldWriter_Get_Ord_Width(field_writer);
-            Hash_Store(self->ord_widths, (Obj*)field, 
-                (Obj*)CB_newf("%i32", ord_width));
+            Hash_Store(self->ord_widths, (Obj*)field,
+                       (Obj*)CB_newf("%i32", ord_width));
         }
 
         DECREF(field_writer);
@@ -236,7 +231,7 @@ SortWriter_finish(SortWriter *self)
 
     // Store metadata.
     Seg_Store_Metadata_Str(self->segment, "sort", 4,
-        (Obj*)SortWriter_Metadata(self));
+                           (Obj*)SortWriter_Metadata(self));
 
     // Clean up.
     Folder  *folder   = self->folder;
@@ -251,8 +246,7 @@ SortWriter_finish(SortWriter *self)
 }
 
 Hash*
-SortWriter_metadata(SortWriter *self)
-{
+SortWriter_metadata(SortWriter *self) {
     Hash *const metadata  = DataWriter_metadata((DataWriter*)self);
     Hash_Store_Str(metadata, "counts", 6, INCREF(self->counts));
     Hash_Store_Str(metadata, "null_ords", 9, INCREF(self->null_ords));
@@ -261,8 +255,7 @@ SortWriter_metadata(SortWriter *self)
 }
 
 int32_t
-SortWriter_format(SortWriter *self)
-{
+SortWriter_format(SortWriter *self) {
     UNUSED_VAR(self);
     return SortWriter_current_file_format;
 }

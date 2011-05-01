@@ -18,7 +18,7 @@
  */
 
 #ifndef H_CHAZ_ATOMICOPS
-#define H_CHAZ_ATOMICOPS 
+#define H_CHAZ_ATOMICOPS
 
 #ifdef __cplusplus
 extern "C" {

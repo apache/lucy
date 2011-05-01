@@ -22,33 +22,36 @@
 #include "Lucy/Store/OutStream.h"
 
 HitDoc*
-HitDoc_new(void *fields, int32_t doc_id, float score)
-{
+HitDoc_new(void *fields, int32_t doc_id, float score) {
     HitDoc *self = (HitDoc*)VTable_Make_Obj(HITDOC);
     return HitDoc_init(self, fields, doc_id, score);
 }
 
 HitDoc*
-HitDoc_init(HitDoc *self, void *fields, int32_t doc_id, float score)
-{
+HitDoc_init(HitDoc *self, void *fields, int32_t doc_id, float score) {
     Doc_init((Doc*)self, fields, doc_id);
     self->score = score;
     return self;
 }
 
-void  HitDoc_set_score(HitDoc *self, float score) { self->score = score; }
-float HitDoc_get_score(HitDoc *self)              { return self->score;  }
+void
+HitDoc_set_score(HitDoc *self, float score) {
+    self->score = score;
+}
+
+float
+HitDoc_get_score(HitDoc *self) {
+    return self->score;
+}
 
 void
-HitDoc_serialize(HitDoc *self, OutStream *outstream)
-{
+HitDoc_serialize(HitDoc *self, OutStream *outstream) {
     Doc_serialize((Doc*)self, outstream);
     OutStream_Write_F32(outstream, self->score);
 }
 
 HitDoc*
-HitDoc_deserialize(HitDoc *self, InStream *instream)
-{
+HitDoc_deserialize(HitDoc *self, InStream *instream) {
     self = self ? self : (HitDoc*)VTable_Make_Obj(HITDOC);
     Doc_deserialize((Doc*)self, instream);
     self->score = InStream_Read_F32(instream);
@@ -56,9 +59,8 @@ HitDoc_deserialize(HitDoc *self, InStream *instream)
 }
 
 Hash*
-HitDoc_dump(HitDoc *self)
-{
-    HitDoc_dump_t super_dump 
+HitDoc_dump(HitDoc *self) {
+    HitDoc_dump_t super_dump
         = (HitDoc_dump_t)SUPER_METHOD(HITDOC, HitDoc, Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "score", 5, (Obj*)CB_newf("%f64", self->score));
@@ -66,10 +68,9 @@ HitDoc_dump(HitDoc *self)
 }
 
 HitDoc*
-HitDoc_load(HitDoc *self, Obj *dump)
-{
+HitDoc_load(HitDoc *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    HitDoc_load_t super_load 
+    HitDoc_load_t super_load
         = (HitDoc_load_t)SUPER_METHOD(HITDOC, HitDoc, Load);
     HitDoc *loaded = super_load(self, dump);
     Obj *score = CERTIFY(Hash_Fetch_Str(source, "score", 5), OBJ);
@@ -78,13 +79,12 @@ HitDoc_load(HitDoc *self, Obj *dump)
 }
 
 bool_t
-HitDoc_equals(HitDoc *self, Obj *other)
-{
+HitDoc_equals(HitDoc *self, Obj *other) {
     HitDoc *twin = (HitDoc*)other;
-    if (twin == self)                { return true;  }
+    if (twin == self)                     { return true;  }
     if (!Obj_Is_A(other, HITDOC))         { return false; }
     if (!Doc_equals((Doc*)self, other))   { return false; }
-    if (self->score != twin->score)  { return false; }
+    if (self->score != twin->score)       { return false; }
     return true;
 }
 

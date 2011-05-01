@@ -25,8 +25,7 @@
 #include <stdlib.h>
 
 void
-Floats_run(void) 
-{
+Floats_run(void) {
     ConfWriter_start_module("Floats");
 
     ConfWriter_append_conf(
@@ -56,7 +55,7 @@ Floats_run(void)
     ConfWriter_shorten_macro("F32_NEGINF");
     ConfWriter_shorten_macro("F32_NAN");
     ConfWriter_end_short_names();
-    
+
     ConfWriter_end_module();
 }
 

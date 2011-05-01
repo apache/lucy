@@ -19,7 +19,7 @@ parcel Lucy;
 /** SortExternal for ByteBufs.
  */
 
-class Lucy::Test::Util::BBSortEx 
+class Lucy::Test::Util::BBSortEx
     inherits Lucy::Util::SortExternal {
 
     VArray   *external;
@@ -30,7 +30,7 @@ class Lucy::Test::Util::BBSortEx
     new(uint32_t mem_thresh = 0x1000000, VArray *external = NULL);
 
     inert BBSortEx*
-    init(BBSortEx *self, uint32_t mem_thresh = 0x1000000, 
+    init(BBSortEx *self, uint32_t mem_thresh = 0x1000000,
         VArray *external = NULL);
 
     void

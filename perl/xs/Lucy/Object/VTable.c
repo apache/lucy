@@ -23,9 +23,8 @@
 #include "Lucy/Util/Memory.h"
 
 lucy_Obj*
-lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj)
-{
-    lucy_Obj *obj 
+lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj) {
+    lucy_Obj *obj
         = (lucy_Obj*)lucy_Memory_wrapped_calloc(self->obj_alloc_size, 1);
     SV *inner_obj = SvRV((SV*)host_obj);
     obj->vtable = self;
@@ -35,33 +34,32 @@ lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj)
 }
 
 void
-lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent)
-{
+lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent) {
     // Register class with host.
-    lucy_Host_callback(LUCY_VTABLE, "_register", 2, 
-        CFISH_ARG_OBJ("singleton", singleton), CFISH_ARG_OBJ("parent", parent));
+    lucy_Host_callback(LUCY_VTABLE, "_register", 2,
+                       CFISH_ARG_OBJ("singleton", singleton),
+                       CFISH_ARG_OBJ("parent", parent));
 }
 
 lucy_VArray*
-lucy_VTable_novel_host_methods(const lucy_CharBuf *class_name)
-{
-    return (lucy_VArray*)lucy_Host_callback_obj(LUCY_VTABLE, 
-        "novel_host_methods", 1, CFISH_ARG_STR("class_name", class_name));
+lucy_VTable_novel_host_methods(const lucy_CharBuf *class_name) {
+    return (lucy_VArray*)lucy_Host_callback_obj(
+               LUCY_VTABLE,
+               "novel_host_methods", 1,
+               CFISH_ARG_STR("class_name", class_name));
 }
 
 lucy_CharBuf*
-lucy_VTable_find_parent_class(const lucy_CharBuf *class_name)
-{
-    return lucy_Host_callback_str(LUCY_VTABLE, "find_parent_class", 1, 
-        CFISH_ARG_STR("class_name", class_name));
+lucy_VTable_find_parent_class(const lucy_CharBuf *class_name) {
+    return lucy_Host_callback_str(LUCY_VTABLE, "find_parent_class", 1,
+                                  CFISH_ARG_STR("class_name", class_name));
 }
 
 void*
-lucy_VTable_to_host(lucy_VTable *self)
-{
+lucy_VTable_to_host(lucy_VTable *self) {
     chy_bool_t first_time = self->ref.count < 4 ? true : false;
-    lucy_VTable_to_host_t to_host = (lucy_VTable_to_host_t)
-        LUCY_SUPER_METHOD(LUCY_VTABLE, VTable, To_Host);
+    lucy_VTable_to_host_t to_host = (lucy_VTable_to_host_t)LUCY_SUPER_METHOD(
+                                        LUCY_VTABLE, VTable, To_Host);
     SV *host_obj = (SV*)to_host(self);
     if (first_time) {
         SvSHARE((SV*)self->ref.host_obj);

@@ -25,8 +25,8 @@ class Lucy::Index::PostingListReader cnick PListReader
     inherits Lucy::Index::DataReader {
 
     inert PostingListReader*
-    init(PostingListReader *self, Schema *schema = NULL, 
-         Folder *folder = NULL, Snapshot *snapshot = NULL, 
+    init(PostingListReader *self, Schema *schema = NULL,
+         Folder *folder = NULL, Snapshot *snapshot = NULL,
          VArray *segments = NULL, int32_t seg_tick = -1);
 
     /** Returns a PostingList, or NULL if either <code>field</code> is NULL or
@@ -61,7 +61,7 @@ class Lucy::Index::DefaultPostingListReader cnick DefPListReader
 
     inert DefaultPostingListReader*
     init(DefaultPostingListReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot, VArray *segments, int32_t seg_tick, 
+         Snapshot *snapshot, VArray *segments, int32_t seg_tick,
          LexiconReader *lex_reader);
 
     public incremented nullable SegPostingList*

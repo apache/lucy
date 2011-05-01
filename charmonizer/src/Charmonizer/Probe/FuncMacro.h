@@ -18,7 +18,7 @@
  */
 
 #ifndef H_CHAZ_FUNC_MACRO
-#define H_CHAZ_FUNC_MACRO 
+#define H_CHAZ_FUNC_MACRO
 
 #ifdef __cplusplus
 extern "C" {

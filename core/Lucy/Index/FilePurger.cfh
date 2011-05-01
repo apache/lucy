@@ -26,11 +26,11 @@ class Lucy::Index::FilePurger inherits Lucy::Object::Obj {
     IndexManager *manager;
     Hash         *disallowed;
 
-    inert incremented FilePurger* 
-    new(Folder *folder, Snapshot *snapshot = NULL, 
+    inert incremented FilePurger*
+    new(Folder *folder, Snapshot *snapshot = NULL,
         IndexManager *manager = NULL);
 
-    inert FilePurger* 
+    inert FilePurger*
     init(FilePurger *self, Folder *folder, Snapshot *snapshot = NULL,
          IndexManager *manager = NULL);
 
@@ -39,7 +39,7 @@ class Lucy::Index::FilePurger inherits Lucy::Object::Obj {
     void
     Purge(FilePurger *self);
 
-    public void 
+    public void
     Destroy(FilePurger *self);
 }
 

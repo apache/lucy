@@ -24,9 +24,8 @@
 #include "Lucy/Store/Folder.h"
 
 DataReader*
-DataReader_init(DataReader *self, Schema *schema, Folder *folder, 
-                Snapshot *snapshot, VArray *segments, int32_t seg_tick)
-{
+DataReader_init(DataReader *self, Schema *schema, Folder *folder,
+                Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
     self->schema   = (Schema*)INCREF(schema);
     self->folder   = (Folder*)INCREF(folder);
     self->snapshot = (Snapshot*)INCREF(snapshot);
@@ -35,7 +34,7 @@ DataReader_init(DataReader *self, Schema *schema, Folder *folder,
     if (seg_tick != -1) {
         if (!segments) {
             THROW(ERR, "No segments array provided, but seg_tick is %i32",
-                seg_tick);
+                  seg_tick);
         }
         else {
             Segment *segment = (Segment*)VA_Fetch(segments, seg_tick);
@@ -54,8 +53,7 @@ DataReader_init(DataReader *self, Schema *schema, Folder *folder,
 }
 
 void
-DataReader_destroy(DataReader *self)
-{
+DataReader_destroy(DataReader *self) {
     DECREF(self->schema);
     DECREF(self->folder);
     DECREF(self->snapshot);
@@ -65,22 +63,33 @@ DataReader_destroy(DataReader *self)
 }
 
 Schema*
-DataReader_get_schema(DataReader *self) 
-    { return self->schema; }
+DataReader_get_schema(DataReader *self) {
+    return self->schema;
+}
+
 Folder*
-DataReader_get_folder(DataReader *self) 
-    { return self->folder; }
+DataReader_get_folder(DataReader *self) {
+    return self->folder;
+}
+
 Snapshot*
-DataReader_get_snapshot(DataReader *self) 
-    { return self->snapshot; }
+DataReader_get_snapshot(DataReader *self) {
+    return self->snapshot;
+}
+
 VArray*
-DataReader_get_segments(DataReader *self) 
-    { return self->segments; }
+DataReader_get_segments(DataReader *self) {
+    return self->segments;
+}
+
 int32_t
-DataReader_get_seg_tick(DataReader *self)
-    { return self->seg_tick; }
+DataReader_get_seg_tick(DataReader *self) {
+    return self->seg_tick;
+}
+
 Segment*
-DataReader_get_segment(DataReader *self) 
-    { return self->segment; }
+DataReader_get_segment(DataReader *self) {
+    return self->segment;
+}
 
 

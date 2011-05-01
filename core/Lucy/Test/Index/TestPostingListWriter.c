@@ -21,8 +21,7 @@
 #include "Lucy/Test/Index/TestPostingListWriter.h"
 
 void
-TestPListWriter_run_tests()
-{
+TestPListWriter_run_tests() {
     TestBatch *batch = TestBatch_new(1);
     TestBatch_Plan(batch);
     PASS(batch, "Placeholder");

@@ -25,8 +25,7 @@
 #include "Lucy/Search/LeafQuery.h"
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
+test_Dump_Load_and_Equals(TestBatch *batch) {
     Query *a_leaf  = (Query*)TestUtils_make_leaf_query(NULL, "a");
     Query *b_leaf  = (Query*)TestUtils_make_leaf_query(NULL, "b");
     Query *c_leaf  = (Query*)TestUtils_make_leaf_query(NULL, "c");
@@ -34,18 +33,18 @@ test_Dump_Load_and_Equals(TestBatch *batch)
     RequiredOptionalQuery *kids_differ = ReqOptQuery_new(a_leaf, c_leaf);
     RequiredOptionalQuery *boost_differs = ReqOptQuery_new(a_leaf, b_leaf);
     Obj *dump = (Obj*)ReqOptQuery_Dump(query);
-    RequiredOptionalQuery *clone 
+    RequiredOptionalQuery *clone
         = (RequiredOptionalQuery*)Obj_Load(dump, dump);
 
-    TEST_FALSE(batch, ReqOptQuery_Equals(query, (Obj*)kids_differ), 
-        "Different kids spoil Equals");
-    TEST_TRUE(batch, ReqOptQuery_Equals(query, (Obj*)boost_differs), 
-        "Equals with identical boosts");
+    TEST_FALSE(batch, ReqOptQuery_Equals(query, (Obj*)kids_differ),
+               "Different kids spoil Equals");
+    TEST_TRUE(batch, ReqOptQuery_Equals(query, (Obj*)boost_differs),
+              "Equals with identical boosts");
     ReqOptQuery_Set_Boost(boost_differs, 1.5);
-    TEST_FALSE(batch, ReqOptQuery_Equals(query, (Obj*)boost_differs), 
-        "Different boost spoils Equals");
-    TEST_TRUE(batch, ReqOptQuery_Equals(query, (Obj*)clone), 
-        "Dump => Load round trip");
+    TEST_FALSE(batch, ReqOptQuery_Equals(query, (Obj*)boost_differs),
+               "Different boost spoils Equals");
+    TEST_TRUE(batch, ReqOptQuery_Equals(query, (Obj*)clone),
+              "Dump => Load round trip");
 
     DECREF(a_leaf);
     DECREF(b_leaf);
@@ -58,8 +57,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 void
-TestReqOptQuery_run_tests()
-{
+TestReqOptQuery_run_tests() {
     TestBatch *batch = TestBatch_new(4);
     TestBatch_Plan(batch);
     test_Dump_Load_and_Equals(batch);

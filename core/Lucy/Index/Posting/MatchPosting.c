@@ -44,43 +44,40 @@
 #include "Lucy/Util/MemoryPool.h"
 
 #define MAX_RAW_POSTING_LEN(_text_len) \
-        (              sizeof(RawPosting) \
-                     + _text_len + 1            /* term text content */ \
-        )
+    (              sizeof(RawPosting) \
+                   + _text_len + 1            /* term text content */ \
+    )
 
 MatchPosting*
-MatchPost_new(Similarity *sim)
-{
+MatchPost_new(Similarity *sim) {
     MatchPosting *self = (MatchPosting*)VTable_Make_Obj(MATCHPOSTING);
     return MatchPost_init(self, sim);
 }
 
 MatchPosting*
-MatchPost_init(MatchPosting *self, Similarity *sim)
-{
+MatchPost_init(MatchPosting *self, Similarity *sim) {
     self->sim = (Similarity*)INCREF(sim);
     return (MatchPosting*)Post_init((Posting*)self);
 }
 
 void
-MatchPost_destroy(MatchPosting *self)
-{
+MatchPost_destroy(MatchPosting *self) {
     DECREF(self->sim);
     SUPER_DESTROY(self, MATCHPOSTING);
 }
 
 int32_t
-MatchPost_get_freq(MatchPosting *self) { return self->freq; }
+MatchPost_get_freq(MatchPosting *self) {
+    return self->freq;
+}
 
 void
-MatchPost_reset(MatchPosting *self)
-{
+MatchPost_reset(MatchPosting *self) {
     self->doc_id = 0;
 }
 
 void
-MatchPost_read_record(MatchPosting *self, InStream *instream)
-{
+MatchPost_read_record(MatchPosting *self, InStream *instream) {
     const uint32_t doc_code = InStream_Read_C32(instream);
     const uint32_t doc_delta = doc_code >> 1;
 
@@ -96,29 +93,27 @@ MatchPost_read_record(MatchPosting *self, InStream *instream)
 
 RawPosting*
 MatchPost_read_raw(MatchPosting *self, InStream *instream, int32_t last_doc_id,
-                   CharBuf *term_text, MemoryPool *mem_pool)
-{
-    char *const     text_buf      = (char*)CB_Get_Ptr8(term_text);
-    const size_t    text_size     = CB_Get_Size(term_text);
-    const uint32_t  doc_code      = InStream_Read_C32(instream);
-    const uint32_t  delta_doc     = doc_code >> 1;
-    const int32_t   doc_id        = last_doc_id + delta_doc;
-    const uint32_t  freq          = (doc_code & 1) 
-                                  ? 1 
-                                  : InStream_Read_C32(instream);
-    size_t raw_post_bytes         = MAX_RAW_POSTING_LEN(text_size);
-    void *const allocation        = MemPool_Grab(mem_pool, raw_post_bytes);
+                   CharBuf *term_text, MemoryPool *mem_pool) {
+    char *const    text_buf  = (char*)CB_Get_Ptr8(term_text);
+    const size_t   text_size = CB_Get_Size(term_text);
+    const uint32_t doc_code  = InStream_Read_C32(instream);
+    const uint32_t delta_doc = doc_code >> 1;
+    const int32_t  doc_id    = last_doc_id + delta_doc;
+    const uint32_t freq      = (doc_code & 1)
+                               ? 1
+                               : InStream_Read_C32(instream);
+    size_t raw_post_bytes    = MAX_RAW_POSTING_LEN(text_size);
+    void *const allocation   = MemPool_Grab(mem_pool, raw_post_bytes);
     UNUSED_VAR(self);
 
     return RawPost_new(allocation, doc_id, freq, text_buf, text_size);
 }
 
 void
-MatchPost_add_inversion_to_pool(MatchPosting *self, PostingPool *post_pool, 
-                                Inversion *inversion, FieldType *type, 
-                                int32_t doc_id, float doc_boost, 
-                                float length_norm)
-{
+MatchPost_add_inversion_to_pool(MatchPosting *self, PostingPool *post_pool,
+                                Inversion *inversion, FieldType *type,
+                                int32_t doc_id, float doc_boost,
+                                float length_norm) {
     MemoryPool  *mem_pool = PostPool_Get_Mem_Pool(post_pool);
     Token      **tokens;
     uint32_t     freq;
@@ -129,23 +124,21 @@ MatchPost_add_inversion_to_pool(MatchPosting *self, PostingPool *post_pool,
     UNUSED_VAR(length_norm);
 
     Inversion_Reset(inversion);
-    while ( (tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL ) {
+    while ((tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL) {
         Token   *token          = *tokens;
         uint32_t raw_post_bytes = MAX_RAW_POSTING_LEN(token->len);
-        RawPosting *raw_posting = RawPost_new(
-            MemPool_Grab(mem_pool, raw_post_bytes), doc_id, freq,
-            token->text, token->len
-        );
+        RawPosting *raw_posting
+            = RawPost_new(MemPool_Grab(mem_pool, raw_post_bytes), doc_id,
+                          freq, token->text, token->len);
         PostPool_Feed(post_pool, &raw_posting);
     }
 }
 
 MatchPostingMatcher*
-MatchPost_make_matcher(MatchPosting *self, Similarity *sim, 
+MatchPost_make_matcher(MatchPosting *self, Similarity *sim,
                        PostingList *plist, Compiler *compiler,
-                       bool_t need_score)
-{
-    MatchPostingMatcher *matcher 
+                       bool_t need_score) {
+    MatchPostingMatcher *matcher
         = (MatchPostingMatcher*)VTable_Make_Obj(MATCHPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
@@ -156,40 +149,36 @@ MatchPost_make_matcher(MatchPosting *self, Similarity *sim,
 
 MatchPostingMatcher*
 MatchPostMatcher_init(MatchPostingMatcher *self, Similarity *sim,
-                      PostingList *plist, Compiler *compiler)
-{
+                      PostingList *plist, Compiler *compiler) {
     TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
     return self;
 }
 
 float
-MatchPostMatcher_score(MatchPostingMatcher* self) 
-{
+MatchPostMatcher_score(MatchPostingMatcher* self) {
     return self->weight;
 }
 
 /***************************************************************************/
 
 MatchPostingWriter*
-MatchPostWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment, 
-                    PolyReader *polyreader, int32_t field_num)
-{
-    MatchPostingWriter *self 
+MatchPostWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
+                    PolyReader *polyreader, int32_t field_num) {
+    MatchPostingWriter *self
         = (MatchPostingWriter*)VTable_Make_Obj(MATCHPOSTINGWRITER);
     return MatchPostWriter_init(self, schema, snapshot, segment, polyreader,
-        field_num);
+                                field_num);
 }
 
 MatchPostingWriter*
-MatchPostWriter_init(MatchPostingWriter *self, Schema *schema, 
-                     Snapshot *snapshot, Segment *segment, 
-                     PolyReader *polyreader, int32_t field_num)
-{
+MatchPostWriter_init(MatchPostingWriter *self, Schema *schema,
+                     Snapshot *snapshot, Segment *segment,
+                     PolyReader *polyreader, int32_t field_num) {
     Folder  *folder = PolyReader_Get_Folder(polyreader);
-    CharBuf *filename 
+    CharBuf *filename
         = CB_newf("%o/postings-%i32.dat", Seg_Get_Name(segment), field_num);
     PostWriter_init((PostingWriter*)self, schema, snapshot, segment,
-        polyreader, field_num);
+                    polyreader, field_num);
     self->outstream = Folder_Open_Out(folder, filename);
     if (!self->outstream) { RETHROW(INCREF(Err_get_error())); }
     DECREF(filename);
@@ -197,15 +186,13 @@ MatchPostWriter_init(MatchPostingWriter *self, Schema *schema,
 }
 
 void
-MatchPostWriter_destroy(MatchPostingWriter *self)
-{
+MatchPostWriter_destroy(MatchPostingWriter *self) {
     DECREF(self->outstream);
     SUPER_DESTROY(self, MATCHPOSTINGWRITER);
 }
 
 void
-MatchPostWriter_write_posting(MatchPostingWriter *self, RawPosting *posting)
-{
+MatchPostWriter_write_posting(MatchPostingWriter *self, RawPosting *posting) {
     OutStream *const outstream   = self->outstream;
     const int32_t    doc_id      = posting->doc_id;
     const uint32_t   delta_doc   = doc_id - self->last_doc_id;
@@ -224,31 +211,27 @@ MatchPostWriter_write_posting(MatchPostingWriter *self, RawPosting *posting)
 }
 
 void
-MatchPostWriter_start_term(MatchPostingWriter *self, TermInfo *tinfo)
-{
+MatchPostWriter_start_term(MatchPostingWriter *self, TermInfo *tinfo) {
     self->last_doc_id   = 0;
     tinfo->post_filepos = OutStream_Tell(self->outstream);
 }
 
 void
-MatchPostWriter_update_skip_info(MatchPostingWriter *self, TermInfo *tinfo)
-{
+MatchPostWriter_update_skip_info(MatchPostingWriter *self, TermInfo *tinfo) {
     tinfo->post_filepos = OutStream_Tell(self->outstream);
 }
 
 /***************************************************************************/
 
 MatchTermInfoStepper*
-MatchTInfoStepper_new(Schema *schema)
-{
-    MatchTermInfoStepper *self 
+MatchTInfoStepper_new(Schema *schema) {
+    MatchTermInfoStepper *self
         = (MatchTermInfoStepper*)VTable_Make_Obj(MATCHTERMINFOSTEPPER);
     return MatchTInfoStepper_init(self, schema);
 }
 
 MatchTermInfoStepper*
-MatchTInfoStepper_init(MatchTermInfoStepper *self, Schema *schema)
-{
+MatchTInfoStepper_init(MatchTermInfoStepper *self, Schema *schema) {
     Architecture *arch = Schema_Get_Architecture(schema);
     TermStepper_init((TermStepper*)self);
     self->skip_interval = Arch_Skip_Interval(arch);
@@ -257,15 +240,13 @@ MatchTInfoStepper_init(MatchTermInfoStepper *self, Schema *schema)
 }
 
 void
-MatchTInfoStepper_reset(MatchTermInfoStepper *self)
-{
+MatchTInfoStepper_reset(MatchTermInfoStepper *self) {
     TInfo_Reset((TermInfo*)self->value);
 }
 
 void
-MatchTInfoStepper_write_key_frame(MatchTermInfoStepper *self, 
-                                  OutStream *outstream, Obj *value)
-{
+MatchTInfoStepper_write_key_frame(MatchTermInfoStepper *self,
+                                  OutStream *outstream, Obj *value) {
     TermInfo *tinfo    = (TermInfo*)CERTIFY(value, TERMINFO);
     int32_t   doc_freq = TInfo_Get_Doc_Freq(tinfo);
 
@@ -284,9 +265,8 @@ MatchTInfoStepper_write_key_frame(MatchTermInfoStepper *self,
 }
 
 void
-MatchTInfoStepper_write_delta(MatchTermInfoStepper *self, 
-                              OutStream *outstream, Obj *value)
-{
+MatchTInfoStepper_write_delta(MatchTermInfoStepper *self,
+                              OutStream *outstream, Obj *value) {
     TermInfo *tinfo      = (TermInfo*)CERTIFY(value, TERMINFO);
     TermInfo *last_tinfo = (TermInfo*)self->value;
     int32_t   doc_freq   = TInfo_Get_Doc_Freq(tinfo);
@@ -307,9 +287,8 @@ MatchTInfoStepper_write_delta(MatchTermInfoStepper *self,
 }
 
 void
-MatchTInfoStepper_read_key_frame(MatchTermInfoStepper *self, 
-                                 InStream *instream)
-{ 
+MatchTInfoStepper_read_key_frame(MatchTermInfoStepper *self,
+                                 InStream *instream) {
     TermInfo *const tinfo = (TermInfo*)self->value;
 
     // Read doc freq.
@@ -328,8 +307,7 @@ MatchTInfoStepper_read_key_frame(MatchTermInfoStepper *self,
 }
 
 void
-MatchTInfoStepper_read_delta(MatchTermInfoStepper *self, InStream *instream)
-{ 
+MatchTInfoStepper_read_delta(MatchTermInfoStepper *self, InStream *instream) {
     TermInfo *const tinfo = (TermInfo*)self->value;
 
     // Read doc freq.

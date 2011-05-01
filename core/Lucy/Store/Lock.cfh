@@ -34,7 +34,7 @@ abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
     CharBuf     *lock_path;
     CharBuf     *host;
     int32_t      timeout;
-    int32_t      interval;  
+    int32_t      interval;
 
     /** Abstract constructor.
      *
@@ -47,7 +47,7 @@ abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
      * @param interval Time in milliseconds between retries.
      */
     public inert Lock*
-    init(Lock *self, Folder *folder, const CharBuf *name, 
+    init(Lock *self, Folder *folder, const CharBuf *name,
          const CharBuf *host, int32_t timeout = 0, int32_t interval = 100);
 
     /** Returns true if the Lock is shared, false if the Lock is exclusive.
@@ -110,17 +110,17 @@ abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
     Destroy(Lock *self);
 }
 
-class Lucy::Store::LockFileLock cnick LFLock 
+class Lucy::Store::LockFileLock cnick LFLock
     inherits Lucy::Store::Lock {
 
     CharBuf *link_path;
 
     inert incremented LockFileLock*
-    new(Folder *folder, const CharBuf *name, const CharBuf *host, 
+    new(Folder *folder, const CharBuf *name, const CharBuf *host,
         int32_t timeout = 0, int32_t interval = 100);
 
     public inert LockFileLock*
-    init(LockFileLock *self, Folder *folder, const CharBuf *name, 
+    init(LockFileLock *self, Folder *folder, const CharBuf *name,
          const CharBuf *host, int32_t timeout = 0, int32_t interval = 100);
 
     public bool_t
@@ -148,7 +148,7 @@ class Lucy::Store::LockFileLock cnick LFLock
      * don't match this process's pid.
      */
     bool_t
-    Maybe_Delete_File(LockFileLock *self, const CharBuf *filepath, 
+    Maybe_Delete_File(LockFileLock *self, const CharBuf *filepath,
                       bool_t delete_mine, bool_t delete_other);
 
     public void
@@ -161,7 +161,7 @@ class Lucy::Store::LockFileLock cnick LFLock
  * that a file locking problem occurred.
  */
 class Lucy::Store::LockErr inherits Lucy::Object::Err {
-    
+
     public inert incremented LockErr*
     new(CharBuf *message);
 

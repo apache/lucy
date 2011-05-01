@@ -27,7 +27,7 @@ static void
 S_put(PriorityQueue *self, Obj *element);
 
 // Free all the elements in the heap and set size to 0.
-static void 
+static void
 S_clear(PriorityQueue *self);
 
 // Heap adjuster.
@@ -39,8 +39,7 @@ static void
 S_down_heap(PriorityQueue *self);
 
 PriorityQueue*
-PriQ_init(PriorityQueue *self, uint32_t max_size)
-{
+PriQ_init(PriorityQueue *self, uint32_t max_size) {
     if (max_size == U32_MAX) {
         THROW(ERR, "max_size too large: %u32", max_size);
     }
@@ -50,7 +49,7 @@ PriQ_init(PriorityQueue *self, uint32_t max_size)
     self->size = 0;
 
     // Assign.
-    self->max_size    = max_size;
+    self->max_size = max_size;
 
     // Allocate space for the heap, assign all slots to NULL.
     self->heap = (Obj**)CALLOCATE(heap_size, sizeof(Obj*));
@@ -60,8 +59,7 @@ PriQ_init(PriorityQueue *self, uint32_t max_size)
 }
 
 void
-PriQ_destroy(PriorityQueue *self) 
-{
+PriQ_destroy(PriorityQueue *self) {
     if (self->heap) {
         S_clear(self);
         FREEMEM(self->heap);
@@ -70,28 +68,28 @@ PriQ_destroy(PriorityQueue *self)
 }
 
 uint32_t
-PriQ_get_size(PriorityQueue *self) { return self->size; }
+PriQ_get_size(PriorityQueue *self) {
+    return self->size;
+}
 
 static void
-S_put(PriorityQueue *self, Obj *element) 
-{
+S_put(PriorityQueue *self, Obj *element) {
     // Increment size.
     if (self->size >= self->max_size) {
-        THROW(ERR, "PriorityQueue exceeded max_size: %u32 %u32", self->size, 
-            self->max_size);
+        THROW(ERR, "PriorityQueue exceeded max_size: %u32 %u32", self->size,
+              self->max_size);
     }
     self->size++;
 
     // Put element into heap.
-    self->heap[ self->size ] = element;
+    self->heap[self->size] = element;
 
     // Adjust heap.
     S_up_heap(self);
 }
 
 bool_t
-PriQ_insert(PriorityQueue *self, Obj *element) 
-{
+PriQ_insert(PriorityQueue *self, Obj *element) {
     Obj *least = PriQ_Jostle(self, element);
     DECREF(least);
     if (element == least) return false;
@@ -99,8 +97,7 @@ PriQ_insert(PriorityQueue *self, Obj *element)
 }
 
 Obj*
-PriQ_jostle(PriorityQueue *self, Obj *element) 
-{
+PriQ_jostle(PriorityQueue *self, Obj *element) {
     // Absorb element if there's a vacancy.
     if (self->size < self->max_size) {
         S_put(self, element);
@@ -112,7 +109,7 @@ PriQ_jostle(PriorityQueue *self, Obj *element)
     }
     else {
         Obj *scratch = PriQ_Peek(self);
-        if ( !PriQ_Less_Than(self, element, scratch) ) {
+        if (!PriQ_Less_Than(self, element, scratch)) {
             // If the new element belongs in the queue, replace something.
             Obj *retval = self->heap[1];
             self->heap[1] = element;
@@ -126,15 +123,14 @@ PriQ_jostle(PriorityQueue *self, Obj *element)
 }
 
 Obj*
-PriQ_pop(PriorityQueue *self) 
-{
+PriQ_pop(PriorityQueue *self) {
     if (self->size > 0) {
         // Save the first value.
         Obj *result = self->heap[1];
 
         // Move last to first and adjust heap.
-        self->heap[1] = self->heap[ self->size ];
-        self->heap[ self->size ] = NULL;
+        self->heap[1] = self->heap[self->size];
+        self->heap[self->size] = NULL;
         self->size--;
         S_down_heap(self);
 
@@ -147,14 +143,13 @@ PriQ_pop(PriorityQueue *self)
 }
 
 VArray*
-PriQ_pop_all(PriorityQueue *self)
-{
+PriQ_pop_all(PriorityQueue *self) {
     VArray *retval = VA_new(self->size);
 
     // Map the queue nodes onto the array in reverse order.
     if (self->size) {
         uint32_t i;
-        for (i = self->size; i--; ) {
+        for (i = self->size; i--;) {
             Obj *const elem = PriQ_Pop(self);
             VA_Store(retval, i, elem);
         }
@@ -164,8 +159,7 @@ PriQ_pop_all(PriorityQueue *self)
 }
 
 Obj*
-PriQ_peek(PriorityQueue *self) 
-{
+PriQ_peek(PriorityQueue *self) {
     if (self->size > 0) {
         return self->heap[1];
     }
@@ -174,9 +168,8 @@ PriQ_peek(PriorityQueue *self)
     }
 }
 
-static void 
-S_clear(PriorityQueue *self) 
-{
+static void
+S_clear(PriorityQueue *self) {
     uint32_t i;
     Obj **elem_ptr = (self->heap + 1);
 
@@ -185,20 +178,19 @@ S_clear(PriorityQueue *self)
         DECREF(*elem_ptr);
         *elem_ptr = NULL;
         elem_ptr++;
-    }   
+    }
     self->size = 0;
 }
 
 static void
-S_up_heap(PriorityQueue *self) 
-{
+S_up_heap(PriorityQueue *self) {
     uint32_t i = self->size;
     uint32_t j = i >> 1;
     Obj *const node = self->heap[i]; // save bottom node
 
-    while (    j > 0 
-            && PriQ_Less_Than(self, node, self->heap[j])
-    ) {
+    while (j > 0
+           && PriQ_Less_Than(self, node, self->heap[j])
+          ) {
         self->heap[i] = self->heap[j];
         i = j;
         j = j >> 1;
@@ -207,30 +199,29 @@ S_up_heap(PriorityQueue *self)
 }
 
 static void
-S_down_heap(PriorityQueue *self) 
-{
+S_down_heap(PriorityQueue *self) {
     uint32_t i = 1;
     uint32_t j = i << 1;
     uint32_t k = j + 1;
     Obj *node = self->heap[i]; // save top node
 
     // Find smaller child.
-    if (   k <= self->size 
+    if (k <= self->size
         && PriQ_Less_Than(self, self->heap[k], self->heap[j])
-    ) {
+       ) {
         j = k;
     }
 
-    while (   j <= self->size 
+    while (j <= self->size
            && PriQ_Less_Than(self, self->heap[j], node)
-    ) {
+          ) {
         self->heap[i] = self->heap[j];
         i = j;
         j = i << 1;
         k = j + 1;
-        if (   k <= self->size 
+        if (k <= self->size
             && PriQ_Less_Than(self, self->heap[k], self->heap[j])
-        ) {
+           ) {
             j = k;
         }
     }

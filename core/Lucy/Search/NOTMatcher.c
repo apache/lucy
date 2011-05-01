@@ -22,15 +22,13 @@
 #include "Lucy/Plan/Schema.h"
 
 NOTMatcher*
-NOTMatcher_new(Matcher *negated_matcher, int32_t doc_max) 
-{
+NOTMatcher_new(Matcher *negated_matcher, int32_t doc_max) {
     NOTMatcher *self = (NOTMatcher*)VTable_Make_Obj(NOTMATCHER);
     return NOTMatcher_init(self, negated_matcher, doc_max);
 }
 
 NOTMatcher*
-NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max)
-{
+NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max) {
     VArray *children = VA_new(1);
     VA_Push(children, INCREF(negated_matcher));
     PolyMatcher_init((PolyMatcher*)self, children, NULL);
@@ -40,7 +38,7 @@ NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max)
     self->next_negation    = 0;
 
     // Assign.
-    self->negated_matcher   = (Matcher*)INCREF(negated_matcher);
+    self->negated_matcher  = (Matcher*)INCREF(negated_matcher);
     self->doc_max          = doc_max;
 
     DECREF(children);
@@ -49,21 +47,19 @@ NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max)
 }
 
 void
-NOTMatcher_destroy(NOTMatcher *self) 
-{
+NOTMatcher_destroy(NOTMatcher *self) {
     DECREF(self->negated_matcher);
     SUPER_DESTROY(self, NOTMATCHER);
 }
 
 int32_t
-NOTMatcher_next(NOTMatcher *self)
-{
+NOTMatcher_next(NOTMatcher *self) {
     while (1) {
         self->doc_id++;
 
         // Get next negated doc id.
         if (self->next_negation < self->doc_id) {
-            self->next_negation 
+            self->next_negation
                 = Matcher_Advance(self->negated_matcher, self->doc_id);
             if (self->next_negation == 0) {
                 DECREF(self->negated_matcher);
@@ -84,21 +80,18 @@ NOTMatcher_next(NOTMatcher *self)
 }
 
 int32_t
-NOTMatcher_advance(NOTMatcher *self, int32_t target)
-{
+NOTMatcher_advance(NOTMatcher *self, int32_t target) {
     self->doc_id = target - 1;
     return NOTMatcher_next(self);
 }
 
 int32_t
-NOTMatcher_get_doc_id(NOTMatcher *self)
-{
+NOTMatcher_get_doc_id(NOTMatcher *self) {
     return self->doc_id;
 }
 
 float
-NOTMatcher_score(NOTMatcher *self)
-{
+NOTMatcher_score(NOTMatcher *self) {
     UNUSED_VAR(self);
     return 0.0f;
 }

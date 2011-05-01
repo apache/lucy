@@ -23,7 +23,7 @@ parcel Lucy;
  */
 
 class Lucy::Test::TestSchema inherits Lucy::Plan::Schema {
-    inert incremented TestSchema* 
+    inert incremented TestSchema*
     new();
 
     inert TestSchema*

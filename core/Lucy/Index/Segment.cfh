@@ -73,11 +73,11 @@ class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
      * @param metadata JSON-izable data structure.
      */
     public void
-    Store_Metadata(Segment *self, const CharBuf *key, 
+    Store_Metadata(Segment *self, const CharBuf *key,
                    decremented Obj *metadata);
 
     void
-    Store_Metadata_Str(Segment *self, const char *key, size_t len, 
+    Store_Metadata_Str(Segment *self, const char *key, size_t len,
                        decremented Obj *value);
 
     /** Fetch a value from the Segment's metadata hash.
@@ -120,7 +120,7 @@ class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
 
     /** Getter for the object's document count.
      */
-    public int64_t 
+    public int64_t
     Get_Count(Segment *self);
 
     /** Add <code>increment</code> to the object's document count, then return

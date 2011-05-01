@@ -20,7 +20,7 @@ inert class Lucy::Test::TestUtils  {
 
     /** Testing-only CharBuf factory which uses strlen().
      */
-    inert incremented CharBuf* 
+    inert incremented CharBuf*
     get_cb(const char *utf8);
 
     /** Return a random unsigned 64-bit integer.
@@ -83,9 +83,9 @@ inert class Lucy::Test::TestUtils  {
     make_not_query(Query *negated_query);
 
     inert incremented RangeQuery*
-    make_range_query(const char *field, const char *lower_term = NULL, 
-                     const char *upper_term = NULL, 
-                     bool_t include_lower = true, 
+    make_range_query(const char *field, const char *lower_term = NULL,
+                     const char *upper_term = NULL,
+                     bool_t include_lower = true,
                      bool_t include_upper = true);
 
     /** Return either an ORQuery or an ANDQuery depending on the value of

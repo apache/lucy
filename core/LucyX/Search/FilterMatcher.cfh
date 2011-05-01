@@ -45,7 +45,7 @@ class LucyX::Search::FilterMatcher inherits Lucy::Search::Matcher {
     public float
     Score(FilterMatcher* self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(FilterMatcher* self);
 }
 

@@ -24,15 +24,13 @@
 #include "Lucy/Store/OutStream.h"
 
 LeafQuery*
-LeafQuery_new(const CharBuf *field, const CharBuf *text)
-{
+LeafQuery_new(const CharBuf *field, const CharBuf *text) {
     LeafQuery *self = (LeafQuery*)VTable_Make_Obj(LEAFQUERY);
     return LeafQuery_init(self, field, text);
 }
 
 LeafQuery*
-LeafQuery_init(LeafQuery *self, const CharBuf *field, const CharBuf *text)
-{
+LeafQuery_init(LeafQuery *self, const CharBuf *field, const CharBuf *text) {
     Query_init((Query*)self, 1.0f);
     self->field       = field ? CB_Clone(field) : NULL;
     self->text        = CB_Clone(text);
@@ -40,21 +38,24 @@ LeafQuery_init(LeafQuery *self, const CharBuf *field, const CharBuf *text)
 }
 
 void
-LeafQuery_destroy(LeafQuery *self)
-{
+LeafQuery_destroy(LeafQuery *self) {
     DECREF(self->field);
     DECREF(self->text);
     SUPER_DESTROY(self, LEAFQUERY);
 }
 
-CharBuf* 
-LeafQuery_get_field(LeafQuery *self) { return self->field; }
-CharBuf* 
-LeafQuery_get_text(LeafQuery *self)  { return self->text; }
+CharBuf*
+LeafQuery_get_field(LeafQuery *self) {
+    return self->field;
+}
+
+CharBuf*
+LeafQuery_get_text(LeafQuery *self) {
+    return self->text;
+}
 
 bool_t
-LeafQuery_equals(LeafQuery *self, Obj *other)
-{
+LeafQuery_equals(LeafQuery *self, Obj *other) {
     LeafQuery *twin = (LeafQuery*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, LEAFQUERY)) return false;
@@ -68,8 +69,7 @@ LeafQuery_equals(LeafQuery *self, Obj *other)
 }
 
 CharBuf*
-LeafQuery_to_string(LeafQuery *self)
-{
+LeafQuery_to_string(LeafQuery *self) {
     if (self->field) {
         return CB_newf("%o:%o", self->field, self->text);
     }
@@ -79,8 +79,7 @@ LeafQuery_to_string(LeafQuery *self)
 }
 
 void
-LeafQuery_serialize(LeafQuery *self, OutStream *outstream)
-{
+LeafQuery_serialize(LeafQuery *self, OutStream *outstream) {
     if (self->field) {
         OutStream_Write_U8(outstream, true);
         CB_Serialize(self->field, outstream);
@@ -93,20 +92,18 @@ LeafQuery_serialize(LeafQuery *self, OutStream *outstream)
 }
 
 LeafQuery*
-LeafQuery_deserialize(LeafQuery *self, InStream *instream)
-{
+LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
     self = self ? self : (LeafQuery*)VTable_Make_Obj(LEAFQUERY);
-    self->field = InStream_Read_U8(instream) 
-                ? CB_deserialize(NULL, instream)
-                : NULL;
+    self->field = InStream_Read_U8(instream)
+                  ? CB_deserialize(NULL, instream)
+                  : NULL;
     self->text  = CB_deserialize(NULL, instream);
     self->boost = InStream_Read_F32(instream);
     return self;
 }
 
 Compiler*
-LeafQuery_make_compiler(LeafQuery *self, Searcher *searcher, float boost) 
-{
+LeafQuery_make_compiler(LeafQuery *self, Searcher *searcher, float boost) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(boost);

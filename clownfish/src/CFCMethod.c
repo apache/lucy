@@ -51,20 +51,18 @@ S_update_typedefs(CFCMethod *self, const char *short_sym);
 
 CFCMethod*
 CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
-              const char *class_cnick, const char *macro_sym, 
-              CFCType *return_type, CFCParamList *param_list, 
-              CFCDocuComment *docucomment, int is_final, int is_abstract)
-{
+              const char *class_cnick, const char *macro_sym,
+              CFCType *return_type, CFCParamList *param_list,
+              CFCDocuComment *docucomment, int is_final, int is_abstract) {
     CFCMethod *self = (CFCMethod*)CFCBase_allocate(sizeof(CFCMethod),
-        "Clownfish::Method");
+                                                   "Clownfish::Method");
     return CFCMethod_init(self, parcel, exposure, class_name, class_cnick,
-        macro_sym, return_type, param_list, docucomment, is_final, 
-        is_abstract);
+                          macro_sym, return_type, param_list, docucomment,
+                          is_final, is_abstract);
 }
 
 static int
-S_validate_macro_sym(const char *macro_sym)
-{
+S_validate_macro_sym(const char *macro_sym) {
     if (!macro_sym || !strlen(macro_sym)) { return false; }
 
     int need_upper  = true;
@@ -76,7 +74,7 @@ S_validate_macro_sym(const char *macro_sym)
         need_letter = false;
 
         // We've reached NULL-termination without problems, so succeed.
-        if (!*macro_sym) { return true; } 
+        if (!*macro_sym) { return true; }
 
         if (!isalnum(*macro_sym)) {
             if (*macro_sym != '_') { return false; }
@@ -86,12 +84,11 @@ S_validate_macro_sym(const char *macro_sym)
 }
 
 CFCMethod*
-CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure, 
-               const char *class_name, const char *class_cnick, 
-               const char *macro_sym, CFCType *return_type, 
-               CFCParamList *param_list, CFCDocuComment *docucomment, 
-               int is_final, int is_abstract)
-{
+CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
+               const char *class_name, const char *class_cnick,
+               const char *macro_sym, CFCType *return_type,
+               CFCParamList *param_list, CFCDocuComment *docucomment,
+               int is_final, int is_abstract) {
     // Validate macro_sym, derive micro_sym.
     if (!S_validate_macro_sym(macro_sym)) {
         croak("Invalid macro_sym: '%s'", macro_sym ? macro_sym : "[NULL]");
@@ -104,8 +101,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 
     // Super-init and clean up derived micro_sym.
     CFCFunction_init((CFCFunction*)self, parcel, exposure, class_name,
-        class_cnick, micro_sym, return_type, param_list, docucomment,
-        false);
+                     class_cnick, micro_sym, return_type, param_list,
+                     docucomment, false);
     FREEMEM(micro_sym);
 
     // Verify that the first element in the arg list is a self.
@@ -120,9 +117,9 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     sprintf(wanted, "%s%s", prefix, struct_sym);
     int mismatch = strcmp(wanted, specifier);
     FREEMEM(wanted);
-    if (mismatch) { 
+    if (mismatch) {
         croak("First arg type doesn't match class: '%s' '%s", class_name,
-            specifier);
+              specifier);
     }
 
     self->macro_sym     = CFCUtil_strdup(macro_sym);
@@ -136,8 +133,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
     self->full_callback_sym = (char*)MALLOCATE(amount);
     self->full_override_sym = (char*)MALLOCATE(amount);
-    int check = sprintf(self->full_callback_sym, "%s_CALLBACK", 
-        full_func_sym);
+    int check = sprintf(self->full_callback_sym, "%s_CALLBACK",
+                        full_func_sym);
     if (check < 0) { croak("sprintf failed"); }
     check = sprintf(self->full_override_sym, "%s_OVERRIDE", full_func_sym);
     if (check < 0) { croak("sprintf failed"); }
@@ -153,8 +150,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 }
 
 void
-CFCMethod_destroy(CFCMethod *self)
-{
+CFCMethod_destroy(CFCMethod *self) {
     FREEMEM(self->macro_sym);
     FREEMEM(self->short_typedef);
     FREEMEM(self->full_typedef);
@@ -164,8 +160,7 @@ CFCMethod_destroy(CFCMethod *self)
 }
 
 int
-CFCMethod_compatible(CFCMethod *self, CFCMethod *other)
-{
+CFCMethod_compatible(CFCMethod *self, CFCMethod *other) {
     if (!other) { return false; }
     if (strcmp(self->macro_sym, other->macro_sym)) { return false; }
     int my_public = CFCSymbol_public((CFCSymbol*)self);
@@ -187,8 +182,8 @@ CFCMethod_compatible(CFCMethod *self, CFCMethod *other)
             if (strcmp(my_vals[i], other_vals[i])) { return false; }
         }
         if (my_args[i]) {
-            if (!CFCVariable_equals(my_args[i], other_args[i])) { 
-                return false; 
+            if (!CFCVariable_equals(my_args[i], other_args[i])) {
+                return false;
             }
         }
         else {
@@ -212,14 +207,13 @@ CFCMethod_compatible(CFCMethod *self, CFCMethod *other)
 }
 
 void
-CFCMethod_override(CFCMethod *self, CFCMethod *orig)
-{
+CFCMethod_override(CFCMethod *self, CFCMethod *orig) {
     // Check that the override attempt is legal.
     if (CFCMethod_final(orig)) {
         const char *orig_class = CFCSymbol_get_class_name((CFCSymbol*)orig);
         const char *my_class   = CFCSymbol_get_class_name((CFCSymbol*)self);
         croak("Attempt to override final method '%s' from '%s' by '%s'",
-            orig->macro_sym, orig_class, my_class);
+              orig->macro_sym, orig_class, my_class);
     }
     if (!CFCMethod_compatible(self, orig)) {
         const char *func      = CFCFunction_full_func_sym((CFCFunction*)self);
@@ -232,26 +226,26 @@ CFCMethod_override(CFCMethod *self, CFCMethod *orig)
 }
 
 CFCMethod*
-CFCMethod_finalize(CFCMethod *self)
-{
-    CFCSymbol *self_sym = (CFCSymbol*)self;
-    CFCParcel *parcel = CFCSymbol_get_parcel(self_sym);
-    const char *exposure = CFCSymbol_get_exposure(self_sym);
-    const char *class_name = CFCSymbol_get_class_name(self_sym);
+CFCMethod_finalize(CFCMethod *self) {
+    CFCSymbol  *self_sym    = (CFCSymbol*)self;
+    CFCParcel  *parcel      = CFCSymbol_get_parcel(self_sym);
+    const char *exposure    = CFCSymbol_get_exposure(self_sym);
+    const char *class_name  = CFCSymbol_get_class_name(self_sym);
     const char *class_cnick = CFCSymbol_get_class_cnick(self_sym);
-    CFCMethod *finalized = CFCMethod_new(parcel, exposure, class_name,
-        class_cnick, self->macro_sym, self->function.return_type,
-        self->function.param_list, self->function.docucomment, true,
-        self->is_abstract);
+    CFCMethod  *finalized
+        = CFCMethod_new(parcel, exposure, class_name, class_cnick,
+                        self->macro_sym, self->function.return_type,
+                        self->function.param_list,
+                        self->function.docucomment, true,
+                        self->is_abstract);
     finalized->is_novel = self->is_final; // Is this right?
     S_update_typedefs(finalized, CFCSymbol_short_sym((CFCSymbol*)self));
     return finalized;
 }
 
 size_t
-CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf, 
-                           size_t buf_size)
-{
+CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf,
+                           size_t buf_size) {
     CFCUTIL_NULL_CHECK(invoker);
     size_t needed = strlen(invoker) + 1 + strlen(self->macro_sym) + 1;
     if (buf_size >= needed) {
@@ -262,13 +256,15 @@ CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf,
 }
 
 size_t
-CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf, 
-                          size_t buf_size)
-{
+CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf,
+                          size_t buf_size) {
     CFCUTIL_NULL_CHECK(invoker);
     const char *Prefix = CFCSymbol_get_Prefix((CFCSymbol*)self);
-    size_t needed = strlen(Prefix) + strlen(invoker) + 1 
-                  + strlen(self->macro_sym) + 1;
+    size_t needed = strlen(Prefix)
+                    + strlen(invoker)
+                    + 1
+                    + strlen(self->macro_sym)
+                    + 1;
     if (buf_size >= needed) {
         int check = sprintf(buf, "%s%s_%s", Prefix, invoker, self->macro_sym);
         if (check < 0) { croak("sprintf failed"); }
@@ -277,12 +273,11 @@ CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf,
 }
 
 size_t
-CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf, 
-                          size_t buf_size)
-{
+CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf,
+                          size_t buf_size) {
     CFCUTIL_NULL_CHECK(invoker);
-    size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0) 
-                  + strlen("_OFFSET");
+    size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0)
+                    + strlen("_OFFSET");
     if (buf_size >= needed) {
         CFCMethod_full_method_sym(self, invoker, buf, buf_size);
         strcat(buf, "_OFFSET");
@@ -291,14 +286,12 @@ CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf,
 }
 
 const char*
-CFCMethod_get_macro_sym(CFCMethod *self)
-{
+CFCMethod_get_macro_sym(CFCMethod *self) {
     return self->macro_sym;
 }
 
 static void
-S_update_typedefs(CFCMethod *self, const char *short_sym)
-{
+S_update_typedefs(CFCMethod *self, const char *short_sym) {
     FREEMEM(self->short_typedef);
     FREEMEM(self->full_typedef);
     if (short_sym) {
@@ -319,50 +312,42 @@ S_update_typedefs(CFCMethod *self, const char *short_sym)
 }
 
 const char*
-CFCMethod_short_typedef(CFCMethod *self)
-{
+CFCMethod_short_typedef(CFCMethod *self) {
     return self->short_typedef;
 }
 
 const char*
-CFCMethod_full_typedef(CFCMethod *self)
-{
+CFCMethod_full_typedef(CFCMethod *self) {
     return self->full_typedef;
 }
 
 const char*
-CFCMethod_full_callback_sym(CFCMethod *self)
-{
+CFCMethod_full_callback_sym(CFCMethod *self) {
     return self->full_callback_sym;
 }
 
 const char*
-CFCMethod_full_override_sym(CFCMethod *self)
-{
+CFCMethod_full_override_sym(CFCMethod *self) {
     return self->full_override_sym;
 }
 
 int
-CFCMethod_final(CFCMethod *self)
-{
+CFCMethod_final(CFCMethod *self) {
     return self->is_final;
 }
 
 int
-CFCMethod_abstract(CFCMethod *self)
-{
+CFCMethod_abstract(CFCMethod *self) {
     return self->is_abstract;
 }
 
 int
-CFCMethod_novel(CFCMethod *self)
-{
+CFCMethod_novel(CFCMethod *self) {
     return self->is_novel;
 }
 
 CFCType*
-CFCMethod_self_type(CFCMethod *self)
-{
+CFCMethod_self_type(CFCMethod *self) {
     CFCVariable **vars = CFCParamList_get_variables(self->function.param_list);
     return CFCVariable_get_type(vars[0]);
 }

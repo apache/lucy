@@ -38,19 +38,17 @@
 #endif
 
 TestBatch*
-TestDirManip_prepare()
-{
+TestDirManip_prepare() {
     return Test_new_batch("Integers", 6, TestDirManip_run);
 }
 
 void
-TestDirManip_run(TestBatch *batch)
-{
+TestDirManip_run(TestBatch *batch) {
     TEST_INT_EQ(batch, 0, makedir("_chaz_test_dir", 0777), "makedir");
     TEST_INT_EQ(batch, 0, makedir("_chaz_test_dir" DIR_SEP "deep", 0777),
-        "makedir with DIR_SEP");
+                "makedir with DIR_SEP");
     TEST_INT_EQ(batch, 0, rmdir("_chaz_test_dir" DIR_SEP "deep"),
-        "rmdir with DIR_SEP");
+                "rmdir with DIR_SEP");
     TEST_INT_EQ(batch, 0, rmdir("_chaz_test_dir"), "rmdir");
 #ifdef CHY_HAS_DIRENT_D_NAMLEN
     {

@@ -50,23 +50,23 @@ class Lucy::Index::PostingPool cnick PostPool
     int64_t            post_end;
 
     inert incremented PostingPool*
-    new(Schema *schema, Snapshot *snapshot, Segment *segment, 
-        PolyReader *polyreader, const CharBuf *field, 
-        LexiconWriter *lex_writer, MemoryPool *mem_pool, 
-        OutStream *lex_temp_out, OutStream *post_temp_out, 
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader, const CharBuf *field,
+        LexiconWriter *lex_writer, MemoryPool *mem_pool,
+        OutStream *lex_temp_out, OutStream *post_temp_out,
         OutStream *skip_out);
 
     inert PostingPool*
-    init(PostingPool *self, Schema *schema, Snapshot *snapshot, 
-         Segment *segment, PolyReader *polyreader, const CharBuf *field, 
-         LexiconWriter *lex_writer, MemoryPool *mem_pool, 
-         OutStream *lex_temp_out, OutStream *post_temp_out, 
+    init(PostingPool *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader, const CharBuf *field,
+         LexiconWriter *lex_writer, MemoryPool *mem_pool,
+         OutStream *lex_temp_out, OutStream *post_temp_out,
          OutStream *skip_out);
 
     /** Add a field's inverted content.
      */
     void
-    Add_Inversion(PostingPool *self, Inversion *inversion, int32_t doc_id, 
+    Add_Inversion(PostingPool *self, Inversion *inversion, int32_t doc_id,
                   float doc_boost, float length_norm);
 
     /** Reduce RAM footprint as much as possible.
@@ -78,7 +78,7 @@ class Lucy::Index::PostingPool cnick PostPool
     Get_Mem_Pool(PostingPool *self);
 
     void
-    Add_Segment(PostingPool *self, SegReader *reader, I32Array *doc_map, 
+    Add_Segment(PostingPool *self, SegReader *reader, I32Array *doc_map,
                 int32_t doc_base);
 
     void

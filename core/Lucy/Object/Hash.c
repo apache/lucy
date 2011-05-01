@@ -59,15 +59,13 @@ static INLINE HashEntry*
 SI_rebuild_hash(Hash *self);
 
 Hash*
-Hash_new(uint32_t capacity)
-{
+Hash_new(uint32_t capacity) {
     Hash *self = (Hash*)VTable_Make_Obj(HASH);
     return Hash_init(self, capacity);
 }
 
 Hash*
-Hash_init(Hash *self, uint32_t capacity)
-{
+Hash_init(Hash *self, uint32_t capacity) {
     // Allocate enough space to hold the requested number of elements without
     // triggering a rebuild.
     uint32_t requested_capacity = capacity < I32_MAX ? capacity : I32_MAX;
@@ -91,9 +89,8 @@ Hash_init(Hash *self, uint32_t capacity)
     return self;
 }
 
-void 
-Hash_destroy(Hash *self) 
-{
+void
+Hash_destroy(Hash *self) {
     if (self->entries) {
         Hash_Clear(self);
         FREEMEM(self->entries);
@@ -102,8 +99,7 @@ Hash_destroy(Hash *self)
 }
 
 Hash*
-Hash_dump(Hash *self)
-{
+Hash_dump(Hash *self) {
     Hash *dump = Hash_new(self->size);
     Obj *key;
     Obj *value;
@@ -120,8 +116,7 @@ Hash_dump(Hash *self)
 }
 
 Obj*
-Hash_load(Hash *self, Obj *dump)
-{
+Hash_load(Hash *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
     UNUSED_VAR(self);
@@ -149,8 +144,8 @@ Hash_load(Hash *self, Obj *dump)
         if (vtable) {
             Obj_load_t load = (Obj_load_t)METHOD(vtable, Obj, Load);
             if (load == Obj_load) {
-                THROW(ERR, "Abstract method Load() not defined for %o", 
-                    VTable_Get_Name(vtable));
+                THROW(ERR, "Abstract method Load() not defined for %o",
+                      VTable_Get_Name(vtable));
             }
             else if (load != (Obj_load_t)Hash_load) { // stop inf loop
                 return load(NULL, dump);
@@ -174,8 +169,7 @@ Hash_load(Hash *self, Obj *dump)
 }
 
 void
-Hash_serialize(Hash *self, OutStream *outstream)
-{
+Hash_serialize(Hash *self, OutStream *outstream) {
     Obj *key;
     Obj *val;
     uint32_t charbuf_count = 0;
@@ -191,7 +185,7 @@ Hash_serialize(Hash *self, OutStream *outstream)
     OutStream_Write_C32(outstream, charbuf_count);
     Hash_Iterate(self);
     while (Hash_Next(self, &key, &val)) {
-        if (Obj_Is_A(key, CHARBUF)) { 
+        if (Obj_Is_A(key, CHARBUF)) {
             Obj_Serialize(key, outstream);
             FREEZE(val, outstream);
         }
@@ -200,7 +194,7 @@ Hash_serialize(Hash *self, OutStream *outstream)
     // Punt on the classes of the remaining keys.
     Hash_Iterate(self);
     while (Hash_Next(self, &key, &val)) {
-        if (!Obj_Is_A(key, CHARBUF)) { 
+        if (!Obj_Is_A(key, CHARBUF)) {
             FREEZE(key, outstream);
             FREEZE(val, outstream);
         }
@@ -208,8 +202,7 @@ Hash_serialize(Hash *self, OutStream *outstream)
 }
 
 Hash*
-Hash_deserialize(Hash *self, InStream *instream)
-{
+Hash_deserialize(Hash *self, InStream *instream) {
     uint32_t size         = InStream_Read_C32(instream);
     uint32_t num_charbufs = InStream_Read_C32(instream);
     uint32_t num_other    = size - num_charbufs;
@@ -217,7 +210,7 @@ Hash_deserialize(Hash *self, InStream *instream)
 
     if (self) Hash_init(self, size);
     else self = Hash_new(size);
- 
+
     // Read key-value pairs with CharBuf keys.
     while (num_charbufs--) {
         uint32_t len = InStream_Read_C32(instream);
@@ -228,7 +221,7 @@ Hash_deserialize(Hash *self, InStream *instream)
         Hash_Store(self, (Obj*)key, THAW(instream));
     }
     DECREF(key);
-    
+
     // Read remaining key/value pairs.
     while (num_other--) {
         Obj *k = THAW(instream);
@@ -240,13 +233,12 @@ Hash_deserialize(Hash *self, InStream *instream)
 }
 
 void
-Hash_clear(Hash *self) 
-{
+Hash_clear(Hash *self) {
     HashEntry *entry       = (HashEntry*)self->entries;
     HashEntry *const limit = entry + self->capacity;
 
     // Iterate through all entries.
-    for ( ; entry < limit; entry++) {
+    for (; entry < limit; entry++) {
         if (!entry->key) { continue; }
         DECREF(entry->key);
         DECREF(entry->value);
@@ -259,12 +251,11 @@ Hash_clear(Hash *self)
 }
 
 void
-Hash_do_store(Hash *self, Obj *key, Obj *value, 
-              int32_t hash_sum, bool_t use_this_key)
-{
+Hash_do_store(Hash *self, Obj *key, Obj *value,
+              int32_t hash_sum, bool_t use_this_key) {
     HashEntry *entries = self->size >= self->threshold
-                       ? SI_rebuild_hash(self)
-                       : (HashEntry*)self->entries;
+                         ? SI_rebuild_hash(self)
+                         : (HashEntry*)self->entries;
     uint32_t       tick = hash_sum;
     const uint32_t mask = self->capacity - 1;
 
@@ -272,21 +263,21 @@ Hash_do_store(Hash *self, Obj *key, Obj *value,
         tick &= mask;
         HashEntry *entry = entries + tick;
         if (entry->key == (Obj*)&TOMBSTONE || !entry->key) {
-            if (entry->key == (Obj*)&TOMBSTONE) { 
+            if (entry->key == (Obj*)&TOMBSTONE) {
                 // Take note of diminished tombstone clutter.
-                self->threshold++; 
+                self->threshold++;
             }
-            entry->key       = use_this_key 
-                             ? key 
-                             : Hash_Make_Key(self, key, hash_sum);
+            entry->key       = use_this_key
+                               ? key
+                               : Hash_Make_Key(self, key, hash_sum);
             entry->value     = value;
             entry->hash_sum  = hash_sum;
             self->size++;
             break;
         }
-        else if (   entry->hash_sum  == hash_sum
+        else if (entry->hash_sum == hash_sum
                  && Obj_Equals(key, entry->key)
-        ) {
+                ) {
             DECREF(entry->value);
             entry->value = value;
             break;
@@ -296,37 +287,32 @@ Hash_do_store(Hash *self, Obj *key, Obj *value,
 }
 
 void
-Hash_store(Hash *self, Obj *key, Obj *value) 
-{
+Hash_store(Hash *self, Obj *key, Obj *value) {
     Hash_do_store(self, key, value, Obj_Hash_Sum(key), false);
 }
 
 void
-Hash_store_str(Hash *self, const char *key, size_t key_len, Obj *value)
-{
+Hash_store_str(Hash *self, const char *key, size_t key_len, Obj *value) {
     ZombieCharBuf *key_buf = ZCB_WRAP_STR((char*)key, key_len);
-    Hash_do_store(self, (Obj*)key_buf, value, 
-        ZCB_Hash_Sum(key_buf), false);
+    Hash_do_store(self, (Obj*)key_buf, value,
+                  ZCB_Hash_Sum(key_buf), false);
 }
 
 Obj*
-Hash_make_key(Hash *self, Obj *key, int32_t hash_sum)
-{
+Hash_make_key(Hash *self, Obj *key, int32_t hash_sum) {
     UNUSED_VAR(self);
     UNUSED_VAR(hash_sum);
     return Obj_Clone(key);
 }
 
 Obj*
-Hash_fetch_str(Hash *self, const char *key, size_t key_len) 
-{
+Hash_fetch_str(Hash *self, const char *key, size_t key_len) {
     ZombieCharBuf *key_buf = ZCB_WRAP_STR(key, key_len);
     return Hash_fetch(self, (Obj*)key_buf);
 }
 
 static INLINE HashEntry*
-SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum) 
-{
+SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum) {
     uint32_t tick = hash_sum;
     HashEntry *const entries = (HashEntry*)self->entries;
     HashEntry *entry;
@@ -334,13 +320,13 @@ SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum)
     while (1) {
         tick &= self->capacity - 1;
         entry = entries + tick;
-        if (!entry->key) { 
+        if (!entry->key) {
             // Failed to find the key, so return NULL.
-            return NULL; 
+            return NULL;
         }
-        else if (   entry->hash_sum  == hash_sum
+        else if (entry->hash_sum == hash_sum
                  && Obj_Equals(key, entry->key)
-        ) {
+                ) {
             return entry;
         }
         tick++;
@@ -348,15 +334,13 @@ SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum)
 }
 
 Obj*
-Hash_fetch(Hash *self, const Obj *key) 
-{
+Hash_fetch(Hash *self, const Obj *key) {
     HashEntry *entry = SI_fetch_entry(self, key, Obj_Hash_Sum(key));
     return entry ? entry->value : NULL;
 }
 
 Obj*
-Hash_delete(Hash *self, const Obj *key) 
-{
+Hash_delete(Hash *self, const Obj *key) {
     HashEntry *entry = SI_fetch_entry(self, key, Obj_Hash_Sum(key));
     if (entry) {
         Obj *value = entry->value;
@@ -374,28 +358,24 @@ Hash_delete(Hash *self, const Obj *key)
 }
 
 Obj*
-Hash_delete_str(Hash *self, const char *key, size_t key_len) 
-{
+Hash_delete_str(Hash *self, const char *key, size_t key_len) {
     ZombieCharBuf *key_buf = ZCB_WRAP_STR(key, key_len);
     return Hash_delete(self, (Obj*)key_buf);
 }
 
 uint32_t
-Hash_iterate(Hash *self) 
-{
+Hash_iterate(Hash *self) {
     SI_kill_iter(self);
     return self->size;
 }
 
 static INLINE void
-SI_kill_iter(Hash *self) 
-{
+SI_kill_iter(Hash *self) {
     self->iter_tick = -1;
 }
 
 bool_t
-Hash_next(Hash *self, Obj **key, Obj **value) 
-{
+Hash_next(Hash *self, Obj **key, Obj **value) {
     while (1) {
         if (++self->iter_tick >= (int32_t)self->capacity) {
             // Bail since we've completed the iteration.
@@ -405,7 +385,7 @@ Hash_next(Hash *self, Obj **key, Obj **value)
             return false;
         }
         else {
-            HashEntry *const entry 
+            HashEntry *const entry
                 = (HashEntry*)self->entries + self->iter_tick;
             if (entry->key && entry->key != (Obj*)&TOMBSTONE) {
                 // Success!
@@ -418,15 +398,13 @@ Hash_next(Hash *self, Obj **key, Obj **value)
 }
 
 Obj*
-Hash_find_key(Hash *self, const Obj *key, int32_t hash_sum)
-{
+Hash_find_key(Hash *self, const Obj *key, int32_t hash_sum) {
     HashEntry *entry = SI_fetch_entry(self, key, hash_sum);
     return entry ? entry->key : NULL;
 }
 
 VArray*
-Hash_keys(Hash *self) 
-{
+Hash_keys(Hash *self) {
     Obj *key;
     Obj *val;
     VArray *keys = VA_new(self->size);
@@ -438,8 +416,7 @@ Hash_keys(Hash *self)
 }
 
 VArray*
-Hash_values(Hash *self) 
-{
+Hash_values(Hash *self) {
     Obj *key;
     Obj *val;
     VArray *values = VA_new(self->size);
@@ -449,8 +426,7 @@ Hash_values(Hash *self)
 }
 
 bool_t
-Hash_equals(Hash *self, Obj *other)
-{
+Hash_equals(Hash *self, Obj *other) {
     Hash    *twin = (Hash*)other;
     Obj     *key;
     Obj     *val;
@@ -469,16 +445,20 @@ Hash_equals(Hash *self, Obj *other)
 }
 
 uint32_t
-Hash_get_capacity(Hash *self) { return self->capacity; }
+Hash_get_capacity(Hash *self) {
+    return self->capacity;
+}
+
 uint32_t
-Hash_get_size(Hash *self)     { return self->size; }
+Hash_get_size(Hash *self) {
+    return self->size;
+}
 
 static INLINE HashEntry*
-SI_rebuild_hash(Hash *self)
-{
-    HashEntry *old_entries   = (HashEntry*)self->entries;
-    HashEntry *entry         = old_entries;
-    HashEntry *limit         = old_entries + self->capacity;
+SI_rebuild_hash(Hash *self) {
+    HashEntry *old_entries = (HashEntry*)self->entries;
+    HashEntry *entry       = old_entries;
+    HashEntry *limit       = old_entries + self->capacity;
 
     SI_kill_iter(self);
     self->capacity *= 2;
@@ -486,12 +466,12 @@ SI_rebuild_hash(Hash *self)
     self->entries   = (HashEntry*)CALLOCATE(self->capacity, sizeof(HashEntry));
     self->size      = 0;
 
-    for ( ; entry < limit; entry++) {
+    for (; entry < limit; entry++) {
         if (!entry->key || entry->key == (Obj*)&TOMBSTONE) {
-            continue; 
+            continue;
         }
-        Hash_do_store(self, entry->key, entry->value, 
-            entry->hash_sum, true);
+        Hash_do_store(self, entry->key, entry->value,
+                      entry->hash_sum, true);
     }
 
     FREEMEM(old_entries);
@@ -502,21 +482,18 @@ SI_rebuild_hash(Hash *self)
 /***************************************************************************/
 
 uint32_t
-HashTombStone_get_refcount(HashTombStone* self)
-{
+HashTombStone_get_refcount(HashTombStone* self) {
     CHY_UNUSED_VAR(self);
     return 1;
 }
 
 HashTombStone*
-HashTombStone_inc_refcount(HashTombStone* self)
-{
+HashTombStone_inc_refcount(HashTombStone* self) {
     return self;
 }
 
 uint32_t
-HashTombStone_dec_refcount(HashTombStone* self)
-{
+HashTombStone_dec_refcount(HashTombStone* self) {
     UNUSED_VAR(self);
     return 1;
 }

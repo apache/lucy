@@ -26,8 +26,7 @@
 #include "Lucy/Search/Compiler.h"
 
 PhraseMatcher*
-PhraseMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler)
-{
+PhraseMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler) {
     PhraseMatcher *self = (PhraseMatcher*)VTable_Make_Obj(PHRASEMATCHER);
     return PhraseMatcher_init(self, sim, plists, compiler);
 
@@ -35,8 +34,7 @@ PhraseMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler)
 
 PhraseMatcher*
 PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
-                  Compiler *compiler)
-{
+                   Compiler *compiler) {
     Matcher_init((Matcher*)self);
 
     // Init.
@@ -49,10 +47,10 @@ PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
     // Extract PostingLists out of VArray into local C array for quick access.
     self->num_elements = VA_Get_Size(plists);
     self->plists = (PostingList**)MALLOCATE(
-        self->num_elements * sizeof(PostingList*));
+                       self->num_elements * sizeof(PostingList*));
     for (size_t i = 0; i < self->num_elements; i++) {
-        PostingList *const plist = (PostingList*)CERTIFY(
-            VA_Fetch(plists, i), POSTINGLIST);
+        PostingList *const plist
+            = (PostingList*)CERTIFY(VA_Fetch(plists, i), POSTINGLIST);
         if (plist == NULL) {
             THROW(ERR, "Missing element %u32", i);
         }
@@ -68,8 +66,7 @@ PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
 }
 
 void
-PhraseMatcher_destroy(PhraseMatcher *self) 
-{
+PhraseMatcher_destroy(PhraseMatcher *self) {
     if (self->plists) {
         for (size_t i = 0; i < self->num_elements; i++) {
             DECREF(self->plists[i]);
@@ -83,8 +80,7 @@ PhraseMatcher_destroy(PhraseMatcher *self)
 }
 
 int32_t
-PhraseMatcher_next(PhraseMatcher *self)
-{
+PhraseMatcher_next(PhraseMatcher *self) {
     if (self->first_time) {
         return PhraseMatcher_Advance(self, 1);
     }
@@ -98,8 +94,7 @@ PhraseMatcher_next(PhraseMatcher *self)
 }
 
 int32_t
-PhraseMatcher_advance(PhraseMatcher *self, int32_t target) 
-{
+PhraseMatcher_advance(PhraseMatcher *self, int32_t target) {
     PostingList **const plists       = self->plists;
     const uint32_t      num_elements = self->num_elements;
     int32_t             highest      = 0;
@@ -193,11 +188,10 @@ PhraseMatcher_advance(PhraseMatcher *self, int32_t target)
     }
 }
 
-static INLINE uint32_t 
+static INLINE uint32_t
 SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
                   const uint32_t *candidates, const uint32_t *const candidates_end,
-                  uint32_t offset) 
-{                          
+                  uint32_t offset) {
     uint32_t *anchors = anchors_start;
     uint32_t *anchors_found = anchors_start;
     uint32_t target_anchor;
@@ -219,36 +213,35 @@ SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
      * But given the vagaries of modern processors, it merits actual
      * testing.*/
 
- SPIN_CANDIDATES:
+SPIN_CANDIDATES:
     target_candidate = *anchors + offset;
     while (*candidates < target_candidate) {
         if (++candidates == candidates_end) goto DONE;
-    } 
+    }
     if (*candidates == target_candidate) goto MATCH;
-    goto SPIN_ANCHORS;  
+    goto SPIN_ANCHORS;
 
- SPIN_ANCHORS: 
+SPIN_ANCHORS:
     target_anchor = *candidates - offset;
-    while (*anchors < target_anchor) { 
+    while (*anchors < target_anchor) {
         if (++anchors == anchors_end) goto DONE;
     };
     if (*anchors == target_anchor) goto MATCH;
-    goto SPIN_CANDIDATES;  
+    goto SPIN_CANDIDATES;
 
- MATCH:       
+MATCH:
     *anchors_found++ = *anchors;
     if (++anchors == anchors_end) goto DONE;
-    goto SPIN_CANDIDATES; 
+    goto SPIN_CANDIDATES;
 
- DONE:
+DONE:
     // Return number of anchors remaining.
-    return anchors_found - anchors_start; 
+    return anchors_found - anchors_start;
 }
 
 float
-PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) 
-{
-    PostingList **const plists   = self->plists;
+PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) {
+    PostingList **const plists = self->plists;
 
     /* Create a overwriteable "anchor set" from the first posting.
      *
@@ -288,8 +281,9 @@ PhraseMatcher_calc_phrase_freq(PhraseMatcher *self)
 
         // Splice out anchors that don't match the next term.  Bail out if
         // we've eliminated all possible anchors.
-        anchors_remaining = SI_winnow_anchors(anchors_start, anchors_end,
-            candidates_start, candidates_end, i);
+        anchors_remaining
+            = SI_winnow_anchors(anchors_start, anchors_end,
+                                candidates_start, candidates_end, i);
         if (!anchors_remaining) { return 0.0f; }
 
         // Adjust end for number of anchors that remain.
@@ -301,18 +295,16 @@ PhraseMatcher_calc_phrase_freq(PhraseMatcher *self)
 }
 
 int32_t
-PhraseMatcher_get_doc_id(PhraseMatcher *self) 
-{
+PhraseMatcher_get_doc_id(PhraseMatcher *self) {
     return self->doc_id;
 }
 
 float
-PhraseMatcher_score(PhraseMatcher *self) 
-{
+PhraseMatcher_score(PhraseMatcher *self) {
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(self->plists[0]);
-    float score = Sim_TF(self->sim, self->phrase_freq) 
-                * self->weight
-                * posting->weight;
+    float score = Sim_TF(self->sim, self->phrase_freq)
+                  * self->weight
+                  * posting->weight;
     return score;
 }
 

@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Read a segment's sort caches.
  */
-abstract class Lucy::Index::SortReader 
+abstract class Lucy::Index::SortReader
     inherits Lucy::Index::DataReader {
 
     inert SortReader*
@@ -34,10 +34,10 @@ abstract class Lucy::Index::SortReader
      */
     public incremented nullable DataReader*
     Aggregator(SortReader *self, VArray *readers, I32Array *offsets);
-    
+
 }
 
-class Lucy::Index::DefaultSortReader cnick DefSortReader 
+class Lucy::Index::DefaultSortReader cnick DefSortReader
     inherits Lucy::Index::SortReader {
 
     Hash *caches;
@@ -51,7 +51,7 @@ class Lucy::Index::DefaultSortReader cnick DefSortReader
         int32_t seg_tick);
 
     inert DefaultSortReader*
-    init(DefaultSortReader *self, Schema *schema, Folder *folder, 
+    init(DefaultSortReader *self, Schema *schema, Folder *folder,
          Snapshot *snapshot, VArray *segments, int32_t seg_tick);
 
     nullable SortCache*

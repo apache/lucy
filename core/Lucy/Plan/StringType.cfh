@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * Lucy::Plan::StringType is used for "exact-match" strings.
  */
-class Lucy::Plan::StringType 
+class Lucy::Plan::StringType
     inherits Lucy::Plan::TextType : dumpable {
 
     /**
@@ -30,14 +30,14 @@ class Lucy::Plan::StringType
      * @param sortable boolean indicating whether the field should be
      * sortable.
      */
-    public inert StringType* 
+    public inert StringType*
     init(StringType *self);
 
-    inert StringType* 
-    init2(StringType *self, float boost = 1.0, bool_t indexed = true, 
+    inert StringType*
+    init2(StringType *self, float boost = 1.0, bool_t indexed = true,
           bool_t stored = true, bool_t sortable = false);
 
-    public inert incremented StringType* 
+    public inert incremented StringType*
     new();
 
     public incremented Similarity*

@@ -73,7 +73,7 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPVutf8(sv, size);
-    lucy_ViewCharBuf *self 
+    lucy_ViewCharBuf *self
         = lucy_ViewCB_new_from_trusted_utf8(ptr, size);
     CHY_UNUSED_VAR(unused);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);

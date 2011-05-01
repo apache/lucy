@@ -28,9 +28,8 @@
 
 static size_t
 S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
-                 uint8_t **buf, uint8_t **limit)
-{
-    lucy_ByteBuf *const  work_buf   = self->work_buf;
+                 uint8_t **buf, uint8_t **limit) {
+    lucy_ByteBuf *const work_buf   = self->work_buf;
     uint8_t            *dest       = *buf;
     uint8_t            *dest_start = dest;
     uint8_t *const      end        = source + len;
@@ -43,7 +42,7 @@ S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
         // Grow if necessary.
         if (((STRLEN)(*limit - dest)) < buf_utf8_len) {
             size_t    bytes_so_far = dest - dest_start;
-            size_t    amount       = bytes_so_far + (end - source) + 10; 
+            size_t    amount       = bytes_so_far + (end - source) + 10;
             Lucy_BB_Set_Size(work_buf, bytes_so_far);
             *buf       = (uint8_t*)Lucy_BB_Grow(work_buf, amount);
             dest_start = *buf;
@@ -64,14 +63,13 @@ S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
 }
 
 lucy_Inversion*
-lucy_CaseFolder_transform(lucy_CaseFolder *self, lucy_Inversion *inversion)
-{
+lucy_CaseFolder_transform(lucy_CaseFolder *self, lucy_Inversion *inversion) {
     lucy_Token *token;
     uint8_t *buf   = (uint8_t*)Lucy_BB_Get_Buf(self->work_buf);
     uint8_t *limit = buf + Lucy_BB_Get_Capacity(self->work_buf);
     while (NULL != (token = Lucy_Inversion_Next(inversion))) {
-        size_t size = S_lc_to_work_buf(self, (uint8_t*)token->text, 
-            token->len, &buf, &limit);
+        size_t size = S_lc_to_work_buf(self, (uint8_t*)token->text,
+                                       token->len, &buf, &limit);
         if (size > token->len) {
             LUCY_FREEMEM(token->text);
             token->text = (char*)LUCY_MALLOCATE(size + 1);
@@ -85,14 +83,13 @@ lucy_CaseFolder_transform(lucy_CaseFolder *self, lucy_Inversion *inversion)
 }
 
 lucy_Inversion*
-lucy_CaseFolder_transform_text(lucy_CaseFolder *self, lucy_CharBuf *text)
-{
+lucy_CaseFolder_transform_text(lucy_CaseFolder *self, lucy_CharBuf *text) {
     lucy_Inversion *retval;
     lucy_Token *token;
     uint8_t *buf   = (uint8_t*)Lucy_BB_Get_Buf(self->work_buf);
     uint8_t *limit = buf + Lucy_BB_Get_Capacity(self->work_buf);
-    size_t size = S_lc_to_work_buf(self, Lucy_CB_Get_Ptr8(text), 
-        Lucy_CB_Get_Size(text), &buf, &limit);
+    size_t size = S_lc_to_work_buf(self, Lucy_CB_Get_Ptr8(text),
+                                   Lucy_CB_Get_Size(text), &buf, &limit);
     token = lucy_Token_new((char*)buf, size, 0, size, 1.0f, 1);
     retval = lucy_Inversion_new(token);
     LUCY_DECREF(token);

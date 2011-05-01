@@ -26,50 +26,50 @@ our @EXPORT_OK = qw( from_perl to_perl );
 
 # Convert from a Perl scalar to a primitive type.
 my %primitives_from_perl = (
-    double => sub {"SvNV( $_[0] )"},
-    float  => sub {"(float)SvNV( $_[0] )"},
-    int    => sub {"(int)SvIV( $_[0] )"},
-    short  => sub {"(short)SvIV( $_[0] )"},
+    double => sub {"SvNV($_[0])"},
+    float  => sub {"(float)SvNV($_[0])"},
+    int    => sub {"(int)SvIV($_[0])"},
+    short  => sub {"(short)SvIV($_[0])"},
     long   => sub {
         "((sizeof(long) <= sizeof(IV)) ? "
             . "(long)SvIV($_[0]) : (long)SvNV($_[0]))"
     },
-    size_t     => sub {"(size_t)SvIV( $_[0] )"},
-    uint64_t   => sub {"(uint64_t)SvNV( $_[0] )"},
-    uint32_t   => sub {"(uint32_t)SvUV( $_[0] )"},
-    uint16_t   => sub {"(uint16_t)SvUV( $_[0] )"},
-    uint8_t    => sub {"(uint8_t)SvUV( $_[0] )"},
-    int64_t    => sub {"(int64_t)SvNV( $_[0] )"},
-    int32_t    => sub {"(int32_t)SvIV( $_[0] )"},
-    int16_t    => sub {"(int16_t)SvIV( $_[0] )"},
-    int8_t     => sub {"(int8_t)SvIV( $_[0] )"},
-    chy_bool_t => sub {"SvTRUE( $_[0] ) ? 1 : 0"},
+    size_t     => sub {"(size_t)SvIV($_[0])"},
+    uint64_t   => sub {"(uint64_t)SvNV($_[0])"},
+    uint32_t   => sub {"(uint32_t)SvUV($_[0])"},
+    uint16_t   => sub {"(uint16_t)SvUV($_[0])"},
+    uint8_t    => sub {"(uint8_t)SvUV($_[0])"},
+    int64_t    => sub {"(int64_t)SvNV($_[0])"},
+    int32_t    => sub {"(int32_t)SvIV($_[0])"},
+    int16_t    => sub {"(int16_t)SvIV($_[0])"},
+    int8_t     => sub {"(int8_t)SvIV($_[0])"},
+    chy_bool_t => sub {"SvTRUE($_[0]) ? 1 : 0"},
 );
 
 # Convert from a primitive type to a Perl scalar.
 my %primitives_to_perl = (
-    double => sub {"newSVnv( $_[0] )"},
-    float  => sub {"newSVnv( $_[0] )"},
-    int    => sub {"newSViv( $_[0] )"},
-    short  => sub {"newSViv( $_[0] )"},
+    double => sub {"newSVnv($_[0])"},
+    float  => sub {"newSVnv($_[0])"},
+    int    => sub {"newSViv($_[0])"},
+    short  => sub {"newSViv($_[0])"},
     long   => sub {
         "((sizeof(long) <= sizeof(IV)) ? "
             . "newSViv((IV)$_[0]) : newSVnv((NV)$_[0]))";
     },
-    size_t   => sub {"newSViv( $_[0] )"},
+    size_t   => sub {"newSViv($_[0])"},
     uint64_t => sub {
         "sizeof(UV) == 8 ? newSVuv((UV)$_[0]) : newSVnv((NV)$_[0])";
     },
-    uint32_t => sub {"newSVuv( $_[0] )"},
-    uint16_t => sub {"newSVuv( $_[0] )"},
-    uint8_t  => sub {"newSVuv( $_[0] )"},
+    uint32_t => sub {"newSVuv($_[0])"},
+    uint16_t => sub {"newSVuv($_[0])"},
+    uint8_t  => sub {"newSVuv($_[0])"},
     int64_t  => sub {
         "sizeof(IV) == 8 ? newSViv((IV)$_[0]) : newSVnv((NV)$_[0])";
     },
-    int32_t    => sub {"newSViv( $_[0] )"},
-    int16_t    => sub {"newSViv( $_[0] )"},
-    int8_t     => sub {"newSViv( $_[0] )"},
-    chy_bool_t => sub {"newSViv( $_[0] )"},
+    int32_t    => sub {"newSViv($_[0])"},
+    int16_t    => sub {"newSViv($_[0])"},
+    int8_t     => sub {"newSViv($_[0])"},
+    chy_bool_t => sub {"newSViv($_[0])"},
 );
 
 sub from_perl {
@@ -119,7 +119,7 @@ sub to_perl {
         if ( $type_str eq 'void*' ) {
             # Assume that void* is a reference SV -- either a hashref or an
             # arrayref.
-            return "newRV_inc( (SV*)($cf_var) )";
+            return "newRV_inc((SV*)($cf_var))";
         }
     }
 

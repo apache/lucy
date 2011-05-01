@@ -136,8 +136,7 @@ typedef void
      Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET)
 
 static CHY_INLINE cfish_method_t
-cfish_method(const void *vtable, size_t offset) 
-{
+cfish_method(const void *vtable, size_t offset) {
     union { char *cptr; cfish_method_t *fptr; } ptr;
     ptr.cptr = (char*)vtable + offset;
     return ptr.fptr[0];
@@ -151,10 +150,9 @@ cfish_method(const void *vtable, size_t offset)
 
 extern size_t cfish_VTable_offset_of_parent;
 static CHY_INLINE cfish_method_t
-cfish_super_method(const void *vtable, size_t offset) 
-{
+cfish_super_method(const void *vtable, size_t offset) {
     char *vt_as_char = (char*)vtable;
-    cfish_VTable **parent_ptr 
+    cfish_VTable **parent_ptr
         = (cfish_VTable**)(vt_as_char + cfish_VTable_offset_of_parent);
     return cfish_method(*parent_ptr, offset);
 }

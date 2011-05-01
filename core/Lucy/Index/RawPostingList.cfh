@@ -18,7 +18,7 @@ parcel Lucy;
 
 class Lucy::Index::RawPostingList cnick RawPList
     inherits Lucy::Index::PostingList {
-    
+
     Posting       *posting;
     InStream      *instream;
     int64_t        start;
@@ -26,11 +26,11 @@ class Lucy::Index::RawPostingList cnick RawPList
     int64_t        len;
 
     inert incremented RawPostingList*
-    new(Schema *schema, const CharBuf *field, InStream *instream, 
+    new(Schema *schema, const CharBuf *field, InStream *instream,
         int64_t start, int64_t end);
 
     inert RawPostingList*
-    init(RawPostingList *self, Schema *schema, const CharBuf *field, 
+    init(RawPostingList *self, Schema *schema, const CharBuf *field,
          InStream *instream, int64_t lex_start, int64_t lex_end);
 
     public void

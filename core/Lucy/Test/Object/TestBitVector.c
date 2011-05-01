@@ -22,26 +22,25 @@
 #include "Lucy/Test/Object/TestBitVector.h"
 
 static void
-test_Set_and_Get(TestBatch *batch)
-{
+test_Set_and_Get(TestBatch *batch) {
     unsigned i, max;
     const uint32_t  three     = 3;
     const uint32_t  seventeen = 17;
     BitVector      *bit_vec   = BitVec_new(8);
 
     BitVec_Set(bit_vec, three);
-    TEST_TRUE(batch, BitVec_Get_Capacity(bit_vec) < seventeen, 
-        "set below cap");
+    TEST_TRUE(batch, BitVec_Get_Capacity(bit_vec) < seventeen,
+              "set below cap");
     BitVec_Set(bit_vec, seventeen);
-    TEST_TRUE(batch, BitVec_Get_Capacity(bit_vec) > seventeen, 
-        "set above cap causes BitVector to grow");
+    TEST_TRUE(batch, BitVec_Get_Capacity(bit_vec) > seventeen,
+              "set above cap causes BitVector to grow");
 
     for (i = 0, max = BitVec_Get_Capacity(bit_vec); i < max; i++) {
-        if (i == three || i == seventeen) { 
-            TEST_TRUE(batch, BitVec_Get(bit_vec, i), "set/get %d", i); 
+        if (i == three || i == seventeen) {
+            TEST_TRUE(batch, BitVec_Get(bit_vec, i), "set/get %d", i);
         }
         else {
-            TEST_FALSE(batch, BitVec_Get(bit_vec, i), "get %d", i); 
+            TEST_FALSE(batch, BitVec_Get(bit_vec, i), "get %d", i);
         }
     }
     TEST_FALSE(batch, BitVec_Get(bit_vec, i), "out of range get");
@@ -50,8 +49,7 @@ test_Set_and_Get(TestBatch *batch)
 }
 
 static void
-test_Flip(TestBatch *batch)
-{
+test_Flip(TestBatch *batch) {
     BitVector *bit_vec = BitVec_new(0);
     int i;
 
@@ -70,8 +68,7 @@ test_Flip(TestBatch *batch)
 }
 
 static void
-test_Flip_Block_ascending(TestBatch *batch)
-{
+test_Flip_Block_ascending(TestBatch *batch) {
     BitVector *bit_vec = BitVec_new(0);
     int i;
 
@@ -80,13 +77,13 @@ test_Flip_Block_ascending(TestBatch *batch)
     }
 
     for (i = 0; i <= 20; i++) {
-        if (i % 2 == 0) { 
-            TEST_TRUE(batch, BitVec_Get(bit_vec, i), 
-                "Flip_Block ascending %d", i);
+        if (i % 2 == 0) {
+            TEST_TRUE(batch, BitVec_Get(bit_vec, i),
+                      "Flip_Block ascending %d", i);
         }
         else {
-            TEST_FALSE(batch, BitVec_Get(bit_vec, i), 
-                "Flip_Block ascending %d", i);
+            TEST_FALSE(batch, BitVec_Get(bit_vec, i),
+                       "Flip_Block ascending %d", i);
         }
     }
 
@@ -94,8 +91,7 @@ test_Flip_Block_ascending(TestBatch *batch)
 }
 
 static void
-test_Flip_Block_descending(TestBatch *batch)
-{
+test_Flip_Block_descending(TestBatch *batch) {
     BitVector *bit_vec = BitVec_new(0);
     int i;
 
@@ -104,13 +100,13 @@ test_Flip_Block_descending(TestBatch *batch)
     }
 
     for (i = 0; i <= 20; i++) {
-        if (i % 2) { 
-            TEST_TRUE(batch, BitVec_Get(bit_vec, i), 
-                "Flip_Block descending %d", i);
+        if (i % 2) {
+            TEST_TRUE(batch, BitVec_Get(bit_vec, i),
+                      "Flip_Block descending %d", i);
         }
         else {
-            TEST_FALSE(batch, BitVec_Get(bit_vec, i), 
-                "Flip_Block descending %d", i);
+            TEST_FALSE(batch, BitVec_Get(bit_vec, i),
+                       "Flip_Block descending %d", i);
         }
     }
 
@@ -118,8 +114,7 @@ test_Flip_Block_descending(TestBatch *batch)
 }
 
 static void
-test_Flip_Block_bulk(TestBatch *batch)
-{
+test_Flip_Block_bulk(TestBatch *batch) {
     int32_t offset;
 
     for (offset = 0; offset <= 17; offset++) {
@@ -146,8 +141,7 @@ test_Flip_Block_bulk(TestBatch *batch)
 }
 
 static void
-test_Mimic(TestBatch *batch)
-{
+test_Mimic(TestBatch *batch) {
     int foo;
 
     for (foo = 0; foo <= 17; foo++) {
@@ -173,12 +167,12 @@ test_Mimic(TestBatch *batch)
 }
 
 static BitVector*
-S_create_set(int set_num) 
-{
+S_create_set(int set_num) {
     int i;
     int nums_1[] = { 1, 2, 3, 10, 20, 30, 0 };
-    int nums_2[] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 
-                     25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0 };
+    int nums_2[] = { 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                     25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0
+                   };
     int *nums = set_num == 1 ? nums_1 : nums_2;
     BitVector *bit_vec = BitVec_new(31);
     for (i = 0; nums[i] != 0; i++) {
@@ -192,16 +186,15 @@ S_create_set(int set_num)
 #define OP_AND 3
 #define OP_AND_NOT 4
 static int
-S_verify_logical_op(BitVector *bit_vec, BitVector *set_1, BitVector *set_2, 
-                  int op)
-{
+S_verify_logical_op(BitVector *bit_vec, BitVector *set_1, BitVector *set_2,
+                    int op) {
     int i;
 
     for (i = 0; i < 50; i++) {
         bool_t wanted;
-        
-        switch(op) {
-            case OP_OR:  
+
+        switch (op) {
+            case OP_OR:
                 wanted = BitVec_Get(set_1, i) || BitVec_Get(set_2, i);
                 break;
             case OP_XOR:
@@ -217,7 +210,7 @@ S_verify_logical_op(BitVector *bit_vec, BitVector *set_1, BitVector *set_2,
                 wanted = false;
                 THROW(ERR, "unknown op: %d", op);
         }
-                      
+
         if (BitVec_Get(bit_vec, i) != wanted) { break; }
     }
 
@@ -225,8 +218,7 @@ S_verify_logical_op(BitVector *bit_vec, BitVector *set_1, BitVector *set_2,
 }
 
 static void
-test_Or(TestBatch *batch)
-{
+test_Or(TestBatch *batch) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
@@ -234,10 +226,10 @@ test_Or(TestBatch *batch)
 
     BitVec_Or(smaller, set_2);
     TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_OR),
-        50, "OR with self smaller than other");
+                50, "OR with self smaller than other");
     BitVec_Or(larger, set_1);
     TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_OR),
-        50, "OR with other smaller than self");
+                50, "OR with other smaller than self");
 
     DECREF(smaller);
     DECREF(larger);
@@ -246,19 +238,18 @@ test_Or(TestBatch *batch)
 }
 
 static void
-test_Xor(TestBatch *batch)
-{
+test_Xor(TestBatch *batch) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
     BitVector *set_2   = S_create_set(2);
 
     BitVec_Xor(smaller, set_2);
-    TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_XOR), 
-        50, "XOR with self smaller than other");
+    TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_XOR),
+                50, "XOR with self smaller than other");
     BitVec_Xor(larger, set_1);
-    TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_XOR), 
-        50, "XOR with other smaller than self");
+    TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_XOR),
+                50, "XOR with other smaller than self");
 
     DECREF(smaller);
     DECREF(larger);
@@ -267,19 +258,18 @@ test_Xor(TestBatch *batch)
 }
 
 static void
-test_And(TestBatch *batch)
-{
+test_And(TestBatch *batch) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
     BitVector *set_2   = S_create_set(2);
 
     BitVec_And(smaller, set_2);
-    TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_AND), 
-        50, "AND with self smaller than other");
+    TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_AND),
+                50, "AND with self smaller than other");
     BitVec_And(larger, set_1);
-    TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_AND), 
-        50, "AND with other smaller than self");
+    TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_AND),
+                50, "AND with other smaller than self");
 
     DECREF(smaller);
     DECREF(larger);
@@ -288,21 +278,20 @@ test_And(TestBatch *batch)
 }
 
 static void
-test_And_Not(TestBatch *batch)
-{
+test_And_Not(TestBatch *batch) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
     BitVector *set_2   = S_create_set(2);
 
     BitVec_And_Not(smaller, set_2);
-    TEST_INT_EQ(batch, 
-        S_verify_logical_op(smaller, set_1, set_2, OP_AND_NOT),
-        50, "AND_NOT with self smaller than other");
+    TEST_INT_EQ(batch,
+                S_verify_logical_op(smaller, set_1, set_2, OP_AND_NOT),
+                50, "AND_NOT with self smaller than other");
     BitVec_And_Not(larger, set_1);
-    TEST_INT_EQ(batch, 
-        S_verify_logical_op(larger, set_2, set_1, OP_AND_NOT),
-        50, "AND_NOT with other smaller than self");
+    TEST_INT_EQ(batch,
+                S_verify_logical_op(larger, set_2, set_1, OP_AND_NOT),
+                50, "AND_NOT with other smaller than self");
 
     DECREF(smaller);
     DECREF(larger);
@@ -311,20 +300,19 @@ test_And_Not(TestBatch *batch)
 }
 
 static void
-test_Count(TestBatch *batch)
-{
+test_Count(TestBatch *batch) {
     int i;
     int shuffled[64];
     BitVector *bit_vec = BitVec_new(64);
 
     for (i = 0; i < 64; i++) { shuffled[i] = i; }
-    for (i = 0; i < 64; i++) { 
+    for (i = 0; i < 64; i++) {
         int shuffle_pos = rand() % 64;
         int temp = shuffled[shuffle_pos];
         shuffled[shuffle_pos] = shuffled[i];
-        shuffled[i] = temp; 
+        shuffled[i] = temp;
     }
-    for (i = 0; i < 64; i++) { 
+    for (i = 0; i < 64; i++) {
         BitVec_Set(bit_vec, shuffled[i]);
         if (BitVec_Count(bit_vec) != (uint32_t)(i + 1)) { break; }
     }
@@ -334,33 +322,31 @@ test_Count(TestBatch *batch)
 }
 
 static void
-test_Next_Hit(TestBatch *batch)
-{
+test_Next_Hit(TestBatch *batch) {
     int i;
 
     for (i = 24; i <= 33; i++) {
         int probe;
         BitVector *bit_vec = BitVec_new(64);
         BitVec_Set(bit_vec, i);
-        TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, 0), i, 
-            "Next_Hit for 0 is %d", i);
-        TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, 0), i, 
-            "Next_Hit for 1 is %d", i);
+        TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, 0), i,
+                    "Next_Hit for 0 is %d", i);
+        TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, 0), i,
+                    "Next_Hit for 1 is %d", i);
         for (probe = 15; probe <= i; probe++) {
-            TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, probe), i, 
-                "Next_Hit for %d is %d", probe, i);
+            TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, probe), i,
+                        "Next_Hit for %d is %d", probe, i);
         }
         for (probe = i + 1; probe <= i + 9; probe++) {
             TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, probe), -1,
-                "no Next_Hit for %d when max is %d", probe, i );
+                        "no Next_Hit for %d when max is %d", probe, i);
         }
         DECREF(bit_vec);
     }
 }
 
 static void
-test_Clear_All(TestBatch *batch)
-{
+test_Clear_All(TestBatch *batch) {
     BitVector *bit_vec = BitVec_new(64);
     BitVec_Flip_Block(bit_vec, 0, 63);
     BitVec_Clear_All(bit_vec);
@@ -369,8 +355,7 @@ test_Clear_All(TestBatch *batch)
 }
 
 static void
-test_Clone(TestBatch *batch)
-{
+test_Clone(TestBatch *batch) {
     int i;
     BitVector *self = BitVec_new(30);
     BitVector *twin;
@@ -392,8 +377,7 @@ test_Clone(TestBatch *batch)
 }
 
 static int
-S_compare_u64s(void *context, const void *va, const void *vb)
-{
+S_compare_u64s(void *context, const void *va, const void *vb) {
     uint64_t a = *(uint64_t*)va;
     uint64_t b = *(uint64_t*)vb;
     UNUSED_VAR(context);
@@ -401,8 +385,7 @@ S_compare_u64s(void *context, const void *va, const void *vb)
 }
 
 static void
-test_To_Array(TestBatch *batch)
-{
+test_To_Array(TestBatch *batch) {
     uint64_t  *source_ints = TestUtils_random_u64s(NULL, 20, 0, 200);
     BitVector *bit_vec = BitVec_new(0);
     I32Array  *array;
@@ -410,8 +393,8 @@ test_To_Array(TestBatch *batch)
     long       i;
 
     // Unique the random ints.
-    Sort_quicksort(source_ints, 20, sizeof(uint64_t), 
-        S_compare_u64s, NULL);
+    Sort_quicksort(source_ints, 20, sizeof(uint64_t),
+                   S_compare_u64s, NULL);
     for (i = 0; i < 19; i++) {
         if (source_ints[i] != source_ints[i + 1]) {
             source_ints[num_unique] = source_ints[i];
@@ -429,8 +412,8 @@ test_To_Array(TestBatch *batch)
     for (i = 0; i < num_unique; i++) {
         if (I32Arr_Get(array, i) != (int32_t)source_ints[i]) { break; }
     }
-    TEST_INT_EQ(batch, i, num_unique, "To_Array (%ld == %ld)", i, 
-        num_unique);
+    TEST_INT_EQ(batch, i, num_unique, "To_Array (%ld == %ld)", i,
+                num_unique);
 
     DECREF(array);
     DECREF(bit_vec);
@@ -440,8 +423,7 @@ test_To_Array(TestBatch *batch)
 
 // Valgrind only - detect off-by-one error.
 static void
-test_off_by_one_error()
-{
+test_off_by_one_error() {
     int cap;
     for (cap = 5; cap <= 24; cap++) {
         BitVector *bit_vec = BitVec_new(cap);
@@ -451,8 +433,7 @@ test_off_by_one_error()
 }
 
 void
-TestBitVector_run_tests()
-{
+TestBitVector_run_tests() {
     TestBatch *batch = TestBatch_new(1029);
 
     TestBatch_Plan(batch);

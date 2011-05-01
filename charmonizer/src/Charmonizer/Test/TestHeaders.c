@@ -146,14 +146,12 @@
 #endif
 
 TestBatch*
-TestHeaders_prepare()
-{
+TestHeaders_prepare() {
     return Test_new_batch("Headers", 2, TestHeaders_run);
 }
 
 void
-TestHeaders_run(TestBatch *batch)
-{
+TestHeaders_run(TestBatch *batch) {
     PASS(batch, "Compiled successfully with all detected headers");
 
     /* Don't bother checking all -- just use stdio as an example. */

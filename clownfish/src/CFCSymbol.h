@@ -47,12 +47,12 @@ int
 CFCSymbol_validate_class_name_component(const char *name);
 
 CFCSymbol*
-CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, const char *class_name, 
+CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *micro_sym);
 
 CFCSymbol*
-CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel, const char *exposure, 
-               const char *class_name, const char *class_cnick, 
+CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel, const char *exposure,
+               const char *class_name, const char *class_cnick,
                const char *micro_sym);
 
 void

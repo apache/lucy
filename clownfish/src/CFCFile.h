@@ -44,15 +44,15 @@ size_t
 CFCFile_path_buf_size(CFCFile *self, const char *base_dir);
 
 void
-CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size, 
+CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size,
                const char *base_dir);
 
 void
-CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size, 
+CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size,
                const char *base_dir);
 
 void
-CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size, 
+CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size,
                  const char *base_dir);
 
 struct CFCBase**

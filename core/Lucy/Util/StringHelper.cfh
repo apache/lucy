@@ -17,7 +17,7 @@
 parcel Lucy;
 
 inert class Lucy::Util::StringHelper cnick StrHelp {
-    
+
     /* A table where the values indicate the number of bytes in a UTF-8
      * sequence implied by the leading utf8 byte.
      */
@@ -36,7 +36,7 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
      * @return the number of digits encoded (not including the terminating
      * NULL).
      */
-    inert uint32_t 
+    inert uint32_t
     to_base36(uint64_t value, void *buffer);
 
     /** Return true if the string is valid UTF-8, false otherwise.
@@ -47,7 +47,7 @@ inert class Lucy::Util::StringHelper cnick StrHelp {
     /** Returns true if the code point qualifies as Unicode whitespace.
      */
     inert bool_t
-    is_whitespace(uint32_t code_point); 
+    is_whitespace(uint32_t code_point);
 
     /** Encode a Unicode code point to a UTF-8 sequence.
      *

@@ -23,14 +23,12 @@
 #include <windows.h>
 
 void
-lucy_Sleep_sleep(uint32_t seconds)
-{
+lucy_Sleep_sleep(uint32_t seconds) {
     Sleep(seconds * 1000);
 }
 
 void
-lucy_Sleep_millisleep(uint32_t milliseconds)
-{
+lucy_Sleep_millisleep(uint32_t milliseconds) {
     Sleep(milliseconds);
 }
 
@@ -40,14 +38,12 @@ lucy_Sleep_millisleep(uint32_t milliseconds)
 #include <unistd.h>
 
 void
-lucy_Sleep_sleep(uint32_t seconds)
-{
+lucy_Sleep_sleep(uint32_t seconds) {
     sleep(seconds);
 }
 
 void
-lucy_Sleep_millisleep(uint32_t milliseconds)
-{
+lucy_Sleep_millisleep(uint32_t milliseconds) {
     uint32_t seconds = milliseconds / 1000;
     milliseconds  = milliseconds % 1000;
     sleep(seconds);

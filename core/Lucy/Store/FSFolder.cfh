@@ -51,13 +51,13 @@ class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
     Close(FSFolder *self);
 
     incremented nullable FileHandle*
-    Local_Open_FileHandle(FSFolder *self, const CharBuf *name, 
+    Local_Open_FileHandle(FSFolder *self, const CharBuf *name,
                           uint32_t flags);
 
     incremented nullable DirHandle*
     Local_Open_Dir(FSFolder *self);
 
-    bool_t 
+    bool_t
     Local_MkDir(FSFolder *self, const CharBuf *name);
 
     bool_t
@@ -69,10 +69,10 @@ class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
     nullable Folder*
     Local_Find_Folder(FSFolder *self, const CharBuf *name);
 
-    bool_t 
+    bool_t
     Local_Delete(FSFolder *self, const CharBuf *name);
 
-    public bool_t 
+    public bool_t
     Rename(FSFolder *self, const CharBuf* from, const CharBuf *to);
 
     public bool_t

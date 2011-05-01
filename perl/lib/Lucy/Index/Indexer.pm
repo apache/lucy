@@ -52,11 +52,12 @@ PPCODE:
         doc_sv = ST(1);
     }
     else if (items > 2) {
-        chy_bool_t args_ok = XSBind_allot_params(
-            &(ST(0)), 1, items, "Lucy::Index::Indexer::add_doc_PARAMS", 
-            ALLOT_SV(&doc_sv, "doc", 3, true),
-            ALLOT_F32(&boost, "boost", 5, false),
-            NULL);
+        chy_bool_t args_ok
+            = XSBind_allot_params(&(ST(0)), 1, items,
+                                  "Lucy::Index::Indexer::add_doc_PARAMS",
+                                  ALLOT_SV(&doc_sv, "doc", 3, true),
+                                  ALLOT_F32(&boost, "boost", 5, false),
+                                  NULL);
         if (!args_ok) {
             CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
         }
@@ -66,10 +67,10 @@ PPCODE:
     }
 
     // Either get a Doc or use the stock doc.
-    if (   sv_isobject(doc_sv) 
+    if (sv_isobject(doc_sv)
         && sv_derived_from(doc_sv, "Lucy::Document::Doc")
-    ) {
-        IV tmp = SvIV( SvRV(doc_sv) );
+       ) {
+        IV tmp = SvIV(SvRV(doc_sv));
         doc = INT2PTR(lucy_Doc*, tmp);
     }
     else if (XSBind_sv_defined(doc_sv) && SvROK(doc_sv)) {
@@ -81,7 +82,7 @@ PPCODE:
     }
     if (!doc) {
         THROW(LUCY_ERR, "Need either a hashref or a %o",
-            Lucy_VTable_Get_Name(LUCY_DOC));
+              Lucy_VTable_Get_Name(LUCY_DOC));
     }
 
     Lucy_Indexer_Add_Doc(self, doc, boost);
@@ -167,7 +168,7 @@ be attached to a Lucy::Document::Doc object internally).
 
 ==item *
 
-B<boost> - A floating point weight which affects how this document scores.  
+B<boost> - A floating point weight which affects how this document scores.
 
 ==back
 

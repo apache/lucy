@@ -42,22 +42,20 @@ struct CFCVariable {
 };
 
 CFCVariable*
-CFCVariable_new(struct CFCParcel *parcel, const char *exposure, 
-                const char *class_name, const char *class_cnick, 
-                const char *micro_sym, struct CFCType *type)
-{
-    CFCVariable *self = (CFCVariable*)CFCBase_allocate(sizeof(CFCVariable), 
-        "Clownfish::Variable");
+CFCVariable_new(struct CFCParcel *parcel, const char *exposure,
+                const char *class_name, const char *class_cnick,
+                const char *micro_sym, struct CFCType *type) {
+    CFCVariable *self = (CFCVariable*)CFCBase_allocate(sizeof(CFCVariable),
+                                                       "Clownfish::Variable");
     return CFCVariable_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym, type);
+                            micro_sym, type);
 }
 
 CFCVariable*
-CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel, 
-                 const char *exposure, const char *class_name, 
-                 const char *class_cnick, const char *micro_sym, 
-                 struct CFCType *type)
-{
+CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
+                 const char *exposure, const char *class_name,
+                 const char *class_cnick, const char *micro_sym,
+                 struct CFCType *type) {
     // Validate type.
     CFCUTIL_NULL_CHECK(type);
 
@@ -65,7 +63,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     const char *real_exposure = exposure ? exposure : "local";
 
     CFCSymbol_init((CFCSymbol*)self, parcel, real_exposure, class_name,
-        class_cnick, micro_sym);
+                   class_cnick, micro_sym);
 
     // Assign type.
     self->type = (CFCType*)CFCBase_incref((CFCBase*)type);
@@ -78,7 +76,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     }
     {
         size_t size = strlen(type_str) + sizeof(" ") + strlen(micro_sym) +
-            strlen(postfix) + 1;
+                      strlen(postfix) + 1;
         self->local_c = (char*)MALLOCATE(size);
         sprintf(self->local_c, "%s %s%s", type_str, micro_sym, postfix);
     }
@@ -89,7 +87,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     {
         const char *full_sym = CFCSymbol_full_sym((CFCSymbol*)self);
         size_t size = strlen(type_str) + sizeof(" ") + strlen(full_sym) +
-            strlen(postfix) + 1;
+                      strlen(postfix) + 1;
         self->global_c = (char*)MALLOCATE(size);
         sprintf(self->global_c, "%s %s%s", type_str, full_sym, postfix);
     }
@@ -98,8 +96,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
 }
 
 void
-CFCVariable_destroy(CFCVariable *self)
-{
+CFCVariable_destroy(CFCVariable *self) {
     CFCBase_decref((CFCBase*)self->type);
     FREEMEM(self->local_c);
     FREEMEM(self->global_c);
@@ -108,33 +105,28 @@ CFCVariable_destroy(CFCVariable *self)
 }
 
 int
-CFCVariable_equals(CFCVariable *self, CFCVariable *other)
-{
+CFCVariable_equals(CFCVariable *self, CFCVariable *other) {
     if (!CFCType_equals(self->type, other->type)) { return false; }
     return CFCSymbol_equals((CFCSymbol*)self, (CFCSymbol*)other);
 }
 
 CFCType*
-CFCVariable_get_type(CFCVariable *self)
-{
+CFCVariable_get_type(CFCVariable *self) {
     return self->type;
 }
 
 const char*
-CFCVariable_local_c(CFCVariable *self)
-{
+CFCVariable_local_c(CFCVariable *self) {
     return self->local_c;
 }
 
 const char*
-CFCVariable_global_c(CFCVariable *self)
-{
+CFCVariable_global_c(CFCVariable *self) {
     return self->global_c;
 }
 
 const char*
-CFCVariable_local_declaration(CFCVariable *self)
-{
+CFCVariable_local_declaration(CFCVariable *self) {
     return self->local_dec;
 }
 

@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Store::TestCompoundFileReader 
+inert class Lucy::Test::Store::TestCompoundFileReader
     cnick TestCFReader {
     inert void
     run_tests();

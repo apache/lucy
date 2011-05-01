@@ -22,15 +22,13 @@
 #include "Lucy/Store/OutStream.h"
 
 void
-Freezer_freeze(Obj *obj, OutStream *outstream)
-{
+Freezer_freeze(Obj *obj, OutStream *outstream) {
     CB_Serialize(Obj_Get_Class_Name(obj), outstream);
     Obj_Serialize(obj, outstream);
 }
 
 Obj*
-Freezer_thaw(InStream *instream)
-{
+Freezer_thaw(InStream *instream) {
     CharBuf *class_name = CB_deserialize(NULL, instream);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Obj *blank = VTable_Make_Obj(vtable);

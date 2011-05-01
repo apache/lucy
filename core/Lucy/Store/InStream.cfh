@@ -35,20 +35,20 @@ class Lucy::Store::InStream inherits Lucy::Object::Obj {
 
     int64_t     offset;
     int64_t     len;
-    char       *buf;          
+    char       *buf;
     char       *limit;
-    CharBuf    *filename; 
+    CharBuf    *filename;
     FileHandle *file_handle;
     FileWindow *window;
 
-    inert incremented nullable InStream* 
+    inert incremented nullable InStream*
     open(Obj *file);
 
     /** Return a new InStream, or set Err_error and return NULL on failure.
      *
      * @param file A FileHandle, a file path, or a RAMFile.
      */
-    inert nullable InStream* 
+    inert nullable InStream*
     do_open(InStream *self, Obj *file);
 
     /** Clone the instream, but specify a new offset, length, and possibly
@@ -61,39 +61,39 @@ class Lucy::Store::InStream inherits Lucy::Object::Obj {
      * from the top of the file as seen by the underlying FileHandle.
      * @param len Length of the file as seen by the new InStream.
      */
-    incremented InStream* 
-    Reopen(InStream *self, const CharBuf *filename = NULL, int64_t offset, 
+    incremented InStream*
+    Reopen(InStream *self, const CharBuf *filename = NULL, int64_t offset,
            int64_t len);
 
     /** Clone the InStream.  Clones share the same underlying FileHandle and
      * start at the current file position, but are able to seek and read
      * independently.
      */
-    public incremented InStream* 
+    public incremented InStream*
     Clone(InStream *self);
 
     /** Decrement the number of streams using the underlying FileHandle.  When
      * the number drops to zero, possibly release system resources.
      */
-    void 
+    void
     Close(InStream *self);
 
-    public void 
+    public void
     Destroy(InStream *self);
 
     /** Seek to <code>target</code>.
      */
-    final void 
+    final void
     Seek(InStream *self, int64_t target);
 
     /** Return the current file position.
      */
-    final int64_t 
+    final int64_t
     Tell(InStream *self);
 
     /** Return the length of the "file" in bytes.
      */
-    final int64_t 
+    final int64_t
     Length(InStream *self);
 
     /** Fill the InStream's buffer, letting the FileHandle decide how many bytes
@@ -127,65 +127,65 @@ class Lucy::Store::InStream inherits Lucy::Object::Obj {
 
     /** Read <code>len</code> bytes from the InStream into <code>buf</code>.
      */
-    final void 
+    final void
     Read_Bytes(InStream *self, char *buf, size_t len);
 
     /** Read a signed 8-bit integer.
      */
-    final int8_t 
+    final int8_t
     Read_I8(InStream *self);
 
     /** Read an unsigned 8-bit integer.
      */
-    final uint8_t 
+    final uint8_t
     Read_U8(InStream *self);
 
     /** Read a signed 32-bit integer.
      */
-    final int32_t 
+    final int32_t
     Read_I32(InStream *self);
 
     /** Read an unsigned 32-bit integer.
      */
-    final uint32_t 
+    final uint32_t
     Read_U32(InStream *self);
 
     /** Read a signed 64-bit integer.
      */
-    final int64_t 
+    final int64_t
     Read_I64(InStream *self);
 
     /** Read an unsigned 64-bit integer.
      */
-    final uint64_t 
+    final uint64_t
     Read_U64(InStream *self);
 
     /** Read an IEEE 764 32-bit floating point number.
      */
-    final float 
+    final float
     Read_F32(InStream *self);
 
     /** Read an IEEE 764 64-bit floating point number.
      */
-    final double 
+    final double
     Read_F64(InStream *self);
 
     /** Read in a compressed 32-bit unsigned integer.
      */
-    uint32_t 
+    uint32_t
     Read_C32(InStream *self);
 
     /** Read a 64-bit integer, using the same encoding as a C32 but occupying
      * as many as 10 bytes.
      */
-    final uint64_t 
+    final uint64_t
     Read_C64(InStream *self);
 
     /** Read the bytes for a C32/C64 into <code>buf</code>.  Return the number
      * of bytes read.  The caller must ensure that sufficient space exists in
      * <code>buf</code> (worst case is 10 bytes).
      */
-    final int 
+    final int
     Read_Raw_C64(InStream *self, char *buf);
 
     /** Accessor for filename member.

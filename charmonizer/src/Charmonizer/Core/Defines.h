@@ -30,7 +30,7 @@ typedef int chaz_bool_t;
   #define false 0
 #endif
 
-#define CHAZ_QUOTE(x) #x "\n" 
+#define CHAZ_QUOTE(x) #x "\n"
 
 #if (defined(CHAZ_USE_SHORT_NAMES) || defined(CHY_USE_SHORT_NAMES))
   #define QUOTE CHAZ_QUOTE

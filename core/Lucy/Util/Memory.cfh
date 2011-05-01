@@ -50,7 +50,7 @@ inert class Lucy::Util::Memory {
      * @param minimum The minimum number of array elements.
      * @param width The size of each array element in bytes.
      */
-    inert size_t 
+    inert size_t
     oversize(size_t minimum, size_t width);
 }
 

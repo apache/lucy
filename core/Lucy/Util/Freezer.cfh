@@ -37,7 +37,7 @@ __C__
     lucy_Freezer_thaw(instream)
 
 #ifdef LUCY_USE_SHORT_NAMES
-  #define FREEZE                LUCY_FREEZE 
+  #define FREEZE                LUCY_FREEZE
   #define THAW                  LUCY_THAW
 #endif
 __END_C__

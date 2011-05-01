@@ -70,7 +70,7 @@ class Lucy::Store::CompoundFileReader cnick CFReader
     Local_Is_Directory(CompoundFileReader *self, const CharBuf *name);
 
     incremented nullable FileHandle*
-    Local_Open_FileHandle(CompoundFileReader *self, const CharBuf *name, 
+    Local_Open_FileHandle(CompoundFileReader *self, const CharBuf *name,
                           uint32_t flags);
 
     incremented nullable InStream*

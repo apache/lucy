@@ -22,15 +22,13 @@
 #include <Windows.h>
 #include <process.h>
 
-int 
-lucy_PID_getpid(void)
-{
+int
+lucy_PID_getpid(void) {
     return GetCurrentProcessId();
 }
 
 chy_bool_t
-lucy_PID_active(int pid)
-{
+lucy_PID_active(int pid) {
     // Attempt to open a handle to the process with permissions to terminate
     // -- but don't actually terminate.
     HANDLE handle = OpenProcess(PROCESS_TERMINATE, false, pid);
@@ -57,15 +55,13 @@ lucy_PID_active(int pid)
 #include <signal.h>
 #include <errno.h>
 
-int 
-lucy_PID_getpid(void)
-{
+int
+lucy_PID_getpid(void) {
     return getpid();
 }
 
 chy_bool_t
-lucy_PID_active(int pid)
-{
+lucy_PID_active(int pid) {
     if (kill(pid, 0) == 0) {
         return true; // signal succeeded, therefore pid active
     }

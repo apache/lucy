@@ -27,7 +27,7 @@ parcel Lucy;
  * semantics.
  */
 
-class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery 
+class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
     : dumpable {
 
     /**
@@ -60,14 +60,14 @@ class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
     Equals(NOTQuery *self, Obj *other);
 }
 
-class Lucy::Search::NOTCompiler 
+class Lucy::Search::NOTCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented NOTCompiler*
     new(NOTQuery *parent, Searcher *searcher, float boost);
 
     inert NOTCompiler*
-    init(NOTCompiler *self, NOTQuery *parent, Searcher *searcher, 
+    init(NOTCompiler *self, NOTQuery *parent, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
@@ -77,7 +77,7 @@ class Lucy::Search::NOTCompiler
     Sum_Of_Squared_Weights(NOTCompiler *self);
 
     public incremented VArray*
-    Highlight_Spans(NOTCompiler *self, Searcher *searcher, 
+    Highlight_Spans(NOTCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 }
 

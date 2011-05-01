@@ -24,15 +24,14 @@
 #include "Lucy/Analysis/Inversion.h"
 
 SnowballStopFilter*
-SnowStop_new(const CharBuf *language, Hash *stoplist)
-{
+SnowStop_new(const CharBuf *language, Hash *stoplist) {
     SnowballStopFilter *self = (SnowballStopFilter*)VTable_Make_Obj(SNOWBALLSTOPFILTER);
     return SnowStop_init(self, language, stoplist);
 }
 
 SnowballStopFilter*
-SnowStop_init(SnowballStopFilter *self, const CharBuf *language, Hash *stoplist)
-{
+SnowStop_init(SnowballStopFilter *self, const CharBuf *language,
+              Hash *stoplist) {
     Analyzer_init((Analyzer*)self);
 
     if (stoplist) {
@@ -53,15 +52,13 @@ SnowStop_init(SnowballStopFilter *self, const CharBuf *language, Hash *stoplist)
 }
 
 void
-SnowStop_destroy(SnowballStopFilter *self)
-{
+SnowStop_destroy(SnowballStopFilter *self) {
     DECREF(self->stoplist);
     SUPER_DESTROY(self, SNOWBALLSTOPFILTER);
 }
 
 Inversion*
-SnowStop_transform(SnowballStopFilter *self, Inversion *inversion)
-{
+SnowStop_transform(SnowballStopFilter *self, Inversion *inversion) {
     Token *token;
     Inversion *new_inversion = Inversion_new(NULL);
     Hash *const stoplist  = self->stoplist;
@@ -76,8 +73,7 @@ SnowStop_transform(SnowballStopFilter *self, Inversion *inversion)
 }
 
 bool_t
-SnowStop_equals(SnowballStopFilter *self, Obj *other)
-{
+SnowStop_equals(SnowballStopFilter *self, Obj *other) {
     SnowballStopFilter *const twin = (SnowballStopFilter*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, SNOWBALLSTOPFILTER)) return false;
@@ -88,13 +84,12 @@ SnowStop_equals(SnowballStopFilter *self, Obj *other)
 }
 
 Hash*
-SnowStop_gen_stoplist(const CharBuf *language) 
-{
+SnowStop_gen_stoplist(const CharBuf *language) {
     CharBuf *lang = CB_new(3);
     CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 0)));
     CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 1)));
     const uint8_t **words = NULL;
-    if      (CB_Equals_Str(lang, "da", 2)) { words = SnowStop_snow_da; }
+    if (CB_Equals_Str(lang, "da", 2))      { words = SnowStop_snow_da; }
     else if (CB_Equals_Str(lang, "de", 2)) { words = SnowStop_snow_de; }
     else if (CB_Equals_Str(lang, "en", 2)) { words = SnowStop_snow_en; }
     else if (CB_Equals_Str(lang, "es", 2)) { words = SnowStop_snow_es; }
@@ -113,7 +108,7 @@ SnowStop_gen_stoplist(const CharBuf *language)
     }
     size_t num_stopwords = 0;
     for (uint32_t i = 0; words[i] != NULL; i++) { num_stopwords++; }
-    NoCloneHash *stoplist = NoCloneHash_new(num_stopwords); 
+    NoCloneHash *stoplist = NoCloneHash_new(num_stopwords);
     for (uint32_t i = 0; words[i] != NULL; i++) {
         char *word = (char*)words[i];
         ViewCharBuf *stop = ViewCB_new_from_trusted_utf8(word, strlen(word));
@@ -127,21 +122,18 @@ SnowStop_gen_stoplist(const CharBuf *language)
 /***************************************************************************/
 
 NoCloneHash*
-NoCloneHash_new(uint32_t capacity)
-{
+NoCloneHash_new(uint32_t capacity) {
     NoCloneHash *self = (NoCloneHash*)VTable_Make_Obj(NOCLONEHASH);
     return NoCloneHash_init(self, capacity);
 }
 
 NoCloneHash*
-NoCloneHash_init(NoCloneHash *self, uint32_t capacity)
-{
+NoCloneHash_init(NoCloneHash *self, uint32_t capacity) {
     return (NoCloneHash*)Hash_init((Hash*)self, capacity);
 }
 
 Obj*
-NoCloneHash_make_key(NoCloneHash *self, Obj *key, int32_t hash_sum)
-{
+NoCloneHash_make_key(NoCloneHash *self, Obj *key, int32_t hash_sum) {
     UNUSED_VAR(self);
     UNUSED_VAR(hash_sum);
     return INCREF(key);

@@ -27,17 +27,15 @@
 #include "Lucy/Store/OutStream.h"
 
 SharedLock*
-ShLock_new(Folder *folder, const CharBuf *name, const CharBuf *host, 
-           int32_t timeout, int32_t interval)
-{
+ShLock_new(Folder *folder, const CharBuf *name, const CharBuf *host,
+           int32_t timeout, int32_t interval) {
     SharedLock *self = (SharedLock*)VTable_Make_Obj(SHAREDLOCK);
     return ShLock_init(self, folder, name, host, timeout, interval);
 }
 
 SharedLock*
-ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name, 
-            const CharBuf *host, int32_t timeout, int32_t interval)
-{
+ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name,
+            const CharBuf *host, int32_t timeout, int32_t interval) {
     LFLock_init((LockFileLock*)self, folder, name, host, timeout, interval);
 
     // Override.
@@ -48,22 +46,24 @@ ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name,
 }
 
 bool_t
-ShLock_shared(SharedLock *self) { UNUSED_VAR(self); return true; }
+ShLock_shared(SharedLock *self) {
+    UNUSED_VAR(self);
+    return true;
+}
 
 bool_t
-ShLock_request(SharedLock *self)
-{
+ShLock_request(SharedLock *self) {
     uint32_t i = 0;
-    ShLock_request_t super_request 
+    ShLock_request_t super_request
         = (ShLock_request_t)SUPER_METHOD(SHAREDLOCK, ShLock, Request);
 
     // EMPTY lock_path indicates whether this particular instance is locked.
-    if (   self->lock_path != (CharBuf*)&EMPTY 
+    if (self->lock_path != (CharBuf*)&EMPTY
         && Folder_Exists(self->folder, self->lock_path)
-    ) {
+       ) {
         // Don't allow double obtain.
-        Err_set_error((Err*)LockErr_new(CB_newf(
-            "Lock already obtained via '%o'", self->lock_path)));
+        Err_set_error((Err*)LockErr_new(CB_newf("Lock already obtained via '%o'",
+                                                self->lock_path)));
         return false;
     }
 
@@ -71,7 +71,7 @@ ShLock_request(SharedLock *self)
     self->lock_path = CB_new(CB_Get_Size(self->name) + 10);
     do {
         CB_setf(self->lock_path, "locks/%o-%u32.lock", self->name, ++i);
-    } while ( Folder_Exists(self->folder, self->lock_path) );
+    } while (Folder_Exists(self->folder, self->lock_path));
 
     bool_t success = super_request(self);
     if (!success) { ERR_ADD_FRAME(Err_get_error()); }
@@ -79,8 +79,7 @@ ShLock_request(SharedLock *self)
 }
 
 void
-ShLock_release(SharedLock *self)
-{
+ShLock_release(SharedLock *self) {
     if (self->lock_path != (CharBuf*)&EMPTY) {
         ShLock_release_t super_release
             = (ShLock_release_t)SUPER_METHOD(SHAREDLOCK, ShLock, Release);
@@ -94,8 +93,7 @@ ShLock_release(SharedLock *self)
 
 
 void
-ShLock_clear_stale(SharedLock *self)
-{
+ShLock_clear_stale(SharedLock *self) {
     DirHandle *dh;
     CharBuf   *entry;
     CharBuf   *candidate = NULL;
@@ -112,9 +110,9 @@ ShLock_clear_stale(SharedLock *self)
 
     // Take a stab at any file that begins with our lock name.
     while (DH_Next(dh)) {
-        if (   CB_Starts_With(entry, self->name)
+        if (CB_Starts_With(entry, self->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
-        ) {
+           ) {
             candidate = candidate ? candidate : CB_new(0);
             CB_setf(candidate, "%o/%o", lock_dir_name, entry);
             ShLock_Maybe_Delete_File(self, candidate, false, true);
@@ -126,8 +124,7 @@ ShLock_clear_stale(SharedLock *self)
 }
 
 bool_t
-ShLock_is_locked(SharedLock *self)
-{
+ShLock_is_locked(SharedLock *self) {
     DirHandle *dh;
     CharBuf   *entry;
 
@@ -140,15 +137,15 @@ ShLock_is_locked(SharedLock *self)
     else {
         return false;
     }
-    
+
     while (DH_Next(dh)) {
         // Translation:  $locked = 1 if $entry =~ /^\Q$name-\d+\.lock$/
-        if (   CB_Starts_With(entry, self->name)
+        if (CB_Starts_With(entry, self->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
-        ) {
+           ) {
             ZombieCharBuf *scratch = ZCB_WRAP(entry);
             ZCB_Chop(scratch, sizeof(".lock") - 1);
-            while(isdigit(ZCB_Code_Point_From(scratch, 1))) {
+            while (isdigit(ZCB_Code_Point_From(scratch, 1))) {
                 ZCB_Chop(scratch, 1);
             }
             if (ZCB_Code_Point_From(scratch, 1) == '-') {

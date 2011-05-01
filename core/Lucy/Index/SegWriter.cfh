@@ -65,7 +65,7 @@ class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
      * @param component A DataWriter.
      */
     public void
-    Register(SegWriter *self, const CharBuf *api, 
+    Register(SegWriter *self, const CharBuf *api,
              decremented DataWriter *component);
 
     /** Retrieve a registered component.
@@ -107,11 +107,11 @@ class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
     Add_Inverted_Doc(SegWriter *self, Inverter *inverter, int32_t doc_id);
 
     public void
-    Add_Segment(SegWriter *self, SegReader *reader, 
+    Add_Segment(SegWriter *self, SegReader *reader,
                 I32Array *doc_map = NULL);
 
     public void
-    Merge_Segment(SegWriter *self, SegReader *reader, 
+    Merge_Segment(SegWriter *self, SegReader *reader,
                   I32Array *doc_map = NULL);
 
     public void

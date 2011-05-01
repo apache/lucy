@@ -38,14 +38,14 @@ chaz_OS_remove_obj(char *name);
 /* Concatenate all arguments in a NULL-terminated list into a single command
  * string, prepend the appropriate prefix, and invoke via system().
  */
-int 
+int
 chaz_OS_run_local(char *arg1, ...);
 
 /* Invoke a command and attempt to suppress output from both stdout and stderr
  * (as if they had been sent to /dev/null).  If it's not possible to run the
  * command quietly, run it anyway.
  */
-int 
+int
 chaz_OS_run_quietly(const char *command);
 
 /* Return the extension for an executable on this system.

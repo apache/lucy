@@ -30,26 +30,27 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
-    SV* fields_sv = NULL; 
+    SV* fields_sv = NULL;
     int32_t doc_id = 0;
-    chy_bool_t args_ok = XSBind_allot_params(
-        &(ST(0)), 1, items, "Lucy::Document::Doc::new_PARAMS",
-        ALLOT_SV(&fields_sv, "fields", 6, false),
-        ALLOT_I32(&doc_id, "doc_id", 6, false),
-        NULL);
+    chy_bool_t args_ok
+        = XSBind_allot_params(&(ST(0)), 1, items,
+                              "Lucy::Document::Doc::new_PARAMS",
+                              ALLOT_SV(&fields_sv, "fields", 6, false),
+                              ALLOT_I32(&doc_id, "doc_id", 6, false),
+                              NULL);
     if (!args_ok) {
         CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
-    }     
+    }
 
     HV *fields = NULL;
     if (fields_sv && XSBind_sv_defined(fields_sv)) {
         if (SvROK(fields_sv)) {
             fields = (HV*)SvRV(fields_sv);
-        }     
+        }
         if (!fields || SvTYPE((SV*)fields) != SVt_PVHV) {
             CFISH_THROW(CFISH_ERR, "fields is not a hashref");
         }
-    }     
+    }
 
     lucy_Doc *self = (lucy_Doc*)XSBind_new_blank_obj(either_sv);
     lucy_Doc_init(self, fields, doc_id);
@@ -62,7 +63,7 @@ get_fields(self, ...)
     lucy_Doc *self;
 CODE:
     CHY_UNUSED_VAR(items);
-    RETVAL = newRV_inc( (SV*)Lucy_Doc_Get_Fields(self) );
+    RETVAL = newRV_inc((SV*)Lucy_Doc_Get_Fields(self));
 OUTPUT: RETVAL
 
 void

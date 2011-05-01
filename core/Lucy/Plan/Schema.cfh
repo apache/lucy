@@ -88,12 +88,12 @@ class Lucy::Plan::Schema inherits Lucy::Object::Obj {
 
     /** Return the Schema instance's internal Architecture object.
      */
-    public Architecture* 
+    public Architecture*
     Get_Architecture(Schema *self);
 
     /** Return the Schema instance's internal Similarity object.
      */
-    public Similarity* 
+    public Similarity*
     Get_Similarity(Schema *self);
 
     public incremented Hash*
@@ -101,7 +101,7 @@ class Lucy::Plan::Schema inherits Lucy::Object::Obj {
 
     public incremented Schema*
     Load(Schema *self, Obj *dump);
-    
+
     /** Absorb the field definitions of another Schema, verify compatibility.
      */
     void

@@ -39,7 +39,7 @@ class Lucy::Index::SegPostingList cnick SegPList
     new(PostingListReader *plist_reader, const CharBuf *field);
 
     inert SegPostingList*
-    init(SegPostingList *self, PostingListReader *plist_reader, 
+    init(SegPostingList *self, PostingListReader *plist_reader,
          const CharBuf *field);
 
     InStream*

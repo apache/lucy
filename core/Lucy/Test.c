@@ -25,18 +25,16 @@
 #include "Lucy/Test.h"
 
 TestBatch*
-TestBatch_new(int64_t num_tests)
-{
+TestBatch_new(int64_t num_tests) {
     TestBatch *self = (TestBatch*)VTable_Make_Obj(TESTBATCH);
     return TestBatch_init(self, num_tests);
 }
 
 TestBatch*
-TestBatch_init(TestBatch *self, int64_t num_tests)
-{
+TestBatch_init(TestBatch *self, int64_t num_tests) {
     // Assign.
     self->num_tests       = num_tests;
-    
+
     // Initialize.
     self->test_num        = 0;
     self->num_passed      = 0;
@@ -53,72 +51,65 @@ TestBatch_init(TestBatch *self, int64_t num_tests)
 }
 
 void
-TestBatch_plan(TestBatch *self)
-{
+TestBatch_plan(TestBatch *self) {
     printf("1..%" I64P "\n", self->num_tests);
 }
 
 bool_t
-TestBatch_test_true(void *vself, bool_t condition, const char *pattern, ...)
-{
+TestBatch_test_true(void *vself, bool_t condition, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VTest_True((TestBatch*)vself, condition, 
-        pattern, args);
+    bool_t result = TestBatch_VTest_True((TestBatch*)vself, condition,
+                                         pattern, args);
     va_end(args);
     return result;
 }
 
 bool_t
-TestBatch_test_false(void *vself, bool_t condition, const char *pattern, ...)
-{
+TestBatch_test_false(void *vself, bool_t condition, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VTest_False((TestBatch*)vself, condition, 
-        pattern, args);
+    bool_t result = TestBatch_VTest_False((TestBatch*)vself, condition,
+                                          pattern, args);
     va_end(args);
     return result;
 }
 
 bool_t
-TestBatch_test_int_equals(void *vself, long got, long expected, 
-                          const char *pattern, ...)
-{
+TestBatch_test_int_equals(void *vself, long got, long expected,
+                          const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
     bool_t result = TestBatch_VTest_Int_Equals((TestBatch*)vself, got,
-        expected, pattern, args);
+                                               expected, pattern, args);
     va_end(args);
     return result;
 }
 
 bool_t
-TestBatch_test_float_equals(void *vself, double got, double expected, 
-                            const char *pattern, ...)
-{
+TestBatch_test_float_equals(void *vself, double got, double expected,
+                            const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
     bool_t result = TestBatch_VTest_Float_Equals((TestBatch*)vself, got,
-        expected, pattern, args);
+                                                 expected, pattern, args);
     va_end(args);
     return result;
 }
 
 bool_t
-TestBatch_test_string_equals(void *vself, const char *got, 
-                             const char *expected, const char *pattern, ...)
-{
+TestBatch_test_string_equals(void *vself, const char *got,
+                             const char *expected, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
     bool_t result = TestBatch_VTest_String_Equals((TestBatch*)vself, got,
-        expected, pattern, args);
+                                                  expected, pattern, args);
     va_end(args);
     return result;
 }
 
 bool_t
-TestBatch_pass(void *vself, const char *pattern, ...)
-{
+TestBatch_pass(void *vself, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
     bool_t result = TestBatch_VPass((TestBatch*)vself, pattern, args);
@@ -127,8 +118,7 @@ TestBatch_pass(void *vself, const char *pattern, ...)
 }
 
 bool_t
-TestBatch_fail(void *vself, const char *pattern, ...)
-{
+TestBatch_fail(void *vself, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
     bool_t result = TestBatch_VFail((TestBatch*)vself, pattern, args);
@@ -137,8 +127,7 @@ TestBatch_fail(void *vself, const char *pattern, ...)
 }
 
 void
-TestBatch_skip(void *vself, const char *pattern, ...)
-{
+TestBatch_skip(void *vself, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
     TestBatch_VSkip((TestBatch*)vself, pattern, args);
@@ -146,9 +135,8 @@ TestBatch_skip(void *vself, const char *pattern, ...)
 }
 
 bool_t
-TestBatch_vtest_true(TestBatch *self, bool_t condition, const char *pattern, 
-                     va_list args)
-{
+TestBatch_vtest_true(TestBatch *self, bool_t condition, const char *pattern,
+                     va_list args) {
     // Increment test number.
     self->test_num++;
 
@@ -170,9 +158,8 @@ TestBatch_vtest_true(TestBatch *self, bool_t condition, const char *pattern,
 }
 
 bool_t
-TestBatch_vtest_false(TestBatch *self, bool_t condition, 
-                     const char *pattern, va_list args)
-{
+TestBatch_vtest_false(TestBatch *self, bool_t condition,
+                      const char *pattern, va_list args) {
     // Increment test number.
     self->test_num++;
 
@@ -193,10 +180,9 @@ TestBatch_vtest_false(TestBatch *self, bool_t condition,
     }
 }
 
-bool_t 
-TestBatch_vtest_int_equals(TestBatch *self, long got, long expected, 
-                           const char *pattern, va_list args)
-{
+bool_t
+TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
+                           const char *pattern, va_list args) {
     // Increment test number.
     self->test_num++;
 
@@ -210,23 +196,22 @@ TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - Expected '%ld', got '%ld'\n    ", 
-            self->test_num, expected, got);
+        printf("not ok %" I64P " - Expected '%ld', got '%ld'\n    ",
+               self->test_num, expected, got);
         vprintf(pattern, args);
         printf("\n");
         return false;
     }
 }
 
-bool_t 
-TestBatch_vtest_float_equals(TestBatch *self, double got, double expected, 
-                             const char *pattern, va_list args)
-{
-    double diff = expected/got;
+bool_t
+TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
+                             const char *pattern, va_list args) {
+    double diff = expected / got;
 
     // Increment test number.
     self->test_num++;
-    
+
     // Evaluate condition and pass or fail.
     if (diff > 0.00001) {
         self->num_passed++;
@@ -237,22 +222,21 @@ TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - Expected '%f', got '%f'\n    ", 
-            self->test_num, expected, got);
+        printf("not ok %" I64P " - Expected '%f', got '%f'\n    ",
+               self->test_num, expected, got);
         vprintf(pattern, args);
         printf("\n");
         return false;
     }
 }
 
-bool_t 
-TestBatch_vtest_string_equals(TestBatch *self, const char *got, 
-                              const char *expected, const char *pattern, 
-                              va_list args)
-{
+bool_t
+TestBatch_vtest_string_equals(TestBatch *self, const char *got,
+                              const char *expected, const char *pattern,
+                              va_list args) {
     // Increment test number.
     self->test_num++;
-    
+
     // Test condition and pass or fail.
     if (strcmp(expected, got) == 0) {
         self->num_passed++;
@@ -263,17 +247,16 @@ TestBatch_vtest_string_equals(TestBatch *self, const char *got,
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - Expected '%s', got '%s'\n    ", 
-            self->test_num, expected, got);
+        printf("not ok %" I64P " - Expected '%s', got '%s'\n    ",
+               self->test_num, expected, got);
         vprintf(pattern, args);
         printf("\n");
         return false;
     }
 }
 
-bool_t 
-TestBatch_vpass(TestBatch *self, const char *pattern, va_list args)
-{
+bool_t
+TestBatch_vpass(TestBatch *self, const char *pattern, va_list args) {
     // Increment test number.
     self->test_num++;
 
@@ -286,9 +269,8 @@ TestBatch_vpass(TestBatch *self, const char *pattern, va_list args)
     return true;
 }
 
-bool_t 
-TestBatch_vfail(TestBatch *self, const char *pattern, va_list args)
-{
+bool_t
+TestBatch_vfail(TestBatch *self, const char *pattern, va_list args) {
     // Increment test number.
     self->test_num++;
 
@@ -302,8 +284,7 @@ TestBatch_vfail(TestBatch *self, const char *pattern, va_list args)
 }
 
 void
-TestBatch_vskip(TestBatch *self, const char *pattern, va_list args)
-{
+TestBatch_vskip(TestBatch *self, const char *pattern, va_list args) {
     self->test_num++;
     printf("ok %" I64P " # SKIP ", self->test_num);
     vprintf(pattern, args);

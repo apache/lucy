@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** File system FileHandle.
  */
-class Lucy::Store::FSFileHandle cnick FSFH 
+class Lucy::Store::FSFileHandle cnick FSFH
     inherits Lucy::Store::FileHandle {
 
     int      fd;
@@ -34,10 +34,10 @@ class Lucy::Store::FSFileHandle cnick FSFH
      * @param path Filepath.
      * @param flags FileHandle constructor flags.
      */
-    inert incremented nullable FSFileHandle* 
+    inert incremented nullable FSFileHandle*
     open(const CharBuf *path = NULL, uint32_t flags);
 
-    inert nullable FSFileHandle* 
+    inert nullable FSFileHandle*
     do_open(FSFileHandle *self, const CharBuf *path = NULL, uint32_t flags);
 
     bool_t

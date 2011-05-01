@@ -18,9 +18,9 @@ parcel Lucy;
 
 /** File system DirHandle.
  */
-class Lucy::Store::FSDirHandle cnick FSDH 
+class Lucy::Store::FSDirHandle cnick FSDH
     inherits Lucy::Store::DirHandle {
-    
+
     void    *sys_dirhandle;
     void    *sys_dir_entry;
     CharBuf *fullpath;

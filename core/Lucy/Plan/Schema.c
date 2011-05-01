@@ -46,15 +46,13 @@ static void
 S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type);
 
 Schema*
-Schema_new()
-{
+Schema_new() {
     Schema *self = (Schema*)VTable_Make_Obj(SCHEMA);
     return Schema_init(self);
 }
 
 Schema*
-Schema_init(Schema *self)
-{
+Schema_init(Schema *self) {
     // Init.
     self->analyzers      = Hash_new(0);
     self->types          = Hash_new(0);
@@ -70,8 +68,7 @@ Schema_init(Schema *self)
 }
 
 void
-Schema_destroy(Schema *self) 
-{
+Schema_destroy(Schema *self) {
     DECREF(self->arch);
     DECREF(self->analyzers);
     DECREF(self->uniq_analyzers);
@@ -82,8 +79,7 @@ Schema_destroy(Schema *self)
 }
 
 static void
-S_add_unique(VArray *array, Obj *elem)
-{
+S_add_unique(VArray *array, Obj *elem) {
     uint32_t i, max;
     if (!elem) { return; }
     for (i = 0, max = VA_Get_Size(array); i < max; i++) {
@@ -98,8 +94,7 @@ S_add_unique(VArray *array, Obj *elem)
 }
 
 bool_t
-Schema_equals(Schema *self, Obj *other)
-{
+Schema_equals(Schema *self, Obj *other) {
     Schema *twin = (Schema*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, SCHEMA)) return false;
@@ -110,15 +105,13 @@ Schema_equals(Schema *self, Obj *other)
 }
 
 Architecture*
-Schema_architecture(Schema *self)
-{
+Schema_architecture(Schema *self) {
     UNUSED_VAR(self);
     return Arch_new();
 }
 
 void
-Schema_spec_field(Schema *self, const CharBuf *field, FieldType *type)
-{
+Schema_spec_field(Schema *self, const CharBuf *field, FieldType *type) {
     FieldType *existing  = Schema_Fetch_Type(self, field);
 
     // If the field already has an association, verify pairing and return.
@@ -145,8 +138,7 @@ Schema_spec_field(Schema *self, const CharBuf *field, FieldType *type)
 }
 
 static void
-S_add_text_field(Schema *self, const CharBuf *field, FieldType *type)
-{
+S_add_text_field(Schema *self, const CharBuf *field, FieldType *type) {
     FullTextType *fttype    = (FullTextType*)CERTIFY(type, FULLTEXTTYPE);
     Similarity   *sim       = FullTextType_Make_Similarity(fttype);
     Analyzer     *analyzer  = FullTextType_Get_Analyzer(fttype);
@@ -161,8 +153,7 @@ S_add_text_field(Schema *self, const CharBuf *field, FieldType *type)
 }
 
 static void
-S_add_string_field(Schema *self, const CharBuf *field, FieldType *type)
-{
+S_add_string_field(Schema *self, const CharBuf *field, FieldType *type) {
     StringType *string_type = (StringType*)CERTIFY(type, STRINGTYPE);
     Similarity *sim         = StringType_Make_Similarity(string_type);
 
@@ -174,63 +165,60 @@ S_add_string_field(Schema *self, const CharBuf *field, FieldType *type)
 }
 
 static void
-S_add_blob_field(Schema *self, const CharBuf *field, FieldType *type)
-{
+S_add_blob_field(Schema *self, const CharBuf *field, FieldType *type) {
     BlobType *blob_type = (BlobType*)CERTIFY(type, BLOBTYPE);
     Hash_Store(self->types, (Obj*)field, INCREF(blob_type));
 }
 
 static void
-S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type)
-{
+S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type) {
     NumericType *num_type = (NumericType*)CERTIFY(type, NUMERICTYPE);
     Hash_Store(self->types, (Obj*)field, INCREF(num_type));
 }
 
 FieldType*
-Schema_fetch_type(Schema *self, const CharBuf *field)
-{
+Schema_fetch_type(Schema *self, const CharBuf *field) {
     return (FieldType*)Hash_Fetch(self->types, (Obj*)field);
 }
 
 Analyzer*
-Schema_fetch_analyzer(Schema *self, const CharBuf *field)
-{
+Schema_fetch_analyzer(Schema *self, const CharBuf *field) {
     return field
-        ? (Analyzer*)Hash_Fetch(self->analyzers, (Obj*)field)
-        : NULL;
+           ? (Analyzer*)Hash_Fetch(self->analyzers, (Obj*)field)
+           : NULL;
 }
 
 Similarity*
-Schema_fetch_sim(Schema *self, const CharBuf *field)
-{
+Schema_fetch_sim(Schema *self, const CharBuf *field) {
     Similarity *sim = NULL;
     if (field != NULL) {
         sim = (Similarity*)Hash_Fetch(self->sims, (Obj*)field);
-    }        
+    }
     return sim;
 }
 
 uint32_t
-Schema_num_fields(Schema *self)
-{
+Schema_num_fields(Schema *self) {
     return Hash_Get_Size(self->types);
 }
 
 Architecture*
-Schema_get_architecture(Schema *self) { return self->arch; }
+Schema_get_architecture(Schema *self) {
+    return self->arch;
+}
+
 Similarity*
-Schema_get_similarity(Schema *self)   { return self->sim; }
+Schema_get_similarity(Schema *self) {
+    return self->sim;
+}
 
 VArray*
-Schema_all_fields(Schema *self)
-{
+Schema_all_fields(Schema *self) {
     return Hash_Keys(self->types);
 }
 
 uint32_t
-S_find_in_array(VArray *array, Obj *obj)
-{
+S_find_in_array(VArray *array, Obj *obj) {
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(array); i < max; i++) {
         Obj *candidate = VA_Fetch(array, i);
@@ -255,8 +243,7 @@ static VTable *old_blob_type_vtable = NULL;
 
 //
 static void
-S_lazy_init_old_type_vtables(void) 
-{
+S_lazy_init_old_type_vtables(void) {
     if (old_full_text_type_vtable) { return; }
     CharBuf *klass = CB_new(40);
     CB_setf(klass, "Lucy::FieldType::FullTextType");
@@ -269,8 +256,7 @@ S_lazy_init_old_type_vtables(void)
 }
 
 Hash*
-Schema_dump(Schema *self)
-{
+Schema_dump(Schema *self) {
     Hash *dump = Hash_new(0);
     Hash *type_dumps = Hash_new(Hash_Get_Size(self->types));
     CharBuf *field;
@@ -279,8 +265,8 @@ Schema_dump(Schema *self)
     S_lazy_init_old_type_vtables();
 
     // Record class name, store dumps of unique Analyzers.
-    Hash_Store_Str(dump, "_class", 6, 
-        (Obj*)CB_Clone(Schema_Get_Class_Name(self)));
+    Hash_Store_Str(dump, "_class", 6,
+                   (Obj*)CB_Clone(Schema_Get_Class_Name(self)));
     Hash_Store_Str(dump, "analyzers", 9, (Obj*)VA_Dump(self->uniq_analyzers));
 
     // Dump FieldTypes.
@@ -290,26 +276,26 @@ Schema_dump(Schema *self)
         VTable *type_vtable = FType_Get_VTable(type);
 
         // Dump known types to simplified format.
-        if (   type_vtable == FULLTEXTTYPE
+        if (type_vtable == FULLTEXTTYPE
             || type_vtable == old_full_text_type_vtable
-        ) {
+           ) {
             FullTextType *fttype = (FullTextType*)type;
             Hash *type_dump = FullTextType_Dump_For_Schema(fttype);
             Analyzer *analyzer = FullTextType_Get_Analyzer(fttype);
-            uint32_t tick 
+            uint32_t tick
                 = S_find_in_array(self->uniq_analyzers, (Obj*)analyzer);
 
             // Store the tick which references a unique analyzer.
-            Hash_Store_Str(type_dump, "analyzer", 8, 
-                (Obj*)CB_newf("%u32", tick));
+            Hash_Store_Str(type_dump, "analyzer", 8,
+                           (Obj*)CB_newf("%u32", tick));
 
             Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
         }
-        else if (   type_vtable == STRINGTYPE
+        else if (type_vtable == STRINGTYPE
                  || type_vtable == old_string_type_vtable
                  || type_vtable == BLOBTYPE
                  || type_vtable == old_blob_type_vtable
-        ) {
+                ) {
             Hash *type_dump = FType_Dump_For_Schema(type);
             Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
         }
@@ -323,18 +309,17 @@ Schema_dump(Schema *self)
 }
 
 Schema*
-Schema_load(Schema *self, Obj *dump)
-{
+Schema_load(Schema *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *class_name = (CharBuf*)CERTIFY(
-        Hash_Fetch_Str(source, "_class", 6), CHARBUF);
+    CharBuf *class_name
+        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), CHARBUF);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Schema *loaded = (Schema*)VTable_Make_Obj(vtable);
-    Hash *type_dumps = (Hash*)CERTIFY(
-        Hash_Fetch_Str(source, "fields", 6), HASH);
-    VArray *analyzer_dumps = (VArray*)CERTIFY(
-        Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
-    VArray *analyzers 
+    Hash *type_dumps
+        = (Hash*)CERTIFY(Hash_Fetch_Str(source, "fields", 6), HASH);
+    VArray *analyzer_dumps
+        = (VArray*)CERTIFY(Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
+    VArray *analyzers
         = (VArray*)VA_Load(analyzer_dumps, (Obj*)analyzer_dumps);
     CharBuf *field;
     Hash    *type_dump;
@@ -352,62 +337,68 @@ Schema_load(Schema *self, Obj *dump)
         if (type_str) {
             if (CB_Equals_Str(type_str, "fulltext", 8)) {
                 // Replace the "analyzer" tick with the real thing.
-                Obj *tick = CERTIFY(
-                    Hash_Fetch_Str(type_dump, "analyzer", 8), OBJ);
-                Analyzer *analyzer = (Analyzer*)VA_Fetch(analyzers, 
-                    (uint32_t)Obj_To_I64(tick));
-                if (!analyzer) { 
+                Obj *tick
+                    = CERTIFY(Hash_Fetch_Str(type_dump, "analyzer", 8), OBJ);
+                Analyzer *analyzer
+                    = (Analyzer*)VA_Fetch(analyzers,
+                                          (uint32_t)Obj_To_I64(tick));
+                if (!analyzer) {
                     THROW(ERR, "Can't find analyzer for '%o'", field);
                 }
                 Hash_Store_Str(type_dump, "analyzer", 8, INCREF(analyzer));
-                FullTextType *type = (FullTextType*)VTable_Load_Obj(
-                    FULLTEXTTYPE, (Obj*)type_dump);
+                FullTextType *type
+                    = (FullTextType*)VTable_Load_Obj(FULLTEXTTYPE,
+                                                     (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "string", 6)) {
-                StringType *type = (StringType*)VTable_Load_Obj(
-                    STRINGTYPE, (Obj*)type_dump);
+                StringType *type
+                    = (StringType*)VTable_Load_Obj(STRINGTYPE,
+                                                   (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "blob", 4)) {
-                BlobType *type = (BlobType*)VTable_Load_Obj(
-                    BLOBTYPE, (Obj*)type_dump);
+                BlobType *type
+                    = (BlobType*)VTable_Load_Obj(BLOBTYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "i32_t", 5)) {
-                Int32Type *type = (Int32Type*)VTable_Load_Obj(
-                    INT32TYPE, (Obj*)type_dump);
+                Int32Type *type
+                    = (Int32Type*)VTable_Load_Obj(INT32TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "i64_t", 5)) {
-                Int64Type *type = (Int64Type*)VTable_Load_Obj(
-                    INT64TYPE, (Obj*)type_dump);
+                Int64Type *type
+                    = (Int64Type*)VTable_Load_Obj(INT64TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "f32_t", 5)) {
-                Float32Type *type = (Float32Type*)VTable_Load_Obj(
-                    FLOAT32TYPE, (Obj*)type_dump);
+                Float32Type *type
+                    = (Float32Type*)VTable_Load_Obj(FLOAT32TYPE,
+                                                    (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "f64_t", 5)) {
-                Float64Type *type = (Float64Type*)VTable_Load_Obj(
-                    FLOAT64TYPE, (Obj*)type_dump);
+                Float64Type *type
+                    = (Float64Type*)VTable_Load_Obj(FLOAT64TYPE,
+                                                    (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else {
                 THROW(ERR, "Unknown type '%o' for field '%o'", type_str, field);
             }
-         }
+        }
         else {
             FieldType *type = (FieldType*)CERTIFY(
-                Hash_Load(type_dump, (Obj*)type_dump), FIELDTYPE);
+                                  Hash_Load(type_dump, (Obj*)type_dump),
+                                  FIELDTYPE);
             Schema_Spec_Field(loaded, field, type);
             DECREF(type);
         }
@@ -419,19 +410,18 @@ Schema_load(Schema *self, Obj *dump)
 }
 
 void
-Schema_eat(Schema *self, Schema *other)
-{
+Schema_eat(Schema *self, Schema *other) {
     if (!Schema_Is_A(self, Schema_Get_VTable(other))) {
         // Special case because of move of Lucy::Schema.
-        if (   Schema_Get_VTable(self) == SCHEMA 
+        if (Schema_Get_VTable(self) == SCHEMA
             && CB_Equals_Str(Schema_Get_Class_Name(other),
-                "Lucy::Schema", 12)
-        ) {
+                             "Lucy::Schema", 12)
+           ) {
             // allow
         }
         else {
-            THROW(ERR, "%o not a descendent of %o", 
-                Schema_Get_Class_Name(self), Schema_Get_Class_Name(other));
+            THROW(ERR, "%o not a descendent of %o",
+                  Schema_Get_Class_Name(self), Schema_Get_Class_Name(other));
         }
     }
 
@@ -444,8 +434,7 @@ Schema_eat(Schema *self, Schema *other)
 }
 
 void
-Schema_write(Schema *self, Folder *folder, const CharBuf *filename)
-{
+Schema_write(Schema *self, Folder *folder, const CharBuf *filename) {
     Hash *dump = Schema_Dump(self);
     ZombieCharBuf *schema_temp = ZCB_WRAP_STR("schema.temp", 11);
     bool_t success;

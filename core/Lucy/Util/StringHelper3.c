@@ -63,29 +63,28 @@ trademarks mentioned herein are the property of their respective owners.
 */
 
 chy_bool_t
-lucy_StrHelp_is_whitespace(uint32_t code_point)
-{
+lucy_StrHelp_is_whitespace(uint32_t code_point) {
     switch (code_point) {
-                 // <control-0009>..<control-000D>
-    case 0x0009: case 0x000A: case 0x000B: case 0x000C: case 0x000D:
-    case 0x0020: // SPACE
-    case 0x0085: // <control-0085>
-    case 0x00A0: // NO-BREAK SPACE
-    case 0x1680: // OGHAM SPACE MARK
-    case 0x180E: // MONGOLIAN VOWEL SEPARATOR
-                 // EN QUAD..HAIR SPACE
-    case 0x2000: case 0x2001: case 0x2002: case 0x2003: case 0x2004: 
-    case 0x2005: case 0x2006: case 0x2007: case 0x2008: case 0x2009: 
-    case 0x200A:
-    case 0x2028: // LINE SEPARATOR
-    case 0x2029: // PARAGRAPH SEPARATOR
-    case 0x202F: // NARROW NO-BREAK SPACE
-    case 0x205F: // MEDIUM MATHEMATICAL SPACE
-    case 0x3000: // IDEOGRAPHIC SPACE
-        return true;
+            // <control-0009>..<control-000D>
+        case 0x0009: case 0x000A: case 0x000B: case 0x000C: case 0x000D:
+        case 0x0020: // SPACE
+        case 0x0085: // <control-0085>
+        case 0x00A0: // NO-BREAK SPACE
+        case 0x1680: // OGHAM SPACE MARK
+        case 0x180E: // MONGOLIAN VOWEL SEPARATOR
+            // EN QUAD..HAIR SPACE
+        case 0x2000: case 0x2001: case 0x2002: case 0x2003: case 0x2004:
+        case 0x2005: case 0x2006: case 0x2007: case 0x2008: case 0x2009:
+        case 0x200A:
+        case 0x2028: // LINE SEPARATOR
+        case 0x2029: // PARAGRAPH SEPARATOR
+        case 0x202F: // NARROW NO-BREAK SPACE
+        case 0x205F: // MEDIUM MATHEMATICAL SPACE
+        case 0x3000: // IDEOGRAPHIC SPACE
+            return true;
 
-    default:
-        return false;
+        default:
+            return false;
     }
 }
 

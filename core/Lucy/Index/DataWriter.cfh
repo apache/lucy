@@ -44,7 +44,7 @@ public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
      * sub-readers).
      */
     public inert DataWriter*
-    init(DataWriter *self, Schema *schema, Snapshot *snapshot, 
+    init(DataWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader);
 
     /** Process a document, previously inverted by <code>inverter</code>.
@@ -65,7 +65,7 @@ public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
      * skipped.
      */
     public abstract void
-    Add_Segment(DataWriter *self, SegReader *reader, 
+    Add_Segment(DataWriter *self, SegReader *reader,
                 I32Array *doc_map = NULL);
 
     /** Remove a segment's data.  The default implementation is a no-op, as
@@ -92,7 +92,7 @@ public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
      * skipped.
      */
     public void
-    Merge_Segment(DataWriter *self, SegReader *reader, 
+    Merge_Segment(DataWriter *self, SegReader *reader,
                   I32Array *doc_map = NULL);
 
     /** Complete the segment: close all streams, store metadata, etc.
@@ -118,7 +118,7 @@ public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
      */
     public Snapshot*
     Get_Snapshot(DataWriter *self);
-  
+
     /** Accessor for "segment" member var.
      */
     public Segment*

@@ -22,19 +22,18 @@
 #include "Lucy/Store/Folder.h"
 
 Obj*
-PolyReader_try_open_segreaders(PolyReader *self, VArray *segments)
-{
-    return Host_callback_obj(self, "try_open_segreaders", 1, 
-        ARG_OBJ("segments", segments));
+PolyReader_try_open_segreaders(PolyReader *self, VArray *segments) {
+    return Host_callback_obj(self, "try_open_segreaders", 1,
+                             ARG_OBJ("segments", segments));
 }
 
 CharBuf*
-PolyReader_try_read_snapshot(Snapshot *snapshot, Folder *folder, 
-                             const CharBuf *path) 
-{
+PolyReader_try_read_snapshot(Snapshot *snapshot, Folder *folder,
+                             const CharBuf *path) {
     return (CharBuf*)Host_callback_obj(POLYREADER, "try_read_snapshot", 3,
-        ARG_OBJ("snapshot", snapshot), ARG_OBJ("folder", folder), 
-        ARG_STR("path", path));
+                                       ARG_OBJ("snapshot", snapshot),
+                                       ARG_OBJ("folder", folder),
+                                       ARG_STR("path", path));
 }
 
 

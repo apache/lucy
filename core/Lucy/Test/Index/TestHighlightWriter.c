@@ -22,8 +22,7 @@
 #include "Lucy/Index/HighlightWriter.h"
 
 void
-TestHLWriter_run_tests()
-{
+TestHLWriter_run_tests() {
     TestBatch *batch = TestBatch_new(1);
     TestBatch_Plan(batch);
     PASS(batch, "Placeholder");

@@ -22,54 +22,51 @@
 #include "Lucy/Test/Object/TestVArray.h"
 
 static CharBuf*
-S_new_cb(const char *text)
-{
+S_new_cb(const char *text) {
     return CB_new_from_utf8(text, strlen(text));
 }
 
 static void
-test_Equals(TestBatch *batch)
-{
-    VArray *array  = VA_new(0);
-    VArray *other  = VA_new(0);
+test_Equals(TestBatch *batch) {
+    VArray *array = VA_new(0);
+    VArray *other = VA_new(0);
     ZombieCharBuf *stuff = ZCB_WRAP_STR("stuff", 5);
 
-    TEST_TRUE(batch, VA_Equals(array, (Obj*)other), 
-        "Empty arrays are equal");
+    TEST_TRUE(batch, VA_Equals(array, (Obj*)other),
+              "Empty arrays are equal");
 
     VA_Push(array, INCREF(&EMPTY));
-    TEST_FALSE(batch, VA_Equals(array, (Obj*)other), 
-        "Add one elem and Equals returns false");
+    TEST_FALSE(batch, VA_Equals(array, (Obj*)other),
+               "Add one elem and Equals returns false");
 
     VA_Push(other, INCREF(&EMPTY));
-    TEST_TRUE(batch, VA_Equals(array, (Obj*)other), 
-        "Add a matching elem and Equals returns true");
+    TEST_TRUE(batch, VA_Equals(array, (Obj*)other),
+              "Add a matching elem and Equals returns true");
 
     VA_Store(array, 2, INCREF(&EMPTY));
-    TEST_FALSE(batch, VA_Equals(array, (Obj*)other), 
-        "Add elem after a NULL and Equals returns false");
+    TEST_FALSE(batch, VA_Equals(array, (Obj*)other),
+               "Add elem after a NULL and Equals returns false");
 
     VA_Store(other, 2, INCREF(&EMPTY));
-    TEST_TRUE(batch, VA_Equals(array, (Obj*)other), 
-        "Empty elems don't spoil Equals");
+    TEST_TRUE(batch, VA_Equals(array, (Obj*)other),
+              "Empty elems don't spoil Equals");
 
     VA_Store(other, 2, INCREF(stuff));
-    TEST_FALSE(batch, VA_Equals(array, (Obj*)other), 
-        "Non-matching value spoils Equals");
+    TEST_FALSE(batch, VA_Equals(array, (Obj*)other),
+               "Non-matching value spoils Equals");
 
     VA_Excise(array, 1, 2); // removes empty elems
     VA_Delete(other, 1);    // leaves NULL in place of deleted elem
     VA_Delete(other, 2);
-    TEST_FALSE(batch, VA_Equals(array, (Obj*)other), 
-        "Empty trailing elements spoil Equals");
+    TEST_FALSE(batch, VA_Equals(array, (Obj*)other),
+               "Empty trailing elements spoil Equals");
 
     DECREF(array);
     DECREF(other);
 }
 
 static void
-test_Store_Fetch(TestBatch *batch)
-{
+test_Store_Fetch(TestBatch *batch) {
     VArray *array = VA_new(0);
     CharBuf *elem;
 
@@ -81,11 +78,11 @@ test_Store_Fetch(TestBatch *batch)
     TEST_TRUE(batch, CB_Equals_Str(elem, "foo", 3), "Store");
 
     INCREF(elem);
-    TEST_INT_EQ(batch, 2, CB_Get_RefCount(elem), 
-        "start with refcount of 2");
+    TEST_INT_EQ(batch, 2, CB_Get_RefCount(elem),
+                "start with refcount of 2");
     VA_Store(array, 2, (Obj*)CB_newf("bar"));
-    TEST_INT_EQ(batch, 1, CB_Get_RefCount(elem), 
-        "Displacing elem via Store updates refcount");
+    TEST_INT_EQ(batch, 1, CB_Get_RefCount(elem),
+                "Displacing elem via Store updates refcount");
     DECREF(elem);
     elem = (CharBuf*)CERTIFY(VA_Fetch(array, 2), CHARBUF);
     TEST_TRUE(batch, CB_Equals_Str(elem, "bar", 3), "Store displacement");
@@ -94,8 +91,7 @@ test_Store_Fetch(TestBatch *batch)
 }
 
 static void
-test_Push_Pop_Shift_Unshift(TestBatch *batch)
-{
+test_Push_Pop_Shift_Unshift(TestBatch *batch) {
     VArray *array = VA_new(0);
     CharBuf *elem;
 
@@ -126,8 +122,7 @@ test_Push_Pop_Shift_Unshift(TestBatch *batch)
 }
 
 static void
-test_Delete(TestBatch *batch)
-{
+test_Delete(TestBatch *batch) {
     VArray *wanted = VA_new(5);
     VArray *got    = VA_new(5);
     uint32_t i;
@@ -145,8 +140,7 @@ test_Delete(TestBatch *batch)
 }
 
 static void
-test_Resize(TestBatch *batch)
-{
+test_Resize(TestBatch *batch) {
     VArray *array = VA_new(3);
     uint32_t i;
 
@@ -155,8 +149,8 @@ test_Resize(TestBatch *batch)
 
     VA_Resize(array, 4);
     TEST_INT_EQ(batch, VA_Get_Size(array), 4, "Resize up");
-    TEST_INT_EQ(batch, VA_Get_Capacity(array), 4, 
-        "Resize changes capacity");
+    TEST_INT_EQ(batch, VA_Get_Capacity(array), 4,
+                "Resize changes capacity");
 
     VA_Resize(array, 2);
     TEST_INT_EQ(batch, VA_Get_Size(array), 2, "Resize down");
@@ -166,46 +160,44 @@ test_Resize(TestBatch *batch)
 }
 
 static void
-test_Excise(TestBatch *batch)
-{
+test_Excise(TestBatch *batch) {
     VArray *wanted = VA_new(5);
     VArray *got    = VA_new(5);
 
     for (uint32_t i = 0; i < 5; i++) {
-        VA_Push(wanted, (Obj*)CB_newf("%u32", i)); 
-        VA_Push(got,    (Obj*)CB_newf("%u32", i)); 
+        VA_Push(wanted, (Obj*)CB_newf("%u32", i));
+        VA_Push(got, (Obj*)CB_newf("%u32", i));
     }
 
     VA_Excise(got, 7, 1);
-    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got), 
-        "Excise outside of range is no-op" );
+    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got),
+              "Excise outside of range is no-op");
 
     VA_Excise(got, 2, 2);
     DECREF(VA_Delete(wanted, 2));
     DECREF(VA_Delete(wanted, 3));
     VA_Store(wanted, 2, VA_Delete(wanted, 4));
-    VA_Resize(wanted, 3); 
-    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got), 
-        "Excise multiple elems" );
+    VA_Resize(wanted, 3);
+    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got),
+              "Excise multiple elems");
 
     VA_Excise(got, 2, 2);
     VA_Resize(wanted, 2);
-    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got), 
-        "Splicing too many elems truncates" );
+    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got),
+              "Splicing too many elems truncates");
 
     VA_Excise(got, 0, 1);
     VA_Store(wanted, 0, VA_Delete(wanted, 1));
     VA_Resize(wanted, 1);
-    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got), 
-        "Excise first elem" );
+    TEST_TRUE(batch, VA_Equals(wanted, (Obj*)got),
+              "Excise first elem");
 
     DECREF(got);
     DECREF(wanted);
 }
 
 static void
-test_Push_VArray(TestBatch *batch)
-{
+test_Push_VArray(TestBatch *batch) {
     VArray *wanted  = VA_new(0);
     VArray *got     = VA_new(0);
     VArray *scratch = VA_new(0);
@@ -224,9 +216,8 @@ test_Push_VArray(TestBatch *batch)
 }
 
 static void
-test_Clone_and_Shallow_Copy(TestBatch *batch)
-{
-    VArray *array  = VA_new(0);
+test_Clone_and_Shallow_Copy(TestBatch *batch) {
+    VArray *array = VA_new(0);
     VArray *twin;
     uint32_t i;
 
@@ -235,31 +226,30 @@ test_Clone_and_Shallow_Copy(TestBatch *batch)
     }
     twin = VA_Shallow_Copy(array);
     TEST_TRUE(batch, VA_Equals(array, (Obj*)twin), "Shallow_Copy");
-    TEST_TRUE(batch, VA_Fetch(array, 1) == VA_Fetch(twin, 1), 
-        "Shallow_Copy doesn't clone elements");
+    TEST_TRUE(batch, VA_Fetch(array, 1) == VA_Fetch(twin, 1),
+              "Shallow_Copy doesn't clone elements");
     DECREF(twin);
 
     twin = VA_Clone(array);
     TEST_TRUE(batch, VA_Equals(array, (Obj*)twin), "Clone");
-    TEST_TRUE(batch, VA_Fetch(array, 1) != VA_Fetch(twin, 1), 
-        "Clone performs deep clone");
+    TEST_TRUE(batch, VA_Fetch(array, 1) != VA_Fetch(twin, 1),
+              "Clone performs deep clone");
 
     DECREF(array);
     DECREF(twin);
 }
 
 static void
-test_Dump_and_Load(TestBatch *batch)
-{
-    VArray *array  = VA_new(0);
+test_Dump_and_Load(TestBatch *batch) {
+    VArray *array = VA_new(0);
     Obj    *dump;
     VArray *loaded;
 
     VA_Push(array, (Obj*)S_new_cb("foo"));
     dump = (Obj*)VA_Dump(array);
     loaded = (VArray*)Obj_Load(dump, dump);
-    TEST_TRUE(batch, VA_Equals(array, (Obj*)loaded), 
-        "Dump => Load round trip");
+    TEST_TRUE(batch, VA_Equals(array, (Obj*)loaded),
+              "Dump => Load round trip");
 
     DECREF(array);
     DECREF(dump);
@@ -267,22 +257,20 @@ test_Dump_and_Load(TestBatch *batch)
 }
 
 static void
-test_serialization(TestBatch *batch)
-{
-    VArray *array  = VA_new(0);
+test_serialization(TestBatch *batch) {
+    VArray *array = VA_new(0);
     VArray *dupe;
     VA_Store(array, 1, (Obj*)CB_newf("foo"));
     VA_Store(array, 3, (Obj*)CB_newf("bar"));
     dupe = (VArray*)TestUtils_freeze_thaw((Obj*)array);
-    TEST_TRUE(batch, dupe && VA_Equals(array, (Obj*)dupe), 
-        "Round trip through FREEZE/THAW");
+    TEST_TRUE(batch, dupe && VA_Equals(array, (Obj*)dupe),
+              "Round trip through FREEZE/THAW");
     DECREF(dupe);
     DECREF(array);
 }
 
 void
-TestVArray_run_tests()
-{
+TestVArray_run_tests() {
     TestBatch *batch = TestBatch_new(39);
 
     TestBatch_Plan(batch);

@@ -33,8 +33,7 @@ static CharBuf bar         = ZCB_LITERAL("bar");
 static CharBuf seg_1       = ZCB_LITERAL("seg_1");
 
 static Folder*
-S_folder_with_contents()
-{
+S_folder_with_contents() {
     RAMFolder *folder  = RAMFolder_new(&seg_1);
     OutStream *foo_out = RAMFolder_Open_Out(folder, &foo);
     OutStream *bar_out = RAMFolder_Open_Out(folder, &bar);
@@ -48,17 +47,16 @@ S_folder_with_contents()
 }
 
 static void
-test_Consolidate(TestBatch *batch)
-{
+test_Consolidate(TestBatch *batch) {
     Folder *folder = S_folder_with_contents();
     FileHandle *fh;
-    
+
     // Fake up detritus from failed consolidation.
-    fh = Folder_Open_FileHandle(folder, &cf_file, 
-        FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE );
+    fh = Folder_Open_FileHandle(folder, &cf_file,
+                                FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     DECREF(fh);
-    fh = Folder_Open_FileHandle(folder, &cfmeta_temp, 
-        FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE );
+    fh = Folder_Open_FileHandle(folder, &cfmeta_temp,
+                                FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     DECREF(fh);
 
     {
@@ -68,21 +66,20 @@ test_Consolidate(TestBatch *batch)
         DECREF(cf_writer);
     }
 
-    TEST_TRUE(batch, Folder_Exists(folder, &cf_file), 
-        "cf.dat file written"); 
-    TEST_TRUE(batch, Folder_Exists(folder, &cfmeta_file), 
-        "cfmeta.json file written"); 
-    TEST_FALSE(batch, Folder_Exists(folder, &foo), 
-        "original file zapped");
-    TEST_FALSE(batch, Folder_Exists(folder, &cfmeta_temp), 
-        "detritus from failed consolidation zapped");
+    TEST_TRUE(batch, Folder_Exists(folder, &cf_file),
+              "cf.dat file written");
+    TEST_TRUE(batch, Folder_Exists(folder, &cfmeta_file),
+              "cfmeta.json file written");
+    TEST_FALSE(batch, Folder_Exists(folder, &foo),
+               "original file zapped");
+    TEST_FALSE(batch, Folder_Exists(folder, &cfmeta_temp),
+               "detritus from failed consolidation zapped");
 
     DECREF(folder);
 }
 
 static void
-test_offsets(TestBatch *batch)
-{
+test_offsets(TestBatch *batch) {
     Folder *folder = S_folder_with_contents();
     CompoundFileWriter *cf_writer = CFWriter_new(folder);
     Hash    *cf_metadata;
@@ -91,9 +88,9 @@ test_offsets(TestBatch *batch)
     CFWriter_Consolidate(cf_writer);
 
     cf_metadata = (Hash*)CERTIFY(
-        Json_slurp_json(folder, &cfmeta_file), HASH);
+                      Json_slurp_json(folder, &cfmeta_file), HASH);
     files = (Hash*)CERTIFY(
-        Hash_Fetch_Str(cf_metadata, "files", 5), HASH);
+                Hash_Fetch_Str(cf_metadata, "files", 5), HASH);
     {
         CharBuf *file;
         Obj     *filestats;
@@ -109,7 +106,7 @@ test_offsets(TestBatch *batch)
             if (offs % 8 != 0) {
                 offsets_ok = false;
                 FAIL(batch, "Offset %" I64P " for %s not a multiple of 8",
-                    offset, CB_Get_Ptr8(file));
+                     offset, CB_Get_Ptr8(file));
                 break;
             }
         }
@@ -124,8 +121,7 @@ test_offsets(TestBatch *batch)
 }
 
 void
-TestCFWriter_run_tests()
-{
+TestCFWriter_run_tests() {
     TestBatch *batch = TestBatch_new(7);
 
     TestBatch_Plan(batch);

@@ -30,31 +30,27 @@ struct CFCCBlock {
 };
 
 CFCCBlock*
-CFCCBlock_new(const char *contents)
-{
+CFCCBlock_new(const char *contents) {
     CFCCBlock *self = (CFCCBlock*)CFCBase_allocate(sizeof(CFCCBlock),
-        "Clownfish::CBlock");
+                                                   "Clownfish::CBlock");
     return CFCCBlock_init(self, contents);
 }
 
 CFCCBlock*
-CFCCBlock_init(CFCCBlock *self, const char *contents) 
-{
+CFCCBlock_init(CFCCBlock *self, const char *contents) {
     CFCUTIL_NULL_CHECK(contents);
     self->contents = CFCUtil_strdup(contents);
     return self;
 }
 
 void
-CFCCBlock_destroy(CFCCBlock *self)
-{
+CFCCBlock_destroy(CFCCBlock *self) {
     FREEMEM(self->contents);
     CFCBase_destroy((CFCBase*)self);
 }
 
 const char*
-CFCCBlock_get_contents(CFCCBlock *self)
-{
+CFCCBlock_get_contents(CFCCBlock *self) {
     return self->contents;
 }
 

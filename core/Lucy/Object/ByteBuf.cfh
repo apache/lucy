@@ -51,7 +51,7 @@ class Lucy::Object::ByteBuf cnick BB inherits Lucy::Object::Obj {
      * please qsort and friends.
      */
     inert int
-    compare(const void *va, const void *vb); 
+    compare(const void *va, const void *vb);
 
     /** Set the object's size member.  If greater than the object's capacity,
      * throws an error.

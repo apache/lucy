@@ -30,7 +30,7 @@
 static chaz_bool_t
 S_machine_is_big_endian();
 
-static char sizes_code[] = 
+static char sizes_code[] =
     QUOTE(  #include "_charm.h"                       )
     QUOTE(  int main () {                             )
     QUOTE(      Charm_Setup;                          )
@@ -51,7 +51,7 @@ static char type64_code[] =
     QUOTE(      return 0;                             )
     QUOTE(  }                                         );
 
-static char literal64_code[] = 
+static char literal64_code[] =
     QUOTE(  #include "_charm.h"                       )
     QUOTE(  #define big 9000000000000000000%s         )
     QUOTE(  int main()                                )
@@ -63,14 +63,13 @@ static char literal64_code[] =
     QUOTE(  }                                         );
 
 void
-Integers_run(void) 
-{
+Integers_run(void) {
     char *output;
     size_t output_len;
-    int sizeof_char       = -1; 
-    int sizeof_short      = -1; 
-    int sizeof_int        = -1; 
-    int sizeof_ptr        = -1; 
+    int sizeof_char       = -1;
+    int sizeof_short      = -1;
+    int sizeof_int        = -1;
+    int sizeof_ptr        = -1;
     int sizeof_long       = -1;
     int sizeof_long_long  = -1;
     int sizeof___int64    = -1;
@@ -104,7 +103,7 @@ Integers_run(void)
     output = CC_capture_output(sizes_code, strlen(sizes_code), &output_len);
     if (output != NULL) {
         char *end_ptr = output;
-        
+
         sizeof_char  = strtol(output, &end_ptr, 10);
         output       = end_ptr;
         sizeof_short = strtol(output, &end_ptr, 10);
@@ -177,7 +176,8 @@ Integers_run(void)
         }
         else {
             sprintf(code_buf, literal64_code, "i64");
-            output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+            output = CC_capture_output(code_buf, strlen(code_buf),
+                                       &output_len);
             if (output != NULL) {
                 strcpy(i64_t_postfix, "i64");
             }
@@ -223,10 +223,12 @@ Integers_run(void)
     ConfWriter_append_conf("#define CHY_SIZEOF_LONG %d\n",  sizeof_long);
     ConfWriter_append_conf("#define CHY_SIZEOF_PTR %d\n",   sizeof_ptr);
     if (has_long_long) {
-        ConfWriter_append_conf("#define CHY_SIZEOF_LONG_LONG %d\n", sizeof_long_long);
+        ConfWriter_append_conf("#define CHY_SIZEOF_LONG_LONG %d\n",
+                               sizeof_long_long);
     }
     if (has___int64) {
-        ConfWriter_append_conf("#define CHY_SIZEOF___INT64 %d\n", sizeof___int64);
+        ConfWriter_append_conf("#define CHY_SIZEOF___INT64 %d\n",
+                               sizeof___int64);
     }
 
     /* Write affirmations, typedefs and maximums/minimums. */
@@ -235,16 +237,16 @@ Integers_run(void)
         ConfWriter_append_conf("#include <stdint.h>\n");
     }
     else {
-    /* we support only the following subset of stdint.h
-     *   int8_t
-     *   int16_t
-     *   int32_t
-     *   int64_t
-     *   uint8_t
-     *   uint16_t
-     *   uint32_t
-     *   uint64_t
-     */
+        /* we support only the following subset of stdint.h
+         *   int8_t
+         *   int16_t
+         *   int32_t
+         *   int64_t
+         *   uint8_t
+         *   uint16_t
+         *   uint32_t
+         *   uint64_t
+         */
         if (has_8) {
             ConfWriter_append_conf(
                 "typedef signed char int8_t;\n"
@@ -297,22 +299,25 @@ Integers_run(void)
     if (has_32) {
         ConfWriter_append_conf("#define CHY_HAS_I32_T\n");
         ConfWriter_append_conf("typedef %s chy_i32_t;\n", i32_t_type);
-        ConfWriter_append_conf("typedef unsigned %s chy_u32_t;\n", i32_t_type);
-        ConfWriter_append_conf("#define CHY_I32_MAX 0x7FFFFFFF%s\n", i32_t_postfix);
+        ConfWriter_append_conf("typedef unsigned %s chy_u32_t;\n",
+                               i32_t_type);
+        ConfWriter_append_conf("#define CHY_I32_MAX 0x7FFFFFFF%s\n",
+                               i32_t_postfix);
         ConfWriter_append_conf("#define CHY_I32_MIN (-I32_MAX - 1)\n");
         ConfWriter_append_conf("#define CHY_U32_MAX (I32_MAX * 2%s + 1%s)\n",
-            u32_t_postfix, u32_t_postfix);
+                               u32_t_postfix, u32_t_postfix);
     }
     if (has_64) {
         ConfWriter_append_conf("#define CHY_HAS_I64_T\n");
         ConfWriter_append_conf("typedef %s chy_i64_t;\n", i64_t_type);
-        ConfWriter_append_conf("typedef unsigned %s chy_u64_t;\n", i64_t_type);
+        ConfWriter_append_conf("typedef unsigned %s chy_u64_t;\n",
+                               i64_t_type);
         ConfWriter_append_conf("#define CHY_I64_MAX 0x7FFFFFFFFFFFFFFF%s\n",
-            i64_t_postfix);
+                               i64_t_postfix);
         ConfWriter_append_conf("#define CHY_I64_MIN (-I64_MAX - 1%s)\n",
-            i64_t_postfix);
+                               i64_t_postfix);
         ConfWriter_append_conf("#define CHY_U64_MAX (I64_MAX * 2%s + 1%s)\n",
-            u64_t_postfix, u64_t_postfix);
+                               u64_t_postfix, u64_t_postfix);
     }
 
     /* Create the I64P and U64P printf macros. */
@@ -328,7 +333,7 @@ Integers_run(void)
         };
 
         /* Buffer to hold the code, and its start and end. */
-        static char format_64_code[] = 
+        static char format_64_code[] =
             QUOTE(  #include "_charm.h"                           )
             QUOTE(  int main() {                                  )
             QUOTE(      Charm_Setup;                              )
@@ -340,13 +345,15 @@ Integers_run(void)
             /* Try to print 2**64-1, and see if we get it back intact. */
             sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
             output = CC_capture_output(code_buf, strlen(code_buf),
-                &output_len);
+                                       &output_len);
 
-            if (   output_len != 0 
+            if (output_len != 0
                 && strcmp(output, "18446744073709551615") == 0
-            ) {
-                ConfWriter_append_conf("#define CHY_I64P \"%sd\"\n", options[i]);
-                ConfWriter_append_conf("#define CHY_U64P \"%su\"\n", options[i]);
+               ) {
+                ConfWriter_append_conf("#define CHY_I64P \"%sd\"\n",
+                                       options[i]);
+                ConfWriter_append_conf("#define CHY_U64P \"%su\"\n",
+                                       options[i]);
                 break;
             }
         }
@@ -357,11 +364,14 @@ Integers_run(void)
     if (has_32) {
         if (strcmp(i32_t_postfix, "") == 0) {
             ConfWriter_append_conf("#define CHY_I32_C(n) n\n");
-            ConfWriter_append_conf("#define CHY_U32_C(n) n##%s\n", u32_t_postfix);
+            ConfWriter_append_conf("#define CHY_U32_C(n) n##%s\n",
+                                   u32_t_postfix);
         }
         else {
-            ConfWriter_append_conf("#define CHY_I32_C(n) n##%s\n", i32_t_postfix);
-            ConfWriter_append_conf("#define CHY_U32_C(n) n##%s\n", u32_t_postfix);
+            ConfWriter_append_conf("#define CHY_I32_C(n) n##%s\n",
+                                   i32_t_postfix);
+            ConfWriter_append_conf("#define CHY_U32_C(n) n##%s\n",
+                                   u32_t_postfix);
         }
     }
     if (has_64) {
@@ -373,11 +383,11 @@ Integers_run(void)
     if (has_64) {
         if (sizeof_ptr == 8) {
             ConfWriter_append_conf("#define CHY_PTR_TO_I64(ptr) "
-                "((chy_i64_t)(chy_u64_t)(ptr))\n");
+                                   "((chy_i64_t)(chy_u64_t)(ptr))\n");
         }
         else {
             ConfWriter_append_conf("#define CHY_PTR_TO_I64(ptr) "
-                "((chy_i64_t)(chy_u32_t)(ptr))\n");
+                                   "((chy_i64_t)(chy_u32_t)(ptr))\n");
         }
     }
 
@@ -393,7 +403,7 @@ Integers_run(void)
 
     /* Shorten. */
     ConfWriter_start_short_names();
-    if ( S_machine_is_big_endian() ) {
+    if (S_machine_is_big_endian()) {
         ConfWriter_shorten_macro("BIG_END");
     }
     else {
@@ -456,15 +466,14 @@ Integers_run(void)
         ConfWriter_shorten_macro("PTR_TO_I64");
     }
     ConfWriter_end_short_names();
-    
+
     ConfWriter_end_module();
 }
 
 static chaz_bool_t
-S_machine_is_big_endian()
-{
+S_machine_is_big_endian() {
     long one = 1;
-    return !(*((char *)(&one)));
+    return !(*((char*)(&one)));
 }
 
 

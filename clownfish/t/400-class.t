@@ -213,18 +213,18 @@ ok( $class->has_attribute('lovable'), "parsed class attribute" );
 ok( $class->has_attribute('drooly'),  "parsed second class attribute" );
 
 $class_content = qq|
-    parcel inert class Rigor::Mortis cnick Mort { 
-        parcel inert void lie_still(); 
+    parcel inert class Rigor::Mortis cnick Mort {
+        parcel inert void lie_still();
     }|;
 $class = $parser->class_declaration($class_content);
 isa_ok( $class, "Clownfish::Class", "inert class_declaration" );
 ok( $class->inert, "inert modifier parsed and passed to constructor" );
 
 $class_content = qq|
-    final class Ultimo { 
+    final class Ultimo {
         /** Throws an error.
          */
-        void Say_Never(Ultimo *self); 
+        void Say_Never(Ultimo *self);
     }|;
 $class = $parser->class_declaration($class_content);
 ok( $class->final, "final class_declaration" );

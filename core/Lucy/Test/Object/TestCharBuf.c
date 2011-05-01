@@ -28,17 +28,15 @@ static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
 
 static CharBuf*
-S_get_cb(char *string)
-{
+S_get_cb(char *string) {
     return CB_new_from_utf8(string, strlen(string));
 }
 
 static void
-test_Cat(TestBatch *batch)
-{
-    CharBuf *wanted  = CB_newf("a%s", smiley);
-    CharBuf *got     = S_get_cb("");
-    
+test_Cat(TestBatch *batch) {
+    CharBuf *wanted = CB_newf("a%s", smiley);
+    CharBuf *got    = S_get_cb("");
+
     CB_Cat(got, wanted);
     TEST_TRUE(batch, CB_Equals(wanted, (Obj*)got), "Cat");
     DECREF(got);
@@ -62,8 +60,7 @@ test_Cat(TestBatch *batch)
 }
 
 static void
-test_Mimic_and_Clone(TestBatch *batch)
-{
+test_Mimic_and_Clone(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo");
     CharBuf *got    = S_get_cb("bar");
 
@@ -84,8 +81,7 @@ test_Mimic_and_Clone(TestBatch *batch)
 }
 
 static void
-test_Find(TestBatch *batch)
-{
+test_Find(TestBatch *batch) {
     CharBuf *string = CB_new(10);
     CharBuf *substring = S_get_cb("foo");
 
@@ -104,9 +100,8 @@ test_Find(TestBatch *batch)
 }
 
 static void
-test_Code_Point_At_and_From(TestBatch *batch)
-{
-    uint32_t code_points[] = { 'a', 0x263A, 0x263A, 'b', 0x263A, 'c' }; 
+test_Code_Point_At_and_From(TestBatch *batch) {
+    uint32_t code_points[] = { 'a', 0x263A, 0x263A, 'b', 0x263A, 'c' };
     uint32_t num_code_points = sizeof(code_points) / sizeof(uint32_t);
     CharBuf *string = CB_newf("a%s%sb%sc", smiley, smiley, smiley);
     uint32_t i;
@@ -114,17 +109,16 @@ test_Code_Point_At_and_From(TestBatch *batch)
     for (i = 0; i < num_code_points; i++) {
         uint32_t from = num_code_points - i - 1;
         TEST_INT_EQ(batch, CB_Code_Point_At(string, i), code_points[i],
-            "Code_Point_At %ld", (long)i);
-        TEST_INT_EQ(batch, CB_Code_Point_At(string, from), 
-            code_points[from], "Code_Point_From %ld", (long)from);
+                    "Code_Point_At %ld", (long)i);
+        TEST_INT_EQ(batch, CB_Code_Point_At(string, from),
+                    code_points[from], "Code_Point_From %ld", (long)from);
     }
 
     DECREF(string);
 }
 
 static void
-test_SubString(TestBatch *batch)
-{
+test_SubString(TestBatch *batch) {
     CharBuf *string = CB_newf("a%s%sb%sc", smiley, smiley, smiley);
     CharBuf *wanted = CB_newf("%sb%s", smiley, smiley);
     CharBuf *got = CB_SubString(string, 2, 3);
@@ -135,8 +129,7 @@ test_SubString(TestBatch *batch)
 }
 
 static void
-test_Nip_and_Chop(TestBatch *batch)
-{
+test_Nip_and_Chop(TestBatch *batch) {
     CharBuf *wanted;
     CharBuf *got;
 
@@ -157,8 +150,7 @@ test_Nip_and_Chop(TestBatch *batch)
 
 
 static void
-test_Truncate(TestBatch *batch)
-{
+test_Truncate(TestBatch *batch) {
     CharBuf *wanted = CB_newf("a%s", smiley, smiley);
     CharBuf *got    = CB_newf("a%s%sb%sc", smiley, smiley, smiley);
     CB_Truncate(got, 2);
@@ -168,12 +160,11 @@ test_Truncate(TestBatch *batch)
 }
 
 static void
-test_Trim(TestBatch *batch)
-{
-    uint32_t spaces[] = { 
+test_Trim(TestBatch *batch) {
+    uint32_t spaces[] = {
         ' ',    '\t',   '\r',   '\n',   0x000B, 0x000C, 0x000D, 0x0085,
-        0x00A0, 0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 
-        0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029, 
+        0x00A0, 0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004,
+        0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029,
         0x202F, 0x205F, 0x3000
     };
     uint32_t num_spaces = sizeof(spaces) / sizeof(uint32_t);
@@ -186,13 +177,13 @@ test_Trim(TestBatch *batch)
     for (i = 0; i < num_spaces; i++) { CB_Cat_Char(got, spaces[i]); }
 
     TEST_TRUE(batch, CB_Trim_Top(got), "Trim_Top returns true on success");
-    TEST_FALSE(batch, CB_Trim_Top(got), 
-        "Trim_Top returns false on failure");
+    TEST_FALSE(batch, CB_Trim_Top(got),
+               "Trim_Top returns false on failure");
     TEST_TRUE(batch, CB_Trim_Tail(got), "Trim_Tail returns true on success");
-    TEST_FALSE(batch, CB_Trim_Tail(got), 
-        "Trim_Tail returns false on failure");
-    TEST_TRUE(batch, CB_Equals_Str(got, smiley, smiley_len), 
-        "Trim_Top and Trim_Tail worked");
+    TEST_FALSE(batch, CB_Trim_Tail(got),
+               "Trim_Tail returns false on failure");
+    TEST_TRUE(batch, CB_Equals_Str(got, smiley, smiley_len),
+              "Trim_Top and Trim_Tail worked");
 
     // Build the spacey smiley again.
     CB_Truncate(got, 0);
@@ -202,15 +193,14 @@ test_Trim(TestBatch *batch)
 
     TEST_TRUE(batch, CB_Trim(got), "Trim returns true on success");
     TEST_FALSE(batch, CB_Trim(got), "Trim returns false on failure");
-    TEST_TRUE(batch, CB_Equals_Str(got, smiley, smiley_len), 
-        "Trim worked");
+    TEST_TRUE(batch, CB_Equals_Str(got, smiley, smiley_len),
+              "Trim worked");
 
     DECREF(got);
 }
 
 static void
-test_To_F64(TestBatch *batch)
-{
+test_To_F64(TestBatch *batch) {
     CharBuf *charbuf = S_get_cb("1.5");
     double difference = 1.5 - CB_To_F64(charbuf);
     if (difference < 0) { difference = 0 - difference; }
@@ -225,15 +215,14 @@ test_To_F64(TestBatch *batch)
     double value_full = CB_To_F64(charbuf);
     CB_Set_Size(charbuf, 3);
     double value_short = CB_To_F64(charbuf);
-    TEST_TRUE(batch, value_short < value_full, 
-        "TO_F64 doesn't run past end of string");
+    TEST_TRUE(batch, value_short < value_full,
+              "TO_F64 doesn't run past end of string");
 
     DECREF(charbuf);
 }
 
 static void
-test_To_I64(TestBatch *batch)
-{
+test_To_I64(TestBatch *batch) {
     CharBuf *charbuf = S_get_cb("10");
     TEST_TRUE(batch, CB_To_I64(charbuf) == 10, "To_I64");
     CB_setf(charbuf, "-10");
@@ -243,8 +232,7 @@ test_To_I64(TestBatch *batch)
 
 
 static void
-test_vcatf_s(TestBatch *batch)
-{
+test_vcatf_s(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar bizzle baz");
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %s baz", "bizzle");
@@ -254,8 +242,7 @@ test_vcatf_s(TestBatch *batch)
 }
 
 static void
-test_vcatf_null_string(TestBatch *batch)
-{
+test_vcatf_null_string(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar [NULL] baz");
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %s baz", NULL);
@@ -265,8 +252,7 @@ test_vcatf_null_string(TestBatch *batch)
 }
 
 static void
-test_vcatf_cb(TestBatch *batch)
-{
+test_vcatf_cb(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar ZEKE baz");
     CharBuf *catworthy = S_get_cb("ZEKE");
     CharBuf *got = S_get_cb("foo ");
@@ -278,8 +264,7 @@ test_vcatf_cb(TestBatch *batch)
 }
 
 static void
-test_vcatf_obj(TestBatch *batch)
-{
+test_vcatf_obj(TestBatch *batch) {
     CharBuf   *wanted = S_get_cb("ooga 20 booga");
     Integer32 *i32 = Int32_new(20);
     CharBuf   *got = S_get_cb("ooga");
@@ -291,8 +276,7 @@ test_vcatf_obj(TestBatch *batch)
 }
 
 static void
-test_vcatf_null_obj(TestBatch *batch)
-{
+test_vcatf_null_obj(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar [NULL] baz");
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %o baz", NULL);
@@ -302,8 +286,7 @@ test_vcatf_null_obj(TestBatch *batch)
 }
 
 static void
-test_vcatf_i8(TestBatch *batch)
-{
+test_vcatf_i8(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar -3 baz");
     int8_t num = -3;
     CharBuf *got = S_get_cb("foo ");
@@ -314,8 +297,7 @@ test_vcatf_i8(TestBatch *batch)
 }
 
 static void
-test_vcatf_i32(TestBatch *batch)
-{
+test_vcatf_i32(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar -100000 baz");
     int32_t num = -100000;
     CharBuf *got = S_get_cb("foo ");
@@ -326,8 +308,7 @@ test_vcatf_i32(TestBatch *batch)
 }
 
 static void
-test_vcatf_i64(TestBatch *batch)
-{
+test_vcatf_i64(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar -5000000000 baz");
     int64_t num = I64_C(-5000000000);
     CharBuf *got = S_get_cb("foo ");
@@ -338,8 +319,7 @@ test_vcatf_i64(TestBatch *batch)
 }
 
 static void
-test_vcatf_u8(TestBatch *batch)
-{
+test_vcatf_u8(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar 3 baz");
     uint8_t num = 3;
     CharBuf *got = S_get_cb("foo ");
@@ -350,8 +330,7 @@ test_vcatf_u8(TestBatch *batch)
 }
 
 static void
-test_vcatf_u32(TestBatch *batch)
-{
+test_vcatf_u32(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar 100000 baz");
     uint32_t num = 100000;
     CharBuf *got = S_get_cb("foo ");
@@ -362,8 +341,7 @@ test_vcatf_u32(TestBatch *batch)
 }
 
 static void
-test_vcatf_u64(TestBatch *batch)
-{
+test_vcatf_u64(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar 5000000000 baz");
     uint64_t num = U64_C(5000000000);
     CharBuf *got = S_get_cb("foo ");
@@ -374,8 +352,7 @@ test_vcatf_u64(TestBatch *batch)
 }
 
 static void
-test_vcatf_f64(TestBatch *batch)
-{
+test_vcatf_f64(TestBatch *batch) {
     CharBuf *wanted;
     char buf[64];
     float num = 1.3f;
@@ -389,8 +366,7 @@ test_vcatf_f64(TestBatch *batch)
 }
 
 static void
-test_vcatf_x32(TestBatch *batch)
-{
+test_vcatf_x32(TestBatch *batch) {
     CharBuf *wanted;
     char buf[64];
     unsigned long num = I32_MAX;
@@ -408,19 +384,17 @@ test_vcatf_x32(TestBatch *batch)
 }
 
 static void
-test_serialization(TestBatch *batch)
-{
+test_serialization(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo");
     CharBuf *got    = (CharBuf*)TestUtils_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(batch, got && CB_Equals(wanted, (Obj*)got), 
-        "Round trip through FREEZE/THAW");
+    TEST_TRUE(batch, got && CB_Equals(wanted, (Obj*)got),
+              "Round trip through FREEZE/THAW");
     DECREF(got);
     DECREF(wanted);
 }
 
 void
-TestCB_run_tests()
-{
+TestCB_run_tests() {
     TestBatch *batch = TestBatch_new(55);
     TestBatch_Plan(batch);
 

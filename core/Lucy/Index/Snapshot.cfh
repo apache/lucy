@@ -33,13 +33,13 @@ class Lucy::Index::Snapshot inherits Lucy::Object::Obj : dumpable {
 
     inert int32_t current_file_format;
 
-    public inert incremented Snapshot* 
+    public inert incremented Snapshot*
     new();
-    
+
     /**
      * Constructor.  Takes no arguments.
      */
-    public inert Snapshot* 
+    public inert Snapshot*
     init(Snapshot *self);
 
     /** Return an array of all entries.
@@ -100,7 +100,7 @@ class Lucy::Index::Snapshot inherits Lucy::Object::Obj : dumpable {
     public nullable CharBuf*
     Get_Path(Snapshot *self);
 
-    public void 
+    public void
     Destroy(Snapshot *self);
 }
 

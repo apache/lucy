@@ -48,7 +48,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
     RAMFile*
     Get_File(RAMFileHandle *self);
 
-    bool_t 
+    bool_t
     Grow(RAMFileHandle *self, int64_t len);
 
     public void
@@ -57,7 +57,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
     bool_t
     Window(RAMFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
-    bool_t 
+    bool_t
     Release_Window(RAMFileHandle *self, FileWindow *window);
 
     bool_t

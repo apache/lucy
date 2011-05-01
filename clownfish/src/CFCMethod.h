@@ -28,19 +28,19 @@ struct CFCParamList;
 struct CFCDocuComment;
 
 CFCMethod*
-CFCMethod_new(struct CFCParcel *parcel, const char *exposure, 
-              const char *class_name, const char *class_cnick, 
-              const char *macro_sym, struct CFCType *return_type, 
-              struct CFCParamList *param_list, 
-              struct CFCDocuComment *docucomment, int is_final, 
+CFCMethod_new(struct CFCParcel *parcel, const char *exposure,
+              const char *class_name, const char *class_cnick,
+              const char *macro_sym, struct CFCType *return_type,
+              struct CFCParamList *param_list,
+              struct CFCDocuComment *docucomment, int is_final,
               int is_abstract);
 
 CFCMethod*
 CFCMethod_init(CFCMethod *self, struct CFCParcel *parcel,
-               const char *exposure, const char *class_name, 
-               const char *class_cnick, const char *macro_sym, 
+               const char *exposure, const char *class_name,
+               const char *class_cnick, const char *macro_sym,
                struct CFCType *return_type, struct CFCParamList *param_list,
-               struct CFCDocuComment *docucomment, int is_final, 
+               struct CFCDocuComment *docucomment, int is_final,
                int is_abstract);
 
 void
@@ -59,21 +59,21 @@ CFCMethod_finalize(CFCMethod *self);
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf, 
+CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf,
                            size_t buf_size);
 
 /**
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf, 
+CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf,
                           size_t buf_size);
 
 /**
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf, 
+CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf,
                           size_t buf_size);
 
 const char*

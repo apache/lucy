@@ -25,21 +25,19 @@
 #include "Lucy/Store/Folder.h"
 
 TextSortCache*
-TextSortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality, 
-                  int32_t doc_max, int32_t null_ord, int32_t ord_width, 
-                  InStream *ord_in, InStream *ix_in, InStream *dat_in)
-{
+TextSortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
+                  InStream *ord_in, InStream *ix_in, InStream *dat_in) {
     TextSortCache *self = (TextSortCache*)VTable_Make_Obj(TEXTSORTCACHE);
     return TextSortCache_init(self, field, type, cardinality, doc_max,
-        null_ord, ord_width, ord_in, ix_in, dat_in);
+                              null_ord, ord_width, ord_in, ix_in, dat_in);
 }
 
 TextSortCache*
 TextSortCache_init(TextSortCache *self, const CharBuf *field,
-                   FieldType *type, int32_t cardinality, 
-                   int32_t doc_max, int32_t null_ord, int32_t ord_width, 
-                   InStream *ord_in, InStream *ix_in, InStream *dat_in)
-{
+                   FieldType *type, int32_t cardinality,
+                   int32_t doc_max, int32_t null_ord, int32_t ord_width,
+                   InStream *ord_in, InStream *ix_in, InStream *dat_in) {
     // Validate.
     if (!type || !FType_Sortable(type)) {
         DECREF(self);
@@ -50,7 +48,7 @@ TextSortCache_init(TextSortCache *self, const CharBuf *field,
     int64_t ord_len = InStream_Length(ord_in);
     void *ords = InStream_Buf(ord_in, (size_t)ord_len);
     SortCache_init((SortCache*)self, field, type, ords, cardinality, doc_max,
-        null_ord, ord_width);
+                   null_ord, ord_width);
 
     // Validate ords file length.
     double  bytes_per_doc = self->ord_width / 8.0;
@@ -58,7 +56,7 @@ TextSortCache_init(TextSortCache *self, const CharBuf *field,
     if (max_ords < self->doc_max + 1) {
         WARN("ORD WIDTH: %i32 %i32", ord_width, self->ord_width);
         THROW(ERR, "Conflict between ord count max %f64 and doc_max %i32 for "
-            "field %o", max_ords, doc_max, field);
+              "field %o", max_ords, doc_max, field);
     }
 
     // Assign.
@@ -70,35 +68,33 @@ TextSortCache_init(TextSortCache *self, const CharBuf *field,
 }
 
 void
-TextSortCache_destroy(TextSortCache *self)
-{
-    if (self->ord_in) { 
-        InStream_Close(self->ord_in); 
+TextSortCache_destroy(TextSortCache *self) {
+    if (self->ord_in) {
+        InStream_Close(self->ord_in);
         InStream_Dec_RefCount(self->ord_in);
     }
-    if (self->ix_in) { 
-        InStream_Close(self->ix_in); 
+    if (self->ix_in) {
+        InStream_Close(self->ix_in);
         InStream_Dec_RefCount(self->ix_in);
     }
-    if (self->dat_in) { 
-        InStream_Close(self->dat_in); 
+    if (self->dat_in) {
+        InStream_Close(self->dat_in);
         InStream_Dec_RefCount(self->dat_in);
     }
     SUPER_DESTROY(self, TEXTSORTCACHE);
 }
 
-#define NULL_SENTINEL -1 
+#define NULL_SENTINEL -1
 
 Obj*
-TextSortCache_value(TextSortCache *self, int32_t ord, Obj *blank)
-{
+TextSortCache_value(TextSortCache *self, int32_t ord, Obj *blank) {
     if (ord == self->null_ord) {
         return NULL;
     }
     InStream_Seek(self->ix_in, ord * sizeof(int64_t));
     int64_t offset = InStream_Read_I64(self->ix_in);
-    if (offset == NULL_SENTINEL) { 
-        return NULL; 
+    if (offset == NULL_SENTINEL) {
+        return NULL;
     }
     else {
         uint32_t next_ord = ord + 1;
@@ -123,8 +119,7 @@ TextSortCache_value(TextSortCache *self, int32_t ord, Obj *blank)
 }
 
 CharBuf*
-TextSortCache_make_blank(TextSortCache *self)
-{
+TextSortCache_make_blank(TextSortCache *self) {
     UNUSED_VAR(self);
     return CB_new_from_trusted_utf8("", 0);
 }

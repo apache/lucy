@@ -24,14 +24,13 @@
 #include "Lucy/Search/NoMatchQuery.h"
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
+test_Dump_Load_and_Equals(TestBatch *batch) {
     NoMatchQuery *query = NoMatchQuery_new();
     Obj          *dump  = (Obj*)NoMatchQuery_Dump(query);
     NoMatchQuery *clone = (NoMatchQuery*)NoMatchQuery_Load(query, dump);
 
-    TEST_TRUE(batch, NoMatchQuery_Equals(query, (Obj*)clone), 
-        "Dump => Load round trip");
+    TEST_TRUE(batch, NoMatchQuery_Equals(query, (Obj*)clone),
+              "Dump => Load round trip");
     TEST_FALSE(batch, NoMatchQuery_Equals(query, (Obj*)&EMPTY), "Equals");
 
     DECREF(query);
@@ -41,8 +40,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 
 
 void
-TestNoMatchQuery_run_tests()
-{
+TestNoMatchQuery_run_tests() {
     TestBatch *batch = TestBatch_new(2);
     TestBatch_Plan(batch);
     test_Dump_Load_and_Equals(batch);

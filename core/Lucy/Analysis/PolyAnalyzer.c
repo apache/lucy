@@ -25,16 +25,14 @@
 #include "Lucy/Analysis/RegexTokenizer.h"
 
 PolyAnalyzer*
-PolyAnalyzer_new(const CharBuf *language, VArray *analyzers)
-{
+PolyAnalyzer_new(const CharBuf *language, VArray *analyzers) {
     PolyAnalyzer *self = (PolyAnalyzer*)VTable_Make_Obj(POLYANALYZER);
     return PolyAnalyzer_init(self, language, analyzers);
 }
 
 PolyAnalyzer*
-PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language, 
-                  VArray *analyzers)
-{
+PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language,
+                  VArray *analyzers) {
     Analyzer_init((Analyzer*)self);
     if (analyzers) {
         for (uint32_t i = 0, max = VA_Get_Size(analyzers); i < max; i++) {
@@ -56,18 +54,18 @@ PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language,
 }
 
 void
-PolyAnalyzer_destroy(PolyAnalyzer *self)
-{
+PolyAnalyzer_destroy(PolyAnalyzer *self) {
     DECREF(self->analyzers);
     SUPER_DESTROY(self, POLYANALYZER);
 }
 
 VArray*
-PolyAnalyzer_get_analyzers(PolyAnalyzer *self) { return self->analyzers; }
+PolyAnalyzer_get_analyzers(PolyAnalyzer *self) {
+    return self->analyzers;
+}
 
 Inversion*
-PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion)
-{
+PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion) {
     VArray *const analyzers = self->analyzers;
     (void)INCREF(inversion);
 
@@ -83,8 +81,7 @@ PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion)
 }
 
 Inversion*
-PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text)
-{
+PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text) {
     VArray *const   analyzers     = self->analyzers;
     const uint32_t  num_analyzers = VA_Get_Size(analyzers);
     Inversion      *retval;
@@ -111,8 +108,7 @@ PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text)
 }
 
 bool_t
-PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other)
-{
+PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
     PolyAnalyzer *const twin = (PolyAnalyzer*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, POLYANALYZER)) return false;
@@ -121,16 +117,17 @@ PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other)
 }
 
 PolyAnalyzer*
-PolyAnalyzer_load(PolyAnalyzer *self, Obj *dump)
-{
+PolyAnalyzer_load(PolyAnalyzer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    PolyAnalyzer_load_t super_load = (PolyAnalyzer_load_t)
-        SUPER_METHOD(POLYANALYZER, PolyAnalyzer, Load);
+    PolyAnalyzer_load_t super_load = (PolyAnalyzer_load_t)SUPER_METHOD(
+                                         POLYANALYZER, PolyAnalyzer, Load);
     PolyAnalyzer *loaded = super_load(self, dump);
     VArray *analyzer_dumps = (VArray*)CERTIFY(
-        Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
+                                 Hash_Fetch_Str(source, "analyzers", 9),
+                                 VARRAY);
     VArray *analyzers = (VArray*)CERTIFY(
-        VA_Load(analyzer_dumps, (Obj*)analyzer_dumps), VARRAY);
+                            VA_Load(analyzer_dumps, (Obj*)analyzer_dumps),
+                            VARRAY);
     PolyAnalyzer_init(loaded, NULL, analyzers);
     DECREF(analyzers);
     return loaded;

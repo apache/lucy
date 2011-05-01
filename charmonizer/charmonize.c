@@ -34,12 +34,11 @@
 #include "Charmonizer/Core/HeaderChecker.h"
 #include "Charmonizer/Core/ConfWriter.h"
 
-int main(int argc, char **argv) 
-{
+int main(int argc, char **argv) {
     /* Parse and process arguments. */
     if (argc < 3) {
-        fprintf(stderr, 
-            "Usage: ./charmonize CC_COMMAND CC_FLAGS [VERBOSITY]\n");
+        fprintf(stderr,
+                "Usage: ./charmonize CC_COMMAND CC_FLAGS [VERBOSITY]\n");
         exit(1);
     }
     else {

@@ -41,7 +41,7 @@ class Lucy::Search::MatchAllMatcher inherits Lucy::Search::Matcher {
     public float
     Score(MatchAllMatcher* self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(MatchAllMatcher* self);
 }
 

@@ -23,14 +23,14 @@ __END__
 __BINDING__
 
 my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy    PACKAGE = Lucy::Index::Similarity     
+MODULE = Lucy    PACKAGE = Lucy::Index::Similarity
 
 SV*
 get_norm_decoder(self)
     lucy_Similarity *self;
 CODE:
-    RETVAL = newSVpvn( (char*)Lucy_Sim_Get_Norm_Decoder(self), 
-        (256 * sizeof(float)) );
+    RETVAL = newSVpvn((char*)Lucy_Sim_Get_Norm_Decoder(self),
+                      (256 * sizeof(float)));
 OUTPUT: RETVAL
 END_XS_CODE
 

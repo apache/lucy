@@ -34,7 +34,7 @@ class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
      * @param optional_query Query which should match.
      */
     public inert RequiredOptionalQuery*
-    init(RequiredOptionalQuery *self, Query *required_query, 
+    init(RequiredOptionalQuery *self, Query *required_query,
          Query *optional_query);
 
     /** Getter for the required Query. */
@@ -54,7 +54,7 @@ class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
     Set_Optional_Query(RequiredOptionalQuery *self, Query *optional_query);
 
     public incremented Compiler*
-    Make_Compiler(RequiredOptionalQuery *self, Searcher *searcher, 
+    Make_Compiler(RequiredOptionalQuery *self, Searcher *searcher,
                   float boost);
 
     public incremented CharBuf*
@@ -71,11 +71,11 @@ class Lucy::Search::RequiredOptionalCompiler cnick ReqOptCompiler
     new(RequiredOptionalQuery *parent, Searcher *searcher, float boost);
 
     inert RequiredOptionalCompiler*
-    init(RequiredOptionalCompiler *self, RequiredOptionalQuery *parent, 
+    init(RequiredOptionalCompiler *self, RequiredOptionalQuery *parent,
          Searcher *searcher, float boost);
 
     public incremented nullable Matcher*
-    Make_Matcher(RequiredOptionalCompiler *self, SegReader *reader, 
+    Make_Matcher(RequiredOptionalCompiler *self, SegReader *reader,
                  bool_t need_score);
 }
 

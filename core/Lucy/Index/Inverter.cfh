@@ -78,7 +78,7 @@ class Lucy::Index::Inverter inherits Lucy::Object::Obj {
      *
      * @return the number of fields which will be iterated over.
      */
-    public uint32_t 
+    public uint32_t
     Iterate(Inverter *self);
 
     /** Proceed to the next field.  Fields are iterated in order of Segment
@@ -158,10 +158,10 @@ private final class Lucy::Index::Inverter::InverterEntry cnick InvEntry
     new(Schema *schema = NULL, const CharBuf *field_name, int32_t field_num);
 
     inert InverterEntry*
-    init(InverterEntry *self = NULL, Schema *schema, 
+    init(InverterEntry *self = NULL, Schema *schema,
          const CharBuf *field_name, int32_t field_num);
 
-    public int32_t 
+    public int32_t
     Compare_To(InverterEntry *self, Obj *other);
 
     /** Expunge all transient data.

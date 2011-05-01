@@ -24,7 +24,7 @@ class Lucy::Test::TestBatch inherits Lucy::Object::Obj {
     int64_t    test_num;
     int64_t    num_tests;
     int64_t    num_passed;
-    int64_t    num_failed; 
+    int64_t    num_failed;
     int64_t    num_skipped;
 
     inert incremented TestBatch*
@@ -39,54 +39,54 @@ class Lucy::Test::TestBatch inherits Lucy::Object::Obj {
     inert bool_t
     test_true(void *vself, bool_t condition, const char *pattern, ...);
 
-    inert bool_t 
+    inert bool_t
     test_false(void *vself, bool_t condition, const char *pattern, ...);
 
-    inert bool_t 
-    test_int_equals(void *vself, long got, long expected, 
+    inert bool_t
+    test_int_equals(void *vself, long got, long expected,
                     const char *pattern, ...);
 
-    inert bool_t 
+    inert bool_t
     test_float_equals(void *vself, double got, double expected,
                       const char *pattern, ...);
 
     inert bool_t
     test_string_equals(void *vself, const char *got, const char *expected,
-                       const char *pattern, ...); 
+                       const char *pattern, ...);
 
-    inert bool_t 
+    inert bool_t
     pass(void *vself, const char *pattern, ...);
 
-    inert bool_t 
+    inert bool_t
     fail(void *vself, const char *pattern, ...);
 
     inert void
     skip(void *vself, const char *pattern, ...);
 
-    bool_t 
-    VTest_True(TestBatch *self, bool_t condition, const char *pattern, 
+    bool_t
+    VTest_True(TestBatch *self, bool_t condition, const char *pattern,
                va_list args);
 
-    bool_t 
-    VTest_False(TestBatch *self, bool_t condition, const char *pattern, 
+    bool_t
+    VTest_False(TestBatch *self, bool_t condition, const char *pattern,
                 va_list args);
 
-    bool_t 
-    VTest_Int_Equals(TestBatch *self, long got, long expected, 
+    bool_t
+    VTest_Int_Equals(TestBatch *self, long got, long expected,
                      const char *pattern, va_list args);
 
-    bool_t 
+    bool_t
     VTest_Float_Equals(TestBatch *self, double got, double expected,
                        const char *pattern, va_list args);
 
     bool_t
     VTest_String_Equals(TestBatch *self, const char *got, const char *expected,
-                       const char *pattern, va_list args); 
+                       const char *pattern, va_list args);
 
-    bool_t 
+    bool_t
     VPass(TestBatch *self, const char *pattern, va_list args);
 
-    bool_t 
+    bool_t
     VFail(TestBatch *self, const char *pattern, va_list args);
 
     void

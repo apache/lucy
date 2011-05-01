@@ -26,14 +26,14 @@ struct CFCParcel;
 struct CFCType;
 
 CFCVariable*
-CFCVariable_new(struct CFCParcel *parcel, const char *exposure, 
-                const char *class_name, const char *class_cnick, 
+CFCVariable_new(struct CFCParcel *parcel, const char *exposure,
+                const char *class_name, const char *class_cnick,
                 const char *micro_sym, struct CFCType *type);
 
 CFCVariable*
-CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel, 
-                 const char *exposure, const char *class_name, 
-                 const char *class_cnick, const char *micro_sym, 
+CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
+                 const char *exposure, const char *class_name,
+                 const char *class_cnick, const char *micro_sym,
                  struct CFCType *type);
 
 void

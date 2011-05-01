@@ -46,17 +46,17 @@ class Lucy::Index::Posting::RichPosting cnick RichPost
     Read_Record(RichPosting *self, InStream *instream);
 
     incremented RawPosting*
-    Read_Raw(RichPosting *self, InStream *instream, int32_t last_doc_id, 
+    Read_Raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
              CharBuf *term_text, MemoryPool *mem_pool);
 
     void
-    Add_Inversion_To_Pool(RichPosting *self, PostingPool *post_pool, 
-                          Inversion *inversion, FieldType *type, 
-                          int32_t doc_id, float doc_boost, 
+    Add_Inversion_To_Pool(RichPosting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
                           float length_norm);
 
     incremented RichPostingMatcher*
-    Make_Matcher(RichPosting *self, Similarity *sim, PostingList *plist, 
+    Make_Matcher(RichPosting *self, Similarity *sim, PostingList *plist,
                  Compiler *compiler, bool_t need_score);
 }
 
@@ -64,7 +64,7 @@ class Lucy::Index::Posting::RichPostingMatcher cnick RichPostMatcher
     inherits Lucy::Index::Posting::ScorePostingMatcher {
 
     inert RichPostingMatcher*
-    init(RichPostingMatcher *self, Similarity *similarity, 
+    init(RichPostingMatcher *self, Similarity *similarity,
          PostingList *posting_list, Compiler *compiler);
 }
 

@@ -30,23 +30,21 @@
 #include "CFCUtil.h"
 
 void
-CFCUtil_null_check(const void *arg, const char *name, const char *file, int line)
-{
+CFCUtil_null_check(const void *arg, const char *name, const char *file,
+                   int line) {
     if (!arg) {
         CFCUtil_die("%s cannot be NULL at %s line %d", name, file, line);
     }
 }
 
 char*
-CFCUtil_strdup(const char *string)
-{
+CFCUtil_strdup(const char *string) {
     if (!string) { return NULL; }
     return CFCUtil_strndup(string, strlen(string));
 }
 
 char*
-CFCUtil_strndup(const char *string, size_t len)
-{
+CFCUtil_strndup(const char *string, size_t len) {
     if (!string) { return NULL; }
     char *copy = (char*)MALLOCATE(len + 1);
     memcpy(copy, string, len);
@@ -55,8 +53,7 @@ CFCUtil_strndup(const char *string, size_t len)
 }
 
 void
-CFCUtil_trim_whitespace(char *text)
-{
+CFCUtil_trim_whitespace(char *text) {
     if (!text) {
         return;
     }
@@ -68,7 +65,7 @@ CFCUtil_trim_whitespace(char *text)
     // Find end.
     size_t orig_len = strlen(text);
     char *limit = text + orig_len;
-    for ( ; limit > text; limit--) {
+    for (; limit > text; limit--) {
         if (!isspace(*(limit - 1))) { break; }
     }
 
@@ -80,13 +77,12 @@ CFCUtil_trim_whitespace(char *text)
 }
 
 void*
-CFCUtil_wrapped_malloc(size_t count, const char *file, int line)
-{
+CFCUtil_wrapped_malloc(size_t count, const char *file, int line) {
     void *pointer = malloc(count);
     if (pointer == NULL && count != 0) {
         if (sizeof(long) >= sizeof(size_t)) {
-            fprintf(stderr, "Can't malloc %lu bytes at %s line %d\n", 
-                (unsigned long)count, file, line);
+            fprintf(stderr, "Can't malloc %lu bytes at %s line %d\n",
+                    (unsigned long)count, file, line);
         }
         else {
             fprintf(stderr, "malloc failed at %s line %d\n", file, line);
@@ -97,14 +93,13 @@ CFCUtil_wrapped_malloc(size_t count, const char *file, int line)
 }
 
 void*
-CFCUtil_wrapped_calloc(size_t count, size_t size, const char *file, int line)
-{
+CFCUtil_wrapped_calloc(size_t count, size_t size, const char *file, int line) {
     void *pointer = calloc(count, size);
     if (pointer == NULL && count != 0) {
         if (sizeof(long) >= sizeof(size_t)) {
-            fprintf(stderr, 
-                "Can't calloc %lu elements of size %lu at %s line %d\n", 
-                (unsigned long)count, (unsigned long)size, file, line);
+            fprintf(stderr,
+                    "Can't calloc %lu elements of size %lu at %s line %d\n",
+                    (unsigned long)count, (unsigned long)size, file, line);
         }
         else {
             fprintf(stderr, "calloc failed at %s line %d\n", file, line);
@@ -115,13 +110,12 @@ CFCUtil_wrapped_calloc(size_t count, size_t size, const char *file, int line)
 }
 
 void*
-CFCUtil_wrapped_realloc(void *ptr, size_t size, const char *file, int line)
-{
+CFCUtil_wrapped_realloc(void *ptr, size_t size, const char *file, int line) {
     void *pointer = realloc(ptr, size);
     if (pointer == NULL && size != 0) {
         if (sizeof(long) >= sizeof(size_t)) {
-            fprintf(stderr, "Can't realloc %lu bytes at %s line %d\n", 
-                (unsigned long)size, file, line);
+            fprintf(stderr, "Can't realloc %lu bytes at %s line %d\n",
+                    (unsigned long)size, file, line);
         }
         else {
             fprintf(stderr, "realloc failed at %s line %d\n", file, line);
@@ -132,23 +126,21 @@ CFCUtil_wrapped_realloc(void *ptr, size_t size, const char *file, int line)
 }
 
 void
-CFCUtil_wrapped_free(void *ptr)
-{
+CFCUtil_wrapped_free(void *ptr) {
     free(ptr);
 }
 
 int
-CFCUtil_current(const char *orig, const char *dest)
-{
+CFCUtil_current(const char *orig, const char *dest) {
     // If the destination file doesn't exist, we're not current.
     struct stat dest_stat;
-    if (stat(dest, &dest_stat) == -1) { 
+    if (stat(dest, &dest_stat) == -1) {
         return false;
-    }   
+    }
 
     // If the source file is newer than the dest, we're not current.
     struct stat orig_stat;
-    if (stat(orig, &orig_stat) == -1) { 
+    if (stat(orig, &orig_stat) == -1) {
         CFCUtil_die("Missing source file '%s'", orig);
     }
     if (orig_stat.st_mtime > dest_stat.st_mtime) {
@@ -160,8 +152,7 @@ CFCUtil_current(const char *orig, const char *dest)
 }
 
 void
-CFCUtil_write_file(const char *filename, const char *content, size_t len)
-{
+CFCUtil_write_file(const char *filename, const char *content, size_t len) {
     FILE *fh = fopen(filename, "w+");
     if (fh == NULL) {
         CFCUtil_die("Couldn't open '%s': %s", filename, strerror(errno));
@@ -173,8 +164,7 @@ CFCUtil_write_file(const char *filename, const char *content, size_t len)
 }
 
 char*
-CFCUtil_slurp_file(const char *file_path, size_t *len_ptr) 
-{
+CFCUtil_slurp_file(const char *file_path, size_t *len_ptr) {
     FILE   *const file = fopen(file_path, "rb");
     char   *contents;
     size_t  len;
@@ -200,7 +190,7 @@ CFCUtil_slurp_file(const char *file_path, size_t *len_ptr)
     /* Weak error check, because CRLF might result in fewer chars read. */
     if (check_val <= 0) {
         CFCUtil_die("Tried to read %d characters of '%s', got %d", (int)len,
-            file_path, check_val);
+                    file_path, check_val);
     }
 
     /* Set length pointer for benefit of caller. */
@@ -215,11 +205,10 @@ CFCUtil_slurp_file(const char *file_path, size_t *len_ptr)
 }
 
 void
-CFCUtil_write_if_changed(const char *path, const char *content, size_t len)
-{
+CFCUtil_write_if_changed(const char *path, const char *content, size_t len) {
     FILE *f = fopen(path, "r");
     if (f) { // Does file exist?
-        if (fclose(f)) { 
+        if (fclose(f)) {
             CFCUtil_die("Error closing file '%s': %s", path, strerror(errno));
         }
         size_t existing_len;
@@ -236,9 +225,8 @@ CFCUtil_write_if_changed(const char *path, const char *content, size_t len)
     CFCUtil_write_file(path, content, len);
 }
 
-long 
-CFCUtil_flength(void *file) 
-{
+long
+CFCUtil_flength(void *file) {
     FILE *f = (FILE*)file;
     const long bookmark = (long)ftell(f);
     long check_val;
@@ -257,9 +245,8 @@ CFCUtil_flength(void *file)
     return len;
 }
 
-void 
-CFCUtil_die(const char* format, ...) 
-{
+void
+CFCUtil_die(const char* format, ...) {
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
@@ -268,9 +255,8 @@ CFCUtil_die(const char* format, ...)
     exit(1);
 }
 
-void 
-CFCUtil_warn(const char* format, ...) 
-{
+void
+CFCUtil_warn(const char* format, ...) {
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
@@ -283,8 +269,7 @@ CFCUtil_warn(const char* format, ...)
 #include "XSUB.h"
 
 void*
-CFCUtil_make_perl_obj(void *ptr, const char *klass)
-{
+CFCUtil_make_perl_obj(void *ptr, const char *klass) {
     SV *inner_obj = newSV(0);
     SvOBJECT_on(inner_obj);
     PL_sv_objcount++;

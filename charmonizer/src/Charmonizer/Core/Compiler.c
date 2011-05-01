@@ -59,8 +59,7 @@ static void
 S_do_test_compile();
 
 void
-CC_init(const char *compiler_command, const char *compiler_flags)
-{
+CC_init(const char *compiler_command, const char *compiler_flags) {
     if (Util_verbosity) { printf("Creating compiler object...\n"); }
 
     /* Assign. */
@@ -86,8 +85,7 @@ CC_init(const char *compiler_command, const char *compiler_flags)
 }
 
 void
-CC_clean_up()
-{
+CC_clean_up() {
     char **dirs;
 
     for (dirs = inc_dirs; *dirs != NULL; dirs++) {
@@ -100,8 +98,7 @@ CC_clean_up()
 }
 
 static char*
-S_inc_dir_string()
-{
+S_inc_dir_string() {
     size_t needed = 0;
     char  *inc_dir_string;
     char **dirs;
@@ -120,33 +117,32 @@ S_inc_dir_string()
 }
 
 chaz_bool_t
-CC_compile_exe(const char *source_path, const char *exe_name, 
-               const char *code, size_t code_len)
-{
+CC_compile_exe(const char *source_path, const char *exe_name,
+               const char *code, size_t code_len) {
     const char *exe_ext        = OS_exe_ext();
     size_t   exe_file_buf_size = strlen(exe_name) + strlen(exe_ext) + 1;
     char    *exe_file          = (char*)malloc(exe_file_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
     char    *inc_dir_string    = S_inc_dir_string();
     size_t   command_max_size  = strlen(cc_command)
-                               + strlen(source_path)
-                               + strlen(exe_flag)
-                               + exe_file_buf_len
-                               + strlen(inc_dir_string)
-                               + strlen(cc_flags)
-                               + 200; /* command start, _charm_run, etc.  */
+                                 + strlen(source_path)
+                                 + strlen(exe_flag)
+                                 + exe_file_buf_len
+                                 + strlen(inc_dir_string)
+                                 + strlen(cc_flags)
+                                 + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     chaz_bool_t result;
     (void)code_len; /* Unused. */
-       
+
     /* Write the source file. */
     Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
     sprintf(command, "%s %s %s%s %s %s",
-        cc_command, source_path, 
-        exe_flag, exe_file, 
-        inc_dir_string, cc_flags);
+            cc_command, source_path,
+            exe_flag, exe_file,
+            inc_dir_string, cc_flags);
     if (Util_verbosity < 2) {
         OS_run_quietly(command);
     }
@@ -167,34 +163,33 @@ CC_compile_exe(const char *source_path, const char *exe_name,
 }
 
 chaz_bool_t
-CC_compile_obj(const char *source_path, const char *obj_name, 
-               const char *code, size_t code_len)
-{
+CC_compile_obj(const char *source_path, const char *obj_name,
+               const char *code, size_t code_len) {
     const char *obj_ext        = OS_obj_ext();
     size_t   obj_file_buf_size = strlen(obj_name) + strlen(obj_ext) + 1;
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
     char    *inc_dir_string    = S_inc_dir_string();
     size_t   command_max_size  = strlen(cc_command)
-                               + strlen(source_path)
-                               + strlen(object_flag)
-                               + obj_file_buf_len
-                               + strlen(inc_dir_string)
-                               + strlen(cc_flags)
-                               + 200; /* command start, _charm_run, etc.  */
+                                 + strlen(source_path)
+                                 + strlen(object_flag)
+                                 + obj_file_buf_len
+                                 + strlen(inc_dir_string)
+                                 + strlen(cc_flags)
+                                 + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     chaz_bool_t result;
     (void)code_len; /* Unused. */
-    
+
     /* Write the source file. */
     Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
     sprintf(command, "%s %s %s%s %s %s",
-        cc_command, source_path, 
-        object_flag, obj_file, 
-        inc_dir_string,
-        cc_flags);
+            cc_command, source_path,
+            object_flag, obj_file,
+            inc_dir_string,
+            cc_flags);
     if (Util_verbosity < 2) {
         OS_run_quietly(command);
     }
@@ -215,16 +210,15 @@ CC_compile_obj(const char *source_path, const char *obj_name,
 }
 
 chaz_bool_t
-CC_test_compile(char *source, size_t source_len)
-{
+CC_test_compile(char *source, size_t source_len) {
     chaz_bool_t compile_succeeded;
 
-    if ( !Util_remove_and_verify(try_app_name) ) {
+    if (!Util_remove_and_verify(try_app_name)) {
         Util_die("Failed to delete file '%s'", try_app_name);
     }
 
     compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME,
-        source, source_len);
+                                       source, source_len);
 
     S_clean_up_try();
 
@@ -232,22 +226,21 @@ CC_test_compile(char *source, size_t source_len)
 }
 
 char*
-CC_capture_output(char *source, size_t source_len, size_t *output_len) 
-{
+CC_capture_output(char *source, size_t source_len, size_t *output_len) {
     char *captured_output = NULL;
     chaz_bool_t compile_succeeded;
 
     /* Clear out previous versions and test to make sure removal worked. */
-    if ( !Util_remove_and_verify(try_app_name) ) {
+    if (!Util_remove_and_verify(try_app_name)) {
         Util_die("Failed to delete file '%s'", try_app_name);
     }
-    if ( !Util_remove_and_verify(TARGET_PATH) ) {
+    if (!Util_remove_and_verify(TARGET_PATH)) {
         Util_die("Failed to delete file '%s'", TARGET_PATH);
     }
 
     /* Attempt compilation; if successful, run app and slurp output. */
-    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME, 
-        source, source_len);
+    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME,
+                                       source, source_len);
     if (compile_succeeded) {
         OS_run_local(try_app_name, NULL);
         captured_output = Util_slurp_file(TARGET_PATH, output_len);
@@ -263,43 +256,40 @@ CC_capture_output(char *source, size_t source_len, size_t *output_len)
 }
 
 static void
-S_clean_up_try()
-{
+S_clean_up_try() {
     remove(TRY_SOURCE_PATH);
     OS_remove_exe(TRY_APP_BASENAME);
     remove(TARGET_PATH);
 }
 
 static void
-S_do_test_compile()
-{
+S_do_test_compile() {
     char *code = "int main() { return 0; }\n";
     chaz_bool_t success;
-    
+
     if (Util_verbosity) {
         printf("Trying to compile a small test file...\n");
     }
 
     /* Attempt compilation. */
-    success = CC_compile_exe("_charm_try.c", "_charm_try", 
-        code, strlen(code));
+    success = CC_compile_exe("_charm_try.c", "_charm_try",
+                             code, strlen(code));
     if (!success) { Util_die("Failed to compile a small test file"); }
-    
+
     /* Clean up. */
     remove("_charm_try.c");
     OS_remove_exe("_charm_try");
 }
 
 void
-CC_add_inc_dir(const char *dir)
-{
-    size_t num_dirs = 0; 
+CC_add_inc_dir(const char *dir) {
+    size_t num_dirs = 0;
     char **dirs = inc_dirs;
 
     /* Count up the present number of dirs, reallocate. */
     while (*dirs++ != NULL) { num_dirs++; }
     num_dirs += 1; /* Passed-in dir. */
-    inc_dirs = (char**)realloc(inc_dirs, (num_dirs + 1)*sizeof(char*));
+    inc_dirs = (char**)realloc(inc_dirs, (num_dirs + 1) * sizeof(char*));
 
     /* Put the passed-in dir at the end of the list. */
     inc_dirs[num_dirs - 1] = Util_strdup(dir);

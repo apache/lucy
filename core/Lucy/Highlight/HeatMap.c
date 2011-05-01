@@ -23,15 +23,13 @@
 #include "Lucy/Util/SortUtils.h"
 
 HeatMap*
-HeatMap_new(VArray *spans, uint32_t window)
-{
+HeatMap_new(VArray *spans, uint32_t window) {
     HeatMap *self = (HeatMap*)VTable_Make_Obj(HEATMAP);
     return HeatMap_init(self, spans, window);
 }
 
 HeatMap*
-HeatMap_init(HeatMap *self, VArray *spans, uint32_t window)
-{
+HeatMap_init(HeatMap *self, VArray *spans, uint32_t window) {
     VArray *spans_copy = VA_Shallow_Copy(spans);
     VArray *spans_plus_boosts;
 
@@ -51,15 +49,13 @@ HeatMap_init(HeatMap *self, VArray *spans, uint32_t window)
 }
 
 void
-HeatMap_destroy(HeatMap *self)
-{
+HeatMap_destroy(HeatMap *self) {
     DECREF(self->spans);
     SUPER_DESTROY(self, HEATMAP);
 }
 
 static int
-S_compare_i32(void *context, const void *va, const void *vb)
-{
+S_compare_i32(void *context, const void *va, const void *vb) {
     UNUSED_VAR(context);
     return *(int32_t*)va - *(int32_t*)vb;
 }
@@ -67,8 +63,7 @@ S_compare_i32(void *context, const void *va, const void *vb)
 // Create all the spans needed by HeatMap_Flatten_Spans, based on the source
 // offsets and lengths... but leave the scores at 0.
 static VArray*
-S_flattened_but_empty_spans(VArray *spans)
-{
+S_flattened_but_empty_spans(VArray *spans) {
     const uint32_t num_spans = VA_Get_Size(spans);
     int32_t *bounds = (int32_t*)MALLOCATE((num_spans * 2) * sizeof(int32_t));
 
@@ -76,10 +71,10 @@ S_flattened_but_empty_spans(VArray *spans)
     for (uint32_t i = 0; i < num_spans; i++) {
         Span *span            = (Span*)VA_Fetch(spans, i);
         bounds[i]             = span->offset;
-        bounds[i + num_spans] = span->offset + span->length; 
+        bounds[i + num_spans] = span->offset + span->length;
     }
-    Sort_quicksort(bounds, num_spans * 2, sizeof(uint32_t), 
-        S_compare_i32, NULL);
+    Sort_quicksort(bounds, num_spans * 2, sizeof(uint32_t),
+                   S_compare_i32, NULL);
     uint32_t num_bounds = 0;
     int32_t  last       = I32_MAX;
     for (uint32_t i = 0; i < num_spans * 2; i++) {
@@ -102,8 +97,7 @@ S_flattened_but_empty_spans(VArray *spans)
 }
 
 VArray*
-HeatMap_flatten_spans(HeatMap *self, VArray *spans)
-{
+HeatMap_flatten_spans(HeatMap *self, VArray *spans) {
     const uint32_t num_spans = VA_Get_Size(spans);
     UNUSED_VAR(self);
 
@@ -119,12 +113,12 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans)
         uint32_t dest_tick = 0;
         for (uint32_t i = 0; i < num_spans; i++) {
             Span *source_span = (Span*)VA_Fetch(spans, i);
-            int32_t source_span_end 
+            int32_t source_span_end
                 = source_span->offset + source_span->length;
 
             // Get the location of the flattened span that shares the source
             // span's offset.
-            for ( ; dest_tick < num_raw_flattened; dest_tick++) {
+            for (; dest_tick < num_raw_flattened; dest_tick++) {
                 Span *dest_span = (Span*)VA_Fetch(flattened, dest_tick);
                 if (dest_span->offset == source_span->offset) {
                     break;
@@ -158,8 +152,7 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans)
 }
 
 float
-HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2)
-{
+HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
     int32_t comparison = Span_Compare_To(span1, (Obj*)span2);
     Span *lower = comparison <= 0 ? span1 : span2;
     Span *upper = comparison >= 0 ? span1 : span2;
@@ -175,33 +168,32 @@ HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2)
     else {
         float factor = (self->window - distance) / (float)self->window;
         // Damp boost with greater distance.
-        factor *= factor; 
+        factor *= factor;
         return factor * (lower->weight + upper->weight);
     }
 }
 
 VArray*
-HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans) 
-{
+HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans) {
     VArray *boosts = VA_new(0);
     const uint32_t num_spans = VA_Get_Size(spans);
 
     if (num_spans > 1) {
-        for (uint32_t i = 0, max = num_spans - 1; i < max; i++ ) {
+        for (uint32_t i = 0, max = num_spans - 1; i < max; i++) {
             Span *span1 = (Span*)VA_Fetch(spans, i);
 
             for (uint32_t j = i + 1; j <= max; j++) {
                 Span *span2 = (Span*)VA_Fetch(spans, j);
-                float prox_score 
+                float prox_score
                     = HeatMap_Calc_Proximity_Boost(self, span1, span2);
                 if (prox_score == 0) {
                     break;
                 }
                 else {
                     int32_t length = (span2->offset - span1->offset)
-                        + span2->length;
-                    VA_Push(boosts, 
-                        (Obj*)Span_new(span1->offset, length, prox_score));
+                                     + span2->length;
+                    VA_Push(boosts,
+                            (Obj*)Span_new(span1->offset, length, prox_score));
                 }
             }
         }
@@ -211,6 +203,8 @@ HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans)
 }
 
 VArray*
-HeatMap_get_spans(HeatMap *self) { return self->spans; }
+HeatMap_get_spans(HeatMap *self) {
+    return self->spans;
+}
 
 

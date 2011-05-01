@@ -20,7 +20,7 @@ class Animal::Dog inherits Animal {
     public inert incremented Dog*
     new();
 
-    public inert Dog* 
+    public inert Dog*
     init(Dog *self);
 
     public void

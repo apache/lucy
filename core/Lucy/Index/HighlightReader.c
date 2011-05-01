@@ -32,34 +32,30 @@
 
 HighlightReader*
 HLReader_init(HighlightReader *self, Schema *schema, Folder *folder,
-              Snapshot *snapshot, VArray *segments, int32_t seg_tick)
-{
+              Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
-        seg_tick);
+                    seg_tick);
     ABSTRACT_CLASS_CHECK(self, HIGHLIGHTREADER);
     return self;
 }
 
 HighlightReader*
-HLReader_aggregator(HighlightReader *self, VArray *readers, 
-                    I32Array *offsets)
-{
+HLReader_aggregator(HighlightReader *self, VArray *readers,
+                    I32Array *offsets) {
     UNUSED_VAR(self);
     return (HighlightReader*)PolyHLReader_new(readers, offsets);
 }
 
 PolyHighlightReader*
-PolyHLReader_new(VArray *readers, I32Array *offsets)
-{
-    PolyHighlightReader *self 
+PolyHLReader_new(VArray *readers, I32Array *offsets) {
+    PolyHighlightReader *self
         = (PolyHighlightReader*)VTable_Make_Obj(POLYHIGHLIGHTREADER);
     return PolyHLReader_init(self, readers, offsets);
 }
 
 PolyHighlightReader*
-PolyHLReader_init(PolyHighlightReader *self, VArray *readers, 
-                   I32Array *offsets)
-{
+PolyHLReader_init(PolyHighlightReader *self, VArray *readers,
+                  I32Array *offsets) {
     uint32_t i, max;
     HLReader_init((HighlightReader*)self, NULL, NULL, NULL, NULL, -1);
     for (i = 0, max = VA_Get_Size(readers); i < max; i++) {
@@ -71,12 +67,11 @@ PolyHLReader_init(PolyHighlightReader *self, VArray *readers,
 }
 
 void
-PolyHLReader_close(PolyHighlightReader *self)
-{
+PolyHLReader_close(PolyHighlightReader *self) {
     if (self->readers) {
         uint32_t i, max;
         for (i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
-            HighlightReader *sub_reader 
+            HighlightReader *sub_reader
                 = (HighlightReader*)VA_Fetch(self->readers, i);
             if (sub_reader) { HLReader_Close(sub_reader); }
         }
@@ -88,57 +83,53 @@ PolyHLReader_close(PolyHighlightReader *self)
 }
 
 void
-PolyHLReader_destroy(PolyHighlightReader *self)
-{
+PolyHLReader_destroy(PolyHighlightReader *self) {
     DECREF(self->readers);
     DECREF(self->offsets);
     SUPER_DESTROY(self, POLYHIGHLIGHTREADER);
 }
 
 DocVector*
-PolyHLReader_fetch_doc_vec(PolyHighlightReader *self, int32_t doc_id)
-{
+PolyHLReader_fetch_doc_vec(PolyHighlightReader *self, int32_t doc_id) {
     uint32_t seg_tick = PolyReader_sub_tick(self->offsets, doc_id);
-    int32_t offset   = I32Arr_Get(self->offsets, seg_tick);
-    HighlightReader *sub_reader 
+    int32_t  offset   = I32Arr_Get(self->offsets, seg_tick);
+    HighlightReader *sub_reader
         = (HighlightReader*)VA_Fetch(self->readers, seg_tick);
     if (!sub_reader) { THROW(ERR, "Invalid doc_id: %i32", doc_id); }
     return HLReader_Fetch_Doc_Vec(sub_reader, doc_id - offset);
 }
 
 DefaultHighlightReader*
-DefHLReader_new(Schema *schema, Folder *folder, Snapshot *snapshot, 
-                VArray *segments, int32_t seg_tick)
-{
-    DefaultHighlightReader *self = (DefaultHighlightReader*)
-        VTable_Make_Obj(DEFAULTHIGHLIGHTREADER);
-    return DefHLReader_init(self, schema, folder, snapshot, segments, 
-        seg_tick);
+DefHLReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
+                VArray *segments, int32_t seg_tick) {
+    DefaultHighlightReader *self = (DefaultHighlightReader*)VTable_Make_Obj(
+                                       DEFAULTHIGHLIGHTREADER);
+    return DefHLReader_init(self, schema, folder, snapshot, segments,
+                            seg_tick);
 }
 
 DefaultHighlightReader*
 DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
                  Folder *folder, Snapshot *snapshot, VArray *segments,
-                 int32_t seg_tick)
-{
+                 int32_t seg_tick) {
     Segment *segment;
-    Hash    *metadata; 
+    Hash    *metadata;
     HLReader_init((HighlightReader*)self, schema, folder, snapshot,
-        segments, seg_tick);
+                  segments, seg_tick);
     segment  = DefHLReader_Get_Segment(self);
     metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "highlight", 9);
     if (!metadata) {
         metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "term_vectors", 12);
     }
-    
+
     // Check format.
     if (metadata) {
-        Obj     *format    = Hash_Fetch_Str(metadata, "format", 6);
+        Obj *format = Hash_Fetch_Str(metadata, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
             if (Obj_To_I64(format) != HLWriter_current_file_format) {
-                THROW(ERR, "Unsupported highlight data format: %i64", 
-                    Obj_To_I64(format));
+                THROW(ERR, "Unsupported highlight data format: %i64",
+                      Obj_To_I64(format));
             }
         }
     }
@@ -157,7 +148,7 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
                 DECREF(dat_file);
                 DECREF(self);
                 RETHROW(error);
-            }   
+            }
             self->dat_in = Folder_Open_In(folder, dat_file);
             if (!self->dat_in) {
                 Err *error = (Err*)INCREF(Err_get_error());
@@ -165,8 +156,8 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
                 DECREF(dat_file);
                 DECREF(self);
                 RETHROW(error);
-            }   
-        }   
+            }
+        }
         DECREF(ix_file);
         DECREF(dat_file);
     }
@@ -175,8 +166,7 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
 }
 
 void
-DefHLReader_close(DefaultHighlightReader *self)
-{
+DefHLReader_close(DefaultHighlightReader *self) {
     if (self->dat_in != NULL) {
         InStream_Close(self->dat_in);
         DECREF(self->dat_in);
@@ -190,16 +180,14 @@ DefHLReader_close(DefaultHighlightReader *self)
 }
 
 void
-DefHLReader_destroy(DefaultHighlightReader *self)
-{
+DefHLReader_destroy(DefaultHighlightReader *self) {
     DECREF(self->ix_in);
     DECREF(self->dat_in);
     SUPER_DESTROY(self, DEFAULTHIGHLIGHTREADER);
 }
 
 DocVector*
-DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id)
-{
+DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id) {
     DocVector *doc_vec = DocVec_new();
     int64_t file_pos;
     uint32_t num_fields;
@@ -222,8 +210,7 @@ DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id)
 
 void
 DefHLReader_read_record(DefaultHighlightReader *self, int32_t doc_id,
-                        ByteBuf *target)
-{
+                        ByteBuf *target) {
     InStream *dat_in = self->dat_in;
     InStream *ix_in  = self->ix_in;
 

@@ -23,8 +23,7 @@
 #include "Lucy/Util/StringHelper.h"
 
 CharBuf*
-IxFileNames_latest_snapshot(Folder *folder)
-{
+IxFileNames_latest_snapshot(Folder *folder) {
     DirHandle *dh = Folder_Open_Dir(folder, NULL);
     CharBuf   *entry = dh ? DH_Get_Entry(dh) : NULL;
     CharBuf   *retval   = NULL;
@@ -33,9 +32,9 @@ IxFileNames_latest_snapshot(Folder *folder)
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
 
     while (DH_Next(dh)) {
-        if (   CB_Starts_With_Str(entry, "snapshot_", 9)
+        if (CB_Starts_With_Str(entry, "snapshot_", 9)
             && CB_Ends_With_Str(entry, ".json", 5)
-        ) {
+           ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_gen) {
                 latest_gen = gen;
@@ -50,8 +49,7 @@ IxFileNames_latest_snapshot(Folder *folder)
 }
 
 uint64_t
-IxFileNames_extract_gen(const CharBuf *name)
-{
+IxFileNames_extract_gen(const CharBuf *name) {
     ZombieCharBuf *num_string = ZCB_WRAP(name);
 
     // Advance past first underscore.  Bail if we run out of string or if we
@@ -66,8 +64,7 @@ IxFileNames_extract_gen(const CharBuf *name)
 }
 
 ZombieCharBuf*
-IxFileNames_local_part(const CharBuf *path, ZombieCharBuf *target)
-{
+IxFileNames_local_part(const CharBuf *path, ZombieCharBuf *target) {
     ZombieCharBuf *scratch = ZCB_WRAP(path);
     size_t local_part_start = CB_Length(path);
     uint32_t code_point;

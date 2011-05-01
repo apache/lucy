@@ -81,7 +81,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
      * Usually invoked via the WARN(pattern, ...) macro.
      */
     inert void
-    warn_at(const char *file, int line, const char *func, 
+    warn_at(const char *file, int line, const char *func,
             const char *pattern, ...);
 
     /** Raise an exception. Usually invoked via the THROW macro.
@@ -130,7 +130,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
      * @return the object.
      */
     inert nullable Obj*
-    downcast(Obj *obj, VTable *vtable, const char *file, int line, 
+    downcast(Obj *obj, VTable *vtable, const char *file, int line,
                 const char *func);
 
     /** Verify that <code>obj</code> is not NULL and inherits from the class
@@ -139,7 +139,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
      * @return the object.
      */
     inert Obj*
-    certify(Obj *obj, VTable *vtable, const char *file, int line, 
+    certify(Obj *obj, VTable *vtable, const char *file, int line,
             const char *func);
 
     /** Verify that an object belongs to a subclass and not an abstract class.
@@ -163,11 +163,11 @@ __C__
 
 #define CFISH_ERR_ADD_FRAME(_error) \
     Lucy_Err_Add_Frame(_error, __FILE__, __LINE__, \
-        CFISH_ERR_FUNC_MACRO)
+                       CFISH_ERR_FUNC_MACRO)
 
 #define CFISH_RETHROW(_error) \
     lucy_Err_rethrow((lucy_Err*)_error, __FILE__, __LINE__, \
-        CFISH_ERR_FUNC_MACRO)
+                     CFISH_ERR_FUNC_MACRO)
 
 /** Macro version of lucy_Err_throw_at which inserts contextual information
  * automatically, provided that the compiler supports the necessary features.
@@ -176,46 +176,45 @@ __C__
  #ifdef CHY_HAS_ISO_VARIADIC_MACROS
   #define CFISH_THROW(_vtable, ...) \
     lucy_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
-        __VA_ARGS__)
+                      __VA_ARGS__)
   #define CFISH_WARN(...) \
     lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, __VA_ARGS__)
   #define CFISH_MAKE_MESS(...) \
     lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
-        __VA_ARGS__)
+                       __VA_ARGS__)
  #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS)
   #define CFISH_THROW(_vtable, args...) \
     lucy_Err_throw_at(_vtable, __FILE__, __LINE__, \
-        CFISH_ERR_FUNC_MACRO, ##args)
+                      CFISH_ERR_FUNC_MACRO, ##args)
   #define CFISH_WARN(args...) \
     lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
   #define CFISH_MAKE_MESS(args...) \
     lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
  #endif
 #else
-  void 
+  void
   CFISH_THROW(lucy_VTable *vtable, char* format, ...);
-  void 
+  void
   CFISH_WARN(char* format, ...);
-  void 
+  void
   CFISH_MAKE_MESS(char* format, ...);
 #endif
 
 #define CFISH_DOWNCAST(_obj, _vtable) \
     lucy_Err_downcast((lucy_Obj*)(_obj), (_vtable), \
-        __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
+                      __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 
 #define CFISH_CERTIFY(_obj, _vtable) \
     lucy_Err_certify((lucy_Obj*)(_obj), (_vtable), \
-        __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
+                     __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 static CHY_INLINE void
-lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable)
-{
+lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable) {
     lucy_VTable *const my_vtable = *(lucy_VTable**)obj;
     if (my_vtable == vtable) {
         lucy_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
-            Lucy_Obj_Get_Class_Name(obj));
+                                             Lucy_Obj_Get_Class_Name(obj));
         Lucy_Obj_Dec_RefCount(obj);
         lucy_Err_throw_mess(LUCY_ERR, mess);
     }

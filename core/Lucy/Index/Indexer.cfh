@@ -60,7 +60,7 @@ class Lucy::Index::Indexer inherits Lucy::Object::Obj {
     public inert int32_t CREATE;
 
     public inert incremented Indexer*
-    new(Schema *schema = NULL, Obj *index, IndexManager *manager = NULL, 
+    new(Schema *schema = NULL, Obj *index, IndexManager *manager = NULL,
         int32_t flags = 0);
 
     /** Open a new Indexer.  If the index already exists, update it.
@@ -71,7 +71,7 @@ class Lucy::Index::Indexer inherits Lucy::Object::Obj {
      * @param flags Flags governing behavior.
      */
     public inert Indexer*
-    init(Indexer *self, Schema *schema = NULL, Obj *index, 
+    init(Indexer *self, Schema *schema = NULL, Obj *index,
          IndexManager *manager = NULL, int32_t flags = 0);
 
     /** Add a document to the index.

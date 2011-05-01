@@ -35,37 +35,34 @@
 
 // Obtain/release read locks and commit locks.  If self->manager is
 // NULL, do nothing.
-static void 
+static void
 S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_filename);
-static void 
+static void
 S_obtain_deletion_lock(PolyReader *self);
-static void 
+static void
 S_release_read_lock(PolyReader *self);
-static void 
+static void
 S_release_deletion_lock(PolyReader *self);
 
 static Folder*
 S_derive_folder(Obj *index);
 
 PolyReader*
-PolyReader_new(Schema *schema, Folder *folder, Snapshot *snapshot, 
-               IndexManager *manager, VArray *sub_readers)
-{
+PolyReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
+               IndexManager *manager, VArray *sub_readers) {
     PolyReader *self = (PolyReader*)VTable_Make_Obj(POLYREADER);
-    return PolyReader_init(self, schema, folder, snapshot, manager, 
-        sub_readers);
+    return PolyReader_init(self, schema, folder, snapshot, manager,
+                           sub_readers);
 }
 
 PolyReader*
-PolyReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager)
-{
+PolyReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager) {
     PolyReader *self = (PolyReader*)VTable_Make_Obj(POLYREADER);
     return PolyReader_do_open(self, index, snapshot, manager);
 }
 
 static Obj*
-S_first_non_null(VArray *array)
-{
+S_first_non_null(VArray *array) {
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(array); i < max; i++) {
         Obj *thing = VA_Fetch(array, i);
@@ -75,8 +72,7 @@ S_first_non_null(VArray *array)
 }
 
 static void
-S_init_sub_readers(PolyReader *self, VArray *sub_readers) 
-{
+S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     uint32_t  i;
     uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
     int32_t *starts = (int32_t*)MALLOCATE(num_sub_readers * sizeof(int32_t));
@@ -98,8 +94,8 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers)
         Hash_Iterate(components);
         while (Hash_Next(components, (Obj**)&api, (Obj**)&component)) {
             VArray *readers = (VArray*)Hash_Fetch(data_readers, (Obj*)api);
-            if (!readers) { 
-                readers = VA_new(num_sub_readers); 
+            if (!readers) {
+                readers = VA_new(num_sub_readers);
                 Hash_Store(data_readers, (Obj*)api, (Obj*)readers);
             }
             VA_Store(readers, i, INCREF(component));
@@ -113,8 +109,9 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers)
         Hash_Iterate(data_readers);
         while (Hash_Next(data_readers, (Obj**)&api, (Obj**)&readers)) {
             DataReader *datareader = (DataReader*)CERTIFY(
-                S_first_non_null(readers), DATAREADER);
-            DataReader *aggregator 
+                                         S_first_non_null(readers),
+                                         DATAREADER);
+            DataReader *aggregator
                 = DataReader_Aggregator(datareader, readers, self->offsets);
             if (aggregator) {
                 CERTIFY(aggregator, DATAREADER);
@@ -125,37 +122,37 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers)
     DECREF(data_readers);
 
     {
-        DeletionsReader *del_reader = (DeletionsReader*)Hash_Fetch(
-            self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+        DeletionsReader *del_reader
+            = (DeletionsReader*)Hash_Fetch(
+                  self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
         self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
     }
 }
 
 PolyReader*
-PolyReader_init(PolyReader *self, Schema *schema, Folder *folder, 
-                Snapshot *snapshot, IndexManager *manager, 
-                VArray *sub_readers)
-{
+PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
+                Snapshot *snapshot, IndexManager *manager,
+                VArray *sub_readers) {
     self->doc_max    = 0;
     self->del_count  = 0;
 
-    if (sub_readers) { 
+    if (sub_readers) {
         uint32_t num_segs = VA_Get_Size(sub_readers);
         VArray *segments = VA_new(num_segs);
         uint32_t i;
         for (i = 0; i < num_segs; i++) {
-            SegReader *seg_reader = (SegReader*)CERTIFY(
-                VA_Fetch(sub_readers, i), SEGREADER);
+            SegReader *seg_reader
+                = (SegReader*)CERTIFY(VA_Fetch(sub_readers, i), SEGREADER);
             VA_Push(segments, INCREF(SegReader_Get_Segment(seg_reader)));
         }
-        IxReader_init((IndexReader*)self, schema, folder, snapshot, 
-            segments, -1, manager);
+        IxReader_init((IndexReader*)self, schema, folder, snapshot,
+                      segments, -1, manager);
         DECREF(segments);
-        S_init_sub_readers(self, sub_readers); 
+        S_init_sub_readers(self, sub_readers);
     }
     else {
-        IxReader_init((IndexReader*)self, schema, folder, snapshot, 
-            NULL, -1, manager);
+        IxReader_init((IndexReader*)self, schema, folder, snapshot,
+                      NULL, -1, manager);
         self->sub_readers = VA_new(0);
         self->offsets = I32Arr_new_steal(NULL, 0);
     }
@@ -164,29 +161,26 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
 }
 
 void
-PolyReader_close(PolyReader *self)
-{
-    PolyReader_close_t super_close 
+PolyReader_close(PolyReader *self) {
+    PolyReader_close_t super_close
         = (PolyReader_close_t)SUPER_METHOD(POLYREADER, PolyReader, Close);
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(self->sub_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(self->sub_readers, i);
-        SegReader_Close(seg_reader); 
+        SegReader_Close(seg_reader);
     }
     super_close(self);
 }
 
 void
-PolyReader_destroy(PolyReader *self)
-{
+PolyReader_destroy(PolyReader *self) {
     DECREF(self->sub_readers);
     DECREF(self->offsets);
     SUPER_DESTROY(self, POLYREADER);
 }
 
 Obj*
-S_try_open_elements(PolyReader *self)
-{
+S_try_open_elements(PolyReader *self) {
     VArray   *files             = Snapshot_List(self->snapshot);
     Folder   *folder            = PolyReader_Get_Folder(self);
     uint32_t  num_segs          = 0;
@@ -202,9 +196,9 @@ S_try_open_elements(PolyReader *self)
         if (Seg_valid_seg_name(entry)) {
             num_segs++;
         }
-        else if (   CB_Starts_With_Str(entry, "schema_", 7)
+        else if (CB_Starts_With_Str(entry, "schema_", 7)
                  && CB_Ends_With_Str(entry, ".json", 5)
-        ) {
+                ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_schema_gen) {
                 latest_schema_gen = gen;
@@ -225,7 +219,7 @@ S_try_open_elements(PolyReader *self)
         if (dump) { // read file successfully
             DECREF(self->schema);
             self->schema = (Schema*)CERTIFY(
-                VTable_Load_Obj(SCHEMA, (Obj*)dump), SCHEMA);
+                               VTable_Load_Obj(SCHEMA, (Obj*)dump), SCHEMA);
             DECREF(dump);
             DECREF(schema_file);
             schema_file = NULL;
@@ -279,11 +273,10 @@ CharBuf* PolyReader_race_condition_debug1 = NULL;
 int32_t  PolyReader_debug1_num_passes     = 0;
 
 PolyReader*
-PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot, 
-                   IndexManager *manager)
-{
-    Folder *folder = S_derive_folder(index);
-    uint64_t last_gen = 0;
+PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
+                   IndexManager *manager) {
+    Folder   *folder   = S_derive_folder(index);
+    uint64_t  last_gen = 0;
 
     PolyReader_init(self, NULL, folder, snapshot, manager, NULL);
     DECREF(folder);
@@ -312,7 +305,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
             // and return NULL.
             if (!target_snap_file) { break; }
         }
-        
+
         // Derive "generation" of this snapshot file from its name.
         gen = IxFileNames_extract_gen(target_snap_file);
 
@@ -326,7 +319,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
             ZombieCharBuf *temp = ZCB_WRAP_STR("temp", 4);
             if (Folder_Exists(folder, (CharBuf*)temp)) {
                 bool_t success = Folder_Rename(folder, (CharBuf*)temp,
-                    PolyReader_race_condition_debug1);
+                                               PolyReader_race_condition_debug1);
                 if (!success) { RETHROW(INCREF(Err_get_error())); }
             }
             PolyReader_debug1_num_passes++;
@@ -334,9 +327,9 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
 
         // If a Snapshot object was passed in, the file has already been read.
         // If that's not the case, we must read the file we just picked.
-        if (!snapshot) { 
-            CharBuf *error = PolyReader_try_read_snapshot(self->snapshot, 
-                folder, target_snap_file);
+        if (!snapshot) {
+            CharBuf *error = PolyReader_try_read_snapshot(self->snapshot, folder,
+                                                          target_snap_file);
 
             if (error) {
                 S_release_read_lock(self);
@@ -388,8 +381,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
 }
 
 static Folder*
-S_derive_folder(Obj *index)
-{
+S_derive_folder(Obj *index) {
     Folder *folder = NULL;
     if (Obj_Is_A(index, FOLDER)) {
         folder = (Folder*)INCREF(index);
@@ -404,34 +396,31 @@ S_derive_folder(Obj *index)
 }
 
 static void
-S_obtain_deletion_lock(PolyReader *self)
-{
+S_obtain_deletion_lock(PolyReader *self) {
     self->deletion_lock = IxManager_Make_Deletion_Lock(self->manager);
     Lock_Clear_Stale(self->deletion_lock);
     if (!Lock_Obtain(self->deletion_lock)) {
         DECREF(self->deletion_lock);
         self->deletion_lock = NULL;
-        THROW(LOCKERR, "Couldn't get commit lock"); 
+        THROW(LOCKERR, "Couldn't get commit lock");
     }
 }
 
 static void
-S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_file_name)
-{
+S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_file_name) {
     if (!self->manager) { return; }
     self->read_lock = IxManager_Make_Snapshot_Read_Lock(self->manager,
-        snapshot_file_name);
+                                                        snapshot_file_name);
 
     Lock_Clear_Stale(self->read_lock);
     if (!Lock_Obtain(self->read_lock)) {
         DECREF(self->read_lock);
-        THROW(LOCKERR, "Couldn't get read lock for %o", snapshot_file_name); 
+        THROW(LOCKERR, "Couldn't get read lock for %o", snapshot_file_name);
     }
 }
 
 static void
-S_release_read_lock(PolyReader *self)
-{
+S_release_read_lock(PolyReader *self) {
     if (self->read_lock) {
         Lock_Release(self->read_lock);
         DECREF(self->read_lock);
@@ -440,8 +429,7 @@ S_release_read_lock(PolyReader *self)
 }
 
 static void
-S_release_deletion_lock(PolyReader *self)
-{
+S_release_deletion_lock(PolyReader *self) {
     if (self->deletion_lock) {
         Lock_Release(self->deletion_lock);
         DECREF(self->deletion_lock);
@@ -449,58 +437,54 @@ S_release_deletion_lock(PolyReader *self)
     }
 }
 
-int32_t 
-PolyReader_doc_max(PolyReader *self)
-{
+int32_t
+PolyReader_doc_max(PolyReader *self) {
     return self->doc_max;
 }
 
 int32_t
-PolyReader_doc_count(PolyReader *self)
-{
+PolyReader_doc_count(PolyReader *self) {
     return self->doc_max - self->del_count;
 }
 
 int32_t
-PolyReader_del_count(PolyReader *self)
-{
+PolyReader_del_count(PolyReader *self) {
     return self->del_count;
 }
 
 I32Array*
-PolyReader_offsets(PolyReader *self) 
-{
+PolyReader_offsets(PolyReader *self) {
     return (I32Array*)INCREF(self->offsets);
 }
 
 VArray*
-PolyReader_seg_readers(PolyReader *self)
-{
+PolyReader_seg_readers(PolyReader *self) {
     return (VArray*)VA_Shallow_Copy(self->sub_readers);
 }
 
 VArray*
-PolyReader_get_seg_readers(PolyReader *self) { return self->sub_readers; }
+PolyReader_get_seg_readers(PolyReader *self) {
+    return self->sub_readers;
+}
 
 uint32_t
-PolyReader_sub_tick(I32Array *offsets, int32_t doc_id)
-{
+PolyReader_sub_tick(I32Array *offsets, int32_t doc_id) {
     int32_t size = I32Arr_Get_Size(offsets);
     if (size == 0) {
         return 0;
     }
-    
-    int32_t lo     = -1; 
-    int32_t hi     = size;
+
+    int32_t lo = -1;
+    int32_t hi = size;
     while (hi - lo > 1) {
-        int32_t mid = lo + ((hi - lo) / 2); 
+        int32_t mid = lo + ((hi - lo) / 2);
         int32_t offset = I32Arr_Get(offsets, mid);
         if (doc_id <= offset) {
             hi = mid;
-        }   
+        }
         else {
             lo = mid;
-        }   
+        }
     }
     if (hi == size) {
         hi--;
@@ -518,5 +502,5 @@ PolyReader_sub_tick(I32Array *offsets, int32_t doc_id)
 
     return hi;
 }
-    
+
 

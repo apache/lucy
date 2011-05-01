@@ -32,16 +32,14 @@
 
 SegWriter*
 SegWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-              PolyReader *polyreader)
-{
+              PolyReader *polyreader) {
     SegWriter *self = (SegWriter*)VTable_Make_Obj(SEGWRITER);
     return SegWriter_init(self, schema, snapshot, segment, polyreader);
 }
 
 SegWriter*
 SegWriter_init(SegWriter *self, Schema *schema, Snapshot *snapshot,
-               Segment *segment, PolyReader *polyreader)
-{
+               Segment *segment, PolyReader *polyreader) {
     Architecture *arch   = Schema_Get_Architecture(schema);
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
     self->by_api   = Hash_new(0);
@@ -52,8 +50,7 @@ SegWriter_init(SegWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-SegWriter_destroy(SegWriter *self) 
-{
+SegWriter_destroy(SegWriter *self) {
     DECREF(self->inverter);
     DECREF(self->writers);
     DECREF(self->by_api);
@@ -62,8 +59,8 @@ SegWriter_destroy(SegWriter *self)
 }
 
 void
-SegWriter_register(SegWriter *self, const CharBuf *api, DataWriter *component)
-{
+SegWriter_register(SegWriter *self, const CharBuf *api,
+                   DataWriter *component) {
     CERTIFY(component, DATAWRITER);
     if (Hash_Fetch(self->by_api, (Obj*)api)) {
         THROW(ERR, "API %o already registered", api);
@@ -72,27 +69,24 @@ SegWriter_register(SegWriter *self, const CharBuf *api, DataWriter *component)
 }
 
 Obj*
-SegWriter_fetch(SegWriter *self, const CharBuf *api)
-{
+SegWriter_fetch(SegWriter *self, const CharBuf *api) {
     return Hash_Fetch(self->by_api, (Obj*)api);
 }
 
 void
-SegWriter_add_writer(SegWriter *self, DataWriter *writer)
-{
+SegWriter_add_writer(SegWriter *self, DataWriter *writer) {
     VA_Push(self->writers, (Obj*)writer);
 }
 
 void
-SegWriter_prep_seg_dir(SegWriter *self)
-{
+SegWriter_prep_seg_dir(SegWriter *self) {
     Folder  *folder   = SegWriter_Get_Folder(self);
     CharBuf *seg_name = Seg_Get_Name(self->segment);
 
     // Clear stale segment files from crashed indexing sessions.
     if (Folder_Exists(folder, seg_name)) {
         bool_t result = Folder_Delete_Tree(folder, seg_name);
-        if (!result) { 
+        if (!result) {
             THROW(ERR, "Couldn't completely remove '%o'", seg_name);
         }
     }
@@ -105,8 +99,7 @@ SegWriter_prep_seg_dir(SegWriter *self)
 }
 
 void
-SegWriter_add_doc(SegWriter *self, Doc *doc, float boost)
-{
+SegWriter_add_doc(SegWriter *self, Doc *doc, float boost) {
     int32_t doc_id = (int32_t)Seg_Increment_Count(self->segment, 1);
     Inverter_Invert_Doc(self->inverter, doc);
     Inverter_Set_Boost(self->inverter, boost);
@@ -114,8 +107,8 @@ SegWriter_add_doc(SegWriter *self, Doc *doc, float boost)
 }
 
 void
-SegWriter_add_inverted_doc(SegWriter *self, Inverter *inverter, int32_t doc_id)
-{
+SegWriter_add_inverted_doc(SegWriter *self, Inverter *inverter,
+                           int32_t doc_id) {
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)VA_Fetch(self->writers, i);
@@ -127,8 +120,7 @@ SegWriter_add_inverted_doc(SegWriter *self, Inverter *inverter, int32_t doc_id)
 // SegReader's number because the DeletionsWriter and the SegReader are
 // probably out of sync.
 static void
-S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map)
-{
+S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map) {
     uint32_t doc_count = SegReader_Doc_Max(reader);
     uint32_t i, max;
     for (i = 1, max = I32Arr_Get_Size(doc_map); i < max; i++) {
@@ -138,8 +130,7 @@ S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map)
 }
 
 void
-SegWriter_add_segment(SegWriter *self, SegReader *reader, I32Array *doc_map)
-{
+SegWriter_add_segment(SegWriter *self, SegReader *reader, I32Array *doc_map) {
     uint32_t i, max;
 
     // Bulk add the slab of documents to the various writers.
@@ -157,8 +148,8 @@ SegWriter_add_segment(SegWriter *self, SegReader *reader, I32Array *doc_map)
 }
 
 void
-SegWriter_merge_segment(SegWriter *self, SegReader *reader, I32Array *doc_map)
-{
+SegWriter_merge_segment(SegWriter *self, SegReader *reader,
+                        I32Array *doc_map) {
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
     CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
     uint32_t i, max;
@@ -178,8 +169,7 @@ SegWriter_merge_segment(SegWriter *self, SegReader *reader, I32Array *doc_map)
 }
 
 void
-SegWriter_delete_segment(SegWriter *self, SegReader *reader)
-{
+SegWriter_delete_segment(SegWriter *self, SegReader *reader) {
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
     CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
     uint32_t i, max;
@@ -196,8 +186,7 @@ SegWriter_delete_segment(SegWriter *self, SegReader *reader)
 }
 
 void
-SegWriter_finish(SegWriter *self)
-{
+SegWriter_finish(SegWriter *self) {
     CharBuf *seg_name = Seg_Get_Name(self->segment);
     uint32_t i, max;
 
@@ -221,19 +210,19 @@ SegWriter_finish(SegWriter *self)
 }
 
 void
-SegWriter_add_data_writer(SegWriter *self, DataWriter *writer)
-{
+SegWriter_add_data_writer(SegWriter *self, DataWriter *writer) {
     VA_Push(self->writers, (Obj*)writer);
 }
 
 void
-SegWriter_set_del_writer(SegWriter *self, DeletionsWriter *del_writer)
-{
+SegWriter_set_del_writer(SegWriter *self, DeletionsWriter *del_writer) {
     DECREF(self->del_writer);
     self->del_writer = (DeletionsWriter*)INCREF(del_writer);
 }
 
 DeletionsWriter*
-SegWriter_get_del_writer(SegWriter *self) { return self->del_writer; }
+SegWriter_get_del_writer(SegWriter *self) {
+    return self->del_writer;
+}
 
 

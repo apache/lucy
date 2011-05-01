@@ -49,25 +49,25 @@ chaz_AllTests_run();
  * fallbacks.
  */
 
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_TestDirManip_prepare();
 
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_TestFuncMacro_prepare();
 
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_TestHeaders_prepare();
 
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_TestIntegers_prepare();
 
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_TestLargeFiles_prepare();
 
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_TestUnusedVars_prepare();
 
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_TestVariadicMacros_prepare();
 
 void

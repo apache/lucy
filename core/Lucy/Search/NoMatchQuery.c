@@ -28,23 +28,20 @@
 #include "Lucy/Util/Freezer.h"
 
 NoMatchQuery*
-NoMatchQuery_new()
-{
+NoMatchQuery_new() {
     NoMatchQuery *self = (NoMatchQuery*)VTable_Make_Obj(NOMATCHQUERY);
     return NoMatchQuery_init(self);
 }
 
 NoMatchQuery*
-NoMatchQuery_init(NoMatchQuery *self)
-{
+NoMatchQuery_init(NoMatchQuery *self) {
     Query_init((Query*)self, 0.0f);
     self->fails_to_match = true;
     return self;
 }
 
 bool_t
-NoMatchQuery_equals(NoMatchQuery *self, Obj *other)
-{
+NoMatchQuery_equals(NoMatchQuery *self, Obj *other) {
     NoMatchQuery *twin = (NoMatchQuery*)other;
     if (!Obj_Is_A(other, NOMATCHQUERY)) return false;
     if (self->boost != twin->boost) return false;
@@ -53,42 +50,41 @@ NoMatchQuery_equals(NoMatchQuery *self, Obj *other)
 }
 
 CharBuf*
-NoMatchQuery_to_string(NoMatchQuery *self)
-{
+NoMatchQuery_to_string(NoMatchQuery *self) {
     UNUSED_VAR(self);
     return CB_new_from_trusted_utf8("[NOMATCH]", 9);
 }
 
 Compiler*
-NoMatchQuery_make_compiler(NoMatchQuery *self, Searcher *searcher, 
-                            float boost)
-{
+NoMatchQuery_make_compiler(NoMatchQuery *self, Searcher *searcher,
+                           float boost) {
     return (Compiler*)NoMatchCompiler_new(self, searcher, boost);
 }
 
 void
-NoMatchQuery_set_fails_to_match(NoMatchQuery *self, bool_t fails_to_match)
-    { self->fails_to_match = fails_to_match; }
+NoMatchQuery_set_fails_to_match(NoMatchQuery *self, bool_t fails_to_match) {
+    self->fails_to_match = fails_to_match;
+}
+
 bool_t
-NoMatchQuery_get_fails_to_match(NoMatchQuery *self) 
-    { return self->fails_to_match; }
+NoMatchQuery_get_fails_to_match(NoMatchQuery *self) {
+    return self->fails_to_match;
+}
 
 Obj*
-NoMatchQuery_dump(NoMatchQuery *self)
-{
+NoMatchQuery_dump(NoMatchQuery *self) {
     NoMatchQuery_dump_t super_dump
         = (NoMatchQuery_dump_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "fails_to_match", 14, (Obj*)CB_newf("%i64",
-        (int64_t)self->fails_to_match));
+    Hash_Store_Str(dump, "fails_to_match", 14,
+                   (Obj*)CB_newf("%i64", (int64_t)self->fails_to_match));
     return (Obj*)dump;
 }
 
 NoMatchQuery*
-NoMatchQuery_load(NoMatchQuery *self, Obj *dump)
-{
+NoMatchQuery_load(NoMatchQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    NoMatchQuery_load_t super_load 
+    NoMatchQuery_load_t super_load
         = (NoMatchQuery_load_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Load);
     NoMatchQuery *loaded = super_load(self, dump);
     Obj *fails = Cfish_Hash_Fetch_Str(source, "fails_to_match", 14);
@@ -102,14 +98,12 @@ NoMatchQuery_load(NoMatchQuery *self, Obj *dump)
 }
 
 void
-NoMatchQuery_serialize(NoMatchQuery *self, OutStream *outstream)
-{
+NoMatchQuery_serialize(NoMatchQuery *self, OutStream *outstream) {
     OutStream_Write_I8(outstream, !!self->fails_to_match);
 }
 
 NoMatchQuery*
-NoMatchQuery_deserialize(NoMatchQuery *self, InStream *instream)
-{
+NoMatchQuery_deserialize(NoMatchQuery *self, InStream *instream) {
     self = self ? self : (NoMatchQuery*)VTable_Make_Obj(NOMATCHQUERY);
     NoMatchQuery_init(self);
     self->fails_to_match = !!InStream_Read_I8(instream);
@@ -119,33 +113,29 @@ NoMatchQuery_deserialize(NoMatchQuery *self, InStream *instream)
 /**********************************************************************/
 
 NoMatchCompiler*
-NoMatchCompiler_new(NoMatchQuery *parent, Searcher *searcher, 
-                     float boost)
-{
-    NoMatchCompiler *self 
+NoMatchCompiler_new(NoMatchQuery *parent, Searcher *searcher,
+                    float boost) {
+    NoMatchCompiler *self
         = (NoMatchCompiler*)VTable_Make_Obj(NOMATCHCOMPILER);
     return NoMatchCompiler_init(self, parent, searcher, boost);
 }
 
 NoMatchCompiler*
-NoMatchCompiler_init(NoMatchCompiler *self, NoMatchQuery *parent, 
-                      Searcher *searcher, float boost)
-{
-    return (NoMatchCompiler*)Compiler_init((Compiler*)self, 
-        (Query*)parent, searcher, NULL, boost);
+NoMatchCompiler_init(NoMatchCompiler *self, NoMatchQuery *parent,
+                     Searcher *searcher, float boost) {
+    return (NoMatchCompiler*)Compiler_init((Compiler*)self, (Query*)parent,
+                                           searcher, NULL, boost);
 }
 
 NoMatchCompiler*
-NoMatchCompiler_deserialize(NoMatchCompiler *self, InStream *instream)
-{
+NoMatchCompiler_deserialize(NoMatchCompiler *self, InStream *instream) {
     self = self ? self : (NoMatchCompiler*)VTable_Make_Obj(NOMATCHCOMPILER);
     return (NoMatchCompiler*)Compiler_deserialize((Compiler*)self, instream);
 }
 
 Matcher*
-NoMatchCompiler_make_matcher(NoMatchCompiler *self, SegReader *reader, 
-                             bool_t need_score)
-{
+NoMatchCompiler_make_matcher(NoMatchCompiler *self, SegReader *reader,
+                             bool_t need_score) {
     UNUSED_VAR(self);
     UNUSED_VAR(reader);
     UNUSED_VAR(need_score);

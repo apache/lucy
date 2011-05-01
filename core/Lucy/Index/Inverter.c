@@ -33,22 +33,20 @@
 #include "Lucy/Plan/Schema.h"
 
 Inverter*
-Inverter_new(Schema *schema, Segment *segment)
-{
+Inverter_new(Schema *schema, Segment *segment) {
     Inverter *self = (Inverter*)VTable_Make_Obj(INVERTER);
     return Inverter_init(self, schema, segment);
 }
 
 Inverter*
-Inverter_init(Inverter *self, Schema *schema, Segment *segment)
-{
+Inverter_init(Inverter *self, Schema *schema, Segment *segment) {
     // Init.
     self->tick       = -1;
     self->doc        = NULL;
     self->sorted     = false;
     self->blank      = InvEntry_new(NULL, NULL, 0);
     self->current    = self->blank;
-    
+
     // Derive.
     self->entry_pool = VA_new(Schema_Num_Fields(schema));
     self->entries    = VA_new(Schema_Num_Fields(schema));
@@ -61,8 +59,7 @@ Inverter_init(Inverter *self, Schema *schema, Segment *segment)
 }
 
 void
-Inverter_destroy(Inverter *self) 
-{
+Inverter_destroy(Inverter *self) {
     Inverter_Clear(self);
     DECREF(self->blank);
     DECREF(self->entries);
@@ -73,83 +70,88 @@ Inverter_destroy(Inverter *self)
 }
 
 uint32_t
-Inverter_iterate(Inverter *self)
-{
+Inverter_iterate(Inverter *self) {
     self->tick = -1;
-    if (!self->sorted) { 
-        VA_Sort(self->entries, NULL, NULL); 
+    if (!self->sorted) {
+        VA_Sort(self->entries, NULL, NULL);
         self->sorted = true;
     }
     return VA_Get_Size(self->entries);
 }
 
 int32_t
-Inverter_next(Inverter *self)
-{
+Inverter_next(Inverter *self) {
     self->current = (InverterEntry*)VA_Fetch(self->entries, ++self->tick);
     if (!self->current) { self->current = self->blank; } // Exhausted.
-    return self->current->field_num; 
+    return self->current->field_num;
 }
 
 void
-Inverter_set_doc(Inverter *self, Doc *doc)
-{
+Inverter_set_doc(Inverter *self, Doc *doc) {
     Inverter_Clear(self); // Zap all cached field values and Inversions.
     self->doc = (Doc*)INCREF(doc);
 }
 
 void
-Inverter_set_boost(Inverter *self, float boost)
-{ self->boost = boost; }
+Inverter_set_boost(Inverter *self, float boost) {
+    self->boost = boost;
+}
 
 float
-Inverter_get_boost(Inverter *self)
-{ return self->boost; }
+Inverter_get_boost(Inverter *self) {
+    return self->boost;
+}
 
 Doc*
-Inverter_get_doc(Inverter *self)
-{ return self->doc; }
+Inverter_get_doc(Inverter *self) {
+    return self->doc;
+}
 
 CharBuf*
-Inverter_get_field_name(Inverter *self)
-{ return self->current->field; }
+Inverter_get_field_name(Inverter *self) {
+    return self->current->field;
+}
 
 Obj*
-Inverter_get_value(Inverter *self)
-{ return self->current->value; }
+Inverter_get_value(Inverter *self) {
+    return self->current->value;
+}
 
 FieldType*
-Inverter_get_type(Inverter *self)
-{ return self->current->type; }
+Inverter_get_type(Inverter *self) {
+    return self->current->type;
+}
 
 Analyzer*
-Inverter_get_analyzer(Inverter *self)
-{ return self->current->analyzer; }
+Inverter_get_analyzer(Inverter *self) {
+    return self->current->analyzer;
+}
 
 Similarity*
-Inverter_get_similarity(Inverter *self)
-{ return self->current->sim; }
+Inverter_get_similarity(Inverter *self) {
+    return self->current->sim;
+}
 
 Inversion*
-Inverter_get_inversion(Inverter *self)
-{ return self->current->inversion; }
+Inverter_get_inversion(Inverter *self) {
+    return self->current->inversion;
+}
 
 
 void
-Inverter_add_field(Inverter *self, InverterEntry *entry)
-{
+Inverter_add_field(Inverter *self, InverterEntry *entry) {
     // Get an Inversion, going through analyzer if appropriate.
     if (entry->analyzer) {
         DECREF(entry->inversion);
-        entry->inversion = Analyzer_Transform_Text(entry->analyzer, 
-            (CharBuf*)entry->value);
+        entry->inversion = Analyzer_Transform_Text(entry->analyzer,
+                                                   (CharBuf*)entry->value);
         Inversion_Invert(entry->inversion);
     }
     else if (entry->indexed || entry->highlightable) {
         ViewCharBuf *value = (ViewCharBuf*)entry->value;
         size_t token_len = ViewCB_Get_Size(value);
-        Token *seed = Token_new((char*)ViewCB_Get_Ptr8(value), 
-            token_len, 0, token_len, 1.0f, 1);
+        Token *seed = Token_new((char*)ViewCB_Get_Ptr8(value),
+                                token_len, 0, token_len, 1.0f, 1);
         DECREF(entry->inversion);
         entry->inversion = Inversion_new(seed);
         DECREF(seed);
@@ -162,8 +164,7 @@ Inverter_add_field(Inverter *self, InverterEntry *entry)
 }
 
 void
-Inverter_clear(Inverter *self)
-{
+Inverter_clear(Inverter *self) {
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(self->entries); i < max; i++) {
         InvEntry_Clear(VA_Fetch(self->entries, i));
@@ -175,29 +176,27 @@ Inverter_clear(Inverter *self)
 }
 
 InverterEntry*
-InvEntry_new(Schema *schema, const CharBuf *field, int32_t field_num)
-{
+InvEntry_new(Schema *schema, const CharBuf *field, int32_t field_num) {
     InverterEntry *self = (InverterEntry*)VTable_Make_Obj(INVERTERENTRY);
     return InvEntry_init(self, schema, field, field_num);
 }
 
 InverterEntry*
 InvEntry_init(InverterEntry *self, Schema *schema, const CharBuf *field,
-              int32_t field_num)
-{
+              int32_t field_num) {
     self->field_num  = field_num;
     self->field      = field ? CB_Clone(field) : NULL;
     self->inversion  = NULL;
 
     if (schema) {
-        self->analyzer =
-             (Analyzer*)INCREF(Schema_Fetch_Analyzer(schema, field));
+        self->analyzer
+            = (Analyzer*)INCREF(Schema_Fetch_Analyzer(schema, field));
         self->sim  = (Similarity*)INCREF(Schema_Fetch_Sim(schema, field));
         self->type = (FieldType*)INCREF(Schema_Fetch_Type(schema, field));
         if (!self->type) { THROW(ERR, "Unknown field: '%o'", field); }
 
         uint8_t prim_id = FType_Primitive_ID(self->type);
-        switch(prim_id & FType_PRIMITIVE_ID_MASK) {
+        switch (prim_id & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT:
                 self->value = (Obj*)ViewCB_new_from_trusted_utf8(NULL, 0);
                 break;
@@ -223,10 +222,10 @@ InvEntry_init(InverterEntry *self, Schema *schema, const CharBuf *field,
         self->indexed = FType_Indexed(self->type);
         if (self->indexed && FType_Is_A(self->type, NUMERICTYPE)) {
             THROW(ERR, "Field '%o' spec'd as indexed, but numerical types cannot "
-                "be indexed yet", field);
+                  "be indexed yet", field);
         }
         if (FType_Is_A(self->type, FULLTEXTTYPE)) {
-            self->highlightable 
+            self->highlightable
                 = FullTextType_Highlightable((FullTextType*)self->type);
         }
     }
@@ -234,8 +233,7 @@ InvEntry_init(InverterEntry *self, Schema *schema, const CharBuf *field,
 }
 
 void
-InvEntry_destroy(InverterEntry *self)
-{
+InvEntry_destroy(InverterEntry *self) {
     DECREF(self->field);
     DECREF(self->value);
     DECREF(self->analyzer);
@@ -246,16 +244,14 @@ InvEntry_destroy(InverterEntry *self)
 }
 
 void
-InvEntry_clear(InverterEntry *self)
-{
+InvEntry_clear(InverterEntry *self) {
     DECREF(self->inversion);
     self->inversion = NULL;
 }
 
 int32_t
-InvEntry_compare_to(InverterEntry *self, Obj *other)
-{
-    InverterEntry *competitor 
+InvEntry_compare_to(InverterEntry *self, Obj *other) {
+    InverterEntry *competitor
         = (InverterEntry*)CERTIFY(other, INVERTERENTRY);
     return self->field_num - competitor->field_num;
 }

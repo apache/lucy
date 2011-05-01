@@ -23,15 +23,13 @@
 #include "Lucy/Index/Similarity.h"
 
 FieldType*
-FType_init(FieldType *self)
-{
+FType_init(FieldType *self) {
     return FType_init2(self, 1.0f, false, false, false);
 }
 
 FieldType*
 FType_init2(FieldType *self, float boost, bool_t indexed, bool_t stored,
-            bool_t sortable)
-{
+            bool_t sortable) {
     self->boost              = boost;
     self->indexed            = indexed;
     self->stored             = stored;
@@ -41,50 +39,65 @@ FType_init2(FieldType *self, float boost, bool_t indexed, bool_t stored,
 }
 
 void
-FType_set_boost(FieldType *self, float boost) 
-    { self->boost = boost; }
+FType_set_boost(FieldType *self, float boost) {
+    self->boost = boost;
+}
+
 void
-FType_set_indexed(FieldType *self, bool_t indexed) 
-    { self->indexed = !!indexed; }
+FType_set_indexed(FieldType *self, bool_t indexed) {
+    self->indexed = !!indexed;
+}
+
 void
-FType_set_stored(FieldType *self, bool_t stored) 
-    { self->stored = !!stored; }
+FType_set_stored(FieldType *self, bool_t stored) {
+    self->stored = !!stored;
+}
+
 void
-FType_set_sortable(FieldType *self, bool_t sortable) 
-    { self->sortable = !!sortable; }
+FType_set_sortable(FieldType *self, bool_t sortable) {
+    self->sortable = !!sortable;
+}
 
 float
-FType_get_boost(FieldType *self)  { return self->boost; }
-bool_t
-FType_indexed(FieldType *self)    { return self->indexed; }
-bool_t
-FType_stored(FieldType *self)     { return self->stored; }
-bool_t
-FType_sortable(FieldType *self)   { return self->sortable; }
+FType_get_boost(FieldType *self) {
+    return self->boost;
+}
 
 bool_t
-FType_binary(FieldType *self) { 
-    UNUSED_VAR(self); 
-    return false; 
+FType_indexed(FieldType *self) {
+    return self->indexed;
+}
+
+bool_t
+FType_stored(FieldType *self) {
+    return self->stored;
+}
+
+bool_t
+FType_sortable(FieldType *self) {
+    return self->sortable;
+}
+
+bool_t
+FType_binary(FieldType *self) {
+    UNUSED_VAR(self);
+    return false;
 }
 
 Similarity*
-FType_similarity(FieldType *self)
-{
+FType_similarity(FieldType *self) {
     UNUSED_VAR(self);
     return NULL;
 }
 
 int32_t
-FType_compare_values(FieldType *self, Obj *a, Obj *b)
-{
+FType_compare_values(FieldType *self, Obj *a, Obj *b) {
     UNUSED_VAR(self);
     return Obj_Compare_To(a, b);
 }
 
 bool_t
-FType_equals(FieldType *self, Obj *other)
-{
+FType_equals(FieldType *self, Obj *other) {
     FieldType *twin = (FieldType*)other;
     if (twin == self) return true;
     if (FType_Get_VTable(self) != FType_Get_VTable(twin)) return false;

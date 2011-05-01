@@ -43,7 +43,7 @@ class Lucy::Index::Similarity cnick Sim
 
     /** Constructor. Takes no arguments.
      */
-    public inert Similarity* 
+    public inert Similarity*
     init(Similarity *self);
 
     /** Factory method for creating a Posting.
@@ -54,8 +54,8 @@ class Lucy::Index::Similarity cnick Sim
     /** Factory method for creating a PostingWriter.
      */
     incremented PostingWriter*
-    Make_Posting_Writer(Similarity *self, Schema *schema, Snapshot *snapshot, 
-                        Segment *segment, PolyReader *polyreader, 
+    Make_Posting_Writer(Similarity *self, Schema *schema, Snapshot *snapshot,
+                        Segment *segment, PolyReader *polyreader,
                         int32_t field_num);
 
     /** Return a score factor based on the frequency of a term in a given
@@ -64,7 +64,7 @@ class Lucy::Index::Similarity cnick Sim
      * freqs, since the more times a doc matches, the more relevant it is
      * likely to be.
      */
-    public float  
+    public float
     TF(Similarity *self, float freq);
 
     /** Calculate the Inverse Document Frequecy for a term in a given
@@ -110,7 +110,7 @@ class Lucy::Index::Similarity cnick Sim
      * range covered by the single-byte encoding is 7x10^9 to 2x10^-9.  The
      * accuracy is about one significant decimal digit.
      */
-    uint32_t 
+    uint32_t
     Encode_Norm(Similarity *self, float f);
 
     /** See encode_norm.
@@ -124,10 +124,10 @@ class Lucy::Index::Similarity cnick Sim
     public void
     Destroy(Similarity *self);
 
-    public incremented Obj* 
+    public incremented Obj*
     Dump(Similarity *self);
 
-    public incremented Similarity* 
+    public incremented Similarity*
     Load(Similarity *self, Obj *dump);
 
     public bool_t

@@ -25,28 +25,25 @@
 #include "Lucy/Store/FileWindow.h"
 
 static void
-S_no_op_method(const void *vself)
-{
+S_no_op_method(const void *vself) {
     UNUSED_VAR(vself);
 }
 
 static FileHandle*
-S_new_filehandle()
-{
+S_new_filehandle() {
     ZombieCharBuf *klass = ZCB_WRAP_STR("TestFileHandle", 14);
     FileHandle *fh;
     VTable *vtable = VTable_fetch_vtable((CharBuf*)klass);
     if (!vtable) {
         vtable = VTable_singleton((CharBuf*)klass, FILEHANDLE);
-    }   
+    }
     VTable_Override(vtable, S_no_op_method, Lucy_FH_Close_OFFSET);
     fh = (FileHandle*)VTable_Make_Obj(vtable);
     return FH_do_open(fh, NULL, 0);
 }
 
 void
-TestFH_run_tests()
-{
+TestFH_run_tests() {
     TestBatch     *batch  = TestBatch_new(2);
     FileHandle    *fh     = S_new_filehandle();
     ZombieCharBuf *foo    = ZCB_WRAP_STR("foo", 3);

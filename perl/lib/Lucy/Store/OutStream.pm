@@ -33,12 +33,12 @@ PPCODE:
     int i;
     for (i = 1; i < items; i++) {
         STRLEN len;
-        char *ptr = SvPV( ST(i), len);
+        char *ptr = SvPV(ST(i), len);
         Lucy_OutStream_Write_Bytes(self, ptr, len);
     }
 }
 
-void 
+void
 write_string(self, aSV)
     lucy_OutStream *self;
     SV *aSV;

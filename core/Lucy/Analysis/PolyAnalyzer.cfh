@@ -44,12 +44,12 @@ parcel Lucy;
  *     sv => Swedish,
  *     tr => Turkish,
  */
-class Lucy::Analysis::PolyAnalyzer 
+class Lucy::Analysis::PolyAnalyzer
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     VArray  *analyzers;
 
-    inert incremented PolyAnalyzer* 
+    inert incremented PolyAnalyzer*
     new(const CharBuf *language = NULL, VArray *analyzers = NULL);
 
     /**
@@ -61,8 +61,8 @@ class Lucy::Analysis::PolyAnalyzer
      * stoplist).  In general, the sequence should be: normalize, tokenize,
      * stopalize, stem.
      */
-    public inert PolyAnalyzer* 
-    init(PolyAnalyzer *self, const CharBuf *language = NULL, 
+    public inert PolyAnalyzer*
+    init(PolyAnalyzer *self, const CharBuf *language = NULL,
          VArray *analyzers = NULL);
 
     /** Getter for "analyzers" member.

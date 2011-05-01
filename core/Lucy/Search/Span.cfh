@@ -41,7 +41,7 @@ class Lucy::Search::Span inherits Lucy::Object::Obj {
      * @param weight A floating point weight.
      */
     public inert Span*
-    init(Span *self, int32_t offset, int32_t length, 
+    init(Span *self, int32_t offset, int32_t length,
          float weight = 0.0);
 
     /** Accessor for <code>offset</code> attribute.

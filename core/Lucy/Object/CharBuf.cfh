@@ -40,13 +40,13 @@ class Lucy::Object::CharBuf cnick CB
     /** Return a new CharBuf which holds a copy of the passed-in string.
      * Check for UTF-8 validity.
      */
-    inert incremented CharBuf* 
+    inert incremented CharBuf*
     new_from_utf8(const char *utf8, size_t size);
 
     /** Return a new CharBuf which holds a copy of the passed-in string.  No
      * validity checking is performed.
      */
-    inert incremented CharBuf* 
+    inert incremented CharBuf*
     new_from_trusted_utf8(const char *utf8, size_t size);
 
     /** Return a pointer to a new CharBuf which assumes ownership of the
@@ -74,14 +74,14 @@ class Lucy::Object::CharBuf cnick CB
      * set to please qsort and friends.
      */
     inert int
-    compare(const void *va, const void *vb); 
+    compare(const void *va, const void *vb);
 
     /** Perform lexical comparison of two CharBufs, with level of indirection
      * set to please qsort and friends, and return true if <code>a</code> is
      * less than <code>b</code>.
      */
     inert bool_t
-    less_than(const void *va, const void *vb); 
+    less_than(const void *va, const void *vb);
 
     public void
     Mimic(CharBuf *self, Obj *other);
@@ -217,7 +217,7 @@ class Lucy::Object::CharBuf cnick CB
      */
     CharBuf*
     To_CB8(CharBuf *self);
-    
+
     public incremented CharBuf*
     Clone(CharBuf *self);
 
@@ -313,13 +313,13 @@ class Lucy::Object::CharBuf cnick CB
     /** Concatenate the supplied text onto the end of the CharBuf.  Don't
      * check for UTF-8 validity.
      */
-    void 
+    void
     Cat_Trusted_Str(CharBuf *self, const char *ptr, size_t size);
 }
 
 class Lucy::Object::ViewCharBuf cnick ViewCB
     inherits Lucy::Object::CharBuf {
-    
+
     inert incremented ViewCharBuf*
     new_from_utf8(const char *utf8, size_t size);
 
@@ -348,7 +348,7 @@ class Lucy::Object::ViewCharBuf cnick ViewCB
     Nip_One(ViewCharBuf *self);
 
     /** Throws an error. */
-    char* 
+    char*
     Grow(ViewCharBuf *self, size_t size);
 
     public void
@@ -398,7 +398,7 @@ __C__
 
 #define CFISH_ZCB_WRAP(source) \
     lucy_ZCB_wrap(alloca(lucy_ZCB_size()), source)
-    
+
 #define CFISH_ZCB_WRAP_STR(ptr, size) \
     lucy_ZCB_wrap_str(alloca(lucy_ZCB_size()), ptr, size)
 

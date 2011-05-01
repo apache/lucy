@@ -25,8 +25,7 @@
 #include "Lucy/Util/Memory.h"
 
 int32_t
-StrHelp_overlap(const char *a, const char *b, size_t a_len,  size_t b_len)
-{
+StrHelp_overlap(const char *a, const char *b, size_t a_len,  size_t b_len) {
     size_t i;
     const size_t len = a_len <= b_len ? a_len : b_len;
 
@@ -39,8 +38,7 @@ StrHelp_overlap(const char *a, const char *b, size_t a_len,  size_t b_len)
 static const char base36_chars[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 uint32_t
-StrHelp_to_base36(uint64_t num, void *buffer) 
-{
+StrHelp_to_base36(uint64_t num, void *buffer) {
     char  my_buf[StrHelp_MAX_BASE36_BYTES];
     char *buf = my_buf + StrHelp_MAX_BASE36_BYTES - 1;
     char *end = buf;
@@ -50,7 +48,7 @@ StrHelp_to_base36(uint64_t num, void *buffer)
 
     // Convert to base 36 characters.
     do {
-        *(--buf) = base36_chars[ num % 36 ];
+        *(--buf) = base36_chars[num % 36];
         num /= 36;
     } while (num > 0);
 
@@ -62,8 +60,7 @@ StrHelp_to_base36(uint64_t num, void *buffer)
 }
 
 uint32_t
-StrHelp_encode_utf8_char(uint32_t code_point, void *buffer)
-{
+StrHelp_encode_utf8_char(uint32_t code_point, void *buffer) {
     uint8_t *buf = (uint8_t*)buffer;
     if (code_point <= 0x7F) { // ASCII
         buf[0] = (uint8_t)code_point;
@@ -75,16 +72,16 @@ StrHelp_encode_utf8_char(uint32_t code_point, void *buffer)
         return 2;
     }
     else if (code_point <= 0xFFFF) { // 3 byte range
-        buf[0] = (uint8_t)(0xE0 | ( code_point >> 12       ));
+        buf[0] = (uint8_t)(0xE0 | (code_point  >> 12));
         buf[1] = (uint8_t)(0x80 | ((code_point >> 6) & 0x3F));
-        buf[2] = (uint8_t)(0x80 | ( code_point       & 0x3f));
+        buf[2] = (uint8_t)(0x80 | (code_point        & 0x3f));
         return 3;
     }
     else if (code_point <= 0x10FFFF) { // 4 byte range
-        buf[0] = (uint8_t)(0xF0 | ( code_point >> 18        ));
+        buf[0] = (uint8_t)(0xF0 | (code_point  >> 18));
         buf[1] = (uint8_t)(0x80 | ((code_point >> 12) & 0x3F));
-        buf[2] = (uint8_t)(0x80 | ((code_point >> 6 ) & 0x3F));
-        buf[3] = (uint8_t)(0x80 | ( code_point        & 0x3f));
+        buf[2] = (uint8_t)(0x80 | ((code_point >> 6)  & 0x3F));
+        buf[3] = (uint8_t)(0x80 | (code_point         & 0x3f));
         return 4;
     }
     else {
@@ -94,8 +91,7 @@ StrHelp_encode_utf8_char(uint32_t code_point, void *buffer)
 }
 
 uint32_t
-StrHelp_decode_utf8_char(const char *ptr)
-{
+StrHelp_decode_utf8_char(const char *ptr) {
     const uint8_t *const string = (const uint8_t*)ptr;
     uint32_t retval = *string;
     int bytes = StrHelp_UTF8_COUNT[retval];
@@ -104,22 +100,22 @@ StrHelp_decode_utf8_char(const char *ptr)
         case 1:
             break;
 
-        case 2: 
-            retval =   ((retval    & 0x1F) << 6)
-                     |  (string[1] & 0x3F);
+        case 2:
+            retval = ((retval     & 0x1F) << 6)
+                     | (string[1] & 0x3F);
             break;
 
-        case 3: 
-            retval =   ((retval    & 0x0F) << 12)
+        case 3:
+            retval = ((retval      & 0x0F) << 12)
                      | ((string[1] & 0x3F) << 6)
-                     |  (string[2] & 0x3F);
+                     | (string[2]  & 0x3F);
             break;
 
-        case 4: 
-            retval =   ((retval    & 0x07) << 18)
+        case 4:
+            retval = ((retval      & 0x07) << 18)
                      | ((string[1] & 0x3F) << 12)
                      | ((string[2] & 0x3F) << 6)
-                     |  (string[3] & 0x3F);
+                     | (string[3]  & 0x3F);
             break;
 
         default:
@@ -130,8 +126,7 @@ StrHelp_decode_utf8_char(const char *ptr)
 }
 
 const char*
-StrHelp_back_utf8_char(const char *ptr, char *start)
-{
+StrHelp_back_utf8_char(const char *ptr, char *start) {
     while (--ptr >= start) {
         if ((*ptr & 0xC0) != 0x80) { return ptr; }
     }

@@ -21,13 +21,11 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-TestUnusedVars_prepare()
-{
+TestUnusedVars_prepare() {
     return Test_new_batch("UnusedVars", 2, TestUnusedVars_run);
 }
 void
-TestUnusedVars_run(TestBatch *batch)
-{
+TestUnusedVars_run(TestBatch *batch) {
 #ifdef UNUSED_VAR
     PASS(batch, "UNUSED_VAR macro is defined");
 #else

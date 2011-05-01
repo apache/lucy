@@ -24,10 +24,10 @@ parcel Lucy;
  * perform case folding to facilitate case-insensitive search
  * (L<CaseFolder|Lucy::Analysis::CaseFolder>).
  */
-abstract class Lucy::Analysis::Analyzer 
+abstract class Lucy::Analysis::Analyzer
     inherits Lucy::Object::Obj : dumpable {
 
-    public inert Analyzer* 
+    public inert Analyzer*
     init(Analyzer *self);
 
     /** Take a single L<Inversion|Lucy::Analysis::Inversion> as input

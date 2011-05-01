@@ -69,7 +69,7 @@ __END_C__
  * and scoring behavior for the field.  It is required if the field is
  * <code>indexed</code>.
  */
-abstract class Lucy::Plan::FieldType cnick FType 
+abstract class Lucy::Plan::FieldType cnick FType
     inherits Lucy::Object::Obj {
 
     float         boost;
@@ -77,11 +77,11 @@ abstract class Lucy::Plan::FieldType cnick FType
     bool_t        stored;
     bool_t        sortable;
 
-    inert FieldType* 
+    inert FieldType*
     init(FieldType *self);
 
-    inert FieldType* 
-    init2(FieldType *self, float boost = 1.0, bool_t indexed = false, 
+    inert FieldType*
+    init2(FieldType *self, float boost = 1.0, bool_t indexed = false,
           bool_t stored = false, bool_t sortable = false);
 
     /** Setter for <code>boost</code>.
@@ -168,9 +168,8 @@ abstract class Lucy::Plan::FieldType cnick FType
 __C__
 
 static CHY_INLINE int32_t
-lucy_FType_null_back_compare_values(lucy_FieldType *self, 
-                                    lucy_Obj *a, lucy_Obj *b)
-{
+lucy_FType_null_back_compare_values(lucy_FieldType *self,
+                                    lucy_Obj *a, lucy_Obj *b) {
     if (a == NULL) {
         if (b == NULL) { return 0; }
         else { return 1; }

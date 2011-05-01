@@ -18,7 +18,7 @@
  */
 
 #ifndef H_CHAZ_MEMORY
-#define H_CHAZ_MEMORY 
+#define H_CHAZ_MEMORY
 
 #ifdef __cplusplus
 extern "C" {

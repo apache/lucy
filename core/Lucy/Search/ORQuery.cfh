@@ -24,7 +24,7 @@ parcel Lucy;
  * child Queries.
  */
 
-class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery 
+class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery
     : dumpable {
 
     inert incremented ORQuery*
@@ -46,14 +46,14 @@ class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery
     Equals(ORQuery *self, Obj *other);
 }
 
-class Lucy::Search::ORCompiler 
+class Lucy::Search::ORCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented ORCompiler*
     new(ORQuery *parent, Searcher *searcher, float boost);
 
     inert ORCompiler*
-    init(ORCompiler *self, ORQuery *parent, Searcher *searcher, 
+    init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*

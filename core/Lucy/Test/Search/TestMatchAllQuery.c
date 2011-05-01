@@ -24,14 +24,13 @@
 #include "Lucy/Search/MatchAllQuery.h"
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
+test_Dump_Load_and_Equals(TestBatch *batch) {
     MatchAllQuery *query = MatchAllQuery_new();
     Obj           *dump  = (Obj*)MatchAllQuery_Dump(query);
     MatchAllQuery *clone = (MatchAllQuery*)MatchAllQuery_Load(query, dump);
 
-    TEST_TRUE(batch, MatchAllQuery_Equals(query, (Obj*)clone), 
-        "Dump => Load round trip");
+    TEST_TRUE(batch, MatchAllQuery_Equals(query, (Obj*)clone),
+              "Dump => Load round trip");
     TEST_FALSE(batch, MatchAllQuery_Equals(query, (Obj*)&EMPTY), "Equals");
 
     DECREF(query);
@@ -41,8 +40,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 
 
 void
-TestMatchAllQuery_run_tests()
-{
+TestMatchAllQuery_run_tests() {
     TestBatch *batch = TestBatch_new(2);
     TestBatch_Plan(batch);
     test_Dump_Load_and_Equals(batch);

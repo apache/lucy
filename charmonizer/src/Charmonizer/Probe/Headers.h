@@ -85,7 +85,7 @@ chaz_Headers_check(const char *header_name);
  *
  * HAS_PTHREAD_H
  */
-void 
+void
 chaz_Headers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES

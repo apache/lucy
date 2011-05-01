@@ -21,19 +21,17 @@
 #include "Lucy/Index/Similarity.h"
 
 RequiredOptionalMatcher*
-ReqOptMatcher_new(Similarity *similarity, Matcher *required_matcher, 
-                  Matcher *optional_matcher) 
-{
-    RequiredOptionalMatcher *self 
+ReqOptMatcher_new(Similarity *similarity, Matcher *required_matcher,
+                  Matcher *optional_matcher) {
+    RequiredOptionalMatcher *self
         = (RequiredOptionalMatcher*)VTable_Make_Obj(REQUIREDOPTIONALMATCHER);
-    return ReqOptMatcher_init(self, similarity, required_matcher, 
-        optional_matcher);
+    return ReqOptMatcher_init(self, similarity, required_matcher,
+                              optional_matcher);
 }
 
 RequiredOptionalMatcher*
-ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity, 
-                   Matcher *required_matcher, Matcher *optional_matcher) 
-{
+ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity,
+                   Matcher *required_matcher, Matcher *optional_matcher) {
     VArray *children = VA_new(2);
     VA_Push(children, INCREF(required_matcher));
     VA_Push(children, INCREF(optional_matcher));
@@ -51,39 +49,34 @@ ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity,
 }
 
 void
-ReqOptMatcher_destroy(RequiredOptionalMatcher *self) 
-{
+ReqOptMatcher_destroy(RequiredOptionalMatcher *self) {
     DECREF(self->req_matcher);
     DECREF(self->opt_matcher);
     SUPER_DESTROY(self, REQUIREDOPTIONALMATCHER);
 }
 
 int32_t
-ReqOptMatcher_next(RequiredOptionalMatcher *self)
-{
+ReqOptMatcher_next(RequiredOptionalMatcher *self) {
     return Matcher_Next(self->req_matcher);
 }
 
 int32_t
-ReqOptMatcher_advance(RequiredOptionalMatcher *self, int32_t target)
-{
+ReqOptMatcher_advance(RequiredOptionalMatcher *self, int32_t target) {
     return Matcher_Advance(self->req_matcher, target);
 }
 
 int32_t
-ReqOptMatcher_get_doc_id(RequiredOptionalMatcher *self)
-{
+ReqOptMatcher_get_doc_id(RequiredOptionalMatcher *self) {
     return Matcher_Get_Doc_ID(self->req_matcher);
 }
 
 float
-ReqOptMatcher_score(RequiredOptionalMatcher *self)
-{
+ReqOptMatcher_score(RequiredOptionalMatcher *self) {
     int32_t const current_doc = Matcher_Get_Doc_ID(self->req_matcher);
 
     if (self->opt_matcher_first_time) {
         self->opt_matcher_first_time = false;
-        if ( !Matcher_Advance(self->opt_matcher, current_doc) ) {
+        if (!Matcher_Advance(self->opt_matcher, current_doc)) {
             DECREF(self->opt_matcher);
             self->opt_matcher = NULL;
         }
@@ -106,7 +99,7 @@ ReqOptMatcher_score(RequiredOptionalMatcher *self)
 
         if (opt_matcher_doc == current_doc) {
             float score = Matcher_Score(self->req_matcher)
-                        + Matcher_Score(self->opt_matcher);
+                          + Matcher_Score(self->opt_matcher);
             score *= self->coord_factors[2];
             return score;
         }

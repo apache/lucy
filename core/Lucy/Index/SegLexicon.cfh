@@ -40,7 +40,7 @@ class Lucy::Index::SegLexicon cnick SegLex
      * @param field The field whose terms the Lexicon will iterate over.
      */
     inert incremented SegLexicon*
-    new(Schema *schema, Folder *folder, Segment *segment, 
+    new(Schema *schema, Folder *folder, Segment *segment,
         const CharBuf *field);
 
     inert SegLexicon*
@@ -53,7 +53,7 @@ class Lucy::Index::SegLexicon cnick SegLex
     int32_t
     Get_Field_Num(SegLexicon *self);
 
-    Segment* 
+    Segment*
     Get_Segment(SegLexicon *self);
 
     public void

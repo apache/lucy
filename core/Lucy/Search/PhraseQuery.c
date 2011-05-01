@@ -45,29 +45,25 @@ static PhraseQuery*
 S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost);
 
 PhraseQuery*
-PhraseQuery_new(const CharBuf *field, VArray *terms)
-{
+PhraseQuery_new(const CharBuf *field, VArray *terms) {
     PhraseQuery *self = (PhraseQuery*)VTable_Make_Obj(PHRASEQUERY);
     return PhraseQuery_init(self, field, terms);
 }
 
 PhraseQuery*
-PhraseQuery_init(PhraseQuery *self, const CharBuf *field, VArray *terms)
-{
+PhraseQuery_init(PhraseQuery *self, const CharBuf *field, VArray *terms) {
     return S_do_init(self, CB_Clone(field), VA_Clone(terms), 1.0f);
 }
 
 void
-PhraseQuery_destroy(PhraseQuery *self)
-{
+PhraseQuery_destroy(PhraseQuery *self) {
     DECREF(self->terms);
     DECREF(self->field);
     SUPER_DESTROY(self, PHRASEQUERY);
 }
 
 static PhraseQuery*
-S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost)
-{
+S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost) {
     uint32_t i, max;
     Query_init((Query*)self, boost);
     for (i = 0, max = VA_Get_Size(terms); i < max; i++) {
@@ -79,26 +75,23 @@ S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost)
 }
 
 void
-PhraseQuery_serialize(PhraseQuery *self, OutStream *outstream)
-{
+PhraseQuery_serialize(PhraseQuery *self, OutStream *outstream) {
     OutStream_Write_F32(outstream, self->boost);
     CB_Serialize(self->field, outstream);
     VA_Serialize(self->terms, outstream);
 }
 
 PhraseQuery*
-PhraseQuery_deserialize(PhraseQuery *self, InStream *instream)
-{
-    float    boost  = InStream_Read_F32(instream);
-    CharBuf *field  = CB_deserialize(NULL, instream);
-    VArray  *terms  = VA_deserialize(NULL, instream);
+PhraseQuery_deserialize(PhraseQuery *self, InStream *instream) {
+    float    boost = InStream_Read_F32(instream);
+    CharBuf *field = CB_deserialize(NULL, instream);
+    VArray  *terms = VA_deserialize(NULL, instream);
     self = self ? self : (PhraseQuery*)VTable_Make_Obj(PHRASEQUERY);
     return S_do_init(self, field, terms, boost);
 }
 
 bool_t
-PhraseQuery_equals(PhraseQuery *self, Obj *other)
-{
+PhraseQuery_equals(PhraseQuery *self, Obj *other) {
     PhraseQuery *twin = (PhraseQuery*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, PHRASEQUERY)) return false;
@@ -113,14 +106,13 @@ PhraseQuery_equals(PhraseQuery *self, Obj *other)
 }
 
 CharBuf*
-PhraseQuery_to_string(PhraseQuery *self)
-{
+PhraseQuery_to_string(PhraseQuery *self) {
     uint32_t i;
-    uint32_t num_terms = VA_Get_Size(self->terms);
-    CharBuf *retval = CB_Clone(self->field);
+    uint32_t  num_terms = VA_Get_Size(self->terms);
+    CharBuf  *retval    = CB_Clone(self->field);
     CB_Cat_Trusted_Str(retval, ":\"", 2);
     for (i = 0; i < num_terms; i++) {
-        Obj *term = VA_Fetch(self->terms, i);
+        Obj     *term        = VA_Fetch(self->terms, i);
         CharBuf *term_string = Obj_To_String(term);
         CB_Cat(retval, term_string);
         DECREF(term_string);
@@ -133,17 +125,17 @@ PhraseQuery_to_string(PhraseQuery *self)
 }
 
 Compiler*
-PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher, 
-                          float boost)
-{
+PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
+                          float boost) {
     if (VA_Get_Size(self->terms) == 1) {
         // Optimize for one-term "phrases".
         Obj *term = VA_Fetch(self->terms, 0);
         TermQuery *term_query = TermQuery_new(self->field, term);
         TermCompiler *term_compiler;
         TermQuery_Set_Boost(term_query, self->boost);
-        term_compiler = (TermCompiler*)TermQuery_Make_Compiler(term_query,
-            searcher, boost);
+        term_compiler
+            = (TermCompiler*)TermQuery_Make_Compiler(term_query, searcher,
+                                                     boost);
         DECREF(term_query);
         return (Compiler*)term_compiler;
     }
@@ -153,23 +145,26 @@ PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
 }
 
 CharBuf*
-PhraseQuery_get_field(PhraseQuery *self) { return self->field; }
+PhraseQuery_get_field(PhraseQuery *self) {
+    return self->field;
+}
+
 VArray*
-PhraseQuery_get_terms(PhraseQuery *self) { return self->terms; }
+PhraseQuery_get_terms(PhraseQuery *self) {
+    return self->terms;
+}
 
 /*********************************************************************/
 
 PhraseCompiler*
-PhraseCompiler_new(PhraseQuery *parent, Searcher *searcher, float boost)
-{
+PhraseCompiler_new(PhraseQuery *parent, Searcher *searcher, float boost) {
     PhraseCompiler *self = (PhraseCompiler*)VTable_Make_Obj(PHRASECOMPILER);
     return PhraseCompiler_init(self, parent, searcher, boost);
 }
 
 PhraseCompiler*
-PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent, 
-                    Searcher *searcher, float boost)
-{
+PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
+                    Searcher *searcher, float boost) {
     Schema     *schema = Searcher_Get_Schema(searcher);
     Similarity *sim    = Schema_Fetch_Sim(schema, parent->field);
     VArray     *terms  = parent->terms;
@@ -184,9 +179,9 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
     // Store IDF for the phrase.
     self->idf = 0;
     for (i = 0, max = VA_Get_Size(terms); i < max; i++) {
-        Obj *term = VA_Fetch(terms, i);
-        int32_t doc_max  = Searcher_Doc_Max(searcher);
-        int32_t doc_freq = Searcher_Doc_Freq(searcher, parent->field, term);
+        Obj     *term     = VA_Fetch(terms, i);
+        int32_t  doc_max  = Searcher_Doc_Max(searcher);
+        int32_t  doc_freq = Searcher_Doc_Freq(searcher, parent->field, term);
         self->idf += Sim_IDF(sim, doc_freq, doc_max);
     }
 
@@ -200,8 +195,7 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
 }
 
 void
-PhraseCompiler_serialize(PhraseCompiler *self, OutStream *outstream)
-{
+PhraseCompiler_serialize(PhraseCompiler *self, OutStream *outstream) {
     Compiler_serialize((Compiler*)self, outstream);
     OutStream_Write_F32(outstream, self->idf);
     OutStream_Write_F32(outstream, self->raw_weight);
@@ -210,8 +204,7 @@ PhraseCompiler_serialize(PhraseCompiler *self, OutStream *outstream)
 }
 
 PhraseCompiler*
-PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream)
-{
+PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream) {
     self = self ? self : (PhraseCompiler*)VTable_Make_Obj(PHRASECOMPILER);
     Compiler_deserialize((Compiler*)self, instream);
     self->idf               = InStream_Read_F32(instream);
@@ -222,8 +215,7 @@ PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream)
 }
 
 bool_t
-PhraseCompiler_equals(PhraseCompiler *self, Obj *other)
-{
+PhraseCompiler_equals(PhraseCompiler *self, Obj *other) {
     PhraseCompiler *twin = (PhraseCompiler*)other;
     if (!Obj_Is_A(other, PHRASECOMPILER)) return false;
     if (!Compiler_equals((Compiler*)self, other)) return false;
@@ -235,28 +227,24 @@ PhraseCompiler_equals(PhraseCompiler *self, Obj *other)
 }
 
 float
-PhraseCompiler_get_weight(PhraseCompiler *self)
-{
+PhraseCompiler_get_weight(PhraseCompiler *self) {
     return self->normalized_weight;
 }
 
 float
-PhraseCompiler_sum_of_squared_weights(PhraseCompiler *self)
-{
+PhraseCompiler_sum_of_squared_weights(PhraseCompiler *self) {
     return self->raw_weight * self->raw_weight;
 }
 
 void
-PhraseCompiler_apply_norm_factor(PhraseCompiler *self, float factor)
-{
+PhraseCompiler_apply_norm_factor(PhraseCompiler *self, float factor) {
     self->query_norm_factor = factor;
     self->normalized_weight = self->raw_weight * self->idf * factor;
 }
 
 Matcher*
 PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
-                            bool_t need_score)
-{
+                            bool_t need_score) {
     UNUSED_VAR(need_score);
     PhraseQuery *const parent    = (PhraseQuery*)self->parent;
     VArray *const      terms     = parent->terms;
@@ -275,15 +263,16 @@ PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
     DECREF(posting);
 
     // Bail if there's no PostingListReader for this segment.
-    PostingListReader *const plist_reader = (PostingListReader*)SegReader_Fetch(
-        reader, VTable_Get_Name(POSTINGLISTREADER));
+    PostingListReader *const plist_reader
+        = (PostingListReader*)SegReader_Fetch(
+              reader, VTable_Get_Name(POSTINGLISTREADER));
     if (!plist_reader) { return NULL; }
 
     // Look up each term.
     VArray  *plists = VA_new(num_terms);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(terms, i);
-        PostingList *plist 
+        PostingList *plist
             = PListReader_Posting_List(plist_reader, parent->field, term);
 
         // Bail if any one of the terms isn't in the index.
@@ -295,24 +284,23 @@ PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
         VA_Push(plists, (Obj*)plist);
     }
 
-    Matcher *retval 
+    Matcher *retval
         = (Matcher*)PhraseMatcher_new(sim, plists, (Compiler*)self);
     DECREF(plists);
     return retval;
 }
 
 VArray*
-PhraseCompiler_highlight_spans(PhraseCompiler *self, Searcher *searcher, 
-                               DocVector *doc_vec, const CharBuf *field)
-{
-    PhraseQuery *const parent = (PhraseQuery*)self->parent;
-    VArray      *const terms  = parent->terms;
-    VArray      *const spans  = VA_new(0);
+PhraseCompiler_highlight_spans(PhraseCompiler *self, Searcher *searcher,
+                               DocVector *doc_vec, const CharBuf *field) {
+    PhraseQuery *const parent    = (PhraseQuery*)self->parent;
+    VArray *const      terms     = parent->terms;
+    VArray *const      spans     = VA_new(0);
     VArray      *term_vectors;
     BitVector   *posit_vec;
     BitVector   *other_posit_vec;
     uint32_t     i;
-    const uint32_t  num_terms = VA_Get_Size(terms);
+    const uint32_t     num_terms = VA_Get_Size(terms);
     uint32_t     num_tvs;
     UNUSED_VAR(searcher);
 
@@ -325,7 +313,7 @@ PhraseCompiler_highlight_spans(PhraseCompiler *self, Searcher *searcher,
     other_posit_vec = BitVec_new(0);
     for (i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(terms, i);
-        TermVector *term_vector 
+        TermVector *term_vector
             = DocVec_Term_Vector(doc_vec, field, (CharBuf*)term);
 
         // Bail if any term is missing.
@@ -363,7 +351,7 @@ PhraseCompiler_highlight_spans(PhraseCompiler *self, Searcher *searcher,
     num_tvs = VA_Get_Size(term_vectors);
     if (num_tvs == num_terms) {
         TermVector *first_tv = (TermVector*)VA_Fetch(term_vectors, 0);
-        TermVector *last_tv  
+        TermVector *last_tv
             = (TermVector*)VA_Fetch(term_vectors, num_tvs - 1);
         I32Array *tv_start_positions = TV_Get_Positions(first_tv);
         I32Array *tv_end_positions   = TV_Get_Positions(last_tv);
@@ -397,8 +385,8 @@ PhraseCompiler_highlight_spans(PhraseCompiler *self, Searcher *searcher,
                 }
             }
 
-            VA_Push(spans, (Obj*)Span_new(start_offset, 
-                end_offset - start_offset, weight) );
+            VA_Push(spans, (Obj*)Span_new(start_offset,
+                                          end_offset - start_offset, weight));
 
             i++, j++;
         }

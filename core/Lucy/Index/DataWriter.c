@@ -28,8 +28,7 @@
 
 DataWriter*
 DataWriter_init(DataWriter *self, Schema *schema, Snapshot *snapshot,
-                Segment *segment, PolyReader *polyreader)
-{
+                Segment *segment, PolyReader *polyreader) {
     self->snapshot   = (Snapshot*)INCREF(snapshot);
     self->segment    = (Segment*)INCREF(segment);
     self->polyreader = (PolyReader*)INCREF(polyreader);
@@ -40,8 +39,7 @@ DataWriter_init(DataWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-DataWriter_destroy(DataWriter *self) 
-{
+DataWriter_destroy(DataWriter *self) {
     DECREF(self->snapshot);
     DECREF(self->segment);
     DECREF(self->polyreader);
@@ -51,37 +49,48 @@ DataWriter_destroy(DataWriter *self)
 }
 
 Snapshot*
-DataWriter_get_snapshot(DataWriter *self) { return self->snapshot; }
+DataWriter_get_snapshot(DataWriter *self) {
+    return self->snapshot;
+}
+
 Segment*
-DataWriter_get_segment(DataWriter *self)  { return self->segment; }
+DataWriter_get_segment(DataWriter *self) {
+    return self->segment;
+}
+
 PolyReader*
-DataWriter_get_polyreader(DataWriter *self) { return self->polyreader; }
+DataWriter_get_polyreader(DataWriter *self) {
+    return self->polyreader;
+}
+
 Schema*
-DataWriter_get_schema(DataWriter *self) { return self->schema; }
+DataWriter_get_schema(DataWriter *self) {
+    return self->schema;
+}
+
 Folder*
-DataWriter_get_folder(DataWriter *self) { return self->folder; }
+DataWriter_get_folder(DataWriter *self) {
+    return self->folder;
+}
 
 void
-DataWriter_delete_segment(DataWriter *self, SegReader *reader)
-{
+DataWriter_delete_segment(DataWriter *self, SegReader *reader) {
     UNUSED_VAR(self);
     UNUSED_VAR(reader);
 }
 
 void
-DataWriter_merge_segment(DataWriter *self, SegReader *reader, 
-                         I32Array *doc_map)
-{
+DataWriter_merge_segment(DataWriter *self, SegReader *reader,
+                         I32Array *doc_map) {
     DataWriter_Add_Segment(self, reader, doc_map);
     DataWriter_Delete_Segment(self, reader);
 }
 
 Hash*
-DataWriter_metadata(DataWriter *self)
-{
+DataWriter_metadata(DataWriter *self) {
     Hash *metadata = Hash_new(0);
-    Hash_Store_Str(metadata, "format", 6, 
-        (Obj*)CB_newf("%i32", DataWriter_Format(self)));
+    Hash_Store_Str(metadata, "format", 6,
+                   (Obj*)CB_newf("%i32", DataWriter_Format(self)));
     return metadata;
 }
 

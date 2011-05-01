@@ -18,7 +18,7 @@
  */
 
 #ifndef H_CHAZ_UNUSED_VARS
-#define H_CHAZ_UNUSED_VARS 
+#define H_CHAZ_UNUSED_VARS
 
 #ifdef __cplusplus
 extern "C" {

@@ -42,21 +42,19 @@ static VArray*
 S_find_all_referenced(Folder *folder, VArray *entries);
 
 FilePurger*
-FilePurger_new(Folder *folder, Snapshot *snapshot, IndexManager *manager)
-{
+FilePurger_new(Folder *folder, Snapshot *snapshot, IndexManager *manager) {
     FilePurger *self = (FilePurger*)VTable_Make_Obj(FILEPURGER);
     return FilePurger_init(self, folder, snapshot, manager);
 }
 
 FilePurger*
-FilePurger_init(FilePurger *self, Folder *folder, Snapshot *snapshot, 
-                IndexManager *manager) 
-{
+FilePurger_init(FilePurger *self, Folder *folder, Snapshot *snapshot,
+                IndexManager *manager) {
     self->folder       = (Folder*)INCREF(folder);
     self->snapshot     = (Snapshot*)INCREF(snapshot);
-    self->manager      = manager 
-                       ? (IndexManager*)INCREF(manager)
-                       : IxManager_new(NULL, NULL);
+    self->manager      = manager
+                         ? (IndexManager*)INCREF(manager)
+                         : IxManager_new(NULL, NULL);
     IxManager_Set_Folder(self->manager, folder);
 
     // Don't allow the locks directory to be zapped.
@@ -67,8 +65,7 @@ FilePurger_init(FilePurger *self, Folder *folder, Snapshot *snapshot,
 }
 
 void
-FilePurger_destroy(FilePurger *self) 
-{
+FilePurger_destroy(FilePurger *self) {
     DECREF(self->folder);
     DECREF(self->snapshot);
     DECREF(self->manager);
@@ -77,17 +74,16 @@ FilePurger_destroy(FilePurger *self)
 }
 
 void
-FilePurger_purge(FilePurger *self)
-{
+FilePurger_purge(FilePurger *self) {
     Lock *deletion_lock = IxManager_Make_Deletion_Lock(self->manager);
 
     // Obtain deletion lock, purge files, release deletion lock.
     Lock_Clear_Stale(deletion_lock);
     if (Lock_Obtain(deletion_lock)) {
-        Folder  *folder    = self->folder;
-        Hash    *failures  = Hash_new(0);
-        VArray  *purgables;
-        VArray  *snapshots;
+        Folder *folder   = self->folder;
+        Hash   *failures = Hash_new(0);
+        VArray *purgables;
+        VArray *snapshots;
 
         S_discover_unused(self, &purgables, &snapshots);
 
@@ -95,10 +91,10 @@ FilePurger_purge(FilePurger *self)
         // again later.  Proceed in reverse lexical order so that directories
         // get deleted after they've been emptied.
         VA_Sort(purgables, NULL, NULL);
-        for (uint32_t i = VA_Get_Size(purgables); i--; ) {
+        for (uint32_t i = VA_Get_Size(purgables); i--;) {
             CharBuf *entry = (CharBuf*)VA_fetch(purgables, i);
             if (Hash_Fetch(self->disallowed, (Obj*)entry)) { continue; }
-            if (!Folder_Delete(folder, entry)) { 
+            if (!Folder_Delete(folder, entry)) {
                 if (Folder_Exists(folder, entry)) {
                     Hash_Store(failures, (Obj*)entry, INCREF(&EMPTY));
                 }
@@ -112,7 +108,7 @@ FilePurger_purge(FilePurger *self)
                 // Only delete snapshot files if all of their entries were
                 // successfully deleted.
                 VArray *entries = Snapshot_List(snapshot);
-                for (uint32_t j = VA_Get_Size(entries); j--; ) {
+                for (uint32_t j = VA_Get_Size(entries); j--;) {
                     CharBuf *entry = (CharBuf*)VA_Fetch(entries, j);
                     if (Hash_Fetch(failures, (Obj*)entry)) {
                         snapshot_has_failures = true;
@@ -134,24 +130,23 @@ FilePurger_purge(FilePurger *self)
     }
     else {
         WARN("Can't obtain deletion lock, skipping deletion of "
-            "obsolete files");
+             "obsolete files");
     }
 
     DECREF(deletion_lock);
 }
 
 static void
-S_zap_dead_merge(FilePurger *self, Hash *candidates)
-{
-    IndexManager *manager = self->manager;
-    Lock *merge_lock   = IxManager_Make_Merge_Lock(manager);
+S_zap_dead_merge(FilePurger *self, Hash *candidates) {
+    IndexManager *manager    = self->manager;
+    Lock         *merge_lock = IxManager_Make_Merge_Lock(manager);
 
     Lock_Clear_Stale(merge_lock);
-    if (!Lock_Is_Locked(merge_lock)) { 
+    if (!Lock_Is_Locked(merge_lock)) {
         Hash *merge_data = IxManager_Read_Merge_Data(manager);
-        Obj  *cutoff = merge_data 
-                     ? Hash_Fetch_Str(merge_data, "cutoff", 6) 
-                     : NULL;
+        Obj  *cutoff = merge_data
+                       ? Hash_Fetch_Str(merge_data, "cutoff", 6)
+                       : NULL;
 
         if (cutoff) {
             CharBuf *cutoff_seg = Seg_num_to_name(Obj_To_I64(cutoff));
@@ -186,9 +181,8 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates)
 }
 
 static void
-S_discover_unused(FilePurger *self, VArray **purgables_ptr, 
-                  VArray **snapshots_ptr)
-{
+S_discover_unused(FilePurger *self, VArray **purgables_ptr,
+                  VArray **snapshots_ptr) {
     Folder      *folder       = self->folder;
     DirHandle   *dh           = Folder_Open_Dir(folder, NULL);
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
@@ -210,11 +204,11 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
     CharBuf *entry      = DH_Get_Entry(dh);
     Hash    *candidates = Hash_new(64);
     while (DH_Next(dh)) {
-        if      (!CB_Starts_With_Str(entry, "snapshot_", 9))   { continue; }
+        if (!CB_Starts_With_Str(entry, "snapshot_", 9))        { continue; }
         else if (!CB_Ends_With_Str(entry, ".json", 5))         { continue; }
         else if (snapfile && CB_Equals(entry, (Obj*)snapfile)) { continue; }
         else {
-            Snapshot *snapshot 
+            Snapshot *snapshot
                 = Snapshot_Read_File(Snapshot_new(), folder, entry);
             Lock *lock
                 = IxManager_Make_Snapshot_Read_Lock(self->manager, entry);
@@ -229,8 +223,9 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
             if (lock && Lock_Is_Locked(lock)) {
                 // The snapshot file is locked, which means someone's using
                 // that version of the index -- protect all of its entries.
-                uint32_t new_size = VA_Get_Size(spared) 
-                                  + VA_Get_Size(referenced)  + 1;
+                uint32_t new_size = VA_Get_Size(spared)
+                                    + VA_Get_Size(referenced)
+                                    + 1;
                 VA_Grow(spared, new_size);
                 VA_Push(spared, (Obj*)CB_Clone(entry));
                 VA_Push_VArray(spared, referenced);
@@ -271,15 +266,14 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
 }
 
 static VArray*
-S_find_all_referenced(Folder *folder, VArray *entries)
-{
+S_find_all_referenced(Folder *folder, VArray *entries) {
     Hash *uniqued = Hash_new(VA_Get_Size(entries));
     for (uint32_t i = 0, max = VA_Get_Size(entries); i < max; i++) {
         CharBuf *entry = (CharBuf*)VA_Fetch(entries, i);
         Hash_Store(uniqued, (Obj*)entry, INCREF(&EMPTY));
         if (Folder_Is_Directory(folder, entry)) {
             VArray *contents = Folder_List_R(folder, entry);
-            for (uint32_t j = VA_Get_Size(contents); j--; ) {
+            for (uint32_t j = VA_Get_Size(contents); j--;) {
                 CharBuf *sub_entry = (CharBuf*)VA_Fetch(contents, j);
                 Hash_Store(uniqued, (Obj*)sub_entry, INCREF(&EMPTY));
             }

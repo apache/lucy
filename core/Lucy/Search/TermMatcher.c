@@ -24,9 +24,8 @@
 #include "Lucy/Search/Compiler.h"
 
 TermMatcher*
-TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist, 
-                 Compiler *compiler)
-{
+TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
+                 Compiler *compiler) {
     Matcher_init((Matcher*)self);
 
     // Assign.
@@ -42,8 +41,7 @@ TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
 }
 
 void
-TermMatcher_destroy(TermMatcher *self) 
-{
+TermMatcher_destroy(TermMatcher *self) {
     DECREF(self->sim);
     DECREF(self->plist);
     DECREF(self->compiler);
@@ -51,8 +49,7 @@ TermMatcher_destroy(TermMatcher *self)
 }
 
 int32_t
-TermMatcher_next(TermMatcher* self) 
-{
+TermMatcher_next(TermMatcher* self) {
     PostingList *const plist = self->plist;
     if (plist) {
         int32_t doc_id = PList_Next(plist);
@@ -71,8 +68,7 @@ TermMatcher_next(TermMatcher* self)
 }
 
 int32_t
-TermMatcher_advance(TermMatcher *self, int32_t target)
-{
+TermMatcher_advance(TermMatcher *self, int32_t target) {
     PostingList *const plist = self->plist;
     if (plist) {
         int32_t doc_id = PList_Advance(plist, target);
@@ -90,9 +86,8 @@ TermMatcher_advance(TermMatcher *self, int32_t target)
     return 0;
 }
 
-int32_t 
-TermMatcher_get_doc_id(TermMatcher* self) 
-{
+int32_t
+TermMatcher_get_doc_id(TermMatcher* self) {
     return Post_Get_Doc_ID(self->posting);
 }
 

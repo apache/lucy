@@ -24,13 +24,13 @@ class Lucy::Util::Json inherits Lucy::Object::Obj {
 
     /** Encode <code>dump</code> as JSON.
      */
-    inert incremented CharBuf* 
+    inert incremented CharBuf*
     to_json(Obj *dump);
 
     /** Decode the supplied JSON and return a data structure made
      * of Hashes, VArrays, and CharBufs.
      */
-    inert incremented Obj* 
+    inert incremented Obj*
     from_json(CharBuf *json);
 
     /** Encode <code>dump</code> as JSON and attempt to write to the indicated
@@ -45,7 +45,7 @@ class Lucy::Util::Json inherits Lucy::Object::Obj {
      * Err_error if the file can't be can't be opened or if the file doesn't
      * contain valid JSON.
      */
-    inert incremented nullable Obj* 
+    inert incremented nullable Obj*
     slurp_json(Folder *folder, const CharBuf *path);
 
     /** Allow the encoder to output strings, etc, instead of throwing an error

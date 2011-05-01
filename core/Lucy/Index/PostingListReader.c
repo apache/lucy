@@ -31,19 +31,17 @@
 #include "Lucy/Store/Folder.h"
 
 PostingListReader*
-PListReader_init(PostingListReader *self, Schema *schema, Folder *folder, 
-                 Snapshot *snapshot, VArray *segments, int32_t seg_tick)
-{
+PListReader_init(PostingListReader *self, Schema *schema, Folder *folder,
+                 Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
-        seg_tick);
+                    seg_tick);
     ABSTRACT_CLASS_CHECK(self, POSTINGLISTREADER);
     return self;
 }
 
 PostingListReader*
-PListReader_aggregator(PostingListReader *self, VArray *readers, 
-                       I32Array *offsets)
-{
+PListReader_aggregator(PostingListReader *self, VArray *readers,
+                       I32Array *offsets) {
     UNUSED_VAR(self);
     UNUSED_VAR(readers);
     UNUSED_VAR(offsets);
@@ -52,22 +50,20 @@ PListReader_aggregator(PostingListReader *self, VArray *readers,
 
 DefaultPostingListReader*
 DefPListReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-                   VArray *segments, int32_t seg_tick, 
-                   LexiconReader *lex_reader)
-{
-    DefaultPostingListReader *self = (DefaultPostingListReader*)
-        VTable_Make_Obj(DEFAULTPOSTINGLISTREADER);
-    return DefPListReader_init(self, schema, folder, snapshot, segments, 
-        seg_tick, lex_reader);
+                   VArray *segments, int32_t seg_tick,
+                   LexiconReader *lex_reader) {
+    DefaultPostingListReader *self 
+        = (DefaultPostingListReader*)VTable_Make_Obj(DEFAULTPOSTINGLISTREADER);
+    return DefPListReader_init(self, schema, folder, snapshot, segments,
+                               seg_tick, lex_reader);
 }
 
 DefaultPostingListReader*
-DefPListReader_init(DefaultPostingListReader *self, Schema *schema, 
+DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
                     Folder *folder, Snapshot *snapshot, VArray *segments,
-                   int32_t seg_tick, LexiconReader *lex_reader)
-{
-    PListReader_init((PostingListReader*)self, schema, folder, snapshot, 
-        segments, seg_tick);
+                    int32_t seg_tick, LexiconReader *lex_reader) {
+    PListReader_init((PostingListReader*)self, schema, folder, snapshot,
+                     segments, seg_tick);
     Segment *segment = DefPListReader_Get_Segment(self);
 
     // Derive.
@@ -76,9 +72,9 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
     // Check format.
     {
         Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "postings", 8);
-        if (!my_meta) { 
-            my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, 
-                "posting_list", 12);
+        if (!my_meta) {
+            my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment,
+                                                    "posting_list", 12);
         }
 
         if (my_meta) {
@@ -86,19 +82,18 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
             if (!format) { THROW(ERR, "Missing 'format' var"); }
             else {
                 if (Obj_To_I64(format) != PListWriter_current_file_format) {
-                    THROW(ERR, "Unsupported postings format: %i64", 
-                        Obj_To_I64(format));
+                    THROW(ERR, "Unsupported postings format: %i64",
+                          Obj_To_I64(format));
                 }
             }
         }
     }
-    
+
     return self;
 }
 
 void
-DefPListReader_close(DefaultPostingListReader *self)
-{
+DefPListReader_close(DefaultPostingListReader *self) {
     if (self->lex_reader) {
         LexReader_Close(self->lex_reader);
         DECREF(self->lex_reader);
@@ -107,17 +102,15 @@ DefPListReader_close(DefaultPostingListReader *self)
 }
 
 void
-DefPListReader_destroy(DefaultPostingListReader *self)
-{
+DefPListReader_destroy(DefaultPostingListReader *self) {
     DECREF(self->lex_reader);
     SUPER_DESTROY(self, DEFAULTPOSTINGLISTREADER);
 }
 
 SegPostingList*
-DefPListReader_posting_list(DefaultPostingListReader *self, 
-                           const CharBuf *field, Obj *target)
-{
-    FieldType *type  = Schema_Fetch_Type(self->schema, field);
+DefPListReader_posting_list(DefaultPostingListReader *self,
+                            const CharBuf *field, Obj *target) {
+    FieldType *type = Schema_Fetch_Type(self->schema, field);
 
     // Only return an object if we've got an indexed field.
     if (type != NULL && FType_Indexed(type)) {
@@ -131,7 +124,7 @@ DefPListReader_posting_list(DefaultPostingListReader *self,
 }
 
 LexiconReader*
-DefPListReader_get_lex_reader(DefaultPostingListReader *self) 
-    { return self->lex_reader; }
-
+DefPListReader_get_lex_reader(DefaultPostingListReader *self) {
+    return self->lex_reader;
+}
 

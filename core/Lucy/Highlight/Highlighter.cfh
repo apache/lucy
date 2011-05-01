@@ -36,7 +36,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
     Compiler   *compiler;
 
     inert incremented Highlighter*
-    new(Searcher *searcher, Obj *query, const CharBuf *field, 
+    new(Searcher *searcher, Obj *query, const CharBuf *field,
         uint32_t excerpt_length = 200);
 
     /**
@@ -50,7 +50,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
      * @param excerpt_length Maximum length of the excerpt, in characters.
      */
     public inert Highlighter*
-    init(Highlighter *self, Searcher *searcher, Obj *query, 
+    init(Highlighter *self, Searcher *searcher, Obj *query,
          const CharBuf *field, uint32_t excerpt_length = 200);
 
     /** Take a HitDoc object and return a highlighted excerpt as a string if
@@ -81,7 +81,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
      * until the end of the string.
      */
     incremented VArray*
-    Find_Sentences(Highlighter *self, CharBuf *text, int32_t offset = 0, 
+    Find_Sentences(Highlighter *self, CharBuf *text, int32_t offset = 0,
                    int32_t length = 0);
 
     /** Highlight a small section of text.  By default, prepends pre-tag and
@@ -118,7 +118,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
 
     /** Accessor.
      */
-    public uint32_t 
+    public uint32_t
     Get_Excerpt_Length(Highlighter *self);
 
     /** Accessor.
@@ -144,7 +144,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     int32_t
-    Find_Best_Fragment(Highlighter *self, const CharBuf *field_val, 
+    Find_Best_Fragment(Highlighter *self, const CharBuf *field_val,
                        ViewCharBuf *fragment, HeatMap *heat_map);
 
     /** Take the fragment and determine the best edges for it based on
@@ -154,8 +154,8 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     int32_t
-    Raw_Excerpt(Highlighter *self, const CharBuf *field_val, 
-                const CharBuf *fragment, CharBuf *raw_excerpt, int32_t top, 
+    Raw_Excerpt(Highlighter *self, const CharBuf *field_val,
+                const CharBuf *fragment, CharBuf *raw_excerpt, int32_t top,
                 HeatMap *heat_map, VArray *sentences);
 
     /** Take the text in raw_excerpt, add highlight tags, encode, and place
@@ -164,7 +164,7 @@ class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     void
-    Highlight_Excerpt(Highlighter *self, VArray *spans, CharBuf *raw_excerpt, 
+    Highlight_Excerpt(Highlighter *self, VArray *spans, CharBuf *raw_excerpt,
                       CharBuf *highlighted, int32_t top);
 
     public void

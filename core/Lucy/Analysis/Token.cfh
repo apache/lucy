@@ -59,18 +59,18 @@ class Lucy::Analysis::Token inherits Lucy::Object::Obj {
     int32_t   pos_inc;
     int32_t   pos;
 
-    inert incremented Token* 
-    new(const char *text, size_t len, uint32_t start_offset, 
+    inert incremented Token*
+    new(const char *text, size_t len, uint32_t start_offset,
         uint32_t end_offset, float boost = 1.0, int32_t pos_inc = 1);
 
-    inert Token* 
-    init(Token *self, const char *text, size_t len, 
-         uint32_t start_offset, uint32_t end_offset, 
+    inert Token*
+    init(Token *self, const char *text, size_t len,
+         uint32_t start_offset, uint32_t end_offset,
          float boost = 1.0, int32_t pos_inc = 1);
 
     /** Sort_quicksort-compatible comparison routine.
      */
-    inert int 
+    inert int
     compare(void *context, const void *va, const void *vb);
 
     uint32_t
@@ -94,7 +94,7 @@ class Lucy::Analysis::Token inherits Lucy::Object::Obj {
     void
     Set_Text(Token *self, char *text, size_t len);
 
-    public void 
+    public void
     Destroy(Token *self);
 }
 

@@ -25,15 +25,13 @@
 #include "Lucy/Store/OutStream.h"
 
 BBSortEx*
-BBSortEx_new(uint32_t mem_threshold, VArray *external)
-{
+BBSortEx_new(uint32_t mem_threshold, VArray *external) {
     BBSortEx *self = (BBSortEx*)VTable_Make_Obj(BBSORTEX);
     return BBSortEx_init(self, mem_threshold, external);
 }
 
 BBSortEx*
-BBSortEx_init(BBSortEx *self, uint32_t mem_threshold, VArray *external)
-{
+BBSortEx_init(BBSortEx *self, uint32_t mem_threshold, VArray *external) {
     SortEx_init((SortExternal*)self, sizeof(Obj*));
     self->external_tick = 0;
     self->external = (VArray*)INCREF(external);
@@ -43,28 +41,26 @@ BBSortEx_init(BBSortEx *self, uint32_t mem_threshold, VArray *external)
 }
 
 void
-BBSortEx_destroy(BBSortEx *self) 
-{
+BBSortEx_destroy(BBSortEx *self) {
     DECREF(self->external);
     SUPER_DESTROY(self, BBSORTEX);
 }
 
 void
-BBSortEx_clear_cache(BBSortEx *self) 
-{
+BBSortEx_clear_cache(BBSortEx *self) {
     Obj **const cache = (Obj**)self->cache;
     for (uint32_t i = self->cache_tick, max = self->cache_max; i < max; i++) {
         DECREF(cache[i]);
     }
     self->mem_consumed = 0;
-    BBSortEx_clear_cache_t super_clear_cache = (BBSortEx_clear_cache_t)
-        SUPER_METHOD(self->vtable, SortEx, Clear_Cache);
+    BBSortEx_clear_cache_t super_clear_cache
+        = (BBSortEx_clear_cache_t)SUPER_METHOD(
+              self->vtable, SortEx, Clear_Cache);
     super_clear_cache(self);
 }
 
 void
-BBSortEx_feed(BBSortEx *self, void *data)
-{
+BBSortEx_feed(BBSortEx *self, void *data) {
     SortEx_feed((SortExternal*)self, data);
 
     // Flush() if necessary.
@@ -76,8 +72,7 @@ BBSortEx_feed(BBSortEx *self, void *data)
 }
 
 void
-BBSortEx_flush(BBSortEx *self)
-{
+BBSortEx_flush(BBSortEx *self) {
     uint32_t     cache_count = self->cache_max - self->cache_tick;
     Obj        **cache = (Obj**)self->cache;
     VArray      *elems;
@@ -102,12 +97,11 @@ BBSortEx_flush(BBSortEx *self)
 }
 
 uint32_t
-BBSortEx_refill(BBSortEx *self)
-{
+BBSortEx_refill(BBSortEx *self) {
     // Make sure cache is empty, then set cache tick vars.
     if (self->cache_max - self->cache_tick > 0) {
         THROW(ERR, "Refill called but cache contains %u32 items",
-            self->cache_max - self->cache_tick);
+              self->cache_max - self->cache_tick);
     }
     self->cache_tick = 0;
     self->cache_max  = 0;
@@ -127,23 +121,22 @@ BBSortEx_refill(BBSortEx *self)
             elem = (ByteBuf*)VA_Fetch(self->external, self->external_tick);
             self->external_tick++;
             // Should be + sizeof(ByteBuf), but that's ok.
-            self->mem_consumed += BB_Get_Size(elem); 
+            self->mem_consumed += BB_Get_Size(elem);
         }
 
         if (self->cache_max == self->cache_cap) {
             BBSortEx_Grow_Cache(self,
-                Memory_oversize(self->cache_max + 1, self->width));
+                                Memory_oversize(self->cache_max + 1, self->width));
         }
         Obj **cache = (Obj**)self->cache;
-        cache[ self->cache_max++ ] = INCREF(elem);
+        cache[self->cache_max++] = INCREF(elem);
     }
 
     return self->cache_max;
 }
 
 void
-BBSortEx_flip(BBSortEx *self)
-{
+BBSortEx_flip(BBSortEx *self) {
     uint32_t i;
     uint32_t run_mem_thresh = 65536;
 
@@ -168,10 +161,9 @@ BBSortEx_flip(BBSortEx *self)
 }
 
 int
-BBSortEx_compare(BBSortEx *self, void *va, void *vb)
-{
+BBSortEx_compare(BBSortEx *self, void *va, void *vb) {
     UNUSED_VAR(self);
-    return BB_compare( (ByteBuf**)va, (ByteBuf**)vb );
+    return BB_compare((ByteBuf**)va, (ByteBuf**)vb);
 }
 
 

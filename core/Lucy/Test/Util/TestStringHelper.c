@@ -21,8 +21,7 @@
 #include "Lucy/Util/StringHelper.h"
 
 static void
-test_overlap(TestBatch *batch)
-{
+test_overlap(TestBatch *batch) {
     int32_t result;
     result = StrHelp_overlap("", "", 0, 0);
     TEST_INT_EQ(batch, result, 0, "two empty strings");
@@ -40,8 +39,7 @@ test_overlap(TestBatch *batch)
 
 
 static void
-test_to_base36(TestBatch *batch)
-{
+test_to_base36(TestBatch *batch) {
     char buffer[StrHelp_MAX_BASE36_BYTES];
     StrHelp_to_base36(U64_MAX, buffer);
     TEST_STR_EQ(batch, "3w5e11264sgsf", buffer, "base36 U64_MAX");
@@ -51,29 +49,27 @@ test_to_base36(TestBatch *batch)
 }
 
 static void
-S_round_trip_utf8_code_point(TestBatch *batch, uint32_t code_point)
-{
+S_round_trip_utf8_code_point(TestBatch *batch, uint32_t code_point) {
     char buffer[4];
     uint32_t len   = StrHelp_encode_utf8_char(code_point, buffer);
     char *start = buffer;
     char *end   = start + len;
-    TEST_TRUE(batch, StrHelp_utf8_valid(buffer, len), "Valid UTF-8 for %lu", 
-        (unsigned long)code_point);
-    TEST_INT_EQ(batch, len, StrHelp_UTF8_COUNT[(unsigned char)buffer[0]], 
-        "length returned for %lu", (unsigned long)code_point);
-    TEST_TRUE(batch, StrHelp_back_utf8_char(end, start) == start, 
-        "back_utf8_char for %lu", (unsigned long)code_point);
+    TEST_TRUE(batch, StrHelp_utf8_valid(buffer, len), "Valid UTF-8 for %lu",
+              (unsigned long)code_point);
+    TEST_INT_EQ(batch, len, StrHelp_UTF8_COUNT[(unsigned char)buffer[0]],
+                "length returned for %lu", (unsigned long)code_point);
+    TEST_TRUE(batch, StrHelp_back_utf8_char(end, start) == start,
+              "back_utf8_char for %lu", (unsigned long)code_point);
     TEST_INT_EQ(batch, StrHelp_decode_utf8_char(buffer), code_point,
-        "round trip encode and decode for %lu", (unsigned long)code_point);
+                "round trip encode and decode for %lu", (unsigned long)code_point);
 }
 
 static void
-test_utf8_round_trip(TestBatch *batch)
-{
-    uint32_t code_points[] = { 
-        0, 
+test_utf8_round_trip(TestBatch *batch) {
+    uint32_t code_points[] = {
+        0,
         0xA,      // newline
-        'a', 
+        'a',
         128,      // two-byte
         0x263A,   // smiley (three-byte)
         0x10FFFF, // Max legal code point (four-byte).
@@ -86,37 +82,34 @@ test_utf8_round_trip(TestBatch *batch)
 }
 
 static void
-test_is_whitespace(TestBatch *batch)
-{
+test_is_whitespace(TestBatch *batch) {
     TEST_TRUE(batch, StrHelp_is_whitespace(' '), "space is whitespace");
     TEST_TRUE(batch, StrHelp_is_whitespace('\n'), "newline is whitespace");
     TEST_TRUE(batch, StrHelp_is_whitespace('\t'), "tab is whitespace");
-    TEST_TRUE(batch, StrHelp_is_whitespace('\v'), 
-        "vertical tab is whitespace");
-    TEST_TRUE(batch, StrHelp_is_whitespace(0x180E), 
-        "Mongolian vowel separator is whitespace");
+    TEST_TRUE(batch, StrHelp_is_whitespace('\v'),
+              "vertical tab is whitespace");
+    TEST_TRUE(batch, StrHelp_is_whitespace(0x180E),
+              "Mongolian vowel separator is whitespace");
     TEST_FALSE(batch, StrHelp_is_whitespace('a'), "'a' isn't whitespace");
     TEST_FALSE(batch, StrHelp_is_whitespace(0), "NULL isn't whitespace");
-    TEST_FALSE(batch, StrHelp_is_whitespace(0x263A), 
-        "Smiley isn't whitespace");
+    TEST_FALSE(batch, StrHelp_is_whitespace(0x263A),
+               "Smiley isn't whitespace");
 }
 
 static void
-test_back_utf8_char(TestBatch *batch)
-{
+test_back_utf8_char(TestBatch *batch) {
     char buffer[4];
     char *buf = buffer + 1;
     uint32_t len = StrHelp_encode_utf8_char(0x263A, buffer);
     char *end = buffer + len;
     TEST_TRUE(batch, StrHelp_back_utf8_char(end, buffer) == buffer,
-        "back_utf8_char");
+              "back_utf8_char");
     TEST_TRUE(batch, StrHelp_back_utf8_char(end, buf) == NULL,
-        "back_utf8_char returns NULL rather than back up beyond start");
+              "back_utf8_char returns NULL rather than back up beyond start");
 }
 
 void
-TestStrHelp_run_tests()
-{
+TestStrHelp_run_tests() {
     TestBatch *batch = TestBatch_new(43);
 
     TestBatch_Plan(batch);

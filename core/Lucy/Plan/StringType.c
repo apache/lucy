@@ -22,22 +22,19 @@
 #include "Lucy/Index/Similarity.h"
 
 StringType*
-StringType_new()
-{
+StringType_new() {
     StringType *self = (StringType*)VTable_Make_Obj(STRINGTYPE);
     return StringType_init(self);
 }
 
 StringType*
-StringType_init(StringType *self)
-{
+StringType_init(StringType *self) {
     return StringType_init2(self, 1.0, true, true, false);
 }
 
 StringType*
-StringType_init2(StringType *self, float boost, bool_t indexed, 
-                 bool_t stored, bool_t sortable)
-{
+StringType_init2(StringType *self, float boost, bool_t indexed,
+                 bool_t stored, bool_t sortable) {
     FType_init((FieldType*)self);
     self->boost      = boost;
     self->indexed    = indexed;
@@ -47,8 +44,7 @@ StringType_init2(StringType *self, float boost, bool_t indexed,
 }
 
 bool_t
-StringType_equals(StringType *self, Obj *other)
-{
+StringType_equals(StringType *self, Obj *other) {
     StringType *twin = (StringType*)other;
     if (twin == self) return true;
     if (!FType_equals((FieldType*)self, other)) return false;
@@ -56,8 +52,7 @@ StringType_equals(StringType *self, Obj *other)
 }
 
 Hash*
-StringType_dump_for_schema(StringType *self) 
-{
+StringType_dump_for_schema(StringType *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("string"));
 
@@ -79,24 +74,22 @@ StringType_dump_for_schema(StringType *self)
 }
 
 Hash*
-StringType_dump(StringType *self)
-{
+StringType_dump(StringType *self) {
     Hash *dump = StringType_Dump_For_Schema(self);
-    Hash_Store_Str(dump, "_class", 6, 
-        (Obj*)CB_Clone(StringType_Get_Class_Name(self)));
+    Hash_Store_Str(dump, "_class", 6,
+                   (Obj*)CB_Clone(StringType_Get_Class_Name(self)));
     DECREF(Hash_Delete_Str(dump, "type", 4));
     return dump;
 }
 
 StringType*
-StringType_load(StringType *self, Obj *dump)
-{
+StringType_load(StringType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
-    VTable *vtable 
+    VTable *vtable
         = (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF))
-        ? VTable_singleton(class_name, NULL)
-        : STRINGTYPE;
+          ? VTable_singleton(class_name, NULL)
+          : STRINGTYPE;
     StringType *loaded   = (StringType*)VTable_Make_Obj(vtable);
     Obj *boost_dump      = Hash_Fetch_Str(source, "boost", 5);
     Obj *indexed_dump    = Hash_Fetch_Str(source, "indexed", 7);
@@ -105,28 +98,30 @@ StringType_load(StringType *self, Obj *dump)
     UNUSED_VAR(self);
 
     StringType_init(loaded);
-    if (boost_dump)    
-        { loaded->boost    = (float)Obj_To_F64(boost_dump);     }
-    if (indexed_dump)  
-        { loaded->indexed  = (bool_t)Obj_To_I64(indexed_dump);  }
-    if (stored_dump)   
-        { loaded->stored   = (bool_t)Obj_To_I64(stored_dump);   }
-    if (sortable_dump) 
-        { loaded->sortable = (bool_t)Obj_To_I64(sortable_dump); }
+    if (boost_dump) {
+        loaded->boost = (float)Obj_To_F64(boost_dump);
+    }
+    if (indexed_dump) {
+        loaded->indexed = (bool_t)Obj_To_I64(indexed_dump);
+    }
+    if (stored_dump) {
+        loaded->stored = (bool_t)Obj_To_I64(stored_dump);
+    }
+    if (sortable_dump) {
+        loaded->sortable = (bool_t)Obj_To_I64(sortable_dump);
+    }
 
     return loaded;
 }
 
 Similarity*
-StringType_make_similarity(StringType *self)
-{
+StringType_make_similarity(StringType *self) {
     UNUSED_VAR(self);
     return Sim_new();
 }
 
 Posting*
-StringType_make_posting(StringType *self, Similarity *similarity)
-{
+StringType_make_posting(StringType *self, Similarity *similarity) {
     if (similarity) {
         return (Posting*)ScorePost_new(similarity);
     }

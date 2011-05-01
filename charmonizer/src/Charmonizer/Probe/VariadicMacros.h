@@ -18,7 +18,7 @@
  */
 
 #ifndef H_CHAZ_VARIADIC_MACROS
-#define H_CHAZ_VARIADIC_MACROS 
+#define H_CHAZ_VARIADIC_MACROS
 
 #ifdef __cplusplus
 extern "C" {

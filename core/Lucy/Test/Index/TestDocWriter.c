@@ -22,8 +22,7 @@
 #include "Lucy/Index/DocWriter.h"
 
 void
-TestDocWriter_run_tests()
-{
+TestDocWriter_run_tests() {
     TestBatch *batch = TestBatch_new(1);
     TestBatch_Plan(batch);
     PASS(batch, "placeholder");

@@ -27,14 +27,14 @@ class Lucy::Object::BitVector cnick BitVec
     uint32_t  cap;
     uint8_t  *bits;
 
-    inert incremented BitVector* 
+    inert incremented BitVector*
     new(uint32_t capacity = 0);
 
     /**
      * @param capacity The number of bits that the initial array should be
      * able to hold.
      */
-    public inert BitVector* 
+    public inert BitVector*
     init(BitVector *self, uint32_t capacity = 0);
 
     /** Return true if the bit at <code>tick</code> has been set, false if it
@@ -133,7 +133,7 @@ class Lucy::Object::BitVector cnick BitVec
      * @param tick The bit to invert.
      */
     public void
-    Flip(BitVector *self, uint32_t tick); 
+    Flip(BitVector *self, uint32_t tick);
 
     /** Invert each bit within a contiguous block.
      *
@@ -156,7 +156,7 @@ class Lucy::Object::BitVector cnick BitVec
     public void
     Destroy(BitVector *self);
 
-    public incremented BitVector* 
+    public incremented BitVector*
     Clone(BitVector *self);
 }
 

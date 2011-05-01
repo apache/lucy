@@ -24,18 +24,17 @@
 #include "Lucy/Analysis/RegexTokenizer.h"
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
+test_Dump_Load_and_Equals(TestBatch *batch) {
     BlobType *type            = BlobType_new(true);
     Obj      *dump            = (Obj*)BlobType_Dump(type);
     Obj      *clone           = Obj_Load(dump, dump);
     Obj      *another_dump    = (Obj*)BlobType_Dump_For_Schema(type);
     BlobType *another_clone   = BlobType_load(NULL, another_dump);
 
-    TEST_TRUE(batch, BlobType_Equals(type, (Obj*)clone), 
-        "Dump => Load round trip");
-    TEST_TRUE(batch, BlobType_Equals(type, (Obj*)another_clone), 
-        "Dump_For_Schema => Load round trip");
+    TEST_TRUE(batch, BlobType_Equals(type, (Obj*)clone),
+              "Dump => Load round trip");
+    TEST_TRUE(batch, BlobType_Equals(type, (Obj*)another_clone),
+              "Dump_For_Schema => Load round trip");
 
     DECREF(type);
     DECREF(dump);
@@ -45,8 +44,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 void
-TestBlobType_run_tests()
-{
+TestBlobType_run_tests() {
     TestBatch *batch = TestBatch_new(2);
     TestBatch_Plan(batch);
     test_Dump_Load_and_Equals(batch);

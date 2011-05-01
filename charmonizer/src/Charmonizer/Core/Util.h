@@ -38,22 +38,22 @@ chaz_Util_write_file(const char *filename, const char *content);
 
 /* Read an entire file into memory.
  */
-char* 
+char*
 chaz_Util_slurp_file(const char *file_path, size_t *len_ptr);
 
 /* Return a newly allocated copy of a NULL-terminated string.
  */
-char* 
+char*
 chaz_Util_strdup(const char *string);
 
 /* Get the length of a file (may overshoot on text files under DOS).
  */
-long  
+long
 chaz_Util_flength(void *file);
 
 /* Print an error message to stderr and exit.
  */
-void  
+void
 chaz_Util_die(const char *format, ...);
 
 /* Print an error message to stderr.
@@ -76,15 +76,15 @@ int
 chaz_Util_can_open_file(const char *file_path);
 
 #ifdef CHAZ_USE_SHORT_NAMES
-  #define Util_verbosity              chaz_Util_verbosity 
-  #define Util_write_file             chaz_Util_write_file 
-  #define Util_slurp_file             chaz_Util_slurp_file 
-  #define Util_flength                chaz_Util_flength 
-  #define Util_die                    chaz_Util_die 
-  #define Util_warn                   chaz_Util_warn 
+  #define Util_verbosity              chaz_Util_verbosity
+  #define Util_write_file             chaz_Util_write_file
+  #define Util_slurp_file             chaz_Util_slurp_file
+  #define Util_flength                chaz_Util_flength
+  #define Util_die                    chaz_Util_die
+  #define Util_warn                   chaz_Util_warn
   #define Util_strdup                 chaz_Util_strdup
-  #define Util_remove_and_verify      chaz_Util_remove_and_verify 
-  #define Util_can_open_file          chaz_Util_can_open_file 
+  #define Util_remove_and_verify      chaz_Util_remove_and_verify
+  #define Util_can_open_file          chaz_Util_can_open_file
 #endif
 
 #ifdef __cplusplus

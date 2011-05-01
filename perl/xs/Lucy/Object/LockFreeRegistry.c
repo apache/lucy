@@ -22,11 +22,10 @@
 #include "Lucy/Object/Host.h"
 
 void*
-lucy_LFReg_to_host(lucy_LockFreeRegistry *self)
-{
+lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
     chy_bool_t first_time = self->ref.count < 4 ? true : false;
-    lucy_LFReg_to_host_t to_host = (lucy_LFReg_to_host_t)
-        LUCY_SUPER_METHOD(LUCY_LOCKFREEREGISTRY, LFReg, To_Host);
+    lucy_LFReg_to_host_t to_host = (lucy_LFReg_to_host_t)LUCY_SUPER_METHOD(
+                                       LUCY_LOCKFREEREGISTRY, LFReg, To_Host);
     SV *host_obj = (SV*)to_host(self);
     if (first_time) {
         SvSHARE((SV*)self->ref.host_obj);

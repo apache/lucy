@@ -42,8 +42,7 @@
 #define make_poly_query   (Query*)lucy_TestUtils_make_poly_query
 
 static TestQueryParser*
-leaf_test_simple_term()
-{
+leaf_test_simple_term() {
     Query   *tree     = make_leaf_query(NULL, "a");
     Query   *plain_q  = make_term_query("plain", "a");
     Query   *fancy_q  = make_term_query("fancy", "a");
@@ -52,8 +51,7 @@ leaf_test_simple_term()
 }
 
 static TestQueryParser*
-leaf_test_simple_phrase()
-{
+leaf_test_simple_phrase() {
     Query   *tree     = make_leaf_query(NULL, "\"a b\"");
     Query   *plain_q  = make_phrase_query("plain", "a", "b", NULL);
     Query   *fancy_q  = make_phrase_query("fancy", "a", "b", NULL);
@@ -62,8 +60,7 @@ leaf_test_simple_phrase()
 }
 
 static TestQueryParser*
-leaf_test_unclosed_quote()
-{
+leaf_test_unclosed_quote() {
     Query   *tree     = make_leaf_query(NULL, "\"a b");
     Query   *plain_q  = make_phrase_query("plain", "a", "b", NULL);
     Query   *fancy_q  = make_phrase_query("fancy", "a", "b", NULL);
@@ -72,8 +69,7 @@ leaf_test_unclosed_quote()
 }
 
 static TestQueryParser*
-leaf_test_escaped_quotes_inside()
-{
+leaf_test_escaped_quotes_inside() {
     Query   *tree     = make_leaf_query(NULL, "\"\\\"a b\\\"\"");
     Query   *plain_q  = make_phrase_query("plain", "\"a", "b\"", NULL);
     Query   *fancy_q  = make_phrase_query("fancy", "a", "b", NULL);
@@ -82,8 +78,7 @@ leaf_test_escaped_quotes_inside()
 }
 
 static TestQueryParser*
-leaf_test_escaped_quotes_outside()
-{
+leaf_test_escaped_quotes_outside() {
     Query   *tree = make_leaf_query(NULL, "\\\"a");
     Query   *plain_q  = make_term_query("plain", "\"a");
     Query   *fancy_q  = make_term_query("fancy", "a");
@@ -92,8 +87,7 @@ leaf_test_escaped_quotes_outside()
 }
 
 static TestQueryParser*
-leaf_test_single_term_phrase()
-{
+leaf_test_single_term_phrase() {
     Query   *tree     = make_leaf_query(NULL, "\"a\"");
     Query   *plain_q  = make_phrase_query("plain", "a", NULL);
     Query   *fancy_q  = make_phrase_query("fancy", "a", NULL);
@@ -102,8 +96,7 @@ leaf_test_single_term_phrase()
 }
 
 static TestQueryParser*
-leaf_test_longer_phrase()
-{
+leaf_test_longer_phrase() {
     Query   *tree     = make_leaf_query(NULL, "\"a b c\"");
     Query   *plain_q  = make_phrase_query("plain", "a", "b", "c", NULL);
     Query   *fancy_q  = make_phrase_query("fancy", "a", "b", "c", NULL);
@@ -112,8 +105,7 @@ leaf_test_longer_phrase()
 }
 
 static TestQueryParser*
-leaf_test_empty_phrase()
-{
+leaf_test_empty_phrase() {
     Query   *tree     = make_leaf_query(NULL, "\"\"");
     Query   *plain_q  = make_phrase_query("plain", NULL);
     Query   *fancy_q  = make_phrase_query("fancy", NULL);
@@ -122,8 +114,7 @@ leaf_test_empty_phrase()
 }
 
 static TestQueryParser*
-leaf_test_phrase_with_stopwords()
-{
+leaf_test_phrase_with_stopwords() {
     Query   *tree     = make_leaf_query(NULL, "\"x a\"");
     Query   *plain_q  = make_phrase_query("plain", "x", "a", NULL);
     Query   *fancy_q  = make_phrase_query("fancy", "a", NULL);
@@ -132,8 +123,7 @@ leaf_test_phrase_with_stopwords()
 }
 
 static TestQueryParser*
-leaf_test_different_tokenization()
-{
+leaf_test_different_tokenization() {
     Query   *tree     = make_leaf_query(NULL, "a.b");
     Query   *plain_q  = make_term_query("plain", "a.b");
     Query   *fancy_q  = make_phrase_query("fancy", "a", "b", NULL);
@@ -142,52 +132,46 @@ leaf_test_different_tokenization()
 }
 
 static TestQueryParser*
-leaf_test_http()
-{
+leaf_test_http() {
     char address[] = "http://www.foo.com/bar.html";
     Query *tree = make_leaf_query(NULL, address);
     Query *plain_q = make_term_query("plain", address);
     Query *fancy_q = make_phrase_query("fancy", "http", "www", "foo",
-        "com", "bar", "html", NULL);
+                                       "com", "bar", "html", NULL);
     Query   *expanded = make_poly_query(BOOLOP_OR, fancy_q, plain_q, NULL);
     return TestQP_new(address, tree, expanded, 0);
 }
 
 static TestQueryParser*
-leaf_test_field()
-{
+leaf_test_field() {
     Query *tree     = make_leaf_query("plain", "b");
     Query *expanded = make_term_query("plain", "b");
     return TestQP_new("plain:b", tree, expanded, 3);
 }
 
 static TestQueryParser*
-leaf_test_unrecognized_field()
-{
+leaf_test_unrecognized_field() {
     Query *tree     = make_leaf_query("bogusfield", "b");
     Query *expanded = make_term_query("bogusfield", "b");
     return TestQP_new("bogusfield:b", tree, expanded, 0);
 }
 
 static TestQueryParser*
-leaf_test_unescape_colons()
-{
+leaf_test_unescape_colons() {
     Query *tree     = make_leaf_query("plain", "a\\:b");
     Query *expanded = make_term_query("plain", "a:b");
     return TestQP_new("plain:a\\:b", tree, expanded, 0);
 }
 
 static TestQueryParser*
-syntax_test_minus_plus()
-{
+syntax_test_minus_plus() {
     Query *leaf = make_leaf_query(NULL, "a");
     Query *tree = make_not_query(leaf);
     return TestQP_new("-+a", tree, NULL, 0);
 }
 
 static TestQueryParser*
-syntax_test_plus_minus()
-{
+syntax_test_plus_minus() {
     // Not a perfect result, but then it's not a good query string.
     Query *leaf = make_leaf_query(NULL, "a");
     Query *tree = make_not_query(leaf);
@@ -195,23 +179,20 @@ syntax_test_plus_minus()
 }
 
 static TestQueryParser*
-syntax_test_minus_minus()
-{
+syntax_test_minus_minus() {
     // Not a perfect result, but then it's not a good query string.
     Query *tree = make_leaf_query(NULL, "a");
     return TestQP_new("--a", tree, NULL, 4);
 }
 
 static TestQueryParser*
-syntax_test_not_minus()
-{
+syntax_test_not_minus() {
     Query *tree = make_leaf_query(NULL, "a");
     return TestQP_new("NOT -a", tree, NULL, 4);
 }
 
 static TestQueryParser*
-syntax_test_not_plus()
-{
+syntax_test_not_plus() {
     // Not a perfect result, but then it's not a good query string.
     Query *leaf = make_leaf_query(NULL, "a");
     Query *tree = make_not_query(leaf);
@@ -219,8 +200,7 @@ syntax_test_not_plus()
 }
 
 static TestQueryParser*
-syntax_test_padded_plus()
-{
+syntax_test_padded_plus() {
     Query *plus = make_leaf_query(NULL, "+");
     Query *a = make_leaf_query(NULL, "a");
     Query *tree = make_poly_query(BOOLOP_OR, plus, a, NULL);
@@ -228,8 +208,7 @@ syntax_test_padded_plus()
 }
 
 static TestQueryParser*
-syntax_test_padded_minus()
-{
+syntax_test_padded_minus() {
     Query *minus = make_leaf_query(NULL, "-");
     Query *a = make_leaf_query(NULL, "a");
     Query *tree = make_poly_query(BOOLOP_OR, minus, a, NULL);
@@ -237,8 +216,7 @@ syntax_test_padded_minus()
 }
 
 static TestQueryParser*
-syntax_test_unclosed_parens()
-{
+syntax_test_unclosed_parens() {
     // Not a perfect result, but then it's not a good query string.
     Query *inner = make_poly_query(BOOLOP_OR, NULL);
     Query *tree = make_poly_query(BOOLOP_OR, inner, NULL);
@@ -246,30 +224,26 @@ syntax_test_unclosed_parens()
 }
 
 static TestQueryParser*
-syntax_test_escaped_quotes_outside()
-{
+syntax_test_escaped_quotes_outside() {
     Query *tree = make_leaf_query(NULL, "\\\"a\\\"");
     return TestQP_new("\\\"a\\\"", tree, NULL, 4);
 }
 
 static TestQueryParser*
-syntax_test_escaped_quotes_inside()
-{
+syntax_test_escaped_quotes_inside() {
     Query *tree = make_leaf_query(NULL, "\"\\\"a\\\"\"");
     return TestQP_new("\"\\\"a\\\"\"", tree, NULL, 4);
 }
 
 static TestQueryParser*
-syntax_test_identifier_field_name()
-{
+syntax_test_identifier_field_name() {
     // Field names must be identifiers, i.e. they cannot start with a number.
     Query *tree = make_leaf_query(NULL, "10:30");
     return TestQP_new("10:30", tree, NULL, 0);
 }
 
 static TestQueryParser*
-syntax_test_double_colon()
-{
+syntax_test_double_colon() {
     Query *tree = make_leaf_query(NULL, "PHP::Interpreter");
     return TestQP_new("PHP::Interpreter", tree, NULL, 0);
 }
@@ -314,13 +288,12 @@ static lucy_TestQPSyntax_test_t syntax_test_funcs[] = {
 };
 
 void
-TestQPSyntax_run_tests(Folder *index)
-{
+TestQPSyntax_run_tests(Folder *index) {
     uint32_t i;
     TestBatch     *batch      = TestBatch_new(66);
     IndexSearcher *searcher   = IxSearcher_new((Obj*)index);
-    QueryParser   *qparser    = QParser_new(IxSearcher_Get_Schema(searcher), 
-        NULL, NULL, NULL);
+    QueryParser   *qparser    = QParser_new(IxSearcher_Get_Schema(searcher),
+                                            NULL, NULL, NULL);
     QParser_Set_Heed_Colons(qparser, true);
 
     TestBatch_Plan(batch);
@@ -334,11 +307,11 @@ TestQPSyntax_run_tests(Folder *index)
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(batch, Query_Equals(tree, (Obj*)test_case->tree),
-            "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                  "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
         TEST_TRUE(batch, Query_Equals(expanded, (Obj*)test_case->expanded),
-            "expand_leaf()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                  "expand_leaf()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
         TEST_INT_EQ(batch, Hits_Total_Hits(hits), test_case->num_hits,
-            "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                    "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(expanded);
@@ -354,9 +327,9 @@ TestQPSyntax_run_tests(Folder *index)
         Hits  *hits   = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(batch, Query_Equals(tree, (Obj*)test_case->tree),
-            "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                  "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
         TEST_INT_EQ(batch, Hits_Total_Hits(hits), test_case->num_hits,
-            "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                    "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);

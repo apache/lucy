@@ -21,15 +21,15 @@ parcel Lucy;
 
 class Lucy::Search::NOTMatcher inherits Lucy::Search::PolyMatcher {
 
-    Matcher       *negated_matcher; 
+    Matcher       *negated_matcher;
     int32_t        doc_id;
     int32_t        doc_max;
     int32_t        next_negation;
 
-    inert incremented NOTMatcher* 
+    inert incremented NOTMatcher*
     new(Matcher* negated_matcher, int32_t doc_max);
 
-    inert NOTMatcher* 
+    inert NOTMatcher*
     init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max);
 
     public void
@@ -44,7 +44,7 @@ class Lucy::Search::NOTMatcher inherits Lucy::Search::PolyMatcher {
     public float
     Score(NOTMatcher *self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(NOTMatcher *self);
 }
 

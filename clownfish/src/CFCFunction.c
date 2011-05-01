@@ -35,19 +35,18 @@
 CFCFunction*
 CFCFunction_new(CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *class_cnick,
-                const char *micro_sym, CFCType *return_type, 
-                CFCParamList *param_list, CFCDocuComment *docucomment, 
-                int is_inline)
-{
+                const char *micro_sym, CFCType *return_type,
+                CFCParamList *param_list, CFCDocuComment *docucomment,
+                int is_inline) {
     CFCFunction *self = (CFCFunction*)CFCBase_allocate(sizeof(CFCFunction),
-        "Clownfish::Function");
+                                                       "Clownfish::Function");
     return CFCFunction_init(self, parcel, exposure, class_name, class_cnick,
-        micro_sym, return_type, param_list, docucomment, is_inline);
+                            micro_sym, return_type, param_list, docucomment,
+                            is_inline);
 }
 
 static int
-S_validate_micro_sym(const char *micro_sym)
-{
+S_validate_micro_sym(const char *micro_sym) {
     size_t i;
     size_t len = strlen(micro_sym);
     if (!len) { return false; }
@@ -60,15 +59,14 @@ S_validate_micro_sym(const char *micro_sym)
 
 CFCFunction*
 CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
-               const char *class_name, const char *class_cnick, 
-               const char *micro_sym, CFCType *return_type, 
-               CFCParamList *param_list, CFCDocuComment *docucomment, 
-               int is_inline)
-{
+                 const char *class_name, const char *class_cnick,
+                 const char *micro_sym, CFCType *return_type,
+                 CFCParamList *param_list, CFCDocuComment *docucomment,
+                 int is_inline) {
 
     exposure = exposure ? exposure : "parcel";
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
-        class_cnick, micro_sym);
+                   class_cnick, micro_sym);
     CFCUTIL_NULL_CHECK(class_name);
     CFCUTIL_NULL_CHECK(return_type);
     CFCUTIL_NULL_CHECK(param_list);
@@ -83,8 +81,7 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
 }
 
 void
-CFCFunction_destroy(CFCFunction *self)
-{
+CFCFunction_destroy(CFCFunction *self) {
     CFCBase_decref((CFCBase*)self->return_type);
     CFCBase_decref((CFCBase*)self->param_list);
     CFCBase_decref((CFCBase*)self->docucomment);
@@ -92,44 +89,37 @@ CFCFunction_destroy(CFCFunction *self)
 }
 
 CFCType*
-CFCFunction_get_return_type(CFCFunction *self)
-{
+CFCFunction_get_return_type(CFCFunction *self) {
     return self->return_type;
 }
 
 CFCParamList*
-CFCFunction_get_param_list(CFCFunction *self)
-{
+CFCFunction_get_param_list(CFCFunction *self) {
     return self->param_list;
 }
 
 CFCDocuComment*
-CFCFunction_get_docucomment(CFCFunction *self)
-{
+CFCFunction_get_docucomment(CFCFunction *self) {
     return self->docucomment;
 }
 
 int
-CFCFunction_inline(CFCFunction *self)
-{
+CFCFunction_inline(CFCFunction *self) {
     return self->is_inline;
 }
 
 int
-CFCFunction_void(CFCFunction *self)
-{
+CFCFunction_void(CFCFunction *self) {
     return CFCType_is_void(self->return_type);
 }
 
 const char*
-CFCFunction_full_func_sym(CFCFunction *self)
-{
+CFCFunction_full_func_sym(CFCFunction *self) {
     return CFCSymbol_full_sym((CFCSymbol*)self);
 }
 
 const char*
-CFCFunction_short_func_sym(CFCFunction *self)
-{
+CFCFunction_short_func_sym(CFCFunction *self) {
     return CFCSymbol_short_sym((CFCSymbol*)self);
 }
 

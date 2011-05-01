@@ -20,15 +20,13 @@
 #include "Lucy/Search/BitVecMatcher.h"
 
 BitVecMatcher*
-BitVecMatcher_new(BitVector *bit_vector)
-{
+BitVecMatcher_new(BitVector *bit_vector) {
     BitVecMatcher *self = (BitVecMatcher*)VTable_Make_Obj(BITVECMATCHER);
     return BitVecMatcher_init(self, bit_vector);
 }
 
 BitVecMatcher*
-BitVecMatcher_init(BitVecMatcher *self, BitVector *bit_vector)
-{
+BitVecMatcher_init(BitVecMatcher *self, BitVector *bit_vector) {
     Matcher_init((Matcher*)self);
     self->bit_vec = (BitVector*)INCREF(bit_vector);
     self->doc_id = 0;
@@ -36,27 +34,26 @@ BitVecMatcher_init(BitVecMatcher *self, BitVector *bit_vector)
 }
 
 void
-BitVecMatcher_destroy(BitVecMatcher *self)
-{
+BitVecMatcher_destroy(BitVecMatcher *self) {
     DECREF(self->bit_vec);
     SUPER_DESTROY(self, BITVECMATCHER);
 }
 
 int32_t
-BitVecMatcher_next(BitVecMatcher *self)
-{
+BitVecMatcher_next(BitVecMatcher *self) {
     self->doc_id = BitVec_Next_Hit(self->bit_vec, self->doc_id + 1);
     return self->doc_id == -1 ? 0 : self->doc_id;
 }
 
 int32_t
-BitVecMatcher_advance(BitVecMatcher *self, int32_t target) 
-{
+BitVecMatcher_advance(BitVecMatcher *self, int32_t target) {
     self->doc_id = BitVec_Next_Hit(self->bit_vec, target);
     return self->doc_id == -1 ? 0 : self->doc_id;
 }
 
 int32_t
-BitVecMatcher_get_doc_id(BitVecMatcher *self) { return self->doc_id; }
+BitVecMatcher_get_doc_id(BitVecMatcher *self) {
+    return self->doc_id;
+}
 
 

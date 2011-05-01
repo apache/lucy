@@ -28,7 +28,7 @@ parcel Lucy;
  * For an exact-match, single value field type using character data, see
  * L<StringType|Lucy::Plan::StringType>.
  */
-class Lucy::Plan::FullTextType 
+class Lucy::Plan::FullTextType
     inherits Lucy::Plan::TextType : dumpable {
 
     bool_t      highlightable;
@@ -43,15 +43,15 @@ class Lucy::Plan::FullTextType
      * @param highlightable boolean indicating whether the field should be
      * highlightable.
      */
-    public inert FullTextType* 
+    public inert FullTextType*
     init(FullTextType *self, Analyzer *analyzer);
 
-    inert FullTextType* 
+    inert FullTextType*
     init2(FullTextType *self, Analyzer *analyzer, float boost = 1.0,
-          bool_t indexed = true, bool_t stored = true, 
+          bool_t indexed = true, bool_t stored = true,
           bool_t sortable = false, bool_t highlightable = false);
 
-    public inert incremented FullTextType* 
+    public inert incremented FullTextType*
     new(Analyzer *analyzer);
 
     /** Indicate whether to store data required by

@@ -23,28 +23,24 @@
 #include "Lucy/Plan/Schema.h"
 
 NoMatchMatcher*
-NoMatchMatcher_new()
-{
+NoMatchMatcher_new() {
     NoMatchMatcher *self = (NoMatchMatcher*)VTable_Make_Obj(NOMATCHMATCHER);
     return NoMatchMatcher_init(self);
 }
 
 NoMatchMatcher*
-NoMatchMatcher_init(NoMatchMatcher *self)
-{
+NoMatchMatcher_init(NoMatchMatcher *self) {
     return (NoMatchMatcher*)Matcher_init((Matcher*)self);
-}   
+}
 
 int32_t
-NoMatchMatcher_next(NoMatchMatcher* self) 
-{
+NoMatchMatcher_next(NoMatchMatcher* self) {
     UNUSED_VAR(self);
     return 0;
 }
 
 int32_t
-NoMatchMatcher_advance(NoMatchMatcher* self, int32_t target) 
-{
+NoMatchMatcher_advance(NoMatchMatcher* self, int32_t target) {
     UNUSED_VAR(self);
     UNUSED_VAR(target);
     return 0;

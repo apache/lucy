@@ -31,11 +31,11 @@ class Lucy::Test::Search::TestQueryParser cnick TestQP
      * reference count each for <code>tree</code>, and <code>expanded</code>.
      */
     inert incremented TestQueryParser*
-    new(const char *query_string = NULL, Query *tree = NULL, 
+    new(const char *query_string = NULL, Query *tree = NULL,
         Query *expanded = NULL, uint32_t num_hits);
 
     inert TestQueryParser*
-    init(TestQueryParser *self, const char *query_string = NULL, 
+    init(TestQueryParser *self, const char *query_string = NULL,
          Query *tree = NULL, Query *expanded = NULL, uint32_t num_hits);
 
     nullable CharBuf*

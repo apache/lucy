@@ -26,7 +26,7 @@ parcel Lucy;
  * which cannot change for the life of an index; IndexManager is used for
  * defining rules which may change from process to process.
  */
-class Lucy::Index::IndexManager cnick IxManager 
+class Lucy::Index::IndexManager cnick IxManager
     inherits Lucy::Object::Obj {
 
     Folder      *folder;
@@ -47,7 +47,7 @@ class Lucy::Index::IndexManager cnick IxManager
      * @param lock_factory A LockFactory.
      */
     public inert IndexManager*
-    init(IndexManager *self, const CharBuf *host = NULL, 
+    init(IndexManager *self, const CharBuf *host = NULL,
          LockFactory *lock_factory = NULL);
 
     public void
@@ -62,12 +62,12 @@ class Lucy::Index::IndexManager cnick IxManager
 
     /** Getter for <code>folder</code> member.
      */
-    public nullable Folder* 
+    public nullable Folder*
     Get_Folder(IndexManager *self);
 
     /** Getter for <code>host</code> member.
      */
-    public CharBuf* 
+    public CharBuf*
     Get_Host(IndexManager *self);
 
     /** Return an array of SegReaders representing segments that should be
@@ -84,8 +84,8 @@ class Lucy::Index::IndexManager cnick IxManager
      * optimizing the index for search-time performance.
      */
     public incremented VArray*
-    Recycle(IndexManager *self, PolyReader *reader, 
-            DeletionsWriter *del_writer, int64_t cutoff, 
+    Recycle(IndexManager *self, PolyReader *reader,
+            DeletionsWriter *del_writer, int64_t cutoff,
             bool_t optimize = false);
 
     /** Return a tick.  All segments below that tick will be merged.

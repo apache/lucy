@@ -48,7 +48,7 @@ extern "C" {
 
 /* Run the Floats module.
  */
-void 
+void
 chaz_Floats_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES

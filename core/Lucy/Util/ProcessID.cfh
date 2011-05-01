@@ -19,10 +19,10 @@ parcel Lucy;
 /** Provide platform-compatible process ID functions.
  */
 inert class Lucy::Util::ProcessID cnick PID {
-    
+
     /** Return the ID for the current process.
      */
-    inert int 
+    inert int
     getpid(void);
 
     /** Return true if the supplied process ID is associated with an active

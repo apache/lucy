@@ -25,10 +25,10 @@ class Lucy::Search::ANDMatcher inherits Lucy::Search::PolyMatcher {
     bool_t        more;
     bool_t        first_time;
 
-    inert incremented ANDMatcher* 
+    inert incremented ANDMatcher*
     new(VArray *children, Similarity *sim);
 
-    inert ANDMatcher* 
+    inert ANDMatcher*
     init(ANDMatcher *self, VArray *children, Similarity *similarity);
 
     public void
@@ -43,7 +43,7 @@ class Lucy::Search::ANDMatcher inherits Lucy::Search::PolyMatcher {
     public float
     Score(ANDMatcher *self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(ANDMatcher *self);
 }
 

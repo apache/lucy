@@ -20,8 +20,7 @@
 #include "Lucy/Util/Stepper.h"
 
 Stepper*
-Stepper_init(Stepper *self)
-{
+Stepper_init(Stepper *self) {
     ABSTRACT_CLASS_CHECK(self, STEPPER);
     return self;
 }

@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Index::SortFieldWriter 
+class Lucy::Index::SortFieldWriter
     inherits Lucy::Util::SortExternal {
     CharBuf    *field;
     Hash       *uniq_vals;
@@ -53,22 +53,22 @@ class Lucy::Index::SortFieldWriter
     int32_t     ord_width;
 
     inert incremented SortFieldWriter*
-    new(Schema *schema, Snapshot *snapshot, Segment *segment, 
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
         PolyReader *polyreader, const CharBuf *field, MemoryPool *memory_pool,
         size_t mem_thresh, OutStream *temp_ord_out, OutStream *temp_ix_out,
         OutStream *temp_dat_out);
 
     inert SortFieldWriter*
-    init(SortFieldWriter *self, Schema *schema, Snapshot *snapshot, 
+    init(SortFieldWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader, const CharBuf *field,
-         MemoryPool *memory_pool, size_t mem_thresh, OutStream *temp_ord_out, 
+         MemoryPool *memory_pool, size_t mem_thresh, OutStream *temp_ord_out,
          OutStream *temp_ix_out, OutStream *temp_dat_out);
 
     void
     Add(SortFieldWriter *self, int32_t doc_id, Obj *value);
 
     void
-    Add_Segment(SortFieldWriter *self, SegReader *reader, I32Array *doc_map, 
+    Add_Segment(SortFieldWriter *self, SegReader *reader, I32Array *doc_map,
                 SortCache *sort_cache);
 
     void

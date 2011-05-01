@@ -58,7 +58,7 @@ __END_C__
  * series of arguments using the ARG_XXX macros.
  *
  *   int32_t area = (int32_t)Host_callback_i64(self, "calc_area", 2,
- *        ARG_I32("length", len),  ARG_I32("width", width) );
+ *        ARG_I32("length", len),  ARG_I32("width", width));
  *
  * The first argument is void* to avoid the need for tiresome casting to Obj*,
  * but must always be a Clownfish object.
@@ -67,7 +67,7 @@ __END_C__
  * callback rather than an object callback.
  */
 inert class Lucy::Object::Host {
- 
+
     /** Invoke an object method in a void context.
      */
     inert void
@@ -81,7 +81,7 @@ inert class Lucy::Object::Host {
     /** Invoke an object method, expecting a 64-bit floating point return
      * value.
      */
-    inert double 
+    inert double
     callback_f64(void *self, char *method, uint32_t num_args, ...);
 
     /** Invoke an object method, expecting a Obj-derived object back, or

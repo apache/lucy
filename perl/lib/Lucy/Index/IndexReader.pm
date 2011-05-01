@@ -38,7 +38,7 @@ PPCODE:
 
 int32_t
 debug1_num_passes()
-CODE: 
+CODE:
     RETVAL = lucy_PolyReader_debug1_num_passes;
 OUTPUT: RETVAL
 END_XS_CODE

@@ -72,7 +72,7 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
      * the parent Query.
      */
     public inert Compiler*
-    init(Compiler *self, Query *parent, Searcher *searcher, 
+    init(Compiler *self, Query *parent, Searcher *searcher,
          Similarity *similarity = NULL, float boost);
 
     /** Factory method returning a Matcher.
@@ -126,7 +126,7 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
      *
      * For a TermQuery, the scoring formula is approximately:
      *
-     *     ( tf_d * idf_t / norm_d ) * ( tf_q * idf_t / norm_q )
+     *     (tf_d * idf_t / norm_d) * (tf_q * idf_t / norm_q)
      *
      * Normalize() is theoretically concerned with applying the second half of
      * that formula to a the Compiler's weight. What actually happens depends
@@ -135,7 +135,7 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
      */
     public void
     Normalize(Compiler *self);
-    
+
     /** Return an array of Span objects, indicating where in the given field
      * the text that matches the parent Query occurs and how well each snippet
      * matches.  The Span's offset and length are measured in Unicode code
@@ -148,7 +148,7 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
      * @param field The name of the field.
      */
     public incremented VArray*
-    Highlight_Spans(Compiler *self, Searcher *searcher, 
+    Highlight_Spans(Compiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
     public void

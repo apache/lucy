@@ -36,12 +36,12 @@ inert class Lucy::Util::Debug {
     /** Private function, used only by the DEBUG macros.
      */
     inert void
-    print_mess(const char *file, int line, const char *func, 
+    print_mess(const char *file, int line, const char *func,
                const char *pat, ...);
 
     /** Private function, used only by the DEBUG macros.
      */
-    inert int 
+    inert int
     debug_should_print(const char *path, const char *func);
 
     /** Force override in cached value of LUCY_DEBUG environment variable.
@@ -94,7 +94,7 @@ __C__
 /** Conditionally print debug statement depending on LUCY_DEBUG env variable.
  */
 #define LUCY_DEBUG(args...)                                            \
-        LUCY_DEBUG_DO(LUCY_DEBUG_PRINT(args));                  
+        LUCY_DEBUG_DO(LUCY_DEBUG_PRINT(args));
 
 /** Abort on error if test fails.
  *
@@ -106,7 +106,7 @@ __C__
             LUCY_DEBUG_PRINT("ASSERT FAILED (" #test ")\n" args);      \
             abort();                                                   \
         }                                                              \
-    } while (0) 
+    } while (0)
 
 #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS) // not LUCY_DEBUG
 

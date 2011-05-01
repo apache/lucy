@@ -139,7 +139,7 @@ abstract class Lucy::Util::SortExternal cnick SortEx
     void
     Grow_Cache(SortExternal *self, uint32_t new_cache_cap);
 
-    void 
+    void
     Set_Mem_Thresh(SortExternal *self, uint32_t mem_thresh);
 
     public void

@@ -43,23 +43,21 @@ static void
 S_seek_tinfo(SegPostingList *self, TermInfo *tinfo);
 
 SegPostingList*
-SegPList_new(PostingListReader *plist_reader, const CharBuf *field)
-{
+SegPList_new(PostingListReader *plist_reader, const CharBuf *field) {
     SegPostingList *self = (SegPostingList*)VTable_Make_Obj(SEGPOSTINGLIST);
     return SegPList_init(self, plist_reader, field);
 }
 
 SegPostingList*
-SegPList_init(SegPostingList *self, PostingListReader *plist_reader, 
-              const CharBuf *field)
-{
+SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
+              const CharBuf *field) {
     Schema       *const schema   = PListReader_Get_Schema(plist_reader);
     Folder       *const folder   = PListReader_Get_Folder(plist_reader);
     Segment      *const segment  = PListReader_Get_Segment(plist_reader);
     Architecture *const arch     = Schema_Get_Architecture(schema);
     CharBuf      *const seg_name = Seg_Get_Name(segment);
     int32_t       field_num      = Seg_Field_Num(segment, field);
-    CharBuf      *post_file      = CB_newf("%o/postings-%i32.dat", 
+    CharBuf      *post_file      = CB_newf("%o/postings-%i32.dat",
                                            seg_name, field_num);
     CharBuf      *skip_file      = CB_newf("%o/postings.skip", seg_name);
 
@@ -76,7 +74,7 @@ SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
     self->plist_reader    = (PostingListReader*)INCREF(plist_reader);
     self->field           = CB_Clone(field);
     self->skip_interval   = Arch_Skip_Interval(arch);
-    
+
     // Derive.
     Similarity *sim = Schema_Fetch_Sim(schema, field);
     self->posting   = Sim_Make_Posting(sim);
@@ -93,7 +91,7 @@ SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
             RETHROW(error);
         }
         self->skip_stream = Folder_Open_In(folder, skip_file);
-        if (!self->skip_stream) { 
+        if (!self->skip_stream) {
             Err *error = (Err*)INCREF(Err_get_error());
             DECREF(post_file);
             DECREF(skip_file);
@@ -112,14 +110,13 @@ SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
     return self;
 }
 
-void 
-SegPList_destroy(SegPostingList *self)
-{
+void
+SegPList_destroy(SegPostingList *self) {
     DECREF(self->plist_reader);
     DECREF(self->posting);
     DECREF(self->skip_stepper);
     DECREF(self->field);
-    
+
     if (self->post_stream != NULL) {
         InStream_Close(self->post_stream);
         InStream_Close(self->skip_stream);
@@ -131,31 +128,32 @@ SegPList_destroy(SegPostingList *self)
 }
 
 Posting*
-SegPList_get_posting(SegPostingList *self) 
-{
+SegPList_get_posting(SegPostingList *self) {
     return self->posting;
 }
 
 uint32_t
-SegPList_get_doc_freq(SegPostingList *self) 
-{
+SegPList_get_doc_freq(SegPostingList *self) {
     return self->doc_freq;
 }
 
 int32_t
-SegPList_get_doc_id(SegPostingList *self) 
-{
+SegPList_get_doc_id(SegPostingList *self) {
     return self->posting->doc_id;
 }
 
 uint32_t
-SegPList_get_count(SegPostingList *self) { return self->count; }
+SegPList_get_count(SegPostingList *self) {
+    return self->count;
+}
+
 InStream*
-SegPList_get_post_stream(SegPostingList *self) { return self->post_stream; }
+SegPList_get_post_stream(SegPostingList *self) {
+    return self->post_stream;
+}
 
 int32_t
-SegPList_next(SegPostingList *self) 
-{
+SegPList_next(SegPostingList *self) {
     InStream *const post_stream = self->post_stream;
     Posting  *const posting     = self->posting;
 
@@ -172,8 +170,7 @@ SegPList_next(SegPostingList *self)
 }
 
 int32_t
-SegPList_advance(SegPostingList *self, int32_t target)
-{
+SegPList_advance(SegPostingList *self, int32_t target) {
     Posting *posting          = self->posting;
     const uint32_t skip_interval = self->skip_interval;
 
@@ -192,18 +189,18 @@ SegPList_advance(SegPostingList *self, int32_t target)
          * ergo, the modulus in the following formula.
          */
         int32_t num_skipped = 0 - (self->count % skip_interval);
-        if (num_skipped == 0 && self->count != 0) { 
-            num_skipped = 0 - skip_interval; 
+        if (num_skipped == 0 && self->count != 0) {
+            num_skipped = 0 - skip_interval;
         }
 
         // See if there's anything to skip.
         while (target > skip_stepper->doc_id) {
-            new_doc_id    = skip_stepper->doc_id;
-            new_filepos   = skip_stepper->filepos;
+            new_doc_id  = skip_stepper->doc_id;
+            new_filepos = skip_stepper->filepos;
 
-            if (   skip_stepper->doc_id != 0 
+            if (skip_stepper->doc_id != 0
                 && skip_stepper->doc_id >= posting->doc_id
-            ) {
+               ) {
                 num_skipped += skip_interval;
             }
 
@@ -233,32 +230,30 @@ SegPList_advance(SegPostingList *self, int32_t target)
     while (1) {
         int32_t doc_id = SegPList_Next(self);
         if (doc_id == 0 || doc_id >= target) {
-            return doc_id; 
+            return doc_id;
         }
     }
 }
 
 void
-SegPList_seek(SegPostingList *self, Obj *target)
-{
+SegPList_seek(SegPostingList *self, Obj *target) {
     LexiconReader *lex_reader = PListReader_Get_Lex_Reader(self->plist_reader);
-    TermInfo      *tinfo      = LexReader_Fetch_Term_Info(lex_reader, 
-        self->field, target);
+    TermInfo      *tinfo      = LexReader_Fetch_Term_Info(lex_reader,
+                                                          self->field, target);
     S_seek_tinfo(self, tinfo);
     DECREF(tinfo);
 }
 
 void
-SegPList_seek_lex(SegPostingList *self, Lexicon *lexicon)
-{
+SegPList_seek_lex(SegPostingList *self, Lexicon *lexicon) {
     // Maybe true, maybe not.
     SegLexicon *const seg_lexicon = (SegLexicon*)lexicon;
 
     // Optimized case.
-    if (   Obj_Is_A((Obj*)lexicon, SEGLEXICON)
-        && (SegLex_Get_Segment(seg_lexicon) ==
-            PListReader_Get_Segment(self->plist_reader)) // i.e. same segment
-    ) {
+    if (Obj_Is_A((Obj*)lexicon, SEGLEXICON)
+        && (SegLex_Get_Segment(seg_lexicon)
+            == PListReader_Get_Segment(self->plist_reader)) // i.e. same segment
+       ) {
         S_seek_tinfo(self, SegLex_Get_Term_Info(seg_lexicon));
     }
     // Punt case.  This is more expensive because of the call to
@@ -270,8 +265,7 @@ SegPList_seek_lex(SegPostingList *self, Lexicon *lexicon)
 }
 
 static void
-S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) 
-{
+S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) {
     self->count = 0;
 
     if (tinfo == NULL) {
@@ -288,27 +282,25 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo)
         Post_Reset(self->posting);
 
         // Prepare to skip.
-        self->skip_count    = 0;
-        self->num_skips     = self->doc_freq / self->skip_interval;
+        self->skip_count = 0;
+        self->num_skips  = self->doc_freq / self->skip_interval;
         SkipStepper_Set_ID_And_Filepos(self->skip_stepper, 0, post_filepos);
         InStream_Seek(self->skip_stream, TInfo_Get_Skip_FilePos(tinfo));
     }
 }
 
 Matcher*
-SegPList_make_matcher(SegPostingList *self, Similarity *sim, 
-                      Compiler *compiler, bool_t need_score)
-{
+SegPList_make_matcher(SegPostingList *self, Similarity *sim,
+                      Compiler *compiler, bool_t need_score) {
     return Post_Make_Matcher(self->posting, sim, (PostingList*)self, compiler,
-        need_score);
+                             need_score);
 }
 
 RawPosting*
 SegPList_read_raw(SegPostingList *self, int32_t last_doc_id, CharBuf *term_text,
-                  MemoryPool *mem_pool)
-{
-    return Post_Read_Raw(self->posting, self->post_stream, 
-        last_doc_id, term_text, mem_pool);
+                  MemoryPool *mem_pool) {
+    return Post_Read_Raw(self->posting, self->post_stream,
+                         last_doc_id, term_text, mem_pool);
 }
 
 

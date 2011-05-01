@@ -24,36 +24,31 @@
 #include "Lucy/Util/StringHelper.h"
 
 TermStepper*
-TermStepper_init(TermStepper *self)
-{
+TermStepper_init(TermStepper *self) {
     Stepper_init((Stepper*)self);
     self->value = NULL;
     return self;
 }
 
 void
-TermStepper_destroy(TermStepper *self)
-{
+TermStepper_destroy(TermStepper *self) {
     DECREF(self->value);
     SUPER_DESTROY(self, TERMSTEPPER);
 }
 
 void
-TermStepper_reset(TermStepper *self)
-{
+TermStepper_reset(TermStepper *self) {
     DECREF(self->value);
     self->value = NULL;
 }
 
 Obj*
-TermStepper_get_value(TermStepper *self)
-{
+TermStepper_get_value(TermStepper *self) {
     return self->value;
 }
 
 void
-TermStepper_set_value(TermStepper *self, Obj *value)
-{
+TermStepper_set_value(TermStepper *self, Obj *value) {
     DECREF(self->value);
     self->value = value ? INCREF(value) : NULL;
 }

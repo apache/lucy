@@ -44,8 +44,7 @@ static CFCParcel *registry[MAX_PARCELS + 1];
 static int first_time = true;
 
 CFCParcel*
-CFCParcel_singleton(const char *name, const char *cnick)
-{
+CFCParcel_singleton(const char *name, const char *cnick) {
     // Set up registry.
     if (first_time) {
         size_t i;
@@ -64,8 +63,8 @@ CFCParcel_singleton(const char *name, const char *cnick)
         CFCParcel *existing = registry[i];
         if (strcmp(existing->name, name) == 0) {
             if (cnick && strcmp(existing->cnick, cnick) != 0) {
-                croak("cnick '%s' for parcel '%s' conflicts with '%s'", 
-                    cnick, name, existing->cnick);
+                croak("cnick '%s' for parcel '%s' conflicts with '%s'",
+                      cnick, name, existing->cnick);
             }
             return existing;
         }
@@ -82,8 +81,7 @@ CFCParcel_singleton(const char *name, const char *cnick)
 }
 
 void
-CFCParcel_reap_singletons(void)
-{
+CFCParcel_reap_singletons(void) {
     if (registry[0]) {
         // default parcel.
         CFCBase_decref((CFCBase*)registry[0]);
@@ -96,26 +94,23 @@ CFCParcel_reap_singletons(void)
 }
 
 static int
-S_validate_name_or_cnick(const char *orig)
-{
+S_validate_name_or_cnick(const char *orig) {
     const char *ptr = orig;
-    for ( ; *ptr != 0; ptr++) {
+    for (; *ptr != 0; ptr++) {
         if (!isalpha(*ptr)) { return false; }
     }
     return true;
 }
 
 CFCParcel*
-CFCParcel_new(const char *name, const char *cnick)
-{
+CFCParcel_new(const char *name, const char *cnick) {
     CFCParcel *self = (CFCParcel*)CFCBase_allocate(sizeof(CFCParcel),
-        "Clownfish::Parcel");
+                                                   "Clownfish::Parcel");
     return CFCParcel_init(self, name, cnick);
 }
 
 CFCParcel*
-CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
-{
+CFCParcel_init(CFCParcel *self, const char *name, const char *cnick) {
     // Validate name.
     if (!name || !S_validate_name_or_cnick(name)) {
         croak("Invalid name: '%s'", name ? name : "[NULL]");
@@ -129,11 +124,11 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
         }
         self->cnick = CFCUtil_strdup(cnick);
     }
-    else {  
+    else {
         // Default cnick to name.
         self->cnick = CFCUtil_strdup(name);
     }
-    
+
     // Derive prefix, Prefix, PREFIX.
     size_t cnick_len  = strlen(self->cnick);
     size_t prefix_len = cnick_len ? cnick_len + 1 : 0;
@@ -162,8 +157,7 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick)
 }
 
 void
-CFCParcel_destroy(CFCParcel *self)
-{
+CFCParcel_destroy(CFCParcel *self) {
     FREEMEM(self->name);
     FREEMEM(self->cnick);
     FREEMEM(self->prefix);
@@ -175,8 +169,7 @@ CFCParcel_destroy(CFCParcel *self)
 static CFCParcel *default_parcel = NULL;
 
 CFCParcel*
-CFCParcel_default_parcel(void)
-{
+CFCParcel_default_parcel(void) {
     if (default_parcel == NULL) {
         default_parcel = CFCParcel_new("DEFAULT", "");
         registry[0] = default_parcel;
@@ -185,46 +178,39 @@ CFCParcel_default_parcel(void)
 }
 
 CFCParcel*
-CFCParcel_clownfish_parcel(void)
-{
+CFCParcel_clownfish_parcel(void) {
     return CFCParcel_singleton("Lucy", "Lucy");
 }
 
 int
-CFCParcel_equals(CFCParcel *self, CFCParcel *other)
-{
+CFCParcel_equals(CFCParcel *self, CFCParcel *other) {
     if (strcmp(self->name, other->name)) { return false; }
     if (strcmp(self->cnick, other->cnick)) { return false; }
     return true;
 }
 
 const char*
-CFCParcel_get_name(CFCParcel *self)
-{
+CFCParcel_get_name(CFCParcel *self) {
     return self->name;
 }
 
 const char*
-CFCParcel_get_cnick(CFCParcel *self)
-{
+CFCParcel_get_cnick(CFCParcel *self) {
     return self->cnick;
 }
 
 const char*
-CFCParcel_get_prefix(CFCParcel *self)
-{
+CFCParcel_get_prefix(CFCParcel *self) {
     return self->prefix;
 }
 
 const char*
-CFCParcel_get_Prefix(CFCParcel *self)
-{
+CFCParcel_get_Prefix(CFCParcel *self) {
     return self->Prefix;
 }
 
 const char*
-CFCParcel_get_PREFIX(CFCParcel *self)
-{
+CFCParcel_get_PREFIX(CFCParcel *self) {
     return self->PREFIX;
 }
 

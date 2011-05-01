@@ -37,7 +37,7 @@ class Lucy::Search::PhraseMatcher inherits Lucy::Search::Matcher {
     new(Similarity *similarity, VArray *posting_lists, Compiler *compiler);
 
     inert PhraseMatcher*
-    init(PhraseMatcher *self, Similarity *similarity, VArray *posting_lists, 
+    init(PhraseMatcher *self, Similarity *similarity, VArray *posting_lists,
          Compiler *compiler);
 
     public void
@@ -49,7 +49,7 @@ class Lucy::Search::PhraseMatcher inherits Lucy::Search::Matcher {
     public int32_t
     Advance(PhraseMatcher *self, int32_t target);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(PhraseMatcher *self);
 
     public float

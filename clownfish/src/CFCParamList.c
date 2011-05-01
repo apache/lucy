@@ -41,16 +41,14 @@ static void
 S_generate_c_strings(CFCParamList *self);
 
 CFCParamList*
-CFCParamList_new(int variadic)
-{
-    CFCParamList *self = (CFCParamList*)CFCBase_allocate(sizeof(CFCParamList), 
-        "Clownfish::ParamList");
+CFCParamList_new(int variadic) {
+    CFCParamList *self = (CFCParamList*)CFCBase_allocate(sizeof(CFCParamList),
+                                                         "Clownfish::ParamList");
     return CFCParamList_init(self, variadic);
 }
 
 CFCParamList*
-CFCParamList_init(CFCParamList *self, int variadic)
-{
+CFCParamList_init(CFCParamList *self, int variadic) {
     self->variadic  = variadic;
     self->num_vars  = 0;
     self->variables = (CFCVariable**)CALLOCATE(1, sizeof(void*));
@@ -60,15 +58,14 @@ CFCParamList_init(CFCParamList *self, int variadic)
 }
 
 void
-CFCParamList_add_param(CFCParamList *self, CFCVariable *variable, 
-                       const char *value)
-{
+CFCParamList_add_param(CFCParamList *self, CFCVariable *variable,
+                       const char *value) {
     CFCUTIL_NULL_CHECK(variable);
     self->num_vars++;
     size_t amount = (self->num_vars + 1) * sizeof(void*);
     self->variables = (CFCVariable**)REALLOCATE(self->variables, amount);
     self->values    = (char**)REALLOCATE(self->values, amount);
-    self->variables[self->num_vars - 1] 
+    self->variables[self->num_vars - 1]
         = (CFCVariable*)CFCBase_incref((CFCBase*)variable);
     self->values[self->num_vars - 1] = value ? CFCUtil_strdup(value) : NULL;
     self->variables[self->num_vars] = NULL;
@@ -78,8 +75,7 @@ CFCParamList_add_param(CFCParamList *self, CFCVariable *variable,
 }
 
 void
-CFCParamList_destroy(CFCParamList *self)
-{
+CFCParamList_destroy(CFCParamList *self) {
     size_t i;
     for (i = 0; i < self->num_vars; i++) {
         CFCBase_decref((CFCBase*)self->variables[i]);
@@ -93,8 +89,7 @@ CFCParamList_destroy(CFCParamList *self)
 }
 
 static void
-S_generate_c_strings(CFCParamList *self)
-{
+S_generate_c_strings(CFCParamList *self) {
     size_t c_string_size = 1;
     size_t name_list_size = 1;
     size_t i;
@@ -135,38 +130,32 @@ S_generate_c_strings(CFCParamList *self)
 }
 
 CFCVariable**
-CFCParamList_get_variables(CFCParamList *self)
-{
+CFCParamList_get_variables(CFCParamList *self) {
     return self->variables;
 }
 
 const char**
-CFCParamList_get_initial_values(CFCParamList *self)
-{
+CFCParamList_get_initial_values(CFCParamList *self) {
     return (const char**)self->values;
 }
 
 size_t
-CFCParamList_num_vars(CFCParamList *self)
-{
+CFCParamList_num_vars(CFCParamList *self) {
     return self->num_vars;
 }
 
 int
-CFCParamList_variadic(CFCParamList *self)
-{
+CFCParamList_variadic(CFCParamList *self) {
     return self->variadic;
 }
 
 const char*
-CFCParamList_to_c(CFCParamList *self)
-{
+CFCParamList_to_c(CFCParamList *self) {
     return self->c_string;
 }
 
 const char*
-CFCParamList_name_list(CFCParamList *self)
-{
+CFCParamList_name_list(CFCParamList *self) {
     return self->name_list;
 }
 

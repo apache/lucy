@@ -43,12 +43,12 @@ class Lucy::Index::IndexReader cnick IxReader
     Lock            *deletion_lock;
 
     public inert nullable IndexReader*
-    init(IndexReader *self, Schema *schema = NULL, Folder *folder, 
-         Snapshot *snapshot = NULL, VArray *segments = NULL, 
+    init(IndexReader *self, Schema *schema = NULL, Folder *folder,
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
          int32_t seg_tick = -1, IndexManager *manager = NULL);
 
     public inert incremented nullable IndexReader*
-    open(Obj *index, Snapshot *snapshot = NULL, 
+    open(Obj *index, Snapshot *snapshot = NULL,
          IndexManager *manager = NULL);
 
     /** IndexReader is an abstract base class; open() returns the IndexReader
@@ -61,7 +61,7 @@ class Lucy::Index::IndexReader cnick IxReader
      * Read-locking is off by default; supplying this argument turns it on.
      */
     public inert nullable IndexReader*
-    do_open(IndexReader *self, Obj *index, Snapshot *snapshot = NULL, 
+    do_open(IndexReader *self, Obj *index, Snapshot *snapshot = NULL,
             IndexManager *manager = NULL);
 
     /** Return the maximum number of documents available to the reader, which

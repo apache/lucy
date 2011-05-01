@@ -33,17 +33,15 @@ static void
 S_read_entry(LexIndex *self);
 
 LexIndex*
-LexIndex_new(Schema *schema, Folder *folder, Segment *segment, 
-             const CharBuf *field)
-{
+LexIndex_new(Schema *schema, Folder *folder, Segment *segment,
+             const CharBuf *field) {
     LexIndex *self = (LexIndex*)VTable_Make_Obj(LEXINDEX);
     return LexIndex_init(self, schema, folder, segment, field);
 }
 
 LexIndex*
-LexIndex_init(LexIndex *self, Schema *schema, Folder *folder, 
-              Segment *segment, const CharBuf *field)
-{
+LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
+              Segment *segment, const CharBuf *field) {
     int32_t  field_num = Seg_Field_Num(segment, field);
     CharBuf *seg_name  = Seg_Get_Name(segment);
     CharBuf *ixix_file = CB_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
@@ -86,7 +84,7 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
     self->skip_interval  = Arch_Skip_Interval(arch);
     self->size    = (int32_t)(InStream_Length(self->ixix_in) / sizeof(int64_t));
     self->offsets = (int64_t*)InStream_Buf(self->ixix_in,
-        (size_t)InStream_Length(self->ixix_in));
+                                           (size_t)InStream_Length(self->ixix_in));
 
     DECREF(ixix_file);
     DECREF(ix_file);
@@ -95,8 +93,7 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
 }
 
 void
-LexIndex_destroy(LexIndex *self) 
-{    
+LexIndex_destroy(LexIndex *self) {
     DECREF(self->field_type);
     DECREF(self->ixix_in);
     DECREF(self->ix_in);
@@ -106,23 +103,22 @@ LexIndex_destroy(LexIndex *self)
 }
 
 int32_t
-LexIndex_get_term_num(LexIndex *self)
-{
+LexIndex_get_term_num(LexIndex *self) {
     return (self->index_interval * self->tick) - 1;
 }
 
 Obj*
-LexIndex_get_term(LexIndex *self) 
-{ 
-    return TermStepper_Get_Value(self->term_stepper); 
+LexIndex_get_term(LexIndex *self) {
+    return TermStepper_Get_Value(self->term_stepper);
 }
 
 TermInfo*
-LexIndex_get_term_info(LexIndex *self) { return self->tinfo; }
+LexIndex_get_term_info(LexIndex *self) {
+    return self->tinfo;
+}
 
 static void
-S_read_entry(LexIndex *self)
-{
+S_read_entry(LexIndex *self) {
     InStream *ix_in  = self->ix_in;
     TermInfo *tinfo  = self->tinfo;
     int64_t offset = (int64_t)NumUtil_decode_bigend_u64(self->offsets + self->tick);
@@ -131,13 +127,13 @@ S_read_entry(LexIndex *self)
     tinfo->doc_freq     = InStream_Read_C32(ix_in);
     tinfo->post_filepos = InStream_Read_C64(ix_in);
     tinfo->skip_filepos = tinfo->doc_freq >= self->skip_interval
-                        ? InStream_Read_C64(ix_in) : 0;
+                          ? InStream_Read_C64(ix_in)
+                          : 0;
     tinfo->lex_filepos  = InStream_Read_C64(ix_in);
 }
 
 void
-LexIndex_seek(LexIndex *self, Obj *target)
-{
+LexIndex_seek(LexIndex *self, Obj *target) {
     TermStepper *term_stepper = self->term_stepper;
     InStream    *ix_in        = self->ix_in;
     FieldType   *type         = self->field_type;
@@ -145,18 +141,18 @@ LexIndex_seek(LexIndex *self, Obj *target)
     int32_t      hi           = self->size - 1;
     int32_t      result       = -100;
 
-    if (target == NULL || self->size == 0) { 
+    if (target == NULL || self->size == 0) {
         self->tick = 0;
         return;
     }
     else {
-        if ( !Obj_Is_A(target, CHARBUF)) {
+        if (!Obj_Is_A(target, CHARBUF)) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
-                Obj_Get_Class_Name(target), VTable_Get_Name(CHARBUF));
+                  Obj_Get_Class_Name(target), VTable_Get_Name(CHARBUF));
         }
         /* TODO:
         Obj *first_obj = VA_Fetch(terms, 0);
-        if ( !Obj_Is_A(target, Obj_Get_VTable(first_obj)) ) {
+        if (!Obj_Is_A(target, Obj_Get_VTable(first_obj))) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
                 Obj_Get_Class_Name(target), Obj_Get_Class_Name(first_obj));
         }
@@ -166,7 +162,7 @@ LexIndex_seek(LexIndex *self, Obj *target)
     // Divide and conquer.
     while (hi >= lo) {
         const int32_t mid = lo + ((hi - lo) / 2);
-        const int64_t offset 
+        const int64_t offset
             = (int64_t)NumUtil_decode_bigend_u64(self->offsets + mid);
         InStream_Seek(ix_in, offset);
         TermStepper_Read_Key_Frame(term_stepper, ix_in);
@@ -189,9 +185,11 @@ LexIndex_seek(LexIndex *self, Obj *target)
     }
 
     // Record the index of the entry we've seeked to, then read entry.
-    self->tick = hi == -1   ? 0  // indicating that target lt first entry
-           : result == -100 ? hi // if result is still -100, it wasn't set
-           : result;
+    self->tick = hi == -1 // indicating that target lt first entry
+                 ? 0
+                 : result == -100 // if result is still -100, it wasn't set
+                 ? hi
+                 : result;
     S_read_entry(self);
 }
 

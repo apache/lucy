@@ -23,20 +23,18 @@
 #include "Lucy/Analysis/Inversion.h"
 
 RegexTokenizer*
-RegexTokenizer_new(const CharBuf *pattern)
-{
+RegexTokenizer_new(const CharBuf *pattern) {
     RegexTokenizer *self = (RegexTokenizer*)VTable_Make_Obj(REGEXTOKENIZER);
     return RegexTokenizer_init(self, pattern);
 }
 
 Inversion*
-RegexTokenizer_transform(RegexTokenizer *self, Inversion *inversion)
-{
+RegexTokenizer_transform(RegexTokenizer *self, Inversion *inversion) {
     Inversion *new_inversion = Inversion_new(NULL);
     Token *token;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        RegexTokenizer_Tokenize_Str(self, token->text, token->len, 
+        RegexTokenizer_Tokenize_Str(self, token->text, token->len,
                                     new_inversion);
     }
 
@@ -44,17 +42,15 @@ RegexTokenizer_transform(RegexTokenizer *self, Inversion *inversion)
 }
 
 Inversion*
-RegexTokenizer_transform_text(RegexTokenizer *self, CharBuf *text)
-{
+RegexTokenizer_transform_text(RegexTokenizer *self, CharBuf *text) {
     Inversion *new_inversion = Inversion_new(NULL);
-    RegexTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text), 
-        CB_Get_Size(text), new_inversion);
+    RegexTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text),
+                                CB_Get_Size(text), new_inversion);
     return new_inversion;
 }
 
 Obj*
-RegexTokenizer_dump(RegexTokenizer *self)
-{
+RegexTokenizer_dump(RegexTokenizer *self) {
     RegexTokenizer_dump_t super_dump
         = (RegexTokenizer_dump_t)SUPER_METHOD(REGEXTOKENIZER, RegexTokenizer, Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
@@ -63,20 +59,18 @@ RegexTokenizer_dump(RegexTokenizer *self)
 }
 
 RegexTokenizer*
-RegexTokenizer_load(RegexTokenizer *self, Obj *dump)
-{
+RegexTokenizer_load(RegexTokenizer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    RegexTokenizer_load_t super_load 
+    RegexTokenizer_load_t super_load
         = (RegexTokenizer_load_t)SUPER_METHOD(REGEXTOKENIZER, RegexTokenizer, Load);
     RegexTokenizer *loaded = super_load(self, dump);
-    CharBuf *pattern = (CharBuf*)CERTIFY(
-        Hash_Fetch_Str(source, "pattern", 7), CHARBUF);
+    CharBuf *pattern 
+        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "pattern", 7), CHARBUF);
     return RegexTokenizer_init(loaded, pattern);
 }
 
 bool_t
-RegexTokenizer_equals(RegexTokenizer *self, Obj *other)
-{
+RegexTokenizer_equals(RegexTokenizer *self, Obj *other) {
     RegexTokenizer *const twin = (RegexTokenizer*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, REGEXTOKENIZER)) return false;

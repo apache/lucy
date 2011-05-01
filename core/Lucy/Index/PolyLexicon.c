@@ -29,18 +29,16 @@ static void
 S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target);
 
 PolyLexicon*
-PolyLex_new(const CharBuf *field, VArray *sub_readers)
-{
+PolyLex_new(const CharBuf *field, VArray *sub_readers) {
     PolyLexicon *self = (PolyLexicon*)VTable_Make_Obj(POLYLEXICON);
     return PolyLex_init(self, field, sub_readers);
 }
 
 PolyLexicon*
-PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers)
-{
-    uint32_t i;
-    uint32_t num_sub_readers = VA_Get_Size(sub_readers);
-    VArray *seg_lexicons  = VA_new(num_sub_readers);
+PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
+    uint32_t  i;
+    uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
+    VArray   *seg_lexicons    = VA_new(num_sub_readers);
 
     // Init.
     Lex_init((Lexicon*)self, field);
@@ -65,8 +63,7 @@ PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers)
 }
 
 void
-PolyLex_destroy(PolyLexicon *self)
-{
+PolyLex_destroy(PolyLexicon *self) {
     DECREF(self->seg_lexicons);
     DECREF(self->lex_q);
     DECREF(self->term);
@@ -74,8 +71,7 @@ PolyLex_destroy(PolyLexicon *self)
 }
 
 static void
-S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target)
-{
+S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
     uint32_t i, max;
 
     // Empty out the queue.
@@ -87,7 +83,7 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target)
 
     // Refill the queue.
     for (i = 0, max = VA_Get_Size(seg_lexicons); i < max; i++) {
-        SegLexicon *const seg_lexicon 
+        SegLexicon *const seg_lexicon
             = (SegLexicon*)VA_Fetch(seg_lexicons, i);
         SegLex_Seek(seg_lexicon, target);
         if (SegLex_Get_Term(seg_lexicon) != NULL) {
@@ -97,12 +93,11 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target)
 }
 
 void
-PolyLex_reset(PolyLexicon *self)
-{
+PolyLex_reset(PolyLexicon *self) {
     uint32_t i;
     VArray *seg_lexicons = self->seg_lexicons;
-    uint32_t   num_segs     = VA_Get_Size(seg_lexicons);
-    SegLexQueue *lex_q  = self->lex_q;
+    uint32_t num_segs = VA_Get_Size(seg_lexicons);
+    SegLexQueue *lex_q = self->lex_q;
 
     // Empty out the queue.
     while (1) {
@@ -113,7 +108,7 @@ PolyLex_reset(PolyLexicon *self)
 
     // Fill the queue with valid SegLexicons.
     for (i = 0; i < num_segs; i++) {
-        SegLexicon *const seg_lexicon 
+        SegLexicon *const seg_lexicon
             = (SegLexicon*)VA_Fetch(seg_lexicons, i);
         SegLex_Reset(seg_lexicon);
         if (SegLex_Next(seg_lexicon)) {
@@ -128,17 +123,16 @@ PolyLex_reset(PolyLexicon *self)
 }
 
 bool_t
-PolyLex_next(PolyLexicon *self)
-{
-    SegLexQueue *lex_q   = self->lex_q;
+PolyLex_next(PolyLexicon *self) {
+    SegLexQueue *lex_q = self->lex_q;
     SegLexicon *top_seg_lexicon = (SegLexicon*)SegLexQ_Peek(lex_q);
-    
+
     // Churn through queue items with equal terms.
     while (top_seg_lexicon != NULL) {
-        Obj *const candidate = SegLex_Get_Term(top_seg_lexicon); 
-        if (   (candidate && !self->term)
-            || Obj_Compare_To(self->term, candidate) != 0 
-        ) {
+        Obj *const candidate = SegLex_Get_Term(top_seg_lexicon);
+        if ((candidate && !self->term)
+            || Obj_Compare_To(self->term, candidate) != 0
+           ) {
             // Succeed if the next item in the queue has a different term.
             DECREF(self->term);
             self->term = Obj_Clone(candidate);
@@ -161,8 +155,7 @@ PolyLex_next(PolyLexicon *self)
 }
 
 void
-PolyLex_seek(PolyLexicon *self, Obj *target)
-{
+PolyLex_seek(PolyLexicon *self, Obj *target) {
     VArray *seg_lexicons = self->seg_lexicons;
     SegLexQueue *lex_q = self->lex_q;
 
@@ -192,28 +185,24 @@ PolyLex_seek(PolyLexicon *self, Obj *target)
     } while (PolyLex_Next(self));
 }
 
-Obj* 
-PolyLex_get_term(PolyLexicon *self)
-{
+Obj*
+PolyLex_get_term(PolyLexicon *self) {
     return self->term;
 }
 
 uint32_t
-PolyLex_get_num_seg_lexicons(PolyLexicon *self)
-{
+PolyLex_get_num_seg_lexicons(PolyLexicon *self) {
     return VA_Get_Size(self->seg_lexicons);
 }
 
 SegLexQueue*
-SegLexQ_new(uint32_t max_size)
-{
+SegLexQ_new(uint32_t max_size) {
     SegLexQueue *self = (SegLexQueue*)VTable_Make_Obj(SEGLEXQUEUE);
     return (SegLexQueue*)PriQ_init((PriorityQueue*)self, max_size);
 }
 
 bool_t
-SegLexQ_less_than(SegLexQueue *self, Obj *a, Obj *b)
-{
+SegLexQ_less_than(SegLexQueue *self, Obj *a, Obj *b) {
     SegLexicon *const lex_a  = (SegLexicon*)a;
     SegLexicon *const lex_b  = (SegLexicon*)b;
     Obj *const term_a = SegLex_Get_Term(lex_a);

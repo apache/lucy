@@ -23,7 +23,7 @@ parcel Lucy;
  * individual terms in a specific field.
  */
 
-class Lucy::Search::TermQuery inherits Lucy::Search::Query 
+class Lucy::Search::TermQuery inherits Lucy::Search::Query
     : dumpable {
 
     CharBuf *field;
@@ -78,7 +78,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
     new(Query *parent, Searcher *searcher, float boost);
 
     inert TermCompiler*
-    init(TermCompiler *self, Query *parent, Searcher *searcher, 
+    init(TermCompiler *self, Query *parent, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
@@ -94,7 +94,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
     Apply_Norm_Factor(TermCompiler *self, float factor);
 
     public incremented VArray*
-    Highlight_Spans(TermCompiler *self, Searcher *searcher, 
+    Highlight_Spans(TermCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
     public bool_t

@@ -41,10 +41,10 @@ class Lucy::Index::PolyLexicon cnick PolyLex
     public bool_t
     Next(PolyLexicon *self);
 
-    public void 
+    public void
     Reset(PolyLexicon *self);
 
-    public nullable Obj* 
+    public nullable Obj*
     Get_Term(PolyLexicon *self);
 
     uint32_t

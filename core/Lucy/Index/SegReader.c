@@ -30,22 +30,20 @@
 #include "Lucy/Store/Folder.h"
 
 SegReader*
-SegReader_new(Schema *schema, Folder *folder, Snapshot *snapshot, 
-              VArray *segments, int32_t seg_tick)
-{
+SegReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
+              VArray *segments, int32_t seg_tick) {
     SegReader *self = (SegReader*)VTable_Make_Obj(SEGREADER);
     return SegReader_init(self, schema, folder, snapshot, segments, seg_tick);
 }
 
 SegReader*
 SegReader_init(SegReader *self, Schema *schema, Folder *folder,
-               Snapshot *snapshot, VArray *segments, int32_t seg_tick)
-{
+               Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
     CharBuf *mess;
     Segment *segment;
 
     IxReader_init((IndexReader*)self, schema, folder, snapshot, segments,
-        seg_tick, NULL);
+                  seg_tick, NULL);
     segment = SegReader_Get_Segment(self);
 
     self->doc_max    = (int32_t)Seg_Get_Count(segment);
@@ -58,23 +56,23 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
         Err_throw_mess(ERR, mess);
     }
     {
-        DeletionsReader *del_reader = (DeletionsReader*)Hash_Fetch(
-            self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+        DeletionsReader *del_reader
+            = (DeletionsReader*)Hash_Fetch(
+                  self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
         self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
     }
     return self;
 }
 
 void
-SegReader_destroy(SegReader *self)
-{
+SegReader_destroy(SegReader *self) {
     DECREF(self->seg_name);
     SUPER_DESTROY(self, SEGREADER);
 }
 
 void
-SegReader_register(SegReader *self, const CharBuf *api, DataReader *component)
-{
+SegReader_register(SegReader *self, const CharBuf *api,
+                   DataReader *component) {
     if (Hash_Fetch(self->components, (Obj*)api)) {
         THROW(ERR, "Interface '%o' already registered");
     }
@@ -83,39 +81,39 @@ SegReader_register(SegReader *self, const CharBuf *api, DataReader *component)
 }
 
 CharBuf*
-SegReader_get_seg_name(SegReader *self) { return self->seg_name; }
+SegReader_get_seg_name(SegReader *self) {
+    return self->seg_name;
+}
+
 int64_t
-SegReader_get_seg_num(SegReader *self)  { return self->seg_num; }
+SegReader_get_seg_num(SegReader *self) {
+    return self->seg_num;
+}
 
 int32_t
-SegReader_del_count(SegReader *self) 
-{
+SegReader_del_count(SegReader *self) {
     return self->del_count;
 }
 
 int32_t
-SegReader_doc_max(SegReader *self)
-{
+SegReader_doc_max(SegReader *self) {
     return self->doc_max;
 }
 
 int32_t
-SegReader_doc_count(SegReader *self)
-{
+SegReader_doc_count(SegReader *self) {
     return self->doc_max - self->del_count;
 }
 
 I32Array*
-SegReader_offsets(SegReader *self)
-{
+SegReader_offsets(SegReader *self) {
     int32_t *ints = (int32_t*)CALLOCATE(1, sizeof(int32_t));
     UNUSED_VAR(self);
     return I32Arr_new_steal(ints, 1);
 }
 
 VArray*
-SegReader_seg_readers(SegReader *self)
-{
+SegReader_seg_readers(SegReader *self) {
     VArray *seg_readers = VA_new(1);
     VA_Push(seg_readers, INCREF(self));
     return seg_readers;

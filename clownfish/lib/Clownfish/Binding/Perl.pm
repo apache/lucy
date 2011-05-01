@@ -212,7 +212,7 @@ init_autobindings()
 PPCODE:
 {
     char* file = __FILE__;
-    CHY_UNUSED_VAR(cv); 
+    CHY_UNUSED_VAR(cv);
     CHY_UNUSED_VAR(items); $xs_init
 }
 
@@ -406,8 +406,7 @@ $self->{header}
 $pound_includes
 
 void
-$self->{boot_func}()
-{
+$self->{boot_func}() {
     AV *isa;
     cfish_ZombieCharBuf *alias = CFISH_ZCB_WRAP_STR("", 0);
 $registrations

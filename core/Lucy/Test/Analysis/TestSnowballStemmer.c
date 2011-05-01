@@ -24,10 +24,9 @@
 #include "Lucy/Util/Json.h"
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
-    CharBuf *EN = (CharBuf*)ZCB_WRAP_STR("en", 2); 
-    CharBuf *ES = (CharBuf*)ZCB_WRAP_STR("es", 2); 
+test_Dump_Load_and_Equals(TestBatch *batch) {
+    CharBuf *EN = (CharBuf*)ZCB_WRAP_STR("en", 2);
+    CharBuf *ES = (CharBuf*)ZCB_WRAP_STR("es", 2);
     SnowballStemmer *stemmer = SnowStemmer_new(EN);
     SnowballStemmer *other   = SnowStemmer_new(ES);
     Obj *dump       = (Obj*)SnowStemmer_Dump(stemmer);
@@ -35,12 +34,15 @@ test_Dump_Load_and_Equals(TestBatch *batch)
     SnowballStemmer *clone       = (SnowballStemmer*)SnowStemmer_Load(other, dump);
     SnowballStemmer *other_clone = (SnowballStemmer*)SnowStemmer_Load(other, other_dump);
 
-    TEST_FALSE(batch, SnowStemmer_Equals(stemmer,
-        (Obj*)other), "Equals() false with different language");
-    TEST_TRUE(batch, SnowStemmer_Equals(stemmer,
-        (Obj*)clone), "Dump => Load round trip");
-    TEST_TRUE(batch, SnowStemmer_Equals(other,
-        (Obj*)other_clone), "Dump => Load round trip");
+    TEST_FALSE(batch,
+               SnowStemmer_Equals(stemmer, (Obj*)other),
+               "Equals() false with different language");
+    TEST_TRUE(batch,
+              SnowStemmer_Equals(stemmer, (Obj*)clone),
+              "Dump => Load round trip");
+    TEST_TRUE(batch,
+              SnowStemmer_Equals(other, (Obj*)other_clone),
+              "Dump => Load round trip");
 
     DECREF(stemmer);
     DECREF(dump);
@@ -51,13 +53,12 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 static void
-test_stemming(TestBatch *batch)
-{
+test_stemming(TestBatch *batch) {
     CharBuf  *path           = CB_newf("modules");
     FSFolder *modules_folder = FSFolder_new(path);
     if (!FSFolder_Check(modules_folder)) {
         DECREF(modules_folder);
-        CB_setf(path, "../modules"); 
+        CB_setf(path, "../modules");
         modules_folder = FSFolder_new(path);
         if (!FSFolder_Check(modules_folder)) {
             THROW(ERR, "Can't open modules folder");
@@ -71,19 +72,19 @@ test_stemming(TestBatch *batch)
     Hash *lang_data;
     Hash_Iterate(tests);
     while (Hash_Next(tests, (Obj**)&iso, (Obj**)&lang_data)) {
-        VArray  *words   = (VArray*)Hash_Fetch_Str(lang_data, "words", 5);
-        VArray  *stems   = (VArray*)Hash_Fetch_Str(lang_data, "stems", 5);
+        VArray *words = (VArray*)Hash_Fetch_Str(lang_data, "words", 5);
+        VArray *stems = (VArray*)Hash_Fetch_Str(lang_data, "stems", 5);
         SnowballStemmer *stemmer = SnowStemmer_new(iso);
         for (uint32_t i = 0, max = VA_Get_Size(words); i < max; i++) {
             CharBuf *word  = (CharBuf*)VA_Fetch(words, i);
             VArray  *got   = SnowStemmer_Split(stemmer, word);
             CharBuf *stem  = (CharBuf*)VA_Fetch(got, 0);
             TEST_TRUE(batch,
-                   stem
-                && CB_Is_A(stem, CHARBUF)
-                && CB_Equals(stem, VA_Fetch(stems, i)),
-                "Stem %s: %s", CB_Get_Ptr8(iso), CB_Get_Ptr8(word)
-                );
+                      stem
+                      && CB_Is_A(stem, CHARBUF)
+                      && CB_Equals(stem, VA_Fetch(stems, i)),
+                      "Stem %s: %s", CB_Get_Ptr8(iso), CB_Get_Ptr8(word)
+                     );
             DECREF(got);
         }
         DECREF(stemmer);
@@ -95,8 +96,7 @@ test_stemming(TestBatch *batch)
 }
 
 void
-TestSnowStemmer_run_tests()
-{
+TestSnowStemmer_run_tests() {
     TestBatch *batch = TestBatch_new(153);
 
     TestBatch_Plan(batch);

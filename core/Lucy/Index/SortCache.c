@@ -23,14 +23,13 @@
 SortCache*
 SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
                void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord,
-               int32_t ord_width)
-{
+               int32_t ord_width) {
     // Init.
     self->native_ords = false;
 
     // Assign.
-    if (!FType_Sortable(type)) { 
-        THROW(ERR, "Non-sortable FieldType for %o", field); 
+    if (!FType_Sortable(type)) {
+        THROW(ERR, "Non-sortable FieldType for %o", field);
     }
     self->field       = CB_Clone(field);
     self->type        = (FieldType*)INCREF(type);
@@ -45,23 +44,25 @@ SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
 }
 
 void
-SortCache_destroy(SortCache *self)
-{
+SortCache_destroy(SortCache *self) {
     DECREF(self->field);
     DECREF(self->type);
     SUPER_DESTROY(self, SORTCACHE);
 }
 
 bool_t
-SortCache_get_native_ords(SortCache *self) { return self->native_ords; }
+SortCache_get_native_ords(SortCache *self) {
+    return self->native_ords;
+}
+
 void
-SortCache_set_native_ords(SortCache *self, bool_t native_ords)
-    { self->native_ords = native_ords; }
+SortCache_set_native_ords(SortCache *self, bool_t native_ords) {
+    self->native_ords = native_ords;
+}
 
 int32_t
-SortCache_ordinal(SortCache *self, int32_t doc_id)
-{
-    if ((uint32_t)doc_id > (uint32_t)self->doc_max) { 
+SortCache_ordinal(SortCache *self, int32_t doc_id) {
+    if ((uint32_t)doc_id > (uint32_t)self->doc_max) {
         THROW(ERR, "Out of range: %i32 > %i32", doc_id, self->doc_max);
     }
     switch (self->ord_width) {
@@ -69,10 +70,10 @@ SortCache_ordinal(SortCache *self, int32_t doc_id)
         case 2: return NumUtil_u2get(self->ords, doc_id);
         case 4: return NumUtil_u4get(self->ords, doc_id);
         case 8: {
-            uint8_t *ints = (uint8_t*)self->ords;
-            return ints[doc_id];
-        }
-        case 16: 
+                uint8_t *ints = (uint8_t*)self->ords;
+                return ints[doc_id];
+            }
+        case 16:
             if (self->native_ords) {
                 uint16_t *ints = (uint16_t*)self->ords;
                 return ints[doc_id];
@@ -93,28 +94,27 @@ SortCache_ordinal(SortCache *self, int32_t doc_id)
                 return NumUtil_decode_bigend_u32(bytes);
             }
         default: {
-            THROW(ERR, "Invalid ord width: %i32", self->ord_width);
-            UNREACHABLE_RETURN(int32_t);
-        }
+                THROW(ERR, "Invalid ord width: %i32", self->ord_width);
+                UNREACHABLE_RETURN(int32_t);
+            }
     }
 }
 
 int32_t
-SortCache_find(SortCache *self, Obj *term)
-{
-    FieldType *const type = self->type;
-    int32_t        lo     = 0;
-    int32_t        hi     = self->cardinality - 1;
-    int32_t        result = -100;
-    Obj           *blank  = SortCache_Make_Blank(self);
+SortCache_find(SortCache *self, Obj *term) {
+    FieldType *const type   = self->type;
+    int32_t          lo     = 0;
+    int32_t          hi     = self->cardinality - 1;
+    int32_t          result = -100;
+    Obj             *blank  = SortCache_Make_Blank(self);
 
-    if (   term != NULL 
+    if (term != NULL
         && !Obj_Is_A(term, Obj_Get_VTable(blank))
         && !Obj_Is_A(blank, Obj_Get_VTable(term))
-    ) {
+       ) {
         THROW(ERR, "SortCache error for field %o: term is a %o, and not "
-            "comparable to a %o", self->field, Obj_Get_Class_Name(term),
-            Obj_Get_Class_Name(blank));
+              "comparable to a %o", self->field, Obj_Get_Class_Name(term),
+              Obj_Get_Class_Name(blank));
     }
 
     // Binary search.
@@ -136,7 +136,7 @@ SortCache_find(SortCache *self, Obj *term)
 
     DECREF(blank);
 
-    if (hi < 0) { 
+    if (hi < 0) {
         // Target is "less than" the first cache entry.
         return -1;
     }
@@ -150,12 +150,23 @@ SortCache_find(SortCache *self, Obj *term)
 }
 
 void*
-SortCache_get_ords(SortCache *self)        { return self->ords; }
+SortCache_get_ords(SortCache *self) {
+    return self->ords;
+}
+
 int32_t
-SortCache_get_cardinality(SortCache *self) { return self->cardinality; }
+SortCache_get_cardinality(SortCache *self) {
+    return self->cardinality;
+}
+
 int32_t
-SortCache_get_null_ord(SortCache *self)    { return self->null_ord; }
+SortCache_get_null_ord(SortCache *self) {
+    return self->null_ord;
+}
+
 int32_t
-SortCache_get_ord_width(SortCache *self)   { return self->ord_width; }
+SortCache_get_ord_width(SortCache *self) {
+    return self->ord_width;
+}
 
 

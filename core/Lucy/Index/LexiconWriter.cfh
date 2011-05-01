@@ -43,7 +43,7 @@ class Lucy::Index::LexiconWriter cnick LexWriter
     new(Schema *schema, Snapshot *snapshot, Segment *segment,
         PolyReader *polyreader);
 
-    inert LexiconWriter* 
+    inert LexiconWriter*
     init(LexiconWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader);
 
@@ -60,7 +60,7 @@ class Lucy::Index::LexiconWriter cnick LexWriter
     /** Prepare to write terms to a temporary file.
      */
     void
-    Enter_Temp_Mode(LexiconWriter *self, const CharBuf *field, 
+    Enter_Temp_Mode(LexiconWriter *self, const CharBuf *field,
                     OutStream *temp_outstream);
 
     /** Stop writing terms to temp file.  Abandon (but don't close) the file.
@@ -75,7 +75,7 @@ class Lucy::Index::LexiconWriter cnick LexWriter
     Add_Term(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo);
 
     public void
-    Add_Segment(LexiconWriter *self, SegReader *reader, 
+    Add_Segment(LexiconWriter *self, SegReader *reader,
                 I32Array *doc_map = NULL);
 
     public incremented Hash*

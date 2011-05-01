@@ -25,11 +25,11 @@ parcel Lucy;
  *
  * Before filtering stopwords:
  *
- *     ( "i", "am", "the", "walrus" )
+ *     ("i", "am", "the", "walrus")
  *
  * After filtering stopwords:
  *
- *     ( "walrus" )
+ *     ("walrus")
  *
  * SnowballStopFilter provides default stoplists for several languages, courtesy of
  * the Snowball project (<http://snowball.tartarus.org>), or you may supply
@@ -72,16 +72,16 @@ class Lucy::Analysis::SnowballStopFilter cnick SnowStop
     inert const uint8_t** snow_pt;
     inert const uint8_t** snow_ru;
     inert const uint8_t** snow_sv;
-    
-    inert incremented SnowballStopFilter* 
+
+    inert incremented SnowballStopFilter*
     new(const CharBuf *language = NULL, Hash *stoplist = NULL);
 
     /**
      * @param stoplist A hash with stopwords as the keys.
      * @param language The ISO code for a supported language.
      */
-    public inert SnowballStopFilter* 
-    init(SnowballStopFilter *self, const CharBuf *language = NULL, 
+    public inert SnowballStopFilter*
+    init(SnowballStopFilter *self, const CharBuf *language = NULL,
          Hash *stoplist = NULL);
 
     /** Return a Hash with the Snowball stoplist for the supplied language.

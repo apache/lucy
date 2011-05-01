@@ -124,7 +124,7 @@
  */
 
 #ifndef H_CHAZ_INTEGERS
-#define H_CHAZ_INTEGERS 
+#define H_CHAZ_INTEGERS
 
 #ifdef __cplusplus
 extern "C" {

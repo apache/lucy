@@ -37,7 +37,7 @@ class Lucy::Index::PostingListWriter cnick PListWriter
 
     inert incremented PostingListWriter*
     new(Schema *schema, Snapshot *snapshot, Segment *segment,
-        PolyReader *polyreader, LexiconWriter *lex_writer); 
+        PolyReader *polyreader, LexiconWriter *lex_writer);
 
     inert PostingListWriter*
     init(PostingListWriter *self, Schema *schema, Snapshot *snapshot,
@@ -48,7 +48,7 @@ class Lucy::Index::PostingListWriter cnick PListWriter
     set_default_mem_thresh(size_t mem_thresh);
 
     public void
-    Add_Inverted_Doc(PostingListWriter *self, Inverter *inverter, 
+    Add_Inverted_Doc(PostingListWriter *self, Inverter *inverter,
                      int32_t doc_id);
 
     public void
@@ -58,7 +58,7 @@ class Lucy::Index::PostingListWriter cnick PListWriter
     public void
     Finish(PostingListWriter *self);
 
-    public int32_t 
+    public int32_t
     Format(PostingListWriter *self);
 
     public void

@@ -42,7 +42,7 @@ class Lucy::Search::Collector::SortCollector cnick SortColl
     bool_t          need_score;
     bool_t          need_values;
 
-    inert incremented SortCollector* 
+    inert incremented SortCollector*
     new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
 
     /**
@@ -51,13 +51,13 @@ class Lucy::Search::Collector::SortCollector cnick SortColl
      * and ascending doc id second.
      * @param wanted Maximum number of hits to collect.
      */
-    inert SortCollector* 
-    init(SortCollector *self, Schema *schema = NULL, 
+    inert SortCollector*
+    init(SortCollector *self, Schema *schema = NULL,
          SortSpec *sort_spec = NULL, uint32_t wanted);
 
     /** Keep highest ranking docs.
      */
-    public void 
+    public void
     Collect(SortCollector *self, int32_t doc_id);
 
     /** Empty out the HitQueue and return an array of sorted MatchDocs.

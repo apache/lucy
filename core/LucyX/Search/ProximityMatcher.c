@@ -27,18 +27,17 @@
 
 
 ProximityMatcher*
-ProximityMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler, 
-                     uint32_t within)
-{
-    ProximityMatcher *self = (ProximityMatcher*)VTable_Make_Obj(PROXIMITYMATCHER);
+ProximityMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler,
+                     uint32_t within) {
+    ProximityMatcher *self =
+        (ProximityMatcher*)VTable_Make_Obj(PROXIMITYMATCHER);
     return ProximityMatcher_init(self, sim, plists, compiler, within);
 
 }
 
 ProximityMatcher*
-ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity, VArray *plists,
-                      Compiler *compiler, uint32_t within)
-{
+ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity,
+                      VArray *plists, Compiler *compiler, uint32_t within) {
     Matcher_init((Matcher*)self);
 
     // Init.
@@ -52,10 +51,10 @@ ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity, VArray *pl
     // Extract PostingLists out of VArray into local C array for quick access.
     self->num_elements = VA_Get_Size(plists);
     self->plists = (PostingList**)MALLOCATE(
-        self->num_elements * sizeof(PostingList*));
+                       self->num_elements * sizeof(PostingList*));
     for (size_t i = 0; i < self->num_elements; i++) {
-        PostingList *const plist = (PostingList*)CERTIFY(
-            VA_Fetch(plists, i), POSTINGLIST);
+        PostingList *const plist
+            = (PostingList*)CERTIFY(VA_Fetch(plists, i), POSTINGLIST);
         if (plist == NULL) {
             THROW(ERR, "Missing element %u32", i);
         }
@@ -71,8 +70,7 @@ ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity, VArray *pl
 }
 
 void
-ProximityMatcher_destroy(ProximityMatcher *self) 
-{
+ProximityMatcher_destroy(ProximityMatcher *self) {
     if (self->plists) {
         for (size_t i = 0; i < self->num_elements; i++) {
             DECREF(self->plists[i]);
@@ -86,8 +84,7 @@ ProximityMatcher_destroy(ProximityMatcher *self)
 }
 
 int32_t
-ProximityMatcher_next(ProximityMatcher *self)
-{
+ProximityMatcher_next(ProximityMatcher *self) {
     if (self->first_time) {
         return ProximityMatcher_Advance(self, 1);
     }
@@ -101,8 +98,7 @@ ProximityMatcher_next(ProximityMatcher *self)
 }
 
 int32_t
-ProximityMatcher_advance(ProximityMatcher *self, int32_t target) 
-{
+ProximityMatcher_advance(ProximityMatcher *self, int32_t target) {
     PostingList **const plists       = self->plists;
     const uint32_t      num_elements = self->num_elements;
     int32_t             highest      = 0;
@@ -197,11 +193,10 @@ ProximityMatcher_advance(ProximityMatcher *self, int32_t target)
 }
 
 
-static INLINE uint32_t 
+static INLINE uint32_t
 SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
                   const uint32_t *candidates, const uint32_t *const candidates_end,
-                  uint32_t offset, uint32_t within) 
-{                          
+                  uint32_t offset, uint32_t within) {
     uint32_t *anchors = anchors_start;
     uint32_t *anchors_found = anchors_start;
     uint32_t target_anchor;
@@ -211,7 +206,7 @@ SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
     if (anchors_start == anchors_end || candidates == candidates_end) {
         return 0;
     }
-        
+
     /* This function is a loop that finds terms that can continue a phrase.
      * It overwrites the anchors in place, and returns the number remaining.
      * The basic algorithm is to alternately increment the candidates' pointer
@@ -223,35 +218,34 @@ SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
      * But given the vagaries of modern processors, it merits actual
      * testing.*/
 
- SPIN_CANDIDATES:
+SPIN_CANDIDATES:
     target_candidate = *anchors + offset;
     while (*candidates < target_candidate) {
         if (++candidates == candidates_end) goto DONE;
     }
     if ((*candidates - target_candidate) < within) goto MATCH;
-    goto SPIN_ANCHORS;  
+    goto SPIN_ANCHORS;
 
- SPIN_ANCHORS: 
+SPIN_ANCHORS:
     target_anchor = *candidates - offset;
     while (*anchors < target_anchor) {
         if (++anchors == anchors_end) goto DONE;
     };
     if (*anchors == target_anchor) goto MATCH;
-    goto SPIN_CANDIDATES;  
+    goto SPIN_CANDIDATES;
 
- MATCH:       
+MATCH:
     *anchors_found++ = *anchors;
     if (++anchors == anchors_end) goto DONE;
-    goto SPIN_CANDIDATES; 
+    goto SPIN_CANDIDATES;
 
- DONE:
+DONE:
     // Return number of anchors remaining.
-    return anchors_found - anchors_start; 
+    return anchors_found - anchors_start;
 }
 
 float
-ProximityMatcher_calc_proximity_freq(ProximityMatcher *self) 
-{
+ProximityMatcher_calc_proximity_freq(ProximityMatcher *self) {
     PostingList **const plists   = self->plists;
 
     /* Create a overwriteable "anchor set" from the first posting.
@@ -289,16 +283,19 @@ ProximityMatcher_calc_proximity_freq(ProximityMatcher *self)
         ScorePosting *posting = (ScorePosting*)PList_Get_Posting(plists[i]);
         uint32_t *candidates_start = posting->prox;
         uint32_t *candidates_end   = candidates_start + posting->freq;
-        
+
         // Splice out anchors that don't match the next term.  Bail out if
         // we've eliminated all possible anchors.
         if (self->within == 1) { // exact phrase match
             anchors_remaining = SI_winnow_anchors(anchors_start, anchors_end,
-                candidates_start, candidates_end, i, 1);
+                                                  candidates_start,
+                                                  candidates_end, i, 1);
         }
         else {  // fuzzy-phrase match
             anchors_remaining = SI_winnow_anchors(anchors_start, anchors_end,
-                candidates_start, candidates_end, i, self->within);
+                                                  candidates_start,
+                                                  candidates_end, i,
+                                                  self->within);
         }
         if (!anchors_remaining) { return 0.0f; }
 
@@ -311,18 +308,16 @@ ProximityMatcher_calc_proximity_freq(ProximityMatcher *self)
 }
 
 int32_t
-ProximityMatcher_get_doc_id(ProximityMatcher *self) 
-{
+ProximityMatcher_get_doc_id(ProximityMatcher *self) {
     return self->doc_id;
 }
 
 float
-ProximityMatcher_score(ProximityMatcher *self) 
-{
+ProximityMatcher_score(ProximityMatcher *self) {
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(self->plists[0]);
-    float score = Sim_TF(self->sim, self->proximity_freq) 
-                * self->weight
-                * posting->weight;
+    float score = Sim_TF(self->sim, self->proximity_freq)
+                  * self->weight
+                  * posting->weight;
     return score;
 }
 

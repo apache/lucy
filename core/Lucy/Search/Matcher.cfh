@@ -68,7 +68,7 @@ abstract class Lucy::Search::Matcher inherits Lucy::Object::Obj {
      * @param deletions A deletions iterator.
      */
     void
-    Collect(Matcher *self, Collector *collector, 
+    Collect(Matcher *self, Collector *collector,
             Matcher *deletions = NULL);
 }
 

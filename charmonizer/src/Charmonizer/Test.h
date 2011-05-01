@@ -49,7 +49,7 @@ struct chaz_TestBatch {
     unsigned      test_num;
     unsigned      num_tests;
     unsigned      num_passed;
-    unsigned      num_failed; 
+    unsigned      num_failed;
     unsigned      num_skipped;
     chaz_TestBatch_destroy_t      destroy;
     chaz_TestBatch_test_func_t    test_func;
@@ -63,7 +63,7 @@ chaz_Test_init(void);
 
 /* Constructor for TestBatch.
  */
-chaz_TestBatch* 
+chaz_TestBatch*
 chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
                     chaz_TestBatch_test_func_t test_func);
 
@@ -81,7 +81,7 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 /* Print a message indicating that a test was skipped and update batch.
  */
 #define CHAZ_TEST_SKIP(batch, message) \
-        chaz_Test_skip(batch, message)
+    chaz_Test_skip(batch, message)
 
 /* Print a message indicating that all remaining tests will be skipped and
  * return.
@@ -95,37 +95,37 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 void
 chaz_Test_plan(chaz_TestBatch *batch);
 
-void 
-chaz_Test_test_true(chaz_TestBatch *batch, int expression, 
+void
+chaz_Test_test_true(chaz_TestBatch *batch, int expression,
                     const char *pat, ...);
 
-void 
-chaz_Test_test_false(chaz_TestBatch *batch, int expression, 
+void
+chaz_Test_test_false(chaz_TestBatch *batch, int expression,
                      const char *pat, ...);
 
-void 
-chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got, 
+void
+chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got,
                       const char *expected, const char *pat, ...);
 
-void 
+void
 chaz_Test_pass(chaz_TestBatch *batch, const char *pat, ...);
 
-void 
+void
 chaz_Test_fail(chaz_TestBatch *batch, const char *pat, ...);
 
-void 
-chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected, 
+void
+chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected,
                       const char *pat, ...);
 
-void 
-chaz_Test_test_float_eq(chaz_TestBatch *batch, double got, 
+void
+chaz_Test_test_float_eq(chaz_TestBatch *batch, double got,
                         double expected, const char *pat, ...);
 
 void
 chaz_Test_skip(chaz_TestBatch *batch, const char *pat, ...);
 
 void
-chaz_Test_report_skip_remaining(chaz_TestBatch* batch, 
+chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
                                 const char *pat, ...);
 
 #ifdef CHAZ_USE_SHORT_NAMES

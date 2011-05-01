@@ -55,10 +55,10 @@ _callback(obj)
     lucy_Obj *obj;
 PPCODE:
 {
-    lucy_ZombieCharBuf *blank = CFISH_ZCB_BLANK(); 
-    lucy_Host_callback(obj, "_test", 2, 
-        CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank),
-        CFISH_ARG_I32("foo", 3));
+    lucy_ZombieCharBuf *blank = CFISH_ZCB_BLANK();
+    lucy_Host_callback(obj, "_test", 2,
+                       CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank),
+                       CFISH_ARG_I32("foo", 3));
 }
 
 int64_t
@@ -67,9 +67,10 @@ _callback_i64(obj)
 CODE:
 {
     lucy_ZombieCharBuf *blank = CFISH_ZCB_BLANK();
-    RETVAL = lucy_Host_callback_i64(obj, "_test", 2, 
-        CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank), 
-        CFISH_ARG_I32("foo", 3));
+    RETVAL
+        = lucy_Host_callback_i64(obj, "_test", 2,
+                                 CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank),
+                                 CFISH_ARG_I32("foo", 3));
 }
 OUTPUT: RETVAL
 
@@ -79,16 +80,17 @@ _callback_f64(obj)
 CODE:
 {
     lucy_ZombieCharBuf *blank = CFISH_ZCB_BLANK();
-    RETVAL = lucy_Host_callback_f64(obj, "_test", 2, 
-        CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank), 
-        CFISH_ARG_I32("foo", 3));
+    RETVAL
+        = lucy_Host_callback_f64(obj, "_test", 2,
+                                 CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank),
+                                 CFISH_ARG_I32("foo", 3));
 }
 OUTPUT: RETVAL
 
 SV*
 _callback_obj(obj)
     lucy_Obj *obj;
-CODE: 
+CODE:
 {
     lucy_Obj *other = lucy_Host_callback_obj(obj, "_test_obj", 0);
     RETVAL = (SV*)Lucy_Obj_To_Host(other);

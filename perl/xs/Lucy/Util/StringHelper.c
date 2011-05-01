@@ -19,8 +19,7 @@
 
 // TODO: replace with code from ICU in common/ucnv_u8.c.
 chy_bool_t
-lucy_StrHelp_utf8_valid(const char *ptr, size_t size)
-{
+lucy_StrHelp_utf8_valid(const char *ptr, size_t size) {
     const U8 *uptr = (const U8*)ptr;
     return size == 0 ? true : !!is_utf8_string(uptr, size);
 }

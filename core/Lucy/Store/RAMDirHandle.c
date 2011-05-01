@@ -23,15 +23,13 @@
 #include "Lucy/Util/IndexFileNames.h"
 
 RAMDirHandle*
-RAMDH_new(RAMFolder *folder)
-{
+RAMDH_new(RAMFolder *folder) {
     RAMDirHandle *self = (RAMDirHandle*)VTable_Make_Obj(RAMDIRHANDLE);
     return RAMDH_init(self, folder);
 }
 
 RAMDirHandle*
-RAMDH_init(RAMDirHandle *self, RAMFolder *folder)
-{
+RAMDH_init(RAMDirHandle *self, RAMFolder *folder) {
     DH_init((DirHandle*)self, RAMFolder_Get_Path(folder));
     self->folder = (RAMFolder*)INCREF(folder);
     self->elems  = Hash_Keys(self->folder->entries);
@@ -40,8 +38,7 @@ RAMDH_init(RAMDirHandle *self, RAMFolder *folder)
 }
 
 bool_t
-RAMDH_close(RAMDirHandle *self)
-{
+RAMDH_close(RAMDirHandle *self) {
     if (self->elems) {
         VA_Dec_RefCount(self->elems);
         self->elems = NULL;
@@ -54,13 +51,12 @@ RAMDH_close(RAMDirHandle *self)
 }
 
 bool_t
-RAMDH_next(RAMDirHandle *self)
-{
+RAMDH_next(RAMDirHandle *self) {
     if (self->elems) {
         self->tick++;
         if (self->tick < (int32_t)VA_Get_Size(self->elems)) {
             CharBuf *path = (CharBuf*)CERTIFY(
-                VA_Fetch(self->elems, self->tick), CHARBUF);
+                                VA_Fetch(self->elems, self->tick), CHARBUF);
             CB_Mimic(self->entry, (Obj*)path);
             return true;
         }
@@ -73,8 +69,7 @@ RAMDH_next(RAMDirHandle *self)
 }
 
 bool_t
-RAMDH_entry_is_dir(RAMDirHandle *self)
-{
+RAMDH_entry_is_dir(RAMDirHandle *self) {
     if (self->elems) {
         CharBuf *name = (CharBuf*)VA_Fetch(self->elems, self->tick);
         if (name) {
@@ -85,8 +80,7 @@ RAMDH_entry_is_dir(RAMDirHandle *self)
 }
 
 bool_t
-RAMDH_entry_is_symlink(RAMDirHandle *self)
-{
+RAMDH_entry_is_symlink(RAMDirHandle *self) {
     UNUSED_VAR(self);
     return false;
 }

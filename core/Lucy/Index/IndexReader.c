@@ -29,15 +29,13 @@
 #include "Lucy/Store/Lock.h"
 
 IndexReader*
-IxReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager)
-{
+IxReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager) {
     return IxReader_do_open(NULL, index, snapshot, manager);
 }
 
 IndexReader*
-IxReader_do_open(IndexReader *temp_self, Obj *index, Snapshot *snapshot, 
-                 IndexManager *manager)
-{
+IxReader_do_open(IndexReader *temp_self, Obj *index, Snapshot *snapshot,
+                 IndexManager *manager) {
     PolyReader *polyreader = PolyReader_open(index, snapshot, manager);
     if (!VA_Get_Size(PolyReader_Get_Seg_Readers(polyreader))) {
         THROW(ERR, "Index doesn't seem to contain any data");
@@ -47,13 +45,12 @@ IxReader_do_open(IndexReader *temp_self, Obj *index, Snapshot *snapshot,
 }
 
 IndexReader*
-IxReader_init(IndexReader *self, Schema *schema, Folder *folder, 
-              Snapshot *snapshot, VArray *segments, int32_t seg_tick, 
-              IndexManager *manager)
-{
+IxReader_init(IndexReader *self, Schema *schema, Folder *folder,
+              Snapshot *snapshot, VArray *segments, int32_t seg_tick,
+              IndexManager *manager) {
     snapshot = snapshot ? (Snapshot*)INCREF(snapshot) : Snapshot_new();
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
-        seg_tick);
+                    seg_tick);
     DECREF(snapshot);
     self->components     = Hash_new(0);
     self->read_lock      = NULL;
@@ -69,17 +66,16 @@ IxReader_init(IndexReader *self, Schema *schema, Folder *folder,
 }
 
 void
-IxReader_close(IndexReader *self)
-{
+IxReader_close(IndexReader *self) {
     if (self->components) {
         CharBuf *key;
         DataReader *component;
         Hash_Iterate(self->components);
-        while (
-            Hash_Next(self->components, (Obj**)&key, (Obj**)&component)
-        ) {
-            if (Obj_Is_A((Obj*)component, DATAREADER)) { 
-                DataReader_Close(component); 
+        while (Hash_Next(self->components, (Obj**)&key,
+                         (Obj**)&component)
+              ) {
+            if (Obj_Is_A((Obj*)component, DATAREADER)) {
+                DataReader_Close(component);
             }
         }
         Hash_Clear(self->components);
@@ -92,8 +88,7 @@ IxReader_close(IndexReader *self)
 }
 
 void
-IxReader_destroy(IndexReader *self)
-{
+IxReader_destroy(IndexReader *self) {
     DECREF(self->components);
     if (self->read_lock) {
         Lock_Release(self->read_lock);
@@ -105,13 +100,13 @@ IxReader_destroy(IndexReader *self)
 }
 
 Hash*
-IxReader_get_components(IndexReader *self) 
-    { return self->components; }
+IxReader_get_components(IndexReader *self) {
+    return self->components;
+}
 
 DataReader*
-IxReader_obtain(IndexReader *self, const CharBuf *api)
-{
-    DataReader *component 
+IxReader_obtain(IndexReader *self, const CharBuf *api) {
+    DataReader *component
         = (DataReader*)Hash_Fetch(self->components, (Obj*)api);
     if (!component) {
         THROW(ERR, "No component registered for '%o'", api);
@@ -120,8 +115,7 @@ IxReader_obtain(IndexReader *self, const CharBuf *api)
 }
 
 DataReader*
-IxReader_fetch(IndexReader *self, const CharBuf *api)
-{
+IxReader_fetch(IndexReader *self, const CharBuf *api) {
     return (DataReader*)Hash_Fetch(self->components, (Obj*)api);
 }
 

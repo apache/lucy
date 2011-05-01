@@ -42,17 +42,15 @@ S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache);
 
 RangeQuery*
 RangeQuery_new(const CharBuf *field, Obj *lower_term, Obj *upper_term,
-               bool_t include_lower, bool_t include_upper)
-{
+               bool_t include_lower, bool_t include_upper) {
     RangeQuery *self = (RangeQuery*)VTable_Make_Obj(RANGEQUERY);
-    return RangeQuery_init(self, field, lower_term, upper_term, 
-        include_lower, include_upper);
+    return RangeQuery_init(self, field, lower_term, upper_term,
+                           include_lower, include_upper);
 }
 
 RangeQuery*
 RangeQuery_init(RangeQuery *self, const CharBuf *field, Obj *lower_term,
-                Obj *upper_term, bool_t include_lower, bool_t include_upper)
-{
+                Obj *upper_term, bool_t include_lower, bool_t include_upper) {
     Query_init((Query*)self, 0.0f);
     self->field          = CB_Clone(field);
     self->lower_term     = lower_term ? Obj_Clone(lower_term) : NULL;
@@ -68,8 +66,7 @@ RangeQuery_init(RangeQuery *self, const CharBuf *field, Obj *lower_term,
 }
 
 void
-RangeQuery_destroy(RangeQuery *self)
-{
+RangeQuery_destroy(RangeQuery *self) {
     DECREF(self->field);
     DECREF(self->lower_term);
     DECREF(self->upper_term);
@@ -77,8 +74,7 @@ RangeQuery_destroy(RangeQuery *self)
 }
 
 bool_t
-RangeQuery_equals(RangeQuery *self, Obj *other)
-{
+RangeQuery_equals(RangeQuery *self, Obj *other) {
     RangeQuery *twin = (RangeQuery*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, RANGEQUERY)) return false;
@@ -88,9 +84,9 @@ RangeQuery_equals(RangeQuery *self, Obj *other)
     if (self->upper_term && !twin->upper_term) return false;
     if (!self->lower_term && twin->lower_term) return false;
     if (!self->upper_term && twin->upper_term) return false;
-    if (   self->lower_term 
+    if (self->lower_term
         && !Obj_Equals(self->lower_term, twin->lower_term)) return false;
-    if (   self->upper_term 
+    if (self->upper_term
         && !Obj_Equals(self->upper_term, twin->upper_term)) return false;
     if (self->include_lower != twin->include_lower) return false;
     if (self->include_upper != twin->include_upper) return false;
@@ -98,28 +94,26 @@ RangeQuery_equals(RangeQuery *self, Obj *other)
 }
 
 CharBuf*
-RangeQuery_to_string(RangeQuery *self)
-{
-    CharBuf *lower_term_str = self->lower_term 
-                            ? Obj_To_String(self->lower_term)
-                            : CB_new_from_trusted_utf8("*", 1);
-    CharBuf *upper_term_str = self->upper_term 
-                            ? Obj_To_String(self->upper_term)
-                            : CB_new_from_trusted_utf8("*", 1);
+RangeQuery_to_string(RangeQuery *self) {
+    CharBuf *lower_term_str = self->lower_term
+                              ? Obj_To_String(self->lower_term)
+                              : CB_new_from_trusted_utf8("*", 1);
+    CharBuf *upper_term_str = self->upper_term
+                              ? Obj_To_String(self->upper_term)
+                              : CB_new_from_trusted_utf8("*", 1);
     CharBuf *retval = CB_newf("%o:%s%o TO %o%s", self->field,
-        self->include_lower ? "[" : "{",
-        lower_term_str,
-        upper_term_str,
-        self->include_upper ? "]" : "}"
-    );
+                              self->include_lower ? "[" : "{",
+                              lower_term_str,
+                              upper_term_str,
+                              self->include_upper ? "]" : "}"
+                             );
     DECREF(upper_term_str);
     DECREF(lower_term_str);
     return retval;
 }
 
 void
-RangeQuery_serialize(RangeQuery *self, OutStream *outstream)
-{
+RangeQuery_serialize(RangeQuery *self, OutStream *outstream) {
     OutStream_Write_F32(outstream, self->boost);
     CB_Serialize(self->field, outstream);
     if (self->lower_term) {
@@ -141,8 +135,7 @@ RangeQuery_serialize(RangeQuery *self, OutStream *outstream)
 }
 
 RangeQuery*
-RangeQuery_deserialize(RangeQuery *self, InStream *instream)
-{
+RangeQuery_deserialize(RangeQuery *self, InStream *instream) {
     // Deserialize components.
     float boost     = InStream_Read_F32(instream);
     CharBuf *field  = CB_deserialize(NULL, instream);
@@ -154,7 +147,7 @@ RangeQuery_deserialize(RangeQuery *self, InStream *instream)
     // Init object.
     self = self ? self : (RangeQuery*)VTable_Make_Obj(RANGEQUERY);
     RangeQuery_init(self, field, lower_term, upper_term, include_lower,
-        include_upper);
+                    include_upper);
     RangeQuery_Set_Boost(self, boost);
 
     DECREF(upper_term);
@@ -164,47 +157,42 @@ RangeQuery_deserialize(RangeQuery *self, InStream *instream)
 }
 
 RangeCompiler*
-RangeQuery_make_compiler(RangeQuery *self, Searcher *searcher, 
-                         float boost)
-{
+RangeQuery_make_compiler(RangeQuery *self, Searcher *searcher,
+                         float boost) {
     return RangeCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/
 
 RangeCompiler*
-RangeCompiler_new(RangeQuery *parent, Searcher *searcher, float boost)
-{
-    RangeCompiler *self 
+RangeCompiler_new(RangeQuery *parent, Searcher *searcher, float boost) {
+    RangeCompiler *self
         = (RangeCompiler*)VTable_Make_Obj(RANGECOMPILER);
     return RangeCompiler_init(self, parent, searcher, boost);
 }
 
 RangeCompiler*
-RangeCompiler_init(RangeCompiler *self, RangeQuery *parent, 
-                   Searcher *searcher, float boost)
-{
-    return (RangeCompiler*)Compiler_init((Compiler*)self, (Query*)parent, 
-        searcher, NULL, boost);
+RangeCompiler_init(RangeCompiler *self, RangeQuery *parent,
+                   Searcher *searcher, float boost) {
+    return (RangeCompiler*)Compiler_init((Compiler*)self, (Query*)parent,
+                                         searcher, NULL, boost);
 }
 
 RangeCompiler*
-RangeCompiler_deserialize(RangeCompiler *self, InStream *instream)
-{
+RangeCompiler_deserialize(RangeCompiler *self, InStream *instream) {
     self = self ? self : (RangeCompiler*)VTable_Make_Obj(RANGECOMPILER);
     return (RangeCompiler*)Compiler_deserialize((Compiler*)self, instream);
 }
 
 Matcher*
 RangeCompiler_make_matcher(RangeCompiler *self, SegReader *reader,
-                           bool_t need_score)
-{
+                           bool_t need_score) {
     RangeQuery *parent = (RangeQuery*)self->parent;
-    SortReader *sort_reader 
+    SortReader *sort_reader
         = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
     SortCache *sort_cache = sort_reader
-        ? SortReader_Fetch_Sort_Cache(sort_reader, parent->field) 
-        : NULL;
+                            ? SortReader_Fetch_Sort_Cache(sort_reader, parent->field)
+                            : NULL;
     UNUSED_VAR(need_score);
 
     if (!sort_cache) {
@@ -219,15 +207,14 @@ RangeCompiler_make_matcher(RangeCompiler *self, SegReader *reader,
         }
         else {
             int32_t doc_max = SegReader_Doc_Max(reader);
-            return (Matcher*)RangeMatcher_new(lower, upper, sort_cache, 
-                doc_max);
+            return (Matcher*)RangeMatcher_new(lower, upper, sort_cache,
+                                              doc_max);
         }
     }
 }
 
 static int32_t
-S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache)
-{
+S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache) {
     RangeQuery *parent      = (RangeQuery*)self->parent;
     Obj        *lower_term  = parent->lower_term;
     int32_t     lower_bound = 0;
@@ -242,8 +229,8 @@ S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache)
             Obj *value = SortCache_Make_Blank(sort_cache);
             Obj *low_found = SortCache_Value(sort_cache, low_ord, value);
             bool_t exact_match = low_found == NULL
-                               ? false
-                               : Obj_Equals(lower_term, low_found);
+                                 ? false
+                                 : Obj_Equals(lower_term, low_found);
 
             lower_bound = low_ord;
             if (!exact_match || !parent->include_lower) {
@@ -257,8 +244,7 @@ S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache)
 }
 
 static int32_t
-S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache)
-{
+S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache) {
     RangeQuery *parent     = (RangeQuery*)self->parent;
     Obj        *upper_term = parent->upper_term;
     int32_t     retval     = I32_MAX;
@@ -273,8 +259,8 @@ S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache)
             Obj *value = SortCache_Make_Blank(sort_cache);
             Obj *hi_found = SortCache_Value(sort_cache, hi_ord, value);
             bool_t exact_match = hi_found == NULL
-                               ? false
-                               : Obj_Equals(upper_term, (Obj*)hi_found);
+                                 ? false
+                                 : Obj_Equals(upper_term, (Obj*)hi_found);
 
             retval = hi_ord;
             if (exact_match && !parent->include_upper) {

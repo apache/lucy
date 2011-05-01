@@ -46,16 +46,14 @@ S_encode_entities(CharBuf *text, CharBuf *encoded);
 
 Highlighter*
 Highlighter_new(Searcher *searcher, Obj *query, const CharBuf *field,
-                uint32_t excerpt_length)
-{
+                uint32_t excerpt_length) {
     Highlighter *self = (Highlighter*)VTable_Make_Obj(HIGHLIGHTER);
     return Highlighter_init(self, searcher, query, field, excerpt_length);
 }
 
 Highlighter*
-Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query, 
-                 const CharBuf *field, uint32_t excerpt_length)
-{
+Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
+                 const CharBuf *field, uint32_t excerpt_length) {
     self->query          = Searcher_Glean_Query(searcher, query);
     self->searcher       = (Searcher*)INCREF(searcher);
     self->field          = CB_Clone(field);
@@ -70,8 +68,7 @@ Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
 }
 
 void
-Highlighter_destroy(Highlighter *self)
-{
+Highlighter_destroy(Highlighter *self) {
     DECREF(self->searcher);
     DECREF(self->query);
     DECREF(self->compiler);
@@ -82,11 +79,10 @@ Highlighter_destroy(Highlighter *self)
 }
 
 CharBuf*
-Highlighter_highlight(Highlighter *self, const CharBuf *text)
-{
-    size_t   size   = CB_Get_Size(text) 
-                    + CB_Get_Size(self->pre_tag) 
-                    + CB_Get_Size(self->post_tag);
+Highlighter_highlight(Highlighter *self, const CharBuf *text) {
+    size_t   size   = CB_Get_Size(text)
+                      + CB_Get_Size(self->pre_tag)
+                      + CB_Get_Size(self->post_tag);
     CharBuf *retval = CB_new(size);
     CB_Cat(retval, self->pre_tag);
     CB_Cat(retval, text);
@@ -95,33 +91,55 @@ Highlighter_highlight(Highlighter *self, const CharBuf *text)
 }
 
 void
-Highlighter_set_pre_tag(Highlighter *self, const CharBuf *pre_tag)
-    { CB_Mimic(self->pre_tag, (Obj*)pre_tag); }
+Highlighter_set_pre_tag(Highlighter *self, const CharBuf *pre_tag) {
+    CB_Mimic(self->pre_tag, (Obj*)pre_tag);
+}
+
 void
-Highlighter_set_post_tag(Highlighter *self, const CharBuf *post_tag)
-    { CB_Mimic(self->post_tag, (Obj*)post_tag); }
+Highlighter_set_post_tag(Highlighter *self, const CharBuf *post_tag) {
+    CB_Mimic(self->post_tag, (Obj*)post_tag);
+}
 
 CharBuf*
-Highlighter_get_pre_tag(Highlighter *self)    { return self->pre_tag; }
+Highlighter_get_pre_tag(Highlighter *self) {
+    return self->pre_tag;
+}
+
 CharBuf*
-Highlighter_get_post_tag(Highlighter *self)   { return self->post_tag; }
+Highlighter_get_post_tag(Highlighter *self) {
+    return self->post_tag;
+}
+
 CharBuf*
-Highlighter_get_field(Highlighter *self)      { return self->field; }
+Highlighter_get_field(Highlighter *self) {
+    return self->field;
+}
+
 Query*
-Highlighter_get_query(Highlighter *self)      { return self->query; }
+Highlighter_get_query(Highlighter *self) {
+    return self->query;
+}
+
 Searcher*
-Highlighter_get_searcher(Highlighter *self)   { return self->searcher; }
+Highlighter_get_searcher(Highlighter *self) {
+    return self->searcher;
+}
+
 Compiler*
-Highlighter_get_compiler(Highlighter *self)   { return self->compiler; }
+Highlighter_get_compiler(Highlighter *self) {
+    return self->compiler;
+}
+
 uint32_t
-Highlighter_get_excerpt_length(Highlighter *self) 
-    { return self->excerpt_length; }
+Highlighter_get_excerpt_length(Highlighter *self) {
+    return self->excerpt_length;
+}
 
 CharBuf*
-Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc) 
-{
-    ZombieCharBuf *field_val = (ZombieCharBuf*)HitDoc_Extract(hit_doc, 
-        self->field, (ViewCharBuf*)ZCB_BLANK());
+Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc) {
+    ZombieCharBuf *field_val
+        = (ZombieCharBuf*)HitDoc_Extract(hit_doc, self->field,
+                                         (ViewCharBuf*)ZCB_BLANK());
 
     if (!field_val || !Obj_Is_A((Obj*)field_val, CHARBUF)) {
         return NULL;
@@ -132,25 +150,30 @@ Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc)
     }
     else {
         ZombieCharBuf *fragment = ZCB_WRAP((CharBuf*)field_val);
-        CharBuf *raw_excerpt   = CB_new(self->excerpt_length + 10);
-        CharBuf *highlighted   = CB_new( (self->excerpt_length * 3) / 2);
-        DocVector *doc_vec = Searcher_Fetch_Doc_Vec(self->searcher,
-            HitDoc_Get_Doc_ID(hit_doc));
-        VArray *maybe_spans = Compiler_Highlight_Spans(self->compiler, 
-            self->searcher, doc_vec, self->field);
+        CharBuf *raw_excerpt = CB_new(self->excerpt_length + 10);
+        CharBuf *highlighted = CB_new((self->excerpt_length * 3) / 2);
+        DocVector *doc_vec
+            = Searcher_Fetch_Doc_Vec(self->searcher,
+                                     HitDoc_Get_Doc_ID(hit_doc));
+        VArray *maybe_spans
+            = Compiler_Highlight_Spans(self->compiler, self->searcher,
+                                       doc_vec, self->field);
         VArray *score_spans = maybe_spans ? maybe_spans : VA_new(0);
-        HeatMap *heat_map = HeatMap_new(score_spans, 
-            (self->excerpt_length * 2) / 3);
-        int32_t top = Highlighter_Find_Best_Fragment(self, 
-            (CharBuf*)field_val, (ViewCharBuf*)fragment, heat_map);
-        VArray *sentences = Highlighter_Find_Sentences(self, 
-            (CharBuf*)field_val, 0, top + self->window_width);
+        HeatMap *heat_map
+            = HeatMap_new(score_spans, (self->excerpt_length * 2) / 3);
+        int32_t top
+            = Highlighter_Find_Best_Fragment(self, (CharBuf*)field_val,
+                                             (ViewCharBuf*)fragment, heat_map);
+        VArray *sentences
+            = Highlighter_Find_Sentences(self, (CharBuf*)field_val, 0,
+                                         top + self->window_width);
 
-        top = Highlighter_Raw_Excerpt(self, (CharBuf*)field_val, 
-            (CharBuf*)fragment, raw_excerpt, top, heat_map, sentences);
+        top = Highlighter_Raw_Excerpt(self, (CharBuf*)field_val,
+                                      (CharBuf*)fragment, raw_excerpt, top,
+                                      heat_map, sentences);
         VA_Sort(score_spans, NULL, NULL);
-        Highlighter_highlight_excerpt(self, score_spans, raw_excerpt, 
-            highlighted, top);
+        Highlighter_highlight_excerpt(self, score_spans, raw_excerpt,
+                                      highlighted, top);
 
         DECREF(sentences);
         DECREF(heat_map);
@@ -163,12 +186,11 @@ Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc)
 }
 
 static int32_t
-S_hottest(HeatMap *heat_map)
-{
+S_hottest(HeatMap *heat_map) {
     float max_score = 0.0f;
     int32_t retval = 0;
     VArray *spans = HeatMap_Get_Spans(heat_map);
-    for (uint32_t i = VA_Get_Size(spans); i--; ) {
+    for (uint32_t i = VA_Get_Size(spans); i--;) {
         Span *span = (Span*)VA_Fetch(spans, i);
         if (span->weight >= max_score) {
             retval = span->offset;
@@ -180,8 +202,7 @@ S_hottest(HeatMap *heat_map)
 
 int32_t
 Highlighter_find_best_fragment(Highlighter *self, const CharBuf *field_val,
-                               ViewCharBuf *fragment, HeatMap *heat_map)
-{
+                               ViewCharBuf *fragment, HeatMap *heat_map) {
     // Window is 1.66 * excerpt_length, with the loc in the middle.
     int32_t best_location = S_hottest(heat_map);
 
@@ -232,8 +253,7 @@ Highlighter_find_best_fragment(Highlighter *self, const CharBuf *field_val,
 // score span, or if there are no score spans so that no excerpt is measurably
 // superior.
 static bool_t
-S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length)
-{
+S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length) {
     VArray   *spans     = HeatMap_Get_Spans(heat_map);
     uint32_t  num_spans = VA_Get_Size(spans);
     int32_t   end       = offset + length;
@@ -255,18 +275,17 @@ S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length)
 }
 
 int32_t
-Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val, 
-                        const CharBuf *fragment, CharBuf *raw_excerpt, 
-                        int32_t top, HeatMap *heat_map, VArray *sentences)
-{
+Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
+                        const CharBuf *fragment, CharBuf *raw_excerpt,
+                        int32_t top, HeatMap *heat_map, VArray *sentences) {
     bool_t   found_starting_edge = false;
     bool_t   found_ending_edge   = false;
     int32_t  start = top;
     int32_t  end   = 0;
     double   field_len = CB_Length(field_val);
     uint32_t min_len = field_len < self->excerpt_length * 0.6666
-                   ? (uint32_t)field_len 
-                   : (uint32_t)(self->excerpt_length * 0.6666);
+                       ? (uint32_t)field_len
+                       : (uint32_t)(self->excerpt_length * 0.6666);
 
     // Try to find a starting sentence boundary.
     const uint32_t num_sentences = VA_Get_Size(sentences);
@@ -285,9 +304,9 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
                 ZombieCharBuf *temp = ZCB_WRAP(fragment);
                 ZCB_Nip(temp, candidate - top);
                 uint32_t chars_left = ZCB_Truncate(temp, self->excerpt_length);
-                if (   chars_left >= min_len
+                if (chars_left >= min_len
                     && S_has_heat(heat_map, candidate, chars_left)
-                ) {
+                   ) {
                     start = candidate;
                     found_starting_edge = true;
                     break;
@@ -301,9 +320,9 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
         ZombieCharBuf *start_trimmed = ZCB_WRAP(fragment);
         ZCB_Nip(start_trimmed, start - top);
 
-        for (uint32_t i = num_sentences; i--; ) {
-            Span *sentence  = (Span*)VA_Fetch(sentences, i);
-            int32_t last_edge = sentence->offset + sentence->length;
+        for (uint32_t i = num_sentences; i--;) {
+            Span    *sentence  = (Span*)VA_Fetch(sentences, i);
+            int32_t  last_edge = sentence->offset + sentence->length;
 
             if (last_edge <= start) {
                 break;
@@ -313,9 +332,9 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
             }
             else {
                 uint32_t chars_left = last_edge - start;
-                if (   chars_left > min_len 
+                if (chars_left > min_len
                     && S_has_heat(heat_map, start, chars_left)
-                ) {
+                   ) {
                     found_ending_edge = true;
                     end = last_edge;
                     break;
@@ -334,9 +353,9 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
             }
         }
     }
-    int32_t this_excerpt_len = found_ending_edge 
-                     ? end - start 
-                     : (int32_t)self->excerpt_length;
+    int32_t this_excerpt_len = found_ending_edge
+                               ? end - start
+                               : (int32_t)self->excerpt_length;
     if (!this_excerpt_len) return start;
 
     if (found_starting_edge) {
@@ -349,7 +368,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
     else {
         ZombieCharBuf *temp = ZCB_WRAP((CharBuf*)field_val);
         const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
-        
+
         // If the excerpt is already shorter than the spec'd length, we might
         // not need to make room.
         this_excerpt_len += ELLIPSIS_LEN;
@@ -399,14 +418,14 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
 
                 // Strip punctuation that collides with an ellipsis.
                 code_point = CB_Code_Point_From(raw_excerpt, 1);
-                while (code_point == '.' 
-                    || code_point == ','
-                    || code_point == ';' 
-                    || code_point == ':' 
-                    || code_point == ':' 
-                    || code_point == '?' 
-                    || code_point == '!' 
-                ) {
+                while (code_point == '.'
+                       || code_point == ','
+                       || code_point == ';'
+                       || code_point == ':'
+                       || code_point == ':'
+                       || code_point == '?'
+                       || code_point == '!'
+                      ) {
                     CB_Chop(raw_excerpt, 1);
                     code_point = CB_Code_Point_From(raw_excerpt, 1);
                 }
@@ -421,14 +440,13 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
 }
 
 void
-Highlighter_highlight_excerpt(Highlighter *self, VArray *spans, 
-                              CharBuf *raw_excerpt, CharBuf *highlighted, 
-                              int32_t top)
-{
-    int32_t last_end = 0;
-    ZombieCharBuf *temp = ZCB_WRAP(raw_excerpt);
-    CharBuf *encode_buf = NULL;
-    int32_t raw_excerpt_end = top + CB_Length(raw_excerpt);
+Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
+                              CharBuf *raw_excerpt, CharBuf *highlighted,
+                              int32_t top) {
+    int32_t        last_end        = 0;
+    ZombieCharBuf *temp            = ZCB_WRAP(raw_excerpt);
+    CharBuf       *encode_buf      = NULL;
+    int32_t        raw_excerpt_end = top + CB_Length(raw_excerpt);
 
     for (uint32_t i = 0, max = VA_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)VA_Fetch(spans, i);
@@ -481,14 +499,13 @@ Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
 }
 
 static Span*
-S_start_sentence(int32_t pos) 
-{
+S_start_sentence(int32_t pos) {
     return Span_new(pos, 0, 0.0);
 }
 
 static void
-S_close_sentence(VArray *sentences, Span **sentence_ptr, int32_t sentence_end)
-{
+S_close_sentence(VArray *sentences, Span **sentence_ptr,
+                 int32_t sentence_end) {
     Span *sentence = *sentence_ptr;
     int32_t length = sentence_end - Span_Get_Offset(sentence);
     const int32_t MIN_SENTENCE_LENGTH = 3; // e.g. "OK.", but not "2."
@@ -501,8 +518,7 @@ S_close_sentence(VArray *sentences, Span **sentence_ptr, int32_t sentence_end)
 
 VArray*
 Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
-                           int32_t length)
-{
+                           int32_t length) {
     /* When [sentence] is NULL, that means a sentence start has not yet been
      * found.  When it is a Span object, we have a start, but we haven't found
      * an end.  Once we find the end, we add the sentence to the [sentences]
@@ -511,9 +527,9 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
      */
     Span    *sentence       = NULL;
     VArray  *sentences      = VA_new(10);
-    int32_t  stop           = length == 0 
-                            ? I32_MAX 
-                            : offset + length;
+    int32_t  stop           = length == 0
+                              ? I32_MAX
+                              : offset + length;
     ZombieCharBuf *fragment = ZCB_WRAP(text);
     int32_t  pos            = ZCB_Trim_Top(fragment);
     UNUSED_VAR(self);
@@ -582,16 +598,14 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
 }
 
 CharBuf*
-Highlighter_encode(Highlighter *self, CharBuf *text)
-{
+Highlighter_encode(Highlighter *self, CharBuf *text) {
     CharBuf *encoded = CB_new(0);
     UNUSED_VAR(self);
     return S_encode_entities(text, encoded);
 }
 
 static CharBuf*
-S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf)
-{
+S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
     if (OVERRIDDEN(self, Highlighter, Encode, encode)) {
         return Highlighter_Encode(self, text);
     }
@@ -603,8 +617,7 @@ S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf)
 }
 
 static CharBuf*
-S_encode_entities(CharBuf *text, CharBuf *encoded)
-{
+S_encode_entities(CharBuf *text, CharBuf *encoded) {
     ZombieCharBuf *temp = ZCB_WRAP(text);
     size_t space = 0;
     const int MAX_ENTITY_BYTES = 9; // &#dddddd;
@@ -612,13 +625,13 @@ S_encode_entities(CharBuf *text, CharBuf *encoded)
     // Scan first so that we only allocate once.
     uint32_t code_point;
     while (0 != (code_point = ZCB_Nip_One(temp))) {
-        if (   code_point > 127
+        if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
             || code_point == '<'
             || code_point == '>'
             || code_point == '&'
             || code_point == '"'
-        ) {
+           ) {
             space += MAX_ENTITY_BYTES;
         }
         else {
@@ -630,9 +643,9 @@ S_encode_entities(CharBuf *text, CharBuf *encoded)
     CB_Set_Size(encoded, 0);
     ZCB_Assign(temp, text);
     while (0 != (code_point = ZCB_Nip_One(temp))) {
-        if (   code_point > 127 
+        if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
-        ) {
+           ) {
             CB_catf(encoded, "&#%u32;", code_point);
         }
         else if (code_point == '<') {

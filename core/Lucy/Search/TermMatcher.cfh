@@ -43,7 +43,7 @@ class Lucy::Search::TermMatcher inherits Lucy::Search::Matcher {
     public int32_t
     Advance(TermMatcher* self, int32_t target);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(TermMatcher* self);
 }
 

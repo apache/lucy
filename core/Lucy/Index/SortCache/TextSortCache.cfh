@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** SortCache for TextType fields.
  */
-class Lucy::Index::SortCache::TextSortCache 
+class Lucy::Index::SortCache::TextSortCache
     inherits Lucy::Index::SortCache {
 
     InStream  *ord_in;
@@ -26,14 +26,14 @@ class Lucy::Index::SortCache::TextSortCache
     InStream  *dat_in;
 
     inert incremented TextSortCache*
-    new(const CharBuf *field, FieldType *type, int32_t cardinality, 
-        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width, 
+    new(const CharBuf *field, FieldType *type, int32_t cardinality,
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
         InStream *ord_in, InStream *ix_in, InStream *dat_in);
 
     inert TextSortCache*
-    init(TextSortCache *self, const CharBuf *field, FieldType *type, 
+    init(TextSortCache *self, const CharBuf *field, FieldType *type,
          int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
-         int32_t ord_width, InStream *ord_in, InStream *ix_in, 
+         int32_t ord_width, InStream *ord_in, InStream *ix_in,
          InStream *dat_in);
 
     public nullable Obj*

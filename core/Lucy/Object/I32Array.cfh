@@ -46,7 +46,7 @@ class Lucy::Object::I32Array cnick I32Arr inherits Lucy::Object::Obj {
 
     /** Accessor for 'size' member.
      */
-    uint32_t 
+    uint32_t
     Get_Size(I32Array *self);
 
     public void

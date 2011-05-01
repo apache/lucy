@@ -44,7 +44,7 @@ OUTPUT: RETVAL
 
 void
 store(self, key, value);
-    lucy_Hash          *self; 
+    lucy_Hash          *self;
     const lucy_CharBuf *key;
     lucy_Obj           *value;
 PPCODE:
@@ -65,8 +65,8 @@ PPCODE:
         SV *key_sv = (SV*)Lucy_Obj_To_Host(key);
         SV *val_sv = (SV*)Lucy_Obj_To_Host(val);
 
-        XPUSHs(sv_2mortal( key_sv ));
-        XPUSHs(sv_2mortal( val_sv ));
+        XPUSHs(sv_2mortal(key_sv));
+        XPUSHs(sv_2mortal(val_sv));
         XSRETURN(2);
     }
     else {

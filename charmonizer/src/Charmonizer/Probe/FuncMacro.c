@@ -34,7 +34,7 @@ static char iso_func_code[] =
     QUOTE(  }                                 );
 
 /* Code for verifying GNU func macro. */
-static char gnuc_func_code[] = 
+static char gnuc_func_code[] =
     QUOTE(  #include "_charm.h"               )
     QUOTE(  int main() {                      )
     QUOTE(      Charm_Setup;                  )
@@ -54,7 +54,7 @@ static char inline_code[] =
 
 static char*
 S_try_inline(const char *keyword, size_t *output_len) {
-    char code[ sizeof(inline_code) + 30 ];
+    char code[sizeof(inline_code) + 30];
     sprintf(code, inline_code, keyword);
     return CC_capture_output(code, strlen(code), output_len);
 }
@@ -67,8 +67,7 @@ static const char* inline_options[] = {
 static int num_inline_options = sizeof(inline_options) / sizeof(void*);
 
 void
-FuncMacro_run(void) 
-{
+FuncMacro_run(void) {
     int i;
     char *output;
     size_t output_len;
@@ -78,10 +77,10 @@ FuncMacro_run(void)
     chaz_bool_t has_inline       = false;
 
     ConfWriter_start_module("FuncMacro");
-    
+
     /* Check for ISO func macro. */
-    output = CC_capture_output(iso_func_code, strlen(iso_func_code), 
-        &output_len);
+    output = CC_capture_output(iso_func_code, strlen(iso_func_code),
+                               &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac     = true;
         has_iso_funcmac = true;
@@ -89,8 +88,8 @@ FuncMacro_run(void)
     free(output);
 
     /* Check for GNUC func macro. */
-    output = CC_capture_output(gnuc_func_code, strlen(gnuc_func_code), 
-        &output_len);
+    output = CC_capture_output(gnuc_func_code, strlen(gnuc_func_code),
+                               &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac      = true;
         has_gnuc_funcmac = true;
@@ -99,9 +98,9 @@ FuncMacro_run(void)
 
     /* Write out common defines. */
     if (has_funcmac) {
-        const char *macro_text = has_iso_funcmac 
-            ? "__func__"
-            : "__FUNCTION__";
+        const char *macro_text = has_iso_funcmac
+                                 ? "__func__"
+                                 : "__FUNCTION__";
         ConfWriter_append_conf(
             "#define CHY_HAS_FUNC_MACRO\n"
             "#define CHY_FUNC_MACRO %s\n",
@@ -111,14 +110,14 @@ FuncMacro_run(void)
 
     /* Write out specific defines. */
     if (has_iso_funcmac) {
-       ConfWriter_append_conf("#define CHY_HAS_ISO_FUNC_MACRO\n");
+        ConfWriter_append_conf("#define CHY_HAS_ISO_FUNC_MACRO\n");
     }
     if (has_gnuc_funcmac) {
         ConfWriter_append_conf("#define CHY_HAS_GNUC_FUNC_MACRO\n");
     }
 
     /* Check for inline keyword. */
-    
+
     for (i = 0; i < num_inline_options; i++) {
         const char *inline_option = inline_options[i];
         output = S_try_inline(inline_option, &output_len);

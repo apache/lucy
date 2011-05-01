@@ -54,7 +54,7 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     Store(Hash *self, Obj *key, decremented Obj *value);
 
     void
-    Store_Str(Hash *self, const char *str, size_t len, 
+    Store_Str(Hash *self, const char *str, size_t len,
               decremented Obj *value);
 
     /** Fetch the value associated with <code>key</code>.
@@ -82,7 +82,7 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
      *
      * @return the number of pairs which will be iterated over.
      */
-    uint32_t 
+    uint32_t
     Iterate(Hash *self);
 
     /** Retrieve the next key-value pair from the hash, setting the supplied
@@ -117,14 +117,14 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     public incremented Obj*
     Make_Key(Hash *self, Obj *key, int32_t hash_sum);
 
-    uint32_t 
+    uint32_t
     Get_Capacity(Hash *self);
 
     /** Accessor for Hash's "size" member.
      *
      * @return the number of key-value pairs.
      */
-    public uint32_t 
+    public uint32_t
     Get_Size(Hash *self);
 
     public bool_t
@@ -146,7 +146,7 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     Destroy(Hash *self);
 }
 
-class Lucy::Object::Hash::HashTombStone 
+class Lucy::Object::Hash::HashTombStone
     inherits Lucy::Object::Obj {
 
     uint32_t
@@ -155,7 +155,7 @@ class Lucy::Object::Hash::HashTombStone
     incremented HashTombStone*
     Inc_RefCount(HashTombStone* self);
 
-    uint32_t 
+    uint32_t
     Dec_RefCount(HashTombStone* self);
 }
 

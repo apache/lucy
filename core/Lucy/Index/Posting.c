@@ -29,23 +29,26 @@
 #include "Lucy/Store/InStream.h"
 
 Posting*
-Post_init(Posting *self)
-{
+Post_init(Posting *self) {
     self->doc_id = 0;
     return self;
 }
 
 void
-Post_set_doc_id(Posting *self, int32_t doc_id) { self->doc_id = doc_id; }
+Post_set_doc_id(Posting *self, int32_t doc_id) {
+    self->doc_id = doc_id;
+}
+
 int32_t
-Post_get_doc_id(Posting *self) { return self->doc_id; }
+Post_get_doc_id(Posting *self) {
+    return self->doc_id;
+}
 
 PostingWriter*
 PostWriter_init(PostingWriter *self, Schema *schema, Snapshot *snapshot,
-                Segment *segment, PolyReader *polyreader, int32_t field_num)
-{
+                Segment *segment, PolyReader *polyreader, int32_t field_num) {
     DataWriter_init((DataWriter*)self, schema, snapshot, segment,
-        polyreader);
+                    polyreader);
     self->field_num = field_num;
     return self;
 }

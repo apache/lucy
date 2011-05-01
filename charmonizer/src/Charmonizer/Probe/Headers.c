@@ -93,20 +93,18 @@ char *win_headers[] = {
 };
 
 chaz_bool_t
-Headers_check(const char *header_name)
-{
+Headers_check(const char *header_name) {
     return HeadCheck_check_header(header_name);
 }
 
 void
-Headers_run(void) 
-{
+Headers_run(void) {
     int i;
     chaz_bool_t has_posix = false;
     chaz_bool_t has_c89   = false;
 
     keeper_count = 0;
-    
+
     ConfWriter_start_module("Headers");
 
     /* Try for all POSIX headers in one blast. */
@@ -189,8 +187,7 @@ Headers_run(void)
 }
 
 static void
-S_keep(const char *header_name)
-{
+S_keep(const char *header_name) {
     if (keeper_count >= MAX_KEEPER_COUNT) {
         Util_die("Too many keepers -- increase MAX_KEEPER_COUNT");
     }
@@ -202,7 +199,7 @@ static void
 S_encode_affirmation(const char *header_name) {
     char *buf, *buf_end;
     size_t len = strlen(header_name) + sizeof("HAS_");
-    
+
     /* Grow buffer and start off with "HAS_". */
     if (aff_buf_size < len + 1) {
         free(aff_buf);
@@ -212,15 +209,15 @@ S_encode_affirmation(const char *header_name) {
     strcpy(aff_buf, "HAS_");
 
     /* Transform one char at a time. */
-    for(buf = aff_buf + sizeof("HAS_") - 1, buf_end = aff_buf + len; 
-        buf < buf_end; 
-        header_name++, buf++
-    ) {
+    for (buf = aff_buf + sizeof("HAS_") - 1, buf_end = aff_buf + len;
+         buf < buf_end;
+         header_name++, buf++
+        ) {
         if (*header_name == '\0') {
             *buf = '\0';
             break;
         }
-        else if (isalnum(*header_name)){
+        else if (isalnum(*header_name)) {
             *buf = toupper(*header_name);
         }
         else {

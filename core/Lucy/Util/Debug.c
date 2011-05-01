@@ -31,15 +31,14 @@ int32_t Debug_num_globals   = 0;
 #include <string.h>
 #include <stdlib.h>
 
-static char    env_cache_buf[256];
-static char   *env_cache            = NULL;
-static char   *env_cache_limit      = NULL;
-static int     env_cache_is_current = 0;
+static char  env_cache_buf[256];
+static char *env_cache            = NULL;
+static char *env_cache_limit      = NULL;
+static int   env_cache_is_current = 0;
 
 // Cache the system call to getenv.
 static void
-S_cache_debug_env_var(char *override)
-{
+S_cache_debug_env_var(char *override) {
     const char *debug_env = override ? override : getenv("DEBUG");
     if (debug_env != NULL) {
         size_t len = strlen(debug_env);
@@ -54,9 +53,8 @@ S_cache_debug_env_var(char *override)
 }
 
 void
-Debug_print_mess(const char *file, int line, const char *func, 
-                      const char *pat, ...)
-{
+Debug_print_mess(const char *file, int line, const char *func,
+                 const char *pat, ...) {
     va_list args;
     fprintf(stderr, "%s:%d %s(): ", file, line, func);
     va_start(args, pat);
@@ -65,9 +63,8 @@ Debug_print_mess(const char *file, int line, const char *func,
     fprintf(stderr, "\n");
 }
 
-int 
-Debug_debug_should_print(const char *path, const char *func) 
-{
+int
+Debug_debug_should_print(const char *path, const char *func) {
     if (!env_cache_is_current) {
         S_cache_debug_env_var(NULL);
     }
@@ -85,7 +82,7 @@ Debug_debug_should_print(const char *path, const char *func)
         // Use just file name if given path.
         if (file) file++;
         else file = path;
-   
+
         // Split criteria on commas. Bail when we run out of critieria.
         for (test = env_cache; test != NULL; test = next) {
             const char *last_char;
@@ -96,17 +93,17 @@ Debug_debug_should_print(const char *path, const char *func)
 
             // Find end of criteria or end of string.
             next = strchr(test, ',');
-            last_char = next ? next - 1 : env_cache_limit - 1; 
+            last_char = next ? next - 1 : env_cache_limit - 1;
             while (last_char > test && isspace(*last_char)) last_char--;
 
             if (*last_char == '*') {
                 const int len = last_char - test;
-                if (! strncmp(test, file, len)) return 1;
-                if (! strncmp(test, func, len)) return 1;
+                if (!strncmp(test, file, len)) return 1;
+                if (!strncmp(test, func, len)) return 1;
             }
             else {
-                if (! strncmp(test, file, filename_len)) return 1;
-                if (! strncmp(test, func, funcname_len)) return 1;
+                if (!strncmp(test, file, filename_len)) return 1;
+                if (!strncmp(test, func, funcname_len)) return 1;
             }
         }
 
@@ -116,16 +113,14 @@ Debug_debug_should_print(const char *path, const char *func)
 }
 
 void
-Debug_set_env_cache(char *override)
-{
+Debug_set_env_cache(char *override) {
     S_cache_debug_env_var(override);
 }
 
 #else // DEBUG
 
 void
-Debug_set_env_cache(char *override)
-{
+Debug_set_env_cache(char *override) {
     (void)override;
 }
 

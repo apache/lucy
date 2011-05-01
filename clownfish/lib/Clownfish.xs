@@ -41,16 +41,15 @@
         default: croak("Internal error. ix: %d", ix); \
     } \
     if (ix % 2 == 0) { \
-        XPUSHs( sv_2mortal(retval) ); \
+        XPUSHs(sv_2mortal(retval)); \
         XSRETURN(1); \
     } \
     else { \
         XSRETURN(0); \
-    } 
+    }
 
 static SV*
-S_cfcbase_to_perlref(void *thing)
-{
+S_cfcbase_to_perlref(void *thing) {
     if (thing) {
         SV *perl_obj = (SV*)CFCBase_get_perl_obj((CFCBase*)thing);
         return newRV(perl_obj);
@@ -62,8 +61,7 @@ S_cfcbase_to_perlref(void *thing)
 
 // Transform a NULL-terminated array of CFCBase* into a Perl arrayref.
 static SV*
-S_array_of_cfcbase_to_av(CFCBase **things)
-{
+S_array_of_cfcbase_to_av(CFCBase **things) {
     AV *av = newAV();
     size_t i;
     for (i = 0; things[i] != NULL; i++) {
@@ -125,21 +123,21 @@ _create(klass, parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docuc
     bool is_final;
     bool is_inert;
 CODE:
-    const char *exposure = SvOK(exposure_sv)
-                         ? SvPV_nolen(exposure_sv) : NULL;
-    const char *class_name = SvOK(class_name_sv) 
-                           ? SvPV_nolen(class_name_sv) : NULL;
-    const char *cnick = SvOK(cnick_sv) 
-                      ? SvPV_nolen(cnick_sv) : NULL;
-    const char *micro_sym = SvOK(micro_sym_sv) 
-                            ? SvPV_nolen(micro_sym_sv) : NULL;
-    const char *source_class = SvOK(source_class_sv) 
-                            ? SvPV_nolen(source_class_sv) : NULL;
-    const char *parent_class_name = SvOK(parent_class_name_sv) 
-                                  ? SvPV_nolen(parent_class_name_sv) : NULL;
+    const char *exposure =
+        SvOK(exposure_sv) ? SvPV_nolen(exposure_sv) : NULL;
+    const char *class_name =
+        SvOK(class_name_sv) ? SvPV_nolen(class_name_sv) : NULL;
+    const char *cnick =
+        SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
+    const char *micro_sym =
+        SvOK(micro_sym_sv) ? SvPV_nolen(micro_sym_sv) : NULL;
+    const char *source_class =
+        SvOK(source_class_sv) ? SvPV_nolen(source_class_sv) : NULL;
+    const char *parent_class_name =
+        SvOK(parent_class_name_sv) ? SvPV_nolen(parent_class_name_sv) : NULL;
     CFCClass *self = CFCClass_create(parcel, exposure, class_name, cnick,
-        micro_sym, docucomment, source_class, parent_class_name, is_final, 
-        is_inert);
+                                     micro_sym, docucomment, source_class,
+                                     parent_class_name, is_final, is_inert);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -167,7 +165,7 @@ PPCODE:
 
 void
 _clear_registry(...)
-PPCODE: 
+PPCODE:
     CFCClass_clear_registry();
 
 void
@@ -275,7 +273,7 @@ ALIAS:
     final                 = 14
     inert                 = 16
     get_struct_sym        = 18
-    full_struct_sym       = 20 
+    full_struct_sym       = 20
     short_vtable_var      = 22
     full_vtable_var       = 24
     full_vtable_type      = 26
@@ -299,9 +297,9 @@ PPCODE:
             break;
         case 5: {
                 CFCClass *parent = NULL;
-                if (   SvOK(ST(1))
+                if (SvOK(ST(1))
                     && sv_derived_from(ST(1), "Clownfish::Class")
-                ) {
+                   ) {
                     IV objint = SvIV((SV*)SvRV(ST(1)));
                     parent = INT2PTR(CFCClass*, objint);
                 }
@@ -369,44 +367,40 @@ PPCODE:
                 retval = S_cfcbase_to_perlref(docucomment);
             }
             break;
-        case 32: 
+        case 32:
             retval = S_array_of_cfcbase_to_av(
                 (CFCBase**)CFCClass_children(self));
             break;
-        case 34: 
-            retval = S_array_of_cfcbase_to_av(
-                (CFCBase**)CFCClass_functions(self));
+        case 34:
+            retval = S_array_of_cfcbase_to_av((CFCBase**)CFCClass_functions(self));
             break;
         case 36:
-            retval = S_array_of_cfcbase_to_av(
-                (CFCBase**)CFCClass_methods(self));
+            retval = S_array_of_cfcbase_to_av((CFCBase**)CFCClass_methods(self));
             break;
         case 38:
-            retval = S_array_of_cfcbase_to_av(
-                (CFCBase**)CFCClass_member_vars(self));
+            retval = S_array_of_cfcbase_to_av((CFCBase**)CFCClass_member_vars(self));
             break;
         case 40:
-            retval = S_array_of_cfcbase_to_av(
-                (CFCBase**)CFCClass_inert_vars(self));
+            retval = S_array_of_cfcbase_to_av((CFCBase**)CFCClass_inert_vars(self));
             break;
         case 42: {
-            CFCClass **ladder = CFCClass_tree_to_ladder(self);
-            retval = S_array_of_cfcbase_to_av((CFCBase**)ladder);
-            FREEMEM(ladder);
-            break;
-        }
+                CFCClass **ladder = CFCClass_tree_to_ladder(self);
+                retval = S_array_of_cfcbase_to_av((CFCBase**)ladder);
+                FREEMEM(ladder);
+                break;
+            }
         case 44: {
-            CFCMethod **novel = CFCClass_novel_methods(self);
-            retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
-            FREEMEM(novel);
-            break;
-        }
+                CFCMethod **novel = CFCClass_novel_methods(self);
+                retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
+                FREEMEM(novel);
+                break;
+            }
         case 46: {
-            CFCVariable **novel = CFCClass_novel_member_vars(self);
-            retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
-            FREEMEM(novel);
-            break;
-        }
+                CFCVariable **novel = CFCClass_novel_member_vars(self);
+                retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
+                FREEMEM(novel);
+                break;
+            }
     END_SET_OR_GET_SWITCH
 }
 
@@ -458,29 +452,29 @@ PPCODE:
             }
             break;
         case 8: {
-            AV *av = newAV();
-            const char **names = CFCDocuComment_get_param_names(self);
-            size_t i;
-            for (i = 0; names[i] != NULL; i++) {
-                SV *val_sv = newSVpvn(names[i], strlen(names[i]));
-                av_store(av, i, val_sv);
+                AV *av = newAV();
+                const char **names = CFCDocuComment_get_param_names(self);
+                size_t i;
+                for (i = 0; names[i] != NULL; i++) {
+                    SV *val_sv = newSVpvn(names[i], strlen(names[i]));
+                    av_store(av, i, val_sv);
+                }
+                retval = newRV((SV*)av);
+                SvREFCNT_dec(av);
+                break;
             }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
-            break;
-        }
         case 10: {
-            AV *av = newAV();
-            const char **docs = CFCDocuComment_get_param_docs(self);
-            size_t i;
-            for (i = 0; docs[i] != NULL; i++) {
-                SV *val_sv = newSVpvn(docs[i], strlen(docs[i]));
-                av_store(av, i, val_sv);
+                AV *av = newAV();
+                const char **docs = CFCDocuComment_get_param_docs(self);
+                size_t i;
+                for (i = 0; docs[i] != NULL; i++) {
+                    SV *val_sv = newSVpvn(docs[i], strlen(docs[i]));
+                    av_store(av, i, val_sv);
+                }
+                retval = newRV((SV*)av);
+                SvREFCNT_dec(av);
+                break;
             }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
-            break;
-        }
         case 12: {
                 const char *rv = CFCDocuComment_get_retval(self);
                 retval = rv ? newSVpvn(rv, strlen(rv)) : newSV(0);
@@ -548,16 +542,16 @@ ALIAS:
     get_source_class   = 4
     guard_name         = 6
     guard_start        = 8
-    guard_close        = 10 
+    guard_close        = 10
     blocks             = 12
     classes            = 14
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
-        case 1: 
+        case 1:
             CFCFile_set_modified(self, !!SvTRUE(ST(1)));
             break;
-        case 2: 
+        case 2:
             retval = newSViv(CFCFile_get_modified(self));
             break;
         case 4: {
@@ -585,7 +579,7 @@ PPCODE:
             break;
         case 14:
             retval = S_array_of_cfcbase_to_av(
-                (CFCBase**)CFCFile_classes(self));
+                         (CFCBase**)CFCFile_classes(self));
             break;
     END_SET_OR_GET_SWITCH
 }
@@ -604,14 +598,14 @@ CODE:
     RETVAL = newSV(buf_size);
     SvPOK_on(RETVAL);
     char *buf = SvPVX(RETVAL);
-    switch(ix) {
-        case 1: 
+    switch (ix) {
+        case 1:
             CFCFile_c_path(self, buf, buf_size, base_dir);
             break;
-        case 2: 
+        case 2:
             CFCFile_h_path(self, buf, buf_size, base_dir);
             break;
-        case 3: 
+        case 3:
             CFCFile_cfh_path(self, buf, buf_size, base_dir);
             break;
         default:
@@ -637,16 +631,17 @@ _new(klass, parcel, exposure_sv, class_name_sv, class_cnick_sv, micro_sym_sv, re
     CFCDocuComment *docucomment;
     int is_inline;
 CODE:
-    const char *exposure = SvOK(exposure_sv) 
-                         ? SvPV_nolen(exposure_sv) : NULL;
-    const char *class_name = SvOK(class_name_sv) 
-                           ? SvPV_nolen(class_name_sv) : NULL;
-    const char *class_cnick = SvOK(class_cnick_sv) 
-                            ? SvPV_nolen(class_cnick_sv) : NULL;
-    const char *micro_sym = SvOK(micro_sym_sv) 
-                            ? SvPV_nolen(micro_sym_sv) : NULL;
-    CFCFunction *self = CFCFunction_new(parcel, exposure, class_name, class_cnick,
-        micro_sym, return_type, param_list, docucomment, is_inline);
+    const char *exposure =
+        SvOK(exposure_sv) ? SvPV_nolen(exposure_sv) : NULL;
+    const char *class_name =
+        SvOK(class_name_sv) ? SvPV_nolen(class_name_sv) : NULL;
+    const char *class_cnick =
+        SvOK(class_cnick_sv) ? SvPV_nolen(class_cnick_sv) : NULL;
+    const char *micro_sym =
+        SvOK(micro_sym_sv) ? SvPV_nolen(micro_sym_sv) : NULL;
+    CFCFunction *self = CFCFunction_new(parcel, exposure, class_name,
+                                        class_cnick, micro_sym, return_type,
+                                        param_list, docucomment, is_inline);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -682,7 +677,7 @@ PPCODE:
             }
             break;
         case 6: {
-                CFCDocuComment *docucomment 
+                CFCDocuComment *docucomment
                     = CFCFunction_get_docucomment(self);
                 retval = S_cfcbase_to_perlref(docucomment);
             }
@@ -791,15 +786,15 @@ _new(klass, parcel, exposure_sv, class_name_sv, class_cnick_sv, macro_sym, retur
     int is_final;
     int is_abstract;
 CODE:
-    const char *exposure = SvOK(exposure_sv) 
-                         ? SvPV_nolen(exposure_sv) : NULL;
-    const char *class_name = SvOK(class_name_sv) 
-                           ? SvPV_nolen(class_name_sv) : NULL;
-    const char *class_cnick = SvOK(class_cnick_sv) 
-                            ? SvPV_nolen(class_cnick_sv) : NULL;
+    const char *exposure =
+        SvOK(exposure_sv) ? SvPV_nolen(exposure_sv) : NULL;
+    const char *class_name =
+        SvOK(class_name_sv) ? SvPV_nolen(class_name_sv) : NULL;
+    const char *class_cnick =
+        SvOK(class_cnick_sv) ? SvPV_nolen(class_cnick_sv) : NULL;
     CFCMethod *self = CFCMethod_new(parcel, exposure, class_name, class_cnick,
-        macro_sym, return_type, param_list, docucomment, is_final, 
-        is_abstract);
+                                    macro_sym, return_type, param_list,
+                                    docucomment, is_final, is_abstract);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -844,25 +839,31 @@ ALIAS:
     full_offset_sym   = 3
 CODE:
     size_t size = 0;
-    switch(ix) {
-        case 1: size = CFCMethod_short_method_sym(self, invoker, NULL, 0);
-                break;
-        case 2: size = CFCMethod_full_method_sym(self, invoker, NULL, 0);
-                break;
-        case 3: size = CFCMethod_full_offset_sym(self, invoker, NULL, 0);
-                break;
+    switch (ix) {
+        case 1:
+            size = CFCMethod_short_method_sym(self, invoker, NULL, 0);
+            break;
+        case 2:
+            size = CFCMethod_full_method_sym(self, invoker, NULL, 0);
+            break;
+        case 3:
+            size = CFCMethod_full_offset_sym(self, invoker, NULL, 0);
+            break;
         default: croak("Unexpected ix: %d", ix);
     }
     RETVAL = newSV(size);
     SvPOK_on(RETVAL);
     char *buf = SvPVX(RETVAL);
-    switch(ix) {
-        case 1: CFCMethod_short_method_sym(self, invoker, buf, size);
-                break;
-        case 2: CFCMethod_full_method_sym(self, invoker, buf, size);
-                break;
-        case 3: CFCMethod_full_offset_sym(self, invoker, buf, size);
-                break;
+    switch (ix) {
+        case 1:
+            CFCMethod_short_method_sym(self, invoker, buf, size);
+            break;
+        case 2:
+            CFCMethod_full_method_sym(self, invoker, buf, size);
+            break;
+        case 3:
+            CFCMethod_full_offset_sym(self, invoker, buf, size);
+            break;
         default: croak("Unexpected ix: %d", ix);
     }
     SvCUR_set(RETVAL, strlen(buf));
@@ -968,36 +969,36 @@ PPCODE:
 {
     START_SET_OR_GET_SWITCH
         case 2: {
-            AV *av = newAV();
-            CFCVariable **vars = CFCParamList_get_variables(self);
-            size_t i;
-            size_t num_vars = CFCParamList_num_vars(self);
-            for (i = 0; i < num_vars; i++) {
-                SV *ref = S_cfcbase_to_perlref(vars[i]);
-                av_store(av, i, ref);
+                AV *av = newAV();
+                CFCVariable **vars = CFCParamList_get_variables(self);
+                size_t i;
+                size_t num_vars = CFCParamList_num_vars(self);
+                for (i = 0; i < num_vars; i++) {
+                    SV *ref = S_cfcbase_to_perlref(vars[i]);
+                    av_store(av, i, ref);
+                }
+                retval = newRV((SV*)av);
+                SvREFCNT_dec(av);
+                break;
             }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
-            break;
-        }
         case 4: {
-            AV *av = newAV();
-            const char **values = CFCParamList_get_initial_values(self);
-            size_t i;
-            size_t num_vars = CFCParamList_num_vars(self);
-            for (i = 0; i < num_vars; i++) {
-                if (values[i] != NULL) {
-                    SV *val_sv = newSVpvn(values[i], strlen(values[i]));
-                    av_store(av, i, val_sv);
+                AV *av = newAV();
+                const char **values = CFCParamList_get_initial_values(self);
+                size_t i;
+                size_t num_vars = CFCParamList_num_vars(self);
+                for (i = 0; i < num_vars; i++) {
+                    if (values[i] != NULL) {
+                        SV *val_sv = newSVpvn(values[i], strlen(values[i]));
+                        av_store(av, i, val_sv);
+                    }
+                    else {
+                        av_store(av, i, newSV(0));
+                    }
                 }
-                else {
-                    av_store(av, i, newSV(0));
-                }
+                retval = newRV((SV*)av);
+                SvREFCNT_dec(av);
+                break;
             }
-            retval = newRV((SV*)av);
-            SvREFCNT_dec(av);
-            break;
-        }
         case 6:
             retval = newSViv(CFCParamList_variadic(self));
             break;
@@ -1110,16 +1111,19 @@ _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
     SV *class_cnick_sv;
     SV *micro_sym_sv;
 CODE:
-    const char *class_name = SvOK(class_name_sv) 
-                           ? SvPV_nolen(class_name_sv) : NULL;
-    const char *class_cnick = SvOK(class_cnick_sv) 
-                            ? SvPV_nolen(class_cnick_sv) : NULL;
-    const char *micro_sym = SvOK(micro_sym_sv) 
-                            ? SvPV_nolen(micro_sym_sv) : NULL;
+    const char *class_name  = SvOK(class_name_sv)
+                              ? SvPV_nolen(class_name_sv)
+                              : NULL;
+    const char *class_cnick = SvOK(class_cnick_sv)
+                              ? SvPV_nolen(class_cnick_sv)
+                              : NULL;
+    const char *micro_sym   = SvOK(micro_sym_sv)
+                              ? SvPV_nolen(micro_sym_sv)
+                              : NULL;
     CFCSymbol *self = CFCSymbol_new(parcel, exposure, class_name, class_cnick,
-        micro_sym);
+                                    micro_sym);
     RETVAL = newSV(0);
-	sv_setref_pv(RETVAL, klass, (void*)self);
+    sv_setref_pv(RETVAL, klass, (void*)self);
 OUTPUT: RETVAL
 
 int
@@ -1164,16 +1168,16 @@ PPCODE:
             break;
         case 4: {
                 const char *class_name = CFCSymbol_get_class_name(self);
-                retval = class_name 
-                       ? newSVpvn(class_name, strlen(class_name))
-                       : newSV(0);
+                retval = class_name
+                         ? newSVpvn(class_name, strlen(class_name))
+                         : newSV(0);
             }
             break;
         case 6: {
                 const char *class_cnick = CFCSymbol_get_class_cnick(self);
-                retval = class_cnick 
-                       ? newSVpvn(class_cnick, strlen(class_cnick))
-                       : newSV(0);
+                retval = class_cnick
+                         ? newSVpvn(class_cnick, strlen(class_cnick))
+                         : newSV(0);
             }
             break;
         case 8: {
@@ -1238,8 +1242,8 @@ _new(klass, flags, parcel, specifier, indirection, c_string)
     int indirection;
     const char *c_string;
 CODE:
-    CFCType *self = CFCType_new(flags, parcel, specifier, indirection, 
-        c_string);
+    CFCType *self = CFCType_new(flags, parcel, specifier, indirection,
+                                c_string);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -1440,7 +1444,7 @@ ALIAS:
     get_indirection = 6
     set_c_string    = 7
     to_c            = 8
-    const           = 10 
+    const           = 10
     set_nullable    = 11
     nullable        = 12
     is_void         = 14
@@ -1529,9 +1533,9 @@ PPCODE:
             break;
         case 38: {
                 const char *array = CFCType_get_array(self);
-                retval = array 
-                       ? newSVpvn(array, strlen(array))
-                       : newSV(0);
+                retval = array
+                         ? newSVpvn(array, strlen(array))
+                         : newSV(0);
             }
             break;
     END_SET_OR_GET_SWITCH
@@ -1591,12 +1595,15 @@ _new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_
     SV *micro_sym_sv;
     SV *type_sv;
 CODE:
-    const char *class_name = SvOK(class_name_sv) 
-                           ? SvPV_nolen(class_name_sv) : NULL;
-    const char *class_cnick = SvOK(class_cnick_sv) 
-                            ? SvPV_nolen(class_cnick_sv) : NULL;
-    const char *micro_sym = SvOK(micro_sym_sv) 
-                            ? SvPV_nolen(micro_sym_sv) : NULL;
+    const char *class_name  = SvOK(class_name_sv)
+                              ? SvPV_nolen(class_name_sv)
+                              : NULL;
+    const char *class_cnick = SvOK(class_cnick_sv)
+                              ? SvPV_nolen(class_cnick_sv)
+                              : NULL;
+    const char *micro_sym   = SvOK(micro_sym_sv)
+                              ? SvPV_nolen(micro_sym_sv)
+                              : NULL;
     CFCType *type = NULL;
     if (SvOK(type_sv) && sv_derived_from(type_sv, "Clownfish::Type")) {
         IV objint = SvIV((SV*)SvRV(type_sv));
@@ -1606,7 +1613,7 @@ CODE:
         croak("Param 'type' is not a Clownfish::Type");
     }
     CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
-        class_cnick, micro_sym, type);
+                                        class_cnick, micro_sym, type);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL

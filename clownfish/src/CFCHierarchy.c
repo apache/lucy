@@ -82,13 +82,12 @@ S_closedir(void *dirhandle, const char *dir);
 // Note: this has to be defined before including the Perl headers because they
 // redefine stat() in an incompatible way on certain systems (Windows).
 static int
-S_is_dir(const char *path)
-{
+S_is_dir(const char *path) {
     struct stat stat_buf;
     int stat_check = stat(path, &stat_buf);
     if (stat_check == -1) {
         CFCUtil_die("Stat failed for '%s': %s", path,
-            strerror(errno));
+                    strerror(errno));
     }
     return (stat_buf.st_mode & S_IFDIR) ? true : false;
 }
@@ -98,17 +97,16 @@ S_is_dir(const char *path)
 #include "XSUB.h"
 
 CFCHierarchy*
-CFCHierarchy_new(const char *source, const char *dest, void *parser)
-{
-    CFCHierarchy *self = (CFCHierarchy*)CFCBase_allocate(sizeof(CFCHierarchy),
-        "Clownfish::Hierarchy");
+CFCHierarchy_new(const char *source, const char *dest, void *parser) {
+    CFCHierarchy *self
+        = (CFCHierarchy*)CFCBase_allocate(sizeof(CFCHierarchy),
+                                          "Clownfish::Hierarchy");
     return CFCHierarchy_init(self, source, dest, parser);
 }
 
 CFCHierarchy*
 CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
-                  void *parser) 
-{
+                  void *parser) {
     if (!source || !strlen(source) || !dest || !strlen(dest)) {
         croak("Both 'source' and 'dest' are required");
     }
@@ -123,8 +121,7 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
 }
 
 void
-CFCHierarchy_destroy(CFCHierarchy *self)
-{
+CFCHierarchy_destroy(CFCHierarchy *self) {
     size_t i;
     for (i = 0; self->trees[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->trees[i]);
@@ -141,8 +138,7 @@ CFCHierarchy_destroy(CFCHierarchy *self)
 }
 
 void
-CFCHierarchy_build(CFCHierarchy *self)
-{
+CFCHierarchy_build(CFCHierarchy *self) {
     S_parse_cf_files(self);
     size_t i;
     for (i = 0; self->trees[i] != NULL; i++) {
@@ -151,8 +147,7 @@ CFCHierarchy_build(CFCHierarchy *self)
 }
 
 static CFCFile*
-S_parse_file(void *parser, const char *content, const char *source_class)
-{
+S_parse_file(void *parser, const char *content, const char *source_class) {
     dSP;
     ENTER;
     SAVETMPS;
@@ -186,8 +181,7 @@ S_parse_file(void *parser, const char *content, const char *source_class)
 }
 
 static char**
-S_find_cfh(char *dir, char **cfh_list, size_t num_cfh)
-{
+S_find_cfh(char *dir, char **cfh_list, size_t num_cfh) {
     void *dirhandle = S_opendir(dir);
     size_t full_path_cap = strlen(dir) * 2;
     char *full_path = (char*)MALLOCATE(full_path_cap);
@@ -209,8 +203,8 @@ S_find_cfh(char *dir, char **cfh_list, size_t num_cfh)
         const char *cfh_suffix = strstr(full_path, ".cfh");
 
         if (cfh_suffix == full_path + (full_path_len - 4)) {
-            cfh_list = (char**)REALLOCATE(cfh_list, 
-                (num_cfh + 2) * sizeof(char*));
+            cfh_list = (char**)REALLOCATE(cfh_list,
+                                          (num_cfh + 2) * sizeof(char*));
             cfh_list[num_cfh++] = CFCUtil_strdup(full_path);
             cfh_list[num_cfh] = NULL;
         }
@@ -229,8 +223,7 @@ S_find_cfh(char *dir, char **cfh_list, size_t num_cfh)
 }
 
 static void
-S_parse_cf_files(CFCHierarchy *self)
-{
+S_parse_cf_files(CFCHierarchy *self) {
     char **all_source_paths = (char**)CALLOCATE(1, sizeof(char*));
     all_source_paths = S_find_cfh(self->source, all_source_paths, 0);
     const char *source_dir = self->source;
@@ -238,7 +231,7 @@ S_parse_cf_files(CFCHierarchy *self)
     size_t all_classes_cap = 10;
     size_t num_classes     = 0;
     CFCClass **all_classes = (CFCClass**)MALLOCATE(
-        (all_classes_cap + 1) * sizeof(CFCClass*));
+                                 (all_classes_cap + 1) * sizeof(CFCClass*));
     char *source_class = NULL;
     size_t source_class_max = 0;
 
@@ -250,7 +243,7 @@ S_parse_cf_files(CFCHierarchy *self)
         size_t source_path_len = strlen(source_path);
         if (strncmp(source_path, source_dir, source_dir_len) != 0) {
             CFCUtil_die("'%s' doesn't start with '%s'", source_path,
-                source_dir);
+                        source_dir);
         }
         size_t j;
         size_t source_class_len = 0;
@@ -280,13 +273,14 @@ S_parse_cf_files(CFCHierarchy *self)
             croak("parser error for %s", source_path);
         }
         S_add_file(self, file);
-        
+
         CFCClass **classes_in_file = CFCFile_classes(file);
         for (j = 0; classes_in_file[j] != NULL; j++) {
             if (num_classes == all_classes_cap) {
                 all_classes_cap += 10;
-                all_classes = (CFCClass**)REALLOCATE(all_classes, 
-                    (all_classes_cap + 1) * sizeof(CFCClass*));
+                all_classes = (CFCClass**)REALLOCATE(
+                                  all_classes,
+                                  (all_classes_cap + 1) * sizeof(CFCClass*));
             }
             all_classes[num_classes++] = classes_in_file[j];
         }
@@ -304,7 +298,7 @@ S_parse_cf_files(CFCHierarchy *self)
                 if (!maybe_parent) {
                     CFCUtil_die("Parent class '%s' not defined", parent_name);
                 }
-                const char *maybe_parent_name 
+                const char *maybe_parent_name
                     = CFCSymbol_get_class_name((CFCSymbol*)maybe_parent);
                 if (strcmp(parent_name, maybe_parent_name) == 0) {
                     CFCClass_add_child(maybe_parent, klass);
@@ -326,8 +320,7 @@ S_parse_cf_files(CFCHierarchy *self)
 }
 
 int
-CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified)
-{
+CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified) {
     // Seed the recursive write.
     int somebody_is_modified = false;
     size_t i;
@@ -337,8 +330,8 @@ CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified)
             somebody_is_modified = true;
         }
     }
-    if (somebody_is_modified || modified) { 
-        return true; 
+    if (somebody_is_modified || modified) {
+        return true;
     }
     else {
         return false;
@@ -346,8 +339,7 @@ CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified)
 }
 
 int
-S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified)
-{
+S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
     const char *source_class = CFCClass_get_source_class(klass);
     CFCFile *file = S_fetch_file(self, source_class);
     size_t cfh_buf_size = CFCFile_path_buf_size(file, self->source);
@@ -372,8 +364,8 @@ S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified)
         CFCClass *kid = children[i];
         if (CFCClass_final(klass)) {
             CFCUtil_die("Attempt to inherit from final class '%s' by '%s'",
-                CFCSymbol_get_class_name((CFCSymbol*)klass),
-                CFCSymbol_get_class_name((CFCSymbol*)kid));
+                        CFCSymbol_get_class_name((CFCSymbol*)klass),
+                        CFCSymbol_get_class_name((CFCSymbol*)kid));
         }
         if (S_do_propagate_modified(self, kid, modified)) {
             somebody_is_modified = 1;
@@ -384,8 +376,7 @@ S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified)
 }
 
 static void
-S_add_tree(CFCHierarchy *self, CFCClass *klass)
-{
+S_add_tree(CFCHierarchy *self, CFCClass *klass) {
     CFCUTIL_NULL_CHECK(klass);
     const char *full_struct_sym = CFCClass_full_struct_sym(klass);
     size_t i;
@@ -398,17 +389,17 @@ S_add_tree(CFCHierarchy *self, CFCClass *klass)
     self->num_trees++;
     size_t size = (self->num_trees + 1) * sizeof(CFCClass*);
     self->trees = (CFCClass**)REALLOCATE(self->trees, size);
-    self->trees[self->num_trees - 1] 
+    self->trees[self->num_trees - 1]
         = (CFCClass*)CFCBase_incref((CFCBase*)klass);
     self->trees[self->num_trees] = NULL;
 }
 
 CFCClass**
-CFCHierarchy_ordered_classes(CFCHierarchy *self)
-{
+CFCHierarchy_ordered_classes(CFCHierarchy *self) {
     size_t num_classes = 0;
     size_t max_classes = 10;
-    CFCClass **ladder = (CFCClass**)MALLOCATE((max_classes + 1) * sizeof(CFCClass*));
+    CFCClass **ladder = (CFCClass**)MALLOCATE(
+                            (max_classes + 1) * sizeof(CFCClass*));
     size_t i;
     for (i = 0; self->trees[i] != NULL; i++) {
         CFCClass *tree = self->trees[i];
@@ -417,8 +408,8 @@ CFCHierarchy_ordered_classes(CFCHierarchy *self)
         for (j = 0; child_ladder[j] != NULL; j++) {
             if (num_classes == max_classes) {
                 max_classes += 10;
-                ladder = (CFCClass**)REALLOCATE(ladder, 
-                    (max_classes + 1) * sizeof(CFCClass*));
+                ladder = (CFCClass**)REALLOCATE(
+                             ladder, (max_classes + 1) * sizeof(CFCClass*));
             }
             ladder[num_classes++] = child_ladder[j];
         }
@@ -429,8 +420,7 @@ CFCHierarchy_ordered_classes(CFCHierarchy *self)
 }
 
 static CFCFile*
-S_fetch_file(CFCHierarchy *self, const char *source_class)
-{
+S_fetch_file(CFCHierarchy *self, const char *source_class) {
     size_t i;
     for (i = 0; self->files[i] != NULL; i++) {
         const char *existing = CFCFile_get_source_class(self->files[i]);
@@ -442,8 +432,7 @@ S_fetch_file(CFCHierarchy *self, const char *source_class)
 }
 
 static void
-S_add_file(CFCHierarchy *self, CFCFile *file)
-{
+S_add_file(CFCHierarchy *self, CFCFile *file) {
     CFCUTIL_NULL_CHECK(file);
     const char *source_class = CFCFile_get_source_class(file);
     CFCClass **classes = CFCFile_classes(file);
@@ -452,21 +441,21 @@ S_add_file(CFCHierarchy *self, CFCFile *file)
         CFCFile *existing = self->files[i];
         const char *old_source_class = CFCFile_get_source_class(existing);
         if (strcmp(source_class, old_source_class) == 0) {
-            CFCUtil_die("File for source class %s already registered", 
-                source_class);
+            CFCUtil_die("File for source class %s already registered",
+                        source_class);
         }
         CFCClass **existing_classes = CFCFile_classes(existing);
         size_t j;
         for (j = 0; classes[j] != NULL; j++) {
             const char *new_class_name
                 = CFCSymbol_get_class_name((CFCSymbol*)classes[j]);
-            size_t k; 
+            size_t k;
             for (k = 0; existing_classes[k] != NULL; k++) {
                 const char *existing_class_name
                     = CFCSymbol_get_class_name((CFCSymbol*)existing_classes[k]);
                 if (strcmp(new_class_name, existing_class_name) == 0) {
                     CFCUtil_die("Class '%s' already registered",
-                        new_class_name);
+                                new_class_name);
                 }
             }
         }
@@ -474,26 +463,23 @@ S_add_file(CFCHierarchy *self, CFCFile *file)
     self->num_files++;
     size_t size = (self->num_files + 1) * sizeof(CFCFile*);
     self->files = (CFCFile**)REALLOCATE(self->files, size);
-    self->files[self->num_files - 1] 
+    self->files[self->num_files - 1]
         = (CFCFile*)CFCBase_incref((CFCBase*)file);
     self->files[self->num_files] = NULL;
 }
 
 struct CFCFile**
-CFCHierarchy_files(CFCHierarchy *self)
-{
+CFCHierarchy_files(CFCHierarchy *self) {
     return self->files;
 }
 
 const char*
-CFCHierarchy_get_source(CFCHierarchy *self)
-{
+CFCHierarchy_get_source(CFCHierarchy *self) {
     return self->source;
 }
 
 const char*
-CFCHierarchy_get_dest(CFCHierarchy *self)
-{
+CFCHierarchy_get_dest(CFCHierarchy *self) {
     return self->dest;
 }
 
@@ -510,8 +496,7 @@ typedef struct WinDH {
 } WinDH;
 
 static void*
-S_opendir(const char *dir)
-{
+S_opendir(const char *dir) {
     size_t dirlen = strlen(dir);
     if (dirlen >= MAX_PATH - 2) {
         CFCUtil_die("Exceeded MAX_PATH(%d): %s", (int)MAX_PATH, dir);
@@ -533,8 +518,7 @@ S_opendir(const char *dir)
 }
 
 static const char*
-S_next_entry(void *dirhandle)
-{
+S_next_entry(void *dirhandle) {
     WinDH *dh = (WinDH*)dirhandle;
     if (dh->first_time) {
         dh->first_time = false;
@@ -542,8 +526,8 @@ S_next_entry(void *dirhandle)
     else {
         if ((FindNextFile(dh->handle, dh->find_data) == 0)) {
             if (GetLastError() != ERROR_NO_MORE_FILES) {
-                CFCUtil_die("Error occurred while reading '%s'", 
-                    dh->path);
+                CFCUtil_die("Error occurred while reading '%s'",
+                            dh->path);
             }
             return NULL;
         }
@@ -552,8 +536,7 @@ S_next_entry(void *dirhandle)
 }
 
 static void
-S_closedir(void *dirhandle, const char *dir)
-{
+S_closedir(void *dirhandle, const char *dir) {
     WinDH *dh = (WinDH*)dirhandle;
     if (!FindClose(dh->handle)) {
         CFCUtil_die("Error occurred while closing dir '%s'", dir);
@@ -563,13 +546,12 @@ S_closedir(void *dirhandle, const char *dir)
 }
 
 /******************************** UNIXEN ***********************************/
-#else 
+#else
 
 #include <dirent.h>
 
 static void*
-S_opendir(const char *dir)
-{
+S_opendir(const char *dir) {
     DIR *dirhandle = opendir(dir);
     if (!dirhandle) {
         CFCUtil_die("Failed to opendir for '%s': %s", dir, strerror(errno));
@@ -578,15 +560,13 @@ S_opendir(const char *dir)
 }
 
 static const char*
-S_next_entry(void *dirhandle)
-{
+S_next_entry(void *dirhandle) {
     struct dirent *entry = readdir((DIR*)dirhandle);
     return entry ? entry->d_name : NULL;
 }
 
 static void
-S_closedir(void *dirhandle, const char *dir)
-{
+S_closedir(void *dirhandle, const char *dir) {
     if (closedir(dirhandle) == -1) {
         CFCUtil_die("Error closing dir '%s': %s", dir, strerror(errno));
     }

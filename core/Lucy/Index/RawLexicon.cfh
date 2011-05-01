@@ -20,7 +20,7 @@ parcel Lucy;
  */
 class Lucy::Index::RawLexicon cnick RawLex
     inherits Lucy::Index::Lexicon {
-    
+
     InStream      *instream;
     TermStepper   *term_stepper;
     TermStepper   *tinfo_stepper;
@@ -29,17 +29,17 @@ class Lucy::Index::RawLexicon cnick RawLex
     int64_t        len;
 
     inert incremented RawLexicon*
-    new(Schema *schema, const CharBuf *field, InStream *instream, 
+    new(Schema *schema, const CharBuf *field, InStream *instream,
         int64_t start, int64_t end);
 
     inert RawLexicon*
-    init(RawLexicon *self, Schema *schema, const CharBuf *field, 
+    init(RawLexicon *self, Schema *schema, const CharBuf *field,
          InStream *instream, int64_t start, int64_t end);
 
     public void
     Destroy(RawLexicon *self);
 
-    public bool_t 
+    public bool_t
     Next(RawLexicon *self);
 
     public nullable Obj*

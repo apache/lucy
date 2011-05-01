@@ -57,16 +57,14 @@ static void
 S_release_merge_lock(BackgroundMerger *self);
 
 BackgroundMerger*
-BGMerger_new(Obj *index, IndexManager *manager)
-{
-    BackgroundMerger *self 
+BGMerger_new(Obj *index, IndexManager *manager) {
+    BackgroundMerger *self
         = (BackgroundMerger*)VTable_Make_Obj(BACKGROUNDMERGER);
     return BGMerger_init(self, index, manager);
 }
 
 BackgroundMerger*
-BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
-{
+BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     Folder *folder = S_init_folder(index);
 
     // Init.
@@ -119,14 +117,14 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
     // Clone the PolyReader's schema.
     {
         Hash *dump = Schema_Dump(PolyReader_Get_Schema(self->polyreader));
-        self->schema = (Schema*)CERTIFY(
-            VTable_Load_Obj(SCHEMA, (Obj*)dump), SCHEMA);
+        self->schema = (Schema*)CERTIFY(VTable_Load_Obj(SCHEMA, (Obj*)dump),
+                                        SCHEMA);
         DECREF(dump);
     }
 
     // Create new Segment.
     {
-        int64_t new_seg_num 
+        int64_t new_seg_num
             = IxManager_Highest_Seg_Num(self->manager, self->snapshot) + 1;
         VArray *fields = Schema_All_Fields(self->schema);
         uint32_t i, max;
@@ -147,11 +145,11 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
      * need it.  (We've reserved the dir by plopping down the merge.json
      * file.) */
     self->seg_writer = SegWriter_new(self->schema, self->snapshot,
-        self->segment, self->polyreader); 
+                                     self->segment, self->polyreader);
 
     // Grab a local ref to the DeletionsWriter.
-    self->del_writer = (DeletionsWriter*)INCREF(
-        SegWriter_Get_Del_Writer(self->seg_writer));
+    self->del_writer
+        = (DeletionsWriter*)INCREF(SegWriter_Get_Del_Writer(self->seg_writer));
 
     // Release the write lock.  Now new Indexers can start while we work in
     // the background.
@@ -161,8 +159,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager)
 }
 
 void
-BGMerger_destroy(BackgroundMerger *self) 
-{
+BGMerger_destroy(BackgroundMerger *self) {
     S_release_merge_lock(self);
     S_release_write_lock(self);
     DECREF(self->schema);
@@ -181,8 +178,7 @@ BGMerger_destroy(BackgroundMerger *self)
 }
 
 static Folder*
-S_init_folder(Obj *index)
-{
+S_init_folder(Obj *index) {
     Folder *folder = NULL;
 
     // Validate or acquire a Folder.
@@ -205,16 +201,14 @@ S_init_folder(Obj *index)
 }
 
 void
-BGMerger_optimize(BackgroundMerger *self)
-{
+BGMerger_optimize(BackgroundMerger *self) {
     self->optimize = true;
 }
 
-static uint32_t 
-S_maybe_merge(BackgroundMerger *self)
-{
-    VArray *to_merge = IxManager_Recycle(self->manager, 
-        self->polyreader, self->del_writer, 0, self->optimize);
+static uint32_t
+S_maybe_merge(BackgroundMerger *self) {
+    VArray *to_merge = IxManager_Recycle(self->manager, self->polyreader,
+                                         self->del_writer, 0, self->optimize);
     int32_t num_to_merge = VA_Get_Size(to_merge);
     uint32_t i, max;
 
@@ -240,10 +234,12 @@ S_maybe_merge(BackgroundMerger *self)
         SegReader *seg_reader = (SegReader*)VA_Fetch(to_merge, i);
         CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         int64_t    doc_count  = Seg_Get_Count(self->segment);
-        Matcher *deletions 
+        Matcher *deletions
             = DelWriter_Seg_Deletions(self->del_writer, seg_reader);
-        I32Array *doc_map = DelWriter_Generate_Doc_Map(self->del_writer,
-            deletions, SegReader_Doc_Max(seg_reader), (int32_t)doc_count);
+        I32Array *doc_map = DelWriter_Generate_Doc_Map(
+                                self->del_writer, deletions,
+                                SegReader_Doc_Max(seg_reader),
+                                (int32_t)doc_count);
 
         Hash_Store(self->doc_maps, (Obj*)seg_name, (Obj*)doc_map);
         SegWriter_Merge_Segment(self->seg_writer, seg_reader, doc_map);
@@ -255,16 +251,15 @@ S_maybe_merge(BackgroundMerger *self)
 }
 
 static bool_t
-S_merge_updated_deletions(BackgroundMerger *self)
-{
+S_merge_updated_deletions(BackgroundMerger *self) {
     Hash *updated_deletions = NULL;
 
     {
-        PolyReader *new_polyreader 
+        PolyReader *new_polyreader
             = PolyReader_open((Obj*)self->folder, NULL, NULL);
-        VArray *new_seg_readers 
+        VArray *new_seg_readers
             = PolyReader_Get_Seg_Readers(new_polyreader);
-        VArray *old_seg_readers 
+        VArray *old_seg_readers
             = PolyReader_Get_Seg_Readers(self->polyreader);
         Hash *new_segs = Hash_new(VA_Get_Size(new_seg_readers));
         uint32_t i, max;
@@ -281,20 +276,23 @@ S_merge_updated_deletions(BackgroundMerger *self)
 
             // If this segment was merged away...
             if (Hash_Fetch(self->doc_maps, (Obj*)seg_name)) {
-                SegReader *new_seg_reader = (SegReader*)CERTIFY(
-                    Hash_Fetch(new_segs, (Obj*)seg_name), SEGREADER);
+                SegReader *new_seg_reader
+                    = (SegReader*)CERTIFY(
+                          Hash_Fetch(new_segs, (Obj*)seg_name),
+                          SEGREADER);
                 int32_t old_del_count = SegReader_Del_Count(seg_reader);
                 int32_t new_del_count = SegReader_Del_Count(new_seg_reader);
                 // ... were any new deletions applied against it?
                 if (old_del_count != new_del_count) {
-                    DeletionsReader *del_reader = (DeletionsReader*)
-                        SegReader_Obtain(new_seg_reader, 
-                        VTable_Get_Name(DELETIONSREADER));
+                    DeletionsReader *del_reader
+                        = (DeletionsReader*)SegReader_Obtain(
+                              new_seg_reader,
+                              VTable_Get_Name(DELETIONSREADER));
                     if (!updated_deletions) {
                         updated_deletions = Hash_new(max);
                     }
-                    Hash_Store(updated_deletions, (Obj*)seg_name, 
-                        (Obj*)DelReader_Iterator(del_reader));
+                    Hash_Store(updated_deletions, (Obj*)seg_name,
+                               (Obj*)DelReader_Iterator(del_reader));
                 }
             }
         }
@@ -307,17 +305,17 @@ S_merge_updated_deletions(BackgroundMerger *self)
         return false;
     }
     else {
-        PolyReader *merge_polyreader = PolyReader_open((Obj*)self->folder,
-            self->snapshot, NULL);
-        VArray *merge_seg_readers 
+        PolyReader *merge_polyreader
+            = PolyReader_open((Obj*)self->folder, self->snapshot, NULL);
+        VArray *merge_seg_readers
             = PolyReader_Get_Seg_Readers(merge_polyreader);
         Snapshot *latest_snapshot
             = Snapshot_Read_File(Snapshot_new(), self->folder, NULL);
         int64_t new_seg_num
             = IxManager_Highest_Seg_Num(self->manager, latest_snapshot) + 1;
-        Segment *new_segment = Seg_new(new_seg_num);
-        SegWriter *seg_writer = SegWriter_new(self->schema, self->snapshot,
-            new_segment, merge_polyreader); 
+        Segment   *new_segment = Seg_new(new_seg_num);
+        SegWriter *seg_writer  = SegWriter_new(self->schema, self->snapshot,
+                                               new_segment, merge_polyreader);
         DeletionsWriter *del_writer = SegWriter_Get_Del_Writer(seg_writer);
         int64_t  merge_seg_num = Seg_Get_Number(self->segment);
         uint32_t seg_tick      = I32_MAX;
@@ -329,7 +327,7 @@ S_merge_updated_deletions(BackgroundMerger *self)
         SegWriter_Prep_Seg_Dir(seg_writer);
 
         for (i = 0, max = VA_Get_Size(merge_seg_readers); i < max; i++) {
-            SegReader *seg_reader 
+            SegReader *seg_reader
                 = (SegReader*)VA_Fetch(merge_seg_readers, i);
             if (SegReader_Get_Seg_Num(seg_reader) == merge_seg_num) {
                 I32Array *offsets = PolyReader_Offsets(merge_polyreader);
@@ -341,13 +339,14 @@ S_merge_updated_deletions(BackgroundMerger *self)
         if (offset == I32_MAX) { THROW(ERR, "Failed sanity check"); }
 
         Hash_Iterate(updated_deletions);
-        while (  Hash_Next(updated_deletions, 
-                     (Obj**)&seg_name, (Obj**)&deletions)
-        ) {
-            I32Array *doc_map = (I32Array*)CERTIFY(
-                Hash_Fetch(self->doc_maps, (Obj*)seg_name), I32ARRAY);
+        while (Hash_Next(updated_deletions,
+                         (Obj**)&seg_name, (Obj**)&deletions)
+              ) {
+            I32Array *doc_map
+                = (I32Array*)CERTIFY(
+                      Hash_Fetch(self->doc_maps, (Obj*)seg_name),
+                      I32ARRAY);
             int32_t del;
-
             while (0 != (del = Matcher_Next(deletions))) {
                 // Find the slot where the deleted doc resides in the
                 // rewritten segment. If the doc was already deleted when we
@@ -375,8 +374,7 @@ S_merge_updated_deletions(BackgroundMerger *self)
 }
 
 void
-BGMerger_prepare_commit(BackgroundMerger *self)
-{
+BGMerger_prepare_commit(BackgroundMerger *self) {
     VArray   *seg_readers     = PolyReader_Get_Seg_Readers(self->polyreader);
     uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
     uint32_t  segs_merged     = 0;
@@ -386,7 +384,7 @@ BGMerger_prepare_commit(BackgroundMerger *self)
     }
 
     // Maybe merge existing index data.
-    if (num_seg_readers) { 
+    if (num_seg_readers) {
         segs_merged = S_maybe_merge(self);
     }
 
@@ -427,12 +425,12 @@ BGMerger_prepare_commit(BackgroundMerger *self)
         // Determine whether the index has been updated while this background
         // merge process was running.
         {
-            CharBuf *start_snapfile = Snapshot_Get_Path(
-                PolyReader_Get_Snapshot(self->polyreader));
-            Snapshot *latest_snapshot 
+            CharBuf *start_snapfile
+                = Snapshot_Get_Path(PolyReader_Get_Snapshot(self->polyreader));
+            Snapshot *latest_snapshot
                 = Snapshot_Read_File(Snapshot_new(), self->folder, NULL);
             CharBuf *latest_snapfile = Snapshot_Get_Path(latest_snapshot);
-            bool_t index_updated 
+            bool_t index_updated
                 = !CB_Equals(start_snapfile, (Obj*)latest_snapfile);
 
             if (index_updated) {
@@ -481,10 +479,9 @@ BGMerger_prepare_commit(BackgroundMerger *self)
 }
 
 void
-BGMerger_commit(BackgroundMerger *self)
-{
+BGMerger_commit(BackgroundMerger *self) {
     // Safety check.
-    if ( !self->merge_lock ) {
+    if (!self->merge_lock) {
         THROW(ERR, "Can't call commit() more than once");
     }
 
@@ -499,11 +496,11 @@ BGMerger_commit(BackgroundMerger *self)
         // Rename temp snapshot file.
         CB_Chop(self->snapfile, sizeof(".temp") - 1);
         success = Folder_Hard_Link(self->folder, temp_snapfile,
-            self->snapfile);
+                                   self->snapfile);
         Snapshot_Set_Path(self->snapshot, self->snapfile);
         if (!success) {
             CharBuf *mess = CB_newf("Can't create hard link from %o to %o",
-                temp_snapfile, self->snapfile);
+                                    temp_snapfile, self->snapfile);
             DECREF(temp_snapfile);
             Err_throw_mess(ERR, mess);
         }
@@ -529,8 +526,7 @@ BGMerger_commit(BackgroundMerger *self)
 }
 
 static void
-S_obtain_write_lock(BackgroundMerger *self)
-{
+S_obtain_write_lock(BackgroundMerger *self) {
     Lock *write_lock = IxManager_Make_Write_Lock(self->manager);
     Lock_Clear_Stale(write_lock);
     if (Lock_Obtain(write_lock)) {
@@ -543,8 +539,7 @@ S_obtain_write_lock(BackgroundMerger *self)
 }
 
 static void
-S_obtain_merge_lock(BackgroundMerger *self)
-{
+S_obtain_merge_lock(BackgroundMerger *self) {
     Lock *merge_lock = IxManager_Make_Merge_Lock(self->manager);
     Lock_Clear_Stale(merge_lock);
     if (Lock_Obtain(merge_lock)) {
@@ -559,8 +554,7 @@ S_obtain_merge_lock(BackgroundMerger *self)
 }
 
 static void
-S_release_write_lock(BackgroundMerger *self)
-{
+S_release_write_lock(BackgroundMerger *self) {
     if (self->write_lock) {
         Lock_Release(self->write_lock);
         DECREF(self->write_lock);
@@ -569,8 +563,7 @@ S_release_write_lock(BackgroundMerger *self)
 }
 
 static void
-S_release_merge_lock(BackgroundMerger *self)
-{
+S_release_merge_lock(BackgroundMerger *self) {
     if (self->merge_lock) {
         Lock_Release(self->merge_lock);
         DECREF(self->merge_lock);

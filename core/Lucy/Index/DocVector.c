@@ -22,41 +22,37 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 
-// Extract a document's compressed TermVector data into ( term_text =>
-// compressed positional data ) pairs.
+// Extract a document's compressed TermVector data into (term_text =>
+// compressed positional data) pairs.
 static Hash*
 S_extract_tv_cache(ByteBuf *field_buf);
 
 // Pull a TermVector object out from compressed positional data.
 static TermVector*
-S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text, 
+S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text,
                          ByteBuf *tv_buf);
 
 DocVector*
-DocVec_new()
-{
+DocVec_new() {
     DocVector *self = (DocVector*)VTable_Make_Obj(DOCVECTOR);
     return DocVec_init(self);
 }
 
 DocVector*
-DocVec_init(DocVector *self)
-{
+DocVec_init(DocVector *self) {
     self->field_bufs    = Hash_new(0);
     self->field_vectors = Hash_new(0);
     return self;
 }
 
 void
-DocVec_serialize(DocVector *self, OutStream *outstream)
-{
+DocVec_serialize(DocVector *self, OutStream *outstream) {
     Hash_Serialize(self->field_bufs, outstream);
     Hash_Serialize(self->field_vectors, outstream);
 }
 
 DocVector*
-DocVec_deserialize(DocVector *self, InStream *instream)
-{
+DocVec_deserialize(DocVector *self, InStream *instream) {
     self = self ? self : (DocVector*)VTable_Make_Obj(DOCVECTOR);
     self->field_bufs    = Hash_deserialize(NULL, instream);
     self->field_vectors = Hash_deserialize(NULL, instream);
@@ -64,42 +60,37 @@ DocVec_deserialize(DocVector *self, InStream *instream)
 }
 
 void
-DocVec_destroy(DocVector *self)
-{
+DocVec_destroy(DocVector *self) {
     DECREF(self->field_bufs);
     DECREF(self->field_vectors);
     SUPER_DESTROY(self, DOCVECTOR);
 }
 
 void
-DocVec_add_field_buf(DocVector *self, const CharBuf *field, 
-                     ByteBuf *field_buf)
-{
+DocVec_add_field_buf(DocVector *self, const CharBuf *field,
+                     ByteBuf *field_buf) {
     Hash_Store(self->field_bufs, (Obj*)field, INCREF(field_buf));
 }
 
 ByteBuf*
-DocVec_field_buf(DocVector *self, const CharBuf *field)
-{
+DocVec_field_buf(DocVector *self, const CharBuf *field) {
     return (ByteBuf*)Hash_Fetch(self->field_bufs, (Obj*)field);
 }
 
 VArray*
-DocVec_field_names(DocVector *self)
-{
+DocVec_field_names(DocVector *self) {
     return Hash_Keys(self->field_bufs);
 }
 
 TermVector*
-DocVec_term_vector(DocVector *self, const CharBuf *field, 
-                   const CharBuf *term_text) 
-{
+DocVec_term_vector(DocVector *self, const CharBuf *field,
+                   const CharBuf *term_text) {
     ByteBuf *tv_buf;
     Hash *field_vector = (Hash*)Hash_Fetch(self->field_vectors, (Obj*)field);
-    
+
     // If no cache hit, try to fill cache.
     if (field_vector == NULL) {
-        ByteBuf *field_buf 
+        ByteBuf *field_buf
             = (ByteBuf*)Hash_Fetch(self->field_bufs, (Obj*)field);
 
         // Bail if there's no content or the field isn't highlightable.
@@ -119,20 +110,19 @@ DocVec_term_vector(DocVector *self, const CharBuf *field,
 }
 
 static Hash*
-S_extract_tv_cache(ByteBuf *field_buf) 
-{
-    Hash          *tv_cache  = Hash_new(0);
-    char          *tv_string = BB_Get_Buf(field_buf);
-    int32_t        num_terms = NumUtil_decode_c32(&tv_string);
-    CharBuf       *text      = CB_new(0);
-    int32_t        i;
-    
+S_extract_tv_cache(ByteBuf *field_buf) {
+    Hash    *tv_cache  = Hash_new(0);
+    char    *tv_string = BB_Get_Buf(field_buf);
+    int32_t  num_terms = NumUtil_decode_c32(&tv_string);
+    CharBuf *text      = CB_new(0);
+    int32_t  i;
+
     // Read the number of highlightable terms in the field.
     for (i = 0; i < num_terms; i++) {
-        char         *bookmark_ptr;
-        size_t        overlap = NumUtil_decode_c32(&tv_string);
-        size_t        len     = NumUtil_decode_c32(&tv_string);
-        int32_t       num_positions;
+        char    *bookmark_ptr;
+        size_t   overlap = NumUtil_decode_c32(&tv_string);
+        size_t   len     = NumUtil_decode_c32(&tv_string);
+        int32_t  num_positions;
 
         // Decompress the term text.
         CB_Set_Size(text, overlap);
@@ -142,7 +132,7 @@ S_extract_tv_cache(ByteBuf *field_buf)
         // Get positions & offsets string.
         bookmark_ptr  = tv_string;
         num_positions = NumUtil_decode_c32(&tv_string);
-        while(num_positions--) {
+        while (num_positions--) {
             // Leave nums compressed to save a little mem.
             NumUtil_skip_cint(&tv_string);
             NumUtil_skip_cint(&tv_string);
@@ -152,7 +142,7 @@ S_extract_tv_cache(ByteBuf *field_buf)
 
         // Store the $text => $posdata pair in the output hash.
         Hash_Store(tv_cache, (Obj*)text,
-            (Obj*)BB_new_bytes(bookmark_ptr, len));
+                   (Obj*)BB_new_bytes(bookmark_ptr, len));
     }
     DECREF(text);
 
@@ -160,9 +150,8 @@ S_extract_tv_cache(ByteBuf *field_buf)
 }
 
 static TermVector*
-S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text, 
-                         ByteBuf *tv_buf)
-{
+S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text,
+                         ByteBuf *tv_buf) {
     TermVector *retval      = NULL;
     char       *posdata     = BB_Get_Buf(tv_buf);
     char       *posdata_end = posdata + BB_Get_Size(tv_buf);

@@ -30,8 +30,7 @@
 #include "Lucy/Store/InStream.h"
 
 lucy_HitDoc*
-lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id)
-{
+lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id) {
     lucy_Schema   *const schema = self->schema;
     lucy_InStream *const dat_in = self->dat_in;
     lucy_InStream *const ix_in  = self->ix_in;
@@ -63,32 +62,32 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id)
         *SvEND(field_name_sv) = '\0';
 
         // Find the Field's FieldType.
-        lucy_ZombieCharBuf *field_name_zcb 
+        lucy_ZombieCharBuf *field_name_zcb
             = CFISH_ZCB_WRAP_STR(field_name_ptr, field_name_len);
         Lucy_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
         type = Lucy_Schema_Fetch_Type(schema, (lucy_CharBuf*)field_name_zcb);
 
         // Read the field value.
-        switch(Lucy_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
+        switch (Lucy_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
             case lucy_FType_TEXT: {
-                STRLEN  value_len = Lucy_InStream_Read_C32(dat_in);
-                value_sv  = newSV((value_len ? value_len : 1));
-                Lucy_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
-                SvCUR_set(value_sv, value_len);
-                *SvEND(value_sv) = '\0';
-                SvPOK_on(value_sv);
-                SvUTF8_on(value_sv);
-                break;
-            }
+                    STRLEN value_len = Lucy_InStream_Read_C32(dat_in);
+                    value_sv = newSV((value_len ? value_len : 1));
+                    Lucy_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
+                    SvCUR_set(value_sv, value_len);
+                    *SvEND(value_sv) = '\0';
+                    SvPOK_on(value_sv);
+                    SvUTF8_on(value_sv);
+                    break;
+                }
             case lucy_FType_BLOB: {
-                STRLEN  value_len = Lucy_InStream_Read_C32(dat_in);
-                value_sv  = newSV((value_len ? value_len : 1));
-                Lucy_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
-                SvCUR_set(value_sv, value_len);
-                *SvEND(value_sv) = '\0';
-                SvPOK_on(value_sv);
-                break;
-            }
+                    STRLEN value_len = Lucy_InStream_Read_C32(dat_in);
+                    value_sv = newSV((value_len ? value_len : 1));
+                    Lucy_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
+                    SvCUR_set(value_sv, value_len);
+                    *SvEND(value_sv) = '\0';
+                    SvPOK_on(value_sv);
+                    break;
+                }
             case lucy_FType_FLOAT32:
                 value_sv = newSVnv(Lucy_InStream_Read_F32(dat_in));
                 break;
@@ -109,7 +108,7 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id)
                 }
                 break;
             default:
-                value_sv = NULL; 
+                value_sv = NULL;
                 CFISH_THROW(LUCY_ERR, "Unrecognized type: %o", type);
         }
 

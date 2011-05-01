@@ -147,13 +147,13 @@ class Lucy::Plan::Architecture cnick Arch inherits Lucy::Object::Obj {
     public int32_t
     Index_Interval(Architecture *self);
 
-    public int32_t 
+    public int32_t
     Skip_Interval(Architecture *self);
 
     /** Returns true for any Architecture object. Subclasses should override
      * this weak check.
      */
-    public bool_t 
+    public bool_t
     Equals(Architecture *self, Obj *other);
 }
 

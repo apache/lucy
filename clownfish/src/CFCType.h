@@ -43,7 +43,7 @@ CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
             int indirection, const char *c_string);
 
 CFCType*
-CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel, 
+CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
              const char *specifier, int indirection, const char *c_string);
 
 CFCType*
@@ -57,7 +57,7 @@ CFCType_new_object(int flags, struct CFCParcel *parcel, const char *specifier,
                    int indirection);
 
 CFCType*
-CFCType_new_composite(int flags, CFCType *child, int indirection, 
+CFCType_new_composite(int flags, CFCType *child, int indirection,
                       const char *array);
 
 CFCType*

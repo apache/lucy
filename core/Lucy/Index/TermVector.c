@@ -23,17 +23,15 @@
 #include "Lucy/Store/OutStream.h"
 
 TermVector*
-TV_new(const CharBuf *field, const CharBuf *text, I32Array *positions, 
-       I32Array *start_offsets, I32Array *end_offsets)
-{
+TV_new(const CharBuf *field, const CharBuf *text, I32Array *positions,
+       I32Array *start_offsets, I32Array *end_offsets) {
     TermVector *self = (TermVector*)VTable_Make_Obj(TERMVECTOR);
     return TV_init(self, field, text, positions, start_offsets, end_offsets);
 }
 
 TermVector*
-TV_init(TermVector *self, const CharBuf *field, const CharBuf *text, 
-        I32Array *positions, I32Array *start_offsets, I32Array *end_offsets)
-{
+TV_init(TermVector *self, const CharBuf *field, const CharBuf *text,
+        I32Array *positions, I32Array *start_offsets, I32Array *end_offsets) {
     // Assign.
     self->field          = CB_Clone(field);
     self->text           = CB_Clone(text);
@@ -42,19 +40,18 @@ TV_init(TermVector *self, const CharBuf *field, const CharBuf *text,
     self->start_offsets  = (I32Array*)INCREF(start_offsets);
     self->end_offsets    = (I32Array*)INCREF(end_offsets);
 
-    if (   I32Arr_Get_Size(start_offsets) != self->num_pos
-        || I32Arr_Get_Size(end_offsets)   != self->num_pos
-    ) {
+    if (I32Arr_Get_Size(start_offsets) != self->num_pos
+        || I32Arr_Get_Size(end_offsets) != self->num_pos
+       ) {
         THROW(ERR, "Unbalanced arrays: %u32 %u32 %u32", self->num_pos,
-           I32Arr_Get_Size(start_offsets), I32Arr_Get_Size(end_offsets));
+              I32Arr_Get_Size(start_offsets), I32Arr_Get_Size(end_offsets));
     }
-    
+
     return self;
 }
 
 void
-TV_destroy(TermVector *self)
-{
+TV_destroy(TermVector *self) {
     DECREF(self->field);
     DECREF(self->text);
     DECREF(self->positions);
@@ -64,15 +61,22 @@ TV_destroy(TermVector *self)
 }
 
 I32Array*
-TV_get_positions(TermVector *self)     { return self->positions; }
+TV_get_positions(TermVector *self) {
+    return self->positions;
+}
+
 I32Array*
-TV_get_start_offsets(TermVector *self) { return self->start_offsets; }
+TV_get_start_offsets(TermVector *self) {
+    return self->start_offsets;
+}
+
 I32Array*
-TV_get_end_offsets(TermVector *self)   { return self->end_offsets; }
+TV_get_end_offsets(TermVector *self) {
+    return self->end_offsets;
+}
 
 void
-TV_serialize(TermVector *self, OutStream *target)
-{
+TV_serialize(TermVector *self, OutStream *target) {
     uint32_t i;
     int32_t *posits = self->positions->ints;
     int32_t *starts = self->start_offsets->ints;
@@ -90,19 +94,18 @@ TV_serialize(TermVector *self, OutStream *target)
 }
 
 TermVector*
-TV_deserialize(TermVector *self, InStream *instream)
-{
-    uint32_t i;
-    CharBuf *field = (CharBuf*)CB_deserialize(NULL, instream);
-    CharBuf *text  = (CharBuf*)CB_deserialize(NULL, instream);
-    uint32_t num_pos  = InStream_Read_C32(instream);
-    int32_t *posits, *starts, *ends;
+TV_deserialize(TermVector *self, InStream *instream) {
+    uint32_t  i;
+    CharBuf  *field  = (CharBuf*)CB_deserialize(NULL, instream);
+    CharBuf  *text   = (CharBuf*)CB_deserialize(NULL, instream);
+    uint32_t num_pos = InStream_Read_C32(instream);
+    int32_t  *posits, *starts, *ends;
     I32Array *positions, *start_offsets, *end_offsets;
 
     // Read positional data.
-    posits    = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
-    starts    = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
-    ends      = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
+    posits = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
+    starts = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
+    ends   = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     for (i = 0; i < num_pos; i++) {
         posits[i] = InStream_Read_C32(instream);
         starts[i] = InStream_Read_C32(instream);
@@ -111,7 +114,7 @@ TV_deserialize(TermVector *self, InStream *instream)
     positions     = I32Arr_new_steal(posits, num_pos);
     start_offsets = I32Arr_new_steal(starts, num_pos);
     end_offsets   = I32Arr_new_steal(ends, num_pos);
-    
+
     self = self ? self : (TermVector*)VTable_Make_Obj(TERMVECTOR);
     self = TV_init(self, field, text, positions, start_offsets, end_offsets);
 
@@ -125,8 +128,7 @@ TV_deserialize(TermVector *self, InStream *instream)
 }
 
 bool_t
-TV_equals(TermVector *self, Obj *other)
-{
+TV_equals(TermVector *self, Obj *other) {
     TermVector *const twin = (TermVector*)other;
     uint32_t i;
     int32_t *const posits       = self->positions->ints;

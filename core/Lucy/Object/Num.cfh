@@ -72,7 +72,7 @@ class Lucy::Object::Float32 inherits Lucy::Object::FloatNum {
     void
     Set_Value(Float32 *self, float value);
 
-    float 
+    float
     Get_Value(Float32 *self);
 
     public int64_t
@@ -142,7 +142,7 @@ class Lucy::Object::Float64 inherits Lucy::Object::FloatNum {
 
 /** 32-bit signed integer.
  */
-class Lucy::Object::Integer32 cnick Int32 
+class Lucy::Object::Integer32 cnick Int32
     inherits Lucy::Object::IntNum {
 
     int32_t value;
@@ -159,7 +159,7 @@ class Lucy::Object::Integer32 cnick Int32
     void
     Set_Value(Integer32 *self, int32_t value);
 
-    int32_t 
+    int32_t
     Get_Value(Integer32 *self);
 
     public int64_t
@@ -187,7 +187,7 @@ class Lucy::Object::Integer32 cnick Int32
 /**
  * 64-bit signed integer.
  */
-class Lucy::Object::Integer64 cnick Int64 
+class Lucy::Object::Integer64 cnick Int64
     inherits Lucy::Object::IntNum {
 
     int64_t value;
@@ -204,7 +204,7 @@ class Lucy::Object::Integer64 cnick Int64
     void
     Set_Value(Integer64 *self, int64_t value);
 
-    int64_t 
+    int64_t
     Get_Value(Integer64 *self);
 
     public int64_t

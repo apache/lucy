@@ -25,11 +25,11 @@ class Lucy::Search::RangeMatcher inherits Lucy::Search::Matcher {
     SortCache *sort_cache;
 
     inert incremented RangeMatcher*
-    new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache, 
+    new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache,
         int32_t doc_max);
 
     inert RangeMatcher*
-    init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound, 
+    init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
          SortCache *sort_cache, int32_t doc_max);
 
     public int32_t
@@ -41,7 +41,7 @@ class Lucy::Search::RangeMatcher inherits Lucy::Search::Matcher {
     public float
     Score(RangeMatcher* self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(RangeMatcher* self);
 
     public void

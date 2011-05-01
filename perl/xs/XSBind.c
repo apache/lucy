@@ -39,14 +39,13 @@ static SV*
 S_cfish_hash_to_perl_hash(cfish_Hash *hash);
 
 cfish_Obj*
-XSBind_new_blank_obj(SV *either_sv)
-{
+XSBind_new_blank_obj(SV *either_sv) {
     cfish_VTable *vtable;
 
     // Get a VTable.
-    if (   sv_isobject(either_sv) 
+    if (sv_isobject(either_sv)
         && sv_derived_from(either_sv, "Lucy::Object::Obj")
-    ) {
+       ) {
         // Use the supplied object's VTable.
         IV iv_ptr = SvIV(SvRV(either_sv));
         cfish_Obj *self = INT2PTR(cfish_Obj*, iv_ptr);
@@ -65,8 +64,7 @@ XSBind_new_blank_obj(SV *either_sv)
 }
 
 cfish_Obj*
-XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation)
-{
+XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
     cfish_Obj *retval = XSBind_maybe_sv_to_cfish_obj(sv, vtable, allocation);
     if (!retval) {
         THROW(CFISH_ERR, "Not a %o", Cfish_VTable_Get_Name(vtable));
@@ -75,24 +73,22 @@ XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation)
 }
 
 cfish_Obj*
-XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation)
-{
+XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
     cfish_Obj *retval = NULL;
     if (XSBind_sv_defined(sv)) {
-        if (   sv_isobject(sv) 
-            && sv_derived_from(sv, 
-                 (char*)Cfish_CB_Get_Ptr8(Cfish_VTable_Get_Name(vtable)))
-        ) {
+        if (sv_isobject(sv)
+            && sv_derived_from(sv, (char*)Cfish_CB_Get_Ptr8(Cfish_VTable_Get_Name(vtable)))
+           ) {
             // Unwrap a real Clownfish object.
-            IV tmp = SvIV( SvRV(sv) );
+            IV tmp = SvIV(SvRV(sv));
             retval = INT2PTR(cfish_Obj*, tmp);
         }
-        else if (   allocation &&
-                 (  vtable == CFISH_ZOMBIECHARBUF
-                 || vtable == CFISH_VIEWCHARBUF
-                 || vtable == CFISH_CHARBUF
-                 || vtable == CFISH_OBJ)
-        ) {
+        else if (allocation &&
+                 (vtable == CFISH_ZOMBIECHARBUF
+                  || vtable == CFISH_VIEWCHARBUF
+                  || vtable == CFISH_CHARBUF
+                  || vtable == CFISH_OBJ)
+                ) {
             // Wrap the string from an ordinary Perl scalar inside a
             // ZombieCharBuf.
             STRLEN size;
@@ -110,7 +106,7 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation)
                 retval = (cfish_Obj*)S_perl_hash_to_cfish_hash((HV*)inner);
             }
 
-            if(retval) {
+            if (retval) {
                 // Mortalize the converted object -- which is somewhat
                 // dangerous, but is the only way to avoid requiring that the
                 // caller take responsibility for a refcount.
@@ -125,8 +121,7 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation)
 }
 
 SV*
-XSBind_cfish_to_perl(cfish_Obj *obj)
-{
+XSBind_cfish_to_perl(cfish_Obj *obj) {
     if (obj == NULL) {
         return newSV(0);
     }
@@ -163,8 +158,7 @@ XSBind_cfish_to_perl(cfish_Obj *obj)
 }
 
 cfish_Obj*
-XSBind_perl_to_cfish(SV *sv)
-{
+XSBind_perl_to_cfish(SV *sv) {
     cfish_Obj *retval = NULL;
 
     if (XSBind_sv_defined(sv)) {
@@ -177,9 +171,9 @@ XSBind_perl_to_cfish(SV *sv)
             else if (SvTYPE(inner) == SVt_PVHV) {
                 retval = (cfish_Obj*)S_perl_hash_to_cfish_hash((HV*)inner);
             }
-            else if (   sv_isobject(sv) 
+            else if (sv_isobject(sv)
                      && sv_derived_from(sv, "Lucy::Object::Obj")
-            ) {
+                    ) {
                 IV tmp = SvIV(inner);
                 retval = INT2PTR(cfish_Obj*, tmp);
                 (void)LUCY_INCREF(retval);
@@ -208,17 +202,15 @@ XSBind_perl_to_cfish(SV *sv)
 }
 
 SV*
-XSBind_bb_to_sv(const cfish_ByteBuf *bb) 
-{
-    return bb 
-        ? newSVpvn(Cfish_BB_Get_Buf(bb), Cfish_BB_Get_Size(bb)) 
-        : newSV(0);
+XSBind_bb_to_sv(const cfish_ByteBuf *bb) {
+    return bb
+           ? newSVpvn(Cfish_BB_Get_Buf(bb), Cfish_BB_Get_Size(bb))
+           : newSV(0);
 }
 
 SV*
-XSBind_cb_to_sv(const cfish_CharBuf *cb) 
-{
-    if (!cb) { 
+XSBind_cb_to_sv(const cfish_CharBuf *cb) {
+    if (!cb) {
         return newSV(0);
     }
     else {
@@ -229,8 +221,7 @@ XSBind_cb_to_sv(const cfish_CharBuf *cb)
 }
 
 static cfish_Hash*
-S_perl_hash_to_cfish_hash(HV *phash)
-{
+S_perl_hash_to_cfish_hash(HV *phash) {
     uint32_t             num_keys = hv_iterinit(phash);
     cfish_Hash          *retval   = cfish_Hash_new(num_keys);
     cfish_ZombieCharBuf *key      = CFISH_ZCB_WRAP_STR("", 0);
@@ -277,8 +268,7 @@ S_perl_hash_to_cfish_hash(HV *phash)
 }
 
 static cfish_VArray*
-S_perl_array_to_cfish_array(AV *parray)
-{
+S_perl_array_to_cfish_array(AV *parray) {
     const uint32_t  size   = av_len(parray) + 1;
     cfish_VArray   *retval = cfish_VA_new(size);
     uint32_t i;
@@ -297,8 +287,7 @@ S_perl_array_to_cfish_array(AV *parray)
 }
 
 static SV*
-S_cfish_array_to_perl_array(cfish_VArray *varray)
-{
+S_cfish_array_to_perl_array(cfish_VArray *varray) {
     AV *perl_array = newAV();
     uint32_t num_elems = Cfish_VA_Get_Size(varray);
 
@@ -323,8 +312,7 @@ S_cfish_array_to_perl_array(cfish_VArray *varray)
 }
 
 static SV*
-S_cfish_hash_to_perl_hash(cfish_Hash *hash)
-{
+S_cfish_hash_to_perl_hash(cfish_Hash *hash) {
     HV *perl_hash = newHV();
     SV *key_sv    = newSV(1);
     cfish_CharBuf *key;
@@ -340,13 +328,13 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash)
         // Recurse for each value.
         SV *val_sv = XSBind_cfish_to_perl(val);
         if (!Cfish_Obj_Is_A((cfish_Obj*)key, CFISH_CHARBUF)) {
-            CFISH_THROW(CFISH_ERR, 
-                "Can't convert a key of class %o to a Perl hash key",
-                Cfish_Obj_Get_Class_Name((cfish_Obj*)key));
+            CFISH_THROW(CFISH_ERR,
+                        "Can't convert a key of class %o to a Perl hash key",
+                        Cfish_Obj_Get_Class_Name((cfish_Obj*)key));
         }
         else {
             STRLEN key_size = Cfish_CB_Get_Size(key);
-            char *key_sv_ptr = SvGROW(key_sv, key_size + 1); 
+            char *key_sv_ptr = SvGROW(key_sv, key_size + 1);
             memcpy(key_sv_ptr, Cfish_CB_Get_Ptr8(key), key_size);
             SvCUR_set(key_sv, key_size);
             *SvEND(key_sv) = '\0';
@@ -359,8 +347,7 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash)
 }
 
 void
-XSBind_enable_overload(void *pobj)
-{
+XSBind_enable_overload(void *pobj) {
     SV *perl_obj = (SV*)pobj;
     HV *stash = SvSTASH(SvRV(perl_obj));
 #if (PERL_VERSION > 10)
@@ -373,9 +360,8 @@ XSBind_enable_overload(void *pobj)
 
 static chy_bool_t
 S_extract_from_sv(SV *value, void *target, const char *label,
-                  chy_bool_t required, int type, cfish_VTable *vtable, 
-                  void *allocation)
-{
+                  chy_bool_t required, int type, cfish_VTable *vtable,
+                  void *allocation) {
     chy_bool_t valid_assignment = false;
 
     if (XSBind_sv_defined(value)) {
@@ -437,16 +423,18 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                 valid_assignment = true;
                 break;
             case XSBIND_WANT_OBJ: {
-                    cfish_Obj *object = XSBind_maybe_sv_to_cfish_obj(value, 
-                        vtable, allocation);
+                    cfish_Obj *object
+                        = XSBind_maybe_sv_to_cfish_obj(value, vtable,
+                                                       allocation);
                     if (object) {
                         *((cfish_Obj**)target) = object;
                         valid_assignment = true;
                     }
                     else {
-                        cfish_CharBuf *mess = CFISH_MAKE_MESS(
-                            "Invalid value for '%s' - not a %o", label,
-                            Cfish_VTable_Get_Name(vtable));
+                        cfish_CharBuf *mess
+                            = CFISH_MAKE_MESS(
+                                  "Invalid value for '%s' - not a %o",
+                                  label, Cfish_VTable_Get_Name(vtable));
                         cfish_Err_set_error(cfish_Err_new(mess));
                         return false;
                     }
@@ -455,11 +443,11 @@ S_extract_from_sv(SV *value, void *target, const char *label,
             case XSBIND_WANT_SV:
                 *((SV**)target) = value;
                 valid_assignment = true;
-            break;
+                break;
             default: {
-                    cfish_CharBuf *mess = CFISH_MAKE_MESS(
-                        "Unrecognized type: %i32 for param '%s'", 
-                        (int32_t)type, label);
+                    cfish_CharBuf *mess
+                        = CFISH_MAKE_MESS("Unrecognized type: %i32 for param '%s'",
+                                          (int32_t)type, label);
                     cfish_Err_set_error(cfish_Err_new(mess));
                     return false;
                 }
@@ -469,8 +457,8 @@ S_extract_from_sv(SV *value, void *target, const char *label,
     // Enforce that required params cannot be undef and must present valid
     // values.
     if (required && !valid_assignment) {
-        cfish_CharBuf *mess = CFISH_MAKE_MESS(
-            "Missing required param %s", label);
+        cfish_CharBuf *mess = CFISH_MAKE_MESS("Missing required param %s",
+                                              label);
         cfish_Err_set_error(cfish_Err_new(mess));
         return false;
     }
@@ -479,17 +467,16 @@ S_extract_from_sv(SV *value, void *target, const char *label,
 }
 
 chy_bool_t
-XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, 
-                    char* params_hash_name, ...)
-{
+XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
+                    char* params_hash_name, ...) {
     va_list args;
     HV *params_hash = get_hv(params_hash_name, 0);
     int32_t args_left = (num_stack_elems - start) / 2;
 
     // Retrieve the params hash, which must be a package global.
     if (params_hash == NULL) {
-        cfish_CharBuf *mess = CFISH_MAKE_MESS(
-            "Can't find hash named %s", params_hash_name);
+        cfish_CharBuf *mess = CFISH_MAKE_MESS("Can't find hash named %s",
+                                              params_hash_name);
         cfish_Err_set_error(cfish_Err_new(mess));
         return false;
     }
@@ -498,8 +485,9 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
     // args.
     if (num_stack_elems == start) { return true; }
     if ((num_stack_elems - start) % 2 != 0) {
-        cfish_CharBuf *mess = CFISH_MAKE_MESS(
-            "Expecting hash-style params, got odd number of args");
+        cfish_CharBuf *mess
+            = CFISH_MAKE_MESS(
+                  "Expecting hash-style params, got odd number of args");
         cfish_Err_set_error(cfish_Err_new(mess));
         return false;
     }
@@ -510,15 +498,15 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         STRLEN key_len;
         const char *key = SvPV(key_sv, key_len); // assume ASCII labels
         if (!hv_exists(params_hash, key, key_len)) {
-            cfish_CharBuf *mess = CFISH_MAKE_MESS(
-                "Invalid parameter: '%s'", key);
+            cfish_CharBuf *mess
+                = CFISH_MAKE_MESS("Invalid parameter: '%s'", key);
             cfish_Err_set_error(cfish_Err_new(mess));
             return false;
         }
     }
 
     void *target;
-    va_start(args, params_hash_name); 
+    va_start(args, params_hash_name);
     while (args_left && NULL != (target = va_arg(args, void*))) {
         char *label     = va_arg(args, char*);
         int   label_len = va_arg(args, int);
@@ -536,8 +524,9 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
             if (SvCUR(key_sv) == (STRLEN)label_len) {
                 if (memcmp(SvPVX(key_sv), label, label_len) == 0) {
                     SV *value = stack[tick + 1];
-                    got_arg = S_extract_from_sv(value, target, label, 
-                        required, type, vtable, allocation);
+                    got_arg = S_extract_from_sv(value, target, label,
+                                                required, type, vtable,
+                                                allocation);
                     if (!got_arg) {
                         CFISH_ERR_ADD_FRAME(cfish_Err_get_error());
                         return false;
@@ -550,8 +539,8 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
 
         // Enforce required params.
         if (required && !got_arg) {
-            cfish_CharBuf *mess = CFISH_MAKE_MESS(
-                "Missing required parameter: '%s'", label);
+            cfish_CharBuf *mess
+                = CFISH_MAKE_MESS("Missing required parameter: '%s'", label);
             cfish_Err_set_error(cfish_Err_new(mess));
             return false;
         }

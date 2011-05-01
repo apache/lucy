@@ -23,7 +23,7 @@ class Lucy::Index::SortCache::NumericSortCache cnick NumSortCache
     InStream  *dat_in;
 
     inert NumericSortCache*
-    init(NumericSortCache *self, const CharBuf *field, FieldType *type, 
+    init(NumericSortCache *self, const CharBuf *field, FieldType *type,
          int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
          int32_t ord_width, InStream *ord_in, InStream *dat_in);
 
@@ -36,7 +36,7 @@ class Lucy::Index::SortCache::Float64SortCache cnick F64SortCache
 
     public inert incremented Float64SortCache*
     new(const CharBuf *field, FieldType *type, int32_t cardinality,
-        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width, 
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
         InStream *ord_in, InStream *dat_in);
 
     public inert Float64SortCache*
@@ -56,7 +56,7 @@ class Lucy::Index::SortCache::Float32SortCache cnick F32SortCache
 
     public inert incremented Float32SortCache*
     new(const CharBuf *field, FieldType *type, int32_t cardinality,
-        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width, 
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
         InStream *ord_in, InStream *dat_in);
 
     public inert Float32SortCache*
@@ -76,7 +76,7 @@ class Lucy::Index::SortCache::Int32SortCache cnick I32SortCache
 
     public inert incremented Int32SortCache*
     new(const CharBuf *field, FieldType *type, int32_t cardinality,
-        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width, 
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
         InStream *ord_in, InStream *dat_in);
 
     public inert Int32SortCache*
@@ -96,7 +96,7 @@ class Lucy::Index::SortCache::Int64SortCache cnick I64SortCache
 
     public inert incremented Int64SortCache*
     new(const CharBuf *field, FieldType *type, int32_t cardinality,
-        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width, 
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
         InStream *ord_in, InStream *dat_in);
 
     public inert Int64SortCache*

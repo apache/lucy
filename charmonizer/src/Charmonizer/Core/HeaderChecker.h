@@ -18,7 +18,7 @@
  */
 
 #ifndef H_CHAZ_HEAD_CHECK
-#define H_CHAZ_HEAD_CHECK 
+#define H_CHAZ_HEAD_CHECK
 
 #ifdef __cplusplus
 extern "C" {

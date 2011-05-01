@@ -23,15 +23,13 @@
 #include "Lucy/Test/TestUtils.h"
 
 DummyFieldType*
-DummyFieldType_new()
-{
+DummyFieldType_new() {
     DummyFieldType *self = (DummyFieldType*)VTable_Make_Obj(DUMMYFIELDTYPE);
     return (DummyFieldType*)FType_init((FieldType*)self);
 }
 
 static FieldType*
-S_alt_field_type()
-{
+S_alt_field_type() {
     ZombieCharBuf *name = ZCB_WRAP_STR("DummyFieldType2", 15);
     VTable *vtable = VTable_singleton((CharBuf*)name, DUMMYFIELDTYPE);
     FieldType *self = (FieldType*)VTable_Make_Obj(vtable);
@@ -39,8 +37,7 @@ S_alt_field_type()
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
+test_Dump_Load_and_Equals(TestBatch *batch) {
     FieldType   *type          = (FieldType*)DummyFieldType_new();
     FieldType   *other         = (FieldType*)DummyFieldType_new();
     FieldType   *class_differs = S_alt_field_type();
@@ -57,17 +54,17 @@ test_Dump_Load_and_Equals(TestBatch *batch)
     FType_Set_Stored(stored, true);
 
     TEST_TRUE(batch, FType_Equals(type, (Obj*)other),
-        "Equals() true with identical stats");
+              "Equals() true with identical stats");
     TEST_FALSE(batch, FType_Equals(type, (Obj*)class_differs),
-        "Equals() false with subclass");
+               "Equals() false with subclass");
     TEST_FALSE(batch, FType_Equals(type, (Obj*)class_differs),
-        "Equals() false with super class");
+               "Equals() false with super class");
     TEST_FALSE(batch, FType_Equals(type, (Obj*)boost_differs),
-        "Equals() false with different boost");
+               "Equals() false with different boost");
     TEST_FALSE(batch, FType_Equals(type, (Obj*)indexed),
-        "Equals() false with indexed => true");
+               "Equals() false with indexed => true");
     TEST_FALSE(batch, FType_Equals(type, (Obj*)stored),
-        "Equals() false with stored => true");
+               "Equals() false with stored => true");
 
     DECREF(stored);
     DECREF(indexed);
@@ -77,28 +74,26 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 static void
-test_Compare_Values(TestBatch *batch)
-{
+test_Compare_Values(TestBatch *batch) {
     FieldType     *type = (FieldType*)DummyFieldType_new();
     ZombieCharBuf *a    = ZCB_WRAP_STR("a", 1);
     ZombieCharBuf *b    = ZCB_WRAP_STR("b", 1);
 
-    TEST_TRUE(batch, 
-        FType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
-        "a less than b");
-    TEST_TRUE(batch, 
-        FType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
-        "b greater than a");
-    TEST_TRUE(batch, 
-        FType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
-        "b equals b");
+    TEST_TRUE(batch,
+              FType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
+              "a less than b");
+    TEST_TRUE(batch,
+              FType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
+              "b greater than a");
+    TEST_TRUE(batch,
+              FType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
+              "b equals b");
 
     DECREF(type);
 }
 
 void
-TestFType_run_tests()
-{
+TestFType_run_tests() {
     TestBatch *batch = TestBatch_new(9);
     TestBatch_Plan(batch);
     test_Dump_Load_and_Equals(batch);

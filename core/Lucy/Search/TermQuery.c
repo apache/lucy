@@ -35,15 +35,13 @@
 #include "Lucy/Util/Freezer.h"
 
 TermQuery*
-TermQuery_new(const CharBuf *field, const Obj *term)
-{
+TermQuery_new(const CharBuf *field, const Obj *term) {
     TermQuery *self = (TermQuery*)VTable_Make_Obj(TERMQUERY);
     return TermQuery_init(self, field, term);
 }
 
 TermQuery*
-TermQuery_init(TermQuery *self, const CharBuf *field, const Obj *term)
-{
+TermQuery_init(TermQuery *self, const CharBuf *field, const Obj *term) {
     Query_init((Query*)self, 1.0f);
     self->field       = CB_Clone(field);
     self->term        = Obj_Clone(term);
@@ -51,24 +49,21 @@ TermQuery_init(TermQuery *self, const CharBuf *field, const Obj *term)
 }
 
 void
-TermQuery_destroy(TermQuery *self)
-{
+TermQuery_destroy(TermQuery *self) {
     DECREF(self->field);
     DECREF(self->term);
     SUPER_DESTROY(self, TERMQUERY);
 }
 
 void
-TermQuery_serialize(TermQuery *self, OutStream *outstream)
-{
+TermQuery_serialize(TermQuery *self, OutStream *outstream) {
     CB_Serialize(self->field, outstream);
     FREEZE(self->term, outstream);
     OutStream_Write_F32(outstream, self->boost);
 }
 
 TermQuery*
-TermQuery_deserialize(TermQuery *self, InStream *instream)
-{
+TermQuery_deserialize(TermQuery *self, InStream *instream) {
     self = self ? self : (TermQuery*)VTable_Make_Obj(TERMQUERY);
     self->field = CB_deserialize(NULL, instream);
     self->term  = (Obj*)THAW(instream);
@@ -77,13 +72,17 @@ TermQuery_deserialize(TermQuery *self, InStream *instream)
 }
 
 CharBuf*
-TermQuery_get_field(TermQuery *self) { return self->field; }
+TermQuery_get_field(TermQuery *self) {
+    return self->field;
+}
+
 Obj*
-TermQuery_get_term(TermQuery *self)  { return self->term; }
+TermQuery_get_term(TermQuery *self) {
+    return self->term;
+}
 
 bool_t
-TermQuery_equals(TermQuery *self, Obj *other)
-{
+TermQuery_equals(TermQuery *self, Obj *other) {
     TermQuery *twin = (TermQuery*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, TERMQUERY)) return false;
@@ -94,8 +93,7 @@ TermQuery_equals(TermQuery *self, Obj *other)
 }
 
 CharBuf*
-TermQuery_to_string(TermQuery *self)
-{
+TermQuery_to_string(TermQuery *self) {
     CharBuf *term_str = Obj_To_String(self->term);
     CharBuf *retval = CB_newf("%o:%o", self->field, term_str);
     DECREF(term_str);
@@ -103,24 +101,21 @@ TermQuery_to_string(TermQuery *self)
 }
 
 Compiler*
-TermQuery_make_compiler(TermQuery *self, Searcher *searcher, float boost) 
-{
+TermQuery_make_compiler(TermQuery *self, Searcher *searcher, float boost) {
     return (Compiler*)TermCompiler_new((Query*)self, searcher, boost);
 }
 
 /******************************************************************/
 
 TermCompiler*
-TermCompiler_new(Query *parent, Searcher *searcher, float boost)
-{
+TermCompiler_new(Query *parent, Searcher *searcher, float boost) {
     TermCompiler *self = (TermCompiler*)VTable_Make_Obj(TERMCOMPILER);
     return TermCompiler_init(self, parent, searcher, boost);
 }
 
 TermCompiler*
-TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher, 
-                  float boost)
-{
+TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
+                  float boost) {
     Schema     *schema  = Searcher_Get_Schema(searcher);
     TermQuery  *tparent = (TermQuery*)parent;
     Similarity *sim     = Schema_Fetch_Sim(schema, tparent->field);
@@ -135,13 +130,13 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
 
     // Derive.
     int32_t doc_max  = Searcher_Doc_Max(searcher);
-    int32_t doc_freq = Searcher_Doc_Freq(searcher, tparent->field, 
-        tparent->term);
+    int32_t doc_freq = Searcher_Doc_Freq(searcher, tparent->field,
+                                         tparent->term);
     self->idf = Sim_IDF(sim, doc_freq, doc_max);
-    
+
     /* The score of any document is approximately equal to:
      *
-     *    ( tf_d * idf_t / norm_d ) * ( tf_q * idf_t / norm_q )
+     *    (tf_d * idf_t / norm_d) * (tf_q * idf_t / norm_q)
      *
      * Here we add in the first IDF, plus user-supplied boost.
      *
@@ -159,8 +154,7 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
 }
 
 bool_t
-TermCompiler_equals(TermCompiler *self, Obj *other)
-{
+TermCompiler_equals(TermCompiler *self, Obj *other) {
     TermCompiler *twin = (TermCompiler*)other;
     if (!Compiler_equals((Compiler*)self, other)) return false;
     if (!Obj_Is_A(other, TERMCOMPILER)) return false;
@@ -172,8 +166,7 @@ TermCompiler_equals(TermCompiler *self, Obj *other)
 }
 
 void
-TermCompiler_serialize(TermCompiler *self, OutStream *outstream)
-{
+TermCompiler_serialize(TermCompiler *self, OutStream *outstream) {
     Compiler_serialize((Compiler*)self, outstream);
     OutStream_Write_F32(outstream, self->idf);
     OutStream_Write_F32(outstream, self->raw_weight);
@@ -182,8 +175,7 @@ TermCompiler_serialize(TermCompiler *self, OutStream *outstream)
 }
 
 TermCompiler*
-TermCompiler_deserialize(TermCompiler *self, InStream *instream)
-{
+TermCompiler_deserialize(TermCompiler *self, InStream *instream) {
     self = self ? self : (TermCompiler*)VTable_Make_Obj(TERMCOMPILER);
     Compiler_deserialize((Compiler*)self, instream);
     self->idf               = InStream_Read_F32(instream);
@@ -194,61 +186,57 @@ TermCompiler_deserialize(TermCompiler *self, InStream *instream)
 }
 
 float
-TermCompiler_sum_of_squared_weights(TermCompiler *self)
-{ 
+TermCompiler_sum_of_squared_weights(TermCompiler *self) {
     return self->raw_weight * self->raw_weight;
 }
 
 void
-TermCompiler_apply_norm_factor(TermCompiler *self, float query_norm_factor) 
-{
+TermCompiler_apply_norm_factor(TermCompiler *self, float query_norm_factor) {
     self->query_norm_factor = query_norm_factor;
 
     /* Multiply raw weight by the idf and norm_q factors in this:
      *
-     *      ( tf_q * idf_q / norm_q )
+     *      (tf_q * idf_q / norm_q)
      *
      * Note: factoring in IDF a second time is correct.  See formula.
      */
-    self->normalized_weight 
+    self->normalized_weight
         = self->raw_weight * self->idf * query_norm_factor;
 }
 
 float
-TermCompiler_get_weight(TermCompiler *self)
-{
+TermCompiler_get_weight(TermCompiler *self) {
     return self->normalized_weight;
 }
 
 Matcher*
-TermCompiler_make_matcher(TermCompiler *self, SegReader *reader, 
-                          bool_t need_score)
-{
+TermCompiler_make_matcher(TermCompiler *self, SegReader *reader,
+                          bool_t need_score) {
     TermQuery *tparent = (TermQuery*)self->parent;
-    PostingListReader *plist_reader = (PostingListReader*)SegReader_Fetch(reader,
-        VTable_Get_Name(POSTINGLISTREADER));
-    PostingList *plist = plist_reader 
-        ? PListReader_Posting_List(plist_reader, tparent->field, tparent->term)
-        : NULL;
+    PostingListReader *plist_reader
+        = (PostingListReader*)SegReader_Fetch(
+              reader, VTable_Get_Name(POSTINGLISTREADER));
+    PostingList *plist = plist_reader
+                         ? PListReader_Posting_List(plist_reader, tparent->field, tparent->term)
+                         : NULL;
 
     if (plist == NULL || PList_Get_Doc_Freq(plist) == 0) {
         DECREF(plist);
         return NULL;
     }
     else {
-        Matcher *retval = PList_Make_Matcher(plist, self->sim, 
-            (Compiler*)self, need_score);
+        Matcher *retval = PList_Make_Matcher(plist, self->sim,
+                                             (Compiler*)self, need_score);
         DECREF(plist);
         return retval;
     }
 }
 
 VArray*
-TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher, 
-                             DocVector *doc_vec, const CharBuf *field)
-{
-    TermQuery *const parent = (TermQuery*)self->parent;
-    VArray *spans = VA_new(0);
+TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher,
+                             DocVector *doc_vec, const CharBuf *field) {
+    TermQuery *const  parent = (TermQuery*)self->parent;
+    VArray          *spans   = VA_new(0);
     TermVector *term_vector;
     I32Array *starts, *ends;
     uint32_t i, max;
@@ -265,8 +253,8 @@ TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher,
     for (i = 0, max = I32Arr_Get_Size(starts); i < max; i++) {
         int32_t start  = I32Arr_Get(starts, i);
         int32_t length = I32Arr_Get(ends, i) - start;
-        VA_Push(spans, 
-            (Obj*)Span_new(start, length, TermCompiler_Get_Weight(self)) );
+        VA_Push(spans,
+                (Obj*)Span_new(start, length, TermCompiler_Get_Weight(self)));
     }
 
     DECREF(term_vector);

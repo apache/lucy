@@ -28,7 +28,7 @@ class Lucy::Index::SkipStepper inherits Lucy::Util::Stepper {
     Read_Record(SkipStepper *self, InStream *instream);
 
     void
-    Write_Record(SkipStepper *self, OutStream *outstream, 
+    Write_Record(SkipStepper *self, OutStream *outstream,
                  int32_t last_doc_id, int64_t last_filepos);
 
     /** Set a base document id and a base file position which Read_Record

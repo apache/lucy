@@ -39,8 +39,8 @@ class Lucy::Util::Stepper inherits Lucy::Object::Obj {
 
     inert Stepper*
     init(Stepper *self);
-    
-    public abstract void 
+
+    public abstract void
     Reset(Stepper* self);
 
     /** Update internal state to reflect <code>value</code> and write a frame

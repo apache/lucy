@@ -20,8 +20,7 @@
 #include "Lucy/Store/DirHandle.h"
 
 DirHandle*
-DH_init(DirHandle *self, const CharBuf *dir)
-{
+DH_init(DirHandle *self, const CharBuf *dir) {
     self->dir   = CB_Clone(dir);
     self->entry = CB_new(32);
     ABSTRACT_CLASS_CHECK(self, DIRHANDLE);
@@ -29,8 +28,7 @@ DH_init(DirHandle *self, const CharBuf *dir)
 }
 
 void
-DH_destroy(DirHandle *self)
-{
+DH_destroy(DirHandle *self) {
     DH_Close(self);
     DECREF(self->dir);
     DECREF(self->entry);
@@ -38,8 +36,13 @@ DH_destroy(DirHandle *self)
 }
 
 CharBuf*
-DH_get_dir(DirHandle *self)   { return self->dir; }
+DH_get_dir(DirHandle *self) {
+    return self->dir;
+}
+
 CharBuf*
-DH_get_entry(DirHandle *self) { return self->entry; }
+DH_get_entry(DirHandle *self) {
+    return self->entry;
+}
 
 

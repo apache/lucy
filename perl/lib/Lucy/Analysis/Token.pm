@@ -36,14 +36,15 @@ CODE:
     int32_t   pos_inc   = 1;
     float     boost     = 1.0f;
 
-    chy_bool_t args_ok = XSBind_allot_params(
-        &(ST(0)), 1, items, "Lucy::Analysis::Token::new_PARAMS",
-        ALLOT_SV(&text_sv, "text", 4, true),
-        ALLOT_U32(&start_off, "start_offset", 12, true),
-        ALLOT_U32(&end_off, "end_offset", 10, true),
-        ALLOT_I32(&pos_inc, "pos_inc", 7, false),
-        ALLOT_F32(&boost, "boost", 5, false),
-        NULL);
+    chy_bool_t args_ok
+        = XSBind_allot_params(&(ST(0)), 1, items,
+                              "Lucy::Analysis::Token::new_PARAMS",
+                              ALLOT_SV(&text_sv, "text", 4, true),
+                              ALLOT_U32(&start_off, "start_offset", 12, true),
+                              ALLOT_U32(&end_off, "end_offset", 10, true),
+                              ALLOT_I32(&pos_inc, "pos_inc", 7, false),
+                              ALLOT_F32(&boost, "boost", 5, false),
+                              NULL);
     if (!args_ok) {
         CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }
@@ -51,8 +52,8 @@ CODE:
     STRLEN      len;
     char       *text = SvPVutf8(text_sv, len);
     lucy_Token *self = (lucy_Token*)XSBind_new_blank_obj(either_sv);
-    lucy_Token_init(self, text, len, start_off, end_off, boost, 
-        pos_inc);
+    lucy_Token_init(self, text, len, start_off, end_off, boost,
+                    pos_inc);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL

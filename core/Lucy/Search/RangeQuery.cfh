@@ -22,7 +22,7 @@ parcel Lucy;
  * within a given range.
  */
 
-class Lucy::Search::RangeQuery inherits Lucy::Search::Query 
+class Lucy::Search::RangeQuery inherits Lucy::Search::Query
     : dumpable {
 
     CharBuf  *field;
@@ -50,8 +50,8 @@ class Lucy::Search::RangeQuery inherits Lucy::Search::Query
      * <code>upper_term</code> should be included in the results.
      */
     public inert RangeQuery*
-    init(RangeQuery *self, const CharBuf *field, 
-         Obj *lower_term = NULL, Obj *upper_term = NULL, 
+    init(RangeQuery *self, const CharBuf *field,
+         Obj *lower_term = NULL, Obj *upper_term = NULL,
          bool_t include_lower = true, bool_t include_upper = true);
 
     public bool_t
@@ -79,7 +79,7 @@ class Lucy::Search::RangeCompiler inherits Lucy::Search::Compiler {
     new(RangeQuery *parent, Searcher *searcher, float boost);
 
     inert RangeCompiler*
-    init(RangeCompiler *self, RangeQuery *parent, Searcher *searcher, 
+    init(RangeCompiler *self, RangeQuery *parent, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*

@@ -31,21 +31,18 @@
 #include "Lucy/Util/Freezer.h"
 
 ANDQuery*
-ANDQuery_new(VArray *children)
-{
+ANDQuery_new(VArray *children) {
     ANDQuery *self = (ANDQuery*)VTable_Make_Obj(ANDQUERY);
     return ANDQuery_init(self, children);
 }
 
 ANDQuery*
-ANDQuery_init(ANDQuery *self, VArray *children)
-{
+ANDQuery_init(ANDQuery *self, VArray *children) {
     return (ANDQuery*)PolyQuery_init((PolyQuery*)self, children);
 }
 
 CharBuf*
-ANDQuery_to_string(ANDQuery *self)
-{
+ANDQuery_to_string(ANDQuery *self) {
     uint32_t num_kids = VA_Get_Size(self->children);
     if (!num_kids) return CB_new_from_trusted_utf8("()", 2);
     else {
@@ -68,42 +65,37 @@ ANDQuery_to_string(ANDQuery *self)
 
 
 bool_t
-ANDQuery_equals(ANDQuery *self, Obj *other)
-{
+ANDQuery_equals(ANDQuery *self, Obj *other) {
     if ((ANDQuery*)other == self) return true;
     if (!Obj_Is_A(other, ANDQUERY)) { return false; }
     return PolyQuery_equals((PolyQuery*)self, other);
 }
 
 Compiler*
-ANDQuery_make_compiler(ANDQuery *self, Searcher *searcher, float boost)
-{
+ANDQuery_make_compiler(ANDQuery *self, Searcher *searcher, float boost) {
     return (Compiler*)ANDCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/
 
 ANDCompiler*
-ANDCompiler_new(ANDQuery *parent, Searcher *searcher, float boost)
-{
+ANDCompiler_new(ANDQuery *parent, Searcher *searcher, float boost) {
     ANDCompiler *self = (ANDCompiler*)VTable_Make_Obj(ANDCOMPILER);
     return ANDCompiler_init(self, parent, searcher, boost);
 }
 
 ANDCompiler*
-ANDCompiler_init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher, 
-                 float boost)
-{
-    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher, 
-        boost);
+ANDCompiler_init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher,
+                 float boost) {
+    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
+                      boost);
     ANDCompiler_Normalize(self);
     return self;
 }
 
 Matcher*
-ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader, 
-                         bool_t need_score)
-{
+ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
+                         bool_t need_score) {
     uint32_t num_kids = VA_Get_Size(self->children);
 
     if (num_kids == 1) {
@@ -117,7 +109,7 @@ ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
         // Add child matchers one by one.
         for (i = 0; i < num_kids; i++) {
             Compiler *child = (Compiler*)VA_Fetch(self->children, i);
-            Matcher *child_matcher 
+            Matcher *child_matcher
                 = Compiler_Make_Matcher(child, reader, need_score);
 
             // If any required clause fails, the whole thing fails.
@@ -130,9 +122,10 @@ ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
             }
         }
 
-        { 
-            Matcher *retval = (Matcher*)ANDMatcher_new(child_matchers, 
-                ANDCompiler_Get_Similarity(self));
+        {
+            Matcher *retval
+                = (Matcher*)ANDMatcher_new(child_matchers,
+                                           ANDCompiler_Get_Similarity(self));
             DECREF(child_matchers);
             return retval;
         }

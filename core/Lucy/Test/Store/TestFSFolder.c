@@ -38,8 +38,7 @@
 #include "Lucy/Store/OutStream.h"
 
 static Folder*
-S_set_up()
-{
+S_set_up() {
     rmdir("_fstest");
     CharBuf  *test_dir = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFolder *folder = FSFolder_new(test_dir);
@@ -51,8 +50,7 @@ S_set_up()
 }
 
 static void
-S_tear_down()
-{
+S_tear_down() {
     struct stat stat_buf;
     rmdir("_fstest");
     if (stat("_fstest", &stat_buf) != -1) {
@@ -61,38 +59,36 @@ S_tear_down()
 }
 
 static void
-test_Initialize_and_Check(TestBatch *batch)
-{
+test_Initialize_and_Check(TestBatch *batch) {
     rmdir("_fstest");
     CharBuf  *test_dir = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFolder *folder   = FSFolder_new(test_dir);
-    TEST_FALSE(batch, FSFolder_Check(folder), 
-        "Check() returns false when folder dir doesn't exist");
+    TEST_FALSE(batch, FSFolder_Check(folder),
+               "Check() returns false when folder dir doesn't exist");
     FSFolder_Initialize(folder);
     PASS(batch, "Initialize() concludes without incident");
-    TEST_TRUE(batch, FSFolder_Check(folder), 
-        "Initialize() created dir, and now Check() succeeds");
+    TEST_TRUE(batch, FSFolder_Check(folder),
+              "Initialize() created dir, and now Check() succeeds");
     DECREF(folder);
     S_tear_down();
 }
 
 static void
-test_protect_symlinks(TestBatch *batch) 
-{
+test_protect_symlinks(TestBatch *batch) {
 #ifdef CHY_HAS_UNISTD_H
     FSFolder *folder    = (FSFolder*)S_set_up();
     CharBuf  *foo       = (CharBuf*)ZCB_WRAP_STR("foo", 3);
     CharBuf  *bar       = (CharBuf*)ZCB_WRAP_STR("bar", 3);
     CharBuf  *foo_boffo = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
-    
+
     FSFolder_MkDir(folder, foo);
     FSFolder_MkDir(folder, bar);
     OutStream *outstream = FSFolder_Open_Out(folder, foo_boffo);
     DECREF(outstream);
 
-    if (   symlink("_fstest/foo/boffo", "_fstest/bar/banana")
+    if (symlink("_fstest/foo/boffo", "_fstest/bar/banana")
         || symlink("_fstest/foo", "_fstest/bar/bazooka")
-    ) {
+       ) {
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
         FAIL(batch, "symlink() failed");
@@ -108,18 +104,18 @@ test_protect_symlinks(TestBatch *batch)
                 saw_bazooka_boffo = true;
             }
         }
-        TEST_FALSE(batch, saw_bazooka_boffo, 
-            "List_R() shouldn't follow symlinks");
+        TEST_FALSE(batch, saw_bazooka_boffo,
+                   "List_R() shouldn't follow symlinks");
         DECREF(list);
 
-        TEST_TRUE(batch, FSFolder_Delete_Tree(folder, bar), 
-            "Delete_Tree() returns true"), 
-        TEST_FALSE(batch, FSFolder_Exists(folder, bar), 
-            "Tree is really gone");
+        TEST_TRUE(batch, FSFolder_Delete_Tree(folder, bar),
+                  "Delete_Tree() returns true"),
+        TEST_FALSE(batch, FSFolder_Exists(folder, bar),
+                   "Tree is really gone");
         TEST_TRUE(batch, FSFolder_Exists(folder, foo),
-            "Original folder sill there");
+                  "Original folder sill there");
         TEST_TRUE(batch, FSFolder_Exists(folder, foo_boffo),
-            "Delete_Tree() did not follow directory symlink");
+                  "Delete_Tree() did not follow directory symlink");
         FSFolder_Delete_Tree(folder, foo);
     }
     DECREF(folder);
@@ -135,8 +131,7 @@ test_protect_symlinks(TestBatch *batch)
 }
 
 void
-test_disallow_updir(TestBatch *batch)
-{
+test_disallow_updir(TestBatch *batch) {
     FSFolder *outer_folder = (FSFolder*)S_set_up();
 
     CharBuf *foo = (CharBuf*)ZCB_WRAP_STR("foo", 3);
@@ -147,8 +142,8 @@ test_disallow_updir(TestBatch *batch)
     CharBuf *inner_path = (CharBuf*)ZCB_WRAP_STR("_fstest/foo", 11);
     FSFolder *foo_folder = FSFolder_new(inner_path);
     CharBuf *up_bar = (CharBuf*)ZCB_WRAP_STR("../bar", 6);
-    TEST_FALSE(batch, FSFolder_Exists(foo_folder, up_bar), 
-        "up-dirs are inaccessible.");
+    TEST_FALSE(batch, FSFolder_Exists(foo_folder, up_bar),
+               "up-dirs are inaccessible.");
 
     DECREF(foo_folder);
     FSFolder_Delete(outer_folder, foo);
@@ -158,8 +153,7 @@ test_disallow_updir(TestBatch *batch)
 }
 
 void
-TestFSFolder_run_tests()
-{
+TestFSFolder_run_tests() {
     uint32_t num_tests = TestFolderCommon_num_tests() + 9;
     TestBatch *batch = TestBatch_new(num_tests);
 

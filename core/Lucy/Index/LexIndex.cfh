@@ -30,11 +30,11 @@ class Lucy::Index::LexIndex inherits Lucy::Index::Lexicon {
     TermInfo    *tinfo;
 
     inert incremented LexIndex*
-    new(Schema *schema, Folder *folder, Segment *segment, 
+    new(Schema *schema, Folder *folder, Segment *segment,
         const CharBuf *field);
 
     inert LexIndex*
-    init(LexIndex *self, Schema *schema, Folder *folder, Segment *segment, 
+    init(LexIndex *self, Schema *schema, Folder *folder, Segment *segment,
          const CharBuf *field);
 
     public void
@@ -43,7 +43,7 @@ class Lucy::Index::LexIndex inherits Lucy::Index::Lexicon {
     int32_t
     Get_Term_Num(LexIndex *self);
 
-    nullable TermInfo* 
+    nullable TermInfo*
     Get_Term_Info(LexIndex *self);
 
     public nullable Obj*

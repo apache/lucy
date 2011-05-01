@@ -23,7 +23,7 @@ parcel Lucy;
 class Lucy::Test::Plan::TestArchitecture cnick TestArch
     inherits Lucy::Plan::Architecture {
 
-    inert incremented TestArchitecture* 
+    inert incremented TestArchitecture*
     new();
 
     inert TestArchitecture*
@@ -32,7 +32,7 @@ class Lucy::Test::Plan::TestArchitecture cnick TestArch
     public int32_t
     Index_Interval(TestArchitecture *self);
 
-    public int32_t 
+    public int32_t
     Skip_Interval(TestArchitecture *self);
 }
 

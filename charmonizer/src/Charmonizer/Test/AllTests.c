@@ -19,12 +19,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Charmonizer/Test/AllTests.h"
-    
+
 static TestBatch **batches = NULL;
 
 void
-AllTests_init()
-{
+AllTests_init() {
     Test_init();
 
     /* Create a null-terminated array of test batches to iterate over. */
@@ -40,14 +39,13 @@ AllTests_init()
 }
 
 void
-AllTests_run()
-{
+AllTests_run() {
     int total_tests   = 0;
     int total_passed  = 0;
     int total_failed  = 0;
     int total_skipped = 0;
     int i;
-    
+
     /* Sanity check. */
     if (batches == NULL) {
         fprintf(stderr, "Must call AllTests_init() first.");
@@ -64,12 +62,12 @@ AllTests_run()
         total_skipped  += batch->num_skipped;
         batch->destroy(batch);
     }
-    
+
     /* Print totals. */
     printf("=============================\n");
     printf("TOTAL TESTS:   %d\nTOTAL PASSED:  %d\nTOTAL FAILED:  %d\n"
-        "TOTAL SKIPPED: %d\n", 
-        total_tests, total_passed, total_failed, total_skipped);
+           "TOTAL SKIPPED: %d\n",
+           total_tests, total_passed, total_failed, total_skipped);
 }
 
 

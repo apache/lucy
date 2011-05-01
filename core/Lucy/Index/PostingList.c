@@ -25,8 +25,7 @@
 #include "Lucy/Util/Memory.h"
 
 PostingList*
-PList_init(PostingList *self)
-{
+PList_init(PostingList *self) {
     ABSTRACT_CLASS_CHECK(self, POSTINGLIST);
     return self;
 }

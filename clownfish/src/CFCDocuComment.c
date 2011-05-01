@@ -38,30 +38,29 @@ struct CFCDocuComment {
 /** Remove comment open, close, and left border from raw comment text.
  */
 static void
-S_strip(char *comment)
-{
+S_strip(char *comment) {
     size_t len = strlen(comment);
     char *scratch = (char*)MALLOCATE(len + 1);
 
     // Establish that comment text begins with "/**" and ends with "*/".
-    if (   strstr(comment, "/**") != comment
+    if (strstr(comment, "/**") != comment
         || strstr(comment, "*/") != (comment + len - 2)
-    ) {
+       ) {
         croak("Malformed comment");
     }
 
     // Capture text minus beginning "/**", ending "*/", and left border.
     size_t i = 3;
     size_t max = len - 2;
-    while ((isspace(comment[i]) || comment[i] == '*') && i < max) { 
-        i++; 
+    while ((isspace(comment[i]) || comment[i] == '*') && i < max) {
+        i++;
     }
     size_t j = 0;
-    for ( ; i < max; i++) {
+    for (; i < max; i++) {
         while (comment[i] == '\n' && i < max) {
             scratch[j++] = comment[i];
             i++;
-            while (isspace(comment[i]) && comment[i] != '\n' && i < max) { 
+            while (isspace(comment[i]) && comment[i] != '\n' && i < max) {
                 i++;
             }
             if (comment[i] == '*') { i++; }
@@ -83,11 +82,11 @@ S_strip(char *comment)
 }
 
 CFCDocuComment*
-CFCDocuComment_parse(const char *raw_text)
-{
+CFCDocuComment_parse(const char *raw_text) {
     char *text = CFCUtil_strdup(raw_text);
-    CFCDocuComment *self = (CFCDocuComment*)CFCBase_allocate(
-        sizeof(CFCDocuComment), "Clownfish::DocuComment");
+    CFCDocuComment *self
+        = (CFCDocuComment*)CFCBase_allocate(sizeof(CFCDocuComment),
+                                            "Clownfish::DocuComment");
 
     // Strip whitespace, comment open, close, and left border.
     CFCUtil_trim_whitespace(text);
@@ -102,9 +101,9 @@ CFCDocuComment_parse(const char *raw_text)
             limit = text + len;
         }
         while (ptr < limit) {
-            if (   *ptr == '.' 
+            if (*ptr == '.'
                 && ((ptr == limit - 1) || isspace(*(ptr + 1)))
-            ) {
+               ) {
                 ptr++;
                 size_t brief_len = ptr - text;
                 self->brief = CFCUtil_strdup(text);
@@ -162,15 +161,15 @@ CFCDocuComment_parse(const char *raw_text)
             size_t size = (num_params + 1) * sizeof(char*);
             self->param_names = (char**)REALLOCATE(self->param_names, size);
             self->param_docs  = (char**)REALLOCATE(self->param_docs, size);
-            self->param_names[num_params - 1] 
+            self->param_names[num_params - 1]
                 = CFCUtil_strndup(param_name, param_name_len);
-            self->param_docs[num_params - 1] 
+            self->param_docs[num_params - 1]
                 = CFCUtil_strndup(param_doc, param_doc_len);
             CFCUtil_trim_whitespace(self->param_names[num_params - 1]);
             CFCUtil_trim_whitespace(self->param_docs[num_params - 1]);
             self->param_names[num_params] = NULL;
             self->param_docs[num_params]  = NULL;
-            
+
             if (ptr == limit) {
                 break;
             }
@@ -214,8 +213,7 @@ CFCDocuComment_parse(const char *raw_text)
 }
 
 void
-CFCDocuComment_destroy(CFCDocuComment *self)
-{
+CFCDocuComment_destroy(CFCDocuComment *self) {
     size_t i;
     if (self->param_names) {
         for (i = 0; self->param_names[i] != NULL; i++) {
@@ -237,38 +235,32 @@ CFCDocuComment_destroy(CFCDocuComment *self)
 }
 
 const char*
-CFCDocuComment_get_description(CFCDocuComment *self)
-{
+CFCDocuComment_get_description(CFCDocuComment *self) {
     return self->description;
 }
 
 const char*
-CFCDocuComment_get_brief(CFCDocuComment *self)
-{
+CFCDocuComment_get_brief(CFCDocuComment *self) {
     return self->brief;
 }
 
 const char*
-CFCDocuComment_get_long(CFCDocuComment *self)
-{
+CFCDocuComment_get_long(CFCDocuComment *self) {
     return self->long_des;
 }
 
 const char**
-CFCDocuComment_get_param_names(CFCDocuComment *self)
-{
+CFCDocuComment_get_param_names(CFCDocuComment *self) {
     return (const char**)self->param_names;
 }
 
 const char**
-CFCDocuComment_get_param_docs(CFCDocuComment *self)
-{
+CFCDocuComment_get_param_docs(CFCDocuComment *self) {
     return (const char**)self->param_docs;
 }
 
 const char*
-CFCDocuComment_get_retval(CFCDocuComment *self)
-{
+CFCDocuComment_get_retval(CFCDocuComment *self) {
     return self->retval;
 }
 

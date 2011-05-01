@@ -63,7 +63,7 @@ class Lucy::Search::ORMatcher inherits Lucy::Search::PolyMatcher {
     public int32_t
     Advance(ORMatcher *self, int32_t target);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(ORMatcher *self);
 }
 
@@ -78,10 +78,10 @@ class Lucy::Search::ORScorer inherits Lucy::Search::ORMatcher {
     float            *scores;
     int32_t           doc_id;
 
-    inert incremented ORScorer* 
+    inert incremented ORScorer*
     new(VArray *children, Similarity *similarity);
 
-    inert ORScorer* 
+    inert ORScorer*
     init(ORScorer *self, VArray *children, Similarity *similarity);
 
     public void
@@ -96,7 +96,7 @@ class Lucy::Search::ORScorer inherits Lucy::Search::ORMatcher {
     public float
     Score(ORScorer *self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(ORScorer *self);
 }
 

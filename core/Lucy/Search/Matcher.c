@@ -24,28 +24,25 @@
 #include "Lucy/Search/Collector.h"
 
 Matcher*
-Matcher_init(Matcher *self)
-{
+Matcher_init(Matcher *self) {
     ABSTRACT_CLASS_CHECK(self, MATCHER);
     return self;
 }
 
 int32_t
-Matcher_advance(Matcher *self, int32_t target) 
-{
+Matcher_advance(Matcher *self, int32_t target) {
     while (1) {
         int32_t doc_id = Matcher_Next(self);
         if (doc_id == 0 || doc_id >= target) {
-            return doc_id; 
+            return doc_id;
         }
     }
 }
 
 void
-Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions)
-{
-    int32_t doc_id         = 0;
-    int32_t next_deletion  = deletions ? 0 : I32_MAX;
+Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions) {
+    int32_t doc_id        = 0;
+    int32_t next_deletion = deletions ? 0 : I32_MAX;
 
     Coll_Set_Matcher(collector, self);
 
@@ -74,7 +71,7 @@ Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions)
         }
         else {
             doc_id = Matcher_Advance(self, doc_id + 1);
-            if (doc_id >= next_deletion) { 
+            if (doc_id >= next_deletion) {
                 next_deletion = Matcher_Advance(deletions, doc_id);
                 if (doc_id == next_deletion) { continue; }
             }
@@ -83,8 +80,8 @@ Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions)
         if (doc_id) {
             Coll_Collect(collector, doc_id);
         }
-        else { 
-            break; 
+        else {
+            break;
         }
     }
 

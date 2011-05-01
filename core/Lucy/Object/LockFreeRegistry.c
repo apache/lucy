@@ -33,24 +33,21 @@ typedef struct lucy_LFRegEntry {
 #define LFRegEntry lucy_LFRegEntry
 
 LockFreeRegistry*
-LFReg_new(size_t capacity)
-{
-    LockFreeRegistry *self 
+LFReg_new(size_t capacity) {
+    LockFreeRegistry *self
         = (LockFreeRegistry*)VTable_Make_Obj(LOCKFREEREGISTRY);
     return LFReg_init(self, capacity);
 }
 
 LockFreeRegistry*
-LFReg_init(LockFreeRegistry *self, size_t capacity)
-{
+LFReg_init(LockFreeRegistry *self, size_t capacity) {
     self->capacity = capacity;
     self->entries  = CALLOCATE(capacity, sizeof(void*));
     return self;
 }
 
 bool_t
-LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
-{
+LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value) {
     LFRegEntry  *new_entry = NULL;
     int32_t      hash_sum  = Obj_Hash_Sum(key);
     size_t       bucket    = (uint32_t)hash_sum  % self->capacity;
@@ -59,10 +56,10 @@ LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
 
     // Proceed through the linked list.  Bail out if the key has already been
     // registered.
-    FIND_END_OF_LINKED_LIST:
+FIND_END_OF_LINKED_LIST:
     while (*slot) {
         LFRegEntry *entry = *slot;
-        if (entry->hash_sum  == hash_sum) {
+        if (entry->hash_sum == hash_sum) {
             if (Obj_Equals(key, entry->key)) {
                 return false;
             }
@@ -92,8 +89,7 @@ LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value)
 }
 
 Obj*
-LFReg_fetch(LockFreeRegistry *self, Obj *key)
-{
+LFReg_fetch(LockFreeRegistry *self, Obj *key) {
     int32_t      hash_sum  = Obj_Hash_Sum(key);
     size_t       bucket    = (uint32_t)hash_sum  % self->capacity;
     LFRegEntry **entries   = (LFRegEntry**)self->entries;
@@ -112,8 +108,7 @@ LFReg_fetch(LockFreeRegistry *self, Obj *key)
 }
 
 void
-LFReg_destroy(LockFreeRegistry *self)
-{
+LFReg_destroy(LockFreeRegistry *self) {
     size_t i;
     LFRegEntry **entries = (LFRegEntry**)self->entries;
 

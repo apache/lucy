@@ -23,27 +23,29 @@
 
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
-    ZombieCharBuf *word_char_pattern  = ZCB_WRAP_STR("\\w+", 3);  
+test_Dump_Load_and_Equals(TestBatch *batch) {
+    ZombieCharBuf *word_char_pattern  = ZCB_WRAP_STR("\\w+", 3);
     ZombieCharBuf *whitespace_pattern = ZCB_WRAP_STR("\\S+", 3);
-    RegexTokenizer *word_char_tokenizer =
-        RegexTokenizer_new((CharBuf*)word_char_pattern);
-    RegexTokenizer *whitespace_tokenizer =
-        RegexTokenizer_new((CharBuf*)whitespace_pattern);
+    RegexTokenizer *word_char_tokenizer
+        = RegexTokenizer_new((CharBuf*)word_char_pattern);
+    RegexTokenizer *whitespace_tokenizer
+        = RegexTokenizer_new((CharBuf*)whitespace_pattern);
     Obj *word_char_dump  = RegexTokenizer_Dump(word_char_tokenizer);
     Obj *whitespace_dump = RegexTokenizer_Dump(whitespace_tokenizer);
-    RegexTokenizer *word_char_clone 
+    RegexTokenizer *word_char_clone
         = RegexTokenizer_Load(whitespace_tokenizer, word_char_dump);
-    RegexTokenizer *whitespace_clone 
+    RegexTokenizer *whitespace_clone
         = RegexTokenizer_Load(whitespace_tokenizer, whitespace_dump);
 
-    TEST_FALSE(batch, RegexTokenizer_Equals(word_char_tokenizer,
-        (Obj*)whitespace_tokenizer), "Equals() false with different pattern");
-    TEST_TRUE(batch, RegexTokenizer_Equals(word_char_tokenizer,
-        (Obj*)word_char_clone), "Dump => Load round trip");
-    TEST_TRUE(batch, RegexTokenizer_Equals(whitespace_tokenizer,
-        (Obj*)whitespace_clone), "Dump => Load round trip");
+    TEST_FALSE(batch,
+               RegexTokenizer_Equals(word_char_tokenizer, (Obj*)whitespace_tokenizer),
+               "Equals() false with different pattern");
+    TEST_TRUE(batch,
+              RegexTokenizer_Equals(word_char_tokenizer, (Obj*)word_char_clone),
+              "Dump => Load round trip");
+    TEST_TRUE(batch,
+              RegexTokenizer_Equals(whitespace_tokenizer, (Obj*)whitespace_clone),
+              "Dump => Load round trip");
 
     DECREF(word_char_tokenizer);
     DECREF(word_char_dump);
@@ -54,8 +56,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 void
-TestRegexTokenizer_run_tests()
-{
+TestRegexTokenizer_run_tests() {
     TestBatch *batch = TestBatch_new(3);
 
     TestBatch_Plan(batch);

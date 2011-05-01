@@ -40,7 +40,7 @@ class Lucy::Search::HitQueue cnick HitQ
      * @param wanted Max elements the queue can hold.
      */
     inert HitQueue*
-    init(HitQueue *self, Schema *schema = NULL, SortSpec *sort_spec = NULL, 
+    init(HitQueue *self, Schema *schema = NULL, SortSpec *sort_spec = NULL,
          uint32_t wanted);
 
     public void
@@ -50,7 +50,7 @@ class Lucy::Search::HitQueue cnick HitQ
      * values array, then invokes parent method.
      */
     incremented nullable Obj*
-    Jostle(HitQueue *self, decremented Obj *element); 
+    Jostle(HitQueue *self, decremented Obj *element);
 
     bool_t
     Less_Than(HitQueue *self, Obj *a, Obj *b);

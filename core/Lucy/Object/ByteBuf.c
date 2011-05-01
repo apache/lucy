@@ -35,15 +35,13 @@ static void
 S_grow(ByteBuf *self, size_t size);
 
 ByteBuf*
-BB_new(size_t capacity) 
-{
+BB_new(size_t capacity) {
     ByteBuf *self = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
     return BB_init(self, capacity);
 }
 
 ByteBuf*
-BB_init(ByteBuf *self, size_t capacity)
-{
+BB_init(ByteBuf *self, size_t capacity) {
     size_t amount = capacity ? capacity : sizeof(int64_t);
     self->buf   = NULL;
     self->size  = 0;
@@ -53,8 +51,7 @@ BB_init(ByteBuf *self, size_t capacity)
 }
 
 ByteBuf*
-BB_new_bytes(const void *bytes, size_t size) 
-{
+BB_new_bytes(const void *bytes, size_t size) {
     ByteBuf *self = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
     BB_init(self, size);
     memcpy(self->buf, bytes, size);
@@ -63,8 +60,7 @@ BB_new_bytes(const void *bytes, size_t size)
 }
 
 ByteBuf*
-BB_new_steal_bytes(void *bytes, size_t size, size_t capacity) 
-{
+BB_new_steal_bytes(void *bytes, size_t size, size_t capacity) {
     ByteBuf *self = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
     self->buf  = (char*)bytes;
     self->size = size;
@@ -72,46 +68,49 @@ BB_new_steal_bytes(void *bytes, size_t size, size_t capacity)
     return self;
 }
 
-void 
-BB_destroy(ByteBuf *self) 
-{
+void
+BB_destroy(ByteBuf *self) {
     FREEMEM(self->buf);
     SUPER_DESTROY(self, BYTEBUF);
 }
 
 ByteBuf*
-BB_clone(ByteBuf *self) 
-{
+BB_clone(ByteBuf *self) {
     return BB_new_bytes(self->buf, self->size);
 }
 
 void
-BB_set_size(ByteBuf *self, size_t size) 
-{ 
+BB_set_size(ByteBuf *self, size_t size) {
     if (size > self->cap) {
-        THROW(ERR, "Can't set size to %u64 ( greater than capacity of %u64)",
-            (uint64_t)size, (uint64_t)self->cap);
+        THROW(ERR, "Can't set size to %u64 (greater than capacity of %u64)",
+              (uint64_t)size, (uint64_t)self->cap);
     }
-    self->size = size; 
+    self->size = size;
 }
 
 char*
-BB_get_buf(ByteBuf *self)      { return self->buf; }
+BB_get_buf(ByteBuf *self) {
+    return self->buf;
+}
+
 size_t
-BB_get_size(ByteBuf *self)     { return self->size; }
+BB_get_size(ByteBuf *self) {
+    return self->size;
+}
+
 size_t
-BB_get_capacity(ByteBuf *self) { return self->cap; }
+BB_get_capacity(ByteBuf *self) {
+    return self->cap;
+}
 
 static INLINE bool_t
-SI_equals_bytes(ByteBuf *self, const void *bytes, size_t size)
-{
+SI_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
     if (self->size != size) { return false; }
     return (memcmp(self->buf, bytes, self->size) == 0);
 }
 
 bool_t
-BB_equals(ByteBuf *self, Obj *other)
-{
+BB_equals(ByteBuf *self, Obj *other) {
     ByteBuf *const twin = (ByteBuf*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, BYTEBUF)) return false;
@@ -119,15 +118,13 @@ BB_equals(ByteBuf *self, Obj *other)
 }
 
 bool_t
-BB_equals_bytes(ByteBuf *self, const void *bytes, size_t size)
-{
+BB_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
     return SI_equals_bytes(self, bytes, size);
 }
 
 int32_t
-BB_hash_sum(ByteBuf *self)
-{
-    uint32_t       sum = 5381; 
+BB_hash_sum(ByteBuf *self) {
+    uint32_t       sum = 5381;
     uint8_t *const buf = (uint8_t*)self->buf;
 
     for (size_t i = 0, max = self->size; i < max; i++) {
@@ -138,52 +135,45 @@ BB_hash_sum(ByteBuf *self)
 }
 
 static INLINE void
-SI_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) 
-{
+SI_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) {
     if (size > self->cap) { S_grow(self, size); }
     memmove(self->buf, bytes, size);
     self->size = size;
 }
 
 void
-BB_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) 
-{
+BB_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) {
     SI_mimic_bytes(self, bytes, size);
 }
 
 void
-BB_mimic(ByteBuf *self, Obj *other)
-{
+BB_mimic(ByteBuf *self, Obj *other) {
     ByteBuf *twin = (ByteBuf*)CERTIFY(other, BYTEBUF);
     SI_mimic_bytes(self, twin->buf, twin->size);
 }
 
-static INLINE void 
-SI_cat_bytes(ByteBuf *self, const void *bytes, size_t size) 
-{
+static INLINE void
+SI_cat_bytes(ByteBuf *self, const void *bytes, size_t size) {
     const size_t new_size = self->size + size;
-    if (new_size > self->cap) { 
-        S_grow(self, Memory_oversize(new_size, sizeof(char))); 
+    if (new_size > self->cap) {
+        S_grow(self, Memory_oversize(new_size, sizeof(char)));
     }
     memcpy((self->buf + self->size), bytes, size);
     self->size = new_size;
 }
 
-void 
-BB_cat_bytes(ByteBuf *self, const void *bytes, size_t size) 
-{
+void
+BB_cat_bytes(ByteBuf *self, const void *bytes, size_t size) {
     SI_cat_bytes(self, bytes, size);
 }
 
-void 
-BB_cat(ByteBuf *self, const ByteBuf *other) 
-{
+void
+BB_cat(ByteBuf *self, const ByteBuf *other) {
     SI_cat_bytes(self, other->buf, other->size);
 }
 
 static void
-S_grow(ByteBuf *self, size_t size)
-{
+S_grow(ByteBuf *self, size_t size) {
     if (size > self->cap) {
         size_t amount    = size;
         size_t remainder = amount % sizeof(int64_t);
@@ -197,22 +187,19 @@ S_grow(ByteBuf *self, size_t size)
 }
 
 char*
-BB_grow(ByteBuf *self, size_t size) 
-{
+BB_grow(ByteBuf *self, size_t size) {
     if (size > self->cap) { S_grow(self, size); }
     return self->buf;
 }
 
 void
-BB_serialize(ByteBuf *self, OutStream *target)
-{
+BB_serialize(ByteBuf *self, OutStream *target) {
     OutStream_Write_C32(target, self->size);
     OutStream_Write_Bytes(target, self->buf, self->size);
 }
 
 ByteBuf*
-BB_deserialize(ByteBuf *self, InStream *instream)
-{
+BB_deserialize(ByteBuf *self, InStream *instream) {
     const size_t size = InStream_Read_C32(instream);
     const size_t capacity = size ? size : sizeof(int64_t);
     self = self ? self : (ByteBuf*)VTable_Make_Obj(BYTEBUF);
@@ -222,9 +209,8 @@ BB_deserialize(ByteBuf *self, InStream *instream)
     return self;
 }
 
-int 
-BB_compare(const void *va, const void *vb) 
-{
+int
+BB_compare(const void *va, const void *vb) {
     const ByteBuf *a = *(const ByteBuf**)va;
     const ByteBuf *b = *(const ByteBuf**)vb;
     const size_t size = a->size < b->size ? a->size : b->size;
@@ -239,8 +225,7 @@ BB_compare(const void *va, const void *vb)
 }
 
 int32_t
-BB_compare_to(ByteBuf *self, Obj *other)
-{
+BB_compare_to(ByteBuf *self, Obj *other) {
     CERTIFY(other, BYTEBUF);
     return BB_compare(&self, &other);
 }
@@ -248,37 +233,32 @@ BB_compare_to(ByteBuf *self, Obj *other)
 /******************************************************************/
 
 ViewByteBuf*
-ViewBB_new(char *buf, size_t size) 
-{
+ViewBB_new(char *buf, size_t size) {
     ViewByteBuf *self = (ViewByteBuf*)VTable_Make_Obj(VIEWBYTEBUF);
     return ViewBB_init(self, buf, size);
 }
 
 ViewByteBuf*
-ViewBB_init(ViewByteBuf *self, char *buf, size_t size) 
-{
+ViewBB_init(ViewByteBuf *self, char *buf, size_t size) {
     self->cap  = 0;
     self->buf  = buf;
     self->size = size;
     return self;
 }
 
-void 
-ViewBB_destroy(ViewByteBuf *self) 
-{
+void
+ViewBB_destroy(ViewByteBuf *self) {
     Obj_destroy((Obj*)self);
 }
 
 void
-ViewBB_assign_bytes(ViewByteBuf *self, char*buf, size_t size) 
-{
+ViewBB_assign_bytes(ViewByteBuf *self, char*buf, size_t size) {
     self->buf  = buf;
     self->size = size;
 }
 
 void
-ViewBB_assign(ViewByteBuf *self, const ByteBuf *other)
-{
+ViewBB_assign(ViewByteBuf *self, const ByteBuf *other) {
     self->buf  = other->buf;
     self->size = other->size;
 }

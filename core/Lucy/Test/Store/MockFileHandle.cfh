@@ -31,7 +31,7 @@ class Lucy::Store::MockFileHandle inherits Lucy::Store::FileHandle {
     bool_t
     Window(MockFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
-    bool_t 
+    bool_t
     Release_Window(MockFileHandle *self, FileWindow *window);
 
     int64_t

@@ -22,17 +22,17 @@ parcel Lucy;
  * searches will be case-insensitive.
  */
 
-class Lucy::Analysis::CaseFolder 
+class Lucy::Analysis::CaseFolder
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     ByteBuf *work_buf;
 
-    inert incremented CaseFolder* 
+    inert incremented CaseFolder*
     new();
 
     /** Constructor.  Takes no arguments.
      */
-    public inert CaseFolder* 
+    public inert CaseFolder*
     init(CaseFolder *self);
 
     public incremented Inversion*

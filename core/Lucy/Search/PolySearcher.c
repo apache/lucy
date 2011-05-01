@@ -34,19 +34,18 @@
 #include "Lucy/Search/Compiler.h"
 
 PolySearcher*
-PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers)
-{
+PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers) {
     const uint32_t num_searchers = VA_Get_Size(searchers);
     uint32_t i;
     int32_t *starts_array = (int32_t*)MALLOCATE(num_searchers * sizeof(int32_t));
-    int32_t doc_max = 0;
+    int32_t  doc_max      = 0;
 
     Searcher_init((Searcher*)self, schema);
     self->searchers = (VArray*)INCREF(searchers);
     self->starts = NULL; // Safe cleanup.
 
     for (i = 0; i < num_searchers; i++) {
-        Searcher *searcher 
+        Searcher *searcher
             = (Searcher*)CERTIFY(VA_Fetch(searchers, i), SEARCHER);
         Schema *candidate    = Searcher_Get_Schema(searcher);
         VTable *orig_vt      = Schema_Get_VTable(schema);
@@ -55,8 +54,8 @@ PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers)
         // Confirm that searchers all use the same schema.
         if (orig_vt != candidate_vt) {
             THROW(ERR, "Conflicting schemas: '%o', '%o'",
-                Schema_Get_Class_Name(schema), 
-                Schema_Get_Class_Name(candidate));
+                  Schema_Get_Class_Name(schema),
+                  Schema_Get_Class_Name(candidate));
         }
 
         // Derive doc_max and relative start offsets.
@@ -71,19 +70,17 @@ PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers)
 }
 
 void
-PolySearcher_destroy(PolySearcher *self)
-{
+PolySearcher_destroy(PolySearcher *self) {
     DECREF(self->searchers);
     DECREF(self->starts);
     SUPER_DESTROY(self, POLYSEARCHER);
 }
 
 HitDoc*
-PolySearcher_fetch_doc(PolySearcher *self, int32_t doc_id)
-{
-    uint32_t    tick       = PolyReader_sub_tick(self->starts, doc_id);
-    Searcher   *searcher   = (Searcher*)VA_Fetch(self->searchers, tick);
-    int32_t     offset     = I32Arr_Get(self->starts, tick);
+PolySearcher_fetch_doc(PolySearcher *self, int32_t doc_id) {
+    uint32_t  tick     = PolyReader_sub_tick(self->starts, doc_id);
+    Searcher *searcher = (Searcher*)VA_Fetch(self->searchers, tick);
+    int32_t   offset   = I32Arr_Get(self->starts, tick);
     if (!searcher) { THROW(ERR, "Invalid doc id: %i32", doc_id); }
     HitDoc *hit_doc = Searcher_Fetch_Doc(searcher, doc_id - offset);
     HitDoc_Set_Doc_ID(hit_doc, doc_id);
@@ -91,25 +88,22 @@ PolySearcher_fetch_doc(PolySearcher *self, int32_t doc_id)
 }
 
 DocVector*
-PolySearcher_fetch_doc_vec(PolySearcher *self, int32_t doc_id)
-{
-    uint32_t    tick       = PolyReader_sub_tick(self->starts, doc_id);
-    Searcher   *searcher   = (Searcher*)VA_Fetch(self->searchers, tick);
-    int32_t     start      = I32Arr_Get(self->starts, tick);
+PolySearcher_fetch_doc_vec(PolySearcher *self, int32_t doc_id) {
+    uint32_t  tick     = PolyReader_sub_tick(self->starts, doc_id);
+    Searcher *searcher = (Searcher*)VA_Fetch(self->searchers, tick);
+    int32_t   start    = I32Arr_Get(self->starts, tick);
     if (!searcher) { THROW(ERR, "Invalid doc id: %i32", doc_id); }
     return Searcher_Fetch_Doc_Vec(searcher, doc_id - start);
 }
 
-int32_t 
-PolySearcher_doc_max(PolySearcher *self)
-{
+int32_t
+PolySearcher_doc_max(PolySearcher *self) {
     return self->doc_max;
 }
 
 uint32_t
-PolySearcher_doc_freq(PolySearcher *self, const CharBuf *field, Obj *term)
-{
-    uint32_t i, max; 
+PolySearcher_doc_freq(PolySearcher *self, const CharBuf *field, Obj *term) {
+    uint32_t i, max;
     uint32_t doc_freq = 0;
     for (i = 0, max = VA_Get_Size(self->searchers); i < max; i++) {
         Searcher *searcher = (Searcher*)VA_Fetch(self->searchers, i);
@@ -119,38 +113,36 @@ PolySearcher_doc_freq(PolySearcher *self, const CharBuf *field, Obj *term)
 }
 
 static void
-S_modify_doc_ids(VArray *match_docs, int32_t base)
-{
+S_modify_doc_ids(VArray *match_docs, int32_t base) {
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(match_docs); i < max; i++) {
         MatchDoc *match_doc = (MatchDoc*)VA_Fetch(match_docs, i);
-        int32_t new_doc_id = MatchDoc_Get_Doc_ID(match_doc) + base;
+        int32_t  new_doc_id = MatchDoc_Get_Doc_ID(match_doc) + base;
         MatchDoc_Set_Doc_ID(match_doc, new_doc_id);
     }
 }
 
 TopDocs*
 PolySearcher_top_docs(PolySearcher *self, Query *query, uint32_t num_wanted,
-                      SortSpec *sort_spec)
-{
+                      SortSpec *sort_spec) {
     Schema   *schema      = PolySearcher_Get_Schema(self);
     VArray   *searchers   = self->searchers;
     I32Array *starts      = self->starts;
-    HitQueue *hit_q       = sort_spec 
-                          ? HitQ_new(schema, sort_spec, num_wanted)
-                          : HitQ_new(NULL, NULL, num_wanted);
+    HitQueue *hit_q       = sort_spec
+                            ? HitQ_new(schema, sort_spec, num_wanted)
+                            : HitQ_new(NULL, NULL, num_wanted);
     uint32_t  total_hits  = 0;
-    Compiler *compiler    = Query_Is_A(query, COMPILER) 
-                          ? ((Compiler*)INCREF(query))
-                          : Query_Make_Compiler(query, (Searcher*)self,
-                                Query_Get_Boost(query));
+    Compiler *compiler    = Query_Is_A(query, COMPILER)
+                            ? ((Compiler*)INCREF(query))
+                            : Query_Make_Compiler(query, (Searcher*)self,
+                                                  Query_Get_Boost(query));
     uint32_t i, max;
 
     for (i = 0, max = VA_Get_Size(searchers); i < max; i++) {
         Searcher   *searcher   = (Searcher*)VA_Fetch(searchers, i);
         int32_t     base       = I32Arr_Get(starts, i);
-        TopDocs    *top_docs   = Searcher_Top_Docs(searcher, 
-            (Query*)compiler, num_wanted, sort_spec);
+        TopDocs    *top_docs   = Searcher_Top_Docs(searcher, (Query*)compiler,
+                                                   num_wanted, sort_spec);
         VArray     *sub_match_docs = TopDocs_Get_Match_Docs(top_docs);
         uint32_t j, jmax;
 
@@ -178,13 +170,12 @@ PolySearcher_top_docs(PolySearcher *self, Query *query, uint32_t num_wanted,
 
 
 void
-PolySearcher_collect(PolySearcher *self, Query *query, 
-                     Collector *collector)
-{
+PolySearcher_collect(PolySearcher *self, Query *query,
+                     Collector *collector) {
     uint32_t i, max;
     VArray *const searchers = self->searchers;
     I32Array *starts = self->starts;
-    
+
     for (i = 0, max = VA_Get_Size(searchers); i < max; i++) {
         int32_t start = I32Arr_Get(starts, i);
         Searcher *searcher = (Searcher*)VA_Fetch(searchers, i);

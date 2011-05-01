@@ -37,7 +37,7 @@ class Lucy::Index::TermInfo cnick TInfo inherits Lucy::Object::Obj {
     inert incremented TermInfo*
     new(int32_t doc_freq = 0);
 
-    inert TermInfo* 
+    inert TermInfo*
     init(TermInfo *self, int32_t doc_freq = 0);
 
     public int32_t

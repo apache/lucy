@@ -36,35 +36,31 @@ S_lazy_init(DocWriter *self);
 int32_t DocWriter_current_file_format = 2;
 
 DocWriter*
-DocWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment, 
-              PolyReader *polyreader)
-{
+DocWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
+              PolyReader *polyreader) {
     DocWriter *self = (DocWriter*)VTable_Make_Obj(DOCWRITER);
     return DocWriter_init(self, schema, snapshot, segment, polyreader);
 }
 
 DocWriter*
 DocWriter_init(DocWriter *self, Schema *schema, Snapshot *snapshot,
-               Segment *segment, PolyReader *polyreader)
-{
+               Segment *segment, PolyReader *polyreader) {
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
     return self;
 }
 
 void
-DocWriter_destroy(DocWriter *self)
-{
+DocWriter_destroy(DocWriter *self) {
     DECREF(self->dat_out);
     DECREF(self->ix_out);
     SUPER_DESTROY(self, DOCWRITER);
 }
 
 static OutStream*
-S_lazy_init(DocWriter *self) 
-{
+S_lazy_init(DocWriter *self) {
     if (!self->dat_out) {
-        Folder   *folder    = self->folder;
-        CharBuf  *seg_name  = Seg_Get_Name(self->segment);
+        Folder  *folder   = self->folder;
+        CharBuf *seg_name = Seg_Get_Name(self->segment);
 
         // Get streams.
         {
@@ -88,14 +84,13 @@ S_lazy_init(DocWriter *self)
 }
 
 void
-DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter, 
-                           int32_t doc_id)
-{
-    OutStream *dat_out         = S_lazy_init(self);
-    OutStream *ix_out          = self->ix_out;
-    uint32_t   num_stored      = 0;
-    int64_t    start           = OutStream_Tell(dat_out);
-    int64_t    expected        = OutStream_Tell(ix_out) / 8;
+DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
+                           int32_t doc_id) {
+    OutStream *dat_out    = S_lazy_init(self);
+    OutStream *ix_out     = self->ix_out;
+    uint32_t   num_stored = 0;
+    int64_t    start      = OutStream_Tell(dat_out);
+    int64_t    expected   = OutStream_Tell(ix_out) / 8;
 
     // Verify doc id.
     if (doc_id != expected) {
@@ -127,9 +122,8 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
 }
 
 void
-DocWriter_add_segment(DocWriter *self, SegReader *reader, 
-                      I32Array *doc_map)
-{
+DocWriter_add_segment(DocWriter *self, SegReader *reader,
+                      I32Array *doc_map) {
     int32_t doc_max = SegReader_Doc_Max(reader);
 
     if (doc_max == 0) {
@@ -137,12 +131,13 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
         return;
     }
     else {
-        OutStream     *const dat_out    = S_lazy_init(self);
-        OutStream     *const ix_out     = self->ix_out;
-        ByteBuf       *const buffer     = BB_new(0);
-        DefaultDocReader *const doc_reader = (DefaultDocReader*)CERTIFY(
-            SegReader_Obtain(reader, VTable_Get_Name(DOCREADER)), 
-                DEFAULTDOCREADER);
+        OutStream *const dat_out = S_lazy_init(self);
+        OutStream *const ix_out  = self->ix_out;
+        ByteBuf   *const buffer  = BB_new(0);
+        DefaultDocReader *const doc_reader
+            = (DefaultDocReader*)CERTIFY(
+                  SegReader_Obtain(reader, VTable_Get_Name(DOCREADER)),
+                  DEFAULTDOCREADER);
         int32_t i, max;
 
         for (i = 1, max = SegReader_Doc_Max(reader); i <= max; i++) {
@@ -167,25 +162,23 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
 }
 
 void
-DocWriter_finish(DocWriter *self)
-{
+DocWriter_finish(DocWriter *self) {
     if (self->dat_out) {
         // Write one final file pointer, so that we can derive the length of
         // the last record.
         int64_t end = OutStream_Tell(self->dat_out);
         OutStream_Write_I64(self->ix_out, end);
-        
+
         // Close down output streams.
         OutStream_Close(self->dat_out);
         OutStream_Close(self->ix_out);
-        Seg_Store_Metadata_Str(self->segment, "documents", 9, 
-            (Obj*)DocWriter_Metadata(self));
+        Seg_Store_Metadata_Str(self->segment, "documents", 9,
+                               (Obj*)DocWriter_Metadata(self));
     }
 }
 
 int32_t
-DocWriter_format(DocWriter *self)
-{
+DocWriter_format(DocWriter *self) {
     UNUSED_VAR(self);
     return DocWriter_current_file_format;
 }

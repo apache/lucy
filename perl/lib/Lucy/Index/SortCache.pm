@@ -31,10 +31,11 @@ value(self, ...)
 CODE:
 {
     int32_t ord = 0;
-    chy_bool_t args_ok = XSBind_allot_params(
-        &(ST(0)), 1, items, "Lucy::Index::SortCache::value_PARAMS",
-        ALLOT_I32(&ord, "ord", 3, false),
-        NULL);
+    chy_bool_t args_ok
+        = XSBind_allot_params(&(ST(0)), 1, items,
+                              "Lucy::Index::SortCache::value_PARAMS",
+                              ALLOT_I32(&ord, "ord", 3, false),
+                              NULL);
     if (!args_ok) {
         CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }

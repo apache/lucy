@@ -32,7 +32,7 @@ extern "C" {
  * @param charmony_start Code to prepend onto the front of charmony.h
  */
 void
-chaz_Probe_init(const char *cc_command, const char *cc_flags, 
+chaz_Probe_init(const char *cc_command, const char *cc_flags,
                 const char *charmony_start);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This

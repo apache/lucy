@@ -26,12 +26,12 @@ class Lucy::Search::RequiredOptionalMatcher cnick ReqOptMatcher
     Matcher      *opt_matcher;
     bool_t        opt_matcher_first_time;
 
-    inert incremented RequiredOptionalMatcher* 
-    new(Similarity *similarity, Matcher *required_matcher, 
+    inert incremented RequiredOptionalMatcher*
+    new(Similarity *similarity, Matcher *required_matcher,
         Matcher *optional_matcher);
 
-    inert RequiredOptionalMatcher* 
-    init(RequiredOptionalMatcher *self, Similarity *similarity, 
+    inert RequiredOptionalMatcher*
+    init(RequiredOptionalMatcher *self, Similarity *similarity,
          Matcher *required_matcher, Matcher *optional_matcher);
 
     public void
@@ -46,7 +46,7 @@ class Lucy::Search::RequiredOptionalMatcher cnick ReqOptMatcher
     public float
     Score(RequiredOptionalMatcher *self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(RequiredOptionalMatcher *self);
 }
 

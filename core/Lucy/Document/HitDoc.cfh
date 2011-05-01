@@ -27,7 +27,7 @@ class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
 
     float score;
 
-    inert incremented HitDoc* 
+    inert incremented HitDoc*
     new(void *fields = NULL, int32_t doc_id = 0, float score = 0.0);
 
     /** Constructor.
@@ -36,8 +36,8 @@ class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
      * @param doc_id Internal document id.
      * @param score Number indicating how well the doc scored against a query.
      */
-    inert HitDoc* 
-    init(HitDoc *self, void *fields = NULL, int32_t doc_id = 0, 
+    inert HitDoc*
+    init(HitDoc *self, void *fields = NULL, int32_t doc_id = 0,
          float score = 0.0);
 
     /** Set score attribute.

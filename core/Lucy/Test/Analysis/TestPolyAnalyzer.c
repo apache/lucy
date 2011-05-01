@@ -27,8 +27,7 @@
 #include "Lucy/Analysis/RegexTokenizer.h"
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
+test_Dump_Load_and_Equals(TestBatch *batch) {
     CharBuf      *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2);
     CharBuf      *ES          = (CharBuf*)ZCB_WRAP_STR("es", 2);
     PolyAnalyzer *analyzer    = PolyAnalyzer_new(EN, NULL);
@@ -36,15 +35,15 @@ test_Dump_Load_and_Equals(TestBatch *batch)
     Obj          *dump        = (Obj*)PolyAnalyzer_Dump(analyzer);
     Obj          *other_dump  = (Obj*)PolyAnalyzer_Dump(other);
     PolyAnalyzer *clone       = (PolyAnalyzer*)PolyAnalyzer_Load(other, dump);
-    PolyAnalyzer *other_clone 
+    PolyAnalyzer *other_clone
         = (PolyAnalyzer*)PolyAnalyzer_Load(other, other_dump);
 
-    TEST_FALSE(batch, PolyAnalyzer_Equals(analyzer,
-        (Obj*)other), "Equals() false with different language");
-    TEST_TRUE(batch, PolyAnalyzer_Equals(analyzer,
-        (Obj*)clone), "Dump => Load round trip");
-    TEST_TRUE(batch, PolyAnalyzer_Equals(other,
-        (Obj*)other_clone), "Dump => Load round trip");
+    TEST_FALSE(batch, PolyAnalyzer_Equals(analyzer, (Obj*)other),
+               "Equals() false with different language");
+    TEST_TRUE(batch, PolyAnalyzer_Equals(analyzer, (Obj*)clone),
+              "Dump => Load round trip");
+    TEST_TRUE(batch, PolyAnalyzer_Equals(other, (Obj*)other_clone),
+              "Dump => Load round trip");
 
     DECREF(analyzer);
     DECREF(dump);
@@ -55,8 +54,7 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 static void
-test_analysis(TestBatch *batch)
-{
+test_analysis(TestBatch *batch) {
     CharBuf            *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2);
     CharBuf            *source_text = CB_newf("Eats, shoots and leaves.");
     CaseFolder         *case_folder = CaseFolder_new();
@@ -70,7 +68,7 @@ test_analysis(TestBatch *batch)
         VArray       *expected     = VA_new(1);
         VA_Push(expected, INCREF(source_text));
         TestUtils_test_analyzer(batch, (Analyzer*)polyanalyzer, source_text,
-            expected, "No sub analyzers");
+                                expected, "No sub analyzers");
         DECREF(expected);
         DECREF(polyanalyzer);
         DECREF(analyzers);
@@ -78,12 +76,12 @@ test_analysis(TestBatch *batch)
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder)); 
+        VA_Push(analyzers, INCREF(case_folder));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
         VA_Push(expected, (Obj*)CB_newf("eats, shoots and leaves."));
         TestUtils_test_analyzer(batch, (Analyzer*)polyanalyzer, source_text,
-            expected, "With CaseFolder");
+                                expected, "With CaseFolder");
         DECREF(expected);
         DECREF(polyanalyzer);
         DECREF(analyzers);
@@ -91,8 +89,8 @@ test_analysis(TestBatch *batch)
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder)); 
-        VA_Push(analyzers, INCREF(tokenizer)); 
+        VA_Push(analyzers, INCREF(case_folder));
+        VA_Push(analyzers, INCREF(tokenizer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
         VA_Push(expected, (Obj*)CB_newf("eats"));
@@ -100,7 +98,7 @@ test_analysis(TestBatch *batch)
         VA_Push(expected, (Obj*)CB_newf("and"));
         VA_Push(expected, (Obj*)CB_newf("leaves"));
         TestUtils_test_analyzer(batch, (Analyzer*)polyanalyzer, source_text,
-            expected, "With RegexTokenizer");
+                                expected, "With RegexTokenizer");
         DECREF(expected);
         DECREF(polyanalyzer);
         DECREF(analyzers);
@@ -108,16 +106,16 @@ test_analysis(TestBatch *batch)
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder)); 
-        VA_Push(analyzers, INCREF(tokenizer)); 
-        VA_Push(analyzers, INCREF(stopfilter)); 
+        VA_Push(analyzers, INCREF(case_folder));
+        VA_Push(analyzers, INCREF(tokenizer));
+        VA_Push(analyzers, INCREF(stopfilter));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
         VA_Push(expected, (Obj*)CB_newf("eats"));
         VA_Push(expected, (Obj*)CB_newf("shoots"));
         VA_Push(expected, (Obj*)CB_newf("leaves"));
         TestUtils_test_analyzer(batch, (Analyzer*)polyanalyzer, source_text,
-            expected, "With SnowballStopFilter");
+                                expected, "With SnowballStopFilter");
         DECREF(expected);
         DECREF(polyanalyzer);
         DECREF(analyzers);
@@ -125,17 +123,17 @@ test_analysis(TestBatch *batch)
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder)); 
-        VA_Push(analyzers, INCREF(tokenizer)); 
-        VA_Push(analyzers, INCREF(stopfilter)); 
-        VA_Push(analyzers, INCREF(stemmer)); 
+        VA_Push(analyzers, INCREF(case_folder));
+        VA_Push(analyzers, INCREF(tokenizer));
+        VA_Push(analyzers, INCREF(stopfilter));
+        VA_Push(analyzers, INCREF(stemmer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
         VA_Push(expected, (Obj*)CB_newf("eat"));
         VA_Push(expected, (Obj*)CB_newf("shoot"));
         VA_Push(expected, (Obj*)CB_newf("leav"));
         TestUtils_test_analyzer(batch, (Analyzer*)polyanalyzer, source_text,
-            expected, "With SnowballStemmer");
+                                expected, "With SnowballStemmer");
         DECREF(expected);
         DECREF(polyanalyzer);
         DECREF(analyzers);
@@ -149,19 +147,17 @@ test_analysis(TestBatch *batch)
 }
 
 static void
-test_Get_Analyzers(TestBatch *batch)
-{
+test_Get_Analyzers(TestBatch *batch) {
     VArray *analyzers = VA_new(0);
     PolyAnalyzer *analyzer = PolyAnalyzer_new(NULL, analyzers);
     TEST_TRUE(batch, PolyAnalyzer_Get_Analyzers(analyzer) == analyzers,
-        "Get_Analyzers()");
+              "Get_Analyzers()");
     DECREF(analyzer);
     DECREF(analyzers);
 }
 
 void
-TestPolyAnalyzer_run_tests()
-{
+TestPolyAnalyzer_run_tests() {
     TestBatch *batch = TestBatch_new(19);
 
     TestBatch_Plan(batch);

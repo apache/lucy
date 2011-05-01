@@ -45,15 +45,15 @@ PPCODE:
     if (items < 2 || !SvTRUE(ST(1))) {
         SV *retval;
         lucy_ByteBuf *serialized_bb;
-        lucy_RAMFileHandle *file_handle = lucy_RAMFH_open(NULL, 
-            LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
+        lucy_RAMFileHandle *file_handle
+            = lucy_RAMFH_open(NULL, LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
         lucy_OutStream *target = lucy_OutStream_open((lucy_Obj*)file_handle);
 
         Lucy_Obj_Serialize(self, target);
 
         Lucy_OutStream_Close(target);
-        serialized_bb = Lucy_RAMFile_Get_Contents(
-            Lucy_RAMFH_Get_File(file_handle));
+        serialized_bb
+            = Lucy_RAMFile_Get_Contents(Lucy_RAMFH_Get_File(file_handle));
         retval = XSBind_bb_to_sv(serialized_bb);
         LUCY_DECREF(file_handle);
         LUCY_DECREF(target);
@@ -82,15 +82,15 @@ STORABLE_thaw(blank_obj, cloning, serialized_sv)
 PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
-    lucy_ZombieCharBuf *klass 
+    lucy_ZombieCharBuf *klass
         = CFISH_ZCB_WRAP_STR(class_name, strlen(class_name));
-    lucy_VTable *vtable = (lucy_VTable*)lucy_VTable_singleton(
-        (lucy_CharBuf*)klass, NULL);
+    lucy_VTable *vtable
+        = (lucy_VTable*)lucy_VTable_singleton((lucy_CharBuf*)klass, NULL);
     STRLEN len;
     char *ptr = SvPV(serialized_sv, len);
     lucy_ViewByteBuf *contents = lucy_ViewBB_new(ptr, len);
     lucy_RAMFile *ram_file = lucy_RAMFile_new((lucy_ByteBuf*)contents, true);
-    lucy_RAMFileHandle *file_handle 
+    lucy_RAMFileHandle *file_handle
         = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
     lucy_InStream *instream = lucy_InStream_open((lucy_Obj*)file_handle);
     lucy_Obj *self = Lucy_VTable_Foster_Obj(vtable, blank_obj);

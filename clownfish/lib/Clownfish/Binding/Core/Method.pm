@@ -59,8 +59,7 @@ sub _virtual_method_def {
     return <<END_STUFF;
 extern size_t $full_offset_sym;
 static CHY_INLINE $return_type
-$full_method_sym($params)
-{
+$full_method_sym($params) {
     char *const method_address = *(char**)self + $full_offset_sym;
     const $typedef method = *(($typedef*)method_address);
     ${maybe_return}method(($common_struct*)$arg_names);
@@ -205,8 +204,7 @@ sub _invalid_callback_def {
     }
     return <<END_CALLBACK_DEF;
 void
-$override_sym($params)
-{
+$override_sym($params) {
     $unused;
     CFISH_THROW(CFISH_ERR, "Can't override $full_method_sym via binding");
 }
@@ -220,8 +218,7 @@ sub _void_callback_def {
     my $params       = $method->get_param_list->to_c;
     return <<END_CALLBACK_DEF;
 void
-$override_sym($params)
-{
+$override_sym($params) {
     cfish_Host_callback($callback_params);
 }
 END_CALLBACK_DEF
@@ -241,8 +238,7 @@ sub _primitive_callback_def {
         :   confess("unrecognized type: $return_type_str");
     return <<END_CALLBACK_DEF;
 $return_type_str
-$override_sym($params)
-{
+$override_sym($params) {
     return ($return_type_str)$nat_func($callback_params);
 }
 END_CALLBACK_DEF
@@ -277,8 +273,7 @@ sub _obj_callback_def {
 
     return <<END_CALLBACK_DEF;
 $return_type_str
-$override_sym($params)
-{
+$override_sym($params) {
     $return_type_str retval = ($return_type_str)$cb_func_name($callback_params);
     ${nullable_check}${decrement}return retval;
 }
@@ -312,8 +307,7 @@ sub abstract_method_def {
 
     return <<END_ABSTRACT_DEF;
 $return_type_str
-$full_func_sym($params)
-{
+$full_func_sym($params) {
     cfish_CharBuf *klass = self ? Cfish_Obj_Get_Class_Name((cfish_Obj*)self) : $vtable->name;$unused
     CFISH_THROW(CFISH_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
 }

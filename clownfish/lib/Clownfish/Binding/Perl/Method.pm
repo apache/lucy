@@ -167,8 +167,7 @@ sub _xsub_def_positional_args {
 
     return <<END_STUFF;
 XS($c_name);
-XS($c_name)
-{
+XS($c_name) {
     dXSARGS;
     CHY_UNUSED_VAR(cv);
     SP -= items;
@@ -204,8 +203,7 @@ sub _xsub_def_labeled_params {
 
     return <<END_STUFF;
 XS($c_name);
-XS($c_name)
-{
+XS($c_name) {
     dXSARGS;
     CHY_UNUSED_VAR(cv);
     $num_args_check;

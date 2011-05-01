@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Plan::TextType inherits Lucy::Plan::FieldType { 
+class Lucy::Plan::TextType inherits Lucy::Plan::FieldType {
     incremented CharBuf*
     Make_Blank(TextType *self);
 
@@ -25,7 +25,7 @@ class Lucy::Plan::TextType inherits Lucy::Plan::FieldType {
 
     int8_t
     Primitive_ID(TextType *self);
-} 
+}
 
 class Lucy::Index::TermStepper::TextTermStepper
     inherits Lucy::Index::TermStepper {
@@ -36,7 +36,7 @@ class Lucy::Index::TermStepper::TextTermStepper
     inert TextTermStepper*
     init(TextTermStepper *self);
 
-    public void 
+    public void
     Reset(TextTermStepper *self);
 
     /**

@@ -37,7 +37,7 @@ class Lucy::Object::LockFreeRegistry cnick LFReg inherits Lucy::Object::Obj {
 
     nullable Obj*
     Fetch(LockFreeRegistry *self, Obj *key);
-    
+
     void*
     To_Host(LockFreeRegistry *self);
 }

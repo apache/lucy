@@ -29,8 +29,7 @@
 #include "Lucy/Util/Freezer.h"
 
 PolyQuery*
-PolyQuery_init(PolyQuery *self, VArray *children)
-{
+PolyQuery_init(PolyQuery *self, VArray *children) {
     uint32_t i;
     const uint32_t num_kids = children ? VA_Get_Size(children) : 0;
     Query_init((Query*)self, 1.0f);
@@ -42,33 +41,31 @@ PolyQuery_init(PolyQuery *self, VArray *children)
 }
 
 void
-PolyQuery_destroy(PolyQuery *self)
-{
+PolyQuery_destroy(PolyQuery *self) {
     DECREF(self->children);
     SUPER_DESTROY(self, POLYQUERY);
 }
 
 void
-PolyQuery_add_child(PolyQuery *self, Query *query)
-{
+PolyQuery_add_child(PolyQuery *self, Query *query) {
     CERTIFY(query, QUERY);
     VA_Push(self->children, INCREF(query));
 }
 
 void
-PolyQuery_set_children(PolyQuery *self, VArray *children)
-{
+PolyQuery_set_children(PolyQuery *self, VArray *children) {
     DECREF(self->children);
     self->children = (VArray*)INCREF(children);
 }
 
 VArray*
-PolyQuery_get_children(PolyQuery *self) { return self->children; }
+PolyQuery_get_children(PolyQuery *self) {
+    return self->children;
+}
 
 void
-PolyQuery_serialize(PolyQuery *self, OutStream *outstream)
-{
-    const uint32_t num_kids =  VA_Get_Size(self->children);
+PolyQuery_serialize(PolyQuery *self, OutStream *outstream) {
+    const uint32_t num_kids = VA_Get_Size(self->children);
     uint32_t i;
     OutStream_Write_F32(outstream, self->boost);
     OutStream_Write_U32(outstream, num_kids);
@@ -79,10 +76,9 @@ PolyQuery_serialize(PolyQuery *self, OutStream *outstream)
 }
 
 PolyQuery*
-PolyQuery_deserialize(PolyQuery *self, InStream *instream)
-{
-    float boost          = InStream_Read_F32(instream);
-    uint32_t num_children   = InStream_Read_U32(instream);
+PolyQuery_deserialize(PolyQuery *self, InStream *instream) {
+    float    boost        = InStream_Read_F32(instream);
+    uint32_t num_children = InStream_Read_U32(instream);
 
     if (!self) THROW(ERR, "Abstract class");
     PolyQuery_init(self, NULL);
@@ -97,8 +93,7 @@ PolyQuery_deserialize(PolyQuery *self, InStream *instream)
 }
 
 bool_t
-PolyQuery_equals(PolyQuery *self, Obj *other)
-{
+PolyQuery_equals(PolyQuery *self, Obj *other) {
     PolyQuery *twin = (PolyQuery*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, POLYQUERY)) return false;
@@ -111,9 +106,8 @@ PolyQuery_equals(PolyQuery *self, Obj *other)
 
 
 PolyCompiler*
-PolyCompiler_init(PolyCompiler *self, PolyQuery *parent, 
-                  Searcher *searcher, float boost)
-{
+PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
+                  Searcher *searcher, float boost) {
     uint32_t i;
     const uint32_t num_kids = VA_Get_Size(parent->children);
 
@@ -124,24 +118,22 @@ PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
     for (i = 0; i < num_kids; i++) {
         Query *child_query = (Query*)VA_Fetch(parent->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
-        VA_Push(self->children, 
-            (Obj*)Query_Make_Compiler(child_query, searcher, sub_boost));
+        VA_Push(self->children,
+                (Obj*)Query_Make_Compiler(child_query, searcher, sub_boost));
     }
 
     return self;
 }
 
 void
-PolyCompiler_destroy(PolyCompiler *self)
-{
+PolyCompiler_destroy(PolyCompiler *self) {
     DECREF(self->children);
     SUPER_DESTROY(self, POLYCOMPILER);
 }
 
 float
-PolyCompiler_sum_of_squared_weights(PolyCompiler *self)
-{
-    float sum = 0;
+PolyCompiler_sum_of_squared_weights(PolyCompiler *self) {
+    float sum      = 0;
     uint32_t i, max;
     float my_boost = PolyCompiler_Get_Boost(self);
 
@@ -157,8 +149,7 @@ PolyCompiler_sum_of_squared_weights(PolyCompiler *self)
 }
 
 void
-PolyCompiler_apply_norm_factor(PolyCompiler *self, float factor)
-{
+PolyCompiler_apply_norm_factor(PolyCompiler *self, float factor) {
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(self->children); i < max; i++) {
         Compiler *child = (Compiler*)VA_Fetch(self->children, i);
@@ -167,15 +158,14 @@ PolyCompiler_apply_norm_factor(PolyCompiler *self, float factor)
 }
 
 VArray*
-PolyCompiler_highlight_spans(PolyCompiler *self, Searcher *searcher, 
-                            DocVector *doc_vec, const CharBuf *field)
-{
+PolyCompiler_highlight_spans(PolyCompiler *self, Searcher *searcher,
+                             DocVector *doc_vec, const CharBuf *field) {
     VArray *spans = VA_new(0);
     uint32_t i, max;
     for (i = 0, max = VA_Get_Size(self->children); i < max; i++) {
         Compiler *child = (Compiler*)VA_Fetch(self->children, i);
         VArray *child_spans = Compiler_Highlight_Spans(child, searcher,
-            doc_vec, field);
+                                                       doc_vec, field);
         if (child_spans) {
             VA_Push_VArray(spans, child_spans);
             VA_Dec_RefCount(child_spans);
@@ -185,16 +175,14 @@ PolyCompiler_highlight_spans(PolyCompiler *self, Searcher *searcher,
 }
 
 void
-PolyCompiler_serialize(PolyCompiler *self, OutStream *outstream)
-{
+PolyCompiler_serialize(PolyCompiler *self, OutStream *outstream) {
     CB_Serialize(PolyCompiler_Get_Class_Name(self), outstream);
     VA_Serialize(self->children, outstream);
     Compiler_serialize((Compiler*)self, outstream);
 }
 
 PolyCompiler*
-PolyCompiler_deserialize(PolyCompiler *self, InStream *instream)
-{
+PolyCompiler_deserialize(PolyCompiler *self, InStream *instream) {
     CharBuf *class_name = CB_deserialize(NULL, instream);
     if (!self) {
         VTable *vtable = VTable_singleton(class_name, NULL);

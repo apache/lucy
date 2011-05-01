@@ -36,7 +36,7 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     OutStream  *temp_ix_out;
     OutStream  *temp_dat_out;
     MemoryPool *mem_pool;
-    size_t      mem_thresh;  
+    size_t      mem_thresh;
     bool_t      flush_at_finish;
 
     inert int32_t current_file_format;
@@ -45,7 +45,7 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     new(Schema *schema, Snapshot *snapshot, Segment *segment,
         PolyReader *polyreader);
 
-    inert SortWriter* 
+    inert SortWriter*
     init(SortWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader);
 
@@ -57,8 +57,8 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     Add_Inverted_Doc(SortWriter *self, Inverter *inverter, int32_t doc_id);
 
     public void
-    Add_Segment(SortWriter *self, SegReader *reader, 
-                I32Array *doc_map = NULL); 
+    Add_Segment(SortWriter *self, SegReader *reader,
+                I32Array *doc_map = NULL);
 
     public incremented Hash*
     Metadata(SortWriter *self);

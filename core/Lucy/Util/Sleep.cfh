@@ -19,7 +19,7 @@ parcel Lucy;
 /** Provide platform-compatible sleep() functions.
  */
 inert class Lucy::Util::Sleep {
-    
+
     /** Sleep for <code>seconds</code> seconds.
      */
     inert void

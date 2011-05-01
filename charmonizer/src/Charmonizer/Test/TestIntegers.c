@@ -26,16 +26,14 @@
 #endif
 
 TestBatch*
-TestIntegers_prepare()
-{
+TestIntegers_prepare() {
     return Test_new_batch("Integers", 37, TestIntegers_run);
 }
 
 void
-TestIntegers_run(TestBatch *batch)
-{
+TestIntegers_run(TestBatch *batch) {
     {
-        long one= 1;
+        long one = 1;
         long big_endian = !(*((char *)(&one)));
 #ifdef BIG_END
         TEST_TRUE(batch, big_endian, "BIG_END");
@@ -47,7 +45,7 @@ TestIntegers_run(TestBatch *batch)
  #endif
 #endif
     }
-    
+
     TEST_INT_EQ(batch, SIZEOF_CHAR,  sizeof(char),  "SIZEOF_CHAR");
     TEST_INT_EQ(batch, SIZEOF_SHORT, sizeof(short), "SIZEOF_SHORT");
     TEST_INT_EQ(batch, SIZEOF_INT,   sizeof(int),   "SIZEOF_INT");
@@ -55,10 +53,10 @@ TestIntegers_run(TestBatch *batch)
     TEST_INT_EQ(batch, SIZEOF_PTR,   sizeof(void*), "SIZEOF_PTR");
 
 #ifdef HAS_LONG_LONG
-    TEST_INT_EQ(batch, SIZEOF_LONG_LONG, sizeof(long long), 
-        "HAS_LONG_LONG and SIZEOF_LONG_LONG");
+    TEST_INT_EQ(batch, SIZEOF_LONG_LONG, sizeof(long long),
+                "HAS_LONG_LONG and SIZEOF_LONG_LONG");
 #endif
-    
+
 #ifdef HAS_INTTYPES_H
     TEST_INT_EQ(batch, sizeof(int8_t), 1, "HAS_INTTYPES_H");
 #else
@@ -116,8 +114,8 @@ TestIntegers_run(TestBatch *batch)
         int64_t foo = -100;
         uint64_t bar = U64_C(18000000000000000000);
         TEST_TRUE(batch, (foo == -100), "int64_t is signed");
-        TEST_TRUE(batch, (bar == U64_C(18000000000000000000)), 
-            "uint64_t is unsigned");
+        TEST_TRUE(batch, (bar == U64_C(18000000000000000000)),
+                  "uint64_t is unsigned");
         TEST_TRUE(batch, (sizeof(int64_t) == 8), "int64_t is 8 bytes");
         TEST_TRUE(batch, (sizeof(uint64_t) == 8), "uint64_t is 8 bytes");
         sprintf(buf, "%"I64P, foo);

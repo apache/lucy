@@ -51,8 +51,7 @@ cfish_XSBind_new_blank_obj(SV *either_sv);
  * own.
  */
 static CHY_INLINE chy_bool_t
-cfish_XSBind_sv_defined(SV *sv)
-{
+cfish_XSBind_sv_defined(SV *sv) {
     if (!sv || !SvANY(sv)) { return false; }
     if (SvGMAGICAL(sv)) { mg_get(sv); }
     return SvOK(sv);
@@ -83,8 +82,7 @@ cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
  * responsibility.
  */
 static CHY_INLINE SV*
-cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj)
-{
+cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj) {
     return obj ? (SV*)Cfish_Obj_To_Host(obj) : newSV(0);
 }
 
@@ -97,8 +95,7 @@ cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj)
  * refcount, e.g.  a call to a constructor.
  */
 static CHY_INLINE SV*
-cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj)
-{
+cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
     SV *retval;
     if (obj) {
         retval = (SV*)Cfish_Obj_To_Host(obj);
@@ -205,8 +202,8 @@ cfish_XSBind_enable_overload(void *pobj);
  * @return true on success, false on failure (sets Err_error).
  */
 chy_bool_t
-cfish_XSBind_allot_params(SV** stack, int32_t start, 
-                          int32_t num_stack_elems, 
+cfish_XSBind_allot_params(SV** stack, int32_t start,
+                          int32_t num_stack_elems,
                           char* params_hash_name, ...);
 
 #define XSBIND_WANT_I8       0x1
@@ -220,8 +217,8 @@ cfish_XSBind_allot_params(SV** stack, int32_t start,
 #define XSBIND_WANT_BOOL     0x9
 #define XSBIND_WANT_F32      0xA
 #define XSBIND_WANT_F64      0xB
-#define XSBIND_WANT_OBJ      0xC 
-#define XSBIND_WANT_SV       0xD 
+#define XSBIND_WANT_OBJ      0xC
+#define XSBIND_WANT_SV       0xD
 
 #if (CHY_SIZEOF_CHAR == 1)
   #define XSBIND_WANT_CHAR XSBIND_WANT_I8
@@ -310,11 +307,11 @@ cfish_XSBind_allot_params(SV** stack, int32_t start,
 #define XSBind_allot_params            cfish_XSBind_allot_params
 #define ALLOT_I8                       XSBIND_ALLOT_I8
 #define ALLOT_I16                      XSBIND_ALLOT_I16
-#define ALLOT_I32                      XSBIND_ALLOT_I32 
+#define ALLOT_I32                      XSBIND_ALLOT_I32
 #define ALLOT_I64                      XSBIND_ALLOT_I64
 #define ALLOT_U8                       XSBIND_ALLOT_U8
 #define ALLOT_U16                      XSBIND_ALLOT_U16
-#define ALLOT_U32                      XSBIND_ALLOT_U32 
+#define ALLOT_U32                      XSBIND_ALLOT_U32
 #define ALLOT_U64                      XSBIND_ALLOT_U64
 #define ALLOT_BOOL                     XSBIND_ALLOT_BOOL
 #define ALLOT_CHAR                     XSBIND_ALLOT_CHAR
@@ -322,7 +319,7 @@ cfish_XSBind_allot_params(SV** stack, int32_t start,
 #define ALLOT_INT                      XSBIND_ALLOT_INT
 #define ALLOT_LONG                     XSBIND_ALLOT_LONG
 #define ALLOT_SIZE_T                   XSBIND_ALLOT_SIZE_T
-#define ALLOT_F32                      XSBIND_ALLOT_F32 
+#define ALLOT_F32                      XSBIND_ALLOT_F32
 #define ALLOT_F64                      XSBIND_ALLOT_F64
 #define ALLOT_OBJ                      XSBIND_ALLOT_OBJ
 #define ALLOT_SV                       XSBIND_ALLOT_SV

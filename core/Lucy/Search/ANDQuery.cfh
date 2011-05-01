@@ -22,7 +22,7 @@ parcel Lucy;
  * only when all of its children match, so its result set is the intersection
  * of their result sets.  Documents which match receive a summed score.
  */
-class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery 
+class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery
     : dumpable {
 
     inert incremented ANDQuery*
@@ -44,14 +44,14 @@ class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery
     Equals(ANDQuery *self, Obj *other);
 }
 
-class Lucy::Search::ANDCompiler 
+class Lucy::Search::ANDCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented ANDCompiler*
     new(ANDQuery *parent, Searcher *searcher, float boost);
 
     inert ANDCompiler*
-    init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher, 
+    init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*

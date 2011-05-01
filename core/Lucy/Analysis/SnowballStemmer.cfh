@@ -31,14 +31,14 @@ class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
     void *snowstemmer;
     CharBuf *language;
 
-    inert incremented SnowballStemmer* 
+    inert incremented SnowballStemmer*
     new(const CharBuf *language);
 
     /**
      * @param language A two-letter ISO code identifying a language supported
      * by Snowball.
      */
-    public inert SnowballStemmer* 
+    public inert SnowballStemmer*
     init(SnowballStemmer *self, const CharBuf *language);
 
     public incremented Inversion*

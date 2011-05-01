@@ -27,35 +27,30 @@
 #include "Lucy/Store/OutStream.h"
 
 ORQuery*
-ORQuery_new(VArray *children)
-{
+ORQuery_new(VArray *children) {
     ORQuery *self = (ORQuery*)VTable_Make_Obj(ORQUERY);
     return ORQuery_init(self, children);
 }
 
 ORQuery*
-ORQuery_init(ORQuery *self, VArray *children)
-{
+ORQuery_init(ORQuery *self, VArray *children) {
     return (ORQuery*)PolyQuery_init((PolyQuery*)self, children);
 }
 
 Compiler*
-ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost)
-{
+ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost) {
     return (Compiler*)ORCompiler_new(self, searcher, boost);
 }
 
 bool_t
-ORQuery_equals(ORQuery *self, Obj *other)
-{
+ORQuery_equals(ORQuery *self, Obj *other) {
     if ((ORQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, ORQUERY)) { return false; }
     return PolyQuery_equals((PolyQuery*)self, other);
 }
 
 CharBuf*
-ORQuery_to_string(ORQuery *self)
-{
+ORQuery_to_string(ORQuery *self) {
     uint32_t num_kids = VA_Get_Size(self->children);
     if (!num_kids) return CB_new_from_trusted_utf8("()", 2);
     else {
@@ -80,26 +75,23 @@ ORQuery_to_string(ORQuery *self)
 /**********************************************************************/
 
 ORCompiler*
-ORCompiler_new(ORQuery *parent, Searcher *searcher, float boost)
-{
+ORCompiler_new(ORQuery *parent, Searcher *searcher, float boost) {
     ORCompiler *self = (ORCompiler*)VTable_Make_Obj(ORCOMPILER);
     return ORCompiler_init(self, parent, searcher, boost);
 }
 
 ORCompiler*
-ORCompiler_init(ORCompiler *self, ORQuery *parent, Searcher *searcher, 
-                 float boost)
-{
-    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher, 
-        boost);
+ORCompiler_init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
+                float boost) {
+    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
+                      boost);
     ORCompiler_Normalize(self);
     return self;
 }
 
 Matcher*
-ORCompiler_make_matcher(ORCompiler *self, SegReader *reader, 
-                        bool_t need_score)
-{
+ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
+                        bool_t need_score) {
     uint32_t num_kids = VA_Get_Size(self->children);
 
     if (num_kids == 1) {
@@ -114,7 +106,7 @@ ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
         // Accumulate sub-matchers.
         for (i = 0; i < num_kids; i++) {
             Compiler *child = (Compiler*)VA_Fetch(self->children, i);
-            Matcher *submatcher 
+            Matcher *submatcher
                 = Compiler_Make_Matcher(child, reader, need_score);
             if (submatcher != NULL) {
                 VA_Push(submatchers, (Obj*)submatcher);
@@ -136,8 +128,8 @@ ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
         else {
             Similarity *sim    = ORCompiler_Get_Similarity(self);
             Matcher    *retval = need_score
-                ? (Matcher*)ORScorer_new(submatchers, sim)
-                : (Matcher*)ORMatcher_new(submatchers);
+                                 ? (Matcher*)ORScorer_new(submatchers, sim)
+                                 : (Matcher*)ORMatcher_new(submatchers);
             DECREF(submatchers);
             return retval;
         }

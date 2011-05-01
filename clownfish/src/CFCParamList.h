@@ -34,7 +34,7 @@ void
 CFCParamList_destroy(CFCParamList *self);
 
 void
-CFCParamList_add_param(CFCParamList *self, struct CFCVariable *variable,  
+CFCParamList_add_param(CFCParamList *self, struct CFCVariable *variable,
                        const char *value);
 
 struct CFCVariable**

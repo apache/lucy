@@ -39,7 +39,7 @@ class LucyX::Search::ProximityMatcher inherits Lucy::Search::Matcher {
         uint32_t within);
 
     inert ProximityMatcher*
-    init(ProximityMatcher *self, Similarity *similarity, VArray *posting_lists, 
+    init(ProximityMatcher *self, Similarity *similarity, VArray *posting_lists,
          Compiler *compiler, uint32_t within);
 
     public void
@@ -51,7 +51,7 @@ class LucyX::Search::ProximityMatcher inherits Lucy::Search::Matcher {
     public int32_t
     Advance(ProximityMatcher *self, int32_t target);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(ProximityMatcher *self);
 
     public float

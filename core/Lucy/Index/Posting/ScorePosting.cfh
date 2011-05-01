@@ -43,20 +43,20 @@ class Lucy::Index::Posting::ScorePosting cnick ScorePost
     Read_Record(ScorePosting *self, InStream *instream);
 
     incremented RawPosting*
-    Read_Raw(ScorePosting *self, InStream *instream, int32_t last_doc_id, 
+    Read_Raw(ScorePosting *self, InStream *instream, int32_t last_doc_id,
              CharBuf *term_text, MemoryPool *mem_pool);
 
     void
-    Add_Inversion_To_Pool(ScorePosting *self, PostingPool *post_pool, 
-                          Inversion *inversion, FieldType *type, 
-                          int32_t doc_id, float doc_boost, 
+    Add_Inversion_To_Pool(ScorePosting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
                           float length_norm);
 
     public void
     Reset(ScorePosting *self);
 
     incremented ScorePostingMatcher*
-    Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist, 
+    Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist,
                  Compiler *compiler, bool_t need_score);
 
     nullable uint32_t*
@@ -69,7 +69,7 @@ class Lucy::Index::Posting::ScorePostingMatcher cnick ScorePostMatcher
     float *score_cache;
 
     inert ScorePostingMatcher*
-    init(ScorePostingMatcher *self, Similarity *sim, PostingList *plist, 
+    init(ScorePostingMatcher *self, Similarity *sim, PostingList *plist,
          Compiler *compiler);
 
     public float

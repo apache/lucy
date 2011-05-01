@@ -33,9 +33,8 @@ static void
 S_write_charm_h();
 
 void
-Probe_init(const char *cc_command, const char *cc_flags, 
-           const char *charmony_start)
-{
+Probe_init(const char *cc_command, const char *cc_flags,
+           const char *charmony_start) {
     /* Dispatch other initializers. */
     OS_init();
     CC_init(cc_command, cc_flags);
@@ -48,8 +47,7 @@ Probe_init(const char *cc_command, const char *cc_flags,
 }
 
 void
-Probe_clean_up()
-{
+Probe_clean_up() {
     if (Util_verbosity) { printf("Cleaning up...\n"); }
 
     /* Dispatch various clean up routines. */
@@ -62,14 +60,12 @@ Probe_clean_up()
 }
 
 void
-Probe_set_verbosity(int level)
-{
+Probe_set_verbosity(int level) {
     Util_verbosity = level;
 }
 
 FILE*
-Probe_get_charmony_fh(void)
-{
+Probe_get_charmony_fh(void) {
     return ConfWriter_get_charmony_fh();
 }
 
@@ -81,8 +77,7 @@ static char charm_h_code[] =
     QUOTE(  #endif                                                           );
 
 static void
-S_write_charm_h()
-{
+S_write_charm_h() {
     Util_write_file("_charm.h", charm_h_code);
 }
 

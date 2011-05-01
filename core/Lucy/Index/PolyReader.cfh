@@ -44,16 +44,16 @@ class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
      * Read-locking is off by default; supplying this argument turns it on.
      */
     public inert nullable PolyReader*
-    do_open(PolyReader *self, Obj *index, Snapshot *snapshot = NULL, 
+    do_open(PolyReader *self, Obj *index, Snapshot *snapshot = NULL,
             IndexManager *manager = NULL);
 
     public inert incremented PolyReader*
-    new(Schema *schema = NULL, Folder *folder, Snapshot *snapshot = NULL, 
+    new(Schema *schema = NULL, Folder *folder, Snapshot *snapshot = NULL,
         IndexManager *manager = NULL, VArray *sub_readers = NULL);
 
     public inert PolyReader*
-    init(PolyReader *self, Schema *schema = NULL, Folder *folder, 
-         Snapshot *snapshot = NULL, IndexManager *manager = NULL, 
+    init(PolyReader *self, Schema *schema = NULL, Folder *folder,
+         Snapshot *snapshot = NULL, IndexManager *manager = NULL,
          VArray *sub_readers = NULL);
 
     /** Attempt to open a SegReader for each Segment that the Snapshot knows
@@ -67,12 +67,12 @@ class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
      * NULL.  If an exception occurs, catch it and return its error message.
      */
     inert incremented nullable CharBuf*
-    try_read_snapshot(Snapshot *snapshot, Folder *folder, 
+    try_read_snapshot(Snapshot *snapshot, Folder *folder,
                       const CharBuf *path);
 
     inert CharBuf* race_condition_debug1;
     inert int32_t  debug1_num_passes;
-    
+
     /** Determine which sub-reader a document id belongs to.
      */
     inert uint32_t

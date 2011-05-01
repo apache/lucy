@@ -29,18 +29,17 @@ S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args);
 
 // Convert all arguments to Perl and place them on the Perl stack.
 static CHY_INLINE void
-SI_push_args(void *vobj, va_list args, uint32_t num_args)
-{
+SI_push_args(void *vobj, va_list args, uint32_t num_args) {
     lucy_Obj *obj = (lucy_Obj*)vobj;
     SV *invoker;
     uint32_t i;
     dSP;
 
     uint32_t stack_slots_needed = num_args < 2
-                                ? num_args + 1
-                                : (num_args * 2) + 1;
+                                  ? num_args + 1
+                                  : (num_args * 2) + 1;
     EXTEND(SP, stack_slots_needed);
-    
+
     if (Lucy_Obj_Is_A(obj, LUCY_VTABLE)) {
         lucy_VTable *vtable = (lucy_VTable*)obj;
         // TODO: Creating a new class name SV every time is wasteful.
@@ -53,53 +52,54 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
-    PUSHs( sv_2mortal(invoker) );
+    PUSHs(sv_2mortal(invoker));
 
     for (i = 0; i < num_args; i++) {
         uint32_t arg_type = va_arg(args, uint32_t);
         char *label = va_arg(args, char*);
         if (num_args > 1) {
-            PUSHs( sv_2mortal( newSVpvn(label, strlen(label)) ) );
+            PUSHs(sv_2mortal(newSVpvn(label, strlen(label))));
         }
         switch (arg_type & CFISH_HOST_ARGTYPE_MASK) {
-        case CFISH_HOST_ARGTYPE_I32: {
-                int32_t value = va_arg(args, int32_t);
-                PUSHs( sv_2mortal( newSViv(value) ) );
-            }
-            break;
-        case CFISH_HOST_ARGTYPE_I64: {
-                int64_t value = va_arg(args, int64_t);
-                if (sizeof(IV) == 8) {
-                    PUSHs( sv_2mortal( newSViv((IV)value) ) );
+            case CFISH_HOST_ARGTYPE_I32: {
+                    int32_t value = va_arg(args, int32_t);
+                    PUSHs(sv_2mortal(newSViv(value)));
                 }
-                else {
-                    // lossy
-                    PUSHs( sv_2mortal( newSVnv((double)value) ) );
+                break;
+            case CFISH_HOST_ARGTYPE_I64: {
+                    int64_t value = va_arg(args, int64_t);
+                    if (sizeof(IV) == 8) {
+                        PUSHs(sv_2mortal(newSViv((IV)value)));
+                    }
+                    else {
+                        // lossy
+                        PUSHs(sv_2mortal(newSVnv((double)value)));
+                    }
                 }
-            }
-            break;
-        case CFISH_HOST_ARGTYPE_F32:
-        case CFISH_HOST_ARGTYPE_F64: {
-                // Floats are promoted to doubles by variadic calling.
-                double value = va_arg(args, double);
-                PUSHs( sv_2mortal( newSVnv(value) ) );
-            }
-            break;
-        case CFISH_HOST_ARGTYPE_STR: {
-                lucy_CharBuf *string = va_arg(args, lucy_CharBuf*);
-                PUSHs( sv_2mortal( XSBind_cb_to_sv(string) ) );
-            }
-            break;
-        case CFISH_HOST_ARGTYPE_OBJ: {
-                lucy_Obj* anObj = va_arg(args, lucy_Obj*);
-                SV *arg_sv = anObj == NULL
-                    ? newSV(0)
-                    : XSBind_cfish_to_perl(anObj);
-                PUSHs( sv_2mortal(arg_sv) );
-            }
-            break;
-        default:
-            CFISH_THROW(LUCY_ERR, "Unrecognized arg type: %u32", arg_type);
+                break;
+            case CFISH_HOST_ARGTYPE_F32:
+            case CFISH_HOST_ARGTYPE_F64: {
+                    // Floats are promoted to doubles by variadic calling.
+                    double value = va_arg(args, double);
+                    PUSHs(sv_2mortal(newSVnv(value)));
+                }
+                break;
+            case CFISH_HOST_ARGTYPE_STR: {
+                    lucy_CharBuf *string = va_arg(args, lucy_CharBuf*);
+                    PUSHs(sv_2mortal(XSBind_cb_to_sv(string)));
+                }
+                break;
+            case CFISH_HOST_ARGTYPE_OBJ: {
+                    lucy_Obj* anObj = va_arg(args, lucy_Obj*);
+                    SV *arg_sv = anObj == NULL
+                                 ? newSV(0)
+                                 : XSBind_cfish_to_perl(anObj);
+                    PUSHs(sv_2mortal(arg_sv));
+                }
+                break;
+            default:
+                CFISH_THROW(LUCY_ERR, "Unrecognized arg type: %u32",
+                            arg_type);
         }
     }
 
@@ -107,19 +107,18 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args)
 }
 
 void
-lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) 
-{
+lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) {
     va_list args;
-    
+
     va_start(args, num_args);
     SI_push_args(vobj, args, num_args);
     va_end(args);
-    
+
     {
-        int count = call_method(method, G_VOID|G_DISCARD);
+        int count = call_method(method, G_VOID | G_DISCARD);
         if (count != 0) {
-            CFISH_THROW(LUCY_ERR, "callback '%s' returned too many values: %i32", 
-                method, (int32_t)count);
+            CFISH_THROW(LUCY_ERR, "callback '%s' returned too many values: %i32",
+                        method, (int32_t)count);
         }
         FREETMPS;
         LEAVE;
@@ -127,8 +126,7 @@ lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 int64_t
-lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...) 
-{
+lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...) {
     va_list args;
     SV *return_sv;
     int64_t retval;
@@ -158,8 +156,7 @@ lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 double
-lucy_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...) 
-{
+lucy_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...) {
     va_list args;
     SV *return_sv;
     double retval;
@@ -176,9 +173,7 @@ lucy_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 lucy_Obj*
-lucy_Host_callback_obj(void *vobj, char *method, 
-                         uint32_t num_args, ...) 
-{
+lucy_Host_callback_obj(void *vobj, char *method, uint32_t num_args, ...) {
     va_list args;
     SV *temp_retval;
     lucy_Obj *retval = NULL;
@@ -196,8 +191,7 @@ lucy_Host_callback_obj(void *vobj, char *method,
 }
 
 lucy_CharBuf*
-lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
-{
+lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...) {
     va_list args;
     SV *temp_retval;
     lucy_CharBuf *retval = NULL;
@@ -220,8 +214,7 @@ lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 void*
-lucy_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...)
-{
+lucy_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...) {
     va_list args;
     SV *retval;
 
@@ -237,16 +230,15 @@ lucy_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...)
 }
 
 static SV*
-S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args) 
-{
+S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args) {
     SV *return_val;
     SI_push_args(vobj, args, num_args);
     {
         int num_returned = call_method(method, G_SCALAR);
         dSP;
         if (num_returned != 1) {
-            CFISH_THROW(LUCY_ERR, "Bad number of return vals from %s: %i32", method,
-                (int32_t)num_returned);
+            CFISH_THROW(LUCY_ERR, "Bad number of return vals from %s: %i32",
+                        method, (int32_t)num_returned);
         }
         return_val = POPs;
         PUTBACK;

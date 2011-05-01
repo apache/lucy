@@ -38,7 +38,7 @@ latest_snapshot(folder)
 CODE:
 {
     lucy_CharBuf *latest = lucy_IxFileNames_latest_snapshot(folder);
-    RETVAL = XSBind_cb_to_sv(latest);   
+    RETVAL = XSBind_cb_to_sv(latest);
     LUCY_DECREF(latest);
 }
 OUTPUT: RETVAL

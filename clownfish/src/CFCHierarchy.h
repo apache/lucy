@@ -29,7 +29,7 @@ CFCHierarchy*
 CFCHierarchy_new(const char *source, const char *dest, void *parser);
 
 CFCHierarchy*
-CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest, 
+CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
                   void *parser);
 
 void

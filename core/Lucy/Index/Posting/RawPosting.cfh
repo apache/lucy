@@ -56,7 +56,7 @@ class Lucy::Index::RawPosting cnick RawPost
     incremented RawPosting*
     Inc_RefCount(RawPosting* self);
 
-    uint32_t 
+    uint32_t
     Dec_RefCount(RawPosting* self);
 
     /** Throws an error.
@@ -72,11 +72,11 @@ class Lucy::Index::Posting::RawPostingWriter cnick RawPostWriter
     int32_t    last_doc_id;
 
     inert incremented RawPostingWriter*
-    new(Schema *schema, Snapshot *snapshot, Segment *segment, 
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
         PolyReader *polyreader, OutStream *outstream);
 
     inert RawPostingWriter*
-    init(RawPostingWriter *self, Schema *schema, Snapshot *snapshot, 
+    init(RawPostingWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader, OutStream *outstream);
 
     public void

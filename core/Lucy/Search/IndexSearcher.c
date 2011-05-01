@@ -44,15 +44,13 @@
 #include "Lucy/Store/FSFolder.h"
 
 IndexSearcher*
-IxSearcher_new(Obj *index)
-{
+IxSearcher_new(Obj *index) {
     IndexSearcher *self = (IndexSearcher*)VTable_Make_Obj(INDEXSEARCHER);
     return IxSearcher_init(self, index);
 }
 
 IndexSearcher*
-IxSearcher_init(IndexSearcher *self, Obj *index)
-{
+IxSearcher_init(IndexSearcher *self, Obj *index) {
     if (Obj_Is_A(index, INDEXREADER)) {
         self->reader = (IndexReader*)INCREF(index);
     }
@@ -63,9 +61,9 @@ IxSearcher_init(IndexSearcher *self, Obj *index)
     self->seg_readers = IxReader_Seg_Readers(self->reader);
     self->seg_starts  = IxReader_Offsets(self->reader);
     self->doc_reader = (DocReader*)IxReader_Fetch(
-        self->reader, VTable_Get_Name(DOCREADER));
+                           self->reader, VTable_Get_Name(DOCREADER));
     self->hl_reader = (HighlightReader*)IxReader_Fetch(
-        self->reader, VTable_Get_Name(HIGHLIGHTREADER));
+                          self->reader, VTable_Get_Name(HIGHLIGHTREADER));
     if (self->doc_reader) { INCREF(self->doc_reader); }
     if (self->hl_reader)  { INCREF(self->hl_reader); }
 
@@ -73,8 +71,7 @@ IxSearcher_init(IndexSearcher *self, Obj *index)
 }
 
 void
-IxSearcher_destroy(IndexSearcher *self)
-{
+IxSearcher_destroy(IndexSearcher *self) {
     DECREF(self->reader);
     DECREF(self->doc_reader);
     DECREF(self->hl_reader);
@@ -84,37 +81,33 @@ IxSearcher_destroy(IndexSearcher *self)
 }
 
 HitDoc*
-IxSearcher_fetch_doc(IndexSearcher *self, int32_t doc_id)
-{
+IxSearcher_fetch_doc(IndexSearcher *self, int32_t doc_id) {
     if (!self->doc_reader) { THROW(ERR, "No DocReader"); }
     return DocReader_Fetch_Doc(self->doc_reader, doc_id);
 }
 
 DocVector*
-IxSearcher_fetch_doc_vec(IndexSearcher *self, int32_t doc_id)
-{
+IxSearcher_fetch_doc_vec(IndexSearcher *self, int32_t doc_id) {
     if (!self->hl_reader) { THROW(ERR, "No HighlightReader"); }
     return HLReader_Fetch_Doc_Vec(self->hl_reader, doc_id);
 }
 
-int32_t 
-IxSearcher_doc_max(IndexSearcher *self)
-{
+int32_t
+IxSearcher_doc_max(IndexSearcher *self) {
     return IxReader_Doc_Max(self->reader);
 }
 
 uint32_t
-IxSearcher_doc_freq(IndexSearcher *self, const CharBuf *field, Obj *term)
-{
-    LexiconReader *lex_reader = (LexiconReader*)IxReader_Fetch(self->reader, 
-        VTable_Get_Name(LEXICONREADER));
+IxSearcher_doc_freq(IndexSearcher *self, const CharBuf *field, Obj *term) {
+    LexiconReader *lex_reader
+        = (LexiconReader*)IxReader_Fetch(self->reader,
+                                         VTable_Get_Name(LEXICONREADER));
     return lex_reader ? LexReader_Doc_Freq(lex_reader, field, term) : 0;
 }
 
 TopDocs*
-IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted, 
-                    SortSpec *sort_spec)
-{
+IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
+                    SortSpec *sort_spec) {
     Schema        *schema    = IxSearcher_Get_Schema(self);
     uint32_t       doc_max   = IxSearcher_Doc_Max(self);
     uint32_t       wanted    = num_wanted > doc_max ? doc_max : num_wanted;
@@ -131,26 +124,26 @@ IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
 }
 
 void
-IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector)
-{
+IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
     uint32_t i, max;
-    VArray   *const seg_readers  = self->seg_readers;
-    I32Array *const seg_starts   = self->seg_starts;
-    bool_t    need_score         = Coll_Need_Score(collector);
+    VArray   *const seg_readers = self->seg_readers;
+    I32Array *const seg_starts  = self->seg_starts;
+    bool_t    need_score        = Coll_Need_Score(collector);
     Compiler *compiler = Query_Is_A(query, COMPILER)
-                       ? (Compiler*)INCREF(query)
-                       : Query_Make_Compiler(query, (Searcher*)self, 
-                                             Query_Get_Boost(query));
+                         ? (Compiler*)INCREF(query)
+                         : Query_Make_Compiler(query, (Searcher*)self,
+                                               Query_Get_Boost(query));
 
     // Accumulate hits into the Collector.
     for (i = 0, max = VA_Get_Size(seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(seg_readers, i);
         DeletionsReader *del_reader = (DeletionsReader*)SegReader_Fetch(
-            seg_reader, VTable_Get_Name(DELETIONSREADER));
-        Matcher *matcher 
+                                          seg_reader,
+                                          VTable_Get_Name(DELETIONSREADER));
+        Matcher *matcher
             = Compiler_Make_Matcher(compiler, seg_reader, need_score);
         if (matcher) {
-            int32_t seg_start = I32Arr_Get(seg_starts, i);
+            int32_t  seg_start = I32Arr_Get(seg_starts, i);
             Matcher *deletions = DelReader_Iterator(del_reader);
             Coll_Set_Reader(collector, seg_reader);
             Coll_Set_Base(collector, seg_start);
@@ -165,11 +158,12 @@ IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector)
 }
 
 IndexReader*
-IxSearcher_get_reader(IndexSearcher *self) { return self->reader; }
+IxSearcher_get_reader(IndexSearcher *self) {
+    return self->reader;
+}
 
 void
-IxSearcher_close(IndexSearcher *self)
-{
+IxSearcher_close(IndexSearcher *self) {
     UNUSED_VAR(self);
 }
 

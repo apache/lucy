@@ -25,16 +25,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static char alloca_code[] = 
-           "#include <%s>\n"
+static char alloca_code[] =
+    "#include <%s>\n"
     QUOTE(  int main() {                   )
     QUOTE(      void *foo = %s(1);         )
     QUOTE(      return 0;                  )
     QUOTE(  }                              );
 
 void
-Memory_run(void) 
-{
+Memory_run(void) {
     chaz_bool_t has_sys_mman_h = false;
     chaz_bool_t has_alloca_h   = false;
     chaz_bool_t has_malloc_h   = false;
@@ -80,7 +79,7 @@ Memory_run(void)
     }
     if (!has_alloca) {
         sprintf(code_buf, alloca_code, "stdio.h", /* stdio.h is filler */
-            "__builtin_alloca");
+                "__builtin_alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_builtin_alloca = true;
             ConfWriter_append_conf("#define chy_alloca __builtin_alloca\n");

@@ -20,15 +20,13 @@
 #include "Lucy/Search/SeriesMatcher.h"
 
 SeriesMatcher*
-SeriesMatcher_new(VArray *matchers, I32Array *offsets)
-{
+SeriesMatcher_new(VArray *matchers, I32Array *offsets) {
     SeriesMatcher *self = (SeriesMatcher*)VTable_Make_Obj(SERIESMATCHER);
     return SeriesMatcher_init(self, matchers, offsets);
 }
 
 SeriesMatcher*
-SeriesMatcher_init(SeriesMatcher *self, VArray *matchers, I32Array *offsets)
-{
+SeriesMatcher_init(SeriesMatcher *self, VArray *matchers, I32Array *offsets) {
     Matcher_init((Matcher*)self);
 
     // Init.
@@ -49,41 +47,39 @@ SeriesMatcher_init(SeriesMatcher *self, VArray *matchers, I32Array *offsets)
 }
 
 void
-SeriesMatcher_destroy(SeriesMatcher *self)
-{
+SeriesMatcher_destroy(SeriesMatcher *self) {
     DECREF(self->matchers);
     DECREF(self->offsets);
     SUPER_DESTROY(self, SERIESMATCHER);
 }
 
 int32_t
-SeriesMatcher_next(SeriesMatcher *self)
-{
+SeriesMatcher_next(SeriesMatcher *self) {
     return SeriesMatcher_advance(self, self->doc_id + 1);
 }
 
 int32_t
-SeriesMatcher_advance(SeriesMatcher *self, int32_t target) 
-{
+SeriesMatcher_advance(SeriesMatcher *self, int32_t target) {
     if (target >= self->next_offset) {
         // Proceed to next matcher or bail.
         if (self->tick < self->num_matchers) {
             while (1) {
-                uint32_t next_offset = self->tick + 1 == self->num_matchers
-                    ? I32_MAX 
-                    : I32Arr_Get(self->offsets, self->tick + 1);
+                uint32_t next_offset
+                    = self->tick + 1 == self->num_matchers
+                      ? I32_MAX
+                      : I32Arr_Get(self->offsets, self->tick + 1);
                 self->current_matcher = (Matcher*)VA_Fetch(self->matchers,
-                    self->tick);
+                                                           self->tick);
                 self->current_offset = self->next_offset;
                 self->next_offset = next_offset;
                 self->doc_id = next_offset - 1;
                 self->tick++;
-                if (   self->current_matcher != NULL 
+                if (self->current_matcher != NULL
                     || self->tick >= self->num_matchers
-                ) {
+                   ) {
                     break;
                 }
-            } 
+            }
             return SeriesMatcher_advance(self, target); // Recurse.
         }
         else {
@@ -94,7 +90,7 @@ SeriesMatcher_advance(SeriesMatcher *self, int32_t target)
     }
     else {
         int32_t target_minus_offset = target - self->current_offset;
-        int32_t found 
+        int32_t found
             = Matcher_Advance(self->current_matcher, target_minus_offset);
         if (found) {
             self->doc_id = found + self->current_offset;
@@ -107,7 +103,9 @@ SeriesMatcher_advance(SeriesMatcher *self, int32_t target)
     }
 }
 
-int32_t 
-SeriesMatcher_get_doc_id(SeriesMatcher *self) { return self->doc_id; }
+int32_t
+SeriesMatcher_get_doc_id(SeriesMatcher *self) {
+    return self->doc_id;
+}
 
 

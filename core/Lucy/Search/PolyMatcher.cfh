@@ -27,10 +27,10 @@ class Lucy::Search::PolyMatcher inherits Lucy::Search::Matcher {
     uint32_t      matching_kids;
     float        *coord_factors;
 
-    inert incremented PolyMatcher* 
+    inert incremented PolyMatcher*
     new(VArray *children, Similarity *similarity);
 
-    inert PolyMatcher* 
+    inert PolyMatcher*
     init(PolyMatcher *self, VArray *children, Similarity *similarity);
 
     public void

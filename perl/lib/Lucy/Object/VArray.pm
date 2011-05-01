@@ -72,7 +72,7 @@ OUTPUT: RETVAL
 
 void
 store(self, tick, value);
-    lucy_VArray *self; 
+    lucy_VArray *self;
     uint32_t     tick;
     lucy_Obj    *value;
 PPCODE:

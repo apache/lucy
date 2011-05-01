@@ -35,8 +35,7 @@ static void
 S_init();
 
 void
-Stat_stat(const char *filepath, Stat *target)
-{
+Stat_stat(const char *filepath, Stat *target) {
     char *stat_output;
     size_t output_len;
 
@@ -68,7 +67,7 @@ Stat_stat(const char *filepath, Stat *target)
 }
 
 /* Source code for the _charm_stat utility. */
-static char charm_stat_code[] = 
+static char charm_stat_code[] =
     QUOTE(  #include <stdio.h>                                     )
     QUOTE(  #include <sys/stat.h>                                  )
     QUOTE(  int main(int argc, char **argv) {                      )
@@ -82,8 +81,7 @@ static char charm_stat_code[] =
     QUOTE(  }                                                      );
 
 static void
-S_init()
-{
+S_init() {
     /* Only try this once. */
     initialized = true;
     if (Util_verbosity) {
@@ -93,10 +91,9 @@ S_init()
     /* Bail if sys/stat.h isn't available. */
     if (!HeadCheck_check_header("sys/stat.h")) { return; }
 
-
     /* If the compile succeeds, open up for business. */
-    stat_available = CC_compile_exe("_charm_stat.c", "_charm_stat", 
-        charm_stat_code, strlen(charm_stat_code));
+    stat_available = CC_compile_exe("_charm_stat.c", "_charm_stat",
+                                    charm_stat_code, strlen(charm_stat_code));
     remove("_charm_stat.c");
 }
 

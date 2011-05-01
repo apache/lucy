@@ -42,7 +42,7 @@ class Lucy::Index::HighlightWriter cnick HLWriter
     Add_Inverted_Doc(HighlightWriter *self, Inverter *inverter, int32_t doc_id);
 
     public void
-    Add_Segment(HighlightWriter *self, SegReader *reader, 
+    Add_Segment(HighlightWriter *self, SegReader *reader,
                 I32Array *doc_map = NULL);
 
     public void

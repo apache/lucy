@@ -43,7 +43,7 @@ class LucyX::Search::MockMatcher inherits Lucy::Search::Matcher {
     public float
     Score(MockMatcher* self);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(MockMatcher* self);
 }
 

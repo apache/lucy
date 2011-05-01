@@ -25,7 +25,7 @@
 
 
 /* Code for verifying ISO-style variadic macros. */
-static char iso_code[] = 
+static char iso_code[] =
     QUOTE(  #include "_charm.h"                                   )
     QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
     "           printf(fmt, __VA_ARGS__)                        \n"
@@ -36,7 +36,7 @@ static char iso_code[] =
     QUOTE(  }                                                     );
 
 /* Code for verifying GNU-style variadic macros. */
-static char gnuc_code[] = 
+static char gnuc_code[] =
     QUOTE(  #include "_charm.h"                                   )
     QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
     QUOTE(  int main() {                                          )
@@ -46,8 +46,7 @@ static char gnuc_code[] =
     QUOTE(  }                                                     );
 
 void
-VariadicMacros_run(void) 
-{
+VariadicMacros_run(void) {
     char *output;
     size_t output_len;
     chaz_bool_t has_varmacros      = false;

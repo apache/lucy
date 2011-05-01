@@ -62,15 +62,14 @@ static char rmdir_code[] =
     QUOTE(  }                                                      );
 
 static chaz_bool_t
-S_try_init_posix_mkdir(char *header)
-{
+S_try_init_posix_mkdir(char *header) {
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
 
     /* Attempt compilation. */
     sprintf(code_buf, posix_mkdir_code, header);
-    mkdir_available = CC_compile_exe("_charm_mkdir.c", "_charm_mkdir", 
-        code_buf, strlen(code_buf));
+    mkdir_available = CC_compile_exe("_charm_mkdir.c", "_charm_mkdir",
+                                     code_buf, strlen(code_buf));
 
     /* Set vars on success. */
     if (mkdir_available) {
@@ -88,10 +87,9 @@ S_try_init_posix_mkdir(char *header)
 }
 
 static chaz_bool_t
-S_try_init_win_mkdir()
-{
-    mkdir_available = CC_compile_exe("_charm_mkdir.c", "_charm_mkdir", 
-        win_mkdir_code, strlen(win_mkdir_code));
+S_try_init_win_mkdir() {
+    mkdir_available = CC_compile_exe("_charm_mkdir.c", "_charm_mkdir",
+                                     win_mkdir_code, strlen(win_mkdir_code));
     if (mkdir_available) {
         strcpy(mkdir_command, "_mkdir");
         Dir_mkdir_num_args = 1;
@@ -100,8 +98,7 @@ S_try_init_win_mkdir()
 }
 
 static void
-S_init_mkdir()
-{
+S_init_mkdir() {
     if (Util_verbosity) {
         printf("Attempting to compile _charm_mkdir utility...\n");
     }
@@ -115,20 +112,18 @@ S_init_mkdir()
 }
 
 static chaz_bool_t
-S_try_init_rmdir(char *header) 
-{
+S_try_init_rmdir(char *header) {
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
     sprintf(code_buf, rmdir_code, header);
-    rmdir_available = CC_compile_exe("_charm_rmdir.c", "_charm_rmdir", 
-        code_buf, strlen(code_buf));
+    rmdir_available = CC_compile_exe("_charm_rmdir.c", "_charm_rmdir",
+                                     code_buf, strlen(code_buf));
     free(code_buf);
     return rmdir_available;
 }
 
 static void
-S_init_rmdir()
-{
+S_init_rmdir() {
     if (Util_verbosity) {
         printf("Attempting to compile _charm_rmdir utility...\n");
     }
@@ -139,9 +134,8 @@ S_init_rmdir()
 
 /* Compile _charm_mkdir and _charm_rmdir. */
 void
-Dir_init(void)
-{
-    if (!initialized) { 
+Dir_init(void) {
+    if (!initialized) {
         initialized = true;
         S_init_mkdir();
         S_init_rmdir();
@@ -149,8 +143,7 @@ Dir_init(void)
 }
 
 void
-Dir_clean_up(void)
-{
+Dir_clean_up(void) {
     if (!Util_remove_and_verify("_charm_mkdir")) {
         Util_die("Failed to remove '_charm_mkdir'");
     }
@@ -160,15 +153,13 @@ Dir_clean_up(void)
 }
 
 chaz_bool_t
-Dir_mkdir(const char *filepath)
-{
+Dir_mkdir(const char *filepath) {
     if (!initialized) { Dir_init(); }
     return OS_run_local("_charm_mkdir ", filepath, NULL);
 }
 
 chaz_bool_t
-Dir_rmdir(const char *filepath)
-{
+Dir_rmdir(const char *filepath) {
     if (!initialized) { Dir_init(); }
     return OS_run_local("_charm_rmdir ", filepath, NULL);
 }

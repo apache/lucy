@@ -43,7 +43,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * FileHandle objects, they're the canary in the coal mine for detecting
      * object-destruction memory leaks.
      */
-    inert int32_t object_count; 
+    inert int32_t object_count;
 
     /** Abstract constructor.
      *
@@ -70,7 +70,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      *
      * @return true on success, false on failure (sets Err_error)
      */
-    abstract bool_t 
+    abstract bool_t
     Release_Window(FileHandle *self, FileWindow *window);
 
     /** Copy file content into the supplied buffer.
@@ -95,7 +95,7 @@ abstract class Lucy::Store::FileHandle cnick FH
     /** Return the current length of the file in bytes, or set Err_error and
      * return -1 on failure.
      */
-    abstract int64_t 
+    abstract int64_t
     Length(FileHandle *self);
 
     /** Advisory call alerting the FileHandle that it should prepare to occupy

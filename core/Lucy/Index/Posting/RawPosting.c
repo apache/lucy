@@ -30,8 +30,8 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/StringHelper.h"
 
-RawPosting RAWPOSTING_BLANK = { 
-    RAWPOSTING, 
+RawPosting RAWPOSTING_BLANK = {
+    RAWPOSTING,
     {1},                   // ref.count
     0,                     // doc_id
     1,                     // freq
@@ -42,9 +42,8 @@ RawPosting RAWPOSTING_BLANK = {
 
 
 RawPosting*
-RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq, 
-            char *term_text, size_t term_text_len)
-{
+RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
+            char *term_text, size_t term_text_len) {
     RawPosting *self    = (RawPosting*)pre_allocated_memory;
     self->vtable        = RAWPOSTING;
     self->ref.count     = 1; // never used
@@ -58,28 +57,24 @@ RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
 }
 
 void
-RawPost_destroy(RawPosting *self)
-{
+RawPost_destroy(RawPosting *self) {
     UNUSED_VAR(self);
     THROW(ERR, "Illegal attempt to destroy RawPosting object");
 }
 
 uint32_t
-RawPost_get_refcount(RawPosting* self)
-{
+RawPost_get_refcount(RawPosting* self) {
     UNUSED_VAR(self);
     return 1;
 }
 
 RawPosting*
-RawPost_inc_refcount(RawPosting* self)
-{
+RawPost_inc_refcount(RawPosting* self) {
     return self;
 }
 
 uint32_t
-RawPost_dec_refcount(RawPosting* self)
-{
+RawPost_dec_refcount(RawPosting* self) {
     UNUSED_VAR(self);
     return 1;
 }
@@ -88,50 +83,44 @@ RawPost_dec_refcount(RawPosting* self)
 
 RawPostingWriter*
 RawPostWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-                  PolyReader *polyreader, OutStream *outstream)
-{
-    RawPostingWriter *self 
+                  PolyReader *polyreader, OutStream *outstream) {
+    RawPostingWriter *self
         = (RawPostingWriter*)VTable_Make_Obj(RAWPOSTINGWRITER);
-    return RawPostWriter_init(self, schema, snapshot, segment, polyreader, 
-        outstream);
+    return RawPostWriter_init(self, schema, snapshot, segment, polyreader,
+                              outstream);
 }
 
 RawPostingWriter*
-RawPostWriter_init(RawPostingWriter *self, Schema *schema, 
-                   Snapshot *snapshot, Segment *segment, 
-                   PolyReader *polyreader, OutStream *outstream)
-{
+RawPostWriter_init(RawPostingWriter *self, Schema *schema,
+                   Snapshot *snapshot, Segment *segment,
+                   PolyReader *polyreader, OutStream *outstream) {
     const int32_t invalid_field_num = 0;
     PostWriter_init((PostingWriter*)self, schema, snapshot, segment,
-        polyreader, invalid_field_num);
+                    polyreader, invalid_field_num);
     self->outstream = (OutStream*)INCREF(outstream);
     self->last_doc_id = 0;
     return self;
 }
 
 void
-RawPostWriter_start_term(RawPostingWriter *self, TermInfo *tinfo)
-{
+RawPostWriter_start_term(RawPostingWriter *self, TermInfo *tinfo) {
     self->last_doc_id   = 0;
     tinfo->post_filepos = OutStream_Tell(self->outstream);
 }
 
 void
-RawPostWriter_update_skip_info(RawPostingWriter *self, TermInfo *tinfo)
-{
+RawPostWriter_update_skip_info(RawPostingWriter *self, TermInfo *tinfo) {
     tinfo->post_filepos = OutStream_Tell(self->outstream);
 }
 
 void
-RawPostWriter_destroy(RawPostingWriter *self)
-{
+RawPostWriter_destroy(RawPostingWriter *self) {
     DECREF(self->outstream);
     SUPER_DESTROY(self, RAWPOSTINGWRITER);
 }
 
 void
-RawPostWriter_write_posting(RawPostingWriter *self, RawPosting *posting)
-{
+RawPostWriter_write_posting(RawPostingWriter *self, RawPosting *posting) {
     OutStream *const outstream   = self->outstream;
     const int32_t    doc_id      = posting->doc_id;
     const uint32_t   delta_doc   = doc_id - self->last_doc_id;

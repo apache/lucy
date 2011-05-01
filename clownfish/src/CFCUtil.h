@@ -97,17 +97,17 @@ CFCUtil_write_if_changed(const char *path, const char *content, size_t len);
 
 /* Read an entire file into memory.
  */
-char* 
+char*
 CFCUtil_slurp_file(const char *file_path, size_t *len_ptr);
 
 /* Get the length of a file (may overshoot on text files under DOS).
  */
-long  
+long
 CFCUtil_flength(void *file);
 
 /* Print an error message to stderr and exit.
  */
-void  
+void
 CFCUtil_die(const char *format, ...);
 
 /* Print an error message to stderr.

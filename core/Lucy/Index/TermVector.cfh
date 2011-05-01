@@ -33,7 +33,7 @@ class Lucy::Index::TermVector cnick TV
      * start_offsets, and end_offsets arrays.
      */
     inert incremented TermVector*
-    new(const CharBuf *field, const CharBuf *text, I32Array *positions, 
+    new(const CharBuf *field, const CharBuf *text, I32Array *positions,
         I32Array *start_offsets, I32Array *end_offsets);
 
     inert TermVector*

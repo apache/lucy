@@ -26,15 +26,13 @@
 #include "Lucy/Util/IndexFileNames.h"
 
 Segment*
-Seg_new(int64_t number)
-{
+Seg_new(int64_t number) {
     Segment *self = (Segment*)VTable_Make_Obj(SEGMENT);
     return Seg_init(self, number);
 }
 
 Segment*
-Seg_init(Segment *self, int64_t number)
-{
+Seg_init(Segment *self, int64_t number) {
     // Validate.
     if (number < 0) { THROW(ERR, "Segment number %i64 less than 0", number); }
 
@@ -57,16 +55,14 @@ Seg_init(Segment *self, int64_t number)
 }
 
 CharBuf*
-Seg_num_to_name(int64_t number)
-{
+Seg_num_to_name(int64_t number) {
     char base36[StrHelp_MAX_BASE36_BYTES];
     StrHelp_to_base36(number, &base36);
     return CB_newf("seg_%s", &base36);
 }
 
 bool_t
-Seg_valid_seg_name(const CharBuf *name)
-{
+Seg_valid_seg_name(const CharBuf *name) {
     if (CB_Starts_With_Str(name, "seg_", 4)) {
         ZombieCharBuf *scratch = ZCB_WRAP(name);
         ZCB_Nip(scratch, 4);
@@ -80,8 +76,7 @@ Seg_valid_seg_name(const CharBuf *name)
 }
 
 void
-Seg_destroy(Segment *self)
-{
+Seg_destroy(Segment *self) {
     DECREF(self->name);
     DECREF(self->metadata);
     DECREF(self->by_name);
@@ -90,8 +85,7 @@ Seg_destroy(Segment *self)
 }
 
 bool_t
-Seg_read_file(Segment *self, Folder *folder)
-{
+Seg_read_file(Segment *self, Folder *folder) {
     CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
     Hash    *metadata = (Hash*)Json_slurp_json(folder, filename);
     Hash    *my_metadata;
@@ -104,8 +98,8 @@ Seg_read_file(Segment *self, Folder *folder)
     // Grab metadata for the Segment object itself.
     DECREF(self->metadata);
     self->metadata = metadata;
-    my_metadata = (Hash*)CERTIFY(
-        Hash_Fetch_Str(self->metadata, "segmeta", 7), HASH);
+    my_metadata
+        = (Hash*)CERTIFY(Hash_Fetch_Str(self->metadata, "segmeta", 7), HASH);
 
     // Assign.
     {
@@ -118,8 +112,8 @@ Seg_read_file(Segment *self, Folder *folder)
     // Get list of field nums.
     {
         uint32_t i;
-        VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata, 
-            "field_names", 11);
+        VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata,
+                                                        "field_names", 11);
         uint32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
         if (source_by_num == NULL) {
             THROW(ERR, "Failed to extract 'field_names' from metadata");
@@ -142,13 +136,12 @@ Seg_read_file(Segment *self, Folder *folder)
 }
 
 void
-Seg_write_file(Segment *self, Folder *folder)
-{
+Seg_write_file(Segment *self, Folder *folder) {
     Hash *my_metadata = Hash_new(16);
 
     // Store metadata specific to this Segment object.
-    Hash_Store_Str(my_metadata, "count", 5, 
-        (Obj*)CB_newf("%i64", self->count) );
+    Hash_Store_Str(my_metadata, "count", 5,
+                   (Obj*)CB_newf("%i64", self->count));
     Hash_Store_Str(my_metadata, "name", 4, (Obj*)CB_Clone(self->name));
     Hash_Store_Str(my_metadata, "field_names", 11, INCREF(self->by_num));
     Hash_Store_Str(my_metadata, "format", 6, (Obj*)CB_newf("%i32", 1));
@@ -156,16 +149,15 @@ Seg_write_file(Segment *self, Folder *folder)
 
     {
         CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
-        bool_t result 
+        bool_t result
             = Json_spew_json((Obj*)self->metadata, folder, filename);
         DECREF(filename);
         if (!result) { RETHROW(INCREF(Err_get_error())); }
     }
 }
 
-int32_t 
-Seg_add_field(Segment *self, const CharBuf *field)
-{
+int32_t
+Seg_add_field(Segment *self, const CharBuf *field) {
     Integer32 *num = (Integer32*)Hash_Fetch(self->by_name, (Obj*)field);
     if (num) {
         return Int32_Get_Value(num);
@@ -179,24 +171,33 @@ Seg_add_field(Segment *self, const CharBuf *field)
 }
 
 CharBuf*
-Seg_get_name(Segment *self)               { return self->name; }
-int64_t
-Seg_get_number(Segment *self)             { return self->number; }
-void
-Seg_set_count(Segment *self, int64_t count) { self->count = count; }
-int64_t
-Seg_get_count(Segment *self)              { return self->count; }
+Seg_get_name(Segment *self) {
+    return self->name;
+}
 
 int64_t
-Seg_increment_count(Segment *self, int64_t increment) 
-{ 
-   self->count += increment;
-   return self->count;
+Seg_get_number(Segment *self) {
+    return self->number;
 }
 
 void
-Seg_store_metadata(Segment *self, const CharBuf *key, Obj *value)
-{
+Seg_set_count(Segment *self, int64_t count) {
+    self->count = count;
+}
+
+int64_t
+Seg_get_count(Segment *self) {
+    return self->count;
+}
+
+int64_t
+Seg_increment_count(Segment *self, int64_t increment) {
+    self->count += increment;
+    return self->count;
+}
+
+void
+Seg_store_metadata(Segment *self, const CharBuf *key, Obj *value) {
     if (Hash_Fetch(self->metadata, (Obj*)key)) {
         THROW(ERR, "Metadata key '%o' already registered", key);
     }
@@ -204,48 +205,44 @@ Seg_store_metadata(Segment *self, const CharBuf *key, Obj *value)
 }
 
 void
-Seg_store_metadata_str(Segment *self, const char *key, size_t key_len, 
-                       Obj *value)
-{
+Seg_store_metadata_str(Segment *self, const char *key, size_t key_len,
+                       Obj *value) {
     ZombieCharBuf *k = ZCB_WRAP_STR((char*)key, key_len);
     Seg_Store_Metadata(self, (CharBuf*)k, value);
 }
 
 Obj*
-Seg_fetch_metadata(Segment *self, const CharBuf *key)
-{
+Seg_fetch_metadata(Segment *self, const CharBuf *key) {
     return Hash_Fetch(self->metadata, (Obj*)key);
 }
 
 Obj*
-Seg_fetch_metadata_str(Segment *self, const char *key, size_t len)
-{
+Seg_fetch_metadata_str(Segment *self, const char *key, size_t len) {
     return Hash_Fetch_Str(self->metadata, key, len);
 }
 
 Hash*
-Seg_get_metadata(Segment *self) { return self->metadata; }
-    
+Seg_get_metadata(Segment *self) {
+    return self->metadata;
+}
+
 int32_t
-Seg_compare_to(Segment *self, Obj *other)
-{
+Seg_compare_to(Segment *self, Obj *other) {
     Segment *other_seg = (Segment*)CERTIFY(other, SEGMENT);
-    if      (self->number <  other_seg->number) { return -1; }
+    if (self->number <  other_seg->number)      { return -1; }
     else if (self->number == other_seg->number) { return 0;  }
     else                                        { return 1;  }
 }
 
 CharBuf*
-Seg_field_name(Segment *self, int32_t field_num)
-{
-     return field_num 
-        ? (CharBuf*)VA_Fetch(self->by_num, field_num)
-        : NULL;
+Seg_field_name(Segment *self, int32_t field_num) {
+    return field_num
+           ? (CharBuf*)VA_Fetch(self->by_num, field_num)
+           : NULL;
 }
 
 int32_t
-Seg_field_num(Segment *self, const CharBuf *field)
-{
+Seg_field_num(Segment *self, const CharBuf *field) {
     if (field == NULL) {
         return 0;
     }

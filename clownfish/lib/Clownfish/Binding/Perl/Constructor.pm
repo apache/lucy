@@ -75,12 +75,11 @@ sub xsub_def {
     # DESTROY.
     my $self_var    = $arg_vars->[0];
     my $self_type   = $self_var->get_type->to_c;
-    my $self_assign = qq|$self_type self = ($self_type)XSBind_new_blank_obj( ST(0) );|;
+    my $self_assign = qq|$self_type self = ($self_type)XSBind_new_blank_obj(ST(0));|;
 
     return <<END_STUFF;
 XS($c_name);
-XS($c_name)
-{
+XS($c_name) {
     dXSARGS;
     CHY_UNUSED_VAR(cv);
     if (items < 1) { CFISH_THROW(CFISH_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
@@ -97,7 +96,7 @@ XS($c_name)
     else {
         ST(0) = newSV(0);
     }
-    sv_2mortal( ST(0) );
+    sv_2mortal(ST(0));
     XSRETURN(1);
 }
 

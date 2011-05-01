@@ -21,15 +21,13 @@
 #include "Lucy/Index/Similarity.h"
 
 PolyMatcher*
-PolyMatcher_new(VArray *children, Similarity *sim) 
-{
+PolyMatcher_new(VArray *children, Similarity *sim) {
     PolyMatcher *self = (PolyMatcher*)VTable_Make_Obj(POLYMATCHER);
     return PolyMatcher_init(self, children, sim);
 }
 
 PolyMatcher*
-PolyMatcher_init(PolyMatcher *self, VArray *children, Similarity *similarity) 
-{
+PolyMatcher_init(PolyMatcher *self, VArray *children, Similarity *similarity) {
     uint32_t i;
 
     Matcher_init((Matcher*)self);
@@ -39,15 +37,14 @@ PolyMatcher_init(PolyMatcher *self, VArray *children, Similarity *similarity)
     self->coord_factors = (float*)MALLOCATE((self->num_kids + 1) * sizeof(float));
     for (i = 0; i <= self->num_kids; i++) {
         self->coord_factors[i] = similarity
-                               ? Sim_Coord(similarity, i, self->num_kids) 
-                               : 1.0f;
+                                 ? Sim_Coord(similarity, i, self->num_kids)
+                                 : 1.0f;
     }
     return self;
 }
 
 void
-PolyMatcher_destroy(PolyMatcher *self) 
-{
+PolyMatcher_destroy(PolyMatcher *self) {
     DECREF(self->children);
     DECREF(self->sim);
     FREEMEM(self->coord_factors);

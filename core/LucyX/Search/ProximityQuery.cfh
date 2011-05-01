@@ -48,7 +48,7 @@ class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
      */
     public VArray*
     Get_Terms(ProximityQuery *self);
-    
+
     /** Accessor for object's within attribute.
      */
     public uint32_t
@@ -68,12 +68,12 @@ class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
 
     public incremented ProximityQuery*
     Deserialize(ProximityQuery *self, InStream *instream);
-    
+
     public void
     Destroy(ProximityQuery *self);
 }
 
-class LucyX::Search::ProximityCompiler 
+class LucyX::Search::ProximityCompiler
     inherits Lucy::Search::Compiler {
 
     float    idf;
@@ -86,7 +86,7 @@ class LucyX::Search::ProximityCompiler
     new(ProximityQuery *parent, Searcher *searcher, float boost, uint32_t within);
 
     inert ProximityCompiler*
-    init(ProximityCompiler *self, ProximityQuery *parent, Searcher *searcher, 
+    init(ProximityCompiler *self, ProximityQuery *parent, Searcher *searcher,
          float boost, uint32_t within);
 
     public incremented nullable Matcher*
@@ -102,7 +102,7 @@ class LucyX::Search::ProximityCompiler
     Apply_Norm_Factor(ProximityCompiler *self, float factor);
 
     public incremented VArray*
-    Highlight_Spans(ProximityCompiler *self, Searcher *searcher, 
+    Highlight_Spans(ProximityCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
     public bool_t

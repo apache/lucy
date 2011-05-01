@@ -26,17 +26,18 @@ my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy PACKAGE = Lucy::Object::I32Array
 
 SV*
-new(either_sv, ...) 
+new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
     SV *ints_sv = NULL;
     lucy_I32Array *self = NULL;
 
-    chy_bool_t args_ok = XSBind_allot_params(
-        &(ST(0)), 1, items, "Lucy::Object::I32Array::new_PARAMS",
-        ALLOT_SV(&ints_sv, "ints", 4, true),
-        NULL);
+    chy_bool_t args_ok
+        = XSBind_allot_params(&(ST(0)), 1, items,
+                              "Lucy::Object::I32Array::new_PARAMS",
+                              ALLOT_SV(&ints_sv, "ints", 4, true),
+                              NULL);
     if (!args_ok) {
         CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
     }
@@ -52,9 +53,9 @@ CODE:
 
         for (i = 0; i < size; i++) {
             SV **const sv_ptr = av_fetch(ints_av, i, 0);
-            ints[i] = (sv_ptr && XSBind_sv_defined(*sv_ptr)) 
-                    ? SvIV(*sv_ptr) 
-                    : 0;
+            ints[i] = (sv_ptr && XSBind_sv_defined(*sv_ptr))
+                      ? SvIV(*sv_ptr)
+                      : 0;
         }
         self = (lucy_I32Array*)XSBind_new_blank_obj(either_sv);
         lucy_I32Arr_init(self, ints, size);
@@ -62,7 +63,7 @@ CODE:
     else {
         THROW(LUCY_ERR, "Required param 'ints' isn't an arrayref");
     }
-    
+
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL

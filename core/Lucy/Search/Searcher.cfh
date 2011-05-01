@@ -75,7 +75,7 @@ class Lucy::Search::Searcher inherits Lucy::Object::Obj {
      * how results are ranked and returned.
      */
     public incremented Hits*
-    Hits(Searcher *self, Obj *query, uint32_t offset = 0, 
+    Hits(Searcher *self, Obj *query, uint32_t offset = 0,
          uint32_t num_wanted = 10, SortSpec *sort_spec = NULL);
 
     /** Iterate over hits, feeding them into a

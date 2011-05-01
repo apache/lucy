@@ -39,28 +39,28 @@ class Lucy::Index::Posting cnick Post inherits Lucy::Util::Stepper {
      * Updates the state of the document id, but nothing else.
      */
     abstract incremented RawPosting*
-    Read_Raw(Posting *self, InStream *instream, int32_t last_doc_id, 
+    Read_Raw(Posting *self, InStream *instream, int32_t last_doc_id,
              CharBuf *term_text, MemoryPool *mem_pool);
 
     /** Process an Inversion into RawPosting objects and add them all to the
      * supplied PostingPool.
      */
     abstract void
-    Add_Inversion_To_Pool(Posting *self, PostingPool *post_pool, 
-                          Inversion *inversion, FieldType *type, 
-                          int32_t doc_id, float doc_boost, 
+    Add_Inversion_To_Pool(Posting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
                           float length_norm);
 
     public void
     Set_Doc_ID(Posting *self, int32_t doc_id);
 
-    public int32_t 
+    public int32_t
     Get_Doc_ID(Posting *self);
 
     /** Factory method for creating a Matcher.
      */
     abstract incremented Matcher*
-    Make_Matcher(Posting *self, Similarity *sim, PostingList *plist, 
+    Make_Matcher(Posting *self, Similarity *sim, PostingList *plist,
                  Compiler *compiler, bool_t need_score);
 }
 
@@ -70,7 +70,7 @@ abstract class Lucy::Index::Posting::PostingWriter cnick PostWriter
     int32_t field_num;
 
     inert PostingWriter*
-    init(PostingWriter *self, Schema *schema, Snapshot *snapshot, 
+    init(PostingWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader, int32_t field_num);
 
     /** Take a RawPosting that was flattened earlier and write it to the

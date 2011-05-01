@@ -28,21 +28,19 @@
 #include "Lucy/Store/RAMFile.h"
 
 static void
-test_open(TestBatch *batch)
-{
+test_open(TestBatch *batch) {
     RAMFileHandle *fh;
 
     Err_set_error(NULL);
     fh = RAMFH_open(NULL, FH_WRITE_ONLY, NULL);
-    TEST_TRUE(batch, fh == NULL, 
-        "open() without a RAMFile or FH_CREATE returns NULL");
+    TEST_TRUE(batch, fh == NULL,
+              "open() without a RAMFile or FH_CREATE returns NULL");
     TEST_TRUE(batch, Err_get_error() != NULL,
-        "open() without a RAMFile or FH_CREATE sets error");
+              "open() without a RAMFile or FH_CREATE sets error");
 }
 
 static void
-test_Read_Write(TestBatch *batch)
-{
+test_Read_Write(TestBatch *batch) {
     RAMFile *file = RAMFile_new(NULL, false);
     RAMFileHandle *fh = RAMFH_open(NULL, FH_WRITE_ONLY, file);
     const char *foo = "foo";
@@ -50,8 +48,8 @@ test_Read_Write(TestBatch *batch)
     char buffer[12];
     char *buf = buffer;
 
-    TEST_TRUE(batch, CB_Equals_Str(RAMFH_Get_Path(fh), "", 0), 
-        "NULL arg as filepath yields empty string");
+    TEST_TRUE(batch, CB_Equals_Str(RAMFH_Get_Path(fh), "", 0),
+              "NULL arg as filepath yields empty string");
 
     TEST_TRUE(batch, RAMFH_Write(fh, foo, 3), "Write returns success");
     TEST_TRUE(batch, RAMFH_Length(fh) == 3, "Length after one Write");
@@ -59,16 +57,16 @@ test_Read_Write(TestBatch *batch)
     TEST_TRUE(batch, RAMFH_Length(fh) == 6, "Length after two Writes");
 
     Err_set_error(NULL);
-    TEST_FALSE(batch, RAMFH_Read(fh, buf, 0, 2), 
-        "Reading from a write-only handle returns false");
-    TEST_TRUE(batch, Err_get_error() != NULL, 
-        "Reading from a write-only handle sets error");
+    TEST_FALSE(batch, RAMFH_Read(fh, buf, 0, 2),
+               "Reading from a write-only handle returns false");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Reading from a write-only handle sets error");
 
     // Reopen for reading.
     DECREF(fh);
     fh = RAMFH_open(NULL, FH_READ_ONLY, file);
-    TEST_TRUE(batch, RAMFile_Read_Only(file), 
-        "FH_READ_ONLY propagates to RAMFile's read_only property");
+    TEST_TRUE(batch, RAMFile_Read_Only(file),
+              "FH_READ_ONLY propagates to RAMFile's read_only property");
 
     TEST_TRUE(batch, RAMFH_Read(fh, buf, 0, 6), "Read returns success");
     TEST_TRUE(batch, strncmp(buf, "foobar", 6) == 0, "Read/Write");
@@ -77,29 +75,28 @@ test_Read_Write(TestBatch *batch)
 
     Err_set_error(NULL);
     TEST_FALSE(batch, RAMFH_Read(fh, buf, -1, 4),
-        "Read() with a negative offset returns false");
-    TEST_TRUE(batch, Err_get_error() != NULL, 
-        "Read() with a negative offset sets error");
+               "Read() with a negative offset returns false");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Read() with a negative offset sets error");
 
     Err_set_error(NULL);
     TEST_FALSE(batch, RAMFH_Read(fh, buf, 6, 1),
-        "Read() past EOF returns false");
-    TEST_TRUE(batch, Err_get_error() != NULL, 
-        "Read() past EOF sets error");
+               "Read() past EOF returns false");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Read() past EOF sets error");
 
     Err_set_error(NULL);
-    TEST_FALSE(batch, RAMFH_Write(fh, foo, 3), 
-        "Writing to a read-only handle returns false");
-    TEST_TRUE(batch, Err_get_error() != NULL, 
-        "Writing to a read-only handle sets error");
+    TEST_FALSE(batch, RAMFH_Write(fh, foo, 3),
+               "Writing to a read-only handle returns false");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Writing to a read-only handle sets error");
 
     DECREF(fh);
     DECREF(file);
 }
 
 static void
-test_Grow_and_Get_File(TestBatch *batch)
-{
+test_Grow_and_Get_File(TestBatch *batch) {
     RAMFileHandle *fh = RAMFH_open(NULL, FH_WRITE_ONLY | FH_CREATE, NULL);
     RAMFile *ram_file = RAMFH_Get_File(fh);
     ByteBuf *contents = RAMFile_Get_Contents(ram_file);
@@ -111,16 +108,14 @@ test_Grow_and_Get_File(TestBatch *batch)
 }
 
 static void
-test_Close(TestBatch *batch)
-{
+test_Close(TestBatch *batch) {
     RAMFileHandle *fh = RAMFH_open(NULL, FH_WRITE_ONLY | FH_CREATE, NULL);
     TEST_TRUE(batch, RAMFH_Close(fh), "Close returns true");
     DECREF(fh);
 }
 
 static void
-test_Window(TestBatch *batch)
-{
+test_Window(TestBatch *batch) {
     RAMFile *file = RAMFile_new(NULL, false);
     RAMFileHandle *fh = RAMFH_open(NULL, FH_WRITE_ONLY, file);
     FileWindow *window = FileWindow_new();
@@ -137,22 +132,22 @@ test_Window(TestBatch *batch)
 
     Err_set_error(NULL);
     TEST_FALSE(batch, RAMFH_Window(fh, window, -1, 4),
-        "Window() with a negative offset returns false");
-    TEST_TRUE(batch, Err_get_error() != NULL, 
-        "Window() with a negative offset sets error");
+               "Window() with a negative offset returns false");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Window() with a negative offset sets error");
 
     Err_set_error(NULL);
     TEST_FALSE(batch, RAMFH_Window(fh, window, 4000, 1000),
-        "Window() past EOF returns false");
-    TEST_TRUE(batch, Err_get_error() != NULL, 
-        "Window() past EOF sets error");
+               "Window() past EOF returns false");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Window() past EOF sets error");
 
-    TEST_TRUE(batch, RAMFH_Window(fh, window, 1021, 2), 
-        "Window() returns true");
+    TEST_TRUE(batch, RAMFH_Window(fh, window, 1021, 2),
+              "Window() returns true");
     TEST_TRUE(batch, strncmp(window->buf, "oo", 2) == 0, "Window()");
 
-    TEST_TRUE(batch, RAMFH_Release_Window(fh, window), 
-        "Release_Window() returns true");
+    TEST_TRUE(batch, RAMFH_Release_Window(fh, window),
+              "Release_Window() returns true");
     TEST_TRUE(batch, window->buf == NULL, "Release_Window() resets buf");
     TEST_TRUE(batch, window->offset == 0, "Release_Window() resets offset");
     TEST_TRUE(batch, window->len == 0, "Release_Window() resets len");
@@ -163,8 +158,7 @@ test_Window(TestBatch *batch)
 }
 
 void
-TestRAMFH_run_tests()
-{
+TestRAMFH_run_tests() {
     TestBatch *batch = TestBatch_new(32);
 
     TestBatch_Plan(batch);

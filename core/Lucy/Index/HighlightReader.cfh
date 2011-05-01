@@ -24,8 +24,8 @@ class Lucy::Index::HighlightReader cnick HLReader
     inherits Lucy::Index::DataReader {
 
     inert HighlightReader*
-    init(HighlightReader *self, Schema *schema = NULL, Folder *folder = NULL, 
-         Snapshot *snapshot = NULL, VArray *segments = NULL, 
+    init(HighlightReader *self, Schema *schema = NULL, Folder *folder = NULL,
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
          int32_t seg_tick = -1);
 
     /** Return the DocVector object for the given doc id.
@@ -72,7 +72,7 @@ class Lucy::Index::DefaultHighlightReader cnick DefHLReader
         int32_t seg_tick);
 
     inert DefaultHighlightReader*
-    init(DefaultHighlightReader *self, Schema *schema, Folder *folder, 
+    init(DefaultHighlightReader *self, Schema *schema, Folder *folder,
          Snapshot *snapshot, VArray *segments, int32_t seg_tick);
 
     /** Return the DocVector object for the given doc id.
@@ -83,7 +83,7 @@ class Lucy::Index::DefaultHighlightReader cnick DefHLReader
     /** Return the raw bytes of an entry.
      */
     void
-    Read_Record(DefaultHighlightReader *self, int32_t doc_id, 
+    Read_Record(DefaultHighlightReader *self, int32_t doc_id,
                 ByteBuf *buffer);
 
     public void

@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestHighlightWriter 
+inert class Lucy::Test::Index::TestHighlightWriter
     cnick TestHLWriter {
 
     inert void

@@ -23,23 +23,20 @@
 #include "Lucy/Index/Similarity.h"
 
 FullTextType*
-FullTextType_new(Analyzer *analyzer)
-{
+FullTextType_new(Analyzer *analyzer) {
     FullTextType *self = (FullTextType*)VTable_Make_Obj(FULLTEXTTYPE);
     return FullTextType_init(self, analyzer);
 }
 
 FullTextType*
-FullTextType_init(FullTextType *self, Analyzer *analyzer)
-{
+FullTextType_init(FullTextType *self, Analyzer *analyzer) {
     return FullTextType_init2(self, analyzer, 1.0, true, true, false, false);
 }
 
 FullTextType*
 FullTextType_init2(FullTextType *self, Analyzer *analyzer, float boost,
-                   bool_t indexed, bool_t stored, bool_t sortable, 
-                   bool_t highlightable)
-{
+                   bool_t indexed, bool_t stored, bool_t sortable,
+                   bool_t highlightable) {
     FType_init((FieldType*)self);
 
     /* Assign */
@@ -54,15 +51,13 @@ FullTextType_init2(FullTextType *self, Analyzer *analyzer, float boost,
 }
 
 void
-FullTextType_destroy(FullTextType *self)
-{
+FullTextType_destroy(FullTextType *self) {
     DECREF(self->analyzer);
     SUPER_DESTROY(self, FULLTEXTTYPE);
 }
 
 bool_t
-FullTextType_equals(FullTextType *self, Obj *other)
-{
+FullTextType_equals(FullTextType *self, Obj *other) {
     FullTextType *twin = (FullTextType*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, FULLTEXTTYPE)) return false;
@@ -76,8 +71,7 @@ FullTextType_equals(FullTextType *self, Obj *other)
 }
 
 Hash*
-FullTextType_dump_for_schema(FullTextType *self) 
-{
+FullTextType_dump_for_schema(FullTextType *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("fulltext"));
 
@@ -102,28 +96,26 @@ FullTextType_dump_for_schema(FullTextType *self)
 }
 
 Hash*
-FullTextType_dump(FullTextType *self)
-{
+FullTextType_dump(FullTextType *self) {
     Hash *dump = FullTextType_Dump_For_Schema(self);
-    Hash_Store_Str(dump, "_class", 6, 
-        (Obj*)CB_Clone(FullTextType_Get_Class_Name(self)));
-    Hash_Store_Str(dump, "analyzer", 8, 
-        (Obj*)Analyzer_Dump(self->analyzer));
+    Hash_Store_Str(dump, "_class", 6,
+                   (Obj*)CB_Clone(FullTextType_Get_Class_Name(self)));
+    Hash_Store_Str(dump, "analyzer", 8,
+                   (Obj*)Analyzer_Dump(self->analyzer));
     DECREF(Hash_Delete_Str(dump, "type", 4));
-    
+
     return dump;
 }
 
 FullTextType*
-FullTextType_load(FullTextType *self, Obj *dump)
-{
+FullTextType_load(FullTextType *self, Obj *dump) {
     UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
-    VTable *vtable 
-        = (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF)) 
-        ? VTable_singleton(class_name, NULL)
-        : FULLTEXTTYPE;
+    VTable *vtable
+        = (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF))
+          ? VTable_singleton(class_name, NULL)
+          : FULLTEXTTYPE;
     FullTextType *loaded = (FullTextType*)VTable_Make_Obj(vtable);
 
     // Extract boost.
@@ -166,17 +158,22 @@ FullTextType_load(FullTextType *self, Obj *dump)
 }
 
 void
-FullTextType_set_highlightable(FullTextType *self, bool_t highlightable)
-    { self->highlightable = highlightable; }
+FullTextType_set_highlightable(FullTextType *self, bool_t highlightable) {
+    self->highlightable = highlightable;
+}
 
 Analyzer*
-FullTextType_get_analyzer(FullTextType *self)  { return self->analyzer; }
+FullTextType_get_analyzer(FullTextType *self) {
+    return self->analyzer;
+}
+
 bool_t
-FullTextType_highlightable(FullTextType *self) { return self->highlightable; }
+FullTextType_highlightable(FullTextType *self) {
+    return self->highlightable;
+}
 
 Similarity*
-FullTextType_make_similarity(FullTextType *self)
-{
+FullTextType_make_similarity(FullTextType *self) {
     UNUSED_VAR(self);
     return Sim_new();
 }

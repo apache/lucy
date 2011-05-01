@@ -22,7 +22,7 @@ parcel Lucy;
  * or more fields, each of which has a value.
  */
 
-public class Lucy::Document::Doc inherits Lucy::Object::Obj 
+public class Lucy::Document::Doc inherits Lucy::Object::Obj
     : dumpable {
 
     void        *fields;
@@ -36,7 +36,7 @@ public class Lucy::Document::Doc inherits Lucy::Object::Obj
      * @param doc_id Internal Lucy document id.  Default of 0 (an
      * invalid doc id).
      */
-    public inert Doc* 
+    public inert Doc*
     init(Doc *self, void *fields = NULL, int32_t doc_id = 0);
 
     /** Set internal Lucy document id.
@@ -58,7 +58,7 @@ public class Lucy::Document::Doc inherits Lucy::Object::Obj
      */
     void
     Set_Fields(Doc *self, void *fields);
-    
+
     /** Return the Doc's backing fields hash.
      */
     public nullable void*

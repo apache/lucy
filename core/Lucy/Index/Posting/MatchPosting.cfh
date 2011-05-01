@@ -45,20 +45,20 @@ class Lucy::Index::Posting::MatchPosting cnick MatchPost
     Read_Record(MatchPosting *self, InStream *instream);
 
     incremented RawPosting*
-    Read_Raw(MatchPosting *self, InStream *instream, int32_t last_doc_id, 
+    Read_Raw(MatchPosting *self, InStream *instream, int32_t last_doc_id,
              CharBuf *term_text, MemoryPool *mem_pool);
 
     void
-    Add_Inversion_To_Pool(MatchPosting *self, PostingPool *post_pool, 
-                          Inversion *inversion, FieldType *type, 
-                          int32_t doc_id, float doc_boost, 
+    Add_Inversion_To_Pool(MatchPosting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
                           float length_norm);
 
     public void
     Reset(MatchPosting *self);
 
     incremented MatchPostingMatcher*
-    Make_Matcher(MatchPosting *self, Similarity *sim, PostingList *plist, 
+    Make_Matcher(MatchPosting *self, Similarity *sim, PostingList *plist,
                  Compiler *compiler, bool_t need_score);
 }
 
@@ -66,7 +66,7 @@ class Lucy::Index::Posting::MatchPostingMatcher cnick MatchPostMatcher
     inherits Lucy::Search::TermMatcher {
 
     inert MatchPostingMatcher*
-    init(MatchPostingMatcher *self, Similarity *similarity, 
+    init(MatchPostingMatcher *self, Similarity *similarity,
          PostingList *posting_list, Compiler *compiler);
 
     public float
@@ -80,7 +80,7 @@ class Lucy::Index::Posting::MatchPostingWriter cnick MatchPostWriter
     int32_t    last_doc_id;
 
     inert incremented MatchPostingWriter*
-    new(Schema *schema, Snapshot *snapshot, Segment *segment, 
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
         PolyReader *polyreader, int32_t field_num);
 
     inert MatchPostingWriter*
@@ -100,22 +100,22 @@ class Lucy::Index::Posting::MatchPostingWriter cnick MatchPostWriter
     Update_Skip_Info(MatchPostingWriter *self, TermInfo *tinfo);
 }
 
-class Lucy::Index::Posting::MatchPosting::MatchTermInfoStepper 
+class Lucy::Index::Posting::MatchPosting::MatchTermInfoStepper
     cnick MatchTInfoStepper inherits Lucy::Index::TermStepper {
 
     int32_t skip_interval;
-    
+
     inert incremented MatchTermInfoStepper*
     new(Schema *schema);
 
     inert MatchTermInfoStepper*
     init(MatchTermInfoStepper *self, Schema *schema);
 
-    public void 
+    public void
     Reset(MatchTermInfoStepper *self);
 
     public void
-    Write_Key_Frame(MatchTermInfoStepper *self, OutStream *outstream, 
+    Write_Key_Frame(MatchTermInfoStepper *self, OutStream *outstream,
                     Obj *value);
 
     public void

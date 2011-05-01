@@ -33,10 +33,11 @@ CODE:
     // parse params, only if there's more than one arg
     if (items > 1) {
         SV *text_sv = NULL;
-        chy_bool_t args_ok = XSBind_allot_params(
-            &(ST(0)), 1, items, "Lucy::Analysis::Inversion::new_PARAMS",
-            ALLOT_SV(&text_sv, "text", 4, false),
-            NULL);
+        chy_bool_t args_ok
+            = XSBind_allot_params(&(ST(0)), 1, items,
+                                  "Lucy::Analysis::Inversion::new_PARAMS",
+                                  ALLOT_SV(&text_sv, "text", 4, false),
+                                  NULL);
         if (!args_ok) {
             CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
         }
@@ -46,7 +47,7 @@ CODE:
             starter_token = lucy_Token_new(text, len, 0, len, 1.0, 1);
         }
     }
-        
+
     RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_Inversion_new(starter_token));
     LUCY_DECREF(starter_token);
 }

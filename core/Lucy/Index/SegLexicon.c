@@ -37,19 +37,18 @@ static void
 S_scan_to(SegLexicon *self, Obj *target);
 
 SegLexicon*
-SegLex_new(Schema *schema, Folder *folder, Segment *segment, 
-           const CharBuf *field)
-{
+SegLex_new(Schema *schema, Folder *folder, Segment *segment,
+           const CharBuf *field) {
     SegLexicon *self = (SegLexicon*)VTable_Make_Obj(SEGLEXICON);
     return SegLex_init(self, schema, folder, segment, field);
 }
 
 SegLexicon*
-SegLex_init(SegLexicon *self, Schema *schema, Folder *folder, 
-            Segment *segment, const CharBuf *field)
-{
+SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
+            Segment *segment, const CharBuf *field) {
     Hash *metadata = (Hash*)CERTIFY(
-        Seg_Fetch_Metadata_Str(segment, "lexicon", 7), HASH);
+                         Seg_Fetch_Metadata_Str(segment, "lexicon", 7),
+                         HASH);
     Architecture *arch      = Schema_Get_Architecture(schema);
     Hash         *counts    = (Hash*)Hash_Fetch_Str(metadata, "counts", 6);
     Obj          *format    = Hash_Fetch_Str(metadata, "format", 6);
@@ -59,13 +58,13 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
     CharBuf *filename = CB_newf("%o/lexicon-%i32.dat", seg_name, field_num);
 
     Lex_init((Lexicon*)self, field);
-    
+
     // Check format.
     if (!format) { THROW(ERR, "Missing 'format'"); }
     else {
         if (Obj_To_I64(format) > LexWriter_current_file_format) {
             THROW(ERR, "Unsupported lexicon format: %i64",
-                Obj_To_I64(format));
+                  Obj_To_I64(format));
         }
     }
 
@@ -104,8 +103,7 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
 }
 
 void
-SegLex_destroy(SegLexicon *self) 
-{
+SegLex_destroy(SegLexicon *self) {
     DECREF(self->segment);
     DECREF(self->term_stepper);
     DECREF(self->tinfo_stepper);
@@ -115,8 +113,7 @@ SegLex_destroy(SegLexicon *self)
 }
 
 void
-SegLex_seek(SegLexicon *self, Obj *target)
-{
+SegLex_seek(SegLexicon *self, Obj *target) {
     LexIndex *const lex_index = self->lex_index;
 
     // Reset upon null term.
@@ -144,8 +141,7 @@ SegLex_seek(SegLexicon *self, Obj *target)
 }
 
 void
-SegLex_reset(SegLexicon* self) 
-{
+SegLex_reset(SegLexicon* self) {
     self->term_num = -1;
     InStream_Seek(self->instream, 0);
     TermStepper_Reset(self->term_stepper);
@@ -153,36 +149,33 @@ SegLex_reset(SegLexicon* self)
 }
 
 int32_t
-SegLex_get_field_num(SegLexicon *self)
-{
+SegLex_get_field_num(SegLexicon *self) {
     return self->field_num;
 }
 
 Obj*
-SegLex_get_term(SegLexicon *self)
-{
+SegLex_get_term(SegLexicon *self) {
     return TermStepper_Get_Value(self->term_stepper);
 }
 
 int32_t
-SegLex_doc_freq(SegLexicon *self)
-{
+SegLex_doc_freq(SegLexicon *self) {
     TermInfo *tinfo = (TermInfo*)TermStepper_Get_Value(self->tinfo_stepper);
     return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;
 }
 
 TermInfo*
-SegLex_get_term_info(SegLexicon *self)
-{
+SegLex_get_term_info(SegLexicon *self) {
     return (TermInfo*)TermStepper_Get_Value(self->tinfo_stepper);
 }
 
 Segment*
-SegLex_get_segment(SegLexicon *self) { return self->segment; }
+SegLex_get_segment(SegLexicon *self) {
+    return self->segment;
+}
 
-bool_t 
-SegLex_next(SegLexicon *self) 
-{
+bool_t
+SegLex_next(SegLexicon *self) {
     // If we've run out of terms, null out and return.
     if (++self->term_num >= self->size) {
         self->term_num = self->size; // don't keep growing
@@ -199,13 +192,12 @@ SegLex_next(SegLexicon *self)
 }
 
 static void
-S_scan_to(SegLexicon *self, Obj *target)
-{
+S_scan_to(SegLexicon *self, Obj *target) {
     // (mildly evil encapsulation violation, since value can be null)
     Obj *current = TermStepper_Get_Value(self->term_stepper);
-    if ( !Obj_Is_A(target, Obj_Get_VTable(current)) ) { 
+    if (!Obj_Is_A(target, Obj_Get_VTable(current))) {
         THROW(ERR, "Target is a %o, and not comparable to a %o",
-            Obj_Get_Class_Name(target), Obj_Get_Class_Name(current));
+              Obj_Get_Class_Name(target), Obj_Get_Class_Name(current));
     }
 
     // Keep looping until the term text is ge target.

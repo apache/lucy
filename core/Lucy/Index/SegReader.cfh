@@ -49,7 +49,7 @@ class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
      * <code>segments</code> that this particular SegReader is assigned to.
      */
     inert SegReader*
-    init(SegReader *self, Schema *schema, Folder *folder, 
+    init(SegReader *self, Schema *schema, Folder *folder,
          Snapshot *snapshot = NULL, VArray *segments, int32_t seg_tick);
 
     public void
@@ -71,7 +71,7 @@ class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
      * @param component A DataReader.
      */
     public void
-    Register(SegReader *self, const CharBuf *api, 
+    Register(SegReader *self, const CharBuf *api,
              decremented DataReader *component);
 
     /** Return the name of the segment.
@@ -92,7 +92,7 @@ class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
 
     public int32_t
     Doc_Count(SegReader *self);
-    
+
     public incremented I32Array*
     Offsets(SegReader *self);
 

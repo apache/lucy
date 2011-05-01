@@ -34,8 +34,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
 #include <libkern/OSAtomic.h>
 
 static CHY_INLINE chy_bool_t
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
-{
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
     return OSAtomicCompareAndSwapPtr(old_value, new_value, target);
 }
 
@@ -43,12 +42,11 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 #elif defined(CHY_HAS_WINDOWS_H)
 
 chy_bool_t
-lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value, 
+lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
                             void *new_value);
 
 static CHY_INLINE chy_bool_t
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
-{
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
     return lucy_Atomic_wrapped_cas_ptr(target, old_value, new_value);
 }
 
@@ -57,8 +55,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 #include <sys/atomic.h>
 
 static CHY_INLINE chy_bool_t
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
-{
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
     return atomic_cas_ptr(target, old_value, new_value) == old_value;
 }
 
@@ -69,8 +66,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
 extern pthread_mutex_t lucy_Atomic_mutex;
 
 static CHY_INLINE chy_bool_t
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value)
-{
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
     pthread_mutex_lock(&lucy_Atomic_mutex);
     if (*target == old_value) {
         *target = new_value;

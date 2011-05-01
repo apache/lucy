@@ -23,21 +23,19 @@
 #include "Charmonizer/Test/AllTests.h"
 
 TestBatch*
-TestVariadicMacros_prepare()
-{
+TestVariadicMacros_prepare() {
     return Test_new_batch("VariadicMacros", 4, TestVariadicMacros_run);
 }
 
 void
-TestVariadicMacros_run(TestBatch *batch)
-{
+TestVariadicMacros_run(TestBatch *batch) {
     char buf[10];
     chaz_bool_t really_has_var_macs = false;
 
 #if defined(HAS_ISO_VARIADIC_MACROS) || defined(HAS_GNUC_VARIADIC_MACROS)
   #ifdef HAS_VARIADIC_MACROS
     PASS(batch, "#defines agree");
-  #else 
+  #else
     FAIL(batch, 0, "#defines agree");
   #endif
 #else

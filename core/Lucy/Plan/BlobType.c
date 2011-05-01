@@ -20,51 +20,44 @@
 #include "Lucy/Plan/BlobType.h"
 
 BlobType*
-BlobType_new(bool_t stored)
-{
+BlobType_new(bool_t stored) {
     BlobType *self = (BlobType*)VTable_Make_Obj(BLOBTYPE);
     return BlobType_init(self, stored);
 }
 
 BlobType*
-BlobType_init(BlobType *self, bool_t stored)
-{
+BlobType_init(BlobType *self, bool_t stored) {
     FType_init((FieldType*)self);
     self->stored = stored;
     return self;
 }
 
 bool_t
-BlobType_binary(BlobType *self)
-{
+BlobType_binary(BlobType *self) {
     UNUSED_VAR(self);
     return true;
 }
 
 void
-BlobType_set_sortable(BlobType *self, bool_t sortable)
-{
+BlobType_set_sortable(BlobType *self, bool_t sortable) {
     UNUSED_VAR(self);
     if (sortable) { THROW(ERR, "BlobType fields can't be sortable"); }
 }
 
 ViewByteBuf*
-BlobType_make_blank(BlobType *self)
-{
+BlobType_make_blank(BlobType *self) {
     UNUSED_VAR(self);
     return ViewBB_new(NULL, 0);
 }
 
 int8_t
-BlobType_primitive_id(BlobType *self)
-{
+BlobType_primitive_id(BlobType *self) {
     UNUSED_VAR(self);
     return FType_BLOB;
 }
 
 bool_t
-BlobType_equals(BlobType *self, Obj *other)
-{
+BlobType_equals(BlobType *self, Obj *other) {
     BlobType *twin = (BlobType*)other;
     if (twin == self) return true;
     if (!Obj_Is_A(other, BLOBTYPE)) return false;
@@ -72,8 +65,7 @@ BlobType_equals(BlobType *self, Obj *other)
 }
 
 Hash*
-BlobType_dump_for_schema(BlobType *self) 
-{
+BlobType_dump_for_schema(BlobType *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("blob"));
 
@@ -93,24 +85,22 @@ BlobType_dump_for_schema(BlobType *self)
 }
 
 Hash*
-BlobType_dump(BlobType *self)
-{
+BlobType_dump(BlobType *self) {
     Hash *dump = BlobType_Dump_For_Schema(self);
-    Hash_Store_Str(dump, "_class", 6, 
-        (Obj*)CB_Clone(BlobType_Get_Class_Name(self)));
+    Hash_Store_Str(dump, "_class", 6,
+                   (Obj*)CB_Clone(BlobType_Get_Class_Name(self)));
     DECREF(Hash_Delete_Str(dump, "type", 4));
     return dump;
 }
 
 BlobType*
-BlobType_load(BlobType *self, Obj *dump)
-{
+BlobType_load(BlobType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
-    VTable *vtable 
-        = (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF)) 
-        ? VTable_singleton(class_name, NULL)
-        : BLOBTYPE;
+    VTable *vtable
+        = (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF))
+          ? VTable_singleton(class_name, NULL)
+          : BLOBTYPE;
     BlobType *loaded     = (BlobType*)VTable_Make_Obj(vtable);
     Obj *boost_dump      = Hash_Fetch_Str(source, "boost", 5);
     Obj *indexed_dump    = Hash_Fetch_Str(source, "indexed", 7);

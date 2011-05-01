@@ -35,35 +35,31 @@ S_init_arena(MemoryPool *self, size_t amount);
     } while (0)
 
 MemoryPool*
-MemPool_new(uint32_t arena_size)
-{
+MemPool_new(uint32_t arena_size) {
     MemoryPool *self = (MemoryPool*)VTable_Make_Obj(MEMORYPOOL);
     return MemPool_init(self, arena_size);
 }
 
 MemoryPool*
-MemPool_init(MemoryPool *self, uint32_t arena_size)
-{
+MemPool_init(MemoryPool *self, uint32_t arena_size) {
     self->arena_size = arena_size == 0 ? DEFAULT_BUF_SIZE : arena_size;
     self->arenas     = VA_new(16);
     self->tick       = -1;
     self->buf        = NULL;
     self->limit      = NULL;
     self->consumed   = 0;
-    
+
     return self;
 }
 
 void
-MemPool_destroy(MemoryPool *self)
-{
+MemPool_destroy(MemoryPool *self) {
     DECREF(self->arenas);
     SUPER_DESTROY(self, MEMORYPOOL);
 }
 
 static void
-S_init_arena(MemoryPool *self, size_t amount)
-{
+S_init_arena(MemoryPool *self, size_t amount) {
     ByteBuf *bb;
     int32_t i;
 
@@ -80,9 +76,9 @@ S_init_arena(MemoryPool *self, size_t amount)
     }
     else {
         // In add mode, get more mem from system.
-        size_t buf_size = (amount + 1) > self->arena_size 
-            ? (amount + 1)
-            : self->arena_size;
+        size_t buf_size = (amount + 1) > self->arena_size
+                          ? (amount + 1)
+                          : self->arena_size;
         char *ptr = (char*)MALLOCATE(buf_size);
         bb = BB_new_steal_bytes(ptr, buf_size - 1, buf_size);
         VA_Push(self->arenas, (Obj*)bb);
@@ -100,11 +96,12 @@ S_init_arena(MemoryPool *self, size_t amount)
 }
 
 size_t
-MemPool_get_consumed(MemoryPool *self) { return self->consumed; }
+MemPool_get_consumed(MemoryPool *self) {
+    return self->consumed;
+}
 
 void*
-MemPool_grab(MemoryPool *self, size_t amount)
-{
+MemPool_grab(MemoryPool *self, size_t amount) {
     INCREASE_TO_WORD_MULTIPLE(amount);
     self->last_buf = self->buf;
 
@@ -124,8 +121,7 @@ MemPool_grab(MemoryPool *self, size_t amount)
 }
 
 void
-MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount)
-{
+MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount) {
     const size_t last_amount = self->buf - self->last_buf;
     INCREASE_TO_WORD_MULTIPLE(new_amount);
 
@@ -139,15 +135,14 @@ MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount)
             self->consumed -= difference;
         }
         else {
-            THROW(ERR, "Can't resize to greater amount: %u64 > %u64", 
-                (uint64_t)new_amount, (uint64_t)last_amount);
+            THROW(ERR, "Can't resize to greater amount: %u64 > %u64",
+                  (uint64_t)new_amount, (uint64_t)last_amount);
         }
     }
 }
 
 void
-MemPool_release_all(MemoryPool *self)
-{
+MemPool_release_all(MemoryPool *self) {
     self->tick     = -1;
     self->buf      = NULL;
     self->last_buf = NULL;
@@ -165,7 +160,7 @@ MemPool_eat(MemoryPool *self, MemoryPool *other) {
     for (i = 0; i <= other->tick; i++) {
         ByteBuf *arena = (ByteBuf*)VA_Shift(other->arenas);
         // Maybe displace existing arena.
-        VA_Store(self->arenas, i, (Obj*)arena); 
+        VA_Store(self->arenas, i, (Obj*)arena);
     }
     self->tick     = other->tick;
     self->last_buf = other->last_buf;

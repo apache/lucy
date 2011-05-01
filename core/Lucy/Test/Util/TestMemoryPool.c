@@ -23,8 +23,7 @@
 #include "Lucy/Util/MemoryPool.h"
 
 void
-TestMemPool_run_tests()
-{
+TestMemPool_run_tests() {
     TestBatch  *batch     = TestBatch_new(4);
     MemoryPool *mem_pool  = MemPool_new(0);
     MemoryPool *other     = MemPool_new(0);

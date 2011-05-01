@@ -104,31 +104,29 @@ static void
 S_bequeath_methods(CFCClass *self);
 
 CFCClass*
-CFCClass_create(struct CFCParcel *parcel, const char *exposure, 
-                const char *class_name, const char *cnick, 
-                const char *micro_sym, CFCDocuComment *docucomment, 
-                const char *source_class, const char *parent_class_name, 
-                int is_final, int is_inert)
-{
+CFCClass_create(struct CFCParcel *parcel, const char *exposure,
+                const char *class_name, const char *cnick,
+                const char *micro_sym, CFCDocuComment *docucomment,
+                const char *source_class, const char *parent_class_name,
+                int is_final, int is_inert) {
     CFCClass *self = (CFCClass*)CFCBase_allocate(sizeof(CFCClass),
-        "Clownfish::Class");
+                                                 "Clownfish::Class");
     return CFCClass_do_create(self, parcel, exposure, class_name, cnick,
-        micro_sym, docucomment, source_class, parent_class_name, is_final, 
-        is_inert);
+                              micro_sym, docucomment, source_class,
+                              parent_class_name, is_final, is_inert);
 }
 
 CFCClass*
-CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel, 
-                   const char *exposure, const char *class_name, 
-                   const char *cnick, const char *micro_sym, 
-                   CFCDocuComment *docucomment, const char *source_class, 
-                   const char *parent_class_name, int is_final, int is_inert)
-{
+CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
+                   const char *exposure, const char *class_name,
+                   const char *cnick, const char *micro_sym,
+                   CFCDocuComment *docucomment, const char *source_class,
+                   const char *parent_class_name, int is_final, int is_inert) {
     CFCUTIL_NULL_CHECK(class_name);
     exposure  = exposure  ? exposure  : "parcel";
     micro_sym = micro_sym ? micro_sym : "class";
-    CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name, cnick, 
-        micro_sym);
+    CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name, cnick,
+                   micro_sym);
     self->parent     = NULL;
     self->tree_grown = false;
     self->autocode   = (char*)CALLOCATE(1, sizeof(char));
@@ -145,19 +143,19 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->attributes      = (CFCClassAttribute**)CALLOCATE(1, sizeof(CFCClassAttribute*));
     self->num_attributes  = 0;
     self->parent_class_name = CFCUtil_strdup(parent_class_name);
-    self->docucomment 
+    self->docucomment
         = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);
 
     // Assume that Foo::Bar should be found in Foo/Bar.h.
-    self->source_class = source_class 
-                       ? CFCUtil_strdup(source_class)
-                       : CFCUtil_strdup(class_name);
+    self->source_class = source_class
+                         ? CFCUtil_strdup(source_class)
+                         : CFCUtil_strdup(class_name);
 
     // Cache several derived symbols.
     const char *last_colon = strrchr(class_name, ':');
-    self->struct_sym = last_colon 
-                     ? CFCUtil_strdup(last_colon + 1)
-                     : CFCUtil_strdup(class_name);
+    self->struct_sym = last_colon
+                       ? CFCUtil_strdup(last_colon + 1)
+                       : CFCUtil_strdup(class_name);
     const char *prefix = CFCSymbol_get_prefix((CFCSymbol*)self);
     size_t prefix_len = strlen(prefix);
     size_t struct_sym_len = strlen(self->struct_sym);
@@ -171,7 +169,7 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     }
     self->short_vtable_var[struct_sym_len] = '\0';
     int check = sprintf(self->full_struct_sym, "%s%s", prefix,
-        self->struct_sym);
+                        self->struct_sym);
     if (check < 0) { croak("sprintf failed"); }
     for (i = 0; self->full_struct_sym[i] != '\0'; i++) {
         self->full_vtable_var[i] = toupper(self->full_struct_sym[i]);
@@ -206,8 +204,7 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
 }
 
 void
-CFCClass_destroy(CFCClass *self)
-{
+CFCClass_destroy(CFCClass *self) {
     CFCBase_decref((CFCBase*)self->docucomment);
     CFCBase_decref((CFCBase*)self->parent);
     size_t i;
@@ -250,12 +247,12 @@ CFCClass_destroy(CFCClass *self)
 }
 
 void
-CFCClass_register(CFCClass *self)
-{
+CFCClass_register(CFCClass *self) {
     if (registry_size == registry_cap) {
         size_t new_cap = registry_cap + 10;
-        registry = (CFCClassRegEntry*)REALLOCATE(registry,
-            (new_cap + 1) * sizeof(CFCClassRegEntry));
+        registry = (CFCClassRegEntry*)REALLOCATE(
+                       registry,
+                       (new_cap + 1) * sizeof(CFCClassRegEntry));
         size_t i;
         for (i = registry_cap; i <= new_cap; i++) {
             registry[i].key = NULL;
@@ -268,9 +265,9 @@ CFCClass_register(CFCClass *self)
     CFCClass *existing = CFCClass_fetch_singleton(parcel, class_name);
     const char *key = self->full_struct_sym;
     if (existing) {
-        croak("New class %s conflicts with existing class %s", 
-             CFCSymbol_get_class_name((CFCSymbol*)self),
-             CFCSymbol_get_class_name((CFCSymbol*)existing));
+        croak("New class %s conflicts with existing class %s",
+              CFCSymbol_get_class_name((CFCSymbol*)self),
+              CFCSymbol_get_class_name((CFCSymbol*)existing));
     }
     registry[registry_size].key   = CFCUtil_strdup(key);
     registry[registry_size].klass = (CFCClass*)CFCBase_incref((CFCBase*)self);
@@ -278,15 +275,14 @@ CFCClass_register(CFCClass *self)
 }
 
 CFCClass*
-CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name)
-{
+CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name) {
     CFCUTIL_NULL_CHECK(class_name);
 
     // Build up the key.
     const char *last_colon = strrchr(class_name, ':');
-    const char *struct_sym = last_colon 
-                           ? last_colon + 1
-                           : class_name;
+    const char *struct_sym = last_colon
+                             ? last_colon + 1
+                             : class_name;
     const char *prefix = parcel ? CFCParcel_get_prefix(parcel) : "";
     size_t prefix_len = strlen(prefix);
     size_t struct_sym_len = strlen(struct_sym);
@@ -307,8 +303,7 @@ CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name)
 }
 
 void
-CFCClass_clear_registry(void)
-{
+CFCClass_clear_registry(void) {
     size_t i;
     for (i = 0; i < registry_size; i++) {
         CFCBase_decref((CFCBase*)registry[i].klass);
@@ -320,39 +315,36 @@ CFCClass_clear_registry(void)
 }
 
 void
-CFCClass_add_child(CFCClass *self, CFCClass *child)
-{
+CFCClass_add_child(CFCClass *self, CFCClass *child) {
     CFCUTIL_NULL_CHECK(child);
     if (self->tree_grown) { croak("Can't call add_child after grow_tree"); }
     self->num_kids++;
     size_t size = (self->num_kids + 1) * sizeof(CFCClass*);
     self->children = (CFCClass**)REALLOCATE(self->children, size);
-    self->children[self->num_kids - 1] 
+    self->children[self->num_kids - 1]
         = (CFCClass*)CFCBase_incref((CFCBase*)child);
     self->children[self->num_kids] = NULL;
 }
 
 void
-CFCClass_add_function(CFCClass *self, CFCFunction *func)
-{
+CFCClass_add_function(CFCClass *self, CFCFunction *func) {
     CFCUTIL_NULL_CHECK(func);
-    if (self->tree_grown) { 
-        croak("Can't call add_function after grow_tree"); 
+    if (self->tree_grown) {
+        croak("Can't call add_function after grow_tree");
     }
     self->num_functions++;
     size_t size = (self->num_functions + 1) * sizeof(CFCFunction*);
     self->functions = (CFCFunction**)REALLOCATE(self->functions, size);
-    self->functions[self->num_functions - 1] 
+    self->functions[self->num_functions - 1]
         = (CFCFunction*)CFCBase_incref((CFCBase*)func);
     self->functions[self->num_functions] = NULL;
 }
 
 void
-CFCClass_add_method(CFCClass *self, CFCMethod *method)
-{
+CFCClass_add_method(CFCClass *self, CFCMethod *method) {
     CFCUTIL_NULL_CHECK(method);
-    if (self->tree_grown) { 
-        croak("Can't call add_method after grow_tree"); 
+    if (self->tree_grown) {
+        croak("Can't call add_method after grow_tree");
     }
     if (self->is_inert) {
         croak("Can't add_method to an inert class");
@@ -360,49 +352,46 @@ CFCClass_add_method(CFCClass *self, CFCMethod *method)
     self->num_methods++;
     size_t size = (self->num_methods + 1) * sizeof(CFCMethod*);
     self->methods = (CFCMethod**)REALLOCATE(self->methods, size);
-    self->methods[self->num_methods - 1] 
+    self->methods[self->num_methods - 1]
         = (CFCMethod*)CFCBase_incref((CFCBase*)method);
     self->methods[self->num_methods] = NULL;
 }
 
 void
-CFCClass_add_member_var(CFCClass *self, CFCVariable *var)
-{
+CFCClass_add_member_var(CFCClass *self, CFCVariable *var) {
     CFCUTIL_NULL_CHECK(var);
-    if (self->tree_grown) { 
-        croak("Can't call add_member_var after grow_tree"); 
+    if (self->tree_grown) {
+        croak("Can't call add_member_var after grow_tree");
     }
     self->num_member_vars++;
     size_t size = (self->num_member_vars + 1) * sizeof(CFCVariable*);
     self->member_vars = (CFCVariable**)REALLOCATE(self->member_vars, size);
-    self->member_vars[self->num_member_vars - 1] 
+    self->member_vars[self->num_member_vars - 1]
         = (CFCVariable*)CFCBase_incref((CFCBase*)var);
     self->member_vars[self->num_member_vars] = NULL;
 }
 
 void
-CFCClass_add_inert_var(CFCClass *self, CFCVariable *var)
-{
+CFCClass_add_inert_var(CFCClass *self, CFCVariable *var) {
     CFCUTIL_NULL_CHECK(var);
-    if (self->tree_grown) { 
-        croak("Can't call add_inert_var after grow_tree"); 
+    if (self->tree_grown) {
+        croak("Can't call add_inert_var after grow_tree");
     }
     self->num_inert_vars++;
     size_t size = (self->num_inert_vars + 1) * sizeof(CFCVariable*);
     self->inert_vars = (CFCVariable**)REALLOCATE(self->inert_vars, size);
-    self->inert_vars[self->num_inert_vars - 1] 
+    self->inert_vars[self->num_inert_vars - 1]
         = (CFCVariable*)CFCBase_incref((CFCBase*)var);
     self->inert_vars[self->num_inert_vars] = NULL;
 }
 
 void
-CFCClass_add_attribute(CFCClass *self, const char *name, const char *value)
-{
+CFCClass_add_attribute(CFCClass *self, const char *name, const char *value) {
     if (!name || !strlen(name)) { croak("'name' is required"); }
-    if (CFCClass_has_attribute(self, name)) { 
+    if (CFCClass_has_attribute(self, name)) {
         croak("Attribute '%s' already registered");
     }
-    CFCClassAttribute *attribute 
+    CFCClassAttribute *attribute
         = (CFCClassAttribute*)MALLOCATE(sizeof(CFCClassAttribute));
     attribute->name  = CFCUtil_strdup(name);
     attribute->value = CFCUtil_strdup(value);
@@ -411,12 +400,10 @@ CFCClass_add_attribute(CFCClass *self, const char *name, const char *value)
     self->attributes = (CFCClassAttribute**)REALLOCATE(self->attributes, size);
     self->attributes[self->num_attributes - 1] = attribute;
     self->attributes[self->num_attributes] = NULL;
-
 }
 
 int
-CFCClass_has_attribute(CFCClass *self, const char *name)
-{
+CFCClass_has_attribute(CFCClass *self, const char *name) {
     CFCUTIL_NULL_CHECK(name);
     size_t i;
     for (i = 0; i < self->num_attributes; i++) {
@@ -428,8 +415,7 @@ CFCClass_has_attribute(CFCClass *self, const char *name)
 }
 
 static CFCFunction*
-S_find_func(CFCFunction **funcs, const char *sym)
-{
+S_find_func(CFCFunction **funcs, const char *sym) {
     const size_t MAX_LEN = 128;
     char lcsym[MAX_LEN + 1];
     size_t sym_len = strlen(sym);
@@ -449,24 +435,21 @@ S_find_func(CFCFunction **funcs, const char *sym)
 }
 
 CFCFunction*
-CFCClass_function(CFCClass *self, const char *sym)
-{
+CFCClass_function(CFCClass *self, const char *sym) {
     return S_find_func(self->functions, sym);
 }
 
 CFCMethod*
-CFCClass_method(CFCClass *self, const char *sym)
-{
+CFCClass_method(CFCClass *self, const char *sym) {
     return (CFCMethod*)S_find_func((CFCFunction**)self->methods, sym);
 }
 
 CFCMethod*
-CFCClass_novel_method(CFCClass *self, const char *sym)
-{
+CFCClass_novel_method(CFCClass *self, const char *sym) {
     CFCMethod *method = CFCClass_method(self, sym);
     if (method) {
         const char *cnick = CFCClass_get_cnick(self);
-        const char *meth_cnick 
+        const char *meth_cnick
             = CFCSymbol_get_class_cnick((CFCSymbol*)method);
         if (strcmp(cnick, meth_cnick) == 0) {
             return method;
@@ -477,20 +460,19 @@ CFCClass_novel_method(CFCClass *self, const char *sym)
 
 // Pass down member vars to from parent to children.
 static void
-S_bequeath_member_vars(CFCClass *self)
-{
+S_bequeath_member_vars(CFCClass *self) {
     size_t i;
     for (i = 0; self->children[i] != NULL; i++) {
         CFCClass *child = self->children[i];
         size_t num_vars = self->num_member_vars + child->num_member_vars;
         size_t size = (num_vars + 1) * sizeof(CFCVariable*);
-        child->member_vars 
+        child->member_vars
             = (CFCVariable**)REALLOCATE(child->member_vars, size);
         memmove(child->member_vars + self->num_member_vars,
-            child->member_vars, 
-            child->num_member_vars * sizeof(CFCVariable*));
-        memcpy(child->member_vars, self->member_vars, 
-            self->num_member_vars * sizeof(CFCVariable*));
+                child->member_vars,
+                child->num_member_vars * sizeof(CFCVariable*));
+        memcpy(child->member_vars, self->member_vars,
+               self->num_member_vars * sizeof(CFCVariable*));
         size_t j;
         for (j = 0; self->member_vars[j] != NULL; j++) {
             CFCBase_incref((CFCBase*)child->member_vars[j]);
@@ -502,8 +484,7 @@ S_bequeath_member_vars(CFCClass *self)
 }
 
 static void
-S_bequeath_methods(CFCClass *self)
-{
+S_bequeath_methods(CFCClass *self) {
     size_t child_num;
     for (child_num = 0; self->children[child_num] != NULL; child_num++) {
         CFCClass *child = self->children[child_num];
@@ -512,7 +493,7 @@ S_bequeath_methods(CFCClass *self)
         size_t num_methods = 0;
         size_t max_methods = self->num_methods + child->num_methods;
         CFCMethod **methods = (CFCMethod**)MALLOCATE(
-            (max_methods + 1) * sizeof(CFCMethod*));
+                                  (max_methods + 1) * sizeof(CFCMethod*));
 
         // Gather methods which child inherits or overrides.
         size_t i;
@@ -538,7 +519,7 @@ S_bequeath_methods(CFCClass *self)
             }
         }
         methods[num_methods] = NULL;
-        
+
         // Manage refcounts and assign new array.  Transform to final methods
         // if child class is a final class.
         if (child->is_final) {
@@ -566,8 +547,7 @@ S_bequeath_methods(CFCClass *self)
 
 // Let the children know who their parent class is.
 static void
-S_establish_ancestry(CFCClass *self)
-{
+S_establish_ancestry(CFCClass *self) {
     size_t i;
     for (i = 0; i < self->num_kids; i++) {
         CFCClass *child = self->children[i];
@@ -579,8 +559,7 @@ S_establish_ancestry(CFCClass *self)
 }
 
 static size_t
-S_family_tree_size(CFCClass *self)
-{
+S_family_tree_size(CFCClass *self) {
     size_t count = 1; // self
     size_t i;
     for (i = 0; i < self->num_kids; i++) {
@@ -590,8 +569,7 @@ S_family_tree_size(CFCClass *self)
 }
 
 static void
-S_create_dumpables(CFCClass *self)
-{
+S_create_dumpables(CFCClass *self) {
     if (CFCClass_has_attribute(self, "dumpable")) {
         CFCDumpable *dumpable = CFCDumpable_new();
         CFCDumpable_add_dumpables(dumpable, self);
@@ -600,8 +578,7 @@ S_create_dumpables(CFCClass *self)
 }
 
 void
-CFCClass_grow_tree(CFCClass *self)
-{
+CFCClass_grow_tree(CFCClass *self) {
     if (self->tree_grown) {
         croak("Can't call grow_tree more than once");
     }
@@ -613,8 +590,7 @@ CFCClass_grow_tree(CFCClass *self)
 }
 
 static void
-S_generate_automethods(CFCClass *self) 
-{
+S_generate_automethods(CFCClass *self) {
     S_create_dumpables(self);
     size_t i;
     for (i = 0; i < self->num_kids; i++) {
@@ -625,8 +601,7 @@ S_generate_automethods(CFCClass *self)
 // Return value is valid only so long as object persists (elements are not
 // refcounted).
 CFCClass**
-CFCClass_tree_to_ladder(CFCClass *self)
-{
+CFCClass_tree_to_ladder(CFCClass *self) {
     size_t ladder_len = S_family_tree_size(self);
     CFCClass **ladder = (CFCClass**)MALLOCATE((ladder_len + 1) * sizeof(CFCClass*));
     ladder[ladder_len] = NULL;
@@ -646,8 +621,7 @@ CFCClass_tree_to_ladder(CFCClass *self)
 }
 
 static CFCSymbol**
-S_novel_syms(CFCClass *self, CFCSymbol **syms)
-{
+S_novel_syms(CFCClass *self, CFCSymbol **syms) {
     const char *cnick = CFCSymbol_get_class_cnick((CFCSymbol*)self);
     size_t count = 0;
     while (syms[count] != NULL) { count++; }
@@ -667,143 +641,120 @@ S_novel_syms(CFCClass *self, CFCSymbol **syms)
 }
 
 CFCMethod**
-CFCClass_novel_methods(CFCClass *self)
-{
+CFCClass_novel_methods(CFCClass *self) {
     return (CFCMethod**)S_novel_syms(self, (CFCSymbol**)self->methods);
 }
 
 CFCVariable**
-CFCClass_novel_member_vars(CFCClass *self)
-{
+CFCClass_novel_member_vars(CFCClass *self) {
     return (CFCVariable**)S_novel_syms(self, (CFCSymbol**)self->member_vars);
 }
 
 CFCClass**
-CFCClass_children(CFCClass *self)
-{
+CFCClass_children(CFCClass *self) {
     return self->children;
 }
 
 CFCFunction**
-CFCClass_functions(CFCClass *self)
-{
+CFCClass_functions(CFCClass *self) {
     return self->functions;
 }
 
 CFCMethod**
-CFCClass_methods(CFCClass *self)
-{
+CFCClass_methods(CFCClass *self) {
     return self->methods;
 }
 
 CFCVariable**
-CFCClass_member_vars(CFCClass *self)
-{
+CFCClass_member_vars(CFCClass *self) {
     return self->member_vars;
 }
 
 CFCVariable**
-CFCClass_inert_vars(CFCClass *self)
-{
+CFCClass_inert_vars(CFCClass *self) {
     return self->inert_vars;
 }
 
 const char*
-CFCClass_get_cnick(CFCClass *self)
-{
+CFCClass_get_cnick(CFCClass *self) {
     return CFCSymbol_get_class_cnick((CFCSymbol*)self);
 }
 
 void
-CFCClass_set_parent(CFCClass *self, CFCClass *parent)
-{
+CFCClass_set_parent(CFCClass *self, CFCClass *parent) {
     CFCBase_decref((CFCBase*)self->parent);
     self->parent = (CFCClass*)CFCBase_incref((CFCBase*)parent);
 }
 
 CFCClass*
-CFCClass_get_parent(CFCClass *self)
-{
+CFCClass_get_parent(CFCClass *self) {
     return self->parent;
 }
 
 void
-CFCClass_append_autocode(CFCClass *self, const char *autocode)
-{
+CFCClass_append_autocode(CFCClass *self, const char *autocode) {
     size_t size = strlen(self->autocode) + strlen(autocode) + 1;
     self->autocode = (char*)REALLOCATE(self->autocode, size);
     strcat(self->autocode, autocode);
 }
 
 const char*
-CFCClass_get_autocode(CFCClass *self)
-{
+CFCClass_get_autocode(CFCClass *self) {
     return self->autocode;
 }
 
 const char*
-CFCClass_get_source_class(CFCClass *self)
-{
+CFCClass_get_source_class(CFCClass *self) {
     return self->source_class;
 }
 
 const char*
-CFCClass_get_parent_class_name(CFCClass *self)
-{
+CFCClass_get_parent_class_name(CFCClass *self) {
     return self->parent_class_name;
 }
 
 int
-CFCClass_final(CFCClass *self)
-{
+CFCClass_final(CFCClass *self) {
     return self->is_final;
 }
 
 int
-CFCClass_inert(CFCClass *self)
-{
+CFCClass_inert(CFCClass *self) {
     return self->is_inert;
 }
 
 const char*
-CFCClass_get_struct_sym(CFCClass *self)
-{
+CFCClass_get_struct_sym(CFCClass *self) {
     return self->struct_sym;
 }
 
 const char*
-CFCClass_full_struct_sym(CFCClass *self)
-{
+CFCClass_full_struct_sym(CFCClass *self) {
     return self->full_struct_sym;
 }
 
 const char*
-CFCClass_short_vtable_var(CFCClass *self)
-{
+CFCClass_short_vtable_var(CFCClass *self) {
     return self->short_vtable_var;
 }
 
 const char*
-CFCClass_full_vtable_var(CFCClass *self)
-{
+CFCClass_full_vtable_var(CFCClass *self) {
     return self->full_vtable_var;
 }
 
 const char*
-CFCClass_full_vtable_type(CFCClass *self)
-{
+CFCClass_full_vtable_type(CFCClass *self) {
     return self->full_vtable_type;
 }
 
 const char*
-CFCClass_include_h(CFCClass *self)
-{
+CFCClass_include_h(CFCClass *self) {
     return self->include_h;
 }
 
 struct CFCDocuComment*
-CFCClass_get_docucomment(CFCClass *self)
-{
+CFCClass_get_docucomment(CFCClass *self) {
     return self->docucomment;
 }
 

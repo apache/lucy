@@ -67,7 +67,7 @@ class Lucy::Search::PhraseQuery inherits Lucy::Search::Query
     Destroy(PhraseQuery *self);
 }
 
-class Lucy::Search::PhraseCompiler 
+class Lucy::Search::PhraseCompiler
     inherits Lucy::Search::Compiler {
 
     float idf;
@@ -79,7 +79,7 @@ class Lucy::Search::PhraseCompiler
     new(PhraseQuery *parent, Searcher *searcher, float boost);
 
     inert PhraseCompiler*
-    init(PhraseCompiler *self, PhraseQuery *parent, Searcher *searcher, 
+    init(PhraseCompiler *self, PhraseQuery *parent, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
@@ -95,7 +95,7 @@ class Lucy::Search::PhraseCompiler
     Apply_Norm_Factor(PhraseCompiler *self, float factor);
 
     public incremented VArray*
-    Highlight_Spans(PhraseCompiler *self, Searcher *searcher, 
+    Highlight_Spans(PhraseCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
     public bool_t

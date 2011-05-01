@@ -33,7 +33,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
 
     public inert nullable Folder*
     init(Folder *self, const CharBuf *path);
-    
+
     public void
     Destroy(Folder *self);
 
@@ -46,7 +46,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
      */
     void
     Set_Path(Folder *self, const CharBuf *path);
-    
+
     /** Open an OutStream, or set Err_error and return NULL on failure.
      *
      * @param path A relative filepath.
@@ -147,7 +147,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
      * @param to The filepath after renaming.
      * @return true on success, false on failure.
      */
-    public abstract bool_t 
+    public abstract bool_t
     Rename(Folder *self, const CharBuf *from, const CharBuf *to);
 
     /** Create a hard link at path <code>to</code> pointing at the existing
@@ -202,7 +202,7 @@ abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
      *
      * @return true on success.
      */
-    public abstract bool_t 
+    public abstract bool_t
     Check(Folder *self);
 
     /** Close the folder and release implementation-specific resources.

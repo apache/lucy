@@ -25,8 +25,7 @@
 #include "Lucy/Analysis/RegexTokenizer.h"
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch)
-{
+test_Dump_Load_and_Equals(TestBatch *batch) {
     RegexTokenizer *tokenizer     = RegexTokenizer_new(NULL);
     CaseFolder     *case_folder   = CaseFolder_new();
     FullTextType   *type          = FullTextType_new((Analyzer*)tokenizer);
@@ -49,19 +48,19 @@ test_Dump_Load_and_Equals(TestBatch *batch)
     FullTextType *another_clone = FullTextType_load(NULL, another_dump);
 
     TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)boost_differs),
-        "Equals() false with different boost");
+               "Equals() false with different boost");
     TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)other),
-        "Equals() false with different Analyzer");
+               "Equals() false with different Analyzer");
     TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)not_indexed),
-        "Equals() false with indexed => false");
+               "Equals() false with indexed => false");
     TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)not_stored),
-        "Equals() false with stored => false");
+               "Equals() false with stored => false");
     TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)highlightable),
-        "Equals() false with highlightable => true");
-    TEST_TRUE(batch, FullTextType_Equals(type, (Obj*)clone), 
-        "Dump => Load round trip");
-    TEST_TRUE(batch, FullTextType_Equals(type, (Obj*)another_clone), 
-        "Dump_For_Schema => Load round trip");
+               "Equals() false with highlightable => true");
+    TEST_TRUE(batch, FullTextType_Equals(type, (Obj*)clone),
+              "Dump => Load round trip");
+    TEST_TRUE(batch, FullTextType_Equals(type, (Obj*)another_clone),
+              "Dump_For_Schema => Load round trip");
 
     DECREF(another_clone);
     DECREF(dump);
@@ -78,30 +77,28 @@ test_Dump_Load_and_Equals(TestBatch *batch)
 }
 
 static void
-test_Compare_Values(TestBatch *batch)
-{
+test_Compare_Values(TestBatch *batch) {
     RegexTokenizer *tokenizer = RegexTokenizer_new(NULL);
     FullTextType   *type      = FullTextType_new((Analyzer*)tokenizer);
     ZombieCharBuf  *a         = ZCB_WRAP_STR("a", 1);
     ZombieCharBuf  *b         = ZCB_WRAP_STR("b", 1);
 
-    TEST_TRUE(batch, 
-        FullTextType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
-        "a less than b");
-    TEST_TRUE(batch, 
-        FullTextType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
-        "b greater than a");
-    TEST_TRUE(batch, 
-        FullTextType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
-        "b equals b");
+    TEST_TRUE(batch,
+              FullTextType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
+              "a less than b");
+    TEST_TRUE(batch,
+              FullTextType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
+              "b greater than a");
+    TEST_TRUE(batch,
+              FullTextType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
+              "b equals b");
 
     DECREF(type);
     DECREF(tokenizer);
 }
 
 void
-TestFullTextType_run_tests()
-{
+TestFullTextType_run_tests() {
     TestBatch *batch = TestBatch_new(10);
     TestBatch_Plan(batch);
     test_Dump_Load_and_Equals(batch);

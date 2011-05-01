@@ -64,7 +64,7 @@ class Lucy::Store::LockFactory cnick LockFact
      * @param interval Time in milliseconds between retries.
      */
     public incremented Lock*
-    Make_Shared_Lock(LockFactory *self, const CharBuf *name, 
+    Make_Shared_Lock(LockFactory *self, const CharBuf *name,
                      int32_t timeout = 0, int32_t interval = 100);
 
     public void

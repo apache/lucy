@@ -35,32 +35,32 @@ class Lucy::Analysis::Inversion inherits Lucy::Object::Obj {
     /**
      * @param seed An initial Token to start things off, which may be NULL.
      */
-    inert incremented Inversion* 
+    inert incremented Inversion*
     new(Token *seed = NULL);
 
     /** Tack a token onto the end of the Inversion.
      *
      * @param token A Token.
      */
-    void 
+    void
     Append(Inversion *self, decremented Token *token);
 
     /** Return the next token in the Inversion until out of tokens.
      */
-    nullable Token* 
+    nullable Token*
     Next(Inversion *self);
 
     /** Reset the Inversion's iterator, so that the next call to next()
      * returns the first Token in the inversion.
      */
-    void 
+    void
     Reset(Inversion *self);
 
     /** Assign positions to constituent Tokens, tallying up the position
      * increments.  Sort the tokens first by token text and then by position
      * ascending.
      */
-    void 
+    void
     Invert(Inversion *self);
 
     /** Return a pointer to the next group of like Tokens.  The number of
@@ -68,13 +68,13 @@ class Lucy::Analysis::Inversion inherits Lucy::Object::Obj {
      *
      * @param count The number of tokens in the cluster.
      */
-    nullable Token** 
+    nullable Token**
     Next_Cluster(Inversion *self, uint32_t *count);
 
     uint32_t
     Get_Size(Inversion *self);
 
-    public void 
+    public void
     Destroy(Inversion *self);
 }
 

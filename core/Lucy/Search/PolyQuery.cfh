@@ -82,7 +82,7 @@ class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
     Apply_Norm_Factor(PolyCompiler *self, float factor);
 
     public incremented VArray*
-    Highlight_Spans(PolyCompiler *self, Searcher *searcher, 
+    Highlight_Spans(PolyCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
     public void

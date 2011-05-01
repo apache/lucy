@@ -32,8 +32,8 @@ inert class Lucy::Test::Store::TestFolderCommon {
     num_tests();
 
     inert void
-    run_tests(void *test_batch, 
-              lucy_TestFolderCommon_set_up_t set_up, 
+    run_tests(void *test_batch,
+              lucy_TestFolderCommon_set_up_t set_up,
               lucy_TestFolderCommon_tear_down_t tear_down);
 }
 

@@ -96,7 +96,7 @@ $vt_type $vt = {
     0, /* flags */
     NULL, /* "void *x" member reserved for future use */
     sizeof($struct_sym), /* obj_alloc_size */
-    offsetof(cfish_VTable, methods) 
+    offsetof(cfish_VTable, methods)
         + $num_methods * sizeof(cfish_method_t), /* vt_alloc_size */
     &$cb_var,  /* callbacks */
     {
@@ -275,7 +275,7 @@ $vt
 $vtable_object
 
 #ifdef $short_names_macro
-  #define $short_struct $full_struct 
+  #define $short_struct $full_struct
   #define $short_vt_var $vtable_var
 $short_names
 #endif /* $short_names_macro */

@@ -74,7 +74,7 @@ S_probe_pread64(unbuff_combo *combo);
 
 /* Determine whether we can use sparse files.
  */
-static chaz_bool_t 
+static chaz_bool_t
 S_check_sparse_files();
 
 /* Helper for check_sparse_files().
@@ -97,8 +97,7 @@ static char pread64_command[10];
 static char off64_type[10];
 
 void
-LargeFiles_run(void) 
-{
+LargeFiles_run(void) {
     chaz_bool_t success = false;
     chaz_bool_t found_lseek = false;
     chaz_bool_t found_pread64 = false;
@@ -138,7 +137,8 @@ LargeFiles_run(void)
             found_lseek = S_probe_lseek(&combo);
             if (found_lseek) {
                 strcpy(lseek_command, combo.lseek_command);
-                ConfWriter_append_conf("#define chy_lseek64 %s\n", lseek_command);
+                ConfWriter_append_conf("#define chy_lseek64 %s\n",
+                                       lseek_command);
                 break;
             }
         }
@@ -147,7 +147,8 @@ LargeFiles_run(void)
             found_pread64 = S_probe_pread64(&combo);
             if (found_pread64) {
                 strcpy(pread64_command, combo.pread64_command);
-                ConfWriter_append_conf("#define chy_pread64 %s\n", pread64_command);
+                ConfWriter_append_conf("#define chy_pread64 %s\n",
+                                       pread64_command);
                 found_pread64 = true;
                 break;
             }
@@ -186,12 +187,12 @@ LargeFiles_run(void)
         }
         ConfWriter_end_short_names();
     }
-    
+
     ConfWriter_end_module();
 }
 
 /* Code for checking ftello64 and friends. */
-static char off64_code[] = 
+static char off64_code[] =
     QUOTE(  %s                                         )
     QUOTE(  #include "_charm.h"                        )
     QUOTE(  int main() {                               )
@@ -208,23 +209,22 @@ static char off64_code[] =
 
 
 static chaz_bool_t
-S_probe_off64(off64_combo *combo)
-{
+S_probe_off64(off64_combo *combo) {
     char *output = NULL;
     size_t output_len;
-    size_t needed = sizeof(off64_code) 
-                  + (2 * strlen(combo->offset64_type)) 
-                  + strlen(combo->fopen_command) 
-                  + strlen(combo->ftell_command) 
-                  + strlen(combo->fseek_command) 
-                  + 20;
+    size_t needed = sizeof(off64_code)
+                    + (2 * strlen(combo->offset64_type))
+                    + strlen(combo->fopen_command)
+                    + strlen(combo->ftell_command)
+                    + strlen(combo->fseek_command)
+                    + 20;
     char *code_buf = (char*)malloc(needed);
     chaz_bool_t success = false;
 
     /* Prepare the source code. */
-    sprintf(code_buf, off64_code, combo->includes, combo->offset64_type, 
-        combo->fopen_command, combo->offset64_type, combo->ftell_command, 
-        combo->fseek_command);
+    sprintf(code_buf, off64_code, combo->includes, combo->offset64_type,
+            combo->fopen_command, combo->offset64_type, combo->ftell_command,
+            combo->fseek_command);
 
     /* Verify compilation and that the offset type has 8 bytes. */
     output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
@@ -244,7 +244,7 @@ S_probe_off64(off64_combo *combo)
 }
 
 /* Code for checking 64-bit lseek. */
-static char lseek_code[] = 
+static char lseek_code[] =
     QUOTE(  %s                                                        )
     QUOTE(  #include "_charm.h"                                       )
     QUOTE(  int main() {                                              )
@@ -259,12 +259,13 @@ static char lseek_code[] =
     QUOTE(  }                                                         );
 
 static chaz_bool_t
-S_probe_lseek(unbuff_combo *combo)
-{
+S_probe_lseek(unbuff_combo *combo) {
     char *output = NULL;
     size_t output_len;
-    size_t needed = sizeof(lseek_code) + strlen(combo->includes) 
-        + strlen(combo->lseek_command) + 20;
+    size_t needed = sizeof(lseek_code)
+                    + strlen(combo->includes)
+                    + strlen(combo->lseek_command)
+                    + 20;
     char *code_buf = (char*)malloc(needed);
     chaz_bool_t success = false;
 
@@ -286,7 +287,7 @@ S_probe_lseek(unbuff_combo *combo)
 
 /* Code for checking 64-bit pread.  The pread call will fail, but that's fine
  * as long as it compiles. */
-static char pread64_code[] = 
+static char pread64_code[] =
     QUOTE(  %s                                     )
     QUOTE(  #include "_charm.h"                    )
     QUOTE(  int main() {                           )
@@ -299,12 +300,13 @@ static char pread64_code[] =
     QUOTE(  }                                      );
 
 static chaz_bool_t
-S_probe_pread64(unbuff_combo *combo)
-{
+S_probe_pread64(unbuff_combo *combo) {
     char *output = NULL;
     size_t output_len;
-    size_t needed = sizeof(pread64_code) + strlen(combo->includes) 
-        + strlen(combo->pread64_command) + 20;
+    size_t needed = sizeof(pread64_code)
+                    + strlen(combo->includes)
+                    + strlen(combo->pread64_command)
+                    + 20;
     char *code_buf = (char*)malloc(needed);
     chaz_bool_t success = false;
 
@@ -320,9 +322,8 @@ S_probe_pread64(unbuff_combo *combo)
     return success;
 }
 
-static chaz_bool_t 
-S_check_sparse_files()
-{
+static chaz_bool_t
+S_check_sparse_files() {
     Stat st_a, st_b;
 
     /* Bail out if we can't stat() a file. */
@@ -350,23 +351,22 @@ S_check_sparse_files()
     else {
         return false;
     }
-} 
+}
 
 static void
-S_test_sparse_file(long offset, Stat *st)
-{
+S_test_sparse_file(long offset, Stat *st) {
     FILE *sparse_fh;
 
     /* Make sure the file's not there, then open. */
     Util_remove_and_verify("_charm_sparse");
-    if ( (sparse_fh = fopen("_charm_sparse", "w+")) == NULL )
+    if ((sparse_fh = fopen("_charm_sparse", "w+")) == NULL)
         Util_die("Couldn't open file '_charm_sparse'");
 
     /* Seek fh to [offset], write a byte, close file. */
-    if ( (fseek(sparse_fh, offset, SEEK_SET)) == -1) {
+    if ((fseek(sparse_fh, offset, SEEK_SET)) == -1) {
         Util_die("seek failed: %s", strerror(errno));
     }
-    if ( (fprintf(sparse_fh, "X")) != 1 ) {
+    if ((fprintf(sparse_fh, "X")) != 1) {
         Util_die("fprintf failed");
     }
     if (fclose(sparse_fh)) {
@@ -380,35 +380,34 @@ S_test_sparse_file(long offset, Stat *st)
 }
 
 /* Open a file, seek to a loc, print a char, and communicate success. */
-static char create_bigfile_code[] = 
+static char create_bigfile_code[] =
     QUOTE(  #include "_charm.h"                                      )
     QUOTE(  int main() {                                             )
     QUOTE(      FILE *fh = fopen("_charm_large_file_test", "w+");    )
     QUOTE(      int check_seek;                                      )
     QUOTE(      Charm_Setup;                                         )
-                /* Bail unless seek succeeds. */
+    /* Bail unless seek succeeds. */
     QUOTE(      check_seek = %s(fh, 5000000000, SEEK_SET);           )
     QUOTE(      if (check_seek == -1)                                )
     QUOTE(          exit(1);                                         )
-                /* Bail unless we write successfully. */
+    /* Bail unless we write successfully. */
     QUOTE(      if (fprintf(fh, "X") != 1)                           )
     QUOTE(          exit(1);                                         )
     QUOTE(      if (fclose(fh))                                      )
     QUOTE(          exit(1);                                         )
-                /* Communicate success to Charmonizer. */
+    /* Communicate success to Charmonizer. */
     QUOTE(      printf("1");                                         )
     QUOTE(      return 0;                                            )
     QUOTE(  }                                                        );
 
 static chaz_bool_t
-S_can_create_big_files()
-{
+S_can_create_big_files() {
     char *output;
     size_t output_len;
     FILE *truncating_fh;
     size_t needed = strlen(create_bigfile_code)
-                  + strlen(fseek_command)
-                  + 10;
+                    + strlen(fseek_command)
+                    + 10;
     char *code_buf = (char*)malloc(needed);
 
     /* Concat the source strings, compile the file, capture output. */

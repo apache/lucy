@@ -20,12 +20,12 @@ parcel Lucy;
  *
  * LexiconReader reads term dictionary information.
  */
-abstract class Lucy::Index::LexiconReader cnick LexReader 
+abstract class Lucy::Index::LexiconReader cnick LexReader
     inherits Lucy::Index::DataReader {
 
     inert LexiconReader*
     init(LexiconReader *self, Schema *schema = NULL, Folder *folder = NULL,
-        Snapshot *snapshot = NULL, VArray *segments = NULL, 
+        Snapshot *snapshot = NULL, VArray *segments = NULL,
         int32_t seg_tick = -1);
 
     /** Return a new Lexicon for the given <code>field</code>.  Will return
@@ -83,7 +83,7 @@ class Lucy::Index::PolyLexiconReader cnick PolyLexReader
     Destroy(PolyLexiconReader *self);
 }
 
-class Lucy::Index::DefaultLexiconReader cnick DefLexReader 
+class Lucy::Index::DefaultLexiconReader cnick DefLexReader
     inherits Lucy::Index::LexiconReader {
 
     VArray *lexicons;
@@ -93,11 +93,11 @@ class Lucy::Index::DefaultLexiconReader cnick DefLexReader
         int32_t seg_tick);
 
     inert DefaultLexiconReader*
-    init(DefaultLexiconReader *self, Schema *schema, Folder *folder, 
+    init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
          Snapshot *snapshot, VArray *segments, int32_t seg_tick);
 
     public incremented nullable Lexicon*
-    Lexicon(DefaultLexiconReader *self, const CharBuf *field, 
+    Lexicon(DefaultLexiconReader *self, const CharBuf *field,
             Obj *term = NULL);
 
     /** Return the number of documents in which the term appears.
@@ -106,7 +106,7 @@ class Lucy::Index::DefaultLexiconReader cnick DefLexReader
     Doc_Freq(DefaultLexiconReader *self, const CharBuf *field, Obj *term);
 
     incremented nullable TermInfo*
-    Fetch_Term_Info(DefaultLexiconReader *self, const CharBuf *field, 
+    Fetch_Term_Info(DefaultLexiconReader *self, const CharBuf *field,
                     Obj *term);
 
     public void
