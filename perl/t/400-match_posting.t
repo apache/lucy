@@ -22,8 +22,7 @@ use base qw( Lucy::Index::Similarity );
 
 sub make_posting {
     my $self = shift;
-    return Lucy::Index::Posting::MatchPosting->new(
-        similarity => $self );
+    return Lucy::Index::Posting::MatchPosting->new( similarity => $self );
 }
 
 package MatchSchema::MatchOnly;
@@ -49,10 +48,9 @@ package main;
 use Lucy::Test::TestUtils qw( get_uscon_docs );
 use Test::More tests => 6;
 
-my $uscon_docs = get_uscon_docs();
+my $uscon_docs   = get_uscon_docs();
 my $match_folder = make_index( MatchSchema->new, $uscon_docs );
-my $score_folder
-    = make_index( Lucy::Test::TestSchema->new, $uscon_docs );
+my $score_folder = make_index( Lucy::Test::TestSchema->new, $uscon_docs );
 
 my $match_searcher
     = Lucy::Search::IndexSearcher->new( index => $match_folder );
@@ -87,10 +85,11 @@ sub hit_ids_array {
     my ( $searcher, $query_string ) = @_;
     my $query = $searcher->glean_query($query_string);
 
-    my $bit_vec = Lucy::Object::BitVector->new(
-        capacity => $searcher->doc_max + 1 );
-    my $bit_collector = Lucy::Search::Collector::BitCollector->new(
-        bit_vector => $bit_vec, );
+    my $bit_vec
+        = Lucy::Object::BitVector->new( capacity => $searcher->doc_max + 1 );
+    my $bit_collector
+        = Lucy::Search::Collector::BitCollector->new( bit_vector => $bit_vec,
+        );
     $searcher->collect( query => $query, collector => $bit_collector );
     return $bit_vec->to_array->to_arrayref;
 }

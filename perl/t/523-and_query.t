@@ -70,11 +70,8 @@ isa_ok( $and_matcher, "Lucy::Search::ANDMatcher", "make_matcher" );
 
 my $term_matcher = $one_child->make_compiler( searcher => $searcher )
     ->make_matcher( reader => $reader, need_score => 0 );
-isa_ok(
-    $term_matcher,
-    "Lucy::Search::TermMatcher",
-    "make_matcher compiles to child's Matcher if there's only one child"
-);
+isa_ok( $term_matcher, "Lucy::Search::TermMatcher",
+    "make_matcher compiles to child's Matcher if there's only one child" );
 
 my $hopeless_query = Lucy::Search::TermQuery->new(
     field => 'nyet',

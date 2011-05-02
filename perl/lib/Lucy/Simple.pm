@@ -48,10 +48,8 @@ sub new {
         ref($either) || $either;
 
     # Get type and schema.
-    my $analyzer
-        = Lucy::Analysis::PolyAnalyzer->new( language => $language );
-    $self->{type}
-        = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
+    my $analyzer = Lucy::Analysis::PolyAnalyzer->new( language => $language );
+    $self->{type} = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
     my $schema = $self->{schema} = Lucy::Plan::Schema->new;
 
     # Cache the object for later clean-up.
@@ -100,8 +98,8 @@ sub search {
     # Flush recent adds; lazily create searcher.
     $self->_finish_indexing;
     if ( !defined $self->{searcher} ) {
-        $self->{searcher} = Lucy::Search::IndexSearcher->new(
-            index => $self->{path} );
+        $self->{searcher}
+            = Lucy::Search::IndexSearcher->new( index => $self->{path} );
     }
 
     $self->{hits} = $self->{searcher}->hits(%args);

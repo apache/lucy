@@ -39,7 +39,7 @@ for my $specifier (qw( float double)) {
     $type = $parser->float_type("const $specifier");
     isa_ok( $type, "Clownfish::Type" );
     ok( $type && $type->is_floating, "parsed const specifier is_floating()" );
-    ok( $type && $type->const,    "parsed const specifier is_floating()" );
+    ok( $type && $type->const,       "parsed const specifier is_floating()" );
     my $bogus = $specifier . "y";
     ok( !$parser->c_float_specifier($bogus),
         "c_float_specifier guards against partial word matches" );

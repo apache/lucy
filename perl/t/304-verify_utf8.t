@@ -22,9 +22,9 @@ use base qw( Lucy::Plan::Schema );
 use Lucy::Analysis::RegexTokenizer;
 
 sub new {
-    my $self = shift->SUPER::new(@_);
+    my $self     = shift->SUPER::new(@_);
     my $analyzer = Lucy::Analysis::RegexTokenizer->new( pattern => '\S+' );
-    my $type = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
+    my $type     = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }

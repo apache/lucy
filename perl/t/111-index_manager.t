@@ -55,8 +55,8 @@ $lock = $lock_factory->make_shared_lock(
     timeout => 0,
 );
 is( ref($lock),      'Lucy::Store::SharedLock', "make_shared_lock" );
-is( $lock->get_name, "fred",                          "correct lock name" );
-is( $lock->get_host, "me",                            "correct host" );
+is( $lock->get_name, "fred",                    "correct lock name" );
+is( $lock->get_host, "me",                      "correct host" );
 
 my $schema = Lucy::Test::TestSchema->new;
 $folder = Lucy::Store::RAMFolder->new;
@@ -81,8 +81,7 @@ $manager->set_folder($folder);
 
 my $polyreader = Lucy::Index::PolyReader->open( index => $folder );
 my $segment = Lucy::Index::Segment->new( number => 22 );
-my $snapshot
-    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $snapshot = Lucy::Index::Snapshot->new->read_file( folder => $folder );
 my $deletions_writer = Lucy::Index::DefaultDeletionsWriter->new(
     schema     => $schema,
     segment    => $segment,

@@ -145,9 +145,7 @@ sub new_composite {
         $array );
 }
 
-our %new_void_PARAMS = (
-    const => undef,
-);
+our %new_void_PARAMS = ( const => undef, );
 
 sub new_void {
     my ( $either, %args ) = @_;

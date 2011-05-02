@@ -26,7 +26,7 @@ our %new_PARAMS = ( variadic => undef, );
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $class_name = ref($either) || $either;
+    my $class_name = ref($either)           || $either;
     my $variadic   = delete $args{variadic} || 0;
     return $class_name->_new($variadic);
 }

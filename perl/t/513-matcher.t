@@ -106,11 +106,11 @@ sub test_search {
         scores  => [ (0) x scalar @$docs ],
     );
     if (@$dels) {
-        my $bit_vec = Lucy::Object::BitVector->new(
-            capacity => $dels->[-1] + 1 );
+        my $bit_vec
+            = Lucy::Object::BitVector->new( capacity => $dels->[-1] + 1 );
         $bit_vec->set($_) for @$dels;
-        $del_enum = Lucy::Search::BitVecMatcher->new(
-            bit_vector => $bit_vec );
+        $del_enum
+            = Lucy::Search::BitVecMatcher->new( bit_vector => $bit_vec );
     }
 
     my $collector

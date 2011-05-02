@@ -37,8 +37,7 @@ my $x_y_query = Lucy::Search::PhraseQuery->new(
 );
 
 my $combined_query
-    = Lucy::Search::ORQuery->new( children => [ $a_query, $x_y_query ],
-    );
+    = Lucy::Search::ORQuery->new( children => [ $a_query, $x_y_query ], );
 my $hits = $searcher->hits( query => $combined_query );
 my $hit = $hits->next;
 is( $hit->{content}, $doc_1, "best doc ranks highest with no boosting" );

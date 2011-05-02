@@ -100,13 +100,9 @@ my $searchclient = LucyX::Remote::SearchClient->new(
 is( $searchclient->doc_freq( field => 'content', term => 'x' ),
     3, "doc_freq" );
 is( $searchclient->doc_max, 3, "doc_max" );
-isa_ok( $searchclient->fetch_doc(1),
-    "Lucy::Document::HitDoc", "fetch_doc" );
-isa_ok(
-    $searchclient->fetch_doc_vec(1),
-    "Lucy::Index::DocVector",
-    "fetch_doc_vec"
-);
+isa_ok( $searchclient->fetch_doc(1), "Lucy::Document::HitDoc", "fetch_doc" );
+isa_ok( $searchclient->fetch_doc_vec(1),
+    "Lucy::Index::DocVector", "fetch_doc_vec" );
 
 my $hits = $searchclient->hits( query => 'x' );
 is( $hits->total_hits, 3, "retrieved hits from search server" );
@@ -127,8 +123,7 @@ for (qw( a b c )) {
     $indexer->commit;
 }
 
-my $searcher_b
-    = Lucy::Search::IndexSearcher->new( index => $folder_b, );
+my $searcher_b = Lucy::Search::IndexSearcher->new( index => $folder_b, );
 is( ref( $searcher_b->get_reader ), 'Lucy::Index::PolyReader', );
 
 my $poly_searcher = Lucy::Search::PolySearcher->new(

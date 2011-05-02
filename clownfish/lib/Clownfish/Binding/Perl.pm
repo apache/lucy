@@ -338,7 +338,8 @@ my %ks_compat = (
         [qw( KinoSearch::Plan::BlobType KinoSearch::FieldType::BlobType )],
     'Lucy::Analysis::PolyAnalyzer' =>
         [qw( KinoSearch::Analysis::PolyAnalyzer )],
-    'Lucy::Analysis::RegexTokenizer'  => [qw( KinoSearch::Analysis::Tokenizer )],
+    'Lucy::Analysis::RegexTokenizer' =>
+        [qw( KinoSearch::Analysis::Tokenizer )],
     'Lucy::Analysis::CaseFolder' => [
         qw( KinoSearch::Analysis::CaseFolder KinoSearch::Analysis::LCNormalizer )
     ],

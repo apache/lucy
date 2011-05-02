@@ -40,8 +40,7 @@ is( $leaf_query->get_text, 'b', 'get text' );
 ok( !$leaf_query->equals($no_field_leaf_query), "!equals (field/nofield)" );
 ok( !$no_field_leaf_query->equals($leaf_query), "!equals (nofield/field)" );
 
-my $diff_field
-    = Lucy::Search::LeafQuery->new( field => 'oink', text => 'b' );
+my $diff_field = Lucy::Search::LeafQuery->new( field => 'oink', text => 'b' );
 ok( !$diff_field->equals($leaf_query), "!equals (different field)" );
 
 my $diff_text

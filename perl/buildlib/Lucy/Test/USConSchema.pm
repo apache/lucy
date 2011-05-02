@@ -23,11 +23,9 @@ use Lucy::Plan::FullTextType;
 use Lucy::Plan::StringType;
 
 sub new {
-    my $self = shift->SUPER::new(@_);
-    my $analyzer
-        = Lucy::Analysis::PolyAnalyzer->new( language => 'en' );
-    my $title_type
-        = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
+    my $self       = shift->SUPER::new(@_);
+    my $analyzer   = Lucy::Analysis::PolyAnalyzer->new( language => 'en' );
+    my $title_type = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
     my $content_type = Lucy::Plan::FullTextType->new(
         analyzer      => $analyzer,
         highlightable => 1,

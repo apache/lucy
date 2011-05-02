@@ -119,8 +119,8 @@ sub get_uscon_docs {
         my $content = do { local $/; <$fh> };
         $content =~ /(.*?)\n\n(.*)/s
             or die "Can't extract title/bodytext from '$filepath'";
-        my $title    = $1; 
-        my $bodytext = $2; 
+        my $title    = $1;
+        my $bodytext = $2;
         $bodytext =~ s/\s+/ /sg;
         my $category
             = $filename =~ /art/      ? 'article'
@@ -140,8 +140,8 @@ sub get_uscon_docs {
 }
 
 sub create_uscon_index {
-    my $folder = Lucy::Store::FSFolder->new(
-        path => persistent_test_index_loc() );
+    my $folder
+        = Lucy::Store::FSFolder->new( path => persistent_test_index_loc() );
     my $schema  = Lucy::Test::USConSchema->new;
     my $indexer = Lucy::Index::Indexer->new(
         schema   => $schema,

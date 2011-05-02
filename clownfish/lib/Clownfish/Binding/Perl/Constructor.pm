@@ -51,31 +51,32 @@ sub new {
 }
 
 sub xsub_def {
-    my $self       = shift;
-    my $c_name     = $self->c_name;
-    my $param_list = $self->{param_list};
-    my $name_list  = $param_list->name_list;
-    my $arg_inits  = $param_list->get_initial_values;
-    my $arg_vars   = $param_list->get_variables;
-    my $func_sym   = $self->{init_func}->full_func_sym;
+    my $self         = shift;
+    my $c_name       = $self->c_name;
+    my $param_list   = $self->{param_list};
+    my $name_list    = $param_list->name_list;
+    my $arg_inits    = $param_list->get_initial_values;
+    my $arg_vars     = $param_list->get_variables;
+    my $func_sym     = $self->{init_func}->full_func_sym;
     my $allot_params = $self->build_allot_params;
 
     # Compensate for swallowed refcounts.
     my $refcount_mods = "";
     for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
-        my $var      = $arg_vars->[$i];
-        my $type     = $var->get_type;
+        my $var  = $arg_vars->[$i];
+        my $type = $var->get_type;
         if ( $type->is_object and $type->decremented ) {
-            my $name     = $var->micro_sym;
+            my $name = $var->micro_sym;
             $refcount_mods .= "\n    LUCY_INCREF($name);";
         }
     }
 
     # Last, so that earlier exceptions while fetching params don't trigger bad
     # DESTROY.
-    my $self_var    = $arg_vars->[0];
-    my $self_type   = $self_var->get_type->to_c;
-    my $self_assign = qq|$self_type self = ($self_type)XSBind_new_blank_obj(ST(0));|;
+    my $self_var  = $arg_vars->[0];
+    my $self_type = $self_var->get_type->to_c;
+    my $self_assign
+        = qq|$self_type self = ($self_type)XSBind_new_blank_obj(ST(0));|;
 
     return <<END_STUFF;
 XS($c_name);

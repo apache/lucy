@@ -80,8 +80,8 @@ like( $@, qr/abstract/i, "clone throws an abstract method exception" );
 ok( $object->is_a("Lucy::Object::Obj"), "custom is_a correct" );
 ok( !$object->is_a("Lucy::Object"),     "custom is_a too long" );
 ok( !$object->is_a("Lucy"),             "custom is_a substring" );
-ok( !$object->is_a(""),                       "custom is_a blank" );
-ok( !$object->is_a("thing"),                  "custom is_a wrong" );
+ok( !$object->is_a(""),                 "custom is_a blank" );
+ok( !$object->is_a("thing"),            "custom is_a wrong" );
 
 eval { my $another_obj = TestObj->new( kill_me_now => 1 ) };
 like( $@, qr/kill_me_now/, "reject bad param" );

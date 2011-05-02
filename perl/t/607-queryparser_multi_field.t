@@ -76,8 +76,7 @@ $multi_field_bar->add_child(
 my $not_multi_field_bar
     = Lucy::Search::NOTQuery->new( negated_query => $multi_field_bar );
 my $bar_leaf = Lucy::Search::LeafQuery->new( text => 'bar' );
-my $not_bar_leaf
-    = Lucy::Search::NOTQuery->new( negated_query => $bar_leaf );
+my $not_bar_leaf = Lucy::Search::NOTQuery->new( negated_query => $bar_leaf );
 $expanded = $qparser->expand($not_bar_leaf);
 ok( $not_multi_field_bar->equals($expanded), "Expand NOTQuery" );
 

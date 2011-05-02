@@ -47,8 +47,8 @@ while ( my $hit = $lucy->next ) {
 }
 
 $lucy->add_doc( { band => 'Cream' } );
-is( $lucy->search( query => 'cream' ),
-    4, "search uses correct PolyAnalyzer" );
+is( $lucy->search( query => 'cream' ), 4,
+    "search uses correct PolyAnalyzer" );
 
 SKIP: {
     skip( "fork on Windows not supported by Lucy", 1 ) if $^O =~ /mswin/i;

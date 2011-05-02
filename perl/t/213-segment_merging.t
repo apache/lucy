@@ -92,8 +92,7 @@ for my $num_letters ( reverse 1 .. 10 ) {
 }
 
 {
-    my $searcher
-        = Lucy::Search::IndexSearcher->new( index => $index_loc );
+    my $searcher = Lucy::Search::IndexSearcher->new( index => $index_loc );
     my $hits = $searcher->hits( query => 'b' );
     is( $hits->total_hits, 10, "correct total_hits from merged index" );
     my @got;
@@ -124,8 +123,7 @@ for my $num_letters ( reverse 1 .. 10 ) {
 }
 
 {
-    my $searcher
-        = Lucy::Search::IndexSearcher->new( index => $index_loc );
+    my $searcher = Lucy::Search::IndexSearcher->new( index => $index_loc );
     my $hits = $searcher->hits( query => 'fish' );
     is( $hits->total_hits, 1, "correct total_hits after add_index" );
     is( $hits->next->{content},

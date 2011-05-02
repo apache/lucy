@@ -32,7 +32,7 @@ my %primitives_from_perl = (
     short  => sub {"(short)SvIV($_[0])"},
     long   => sub {
         "((sizeof(long) <= sizeof(IV)) ? "
-            . "(long)SvIV($_[0]) : (long)SvNV($_[0]))"
+            . "(long)SvIV($_[0]) : (long)SvNV($_[0]))";
     },
     size_t     => sub {"(size_t)SvIV($_[0])"},
     uint64_t   => sub {"(uint64_t)SvNV($_[0])"},

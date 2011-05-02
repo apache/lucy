@@ -34,10 +34,8 @@ my $c_query = Lucy::Search::TermQuery->new(
     field => 'content',
     term  => 'c'
 );
-my $not_b_query
-    = Lucy::Search::NOTQuery->new( negated_query => $b_query );
-my $not_c_query
-    = Lucy::Search::NOTQuery->new( negated_query => $c_query );
+my $not_b_query = Lucy::Search::NOTQuery->new( negated_query => $b_query );
+my $not_c_query = Lucy::Search::NOTQuery->new( negated_query => $c_query );
 
 is( $not_b_query->to_string, "-content:b", "to_string" );
 
@@ -85,8 +83,9 @@ for my $num_negated ( 1 .. 26 ) {
         negated_matcher => $mock_matcher,
     );
     my $bit_vec = Lucy::Object::BitVector->new( capacity => 30 );
-    my $collector = Lucy::Search::Collector::BitCollector->new(
-        bit_vector => $bit_vec, );
+    my $collector
+        = Lucy::Search::Collector::BitCollector->new( bit_vector => $bit_vec,
+        );
     $not_matcher->collect( collector => $collector );
     my $got = $bit_vec->to_arrayref;
     is( scalar @$got, scalar @source_ids, "got all docs ($num_negated)" );

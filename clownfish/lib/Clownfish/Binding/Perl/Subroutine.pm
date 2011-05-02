@@ -99,7 +99,6 @@ sub params_hash_def {
     }
 }
 
-
 my %prim_type_to_allot_macro = (
     double     => 'ALLOT_F64',
     float      => 'ALLOT_F32',

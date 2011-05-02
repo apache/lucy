@@ -23,8 +23,7 @@ use LucyX::Search::MockMatcher;
 my @docs   = ( 1, 5, 10, 1000 );
 my @scores = ( 2, 0, 0,  1 );
 
-my $collector
-    = Lucy::Search::Collector::SortCollector->new( wanted => 3 );
+my $collector = Lucy::Search::Collector::SortCollector->new( wanted => 3 );
 test_collect($collector);
 
 my @got = map { $_->get_score } @{ $collector->pop_match_docs };
@@ -38,8 +37,8 @@ my $match_docs = $collector->pop_match_docs;
 is( scalar @$match_docs, 0, "no hits wanted, so no hits returned" );
 
 my $bit_vec = Lucy::Object::BitVector->new;
-$collector = Lucy::Search::Collector::BitCollector->new(
-    bit_vector => $bit_vec );
+$collector
+    = Lucy::Search::Collector::BitCollector->new( bit_vector => $bit_vec );
 test_collect($collector);
 is_deeply(
     $bit_vec->to_arrayref,
@@ -48,8 +47,8 @@ is_deeply(
 );
 
 $bit_vec = Lucy::Object::BitVector->new;
-my $inner_coll = Lucy::Search::Collector::BitCollector->new(
-    bit_vector => $bit_vec );
+my $inner_coll
+    = Lucy::Search::Collector::BitCollector->new( bit_vector => $bit_vec );
 my $offset_coll = Lucy::Search::Collector::OffsetCollector->new(
     collector => $inner_coll,
     offset    => 10,

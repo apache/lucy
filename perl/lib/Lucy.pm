@@ -184,9 +184,9 @@ sub error {$Lucy::Object::Err::error}
     sub novel_host_methods {
         my ( undef, $package ) = @_;
         no strict 'refs';
-        my $stash   = \%{"$package\::"};
-        my $methods = Lucy::Object::VArray->new(
-            capacity => scalar keys %$stash );
+        my $stash = \%{"$package\::"};
+        my $methods
+            = Lucy::Object::VArray->new( capacity => scalar keys %$stash );
         while ( my ( $symbol, $glob ) = each %$stash ) {
             next if ref $glob;
             next unless *$glob{CODE};
@@ -235,9 +235,8 @@ sub error {$Lucy::Object::Err::error}
         return;
     }
     sub posting_list {
-        my $self = shift;
-        my $plist_reader
-            = $self->fetch("Lucy::Index::PostingListReader");
+        my $self         = shift;
+        my $plist_reader = $self->fetch("Lucy::Index::PostingListReader");
         return $plist_reader->posting_list(@_) if $plist_reader;
         return;
     }
@@ -258,11 +257,11 @@ sub error {$Lucy::Object::Err::error}
 
     sub try_open_segreaders {
         my ( $self, $segments ) = @_;
-        my $schema      = $self->get_schema;
-        my $folder      = $self->get_folder;
-        my $snapshot    = $self->get_snapshot;
-        my $seg_readers = Lucy::Object::VArray->new(
-            capacity => scalar @$segments );
+        my $schema   = $self->get_schema;
+        my $folder   = $self->get_folder;
+        my $snapshot = $self->get_snapshot;
+        my $seg_readers
+            = Lucy::Object::VArray->new( capacity => scalar @$segments );
         my $segs = to_clownfish($segments);    # FIXME: Don't convert twice.
         eval {
             # Create a SegReader for each segment in the index.
@@ -416,12 +415,11 @@ sub error {$Lucy::Object::Err::error}
         my ( $either, $message ) = @_;
         my ( undef, $file, $line ) = caller;
         $message .= ", $file line $line\n";
-        return $either->_new(
-            mess => Lucy::Object::CharBuf->new($message) );
+        return $either->_new( mess => Lucy::Object::CharBuf->new($message) );
     }
 
     sub do_throw {
-        my $err = shift;
+        my $err      = shift;
         my $longmess = longmess();
         $longmess =~ s/^\s*/\t/;
         $err->cat_mess($longmess);
@@ -485,8 +483,7 @@ sub error {$Lucy::Object::Err::error}
     sub open {
         my ( $either, %args ) = @_;
         $args{flags} ||= 0;
-        $args{flags}
-            |= Lucy::Store::FileHandle::build_fh_flags( \%args );
+        $args{flags} |= Lucy::Store::FileHandle::build_fh_flags( \%args );
         return $either->_open(%args);
     }
 }
@@ -503,8 +500,7 @@ sub error {$Lucy::Object::Err::error}
     sub open {
         my ( $either, %args ) = @_;
         $args{flags} ||= 0;
-        $args{flags}
-            |= Lucy::Store::FileHandle::build_fh_flags( \%args );
+        $args{flags} |= Lucy::Store::FileHandle::build_fh_flags( \%args );
         return $either->_open(%args);
     }
 }
@@ -552,8 +548,7 @@ sub error {$Lucy::Object::Err::error}
         }
         if ( $@ or !$result ) {
             Lucy::Object::Err->set_error(
-                Lucy::Object::Err->new( $@ || "Failed to decode JSON" )
-            );
+                Lucy::Object::Err->new( $@ || "Failed to decode JSON" ) );
             return;
         }
         return $result;
@@ -563,8 +558,7 @@ sub error {$Lucy::Object::Err::error}
         my ( undef, %args ) = @_;
         my $json = eval { $json_encoder->encode( $args{'dump'} ) };
         if ( !defined $json ) {
-            Lucy::Object::Err->set_error(
-                Lucy::Object::Err->new($@) );
+            Lucy::Object::Err->set_error( Lucy::Object::Err->new($@) );
             return 0;
         }
         my $outstream = $args{folder}->open_out( $args{path} );

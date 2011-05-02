@@ -24,9 +24,9 @@ use base qw( Lucy::Plan::Schema );
 use Lucy::Analysis::RegexTokenizer;
 
 sub new {
-    my $self = shift->SUPER::new(@_);
+    my $self      = shift->SUPER::new(@_);
     my $tokenizer = Lucy::Analysis::RegexTokenizer->new( pattern => '\S+' );
-    my $type = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
+    my $type      = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }
@@ -42,8 +42,7 @@ sub new {
         = Lucy::Analysis::SnowballStopFilter->new( stoplist => { x => 1 } );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $whitespace_tokenizer, $stopfilter, ], );
-    my $type
-        = Lucy::Plan::FullTextType->new( analyzer => $polyanalyzer, );
+    my $type = Lucy::Plan::FullTextType->new( analyzer => $polyanalyzer, );
     $self->spec_field( name => 'content', type => $type );
     return $self;
 }
@@ -103,8 +102,7 @@ for (@docs) {
 $indexer->commit;
 $stop_indexer->commit;
 
-my $OR_parser
-    = Lucy::Search::QueryParser->new( schema => $plain_schema, );
+my $OR_parser = Lucy::Search::QueryParser->new( schema => $plain_schema, );
 my $AND_parser = Lucy::Search::QueryParser->new(
     schema         => $plain_schema,
     default_boolop => 'AND',
@@ -121,9 +119,8 @@ my $AND_stop_parser = Lucy::Search::QueryParser->new(
 $OR_stop_parser->set_heed_colons(1);
 $AND_stop_parser->set_heed_colons(1);
 
-my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
-my $stop_searcher
-    = Lucy::Search::IndexSearcher->new( index => $stop_folder );
+my $searcher      = Lucy::Search::IndexSearcher->new( index => $folder );
+my $stop_searcher = Lucy::Search::IndexSearcher->new( index => $stop_folder );
 
 my @logical_tests = (
 
@@ -226,8 +223,7 @@ while ( $i < @logical_tests ) {
 my $motorhead = "Mot\xF6rhead";
 utf8ify($motorhead);
 my $unicode_folder = create_index($motorhead);
-$searcher
-    = Lucy::Search::IndexSearcher->new( index => $unicode_folder );
+$searcher = Lucy::Search::IndexSearcher->new( index => $unicode_folder );
 
 my $hits = $searcher->hits( query => 'Mot' );
 is( $hits->total_hits, 0, "Pre-test - indexing worked properly" );

@@ -23,14 +23,14 @@ use File::Temp qw( mktemp );
 use Getopt::Long;
 use Fcntl;
 
-my $ignore  = qr/(
+my $ignore = qr/(
       \.svn
     | \.git
     | modules.analysis.snowstem.source
     | perl.sample
     )/x;
 my $scratch_template = catfile( tmpdir(), 'lucytidy_scratch_XXXXXX' );
-my $scratch          = mktemp($scratch_template);
+my $scratch = mktemp($scratch_template);
 END { unlink $scratch }
 
 # Parse command-line options.

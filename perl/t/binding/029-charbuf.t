@@ -34,8 +34,7 @@ isa_ok( $dupe, "Lucy::Object::CharBuf",
 is( $dupe->to_perl, $charbuf->to_perl, "freeze/thaw" );
 
 my $clone = $charbuf->clone;
-is( $clone->to_perl, Lucy::Object::CharBuf->new($smiley)->to_perl,
-    "clone" );
+is( $clone->to_perl, Lucy::Object::CharBuf->new($smiley)->to_perl, "clone" );
 
 my $ram_file = Lucy::Store::RAMFile->new;
 my $outstream = Lucy::Store::OutStream->open( file => $ram_file )

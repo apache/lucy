@@ -69,9 +69,9 @@ my $storage = Lucy::Object::Hash->new;
 
     isa_ok( $subclassed_hash, "MyHash", "Perl isa reports correct subclass" );
 
-    # Store the subclassed object.  At the end of this block, the Perl object
-    # will go out of scope and DESTROY will be called, but the Clownfish object
-    # will persist.
+   # Store the subclassed object.  At the end of this block, the Perl object
+   # will go out of scope and DESTROY will be called, but the Clownfish object
+   # will persist.
     $storage->store( "test", $subclassed_hash );
 }
 

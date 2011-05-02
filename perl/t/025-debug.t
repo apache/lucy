@@ -58,8 +58,7 @@ SKIP: {
     my $stderr_out = capture_debug( 'Lucy.xs', 'Borax' );
     like( $stderr_out, qr/Borax/, "DEBUG - file name" );
 
-    $stderr_out
-        = capture_debug( 'XS_Lucy__Util__Debug_DEBUG', "Strychnine" );
+    $stderr_out = capture_debug( 'XS_Lucy__Util__Debug_DEBUG', "Strychnine" );
     like( $stderr_out, qr/Strychnine/, "DEBUG - function name" );
 
     $stderr_out = capture_debug( 'Lucy*', 'Raid' );

@@ -164,7 +164,7 @@ sub _callback_params {
         elsif ( $type->is_integer ) {
             my $width = $type->get_width;
             if ($width) {
-                if ($width <= 4) {
+                if ( $width <= 4 ) {
                     $param = qq|CFISH_ARG_I32("$name", $name)|;
                 }
                 else {

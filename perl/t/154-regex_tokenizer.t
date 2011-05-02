@@ -42,7 +42,7 @@ is_deeply( \@start_offsets, [ 0, 2, 4, ], "correctstart offsets" );
 is_deeply( \@end_offsets,   [ 1, 3, 5, ], "correct end offsets" );
 
 $tokenizer = Lucy::Analysis::RegexTokenizer->new( pattern => '.' );
-$inversion = Lucy::Analysis::Inversion->new( text    => "a b c" );
+$inversion = Lucy::Analysis::Inversion->new( text => "a b c" );
 $inversion = $tokenizer->transform($inversion);
 
 @token_texts   = ();

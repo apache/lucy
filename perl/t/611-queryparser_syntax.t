@@ -33,8 +33,7 @@ sub new {
         analyzers => [ $wordchar_tokenizer, $stopfilter, ], );
 
     my $plain = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
-    my $fancy
-        = Lucy::Plan::FullTextType->new( analyzer => $fancy_analyzer );
+    my $fancy = Lucy::Plan::FullTextType->new( analyzer => $fancy_analyzer );
     $self->spec_field( name => 'plain', type => $plain );
     $self->spec_field( name => 'fancy', type => $fancy );
     return $self;

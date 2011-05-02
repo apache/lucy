@@ -29,8 +29,7 @@ use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self = shift->SUPER::new(@_);
-    my $type = Lucy::Plan::FullTextType->new(
-        analyzer => TestAnalyzer->new );
+    my $type = Lucy::Plan::FullTextType->new( analyzer => TestAnalyzer->new );
     $self->spec_field( name => 'a', type => $type );
     $self->spec_field( name => 'b', type => $type );
     $self->spec_field( name => 'c', type => $type );
@@ -60,8 +59,7 @@ for my $animal (@animals) {
 }
 $indexer->commit;
 
-my $snapshot
-    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $snapshot = Lucy::Index::Snapshot->new->read_file( folder => $folder );
 my $segment = Lucy::Index::Segment->new( number => 1 );
 $segment->read_file($folder);
 my $lex_reader = Lucy::Index::DefaultLexiconReader->new(

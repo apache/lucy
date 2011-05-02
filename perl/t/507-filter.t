@@ -23,8 +23,8 @@ use Lucy::Test;
 use Lucy::Test::TestUtils qw( create_index );
 use LucyX::Search::Filter;
 
-my $query_parser = Lucy::Search::QueryParser->new(
-    schema => Lucy::Test::TestSchema->new );
+my $query_parser
+    = Lucy::Search::QueryParser->new( schema => Lucy::Test::TestSchema->new );
 
 ## Set up main objects.
 my ( $filter_1, $filter_2 );
@@ -32,10 +32,8 @@ my ( $filter_1, $filter_2 );
     my $folder_1 = create_index( 'a x', 'b x', 'c x', 'a y', 'b y', 'c y' );
     my $folder_2 = create_index( 'a w', 'b w', 'c w', 'a z', 'b z', 'c z' );
 
-    my $searcher_1
-        = Lucy::Search::IndexSearcher->new( index => $folder_1 );
-    my $searcher_2
-        = Lucy::Search::IndexSearcher->new( index => $folder_2 );
+    my $searcher_1 = Lucy::Search::IndexSearcher->new( index => $folder_1 );
+    my $searcher_2 = Lucy::Search::IndexSearcher->new( index => $folder_2 );
 
     my $reader_1 = $searcher_1->get_reader->get_seg_readers->[0];
     my $reader_2 = $searcher_2->get_reader->get_seg_readers->[0];

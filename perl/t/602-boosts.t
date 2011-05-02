@@ -35,10 +35,9 @@ package BoostedFieldSchema;
 use base qw( Lucy::Plan::Schema );
 
 sub new {
-    my $self      = shift->SUPER::new(@_);
-    my $tokenizer = Lucy::Analysis::RegexTokenizer->new;
-    my $plain_type
-        = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
+    my $self       = shift->SUPER::new(@_);
+    my $tokenizer  = Lucy::Analysis::RegexTokenizer->new;
+    my $plain_type = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
     my $boosted_type = Lucy::Plan::FullTextType->new(
         analyzer => $tokenizer,
         boost    => 100,
@@ -89,21 +88,18 @@ $control_indexer->commit;
 $boosted_field_indexer->commit;
 $boosted_doc_indexer->commit;
 
-my $searcher
-    = Lucy::Search::IndexSearcher->new( index => $control_folder, );
+my $searcher = Lucy::Search::IndexSearcher->new( index => $control_folder, );
 my $hits = $searcher->hits( query => 'a' );
 my $hit = $hits->next;
 is( $hit->{content}, "x a a a a", "best doc ranks highest with no boosting" );
 
 $searcher
-    = Lucy::Search::IndexSearcher->new( index => $boosted_field_folder,
-    );
+    = Lucy::Search::IndexSearcher->new( index => $boosted_field_folder, );
 $hits = $searcher->hits( query => 'a' );
 $hit = $hits->next;
 is( $hit->{content}, 'a b', "boost in FieldType works" );
 
-$searcher
-    = Lucy::Search::IndexSearcher->new( index => $boosted_doc_folder, );
+$searcher = Lucy::Search::IndexSearcher->new( index => $boosted_doc_folder, );
 $hits = $searcher->hits( query => 'a' );
 $hit = $hits->next;
 is( $hit->{content}, 'a b', "boost from \$doc->set_boost works" );

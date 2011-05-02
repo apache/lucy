@@ -26,12 +26,10 @@ package MySchema;
 use base qw( Lucy::Plan::Schema );
 
 sub new {
-    my $self      = shift->SUPER::new(@_);
-    my $tokenizer = Lucy::Analysis::RegexTokenizer->new;
-    my $polyanalyzer
-        = Lucy::Analysis::PolyAnalyzer->new( language => 'en' );
-    my $plain
-        = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
+    my $self         = shift->SUPER::new(@_);
+    my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( language => 'en' );
+    my $plain = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
     my $polyanalyzed
         = Lucy::Plan::FullTextType->new( analyzer => $polyanalyzer );
     my $string_spec          = Lucy::Plan::StringType->new;
@@ -39,8 +37,7 @@ sub new {
         analyzer => $tokenizer,
         indexed  => 0,
     );
-    my $unanalyzedunindexed
-        = Lucy::Plan::StringType->new( indexed => 0, );
+    my $unanalyzedunindexed = Lucy::Plan::StringType->new( indexed => 0, );
     $self->spec_field( name => 'analyzed',     type => $plain );
     $self->spec_field( name => 'polyanalyzed', type => $polyanalyzed );
     $self->spec_field( name => 'string',       type => $string_spec );

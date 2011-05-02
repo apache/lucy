@@ -30,7 +30,7 @@ BEGIN {
 }
 
 use XSLoader;
-BEGIN { XSLoader::load( 'Clownfish', '0.01' ) } 
+BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 1;
 

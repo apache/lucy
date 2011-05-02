@@ -21,7 +21,7 @@ use Text::Wrap qw( wrap );
 
 # Don't use tabs.  Wrap at 78 columns.
 $Text::Wrap::unexpand = 0;
-$Text::Wrap::columns = 78;
+$Text::Wrap::columns  = 78;
 
 if ( @ARGV != 2 ) {
     die "Usage: perl update_snowstop.pl SNOWBALL_SVN_CO LUCY_SNOWSTOP_DIR";

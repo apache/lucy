@@ -46,10 +46,10 @@ is( $hits->total_hits, 1, "Find hit in second searcher" );
 $hits = $poly_searcher->hits( query => 'c' );
 is( $hits->total_hits, 2, "Find hits in both searchers" );
 
-my $bit_vec = Lucy::Object::BitVector->new(
-    capacity => $poly_searcher->doc_max );
-my $bitcoll = Lucy::Search::Collector::BitCollector->new(
-    bit_vector => $bit_vec );
+my $bit_vec
+    = Lucy::Object::BitVector->new( capacity => $poly_searcher->doc_max );
+my $bitcoll
+    = Lucy::Search::Collector::BitCollector->new( bit_vector => $bit_vec );
 my $query = $poly_searcher->glean_query('b');
 $poly_searcher->collect( query => $query, collector => $bitcoll );
 is_deeply( $bit_vec->to_arrayref, [ 2, 4 ], "collect" );

@@ -45,8 +45,7 @@ my $folder = create_index(
 );
 my $schema = Lucy::Test::TestSchema->new;
 
-my $snapshot
-    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $snapshot = Lucy::Index::Snapshot->new->read_file( folder => $folder );
 my $segment = Lucy::Index::Segment->new( number => 1 );
 $segment->read_file($folder);
 my $lex_reader = Lucy::Index::DefaultLexiconReader->new(

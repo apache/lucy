@@ -67,9 +67,13 @@ sub create {
     verify_args( \%create_PARAMS, %args ) or confess $@;
     $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
     my $package = ref($either) || $either;
-    return _create( $package, 
-        @args{qw( parcel exposure class_name cnick micro_sym
-        docucomment source_class parent_class_name final inert )} );
+    return _create(
+        $package,
+        @args{
+            qw( parcel exposure class_name cnick micro_sym
+                docucomment source_class parent_class_name final inert )
+            }
+    );
 }
 
 1;

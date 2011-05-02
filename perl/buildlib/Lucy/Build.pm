@@ -141,16 +141,18 @@ my $base_dir = $is_distro_not_devel ? curdir() : updir();
 my $CHARMONIZE_EXE_PATH  = 'charmonize' . $Config{_exe};
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
 my $CHARMONIZER_SRC_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
-my $SNOWSTEM_SRC_DIR     = catdir( $base_dir, qw( modules analysis snowstem source ) );
-my $SNOWSTEM_INC_DIR     = catdir( $SNOWSTEM_SRC_DIR, 'include' );
-my $SNOWSTOP_SRC_DIR     = catdir( $base_dir, qw( modules analysis snowstop source ) );
-my $CORE_SOURCE_DIR      = catdir( $base_dir, 'core' );
-my $CLOWNFISH_DIR        = catdir( $base_dir, 'clownfish' );
-my $AUTOGEN_DIR          = 'autogen';
-my $XS_SOURCE_DIR        = 'xs';
-my $LIB_DIR              = 'lib';
-my $XS_FILEPATH          = catfile( $LIB_DIR, "Lucy.xs" );
-my $AUTOBIND_PM_PATH     = catfile( $LIB_DIR, 'Lucy', 'Autobinding.pm' );
+my $SNOWSTEM_SRC_DIR
+    = catdir( $base_dir, qw( modules analysis snowstem source ) );
+my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
+my $SNOWSTOP_SRC_DIR
+    = catdir( $base_dir, qw( modules analysis snowstop source ) );
+my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
+my $CLOWNFISH_DIR   = catdir( $base_dir, 'clownfish' );
+my $AUTOGEN_DIR     = 'autogen';
+my $XS_SOURCE_DIR   = 'xs';
+my $LIB_DIR         = 'lib';
+my $XS_FILEPATH = catfile( $LIB_DIR, "Lucy.xs" );
+my $AUTOBIND_PM_PATH = catfile( $LIB_DIR, 'Lucy', 'Autobinding.pm' );
 
 sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
 
@@ -544,7 +546,7 @@ sub ACTION_compile_custom_xs {
 
     # .c => .o
     my $lucy_pm_file = catfile( $LIB_DIR, 'Lucy.pm' );
-    my $info = Module::Build::ModuleInfo->new_from_file($lucy_pm_file);
+    my $info    = Module::Build::ModuleInfo->new_from_file($lucy_pm_file);
     my $version = $info->version;
     my $perl_binding_o_file = catfile( $LIB_DIR, "Lucy$Config{_o}" );
     unshift @objects, $perl_binding_o_file;
@@ -703,7 +705,8 @@ sub ACTION_semiclean {
     my $self = shift;
     print "Cleaning up most build files.\n";
     my @candidates
-        = grep { $_ !~ /(charmonizer|^_charm|charmony|charmonize|snowstem)/ } $self->cleanup;
+        = grep { $_ !~ /(charmonizer|^_charm|charmony|charmonize|snowstem)/ }
+        $self->cleanup;
     for my $path ( map { glob($_) } @candidates ) {
         next unless -e $path;
         rmtree($path);

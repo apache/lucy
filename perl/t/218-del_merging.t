@@ -114,7 +114,7 @@ for ( 1 .. 10 ) {
 
 sub search_doc {
     my $query_string = shift;
-    my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
-    my $hits = $searcher->hits( query => $query_string );
+    my $searcher     = Lucy::Search::IndexSearcher->new( index => $folder );
+    my $hits         = $searcher->hits( query => $query_string );
     return $hits->total_hits;
 }

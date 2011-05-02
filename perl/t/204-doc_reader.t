@@ -27,11 +27,10 @@ use Encode qw( _utf8_on );
 use Lucy::Test;
 
 sub new_schema {
-    my $schema   = Lucy::Plan::Schema->new;
-    my $analyzer = TestAnalyzer->new;
-    my $fulltext
-        = Lucy::Plan::FullTextType->new( analyzer => $analyzer );
-    my $bin = Lucy::Plan::BlobType->new( stored => 1 );
+    my $schema     = Lucy::Plan::Schema->new;
+    my $analyzer   = TestAnalyzer->new;
+    my $fulltext   = Lucy::Plan::FullTextType->new( analyzer => $analyzer );
+    my $bin        = Lucy::Plan::BlobType->new( stored => 1 );
     my $not_stored = Lucy::Plan::FullTextType->new(
         analyzer => $analyzer,
         stored   => 0,
@@ -68,8 +67,7 @@ $indexer->add_doc(
 );
 $indexer->commit;
 
-my $snapshot
-    = Lucy::Index::Snapshot->new->read_file( folder => $folder );
+my $snapshot = Lucy::Index::Snapshot->new->read_file( folder => $folder );
 my $segment = Lucy::Index::Segment->new( number => 1 );
 $segment->read_file($folder);
 my $doc_reader = Lucy::Index::DefaultDocReader->new(

@@ -95,8 +95,7 @@ for my $size ( 0 .. @doc_ids ) {
         scores  => \@scores,
     );
     my $collector
-        = Lucy::Search::Collector::SortCollector->new( wanted => $size,
-        );
+        = Lucy::Search::Collector::SortCollector->new( wanted => $size, );
     $collector->set_matcher($matcher);
     $matcher->collect( collector => $collector );
 

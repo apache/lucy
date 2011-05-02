@@ -30,8 +30,11 @@ test_analyzer(
     '"analyzers" constructor arg'
 );
 $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( language => 'en', );
-test_analyzer( $polyanalyzer, $source_text, [qw( eat shoot and leav )],
-    '"language" constructor arg' );
+test_analyzer(
+    $polyanalyzer, $source_text,
+    [qw( eat shoot and leav )],
+    '"language" constructor arg'
+);
 
 ok( $polyanalyzer->get_analyzers(), "get_analyzers method" );
 

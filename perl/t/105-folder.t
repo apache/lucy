@@ -80,11 +80,9 @@ for my $folder ( $fs_folder, $ram_folder ) {
     is( $folder->open_out("king_of_lock"),
         undef, "open_out returns undef when file exists" );
 
-    isa_ok(
-        $folder->open_out("lockit"),
+    isa_ok( $folder->open_out("lockit"),
         "Lucy::Store::OutStream",
-        "open_out succeeds when file doesn't exist"
-    );
+        "open_out succeeds when file doesn't exist" );
 
     $folder->delete('king_of_lock');
     ok( !$folder->exists('king_of_lock'), "Delete()" );
