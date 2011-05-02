@@ -365,7 +365,7 @@ SI_map(FSFileHandle *self, int64_t offset, int64_t len) {
     if (len) {
         // Read-only memory mapping.
         buf = mmap(NULL, len, PROT_READ, MAP_SHARED, self->fd, offset);
-        if (buf == (void*)-1) {
+        if (buf == (void*)(-1)) {
             Err_set_error(Err_new(CB_newf("mmap of offset %i64 and length %i64 (page size %i64) "
                                           "against '%o' failed: %s",
                                           offset, len, self->page_size,

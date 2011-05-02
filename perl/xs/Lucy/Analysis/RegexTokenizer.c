@@ -150,14 +150,14 @@ lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
 
         // Get start and end offsets in Unicode code points.
         for (; string_arg < start_ptr; num_code_points++) {
-            string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)*string_arg];
+            string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)(*string_arg)];
             if (string_arg > string_end) {
                 THROW(LUCY_ERR, "scanned past end of '%s'", string_beg);
             }
         }
         start = num_code_points;
         for (; string_arg < end_ptr; num_code_points++) {
-            string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)*string_arg];
+            string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)(*string_arg)];
             if (string_arg > string_end) {
                 THROW(LUCY_ERR, "scanned past end of '%s'", string_beg);
             }

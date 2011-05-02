@@ -363,7 +363,7 @@ InStream_read_i8(InStream *self) {
 static INLINE uint8_t
 SI_read_u8(InStream *self) {
     if (self->buf >= self->limit) { S_refill(self); }
-    return (uint8_t)*self->buf++;
+    return (uint8_t)(*self->buf++);
 }
 
 uint8_t
