@@ -124,7 +124,7 @@ S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map) {
     uint32_t doc_count = SegReader_Doc_Max(reader);
     uint32_t i, max;
     for (i = 1, max = I32Arr_Get_Size(doc_map); i < max; i++) {
-        if (I32Arr_Get(doc_map, i) == 0) doc_count--;
+        if (I32Arr_Get(doc_map, i) == 0) { doc_count--; }
     }
     Seg_Increment_Count(self->segment, doc_count);
 }

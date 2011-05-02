@@ -260,7 +260,7 @@ static bool_t
 S_dir_ok(const CharBuf *path) {
     struct stat stat_buf;
     if (stat((char*)CB_Get_Ptr8(path), &stat_buf) != -1) {
-        if (stat_buf.st_mode & S_IFDIR) return true;
+        if (stat_buf.st_mode & S_IFDIR) { return true; }
     }
     return false;
 }

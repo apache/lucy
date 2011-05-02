@@ -99,16 +99,16 @@ ProximityQuery_deserialize(ProximityQuery *self, InStream *instream) {
 bool_t
 ProximityQuery_equals(ProximityQuery *self, Obj *other) {
     ProximityQuery *twin = (ProximityQuery*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, PROXIMITYQUERY)) return false;
-    if (self->boost != twin->boost) return false;
-    if (self->field && !twin->field) return false;
-    if (!self->field && twin->field) return false;
+    if (twin == self)                     { return true; }
+    if (!Obj_Is_A(other, PROXIMITYQUERY)) { return false; }
+    if (self->boost != twin->boost)       { return false; }
+    if (self->field && !twin->field)      { return false; }
+    if (!self->field && twin->field)      { return false; }
     if (self->field && !CB_Equals(self->field, (Obj*)twin->field)) {
         return false;
     }
-    if (!VA_Equals(twin->terms, (Obj*)self->terms)) return false;
-    if (self->within != twin->within) return false;
+    if (!VA_Equals(twin->terms, (Obj*)self->terms)) { return false; }
+    if (self->within != twin->within)               { return false; }
     return true;
 }
 
@@ -237,13 +237,13 @@ ProximityCompiler_deserialize(ProximityCompiler *self, InStream *instream) {
 bool_t
 ProximityCompiler_equals(ProximityCompiler *self, Obj *other) {
     ProximityCompiler *twin = (ProximityCompiler*)other;
-    if (!Obj_Is_A(other, PROXIMITYCOMPILER)) return false;
-    if (!Compiler_equals((Compiler*)self, other)) return false;
-    if (self->idf != twin->idf) return false;
-    if (self->raw_weight != twin->raw_weight) return false;
-    if (self->query_norm_factor != twin->query_norm_factor) return false;
-    if (self->normalized_weight != twin->normalized_weight) return false;
-    if (self->within            != twin->within) return false;
+    if (!Obj_Is_A(other, PROXIMITYCOMPILER))                { return false; }
+    if (!Compiler_equals((Compiler*)self, other))           { return false; }
+    if (self->idf != twin->idf)                             { return false; }
+    if (self->raw_weight != twin->raw_weight)               { return false; }
+    if (self->query_norm_factor != twin->query_norm_factor) { return false; }
+    if (self->normalized_weight != twin->normalized_weight) { return false; }
+    if (self->within            != twin->within)            { return false; }
     return true;
 }
 
@@ -272,7 +272,7 @@ ProximityCompiler_make_matcher(ProximityCompiler *self, SegReader *reader,
     uint32_t           num_terms = VA_Get_Size(terms);
 
     // Bail if there are no terms.
-    if (!num_terms) return NULL;
+    if (!num_terms) { return NULL; }
 
     // Bail unless field is valid and posting type supports positions.
     Similarity *sim     = ProximityCompiler_Get_Similarity(self);

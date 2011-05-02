@@ -160,7 +160,7 @@ HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
     int32_t distance = upper->offset - lower_end_offset;
 
     // If spans overlap, set distance to 0.
-    if (distance < 0) distance = 0;
+    if (distance < 0) { distance = 0; }
 
     if (distance > (int32_t)self->window) {
         return 0.0f;

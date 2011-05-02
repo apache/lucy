@@ -59,8 +59,8 @@ BlobType_primitive_id(BlobType *self) {
 bool_t
 BlobType_equals(BlobType *self, Obj *other) {
     BlobType *twin = (BlobType*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, BLOBTYPE)) return false;
+    if (twin == self)               { return true; }
+    if (!Obj_Is_A(other, BLOBTYPE)) { return false; }
     return FType_equals((FieldType*)self, other);
 }
 

@@ -72,9 +72,9 @@ RegexTokenizer_load(RegexTokenizer *self, Obj *dump) {
 bool_t
 RegexTokenizer_equals(RegexTokenizer *self, Obj *other) {
     RegexTokenizer *const twin = (RegexTokenizer*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, REGEXTOKENIZER)) return false;
-    if (!CB_Equals(twin->pattern, (Obj*)self->pattern)) return false;
+    if (twin == self)                                   { return true; }
+    if (!Obj_Is_A(other, REGEXTOKENIZER))               { return false; }
+    if (!CB_Equals(twin->pattern, (Obj*)self->pattern)) { return false; }
     return true;
 }
 

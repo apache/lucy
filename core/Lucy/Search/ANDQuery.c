@@ -44,7 +44,7 @@ ANDQuery_init(ANDQuery *self, VArray *children) {
 CharBuf*
 ANDQuery_to_string(ANDQuery *self) {
     uint32_t num_kids = VA_Get_Size(self->children);
-    if (!num_kids) return CB_new_from_trusted_utf8("()", 2);
+    if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *retval = CB_new_from_trusted_utf8("(", 1);
         uint32_t i;
@@ -66,7 +66,7 @@ ANDQuery_to_string(ANDQuery *self) {
 
 bool_t
 ANDQuery_equals(ANDQuery *self, Obj *other) {
-    if ((ANDQuery*)other == self) return true;
+    if ((ANDQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, ANDQUERY)) { return false; }
     return PolyQuery_equals((PolyQuery*)self, other);
 }

@@ -80,7 +80,7 @@ PolyQuery_deserialize(PolyQuery *self, InStream *instream) {
     float    boost        = InStream_Read_F32(instream);
     uint32_t num_children = InStream_Read_U32(instream);
 
-    if (!self) THROW(ERR, "Abstract class");
+    if (!self) { THROW(ERR, "Abstract class"); }
     PolyQuery_init(self, NULL);
     PolyQuery_Set_Boost(self, boost);
 
@@ -95,10 +95,10 @@ PolyQuery_deserialize(PolyQuery *self, InStream *instream) {
 bool_t
 PolyQuery_equals(PolyQuery *self, Obj *other) {
     PolyQuery *twin = (PolyQuery*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, POLYQUERY)) return false;
-    if (self->boost != twin->boost) return false;
-    if (!VA_Equals(twin->children, (Obj*)self->children)) return false;
+    if (twin == self)                                     { return true; }
+    if (!Obj_Is_A(other, POLYQUERY))                      { return false; }
+    if (self->boost != twin->boost)                       { return false; }
+    if (!VA_Equals(twin->children, (Obj*)self->children)) { return false; }
     return true;
 }
 

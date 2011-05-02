@@ -110,9 +110,9 @@ PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text) {
 bool_t
 PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
     PolyAnalyzer *const twin = (PolyAnalyzer*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, POLYANALYZER)) return false;
-    if (!VA_Equals(twin->analyzers, (Obj*)self->analyzers)) return false;
+    if (twin == self)                                       { return true; }
+    if (!Obj_Is_A(other, POLYANALYZER))                     { return false; }
+    if (!VA_Equals(twin->analyzers, (Obj*)self->analyzers)) { return false; }
     return true;
 }
 

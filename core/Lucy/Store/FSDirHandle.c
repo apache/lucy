@@ -149,7 +149,7 @@ FSDH_entry_is_symlink(FSDirHandle *self) {
         CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
                 self->entry);
         if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
-            if (stat_buf.st_mode & S_IFLNK) return true;
+            if (stat_buf.st_mode & S_IFLNK) { return true; }
         }
         return false;
     }

@@ -112,8 +112,8 @@ SI_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
 bool_t
 BB_equals(ByteBuf *self, Obj *other) {
     ByteBuf *const twin = (ByteBuf*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, BYTEBUF)) return false;
+    if (twin == self)              { return true; }
+    if (!Obj_Is_A(other, BYTEBUF)) { return false; }
     return SI_equals_bytes(self, twin->buf, twin->size);
 }
 

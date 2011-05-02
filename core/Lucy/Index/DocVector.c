@@ -94,7 +94,7 @@ DocVec_term_vector(DocVector *self, const CharBuf *field,
             = (ByteBuf*)Hash_Fetch(self->field_bufs, (Obj*)field);
 
         // Bail if there's no content or the field isn't highlightable.
-        if (field_buf == NULL) return NULL;
+        if (field_buf == NULL) { return NULL; }
 
         field_vector = S_extract_tv_cache(field_buf);
         Hash_Store(self->field_vectors, (Obj*)field, (Obj*)field_vector);

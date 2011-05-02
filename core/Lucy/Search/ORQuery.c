@@ -52,7 +52,7 @@ ORQuery_equals(ORQuery *self, Obj *other) {
 CharBuf*
 ORQuery_to_string(ORQuery *self) {
     uint32_t num_kids = VA_Get_Size(self->children);
-    if (!num_kids) return CB_new_from_trusted_utf8("()", 2);
+    if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *retval = CB_new_from_trusted_utf8("(", 1);
         uint32_t i;

@@ -322,7 +322,7 @@ S_splice_out_token_type(VArray *elems, uint32_t token_type_mask) {
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         ParserToken *token = (ParserToken*)VA_Fetch(elems, i);
         if (Obj_Is_A((Obj*)token, PARSERTOKEN)) {
-            if (token->type & token_type_mask) VA_Excise(elems, i, 1);
+            if (token->type & token_type_mask) { VA_Excise(elems, i, 1); }
         }
     }
 }
@@ -465,10 +465,10 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
             for (j = i + 1, jmax = VA_Get_Size(elems); j < jmax; j++) {
                 ParserClause *clause = (ParserClause*)VA_Fetch(elems, j);
-                if (Obj_Is_A((Obj*)clause, PARSERCLAUSE)) break;
-                else num_to_zap++;
+                if (Obj_Is_A((Obj*)clause, PARSERCLAUSE)) { break; }
+                else { num_to_zap++; }
             }
-            if (num_to_zap) VA_Excise(elems, i, num_to_zap);
+            if (num_to_zap) { VA_Excise(elems, i, num_to_zap); }
         }
     }
 
@@ -510,7 +510,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             VA_Excise(elems, i + 1, num_to_zap);
 
             // Don't double wrap '(a AND b)'.
-            if (VA_Get_Size(elems) == 1) apply_parens = false;
+            if (VA_Get_Size(elems) == 1) { apply_parens = false; }
         }
     }
 
@@ -552,7 +552,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             VA_Excise(elems, i + 1, num_to_zap);
 
             // Don't double wrap '(a OR b)'.
-            if (VA_Get_Size(elems) == 1) apply_parens = false;
+            if (VA_Get_Size(elems) == 1) { apply_parens = false; }
         }
     }
 
@@ -666,14 +666,20 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
 static bool_t
 S_has_valid_clauses(Query *query) {
-    if (Query_Is_A(query, NOTQUERY)) return false;
-    else if (Query_Is_A(query, MATCHALLQUERY)) return false;
+    if (Query_Is_A(query, NOTQUERY)) {
+        return false;
+    }
+    else if (Query_Is_A(query, MATCHALLQUERY)) {
+        return false;
+    }
     else if (Query_Is_A(query, ORQUERY) || Query_Is_A(query, ANDQUERY)) {
         PolyQuery *polyquery = (PolyQuery*)query;
         VArray    *children  = PolyQuery_Get_Children(polyquery);
         for (uint32_t i = 0, max = VA_Get_Size(children); i < max; i++) {
             Query *child = (Query*)VA_Fetch(children, i);
-            if (S_has_valid_clauses(child)) return true;
+            if (S_has_valid_clauses(child)) {
+                return true;
+            }
         }
         return false;
     }
@@ -779,9 +785,16 @@ S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target) {
     // Only alphanumerics and underscores are allowed  in field names.
     while (1) {
         code_point = ViewCB_Code_Point_At(qstring, tick);
-        if (isalnum(code_point) || code_point == '_') tick++;
-        else if (code_point == ':') { tick++; break; }
-        else return false;
+        if (isalnum(code_point) || code_point == '_') {
+            tick++;
+        }
+        else if (code_point == ':') {
+            tick++;
+            break;
+        }
+        else {
+            return false;
+        }
     }
 
     // Field name constructs must be followed by something sensible.
@@ -894,9 +907,9 @@ QParser_expand(QueryParser *self, Query *query) {
             ReqOptQuery_Set_Optional_Query(req_opt_query, opt_query);
             retval = (Query*)INCREF(query);
         }
-        else if (req_query) retval = (Query*)INCREF(req_query);
-        else if (opt_query) retval = (Query*)INCREF(opt_query);
-        else retval = (Query*)NoMatchQuery_new();
+        else if (req_query) { retval = (Query*)INCREF(req_query); }
+        else if (opt_query) { retval = (Query*)INCREF(opt_query); }
+        else { retval = (Query*)NoMatchQuery_new(); }
 
         DECREF(opt_query);
         DECREF(req_query);
@@ -948,8 +961,8 @@ QParser_expand_leaf(QueryParser *self, Query *query) {
     bool_t         ambiguous   = false;
 
     // Determine whether we can actually process the input.
-    if (!Query_Is_A(query, LEAFQUERY)) return NULL;
-    if (!CB_Get_Size(LeafQuery_Get_Text(leaf_query))) return NULL;
+    if (!Query_Is_A(query, LEAFQUERY))                { return NULL; }
+    if (!CB_Get_Size(LeafQuery_Get_Text(leaf_query))) { return NULL; }
     ZCB_Assign(source_text, LeafQuery_Get_Text(leaf_query));
 
     // If quoted, always generate PhraseQuery.

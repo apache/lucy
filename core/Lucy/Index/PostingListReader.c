@@ -115,7 +115,7 @@ DefPListReader_posting_list(DefaultPostingListReader *self,
     // Only return an object if we've got an indexed field.
     if (type != NULL && FType_Indexed(type)) {
         SegPostingList *plist = SegPList_new((PostingListReader*)self, field);
-        if (target) SegPList_Seek(plist, target);
+        if (target) { SegPList_Seek(plist, target); }
         return plist;
     }
     else {

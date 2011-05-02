@@ -43,8 +43,8 @@ MatchAllQuery_init(MatchAllQuery *self) {
 bool_t
 MatchAllQuery_equals(MatchAllQuery *self, Obj *other) {
     MatchAllQuery *twin = (MatchAllQuery*)other;
-    if (!Obj_Is_A(other, MATCHALLQUERY)) return false;
-    if (self->boost != twin->boost) return false;
+    if (!Obj_Is_A(other, MATCHALLQUERY)) { return false; }
+    if (self->boost != twin->boost)      { return false; }
     return true;
 }
 

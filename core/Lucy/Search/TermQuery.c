@@ -84,11 +84,11 @@ TermQuery_get_term(TermQuery *self) {
 bool_t
 TermQuery_equals(TermQuery *self, Obj *other) {
     TermQuery *twin = (TermQuery*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, TERMQUERY)) return false;
-    if (self->boost != twin->boost) return false;
-    if (!CB_Equals(self->field, (Obj*)twin->field)) return false;
-    if (!Obj_Equals(self->term, twin->term)) return false;
+    if (twin == self)                               { return true; }
+    if (!Obj_Is_A(other, TERMQUERY))                { return false; }
+    if (self->boost != twin->boost)                 { return false; }
+    if (!CB_Equals(self->field, (Obj*)twin->field)) { return false; }
+    if (!Obj_Equals(self->term, twin->term))        { return false; }
     return true;
 }
 
@@ -156,12 +156,12 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
 bool_t
 TermCompiler_equals(TermCompiler *self, Obj *other) {
     TermCompiler *twin = (TermCompiler*)other;
-    if (!Compiler_equals((Compiler*)self, other)) return false;
-    if (!Obj_Is_A(other, TERMCOMPILER)) return false;
-    if (self->idf != twin->idf) return false;
-    if (self->raw_weight != twin->raw_weight) return false;
-    if (self->query_norm_factor != twin->query_norm_factor) return false;
-    if (self->normalized_weight != twin->normalized_weight) return false;
+    if (!Compiler_equals((Compiler*)self, other))           { return false; }
+    if (!Obj_Is_A(other, TERMCOMPILER))                     { return false; }
+    if (self->idf != twin->idf)                             { return false; }
+    if (self->raw_weight != twin->raw_weight)               { return false; }
+    if (self->query_norm_factor != twin->query_norm_factor) { return false; }
+    if (self->normalized_weight != twin->normalized_weight) { return false; }
     return true;
 }
 
@@ -242,11 +242,11 @@ TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher,
     uint32_t i, max;
     UNUSED_VAR(searcher);
 
-    if (!CB_Equals(parent->field, (Obj*)field)) return spans;
+    if (!CB_Equals(parent->field, (Obj*)field)) { return spans; }
 
     // Add all starts and ends.
     term_vector = DocVec_Term_Vector(doc_vec, field, (CharBuf*)parent->term);
-    if (!term_vector) return spans;
+    if (!term_vector) { return spans; }
 
     starts = TV_Get_Start_Offsets(term_vector);
     ends   = TV_Get_End_Offsets(term_vector);

@@ -118,7 +118,7 @@ VA_deserialize(VArray *self, InStream *instream) {
         self->cap = size + 1;
         self->elems = (Obj**)CALLOCATE(self->cap, sizeof(Obj*));
     }
-    else self = VA_new(size);
+    else { self = VA_new(size); }
     for (tick = InStream_Read_C32(instream);
          tick < size;
          tick += InStream_Read_C32(instream)
@@ -274,8 +274,8 @@ VA_excise(VArray *self, uint32_t offset, uint32_t length) {
     uint32_t i;
     uint32_t num_to_move;
 
-    if (self->size <= offset) return;
-    else if (self->size < offset + length) length = self->size - offset;
+    if (self->size <= offset)              { return; }
+    else if (self->size < offset + length) { length = self->size - offset; }
 
     for (i = 0; i < length; i++) {
         DECREF(self->elems[offset + i]);
@@ -333,8 +333,8 @@ VA_sort(VArray *self, lucy_Sort_compare_t compare, void *context) {
 bool_t
 VA_equals(VArray *self, Obj *other) {
     VArray *twin = (VArray*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, VARRAY)) return false;
+    if (twin == self)             { return true; }
+    if (!Obj_Is_A(other, VARRAY)) { return false; }
     if (twin->size != self->size) {
         return false;
     }
@@ -343,8 +343,8 @@ VA_equals(VArray *self, Obj *other) {
         for (i = 0, max = self->size; i < max; i++) {
             Obj *val       = self->elems[i];
             Obj *other_val = twin->elems[i];
-            if ((val && !other_val) || (other_val && !val)) return false;
-            if (val && !Obj_Equals(val, other_val)) return false;
+            if ((val && !other_val) || (other_val && !val)) { return false; }
+            if (val && !Obj_Equals(val, other_val))         { return false; }
         }
     }
     return true;

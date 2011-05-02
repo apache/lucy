@@ -112,11 +112,11 @@ Compiler_to_string(Compiler *self) {
 bool_t
 Compiler_equals(Compiler *self, Obj *other) {
     Compiler *twin = (Compiler*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, COMPILER)) return false;
-    if (self->boost != twin->boost) return false;
-    if (!Query_Equals(self->parent, (Obj*)twin->parent)) return false;
-    if (!Sim_Equals(self->sim, (Obj*)twin->sim)) return false;
+    if (twin == self)                                    { return true; }
+    if (!Obj_Is_A(other, COMPILER))                      { return false; }
+    if (self->boost != twin->boost)                      { return false; }
+    if (!Query_Equals(self->parent, (Obj*)twin->parent)) { return false; }
+    if (!Sim_Equals(self->sim, (Obj*)twin->sim))         { return false; }
     return true;
 }
 
@@ -130,7 +130,7 @@ Compiler_serialize(Compiler *self, OutStream *outstream) {
 
 Compiler*
 Compiler_deserialize(Compiler *self, InStream *instream) {
-    if (!self) THROW(ERR, "Compiler_Deserialize is abstract");
+    if (!self) { THROW(ERR, "Compiler_Deserialize is abstract"); }
     self->boost  = InStream_Read_F32(instream);
     self->parent = (Query*)THAW(instream);
     self->sim    = (Similarity*)THAW(instream);

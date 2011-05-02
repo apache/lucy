@@ -93,15 +93,15 @@ PhraseQuery_deserialize(PhraseQuery *self, InStream *instream) {
 bool_t
 PhraseQuery_equals(PhraseQuery *self, Obj *other) {
     PhraseQuery *twin = (PhraseQuery*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, PHRASEQUERY)) return false;
-    if (self->boost != twin->boost) return false;
-    if (self->field && !twin->field) return false;
-    if (!self->field && twin->field) return false;
+    if (twin == self)                  { return true; }
+    if (!Obj_Is_A(other, PHRASEQUERY)) { return false; }
+    if (self->boost != twin->boost)    { return false; }
+    if (self->field && !twin->field)   { return false; }
+    if (!self->field && twin->field)   { return false; }
     if (self->field && !CB_Equals(self->field, (Obj*)twin->field)) {
         return false;
     }
-    if (!VA_Equals(twin->terms, (Obj*)self->terms)) return false;
+    if (!VA_Equals(twin->terms, (Obj*)self->terms)) { return false; }
     return true;
 }
 
@@ -217,12 +217,12 @@ PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream) {
 bool_t
 PhraseCompiler_equals(PhraseCompiler *self, Obj *other) {
     PhraseCompiler *twin = (PhraseCompiler*)other;
-    if (!Obj_Is_A(other, PHRASECOMPILER)) return false;
-    if (!Compiler_equals((Compiler*)self, other)) return false;
-    if (self->idf != twin->idf) return false;
-    if (self->raw_weight != twin->raw_weight) return false;
-    if (self->query_norm_factor != twin->query_norm_factor) return false;
-    if (self->normalized_weight != twin->normalized_weight) return false;
+    if (!Obj_Is_A(other, PHRASECOMPILER))                   { return false; }
+    if (!Compiler_equals((Compiler*)self, other))           { return false; }
+    if (self->idf != twin->idf)                             { return false; }
+    if (self->raw_weight != twin->raw_weight)               { return false; }
+    if (self->query_norm_factor != twin->query_norm_factor) { return false; }
+    if (self->normalized_weight != twin->normalized_weight) { return false; }
     return true;
 }
 
@@ -251,7 +251,7 @@ PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
     uint32_t           num_terms = VA_Get_Size(terms);
 
     // Bail if there are no terms.
-    if (!num_terms) return NULL;
+    if (!num_terms) { return NULL; }
 
     // Bail unless field is valid and posting type supports positions.
     Similarity *sim     = PhraseCompiler_Get_Similarity(self);

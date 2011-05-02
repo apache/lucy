@@ -359,8 +359,9 @@ S_test_sparse_file(long offset, Stat *st) {
 
     /* Make sure the file's not there, then open. */
     Util_remove_and_verify("_charm_sparse");
-    if ((sparse_fh = fopen("_charm_sparse", "w+")) == NULL)
+    if ((sparse_fh = fopen("_charm_sparse", "w+")) == NULL) {
         Util_die("Couldn't open file '_charm_sparse'");
+    }
 
     /* Seek fh to [offset], write a byte, close file. */
     if ((fseek(sparse_fh, offset, SEEK_SET)) == -1) {

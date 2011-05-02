@@ -102,9 +102,9 @@ SnowStemmer_load(SnowballStemmer *self, Obj *dump) {
 bool_t
 SnowStemmer_equals(SnowballStemmer *self, Obj *other) {
     SnowballStemmer *const twin = (SnowballStemmer*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, SNOWBALLSTEMMER)) return false;
-    if (!CB_Equals(twin->language, (Obj*)self->language)) return false;
+    if (twin == self)                                     { return true; }
+    if (!Obj_Is_A(other, SNOWBALLSTEMMER))                { return false; }
+    if (!CB_Equals(twin->language, (Obj*)self->language)) { return false; }
     return true;
 }
 

@@ -26,7 +26,7 @@ lucy_Doc*
 lucy_Doc_init(lucy_Doc *self, void *fields, int32_t doc_id) {
     // Assign.
     if (fields) {
-        if (SvTYPE((SV*)fields) != SVt_PVHV) THROW(LUCY_ERR, "Not a hash");
+        if (SvTYPE((SV*)fields) != SVt_PVHV) { THROW(LUCY_ERR, "Not a hash"); }
         self->fields = SvREFCNT_inc((SV*)fields);
     }
     else {
@@ -39,7 +39,7 @@ lucy_Doc_init(lucy_Doc *self, void *fields, int32_t doc_id) {
 
 void
 lucy_Doc_set_fields(lucy_Doc *self, void *fields) {
-    if (self->fields) SvREFCNT_dec((SV*)self->fields);
+    if (self->fields) { SvREFCNT_dec((SV*)self->fields); }
     self->fields = SvREFCNT_inc((SV*)fields);
 }
 
@@ -184,7 +184,7 @@ lucy_Doc_equals(lucy_Doc *self, lucy_Obj *other) {
 
 void
 lucy_Doc_destroy(lucy_Doc *self) {
-    if (self->fields) SvREFCNT_dec((SV*)self->fields);
+    if (self->fields) { SvREFCNT_dec((SV*)self->fields); }
     LUCY_SUPER_DESTROY(self, LUCY_DOC);
 }
 

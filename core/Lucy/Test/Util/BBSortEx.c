@@ -79,8 +79,8 @@ BBSortEx_flush(BBSortEx *self) {
     BBSortEx    *run;
     uint32_t     i;
 
-    if (!cache_count) return;
-    else elems = VA_new(cache_count);
+    if (!cache_count) { return; }
+    else              { elems = VA_new(cache_count); }
 
     // Sort, then create a new run.
     BBSortEx_Sort_Cache(self);

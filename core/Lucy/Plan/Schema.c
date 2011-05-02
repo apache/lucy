@@ -96,11 +96,11 @@ S_add_unique(VArray *array, Obj *elem) {
 bool_t
 Schema_equals(Schema *self, Obj *other) {
     Schema *twin = (Schema*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, SCHEMA)) return false;
-    if (!Arch_Equals(self->arch, (Obj*)twin->arch)) return false;
-    if (!Sim_Equals(self->sim, (Obj*)twin->sim)) return false;
-    if (!Hash_Equals(self->types, (Obj*)twin->types)) return false;
+    if (twin == self)                                 { return true; }
+    if (!Obj_Is_A(other, SCHEMA))                     { return false; }
+    if (!Arch_Equals(self->arch, (Obj*)twin->arch))   { return false; }
+    if (!Sim_Equals(self->sim, (Obj*)twin->sim))      { return false; }
+    if (!Hash_Equals(self->types, (Obj*)twin->types)) { return false; }
     return true;
 }
 

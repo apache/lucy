@@ -92,8 +92,8 @@ bool_t
 PriQ_insert(PriorityQueue *self, Obj *element) {
     Obj *least = PriQ_Jostle(self, element);
     DECREF(least);
-    if (element == least) return false;
-    else                  return true;
+    if (element == least) { return false; }
+    else                  { return true; }
 }
 
 Obj*

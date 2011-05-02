@@ -43,9 +43,9 @@ NoMatchQuery_init(NoMatchQuery *self) {
 bool_t
 NoMatchQuery_equals(NoMatchQuery *self, Obj *other) {
     NoMatchQuery *twin = (NoMatchQuery*)other;
-    if (!Obj_Is_A(other, NOMATCHQUERY)) return false;
-    if (self->boost != twin->boost) return false;
-    if (!!self->fails_to_match != !!twin->fails_to_match) return false;
+    if (!Obj_Is_A(other, NOMATCHQUERY))                   { return false; }
+    if (self->boost != twin->boost)                       { return false; }
+    if (!!self->fails_to_match != !!twin->fails_to_match) { return false; }
     return true;
 }
 

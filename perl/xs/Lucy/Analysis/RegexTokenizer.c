@@ -81,7 +81,7 @@ S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re) {
         THROW(LUCY_ERR, "Failed to extract REGEXP from token_re '%s'",
               SvPV_nolen((SV*)token_re));
     }
-    if (self->token_re) ReREFCNT_dec(((REGEXP*)self->token_re));
+    if (self->token_re) { ReREFCNT_dec(((REGEXP*)self->token_re)); }
     self->token_re = rx;
     (void)ReREFCNT_inc(((REGEXP*)self->token_re));
 }

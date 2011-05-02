@@ -120,7 +120,7 @@ Sim_deserialize(Similarity *self, InStream *instream) {
 
 bool_t
 Sim_equals(Similarity *self, Obj *other) {
-    if (Sim_Get_VTable(self) != Obj_Get_VTable(other)) return false;
+    if (Sim_Get_VTable(self) != Obj_Get_VTable(other)) { return false; }
     return true;
 }
 

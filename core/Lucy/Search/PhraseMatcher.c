@@ -216,22 +216,22 @@ SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
 SPIN_CANDIDATES:
     target_candidate = *anchors + offset;
     while (*candidates < target_candidate) {
-        if (++candidates == candidates_end) goto DONE;
+        if (++candidates == candidates_end) { goto DONE; }
     }
-    if (*candidates == target_candidate) goto MATCH;
+    if (*candidates == target_candidate) { goto MATCH; }
     goto SPIN_ANCHORS;
 
 SPIN_ANCHORS:
     target_anchor = *candidates - offset;
     while (*anchors < target_anchor) {
-        if (++anchors == anchors_end) goto DONE;
+        if (++anchors == anchors_end) { goto DONE; }
     };
-    if (*anchors == target_anchor) goto MATCH;
+    if (*anchors == target_anchor) { goto MATCH; }
     goto SPIN_CANDIDATES;
 
 MATCH:
     *anchors_found++ = *anchors;
-    if (++anchors == anchors_end) goto DONE;
+    if (++anchors == anchors_end) { goto DONE; }
     goto SPIN_CANDIDATES;
 
 DONE:

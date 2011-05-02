@@ -80,30 +80,30 @@ Debug_debug_should_print(const char *path, const char *func) {
         const int funcname_len = func ? strlen(func) : 0;
 
         // Use just file name if given path.
-        if (file) file++;
-        else file = path;
+        if (file) { file++; }
+        else      { file = path; }
 
         // Split criteria on commas. Bail when we run out of critieria.
         for (test = env_cache; test != NULL; test = next) {
             const char *last_char;
 
             // Skip whitespace.
-            while (isspace(*test)) test++;
-            if (test >= env_cache_limit) return 0;
+            while (isspace(*test)) { test++; }
+            if (test >= env_cache_limit) { return 0; }
 
             // Find end of criteria or end of string.
             next = strchr(test, ',');
             last_char = next ? next - 1 : env_cache_limit - 1;
-            while (last_char > test && isspace(*last_char)) last_char--;
+            while (last_char > test && isspace(*last_char)) { last_char--; }
 
             if (*last_char == '*') {
                 const int len = last_char - test;
-                if (!strncmp(test, file, len)) return 1;
-                if (!strncmp(test, func, len)) return 1;
+                if (!strncmp(test, file, len)) { return 1; }
+                if (!strncmp(test, func, len)) { return 1; }
             }
             else {
-                if (!strncmp(test, file, filename_len)) return 1;
-                if (!strncmp(test, func, funcname_len)) return 1;
+                if (!strncmp(test, file, filename_len)) { return 1; }
+                if (!strncmp(test, func, funcname_len)) { return 1; }
             }
         }
 

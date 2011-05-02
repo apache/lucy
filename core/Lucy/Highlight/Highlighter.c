@@ -356,7 +356,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
     int32_t this_excerpt_len = found_ending_edge
                                ? end - start
                                : (int32_t)self->excerpt_length;
-    if (!this_excerpt_len) return start;
+    if (!this_excerpt_len) { return start; }
 
     if (found_starting_edge) {
         ZombieCharBuf *temp = ZCB_WRAP((CharBuf*)field_val);
@@ -557,7 +557,7 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
         if (!code_point) {
             // End of fragment.  If we have a sentence open, close it,
             // then bail.
-            if (sentence) S_close_sentence(sentences, &sentence, pos);
+            if (sentence) { S_close_sentence(sentences, &sentence, pos); }
             break;
         }
         else if (code_point == '.') {
@@ -566,13 +566,13 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
 
             if (pos == stop && ZCB_Get_Size(fragment) == 0) {
                 // Period ending the field string.
-                if (sentence) S_close_sentence(sentences, &sentence, pos);
+                if (sentence) { S_close_sentence(sentences, &sentence, pos); }
                 break;
             }
             else if (0 != (whitespace_count = ZCB_Trim_Top(fragment))) {
                 // We've found a period followed by whitespace.  Close out the
                 // existing sentence, if there is one. */
-                if (sentence) S_close_sentence(sentences, &sentence, pos);
+                if (sentence) { S_close_sentence(sentences, &sentence, pos); }
 
                 // Advance past whitespace.
                 pos += whitespace_count;
@@ -586,7 +586,7 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
             // We may not have reached the end of the field yet, but it's
             // entirely possible that our last sentence overlapped the end of
             // the fragment -- in which case, it's time to bail.
-            if (pos >= stop) break;
+            if (pos >= stop) { break; }
         }
         else {
             ZCB_Nip(fragment, 1);
@@ -610,7 +610,7 @@ S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
         return Highlighter_Encode(self, text);
     }
     else {
-        if (*encode_buf == NULL) *encode_buf = CB_new(0);
+        if (*encode_buf == NULL) { *encode_buf = CB_new(0); }
         (void)S_encode_entities(text, *encode_buf);
         return (CharBuf*)INCREF(*encode_buf);
     }

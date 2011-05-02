@@ -38,8 +38,8 @@ IxFileNames_latest_snapshot(Folder *folder) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_gen) {
                 latest_gen = gen;
-                if (!retval) retval = CB_Clone(entry);
-                else CB_Mimic(retval, (Obj*)entry);
+                if (!retval) { retval = CB_Clone(entry); }
+                else         { CB_Mimic(retval, (Obj*)entry); }
             }
         }
     }

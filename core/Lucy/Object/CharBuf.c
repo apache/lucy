@@ -166,7 +166,7 @@ S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
                    const char *func) {
     fprintf(stderr, "Invalid UTF-8, aborting: '");
     fwrite(text, sizeof(char), size < 200 ? size : 200, stderr);
-    if (size > 200) fwrite("[...]", sizeof(char), 5, stderr);
+    if (size > 200) { fwrite("[...]", sizeof(char), 5, stderr); }
     fprintf(stderr, "' (length %lu)\n", (unsigned long)size);
     Err_throw_at(ERR, file, line, func, "Invalid UTF-8");
 }
@@ -400,7 +400,7 @@ CB_basex_to_i64(CharBuf *self, uint32_t base) {
             int32_t addend = isdigit(code_point)
                              ? code_point - '0'
                              : tolower(code_point) - 'a' + 10;
-            if (addend > (int32_t)base) break;
+            if (addend > (int32_t)base) { break; }
             retval *= base;
             retval += addend;
         }
@@ -410,7 +410,7 @@ CB_basex_to_i64(CharBuf *self, uint32_t base) {
     }
 
     // Apply minus sign.
-    if (is_negative) retval = 0 - retval;
+    if (is_negative) { retval = 0 - retval; }
 
     return retval;
 }
@@ -544,8 +544,8 @@ CB_starts_with_str(CharBuf *self, const char *prefix, size_t size) {
 bool_t
 CB_equals(CharBuf *self, Obj *other) {
     CharBuf *const twin = (CharBuf*)other;
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, CHARBUF)) return false;
+    if (twin == self)              { return true; }
+    if (!Obj_Is_A(other, CHARBUF)) { return false; }
     return CB_equals_str(self, twin->ptr, twin->size);
 }
 
@@ -614,7 +614,7 @@ CB_trim_top(CharBuf *self) {
 
     while (ptr < end) {
         uint32_t code_point = StrHelp_decode_utf8_char(ptr);
-        if (!StrHelp_is_whitespace(code_point)) break;
+        if (!StrHelp_is_whitespace(code_point)) { break; }
         ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr];
         count++;
     }
@@ -637,7 +637,7 @@ CB_trim_tail(CharBuf *self) {
 
     while (NULL != (ptr = StrHelp_back_utf8_char(ptr, top))) {
         uint32_t code_point = StrHelp_decode_utf8_char(ptr);
-        if (!StrHelp_is_whitespace(code_point)) break;
+        if (!StrHelp_is_whitespace(code_point)) { break; }
         new_size = ptr - top;
         count++;
     }
@@ -681,7 +681,7 @@ CB_chop(CharBuf *self, size_t count) {
     const char *ptr         = top + self->size;
     for (num_chopped = 0; num_chopped < count; num_chopped++) {
         const char *end = ptr;
-        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) break;
+        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) { break; }
         self->size -= (end - ptr);
     }
     return num_chopped;
@@ -715,7 +715,7 @@ CB_code_point_at(CharBuf *self, size_t tick) {
     char *const end = ptr + self->size;
 
     for (; ptr < end; ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr]) {
-        if (count == tick) return StrHelp_decode_utf8_char(ptr);
+        if (count == tick) { return StrHelp_decode_utf8_char(ptr); }
         count++;
     }
 
@@ -729,7 +729,7 @@ CB_code_point_from(CharBuf *self, size_t tick) {
     const char *ptr   = top + self->size;
 
     for (count = 0; count < tick; count++) {
-        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) return 0;
+        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) { return 0; }
     }
     return StrHelp_decode_utf8_char(ptr);
 }
@@ -758,7 +758,7 @@ CB_compare(const void *va, const void *vb) {
         int32_t code_point_a = ZCB_Nip_One(iterator_a);
         int32_t code_point_b = ZCB_Nip_One(iterator_b);
         const int32_t comparison = code_point_a - code_point_b;
-        if (comparison != 0) return comparison;
+        if (comparison != 0) { return comparison; }
     }
     if (iterator_a->size != iterator_b->size) {
         return iterator_a->size < iterator_b->size ? -1 : 1;
@@ -846,7 +846,7 @@ ViewCB_trim_top(ViewCharBuf *self) {
 
     while (ptr < end) {
         uint32_t code_point = StrHelp_decode_utf8_char(ptr);
-        if (!StrHelp_is_whitespace(code_point)) break;
+        if (!StrHelp_is_whitespace(code_point)) { break; }
         ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr];
         count++;
     }

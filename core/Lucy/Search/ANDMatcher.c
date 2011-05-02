@@ -40,7 +40,7 @@ ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) {
     for (i = 0; i < self->num_kids; i++) {
         Matcher *child = (Matcher*)VA_Fetch(children, i);
         self->kids[i] = child;
-        if (!Matcher_Next(child)) self->more = false;
+        if (!Matcher_Next(child)) { self->more = false; }
     }
 
     // Derive.
@@ -75,7 +75,7 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target) {
     const uint32_t  num_kids = self->num_kids;
     int32_t         highest  = 0;
 
-    if (!self->more) return 0;
+    if (!self->more) { return 0; }
 
     // First step: Advance first child and use its doc as a starting point.
     if (self->first_time) {

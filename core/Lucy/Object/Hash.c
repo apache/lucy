@@ -208,8 +208,8 @@ Hash_deserialize(Hash *self, InStream *instream) {
     uint32_t num_other    = size - num_charbufs;
     CharBuf *key          = num_charbufs ? CB_new(0) : NULL;
 
-    if (self) Hash_init(self, size);
-    else self = Hash_new(size);
+    if (self) { Hash_init(self, size); }
+    else      { self = Hash_new(size); }
 
     // Read key-value pairs with CharBuf keys.
     while (num_charbufs--) {
@@ -421,7 +421,7 @@ Hash_values(Hash *self) {
     Obj *val;
     VArray *values = VA_new(self->size);
     Hash_Iterate(self);
-    while (Hash_Next(self, &key, &val)) VA_push(values, INCREF(val));
+    while (Hash_Next(self, &key, &val)) { VA_push(values, INCREF(val)); }
     return values;
 }
 
@@ -431,14 +431,14 @@ Hash_equals(Hash *self, Obj *other) {
     Obj     *key;
     Obj     *val;
 
-    if (twin == self) return true;
-    if (!Obj_Is_A(other, HASH)) return false;
-    if (self->size != twin->size) return false;
+    if (twin == self)             { return true; }
+    if (!Obj_Is_A(other, HASH))   { return false; }
+    if (self->size != twin->size) { return false; }
 
     Hash_Iterate(self);
     while (Hash_Next(self, &key, &val)) {
         Obj *other_val = Hash_Fetch(twin, key);
-        if (!other_val || !Obj_Equals(other_val, val)) return false;
+        if (!other_val || !Obj_Equals(other_val, val)) { return false; }
     }
 
     return true;

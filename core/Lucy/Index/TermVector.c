@@ -138,16 +138,16 @@ TV_equals(TermVector *self, Obj *other) {
     int32_t *const other_starts = twin->start_offsets->ints;
     int32_t *const other_ends   = twin->start_offsets->ints;
 
-    if (twin == self) return true;
+    if (twin == self) { return true; }
 
-    if (!CB_Equals(self->field, (Obj*)twin->field)) return false;
-    if (!CB_Equals(self->text, (Obj*)twin->text))   return false;
-    if (self->num_pos != twin->num_pos)             return false;
+    if (!CB_Equals(self->field, (Obj*)twin->field)) { return false; }
+    if (!CB_Equals(self->text, (Obj*)twin->text))   { return false; }
+    if (self->num_pos != twin->num_pos)             { return false; }
 
     for (i = 0; i < self->num_pos; i++) {
-        if (posits[i] != other_posits[i]) return false;
-        if (starts[i] != other_starts[i]) return false;
-        if (ends[i]   != other_ends[i])   return false;
+        if (posits[i] != other_posits[i]) { return false; }
+        if (starts[i] != other_starts[i]) { return false; }
+        if (ends[i]   != other_ends[i])   { return false; }
     }
 
     return true;

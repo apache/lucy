@@ -281,7 +281,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
     PolyReader_init(self, NULL, folder, snapshot, manager, NULL);
     DECREF(folder);
 
-    if (manager) S_obtain_deletion_lock(self);
+    if (manager) { S_obtain_deletion_lock(self); }
 
     while (1) {
         CharBuf *target_snap_file;
@@ -340,7 +340,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                     continue;
                 }
                 else { // Real error.
-                    if (manager) S_release_deletion_lock(self);
+                    if (manager) { S_release_deletion_lock(self); }
                     Err_throw_mess(ERR, error);
                 }
             }
@@ -362,7 +362,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                     last_gen = gen;
                 }
                 else { // Real error.
-                    if (manager) S_release_deletion_lock(self);
+                    if (manager) { S_release_deletion_lock(self); }
                     Err_throw_mess(ERR, (CharBuf*)result);
                 }
             }

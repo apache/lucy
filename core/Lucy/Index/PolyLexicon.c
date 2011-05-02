@@ -77,7 +77,7 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
     // Empty out the queue.
     while (1) {
         SegLexicon *seg_lex = (SegLexicon*)SegLexQ_Pop(lex_q);
-        if (seg_lex == NULL) break;
+        if (seg_lex == NULL) { break; }
         DECREF(seg_lex);
     }
 
@@ -102,7 +102,7 @@ PolyLex_reset(PolyLexicon *self) {
     // Empty out the queue.
     while (1) {
         SegLexicon *seg_lex = (SegLexicon*)SegLexQ_Pop(lex_q);
-        if (seg_lex == NULL) break;
+        if (seg_lex == NULL) { break; }
         DECREF(seg_lex);
     }
 
