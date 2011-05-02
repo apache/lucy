@@ -45,7 +45,7 @@ my $top_dir = rel2abs(__FILE__);
 $top_dir =~ s/\Wdevel.*//;
 my $astylerc = catfile( $top_dir, qw( devel conf astylerc ) );
 die "Can't find astylerc file" unless -f $astylerc;
-my $perltidyrc = catfile( $top_dir, qw( devel conf lucytidyrc ) );
+my $perltidyrc = catfile( $top_dir, qw( devel conf perltidyrc ) );
 die "Can't find perltidyrc file" unless -f $perltidyrc;
 
 # Find/verify astyle and perltidy executables.
