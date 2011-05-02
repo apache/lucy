@@ -73,12 +73,6 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    # Temporary back compat.
-    package Lucy::Schema;
-    BEGIN { our @ISA = qw( Lucy::Plan::Schema ) }
-}
-
-{
     package Lucy::Analysis::Inversion;
 
     our %new_PARAMS = (

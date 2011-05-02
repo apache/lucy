@@ -20,14 +20,7 @@ use lib 'buildlib';
 use Lucy::Test;
 
 package main;
-use Test::More tests => 3;
-
-my $old_schema = Lucy::Schema->new;
-my $new_schema = Lucy::Plan::Schema->new;
-
-$old_schema->eat($new_schema);
-$new_schema->eat($old_schema);
-pass("Stub class Lucy::Schema passed by eat()");
+use Test::More tests => 2;
 
 my $schema;
 SKIP: {
