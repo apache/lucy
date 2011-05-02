@@ -1,0 +1,63 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Disallow tabs.
+--convert-tabs
+
+# Attach opening brackets to the previous line rather than place them on a
+# dedicated line.
+--brackets=attach
+
+# Indent switches and case statements.
+--indent-switches
+--indent-cases 
+
+# Indent backslash continuations within a preprocessor directive.
+--indent-preprocessor 
+
+# Vertically align subsections of multi-part conditionals.
+--min-conditional-indent=0 
+
+# Force space around operators, i.e. "foo = 7" not "foo=7".
+--pad-oper
+
+# Don't cuddle elses.
+--break-elseifs 
+--break-closing-brackets 
+
+# Allow all statements to occupy one line, particularly conditional 
+# statements:
+# 
+#    if (foo) do_stuff();
+#
+--keep-one-line-statements
+
+# Allow single-line blocks:
+# 
+# int
+# Foo_get_thing(Foo *self)
+# { return self->thing; }
+# 
+--keep-one-line-blocks
+
+# Force space between if/when/while and opening paren.
+--pad-header 
+
+# Tighten parens around their contents.
+--unpad-paren 
+
+# Allow continuation lines to start at anywhere up to column 79.
+--max-instatement-indent=79
+
