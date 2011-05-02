@@ -109,7 +109,7 @@ test_protect_symlinks(TestBatch *batch) {
         DECREF(list);
 
         TEST_TRUE(batch, FSFolder_Delete_Tree(folder, bar),
-                  "Delete_Tree() returns true"),
+                  "Delete_Tree() returns true");
         TEST_FALSE(batch, FSFolder_Exists(folder, bar),
                    "Tree is really gone");
         TEST_TRUE(batch, FSFolder_Exists(folder, foo),
