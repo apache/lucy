@@ -273,7 +273,11 @@ sub _compile_clownfish {
     return ( $hierarchy, $binding, \@pm_filepaths_with_xs );
 }
 
-sub ACTION_pod { shift->_write_pod(@_) }
+sub ACTION_pod {
+    my $self = shift;
+    $self->dispatch("build_clownfish");
+    $self->_write_pod(@_);
+}
 
 sub _write_pod {
     my ( $self, $binding ) = @_;
@@ -645,11 +649,21 @@ sub ACTION_dist {
     # Because some items we need are outside this directory, we need to copy a
     # bunch of stuff.  After the tarball is packaged up, we delete the copied
     # directories.
-    my @dirs_to_copy = qw( core modules charmonizer devel clownfish );
+    my @items_to_copy = qw(
+        core
+        modules
+        charmonizer
+        devel
+        clownfish
+        CHANGES
+        LICENSE
+        NOTICE
+        README
+    );
     print "Copying files...\n";
-    for my $dir (@dirs_to_copy) {
-        confess("'$dir' already exists") if -e $dir;
-        system("cp -R ../$dir $dir");
+    for my $item (@items_to_copy) {
+        confess("'$item' already exists") if -e $item;
+        system("cp -R ../$item $item");
     }
 
     $self->dispatch('manifest');
@@ -659,8 +673,9 @@ sub ACTION_dist {
 
     # Clean up.
     print "Removing copied files...\n";
-    rmtree($_) for @dirs_to_copy;
-    unlink($_) for qw( MANIFEST META.yml );
+    rmtree($_) for @items_to_copy;
+    unlink("META.yml"); 
+    move("MANIFEST.bak", "MANIFEST") or die "move() failed: $!";
 }
 
 # Generate a list of files for PAUSE, search.cpan.org, etc to ignore.
