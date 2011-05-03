@@ -288,6 +288,10 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
 
     if (right <= left) { return; }
 
+    /* TODO: A standard optimization for quicksort is to fall back to an
+     * insertion sort when the the number of elements to be sorted becomes
+     * small enough. */
+
     while (1) {
         int comparison1;
         int comparison2;
@@ -390,6 +394,10 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
     int32_t q = right;
 
     if (right <= left) { return; }
+
+    /* TODO: A standard optimization for quicksort is to fall back to an
+     * insertion sort when the the number of elements to be sorted becomes
+     * small enough. */
 
     while (1) {
         int comparison1;
