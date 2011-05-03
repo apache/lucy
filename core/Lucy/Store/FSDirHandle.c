@@ -59,7 +59,7 @@ SI_is_updir(const char *name, size_t len) {
 }
 
 /********************************** UNIXEN *********************************/
-#ifdef CHY_HAS_DIRENT_H
+#if (defined(CHY_HAS_DIRENT_H) && !defined(CHY_HAS_WINDOWS_H))
 
 #include <dirent.h>
 
@@ -312,6 +312,8 @@ FSDH_next(FSDirHandle *self) {
     }
 }
 
+#else
+  #error "Need either dirent.h or windows.h"
 #endif // CHY_HAS_DIRENT_H vs. CHY_HAS_WINDOWS_H
 
 
