@@ -64,18 +64,17 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
 
 static void
 S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re) {
-    MAGIC *magic = NULL;
-    REGEXP *rx;
 #if (PERL_VERSION > 10)
-    rx = SvRX((SV*)token_re);
+    REGEXP *rx = SvRX((SV*)token_re);
 #else
+    MAGIC *magic = NULL;
     if (SvMAGICAL((SV*)token_re)) {
         magic = mg_find((SV*)token_re, PERL_MAGIC_qr);
     }
     if (!magic) {
         THROW(LUCY_ERR, "token_re is not a qr// entity");
     }
-    rx = (REGEXP*)magic->mg_obj;
+    REGEXP *rx = (REGEXP*)magic->mg_obj;
 #endif
     if (rx == NULL) {
         THROW(LUCY_ERR, "Failed to extract REGEXP from token_re '%s'",
