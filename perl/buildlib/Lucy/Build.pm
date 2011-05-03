@@ -148,10 +148,11 @@ my $SNOWSTOP_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstop source ) );
 my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
 my $CLOWNFISH_DIR   = catdir( $base_dir, 'clownfish' );
-my $AUTOGEN_DIR     = 'autogen';
-my $XS_SOURCE_DIR   = 'xs';
-my $LIB_DIR         = 'lib';
-my $XS_FILEPATH = catfile( $LIB_DIR, "Lucy.xs" );
+my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
+my $AUTOGEN_DIR      = 'autogen';
+my $XS_SOURCE_DIR    = 'xs';
+my $LIB_DIR          = 'lib';
+my $XS_FILEPATH      = catfile( $LIB_DIR, "Lucy.xs" );
 my $AUTOBIND_PM_PATH = catfile( $LIB_DIR, 'Lucy', 'Autobinding.pm' );
 
 sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
@@ -712,6 +713,24 @@ sub ACTION_semiclean {
         rmtree($path);
         confess("Failed to remove '$path'") if -e $path;
     }
+}
+
+sub ACTION_clean {
+    my $self = shift;
+    if ( -e $CLOWNFISH_BUILD ) {
+        system("$^X $CLOWNFISH_BUILD clean")
+            and die "Clownfish clean failed";
+    }
+    $self->SUPER::ACTION_clean;
+}
+
+sub ACTION_realclean {
+    my $self = shift;
+    if ( -e $CLOWNFISH_BUILD ) {
+        system("$^X $CLOWNFISH_BUILD realclean")
+            and die "Clownfish realclean failed";
+    }
+    $self->SUPER::ACTION_realclean;
 }
 
 1;
