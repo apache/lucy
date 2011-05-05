@@ -85,7 +85,7 @@ Extremely fast.  A single machine can handle millions of documents.
 
 =item *
 
-Scalability to multiple machines.
+Scalable to multiple machines.
 
 =item *
 
@@ -103,7 +103,7 @@ Unicode support.
 =item *
 
 Support for boolean operators AND, OR, and AND NOT; parenthetical groupings;
-and prepended +plus and -minus.
+prepended +plus and -minus.
 
 =item *
 
@@ -192,10 +192,10 @@ will be named "Lucy1".  Users who require strong backwards compatibility
 should use a stable fork.
 
 The main namespace, "Lucy", is an API-unstable development branch (as hinted
-at by its 0.x.x version number).  Superficial interface changes are frequent.
-Hard file format compatibility breaks which require reindexing are rare, as we
-generally try to provide continuity across multiple releases, but they happen
-every once in a while.
+at by its 0.x.x version number).  Superficial interface changes happen
+frequently.  Hard file format compatibility breaks which require reindexing
+are rare, as we generally try to provide continuity across multiple releases,
+but we reserve the right to make such changes.
 
 =head1 CLASS METHODS
 
@@ -207,7 +207,7 @@ single public class method.
     my $instream = $folder->open_in( file => 'foo' ) or die Lucy->error;
 
 Access a shared variable which is set by some routines on failure.  It will
-always be either a L<Lucy::Object::Err> or undef.
+always be either a L<Lucy::Object::Err> object or undef.
 
 =head1 SUPPORT
 
