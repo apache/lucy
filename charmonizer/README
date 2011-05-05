@@ -108,10 +108,3 @@ FILESYSTEM NAMESPACE
     Charmonizer creates a number of temporary files within the current working
     directory while it runs.  These files all begin with "_charm".
 
-SECURITY
-
-    Under no circumstances should input from untrusted users be supplied to
-    Charmonizer.  A lot of what Charmonizer does it does by passing strings to
-    the system() command; security cannot be assured unless input is
-    restricted.
-
