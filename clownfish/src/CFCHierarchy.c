@@ -95,6 +95,7 @@ S_is_dir(const char *path) {
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 CFCHierarchy*
 CFCHierarchy_new(const char *source, const char *dest, void *parser) {

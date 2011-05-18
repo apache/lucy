@@ -18,6 +18,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"

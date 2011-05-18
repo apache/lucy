@@ -19,6 +19,10 @@ use warnings;
 package Clownfish::Build;
 use base qw( Module::Build );
 
+use File::Spec::Functions qw( catfile );
+
+my $PPPORT_H_PATH = catfile(qw( include ppport.h ));
+
 sub extra_ccflags {
     my $self = shift;
     my $extra_ccflags = defined $ENV{CFLAGS} ? "$ENV{CFLAGS} " : "";
@@ -72,6 +76,28 @@ sub new {
         recursive_test_files => 1,
         extra_compiler_flags => __PACKAGE__->extra_ccflags,
     );
+}
+
+# Write ppport.h, which supplies some XS routines not found in older Perls and
+# allows us to use more up-to-date XS API while still supporting Perls back to
+# 5.8.3.
+#
+# The Devel::PPPort docs recommend that we distribute ppport.h rather than
+# require Devel::PPPort itself, but ppport.h isn't compatible with the Apache
+# license.
+sub ACTION_ppport {
+    my $self = shift;
+    if ( !-e $PPPORT_H_PATH ) {
+        require Devel::PPPort;
+        $self->add_to_cleanup($PPPORT_H_PATH);
+        Devel::PPPort::WriteFile($PPPORT_H_PATH);
+    }
+}
+
+sub ACTION_code {
+    my $self = shift;
+    $self->dispatch('ppport');
+    $self->SUPER::ACTION_code;
 }
 
 1;

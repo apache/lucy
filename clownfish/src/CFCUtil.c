@@ -267,6 +267,7 @@ CFCUtil_warn(const char* format, ...) {
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 void*
 CFCUtil_make_perl_obj(void *ptr, const char *klass) {
