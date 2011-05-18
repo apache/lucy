@@ -16,14 +16,10 @@
 use 5.008003;
 use strict;
 use warnings;
-use Module::Build;
-use Config;
-my $extra_cc_flags = '';
-if ( $Config{cc} eq 'cl' ) {
-    $extra_cc_flags .= '/TP ';
-}
+use lib 'buildlib';
+use Clownfish::Build;
 
-my $builder = Module::Build->new(
+my $builder = Clownfish::Build->new(
     module_name => 'Clownfish',
     license     => 'apache',
     dist_author =>
@@ -45,7 +41,6 @@ my $builder = Module::Build->new(
             *.manifest
             ),
     ],
-    extra_compiler_flags => $extra_cc_flags,
 );
 
 $builder->create_build_script();
