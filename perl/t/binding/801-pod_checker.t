@@ -16,8 +16,16 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 use Pod::Checker;
+BEGIN {
+    if ( $] < 5.010 ) {
+        plan( 'skip_all', "Old Pod::Checker is buggy" );
+    }
+    else {
+        plan('no_plan');
+    }
+}
 
 use File::Find qw( find );
 
