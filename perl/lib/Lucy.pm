@@ -21,7 +21,7 @@ package Lucy;
 use 5.008003;
 use Exporter;
 
-our $VERSION = '0.001';
+our $VERSION = '0.001000';
 $VERSION = eval $VERSION;
 
 use XSLoader;
