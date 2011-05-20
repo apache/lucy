@@ -113,6 +113,11 @@ TextSortCache_value(TextSortCache *self, int32_t ord, Obj *blank) {
         InStream_Seek(self->dat_in, offset);
         InStream_Read_Bytes(self->dat_in, ptr, (size_t)len);
         ptr[len] = '\0';
+        if (!StrHelp_utf8_valid(ptr, (size_t)len)) {
+            CB_Set_Size((CharBuf*)blank, 0);
+            THROW(ERR, "Invalid UTF-8 at %i64 in %o", offset,
+                  InStream_Get_Filename(self->dat_in));
+        }
         CB_Set_Size((CharBuf*)blank, (size_t)len);
     }
     return blank;
