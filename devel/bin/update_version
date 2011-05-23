@@ -49,6 +49,8 @@ my $buf;
 $buf = read_file('perl/lib/Lucy.pm');
 $buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/
     or die "no match";
+$buf =~ s/XSLoader::load\( 'Lucy', '(.+?)'/XSLoader::load\( 'Lucy', '$x_yyyzzz_version'/
+    or die "no match";
 write_file( 'perl/lib/Lucy.pm', $buf );
 $buf = read_file('perl/lib/Lucy.pod');
 $buf =~ s/(^=head1\s+VERSION\s+)([\d.]+)/$1$x_y_z_version/m
