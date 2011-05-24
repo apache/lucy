@@ -223,13 +223,13 @@ cfish_XSBind_allot_params(SV** stack, int32_t start,
 #if (CHY_SIZEOF_CHAR == 1)
   #define XSBIND_WANT_CHAR XSBIND_WANT_I8
 #else
-  #error Can't build unless sizeof(char) == 1
+  #error "Can't build unless sizeof(char) == 1"
 #endif
 
 #if (CHY_SIZEOF_SHORT == 2)
   #define XSBIND_WANT_SHORT XSBIND_WANT_I16
 #else
-  #error Can't build unless sizeof(short) == 2
+  #error "Can't build unless sizeof(short) == 2"
 #endif
 
 #if (CHY_SIZEOF_INT == 4)
