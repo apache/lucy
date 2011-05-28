@@ -39,6 +39,10 @@ TODO LIST:
   * Port most test files within trunk/perl/t/ to C.
     <https://issues.apache.org/jira/browse/LUCY-149>
 
+  * Scaling issues: get Lucy to perform well enough to handle search
+    for ASF public mailing lists (~ 10M messages as of 2011) from a
+    single host.
+
 
 WISH LIST:
 
