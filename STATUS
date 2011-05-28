@@ -43,6 +43,14 @@ TODO LIST:
     for ASF public mailing lists (~ 10M messages as of 2011) from a
     single host.
 
+  * Independent build system for charmonizer. charmonizer needs to be built
+    by the per-lang packaging system to create the autogen/ files.  It also
+    needs to be built by the user to create the charmony.h file on the user's
+    platform.  This should be accomplishable by using a "portable Makefile"
+    and limiting the set of compiled objects to carefully avoid linking.
+
+  * Tests for charmonizer need to become independent executables.  See previous
+    item for more details.
 
 WISH LIST:
 
