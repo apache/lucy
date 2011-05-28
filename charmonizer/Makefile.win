@@ -1,7 +1,7 @@
 CC= cl
 #DEFS=  -nologo -DSTRICT -G3 -Ow -W3 -Zp -Tp
 DEFS=  -nologo -G3
-PROGNAME= charmonize
+PROGNAME= charmonize.exe
 LINKER=link -nologo
 
 INCLUDES=  -I. -Isrc
