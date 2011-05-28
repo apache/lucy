@@ -1,0 +1,48 @@
+==================
+Apache Lucy STATUS
+==================
+
+The current version of this file can be found here:
+
+  * <http://svn.apache.org/repos/asf/incubator/lucy/trunk/STATUS>
+
+Contributors looking for a mission should browse the issues linked below to
+get a feel for the Lucy community's consensus priorities.  See
+<http://wiki.apache.org/lucy/HowToContribute> for practical instructions.
+
+
+CURRENT RELEASE NOTES:
+
+
+RELEASE BLOCKERS:
+
+  * See the issue tracker report for the upcoming release.
+
+
+TODO LIST:
+
+  * Port the Clownfish compiler to C.
+    <https://issues.apache.org/jira/browse/LUCY-142>
+
+  * Replace dependency on Parse::RecDescent within Clownfish::Parser with
+    the Lemon parser generator. 
+    <https://issues.apache.org/jira/browse/LUCY-143>
+    <https://issues.apache.org/jira/browse/LUCY-134>
+
+  * Replace dependency on JSON::XS with ???
+    <https://issues.apache.org/jira/browse/LUCY-133>
+
+  * Refactor away C89 idioms, since we have chosen the intersection of C99 
+    and C++ as our C dialect.
+    <https://issues.apache.org/jira/browse/LUCY-144>
+
+  * Port most test files within trunk/perl/t/ to C.
+    <https://issues.apache.org/jira/browse/LUCY-149>
+
+
+WISH LIST:
+
+  * Ruby bindings.
+
+  * Python bindings.
+
