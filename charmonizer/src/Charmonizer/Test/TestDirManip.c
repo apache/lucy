@@ -70,4 +70,12 @@ TestDirManip_run(TestBatch *batch) {
 #endif
 }
 
+int main(int argc, char **argv) {
+    TestBatch *batch;
 
+    Test_init();
+    batch = TestDirManip_prepare();
+    batch->run_test(batch);
+    batch->destroy(batch);
+    return 0;
+}

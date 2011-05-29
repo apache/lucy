@@ -99,6 +99,12 @@ TestLargeFiles_run(TestBatch *batch) {
     remove("_charm_large_file_test");
 }
 
+int main(int argc, char **argv) {
+    TestBatch *batch;
 
-
-
+    Test_init();
+    batch = TestLargeFiles_prepare();
+    batch->run_test(batch);
+    batch->destroy(batch);
+    return 0;
+}

@@ -38,5 +38,14 @@ TestUnusedVars_run(TestBatch *batch) {
     FAIL(batch, "UNREACHABLE_RETURN macro is defined");
 #endif
 }
+int main(int argc, char **argv) {
+    TestBatch *batch;
+
+    Test_init();
+    batch = TestUnusedVars_prepare();
+    batch->run_test(batch);
+    batch->destroy(batch);
+    return 0;
+}
 
 

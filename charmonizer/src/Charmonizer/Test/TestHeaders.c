@@ -163,3 +163,12 @@ TestHeaders_run(TestBatch *batch) {
 }
 
 
+int main(int argc, char **argv) {
+    TestBatch *batch;
+
+    Test_init();
+    batch = TestHeaders_prepare();
+    batch->run_test(batch);
+    batch->destroy(batch);
+    return 0;
+}
