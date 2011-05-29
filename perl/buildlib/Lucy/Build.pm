@@ -141,6 +141,7 @@ my $base_dir = $is_distro_not_devel ? curdir() : updir();
 my $CHARMONIZE_EXE_PATH  = catfile($base_dir, 'charmonizer', 'charmonize' . $Config{_exe});
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
 my $CHARMONIZER_SRC_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
+my $CHARMONIZER_TESTS_DIR= catdir( $CHARMONIZER_ORIG_DIR, 'src', 'Charmonizer', 'Test' );
 my $SNOWSTEM_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
@@ -205,6 +206,57 @@ sub ACTION_charmonizer {
     }
 
     $self->add_to_cleanup($CHARMONIZE_EXE_PATH);
+#    my $exe_path = $cbuilder->link_executable(
+#        objects  => \@o_files,
+#        exe_file => $CHARMONIZE_EXE_PATH,
+#    );
+}
+
+# Build the charmonizer tests.
+sub ACTION_charmonizer_tests {
+    my $self = shift;
+
+    $self->dispatch('charmony');
+
+    # Gather .c and .h Charmonizer files.
+    my $charm_source_files
+        = $self->rscan_dir( $CHARMONIZER_TESTS_DIR, qr/Test.+\.[ch]$/ );
+
+    my @all_source = ( @$charm_source_files, catfile($CHARMONIZER_SRC_DIR, "Charmonizer", "Test.c") );
+
+    print "Building Charmonizer Tests...\n\n";
+
+    my $cbuilder
+        = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
+        );
+
+    my $flags = $self->config('ccflags') . ' '
+        . $self->extra_ccflags . ' '
+            . $self->config('cccdlflags') . " -I../perl";
+
+    my $dir = getcwd();
+    chdir $CHARMONIZER_ORIG_DIR;
+    my $rv = system($cbuilder->get_cc eq 'cl' ? 'nmake' : 'make',
+                    "CC=". $cbuilder->get_cc, "DEFS=$flags",
+                    $cbuilder->get_cc eq 'cl' ? ("-f", "Makefile.win") : (), "tests");
+    chdir $dir;
+
+    my @o_files;
+    for (@all_source) {
+        next unless /\.c$/;
+        my $o_file = $cbuilder->object_file($_);
+        $self->add_to_cleanup($o_file);
+        push @o_files, $o_file;
+
+        next if $self->up_to_date( $_, $o_file );
+
+#        $cbuilder->compile(
+#            source               => $_,
+#            include_dirs         => [$CHARMONIZER_SRC_DIR],
+#            extra_compiler_flags => $self->extra_ccflags,
+#        );
+    }
+
 #    my $exe_path = $cbuilder->link_executable(
 #        objects  => \@o_files,
 #        exe_file => $CHARMONIZE_EXE_PATH,
@@ -322,7 +374,7 @@ sub ACTION_build_clownfish {
 sub ACTION_clownfish {
     my $self = shift;
 
-    $self->dispatch('charmony');
+    $self->dispatch('charmonizer_tests');
     $self->dispatch('build_clownfish');
 
     # Create destination dir, copy xs helper files.
@@ -334,6 +386,8 @@ sub ACTION_clownfish {
     my $pm_filepaths  = $self->rscan_dir( $LIB_DIR,         qr/\.pm$/ );
     my $cfh_filepaths = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.cfh$/ );
 
+
+    # XXX joes thinks this is dubious
     # Don't bother parsing Clownfish files if everything's up to date.
     return
         if $self->up_to_date(
