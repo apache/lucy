@@ -531,7 +531,7 @@ sub ACTION_compile_custom_xs {
     my $c_files = [];
     push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,     qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,       qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $CHARMONIZER_SRC_DIR, qr/\.c$/ ) };
+#    push @$c_files, @{ $self->rscan_dir( $CHARMONIZER_SRC_DIR, qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,         qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR,    qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR,    qr/\.c$/ ) };
