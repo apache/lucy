@@ -14,6 +14,7 @@ WINSOCK_LIB=wsock32.lib
 LIBS=$(WINSOCK_LIB) $(GUIFLAGS)
 RC=rc
 RCVARS=-r -DWIN32
+TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe
 
 SRCS = charmonize.c src\Charmonizer\Probe.c src\Charmonizer\Core\Compiler.c src\Charmonizer\Core\ConfWriter.c src\Charmonizer\Core\Dir.c src\Charmonizer\Core\HeaderChecker.c src\Charmonizer\Core\OperatingSystem.c src\Charmonizer\Core\Stat.c src\Charmonizer\Core\Util.c src\Charmonizer\Probe\AtomicOps.c src\Charmonizer\Probe\DirManip.c src\Charmonizer\Probe\Floats.c src\Charmonizer\Probe\FuncMacro.c src\Charmonizer\Probe\Headers.c src\Charmonizer\Probe\Integers.c src\Charmonizer\Probe\LargeFiles.c src\Charmonizer\Probe\Memory.c src\Charmonizer\Probe\UnusedVars.c src\Charmonizer\Probe\VariadicMacros.c
 
@@ -32,6 +33,30 @@ all: $(PROGNAME)
 $(PROGNAME) : $(OBJS)
 	$(LINKER) $(OBJS) /OUT:$(PROGNAME) $(LIBS)
 
+tests: $(TESTS)
+
+TestDirManip.exe:	src\Charmonizer\Test.obj src/Charmonizer\Test\TestDirManip.obj
+	$(LINKER) src\Charmonizer\Test.obj src/Charmonizer\Test\TestDirManip.obj $(LIBS) /OUT:$@ $(LIBS)
+
+TestFuncMacro.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj
+	$(LINKER) src\Charmonizer\Test.obj src/Charmonizer/Test/TestFuncMacro.obj /OUT:$@ $(LIBS)
+
+TestHeaders.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj /OUT:$@ $(LIBS)
+
+TestIntegers.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj /OUT:$@ $(LIBS)
+
+TestLargeFiles.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj /OUT:$@ $(LIBS)
+
+TestUnusedVars.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj /OUT:$@ $(LIBS)
+
+TestVariadicMacros.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj /OUT:$@ $(LIBS)
+
+
 clean:
-	del $(OBJS) $(PROGNAME) core
+	del $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core
 
