@@ -49,8 +49,6 @@ TODO LIST:
     platform.  This should be accomplishable by using a "portable Makefile"
     and limiting the set of compiled objects to carefully avoid linking.
 
-  * Tests for charmonizer need to become independent executables.  See previous
-    item for more details.
 
 WISH LIST:
 
