@@ -20,6 +20,15 @@ use Lucy;
 # that we simulate large indexes by performing a lot of PostingPool flushes.
 Lucy::Index::PostingListWriter::set_default_mem_thresh(0x1000);
 
+package Lucy::Test::TestCharmonizer;
+use Config;
+sub run_tests {
+    my $name = ucfirst shift;
+    $name =~ s/_([a-z])/\u$1/g;
+    exec "../charmonizer/Test$name$Config{_exe}";
+}
+
+
 1;
 
 __END__

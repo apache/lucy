@@ -17,5 +17,5 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::TestCharmonizer::run_tests("dirmanip");
+Lucy::Test::TestCharmonizer::run_tests("dir_manip");
 
