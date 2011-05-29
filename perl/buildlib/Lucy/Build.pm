@@ -138,7 +138,7 @@ locations.
 my $is_distro_not_devel = -e 'core';
 my $base_dir = $is_distro_not_devel ? curdir() : updir();
 
-my $CHARMONIZE_EXE_PATH  = 'charmonize' . $Config{_exe};
+my $CHARMONIZE_EXE_PATH  = catfile($base_dir, 'charmonizer', 'charmonize' . $Config{_exe});
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
 my $CHARMONIZER_SRC_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
 my $SNOWSTEM_SRC_DIR
@@ -176,6 +176,16 @@ sub ACTION_charmonizer {
         = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
         );
 
+    my $flags = $self->config('ccflags') . ' '
+        . $self->extra_ccflags . ' '
+            . $self->config('cccdlflags');
+
+    my $dir = getcwd();
+    chdir $CHARMONIZER_ORIG_DIR;
+    my $rv = system($cbuilder->get_cc eq 'cl' ? 'nmake' : 'make',
+                    "CC=". $cbuilder->get_cc, "DEFS=$flags");
+    chdir $dir;
+
     my @o_files;
     for (@all_source) {
         next unless /\.c$/;
@@ -186,18 +196,18 @@ sub ACTION_charmonizer {
 
         next if $self->up_to_date( $_, $o_file );
 
-        $cbuilder->compile(
-            source               => $_,
-            include_dirs         => [$CHARMONIZER_SRC_DIR],
-            extra_compiler_flags => $self->extra_ccflags,
-        );
+#        $cbuilder->compile(
+#            source               => $_,
+#            include_dirs         => [$CHARMONIZER_SRC_DIR],
+#            extra_compiler_flags => $self->extra_ccflags,
+#        );
     }
 
     $self->add_to_cleanup($CHARMONIZE_EXE_PATH);
-    my $exe_path = $cbuilder->link_executable(
-        objects  => \@o_files,
-        exe_file => $CHARMONIZE_EXE_PATH,
-    );
+#    my $exe_path = $cbuilder->link_executable(
+#        objects  => \@o_files,
+#        exe_file => $CHARMONIZE_EXE_PATH,
+#    );
 }
 
 # Run the charmonizer executable, creating the charmony.h file.
@@ -226,7 +236,7 @@ sub ACTION_charmony {
             and die "Failed to write charmony.h";
     }
     else {
-        system("./$CHARMONIZE_EXE_PATH \"$cc\" \"$flags\" $verbosity")
+        system("$CHARMONIZE_EXE_PATH \"$cc\" \"$flags\" $verbosity")
             and die "Failed to write charmony.h: $!";
     }
 }
