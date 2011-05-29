@@ -162,20 +162,7 @@ sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
 sub ACTION_charmonizer {
     my $self = shift;
 
-    # Gather .c and .h Charmonizer files.
-    my $charm_source_files
-        = $self->rscan_dir( $CHARMONIZER_SRC_DIR, qr/Charmonizer.+\.[ch]$/ );
-    my $charmonize_c = catfile( $CHARMONIZER_ORIG_DIR, 'charmonize.c' );
-    my @all_source = ( $charmonize_c, @$charm_source_files );
-
-    # Don't compile if we're up to date.
-    return if $self->up_to_date( \@all_source, $CHARMONIZE_EXE_PATH );
-
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
-
-    my $cbuilder
-        = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
-        );
 
     my $flags = $self->config('ccflags') . ' '
         . $self->extra_ccflags . ' '
@@ -183,33 +170,11 @@ sub ACTION_charmonizer {
 
     my $dir = getcwd();
     chdir $CHARMONIZER_ORIG_DIR;
-    my $rv = system($cbuilder->get_cc eq 'cl' ? 'nmake' : 'make',
-                    "CC=". $cbuilder->get_cc, "DEFS=$flags",
-                    $cbuilder->get_cc eq 'cl' ? ("-f", "Makefile.win") : ());
+    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
+                    "CC=". $self->config('cc'), "DEFS=$flags",
+                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : ());
     chdir $dir;
 
-    my @o_files;
-    for (@all_source) {
-        next unless /\.c$/;
-        next if m#Charmonizer/Test#;
-        my $o_file = $cbuilder->object_file($_);
-        $self->add_to_cleanup($o_file);
-        push @o_files, $o_file;
-
-        next if $self->up_to_date( $_, $o_file );
-
-#        $cbuilder->compile(
-#            source               => $_,
-#            include_dirs         => [$CHARMONIZER_SRC_DIR],
-#            extra_compiler_flags => $self->extra_ccflags,
-#        );
-    }
-
-    $self->add_to_cleanup($CHARMONIZE_EXE_PATH);
-#    my $exe_path = $cbuilder->link_executable(
-#        objects  => \@o_files,
-#        exe_file => $CHARMONIZE_EXE_PATH,
-#    );
 }
 
 # Build the charmonizer tests.
@@ -218,17 +183,7 @@ sub ACTION_charmonizer_tests {
 
     $self->dispatch('charmony');
 
-    # Gather .c and .h Charmonizer files.
-    my $charm_source_files
-        = $self->rscan_dir( $CHARMONIZER_TESTS_DIR, qr/Test.+\.[ch]$/ );
-
-    my @all_source = ( @$charm_source_files, catfile($CHARMONIZER_SRC_DIR, "Charmonizer", "Test.c") );
-
     print "Building Charmonizer Tests...\n\n";
-
-    my $cbuilder
-        = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
-        );
 
     my $flags = $self->config('ccflags') . ' '
         . $self->extra_ccflags . ' '
@@ -236,31 +191,11 @@ sub ACTION_charmonizer_tests {
 
     my $dir = getcwd();
     chdir $CHARMONIZER_ORIG_DIR;
-    my $rv = system($cbuilder->get_cc eq 'cl' ? 'nmake' : 'make',
-                    "CC=". $cbuilder->get_cc, "DEFS=$flags",
-                    $cbuilder->get_cc eq 'cl' ? ("-f", "Makefile.win") : (), "tests");
+    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
+                    "CC=". $self->config('cc'), "DEFS=$flags",
+                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "tests");
     chdir $dir;
 
-    my @o_files;
-    for (@all_source) {
-        next unless /\.c$/;
-        my $o_file = $cbuilder->object_file($_);
-        $self->add_to_cleanup($o_file);
-        push @o_files, $o_file;
-
-        next if $self->up_to_date( $_, $o_file );
-
-#        $cbuilder->compile(
-#            source               => $_,
-#            include_dirs         => [$CHARMONIZER_SRC_DIR],
-#            extra_compiler_flags => $self->extra_ccflags,
-#        );
-    }
-
-#    my $exe_path = $cbuilder->link_executable(
-#        objects  => \@o_files,
-#        exe_file => $CHARMONIZE_EXE_PATH,
-#    );
 }
 
 # Run the charmonizer executable, creating the charmony.h file.
@@ -585,7 +520,6 @@ sub ACTION_compile_custom_xs {
     my $c_files = [];
     push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,     qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,       qr/\.c$/ ) };
-#    push @$c_files, @{ $self->rscan_dir( $CHARMONIZER_SRC_DIR, qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,         qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR,    qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR,    qr/\.c$/ ) };
@@ -801,6 +735,13 @@ sub ACTION_clean {
         system("$^X $CLOWNFISH_BUILD clean")
             and die "Clownfish clean failed";
     }
+
+    my $dir = getcwd();
+    chdir $CHARMONIZER_ORIG_DIR;
+    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
+                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "clean");
+    chdir $dir;
+
     $self->SUPER::ACTION_clean;
 }
 
@@ -810,6 +751,13 @@ sub ACTION_realclean {
         system("$^X $CLOWNFISH_BUILD realclean")
             and die "Clownfish realclean failed";
     }
+
+    my $dir = getcwd();
+    chdir $CHARMONIZER_ORIG_DIR;
+    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
+                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "clean");
+    chdir $dir;
+
     $self->SUPER::ACTION_realclean;
 }
 
