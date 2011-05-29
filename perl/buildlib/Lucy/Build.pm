@@ -183,7 +183,8 @@ sub ACTION_charmonizer {
     my $dir = getcwd();
     chdir $CHARMONIZER_ORIG_DIR;
     my $rv = system($cbuilder->get_cc eq 'cl' ? 'nmake' : 'make',
-                    "CC=". $cbuilder->get_cc, "DEFS=$flags");
+                    "CC=". $cbuilder->get_cc, "DEFS=$flags",
+                    $self->get_cc eq 'cl' ? "-f Makefile.win" : ());
     chdir $dir;
 
     my @o_files;
