@@ -752,12 +752,6 @@ sub ACTION_realclean {
             and die "Clownfish realclean failed";
     }
 
-    my $dir = getcwd();
-    chdir $CHARMONIZER_ORIG_DIR;
-    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
-                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "clean");
-    chdir $dir;
-
     $self->SUPER::ACTION_realclean;
 }
 
