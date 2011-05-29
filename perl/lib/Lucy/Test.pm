@@ -246,47 +246,6 @@ PPCODE:
     lucy_TestQPSyntax_run_tests(index);
 END_XS_CODE
 
-my $charm_xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Test::TestCharmonizer
-
-void
-run_tests(which)
-    char *which;
-PPCODE:
-{
-    chaz_TestBatch *batch = NULL;
-    chaz_Test_init();
-
-    if (strcmp(which, "dirmanip") == 0) {
-        batch = chaz_TestDirManip_prepare();
-    }
-    else if (strcmp(which, "integers") == 0) {
-        batch = chaz_TestIntegers_prepare();
-    }
-    else if (strcmp(which, "func_macro") == 0) {
-        batch = chaz_TestFuncMacro_prepare();
-    }
-    else if (strcmp(which, "headers") == 0) {
-        batch = chaz_TestHeaders_prepare();
-    }
-    else if (strcmp(which, "large_files") == 0) {
-        batch = chaz_TestLargeFiles_prepare();
-    }
-    else if (strcmp(which, "unused_vars") == 0) {
-        batch = chaz_TestUnusedVars_prepare();
-    }
-    else if (strcmp(which, "variadic_macros") == 0) {
-        batch = chaz_TestVariadicMacros_prepare();
-    }
-    else {
-        THROW(LUCY_ERR, "Unknown test identifier: '%s'", which);
-    }
-
-    batch->run_test(batch);
-    batch->destroy(batch);
-}
-END_XS_CODE
-
 Clownfish::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Test::TestSchema",
@@ -298,11 +257,4 @@ Clownfish::Binding::Perl::Class->register(
     class_name        => "Lucy::Test",
     xs_code           => $xs_code,
 );
-
-Clownfish::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Test::TestCharmonizer",
-    xs_code           => $charm_xs_code,
-);
-
 
