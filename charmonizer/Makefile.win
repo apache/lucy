@@ -1,12 +1,12 @@
 CC= cl
 #DEFS=  -nologo -DSTRICT -G3 -Ow -W3 -Zp -Tp
-DEFS=  -nologo -G3
+DEFS=
 PROGNAME= charmonize.exe
 LINKER=link -nologo
 
 INCLUDES=  -I. -Isrc
 
-DEFINES= $(INCLUDES) $(DEFS)
+DEFINES= $(INCLUDES) $(DEFS) -nologo -G3
 
 CFLAGS= $(DEFINES)
 GUIFLAGS=user32.lib gdi32.lib winmm.lib comdlg32.lib comctl32.lib
