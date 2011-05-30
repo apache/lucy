@@ -9,9 +9,7 @@ INCLUDES=  -I. -Isrc
 DEFINES= $(INCLUDES) $(DEFS) -nologo
 
 CFLAGS= $(DEFINES)
-GUIFLAGS=user32.lib gdi32.lib winmm.lib comdlg32.lib comctl32.lib
-WINSOCK_LIB=wsock32.lib
-LIBS=$(WINSOCK_LIB) $(GUIFLAGS)
+LIBS=
 RC=rc
 RCVARS=-r -DWIN32
 TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe

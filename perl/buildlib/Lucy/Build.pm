@@ -162,12 +162,10 @@ sub ACTION_charmonizer {
 
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
 
-    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags;
-
     my $dir = getcwd();
     chdir $CHARMONIZER_ORIG_DIR;
     my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
-                    "CC=". $self->config('cc'), "DEFS=$flags",
+                    "CC=". $self->config('cc'),
                     $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : ());
     chdir $dir;
 
