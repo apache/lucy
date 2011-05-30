@@ -19,12 +19,6 @@
 #include "charmony.h"
 #include <string.h>
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
-
-TestBatch*
-TestFuncMacro_prepare() {
-    return Test_new_batch("FuncMacro", 4, TestFuncMacro_run);
-}
 
 #ifdef INLINE
 static INLINE char* S_inline_function() {
@@ -32,25 +26,25 @@ static INLINE char* S_inline_function() {
 }
 #endif
 
-void
-TestFuncMacro_run(TestBatch *batch) {
+static void
+S_run_tests(TestBatch *batch) {
 
 #ifdef HAS_FUNC_MACRO
-    TEST_STR_EQ(batch, FUNC_MACRO, "chaz_TestFuncMacro_run",
+    TEST_STR_EQ(batch, FUNC_MACRO, "S_run_tests",
                 "FUNC_MACRO");
 #else
     SKIP(batch, "no FUNC_MACRO");
 #endif
 
 #ifdef HAS_ISO_FUNC_MACRO
-    TEST_STR_EQ(batch, __func__, "chaz_TestFuncMacro_run",
+    TEST_STR_EQ(batch, __func__, "S_run_tests",
                 "HAS_ISO_FUNC_MACRO");
 #else
     SKIP(batch, "no ISO_FUNC_MACRO");
 #endif
 
 #ifdef HAS_GNUC_FUNC_MACRO
-    TEST_STR_EQ(batch, __FUNCTION__, "chaz_TestFuncMacro_run",
+    TEST_STR_EQ(batch, __FUNCTION__, "S_run_tests",
                 "HAS_GNUC_FUNC_MACRO");
 #else
     SKIP(batch, "no GNUC_FUNC_MACRO");
@@ -68,7 +62,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = TestFuncMacro_prepare();
+    batch = Test_new_batch("FuncMacro", 4, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;

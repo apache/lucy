@@ -19,7 +19,6 @@
 #include "charmony.h"
 #include <string.h>
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
 
 #ifdef HAS_ASSERT_H
   #include <assert.h>
@@ -145,13 +144,8 @@
   #include <utime.h>
 #endif
 
-TestBatch*
-TestHeaders_prepare() {
-    return Test_new_batch("Headers", 2, TestHeaders_run);
-}
-
-void
-TestHeaders_run(TestBatch *batch) {
+static void
+S_run_tests(TestBatch *batch) {
     PASS(batch, "Compiled successfully with all detected headers");
 
     /* Don't bother checking all -- just use stdio as an example. */
@@ -167,7 +161,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = TestHeaders_prepare();
+    batch = Test_new_batch("Headers", 2, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;

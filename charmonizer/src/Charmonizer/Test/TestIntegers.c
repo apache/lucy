@@ -17,7 +17,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
 #include "charmony.h"
 #include <stdio.h>
 #include <string.h>
@@ -25,13 +24,8 @@
     #include <inttypes.h>
 #endif
 
-TestBatch*
-TestIntegers_prepare() {
-    return Test_new_batch("Integers", 37, TestIntegers_run);
-}
-
-void
-TestIntegers_run(TestBatch *batch) {
+static void
+S_run_tests(TestBatch *batch) {
     {
         long one = 1;
         long big_endian = !(*((char *)(&one)));
@@ -131,7 +125,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = TestIntegers_prepare();
+    batch = Test_new_batch("Integers", 37, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;

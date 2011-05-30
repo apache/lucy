@@ -24,15 +24,9 @@
 
 #include <stdio.h>
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
 
-TestBatch*
-TestLargeFiles_prepare() {
-    return Test_new_batch("LargeFiles", 10, TestLargeFiles_run);
-}
-
-void
-TestLargeFiles_run(TestBatch *batch) {
+static void
+S_run_tests(TestBatch *batch) {
     FILE *fh;
     off64_t offset;
     int check_val;
@@ -103,7 +97,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = TestLargeFiles_prepare();
+    batch = Test_new_batch("LargeFiles", 10, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;

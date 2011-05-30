@@ -18,14 +18,9 @@
 
 #include "charmony.h"
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
 
-TestBatch*
-TestUnusedVars_prepare() {
-    return Test_new_batch("UnusedVars", 2, TestUnusedVars_run);
-}
-void
-TestUnusedVars_run(TestBatch *batch) {
+static void
+S_run_tests(TestBatch *batch) {
 #ifdef UNUSED_VAR
     PASS(batch, "UNUSED_VAR macro is defined");
 #else
@@ -42,7 +37,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = TestUnusedVars_prepare();
+    batch = Test_new_batch("UnusedVars", 2, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;

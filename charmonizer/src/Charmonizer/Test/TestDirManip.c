@@ -17,7 +17,6 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
 #include <stdio.h>
 #include <string.h>
 #include "charmony.h"
@@ -37,13 +36,8 @@
   #include <direct.h>
 #endif
 
-TestBatch*
-TestDirManip_prepare() {
-    return Test_new_batch("Integers", 6, TestDirManip_run);
-}
-
-void
-TestDirManip_run(TestBatch *batch) {
+static void
+S_run_tests(TestBatch *batch) {
     TEST_INT_EQ(batch, 0, makedir("_chaz_test_dir", 0777), "makedir");
     TEST_INT_EQ(batch, 0, makedir("_chaz_test_dir" DIR_SEP "deep", 0777),
                 "makedir with DIR_SEP");
@@ -74,7 +68,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = TestDirManip_prepare();
+    batch = Test_new_batch("Integers", 6, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;

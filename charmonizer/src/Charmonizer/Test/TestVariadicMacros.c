@@ -20,15 +20,9 @@
 #include <string.h>
 #include <stdio.h>
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
 
-TestBatch*
-TestVariadicMacros_prepare() {
-    return Test_new_batch("VariadicMacros", 4, TestVariadicMacros_run);
-}
-
-void
-TestVariadicMacros_run(TestBatch *batch) {
+static void
+S_run_tests(TestBatch *batch) {
     char buf[10];
     chaz_bool_t really_has_var_macs = false;
 
@@ -71,7 +65,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = TestVariadicMacros_prepare();
+    batch = Test_new_batch("VariadicMacros", 4, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;
