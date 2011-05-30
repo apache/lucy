@@ -200,8 +200,6 @@ sub _xs_file_contents {
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"
 
-#include "Charmonizer/Test.h"
-
 $generated_xs
 
 MODULE = Lucy   PACKAGE = Lucy::Autobinding
