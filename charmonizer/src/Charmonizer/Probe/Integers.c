@@ -56,8 +56,8 @@ static char literal64_code[] =
     QUOTE(  #define big 9000000000000000000%s         )
     QUOTE(  int main()                                )
     QUOTE(  {                                         )
-    QUOTE(      Charm_Setup;                          )
     QUOTE(      int truncated = (int)big;             )
+    QUOTE(      Charm_Setup;                          )
     QUOTE(      printf("%%d\n", truncated);           )
     QUOTE(      return 0;                             )
     QUOTE(  }                                         );
