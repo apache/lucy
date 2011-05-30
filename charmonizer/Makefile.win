@@ -1,17 +1,12 @@
 CC= cl
-#DEFS=  -nologo -DSTRICT -G3 -Ow -W3 -Zp -Tp
 DEFS=
 PROGNAME= charmonize.exe
 LINKER=link -nologo
-
 INCLUDES=  -I. -Isrc
-
 DEFINES= $(INCLUDES) $(DEFS) -nologo
-
 CFLAGS= $(DEFINES)
 LIBS=
-RC=rc
-RCVARS=-r -DWIN32
+
 TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe
 
 SRCS = charmonize.c src\Charmonizer\Probe.c src\Charmonizer\Core\Compiler.c src\Charmonizer\Core\ConfWriter.c src\Charmonizer\Core\Dir.c src\Charmonizer\Core\HeaderChecker.c src\Charmonizer\Core\OperatingSystem.c src\Charmonizer\Core\Stat.c src\Charmonizer\Core\Util.c src\Charmonizer\Probe\AtomicOps.c src\Charmonizer\Probe\DirManip.c src\Charmonizer\Probe\Floats.c src\Charmonizer\Probe\FuncMacro.c src\Charmonizer\Probe\Headers.c src\Charmonizer\Probe\Integers.c src\Charmonizer\Probe\LargeFiles.c src\Charmonizer\Probe\Memory.c src\Charmonizer\Probe\UnusedVars.c src\Charmonizer\Probe\VariadicMacros.c
