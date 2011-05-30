@@ -140,8 +140,6 @@ my $base_dir = $is_distro_not_devel ? curdir() : updir();
 
 my $CHARMONIZE_EXE_PATH  = catfile($base_dir, 'charmonizer', 'charmonize' . $Config{_exe});
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
-my $CHARMONIZER_SRC_DIR  = catdir( $CHARMONIZER_ORIG_DIR, 'src' );
-my $CHARMONIZER_TESTS_DIR= catdir( $CHARMONIZER_ORIG_DIR, 'src', 'Charmonizer', 'Test' );
 my $SNOWSTEM_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
@@ -508,7 +506,7 @@ sub ACTION_compile_custom_xs {
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
         curdir(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
-        $CHARMONIZER_SRC_DIR, $SNOWSTEM_INC_DIR
+        $SNOWSTEM_INC_DIR
     );
     my @objects;
 
