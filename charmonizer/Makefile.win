@@ -22,7 +22,7 @@ TEST_SRCS = src\Charmonizer\Test.c src\Charmonizer\Test\TestDirManip.c src\Charm
 
 OBJS = charmonize.obj src\Charmonizer\Probe.obj src\Charmonizer\Core\Compiler.obj src\Charmonizer\Core\ConfWriter.obj src\Charmonizer\Core\Dir.obj src\Charmonizer\Core\HeaderChecker.obj src\Charmonizer\Core\OperatingSystem.obj src\Charmonizer\Core\Stat.obj src\Charmonizer\Core\Util.obj src\Charmonizer\Probe\AtomicOps.obj src\Charmonizer\Probe\DirManip.obj src\Charmonizer\Probe\Floats.obj src\Charmonizer\Probe\FuncMacro.obj src\Charmonizer\Probe\Headers.obj src\Charmonizer\Probe\Integers.obj src\Charmonizer\Probe\LargeFiles.obj src\Charmonizer\Probe\Memory.obj src\Charmonizer\Probe\UnusedVars.obj src\Charmonizer\Probe\VariadicMacros.obj
 
-TEST_OBJS = src\Charmonizer\Test.o src\Charmonizer\Test\TestDirManip.obj src\Charmonizer\Test\TestFuncMacro.obj src\Charmonizer\Test\TestHeaders.obj src\Charmonizer\Test\TestIntegers.obj src\Charmonizer\Test\TestLargeFiles.obj src\Charmonizer\Test\TestUnusedVars.obj src\Charmonizer\Test\TestVariadicMacros.obj  
+TEST_OBJS = src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj src\Charmonizer\Test\TestFuncMacro.obj src\Charmonizer\Test\TestHeaders.obj src\Charmonizer\Test\TestIntegers.obj src\Charmonizer\Test\TestLargeFiles.obj src\Charmonizer\Test\TestUnusedVars.obj src\Charmonizer\Test\TestVariadicMacros.obj  
 
 
 .c.obj:
