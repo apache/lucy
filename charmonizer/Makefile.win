@@ -35,11 +35,11 @@ $(PROGNAME) : $(OBJS)
 
 tests: $(TESTS)
 
-TestDirManip.exe:	src\Charmonizer\Test.obj src/Charmonizer\Test\TestDirManip.obj
-	$(LINKER) src\Charmonizer\Test.obj src/Charmonizer\Test\TestDirManip.obj $(LIBS) /OUT:$@ $(LIBS)
+TestDirManip.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj $(LIBS) /OUT:$@ $(LIBS)
 
 TestFuncMacro.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj
-	$(LINKER) src\Charmonizer\Test.obj src/Charmonizer/Test/TestFuncMacro.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj /OUT:$@ $(LIBS)
 
 TestHeaders.exe:	src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj /OUT:$@ $(LIBS)
