@@ -164,9 +164,7 @@ sub ACTION_charmonizer {
 
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
 
-    my $flags = $self->config('ccflags') . ' '
-        . $self->extra_ccflags . ' '
-            . $self->config('cccdlflags');
+    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags;
 
     my $dir = getcwd();
     chdir $CHARMONIZER_ORIG_DIR;
@@ -185,9 +183,7 @@ sub ACTION_charmonizer_tests {
 
     print "Building Charmonizer Tests...\n\n";
 
-    my $flags = $self->config('ccflags') . ' '
-        . $self->extra_ccflags . ' '
-            . $self->config('cccdlflags') . " -I../perl";
+    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags . ' -I../perl';
 
     my $dir = getcwd();
     chdir $CHARMONIZER_ORIG_DIR;
