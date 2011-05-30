@@ -201,7 +201,6 @@ sub _xs_file_contents {
 #include "Lucy/Util/StringHelper.h"
 
 #include "Charmonizer/Test.h"
-#include "Charmonizer/Test/AllTests.h"
 
 $generated_xs
 
