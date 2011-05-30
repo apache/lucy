@@ -6,7 +6,7 @@ LINKER=link -nologo
 
 INCLUDES=  -I. -Isrc
 
-DEFINES= $(INCLUDES) $(DEFS) -nologo -G3
+DEFINES= $(INCLUDES) $(DEFS) -nologo
 
 CFLAGS= $(DEFINES)
 GUIFLAGS=user32.lib gdi32.lib winmm.lib comdlg32.lib comctl32.lib
