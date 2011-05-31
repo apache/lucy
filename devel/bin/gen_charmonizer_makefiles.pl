@@ -55,12 +55,12 @@ sub unix_tests {
     my @obj = unix_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.o$/ ? ($test_obj = $_) && 0 : 1, @obj;
-    my @rv;
-    push @rv, <<EOT for 0..$#test;
+    my @block;
+    push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
 	\$(CC) \$(CFLAGS) -o \$@ $test_obj $obj[$_] \$(LIBS)
 EOT
-    return \@rv, \@test;
+    return \@block, \@test;
 }
 
 sub win_tests {
@@ -70,12 +70,12 @@ sub win_tests {
     my @obj = win_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.obj$/ ? ($test_obj = $_) && 0 : 1, @obj;
-    my @rv;
-    push @rv, <<EOT for 0..$#test;
+    my @block;
+    push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
 	\$(LINKER) $test_obj $obj[$_] /OUT:\$@ \$(LIBS)
 EOT
-    return \@rv, \@test;
+    return \@block, \@test;
 }
 
 sub gen_makefile {
