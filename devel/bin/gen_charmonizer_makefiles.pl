@@ -17,9 +17,7 @@
 
 use strict;
 use warnings;
-use File::Spec::Functions qw( catfile rel2abs tmpdir );
 use File::Find qw( find );
-use File::Temp qw( mktemp );
 
 -d "src" or die "Switch to the directory containg the charmonizer src/.\n";
 
