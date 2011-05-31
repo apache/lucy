@@ -55,13 +55,12 @@ sub unix_tests {
     my @obj = unix_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.o$/ ? ($test_obj = $_) && 0 : 1, @obj;
-    my $rv = "";
-    $rv .= <<EOT for 0..$#test;
+    my @rv;
+    push @rv, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
 	\$(CC) \$(CFLAGS) -o \$@ $test_obj $obj[$_] \$(LIBS)
-
 EOT
-    return $rv, \@test;
+    return \@rv, \@test;
 }
 
 sub win_tests {
@@ -71,13 +70,12 @@ sub win_tests {
     my @obj = win_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.obj$/ ? ($test_obj = $_) && 0 : 1, @obj;
-    my $rv = "";
-    $rv .= <<EOT for 0..$#test;
+    my @rv;
+    push @rv, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
 	\$(LINKER) $test_obj $obj[$_] /OUT:\$@ \$(LIBS)
-
 EOT
-    return $rv, \@test;
+    return \@rv, \@test;
 }
 
 sub gen_makefile {
@@ -179,7 +177,7 @@ gen_makefile
     objs        => join(" ", sort {$a cmp $b} unix_obj @srcs),
     test_objs   => join(" ", sort {$a cmp $b} unix_obj @tests),
     headers     => join(" ", sort {$a cmp $b} unix_obj @hdrs),
-    test_blocks => $unix_test_blocks;
+    test_blocks => join(" ", sort @$unix_test_blocks);
 
 my ($win_test_blocks, $win_tests) = win_tests @tests;
 gen_makefile_win
@@ -187,7 +185,7 @@ gen_makefile_win
     objs        => join(" ", sort {$a cmp $b} win_obj @srcs),
     test_objs   => join(" ", sort {$a cmp $b} win_obj @tests),
     headers     => join(" ", sort {$a cmp $b} win_obj @hdrs),
-    test_blocks => $win_test_blocks;
+    test_blocks => join(" ", sort @$win_test_blocks);
 
 __END__
 
@@ -202,5 +200,5 @@ gen_charmonizer_makefiles.pl
 =head1 DESCRIPTION
 
 Be sure to run this code from the charmonizer subdirectory (where the
-existing Makefiles live).  Note that this process isn't 100% stable due
-to the test blocks' dependence on the order of the File::Find walk.
+existing Makefiles live).
+
