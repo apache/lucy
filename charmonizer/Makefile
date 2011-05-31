@@ -29,17 +29,23 @@ $(OBJS) $(TEST_OBJS): $(HEADERS)
 
 TestDirManip: src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o $(LIBS)
- TestFuncMacro: src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
+
+TestFuncMacro: src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o $(LIBS)
- TestHeaders: src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
+
+TestHeaders: src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o $(LIBS)
- TestIntegers: src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
+
+TestIntegers: src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o $(LIBS)
- TestLargeFiles: src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
+
+TestLargeFiles: src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o $(LIBS)
- TestUnusedVars: src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
+
+TestUnusedVars: src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o $(LIBS)
- TestVariadicMacros: src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
+
+TestVariadicMacros: src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o $(LIBS)
 
 

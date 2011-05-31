@@ -177,7 +177,7 @@ gen_makefile
     objs        => join(" ", sort {$a cmp $b} unix_obj @srcs),
     test_objs   => join(" ", sort {$a cmp $b} unix_obj @tests),
     headers     => join(" ", sort {$a cmp $b} unix_obj @hdrs),
-    test_blocks => join(" ", sort @$unix_test_blocks);
+    test_blocks => join("\n", sort @$unix_test_blocks);
 
 my ($win_test_blocks, $win_tests) = win_tests @tests;
 gen_makefile_win
@@ -185,7 +185,7 @@ gen_makefile_win
     objs        => join(" ", sort {$a cmp $b} win_obj @srcs),
     test_objs   => join(" ", sort {$a cmp $b} win_obj @tests),
     headers     => join(" ", sort {$a cmp $b} win_obj @hdrs),
-    test_blocks => join(" ", sort @$win_test_blocks);
+    test_blocks => join("\n", sort @$win_test_blocks);
 
 __END__
 

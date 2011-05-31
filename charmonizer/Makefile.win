@@ -30,17 +30,23 @@ tests: $(TESTS)
 
 TestDirManip.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj /OUT:$@ $(LIBS)
- TestFuncMacro.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj
+
+TestFuncMacro.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj /OUT:$@ $(LIBS)
- TestHeaders.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj
+
+TestHeaders.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj /OUT:$@ $(LIBS)
- TestIntegers.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj
+
+TestIntegers.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj /OUT:$@ $(LIBS)
- TestLargeFiles.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj
+
+TestLargeFiles.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj /OUT:$@ $(LIBS)
- TestUnusedVars.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj
+
+TestUnusedVars.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj /OUT:$@ $(LIBS)
- TestVariadicMacros.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj
+
+TestVariadicMacros.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj
 	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj /OUT:$@ $(LIBS)
 
 
