@@ -139,7 +139,7 @@ TEST_OBJS= $args{test_objs}
 
 all: \$(PROGNAME)
 
-\$(PROGNAME) : \$(OBJS)
+\$(PROGNAME): \$(OBJS)
 	\$(LINKER) \$(OBJS) /OUT:\$(PROGNAME) \$(LIBS)
 
 tests: \$(TESTS)

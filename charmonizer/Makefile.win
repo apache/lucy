@@ -19,7 +19,7 @@ TEST_OBJS= src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj src\Ch
 
 all: $(PROGNAME)
 
-$(PROGNAME) : $(OBJS)
+$(PROGNAME): $(OBJS)
 	$(LINKER) $(OBJS) /OUT:$(PROGNAME) $(LIBS)
 
 tests: $(TESTS)
