@@ -47,13 +47,14 @@ sub gen_win_obj {
 
 sub gen_unix_tests {
     my @src = @_;
-    my @test = map m!\b(Test\w+)\.c$!, @src; # \w+ skips the first entry Test.c
+    my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
     my @obj = gen_unix_obj @src;
-    my $first_obj = shift @obj;
+    my $test_obj;
+    @obj = grep /\bTest\.o$/ ? ($test_obj = $_) && 0 : 1, @obj;
     my $rv = "";
     $rv .= <<EOT for 0..$#test;
-$test[$_]: $first_obj $obj[$_]
-	\$(CC) \$(CFLAGS) -o \$@ $first_obj $obj[$_] \$(LIBS)
+$test[$_]: $test_obj $obj[$_]
+	\$(CC) \$(CFLAGS) -o \$@ $test_obj $obj[$_] \$(LIBS)
 
 EOT
     return $rv, \@test;
@@ -61,14 +62,15 @@ EOT
 
 sub gen_win_tests {
     my @src = @_;
-    my @test = map m!\b(Test\w+)\.c$!, @src; # \w+ skips the first entry Test.c
+    my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
     $_ .= '.exe' for @test;
     my @obj = gen_win_obj @src;
-    my $first_obj = shift @obj;
+    my $test_obj;
+    @obj = grep /\bTest\.obj$/ ? ($test_obj = $_) && 0 : 1, @obj;
     my $rv = "";
     $rv .= <<EOT for 0..$#test;
-$test[$_]: $first_obj $obj[$_]
-	\$(LINKER) $first_obj $obj[$_] /OUT:\$@ \$(LIBS)
+$test[$_]: $test_obj $obj[$_]
+	\$(LINKER) $test_obj $obj[$_] /OUT:\$@ \$(LIBS)
 
 EOT
     return $rv, \@test;
