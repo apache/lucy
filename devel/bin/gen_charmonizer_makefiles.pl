@@ -21,15 +21,19 @@ use File::Find qw( find );
 
 -d "src" or die "Switch to the directory containg the charmonizer src/.\n";
 
-my (@srcs, @tests);
+my (@srcs, @tests, @hdrs);
 
 sub wanted {
-    return unless /\.c$/;
-    if (/^Test/) {
-        push @tests, $File::Find::name;
+    if (/\.c$/) {
+        if (/^Test/) {
+            push @tests, $File::Find::name;
+        }
+        else {
+            push @srcs, $File::Find::name;
+        }
     }
-    else {
-        push @srcs, $File::Find::name;
+    elsif (/\.h$/) {
+        push @hdrs, $File::Find::name;
     }
 }
 
@@ -96,6 +100,8 @@ OBJS= $args{objs}
 
 TEST_OBJS= $args{test_objs}
 
+HEADERS= $args{headers}
+
 .c.o:
 	\$(CC) \$(CFLAGS) -c \$*.c -o \$@
 
@@ -105,6 +111,8 @@ tests: \$(TESTS)
 
 \$(PROGNAME): \$(OBJS)
 	\$(CC) \$(CFLAGS) -o \$(PROGNAME) \$(OBJS) \$(LIBS)
+
+\$(OBJS) \$(TEST_OBJS): \$(HEADERS)
 
 $args{test_blocks}
 
@@ -136,6 +144,8 @@ OBJS= $args{objs}
 
 TEST_OBJS= $args{test_objs}
 
+HEADERS= $args{headers}
+
 .c.obj:
 	\$(CC) \$(CFLAGS) -c \$< -Fo\$@
 
@@ -143,6 +153,8 @@ all: \$(PROGNAME)
 
 \$(PROGNAME): \$(OBJS)
 	\$(LINKER) \$(OBJS) /OUT:\$(PROGNAME) \$(LIBS)
+
+\$(OBJS) \$(TEST_OBJS): \$(HEADERS)
 
 tests: \$(TESTS)
 
@@ -166,6 +178,7 @@ gen_makefile
     test_execs  => join(" ", sort @$unix_tests),
     objs        => join(" ", sort {$a cmp $b} gen_unix_obj @srcs),
     test_objs   => join(" ", sort {$a cmp $b} gen_unix_obj @tests),
+    headers     => join(" ", sort {$a cmp $b} gen_unix_obj @hdrs),
     test_blocks => $unix_test_blocks;
 
 my ($win_test_blocks, $win_tests) = gen_win_tests @tests;
@@ -173,6 +186,7 @@ gen_makefile_win
     test_execs  => join(" ", sort @$win_tests),
     objs        => join(" ", sort {$a cmp $b} gen_win_obj @srcs),
     test_objs   => join(" ", sort {$a cmp $b} gen_win_obj @tests),
+    headers     => join(" ", sort {$a cmp $b} gen_win_obj @hdrs),
     test_blocks => $win_test_blocks;
 
 __END__

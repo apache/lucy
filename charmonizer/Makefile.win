@@ -14,6 +14,8 @@ OBJS= charmonize.obj src\Charmonizer\Core\Compiler.obj src\Charmonizer\Core\Conf
 
 TEST_OBJS= src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj src\Charmonizer\Test\TestFuncMacro.obj src\Charmonizer\Test\TestHeaders.obj src\Charmonizer\Test\TestIntegers.obj src\Charmonizer\Test\TestLargeFiles.obj src\Charmonizer\Test\TestUnusedVars.obj src\Charmonizer\Test\TestVariadicMacros.obj
 
+HEADERS= src\Charmonizer\Core\Compiler.h src\Charmonizer\Core\ConfWriter.h src\Charmonizer\Core\Defines.h src\Charmonizer\Core\Dir.h src\Charmonizer\Core\HeaderChecker.h src\Charmonizer\Core\OperatingSystem.h src\Charmonizer\Core\Stat.h src\Charmonizer\Core\Util.h src\Charmonizer\Probe.h src\Charmonizer\Probe\AtomicOps.h src\Charmonizer\Probe\DirManip.h src\Charmonizer\Probe\Floats.h src\Charmonizer\Probe\FuncMacro.h src\Charmonizer\Probe\Headers.h src\Charmonizer\Probe\Integers.h src\Charmonizer\Probe\LargeFiles.h src\Charmonizer\Probe\Memory.h src\Charmonizer\Probe\UnusedVars.h src\Charmonizer\Probe\VariadicMacros.h src\Charmonizer\Test.h
+
 .c.obj:
 	$(CC) $(CFLAGS) -c $< -Fo$@
 
@@ -21,6 +23,8 @@ all: $(PROGNAME)
 
 $(PROGNAME): $(OBJS)
 	$(LINKER) $(OBJS) /OUT:$(PROGNAME) $(LIBS)
+
+$(OBJS) $(TEST_OBJS): $(HEADERS)
 
 tests: $(TESTS)
 
