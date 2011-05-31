@@ -47,7 +47,7 @@ sub gen_win_obj {
 
 sub gen_unix_tests {
     my @src = @_;
-    my @test = map m!/(Test\w+)\.c$!, @src; # note the \w+ skips the first entry Test.c
+    my @test = map m!/(Test\w+)\.c$!, @src; # \w+ skips the first entry Test.c
     my @obj = gen_unix_obj @src;
     my $first_obj = shift @obj;
     my $rv = "";
@@ -61,7 +61,7 @@ EOT
 
 sub gen_win_tests {
     my @src = @_;
-    my @test = map m!/(Test\w+)\.c$!, @src; # note the \w+ skips the first entry Test.c
+    my @test = map m!/(Test\w+)\.c$!, @src; # \w+ skips the first entry Test.c
     $_ .= '.exe' for @test;
     my @obj = gen_win_obj @src;
     my $first_obj = shift @obj;
