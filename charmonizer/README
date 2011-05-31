@@ -15,7 +15,10 @@ OVERVIEW
 REQUIREMENTS
 
     Charmonizer's only prerequisite is an ISO C90-compliant compiler which can
-    be invoked from C via the system() command.
+    be invoked from C via the system() command.  The build system assumes you
+    have a corresponding make or nmake executable.  Folks hacking on the Charmonizer
+    source need to be aware of  ../devel/bin/gen_charmonizer_makefiles.pl which
+    generates the makefiles from the src tree.
     
 PROBING
 
