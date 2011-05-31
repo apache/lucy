@@ -27,27 +27,20 @@ $(PROGNAME): $(OBJS)
 
 $(OBJS) $(TEST_OBJS): $(HEADERS)
 
-TestUnusedVars: src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
-	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o $(LIBS)
-
-TestIntegers: src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
-	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o $(LIBS)
-
 TestDirManip: src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o $(LIBS)
-
-TestVariadicMacros: src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
-	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o $(LIBS)
-
-TestHeaders: src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
-	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o $(LIBS)
-
-TestFuncMacro: src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
+ TestFuncMacro: src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o $(LIBS)
-
-TestLargeFiles: src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
+ TestHeaders: src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
+	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o $(LIBS)
+ TestIntegers: src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
+	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o $(LIBS)
+ TestLargeFiles: src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o $(LIBS)
-
+ TestUnusedVars: src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
+	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o $(LIBS)
+ TestVariadicMacros: src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
+	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o $(LIBS)
 
 
 clean:
