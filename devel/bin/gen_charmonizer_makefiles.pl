@@ -186,17 +186,17 @@ find \&wanted, "src";
 my ($unix_test_blocks, $unix_tests) = unix_tests @tests;
 gen_makefile
     test_execs  => join(" ", sort @$unix_tests),
-    objs        => join(" ", sort {$a cmp $b} unix_obj @srcs),
-    test_objs   => join(" ", sort {$a cmp $b} unix_obj @tests),
-    headers     => join(" ", sort {$a cmp $b} unix_obj @hdrs),
+    objs        => join(" ", sort +unix_obj @srcs),
+    test_objs   => join(" ", sort +unix_obj @tests),
+    headers     => join(" ", sort +unix_obj @hdrs),
     test_blocks => join("\n", sort @$unix_test_blocks);
 
 my ($win_test_blocks, $win_tests) = win_tests @tests;
 gen_makefile_win
     test_execs  => join(" ", sort @$win_tests),
-    objs        => join(" ", sort {$a cmp $b} win_obj @srcs),
-    test_objs   => join(" ", sort {$a cmp $b} win_obj @tests),
-    headers     => join(" ", sort {$a cmp $b} win_obj @hdrs),
+    objs        => join(" ", sort +win_obj @srcs),
+    test_objs   => join(" ", sort +win_obj @tests),
+    headers     => join(" ", sort +win_obj @hdrs),
     test_blocks => join("\n", sort @$win_test_blocks);
 
 __END__
