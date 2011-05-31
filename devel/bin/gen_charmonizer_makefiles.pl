@@ -37,22 +37,22 @@ sub wanted {
     }
 }
 
-sub gen_unix_obj {
+sub unix_obj {
     my @o = @_;
     s/\.c$/.o/, tr{\\}{/} for @o;
     return @o;
 }
 
-sub gen_win_obj {
+sub win_obj {
     my @obj = @_;
     s/\.c$/.obj/, tr{/}{\\} for @obj;
     return @obj;
 }
 
-sub gen_unix_tests {
+sub unix_tests {
     my @src = @_;
     my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
-    my @obj = gen_unix_obj @src;
+    my @obj = unix_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.o$/ ? ($test_obj = $_) && 0 : 1, @obj;
     my $rv = "";
@@ -64,11 +64,11 @@ EOT
     return $rv, \@test;
 }
 
-sub gen_win_tests {
+sub win_tests {
     my @src = @_;
     my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
     $_ .= '.exe' for @test;
-    my @obj = gen_win_obj @src;
+    my @obj = win_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.obj$/ ? ($test_obj = $_) && 0 : 1, @obj;
     my $rv = "";
@@ -173,20 +173,20 @@ EOT
 push @srcs, "charmonize.c";
 find \&wanted, "src";
 
-my ($unix_test_blocks, $unix_tests) = gen_unix_tests @tests;
+my ($unix_test_blocks, $unix_tests) = unix_tests @tests;
 gen_makefile
     test_execs  => join(" ", sort @$unix_tests),
-    objs        => join(" ", sort {$a cmp $b} gen_unix_obj @srcs),
-    test_objs   => join(" ", sort {$a cmp $b} gen_unix_obj @tests),
-    headers     => join(" ", sort {$a cmp $b} gen_unix_obj @hdrs),
+    objs        => join(" ", sort {$a cmp $b} unix_obj @srcs),
+    test_objs   => join(" ", sort {$a cmp $b} unix_obj @tests),
+    headers     => join(" ", sort {$a cmp $b} unix_obj @hdrs),
     test_blocks => $unix_test_blocks;
 
-my ($win_test_blocks, $win_tests) = gen_win_tests @tests;
+my ($win_test_blocks, $win_tests) = win_tests @tests;
 gen_makefile_win
     test_execs  => join(" ", sort @$win_tests),
-    objs        => join(" ", sort {$a cmp $b} gen_win_obj @srcs),
-    test_objs   => join(" ", sort {$a cmp $b} gen_win_obj @tests),
-    headers     => join(" ", sort {$a cmp $b} gen_win_obj @hdrs),
+    objs        => join(" ", sort {$a cmp $b} win_obj @srcs),
+    test_objs   => join(" ", sort {$a cmp $b} win_obj @tests),
+    headers     => join(" ", sort {$a cmp $b} win_obj @hdrs),
     test_blocks => $win_test_blocks;
 
 __END__
