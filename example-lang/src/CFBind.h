@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-/* XSBind.h -- Functions to help bind Clownfish to Perl XS api.
+/* CFBind.h -- Functions to help bind Clownfish to Perl XS api.
  */
 
-#ifndef H_CFISH_XSBIND
-#define H_CFISH_XSBIND 1
+#ifndef H_CFISH_CFBIND
+#define H_CFISH_CFBIND 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,13 +45,13 @@ extern "C" {
  * object suitable for supplying to a cfish_Foo_init() function.
  */
 cfish_Obj*
-cfish_XSBind_new_blank_obj(SV *either_sv);
+cfish_CFBind_new_blank_obj(SV *either_sv);
 
 /** Test whether an SV is defined.  Handles "get" magic, unlike SvOK on its
  * own.
  */
 static CHY_INLINE chy_bool_t
-cfish_XSBind_sv_defined(SV *sv) {
+cfish_CFBind_sv_defined(SV *sv) {
     if (!sv || !SvANY(sv)) { return false; }
     if (SvGMAGICAL(sv)) { mg_get(sv); }
     return SvOK(sv);
@@ -65,13 +65,13 @@ cfish_XSBind_sv_defined(SV *sv) {
  * instead.  If all else fails, throw an exception.
  */
 cfish_Obj*
-cfish_XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation);
+cfish_CFBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation);
 
-/** As XSBind_sv_to_cfish_obj above, but returns NULL instead of throwing an
+/** As CFBind_sv_to_cfish_obj above, but returns NULL instead of throwing an
  * exception.
  */
 cfish_Obj*
-cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
+cfish_CFBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
                                    void *allocation);
 
 
@@ -82,20 +82,20 @@ cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
  * responsibility.
  */
 static CHY_INLINE SV*
-cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj) {
+cfish_CFBind_cfish_obj_to_sv(cfish_Obj *obj) {
     return obj ? (SV*)Cfish_Obj_To_Host(obj) : newSV(0);
 }
 
-/** XSBind_cfish_obj_to_sv, with a cast.
+/** CFBind_cfish_obj_to_sv, with a cast.
  */
-#define CFISH_OBJ_TO_SV(_obj) cfish_XSBind_cfish_obj_to_sv((cfish_Obj*)_obj)
+#define CFISH_OBJ_TO_SV(_obj) cfish_CFBind_cfish_obj_to_sv((cfish_Obj*)_obj)
 
-/** As XSBind_cfish_obj_to_sv above, except decrements the object's refcount
+/** As CFBind_cfish_obj_to_sv above, except decrements the object's refcount
  * after creating the SV. This is useful when the Clownfish expression creates a new
  * refcount, e.g.  a call to a constructor.
  */
 static CHY_INLINE SV*
-cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
+cfish_CFBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
     SV *retval;
     if (obj) {
         retval = (SV*)Cfish_Obj_To_Host(obj);
@@ -107,44 +107,44 @@ cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
     return retval;
 }
 
-/** XSBind_cfish_obj_to_sv_noinc, with a cast.
+/** CFBind_cfish_obj_to_sv_noinc, with a cast.
  */
 #define CFISH_OBJ_TO_SV_NOINC(_obj) \
-    cfish_XSBind_cfish_obj_to_sv_noinc((cfish_Obj*)_obj)
+    cfish_CFBind_cfish_obj_to_sv_noinc((cfish_Obj*)_obj)
 
 /** Deep conversion of Clownfish objects to Perl objects -- CharBufs to UTF-8
  * SVs, ByteBufs to SVs, VArrays to Perl array refs, Hashes to Perl hashrefs,
  * and any other object to a Perl object wrapping the Clownfish Obj.
  */
 SV*
-cfish_XSBind_cfish_to_perl(cfish_Obj *obj);
+cfish_CFBind_cfish_to_perl(cfish_Obj *obj);
 
 /** Deep conversion of Perl data structures to Clownfish objects -- Perl hash
  * to Hash, Perl array to VArray, Clownfish objects stripped of their
  * wrappers, and everything else stringified and turned to a CharBuf.
  */
 cfish_Obj*
-cfish_XSBind_perl_to_cfish(SV *sv);
+cfish_CFBind_perl_to_cfish(SV *sv);
 
 /** Convert a ByteBuf into a new string SV.
  */
 SV*
-cfish_XSBind_bb_to_sv(const cfish_ByteBuf *bb);
+cfish_CFBind_bb_to_sv(const cfish_ByteBuf *bb);
 
 /** Convert a CharBuf into a new UTF-8 string SV.
  */
 SV*
-cfish_XSBind_cb_to_sv(const cfish_CharBuf *cb);
+cfish_CFBind_cb_to_sv(const cfish_CharBuf *cb);
 
 /** Turn on overloading for the supplied Perl object and its class.
  */
 void
-cfish_XSBind_enable_overload(void *pobj);
+cfish_CFBind_enable_overload(void *pobj);
 
 /** Process hash-style params passed to an XS subroutine.  The varargs must be
  * a NULL-terminated series of ALLOT_ macros.
  *
- *     cfish_XSBind_allot_params(stack, start, num_stack_elems,
+ *     cfish_CFBind_allot_params(stack, start, num_stack_elems,
  *         "Lucy::Search::TermQuery::new_PARAMS",
  *          ALLOT_OBJ(&field, "field", 5, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
  *          ALLOT_OBJ(&term, "term", 4, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
@@ -202,127 +202,127 @@ cfish_XSBind_enable_overload(void *pobj);
  * @return true on success, false on failure (sets Err_error).
  */
 chy_bool_t
-cfish_XSBind_allot_params(SV** stack, int32_t start,
+cfish_CFBind_allot_params(SV** stack, int32_t start,
                           int32_t num_stack_elems,
                           char* params_hash_name, ...);
 
-#define XSBIND_WANT_I8       0x1
-#define XSBIND_WANT_I16      0x2
-#define XSBIND_WANT_I32      0x3
-#define XSBIND_WANT_I64      0x4
-#define XSBIND_WANT_U8       0x5
-#define XSBIND_WANT_U16      0x6
-#define XSBIND_WANT_U32      0x7
-#define XSBIND_WANT_U64      0x8
-#define XSBIND_WANT_BOOL     0x9
-#define XSBIND_WANT_F32      0xA
-#define XSBIND_WANT_F64      0xB
-#define XSBIND_WANT_OBJ      0xC
-#define XSBIND_WANT_SV       0xD
+#define CFBIND_WANT_I8       0x1
+#define CFBIND_WANT_I16      0x2
+#define CFBIND_WANT_I32      0x3
+#define CFBIND_WANT_I64      0x4
+#define CFBIND_WANT_U8       0x5
+#define CFBIND_WANT_U16      0x6
+#define CFBIND_WANT_U32      0x7
+#define CFBIND_WANT_U64      0x8
+#define CFBIND_WANT_BOOL     0x9
+#define CFBIND_WANT_F32      0xA
+#define CFBIND_WANT_F64      0xB
+#define CFBIND_WANT_OBJ      0xC
+#define CFBIND_WANT_SV       0xD
 
 #if (CHY_SIZEOF_CHAR == 1)
-  #define XSBIND_WANT_CHAR XSBIND_WANT_I8
+  #define CFBIND_WANT_CHAR CFBIND_WANT_I8
 #else
   #error "Can't build unless sizeof(char) == 1"
 #endif
 
 #if (CHY_SIZEOF_SHORT == 2)
-  #define XSBIND_WANT_SHORT XSBIND_WANT_I16
+  #define CFBIND_WANT_SHORT CFBIND_WANT_I16
 #else
   #error "Can't build unless sizeof(short) == 2"
 #endif
 
 #if (CHY_SIZEOF_INT == 4)
-  #define XSBIND_WANT_INT XSBIND_WANT_I32
+  #define CFBIND_WANT_INT CFBIND_WANT_I32
 #else // sizeof(int) == 8
-  #define XSBIND_WANT_INT XSBIND_WANT_I64
+  #define CFBIND_WANT_INT CFBIND_WANT_I64
 #endif
 
 #if (CHY_SIZEOF_LONG == 4)
-  #define XSBIND_WANT_LONG XSBIND_WANT_I32
+  #define CFBIND_WANT_LONG CFBIND_WANT_I32
 #else // sizeof(long) == 8
-  #define XSBIND_WANT_LONG XSBIND_WANT_I64
+  #define CFBIND_WANT_LONG CFBIND_WANT_I64
 #endif
 
 #if (CHY_SIZEOF_SIZE_T == 4)
-  #define XSBIND_WANT_SIZE_T XSBIND_WANT_U32
+  #define CFBIND_WANT_SIZE_T CFBIND_WANT_U32
 #else // sizeof(long) == 8
-  #define XSBIND_WANT_SIZE_T XSBIND_WANT_U64
+  #define CFBIND_WANT_SIZE_T CFBIND_WANT_U64
 #endif
 
-#define XSBIND_ALLOT_I8(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_I8, NULL, NULL
-#define XSBIND_ALLOT_I16(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_I16, NULL, NULL
-#define XSBIND_ALLOT_I32(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_I32, NULL, NULL
-#define XSBIND_ALLOT_I64(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_I64, NULL, NULL
-#define XSBIND_ALLOT_U8(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_U8, NULL, NULL
-#define XSBIND_ALLOT_U16(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_U16, NULL, NULL
-#define XSBIND_ALLOT_U32(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_U32, NULL, NULL
-#define XSBIND_ALLOT_U64(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_U64, NULL, NULL
-#define XSBIND_ALLOT_BOOL(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_BOOL, NULL, NULL
-#define XSBIND_ALLOT_CHAR(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_CHAR, NULL, NULL
-#define XSBIND_ALLOT_SHORT(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_SHORT, NULL, NULL
-#define XSBIND_ALLOT_INT(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_INT, NULL, NULL
-#define XSBIND_ALLOT_LONG(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_LONG, NULL, NULL
-#define XSBIND_ALLOT_SIZE_T(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_SIZE_T, NULL, NULL
-#define XSBIND_ALLOT_F32(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_F32, NULL, NULL
-#define XSBIND_ALLOT_F64(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_F64, NULL, NULL
-#define XSBIND_ALLOT_OBJ(ptr, key, keylen, required, vtable, allocation) \
-    ptr, key, keylen, required, XSBIND_WANT_OBJ, vtable, allocation
-#define XSBIND_ALLOT_SV(ptr, key, keylen, required) \
-    ptr, key, keylen, required, XSBIND_WANT_SV, NULL, NULL
+#define CFBIND_ALLOT_I8(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_I8, NULL, NULL
+#define CFBIND_ALLOT_I16(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_I16, NULL, NULL
+#define CFBIND_ALLOT_I32(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_I32, NULL, NULL
+#define CFBIND_ALLOT_I64(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_I64, NULL, NULL
+#define CFBIND_ALLOT_U8(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_U8, NULL, NULL
+#define CFBIND_ALLOT_U16(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_U16, NULL, NULL
+#define CFBIND_ALLOT_U32(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_U32, NULL, NULL
+#define CFBIND_ALLOT_U64(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_U64, NULL, NULL
+#define CFBIND_ALLOT_BOOL(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_BOOL, NULL, NULL
+#define CFBIND_ALLOT_CHAR(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_CHAR, NULL, NULL
+#define CFBIND_ALLOT_SHORT(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_SHORT, NULL, NULL
+#define CFBIND_ALLOT_INT(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_INT, NULL, NULL
+#define CFBIND_ALLOT_LONG(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_LONG, NULL, NULL
+#define CFBIND_ALLOT_SIZE_T(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_SIZE_T, NULL, NULL
+#define CFBIND_ALLOT_F32(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_F32, NULL, NULL
+#define CFBIND_ALLOT_F64(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_F64, NULL, NULL
+#define CFBIND_ALLOT_OBJ(ptr, key, keylen, required, vtable, allocation) \
+    ptr, key, keylen, required, CFBIND_WANT_OBJ, vtable, allocation
+#define CFBIND_ALLOT_SV(ptr, key, keylen, required) \
+    ptr, key, keylen, required, CFBIND_WANT_SV, NULL, NULL
 
 /* Define short names for most of the symbols in this file.  Note that these
  * short names are ALWAYS in effect, since they are only used for Perl and we
  * can be confident they don't conflict with anything.  (It's prudent to use
  * full symbols nevertheless in case someone else defines e.g. a function
- * named "XSBind_sv_defined".)
+ * named "CFBind_sv_defined".)
  */
-#define XSBind_new_blank_obj           cfish_XSBind_new_blank_obj
-#define XSBind_sv_defined              cfish_XSBind_sv_defined
-#define XSBind_sv_to_cfish_obj         cfish_XSBind_sv_to_cfish_obj
-#define XSBind_maybe_sv_to_cfish_obj   cfish_XSBind_maybe_sv_to_cfish_obj
-#define XSBind_cfish_obj_to_sv         cfish_XSBind_cfish_obj_to_sv
-#define XSBind_cfish_obj_to_sv_noinc   cfish_XSBind_cfish_obj_to_sv_noinc
-#define XSBind_cfish_to_perl           cfish_XSBind_cfish_to_perl
-#define XSBind_perl_to_cfish           cfish_XSBind_perl_to_cfish
-#define XSBind_bb_to_sv                cfish_XSBind_bb_to_sv
-#define XSBind_cb_to_sv                cfish_XSBind_cb_to_sv
-#define XSBind_enable_overload         cfish_XSBind_enable_overload
-#define XSBind_allot_params            cfish_XSBind_allot_params
-#define ALLOT_I8                       XSBIND_ALLOT_I8
-#define ALLOT_I16                      XSBIND_ALLOT_I16
-#define ALLOT_I32                      XSBIND_ALLOT_I32
-#define ALLOT_I64                      XSBIND_ALLOT_I64
-#define ALLOT_U8                       XSBIND_ALLOT_U8
-#define ALLOT_U16                      XSBIND_ALLOT_U16
-#define ALLOT_U32                      XSBIND_ALLOT_U32
-#define ALLOT_U64                      XSBIND_ALLOT_U64
-#define ALLOT_BOOL                     XSBIND_ALLOT_BOOL
-#define ALLOT_CHAR                     XSBIND_ALLOT_CHAR
-#define ALLOT_SHORT                    XSBIND_ALLOT_SHORT
-#define ALLOT_INT                      XSBIND_ALLOT_INT
-#define ALLOT_LONG                     XSBIND_ALLOT_LONG
-#define ALLOT_SIZE_T                   XSBIND_ALLOT_SIZE_T
-#define ALLOT_F32                      XSBIND_ALLOT_F32
-#define ALLOT_F64                      XSBIND_ALLOT_F64
-#define ALLOT_OBJ                      XSBIND_ALLOT_OBJ
-#define ALLOT_SV                       XSBIND_ALLOT_SV
+#define CFBind_new_blank_obj           cfish_CFBind_new_blank_obj
+#define CFBind_sv_defined              cfish_CFBind_sv_defined
+#define CFBind_sv_to_cfish_obj         cfish_CFBind_sv_to_cfish_obj
+#define CFBind_maybe_sv_to_cfish_obj   cfish_CFBind_maybe_sv_to_cfish_obj
+#define CFBind_cfish_obj_to_sv         cfish_CFBind_cfish_obj_to_sv
+#define CFBind_cfish_obj_to_sv_noinc   cfish_CFBind_cfish_obj_to_sv_noinc
+#define CFBind_cfish_to_perl           cfish_CFBind_cfish_to_perl
+#define CFBind_perl_to_cfish           cfish_CFBind_perl_to_cfish
+#define CFBind_bb_to_sv                cfish_CFBind_bb_to_sv
+#define CFBind_cb_to_sv                cfish_CFBind_cb_to_sv
+#define CFBind_enable_overload         cfish_CFBind_enable_overload
+#define CFBind_allot_params            cfish_CFBind_allot_params
+#define ALLOT_I8                       CFBIND_ALLOT_I8
+#define ALLOT_I16                      CFBIND_ALLOT_I16
+#define ALLOT_I32                      CFBIND_ALLOT_I32
+#define ALLOT_I64                      CFBIND_ALLOT_I64
+#define ALLOT_U8                       CFBIND_ALLOT_U8
+#define ALLOT_U16                      CFBIND_ALLOT_U16
+#define ALLOT_U32                      CFBIND_ALLOT_U32
+#define ALLOT_U64                      CFBIND_ALLOT_U64
+#define ALLOT_BOOL                     CFBIND_ALLOT_BOOL
+#define ALLOT_CHAR                     CFBIND_ALLOT_CHAR
+#define ALLOT_SHORT                    CFBIND_ALLOT_SHORT
+#define ALLOT_INT                      CFBIND_ALLOT_INT
+#define ALLOT_LONG                     CFBIND_ALLOT_LONG
+#define ALLOT_SIZE_T                   CFBIND_ALLOT_SIZE_T
+#define ALLOT_F32                      CFBIND_ALLOT_F32
+#define ALLOT_F64                      CFBIND_ALLOT_F64
+#define ALLOT_OBJ                      CFBIND_ALLOT_OBJ
+#define ALLOT_SV                       CFBIND_ALLOT_SV
 
 /* Strip the prefix from some common ClownFish symbols where we know there's
  * no conflict with Perl.  It's a little inconsistent to do this rather than
@@ -335,6 +335,6 @@ cfish_XSBind_allot_params(SV** stack, int32_t start,
 }
 #endif
 
-#endif // H_CFISH_XSBIND
+#endif // H_CFISH_CFBIND
 
 

@@ -16,7 +16,7 @@
 
 #define C_LUCY_OBJ
 #define NEED_newRV_noinc
-#include "XSBind.h"
+#include "CFBind.h"
 #include "Lucy/Util/StringHelper.h"
 
 // Convert a Perl hash into a Clownfish Hash.  Caller takes responsibility for
@@ -39,7 +39,7 @@ static SV*
 S_cfish_hash_to_perl_hash(cfish_Hash *hash);
 
 cfish_Obj*
-XSBind_new_blank_obj(SV *either_sv) {
+CFBind_new_blank_obj(SV *either_sv) {
     cfish_VTable *vtable;
 
     // Get a VTable.
@@ -64,8 +64,8 @@ XSBind_new_blank_obj(SV *either_sv) {
 }
 
 cfish_Obj*
-XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
-    cfish_Obj *retval = XSBind_maybe_sv_to_cfish_obj(sv, vtable, allocation);
+CFBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
+    cfish_Obj *retval = CFBind_maybe_sv_to_cfish_obj(sv, vtable, allocation);
     if (!retval) {
         THROW(CFISH_ERR, "Not a %o", Cfish_VTable_Get_Name(vtable));
     }
@@ -73,9 +73,9 @@ XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
 }
 
 cfish_Obj*
-XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
+CFBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
     cfish_Obj *retval = NULL;
-    if (XSBind_sv_defined(sv)) {
+    if (CFBind_sv_defined(sv)) {
         if (sv_isobject(sv)
             && sv_derived_from(sv, (char*)Cfish_CB_Get_Ptr8(Cfish_VTable_Get_Name(vtable)))
            ) {
@@ -121,15 +121,15 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
 }
 
 SV*
-XSBind_cfish_to_perl(cfish_Obj *obj) {
+CFBind_cfish_to_perl(cfish_Obj *obj) {
     if (obj == NULL) {
         return newSV(0);
     }
     else if (Cfish_Obj_Is_A(obj, CFISH_CHARBUF)) {
-        return XSBind_cb_to_sv((cfish_CharBuf*)obj);
+        return CFBind_cb_to_sv((cfish_CharBuf*)obj);
     }
     else if (Cfish_Obj_Is_A(obj, CFISH_BYTEBUF)) {
-        return XSBind_bb_to_sv((cfish_ByteBuf*)obj);
+        return CFBind_bb_to_sv((cfish_ByteBuf*)obj);
     }
     else if (Cfish_Obj_Is_A(obj, CFISH_VARRAY)) {
         return S_cfish_array_to_perl_array((cfish_VArray*)obj);
@@ -158,10 +158,10 @@ XSBind_cfish_to_perl(cfish_Obj *obj) {
 }
 
 cfish_Obj*
-XSBind_perl_to_cfish(SV *sv) {
+CFBind_perl_to_cfish(SV *sv) {
     cfish_Obj *retval = NULL;
 
-    if (XSBind_sv_defined(sv)) {
+    if (CFBind_sv_defined(sv)) {
         if (SvROK(sv)) {
             // Deep conversion of references.
             SV *inner = SvRV(sv);
@@ -202,14 +202,14 @@ XSBind_perl_to_cfish(SV *sv) {
 }
 
 SV*
-XSBind_bb_to_sv(const cfish_ByteBuf *bb) {
+CFBind_bb_to_sv(const cfish_ByteBuf *bb) {
     return bb
            ? newSVpvn(Cfish_BB_Get_Buf(bb), Cfish_BB_Get_Size(bb))
            : newSV(0);
 }
 
 SV*
-XSBind_cb_to_sv(const cfish_CharBuf *cb) {
+CFBind_cb_to_sv(const cfish_CharBuf *cb) {
     if (!cb) {
         return newSV(0);
     }
@@ -230,7 +230,7 @@ S_perl_hash_to_cfish_hash(HV *phash) {
         HE        *entry    = hv_iternext(phash);
         STRLEN     key_len  = HeKLEN(entry);
         SV        *value_sv = HeVAL(entry);
-        cfish_Obj *value    = XSBind_perl_to_cfish(value_sv); // Recurse.
+        cfish_Obj *value    = CFBind_perl_to_cfish(value_sv); // Recurse.
 
         // Force key to UTF-8 if necessary.
         if (key_len == (STRLEN)HEf_SVKEY) {
@@ -277,7 +277,7 @@ S_perl_array_to_cfish_array(AV *parray) {
     for (i = 0; i < size; i++) {
         SV **elem_sv = av_fetch(parray, i, false);
         if (elem_sv) {
-            cfish_Obj *elem = XSBind_perl_to_cfish(*elem_sv);
+            cfish_Obj *elem = CFBind_perl_to_cfish(*elem_sv);
             if (elem) { Cfish_VA_Store(retval, i, elem); }
         }
     }
@@ -302,7 +302,7 @@ S_cfish_array_to_perl_array(cfish_VArray *varray) {
             }
             else {
                 // Recurse for each value.
-                SV *const val_sv = XSBind_cfish_to_perl(val);
+                SV *const val_sv = CFBind_cfish_to_perl(val);
                 av_store(perl_array, i, val_sv);
             }
         }
@@ -326,7 +326,7 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash) {
     Cfish_Hash_Iterate(hash);
     while (Cfish_Hash_Next(hash, (cfish_Obj**)&key, &val)) {
         // Recurse for each value.
-        SV *val_sv = XSBind_cfish_to_perl(val);
+        SV *val_sv = CFBind_cfish_to_perl(val);
         if (!Cfish_Obj_Is_A((cfish_Obj*)key, CFISH_CHARBUF)) {
             CFISH_THROW(CFISH_ERR,
                         "Can't convert a key of class %o to a Perl hash key",
@@ -347,7 +347,7 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash) {
 }
 
 void
-XSBind_enable_overload(void *pobj) {
+CFBind_enable_overload(void *pobj) {
     SV *perl_obj = (SV*)pobj;
     HV *stash = SvSTASH(SvRV(perl_obj));
 #if (PERL_VERSION > 10)
@@ -364,21 +364,21 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                   void *allocation) {
     chy_bool_t valid_assignment = false;
 
-    if (XSBind_sv_defined(value)) {
+    if (CFBind_sv_defined(value)) {
         switch (type) {
-            case XSBIND_WANT_I8:
+            case CFBIND_WANT_I8:
                 *((int8_t*)target) = (int8_t)SvIV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_I16:
+            case CFBIND_WANT_I16:
                 *((int16_t*)target) = (int16_t)SvIV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_I32:
+            case CFBIND_WANT_I32:
                 *((int32_t*)target) = (int32_t)SvIV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_I64:
+            case CFBIND_WANT_I64:
                 if (sizeof(IV) == 8) {
                     *((int64_t*)target) = (int64_t)SvIV(value);
                 }
@@ -388,19 +388,19 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                 }
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_U8:
+            case CFBIND_WANT_U8:
                 *((uint8_t*)target) = (uint8_t)SvUV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_U16:
+            case CFBIND_WANT_U16:
                 *((uint16_t*)target) = (uint16_t)SvUV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_U32:
+            case CFBIND_WANT_U32:
                 *((uint32_t*)target) = (uint32_t)SvUV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_U64:
+            case CFBIND_WANT_U64:
                 if (sizeof(UV) == 8) {
                     *((uint64_t*)target) = (uint64_t)SvUV(value);
                 }
@@ -410,21 +410,21 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                 }
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_BOOL:
+            case CFBIND_WANT_BOOL:
                 *((chy_bool_t*)target) = !!SvTRUE(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_F32:
+            case CFBIND_WANT_F32:
                 *((float*)target) = (float)SvNV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_F64:
+            case CFBIND_WANT_F64:
                 *((double*)target) = SvNV(value);
                 valid_assignment = true;
                 break;
-            case XSBIND_WANT_OBJ: {
+            case CFBIND_WANT_OBJ: {
                     cfish_Obj *object
-                        = XSBind_maybe_sv_to_cfish_obj(value, vtable,
+                        = CFBind_maybe_sv_to_cfish_obj(value, vtable,
                                                        allocation);
                     if (object) {
                         *((cfish_Obj**)target) = object;
@@ -440,7 +440,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                     }
                 }
                 break;
-            case XSBIND_WANT_SV:
+            case CFBIND_WANT_SV:
                 *((SV**)target) = value;
                 valid_assignment = true;
                 break;
@@ -467,7 +467,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
 }
 
 chy_bool_t
-XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
+CFBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
                     char* params_hash_name, ...) {
     va_list args;
     HV *params_hash = get_hv(params_hash_name, 0);
