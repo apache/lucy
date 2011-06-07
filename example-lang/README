@@ -1,0 +1,30 @@
+The "example-lang" directory contains a template for adding a language binding
+to Lucy and its object model layer, Clownfish.  See the DevGuide for an
+overview of Lucy's layers:
+
+    http://incubator.apache.org/lucy/docs/perl/Lucy/Docs/DevGuide.html
+
+The C files within "example-lang/src" contain stubs for C functions whose
+interfaces are defined within "trunk/core".  These functions fill in the
+missing pieces of the puzzle.  Once they are all implemented correctly, Lucy
+will theoretically build and pass its tests.
+
+Some of Lucy's classes really ought to be grouped with Clownfish, as they form
+something similar to a free floating "standard library" and are not
+search-related.  At some point everything under Lucy::Object will probably
+migrate to a new namespace:
+
+    Lucy::Object::Obj       => Clownfish::Obj
+    Lucy::Object::CharBuf   => Clownfish::CharBuf
+    Lucy::Object::VArray    => Clownfish::VArray
+    Lucy::Object::Hash      => Clownfish::Hash
+    Lucy::Object::BitVector => Clownfish::BitVector
+    ...
+
+Other, search-related classes belong with Lucy itself, but are represented
+here because they lack one or more implementing functions:
+
+    Lucy::Document::Doc
+    Lucy::Analysis::RegexTokenizer
+    Lucy::Index::Inverter
+    ...
