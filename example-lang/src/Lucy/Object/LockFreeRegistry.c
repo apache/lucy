@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-#define C_LUCY_OBJ
 #define C_LUCY_LOCKFREEREGISTRY
-#include "XSBind.h"
 
 #include "Lucy/Object/LockFreeRegistry.h"
-#include "Lucy/Object/Host.h"
 
 void*
 lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
-    chy_bool_t first_time = self->ref.count < 4 ? true : false;
-    lucy_LFReg_to_host_t to_host = (lucy_LFReg_to_host_t)LUCY_SUPER_METHOD(
-                                       LUCY_LOCKFREEREGISTRY, LFReg, To_Host);
-    SV *host_obj = (SV*)to_host(self);
-    if (first_time) {
-        SvSHARE((SV*)self->ref.host_obj);
-    }
-    return host_obj;
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(void*);
 }
 
 

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-#include "XSBind.h"
 #include "Lucy/Util/StringHelper.h"
 
 // TODO: replace with code from ICU in common/ucnv_u8.c.
 chy_bool_t
 lucy_StrHelp_utf8_valid(const char *ptr, size_t size) {
-    const U8 *uptr = (const U8*)ptr;
-    return size == 0 ? true : !!is_utf8_string(uptr, size);
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(chy_bool_t);
 }
 
 

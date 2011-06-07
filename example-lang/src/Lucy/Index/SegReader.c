@@ -17,11 +17,11 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/SegReader.h"
-#include "Lucy/Object/Host.h"
 
 CharBuf*
 SegReader_try_init_components(SegReader *self) {
-    return (CharBuf*)Host_callback_obj(self, "try_init_components", 0);
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(CharBuf*);
 }
 
 

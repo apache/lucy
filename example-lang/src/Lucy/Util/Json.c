@@ -22,38 +22,31 @@
 
 bool_t
 Json_spew_json(Obj *dump, Folder *folder, const CharBuf *path) {
-    bool_t result = (bool_t)Host_callback_i64(JSON, "spew_json", 3,
-                                              ARG_OBJ("dump", dump),
-                                              ARG_OBJ("folder", folder),
-                                              ARG_STR("path", path));
-    if (!result) { ERR_ADD_FRAME(Err_get_error()); }
-    return result;
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(bool_t);
 }
 
 Obj*
 Json_slurp_json(Folder *folder, const CharBuf *path) {
-    Obj *dump = Host_callback_obj(JSON, "slurp_json", 2,
-                                  ARG_OBJ("folder", folder),
-                                  ARG_STR("path", path));
-    if (!dump) { ERR_ADD_FRAME(Err_get_error()); }
-    return dump;
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(lucy_Obj*);
 }
 
 CharBuf*
 Json_to_json(Obj *dump) {
-    return Host_callback_str(JSON, "to_json", 1,
-                             ARG_OBJ("dump", dump));
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(lucy_CharBuf*);
 }
 
 Obj*
 Json_from_json(CharBuf *json) {
-    return Host_callback_obj(JSON, "from_json", 1,
-                             ARG_STR("json", json));
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(lucy_Obj*);
 }
 
 void
 Json_set_tolerant(bool_t tolerant) {
-    Host_callback(JSON, "set_tolerant", 1,
-                  ARG_I32("tolerant", tolerant));
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(bool_t);
 }
 
