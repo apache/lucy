@@ -16,6 +16,7 @@
 
 #define C_LUCY_REGEXTOKENIZER
 
+#include "CFBind.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
@@ -24,7 +25,7 @@ lucy_RegexTokenizer*
 lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
                          const lucy_CharBuf *pattern) {
     THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_RegexTokenizer*)
+    UNREACHABLE_RETURN(lucy_RegexTokenizer*);
 }
 
 void

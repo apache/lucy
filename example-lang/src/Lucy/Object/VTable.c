@@ -17,9 +17,7 @@
 #define C_LUCY_OBJ
 #define C_LUCY_VTABLE
 
-#include "Lucy/Object/VTable.h"
-#include "Lucy/Object/Host.h"
-#include "Lucy/Object/CharBuf.h"
+#include "CFBind.h"
 
 lucy_Obj*
 lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj) {

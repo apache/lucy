@@ -16,6 +16,7 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "CFBind.h"
 #include "Lucy/Index/PolyReader.h"
 #include "Lucy/Index/Snapshot.h"
 #include "Lucy/Store/Folder.h"

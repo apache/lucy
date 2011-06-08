@@ -47,6 +47,5 @@ Json_from_json(CharBuf *json) {
 void
 Json_set_tolerant(bool_t tolerant) {
     THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(bool_t);
 }
 

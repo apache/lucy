@@ -16,18 +16,19 @@
 
 #define C_LUCY_CASEFOLDER
 
+#include "CFBind.h"
 #include "Lucy/Analysis/CaseFolder.h"
 #include "Lucy/Analysis/Inversion.h"
 
 lucy_Inversion*
 lucy_CaseFolder_transform(lucy_CaseFolder *self, lucy_Inversion *inversion) {
-    THROW(ERR, "TODO");
+    THROW(LUCY_ERR, "TODO");
     UNREACHABLE_RETURN(lucy_Inversion*);
 }
 
 lucy_Inversion*
 lucy_CaseFolder_transform_text(lucy_CaseFolder *self, lucy_CharBuf *text) {
-    THROW(ERR, "TODO");
+    THROW(LUCY_ERR, "TODO");
     UNREACHABLE_RETURN(lucy_Inversion*);
 }
 

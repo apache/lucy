@@ -17,6 +17,7 @@
 #define C_LUCY_DOCREADER
 #define C_LUCY_DEFAULTDOCREADER
 
+#include "CFBind.h"
 #include "Lucy/Index/DocReader.h"
 #include "Lucy/Document/HitDoc.h"
 

@@ -34,12 +34,13 @@ extern "C" {
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Object/VTable.h"
 
-/* Strip the prefix from some common ClownFish symbols where we know there's
- * no conflict.  It's a little inconsistent to do this rather than leave all
+/* Strip the prefix from some common symbols where we know there's no
+ * conflict.  It's a little inconsistent to do this rather than leave all
  * symbols at full size, but the succinctness is worth it.
  */
-#define THROW            CFISH_THROW
-#define WARN             CFISH_WARN
+#define THROW                CFISH_THROW
+#define WARN                 CFISH_WARN
+#define UNREACHABLE_RETURN   CHY_UNREACHABLE_RETURN
 
 #ifdef __cplusplus
 }

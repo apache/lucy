@@ -16,8 +16,7 @@
 
 #define C_LUCY_OBJ
 
-#include "Lucy/Object/Obj.h"
-#include "Lucy/Object/Err.h"
+#include "CFBind.h"
 
 uint32_t
 lucy_Obj_get_refcount(lucy_Obj *self) {

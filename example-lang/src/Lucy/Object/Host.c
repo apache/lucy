@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-#include "Lucy/Object/VTable.h"
-
-#include "Lucy/Object/Obj.h"
-#include "Lucy/Object/Host.h"
-#include "Lucy/Object/CharBuf.h"
-#include "Lucy/Object/Err.h"
+#include "CFBind.h"
 
 void
 lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) {

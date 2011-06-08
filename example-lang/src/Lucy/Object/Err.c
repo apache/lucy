@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "Lucy/Object/Err.h"
+#include "CFBind.h"
 
 lucy_Err*
 lucy_Err_get_error() {

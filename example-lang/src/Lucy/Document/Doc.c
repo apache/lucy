@@ -16,6 +16,7 @@
 
 #define C_LUCY_DOC
 
+#include "CFBind.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"

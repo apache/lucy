@@ -16,6 +16,7 @@
 
 #define C_LUCY_LOCKFREEREGISTRY
 
+#include "CFBind.h"
 #include "Lucy/Object/LockFreeRegistry.h"
 
 void*

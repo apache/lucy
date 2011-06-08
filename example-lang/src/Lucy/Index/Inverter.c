@@ -17,13 +17,13 @@
 #define C_LUCY_INVERTER
 #define C_LUCY_INVERTERENTRY
 
+#include "CFBind.h"
 #include "Lucy/Index/Inverter.h"
 #include "Lucy/Document/Doc.h"
 
 void
 lucy_Inverter_invert_doc(lucy_Inverter *self, lucy_Doc *doc) {
     THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Doc*);
 }
 
 
