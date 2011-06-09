@@ -74,7 +74,7 @@ THROW(VTable *vtable, char *pattern, ...) {
     CharBuf *mess = Err_Get_Mess(err);
 
     va_start(args, pattern);
-    CB_VCatF(message, pattern, args);
+    CB_VCatF(mess, pattern, args);
     va_end(args);
 
     Err_do_throw(err);

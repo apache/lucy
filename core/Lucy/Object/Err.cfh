@@ -196,7 +196,7 @@ __C__
   CFISH_THROW(lucy_VTable *vtable, char* format, ...);
   void
   CFISH_WARN(char* format, ...);
-  void
+  lucy_CharBuf*
   CFISH_MAKE_MESS(char* format, ...);
 #endif
 
