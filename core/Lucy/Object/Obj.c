@@ -103,7 +103,7 @@ Obj_to_string(Obj *self) {
     return CB_newf("%o@0x%x32%x32", Obj_Get_Class_Name(self), address_hi,
                    address_lo);
 #else
-  #error Unexpected pointer size.
+  #error "Unexpected pointer size."
 #endif
 }
 

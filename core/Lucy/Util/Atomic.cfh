@@ -82,7 +82,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 /******************** No support for atomics at all. ***********************/
 #else
 
-#error No support for atomic operations.
+#error "No support for atomic operations."
 
 #endif // Big platform if-else chain.
 
