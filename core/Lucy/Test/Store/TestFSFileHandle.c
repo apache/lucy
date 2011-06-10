@@ -158,7 +158,6 @@ static void
 test_Close(TestBatch *batch) {
     CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
-    bool_t result;
 
     remove((char*)CB_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename,
@@ -171,13 +170,19 @@ test_Close(TestBatch *batch) {
     remove((char*)CB_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
-    close(fh->fd);
+#ifdef _MSC_VER
+    SKIP(batch, "LUCY-155");
+    SKIP(batch, "LUCY-155");
+#else
+    int saved_fd = fh->fd;
     fh->fd = -1;
     Err_set_error(NULL);
-    result = FSFH_Close(fh);
+    bool_t result = FSFH_Close(fh);
     TEST_FALSE(batch, result, "Failed Close() returns false");
     TEST_TRUE(batch, Err_get_error() != NULL,
               "Failed Close() sets Err_error");
+    fh->fd = saved_fd;
+#endif /* _MSC_VER */
     DECREF(fh);
 
     fh = FSFH_open(test_filename, FH_READ_ONLY);
