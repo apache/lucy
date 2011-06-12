@@ -62,7 +62,7 @@ static char rmdir_code[] =
     QUOTE(  }                                                      );
 
 static chaz_bool_t
-S_try_init_posix_mkdir(char *header) {
+S_try_init_posix_mkdir(const char *header) {
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
 
@@ -112,7 +112,7 @@ S_init_mkdir(void) {
 }
 
 static chaz_bool_t
-S_try_init_rmdir(char *header) {
+S_try_init_rmdir(const char *header) {
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
     sprintf(code_buf, rmdir_code, header);

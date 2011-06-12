@@ -28,18 +28,18 @@ extern "C" {
 /* Remove an executable file named [name], appending the exe_ext if needed.
  */
 void
-chaz_OS_remove_exe(char *name);
+chaz_OS_remove_exe(const char *name);
 
 /* Remove an object file named [name], appending the obj_ext if needed.
  */
 void
-chaz_OS_remove_obj(char *name);
+chaz_OS_remove_obj(const char *name);
 
 /* Concatenate all arguments in a NULL-terminated list into a single command
  * string, prepend the appropriate prefix, and invoke via system().
  */
 int
-chaz_OS_run_local(char *arg1, ...);
+chaz_OS_run_local(const char *arg1, ...);
 
 /* Invoke a command and attempt to suppress output from both stdout and stderr
  * (as if they had been sent to /dev/null).  If it's not possible to run the

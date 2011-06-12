@@ -210,7 +210,7 @@ CC_compile_obj(const char *source_path, const char *obj_name,
 }
 
 chaz_bool_t
-CC_test_compile(char *source, size_t source_len) {
+CC_test_compile(const char *source, size_t source_len) {
     chaz_bool_t compile_succeeded;
 
     if (!Util_remove_and_verify(try_app_name)) {
@@ -226,7 +226,7 @@ CC_test_compile(char *source, size_t source_len) {
 }
 
 char*
-CC_capture_output(char *source, size_t source_len, size_t *output_len) {
+CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
     char *captured_output = NULL;
     chaz_bool_t compile_succeeded;
 

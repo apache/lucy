@@ -164,7 +164,7 @@ S_build_charm_run(void) {
 }
 
 void
-OS_remove_exe(char *name) {
+OS_remove_exe(const char *name) {
     char *exe_name = (char*)malloc(strlen(name) + strlen(exe_ext) + 1);
     sprintf(exe_name, "%s%s", name, exe_ext);
     remove(exe_name);
@@ -172,7 +172,7 @@ OS_remove_exe(char *name) {
 }
 
 void
-OS_remove_obj(char *name) {
+OS_remove_obj(const char *name) {
     char *obj_name = (char*)malloc(strlen(name) + strlen(obj_ext) + 1);
     sprintf(obj_name, "%s%s", name, obj_ext);
     remove(obj_name);
@@ -180,7 +180,7 @@ OS_remove_obj(char *name) {
 }
 
 int
-OS_run_local(char *arg1, ...) {
+OS_run_local(const char *arg1, ...) {
     va_list  args;
     size_t   len     = strlen(local_command_start) + strlen(arg1);
     char    *command = (char*)malloc(len + 1);
