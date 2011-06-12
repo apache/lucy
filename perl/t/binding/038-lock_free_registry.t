@@ -22,6 +22,9 @@ BEGIN {
     if ( $ENV{LUCY_VALGRIND} ) {
         plan( skip_all => 'Known leaks' );
     }
+    elsif ( !defined( $ENV{LUCY_DEBUG} ) ) {
+        plan( skip_all => 'Debug-only test' );
+    }
     elsif ( $Config{usethreads} and $^O !~ /mswin/i ) {
         plan( tests => 1 );
     }
