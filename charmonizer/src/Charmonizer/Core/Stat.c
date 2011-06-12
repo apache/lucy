@@ -32,7 +32,7 @@ static chaz_bool_t stat_available = false;
 
 /* Lazily compile _charm_stat. */
 static void
-S_init();
+S_init(void);
 
 void
 Stat_stat(const char *filepath, Stat *target) {
@@ -81,7 +81,7 @@ static char charm_stat_code[] =
     QUOTE(  }                                                      );
 
 static void
-S_init() {
+S_init(void) {
     /* Only try this once. */
     initialized = true;
     if (Util_verbosity) {

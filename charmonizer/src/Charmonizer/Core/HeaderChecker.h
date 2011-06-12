@@ -29,7 +29,7 @@ extern "C" {
 /* Bootstrap the HeadCheck.  Call this before anything else.
  */
 void
-chaz_HeadCheck_init();
+chaz_HeadCheck_init(void);
 
 /* Check for a particular header and return true if it's available.  The
  * test-compile is only run the first time a given request is made.

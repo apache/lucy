@@ -44,13 +44,13 @@ S_probe_dev_null(void);
  * to dev_null.
  */
 static void
-S_build_charm_run();
+S_build_charm_run(void);
 
 static chaz_bool_t charm_run_initialized = false;
 static chaz_bool_t charm_run_ok = false;
 
 void
-OS_init() {
+OS_init(void) {
     if (Util_verbosity) {
         printf("Initializing Charmonizer/Core/OperatingSystem...\n");
     }
@@ -142,7 +142,7 @@ static char charm_run_code[] =
     QUOTE(  }                                                            );
 
 static void
-S_build_charm_run() {
+S_build_charm_run(void) {
     chaz_bool_t compile_succeeded = false;
     const char *dev_null = OS_dev_null();
     size_t needed = sizeof(charm_run_code)

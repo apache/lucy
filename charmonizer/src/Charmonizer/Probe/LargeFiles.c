@@ -75,7 +75,7 @@ S_probe_pread64(unbuff_combo *combo);
 /* Determine whether we can use sparse files.
  */
 static chaz_bool_t
-S_check_sparse_files();
+S_check_sparse_files(void);
 
 /* Helper for check_sparse_files().
  */
@@ -86,7 +86,7 @@ S_test_sparse_file(long offset, Stat *st);
  * doesn't, then the test suite can safely verify large file support.
  */
 static chaz_bool_t
-S_can_create_big_files();
+S_can_create_big_files(void);
 
 /* Vars for holding lfs commands, once they're discovered. */
 static char fopen_command[10];
@@ -323,7 +323,7 @@ S_probe_pread64(unbuff_combo *combo) {
 }
 
 static chaz_bool_t
-S_check_sparse_files() {
+S_check_sparse_files(void) {
     Stat st_a, st_b;
 
     /* Bail out if we can't stat() a file. */
@@ -402,7 +402,7 @@ static char create_bigfile_code[] =
     QUOTE(  }                                                        );
 
 static chaz_bool_t
-S_can_create_big_files() {
+S_can_create_big_files(void) {
     char *output;
     size_t output_len;
     FILE *truncating_fh;

@@ -87,7 +87,7 @@ S_try_init_posix_mkdir(char *header) {
 }
 
 static chaz_bool_t
-S_try_init_win_mkdir() {
+S_try_init_win_mkdir(void) {
     mkdir_available = CC_compile_exe("_charm_mkdir.c", "_charm_mkdir",
                                      win_mkdir_code, strlen(win_mkdir_code));
     if (mkdir_available) {
@@ -98,7 +98,7 @@ S_try_init_win_mkdir() {
 }
 
 static void
-S_init_mkdir() {
+S_init_mkdir(void) {
     if (Util_verbosity) {
         printf("Attempting to compile _charm_mkdir utility...\n");
     }
@@ -123,7 +123,7 @@ S_try_init_rmdir(char *header) {
 }
 
 static void
-S_init_rmdir() {
+S_init_rmdir(void) {
     if (Util_verbosity) {
         printf("Attempting to compile _charm_rmdir utility...\n");
     }

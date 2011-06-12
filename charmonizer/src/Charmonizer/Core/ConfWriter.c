@@ -30,7 +30,7 @@
 static FILE *charmony_fh  = NULL;
 
 void
-ConfWriter_init() {
+ConfWriter_init(void) {
     return;
 }
 

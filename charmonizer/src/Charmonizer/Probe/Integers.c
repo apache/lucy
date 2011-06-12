@@ -28,7 +28,7 @@
 /* Determine endian-ness of this machine.
  */
 static chaz_bool_t
-S_machine_is_big_endian();
+S_machine_is_big_endian(void);
 
 static char sizes_code[] =
     QUOTE(  #include "_charm.h"                       )
@@ -471,7 +471,7 @@ Integers_run(void) {
 }
 
 static chaz_bool_t
-S_machine_is_big_endian() {
+S_machine_is_big_endian(void) {
     long one = 1;
     return !(*((char*)(&one)));
 }

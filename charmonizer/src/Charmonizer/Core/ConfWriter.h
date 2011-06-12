@@ -32,7 +32,7 @@ extern "C" {
  * else, but after os and compiler are initialized.
  */
 void
-chaz_ConfWriter_init();
+chaz_ConfWriter_init(void);
 
 /* Open the charmony.h file handle.  Print supplied text to it, if non-null.
  * Print an explanatory comment and open the include guard.

@@ -53,10 +53,10 @@ static char *exe_flag          = "-o ";
 /* Clean up the files associated with CC_capture_output().
  */
 static void
-S_clean_up_try();
+S_clean_up_try(void);
 
 static void
-S_do_test_compile();
+S_do_test_compile(void);
 
 void
 CC_init(const char *compiler_command, const char *compiler_flags) {
@@ -85,7 +85,7 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
 }
 
 void
-CC_clean_up() {
+CC_clean_up(void) {
     char **dirs;
 
     for (dirs = inc_dirs; *dirs != NULL; dirs++) {
@@ -98,7 +98,7 @@ CC_clean_up() {
 }
 
 static char*
-S_inc_dir_string() {
+S_inc_dir_string(void) {
     size_t needed = 0;
     char  *inc_dir_string;
     char **dirs;
@@ -256,14 +256,14 @@ CC_capture_output(char *source, size_t source_len, size_t *output_len) {
 }
 
 static void
-S_clean_up_try() {
+S_clean_up_try(void) {
     remove(TRY_SOURCE_PATH);
     OS_remove_exe(TRY_APP_BASENAME);
     remove(TARGET_PATH);
 }
 
 static void
-S_do_test_compile() {
+S_do_test_compile(void) {
     char *code = "int main() { return 0; }\n";
     chaz_bool_t success;
 

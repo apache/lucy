@@ -30,7 +30,7 @@
 /* Write the "_charm.h" file used by every probe.
  */
 static void
-S_write_charm_h();
+S_write_charm_h(void);
 
 void
 Probe_init(const char *cc_command, const char *cc_flags,
@@ -47,7 +47,7 @@ Probe_init(const char *cc_command, const char *cc_flags,
 }
 
 void
-Probe_clean_up() {
+Probe_clean_up(void) {
     if (Util_verbosity) { printf("Cleaning up...\n"); }
 
     /* Dispatch various clean up routines. */
@@ -77,7 +77,7 @@ static char charm_h_code[] =
     QUOTE(  #endif                                                           );
 
 static void
-S_write_charm_h() {
+S_write_charm_h(void) {
     Util_write_file("_charm.h", charm_h_code);
 }
 

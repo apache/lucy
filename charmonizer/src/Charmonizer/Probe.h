@@ -39,7 +39,7 @@ chaz_Probe_init(const char *cc_command, const char *cc_flags,
  * should be called only after everything else finishes.
  */
 void
-chaz_Probe_clean_up();
+chaz_Probe_clean_up(void);
 
 /* Determine how much feedback Charmonizer provides.
  * 0 - silent

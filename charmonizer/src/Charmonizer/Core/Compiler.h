@@ -69,7 +69,7 @@ chaz_CC_init(const char *cc_command, const char *cc_flags);
 /* Clean up the environment.
  */
 void
-chaz_CC_clean_up();
+chaz_CC_clean_up(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define CC_compile_exe              chaz_CC_compile_exe

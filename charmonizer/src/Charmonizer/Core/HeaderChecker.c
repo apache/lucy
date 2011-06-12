@@ -60,7 +60,7 @@ static void
 S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists);
 
 void
-HeadCheck_init() {
+HeadCheck_init(void) {
     Header *null_header = (Header*)malloc(sizeof(Header));
 
     /* Create terminating record for the dynamic array of Header objects. */
