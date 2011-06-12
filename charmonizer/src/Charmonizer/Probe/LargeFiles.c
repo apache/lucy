@@ -192,7 +192,7 @@ LargeFiles_run(void) {
 }
 
 /* Code for checking ftello64 and friends. */
-static char off64_code[] =
+static const char off64_code[] =
     QUOTE(  %s                                         )
     QUOTE(  #include "_charm.h"                        )
     QUOTE(  int main() {                               )
@@ -244,7 +244,7 @@ S_probe_off64(off64_combo *combo) {
 }
 
 /* Code for checking 64-bit lseek. */
-static char lseek_code[] =
+static const char lseek_code[] =
     QUOTE(  %s                                                        )
     QUOTE(  #include "_charm.h"                                       )
     QUOTE(  int main() {                                              )
@@ -287,7 +287,7 @@ S_probe_lseek(unbuff_combo *combo) {
 
 /* Code for checking 64-bit pread.  The pread call will fail, but that's fine
  * as long as it compiles. */
-static char pread64_code[] =
+static const char pread64_code[] =
     QUOTE(  %s                                     )
     QUOTE(  #include "_charm.h"                    )
     QUOTE(  int main() {                           )
@@ -381,7 +381,7 @@ S_test_sparse_file(long offset, Stat *st) {
 }
 
 /* Open a file, seek to a loc, print a char, and communicate success. */
-static char create_bigfile_code[] =
+static const char create_bigfile_code[] =
     QUOTE(  #include "_charm.h"                                      )
     QUOTE(  int main() {                                             )
     QUOTE(      FILE *fh = fopen("_charm_large_file_test", "w+");    )

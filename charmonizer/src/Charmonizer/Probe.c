@@ -69,7 +69,7 @@ Probe_get_charmony_fh(void) {
     return ConfWriter_get_charmony_fh();
 }
 
-static char charm_h_code[] =
+static const char charm_h_code[] =
     QUOTE(  #ifndef CHARM_H                                                  )
     QUOTE(  #define CHARM_H 1                                                )
     QUOTE(  #include <stdio.h>                                               )

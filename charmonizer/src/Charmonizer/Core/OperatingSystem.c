@@ -28,13 +28,13 @@
 static char dev_null[20] = "";
 
 #ifdef _WIN32
-static char *exe_ext = ".exe";
-static char *obj_ext = ".obj";
-static char *local_command_start = ".\\";
+static const char *exe_ext = ".exe";
+static const char *obj_ext = ".obj";
+static const char *local_command_start = ".\\";
 #else
-static char *exe_ext = "";
-static char *obj_ext = "";
-static char *local_command_start = "./";
+static const char *exe_ext = "";
+static const char *obj_ext = "";
+static const char *local_command_start = "./";
 #endif
 
 static void
@@ -68,7 +68,7 @@ S_probe_dev_null(void) {
     strcpy(dev_null, "nul");
 #else
     {
-        char *const options[] = {
+        const char *const options[] = {
             "/dev/null",
             "/dev/nul",
             NULL
@@ -109,7 +109,7 @@ OS_dev_null(void) {
     return dev_null;
 }
 
-static char charm_run_code[] =
+static const char charm_run_code[] =
     QUOTE(  #include <stdio.h>                                           )
     QUOTE(  #include <stdlib.h>                                          )
     QUOTE(  #include <string.h>                                          )

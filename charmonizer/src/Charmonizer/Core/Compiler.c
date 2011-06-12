@@ -37,17 +37,17 @@ static char     *try_app_name = NULL;
 /* Detect a supported compiler, or assume a generic GCC-compatible compiler
  * and hope for the best.  */
 #ifdef __GNUC__
-static char *include_flag      = "-I ";
-static char *object_flag       = "-o ";
-static char *exe_flag          = "-o ";
+static const char *include_flag      = "-I ";
+static const char *object_flag       = "-o ";
+static const char *exe_flag          = "-o ";
 #elif defined(_MSC_VER)
-static char *include_flag      = "/I";
-static char *object_flag       = "/Fo";
-static char *exe_flag          = "/Fe";
+static const char *include_flag      = "/I";
+static const char *object_flag       = "/Fo";
+static const char *exe_flag          = "/Fe";
 #else
-static char *include_flag      = "-I ";
-static char *object_flag       = "-o ";
-static char *exe_flag          = "-o ";
+static const char *include_flag      = "-I ";
+static const char *object_flag       = "-o ";
+static const char *exe_flag          = "-o ";
 #endif
 
 /* Clean up the files associated with CC_capture_output().
@@ -264,7 +264,7 @@ S_clean_up_try(void) {
 
 static void
 S_do_test_compile(void) {
-    char *code = "int main() { return 0; }\n";
+    const char *code = "int main() { return 0; }\n";
     chaz_bool_t success;
 
     if (Util_verbosity) {

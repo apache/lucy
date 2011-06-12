@@ -35,7 +35,7 @@ static char mkdir_command[7];
 char *Dir_mkdir_command = mkdir_command;
 
 /* Source code for standard POSIX mkdir */
-static char posix_mkdir_code[] =
+static const char posix_mkdir_code[] =
     QUOTE(  #include <%s>                                          )
     QUOTE(  int main(int argc, char **argv) {                      )
     QUOTE(      if (argc != 2) { return 1; }                       )
@@ -44,7 +44,7 @@ static char posix_mkdir_code[] =
     QUOTE(  }                                                      );
 
 /* Source code for Windows _mkdir. */
-static char win_mkdir_code[] =
+static const char win_mkdir_code[] =
     QUOTE(  #include <direct.h>                                    )
     QUOTE(  int main(int argc, char **argv) {                      )
     QUOTE(      if (argc != 2) { return 1; }                       )
@@ -53,7 +53,7 @@ static char win_mkdir_code[] =
     QUOTE(  }                                                      );
 
 /* Source code for rmdir. */
-static char rmdir_code[] =
+static const char rmdir_code[] =
     QUOTE(  #include <%s>                                          )
     QUOTE(  int main(int argc, char **argv) {                      )
     QUOTE(      if (argc != 2) { return 1; }                       )

@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static char osatomic_casptr_code[] =
+static const char osatomic_casptr_code[] =
     QUOTE(  #include <libkern/OSAtomic.h>                                  )
     QUOTE(  #include <libkern/OSAtomic.h>                                  )
     QUOTE(  int main() {                                                   )

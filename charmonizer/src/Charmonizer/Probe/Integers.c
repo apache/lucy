@@ -30,7 +30,7 @@
 static chaz_bool_t
 S_machine_is_big_endian(void);
 
-static char sizes_code[] =
+static const char sizes_code[] =
     QUOTE(  #include "_charm.h"                       )
     QUOTE(  int main () {                             )
     QUOTE(      Charm_Setup;                          )
@@ -42,7 +42,7 @@ static char sizes_code[] =
     QUOTE(      return 0;                             )
     QUOTE(  }                                         );
 
-static char type64_code[] =
+static const char type64_code[] =
     QUOTE(  #include "_charm.h"                       )
     QUOTE(  int main()                                )
     QUOTE(  {                                         )
@@ -51,7 +51,7 @@ static char type64_code[] =
     QUOTE(      return 0;                             )
     QUOTE(  }                                         );
 
-static char literal64_code[] =
+static const char literal64_code[] =
     QUOTE(  #include "_charm.h"                       )
     QUOTE(  #define big 9000000000000000000%s         )
     QUOTE(  int main()                                )
@@ -323,7 +323,7 @@ Integers_run(void) {
     /* Create the I64P and U64P printf macros. */
     if (has_64) {
         int i;
-        char *options[] = {
+        const char *options[] = {
             "ll",
             "l",
             "L",
@@ -333,7 +333,7 @@ Integers_run(void) {
         };
 
         /* Buffer to hold the code, and its start and end. */
-        static char format_64_code[] =
+        static const char format_64_code[] =
             QUOTE(  #include "_charm.h"                           )
             QUOTE(  int main() {                                  )
             QUOTE(      Charm_Setup;                              )

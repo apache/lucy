@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 /* Code for verifying ISO func macro. */
-static char iso_func_code[] =
+static const char iso_func_code[] =
     QUOTE(  #include "_charm.h"               )
     QUOTE(  int main() {                      )
     QUOTE(      Charm_Setup;                  )
@@ -34,7 +34,7 @@ static char iso_func_code[] =
     QUOTE(  }                                 );
 
 /* Code for verifying GNU func macro. */
-static char gnuc_func_code[] =
+static const char gnuc_func_code[] =
     QUOTE(  #include "_charm.h"               )
     QUOTE(  int main() {                      )
     QUOTE(      Charm_Setup;                  )
@@ -43,7 +43,7 @@ static char gnuc_func_code[] =
     QUOTE(  }                                 );
 
 /* Code for verifying inline keyword. */
-static char inline_code[] =
+static const char inline_code[] =
     QUOTE(  #include "_charm.h"               )
     QUOTE(  static %s int foo() { return 1; } )
     QUOTE(  int main() {                      )

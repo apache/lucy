@@ -29,7 +29,7 @@ typedef struct Header {
 } Header;
 
 /* "hello_world.c" without the hello or the world. */
-static char test_code[] = "int main() { return 0; }\n";
+static const char test_code[] = "int main() { return 0; }\n";
 
 /* Keep a sorted, dynamically-sized array of names of all headers we've
  * checked for so far.
@@ -129,7 +129,7 @@ HeadCheck_check_many_headers(const char **header_names) {
     return success;
 }
 
-static char contains_code[] =
+static const char contains_code[] =
     QUOTE(  #include <stddef.h>                           )
     QUOTE(  %s                                            )
     QUOTE(  int main() { return offsetof(%s, %s); }       );

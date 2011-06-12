@@ -46,7 +46,7 @@ static void
 S_encode_affirmation(const char *header_name);
 
 #define NUM_C89_HEADERS 15
-char *c89_headers[] = {
+const char *c89_headers[] = {
     "assert.h",
     "ctype.h",
     "errno.h",
@@ -66,7 +66,7 @@ char *c89_headers[] = {
 };
 
 #define NUM_POSIX_HEADERS 14
-char *posix_headers[] = {
+const char *posix_headers[] = {
     "cpio.h",
     "dirent.h",
     "fcntl.h",
@@ -85,7 +85,7 @@ char *posix_headers[] = {
 };
 
 #define NUM_WIN_HEADERS 3
-char *win_headers[] = {
+const char *win_headers[] = {
     "io.h",
     "windows.h",
     "process.h",

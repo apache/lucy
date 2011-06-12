@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static char alloca_code[] =
+static const char alloca_code[] =
     "#include <%s>\n"
     QUOTE(  int main() {                   )
     QUOTE(      void *foo = %s(1);         )
@@ -49,7 +49,7 @@ Memory_run(void) {
         /* OpenBSD needs sys/types.h for sys/mman.h to work and mmap() to be
          * available. Everybody else that has sys/mman.h should have
          * sys/types.h as well. */
-        char *mman_headers[] = {
+        const char *mman_headers[] = {
             "sys/types.h",
             "sys/mman.h",
             NULL

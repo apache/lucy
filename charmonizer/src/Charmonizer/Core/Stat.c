@@ -67,7 +67,7 @@ Stat_stat(const char *filepath, Stat *target) {
 }
 
 /* Source code for the _charm_stat utility. */
-static char charm_stat_code[] =
+static const char charm_stat_code[] =
     QUOTE(  #include <stdio.h>                                     )
     QUOTE(  #include <sys/stat.h>                                  )
     QUOTE(  int main(int argc, char **argv) {                      )
