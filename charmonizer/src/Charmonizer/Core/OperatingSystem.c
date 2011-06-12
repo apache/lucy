@@ -144,7 +144,6 @@ static const char charm_run_code[] =
 static void
 S_build_charm_run(void) {
     chaz_bool_t compile_succeeded = false;
-    const char *dev_null = OS_dev_null();
     size_t needed = sizeof(charm_run_code)
                     + strlen(dev_null)
                     + strlen(dev_null)
