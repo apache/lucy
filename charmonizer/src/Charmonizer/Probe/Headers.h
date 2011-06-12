@@ -90,6 +90,7 @@ chaz_Headers_run(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Headers_run        chaz_Headers_run
+  #define Headers_check      chaz_Headers_check
 #endif
 
 #ifdef __cplusplus

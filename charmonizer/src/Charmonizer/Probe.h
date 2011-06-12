@@ -60,6 +60,7 @@ chaz_Probe_get_charmony_fh(void);
   #define Probe_init            chaz_Probe_init
   #define Probe_clean_up        chaz_Probe_clean_up
   #define Probe_set_verbosity   chaz_Probe_set_verbosity
+  #define Probe_get_charmony_fh chaz_Probe_get_charmony_fh
 #endif
 
 #ifdef __cplusplus
