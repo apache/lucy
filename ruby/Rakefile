@@ -1,0 +1,139 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+require 'rbconfig'
+require 'rake/clean'
+
+def exe_path(*args)
+  File.join(args).ext(RbConfig::CONFIG["EXEEXT"])
+end
+
+def obj_path(*args)
+  File.join(args).ext(RbConfig::CONFIG["OBJEXT"])
+end
+
+def cc_command
+  RbConfig::CONFIG["CC"]
+end
+
+def make_command
+  return cc_command == "cl" ? "nmake" : "make"
+end
+
+def extra_ccflags
+  ""
+end
+
+def all_ccflags
+  flags = RbConfig::CONFIG["cflags"] + extra_ccflags
+  flags.gsub!(/"/, '\\"');
+  flags
+end
+
+IS_DISTRO_NOT_DEVEL  = File.directory?('core')
+BASE_DIR             = File.absolute_path(IS_DISTRO_NOT_DEVEL ? '.' : '..')
+CHARMONIZER_ORIG_DIR = File.join(BASE_DIR, "charmonizer")
+CHARMONIZE_EXE_PATH  = exe_path(CHARMONIZER_ORIG_DIR, 'charmonize')
+CHARMONY_PATH        = "charmony.h"
+
+desc "Build the charmonize executable"
+task :charmonizer do
+  puts "Building #{CHARMONIZE_EXE_PATH}...\n"
+  dir = Dir.pwd
+  Dir.chdir(CHARMONIZER_ORIG_DIR)
+  success = system(make_command)
+  if !success
+    raise "make failed"
+  end
+  Dir.chdir(dir);
+end
+
+desc "Run the charmonize executable, creating the charmony.h file"
+task :charmony => [:charmonizer] do
+  if uptodate? CHARMONY_PATH, [CHARMONIZE_EXE_PATH]
+    puts "skip"
+    next
+  end
+  puts "Writing #{CHARMONY_PATH}...\n"
+
+  # Prepare arguments to charmonize.
+  flags = all_ccflags
+  verbosity = ENV["DEBUG_CHARM"] ? 2 : 1;
+
+  if ENV["CHARM_VALGRIND"]
+    success = system("valgrind",  "--leak-check=yes", CHARMONIZE_EXE_PATH, 
+      cc_command, flags, verbosity.to_s)
+    if !success
+      raise "Failed to write charmony.h"
+    end
+  else
+    success = system(CHARMONIZE_EXE_PATH, cc_command, flags, verbosity.to_s)
+    if !success
+      raise "Failed to write charmony.h"
+    end
+  end
+end
+# Clean up after Charmonizer if it doesn't succeed on its own.
+CLEAN.include("_charm*")
+CLEAN.include(CHARMONY_PATH)
+
+desc "Build the charmonizer tests"
+task :charmonizer_tests => [:charmony] do
+  puts "Building Charmonizer Tests...\n"
+
+  flags = all_ccflags + ' -I../ruby'
+
+  dir = Dir.pwd
+  Dir.chdir(CHARMONIZER_ORIG_DIR)
+  args = [make_command, "CC=#{cc_command}", "DEFS=#{flags}"]
+  if make_command == 'nmake'
+    args.push("-f", "Makefile.win")
+  end
+  args.push("tests")
+  success = system(*args)
+  if !success
+    raise "Make failed"
+  end
+  Dir.chdir(dir)
+end
+
+task :clean do
+  dir = Dir.pwd
+  Dir.chdir(CHARMONIZER_ORIG_DIR)
+  success = system(make_command, "clean")
+  if !success
+    raise "make failed"
+  end
+  Dir.chdir(dir);
+end
+
+task :test => [:charmonizer_tests] do
+  pattern = File.join(CHARMONIZER_ORIG_DIR, "Test*")
+  charm_tests = Dir.glob(pattern)
+  puts charm_tests
+  failed = []
+  for charm_test in charm_tests
+    success = system(charm_test)
+    if !success
+      failed.push(charm_test)
+    end
+  end
+  if failed.length != 0
+    puts "Failed: #{failed}"
+  else
+    puts "All tests pass"
+  end
+end
+
