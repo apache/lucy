@@ -175,7 +175,7 @@ sub _run_make {
 }
 
 # Build the charmonize executable.
-sub ACTION_charmonizer {
+sub ACTION_charmonize {
     my $self = shift;
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
     $self->_run_make(
@@ -184,16 +184,16 @@ sub ACTION_charmonizer {
     );
 }
 
-# Run the charmonizer executable, creating the charmony.h file.
+# Run the charmonize executable, creating the charmony.h file.
 sub ACTION_charmony {
     my $self          = shift;
 
-    $self->dispatch('charmonizer');
+    $self->dispatch('charmonize');
 
     return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $CHARMONY_PATH );
     print "\nWriting $CHARMONY_PATH...\n\n";
 
-    # Clean up after Charmonizer if it doesn't succeed on its own.
+    # Clean up after charmonize if it doesn't succeed on its own.
     $self->add_to_cleanup("_charm*");
     $self->add_to_cleanup($CHARMONY_PATH);
 

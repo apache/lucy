@@ -62,13 +62,13 @@ CHARMONIZE_EXE_PATH  = exe_path(CHARMONIZER_ORIG_DIR, 'charmonize')
 CHARMONY_PATH        = "charmony.h"
 
 desc "Build the charmonize executable"
-task :charmonizer do
+task :charmonize do
   puts "Building #{CHARMONIZE_EXE_PATH}...\n"
   run_make(CHARMONIZER_ORIG_DIR, [])
 end
 
 desc "Run the charmonize executable, creating the charmony.h file"
-task :charmony => [:charmonizer] do
+task :charmony => [:charmonize] do
   if uptodate? CHARMONY_PATH, [CHARMONIZE_EXE_PATH]
     next
   end
@@ -91,7 +91,7 @@ task :charmony => [:charmonizer] do
     end
   end
 end
-# Clean up after Charmonizer if it doesn't succeed on its own.
+# Clean up after charmonize if it doesn't succeed on its own.
 CLEAN.include("_charm*")
 CLEAN.include(CHARMONY_PATH)
 
