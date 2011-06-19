@@ -65,7 +65,7 @@ package Lucy::Build;
 use base qw( Module::Build );
 
 use File::Spec::Functions
-    qw( catdir catfile curdir splitpath updir no_upwards );
+    qw( catdir catfile curdir splitpath updir no_upwards rel2abs );
 use File::Path qw( mkpath rmtree );
 use File::Copy qw( copy move );
 use File::Find qw( find );
@@ -221,7 +221,7 @@ sub ACTION_charmonizer_tests {
     print "Building Charmonizer Tests...\n\n";
     my $flags = join( " ",
         $self->config('ccflags'),
-        $self->extra_ccflags, ' -I../perl' );
+        $self->extra_ccflags, '-I' . rel2abs( getcwd() ) );
     $flags =~ s/"/\\"/g;
     $self->_run_make(
         dir  => $CHARMONIZER_ORIG_DIR,
