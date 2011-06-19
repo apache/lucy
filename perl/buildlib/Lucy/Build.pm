@@ -173,26 +173,6 @@ sub ACTION_charmonizer {
 
 }
 
-# Build the charmonizer tests.
-sub ACTION_charmonizer_tests {
-    my $self = shift;
-
-    $self->dispatch('charmony');
-
-    print "Building Charmonizer Tests...\n\n";
-
-    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags . ' -I../perl';
-
-    my $dir = getcwd();
-    chdir $CHARMONIZER_ORIG_DIR;
-    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
-                    "CC=". $self->config('cc'), "DEFS=$flags",
-                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "tests");
-    $rv and confess("Make failed");
-    chdir $dir;
-
-}
-
 # Run the charmonizer executable, creating the charmony.h file.
 sub ACTION_charmony {
     my $self          = shift;
@@ -221,6 +201,25 @@ sub ACTION_charmony {
         system("$CHARMONIZE_EXE_PATH \"$cc\" \"$flags\" $verbosity")
             and die "Failed to write $CHARMONY_PATH: $!";
     }
+}
+
+# Build the charmonizer tests.
+sub ACTION_charmonizer_tests {
+    my $self = shift;
+
+    $self->dispatch('charmony');
+
+    print "Building Charmonizer Tests...\n\n";
+
+    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags . ' -I../perl';
+
+    my $dir = getcwd();
+    chdir $CHARMONIZER_ORIG_DIR;
+    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
+                    "CC=". $self->config('cc'), "DEFS=$flags",
+                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "tests");
+    $rv and confess("Make failed");
+    chdir $dir;
 }
 
 sub _compile_clownfish {
