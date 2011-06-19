@@ -35,6 +35,12 @@ S_write_charm_h(void);
 void
 Probe_init(const char *cc_command, const char *cc_flags,
            const char *charmony_start) {
+    /* Proces CHARM_VERBOSITY environment variable. */
+    const char *verbosity_env = getenv("CHARM_VERBOSITY");
+    if (verbosity_env && strlen(verbosity_env)) {
+        Util_verbosity = strtol(verbosity_env, NULL, 10);
+    }
+
     /* Dispatch other initializers. */
     OS_init();
     CC_init(cc_command, cc_flags);
@@ -57,11 +63,6 @@ Probe_clean_up(void) {
     Dir_clean_up();
 
     if (Util_verbosity) { printf("Cleanup complete.\n"); }
-}
-
-void
-Probe_set_verbosity(int level) {
-    Util_verbosity = level;
 }
 
 FILE*

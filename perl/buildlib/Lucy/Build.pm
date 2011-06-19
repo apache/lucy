@@ -172,7 +172,6 @@ sub ACTION_charmony {
     my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags;
     $flags =~ s/"/\\"/g;
     my @command = ( $CHARMONIZE_EXE_PATH, $self->config('cc'), $flags );
-    push @command, 2 if $ENV{DEBUG_CHARM};
     if ( $ENV{CHARM_VALGRIND} ) {
         unshift @command, "valgrind", "--leak-check=yes";
     }

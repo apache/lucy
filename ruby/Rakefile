@@ -76,16 +76,15 @@ task :charmony => [:charmonize] do
 
   # Prepare arguments to charmonize.
   flags = all_ccflags
-  verbosity = ENV["DEBUG_CHARM"] ? 2 : 1;
 
   if ENV["CHARM_VALGRIND"]
     success = system("valgrind",  "--leak-check=yes", CHARMONIZE_EXE_PATH, 
-      cc_command, flags, verbosity.to_s)
+      cc_command, flags)
     if !success
       raise "Failed to write charmony.h"
     end
   else
-    success = system(CHARMONIZE_EXE_PATH, cc_command, flags, verbosity.to_s)
+    success = system(CHARMONIZE_EXE_PATH, cc_command, flags)
     if !success
       raise "Failed to write charmony.h"
     end
