@@ -159,10 +159,8 @@ sub ACTION_charmonize {
 
 # Run the charmonize executable, creating the charmony.h file.
 sub ACTION_charmony {
-    my $self          = shift;
-
+    my $self = shift;
     $self->dispatch('charmonize');
-
     return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $CHARMONY_PATH );
     print "\nWriting $CHARMONY_PATH...\n\n";
 
@@ -171,20 +169,15 @@ sub ACTION_charmony {
     $self->add_to_cleanup($CHARMONY_PATH);
 
     # Prepare arguments to charmonize.
-    my $cc        = $self->config('cc');
-    my $flags     = $self->config('ccflags') . ' ' . $self->extra_ccflags;
-    my $verbosity = $ENV{DEBUG_CHARM} ? 2 : 1;
+    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags;
     $flags =~ s/"/\\"/g;
-
+    my @command = ( $CHARMONIZE_EXE_PATH, $self->config('cc'), $flags );
+    push @command, 2 if $ENV{DEBUG_CHARM};
     if ( $ENV{CHARM_VALGRIND} ) {
-        system(   "valgrind --leak-check=yes ./$CHARMONIZE_EXE_PATH $cc "
-                . "\"$flags\" $verbosity" )
-            and die "Failed to write $CHARMONY_PATH";
+        unshift @command, "valgrind", "--leak-check=yes";
     }
-    else {
-        system("$CHARMONIZE_EXE_PATH \"$cc\" \"$flags\" $verbosity")
-            and die "Failed to write $CHARMONY_PATH: $!";
-    }
+
+    system(@command) and die "Failed to write $CHARMONY_PATH: $!";
 }
 
 # Build the charmonizer tests.
