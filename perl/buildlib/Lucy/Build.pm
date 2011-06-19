@@ -140,6 +140,7 @@ my $base_dir = $is_distro_not_devel ? curdir() : updir();
 
 my $CHARMONIZE_EXE_PATH  = catfile($base_dir, 'charmonizer', 'charmonize' . $Config{_exe});
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
+my $CHARMONY_PATH        = 'charmony.h';
 my $SNOWSTEM_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
@@ -195,16 +196,15 @@ sub ACTION_charmonizer_tests {
 # Run the charmonizer executable, creating the charmony.h file.
 sub ACTION_charmony {
     my $self          = shift;
-    my $charmony_path = 'charmony.h';
 
     $self->dispatch('charmonizer');
 
-    return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $charmony_path );
-    print "\nWriting $charmony_path...\n\n";
+    return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $CHARMONY_PATH );
+    print "\nWriting $CHARMONY_PATH...\n\n";
 
     # Clean up after Charmonizer if it doesn't succeed on its own.
     $self->add_to_cleanup("_charm*");
-    $self->add_to_cleanup($charmony_path);
+    $self->add_to_cleanup($CHARMONY_PATH);
 
     # Prepare arguments to charmonize.
     my $cc        = $self->config('cc');
@@ -215,11 +215,11 @@ sub ACTION_charmony {
     if ( $ENV{CHARM_VALGRIND} ) {
         system(   "valgrind --leak-check=yes ./$CHARMONIZE_EXE_PATH $cc "
                 . "\"$flags\" $verbosity" )
-            and die "Failed to write charmony.h";
+            and die "Failed to write $CHARMONY_PATH";
     }
     else {
         system("$CHARMONIZE_EXE_PATH \"$cc\" \"$flags\" $verbosity")
-            and die "Failed to write charmony.h: $!";
+            and die "Failed to write $CHARMONY_PATH: $!";
     }
 }
 
