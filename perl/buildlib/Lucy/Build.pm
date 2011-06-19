@@ -65,7 +65,7 @@ package Lucy::Build;
 use base qw( Module::Build );
 
 use File::Spec::Functions
-    qw( catdir catfile curdir splitpath updir no_upwards rel2abs );
+    qw( catdir catfile splitpath updir no_upwards rel2abs );
 use File::Path qw( mkpath rmtree );
 use File::Copy qw( copy move );
 use File::Find qw( find );
@@ -76,7 +76,7 @@ use Fcntl;
 use Carp;
 use Cwd qw( getcwd );
 
-BEGIN { unshift @PATH, curdir() }
+BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 
 sub extra_ccflags {
     my $self = shift;
@@ -136,7 +136,7 @@ locations.
 =cut
 
 my $is_distro_not_devel = -e 'core';
-my $base_dir = $is_distro_not_devel ? curdir() : updir();
+my $base_dir = rel2abs( $is_distro_not_devel ? getcwd() : updir() );
 
 my $CHARMONIZE_EXE_PATH  = catfile($base_dir, 'charmonizer', 'charmonize' . $Config{_exe});
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
@@ -511,7 +511,7 @@ sub ACTION_compile_custom_xs {
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'Lucy', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
-        curdir(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
+        getcwd(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
         $SNOWSTEM_INC_DIR
     );
     my @objects;
