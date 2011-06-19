@@ -79,49 +79,22 @@ use Cwd qw( getcwd );
 BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 
 sub extra_ccflags {
-    my $self = shift;
-    my $extra_ccflags = defined $ENV{CFLAGS} ? "$ENV{CFLAGS} " : "";
-    my $gcc_version 
-        = $ENV{REAL_GCC_VERSION}
-        || $self->config('gccversion')
-        || undef;
-    if ( defined $gcc_version ) {
-        $gcc_version =~ /^(\d+(\.\d+))/
-            or die "Invalid GCC version: $gcc_version";
-        $gcc_version = $1;
+    my $self      = shift;
+    my $gcc_flags = '-std=gnu99 -D_GNU_SOURCE ';
+    if ( defined $ENV{LUCY_VALGRIND} ) {
+        return "$gcc_flags -fno-inline-functions ";
     }
-
-    if ( defined $ENV{LUCY_DEBUG} ) {
-        if ( defined $gcc_version ) {
-            $extra_ccflags .= "-DLUCY_DEBUG ";
-            $extra_ccflags
-                .= "-DPERL_GCC_PEDANTIC -std=gnu99 -pedantic -Wall ";
-            $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct
-            $extra_ccflags .= "-Wno-variadic-macros "
-                if $gcc_version > 3.4;    # at least not on gcc 3.4
-        }
+    elsif ( defined $ENV{LUCY_DEBUG} ) {
+        return "$gcc_flags -DLUCY_DEBUG -pedantic -Wall -Wextra "
+            . "-Wno-variadic-macros ";
     }
-
-    if ( $ENV{LUCY_VALGRIND} and defined $gcc_version ) {
-        $extra_ccflags .= "-fno-inline-functions ";
+    elsif ( $self->config('gccversion') ) {
+        return $gcc_flags;
     }
-
-    # Compile as C++ under MSVC.
-    if ( $self->config('cc') eq 'cl' ) {
-        $extra_ccflags .= '/TP ';
+    elsif ( $self->config('cc') =~ /^cl\b/ ) {
+        # Compile as C++ under MSVC.
+        return '/TP ';
     }
-
-    if ( defined $gcc_version ) {
-        # Tell GCC explicitly to run with maximum options.
-        if ( $extra_ccflags !~ m/-std=/ ) {
-            $extra_ccflags .= "-std=gnu99 ";
-        }
-        if ( $extra_ccflags !~ m/-D_GNU_SOURCE/ ) {
-            $extra_ccflags .= "-D_GNU_SOURCE ";
-        }
-    }
-
-    return $extra_ccflags;
 }
 
 =for Rationale
