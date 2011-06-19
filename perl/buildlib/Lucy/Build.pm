@@ -157,20 +157,31 @@ my $AUTOBIND_PM_PATH = catfile( $LIB_DIR, 'Lucy', 'Autobinding.pm' );
 
 sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
 
+sub _run_make {
+    my ( $self, %params ) = @_;
+    my @command = @{ $params{args} };
+    my $dir = $params{dir};
+    unshift @command, 'CC=' . $self->config('cc');
+    if ( $self->config('cc') =~ /^cl\b/ ) {
+        unshift @command, "nmake", "-f", "Makefile.win";
+    }
+    else {
+        unshift @command, "make";
+    }
+    my $current_directory = getcwd();
+    chdir $dir if $dir;
+    system(@command) and confess("Make failed");
+    chdir $current_directory if $dir;
+}
+
 # Build the charmonize executable.
 sub ACTION_charmonizer {
     my $self = shift;
-
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
-
-    my $dir = getcwd();
-    chdir $CHARMONIZER_ORIG_DIR;
-    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
-                    "CC=". $self->config('cc'),
-                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : ());
-    $rv and confess("Make failed");
-    chdir $dir;
-
+    $self->_run_make(
+        dir  => $CHARMONIZER_ORIG_DIR,
+        args => [],
+    );
 }
 
 # Run the charmonizer executable, creating the charmony.h file.
@@ -206,20 +217,16 @@ sub ACTION_charmony {
 # Build the charmonizer tests.
 sub ACTION_charmonizer_tests {
     my $self = shift;
-
     $self->dispatch('charmony');
-
     print "Building Charmonizer Tests...\n\n";
-
-    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags . ' -I../perl';
-
-    my $dir = getcwd();
-    chdir $CHARMONIZER_ORIG_DIR;
-    my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
-                    "CC=". $self->config('cc'), "DEFS=$flags",
-                    $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "tests");
-    $rv and confess("Make failed");
-    chdir $dir;
+    my $flags = join( " ",
+        $self->config('ccflags'),
+        $self->extra_ccflags, ' -I../perl' );
+    $flags =~ s/"/\\"/g;
+    $self->_run_make(
+        dir  => $CHARMONIZER_ORIG_DIR,
+        args => [ "DEFS=$flags", "tests" ],
+    );
 }
 
 sub _compile_clownfish {
