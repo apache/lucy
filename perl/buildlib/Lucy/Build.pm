@@ -134,15 +134,18 @@ sub _run_make {
     my ( $self, %params ) = @_;
     my @command = @{ $params{args} };
     my $dir = $params{dir};
+    my $current_directory = getcwd();
+    chdir $dir if $dir;
     unshift @command, 'CC=' . $self->config('cc');
     if ( $self->config('cc') =~ /^cl\b/ ) {
-        unshift @command, "nmake", "-f", "Makefile.win";
+        if ( -f "Makefile.win" ) {
+            unshift @command, "-f", "Makefile.win";
+        }
+        unshift @command, "nmake";
     }
     else {
         unshift @command, "make";
     }
-    my $current_directory = getcwd();
-    chdir $dir if $dir;
     system(@command) and confess("Make failed");
     chdir $current_directory if $dir;
 }

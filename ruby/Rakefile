@@ -39,15 +39,18 @@ def all_ccflags
 end
 
 def run_make(dir, params)
+  current_dir = Dir.pwd
+  chdir(dir) if dir
   command = params.clone
   command.unshift("CC=#{cc_command}")
-  if cc_command =~ /^cl\b/
-    command.unshift("nmake", "-f", "Makefile.win")
+  if cc_command =~ /^cl\b/ 
+    if File.exists?("Makefile.win")
+      command.unshift("-f", "Makefile.win")
+    end
+    command.unshift("nmake")
   else
     command.unshift("make")
   end
-  current_dir = Dir.pwd
-  chdir(dir) if dir
   success = system(*command)
   if !success
     raise "Make failed"
