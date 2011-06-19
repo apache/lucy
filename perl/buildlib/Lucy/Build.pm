@@ -273,7 +273,7 @@ sub _compile_clownfish {
 
 sub ACTION_pod {
     my $self = shift;
-    $self->dispatch("build_clownfish");
+    $self->dispatch("cfc");
     $self->_write_pod(@_);
 }
 
@@ -293,7 +293,7 @@ sub _write_pod {
     }
 }
 
-sub ACTION_build_clownfish {
+sub ACTION_cfc {
     my $self    = shift;
     my $old_dir = getcwd();
     chdir($CLOWNFISH_DIR);
@@ -310,7 +310,7 @@ sub ACTION_clownfish {
     my $self = shift;
 
     $self->dispatch('charmonizer_tests');
-    $self->dispatch('build_clownfish');
+    $self->dispatch('cfc');
 
     # Create destination dir, copy xs helper files.
     if ( !-d $AUTOGEN_DIR ) {
