@@ -167,6 +167,7 @@ sub ACTION_charmonizer {
     my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
                     "CC=". $self->config('cc'),
                     $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : ());
+    $rv and confess("Make failed");
     chdir $dir;
 
 }
@@ -186,6 +187,7 @@ sub ACTION_charmonizer_tests {
     my $rv = system($self->config('cc') eq 'cl' ? 'nmake' : 'make',
                     "CC=". $self->config('cc'), "DEFS=$flags",
                     $self->config('cc') eq 'cl' ? ("-f", "Makefile.win") : (), "tests");
+    $rv and confess("Make failed");
     chdir $dir;
 
 }
