@@ -138,8 +138,8 @@ locations.
 my $is_distro_not_devel = -e 'core';
 my $base_dir = rel2abs( $is_distro_not_devel ? getcwd() : updir() );
 
-my $CHARMONIZE_EXE_PATH  = catfile($base_dir, 'charmonizer', 'charmonize' . $Config{_exe});
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
+my $CHARMONIZE_EXE_PATH  = catfile( $CHARMONIZER_ORIG_DIR, "charmonize$Config{_exe}" );
 my $CHARMONY_PATH        = 'charmony.h';
 my $SNOWSTEM_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstem source ) );
