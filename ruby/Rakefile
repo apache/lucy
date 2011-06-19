@@ -29,7 +29,7 @@ def cc_command
 end
 
 def make_command
-  return cc_command == "cl" ? "nmake" : "make"
+  return cc_command =~ /^cl\b/ ? ["nmake", "-f", "Makefile.win"] : ["make"]
 end
 
 def extra_ccflags
@@ -37,7 +37,7 @@ def extra_ccflags
 end
 
 def all_ccflags
-  flags = RbConfig::CONFIG["cflags"] + extra_ccflags
+  flags = RbConfig::CONFIG["CFLAGS"] + extra_ccflags
   flags.gsub!(/"/, '\\"');
   flags
 end
@@ -53,7 +53,7 @@ task :charmonizer do
   puts "Building #{CHARMONIZE_EXE_PATH}...\n"
   dir = Dir.pwd
   Dir.chdir(CHARMONIZER_ORIG_DIR)
-  success = system(make_command)
+  success = system(*make_command)
   if !success
     raise "make failed"
   end
@@ -63,7 +63,6 @@ end
 desc "Run the charmonize executable, creating the charmony.h file"
 task :charmony => [:charmonizer] do
   if uptodate? CHARMONY_PATH, [CHARMONIZE_EXE_PATH]
-    puts "skip"
     next
   end
   puts "Writing #{CHARMONY_PATH}...\n"
@@ -97,12 +96,8 @@ task :charmonizer_tests => [:charmony] do
 
   dir = Dir.pwd
   Dir.chdir(CHARMONIZER_ORIG_DIR)
-  args = [make_command, "CC=#{cc_command}", "DEFS=#{flags}"]
-  if make_command == 'nmake'
-    args.push("-f", "Makefile.win")
-  end
-  args.push("tests")
-  success = system(*args)
+  success = system(*make_command, "CC=\"#{cc_command}\"", "DEFS=#{flags}",
+    "tests")
   if !success
     raise "Make failed"
   end
@@ -112,7 +107,7 @@ end
 task :clean do
   dir = Dir.pwd
   Dir.chdir(CHARMONIZER_ORIG_DIR)
-  success = system(make_command, "clean")
+  success = system(*make_command, "clean")
   if !success
     raise "make failed"
   end
