@@ -26,6 +26,9 @@ struct CFCMethod;
 char*
 CFCBindMeth_typdef_dec(struct CFCMethod *method);
 
+char*
+CFCBindMeth_abstract_method_def(struct CFCMethod *method);
+
 #ifdef __cplusplus
 }
 #endif

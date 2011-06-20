@@ -1698,3 +1698,11 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindMeth_typdef_dec(meth));
 OUTPUT: RETVAL
 
+SV*
+abstract_method_def(unused, meth)
+    SV *unused;
+    CFCMethod *meth;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_abstract_method_def(meth));
+OUTPUT: RETVAL
+

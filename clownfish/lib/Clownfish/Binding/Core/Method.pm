@@ -269,40 +269,6 @@ $override_sym($params) {
 END_CALLBACK_DEF
 }
 
-# Create a function which throws a runtime error indicating that a method is
-# abstract.  This serves as the implementation for methods which are
-# declared as "abstract" in a Clownfish header file.
-sub abstract_method_def {
-    my ( undef, $method ) = @_;
-    my $params          = $method->get_param_list->to_c;
-    my $full_func_sym   = $method->full_func_sym;
-    my $vtable          = uc( $method->self_type->get_specifier );
-    my $return_type     = $method->get_return_type;
-    my $return_type_str = $return_type->to_c;
-    my $macro_sym       = $method->get_macro_sym;
-
-    # Build list of unused params and create an unreachable return statement
-    # if necessary, in order to thwart compiler warnings.
-    my $param_vars = $method->get_param_list->get_variables;
-    my $unused     = "";
-    for ( my $i = 1; $i < @$param_vars; $i++ ) {
-        my $var_name = $param_vars->[$i]->micro_sym;
-        $unused .= "\n    CHY_UNUSED_VAR($var_name);";
-    }
-    my $ret_statement = '';
-    if ( !$return_type->is_void ) {
-        $ret_statement = "\n    CHY_UNREACHABLE_RETURN($return_type_str);";
-    }
-
-    return <<END_ABSTRACT_DEF;
-$return_type_str
-$full_func_sym($params) {
-    cfish_CharBuf *klass = self ? Cfish_Obj_Get_Class_Name((cfish_Obj*)self) : $vtable->name;$unused
-    CFISH_THROW(CFISH_ERR, "Abstract method '$macro_sym' not defined by %o", klass);$ret_statement
-}
-END_ABSTRACT_DEF
-}
-
 1;
 
 __END__
@@ -372,6 +338,7 @@ is used when a Host method has overridden a method in a Clownfish class.
         = Clownfish::Binding::Core::Method->abstract_method_def($method);
 
 Return C code implementing a version of the method which throws an "abstract
-method" error at runtime.
+method" error at runtime, for methods which are declared as "abstract" in a
+Clownfish header file.
 
 =cut
