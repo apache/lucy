@@ -73,6 +73,18 @@ S_array_of_cfcbase_to_av(CFCBase **things) {
     return retval;
 }
 
+static SV*
+S_sv_eat_c_string(char *string) {
+    if (string) {
+        SV *sv = newSVpvn(string, strlen(string));
+        FREEMEM(string);
+        return sv;
+    }
+    else {
+        return newSV(0);
+    }
+}
+
 MODULE = Clownfish    PACKAGE = Clownfish::CBlock
 
 SV*
@@ -1673,11 +1685,7 @@ func_declaration(unused, func)
     SV *unused;
     CFCFunction *func;
 CODE:
-{
-    char *declaration = CFCBindFunc_func_declaration(func);
-    RETVAL = newSVpvn(declaration, strlen(declaration));
-    FREEMEM(declaration);
-}
+    RETVAL = S_sv_eat_c_string(CFCBindFunc_func_declaration(func));
 OUTPUT: RETVAL
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Method
@@ -1687,10 +1695,6 @@ typedef_dec(unused, meth)
     SV *unused;
     CFCMethod *meth;
 CODE:
-{
-    char *declaration = CFCBindMeth_typdef_dec(meth);
-    RETVAL = newSVpvn(declaration, strlen(declaration));
-    FREEMEM(declaration);
-}
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_typdef_dec(meth));
 OUTPUT: RETVAL
 
