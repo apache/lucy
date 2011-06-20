@@ -22,12 +22,17 @@ Lucy::Index::PostingListWriter::set_default_mem_thresh(0x1000);
 
 package Lucy::Test::TestCharmonizer;
 use Config;
+use File::Spec::Functions qw( catfile updir );
+
 sub run_tests {
     my $name = ucfirst shift;
     $name =~ s/_([a-z])/\u$1/g;
-    exec "../charmonizer/Test$name$Config{_exe}";
+    my $path = catfile( 'charmonizer', "Test$name$Config{_exe}" );
+    if ( !-e $path ) {
+        $path = catfile( updir(), $path );
+    }
+    exec $path;
 }
-
 
 1;
 
