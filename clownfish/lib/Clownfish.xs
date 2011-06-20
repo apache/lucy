@@ -1666,3 +1666,17 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Function
+
+SV*
+func_declaration(unused, func)
+    SV *unused;
+    CFCFunction *func;
+CODE:
+{
+    char *declaration = CFCBindFunc_func_declaration(func);
+    RETVAL = newSVpvn(declaration, strlen(declaration));
+    FREEMEM(declaration);
+}
+OUTPUT: RETVAL
+
