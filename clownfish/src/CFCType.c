@@ -37,6 +37,7 @@ struct CFCType {
     CFCBase  base;
     int      flags;
     char    *specifier;
+    char    *vtable_var;
     int      indirection;
     struct CFCParcel *parcel;
     char    *c_string;
@@ -65,6 +66,16 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
     self->width       = 0;
     self->array       = NULL;
     self->child       = NULL;
+    if (flags & CFCTYPE_OBJECT) {
+        int i;
+        self->vtable_var = CFCUtil_strdup(specifier);
+        for (i = 0; self->vtable_var[i] != 0; i++) {
+            self->vtable_var[i] = toupper(self->vtable_var[i]);
+        }
+    }
+    else {
+        self->vtable_var  = NULL;
+    }
     return self;
 }
 
@@ -364,6 +375,11 @@ CFCType_set_specifier(CFCType *self, const char *specifier) {
 const char*
 CFCType_get_specifier(CFCType *self) {
     return self->specifier;
+}
+
+const char*
+CFCType_get_vtable_var(CFCType *self) {
+    return self->vtable_var;
 }
 
 int

@@ -365,7 +365,7 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
         return;
     }
 
-    if (strlen(type_str) + 100 > sizeof(extraction)) { // play it safe
+    if (2 * strlen(type_str) + 100 > sizeof(extraction)) { // play it safe
         croak("type_str too long: '%s'", type_str);
     }
     if (CFCType_is_integer(type)) {
@@ -377,14 +377,7 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
         if (check < 0) { croak("sprintf failed"); }
     }
     else if (CFCType_is_object(type)) {
-        char vtable_var[50];
-        if (specifier_len > sizeof(vtable_var) - 2) {
-            croak("specifier too long: '%s'", specifier);
-        }
-        size_t i;
-        for (i = 0; i <= specifier_len; i++) {
-            vtable_var[i] = toupper(specifier[i]);
-        }
+        const char *vtable_var = CFCType_get_vtable_var(type);
         int check = sprintf(extraction,
                             "(%s*)CFISH_CERTIFY(Cfish_Obj_Load(var, var), %s)",
                             specifier, vtable_var);
