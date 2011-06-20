@@ -84,17 +84,6 @@ sub _final_method_def {
 END_STUFF
 }
 
-sub typedef_dec {
-    my ( undef, $method ) = @_;
-    my $params      = $method->get_param_list->to_c;
-    my $return_type = $method->get_return_type->to_c;
-    my $typedef     = $method->full_typedef;
-    return <<END_STUFF;
-typedef $return_type
-(*$typedef)($params);
-END_STUFF
-}
-
 sub callback_dec {
     my ( undef, $method ) = @_;
     my $callback_sym = $method->full_callback_sym;

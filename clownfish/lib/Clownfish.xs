@@ -1680,3 +1680,17 @@ CODE:
 }
 OUTPUT: RETVAL
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Method
+
+SV*
+typedef_dec(unused, meth)
+    SV *unused;
+    CFCMethod *meth;
+CODE:
+{
+    char *declaration = CFCBindMeth_typdef_dec(meth);
+    RETVAL = newSVpvn(declaration, strlen(declaration));
+    FREEMEM(declaration);
+}
+OUTPUT: RETVAL
+

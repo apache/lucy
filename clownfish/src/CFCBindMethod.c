@@ -14,22 +14,29 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
-
-#include "CFCBindFunction.h"
+#include <stdio.h>
+#include <string.h>
 #include "CFCBindMethod.h"
+#include "CFCUtil.h"
+#include "CFCMethod.h"
+#include "CFCFunction.h"
+#include "CFCParamList.h"
+#include "CFCType.h"
+
+char*
+CFCBindMeth_typdef_dec(struct CFCMethod *method) {
+    const char *params 
+        = CFCParamList_to_c(CFCFunction_get_param_list((CFCFunction*)method));
+    const char *ret_type
+        = CFCType_to_c(CFCFunction_get_return_type((CFCFunction*)method));
+    const char *full_typedef = CFCMethod_full_typedef(method);
+    size_t size = strlen(params)
+                  + strlen(ret_type)
+                  + strlen(full_typedef)
+                  + 20
+                  + sizeof("\0");
+    char *buf = (char*)MALLOCATE(size);
+    sprintf(buf, "typedef %s\n(*%s)(%s);\n", ret_type, full_typedef, params);
+    return buf;
+}
 

@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
+#ifndef H_CFCBINDMETHOD
+#define H_CFCBINDMETHOD
 
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct CFCMethod;
+
+char*
+CFCBindMeth_typdef_dec(struct CFCMethod *method);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CFCBINDMETHOD */
+
 
