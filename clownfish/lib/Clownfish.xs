@@ -1706,3 +1706,19 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindMeth_abstract_method_def(meth));
 OUTPUT: RETVAL
 
+SV*
+callback_dec(unused, meth)
+    SV *unused;
+    CFCMethod *meth;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_dec(meth));
+OUTPUT: RETVAL
+
+SV*
+_callback_obj_def(meth, offset)
+    CFCMethod *meth;
+    const char *offset;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_obj_def(meth, offset));
+OUTPUT: RETVAL
+

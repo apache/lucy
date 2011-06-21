@@ -41,6 +41,36 @@ CFCBindMeth_typdef_dec(struct CFCMethod *method) {
 }
 
 char*
+CFCBindMeth_callback_dec(CFCMethod *method)
+{
+    const char *full_callback_sym = CFCMethod_full_callback_sym(method);
+    size_t size = strlen(full_callback_sym) + 50;
+    char *callback_dec = (char*)MALLOCATE(size);
+    sprintf(callback_dec, "extern cfish_Callback %s;\n", full_callback_sym);
+    return callback_dec;
+}
+
+char*
+CFCBindMeth_callback_obj_def(CFCMethod *method, const char *offset) {
+    const char *macro_sym         = CFCMethod_get_macro_sym(method);
+    unsigned    macro_sym_len     = strlen(macro_sym);
+    const char *full_override_sym = CFCMethod_full_override_sym(method);
+    const char *full_callback_sym = CFCMethod_full_callback_sym(method);
+    char template[] = 
+         "cfish_Callback %s = {\"%s\", %u, (cfish_method_t)%s, %s};\n";
+    size_t size = sizeof(template)
+                  + macro_sym_len
+                  + strlen(full_override_sym)
+                  + strlen(full_callback_sym)
+                  + strlen(offset)
+                  + 30;
+    char *def = (char*)MALLOCATE(size);
+    sprintf(def, template, full_callback_sym, macro_sym, macro_sym_len,
+        full_override_sym, offset);
+    return def;
+}
+
+char*
 CFCBindMeth_abstract_method_def(CFCMethod *method) {
     CFCParamList *param_list = CFCMethod_get_param_list(method);
     const char *params = CFCParamList_to_c(param_list);

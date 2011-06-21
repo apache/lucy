@@ -84,22 +84,9 @@ sub _final_method_def {
 END_STUFF
 }
 
-sub callback_dec {
-    my ( undef, $method ) = @_;
-    my $callback_sym = $method->full_callback_sym;
-    return qq|extern cfish_Callback $callback_sym;\n|;
-}
-
 sub callback_obj_def {
     my ( undef, %args ) = @_;
-    my $method       = $args{method};
-    my $offset       = $args{offset};
-    my $macro_sym    = $method->get_macro_sym;
-    my $len          = length($macro_sym);
-    my $func_sym     = $method->full_override_sym;
-    my $callback_sym = $method->full_callback_sym;
-    return qq|cfish_Callback $callback_sym = |
-        . qq|{"$macro_sym", $len, (cfish_method_t)$func_sym, $offset};\n|;
+    return _callback_obj_def( @args{qw( method offset )} );
 }
 
 sub callback_def {
