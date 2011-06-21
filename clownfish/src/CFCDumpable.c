@@ -86,8 +86,7 @@ CFCDumpable_add_dumpables(CFCDumpable *self, CFCClass *klass) {
     (void)self;
 
     if (!CFCClass_has_attribute(klass, "dumpable")) {
-        croak("Class %s isn't dumpable",
-              CFCSymbol_get_class_name((CFCSymbol*)klass));
+        croak("Class %s isn't dumpable", CFCClass_get_class_name(klass));
     }
 
     // Inherit Dump/Load from parent if no novel member vars.
@@ -110,9 +109,9 @@ CFCDumpable_add_dumpables(CFCDumpable *self, CFCClass *klass) {
 static CFCMethod*
 S_make_method_obj(CFCClass *klass, const char *method_name) {
     const char *klass_struct_sym = CFCClass_get_struct_sym(klass);
-    const char *klass_name   = CFCSymbol_get_class_name((CFCSymbol*)klass);
-    const char *klass_cnick  = CFCSymbol_get_class_cnick((CFCSymbol*)klass);
-    CFCParcel  *klass_parcel = CFCSymbol_get_parcel((CFCSymbol*)klass);
+    const char *klass_name   = CFCClass_get_class_name(klass);
+    const char *klass_cnick  = CFCClass_get_cnick(klass);
+    CFCParcel  *klass_parcel = CFCClass_get_parcel(klass);
     CFCParcel  *cf_parcel    = CFCParcel_clownfish_parcel();
 
     CFCType *return_type
@@ -299,7 +298,7 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
                       size_t buf_size) {
     CFCUTIL_NULL_CHECK(member);
     CFCType *type = CFCVariable_get_type(member);
-    const char *name = CFCSymbol_micro_sym((CFCSymbol*)member);
+    const char *name = CFCVariable_micro_sym(member);
     unsigned name_len = (unsigned)strlen(name);
     const char *specifier = CFCType_get_specifier(type);
 
@@ -352,7 +351,7 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
     CFCUTIL_NULL_CHECK(member);
     CFCType *type = CFCVariable_get_type(member);
     const char *type_str = CFCType_to_c(type);
-    const char *name = CFCSymbol_micro_sym((CFCSymbol*)member);
+    const char *name = CFCVariable_micro_sym(member);
     unsigned name_len = (unsigned)strlen(name);
     char extraction[200];
     const char *specifier = CFCType_get_specifier(type);

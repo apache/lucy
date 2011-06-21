@@ -86,7 +86,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
         sprintf(self->local_dec, "%s;", self->local_c);
     }
     {
-        const char *full_sym = CFCSymbol_full_sym((CFCSymbol*)self);
+        const char *full_sym = CFCVariable_full_sym(self);
         size_t size = strlen(type_str) + sizeof(" ") + strlen(full_sym) +
                       strlen(postfix) + 1;
         self->global_c = (char*)MALLOCATE(size);
@@ -129,5 +129,15 @@ CFCVariable_global_c(CFCVariable *self) {
 const char*
 CFCVariable_local_declaration(CFCVariable *self) {
     return self->local_dec;
+}
+
+const char*
+CFCVariable_micro_sym(CFCVariable *self) {
+    return CFCSymbol_micro_sym((CFCSymbol*)self);
+}
+
+const char*
+CFCVariable_full_sym(CFCVariable *self) {
+    return CFCSymbol_full_sym((CFCSymbol*)self);
 }
 

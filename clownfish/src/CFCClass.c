@@ -157,7 +157,7 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->struct_sym = last_colon
                        ? CFCUtil_strdup(last_colon + 1)
                        : CFCUtil_strdup(class_name);
-    const char *prefix = CFCSymbol_get_prefix((CFCSymbol*)self);
+    const char *prefix = CFCClass_get_prefix(self);
     size_t prefix_len = strlen(prefix);
     size_t struct_sym_len = strlen(self->struct_sym);
     self->short_vtable_var = (char*)MALLOCATE(struct_sym_len + 1);
@@ -261,14 +261,14 @@ CFCClass_register(CFCClass *self) {
         }
         registry_cap = new_cap;
     }
-    CFCParcel *parcel = CFCSymbol_get_parcel((CFCSymbol*)self);
-    const char *class_name = CFCSymbol_get_class_name((CFCSymbol*)self);
+    CFCParcel *parcel = CFCClass_get_parcel(self);
+    const char *class_name = CFCClass_get_class_name(self);
     CFCClass *existing = CFCClass_fetch_singleton(parcel, class_name);
     const char *key = self->full_struct_sym;
     if (existing) {
         croak("New class %s conflicts with existing class %s",
-              CFCSymbol_get_class_name((CFCSymbol*)self),
-              CFCSymbol_get_class_name((CFCSymbol*)existing));
+              CFCClass_get_class_name(self),
+              CFCClass_get_class_name(existing));
     }
     registry[registry_size].key   = CFCUtil_strdup(key);
     registry[registry_size].klass = (CFCClass*)CFCBase_incref((CFCBase*)self);
@@ -427,8 +427,7 @@ S_find_func(CFCFunction **funcs, const char *sym) {
     }
     for (i = 0; funcs[i] != NULL; i++) {
         CFCFunction *func = funcs[i];
-        const char *func_micro_sym = CFCSymbol_micro_sym((CFCSymbol*)func);
-        if (strcmp(lcsym, func_micro_sym) == 0) {
+        if (strcmp(lcsym, CFCFunction_micro_sym(func)) == 0) {
             return func;
         }
     }
@@ -450,8 +449,7 @@ CFCClass_novel_method(CFCClass *self, const char *sym) {
     CFCMethod *method = CFCClass_method(self, sym);
     if (method) {
         const char *cnick = CFCClass_get_cnick(self);
-        const char *meth_cnick
-            = CFCSymbol_get_class_cnick((CFCSymbol*)method);
+        const char *meth_cnick = CFCMethod_get_class_cnick(method);
         if (strcmp(cnick, meth_cnick) == 0) {
             return method;
         }
@@ -500,8 +498,8 @@ S_bequeath_methods(CFCClass *self) {
         size_t i;
         for (i = 0; i < self->num_methods; i++) {
             CFCMethod *method = self->methods[i];
-            const char *micro_sym = CFCSymbol_micro_sym((CFCSymbol*)method);
-            CFCMethod *child_method = CFCClass_method(child, micro_sym);
+            const char *macro_sym = CFCMethod_get_macro_sym(method);
+            CFCMethod *child_method = CFCClass_method(child, macro_sym);
             if (child_method) {
                 CFCMethod_override(child_method, method);
                 methods[num_methods++] = child_method;
@@ -623,7 +621,7 @@ CFCClass_tree_to_ladder(CFCClass *self) {
 
 static CFCSymbol**
 S_novel_syms(CFCClass *self, CFCSymbol **syms) {
-    const char *cnick = CFCSymbol_get_class_cnick((CFCSymbol*)self);
+    const char *cnick = CFCClass_get_cnick(self);
     size_t count = 0;
     while (syms[count] != NULL) { count++; }
     size_t amount = (count + 1) * sizeof(CFCSymbol*);
@@ -632,7 +630,7 @@ S_novel_syms(CFCClass *self, CFCSymbol **syms) {
     size_t i;
     for (i = 0; i < count; i++) {
         CFCSymbol *sym = syms[i];
-        const char *sym_cnick = CFCSymbol_get_class_cnick((CFCSymbol*)sym);
+        const char *sym_cnick = CFCSymbol_get_class_cnick(sym);
         if (strcmp(sym_cnick, cnick) == 0) {
             novel[num_novel++] = sym;
         }
@@ -757,5 +755,20 @@ CFCClass_include_h(CFCClass *self) {
 struct CFCDocuComment*
 CFCClass_get_docucomment(CFCClass *self) {
     return self->docucomment;
+}
+
+const char*
+CFCClass_get_prefix(CFCClass *self) {
+    return CFCSymbol_get_prefix((CFCSymbol*)self);
+}
+
+const char*
+CFCClass_get_class_name(CFCClass *self) {
+    return CFCSymbol_get_class_name((CFCSymbol*)self);
+}
+
+CFCParcel*
+CFCClass_get_parcel(CFCClass *self) {
+    return CFCSymbol_get_parcel((CFCSymbol*)self);
 }
 

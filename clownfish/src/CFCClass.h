@@ -160,6 +160,15 @@ CFCClass_include_h(CFCClass *self);
 struct CFCDocuComment*
 CFCClass_get_docucomment(CFCClass *self);
 
+const char*
+CFCClass_get_prefix(CFCClass *self);
+
+const char*
+CFCClass_get_class_name(CFCClass *self);
+
+struct CFCParcel*
+CFCClass_get_parcel(CFCClass *self);
+
 #ifdef __cplusplus
 }
 #endif

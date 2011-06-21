@@ -78,6 +78,9 @@ CFCFunction_full_func_sym(CFCFunction *self);
 const char*
 CFCFunction_short_func_sym(CFCFunction *self);
 
+const char*
+CFCFunction_micro_sym(CFCFunction *self);
+
 #ifdef __cplusplus
 }
 #endif

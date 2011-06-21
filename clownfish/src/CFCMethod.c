@@ -111,7 +111,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     if (!args[0]) { croak("Missing 'self' argument"); }
     CFCType *type = CFCVariable_get_type(args[0]);
     const char *specifier = CFCType_get_specifier(type);
-    const char *prefix    = CFCSymbol_get_prefix((CFCSymbol*)self);
+    const char *prefix    = CFCMethod_get_prefix(self);
     const char *last_colon = strrchr(class_name, ':');
     const char *struct_sym = last_colon ? last_colon + 1 : class_name;
     char *wanted = (char*)MALLOCATE(strlen(prefix) + strlen(struct_sym) + 1);
@@ -164,8 +164,8 @@ int
 CFCMethod_compatible(CFCMethod *self, CFCMethod *other) {
     if (!other) { return false; }
     if (strcmp(self->macro_sym, other->macro_sym)) { return false; }
-    int my_public = CFCSymbol_public((CFCSymbol*)self);
-    int other_public = CFCSymbol_public((CFCSymbol*)self);
+    int my_public = CFCMethod_public(self);
+    int other_public = CFCMethod_public(self);
     if (!!my_public != !!other_public) { return false; }
 
     // Check arguments and initial values.
@@ -211,8 +211,8 @@ void
 CFCMethod_override(CFCMethod *self, CFCMethod *orig) {
     // Check that the override attempt is legal.
     if (CFCMethod_final(orig)) {
-        const char *orig_class = CFCSymbol_get_class_name((CFCSymbol*)orig);
-        const char *my_class   = CFCSymbol_get_class_name((CFCSymbol*)self);
+        const char *orig_class = CFCMethod_get_class_name(orig);
+        const char *my_class   = CFCMethod_get_class_name(self);
         croak("Attempt to override final method '%s' from '%s' by '%s'",
               orig->macro_sym, orig_class, my_class);
     }
@@ -228,11 +228,10 @@ CFCMethod_override(CFCMethod *self, CFCMethod *orig) {
 
 CFCMethod*
 CFCMethod_finalize(CFCMethod *self) {
-    CFCSymbol  *self_sym    = (CFCSymbol*)self;
-    CFCParcel  *parcel      = CFCSymbol_get_parcel(self_sym);
-    const char *exposure    = CFCSymbol_get_exposure(self_sym);
-    const char *class_name  = CFCSymbol_get_class_name(self_sym);
-    const char *class_cnick = CFCSymbol_get_class_cnick(self_sym);
+    CFCParcel  *parcel      = CFCMethod_get_parcel(self);
+    const char *exposure    = CFCMethod_get_exposure(self);
+    const char *class_name  = CFCMethod_get_class_name(self);
+    const char *class_cnick = CFCMethod_get_class_cnick(self);
     CFCMethod  *finalized
         = CFCMethod_new(parcel, exposure, class_name, class_cnick,
                         self->macro_sym, self->function.return_type,
@@ -260,7 +259,7 @@ size_t
 CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf,
                           size_t buf_size) {
     CFCUTIL_NULL_CHECK(invoker);
-    const char *Prefix = CFCSymbol_get_Prefix((CFCSymbol*)self);
+    const char *Prefix = CFCMethod_get_Prefix(self);
     size_t needed = strlen(Prefix)
                     + strlen(invoker)
                     + 1
@@ -296,7 +295,7 @@ S_update_typedefs(CFCMethod *self, const char *short_sym) {
     FREEMEM(self->short_typedef);
     FREEMEM(self->full_typedef);
     if (short_sym) {
-        const char *prefix = CFCSymbol_get_prefix((CFCSymbol*)self);
+        const char *prefix = CFCMethod_get_prefix(self);
         size_t amount = strlen(short_sym) + 3;
         self->short_typedef = (char*)MALLOCATE(amount);
         int check = sprintf(self->short_typedef, "%s_t", short_sym);
@@ -351,5 +350,40 @@ CFCType*
 CFCMethod_self_type(CFCMethod *self) {
     CFCVariable **vars = CFCParamList_get_variables(self->function.param_list);
     return CFCVariable_get_type(vars[0]);
+}
+
+CFCParcel*
+CFCMethod_get_parcel(CFCMethod *self) {
+    return CFCSymbol_get_parcel((CFCSymbol*)self);
+}
+
+const char*
+CFCMethod_get_prefix(CFCMethod *self) {
+    return CFCSymbol_get_prefix((CFCSymbol*)self);
+}
+
+const char*
+CFCMethod_get_Prefix(CFCMethod *self) {
+    return CFCSymbol_get_Prefix((CFCSymbol*)self);
+}
+
+const char*
+CFCMethod_get_exposure(CFCMethod *self) {
+    return CFCSymbol_get_exposure((CFCSymbol*)self);
+}
+
+const char*
+CFCMethod_get_class_name(CFCMethod *self) {
+    return CFCSymbol_get_class_name((CFCSymbol*)self);
+}
+
+const char*
+CFCMethod_get_class_cnick(CFCMethod *self) {
+    return CFCSymbol_get_class_cnick((CFCSymbol*)self);
+}
+
+int
+CFCMethod_public(CFCMethod *self) {
+    return CFCSymbol_public((CFCSymbol*)self);
 }
 

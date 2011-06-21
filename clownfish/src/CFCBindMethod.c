@@ -58,7 +58,7 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
     char *unused = CFCUtil_strdup("");
     CFCVariable **param_vars = CFCParamList_get_variables(param_list);
     for (int i = 1; param_vars[i] != NULL; i++) {
-        const char *var_name = CFCSymbol_micro_sym((CFCSymbol*)param_vars[i]);
+        const char *var_name = CFCVariable_micro_sym(param_vars[i]);
         size_t size = strlen(unused) + strlen(var_name) + 80;
         unused = (char*)REALLOCATE(unused, size);
         strcat(unused, "\n    CHY_UNUSED_VAR(");

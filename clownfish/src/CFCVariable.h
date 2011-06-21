@@ -54,6 +54,12 @@ CFCVariable_global_c(CFCVariable *self);
 const char*
 CFCVariable_local_declaration(CFCVariable *self);
 
+const char*
+CFCVariable_micro_sym(CFCVariable *self);
+
+const char*
+CFCVariable_full_sym(CFCVariable *self);
+
 #ifdef __cplusplus
 }
 #endif

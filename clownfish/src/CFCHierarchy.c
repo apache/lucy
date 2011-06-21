@@ -300,7 +300,7 @@ S_parse_cf_files(CFCHierarchy *self) {
                     CFCUtil_die("Parent class '%s' not defined", parent_name);
                 }
                 const char *maybe_parent_name
-                    = CFCSymbol_get_class_name((CFCSymbol*)maybe_parent);
+                    = CFCClass_get_class_name(maybe_parent);
                 if (strcmp(parent_name, maybe_parent_name) == 0) {
                     CFCClass_add_child(maybe_parent, klass);
                     break;
@@ -365,8 +365,8 @@ S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
         CFCClass *kid = children[i];
         if (CFCClass_final(klass)) {
             CFCUtil_die("Attempt to inherit from final class '%s' by '%s'",
-                        CFCSymbol_get_class_name((CFCSymbol*)klass),
-                        CFCSymbol_get_class_name((CFCSymbol*)kid));
+                        CFCClass_get_class_name(klass),
+                        CFCClass_get_class_name(kid));
         }
         if (S_do_propagate_modified(self, kid, modified)) {
             somebody_is_modified = 1;
@@ -448,12 +448,11 @@ S_add_file(CFCHierarchy *self, CFCFile *file) {
         CFCClass **existing_classes = CFCFile_classes(existing);
         size_t j;
         for (j = 0; classes[j] != NULL; j++) {
-            const char *new_class_name
-                = CFCSymbol_get_class_name((CFCSymbol*)classes[j]);
+            const char *new_class_name = CFCClass_get_class_name(classes[j]);
             size_t k;
             for (k = 0; existing_classes[k] != NULL; k++) {
                 const char *existing_class_name
-                    = CFCSymbol_get_class_name((CFCSymbol*)existing_classes[k]);
+                    = CFCClass_get_class_name(existing_classes[k]);
                 if (strcmp(new_class_name, existing_class_name) == 0) {
                     CFCUtil_die("Class '%s' already registered",
                                 new_class_name);

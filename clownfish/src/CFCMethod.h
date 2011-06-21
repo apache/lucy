@@ -103,6 +103,27 @@ CFCMethod_novel(CFCMethod *self);
 struct CFCType*
 CFCMethod_self_type(CFCMethod *self);
 
+struct CFCParcel*
+CFCMethod_get_parcel(CFCMethod *self);
+
+const char*
+CFCMethod_get_prefix(CFCMethod *self);
+
+const char*
+CFCMethod_get_Prefix(CFCMethod *self);
+
+const char*
+CFCMethod_get_exposure(CFCMethod *self);
+
+const char*
+CFCMethod_get_class_name(CFCMethod *self);
+
+const char*
+CFCMethod_get_class_cnick(CFCMethod *self);
+
+int
+CFCMethod_public(CFCMethod *self);
+
 #ifdef __cplusplus
 }
 #endif

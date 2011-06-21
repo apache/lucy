@@ -124,3 +124,8 @@ CFCFunction_short_func_sym(CFCFunction *self) {
     return CFCSymbol_short_sym((CFCSymbol*)self);
 }
 
+const char*
+CFCFunction_micro_sym(CFCFunction *self) {
+    return CFCSymbol_micro_sym((CFCSymbol*)self);
+}
+
