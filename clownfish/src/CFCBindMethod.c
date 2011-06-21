@@ -27,10 +27,8 @@
 
 char*
 CFCBindMeth_typdef_dec(struct CFCMethod *method) {
-    const char *params 
-        = CFCParamList_to_c(CFCFunction_get_param_list((CFCFunction*)method));
-    const char *ret_type
-        = CFCType_to_c(CFCFunction_get_return_type((CFCFunction*)method));
+    const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
+    const char *ret_type = CFCType_to_c(CFCMethod_get_return_type(method));
     const char *full_typedef = CFCMethod_full_typedef(method);
     size_t size = strlen(params)
                   + strlen(ret_type)
@@ -44,13 +42,13 @@ CFCBindMeth_typdef_dec(struct CFCMethod *method) {
 
 char*
 CFCBindMeth_abstract_method_def(CFCMethod *method) {
-    CFCParamList *param_list = CFCFunction_get_param_list((CFCFunction*)method);
+    CFCParamList *param_list = CFCMethod_get_param_list(method);
     const char *params = CFCParamList_to_c(param_list);
     const char *full_func_sym 
         = CFCFunction_full_func_sym((CFCFunction*)method);
     const char *vtable_var
         = CFCType_get_vtable_var(CFCMethod_self_type(method));
-    CFCType    *return_type  = CFCFunction_get_return_type((CFCFunction*)method);
+    CFCType    *return_type  = CFCMethod_get_return_type(method);
     const char *ret_type_str = CFCType_to_c(return_type);
     const char *macro_sym    = CFCMethod_get_macro_sym(method);
     

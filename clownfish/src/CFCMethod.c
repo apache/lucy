@@ -193,8 +193,8 @@ CFCMethod_compatible(CFCMethod *self, CFCMethod *other) {
     }
 
     // Check return types.
-    CFCType *type       = CFCFunction_get_return_type((CFCFunction*)self);
-    CFCType *other_type = CFCFunction_get_return_type((CFCFunction*)other);
+    CFCType *type       = CFCMethod_get_return_type(self);
+    CFCType *other_type = CFCMethod_get_return_type(other);
     if (CFCType_is_object(type)) {
         // Weak validation to allow covariant object return types.
         if (!CFCType_is_object(other_type)) { return false; }
@@ -387,3 +387,12 @@ CFCMethod_public(CFCMethod *self) {
     return CFCSymbol_public((CFCSymbol*)self);
 }
 
+CFCType*
+CFCMethod_get_return_type(CFCMethod *self) {
+    return CFCFunction_get_return_type((CFCFunction*)self);
+}
+
+CFCParamList*
+CFCMethod_get_param_list(CFCMethod *self) {
+    return CFCFunction_get_param_list((CFCFunction*)self);
+}
