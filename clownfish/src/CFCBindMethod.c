@@ -44,8 +44,7 @@ char*
 CFCBindMeth_abstract_method_def(CFCMethod *method) {
     CFCParamList *param_list = CFCMethod_get_param_list(method);
     const char *params = CFCParamList_to_c(param_list);
-    const char *full_func_sym 
-        = CFCFunction_full_func_sym((CFCFunction*)method);
+    const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *vtable_var
         = CFCType_get_vtable_var(CFCMethod_self_type(method));
     CFCType    *return_type  = CFCMethod_get_return_type(method);

@@ -156,7 +156,7 @@ S_add_dump_method(CFCClass *klass) {
     CFCMethod *method = S_make_method_obj(klass, "Dump");
     CFCClass_add_method(klass, method);
     CFCBase_decref((CFCBase*)method);
-    const char *full_func_sym = CFCFunction_full_func_sym((CFCFunction*)method);
+    const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *full_typedef  = CFCMethod_full_typedef(method);
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
@@ -224,7 +224,7 @@ S_add_load_method(CFCClass *klass) {
     CFCMethod *method = S_make_method_obj(klass, "Load");
     CFCClass_add_method(klass, method);
     CFCBase_decref((CFCBase*)method);
-    const char *full_func_sym = CFCFunction_full_func_sym((CFCFunction*)method);
+    const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *full_typedef  = CFCMethod_full_typedef(method);
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);

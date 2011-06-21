@@ -130,7 +130,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     self->is_abstract   = is_abstract;
 
     // Derive more symbols.
-    const char *full_func_sym = CFCFunction_full_func_sym((CFCFunction*)self);
+    const char *full_func_sym = CFCMethod_implementing_func_sym(self);
     size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
     self->full_callback_sym = (char*)MALLOCATE(amount);
     self->full_override_sym = (char*)MALLOCATE(amount);
@@ -217,8 +217,8 @@ CFCMethod_override(CFCMethod *self, CFCMethod *orig) {
               orig->macro_sym, orig_class, my_class);
     }
     if (!CFCMethod_compatible(self, orig)) {
-        const char *func      = CFCFunction_full_func_sym((CFCFunction*)self);
-        const char *orig_func = CFCFunction_full_func_sym((CFCFunction*)orig);
+        const char *func      = CFCMethod_implementing_func_sym(self);
+        const char *orig_func = CFCMethod_implementing_func_sym(orig);
         croak("Non-matching signatures for %s and %s", func, orig_func);
     }
 
@@ -396,3 +396,9 @@ CFCParamList*
 CFCMethod_get_param_list(CFCMethod *self) {
     return CFCFunction_get_param_list((CFCFunction*)self);
 }
+
+const char*
+CFCMethod_implementing_func_sym(CFCMethod *self) {
+    return CFCFunction_full_func_sym((CFCFunction*)self);
+}
+

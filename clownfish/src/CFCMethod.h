@@ -130,6 +130,9 @@ CFCMethod_get_return_type(CFCMethod *self);
 struct CFCParamList*
 CFCMethod_get_param_list(CFCMethod *self);
 
+const char*
+CFCMethod_implementing_func_sym(CFCMethod *self);
+
 #ifdef __cplusplus
 }
 #endif
