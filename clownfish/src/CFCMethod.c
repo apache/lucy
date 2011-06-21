@@ -165,7 +165,7 @@ CFCMethod_compatible(CFCMethod *self, CFCMethod *other) {
     if (!other) { return false; }
     if (strcmp(self->macro_sym, other->macro_sym)) { return false; }
     int my_public = CFCMethod_public(self);
-    int other_public = CFCMethod_public(self);
+    int other_public = CFCMethod_public(other);
     if (!!my_public != !!other_public) { return false; }
 
     // Check arguments and initial values.
