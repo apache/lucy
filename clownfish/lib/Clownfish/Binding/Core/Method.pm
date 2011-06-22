@@ -21,67 +21,8 @@ use Clownfish::Util qw( a_isa_b );
 use Carp;
 
 sub method_def {
-    my ( undef,   %args )  = @_;
-    my ( $method, $class ) = @args{qw( method class )};
-    confess("Not a Method")
-        unless a_isa_b( $method, "Clownfish::Method" );
-    confess("Not a Class")
-        unless a_isa_b( $class, "Clownfish::Class" );
-    if ( $method->final ) {
-        return _final_method_def( $method, $class );
-    }
-    else {
-        return _virtual_method_def( $method, $class );
-    }
-}
-
-sub _virtual_method_def {
-    my ( $method, $class ) = @_;
-    my $cnick           = $class->get_cnick;
-    my $param_list      = $method->get_param_list;
-    my $invoker_struct  = $class->full_struct_sym;
-    my $common_struct   = $method->self_type->get_specifier;
-    my $full_method_sym = $method->full_method_sym($cnick);
-    my $full_offset_sym = $method->full_offset_sym($cnick);
-    my $typedef         = $method->full_typedef;
-    my $arg_names       = $param_list->name_list;
-    $arg_names =~ s/\s*\w+/self/;
-
-    # Prepare the parameter list for the inline function.
-    my $params = $param_list->to_c;
-    $params =~ s/^.*?\*\s*\w+/const $invoker_struct *self/
-        or confess("no match: $params");
-
-    # Prepare a return statement... or not.
-    my $return_type = $method->get_return_type->to_c;
-    my $maybe_return = $method->get_return_type->is_void ? '' : 'return ';
-
-    return <<END_STUFF;
-extern size_t $full_offset_sym;
-static CHY_INLINE $return_type
-$full_method_sym($params) {
-    char *const method_address = *(char**)self + $full_offset_sym;
-    const $typedef method = *(($typedef*)method_address);
-    ${maybe_return}method(($common_struct*)$arg_names);
-}
-END_STUFF
-}
-
-# Create a macro definition that aliases to a function name directly, since
-# this method may not be overridden.
-sub _final_method_def {
-    my ( $method, $class ) = @_;
-    my $cnick           = $class->get_cnick;
-    my $macro_sym       = $method->get_macro_sym;
-    my $self_type       = $method->self_type->to_c;
-    my $full_method_sym = $method->full_method_sym($cnick);
-    my $full_func_sym   = $method->full_func_sym;
-    my $arg_names       = $method->get_param_list->name_list;
-
-    return <<END_STUFF;
-#define $full_method_sym($arg_names) \\
-    $full_func_sym(($self_type)$arg_names)
-END_STUFF
+    my ( undef, %args ) = @_;
+    return _method_def( @args{qw( method class )} );
 }
 
 sub callback_obj_def {

@@ -22,6 +22,10 @@ extern "C" {
 #endif
 
 struct CFCMethod;
+struct CFCClass;
+
+char*
+CFCBindMeth_method_def(struct CFCMethod *method, struct CFCClass *klass);
 
 char*
 CFCBindMeth_typdef_dec(struct CFCMethod *method);

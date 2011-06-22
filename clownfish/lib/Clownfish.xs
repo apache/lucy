@@ -1723,6 +1723,14 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_method_def(meth, klass)
+    CFCMethod *meth;
+    CFCClass  *klass;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_method_def(meth, klass));
+OUTPUT: RETVAL
+
+SV*
 _callback_obj_def(meth, offset)
     CFCMethod *meth;
     const char *offset;
