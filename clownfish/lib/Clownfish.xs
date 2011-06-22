@@ -1715,10 +1715,64 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+callback_def(unused, meth)
+    SV *unused;
+    CFCMethod *meth;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_def(meth));
+    /*
+    char *def = CFCBindMeth_callback_def(meth);
+    RETVAL = newSVpvn(def, strlen(def));
+    FREEMEM(def);
+    */
+OUTPUT: RETVAL
+
+SV*
 _callback_obj_def(meth, offset)
     CFCMethod *meth;
     const char *offset;
 CODE:
     RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_obj_def(meth, offset));
+OUTPUT: RETVAL
+
+SV*
+_callback_params(meth)
+    CFCMethod *meth;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_params(meth));
+OUTPUT: RETVAL
+
+SV*
+_invalid_callback_def(meth)
+    CFCMethod *meth;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_invalid_callback_def(meth));
+OUTPUT: RETVAL
+
+SV*
+_void_callback_def(meth, callback_params)
+    CFCMethod *meth;
+    const char *callback_params;
+CODE:
+    char *def = CFCBindMeth_void_callback_def(meth, callback_params);
+    RETVAL = S_sv_eat_c_string(def);
+OUTPUT: RETVAL
+
+SV*
+_primitive_callback_def(meth, callback_params)
+    CFCMethod *meth;
+    const char *callback_params;
+CODE:
+    char *def = CFCBindMeth_primitive_callback_def(meth, callback_params);
+    RETVAL = S_sv_eat_c_string(def);
+OUTPUT: RETVAL
+
+SV*
+_obj_callback_def(meth, callback_params)
+    CFCMethod *meth;
+    const char *callback_params;
+CODE:
+    char *def = CFCBindMeth_obj_callback_def(meth, callback_params);
+    RETVAL = S_sv_eat_c_string(def);
 OUTPUT: RETVAL
 
