@@ -38,24 +38,6 @@ CFCBindMeth_abstract_method_def(struct CFCMethod *method);
 char*
 CFCBindMeth_callback_def(struct CFCMethod *method);
 
-char*
-CFCBindMeth_callback_params(struct CFCMethod *method);
-
-char*
-CFCBindMeth_invalid_callback_def(struct CFCMethod *method);
-
-char*
-CFCBindMeth_void_callback_def(struct CFCMethod *method,
-                              const char *callback_params);
-
-char*
-CFCBindMeth_primitive_callback_def(struct CFCMethod *method,
-                                   const char *callback_params);
-
-char*
-CFCBindMeth_obj_callback_def(struct CFCMethod *method,
-                             const char *callback_params);
-
 #ifdef __cplusplus
 }
 #endif

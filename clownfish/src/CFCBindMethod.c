@@ -39,6 +39,36 @@ S_build_unused_vars(CFCVariable **vars);
 static char*
 S_maybe_unreachable(CFCType *return_type);
 
+/* Return a string which maps arguments to various arg wrappers conforming
+ * to Host's callback interface.  For instance, (int32_t foo, Obj *bar)
+ * produces the following:
+ *
+ *   CFISH_ARG_I32("foo", foo),
+ *   CFISH_ARG_OBJ("bar", bar)
+ */
+static char*
+S_callback_params(CFCMethod *method);
+
+/* Return a function which throws a runtime error indicating which variable
+ * couldn't be mapped.  TODO: it would be better to resolve all these cases at
+ * compile-time.
+ */
+static char*
+S_invalid_callback_def(CFCMethod *method);
+
+// Create a callback for a method which operates in a void context.
+static char*
+S_void_callback_def(CFCMethod *method, const char *callback_params);
+
+// Create a callback which returns a primitive type.
+static char*
+S_primitive_callback_def(CFCMethod *method, const char *callback_params);
+
+/* Create a callback which returns an object type -- either a generic object or
+ * a string. */
+static char*
+S_obj_callback_def(CFCMethod *method, const char *callback_params);
+
 char*
 CFCBindMeth_typdef_dec(struct CFCMethod *method) {
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
@@ -160,23 +190,23 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
 char*
 CFCBindMeth_callback_def(CFCMethod *method) {
     CFCType *return_type = CFCMethod_get_return_type(method);
-    char *params = CFCBindMeth_callback_params(method);
+    char *params = S_callback_params(method);
     char *callback_def = NULL;
 
     if (!params) {
         // Can't map vars, because there's at least one type in the argument
         // list we don't yet support.  Return a callback wrapper that throws
         // an error error.
-        callback_def = CFCBindMeth_invalid_callback_def(method);
+        callback_def = S_invalid_callback_def(method);
     }
     else if (CFCType_is_void(return_type)) {
-        callback_def = CFCBindMeth_void_callback_def(method, params);
+        callback_def = S_void_callback_def(method, params);
     }
     else if (CFCType_is_object(return_type)) {
-        callback_def = CFCBindMeth_obj_callback_def(method, params);
+        callback_def = S_obj_callback_def(method, params);
     }
     else {
-        callback_def = CFCBindMeth_primitive_callback_def(method, params);
+        callback_def = S_primitive_callback_def(method, params);
     }
 
     FREEMEM(params);
@@ -190,8 +220,8 @@ CFCBindMeth_callback_def(CFCMethod *method) {
  *   CFISH_ARG_I32("foo", foo),
  *   CFISH_ARG_OBJ("bar", bar)
  */
-char*
-CFCBindMeth_callback_params(CFCMethod *method) {
+static char*
+S_callback_params(CFCMethod *method) {
     const char *micro_sym = CFCSymbol_micro_sym((CFCSymbol*)method);
     CFCParamList *param_list = CFCMethod_get_param_list(method);
     unsigned num_params = CFCParamList_num_vars(param_list) - 1;
@@ -256,12 +286,8 @@ CFCBindMeth_callback_params(CFCMethod *method) {
     return params;
 }
 
-/* Return a function which throws a runtime error indicating which variable
- * couldn't be mapped.  TODO: it would be better to resolve all these cases at
- * compile-time.
- */
-char*
-CFCBindMeth_invalid_callback_def(CFCMethod *method) {
+static char*
+S_invalid_callback_def(CFCMethod *method) {
     const char *class_cnick = CFCMethod_get_class_cnick(method);
     size_t meth_sym_size = CFCMethod_full_method_sym(method, class_cnick, NULL, 0);
     char *full_method_sym = (char*)MALLOCATE(meth_sym_size);
@@ -298,10 +324,8 @@ CFCBindMeth_invalid_callback_def(CFCMethod *method) {
     return callback_def;
 }
 
-// Create a callback for a method which operates in a void context.
-char*
-CFCBindMeth_void_callback_def(CFCMethod *method, 
-                              const char *callback_params) {
+static char*
+S_void_callback_def(CFCMethod *method, const char *callback_params) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     const char pattern[] = 
@@ -319,10 +343,8 @@ CFCBindMeth_void_callback_def(CFCMethod *method,
     return callback_def;
 }
 
-// Create a callback which returns a primitive type.
-char*
-CFCBindMeth_primitive_callback_def(CFCMethod *method,
-                                   const char *callback_params) {
+static char*
+S_primitive_callback_def(CFCMethod *method, const char *callback_params) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     CFCType *return_type = CFCMethod_get_return_type(method);
@@ -361,10 +383,8 @@ CFCBindMeth_primitive_callback_def(CFCMethod *method,
     return callback_def;
 }
 
-// Create a callback which returns an object type -- either a generic object or
-// a string.
-char*
-CFCBindMeth_obj_callback_def(CFCMethod *method, const char *callback_params) {
+static char*
+S_obj_callback_def(CFCMethod *method, const char *callback_params) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     CFCType *return_type = CFCMethod_get_return_type(method);
