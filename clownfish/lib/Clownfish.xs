@@ -1720,11 +1720,6 @@ callback_def(unused, meth)
     CFCMethod *meth;
 CODE:
     RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_def(meth));
-    /*
-    char *def = CFCBindMeth_callback_def(meth);
-    RETVAL = newSVpvn(def, strlen(def));
-    FREEMEM(def);
-    */
 OUTPUT: RETVAL
 
 SV*

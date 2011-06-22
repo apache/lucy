@@ -130,8 +130,6 @@ S_build_unused_vars(CFCVariable **vars) {
     return unused;
 }
 
-/* Create an unreachable return statement if necessary, in order to thwart
- * compiler warnings. */
 static char*
 S_maybe_unreachable(CFCType *return_type) {
     char *return_statement;
@@ -213,13 +211,6 @@ CFCBindMeth_callback_def(CFCMethod *method) {
     return callback_def;
 }
 
-/* Return a string which maps arguments to various arg wrappers conforming
- * to Host's callback interface.  For instance, (int32_t foo, Obj *bar)
- * produces the following:
- *
- *   CFISH_ARG_I32("foo", foo),
- *   CFISH_ARG_OBJ("bar", bar)
- */
 static char*
 S_callback_params(CFCMethod *method) {
     const char *micro_sym = CFCSymbol_micro_sym((CFCSymbol*)method);
