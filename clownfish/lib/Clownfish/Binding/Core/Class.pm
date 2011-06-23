@@ -37,16 +37,18 @@ sub new {
     return $self;
 }
 
-sub _full_callbacks_var { shift->{client}->full_vtable_var . '_CALLBACKS' }
-sub _full_name_var      { shift->{client}->full_vtable_var . '_CLASS_NAME' }
-sub _short_names_macro  { shift->{client}->get_PREFIX . 'USE_SHORT_NAMES' }
+sub _get_client { shift->{client} }
+
+sub _full_callbacks_var { shift->_get_client->full_vtable_var . '_CALLBACKS' }
+sub _full_name_var      { shift->_get_client->full_vtable_var . '_CLASS_NAME' }
+sub _short_names_macro  { shift->_get_client->get_PREFIX . 'USE_SHORT_NAMES' }
 
 # C code defining the ZombieCharBuf which contains the class name for this
 # class.
 sub _name_var_definition {
     my $self           = shift;
     my $full_var_name  = _full_name_var($self);
-    my $class_name     = $self->{client}->get_class_name;
+    my $class_name     = $self->_get_client->get_class_name;
     my $class_name_len = length($class_name);
     return <<END_STUFF;
 cfish_ZombieCharBuf $full_var_name = {
@@ -63,7 +65,7 @@ END_STUFF
 # Return C code defining the class's VTable.
 sub _vtable_definition {
     my $self       = shift;
-    my $client     = $self->{client};
+    my $client     = $self->_get_client;
     my $parent     = $client->get_parent;
     my $methods    = $client->methods;
     my $vt_type    = $client->full_vtable_type;
@@ -110,9 +112,9 @@ END_VTABLE
 # Create the definition for the instantiable object struct.
 sub _struct_definition {
     my $self                = shift;
-    my $struct_sym          = $self->{client}->full_struct_sym;
+    my $struct_sym          = $self->_get_client->full_struct_sym;
     my $member_declarations = join( "\n    ",
-        map { $_->local_declaration } @{ $self->{client}->member_vars } );
+        map { $_->local_declaration } @{ $self->_get_client->member_vars } );
     return <<END_STRUCT
 struct $struct_sym {
     $member_declarations
@@ -122,7 +124,7 @@ END_STRUCT
 
 sub to_c_header {
     my $self          = shift;
-    my $client        = $self->{client};
+    my $client        = $self->_get_client;
     my $cnick         = $client->get_cnick;
     my $functions     = $client->functions;
     my $methods       = $client->methods;
@@ -168,12 +170,12 @@ sub to_c_header {
     for my $method (@$methods) {
         $method_defs .= Clownfish::Binding::Core::Method->method_def(
             method => $method,
-            class  => $self->{client},
+            class  => $self->_get_client,
         ) . "\n";
     }
 
     # Declare the virtual table singleton object.
-    my $vt_type = $self->{client}->full_vtable_type;
+    my $vt_type = $self->_get_client->full_vtable_type;
     my $vt      = "extern struct $vt_type ${vtable_var}_vt;";
     my $vtable_object
         = "#define $vtable_var ((cfish_VTable*)&${vtable_var}_vt)";
@@ -285,7 +287,7 @@ END_STUFF
 
 sub to_c {
     my $self   = shift;
-    my $client = $self->{client};
+    my $client = $self->_get_client;
 
     return $client->get_autocode if $client->inert;
 
