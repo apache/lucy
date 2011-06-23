@@ -49,53 +49,6 @@ cfish_ZombieCharBuf $full_var_name = {
 END_STUFF
 }
 
-# Return C code defining the class's VTable.
-sub _vtable_definition {
-    my $self       = shift;
-    my $client     = $self->_get_client;
-    my $parent     = $client->get_parent;
-    my $methods    = $client->methods;
-    my $vt_type    = $client->full_vtable_type;
-    my $cnick      = $client->get_cnick;
-    my $vtable_var = $client->full_vtable_var;
-    my $struct_sym = $client->full_struct_sym;
-    my $vt         = $vtable_var . "_vt";
-    my $name_var   = _full_name_var($self);
-    my $cb_var     = _full_callbacks_var($self);
-
-    # Create a pointer to the parent class's vtable.
-    my $parent_ref
-        = defined $parent
-        ? $parent->full_vtable_var
-        : "NULL";    # No parent, e.g. Obj or inert classes.
-
-    # Spec functions which implement the methods, casting to quiet compiler.
-    my @implementing_funcs
-        = map { "(cfish_method_t)" . $_->full_func_sym } @$methods;
-    my $method_string = join( ",\n        ", @implementing_funcs );
-    my $num_methods = scalar @implementing_funcs;
-
-    return <<END_VTABLE
-
-$vt_type $vt = {
-    CFISH_VTABLE, /* vtable vtable */
-    {1}, /* ref.count */
-    $parent_ref, /* parent */
-    (cfish_CharBuf*)&$name_var,
-    0, /* flags */
-    NULL, /* "void *x" member reserved for future use */
-    sizeof($struct_sym), /* obj_alloc_size */
-    offsetof(cfish_VTable, methods)
-        + $num_methods * sizeof(cfish_method_t), /* vt_alloc_size */
-    &$cb_var,  /* callbacks */
-    {
-        $method_string
-    }
-};
-
-END_VTABLE
-}
-
 sub to_c_header {
     my $self          = shift;
     my $client        = $self->_get_client;

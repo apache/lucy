@@ -98,6 +98,73 @@ CFCBindClass_struct_definition(CFCBindClass *self) {
     return struct_def;
 }
 
+// Return C code defining the class's VTable.
+char*
+CFCBindClass_vtable_definition(CFCBindClass *self) {
+    CFCClass    *client     = self->client;
+    CFCClass    *parent     = CFCClass_get_parent(client);
+    CFCMethod  **methods    = CFCClass_methods(client);
+    const char  *vt_type    = CFCClass_full_vtable_type(client);
+    const char  *vt_var     = CFCClass_full_vtable_var(client);
+    const char  *struct_sym = CFCClass_full_struct_sym(client);
+    
+    // Create a pointer to the parent class's vtable.
+    const char *parent_ref = parent
+                             ? CFCClass_full_vtable_var(parent)
+                             : "NULL"; // No parent, e.g. Obj or inert classes.
+
+    // Spec functions which implement the methods, casting to quiet compiler.
+    char *method_str = CFCUtil_strdup("");
+    int num_methods = 0;
+    for (; methods[num_methods] != NULL; num_methods++) {
+        CFCMethod *method = methods[num_methods];
+        const char *implementing_sym = CFCMethod_implementing_func_sym(method);
+        size_t size = strlen(method_str) + strlen(implementing_sym) + 50;
+        method_str = (char*)REALLOCATE(method_str, size);
+        if (strlen(method_str)) {
+            strcat(method_str, ",\n");
+        }
+        strcat(method_str, "        (cfish_method_t)");
+        strcat(method_str, implementing_sym);
+    }
+
+    char pattern[] =
+        "\n"
+        "%s %s_vt = {\n"
+        "    CFISH_VTABLE, /* vtable vtable */\n"
+        "    {1}, /* ref.count */\n"
+        "    %s, /* parent */\n"
+        "    (cfish_CharBuf*)&%s,\n"
+        "    0, /* flags */\n"
+        "    NULL, /* \"void *x\" member reserved for future use */\n"
+        "    sizeof(%s), /* obj_alloc_size */\n"
+        "    offsetof(cfish_VTable, methods)\n"
+        "        + %d * sizeof(cfish_method_t), /* vt_alloc_size */\n"
+        "    &%s,  /* callbacks */\n"
+        "    {\n"
+        "%s\n"
+        "    }\n"
+        "};\n\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(vt_type)
+                  + strlen(vt_var)
+                  + strlen(parent_ref)
+                  + strlen(self->full_name_var)
+                  + strlen(struct_sym)
+                  + 10 /* num_methods */
+                  + strlen(self->full_callbacks_var)
+                  + strlen(method_str)
+                  + 40;
+    char *vtable_def = (char*)MALLOCATE(size);
+    sprintf(vtable_def, pattern, vt_type, vt_var, parent_ref,
+            self->full_name_var, struct_sym, num_methods,
+            self->full_callbacks_var, method_str);
+
+    FREEMEM(method_str);
+    return vtable_def;
+}
+
 CFCClass*
 CFCBindClass_get_client(CFCBindClass *self) {
     return self->client;

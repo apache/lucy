@@ -1806,3 +1806,10 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindClass_struct_definition(self));
 OUTPUT: RETVAL
 
+SV*
+_vtable_definition(self)
+    CFCBindClass *self;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindClass_vtable_definition(self));
+OUTPUT: RETVAL
+
