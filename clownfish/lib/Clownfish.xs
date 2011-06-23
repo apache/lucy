@@ -1738,3 +1738,11 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_obj_def(meth, offset));
 OUTPUT: RETVAL
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Aliases
+
+SV*
+c_aliases(...)
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindAliases_c_aliases());
+OUTPUT: RETVAL
+
