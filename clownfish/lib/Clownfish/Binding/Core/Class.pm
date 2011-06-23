@@ -25,19 +25,10 @@ use File::Spec::Functions qw( catfile );
 our %new_PARAMS = ( client => undef, );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless { %new_PARAMS, @_, }, ref($either) || $either;
-
-    # Validate.
-    my $client = $self->{client};
-    confess("Not a Clownfish::Class")
-        unless a_isa_b( $client, "Clownfish::Class" );
-
-    return $self;
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    return _new( $args{client} );
 }
-
-sub _get_client { shift->{client} }
 
 sub _full_callbacks_var { shift->_get_client->full_vtable_var . '_CALLBACKS' }
 sub _full_name_var      { shift->_get_client->full_vtable_var . '_CLASS_NAME' }

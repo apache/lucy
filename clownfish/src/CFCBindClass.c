@@ -14,24 +14,49 @@
  * limitations under the License.
  */
 
+#define CFC_NEED_BASE_STRUCT_DEF
+
+#include <stdio.h>
+#include <string.h>
+#include "CFCBindClass.h"
 #include "CFCBase.h"
-#include "CFCCBlock.h"
 #include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
 #include "CFCFunction.h"
-#include "CFCHierarchy.h"
 #include "CFCMethod.h"
 #include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
 #include "CFCType.h"
-#include "CFCUtil.h"
 #include "CFCVariable.h"
+#include "CFCUtil.h"
 
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+struct CFCBindClass {
+    CFCBase base;
+    CFCClass *client;
+};
+
+CFCBindClass*
+CFCBindClass_new(CFCClass *client) {
+    CFCBindClass *self 
+        = (CFCBindClass*)CFCBase_allocate(sizeof(CFCBindClass),
+                                          "Clownfish::Binding::Core::Class");
+    return CFCBindClass_init(self, client);
+}
+
+CFCBindClass*
+CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
+    CFCUTIL_NULL_CHECK(client);
+    self->client = (CFCClass*)CFCBase_incref((CFCBase*)client);
+    return self;
+}
+
+void
+CFCBindClass_destroy(CFCBindClass *self)
+{
+    CFCBase_decref((CFCBase*)self->client);
+    CFCBase_destroy((CFCBase*)self);
+}
+
+CFCClass*
+CFCBindClass_get_client(CFCBindClass *self) {
+    return self->client;
+}
 

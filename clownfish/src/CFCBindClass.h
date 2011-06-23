@@ -14,24 +14,32 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
+#ifndef H_CFCBINDCLASS
+#define H_CFCBINDCLASS
 
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct CFCBindClass CFCBindClass;
+
+struct CFCClass;
+
+struct CFCBindClass*
+CFCBindClass_new(struct CFCClass *client);
+
+struct CFCBindClass*
+CFCBindClass_init(struct CFCBindClass *self, struct CFCClass *client);
+
+void
+CFCBindClass_destroy(CFCBindClass *self);
+
+struct CFCClass*
+CFCBindClass_get_client(struct CFCBindClass *self);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CFCBINDCLASS */
 

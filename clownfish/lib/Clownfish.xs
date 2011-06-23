@@ -1746,3 +1746,28 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindAliases_c_aliases());
 OUTPUT: RETVAL
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Class
+
+SV*
+_new(client)
+    CFCClass *client;
+CODE:
+    CFCBindClass *self = CFCBindClass_new(client);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+SV*
+_get_client(self)
+    CFCBindClass *self;
+CODE:
+    CFCClass *client = CFCBindClass_get_client(self);
+    RETVAL = S_cfcbase_to_perlref(client);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCBindClass *self;
+PPCODE:
+    CFCBindClass_destroy(self);
+
