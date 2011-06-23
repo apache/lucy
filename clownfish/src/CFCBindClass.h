@@ -38,6 +38,9 @@ char*
 CFCBindClass_struct_definition(CFCBindClass *self);
 
 char*
+CFCBindClass_name_var_definition(CFCBindClass *self);
+
+char*
 CFCBindClass_vtable_definition(CFCBindClass *self);
 
 struct CFCClass*

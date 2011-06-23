@@ -98,6 +98,33 @@ CFCBindClass_struct_definition(CFCBindClass *self) {
     return struct_def;
 }
 
+/* C code defining the ZombieCharBuf which contains the class name for this
+ * class. */
+char*
+CFCBindClass_name_var_definition(CFCBindClass *self) {
+    const char *class_name  = CFCClass_get_class_name(self->client);
+    unsigned class_name_len = (unsigned)strlen(class_name);
+
+    const char pattern[] = 
+        "cfish_ZombieCharBuf %s = {\n"
+        "    CFISH_ZOMBIECHARBUF,\n"
+        "    {1}, /* ref.count */\n"
+        "    \"%s\",\n"
+        "    %u,\n"
+        "    0\n"
+        "};\n\n";
+    size_t size = sizeof(pattern)
+                  + strlen(self->full_name_var)
+                  + class_name_len
+                  + 15 // class_name_len
+                  + 20;
+    char *name_var_def = (char*)MALLOCATE(size);
+    sprintf(name_var_def, pattern, self->full_name_var, class_name,
+            class_name_len);
+
+    return name_var_def;
+}
+
 // Return C code defining the class's VTable.
 char*
 CFCBindClass_vtable_definition(CFCBindClass *self) {

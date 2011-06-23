@@ -1807,6 +1807,13 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_name_var_definition(self)
+    CFCBindClass *self;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindClass_name_var_definition(self));
+OUTPUT: RETVAL
+
+SV*
 _vtable_definition(self)
     CFCBindClass *self;
 CODE:

@@ -30,25 +30,6 @@ sub new {
     return _new( $args{client} );
 }
 
-# C code defining the ZombieCharBuf which contains the class name for this
-# class.
-sub _name_var_definition {
-    my $self           = shift;
-    my $full_var_name  = _full_name_var($self);
-    my $class_name     = $self->_get_client->get_class_name;
-    my $class_name_len = length($class_name);
-    return <<END_STUFF;
-cfish_ZombieCharBuf $full_var_name = {
-    CFISH_ZOMBIECHARBUF,
-    {1}, /* ref.count */
-    "$class_name",
-    $class_name_len,
-    0
-};
-
-END_STUFF
-}
-
 sub to_c_header {
     my $self          = shift;
     my $client        = $self->_get_client;
