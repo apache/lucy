@@ -34,6 +34,9 @@ CFCBindClass_init(struct CFCBindClass *self, struct CFCClass *client);
 void
 CFCBindClass_destroy(CFCBindClass *self);
 
+char*
+CFCBindClass_struct_definition(CFCBindClass *self);
+
 struct CFCClass*
 CFCBindClass_get_client(struct CFCBindClass *self);
 

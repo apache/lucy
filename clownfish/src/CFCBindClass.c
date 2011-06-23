@@ -71,6 +71,33 @@ CFCBindClass_destroy(CFCBindClass *self)
     CFCBase_destroy((CFCBase*)self);
 }
 
+// Create the definition for the instantiable object struct.
+char*
+CFCBindClass_struct_definition(CFCBindClass *self) {
+    const char *struct_sym = CFCClass_full_struct_sym(self->client);
+    CFCVariable **member_vars = CFCClass_member_vars(self->client);
+    char *member_decs = CFCUtil_strdup("");
+    
+    for (int i = 0; member_vars[i] != NULL; i++) {
+        const char *member_dec = CFCVariable_local_declaration(member_vars[i]);
+        size_t needed = strlen(member_decs) + strlen(member_dec) + 10;
+        member_decs = (char*)REALLOCATE(member_decs, needed);
+        strcat(member_decs, "\n    ");
+        strcat(member_decs, member_dec);
+    }
+
+    char pattern[] = "struct %s {%s\n};\n";
+    size_t size = sizeof(pattern)
+                  + strlen(struct_sym)
+                  + strlen(member_decs)
+                  + 10;
+    char *struct_def = (char*)MALLOCATE(size);
+    sprintf(struct_def, pattern, struct_sym, member_decs);
+
+    FREEMEM(member_decs);
+    return struct_def;
+}
+
 CFCClass*
 CFCBindClass_get_client(CFCBindClass *self) {
     return self->client;

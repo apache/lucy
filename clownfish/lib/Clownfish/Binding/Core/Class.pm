@@ -96,19 +96,6 @@ $vt_type $vt = {
 END_VTABLE
 }
 
-# Create the definition for the instantiable object struct.
-sub _struct_definition {
-    my $self                = shift;
-    my $struct_sym          = $self->_get_client->full_struct_sym;
-    my $member_declarations = join( "\n    ",
-        map { $_->local_declaration } @{ $self->_get_client->member_vars } );
-    return <<END_STRUCT
-struct $struct_sym {
-    $member_declarations
-};
-END_STRUCT
-}
-
 sub to_c_header {
     my $self          = shift;
     my $client        = $self->_get_client;

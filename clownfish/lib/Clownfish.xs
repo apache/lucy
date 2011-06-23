@@ -1799,4 +1799,10 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+SV*
+_struct_definition(self)
+    CFCBindClass *self;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindClass_struct_definition(self));
+OUTPUT: RETVAL
 
