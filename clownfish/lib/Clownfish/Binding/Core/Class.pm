@@ -30,10 +30,6 @@ sub new {
     return _new( $args{client} );
 }
 
-sub _full_callbacks_var { shift->_get_client->full_vtable_var . '_CALLBACKS' }
-sub _full_name_var      { shift->_get_client->full_vtable_var . '_CLASS_NAME' }
-sub _short_names_macro  { shift->_get_client->get_PREFIX . 'USE_SHORT_NAMES' }
-
 # C code defining the ZombieCharBuf which contains the class name for this
 # class.
 sub _name_var_definition {

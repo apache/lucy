@@ -763,6 +763,16 @@ CFCClass_get_prefix(CFCClass *self) {
 }
 
 const char*
+CFCClass_get_Prefix(CFCClass *self) {
+    return CFCSymbol_get_Prefix((CFCSymbol*)self);
+}
+
+const char*
+CFCClass_get_PREFIX(CFCClass *self) {
+    return CFCSymbol_get_PREFIX((CFCSymbol*)self);
+}
+
+const char*
 CFCClass_get_class_name(CFCClass *self) {
     return CFCSymbol_get_class_name((CFCSymbol*)self);
 }

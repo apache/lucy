@@ -37,6 +37,15 @@ CFCBindClass_destroy(CFCBindClass *self);
 struct CFCClass*
 CFCBindClass_get_client(struct CFCBindClass *self);
 
+const char*
+CFCBindClass_full_callbacks_var(CFCBindClass *self);
+
+const char*
+CFCBindClass_full_name_var(CFCBindClass *self);
+
+const char*
+CFCBindClass_short_names_macro(CFCBindClass *self);
+
 #ifdef __cplusplus
 }
 #endif

@@ -164,6 +164,12 @@ const char*
 CFCClass_get_prefix(CFCClass *self);
 
 const char*
+CFCClass_get_Prefix(CFCClass *self);
+
+const char*
+CFCClass_get_PREFIX(CFCClass *self);
+
+const char*
 CFCClass_get_class_name(CFCClass *self);
 
 struct CFCParcel*

@@ -31,6 +31,9 @@
 struct CFCBindClass {
     CFCBase base;
     CFCClass *client;
+    char *full_callbacks_var;
+    char *full_name_var;
+    char *short_names_macro;
 };
 
 CFCBindClass*
@@ -45,12 +48,25 @@ CFCBindClass*
 CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
     CFCUTIL_NULL_CHECK(client);
     self->client = (CFCClass*)CFCBase_incref((CFCBase*)client);
+
+    const char *full_vtable_var = CFCClass_full_vtable_var(client);
+    const char *PREFIX = CFCClass_get_PREFIX(client);
+    self->full_callbacks_var = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
+    self->full_name_var      = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
+    self->short_names_macro  = (char*)MALLOCATE(strlen(PREFIX) + 20);
+    sprintf(self->full_callbacks_var, "%s_CALLBACKS", full_vtable_var);
+    sprintf(self->full_name_var, "%s_CLASS_NAME", full_vtable_var);
+    sprintf(self->short_names_macro, "%sUSE_SHORT_NAMES", PREFIX);
+
     return self;
 }
 
 void
 CFCBindClass_destroy(CFCBindClass *self)
 {
+    FREEMEM(self->full_callbacks_var);
+    FREEMEM(self->full_name_var);
+    FREEMEM(self->short_names_macro);
     CFCBase_decref((CFCBase*)self->client);
     CFCBase_destroy((CFCBase*)self);
 }
@@ -58,5 +74,23 @@ CFCBindClass_destroy(CFCBindClass *self)
 CFCClass*
 CFCBindClass_get_client(CFCBindClass *self) {
     return self->client;
+}
+
+const char*
+CFCBindClass_full_callbacks_var(CFCBindClass *self)
+{
+    return self->full_callbacks_var;
+}
+
+const char*
+CFCBindClass_full_name_var(CFCBindClass *self)
+{
+    return self->full_name_var;
+}
+
+const char*
+CFCBindClass_short_names_macro(CFCBindClass *self)
+{
+    return self->short_names_macro;
 }
 
