@@ -355,7 +355,6 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
     unsigned name_len = (unsigned)strlen(name);
     char extraction[200];
     const char *specifier = CFCType_get_specifier(type);
-    size_t specifier_len = strlen(specifier);
 
     // Skip the VTable and the refcount/host-object.
     if (strcmp(specifier, "lucy_VTable") == 0
