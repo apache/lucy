@@ -180,9 +180,8 @@ S_add_dump_method(CFCClass *klass) {
                         + strlen(cnick)
                         + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, pattern, full_func_sym, full_struct,
-                            full_typedef, full_typedef, vtable_var, cnick);
-        if (check < 0) { CFCUtil_die("sprintf failed"); }
+        sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
+                full_typedef, vtable_var, cnick);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **novel = CFCClass_novel_member_vars(klass);
@@ -205,8 +204,7 @@ S_add_dump_method(CFCClass *klass) {
                         + strlen(full_struct)
                         + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, pattern, full_func_sym, full_struct);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(autocode, pattern, full_func_sym, full_struct);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
@@ -249,10 +247,8 @@ S_add_load_method(CFCClass *klass) {
                         + strlen(cnick)
                         + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, pattern, full_func_sym, full_struct,
-                            full_typedef, full_typedef, vtable_var, cnick,
-                            full_struct, full_struct);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
+                full_typedef, vtable_var, cnick, full_struct, full_struct);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **novel = CFCClass_novel_member_vars(klass);
@@ -278,9 +274,8 @@ S_add_load_method(CFCClass *klass) {
                         + strlen(full_struct) * 3
                         + 50;
         char *autocode = (char*)MALLOCATE(amount);
-        int check = sprintf(autocode, pattern, full_func_sym, full_struct,
-                            full_struct, full_struct);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(autocode, pattern, full_func_sym, full_struct, full_struct,
+                full_struct);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
@@ -321,8 +316,7 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
             croak("Buffer not big enough (%lu < %lu)",
                   (unsigned long)buf_size, (unsigned long)needed);
         }
-        int check = sprintf(buf, pattern, name, name_len, name);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(buf, pattern, name, name_len, name);
     }
     else if (CFCType_is_object(type)) {
         char pattern[] =
@@ -335,8 +329,7 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
             croak("Buffer not big enough (%lu < %lu)",
                   (unsigned long)buf_size, (unsigned long)needed);
         }
-        int check = sprintf(buf, pattern, name, name, name_len, name);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(buf, pattern, name, name, name_len, name);
     }
     else {
         croak("Don't know how to dump a %s", CFCType_get_specifier(type));
@@ -367,19 +360,16 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
         croak("type_str too long: '%s'", type_str);
     }
     if (CFCType_is_integer(type)) {
-        int check = sprintf(extraction, "(%s)Cfish_Obj_To_I64(var)", type_str);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(extraction, "(%s)Cfish_Obj_To_I64(var)", type_str);
     }
     else if (CFCType_is_floating(type)) {
-        int check = sprintf(extraction, "(%s)Cfish_Obj_To_F64(var)", type_str);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(extraction, "(%s)Cfish_Obj_To_F64(var)", type_str);
     }
     else if (CFCType_is_object(type)) {
         const char *vtable_var = CFCType_get_vtable_var(type);
-        int check = sprintf(extraction,
-                            "(%s*)CFISH_CERTIFY(Cfish_Obj_Load(var, var), %s)",
-                            specifier, vtable_var);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(extraction,
+                "(%s*)CFISH_CERTIFY(Cfish_Obj_Load(var, var), %s)",
+                specifier, vtable_var);
     }
     else {
         croak("Don't know how to load %s", specifier);
@@ -398,8 +388,7 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
         croak("Buffer not big enough (%lu < %lu)", (unsigned long)buf_size,
               (unsigned long)needed);
     }
-    int check = sprintf(buf, pattern, name, name_len, name, extraction);
-    if (check < 0) { croak("sprintf failed"); }
+    sprintf(buf, pattern, name, name_len, name, extraction);
 
     CFCClass_append_autocode(klass, buf);
 }

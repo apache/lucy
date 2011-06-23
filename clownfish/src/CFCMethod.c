@@ -134,11 +134,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
     self->full_callback_sym = (char*)MALLOCATE(amount);
     self->full_override_sym = (char*)MALLOCATE(amount);
-    int check = sprintf(self->full_callback_sym, "%s_CALLBACK",
-                        full_func_sym);
-    if (check < 0) { croak("sprintf failed"); }
-    check = sprintf(self->full_override_sym, "%s_OVERRIDE", full_func_sym);
-    if (check < 0) { croak("sprintf failed"); }
+    sprintf(self->full_callback_sym, "%s_CALLBACK", full_func_sym);
+    sprintf(self->full_override_sym, "%s_OVERRIDE", full_func_sym);
 
     // Assume that this method is novel until we discover when applying
     // inheritance that it was overridden.
@@ -249,8 +246,7 @@ CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf,
     CFCUTIL_NULL_CHECK(invoker);
     size_t needed = strlen(invoker) + 1 + strlen(self->macro_sym) + 1;
     if (buf_size >= needed) {
-        int check = sprintf(buf, "%s_%s", invoker, self->macro_sym);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(buf, "%s_%s", invoker, self->macro_sym);
     }
     return needed;
 }
@@ -266,8 +262,7 @@ CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf,
                     + strlen(self->macro_sym)
                     + 1;
     if (buf_size >= needed) {
-        int check = sprintf(buf, "%s%s_%s", Prefix, invoker, self->macro_sym);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(buf, "%s%s_%s", Prefix, invoker, self->macro_sym);
     }
     return needed;
 }
@@ -298,12 +293,10 @@ S_update_typedefs(CFCMethod *self, const char *short_sym) {
         const char *prefix = CFCMethod_get_prefix(self);
         size_t amount = strlen(short_sym) + 3;
         self->short_typedef = (char*)MALLOCATE(amount);
-        int check = sprintf(self->short_typedef, "%s_t", short_sym);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(self->short_typedef, "%s_t", short_sym);
         amount += strlen(prefix);
         self->full_typedef = (char*)MALLOCATE(amount);
-        check = sprintf(self->full_typedef, "%s%s_t", prefix, short_sym);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(self->full_typedef, "%s%s_t", prefix, short_sym);
     }
     else {
         self->short_typedef = NULL;

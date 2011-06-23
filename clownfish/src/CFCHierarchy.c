@@ -200,7 +200,6 @@ S_find_cfh(char *dir, char **cfh_list, size_t num_cfh) {
             full_path = (char*)MALLOCATE(full_path_cap);
         }
         int full_path_len = sprintf(full_path, "%s" PATH_SEP "%s", dir, entry);
-        if (full_path_len < 0) { CFCUtil_die("sprintf failed"); }
         const char *cfh_suffix = strstr(full_path, ".cfh");
 
         if (cfh_suffix == full_path + (full_path_len - 4)) {
@@ -505,8 +504,7 @@ S_opendir(const char *dir) {
     dh->find_data = (WIN32_FIND_DATA*)MALLOCATE(sizeof(WIN32_FIND_DATA));
 
     // Tack on wildcard needed by FindFirstFile.
-    int check = sprintf(dh->path, "%s\\*", dir);
-    if (check < 0) { CFCUtil_die("sprintf failed"); }
+    sprintf(dh->path, "%s\\*", dir);
 
     dh->handle = FindFirstFile(dh->path, dh->find_data);
     if (dh->handle == INVALID_HANDLE_VALUE) {

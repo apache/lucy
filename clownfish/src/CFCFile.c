@@ -86,12 +86,9 @@ CFCFile_init(CFCFile *self, const char *source_class) {
         }
     }
     self->guard_name[j] = '\0';
-    int check = sprintf(self->guard_start, "#ifndef %s\n#define %s 1\n",
-                        self->guard_name, self->guard_name);
-    if (check < 0) { croak("sprintf failed"); }
-    check = sprintf(self->guard_close, "#endif /* %s */\n",
-                    self->guard_name);
-    if (check < 0) { croak("sprintf failed"); }
+    sprintf(self->guard_start, "#ifndef %s\n#define %s 1\n", self->guard_name,
+            self->guard_name);
+    sprintf(self->guard_close, "#endif /* %s */\n", self->guard_name);
 
     // Cache partial path derived from source_class.
     self->path_part = (char*)MALLOCATE(len + 1);
@@ -179,13 +176,10 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
         croak("Need buf_size of %lu, but got %lu", needed, buf_size);
     }
     if (base_dir) {
-        int check = sprintf(buf, "%s" PATH_SEP "%s%s", base_dir,
-                            self->path_part, ext);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(buf, "%s" PATH_SEP "%s%s", base_dir, self->path_part, ext);
     }
     else {
-        int check = sprintf(buf, "%s%s", self->path_part, ext);
-        if (check < 0) { croak("sprintf failed"); }
+        sprintf(buf, "%s%s", self->path_part, ext);
     }
     size_t i;
     for (i = 0; buf[i] != '\0'; i++) {
