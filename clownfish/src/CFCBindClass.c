@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "CFCBindClass.h"
+#include "CFCBindMethod.h"
 #include "CFCBase.h"
 #include "CFCClass.h"
 #include "CFCFunction.h"
@@ -69,6 +70,130 @@ CFCBindClass_destroy(CFCBindClass *self)
     FREEMEM(self->short_names_macro);
     CFCBase_decref((CFCBase*)self->client);
     CFCBase_destroy((CFCBase*)self);
+}
+
+static int
+S_method_is_novel(CFCMethod *method, CFCMethod **novel_methods)
+{
+    for (int i = 0; novel_methods[i] != NULL; i++) {
+        if (method == novel_methods[i]) { return 1; }
+    }
+    return 0;
+}
+
+char*
+CFCBindClass_to_c(CFCBindClass *self) {
+    CFCClass *client = self->client;
+
+    if (CFCClass_inert(client)) {
+        return CFCUtil_strdup(CFCClass_get_autocode(client));
+    }
+
+    const char *include_h = CFCClass_include_h(client);
+    const char *autocode  = CFCClass_get_autocode(client);
+    const char *vt_type   = CFCClass_full_vtable_type(client);
+    const char *cnick     = CFCClass_get_cnick(client);
+    char *class_name_def  = CFCBindClass_name_var_definition(self);
+    char *vtable_def      = CFCBindClass_vtable_definition(self);
+
+    CFCMethod **methods  = CFCClass_methods(client);
+    CFCMethod **novel_methods = CFCClass_novel_methods(client);
+
+    char *offsets    = CFCUtil_strdup("");
+    char *cb_funcs   = CFCUtil_strdup("");
+    char *cb_objects = CFCUtil_strdup("");
+
+    /* Start a NULL-terminated array of cfish_Callback vars.  Since C89
+     * doesn't allow us to initialize a pointer to an anonymous array inside a
+     * global struct, we have to give it a real symbol and then store a pointer
+     * to that symbol inside the VTable struct. */
+    char *cb_var = CFCUtil_strdup("");
+    cb_var = CFCUtil_cat_strings(cb_var, "cfish_Callback *",
+                                 self->full_callbacks_var, "[] = {\n    ",
+                                 NULL);
+
+    for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
+        CFCMethod *method = methods[meth_num];
+        int method_is_novel = S_method_is_novel(method, novel_methods);
+        size_t off_sym_size 
+            = CFCMethod_full_offset_sym(method, cnick, NULL, 0);
+        char *full_offset_sym = (char*)MALLOCATE(off_sym_size);
+        CFCMethod_full_offset_sym(method, cnick, full_offset_sym,
+                                  off_sym_size);
+        char meth_num_str[20];
+        sprintf(meth_num_str, "%d", meth_num);
+
+        // Create offset in bytes for the method from the top of the VTable
+        // object.
+        char *offset_str
+            = CFCUtil_cat_strings(CFCUtil_strdup(""), "(offsetof(", vt_type,
+                                  ", methods) + ", meth_num_str, 
+                                  " * sizeof(cfish_method_t))", NULL);
+        offsets = CFCUtil_cat_strings(offsets, "size_t ", full_offset_sym,
+                                      " = ", offset_str, ";\n", NULL);
+        FREEMEM(full_offset_sym);
+
+        // Create a default implementation for abstract methods.
+        if (method_is_novel && CFCMethod_abstract(method)) {
+            char *method_def = CFCBindMeth_abstract_method_def(method);
+            cb_funcs = CFCUtil_cat_strings(cb_funcs, method_def, "\n", NULL);
+            FREEMEM(method_def);
+        }
+
+        // Define callbacks for methods that can be overridden via the
+        // host.
+        if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
+            const char *full_cb_sym = CFCMethod_full_callback_sym(method);
+            if (method_is_novel) {
+                char *cb_def = CFCBindMeth_callback_def(method);
+                char *cb_obj_def
+                    = CFCBindMeth_callback_obj_def(method, offset_str);
+                cb_funcs = CFCUtil_cat_strings(cb_funcs, cb_def, "\n", NULL);
+                cb_objects = CFCUtil_cat_strings(cb_objects, cb_obj_def, NULL);
+                FREEMEM(cb_def);
+                FREEMEM(cb_obj_def);
+            }
+            cb_var = CFCUtil_cat_strings(cb_var, "&", full_cb_sym, ",\n    ",
+                                         NULL);
+        }
+
+        FREEMEM(offset_str);
+    }
+
+    // Close callbacks variable definition.
+    cb_var =  CFCUtil_cat_strings(cb_var, "NULL\n};\n", NULL);
+
+    const char pattern[] = 
+        "#include \"%s\"\n"
+        "\n"
+        "%s\n"
+        "%s\n"
+        "%s\n"
+        "%s\n"
+        "%s\n"
+        "%s\n"
+        "%s\n"
+        "\n";
+    size_t size = sizeof(pattern)
+                  + strlen(include_h)
+                  + strlen(offsets)
+                  + strlen(cb_funcs)
+                  + strlen(cb_objects)
+                  + strlen(cb_var)
+                  + strlen(class_name_def)
+                  + strlen(vtable_def)
+                  + strlen(autocode)
+                  + 100;
+    char *code = (char*)MALLOCATE(size);
+    sprintf(code, pattern, include_h, offsets, cb_funcs, cb_objects, cb_var,
+            class_name_def, vtable_def, autocode);
+
+    FREEMEM(cb_funcs);
+    FREEMEM(cb_objects);
+    FREEMEM(cb_var);
+    FREEMEM(class_name_def);
+    FREEMEM(vtable_def);
+    return code;
 }
 
 // Create the definition for the instantiable object struct.

@@ -1771,6 +1771,13 @@ DESTROY(self)
 PPCODE:
     CFCBindClass_destroy(self);
 
+SV*
+to_c(self)
+    CFCBindClass *self;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindClass_to_c(self));
+OUTPUT: RETVAL
+
 void
 _set_or_get(self, ...)
     CFCBindClass *self;
