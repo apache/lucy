@@ -44,6 +44,12 @@ CFCUtil_strdup(const char *string);
 char*
 CFCUtil_strndup(const char *string, size_t len);
 
+/** Concatenate a NULL-terminated list of strings onto the first, reallocating
+ * with each argument. 
+ */
+char*
+CFCUtil_cat_strings(char *string, ...);
+
 /** Trim whitespace from the beginning and the end of a string.
  */
 void

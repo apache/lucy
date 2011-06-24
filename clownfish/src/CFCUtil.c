@@ -52,6 +52,22 @@ CFCUtil_strndup(const char *string, size_t len) {
     return copy;
 }
 
+char*
+CFCUtil_cat_strings(char *string, ...) {
+    va_list args;
+    char *appended;
+    CFCUTIL_NULL_CHECK(string);
+    size_t size = strlen(string) + 1;
+    va_start(args, string);
+    while (NULL != (appended = va_arg(args, char*))) {
+        size += strlen(appended);
+        string = (char*)REALLOCATE(string, size);
+        strcat(string, appended);
+    }
+    va_end(args);
+    return string;
+}
+
 void
 CFCUtil_trim_whitespace(char *text) {
     if (!text) {
