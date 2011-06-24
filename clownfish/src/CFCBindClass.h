@@ -40,20 +40,8 @@ CFCBindClass_to_c(CFCBindClass *self);
 char*
 CFCBindClass_struct_definition(CFCBindClass *self);
 
-char*
-CFCBindClass_name_var_definition(CFCBindClass *self);
-
-char*
-CFCBindClass_vtable_definition(CFCBindClass *self);
-
 struct CFCClass*
 CFCBindClass_get_client(struct CFCBindClass *self);
-
-const char*
-CFCBindClass_full_callbacks_var(CFCBindClass *self);
-
-const char*
-CFCBindClass_full_name_var(CFCBindClass *self);
 
 const char*
 CFCBindClass_short_names_macro(CFCBindClass *self);

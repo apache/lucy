@@ -37,6 +37,16 @@ struct CFCBindClass {
     char *short_names_macro;
 };
 
+// Return C code defining the class's VTable.
+static char*
+S_vtable_definition(CFCBindClass *self);
+
+/* C code defining the ZombieCharBuf which contains the class name for this
+ * class. 
+ */
+static char*
+S_name_var_definition(CFCBindClass *self);
+
 CFCBindClass*
 CFCBindClass_new(CFCClass *client) {
     CFCBindClass *self 
@@ -93,8 +103,8 @@ CFCBindClass_to_c(CFCBindClass *self) {
     const char *autocode  = CFCClass_get_autocode(client);
     const char *vt_type   = CFCClass_full_vtable_type(client);
     const char *cnick     = CFCClass_get_cnick(client);
-    char *class_name_def  = CFCBindClass_name_var_definition(self);
-    char *vtable_def      = CFCBindClass_vtable_definition(self);
+    char *class_name_def  = S_name_var_definition(self);
+    char *vtable_def      = S_vtable_definition(self);
 
     CFCMethod **methods  = CFCClass_methods(client);
     CFCMethod **novel_methods = CFCClass_novel_methods(client);
@@ -223,10 +233,8 @@ CFCBindClass_struct_definition(CFCBindClass *self) {
     return struct_def;
 }
 
-/* C code defining the ZombieCharBuf which contains the class name for this
- * class. */
-char*
-CFCBindClass_name_var_definition(CFCBindClass *self) {
+static char*
+S_name_var_definition(CFCBindClass *self) {
     const char *class_name  = CFCClass_get_class_name(self->client);
     unsigned class_name_len = (unsigned)strlen(class_name);
 
@@ -251,8 +259,8 @@ CFCBindClass_name_var_definition(CFCBindClass *self) {
 }
 
 // Return C code defining the class's VTable.
-char*
-CFCBindClass_vtable_definition(CFCBindClass *self) {
+static char*
+S_vtable_definition(CFCBindClass *self) {
     CFCClass    *client     = self->client;
     CFCClass    *parent     = CFCClass_get_parent(client);
     CFCMethod  **methods    = CFCClass_methods(client);
@@ -320,18 +328,6 @@ CFCBindClass_vtable_definition(CFCBindClass *self) {
 CFCClass*
 CFCBindClass_get_client(CFCBindClass *self) {
     return self->client;
-}
-
-const char*
-CFCBindClass_full_callbacks_var(CFCBindClass *self)
-{
-    return self->full_callbacks_var;
-}
-
-const char*
-CFCBindClass_full_name_var(CFCBindClass *self)
-{
-    return self->full_name_var;
 }
 
 const char*

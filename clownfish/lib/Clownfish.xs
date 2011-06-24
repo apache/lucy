@@ -1782,22 +1782,10 @@ void
 _set_or_get(self, ...)
     CFCBindClass *self;
 ALIAS:
-    _full_callbacks_var = 2
-    _full_name_var      = 4
     _short_names_macro  = 6
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
-        case 2: {
-                const char *value = CFCBindClass_full_callbacks_var(self);
-                retval = newSVpv(value, strlen(value));
-            }
-            break;
-        case 4: {
-                const char *value = CFCBindClass_full_name_var(self);
-                retval = newSVpv(value, strlen(value));
-            }
-            break;
         case 6: {
                 const char *value = CFCBindClass_short_names_macro(self);
                 retval = newSVpv(value, strlen(value));
@@ -1811,19 +1799,5 @@ _struct_definition(self)
     CFCBindClass *self;
 CODE:
     RETVAL = S_sv_eat_c_string(CFCBindClass_struct_definition(self));
-OUTPUT: RETVAL
-
-SV*
-_name_var_definition(self)
-    CFCBindClass *self;
-CODE:
-    RETVAL = S_sv_eat_c_string(CFCBindClass_name_var_definition(self));
-OUTPUT: RETVAL
-
-SV*
-_vtable_definition(self)
-    CFCBindClass *self;
-CODE:
-    RETVAL = S_sv_eat_c_string(CFCBindClass_vtable_definition(self));
 OUTPUT: RETVAL
 
