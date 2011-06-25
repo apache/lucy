@@ -1783,12 +1783,60 @@ _set_or_get(self, ...)
     CFCBindClass *self;
 ALIAS:
     _short_names_macro  = 6
+    _callback_declarations = 8
+    _method_typedefs = 10
+    _parent_include = 12
+    _sub_declarations = 14
+    _inert_var_declarations = 16
+    _method_defs = 18
+    _vt_singleton_def = 20
+    _short_names = 22
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
         case 6: {
                 const char *value = CFCBindClass_short_names_macro(self);
                 retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 8: {
+                char *value = CFCBindClass_callback_declarations(self);
+                retval = S_sv_eat_c_string(value);
+            }
+            break;
+        case 10: {
+                char *value = CFCBindClass_method_typedefs(self);
+                retval = S_sv_eat_c_string(value);
+            }
+            break;
+        case 12: {
+                char *value = CFCBindClass_parent_include(self);
+                retval = S_sv_eat_c_string(value);
+            }
+            break;
+        case 14: {
+                char *value = CFCBindClass_sub_declarations(self);
+                retval = S_sv_eat_c_string(value);
+            }
+            break;
+        case 16: {
+                char *value = CFCBindClass_inert_var_declarations(self);
+                retval = S_sv_eat_c_string(value);
+            }
+            break;
+        case 18: {
+                char *value = CFCBindClass_method_defs(self);
+                retval = S_sv_eat_c_string(value);
+            }
+            break;
+        case 20: {
+                char *value = CFCBindClass_vt_singleton_def(self);
+                retval = S_sv_eat_c_string(value);
+            }
+            break;
+        case 22: {
+                char *value = CFCBindClass_short_names(self);
+                retval = S_sv_eat_c_string(value);
             }
             break;
     END_SET_OR_GET_SWITCH

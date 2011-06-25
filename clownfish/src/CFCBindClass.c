@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "CFCBindClass.h"
+#include "CFCBindFunction.h"
 #include "CFCBindMethod.h"
 #include "CFCBase.h"
 #include "CFCClass.h"
@@ -334,5 +335,219 @@ const char*
 CFCBindClass_short_names_macro(CFCBindClass *self)
 {
     return self->short_names_macro;
+}
+
+// Declare cfish_Callback objects.
+char*
+CFCBindClass_callback_declarations(CFCBindClass *self) {
+    CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
+    char *declarations = CFCUtil_strdup("");
+    for (int i = 0; novel_methods[i] != NULL; i++) {
+        CFCMethod *method = novel_methods[i];
+        if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
+            char *callback = CFCBindMeth_callback_dec(method);
+            declarations = CFCUtil_cat_strings(declarations, callback, NULL);
+            FREEMEM(callback);
+        }
+    }
+    FREEMEM(novel_methods);
+    return declarations;
+}
+
+// Declare typedefs for novel methods, to ease casting.
+char*
+CFCBindClass_method_typedefs(CFCBindClass *self) {
+    CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
+    char *typedefs = CFCUtil_strdup("");
+    for (int i = 0; novel_methods[i] != NULL; i++) {
+        CFCMethod *method = novel_methods[i];
+        char *typedef_str = CFCBindMeth_typdef_dec(method);
+        typedefs = CFCUtil_cat_strings(typedefs, typedef_str, "\n", NULL);
+        FREEMEM(typedef_str);
+    }
+    FREEMEM(novel_methods);
+    return typedefs;
+}
+
+// If class inherits from something, include the parent class's header.
+char*
+CFCBindClass_parent_include(CFCBindClass *self) {
+    char *parent_include = CFCUtil_strdup("");
+    CFCClass *parent = CFCClass_get_parent(self->client);
+    if (parent) {
+        parent_include
+            = CFCUtil_cat_strings(parent_include, "#include \"",
+                                  CFCClass_include_h(parent), "\"", NULL);
+    }
+    return parent_include;
+}
+
+// Add a C function definition for each method and each function.
+char*
+CFCBindClass_sub_declarations(CFCBindClass *self) {
+    CFCFunction **functions = CFCClass_functions(self->client);
+    CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
+    char *declarations = CFCUtil_strdup("");
+    for (int i = 0; functions[i] != NULL; i++) {
+        CFCFunction *func = functions[i];
+        char *dec = CFCBindFunc_func_declaration(func);
+        declarations = CFCUtil_cat_strings(declarations, dec, "\n\n", NULL);
+        FREEMEM(dec);
+    }
+    for (int i = 0; novel_methods[i] != NULL; i++) {
+        CFCMethod *method = novel_methods[i];
+        char *dec = CFCBindFunc_func_declaration((CFCFunction*)method);
+        declarations = CFCUtil_cat_strings(declarations, dec, "\n\n", NULL);
+        FREEMEM(dec);
+    }
+    FREEMEM(novel_methods);
+    return declarations;
+}
+
+// Declare class (a.k.a. "inert") variables.
+char*
+CFCBindClass_inert_var_declarations(CFCBindClass *self) {
+    CFCVariable **inert_vars = CFCClass_inert_vars(self->client);
+    char *declarations = CFCUtil_strdup("");
+    for (int i = 0; inert_vars[i] != NULL; i++) {
+        const char *global_c = CFCVariable_global_c(inert_vars[i]);
+        declarations = CFCUtil_cat_strings(declarations, "extern ", global_c, 
+                                           ";\n", NULL);
+    }
+    return declarations;
+}
+
+// Define method invocation inline functions.
+char*
+CFCBindClass_method_defs(CFCBindClass *self) {
+    CFCMethod **methods = CFCClass_methods(self->client);
+    char *method_defs = CFCUtil_strdup("");
+    for (int i = 0; methods[i] != NULL; i++) {
+        CFCMethod *method = methods[i];
+        char *def = CFCBindMeth_method_def(method, self->client);
+        method_defs = CFCUtil_cat_strings(method_defs, def, "\n", NULL);
+        FREEMEM(def);
+    }
+    return method_defs;
+}
+
+
+// Define the virtual table singleton object.
+char*
+CFCBindClass_vt_singleton_def(CFCBindClass *self) {
+    CFCClass   *client      = self->client;
+    const char *vt_type     = CFCClass_full_vtable_type(client);
+    const char *vt_var      = CFCClass_full_vtable_var(client);
+    const char *vt_hidden   = CFCClass_full_vtable_hidden(client);
+    size_t      num_methods = CFCClass_num_methods(client);
+
+    const char pattern[] = 
+        "typedef struct %s {\n"
+        "    cfish_VTable *vtable;\n"
+        "    cfish_ref_t ref;\n"
+        "    cfish_VTable *parent;\n"
+        "    cfish_CharBuf *name;\n"
+        "    uint32_t flags;\n"
+        "    void *x;\n"
+        "    size_t obj_alloc_size;\n"
+        "    size_t vt_alloc_size;\n"
+        "    void *callbacks;\n"
+        "    cfish_method_t methods[%lu];\n"
+        "} %s;\n"
+        "extern struct %s %s;\n"
+        "#define %s ((cfish_VTable*)&%s)\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(vt_type)
+                  + 40 // num_methods
+                  + strlen(vt_type)
+                  + strlen(vt_type)
+                  + strlen(vt_hidden)
+                  + strlen(vt_var)
+                  + strlen(vt_hidden)
+                  + 30;
+    char *def = (char*)MALLOCATE(size);
+    sprintf(def, pattern, vt_type, (unsigned long)num_methods, vt_type,
+            vt_type, vt_hidden, vt_var, vt_hidden);
+
+    return def;
+}
+
+// Define short names for all of the symbols associated with this class.
+char*
+CFCBindClass_short_names(CFCBindClass *self) {
+    CFCClass *client = self->client;
+    char *short_names = CFCUtil_strdup("");
+    short_names = CFCUtil_cat_strings(short_names, "#ifdef ",
+                                      self->short_names_macro, "\n", NULL);
+
+    if (!CFCClass_inert(client)) {
+        const char *short_struct = CFCClass_get_struct_sym(client);
+        const char *full_struct  = CFCClass_full_struct_sym(client);
+        const char *short_vt_var = CFCClass_short_vtable_var(client);
+        const char *full_vt_var  = CFCClass_full_vtable_var(client);
+        short_names 
+            = CFCUtil_cat_strings(short_names, "  #define ",
+                                  short_struct, " ", full_struct, "\n",
+                                  "  #define ", short_vt_var, " ", 
+                                  full_vt_var, "\n", NULL);
+    }
+    
+    CFCFunction **functions = CFCClass_functions(client);
+    for (int i = 0; functions[i] != NULL; i++) {
+        CFCFunction *func = functions[i];
+        short_names 
+            = CFCUtil_cat_strings(short_names, "  #define ",
+                                  CFCFunction_short_func_sym(func), " ", 
+                                  CFCFunction_full_func_sym(func), "\n",
+                                  NULL);
+    }
+
+    CFCVariable **inert_vars = CFCClass_inert_vars(client);
+    for (int i = 0; inert_vars[i] != NULL; i++) {
+        CFCVariable *var = inert_vars[i];
+        short_names 
+            = CFCUtil_cat_strings(short_names, "  #define ",
+                                  CFCVariable_short_sym(var), " ", 
+                                  CFCVariable_full_sym(var), "\n", NULL);
+    }
+
+    if (!CFCClass_inert(client)) {
+        CFCMethod **novel_methods = CFCClass_novel_methods(client);
+        for (int i = 0; novel_methods[i] != NULL; i++) {
+            CFCMethod *meth = novel_methods[i];
+            const char *short_typedef = CFCMethod_short_typedef(meth);
+            const char *full_typedef  = CFCMethod_full_typedef(meth);
+            short_names 
+                = CFCUtil_cat_strings(short_names, "  #define ",
+                                      short_typedef, " ", full_typedef, "\n",
+                                      NULL);
+            const char *short_func = CFCMethod_short_implementing_func_sym(meth);
+            const char *full_func  = CFCMethod_implementing_func_sym(meth);
+            short_names 
+                = CFCUtil_cat_strings(short_names, "  #define ", short_func,
+                                      " ", full_func, "\n", NULL);
+        }
+        FREEMEM(novel_methods);
+
+        CFCMethod  **methods = CFCClass_methods(client);
+        const char  *cnick   = CFCClass_get_cnick(client);
+        for (int i = 0; methods[i] != NULL; i++) {
+            CFCMethod *meth = methods[i];
+            size_t size = CFCMethod_short_method_sym(meth, cnick, NULL, 0);
+            char *short_sym = (char*)MALLOCATE(size);
+            CFCMethod_short_method_sym(meth, cnick, short_sym, size);
+            size = CFCMethod_full_method_sym(meth, cnick, NULL, 0);
+            char *full_sym = (char*)MALLOCATE(size);
+            CFCMethod_full_method_sym(meth, cnick, full_sym, size);
+            short_names 
+                = CFCUtil_cat_strings(short_names, "  #define ", short_sym,
+                                      " ", full_sym, "\n", NULL);
+        }
+    }
+    short_names = CFCUtil_cat_strings(short_names, "#endif /* ",
+                                      self->short_names_macro, " */\n", NULL);
+
+    return short_names;
 }
 
