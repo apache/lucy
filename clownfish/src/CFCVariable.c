@@ -137,6 +137,11 @@ CFCVariable_micro_sym(CFCVariable *self) {
 }
 
 const char*
+CFCVariable_short_sym(CFCVariable *self) {
+    return CFCSymbol_short_sym((CFCSymbol*)self);
+}
+
+const char*
 CFCVariable_full_sym(CFCVariable *self) {
     return CFCSymbol_full_sym((CFCSymbol*)self);
 }

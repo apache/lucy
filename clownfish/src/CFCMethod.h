@@ -133,6 +133,9 @@ CFCMethod_get_param_list(CFCMethod *self);
 const char*
 CFCMethod_implementing_func_sym(CFCMethod *self);
 
+const char*
+CFCMethod_short_implementing_func_sym(CFCMethod *self);
+
 #ifdef __cplusplus
 }
 #endif

@@ -106,6 +106,9 @@ CFCClass_functions(CFCClass *self);
 struct CFCMethod**
 CFCClass_methods(CFCClass *self);
 
+size_t
+CFCClass_num_methods(CFCClass *self);
+
 struct CFCVariable**
 CFCClass_member_vars(CFCClass *self);
 
@@ -150,6 +153,9 @@ CFCClass_short_vtable_var(CFCClass *self);
 
 const char*
 CFCClass_full_vtable_var(CFCClass *self);
+
+const char*
+CFCClass_full_vtable_hidden(CFCClass *self);
 
 const char*
 CFCClass_full_vtable_type(CFCClass *self);

@@ -395,3 +395,8 @@ CFCMethod_implementing_func_sym(CFCMethod *self) {
     return CFCFunction_full_func_sym((CFCFunction*)self);
 }
 
+const char*
+CFCMethod_short_implementing_func_sym(CFCMethod *self) {
+    return CFCFunction_short_func_sym((CFCFunction*)self);
+}
+

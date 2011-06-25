@@ -58,6 +58,9 @@ const char*
 CFCVariable_micro_sym(CFCVariable *self);
 
 const char*
+CFCVariable_short_sym(CFCVariable *self);
+
+const char*
 CFCVariable_full_sym(CFCVariable *self);
 
 #ifdef __cplusplus
