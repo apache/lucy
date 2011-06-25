@@ -163,7 +163,7 @@ tests: \$(TESTS)
 $args{test_blocks}
 
 clean:
-	del \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core
+	CMD /c FOR %i IN (\$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core) DO IF EXIST %i DEL /F %i
 EOT
     print $fh $content;
 }
