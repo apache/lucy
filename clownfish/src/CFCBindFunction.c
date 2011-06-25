@@ -38,7 +38,7 @@ CFCBindFunc_func_declaration(CFCFunction *func) {
                   + strlen(param_list_str)
                   + 20
                   + strlen("\0");
-    char *buf = MALLOCATE(size);
+    char *buf = (char*)MALLOCATE(size);
     sprintf(buf, "%s%s\n%s(%s);", inline_prop, ret_type_str, full_func_sym,
             param_list_str);
     return buf;

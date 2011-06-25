@@ -119,7 +119,7 @@ CFCBindAliases_c_aliases(void) {
         size += strlen(aliases[i].to);
         size += sizeof("#define %s %s\n");
     }
-    char *content = MALLOCATE(size);
+    char *content = (char*)MALLOCATE(size);
     content[0] = '\0';
 
     strcat(content, "#ifndef CFISH_C_ALIASES\n#define CFISH_C_ALIASES\n\n");

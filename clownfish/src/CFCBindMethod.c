@@ -214,16 +214,16 @@ CFCBindMeth_callback_obj_def(CFCMethod *method, const char *offset) {
     unsigned    macro_sym_len     = strlen(macro_sym);
     const char *full_override_sym = CFCMethod_full_override_sym(method);
     const char *full_callback_sym = CFCMethod_full_callback_sym(method);
-    char template[] = 
+    char pattern[] = 
          "cfish_Callback %s = {\"%s\", %u, (cfish_method_t)%s, %s};\n";
-    size_t size = sizeof(template)
+    size_t size = sizeof(pattern)
                   + macro_sym_len
                   + strlen(full_override_sym)
                   + strlen(full_callback_sym)
                   + strlen(offset)
                   + 30;
     char *def = (char*)MALLOCATE(size);
-    sprintf(def, template, full_callback_sym, macro_sym, macro_sym_len,
+    sprintf(def, pattern, full_callback_sym, macro_sym, macro_sym_len,
         full_override_sym, offset);
     return def;
 }
@@ -252,7 +252,7 @@ S_maybe_unreachable(CFCType *return_type) {
     }
     else {
         const char *ret_type_str = CFCType_to_c(return_type);
-        return_statement = MALLOCATE(strlen(ret_type_str) + 60);
+        return_statement = (char*)MALLOCATE(strlen(ret_type_str) + 60);
         sprintf(return_statement, "\n    CHY_UNREACHABLE_RETURN(%s);",
                 ret_type_str);
     }
@@ -275,13 +275,13 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
     char *unused = S_build_unused_vars(param_vars + 1);
     char *return_statement = S_maybe_unreachable(return_type);
 
-    char template[] = 
+    char pattern[] = 
         "%s\n"
         "%s(%s) {\n"
         "    cfish_CharBuf *klass = self ? Cfish_Obj_Get_Class_Name((cfish_Obj*)self) : %s->name;%s\n"
         "    CFISH_THROW(CFISH_ERR, \"Abstract method '%s' not defined by %%o\", klass);%s\n"
         "}\n";
-    size_t needed = sizeof(template)
+    size_t needed = sizeof(pattern)
                     + strlen(ret_type_str)
                     + strlen(full_func_sym)
                     + strlen(params)
@@ -291,7 +291,7 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
                     + strlen(return_statement)
                     + 50;
     char *abstract_def = (char*)MALLOCATE(needed);
-    sprintf(abstract_def, template, ret_type_str, full_func_sym, params, 
+    sprintf(abstract_def, pattern, ret_type_str, full_func_sym, params, 
             vtable_var, unused, macro_sym, return_statement);
 
     FREEMEM(unused);
@@ -406,15 +406,17 @@ S_invalid_callback_def(CFCMethod *method) {
 
     // Thwart compiler warnings.
     CFCType *return_type = CFCMethod_get_return_type(method);
+    const char *ret_type_str = CFCType_to_c(return_type);
     char *unused = S_build_unused_vars(param_vars);
     char *unreachable = S_maybe_unreachable(return_type);
 
     char pattern[] = 
-        "void\n"
+        "%s\n"
         "%s(%s) {%s\n"
         "    CFISH_THROW(CFISH_ERR, \"Can't override %s via binding\");%s\n"
         "}\n";
     size_t size = sizeof(pattern) 
+                  + strlen(ret_type_str)
                   + strlen(override_sym)
                   + strlen(params)
                   + strlen(unused)
@@ -422,7 +424,7 @@ S_invalid_callback_def(CFCMethod *method) {
                   + strlen(unreachable)
                   + 20;
     char *callback_def = (char*)MALLOCATE(size);
-    sprintf(callback_def, pattern, override_sym, params, unused,
+    sprintf(callback_def, pattern, ret_type_str, override_sym, params, unused,
             full_method_sym, unreachable);
 
     FREEMEM(unused);
