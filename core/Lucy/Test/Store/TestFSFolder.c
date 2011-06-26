@@ -37,6 +37,13 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/OutStream.h"
 
+/* The tests involving symlinks have to be run with administrator privileges
+ * under Windows, so disable by default.
+ */
+#ifndef _WIN32
+  #define ENABLE_SYMLINK_TESTS
+#endif
+
 static Folder*
 S_set_up() {
     rmdir("_fstest");
@@ -73,9 +80,13 @@ test_Initialize_and_Check(TestBatch *batch) {
     S_tear_down();
 }
 
+// Creae the symlinks needed by test_protect_symlinks().
+static bool_t
+S_create_test_symlinks(void);
+
 static void
 test_protect_symlinks(TestBatch *batch) {
-#ifdef CHY_HAS_UNISTD_H
+#ifdef ENABLE_SYMLINK_TESTS
     FSFolder *folder    = (FSFolder*)S_set_up();
     CharBuf  *foo       = (CharBuf*)ZCB_WRAP_STR("foo", 3);
     CharBuf  *bar       = (CharBuf*)ZCB_WRAP_STR("bar", 3);
@@ -86,14 +97,15 @@ test_protect_symlinks(TestBatch *batch) {
     OutStream *outstream = FSFolder_Open_Out(folder, foo_boffo);
     DECREF(outstream);
 
-    if (symlink("_fstest/foo/boffo", "_fstest/bar/banana")
-        || symlink("_fstest/foo", "_fstest/bar/bazooka")
-       ) {
-        FAIL(batch, "symlink() failed");
-        FAIL(batch, "symlink() failed");
-        FAIL(batch, "symlink() failed");
-        FAIL(batch, "symlink() failed");
-        FAIL(batch, "symlink() failed");
+    if (!S_create_test_symlinks()) {
+        FAIL(batch, "symlink creation failed");
+        FAIL(batch, "symlink creation failed");
+        FAIL(batch, "symlink creation failed");
+        FAIL(batch, "symlink creation failed");
+        FAIL(batch, "symlink creation failed");
+        // Try to clean up anyway.
+        FSFolder_Delete_Tree(folder, foo);
+        FSFolder_Delete_Tree(folder, bar);
     }
     else {
         VArray *list = FSFolder_List_R(folder, NULL);
@@ -121,13 +133,12 @@ test_protect_symlinks(TestBatch *batch) {
     DECREF(folder);
     S_tear_down();
 #else
-    // TODO: Add test for Windows.
-    SKIP(batch, "No symlink() function");
-    SKIP(batch, "No symlink() function");
-    SKIP(batch, "No symlink() function");
-    SKIP(batch, "No symlink() function");
-    SKIP(batch, "No symlink() function");
-#endif // CHY_HAS_UNISTD_H
+    SKIP(batch, "Tests requiring symlink() disabled");
+    SKIP(batch, "Tests requiring symlink() disabled");
+    SKIP(batch, "Tests requiring symlink() disabled");
+    SKIP(batch, "Tests requiring symlink() disabled");
+    SKIP(batch, "Tests requiring symlink() disabled");
+#endif // ENABLE_SYMLINK_TESTS
 }
 
 void
@@ -166,4 +177,29 @@ TestFSFolder_run_tests() {
     DECREF(batch);
 }
 
+#ifdef CHY_HAS_WINDOWS_H
+#include "windows.h"
+#elif defined(CHY_HAS_UNISTD_H)
+#include <unistd.h>
+#else
+#error "Don't have either windows.h or unistd.h"
+#endif
+
+static bool_t
+S_create_test_symlinks(void) {
+#ifdef CHY_HAS_WINDOWS_H
+    if (!CreateSymbolicLink("_fstest\\bar\\banana", "_fstest\\foo\\boffo", 0)
+        || !CreateSymbolicLink("_fstest\\bar\\bazooka", "_fstest\\foo", 1)
+       ) {
+        return false;
+    }
+#else
+    if (symlink("_fstest/foo/boffo", "_fstest/bar/banana")
+        || symlink("_fstest/foo", "_fstest/bar/bazooka")
+       ) {
+        return false;
+    }
+#endif
+    return true;
+}
 
