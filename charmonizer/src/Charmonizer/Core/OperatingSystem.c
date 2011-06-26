@@ -205,18 +205,25 @@ OS_run_local(const char *arg1, ...) {
 int
 OS_run_quietly(const char *command) {
     int retval = 1;
-
+#ifdef _WIN32
+    char pattern[] = "%s > NUL 2> NUL";
+    size_t size = sizeof(pattern) + strlen(command) + 10;
+    char *quiet_command = (char*)malloc(size);
+    sprintf(quiet_command, pattern, command);
+    retval = system(quiet_command);
+    free(quiet_command);
+#else
     if (!charm_run_initialized) {
         charm_run_initialized = true;
         S_build_charm_run();
     }
-
     if (!charm_run_ok) {
         retval = system(command);
     }
     else {
         retval = OS_run_local("_charm_run ", command, NULL);
     }
+#endif
 
     return retval;
 }
