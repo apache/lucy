@@ -287,7 +287,7 @@ S_is_local_entry(const CharBuf *path) {
 
 /***************************************************************************/
 
-#ifdef CHY_HAS_UNISTD_H
+#if (defined(CHY_HAS_UNISTD_H) && !defined(CHY_HAS_WINDOWS_H))
 
 bool_t
 S_hard_link(CharBuf *from_path, CharBuf *to_path) {
