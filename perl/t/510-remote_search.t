@@ -22,7 +22,7 @@ use IO::Socket::INET;
 
 my $PORT_NUM = 7890;
 BEGIN {
-    if ( $^O =~ /mswin/i ) {
+    if ( $^O =~ /(mswin|cygwin)/i ) {
         plan( 'skip_all', "fork on Windows not supported by Lucy" );
     }
     elsif ( $ENV{LUCY_VALGRIND} ) {

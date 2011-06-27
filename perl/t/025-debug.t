@@ -53,7 +53,8 @@ ASSERT(1);
 pass("ASSERT(true) didn't die");
 
 SKIP: {
-    skip( "Windows fork not supported by Lucy", 3 ) if $^O =~ /mswin/i;
+    skip( "Windows fork not supported by Lucy", 3 )
+    	if $^O =~ /(mswin|cygwin)/i;
 
     my $stderr_out = capture_debug( 'Lucy.xs', 'Borax' );
     like( $stderr_out, qr/Borax/, "DEBUG - file name" );

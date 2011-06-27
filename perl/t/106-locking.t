@@ -23,7 +23,7 @@ use File::Spec::Functions qw( catfile );
 use Lucy::Test::TestUtils qw( init_test_index_loc );
 
 BEGIN {
-    if ( $^O =~ /mswin/i ) {
+    if ( $^O =~ /(mswin|cygwin)/i ) {
         plan( 'skip_all', "fork on Windows not supported by Lucy" );
     }
     else {
