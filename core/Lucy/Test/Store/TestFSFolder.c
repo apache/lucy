@@ -40,9 +40,12 @@
 /* The tests involving symlinks have to be run with administrator privileges
  * under Windows, so disable by default.
  */
-#ifndef _WIN32
-  #define ENABLE_SYMLINK_TESTS
-#endif
+#ifndef CHY_HAS_WINDOWS_H
+#define ENABLE_SYMLINK_TESTS
+// Create the symlinks needed by test_protect_symlinks().
+static bool_t
+S_create_test_symlinks(void);
+#endif /* CHY_HAS_WINDOWS_H */
 
 static Folder*
 S_set_up() {
@@ -79,10 +82,6 @@ test_Initialize_and_Check(TestBatch *batch) {
     DECREF(folder);
     S_tear_down();
 }
-
-// Creae the symlinks needed by test_protect_symlinks().
-static bool_t
-S_create_test_symlinks(void);
 
 static void
 test_protect_symlinks(TestBatch *batch) {
@@ -177,6 +176,8 @@ TestFSFolder_run_tests() {
     DECREF(batch);
 }
 
+#ifdef ENABLE_SYMLINK_TESTS
+
 #ifdef CHY_HAS_WINDOWS_H
 #include "windows.h"
 #elif defined(CHY_HAS_UNISTD_H)
@@ -202,4 +203,6 @@ S_create_test_symlinks(void) {
 #endif
     return true;
 }
+
+#endif /* ENABLE_SYMLINK_TESTS */
 

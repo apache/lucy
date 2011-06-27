@@ -74,6 +74,13 @@ int main(int argc, char **argv) {
         "  #include <stdlib.h>\n"
         "#endif\n\n"
     );
+    chaz_ConfWriter_append_conf(
+        "#ifdef CHY_HAS_WINDOWS_H\n"
+        "  /* Target Windows XP. */\n"
+        "  #define WINVER 0x0500\n"
+        "  #define _WIN32_WINNT 0x0500\n"
+        "#endif\n\n"
+    );
 
     /* Clean up. */
     chaz_Probe_clean_up();
