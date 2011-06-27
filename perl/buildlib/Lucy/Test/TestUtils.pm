@@ -117,7 +117,7 @@ sub get_uscon_docs {
         open( my $fh, '<', $filepath )
             or die "couldn't open file '$filepath': $!";
         my $content = do { local $/; <$fh> };
-        $content =~ /(.*?)\n\n(.*)/s
+        $content =~ /\A(.+?)^\s+(.*)/ms
             or die "Can't extract title/bodytext from '$filepath'";
         my $title    = $1;
         my $bodytext = $2;

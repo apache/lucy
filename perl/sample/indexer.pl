@@ -78,7 +78,7 @@ sub parse_file {
     my $filepath = catfile( $uscon_source, $filename );
     open( my $fh, '<', $filepath ) or die "Can't open '$filepath': $!";
     my $text = do { local $/; <$fh> };    # slurp file content
-    $text =~ /(.*?)\n\n(.*)/s
+    $text =~ /\A(.+?)^\s+(.*)/ms 
         or die "Can't extract title/bodytext from '$filepath'";
     my $title    = $1;
     my $bodytext = $2;
