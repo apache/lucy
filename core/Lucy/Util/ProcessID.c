@@ -16,8 +16,34 @@
 
 #include "Lucy/Util/ProcessID.h"
 
+/********************************* UNIXEN *********************************/
+#if (defined(CHY_HAS_UNISTD_H) && defined(CHY_HAS_SIGNAL_H))
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <signal.h>
+#include <errno.h>
+
+int
+lucy_PID_getpid(void) {
+    return getpid();
+}
+
+chy_bool_t
+lucy_PID_active(int pid) {
+    if (kill(pid, 0) == 0) {
+        return true; // signal succeeded, therefore pid active
+    }
+
+    if (errno != ESRCH) {
+        return true; // an error other than "pid not found", thus active
+    }
+
+    return false;
+}
+
 /********************************* WINDOWS ********************************/
-#if (defined(CHY_HAS_WINDOWS_H) && defined(CHY_HAS_PROCESS_H) && !defined(__CYGWIN__))
+#elif (defined(CHY_HAS_WINDOWS_H) && defined(CHY_HAS_PROCESS_H))
 
 #include <Windows.h>
 #include <process.h>
@@ -47,35 +73,7 @@ lucy_PID_active(int pid) {
     return false;
 }
 
-
-/********************************* UNIXEN *********************************/
-#elif (defined(CHY_HAS_UNISTD_H) && defined(CHY_HAS_SIGNAL_H))
-
-#include <sys/types.h>
-#include <unistd.h>
-#include <signal.h>
-#include <errno.h>
-
-int
-lucy_PID_getpid(void) {
-    return getpid();
-}
-
-chy_bool_t
-lucy_PID_active(int pid) {
-    if (kill(pid, 0) == 0) {
-        return true; // signal succeeded, therefore pid active
-    }
-
-    if (errno != ESRCH) {
-        return true; // an error other than "pid not found", thus active
-    }
-
-    return false;
-}
-
 #else
   #error "Can't find a known process ID API."
 #endif // OS switch.
-
 
