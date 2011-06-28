@@ -175,7 +175,7 @@ FSFH_close(FSFileHandle *self) {
         }
         self->fd  = 0;
     }
-    #ifdef CHY_HAS_WINDOWS_H
+    #if (defined(CHY_HAS_WINDOWS_H) && !defined(CHY_HAS_SYS_MMAN_H))
     if (self->win_fhandle) {
         if (!SI_close_win_handles(self)) { return false; }
     }
