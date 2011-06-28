@@ -195,7 +195,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
         // Deal with Windows ceiling on file path lengths.
         Err_set_error(Err_new(CB_newf("Directory path is too long: %o",
                                       dir)));
-        DECREF(self);
+        LUCY_DECREF(self);
         return NULL;
     }
 
@@ -209,7 +209,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
     if (INVALID_HANDLE_VALUE == self->sys_dirhandle) {
         // Directory inaccessible or doesn't exist.
         Err_set_error(Err_new(CB_newf("Failed to open dir '%o'", dir)));
-        DECREF(self);
+        LUCY_DECREF(self);
         return NULL;
     }
     else {
@@ -266,7 +266,7 @@ FSDH_close(FSDirHandle *self) {
 
     // If we encountered an error condition previously, report it now.
     if (self->saved_error) {
-        Err_set_error((Err*)INCREF(self->saved_error));
+        Err_set_error((Err*)LUCY_INCREF(self->saved_error));
         return false;
     }
     else {
