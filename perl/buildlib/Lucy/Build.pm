@@ -141,12 +141,9 @@ sub _run_make {
         if ( -f "Makefile.win" ) {
             unshift @command, "-f", "Makefile.win";
         }
-        unshift @command, "nmake";
     }
-    else {
-        unshift @command, "make";
-    }
-    system(@command) and confess("Make failed");
+    unshift @command, "$Config{make}";
+    system(@command) and confess("$Config{make} failed");
     chdir $current_directory if $dir;
 }
 
