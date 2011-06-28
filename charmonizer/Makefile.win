@@ -23,6 +23,7 @@ INCLUDES=  -I. -Isrc
 DEFINES= $(INCLUDES) $(DEFS) -nologo
 CFLAGS= $(DEFINES)
 LIBS=
+CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core *.pdb
 
 TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe
 
@@ -67,4 +68,4 @@ TestVariadicMacros.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariad
 
 
 clean:
-	CMD /c FOR %i IN ($(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core) DO IF EXIST %i DEL /F %i
+	CMD /c FOR %i IN ($(CLEANABLE)) DO IF EXIST %i DEL /F %i

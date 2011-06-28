@@ -22,6 +22,7 @@ INCLUDES= -I. -Isrc
 DEFINES= $(INCLUDES) $(DEFS)
 CFLAGS= -g $(DEFINES)
 LIBS=
+CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core
 
 TESTS= TestDirManip TestFuncMacro TestHeaders TestIntegers TestLargeFiles TestUnusedVars TestVariadicMacros
 
@@ -66,4 +67,4 @@ TestVariadicMacros: src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacr
 
 
 clean:
-	rm -f $(OBJS) $(TEST_OBJS) $(PROGNAME) $(TESTS) core
+	rm -f $(CLEANABLE)

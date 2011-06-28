@@ -94,6 +94,7 @@ INCLUDES= -I. -Isrc
 DEFINES= \$(INCLUDES) \$(DEFS)
 CFLAGS= -g \$(DEFINES)
 LIBS=
+CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core
 
 TESTS= $args{test_execs}
 
@@ -118,7 +119,7 @@ tests: \$(TESTS)
 $args{test_blocks}
 
 clean:
-	rm -f \$(OBJS) \$(TEST_OBJS) \$(PROGNAME) \$(TESTS) core
+	rm -f \$(CLEANABLE)
 EOT
     print $fh $content;
 }
@@ -139,6 +140,7 @@ INCLUDES=  -I. -Isrc
 DEFINES= \$(INCLUDES) \$(DEFS) -nologo
 CFLAGS= \$(DEFINES)
 LIBS=
+CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core *.pdb
 
 TESTS= $args{test_execs}
 
@@ -163,7 +165,7 @@ tests: \$(TESTS)
 $args{test_blocks}
 
 clean:
-	CMD /c FOR %i IN (\$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core) DO IF EXIST %i DEL /F %i
+	CMD /c FOR %i IN (\$(CLEANABLE)) DO IF EXIST %i DEL /F %i
 EOT
     print $fh $content;
 }
