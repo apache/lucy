@@ -287,34 +287,12 @@ S_is_local_entry(const CharBuf *path) {
 
 /***************************************************************************/
 
-#if (defined(CHY_HAS_UNISTD_H) && !defined(CHY_HAS_WINDOWS_H))
-
-bool_t
-S_hard_link(CharBuf *from_path, CharBuf *to_path) {
-    char *from8 = (char*)CB_Get_Ptr8(from_path);
-    char *to8   = (char*)CB_Get_Ptr8(to_path);
-
-    if (-1 == link(from8, to8)) {
-        Err_set_error(Err_new(CB_newf("hard link for new file '%o' from '%o' failed: %s",
-                                      to_path, from_path, strerror(errno))));
-        return false;
-    }
-    else {
-        return true;
-    }
-}
-
-#elif defined(CHY_HAS_WINDOWS_H)
+#if (defined(CHY_HAS_WINDOWS_H) && !defined(__CYGWIN__))
 
 // Windows.h defines INCREF and DECREF, so we include it only at the end of
 // this file and undef those symbols.
 #undef INCREF
 #undef DECREF
-
-// For CreateHardLink.
-#ifdef CHY_HAS_WINDOWS_H
-  #include <windows.h>
-#endif
 
 #include <windows.h>
 
@@ -335,5 +313,25 @@ S_hard_link(CharBuf *from_path, CharBuf *to_path) {
     }
 }
 
+#elif (defined(CHY_HAS_UNISTD_H))
+
+bool_t
+S_hard_link(CharBuf *from_path, CharBuf *to_path) {
+    char *from8 = (char*)CB_Get_Ptr8(from_path);
+    char *to8   = (char*)CB_Get_Ptr8(to_path);
+
+    if (-1 == link(from8, to8)) {
+        Err_set_error(Err_new(CB_newf("hard link for new file '%o' from '%o' failed: %s",
+                                      to_path, from_path, strerror(errno))));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+#else
+  #error "Need either windows.h or unistd.h"
 #endif /* CHY_HAS_UNISTD_H vs. CHY_HAS_WINDOWS_H */
+
 
