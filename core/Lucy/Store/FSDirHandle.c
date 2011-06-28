@@ -58,124 +58,8 @@ SI_is_updir(const char *name, size_t len) {
     }
 }
 
-/********************************** UNIXEN *********************************/
-#if (defined(CHY_HAS_DIRENT_H) && !defined(CHY_HAS_WINDOWS_H))
-
-#include <dirent.h>
-
-FSDirHandle*
-FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
-    char *dir_path_ptr = (char*)CB_Get_Ptr8(dir);
-
-    DH_init((DirHandle*)self, dir);
-    self->sys_dir_entry    = NULL;
-    self->fullpath         = NULL;
-
-    self->sys_dirhandle = opendir(dir_path_ptr);
-    if (!self->sys_dirhandle) {
-        Err_set_error(Err_new(CB_newf("Failed to opendir '%o'", dir)));
-        DECREF(self);
-        return NULL;
-    }
-
-    return self;
-}
-
-bool_t
-FSDH_next(FSDirHandle *self) {
-    self->sys_dir_entry = (struct dirent*)readdir((DIR*)self->sys_dirhandle);
-    if (!self->sys_dir_entry) {
-        CB_Set_Size(self->entry, 0);
-        return false;
-    }
-    else {
-        struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
-        #ifdef CHY_HAS_DIRENT_D_NAMLEN
-        size_t len = sys_dir_entry->d_namlen;
-        #else
-        size_t len = strlen(sys_dir_entry->d_name);
-        #endif
-        if (SI_is_updir(sys_dir_entry->d_name, len)) {
-            return FSDH_Next(self);
-        }
-        else {
-            CB_Mimic_Str(self->entry, sys_dir_entry->d_name, len);
-            return true;
-        }
-    }
-}
-
-bool_t
-FSDH_entry_is_dir(FSDirHandle *self) {
-    struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
-    if (!sys_dir_entry) { return false; }
-
-    // If d_type is available, try to avoid a stat() call.  If it's not, or if
-    // the type comes back as unknown, fall back to stat().
-    #ifdef CHY_HAS_DIRENT_D_TYPE
-    if (sys_dir_entry->d_type == DT_DIR) {
-        return true;
-    }
-    else if (sys_dir_entry->d_type != DT_UNKNOWN) {
-        return false;
-    }
-    #endif
-
-    struct stat stat_buf;
-    if (!self->fullpath) {
-        self->fullpath = CB_new(CB_Get_Size(self->dir) + 20);
-    }
-    CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
-            self->entry);
-    if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
-        if (stat_buf.st_mode & S_IFDIR) { return true; }
-    }
-    return false;
-}
-
-bool_t
-FSDH_entry_is_symlink(FSDirHandle *self) {
-    struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
-    if (!sys_dir_entry) { return false; }
-
-    #ifdef CHY_HAS_DIRENT_D_TYPE
-    return sys_dir_entry->d_type == DT_LNK ? true : false;
-    #else
-    {
-        struct stat stat_buf;
-        if (!self->fullpath) {
-            self->fullpath = CB_new(CB_Get_Size(self->dir) + 20);
-        }
-        CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
-                self->entry);
-        if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
-            if (stat_buf.st_mode & S_IFLNK) { return true; }
-        }
-        return false;
-    }
-    #endif // CHY_HAS_DIRENT_D_TYPE
-}
-
-bool_t
-FSDH_close(FSDirHandle *self) {
-    if (self->fullpath) {
-        CB_Dec_RefCount(self->fullpath);
-        self->fullpath = NULL;
-    }
-    if (self->sys_dirhandle) {
-        DIR *sys_dirhandle = (DIR*)self->sys_dirhandle;
-        self->sys_dirhandle = NULL;
-        if (closedir(sys_dirhandle) == -1) {
-            Err_set_error(Err_new(CB_newf("Error closing dirhandle: %s",
-                                          strerror(errno))));
-            return false;
-        }
-    }
-    return true;
-}
-
 /********************************** Windows ********************************/
-#elif defined(CHY_HAS_WINDOWS_H)
+#if (defined(CHY_HAS_WINDOWS_H) && !defined(__CYGWIN__))
 
 #include <windows.h>
 
@@ -310,6 +194,122 @@ FSDH_next(FSDirHandle *self) {
             return true;
         }
     }
+}
+
+/********************************** UNIXEN *********************************/
+#elif defined(CHY_HAS_DIRENT_H)
+
+#include <dirent.h>
+
+FSDirHandle*
+FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
+    char *dir_path_ptr = (char*)CB_Get_Ptr8(dir);
+
+    DH_init((DirHandle*)self, dir);
+    self->sys_dir_entry    = NULL;
+    self->fullpath         = NULL;
+
+    self->sys_dirhandle = opendir(dir_path_ptr);
+    if (!self->sys_dirhandle) {
+        Err_set_error(Err_new(CB_newf("Failed to opendir '%o'", dir)));
+        DECREF(self);
+        return NULL;
+    }
+
+    return self;
+}
+
+bool_t
+FSDH_next(FSDirHandle *self) {
+    self->sys_dir_entry = (struct dirent*)readdir((DIR*)self->sys_dirhandle);
+    if (!self->sys_dir_entry) {
+        CB_Set_Size(self->entry, 0);
+        return false;
+    }
+    else {
+        struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
+        #ifdef CHY_HAS_DIRENT_D_NAMLEN
+        size_t len = sys_dir_entry->d_namlen;
+        #else
+        size_t len = strlen(sys_dir_entry->d_name);
+        #endif
+        if (SI_is_updir(sys_dir_entry->d_name, len)) {
+            return FSDH_Next(self);
+        }
+        else {
+            CB_Mimic_Str(self->entry, sys_dir_entry->d_name, len);
+            return true;
+        }
+    }
+}
+
+bool_t
+FSDH_entry_is_dir(FSDirHandle *self) {
+    struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
+    if (!sys_dir_entry) { return false; }
+
+    // If d_type is available, try to avoid a stat() call.  If it's not, or if
+    // the type comes back as unknown, fall back to stat().
+    #ifdef CHY_HAS_DIRENT_D_TYPE
+    if (sys_dir_entry->d_type == DT_DIR) {
+        return true;
+    }
+    else if (sys_dir_entry->d_type != DT_UNKNOWN) {
+        return false;
+    }
+    #endif
+
+    struct stat stat_buf;
+    if (!self->fullpath) {
+        self->fullpath = CB_new(CB_Get_Size(self->dir) + 20);
+    }
+    CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
+            self->entry);
+    if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
+        if (stat_buf.st_mode & S_IFDIR) { return true; }
+    }
+    return false;
+}
+
+bool_t
+FSDH_entry_is_symlink(FSDirHandle *self) {
+    struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
+    if (!sys_dir_entry) { return false; }
+
+    #ifdef CHY_HAS_DIRENT_D_TYPE
+    return sys_dir_entry->d_type == DT_LNK ? true : false;
+    #else
+    {
+        struct stat stat_buf;
+        if (!self->fullpath) {
+            self->fullpath = CB_new(CB_Get_Size(self->dir) + 20);
+        }
+        CB_setf(self->fullpath, "%o%s%o", self->dir, CHY_DIR_SEP,
+                self->entry);
+        if (stat((char*)CB_Get_Ptr8(self->fullpath), &stat_buf) != -1) {
+            if (stat_buf.st_mode & S_IFLNK) { return true; }
+        }
+        return false;
+    }
+    #endif // CHY_HAS_DIRENT_D_TYPE
+}
+
+bool_t
+FSDH_close(FSDirHandle *self) {
+    if (self->fullpath) {
+        CB_Dec_RefCount(self->fullpath);
+        self->fullpath = NULL;
+    }
+    if (self->sys_dirhandle) {
+        DIR *sys_dirhandle = (DIR*)self->sys_dirhandle;
+        self->sys_dirhandle = NULL;
+        if (closedir(sys_dirhandle) == -1) {
+            Err_set_error(Err_new(CB_newf("Error closing dirhandle: %s",
+                                          strerror(errno))));
+            return false;
+        }
+    }
+    return true;
 }
 
 #else
