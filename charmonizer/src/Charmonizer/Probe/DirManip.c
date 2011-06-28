@@ -17,6 +17,7 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/ConfWriter.h"
+#include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/Dir.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/HeaderChecker.h"
@@ -24,6 +25,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+static const char cygwin_code[] = 
+    QUOTE(#ifndef __CYGWIN__            )
+    QUOTE(  #error "Not Cygwin"         )
+    QUOTE(#endif                        )
+    QUOTE(int main() { return 0; }      );
 
 void
 DirManip_run(void) {
@@ -77,44 +84,17 @@ DirManip_run(void) {
         ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 1\n");
     }
 
-    /* Create a directory. */
-    Dir_mkdir("_charm_test_dir_orig");
-
-    /* Try to create files under the new directory. */
-    if ((f = fopen("_charm_test_dir_orig\\backslash", "w")) != NULL) {
-        fclose(f);
-    }
-    if ((f = fopen("_charm_test_dir_orig/slash", "w")) != NULL) {
-        fclose(f);
-    }
-
-    /* Rename the directory, then see which file we can get to. */
-    rename("_charm_test_dir_orig", "_charm_test_dir_mod");
-    if ((f = fopen("_charm_test_dir_mod\\backslash", "r")) != NULL) {
-        fclose(f);
-        strcpy(dir_sep, "\\\\");
-    }
-    else if ((f = fopen("_charm_test_dir_mod/slash", "r")) != NULL) {
-        fclose(f);
+    if (CC_test_compile(cygwin_code, strlen(cygwin_code))) {
         strcpy(dir_sep, "/");
+    }
+    else if (HeadCheck_check_header("windows.h")) {
+        strcpy(dir_sep, "\\\\");
     }
     else {
-        /* Punt based on OS. */
-        #ifdef _WIN32
-        strcpy(dir_sep, "\\\\");
-        #else
         strcpy(dir_sep, "/");
-        #endif
     }
-    ConfWriter_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
 
-    /* Clean up - delete all possible files without verifying. */
-    remove("_charm_test_dir_mod/slash");
-    remove("_charm_test_dir_mod\\backslash");
-    remove("_charm_test_dir_orig/slash");
-    remove("_charm_test_dir_orig\\backslash");
-    Dir_rmdir("_charm_test_dir_orig");
-    Dir_rmdir("_charm_test_dir_mod");
+    ConfWriter_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
 
     /* See whether remove works on directories. */
     Dir_mkdir("_charm_test_remove_me");
