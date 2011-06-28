@@ -489,11 +489,14 @@ sub ACTION_compile_custom_xs {
     push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR,    qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR,    qr/\.c$/ ) };
     for my $c_file (@$c_files) {
-        my $o_file = $c_file;
-        $o_file =~ s/\.c/$Config{_o}/;
+        my $o_file   = $c_file;
+        my $ccs_file = $c_file;
+        $o_file   =~ s/\.c/$Config{_o}/;
+        $ccs_file =~ s/\.c/.ccs/;
         push @objects, $o_file;
         next if $self->up_to_date( $c_file, $o_file );
         $self->add_to_cleanup($o_file);
+        $self->add_to_cleanup($ccs_file);
         $cbuilder->compile(
             source               => $c_file,
             extra_compiler_flags => $self->extra_ccflags,
@@ -551,6 +554,16 @@ sub ACTION_compile_custom_xs {
         }
         utime( (time) x 2, $bs_file );    # touch
     }
+
+    # Clean up after CBuilder under MSVC.
+    $self->add_to_cleanup('compilet*');
+    $self->add_to_cleanup('*.ccs');
+    $self->add_to_cleanup( catfile( 'lib', 'Lucy.ccs' ) );
+    $self->add_to_cleanup( catfile( 'lib', 'Lucy.def' ) );
+    $self->add_to_cleanup( catfile( 'lib', 'Lucy_def.old' ) );
+    $self->add_to_cleanup( catfile( 'lib', 'Lucy.exp' ) );
+    $self->add_to_cleanup( catfile( 'lib', 'Lucy.lib' ) );
+    $self->add_to_cleanup( catfile( 'lib', 'Lucy.lds' ) );
 
     # .o => .(a|bundle)
     my $lib_file = catfile( $archdir, "Lucy.$Config{dlext}" );
