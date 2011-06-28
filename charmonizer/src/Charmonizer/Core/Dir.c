@@ -106,9 +106,7 @@ S_init_mkdir(void) {
         if (S_try_init_win_mkdir())               { return; }
         if (S_try_init_posix_mkdir("direct.h"))   { return; }
     }
-    else {
-        if (S_try_init_posix_mkdir("sys/stat.h")) { return; }
-    }
+    if (S_try_init_posix_mkdir("sys/stat.h")) { return; }
 }
 
 static chaz_bool_t
