@@ -60,6 +60,8 @@ S_do_test_compile(void);
 
 void
 CC_init(const char *compiler_command, const char *compiler_flags) {
+    const char *code = "int main() { return 0; }\n";
+
     if (Util_verbosity) { printf("Creating compiler object...\n"); }
 
     /* Assign. */
@@ -81,7 +83,12 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     }
 
     /* If we can't compile anything, game over. */
-    S_do_test_compile();
+    if (Util_verbosity) {
+        printf("Trying to compile a small test file...\n");
+    }
+    if (!CC_test_compile(code, strlen(code))) {
+         Util_die("Failed to compile a small test file");
+    }
 }
 
 void
@@ -260,25 +267,6 @@ S_clean_up_try(void) {
     remove(TRY_SOURCE_PATH);
     OS_remove_exe(TRY_APP_BASENAME);
     remove(TARGET_PATH);
-}
-
-static void
-S_do_test_compile(void) {
-    const char *code = "int main() { return 0; }\n";
-    chaz_bool_t success;
-
-    if (Util_verbosity) {
-        printf("Trying to compile a small test file...\n");
-    }
-
-    /* Attempt compilation. */
-    success = CC_compile_exe("_charm_try.c", "_charm_try",
-                             code, strlen(code));
-    if (!success) { Util_die("Failed to compile a small test file"); }
-
-    /* Clean up. */
-    remove("_charm_try.c");
-    OS_remove_exe("_charm_try");
 }
 
 void
