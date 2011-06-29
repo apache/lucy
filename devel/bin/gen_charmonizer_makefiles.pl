@@ -41,13 +41,13 @@ sub wanted {
 
 sub unix_obj {
     my @o = @_;
-    s/\.c$/.o/, tr{\\}{/} for @o;
+    s/\.c$/\$(OBJEXT)/, tr{\\}{/} for @o;
     return @o;
 }
 
 sub win_obj {
     my @obj = @_;
-    s/\.c$/.obj/, tr{/}{\\} for @obj;
+    s/\.c$/\$(OBJEXT)/, tr{/}{\\} for @obj;
     return @obj;
 }
 
@@ -57,7 +57,7 @@ sub unix_tests {
     $_ .= '$(EXEEXT)' for @test;
     my @obj = unix_obj @src;
     my $test_obj;
-    @obj = grep /\bTest\.o$/ ? ($test_obj = $_) && 0 : 1, @obj;
+    @obj = grep /\bTest\$\(OBJEXT\)$/ ? ($test_obj = $_) && 0 : 1, @obj;
     my @block;
     push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
@@ -72,7 +72,7 @@ sub win_tests {
     $_ .= '$(EXEEXT)' for @test;
     my @obj = win_obj @src;
     my $test_obj;
-    @obj = grep /\bTest\.obj$/ ? ($test_obj = $_) && 0 : 1, @obj;
+    @obj = grep /\bTest\$\(OBJEXT\)$/ ? ($test_obj = $_) && 0 : 1, @obj;
     my @block;
     push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
@@ -91,6 +91,7 @@ $license
 CC= cc
 DEFS=
 EXEEXT= 
+OBJEXT= .o
 PROGNAME= charmonize\$(EXEEXT)
 CFLAGS= -Isrc \$(DEFS)
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core
@@ -133,6 +134,7 @@ $license
 CC= cl
 DEFS=
 EXEEXT= .exe
+OBJEXT= .obj
 PROGNAME= charmonize\$(EXEEXT)
 LINKER= link -nologo
 CFLAGS= -Isrc -nologo \$(DEFS)
