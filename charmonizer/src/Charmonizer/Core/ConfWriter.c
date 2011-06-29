@@ -63,10 +63,6 @@ ConfWriter_get_charmony_fh(void) {
 
 void
 ConfWriter_clean_up(void) {
-    /* Clean up some temp files. */
-    remove("_charm.h");
-    OS_remove_exe("_charm_stat");
-
     /* Write the last bit of charmony.h and close. */
     fprintf(charmony_fh, "#endif /* H_CHARMONY */\n\n");
     if (fclose(charmony_fh)) {

@@ -97,5 +97,8 @@ S_init(void) {
     remove("_charm_stat.c");
 }
 
-
+void
+Stat_clean_up(void) {
+    OS_remove_exe("_charm_stat");
+}
 

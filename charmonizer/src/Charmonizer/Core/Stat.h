@@ -50,9 +50,13 @@ struct chaz_Stat {
 void
 chaz_Stat_stat(const char *filepath, chaz_Stat *target);
 
+void
+chaz_Stat_clean_up(void);
+
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Stat                  chaz_Stat
   #define Stat_stat             chaz_Stat_stat
+  #define Stat_clean_up         chaz_Stat_clean_up
 #endif
 
 #ifdef __cplusplus

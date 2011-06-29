@@ -26,11 +26,15 @@
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/OperatingSystem.h"
+#include "Charmonizer/Core/Stat.h"
 
 /* Write the "_charm.h" file used by every probe.
  */
 static void
 S_write_charm_h(void);
+
+static void
+S_remove_charm_h(void);
 
 void
 Probe_init(const char *cc_command, const char *cc_flags,
@@ -57,7 +61,9 @@ Probe_clean_up(void) {
     if (Util_verbosity) { printf("Cleaning up...\n"); }
 
     /* Dispatch various clean up routines. */
+    S_remove_charm_h();
     ConfWriter_clean_up();
+    Stat_clean_up();
     CC_clean_up();
     OS_clean_up();
     Dir_clean_up();
@@ -82,4 +88,8 @@ S_write_charm_h(void) {
     Util_write_file("_charm.h", charm_h_code);
 }
 
+static void
+S_remove_charm_h(void) {
+    remove("_charm.h");
+}
 
