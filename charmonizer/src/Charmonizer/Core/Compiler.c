@@ -25,14 +25,14 @@
 
 /* Temporary files. */
 #define TRY_SOURCE_PATH  "_charmonizer_try.c"
-#define TRY_APP_BASENAME "_charmonizer_try"
+#define TRY_BASENAME     "_charmonizer_try"
 #define TARGET_PATH      "_charmonizer_target"
 
 /* Static vars. */
 static char     *cc_command   = NULL;
 static char     *cc_flags     = NULL;
 static char    **inc_dirs     = NULL;
-static char     *try_app_name = NULL;
+static char     *try_exe_name = NULL;
 static char     *try_obj_name = NULL;
 
 /* Detect a supported compiler, or assume a generic GCC-compatible compiler
@@ -74,12 +74,12 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     {
         const char *exe_ext = OS_exe_ext();
         const char *obj_ext = OS_obj_ext();
-        size_t exe_len = strlen(TRY_APP_BASENAME) + strlen(exe_ext) + 1;
-        size_t obj_len = strlen(TRY_APP_BASENAME) + strlen(obj_ext) + 1;
-        try_app_name = (char*)malloc(exe_len);
+        size_t exe_len = strlen(TRY_BASENAME) + strlen(exe_ext) + 1;
+        size_t obj_len = strlen(TRY_BASENAME) + strlen(obj_ext) + 1;
+        try_exe_name = (char*)malloc(exe_len);
         try_obj_name = (char*)malloc(obj_len);
-        sprintf(try_app_name, "%s%s", TRY_APP_BASENAME, exe_ext);
-        sprintf(try_obj_name, "%s%s", TRY_APP_BASENAME, obj_ext);
+        sprintf(try_exe_name, "%s%s", TRY_BASENAME, exe_ext);
+        sprintf(try_obj_name, "%s%s", TRY_BASENAME, obj_ext);
     }
 
     /* If we can't compile anything, game over. */
@@ -104,7 +104,7 @@ CC_clean_up(void) {
     free(cc_flags);
 
     free(try_obj_name);
-    free(try_app_name);
+    free(try_exe_name);
 }
 
 static char*
@@ -240,7 +240,7 @@ CC_test_compile(const char *source, size_t source_len) {
     if (!Util_remove_and_verify(try_obj_name)) {
         Util_die("Failed to delete file '%s'", try_obj_name);
     }
-    compile_succeeded = CC_compile_obj(TRY_SOURCE_PATH, TRY_APP_BASENAME,
+    compile_succeeded = CC_compile_obj(TRY_SOURCE_PATH, TRY_BASENAME,
                                        source, source_len);
     remove(try_obj_name);
     return compile_succeeded;
@@ -252,18 +252,18 @@ CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
     chaz_bool_t compile_succeeded;
 
     /* Clear out previous versions and test to make sure removal worked. */
-    if (!Util_remove_and_verify(try_app_name)) {
-        Util_die("Failed to delete file '%s'", try_app_name);
+    if (!Util_remove_and_verify(try_exe_name)) {
+        Util_die("Failed to delete file '%s'", try_exe_name);
     }
     if (!Util_remove_and_verify(TARGET_PATH)) {
         Util_die("Failed to delete file '%s'", TARGET_PATH);
     }
 
     /* Attempt compilation; if successful, run app and slurp output. */
-    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME,
+    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_BASENAME,
                                        source, source_len);
     if (compile_succeeded) {
-        OS_run_local(try_app_name, NULL);
+        OS_run_local(try_exe_name, NULL);
         captured_output = Util_slurp_file(TARGET_PATH, output_len);
     }
     else {
@@ -272,7 +272,7 @@ CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
 
     /* Remove all the files we just created. */
     remove(TRY_SOURCE_PATH);
-    OS_remove_exe(TRY_APP_BASENAME);
+    OS_remove_exe(TRY_BASENAME);
     remove(TARGET_PATH);
 
     return captured_output;
