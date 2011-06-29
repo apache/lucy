@@ -33,6 +33,7 @@ static char     *cc_command   = NULL;
 static char     *cc_flags     = NULL;
 static char    **inc_dirs     = NULL;
 static char     *try_app_name = NULL;
+static char     *try_obj_name = NULL;
 
 /* Detect a supported compiler, or assume a generic GCC-compatible compiler
  * and hope for the best.  */
@@ -49,11 +50,6 @@ static const char *include_flag      = "-I ";
 static const char *object_flag       = "-o ";
 static const char *exe_flag          = "-o ";
 #endif
-
-/* Clean up the files associated with CC_capture_output().
- */
-static void
-S_clean_up_try(void);
 
 static void
 S_do_test_compile(void);
@@ -74,12 +70,16 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     /* Add the current directory as an include dir. */
     CC_add_inc_dir(".");
 
-    /* Set the name of the application which we "try" to execute. */
+    /* Set names for the targets which we "try" to compile. */
     {
         const char *exe_ext = OS_exe_ext();
-        size_t len = strlen(TRY_APP_BASENAME) + strlen(exe_ext) + 1;
-        try_app_name = (char*)malloc(len);
+        const char *obj_ext = OS_obj_ext();
+        size_t exe_len = strlen(TRY_APP_BASENAME) + strlen(exe_ext) + 1;
+        size_t obj_len = strlen(TRY_APP_BASENAME) + strlen(obj_ext) + 1;
+        try_app_name = (char*)malloc(exe_len);
+        try_obj_name = (char*)malloc(obj_len);
         sprintf(try_app_name, "%s%s", TRY_APP_BASENAME, exe_ext);
+        sprintf(try_obj_name, "%s%s", TRY_APP_BASENAME, obj_ext);
     }
 
     /* If we can't compile anything, game over. */
@@ -102,6 +102,9 @@ CC_clean_up(void) {
 
     free(cc_command);
     free(cc_flags);
+
+    free(try_obj_name);
+    free(try_app_name);
 }
 
 static char*
@@ -234,16 +237,12 @@ CC_compile_obj(const char *source_path, const char *obj_name,
 chaz_bool_t
 CC_test_compile(const char *source, size_t source_len) {
     chaz_bool_t compile_succeeded;
-
-    if (!Util_remove_and_verify(try_app_name)) {
-        Util_die("Failed to delete file '%s'", try_app_name);
+    if (!Util_remove_and_verify(try_obj_name)) {
+        Util_die("Failed to delete file '%s'", try_obj_name);
     }
-
-    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_APP_BASENAME,
+    compile_succeeded = CC_compile_obj(TRY_SOURCE_PATH, TRY_APP_BASENAME,
                                        source, source_len);
-
-    S_clean_up_try();
-
+    remove(try_obj_name);
     return compile_succeeded;
 }
 
@@ -272,16 +271,11 @@ CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
     }
 
     /* Remove all the files we just created. */
-    S_clean_up_try();
-
-    return captured_output;
-}
-
-static void
-S_clean_up_try(void) {
     remove(TRY_SOURCE_PATH);
     OS_remove_exe(TRY_APP_BASENAME);
     remove(TARGET_PATH);
+
+    return captured_output;
 }
 
 void
