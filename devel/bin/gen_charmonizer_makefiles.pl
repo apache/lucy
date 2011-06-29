@@ -61,7 +61,7 @@ sub unix_tests {
     my @block;
     push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
-	\$(CC) \$(CFLAGS) -o \$@ $test_obj $obj[$_]
+	\$(LINKER) \$(LINKFLAGS) $test_obj $obj[$_] \$(LINKOUT)"\$@"
 EOT
     return \@block, \@test;
 }
@@ -76,7 +76,7 @@ sub win_tests {
     my @block;
     push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
-	\$(LINKER) $test_obj $obj[$_] /OUT:\$@
+	\$(LINKER) \$(LINKFLAGS) $test_obj $obj[$_] \$(LINKOUT)"\$@"
 EOT
     return \@block, \@test;
 }
@@ -90,10 +90,13 @@ sub gen_makefile {
 $license
 CC= cc
 DEFS=
+CFLAGS= -Isrc \$(DEFS)
 EXEEXT= 
 OBJEXT= .o
+LINKER= \$(CC)
+LINKFLAGS = \$(CFLAGS)
+LINKOUT= -o
 PROGNAME= charmonize\$(EXEEXT)
-CFLAGS= -Isrc \$(DEFS)
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core
 
 TESTS= $args{test_execs}
@@ -112,7 +115,7 @@ all: \$(PROGNAME)
 tests: \$(TESTS)
 
 \$(PROGNAME): \$(OBJS)
-	\$(CC) \$(CFLAGS) -o \$(PROGNAME) \$(OBJS)
+	\$(LINKER) \$(LINKFLAGS) \$(OBJS) \$(LINKOUT)"\$(PROGNAME)"
 
 \$(OBJS) \$(TEST_OBJS): \$(HEADERS)
 
@@ -133,11 +136,13 @@ sub gen_makefile_win {
 $license
 CC= cl
 DEFS=
+CFLAGS= -Isrc -nologo \$(DEFS)
 EXEEXT= .exe
 OBJEXT= .obj
 PROGNAME= charmonize\$(EXEEXT)
-LINKER= link -nologo
-CFLAGS= -Isrc -nologo \$(DEFS)
+LINKER= link
+LINKFLAGS = -nologo
+LINKOUT= /OUT:
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core *.pdb
 
 TESTS= $args{test_execs}
@@ -154,7 +159,7 @@ HEADERS= $args{headers}
 all: \$(PROGNAME)
 
 \$(PROGNAME): \$(OBJS)
-	\$(LINKER) \$(OBJS) /OUT:\$(PROGNAME)
+	\$(LINKER) \$(LINKFLAGS) \$(OBJS) \$(LINKOUT)"\$(PROGNAME)"
 
 \$(OBJS) \$(TEST_OBJS): \$(HEADERS)
 

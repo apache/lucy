@@ -17,11 +17,13 @@
 
 CC= cl
 DEFS=
+CFLAGS= -Isrc -nologo $(DEFS)
 EXEEXT= .exe
 OBJEXT= .obj
 PROGNAME= charmonize$(EXEEXT)
-LINKER= link -nologo
-CFLAGS= -Isrc -nologo $(DEFS)
+LINKER= link
+LINKFLAGS = -nologo
+LINKOUT= /OUT:
 CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core *.pdb
 
 TESTS= TestDirManip$(EXEEXT) TestFuncMacro$(EXEEXT) TestHeaders$(EXEEXT) TestIntegers$(EXEEXT) TestLargeFiles$(EXEEXT) TestUnusedVars$(EXEEXT) TestVariadicMacros$(EXEEXT)
@@ -38,32 +40,32 @@ HEADERS= src\Charmonizer\Core\Compiler.h src\Charmonizer\Core\ConfWriter.h src\C
 all: $(PROGNAME)
 
 $(PROGNAME): $(OBJS)
-	$(LINKER) $(OBJS) /OUT:$(PROGNAME)
+	$(LINKER) $(LINKFLAGS) $(OBJS) $(LINKOUT)"$(PROGNAME)"
 
 $(OBJS) $(TEST_OBJS): $(HEADERS)
 
 tests: $(TESTS)
 
 TestDirManip$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJEXT)
-	$(LINKER) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJEXT) /OUT:$@
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJEXT) $(LINKOUT)"$@"
 
 TestFuncMacro$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestFuncMacro$(OBJEXT)
-	$(LINKER) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestFuncMacro$(OBJEXT) /OUT:$@
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestFuncMacro$(OBJEXT) $(LINKOUT)"$@"
 
 TestHeaders$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestHeaders$(OBJEXT)
-	$(LINKER) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestHeaders$(OBJEXT) /OUT:$@
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestHeaders$(OBJEXT) $(LINKOUT)"$@"
 
 TestIntegers$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestIntegers$(OBJEXT)
-	$(LINKER) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestIntegers$(OBJEXT) /OUT:$@
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestIntegers$(OBJEXT) $(LINKOUT)"$@"
 
 TestLargeFiles$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestLargeFiles$(OBJEXT)
-	$(LINKER) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestLargeFiles$(OBJEXT) /OUT:$@
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestLargeFiles$(OBJEXT) $(LINKOUT)"$@"
 
 TestUnusedVars$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestUnusedVars$(OBJEXT)
-	$(LINKER) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestUnusedVars$(OBJEXT) /OUT:$@
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestUnusedVars$(OBJEXT) $(LINKOUT)"$@"
 
 TestVariadicMacros$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT)
-	$(LINKER) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT) /OUT:$@
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT) $(LINKOUT)"$@"
 
 
 clean:
