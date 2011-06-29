@@ -60,7 +60,7 @@ sub unix_tests {
     my @block;
     push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
-	\$(CC) \$(CFLAGS) -o \$@ $test_obj $obj[$_] \$(LIBS)
+	\$(CC) \$(CFLAGS) -o \$@ $test_obj $obj[$_]
 EOT
     return \@block, \@test;
 }
@@ -75,7 +75,7 @@ sub win_tests {
     my @block;
     push @block, <<EOT for 0..$#test;
 $test[$_]: $test_obj $obj[$_]
-	\$(LINKER) $test_obj $obj[$_] /OUT:\$@ \$(LIBS)
+	\$(LINKER) $test_obj $obj[$_] /OUT:\$@
 EOT
     return \@block, \@test;
 }
@@ -90,10 +90,7 @@ $license
 CC= cc
 DEFS=
 PROGNAME= charmonize
-INCLUDES= -I. -Isrc
-DEFINES= \$(INCLUDES) \$(DEFS)
-CFLAGS= -g \$(DEFINES)
-LIBS=
+CFLAGS= -Isrc \$(DEFS)
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core
 
 TESTS= $args{test_execs}
@@ -112,7 +109,7 @@ all: \$(PROGNAME)
 tests: \$(TESTS)
 
 \$(PROGNAME): \$(OBJS)
-	\$(CC) \$(CFLAGS) -o \$(PROGNAME) \$(OBJS) \$(LIBS)
+	\$(CC) \$(CFLAGS) -o \$(PROGNAME) \$(OBJS)
 
 \$(OBJS) \$(TEST_OBJS): \$(HEADERS)
 
@@ -135,10 +132,7 @@ CC= cl
 DEFS=
 PROGNAME= charmonize.exe
 LINKER= link -nologo
-INCLUDES=  -I. -Isrc
-DEFINES= \$(INCLUDES) \$(DEFS) -nologo
-CFLAGS= \$(DEFINES)
-LIBS=
+CFLAGS= -Isrc -nologo \$(DEFS)
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core *.pdb
 
 TESTS= $args{test_execs}
@@ -155,7 +149,7 @@ HEADERS= $args{headers}
 all: \$(PROGNAME)
 
 \$(PROGNAME): \$(OBJS)
-	\$(LINKER) \$(OBJS) /OUT:\$(PROGNAME) \$(LIBS)
+	\$(LINKER) \$(OBJS) /OUT:\$(PROGNAME)
 
 \$(OBJS) \$(TEST_OBJS): \$(HEADERS)
 

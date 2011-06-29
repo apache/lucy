@@ -19,10 +19,7 @@ CC= cl
 DEFS=
 PROGNAME= charmonize.exe
 LINKER= link -nologo
-INCLUDES=  -I. -Isrc
-DEFINES= $(INCLUDES) $(DEFS) -nologo
-CFLAGS= $(DEFINES)
-LIBS=
+CFLAGS= -Isrc -nologo $(DEFS)
 CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core *.pdb
 
 TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe
@@ -39,32 +36,32 @@ HEADERS= src\Charmonizer\Core\Compiler.h src\Charmonizer\Core\ConfWriter.h src\C
 all: $(PROGNAME)
 
 $(PROGNAME): $(OBJS)
-	$(LINKER) $(OBJS) /OUT:$(PROGNAME) $(LIBS)
+	$(LINKER) $(OBJS) /OUT:$(PROGNAME)
 
 $(OBJS) $(TEST_OBJS): $(HEADERS)
 
 tests: $(TESTS)
 
 TestDirManip.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj
-	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj /OUT:$@
 
 TestFuncMacro.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj
-	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj /OUT:$@
 
 TestHeaders.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj
-	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj /OUT:$@
 
 TestIntegers.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj
-	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj /OUT:$@
 
 TestLargeFiles.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj
-	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj /OUT:$@
 
 TestUnusedVars.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj
-	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj /OUT:$@
 
 TestVariadicMacros.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj
-	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj /OUT:$@ $(LIBS)
+	$(LINKER) src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj /OUT:$@
 
 
 clean:
