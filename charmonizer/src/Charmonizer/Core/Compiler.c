@@ -129,6 +129,8 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     const char *exe_ext        = OS_exe_ext();
     size_t   exe_file_buf_size = strlen(exe_name) + strlen(exe_ext) + 1;
     char    *exe_file          = (char*)malloc(exe_file_buf_size);
+    size_t   junk_buf_size     = exe_file_buf_size + 3;
+    char    *junk              = (char*)malloc(junk_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
     char    *inc_dir_string    = S_inc_dir_string();
     size_t   command_max_size  = strlen(cc_command)
@@ -157,6 +159,18 @@ CC_compile_exe(const char *source_path, const char *exe_name,
         system(command);
     }
 
+#ifdef _MSC_VER
+    /* Zap MSVC junk. */
+    /* TODO: Key this off the compiler supplied as argument, not the compiler
+     * used to compile Charmonizer. */
+    sprintf(junk, "%s.obj", exe_name);
+    remove(junk);
+    sprintf(junk, "%s.ilk", exe_name);
+    remove(junk);
+    sprintf(junk, "%s.pdb", exe_name);
+    remove(junk);
+#endif
+
     /* See if compilation was successful.  Remove the source file. */
     result = Util_can_open_file(exe_file);
     if (!Util_remove_and_verify(source_path)) {
@@ -165,6 +179,7 @@ CC_compile_exe(const char *source_path, const char *exe_name,
 
     free(command);
     free(inc_dir_string);
+    free(junk);
     free(exe_file);
     return result;
 }
