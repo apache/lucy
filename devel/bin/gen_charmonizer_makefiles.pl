@@ -54,6 +54,7 @@ sub win_obj {
 sub unix_tests {
     my @src = @_;
     my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
+    $_ .= '$(EXEEXT)' for @test;
     my @obj = unix_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.o$/ ? ($test_obj = $_) && 0 : 1, @obj;
@@ -68,7 +69,7 @@ EOT
 sub win_tests {
     my @src = @_;
     my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
-    $_ .= '.exe' for @test;
+    $_ .= '$(EXEEXT)' for @test;
     my @obj = win_obj @src;
     my $test_obj;
     @obj = grep /\bTest\.obj$/ ? ($test_obj = $_) && 0 : 1, @obj;
@@ -89,7 +90,8 @@ sub gen_makefile {
 $license
 CC= cc
 DEFS=
-PROGNAME= charmonize
+EXEEXT= 
+PROGNAME= charmonize\$(EXEEXT)
 CFLAGS= -Isrc \$(DEFS)
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core
 
@@ -130,7 +132,8 @@ sub gen_makefile_win {
 $license
 CC= cl
 DEFS=
-PROGNAME= charmonize.exe
+EXEEXT= .exe
+PROGNAME= charmonize\$(EXEEXT)
 LINKER= link -nologo
 CFLAGS= -Isrc -nologo \$(DEFS)
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core *.pdb

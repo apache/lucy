@@ -17,11 +17,12 @@
 
 CC= cc
 DEFS=
-PROGNAME= charmonize
+EXEEXT= 
+PROGNAME= charmonize$(EXEEXT)
 CFLAGS= -Isrc $(DEFS)
 CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core
 
-TESTS= TestDirManip TestFuncMacro TestHeaders TestIntegers TestLargeFiles TestUnusedVars TestVariadicMacros
+TESTS= TestDirManip$(EXEEXT) TestFuncMacro$(EXEEXT) TestHeaders$(EXEEXT) TestIntegers$(EXEEXT) TestLargeFiles$(EXEEXT) TestUnusedVars$(EXEEXT) TestVariadicMacros$(EXEEXT)
 
 OBJS= charmonize.o src/Charmonizer/Core/Compiler.o src/Charmonizer/Core/ConfWriter.o src/Charmonizer/Core/Dir.o src/Charmonizer/Core/HeaderChecker.o src/Charmonizer/Core/OperatingSystem.o src/Charmonizer/Core/Stat.o src/Charmonizer/Core/Util.o src/Charmonizer/Probe.o src/Charmonizer/Probe/AtomicOps.o src/Charmonizer/Probe/DirManip.o src/Charmonizer/Probe/Floats.o src/Charmonizer/Probe/FuncMacro.o src/Charmonizer/Probe/Headers.o src/Charmonizer/Probe/Integers.o src/Charmonizer/Probe/LargeFiles.o src/Charmonizer/Probe/Memory.o src/Charmonizer/Probe/UnusedVars.o src/Charmonizer/Probe/VariadicMacros.o
 
@@ -41,25 +42,25 @@ $(PROGNAME): $(OBJS)
 
 $(OBJS) $(TEST_OBJS): $(HEADERS)
 
-TestDirManip: src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o
+TestDirManip$(EXEEXT): src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o
 
-TestFuncMacro: src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
+TestFuncMacro$(EXEEXT): src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
 
-TestHeaders: src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
+TestHeaders$(EXEEXT): src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
 
-TestIntegers: src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
+TestIntegers$(EXEEXT): src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
 
-TestLargeFiles: src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
+TestLargeFiles$(EXEEXT): src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
 
-TestUnusedVars: src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
+TestUnusedVars$(EXEEXT): src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
 
-TestVariadicMacros: src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
+TestVariadicMacros$(EXEEXT): src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
 	$(CC) $(CFLAGS) -o $@ src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
 
 
