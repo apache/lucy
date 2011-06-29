@@ -77,8 +77,12 @@ int main(int argc, char **argv) {
     chaz_ConfWriter_append_conf(
         "#ifdef CHY_HAS_WINDOWS_H\n"
         "  /* Target Windows XP. */\n"
-        "  #define WINVER 0x0500\n"
-        "  #define _WIN32_WINNT 0x0500\n"
+        "  #ifndef WINVER\n"
+        "    #define WINVER 0x0500\n"
+        "  #endif\n"
+        "  #ifndef _WIN32_WINNT\n"
+        "    #define _WIN32_WINNT 0x0500\n"
+        "  #endif\n"
         "#endif\n\n"
     );
 
