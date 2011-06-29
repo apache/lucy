@@ -124,7 +124,6 @@ EOT
     print $fh $content;
 }
 
-use FindBin;
 sub gen_makefile_win {
     my %args = @_;
     open my $fh, ">Makefile.win" or die "open Makefile.win failed: $!\n";
