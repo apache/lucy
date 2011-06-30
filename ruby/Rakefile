@@ -28,6 +28,23 @@ def cc_command
   RbConfig::CONFIG["CC"]
 end
 
+def make_command
+  command = RbConfig::CONFIG["make-prog"]
+  if !command
+    if RUBY_PLATFORM =~ /mswin/i
+      cc = cc_command
+      if cc =~ /^cl\b/
+        command = "nmake"
+      else
+        command = "dmake"
+      end
+    end
+  else
+    command = "make"
+  end
+  return command
+end
+
 def extra_ccflags
   ""
 end
@@ -43,14 +60,14 @@ def run_make(dir, params)
   chdir(dir) if dir
   command = params.clone
   command.unshift("CC=#{cc_command}")
-  if cc_command =~ /^cl\b/ 
-    if File.exists?("Makefile.win")
-      command.unshift("-f", "Makefile.win")
+  if RUBY_PLATFORM =~ /mswin/i
+    if cc_command =~ /^cl\b/ 
+      command.unshift("-f", "Makefile.MSVC")
+    else
+      command.unshift("-f", "Makefile.MinGW")
     end
-    command.unshift("nmake")
-  else
-    command.unshift("make")
   end
+  command.unshift(make_command)
   success = system(*command)
   if !success
     raise "Make failed"
