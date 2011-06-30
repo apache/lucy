@@ -113,6 +113,9 @@ task :charmonizer_tests => [:charmony] do
   run_make(CHARMONIZER_ORIG_DIR, args)
 end
 
+# Clean up after MSVC.
+CLEAN.include("*.pdb")
+
 task :clean do
   run_make(CHARMONIZER_ORIG_DIR, ["clean"])
 end
