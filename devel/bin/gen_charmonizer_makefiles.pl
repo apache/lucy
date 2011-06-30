@@ -86,11 +86,11 @@ sub gen_makefile {
     my ( $file, $clean );
     if ( $target eq 'win' ) {
         $file = 'base.win.mk';
-        $clean = "CMD /c FOR %i IN (\$(CLEANABLE)) DO IF EXIST %i DEL /F %i";
+        $clean = "CMD /c FOR %i IN (\$(CLEANABLE)) DO IF EXIST %i DEL /F %i\n";
     }
     else {
         $file = 'base.POSIX.mk';
-        $clean = "rm -f \$(CLEANABLE)";
+        $clean = "rm -f \$(CLEANABLE)\n";
     }
     open my $fh, ">$file" or die "open '$file' failed: $!\n";
     my $content = <<EOT;
@@ -98,7 +98,6 @@ sub gen_makefile {
 #
 $license
 PROGNAME= charmonize\$(EXEEXT)
-CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
 
 TESTS= $args{test_execs}
 
@@ -118,6 +117,7 @@ all: \$(PROGNAME)
 tests: \$(TESTS)
 
 $args{test_blocks}
+CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
 
 clean:
 	$clean

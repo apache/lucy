@@ -16,7 +16,6 @@
 # limitations under the License.
 
 PROGNAME= charmonize$(EXEEXT)
-CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
 
 TESTS= TestDirManip$(EXEEXT) TestFuncMacro$(EXEEXT) TestHeaders$(EXEEXT) TestIntegers$(EXEEXT) TestLargeFiles$(EXEEXT) TestUnusedVars$(EXEEXT) TestVariadicMacros$(EXEEXT)
 
@@ -56,6 +55,8 @@ TestUnusedVars$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\Test
 TestVariadicMacros$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT)
 	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT) $(LINKOUT)"$@"
 
+CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
 
 clean:
 	CMD /c FOR %i IN ($(CLEANABLE)) DO IF EXIST %i DEL /F %i
+
