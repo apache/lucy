@@ -39,46 +39,44 @@ sub wanted {
     }
 }
 
-sub unix_obj {
-    my @o = @_;
-    s/\.c$/\$(OBJEXT)/, tr{\\}{/} for @o;
-    return @o;
+sub unixify {
+    map { my $copy = $_; $copy =~ tr{\\}{/}; $copy } @_;
 }
 
-sub win_obj {
-    my @obj = @_;
-    s/\.c$/\$(OBJEXT)/, tr{/}{\\} for @obj;
-    return @obj;
+sub winnify {
+    map { my $copy = $_; $copy =~ tr{/}{\\}; $copy } @_;
 }
 
-sub unix_tests {
-    my @src = @_;
-    my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
-    $_ .= '$(EXEEXT)' for @test;
-    my @obj = unix_obj @src;
-    my $test_obj;
-    @obj = grep /\bTest\$\(OBJEXT\)$/ ? ($test_obj = $_) && 0 : 1, @obj;
-    my @block;
-    push @block, <<EOT for 0..$#test;
-$test[$_]: $test_obj $obj[$_]
-	\$(LINKER) \$(LINKFLAGS) $test_obj $obj[$_] \$(LINKOUT)"\$@"
-EOT
-    return \@block, \@test;
+sub objectify {
+    my @objects = @_;
+    for (@objects) {
+        s/\.c$/\$(OBJEXT)/ or die "No match: $_";
+    }
+    return @objects;
 }
 
-sub win_tests {
-    my @src = @_;
-    my @test = map /\b(Test\w+)\.c$/, @src; # \w+ skips the Test.c entry
-    $_ .= '$(EXEEXT)' for @test;
-    my @obj = win_obj @src;
-    my $test_obj;
-    @obj = grep /\bTest\$\(OBJEXT\)$/ ? ($test_obj = $_) && 0 : 1, @obj;
-    my @block;
-    push @block, <<EOT for 0..$#test;
-$test[$_]: $test_obj $obj[$_]
-	\$(LINKER) \$(LINKFLAGS) $test_obj $obj[$_] \$(LINKOUT)"\$@"
-EOT
-    return \@block, \@test;
+sub test_execs {
+    my @test_execs = grep { $_ !~ /Test\.c/ } @_; # skip Test.c entry
+    for (@test_execs) {
+        s/.*(Test\w+)\.c$/$1\$(EXEEXT)/ or die "no match: $_";
+    }
+    return @test_execs;
+}
+
+sub test_blocks {
+    my @c_files = grep { $_ !~ /Test\.c/ } @_; # skip Test.c entry
+    my @blocks;
+    for my $c_file (@c_files) {
+        my $exe = $c_file; 
+        $exe =~ s/.*(Test\w+)\.c$/$1\$(EXEEXT)/ or die "no match $exe";
+        my $obj = $c_file;
+        $obj =~ s/\.c$/\$(OBJEXT)/ or die "no match: $obj";
+        push @blocks, <<END_BLOCK;
+$exe: src/Charmonizer/Test\$(OBJEXT) $obj
+\t\$(LINKER) \$(LINKFLAGS) src/Charmonizer/Test\$(OBJEXT) $obj \$(LINKOUT)"\$@"
+END_BLOCK
+    }
+    return @blocks;
 }
 
 sub gen_makefile {
@@ -163,22 +161,27 @@ while (<$fh>) {
 
 push @srcs, "charmonize.c";
 find \&wanted, "src";
+@srcs  = sort @srcs;
+@hdrs  = sort @hdrs;
+@tests = sort @tests;
+my @objects      = objectify(@srcs);
+my @test_objects = objectify(@tests);
+my @test_execs   = test_execs(@tests);
+my @test_blocks  = test_blocks(@tests);
 
-my ($unix_test_blocks, $unix_tests) = unix_tests @tests;
 gen_makefile
-    test_execs  => join(" ", sort @$unix_tests),
-    objs        => join(" ", sort +unix_obj @srcs),
-    test_objs   => join(" ", sort +unix_obj @tests),
-    headers     => join(" ", sort +unix_obj @hdrs),
-    test_blocks => join("\n", sort @$unix_test_blocks);
+    test_execs  => join(" ", unixify(@test_execs)),
+    objs        => join(" ", unixify(@objects)),
+    test_objs   => join(" ", unixify(@test_objects)),
+    headers     => join(" ", unixify(@hdrs)),
+    test_blocks => join("\n", unixify(@test_blocks));
 
-my ($win_test_blocks, $win_tests) = win_tests @tests;
 gen_makefile_win
-    test_execs  => join(" ", sort @$win_tests),
-    objs        => join(" ", sort +win_obj @srcs),
-    test_objs   => join(" ", sort +win_obj @tests),
-    headers     => join(" ", sort +win_obj @hdrs),
-    test_blocks => join("\n", sort @$win_test_blocks);
+    test_execs  => join(" ", winnify(@test_execs)),
+    objs        => join(" ", winnify(@objects)),
+    test_objs   => join(" ", winnify(@test_objects)),
+    headers     => join(" ", winnify(@hdrs)),
+    test_blocks => join("\n", winnify(@test_blocks));
 
 __END__
 
