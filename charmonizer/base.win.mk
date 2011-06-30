@@ -25,6 +25,8 @@ TEST_OBJS= src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJE
 
 HEADERS= src\Charmonizer\Core\Compiler.h src\Charmonizer\Core\ConfWriter.h src\Charmonizer\Core\Defines.h src\Charmonizer\Core\Dir.h src\Charmonizer\Core\HeaderChecker.h src\Charmonizer\Core\OperatingSystem.h src\Charmonizer\Core\Stat.h src\Charmonizer\Core\Util.h src\Charmonizer\Probe.h src\Charmonizer\Probe\AtomicOps.h src\Charmonizer\Probe\DirManip.h src\Charmonizer\Probe\Floats.h src\Charmonizer\Probe\FuncMacro.h src\Charmonizer\Probe\Headers.h src\Charmonizer\Probe\Integers.h src\Charmonizer\Probe\LargeFiles.h src\Charmonizer\Probe\Memory.h src\Charmonizer\Probe\UnusedVars.h src\Charmonizer\Probe\VariadicMacros.h src\Charmonizer\Test.h
 
+CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
+
 all: $(PROGNAME)
 
 $(PROGNAME): $(OBJS)
@@ -54,8 +56,6 @@ TestUnusedVars$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\Test
 
 TestVariadicMacros$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT)
 	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT) $(LINKOUT)"$@"
-
-CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
 
 clean:
 	CMD /c FOR %i IN ($(CLEANABLE)) DO IF EXIST %i DEL /F %i

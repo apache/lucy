@@ -107,6 +107,8 @@ TEST_OBJS= $args{test_objs}
 
 HEADERS= $args{headers}
 
+CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
+
 all: \$(PROGNAME)
 
 \$(PROGNAME): \$(OBJS)
@@ -117,8 +119,6 @@ all: \$(PROGNAME)
 tests: \$(TESTS)
 
 $args{test_blocks}
-CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
-
 clean:
 	$clean
 EOT
