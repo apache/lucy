@@ -565,6 +565,7 @@ sub ACTION_compile_custom_xs {
     $self->add_to_cleanup( catfile( 'lib', 'Lucy.exp' ) );
     $self->add_to_cleanup( catfile( 'lib', 'Lucy.lib' ) );
     $self->add_to_cleanup( catfile( 'lib', 'Lucy.lds' ) );
+    $self->add_to_cleanup( catfile( 'lib', 'Lucy.base' ) );
 
     # .o => .(a|bundle)
     my $lib_file = catfile( $archdir, "Lucy.$Config{dlext}" );
