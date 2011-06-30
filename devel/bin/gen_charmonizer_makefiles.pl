@@ -99,12 +99,12 @@ HEADERS= $args{headers}
 
 all: \$(PROGNAME)
 
-tests: \$(TESTS)
-
 \$(PROGNAME): \$(OBJS)
 	\$(LINKER) \$(LINKFLAGS) \$(OBJS) \$(LINKOUT)"\$(PROGNAME)"
 
 \$(OBJS) \$(TEST_OBJS): \$(HEADERS)
+
+tests: \$(TESTS)
 
 $args{test_blocks}
 

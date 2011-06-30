@@ -28,12 +28,12 @@ HEADERS= src/Charmonizer/Core/Compiler.h src/Charmonizer/Core/ConfWriter.h src/C
 
 all: $(PROGNAME)
 
-tests: $(TESTS)
-
 $(PROGNAME): $(OBJS)
 	$(LINKER) $(LINKFLAGS) $(OBJS) $(LINKOUT)"$(PROGNAME)"
 
 $(OBJS) $(TEST_OBJS): $(HEADERS)
+
+tests: $(TESTS)
 
 TestDirManip$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestDirManip$(OBJEXT)
 	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestDirManip$(OBJEXT) $(LINKOUT)"$@"
