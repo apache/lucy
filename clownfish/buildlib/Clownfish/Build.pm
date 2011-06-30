@@ -51,9 +51,9 @@ sub extra_ccflags {
         $extra_ccflags .= "-fno-inline-functions ";
     }
 
-    # Compile as C++ under MSVC.
-    if ( $self->config('cc') eq 'cl' ) {
-        $extra_ccflags .= '/TP ';
+    # Compile as C++ under MSVC.  Turn off stupid warnings, too.
+    if ( $self->config('cc') =~ /^cl\b/ ) {
+        $extra_ccflags .= '/TP -D_CRT_SECURE_NO_WARNINGS ';
     }
 
     if ( defined $gcc_version ) {

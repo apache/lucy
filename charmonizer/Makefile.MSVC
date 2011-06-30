@@ -17,7 +17,7 @@
 
 CC= cl
 DEFS=
-CFLAGS= -Isrc -nologo $(DEFS)
+CFLAGS= -Isrc -nologo -D_CRT_SECURE_NO_WARNINGS $(DEFS)
 OBJEXT= .obj
 EXEEXT= .exe
 LINKER= link
