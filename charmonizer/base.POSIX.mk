@@ -16,7 +16,7 @@
 # limitations under the License.
 
 PROGNAME= charmonize$(EXEEXT)
-CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core
+CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
 
 TESTS= TestDirManip$(EXEEXT) TestFuncMacro$(EXEEXT) TestHeaders$(EXEEXT) TestIntegers$(EXEEXT) TestLargeFiles$(EXEEXT) TestUnusedVars$(EXEEXT) TestVariadicMacros$(EXEEXT)
 

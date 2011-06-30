@@ -87,7 +87,7 @@ sub gen_makefile {
 #
 $license
 PROGNAME= charmonize\$(EXEEXT)
-CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core
+CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
 
 TESTS= $args{test_execs}
 
@@ -122,7 +122,7 @@ sub gen_makefile_win {
 #
 $license
 PROGNAME= charmonize\$(EXEEXT)
-CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) core *.pdb
+CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
 
 TESTS= $args{test_execs}
 
