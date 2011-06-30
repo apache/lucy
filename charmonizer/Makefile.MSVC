@@ -27,5 +27,5 @@ LINKOUT= /OUT:
 .c.obj:
 	$(CC) $(CFLAGS) -c $< -Fo$@
 
-include Makefile.win
+include base.win.mk
 
