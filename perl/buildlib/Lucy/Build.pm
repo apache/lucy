@@ -138,9 +138,10 @@ sub _run_make {
     chdir $dir if $dir;
     unshift @command, 'CC=' . $self->config('cc');
     if ( $self->config('cc') =~ /^cl\b/ ) {
-        if ( -f "Makefile.win" ) {
-            unshift @command, "-f", "Makefile.win";
-        }
+        unshift @command, "-f", "Makefile.MSVC";
+    }
+    elsif ( $^O =~ /mswin/i ) {
+        unshift @command, "-f", "Makefile.MinGW";
     }
     unshift @command, "$Config{make}";
     system(@command) and confess("$Config{make} failed");

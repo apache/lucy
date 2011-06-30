@@ -15,15 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CC= cl
-DEFS=
-CFLAGS= -Isrc -nologo $(DEFS)
-EXEEXT= .exe
-OBJEXT= .obj
 PROGNAME= charmonize$(EXEEXT)
-LINKER= link
-LINKFLAGS = -nologo
-LINKOUT= /OUT:
 CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core *.pdb
 
 TESTS= TestDirManip$(EXEEXT) TestFuncMacro$(EXEEXT) TestHeaders$(EXEEXT) TestIntegers$(EXEEXT) TestLargeFiles$(EXEEXT) TestUnusedVars$(EXEEXT) TestVariadicMacros$(EXEEXT)
@@ -33,9 +25,6 @@ OBJS= charmonize$(OBJEXT) src\Charmonizer\Core\Compiler$(OBJEXT) src\Charmonizer
 TEST_OBJS= src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJEXT) src\Charmonizer\Test\TestFuncMacro$(OBJEXT) src\Charmonizer\Test\TestHeaders$(OBJEXT) src\Charmonizer\Test\TestIntegers$(OBJEXT) src\Charmonizer\Test\TestLargeFiles$(OBJEXT) src\Charmonizer\Test\TestUnusedVars$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT)
 
 HEADERS= src\Charmonizer\Core\Compiler.h src\Charmonizer\Core\ConfWriter.h src\Charmonizer\Core\Defines.h src\Charmonizer\Core\Dir.h src\Charmonizer\Core\HeaderChecker.h src\Charmonizer\Core\OperatingSystem.h src\Charmonizer\Core\Stat.h src\Charmonizer\Core\Util.h src\Charmonizer\Probe.h src\Charmonizer\Probe\AtomicOps.h src\Charmonizer\Probe\DirManip.h src\Charmonizer\Probe\Floats.h src\Charmonizer\Probe\FuncMacro.h src\Charmonizer\Probe\Headers.h src\Charmonizer\Probe\Integers.h src\Charmonizer\Probe\LargeFiles.h src\Charmonizer\Probe\Memory.h src\Charmonizer\Probe\UnusedVars.h src\Charmonizer\Probe\VariadicMacros.h src\Charmonizer\Test.h
-
-.c.obj:
-	$(CC) $(CFLAGS) -c $< -Fo$@
 
 all: $(PROGNAME)
 
