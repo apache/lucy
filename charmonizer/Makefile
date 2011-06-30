@@ -18,55 +18,14 @@
 CC= cc
 DEFS=
 CFLAGS= -Isrc $(DEFS)
-EXEEXT= 
 OBJEXT= .o
+EXEEXT=
 LINKER= $(CC)
-LINKFLAGS = $(CFLAGS)
+LINKFLAGS= $(CFLAGS)
 LINKOUT= -o
-PROGNAME= charmonize$(EXEEXT)
-CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) core
-
-TESTS= TestDirManip$(EXEEXT) TestFuncMacro$(EXEEXT) TestHeaders$(EXEEXT) TestIntegers$(EXEEXT) TestLargeFiles$(EXEEXT) TestUnusedVars$(EXEEXT) TestVariadicMacros$(EXEEXT)
-
-OBJS= charmonize$(OBJEXT) src/Charmonizer/Core/Compiler$(OBJEXT) src/Charmonizer/Core/ConfWriter$(OBJEXT) src/Charmonizer/Core/Dir$(OBJEXT) src/Charmonizer/Core/HeaderChecker$(OBJEXT) src/Charmonizer/Core/OperatingSystem$(OBJEXT) src/Charmonizer/Core/Stat$(OBJEXT) src/Charmonizer/Core/Util$(OBJEXT) src/Charmonizer/Probe$(OBJEXT) src/Charmonizer/Probe/AtomicOps$(OBJEXT) src/Charmonizer/Probe/DirManip$(OBJEXT) src/Charmonizer/Probe/Floats$(OBJEXT) src/Charmonizer/Probe/FuncMacro$(OBJEXT) src/Charmonizer/Probe/Headers$(OBJEXT) src/Charmonizer/Probe/Integers$(OBJEXT) src/Charmonizer/Probe/LargeFiles$(OBJEXT) src/Charmonizer/Probe/Memory$(OBJEXT) src/Charmonizer/Probe/UnusedVars$(OBJEXT) src/Charmonizer/Probe/VariadicMacros$(OBJEXT)
-
-TEST_OBJS= src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestDirManip$(OBJEXT) src/Charmonizer/Test/TestFuncMacro$(OBJEXT) src/Charmonizer/Test/TestHeaders$(OBJEXT) src/Charmonizer/Test/TestIntegers$(OBJEXT) src/Charmonizer/Test/TestLargeFiles$(OBJEXT) src/Charmonizer/Test/TestUnusedVars$(OBJEXT) src/Charmonizer/Test/TestVariadicMacros$(OBJEXT)
-
-HEADERS= src/Charmonizer/Core/Compiler.h src/Charmonizer/Core/ConfWriter.h src/Charmonizer/Core/Defines.h src/Charmonizer/Core/Dir.h src/Charmonizer/Core/HeaderChecker.h src/Charmonizer/Core/OperatingSystem.h src/Charmonizer/Core/Stat.h src/Charmonizer/Core/Util.h src/Charmonizer/Probe.h src/Charmonizer/Probe/AtomicOps.h src/Charmonizer/Probe/DirManip.h src/Charmonizer/Probe/Floats.h src/Charmonizer/Probe/FuncMacro.h src/Charmonizer/Probe/Headers.h src/Charmonizer/Probe/Integers.h src/Charmonizer/Probe/LargeFiles.h src/Charmonizer/Probe/Memory.h src/Charmonizer/Probe/UnusedVars.h src/Charmonizer/Probe/VariadicMacros.h src/Charmonizer/Test.h
 
 .c.o:
 	$(CC) $(CFLAGS) -c $*.c -o $@
 
-all: $(PROGNAME)
+include base.POSIX.mk
 
-tests: $(TESTS)
-
-$(PROGNAME): $(OBJS)
-	$(LINKER) $(LINKFLAGS) $(OBJS) $(LINKOUT)"$(PROGNAME)"
-
-$(OBJS) $(TEST_OBJS): $(HEADERS)
-
-TestDirManip$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestDirManip$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestDirManip$(OBJEXT) $(LINKOUT)"$@"
-
-TestFuncMacro$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestFuncMacro$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestFuncMacro$(OBJEXT) $(LINKOUT)"$@"
-
-TestHeaders$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestHeaders$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestHeaders$(OBJEXT) $(LINKOUT)"$@"
-
-TestIntegers$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestIntegers$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestIntegers$(OBJEXT) $(LINKOUT)"$@"
-
-TestLargeFiles$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestLargeFiles$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestLargeFiles$(OBJEXT) $(LINKOUT)"$@"
-
-TestUnusedVars$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestUnusedVars$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestUnusedVars$(OBJEXT) $(LINKOUT)"$@"
-
-TestVariadicMacros$(EXEEXT): src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestVariadicMacros$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test$(OBJEXT) src/Charmonizer/Test/TestVariadicMacros$(OBJEXT) $(LINKOUT)"$@"
-
-
-clean:
-	rm -f $(CLEANABLE)
