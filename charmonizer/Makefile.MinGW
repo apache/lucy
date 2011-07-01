@@ -25,5 +25,5 @@ LINKOUT= -o
 .c.o:
 	$(CC) $(CFLAGS) -c $*.c -o $@
 
-include base.win.inc
+include base.win.mk
 
