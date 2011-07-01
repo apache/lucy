@@ -24,7 +24,7 @@ use Carp;
 use Fcntl;
 
 our @EXPORT_OK = qw(
-    slurp_file
+    slurp_text
     current
     strip_c_comments
     verify_args
@@ -78,12 +78,11 @@ other Clownfish modules.
 
 =head1 FUNCTIONS
 
-=head2 slurp_file
+=head2 slurp_text
 
-    my $foo_contents = slurp_file('foo.txt');
+    my $foo_contents = slurp_text('foo.txt');
 
-Open a file, read it in, return its contents.  Assumes either binary data or
-text with an encoding of Latin-1.
+Open a file, read it in (as text), return its contents.
 
 =head2 current
 

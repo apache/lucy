@@ -180,11 +180,11 @@ CFCUtil_write_file(const char *filename, const char *content, size_t len) {
 }
 
 char*
-CFCUtil_slurp_file(const char *file_path, size_t *len_ptr) {
-    FILE   *const file = fopen(file_path, "rb");
+CFCUtil_slurp_text(const char *file_path, size_t *len_ptr) {
+    FILE   *const file = fopen(file_path, "r");
     char   *contents;
-    size_t  len;
-    long    check_val;
+    size_t  binary_len;
+    long    text_len;
 
     /* Sanity check. */
     if (file == NULL) {
@@ -192,25 +192,27 @@ CFCUtil_slurp_file(const char *file_path, size_t *len_ptr) {
     }
 
     /* Find length; return NULL if the file has a zero-length. */
-    len = CFCUtil_flength(file);
-    if (len == 0) {
+    binary_len = CFCUtil_flength(file);
+    if (binary_len == 0) {
         *len_ptr = 0;
         return NULL;
     }
 
     /* Allocate memory and read the file. */
-    contents = (char*)MALLOCATE(len * sizeof(char) + 1);
-    contents[len] = '\0';
-    check_val = fread(contents, sizeof(char), len, file);
+    contents = (char*)MALLOCATE(binary_len * sizeof(char) + 1);
+    text_len = fread(contents, sizeof(char), binary_len, file);
 
     /* Weak error check, because CRLF might result in fewer chars read. */
-    if (check_val <= 0) {
-        CFCUtil_die("Tried to read %d characters of '%s', got %d", (int)len,
-                    file_path, check_val);
+    if (text_len <= 0) {
+        CFCUtil_die("Tried to read %ld bytes of '%s', got return code %ld",
+                    (long)binary_len, file_path, (long)text_len);
     }
 
+    /* NULL-terminate. */
+    contents[text_len] = '\0';
+
     /* Set length pointer for benefit of caller. */
-    *len_ptr = check_val;
+    *len_ptr = text_len;
 
     /* Clean up. */
     if (fclose(file)) {
@@ -228,7 +230,7 @@ CFCUtil_write_if_changed(const char *path, const char *content, size_t len) {
             CFCUtil_die("Error closing file '%s': %s", path, strerror(errno));
         }
         size_t existing_len;
-        char *existing = CFCUtil_slurp_file(path, &existing_len);
+        char *existing = CFCUtil_slurp_text(path, &existing_len);
         int changed = true;
         if (existing_len == len && strcmp(content, existing) == 0) {
             changed = false;

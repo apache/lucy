@@ -19,7 +19,7 @@ use warnings;
 use Test::More tests => 15;
 use File::stat qw( stat );
 use Clownfish::Util qw(
-    slurp_file
+    slurp_text
     current
     verify_args
     a_isa_b
@@ -31,7 +31,7 @@ unlink $foo_txt;
 open( my $fh, '>', $foo_txt ) or die "Can't open '$foo_txt': $!";
 print $fh "foo";
 close $fh or die "Can't close '$foo_txt': $!";
-is( slurp_file($foo_txt), "foo", "slurp_file" );
+is( slurp_text($foo_txt), "foo", "slurp_text" );
 
 ok( current( $foo_txt, $foo_txt ), "current" );
 ok( !current( $foo_txt, 't' ), "not current" );

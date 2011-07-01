@@ -1568,11 +1568,11 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-slurp_file(path)
+slurp_text(path)
     const char *path;
 CODE:
     size_t len;
-    char *contents = CFCUtil_slurp_file(path, &len);
+    char *contents = CFCUtil_slurp_text(path, &len);
     RETVAL = newSVpvn(contents, len);
     FREEMEM(contents);
 OUTPUT: RETVAL

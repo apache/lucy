@@ -267,7 +267,7 @@ S_parse_cf_files(CFCHierarchy *self) {
 
         // Slurp, parse, add parsed file to pool.
         size_t unused;
-        char *content = CFCUtil_slurp_file(source_path, &unused);
+        char *content = CFCUtil_slurp_text(source_path, &unused);
         CFCFile *file = S_parse_file(self->parser, content, source_class);
         if (!file) {
             croak("parser error for %s", source_path);
