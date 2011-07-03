@@ -134,8 +134,8 @@ sub clean_rule_win {
 
 sub gen_makefile {
     my ( $self, %args ) = @_;
-    my ( $h_files, $c_files, $c_tests, $c_test_cases, $extra_cflags )
-        = @$self{qw( h_files c_files c_tests c_test_cases extra_cflags )};
+    my ( $h_files, $c_files, $c_tests, $c_test_cases )
+        = @$self{qw( h_files c_files c_tests c_test_cases )};
 
     # Derive chunks of Makefile content.
     my $progname = $self->execify('charmonize.c');
@@ -174,7 +174,7 @@ sub gen_makefile {
 
 CC= $self->{cc}
 DEFS=
-CFLAGS= -Isrc \$(DEFS) $extra_cflags
+CFLAGS= -Isrc \$(DEFS) $self->{extra_cflags}
 PROGNAME= $progname
 
 TESTS= $test_execs
