@@ -28,14 +28,15 @@ sub new {
     my ( $class, %args ) = @_;
 
     # Validate args, create object.
-    for (qw( dir filename obj_ext )) {
-        $args{$_} or confess("Missing required param '$_'");
+    for (qw( dir filename obj_ext exe_ext )) {
+        defined $args{$_} or confess("Missing required param '$_'");
     }
     my $dir = $args{dir};
     my $self = bless { 
         dir      => $dir,  
         filename => $args{filename},
         obj_ext  => $args{obj_ext},
+        exe_ext  => $args{exe_ext},
     }, $class;
 
     # Gather source paths, normalized for the target OS.
@@ -91,7 +92,7 @@ sub test_execs {
     my $self = shift;
     my @test_execs = grep { $_ !~ /Test\.c/ } @_; # skip Test.c entry
     for (@test_execs) {
-        s/.*(Test\w+)\.c$/$1\$(EXEEXT)/ or die "no match: $_";
+        s/.*(Test\w+)\.c$/$1$self->{exe_ext}/ or die "no match: $_";
     }
     return @test_execs;
 }
@@ -102,7 +103,7 @@ sub test_blocks {
     my @blocks;
     for my $c_file (@c_files) {
         my $exe = $c_file; 
-        $exe =~ s/.*(Test\w+)\.c$/$1\$(EXEEXT)/ or die "no match $exe";
+        $exe =~ s/.*(Test\w+)\.c$/$1$self->{exe_ext}/ or die "no match $exe";
         my ($obj) = $self->objectify($c_file);
         push @blocks, <<END_BLOCK;
 $exe: src/Charmonizer/Test$self->{obj_ext} $obj
@@ -131,7 +132,7 @@ sub gen_makefile {
 #
 $license
 $args{top}
-PROGNAME= charmonize\$(EXEEXT)
+PROGNAME= charmonize$self->{exe_ext}
 
 TESTS= $args{test_execs}
 
@@ -205,6 +206,7 @@ sub new {
     return $class->SUPER::new(
         filename => 'Makefile', 
         obj_ext  => '.o',
+        exe_ext  => '',
         @_ 
     );
 }
@@ -214,7 +216,6 @@ sub top {
 CC= cc
 DEFS=
 CFLAGS= -Isrc \$(DEFS)
-EXEEXT=
 LINKER= \$(CC)
 LINKFLAGS= \$(CFLAGS)
 LINKOUT= -o
@@ -235,6 +236,7 @@ sub new {
     return $class->SUPER::new(
         filename => 'Makefile.MSVC', 
         obj_ext  => '.obj',
+        exe_ext  => '.exe',
         @_ 
     );
 }
@@ -245,7 +247,6 @@ sub top {
 CC= cl
 DEFS=
 CFLAGS= -Isrc -nologo -D_CRT_SECURE_NO_WARNINGS \$(DEFS)
-EXEEXT= .exe
 LINKER= link
 LINKFLAGS= -nologo
 LINKOUT= /OUT:
@@ -266,6 +267,7 @@ sub new {
     return $class->SUPER::new(
         filename => 'Makefile.MinGW', 
         obj_ext  => '.o',
+        exe_ext  => '.exe',
         @_ 
     );
 }
@@ -275,7 +277,6 @@ sub top {
 CC= gcc
 DEFS=
 CFLAGS= -Isrc \$(DEFS)
-EXEEXT= .exe
 LINKER= \$(CC)
 LINKFLAGS= \$(CFLAGS)
 LINKOUT= -o
