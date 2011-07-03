@@ -182,10 +182,10 @@ sub write_makefile {
     my @test_blocks  = $self->test_blocks( @{ $self->{c_tests} } );
 
     $self->gen_makefile(
-        test_execs   => join(" ", $self->pathify(@test_execs)),
-        objs         => join(" ", $self->pathify(@objects)),
-        test_objs    => join(" ", $self->pathify(@test_objects)),
-        headers      => join(" ", $self->pathify( @{ $self->{h_files} } ) ),
+        test_execs   => join(" ", @test_execs),
+        objs         => join(" ", @objects),
+        test_objs    => join(" ", @test_objects),
+        headers      => join(" ", @{ $self->{h_files} }),
         test_blocks  => join("\n\n", @test_blocks),
         top          => $self->top,
         clean_target => $self->clean_target,
