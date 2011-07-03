@@ -31,15 +31,15 @@ sub new {
     for (qw( dir filename obj_ext exe_ext cc )) {
         defined $args{$_} or confess("Missing required param '$_'");
     }
-    my $dir = $args{dir};
-    my $self = bless { 
-        dir          => $dir,  
+    my $dir  = $args{dir};
+    my $self = bless {
+        dir          => $dir,
         filename     => $args{filename},
         obj_ext      => $args{obj_ext},
         exe_ext      => $args{exe_ext},
         cc           => $args{cc},
         extra_cflags => $args{extra_cflags} || '',
-        extra_clean  => $args{extra_clean}  || '',
+        extra_clean  => $args{extra_clean} || '',
     }, $class;
 
     # Gather source paths, normalized for the target OS.
@@ -48,21 +48,23 @@ sub new {
     -d 'src' or confess("Can't find 'src' directory within '$dir'");
     my ( @h_files, @c_files, @c_tests );
     push @c_files, "charmonize.c";
-    File::Find::find( {
-        wanted => sub {
-            if (/\.c$/) {
-                if (/^Test/) {
-                    push @c_tests, $File::Find::name;
+    File::Find::find(
+        {   wanted => sub {
+                if (/\.c$/) {
+                    if (/^Test/) {
+                        push @c_tests, $File::Find::name;
+                    }
+                    else {
+                        push @c_files, $File::Find::name;
+                    }
                 }
-                else {
-                    push @c_files, $File::Find::name;
+                elsif (/\.h$/) {
+                    push @h_files, $File::Find::name;
                 }
-            }
-            elsif (/\.h$/) {
-                push @h_files, $File::Find::name;
-            }
+            },
         },
-    }, 'src', );
+        'src',
+    );
     chdir($orig_dir);
     $self->{c_files} = [ sort map { $self->pathify($_) } @c_files ];
     $self->{h_files} = [ sort map { $self->pathify($_) } @h_files ];
@@ -111,7 +113,7 @@ sub c2o_rule {
 
 sub test_block {
     my ( $self, $c_test_case ) = @_;
-    my $exe = $self->execify($c_test_case); 
+    my $exe = $self->execify($c_test_case);
     my $obj = $self->objectify($c_test_case);
     my $test_obj
         = $self->pathify( $self->objectify("src/Charmonizer/Test.c") );
@@ -138,18 +140,19 @@ sub gen_makefile {
         = @$self{qw( h_files c_files c_tests c_test_cases )};
 
     # Derive chunks of Makefile content.
-    my $progname = $self->execify('charmonize.c');
-    my $c2o_rule = $self->c2o_rule;
+    my $progname              = $self->execify('charmonize.c');
+    my $c2o_rule              = $self->c2o_rule;
     my $progname_link_command = $self->build_link_command(
         objects => ['$(OBJS)'],
         target  => '$(PROGNAME)',
     );
-    my $clean_rule = $self->clean_rule;
+    my $clean_rule  = $self->clean_rule;
     my $objs        = join " ", map { $self->objectify($_) } @$c_files;
     my $test_objs   = join " ", map { $self->objectify($_) } @$c_tests;
-    my $test_blocks = join "\n\n", map { $self->test_block($_) } @$c_test_cases;
-    my $test_execs  = join " ", map { $self->execify($_) } @$c_test_cases;
-    my $headers     = join " ", @$h_files;
+    my $test_blocks = join "\n\n",
+        map { $self->test_block($_) } @$c_test_cases;
+    my $test_execs = join " ", map { $self->execify($_) } @$c_test_cases;
+    my $headers = join " ", @$h_files;
 
     # Write out Makefile content.
     open my $fh, ">", $self->{filename}
@@ -209,14 +212,14 @@ EOT
 package Charmonizer::Build::Makefile::Posix;
 BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
 
-sub new { 
+sub new {
     my $class = shift;
     return $class->SUPER::new(
-        filename => 'Makefile', 
+        filename => 'Makefile',
         obj_ext  => '.o',
         exe_ext  => '',
         cc       => 'cc',
-        @_ 
+        @_
     );
 }
 
@@ -226,16 +229,16 @@ sub pathify    { shift->unixify(@_) }
 package Charmonizer::Build::Makefile::MSVC;
 BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
 
-sub new { 
+sub new {
     my $class = shift;
     return $class->SUPER::new(
-        filename     => 'Makefile.MSVC', 
+        filename     => 'Makefile.MSVC',
         obj_ext      => '.obj',
         exe_ext      => '.exe',
         cc           => 'cl',
         extra_cflags => '-nologo -D_CRT_SECURE_NO_WARNINGS',
         extra_clean  => '*.pdb',
-        @_ 
+        @_
     );
 }
 
@@ -255,14 +258,14 @@ sub clean_rule { shift->clean_rule_win }
 package Charmonizer::Build::Makefile::MinGW;
 BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
 
-sub new { 
+sub new {
     my $class = shift;
     return $class->SUPER::new(
-        filename => 'Makefile.MinGW', 
+        filename => 'Makefile.MinGW',
         obj_ext  => '.o',
         exe_ext  => '.exe',
         cc       => 'gcc',
-        @_ 
+        @_
     );
 }
 
@@ -273,7 +276,7 @@ sub clean_rule { shift->clean_rule_win }
 package main;
 
 my $makefile_posix = Charmonizer::Build::Makefile::Posix->new( dir => '.' );
-my $makefile_msvc  = Charmonizer::Build::Makefile::MSVC->new( dir => '.' );
+my $makefile_msvc = Charmonizer::Build::Makefile::MSVC->new( dir => '.' );
 my $makefile_mingw = Charmonizer::Build::Makefile::MinGW->new( dir => '.' );
 $makefile_posix->gen_makefile;
 $makefile_msvc->gen_makefile;
