@@ -39,6 +39,7 @@ sub new {
         exe_ext      => $args{exe_ext},
         cc           => $args{cc},
         extra_cflags => $args{extra_cflags} || '',
+        extra_clean  => $args{extra_clean}  || '',
     }, $class;
 
     # Gather source paths, normalized for the target OS.
@@ -184,7 +185,7 @@ TEST_OBJS= $test_objs
 
 HEADERS= $headers
 
-CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
+CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) $self->{extra_clean}
 
 $c2o_rule
 
@@ -233,6 +234,7 @@ sub new {
         exe_ext      => '.exe',
         cc           => 'cl',
         extra_cflags => '-nologo -D_CRT_SECURE_NO_WARNINGS',
+        extra_clean  => '*.pdb',
         @_ 
     );
 }
