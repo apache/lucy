@@ -17,8 +17,7 @@
 
 CC= cc
 DEFS=
-CFLAGS= -Isrc $(DEFS)
-
+CFLAGS= -Isrc $(DEFS) 
 PROGNAME= charmonize
 
 TESTS= TestDirManip TestFuncMacro TestHeaders TestIntegers TestLargeFiles TestUnusedVars TestVariadicMacros

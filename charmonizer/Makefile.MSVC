@@ -17,8 +17,7 @@
 
 CC= cl
 DEFS=
-CFLAGS= -Isrc -nologo -D_CRT_SECURE_NO_WARNINGS $(DEFS)
-
+CFLAGS= -Isrc $(DEFS) -nologo -D_CRT_SECURE_NO_WARNINGS
 PROGNAME= charmonize.exe
 
 TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe

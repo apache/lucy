@@ -17,8 +17,7 @@
 
 CC= gcc
 DEFS=
-CFLAGS= -Isrc $(DEFS)
-
+CFLAGS= -Isrc $(DEFS) 
 PROGNAME= charmonize.exe
 
 TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe
