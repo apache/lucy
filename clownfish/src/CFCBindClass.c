@@ -43,7 +43,7 @@ static char*
 S_vtable_definition(CFCBindClass *self);
 
 /* C code defining the ZombieCharBuf which contains the class name for this
- * class. 
+ * class.
  */
 static char*
 S_name_var_definition(CFCBindClass *self);
@@ -74,8 +74,7 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 }
 
 void
-CFCBindClass_destroy(CFCBindClass *self)
-{
+CFCBindClass_destroy(CFCBindClass *self) {
     FREEMEM(self->full_callbacks_var);
     FREEMEM(self->full_name_var);
     FREEMEM(self->short_names_macro);
@@ -84,8 +83,7 @@ CFCBindClass_destroy(CFCBindClass *self)
 }
 
 static int
-S_method_is_novel(CFCMethod *method, CFCMethod **novel_methods)
-{
+S_method_is_novel(CFCMethod *method, CFCMethod **novel_methods) {
     for (int i = 0; novel_methods[i] != NULL; i++) {
         if (method == novel_methods[i]) { return 1; }
     }
@@ -138,7 +136,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
         // object.
         char *offset_str
             = CFCUtil_cat_strings(CFCUtil_strdup(""), "(offsetof(", vt_type,
-                                  ", methods) + ", meth_num_str, 
+                                  ", methods) + ", meth_num_str,
                                   " * sizeof(cfish_method_t))", NULL);
         offsets = CFCUtil_cat_strings(offsets, "size_t ", full_offset_sym,
                                       " = ", offset_str, ";\n", NULL);
@@ -174,7 +172,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
     // Close callbacks variable definition.
     cb_var =  CFCUtil_cat_strings(cb_var, "NULL\n};\n", NULL);
 
-    const char pattern[] = 
+    const char pattern[] =
         "#include \"%s\"\n"
         "\n"
         "%s\n"
@@ -213,7 +211,7 @@ CFCBindClass_struct_definition(CFCBindClass *self) {
     const char *struct_sym = CFCClass_full_struct_sym(self->client);
     CFCVariable **member_vars = CFCClass_member_vars(self->client);
     char *member_decs = CFCUtil_strdup("");
-    
+
     for (int i = 0; member_vars[i] != NULL; i++) {
         const char *member_dec = CFCVariable_local_declaration(member_vars[i]);
         size_t needed = strlen(member_decs) + strlen(member_dec) + 10;
@@ -239,7 +237,7 @@ S_name_var_definition(CFCBindClass *self) {
     const char *class_name  = CFCClass_get_class_name(self->client);
     unsigned class_name_len = (unsigned)strlen(class_name);
 
-    const char pattern[] = 
+    const char pattern[] =
         "cfish_ZombieCharBuf %s = {\n"
         "    CFISH_ZOMBIECHARBUF,\n"
         "    {1}, /* ref.count */\n"
@@ -268,7 +266,7 @@ S_vtable_definition(CFCBindClass *self) {
     const char  *vt_type    = CFCClass_full_vtable_type(client);
     const char  *vt_var     = CFCClass_full_vtable_var(client);
     const char  *struct_sym = CFCClass_full_struct_sym(client);
-    
+
     // Create a pointer to the parent class's vtable.
     const char *parent_ref = parent
                              ? CFCClass_full_vtable_var(parent)
@@ -332,8 +330,7 @@ CFCBindClass_get_client(CFCBindClass *self) {
 }
 
 const char*
-CFCBindClass_short_names_macro(CFCBindClass *self)
-{
+CFCBindClass_short_names_macro(CFCBindClass *self) {
     return self->short_names_macro;
 }
 
@@ -411,7 +408,7 @@ CFCBindClass_inert_var_declarations(CFCBindClass *self) {
     char *declarations = CFCUtil_strdup("");
     for (int i = 0; inert_vars[i] != NULL; i++) {
         const char *global_c = CFCVariable_global_c(inert_vars[i]);
-        declarations = CFCUtil_cat_strings(declarations, "extern ", global_c, 
+        declarations = CFCUtil_cat_strings(declarations, "extern ", global_c,
                                            ";\n", NULL);
     }
     return declarations;
@@ -441,7 +438,7 @@ CFCBindClass_vt_singleton_def(CFCBindClass *self) {
     const char *vt_hidden   = CFCClass_full_vtable_hidden(client);
     size_t      num_methods = CFCClass_num_methods(client);
 
-    const char pattern[] = 
+    const char pattern[] =
         "typedef struct %s {\n"
         "    cfish_VTable *vtable;\n"
         "    cfish_ref_t ref;\n"
@@ -489,16 +486,16 @@ CFCBindClass_short_names(CFCBindClass *self) {
         short_names 
             = CFCUtil_cat_strings(short_names, "  #define ",
                                   short_struct, " ", full_struct, "\n",
-                                  "  #define ", short_vt_var, " ", 
+                                  "  #define ", short_vt_var, " ",
                                   full_vt_var, "\n", NULL);
     }
-    
+
     CFCFunction **functions = CFCClass_functions(client);
     for (int i = 0; functions[i] != NULL; i++) {
         CFCFunction *func = functions[i];
         short_names 
             = CFCUtil_cat_strings(short_names, "  #define ",
-                                  CFCFunction_short_func_sym(func), " ", 
+                                  CFCFunction_short_func_sym(func), " ",
                                   CFCFunction_full_func_sym(func), "\n",
                                   NULL);
     }
@@ -508,7 +505,7 @@ CFCBindClass_short_names(CFCBindClass *self) {
         CFCVariable *var = inert_vars[i];
         short_names 
             = CFCUtil_cat_strings(short_names, "  #define ",
-                                  CFCVariable_short_sym(var), " ", 
+                                  CFCVariable_short_sym(var), " ",
                                   CFCVariable_full_sym(var), "\n", NULL);
     }
 

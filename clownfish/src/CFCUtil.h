@@ -45,7 +45,7 @@ char*
 CFCUtil_strndup(const char *string, size_t len);
 
 /** Concatenate a NULL-terminated list of strings onto the first, reallocating
- * with each argument. 
+ * with each argument.
  */
 char*
 CFCUtil_cat_strings(char *string, ...);

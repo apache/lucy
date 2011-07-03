@@ -37,8 +37,8 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass);
 /* Take a NULL-terminated list of CFCVariables and build up a string of
  * directives like:
  *
- *     UNUSED_VAR(var1); 
- *     UNUSED_VAR(var2); 
+ *     UNUSED_VAR(var1);
+ *     UNUSED_VAR(var2);
  */
 static char*
 S_build_unused_vars(CFCVariable **vars);
@@ -150,7 +150,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char *ret_type_str = CFCType_to_c(return_type);
     const char *maybe_return = CFCType_is_void(return_type) ? "" : "return ";
 
-    const char pattern[] = 
+    const char pattern[] =
         "extern size_t %s;\n"
         "static CHY_INLINE %s\n"
         "%s(const %s *self%s) {\n"
@@ -199,8 +199,7 @@ CFCBindMeth_typdef_dec(struct CFCMethod *method) {
 }
 
 char*
-CFCBindMeth_callback_dec(CFCMethod *method)
-{
+CFCBindMeth_callback_dec(CFCMethod *method) {
     const char *full_callback_sym = CFCMethod_full_callback_sym(method);
     size_t size = strlen(full_callback_sym) + 50;
     char *callback_dec = (char*)MALLOCATE(size);
@@ -214,8 +213,8 @@ CFCBindMeth_callback_obj_def(CFCMethod *method, const char *offset) {
     unsigned    macro_sym_len     = strlen(macro_sym);
     const char *full_override_sym = CFCMethod_full_override_sym(method);
     const char *full_callback_sym = CFCMethod_full_callback_sym(method);
-    char pattern[] = 
-         "cfish_Callback %s = {\"%s\", %u, (cfish_method_t)%s, %s};\n";
+    char pattern[] =
+        "cfish_Callback %s = {\"%s\", %u, (cfish_method_t)%s, %s};\n";
     size_t size = sizeof(pattern)
                   + macro_sym_len
                   + strlen(full_override_sym)
@@ -224,7 +223,7 @@ CFCBindMeth_callback_obj_def(CFCMethod *method, const char *offset) {
                   + 30;
     char *def = (char*)MALLOCATE(size);
     sprintf(def, pattern, full_callback_sym, macro_sym, macro_sym_len,
-        full_override_sym, offset);
+            full_override_sym, offset);
     return def;
 }
 
@@ -269,13 +268,13 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
     CFCType    *return_type  = CFCMethod_get_return_type(method);
     const char *ret_type_str = CFCType_to_c(return_type);
     const char *macro_sym    = CFCMethod_get_macro_sym(method);
-    
+
     // Thwart compiler warnings.
     CFCVariable **param_vars = CFCParamList_get_variables(param_list);
     char *unused = S_build_unused_vars(param_vars + 1);
     char *return_statement = S_maybe_unreachable(return_type);
 
-    char pattern[] = 
+    char pattern[] =
         "%s\n"
         "%s(%s) {\n"
         "    cfish_CharBuf *klass = self ? Cfish_Obj_Get_Class_Name((cfish_Obj*)self) : %s->name;%s\n"
@@ -291,7 +290,7 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
                     + strlen(return_statement)
                     + 50;
     char *abstract_def = (char*)MALLOCATE(needed);
-    sprintf(abstract_def, pattern, ret_type_str, full_func_sym, params, 
+    sprintf(abstract_def, pattern, ret_type_str, full_func_sym, params,
             vtable_var, unused, macro_sym, return_statement);
 
     FREEMEM(unused);
@@ -345,11 +344,11 @@ S_callback_params(CFCMethod *method) {
         size_t       name_len = strlen(name);
         CFCType     *type     = CFCVariable_get_type(var);
         const char  *c_type   = CFCType_to_c(type);
-        size_t       size     = strlen(params) 
-                                + strlen(c_type) 
+        size_t       size     = strlen(params)
+                                + strlen(c_type)
                                 + name_len * 2
                                 + 30;
-        char        *new_buf  = (char*)MALLOCATE(size); 
+        char        *new_buf  = (char*)MALLOCATE(size);
 
         if (CFCType_is_string_type(type)) {
             sprintf(new_buf, "%s, CFISH_ARG_STR(\"%s\", %s)", params, name, name);
@@ -396,7 +395,7 @@ S_invalid_callback_def(CFCMethod *method) {
     const char *class_cnick = CFCMethod_get_class_cnick(method);
     size_t meth_sym_size = CFCMethod_full_method_sym(method, class_cnick, NULL, 0);
     char *full_method_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, class_cnick, full_method_sym, 
+    CFCMethod_full_method_sym(method, class_cnick, full_method_sym,
                               meth_sym_size);
 
     const char *override_sym = CFCMethod_full_override_sym(method);
@@ -410,12 +409,12 @@ S_invalid_callback_def(CFCMethod *method) {
     char *unused = S_build_unused_vars(param_vars);
     char *unreachable = S_maybe_unreachable(return_type);
 
-    char pattern[] = 
+    char pattern[] =
         "%s\n"
         "%s(%s) {%s\n"
         "    CFISH_THROW(CFISH_ERR, \"Can't override %s via binding\");%s\n"
         "}\n";
-    size_t size = sizeof(pattern) 
+    size_t size = sizeof(pattern)
                   + strlen(ret_type_str)
                   + strlen(override_sym)
                   + strlen(params)
@@ -435,7 +434,7 @@ static char*
 S_void_callback_def(CFCMethod *method, const char *callback_params) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
-    const char pattern[] = 
+    const char pattern[] =
         "void\n"
         "%s(%s) {\n"
         "    cfish_Host_callback(%s);\n"
@@ -470,7 +469,7 @@ S_primitive_callback_def(CFCMethod *method, const char *callback_params) {
         CFCUtil_die("unrecognized type: %s", ret_type_str);
     }
 
-    char pattern[] = 
+    char pattern[] =
         "%s\n"
         "%s(%s) {\n"
         "    return (%s)%s(%s);\n"
@@ -503,7 +502,7 @@ S_obj_callback_def(CFCMethod *method, const char *callback_params) {
     char *nullable_check = CFCUtil_strdup("");
     if (!CFCType_nullable(return_type)) {
         const char *macro_sym = CFCMethod_get_macro_sym(method);
-        char pattern[] = 
+        char pattern[] =
             "\n    if (!retval) { CFISH_THROW(CFISH_ERR, "
             "\"%s() for class '%%o' cannot return NULL\", "
             "Cfish_Obj_Get_Class_Name((cfish_Obj*)self)); }";
@@ -513,10 +512,10 @@ S_obj_callback_def(CFCMethod *method, const char *callback_params) {
     }
 
     const char *decrement = CFCType_incremented(return_type)
-                            ? "" 
+                            ? ""
                             : "\n    LUCY_DECREF(retval);";
 
-    char pattern[] = 
+    char pattern[] =
         "%s\n"
         "%s(%s) {\n"
         "    %s retval = (%s)%s(%s);%s%s\n"
