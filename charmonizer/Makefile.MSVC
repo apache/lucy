@@ -18,9 +18,6 @@
 CC= cl
 DEFS=
 CFLAGS= -Isrc -nologo -D_CRT_SECURE_NO_WARNINGS $(DEFS)
-LINKER= link
-LINKFLAGS= -nologo
-LINKOUT= /OUT:
 
 .c.obj:
 	$(CC) $(CFLAGS) -c $< -Fo$@
@@ -40,32 +37,32 @@ CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
 all: $(PROGNAME)
 
 $(PROGNAME): $(OBJS)
-	$(LINKER) $(LINKFLAGS) $(OBJS) $(LINKOUT)"$(PROGNAME)"
+	link -nologo $(OBJS) /OUT:$(PROGNAME)
 
 $(OBJS) $(TEST_OBJS): $(HEADERS)
 
 tests: $(TESTS)
 
 TestDirManip.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj $(LINKOUT)"$@"
+	link -nologo src\Charmonizer\Test\TestDirManip.obj src\Charmonizer\Test.obj /OUT:$@
 
 TestFuncMacro.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj $(LINKOUT)"$@"
+	link -nologo src\Charmonizer\Test\TestFuncMacro.obj src\Charmonizer\Test.obj /OUT:$@
 
 TestHeaders.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj $(LINKOUT)"$@"
+	link -nologo src\Charmonizer\Test\TestHeaders.obj src\Charmonizer\Test.obj /OUT:$@
 
 TestIntegers.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj $(LINKOUT)"$@"
+	link -nologo src\Charmonizer\Test\TestIntegers.obj src\Charmonizer\Test.obj /OUT:$@
 
 TestLargeFiles.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj $(LINKOUT)"$@"
+	link -nologo src\Charmonizer\Test\TestLargeFiles.obj src\Charmonizer\Test.obj /OUT:$@
 
 TestUnusedVars.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj $(LINKOUT)"$@"
+	link -nologo src\Charmonizer\Test\TestUnusedVars.obj src\Charmonizer\Test.obj /OUT:$@
 
 TestVariadicMacros.exe: src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj $(LINKOUT)"$@"
+	link -nologo src\Charmonizer\Test\TestVariadicMacros.obj src\Charmonizer\Test.obj /OUT:$@
 
 clean:
 	CMD /c FOR %i IN ($(CLEANABLE)) DO IF EXIST %i DEL /F %i

@@ -18,9 +18,6 @@
 CC= cc
 DEFS=
 CFLAGS= -Isrc $(DEFS)
-LINKER= $(CC)
-LINKFLAGS= $(CFLAGS)
-LINKOUT= -o
 
 .c.o:
 	$(CC) $(CFLAGS) -c $*.c -o $@
@@ -40,32 +37,32 @@ CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
 all: $(PROGNAME)
 
 $(PROGNAME): $(OBJS)
-	$(LINKER) $(LINKFLAGS) $(OBJS) $(LINKOUT)"$(PROGNAME)"
+	$(CC) $(CFLAGS) $(OBJS) -o $(PROGNAME)
 
 $(OBJS) $(TEST_OBJS): $(HEADERS)
 
 tests: $(TESTS)
 
 TestDirManip: src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test.o src/Charmonizer/Test/TestDirManip.o $(LINKOUT)"$@"
+	$(CC) $(CFLAGS) src/Charmonizer/Test/TestDirManip.o src/Charmonizer/Test.o -o $@
 
 TestFuncMacro: src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test.o src/Charmonizer/Test/TestFuncMacro.o $(LINKOUT)"$@"
+	$(CC) $(CFLAGS) src/Charmonizer/Test/TestFuncMacro.o src/Charmonizer/Test.o -o $@
 
 TestHeaders: src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test.o src/Charmonizer/Test/TestHeaders.o $(LINKOUT)"$@"
+	$(CC) $(CFLAGS) src/Charmonizer/Test/TestHeaders.o src/Charmonizer/Test.o -o $@
 
 TestIntegers: src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test.o src/Charmonizer/Test/TestIntegers.o $(LINKOUT)"$@"
+	$(CC) $(CFLAGS) src/Charmonizer/Test/TestIntegers.o src/Charmonizer/Test.o -o $@
 
 TestLargeFiles: src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test.o src/Charmonizer/Test/TestLargeFiles.o $(LINKOUT)"$@"
+	$(CC) $(CFLAGS) src/Charmonizer/Test/TestLargeFiles.o src/Charmonizer/Test.o -o $@
 
 TestUnusedVars: src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test.o src/Charmonizer/Test/TestUnusedVars.o $(LINKOUT)"$@"
+	$(CC) $(CFLAGS) src/Charmonizer/Test/TestUnusedVars.o src/Charmonizer/Test.o -o $@
 
 TestVariadicMacros: src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o
-	$(LINKER) $(LINKFLAGS) src/Charmonizer/Test.o src/Charmonizer/Test/TestVariadicMacros.o $(LINKOUT)"$@"
+	$(CC) $(CFLAGS) src/Charmonizer/Test/TestVariadicMacros.o src/Charmonizer/Test.o -o $@
 
 clean:
 	rm -f $(CLEANABLE)
