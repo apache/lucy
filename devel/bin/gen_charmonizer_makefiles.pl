@@ -64,6 +64,8 @@ sub new {
     $self->{c_files} = [ sort map { $self->pathify($_) } @c_files ];
     $self->{h_files} = [ sort map { $self->pathify($_) } @h_files ];
     $self->{c_tests} = [ sort map { $self->pathify($_) } @c_tests ];
+    $self->{c_test_cases}
+        = [ grep { $_ !~ /Test\.c/ } @{ $self->{c_tests} } ];
 
     return $self;
 }
@@ -88,38 +90,29 @@ sub objectify {
     return $c_file;
 }
 
+sub execify {
+    my ( $self, $file ) = @_;
+    $file =~ s/.*?(\w+)\.c$/$1$self->{exe_ext}/ or die "No match: $file";
+    return $file;
+}
+
 sub build_link_command {
     my ( $self, %args ) = @_;
     my $objects = join( " ", @{ $args{objects} } );
     return "\$(CC) \$(CFLAGS) $objects -o $args{target}";
 }
 
-sub test_execs {
-    my $self = shift;
-    my @test_execs = grep { $_ !~ /Test\.c/ } @_; # skip Test.c entry
-    for (@test_execs) {
-        s/.*(Test\w+)\.c$/$1$self->{exe_ext}/ or die "no match: $_";
-    }
-    return @test_execs;
-}
-
-sub test_blocks {
-    my $self = shift;
-    my @c_files = grep { $_ !~ /Test\.c/ } @_; # skip Test.c entry
-    my @blocks;
-    for my $c_file (@c_files) {
-        my $exe = $c_file; 
-        $exe =~ s/.*(Test\w+)\.c$/$1$self->{exe_ext}/ or die "no match $exe";
-        my $obj = $self->objectify($c_file);
-        my $test_obj
-            = $self->pathify( $self->objectify("src/Charmonizer/Test.c") );
-        my $link_command = $self->build_link_command(
-            objects => [ $obj, $test_obj ],
-            target  => '$@',
-        );
-        push @blocks, qq|$exe: $test_obj $obj\n\t$link_command|;
-    }
-    return @blocks;
+sub test_block {
+    my ( $self, $c_test_case ) = @_;
+    my $exe = $self->execify($c_test_case); 
+    my $obj = $self->objectify($c_test_case);
+    my $test_obj
+        = $self->pathify( $self->objectify("src/Charmonizer/Test.c") );
+    my $link_command = $self->build_link_command(
+        objects => [ $obj, $test_obj ],
+        target  => '$@',
+    );
+    return qq|$exe: $test_obj $obj\n\t$link_command|;
 }
 
 sub clean_target { confess "abstract method" }
@@ -176,16 +169,18 @@ EOT
 
 sub write_makefile {
     my $self = shift;
-    my @objects      = map { $self->objectify($_) } @{ $self->{c_files} };
-    my @test_objects = map { $self->objectify($_) } @{ $self->{c_tests} };
-    my @test_execs   = $self->test_execs( @{ $self->{c_tests} } );
-    my @test_blocks  = $self->test_blocks( @{ $self->{c_tests} } );
+    my ( $h_files, $c_files, $c_tests, $c_test_cases )
+        = @$self{qw( h_files c_files c_tests c_test_cases )};
+    my @objects      = map { $self->objectify($_) } @$c_files;
+    my @test_objects = map { $self->objectify($_) } @$c_tests;
+    my @test_execs   = map { $self->execify($_) } @$c_test_cases;
+    my @test_blocks  = map { $self->test_block($_) } @$c_test_cases;
 
     $self->gen_makefile(
         test_execs   => join(" ", @test_execs),
         objs         => join(" ", @objects),
         test_objs    => join(" ", @test_objects),
-        headers      => join(" ", @{ $self->{h_files} }),
+        headers      => join(" ", @$h_files),
         test_blocks  => join("\n\n", @test_blocks),
         top          => $self->top,
         clean_target => $self->clean_target,
