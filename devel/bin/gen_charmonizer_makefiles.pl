@@ -133,6 +133,8 @@ sub clean_rule_win {
 
 sub gen_makefile {
     my ( $self, %args ) = @_;
+    my ( $h_files, $c_files, $c_tests, $c_test_cases )
+        = @$self{qw( h_files c_files c_tests c_test_cases )};
 
     # Derive chunks of Makefile content.
     my $extra_cflags = $self->{extra_cflags} || '';
@@ -143,6 +145,11 @@ sub gen_makefile {
         target  => '$(PROGNAME)',
     );
     my $clean_rule = $self->clean_rule;
+    my $objs        = join " ", map { $self->objectify($_) } @$c_files;
+    my $test_objs   = join " ", map { $self->objectify($_) } @$c_tests;
+    my $test_blocks = join "\n\n", map { $self->test_block($_) } @$c_test_cases;
+    my $test_execs  = join " ", map { $self->execify($_) } @$c_test_cases;
+    my $headers     = join " ", @$h_files;
 
     # Write out Makefile content.
     open my $fh, ">", $self->{filename}
@@ -170,13 +177,13 @@ DEFS=
 CFLAGS= -Isrc \$(DEFS) $extra_cflags
 PROGNAME= $progname
 
-TESTS= $args{test_execs}
+TESTS= $test_execs
 
-OBJS= $args{objs}
+OBJS= $objs
 
-TEST_OBJS= $args{test_objs}
+TEST_OBJS= $test_objs
 
-HEADERS= $args{headers}
+HEADERS= $headers
 
 CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) *.pdb
 
@@ -191,30 +198,12 @@ all: \$(PROGNAME)
 
 tests: \$(TESTS)
 
-$args{test_blocks}
+$test_blocks
 
 $clean_rule
 
 EOT
     print $fh $content;
-}
-
-sub write_makefile {
-    my $self = shift;
-    my ( $h_files, $c_files, $c_tests, $c_test_cases )
-        = @$self{qw( h_files c_files c_tests c_test_cases )};
-    my @objects      = map { $self->objectify($_) } @$c_files;
-    my @test_objects = map { $self->objectify($_) } @$c_tests;
-    my @test_execs   = map { $self->execify($_) } @$c_test_cases;
-    my @test_blocks  = map { $self->test_block($_) } @$c_test_cases;
-
-    $self->gen_makefile(
-        test_execs  => join(" ", @test_execs),
-        objs        => join(" ", @objects),
-        test_objs   => join(" ", @test_objects),
-        headers     => join(" ", @$h_files),
-        test_blocks => join("\n\n", @test_blocks),
-    );
 }
 
 package Charmonizer::Build::Makefile::Posix;
@@ -285,9 +274,9 @@ package main;
 my $makefile_posix = Charmonizer::Build::Makefile::Posix->new( dir => '.' );
 my $makefile_msvc  = Charmonizer::Build::Makefile::MSVC->new( dir => '.' );
 my $makefile_mingw = Charmonizer::Build::Makefile::MinGW->new( dir => '.' );
-$makefile_posix->write_makefile;
-$makefile_msvc->write_makefile;
-$makefile_mingw->write_makefile;
+$makefile_posix->gen_makefile;
+$makefile_msvc->gen_makefile;
+$makefile_mingw->gen_makefile;
 
 __END__
 
