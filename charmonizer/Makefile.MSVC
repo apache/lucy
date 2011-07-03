@@ -18,7 +18,6 @@
 CC= cl
 DEFS=
 CFLAGS= -Isrc -nologo -D_CRT_SECURE_NO_WARNINGS $(DEFS)
-OBJEXT= .obj
 EXEEXT= .exe
 LINKER= link
 LINKFLAGS= -nologo
@@ -31,9 +30,9 @@ PROGNAME= charmonize$(EXEEXT)
 
 TESTS= TestDirManip$(EXEEXT) TestFuncMacro$(EXEEXT) TestHeaders$(EXEEXT) TestIntegers$(EXEEXT) TestLargeFiles$(EXEEXT) TestUnusedVars$(EXEEXT) TestVariadicMacros$(EXEEXT)
 
-OBJS= charmonize$(OBJEXT) src\Charmonizer\Core\Compiler$(OBJEXT) src\Charmonizer\Core\ConfWriter$(OBJEXT) src\Charmonizer\Core\Dir$(OBJEXT) src\Charmonizer\Core\HeaderChecker$(OBJEXT) src\Charmonizer\Core\OperatingSystem$(OBJEXT) src\Charmonizer\Core\Stat$(OBJEXT) src\Charmonizer\Core\Util$(OBJEXT) src\Charmonizer\Probe$(OBJEXT) src\Charmonizer\Probe\AtomicOps$(OBJEXT) src\Charmonizer\Probe\DirManip$(OBJEXT) src\Charmonizer\Probe\Floats$(OBJEXT) src\Charmonizer\Probe\FuncMacro$(OBJEXT) src\Charmonizer\Probe\Headers$(OBJEXT) src\Charmonizer\Probe\Integers$(OBJEXT) src\Charmonizer\Probe\LargeFiles$(OBJEXT) src\Charmonizer\Probe\Memory$(OBJEXT) src\Charmonizer\Probe\UnusedVars$(OBJEXT) src\Charmonizer\Probe\VariadicMacros$(OBJEXT)
+OBJS= charmonize.obj src\Charmonizer\Core\Compiler.obj src\Charmonizer\Core\ConfWriter.obj src\Charmonizer\Core\Dir.obj src\Charmonizer\Core\HeaderChecker.obj src\Charmonizer\Core\OperatingSystem.obj src\Charmonizer\Core\Stat.obj src\Charmonizer\Core\Util.obj src\Charmonizer\Probe.obj src\Charmonizer\Probe\AtomicOps.obj src\Charmonizer\Probe\DirManip.obj src\Charmonizer\Probe\Floats.obj src\Charmonizer\Probe\FuncMacro.obj src\Charmonizer\Probe\Headers.obj src\Charmonizer\Probe\Integers.obj src\Charmonizer\Probe\LargeFiles.obj src\Charmonizer\Probe\Memory.obj src\Charmonizer\Probe\UnusedVars.obj src\Charmonizer\Probe\VariadicMacros.obj
 
-TEST_OBJS= src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJEXT) src\Charmonizer\Test\TestFuncMacro$(OBJEXT) src\Charmonizer\Test\TestHeaders$(OBJEXT) src\Charmonizer\Test\TestIntegers$(OBJEXT) src\Charmonizer\Test\TestLargeFiles$(OBJEXT) src\Charmonizer\Test\TestUnusedVars$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT)
+TEST_OBJS= src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj src\Charmonizer\Test\TestFuncMacro.obj src\Charmonizer\Test\TestHeaders.obj src\Charmonizer\Test\TestIntegers.obj src\Charmonizer\Test\TestLargeFiles.obj src\Charmonizer\Test\TestUnusedVars.obj src\Charmonizer\Test\TestVariadicMacros.obj
 
 HEADERS= src\Charmonizer\Core\Compiler.h src\Charmonizer\Core\ConfWriter.h src\Charmonizer\Core\Defines.h src\Charmonizer\Core\Dir.h src\Charmonizer\Core\HeaderChecker.h src\Charmonizer\Core\OperatingSystem.h src\Charmonizer\Core\Stat.h src\Charmonizer\Core\Util.h src\Charmonizer\Probe.h src\Charmonizer\Probe\AtomicOps.h src\Charmonizer\Probe\DirManip.h src\Charmonizer\Probe\Floats.h src\Charmonizer\Probe\FuncMacro.h src\Charmonizer\Probe\Headers.h src\Charmonizer\Probe\Integers.h src\Charmonizer\Probe\LargeFiles.h src\Charmonizer\Probe\Memory.h src\Charmonizer\Probe\UnusedVars.h src\Charmonizer\Probe\VariadicMacros.h src\Charmonizer\Test.h
 
@@ -48,26 +47,26 @@ $(OBJS) $(TEST_OBJS): $(HEADERS)
 
 tests: $(TESTS)
 
-TestDirManip$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestDirManip$(OBJEXT) $(LINKOUT)"$@"
+TestDirManip$(EXEEXT): src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj $(LINKOUT)"$@"
 
-TestFuncMacro$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestFuncMacro$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestFuncMacro$(OBJEXT) $(LINKOUT)"$@"
+TestFuncMacro$(EXEEXT): src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestFuncMacro.obj $(LINKOUT)"$@"
 
-TestHeaders$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestHeaders$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestHeaders$(OBJEXT) $(LINKOUT)"$@"
+TestHeaders$(EXEEXT): src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestHeaders.obj $(LINKOUT)"$@"
 
-TestIntegers$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestIntegers$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestIntegers$(OBJEXT) $(LINKOUT)"$@"
+TestIntegers$(EXEEXT): src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestIntegers.obj $(LINKOUT)"$@"
 
-TestLargeFiles$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestLargeFiles$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestLargeFiles$(OBJEXT) $(LINKOUT)"$@"
+TestLargeFiles$(EXEEXT): src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestLargeFiles.obj $(LINKOUT)"$@"
 
-TestUnusedVars$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestUnusedVars$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestUnusedVars$(OBJEXT) $(LINKOUT)"$@"
+TestUnusedVars$(EXEEXT): src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestUnusedVars.obj $(LINKOUT)"$@"
 
-TestVariadicMacros$(EXEEXT): src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT)
-	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test$(OBJEXT) src\Charmonizer\Test\TestVariadicMacros$(OBJEXT) $(LINKOUT)"$@"
+TestVariadicMacros$(EXEEXT): src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj
+	$(LINKER) $(LINKFLAGS) src\Charmonizer\Test.obj src\Charmonizer\Test\TestVariadicMacros.obj $(LINKOUT)"$@"
 
 clean:
 	CMD /c FOR %i IN ($(CLEANABLE)) DO IF EXIST %i DEL /F %i

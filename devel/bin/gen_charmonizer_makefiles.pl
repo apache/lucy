@@ -28,13 +28,14 @@ sub new {
     my ( $class, %args ) = @_;
 
     # Validate args, create object.
-    for (qw( dir filename )) {
+    for (qw( dir filename obj_ext )) {
         $args{$_} or confess("Missing required param '$_'");
     }
     my $dir = $args{dir};
     my $self = bless { 
         dir      => $dir,  
         filename => $args{filename},
+        obj_ext  => $args{obj_ext},
     }, $class;
 
     # Gather source paths, normalized for the target OS.
@@ -81,7 +82,7 @@ sub winnify {
 sub objectify {
     my ( $self, @objects ) = @_;
     for (@objects) {
-        s/\.c$/\$(OBJEXT)/ or die "No match: $_";
+        s/\.c$/$self->{obj_ext}/ or die "No match: $_";
     }
     return @objects;
 }
@@ -102,11 +103,10 @@ sub test_blocks {
     for my $c_file (@c_files) {
         my $exe = $c_file; 
         $exe =~ s/.*(Test\w+)\.c$/$1\$(EXEEXT)/ or die "no match $exe";
-        my $obj = $c_file;
-        $obj =~ s/\.c$/\$(OBJEXT)/ or die "no match: $obj";
+        my ($obj) = $self->objectify($c_file);
         push @blocks, <<END_BLOCK;
-$exe: src/Charmonizer/Test\$(OBJEXT) $obj
-\t\$(LINKER) \$(LINKFLAGS) src/Charmonizer/Test\$(OBJEXT) $obj \$(LINKOUT)"\$@"
+$exe: src/Charmonizer/Test$self->{obj_ext} $obj
+\t\$(LINKER) \$(LINKFLAGS) src/Charmonizer/Test$self->{obj_ext} $obj \$(LINKOUT)"\$@"
 END_BLOCK
     }
     return @blocks;
@@ -200,14 +200,20 @@ END_LICENSE
 package Charmonizer::Build::Makefile::Posix;
 BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
 
-sub new { shift->SUPER::new( filename => 'Makefile', @_ ) }
+sub new { 
+    my $class = shift;
+    return $class->SUPER::new(
+        filename => 'Makefile', 
+        obj_ext  => '.o',
+        @_ 
+    );
+}
 
 sub top {
     return <<END_STUFF;
 CC= cc
 DEFS=
 CFLAGS= -Isrc \$(DEFS)
-OBJEXT= .o
 EXEEXT=
 LINKER= \$(CC)
 LINKFLAGS= \$(CFLAGS)
@@ -224,14 +230,21 @@ sub pathify      { shift->unixify(@_) }
 package Charmonizer::Build::Makefile::MSVC;
 BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
 
-sub new { shift->SUPER::new( filename => 'Makefile.MSVC', @_ ) }
+sub new { 
+    my $class = shift;
+    return $class->SUPER::new(
+        filename => 'Makefile.MSVC', 
+        obj_ext  => '.obj',
+        @_ 
+    );
+}
+
 
 sub top {
     return <<END_STUFF;
 CC= cl
 DEFS=
 CFLAGS= -Isrc -nologo -D_CRT_SECURE_NO_WARNINGS \$(DEFS)
-OBJEXT= .obj
 EXEEXT= .exe
 LINKER= link
 LINKFLAGS= -nologo
@@ -248,14 +261,20 @@ sub clean_target { shift->clean_target_win }
 package Charmonizer::Build::Makefile::MinGW;
 BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
 
-sub new { shift->SUPER::new( filename => 'Makefile.MinGW', @_ ) }
+sub new { 
+    my $class = shift;
+    return $class->SUPER::new(
+        filename => 'Makefile.MinGW', 
+        obj_ext  => '.o',
+        @_ 
+    );
+}
 
 sub top {
     return <<END_STUFF;
 CC= gcc
 DEFS=
 CFLAGS= -Isrc \$(DEFS)
-OBJEXT= .o
 EXEEXT= .exe
 LINKER= \$(CC)
 LINKFLAGS= \$(CFLAGS)
