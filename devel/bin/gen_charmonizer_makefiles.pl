@@ -61,9 +61,9 @@ sub new {
         },
     }, 'src', );
     chdir($orig_dir);
-    $self->{c_files} = [ sort $self->pathify(@c_files) ];
-    $self->{h_files} = [ sort $self->pathify(@h_files) ];
-    $self->{c_tests} = [ sort $self->pathify(@c_tests) ];
+    $self->{c_files} = [ sort map { $self->pathify($_) } @c_files ];
+    $self->{h_files} = [ sort map { $self->pathify($_) } @h_files ];
+    $self->{c_tests} = [ sort map { $self->pathify($_) } @c_tests ];
 
     return $self;
 }
@@ -71,21 +71,21 @@ sub new {
 sub pathify { confess "abstract method" }
 
 sub unixify {
-    my $self = shift;
-    map { my $copy = $_; $copy =~ tr{\\}{/}; $copy } @_;
+    my ( $self, $path ) = @_;
+    $path =~ tr{\\}{/};
+    return $path;
 }
 
 sub winnify {
-    my $self = shift;
-    map { my $copy = $_; $copy =~ tr{/}{\\}; $copy } @_;
+    my ( $self, $path ) = @_;
+    $path =~ tr{/}{\\};
+    return $path;
 }
 
 sub objectify {
-    my ( $self, @objects ) = @_;
-    for (@objects) {
-        s/\.c$/$self->{obj_ext}/ or die "No match: $_";
-    }
-    return @objects;
+    my ( $self, $c_file ) = @_;
+    $c_file =~ s/\.c$/$self->{obj_ext}/ or die "No match: $c_file";
+    return $c_file;
 }
 
 sub build_link_command {
@@ -110,8 +110,8 @@ sub test_blocks {
     for my $c_file (@c_files) {
         my $exe = $c_file; 
         $exe =~ s/.*(Test\w+)\.c$/$1$self->{exe_ext}/ or die "no match $exe";
-        my ($obj) = $self->objectify($c_file);
-        my ($test_obj)
+        my $obj = $self->objectify($c_file);
+        my $test_obj
             = $self->pathify( $self->objectify("src/Charmonizer/Test.c") );
         my $link_command = $self->build_link_command(
             objects => [ $obj, $test_obj ],
@@ -176,8 +176,8 @@ EOT
 
 sub write_makefile {
     my $self = shift;
-    my @objects      = $self->objectify( @{ $self->{c_files} } );
-    my @test_objects = $self->objectify( @{ $self->{c_tests} } );
+    my @objects      = map { $self->objectify($_) } @{ $self->{c_files} };
+    my @test_objects = map { $self->objectify($_) } @{ $self->{c_tests} };
     my @test_execs   = $self->test_execs( @{ $self->{c_tests} } );
     my @test_blocks  = $self->test_blocks( @{ $self->{c_tests} } );
 
