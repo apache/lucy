@@ -38,7 +38,7 @@ sub new {
         obj_ext      => $args{obj_ext},
         exe_ext      => $args{exe_ext},
         cc           => $args{cc},
-        extra_cflags => $args{extra_cflags},
+        extra_cflags => $args{extra_cflags} || '',
     }, $class;
 
     # Gather source paths, normalized for the target OS.
@@ -133,11 +133,10 @@ sub clean_rule_win {
 
 sub gen_makefile {
     my ( $self, %args ) = @_;
-    my ( $h_files, $c_files, $c_tests, $c_test_cases )
-        = @$self{qw( h_files c_files c_tests c_test_cases )};
+    my ( $h_files, $c_files, $c_tests, $c_test_cases, $extra_cflags )
+        = @$self{qw( h_files c_files c_tests c_test_cases extra_cflags )};
 
     # Derive chunks of Makefile content.
-    my $extra_cflags = $self->{extra_cflags} || '';
     my $progname = $self->execify('charmonize.c');
     my $c2o_rule = $self->c2o_rule;
     my $progname_link_command = $self->build_link_command(
