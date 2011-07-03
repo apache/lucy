@@ -19,9 +19,6 @@ CC= cl
 DEFS=
 CFLAGS= -Isrc -nologo -D_CRT_SECURE_NO_WARNINGS $(DEFS)
 
-.c.obj:
-	$(CC) $(CFLAGS) -c $< -Fo$@
-
 PROGNAME= charmonize.exe
 
 TESTS= TestDirManip.exe TestFuncMacro.exe TestHeaders.exe TestIntegers.exe TestLargeFiles.exe TestUnusedVars.exe TestVariadicMacros.exe
@@ -33,6 +30,9 @@ TEST_OBJS= src\Charmonizer\Test.obj src\Charmonizer\Test\TestDirManip.obj src\Ch
 HEADERS= src\Charmonizer\Core\Compiler.h src\Charmonizer\Core\ConfWriter.h src\Charmonizer\Core\Defines.h src\Charmonizer\Core\Dir.h src\Charmonizer\Core\HeaderChecker.h src\Charmonizer\Core\OperatingSystem.h src\Charmonizer\Core\Stat.h src\Charmonizer\Core\Util.h src\Charmonizer\Probe.h src\Charmonizer\Probe\AtomicOps.h src\Charmonizer\Probe\DirManip.h src\Charmonizer\Probe\Floats.h src\Charmonizer\Probe\FuncMacro.h src\Charmonizer\Probe\Headers.h src\Charmonizer\Probe\Integers.h src\Charmonizer\Probe\LargeFiles.h src\Charmonizer\Probe\Memory.h src\Charmonizer\Probe\UnusedVars.h src\Charmonizer\Probe\VariadicMacros.h src\Charmonizer\Test.h
 
 CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS) *.pdb
+
+.c.obj:
+	$(CC) $(CFLAGS) -c $< -Fo$@
 
 all: $(PROGNAME)
 
