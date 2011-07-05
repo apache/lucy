@@ -75,9 +75,18 @@ sub to_c_header {
 #include "boil.h"
 $parent_include
 
+/* Declare this class's inert variables.
+ */
+
 $inert_var_defs
 
+/* Declare this class's inert functions.
+ */
+
 $sub_declarations
+
+/* Define "short names" for this class's symbols.
+ */
 
 $short_names
 
@@ -89,22 +98,55 @@ END_INERT
 
 #include "charmony.h"
 #include "boil.h"
+
+/* Include the header for this class's parent. 
+ */
+
 $parent_include
+
+/* Define the struct layout for instances of this class.
+ */
 
 #ifdef $c_file_sym
 $struct_def
 #endif /* $c_file_sym */
 
+/* Declare this class's inert variables.
+ */
+
 $inert_var_defs
 
+/* Declare both this class's inert functions and the C functions which
+ * implement this class's dynamic methods.
+ */
+
 $sub_declarations
+
+/* Declare the cfish_Callback objects which provide the introspection
+ * information needed to perform method overriding at runtime.
+ */
+
 $callback_declarations
+
+/* Define typedefs for each dynamic method, allowing us to cast generic
+ * pointers to the appropriate function pointer type more cleanly.
+ */
 
 $method_typedefs
 
+/* Define the inline functions which implement this class's virtual methods.
+ */
+
 $method_defs
 
+/* Define the VTable singleton for this class.
+ */
+
 $vt_singleton_def
+
+/* Define "short names" for this class's symbols.
+ */
+
 $short_names
 
 END_STUFF
