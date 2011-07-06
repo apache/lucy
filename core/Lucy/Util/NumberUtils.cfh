@@ -178,6 +178,8 @@ inert class Lucy::Util::NumberUtils cnick NumUtil {
 
 __C__
 
+#include <string.h>
+
 static CHY_INLINE void
 lucy_NumUtil_encode_bigend_u16(uint16_t value, void *dest_ptr) {
     uint8_t *dest = *(uint8_t**)dest_ptr;
