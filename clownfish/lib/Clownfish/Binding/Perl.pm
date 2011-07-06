@@ -193,7 +193,7 @@ sub _xs_file_contents {
  */
 
 #include "XSBind.h"
-#include "boil.h"
+#include "parcel.h"
 #include "$self->{boot_h_file}"
 
 #include "Lucy/Object/Host.h"
@@ -400,7 +400,7 @@ $self->{header}
 #include "perl.h"
 #include "XSUB.h"
 #include "$self->{boot_h_file}"
-#include "boil.h"
+#include "parcel.h"
 $pound_includes
 
 void

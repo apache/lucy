@@ -72,7 +72,7 @@ sub to_c_header {
     if ( $client->inert ) {
         return <<END_INERT
 #include "charmony.h"
-#include "boil.h"
+#include "parcel.h"
 $parent_include
 
 /* Declare this class's inert variables.
@@ -97,7 +97,7 @@ END_INERT
     return <<END_STUFF;
 
 #include "charmony.h"
-#include "boil.h"
+#include "parcel.h"
 
 /* Include the header for this class's parent. 
  */

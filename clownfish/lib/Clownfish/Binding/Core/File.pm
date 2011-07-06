@@ -136,7 +136,7 @@ $args{header}
 $c_file_syms
 #define C_LUCY_VTABLE
 #define C_LUCY_ZOMBIECHARBUF
-#include "boil.h"
+#include "parcel.h"
 #include "Lucy/Object/VTable.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"

@@ -76,15 +76,15 @@ sub write_all_modified {
         );
     }
 
-    # If any class definition changed, rewrite the boil.h file.
-    $self->_write_boil_h if $modified;
+    # If any class definition changed, rewrite the parcel.h file.
+    $self->_write_parcel_h if $modified;
 
     return $modified;
 }
 
-# Write the "boil.h" header file, which contains common symbols needed by all
+# Write the "parcel.h" header file, which contains common symbols needed by all
 # classes, plus typedefs for all class structs.
-sub _write_boil_h {
+sub _write_parcel_h {
     my $self     = shift;
     my $ordered  = $self->{hierarchy}->ordered_classes;
     my $typedefs = "";
@@ -99,7 +99,7 @@ sub _write_boil_h {
     # Create Clownfish aliases if necessary.
     my $aliases = Clownfish::Binding::Core::Aliases->c_aliases;
 
-    my $filepath = catfile( $self->{dest}, "boil.h" );
+    my $filepath = catfile( $self->{dest}, "parcel.h" );
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$filepath': $!");
