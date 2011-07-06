@@ -22,6 +22,7 @@ use Clownfish::Binding::Core::File;
 use Clownfish::Binding::Core::Aliases;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
+use Scalar::Util qw( blessed );
 
 our %new_PARAMS = (
     hierarchy => undef,
@@ -68,16 +69,12 @@ sub write_all_modified {
             header => $header,
             footer => $footer,
         );
-        Clownfish::Binding::Core::File->write_c(
-            file   => $file,
-            dest   => $dest,
-            header => $header,
-            footer => $footer,
-        );
     }
 
-    # If any class definition changed, rewrite the parcel.h file.
+    # If any class definition has changed, rewrite the parcel.h and parcel.c
+    # files.
     $self->_write_parcel_h if $modified;
+    $self->_write_parcel_c if $modified;
 
     return $modified;
 }
@@ -182,6 +179,49 @@ typedef struct cfish_Callback {
 #endif
 
 #endif /* BOIL_H */
+
+$self->{footer}
+
+END_STUFF
+}
+
+sub _write_parcel_c {
+    my $self      = shift;
+    my $hierarchy = $self->{hierarchy};
+
+    # Aggregate C code from all files.
+    my $content     = "";
+    my $c_file_syms = "";
+    my $includes    = "";
+    for my $file ( @{ $hierarchy->files } ) {
+        for my $block ( @{ $file->blocks } ) {
+            if ( blessed($block) ) {
+                if ( $block->isa('Clownfish::Class') ) {
+                    my $bound = Clownfish::Binding::Core::Class->new(
+                        client => $block, );
+                    $content .= $bound->to_c . "\n";
+                    my $c_file_sym = "C_" . uc( $block->full_struct_sym );
+                    $c_file_syms .= "#define $c_file_sym\n";
+                    my $include_h = $block->include_h;
+                    $includes .= qq|#include "$include_h"\n|;
+                }
+            }
+        }
+    }
+
+    # Unlink then open file.
+    my $filepath = catfile( $self->{dest}, "parcel.c" );
+    unlink $filepath;
+    sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
+        or confess("Can't open '$filepath': $!");
+    print $fh <<END_STUFF;
+$self->{header}
+
+$c_file_syms
+#include "parcel.h"
+$includes
+
+$content
 
 $self->{footer}
 
