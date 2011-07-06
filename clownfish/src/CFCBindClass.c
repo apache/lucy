@@ -269,7 +269,7 @@ S_name_var_definition(CFCBindClass *self) {
     unsigned class_name_len = (unsigned)strlen(class_name);
 
     const char pattern[] =
-        "cfish_ZombieCharBuf %s = {\n"
+        "static cfish_ZombieCharBuf %s = {\n"
         "    CFISH_ZOMBIECHARBUF,\n"
         "    {1}, /* ref.count */\n"
         "    \"%s\",\n"
