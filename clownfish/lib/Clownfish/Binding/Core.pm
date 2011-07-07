@@ -200,7 +200,7 @@ sub _write_parcel_c {
                     my $bound = Clownfish::Binding::Core::Class->new(
                         client => $block, );
                     $content .= $bound->to_c . "\n";
-                    my $c_file_sym = "C_" . uc( $block->full_struct_sym );
+                    my $c_file_sym = $block->privacy_symbol;
                     $c_file_syms .= "#define $c_file_sym\n";
                     my $include_h = $block->include_h;
                     $includes .= qq|#include "$include_h"\n|;

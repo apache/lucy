@@ -299,6 +299,7 @@ ALIAS:
     tree_to_ladder        = 42
     novel_methods         = 44
     novel_member_vars     = 46
+    privacy_symbol        = 48
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -413,6 +414,11 @@ PPCODE:
                 FREEMEM(novel);
                 break;
             }
+        case 48: {
+                const char *value = CFCClass_privacy_symbol(self);
+                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
+            }
+            break;
     END_SET_OR_GET_SWITCH
 }
 
