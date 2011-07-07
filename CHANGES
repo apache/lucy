@@ -1,5 +1,37 @@
 Revision history for Lucy
 
+0.2.0  XXXX-XX-XX
+
+  Bugfixes:
+
+    * [LUCY-152] - Bad prototype for MAKE_MESS when no variadic macros
+                   available
+    * [LUCY-153] - XSLoader version string mismatch
+    * [LUCY-154] - Double-quote all #error directives
+    * [LUCY-155] - TestFSFileHandle's Close() test on Windows fails to clean
+                   up
+    * [LUCY-157] - Add -pthread linker flag on OpenBSD
+    * [LUCY-158] - Disable LockFreeRegistry test by default
+    * [LUCY-160] - Always disable symlink tests on Windows
+    * [LUCY-161] - Always use CreateHardLink() on Windows
+    * [LUCY-162] - Use shell to redirect Charmonizer stderr on Windows
+    * [LUCY-164] - Skip forking tests under Cygwin
+    * [LUCY-165] - Line-ending-agnostic parsing of sample docs
+    * [LUCY-166] - Prefer POSIX over windows.h for process ID
+    * [LUCY-167] - INCREF/DECREF symbol collisions under Windows in
+                   FSDirHandle.c
+    * [LUCY-168] - Directory handling under Cygwin
+    * [LUCY-172] - Clownfish should slurp files in text mode
+
+  Improvements:
+
+    * [LUCY-156] - Address GCC warnings for Charmonizer code
+    * [LUCY-163] - Target Windows XP
+    * [LUCY-169] - Improve cleanup after MSVC
+    * [LUCY-170] - Charmonizer test compiles should use obj rather than exe
+                   when possible
+    * [LUCY-171] - Turn off stupid MSVC warnings
+
 0.1.0  2011-05-20
 
   Initial release, adapted from a software grant for the KinoSearch codebase.
