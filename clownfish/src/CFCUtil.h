@@ -48,7 +48,7 @@ CFCUtil_strndup(const char *string, size_t len);
  * with each argument.
  */
 char*
-CFCUtil_cat_strings(char *string, ...);
+CFCUtil_cat(char *string, ...);
 
 /** Trim whitespace from the beginning and the end of a string.
  */

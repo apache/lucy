@@ -317,9 +317,8 @@ CFCBindClass_to_c(CFCBindClass *self) {
      * global struct, we have to give it a real symbol and then store a pointer
      * to that symbol inside the VTable struct. */
     char *cb_var = CFCUtil_strdup("");
-    cb_var = CFCUtil_cat_strings(cb_var, "cfish_Callback *",
-                                 self->full_callbacks_var, "[] = {\n    ",
-                                 NULL);
+    cb_var = CFCUtil_cat(cb_var, "cfish_Callback *", self->full_callbacks_var,
+                         "[] = {\n    ", NULL);
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
@@ -334,18 +333,17 @@ CFCBindClass_to_c(CFCBindClass *self) {
 
         // Create offset in bytes for the method from the top of the VTable
         // object.
-        char *offset_str
-            = CFCUtil_cat_strings(CFCUtil_strdup(""), "(offsetof(", vt_type,
-                                  ", methods) + ", meth_num_str,
-                                  " * sizeof(cfish_method_t))", NULL);
-        offsets = CFCUtil_cat_strings(offsets, "size_t ", full_offset_sym,
-                                      " = ", offset_str, ";\n", NULL);
+        char *offset_str = CFCUtil_cat(CFCUtil_strdup(""), "(offsetof(", vt_type,
+                                       ", methods) + ", meth_num_str,
+                                       " * sizeof(cfish_method_t))", NULL);
+        offsets = CFCUtil_cat(offsets, "size_t ", full_offset_sym, " = ", 
+                              offset_str, ";\n", NULL);
         FREEMEM(full_offset_sym);
 
         // Create a default implementation for abstract methods.
         if (method_is_novel && CFCMethod_abstract(method)) {
             char *method_def = CFCBindMeth_abstract_method_def(method);
-            cb_funcs = CFCUtil_cat_strings(cb_funcs, method_def, "\n", NULL);
+            cb_funcs = CFCUtil_cat(cb_funcs, method_def, "\n", NULL);
             FREEMEM(method_def);
         }
 
@@ -357,20 +355,19 @@ CFCBindClass_to_c(CFCBindClass *self) {
                 char *cb_def = CFCBindMeth_callback_def(method);
                 char *cb_obj_def
                     = CFCBindMeth_callback_obj_def(method, offset_str);
-                cb_funcs = CFCUtil_cat_strings(cb_funcs, cb_def, "\n", NULL);
-                cb_objects = CFCUtil_cat_strings(cb_objects, cb_obj_def, NULL);
+                cb_funcs = CFCUtil_cat(cb_funcs, cb_def, "\n", NULL);
+                cb_objects = CFCUtil_cat(cb_objects, cb_obj_def, NULL);
                 FREEMEM(cb_def);
                 FREEMEM(cb_obj_def);
             }
-            cb_var = CFCUtil_cat_strings(cb_var, "&", full_cb_sym, ",\n    ",
-                                         NULL);
+            cb_var = CFCUtil_cat(cb_var, "&", full_cb_sym, ",\n    ", NULL);
         }
 
         FREEMEM(offset_str);
     }
 
     // Close callbacks variable definition.
-    cb_var =  CFCUtil_cat_strings(cb_var, "NULL\n};\n", NULL);
+    cb_var =  CFCUtil_cat(cb_var, "NULL\n};\n", NULL);
 
     const char pattern[] =
         "#include \"%s\"\n"
@@ -564,7 +561,7 @@ S_callback_declarations(CFCBindClass *self) {
         CFCMethod *method = novel_methods[i];
         if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
             char *callback = CFCBindMeth_callback_dec(method);
-            declarations = CFCUtil_cat_strings(declarations, callback, NULL);
+            declarations = CFCUtil_cat(declarations, callback, NULL);
             FREEMEM(callback);
         }
     }
@@ -580,7 +577,7 @@ S_method_typedefs(CFCBindClass *self) {
     for (int i = 0; novel_methods[i] != NULL; i++) {
         CFCMethod *method = novel_methods[i];
         char *typedef_str = CFCBindMeth_typdef_dec(method);
-        typedefs = CFCUtil_cat_strings(typedefs, typedef_str, "\n", NULL);
+        typedefs = CFCUtil_cat(typedefs, typedef_str, "\n", NULL);
         FREEMEM(typedef_str);
     }
     FREEMEM(novel_methods);
@@ -593,9 +590,8 @@ S_parent_include(CFCBindClass *self) {
     char *parent_include = CFCUtil_strdup("");
     CFCClass *parent = CFCClass_get_parent(self->client);
     if (parent) {
-        parent_include
-            = CFCUtil_cat_strings(parent_include, "#include \"",
-                                  CFCClass_include_h(parent), "\"", NULL);
+        parent_include = CFCUtil_cat(parent_include, "#include \"",
+                                     CFCClass_include_h(parent), "\"", NULL);
     }
     return parent_include;
 }
@@ -609,13 +605,13 @@ S_sub_declarations(CFCBindClass *self) {
     for (int i = 0; functions[i] != NULL; i++) {
         CFCFunction *func = functions[i];
         char *dec = CFCBindFunc_func_declaration(func);
-        declarations = CFCUtil_cat_strings(declarations, dec, "\n\n", NULL);
+        declarations = CFCUtil_cat(declarations, dec, "\n\n", NULL);
         FREEMEM(dec);
     }
     for (int i = 0; novel_methods[i] != NULL; i++) {
         CFCMethod *method = novel_methods[i];
         char *dec = CFCBindFunc_func_declaration((CFCFunction*)method);
-        declarations = CFCUtil_cat_strings(declarations, dec, "\n\n", NULL);
+        declarations = CFCUtil_cat(declarations, dec, "\n\n", NULL);
         FREEMEM(dec);
     }
     FREEMEM(novel_methods);
@@ -629,8 +625,8 @@ S_inert_var_declarations(CFCBindClass *self) {
     char *declarations = CFCUtil_strdup("");
     for (int i = 0; inert_vars[i] != NULL; i++) {
         const char *global_c = CFCVariable_global_c(inert_vars[i]);
-        declarations = CFCUtil_cat_strings(declarations, "extern ", global_c,
-                                           ";\n", NULL);
+        declarations = CFCUtil_cat(declarations, "extern ", global_c, ";\n",
+                                   NULL);
     }
     return declarations;
 }
@@ -643,7 +639,7 @@ S_method_defs(CFCBindClass *self) {
     for (int i = 0; methods[i] != NULL; i++) {
         CFCMethod *method = methods[i];
         char *def = CFCBindMeth_method_def(method, self->client);
-        method_defs = CFCUtil_cat_strings(method_defs, def, "\n", NULL);
+        method_defs = CFCUtil_cat(method_defs, def, "\n", NULL);
         FREEMEM(def);
     }
     return method_defs;
@@ -696,16 +692,15 @@ static char*
 S_short_names(CFCBindClass *self) {
     CFCClass *client = self->client;
     char *short_names = CFCUtil_strdup("");
-    short_names = CFCUtil_cat_strings(short_names, "#ifdef ",
-                                      self->short_names_macro, "\n", NULL);
+    short_names = CFCUtil_cat(short_names, "#ifdef ", self->short_names_macro,
+                              "\n", NULL);
 
     if (!CFCClass_inert(client)) {
         const char *short_struct = CFCClass_get_struct_sym(client);
         const char *full_struct  = CFCClass_full_struct_sym(client);
         const char *short_vt_var = CFCClass_short_vtable_var(client);
         const char *full_vt_var  = CFCClass_full_vtable_var(client);
-        short_names 
-            = CFCUtil_cat_strings(short_names, "  #define ",
+        short_names = CFCUtil_cat(short_names, "  #define ",
                                   short_struct, " ", full_struct, "\n",
                                   "  #define ", short_vt_var, " ",
                                   full_vt_var, "\n", NULL);
@@ -714,8 +709,7 @@ S_short_names(CFCBindClass *self) {
     CFCFunction **functions = CFCClass_functions(client);
     for (int i = 0; functions[i] != NULL; i++) {
         CFCFunction *func = functions[i];
-        short_names 
-            = CFCUtil_cat_strings(short_names, "  #define ",
+        short_names = CFCUtil_cat(short_names, "  #define ",
                                   CFCFunction_short_func_sym(func), " ",
                                   CFCFunction_full_func_sym(func), "\n",
                                   NULL);
@@ -724,8 +718,7 @@ S_short_names(CFCBindClass *self) {
     CFCVariable **inert_vars = CFCClass_inert_vars(client);
     for (int i = 0; inert_vars[i] != NULL; i++) {
         CFCVariable *var = inert_vars[i];
-        short_names 
-            = CFCUtil_cat_strings(short_names, "  #define ",
+        short_names = CFCUtil_cat(short_names, "  #define ",
                                   CFCVariable_short_sym(var), " ",
                                   CFCVariable_full_sym(var), "\n", NULL);
     }
@@ -736,14 +729,12 @@ S_short_names(CFCBindClass *self) {
             CFCMethod *meth = novel_methods[i];
             const char *short_typedef = CFCMethod_short_typedef(meth);
             const char *full_typedef  = CFCMethod_full_typedef(meth);
-            short_names 
-                = CFCUtil_cat_strings(short_names, "  #define ",
+            short_names = CFCUtil_cat(short_names, "  #define ",
                                       short_typedef, " ", full_typedef, "\n",
                                       NULL);
             const char *short_func = CFCMethod_short_implementing_func_sym(meth);
             const char *full_func  = CFCMethod_implementing_func_sym(meth);
-            short_names 
-                = CFCUtil_cat_strings(short_names, "  #define ", short_func,
+            short_names = CFCUtil_cat(short_names, "  #define ", short_func,
                                       " ", full_func, "\n", NULL);
         }
         FREEMEM(novel_methods);
@@ -758,13 +749,12 @@ S_short_names(CFCBindClass *self) {
             size = CFCMethod_full_method_sym(meth, cnick, NULL, 0);
             char *full_sym = (char*)MALLOCATE(size);
             CFCMethod_full_method_sym(meth, cnick, full_sym, size);
-            short_names 
-                = CFCUtil_cat_strings(short_names, "  #define ", short_sym,
+            short_names = CFCUtil_cat(short_names, "  #define ", short_sym,
                                       " ", full_sym, "\n", NULL);
         }
     }
-    short_names = CFCUtil_cat_strings(short_names, "#endif /* ",
-                                      self->short_names_macro, " */\n", NULL);
+    short_names = CFCUtil_cat(short_names, "#endif /* ",
+                              self->short_names_macro, " */\n", NULL);
 
     return short_names;
 }

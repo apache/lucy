@@ -53,7 +53,7 @@ CFCUtil_strndup(const char *string, size_t len) {
 }
 
 char*
-CFCUtil_cat_strings(char *string, ...) {
+CFCUtil_cat(char *string, ...) {
     va_list args;
     char *appended;
     CFCUTIL_NULL_CHECK(string);
