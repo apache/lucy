@@ -147,7 +147,6 @@ CFCBindClass_to_c_header(CFCBindClass *self) {
 
 static char*
 S_to_c_header_inert(CFCBindClass *self) {
-    char *parent_include  = S_parent_include(self);
     char *inert_func_decs = S_sub_declarations(self);
     char *inert_var_defs  = S_inert_var_declarations(self);
     char *short_names     = S_short_names(self);
@@ -155,7 +154,6 @@ S_to_c_header_inert(CFCBindClass *self) {
     char pattern[] = 
         "#include \"charmony.h\"\n"
         "#include \"parcel.h\"\n"
-        "%s\n"
         "\n"
         "/* Declare this class's inert variables.\n"
         " */\n"
@@ -174,16 +172,13 @@ S_to_c_header_inert(CFCBindClass *self) {
         "\n";
 
     size_t size = sizeof(pattern)
-                  + strlen(parent_include)
                   + strlen(inert_var_defs)
                   + strlen(inert_func_decs)
                   + strlen(short_names)
                   + 50;
     char *content = (char*)MALLOCATE(size);
-    sprintf(content, pattern, parent_include, inert_var_defs, inert_func_decs,
-            short_names);
+    sprintf(content, pattern, inert_var_defs, inert_func_decs, short_names);
 
-    FREEMEM(parent_include);
     FREEMEM(inert_var_defs);
     FREEMEM(inert_func_decs);
     FREEMEM(short_names);
