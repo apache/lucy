@@ -35,6 +35,9 @@ void
 CFCBindClass_destroy(CFCBindClass *self);
 
 char*
+CFCBindClass_to_c_header(CFCBindClass *self);
+
+char*
 CFCBindClass_to_c(CFCBindClass *self);
 
 char*

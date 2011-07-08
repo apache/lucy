@@ -38,6 +38,14 @@ struct CFCBindClass {
     char *short_names_macro;
 };
 
+// Generate C header for an inert class.
+static char*
+S_to_c_header_inert(CFCBindClass *self);
+
+// Generate C header for a dynamic class.
+static char*
+S_to_c_header_dynamic(CFCBindClass *self);
+
 // Return C code defining the class's VTable.
 static char*
 S_vtable_definition(CFCBindClass *self);
@@ -88,6 +96,162 @@ S_method_is_novel(CFCMethod *method, CFCMethod **novel_methods) {
         if (method == novel_methods[i]) { return 1; }
     }
     return 0;
+}
+
+char*
+CFCBindClass_to_c_header(CFCBindClass *self) {
+    if (CFCClass_inert(self->client)) {
+        // Inert classes only output inert functions and vars.
+        return S_to_c_header_inert(self);
+    }
+    else {
+        return S_to_c_header_dynamic(self);
+    }
+}
+
+static char*
+S_to_c_header_inert(CFCBindClass *self) {
+    char *parent_include  = CFCBindClass_parent_include(self);
+    char *inert_func_decs = CFCBindClass_sub_declarations(self);
+    char *inert_var_defs  = CFCBindClass_inert_var_declarations(self);
+    char *short_names     = CFCBindClass_short_names(self);
+
+    char pattern[] = 
+        "#include \"charmony.h\"\n"
+        "#include \"parcel.h\"\n"
+        "%s\n"
+        "\n"
+        "/* Declare this class's inert variables.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Declare this class's inert functions.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Define \"short names\" for this class's symbols.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(parent_include)
+                  + strlen(inert_var_defs)
+                  + strlen(inert_func_decs)
+                  + strlen(short_names)
+                  + 50;
+    char *content = (char*)MALLOCATE(size);
+    sprintf(content, pattern, parent_include, inert_var_defs, inert_func_decs,
+            short_names);
+
+    FREEMEM(parent_include);
+    FREEMEM(inert_var_defs);
+    FREEMEM(inert_func_decs);
+    FREEMEM(short_names);
+    return content;
+}
+
+static char*
+S_to_c_header_dynamic(CFCBindClass *self) {
+    const char *privacy_symbol  = CFCClass_privacy_symbol(self->client);
+    char *struct_def            = CFCBindClass_struct_definition(self);
+    char *parent_include        = CFCBindClass_parent_include(self);
+    char *sub_declarations      = CFCBindClass_sub_declarations(self);
+    char *inert_var_defs        = CFCBindClass_inert_var_declarations(self);
+    char *method_typedefs       = CFCBindClass_method_typedefs(self);
+    char *method_defs           = CFCBindClass_method_defs(self);
+    char *vt_singleton_def      = CFCBindClass_vt_singleton_def(self);
+    char *callback_declarations = CFCBindClass_callback_declarations(self);
+    char *short_names           = CFCBindClass_short_names(self);
+
+    char pattern[] = 
+        "#include \"charmony.h\"\n"
+        "#include \"parcel.h\"\n"
+        "\n"
+        "/* Include the header for this class's parent. \n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Define the struct layout for instances of this class.\n"
+        " */\n"
+        "\n"
+        "#ifdef %s\n"
+        "%s\n"
+        "#endif /* %s */\n"
+        "\n"
+        "/* Declare this class's inert variables.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Declare both this class's inert functions and the C functions which\n"
+        " * implement this class's dynamic methods.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Declare the cfish_Callback objects which provide the introspection\n"
+        " * information needed to perform method overriding at runtime.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Define typedefs for each dynamic method, allowing us to cast generic\n"
+        " * pointers to the appropriate function pointer type more cleanly.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Define the inline functions which implement this class's virtual methods.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Define the VTable singleton for this class.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "/* Define \"short names\" for this class's symbols.\n"
+        " */\n"
+        "\n"
+        "%s\n"
+        "\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(parent_include)
+                  + strlen(privacy_symbol)
+                  + strlen(struct_def)
+                  + strlen(privacy_symbol)
+                  + strlen(inert_var_defs)
+                  + strlen(sub_declarations)
+                  + strlen(callback_declarations)
+                  + strlen(method_typedefs)
+                  + strlen(method_defs)
+                  + strlen(vt_singleton_def)
+                  + strlen(short_names)
+                  + 100;
+
+    char *content = (char*)MALLOCATE(size);
+    sprintf(content, pattern, parent_include, privacy_symbol, struct_def,
+            privacy_symbol, inert_var_defs, sub_declarations,
+            callback_declarations, method_typedefs, method_defs,
+            vt_singleton_def, short_names);
+
+    FREEMEM(struct_def);
+    FREEMEM(parent_include);
+    FREEMEM(sub_declarations);
+    FREEMEM(inert_var_defs);
+    FREEMEM(method_typedefs);
+    FREEMEM(method_defs);
+    FREEMEM(vt_singleton_def);
+    FREEMEM(callback_declarations);
+    FREEMEM(short_names);
+    return content;
 }
 
 char*

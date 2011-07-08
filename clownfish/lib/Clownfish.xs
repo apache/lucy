@@ -1784,6 +1784,13 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindClass_to_c(self));
 OUTPUT: RETVAL
 
+SV*
+to_c_header(self)
+    CFCBindClass *self;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindClass_to_c_header(self));
+OUTPUT: RETVAL
+
 void
 _set_or_get(self, ...)
     CFCBindClass *self;
