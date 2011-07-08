@@ -65,9 +65,6 @@ sub to_c_header {
     # Define short names.
     my $short_names = _short_names($self);
 
-    # Make the spacing in the file a little more elegant.
-    s/\s+$// for ( $method_typedefs, $method_defs, $short_names );
-
     # Inert classes only output inert functions and member vars.
     if ( $client->inert ) {
         return <<END_INERT
