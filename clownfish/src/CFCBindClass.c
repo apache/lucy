@@ -46,15 +46,51 @@ S_to_c_header_inert(CFCBindClass *self);
 static char*
 S_to_c_header_dynamic(CFCBindClass *self);
 
-// Return C code defining the class's VTable.
+// Create the definition for the instantiable object struct.
 static char*
-S_vtable_definition(CFCBindClass *self);
+S_struct_definition(CFCBindClass *self);
 
 /* C code defining the ZombieCharBuf which contains the class name for this
  * class.
  */
 static char*
 S_name_var_definition(CFCBindClass *self);
+
+// Return C code defining the class's VTable.
+static char*
+S_vtable_definition(CFCBindClass *self);
+
+// Declare cfish_Callback objects.
+static char*
+S_callback_declarations(CFCBindClass *self);
+
+// Declare typedefs for novel methods, to ease casting.
+static char*
+S_method_typedefs(CFCBindClass *self);
+
+// If class inherits from something, include the parent class's header.
+static char*
+S_parent_include(CFCBindClass *self);
+
+// Add a C function definition for each method and each function.
+static char*
+S_sub_declarations(CFCBindClass *self);
+
+// Declare class (a.k.a. "inert") variables.
+static char*
+S_inert_var_declarations(CFCBindClass *self);
+
+// Define method invocation inline functions.
+static char*
+S_method_defs(CFCBindClass *self);
+
+// Define the virtual table singleton object.
+static char*
+S_vt_singleton_def(CFCBindClass *self);
+
+// Define short names for all of the symbols associated with this class.
+static char*
+S_short_names(CFCBindClass *self);
 
 CFCBindClass*
 CFCBindClass_new(CFCClass *client) {
@@ -111,10 +147,10 @@ CFCBindClass_to_c_header(CFCBindClass *self) {
 
 static char*
 S_to_c_header_inert(CFCBindClass *self) {
-    char *parent_include  = CFCBindClass_parent_include(self);
-    char *inert_func_decs = CFCBindClass_sub_declarations(self);
-    char *inert_var_defs  = CFCBindClass_inert_var_declarations(self);
-    char *short_names     = CFCBindClass_short_names(self);
+    char *parent_include  = S_parent_include(self);
+    char *inert_func_decs = S_sub_declarations(self);
+    char *inert_var_defs  = S_inert_var_declarations(self);
+    char *short_names     = S_short_names(self);
 
     char pattern[] = 
         "#include \"charmony.h\"\n"
@@ -157,15 +193,15 @@ S_to_c_header_inert(CFCBindClass *self) {
 static char*
 S_to_c_header_dynamic(CFCBindClass *self) {
     const char *privacy_symbol  = CFCClass_privacy_symbol(self->client);
-    char *struct_def            = CFCBindClass_struct_definition(self);
-    char *parent_include        = CFCBindClass_parent_include(self);
-    char *sub_declarations      = CFCBindClass_sub_declarations(self);
-    char *inert_var_defs        = CFCBindClass_inert_var_declarations(self);
-    char *method_typedefs       = CFCBindClass_method_typedefs(self);
-    char *method_defs           = CFCBindClass_method_defs(self);
-    char *vt_singleton_def      = CFCBindClass_vt_singleton_def(self);
-    char *callback_declarations = CFCBindClass_callback_declarations(self);
-    char *short_names           = CFCBindClass_short_names(self);
+    char *struct_def            = S_struct_definition(self);
+    char *parent_include        = S_parent_include(self);
+    char *sub_declarations      = S_sub_declarations(self);
+    char *inert_var_defs        = S_inert_var_declarations(self);
+    char *method_typedefs       = S_method_typedefs(self);
+    char *method_defs           = S_method_defs(self);
+    char *vt_singleton_def      = S_vt_singleton_def(self);
+    char *callback_declarations = S_callback_declarations(self);
+    char *short_names           = S_short_names(self);
 
     char pattern[] = 
         "#include \"charmony.h\"\n"
@@ -401,8 +437,8 @@ CFCBindClass_to_c(CFCBindClass *self) {
 }
 
 // Create the definition for the instantiable object struct.
-char*
-CFCBindClass_struct_definition(CFCBindClass *self) {
+static char*
+S_struct_definition(CFCBindClass *self) {
     const char *struct_sym = CFCClass_full_struct_sym(self->client);
     CFCVariable **member_vars = CFCClass_member_vars(self->client);
     char *member_decs = CFCUtil_strdup("");
@@ -519,19 +555,9 @@ S_vtable_definition(CFCBindClass *self) {
     return vtable_def;
 }
 
-CFCClass*
-CFCBindClass_get_client(CFCBindClass *self) {
-    return self->client;
-}
-
-const char*
-CFCBindClass_short_names_macro(CFCBindClass *self) {
-    return self->short_names_macro;
-}
-
 // Declare cfish_Callback objects.
-char*
-CFCBindClass_callback_declarations(CFCBindClass *self) {
+static char*
+S_callback_declarations(CFCBindClass *self) {
     CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
     char *declarations = CFCUtil_strdup("");
     for (int i = 0; novel_methods[i] != NULL; i++) {
@@ -547,8 +573,8 @@ CFCBindClass_callback_declarations(CFCBindClass *self) {
 }
 
 // Declare typedefs for novel methods, to ease casting.
-char*
-CFCBindClass_method_typedefs(CFCBindClass *self) {
+static char*
+S_method_typedefs(CFCBindClass *self) {
     CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
     char *typedefs = CFCUtil_strdup("");
     for (int i = 0; novel_methods[i] != NULL; i++) {
@@ -562,8 +588,8 @@ CFCBindClass_method_typedefs(CFCBindClass *self) {
 }
 
 // If class inherits from something, include the parent class's header.
-char*
-CFCBindClass_parent_include(CFCBindClass *self) {
+static char*
+S_parent_include(CFCBindClass *self) {
     char *parent_include = CFCUtil_strdup("");
     CFCClass *parent = CFCClass_get_parent(self->client);
     if (parent) {
@@ -575,8 +601,8 @@ CFCBindClass_parent_include(CFCBindClass *self) {
 }
 
 // Add a C function definition for each method and each function.
-char*
-CFCBindClass_sub_declarations(CFCBindClass *self) {
+static char*
+S_sub_declarations(CFCBindClass *self) {
     CFCFunction **functions = CFCClass_functions(self->client);
     CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
     char *declarations = CFCUtil_strdup("");
@@ -597,8 +623,8 @@ CFCBindClass_sub_declarations(CFCBindClass *self) {
 }
 
 // Declare class (a.k.a. "inert") variables.
-char*
-CFCBindClass_inert_var_declarations(CFCBindClass *self) {
+static char*
+S_inert_var_declarations(CFCBindClass *self) {
     CFCVariable **inert_vars = CFCClass_inert_vars(self->client);
     char *declarations = CFCUtil_strdup("");
     for (int i = 0; inert_vars[i] != NULL; i++) {
@@ -610,8 +636,8 @@ CFCBindClass_inert_var_declarations(CFCBindClass *self) {
 }
 
 // Define method invocation inline functions.
-char*
-CFCBindClass_method_defs(CFCBindClass *self) {
+static char*
+S_method_defs(CFCBindClass *self) {
     CFCMethod **methods = CFCClass_methods(self->client);
     char *method_defs = CFCUtil_strdup("");
     for (int i = 0; methods[i] != NULL; i++) {
@@ -625,8 +651,8 @@ CFCBindClass_method_defs(CFCBindClass *self) {
 
 
 // Define the virtual table singleton object.
-char*
-CFCBindClass_vt_singleton_def(CFCBindClass *self) {
+static char*
+S_vt_singleton_def(CFCBindClass *self) {
     CFCClass   *client      = self->client;
     const char *vt_type     = CFCClass_full_vtable_type(client);
     const char *vt_var      = CFCClass_full_vtable_var(client);
@@ -666,8 +692,8 @@ CFCBindClass_vt_singleton_def(CFCBindClass *self) {
 }
 
 // Define short names for all of the symbols associated with this class.
-char*
-CFCBindClass_short_names(CFCBindClass *self) {
+static char*
+S_short_names(CFCBindClass *self) {
     CFCClass *client = self->client;
     char *short_names = CFCUtil_strdup("");
     short_names = CFCUtil_cat_strings(short_names, "#ifdef ",

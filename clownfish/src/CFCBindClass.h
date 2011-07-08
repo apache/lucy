@@ -40,39 +40,6 @@ CFCBindClass_to_c_header(CFCBindClass *self);
 char*
 CFCBindClass_to_c(CFCBindClass *self);
 
-char*
-CFCBindClass_struct_definition(CFCBindClass *self);
-
-struct CFCClass*
-CFCBindClass_get_client(struct CFCBindClass *self);
-
-const char*
-CFCBindClass_short_names_macro(CFCBindClass *self);
-
-char*
-CFCBindClass_callback_declarations(CFCBindClass *self);
-
-char*
-CFCBindClass_method_typedefs(CFCBindClass *self);
-
-char*
-CFCBindClass_parent_include(CFCBindClass *self);
-
-char*
-CFCBindClass_sub_declarations(CFCBindClass *self);
-
-char*
-CFCBindClass_inert_var_declarations(CFCBindClass *self);
-
-char*
-CFCBindClass_method_defs(CFCBindClass *self);
-
-char*
-CFCBindClass_vt_singleton_def(CFCBindClass *self);
-
-char*
-CFCBindClass_short_names(CFCBindClass *self);
-
 #ifdef __cplusplus
 }
 #endif
