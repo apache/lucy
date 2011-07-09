@@ -34,27 +34,44 @@ our %new_PARAMS = (
     footer    => undef,
 );
 
-sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless { %new_PARAMS, @_ }, ref($either) || $either;
+our %hierarchy;
+our %dest;
+our %header;
+our %footer;
 
-    # Validate.
+sub new {
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
     for ( keys %new_PARAMS ) {
-        confess("Missing required param '$_'") unless defined $self->{$_};
+        confess("Missing required param '$_'") unless defined $args{$_};
     }
     confess("Not a Hierarchy")
-        unless a_isa_b( $self->{hierarchy}, "Clownfish::Hierarchy" );
+        unless a_isa_b( $args{hierarchy}, "Clownfish::Hierarchy" );
+
+    my $empty = "";
+    my $self = bless \$empty, ref($either) || $either;
+    $hierarchy{$self} = $args{hierarchy};
+    $dest{$self}      = $args{dest};
+    $header{$self}    = $args{header};
+    $footer{$self}    = $args{footer};
 
     return $self;
 }
 
+sub DESTROY {
+    my $self = shift;
+    delete $hierarchy{$self};
+    delete $dest{$self};
+    delete $header{$self};
+    delete $footer{$self};
+}
+
 sub write_all_modified {
     my ( $self, $modified ) = @_;
-    my $hierarchy = $self->{hierarchy};
-    my $header    = $self->{header};
-    my $footer    = $self->{footer};
-    my $dest      = $self->{dest};
+    my $hierarchy = $hierarchy{$self};
+    my $header    = $header{$self};
+    my $footer    = $footer{$self};
+    my $dest      = $dest{$self};
 
     $modified = $hierarchy->propagate_modified($modified);
 
@@ -86,7 +103,7 @@ sub write_all_modified {
 # classes, plus typedefs for all class structs.
 sub _write_parcel_h {
     my $self     = shift;
-    my $ordered  = $self->{hierarchy}->ordered_classes;
+    my $ordered  = $hierarchy{$self}->ordered_classes;
     my $typedefs = "";
 
     # Declare object structs for all instantiable classes.
@@ -99,12 +116,12 @@ sub _write_parcel_h {
     # Create Clownfish aliases if necessary.
     my $aliases = Clownfish::Binding::Core::Aliases->c_aliases;
 
-    my $filepath = catfile( $self->{dest}, "parcel.h" );
+    my $filepath = catfile( $dest{$self}, "parcel.h" );
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$filepath': $!");
     print $fh <<END_STUFF;
-$self->{header}
+$header{$self}
 #ifndef BOIL_H
 #define BOIL_H 1
 
@@ -183,14 +200,14 @@ typedef struct cfish_Callback {
 
 #endif /* BOIL_H */
 
-$self->{footer}
+$footer{$self}
 
 END_STUFF
 }
 
 sub _write_parcel_c {
     my $self      = shift;
-    my $hierarchy = $self->{hierarchy};
+    my $hierarchy = $hierarchy{$self};
 
     # Aggregate C code from all files.
     my $content     = "";
@@ -213,12 +230,12 @@ sub _write_parcel_c {
     }
 
     # Unlink then open file.
-    my $filepath = catfile( $self->{dest}, "parcel.c" );
+    my $filepath = catfile( $dest{$self}, "parcel.c" );
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$filepath': $!");
     print $fh <<END_STUFF;
-$self->{header}
+$header{$self}
 
 $c_file_syms
 #include "parcel.h"
@@ -226,7 +243,7 @@ $includes
 
 $content
 
-$self->{footer}
+$footer{$self}
 
 END_STUFF
 }
