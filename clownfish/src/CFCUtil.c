@@ -282,6 +282,61 @@ CFCUtil_warn(const char* format, ...) {
     fprintf(stderr, "\n");
 }
 
+// Note: this has to be defined before including the Perl headers because they
+// redefine stat() in an incompatible way on certain systems (Windows).
+int
+CFCUtil_is_dir(const char *path) {
+    struct stat stat_buf;
+    int stat_check = stat(path, &stat_buf);
+    if (stat_check == -1) {
+        return false;
+    }
+    return (stat_buf.st_mode & S_IFDIR) ? true : false;
+}
+
+#ifdef WIN32
+  #define DIR_SEP_CHAR '\\'
+#else
+  #define DIR_SEP_CHAR '/'
+#endif
+
+int
+CFCUtil_make_path(const char *path) {
+    CFCUTIL_NULL_CHECK(path);
+    char *target = CFCUtil_strdup(path);
+    size_t orig_len = strlen(target);
+    size_t len = orig_len;
+    for (size_t i = 0; i <= len; i++) {
+#ifndef WIN32
+        if (target[i] == '\\') {
+            i++;
+            continue;
+        }
+#endif
+        if (target[i] == DIR_SEP_CHAR || i == len) {
+            target[i] = 0; // NULL-terminate.
+            struct stat stat_buf;
+            int stat_check = stat(target, &stat_buf);
+            if (stat_check != -1) {
+                if (!(stat_buf.st_mode & S_IFDIR)) {
+                    CFCUtil_die("%s isn't a directory", target);
+                }
+            }
+            else {
+                int success = CFCUtil_make_dir(target);
+                if (!success) {
+                    FREEMEM(target);
+                    return false;
+                }
+            }
+            target[i] = DIR_SEP_CHAR;
+        }
+    }
+
+    FREEMEM(target);
+    return true;
+}
+
 /******************************** WINDOWS **********************************/
 #ifdef WIN32
 
@@ -293,6 +348,11 @@ typedef struct WinDH {
     char path[MAX_PATH + 1];
     int first_time;
 } WinDH;
+
+void
+CFCUtil_make_dir (const char *dir) {
+    return !mkdir(dir);
+}
 
 void*
 CFCUtil_opendir(const char *dir) {
@@ -347,6 +407,12 @@ CFCUtil_closedir(void *dirhandle, const char *dir) {
 #else
 
 #include <dirent.h>
+
+int
+CFCUtil_make_dir (const char *dir) {
+    return !mkdir(dir, 0777);
+}
+
 
 void*
 CFCUtil_opendir(const char *dir) {

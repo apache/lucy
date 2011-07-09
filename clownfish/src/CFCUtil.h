@@ -126,6 +126,23 @@ CFCUtil_dirnext(void *dirhandle);
 void
 CFCUtil_closedir(void *dirhandle, const char *dir);
 
+/* Returns true if the supplied path is a directory, false otherwise.
+ */
+int
+CFCUtil_is_dir(const char *path);
+
+/* Create the specified directory.  Returns true on success, false on failure.
+ */
+int
+CFCUtil_make_dir(const char *dir);
+
+/* Create the specified path including all subdirectories.  Returns true on
+ * success, false on failure.  Intermediate directories may be left behind on
+ * failure.
+ */
+int
+CFCUtil_make_path(const char *path);
+
 /* Print an error message to stderr and exit.
  */
 void

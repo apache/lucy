@@ -1600,6 +1600,26 @@ PPCODE:
     char *content = SvPV(content_sv, len);
     CFCUtil_write_if_changed(path, content, len);
 
+int
+is_dir(path)
+    const char *path;
+CODE:
+    RETVAL = CFCUtil_is_dir(path);
+OUTPUT: RETVAL
+
+int
+make_dir(dir)
+    const char *dir;
+CODE:
+    RETVAL = CFCUtil_make_dir(dir);
+OUTPUT: RETVAL
+
+int
+make_path(path)
+    const char *path;
+CODE:
+    RETVAL = CFCUtil_make_path(path);
+OUTPUT: RETVAL
 
 MODULE = Clownfish   PACKAGE = Clownfish::Variable
 

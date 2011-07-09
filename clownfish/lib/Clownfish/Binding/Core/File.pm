@@ -17,10 +17,9 @@ use strict;
 use warnings;
 
 package Clownfish::Binding::Core::File;
-use Clownfish::Util qw( a_isa_b verify_args );
+use Clownfish::Util qw( a_isa_b verify_args make_path is_dir );
 use Clownfish::Binding::Core::Class;
 use File::Spec::Functions qw( catfile splitpath );
-use File::Path qw( mkpath );
 use Scalar::Util qw( blessed );
 use Fcntl;
 use Carp;
@@ -42,8 +41,8 @@ sub write_h {
 
     # Unlink then open file.
     my ( undef, $out_dir, undef ) = splitpath($h_path);
-    mkpath $out_dir unless -d $out_dir;
-    confess("Can't make dir '$out_dir'") unless -d $out_dir;
+    make_path($out_dir) unless is_dir($out_dir);
+    confess("Can't make dir '$out_dir'") unless is_dir($out_dir);
     unlink $h_path;
     sysopen( my $fh, $h_path, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$h_path' for writing");

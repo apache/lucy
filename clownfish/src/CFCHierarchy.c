@@ -66,20 +66,6 @@ S_fetch_file(CFCHierarchy *self, const char *source_class);
 static int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified);
 
-// Indicate whether a path is a directory.
-// Note: this has to be defined before including the Perl headers because they
-// redefine stat() in an incompatible way on certain systems (Windows).
-static int
-S_is_dir(const char *path) {
-    struct stat stat_buf;
-    int stat_check = stat(path, &stat_buf);
-    if (stat_check == -1) {
-        CFCUtil_die("Stat failed for '%s': %s", path,
-                    strerror(errno));
-    }
-    return (stat_buf.st_mode & S_IFDIR) ? true : false;
-}
-
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -196,7 +182,7 @@ S_find_cfh(char *dir, char **cfh_list, size_t num_cfh) {
             cfh_list[num_cfh++] = CFCUtil_strdup(full_path);
             cfh_list[num_cfh] = NULL;
         }
-        else if (S_is_dir(full_path)) {
+        else if (CFCUtil_is_dir(full_path)) {
             cfh_list = S_find_cfh(full_path, cfh_list, num_cfh);
             num_cfh = 0;
             if (cfh_list) {

@@ -31,6 +31,9 @@ our @EXPORT_OK = qw(
     a_isa_b
     write_if_changed
     trim_whitespace
+    is_dir
+    make_dir
+    make_path
 );
 
 sub verify_args {
