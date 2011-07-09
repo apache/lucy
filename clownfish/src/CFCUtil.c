@@ -282,6 +282,98 @@ CFCUtil_warn(const char* format, ...) {
     fprintf(stderr, "\n");
 }
 
+/******************************** WINDOWS **********************************/
+#ifdef WIN32
+
+#include <windows.h>
+
+typedef struct WinDH {
+    HANDLE handle;
+    WIN32_FIND_DATA *find_data;
+    char path[MAX_PATH + 1];
+    int first_time;
+} WinDH;
+
+void*
+CFCUtil_opendir(const char *dir) {
+    size_t dirlen = strlen(dir);
+    if (dirlen >= MAX_PATH - 2) {
+        CFCUtil_die("Exceeded MAX_PATH(%d): %s", (int)MAX_PATH, dir);
+    }
+    WinDH *dh = (WinDH*)CALLOCATE(1, sizeof(WinDH));
+    dh->find_data = (WIN32_FIND_DATA*)MALLOCATE(sizeof(WIN32_FIND_DATA));
+
+    // Tack on wildcard needed by FindFirstFile.
+    sprintf(dh->path, "%s\\*", dir);
+
+    dh->handle = FindFirstFile(dh->path, dh->find_data);
+    if (dh->handle == INVALID_HANDLE_VALUE) {
+        CFCUtil_die("Can't open dir '%s'", dh->path);
+    }
+    dh->first_time = true;
+
+    return dh;
+}
+
+const char*
+CFCUtil_dirnext(void *dirhandle) {
+    WinDH *dh = (WinDH*)dirhandle;
+    if (dh->first_time) {
+        dh->first_time = false;
+    }
+    else {
+        if ((FindNextFile(dh->handle, dh->find_data) == 0)) {
+            if (GetLastError() != ERROR_NO_MORE_FILES) {
+                CFCUtil_die("Error occurred while reading '%s'",
+                            dh->path);
+            }
+            return NULL;
+        }
+    }
+    return dh->find_data->cFileName;
+}
+
+void
+CFCUtil_closedir(void *dirhandle, const char *dir) {
+    WinDH *dh = (WinDH*)dirhandle;
+    if (!FindClose(dh->handle)) {
+        CFCUtil_die("Error occurred while closing dir '%s'", dir);
+    }
+    FREEMEM(dh->find_data);
+    FREEMEM(dh);
+}
+
+/******************************** UNIXEN ***********************************/
+#else
+
+#include <dirent.h>
+
+void*
+CFCUtil_opendir(const char *dir) {
+    DIR *dirhandle = opendir(dir);
+    if (!dirhandle) {
+        CFCUtil_die("Failed to opendir for '%s': %s", dir, strerror(errno));
+    }
+    return dirhandle;
+}
+
+const char*
+CFCUtil_dirnext(void *dirhandle) {
+    struct dirent *entry = readdir((DIR*)dirhandle);
+    return entry ? entry->d_name : NULL;
+}
+
+void
+CFCUtil_closedir(void *dirhandle, const char *dir) {
+    if (closedir(dirhandle) == -1) {
+        CFCUtil_die("Error closing dir '%s': %s", dir, strerror(errno));
+    }
+}
+
+#endif /* Windows vs. Unix. */
+
+/***************************************************************************/
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"

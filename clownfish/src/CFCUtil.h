@@ -111,6 +111,21 @@ CFCUtil_slurp_text(const char *file_path, size_t *len_ptr);
 long
 CFCUtil_flength(void *file);
 
+/* Platform-agnostic opendir wrapper.
+ */
+void*
+CFCUtil_opendir(const char *dir);
+
+/* Platform-agnostic readdir wrapper.
+ */
+const char*
+CFCUtil_dirnext(void *dirhandle);
+
+/* Platform-agnostic closedir wrapper.
+ */
+void
+CFCUtil_closedir(void *dirhandle, const char *dir);
+
 /* Print an error message to stderr and exit.
  */
 void
