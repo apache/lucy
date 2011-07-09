@@ -1803,3 +1803,14 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindClass_to_c_header(self));
 OUTPUT: RETVAL
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::File
+
+void
+_write_h(file, dest, header, footer)
+    CFCFile *file;
+    const char *dest;
+    const char *header;
+    const char *footer;
+PPCODE:
+    CFCBindFile_write_h(file, dest, header, footer);
+

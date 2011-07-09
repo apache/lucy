@@ -17,12 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Binding::Core::File;
-use Clownfish::Util qw( a_isa_b verify_args make_path is_dir );
-use Clownfish::Binding::Core::Class;
-use File::Spec::Functions qw( catfile splitpath );
-use Scalar::Util qw( blessed );
-use Fcntl;
-use Carp;
+use Clownfish::Util qw( verify_args );
 
 my %write_h_PARAMS = (
     file   => undef,
@@ -34,68 +29,8 @@ my %write_h_PARAMS = (
 sub write_h {
     my ( undef, %args ) = @_;
     verify_args( \%write_h_PARAMS, %args ) or confess $@;
-    my $file = $args{file};
-    confess("Not a Clownfish::File")
-        unless a_isa_b( $file, "Clownfish::File" );
-    my $h_path = $file->h_path( $args{dest} );
-
-    # Unlink then open file.
-    my ( undef, $out_dir, undef ) = splitpath($h_path);
-    make_path($out_dir) unless is_dir($out_dir);
-    confess("Can't make dir '$out_dir'") unless is_dir($out_dir);
-    unlink $h_path;
-    sysopen( my $fh, $h_path, O_CREAT | O_EXCL | O_WRONLY )
-        or confess("Can't open '$h_path' for writing");
-
-    # Create the include-guard strings.
-    my $include_guard_start = $file->guard_start;
-    my $include_guard_close = $file->guard_close;
-
-    # Aggregate block content.
-    my $content = "";
-    for my $block ( @{ $file->blocks } ) {
-        if ( a_isa_b( $block, 'Clownfish::Parcel' ) ) { }
-        elsif ( a_isa_b( $block, 'Clownfish::Class' ) ) {
-            my $class_binding
-                = Clownfish::Binding::Core::Class->new( client => $block, );
-            $content .= $class_binding->to_c_header . "\n";
-        }
-        elsif ( a_isa_b( $block, 'Clownfish::CBlock' ) ) {
-            $content .= $block->get_contents . "\n";
-        }
-        else {
-            confess("Invalid block: $block");
-        }
-    }
-
-    print $fh <<END_STUFF;
-$args{header}
-
-$include_guard_start
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-$content
-
-#ifdef __cplusplus
+    _write_h( @args{qw( file dest header footer )} );
 }
-#endif
-
-$include_guard_close
-
-$args{footer}
-
-END_STUFF
-}
-
-my %write_c_PARAMS = (
-    file   => undef,
-    dest   => undef,
-    header => undef,
-    footer => undef,
-);
 
 1;
 

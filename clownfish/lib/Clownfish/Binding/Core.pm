@@ -18,6 +18,9 @@ use warnings;
 
 package Clownfish::Binding::Core;
 use Clownfish::Util qw( a_isa_b verify_args );
+use Clownfish::Binding::Core::Function;
+use Clownfish::Binding::Core::Method;
+use Clownfish::Binding::Core::Class;
 use Clownfish::Binding::Core::File;
 use Clownfish::Binding::Core::Aliases;
 use File::Spec::Functions qw( catfile );

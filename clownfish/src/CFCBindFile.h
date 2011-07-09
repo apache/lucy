@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
+#ifndef H_CFCBINDFILE
+#define H_CFCBINDFILE
 
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct CFCFile;
+
+void
+CFCBindFile_write_h(struct CFCFile *file, const char *dest,
+                    const char *header, const char *footer);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CFCBINDFILE */
+
 
