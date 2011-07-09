@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 typedef struct CFCBase CFCBase;
 
 #ifdef CFC_NEED_BASE_STRUCT_DEF

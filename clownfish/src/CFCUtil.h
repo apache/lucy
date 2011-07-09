@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 /** Create an inner Perl object with a refcount of 1.  For use in actual
  * Perl-space, it is necessary to wrap this inner object in an RV.
  */
