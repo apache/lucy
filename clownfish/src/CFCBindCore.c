@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
+#define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
-
 #include "CFCBindCore.h"
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+#include "CFCUtil.h"
+
+struct CFCBindCore {
+    CFCBase base;
+};
+
+CFCBindCore*
+CFCBindCore_new(void) {
+    CFCBindCore *self
+        = (CFCBindCore*)CFCBase_allocate(sizeof(CFCBindCore),
+                                         "Clownfish::Binding::Core");
+    return CFCBindCore_init(self);
+}
+
+CFCBindCore*
+CFCBindCore_init(CFCBindCore *self) {
+    return self;
+}
+
+void
+CFCBindCore_destroy(CFCBindCore *self) {
+    CFCBase_destroy((CFCBase*)self);
+}
 

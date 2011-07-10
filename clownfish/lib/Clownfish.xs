@@ -1704,6 +1704,23 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core
+
+SV*
+_new()
+CODE:
+    CFCBindCore *self = CFCBindCore_new();
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_destroy(self);
+    CFCBindCore *self;
+PPCODE:
+    CFCBindCore_destroy(self);
+
+
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Function
 
 SV*

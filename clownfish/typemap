@@ -28,6 +28,7 @@ CFCParcel*	CLOWNFISH_TYPE
 CFCSymbol*	CLOWNFISH_TYPE
 CFCType*	CLOWNFISH_TYPE
 CFCVariable*	CLOWNFISH_TYPE
+CFCBindCore*	CLOWNFISH_BINDING_CORE
 CFCBindClass*	CLOWNFISH_BINDING_CORE_TYPE
 
 INPUT
@@ -42,6 +43,18 @@ CLOWNFISH_TYPE
 	}
     else {
 		croak(\"Not a ${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\");
+	}
+
+CLOWNFISH_BINDING_CORE
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"Clownfish::Binding::Core\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a Clownfish::Binding::Core\");
 	}
 
 CLOWNFISH_BINDING_CORE_TYPE
@@ -61,6 +74,9 @@ OUTPUT
 
 CLOWNFISH_TYPE
 	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::$1/;\$t}\", (void*)$var);
+
+CLOWNFISH_BINDING_CORE
+	sv_setref_pv($arg, \"Clownfish::Binding::Core\", (void*)$var);
 
 CLOWNFISH_BINDING_CORE_TYPE
 	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFCBind(\w+).*/Clownfish::Binding::Core::$1/;\$t}\", (void*)$var);

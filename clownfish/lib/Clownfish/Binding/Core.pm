@@ -48,8 +48,7 @@ sub new {
     confess("Not a Hierarchy")
         unless a_isa_b( $args{hierarchy}, "Clownfish::Hierarchy" );
 
-    my $empty = "";
-    my $self = bless \$empty, ref($either) || $either;
+    my $self = _new();
     $hierarchy{$self} = $args{hierarchy};
     $dest{$self}      = $args{dest};
     $header{$self}    = $args{header};
@@ -64,6 +63,7 @@ sub DESTROY {
     delete $dest{$self};
     delete $header{$self};
     delete $footer{$self};
+    _destroy($self);
 }
 
 sub write_all_modified {
