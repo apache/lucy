@@ -1758,6 +1758,30 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+int
+write_all_modified(self, ...)
+    CFCBindCore *self;
+CODE:
+{
+    int modified = 0;
+    if (items > 1 && SvOK(ST(1))) {
+        modified = !!SvIV(ST(1));
+    }
+    RETVAL = CFCBindCore_write_all_modified(self, modified);
+}
+OUTPUT: RETVAL
+
+void
+_write_parcel_h(self)
+    CFCBindCore *self;
+PPCODE:
+    CFCBindCore_write_parcel_h(self);
+
+void
+_write_parcel_c(self)
+    CFCBindCore *self;
+PPCODE:
+    CFCBindCore_write_parcel_c(self);
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Function
 

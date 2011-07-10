@@ -35,6 +35,15 @@ CFCBindCore_init(CFCBindCore *self, struct CFCHierarchy *hierarchy,
 void
 CFCBindCore_destroy(CFCBindCore *self);
 
+int
+CFCBindCore_write_all_modified(CFCBindCore *self, int modified);
+
+char*
+CFCBindCore_write_parcel_h(CFCBindCore *self);
+
+char*
+CFCBindCore_write_parcel_c(CFCBindCore *self);
+
 struct CFCHierarchy*
 CFCBindCore_get_hierarchy(CFCBindCore *self);
 
