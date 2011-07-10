@@ -33,58 +33,89 @@ our %register_PARAMS = (
     client            => undef,
 );
 
+our %parcel;
+our %class_name;
+our %bind_methods;
+our %bind_constructors;
+our %make_pod;
+our %xs_code;
+our %client;
+
 sub register {
-    my $either = shift;
-    verify_args( \%register_PARAMS, @_ ) or confess $@;
-    my $self = bless { %register_PARAMS, @_, }, ref($either) || $either;
+    my ( $either, %args ) = @_;
+    verify_args( \%register_PARAMS, %args ) or confess $@;
 
     # Validate.
     confess("Missing required param 'class_name'")
-        unless $self->{class_name};
-    confess("$self->{class_name} already registered")
-        if exists $registry{ $self->{class_name} };
+        unless $args{class_name};
+    confess("$args{class_name} already registered")
+        if exists $registry{ $args{class_name} };
 
     # Retrieve Clownfish::Class client, if it will be needed.
-    if (   $self->{bind_methods}
-        || $self->{bind_constructors}
-        || $self->{make_pod} )
+    my $client;
+    if (   $args{bind_methods}
+        || $args{bind_constructors}
+        || $args{make_pod} )
     {
-        $self->{client} = Clownfish::Class->fetch_singleton(
-            parcel     => $self->{parcel},
-            class_name => $self->{class_name},
+        $args{client} = Clownfish::Class->fetch_singleton(
+            parcel     => $args{parcel},
+            class_name => $args{class_name},
         );
-        confess("Can't fetch singleton for $self->{class_name}")
-            unless $self->{client};
+        confess("Can't fetch singleton for $args{class_name}")
+            unless $args{client};
     }
 
+    # Create object.
+    my $empty = "";
+    my $self = bless \$empty, ref($either) || $either;
+    $parcel{$self}            = $args{parcel};
+    $class_name{$self}        = $args{class_name};
+    $bind_methods{$self}      = $args{bind_methods};
+    $bind_constructors{$self} = $args{bind_constructors};
+    $make_pod{$self}          = $args{make_pod};
+    $xs_code{$self}           = $args{xs_code};
+    $client{$self}            = $args{client};
+
     # Add to registry.
-    $registry{ $self->{class_name} } = $self;
+    $registry{ $args{class_name} } = $self;
 
     return $self;
 }
 
-sub get_class_name        { shift->{class_name} }
-sub get_bind_methods      { shift->{bind_methods} }
-sub get_bind_constructors { shift->{bind_constructors} }
-sub get_make_pod          { shift->{make_pod} }
-sub get_client            { shift->{client} }
-sub get_xs_code           { shift->{xs_code} }
+sub DESTROY {
+    my $self = shift;
+    delete $parcel{$self};
+    delete $class_name{$self};
+    delete $bind_methods{$self};
+    delete $bind_constructors{$self};
+    delete $make_pod{$self};
+    delete $xs_code{$self};
+    delete $client{$self};
+}
+
+sub get_class_name        { $class_name{ +shift } }
+sub get_bind_methods      { $bind_methods{ +shift } }
+sub get_bind_constructors { $bind_constructors{ +shift } }
+sub get_make_pod          { $make_pod{ +shift } }
+sub get_client            { $client{ +shift } }
+sub get_xs_code           { $xs_code{ +shift } }
 
 sub constructor_bindings {
     my $self  = shift;
     my @bound = map {
         my $xsub = Clownfish::Binding::Perl::Constructor->new(
-            class => $self->{client},
+            class => $self->get_client,
             alias => $_,
         );
-    } @{ $self->{bind_constructors} };
+    } @{ $self->get_bind_constructors };
     return @bound;
 }
 
 sub method_bindings {
-    my $self      = shift;
-    my $client    = $self->{client};
-    my $meth_list = $self->{bind_methods};
+    my $self       = shift;
+    my $client     = $self->get_client;
+    my $meth_list  = $self->get_bind_methods;
+    my $class_name = $self->get_class_name;
     my @bound;
 
     # Assemble a list of methods to be bound for this class.
@@ -107,12 +138,12 @@ sub method_bindings {
         # Safety checks against excess binding code or private methods.
         if ( !$method->novel ) {
             confess(  "Binding spec'd for method '$meth_name' in class "
-                    . "$self->{class_name}, but it's overridden and "
+                    . "$class_name, but it's overridden and "
                     . "should be bound via the parent class" );
         }
         elsif ( $method->private ) {
             confess(  "Binding spec'd for method '$meth_name' in class "
-                    . "$self->{class_name}, but it's private" );
+                    . "$class_name, but it's private" );
         }
 
         # Create an XSub binding for each override.  Each of these directly
@@ -134,7 +165,7 @@ sub method_bindings {
 
     # Verify that we processed all methods.
     my @leftover_meths = keys %meth_to_bind;
-    confess("Leftover for $self->{class_name}: '@leftover_meths'")
+    confess("Leftover for $class_name: '@leftover_meths'")
         if @leftover_meths;
 
     return @bound;
@@ -207,10 +238,10 @@ sub _gen_subroutine_pod {
 }
 
 sub create_pod {
-    my $self     = shift;
-    my $pod_args = $self->{make_pod} or return;
-    my $class    = $self->{client} or die "No client for $self->{class_name}";
-    my $class_name = $class->get_class_name;
+    my $self       = shift;
+    my $pod_args   = $self->get_make_pod or return;
+    my $class_name = $self->get_class_name;
+    my $class      = $self->get_client or die "No client for $class_name";
     my $docucom    = $class->get_docucomment;
     confess("No DocuComment for '$class_name'") unless $docucom;
     my $brief = $docucom->get_brief;

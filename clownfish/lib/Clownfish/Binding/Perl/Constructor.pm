@@ -21,6 +21,8 @@ use base qw( Clownfish::Binding::Perl::Subroutine );
 use Carp;
 use Clownfish::ParamList;
 
+our %init_func;
+
 sub new {
     my ( $either, %args ) = @_;
     my $class          = delete $args{class};
@@ -46,18 +48,26 @@ sub new {
         alias              => $alias,
         %args
     );
-    $self->{init_func} = $func;
+    $init_func{$self} = $func;
     return $self;
 }
+
+sub DESTROY {
+    my $self = shift;
+    delete $init_func{$self};
+    $self->SUPER::DESTROY;
+}
+
+sub _get_init_func { $init_func{ +shift } }
 
 sub xsub_def {
     my $self         = shift;
     my $c_name       = $self->c_name;
-    my $param_list   = $self->{param_list};
+    my $param_list   = $self->get_param_list;
     my $name_list    = $param_list->name_list;
     my $arg_inits    = $param_list->get_initial_values;
     my $arg_vars     = $param_list->get_variables;
-    my $func_sym     = $self->{init_func}->full_func_sym;
+    my $func_sym     = $self->_get_init_func->full_func_sym;
     my $allot_params = $self->build_allot_params;
 
     # Compensate for swallowed refcounts.

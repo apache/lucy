@@ -34,23 +34,44 @@ our %new_PARAMS = (
     use_labeled_params => undef,
 );
 
+our %param_list;
+our %class_name;
+our %alias;
+our %retval_type;
+our %use_labeled_params;
+our %perl_name;
+
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless { %new_PARAMS, @_, }, ref($either) || $either;
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
     for (qw( param_list class_name alias retval_type )) {
-        confess("$_ is required") unless defined $self->{$_};
+        confess("$_ is required") unless defined $args{$_};
     }
+    my $empty = "";
+    my $self = bless \$empty, ref($either) || $either;
+    $param_list{$self}         = $args{param_list};
+    $alias{$self}              = $args{alias};
+    $class_name{$self}         = $args{class_name};
+    $retval_type{$self}        = $args{retval_type};
+    $use_labeled_params{$self} = $args{use_labeled_params};
+    $perl_name{$self}          = "$args{class_name}::$args{alias}";
     return $self;
 }
 
-sub get_class_name     { shift->{class_name} }
-sub use_labeled_params { shift->{use_labeled_params} }
-
-sub perl_name {
+sub DESTROY {
     my $self = shift;
-    return "$self->{class_name}::$self->{alias}";
+    delete $param_list{$self};
+    delete $class_name{$self};
+    delete $alias{$self};
+    delete $retval_type{$self};
+    delete $use_labeled_params{$self};
+    delete $perl_name{$self};
 }
+
+sub get_class_name     { $class_name{ +shift } }
+sub use_labeled_params { $use_labeled_params{ +shift } }
+sub perl_name          { $perl_name{ +shift } }
+sub get_param_list     { $param_list{ +shift } }
 
 sub c_name {
     my $self   = shift;
@@ -61,7 +82,7 @@ sub c_name {
 
 sub c_name_list {
     my $self = shift;
-    return $self->{param_list}->name_list;
+    return $self->get_param_list->name_list;
 }
 
 my %params_hash_vals_map = (
@@ -72,11 +93,11 @@ my %params_hash_vals_map = (
 
 sub params_hash_def {
     my $self = shift;
-    return unless $self->{use_labeled_params};
+    return unless $self->use_labeled_params;
 
     my $params_hash_name = $self->perl_name . "_PARAMS";
-    my $arg_vars         = $self->{param_list}->get_variables;
-    my $vals             = $self->{param_list}->get_initial_values;
+    my $arg_vars         = $self->get_param_list->get_variables;
+    my $vals             = $self->get_param_list->get_initial_values;
     my @pairs;
     for ( my $i = 1; $i < @$arg_vars; $i++ ) {
         my $var = $arg_vars->[$i];
@@ -149,7 +170,7 @@ sub _allot_params_arg {
 
 sub build_allot_params {
     my $self         = shift;
-    my $param_list   = $self->{param_list};
+    my $param_list   = $self->get_param_list;
     my $arg_inits    = $param_list->get_initial_values;
     my $arg_vars     = $param_list->get_variables;
     my $params_hash  = $self->perl_name . "_PARAMS";

@@ -27,6 +27,8 @@ our %new_PARAMS = (
     alias  => undef,
 );
 
+our %method;
+
 sub new {
     my ( $either, %args ) = @_;
     confess $@ unless verify_args( \%new_PARAMS, %args );
@@ -44,14 +46,22 @@ sub new {
             : 0;
     }
     my $self = $either->SUPER::new(%args);
-    $self->{method} = $method;
+    $method{$self} = $method;
 
     return $self;
 }
 
+sub DESTROY {
+    my $self = shift;
+    delete $method{$self};
+    $self->SUPER::DESTROY;
+}
+
+sub _get_method { $method{ +shift } }
+
 sub xsub_def {
     my $self = shift;
-    if ( $self->{use_labeled_params} ) {
+    if ( $self->use_labeled_params ) {
         return $self->_xsub_def_labeled_params;
     }
     else {
@@ -62,7 +72,7 @@ sub xsub_def {
 # Build XSUB function body.
 sub _xsub_body {
     my $self          = shift;
-    my $method        = $self->{method};
+    my $method        = $self->_get_method;
     my $full_func_sym = $method->full_func_sym;
     my $param_list    = $method->get_param_list;
     my $arg_vars      = $param_list->get_variables;
@@ -103,7 +113,7 @@ sub _xsub_body {
 
 sub _xsub_def_positional_args {
     my $self       = shift;
-    my $method     = $self->{method};
+    my $method     = $self->_get_method;
     my $param_list = $method->get_param_list;
     my $arg_vars   = $param_list->get_variables;
     my $arg_inits  = $param_list->get_initial_values;
@@ -185,12 +195,12 @@ END_STUFF
 sub _xsub_def_labeled_params {
     my $self        = shift;
     my $c_name      = $self->c_name;
-    my $param_list  = $self->{param_list};
+    my $param_list  = $self->get_param_list;
     my $arg_inits   = $param_list->get_initial_values;
     my $arg_vars    = $param_list->get_variables;
     my $self_var    = $arg_vars->[0];
     my $self_assign = _self_assign_statement( $self_var->get_type,
-        $self->{method}->micro_sym );
+        $self->_get_method->micro_sym );
     my $allot_params = $self->build_allot_params;
     my $body         = $self->_xsub_body;
 
