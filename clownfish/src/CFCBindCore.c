@@ -36,14 +36,6 @@ struct CFCBindCore {
     char         *footer;
 };
 
-#ifdef _WIN32
-#define PATH_SEP "\\"
-#define PATH_SEP_CHAR '\\'
-#else
-#define PATH_SEP "/"
-#define PATH_SEP_CHAR '/'
-#endif
-
 /* Write the "parcel.h" header file, which contains common symbols needed by
  * all classes, plus typedefs for all class structs.
  */
@@ -232,8 +224,8 @@ S_write_parcel_h(CFCBindCore *self) {
             self->footer);
 
     // Unlink then write file.
-    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), self->dest, PATH_SEP, 
-                                 "parcel.h", NULL);
+    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
+                                 CFCUTIL_PATH_SEP, "parcel.h", NULL);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
 
@@ -296,8 +288,8 @@ S_write_parcel_c(CFCBindCore *self) {
             content, self->footer);
 
     // Unlink then open file.
-    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), self->dest, PATH_SEP, 
-                                 "parcel.c", NULL);
+    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
+                                 CFCUTIL_PATH_SEP, "parcel.c", NULL);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
 

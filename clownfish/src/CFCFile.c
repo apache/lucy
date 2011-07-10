@@ -25,14 +25,6 @@
     #define false 0
 #endif
 
-#ifdef _WIN32
-#define PATH_SEP "\\"
-#define PATH_SEP_CHAR '\\'
-#else
-#define PATH_SEP "/"
-#define PATH_SEP_CHAR '/'
-#endif
-
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCFile.h"
@@ -95,7 +87,7 @@ CFCFile_init(CFCFile *self, const char *source_class) {
     for (i = 0, j = 0; i < len; i++, j++) {
         char c = source_class[i];
         if (c == ':') {
-            self->path_part[j] = PATH_SEP_CHAR;
+            self->path_part[j] = CFCUTIL_PATH_SEP_CHAR;
             i++;
         }
         else {
@@ -176,7 +168,8 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
         croak("Need buf_size of %lu, but got %lu", needed, buf_size);
     }
     if (base_dir) {
-        sprintf(buf, "%s" PATH_SEP "%s%s", base_dir, self->path_part, ext);
+        sprintf(buf, "%s" CFCUTIL_PATH_SEP "%s%s", base_dir, self->path_part,
+                ext);
     }
     else {
         sprintf(buf, "%s%s", self->path_part, ext);
@@ -198,7 +191,7 @@ CFCFile_path_buf_size(CFCFile *self, const char *base_dir) {
     size += 1; // NULL-termination.
     if (base_dir) {
         size += strlen(base_dir);
-        size += strlen(PATH_SEP);
+        size += strlen(CFCUTIL_PATH_SEP);
     }
     return size;
 }

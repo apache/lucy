@@ -25,12 +25,6 @@
     #define false 0
 #endif
 
-#ifdef WIN32
-    #define PATH_SEP "\\"
-#else
-    #define PATH_SEP "/"
-#endif
-
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCHierarchy.h"
@@ -173,7 +167,8 @@ S_find_cfh(char *dir, char **cfh_list, size_t num_cfh) {
             full_path_cap = needed;
             full_path = (char*)MALLOCATE(full_path_cap);
         }
-        int full_path_len = sprintf(full_path, "%s" PATH_SEP "%s", dir, entry);
+        int full_path_len = sprintf(full_path, "%s" CFCUTIL_PATH_SEP "%s",
+                                    dir, entry);
         const char *cfh_suffix = strstr(full_path, ".cfh");
 
         if (cfh_suffix == full_path + (full_path_len - 4)) {

@@ -294,12 +294,6 @@ CFCUtil_is_dir(const char *path) {
     return (stat_buf.st_mode & S_IFDIR) ? true : false;
 }
 
-#ifdef WIN32
-  #define DIR_SEP_CHAR '\\'
-#else
-  #define DIR_SEP_CHAR '/'
-#endif
-
 int
 CFCUtil_make_path(const char *path) {
     CFCUTIL_NULL_CHECK(path);
@@ -313,7 +307,7 @@ CFCUtil_make_path(const char *path) {
             continue;
         }
 #endif
-        if (target[i] == DIR_SEP_CHAR || i == len) {
+        if (target[i] == CFCUTIL_PATH_SEP_CHAR || i == len) {
             target[i] = 0; // NULL-terminate.
             struct stat stat_buf;
             int stat_check = stat(target, &stat_buf);
@@ -329,7 +323,7 @@ CFCUtil_make_path(const char *path) {
                     return false;
                 }
             }
-            target[i] = DIR_SEP_CHAR;
+            target[i] = CFCUTIL_PATH_SEP_CHAR;
         }
     }
 

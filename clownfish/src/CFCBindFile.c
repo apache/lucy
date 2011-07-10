@@ -24,14 +24,6 @@
 #include "CFCCBlock.h"
 #include "CFCUtil.h"
 
-#ifdef _WIN32
-#define PATH_SEP "\\"
-#define PATH_SEP_CHAR '\\'
-#else
-#define PATH_SEP "/"
-#define PATH_SEP_CHAR '/'
-#endif
-
 void
 CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
                     const char *footer) {
@@ -46,7 +38,7 @@ CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
     CFCFile_h_path(file, h_path, h_path_buf_size, dest);
     char *h_dir = CFCUtil_strdup(h_path);
     for (size_t len = h_path_buf_size; len--; ) {
-        if (h_dir[len] == PATH_SEP_CHAR) {
+        if (h_dir[len] == CFCUTIL_PATH_SEP_CHAR) {
             h_dir[len] = 0;
             break;
         }
