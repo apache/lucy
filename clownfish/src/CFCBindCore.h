@@ -38,24 +38,6 @@ CFCBindCore_destroy(CFCBindCore *self);
 int
 CFCBindCore_write_all_modified(CFCBindCore *self, int modified);
 
-char*
-CFCBindCore_write_parcel_h(CFCBindCore *self);
-
-char*
-CFCBindCore_write_parcel_c(CFCBindCore *self);
-
-struct CFCHierarchy*
-CFCBindCore_get_hierarchy(CFCBindCore *self);
-
-const char*
-CFCBindCore_get_dest(CFCBindCore *self);
-
-const char*
-CFCBindCore_get_header(CFCBindCore *self);
-
-const char*
-CFCBindCore_get_footer(CFCBindCore *self);
-
 #ifdef __cplusplus
 }
 #endif

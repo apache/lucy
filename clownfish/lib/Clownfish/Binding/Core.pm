@@ -23,9 +23,6 @@ use Clownfish::Binding::Core::Method;
 use Clownfish::Binding::Core::Class;
 use Clownfish::Binding::Core::File;
 use Clownfish::Binding::Core::Aliases;
-use File::Spec::Functions qw( catfile );
-use Fcntl;
-use Scalar::Util qw( blessed );
 
 our %new_PARAMS = (
     hierarchy => undef,
@@ -33,11 +30,6 @@ our %new_PARAMS = (
     header    => undef,
     footer    => undef,
 );
-
-our %hierarchy;
-our %dest;
-our %header;
-our %footer;
 
 sub new {
     my ( $either, %args ) = @_;

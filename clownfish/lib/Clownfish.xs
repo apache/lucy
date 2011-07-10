@@ -1724,40 +1724,6 @@ DESTROY(self);
 PPCODE:
     CFCBindCore_destroy(self);
 
-void
-_set_or_get(self, ...)
-    CFCBindCore *self;
-ALIAS:
-    _get_hierarchy    = 2
-    _get_dest         = 4
-    _get_header       = 6
-    _get_footer       = 8
-PPCODE:
-{
-    START_SET_OR_GET_SWITCH
-        case 2: {
-                CFCHierarchy *hierarchy = CFCBindCore_get_hierarchy(self);
-                retval = S_cfcbase_to_perlref(hierarchy);
-            }
-            break;
-        case 4: {
-                const char *value = CFCBindCore_get_dest(self);
-                retval = newSVpvn(value, strlen(value));
-            }
-            break;
-        case 6: {
-                const char *value = CFCBindCore_get_header(self);
-                retval = newSVpvn(value, strlen(value));
-            }
-            break;
-        case 8: {
-                const char *value = CFCBindCore_get_footer(self);
-                retval = newSVpvn(value, strlen(value));
-            }
-            break;
-    END_SET_OR_GET_SWITCH
-}
-
 int
 write_all_modified(self, ...)
     CFCBindCore *self;
@@ -1771,17 +1737,6 @@ CODE:
 }
 OUTPUT: RETVAL
 
-void
-_write_parcel_h(self)
-    CFCBindCore *self;
-PPCODE:
-    CFCBindCore_write_parcel_h(self);
-
-void
-_write_parcel_c(self)
-    CFCBindCore *self;
-PPCODE:
-    CFCBindCore_write_parcel_c(self);
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Function
 
