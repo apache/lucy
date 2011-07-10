@@ -141,8 +141,8 @@ S_write_parcel_h(CFCBindCore *self) {
 
     const char pattern[] = 
         "%s\n"
-        "#ifndef BOIL_H\n"
-        "#define BOIL_H 1\n"
+        "#ifndef CFCPARCEL_H\n"
+        "#define CFCPARCEL_H 1\n"
         "\n"
         "#ifdef __cplusplus\n"
         "extern \"C\" {\n"
@@ -217,7 +217,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "}\n"
         "#endif\n"
         "\n"
-        "#endif /* BOIL_H */\n"
+        "#endif /* CFCPARCEL_H */\n"
         "\n"
         "%s\n"
         "\n";
