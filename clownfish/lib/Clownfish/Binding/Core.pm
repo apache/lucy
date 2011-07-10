@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Binding::Core;
-use Clownfish::Util qw( a_isa_b verify_args );
+use Clownfish::Util qw( verify_args );
 use Clownfish::Binding::Core::Function;
 use Clownfish::Binding::Core::Method;
 use Clownfish::Binding::Core::Class;
@@ -42,34 +42,8 @@ our %footer;
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    for ( keys %new_PARAMS ) {
-        confess("Missing required param '$_'") unless defined $args{$_};
-    }
-    confess("Not a Hierarchy")
-        unless a_isa_b( $args{hierarchy}, "Clownfish::Hierarchy" );
-
-    my $self = _new();
-    $hierarchy{$self} = $args{hierarchy};
-    $dest{$self}      = $args{dest};
-    $header{$self}    = $args{header};
-    $footer{$self}    = $args{footer};
-
-    return $self;
+    return _new( @args{qw( hierarchy dest header footer )} );
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $hierarchy{$self};
-    delete $dest{$self};
-    delete $header{$self};
-    delete $footer{$self};
-    _destroy($self);
-}
-
-sub _get_hierarchy { $hierarchy{ +shift } }
-sub _get_dest      { $dest{ +shift } }
-sub _get_header    { $header{ +shift } }
-sub _get_footer    { $footer{ +shift } }
 
 sub write_all_modified {
     my ( $self, $modified ) = @_;

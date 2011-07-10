@@ -1707,18 +1707,56 @@ PPCODE:
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core
 
 SV*
-_new()
+_new(hierarchy, dest, header, footer)
+    CFCHierarchy *hierarchy;
+    const char   *dest;
+    const char   *header;
+    const char   *footer;
 CODE:
-    CFCBindCore *self = CFCBindCore_new();
+    CFCBindCore *self = CFCBindCore_new(hierarchy, dest, header, footer);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void
-_destroy(self);
+DESTROY(self);
     CFCBindCore *self;
 PPCODE:
     CFCBindCore_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCBindCore *self;
+ALIAS:
+    _get_hierarchy    = 2
+    _get_dest         = 4
+    _get_header       = 6
+    _get_footer       = 8
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                CFCHierarchy *hierarchy = CFCBindCore_get_hierarchy(self);
+                retval = S_cfcbase_to_perlref(hierarchy);
+            }
+            break;
+        case 4: {
+                const char *value = CFCBindCore_get_dest(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 6: {
+                const char *value = CFCBindCore_get_header(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 8: {
+                const char *value = CFCBindCore_get_footer(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
 
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Function

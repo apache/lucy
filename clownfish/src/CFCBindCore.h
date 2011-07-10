@@ -22,15 +22,30 @@ extern "C" {
 #endif
 
 typedef struct CFCBindCore CFCBindCore;
+struct CFCHierarchy;
 
 CFCBindCore*
-CFCBindCore_new(void);
+CFCBindCore_new(struct CFCHierarchy *hierarchy, const char *dest,
+                 const char *header, const char *footer);
 
 CFCBindCore*
-CFCBindCore_init(CFCBindCore *self);
+CFCBindCore_init(CFCBindCore *self, struct CFCHierarchy *hierarchy,
+                 const char *dest, const char *header, const char *footer);
 
 void
 CFCBindCore_destroy(CFCBindCore *self);
+
+struct CFCHierarchy*
+CFCBindCore_get_hierarchy(CFCBindCore *self);
+
+const char*
+CFCBindCore_get_dest(CFCBindCore *self);
+
+const char*
+CFCBindCore_get_header(CFCBindCore *self);
+
+const char*
+CFCBindCore_get_footer(CFCBindCore *self);
 
 #ifdef __cplusplus
 }
