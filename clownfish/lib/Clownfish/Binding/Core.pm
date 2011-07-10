@@ -66,12 +66,17 @@ sub DESTROY {
     _destroy($self);
 }
 
+sub _get_hierarchy { $hierarchy{ +shift } }
+sub _get_dest      { $dest{ +shift } }
+sub _get_header    { $header{ +shift } }
+sub _get_footer    { $footer{ +shift } }
+
 sub write_all_modified {
     my ( $self, $modified ) = @_;
-    my $hierarchy = $hierarchy{$self};
-    my $header    = $header{$self};
-    my $footer    = $footer{$self};
-    my $dest      = $dest{$self};
+    my $hierarchy = $self->_get_hierarchy;
+    my $header    = $self->_get_header;
+    my $footer    = $self->_get_footer;
+    my $dest      = $self->_get_dest;
 
     $modified = $hierarchy->propagate_modified($modified);
 
@@ -103,7 +108,10 @@ sub write_all_modified {
 # classes, plus typedefs for all class structs.
 sub _write_parcel_h {
     my $self     = shift;
-    my $ordered  = $hierarchy{$self}->ordered_classes;
+    my $ordered  = $self->_get_hierarchy->ordered_classes;
+    my $dest     = $self->_get_dest;
+    my $header   = $self->_get_header;
+    my $footer   = $self->_get_footer;
     my $typedefs = "";
 
     # Declare object structs for all instantiable classes.
@@ -116,12 +124,12 @@ sub _write_parcel_h {
     # Create Clownfish aliases if necessary.
     my $aliases = Clownfish::Binding::Core::Aliases->c_aliases;
 
-    my $filepath = catfile( $dest{$self}, "parcel.h" );
+    my $filepath = catfile( $dest, "parcel.h" );
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$filepath': $!");
     print $fh <<END_STUFF;
-$header{$self}
+$header
 #ifndef BOIL_H
 #define BOIL_H 1
 
@@ -200,14 +208,17 @@ typedef struct cfish_Callback {
 
 #endif /* BOIL_H */
 
-$footer{$self}
+$footer
 
 END_STUFF
 }
 
 sub _write_parcel_c {
     my $self      = shift;
-    my $hierarchy = $hierarchy{$self};
+    my $hierarchy = $self->_get_hierarchy;
+    my $dest      = $self->_get_dest;
+    my $header    = $self->_get_header;
+    my $footer    = $self->_get_footer;
 
     # Aggregate C code from all files.
     my $content     = "";
@@ -230,12 +241,12 @@ sub _write_parcel_c {
     }
 
     # Unlink then open file.
-    my $filepath = catfile( $dest{$self}, "parcel.c" );
+    my $filepath = catfile( $dest, "parcel.c" );
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$filepath': $!");
     print $fh <<END_STUFF;
-$header{$self}
+$header
 
 $c_file_syms
 #include "parcel.h"
@@ -243,7 +254,7 @@ $includes
 
 $content
 
-$footer{$self}
+$footer
 
 END_STUFF
 }
