@@ -332,8 +332,9 @@ CFCUtil_make_path(const char *path) {
 }
 
 /******************************** WINDOWS **********************************/
-#ifdef WIN32
+#ifdef _WIN32
 
+#include <direct.h>
 #include <windows.h>
 
 typedef struct WinDH {
@@ -343,7 +344,7 @@ typedef struct WinDH {
     int first_time;
 } WinDH;
 
-void
+int
 CFCUtil_make_dir (const char *dir) {
     return !mkdir(dir);
 }
