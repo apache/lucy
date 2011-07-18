@@ -42,7 +42,7 @@ if ( $rc < 2 ) {
     say qq|svn commit -m "Updating CHANGES and version number for release $x_y_z_version"\n|;
 }
 
-if ( $micro == 0 ) {
+if ( $micro == 0 && $rc < 2) {
     say qq|# Branch for non-bugfix release.|;
     say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/trunk |
         . qq|https://svn.apache.org/repos/asf/incubator/lucy/branches/$major.$minor |
