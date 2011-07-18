@@ -83,8 +83,8 @@ say qq|scp -p apache-lucy-incubating-$x_y_z_version.tar.gz* |
 say qq|# Modify permissions.|;
 say qq|ssh people.apache.org|;
 say qq|cd public_html/apache-lucy-incubating-$full_rc_version/|;
-say qq|find . -type f -exec chmod 664 {} \;|;
-say qq|find . -type d -exec chmod 775 {} \;|;
+say qq|find . -type f -exec chmod 664 {} \\;|;
+say qq|find . -type d -exec chmod 775 {} \\;|;
 say qq|chgrp -R incubator *\n|;
 
 say qq|# Tag release after all votes have passed.|;
