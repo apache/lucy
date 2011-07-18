@@ -345,7 +345,7 @@ typedef struct WinDH {
 } WinDH;
 
 int
-CFCUtil_make_dir (const char *dir) {
+CFCUtil_make_dir(const char *dir) {
     return !mkdir(dir);
 }
 
@@ -404,7 +404,7 @@ CFCUtil_closedir(void *dirhandle, const char *dir) {
 #include <dirent.h>
 
 int
-CFCUtil_make_dir (const char *dir) {
+CFCUtil_make_dir(const char *dir) {
     return !mkdir(dir, 0777);
 }
 

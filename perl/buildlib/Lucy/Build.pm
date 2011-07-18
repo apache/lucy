@@ -112,8 +112,9 @@ my $is_distro_not_devel = -e 'core';
 my $base_dir = rel2abs( $is_distro_not_devel ? getcwd() : updir() );
 
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
-my $CHARMONIZE_EXE_PATH  = catfile( $CHARMONIZER_ORIG_DIR, "charmonize$Config{_exe}" );
-my $CHARMONY_PATH        = 'charmony.h';
+my $CHARMONIZE_EXE_PATH
+    = catfile( $CHARMONIZER_ORIG_DIR, "charmonize$Config{_exe}" );
+my $CHARMONY_PATH = 'charmony.h';
 my $SNOWSTEM_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
@@ -132,8 +133,8 @@ sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
 
 sub _run_make {
     my ( $self, %params ) = @_;
-    my @command = @{ $params{args} };
-    my $dir = $params{dir};
+    my @command           = @{ $params{args} };
+    my $dir               = $params{dir};
     my $current_directory = getcwd();
     chdir $dir if $dir;
     unshift @command, 'CC=' . $self->config('cc');
@@ -286,7 +287,6 @@ sub ACTION_clownfish {
 
     my $pm_filepaths  = $self->rscan_dir( $LIB_DIR,         qr/\.pm$/ );
     my $cfh_filepaths = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.cfh$/ );
-
 
     # XXX joes thinks this is dubious
     # Don't bother parsing Clownfish files if everything's up to date.
@@ -484,11 +484,11 @@ sub ACTION_compile_custom_xs {
 
     # Compile C source files.
     my $c_files = [];
-    push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,     qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,       qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,         qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR,    qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR,    qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,  qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,    qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,      qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR, qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR, qr/\.c$/ ) };
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
@@ -643,6 +643,7 @@ sub ACTION_dist {
         README
     );
     print "Copying files...\n";
+
     for my $item (@items_to_copy) {
         confess("'$item' already exists") if -e $item;
         system("cp -R ../$item $item");
@@ -656,8 +657,8 @@ sub ACTION_dist {
     # Clean up.
     print "Removing copied files...\n";
     rmtree($_) for @items_to_copy;
-    unlink("META.yml"); 
-    move("MANIFEST.bak", "MANIFEST") or die "move() failed: $!";
+    unlink("META.yml");
+    move( "MANIFEST.bak", "MANIFEST" ) or die "move() failed: $!";
 }
 
 # Generate a list of files for PAUSE, search.cpan.org, etc to ignore.

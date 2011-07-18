@@ -151,7 +151,7 @@ S_to_c_header_inert(CFCBindClass *self) {
     char *inert_var_defs  = S_inert_var_declarations(self);
     char *short_names     = S_short_names(self);
 
-    char pattern[] = 
+    char pattern[] =
         "#include \"charmony.h\"\n"
         "#include \"parcel.h\"\n"
         "\n"
@@ -198,7 +198,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *callback_declarations = S_callback_declarations(self);
     char *short_names           = S_short_names(self);
 
-    char pattern[] = 
+    char pattern[] =
         "#include \"charmony.h\"\n"
         "#include \"parcel.h\"\n"
         "\n"
@@ -331,7 +331,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
         char *offset_str = CFCUtil_cat(CFCUtil_strdup(""), "(offsetof(", vt_type,
                                        ", methods) + ", meth_num_str,
                                        " * sizeof(cfish_method_t))", NULL);
-        offsets = CFCUtil_cat(offsets, "size_t ", full_offset_sym, " = ", 
+        offsets = CFCUtil_cat(offsets, "size_t ", full_offset_sym, " = ",
                               offset_str, ";\n", NULL);
         FREEMEM(full_offset_sym);
 

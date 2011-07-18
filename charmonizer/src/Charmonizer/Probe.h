@@ -26,7 +26,7 @@ extern "C" {
 
 /* Set up the Charmonizer environment.  This should be called before anything
  * else.
- * 
+ *
  * If the environment variable CHARM_VERBOSITY has been set, it will be
  * processed at this time:
  *

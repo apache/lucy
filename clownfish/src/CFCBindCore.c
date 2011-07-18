@@ -48,7 +48,7 @@ static void
 S_write_parcel_c(CFCBindCore *self);
 
 CFCBindCore*
-CFCBindCore_new(CFCHierarchy *hierarchy, const char *dest, const char *header, 
+CFCBindCore_new(CFCHierarchy *hierarchy, const char *dest, const char *header,
                 const char *footer) {
     CFCBindCore *self
         = (CFCBindCore*)CFCBase_allocate(sizeof(CFCBindCore),
@@ -122,7 +122,7 @@ S_write_parcel_h(CFCBindCore *self) {
         CFCClass *klass = ordered[i];
         if (!CFCClass_inert(klass)) {
             const char *full_struct = CFCClass_full_struct_sym(klass);
-            typedefs = CFCUtil_cat(typedefs, "typedef struct ", full_struct, 
+            typedefs = CFCUtil_cat(typedefs, "typedef struct ", full_struct,
                                    " ", full_struct, ";\n", NULL);
         }
     }
@@ -131,7 +131,7 @@ S_write_parcel_h(CFCBindCore *self) {
     // Create Clownfish aliases if necessary.
     char *aliases = CFCBindAliases_c_aliases();
 
-    const char pattern[] = 
+    const char pattern[] =
         "%s\n"
         "#ifndef CFCPARCEL_H\n"
         "#define CFCPARCEL_H 1\n"
@@ -250,7 +250,7 @@ S_write_parcel_c(CFCBindCore *self) {
             const char *cfc_class = CFCBase_get_cfc_class(blocks[j]);
             if (strcmp(cfc_class, "Clownfish::Class") == 0) {
                 CFCClass *klass = (CFCClass*)blocks[j];
-                
+
                 CFCBindClass *class_binding = CFCBindClass_new(klass);
                 char *c_code = CFCBindClass_to_c(class_binding);
                 content = CFCUtil_cat(content, c_code, "\n", NULL);
@@ -266,7 +266,7 @@ S_write_parcel_c(CFCBindCore *self) {
         }
     }
 
-    char pattern[] = 
+    char pattern[] =
         "%s\n"
         "\n"
         "%s\n"

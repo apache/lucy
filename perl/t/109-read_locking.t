@@ -82,7 +82,8 @@ SKIP: {
         );
     };
     ok( blessed($@) && $@->isa("Lucy::Store::LockErr"),
-        "IndexReader dies if it can't get deletion lock" );
+        "IndexReader dies if it can't get deletion lock"
+    );
 }
 $folder->delete('locks/deletion.lock') or die "Can't delete 'deletion.lock'";
 

@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char cygwin_code[] = 
+static const char cygwin_code[] =
     QUOTE(#ifndef __CYGWIN__            )
     QUOTE(  #error "Not Cygwin"         )
     QUOTE(#endif                        )

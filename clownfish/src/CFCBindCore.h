@@ -26,7 +26,7 @@ struct CFCHierarchy;
 
 CFCBindCore*
 CFCBindCore_new(struct CFCHierarchy *hierarchy, const char *dest,
-                 const char *header, const char *footer);
+                const char *header, const char *footer);
 
 CFCBindCore*
 CFCBindCore_init(CFCBindCore *self, struct CFCHierarchy *hierarchy,

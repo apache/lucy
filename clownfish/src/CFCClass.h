@@ -161,7 +161,7 @@ const char*
 CFCClass_full_vtable_type(CFCClass *self);
 
 /** Access the symbol which unlocks the class struct definition and other
- * private information. 
+ * private information.
  */
 const char*
 CFCClass_privacy_symbol(CFCClass *self);

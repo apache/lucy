@@ -52,7 +52,7 @@ is( $lucy->search( query => 'cream' ), 4,
 
 SKIP: {
     skip( "fork on Windows not supported by Lucy", 1 )
-    	if $^O =~ /(mswin|cygwin)/i;
+        if $^O =~ /(mswin|cygwin)/i;
 
     # We need another one:
     my $test_index_loc = init_test_index_loc();

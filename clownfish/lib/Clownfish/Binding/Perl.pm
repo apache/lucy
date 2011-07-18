@@ -85,7 +85,7 @@ sub new {
     $xs_file_components[-1] .= '.xs';
     $xs_path{$self} = catfile( $lib, @xs_file_components );
 
-    $pm_path{$self} = catfile( $lib, @file_components, 'Autobinding.pm' );
+    $pm_path{$self}     = catfile( $lib, @file_components, 'Autobinding.pm' );
     $boot_h_file{$self} = $parcel->get_prefix . "boot.h";
     $boot_c_file{$self} = $parcel->get_prefix . "boot.c";
     $boot_h_path{$self} = catfile( $dest_dir, $self->_get_boot_h_file );
@@ -356,8 +356,8 @@ sub _write_boot_h {
     my $filepath  = catfile( $hierarchy->get_dest, $self->_get_boot_h_file );
     my $guard     = uc( $self->_get_boot_class . "_BOOT" );
     $guard =~ s/\W+/_/g;
-    my $header = $self->_get_header;
-    my $footer = $self->_get_footer;
+    my $header    = $self->_get_header;
+    my $footer    = $self->_get_footer;
     my $boot_func = $self->_get_boot_func;
 
     unlink $filepath;

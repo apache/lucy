@@ -87,7 +87,7 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
         printf("Trying to compile a small test file...\n");
     }
     if (!CC_test_compile(code, strlen(code))) {
-         Util_die("Failed to compile a small test file");
+        Util_die("Failed to compile a small test file");
     }
 }
 
