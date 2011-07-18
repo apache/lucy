@@ -87,18 +87,6 @@ say qq|find . -type f -exec chmod 664 {} \\;|;
 say qq|find . -type d -exec chmod 775 {} \\;|;
 say qq|chgrp -R incubator *\n|;
 
-say qq|# Tag release after all votes have passed.|;
-say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
- . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$x_y_z_version |
- . qq|-m "Tagging release $x_y_z_version"\n|;
-
-
-say qq|# Copy to dist directory, remove RC dir.|;
-say qq|ssh people.apache.org|;
-say qq|cd public_html/|;
-say qq|cp -p apache-lucy-incubating-$full_rc_version/* /www/www.apache.org/dist/incubator/lucy/|;
-say qq|rm -rf apache-lucy-incubating-$full_rc_version/\n|;
-
 say qq|#######################################################################|;
 say qq|# Boilerplate VOTE email for lucy-dev\@incubator.a.o|;
 say qq|#######################################################################\n|;
@@ -198,6 +186,21 @@ $x_y_z_version.  The vote is open for the next 72 hours.
 
 Thanks!
 END_GENERAL_AT_INCUBATOR_VOTE
+
+say qq|#######################################################################|;
+say qq|# After both Lucy PPMC and Incubator PMC votes have passed...|;
+say qq|#######################################################################\n|;
+
+say qq|# Tag release.|;
+say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
+ . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$x_y_z_version |
+ . qq|-m "Tagging release $x_y_z_version"\n|;
+
+say qq|# Copy to dist directory, remove RC dir.|;
+say qq|ssh people.apache.org|;
+say qq|cd public_html/|;
+say qq|cp -p apache-lucy-incubating-$full_rc_version/* /www/www.apache.org/dist/incubator/lucy/|;
+say qq|rm -rf apache-lucy-incubating-$full_rc_version/\n|;
 
 say qq|#######################################################################|;
 
