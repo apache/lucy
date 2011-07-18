@@ -58,8 +58,11 @@ say qq|svn export https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lu
 say qq|# Tar and gzip the export.|;
 say qq|tar -czf apache-lucy-incubating-$x_y_z_version.tar.gz apache-lucy-incubating-$x_y_z_version\n|;
 
-say qq|# Generate MD5 checksum.|;
-say qq|md5sum apache-lucy-incubating-$x_y_z_version.tar.gz > apache-lucy-incubating-$x_y_z_version.tar.gz.md5\n|;
+say qq|# Generate checksums.|;
+say qq|gpg --print-md MD5 apache-lucy-incubating-$x_y_z_version.tar.gz |
+    . qq|> apache-lucy-incubating-$x_y_z_version.tar.gz.md5|;
+say qq|gpg --print-md SHA512 apache-lucy-incubating-$x_y_z_version.tar.gz |
+    . qq|> apache-lucy-incubating-$x_y_z_version.tar.gz.sha\n|;
 
 say qq|# Sign the release.|;
 say qq|gpg --armor --output apache-lucy-incubating-$x_y_z_version.tar.gz.asc |
