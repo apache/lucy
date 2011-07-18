@@ -21,12 +21,12 @@ package Lucy;
 use 5.008003;
 use Exporter;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.002000';
 $VERSION = eval $VERSION;
 
 use XSLoader;
 # This loads a large number of disparate subs.
-BEGIN { XSLoader::load( 'Lucy', '0.001000' ) }
+BEGIN { XSLoader::load( 'Lucy', '0.002000' ) }
 
 BEGIN {
     push our @ISA, 'Exporter';
