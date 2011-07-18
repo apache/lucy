@@ -131,8 +131,9 @@ sub process_c {
 
     # AStyle sometimes confuses dereference operators for multiplication
     # operators and pads them.  This hack prevents it from turning
-    # '(Foo*volatile*)' into '(Foo * volatile*)'.
+    # '(Foo*volatile*)' into '(Foo * volatile*)' and so on.
     $content =~ s!\*volatile\*!STARVOLAT*!g;
+    $content =~ s!\*const\*!STARCONST*!g;
 
     # AStyle has a bad interaction with Charmonizer's QUOTE macro, because it
     # can't handle e.g. implicitly stringified brackets:
@@ -167,6 +168,7 @@ sub process_c {
     $content =~ s! = // HAKK!!g;
     $content =~ s!wHiLe[ ]*\(!while (!g;
     $content =~ s!STARVOLAT!*volatile!g;
+    $content =~ s!STARCONST!*const!g;
     while ( my ( $placeholder, $orig ) = each %quote_placeholders ) {
         $content =~ s/\Q$placeholder/$orig/
             or die "Can't match placeholder '$placeholder'";
