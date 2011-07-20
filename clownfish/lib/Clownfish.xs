@@ -1848,3 +1848,20 @@ _write_h(file, dest, header, footer)
 PPCODE:
     CFCBindFile_write_h(file, dest, header, footer);
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Subroutine
+
+SV*
+_new(klass)
+    const char *klass
+CODE:
+    CFCPerlSub *self = CFCPerlSub_new(klass);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_destroy(self)
+    CFCPerlSub *self;
+PPCODE:
+    CFCPerlSub_destroy(self);
+

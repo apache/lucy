@@ -47,8 +47,7 @@ sub new {
     for (qw( param_list class_name alias retval_type )) {
         confess("$_ is required") unless defined $args{$_};
     }
-    my $empty = "";
-    my $self = bless \$empty, ref($either) || $either;
+    my $self = _new( ref($either) || $either );
     $param_list{$self}         = $args{param_list};
     $alias{$self}              = $args{alias};
     $class_name{$self}         = $args{class_name};
@@ -66,6 +65,7 @@ sub DESTROY {
     delete $retval_type{$self};
     delete $use_labeled_params{$self};
     delete $perl_name{$self};
+    $self->_destroy;
 }
 
 sub get_class_name     { $class_name{ +shift } }

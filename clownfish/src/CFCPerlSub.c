@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
+#define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
-
-#include "CFCBindCore.h"
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
-
 #include "CFCPerlSub.h"
+#include "CFCUtil.h"
+
+struct CFCPerlSub {
+    CFCBase base;
+};
+
+CFCPerlSub*
+CFCPerlSub_new(const char *class_name) {
+    CFCPerlSub *self
+        = (CFCPerlSub*)CFCBase_allocate(sizeof(CFCPerlSub), class_name);
+    return CFCPerlSub_init(self);
+}
+
+CFCPerlSub*
+CFCPerlSub_init(CFCPerlSub *self) {
+    return self;
+}
+
+void
+CFCPerlSub_destroy(CFCPerlSub *self) {
+    CFCBase_destroy((CFCBase*)self);
+}
+

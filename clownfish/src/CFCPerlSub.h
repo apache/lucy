@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
+#ifndef H_CFCPERLSUB
+#define H_CFCPERLSUB
 
-#include "CFCBindCore.h"
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "CFCPerlSub.h"
+typedef struct CFCPerlSub CFCPerlSub;
+
+CFCPerlSub*
+CFCPerlSub_new(const char *class_name);
+
+CFCPerlSub*
+CFCPerlSub_init(CFCPerlSub *self);
+
+void
+CFCPerlSub_destroy(CFCPerlSub *self);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CFCPERLSUB */
+
