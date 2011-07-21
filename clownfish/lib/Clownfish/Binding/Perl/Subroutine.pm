@@ -30,14 +30,12 @@ our %new_PARAMS = (
     param_list         => undef,
     alias              => undef,
     class_name         => undef,
-    retval_type        => undef,
     use_labeled_params => undef,
 );
 
 our %param_list;
 our %class_name;
 our %alias;
-our %retval_type;
 our %use_labeled_params;
 our %perl_name;
 
@@ -45,7 +43,7 @@ sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
     return _new( ref($either) || $either,
-        @args{qw( param_list class_name alias retval_type use_labeled_params )} );
+        @args{qw( param_list class_name alias use_labeled_params )} );
 }
 
 sub c_name {
@@ -211,7 +209,6 @@ functions and methods across the Perl/C barrier.
         param_list         => $param_list,           # required
         alias              => 'pinch',               # required
         class_name         => 'Crustacean::Claw',    # required
-        retval_type        => $type,                 # required
         use_labeled_params => 1,                     # default: false
     );
 
@@ -226,8 +223,6 @@ will be used to invoke the function.
 
 =item * B<class_name> - The name of the Perl class that the subroutine belongs
 to.
-
-=item * B<retval_type> - The return value's L<Type|Clownfish::Type>.
 
 =item * B<use_labeled_params> - True if the binding should take hash-style
 labeled parameters, false if it should take positional arguments.

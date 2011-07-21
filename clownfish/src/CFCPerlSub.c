@@ -18,7 +18,6 @@
 #include "CFCBase.h"
 #include "CFCPerlSub.h"
 #include "CFCUtil.h"
-#include "CFCType.h"
 #include "CFCParamList.h"
 
 struct CFCPerlSub {
@@ -26,7 +25,6 @@ struct CFCPerlSub {
     CFCParamList *param_list;
     char *class_name;
     char *alias;
-    CFCType *retval_type;
     int use_labeled_params;
     char *perl_name;
 };
@@ -34,25 +32,23 @@ struct CFCPerlSub {
 CFCPerlSub*
 CFCPerlSub_new(const char *klass, CFCParamList *param_list,
                const char *class_name, const char *alias,
-               CFCType *retval_type, int use_labeled_params) {
+               int use_labeled_params) {
     CFCPerlSub *self
         = (CFCPerlSub*)CFCBase_allocate(sizeof(CFCPerlSub), klass);
-    return CFCPerlSub_init(self, param_list, class_name, alias, retval_type,
+    return CFCPerlSub_init(self, param_list, class_name, alias,
                            use_labeled_params);
 }
 
 CFCPerlSub*
 CFCPerlSub_init(CFCPerlSub *self, CFCParamList *param_list,
                 const char *class_name, const char *alias,
-                CFCType *retval_type, int use_labeled_params) {
+                int use_labeled_params) {
     CFCUTIL_NULL_CHECK(param_list);
     CFCUTIL_NULL_CHECK(class_name);
     CFCUTIL_NULL_CHECK(alias);
-    CFCUTIL_NULL_CHECK(retval_type);
     self->param_list  = (CFCParamList*)CFCBase_incref((CFCBase*)param_list);
     self->class_name  = CFCUtil_strdup(class_name);
     self->alias       = CFCUtil_strdup(alias);
-    self->retval_type = (CFCType*)CFCBase_incref((CFCBase*)retval_type);
     self->use_labeled_params = use_labeled_params;
     self->perl_name = CFCUtil_cat(CFCUtil_strdup(class_name), "::", alias,
                                   NULL);
@@ -64,7 +60,6 @@ CFCPerlSub_destroy(CFCPerlSub *self) {
     CFCBase_decref((CFCBase*)self->param_list);
     FREEMEM(self->class_name);
     FREEMEM(self->alias);
-    CFCBase_decref((CFCBase*)self->retval_type);
     FREEMEM(self->perl_name);
     CFCBase_destroy((CFCBase*)self);
 }

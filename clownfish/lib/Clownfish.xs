@@ -1851,16 +1851,15 @@ PPCODE:
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Subroutine
 
 SV*
-_new(klass, param_list, class_name, alias, retval_type, use_labeled_params)
+_new(klass, param_list, class_name, alias, use_labeled_params)
     const char *klass;
     CFCParamList *param_list;
     const char *class_name;
     const char *alias;
-    CFCType *retval_type;
     int use_labeled_params;
 CODE:
     CFCPerlSub *self = CFCPerlSub_new(klass, param_list, class_name,
-                                      alias, retval_type, use_labeled_params);
+                                      alias, use_labeled_params);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL

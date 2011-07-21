@@ -42,7 +42,6 @@ sub new {
 
     my $self = $either->SUPER::new(
         param_list         => $func->get_param_list,
-        retval_type        => $func->get_return_type,
         class_name         => $class_name,
         use_labeled_params => 1,
         alias              => $alias,

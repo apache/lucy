@@ -35,7 +35,6 @@ sub new {
 
     # Derive arguments to SUPER constructor from supplied Method.
     my $method = delete $args{method};
-    $args{retval_type} ||= $method->get_return_type;
     $args{param_list}  ||= $method->get_param_list;
     $args{alias}       ||= $method->micro_sym;
     $args{class_name}  ||= $method->get_class_name;
