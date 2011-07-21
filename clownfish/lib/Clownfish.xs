@@ -1851,17 +1851,55 @@ PPCODE:
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Subroutine
 
 SV*
-_new(klass)
-    const char *klass
+_new(klass, param_list, class_name, alias, retval_type, use_labeled_params)
+    const char *klass;
+    CFCParamList *param_list;
+    const char *class_name;
+    const char *alias;
+    CFCType *retval_type;
+    int use_labeled_params;
 CODE:
-    CFCPerlSub *self = CFCPerlSub_new(klass);
+    CFCPerlSub *self = CFCPerlSub_new(klass, param_list, class_name,
+                                      alias, retval_type, use_labeled_params);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 void
-_destroy(self)
+DESTROY(self)
     CFCPerlSub *self;
 PPCODE:
     CFCPerlSub_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCPerlSub *self;
+ALIAS:
+    get_class_name     = 2
+    use_labeled_params = 4
+    perl_name          = 6
+    get_param_list     = 8
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *value = CFCPerlSub_get_class_name(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 4:
+            retval = newSViv(CFCPerlSub_use_labeled_params(self));
+            break;
+        case 6: {
+                const char *value = CFCPerlSub_perl_name(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 8: {
+                CFCParamList *value = CFCPerlSub_get_param_list(self);
+                retval = S_cfcbase_to_perlref(value);
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
 

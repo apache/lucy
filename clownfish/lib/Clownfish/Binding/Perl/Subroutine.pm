@@ -44,34 +44,9 @@ our %perl_name;
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    for (qw( param_list class_name alias retval_type )) {
-        confess("$_ is required") unless defined $args{$_};
-    }
-    my $self = _new( ref($either) || $either );
-    $param_list{$self}         = $args{param_list};
-    $alias{$self}              = $args{alias};
-    $class_name{$self}         = $args{class_name};
-    $retval_type{$self}        = $args{retval_type};
-    $use_labeled_params{$self} = $args{use_labeled_params};
-    $perl_name{$self}          = "$args{class_name}::$args{alias}";
-    return $self;
+    return _new( ref($either) || $either,
+        @args{qw( param_list class_name alias retval_type use_labeled_params )} );
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $param_list{$self};
-    delete $class_name{$self};
-    delete $alias{$self};
-    delete $retval_type{$self};
-    delete $use_labeled_params{$self};
-    delete $perl_name{$self};
-    $self->_destroy;
-}
-
-sub get_class_name     { $class_name{ +shift } }
-sub use_labeled_params { $use_labeled_params{ +shift } }
-sub perl_name          { $perl_name{ +shift } }
-sub get_param_list     { $param_list{ +shift } }
 
 sub c_name {
     my $self   = shift;

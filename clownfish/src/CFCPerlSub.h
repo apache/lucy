@@ -22,15 +22,33 @@ extern "C" {
 #endif
 
 typedef struct CFCPerlSub CFCPerlSub;
+struct CFCParamList;
+struct CFCType;
 
 CFCPerlSub*
-CFCPerlSub_new(const char *class_name);
+CFCPerlSub_new(const char *klass, struct CFCParamList *param_list,
+               const char *class_name, const char *alias,
+               struct CFCType *retval_type, int use_labeled_params);
 
 CFCPerlSub*
-CFCPerlSub_init(CFCPerlSub *self);
+CFCPerlSub_init(CFCPerlSub *self, struct CFCParamList *param_list,
+                const char *class_name, const char *alias,
+                struct CFCType *retval_type, int use_labeled_params);
 
 void
 CFCPerlSub_destroy(CFCPerlSub *self);
+
+struct CFCParamList*
+CFCPerlSub_get_param_list(CFCPerlSub *self);
+
+const char*
+CFCPerlSub_get_class_name(CFCPerlSub *self);
+
+int
+CFCPerlSub_use_labeled_params(CFCPerlSub *self);
+
+const char*
+CFCPerlSub_perl_name(CFCPerlSub *self);
 
 #ifdef __cplusplus
 }
