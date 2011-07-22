@@ -18,7 +18,6 @@ use warnings;
 
 package Clownfish::Binding::Perl::Subroutine;
 use Carp;
-use Scalar::Util qw( blessed );
 use Clownfish::Class;
 use Clownfish::Function;
 use Clownfish::Method;
@@ -32,12 +31,6 @@ our %new_PARAMS = (
     class_name         => undef,
     use_labeled_params => undef,
 );
-
-our %param_list;
-our %class_name;
-our %alias;
-our %use_labeled_params;
-our %perl_name;
 
 sub new {
     my ( $either, %args ) = @_;
