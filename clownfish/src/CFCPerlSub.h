@@ -37,6 +37,9 @@ CFCPerlSub_init(CFCPerlSub *self, struct CFCParamList *param_list,
 void
 CFCPerlSub_destroy(CFCPerlSub *self);
 
+char*
+CFCPerlSub_params_hash_def(CFCPerlSub *self);
+
 struct CFCParamList*
 CFCPerlSub_get_param_list(CFCPerlSub *self);
 

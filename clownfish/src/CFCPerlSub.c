@@ -20,6 +20,7 @@
 #include "CFCPerlSub.h"
 #include "CFCUtil.h"
 #include "CFCParamList.h"
+#include "CFCVariable.h"
 
 struct CFCPerlSub {
     CFCBase base;
@@ -84,6 +85,44 @@ CFCPerlSub_destroy(CFCPerlSub *self) {
     CFCBase_destroy((CFCBase*)self);
 }
 
+char*
+CFCPerlSub_params_hash_def(CFCPerlSub *self)
+{
+    if (!self->use_labeled_params) {
+        return NULL;
+    }
+
+    char *def = CFCUtil_strdup("");
+    def = CFCUtil_cat(def, "%", self->perl_name, "_PARAMS = (", NULL);
+
+    CFCVariable **arg_vars = CFCParamList_get_variables(self->param_list);
+    const char **vals = CFCParamList_get_initial_values(self->param_list);
+
+    // No labeled params means an empty params hash def.
+    if (!arg_vars[1]) {
+        def = CFCUtil_cat(def, ");\n", NULL);
+        return def;
+    }
+
+    for (int i = 1; arg_vars[i] != NULL; i++) {
+        CFCVariable *var = arg_vars[i];
+        const char *micro_sym = CFCVariable_micro_sym(var);
+        const char *val = vals[i];
+        val = val == NULL
+              ? "undef"
+              : strcmp(val, "NULL") == 0
+              ? "undef"
+              : strcmp(val, "true") == 0
+              ? "1"
+              : strcmp(val, "false") == 0
+              ? "0"
+              : val;
+        def = CFCUtil_cat(def, "\n    ", micro_sym, " => ", val, ",", NULL);
+    }
+    def = CFCUtil_cat(def, "\n);\n", NULL);
+
+    return def;
+}
 
 CFCParamList*
 CFCPerlSub_get_param_list(CFCPerlSub *self) {

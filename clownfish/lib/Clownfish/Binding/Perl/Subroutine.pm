@@ -46,41 +46,6 @@ sub new {
         @args{qw( param_list class_name alias use_labeled_params )} );
 }
 
-my %params_hash_vals_map = (
-    NULL  => 'undef',
-    true  => 1,
-    false => 0,
-);
-
-sub params_hash_def {
-    my $self = shift;
-    return unless $self->use_labeled_params;
-
-    my $params_hash_name = $self->perl_name . "_PARAMS";
-    my $arg_vars         = $self->get_param_list->get_variables;
-    my $vals             = $self->get_param_list->get_initial_values;
-    my @pairs;
-    for ( my $i = 1; $i < @$arg_vars; $i++ ) {
-        my $var = $arg_vars->[$i];
-        my $val = $vals->[$i];
-        if ( !defined $val ) {
-            $val = 'undef';
-        }
-        elsif ( exists $params_hash_vals_map{$val} ) {
-            $val = $params_hash_vals_map{$val};
-        }
-        push @pairs, $var->micro_sym . " => $val,";
-    }
-
-    if (@pairs) {
-        my $list = join( "\n    ", @pairs );
-        return qq|\%$params_hash_name = (\n    $list\n);\n|;
-    }
-    else {
-        return qq|\%$params_hash_name = ();\n|;
-    }
-}
-
 my %prim_type_to_allot_macro = (
     double     => 'ALLOT_F64',
     float      => 'ALLOT_F32',
