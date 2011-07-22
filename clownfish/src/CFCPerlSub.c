@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <string.h>
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCPerlSub.h"
@@ -27,6 +28,7 @@ struct CFCPerlSub {
     char *alias;
     int use_labeled_params;
     char *perl_name;
+    char *c_name;
 };
 
 CFCPerlSub*
@@ -52,6 +54,23 @@ CFCPerlSub_init(CFCPerlSub *self, CFCParamList *param_list,
     self->use_labeled_params = use_labeled_params;
     self->perl_name = CFCUtil_cat(CFCUtil_strdup(class_name), "::", alias,
                                   NULL);
+
+    size_t c_name_len = strlen(self->perl_name) + sizeof("XS_") + 1;
+    self->c_name = (char*)MALLOCATE(c_name_len);
+    int j = 3;
+    memcpy(self->c_name, "XS_", j);
+    for (int i = 0, max = strlen(self->perl_name); i < max; i++) {
+        char c = self->perl_name[i];
+        if (c == ':') {
+            while (self->perl_name[i + 1] == ':') { i++; }
+            self->c_name[j++] = '_';
+        }
+        else {
+            self->c_name[j++] = c;
+        }
+    }
+    self->c_name[j] = 0; // NULL-terminate.
+
     return self;
 }
 
@@ -61,8 +80,10 @@ CFCPerlSub_destroy(CFCPerlSub *self) {
     FREEMEM(self->class_name);
     FREEMEM(self->alias);
     FREEMEM(self->perl_name);
+    FREEMEM(self->c_name);
     CFCBase_destroy((CFCBase*)self);
 }
+
 
 CFCParamList*
 CFCPerlSub_get_param_list(CFCPerlSub *self) {
@@ -87,5 +108,15 @@ CFCPerlSub_use_labeled_params(CFCPerlSub *self) {
 const char*
 CFCPerlSub_perl_name(CFCPerlSub *self) {
     return self->perl_name;
+}
+
+const char*
+CFCPerlSub_c_name(CFCPerlSub *self) {
+    return self->c_name;
+}
+
+const char*
+CFCPerlSub_c_name_list(CFCPerlSub *self) {
+    return CFCParamList_name_list(self->param_list);
 }
 

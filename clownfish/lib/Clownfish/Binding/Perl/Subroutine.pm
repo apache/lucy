@@ -46,18 +46,6 @@ sub new {
         @args{qw( param_list class_name alias use_labeled_params )} );
 }
 
-sub c_name {
-    my $self   = shift;
-    my $c_name = "XS_" . $self->perl_name;
-    $c_name =~ s/:+/_/g;
-    return $c_name;
-}
-
-sub c_name_list {
-    my $self = shift;
-    return $self->get_param_list->name_list;
-}
-
 my %params_hash_vals_map = (
     NULL  => 'undef',
     true  => 1,

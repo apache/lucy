@@ -1878,6 +1878,8 @@ ALIAS:
     use_labeled_params = 4
     perl_name          = 6
     get_param_list     = 8
+    c_name             = 10
+    c_name_list        = 12
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -1897,6 +1899,16 @@ PPCODE:
         case 8: {
                 CFCParamList *value = CFCPerlSub_get_param_list(self);
                 retval = S_cfcbase_to_perlref(value);
+            }
+            break;
+        case 10: {
+                const char *value = CFCPerlSub_c_name(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 12: {
+                const char *value = CFCPerlSub_c_name_list(self);
+                retval = newSVpvn(value, strlen(value));
             }
             break;
     END_SET_OR_GET_SWITCH

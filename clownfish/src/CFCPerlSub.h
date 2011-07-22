@@ -49,6 +49,12 @@ CFCPerlSub_use_labeled_params(CFCPerlSub *self);
 const char*
 CFCPerlSub_perl_name(CFCPerlSub *self);
 
+const char*
+CFCPerlSub_c_name(CFCPerlSub *self);
+
+const char*
+CFCPerlSub_c_name_list(CFCPerlSub *self);
+
 #ifdef __cplusplus
 }
 #endif
