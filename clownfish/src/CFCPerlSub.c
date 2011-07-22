@@ -15,12 +15,19 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCPerlSub.h"
 #include "CFCUtil.h"
 #include "CFCParamList.h"
 #include "CFCVariable.h"
+#include "CFCType.h"
+
+#ifndef true
+    #define true 1
+    #define false 0
+#endif
 
 struct CFCPerlSub {
     CFCBase base;
@@ -122,6 +129,138 @@ CFCPerlSub_params_hash_def(CFCPerlSub *self)
     def = CFCUtil_cat(def, "\n);\n", NULL);
 
     return def;
+}
+
+struct allot_macro_map {
+    char *prim_type;
+    char *allot_macro;
+};
+
+struct allot_macro_map prim_type_to_allot_macro[] = {
+    { "double",     "ALLOT_F64"    },
+    { "float",      "ALLOT_F32"    },
+    { "int",        "ALLOT_INT"    },
+    { "short",      "ALLOT_SHORT"  },
+    { "long",       "ALLOT_LONG"   },
+    { "size_t",     "ALLOT_SIZE_T" },
+    { "uint64_t",   "ALLOT_U64"    },
+    { "uint32_t",   "ALLOT_U32"    },
+    { "uint16_t",   "ALLOT_U16"    },
+    { "uint8_t",    "ALLOT_U8"     },
+    { "int64_t",    "ALLOT_I64"    },
+    { "int32_t",    "ALLOT_I32"    },
+    { "int16_t",    "ALLOT_I16"    },
+    { "int8_t",     "ALLOT_I8"     },
+    { "chy_bool_t", "ALLOT_BOOL"   },
+    { NULL, NULL }
+};
+
+static char*
+S_allot_params_arg(CFCType *type, const char *label, int required) {
+    const char *type_c_string = CFCType_to_c(type);
+    unsigned label_len = strlen(label);
+    const char *req_string = required ? "true" : "false";
+
+    if (CFCType_is_object(type)) {
+        const char *struct_sym = CFCType_get_specifier(type);
+        const char *vtable_var = CFCType_get_vtable_var(type);
+
+        // Share buffers rather than copy between Perl scalars and Clownfish
+        // string types.
+        int use_sv_buffer = false;
+        if (strcmp(struct_sym, "lucy_CharBuf") == 0
+            || strcmp(struct_sym, "cfish_CharBuf") == 0
+            || strcmp(struct_sym, "lucy_Obj") == 0
+            || strcmp(struct_sym, "cfish_Obj") == 0
+           ) {
+            use_sv_buffer = true;
+        }
+        const char *zcb_allocation = use_sv_buffer
+                                     ? "alloca(cfish_ZCB_size())"
+                                     : "NULL";
+        const char pattern[] = "ALLOT_OBJ(&%s, \"%s\", %u, %s, %s, %s)";
+        size_t size = sizeof(pattern)
+                      + label_len * 2
+                      + 20
+                      + 5
+                      + strlen(vtable_var)
+                      + strlen(zcb_allocation)
+                      + 50;
+        char *arg = MALLOCATE(size);
+        sprintf(arg, pattern, label, label, label_len, req_string, vtable_var,
+                zcb_allocation);
+        return arg;
+    }
+    else if (CFCType_is_primitive(type)) {
+        for (int i = 0; prim_type_to_allot_macro[i].prim_type != NULL; i++) {
+            const char *prim_type = prim_type_to_allot_macro[i].prim_type;
+            if (strcmp(prim_type, type_c_string) == 0) {
+                const char *allot = prim_type_to_allot_macro[i].allot_macro;
+                char pattern[] = "%s(&%s, \"%s\", %u, %s)"; 
+                size_t size = sizeof(pattern)
+                              + strlen(allot)
+                              + label_len * 2
+                              + 20
+                              + 5
+                              + 20; // extra
+                char *arg = (char*)MALLOCATE(size);
+                sprintf(arg, pattern, allot, label, label, label_len,
+                        req_string);
+                return arg;
+            }
+        }
+    }
+
+    CFCUtil_die("Missing typemap for %s", type_c_string);
+}
+
+char*
+CFCPerlSub_build_allot_params(CFCPerlSub *self) {
+    CFCParamList *param_list = self->param_list;
+    CFCVariable **arg_vars   = CFCParamList_get_variables(param_list);
+    const char  **arg_inits  = CFCParamList_get_initial_values(param_list);
+    size_t        num_vars   = CFCParamList_num_vars(param_list);
+    char *allot_params = CFCUtil_strdup("");
+
+    // Declare variables and assign default values.
+    for (int i = 1; i < num_vars; i++) {
+        CFCVariable *arg_var = arg_vars[i];
+        const char  *val     = arg_inits[i];
+        const char  *local_c = CFCVariable_local_c(arg_var);
+        if (val == NULL) {
+            CFCType *arg_type = CFCVariable_get_type(arg_var);
+            val = CFCType_is_object(arg_type)
+                  ? "NULL"
+                  : "0";
+            allot_params = CFCUtil_cat(allot_params, local_c, " = ", val,
+                                       ";\n     ", NULL);
+        }
+    }
+
+    // Iterate over args in param list.
+    allot_params
+        = CFCUtil_cat(allot_params,
+                      "chy_bool_t args_ok = XSBind_allot_params(\n"
+                      "        &(ST(0)), 1, items, \"",
+                      self->perl_name, "_PARAMS\",\n", NULL);
+    for (int i = 1; i < num_vars; i++) {
+        CFCVariable *var = arg_vars[i];
+        const char  *val = arg_inits[i];
+        int required = val ? 0 : 1;
+        const char *name = CFCVariable_micro_sym(var);
+        CFCType *type = CFCVariable_get_type(var);
+        char *arg = S_allot_params_arg(type, name, required);
+        allot_params
+            = CFCUtil_cat(allot_params, "        ", arg, ",\n", NULL);
+        FREEMEM(arg);
+    }
+    allot_params
+        = CFCUtil_cat(allot_params, "        NULL);\n", 
+                      "    if (!args_ok) {\n"
+                      "        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));\n"
+                      "    }\n", NULL);
+
+    return allot_params;
 }
 
 CFCParamList*

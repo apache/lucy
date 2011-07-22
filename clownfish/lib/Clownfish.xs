@@ -1921,3 +1921,10 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCPerlSub_params_hash_def(self));
 OUTPUT: RETVAL
 
+SV*
+build_allot_params(self)
+    CFCPerlSub *self;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCPerlSub_build_allot_params(self));
+OUTPUT: RETVAL
+

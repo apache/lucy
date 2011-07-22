@@ -23,6 +23,7 @@ extern "C" {
 
 typedef struct CFCPerlSub CFCPerlSub;
 struct CFCParamList;
+struct CFCType;
 
 CFCPerlSub*
 CFCPerlSub_new(const char *klass, struct CFCParamList *param_list,
@@ -39,6 +40,9 @@ CFCPerlSub_destroy(CFCPerlSub *self);
 
 char*
 CFCPerlSub_params_hash_def(CFCPerlSub *self);
+
+char*
+CFCPerlSub_build_allot_params(CFCPerlSub *self);
 
 struct CFCParamList*
 CFCPerlSub_get_param_list(CFCPerlSub *self);
