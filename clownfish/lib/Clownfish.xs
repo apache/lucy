@@ -1928,6 +1928,40 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCPerlSub_build_allot_params(self));
 OUTPUT: RETVAL
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Method
+
+SV*
+_new(method, alias)
+    CFCMethod *method;
+    const char *alias;
+CODE:
+    CFCPerlMethod *self = CFCPerlMethod_new(method, alias);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCPerlMethod *self;
+PPCODE:
+    CFCPerlMethod_destroy(self);
+
+void
+_set_or_get(self, ...)
+    CFCPerlMethod *self;
+ALIAS:
+    _get_method        = 2
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                CFCMethod *value = CFCPerlMethod_get_method(self);
+                retval = S_cfcbase_to_perlref(value);
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Class
 

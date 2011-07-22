@@ -17,8 +17,9 @@
 #include <string.h>
 #include <stdio.h>
 #define CFC_NEED_BASE_STRUCT_DEF
-#include "CFCBase.h"
+#define CFC_NEED_PERLSUB_STRUCT_DEF
 #include "CFCPerlSub.h"
+#include "CFCBase.h"
 #include "CFCUtil.h"
 #include "CFCParamList.h"
 #include "CFCVariable.h"
@@ -28,16 +29,6 @@
     #define true 1
     #define false 0
 #endif
-
-struct CFCPerlSub {
-    CFCBase base;
-    CFCParamList *param_list;
-    char *class_name;
-    char *alias;
-    int use_labeled_params;
-    char *perl_name;
-    char *c_name;
-};
 
 CFCPerlSub*
 CFCPerlSub_new(const char *klass, CFCParamList *param_list,

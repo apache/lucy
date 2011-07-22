@@ -14,30 +14,32 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
+#ifndef H_CFCPERLMETHOD
+#define H_CFCPERLMETHOD
 
-#include "CFCBindCore.h"
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "CFCPerlSub.h"
-#include "CFCPerlMethod.h"
-#include "CFCPerlClass.h"
+typedef struct CFCPerlMethod CFCPerlMethod;
+struct CFCMethod;
+
+CFCPerlMethod*
+CFCPerlMethod_new(struct CFCMethod *method, const char *alias);
+
+CFCPerlMethod*
+CFCPerlMethod_init(CFCPerlMethod *self, struct CFCMethod *method,
+                   const char *alias);
+
+void
+CFCPerlMethod_destroy(CFCPerlMethod *self);
+
+struct CFCMethod*
+CFCPerlMethod_get_method(CFCPerlMethod *self);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CFCPERLMETHOD */
 

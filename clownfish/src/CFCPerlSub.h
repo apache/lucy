@@ -25,6 +25,20 @@ typedef struct CFCPerlSub CFCPerlSub;
 struct CFCParamList;
 struct CFCType;
 
+#ifdef CFC_NEED_PERLSUB_STRUCT_DEF
+#define CFC_NEED_BASE_STRUCT_DEF
+#include "CFCBase.h"
+struct CFCPerlSub {
+    CFCBase base;
+    struct CFCParamList *param_list;
+    char *class_name;
+    char *alias;
+    int use_labeled_params;
+    char *perl_name;
+    char *c_name;
+};
+#endif
+
 CFCPerlSub*
 CFCPerlSub_new(const char *klass, struct CFCParamList *param_list,
                const char *class_name, const char *alias,

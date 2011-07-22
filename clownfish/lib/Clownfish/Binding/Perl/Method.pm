@@ -27,36 +27,11 @@ our %new_PARAMS = (
     alias  => undef,
 );
 
-our %method;
-
 sub new {
     my ( $either, %args ) = @_;
     confess $@ unless verify_args( \%new_PARAMS, %args );
-
-    # Derive arguments to SUPER constructor from supplied Method.
-    my $method = delete $args{method};
-    $args{param_list}  ||= $method->get_param_list;
-    $args{alias}       ||= $method->micro_sym;
-    $args{class_name}  ||= $method->get_class_name;
-    if ( !defined $args{use_labeled_params} ) {
-        $args{use_labeled_params}
-            = $method->get_param_list->num_vars > 2
-            ? 1
-            : 0;
-    }
-    my $self = $either->SUPER::new(%args);
-    $method{$self} = $method;
-
-    return $self;
+    return _new( @args{qw( method alias )} );
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $method{$self};
-    $self->SUPER::DESTROY;
-}
-
-sub _get_method { $method{ +shift } }
 
 sub xsub_def {
     my $self = shift;
