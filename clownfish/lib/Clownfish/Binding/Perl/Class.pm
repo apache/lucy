@@ -66,8 +66,7 @@ sub register {
     }
 
     # Create object.
-    my $empty = "";
-    my $self = bless \$empty, ref($either) || $either;
+    my $self = _new();
     $parcel{$self}            = $args{parcel};
     $class_name{$self}        = $args{class_name};
     $bind_methods{$self}      = $args{bind_methods};
@@ -91,6 +90,7 @@ sub DESTROY {
     delete $make_pod{$self};
     delete $xs_code{$self};
     delete $client{$self};
+    _destroy($self);
 }
 
 sub get_class_name        { $class_name{ +shift } }

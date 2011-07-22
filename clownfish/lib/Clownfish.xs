@@ -1928,3 +1928,20 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCPerlSub_build_allot_params(self));
 OUTPUT: RETVAL
 
+
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Class
+
+SV*
+_new()
+CODE:
+    CFCPerlClass *self = CFCPerlClass_new();
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_destroy(self)
+    CFCPerlClass *self;
+PPCODE:
+    CFCPerlClass_destroy(self);
+

@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
+#define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
-
-#include "CFCBindCore.h"
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
-
-#include "CFCPerlSub.h"
 #include "CFCPerlClass.h"
+#include "CFCUtil.h"
+
+struct CFCPerlClass {
+    CFCBase base;
+};
+
+CFCPerlClass*
+CFCPerlClass_new(void) {
+    CFCPerlClass *self
+        = (CFCPerlClass*)CFCBase_allocate(sizeof(CFCPerlClass),
+                                          "Clownfish::Binding::Perl::Class");
+    return CFCPerlClass_init(self);
+}
+
+CFCPerlClass*
+CFCPerlClass_init(CFCPerlClass *self) {
+    return self;
+}
+
+void
+CFCPerlClass_destroy(CFCPerlClass *self) {
+    CFCBase_destroy((CFCBase*)self);
+}
 
