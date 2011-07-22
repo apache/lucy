@@ -22,15 +22,30 @@ extern "C" {
 #endif
 
 typedef struct CFCPerlClass CFCPerlClass;
+struct CFCParcel;
+struct CFCClass;
 
 CFCPerlClass*
-CFCPerlClass_new(void);
+CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name,
+                 struct CFCClass *client, const char *xs_code);
 
 CFCPerlClass*
-CFCPerlClass_init(CFCPerlClass *self);
+CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
+                  const char *class_name, struct CFCClass *client,
+                  const char *xs_code);
 
 void
 CFCPerlClass_destroy(CFCPerlClass *self);
+
+struct CFCClass*
+CFCPerlClass_get_client(CFCPerlClass *self);
+
+const char*
+CFCPerlClass_get_class_name(CFCPerlClass *self);
+
+const char*
+CFCPerlClass_get_xs_code(CFCPerlClass *self);
+
 
 #ifdef __cplusplus
 }

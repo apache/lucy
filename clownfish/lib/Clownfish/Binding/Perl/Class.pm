@@ -33,17 +33,14 @@ our %register_PARAMS = (
     client            => undef,
 );
 
-our %parcel;
-our %class_name;
 our %bind_methods;
 our %bind_constructors;
 our %make_pod;
-our %xs_code;
-our %client;
 
 sub register {
     my ( $either, %args ) = @_;
     verify_args( \%register_PARAMS, %args ) or confess $@;
+    $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
 
     # Validate.
     confess("Missing required param 'class_name'")
@@ -66,14 +63,10 @@ sub register {
     }
 
     # Create object.
-    my $self = _new();
-    $parcel{$self}            = $args{parcel};
-    $class_name{$self}        = $args{class_name};
+    my $self = _new( @args{qw( parcel class_name client xs_code ) } );
     $bind_methods{$self}      = $args{bind_methods};
     $bind_constructors{$self} = $args{bind_constructors};
     $make_pod{$self}          = $args{make_pod};
-    $xs_code{$self}           = $args{xs_code};
-    $client{$self}            = $args{client};
 
     # Add to registry.
     $registry{ $args{class_name} } = $self;
@@ -83,22 +76,15 @@ sub register {
 
 sub DESTROY {
     my $self = shift;
-    delete $parcel{$self};
-    delete $class_name{$self};
     delete $bind_methods{$self};
     delete $bind_constructors{$self};
     delete $make_pod{$self};
-    delete $xs_code{$self};
-    delete $client{$self};
     _destroy($self);
 }
 
-sub get_class_name        { $class_name{ +shift } }
 sub get_bind_methods      { $bind_methods{ +shift } }
 sub get_bind_constructors { $bind_constructors{ +shift } }
 sub get_make_pod          { $make_pod{ +shift } }
-sub get_client            { $client{ +shift } }
-sub get_xs_code           { $xs_code{ +shift } }
 
 sub constructor_bindings {
     my $self  = shift;
