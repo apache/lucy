@@ -52,11 +52,11 @@ CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel, const char *class_name,
 
 void
 CFCPerlClass_destroy(CFCPerlClass *self) {
-    CFCBase_destroy((CFCBase*)self);
     CFCBase_decref((CFCBase*)self->parcel);
     CFCBase_decref((CFCBase*)self->client);
     FREEMEM(self->class_name);
     FREEMEM(self->xs_code);
+    CFCBase_destroy((CFCBase*)self);
 }
 
 CFCClass*
