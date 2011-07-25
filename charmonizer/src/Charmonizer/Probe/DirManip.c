@@ -18,7 +18,6 @@
 
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Compiler.h"
-#include "Charmonizer/Core/Dir.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/HeaderChecker.h"
@@ -26,6 +25,99 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+static int   mkdir_num_args  = 0;
+static int   mkdir_available = 0;
+static char  mkdir_command_buf[7];
+static char *mkdir_command = mkdir_command_buf;
+static int   rmdir_available = 0;
+
+/* Source code for standard POSIX mkdir */
+static const char posix_mkdir_code[] =
+    QUOTE(  #include <%s>                                          )
+    QUOTE(  int main(int argc, char **argv) {                      )
+    QUOTE(      if (argc != 2) { return 1; }                       )
+    QUOTE(      if (mkdir(argv[1], 0777) != 0) { return 2; }       )
+    QUOTE(      return 0;                                          )
+    QUOTE(  }                                                      );
+
+/* Source code for Windows _mkdir. */
+static const char win_mkdir_code[] =
+    QUOTE(  #include <direct.h>                                    )
+    QUOTE(  int main(int argc, char **argv) {                      )
+    QUOTE(      if (argc != 2) { return 1; }                       )
+    QUOTE(      if (_mkdir(argv[1]) != 0) { return 2; }            )
+    QUOTE(      return 0;                                          )
+    QUOTE(  }                                                      );
+
+/* Source code for rmdir. */
+static const char rmdir_code[] =
+    QUOTE(  #include <%s>                                          )
+    QUOTE(  int main(int argc, char **argv) {                      )
+    QUOTE(      if (argc != 2) { return 1; }                       )
+    QUOTE(      if (rmdir(argv[1]) != 0) { return 2; }             )
+    QUOTE(      return 0;                                          )
+    QUOTE(  }                                                      );
+
+static chaz_bool_t
+S_compile_posix_mkdir(const char *header) {
+    size_t needed = sizeof(posix_mkdir_code) + 30;
+    char *code_buf = (char*)malloc(needed);
+
+    /* Attempt compilation. */
+    sprintf(code_buf, posix_mkdir_code, header);
+    mkdir_available = CC_test_compile(code_buf, strlen(code_buf));
+
+    /* Set vars on success. */
+    if (mkdir_available) {
+        strcpy(mkdir_command, "mkdir");
+        if (strcmp(header, "direct.h") == 0) {
+            mkdir_num_args = 1;
+        }
+        else {
+            mkdir_num_args = 2;
+        }
+    }
+
+    free(code_buf);
+    return mkdir_available;
+}
+
+static chaz_bool_t
+S_compile_win_mkdir(void) {
+    mkdir_available = CC_test_compile(win_mkdir_code, strlen(win_mkdir_code));
+    if (mkdir_available) {
+        strcpy(mkdir_command, "_mkdir");
+        mkdir_num_args = 1;
+    }
+    return mkdir_available;
+}
+
+static void
+S_try_mkdir(void) {
+    if (HeadCheck_check_header("windows.h")) {
+        if (S_compile_win_mkdir())               { return; }
+        if (S_compile_posix_mkdir("direct.h"))   { return; }
+    }
+    if (S_compile_posix_mkdir("sys/stat.h")) { return; }
+}
+
+static chaz_bool_t
+S_compile_rmdir(const char *header) {
+    size_t needed = sizeof(posix_mkdir_code) + 30;
+    char *code_buf = (char*)malloc(needed);
+    sprintf(code_buf, rmdir_code, header);
+    rmdir_available = CC_test_compile(code_buf, strlen(code_buf));
+    free(code_buf);
+    return rmdir_available;
+}
+
+static void
+S_try_rmdir(void) {
+    if (S_compile_rmdir("unistd.h"))   { return; }
+    if (S_compile_rmdir("dirent.h"))   { return; }
+    if (S_compile_rmdir("direct.h"))   { return; }
+}
 
 static const char cygwin_code[] =
     QUOTE(#ifndef __CYGWIN__            )
@@ -44,7 +136,8 @@ DirManip_run(void) {
     chaz_bool_t has_dirent_d_type   = false;
 
     ConfWriter_start_module("DirManip");
-    Dir_init();
+    S_try_mkdir();
+    S_try_rmdir();
 
     /* Header checks. */
     if (has_dirent_h) {
@@ -72,16 +165,16 @@ DirManip_run(void) {
         }
     }
 
-    if (Dir_mkdir_num_args == 2) {
+    if (mkdir_num_args == 2) {
         /* It's two args, but the command isn't "mkdir". */
         ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir, _mode)\n",
-                               Dir_mkdir_command);
+                               mkdir_command);
         ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 0\n");
     }
-    else if (Dir_mkdir_num_args == 1) {
+    else if (mkdir_num_args == 1) {
         /* It's one arg... mode arg will be ignored. */
         ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir)\n",
-                               Dir_mkdir_command);
+                               mkdir_command);
         ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 1\n");
     }
 

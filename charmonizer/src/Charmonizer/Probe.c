@@ -22,7 +22,6 @@
 #include "Charmonizer/Probe.h"
 #include "Charmonizer/Core/HeaderChecker.h"
 #include "Charmonizer/Core/ConfWriter.h"
-#include "Charmonizer/Core/Dir.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/OperatingSystem.h"
@@ -64,7 +63,6 @@ Probe_clean_up(void) {
     S_remove_charm_h();
     ConfWriter_clean_up();
     Stat_clean_up();
-    Dir_clean_up();
     CC_clean_up();
     OS_clean_up();
 
