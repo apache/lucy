@@ -285,6 +285,11 @@ CFCMethod_get_macro_sym(CFCMethod *self) {
     return self->macro_sym;
 }
 
+const char*
+CFCMethod_micro_sym(CFCMethod *self) {
+    return CFCSymbol_micro_sym((CFCSymbol*)self);
+}
+
 static void
 S_update_typedefs(CFCMethod *self, const char *short_sym) {
     FREEMEM(self->short_typedef);

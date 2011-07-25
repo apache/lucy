@@ -80,6 +80,9 @@ const char*
 CFCMethod_get_macro_sym(CFCMethod *self);
 
 const char*
+CFCMethod_micro_sym(CFCMethod *self);
+
+const char*
 CFCMethod_short_typedef(CFCMethod *self);
 
 const char*
