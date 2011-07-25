@@ -37,17 +37,6 @@ chaz_Dir_init(void);
 void
 chaz_Dir_clean_up(void);
 
-/* Attempt to create a directory.  Returns true on success, false on failure.
- */
-chaz_bool_t
-chaz_Dir_mkdir(const char *filepath);
-
-/* Attempt to remove a directory, which must be empty.  Returns true on
- * success, false on failure.
- */
-chaz_bool_t
-chaz_Dir_rmdir(const char *filepath);
-
 /* The string command for mkdir. */
 extern char* chaz_Dir_mkdir_command;
 
@@ -57,8 +46,6 @@ extern int chaz_Dir_mkdir_num_args;
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Dir_init              chaz_Dir_init
   #define Dir_clean_up          chaz_Dir_clean_up
-  #define Dir_mkdir             chaz_Dir_mkdir
-  #define Dir_rmdir             chaz_Dir_rmdir
   #define Dir_mkdir_command     chaz_Dir_mkdir_command
   #define Dir_mkdir_num_args    chaz_Dir_mkdir_num_args
 #endif

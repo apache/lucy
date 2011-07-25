@@ -28,10 +28,12 @@
 static char dev_null[20] = "";
 
 #ifdef _WIN32
+#define SHELL_IS_CMD_EXE
 static const char *exe_ext = ".exe";
 static const char *obj_ext = ".obj";
 static const char *local_command_start = ".\\";
 #else
+#define SHELL_IS_POSIX
 static const char *exe_ext = "";
 static const char *obj_ext = "";
 static const char *local_command_start = "./";
@@ -228,4 +230,29 @@ OS_run_quietly(const char *command) {
     return retval;
 }
 
+void
+OS_mkdir(const char *filepath) {
+    #if (defined(SHELL_IS_POSIX) || defined (SHELL_IS_CMD_EXE))
+    char *mkdir_command = "mkdir";
+    #endif
+    unsigned size = strlen(mkdir_command) + 1 + strlen (filepath) + 1;
+    char *command = (char*)malloc(size);
+    sprintf(command, "%s %s", mkdir_command, filepath);
+    OS_run_quietly(command);
+    free(command);
+}
+
+void
+OS_rmdir(const char *filepath) {
+    #ifdef SHELL_IS_POSIX
+    char *rmdir_command = "rmdir";
+    #elif defined(SHELL_IS_CMD_EXE)
+    char *rmdir_command = "rmdir /q";
+    #endif
+    unsigned size = strlen(rmdir_command) + 1 + strlen (filepath) + 1;
+    char *command = (char*)malloc(size);
+    sprintf(command, "%s %s", rmdir_command, filepath);
+    OS_run_quietly(command);
+    free(command);
+}
 

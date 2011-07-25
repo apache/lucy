@@ -19,6 +19,7 @@
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/Dir.h"
+#include "Charmonizer/Core/OperatingSystem.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/HeaderChecker.h"
 #include "Charmonizer/Probe/DirManip.h"
@@ -97,12 +98,12 @@ DirManip_run(void) {
     ConfWriter_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
 
     /* See whether remove works on directories. */
-    Dir_mkdir("_charm_test_remove_me");
+    OS_mkdir("_charm_test_remove_me");
     if (0 == remove("_charm_test_remove_me")) {
         remove_zaps_dirs = true;
         ConfWriter_append_conf("#define CHY_REMOVE_ZAPS_DIRS\n");
     }
-    Dir_rmdir("_charm_test_remove_me");
+    OS_rmdir("_charm_test_remove_me");
 
     /* Shorten. */
     ConfWriter_start_short_names();

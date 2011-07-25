@@ -146,16 +146,3 @@ Dir_clean_up(void) {
     OS_remove_exe("_charm_rmdir");
 }
 
-chaz_bool_t
-Dir_mkdir(const char *filepath) {
-    if (!initialized) { Dir_init(); }
-    return OS_run_local("_charm_mkdir ", filepath, NULL);
-}
-
-chaz_bool_t
-Dir_rmdir(const char *filepath) {
-    if (!initialized) { Dir_init(); }
-    return OS_run_local("_charm_rmdir ", filepath, NULL);
-}
-
-
