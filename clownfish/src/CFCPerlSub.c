@@ -177,7 +177,7 @@ S_allot_params_arg(CFCType *type, const char *label, int required) {
                       + strlen(vtable_var)
                       + strlen(zcb_allocation)
                       + 50;
-        char *arg = MALLOCATE(size);
+        char *arg = (char*)MALLOCATE(size);
         sprintf(arg, pattern, label, label, label_len, req_string, vtable_var,
                 zcb_allocation);
         return arg;
@@ -214,7 +214,7 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
     char *allot_params = CFCUtil_strdup("");
 
     // Declare variables and assign default values.
-    for (int i = 1; i < num_vars; i++) {
+    for (size_t i = 1; i < num_vars; i++) {
         CFCVariable *arg_var = arg_vars[i];
         const char  *val     = arg_inits[i];
         const char  *local_c = CFCVariable_local_c(arg_var);
@@ -223,9 +223,9 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
             val = CFCType_is_object(arg_type)
                   ? "NULL"
                   : "0";
-            allot_params = CFCUtil_cat(allot_params, local_c, " = ", val,
-                                       ";\n     ", NULL);
         }
+        allot_params = CFCUtil_cat(allot_params, local_c, " = ", val,
+                                   ";\n     ", NULL);
     }
 
     // Iterate over args in param list.
@@ -234,7 +234,7 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
                       "chy_bool_t args_ok = XSBind_allot_params(\n"
                       "        &(ST(0)), 1, items, \"",
                       self->perl_name, "_PARAMS\",\n", NULL);
-    for (int i = 1; i < num_vars; i++) {
+    for (size_t i = 1; i < num_vars; i++) {
         CFCVariable *var = arg_vars[i];
         const char  *val = arg_inits[i];
         int required = val ? 0 : 1;
