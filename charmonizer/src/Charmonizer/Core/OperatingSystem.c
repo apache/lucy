@@ -91,11 +91,6 @@ S_probe_dev_null(void) {
 #endif
 }
 
-void
-OS_clean_up(void) {
-    OS_remove_exe("_charm_run");
-}
-
 const char*
 OS_exe_ext(void) {
     return exe_ext;
@@ -109,59 +104,6 @@ OS_obj_ext(void) {
 const char*
 OS_dev_null(void) {
     return dev_null;
-}
-
-static const char charm_run_code[] =
-    QUOTE(  #include <stdio.h>                                           )
-    QUOTE(  #include <stdlib.h>                                          )
-    QUOTE(  #include <string.h>                                          )
-    QUOTE(  #include <stddef.h>                                          )
-    QUOTE(  int main(int argc, char **argv)                              )
-    QUOTE(  {                                                            )
-    QUOTE(      char *command;                                           )
-    QUOTE(      size_t command_len = 1; /* Terminating null. */          )
-    QUOTE(      int i;                                                   )
-    QUOTE(      int retval;                                              )
-    /* Rebuild command line args. */
-    QUOTE(      for (i = 1; i < argc; i++) {                             )
-    QUOTE(          command_len += strlen(argv[i]) + 1;                  )
-    QUOTE(      }                                                        )
-    QUOTE(      command = (char*)calloc(command_len, sizeof(char));      )
-    QUOTE(      if (command == NULL) {                                   )
-    QUOTE(          fprintf(stderr, "calloc failed\n");                  )
-    QUOTE(          exit(1);                                             )
-    QUOTE(      }                                                        )
-    QUOTE(      for (i = 1; i < argc; i++) {                             )
-    QUOTE(          strcat( strcat(command, " "), argv[i] );             )
-    QUOTE(      }                                                        )
-    /* Redirect all output to /dev/null or equivalent. */
-    QUOTE(      freopen("%s", "w", stdout);                              )
-    QUOTE(      freopen("%s", "w", stderr);                              )
-    /* Run commmand and return its value to parent. */
-    QUOTE(      retval = system(command);                                )
-    QUOTE(      free(command);                                           )
-    QUOTE(      return retval;                                           )
-    QUOTE(  }                                                            );
-
-static void
-S_build_charm_run(void) {
-    chaz_bool_t compile_succeeded = false;
-    size_t needed = sizeof(charm_run_code)
-                    + strlen(dev_null)
-                    + strlen(dev_null)
-                    + 20;
-    char *code = (char*)malloc(needed);
-
-    sprintf(code, charm_run_code, dev_null, dev_null);
-    compile_succeeded = CC_compile_exe("_charm_run.c", "_charm_run",
-                                       code, strlen(code));
-    if (!compile_succeeded) {
-        Util_die("failed to compile _charm_run helper utility");
-    }
-
-    remove("_charm_run.c");
-    free(code);
-    charm_run_ok = true;
 }
 
 void
@@ -212,20 +154,14 @@ OS_run_quietly(const char *command) {
     size_t size = sizeof(pattern) + strlen(command) + 10;
     char *quiet_command = (char*)malloc(size);
     sprintf(quiet_command, pattern, command);
+#else
+    char pattern[] = "%s > %s 2>&1";
+    size_t size = sizeof(pattern) + strlen(command) + strlen(dev_null) + 10;
+    char *quiet_command = (char*)malloc(size);
+    sprintf(quiet_command, pattern, command, dev_null);
+#endif
     retval = system(quiet_command);
     free(quiet_command);
-#else
-    if (!charm_run_initialized) {
-        charm_run_initialized = true;
-        S_build_charm_run();
-    }
-    if (!charm_run_ok) {
-        retval = system(command);
-    }
-    else {
-        retval = OS_run_local("_charm_run ", command, NULL);
-    }
-#endif
 
     return retval;
 }

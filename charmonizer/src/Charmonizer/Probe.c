@@ -64,7 +64,6 @@ Probe_clean_up(void) {
     ConfWriter_clean_up();
     Stat_clean_up();
     CC_clean_up();
-    OS_clean_up();
 
     if (Util_verbosity) { printf("Cleanup complete.\n"); }
 }

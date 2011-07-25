@@ -78,11 +78,6 @@ chaz_OS_dev_null(void);
 void
 chaz_OS_init(void);
 
-/* Tear down the Charmonizer/Core/OperatingSystem module.
- */
-void
-chaz_OS_clean_up(void);
-
 #ifdef CHAZ_USE_SHORT_NAMES
   #define OS_remove_exe                chaz_OS_remove_exe
   #define OS_remove_obj                chaz_OS_remove_obj
@@ -94,7 +89,6 @@ chaz_OS_clean_up(void);
   #define OS_obj_ext                   chaz_OS_obj_ext
   #define OS_dev_null                  chaz_OS_dev_null
   #define OS_init                      chaz_OS_init
-  #define OS_clean_up                  chaz_OS_clean_up
 #endif
 
 #ifdef __cplusplus
