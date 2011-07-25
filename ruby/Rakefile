@@ -38,9 +38,9 @@ def make_command
       else
         command = "dmake"
       end
+    else
+      command = "make"
     end
-  else
-    command = "make"
   end
   return command
 end
