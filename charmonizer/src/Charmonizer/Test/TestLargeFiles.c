@@ -17,6 +17,8 @@
 #define CHAZ_USE_SHORT_NAMES
 
 #include "charmony.h"
+#include <string.h>
+#include <errno.h>
 
 #ifdef HAS_SYS_TYPES_H
   #include <sys/types.h>
@@ -24,6 +26,31 @@
 
 #include <stdio.h>
 #include "Charmonizer/Test.h"
+
+#if (defined(HAS_LARGE_FILE_SUPPORT) \
+     && defined(CHAZ_HAS_STAT_ST_SIZE) \
+     && defined(CHAZ_HAS_STAT_ST_BLOCKS))
+#define STAT_TESTS_ENABLED
+
+#include <sys/stat.h>
+
+/* Determine whether we can use sparse files.
+ */
+static chaz_bool_t
+S_check_sparse_files(void);
+
+/* Helper for check_sparse_files().
+ */
+static chaz_bool_t 
+S_test_sparse_file(long offset, struct stat *st);
+
+/* See if trying to write a 5 GB file in a subprocess bombs out.  If it
+ * doesn't, then the test suite can safely verify large file support.
+ */
+static chaz_bool_t
+S_can_create_big_files(void);
+
+#endif /* criteria for defining STAT_TESTS_ENABLED */
 
 static void
 S_run_tests(TestBatch *batch) {
@@ -44,13 +71,20 @@ S_run_tests(TestBatch *batch) {
 #ifndef HAS_LARGE_FILE_SUPPORT
     SKIP_REMAINING(batch, "No large file support");
 #endif
-#ifndef CHAZ_HAS_SPARSE_FILES
-    SKIP_REMAINING(batch,
-                   "Can't verify large file support without sparse files");
-#endif
-#ifndef CHAZ_CAN_CREATE_BIG_FILES
-    SKIP_REMAINING(batch, "Unsafe to create 5GB sparse files on this system");
-#endif
+#ifndef STAT_TESTS_ENABLED
+    SKIP_REMAINING(batch, "Need stat with st_size and st_blocks");
+#else
+    /* Check for sparse files. */
+    if (!S_check_sparse_files()) {
+        SKIP_REMAINING(batch, "Can't verify large file support "
+                       "without sparse files");
+        return;
+    }
+    if (!S_can_create_big_files()) {
+        SKIP_REMAINING(batch, "Unsafe to create 5GB sparse files "
+                       "on this system");
+        return;
+    }
 
     fh = fopen64("_charm_large_file_test", "w+");
     if (fh == NULL) {
@@ -91,7 +125,86 @@ S_run_tests(TestBatch *batch) {
         fclose(fh);
     }
     remove("_charm_large_file_test");
+#endif /* STAT_TESTS_ENABLED */
 }
+
+#ifdef STAT_TESTS_ENABLED
+
+static chaz_bool_t
+S_check_sparse_files(void) {
+    struct stat st_a, st_b;
+
+    /* Write and stat a 1 MB file and a 2 MB file, both of them sparse. */
+    if (!S_test_sparse_file(1000000, &st_a)) { return false; }
+    if (!S_test_sparse_file(2000000, &st_b)) { return false; }
+    if (st_a.st_size != 1000001 || st_b.st_size != 2000001) {
+        return false;
+    }
+
+    /* See if two files with very different lengths have the same block size. */
+    return st_a.st_blocks == st_b.st_blocks ? true : false;
+}
+
+static chaz_bool_t
+S_test_sparse_file(long offset, struct stat *st) {
+    FILE *sparse_fh;
+    chaz_bool_t result = false;
+
+    /* Make sure the file's not there, then open. */
+    remove("_charm_sparse");
+    if ((sparse_fh = fopen("_charm_sparse", "w+")) == NULL) {
+        return false;
+    }
+
+    /* Seek fh to [offset], write a byte, close file. */
+    if ((fseek(sparse_fh, offset, SEEK_SET)) != -1) {
+        if ((fprintf(sparse_fh, "X")) == 1) {
+            result = true;
+        }
+    }
+    if (fclose(sparse_fh)) {
+        result = false;
+    }
+
+    /* Stat the file. */
+    stat("_charm_sparse", st);
+
+    remove("_charm_sparse");
+    return true;
+}
+
+static chaz_bool_t
+S_can_create_big_files(void) {
+    chy_bool_t result = 0;
+    FILE *fh = fopen("_charm_large_file_test", "w+");
+    if (!fh) {
+        return false;
+    }
+    else {
+        /* Bail unless seek succeeds. */
+        int64_t check_seek = fseeko64(fh, I64_C(5000000000), SEEK_SET);
+        if (check_seek != -1) {
+            /* Bail unless we write successfully. */
+            if (fprintf(fh, "X") == 1) {
+                result = true;
+            }
+        }
+        if (fclose(fh)) {
+            result = false;
+        }
+    }
+
+    /* Truncate, just in case the call to remove fails. */
+    fh = fopen("_charm_large_file_test", "w");
+    if (fh != NULL) {
+        fclose(fh);
+    }
+    remove("_charm_large_file_test");
+
+    return result;
+}
+
+#endif /* STAT_TESTS_ENABLED */
 
 int main(int argc, char **argv) {
     TestBatch *batch;

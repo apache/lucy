@@ -19,7 +19,6 @@
 #include "Charmonizer/Core/HeaderChecker.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/ConfWriter.h"
-#include "Charmonizer/Core/Stat.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Probe/LargeFiles.h"
 #include <errno.h>
@@ -71,22 +70,6 @@ S_probe_lseek(unbuff_combo *combo);
  */
 static chaz_bool_t
 S_probe_pread64(unbuff_combo *combo);
-
-/* Determine whether we can use sparse files.
- */
-static chaz_bool_t
-S_check_sparse_files(void);
-
-/* Helper for check_sparse_files().
- */
-static void
-S_test_sparse_file(long offset, Stat *st);
-
-/* See if trying to write a 5 GB file in a subprocess bombs out.  If it
- * doesn't, then the test suite can safely verify large file support.
- */
-static chaz_bool_t
-S_can_create_big_files(void);
 
 /* Vars for holding lfs commands, once they're discovered. */
 static char fopen_command[10];
@@ -155,16 +138,16 @@ LargeFiles_run(void) {
         }
     }
 
-    /* Check for sparse files. */
-    if (S_check_sparse_files()) {
-        ConfWriter_append_conf("#define CHAZ_HAS_SPARSE_FILES\n");
-        /* See if we can create a 5 GB file without crashing. */
-        if (success && S_can_create_big_files()) {
-            ConfWriter_append_conf("#define CHAZ_CAN_CREATE_BIG_FILES\n");
-        }
+    /* Make checks needed for testing. */
+    const char *stat_includes = "#include <stdio.h>\n#include <sys/stat.h>";
+    if (HeadCheck_check_header("sys/stat.h")) {
+        ConfWriter_append_conf("#define CHAZ_HAS_SYS_STAT_H\n");
     }
-    else {
-        ConfWriter_append_conf("#define CHAZ_NO_SPARSE_FILES\n");
+    if (HeadCheck_contains_member("struct stat", "st_size", stat_includes)) {
+        ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_SIZE\n");
+    }
+    if (HeadCheck_contains_member("struct stat", "st_blocks", stat_includes)) {
+        ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_BLOCKS\n");
     }
 
     /* Short names. */
@@ -321,111 +304,4 @@ S_probe_pread64(unbuff_combo *combo) {
     free(code_buf);
     return success;
 }
-
-static chaz_bool_t
-S_check_sparse_files(void) {
-    Stat st_a, st_b;
-
-    /* Bail out if we can't stat() a file. */
-    if (!HeadCheck_check_header("sys/stat.h")) {
-        return false;
-    }
-
-    /* Write and stat a 1 MB file and a 2 MB file, both of them sparse. */
-    S_test_sparse_file(1000000, &st_a);
-    S_test_sparse_file(2000000, &st_b);
-    if (!(st_a.valid && st_b.valid)) {
-        return false;
-    }
-    if (st_a.size != 1000001) {
-        Util_die("Expected size of 1000001 but got %ld", (long)st_a.size);
-    }
-    if (st_b.size != 2000001) {
-        Util_die("Expected size of 2000001 but got %ld", (long)st_b.size);
-    }
-
-    /* See if two files with very different lengths have the same block size. */
-    if (st_a.blocks == st_b.blocks) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-static void
-S_test_sparse_file(long offset, Stat *st) {
-    FILE *sparse_fh;
-
-    /* Make sure the file's not there, then open. */
-    Util_remove_and_verify("_charm_sparse");
-    if ((sparse_fh = fopen("_charm_sparse", "w+")) == NULL) {
-        Util_die("Couldn't open file '_charm_sparse'");
-    }
-
-    /* Seek fh to [offset], write a byte, close file. */
-    if ((fseek(sparse_fh, offset, SEEK_SET)) == -1) {
-        Util_die("seek failed: %s", strerror(errno));
-    }
-    if ((fprintf(sparse_fh, "X")) != 1) {
-        Util_die("fprintf failed");
-    }
-    if (fclose(sparse_fh)) {
-        Util_die("Error closing file '_charm_sparse': %s", strerror(errno));
-    }
-
-    /* Stat the file. */
-    Stat_stat("_charm_sparse", st);
-
-    remove("_charm_sparse");
-}
-
-/* Open a file, seek to a loc, print a char, and communicate success. */
-static const char create_bigfile_code[] =
-    QUOTE(  #include "_charm.h"                                      )
-    QUOTE(  int main() {                                             )
-    QUOTE(      FILE *fh = fopen("_charm_large_file_test", "w+");    )
-    QUOTE(      int check_seek;                                      )
-    QUOTE(      Charm_Setup;                                         )
-    /* Bail unless seek succeeds. */
-    QUOTE(      check_seek = %s(fh, 5000000000, SEEK_SET);           )
-    QUOTE(      if (check_seek == -1)                                )
-    QUOTE(          exit(1);                                         )
-    /* Bail unless we write successfully. */
-    QUOTE(      if (fprintf(fh, "X") != 1)                           )
-    QUOTE(          exit(1);                                         )
-    QUOTE(      if (fclose(fh))                                      )
-    QUOTE(          exit(1);                                         )
-    /* Communicate success to Charmonizer. */
-    QUOTE(      printf("1");                                         )
-    QUOTE(      return 0;                                            )
-    QUOTE(  }                                                        );
-
-static chaz_bool_t
-S_can_create_big_files(void) {
-    char *output;
-    size_t output_len;
-    FILE *truncating_fh;
-    size_t needed = strlen(create_bigfile_code)
-                    + strlen(fseek_command)
-                    + 10;
-    char *code_buf = (char*)malloc(needed);
-
-    /* Concat the source strings, compile the file, capture output. */
-    sprintf(code_buf, create_bigfile_code, fseek_command);
-    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
-
-    /* Truncate, just in case the call to remove fails. */
-    truncating_fh = fopen("_charm_large_file_test", "w");
-    if (truncating_fh != NULL) {
-        fclose(truncating_fh);
-    }
-    Util_remove_and_verify("_charm_large_file_test");
-
-    /* Return true if the test app made it to the finish line. */
-    free(code_buf);
-    return output == NULL ? false : true;
-}
-
-
 
