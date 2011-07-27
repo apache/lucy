@@ -22,6 +22,13 @@ extern "C" {
 #endif
 
 struct CFCHierarchy;
+struct CFCType;
+
+char*
+CFCPerlTypeMap_from_perl(struct CFCType *type, const char *xs_var);
+
+char*
+CFCPerlTypeMap_to_perl(struct CFCType *type, const char *cf_var);
 
 void
 CFCPerlTypeMap_write_xs_typemap(struct CFCHierarchy *hierarchy);
