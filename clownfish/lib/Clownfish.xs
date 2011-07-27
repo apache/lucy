@@ -2017,4 +2017,11 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::TypeMap
+
+void
+_write_xs_typemap(hierarchy)
+    CFCHierarchy *hierarchy;
+PPCODE:
+    CFCPerlTypeMap_write_xs_typemap(hierarchy);
 
