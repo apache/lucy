@@ -180,7 +180,7 @@ S_xsub_def_labeled_params(CFCPerlMethod *self) {
         "XS(%s) {\n"
         "    dXSARGS;\n"
         "    CHY_UNUSED_VAR(cv);\n"
-        "    if (items < 1) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%s, ...)\",  GvNAME(CvGV(cv))); };\n"
+        "    if (items < 1) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%s, ...)\",  GvNAME(CvGV(cv))); }\n"
         "    SP -= items;\n"
         "\n"
         "    /* Extract vars from Perl stack. */\n"
