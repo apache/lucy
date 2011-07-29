@@ -225,7 +225,7 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
                   : "0";
         }
         allot_params = CFCUtil_cat(allot_params, local_c, " = ", val,
-                                   ";\n     ", NULL);
+                                   ";\n    ", NULL);
     }
 
     // Iterate over args in param list.
@@ -249,7 +249,7 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
         = CFCUtil_cat(allot_params, "        NULL);\n", 
                       "    if (!args_ok) {\n"
                       "        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));\n"
-                      "    }\n", NULL);
+                      "    }", NULL);
 
     return allot_params;
 }
