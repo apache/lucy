@@ -180,7 +180,7 @@ S_xsub_def_labeled_params(CFCPerlMethod *self) {
         "XS(%s) {\n"
         "    dXSARGS;\n"
         "    CHY_UNUSED_VAR(cv);\n"
-        "    if (items < 1) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%%s)\",  GvNAME(CvGV(cv)), \"%s, ...\"); };\n"
+        "    if (items < 1) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%s, ...)\",  GvNAME(CvGV(cv))); };\n"
         "    SP -= items;\n"
         "\n"
         "    /* Extract vars from Perl stack. */\n"
@@ -237,8 +237,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
         }
     }
     const char num_args_pattern[] = 
-        "if (items %s %u) {  CFISH_THROW(CFISH_ERR, \"Usage: %%s(%%s)\",  "
-        "GvNAME(CvGV(cv)), \"%s\"); }";
+        "if (items %s %u) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%s)\", GvNAME(CvGV(cv))); }";
     size_t num_args_check_size = sizeof(num_args_pattern)
                                  + strlen(xs_name_list)
                                  + 30;
@@ -248,7 +247,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
                 xs_name_list);
     }
     else {
-        sprintf(num_args_check, num_args_pattern, "!=", min_required,
+        sprintf(num_args_check, num_args_pattern, "!=", num_vars,
                 xs_name_list);
     }
 
