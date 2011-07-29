@@ -1946,21 +1946,12 @@ DESTROY(self)
 PPCODE:
     CFCPerlMethod_destroy(self);
 
-void
-_set_or_get(self, ...)
+SV*
+xsub_def(self)
     CFCPerlMethod *self;
-ALIAS:
-    _get_method        = 2
-PPCODE:
-{
-    START_SET_OR_GET_SWITCH
-        case 2: {
-                CFCMethod *value = CFCPerlMethod_get_method(self);
-                retval = S_cfcbase_to_perlref(value);
-            }
-            break;
-    END_SET_OR_GET_SWITCH
-}
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCPerlMethod_xsub_def(self));
+OUTPUT: RETVAL
 
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Class

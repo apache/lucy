@@ -34,8 +34,8 @@ CFCPerlMethod_init(CFCPerlMethod *self, struct CFCMethod *method,
 void
 CFCPerlMethod_destroy(CFCPerlMethod *self);
 
-struct CFCMethod*
-CFCPerlMethod_get_method(CFCPerlMethod *self);
+char*
+CFCPerlMethod_xsub_def(CFCPerlMethod *self);
 
 #ifdef __cplusplus
 }
