@@ -37,6 +37,9 @@ CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
 void
 CFCPerlClass_destroy(CFCPerlClass *self);
 
+char*
+CFCPerlClass_perlify_doc_text(CFCPerlClass *self, const char *source);
+
 struct CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self);
 

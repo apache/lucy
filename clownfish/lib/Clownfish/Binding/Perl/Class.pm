@@ -200,7 +200,7 @@ sub _gen_subroutine_pod {
 
     # Incorporate "description" text from DocuComment.
     if ( my $long_doc = $docucom->get_description ) {
-        $pod .= _perlify_doc_text($long_doc) . "\n\n";
+        $pod .= _perlify_doc_text( $self, $long_doc ) . "\n\n";
     }
 
     # Add params in a list.
@@ -232,7 +232,7 @@ sub create_pod {
     confess("No DocuComment for '$class_name'") unless $docucom;
     my $brief = $docucom->get_brief;
     my $description
-        = _perlify_doc_text( $pod_args->{description} || $docucom->get_long );
+        = _perlify_doc_text( $self, $pod_args->{description} || $docucom->get_long );
 
     # Create SYNOPSIS.
     my $synopsis_pod = '';
@@ -250,7 +250,7 @@ sub create_pod {
         $constructor_pod = "=head1 CONSTRUCTORS\n\n";
         for my $spec (@$constructors) {
             if ( !ref $spec ) {
-                $constructor_pod .= _perlify_doc_text($spec);
+                $constructor_pod .= _perlify_doc_text( $self, $spec );
             }
             else {
                 my $func_name   = $spec->{func} || 'init';
@@ -258,6 +258,7 @@ sub create_pod {
                 my $ctor_name   = $spec->{name} || 'new';
                 my $code_sample = $spec->{sample};
                 $constructor_pod .= _perlify_doc_text(
+                    $self, 
                     $self->_gen_subroutine_pod(
                         func           => $init_func,
                         name           => $ctor_name,
@@ -295,10 +296,10 @@ sub create_pod {
             );
         }
         if ( $method->abstract ) {
-            push @abstract_method_docs, _perlify_doc_text($method_pod);
+            push @abstract_method_docs, _perlify_doc_text( $self, $method_pod );
         }
         else {
-            push @method_docs, _perlify_doc_text($method_pod);
+            push @method_docs, _perlify_doc_text( $self, $method_pod );
         }
     }
     if (@method_docs) {
@@ -372,28 +373,6 @@ END_POD
     $pod =~ s/^==/=/gm;
 
     return $pod;
-}
-
-sub _perlify_doc_text {
-    my $documentation = shift;
-
-    # Remove double-equals hack needed to fool perldoc, PAUSE, etc. :P
-    $documentation =~ s/^==/=/mg;
-
-    # Change <code>foo</code> to C<< foo >>.
-    $documentation =~ s#<code>(.*?)</code>#C<< $1 >>#gsm;
-
-    # Lowercase all method names: Open_In() => open_in()
-    $documentation
-        =~ s/([A-Z][A-Za-z0-9]*(?:_[A-Z][A-Za-z0-9]*)*\(\))/\L$1\E/gsm;
-
-    # Change all instances of NULL to 'undef'
-    $documentation =~ s/NULL/undef/g;
-
-    # Change "Err_error" to "Lucy->error".
-    $documentation =~ s/Err_error/Lucy->error/g;
-
-    return $documentation;
 }
 
 1;

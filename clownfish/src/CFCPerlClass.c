@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <string.h>
+#include <ctype.h>
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCPerlClass.h"
@@ -62,6 +64,93 @@ CFCPerlClass_destroy(CFCPerlClass *self) {
 CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self) {
     return self->client;
+}
+
+static char*
+S_global_replace(const char *string, const char *match,
+                 const char *replacement) {
+    char *found = (char*)string;
+    int   string_len      = strlen(string);
+    int   match_len       = strlen(match);
+    int   replacement_len = strlen(replacement);
+    int   len_diff        = replacement_len - match_len;
+
+    // Allocate space.
+    unsigned count = 0;
+    while (NULL != (found = strstr(found, match))) {
+        count++;
+        found += match_len;
+    }
+    int size = string_len + count * len_diff + 1;
+    char *modified = (char*)MALLOCATE(size);
+    modified[size - 1] = 0; // NULL-terminate.
+
+    // Iterate through all matches.
+    found = (char*)string;
+    char *target = modified;
+    size_t last_end = 0;
+    if (count) {
+        while (NULL != (found = strstr(found, match))) {
+            size_t pos = found - string;
+            size_t unchanged_len = pos - last_end;
+            found += match_len;
+            memcpy(target, string + last_end, unchanged_len);
+            target += unchanged_len;
+            last_end = pos + match_len;
+            memcpy(target, replacement, replacement_len);
+            target += replacement_len;
+        }
+    }
+    size_t remaining = string_len - last_end;
+    memcpy(target, string + string_len - remaining, remaining);
+
+    return modified;
+}
+
+char*
+CFCPerlClass_perlify_doc_text(CFCPerlClass *self, const char *source) {
+    // Remove double-equals hack needed to fool perldoc, PAUSE, etc. :P
+    // char *copy = S_global_replace(source, "==", "=");
+    char *copy = CFCUtil_strdup(source);
+
+    // Change <code>foo</code> to C<< foo >>.
+    char *orig = copy;
+    copy = S_global_replace(orig, "<code>", "C<< ");
+    FREEMEM(orig);
+    orig = copy;
+    copy = S_global_replace(orig, "</code>", " >>");
+    FREEMEM(orig);
+
+    // Lowercase all method names: Open_In() => open_in()
+    for (size_t i = 0, max = strlen(copy); i < max; i++) {
+        if (isupper(copy[i])) {
+            size_t mark = i;
+            for (; i < max; i++) {
+                char c = copy[i];
+                if (!(isalpha(c) || c == '_')) {
+                    if (memcmp(copy + i, "()", 2) == 0) {
+                        for (size_t j = mark; j < i; j++) {
+                            copy[j] = tolower(copy[j]);
+                        }
+                        i += 2; // go past parens.
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    // Change all instances of NULL to 'undef'
+    orig = copy;
+    copy = S_global_replace(orig, "NULL", "undef");
+    FREEMEM(orig);
+
+    // Change "Err_error" to "Lucy->error".
+    orig = copy;
+    copy = S_global_replace(orig, "Err_error", "Lucy->error");
+    FREEMEM(orig);
+
+    return copy;
 }
 
 const char*

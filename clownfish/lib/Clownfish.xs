@@ -2008,6 +2008,15 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+SV*
+_perlify_doc_text(self, source)
+    CFCPerlClass *self;
+    const char   *source;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCPerlClass_perlify_doc_text(self, source));
+OUTPUT: RETVAL
+
+
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::TypeMap
 
 SV*
