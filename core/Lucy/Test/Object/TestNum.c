@@ -31,6 +31,8 @@ test_To_String(TestBatch *batch) {
     CharBuf *f64_string = Float64_To_String(f64);
     CharBuf *i32_string = Int32_To_String(i32);
     CharBuf *i64_string = Int64_To_String(i64);
+    CharBuf *true_string  = Bool_To_String(CFISH_TRUE);
+    CharBuf *false_string = Bool_To_String(CFISH_FALSE);
 
     TEST_TRUE(batch, CB_Starts_With_Str(f32_string, "1.3", 3),
               "Float32_To_String");
@@ -40,7 +42,13 @@ test_To_String(TestBatch *batch) {
               "Int32_To_String");
     TEST_TRUE(batch, CB_Equals_Str(i64_string, "9223372036854775807", 19),
               "Int64_To_String");
+    TEST_TRUE(batch, CB_Equals_Str(true_string, "true", 4),
+              "Bool_To_String [true]");
+    TEST_TRUE(batch, CB_Equals_Str(false_string, "false", 5),
+              "Bool_To_String [false]");
 
+    DECREF(false_string);
+    DECREF(true_string);
     DECREF(i64_string);
     DECREF(i32_string);
     DECREF(f64_string);
@@ -94,6 +102,19 @@ test_accessors(TestBatch *batch) {
     Int64_Set_Value(i64, -1);
     TEST_TRUE(batch, Int32_To_F64(i32) == -1, "Int32_To_F64");
     TEST_TRUE(batch, Int64_To_F64(i64) == -1, "Int64_To_F64");
+
+    TEST_INT_EQ(batch, Bool_Get_Value(CFISH_TRUE), true,
+                "Bool_Get_Value [true]");
+    TEST_INT_EQ(batch, Bool_Get_Value(CFISH_FALSE), false,
+                "Bool_Get_Value [false]");
+    TEST_TRUE(batch, Bool_To_I64(CFISH_TRUE) == true,
+              "Bool_To_I64 [true]");
+    TEST_TRUE(batch, Bool_To_I64(CFISH_FALSE) == false,
+              "Bool_To_I64 [false]");
+    TEST_TRUE(batch, Bool_To_F64(CFISH_TRUE) == 1.0,
+              "Bool_To_F64 [true]");
+    TEST_TRUE(batch, Bool_To_F64(CFISH_FALSE) == 0.0,
+              "Bool_To_F64 [false]");
 
     DECREF(i64);
     DECREF(i32);
@@ -156,6 +177,17 @@ test_Equals_and_Compare_To(TestBatch *batch) {
     TEST_TRUE(batch, Int32_Compare_To(i32, (Obj*)f32) < 0,
               "Integer32 comparison to Float32");
 
+    TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_TRUE), 
+              "CFISH_TRUE Equals itself");
+    TEST_TRUE(batch, Bool_Equals(CFISH_FALSE, (Obj*)CFISH_FALSE), 
+              "CFISH_FALSE Equals itself");
+    TEST_FALSE(batch, Bool_Equals(CFISH_FALSE, (Obj*)CFISH_TRUE), 
+               "CFISH_FALSE not Equals CFISH_TRUE ");
+    TEST_FALSE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_FALSE), 
+               "CFISH_TRUE not Equals CFISH_FALSE ");
+    TEST_FALSE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CHARBUF), 
+               "CFISH_TRUE not Equals random other object ");
+
     DECREF(i64);
     DECREF(i32);
     DECREF(f64);
@@ -180,6 +212,8 @@ test_Clone(TestBatch *batch) {
               "Integer32 Clone");
     TEST_TRUE(batch, Int64_Equals(i64, (Obj*)i64_dupe),
               "Integer64 Clone");
+    TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)Bool_Clone(CFISH_TRUE)),
+              "BoolNum Clone");
     DECREF(i64_dupe);
     DECREF(i32_dupe);
     DECREF(f64_dupe);
@@ -232,6 +266,7 @@ test_serialization(TestBatch *batch) {
     Float64   *f64_thaw = (Float64*)TestUtils_freeze_thaw((Obj*)f64);
     Integer32 *i32_thaw = (Integer32*)TestUtils_freeze_thaw((Obj*)i32);
     Integer64 *i64_thaw = (Integer64*)TestUtils_freeze_thaw((Obj*)i64);
+    BoolNum   *true_thaw = (BoolNum*)TestUtils_freeze_thaw((Obj*)CFISH_TRUE);
 
     TEST_TRUE(batch, Float32_Equals(f32, (Obj*)f32_thaw),
               "Float32 freeze/thaw");
@@ -241,6 +276,8 @@ test_serialization(TestBatch *batch) {
               "Integer32 freeze/thaw");
     TEST_TRUE(batch, Int64_Equals(i64, (Obj*)i64_thaw),
               "Integer64 freeze/thaw");
+    TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)true_thaw),
+              "BoolNum freeze/thaw");
 
     DECREF(i64_thaw);
     DECREF(i32_thaw);
@@ -254,7 +291,7 @@ test_serialization(TestBatch *batch) {
 
 void
 TestNum_run_tests() {
-    TestBatch *batch = TestBatch_new(42);
+    TestBatch *batch = TestBatch_new(57);
     TestBatch_Plan(batch);
 
     test_To_String(batch);

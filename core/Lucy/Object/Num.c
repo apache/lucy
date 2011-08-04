@@ -21,6 +21,8 @@
 #define C_LUCY_INTEGER64
 #define C_LUCY_FLOAT32
 #define C_LUCY_FLOAT64
+#define C_LUCY_BOOLNUM
+#define C_LUCY_VIEWCHARBUF
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
@@ -354,4 +356,74 @@ Int64_deserialize(Integer64 *self, InStream *instream) {
     return self ? Int64_init(self, value) : Int64_new(value);
 }
 
+/***************************************************************************/
+
+static ViewCharBuf true_string  = { VIEWCHARBUF, {1}, "true",  4, 0 };
+static ViewCharBuf false_string = { VIEWCHARBUF, {1}, "false", 5, 0 };
+static BoolNum true_obj  = { BOOLNUM, {1}, true, &true_string };
+static BoolNum false_obj = { BOOLNUM, {1}, false, &false_string };
+BoolNum *Bool_true_singleton  = &true_obj;
+BoolNum *Bool_false_singleton = &false_obj;
+
+void
+Bool_destroy(BoolNum *self) {
+    UNUSED_VAR(self);
+}
+
+bool_t
+Bool_get_value(BoolNum *self) {
+    return self->value;
+}
+
+double
+Bool_to_f64(BoolNum *self) {
+    return (double)self->value;
+}
+
+int64_t
+Bool_to_i64(BoolNum *self) {
+    return self->value;
+}
+
+BoolNum*
+Bool_clone(BoolNum *self) {
+    return self;
+}
+
+int32_t
+Bool_hash_sum(BoolNum *self) {
+    int64_t hash_sum = PTR_TO_I64(self) + self->value;
+    return (int32_t)hash_sum;
+}
+
+CharBuf*
+Bool_to_string(BoolNum *self) {
+    return (CharBuf*)ViewCB_Inc_RefCount(self->string);
+}
+
+bool_t
+Bool_equals(BoolNum *self, Obj *other) {
+    return self == (BoolNum*)other;
+}
+
+void
+Bool_serialize(BoolNum *self, OutStream *outstream) {
+    OutStream_Write_U8(outstream, (uint8_t)self->value);
+}
+
+BoolNum*
+Bool_deserialize(BoolNum *self, InStream *instream) {
+    bool_t value = (bool_t)InStream_Read_U8(instream);
+    return value ? CFISH_TRUE : CFISH_FALSE;
+}
+
+BoolNum*
+Bool_inc_refcount(BoolNum *self) {
+    return self;
+}
+
+uint32_t
+Bool_dec_refcount(BoolNum *self) {
+    return 1;
+}
 

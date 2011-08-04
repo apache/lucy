@@ -53,7 +53,6 @@ abstract class Lucy::Object::IntNum inherits Lucy::Object::Num {
     To_String(IntNum *self);
 }
 
-
 /** Single precision floating point number.
  */
 class Lucy::Object::Float32 inherits Lucy::Object::FloatNum {
@@ -232,4 +231,62 @@ class Lucy::Object::Integer64 cnick Int64
     Mimic(Integer64 *self, Obj *other);
 }
 
+
+/**
+ * Boolean type.
+ * 
+ * There are only two singleton instances of this class: CFISH_TRUE and
+ * CFISH_FALSE.
+ */
+class Lucy::Object::BoolNum cnick Bool inherits Lucy::Object::IntNum {
+    bool_t value;
+    ViewCharBuf *string;
+
+    inert BoolNum *true_singleton;
+    inert BoolNum *false_singleton;
+
+    public void
+    Destroy(BoolNum *self);
+
+    bool_t
+    Get_Value(BoolNum *self);
+
+    public int64_t
+    To_I64(BoolNum *self);
+
+    public double
+    To_F64(BoolNum *self);
+
+    public int32_t
+    Hash_Sum(BoolNum *self);
+
+    public void
+    Serialize(BoolNum *self, OutStream *outstream);
+
+    public incremented BoolNum*
+    Deserialize(BoolNum *self, InStream *instream);
+
+    /* Returns self. */
+    public incremented BoolNum*
+    Clone(BoolNum *self);
+
+    public bool_t
+    Equals(BoolNum *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(BoolNum *self);
+
+    incremented BoolNum*
+    Inc_RefCount(BoolNum *self);
+
+    uint32_t
+    Dec_RefCount(BoolNum *self);
+}
+
+__C__
+
+#define CFISH_TRUE  lucy_Bool_true_singleton
+#define CFISH_FALSE lucy_Bool_false_singleton
+
+__END_C__
 
