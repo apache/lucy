@@ -85,6 +85,7 @@ LargeFiles_run(void) {
     chaz_bool_t found_lseek = false;
     chaz_bool_t found_pread64 = false;
     unsigned i;
+    const char *stat_includes = "#include <stdio.h>\n#include <sys/stat.h>";
 
     ConfWriter_start_module("LargeFiles");
 
@@ -139,7 +140,6 @@ LargeFiles_run(void) {
     }
 
     /* Make checks needed for testing. */
-    const char *stat_includes = "#include <stdio.h>\n#include <sys/stat.h>";
     if (HeadCheck_check_header("sys/stat.h")) {
         ConfWriter_append_conf("#define CHAZ_HAS_SYS_STAT_H\n");
     }
