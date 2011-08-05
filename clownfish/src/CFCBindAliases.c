@@ -37,6 +37,7 @@ struct alias aliases[] = {
     {"Cfish_Obj_Load", "Lucy_Obj_Load"},
     {"Cfish_Obj_To_F64", "Lucy_Obj_To_F64"},
     {"Cfish_Obj_To_I64", "Lucy_Obj_To_I64"},
+    {"Cfish_Obj_To_Bool", "Lucy_Obj_To_Bool"},
     {"Cfish_Obj_To_Host", "Lucy_Obj_To_Host"},
     {"Cfish_Obj_Dec_RefCount", "Lucy_Obj_Dec_RefCount"},
     {"Cfish_Obj_Inc_RefCount", "Lucy_Obj_Inc_RefCount"},
@@ -67,6 +68,7 @@ struct alias aliases[] = {
     {"CFISH_INTEGER64", "LUCY_INTEGER64"},
     {"CFISH_FLOAT32", "LUCY_FLOAT32"},
     {"CFISH_FLOAT64", "LUCY_FLOAT64"},
+    {"cfish_Bool_singleton", "lucy_Bool_singleton"},
 
     {"CFISH_ERR", "LUCY_ERR"},
     {"cfish_Err_new", "lucy_Err_new"},

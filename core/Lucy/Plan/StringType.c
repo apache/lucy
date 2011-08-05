@@ -61,13 +61,13 @@ StringType_dump_for_schema(StringType *self) {
         Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
     }
     if (!self->indexed) {
-        Hash_Store_Str(dump, "indexed", 7, (Obj*)CB_newf("0"));
+        Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
     }
     if (!self->stored) {
-        Hash_Store_Str(dump, "stored", 6, (Obj*)CB_newf("0"));
+        Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_FALSE);
     }
     if (self->sortable) {
-        Hash_Store_Str(dump, "sortable", 8, (Obj*)CB_newf("1"));
+        Hash_Store_Str(dump, "sortable", 8, (Obj*)CFISH_TRUE);
     }
 
     return dump;
@@ -98,18 +98,10 @@ StringType_load(StringType *self, Obj *dump) {
     UNUSED_VAR(self);
 
     StringType_init(loaded);
-    if (boost_dump) {
-        loaded->boost = (float)Obj_To_F64(boost_dump);
-    }
-    if (indexed_dump) {
-        loaded->indexed = (bool_t)Obj_To_I64(indexed_dump);
-    }
-    if (stored_dump) {
-        loaded->stored = (bool_t)Obj_To_I64(stored_dump);
-    }
-    if (sortable_dump) {
-        loaded->sortable = (bool_t)Obj_To_I64(sortable_dump);
-    }
+    if (boost_dump)    { loaded->boost    = (float)Obj_To_F64(boost_dump); }
+    if (indexed_dump)  { loaded->indexed  = Obj_To_Bool(indexed_dump); }
+    if (stored_dump)   { loaded->stored   = Obj_To_Bool(stored_dump); }
+    if (sortable_dump) { loaded->sortable = Obj_To_Bool(sortable_dump); }
 
     return loaded;
 }

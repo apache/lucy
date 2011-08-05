@@ -309,8 +309,20 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
             "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%i64\", (int64_t)self->%s));\n";
         char float_pattern[] =
             "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%f64\", (double)self->%s));\n";
-        const char *pattern = CFCType_is_integer(type)
-                              ? int_pattern : float_pattern;
+        char bool_pattern[] =
+            "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_Bool_singleton(self->%s));\n";
+        const char *pattern; 
+        if (strcmp(specifier, "bool_t") == 0
+            || strcmp(specifier, "chy_bool_t") == 0
+           ) {
+            pattern = bool_pattern;
+        }
+        else if (CFCType_is_integer(type)) {
+            pattern = int_pattern;
+        }
+        else {
+            pattern = float_pattern;
+        }
         size_t needed = strlen(pattern) + name_len * 2 + 20;
         if (buf_size < needed) {
             croak("Buffer not big enough (%lu < %lu)",
@@ -360,7 +372,14 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
         croak("type_str too long: '%s'", type_str);
     }
     if (CFCType_is_integer(type)) {
-        sprintf(extraction, "(%s)Cfish_Obj_To_I64(var)", type_str);
+        if (strcmp(specifier, "bool_t") == 0
+            || strcmp(specifier, "chy_bool_t") == 0
+           ) {
+            sprintf(extraction, "Cfish_Obj_To_Bool(var)");
+        }
+        else {
+            sprintf(extraction, "(%s)Cfish_Obj_To_I64(var)", type_str);
+        }
     }
     else if (CFCType_is_floating(type)) {
         sprintf(extraction, "(%s)Cfish_Obj_To_F64(var)", type_str);

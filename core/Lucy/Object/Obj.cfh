@@ -147,6 +147,12 @@ class Lucy::Object::Obj {
     public abstract double
     To_F64(Obj *self);
 
+    /** Evaluate the object in a boolean context.  By default, invokes
+     * To_I64() and returns true if it is non-zero.
+     */
+    public bool_t
+    To_Bool(Obj *self);
+
     /** Serialize the object by writing to the supplied OutStream.
      */
     public void

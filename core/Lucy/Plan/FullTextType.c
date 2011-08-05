@@ -80,16 +80,16 @@ FullTextType_dump_for_schema(FullTextType *self) {
         Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
     }
     if (!self->indexed) {
-        Hash_Store_Str(dump, "indexed", 7, (Obj*)CB_newf("0"));
+        Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
     }
     if (!self->stored) {
-        Hash_Store_Str(dump, "stored", 6, (Obj*)CB_newf("0"));
+        Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_FALSE);
     }
     if (self->sortable) {
-        Hash_Store_Str(dump, "sortable", 8, (Obj*)CB_newf("1"));
+        Hash_Store_Str(dump, "sortable", 8, (Obj*)CFISH_TRUE);
     }
     if (self->highlightable) {
-        Hash_Store_Str(dump, "highlightable", 13, (Obj*)CB_newf("1"));
+        Hash_Store_Str(dump, "highlightable", 13, (Obj*)CFISH_TRUE);
     }
 
     return dump;
@@ -127,10 +127,10 @@ FullTextType_load(FullTextType *self, Obj *dump) {
     Obj *stored_dump  = Hash_Fetch_Str(source, "stored", 6);
     Obj *sort_dump    = Hash_Fetch_Str(source, "sortable", 8);
     Obj *hl_dump      = Hash_Fetch_Str(source, "highlightable", 13);
-    bool_t indexed  = indexed_dump ? (bool_t)Obj_To_I64(indexed_dump) : true;
-    bool_t stored   = stored_dump  ? (bool_t)Obj_To_I64(stored_dump)  : true;
-    bool_t sortable = sort_dump    ? (bool_t)Obj_To_I64(sort_dump)    : false;
-    bool_t hl       = hl_dump      ? (bool_t)Obj_To_I64(hl_dump)      : false;
+    bool_t indexed  = indexed_dump ? Obj_To_Bool(indexed_dump) : true;
+    bool_t stored   = stored_dump  ? Obj_To_Bool(stored_dump)  : true;
+    bool_t sortable = sort_dump    ? Obj_To_Bool(sort_dump)    : false;
+    bool_t hl       = hl_dump      ? Obj_To_Bool(hl_dump)      : false;
 
     // Extract an Analyzer.
     Obj *analyzer_dump = Hash_Fetch_Str(source, "analyzer", 8);

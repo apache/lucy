@@ -75,10 +75,10 @@ BlobType_dump_for_schema(BlobType *self) {
         Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
     }
     if (self->indexed) {
-        Hash_Store_Str(dump, "indexed", 7, (Obj*)CB_newf("1"));
+        Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_TRUE);
     }
     if (self->stored) {
-        Hash_Store_Str(dump, "stored", 6, (Obj*)CB_newf("1"));
+        Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_TRUE);
     }
 
     return dump;
@@ -109,8 +109,8 @@ BlobType_load(BlobType *self, Obj *dump) {
 
     BlobType_init(loaded, false);
     if (boost_dump)   { loaded->boost   = (float)Obj_To_F64(boost_dump);    }
-    if (indexed_dump) { loaded->indexed = (bool_t)Obj_To_I64(indexed_dump); }
-    if (stored_dump)  { loaded->stored  = (bool_t)Obj_To_I64(stored_dump);  }
+    if (indexed_dump) { loaded->indexed = Obj_To_Bool(indexed_dump); }
+    if (stored_dump)  { loaded->stored  = Obj_To_Bool(stored_dump);  }
 
     return loaded;
 }

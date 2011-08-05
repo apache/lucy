@@ -140,6 +140,12 @@ XSBind_cfish_to_perl(cfish_Obj *obj) {
     else if (Cfish_Obj_Is_A(obj, CFISH_FLOATNUM)) {
         return newSVnv(Cfish_Obj_To_F64(obj));
     }
+    else if (obj == (cfish_Obj*)CFISH_TRUE) {
+        return newSViv(1);
+    }
+    else if (obj == (cfish_Obj*)CFISH_FALSE) {
+        return newSViv(0);
+    }
     else if (sizeof(IV) == 8 && Cfish_Obj_Is_A(obj, CFISH_INTNUM)) {
         int64_t num = Cfish_Obj_To_I64(obj);
         return newSViv((IV)num);

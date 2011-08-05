@@ -107,6 +107,11 @@ Obj_to_string(Obj *self) {
 #endif
 }
 
+bool_t
+Obj_to_bool(Obj *self) {
+    return !!Obj_To_I64(self);
+}
+
 Obj*
 Obj_dump(Obj *self) {
     return (Obj*)Obj_To_String(self);

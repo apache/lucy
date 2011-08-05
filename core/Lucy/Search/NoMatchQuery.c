@@ -77,7 +77,7 @@ NoMatchQuery_dump(NoMatchQuery *self) {
         = (NoMatchQuery_dump_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "fails_to_match", 14,
-                   (Obj*)CB_newf("%i64", (int64_t)self->fails_to_match));
+                   (Obj*)Bool_singleton(self->fails_to_match));
     return (Obj*)dump;
 }
 
@@ -88,12 +88,7 @@ NoMatchQuery_load(NoMatchQuery *self, Obj *dump) {
         = (NoMatchQuery_load_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Load);
     NoMatchQuery *loaded = super_load(self, dump);
     Obj *fails = Cfish_Hash_Fetch_Str(source, "fails_to_match", 14);
-    if (fails) {
-        loaded->fails_to_match = (bool_t)!!Obj_To_I64(fails);
-    }
-    else {
-        loaded->fails_to_match = true;
-    }
+    loaded->fails_to_match = fails ? Obj_To_Bool(fails) : true;
     return loaded;
 }
 

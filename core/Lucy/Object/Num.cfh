@@ -245,6 +245,12 @@ class Lucy::Object::BoolNum cnick Bool inherits Lucy::Object::IntNum {
     inert BoolNum *true_singleton;
     inert BoolNum *false_singleton;
 
+    /** Return either CFISH_TRUE or CFISH_FALSE depending on the supplied
+     * value.
+     */
+    inert BoolNum*
+    singleton(bool_t value);
+
     public void
     Destroy(BoolNum *self);
 
@@ -256,6 +262,9 @@ class Lucy::Object::BoolNum cnick Bool inherits Lucy::Object::IntNum {
 
     public double
     To_F64(BoolNum *self);
+
+    public bool_t
+    To_Bool(BoolNum *self);
 
     public int32_t
     Hash_Sum(BoolNum *self);

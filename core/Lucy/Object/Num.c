@@ -365,6 +365,11 @@ static BoolNum false_obj = { BOOLNUM, {1}, false, &false_string };
 BoolNum *Bool_true_singleton  = &true_obj;
 BoolNum *Bool_false_singleton = &false_obj;
 
+BoolNum*
+Bool_singleton(bool_t value) {
+    return value ? CFISH_TRUE : CFISH_FALSE;
+}
+
 void
 Bool_destroy(BoolNum *self) {
     UNUSED_VAR(self);
@@ -382,6 +387,11 @@ Bool_to_f64(BoolNum *self) {
 
 int64_t
 Bool_to_i64(BoolNum *self) {
+    return self->value;
+}
+
+bool_t
+Bool_to_bool(BoolNum *self) {
     return self->value;
 }
 
