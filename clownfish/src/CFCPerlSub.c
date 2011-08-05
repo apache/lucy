@@ -248,7 +248,7 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
     allot_params
         = CFCUtil_cat(allot_params, "        NULL);\n", 
                       "    if (!args_ok) {\n"
-                      "        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));\n"
+                      "        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));\n"
                       "    }", NULL);
 
     return allot_params;

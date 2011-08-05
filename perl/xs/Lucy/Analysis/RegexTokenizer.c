@@ -42,7 +42,7 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
         if (Lucy_CB_Find_Str(pattern, "\\p", 2) != -1
             || Lucy_CB_Find_Str(pattern, "\\P", 2) != -1
            ) {
-            LUCY_DECREF(self);
+            CFISH_DECREF(self);
             THROW(LUCY_ERR, "\\p and \\P constructs forbidden");
         }
         self->pattern = Lucy_CB_Clone(pattern);
@@ -103,7 +103,7 @@ lucy_RegexTokenizer_set_token_re(lucy_RegexTokenizer *self, void *token_re) {
 
 void
 lucy_RegexTokenizer_destroy(lucy_RegexTokenizer *self) {
-    LUCY_DECREF(self->pattern);
+    CFISH_DECREF(self->pattern);
     ReREFCNT_dec(((REGEXP*)self->token_re));
     LUCY_SUPER_DESTROY(self, LUCY_REGEXTOKENIZER);
 }

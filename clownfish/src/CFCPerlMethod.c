@@ -103,7 +103,7 @@ S_xsub_body(CFCPerlMethod *self) {
         CFCVariable *var = arg_vars[i];
         CFCType     *type = CFCVariable_get_type(var);
         if (CFCType_is_object(type) && CFCType_decremented(type)) {
-            body = CFCUtil_cat(body, "LUCY_INCREF(",
+            body = CFCUtil_cat(body, "CFISH_INCREF(",
                                CFCVariable_micro_sym(var), ");\n    ", NULL);
         }
     }
@@ -124,7 +124,7 @@ S_xsub_body(CFCPerlMethod *self) {
         if (CFCType_is_object(return_type) 
             && CFCType_incremented(return_type)
            ) {
-            body = CFCUtil_cat(body, "\n    LUCY_DECREF(retval);", NULL);
+            body = CFCUtil_cat(body, "\n    CFISH_DECREF(retval);", NULL);
         }
         body = CFCUtil_cat(body, "\n    sv_2mortal( ST(0) );\n    XSRETURN(1);",
                            NULL);

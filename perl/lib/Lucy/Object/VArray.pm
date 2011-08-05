@@ -77,7 +77,7 @@ store(self, tick, value);
     lucy_Obj    *value;
 PPCODE:
 {
-    if (value) { LUCY_INCREF(value); }
+    if (value) { CFISH_INCREF(value); }
     lucy_VA_store(self, tick, value);
 }
 

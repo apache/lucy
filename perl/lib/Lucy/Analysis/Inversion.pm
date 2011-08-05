@@ -39,7 +39,7 @@ CODE:
                                   ALLOT_SV(&text_sv, "text", 4, false),
                                   NULL);
         if (!args_ok) {
-            CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+            CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
         }
         if (XSBind_sv_defined(text_sv)) {
             STRLEN len;
@@ -49,7 +49,7 @@ CODE:
     }
 
     RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_Inversion_new(starter_token));
-    LUCY_DECREF(starter_token);
+    CFISH_DECREF(starter_token);
 }
 OUTPUT: RETVAL
 END_XS

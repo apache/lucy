@@ -111,7 +111,7 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
                 // dangerous, but is the only way to avoid requiring that the
                 // caller take responsibility for a refcount.
                 SV *mortal = (SV*)Cfish_Obj_To_Host(retval);
-                LUCY_DECREF(retval);
+                CFISH_DECREF(retval);
                 sv_2mortal(mortal);
             }
         }
@@ -182,7 +182,7 @@ XSBind_perl_to_cfish(SV *sv) {
                     ) {
                 IV tmp = SvIV(inner);
                 retval = INT2PTR(cfish_Obj*, tmp);
-                (void)LUCY_INCREF(retval);
+                (void)CFISH_INCREF(retval);
             }
         }
 

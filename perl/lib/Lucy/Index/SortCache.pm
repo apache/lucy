@@ -37,13 +37,13 @@ CODE:
                               ALLOT_I32(&ord, "ord", 3, false),
                               NULL);
     if (!args_ok) {
-        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
     {
         lucy_Obj *blank = Lucy_SortCache_Make_Blank(self);
         lucy_Obj *value = Lucy_SortCache_Value(self, ord, blank);
         RETVAL = XSBind_cfish_to_perl(value);
-        LUCY_DECREF(blank);
+        CFISH_DECREF(blank);
     }
 }
 OUTPUT: RETVAL

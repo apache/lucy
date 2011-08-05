@@ -76,7 +76,7 @@ sub xsub_def {
         my $type = $var->get_type;
         if ( $type->is_object and $type->decremented ) {
             my $name = $var->micro_sym;
-            $refcount_mods .= "\n    LUCY_INCREF($name);";
+            $refcount_mods .= "\n    CFISH_INCREF($name);";
         }
     }
 

@@ -45,7 +45,7 @@ CODE:
     SV *pack_var = get_sv("Lucy::Object::Host::testobj", 1);
     RETVAL = (SV*)Lucy_BB_To_Host(test_obj);
     SvSetSV_nosteal(pack_var, RETVAL);
-    LUCY_DECREF(test_obj);
+    CFISH_DECREF(test_obj);
     CHY_UNUSED_VAR(items);
 }
 OUTPUT: RETVAL
@@ -94,7 +94,7 @@ CODE:
 {
     lucy_Obj *other = lucy_Host_callback_obj(obj, "_test_obj", 0);
     RETVAL = (SV*)Lucy_Obj_To_Host(other);
-    LUCY_DECREF(other);
+    CFISH_DECREF(other);
 }
 OUTPUT: RETVAL
 END_XS_CODE

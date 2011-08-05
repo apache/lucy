@@ -59,7 +59,7 @@ PPCODE:
                                   ALLOT_F32(&boost, "boost", 5, false),
                                   NULL);
         if (!args_ok) {
-            CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+            CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
         }
     }
     else if (items == 1) {

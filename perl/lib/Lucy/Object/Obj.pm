@@ -55,8 +55,8 @@ PPCODE:
         serialized_bb
             = Lucy_RAMFile_Get_Contents(Lucy_RAMFH_Get_File(file_handle));
         retval = XSBind_bb_to_sv(serialized_bb);
-        LUCY_DECREF(file_handle);
-        LUCY_DECREF(target);
+        CFISH_DECREF(file_handle);
+        CFISH_DECREF(target);
 
         if (SvCUR(retval) == 0) { // Thwart Storable bug
             THROW(LUCY_ERR, "Calling serialize produced an empty string");
@@ -97,10 +97,10 @@ PPCODE:
     lucy_Obj *deserialized = Lucy_Obj_Deserialize(self, instream);
 
     CHY_UNUSED_VAR(cloning);
-    LUCY_DECREF(contents);
-    LUCY_DECREF(ram_file);
-    LUCY_DECREF(file_handle);
-    LUCY_DECREF(instream);
+    CFISH_DECREF(contents);
+    CFISH_DECREF(ram_file);
+    CFISH_DECREF(file_handle);
+    CFISH_DECREF(instream);
 
     // Catch bad deserialize() override.
     if (deserialized != self) {

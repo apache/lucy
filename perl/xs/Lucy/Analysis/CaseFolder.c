@@ -79,7 +79,7 @@ lucy_CaseFolder_transform(lucy_CaseFolder *self, lucy_Inversion *inversion) {
         token->len = size;
     }
     Lucy_Inversion_Reset(inversion);
-    return (lucy_Inversion*)LUCY_INCREF(inversion);
+    return (lucy_Inversion*)CFISH_INCREF(inversion);
 }
 
 lucy_Inversion*
@@ -92,7 +92,7 @@ lucy_CaseFolder_transform_text(lucy_CaseFolder *self, lucy_CharBuf *text) {
                                    Lucy_CB_Get_Size(text), &buf, &limit);
     token = lucy_Token_new((char*)buf, size, 0, size, 1.0f, 1);
     retval = lucy_Inversion_new(token);
-    LUCY_DECREF(token);
+    CFISH_DECREF(token);
     return retval;
 }
 

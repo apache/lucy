@@ -513,7 +513,7 @@ S_obj_callback_def(CFCMethod *method, const char *callback_params) {
 
     const char *decrement = CFCType_incremented(return_type)
                             ? ""
-                            : "\n    LUCY_DECREF(retval);";
+                            : "\n    CFISH_DECREF(retval);";
 
     char pattern[] =
         "%s\n"

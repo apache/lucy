@@ -39,7 +39,7 @@ CODE:
                               ALLOT_SV(&ints_sv, "ints", 4, true),
                               NULL);
     if (!args_ok) {
-        CFISH_RETHROW(LUCY_INCREF(cfish_Err_get_error()));
+        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
 
     AV *ints_av = NULL;

@@ -29,11 +29,11 @@ void
 set_race_condition_debug1(val_sv)
     SV *val_sv;
 PPCODE:
-    LUCY_DECREF(lucy_PolyReader_race_condition_debug1);
+    CFISH_DECREF(lucy_PolyReader_race_condition_debug1);
     lucy_PolyReader_race_condition_debug1 = (lucy_CharBuf*)
         XSBind_maybe_sv_to_cfish_obj(val_sv, LUCY_CHARBUF, NULL);
     if (lucy_PolyReader_race_condition_debug1) {
-        (void)LUCY_INCREF(lucy_PolyReader_race_condition_debug1);
+        (void)CFISH_INCREF(lucy_PolyReader_race_condition_debug1);
     }
 
 int32_t

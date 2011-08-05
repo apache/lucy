@@ -208,7 +208,7 @@ lucy_Obj_incref(lucy_Obj *self) {
     else { return NULL; }
 }
 
-#define LUCY_INCREF(_self) lucy_Obj_incref((lucy_Obj*)_self)
+#define CFISH_INCREF(_self) lucy_Obj_incref((lucy_Obj*)_self)
 
 static CHY_INLINE uint32_t
 lucy_Obj_decref(lucy_Obj *self) {
@@ -216,12 +216,12 @@ lucy_Obj_decref(lucy_Obj *self) {
     else { return 0; }
 }
 
-#define LUCY_DECREF(_self) lucy_Obj_decref((lucy_Obj*)_self)
+#define CFISH_DECREF(_self) lucy_Obj_decref((lucy_Obj*)_self)
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define SUPER_DESTROY(_self, _vtable)   LUCY_SUPER_DESTROY(_self, _vtable)
-  #define INCREF(_self)                   LUCY_INCREF(_self)
-  #define DECREF(_self)                   LUCY_DECREF(_self)
+  #define INCREF(_self)                   CFISH_INCREF(_self)
+  #define DECREF(_self)                   CFISH_DECREF(_self)
 #endif
 
 __END_C__

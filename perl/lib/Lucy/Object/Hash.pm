@@ -49,7 +49,7 @@ store(self, key, value);
     lucy_Obj           *value;
 PPCODE:
 {
-    if (value) { LUCY_INCREF(value); }
+    if (value) { CFISH_INCREF(value); }
     lucy_Hash_store(self, (lucy_Obj*)key, value);
 }
 

@@ -33,7 +33,7 @@ CODE:
     void *address = Lucy_BBSortEx_Fetch(self);
     if (address) {
         RETVAL = XSBind_cfish_to_perl(*(lucy_Obj**)address);
-        LUCY_DECREF(*(lucy_Obj**)address);
+        CFISH_DECREF(*(lucy_Obj**)address);
     }
     else {
         RETVAL = newSV(0);
@@ -61,7 +61,7 @@ feed(self, bb)
     lucy_BBSortEx *self;
     lucy_ByteBuf *bb;
 CODE:
-    LUCY_INCREF(bb);
+    CFISH_INCREF(bb);
     Lucy_BBSortEx_Feed(self, &bb);
 
 END_XS_CODE
