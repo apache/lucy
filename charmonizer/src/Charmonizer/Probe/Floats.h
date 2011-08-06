@@ -22,6 +22,9 @@
  * F32_NAN
  * F32_INF
  * F32_NEGINF
+ * F64_NAN
+ * F64_INF
+ * F64_NEGINF
  *
  * TODO: Actually test to see whether IEEE 754 is supported, rather than just
  * lying about it.
