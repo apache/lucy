@@ -111,12 +111,12 @@ It was cut from an "svn export" of the tag at:
     https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version
 
 Please vote on releasing this candidate as Apache Lucy (incubating) version
-$x_y_z_version.  The vote is open for the next 72 hours.
+$x_y_z_version.  The vote will be held open for at least the next 72 hours.
 
 All interested parties are welcome to inspect the release candidate and
-express approval or disapproval.  Only votes from members of the Lucy PPMC
-and/or Incubator PMC are binding; the vote passes if three binding +1 votes
-and no binding -1 votes are cast.
+express approval or disapproval.  Votes from members of the Lucy PPMC and/or
+Incubator PMC are binding; the vote passes if there are at least three binding
++1 votes and more +1 votes than -1 votes. 
 
 Should this vote pass, a ratifying vote of the Incubator PMC will be held on
 general\@incubator.a.o.  Any votes cast by Incubator PMC members here will be
@@ -178,7 +178,7 @@ Apache Lucy PPMC vote thread:
     + indicates Incubator PMC member
 
 Please vote on releasing this candidate as Apache Lucy (incubating) version
-$x_y_z_version.  The vote is open for the next 72 hours.
+$x_y_z_version.  The vote will be held open for at least the next 72 hours.
 
 [ ] +1 Release RC $rc as Apache Lucy (incubating) version $x_y_z_version.
 [ ] +0
