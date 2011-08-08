@@ -114,7 +114,9 @@ my $base_dir = rel2abs( $is_distro_not_devel ? getcwd() : updir() );
 my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
 my $CHARMONIZE_EXE_PATH
     = catfile( $CHARMONIZER_ORIG_DIR, "charmonize$Config{_exe}" );
-my $CHARMONY_PATH = 'charmony.h';
+my $CHARMONY_PATH  = 'charmony.h';
+my $LEMON_DIR      = catdir( $base_dir, 'lemon' );
+my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $SNOWSTEM_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
@@ -193,6 +195,16 @@ sub ACTION_charmonizer_tests {
     $self->_run_make(
         dir  => $CHARMONIZER_ORIG_DIR,
         args => [ "DEFS=$flags", "tests" ],
+    );
+}
+
+# Build the Lemon parser generator.
+sub ACTION_lemon {
+    my $self = shift;
+    print "Building the Lemon parser generator...\n\n";
+    $self->_run_make(
+        dir  => $LEMON_DIR,
+        args => [],
     );
 }
 
@@ -720,6 +732,7 @@ sub ACTION_clean {
             and die "Clownfish clean failed";
     }
     $self->_run_make( dir => $CHARMONIZER_ORIG_DIR, args => ['clean'] );
+    $self->_run_make( dir => $LEMON_DIR, args => ['clean'] );
     $self->SUPER::ACTION_clean;
 }
 

@@ -1,0 +1,3 @@
+This directory contains the bundled source code for the Lemon parser
+generator, which originates with the SQLite project.  It is used for building
+various parsers needed by Apache Lucy and its subcomponents.

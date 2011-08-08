@@ -17,3 +17,7 @@ Copyright (c) 2002, Richard Boulton.
 This product bundles the text of the Constitution of the United States of
 America, which is in the public domain.
 
+This product bundles the Lemon parser generator from the SQLite project, which
+has been released into the public domain by its authors as explained at
+<http://www.sqlite.org/copyright.html>.
+
