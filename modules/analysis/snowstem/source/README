@@ -1,0 +1,11 @@
+Unless otherwise noted, the files within this directory are imported directly
+from a checkout of the Snowball source code repository.  Some of the files do
+not contain license headers, by choice of the Snowball project:
+
+    http://snowball.tartarus.org/license.php
+
+    We have not bothered to insert the licensing arrangement into the text of
+    the Snowball software. 
+
+For licensing information, see LICENSE and NOTICE at the top of the Apache
+Lucy distribution.

@@ -37,6 +37,25 @@ $retval = system("make dist_libstemmer_c");
 die "'make dist_libstemmer_c' failed" if ( $retval >> 8 );
 chdir($oldpwd) or die $!;
 
+# Add a README file explaining the deal with Snowball and license headers.
+my $snowstem_readme_path = catfile( $dest_dir, 'source', 'README' );
+open( my $snowstem_readme_fh, '>:encoding(UTF-8)', $snowstem_readme_path )
+    or die "Can't open '$snowstem_readme_path': $!";
+print $snowstem_readme_fh <<'END_STUFF';
+Unless otherwise noted, the files within this directory are imported directly
+from a checkout of the Snowball source code repository.  Some of the files do
+not contain license headers, by choice of the Snowball project:
+
+    http://snowball.tartarus.org/license.php
+
+    We have not bothered to insert the licensing arrangement into the text of
+    the Snowball software. 
+
+For licensing information, see LICENSE and NOTICE at the top of the Apache
+Lucy distribution.
+END_STUFF
+close $snowstem_readme_fh or die $!;
+
 # Copy only UTF-8 Stemmer files.  Keep directory structure intact so that
 # compilation succeeds.
 copy_dir_contents( 'src_c', qr/UTF/ );
