@@ -141,7 +141,7 @@ class Lucy::Plan::Architecture cnick Arch inherits Lucy::Object::Obj {
 
     /** Factory method for creating a new Similarity object.
      */
-    public Similarity*
+    public incremented Similarity*
     Make_Similarity(Architecture *self);
 
     public int32_t
