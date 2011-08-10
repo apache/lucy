@@ -108,7 +108,9 @@ CB_new_steal_from_trusted_str(char *ptr, size_t size, size_t cap) {
 
 CharBuf*
 CB_new_steal_str(char *ptr, size_t size, size_t cap) {
-    StrHelp_utf8_valid(ptr, size);
+    if (!StrHelp_utf8_valid(ptr, size)) {
+        DIE_INVALID_UTF8(ptr, size);
+    }
     return CB_new_steal_from_trusted_str(ptr, size, cap);
 }
 
