@@ -577,11 +577,23 @@ sub error {$Lucy::Object::Err::error}
 
     sub to_json {
         my ( undef, $dump ) = @_;
-        return $json_encoder->encode($dump);
+        my $json = eval { $json_encoder->encode($dump) };
+        if ($@) {
+            my $error = Lucy::Object::Err->new($@);
+            Lucy::Object::Err->set_error($error);
+            return;
+        }
+        return $json;
     }
 
     sub from_json {
-        return to_clownfish( $json_encoder->decode( $_[1] ) );
+        my $dump = eval { to_clownfish( $json_encoder->decode( $_[1] ) ) };
+        if ($@) {
+            my $error = Lucy::Object::Err->new($@);
+            Lucy::Object::Err->set_error($error);
+            return;
+        }
+        return $dump;
     }
 
     sub set_tolerant { $json_encoder->allow_nonref( $_[1] ) }

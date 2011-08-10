@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <string.h>
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
@@ -30,6 +31,17 @@ S_make_dump() {
     Hash_Store_Str(dump, "foo", 3, (Obj*)CB_newf("foo"));
     Hash_Store_Str(dump, "stuff", 5, (Obj*)VA_new(0));
     return (Obj*)dump;
+}
+
+static void
+test_tolerance(TestBatch *batch) {
+    CharBuf *foo = CB_newf("foo");
+    CharBuf *not_json = Json_to_json((Obj*)foo);
+    TEST_TRUE(batch, not_json == NULL,
+              "to_json returns NULL when fed invalid data type");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "to_json sets Err_error when fed invalid data type");
+    DECREF(foo);
 }
 
 // Test escapes for control characters ASCII 0-31.
@@ -226,20 +238,59 @@ test_spew_and_slurp(TestBatch *batch) {
     DECREF(folder);
 }
 
+static void
+S_verify_bad_syntax(TestBatch *batch, const char *bad, const char *mess) {
+    ZombieCharBuf *has_errors = ZCB_WRAP_STR(bad, strlen(bad));
+    Err_set_error(NULL);
+    Obj *not_json = Json_from_json((CharBuf*)has_errors);
+    TEST_TRUE(batch, not_json == NULL, "from_json returns NULL: %s", mess);
+    TEST_TRUE(batch, Err_get_error() != NULL, "from_json sets Err_error: %s",
+              mess);
+}
+
+static void
+test_syntax_errors(TestBatch *batch) {
+    S_verify_bad_syntax(batch, "[", "unclosed left bracket");
+    S_verify_bad_syntax(batch, "]", "unopened right bracket");
+    S_verify_bad_syntax(batch, "{", "unclosed left curly");
+    S_verify_bad_syntax(batch, "}", "unopened right curly");
+    S_verify_bad_syntax(batch, "{}[]", "two top-level objects");
+    S_verify_bad_syntax(batch, "[1 \"foo\"]", "missing comma in array");
+    S_verify_bad_syntax(batch, "[1, \"foo\",]", "extra comma in array");
+    S_verify_bad_syntax(batch, "{\"1\":1 \"2\":2}", "missing comma in hash");
+    S_verify_bad_syntax(batch, "{\"1\":1,\"2\":2,}", "extra comma in hash");
+    S_verify_bad_syntax(batch, "\"1", "unterminated string");
+    // Tolerated by strtod().
+    // S_verify_bad_syntax(batch, "1. ", "float missing fraction");
+    // S_verify_bad_syntax(batch, "-.3 ", "Number missing integral part");
+    S_verify_bad_syntax(batch, "-. ", "Number missing any digits");
+    S_verify_bad_syntax(batch, "+1.0 ", "float with prepended plus");
+    S_verify_bad_syntax(batch, "\"\\g\"", "invalid char escape");
+    S_verify_bad_syntax(batch, "\"\\uAAAZ\"", "invalid \\u escape");
+}
+
 void
 TestJson_run_tests() {
-    TestBatch *batch = TestBatch_new(92);
+    int num_tests = 94;
+#ifndef LUCY_VALGRIND
+    num_tests += 28; // FIXME: syntax errors leak memory.
+#endif
+    TestBatch *batch = TestBatch_new(num_tests);
+    TestBatch_Plan(batch);
 
-    // Liberalize for testing.
+    // Test tolerance, then liberalize for testing.
+    test_tolerance(batch);
     Json_set_tolerant(true);
 
-    TestBatch_Plan(batch);
     test_to_and_from(batch);
     test_escapes(batch);
     test_numbers(batch);
     test_spew_and_slurp(batch);
 
+#ifndef LUCY_VALGRIND
+    test_syntax_errors(batch);
+#endif
+
     DECREF(batch);
 }
-
 
