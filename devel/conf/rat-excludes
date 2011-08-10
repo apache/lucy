@@ -16,7 +16,6 @@
 # CHANGES and MANIFEST files do not require license headers.
 CHANGES
 clownfish/MANIFEST
-perl/Changes
 perl/MANIFEST
 
 # RAT does not recognize either the ICU license or the license from the
