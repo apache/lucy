@@ -82,7 +82,7 @@ sub extra_ccflags {
     my $self      = shift;
     my $gcc_flags = '-std=gnu99 -D_GNU_SOURCE ';
     if ( defined $ENV{LUCY_VALGRIND} ) {
-        return "$gcc_flags -fno-inline-functions ";
+        return "$gcc_flags -DLUCY_VALGRIND -fno-inline-functions ";
     }
     elsif ( defined $ENV{LUCY_DEBUG} ) {
         return "$gcc_flags -DLUCY_DEBUG -pedantic -Wall -Wextra "
@@ -476,10 +476,27 @@ sub ACTION_test_valgrind {
     }
 }
 
+# Run all .y files through lemon.
+sub ACTION_parsers {
+    my $self = shift;
+    $self->dispatch('lemon');
+    my $y_files = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.y$/ );
+    for my $y_file (@$y_files) {
+        my $c_file = $y_file;
+        my $h_file = $y_file;
+        $c_file =~ s/\.y$/.c/ or die "no match";
+        $h_file =~ s/\.y$/.h/ or die "no match";
+        next if $self->up_to_date( $y_file, [ $c_file, $h_file ] );
+        $self->add_to_cleanup( $c_file, $h_file );
+        system( $LEMON_EXE_PATH, '-q', $y_file ) and die "lemon failed";
+    }
+}
+
 sub ACTION_compile_custom_xs {
     my $self = shift;
 
     $self->dispatch('ppport');
+    $self->dispatch('parsers');
 
     require ExtUtils::ParseXS;
 

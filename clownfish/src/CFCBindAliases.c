@@ -91,6 +91,7 @@ struct alias aliases[] = {
     {"Cfish_VA_Get_Size", "Lucy_VA_Get_Size"},
     {"Cfish_VA_Resize", "Lucy_VA_Resize"},
     {"Cfish_VA_Store", "Lucy_VA_Store"},
+    {"Cfish_VA_Push", "Lucy_VA_Push"},
 
     {"cfish_VTable", "lucy_VTable"},
     {"CFISH_VTABLE", "LUCY_VTABLE"},

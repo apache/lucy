@@ -29,9 +29,6 @@ TODO LIST:
     <https://issues.apache.org/jira/browse/LUCY-143>
     <https://issues.apache.org/jira/browse/LUCY-134>
 
-  * Replace dependency on JSON::XS with ???
-    <https://issues.apache.org/jira/browse/LUCY-133>
-
   * Refactor away C89 idioms, since we have chosen the intersection of C99 
     and C++ as our C dialect.
     <https://issues.apache.org/jira/browse/LUCY-144>

@@ -269,9 +269,85 @@ test_syntax_errors(TestBatch *batch) {
     S_verify_bad_syntax(batch, "\"\\uAAAZ\"", "invalid \\u escape");
 }
 
+static void
+S_round_trip_integer(TestBatch *batch, int64_t value) {
+    Integer64 *num = Int64_new(value);
+    VArray *array = VA_new(1);
+    VA_Store(array, 0, (Obj*)num);
+    CharBuf *json = Json_to_json((Obj*)array);
+    Obj *dump = Json_from_json(json);
+    TEST_TRUE(batch, VA_Equals(array, dump), "Round trip integer %ld",
+              (long)value);
+    DECREF(dump);
+    DECREF(json);
+    DECREF(array);
+}
+
+static void
+test_integers(TestBatch *batch) {
+    S_round_trip_integer(batch, 0);
+    S_round_trip_integer(batch, -1);
+    S_round_trip_integer(batch, -1000000);
+    S_round_trip_integer(batch, 1000000);
+}
+
+static void
+S_round_trip_float(TestBatch *batch, double value, double max_diff) {
+    Float64 *num = Float64_new(value);
+    VArray *array = VA_new(1);
+    VA_Store(array, 0, (Obj*)num);
+    CharBuf *json = Json_to_json((Obj*)array);
+    Obj *dump = CERTIFY(Json_from_json(json), VARRAY);
+    Float64 *got = (Float64*)CERTIFY(VA_Fetch((VArray*)dump, 0), FLOAT64);
+    double diff = Float64_Get_Value(num) - Float64_Get_Value(got);
+    if (diff < 0) { diff = 0 - diff; }
+    TEST_TRUE(batch, diff <= max_diff, "Round trip float %f", value);
+    DECREF(dump);
+    DECREF(json);
+    DECREF(array);
+}
+
+static void
+test_floats(TestBatch *batch) {
+    S_round_trip_float(batch, 0.0, 0.0);
+    S_round_trip_float(batch, 0.1, 0.00001);
+    S_round_trip_float(batch, -0.1, 0.00001);
+    S_round_trip_float(batch, 1000000.5, 1.0);
+    S_round_trip_float(batch, -1000000.5, 1.0);
+}
+
+static void
+test_max_depth(TestBatch *batch) {
+    Hash *circular = Hash_new(0);
+    Hash_Store_Str(circular, "circular", 8, INCREF(circular));
+    Err_set_error(NULL);
+    CharBuf *not_json = Json_to_json((Obj*)circular);
+    TEST_TRUE(batch, not_json == NULL,
+              "to_json returns NULL when fed recursing data");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "to_json sets Err_error when fed recursing data");
+    DECREF(Hash_Delete_Str(circular, "circular", 8));
+    DECREF(circular);
+}
+
+static void
+test_illegal_keys(TestBatch *batch) {
+    Hash *hash = Hash_new(0);
+    Float64 *key = Float64_new(1.1);
+    Hash_Store(hash, (Obj*)key, (Obj*)CB_newf("blah"));
+    Err_set_error(NULL);
+    CharBuf *not_json = Json_to_json((Obj*)hash);
+    TEST_TRUE(batch, not_json == NULL,
+              "to_json returns NULL when fed an illegal key");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "to_json sets Err_error when fed an illegal key");
+    DECREF(key);
+    DECREF(hash);
+}
+
 void
 TestJson_run_tests() {
-    int num_tests = 94;
+    int num_tests = 107;
 #ifndef LUCY_VALGRIND
     num_tests += 28; // FIXME: syntax errors leak memory.
 #endif
@@ -286,6 +362,10 @@ TestJson_run_tests() {
     test_escapes(batch);
     test_numbers(batch);
     test_spew_and_slurp(batch);
+    test_integers(batch);
+    test_floats(batch);
+    test_max_depth(batch);
+    test_illegal_keys(batch);
 
 #ifndef LUCY_VALGRIND
     test_syntax_errors(batch);

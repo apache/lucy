@@ -58,3 +58,14 @@ class Lucy::Util::Json inherits Lucy::Object::Obj {
 }
 
 
+__C__
+
+struct lucy_JsonParserState 
+{
+    lucy_Obj   *result;
+    chy_bool_t  errors;
+};
+typedef struct lucy_JsonParserState lucy_JsonParserState;
+
+__END_C__
+
