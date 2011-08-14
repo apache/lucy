@@ -492,8 +492,8 @@ sub ACTION_compile_custom_xs {
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
-        $o_file   =~ s/\.c/$Config{_o}/;
-        $ccs_file =~ s/\.c/.ccs/;
+        $o_file   =~ s/\.c$/$Config{_o}/ or die "no match";
+        $ccs_file =~ s/\.c$/.ccs/        or die "no match";
         push @objects, $o_file;
         next if $self->up_to_date( $c_file, $o_file );
         $self->add_to_cleanup($o_file);
