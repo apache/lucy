@@ -1,5 +1,12 @@
 Revision history for Lucy
 
+0.2.1  2011-08-14
+
+  Bugfixes:
+
+    * [LUCY-174] - Filepath naming glitch breaks CPAN build process
+
+
 0.2.0  2011-07-24
 
   Bugfixes:

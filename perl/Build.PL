@@ -24,7 +24,7 @@ my $builder = Lucy::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
-    dist_version => '0.2.0',
+    dist_version => '0.2.1',
     requires     => {
         'JSON::XS' => 1.53,
         'perl'     => '5.8.3',
