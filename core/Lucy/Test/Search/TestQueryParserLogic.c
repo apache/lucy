@@ -673,7 +673,6 @@ typedef TestQueryParser*
 (*lucy_TestQPLogic_prune_test_t)();
 
 static lucy_TestQPLogic_prune_test_t prune_test_funcs[] = {
-    NULL,
     prune_test_null_querystring,
     prune_test_matchall,
     prune_test_nomatch,
@@ -712,7 +711,7 @@ S_create_index() {
 void
 TestQPLogic_run_tests() {
     uint32_t i;
-    TestBatch     *batch      = TestBatch_new(196);
+    TestBatch     *batch      = TestBatch_new(210);
     Folder        *folder     = S_create_index();
     IndexSearcher *searcher   = IxSearcher_new((Obj*)folder);
     QueryParser   *or_parser  = QParser_new(IxSearcher_Get_Schema(searcher),
