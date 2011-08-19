@@ -35,28 +35,34 @@ say qq|#######################################################################|;
 say qq|# Commands needed to execute ReleaseGuide for Apache Lucy $x_y_z_version RC $rc|;
 say qq|#######################################################################\n|;
 
+say qq|# If your code signing key is not already available from pgp.mit.edu|;
+say qq|# and <http://www.apache.org/dist/incubator/lucy/KEYS>, publish it.|;
+say qq|[...]\n|;
+
 if ( $rc < 2 ) {
-    say qq|# Run update_version.|;
+    say qq|# Since this is the first RC, run update_version.|;
     say qq|./devel/bin/update_version $x_y_z_version\n|;
+    say qq|# Update the the CHANGES file and associate release $x_y_z_version with today's date.|;
+    say qq|[...]\n|;
     say qq|# Commit version bump and CHANGES.|;
     say qq|svn commit -m "Updating CHANGES and version number for release $x_y_z_version."\n|;
 }
 
 if ( $micro == 0 && $rc < 2) {
-    say qq|# Branch for non-bugfix release.|;
+    say qq|# Since this is the first release in a series (i.e. X.Y.0), create a branch.|;
     say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/trunk |
         . qq|https://svn.apache.org/repos/asf/incubator/lucy/branches/$major.$minor |
         . qq|-m "Branching for $x_y_z_version release"\n|;
 }
 
-say qq|# Tag release candidate.|;
+say qq|# Create a tag for the release candidate.|;
 say
     qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/branches/$major.$minor |
     . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
     . qq|-m "Tagging release candidate $rc for $x_y_z_version."\n|;
 
 
-say qq|# Export pristine source tree.|;
+say qq|# Export a pristine copy of the source from the release candidate tag.|;
 say qq|svn export https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
  . qq|apache-lucy-incubating-$x_y_z_version\n|;
 
@@ -86,6 +92,10 @@ say qq|cd public_html/apache-lucy-incubating-$full_rc_version/|;
 say qq|find . -type f -exec chmod 664 {} \\;|;
 say qq|find . -type d -exec chmod 775 {} \\;|;
 say qq|chgrp -R incubator *\n|;
+
+say qq|# Perform whatever QC seems prudent on the tarball, installing it|;
+say qq|# on test systems, etc.|;
+say qq|[...]\n|;
 
 say qq|#######################################################################|;
 say qq|# Boilerplate VOTE email for lucy-dev\@incubator.a.o|;
