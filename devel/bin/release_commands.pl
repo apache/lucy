@@ -98,6 +98,61 @@ say qq|# on test systems, etc.|;
 say qq|[...]\n|;
 
 say qq|#######################################################################|;
+say qq|# Voting|;
+say qq|#######################################################################\n|;
+
+say qq|# Call a release vote on the dev list, referring to the artifacts|;
+say qq|# made public in the previous step and using the first of the two|;
+say qq|# boilerplate emails below.|;
+say qq|[...]\n|;
+
+say qq|# Once the PPMC vote has passed, call a release vote on the Incubator|;
+say qq|# general@ list, using the second of the boilerplate emails below.|;
+say qq|# Each release requires at least 3 Incubator PMC votes to pass; even |;
+say qq|# if we get those three +1 votes from our Mentors during the PPMC|;
+say qq|# vote thread on the dev list, we need to give the rest of the|;
+say qq|# Incubator PMC 72 hours to vote.|;
+say qq|[...]\n|;
+
+say qq|#######################################################################|;
+say qq|# After both Lucy PPMC and Incubator PMC votes have passed...|;
+say qq|#######################################################################\n|;
+
+say qq|# Tag the release.|;
+say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
+ . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$x_y_z_version |
+ . qq|-m "Tagging release $x_y_z_version."\n|;
+
+say qq|# Copy release artifacts to dist directory, remove RC dir.|;
+say qq|ssh $apache_id\@people.apache.org|;
+say qq|cd public_html/|;
+say qq|cp -p apache-lucy-incubating-$full_rc_version/* /www/www.apache.org/dist/incubator/lucy/|;
+say qq|rm -rf apache-lucy-incubating-$full_rc_version/\n|;
+
+say qq|# Carefully remove the artifacts for any previous releases superseded|;
+say qq|# by this one.  DO NOT overwrite any release artifact files, as that|;
+say qq|# triggers the Infra team's security alarm bells.|;
+say qq|cd /www/www.apache.org/dist/incubator/lucy/|;
+say qq|[...]\n|;
+
+say qq|# Once the release files are in place, update the download page|;
+say qq|# of the Lucy website. Change the artifact links to point at the|;
+say qq|# new version; ensure that while the primary download links point|;
+say qq|# at mirrors, the signature and sums files point at apache.org.|;
+say qq|[...]\n|;
+
+say qq|# Send emails announcing the release to:|;
+say qq|#|;
+say qq|#     * The user list.|;
+say qq|#     * The dev list.|;
+say qq|#     * The Incubator general@ list.|;
+say qq|#     * The announce\@a.o list.  Be sure to send from your apache.org|;
+say qq|#       address|;
+say qq|#|;
+say qq|# Use the entry in the CHANGES file as the basis for your email.|;
+say qq|[...]\n|;
+
+say qq|#######################################################################|;
 say qq|# Boilerplate VOTE email for lucy-dev\@incubator.a.o|;
 say qq|#######################################################################\n|;
 
@@ -196,21 +251,6 @@ $x_y_z_version.  The vote will be held open for at least the next 72 hours.
 
 Thanks!
 END_GENERAL_AT_INCUBATOR_VOTE
-
-say qq|#######################################################################|;
-say qq|# After both Lucy PPMC and Incubator PMC votes have passed...|;
-say qq|#######################################################################\n|;
-
-say qq|# Tag release.|;
-say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
- . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$x_y_z_version |
- . qq|-m "Tagging release $x_y_z_version."\n|;
-
-say qq|# Copy to dist directory, remove RC dir.|;
-say qq|ssh $apache_id\@people.apache.org|;
-say qq|cd public_html/|;
-say qq|cp -p apache-lucy-incubating-$full_rc_version/* /www/www.apache.org/dist/incubator/lucy/|;
-say qq|rm -rf apache-lucy-incubating-$full_rc_version/\n|;
 
 say qq|#######################################################################|;
 
