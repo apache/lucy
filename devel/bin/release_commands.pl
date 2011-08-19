@@ -39,7 +39,7 @@ if ( $rc < 2 ) {
     say qq|# Run update_version.|;
     say qq|./devel/bin/update_version $x_y_z_version\n|;
     say qq|# Commit version bump and CHANGES.|;
-    say qq|svn commit -m "Updating CHANGES and version number for release $x_y_z_version"\n|;
+    say qq|svn commit -m "Updating CHANGES and version number for release $x_y_z_version."\n|;
 }
 
 if ( $micro == 0 && $rc < 2) {
@@ -53,7 +53,7 @@ say qq|# Tag release candidate.|;
 say
     qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/branches/$major.$minor |
     . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
-    . qq|-m "Tagging release candidate $rc for $x_y_z_version"\n|;
+    . qq|-m "Tagging release candidate $rc for $x_y_z_version."\n|;
 
 
 say qq|# Export pristine source tree.|;
@@ -74,14 +74,14 @@ say qq|gpg --armor --output apache-lucy-incubating-$x_y_z_version.tar.gz.asc |
  . qq|--detach-sig apache-lucy-incubating-$x_y_z_version.tar.gz\n|;
 
 say qq|# Copy files to people.apache.org.|;
-say qq|ssh people.apache.org|;
+say qq|ssh $apache_id\@people.apache.org|;
 say qq|mkdir public_html/apache-lucy-incubating-$full_rc_version|;
 say qq|exit|;
 say qq|scp -p apache-lucy-incubating-$x_y_z_version.tar.gz* |
  . qq|people.apache.org:~/public_html/apache-lucy-incubating-$full_rc_version\n|;
 
 say qq|# Modify permissions.|;
-say qq|ssh people.apache.org|;
+say qq|ssh $apache_id\@people.apache.org|;
 say qq|cd public_html/apache-lucy-incubating-$full_rc_version/|;
 say qq|find . -type f -exec chmod 664 {} \\;|;
 say qq|find . -type d -exec chmod 775 {} \\;|;
@@ -194,10 +194,10 @@ say qq|#######################################################################\n
 say qq|# Tag release.|;
 say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
  . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$x_y_z_version |
- . qq|-m "Tagging release $x_y_z_version"\n|;
+ . qq|-m "Tagging release $x_y_z_version."\n|;
 
 say qq|# Copy to dist directory, remove RC dir.|;
-say qq|ssh people.apache.org|;
+say qq|ssh $apache_id\@people.apache.org|;
 say qq|cd public_html/|;
 say qq|cp -p apache-lucy-incubating-$full_rc_version/* /www/www.apache.org/dist/incubator/lucy/|;
 say qq|rm -rf apache-lucy-incubating-$full_rc_version/\n|;
