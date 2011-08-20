@@ -148,6 +148,11 @@ say qq|# new version; ensure that while the primary download links point|;
 say qq|# at mirrors, the signature and sums files point at apache.org.|;
 say qq|[...]\n|;
 
+say qq|# [TODO: this action cannot yet be performed by the RM, so ignore.]|; 
+say qq|# Publish HTML exports of the documentation for the new release on|;
+say qq|# the Lucy website.|;
+say qq|[...]\n|;
+
 say qq|# Send emails announcing the release to:|;
 say qq|#|;
 say qq|#     * The user list.|;
