@@ -21,7 +21,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <fcntl.h> // open, POSIX flags
-#include <stdarg.h>
 
 #ifdef CHY_HAS_UNISTD_H
   #include <unistd.h> // close

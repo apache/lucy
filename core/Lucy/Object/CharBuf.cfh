@@ -16,10 +16,6 @@
 
 parcel Lucy;
 
-__C__
-#include <stdarg.h>
-__END_C__
-
 /**
  * Growable buffer holding Unicode characters.
  */

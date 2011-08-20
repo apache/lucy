@@ -17,7 +17,6 @@
 #define C_LUCY_TESTQUERYPARSERLOGIC
 #define C_LUCY_TESTQUERYPARSER
 #include "Lucy/Util/ToolSet.h"
-#include <stdarg.h>
 #include <string.h>
 
 #include "Lucy/Test.h"

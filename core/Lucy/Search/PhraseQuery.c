@@ -16,7 +16,6 @@
 
 #define C_LUCY_PHRASEQUERY
 #define C_LUCY_PHRASECOMPILER
-#include <stdarg.h>
 
 #include "Lucy/Util/ToolSet.h"
 
