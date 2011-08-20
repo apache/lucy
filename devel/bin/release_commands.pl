@@ -135,6 +135,13 @@ say qq|# triggers the Infra team's security alarm bells.|;
 say qq|cd /www/www.apache.org/dist/incubator/lucy/|;
 say qq|[...]\n|;
 
+say qq|# Update the issue tracker.|;
+say qq|# While logged into JIRA, visit the following web page. (Note: this|;
+say qq|# permalink may or may not work.  Please let the dev list know one|;
+say qq|# way or the other.)  Click the "release" link for $x_y_z_version and|;
+say qq|# input the date from the CHANGES file.|;
+say qq|https://issues.apache.org/jira/secure/project/ManageVersions.jspa?pid=12310501\n|;
+
 say qq|# Once the release files are in place, update the download page|;
 say qq|# of the Lucy website. Change the artifact links to point at the|;
 say qq|# new version; ensure that while the primary download links point|;
