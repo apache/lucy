@@ -20,12 +20,18 @@ use strict;
 use warnings;
 use Getopt::Long qw( GetOptions );
 
-my $usage = "$0 --version=X.Y.Z-rcN --apache-id=APACHE_ID\n";
+my $usage
+    = qq|$0 --version=X.Y.Z-rcN --apache-id=APACHE_ID --name="FULL NAME"\n|;
 
-my ( $full_rc_version, $apache_id );
-GetOptions( 'version=s' => \$full_rc_version, 'apache-id=s' => \$apache_id );
+my ( $full_rc_version, $apache_id, $name );
+GetOptions(
+    'version=s'   => \$full_rc_version,
+    'apache-id=s' => \$apache_id,
+    'name=s'      => \$name,
+);
 $full_rc_version or die $usage;
 $apache_id       or die $usage;
+$name            or die $usage;
 $apache_id =~ /^\w+$/ or die $usage;
 $full_rc_version =~ m/^(\d+)\.(\d+)\.(\d+)-rc(\d+)$/ or die $usage;
 my ( $major, $minor, $micro, $rc ) = ( $1, $2, $3, $4 );
@@ -161,11 +167,16 @@ say qq|#     * The Incubator general@ list.|;
 say qq|#     * The announce\@a.o list.  Be sure to send from your apache.org|;
 say qq|#       address|;
 say qq|#|;
-say qq|# Use the entry in the CHANGES file as the basis for your email.|;
+say qq|# Use the entry in the CHANGES file as the basis for your|;
+say qq|# email, or optionally, use the boilerplate announcement text below.|;
 say qq|[...]\n|;
 
 say qq|#######################################################################|;
 say qq|# Boilerplate VOTE email for lucy-dev\@incubator.a.o|;
+say qq|# Suggested subject:|;
+say qq|#|;
+say qq|#    [VOTE] Apache Lucy (incubating) $x_y_z_version RC $rc|;
+say qq|#|;
 say qq|#######################################################################\n|;
 
 say <<END_LUCY_DEV_VOTE;
@@ -215,6 +226,10 @@ END_LUCY_DEV_VOTE
 
 say qq|#######################################################################|;
 say qq|# Boilerplate VOTE email for general\@incubator.a.o|;
+say qq|# Suggested subject:|;
+say qq|#|;
+say qq|#    [VOTE] Apache Lucy (incubating) $x_y_z_version RC $rc|;
+say qq|#|;
 say qq|# NOTE -- YOU MUST FILL IN THE LINK TO THE LUCY PPMC VOTE THREAD AND|;
 say qq|#         THE VOTE TALLIES FOR INCUBATOR PMC MEMBERS!!!|;
 say qq|#######################################################################\n|;
@@ -263,6 +278,51 @@ $x_y_z_version.  The vote will be held open for at least the next 72 hours.
 
 Thanks!
 END_GENERAL_AT_INCUBATOR_VOTE
+
+say qq|#######################################################################|;
+say qq|# Boilerplate ANNOUNCE email|;
+say qq|# Suggested subject:|;
+say qq|#|;
+say qq|#    [ANNOUNCE] Apache Lucy (incubating) $x_y_z_version released|;
+say qq|#|;
+say qq|#######################################################################\n|;
+
+say <<END_ANNOUNCE_EMAIL;
+Greetings,
+
+The Apache Lucy team is pleased to announce the release of version $x_y_z_version
+from the Apache Incubator!
+
+Apache Lucy is full-text search engine library written in C and targeted at
+dynamic languages.  For a list of issues resolved in this version, please see
+the release notes:
+
+  http://www.apache.org/dist/incubator/lucy/CHANGES-$x_y_z_version.txt
+
+The most recent release can be obtained from our download page:
+
+  http://incubator.apache.org/lucy/download.html
+
+For general information on Apache Lucy, please visit the project website:
+
+  http://incubator.apache.org/lucy/
+
+Disclaimer:
+
+  Apache Lucy is an effort undergoing incubation at The Apache Software
+  Foundation (ASF), sponsored by the Apache Incubator. Incubation is required
+  of all newly accepted projects until a further review indicates that the 
+  infrastructure, communications, and decision making process have stabilized
+  in a manner consistent with other successful ASF projects.  While incubation
+  status is not necessarily a reflection of the completeness or stability of
+  the code, it does indicate that the project has yet to be fully endorsed by
+  the ASF.
+
+Regards, 
+
+$name, on behalf of the Apache Lucy development team and community
+
+END_ANNOUNCE_EMAIL
 
 say qq|#######################################################################|;
 
