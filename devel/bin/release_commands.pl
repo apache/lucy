@@ -85,11 +85,16 @@ say qq|# Sign the release.|;
 say qq|gpg --armor --output apache-lucy-incubating-$x_y_z_version.tar.gz.asc |
  . qq|--detach-sig apache-lucy-incubating-$x_y_z_version.tar.gz\n|;
 
+say qq|# Break out CHANGES as a separate file.|;
+say qq|cp -p apache-lucy-incubating-$x_y_z_version/CHANGES CHANGES-$x_y_z_version.txt\n|;
+
 say qq|# Copy files to people.apache.org.|;
 say qq|ssh $apache_id\@people.apache.org|;
 say qq|mkdir public_html/apache-lucy-incubating-$full_rc_version|;
 say qq|exit|;
 say qq|scp -p apache-lucy-incubating-$x_y_z_version.tar.gz* |
+ . qq|people.apache.org:~/public_html/apache-lucy-incubating-$full_rc_version|;
+say qq|scp -p CHANGES-$x_y_z_version.txt |
  . qq|people.apache.org:~/public_html/apache-lucy-incubating-$full_rc_version\n|;
 
 say qq|# Modify permissions.|;
