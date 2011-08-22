@@ -16,7 +16,6 @@
 
 #define C_LUCY_TESTCHARBUF
 #include "Lucy/Util/ToolSet.h"
-#include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 

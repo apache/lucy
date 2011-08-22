@@ -16,7 +16,6 @@
 
 #define C_LUCY_TESTSNOWBALLSTOPFILTER
 #include "Lucy/Util/ToolSet.h"
-#include <stdarg.h>
 
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestSnowballStopFilter.h"

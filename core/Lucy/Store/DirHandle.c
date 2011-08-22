@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_DIRHANDLE
-#include <stdarg.h>
 #include "Lucy/Util/ToolSet.h"
 #include "Lucy/Store/DirHandle.h"
 

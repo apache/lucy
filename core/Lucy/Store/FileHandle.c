@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <stdarg.h>
-
 #define C_LUCY_FILEHANDLE
 #include "Lucy/Util/ToolSet.h"
 

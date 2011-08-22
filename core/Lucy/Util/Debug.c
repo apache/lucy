@@ -26,7 +26,6 @@ int32_t Debug_num_globals   = 0;
 
 #if DEBUG_ENABLED
 
-#include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>

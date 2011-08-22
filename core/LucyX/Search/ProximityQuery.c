@@ -16,7 +16,6 @@
 
 #define C_LUCY_PROXIMITYQUERY
 #define C_LUCY_PROXIMITYCOMPILER
-#include <stdarg.h>
 
 #include "Lucy/Util/ToolSet.h"
 
