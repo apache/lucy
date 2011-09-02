@@ -92,7 +92,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
     FH_do_open((FileHandle*)self, path, flags);
     if (!path || !CB_Get_Size(path)) {
         Err_set_error(Err_new(CB_newf("Missing required param 'path'")));
-        DECREF(self);
+        CFISH_DECREF(self);
         return NULL;
     }
 
@@ -103,7 +103,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
             self->fd = 0;
             Err_set_error(Err_new(CB_newf("Attempt to open '%o' failed: %s",
                                           path, strerror(errno))));
-            DECREF(self);
+            CFISH_DECREF(self);
             return NULL;
         }
         if (flags & FH_EXCLUSIVE) {
@@ -115,7 +115,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
             if (self->len == -1) {
                 Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s",
                                               self->path, strerror(errno))));
-                DECREF(self);
+                CFISH_DECREF(self);
                 return NULL;
             }
             else {
@@ -123,7 +123,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
                 if (check_val == -1) {
                     Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s",
                                                   self->path, strerror(errno))));
-                    DECREF(self);
+                    CFISH_DECREF(self);
                     return NULL;
                 }
             }
@@ -137,20 +137,20 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
                 if (!self->buf) {
                     // An error occurred during SI_map, which has set
                     // Err_error for us already.
-                    DECREF(self);
+                    CFISH_DECREF(self);
                     return NULL;
                 }
             }
         }
         else {
-            DECREF(self);
+            CFISH_DECREF(self);
             return NULL;
         }
     }
     else {
         Err_set_error(Err_new(CB_newf("Must specify FH_READ_ONLY or FH_WRITE_ONLY to open '%o'",
                                       path)));
-        DECREF(self);
+        CFISH_DECREF(self);
         return NULL;
     }
 
