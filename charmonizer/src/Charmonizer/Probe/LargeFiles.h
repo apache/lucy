@@ -33,15 +33,23 @@ extern "C" {
  * fopen64
  * ftello64
  * fseeko64
- *
- * If the attempt succeeds, this will be defined:
- *
- * HAS_LARGE_FILE_SUPPORT
- *
- * Additionally, 64-bit versions of lseek and pread may be detected/aliased:
- *
  * lseek64
  * pread64
+ *
+ * If off64_t or its equivalent is available, this will be defined:
+ *
+ * HAS_64BIT_OFFSET_TYPE
+ * 
+ * If 64-bit variants of fopen, ftell, and fseek are available, this will be
+ * defined:
+ *
+ * HAS_64BIT_STDIO
+ * 
+ * If 64-bit variants of pread and lseek are available, then corresponding
+ * symbols will be defined:
+ * 
+ * HAS_64BIT_PREAD
+ * HAS_64BIT_LSEEK
  *
  * Use of the off64_t symbol may require sys/types.h.
  */

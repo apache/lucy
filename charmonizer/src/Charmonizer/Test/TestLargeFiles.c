@@ -20,14 +20,23 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef HAS_SYS_TYPES_H
+#ifdef CHAZ_HAS_SYS_TYPES_H
   #include <sys/types.h>
+#endif
+#ifdef CHAZ_HAS_FCNTL_H
+  #include <fcntl.h> /* open, fcntl flags */
+#endif
+#ifdef CHY_HAS_UNISTD_H
+  #include <unistd.h> /* close */
+#endif
+#ifdef CHAZ_HAS_IO_H
+  #include <io.h>
 #endif
 
 #include <stdio.h>
 #include "Charmonizer/Test.h"
 
-#if (defined(HAS_LARGE_FILE_SUPPORT) \
+#if (defined(HAS_64BIT_STDIO) \
      && defined(CHAZ_HAS_STAT_ST_SIZE) \
      && defined(CHAZ_HAS_STAT_ST_BLOCKS))
 #define STAT_TESTS_ENABLED
@@ -52,24 +61,28 @@ S_can_create_big_files(void);
 
 #endif /* criteria for defining STAT_TESTS_ENABLED */
 
+#ifdef O_LARGEFILE
+  #define LARGEFILE_OPEN_FLAG O_LARGEFILE
+#else
+  #define LARGEFILE_OPEN_FLAG 0
+#endif
+
 static void
 S_run_tests(TestBatch *batch) {
     FILE *fh;
     off64_t offset;
     int check_val;
     char check_char;
+    int fd;
 
     /* A little over 4 GB, and a little over 2 GB. */
     off64_t gb4_plus = ((off64_t)0x7FFFFFFF << 1) + 100;
     off64_t gb2_plus = (off64_t)0x7FFFFFFF + 200;
 
-    /* Gb4_plus modulo 4 GB (wrap is intentional). */
-    i32_t wrap_gb4 = (i32_t)gb4_plus;
-
     TEST_INT_EQ(batch, sizeof(off64_t), 8, "off64_t type has 8 bytes");
 
-#ifndef HAS_LARGE_FILE_SUPPORT
-    SKIP_REMAINING(batch, "No large file support");
+#ifndef HAS_64BIT_STDIO
+    SKIP_REMAINING(batch, "No stdio large file support");
 #endif
 #ifndef STAT_TESTS_ENABLED
     SKIP_REMAINING(batch, "Need stat with st_size and st_blocks");
@@ -112,12 +125,61 @@ S_run_tests(TestBatch *batch) {
     check_char = fgetc(fh);
     TEST_INT_EQ(batch, check_char, 'X', "read value after multiple seeks");
 
-    fseeko64(fh, wrap_gb4, SEEK_SET);
-    check_char = fgetc(fh);
-    TEST_INT_EQ(batch, check_char, '\0', "No wraparound");
-
     check_val = fclose(fh);
     TEST_INT_EQ(batch, check_val, 0, "fclose succeeds after all that");
+
+    /* Truncate, just in case the call to remove fails. */
+    fh = fopen64("_charm_large_file_test", "w+");
+    if (fh != NULL) {
+        fclose(fh);
+    }
+    remove("_charm_large_file_test");
+
+#ifndef HAS_64BIT_LSEEK
+    SKIP_REMAINING(batch, "No 64-bit lseek");
+#else
+    fd = open("_charm_large_file_test",
+              O_RDWR | O_CREAT | LARGEFILE_OPEN_FLAG, 0666);
+    if (fd == -1) {
+        FAIL(batch, "open failed");
+        SKIP_REMAINING(batch, "open failed");
+    }
+
+    offset = lseek64(fd, gb4_plus, SEEK_SET);
+    TEST_TRUE(batch, offset == gb4_plus, "lseek64 above 4 GB");
+
+    offset = lseek64(fd, 0, SEEK_CUR);
+    TEST_TRUE(batch, offset == gb4_plus, "lseek64 in place above 4 GB");
+
+    check_val = write(fd, "X", 1);
+    TEST_INT_EQ(batch, check_val, 1, "write() above 4 GB");
+
+    offset = lseek64(fd, gb2_plus, SEEK_SET);
+    TEST_TRUE(batch, offset == gb2_plus, "lseek64 above 2 GB");
+
+    offset = lseek64(fd, 0, SEEK_CUR);
+    TEST_TRUE(batch, (offset == gb2_plus), "lseek64 in place above 2 GB");
+
+    offset = lseek64(fd, -1, SEEK_END);
+    TEST_TRUE(batch, offset == gb4_plus, "seek to near end");
+
+    check_val = read(fd, &check_char, 1);
+    TEST_INT_EQ(batch, check_val, 1, "read() after multiple lseek64 calls");
+    TEST_INT_EQ(batch, check_char, 'X',
+                "read() correct data after multiple lseek64 calls");
+#ifdef HAS_64BIT_PREAD
+    check_char = 0;
+    check_val = pread64(fd, &check_char, 1, gb4_plus);
+    TEST_INT_EQ(batch, check_val, 1, "pread64");
+    TEST_INT_EQ(batch, check_char, 'X', "pread64() correct data");
+#else
+    SKIP(batch, "no pread64");
+    SKIP(batch, "no pread64");
+#endif
+
+    check_val = close(fd);
+    TEST_INT_EQ(batch, check_val, 0, "close succeeds after all that");
+#endif
 
     /* Truncate, just in case the call to remove fails. */
     fh = fopen64("_charm_large_file_test", "w+");
@@ -152,12 +214,12 @@ S_test_sparse_file(long offset, struct stat *st) {
 
     /* Make sure the file's not there, then open. */
     remove("_charm_sparse");
-    if ((sparse_fh = fopen("_charm_sparse", "w+")) == NULL) {
+    if ((sparse_fh = fopen64("_charm_sparse", "w+")) == NULL) {
         return false;
     }
 
     /* Seek fh to [offset], write a byte, close file. */
-    if ((fseek(sparse_fh, offset, SEEK_SET)) != -1) {
+    if ((fseeko64(sparse_fh, offset, SEEK_SET)) != -1) {
         if ((fprintf(sparse_fh, "X")) == 1) {
             result = true;
         }
@@ -176,7 +238,7 @@ S_test_sparse_file(long offset, struct stat *st) {
 static chaz_bool_t
 S_can_create_big_files(void) {
     chy_bool_t result = 0;
-    FILE *fh = fopen("_charm_large_file_test", "w+");
+    FILE *fh = fopen64("_charm_large_file_test", "w+");
     if (!fh) {
         return false;
     }
@@ -195,7 +257,7 @@ S_can_create_big_files(void) {
     }
 
     /* Truncate, just in case the call to remove fails. */
-    fh = fopen("_charm_large_file_test", "w");
+    fh = fopen64("_charm_large_file_test", "w");
     if (fh != NULL) {
         fclose(fh);
     }
@@ -210,7 +272,7 @@ int main(int argc, char **argv) {
     TestBatch *batch;
 
     Test_init();
-    batch = Test_new_batch("LargeFiles", 10, S_run_tests);
+    batch = Test_new_batch("LargeFiles", 20, S_run_tests);
     batch->run_test(batch);
     batch->destroy(batch);
     return 0;
