@@ -620,6 +620,9 @@ CB_trim_top(CharBuf *self) {
         ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr];
         count++;
     }
+    if (ptr > end) {
+        DIE_INVALID_UTF8(self->ptr, self->size);
+    }
 
     if (count) {
         // Copy string backwards.
@@ -656,6 +659,9 @@ CB_nip(CharBuf *self, size_t count) {
     for (; ptr < end  && count--; ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr]) {
         num_nipped++;
     }
+    if (ptr > end) {
+        DIE_INVALID_UTF8(self->ptr, self->size);
+    }
     self->size = end - ptr;
     memmove(self->ptr, ptr, self->size);
     return num_nipped;
@@ -669,6 +675,9 @@ CB_nip_one(CharBuf *self) {
     else {
         int32_t retval = (int32_t)StrHelp_decode_utf8_char(self->ptr);
         size_t consumed = StrHelp_UTF8_COUNT[*(uint8_t*)self->ptr];
+        if (consumed > self->size) {
+            DIE_INVALID_UTF8(self->ptr, self->size);
+        }
         char *ptr = self->ptr + StrHelp_UTF8_COUNT[*(uint8_t*)self->ptr];
         self->size -= consumed;
         memmove(self->ptr, ptr, self->size);
@@ -698,6 +707,9 @@ CB_length(CharBuf *self) {
         ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr];
         len++;
     }
+    if (ptr != end) {
+        DIE_INVALID_UTF8(self->ptr, self->size);
+    }
     return len;
 }
 
@@ -717,7 +729,12 @@ CB_code_point_at(CharBuf *self, size_t tick) {
     char *const end = ptr + self->size;
 
     for (; ptr < end; ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr]) {
-        if (count == tick) { return StrHelp_decode_utf8_char(ptr); }
+        if (count == tick) {
+            if (ptr > end) {
+                DIE_INVALID_UTF8(self->ptr, self->size);
+            }
+            return StrHelp_decode_utf8_char(ptr); 
+        }
         count++;
     }
 
@@ -854,6 +871,9 @@ ViewCB_trim_top(ViewCharBuf *self) {
     }
 
     if (count) {
+        if (ptr > end) {
+            DIE_INVALID_UTF8(self->ptr, self->size);
+        }
         self->size = end - ptr;
         self->ptr  = ptr;
     }
@@ -872,6 +892,9 @@ ViewCB_nip(ViewCharBuf *self, size_t count) {
         ) {
         num_nipped++;
     }
+    if (ptr > end) {
+        DIE_INVALID_UTF8(self->ptr, self->size);
+    }
     self->size = end - ptr;
     self->ptr  = ptr;
     return num_nipped;
@@ -885,6 +908,9 @@ ViewCB_nip_one(ViewCharBuf *self) {
     else {
         int32_t retval = (int32_t)StrHelp_decode_utf8_char(self->ptr);
         size_t consumed = StrHelp_UTF8_COUNT[*(uint8_t*)self->ptr];
+        if (consumed > self->size) {
+            DIE_INVALID_UTF8(self->ptr, self->size);
+        }
         self->ptr  += consumed;
         self->size -= consumed;
         return retval;

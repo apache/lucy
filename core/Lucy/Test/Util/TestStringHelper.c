@@ -106,11 +106,13 @@ test_back_utf8_char(TestBatch *batch) {
               "back_utf8_char");
     TEST_TRUE(batch, StrHelp_back_utf8_char(end, buf) == NULL,
               "back_utf8_char returns NULL rather than back up beyond start");
+    TEST_TRUE(batch, StrHelp_back_utf8_char(buffer, buffer) == NULL,
+              "back_utf8_char returns NULL when end == start");
 }
 
 void
 TestStrHelp_run_tests() {
-    TestBatch *batch = TestBatch_new(43);
+    TestBatch *batch = TestBatch_new(44);
 
     TestBatch_Plan(batch);
 
