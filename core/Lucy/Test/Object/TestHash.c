@@ -23,15 +23,13 @@
 #include "Lucy/Test/Object/TestHash.h"
 #include "Lucy/Object/Hash.h"
 
-static CharBuf*
-S_random_string() {
-    uint32_t len    = rand() % 1200;
-    CharBuf *string = CB_new(len * 3);
 
-    while (len--) {
-        uint8_t bytes = (rand() % 3) + 1;
-        uint32_t code_point = 0;
-        switch (bytes & 0x3) {
+uint32_t
+S_random_code_point(void) {
+    uint32_t code_point = 0;
+    while (1) {
+        uint8_t bytes = (rand() % 4) + 1;
+        switch (bytes) {
             case 1:
                 code_point = rand() % 0x80;
                 break;
@@ -41,8 +39,27 @@ S_random_string() {
             case 3:
                 code_point = (rand() % (0x10000 - 0x0800)) + 0x0800;
                 break;
+            case 4: {
+                    uint64_t num = TestUtils_random_u64();
+                    code_point = (num % (0x10FFFF - 0x10000)) + 0x10000;
+                }
         }
-        CB_Cat_Char(string, code_point);
+        if (code_point <= 0xD7FF
+            || (code_point >= 0xE000 && code_point <= 0x10FFFF)
+           ) {
+            break;
+        }
+    }
+    return code_point;
+}
+
+static CharBuf*
+S_random_string() {
+    uint32_t len    = rand() % 1200;
+    CharBuf *string = CB_new(len * 4);
+
+    while (len--) {
+        CB_Cat_Char(string, S_random_code_point());
     }
 
     return string;
