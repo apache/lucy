@@ -1,3 +1,6 @@
+#include <charmony.h>
+#include "Lucy/Util/StringHelper.h"
+
 /*
 
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -17,7 +20,7 @@
 
 */
 
-    protected static final byte[] UTF8_BYTES = {
+const uint8_t lucy_StrHelp_UTF8_COUNT[] = {
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
