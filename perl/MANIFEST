@@ -404,6 +404,5 @@ xs/Lucy/Object/LockFreeRegistry.c
 xs/Lucy/Object/Obj.c
 xs/Lucy/Object/VTable.c
 xs/Lucy/Store/FSFolder.c
-xs/Lucy/Util/StringHelper.c
 xs/XSBind.c
 xs/XSBind.h

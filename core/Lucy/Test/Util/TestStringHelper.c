@@ -20,6 +20,100 @@
 #include "Lucy/Test/Util/TestStringHelper.h"
 #include "Lucy/Util/StringHelper.h"
 
+
+/* This alternative implementation of utf8_valid() is (presumably) slower, but
+ * it implements the standard in a more linear, easy-to-grok way.
+ */
+#define TRAIL_OK(n) (n >= 0x80 && n <= 0xBF)
+static bool_t
+S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
+	const uint8_t *string = maybe_utf8;
+	const uint8_t *const end = maybe_utf8 + size;
+    while (string < end) {
+        int count = StrHelp_UTF8_COUNT[*string];
+        bool_t valid = false;
+        if (count == 1) {
+            if (string[0] <= 0x7F) {
+                valid = true;
+            }
+        }
+        else if (count == 2) {
+            if (string[0] >= 0xC2 && string[0] <= 0xDF) {
+                if (TRAIL_OK(string[1])) {
+                    valid = true;
+                }
+            }
+        }
+        else if (count == 3) {
+            if (string[0] == 0xE0) {
+                if (string[1] >= 0xA0 && string[1] <= 0xBF
+                    && TRAIL_OK(string[2])
+                   ) {
+                    valid = true;
+                }
+            }
+            else if (string[0] >= 0xE1 && string[0] <= 0xEC) {
+                if (TRAIL_OK(string[1])
+                    && TRAIL_OK(string[2])
+                   ) {
+                    valid = true;
+                }
+            }
+            else if (string[0] == 0xED) {
+                if (string[1] >= 0x80 && string[1] <= 0x9F
+                    && TRAIL_OK(string[2])
+                   ) {
+                    valid = true;
+                }
+            }
+            else if (string[0] >= 0xEE && string[0] <= 0xEF) {
+                if (TRAIL_OK(string[1])
+                    && TRAIL_OK(string[2])
+                   ) {
+                    valid = true;
+                }
+            }
+        }
+        else if (count == 4) {
+            if (string[0] == 0xF0) {
+                if (string[1] >= 0x90 && string[1] <= 0xBF
+                    && TRAIL_OK(string[2]) 
+                    && TRAIL_OK(string[3])
+                   ) {
+                    valid = true;
+                }
+            }
+            else if (string[0] >= 0xF1 && string[0] <= 0xF3) {
+                if (TRAIL_OK(string[1])
+                    && TRAIL_OK(string[2])
+                    && TRAIL_OK(string[3])
+                   ) {
+                    valid = true;
+                }
+            }
+            else if (string[0] == 0xF4) {
+                if (string[1] >= 0x80 && string[1] <= 0x8F
+                    && TRAIL_OK(string[2])
+                    && TRAIL_OK(string[3])
+                   ) {
+                    valid = true;
+                }
+            }
+        }
+
+        if (!valid) {
+            return false;
+        }
+        string += count;
+    }
+
+    if (string != end) {
+        return false;
+    }
+
+    return true;
+}
+
 static void
 test_overlap(TestBatch *batch) {
     int32_t result;
@@ -49,36 +143,106 @@ test_to_base36(TestBatch *batch) {
 }
 
 static void
-S_round_trip_utf8_code_point(TestBatch *batch, uint32_t code_point) {
-    char buffer[4];
-    uint32_t len   = StrHelp_encode_utf8_char(code_point, buffer);
-    char *start = buffer;
-    char *end   = start + len;
-    TEST_TRUE(batch, StrHelp_utf8_valid(buffer, len), "Valid UTF-8 for %lu",
-              (unsigned long)code_point);
-    TEST_INT_EQ(batch, len, StrHelp_UTF8_COUNT[(unsigned char)buffer[0]],
-                "length returned for %lu", (unsigned long)code_point);
-    TEST_TRUE(batch, StrHelp_back_utf8_char(end, start) == start,
-              "back_utf8_char for %lu", (unsigned long)code_point);
-    TEST_INT_EQ(batch, StrHelp_decode_utf8_char(buffer), code_point,
-                "round trip encode and decode for %lu", (unsigned long)code_point);
+test_utf8_round_trip(TestBatch *batch) {
+    bool_t failed = false;
+    uint32_t code_point;
+    for (code_point = 0; code_point <= 0x10FFFF; code_point++) {
+        char buffer[4];
+        uint32_t size = StrHelp_encode_utf8_char(code_point, buffer);
+        char *start = buffer;
+        char *end   = start + size;
+
+        // Verify length returned by encode_utf8_char().
+        if (size != StrHelp_UTF8_COUNT[(unsigned char)buffer[0]]) {
+            break;
+        }
+        // Verify that utf8_valid() agrees with alternate implementation.
+        if (!!StrHelp_utf8_valid(start, size)
+            != !!S_utf8_valid_alt(start, size)
+           ) {
+            break;
+        }
+
+        // Verify back_utf8_char().
+        if (StrHelp_back_utf8_char(end, start) != start) {
+            break;
+        }
+
+        // Verify round trip of encode/decode.
+        if (StrHelp_decode_utf8_char(buffer) != code_point) {
+            break;
+        }
+    }
+    if (code_point == 0x110000) {
+        PASS(batch, "Successfully round tripped 0 - 0x10FFFF");
+    }
+    else {
+        FAIL(batch, "Failed round trip at 0x%.1X", (unsigned)code_point);
+    }
 }
 
 static void
-test_utf8_round_trip(TestBatch *batch) {
-    uint32_t code_points[] = {
-        0,
-        0xA,      // newline
-        'a',
-        128,      // two-byte
-        0x263A,   // smiley (three-byte)
-        0x10FFFF, // Max legal code point (four-byte).
-    };
-    uint32_t num_code_points = sizeof(code_points) / sizeof(uint32_t);
-    uint32_t i;
-    for (i = 0; i < num_code_points; i++) {
-        S_round_trip_utf8_code_point(batch, code_points[i]);
+S_test_validity(TestBatch *batch, const char *content, size_t size,
+                bool_t expected, const char *description) {
+    bool_t sane = StrHelp_utf8_valid(content, size);
+    bool_t double_check = S_utf8_valid_alt(content, size);
+    if (sane != double_check) {
+        FAIL(batch, "Disagreement: %s", description);
     }
+    else {
+        TEST_TRUE(batch, sane == expected, "%s", description);
+    }
+}
+
+static void
+test_utf8_valid(TestBatch *batch) {
+    // Musical symbol G clef:
+    // Code point: U+1D11E
+    // UTF-16:     0xD834 0xDD1E
+    // UTF-8       0xF0 0x9D 0x84 0x9E
+    S_test_validity(batch, "\xF0\x9D\x84\x9E", 4, true,
+                    "Musical symbol G clef");
+    S_test_validity(batch, "\xED\xA0\xB4\xED\xB4\x9E", 6, false,
+                    "G clef as UTF-8 encoded UTF-16 surrogates");
+    S_test_validity(batch, ".\xED\xA0\xB4.", 5, false,
+                    "Isolated high surrogate");
+    S_test_validity(batch, ".\xED\xB4\x9E.", 5, false,
+                    "Isolated low surrogate");
+
+    // Shortest form.
+    S_test_validity(batch, ".\xC1\x9C.", 4, false,
+                    "Non-shortest form ASCII backslash");
+    S_test_validity(batch, ".\xC0\xAF.", 4, false,
+                    "Non-shortest form ASCII slash");
+    S_test_validity(batch, ".\xC0\x80.", 4, false,
+                    "Non-shortest form ASCII NUL character");
+
+    // Range.
+    S_test_validity(batch, "\xF8\x88\x80\x80\x80", 5, false, "5-byte UTF-8");
+
+    // Bad continuations.
+    S_test_validity(batch, "\xE2\x98\xBA\xE2\x98\xBA", 6, true,
+                    "SmileySmiley");
+    S_test_validity(batch, "\xE2\xBA\xE2\x98\xBA", 5, false, 
+                    "missing first continuation byte");
+    S_test_validity(batch, "\xE2\x98\xE2\x98\xBA", 5, false, 
+                    "missing second continuation byte");
+    S_test_validity(batch, "\xE2\xE2\x98\xBA", 4, false, 
+                    "missing both continuation bytes");
+    S_test_validity(batch, "\xBA\xE2\x98\xBA\xE2\xBA", 5, false, 
+                    "missing first continuation byte (end)");
+    S_test_validity(batch, "\xE2\x98\xBA\xE2\x98", 5, false, 
+                    "missing second continuation byte (end)");
+    S_test_validity(batch, "\xE2\x98\xBA\xE2", 4, false, 
+                    "missing both continuation bytes (end)");
+    S_test_validity(batch, "\xBA\xE2\x98\xBA", 4, false, 
+                    "isolated continuation byte 0xBA");
+    S_test_validity(batch, "\x98\xE2\x98\xBA", 4, false, 
+                    "isolated continuation byte 0x98");
+    S_test_validity(batch, "\xE2\x98\xBA\xBA", 4, false, 
+                    "isolated continuation byte 0xBA (end)");
+    S_test_validity(batch, "\xE2\x98\xBA\x98", 4, false, 
+                    "isolated continuation byte 0x98 (end)");
 }
 
 static void
@@ -112,13 +276,14 @@ test_back_utf8_char(TestBatch *batch) {
 
 void
 TestStrHelp_run_tests() {
-    TestBatch *batch = TestBatch_new(44);
+    TestBatch *batch = TestBatch_new(40);
 
     TestBatch_Plan(batch);
 
     test_overlap(batch);
     test_to_base36(batch);
     test_utf8_round_trip(batch);
+    test_utf8_valid(batch);
     test_is_whitespace(batch);
     test_back_utf8_char(batch);
 

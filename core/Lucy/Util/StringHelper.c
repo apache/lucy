@@ -78,6 +78,57 @@ StrHelp_to_base36(uint64_t num, void *buffer) {
     }
 }
 
+bool_t
+StrHelp_utf8_valid(const char *ptr, size_t size) {
+    const uint8_t *string    = (const uint8_t*)ptr;
+    const uint8_t *const end = string + size;
+    while (string < end) {
+		const uint8_t header_byte = *string++;
+        int count = StrHelp_UTF8_COUNT[header_byte] & 0x7;
+        switch (count & 0x7) {
+            case 1: 
+				// ASCII
+                break;
+            case 2:
+                if (string == end)              { return false; }
+				// Disallow non-shortest-form ASCII.
+                if (!(header_byte & 0x1E))      { return false; }
+                if ((*string++ & 0xC0) != 0x80) { return false; }
+                break;
+            case 3:
+                if (end - string < 2)           { return false; }
+				if (header_byte == 0xED) {
+					if (*string < 0x80 || *string > 0x9F) {
+						return false;
+					}
+				}
+				else if (!(header_byte & 0x0F)) {
+					if (!(*string & 0x20)) {
+						return false;
+					}
+				}
+                if ((*string++ & 0xC0) != 0x80) { return false; }
+                if ((*string++ & 0xC0) != 0x80) { return false; }
+                break;
+            case 4:
+                if (end - string < 3)           { return false; }
+				if (!(header_byte & 0x07)) {
+					if (!(*string & 0x30)) {
+						return false;
+					}
+				}
+                if ((*string++ & 0xC0) != 0x80) { return false; }
+                if ((*string++ & 0xC0) != 0x80) { return false; }
+                if ((*string++ & 0xC0) != 0x80) { return false; }
+                break;
+            default:
+                return false;
+        }
+    }
+
+    return true;
+}
+
 uint32_t
 StrHelp_encode_utf8_char(uint32_t code_point, void *buffer) {
     uint8_t *buf = (uint8_t*)buffer;
