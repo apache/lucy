@@ -322,7 +322,13 @@ sub create_pod {
         $inheritance_pod = "=head1 INHERITANCE\n\n";
         $inheritance_pod .= $class->get_class_name;
         for my $ancestor (@ancestors) {
-            $inheritance_pod .= " isa L<" . $ancestor->get_class_name . ">";
+            my $class_name = $ancestor->get_class_name;           
+            if ( $registry{$class_name} ) {
+                $inheritance_pod .= " isa L<$class_name>";
+            } 
+            else {
+                $inheritance_pod .= " isa $class_name";
+            }
         }
         $inheritance_pod .= ".\n";
     }
