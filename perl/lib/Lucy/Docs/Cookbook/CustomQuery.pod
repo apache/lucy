@@ -131,8 +131,11 @@ The last thing we'll need is a make_compiler() factory method which kicks out
 a subclass of L<Compiler|Lucy::Search::Compiler>.
 
     sub make_compiler {
-        my $self = shift;
-        return PrefixCompiler->new( @_, parent => $self );
+        my ( $self, %args ) = @_;
+        my $subordinate = delete $args{subordinate};
+        my $compiler = PrefixCompiler->new( %args, parent => $self );
+        $compiler->normalize unless $subordinate;
+        return $compiler;
     }
 
 =head2 PrefixCompiler

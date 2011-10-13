@@ -132,7 +132,7 @@ IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
     Compiler *compiler = Query_Is_A(query, COMPILER)
                          ? (Compiler*)INCREF(query)
                          : Query_Make_Compiler(query, (Searcher*)self,
-                                               Query_Get_Boost(query));
+                                               Query_Get_Boost(query), false);
 
     // Accumulate hits into the Collector.
     for (i = 0, max = VA_Get_Size(seg_readers); i < max; i++) {

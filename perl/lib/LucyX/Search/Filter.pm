@@ -49,8 +49,12 @@ sub DESTROY {
 }
 
 sub make_compiler {
-    my $self = shift;
-    return LucyX::Search::FilterCompiler->new( @_, parent => $self );
+    my ( $self, %args ) = @_;
+    my $subordinate = delete $args{subordinate};
+    my $compiler
+        = LucyX::Search::FilterCompiler->new( %args, parent => $self );
+    $compiler->normalize unless $subordinate;
+    return $compiler;
 }
 
 sub serialize {

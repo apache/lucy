@@ -67,8 +67,13 @@ NOTQuery_equals(NOTQuery *self, Obj *other) {
 }
 
 Compiler*
-NOTQuery_make_compiler(NOTQuery *self, Searcher *searcher, float boost) {
-    return (Compiler*)NOTCompiler_new(self, searcher, boost);
+NOTQuery_make_compiler(NOTQuery *self, Searcher *searcher, float boost,
+                       bool_t subordinate) {
+    NOTCompiler *compiler = NOTCompiler_new(self, searcher, boost);
+    if (!subordinate) {
+        NOTCompiler_Normalize(compiler);
+    }   
+    return (Compiler*)compiler;
 }
 
 /**********************************************************************/
@@ -84,7 +89,6 @@ NOTCompiler_init(NOTCompiler *self, NOTQuery *parent, Searcher *searcher,
                  float boost) {
     PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
                       boost);
-    NOTCompiler_Normalize(self);
     return self;
 }
 

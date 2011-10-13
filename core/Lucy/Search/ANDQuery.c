@@ -72,8 +72,13 @@ ANDQuery_equals(ANDQuery *self, Obj *other) {
 }
 
 Compiler*
-ANDQuery_make_compiler(ANDQuery *self, Searcher *searcher, float boost) {
-    return (Compiler*)ANDCompiler_new(self, searcher, boost);
+ANDQuery_make_compiler(ANDQuery *self, Searcher *searcher, float boost,
+                       bool_t subordinate) {
+    ANDCompiler *compiler = ANDCompiler_new(self, searcher, boost);
+    if (!subordinate) {
+        ANDCompiler_Normalize(compiler);
+    }
+    return (Compiler*)compiler;
 }
 
 /**********************************************************************/
@@ -89,7 +94,6 @@ ANDCompiler_init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher,
                  float boost) {
     PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
                       boost);
-    ANDCompiler_Normalize(self);
     return self;
 }
 

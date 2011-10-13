@@ -118,8 +118,9 @@ PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
     for (i = 0; i < num_kids; i++) {
         Query *child_query = (Query*)VA_Fetch(parent->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
-        VA_Push(self->children,
-                (Obj*)Query_Make_Compiler(child_query, searcher, sub_boost));
+        Compiler *child_compiler
+            = Query_Make_Compiler(child_query, searcher, sub_boost, true);
+        VA_Push(self->children, (Obj*)child_compiler);
     }
 
     return self;

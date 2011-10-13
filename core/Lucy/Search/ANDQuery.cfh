@@ -35,7 +35,8 @@ class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery
     init(ANDQuery *self, VArray *children = NULL);
 
     public incremented Compiler*
-    Make_Compiler(ANDQuery *self, Searcher *searcher, float boost);
+    Make_Compiler(ANDQuery *self, Searcher *searcher, float boost,
+                  bool_t subordinate = false);
 
     public incremented CharBuf*
     To_String(ANDQuery *self);

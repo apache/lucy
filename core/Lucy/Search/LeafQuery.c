@@ -103,10 +103,12 @@ LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
 }
 
 Compiler*
-LeafQuery_make_compiler(LeafQuery *self, Searcher *searcher, float boost) {
+LeafQuery_make_compiler(LeafQuery *self, Searcher *searcher, float boost,
+                        bool_t subordinate) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(boost);
+    UNUSED_VAR(subordinate);
     THROW(ERR, "Can't Make_Compiler() from LeafQuery");
     UNREACHABLE_RETURN(Compiler*);
 }

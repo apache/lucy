@@ -55,7 +55,7 @@ class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
 
     public incremented Compiler*
     Make_Compiler(RequiredOptionalQuery *self, Searcher *searcher,
-                  float boost);
+                  float boost, bool_t subordinate = false);
 
     public incremented CharBuf*
     To_String(RequiredOptionalQuery *self);

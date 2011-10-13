@@ -38,8 +38,13 @@ ORQuery_init(ORQuery *self, VArray *children) {
 }
 
 Compiler*
-ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost) {
-    return (Compiler*)ORCompiler_new(self, searcher, boost);
+ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost,
+                      bool_t subordinate) {
+    ORCompiler *compiler = ORCompiler_new(self, searcher, boost);
+    if (!subordinate) {
+        ORCompiler_Normalize(compiler);
+    }   
+    return (Compiler*)compiler;
 }
 
 bool_t
@@ -85,7 +90,6 @@ ORCompiler_init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
                 float boost) {
     PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
                       boost);
-    ORCompiler_Normalize(self);
     return self;
 }
 

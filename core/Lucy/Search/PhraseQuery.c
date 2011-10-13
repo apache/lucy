@@ -125,7 +125,7 @@ PhraseQuery_to_string(PhraseQuery *self) {
 
 Compiler*
 PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
-                          float boost) {
+                          float boost, bool_t subordinate) {
     if (VA_Get_Size(self->terms) == 1) {
         // Optimize for one-term "phrases".
         Obj *term = VA_Fetch(self->terms, 0);
@@ -134,12 +134,17 @@ PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
         TermQuery_Set_Boost(term_query, self->boost);
         term_compiler
             = (TermCompiler*)TermQuery_Make_Compiler(term_query, searcher,
-                                                     boost);
+                                                     boost, subordinate);
         DECREF(term_query);
         return (Compiler*)term_compiler;
     }
     else {
-        return (Compiler*)PhraseCompiler_new(self, searcher, boost);
+        PhraseCompiler *compiler
+            = PhraseCompiler_new(self, searcher, boost);
+        if (!subordinate) {
+            PhraseCompiler_Normalize(compiler);
+        }   
+        return (Compiler*)compiler;
     }
 }
 
@@ -186,9 +191,6 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
 
     // Calculate raw weight.
     self->raw_weight = self->idf * self->boost;
-
-    // Make final preparations.
-    PhraseCompiler_Normalize(self);
 
     return self;
 }
