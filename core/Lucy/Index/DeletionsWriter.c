@@ -274,7 +274,7 @@ DefDelWriter_delete_by_term(DefaultDeletionsWriter *self,
 void
 DefDelWriter_delete_by_query(DefaultDeletionsWriter *self, Query *query) {
     Compiler *compiler = Query_Make_Compiler(query, (Searcher*)self->searcher,
-                                             Query_Get_Boost(query));
+                                             Query_Get_Boost(query), false);
     uint32_t i, max;
 
     for (i = 0, max = VA_Get_Size(self->seg_readers); i < max; i++) {

@@ -50,7 +50,8 @@ class Lucy::Search::TermQuery inherits Lucy::Search::Query
     Get_Term(TermQuery *self);
 
     public incremented Compiler*
-    Make_Compiler(TermQuery *self, Searcher *searcher, float boost);
+    Make_Compiler(TermQuery *self, Searcher *searcher, float boost,
+                  bool_t subordinate = false);
 
     public incremented CharBuf*
     To_String(TermQuery *self);

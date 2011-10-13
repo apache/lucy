@@ -51,7 +51,8 @@ class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
     Set_Negated_Query(NOTQuery *self, Query *negated_query);
 
     public incremented Compiler*
-    Make_Compiler(NOTQuery *self, Searcher *searcher, float boost);
+    Make_Compiler(NOTQuery *self, Searcher *searcher, float boost,
+                  bool_t subordinate = false);
 
     public incremented CharBuf*
     To_String(NOTQuery *self);

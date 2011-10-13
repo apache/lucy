@@ -135,7 +135,8 @@ PolySearcher_top_docs(PolySearcher *self, Query *query, uint32_t num_wanted,
     Compiler *compiler    = Query_Is_A(query, COMPILER)
                             ? ((Compiler*)INCREF(query))
                             : Query_Make_Compiler(query, (Searcher*)self,
-                                                  Query_Get_Boost(query));
+                                                  Query_Get_Boost(query),
+                                                  false);
     uint32_t i, max;
 
     for (i = 0, max = VA_Get_Size(searchers); i < max; i++) {

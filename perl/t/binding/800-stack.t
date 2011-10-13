@@ -23,8 +23,11 @@ package MyQuery;
 use base qw( Lucy::Search::Query );
 
 sub make_compiler {
-    my $self = shift;
-    return MyCompiler->new( @_, parent => $self );
+    my ( $self, %args ) = @_;
+    my $subordinate = delete $args{subordinate};
+    my $compiler = MyCompiler->new( %args, parent => $self );
+    $compiler->normalize unless $subordinate;
+    return $compiler;
 }
 
 package MyCompiler;

@@ -158,8 +158,12 @@ RangeQuery_deserialize(RangeQuery *self, InStream *instream) {
 
 RangeCompiler*
 RangeQuery_make_compiler(RangeQuery *self, Searcher *searcher,
-                         float boost) {
-    return RangeCompiler_new(self, searcher, boost);
+                         float boost, bool_t subordinate) {
+    RangeCompiler *compiler = RangeCompiler_new(self, searcher, boost);
+    if (!subordinate) {
+        RangeCompiler_Normalize(compiler);
+    }   
+    return (Compiler*)compiler;
 }
 
 /**********************************************************************/

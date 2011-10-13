@@ -56,8 +56,12 @@ MatchAllQuery_to_string(MatchAllQuery *self) {
 
 Compiler*
 MatchAllQuery_make_compiler(MatchAllQuery *self, Searcher *searcher,
-                            float boost) {
-    return (Compiler*)MatchAllCompiler_new(self, searcher, boost);
+                            float boost, bool_t subordinate) {
+    MatchAllCompiler *compiler = MatchAllCompiler_new(self, searcher, boost);
+    if (!subordinate) {
+        MatchAllCompiler_Normalize(compiler);
+    }
+    return (Compiler*)compiler;
 }
 
 /**********************************************************************/

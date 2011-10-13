@@ -58,7 +58,8 @@ Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
     self->searcher       = (Searcher*)INCREF(searcher);
     self->field          = CB_Clone(field);
     self->compiler       = Query_Make_Compiler(self->query, searcher,
-                                               Query_Get_Boost(self->query));
+                                               Query_Get_Boost(self->query),
+                                               false);
     self->excerpt_length = excerpt_length;
     self->slop           = excerpt_length / 3;
     self->window_width   = excerpt_length + (self->slop * 2);

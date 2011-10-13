@@ -101,8 +101,14 @@ TermQuery_to_string(TermQuery *self) {
 }
 
 Compiler*
-TermQuery_make_compiler(TermQuery *self, Searcher *searcher, float boost) {
-    return (Compiler*)TermCompiler_new((Query*)self, searcher, boost);
+TermQuery_make_compiler(TermQuery *self, Searcher *searcher, float boost,
+                        bool_t subordinate) {
+    TermCompiler *compiler = TermCompiler_new((Query*)self, searcher, boost);
+    if (!subordinate) {
+        TermCompiler_Normalize(compiler);
+    }   
+    return (Compiler*)compiler;
+
 }
 
 /******************************************************************/
@@ -146,9 +152,6 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
      * per-document.
      */
     self->raw_weight = self->idf * self->boost;
-
-    // Make final preparations.
-    TermCompiler_Normalize(self);
 
     return self;
 }

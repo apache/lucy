@@ -52,9 +52,14 @@ class Lucy::Search::Query inherits Lucy::Object::Obj : dumpable {
      *
      * @param searcher A Searcher.
      * @param boost A scoring multiplier. Defaults to the Query's own boost.
+     * @param subordinate Indicates whether the Query is a subquery (as
+     * opposed to a top-level query).  If false, the implementation must
+     * invoke Normalize() on the newly minted Compiler object before returning
+     * it.
      */
     public abstract incremented Compiler*
-    Make_Compiler(Query *self, Searcher *searcher, float boost);
+    Make_Compiler(Query *self, Searcher *searcher, float boost,
+                  bool_t subordinate = false);
 
     /** Set the Query's boost.
      */

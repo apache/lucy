@@ -57,8 +57,12 @@ NoMatchQuery_to_string(NoMatchQuery *self) {
 
 Compiler*
 NoMatchQuery_make_compiler(NoMatchQuery *self, Searcher *searcher,
-                           float boost) {
-    return (Compiler*)NoMatchCompiler_new(self, searcher, boost);
+                           float boost, bool_t subordinate) {
+    NoMatchCompiler *compiler = NoMatchCompiler_new(self, searcher, boost);
+    if (!subordinate) {
+        NoMatchCompiler_Normalize(compiler);
+    }
+    return (Compiler*)compiler;
 }
 
 void

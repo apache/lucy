@@ -35,7 +35,7 @@ parcel Lucy;
  *
  * Compiling a Matcher is a two stage process.
  *
- * The first stage takes place during the Compiler's constructor, which is
+ * The first stage takes place during the Compiler's construction, which is
  * where the Query object meets a L<Searcher|Lucy::Search::Searcher>
  * object for the first time.  Searchers operate on a specific document
  * collection and they can tell you certain statistical information about the
@@ -121,8 +121,8 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
     Apply_Norm_Factor(Compiler *self, float factor);
 
     /**  Take a newly minted Compiler object and apply query-specific
-     * normalization factors.  Should be called at or near the end of
-     * construction.
+     * normalization factors.  Should be invoked by Query subclasses during
+     * Make_Compiler() for top-level nodes.
      *
      * For a TermQuery, the scoring formula is approximately:
      *
