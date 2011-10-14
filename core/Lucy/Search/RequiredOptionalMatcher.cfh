@@ -28,11 +28,11 @@ class Lucy::Search::RequiredOptionalMatcher cnick ReqOptMatcher
 
     inert incremented RequiredOptionalMatcher*
     new(Similarity *similarity, Matcher *required_matcher,
-        Matcher *optional_matcher);
+        Matcher *optional_matcher = NULL);
 
     inert RequiredOptionalMatcher*
     init(RequiredOptionalMatcher *self, Similarity *similarity,
-         Matcher *required_matcher, Matcher *optional_matcher);
+         Matcher *required_matcher, Matcher *optional_matcher = NULL);
 
     public void
     Destroy(RequiredOptionalMatcher *self);

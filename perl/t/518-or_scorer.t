@@ -17,17 +17,17 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 900;
+use Test::More tests => 1617; 
 use Lucy::Test;
 use LucyX::Search::MockMatcher;
 use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 
 my $sim = Lucy::Index::Similarity->new;
 
-for my $interval_a ( 1 .. 10 ) {
-    for my $interval_b ( 5 .. 10 ) {
+for my $interval_a ( 1 .. 10, 1000 ) {
+    for my $interval_b ( 5 .. 10, 1000 ) {
         check_matcher( $interval_a, $interval_b );
-        for my $interval_c ( 30, 75 ) {
+        for my $interval_c ( 30, 75, 1000 ) {
             check_matcher( $interval_a, $interval_b, $interval_c );
             check_matcher( $interval_c, $interval_b, $interval_a );
         }
@@ -40,11 +40,16 @@ sub check_matcher {
     my $child_matchers
         = Lucy::Object::VArray->new( capacity => scalar @intervals );
     for my $doc_id_array (@doc_id_arrays) {
-        my $mock = LucyX::Search::MockMatcher->new(
-            doc_ids => $doc_id_array,
-            scores  => [ (1) x scalar @$doc_id_array ],
-        );
-        $child_matchers->push($mock);
+        if (@$doc_id_array) {
+            my $mock = LucyX::Search::MockMatcher->new(
+                doc_ids => $doc_id_array,
+                scores  => [ (1) x scalar @$doc_id_array ],
+            );
+            $child_matchers->push($mock);
+        }
+        else {
+            $child_matchers->push(undef);
+        }
     }
 
     my $or_scorer = Lucy::Search::ORScorer->new(

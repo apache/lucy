@@ -97,7 +97,9 @@ S_ormatcher_init2(ORMatcher *self, VArray *children, Similarity *sim) {
     // Prime queue.
     for (i = 0; i < self->max_size; i++) {
         Matcher *matcher = (Matcher*)VA_Fetch(children, i);
-        S_add_element(self, (Matcher*)INCREF(matcher), 0);
+        if (matcher) {
+            S_add_element(self, (Matcher*)INCREF(matcher), 0);
+        }
     }
 
     return self;

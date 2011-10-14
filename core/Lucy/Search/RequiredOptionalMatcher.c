@@ -76,14 +76,15 @@ ReqOptMatcher_score(RequiredOptionalMatcher *self) {
 
     if (self->opt_matcher_first_time) {
         self->opt_matcher_first_time = false;
-        if (!Matcher_Advance(self->opt_matcher, current_doc)) {
+        if (self->opt_matcher != NULL
+            && !Matcher_Advance(self->opt_matcher, current_doc)) {
             DECREF(self->opt_matcher);
             self->opt_matcher = NULL;
         }
     }
 
     if (self->opt_matcher == NULL) {
-        return Matcher_Score(self->req_matcher);
+        return Matcher_Score(self->req_matcher) * self->coord_factors[1];
     }
     else {
         int32_t opt_matcher_doc = Matcher_Get_Doc_ID(self->opt_matcher);
@@ -93,7 +94,8 @@ ReqOptMatcher_score(RequiredOptionalMatcher *self) {
             if (!opt_matcher_doc) {
                 DECREF(self->opt_matcher);
                 self->opt_matcher = NULL;
-                return Matcher_Score(self->req_matcher);
+                float req_score = Matcher_Score(self->req_matcher);
+                return req_score * self->coord_factors[1];
             }
         }
 
@@ -104,7 +106,7 @@ ReqOptMatcher_score(RequiredOptionalMatcher *self) {
             return score;
         }
         else {
-            return Matcher_Score(self->req_matcher);
+            return Matcher_Score(self->req_matcher) * self->coord_factors[1];
         }
     }
 }
