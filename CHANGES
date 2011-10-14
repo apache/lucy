@@ -1,5 +1,20 @@
 Revision history for Lucy
 
+0.2.2  XXXX-XX-XX
+
+  Bugfixes:
+
+    * [LUCY-175] - Missing stdarg.h breaks build
+    * [LUCY-176] - More INCREF/DECREF symbol collisions under Windows
+    * [LUCY-180] - ORQuery, ANDQuery, RequiredOptionalQuery optimizations
+                   affect scoring
+    * [LUCY-181] - Perl Documentation fix - Remove links to classes within
+                   docs, that are not exposed to Perl
+    * [LUCY-182] - highlighter bug when searching for duplicate terms [wordX
+                   wordX]
+    * [LUCY-183] - Eliminate spurious "extra" query normalization
+
+
 0.2.1  2011-08-14
 
   Bugfixes:
