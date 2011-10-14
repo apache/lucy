@@ -48,7 +48,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     /** Push an item onto the end of a VArray.
      */
     void
-    Push(VArray *self, decremented Obj *element);
+    Push(VArray *self, decremented Obj *element = NULL);
 
     /** Push all the elements of another VArray onto the end of this one.
      */
@@ -63,7 +63,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     /** Unshift an item onto the front of a VArray.
      */
     void
-    Unshift(VArray *self, decremented Obj *element);
+    Unshift(VArray *self, decremented Obj *element = NULL);
 
     /** Shift an item off of the front of a VArray.
      */
@@ -85,7 +85,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
      * existing element.
      */
     void
-    Store(VArray *self, uint32_t tick, decremented Obj *elem);
+    Store(VArray *self, uint32_t tick, decremented Obj *elem = NULL);
 
     /** Replace an element in the VArray with NULL and return it.
      *
