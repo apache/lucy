@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( create_index );
 
@@ -50,15 +50,6 @@ my $thawed   = thaw($frozen);
 ok( $thawed->equals($compiler), "freeze/thaw compiler" );
 my $matcher = $compiler->make_matcher( reader => $reader, need_score => 1 );
 isa_ok( $matcher, 'Lucy::Search::RequiredOptionalMatcher' );
-
-$req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
-    required_query => $b_query,
-    optional_query => $x_query,
-);
-$matcher = $req_opt_query->make_compiler( searcher => $searcher )
-    ->make_matcher( reader => $reader, need_score => 0 );
-isa_ok( $matcher, 'Lucy::Search::TermMatcher',
-    "return required matcher only when opt matcher doesn't match" );
 
 $req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
     required_query => $x_query,

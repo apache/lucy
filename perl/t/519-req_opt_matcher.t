@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 726;
+use Test::More tests => 792;
 use Lucy::Test;
 use LucyX::Search::MockMatcher;
 use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
@@ -25,7 +25,7 @@ use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 my $sim = Lucy::Index::Similarity->new;
 
 for my $req_interval ( 1 .. 10, 75 ) {
-    for my $opt_interval ( 1 .. 10, 75 ) {
+    for my $opt_interval ( 1 .. 10, 75, 1000 ) { # 1000 = no matches
         check_matcher( $req_interval, $opt_interval );
         check_matcher( $opt_interval, $req_interval );
     }
@@ -39,10 +39,13 @@ sub check_matcher {
         doc_ids => $req_docs,
         scores  => [ (1) x scalar @$req_docs ],
     );
-    my $opt_mock = LucyX::Search::MockMatcher->new(
-        doc_ids => $opt_docs,
-        scores  => [ (1) x scalar @$opt_docs ],
-    );
+    my $opt_mock;
+    if (@$opt_docs) {
+        $opt_mock = LucyX::Search::MockMatcher->new(
+            doc_ids => $opt_docs,
+            scores  => [ (1) x scalar @$opt_docs ],
+        );
+    }
     my $req_opt_matcher = Lucy::Search::RequiredOptionalMatcher->new(
         similarity       => $sim,
         required_matcher => $req_mock,

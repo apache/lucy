@@ -128,9 +128,6 @@ ReqOptCompiler_make_matcher(RequiredOptionalCompiler *self, SegReader *reader,
         DECREF(opt_matcher);
         return NULL;
     }
-    else if (opt_matcher == NULL) {
-        return req_matcher;
-    }
     else {
         Matcher *retval
             = (Matcher*)ReqOptMatcher_new(sim, req_matcher, opt_matcher);
