@@ -23,7 +23,7 @@ inert class Lucy::Util::ProcessID cnick PID {
     /** Return the ID for the current process.
      */
     inert int
-    getpid(void);
+    getpid();
 
     /** Return true if the supplied process ID is associated with an active
      * process.
