@@ -27,7 +27,6 @@ my $builder = Lucy::Build->new(
     dist_version   => '0.2.0',
     requires       => { 'perl' => '5.8.3', },
     build_requires => {
-        'Parse::RecDescent'  => 1.94,
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 2.18,

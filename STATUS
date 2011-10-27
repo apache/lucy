@@ -24,11 +24,6 @@ TODO LIST:
   * Port the Clownfish compiler to C.
     <https://issues.apache.org/jira/browse/LUCY-142>
 
-  * Replace dependency on Parse::RecDescent within Clownfish::Parser with
-    the Lemon parser generator. 
-    <https://issues.apache.org/jira/browse/LUCY-143>
-    <https://issues.apache.org/jira/browse/LUCY-134>
-
   * Refactor away C89 idioms, since we have chosen the intersection of C99 
     and C++ as our C dialect.
     <https://issues.apache.org/jira/browse/LUCY-144>
