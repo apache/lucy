@@ -1,0 +1,73 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+use strict;
+use warnings;
+
+package Clownfish::Binding::Perl::Method;
+use base qw( Clownfish::Binding::Perl::Subroutine );
+use Clownfish::Util qw( verify_args );
+use Clownfish::Binding::Perl::TypeMap qw( from_perl to_perl );
+use Carp;
+
+our %new_PARAMS = (
+    method => undef,
+    alias  => undef,
+);
+
+sub new {
+    my ( $either, %args ) = @_;
+    confess $@ unless verify_args( \%new_PARAMS, %args );
+    return _new( @args{qw( method alias )} );
+}
+
+1;
+
+__END__
+
+__POD__
+
+=head1 NAME
+
+Clownfish::Binding::Perl::Method - Binding for an object method.
+
+=head1 DESCRIPTION
+
+This class isa Clownfish::Binding::Perl::Subroutine -- see its
+documentation for various code-generating routines.
+
+Method bindings use labeled parameters if the C function takes more than one
+argument (other than C<self>).  If there is only one argument, the binding
+will be set up to accept a single positional argument.
+
+=head1 METHODS
+
+=head2 new
+
+    my $binding = Clownfish::Binding::Perl::Method->new(
+        method => $method,    # required
+    );
+
+=over
+
+=item * B<method> - A L<Clownfish::Method>.
+
+=back
+
+=head2 xsub_def
+
+Generate the XSUB code.
+
+=cut
