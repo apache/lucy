@@ -2045,6 +2045,22 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCPerlClass_perlify_doc_text(self, source));
 OUTPUT: RETVAL
 
+SV*
+_gen_subroutine_pod(self, func, sub_name, klass, code_sample, class_name, is_constructor)
+    CFCPerlClass *self;
+    CFCFunction *func;
+    const char *sub_name;
+    CFCClass *klass;
+    const char *code_sample;
+    const char *class_name;
+    int is_constructor;
+CODE:
+    char *value = CFCPerlClass_gen_subroutine_pod(self, func, sub_name, klass,
+                                                  code_sample, class_name,
+                                                  is_constructor);
+    RETVAL = S_sv_eat_c_string(value);
+OUTPUT: RETVAL
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::TypeMap
 

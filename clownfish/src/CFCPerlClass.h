@@ -24,6 +24,7 @@ extern "C" {
 typedef struct CFCPerlClass CFCPerlClass;
 struct CFCParcel;
 struct CFCClass;
+struct CFCFunction;
 
 CFCPerlClass*
 CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name,
@@ -39,6 +40,12 @@ CFCPerlClass_destroy(CFCPerlClass *self);
 
 char*
 CFCPerlClass_perlify_doc_text(CFCPerlClass *self, const char *source);
+
+char*
+CFCPerlClass_gen_subroutine_pod(CFCPerlClass *self, struct CFCFunction *func,
+                                const char *sub_name, struct CFCClass *klass,
+                                const char *code_sample,
+                                const char *class_name, int is_constructor);
 
 struct CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self);

@@ -157,72 +157,6 @@ sub method_bindings {
     return @bound;
 }
 
-sub _gen_subroutine_pod {
-    my ( $self, %args ) = @_;
-    my ( $func, $sub_name, $class, $code_sample, $class_name )
-        = @args{qw( func name class sample class_name )};
-    my $param_list = $func->get_param_list;
-    my $args       = "";
-    my $num_vars   = $param_list->num_vars;
-
-    # Only allow "public" subs to be exposed as part of the public API.
-    confess("$class_name->$sub_name is not public") unless $func->public;
-
-    # Get documentation, which may be inherited.
-    my $docucom = $func->get_docucomment;
-    if ( !$docucom ) {
-        my $micro_sym = $func->micro_sym;
-        my $parent    = $class;
-        while ( $parent = $parent->get_parent ) {
-            my $parent_func = $parent->method($micro_sym);
-            last unless $parent_func;
-            $docucom = $parent_func->get_docucomment;
-            last if $docucom;
-        }
-    }
-    confess("No DocuComment for '$sub_name' in '$class_name'")
-        unless $docucom;
-
-    # Build string summarizing arguments to use in header.
-    if ( $num_vars > 2 or ( $args{is_constructor} && $num_vars > 1 ) ) {
-        $args = " I<[labeled params]> ";
-    }
-    elsif ( $param_list->num_vars ) {
-        $args = $func->get_param_list->name_list;
-        $args =~ s/self.*?(?:,\s*|$)//;    # kill self param
-    }
-
-    # Add code sample.
-    my $pod = "=head2 $sub_name($args)\n\n";
-    if ( defined($code_sample) && length($code_sample) ) {
-        $pod .= "$code_sample\n";
-    }
-
-    # Incorporate "description" text from DocuComment.
-    if ( my $long_doc = $docucom->get_description ) {
-        $pod .= _perlify_doc_text( $self, $long_doc ) . "\n\n";
-    }
-
-    # Add params in a list.
-    my $param_names = $docucom->get_param_names;
-    my $param_docs  = $docucom->get_param_docs;
-    if (@$param_names) {
-        $pod .= "=over\n\n";
-        for ( my $i = 0; $i <= $#$param_names; $i++ ) {
-            $pod .= "=item *\n\n";
-            $pod .= "B<$param_names->[$i]> - $param_docs->[$i]\n\n";
-        }
-        $pod .= "=back\n\n";
-    }
-
-    # Add return value description, if any.
-    if ( defined( my $retval = $docucom->get_retval ) ) {
-        $pod .= "Returns: $retval\n\n";
-    }
-
-    return $pod;
-}
-
 sub create_pod {
     my $self       = shift;
     my $pod_args   = $self->get_make_pod or return;
@@ -257,17 +191,10 @@ sub create_pod {
                 my $init_func   = $class->function($func_name);
                 my $ctor_name   = $spec->{name} || 'new';
                 my $code_sample = $spec->{sample};
-                $constructor_pod .= _perlify_doc_text(
-                    $self, 
-                    $self->_gen_subroutine_pod(
-                        func           => $init_func,
-                        name           => $ctor_name,
-                        sample         => $code_sample,
-                        class          => $class,
-                        class_name     => $class_name,
-                        is_constructor => 1,
-                    )
-                );
+                my $sub_pod
+                    = _gen_subroutine_pod( $self, $init_func, $ctor_name,
+                    $class, $code_sample, $class_name, 1 );
+                $constructor_pod .= _perlify_doc_text( $self, $sub_pod );
             }
         }
     }
@@ -287,13 +214,9 @@ sub create_pod {
             $method_pod = $spec->{pod};
         }
         else {
-            $method_pod = $self->_gen_subroutine_pod(
-                func       => $method,
-                name       => $meth_name,
-                sample     => '',
-                class      => $class,
-                class_name => $class_name
-            );
+            $method_pod
+                = _gen_subroutine_pod( $self, $method, $meth_name, $class, '',
+                $class_name, 0 );
         }
         if ( $method->abstract ) {
             push @abstract_method_docs, _perlify_doc_text( $self, $method_pod );

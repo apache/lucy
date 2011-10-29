@@ -22,6 +22,10 @@
 #include "CFCUtil.h"
 #include "CFCClass.h"
 #include "CFCParcel.h"
+#include "CFCParamList.h"
+#include "CFCFunction.h"
+#include "CFCDocuComment.h"
+#include "CFCSymbol.h"
 
 struct CFCPerlClass {
     CFCBase base;
@@ -105,6 +109,87 @@ S_global_replace(const char *string, const char *match,
     memcpy(target, string + string_len - remaining, remaining);
 
     return modified;
+}
+
+char*
+CFCPerlClass_gen_subroutine_pod(CFCPerlClass *self, CFCFunction *func,
+                                const char *sub_name, CFCClass *klass,
+                                const char *code_sample,
+                                const char *class_name, int is_constructor) {
+    // Only allow "public" subs to be exposed as part of the public API.
+    if (!CFCSymbol_public((CFCSymbol*)func)) {
+        CFCUtil_die("%s#%s is not public", class_name, sub_name);
+    }
+
+    CFCParamList *param_list = CFCFunction_get_param_list(func);
+    int num_vars = CFCParamList_num_vars(param_list);
+    char *pod = CFCUtil_cat(CFCUtil_strdup(""), "=head2 ", sub_name, NULL);
+
+    // Get documentation, which may be inherited.
+    CFCDocuComment *docucomment = CFCFunction_get_docucomment(func);
+    if (!docucomment) {
+        const char *micro_sym = CFCFunction_micro_sym(func);
+        CFCClass *parent = klass;
+        while (NULL != (parent = CFCClass_get_parent(parent))) {
+            CFCFunction *parent_func
+                = (CFCFunction*)CFCClass_method(parent, micro_sym);
+            if (!parent_func) { break; }
+            docucomment = CFCFunction_get_docucomment(parent_func);
+            if (docucomment) { break; }
+        }
+    }
+    if (!docucomment) {
+        CFCUtil_die("No DocuComment for '%s' in '%s'", sub_name, class_name);
+    }
+
+    // Build string summarizing arguments to use in header.
+    if (num_vars > 2 || (is_constructor && num_vars > 1)) {
+        pod = CFCUtil_cat(pod, "( I<[labeled params]> )\n\n", NULL);
+    }
+    else if (num_vars == 2) {
+        // Kill self param.
+        const char *name_list = CFCParamList_name_list(param_list);
+        char *after_comma = strchr(name_list, ',') + 1;
+        while (isspace(*after_comma)) { after_comma++; }
+        pod = CFCUtil_cat(pod, "(", after_comma, ")\n\n", NULL);
+    }
+    else { 
+        // num_args == 1, leave off 'self'.
+        pod = CFCUtil_cat(pod, "()\n\n", NULL);
+    }
+
+    // Add code sample.
+    if (code_sample && strlen(code_sample)) {
+        pod = CFCUtil_cat(pod, code_sample, "\n", NULL);
+    }
+
+    // Incorporate "description" text from DocuComment.
+    const char *long_doc = CFCDocuComment_get_description(docucomment);
+    if (long_doc && strlen(long_doc)) {
+        char *perlified = CFCPerlClass_perlify_doc_text(self, long_doc);
+        pod = CFCUtil_cat(pod, perlified, "\n\n", NULL);
+        FREEMEM(perlified);
+    }
+
+    // Add params in a list.
+    const char**param_names = CFCDocuComment_get_param_names(docucomment);
+    const char**param_docs  = CFCDocuComment_get_param_docs(docucomment);
+    if (param_names[0]) {
+        pod = CFCUtil_cat(pod, "=over\n\n", NULL);
+        for (size_t i = 0; param_names[i] != NULL; i++) {
+            pod = CFCUtil_cat(pod, "=item *\n\nB<", param_names[i], "> - ",
+                              param_docs[i], "\n\n", NULL);
+        }
+        pod = CFCUtil_cat(pod, "=back\n\n", NULL);
+    }
+
+    // Add return value description, if any.
+    const char *retval_doc = CFCDocuComment_get_retval(docucomment);
+    if (retval_doc && strlen(retval_doc)) {
+        pod = CFCUtil_cat(pod, "Returns: ", retval_doc, "\n\n", NULL);
+    }
+
+    return pod;
 }
 
 char*
