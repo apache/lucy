@@ -14,34 +14,32 @@
  * limitations under the License.
  */
 
-#include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCMemPool.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCParser.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
+#ifndef H_CFCPERLCONSTRUCTOR
+#define H_CFCPERLCONSTRUCTOR
 
-#include "CFCBindCore.h"
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "CFCPerlSub.h"
-#include "CFCPerlMethod.h"
-#include "CFCPerlClass.h"
-#include "CFCPerlConstructor.h"
-#include "CFCPerlTypeMap.h"
+typedef struct CFCPerlConstructor CFCPerlConstructor;
+struct CFCClass;
+
+CFCPerlConstructor*
+CFCPerlConstructor_new(struct CFCClass *klass, const char *alias);
+
+CFCPerlConstructor*
+CFCPerlConstructor_init(CFCPerlConstructor *self, struct CFCClass *klass,
+                        const char *alias);
+
+void
+CFCPerlConstructor_destroy(CFCPerlConstructor *self);
+
+struct CFCFunction*
+CFCPerlConstructor_get_init_func(CFCPerlConstructor *self);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CFCPERLCONSTRUCTOR */
 

@@ -1957,6 +1957,33 @@ CODE:
 OUTPUT: RETVAL
 
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Constructor
+
+SV*
+_new(klass, alias)
+    CFCClass *klass;
+    const char *alias;
+CODE:
+    CFCPerlConstructor *self = CFCPerlConstructor_new(klass, alias);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+DESTROY(self)
+    CFCPerlConstructor *self;
+PPCODE:
+    CFCPerlConstructor_destroy(self);
+
+SV*
+_get_init_func(self)
+    CFCPerlConstructor *self;
+CODE:
+    CFCFunction *func = CFCPerlConstructor_get_init_func(self);
+    RETVAL = S_cfcbase_to_perlref(func);
+OUTPUT: RETVAL
+
+
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Class
 
 SV*

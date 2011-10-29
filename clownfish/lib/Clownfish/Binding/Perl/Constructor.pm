@@ -19,45 +19,18 @@ use warnings;
 package Clownfish::Binding::Perl::Constructor;
 use base qw( Clownfish::Binding::Perl::Subroutine );
 use Carp;
-use Clownfish::ParamList;
+use Clownfish::Util qw( verify_args );
 
-our %init_func;
+our %new_PARAMS = (
+    class => undef,
+    alias => undef,
+);
 
 sub new {
     my ( $either, %args ) = @_;
-    my $class          = delete $args{class};
-    my $alias          = delete $args{alias};
-    my $init_func_name = $alias =~ s/^(\w+)\|(\w+)$/$1/ ? $2 : 'init';
-    my $class_name     = $class->get_class_name;
-
-    # Find the implementing function.
-    my $func;
-    for my $function ( @{ $class->functions } ) {
-        next unless $function->micro_sym eq $init_func_name;
-        $func = $function;
-        last;
-    }
-    confess("Missing or invalid init() function for $class_name")
-        unless $func;
-
-    my $self = $either->SUPER::new(
-        param_list         => $func->get_param_list,
-        class_name         => $class_name,
-        use_labeled_params => 1,
-        alias              => $alias,
-        %args
-    );
-    $init_func{$self} = $func;
-    return $self;
+    confess $@ unless verify_args( \%new_PARAMS, %args );
+    return _new( @args{qw( class alias )} );
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $init_func{$self};
-    $self->SUPER::DESTROY;
-}
-
-sub _get_init_func { $init_func{ +shift } }
 
 sub xsub_def {
     my $self         = shift;

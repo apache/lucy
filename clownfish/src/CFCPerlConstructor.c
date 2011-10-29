@@ -1,0 +1,102 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <string.h>
+#include <stdio.h>
+
+#ifndef true
+  #define true 1
+  #define false 0
+#endif
+
+#define CFC_NEED_PERLSUB_STRUCT_DEF 1
+#include "CFCPerlSub.h"
+#include "CFCPerlConstructor.h"
+#include "CFCClass.h"
+#include "CFCFunction.h"
+#include "CFCParamList.h"
+#include "CFCPerlTypeMap.h"
+#include "CFCVariable.h"
+#include "CFCUtil.h"
+
+struct CFCPerlConstructor {
+    CFCPerlSub   sub;
+    CFCFunction *init_func;
+};
+
+CFCPerlConstructor*
+CFCPerlConstructor_new(CFCClass *klass, const char *alias) {
+    CFCPerlConstructor *self
+        = (CFCPerlConstructor*)CFCBase_allocate(sizeof(CFCPerlConstructor),
+                                                "Clownfish::Binding::Perl::Constructor");
+    return CFCPerlConstructor_init(self, klass, alias);
+}
+
+CFCPerlConstructor*
+CFCPerlConstructor_init(CFCPerlConstructor *self, CFCClass *klass,
+                        const char *alias) {
+    // Extract alias from the alias spec, which may include a pipe.  If it
+    // does, then the Perl-space alias is on the left, and the name of the
+    // init function is on the right: alias|init_func
+    CFCUTIL_NULL_CHECK(alias);
+    char *real_alias = CFCUtil_strdup(alias);
+    char *init_func_name;
+    char *alias_end = strchr(alias, '|');
+    if (alias_end) {
+        size_t alias_len = alias_end - alias;
+        real_alias[alias_len] = '\0';
+        init_func_name = CFCUtil_strdup(alias_end + 1);
+    }
+    else {
+        init_func_name = CFCUtil_strdup("init");
+    }
+
+    const char *class_name = CFCClass_get_class_name(klass);
+
+    // Find the implementing function.
+    self->init_func = NULL;
+    CFCFunction **funcs = CFCClass_functions(klass);
+    for (size_t i = 0; funcs[i] != NULL; i++) {
+        CFCFunction *func = funcs[i];
+        const char *func_name = CFCFunction_micro_sym(func);
+        if (strcmp(init_func_name, func_name) == 0) {
+            self->init_func = (CFCFunction*)CFCBase_incref((CFCBase*)func);
+            break;
+        }
+    }
+    if (!self->init_func) {
+        CFCUtil_die("Missing or invalid '%s' function for '%s'",
+                    init_func_name, class_name);
+    }
+    CFCParamList *param_list = CFCFunction_get_param_list(self->init_func);
+    CFCPerlSub_init((CFCPerlSub*)self, param_list, class_name, real_alias,
+                    true);
+    FREEMEM(init_func_name);
+    FREEMEM(real_alias);
+    return self;
+}
+
+void
+CFCPerlConstructor_destroy(CFCPerlConstructor *self) {
+    CFCBase_decref((CFCBase*)self->init_func);
+    CFCPerlSub_destroy((CFCPerlSub*)self);
+}
+
+CFCFunction*
+CFCPerlConstructor_get_init_func(CFCPerlConstructor *self) {
+    return self->init_func;
+}
+
