@@ -14,43 +14,42 @@
  * limitations under the License.
  */
 
-#ifndef H_CFCPERLCLASS
-#define H_CFCPERLCLASS
+#ifndef H_CFCPERLPOD
+#define H_CFCPERLPOD
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct CFCPerlClass CFCPerlClass;
-struct CFCParcel;
-struct CFCClass;
+/** Spec for generating POD for a single class.
+ */
+
+typedef struct CFCPerlPod CFCPerlPod;
 struct CFCFunction;
+struct CFCClass;
 
-CFCPerlClass*
-CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name,
-                 struct CFCClass *client, const char *xs_code);
+CFCPerlPod*
+CFCPerlPod_new(void);
 
-CFCPerlClass*
-CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
-                  const char *class_name, struct CFCClass *client,
-                  const char *xs_code);
+CFCPerlPod*
+CFCPerlPod_init(CFCPerlPod *self);
 
 void
-CFCPerlClass_destroy(CFCPerlClass *self);
+CFCPerlPod_destroy(CFCPerlPod *self);
 
-struct CFCClass*
-CFCPerlClass_get_client(CFCPerlClass *self);
+char*
+CFCPerlPod_perlify_doc_text(CFCPerlPod *self, const char *source);
 
-const char*
-CFCPerlClass_get_class_name(CFCPerlClass *self);
-
-const char*
-CFCPerlClass_get_xs_code(CFCPerlClass *self);
+char*
+CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, struct CFCFunction *func,
+                              const char *sub_name, struct CFCClass *klass,
+                              const char *code_sample,
+                              const char *class_name, int is_constructor);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* H_CFCPERLCLASS */
+#endif /* H_CFCPERLPOD */
 

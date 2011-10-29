@@ -2037,17 +2037,35 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Pod
+
+SV*
+new(unused_sv)
+    SV *unused_sv;
+CODE:
+    (void)unused_sv;
+    CFCPerlPod *self = CFCPerlPod_new();
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_destroy(self)
+    CFCPerlPod *self;
+PPCODE:
+    CFCPerlPod_destroy(self);
+
 SV*
 _perlify_doc_text(self, source)
-    CFCPerlClass *self;
+    CFCPerlPod   *self;
     const char   *source;
 CODE:
-    RETVAL = S_sv_eat_c_string(CFCPerlClass_perlify_doc_text(self, source));
+    RETVAL = S_sv_eat_c_string(CFCPerlPod_perlify_doc_text(self, source));
 OUTPUT: RETVAL
 
 SV*
 _gen_subroutine_pod(self, func, sub_name, klass, code_sample, class_name, is_constructor)
-    CFCPerlClass *self;
+    CFCPerlPod *self;
     CFCFunction *func;
     const char *sub_name;
     CFCClass *klass;
@@ -2055,9 +2073,9 @@ _gen_subroutine_pod(self, func, sub_name, klass, code_sample, class_name, is_con
     const char *class_name;
     int is_constructor;
 CODE:
-    char *value = CFCPerlClass_gen_subroutine_pod(self, func, sub_name, klass,
-                                                  code_sample, class_name,
-                                                  is_constructor);
+    char *value = CFCPerlPod_gen_subroutine_pod(self, func, sub_name, klass,
+                                                code_sample, class_name,
+                                                is_constructor);
     RETVAL = S_sv_eat_c_string(value);
 OUTPUT: RETVAL
 

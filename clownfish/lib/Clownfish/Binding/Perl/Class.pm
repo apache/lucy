@@ -18,6 +18,7 @@ use warnings;
 
 package Clownfish::Binding::Perl::Class;
 use Clownfish::Util qw( verify_args );
+use Clownfish::Binding::Perl::Pod;
 use Carp;
 
 our %registry;
@@ -36,6 +37,7 @@ our %register_PARAMS = (
 our %bind_methods;
 our %bind_constructors;
 our %make_pod;
+our %pod_spec;
 
 sub register {
     my ( $either, %args ) = @_;
@@ -67,6 +69,7 @@ sub register {
     $bind_methods{$self}      = $args{bind_methods};
     $bind_constructors{$self} = $args{bind_constructors};
     $make_pod{$self}          = $args{make_pod};
+    $pod_spec{$self}          = Clownfish::Binding::Perl::Pod->new;
 
     # Add to registry.
     $registry{ $args{class_name} } = $self;
@@ -79,12 +82,14 @@ sub DESTROY {
     delete $bind_methods{$self};
     delete $bind_constructors{$self};
     delete $make_pod{$self};
+    delete $pod_spec{$self};
     _destroy($self);
 }
 
 sub get_bind_methods      { $bind_methods{ +shift } }
 sub get_bind_constructors { $bind_constructors{ +shift } }
 sub get_make_pod          { $make_pod{ +shift } }
+sub get_pod_spec          { $pod_spec{ +shift } }
 
 sub constructor_bindings {
     my $self  = shift;
@@ -160,13 +165,14 @@ sub method_bindings {
 sub create_pod {
     my $self       = shift;
     my $pod_args   = $self->get_make_pod or return;
+    my $pod_spec   = $self->get_pod_spec;
     my $class_name = $self->get_class_name;
     my $class      = $self->get_client or die "No client for $class_name";
     my $docucom    = $class->get_docucomment;
     confess("No DocuComment for '$class_name'") unless $docucom;
-    my $brief = $docucom->get_brief;
-    my $description
-        = _perlify_doc_text( $self, $pod_args->{description} || $docucom->get_long );
+    my $brief       = $docucom->get_brief;
+    my $description = $pod_spec->_perlify_doc_text( $pod_args->{description}
+            || $docucom->get_long );
 
     # Create SYNOPSIS.
     my $synopsis_pod = '';
@@ -184,7 +190,7 @@ sub create_pod {
         $constructor_pod = "=head1 CONSTRUCTORS\n\n";
         for my $spec (@$constructors) {
             if ( !ref $spec ) {
-                $constructor_pod .= _perlify_doc_text( $self, $spec );
+                $constructor_pod .= $pod_spec->_perlify_doc_text($spec);
             }
             else {
                 my $func_name   = $spec->{func} || 'init';
@@ -192,9 +198,9 @@ sub create_pod {
                 my $ctor_name   = $spec->{name} || 'new';
                 my $code_sample = $spec->{sample};
                 my $sub_pod
-                    = _gen_subroutine_pod( $self, $init_func, $ctor_name,
+                    = $pod_spec->_gen_subroutine_pod( $init_func, $ctor_name,
                     $class, $code_sample, $class_name, 1 );
-                $constructor_pod .= _perlify_doc_text( $self, $sub_pod );
+                $constructor_pod .= $pod_spec->_perlify_doc_text($sub_pod);
             }
         }
     }
@@ -215,14 +221,14 @@ sub create_pod {
         }
         else {
             $method_pod
-                = _gen_subroutine_pod( $self, $method, $meth_name, $class, '',
-                $class_name, 0 );
+                = $pod_spec->_gen_subroutine_pod( $method, $meth_name, $class,
+                '', $class_name, 0 );
         }
         if ( $method->abstract ) {
-            push @abstract_method_docs, _perlify_doc_text( $self, $method_pod );
+            push @abstract_method_docs, $pod_spec->_perlify_doc_text($method_pod);
         }
         else {
-            push @method_docs, _perlify_doc_text( $self, $method_pod );
+            push @method_docs, $pod_spec->_perlify_doc_text($method_pod);
         }
     }
     if (@method_docs) {
