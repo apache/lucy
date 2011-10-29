@@ -1976,11 +1976,10 @@ PPCODE:
     CFCPerlConstructor_destroy(self);
 
 SV*
-_get_init_func(self)
+xsub_def(self)
     CFCPerlConstructor *self;
 CODE:
-    CFCFunction *func = CFCPerlConstructor_get_init_func(self);
-    RETVAL = S_cfcbase_to_perlref(func);
+    RETVAL = S_sv_eat_c_string(CFCPerlConstructor_xsub_def(self));
 OUTPUT: RETVAL
 
 

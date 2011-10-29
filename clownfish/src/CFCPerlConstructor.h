@@ -34,8 +34,8 @@ CFCPerlConstructor_init(CFCPerlConstructor *self, struct CFCClass *klass,
 void
 CFCPerlConstructor_destroy(CFCPerlConstructor *self);
 
-struct CFCFunction*
-CFCPerlConstructor_get_init_func(CFCPerlConstructor *self);
+char*
+CFCPerlConstructor_xsub_def(CFCPerlConstructor *self);
 
 #ifdef __cplusplus
 }

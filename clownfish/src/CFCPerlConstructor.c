@@ -28,9 +28,10 @@
 #include "CFCClass.h"
 #include "CFCFunction.h"
 #include "CFCParamList.h"
-#include "CFCPerlTypeMap.h"
+#include "CFCType.h"
 #include "CFCVariable.h"
 #include "CFCUtil.h"
+#include "CFCPerlTypeMap.h"
 
 struct CFCPerlConstructor {
     CFCPerlSub   sub;
@@ -95,8 +96,70 @@ CFCPerlConstructor_destroy(CFCPerlConstructor *self) {
     CFCPerlSub_destroy((CFCPerlSub*)self);
 }
 
-CFCFunction*
-CFCPerlConstructor_get_init_func(CFCPerlConstructor *self) {
-    return self->init_func;
+char*
+CFCPerlConstructor_xsub_def(CFCPerlConstructor *self) {
+    const char *c_name = self->sub.c_name;
+    CFCParamList *param_list = self->sub.param_list;
+    const char   *name_list  = CFCParamList_name_list(param_list);
+    const char  **arg_inits  = CFCParamList_get_initial_values(param_list);
+    CFCVariable **arg_vars   = CFCParamList_get_variables(param_list);
+    const char   *func_sym   = CFCFunction_full_func_sym(self->init_func);
+    char *allot_params = CFCPerlSub_build_allot_params((CFCPerlSub*)self);
+    CFCVariable *self_var       = arg_vars[0];
+    CFCType     *self_type      = CFCVariable_get_type(self_var);
+    const char  *self_type_str  = CFCType_to_c(self_type);
+
+    // Compensate for swallowed refcounts.
+    char *refcount_mods = CFCUtil_strdup("");
+    for (size_t i = 0; arg_vars[i] != NULL; i++) {
+        CFCVariable *var = arg_vars[i];
+        CFCType *type = CFCVariable_get_type(var);
+        if (CFCType_is_object(type) && CFCType_decremented(type)) {
+            const char *name = CFCVariable_micro_sym(var);
+            refcount_mods = CFCUtil_cat(refcount_mods, "\n    CFISH_INCREF(",
+                                        name, ");", NULL);
+        }
+    }
+
+    const char pattern[] = 
+        "XS(%s);\n"
+        "XS(%s) {\n"
+        "    dXSARGS;\n"
+        "    CHY_UNUSED_VAR(cv);\n"
+        "    if (items < 1) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(class_name, ...)\",  GvNAME(CvGV(cv))); }\n"
+        "    SP -= items;\n"
+        "\n"
+        "    %s\n"
+        // Create "self" last, so that earlier exceptions while fetching
+        // params don't trigger a bad invocation of DESTROY.
+        "    %s self = (%s)XSBind_new_blank_obj(ST(0));%s\n"
+        "\n"
+        "    %s retval = %s(%s);\n"
+        "    if (retval) {\n"
+        "        ST(0) = (SV*)Cfish_Obj_To_Host((cfish_Obj*)retval);\n"
+        "        Cfish_Obj_Dec_RefCount((cfish_Obj*)retval);\n"
+        "    }\n"
+        "    else {\n"
+        "        ST(0) = newSV(0);\n"
+        "    }\n"
+        "    sv_2mortal(ST(0));\n"
+        "    XSRETURN(1);\n"
+        "}\n\n";
+    size_t size = sizeof(pattern)
+                  + strlen(c_name) * 2
+                  + strlen(allot_params)
+                  + strlen(self_type_str) * 2
+                  + strlen(refcount_mods)
+                  + strlen(self_type_str)
+                  + strlen(func_sym)
+                  + strlen(name_list);
+    char *xsub_def = (char*)MALLOCATE(size);
+    sprintf(xsub_def, pattern, c_name, c_name, allot_params, self_type_str,
+            self_type_str, refcount_mods, self_type_str, func_sym, name_list);
+
+    FREEMEM(refcount_mods);
+    FREEMEM(allot_params);
+
+    return xsub_def;
 }
 
