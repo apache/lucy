@@ -2064,6 +2064,20 @@ PPCODE:
     const char *pod = SvPOK(pod_sv) ? SvPVutf8_nolen(pod_sv) : NULL;
     CFCPerlPod_add_method(self, name, pod);
 
+void
+_add_constructor(self, name_sv, pod_sv, func_sv, sample_sv)
+    CFCPerlPod *self;
+    SV *name_sv;
+    SV *pod_sv;
+    SV *func_sv;
+    SV *sample_sv;
+PPCODE:
+    const char *name   = SvPOK(name_sv)   ? SvPVutf8_nolen(name_sv)   : NULL;
+    const char *pod    = SvPOK(pod_sv)    ? SvPVutf8_nolen(pod_sv)    : NULL;
+    const char *func   = SvPOK(func_sv)   ? SvPVutf8_nolen(func_sv)   : NULL;
+    const char *sample = SvPOK(sample_sv) ? SvPVutf8_nolen(sample_sv) : NULL;
+    CFCPerlPod_add_constructor(self, name, pod, func, sample);
+
 SV*
 methods_pod(self, klass)
     CFCPerlPod *self;
@@ -2071,6 +2085,15 @@ methods_pod(self, klass)
 CODE:
     char *methods_pod = CFCPerlPod_methods_pod(self, klass);
     RETVAL = S_sv_eat_c_string(methods_pod);
+OUTPUT: RETVAL
+
+SV*
+constructors_pod(self, klass)
+    CFCPerlPod *self;
+    CFCClass   *klass;
+CODE:
+    char *constructors_pod = CFCPerlPod_constructors_pod(self, klass);
+    RETVAL = S_sv_eat_c_string(constructors_pod);
 OUTPUT: RETVAL
 
 void

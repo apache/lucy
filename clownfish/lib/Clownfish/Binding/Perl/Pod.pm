@@ -32,17 +32,23 @@ our %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $synopsis    = $args{synopsis}    || '';
-    my $description = $args{description} || '';
-    my $methods     = $args{methods}     || [];
+    my $synopsis     = $args{synopsis}     || '';
+    my $description  = $args{description}  || '';
+    my $methods      = $args{methods}      || [];
+    my $constructors = $args{constructors} || [];
+    push @$constructors, $args{constructor} if $args{constructor};
     my $self = _new( $synopsis, $description );
+
     for (@$methods) {
-        if (ref($_)) {
+        if ( ref($_) ) {
             _add_method( $self, $_->{name}, $_->{pod} );
         }
         else {
-            _add_method( $self, $_, undef);
+            _add_method( $self, $_, undef );
         }
+    }
+    for my $con (@$constructors) {
+        _add_constructor( $self, @{$con}{qw( name pod func sample )} );
     }
     return $self;
 }

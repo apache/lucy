@@ -41,8 +41,16 @@ CFCPerlPod_destroy(CFCPerlPod *self);
 void
 CFCPerlPod_add_method(CFCPerlPod *self, const char *name, const char *pod);
 
+void
+CFCPerlPod_add_constructor(CFCPerlPod *self, const char *name,
+                           const char *pod, const char *func,
+                           const char *sample);
+
 char*
 CFCPerlPod_methods_pod(CFCPerlPod *self, struct CFCClass *klass);
+
+char*
+CFCPerlPod_constructors_pod(CFCPerlPod *self, struct CFCClass *klass);
 
 const char*
 CFCPerlPod_get_synopsis(CFCPerlPod *self);

@@ -35,6 +35,8 @@
 
 typedef struct NamePod {
     char *name;
+    char *func;
+    char *sample;
     char *pod;
 } NamePod;
 
@@ -44,6 +46,8 @@ struct CFCPerlPod {
     char    *description;
     NamePod *methods;
     size_t   num_methods;
+    NamePod *constructors;
+    size_t   num_constructors;
 };
 
 CFCPerlPod*
@@ -57,10 +61,12 @@ CFCPerlPod_new(const char *synopsis, const char *description) {
 CFCPerlPod*
 CFCPerlPod_init(CFCPerlPod *self, const char *synopsis,
                 const char *description) {
-    self->synopsis    = CFCUtil_strdup(synopsis ? synopsis : "");
-    self->description = CFCUtil_strdup(description ? description : "");
-    self->methods     = NULL;
-    self->num_methods = 0;
+    self->synopsis         = CFCUtil_strdup(synopsis ? synopsis : "");
+    self->description      = CFCUtil_strdup(description ? description : "");
+    self->methods          = NULL;
+    self->constructors     = NULL;
+    self->num_methods      = 0;
+    self->num_constructors = 0;
     return self;
 }
 
@@ -71,6 +77,8 @@ CFCPerlPod_destroy(CFCPerlPod *self) {
     for (size_t i = 0; i < self->num_methods; i++) {
         FREEMEM(self->methods[i].name);
         FREEMEM(self->methods[i].pod);
+        FREEMEM(self->methods[i].func);
+        FREEMEM(self->methods[i].sample);
     }
     FREEMEM(self->methods);
     CFCBase_destroy((CFCBase*)self);
@@ -83,8 +91,24 @@ CFCPerlPod_add_method(CFCPerlPod *self, const char *name, const char *pod) {
     size_t size = self->num_methods * sizeof(NamePod);
     self->methods = (NamePod*)REALLOCATE(self->methods, size);
     NamePod *slot = &self->methods[self->num_methods - 1];
-    slot->name = CFCUtil_strdup(name);
-    slot->pod  = pod ? CFCUtil_strdup(pod) : NULL;
+    slot->name   = CFCUtil_strdup(name);
+    slot->pod    = pod ? CFCUtil_strdup(pod) : NULL;
+    slot->func   = NULL;
+    slot->sample = NULL;
+}
+
+void
+CFCPerlPod_add_constructor(CFCPerlPod *self, const char *name,
+                           const char *pod, const char *func,
+                           const char *sample) {
+    self->num_constructors++;
+    size_t size = self->num_constructors * sizeof(NamePod);
+    self->constructors = (NamePod*)REALLOCATE(self->constructors, size);
+    NamePod *slot = &self->constructors[self->num_constructors - 1];
+    slot->name   = CFCUtil_strdup(name ? name : "new");
+    slot->pod    = pod ? CFCUtil_strdup(pod) : NULL;
+    slot->func   = CFCUtil_strdup(func ? func : "init");
+    slot->sample = CFCUtil_strdup(sample ? sample : "");
 }
 
 const char*
@@ -140,6 +164,35 @@ CFCPerlPod_methods_pod(CFCPerlPod *self, CFCClass *klass) {
     }
     FREEMEM(methods_pod);
 
+    return pod;
+}
+
+// Create CONSTRUCTORS.
+char*
+CFCPerlPod_constructors_pod(CFCPerlPod *self, CFCClass *klass) {
+    if (!self->num_constructors) {
+        return CFCUtil_strdup("");
+    }
+    const char *class_name = CFCClass_get_class_name(klass);
+    char *pod = CFCUtil_strdup("=head1 CONSTRUCTORS\n\n");
+    for (size_t i = 0; i < self->num_constructors; i++) {
+        NamePod slot = self->constructors[i];
+        if (slot.pod) {
+            char *perlified = CFCPerlPod_perlify_doc_text(self, slot.pod);
+            pod = CFCUtil_cat(pod, perlified, NULL);
+            FREEMEM(perlified);
+        }
+        else {
+            CFCFunction *init_func = CFCClass_function(klass, slot.func);
+            char *sub_pod
+                = CFCPerlPod_gen_subroutine_pod(self, init_func, slot.name, klass,
+                                                slot.sample, class_name, true);
+            char *perlified = CFCPerlPod_perlify_doc_text(self, sub_pod);
+            pod = CFCUtil_cat(pod, perlified, NULL);
+            FREEMEM(sub_pod);
+            FREEMEM(perlified);
+        }
+    }
     return pod;
 }
 

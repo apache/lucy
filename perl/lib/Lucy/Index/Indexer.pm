@@ -202,7 +202,7 @@ Clownfish::Binding::Perl::Class->register(
                 )
         ],
         synopsis     => $synopsis,
-        constructors => [$constructor],
+        constructors => [ { pod => $constructor } ],
     },
 );
 

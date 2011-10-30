@@ -184,29 +184,7 @@ sub create_pod {
     }
 
     # Create CONSTRUCTORS.
-    my $constructor_pod = "";
-    my $constructors = $pod_args->{constructors} || [];
-    if ( defined $pod_args->{constructor} ) {
-        push @$constructors, $pod_args->{constructor};
-    }
-    if (@$constructors) {
-        $constructor_pod = "=head1 CONSTRUCTORS\n\n";
-        for my $spec (@$constructors) {
-            if ( !ref $spec ) {
-                $constructor_pod .= $pod_spec->_perlify_doc_text($spec);
-            }
-            else {
-                my $func_name   = $spec->{func} || 'init';
-                my $init_func   = $class->function($func_name);
-                my $ctor_name   = $spec->{name} || 'new';
-                my $code_sample = $spec->{sample};
-                my $sub_pod
-                    = $pod_spec->_gen_subroutine_pod( $init_func, $ctor_name,
-                    $class, $code_sample, $class_name, 1 );
-                $constructor_pod .= $pod_spec->_perlify_doc_text($sub_pod);
-            }
-        }
-    }
+    my $constructor_pod = $pod_spec->constructors_pod($class);
 
     # Create METHODS, possibly including an ABSTRACT METHODS section.
     my $methods_pod = $pod_spec->methods_pod($class);
