@@ -316,7 +316,7 @@ sub prepare_pod {
 
     my $registry = Clownfish::Binding::Perl::Class->registry;
     $has_pod{ $_->get_class_name } = 1
-        for grep { $_->get_make_pod } values %$registry;
+        for grep { $_->get_pod_spec } values %$registry;
 
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;

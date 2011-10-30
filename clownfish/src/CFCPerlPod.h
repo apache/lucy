@@ -29,13 +29,26 @@ struct CFCFunction;
 struct CFCClass;
 
 CFCPerlPod*
-CFCPerlPod_new(void);
+CFCPerlPod_new(const char *synopsis, const char *description);
 
 CFCPerlPod*
-CFCPerlPod_init(CFCPerlPod *self);
+CFCPerlPod_init(CFCPerlPod *self, const char *synopsis,
+                const char *description);
 
 void
 CFCPerlPod_destroy(CFCPerlPod *self);
+
+void
+CFCPerlPod_add_method(CFCPerlPod *self, const char *name, const char *pod);
+
+char*
+CFCPerlPod_methods_pod(CFCPerlPod *self, struct CFCClass *klass);
+
+const char*
+CFCPerlPod_get_synopsis(CFCPerlPod *self);
+
+const char*
+CFCPerlPod_get_description(CFCPerlPod *self);
 
 char*
 CFCPerlPod_perlify_doc_text(CFCPerlPod *self, const char *source);
@@ -45,7 +58,6 @@ CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, struct CFCFunction *func,
                               const char *sub_name, struct CFCClass *klass,
                               const char *code_sample,
                               const char *class_name, int is_constructor);
-
 
 #ifdef __cplusplus
 }

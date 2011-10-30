@@ -21,32 +21,126 @@
 #include "CFCPerlPod.h"
 #include "CFCUtil.h"
 #include "CFCClass.h"
+#include "CFCMethod.h"
 #include "CFCParcel.h"
 #include "CFCParamList.h"
 #include "CFCFunction.h"
 #include "CFCDocuComment.h"
 #include "CFCSymbol.h"
 
+#ifndef true
+  #define true 1
+  #define false 0
+#endif
+
+typedef struct NamePod {
+    char *name;
+    char *pod;
+} NamePod;
+
 struct CFCPerlPod {
     CFCBase base;
+    char    *synopsis;
+    char    *description;
+    NamePod *methods;
+    size_t   num_methods;
 };
 
 CFCPerlPod*
-CFCPerlPod_new(void) {
+CFCPerlPod_new(const char *synopsis, const char *description) {
     CFCPerlPod *self
         = (CFCPerlPod*)CFCBase_allocate(sizeof(CFCPerlPod),
                                         "Clownfish::Binding::Perl::Pod");
-    return CFCPerlPod_init(self);
+    return CFCPerlPod_init(self, synopsis, description);
 }
 
 CFCPerlPod*
-CFCPerlPod_init(CFCPerlPod *self) {
+CFCPerlPod_init(CFCPerlPod *self, const char *synopsis,
+                const char *description) {
+    self->synopsis    = CFCUtil_strdup(synopsis ? synopsis : "");
+    self->description = CFCUtil_strdup(description ? description : "");
+    self->methods     = NULL;
+    self->num_methods = 0;
     return self;
 }
 
 void
 CFCPerlPod_destroy(CFCPerlPod *self) {
+    FREEMEM(self->synopsis);
+    FREEMEM(self->description);
+    for (size_t i = 0; i < self->num_methods; i++) {
+        FREEMEM(self->methods[i].name);
+        FREEMEM(self->methods[i].pod);
+    }
+    FREEMEM(self->methods);
     CFCBase_destroy((CFCBase*)self);
+}
+
+void
+CFCPerlPod_add_method(CFCPerlPod *self, const char *name, const char *pod) {
+    CFCUTIL_NULL_CHECK(name);
+    self->num_methods++;
+    size_t size = self->num_methods * sizeof(NamePod);
+    self->methods = (NamePod*)REALLOCATE(self->methods, size);
+    NamePod *slot = &self->methods[self->num_methods - 1];
+    slot->name = CFCUtil_strdup(name);
+    slot->pod  = pod ? CFCUtil_strdup(pod) : NULL;
+}
+
+const char*
+CFCPerlPod_get_synopsis(CFCPerlPod *self) {
+    return self->synopsis;
+}
+
+const char*
+CFCPerlPod_get_description(CFCPerlPod *self) {
+    return self->description;
+}
+
+// Create METHODS, possibly including an ABSTRACT METHODS section.
+char*
+CFCPerlPod_methods_pod(CFCPerlPod *self, CFCClass *klass) {
+    const char *class_name = CFCClass_get_class_name(klass);
+    char *abstract_pod = CFCUtil_strdup("");
+    char *methods_pod  = CFCUtil_strdup("");
+    for (size_t i = 0; i < self->num_methods; i++) {
+        NamePod meth_spec = self->methods[i];
+        CFCMethod *method = CFCClass_method(klass, meth_spec.name);
+        if (!method) {
+            CFCUtil_die("Can't find method '%s' in class '%s'",
+                        meth_spec.name, CFCClass_get_class_name(klass));
+        }
+        char *meth_pod;
+        if (meth_spec.pod) {
+            meth_pod = CFCPerlPod_perlify_doc_text(self, meth_spec.pod);
+        }
+        else {
+            char *raw = CFCPerlPod_gen_subroutine_pod(self, (CFCFunction*)method,
+                                                      meth_spec.name, klass,
+                                                      NULL, class_name, false);
+            meth_pod = CFCPerlPod_perlify_doc_text(self, raw);
+            FREEMEM(raw);
+        }
+        if (CFCMethod_abstract(method)) {
+            abstract_pod = CFCUtil_cat(abstract_pod, meth_pod, NULL);
+        }
+        else {
+            methods_pod = CFCUtil_cat(methods_pod, meth_pod, NULL);
+        }
+        FREEMEM(meth_pod);
+    }
+
+    char *pod = CFCUtil_strdup("");
+    if (strlen(abstract_pod)) {
+        pod = CFCUtil_cat(pod, "=head1 ABSTRACT METHODS\n\n", abstract_pod, NULL);
+    }
+    FREEMEM(abstract_pod);
+    if (strlen(methods_pod)) {
+        pod = CFCUtil_cat(pod, "=head1 METHODS\n\n", methods_pod, NULL);
+    }
+    FREEMEM(methods_pod);
+
+    return pod;
 }
 
 static char*

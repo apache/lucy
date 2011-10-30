@@ -65,11 +65,14 @@ sub register {
     }
 
     # Create object.
-    my $self = _new( @args{qw( parcel class_name client xs_code ) } );
+    my $self = _new( @args{qw( parcel class_name client xs_code )} );
     $bind_methods{$self}      = $args{bind_methods};
     $bind_constructors{$self} = $args{bind_constructors};
-    $make_pod{$self}          = $args{make_pod};
-    $pod_spec{$self}          = Clownfish::Binding::Perl::Pod->new;
+    if ( $args{make_pod} ) {
+        $make_pod{$self} = $args{make_pod};
+        $pod_spec{$self}
+            = Clownfish::Binding::Perl::Pod->new( %{ $args{make_pod} } );
+    }
 
     # Add to registry.
     $registry{ $args{class_name} } = $self;
@@ -171,13 +174,13 @@ sub create_pod {
     my $docucom    = $class->get_docucomment;
     confess("No DocuComment for '$class_name'") unless $docucom;
     my $brief       = $docucom->get_brief;
-    my $description = $pod_spec->_perlify_doc_text( $pod_args->{description}
+    my $description = $pod_spec->_perlify_doc_text( $pod_spec->get_description
             || $docucom->get_long );
 
     # Create SYNOPSIS.
-    my $synopsis_pod = '';
-    if ( defined $pod_args->{synopsis} ) {
-        $synopsis_pod = qq|=head1 SYNOPSIS\n\n$pod_args->{synopsis}\n|;
+    my $synopsis_pod = $pod_spec->get_synopsis;
+    if ($synopsis_pod) {
+        $synopsis_pod = qq|=head1 SYNOPSIS\n\n$synopsis_pod\n|;
     }
 
     # Create CONSTRUCTORS.
@@ -206,38 +209,7 @@ sub create_pod {
     }
 
     # Create METHODS, possibly including an ABSTRACT METHODS section.
-    my @method_docs;
-    my $methods_pod = "";
-    my @abstract_method_docs;
-    my $abstract_methods_pod = "";
-    for my $spec ( @{ $pod_args->{methods} } ) {
-        my $meth_name = ref($spec) ? $spec->{name} : $spec;
-        my $method = $class->method($meth_name);
-        confess("Can't find method '$meth_name' in class '$class_name'")
-            unless $method;
-        my $method_pod;
-        if ( ref($spec) ) {
-            $method_pod = $spec->{pod};
-        }
-        else {
-            $method_pod
-                = $pod_spec->_gen_subroutine_pod( $method, $meth_name, $class,
-                '', $class_name, 0 );
-        }
-        if ( $method->abstract ) {
-            push @abstract_method_docs, $pod_spec->_perlify_doc_text($method_pod);
-        }
-        else {
-            push @method_docs, $pod_spec->_perlify_doc_text($method_pod);
-        }
-    }
-    if (@method_docs) {
-        $methods_pod = join( "", "=head1 METHODS\n\n", @method_docs );
-    }
-    if (@abstract_method_docs) {
-        $abstract_methods_pod = join( "", "=head1 ABSTRACT METHODS\n\n",
-            @abstract_method_docs );
-    }
+    my $methods_pod = $pod_spec->methods_pod($class);
 
     # Build an INHERITANCE section describing class ancestry.
     my $child = $class;
@@ -292,8 +264,6 @@ $synopsis_pod
 $description
 
 $constructor_pod
-
-$abstract_methods_pod
 
 $methods_pod
 
@@ -377,7 +347,7 @@ the values are Clownfish::Binding::Perl::Class objects.
 
 =head1 OBJECT METHODS
 
-=head2 get_class_name get_bind_methods get_bind_methods get_make_pod
+=head2 get_class_name get_bind_methods get_bind_methods get_pod_spec
 get_xs_code get_client
 
 Accessors.  C<get_client> retrieves the Clownfish::Class module to be
