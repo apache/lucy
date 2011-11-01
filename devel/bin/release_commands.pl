@@ -76,10 +76,16 @@ say qq|# Tar and gzip the export.|;
 say qq|tar -czf apache-lucy-incubating-$x_y_z_version.tar.gz apache-lucy-incubating-$x_y_z_version\n|;
 
 say qq|# Generate checksums.|;
-say qq|gpg --print-md MD5 apache-lucy-incubating-$x_y_z_version.tar.gz |
-    . qq|> apache-lucy-incubating-$x_y_z_version.tar.gz.md5|;
-say qq|gpg --print-md SHA512 apache-lucy-incubating-$x_y_z_version.tar.gz |
-    . qq|> apache-lucy-incubating-$x_y_z_version.tar.gz.sha\n|;
+say qq|perl -MDigest -e '\$d = Digest->new("MD5"); open \$fh, |
+    . qq|"<apache-lucy-incubating-$x_y_z_version.tar.gz" or die; |
+    . qq|\$d->addfile(\$fh); print \$d->hexdigest; |
+    . qq|print "  apache-lucy-incubating-$x_y_z_version.tar.gz\\n"' > |
+    . qq| apache-lucy-incubating-0.2.2.tar.gz.md5|;
+say qq|perl -MDigest -e '\$d = Digest->new("SHA-512"); open \$fh, |
+    . qq|"<apache-lucy-incubating-$x_y_z_version.tar.gz" or die; |
+    . qq|\$d->addfile(\$fh); print \$d->hexdigest; |
+    . qq|print "  apache-lucy-incubating-$x_y_z_version.tar.gz\\n"' > |
+    . qq| apache-lucy-incubating-0.2.2.tar.gz.sha\n|;
 
 say qq|# Sign the release.|;
 say qq|gpg --armor --output apache-lucy-incubating-$x_y_z_version.tar.gz.asc |
