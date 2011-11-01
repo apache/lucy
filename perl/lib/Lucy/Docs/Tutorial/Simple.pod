@@ -69,7 +69,6 @@ Next, we'll add a subroutine which parses our sample documents.
             title    => $title,
             content  => $bodytext,
             url      => "/us_constitution/$filename",
-            category => $category,
         };
     }
 
@@ -198,7 +197,6 @@ The rest of the script is just text wrangling.
             # Create a url for use in paging links.
             my $href = $cgi->url( -relative => 1 );
             $href .= "?q=" . CGI::escape($query_string);
-            $href .= ";category=" . CGI::escape($category);
             $href .= ";offset=" . CGI::escape($offset);
 
             # Generate the "Prev" link.
@@ -297,4 +295,4 @@ indexing and search scripts using the classes that Lucy::Simple hides
 from view, opening up the possibilities for expansion; then, we'll spend the
 rest of the tutorial chapters exploring these possibilities.
 
-
+=cut

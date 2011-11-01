@@ -107,7 +107,7 @@ Next, have the C<$indexer> object C<add_doc> where we were having the
 C<$lucy> object C<add_doc> before:
 
     foreach my $filename (@filenames) {
-        my $doc = slurp_and_parse_file($filename);
+        my $doc = parse_file($filename);
         $indexer->add_doc($doc);
     }
 
