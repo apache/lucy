@@ -489,7 +489,6 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
 
     // Verify that our args come in pairs. Return success if there are no
     // args.
-    if (num_stack_elems == start) { return true; }
     if ((num_stack_elems - start) % 2 != 0) {
         cfish_CharBuf *mess
             = CFISH_MAKE_MESS(
@@ -513,7 +512,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
 
     void *target;
     va_start(args, params_hash_name);
-    while (args_left && NULL != (target = va_arg(args, void*))) {
+    while (NULL != (target = va_arg(args, void*))) {
         char *label     = va_arg(args, char*);
         int   label_len = va_arg(args, int);
         int   required  = va_arg(args, int);
@@ -537,7 +536,6 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
                         CFISH_ERR_ADD_FRAME(cfish_Err_get_error());
                         return false;
                     }
-                    args_left--;
                     break;
                 }
             }
