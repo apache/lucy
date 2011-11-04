@@ -56,6 +56,7 @@ sub new {
 
 sub DESTROY {
     my $self = shift;
+    $self->close if defined $sock{$$self};
     delete $peer_address{$$self};
     delete $password{$$self};
     delete $sock{$$self};
@@ -131,11 +132,6 @@ sub close {
     my $sock = $sock{$$self};
     close $sock or confess("Error when closing socket: $!");
     delete $sock{$$self};
-}
-
-sub NUKE {
-    my $self = shift;
-    $self->close if defined $sock{$$self};
 }
 
 1;
