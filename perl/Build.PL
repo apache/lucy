@@ -29,6 +29,7 @@ my $builder = Lucy::Build->new(
         'JSON::XS' => 1.53,
         'perl'     => '5.8.3',
     },
+    configure_requires => { 'Module::Build' => 0.280801 },
     build_requires => {
         'Parse::RecDescent'  => 1.94,
         'Module::Build'      => 0.280801,
