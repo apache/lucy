@@ -20,8 +20,6 @@ package LucyX::Remote::SearchClient;
 BEGIN { our @ISA = qw( Lucy::Search::Searcher ) }
 use Carp;
 use Storable qw( nfreeze thaw );
-use bytes;
-no bytes;
 
 # Inside-out member vars.
 our %peer_address;
@@ -76,7 +74,7 @@ sub _rpc {
     my $sock = $sock{$$self};
 
     my $serialized = nfreeze($args);
-    my $packed_len = pack( 'N', bytes::length($serialized) );
+    my $packed_len = pack( 'N', length($serialized) );
     print $sock "$method\n$packed_len$serialized";
 
     # Bail out if we're either closing or shutting down the server remotely.

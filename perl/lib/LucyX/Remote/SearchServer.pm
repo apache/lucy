@@ -20,8 +20,6 @@ package LucyX::Remote::SearchServer;
 BEGIN { our @ISA = qw( Lucy::Object::Obj ) }
 use Carp;
 use Storable qw( nfreeze thaw );
-use bytes;
-no bytes;
 
 # Inside-out member vars.
 our %searcher;
@@ -129,7 +127,7 @@ sub serve {
                 read( $client_sock, $buf, $len );
                 my $response   = $dispatch{$method}->( $self, thaw($buf) );
                 my $frozen     = nfreeze($response);
-                my $packed_len = pack( 'N', bytes::length($frozen) );
+                my $packed_len = pack( 'N', length($frozen) );
                 print $client_sock $packed_len . $frozen;
             }
         }
