@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+
+Name: liblucy
+Version: @VERSION@
+Description: liblucy - Apache Lucy C library
+Requires: 
+Libs: -L${libdir} -llucy @Z_LIBS@ @LIBS@
+Cflags: @CFLAGS@ -I${includedir} @Z_CFLAGS@
+
