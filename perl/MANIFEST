@@ -157,6 +157,7 @@ lib/LucyX/Index/ByteBufDocWriter.pm
 lib/LucyX/Index/LongFieldSim.pm
 lib/LucyX/Index/ZlibDocReader.pm
 lib/LucyX/Index/ZlibDocWriter.pm
+lib/LucyX/Remote/ClusterSearcher.pm
 lib/LucyX/Remote/SearchClient.pm
 lib/LucyX/Remote/SearchServer.pm
 lib/LucyX/Search/Filter.pm
@@ -300,6 +301,7 @@ t/527-req_opt_query.t
 t/528-leaf_query.t
 t/529-no_match_query.t
 t/532-sort_collector.t
+t/550-cluster_searcher.t
 t/601-queryparser.t
 t/602-boosts.t
 t/603-query_boosts.t
