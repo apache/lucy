@@ -154,15 +154,19 @@ say qq|[...]\n|;
 
 say qq|# Update the issue tracker.|;
 say qq|# While logged into JIRA, visit the following web page. (Note: this|;
-say qq|# permalink may or may not work.  Please let the dev list know one|;
-say qq|# way or the other.)  Click the "release" link for $x_y_z_version and|;
-say qq|# input the date from the CHANGES file.|;
-say qq|https://issues.apache.org/jira/secure/project/ManageVersions.jspa?pid=12310501\n|;
+say qq|# permalink may or may not work, and you may not have the necessary|;
+say qq|# JIRA permissions to perform the required actions.  Please let the|;
+say qq|# dev list know if you encounter problems.)  Click the "release"|;
+say qq|# link for $x_y_z_version and input the date from the CHANGES file.|;
+say qq|https://issues.apache.org/jira/plugins/servlet/project-config/LUCY/versions\n|;
 
 say qq|# Once the release files are in place, update the download page|;
-say qq|# of the Lucy website. Change the artifact links to point at the|;
-say qq|# new version; ensure that while the primary download links point|;
-say qq|# at mirrors, the signature and sums files point at apache.org.|;
+say qq|# of the Lucy website. The easiest way to perform this action is to|;
+say qq|# use the CMS bookmarklet at https://cms.apache.org/#bookmark|;
+say qq|# to access the edit screens via the CMS web interface.  Change the|;
+say qq|# artifact links to point at the new version; ensure that while the|;
+say qq|# primary download links point at mirrors, the signature and sums|;
+say qq|# files point at apache.org.|;
 say qq|[...]\n|;
 
 say qq|# [TODO: this action cannot yet be performed by the RM, so ignore.]|; 
