@@ -26,6 +26,8 @@ use Scalar::Util qw( reftype );
 our %shards;
 our %password;
 our %socks;
+our %starts;
+our %doc_max;
 
 use IO::Socket::INET;
 
@@ -57,6 +59,17 @@ sub new {
         push @$socks, $sock;
     }
 
+    # Derive doc_max and relative start offsets.
+    my $doc_max_responses = $self->_rpc( 'doc_max', {} );
+    my $doc_max = 0;
+    my @starts;
+    for my $shard_doc_max (@$doc_max_responses) {
+        push @starts, $doc_max;
+        $doc_max += $shard_doc_max;
+    }
+    $starts{$$self}  = \@starts;
+    $doc_max{$$self} = $doc_max;
+
     return $self;
 }
 
@@ -66,6 +79,8 @@ sub DESTROY {
     delete $shards{$$self};
     delete $password{$$self};
     delete $socks{$$self};
+    delete $starts{$$self};
+    delete $doc_max{$$self};
     $self->SUPER::DESTROY;
 }
 
@@ -97,39 +112,40 @@ sub _rpc {
         unless ( defined $arg_len and $check_val == $arg_len );
     my $response = thaw($serialized);
     if ( exists $response->{retval} ) {
-        return $response->{retval};
+        return [ $response->{retval} ];
     }
     return;
 }
 
 sub top_docs {
     my $self = shift;
-    return $self->_rpc( 'top_docs', {@_} );
+    return $self->_rpc( 'top_docs', {@_} )->[0];
 }
 
 sub terminate {
     my $self = shift;
-    return $self->_rpc( 'terminate', {} );
+    $self->_rpc( 'terminate', {} );
+    return;
 }
 
 sub fetch_doc {
     my ( $self, $doc_id ) = @_;
-    return $self->_rpc( 'fetch_doc', { doc_id => $doc_id } );
+    return $self->_rpc( 'fetch_doc', { doc_id => $doc_id } )->[0];
 }
 
 sub fetch_doc_vec {
     my ( $self, $doc_id ) = @_;
-    return $self->_rpc( 'fetch_doc_vec', { doc_id => $doc_id } );
+    return $self->_rpc( 'fetch_doc_vec', { doc_id => $doc_id } )->[0];
 }
 
 sub doc_max {
     my $self = shift;
-    return $self->_rpc( 'doc_max', {} );
+    return $doc_max{$$self};
 }
 
 sub doc_freq {
     my $self = shift;
-    return $self->_rpc( 'doc_freq', {@_} );
+    return $self->_rpc( 'doc_freq', {@_} )->[0];
 }
 
 sub close {
