@@ -94,27 +94,29 @@ Storable.
 
 sub _rpc {
     my ( $self, $method, $args ) = @_;
-    my $sock = $socks{$$self}[0];
-
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
-    print $sock "$method\n$packed_len$serialized";
+
+    for my $sock ( @{ $socks{$$self} } ) {
+        print $sock "$method\n$packed_len$serialized";
+    }
 
     # Bail out if we're either closing or shutting down the server remotely.
     return if $method eq 'done';
     return if $method eq 'terminate';
 
-    # Decode response.
-    $sock->read( $packed_len, 4 );
-    my $arg_len = unpack( 'N', $packed_len );
-    my $check_val = read( $sock, $serialized, $arg_len );
-    confess("Tried to read $arg_len bytes, got $check_val")
-        unless ( defined $arg_len and $check_val == $arg_len );
-    my $response = thaw($serialized);
-    if ( exists $response->{retval} ) {
-        return [ $response->{retval} ];
+    my @responses;
+    for my $sock ( @{ $socks{$$self} } ) {
+        # Decode response.
+        $sock->read( $packed_len, 4 );
+        my $arg_len = unpack( 'N', $packed_len );
+        my $check_val = read( $sock, $serialized, $arg_len );
+        confess("Tried to read $arg_len bytes, got $check_val")
+            unless ( defined $arg_len and $check_val == $arg_len );
+        my $response = thaw($serialized);
+        push @responses, $response->{retval};
     }
-    return;
+    return \@responses;
 }
 
 sub top_docs {
@@ -145,7 +147,10 @@ sub doc_max {
 
 sub doc_freq {
     my $self = shift;
-    return $self->_rpc( 'doc_freq', {@_} )->[0];
+    my $responses = $self->_rpc( 'doc_freq', {@_} );
+    my $doc_freq = 0;
+    $doc_freq += $_ for @$responses;
+    return $doc_freq;
 }
 
 sub close {
