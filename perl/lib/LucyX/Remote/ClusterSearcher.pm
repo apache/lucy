@@ -20,9 +20,10 @@ package LucyX::Remote::ClusterSearcher;
 BEGIN { our @ISA = qw( Lucy::Search::Searcher ) }
 use Carp;
 use Storable qw( nfreeze thaw );
+use Scalar::Util qw( reftype );
 
 # Inside-out member vars.
-our %peer_address;
+our %shards;
 our %password;
 our %sock;
 
@@ -30,15 +31,17 @@ use IO::Socket::INET;
 
 sub new {
     my ( $either, %args ) = @_;
-    my $peer_address = delete $args{peer_address};
-    my $password     = delete $args{password};
-    my $self         = $either->SUPER::new(%args);
-    $peer_address{$$self} = $peer_address;
-    $password{$$self}     = $password;
+    my $shards   = delete $args{shards};
+    my $password = delete $args{password};
+    my $self     = $either->SUPER::new(%args);
+    confess("'shards' must be an arrayref")
+        unless reftype($shards) eq 'ARRAY';
+    $shards{$$self}   = $shards;
+    $password{$$self} = $password;
 
     # Establish a connection.
     my $sock = $sock{$$self} = IO::Socket::INET->new(
-        PeerAddr => $peer_address,
+        PeerAddr => $shards->[0],
         Proto    => 'tcp',
     );
     confess("No socket: $!") unless $sock;
@@ -55,7 +58,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
     $self->close if defined $sock{$$self};
-    delete $peer_address{$$self};
+    delete $shards{$$self};
     delete $password{$$self};
     delete $sock{$$self};
     $self->SUPER::DESTROY;
@@ -143,8 +146,8 @@ LucyX::Remote::ClusterSearcher - Connect to a remote SearchServer.
 =head1 SYNOPSIS
 
     my $client = LucyX::Remote::ClusterSearcher->new(
-        peer_address => 'searchserver1:7890',
-        password     => $pass,
+        shards   => ['searchserver1:7890'], 
+        password => $pass,
     );
     my $hits = $client->hits( query => $query );
 
@@ -164,8 +167,8 @@ Constructor.  Takes hash-style params.
 
 =item *
 
-B<peer_address> - The name/IP and the port number which the client should
-attempt to connect to.
+B<shards> - An array of host:port pairs identifying the shards that make up
+the composite index and that the client should connect to.
 
 =item *
 

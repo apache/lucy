@@ -92,9 +92,9 @@ else {
 }
 
 my $cluster_searcher = LucyX::Remote::ClusterSearcher->new(
-    schema       => SortSchema->new,
-    peer_address => "localhost:$PORT_NUM",
-    password     => 'foo',
+    schema   => SortSchema->new,
+    shards   => ["localhost:$PORT_NUM"],
+    password => 'foo',
 );
 
 is( $cluster_searcher->doc_freq( field => 'content', term => 'x' ),
