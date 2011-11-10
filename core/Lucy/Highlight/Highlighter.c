@@ -57,14 +57,19 @@ Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
     self->query          = Searcher_Glean_Query(searcher, query);
     self->searcher       = (Searcher*)INCREF(searcher);
     self->field          = CB_Clone(field);
-    self->compiler       = Query_Make_Compiler(self->query, searcher,
-                                               Query_Get_Boost(self->query),
-                                               false);
     self->excerpt_length = excerpt_length;
     self->slop           = excerpt_length / 3;
     self->window_width   = excerpt_length + (self->slop * 2);
     self->pre_tag        = CB_new_from_trusted_utf8("<strong>", 8);
     self->post_tag       = CB_new_from_trusted_utf8("</strong>", 9);
+    if (Query_Is_A(self->query, COMPILER)) {
+        self->compiler = (Compiler*)INCREF(self->query);
+    }
+    else {
+        self->compiler = Query_Make_Compiler(self->query, searcher,
+                                             Query_Get_Boost(self->query),
+                                             false);
+    }
     return self;
 }
 
