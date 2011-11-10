@@ -25,7 +25,7 @@ use Scalar::Util qw( reftype );
 # Inside-out member vars.
 our %shards;
 our %password;
-our %sock;
+our %socks;
 
 use IO::Socket::INET;
 
@@ -39,28 +39,33 @@ sub new {
     $shards{$$self}   = $shards;
     $password{$$self} = $password;
 
-    # Establish a connection.
-    my $sock = $sock{$$self} = IO::Socket::INET->new(
-        PeerAddr => $shards->[0],
-        Proto    => 'tcp',
-    );
-    confess("No socket: $!") unless $sock;
-    $sock->autoflush(1);
+    # Establish connections.
+    my $socks = $socks{$$self} = [];
+    for my $shard (@$shards) {
+        my $sock = IO::Socket::INET->new(
+            PeerAddr => $shard,
+            Proto    => 'tcp',
+        );
+        confess("No socket: $!") unless $sock;
+        $sock->autoflush(1);
 
-    # Verify password.
-    print $sock "$password\n";
-    chomp( my $response = <$sock> );
-    confess("Failed to connect: '$response'") unless $response =~ /accept/i;
+        # Handshake.
+        print $sock "$password\n";
+        chomp( my $response = <$sock> );
+        confess("Failed to connect: '$response'") unless $response =~ /accept/i;
+
+        push @$socks, $sock;
+    }
 
     return $self;
 }
 
 sub DESTROY {
     my $self = shift;
-    $self->close if defined $sock{$$self};
+    $self->close if defined $socks{$$self};
     delete $shards{$$self};
     delete $password{$$self};
-    delete $sock{$$self};
+    delete $socks{$$self};
     $self->SUPER::DESTROY;
 }
 
@@ -74,7 +79,7 @@ Storable.
 
 sub _rpc {
     my ( $self, $method, $args ) = @_;
-    my $sock = $sock{$$self};
+    my $sock = $socks{$$self}[0];
 
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
@@ -130,9 +135,10 @@ sub doc_freq {
 sub close {
     my $self = shift;
     $self->_rpc( 'done', {} );
-    my $sock = $sock{$$self};
-    close $sock or confess("Error when closing socket: $!");
-    delete $sock{$$self};
+    for my $sock ( @{ $socks{$$self} } ) {
+        close $sock or confess("Error when closing socket: $!");
+    }
+    delete $socks{$$self};
 }
 
 1;
