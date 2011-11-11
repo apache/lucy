@@ -24,6 +24,7 @@ use Scalar::Util qw( reftype );
 
 # Inside-out member vars.
 our %shards;
+our %num_shards;
 our %password;
 our %socks;
 our %starts;
@@ -38,8 +39,9 @@ sub new {
     my $self     = $either->SUPER::new(%args);
     confess("'shards' must be an arrayref")
         unless reftype($shards) eq 'ARRAY';
-    $shards{$$self}   = $shards;
-    $password{$$self} = $password;
+    $shards{$$self}     = $shards;
+    $num_shards{$$self} = scalar @$shards;
+    $password{$$self}   = $password;
 
     # Establish connections.
     my $socks = $socks{$$self} = [];
@@ -60,7 +62,7 @@ sub new {
     }
 
     # Derive doc_max and relative start offsets.
-    my $doc_max_responses = $self->_rpc( 'doc_max', {} );
+    my $doc_max_responses = $self->_multi_rpc( 'doc_max', {} );
     my $doc_max = 0;
     my @starts;
     for my $shard_doc_max (@$doc_max_responses) {
@@ -77,6 +79,7 @@ sub DESTROY {
     my $self = shift;
     $self->close if defined $socks{$$self};
     delete $shards{$$self};
+    delete $num_shards{$$self};
     delete $password{$$self};
     delete $socks{$$self};
     delete $starts{$$self};
@@ -84,21 +87,13 @@ sub DESTROY {
     $self->SUPER::DESTROY;
 }
 
-=for comment
-
-Make a remote procedure call.  For every call that does not close/terminate
-the socket connection, expect a response back that's been serialized using
-Storable.
-
-=cut
-
-sub _rpc {
+# Send a remote procedure call to all shards.
+sub _multi_rpc {
     my ( $self, $method, $args ) = @_;
-    my $serialized = nfreeze($args);
-    my $packed_len = pack( 'N', length($serialized) );
-
-    for my $sock ( @{ $socks{$$self} } ) {
-        print $sock "$method\n$packed_len$serialized";
+    my $num_shards = $num_shards{$$self};
+    my $request = $self->_serialize_request( $method, $args );
+    for ( my $i = 0; $i < $num_shards; $i++ ) {
+        $self->_send_request_to_shard( $i, $request );
     }
 
     # Bail out if we're either closing or shutting down the server remotely.
@@ -106,22 +101,48 @@ sub _rpc {
     return if $method eq 'terminate';
 
     my @responses;
-    for my $sock ( @{ $socks{$$self} } ) {
-        # Decode response.
-        $sock->read( $packed_len, 4 );
-        my $arg_len = unpack( 'N', $packed_len );
-        my $check_val = read( $sock, $serialized, $arg_len );
-        confess("Tried to read $arg_len bytes, got $check_val")
-            unless ( defined $arg_len and $check_val == $arg_len );
-        my $response = thaw($serialized);
+    for ( my $i = 0; $i < $num_shards; $i++ ) {
+        my $response = $self->_retrieve_response_from_shard($i);
         push @responses, $response->{retval};
     }
     return \@responses;
 }
 
+# Serialize a method name and hash-style parameters using the conventions
+# understood by SearchServer.
+sub _serialize_request {
+    my ( $self, $method, $args ) = @_;
+    my $serialized = nfreeze($args);
+    my $packed_len = pack( 'N', length($serialized) );
+    my $request    = "$method\n$packed_len$serialized";
+    return \$request;
+}
+
+# Send a serialized request to one shard.
+sub _send_request_to_shard {
+    my ( $self, $shard_num, $request ) = @_;
+    my $sock = $socks{$$self}[$shard_num];
+    print $sock $$request;
+}
+
+# Retrieve the response from a shard.
+sub _retrieve_response_from_shard {
+    my ( $self, $shard_num ) = @_;
+    my $sock = $socks{$$self}[$shard_num];
+    my $packed_len;
+    my $serialized;
+    $sock->read( $packed_len, 4 );
+    my $arg_len = unpack( 'N', $packed_len );
+    my $check_val = read( $sock, $serialized, $arg_len );
+    confess("Tried to read $arg_len bytes, got $check_val")
+        unless ( defined $arg_len and $check_val == $arg_len );
+    return thaw($serialized);
+}
+
 sub top_docs {
     my ( $self, %args ) = @_;
     my $starts     = $starts{$$self};
+    my $num_shards = $num_shards{$$self};
     my $query      = $args{query};
     my $num_wanted = $args{num_wanted};
     my $sort_spec  = $args{sort_spec};
@@ -146,9 +167,9 @@ sub top_docs {
     }
 
     # Gather remote responses and aggregate.
-    my $responses = $self->_rpc( 'top_docs', \%args );
+    my $responses = $self->_multi_rpc( 'top_docs', \%args );
     my $total_hits = 0;
-    for ( my $i = 0; $i < $starts->get_size; $i++ ) {
+    for ( my $i = 0; $i < $num_shards; $i++ ) {
         my $base           = $starts->get($i);
         my $sub_top_docs   = $responses->[$i];
         my @sub_match_docs = sort { $a->get_doc_id <=> $b->get_doc_id }
@@ -170,18 +191,18 @@ sub top_docs {
 
 sub terminate {
     my $self = shift;
-    $self->_rpc( 'terminate', {} );
+    $self->_multi_rpc( 'terminate', {} );
     return;
 }
 
 sub fetch_doc {
     my ( $self, $doc_id ) = @_;
-    return $self->_rpc( 'fetch_doc', { doc_id => $doc_id } )->[0];
+    return $self->_multi_rpc( 'fetch_doc', { doc_id => $doc_id } )->[0];
 }
 
 sub fetch_doc_vec {
     my ( $self, $doc_id ) = @_;
-    return $self->_rpc( 'fetch_doc_vec', { doc_id => $doc_id } )->[0];
+    return $self->_multi_rpc( 'fetch_doc_vec', { doc_id => $doc_id } )->[0];
 }
 
 sub doc_max {
@@ -191,7 +212,7 @@ sub doc_max {
 
 sub doc_freq {
     my $self = shift;
-    my $responses = $self->_rpc( 'doc_freq', {@_} );
+    my $responses = $self->_multi_rpc( 'doc_freq', {@_} );
     my $doc_freq = 0;
     $doc_freq += $_ for @$responses;
     return $doc_freq;
@@ -199,7 +220,7 @@ sub doc_freq {
 
 sub close {
     my $self = shift;
-    $self->_rpc( 'done', {} );
+    $self->_multi_rpc( 'done', {} );
     for my $sock ( @{ $socks{$$self} } ) {
         close $sock or confess("Error when closing socket: $!");
     }
