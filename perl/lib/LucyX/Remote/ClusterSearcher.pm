@@ -120,8 +120,52 @@ sub _rpc {
 }
 
 sub top_docs {
-    my $self = shift;
-    return $self->_rpc( 'top_docs', {@_} )->[0];
+    my ( $self, %args ) = @_;
+    my $starts     = $starts{$$self};
+    my $query      = $args{query};
+    my $num_wanted = $args{num_wanted};
+    my $sort_spec  = $args{sort_spec};
+
+    # Weight query if necessary.
+    my $compiler
+        = $query->isa("Lucy::Search::Compiler")
+        ? $query
+        : $query->make_compiler( searcher => $self );
+
+    # Create HitQueue.
+    my $hit_q;
+    if ($sort_spec) {
+        $hit_q = Lucy::Search::HitQueue->new(
+            schema    => $self->get_schema,
+            sort_spec => $sort_spec,
+            wanted    => $num_wanted,
+        );
+    }
+    else {
+        $hit_q = Lucy::Search::HitQueue->new( wanted => $num_wanted, );
+    }
+
+    # Gather remote responses and aggregate.
+    my $responses = $self->_rpc( 'top_docs', \%args );
+    my $total_hits = 0;
+    for ( my $i = 0; $i < scalar @$starts; $i++ ) {
+        my $base           = $starts->[$i];
+        my $sub_top_docs   = $responses->[$i];
+        my @sub_match_docs = sort { $a->get_doc_id <=> $b->get_doc_id }
+            @{ $sub_top_docs->get_match_docs };
+        for my $match_doc (@sub_match_docs) {
+            $match_doc->set_doc_id( $match_doc->get_doc_id + $base );
+            $hit_q->insert($match_doc);
+        }
+        $total_hits += $sub_top_docs->get_total_hits;
+    }
+
+    # Return a TopDocs object with the best of the best.
+    my $best_match_docs = $hit_q->pop_all;
+    return Lucy::Search::TopDocs->new(
+        total_hits => $total_hits,
+        match_docs => $best_match_docs,
+    );
 }
 
 sub terminate {
