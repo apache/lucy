@@ -108,6 +108,15 @@ sub _multi_rpc {
     return \@responses;
 }
 
+# Send a remote procedure call to one shard.
+sub _single_rpc {
+    my ( $self, $method, $args, $shard_num ) = @_;
+    my $request = $self->_serialize_request( $method, $args );
+    $self->_send_request_to_shard( $shard_num, $request );
+    my $response = $self->_retrieve_response_from_shard($shard_num);
+    return $response->{retval};
+}
+
 # Serialize a method name and hash-style parameters using the conventions
 # understood by SearchServer.
 sub _serialize_request {
@@ -197,12 +206,15 @@ sub terminate {
 
 sub fetch_doc {
     my ( $self, $doc_id ) = @_;
-    return $self->_multi_rpc( 'fetch_doc', { doc_id => $doc_id } )->[0];
+    my $tick = Lucy::Index::PolyReader::sub_tick( $starts{$$self}, $doc_id );
+    return $self->_single_rpc( 'fetch_doc', { doc_id => $doc_id }, $tick );
 }
 
 sub fetch_doc_vec {
     my ( $self, $doc_id ) = @_;
-    return $self->_multi_rpc( 'fetch_doc_vec', { doc_id => $doc_id } )->[0];
+    my $tick = Lucy::Index::PolyReader::sub_tick( $starts{$$self}, $doc_id );
+    return $self->_single_rpc( 'fetch_doc_vec', { doc_id => $doc_id },
+        $tick );
 }
 
 sub doc_max {
