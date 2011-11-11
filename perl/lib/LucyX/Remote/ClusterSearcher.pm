@@ -67,7 +67,7 @@ sub new {
         push @starts, $doc_max;
         $doc_max += $shard_doc_max;
     }
-    $starts{$$self}  = \@starts;
+    $starts{$$self}  = Lucy::Object::I32Array->new( ints => \@starts );
     $doc_max{$$self} = $doc_max;
 
     return $self;
@@ -148,8 +148,8 @@ sub top_docs {
     # Gather remote responses and aggregate.
     my $responses = $self->_rpc( 'top_docs', \%args );
     my $total_hits = 0;
-    for ( my $i = 0; $i < scalar @$starts; $i++ ) {
-        my $base           = $starts->[$i];
+    for ( my $i = 0; $i < $starts->get_size; $i++ ) {
+        my $base           = $starts->get($i);
         my $sub_top_docs   = $responses->[$i];
         my @sub_match_docs = sort { $a->get_doc_id <=> $b->get_doc_id }
             @{ $sub_top_docs->get_match_docs };
