@@ -20,7 +20,7 @@ use Test::More;
 use Time::HiRes qw( sleep );
 use IO::Socket::INET;
 
-my @ports = 7890 .. 7891;
+my @ports = 7890 .. 7895;
 BEGIN {
     if ( $^O =~ /(mswin|cygwin)/i ) {
         plan( 'skip_all', "fork on Windows not supported by Lucy" );
@@ -129,12 +129,11 @@ my $cluster_searcher = LucyX::Remote::ClusterSearcher->new(
 );
 
 $hits = $cluster_searcher->hits( query => 'b' );
-is( $hits->total_hits, 2, "matched hits across multiple shards" );
+is( $hits->total_hits, scalar @ports, "matched hits across multiple shards" );
 
+my %expected = map { ( "x b $_" => 1 ) } @ports;
 my %results;
-$results{ $hits->next()->{content} } = 1;
-$results{ $hits->next()->{content} } = 1;
-my %expected = ( 'x b 7890' => 1, 'x b 7891' => 1, );
+$results{ $_->{content} } = 1 while $_ = $hits->next();
 
 is_deeply( \%results, \%expected, "docs fetched from multiple shards" );
 
