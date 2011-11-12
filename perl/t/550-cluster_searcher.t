@@ -20,7 +20,7 @@ use Test::More;
 use Time::HiRes qw( sleep );
 use IO::Socket::INET;
 
-my $PORT_NUM = 7890;
+my @ports = 7890 .. 7891;
 BEGIN {
     if ( $^O =~ /(mswin|cygwin)/i ) {
         plan( 'skip_all', "fork on Windows not supported by Lucy" );
@@ -38,9 +38,11 @@ sub new {
     my $self       = shift->SUPER::new(@_);
     my $plain_type = Lucy::Plan::FullTextType->new(
         analyzer => Lucy::Analysis::RegexTokenizer->new );
+    my $num_type = Lucy::Plan::Int32Type->new( sortable => 1, indexed => 0 );
     my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
     $self->spec_field( name => 'content', type => $plain_type );
-    $self->spec_field( name => 'number',  type => $string_type );
+    $self->spec_field( name => 'number',  type => $num_type );
+    $self->spec_field( name => 'port',    type => $string_type );
     return $self;
 }
 
@@ -50,96 +52,91 @@ use Lucy::Test;
 use LucyX::Remote::SearchServer;
 use LucyX::Remote::ClusterSearcher;
 
-my $kid;
-$kid = fork;
-if ($kid) {
-    sleep .25;    # allow time for the server to set up the socket
-    die "Failed fork: $!" unless defined $kid;
-}
-else {
-    my $folder  = Lucy::Store::RAMFolder->new;
-    my $indexer = Lucy::Index::Indexer->new(
-        index  => $folder,
-        schema => SortSchema->new,
-    );
-    my $number = 5;
-    for (qw( a b c )) {
-        $indexer->add_doc( { content => "x $_", number => $number } );
-        $number -= 2;
+my @kids;
+my $number = 7;
+for my $port (@ports) {
+    my $kid = fork;
+    if ($kid) {
+        die "Failed fork: $!" unless defined $kid;
+        push @kids, $kid;
     }
-    $indexer->commit;
+    else {
+        my $folder  = Lucy::Store::RAMFolder->new;
+        my $indexer = Lucy::Index::Indexer->new(
+            index  => $folder,
+            schema => SortSchema->new,
+        );
+        for (qw( a b c )) {
+            my %doc = (
+                content => "x $_ $port",
+                number  => $number,
+                port    => $port,
+            );
+            $indexer->add_doc(\%doc);
+            $number += 2;
+        }
+        $indexer->commit;
 
-    my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
-    my $server = LucyX::Remote::SearchServer->new(
-        port     => $PORT_NUM,
-        searcher => $searcher,
-        password => 'foo',
-    );
-    $server->serve;
-    exit(0);
+        my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
+        my $server = LucyX::Remote::SearchServer->new(
+            port     => $port,
+            searcher => $searcher,
+            password => 'foo',
+        );
+        $server->serve;
+        exit(0);
+    }
 }
+
+# Allow time for the servers to set up their sockets.
+sleep .25;
 
 my $test_client_sock = IO::Socket::INET->new(
-    PeerAddr => "localhost:$PORT_NUM",
+    PeerAddr => "localhost:$ports[0]",
     Proto    => 'tcp',
 );
 if ($test_client_sock) {
-    plan( tests => 10 );
+    plan( tests => 9 );
     undef $test_client_sock;
 }
 else {
     plan( 'skip_all', "Can't get a socket: $!" );
 }
 
-my $cluster_searcher = LucyX::Remote::ClusterSearcher->new(
+my $solo_cluster_searcher = LucyX::Remote::ClusterSearcher->new(
     schema   => SortSchema->new,
-    shards   => ["localhost:$PORT_NUM"],
+    shards   => ["localhost:$ports[0]"],
     password => 'foo',
 );
 
-is( $cluster_searcher->doc_freq( field => 'content', term => 'x' ),
+is( $solo_cluster_searcher->doc_freq( field => 'content', term => 'x' ),
     3, "doc_freq" );
-is( $cluster_searcher->doc_max, 3, "doc_max" );
-isa_ok( $cluster_searcher->fetch_doc(1), "Lucy::Document::HitDoc", "fetch_doc" );
-isa_ok( $cluster_searcher->fetch_doc_vec(1),
+is( $solo_cluster_searcher->doc_max, 3, "doc_max" );
+isa_ok( $solo_cluster_searcher->fetch_doc(1), "Lucy::Document::HitDoc", "fetch_doc" );
+isa_ok( $solo_cluster_searcher->fetch_doc_vec(1),
     "Lucy::Index::DocVector", "fetch_doc_vec" );
 
-my $hits = $cluster_searcher->hits( query => 'x' );
+my $hits = $solo_cluster_searcher->hits( query => 'x' );
 is( $hits->total_hits, 3, "retrieved hits from search server" );
 
-$hits = $cluster_searcher->hits( query => 'a' );
+$hits = $solo_cluster_searcher->hits( query => 'a' );
 is( $hits->total_hits, 1, "retrieved hit from search server" );
 
-my $folder_b = Lucy::Store::RAMFolder->new;
-my $number   = 6;
-for (qw( a b c )) {
-    my $indexer = Lucy::Index::Indexer->new(
-        index  => $folder_b,
-        schema => SortSchema->new,
-    );
-    $indexer->add_doc( { content => "y $_", number => $number } );
-    $number -= 2;
-    $indexer->add_doc( { content => 'blah blah blah' } ) for 1 .. 3;
-    $indexer->commit;
-}
-
-my $searcher_b = Lucy::Search::IndexSearcher->new( index => $folder_b, );
-is( ref( $searcher_b->get_reader ), 'Lucy::Index::PolyReader', );
-
-my $poly_searcher = Lucy::Search::PolySearcher->new(
-    schema    => SortSchema->new,
-    searchers => [ $searcher_b, $cluster_searcher ],
+my $cluster_searcher = LucyX::Remote::ClusterSearcher->new(
+    schema   => SortSchema->new,
+    shards   => [ map {"localhost:$_"} @ports ],
+    password => 'foo',
 );
 
-$hits = $poly_searcher->hits( query => 'b' );
-is( $hits->total_hits, 2, "retrieved hits from PolySearcher" );
+$hits = $cluster_searcher->hits( query => 'b' );
+is( $hits->total_hits, 2, "matched hits across multiple shards" );
 
 my %results;
 $results{ $hits->next()->{content} } = 1;
 $results{ $hits->next()->{content} } = 1;
-my %expected = ( 'x b' => 1, 'y b' => 1, );
+my %expected = ( 'x b 7890' => 1, 'x b 7891' => 1, );
 
-is_deeply( \%results, \%expected, "docs fetched from both local and remote" );
+is_deeply( \%results, \%expected, "docs fetched from multiple shards" );
 
 my $sort_spec = Lucy::Search::SortSpec->new(
     rules => [
@@ -147,14 +144,14 @@ my $sort_spec = Lucy::Search::SortSpec->new(
         Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ],
 );
-$hits = $poly_searcher->hits(
+$hits = $cluster_searcher->hits(
     query     => 'b',
     sort_spec => $sort_spec,
 );
 my @got;
 
 while ( my $hit = $hits->next ) {
-    push @got, $hit->{content};
+    push @got, $hit->{number};
 }
 $sort_spec = Lucy::Search::SortSpec->new(
     rules => [
@@ -162,21 +159,24 @@ $sort_spec = Lucy::Search::SortSpec->new(
         Lucy::Search::SortRule->new( type  => 'doc_id' ),
     ],
 );
-$hits = $poly_searcher->hits(
+$hits = $cluster_searcher->hits(
     query     => 'b',
     sort_spec => $sort_spec,
 );
 my @reversed;
 while ( my $hit = $hits->next ) {
-    push @reversed, $hit->{content};
+    push @reversed, $hit->{number};
 }
 is_deeply(
     \@got,
     [ reverse @reversed ],
-    "Sort combination of remote and local"
+    "Sort hits accross multiple shards"
 );
 
 END {
-    $cluster_searcher->terminate if defined $cluster_searcher;
-    kill( TERM => $kid ) if $kid;
+    $solo_cluster_searcher->terminate if defined $solo_cluster_searcher;
+    $cluster_searcher->terminate      if defined $cluster_searcher;
+    for my $kid (@kids) {
+        kill( TERM => $kid ) if $kid;
+    }
 }
