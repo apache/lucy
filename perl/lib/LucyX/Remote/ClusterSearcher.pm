@@ -206,13 +206,19 @@ sub terminate {
 
 sub fetch_doc {
     my ( $self, $doc_id ) = @_;
-    my $tick = Lucy::Index::PolyReader::sub_tick( $starts{$$self}, $doc_id );
-    return $self->_single_rpc( 'fetch_doc', { doc_id => $doc_id }, $tick );
+    my $starts = $starts{$$self};
+    my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
+    my $start  = $starts->get($tick);
+    my %params = ( doc_id => $doc_id - $start );
+    return $self->_single_rpc( 'fetch_doc', \%params, $tick );
 }
 
 sub fetch_doc_vec {
     my ( $self, $doc_id ) = @_;
-    my $tick = Lucy::Index::PolyReader::sub_tick( $starts{$$self}, $doc_id );
+    my $starts = $starts{$$self};
+    my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
+    my $start  = $starts->get($tick);
+    my %params = ( doc_id => $doc_id - $start );
     return $self->_single_rpc( 'fetch_doc_vec', { doc_id => $doc_id },
         $tick );
 }
