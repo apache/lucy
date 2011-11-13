@@ -70,17 +70,16 @@ Storable.
 =cut
 
 sub _rpc {
-    my ( $self, $method, $args ) = @_;
+    my ( $self, $args ) = @_;
     my $sock = $sock{$$self};
 
-    $args->{_action} = $method;
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
     print $sock $packed_len, $serialized;
 
     # Bail out if we're either closing or shutting down the server remotely.
-    return if $method eq 'done';
-    return if $method eq 'terminate';
+    return if $args->{_action} eq 'done';
+    return if $args->{_action} eq 'terminate';
 
     # Decode response.
     $sock->read( $packed_len, 4 );
@@ -97,37 +96,43 @@ sub _rpc {
 
 sub top_docs {
     my $self = shift;
-    return $self->_rpc( 'top_docs', {@_} );
+    my %args = ( @_, _action => 'top_docs' );
+    return $self->_rpc( \%args );
 }
 
 sub terminate {
     my $self = shift;
-    return $self->_rpc( 'terminate', {} );
+    my %args = ( _action => 'terminate' );
+    return $self->_rpc( \%args );
 }
 
 sub fetch_doc {
     my ( $self, $doc_id ) = @_;
-    return $self->_rpc( 'fetch_doc', { doc_id => $doc_id } );
+    my %args = ( doc_id => $doc_id, _action => 'fetch_doc' );
+    return $self->_rpc( \%args );
 }
 
 sub fetch_doc_vec {
     my ( $self, $doc_id ) = @_;
-    return $self->_rpc( 'fetch_doc_vec', { doc_id => $doc_id } );
+    my %args = ( doc_id => $doc_id, _action => 'fetch_doc_vec' );
+    return $self->_rpc( \%args );
 }
 
 sub doc_max {
     my $self = shift;
-    return $self->_rpc( 'doc_max', {} );
+    my %args = ( _action => 'doc_max' );
+    return $self->_rpc( { _action => 'doc_max' } );
 }
 
 sub doc_freq {
     my $self = shift;
-    return $self->_rpc( 'doc_freq', {@_} );
+    my %args = ( @_, _action => 'doc_freq' );
+    return $self->_rpc( \%args );
 }
 
 sub close {
     my $self = shift;
-    $self->_rpc( 'done', {} );
+    $self->_rpc( { _action => 'done' } );
     my $sock = $sock{$$self};
     close $sock or confess("Error when closing socket: $!");
     delete $sock{$$self};

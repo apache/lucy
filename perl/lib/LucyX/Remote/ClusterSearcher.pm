@@ -62,7 +62,7 @@ sub new {
     }
 
     # Derive doc_max and relative start offsets.
-    my $doc_max_responses = $self->_multi_rpc( 'doc_max', {} );
+    my $doc_max_responses = $self->_multi_rpc( { _action => 'doc_max' } );
     my $doc_max = 0;
     my @starts;
     for my $shard_doc_max (@$doc_max_responses) {
@@ -89,16 +89,16 @@ sub DESTROY {
 
 # Send a remote procedure call to all shards.
 sub _multi_rpc {
-    my ( $self, $method, $args ) = @_;
+    my ( $self, $args ) = @_;
     my $num_shards = $num_shards{$$self};
-    my $request = $self->_serialize_request( $method, $args );
+    my $request = $self->_serialize_request($args);
     for ( my $i = 0; $i < $num_shards; $i++ ) {
         $self->_send_request_to_shard( $i, $request );
     }
 
     # Bail out if we're either closing or shutting down the server remotely.
-    return if $method eq 'done';
-    return if $method eq 'terminate';
+    return if $args->{_action} eq 'done';
+    return if $args->{_action} eq 'terminate';
 
     my @responses;
     for ( my $i = 0; $i < $num_shards; $i++ ) {
@@ -110,8 +110,8 @@ sub _multi_rpc {
 
 # Send a remote procedure call to one shard.
 sub _single_rpc {
-    my ( $self, $method, $args, $shard_num ) = @_;
-    my $request = $self->_serialize_request( $method, $args );
+    my ( $self, $args, $shard_num ) = @_;
+    my $request = $self->_serialize_request($args);
     $self->_send_request_to_shard( $shard_num, $request );
     my $response = $self->_retrieve_response_from_shard($shard_num);
     return $response->{retval};
@@ -120,8 +120,7 @@ sub _single_rpc {
 # Serialize a method name and hash-style parameters using the conventions
 # understood by SearchServer.
 sub _serialize_request {
-    my ( $self, $method, $args ) = @_;
-    $args->{_action} = $method;
+    my ( $self, $args ) = @_;
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
     my $request    = "$packed_len$serialized";
@@ -177,7 +176,8 @@ sub top_docs {
     }
 
     # Gather remote responses and aggregate.
-    my $responses = $self->_multi_rpc( 'top_docs', \%args );
+    $args{_action} = 'top_docs';
+    my $responses = $self->_multi_rpc( \%args );
     my $total_hits = 0;
     for ( my $i = 0; $i < $num_shards; $i++ ) {
         my $base           = $starts->get($i);
@@ -201,7 +201,7 @@ sub top_docs {
 
 sub terminate {
     my $self = shift;
-    $self->_multi_rpc( 'terminate', {} );
+    $self->_multi_rpc( { _action => 'terminate' } );
     return;
 }
 
@@ -210,8 +210,8 @@ sub fetch_doc {
     my $starts = $starts{$$self};
     my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
     my $start  = $starts->get($tick);
-    my %params = ( doc_id => $doc_id - $start );
-    return $self->_single_rpc( 'fetch_doc', \%params, $tick );
+    my %args = ( doc_id => $doc_id - $start, _action => 'fetch_doc' );
+    return $self->_single_rpc( \%args, $tick );
 }
 
 sub fetch_doc_vec {
@@ -219,9 +219,8 @@ sub fetch_doc_vec {
     my $starts = $starts{$$self};
     my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
     my $start  = $starts->get($tick);
-    my %params = ( doc_id => $doc_id - $start );
-    return $self->_single_rpc( 'fetch_doc_vec', { doc_id => $doc_id },
-        $tick );
+    my %args = ( doc_id => $doc_id - $start, _action => 'fetch_doc_vec' );
+    return $self->_single_rpc( \%args, $tick );
 }
 
 sub doc_max {
@@ -231,7 +230,8 @@ sub doc_max {
 
 sub doc_freq {
     my $self = shift;
-    my $responses = $self->_multi_rpc( 'doc_freq', {@_} );
+    my %args = ( @_, _action => 'doc_freq' );
+    my $responses = $self->_multi_rpc( \%args );
     my $doc_freq = 0;
     $doc_freq += $_ for @$responses;
     return $doc_freq;
@@ -239,7 +239,7 @@ sub doc_freq {
 
 sub close {
     my $self = shift;
-    $self->_multi_rpc( 'done', {} );
+    $self->_multi_rpc( { _action => 'done' } );
     for my $sock ( @{ $socks{$$self} } ) {
         close $sock or confess("Error when closing socket: $!");
     }
