@@ -27,7 +27,6 @@ my $synopsis = <<'END_SYNOPSIS';
     for my $server_name (@server_names) {
         push @searchers, LucyX::Remote::SearchClient->new(
             peer_address => "$server_name:$port",
-            password     => $pass,
             schema       => $schema,
         );
     }

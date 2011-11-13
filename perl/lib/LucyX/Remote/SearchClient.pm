@@ -150,7 +150,6 @@ LucyX::Remote::SearchClient - Connect to a remote SearchServer.
 
     my $client = LucyX::Remote::SearchClient->new(
         peer_address => 'searchserver1:7890',
-        password     => $pass,
     );
     my $hits = $client->hits( query => $query );
 
@@ -175,8 +174,8 @@ attempt to connect to.
 
 =item *
 
-B<password> - Password to be supplied to the SearchServer when initializing
-socket connection.
+B<password> - Optional password to be supplied to the SearchServer when
+initializing socket connection.
 
 =back
 

@@ -258,8 +258,7 @@ LucyX::Remote::ClusterSearcher - Connect to a remote SearchServer.
 =head1 SYNOPSIS
 
     my $client = LucyX::Remote::ClusterSearcher->new(
-        shards   => ['searchserver1:7890'], 
-        password => $pass,
+        shards => ['searchserver1:7890'], 
     );
     my $hits = $client->hits( query => $query );
 
@@ -284,8 +283,8 @@ the composite index and that the client should connect to.
 
 =item *
 
-B<password> - Password to be supplied to the SearchServer when initializing
-socket connection.
+B<password> - Optional password to be supplied to the SearchServer when
+initializing socket connection.
 
 =back
 
