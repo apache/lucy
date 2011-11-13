@@ -51,13 +51,6 @@ sub new {
             Proto    => 'tcp',
         );
         confess("No socket: $!") unless $sock;
-        $sock->autoflush(1);
-
-        # Handshake.
-        print $sock "$password\n";
-        chomp( my $response = <$sock> );
-        confess("Failed to connect: '$response'") unless $response =~ /accept/i;
-
         push @$socks, $sock;
     }
 

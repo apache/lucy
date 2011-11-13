@@ -51,7 +51,6 @@ sub new {
         Reuse     => 1,
     );
     confess("No socket: $!") unless $sock;
-    $sock->autoflush(1);
     $sock{$$self} = $sock;
 
     return $self;
@@ -86,23 +85,14 @@ sub serve {
             # If this is the main handle, we have a new client, so accept.
             if ( $readhandle == $main_sock ) {
                 my $client_sock = $main_sock->accept;
-
-                # Verify password.
-                my $pass = <$client_sock>;
-                chomp($pass) if defined $pass;
-                if ( defined $pass && $pass eq $password{$$self} ) {
-                    $read_set->add($client_sock);
-                    print $client_sock "accepted\n";
-                }
-                else {
-                    print $client_sock "password incorrect\n";
-                }
+                $read_set->add($client_sock);
             }
             # Otherwise it's a client sock, so process the request.
             else {
                 my $client_sock = $readhandle;
                 my ( $check_val, $buf, $len );
                 $check_val = $client_sock->sysread( $buf, 4 );
+                next if $check_val == 0; # FIXME closed socket?
                 confess $! unless $check_val == 4;
                 $len = unpack( 'N', $buf );
                 $check_val = $client_sock->sysread( $buf, $len );
