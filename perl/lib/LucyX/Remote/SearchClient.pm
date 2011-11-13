@@ -48,6 +48,9 @@ sub new {
     print $sock "$password\n";
     chomp( my $response = <$sock> );
     confess("Failed to connect: '$response'") unless $response =~ /accept/i;
+    my %handshake_args = ( _action => 'handshake', password => $password );
+    $response = $self->_rpc( \%handshake_args );
+    confess("Failed to connect") unless $response;
 
     return $self;
 }

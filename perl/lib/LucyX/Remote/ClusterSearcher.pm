@@ -61,6 +61,13 @@ sub new {
         push @$socks, $sock;
     }
 
+    # Handshake with servers.
+    my %handshake_args = ( password => $password, _action => 'handshake' );
+    my $responses = $self->_multi_rpc( \%handshake_args );
+    for my $response (@$responses) {
+        confess unless $response;
+    }
+    
     # Derive doc_max and relative start offsets.
     my $doc_max_responses = $self->_multi_rpc( { _action => 'doc_max' } );
     my $doc_max = 0;

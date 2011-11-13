@@ -67,6 +67,7 @@ sub DESTROY {
 }
 
 my %dispatch = (
+    handshake     => \&do_handshake,
     doc_max       => \&do_doc_max,
     doc_freq      => \&do_doc_freq,
     top_docs      => \&do_top_docs,
@@ -137,6 +138,11 @@ sub serve {
             }
         }
     }
+}
+
+sub do_handshake {
+    my ( $self, $args ) = @_;
+    return { retval => $password{$$self} eq $args->{password} };
 }
 
 sub do_doc_freq {
