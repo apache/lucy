@@ -253,20 +253,24 @@ __END__
 
 =head1 NAME
 
-LucyX::Remote::ClusterSearcher - Connect to a remote SearchServer.
+LucyX::Remote::ClusterSearcher - Search multiple remote indexes.
 
 =head1 SYNOPSIS
 
-    my $client = LucyX::Remote::ClusterSearcher->new(
-        shards => ['searchserver1:7890'], 
-    );
-    my $hits = $client->hits( query => $query );
+    my $searcher = eval {
+        LucyX::Remote::ClusterSearcher->new(
+            schema => MySchema->new,
+            shards => [ 'search1:7890', 'search2:7890', 'search3:7890' ],
+        );
+    };
+    ...
+    my $hits = eval { $searcher->hits( query => $query ) };
 
 =head1 DESCRIPTION
 
-ClusterSearcher is a subclass of L<Lucy::Search::Searcher> which can be
-used to search an index on a remote machine made accessible via
-L<SearchServer|LucyX::Remote::SearchServer>.
+ClusterSearcher is a subclass of L<Lucy::Search::Searcher> which can be used
+to search a composite index made up of multiple shards, where each shard is
+represented by a host:port pair running L<LucyX::Remote::SearchServer>.
 
 =head1 METHODS
 
@@ -278,13 +282,17 @@ Constructor.  Takes hash-style params.
 
 =item *
 
-B<shards> - An array of host:port pairs identifying the shards that make up
-the composite index and that the client should connect to.
+B<schema> - A Schema, which must match the Schema used by each remote node.
 
 =item *
 
-B<password> - Optional password to be supplied to the SearchServer when
-initializing socket connection.
+B<shards> - An array of host:port pairs running LucyX::Remote::SearchServer
+instances, which identifying the shards that make up the composite index.
+
+=item *
+
+B<password> - Optional password to be supplied to the SearchServers when
+initializing socket connections.
 
 =back
 
