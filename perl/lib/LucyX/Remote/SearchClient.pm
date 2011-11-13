@@ -73,9 +73,10 @@ sub _rpc {
     my ( $self, $method, $args ) = @_;
     my $sock = $sock{$$self};
 
+    $args->{_action} = $method;
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
-    print $sock "$method\n$packed_len$serialized";
+    print $sock $packed_len, $serialized;
 
     # Bail out if we're either closing or shutting down the server remotely.
     return if $method eq 'done';

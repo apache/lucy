@@ -121,9 +121,10 @@ sub _single_rpc {
 # understood by SearchServer.
 sub _serialize_request {
     my ( $self, $method, $args ) = @_;
+    $args->{_action} = $method;
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
-    my $request    = "$method\n$packed_len$serialized";
+    my $request    = "$packed_len$serialized";
     return \$request;
 }
 

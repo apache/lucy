@@ -20,6 +20,7 @@ package LucyX::Remote::SearchServer;
 BEGIN { our @ISA = qw( Lucy::Object::Obj ) }
 use Carp;
 use Storable qw( nfreeze thaw );
+use Scalar::Util qw( reftype );
 
 # Inside-out member vars.
 our %searcher;
@@ -99,8 +100,15 @@ sub serve {
             # Otherwise it's a client sock, so process the request.
             else {
                 my $client_sock = $readhandle;
-                my ( $check_val, $buf, $len, $method, $args );
-                chomp( $method = <$client_sock> );
+                my ( $check_val, $buf, $len );
+                $check_val = $client_sock->read( $buf, 4 );
+                confess unless $check_val == 4;
+                $len = unpack( 'N', $buf );
+                $check_val = $client_sock->read( $buf, $len );
+                my $args = eval { thaw($buf) };
+                confess $@ if $@;
+                confess "Not a hashref" unless reftype($args) eq 'HASH';
+                my $method = delete $args->{_action};
 
                 # If "done", the client's closing.
                 if ( $method eq 'done' ) {
@@ -122,10 +130,7 @@ sub serve {
                 }
 
                 # Process the method call.
-                read( $client_sock, $buf, 4 );
-                $len = unpack( 'N', $buf );
-                read( $client_sock, $buf, $len );
-                my $response   = $dispatch{$method}->( $self, thaw($buf) );
+                my $response   = $dispatch{$method}->( $self, $args );
                 my $frozen     = nfreeze($response);
                 my $packed_len = pack( 'N', length($frozen) );
                 print $client_sock $packed_len . $frozen;
