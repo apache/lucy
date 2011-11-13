@@ -138,7 +138,8 @@ sub _serialize_request {
 sub _send_request_to_shard {
     my ( $self, $shard_num, $request ) = @_;
     my $sock = $socks{$$self}[$shard_num];
-    print $sock $$request;
+    my $check_val = $sock->syswrite($$request);
+    confess $! unless $check_val == length($$request);
 }
 
 # Retrieve the response from a shard.
@@ -147,11 +148,11 @@ sub _retrieve_response_from_shard {
     my $sock = $socks{$$self}[$shard_num];
     my $packed_len;
     my $serialized;
-    $sock->read( $packed_len, 4 );
+    my $check_val = $sock->sysread( $packed_len, 4 );
+    confess $! unless $check_val == 4;
     my $arg_len = unpack( 'N', $packed_len );
-    my $check_val = read( $sock, $serialized, $arg_len );
-    confess("Tried to read $arg_len bytes, got $check_val")
-        unless ( defined $arg_len and $check_val == $arg_len );
+    $check_val = $sock->sysread( $serialized, $arg_len );
+    confess $! unless $check_val == $arg_len;
     return thaw($serialized);
 }
 

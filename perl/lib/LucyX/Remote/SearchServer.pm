@@ -102,10 +102,11 @@ sub serve {
             else {
                 my $client_sock = $readhandle;
                 my ( $check_val, $buf, $len );
-                $check_val = $client_sock->read( $buf, 4 );
-                confess unless $check_val == 4;
+                $check_val = $client_sock->sysread( $buf, 4 );
+                confess $! unless $check_val == 4;
                 $len = unpack( 'N', $buf );
-                $check_val = $client_sock->read( $buf, $len );
+                $check_val = $client_sock->sysread( $buf, $len );
+                confess $! unless $check_val == $len;
                 my $args = eval { thaw($buf) };
                 confess $@ if $@;
                 confess "Not a hashref" unless reftype($args) eq 'HASH';
@@ -134,7 +135,8 @@ sub serve {
                 my $response   = $dispatch{$method}->( $self, $args );
                 my $frozen     = nfreeze($response);
                 my $packed_len = pack( 'N', length($frozen) );
-                print $client_sock $packed_len . $frozen;
+                $check_val = $client_sock->syswrite("$packed_len$frozen");
+                confess $! unless $check_val == length($frozen) + 4;
             }
         }
     }

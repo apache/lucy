@@ -78,18 +78,21 @@ sub _rpc {
 
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
-    print $sock $packed_len, $serialized;
+    my $check_val = $sock->syswrite("$packed_len$serialized");
+    confess $! if $check_val != length($serialized) + 4;
 
     # Bail out if we're either closing or shutting down the server remotely.
     return if $args->{_action} eq 'done';
     return if $args->{_action} eq 'terminate';
 
     # Decode response.
-    $sock->read( $packed_len, 4 );
+    $check_val = $sock->sysread( $packed_len, 4 );
+    confess("Failed to read 4 bytes: $!")
+        unless $check_val == 4;
     my $arg_len = unpack( 'N', $packed_len );
-    my $check_val = read( $sock, $serialized, $arg_len );
-    confess("Tried to read $arg_len bytes, got $check_val")
-        unless ( defined $arg_len and $check_val == $arg_len );
+    $check_val = $sock->sysread( $serialized, $arg_len );
+    confess("Failed to read $arg_len bytes")
+        unless $check_val == $arg_len;
     my $response = thaw($serialized);
     if ( exists $response->{retval} ) {
         return $response->{retval};
