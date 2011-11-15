@@ -35,7 +35,6 @@ our %sock_map;
 
 use IO::Socket::INET;
 use IO::Select;
-use Fcntl qw( F_GETFL F_SETFL O_NONBLOCK );
 
 sub new {
     my ( $either, %args ) = @_;
@@ -54,12 +53,9 @@ sub new {
         my $sock = IO::Socket::INET->new(
             PeerAddr => $shard,
             Proto    => 'tcp',
+            Blocking => 0,
         );
         confess("No socket: $!") unless $sock;
-        my $flags = fcntl( $sock, F_GETFL, 0 )
-            or confess "Can't get socket flags: $!";
-        fcntl( $sock, F_SETFL, $flags | O_NONBLOCK )
-            or confess "Can't set socket flags: $!";
         push @$socks, $sock;
     }
 
