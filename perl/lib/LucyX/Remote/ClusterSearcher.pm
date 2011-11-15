@@ -29,8 +29,11 @@ our %password;
 our %socks;
 our %starts;
 our %doc_max;
+our %select;
+our %sock_map;
 
 use IO::Socket::INET;
+use IO::Select;
 
 sub new {
     my ( $either, %args ) = @_;
@@ -53,6 +56,13 @@ sub new {
         confess("No socket: $!") unless $sock;
         push @$socks, $sock;
     }
+
+    # Create an IO::Select object and a mapping from socket handles to shard
+    # numbers.
+    $select{$$self} = IO::Select->new($socks);
+    my $num = 0;
+    my %sock_to_shard_num_map = map { ( "$_" => $num++ ) } @$socks;
+    $sock_map{$$self} = \%sock_to_shard_num_map;
 
     # Handshake with servers.
     my %handshake_args = ( password => $password, _action => 'handshake' );
@@ -84,6 +94,8 @@ sub DESTROY {
     delete $socks{$$self};
     delete $starts{$$self};
     delete $doc_max{$$self};
+    delete $select{$$self};
+    delete $sock_map{$$self};
     $self->SUPER::DESTROY;
 }
 
@@ -101,9 +113,17 @@ sub _multi_rpc {
     return if $args->{_action} eq 'terminate';
 
     my @responses;
-    for ( my $i = 0; $i < $num_shards; $i++ ) {
-        my $response = $self->_retrieve_response_from_shard($i);
-        push @responses, $response->{retval};
+    my $remaining = $num_shards;
+    my $select    = $select{$$self};
+    my $sock_map  = $sock_map{$$self};
+    while ($remaining) {
+        my @ready = $select->can_read;
+        for my $sock ( @{ $ready[0] } ) {
+            my $shard_num = $sock_map->{"$sock"};
+            my $response  = $self->_retrieve_response_from_shard($shard_num);
+            $responses[$shard_num] = $response->{retval};
+            $remaining--;
+        }
     }
     return \@responses;
 }
