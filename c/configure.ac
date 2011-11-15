@@ -24,6 +24,7 @@ AC_SUBST(ac_aux_dir)
 AC_CONFIG_FILES([
                 Makefile
                 src/Makefile
+                t/Makefile
                 liblucy.pc
                 liblucy-config
                 ])

@@ -30,6 +30,8 @@ my $base_dir = rel2abs( $is_distro_not_devel ? getcwd() : updir() );
 
 my $DEBUG = $ENV{LIBLUCY_DEBUG} || 0;
 
+$DEBUG and print "base_dir=$base_dir\n";
+
 my $usage = "$0 make-cmd cc-cmd cc-flags\n";
 
 die $usage if $ARGV[0] and $ARGV[0] =~ m/^\-\-?h/;
@@ -69,7 +71,10 @@ sub run_make {
     my @command           = @{ $params{args} };
     my $dir               = $params{dir};
     my $current_directory = getcwd();
-    chdir $dir if $dir;
+    $DEBUG and print "cur=$current_directory dir=$dir\n";
+    if ($dir) {
+        chdir $dir or die "failed to chdir $dir";
+    }
     unshift @command, 'CC=' . $CC;
     if ( $CC =~ /^cl\b/ ) {
         unshift @command, "-f", "Makefile.MSVC";

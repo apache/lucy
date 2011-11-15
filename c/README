@@ -22,3 +22,14 @@ The CFBind files are there to hold conversion routines which are specific to C.
 Since it is impractical to impose a generic interface, they
 are not defined in core.
 
+================================================================================
+   HACKING
+================================================================================
+
+The C host language uses the autotools toolchain. Get started with:
+
+ % ./bootstrap.sh
+ % ./configure && make test
+
+
+

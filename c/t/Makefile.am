@@ -13,19 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src t
+AM_CFLAGS= -Wall 
+# -pg is for profiling
+#AM_CFLAGS= -Wall -pg
+LIBLUCY_VERSION = @LIBLUCY_VERSION@
 
-test: check
+myldflags= -I$(top_srcdir)/src -I. -I$(top_srcdir)/../charmonizer/src -L$(top_srcdir)/src -llucy
+AM_LDFLAGS= $(myldflags)
+bin_PROGRAMS = 000-sanity-check.t
+000_sanity_check_t_SOURCES = 000-sanity-check.t.c
+000_sanity_check_t_LDFLAGS = $(myldflags)
+000_sanity_check_t_CFLAGS = $(myldflags)
 
-bin_SCRIPTS = liblucy-config
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = liblucy.pc
-distdir = $(PACKAGE)-$(VERSION)
 
-EXTRA_DIST = m4
+TESTS = $(check_PROGRAMS) test.sh 
 
-dist-hook:
-	rm -rf `find $(distdir) -name .svn`
-
+test:
+	prove *t
