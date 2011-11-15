@@ -21,6 +21,7 @@ BEGIN { our @ISA = qw( Lucy::Search::Searcher ) }
 use Carp;
 use Storable qw( nfreeze thaw );
 use Scalar::Util qw( reftype );
+use Errno qw( EAGAIN );
 
 # Inside-out member vars.
 our %shards;
@@ -34,6 +35,7 @@ our %sock_map;
 
 use IO::Socket::INET;
 use IO::Select;
+use Fcntl qw( F_GETFL F_SETFL O_NONBLOCK );
 
 sub new {
     my ( $either, %args ) = @_;
@@ -54,6 +56,10 @@ sub new {
             Proto    => 'tcp',
         );
         confess("No socket: $!") unless $sock;
+        my $flags = fcntl( $sock, F_GETFL, 0 )
+            or confess "Can't get socket flags: $!";
+        fcntl( $sock, F_SETFL, $flags | O_NONBLOCK )
+            or confess "Can't set socket flags: $!";
         push @$socks, $sock;
     }
 
@@ -159,10 +165,26 @@ sub _send_request_to_shard {
 sub _retrieve_response_from_shard {
     my ( $self, $shard_num ) = @_;
     my $sock = $socks{$$self}[$shard_num];
-    my $packed_len;
-    my $serialized;
-    my $check_val = $sock->sysread( $packed_len, 4 );
-    confess $! unless $check_val == 4;
+    my $packed_len = "";
+    my $serialized = "";
+    my $check_val;
+    $! = undef;
+    while (1) {
+        my $check_val = $sock->sysread( $packed_len, 4 );
+        if (!defined $check_val) {
+            confess $! unless $! == EAGAIN;
+            $! = undef;
+        }
+        elsif ($check_val == 4) {
+            last;
+        }
+        elsif ($check_val == 0) {
+            confess "Socket closed";
+        }
+        else {
+            confess "Tried to read 4 bytes, got $check_val";
+        }
+    }
     my $arg_len = unpack( 'N', $packed_len );
     $check_val = $sock->sysread( $serialized, $arg_len );
     confess $! unless $check_val == $arg_len;
