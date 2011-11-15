@@ -5,6 +5,6 @@ int main();
 
 int main() {
     lucy_test();
-    return 1;
+    return 0;
 }
 

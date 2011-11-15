@@ -35,4 +35,4 @@ liblucy_la_LDFLAGS = -no-undefined -version-info 0:3:0
 
 liblucy_la_SOURCES = liblucy.c
 
-TESTS = $(check_PROGRAMS) test.sh
+TESTS = $(check_PROGRAMS) lucy-test
