@@ -173,8 +173,8 @@ is_deeply(
 );
 
 END {
-    $solo_cluster_searcher->terminate if defined $solo_cluster_searcher;
-    $cluster_searcher->terminate      if defined $cluster_searcher;
+    $solo_cluster_searcher->close if defined $solo_cluster_searcher;
+    $cluster_searcher->close      if defined $cluster_searcher;
     for my $kid (@kids) {
         kill( TERM => $kid ) if $kid;
     }

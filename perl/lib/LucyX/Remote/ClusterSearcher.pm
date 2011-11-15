@@ -260,11 +260,16 @@ sub doc_freq {
 
 sub close {
     my $self = shift;
+    return unless $socks{$$self} && $select{$$self};
     $self->_multi_rpc( { _action => 'done' } );
+    if ( $select{$$self} ) {
+        $select{$$self}->remove( $socks{$$self} );
+    }
     for my $sock ( @{ $socks{$$self} } ) {
         close $sock or confess("Error when closing socket: $!");
     }
     delete $socks{$$self};
+    delete $select{$$self};
 }
 
 1;

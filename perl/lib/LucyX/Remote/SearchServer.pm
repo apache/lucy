@@ -67,12 +67,12 @@ sub DESTROY {
 
 my %dispatch = (
     handshake     => \&do_handshake,
+    terminate     => \&do_terminate,
     doc_max       => \&do_doc_max,
     doc_freq      => \&do_doc_freq,
     top_docs      => \&do_top_docs,
     fetch_doc     => \&do_fetch_doc,
     fetch_doc_vec => \&do_fetch_doc_vec,
-    terminate     => undef,
 );
 
 sub serve {
@@ -92,7 +92,12 @@ sub serve {
                 my $client_sock = $readhandle;
                 my ( $check_val, $buf, $len );
                 $check_val = $client_sock->sysread( $buf, 4 );
-                next if $check_val == 0; # FIXME closed socket?
+                if ( $check_val == 0 ) {
+                    # If sysread returns 0, socket has been closed cleanly at
+                    # the other end.
+                    $read_set->remove($client_sock);
+                    next;
+                }
                 confess $! unless $check_val == 4;
                 $len = unpack( 'N', $buf );
                 $check_val = $client_sock->sysread( $buf, $len );
@@ -108,25 +113,23 @@ sub serve {
                     $client_sock->close;
                     next;
                 }
-                # Remote signal to close the server.
-                elsif ( $method eq 'terminate' ) {
-                    $read_set->remove($client_sock);
-                    $client_sock->close;
-                    $main_sock->close;
-                    return;
-                }
-                # Sanity check the method name.
-                elsif ( !$dispatch{$method} ) {
-                    print $client_sock "ERROR: Bad method name: $method\n";
-                    next;
-                }
 
                 # Process the method call.
+                $dispatch{$method} or confess "ERROR: Bad method name: $method\n";
                 my $response   = $dispatch{$method}->( $self, $args );
                 my $frozen     = nfreeze($response);
                 my $packed_len = pack( 'N', length($frozen) );
                 $check_val = $client_sock->syswrite("$packed_len$frozen");
                 confess $! unless $check_val == length($frozen) + 4;
+
+                # Remote signal to close the server.
+                if ( $method eq 'terminate' ) {
+                    my @all_handles = $read_set->handles;
+                    $read_set->remove(\@all_handles);
+                    $client_sock->close;
+                    $main_sock->close;
+                    return;
+                }
             }
         }
     }
@@ -135,6 +138,10 @@ sub serve {
 sub do_handshake {
     my ( $self, $args ) = @_;
     return { retval => $password{$$self} eq $args->{password} };
+}
+
+sub do_terminate {
+    return { retval => 1 };
 }
 
 sub do_doc_freq {
