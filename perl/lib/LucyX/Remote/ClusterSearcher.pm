@@ -60,7 +60,7 @@ sub new {
     for my $response (@$responses) {
         confess unless $response;
     }
-    
+
     # Derive doc_max and relative start offsets.
     my $doc_max_responses = $self->_multi_rpc( { _action => 'doc_max' } );
     my $doc_max = 0;
@@ -69,7 +69,7 @@ sub new {
         push @starts, $doc_max;
         $doc_max += $shard_doc_max;
     }
-    $starts{$$self}  = Lucy::Object::I32Array->new( ints => \@starts );
+    $starts{$$self} = Lucy::Object::I32Array->new( ints => \@starts );
     $doc_max{$$self} = $doc_max;
 
     return $self;
@@ -91,7 +91,7 @@ sub DESTROY {
 sub _multi_rpc {
     my ( $self, $args ) = @_;
     my $num_shards = $num_shards{$$self};
-    my $request = $self->_serialize_request($args);
+    my $request    = $self->_serialize_request($args);
     for ( my $i = 0; $i < $num_shards; $i++ ) {
         $self->_send_request_to_shard( $i, $request );
     }
@@ -130,7 +130,7 @@ sub _serialize_request {
 # Send a serialized request to one shard.
 sub _send_request_to_shard {
     my ( $self, $shard_num, $request ) = @_;
-    my $sock = $socks{$$self}[$shard_num];
+    my $sock      = $socks{$$self}[$shard_num];
     my $check_val = $sock->syswrite($$request);
     confess $! unless $check_val == length($$request);
 }
@@ -178,7 +178,7 @@ sub top_docs {
 
     # Gather remote responses and aggregate.
     $args{_action} = 'top_docs';
-    my $responses = $self->_multi_rpc( \%args );
+    my $responses  = $self->_multi_rpc( \%args );
     my $total_hits = 0;
     for ( my $i = 0; $i < $num_shards; $i++ ) {
         my $base           = $starts->get($i);
@@ -211,7 +211,7 @@ sub fetch_doc {
     my $starts = $starts{$$self};
     my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
     my $start  = $starts->get($tick);
-    my %args = ( doc_id => $doc_id - $start, _action => 'fetch_doc' );
+    my %args   = ( doc_id => $doc_id - $start, _action => 'fetch_doc' );
     return $self->_single_rpc( \%args, $tick );
 }
 
@@ -220,7 +220,7 @@ sub fetch_doc_vec {
     my $starts = $starts{$$self};
     my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
     my $start  = $starts->get($tick);
-    my %args = ( doc_id => $doc_id - $start, _action => 'fetch_doc_vec' );
+    my %args   = ( doc_id => $doc_id - $start, _action => 'fetch_doc_vec' );
     return $self->_single_rpc( \%args, $tick );
 }
 
@@ -230,10 +230,10 @@ sub doc_max {
 }
 
 sub doc_freq {
-    my $self = shift;
-    my %args = ( @_, _action => 'doc_freq' );
+    my $self      = shift;
+    my %args      = ( @_, _action => 'doc_freq' );
     my $responses = $self->_multi_rpc( \%args );
-    my $doc_freq = 0;
+    my $doc_freq  = 0;
     $doc_freq += $_ for @$responses;
     return $doc_freq;
 }
