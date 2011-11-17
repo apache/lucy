@@ -179,7 +179,6 @@ CFCDocuComment_parse(const char *raw_text) {
         candidate = strstr(ptr, "@param");
     }
 
-
     // Extract full description.
     self->description = CFCUtil_strdup(text);
 

@@ -134,7 +134,6 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
         }
     }
 
-
     // Open instreams.
     CharBuf *seg_name = Seg_Get_Name(segment);
     CharBuf *ix_file  = CB_newf("%o/highlight.ix", seg_name);

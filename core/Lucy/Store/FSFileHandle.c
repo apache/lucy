@@ -289,14 +289,12 @@ SI_window(FSFileHandle *self, FileWindow *window, int64_t offset,
     const int64_t remainder       = offset % self->page_size;
     const int64_t adjusted_offset = offset - remainder;
     const int64_t adjusted_len    = len + remainder;
-    char *const buf
-        = (char*)SI_map(self, adjusted_offset, adjusted_len);
+    char *const buf = (char*)SI_map(self, adjusted_offset, adjusted_len);
     if (len && buf == NULL) {
         return false;
     }
     else {
-        FileWindow_Set_Window(window, buf, adjusted_offset,
-                              adjusted_len);
+        FileWindow_Set_Window(window, buf, adjusted_offset, adjusted_len);
     }
 
     return true;

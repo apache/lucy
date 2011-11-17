@@ -124,7 +124,6 @@ SegLex_seek(SegLexicon *self, Obj *target) {
 
     // Use the LexIndex to get in the ballpark.
     LexIndex_Seek(lex_index, target);
-
     TermInfo *target_tinfo = LexIndex_Get_Term_Info(lex_index);
     TermInfo *my_tinfo
         = (TermInfo*)TermStepper_Get_Value(self->tinfo_stepper);
@@ -133,7 +132,6 @@ SegLex_seek(SegLexicon *self, Obj *target) {
     TermStepper_Set_Value(self->term_stepper, lex_index_term);
     DECREF(lex_index_term);
     InStream_Seek(self->instream, TInfo_Get_Lex_FilePos(target_tinfo));
-
     self->term_num = LexIndex_Get_Term_Num(lex_index);
 
     // Scan to the precise location.

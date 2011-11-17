@@ -74,7 +74,6 @@ StrHelp_to_base36(uint64_t num, void *buffer) {
     uint32_t size = end - buf;
     memcpy(buffer, buf, size + 1);
     return size;
-
 }
 
 bool_t

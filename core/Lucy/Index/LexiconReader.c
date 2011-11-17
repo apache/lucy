@@ -221,7 +221,6 @@ S_find_tinfo(DefaultLexiconReader *self, const CharBuf *field, Obj *target) {
             if (found && Obj_Equals(target, found)) {
                 return SegLex_Get_Term_Info(lexicon);
             }
-
         }
     }
     return NULL;

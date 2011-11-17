@@ -168,14 +168,11 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     FilePurger_Purge(file_purger);
     DECREF(file_purger);
 
-
     // Create a new segment.
-
     int64_t new_seg_num
         = IxManager_Highest_Seg_Num(self->manager, latest_snapshot) + 1;
     Lock *merge_lock = IxManager_Make_Merge_Lock(self->manager);
     uint32_t i, max;
-
     if (Lock_Is_Locked(merge_lock)) {
         // If there's a background merge process going on, stay out of its
         // way.
@@ -196,11 +193,9 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
         }
         DECREF(merge_data);
     }
-
     self->segment = Seg_new(new_seg_num);
 
     // Add all known fields to Segment.
-
     VArray *fields = Schema_All_Fields(schema);
     for (i = 0, max = VA_Get_Size(fields); i < max; i++) {
         Seg_Add_Field(self->segment, (CharBuf*)VA_Fetch(fields, i));
@@ -291,7 +286,6 @@ Indexer_delete_by_term(Indexer *self, CharBuf *field, Obj *term) {
     // Analyze term if appropriate, then zap.
     if (FType_Is_A(type, FULLTEXTTYPE)) {
         CERTIFY(term, CHARBUF);
-
         Analyzer *analyzer = Schema_Fetch_Analyzer(schema, field);
         VArray *terms = Analyzer_Split(analyzer, (CharBuf*)term);
         Obj *analyzed_term = VA_Fetch(terms, 0);

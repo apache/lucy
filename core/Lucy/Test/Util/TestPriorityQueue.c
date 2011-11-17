@@ -66,7 +66,6 @@ test_Peek_and_Pop_All(TestBatch *batch) {
                 "peek at the least item in the queue");
 
     VArray  *got = NumPriQ_Pop_All(pq);
-
     val = (Float64*)CERTIFY(VA_Fetch(got, 0), FLOAT64);
     TEST_INT_EQ(batch, (long)Float64_Get_Value(val), 20, "pop_all");
     val = (Float64*)CERTIFY(VA_Fetch(got, 1), FLOAT64);
@@ -79,7 +78,6 @@ test_Peek_and_Pop_All(TestBatch *batch) {
     TEST_INT_EQ(batch, (long)Float64_Get_Value(val),  1, "pop_all");
 
     DECREF(got);
-
     DECREF(pq);
 }
 

@@ -107,7 +107,6 @@ Seg_read_file(Segment *self, Folder *folder) {
     if (!count) { THROW(ERR, "Missing 'count'"); }
     else { self->count = Obj_To_I64(count); }
 
-
     // Get list of field nums.
     uint32_t i;
     VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata,
@@ -145,11 +144,9 @@ Seg_write_file(Segment *self, Folder *folder) {
     Hash_Store_Str(self->metadata, "segmeta", 7, (Obj*)my_metadata);
 
     CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
-    bool_t result
-        = Json_spew_json((Obj*)self->metadata, folder, filename);
+    bool_t result = Json_spew_json((Obj*)self->metadata, folder, filename);
     DECREF(filename);
     if (!result) { RETHROW(INCREF(Err_get_error())); }
-
 }
 
 int32_t

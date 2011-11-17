@@ -48,8 +48,7 @@ Lock_init(Lock *self, Folder *folder, const CharBuf *name,
             continue;
         }
         DECREF(self);
-        THROW(ERR, "Lock name contains disallowed characters: '%o'",
-              name);
+        THROW(ERR, "Lock name contains disallowed characters: '%o'", name);
     }
 
     // Assign.

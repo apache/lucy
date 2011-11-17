@@ -103,7 +103,6 @@ IxManager_make_snapshot_filename(IndexManager *self) {
     char  base36[StrHelp_MAX_BASE36_BYTES];
     StrHelp_to_base36(new_gen, &base36);
     return CB_newf("snapshot_%s.json", &base36);
-
 }
 
 static int

@@ -349,7 +349,6 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
     for (k = left; k < p; k++, j--)      { SI_exchange4(elems, k, j); }
     for (k = right - 1; k > q; k--, i++) { SI_exchange4(elems, i, k); }
 
-
     // Recurse.
     S_qsort4(elems, left, j, compare, context);   // Sort less_than.
     S_qsort4(elems, i, right, compare, context);  // Sort greater_than.
@@ -454,7 +453,6 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
     i++;
     for (k = left; k < p; k++, j--)      { SI_exchange8(elems, k, j); }
     for (k = right - 1; k > q; k--, i++) { SI_exchange8(elems, i, k); }
-
 
     // Recurse.
     S_qsort8(elems, left, j, compare, context);   // Sort less_than.

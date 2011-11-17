@@ -72,8 +72,7 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
     // Check format.
     Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "postings", 8);
     if (!my_meta) {
-        my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment,
-                                                "posting_list", 12);
+        my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "posting_list", 12);
     }
 
     if (my_meta) {
@@ -86,7 +85,6 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
             }
         }
     }
-
 
     return self;
 }

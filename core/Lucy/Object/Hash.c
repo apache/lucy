@@ -157,7 +157,6 @@ Hash_load(Hash *self, Obj *dump) {
     Hash *loaded = Hash_new(source->size);
     Obj *key;
     Obj *value;
-
     Hash_Iterate(source);
     while (Hash_Next(source, &key, &value)) {
         Hash_Store(loaded, key, Obj_Load(value, value));

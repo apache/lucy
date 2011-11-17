@@ -201,7 +201,6 @@ SegWriter_finish(SegWriter *self) {
     Snapshot_Add_Entry(snapshot, seg_name);
     DECREF(segmeta_filename);
 
-
     // Collapse segment files into compound file.
     Folder_Consolidate(self->folder, seg_name);
 }

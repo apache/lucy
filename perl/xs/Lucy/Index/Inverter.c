@@ -71,8 +71,7 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
     lucy_InverterEntry *entry
         = (lucy_InverterEntry*)Lucy_VA_Fetch(self->entry_pool, field_num);
     if (!entry) {
-        entry = lucy_InvEntry_new(schema, (lucy_CharBuf*)field,
-                                  field_num);
+        entry = lucy_InvEntry_new(schema, (lucy_CharBuf*)field, field_num);
         Lucy_VA_Store(self->entry_pool, field_num, (lucy_Obj*)entry);
     }
     return entry;

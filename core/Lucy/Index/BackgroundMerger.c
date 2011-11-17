@@ -115,15 +115,12 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     self->polyreader = PolyReader_open((Obj*)folder, NULL, self->manager);
 
     // Clone the PolyReader's schema.
-
     Hash *dump = Schema_Dump(PolyReader_Get_Schema(self->polyreader));
     self->schema = (Schema*)CERTIFY(VTable_Load_Obj(SCHEMA, (Obj*)dump),
                                     SCHEMA);
     DECREF(dump);
 
-
     // Create new Segment.
-
     int64_t new_seg_num
         = IxManager_Highest_Seg_Num(self->manager, self->snapshot) + 1;
     VArray *fields = Schema_All_Fields(self->schema);
@@ -133,7 +130,6 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
         Seg_Add_Field(self->segment, (CharBuf*)VA_Fetch(fields, i));
     }
     DECREF(fields);
-
 
     // Our "cutoff" is the segment this BackgroundMerger will write.  Now that
     // we've determined the cutoff, write the merge data file.
@@ -254,7 +250,6 @@ static bool_t
 S_merge_updated_deletions(BackgroundMerger *self) {
     Hash *updated_deletions = NULL;
 
-
     PolyReader *new_polyreader
         = PolyReader_open((Obj*)self->folder, NULL, NULL);
     VArray *new_seg_readers
@@ -299,7 +294,6 @@ S_merge_updated_deletions(BackgroundMerger *self) {
 
     DECREF(new_polyreader);
     DECREF(new_segs);
-
 
     if (!updated_deletions) {
         return false;
@@ -445,7 +439,6 @@ BGMerger_prepare_commit(BackgroundMerger *self) {
             // Add the fresh content to our snapshot. (It's important to
             // run this AFTER S_merge_updated_deletions, because otherwise
             // we couldn't tell whether the deletion counts changed.)
-
             VArray *files = Snapshot_List(latest_snapshot);
             uint32_t i, max;
             for (i = 0, max = VA_Get_Size(files); i < max; i++) {
@@ -459,15 +452,12 @@ BGMerger_prepare_commit(BackgroundMerger *self) {
             }
             DECREF(files);
 
-
-            // Since the snapshot content has changed, we need to rewrite
-            // it.
+            // Since the snapshot content has changed, we need to rewrite it.
             Folder_Delete(folder, self->snapfile);
             Snapshot_Write_File(snapshot, folder, self->snapfile);
         }
 
         DECREF(latest_snapshot);
-
 
         self->needs_commit = true;
     }

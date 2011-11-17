@@ -166,7 +166,6 @@ PolyLex_seek(PolyLexicon *self, Obj *target) {
 
     // Refresh the queue, set vars.
     S_refresh_lex_q(lex_q, seg_lexicons, target);
-
     SegLexicon *least = (SegLexicon*)SegLexQ_Peek(lex_q);
     DECREF(self->term);
     self->term = NULL;

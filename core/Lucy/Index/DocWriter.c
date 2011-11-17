@@ -63,18 +63,14 @@ S_lazy_init(DocWriter *self) {
         CharBuf *seg_name = Seg_Get_Name(self->segment);
 
         // Get streams.
-
         CharBuf *ix_file = CB_newf("%o/documents.ix", seg_name);
         self->ix_out = Folder_Open_Out(folder, ix_file);
         DECREF(ix_file);
         if (!self->ix_out) { RETHROW(INCREF(Err_get_error())); }
-
-
         CharBuf *dat_file = CB_newf("%o/documents.dat", seg_name);
         self->dat_out = Folder_Open_Out(folder, dat_file);
         DECREF(dat_file);
         if (!self->dat_out) { RETHROW(INCREF(Err_get_error())); }
-
 
         // Go past non-doc #0.
         OutStream_Write_I64(self->ix_out, 0);
