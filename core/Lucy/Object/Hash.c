@@ -154,18 +154,17 @@ Hash_load(Hash *self, Obj *dump) {
     }
 
     // It's an ordinary Hash.
-    {
-        Hash *loaded = Hash_new(source->size);
-        Obj *key;
-        Obj *value;
+    Hash *loaded = Hash_new(source->size);
+    Obj *key;
+    Obj *value;
 
-        Hash_Iterate(source);
-        while (Hash_Next(source, &key, &value)) {
-            Hash_Store(loaded, key, Obj_Load(value, value));
-        }
-
-        return (Obj*)loaded;
+    Hash_Iterate(source);
+    while (Hash_Next(source, &key, &value)) {
+        Hash_Store(loaded, key, Obj_Load(value, value));
     }
+
+    return (Obj*)loaded;
+
 }
 
 void

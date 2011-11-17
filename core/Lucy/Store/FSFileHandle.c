@@ -283,22 +283,20 @@ SI_window(FSFileHandle *self, FileWindow *window, int64_t offset,
     // Release the previously mmap'd region, if any.
     FSFH_release_window(self, window);
 
-    {
-        // Start map on a page boundary.  Ensure that the window is at
-        // least wide enough to view all the data spec'd in the original
-        // request.
-        const int64_t remainder       = offset % self->page_size;
-        const int64_t adjusted_offset = offset - remainder;
-        const int64_t adjusted_len    = len + remainder;
-        char *const buf
-            = (char*)SI_map(self, adjusted_offset, adjusted_len);
-        if (len && buf == NULL) {
-            return false;
-        }
-        else {
-            FileWindow_Set_Window(window, buf, adjusted_offset,
-                                  adjusted_len);
-        }
+    // Start map on a page boundary.  Ensure that the window is at
+    // least wide enough to view all the data spec'd in the original
+    // request.
+    const int64_t remainder       = offset % self->page_size;
+    const int64_t adjusted_offset = offset - remainder;
+    const int64_t adjusted_len    = len + remainder;
+    char *const buf
+        = (char*)SI_map(self, adjusted_offset, adjusted_len);
+    if (len && buf == NULL) {
+        return false;
+    }
+    else {
+        FileWindow_Set_Window(window, buf, adjusted_offset,
+                              adjusted_len);
     }
 
     return true;

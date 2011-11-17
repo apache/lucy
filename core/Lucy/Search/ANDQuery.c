@@ -126,13 +126,12 @@ ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
             }
         }
 
-        {
-            Matcher *retval
-                = (Matcher*)ANDMatcher_new(child_matchers,
-                                           ANDCompiler_Get_Similarity(self));
-            DECREF(child_matchers);
-            return retval;
-        }
+        Matcher *retval
+            = (Matcher*)ANDMatcher_new(child_matchers,
+                                       ANDCompiler_Get_Similarity(self));
+        DECREF(child_matchers);
+        return retval;
+
     }
 }
 

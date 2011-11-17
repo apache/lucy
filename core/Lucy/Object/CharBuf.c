@@ -135,13 +135,11 @@ CB_hash_sum(CharBuf *self) {
     uint32_t hashvalue = 5381;
     ZombieCharBuf *iterator = ZCB_WRAP(self);
 
-    {
-        const CB_nip_one_t nip_one
-            = (CB_nip_one_t)METHOD(iterator->vtable, CB, Nip_One);
-        while (iterator->size) {
-            uint32_t code_point = (uint32_t)nip_one((CharBuf*)iterator);
-            hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point;
-        }
+    const CB_nip_one_t nip_one
+        = (CB_nip_one_t)METHOD(iterator->vtable, CB, Nip_One);
+    while (iterator->size) {
+        uint32_t code_point = (uint32_t)nip_one((CharBuf*)iterator);
+        hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point;
     }
 
     return (int32_t) hashvalue;
@@ -733,7 +731,7 @@ CB_code_point_at(CharBuf *self, size_t tick) {
             if (ptr > end) {
                 DIE_INVALID_UTF8(self->ptr, self->size);
             }
-            return StrHelp_decode_utf8_char(ptr); 
+            return StrHelp_decode_utf8_char(ptr);
         }
         count++;
     }

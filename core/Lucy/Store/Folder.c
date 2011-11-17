@@ -435,20 +435,18 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path) {
     // If we've eaten up the entire filepath, self is enclosing folder.
     if (ZCB_Get_Size(scratch) == 0) { return self; }
 
-    {
-        Folder *local_folder
-            = Folder_Local_Find_Folder(self, (CharBuf*)path_component);
-        if (!local_folder) {
-            /* This element of the filepath doesn't exist, or it's not a
-             * directory.  However, there are filepath characters left over,
-             * implying that this component ought to be a directory -- so the
-             * original file path is invalid. */
-            return NULL;
-        }
-
-        // This file path component is a folder.  Recurse into it.
-        return S_enclosing_folder(local_folder, path);
+    Folder *local_folder
+        = Folder_Local_Find_Folder(self, (CharBuf*)path_component);
+    if (!local_folder) {
+        /* This element of the filepath doesn't exist, or it's not a
+         * directory.  However, there are filepath characters left over,
+         * implying that this component ought to be a directory -- so the
+         * original file path is invalid. */
+        return NULL;
     }
+
+    // This file path component is a folder.  Recurse into it.
+    return S_enclosing_folder(local_folder, path);
 }
 
 Folder*

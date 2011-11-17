@@ -263,15 +263,13 @@ CFReaderDH_init(CFReaderDirHandle *self, CompoundFileReader *cf_reader) {
     self->cf_reader = (CompoundFileReader*)INCREF(cf_reader);
     self->elems  = Hash_Keys(self->cf_reader->records);
     self->tick   = -1;
-    {
-        // Accumulate entries from real Folder.
-        DirHandle *dh = Folder_Local_Open_Dir(self->cf_reader->real_folder);
-        CharBuf *entry = DH_Get_Entry(dh);
-        while (DH_Next(dh)) {
-            VA_Push(self->elems, (Obj*)CB_Clone(entry));
-        }
-        DECREF(dh);
+    // Accumulate entries from real Folder.
+    DirHandle *dh = Folder_Local_Open_Dir(self->cf_reader->real_folder);
+    CharBuf *entry = DH_Get_Entry(dh);
+    while (DH_Next(dh)) {
+        VA_Push(self->elems, (Obj*)CB_Clone(entry));
     }
+    DECREF(dh);
     return self;
 }
 

@@ -48,11 +48,9 @@ S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max) {
         DECREF(bit_vec);
     }
 
-    {
-        SeriesMatcher *series_matcher = SeriesMatcher_new(matchers, offsets);
-        DECREF(matchers);
-        return series_matcher;
-    }
+    SeriesMatcher *series_matcher = SeriesMatcher_new(matchers, offsets);
+    DECREF(matchers);
+    return series_matcher;
 }
 
 static I32Array*

@@ -136,31 +136,29 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
 
 
     // Open instreams.
-    {
-        CharBuf *seg_name = Seg_Get_Name(segment);
-        CharBuf *ix_file  = CB_newf("%o/highlight.ix", seg_name);
-        CharBuf *dat_file = CB_newf("%o/highlight.dat", seg_name);
-        if (Folder_Exists(folder, ix_file)) {
-            self->ix_in = Folder_Open_In(folder, ix_file);
-            if (!self->ix_in) {
-                Err *error = (Err*)INCREF(Err_get_error());
-                DECREF(ix_file);
-                DECREF(dat_file);
-                DECREF(self);
-                RETHROW(error);
-            }
-            self->dat_in = Folder_Open_In(folder, dat_file);
-            if (!self->dat_in) {
-                Err *error = (Err*)INCREF(Err_get_error());
-                DECREF(ix_file);
-                DECREF(dat_file);
-                DECREF(self);
-                RETHROW(error);
-            }
+    CharBuf *seg_name = Seg_Get_Name(segment);
+    CharBuf *ix_file  = CB_newf("%o/highlight.ix", seg_name);
+    CharBuf *dat_file = CB_newf("%o/highlight.dat", seg_name);
+    if (Folder_Exists(folder, ix_file)) {
+        self->ix_in = Folder_Open_In(folder, ix_file);
+        if (!self->ix_in) {
+            Err *error = (Err*)INCREF(Err_get_error());
+            DECREF(ix_file);
+            DECREF(dat_file);
+            DECREF(self);
+            RETHROW(error);
         }
-        DECREF(ix_file);
-        DECREF(dat_file);
+        self->dat_in = Folder_Open_In(folder, dat_file);
+        if (!self->dat_in) {
+            Err *error = (Err*)INCREF(Err_get_error());
+            DECREF(ix_file);
+            DECREF(dat_file);
+            DECREF(self);
+            RETHROW(error);
+        }
     }
+    DECREF(ix_file);
+    DECREF(dat_file);
 
     return self;
 }
@@ -216,16 +214,14 @@ DefHLReader_read_record(DefaultHighlightReader *self, int32_t doc_id,
 
     InStream_Seek(ix_in, doc_id * 8);
 
-    {
-        // Copy the whole record.
-        int64_t  filepos = InStream_Read_I64(ix_in);
-        int64_t  end     = InStream_Read_I64(ix_in);
-        size_t   size    = (size_t)(end - filepos);
-        char    *buf     = BB_Grow(target, size);
-        InStream_Seek(dat_in, filepos);
-        InStream_Read_Bytes(dat_in, buf, size);
-        BB_Set_Size(target, size);
-    }
+    // Copy the whole record.
+    int64_t  filepos = InStream_Read_I64(ix_in);
+    int64_t  end     = InStream_Read_I64(ix_in);
+    size_t   size    = (size_t)(end - filepos);
+    char    *buf     = BB_Grow(target, size);
+    InStream_Seek(dat_in, filepos);
+    InStream_Read_Bytes(dat_in, buf, size);
+    BB_Set_Size(target, size);
 }
 
 

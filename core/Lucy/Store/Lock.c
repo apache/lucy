@@ -37,21 +37,19 @@ Lock_init(Lock *self, Folder *folder, const CharBuf *name,
         DECREF(self);
         THROW(ERR, "Invalid value for 'interval': %i32", interval);
     }
-    {
-        ZombieCharBuf *scratch = ZCB_WRAP(name);
-        uint32_t code_point;
-        while (0 != (code_point = ZCB_Nip_One(scratch))) {
-            if (isalnum(code_point)
-                || code_point == '.'
-                || code_point == '-'
-                || code_point == '_'
-               ) {
-                continue;
-            }
-            DECREF(self);
-            THROW(ERR, "Lock name contains disallowed characters: '%o'",
-                  name);
+    ZombieCharBuf *scratch = ZCB_WRAP(name);
+    uint32_t code_point;
+    while (0 != (code_point = ZCB_Nip_One(scratch))) {
+        if (isalnum(code_point)
+            || code_point == '.'
+            || code_point == '-'
+            || code_point == '_'
+           ) {
+            continue;
         }
+        DECREF(self);
+        THROW(ERR, "Lock name contains disallowed characters: '%o'",
+              name);
     }
 
     // Assign.

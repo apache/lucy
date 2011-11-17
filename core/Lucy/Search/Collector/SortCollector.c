@@ -154,12 +154,10 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
 
 
     // Prepare a MatchDoc-in-waiting.
-    {
-        VArray *values = self->need_values ? VA_new(num_rules) : NULL;
-        float   score  = self->need_score  ? F32_NEGINF : F32_NAN;
-        self->bumped = MatchDoc_new(I32_MAX, score, values);
-        DECREF(values);
-    }
+    VArray *values = self->need_values ? VA_new(num_rules) : NULL;
+    float   score  = self->need_score  ? F32_NEGINF : F32_NAN;
+    self->bumped = MatchDoc_new(I32_MAX, score, values);
+    DECREF(values);
 
     return self;
 }

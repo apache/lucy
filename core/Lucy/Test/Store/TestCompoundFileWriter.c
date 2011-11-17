@@ -59,12 +59,10 @@ test_Consolidate(TestBatch *batch) {
                                 FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     DECREF(fh);
 
-    {
-        CompoundFileWriter *cf_writer = CFWriter_new(folder);
-        CFWriter_Consolidate(cf_writer);
-        PASS(batch, "Consolidate completes despite leftover files");
-        DECREF(cf_writer);
-    }
+    CompoundFileWriter *cf_writer = CFWriter_new(folder);
+    CFWriter_Consolidate(cf_writer);
+    PASS(batch, "Consolidate completes despite leftover files");
+    DECREF(cf_writer);
 
     TEST_TRUE(batch, Folder_Exists(folder, &cf_file),
               "cf.dat file written");
@@ -91,28 +89,27 @@ test_offsets(TestBatch *batch) {
                       Json_slurp_json(folder, &cfmeta_file), HASH);
     files = (Hash*)CERTIFY(
                 Hash_Fetch_Str(cf_metadata, "files", 5), HASH);
-    {
-        CharBuf *file;
-        Obj     *filestats;
-        bool_t   offsets_ok = true;
 
-        TEST_TRUE(batch, Hash_Get_Size(files) > 0, "Multiple files");
+    CharBuf *file;
+    Obj     *filestats;
+    bool_t   offsets_ok = true;
 
-        Hash_Iterate(files);
-        while (Hash_Next(files, (Obj**)&file, &filestats)) {
-            Hash *stats = (Hash*)CERTIFY(filestats, HASH);
-            Obj *offset = CERTIFY(Hash_Fetch_Str(stats, "offset", 6), OBJ);
-            int64_t offs = Obj_To_I64(offset);
-            if (offs % 8 != 0) {
-                offsets_ok = false;
-                FAIL(batch, "Offset %" I64P " for %s not a multiple of 8",
-                     offset, CB_Get_Ptr8(file));
-                break;
-            }
+    TEST_TRUE(batch, Hash_Get_Size(files) > 0, "Multiple files");
+
+    Hash_Iterate(files);
+    while (Hash_Next(files, (Obj**)&file, &filestats)) {
+        Hash *stats = (Hash*)CERTIFY(filestats, HASH);
+        Obj *offset = CERTIFY(Hash_Fetch_Str(stats, "offset", 6), OBJ);
+        int64_t offs = Obj_To_I64(offset);
+        if (offs % 8 != 0) {
+            offsets_ok = false;
+            FAIL(batch, "Offset %" I64P " for %s not a multiple of 8",
+                 offset, CB_Get_Ptr8(file));
+            break;
         }
-        if (offsets_ok) {
-            PASS(batch, "All offsets are multiples of 8");
-        }
+    }
+    if (offsets_ok) {
+        PASS(batch, "All offsets are multiples of 8");
     }
 
     DECREF(cf_metadata);

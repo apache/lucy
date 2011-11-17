@@ -115,25 +115,25 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     self->polyreader = PolyReader_open((Obj*)folder, NULL, self->manager);
 
     // Clone the PolyReader's schema.
-    {
-        Hash *dump = Schema_Dump(PolyReader_Get_Schema(self->polyreader));
-        self->schema = (Schema*)CERTIFY(VTable_Load_Obj(SCHEMA, (Obj*)dump),
-                                        SCHEMA);
-        DECREF(dump);
-    }
+
+    Hash *dump = Schema_Dump(PolyReader_Get_Schema(self->polyreader));
+    self->schema = (Schema*)CERTIFY(VTable_Load_Obj(SCHEMA, (Obj*)dump),
+                                    SCHEMA);
+    DECREF(dump);
+
 
     // Create new Segment.
-    {
-        int64_t new_seg_num
-            = IxManager_Highest_Seg_Num(self->manager, self->snapshot) + 1;
-        VArray *fields = Schema_All_Fields(self->schema);
-        uint32_t i, max;
-        self->segment = Seg_new(new_seg_num);
-        for (i = 0, max = VA_Get_Size(fields); i < max; i++) {
-            Seg_Add_Field(self->segment, (CharBuf*)VA_Fetch(fields, i));
-        }
-        DECREF(fields);
+
+    int64_t new_seg_num
+        = IxManager_Highest_Seg_Num(self->manager, self->snapshot) + 1;
+    VArray *fields = Schema_All_Fields(self->schema);
+    uint32_t i, max;
+    self->segment = Seg_new(new_seg_num);
+    for (i = 0, max = VA_Get_Size(fields); i < max; i++) {
+        Seg_Add_Field(self->segment, (CharBuf*)VA_Fetch(fields, i));
     }
+    DECREF(fields);
+
 
     // Our "cutoff" is the segment this BackgroundMerger will write.  Now that
     // we've determined the cutoff, write the merge data file.
@@ -254,52 +254,52 @@ static bool_t
 S_merge_updated_deletions(BackgroundMerger *self) {
     Hash *updated_deletions = NULL;
 
-    {
-        PolyReader *new_polyreader
-            = PolyReader_open((Obj*)self->folder, NULL, NULL);
-        VArray *new_seg_readers
-            = PolyReader_Get_Seg_Readers(new_polyreader);
-        VArray *old_seg_readers
-            = PolyReader_Get_Seg_Readers(self->polyreader);
-        Hash *new_segs = Hash_new(VA_Get_Size(new_seg_readers));
-        uint32_t i, max;
 
-        for (i = 0, max = VA_Get_Size(new_seg_readers); i < max; i++) {
-            SegReader *seg_reader = (SegReader*)VA_Fetch(new_seg_readers, i);
-            CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
-            Hash_Store(new_segs, (Obj*)seg_name, INCREF(seg_reader));
-        }
+    PolyReader *new_polyreader
+        = PolyReader_open((Obj*)self->folder, NULL, NULL);
+    VArray *new_seg_readers
+        = PolyReader_Get_Seg_Readers(new_polyreader);
+    VArray *old_seg_readers
+        = PolyReader_Get_Seg_Readers(self->polyreader);
+    Hash *new_segs = Hash_new(VA_Get_Size(new_seg_readers));
+    uint32_t i, max;
 
-        for (i = 0, max = VA_Get_Size(old_seg_readers); i < max; i++) {
-            SegReader *seg_reader = (SegReader*)VA_Fetch(old_seg_readers, i);
-            CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
+    for (i = 0, max = VA_Get_Size(new_seg_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)VA_Fetch(new_seg_readers, i);
+        CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
+        Hash_Store(new_segs, (Obj*)seg_name, INCREF(seg_reader));
+    }
 
-            // If this segment was merged away...
-            if (Hash_Fetch(self->doc_maps, (Obj*)seg_name)) {
-                SegReader *new_seg_reader
-                    = (SegReader*)CERTIFY(
-                          Hash_Fetch(new_segs, (Obj*)seg_name),
-                          SEGREADER);
-                int32_t old_del_count = SegReader_Del_Count(seg_reader);
-                int32_t new_del_count = SegReader_Del_Count(new_seg_reader);
-                // ... were any new deletions applied against it?
-                if (old_del_count != new_del_count) {
-                    DeletionsReader *del_reader
-                        = (DeletionsReader*)SegReader_Obtain(
-                              new_seg_reader,
-                              VTable_Get_Name(DELETIONSREADER));
-                    if (!updated_deletions) {
-                        updated_deletions = Hash_new(max);
-                    }
-                    Hash_Store(updated_deletions, (Obj*)seg_name,
-                               (Obj*)DelReader_Iterator(del_reader));
+    for (i = 0, max = VA_Get_Size(old_seg_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)VA_Fetch(old_seg_readers, i);
+        CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
+
+        // If this segment was merged away...
+        if (Hash_Fetch(self->doc_maps, (Obj*)seg_name)) {
+            SegReader *new_seg_reader
+                = (SegReader*)CERTIFY(
+                      Hash_Fetch(new_segs, (Obj*)seg_name),
+                      SEGREADER);
+            int32_t old_del_count = SegReader_Del_Count(seg_reader);
+            int32_t new_del_count = SegReader_Del_Count(new_seg_reader);
+            // ... were any new deletions applied against it?
+            if (old_del_count != new_del_count) {
+                DeletionsReader *del_reader
+                    = (DeletionsReader*)SegReader_Obtain(
+                          new_seg_reader,
+                          VTable_Get_Name(DELETIONSREADER));
+                if (!updated_deletions) {
+                    updated_deletions = Hash_new(max);
                 }
+                Hash_Store(updated_deletions, (Obj*)seg_name,
+                           (Obj*)DelReader_Iterator(del_reader));
             }
         }
-
-        DECREF(new_polyreader);
-        DECREF(new_segs);
     }
+
+    DECREF(new_polyreader);
+    DECREF(new_segs);
+
 
     if (!updated_deletions) {
         return false;
@@ -424,50 +424,50 @@ BGMerger_prepare_commit(BackgroundMerger *self) {
 
         // Determine whether the index has been updated while this background
         // merge process was running.
-        {
-            CharBuf *start_snapfile
-                = Snapshot_Get_Path(PolyReader_Get_Snapshot(self->polyreader));
-            Snapshot *latest_snapshot
-                = Snapshot_Read_File(Snapshot_new(), self->folder, NULL);
-            CharBuf *latest_snapfile = Snapshot_Get_Path(latest_snapshot);
-            bool_t index_updated
-                = !CB_Equals(start_snapfile, (Obj*)latest_snapfile);
 
-            if (index_updated) {
-                /* See if new deletions have been applied since this
-                 * background merge process started against any of the
-                 * segments we just merged away.  If that's true, we need to
-                 * write another segment which applies the deletions against
-                 * the new composite segment.
-                 */
-                S_merge_updated_deletions(self);
+        CharBuf *start_snapfile
+            = Snapshot_Get_Path(PolyReader_Get_Snapshot(self->polyreader));
+        Snapshot *latest_snapshot
+            = Snapshot_Read_File(Snapshot_new(), self->folder, NULL);
+        CharBuf *latest_snapfile = Snapshot_Get_Path(latest_snapshot);
+        bool_t index_updated
+            = !CB_Equals(start_snapfile, (Obj*)latest_snapfile);
 
-                // Add the fresh content to our snapshot. (It's important to
-                // run this AFTER S_merge_updated_deletions, because otherwise
-                // we couldn't tell whether the deletion counts changed.)
-                {
-                    VArray *files = Snapshot_List(latest_snapshot);
-                    uint32_t i, max;
-                    for (i = 0, max = VA_Get_Size(files); i < max; i++) {
-                        CharBuf *file = (CharBuf*)VA_Fetch(files, i);
-                        if (CB_Starts_With_Str(file, "seg_", 4)) {
-                            int64_t gen = (int64_t)IxFileNames_extract_gen(file);
-                            if (gen > self->cutoff) {
-                                Snapshot_Add_Entry(self->snapshot, file);
-                            }
-                        }
+        if (index_updated) {
+            /* See if new deletions have been applied since this
+             * background merge process started against any of the
+             * segments we just merged away.  If that's true, we need to
+             * write another segment which applies the deletions against
+             * the new composite segment.
+             */
+            S_merge_updated_deletions(self);
+
+            // Add the fresh content to our snapshot. (It's important to
+            // run this AFTER S_merge_updated_deletions, because otherwise
+            // we couldn't tell whether the deletion counts changed.)
+
+            VArray *files = Snapshot_List(latest_snapshot);
+            uint32_t i, max;
+            for (i = 0, max = VA_Get_Size(files); i < max; i++) {
+                CharBuf *file = (CharBuf*)VA_Fetch(files, i);
+                if (CB_Starts_With_Str(file, "seg_", 4)) {
+                    int64_t gen = (int64_t)IxFileNames_extract_gen(file);
+                    if (gen > self->cutoff) {
+                        Snapshot_Add_Entry(self->snapshot, file);
                     }
-                    DECREF(files);
                 }
-
-                // Since the snapshot content has changed, we need to rewrite
-                // it.
-                Folder_Delete(folder, self->snapfile);
-                Snapshot_Write_File(snapshot, folder, self->snapfile);
             }
+            DECREF(files);
 
-            DECREF(latest_snapshot);
+
+            // Since the snapshot content has changed, we need to rewrite
+            // it.
+            Folder_Delete(folder, self->snapfile);
+            Snapshot_Write_File(snapshot, folder, self->snapfile);
         }
+
+        DECREF(latest_snapshot);
+
 
         self->needs_commit = true;
     }

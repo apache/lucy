@@ -113,14 +113,12 @@ IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
     uint32_t       wanted    = num_wanted > doc_max ? doc_max : num_wanted;
     SortCollector *collector = SortColl_new(schema, sort_spec, wanted);
     IxSearcher_Collect(self, query, (Collector*)collector);
-    {
-        VArray  *match_docs = SortColl_Pop_Match_Docs(collector);
-        int32_t  total_hits = SortColl_Get_Total_Hits(collector);
-        TopDocs *retval     = TopDocs_new(match_docs, total_hits);
-        DECREF(collector);
-        DECREF(match_docs);
-        return retval;
-    }
+    VArray  *match_docs = SortColl_Pop_Match_Docs(collector);
+    int32_t  total_hits = SortColl_Get_Total_Hits(collector);
+    TopDocs *retval     = TopDocs_new(match_docs, total_hits);
+    DECREF(collector);
+    DECREF(match_docs);
+    return retval;
 }
 
 void

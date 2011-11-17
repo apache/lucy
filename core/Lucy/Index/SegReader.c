@@ -55,12 +55,12 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
         DECREF(self);
         Err_throw_mess(ERR, mess);
     }
-    {
-        DeletionsReader *del_reader
-            = (DeletionsReader*)Hash_Fetch(
-                  self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
-        self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
-    }
+
+    DeletionsReader *del_reader
+        = (DeletionsReader*)Hash_Fetch(
+              self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+    self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
+
     return self;
 }
 

@@ -94,13 +94,11 @@ test_Buf(TestBatch *batch) {
     TEST_INT_EQ(batch, instream->limit - buf, IO_STREAM_BUF_SIZE,
                 "Requesting over limit triggers refill");
 
-    {
-        int64_t  expected = InStream_Length(instream) - InStream_Tell(instream);
-        char    *buff     = InStream_Buf(instream, 100000);
-        int64_t  got      = PTR_TO_I64(instream->limit) - PTR_TO_I64(buff);
-        TEST_TRUE(batch, got == expected,
-                  "Requests greater than file size get pared down");
-    }
+    int64_t  expected = InStream_Length(instream) - InStream_Tell(instream);
+    char    *buff     = InStream_Buf(instream, 100000);
+    int64_t  got      = PTR_TO_I64(instream->limit) - PTR_TO_I64(buff);
+    TEST_TRUE(batch, got == expected,
+              "Requests greater than file size get pared down");
 
     DECREF(instream);
     DECREF(outstream);

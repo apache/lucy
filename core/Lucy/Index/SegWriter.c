@@ -91,11 +91,9 @@ SegWriter_prep_seg_dir(SegWriter *self) {
         }
     }
 
-    {
-        // Create the segment directory.
-        bool_t result = Folder_MkDir(folder, seg_name);
-        if (!result) { RETHROW(INCREF(Err_get_error())); }
-    }
+    // Create the segment directory.
+    bool_t result = Folder_MkDir(folder, seg_name);
+    if (!result) { RETHROW(INCREF(Err_get_error())); }
 }
 
 void
@@ -197,13 +195,12 @@ SegWriter_finish(SegWriter *self) {
     }
 
     // Write segment metadata and add the segment directory to the snapshot.
-    {
-        Snapshot *snapshot = SegWriter_Get_Snapshot(self);
-        CharBuf *segmeta_filename = CB_newf("%o/segmeta.json", seg_name);
-        Seg_Write_File(self->segment, self->folder);
-        Snapshot_Add_Entry(snapshot, seg_name);
-        DECREF(segmeta_filename);
-    }
+    Snapshot *snapshot = SegWriter_Get_Snapshot(self);
+    CharBuf *segmeta_filename = CB_newf("%o/segmeta.json", seg_name);
+    Seg_Write_File(self->segment, self->folder);
+    Snapshot_Add_Entry(snapshot, seg_name);
+    DECREF(segmeta_filename);
+
 
     // Collapse segment files into compound file.
     Folder_Consolidate(self->folder, seg_name);

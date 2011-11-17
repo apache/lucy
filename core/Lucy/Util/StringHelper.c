@@ -71,11 +71,10 @@ StrHelp_to_base36(uint64_t num, void *buffer) {
         num /= 36;
     } while (num > 0);
 
-    {
-        uint32_t size = end - buf;
-        memcpy(buffer, buf, size + 1);
-        return size;
-    }
+    uint32_t size = end - buf;
+    memcpy(buffer, buf, size + 1);
+    return size;
+
 }
 
 bool_t
@@ -86,7 +85,7 @@ StrHelp_utf8_valid(const char *ptr, size_t size) {
 		const uint8_t header_byte = *string++;
         int count = StrHelp_UTF8_COUNT[header_byte] & 0x7;
         switch (count & 0x7) {
-            case 1: 
+            case 1:
 				// ASCII
                 break;
             case 2:

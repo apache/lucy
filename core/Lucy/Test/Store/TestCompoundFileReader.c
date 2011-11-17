@@ -247,12 +247,10 @@ test_Local_Open_FileHandle(TestBatch *batch) {
     CompoundFileReader *cf_reader = CFReader_open(real_folder);
     FileHandle *fh;
 
-    {
-        OutStream *outstream = CFReader_Open_Out(cf_reader, (CharBuf*)&baz);
-        OutStream_Write_Bytes(outstream, "baz", 3);
-        OutStream_Close(outstream);
-        DECREF(outstream);
-    }
+    OutStream *outstream = CFReader_Open_Out(cf_reader, (CharBuf*)&baz);
+    OutStream_Write_Bytes(outstream, "baz", 3);
+    OutStream_Close(outstream);
+    DECREF(outstream);
 
     fh = CFReader_Local_Open_FileHandle(cf_reader, (CharBuf*)&baz,
                                         FH_READ_ONLY);
@@ -294,16 +292,14 @@ test_Local_Open_In(TestBatch *batch) {
               "InStream's path includes directory");
     DECREF(instream);
 
-    {
-        OutStream *outstream = CFReader_Open_Out(cf_reader, (CharBuf*)&baz);
-        OutStream_Write_Bytes(outstream, "baz", 3);
-        OutStream_Close(outstream);
-        DECREF(outstream);
-        instream = CFReader_Local_Open_In(cf_reader, (CharBuf*)&baz);
-        TEST_TRUE(batch, instream != NULL,
-                  "Local_Open_In pass-through for real file");
-        DECREF(instream);
-    }
+    OutStream *outstream = CFReader_Open_Out(cf_reader, (CharBuf*)&baz);
+    OutStream_Write_Bytes(outstream, "baz", 3);
+    OutStream_Close(outstream);
+    DECREF(outstream);
+    instream = CFReader_Local_Open_In(cf_reader, (CharBuf*)&baz);
+    TEST_TRUE(batch, instream != NULL,
+              "Local_Open_In pass-through for real file");
+    DECREF(instream);
 
     Err_set_error(NULL);
     instream = CFReader_Local_Open_In(cf_reader, (CharBuf*)&stuff);

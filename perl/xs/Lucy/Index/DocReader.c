@@ -117,11 +117,9 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id) {
     }
     SvREFCNT_dec(field_name_sv);
 
-    {
-        lucy_HitDoc *retval = lucy_HitDoc_new(fields, doc_id, 0.0);
-        SvREFCNT_dec((SV*)fields);
-        return retval;
-    }
+    lucy_HitDoc *retval = lucy_HitDoc_new(fields, doc_id, 0.0);
+    SvREFCNT_dec((SV*)fields);
+    return retval;
 }
 
 

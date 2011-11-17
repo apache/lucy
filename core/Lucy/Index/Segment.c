@@ -102,34 +102,31 @@ Seg_read_file(Segment *self, Folder *folder) {
         = (Hash*)CERTIFY(Hash_Fetch_Str(self->metadata, "segmeta", 7), HASH);
 
     // Assign.
-    {
-        Obj *count = Hash_Fetch_Str(my_metadata, "count", 5);
-        if (!count) { count = Hash_Fetch_Str(my_metadata, "doc_count", 9); }
-        if (!count) { THROW(ERR, "Missing 'count'"); }
-        else { self->count = Obj_To_I64(count); }
-    }
+    Obj *count = Hash_Fetch_Str(my_metadata, "count", 5);
+    if (!count) { count = Hash_Fetch_Str(my_metadata, "doc_count", 9); }
+    if (!count) { THROW(ERR, "Missing 'count'"); }
+    else { self->count = Obj_To_I64(count); }
+
 
     // Get list of field nums.
-    {
-        uint32_t i;
-        VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata,
-                                                        "field_names", 11);
-        uint32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
-        if (source_by_num == NULL) {
-            THROW(ERR, "Failed to extract 'field_names' from metadata");
-        }
+    uint32_t i;
+    VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata,
+                                                    "field_names", 11);
+    uint32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
+    if (source_by_num == NULL) {
+        THROW(ERR, "Failed to extract 'field_names' from metadata");
+    }
 
-        // Init.
-        DECREF(self->by_num);
-        DECREF(self->by_name);
-        self->by_num  = VA_new(num_fields);
-        self->by_name = Hash_new(num_fields);
+    // Init.
+    DECREF(self->by_num);
+    DECREF(self->by_name);
+    self->by_num  = VA_new(num_fields);
+    self->by_name = Hash_new(num_fields);
 
-        // Copy the list of fields from the source.
-        for (i = 0; i < num_fields; i++) {
-            CharBuf *name = (CharBuf*)VA_Fetch(source_by_num, i);
-            Seg_Add_Field(self, name);
-        }
+    // Copy the list of fields from the source.
+    for (i = 0; i < num_fields; i++) {
+        CharBuf *name = (CharBuf*)VA_Fetch(source_by_num, i);
+        Seg_Add_Field(self, name);
     }
 
     return true;
@@ -147,13 +144,12 @@ Seg_write_file(Segment *self, Folder *folder) {
     Hash_Store_Str(my_metadata, "format", 6, (Obj*)CB_newf("%i32", 1));
     Hash_Store_Str(self->metadata, "segmeta", 7, (Obj*)my_metadata);
 
-    {
-        CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
-        bool_t result
-            = Json_spew_json((Obj*)self->metadata, folder, filename);
-        DECREF(filename);
-        if (!result) { RETHROW(INCREF(Err_get_error())); }
-    }
+    CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
+    bool_t result
+        = Json_spew_json((Obj*)self->metadata, folder, filename);
+    DECREF(filename);
+    if (!result) { RETHROW(INCREF(Err_get_error())); }
+
 }
 
 int32_t

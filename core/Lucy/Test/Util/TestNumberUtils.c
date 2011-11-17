@@ -181,10 +181,9 @@ test_c64(TestBatch *batch) {
     target = encoded;
     NumUtil_encode_c64(U64_MAX, &target);
     target = encoded;
-    {
-        uint64_t got = NumUtil_decode_c64(&target);
-        TEST_TRUE(batch, got == U64_MAX, "c64 U64_MAX");
-    }
+
+    uint64_t got = NumUtil_decode_c64(&target);
+    TEST_TRUE(batch, got == U64_MAX, "c64 U64_MAX");
 
     FREEMEM(encoded);
     FREEMEM(ints);

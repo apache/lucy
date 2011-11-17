@@ -158,15 +158,13 @@ PolySearcher_top_docs(PolySearcher *self, Query *query, uint32_t num_wanted,
         DECREF(top_docs);
     }
 
-    {
-        VArray  *match_docs = HitQ_Pop_All(hit_q);
-        TopDocs *retval     = TopDocs_new(match_docs, total_hits);
+    VArray  *match_docs = HitQ_Pop_All(hit_q);
+    TopDocs *retval     = TopDocs_new(match_docs, total_hits);
 
-        DECREF(match_docs);
-        DECREF(compiler);
-        DECREF(hit_q);
-        return retval;
-    }
+    DECREF(match_docs);
+    DECREF(compiler);
+    DECREF(hit_q);
+    return retval;
 }
 
 

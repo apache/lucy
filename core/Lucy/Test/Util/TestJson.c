@@ -220,12 +220,12 @@ test_spew_and_slurp(TestBatch *batch) {
               "Failed slurp_json sets Err_error");
 
     CharBuf *boffo = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
-    {
-        FileHandle *fh
-            = Folder_Open_FileHandle(folder, boffo, FH_CREATE | FH_WRITE_ONLY);
-        FH_Write(fh, "garbage", 7);
-        DECREF(fh);
-    }
+
+    FileHandle *fh
+        = Folder_Open_FileHandle(folder, boffo, FH_CREATE | FH_WRITE_ONLY);
+    FH_Write(fh, "garbage", 7);
+    DECREF(fh);
+
     Err_set_error(NULL);
     got = Json_slurp_json(folder, boffo);
     TEST_TRUE(batch, got == NULL,

@@ -103,30 +103,28 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     }
     self->offsets = I32Arr_new_steal(starts, num_sub_readers);
 
-    {
-        CharBuf *api;
-        VArray  *readers;
-        Hash_Iterate(data_readers);
-        while (Hash_Next(data_readers, (Obj**)&api, (Obj**)&readers)) {
-            DataReader *datareader = (DataReader*)CERTIFY(
-                                         S_first_non_null(readers),
-                                         DATAREADER);
-            DataReader *aggregator
-                = DataReader_Aggregator(datareader, readers, self->offsets);
-            if (aggregator) {
-                CERTIFY(aggregator, DATAREADER);
-                Hash_Store(self->components, (Obj*)api, (Obj*)aggregator);
-            }
+    CharBuf *api;
+    VArray  *readers;
+    Hash_Iterate(data_readers);
+    while (Hash_Next(data_readers, (Obj**)&api, (Obj**)&readers)) {
+        DataReader *datareader = (DataReader*)CERTIFY(
+                                     S_first_non_null(readers),
+                                     DATAREADER);
+        DataReader *aggregator
+            = DataReader_Aggregator(datareader, readers, self->offsets);
+        if (aggregator) {
+            CERTIFY(aggregator, DATAREADER);
+            Hash_Store(self->components, (Obj*)api, (Obj*)aggregator);
         }
     }
+
     DECREF(data_readers);
 
-    {
-        DeletionsReader *del_reader
-            = (DeletionsReader*)Hash_Fetch(
-                  self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
-        self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
-    }
+    DeletionsReader *del_reader
+        = (DeletionsReader*)Hash_Fetch(
+              self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+    self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
+
 }
 
 PolyReader*
@@ -260,12 +258,11 @@ S_try_open_elements(PolyReader *self) {
     // Sort the segments by age.
     VA_Sort(segments, NULL, NULL);
 
-    {
-        Obj *result = PolyReader_Try_Open_SegReaders(self, segments);
-        DECREF(segments);
-        DECREF(files);
-        return result;
-    }
+    Obj *result = PolyReader_Try_Open_SegReaders(self, segments);
+    DECREF(segments);
+    DECREF(files);
+    return result;
+
 }
 
 // For test suite.
@@ -352,26 +349,25 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
          * failed to open something, see if we can find a newer snapshot file.
          * If we can, then the exception was due to the race condition.  If
          * not, we have a real exception, so throw an error. */
-        {
-            Obj *result = S_try_open_elements(self);
-            if (Obj_Is_A(result, CHARBUF)) { // Error occurred.
-                S_release_read_lock(self);
-                DECREF(target_snap_file);
-                if (last_gen < gen) { // Index updated, so try again.
-                    DECREF(result);
-                    last_gen = gen;
-                }
-                else { // Real error.
-                    if (manager) { S_release_deletion_lock(self); }
-                    Err_throw_mess(ERR, (CharBuf*)result);
-                }
-            }
-            else { // Succeeded.
-                S_init_sub_readers(self, (VArray*)result);
+
+        Obj *result = S_try_open_elements(self);
+        if (Obj_Is_A(result, CHARBUF)) { // Error occurred.
+            S_release_read_lock(self);
+            DECREF(target_snap_file);
+            if (last_gen < gen) { // Index updated, so try again.
                 DECREF(result);
-                DECREF(target_snap_file);
-                break;
+                last_gen = gen;
             }
+            else { // Real error.
+                if (manager) { S_release_deletion_lock(self); }
+                Err_throw_mess(ERR, (CharBuf*)result);
+            }
+        }
+        else { // Succeeded.
+            S_init_sub_readers(self, (VArray*)result);
+            DECREF(result);
+            DECREF(target_snap_file);
+            break;
         }
     }
 

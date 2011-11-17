@@ -72,18 +72,15 @@ S_lazy_init(HighlightWriter *self) {
         CharBuf  *seg_name = Seg_Get_Name(segment);
 
         // Open outstreams.
-        {
-            CharBuf *ix_file = CB_newf("%o/highlight.ix", seg_name);
-            self->ix_out = Folder_Open_Out(folder, ix_file);
-            DECREF(ix_file);
-            if (!self->ix_out) { RETHROW(INCREF(Err_get_error())); }
-        }
-        {
-            CharBuf *dat_file = CB_newf("%o/highlight.dat", seg_name);
-            self->dat_out = Folder_Open_Out(folder, dat_file);
-            DECREF(dat_file);
-            if (!self->dat_out) { RETHROW(INCREF(Err_get_error())); }
-        }
+        CharBuf *ix_file = CB_newf("%o/highlight.ix", seg_name);
+        self->ix_out = Folder_Open_Out(folder, ix_file);
+        DECREF(ix_file);
+        if (!self->ix_out) { RETHROW(INCREF(Err_get_error())); }
+
+        CharBuf *dat_file = CB_newf("%o/highlight.dat", seg_name);
+        self->dat_out = Folder_Open_Out(folder, dat_file);
+        DECREF(dat_file);
+        if (!self->dat_out) { RETHROW(INCREF(Err_get_error())); }
 
         // Go past invalid doc 0.
         OutStream_Write_I64(self->ix_out, 0);

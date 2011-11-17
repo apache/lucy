@@ -339,21 +339,19 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     uint32_t  i, max;
 
     // Determine whether this subclause is bracketed by parens.
-    {
-        ParserToken *maybe_open_paren = (ParserToken*)VA_Fetch(elems, 0);
-        if (maybe_open_paren != NULL
-            && maybe_open_paren->type == TOKEN_OPEN_PAREN
-           ) {
-            uint32_t num_elems;
-            apply_parens = true;
-            VA_Excise(elems, 0, 1);
-            num_elems = VA_Get_Size(elems);
-            if (num_elems) {
-                ParserToken *maybe_close_paren
-                    = (ParserToken*)VA_Fetch(elems, num_elems - 1);
-                if (maybe_close_paren->type == TOKEN_CLOSE_PAREN) {
-                    VA_Excise(elems, num_elems - 1, 1);
-                }
+    ParserToken *maybe_open_paren = (ParserToken*)VA_Fetch(elems, 0);
+    if (maybe_open_paren != NULL
+        && maybe_open_paren->type == TOKEN_OPEN_PAREN
+       ) {
+        uint32_t num_elems;
+        apply_parens = true;
+        VA_Excise(elems, 0, 1);
+        num_elems = VA_Get_Size(elems);
+        if (num_elems) {
+            ParserToken *maybe_close_paren
+                = (ParserToken*)VA_Fetch(elems, num_elems - 1);
+            if (maybe_close_paren->type == TOKEN_CLOSE_PAREN) {
+                VA_Excise(elems, num_elems - 1, 1);
             }
         }
     }

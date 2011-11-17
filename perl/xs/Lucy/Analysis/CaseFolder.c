@@ -55,11 +55,9 @@ S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
         dest += buf_utf8_len;
     }
 
-    {
-        size_t size = dest - dest_start;
-        Lucy_BB_Set_Size(work_buf, size);
-        return size;
-    }
+    size_t size = dest - dest_start;
+    Lucy_BB_Set_Size(work_buf, size);
+    return size;
 }
 
 lucy_Inversion*

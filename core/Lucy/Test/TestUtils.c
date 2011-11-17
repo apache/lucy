@@ -181,13 +181,12 @@ TestUtils_freeze_thaw(Obj *object) {
         FREEZE(object, outstream);
         OutStream_Close(outstream);
         DECREF(outstream);
-        {
-            InStream *instream = InStream_open((Obj*)ram_file);
-            Obj *retval = THAW(instream);
-            DECREF(instream);
-            DECREF(ram_file);
-            return retval;
-        }
+
+        InStream *instream = InStream_open((Obj*)ram_file);
+        Obj *retval = THAW(instream);
+        DECREF(instream);
+        DECREF(ram_file);
+        return retval;
     }
     else {
         return NULL;

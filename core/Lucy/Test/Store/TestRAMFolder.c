@@ -143,20 +143,18 @@ test_Local_MkDir(TestBatch *batch) {
     TEST_TRUE(batch, RAMFolder_Exists(folder, &foo),
               "Existing dir untouched after failed Local_MkDir");
 
-    {
-        FileHandle *fh = RAMFolder_Open_FileHandle(folder, &boffo,
-                                                   FH_CREATE | FH_WRITE_ONLY);
-        DECREF(fh);
-        Err_set_error(NULL);
-        result = RAMFolder_Local_MkDir(folder, &foo);
-        TEST_FALSE(batch, result,
-                   "Local_MkDir returns false when a file already exists");
-        TEST_TRUE(batch, Err_get_error() != NULL,
-                  "Local_MkDir sets Err_error when a file already exists");
-        TEST_TRUE(batch, RAMFolder_Exists(folder, &boffo) &&
-                  !RAMFolder_Local_Is_Directory(folder, &boffo),
-                  "Existing file untouched after failed Local_MkDir");
-    }
+    FileHandle *fh = RAMFolder_Open_FileHandle(folder, &boffo,
+                                               FH_CREATE | FH_WRITE_ONLY);
+    DECREF(fh);
+    Err_set_error(NULL);
+    result = RAMFolder_Local_MkDir(folder, &foo);
+    TEST_FALSE(batch, result,
+               "Local_MkDir returns false when a file already exists");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Local_MkDir sets Err_error when a file already exists");
+    TEST_TRUE(batch, RAMFolder_Exists(folder, &boffo) &&
+              !RAMFolder_Local_Is_Directory(folder, &boffo),
+              "Existing file untouched after failed Local_MkDir");
 
     DECREF(folder);
 }

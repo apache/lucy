@@ -153,20 +153,18 @@ S_do_consolidate(CompoundFileWriter *self) {
     DECREF(outstream);
     DECREF(files);
     DECREF(metadata);
-    {
-        /*
-        CharBuf *merged_file;
-        Obj     *ignore;
-        Hash_Iterate(sub_files);
-        while (Hash_Next(sub_files, (Obj**)&merged_file, &ignore)) {
-            if (!Folder_Delete(folder, merged_file)) {
-                CharBuf *mess = MAKE_MESS("Can't delete '%o'", merged_file);
-                DECREF(sub_files);
-                Err_throw_mess(ERR, mess);
-            }
+    /*
+    CharBuf *merged_file;
+    Obj     *ignore;
+    Hash_Iterate(sub_files);
+    while (Hash_Next(sub_files, (Obj**)&merged_file, &ignore)) {
+        if (!Folder_Delete(folder, merged_file)) {
+            CharBuf *mess = MAKE_MESS("Can't delete '%o'", merged_file);
+            DECREF(sub_files);
+            Err_throw_mess(ERR, mess);
         }
-        */
     }
+    */
     DECREF(sub_files);
     for (uint32_t i = 0, max = VA_Get_Size(merged); i < max; i++) {
         CharBuf *merged_file = (CharBuf*)VA_Fetch(merged, i);

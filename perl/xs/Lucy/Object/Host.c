@@ -114,15 +114,13 @@ lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) {
     SI_push_args(vobj, args, num_args);
     va_end(args);
 
-    {
-        int count = call_method(method, G_VOID | G_DISCARD);
-        if (count != 0) {
-            CFISH_THROW(LUCY_ERR, "callback '%s' returned too many values: %i32",
-                        method, (int32_t)count);
-        }
-        FREETMPS;
-        LEAVE;
+    int count = call_method(method, G_VOID | G_DISCARD);
+    if (count != 0) {
+        CFISH_THROW(LUCY_ERR, "callback '%s' returned too many values: %i32",
+                    method, (int32_t)count);
     }
+    FREETMPS;
+    LEAVE;
 }
 
 int64_t
@@ -233,16 +231,14 @@ static SV*
 S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args) {
     SV *return_val;
     SI_push_args(vobj, args, num_args);
-    {
-        int num_returned = call_method(method, G_SCALAR);
-        dSP;
-        if (num_returned != 1) {
-            CFISH_THROW(LUCY_ERR, "Bad number of return vals from %s: %i32",
-                        method, (int32_t)num_returned);
-        }
-        return_val = POPs;
-        PUTBACK;
+    int num_returned = call_method(method, G_SCALAR);
+    dSP;
+    if (num_returned != 1) {
+        CFISH_THROW(LUCY_ERR, "Bad number of return vals from %s: %i32",
+                    method, (int32_t)num_returned);
     }
+    return_val = POPs;
+    PUTBACK;
     return return_val;
 }
 

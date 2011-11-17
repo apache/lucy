@@ -52,7 +52,7 @@ DefaultPostingListReader*
 DefPListReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                    VArray *segments, int32_t seg_tick,
                    LexiconReader *lex_reader) {
-    DefaultPostingListReader *self 
+    DefaultPostingListReader *self
         = (DefaultPostingListReader*)VTable_Make_Obj(DEFAULTPOSTINGLISTREADER);
     return DefPListReader_init(self, schema, folder, snapshot, segments,
                                seg_tick, lex_reader);
@@ -70,24 +70,23 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
     self->lex_reader = (LexiconReader*)INCREF(lex_reader);
 
     // Check format.
-    {
-        Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "postings", 8);
-        if (!my_meta) {
-            my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment,
-                                                    "posting_list", 12);
-        }
+    Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "postings", 8);
+    if (!my_meta) {
+        my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment,
+                                                "posting_list", 12);
+    }
 
-        if (my_meta) {
-            Obj *format = Hash_Fetch_Str(my_meta, "format", 6);
-            if (!format) { THROW(ERR, "Missing 'format' var"); }
-            else {
-                if (Obj_To_I64(format) != PListWriter_current_file_format) {
-                    THROW(ERR, "Unsupported postings format: %i64",
-                          Obj_To_I64(format));
-                }
+    if (my_meta) {
+        Obj *format = Hash_Fetch_Str(my_meta, "format", 6);
+        if (!format) { THROW(ERR, "Missing 'format' var"); }
+        else {
+            if (Obj_To_I64(format) != PListWriter_current_file_format) {
+                THROW(ERR, "Unsupported postings format: %i64",
+                      Obj_To_I64(format));
             }
         }
     }
+
 
     return self;
 }

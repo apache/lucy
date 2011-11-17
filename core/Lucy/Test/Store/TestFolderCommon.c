@@ -151,19 +151,17 @@ test_Local_MkDir(TestBatch *batch, set_up_t set_up, tear_down_t tear_down) {
     TEST_TRUE(batch, Folder_Exists(folder, &foo),
               "Existing dir untouched after failed Local_MkDir");
 
-    {
-        OutStream *outstream = Folder_Open_Out(folder, &boffo);
-        DECREF(outstream);
-        Err_set_error(NULL);
-        result = Folder_Local_MkDir(folder, &foo);
-        TEST_FALSE(batch, result,
-                   "Local_MkDir returns false when a file already exists");
-        TEST_TRUE(batch, Err_get_error() != NULL,
-                  "Local_MkDir sets Err_error when a file already exists");
-        TEST_TRUE(batch, Folder_Exists(folder, &boffo) &&
-                  !Folder_Local_Is_Directory(folder, &boffo),
-                  "Existing file untouched after failed Local_MkDir");
-    }
+    OutStream *outstream = Folder_Open_Out(folder, &boffo);
+    DECREF(outstream);
+    Err_set_error(NULL);
+    result = Folder_Local_MkDir(folder, &foo);
+    TEST_FALSE(batch, result,
+               "Local_MkDir returns false when a file already exists");
+    TEST_TRUE(batch, Err_get_error() != NULL,
+              "Local_MkDir sets Err_error when a file already exists");
+    TEST_TRUE(batch, Folder_Exists(folder, &boffo) &&
+              !Folder_Local_Is_Directory(folder, &boffo),
+              "Existing file untouched after failed Local_MkDir");
 
     Folder_Delete(folder, &foo);
     Folder_Delete(folder, &boffo);

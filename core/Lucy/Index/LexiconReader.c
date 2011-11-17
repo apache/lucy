@@ -57,7 +57,7 @@ PolyLexReader_init(PolyLexiconReader *self, VArray *readers,
     uint32_t i, max;
     Schema *schema = NULL;
     for (i = 0, max = VA_Get_Size(readers); i < max; i++) {
-        LexiconReader *reader 
+        LexiconReader *reader
             = (LexiconReader*)CERTIFY(VA_Fetch(readers, i), LEXICONREADER);
         if (!schema) { schema = LexReader_Get_Schema(reader); }
     }
@@ -217,12 +217,11 @@ S_find_tinfo(DefaultLexiconReader *self, const CharBuf *field, Obj *target) {
             SegLex_Seek(lexicon, target);
 
             //if found matches target, return info; otherwise NULL
-            {
-                Obj *found = SegLex_Get_Term(lexicon);
-                if (found && Obj_Equals(target, found)) {
-                    return SegLex_Get_Term_Info(lexicon);
-                }
+            Obj *found = SegLex_Get_Term(lexicon);
+            if (found && Obj_Equals(target, found)) {
+                return SegLex_Get_Term_Info(lexicon);
             }
+
         }
     }
     return NULL;

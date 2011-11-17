@@ -342,14 +342,13 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
      *
      *    less_than  |       equal       |  greater_than
      */
-    {
-        int32_t k;
-        SI_exchange4(elems, i, right);
-        j = i - 1;
-        i++;
-        for (k = left; k < p; k++, j--)      { SI_exchange4(elems, k, j); }
-        for (k = right - 1; k > q; k--, i++) { SI_exchange4(elems, i, k); }
-    }
+    int32_t k;
+    SI_exchange4(elems, i, right);
+    j = i - 1;
+    i++;
+    for (k = left; k < p; k++, j--)      { SI_exchange4(elems, k, j); }
+    for (k = right - 1; k > q; k--, i++) { SI_exchange4(elems, i, k); }
+
 
     // Recurse.
     S_qsort4(elems, left, j, compare, context);   // Sort less_than.
@@ -449,14 +448,13 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
      *
      *    less_than  |       equal       |  greater_than
      */
-    {
-        int32_t k;
-        SI_exchange8(elems, i, right);
-        j = i - 1;
-        i++;
-        for (k = left; k < p; k++, j--)      { SI_exchange8(elems, k, j); }
-        for (k = right - 1; k > q; k--, i++) { SI_exchange8(elems, i, k); }
-    }
+    int32_t k;
+    SI_exchange8(elems, i, right);
+    j = i - 1;
+    i++;
+    for (k = left; k < p; k++, j--)      { SI_exchange8(elems, k, j); }
+    for (k = right - 1; k > q; k--, i++) { SI_exchange8(elems, i, k); }
+
 
     // Recurse.
     S_qsort8(elems, left, j, compare, context);   // Sort less_than.

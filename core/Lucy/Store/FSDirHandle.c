@@ -184,15 +184,13 @@ FSDH_next(FSDirHandle *self) {
     }
 
     // Process the results of the iteration.
-    {
-        size_t len = strlen(find_data->cFileName);
-        if (SI_is_updir(find_data->cFileName, len)) {
-            return FSDH_Next(self);
-        }
-        else {
-            CB_Mimic_Str(self->entry, find_data->cFileName, len);
-            return true;
-        }
+    size_t len = strlen(find_data->cFileName);
+    if (SI_is_updir(find_data->cFileName, len)) {
+        return FSDH_Next(self);
+    }
+    else {
+        CB_Mimic_Str(self->entry, find_data->cFileName, len);
+        return true;
     }
 }
 

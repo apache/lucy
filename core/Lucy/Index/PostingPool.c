@@ -494,11 +494,10 @@ PostPool_refill(PostingPool *self) {
                 if (term_text && !Obj_Is_A((Obj*)term_text, CHARBUF)) {
                     THROW(ERR, "Only CharBuf terms are supported for now");
                 }
-                {
-                    Posting *posting = PList_Get_Posting(plist);
-                    Post_Set_Doc_ID(posting, doc_base);
-                    self->last_doc_id = doc_base;
-                }
+
+                Posting *posting = PList_Get_Posting(plist);
+                Post_Set_Doc_ID(posting, doc_base);
+                self->last_doc_id = doc_base;
             }
             // Bail if we've read everything in this run.
             else {
