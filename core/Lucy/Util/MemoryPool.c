@@ -61,7 +61,6 @@ MemPool_destroy(MemoryPool *self) {
 static void
 S_init_arena(MemoryPool *self, size_t amount) {
     ByteBuf *bb;
-    int32_t i;
 
     // Indicate which arena we're using at present.
     self->tick++;
@@ -86,7 +85,7 @@ S_init_arena(MemoryPool *self, size_t amount) {
 
     // Recalculate consumption to take into account blocked off space.
     self->consumed = 0;
-    for (i = 0; i < self->tick; i++) {
+    for (int32_t i = 0; i < self->tick; i++) {
         ByteBuf *bb = (ByteBuf*)VA_Fetch(self->arenas, i);
         self->consumed += BB_Get_Size(bb);
     }
@@ -151,13 +150,12 @@ MemPool_release_all(MemoryPool *self) {
 
 void
 MemPool_eat(MemoryPool *self, MemoryPool *other) {
-    int32_t i;
     if (self->buf != NULL) {
         THROW(ERR, "Memory pool is not empty");
     }
 
     // Move active arenas from other to self.
-    for (i = 0; i <= other->tick; i++) {
+    for (int32_t i = 0; i <= other->tick; i++) {
         ByteBuf *arena = (ByteBuf*)VA_Shift(other->arenas);
         // Maybe displace existing arena.
         VA_Store(self->arenas, i, (Obj*)arena);
