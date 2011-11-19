@@ -55,6 +55,12 @@ inert class Lucy::Test::TestUtils  {
     inert double*
     random_f64s(double *buf, size_t count);
 
+    /** Return a string with a random (legal) sequence of code points.
+     * @param length Length of the string in code points.
+     */
+    inert incremented CharBuf*
+    random_string(size_t length);
+
     /** Return a VArray of CharBufs, each representing the content for a
      * document in the shared collection.
      */

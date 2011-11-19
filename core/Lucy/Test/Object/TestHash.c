@@ -23,48 +23,6 @@
 #include "Lucy/Test/Object/TestHash.h"
 #include "Lucy/Object/Hash.h"
 
-
-uint32_t
-S_random_code_point(void) {
-    uint32_t code_point = 0;
-    while (1) {
-        uint8_t bytes = (rand() % 4) + 1;
-        switch (bytes) {
-            case 1:
-                code_point = rand() % 0x80;
-                break;
-            case 2:
-                code_point = (rand() % (0x0800  - 0x0080)) + 0x0080;
-                break;
-            case 3:
-                code_point = (rand() % (0x10000 - 0x0800)) + 0x0800;
-                break;
-            case 4: {
-                    uint64_t num = TestUtils_random_u64();
-                    code_point = (num % (0x10FFFF - 0x10000)) + 0x10000;
-                }
-        }
-        if (code_point <= 0xD7FF
-            || (code_point >= 0xE000 && code_point <= 0x10FFFF)
-           ) {
-            break;
-        }
-    }
-    return code_point;
-}
-
-static CharBuf*
-S_random_string() {
-    uint32_t len    = rand() % 1200;
-    CharBuf *string = CB_new(len * 4);
-
-    while (len--) {
-        CB_Cat_Char(string, S_random_code_point());
-    }
-
-    return string;
-}
-
 static void
 test_Equals(TestBatch *batch) {
     Hash *hash  = Hash_new(0);
@@ -252,7 +210,7 @@ test_serialization(TestBatch *batch) {
     uint32_t  i;
 
     for (i = 0; i < 10; i++) {
-        CharBuf *cb = S_random_string();
+        CharBuf *cb = TestUtils_random_string(rand() % 1200);
         Integer32 *num = Int32_new(i);
         Hash_Store(wanted, (Obj*)cb, (Obj*)num);
         Hash_Store(wanted, (Obj*)num, (Obj*)cb);
@@ -275,10 +233,10 @@ test_stress(TestBatch *batch) {
     VArray   *values;
 
     for (i = 0; i < 1000; i++) {
-        CharBuf *cb = S_random_string();
+        CharBuf *cb = TestUtils_random_string(rand() % 1200);
         while (Hash_Fetch(hash, (Obj*)cb)) {
             DECREF(cb);
-            cb = S_random_string();
+            cb = TestUtils_random_string(rand() % 1200);
         }
         Hash_Store(hash, (Obj*)cb, (Obj*)cb);
         VA_Push(expected, INCREF(cb));
