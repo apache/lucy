@@ -103,15 +103,13 @@ TextTermStepper_write_delta(TextTermStepper *self, OutStream *outstream,
 void
 TextTermStepper_read_key_frame(TextTermStepper *self, InStream *instream) {
     const uint32_t text_len = InStream_Read_C32(instream);
-    CharBuf *value;
-    char *ptr;
 
     // Allocate space.
     if (self->value == NULL) {
         self->value = (Obj*)CB_new(text_len);
     }
-    value = (CharBuf*)self->value;
-    ptr   = CB_Grow(value, text_len);
+    CharBuf *value = (CharBuf*)self->value;
+    char *ptr      = CB_Grow(value, text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr, text_len);
@@ -131,15 +129,13 @@ TextTermStepper_read_delta(TextTermStepper *self, InStream *instream) {
     const uint32_t text_overlap     = InStream_Read_C32(instream);
     const uint32_t finish_chars_len = InStream_Read_C32(instream);
     const uint32_t total_text_len   = text_overlap + finish_chars_len;
-    CharBuf *value;
-    char *ptr;
 
     // Allocate space.
     if (self->value == NULL) {
         self->value = (Obj*)CB_new(total_text_len);
     }
-    value = (CharBuf*)self->value;
-    ptr   = CB_Grow(value, total_text_len);
+    CharBuf *value = (CharBuf*)self->value;
+    char *ptr      = CB_Grow(value, total_text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr + text_overlap, finish_chars_len);

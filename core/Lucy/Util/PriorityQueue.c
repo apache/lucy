@@ -170,11 +170,10 @@ PriQ_peek(PriorityQueue *self) {
 
 static void
 S_clear(PriorityQueue *self) {
-    uint32_t i;
     Obj **elem_ptr = (self->heap + 1);
 
     // Node 0 is held empty, to make the algo clearer.
-    for (i = 1; i <= self->size; i++) {
+    for (uint32_t i = 1; i <= self->size; i++) {
         DECREF(*elem_ptr);
         *elem_ptr = NULL;
         elem_ptr++;

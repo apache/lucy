@@ -66,9 +66,8 @@ ProximityQuery_destroy(ProximityQuery *self) {
 static ProximityQuery*
 S_do_init(ProximityQuery *self, CharBuf *field, VArray *terms, float boost,
           uint32_t within) {
-    uint32_t i, max;
     Query_init((Query*)self, boost);
-    for (i = 0, max = VA_Get_Size(terms); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(terms); i < max; i++) {
         CERTIFY(VA_Fetch(terms, i), OBJ);
     }
     self->field  = field;
@@ -113,11 +112,10 @@ ProximityQuery_equals(ProximityQuery *self, Obj *other) {
 
 CharBuf*
 ProximityQuery_to_string(ProximityQuery *self) {
-    uint32_t i;
     uint32_t num_terms = VA_Get_Size(self->terms);
     CharBuf *retval = CB_Clone(self->field);
     CB_Cat_Trusted_Str(retval, ":\"", 2);
-    for (i = 0; i < num_terms; i++) {
+    for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(self->terms, i);
         CharBuf *term_string = Obj_To_String(term);
         CB_Cat(retval, term_string);
@@ -138,9 +136,8 @@ ProximityQuery_make_compiler(ProximityQuery *self, Searcher *searcher,
         // Optimize for one-term "phrases".
         Obj *term = VA_Fetch(self->terms, 0);
         TermQuery *term_query = TermQuery_new(self->field, term);
-        TermCompiler *term_compiler;
         TermQuery_Set_Boost(term_query, self->boost);
-        term_compiler
+        TermCompiler *term_compiler
             = (TermCompiler*)TermQuery_Make_Compiler(term_query, searcher,
                                                      boost, subordinate);
         DECREF(term_query);
@@ -187,7 +184,6 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
     Schema     *schema = Searcher_Get_Schema(searcher);
     Similarity *sim    = Schema_Fetch_Sim(schema, parent->field);
     VArray     *terms  = parent->terms;
-    uint32_t i, max;
 
     self->within = within;
 
@@ -199,7 +195,7 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
 
     // Store IDF for the phrase.
     self->idf = 0;
-    for (i = 0, max = VA_Get_Size(terms); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(terms); i < max; i++) {
         Obj *term = VA_Fetch(terms, i);
         int32_t doc_max  = Searcher_Doc_Max(searcher);
         int32_t doc_freq = Searcher_Doc_Freq(searcher, parent->field, term);
@@ -317,22 +313,17 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
     ProximityQuery *const parent = (ProximityQuery*)self->parent;
     VArray         *const terms  = parent->terms;
     VArray         *const spans  = VA_new(0);
-    VArray         *term_vectors;
-    BitVector      *posit_vec;
-    BitVector      *other_posit_vec;
-    uint32_t        i;
-    const uint32_t  num_terms = VA_Get_Size(terms);
-    uint32_t        num_tvs;
+    const uint32_t  num_terms    = VA_Get_Size(terms);
     UNUSED_VAR(searcher);
 
     // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
     if (!CB_Equals(field, (Obj*)parent->field)) { return spans; }
 
-    term_vectors    = VA_new(num_terms);
-    posit_vec       = BitVec_new(0);
-    other_posit_vec = BitVec_new(0);
-    for (i = 0; i < num_terms; i++) {
+    VArray      *term_vectors    = VA_new(num_terms);
+    BitVector   *posit_vec       = BitVec_new(0);
+    BitVector   *other_posit_vec = BitVec_new(0);
+    for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(terms, i);
         TermVector *term_vector
             = DocVec_Term_Vector(doc_vec, field, (CharBuf*)term);
@@ -346,19 +337,17 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
 
         if (i == 0) {
             // Set initial positions from first term.
-            uint32_t j;
             I32Array *positions = TV_Get_Positions(term_vector);
-            for (j = I32Arr_Get_Size(positions); j > 0; j--) {
+            for (uint32_t j = I32Arr_Get_Size(positions); j > 0; j--) {
                 BitVec_Set(posit_vec, I32Arr_Get(positions, j - 1));
             }
         }
         else {
             // Filter positions using logical "and".
-            uint32_t j;
             I32Array *positions = TV_Get_Positions(term_vector);
 
             BitVec_Clear_All(other_posit_vec);
-            for (j = I32Arr_Get_Size(positions); j > 0; j--) {
+            for (uint32_t j = I32Arr_Get_Size(positions); j > 0; j--) {
                 int32_t pos = I32Arr_Get(positions, j - 1) - i;
                 if (pos >= 0) {
                     BitVec_Set(other_posit_vec, pos);
@@ -369,7 +358,7 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
     }
 
     // Proceed only if all terms are present.
-    num_tvs = VA_Get_Size(term_vectors);
+    uint32_t num_tvs = VA_Get_Size(term_vectors);
     if (num_tvs == num_terms) {
         TermVector *first_tv = (TermVector*)VA_Fetch(term_vectors, 0);
         TermVector *last_tv
@@ -382,24 +371,22 @@ ProximityCompiler_highlight_spans(ProximityCompiler *self, Searcher *searcher,
         I32Array *valid_posits       = BitVec_To_Array(posit_vec);
         uint32_t  num_valid_posits   = I32Arr_Get_Size(valid_posits);
         uint32_t  j = 0;
-        uint32_t  posit_tick;
         float     weight = ProximityCompiler_Get_Weight(self);
-        i = 0;
+        uint32_t  i = 0;
 
         // Add only those starts/ends that belong to a valid position.
-        for (posit_tick = 0; posit_tick < num_valid_posits; posit_tick++) {
+        for (uint32_t posit_tick = 0; posit_tick < num_valid_posits; posit_tick++) {
             int32_t valid_start_posit = I32Arr_Get(valid_posits, posit_tick);
             int32_t valid_end_posit   = valid_start_posit + terms_max;
             int32_t start_offset = 0, end_offset = 0;
-            uint32_t max;
 
-            for (max = I32Arr_Get_Size(tv_start_positions); i < max; i++) {
+            for (uint32_t max = I32Arr_Get_Size(tv_start_positions); i < max; i++) {
                 if (I32Arr_Get(tv_start_positions, i) == valid_start_posit) {
                     start_offset = I32Arr_Get(tv_start_offsets, i);
                     break;
                 }
             }
-            for (max = I32Arr_Get_Size(tv_end_positions); j < max; j++) {
+            for (uint32_t max = I32Arr_Get_Size(tv_end_positions); j < max; j++) {
                 if (I32Arr_Get(tv_end_positions, j) == valid_end_posit) {
                     end_offset = I32Arr_Get(tv_end_offsets, j);
                     break;
