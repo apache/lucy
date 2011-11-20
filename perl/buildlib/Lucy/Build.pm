@@ -179,6 +179,7 @@ sub ACTION_charmony {
     if ( $ENV{CHARM_VALGRIND} ) {
         unshift @command, "valgrind", "--leak-check=yes";
     }
+    print join(" ", @command), $/;
 
     system(@command) and die "Failed to write $CHARMONY_PATH: $!";
 }
