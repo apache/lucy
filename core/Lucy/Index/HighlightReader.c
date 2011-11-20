@@ -56,9 +56,8 @@ PolyHLReader_new(VArray *readers, I32Array *offsets) {
 PolyHighlightReader*
 PolyHLReader_init(PolyHighlightReader *self, VArray *readers,
                   I32Array *offsets) {
-    uint32_t i, max;
     HLReader_init((HighlightReader*)self, NULL, NULL, NULL, NULL, -1);
-    for (i = 0, max = VA_Get_Size(readers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
         CERTIFY(VA_Fetch(readers, i), HIGHLIGHTREADER);
     }
     self->readers = (VArray*)INCREF(readers);
@@ -69,8 +68,7 @@ PolyHLReader_init(PolyHighlightReader *self, VArray *readers,
 void
 PolyHLReader_close(PolyHighlightReader *self) {
     if (self->readers) {
-        uint32_t i, max;
-        for (i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
+        for (uint32_t i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
             HighlightReader *sub_reader
                 = (HighlightReader*)VA_Fetch(self->readers, i);
             if (sub_reader) { HLReader_Close(sub_reader); }
@@ -112,12 +110,10 @@ DefaultHighlightReader*
 DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
                  Folder *folder, Snapshot *snapshot, VArray *segments,
                  int32_t seg_tick) {
-    Segment *segment;
-    Hash    *metadata;
     HLReader_init((HighlightReader*)self, schema, folder, snapshot,
                   segments, seg_tick);
-    segment  = DefHLReader_Get_Segment(self);
-    metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "highlight", 9);
+    Segment *segment    = DefHLReader_Get_Segment(self);
+    Hash *metadata      = (Hash*)Seg_Fetch_Metadata_Str(segment, "highlight", 9);
     if (!metadata) {
         metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "term_vectors", 12);
     }
@@ -186,14 +182,12 @@ DefHLReader_destroy(DefaultHighlightReader *self) {
 DocVector*
 DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id) {
     DocVector *doc_vec = DocVec_new();
-    int64_t file_pos;
-    uint32_t num_fields;
 
     InStream_Seek(self->ix_in, doc_id * 8);
-    file_pos = InStream_Read_I64(self->ix_in);
+    int64_t file_pos = InStream_Read_I64(self->ix_in);
     InStream_Seek(self->dat_in, file_pos);
 
-    num_fields = InStream_Read_C32(self->dat_in);
+    uint32_t num_fields = InStream_Read_C32(self->dat_in);
     while (num_fields--) {
         CharBuf *field = CB_deserialize(NULL, self->dat_in);
         ByteBuf *field_buf  = BB_deserialize(NULL, self->dat_in);

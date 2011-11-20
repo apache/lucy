@@ -63,8 +63,7 @@ PolyReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager) {
 
 static Obj*
 S_first_non_null(VArray *array) {
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(array); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
         Obj *thing = VA_Fetch(array, i);
         if (thing) { return thing; }
     }
@@ -73,7 +72,6 @@ S_first_non_null(VArray *array) {
 
 static void
 S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
-    uint32_t  i;
     uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
     int32_t *starts = (int32_t*)MALLOCATE(num_sub_readers * sizeof(int32_t));
     Hash  *data_readers = Hash_new(0);
@@ -84,7 +82,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
 
     // Accumulate doc_max, subreader start offsets, and DataReaders.
     self->doc_max = 0;
-    for (i = 0; i < num_sub_readers; i++) {
+    for (uint32_t i = 0; i < num_sub_readers; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(sub_readers, i);
         Hash *components = SegReader_Get_Components(seg_reader);
         CharBuf *api;
@@ -134,8 +132,7 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
     if (sub_readers) {
         uint32_t num_segs = VA_Get_Size(sub_readers);
         VArray *segments = VA_new(num_segs);
-        uint32_t i;
-        for (i = 0; i < num_segs; i++) {
+        for (uint32_t i = 0; i < num_segs; i++) {
             SegReader *seg_reader
                 = (SegReader*)CERTIFY(VA_Fetch(sub_readers, i), SEGREADER);
             VA_Push(segments, INCREF(SegReader_Get_Segment(seg_reader)));
@@ -159,8 +156,7 @@ void
 PolyReader_close(PolyReader *self) {
     PolyReader_close_t super_close
         = (PolyReader_close_t)SUPER_METHOD(POLYREADER, PolyReader, Close);
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(self->sub_readers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->sub_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(self->sub_readers, i);
         SegReader_Close(seg_reader);
     }
@@ -181,11 +177,9 @@ S_try_open_elements(PolyReader *self) {
     uint32_t  num_segs          = 0;
     uint64_t  latest_schema_gen = 0;
     CharBuf  *schema_file       = NULL;
-    VArray   *segments;
-    uint32_t  i, max;
 
     // Find schema file, count segments.
-    for (i = 0, max = VA_Get_Size(files); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
         CharBuf *entry = (CharBuf*)VA_Fetch(files, i);
 
         if (Seg_valid_seg_name(entry)) {
@@ -227,8 +221,8 @@ S_try_open_elements(PolyReader *self) {
         }
     }
 
-    segments = VA_new(num_segs);
-    for (i = 0, max = VA_Get_Size(files); i < max; i++) {
+    VArray *segments = VA_new(num_segs);
+    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
         CharBuf *entry = (CharBuf*)VA_Fetch(files, i);
 
         // Create a Segment for each segmeta.
@@ -279,7 +273,6 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
 
     while (1) {
         CharBuf *target_snap_file;
-        uint64_t gen;
 
         // If a Snapshot was supplied, use its file.
         if (snapshot) {
@@ -301,7 +294,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         }
 
         // Derive "generation" of this snapshot file from its name.
-        gen = IxFileNames_extract_gen(target_snap_file);
+        uint64_t gen = IxFileNames_extract_gen(target_snap_file);
 
         // Get a read lock on the most recent snapshot file if indicated.
         if (manager) {

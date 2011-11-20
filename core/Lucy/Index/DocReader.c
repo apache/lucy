@@ -50,9 +50,8 @@ PolyDocReader_new(VArray *readers, I32Array *offsets) {
 
 PolyDocReader*
 PolyDocReader_init(PolyDocReader *self, VArray *readers, I32Array *offsets) {
-    uint32_t i, max;
     DocReader_init((DocReader*)self, NULL, NULL, NULL, NULL, -1);
-    for (i = 0, max = VA_Get_Size(readers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
         CERTIFY(VA_Fetch(readers, i), DOCREADER);
     }
     self->readers = (VArray*)INCREF(readers);
@@ -63,8 +62,7 @@ PolyDocReader_init(PolyDocReader *self, VArray *readers, I32Array *offsets) {
 void
 PolyDocReader_close(PolyDocReader *self) {
     if (self->readers) {
-        uint32_t i, max;
-        for (i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
+        for (uint32_t i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
             DocReader *reader = (DocReader*)VA_Fetch(self->readers, i);
             if (reader) { DocReader_Close(reader); }
         }
@@ -183,19 +181,14 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
 void
 DefDocReader_read_record(DefaultDocReader *self, ByteBuf *buffer,
                          int32_t doc_id) {
-    int64_t  start;
-    int64_t  end;
-    size_t   size;
-    char    *buf;
-
     // Find start and length of variable length record.
     InStream_Seek(self->ix_in, (int64_t)doc_id * 8);
-    start = InStream_Read_I64(self->ix_in);
-    end   = InStream_Read_I64(self->ix_in);
-    size  = (size_t)(end - start);
+    int64_t start = InStream_Read_I64(self->ix_in);
+    int64_t end   = InStream_Read_I64(self->ix_in);
+    size_t size  = (size_t)(end - start);
 
     // Read in the record.
-    buf = BB_Grow(buffer, size);
+    char *buf = BB_Grow(buffer, size);
     InStream_Seek(self->dat_in, start);
     InStream_Read_Bytes(self->dat_in, buf, size);
     BB_Set_Size(buffer, size);

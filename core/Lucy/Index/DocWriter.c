@@ -134,18 +134,15 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
             = (DefaultDocReader*)CERTIFY(
                   SegReader_Obtain(reader, VTable_Get_Name(DOCREADER)),
                   DEFAULTDOCREADER);
-        int32_t i, max;
 
-        for (i = 1, max = SegReader_Doc_Max(reader); i <= max; i++) {
+        for (int32_t i = 1, max = SegReader_Doc_Max(reader); i <= max; i++) {
             if (I32Arr_Get(doc_map, i)) {
                 int64_t  start = OutStream_Tell(dat_out);
-                char    *buf;
-                size_t   size;
 
                 // Copy record over.
                 DefDocReader_Read_Record(doc_reader, buffer, i);
-                buf  = BB_Get_Buf(buffer);
-                size = BB_Get_Size(buffer);
+                char *buf   = BB_Get_Buf(buffer);
+                size_t size = BB_Get_Size(buffer);
                 OutStream_Write_Bytes(dat_out, buf, size);
 
                 // Write file pointer.

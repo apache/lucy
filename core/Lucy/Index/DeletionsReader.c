@@ -57,10 +57,9 @@ PolyDelReader_new(VArray *readers, I32Array *offsets) {
 PolyDeletionsReader*
 PolyDelReader_init(PolyDeletionsReader *self, VArray *readers,
                    I32Array *offsets) {
-    uint32_t i, max;
     DelReader_init((DeletionsReader*)self, NULL, NULL, NULL, NULL, -1);
     self->del_count = 0;
-    for (i = 0, max = VA_Get_Size(readers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
         DeletionsReader *reader = (DeletionsReader*)CERTIFY(
                                       VA_Fetch(readers, i), DELETIONSREADER);
         self->del_count += DelReader_Del_Count(reader);
@@ -73,8 +72,7 @@ PolyDelReader_init(PolyDeletionsReader *self, VArray *readers,
 void
 PolyDelReader_close(PolyDeletionsReader *self) {
     if (self->readers) {
-        uint32_t i, max;
-        for (i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
+        for (uint32_t i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
             DeletionsReader *reader
                 = (DeletionsReader*)VA_Fetch(self->readers, i);
             if (reader) { DelReader_Close(reader); }
@@ -101,8 +99,7 @@ PolyDelReader_iterator(PolyDeletionsReader *self) {
     if (self->del_count) {
         uint32_t num_readers = VA_Get_Size(self->readers);
         VArray *matchers = VA_new(num_readers);
-        uint32_t i;
-        for (i = 0; i < num_readers; i++) {
+        for (uint32_t i = 0; i < num_readers; i++) {
             DeletionsReader *reader
                 = (DeletionsReader*)VA_Fetch(self->readers, i);
             Matcher *matcher = DelReader_Iterator(reader);
@@ -156,12 +153,11 @@ DefDelReader_read_deletions(DefaultDeletionsReader *self) {
     CharBuf *my_seg_name = Seg_Get_Name(segment);
     CharBuf *del_file    = NULL;
     int32_t  del_count   = 0;
-    int32_t i;
 
     // Start with deletions files in the most recently added segments and work
     // backwards.  The first one we find which addresses our segment is the
     // one we need.
-    for (i = VA_Get_Size(segments) - 1; i >= 0; i--) {
+    for (int32_t i = VA_Get_Size(segments) - 1; i >= 0; i--) {
         Segment *other_seg = (Segment*)VA_Fetch(segments, i);
         Hash *metadata
             = (Hash*)Seg_Fetch_Metadata_Str(other_seg, "deletions", 9);

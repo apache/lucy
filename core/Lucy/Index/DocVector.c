@@ -85,7 +85,6 @@ DocVec_field_names(DocVector *self) {
 TermVector*
 DocVec_term_vector(DocVector *self, const CharBuf *field,
                    const CharBuf *term_text) {
-    ByteBuf *tv_buf;
     Hash *field_vector = (Hash*)Hash_Fetch(self->field_vectors, (Obj*)field);
 
     // If no cache hit, try to fill cache.
@@ -101,7 +100,7 @@ DocVec_term_vector(DocVector *self, const CharBuf *field,
     }
 
     // Get a buf for the term text or bail.
-    tv_buf = (ByteBuf*)Hash_Fetch(field_vector, (Obj*)term_text);
+    ByteBuf *tv_buf = (ByteBuf*)Hash_Fetch(field_vector, (Obj*)term_text);
     if (tv_buf == NULL) {
         return NULL;
     }
@@ -115,14 +114,11 @@ S_extract_tv_cache(ByteBuf *field_buf) {
     char    *tv_string = BB_Get_Buf(field_buf);
     int32_t  num_terms = NumUtil_decode_c32(&tv_string);
     CharBuf *text      = CB_new(0);
-    int32_t  i;
 
     // Read the number of highlightable terms in the field.
-    for (i = 0; i < num_terms; i++) {
-        char    *bookmark_ptr;
+    for (int32_t i = 0; i < num_terms; i++) {
         size_t   overlap = NumUtil_decode_c32(&tv_string);
         size_t   len     = NumUtil_decode_c32(&tv_string);
-        int32_t  num_positions;
 
         // Decompress the term text.
         CB_Set_Size(text, overlap);
@@ -130,8 +126,8 @@ S_extract_tv_cache(ByteBuf *field_buf) {
         tv_string += len;
 
         // Get positions & offsets string.
-        bookmark_ptr  = tv_string;
-        num_positions = NumUtil_decode_c32(&tv_string);
+        char *bookmark_ptr      = tv_string;
+        int32_t num_positions   = NumUtil_decode_c32(&tv_string);
         while (num_positions--) {
             // Leave nums compressed to save a little mem.
             NumUtil_skip_cint(&tv_string);
@@ -159,7 +155,6 @@ S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text,
     int32_t    *starts      = NULL;
     int32_t    *ends        = NULL;
     uint32_t    num_pos     = 0;
-    uint32_t    i;
 
     if (posdata != posdata_end) {
         num_pos   = NumUtil_decode_c32(&posdata);
@@ -169,7 +164,7 @@ S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text,
     }
 
     // Expand C32s.
-    for (i = 0; i < num_pos; i++) {
+    for (uint32_t i = 0; i < num_pos; i++) {
         positions[i] = NumUtil_decode_c32(&posdata);
         starts[i]    = NumUtil_decode_c32(&posdata);
         ends[i]      = NumUtil_decode_c32(&posdata);

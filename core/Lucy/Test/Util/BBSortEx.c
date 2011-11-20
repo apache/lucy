@@ -76,18 +76,16 @@ BBSortEx_flush(BBSortEx *self) {
     uint32_t     cache_count = self->cache_max - self->cache_tick;
     Obj        **cache = (Obj**)self->cache;
     VArray      *elems;
-    BBSortEx    *run;
-    uint32_t     i;
 
     if (!cache_count) { return; }
     else              { elems = VA_new(cache_count); }
 
     // Sort, then create a new run.
     BBSortEx_Sort_Cache(self);
-    for (i = self->cache_tick; i < self->cache_max; i++) {
+    for (uint32_t i = self->cache_tick; i < self->cache_max; i++) {
         VA_Push(elems, cache[i]);
     }
-    run = BBSortEx_new(0, elems);
+    BBSortEx *run = BBSortEx_new(0, elems);
     DECREF(elems);
     BBSortEx_Add_Run(self, (SortExternal*)run);
 
@@ -137,7 +135,6 @@ BBSortEx_refill(BBSortEx *self) {
 
 void
 BBSortEx_flip(BBSortEx *self) {
-    uint32_t i;
     uint32_t run_mem_thresh = 65536;
 
     BBSortEx_Flush(self);
@@ -151,7 +148,7 @@ BBSortEx_flip(BBSortEx *self) {
         }
     }
 
-    for (i = 0; i < num_runs; i++) {
+    for (uint32_t i = 0; i < num_runs; i++) {
         BBSortEx *run = (BBSortEx*)VA_Fetch(self->runs, i);
         BBSortEx_Set_Mem_Thresh(run, run_mem_thresh);
     }
