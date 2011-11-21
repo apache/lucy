@@ -122,6 +122,8 @@ my $SNOWSTEM_SRC_DIR
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
 my $SNOWSTOP_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstop source ) );
+my $UTF8PROC_SRC_DIR = catdir( $base_dir, qw( modules unicode utf8proc ) );
+my $UTF8PROC_C = catfile( $UTF8PROC_SRC_DIR, 'utf8proc.c' );
 my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
 my $CLOWNFISH_DIR   = catdir( $base_dir, 'clownfish' );
 my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
@@ -508,7 +510,7 @@ sub ACTION_compile_custom_xs {
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
         getcwd(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
-        $SNOWSTEM_INC_DIR
+        $SNOWSTEM_INC_DIR, $UTF8PROC_SRC_DIR
     );
     my @objects;
 
@@ -519,6 +521,7 @@ sub ACTION_compile_custom_xs {
     push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,      qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR, qr/\.c$/ ) };
     push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR, qr/\.c$/ ) };
+    push @$c_files, $UTF8PROC_C;
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
