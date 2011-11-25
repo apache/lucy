@@ -91,16 +91,16 @@ sub serve {
             else {
                 my $client_sock = $readhandle;
                 my ( $check_val, $buf, $len );
-                $check_val = $client_sock->sysread( $buf, 4 );
+                $check_val = $client_sock->read( $buf, 4 );
                 if ( $check_val == 0 ) {
-                    # If sysread returns 0, socket has been closed cleanly at
+                    # If read returns 0, socket has been closed cleanly at
                     # the other end.
                     $read_set->remove($client_sock);
                     next;
                 }
                 confess $! unless $check_val == 4;
                 $len = unpack( 'N', $buf );
-                $check_val = $client_sock->sysread( $buf, $len );
+                $check_val = $client_sock->read( $buf, $len );
                 confess $! unless $check_val == $len;
                 my $args = eval { thaw($buf) };
                 confess $@ if $@;
@@ -119,8 +119,8 @@ sub serve {
                 my $response   = $dispatch{$method}->( $self, $args );
                 my $frozen     = nfreeze($response);
                 my $packed_len = pack( 'N', length($frozen) );
-                $check_val = $client_sock->syswrite("$packed_len$frozen");
-                confess $! unless $check_val == length($frozen) + 4;
+                print $client_sock "$packed_len$frozen"
+                    or confess $!;
 
                 # Remote signal to close the server.
                 if ( $method eq 'terminate' ) {

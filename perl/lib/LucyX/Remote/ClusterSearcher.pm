@@ -53,8 +53,9 @@ sub new {
         my $sock = IO::Socket::INET->new(
             PeerAddr => $shard,
             Proto    => 'tcp',
-            Blocking => 0,
+            # Blocking => 0,
         );
+        $sock->autoflush(1);
         confess("No socket: $!") unless $sock;
         push @$socks, $sock;
     }
@@ -114,6 +115,7 @@ sub _multi_rpc {
     return if $args->{_action} eq 'done';
     return if $args->{_action} eq 'terminate';
 
+=begin disabled
     my @responses;
     my $remaining = $num_shards;
     my $select    = $select{$$self};
@@ -126,6 +128,12 @@ sub _multi_rpc {
             $responses[$shard_num] = $response->{retval};
             $remaining--;
         }
+    }
+=cut
+    my @responses;
+    for ( my $i = 0; $i < $num_shards; $i++ ) {
+        my $response  = $self->_retrieve_response_from_shard($i);
+        $responses[$i] = $response->{retval};
     }
     return \@responses;
 }
@@ -153,8 +161,11 @@ sub _serialize_request {
 sub _send_request_to_shard {
     my ( $self, $shard_num, $request ) = @_;
     my $sock      = $socks{$$self}[$shard_num];
+    print $sock $$request or confess $!;
+=begin disabled
     my $check_val = $sock->syswrite($$request);
     confess $! unless $check_val == length($$request);
+=cut
 }
 
 # Retrieve the response from a shard.
@@ -163,6 +174,12 @@ sub _retrieve_response_from_shard {
     my $sock = $socks{$$self}[$shard_num];
     my $packed_len = "";
     my $serialized = "";
+    my $check_val = $sock->read( $packed_len, 4 );
+    confess $! unless $check_val == 4;
+    my $arg_len = unpack( 'N', $packed_len );
+    $check_val = $sock->read( $serialized, $arg_len );
+    confess $! unless $check_val == $arg_len;
+=begin disabled
     my $check_val;
     $! = undef;
     while (1) {
@@ -184,6 +201,7 @@ sub _retrieve_response_from_shard {
     my $arg_len = unpack( 'N', $packed_len );
     $check_val = $sock->sysread( $serialized, $arg_len );
     confess $! unless $check_val == $arg_len;
+=cut
     return thaw($serialized);
 }
 
