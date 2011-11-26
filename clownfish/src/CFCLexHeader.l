@@ -32,6 +32,7 @@
 %option noyywrap
 %option nodefault
 %option yylineno
+%option never-interactive
 
 %x CBLOCK
 
