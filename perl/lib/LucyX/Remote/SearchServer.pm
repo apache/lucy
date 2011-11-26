@@ -137,7 +137,15 @@ sub serve {
 
 sub do_handshake {
     my ( $self, $args ) = @_;
-    return { retval => $password{$$self} eq $args->{password} };
+    my $retval = 1;
+    if ( defined $password{$$self} ) {
+        if ( !defined $args->{password}
+            || $password{$$self} ne $args->{password} )
+        {
+            $retval = 0;
+        }
+    }
+    return { retval => $retval };
 }
 
 sub do_terminate {
@@ -188,8 +196,7 @@ LucyX::Remote::SearchServer - Make a Searcher remotely accessible.
     );
     my $search_server = LucyX::Remote::SearchServer->new(
         searcher => $searcher,
-        port       => 7890,
-        password   => $pass,
+        port     => 7890,
     );
     $search_server->serve;
 
@@ -210,8 +217,8 @@ across multiple nodes, each with its own, smaller index.
 
     my $search_server = LucyX::Remote::SearchServer->new(
         searcher => $searcher, # required
-        port       => 7890,      # required
-        password   => $pass,     # required
+        port     => 7890,      # required
+        password => $pass,     # optional
     );
 
 Constructor.  Takes hash-style parameters.
@@ -229,7 +236,8 @@ B<port> - the port on localhost that the server should open and listen on.
 
 =item *
 
-B<password> - a password which must be supplied by clients.
+B<password> - an optional password which, if supplied, must also be supplied
+by clients.
 
 =back
 
