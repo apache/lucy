@@ -18,10 +18,6 @@
     #include "CFC.h"
     #include "CFCParseHeader.h"
 
-    void
-    CFCParseHeader(void *header_parser, int token_type, char *value,
-                   CFCParser *state);
-
     /* Dupe yytext and invoke Lemon-generated parser. */
     #define PARSE(token_type) \
         CFCParseHeader(CFCParser_current_parser, token_type, \

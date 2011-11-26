@@ -676,17 +676,13 @@ char *yytext;
     #include "CFC.h"
     #include "CFCParseHeader.h"
 
-    void
-    CFCParseHeader(void *header_parser, int token_type, char *value,
-                   CFCParser *state);
-
     /* Dupe yytext and invoke Lemon-generated parser. */
     #define PARSE(token_type) \
         CFCParseHeader(CFCParser_current_parser, token_type, \
 			CFCParser_dupe(CFCParser_current_state, yytext), \
 			CFCParser_current_state)
 
-#line 690 "src/CFCLexHeader.c"
+#line 686 "src/CFCLexHeader.c"
 
 #define INITIAL 0
 #define CBLOCK 1
@@ -866,9 +862,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 39 "src/CFCLexHeader.l"
+#line 35 "src/CFCLexHeader.l"
 
-#line 872 "src/CFCLexHeader.c"
+#line 868 "src/CFCLexHeader.c"
 
 	if ( !(yy_init) )
 		{
@@ -959,325 +955,325 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 40 "src/CFCLexHeader.l"
+#line 36 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_CONST); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 41 "src/CFCLexHeader.l"
+#line 37 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_NULLABLE); } 
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 42 "src/CFCLexHeader.l"
+#line 38 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INCREMENTED); } 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 43 "src/CFCLexHeader.l"
+#line 39 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_DECREMENTED); } 
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 45 "src/CFCLexHeader.l"
+#line 41 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_VOID); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 46 "src/CFCLexHeader.l"
+#line 42 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_FLOAT_TYPE_NAME); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 47 "src/CFCLexHeader.l"
+#line 43 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_FLOAT_TYPE_NAME); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 48 "src/CFCLexHeader.l"
+#line 44 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 49 "src/CFCLexHeader.l"
+#line 45 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 50 "src/CFCLexHeader.l"
+#line 46 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 51 "src/CFCLexHeader.l"
+#line 47 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 52 "src/CFCLexHeader.l"
+#line 48 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 53 "src/CFCLexHeader.l"
+#line 49 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 54 "src/CFCLexHeader.l"
+#line 50 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 55 "src/CFCLexHeader.l"
+#line 51 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 56 "src/CFCLexHeader.l"
+#line 52 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 57 "src/CFCLexHeader.l"
+#line 53 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 58 "src/CFCLexHeader.l"
+#line 54 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 59 "src/CFCLexHeader.l"
+#line 55 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 60 "src/CFCLexHeader.l"
+#line 56 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 61 "src/CFCLexHeader.l"
+#line 57 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 62 "src/CFCLexHeader.l"
+#line 58 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_VA_LIST); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 63 "src/CFCLexHeader.l"
+#line 59 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_TRUE); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 64 "src/CFCLexHeader.l"
+#line 60 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_FALSE); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 65 "src/CFCLexHeader.l"
+#line 61 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_NULL); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 66 "src/CFCLexHeader.l"
+#line 62 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_CNICK); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 67 "src/CFCLexHeader.l"
+#line 63 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INHERITS); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 68 "src/CFCLexHeader.l"
+#line 64 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_PARCEL); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 69 "src/CFCLexHeader.l"
+#line 65 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_CLASS); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 70 "src/CFCLexHeader.l"
+#line 66 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_PUBLIC); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 71 "src/CFCLexHeader.l"
+#line 67 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_PRIVATE); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 72 "src/CFCLexHeader.l"
+#line 68 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_LOCAL); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 73 "src/CFCLexHeader.l"
+#line 69 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INERT); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 74 "src/CFCLexHeader.l"
+#line 70 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INLINE); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 75 "src/CFCLexHeader.l"
+#line 71 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_ABSTRACT); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 76 "src/CFCLexHeader.l"
+#line 72 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_FINAL); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 78 "src/CFCLexHeader.l"
+#line 74 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_SCOPE_OP); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 79 "src/CFCLexHeader.l"
+#line 75 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_ASTERISK); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 80 "src/CFCLexHeader.l"
+#line 76 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_LEFT_CURLY_BRACE); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 81 "src/CFCLexHeader.l"
+#line 77 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_RIGHT_CURLY_BRACE); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 82 "src/CFCLexHeader.l"
+#line 78 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_LEFT_SQUARE_BRACKET); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 83 "src/CFCLexHeader.l"
+#line 79 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_RIGHT_SQUARE_BRACKET); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 84 "src/CFCLexHeader.l"
+#line 80 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_LEFT_PAREN); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 85 "src/CFCLexHeader.l"
+#line 81 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_RIGHT_PAREN); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 86 "src/CFCLexHeader.l"
+#line 82 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_ELLIPSIS); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 87 "src/CFCLexHeader.l"
+#line 83 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_COMMA); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 88 "src/CFCLexHeader.l"
+#line 84 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_SEMICOLON); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 89 "src/CFCLexHeader.l"
+#line 85 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_COLON); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 90 "src/CFCLexHeader.l"
+#line 86 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_EQUALS); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 92 "src/CFCLexHeader.l"
+#line 88 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_HEX_LITERAL); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 93 "src/CFCLexHeader.l"
+#line 89 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_FLOAT_LITERAL); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 94 "src/CFCLexHeader.l"
+#line 90 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_LITERAL); }
 	YY_BREAK
 case 53:
 /* rule 53 can match eol */
 YY_RULE_SETUP
-#line 95 "src/CFCLexHeader.l"
+#line 91 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_STRING_LITERAL); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 97 "src/CFCLexHeader.l"
+#line 93 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_IDENTIFIER); }
 	YY_BREAK
 case 55:
 /* rule 55 can match eol */
 YY_RULE_SETUP
-#line 99 "src/CFCLexHeader.l"
+#line 95 "src/CFCLexHeader.l"
 { BEGIN(CBLOCK);  PARSE(CFC_TOKENTYPE_CBLOCK_START); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 100 "src/CFCLexHeader.l"
+#line 96 "src/CFCLexHeader.l"
 { BEGIN(INITIAL); PARSE(CFC_TOKENTYPE_CBLOCK_CLOSE); }
 	YY_BREAK
 case 57:
 /* rule 57 can match eol */
 YY_RULE_SETUP
-#line 101 "src/CFCLexHeader.l"
+#line 97 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_BLOB); }
 	YY_BREAK
 case 58:
 /* rule 58 can match eol */
 YY_RULE_SETUP
-#line 102 "src/CFCLexHeader.l"
+#line 98 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_BLOB); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 103 "src/CFCLexHeader.l"
+#line 99 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_BLOB); }
 	YY_BREAK
 /* Parse docucomments, but skip ordinary comments */
 case 60:
 /* rule 60 can match eol */
 YY_RULE_SETUP
-#line 106 "src/CFCLexHeader.l"
+#line 102 "src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_DOCUCOMMENT); }
 	YY_BREAK
 case 61:
 /* rule 61 can match eol */
 YY_RULE_SETUP
-#line 107 "src/CFCLexHeader.l"
+#line 103 "src/CFCLexHeader.l"
 
 	YY_BREAK
 case 62:
 /* rule 62 can match eol */
 YY_RULE_SETUP
-#line 109 "src/CFCLexHeader.l"
+#line 105 "src/CFCLexHeader.l"
 /* Skip whitespace. */
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 110 "src/CFCLexHeader.l"
+#line 106 "src/CFCLexHeader.l"
 { 
                 printf("Bad input character '%s' at line %d\n", yytext, yylineno);
                 yyterminate();
@@ -1285,15 +1281,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(CBLOCK):
-#line 114 "src/CFCLexHeader.l"
+#line 110 "src/CFCLexHeader.l"
 { yyterminate(); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 115 "src/CFCLexHeader.l"
+#line 111 "src/CFCLexHeader.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1297 "src/CFCLexHeader.c"
+#line 1293 "src/CFCLexHeader.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2298,7 +2294,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 115 "src/CFCLexHeader.l"
+#line 111 "src/CFCLexHeader.l"
 
 
 
