@@ -275,7 +275,7 @@ CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, CFCFunction *func,
     else if (num_vars == 2) {
         // Kill self param.
         const char *name_list = CFCParamList_name_list(param_list);
-        char *after_comma = strchr(name_list, ',') + 1;
+        const char *after_comma = strchr(name_list, ',') + 1;
         while (isspace(*after_comma)) { after_comma++; }
         pod = CFCUtil_cat(pod, "(", after_comma, ")\n\n", NULL);
     }

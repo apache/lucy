@@ -55,7 +55,7 @@ CFCPerlConstructor_init(CFCPerlConstructor *self, CFCClass *klass,
     CFCUTIL_NULL_CHECK(alias);
     char *real_alias = CFCUtil_strdup(alias);
     char *init_func_name;
-    char *alias_end = strchr(alias, '|');
+    const char *alias_end = strchr(alias, '|');
     if (alias_end) {
         size_t alias_len = alias_end - alias;
         real_alias[alias_len] = '\0';

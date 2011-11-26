@@ -121,7 +121,7 @@ CFCParser_parse_file(CFCParser *self, const char *string,
 char*
 CFCParser_dupe(CFCParser *self, const char *string) {
     size_t len = strlen(string);
-    char *dupe = CFCMemPool_allocate(self->pool, len + 1);
+    char *dupe = (char*)CFCMemPool_allocate(self->pool, len + 1);
     memcpy(dupe, string, len + 1);
     return dupe;
 }
