@@ -38,7 +38,7 @@
     switch (ix) {
 
 #define END_SET_OR_GET_SWITCH \
-        default: croak("Internal error. ix: %d", ix); \
+        default: croak("Internal error. ix: %d", (int)ix); \
     } \
     if (ix % 2 == 0) { \
         XPUSHs(sv_2mortal(retval)); \
@@ -627,7 +627,7 @@ CODE:
             CFCFile_cfh_path(self, buf, buf_size, base_dir);
             break;
         default:
-            croak("unexpected ix value: %d", ix);
+            croak("unexpected ix value: %d", (int)ix);
     }
     SvCUR_set(RETVAL, strlen(buf));
 }
@@ -867,7 +867,7 @@ CODE:
         case 3:
             size = CFCMethod_full_offset_sym(self, invoker, NULL, 0);
             break;
-        default: croak("Unexpected ix: %d", ix);
+        default: croak("Unexpected ix: %d", (int)ix);
     }
     RETVAL = newSV(size);
     SvPOK_on(RETVAL);
@@ -882,7 +882,7 @@ CODE:
         case 3:
             CFCMethod_full_offset_sym(self, invoker, buf, size);
             break;
-        default: croak("Unexpected ix: %d", ix);
+        default: croak("Unexpected ix: %d", (int)ix);
     }
     SvCUR_set(RETVAL, strlen(buf));
 OUTPUT: RETVAL

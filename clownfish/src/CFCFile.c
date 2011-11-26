@@ -165,7 +165,8 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
         croak("ext cannot be more than 4 characters.");
     }
     if (needed > buf_size) {
-        croak("Need buf_size of %lu, but got %lu", needed, buf_size);
+        croak("Need buf_size of %lu, but got %lu", (unsigned long)needed,
+              (unsigned long)buf_size);
     }
     if (base_dir) {
         sprintf(buf, "%s" CFCUTIL_PATH_SEP "%s%s", base_dir, self->path_part,

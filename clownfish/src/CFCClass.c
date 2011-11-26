@@ -395,7 +395,7 @@ void
 CFCClass_add_attribute(CFCClass *self, const char *name, const char *value) {
     if (!name || !strlen(name)) { croak("'name' is required"); }
     if (CFCClass_has_attribute(self, name)) {
-        croak("Attribute '%s' already registered");
+        croak("Attribute '%s' already registered", name);
     }
     CFCClassAttribute *attribute
         = (CFCClassAttribute*)MALLOCATE(sizeof(CFCClassAttribute));

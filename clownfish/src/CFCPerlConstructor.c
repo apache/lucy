@@ -101,7 +101,6 @@ CFCPerlConstructor_xsub_def(CFCPerlConstructor *self) {
     const char *c_name = self->sub.c_name;
     CFCParamList *param_list = self->sub.param_list;
     const char   *name_list  = CFCParamList_name_list(param_list);
-    const char  **arg_inits  = CFCParamList_get_initial_values(param_list);
     CFCVariable **arg_vars   = CFCParamList_get_variables(param_list);
     const char   *func_sym   = CFCFunction_full_func_sym(self->init_func);
     char *allot_params = CFCPerlSub_build_allot_params((CFCPerlSub*)self);
