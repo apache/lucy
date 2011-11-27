@@ -60,6 +60,7 @@ sub extra_ccflags {
     # Compile as C++ under MSVC.  Turn off stupid warnings, too.
     if ( $self->config('cc') =~ /^cl\b/ ) {
         $extra_ccflags .= '/TP -D_CRT_SECURE_NO_WARNINGS ';
+        $extra_ccflags .= '-D_SCL_SECURE_NO_WARNINGS ';
     }
 
     if ( defined $gcc_version ) {

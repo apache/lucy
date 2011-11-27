@@ -231,12 +231,14 @@ BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
 
 sub new {
     my $class = shift;
+    my $flags = '-nologo -D_CRT_SECURE_NO_WARNINGS '
+        . '-D_SCL_SECURE_NO_WARNINGS';
     return $class->SUPER::new(
         filename     => 'Makefile.MSVC',
         obj_ext      => '.obj',
         exe_ext      => '.exe',
         cc           => 'cl',
-        extra_cflags => '-nologo -D_CRT_SECURE_NO_WARNINGS',
+        extra_cflags => $flags,
         extra_clean  => '*.pdb',
         @_
     );

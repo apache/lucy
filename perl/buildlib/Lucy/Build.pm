@@ -93,7 +93,7 @@ sub extra_ccflags {
     }
     elsif ( $self->config('cc') =~ /^cl\b/ ) {
         # Compile as C++ under MSVC.
-        return '/TP ';
+        return '/TP -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS ';
     }
 }
 
