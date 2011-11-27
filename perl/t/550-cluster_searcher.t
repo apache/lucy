@@ -37,7 +37,9 @@ use Lucy::Analysis::RegexTokenizer;
 sub new {
     my $self       = shift->SUPER::new(@_);
     my $plain_type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::RegexTokenizer->new );
+        analyzer      => Lucy::Analysis::RegexTokenizer->new,
+        highlightable => 1,
+    );
     my $num_type = Lucy::Plan::Int32Type->new( sortable => 1, indexed => 0 );
     my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
     $self->spec_field( name => 'content', type => $plain_type );
@@ -96,7 +98,7 @@ my $test_client_sock = IO::Socket::INET->new(
     Proto    => 'tcp',
 );
 if ($test_client_sock) {
-    plan( tests => 9 );
+    plan( tests => 10 );
     undef $test_client_sock;
 }
 else {
@@ -131,11 +133,26 @@ my $cluster_searcher = LucyX::Remote::ClusterSearcher->new(
 $hits = $cluster_searcher->hits( query => 'b' );
 is( $hits->total_hits, scalar @ports, "matched hits across multiple shards" );
 
-my %expected = map { ( "x b $_" => 1 ) } @ports;
-my %results;
-$results{ $_->{content} } = 1 while $_ = $hits->next();
+my $highlighter = Lucy::Highlight::Highlighter->new(
+    searcher => $cluster_searcher,
+    query    => 'b',
+    field    => 'content',
+);
 
-is_deeply( \%results, \%expected, "docs fetched from multiple shards" );
+my %content_expected = map { ( "x b $_" => 1 ) } @ports;
+my %highlight_expected = map { ( "x <strong>b</strong> $_" => 1 ) } @ports;
+my %content_results;
+my %highlight_results;
+while ( my $hit = $hits->next ) {
+    $content_results{ $hit->{content} } = 1;
+    my $excerpt = $highlighter->create_excerpt($hit);
+    $highlight_results{$excerpt} = 1;
+}
+
+is_deeply( \%content_results, \%content_expected,
+    "docs fetched from multiple shards" );
+is_deeply( \%highlight_results, \%highlight_expected,
+    "highlighting across multiple shards" );
 
 my $sort_spec = Lucy::Search::SortSpec->new(
     rules => [

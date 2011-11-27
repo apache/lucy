@@ -268,7 +268,9 @@ sub fetch_doc {
     my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
     my $start  = $starts->get($tick);
     my %args   = ( doc_id => $doc_id - $start, _action => 'fetch_doc' );
-    return $self->_single_rpc( \%args, $tick );
+    my $hit_doc = $self->_single_rpc( \%args, $tick );
+    $hit_doc->set_doc_id($doc_id);
+    return $hit_doc;
 }
 
 sub fetch_doc_vec {
