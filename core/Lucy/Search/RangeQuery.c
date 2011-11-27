@@ -163,7 +163,7 @@ RangeQuery_make_compiler(RangeQuery *self, Searcher *searcher,
     if (!subordinate) {
         RangeCompiler_Normalize(compiler);
     }   
-    return (Compiler*)compiler;
+    return compiler;
 }
 
 /**********************************************************************/

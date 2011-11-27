@@ -27,8 +27,8 @@
 #define TRAIL_OK(n) (n >= 0x80 && n <= 0xBF)
 static bool_t
 S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
-	const uint8_t *string = maybe_utf8;
-	const uint8_t *const end = maybe_utf8 + size;
+	const uint8_t *string = (const uint8_t*)maybe_utf8;
+	const uint8_t *const end = string + size;
     while (string < end) {
         int count = StrHelp_UTF8_COUNT[*string];
         bool_t valid = false;
