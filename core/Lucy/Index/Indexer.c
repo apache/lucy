@@ -488,18 +488,20 @@ Indexer_prepare_commit(Indexer *self) {
         Folder   *folder   = self->folder;
         Schema   *schema   = self->schema;
         Snapshot *snapshot = self->snapshot;
-        CharBuf  *old_schema_name = S_find_schema_file(snapshot);
-        uint64_t  schema_gen = old_schema_name
-                               ? IxFileNames_extract_gen(old_schema_name) + 1
-                               : 1;
-        char      base36[StrHelp_MAX_BASE36_BYTES];
 
+        // Derive snapshot and schema file names.
+        DECREF(self->snapfile);
+        self->snapfile = IxManager_Make_Snapshot_Filename(self->manager);
+        CB_Cat_Trusted_Str(self->snapfile, ".temp", 5);
+        uint64_t schema_gen = IxFileNames_extract_gen(self->snapfile);
+        char base36[StrHelp_MAX_BASE36_BYTES];
         StrHelp_to_base36(schema_gen, &base36);
         CharBuf *new_schema_name = CB_newf("schema_%s.json", base36);
 
         // Finish the segment, write schema file.
         SegWriter_Finish(self->seg_writer);
         Schema_Write(schema, folder, new_schema_name);
+        CharBuf *old_schema_name = S_find_schema_file(snapshot);
         if (old_schema_name) {
             Snapshot_Delete_Entry(snapshot, old_schema_name);
         }
@@ -507,9 +509,6 @@ Indexer_prepare_commit(Indexer *self) {
         DECREF(new_schema_name);
 
         // Write temporary snapshot file.
-        DECREF(self->snapfile);
-        self->snapfile = IxManager_Make_Snapshot_Filename(self->manager);
-        CB_Cat_Trusted_Str(self->snapfile, ".temp", 5);
         Folder_Delete(folder, self->snapfile);
         Snapshot_Write_File(snapshot, folder, self->snapfile);
 
