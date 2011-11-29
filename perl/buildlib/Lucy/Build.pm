@@ -604,7 +604,7 @@ sub ACTION_compile_custom_xs {
     my $lib_file = catfile( $archdir, "Lucy.$Config{dlext}" );
     if ( !$self->up_to_date( [ @objects, $AUTOGEN_DIR ], $lib_file ) ) {
         # TODO: use Charmonizer to determine whether pthreads are userland.
-        my $link_flags = $Config{osname} =~ /openbsd/i ? '-pthread ' : '';
+        my $link_flags = $Config{osname} =~ /openbsd/i ? '-lpthread ' : '';
         $cbuilder->link(
             module_name        => 'Lucy',
             objects            => \@objects,
