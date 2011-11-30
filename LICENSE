@@ -300,3 +300,10 @@ for all bundled materials associated with utf8proc:
     registered in some jurisdictions. All other trademarks and registered
     trademarks mentioned herein are the property of their respective owners.
 
+This product bundles the Lemon parser generator from the SQLite project,
+hich has been released into the public domain by its authors as explained at
+<http://www.sqlite.org/copyright.html>.
+
+This product bundles the text of the Constitution of the United States of
+America, which is in the public domain.
+
