@@ -9,6 +9,7 @@ lib/Lucy.pod
 lib/Lucy/Analysis/Analyzer.pm
 lib/Lucy/Analysis/CaseFolder.pm
 lib/Lucy/Analysis/Inversion.pm
+lib/Lucy/Analysis/Normalizer.pm
 lib/Lucy/Analysis/PolyAnalyzer.pm
 lib/Lucy/Analysis/RegexTokenizer.pm
 lib/Lucy/Analysis/SnowballStemmer.pm

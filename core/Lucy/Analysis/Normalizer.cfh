@@ -1,0 +1,62 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Unicode normalization, case folding and accent stripping
+ *
+ * Normalizer is an L<Analyzer|Lucy::Analysis::Analyzer> which normalizes
+ * tokens to one of the Unicode normalization forms. Optionally, it
+ * performs Unicode case folding and converts accented characters to their
+ * base character.
+ *
+ * If you use highlighting, Normalizer should be run after tokenization
+ * because it might add or remove characters.
+ */
+
+class Lucy::Analysis::Normalizer
+    inherits Lucy::Analysis::Analyzer : dumpable {
+
+    int options;
+
+    inert incremented Normalizer*
+    new(const CharBuf *normalization_form = NULL, bool_t case_fold = true,
+        bool_t strip_accents = false);
+
+    /**
+     * @param normalization_form Unicode normalization form, can be one of
+     * 'NFC', 'NFKC', 'NFD', 'NFKD'. Defaults to 'NFKC'.
+     * @param case_fold Perform case folding, default is true.
+     * @param strip_accents Strip accents, default is false.
+     */
+    public inert Normalizer*
+    init(Normalizer *self, const CharBuf *normalization_form = NULL,
+        bool_t case_fold = true, bool_t strip_accents = false);
+
+    public incremented Inversion*
+    Transform(Normalizer *self, Inversion *inversion);
+
+    public incremented Hash*
+    Dump(Normalizer *self);
+
+    public incremented Normalizer*
+    Load(Normalizer *self, Obj *dump);
+
+    public bool_t
+    Equals(Normalizer *self, Obj *other);
+}
+
+

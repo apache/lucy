@@ -72,6 +72,9 @@ PPCODE:
     else if (strEQ(package, "TestSnowStemmer")) {
         lucy_TestSnowStemmer_run_tests();
     }
+    else if (strEQ(package, "TestNormalizer")) {
+        lucy_TestNormalizer_run_tests();
+    }
     else if (strEQ(package, "TestRegexTokenizer")) {
         lucy_TestRegexTokenizer_run_tests();
     }

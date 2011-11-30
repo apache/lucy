@@ -1,0 +1,64 @@
+[
+    {
+        "normalization_form" : "NFKC",
+        "case_fold" : true,
+        "strip_accents" : false,
+        "words" : [
+            "Weißbier",
+            "ⒶⒷⒸ",
+            "ⅯⅯⅪ",
+            "naïveté"
+        ],
+        "norms" : [
+            "weissbier",
+            "abc",
+            "mmxi",
+            "naïveté"
+        ]
+    },
+    {
+        "normalization_form" : "NFKC",
+        "case_fold" : false,
+        "strip_accents" : false,
+        "words" : [
+            "Weißbier",
+            "ⒶⒷⒸ",
+            "ⅯⅯⅪ",
+            "naïveté"
+        ],
+        "norms" : [
+            "Weißbier",
+            "ABC",
+            "MMXI",
+            "naïveté"
+        ]
+    },
+    {
+        "normalization_form" : "NFC",
+        "case_fold" : true,
+        "strip_accents" : false,
+        "words" : [
+            "Weißbier",
+            "ⒶⒷⒸ",
+            "naïveté"
+        ],
+        "norms" : [
+            "weissbier",
+            "ⓐⓑⓒ",
+            "naïveté"
+        ]
+    },
+    {
+        "normalization_form" : "NFKC",
+        "case_fold" : true,
+        "strip_accents" : true,
+        "words" : [
+            "Tümpel",
+            "naïveté"
+        ],
+        "norms" : [
+            "tumpel",
+            "naivete"
+        ]
+    }
+]
