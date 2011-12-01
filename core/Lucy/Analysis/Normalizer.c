@@ -25,7 +25,7 @@
 
 #include "utf8proc.h"
 
-#define BUFSIZE 64
+#define INITIAL_BUFSIZE 63
 
 Normalizer*
 Normalizer_new(const CharBuf *form, bool_t case_fold, bool_t strip_accents) {
@@ -66,27 +66,27 @@ Normalizer_init(Normalizer *self, const CharBuf *form, bool_t case_fold,
 
 Inversion*
 Normalizer_transform(Normalizer *self, Inversion *inversion) {
-    int32_t static_buffer[BUFSIZE];
+    // allocate additional space because utf8proc_reencode adds a
+    // terminating null char
+    int32_t static_buffer[INITIAL_BUFSIZE+1];
     int32_t *buffer = static_buffer;
-    ssize_t bufsize = BUFSIZE;
+    ssize_t bufsize = INITIAL_BUFSIZE;
     Token *token;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        // leave space at the end of buffer because utf8proc_reencode
-        // adds a terminating null char
         ssize_t len = utf8proc_decompose(token->text, token->len, buffer,
-                                         bufsize - 1, self->options);
+                                         bufsize, self->options);
 
         if (len > bufsize) {
             // buffer too small, (re)allocate
             if (buffer != static_buffer) {
                 FREEMEM(buffer);
             }
-            // allocate additional BUFSIZE items
-            bufsize = len + BUFSIZE;
-            buffer = (int32_t*)MALLOCATE(bufsize * sizeof(int32_t));
+            // allocate additional INITIAL_BUFSIZE items
+            bufsize = len + INITIAL_BUFSIZE;
+            buffer = (int32_t*)MALLOCATE((bufsize + 1) * sizeof(int32_t));
             len = utf8proc_decompose(token->text, token->len, buffer,
-                                     bufsize - 1, self->options);
+                                     bufsize, self->options);
         }
         if (len < 0) {
             continue;
