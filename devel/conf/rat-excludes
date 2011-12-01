@@ -49,7 +49,12 @@ modules/analysis/snowstem/source/test/tests.json
 modules/analysis/snowstop/source/snowball_stoplists.c
 
 # The Unicode license as applied to utf8proc was dealt with in LEGAL-110.
-modules/analysis/unicode/utf8proc/utf8proc_data.c
+modules/unicode/utf8proc/utf8proc_data.c
+
+# For whatever reason, RAT does not recognize the MIT license of utf8proc.h
+# and utf8proc.c.
+modules/unicode/utf8proc/utf8proc.h
+modules/unicode/utf8proc/utf8proc.c
 
 # The text of the US constitution is in the public domain.
 perl/sample/us_constitution/*.txt
