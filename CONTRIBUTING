@@ -1,0 +1,88 @@
+===========================
+Contributing to Apache Lucy
+==========================
+
+MAKE A PLAN:
+
+  If you're looking for something to work on, see the STATUS file for a list
+  of development priorities that the Lucy community has already built
+  consensus around.
+
+  If you propose to make non-trivial changes to Lucy, especially changes to
+  the public API, send a note to the Lucy developer's list describing your
+  plans:
+
+    http://incubator.apache.org/lucy/mailing_lists.html
+  
+GET THE CODE:
+
+  Lucy's codebase is housed in a Subversion repository.  Run this command to
+  check out the mainline:
+
+    svn co http://svn.apache.org/repos/asf/incubator/lucy/trunk lucy
+
+  If you prefer Git, we maintain read-only mirrors of our codebase on
+  git.apache.org.
+  
+    git clone git://git.apache.org/lucy.git lucy
+
+  There is also a mirror on Github.
+
+    https://github.com/apache/lucy
+
+MAKE CHANGES:
+
+  Edit the source code as you see fit, then follow the instructions in INSTALL
+  to build Lucy and run its test suite.
+
+  Please bear the following in mind:
+
+    * All code will eventually need to be portable to multiple operating
+      systems and compilers. (This is a complex requirement and it should not
+      block your contribution.)
+    * All public APIs must be documented.
+    * Code should be formatted according to the style guidelines at
+      <http://wiki.apache.org/lucy/LucyStyleGuide>.
+    * All unit tests must pass.
+    * New code needs to be accompanied by new unit tests.
+    * Simplicity, both in terms of API and implementation, is highly valued
+      within the Lucy development community; the simpler the contribution, the
+      more quickly it can be reviewed and integrated. 
+
+GENERATE A PATCH:
+
+  With Subversion, navigate to the top level of the checkout and capture the
+  output of 'svn diff':
+
+    cd lucy/
+    svn diff > my_changes.patch
+
+  With command-line Git, you can either capture the output of 'git diff', or
+  use 'git format-patch' to export a series of one or more commits.
+
+    git diff > my_changes.patch
+
+CONTRIBUTE YOUR PATCH
+
+  Lucy's issue-tracker/bug-tracker installation runs Atlassian JIRA and we
+  generally use the term "issue" rather than "bug" because not every
+  contribution fixes a "bug".
+  
+     https://issues.apache.org/jira/browse/LUCY
+  
+  1. Create a JIRA account for yourself and sign in.
+  2. Once you have signed in, the "create new issue" link will appear.  Either
+     use it to open a new issue or navigate to an existing one as appropriate.
+  3. Attach your patch to the issue using the menu command
+     'More Actions > Attach Files'.
+
+  Attaching a file to an issue causes an email notification to be sent to the
+  lucy-issues list signalling that a patch has arrived.  Please be patient but
+  persistent while engaging with the Lucy committers who review and apply such
+  patches.
+
+GITHUB PULL REQUESTS
+
+  At this time, we have no way to accept pull requests for the Github
+  read-only mirror, so please use the JIRA patch submission process.
+
