@@ -63,15 +63,12 @@ RichPost_destroy(RichPosting *self) {
 void
 RichPost_read_record(RichPosting *self, InStream *instream) {
     float *const norm_decoder = self->norm_decoder;
-    uint32_t  doc_code;
     uint32_t  num_prox = 0;
     uint32_t  position = 0;
-    uint32_t *positions;
-    float    *prox_boosts;
     float     aggregate_weight = 0.0;
 
     // Decode delta doc.
-    doc_code = InStream_Read_C32(instream);
+    uint32_t doc_code = InStream_Read_C32(instream);
     self->doc_id += doc_code >> 1;
 
     // If the stored num was odd, the freq is 1.
@@ -91,8 +88,8 @@ RichPost_read_record(RichPosting *self, InStream *instream) {
         self->prox_boosts
             = (float*)REALLOCATE(self->prox_boosts, num_prox * sizeof(float));
     }
-    positions   = self->prox;
-    prox_boosts = self->prox_boosts;
+    uint32_t *positions    = self->prox;
+    uint32_t *prox_boosts  = self->prox_boosts;
 
     while (num_prox--) {
         position += InStream_Read_C32(instream);

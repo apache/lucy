@@ -67,8 +67,7 @@ VA_destroy(VArray *self) {
 VArray*
 VA_dump(VArray *self) {
     VArray *dump = VA_new(self->size);
-    uint32_t i, max;
-    for (i = 0, max = self->size; i < max; i++) {
+    for (uint32_t i = 0, max = self->size; i < max; i++) {
         Obj *elem = VA_Fetch(self, i);
         if (elem) { VA_Store(dump, i, Obj_Dump(elem)); }
     }
@@ -79,10 +78,9 @@ VArray*
 VA_load(VArray *self, Obj *dump) {
     VArray *source = (VArray*)CERTIFY(dump, VARRAY);
     VArray *loaded = VA_new(source->size);
-    uint32_t i, max;
     UNUSED_VAR(self);
 
-    for (i = 0, max = source->size; i < max; i++) {
+    for (uint32_t i = 0, max = source->size; i < max; i++) {
         Obj *elem_dump = VA_Fetch(source, i);
         if (elem_dump) {
             VA_Store(loaded, i, Obj_Load(elem_dump, elem_dump));
@@ -94,10 +92,9 @@ VA_load(VArray *self, Obj *dump) {
 
 void
 VA_serialize(VArray *self, OutStream *outstream) {
-    uint32_t i;
     uint32_t last_valid_tick = 0;
     OutStream_Write_C32(outstream, self->size);
-    for (i = 0; i < self->size; i++) {
+    for (uint32_t i = 0; i < self->size; i++) {
         Obj *elem = self->elems[i];
         if (elem) {
             OutStream_Write_C32(outstream, i - last_valid_tick);
@@ -111,7 +108,6 @@ VA_serialize(VArray *self, OutStream *outstream) {
 
 VArray*
 VA_deserialize(VArray *self, InStream *instream) {
-    uint32_t tick;
     uint32_t size = InStream_Read_C32(instream);
     if (self) {
         self->size = size;
@@ -119,7 +115,7 @@ VA_deserialize(VArray *self, InStream *instream) {
         self->elems = (Obj**)CALLOCATE(self->cap, sizeof(Obj*));
     }
     else { self = VA_new(size); }
-    for (tick = InStream_Read_C32(instream);
+    for (uint32_t tick = InStream_Read_C32(instream);
          tick < size;
          tick += InStream_Read_C32(instream)
         ) {
@@ -132,11 +128,10 @@ VA_deserialize(VArray *self, InStream *instream) {
 
 VArray*
 VA_clone(VArray *self) {
-    uint32_t i;
     VArray *twin = VA_new(self->size);
 
     // Clone each element.
-    for (i = 0; i < self->size; i++) {
+    for (uint32_t i = 0; i < self->size; i++) {
         Obj *elem = self->elems[i];
         if (elem) {
             twin->elems[i] = Obj_Clone(elem);
@@ -151,16 +146,12 @@ VA_clone(VArray *self) {
 
 VArray*
 VA_shallow_copy(VArray *self) {
-    uint32_t i;
-    VArray *twin;
-    Obj **elems;
-
     // Dupe, then increment refcounts.
-    twin = VA_new(self->size);
-    elems = twin->elems;
+    VArray *twin = VA_new(self->size);
+    Obj **elems = twin->elems;
     memcpy(elems, self->elems, self->size * sizeof(Obj*));
     twin->size = self->size;
-    for (i = 0; i < self->size; i++) {
+    for (uint32_t i = 0; i < self->size; i++) {
         if (elems[i] != NULL) {
             (void)INCREF(elems[i]);
         }
@@ -180,13 +171,12 @@ VA_push(VArray *self, Obj *element) {
 
 void
 VA_push_varray(VArray *self, VArray *other) {
-    uint32_t i;
     uint32_t tick = self->size;
     uint32_t new_size = self->size + other->size;
     if (new_size > self->cap) {
         VA_Grow(self, Memory_oversize(new_size, sizeof(Obj*)));
     }
-    for (i = 0; i < other->size; i++, tick++) {
+    for (uint32_t i = 0; i < other->size; i++, tick++) {
         Obj *elem = VA_Fetch(other, i);
         if (elem != NULL) {
             self->elems[tick] = INCREF(elem);
@@ -271,17 +261,14 @@ VA_delete(VArray *self, uint32_t num) {
 
 void
 VA_excise(VArray *self, uint32_t offset, uint32_t length) {
-    uint32_t i;
-    uint32_t num_to_move;
-
     if (self->size <= offset)              { return; }
     else if (self->size < offset + length) { length = self->size - offset; }
 
-    for (i = 0; i < length; i++) {
+    for (uint32_t i = 0; i < length; i++) {
         DECREF(self->elems[offset + i]);
     }
 
-    num_to_move = self->size - (offset + length);
+    uint32_t num_to_move = self->size - (offset + length);
     memmove(self->elems + offset, self->elems + offset + length,
             num_to_move * sizeof(Obj*));
     self->size -= length;
@@ -339,8 +326,7 @@ VA_equals(VArray *self, Obj *other) {
         return false;
     }
     else {
-        uint32_t i, max;
-        for (i = 0, max = self->size; i < max; i++) {
+        for (uint32_t i = 0, max = self->size; i < max; i++) {
             Obj *val       = self->elems[i];
             Obj *other_val = twin->elems[i];
             if ((val && !other_val) || (other_val && !val)) { return false; }
@@ -352,9 +338,8 @@ VA_equals(VArray *self, Obj *other) {
 
 VArray*
 VA_gather(VArray *self, lucy_VA_gather_test_t test, void *data) {
-    uint32_t i, max;
     VArray *gathered = VA_new(self->size);
-    for (i = 0, max = self->size; i < max; i++) {
+    for (uint32_t i = 0, max = self->size; i < max; i++) {
         if (test(self, i, data)) {
             Obj *elem = self->elems[i];
             VA_Push(gathered, elem ? INCREF(elem) : NULL);
