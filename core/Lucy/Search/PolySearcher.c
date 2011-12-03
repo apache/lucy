@@ -36,7 +36,6 @@
 PolySearcher*
 PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers) {
     const uint32_t num_searchers = VA_Get_Size(searchers);
-    uint32_t i;
     int32_t *starts_array = (int32_t*)MALLOCATE(num_searchers * sizeof(int32_t));
     int32_t  doc_max      = 0;
 
@@ -44,7 +43,7 @@ PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers) {
     self->searchers = (VArray*)INCREF(searchers);
     self->starts = NULL; // Safe cleanup.
 
-    for (i = 0; i < num_searchers; i++) {
+    for (uint32_t i = 0; i < num_searchers; i++) {
         Searcher *searcher
             = (Searcher*)CERTIFY(VA_Fetch(searchers, i), SEARCHER);
         Schema *candidate    = Searcher_Get_Schema(searcher);
@@ -103,9 +102,8 @@ PolySearcher_doc_max(PolySearcher *self) {
 
 uint32_t
 PolySearcher_doc_freq(PolySearcher *self, const CharBuf *field, Obj *term) {
-    uint32_t i, max;
     uint32_t doc_freq = 0;
-    for (i = 0, max = VA_Get_Size(self->searchers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->searchers); i < max; i++) {
         Searcher *searcher = (Searcher*)VA_Fetch(self->searchers, i);
         doc_freq += Searcher_Doc_Freq(searcher, field, term);
     }
@@ -114,8 +112,7 @@ PolySearcher_doc_freq(PolySearcher *self, const CharBuf *field, Obj *term) {
 
 static void
 S_modify_doc_ids(VArray *match_docs, int32_t base) {
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(match_docs); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(match_docs); i < max; i++) {
         MatchDoc *match_doc = (MatchDoc*)VA_Fetch(match_docs, i);
         int32_t  new_doc_id = MatchDoc_Get_Doc_ID(match_doc) + base;
         MatchDoc_Set_Doc_ID(match_doc, new_doc_id);
@@ -137,20 +134,18 @@ PolySearcher_top_docs(PolySearcher *self, Query *query, uint32_t num_wanted,
                             : Query_Make_Compiler(query, (Searcher*)self,
                                                   Query_Get_Boost(query),
                                                   false);
-    uint32_t i, max;
 
-    for (i = 0, max = VA_Get_Size(searchers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(searchers); i < max; i++) {
         Searcher   *searcher   = (Searcher*)VA_Fetch(searchers, i);
         int32_t     base       = I32Arr_Get(starts, i);
         TopDocs    *top_docs   = Searcher_Top_Docs(searcher, (Query*)compiler,
                                                    num_wanted, sort_spec);
         VArray     *sub_match_docs = TopDocs_Get_Match_Docs(top_docs);
-        uint32_t j, jmax;
 
         total_hits += TopDocs_Get_Total_Hits(top_docs);
 
         S_modify_doc_ids(sub_match_docs, base);
-        for (j = 0, jmax = VA_Get_Size(sub_match_docs); j < jmax; j++) {
+        for (uint32_t j = 0, jmax = VA_Get_Size(sub_match_docs); j < jmax; j++) {
             MatchDoc *match_doc = (MatchDoc*)VA_Fetch(sub_match_docs, j);
             if (!HitQ_Insert(hit_q, INCREF(match_doc))) { break; }
         }
@@ -171,11 +166,10 @@ PolySearcher_top_docs(PolySearcher *self, Query *query, uint32_t num_wanted,
 void
 PolySearcher_collect(PolySearcher *self, Query *query,
                      Collector *collector) {
-    uint32_t i, max;
     VArray *const searchers = self->searchers;
     I32Array *starts = self->starts;
 
-    for (i = 0, max = VA_Get_Size(searchers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(searchers); i < max; i++) {
         int32_t start = I32Arr_Get(starts, i);
         Searcher *searcher = (Searcher*)VA_Fetch(searchers, i);
         OffsetCollector *offset_coll = OffsetColl_new(collector, start);

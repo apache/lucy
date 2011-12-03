@@ -36,7 +36,6 @@ PolyLex_new(const CharBuf *field, VArray *sub_readers) {
 
 PolyLexicon*
 PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
-    uint32_t  i;
     uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
     VArray   *seg_lexicons    = VA_new(num_sub_readers);
 
@@ -46,7 +45,7 @@ PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
     self->lex_q           = SegLexQ_new(num_sub_readers);
 
     // Derive.
-    for (i = 0; i < num_sub_readers; i++) {
+    for (uint32_t i = 0; i < num_sub_readers; i++) {
         LexiconReader *lex_reader = (LexiconReader*)VA_Fetch(sub_readers, i);
         if (lex_reader && CERTIFY(lex_reader, LEXICONREADER)) {
             Lexicon *seg_lexicon = LexReader_Lexicon(lex_reader, field, NULL);
@@ -72,8 +71,6 @@ PolyLex_destroy(PolyLexicon *self) {
 
 static void
 S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
-    uint32_t i, max;
-
     // Empty out the queue.
     while (1) {
         SegLexicon *seg_lex = (SegLexicon*)SegLexQ_Pop(lex_q);
@@ -82,7 +79,7 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
     }
 
     // Refill the queue.
-    for (i = 0, max = VA_Get_Size(seg_lexicons); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(seg_lexicons); i < max; i++) {
         SegLexicon *const seg_lexicon
             = (SegLexicon*)VA_Fetch(seg_lexicons, i);
         SegLex_Seek(seg_lexicon, target);
@@ -94,7 +91,6 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
 
 void
 PolyLex_reset(PolyLexicon *self) {
-    uint32_t i;
     VArray *seg_lexicons = self->seg_lexicons;
     uint32_t num_segs = VA_Get_Size(seg_lexicons);
     SegLexQueue *lex_q = self->lex_q;
@@ -107,7 +103,7 @@ PolyLex_reset(PolyLexicon *self) {
     }
 
     // Fill the queue with valid SegLexicons.
-    for (i = 0; i < num_segs; i++) {
+    for (uint32_t i = 0; i < num_segs; i++) {
         SegLexicon *const seg_lexicon
             = (SegLexicon*)VA_Fetch(seg_lexicons, i);
         SegLex_Reset(seg_lexicon);

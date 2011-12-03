@@ -93,14 +93,13 @@ ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
         char *const start  = raw_posting->blob + token->len;
         char *dest         = start;
         uint32_t last_prox = 0;
-        uint32_t i;
 
         // Field_boost.
         *((uint8_t*)dest) = field_boost_byte;
         dest++;
 
         // Positions.
-        for (i = 0; i < freq; i++) {
+        for (uint32_t i = 0; i < freq; i++) {
             Token *const t = tokens[i];
             const uint32_t prox_delta = t->pos - last_prox;
             NumUtil_encode_c32(prox_delta, &dest);
@@ -124,9 +123,7 @@ ScorePost_reset(ScorePosting *self) {
 
 void
 ScorePost_read_record(ScorePosting *self, InStream *instream) {
-    uint32_t  num_prox;
     uint32_t  position = 0;
-    uint32_t *positions;
     const size_t max_start_bytes = (C32_MAX_BYTES * 2) + 1;
     char *buf = InStream_Buf(instream, max_start_bytes);
     const uint32_t doc_code = NumUtil_decode_c32(&buf);
@@ -146,13 +143,13 @@ ScorePost_read_record(ScorePosting *self, InStream *instream) {
     buf++;
 
     // Read positions.
-    num_prox = self->freq;
+    uint32_t num_prox = self->freq;
     if (num_prox > self->prox_cap) {
         self->prox = (uint32_t*)REALLOCATE(
                          self->prox, num_prox * sizeof(uint32_t));
         self->prox_cap = num_prox;
     }
-    positions = self->prox;
+    uint32_t *positions = self->prox;
 
     InStream_Advance_Buf(instream, buf);
     buf = InStream_Buf(instream, num_prox * C32_MAX_BYTES);
@@ -216,14 +213,12 @@ ScorePost_make_matcher(ScorePosting *self, Similarity *sim,
 ScorePostingMatcher*
 ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim,
                       PostingList *plist, Compiler *compiler) {
-    uint32_t i;
-
     // Init.
     TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
 
     // Fill score cache.
     self->score_cache = (float*)MALLOCATE(TERMMATCHER_SCORE_CACHE_SIZE * sizeof(float));
-    for (i = 0; i < TERMMATCHER_SCORE_CACHE_SIZE; i++) {
+    for (uint32_t i = 0; i < TERMMATCHER_SCORE_CACHE_SIZE; i++) {
         self->score_cache[i] = Sim_TF(sim, (float)i) * self->weight;
     }
 

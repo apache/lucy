@@ -118,8 +118,6 @@ QParser_new(Schema *schema, Analyzer *analyzer, const CharBuf *default_boolop,
 QueryParser*
 QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
              const CharBuf *default_boolop, VArray *fields) {
-    uint32_t i;
-
     // Init.
     self->heed_colons = false;
     self->label_inc   = 0;
@@ -164,7 +162,7 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
     self->bool_group_label = CB_new_from_trusted_utf8("_bool_group", 11);
     CB_Grow(self->phrase_label, PHRASE_LABEL_LEN + 5);
     CB_Grow(self->bool_group_label, BOOL_GROUP_LABEL_LEN + 5);
-    for (i = 0; i < RAND_STRING_LEN; i++) {
+    for (uint32_t i = 0; i < RAND_STRING_LEN; i++) {
         char rand_char = (rand() % 26) + 'A';
         CB_Cat_Trusted_Str(self->phrase_label, &rand_char, 1);
         CB_Cat_Trusted_Str(self->bool_group_label, &rand_char, 1);
@@ -336,17 +334,15 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                               ? MUST
                               : SHOULD;
     VArray   *elems         = S_parse_flat_string(self, query_string);
-    uint32_t  i, max;
 
     // Determine whether this subclause is bracketed by parens.
     ParserToken *maybe_open_paren = (ParserToken*)VA_Fetch(elems, 0);
     if (maybe_open_paren != NULL
         && maybe_open_paren->type == TOKEN_OPEN_PAREN
        ) {
-        uint32_t num_elems;
         apply_parens = true;
         VA_Excise(elems, 0, 1);
-        num_elems = VA_Get_Size(elems);
+        uint32_t num_elems = VA_Get_Size(elems);
         if (num_elems) {
             ParserToken *maybe_close_paren
                 = (ParserToken*)VA_Fetch(elems, num_elems - 1);
@@ -357,7 +353,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     }
 
     // Generate all queries.  Apply any fields.
-    for (i = VA_Get_Size(elems); i--;) {
+    for (uint32_t i = VA_Get_Size(elems); i--;) {
         CharBuf *field = default_field;
         ParserToken *token = (ParserToken*)VA_Fetch(elems, i);
 
@@ -408,11 +404,10 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     S_splice_out_token_type(elems, TOKEN_FIELD | TOKEN_QUERY);
 
     // Apply +, -, NOT.
-    for (i = VA_Get_Size(elems); i--;) {
+    for (uint32_t i = VA_Get_Size(elems); i--;) {
         ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
         if (Obj_Is_A((Obj*)clause, PARSERCLAUSE)) {
-            uint32_t j;
-            for (j = i; j--;) {
+            for (uint32_t j = i; j--;) {
                 ParserToken *token = (ParserToken*)VA_Fetch(elems, j);
                 if (Obj_Is_A((Obj*)token, PARSERTOKEN)) {
                     if (token->type == TOKEN_MINUS
@@ -437,7 +432,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     S_splice_out_token_type(elems, TOKEN_PLUS | TOKEN_MINUS | TOKEN_NOT);
 
     // Wrap negated queries with NOTQuery objects.
-    for (i = 0, max = VA_Get_Size(elems); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
         ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
         if (Obj_Is_A((Obj*)clause, PARSERCLAUSE) && clause->occur == MUST_NOT) {
             Query *not_query = QParser_Make_NOT_Query(self, clause->query);
@@ -448,10 +443,9 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
     // Silently discard non-sensical combos of AND and OR, e.g.
     // 'OR a AND AND OR b AND'.
-    for (i = 0; i < VA_Get_Size(elems); i++) {
+    for (uint32_t i = 0; i < VA_Get_Size(elems); i++) {
         ParserToken *token = (ParserToken*)VA_Fetch(elems, i);
         if (Obj_Is_A((Obj*)token, PARSERTOKEN)) {
-            uint32_t j, jmax;
             uint32_t num_to_zap = 0;
             ParserClause *preceding = (ParserClause*)VA_Fetch(elems, i - 1);
             ParserClause *following = (ParserClause*)VA_Fetch(elems, i + 1);
@@ -461,7 +455,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             if (!following || !Obj_Is_A((Obj*)following, PARSERCLAUSE)) {
                 num_to_zap = 1;
             }
-            for (j = i + 1, jmax = VA_Get_Size(elems); j < jmax; j++) {
+            for (uint32_t j = i + 1, jmax = VA_Get_Size(elems); j < jmax; j++) {
                 ParserClause *clause = (ParserClause*)VA_Fetch(elems, j);
                 if (Obj_Is_A((Obj*)clause, PARSERCLAUSE)) { break; }
                 else { num_to_zap++; }
@@ -471,19 +465,18 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     }
 
     // Apply AND.
-    for (i = 0; i + 2 < VA_Get_Size(elems); i++) {
+    for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserToken *token = (ParserToken*)VA_Fetch(elems, i + 1);
         if (Obj_Is_A((Obj*)token, PARSERTOKEN) && token->type == TOKEN_AND) {
             ParserClause *preceding  = (ParserClause*)VA_Fetch(elems, i);
             VArray       *children   = VA_new(2);
             uint32_t      num_to_zap = 0;
-            uint32_t      j, jmax;
 
             // Add first clause.
             VA_Push(children, INCREF(preceding->query));
 
             // Add following clauses.
-            for (j = i + 1, jmax = VA_Get_Size(elems);
+            for (uint32_t j = i + 1, jmax = VA_Get_Size(elems);
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
@@ -513,19 +506,18 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     }
 
     // Apply OR.
-    for (i = 0; i + 2 < VA_Get_Size(elems); i++) {
+    for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserToken *token = (ParserToken*)VA_Fetch(elems, i + 1);
         if (Obj_Is_A((Obj*)token, PARSERTOKEN) && token->type == TOKEN_OR) {
             ParserClause *preceding  = (ParserClause*)VA_Fetch(elems, i);
             VArray       *children   = VA_new(2);
             uint32_t      num_to_zap = 0;
-            uint32_t      j, jmax;
 
             // Add first clause.
             VA_Push(children, INCREF(preceding->query));
 
             // Add following clauses.
-            for (j = i + 1, jmax = VA_Get_Size(elems);
+            for (uint32_t j = i + 1, jmax = VA_Get_Size(elems);
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
@@ -577,10 +569,9 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
         VArray   *negated   = VA_new(num_elems);
         Query    *req_query = NULL;
         Query    *opt_query = NULL;
-        uint32_t  i, num_required, num_negated, num_optional;
 
         // Demux elems into bins.
-        for (i = 0; i < num_elems; i++) {
+        for (uint32_t i = 0; i < num_elems; i++) {
             ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
             if (clause->occur == MUST) {
                 VA_Push(required, INCREF(clause->query));
@@ -592,9 +583,9 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                 VA_Push(negated, INCREF(clause->query));
             }
         }
-        num_required = VA_Get_Size(required);
-        num_negated  = VA_Get_Size(negated);
-        num_optional = VA_Get_Size(optional);
+        uint32_t num_required = VA_Get_Size(required);
+        uint32_t num_negated  = VA_Get_Size(negated);
+        uint32_t num_optional = VA_Get_Size(optional);
 
         // Bind all mandatory matchers together in one Query.
         if (num_required || num_negated) {

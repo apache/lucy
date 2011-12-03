@@ -80,9 +80,8 @@ Schema_destroy(Schema *self) {
 
 static void
 S_add_unique(VArray *array, Obj *elem) {
-    uint32_t i, max;
     if (!elem) { return; }
-    for (i = 0, max = VA_Get_Size(array); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
         Obj *candidate = VA_Fetch(array, i);
         if (!candidate) { continue; }
         if (elem == candidate) { return; }
@@ -219,8 +218,7 @@ Schema_all_fields(Schema *self) {
 
 uint32_t
 S_find_in_array(VArray *array, Obj *obj) {
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(array); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
         Obj *candidate = VA_Fetch(array, i);
         if (obj == NULL && candidate == NULL) {
             return i;

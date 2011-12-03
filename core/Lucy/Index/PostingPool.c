@@ -164,7 +164,6 @@ PostPool_get_mem_pool(PostingPool *self) {
 
 void
 PostPool_flip(PostingPool *self) {
-    uint32_t i;
     uint32_t num_runs   = VA_Get_Size(self->runs);
     uint32_t sub_thresh = num_runs > 0
                           ? self->mem_thresh / num_runs
@@ -206,7 +205,7 @@ PostPool_flip(PostingPool *self) {
     }
 
     // Assign.
-    for (i = 0; i < num_runs; i++) {
+    for (uint32_t i = 0; i < num_runs; i++) {
         PostingPool *run = (PostingPool*)VA_Fetch(self->runs, i);
         if (run != NULL) {
             PostPool_Set_Mem_Thresh(run, sub_thresh);

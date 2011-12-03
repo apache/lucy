@@ -123,7 +123,6 @@ IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
 
 void
 IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
-    uint32_t i, max;
     VArray   *const seg_readers = self->seg_readers;
     I32Array *const seg_starts  = self->seg_starts;
     bool_t    need_score        = Coll_Need_Score(collector);
@@ -133,7 +132,7 @@ IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
                                                Query_Get_Boost(query), false);
 
     // Accumulate hits into the Collector.
-    for (i = 0, max = VA_Get_Size(seg_readers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(seg_readers, i);
         DeletionsReader *del_reader = (DeletionsReader*)SegReader_Fetch(
                                           seg_reader,

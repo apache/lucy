@@ -60,9 +60,8 @@ ORQuery_to_string(ORQuery *self) {
     if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *retval = CB_new_from_trusted_utf8("(", 1);
-        uint32_t i;
         uint32_t last_kid = num_kids - 1;
-        for (i = 0; i < num_kids; i++) {
+        for (uint32_t i = 0; i < num_kids; i++) {
             CharBuf *kid_string = Obj_To_String(VA_Fetch(self->children, i));
             CB_Cat(retval, kid_string);
             DECREF(kid_string);
@@ -105,11 +104,10 @@ ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
     }
     else {
         VArray *submatchers = VA_new(num_kids);
-        uint32_t i;
         uint32_t num_submatchers = 0;
 
         // Accumulate sub-matchers.
-        for (i = 0; i < num_kids; i++) {
+        for (uint32_t i = 0; i < num_kids; i++) {
             Compiler *child = (Compiler*)VA_Fetch(self->children, i);
             Matcher *submatcher
                 = Compiler_Make_Matcher(child, reader, need_score);

@@ -70,9 +70,6 @@ ORMatcher_new(VArray *children) {
 
 static ORMatcher*
 S_ormatcher_init2(ORMatcher *self, VArray *children, Similarity *sim) {
-    size_t amount_to_malloc;
-    uint32_t i;
-
     // Init.
     PolyMatcher_init((PolyMatcher*)self, children, sim);
     self->size = 0;
@@ -85,17 +82,17 @@ S_ormatcher_init2(ORMatcher *self, VArray *children, Similarity *sim) {
 
     // Create a pool of HMDs.  Encourage CPU cache hits by using a single
     // allocation for all of them.
-    amount_to_malloc = (self->max_size + 1) * sizeof(HeapedMatcherDoc);
+    size_t amount_to_malloc = (self->max_size + 1) * sizeof(HeapedMatcherDoc);
     self->blob = (char*)MALLOCATE(amount_to_malloc);
     self->pool = (HeapedMatcherDoc**)CALLOCATE(self->max_size + 1, sizeof(HeapedMatcherDoc*));
-    for (i = 1; i <= self->max_size; i++) {
+    for (uint32_t i = 1; i <= self->max_size; i++) {
         size_t offset = i * sizeof(HeapedMatcherDoc);
         HeapedMatcherDoc *hmd = (HeapedMatcherDoc*)(self->blob + offset);
         self->pool[i] = hmd;
     }
 
     // Prime queue.
-    for (i = 0; i < self->max_size; i++) {
+    for (uint32_t i = 0; i < self->max_size; i++) {
         Matcher *matcher = (Matcher*)VA_Fetch(children, i);
         if (matcher) {
             S_add_element(self, (Matcher*)INCREF(matcher), 0);
@@ -385,10 +382,9 @@ float
 ORScorer_score(ORScorer *self) {
     float *const scores = self->scores;
     float score = 0.0f;
-    uint32_t i;
 
     // Accumulate score, then factor in coord bonus.
-    for (i = 0; i < self->matching_kids; i++) {
+    for (uint32_t i = 0; i < self->matching_kids; i++) {
         score += scores[i];
     }
     score *= self->coord_factors[self->matching_kids];

@@ -107,8 +107,7 @@ SegWriter_add_doc(SegWriter *self, Doc *doc, float boost) {
 void
 SegWriter_add_inverted_doc(SegWriter *self, Inverter *inverter,
                            int32_t doc_id) {
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)VA_Fetch(self->writers, i);
         DataWriter_Add_Inverted_Doc(writer, inverter, doc_id);
     }
@@ -120,8 +119,7 @@ SegWriter_add_inverted_doc(SegWriter *self, Inverter *inverter,
 static void
 S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map) {
     uint32_t doc_count = SegReader_Doc_Max(reader);
-    uint32_t i, max;
-    for (i = 1, max = I32Arr_Get_Size(doc_map); i < max; i++) {
+    for (uint32_t i = 1, max = I32Arr_Get_Size(doc_map); i < max; i++) {
         if (I32Arr_Get(doc_map, i) == 0) { doc_count--; }
     }
     Seg_Increment_Count(self->segment, doc_count);
@@ -129,10 +127,8 @@ S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map) {
 
 void
 SegWriter_add_segment(SegWriter *self, SegReader *reader, I32Array *doc_map) {
-    uint32_t i, max;
-
     // Bulk add the slab of documents to the various writers.
-    for (i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)VA_Fetch(self->writers, i);
         DataWriter_Add_Segment(writer, reader, doc_map);
     }
@@ -150,10 +146,9 @@ SegWriter_merge_segment(SegWriter *self, SegReader *reader,
                         I32Array *doc_map) {
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
     CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
-    uint32_t i, max;
 
     // Have all the sub-writers merge the segment.
-    for (i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)VA_Fetch(self->writers, i);
         DataWriter_Merge_Segment(writer, reader, doc_map);
     }
@@ -170,10 +165,9 @@ void
 SegWriter_delete_segment(SegWriter *self, SegReader *reader) {
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
     CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
-    uint32_t i, max;
 
     // Have all the sub-writers delete the segment.
-    for (i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)VA_Fetch(self->writers, i);
         DataWriter_Delete_Segment(writer, reader);
     }
@@ -186,10 +180,9 @@ SegWriter_delete_segment(SegWriter *self, SegReader *reader) {
 void
 SegWriter_finish(SegWriter *self) {
     CharBuf *seg_name = Seg_Get_Name(self->segment);
-    uint32_t i, max;
 
     // Finish off children.
-    for (i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)VA_Fetch(self->writers, i);
         DataWriter_Finish(writer);
     }

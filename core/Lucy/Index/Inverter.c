@@ -165,8 +165,7 @@ Inverter_add_field(Inverter *self, InverterEntry *entry) {
 
 void
 Inverter_clear(Inverter *self) {
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(self->entries); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->entries); i < max; i++) {
         InvEntry_Clear(VA_Fetch(self->entries, i));
     }
     VA_Clear(self->entries);

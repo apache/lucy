@@ -30,11 +30,10 @@
 
 PolyQuery*
 PolyQuery_init(PolyQuery *self, VArray *children) {
-    uint32_t i;
     const uint32_t num_kids = children ? VA_Get_Size(children) : 0;
     Query_init((Query*)self, 1.0f);
     self->children = VA_new(num_kids);
-    for (i = 0; i < num_kids; i++) {
+    for (uint32_t i = 0; i < num_kids; i++) {
         PolyQuery_Add_Child(self, (Query*)VA_Fetch(children, i));
     }
     return self;
@@ -66,10 +65,9 @@ PolyQuery_get_children(PolyQuery *self) {
 void
 PolyQuery_serialize(PolyQuery *self, OutStream *outstream) {
     const uint32_t num_kids = VA_Get_Size(self->children);
-    uint32_t i;
     OutStream_Write_F32(outstream, self->boost);
     OutStream_Write_U32(outstream, num_kids);
-    for (i = 0; i < num_kids; i++) {
+    for (uint32_t i = 0; i < num_kids; i++) {
         Query *child = (Query*)VA_Fetch(self->children, i);
         FREEZE(child, outstream);
     }
@@ -108,14 +106,13 @@ PolyQuery_equals(PolyQuery *self, Obj *other) {
 PolyCompiler*
 PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
                   Searcher *searcher, float boost) {
-    uint32_t i;
     const uint32_t num_kids = VA_Get_Size(parent->children);
 
     Compiler_init((Compiler*)self, (Query*)parent, searcher, NULL, boost);
     self->children = VA_new(num_kids);
 
     // Iterate over the children, creating a Compiler for each one.
-    for (i = 0; i < num_kids; i++) {
+    for (uint32_t i = 0; i < num_kids; i++) {
         Query *child_query = (Query*)VA_Fetch(parent->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
         Compiler *child_compiler
@@ -135,10 +132,9 @@ PolyCompiler_destroy(PolyCompiler *self) {
 float
 PolyCompiler_sum_of_squared_weights(PolyCompiler *self) {
     float sum      = 0;
-    uint32_t i, max;
     float my_boost = PolyCompiler_Get_Boost(self);
 
-    for (i = 0, max = VA_Get_Size(self->children); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->children); i < max; i++) {
         Compiler *child = (Compiler*)VA_Fetch(self->children, i);
         sum += Compiler_Sum_Of_Squared_Weights(child);
     }
@@ -151,8 +147,7 @@ PolyCompiler_sum_of_squared_weights(PolyCompiler *self) {
 
 void
 PolyCompiler_apply_norm_factor(PolyCompiler *self, float factor) {
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(self->children); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->children); i < max; i++) {
         Compiler *child = (Compiler*)VA_Fetch(self->children, i);
         Compiler_Apply_Norm_Factor(child, factor);
     }
@@ -162,8 +157,7 @@ VArray*
 PolyCompiler_highlight_spans(PolyCompiler *self, Searcher *searcher,
                              DocVector *doc_vec, const CharBuf *field) {
     VArray *spans = VA_new(0);
-    uint32_t i, max;
-    for (i = 0, max = VA_Get_Size(self->children); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(self->children); i < max; i++) {
         Compiler *child = (Compiler*)VA_Fetch(self->children, i);
         VArray *child_spans = Compiler_Highlight_Spans(child, searcher,
                                                        doc_vec, field);

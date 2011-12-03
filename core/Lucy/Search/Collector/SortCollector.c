@@ -87,7 +87,6 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
                     ? (VArray*)INCREF(SortSpec_Get_Rules(sort_spec))
                     : S_default_sort_rules();
     uint32_t num_rules = VA_Get_Size(rules);
-    uint32_t i;
 
     // Validate.
     if (sort_spec && !schema) {
@@ -120,7 +119,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     // values.
     self->need_score  = false;
     self->need_values = false;
-    for (i = 0; i < num_rules; i++) {
+    for (uint32_t i = 0; i < num_rules; i++) {
         SortRule *rule   = (SortRule*)VA_Fetch(rules, i);
         int32_t rule_type  = SortRule_Get_Type(rule);
         self->actions[i] = S_derive_action(rule, NULL);
@@ -234,8 +233,7 @@ SortColl_set_reader(SortCollector *self, SegReader *reader) {
 
     // Obtain sort caches. Derive actions array for this segment.
     if (self->need_values && sort_reader) {
-        uint32_t i, max;
-        for (i = 0, max = self->num_rules; i < max; i++) {
+        for (uint32_t i = 0, max = self->num_rules; i < max; i++) {
             SortRule  *rule  = (SortRule*)VA_Fetch(self->rules, i);
             CharBuf   *field = SortRule_Get_Field(rule);
             SortCache *cache = field
@@ -283,9 +281,8 @@ SortColl_collect(SortCollector *self, int32_t doc_id) {
         // Fetch values so that cross-segment sorting can work.
         if (self->need_values) {
             VArray *values = match_doc->values;
-            uint32_t i, max;
 
-            for (i = 0, max = self->num_rules; i < max; i++) {
+            for (uint32_t i = 0, max = self->num_rules; i < max; i++) {
                 SortCache *cache   = self->sort_caches[i];
                 Obj       *old_val = (Obj*)VA_Delete(values, i);
                 if (cache) {
