@@ -624,7 +624,7 @@ S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
 static CharBuf*
 S_encode_entities(CharBuf *text, CharBuf *encoded) {
     ZombieCharBuf *temp = ZCB_WRAP(text);
-    size_t space = 
+    size_t space = 0;
     const int MAX_ENTITY_BYTES = 9; // &#dddddd;
 
     // Scan first so that we only allocate once.
