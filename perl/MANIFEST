@@ -248,6 +248,7 @@ t/153-case_folder.t
 t/154-regex_tokenizer.t
 t/155-snowball_stop_filter.t
 t/156-snowball_stemmer.t
+t/157-normalizer.t
 t/200-doc.t
 t/201-hit_doc.t
 t/204-doc_reader.t
@@ -371,6 +372,7 @@ t/core/153-case_folder.t
 t/core/154-regex_tokenizer.t
 t/core/155-snowball_stop_filter.t
 t/core/156-snowball_stemmer.t
+t/core/157-normalizer.t
 t/core/206-snapshot.t
 t/core/216-schema.t
 t/core/220-doc_writer.t
