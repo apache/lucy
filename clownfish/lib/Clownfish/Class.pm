@@ -13,68 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Class;
-use base qw( Clownfish::Symbol );
-use Carp;
-use Config;
-use Clownfish::Function;
-use Clownfish::Method;
-use Clownfish::Util qw(
-    verify_args
-    a_isa_b
-);
-use Clownfish::Dumpable;
-
-END { __PACKAGE__->_clear_registry() }
-
-our %create_PARAMS = (
-    source_class      => undef,
-    class_name        => undef,
-    cnick             => undef,
-    parent_class_name => undef,
-    docucomment       => undef,
-    inert             => undef,
-    final             => undef,
-    parcel            => undef,
-    exposure          => 'parcel',
-);
-
-our %fetch_singleton_PARAMS = (
-    parcel     => undef,
-    class_name => undef,
-);
-
-sub fetch_singleton {
-    my ( undef, %args ) = @_;
-    verify_args( \%fetch_singleton_PARAMS, %args ) or confess $@;
-    # Maybe prepend parcel prefix.
-    my $parcel = $args{parcel};
-    if ( defined $parcel ) {
-        if ( !a_isa_b( $parcel, "Clownfish::Parcel" ) ) {
-            $parcel = Clownfish::Parcel->singleton( name => $parcel );
-        }
-    }
-    return _fetch_singleton( $parcel, $args{class_name} );
-}
-
-sub new { confess("The constructor for Clownfish::Class is create()") }
-
-sub create {
-    my ( $either, %args ) = @_;
-    verify_args( \%create_PARAMS, %args ) or confess $@;
-    $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-    my $package = ref($either) || $either;
-    return _create(
-        $package,
-        @args{
-            qw( parcel exposure class_name cnick micro_sym
-                docucomment source_class parent_class_name final inert )
-            }
-    );
-}
+use Clownfish;
 
 1;
 

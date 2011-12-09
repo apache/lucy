@@ -13,21 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::File;
-use Clownfish::Util qw( verify_args );
-use Carp;
-
-our %new_PARAMS = ( source_class => undef, );
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $package = ref($either) || $either;
-    return $either->_new( $args{source_class} );
-}
+use Clownfish;
 
 1;
 

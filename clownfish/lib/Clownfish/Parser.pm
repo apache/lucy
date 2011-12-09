@@ -13,21 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Parser;
-
-use Clownfish::Parcel;
-use Clownfish::Type;
-use Clownfish::Variable;
-use Clownfish::DocuComment;
-use Clownfish::Function;
-use Clownfish::Method;
-use Clownfish::Class;
-use Clownfish::CBlock;
-use Clownfish::File;
-use Carp;
+use Clownfish;
 
 1;
 

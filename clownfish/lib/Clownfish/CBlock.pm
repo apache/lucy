@@ -13,22 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::CBlock;
-use Clownfish::Util qw( verify_args );
-use Carp;
-
-our %new_PARAMS = ( contents => undef, );
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    confess("Missing required param 'contents'")
-        unless defined $args{contents};
-    return $either->_new( $args{contents} );
-}
+use Clownfish;
 
 1;
 

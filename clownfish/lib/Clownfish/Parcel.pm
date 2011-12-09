@@ -13,46 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Parcel;
-use base qw( Exporter );
 use Clownfish;
-use Clownfish::Util qw( verify_args );
-use Scalar::Util qw( blessed );
-use Carp;
-
-END {
-    __PACKAGE__->reap_singletons();
-}
-
-our %singleton_PARAMS = (
-    name  => undef,
-    cnick => undef,
-);
-
-sub singleton {
-    my ( $either, %args ) = @_;
-    verify_args( \%singleton_PARAMS, %args ) or confess $@;
-    my $package = ref($either) || $either;
-    return $package->_singleton( @args{qw( name cnick )} );
-}
-
-sub acquire {
-    my ( undef, $thing ) = @_;
-    if ( !defined $thing ) {
-        return Clownfish::Parcel->default_parcel;
-    }
-    elsif ( blessed($thing) ) {
-        confess("Not a Clownfish::Parcel")
-            unless $thing->isa('Clownfish::Parcel');
-        return $thing;
-    }
-    else {
-        return Clownfish::Parcel->singleton( name => $thing );
-    }
-}
 
 1;
 

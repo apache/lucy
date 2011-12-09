@@ -17,8 +17,10 @@ use strict;
 use warnings;
 
 package Clownfish;
-use Clownfish::Base;
 our $VERSION = '0.01';
+
+use XSLoader;
+BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 BEGIN {
     push @Clownfish::CBlock::ISA,      "Clownfish::Base";
@@ -29,8 +31,468 @@ BEGIN {
     push @Clownfish::Type::ISA,        "Clownfish::Base";
 }
 
-use XSLoader;
-BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
+{
+    package Clownfish::Base;
+}
+
+{
+    package Clownfish::CBlock;
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = ( contents => undef, );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        confess("Missing required param 'contents'")
+            unless defined $args{contents};
+        return $either->_new( $args{contents} );
+    }
+}
+
+{
+    package Clownfish::Class;
+    BEGIN { push our @ISA, 'Clownfish::Symbol' }
+    use Carp;
+    use Config;
+    use Clownfish::Util qw(
+        verify_args
+        a_isa_b
+    );
+
+    END { __PACKAGE__->_clear_registry() }
+
+    our %create_PARAMS = (
+        source_class      => undef,
+        class_name        => undef,
+        cnick             => undef,
+        parent_class_name => undef,
+        docucomment       => undef,
+        inert             => undef,
+        final             => undef,
+        parcel            => undef,
+        exposure          => 'parcel',
+    );
+
+    our %fetch_singleton_PARAMS = (
+        parcel     => undef,
+        class_name => undef,
+    );
+
+    sub fetch_singleton {
+        my ( undef, %args ) = @_;
+        verify_args( \%fetch_singleton_PARAMS, %args ) or confess $@;
+        # Maybe prepend parcel prefix.
+        my $parcel = $args{parcel};
+        if ( defined $parcel ) {
+            if ( !a_isa_b( $parcel, "Clownfish::Parcel" ) ) {
+                $parcel = Clownfish::Parcel->singleton( name => $parcel );
+            }
+        }
+        return _fetch_singleton( $parcel, $args{class_name} );
+    }
+
+    sub new { confess("The constructor for Clownfish::Class is create()") }
+
+    sub create {
+        my ( $either, %args ) = @_;
+        verify_args( \%create_PARAMS, %args ) or confess $@;
+        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        my $package = ref($either) || $either;
+        return _create(
+            $package,
+            @args{
+                qw( parcel exposure class_name cnick micro_sym
+                    docucomment source_class parent_class_name final inert )
+                }
+        );
+    }
+}
+
+{
+    package Clownfish::Dumpable;
+
+    sub new {
+        my $either = shift;
+        my $package = ref($either) || $either;
+        return $either->_new();
+    }
+}
+
+{
+    package Clownfish::File;
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = ( source_class => undef, );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        my $package = ref($either) || $either;
+        return $either->_new( $args{source_class} );
+    }
+}
+
+{
+    package Clownfish::Function;
+    BEGIN { push our @ISA, 'Clownfish::Symbol' }
+    use Carp;
+    use Clownfish::Util qw( verify_args a_isa_b );
+
+    my %new_PARAMS = (
+        return_type => undef,
+        class_name  => undef,
+        class_cnick => undef,
+        param_list  => undef,
+        micro_sym   => undef,
+        docucomment => undef,
+        parcel      => undef,
+        inline      => undef,
+        exposure    => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        $args{inline} ||= 0;
+        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        my $package = ref($either) || $either;
+        return $package->_new(
+            @args{
+                qw( parcel exposure class_name class_cnick micro_sym
+                    return_type param_list docucomment inline )
+                }
+        );
+    }
+}
+
+{
+    package Clownfish::Hierarchy;
+    use Carp;
+    use Clownfish::Util qw( verify_args );
+
+    our %new_PARAMS = (
+        source => undef,
+        dest   => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        my $package = ref($either) || $either;
+        my $parser = Clownfish::Parser->new;
+        return $package->_new( @args{qw( source dest )}, $parser );
+    }
+
+    sub _do_parse_file {
+        my ( $parser, $content, $source_class ) = @_;
+        $content = $parser->strip_plain_comments($content);
+        return $parser->file( $content, 0, source_class => $source_class, );
+    }
+}
+
+{
+    package Clownfish::Method;
+    BEGIN { push our @ISA, 'Clownfish::Function' }
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    my %new_PARAMS = (
+        return_type => undef,
+        class_name  => undef,
+        class_cnick => undef,
+        param_list  => undef,
+        macro_sym   => undef,
+        docucomment => undef,
+        parcel      => undef,
+        abstract    => undef,
+        final       => undef,
+        exposure    => 'parcel',
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        $args{abstract} ||= 0;
+        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        $args{final} ||= 0;
+        my $package = ref($either) || $either;
+        return $package->_new(
+            @args{
+                qw( parcel exposure class_name class_cnick macro_sym
+                    return_type param_list docucomment final abstract )
+                }
+        );
+    }
+}
+
+{
+    package Clownfish::ParamList;
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = ( variadic => undef, );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        my $class_name = ref($either)           || $either;
+        my $variadic   = delete $args{variadic} || 0;
+        return $class_name->_new($variadic);
+    }
+}
+
+{
+    package Clownfish::Parcel;
+    use base qw( Exporter );
+    use Clownfish::Util qw( verify_args );
+    use Scalar::Util qw( blessed );
+    use Carp;
+
+    END {
+        __PACKAGE__->reap_singletons();
+    }
+
+    our %singleton_PARAMS = (
+        name  => undef,
+        cnick => undef,
+    );
+
+    sub singleton {
+        my ( $either, %args ) = @_;
+        verify_args( \%singleton_PARAMS, %args ) or confess $@;
+        my $package = ref($either) || $either;
+        return $package->_singleton( @args{qw( name cnick )} );
+    }
+
+    sub acquire {
+        my ( undef, $thing ) = @_;
+        if ( !defined $thing ) {
+            return Clownfish::Parcel->default_parcel;
+        }
+        elsif ( blessed($thing) ) {
+            confess("Not a Clownfish::Parcel")
+                unless $thing->isa('Clownfish::Parcel');
+            return $thing;
+        }
+        else {
+            return Clownfish::Parcel->singleton( name => $thing );
+        }
+    }
+}
+
+{
+    package Clownfish::Symbol;
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    my %new_PARAMS = (
+        parcel      => undef,
+        exposure    => undef,
+        class_name  => undef,
+        class_cnick => undef,
+        micro_sym   => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        my $class_class = ref($either) || $either;
+        return $class_class->_new(
+            @args{qw( parcel exposure class_name class_cnick micro_sym )} );
+    }
+}
+
+{
+    package Clownfish::Type;
+    use Clownfish::Util qw( verify_args a_isa_b );
+    use Scalar::Util qw( blessed );
+    use Carp;
+
+    our %new_PARAMS = (
+        const       => undef,
+        specifier   => undef,
+        indirection => undef,
+        parcel      => undef,
+        c_string    => undef,
+        void        => undef,
+        object      => undef,
+        primitive   => undef,
+        integer     => undef,
+        floating    => undef,
+        string_type => undef,
+        va_list     => undef,
+        arbitrary   => undef,
+        composite   => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        my $package = ref($either) || $either;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+
+        my $flags = 0;
+        $flags |= CONST       if $args{const};
+        $flags |= NULLABLE    if $args{nullable};
+        $flags |= VOID        if $args{void};
+        $flags |= OBJECT      if $args{object};
+        $flags |= PRIMITIVE   if $args{primitive};
+        $flags |= INTEGER     if $args{integer};
+        $flags |= FLOATING    if $args{floating};
+        $flags |= STRING_TYPE if $args{string_type};
+        $flags |= VA_LIST     if $args{va_list};
+        $flags |= ARBITRARY   if $args{arbitrary};
+        $flags |= COMPOSITE   if $args{composite};
+
+        my $parcel
+            = $args{parcel}
+            ? Clownfish::Parcel->acquire( $args{parcel} )
+            : $args{parcel};
+
+        my $indirection = $args{indirection} || 0;
+        my $specifier   = $args{specifier}   || '';
+        my $c_string    = $args{c_string}    || '';
+
+        return $package->_new( $flags, $parcel, $specifier, $indirection,
+            $c_string );
+    }
+
+    our %new_integer_PARAMS = (
+        const     => undef,
+        specifier => undef,
+    );
+
+    sub new_integer {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_integer_PARAMS, %args ) or confess $@;
+        my $flags = 0;
+        $flags |= CONST if $args{const};
+        my $package = ref($either) || $either;
+        return $package->_new_integer( $flags, $args{specifier} );
+    }
+
+    our %new_float_PARAMS = (
+        const     => undef,
+        specifier => undef,
+    );
+
+    sub new_float {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_float_PARAMS, %args ) or confess $@;
+        my $flags = 0;
+        $flags |= CONST if $args{const};
+        my $package = ref($either) || $either;
+        return $package->_new_float( $flags, $args{specifier} );
+    }
+
+    our %new_object_PARAMS = (
+        const       => undef,
+        specifier   => undef,
+        indirection => 1,
+        parcel      => undef,
+        incremented => 0,
+        decremented => 0,
+        nullable    => 0,
+    );
+
+    sub new_object {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_object_PARAMS, %args ) or confess $@;
+        my $flags = 0;
+        $flags |= INCREMENTED if $args{incremented};
+        $flags |= DECREMENTED if $args{decremented};
+        $flags |= NULLABLE    if $args{nullable};
+        $flags |= CONST       if $args{const};
+        $args{indirection} = 1 unless defined $args{indirection};
+        my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
+        my $package = ref($either) || $either;
+        confess("Missing required param 'specifier'")
+            unless defined $args{specifier};
+        return $package->_new_object( $flags, $parcel, $args{specifier},
+            $args{indirection} );
+    }
+
+    our %new_composite_PARAMS = (
+        child       => undef,
+        indirection => undef,
+        array       => undef,
+        nullable    => undef,
+    );
+
+    sub new_composite {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_composite_PARAMS, %args ) or confess $@;
+        my $flags = 0;
+        $flags |= NULLABLE if $args{nullable};
+        my $indirection = $args{indirection} || 0;
+        my $array = defined $args{array} ? $args{array} : "";
+        my $package = ref($either) || $either;
+        return $package->_new_composite( $flags, $args{child}, $indirection,
+            $array );
+    }
+
+    our %new_void_PARAMS = ( const => undef, );
+
+    sub new_void {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_void_PARAMS, %args ) or confess $@;
+        my $package = ref($either) || $either;
+        return $package->_new_void( !!$args{const} );
+    }
+
+    sub new_va_list {
+        my $either = shift;
+        verify_args( {}, @_ ) or confess $@;
+        my $package = ref($either) || $either;
+        return $either->_new_va_list();
+    }
+
+    our %new_arbitrary_PARAMS = (
+        parcel    => undef,
+        specifier => undef,
+    );
+
+    sub new_arbitrary {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_arbitrary_PARAMS, %args ) or confess $@;
+        my $package = ref($either) || $either;
+        my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
+        return $package->_new_arbitrary( $parcel, $args{specifier} );
+    }
+}
+
+{
+    package Clownfish::Variable;
+    BEGIN { push our @ISA, 'Clownfish::Symbol' }
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = (
+        type        => undef,
+        micro_sym   => undef,
+        parcel      => undef,
+        exposure    => 'local',
+        class_name  => undef,
+        class_cnick => undef,
+        inert       => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        $args{exposure} ||= 'local';
+        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        my $package = ref($either) || $either;
+        return $package->_new(
+            @args{
+                qw( parcel exposure class_name class_cnick micro_sym type inert )
+                }
+        );
+    }
+}
 
 1;
 

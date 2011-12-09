@@ -13,21 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Dumpable;
-use Carp;
-use Clownfish::Class;
-use Clownfish::Type;
-use Clownfish::Method;
-use Clownfish::Variable;
-
-sub new {
-    my $either = shift;
-    my $package = ref($either) || $either;
-    return $either->_new();
-}
+use Clownfish;
 
 1;
 

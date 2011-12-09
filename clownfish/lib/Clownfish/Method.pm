@@ -13,41 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Method;
-use base qw( Clownfish::Function );
-use Clownfish::Util qw( verify_args );
-use Carp;
-
-my %new_PARAMS = (
-    return_type => undef,
-    class_name  => undef,
-    class_cnick => undef,
-    param_list  => undef,
-    macro_sym   => undef,
-    docucomment => undef,
-    parcel      => undef,
-    abstract    => undef,
-    final       => undef,
-    exposure    => 'parcel',
-);
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    $args{abstract} ||= 0;
-    $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-    $args{final} ||= 0;
-    my $package = ref($either) || $either;
-    return $package->_new(
-        @args{
-            qw( parcel exposure class_name class_cnick macro_sym
-                return_type param_list docucomment final abstract )
-            }
-    );
-}
+use Clownfish;
 
 1;
 

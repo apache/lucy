@@ -13,34 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Hierarchy;
-use Carp;
-
-use Clownfish::Util qw( verify_args );
-use Clownfish::Class;
-use Clownfish::Parser;
-
-our %new_PARAMS = (
-    source => undef,
-    dest   => undef,
-);
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $package = ref($either) || $either;
-    my $parser = Clownfish::Parser->new;
-    return $package->_new( @args{qw( source dest )}, $parser );
-}
-
-sub _do_parse_file {
-    my ( $parser, $content, $source_class ) = @_;
-    $content = $parser->strip_plain_comments($content);
-    return $parser->file( $content, 0, source_class => $source_class, );
-}
+use Clownfish;
 
 1;
 

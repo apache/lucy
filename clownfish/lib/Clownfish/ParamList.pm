@@ -13,23 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::ParamList;
-use Clownfish::Variable;
-use Clownfish::Util qw( verify_args );
-use Carp;
-
-our %new_PARAMS = ( variadic => undef, );
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $class_name = ref($either)           || $either;
-    my $variadic   = delete $args{variadic} || 0;
-    return $class_name->_new($variadic);
-}
+use Clownfish;
 
 1;
 
