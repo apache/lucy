@@ -13,22 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Binding::Core::Class;
-use Clownfish::Util qw( a_isa_b verify_args );
-use Clownfish::Binding::Core::Method;
-use Clownfish::Binding::Core::Function;
-use File::Spec::Functions qw( catfile );
-
-our %new_PARAMS = ( client => undef, );
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    return _new( $args{client} );
-}
+use Clownfish;
 
 1;
 

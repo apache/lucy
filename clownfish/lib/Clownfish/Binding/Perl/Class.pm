@@ -17,6 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Binding::Perl::Class;
+use base qw( Clownfish::Base );
 use Clownfish::Util qw( verify_args );
 use Clownfish::Binding::Perl::Pod;
 use Carp;

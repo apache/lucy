@@ -497,6 +497,191 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     }
 }
 
+{
+    package Clownfish::Binding::Core;
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = (
+        hierarchy => undef,
+        dest      => undef,
+        header    => undef,
+        footer    => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        return _new( @args{qw( hierarchy dest header footer )} );
+    }
+}
+
+{
+    package Clownfish::Binding::Core::Class;
+    use Clownfish::Util qw( a_isa_b verify_args );
+    use Carp;
+
+    our %new_PARAMS = ( client => undef, );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        return _new( $args{client} );
+    }
+}
+
+{
+    package Clownfish::Binding::Core::File;
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    my %write_h_PARAMS = (
+        file   => undef,
+        dest   => undef,
+        header => undef,
+        footer => undef,
+    );
+
+    sub write_h {
+        my ( undef, %args ) = @_;
+        verify_args( \%write_h_PARAMS, %args ) or confess $@;
+        _write_h( @args{qw( file dest header footer )} );
+    }
+}
+
+{
+    package Clownfish::Binding::Core::Method;
+
+    sub method_def {
+        my ( undef, %args ) = @_;
+        return _method_def( @args{qw( method class )} );
+    }
+
+    sub callback_obj_def {
+        my ( undef, %args ) = @_;
+        return _callback_obj_def( @args{qw( method offset )} );
+    }
+}
+
+{
+    package Clownfish::Binding::Perl;
+    use Clownfish::Binding::Perl;
+}
+
+{
+    package Clownfish::Binding::Perl::Class;
+    use Clownfish::Binding::Perl::Class;
+}
+
+{
+    package Clownfish::Binding::Perl::Constructor;
+    BEGIN { push our @ISA, 'Clownfish::Binding::Perl::Subroutine' }
+    use Carp;
+    use Clownfish::Util qw( verify_args );
+
+    our %new_PARAMS = (
+        class => undef,
+        alias => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        confess $@ unless verify_args( \%new_PARAMS, %args );
+        return _new( @args{qw( class alias )} );
+    }
+}
+
+{
+    package Clownfish::Binding::Perl::Method;
+    BEGIN { push our @ISA, 'Clownfish::Binding::Perl::Subroutine' }
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = (
+        method => undef,
+        alias  => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        confess $@ unless verify_args( \%new_PARAMS, %args );
+        return _new( @args{qw( method alias )} );
+    }
+}
+
+{
+    package Clownfish::Binding::Perl::Pod;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
+    use Clownfish::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = (
+        description  => undef,
+        synopsis     => undef,
+        constructor  => undef,
+        constructors => undef,
+        methods      => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        my $synopsis     = $args{synopsis}     || '';
+        my $description  = $args{description}  || '';
+        my $methods      = $args{methods}      || [];
+        my $constructors = $args{constructors} || [];
+        push @$constructors, $args{constructor} if $args{constructor};
+        my $self = _new( $synopsis, $description );
+
+        for (@$methods) {
+            if ( ref($_) ) {
+                _add_method( $self, $_->{name}, $_->{pod} );
+            }
+            else {
+                _add_method( $self, $_, undef );
+            }
+        }
+        for my $con (@$constructors) {
+            _add_constructor( $self, @{$con}{qw( name pod func sample )} );
+        }
+        return $self;
+    }
+}
+
+{
+    package Clownfish::Binding::Perl::Subroutine;
+    use Carp;
+    use Clownfish::Util qw( verify_args );
+
+    our %new_PARAMS = (
+        param_list         => undef,
+        alias              => undef,
+        class_name         => undef,
+        use_labeled_params => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        return _new( ref($either) || $either,
+            @args{qw( param_list class_name alias use_labeled_params )} );
+    }
+
+    sub xsub_def { confess "Abstract method" }
+}
+
+{
+    package Clownfish::Binding::Perl::TypeMap;
+    use base qw( Exporter );
+
+    our @EXPORT_OK = qw( from_perl to_perl );
+
+    sub write_xs_typemap {
+        my ( undef, %args ) = @_;
+        _write_xs_typemap( $args{hierarchy} );
+    }
+}
+
 1;
 
 =head1 NAME

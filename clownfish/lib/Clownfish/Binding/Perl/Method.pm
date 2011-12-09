@@ -13,25 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Binding::Perl::Method;
-use base qw( Clownfish::Binding::Perl::Subroutine );
-use Clownfish::Util qw( verify_args );
-use Clownfish::Binding::Perl::TypeMap qw( from_perl to_perl );
-use Carp;
-
-our %new_PARAMS = (
-    method => undef,
-    alias  => undef,
-);
-
-sub new {
-    my ( $either, %args ) = @_;
-    confess $@ unless verify_args( \%new_PARAMS, %args );
-    return _new( @args{qw( method alias )} );
-}
+use Clownfish;
 
 1;
 

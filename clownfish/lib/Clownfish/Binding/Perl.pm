@@ -17,6 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::Binding::Perl;
+use base qw( Clownfish::Base );
 
 use Clownfish::Hierarchy;
 use Carp;

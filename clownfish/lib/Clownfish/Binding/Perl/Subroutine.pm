@@ -13,33 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Binding::Perl::Subroutine;
-use Carp;
-use Clownfish::Class;
-use Clownfish::Function;
-use Clownfish::Method;
-use Clownfish::Variable;
-use Clownfish::ParamList;
-use Clownfish::Util qw( verify_args );
-
-our %new_PARAMS = (
-    param_list         => undef,
-    alias              => undef,
-    class_name         => undef,
-    use_labeled_params => undef,
-);
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    return _new( ref($either) || $either,
-        @args{qw( param_list class_name alias use_labeled_params )} );
-}
-
-sub xsub_def { confess "Abstract method" }
+use Clownfish;
 
 1;
 

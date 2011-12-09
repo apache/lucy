@@ -13,22 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Binding::Core::Method;
-use Clownfish::Util qw( a_isa_b );
-use Carp;
-
-sub method_def {
-    my ( undef, %args ) = @_;
-    return _method_def( @args{qw( method class )} );
-}
-
-sub callback_obj_def {
-    my ( undef, %args ) = @_;
-    return _callback_obj_def( @args{qw( method offset )} );
-}
+use Clownfish;
 
 1;
 

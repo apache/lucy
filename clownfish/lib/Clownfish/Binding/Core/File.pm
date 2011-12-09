@@ -13,24 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Binding::Core::File;
-use Clownfish::Util qw( verify_args );
-
-my %write_h_PARAMS = (
-    file   => undef,
-    dest   => undef,
-    header => undef,
-    footer => undef,
-);
-
-sub write_h {
-    my ( undef, %args ) = @_;
-    verify_args( \%write_h_PARAMS, %args ) or confess $@;
-    _write_h( @args{qw( file dest header footer )} );
-}
+use Clownfish;
 
 1;
 

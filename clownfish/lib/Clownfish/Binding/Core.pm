@@ -13,29 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
-
 package Clownfish::Binding::Core;
-use Clownfish::Util qw( verify_args );
-use Clownfish::Binding::Core::Function;
-use Clownfish::Binding::Core::Method;
-use Clownfish::Binding::Core::Class;
-use Clownfish::Binding::Core::File;
-use Clownfish::Binding::Core::Aliases;
-
-our %new_PARAMS = (
-    hierarchy => undef,
-    dest      => undef,
-    header    => undef,
-    footer    => undef,
-);
-
-sub new {
-    my ( $either, %args ) = @_;
-    verify_args( \%new_PARAMS, %args ) or confess $@;
-    return _new( @args{qw( hierarchy dest header footer )} );
-}
+use Clownfish;
 
 1;
 
