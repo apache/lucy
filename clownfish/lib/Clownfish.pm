@@ -22,21 +22,13 @@ our $VERSION = '0.01';
 use XSLoader;
 BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
-BEGIN {
-    push @Clownfish::CBlock::ISA,      "Clownfish::Base";
-    push @Clownfish::DocuComment::ISA, "Clownfish::Base";
-    push @Clownfish::File::ISA,        "Clownfish::Base";
-    push @Clownfish::Parcel::ISA,      "Clownfish::Base";
-    push @Clownfish::Symbol::ISA,      "Clownfish::Base";
-    push @Clownfish::Type::ISA,        "Clownfish::Base";
-}
-
 {
     package Clownfish::Base;
 }
 
 {
     package Clownfish::CBlock;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Clownfish::Util qw( verify_args );
     use Carp;
 
@@ -111,7 +103,13 @@ BEGIN {
 }
 
 {
+    package Clownfish::DocuComment;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
+}
+
+{
     package Clownfish::Dumpable;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
 
     sub new {
         my $either = shift;
@@ -122,6 +120,7 @@ BEGIN {
 
 {
     package Clownfish::File;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Clownfish::Util qw( verify_args );
     use Carp;
 
@@ -170,6 +169,7 @@ BEGIN {
 
 {
     package Clownfish::Hierarchy;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Carp;
     use Clownfish::Util qw( verify_args );
 
@@ -230,6 +230,7 @@ BEGIN {
 
 {
     package Clownfish::ParamList;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Clownfish::Util qw( verify_args );
     use Carp;
 
@@ -246,7 +247,7 @@ BEGIN {
 
 {
     package Clownfish::Parcel;
-    use base qw( Exporter );
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Clownfish::Util qw( verify_args );
     use Scalar::Util qw( blessed );
     use Carp;
@@ -285,6 +286,7 @@ BEGIN {
 
 {
     package Clownfish::Symbol;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Clownfish::Util qw( verify_args );
     use Carp;
 
@@ -308,6 +310,7 @@ BEGIN {
 
 {
     package Clownfish::Type;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Clownfish::Util qw( verify_args a_isa_b );
     use Scalar::Util qw( blessed );
     use Carp;
