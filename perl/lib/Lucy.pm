@@ -154,6 +154,7 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::LockFreeRegistry;
+    no warnings 'redefine';
     sub DESTROY { }    # leak all
 }
 
@@ -393,6 +394,7 @@ sub error {$Lucy::Object::Err::error}
     package Lucy::Object::ZombieCharBuf;
     use Carp;
     sub new { confess "ZombieCharBuf objects can only be created from C." }
+    no warnings 'redefine';
     sub DESTROY { }
 }
 

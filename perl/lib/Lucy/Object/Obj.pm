@@ -107,18 +107,6 @@ PPCODE:
         THROW(LUCY_ERR, "Error when deserializing obj of class %o", klass);
     }
 }
-
-void
-DESTROY(self)
-    lucy_Obj *self;
-PPCODE:
-    /*
-    {
-        char *perl_class = HvNAME(SvSTASH(SvRV(ST(0))));
-        warn("Destroying: 0x%x %s", (unsigned)self, perl_class);
-    }
-    */
-    Lucy_Obj_Destroy(self);
 END_XS_CODE
 
 my $synopsis = <<'END_SYNOPSIS';

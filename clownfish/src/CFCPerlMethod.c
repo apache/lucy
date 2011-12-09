@@ -64,9 +64,16 @@ CFCPerlMethod_init(CFCPerlMethod *self, CFCMethod *method,
     const char *class_name = CFCMethod_get_class_name(method);
     int use_labeled_params = CFCParamList_num_vars(param_list) > 2
                              ? 1 : 0;
+
+    // The Clownfish destructor needs to be spelled DESTROY for Perl.
     if (!alias) {
         alias = CFCMethod_micro_sym(method);
     }
+    static const char destroy_uppercase[] = "DESTROY";
+    if (strcmp(alias, "destroy") == 0) {
+        alias = destroy_uppercase;
+    }
+
     CFCPerlSub_init((CFCPerlSub*)self, param_list, class_name, alias,
                     use_labeled_params);
     self->method = (CFCMethod*)CFCBase_incref((CFCBase*)method);
