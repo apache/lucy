@@ -199,6 +199,9 @@ sub error {$Lucy::Object::Err::error}
             push @{"$singleton_class\::ISA"}, $parent_class;
         }
     }
+
+    no warnings 'redefine';
+    sub DESTROY { }    # leak all
 }
 
 {
