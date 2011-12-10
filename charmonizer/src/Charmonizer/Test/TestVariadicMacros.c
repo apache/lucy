@@ -42,7 +42,7 @@ S_run_tests(TestBatch *batch) {
     sprintf(buffer, fmt, __VA_ARGS__)
     really_has_var_macs = true;
     ISO_TEST(buf, "%s", "iso");
-    TEST_STR_EQ(batch, buf, "iso", "ISO variadic macros work");
+    STR_EQ(buf, "iso", "ISO variadic macros work");
 #else
     SKIP(batch, "No ISO variadic macros");
 #endif
@@ -52,7 +52,7 @@ S_run_tests(TestBatch *batch) {
     sprintf(buffer, fmt, ##args )
     really_has_var_macs = true;
     GNU_TEST(buf, "%s", "gnu");
-    TEST_STR_EQ(batch, buf, "gnu", "GNUC variadic macros work");
+    STR_EQ(buf, "gnu", "GNUC variadic macros work");
 #else
     SKIP(batch, "No GNUC variadic macros");
 #endif

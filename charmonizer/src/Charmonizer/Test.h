@@ -109,9 +109,11 @@ chaz_Test_plan(chaz_TestBatch *batch);
 void
 chaz_Test_ok(chaz_TestBatch *batch, int expression, const char *message);
 
+#define CHAZ_TEST_STR_EQ(_got, _expected, _message) \
+	chaz_Test_str_eq(chaz_Test_current, (_got), (_expected), (_message))
 void
-chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got,
-                      const char *expected, const char *message);
+chaz_Test_str_eq(chaz_TestBatch *batch, const char *got,
+                 const char *expected, const char *message);
 
 void
 chaz_Test_pass(chaz_TestBatch *batch, const char *message);
@@ -141,6 +143,7 @@ extern chaz_TestBatch *chaz_Test_current;
   #define Test_start                   chaz_Test_start
   #define Test_finish                  chaz_Test_finish
   #define OK                           CHAZ_TEST_OK
+  #define STR_EQ                       CHAZ_TEST_STR_EQ
   #define TestBatch_destroy_t          chaz_TestBatch_destroy_t
   #define TestBatch_test_func_t        chaz_TestBatch_test_func_t
   #define TestBatch_run_test_t         chaz_TestBatch_run_test_t
@@ -149,8 +152,7 @@ extern chaz_TestBatch *chaz_Test_current;
   #define Test_new_batch               chaz_Test_new_batch
   #define Test_plan                    chaz_Test_plan
   #define PLAN                         CHAZ_TEST_PLAN
-  #define Test_test_str_eq             chaz_Test_test_str_eq
-  #define TEST_STR_EQ                  CHAZ_TEST_TEST_STR_EQ
+  #define Test_str_eq                  chaz_Test_str_eq
   #define Test_pass                    chaz_Test_pass
   #define PASS                         CHAZ_TEST_PASS
   #define Test_fail                    chaz_Test_fail

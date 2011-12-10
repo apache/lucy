@@ -30,22 +30,19 @@ static void
 S_run_tests(TestBatch *batch) {
 
 #ifdef HAS_FUNC_MACRO
-    TEST_STR_EQ(batch, FUNC_MACRO, "S_run_tests",
-                "FUNC_MACRO");
+    STR_EQ(FUNC_MACRO, "S_run_tests", "FUNC_MACRO");
 #else
     SKIP(batch, "no FUNC_MACRO");
 #endif
 
 #ifdef HAS_ISO_FUNC_MACRO
-    TEST_STR_EQ(batch, __func__, "S_run_tests",
-                "HAS_ISO_FUNC_MACRO");
+    STR_EQ(__func__, "S_run_tests", "HAS_ISO_FUNC_MACRO");
 #else
     SKIP(batch, "no ISO_FUNC_MACRO");
 #endif
 
 #ifdef HAS_GNUC_FUNC_MACRO
-    TEST_STR_EQ(batch, __FUNCTION__, "S_run_tests",
-                "HAS_GNUC_FUNC_MACRO");
+    STR_EQ(__FUNCTION__, "S_run_tests", "HAS_GNUC_FUNC_MACRO");
 #else
     SKIP(batch, "no GNUC_FUNC_MACRO");
 #endif

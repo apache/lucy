@@ -112,9 +112,9 @@ S_run_tests(TestBatch *batch) {
         OK((sizeof(int64_t) == 8), "int64_t is 8 bytes");
         OK((sizeof(uint64_t) == 8), "uint64_t is 8 bytes");
         sprintf(buf, "%"I64P, foo);
-        TEST_STR_EQ(batch, buf, "-100", "I64P");
+        STR_EQ(buf, "-100", "I64P");
         sprintf(buf, "%"U64P, bar);
-        TEST_STR_EQ(batch, buf, "18000000000000000000", "U64P");
+        STR_EQ(buf, "18000000000000000000", "U64P");
     }
 #endif
 }

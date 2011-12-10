@@ -128,8 +128,8 @@ chaz_Test_ok(chaz_TestBatch *batch, int value, const char *message) {
 }
 
 void
-chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got,
-                      const char *expected, const char *message) {
+chaz_Test_str_eq(chaz_TestBatch *batch, const char *got,
+                 const char *expected, const char *message) {
     va_list args;
 
     /* Increment test number. */
