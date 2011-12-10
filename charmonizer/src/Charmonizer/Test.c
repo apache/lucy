@@ -45,11 +45,21 @@ chaz_TestBatch*
 chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
                     chaz_TestBatch_test_func_t test_func) {
     chaz_TestBatch *batch = (chaz_TestBatch*)malloc(sizeof(chaz_TestBatch));
+    if (!batch) {
+        fprintf(stderr, "Out of memory\n");
+        return NULL;
+    }
+    batch_name = batch_name ? batch_name : "";
 
     /* Assign. */
     batch->num_tests       = num_tests;
-    batch->name            = strdup(batch_name);
     batch->test_func       = test_func;
+    batch->name            = (char*)malloc(strlen(batch_name) + 1);
+    if (!batch->name) {
+        fprintf(stderr, "Out of memory\n");
+        return NULL;
+    }
+    strcpy(batch->name, batch_name);
 
     /* Initialize. */
     batch->test_num        = 0;
