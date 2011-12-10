@@ -82,7 +82,6 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
  */
 #define CHAZ_TEST_PLAN              chaz_Test_plan
 #define CHAZ_TEST_TEST_STR_EQ       chaz_Test_test_str_eq
-#define CHAZ_TEST_TEST_INT_EQ       chaz_Test_test_int_eq
 #define CHAZ_TEST_TEST_FLOAT_EQ     chaz_Test_test_float_eq
 
 /* Print a message indicating that a test was skipped and update batch.
@@ -123,9 +122,11 @@ chaz_Test_pass(chaz_TestBatch *batch, const char *message);
 void
 chaz_Test_fail(chaz_TestBatch *batch, const char *message);
 
+#define CHAZ_TEST_LONG_EQ(_got, _expected, _message) \
+	chaz_Test_long_eq(chaz_Test_current, (_got), (_expected), (_message))
 void
-chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected,
-                      const char *message);
+chaz_Test_long_eq(chaz_TestBatch *batch, long got, long expected,
+                  const char *message);
 
 void
 chaz_Test_test_float_eq(chaz_TestBatch *batch, double got,
@@ -146,6 +147,7 @@ extern chaz_TestBatch *chaz_Test_current;
   #define Test_finish                  chaz_Test_finish
   #define OK                           CHAZ_TEST_OK
   #define STR_EQ                       CHAZ_TEST_STR_EQ
+  #define LONG_EQ                      CHAZ_TEST_LONG_EQ
   #define PASS                         CHAZ_TEST_PASS
   #define FAIL                         CHAZ_TEST_FAIL
   #define TestBatch_destroy_t          chaz_TestBatch_destroy_t
@@ -157,10 +159,9 @@ extern chaz_TestBatch *chaz_Test_current;
   #define Test_plan                    chaz_Test_plan
   #define PLAN                         CHAZ_TEST_PLAN
   #define Test_str_eq                  chaz_Test_str_eq
+  #define Test_long_eq                 chaz_Test_long_eq
   #define Test_pass                    chaz_Test_pass
   #define Test_fail                    chaz_Test_fail
-  #define Test_test_int_eq             chaz_Test_test_int_eq
-  #define TEST_INT_EQ                  CHAZ_TEST_TEST_INT_EQ
   #define Test_test_float_eq           chaz_Test_test_float_eq
   #define TEST_FLOAT_EQ                CHAZ_TEST_TEST_FLOAT_EQ
   #define Test_skip                    chaz_Test_skip

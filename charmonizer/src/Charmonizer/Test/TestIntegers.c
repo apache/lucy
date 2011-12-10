@@ -40,19 +40,19 @@ S_run_tests(TestBatch *batch) {
 #endif
     }
 
-    TEST_INT_EQ(batch, SIZEOF_CHAR,  sizeof(char),  "SIZEOF_CHAR");
-    TEST_INT_EQ(batch, SIZEOF_SHORT, sizeof(short), "SIZEOF_SHORT");
-    TEST_INT_EQ(batch, SIZEOF_INT,   sizeof(int),   "SIZEOF_INT");
-    TEST_INT_EQ(batch, SIZEOF_LONG,  sizeof(long),  "SIZEOF_LONG");
-    TEST_INT_EQ(batch, SIZEOF_PTR,   sizeof(void*), "SIZEOF_PTR");
+    LONG_EQ(SIZEOF_CHAR,  sizeof(char),  "SIZEOF_CHAR");
+    LONG_EQ(SIZEOF_SHORT, sizeof(short), "SIZEOF_SHORT");
+    LONG_EQ(SIZEOF_INT,   sizeof(int),   "SIZEOF_INT");
+    LONG_EQ(SIZEOF_LONG,  sizeof(long),  "SIZEOF_LONG");
+    LONG_EQ(SIZEOF_PTR,   sizeof(void*), "SIZEOF_PTR");
 
 #ifdef HAS_LONG_LONG
-    TEST_INT_EQ(batch, SIZEOF_LONG_LONG, sizeof(long long),
-                "HAS_LONG_LONG and SIZEOF_LONG_LONG");
+    LONG_EQ(SIZEOF_LONG_LONG, sizeof(long long),
+            "HAS_LONG_LONG and SIZEOF_LONG_LONG");
 #endif
 
 #ifdef HAS_INTTYPES_H
-    TEST_INT_EQ(batch, sizeof(int8_t), 1, "HAS_INTTYPES_H");
+    LONG_EQ(sizeof(int8_t), 1, "HAS_INTTYPES_H");
 #else
     SKIP(batch, "No inttypes.h");
 #endif
@@ -66,26 +66,26 @@ S_run_tests(TestBatch *batch) {
     {
         int8_t foo = -100;
         uint8_t bar = 200;
-        TEST_INT_EQ(batch, foo, -100, "int8_t is signed");
-        TEST_INT_EQ(batch, bar, 200, "uint8_t is unsigned");
-        TEST_INT_EQ(batch, sizeof(int8_t), 1, "i8_t is 1 byte");
-        TEST_INT_EQ(batch, sizeof(uint8_t), 1, "u8_t is 1 byte");
-        TEST_INT_EQ(batch, I8_MAX,  127, "I8_MAX");
-        TEST_INT_EQ(batch, I8_MIN, -128, "I8_MIN");
-        TEST_INT_EQ(batch, U8_MAX,  255, "U8_MAX");
+        LONG_EQ(foo, -100, "int8_t is signed");
+        LONG_EQ(bar, 200, "uint8_t is unsigned");
+        LONG_EQ(sizeof(int8_t), 1, "i8_t is 1 byte");
+        LONG_EQ(sizeof(uint8_t), 1, "u8_t is 1 byte");
+        LONG_EQ(I8_MAX,  127, "I8_MAX");
+        LONG_EQ(I8_MIN, -128, "I8_MIN");
+        LONG_EQ(U8_MAX,  255, "U8_MAX");
     }
 #endif
 #ifdef HAS_I16_T
     {
         int16_t foo = -100;
         uint16_t bar = 30000;
-        TEST_INT_EQ(batch, foo, -100, "int16_t is signed");
-        TEST_INT_EQ(batch, bar, 30000, "uint16_t is unsigned");
-        TEST_INT_EQ(batch, sizeof(int16_t), 2, "int16_t is 2 bytes");
-        TEST_INT_EQ(batch, sizeof(uint16_t), 2, "uint16_t is 2 bytes");
-        TEST_INT_EQ(batch, I16_MAX,  32767, "I16_MAX");
-        TEST_INT_EQ(batch, I16_MIN, -32768, "I16_MIN");
-        TEST_INT_EQ(batch, U16_MAX,  65535, "U16_MAX");
+        LONG_EQ(foo, -100, "int16_t is signed");
+        LONG_EQ(bar, 30000, "uint16_t is unsigned");
+        LONG_EQ(sizeof(int16_t), 2, "int16_t is 2 bytes");
+        LONG_EQ(sizeof(uint16_t), 2, "uint16_t is 2 bytes");
+        LONG_EQ(I16_MAX,  32767, "I16_MAX");
+        LONG_EQ(I16_MIN, -32768, "I16_MIN");
+        LONG_EQ(U16_MAX,  65535, "U16_MAX");
     }
 #endif
 #ifdef HAS_I32_T

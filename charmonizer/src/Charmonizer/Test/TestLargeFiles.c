@@ -79,7 +79,7 @@ S_run_tests(TestBatch *batch) {
     off64_t gb4_plus = ((off64_t)0x7FFFFFFF << 1) + 100;
     off64_t gb2_plus = (off64_t)0x7FFFFFFF + 200;
 
-    TEST_INT_EQ(batch, sizeof(off64_t), 8, "off64_t type has 8 bytes");
+    LONG_EQ(sizeof(off64_t), 8, "off64_t type has 8 bytes");
 
 #ifndef HAS_64BIT_STDIO
     SKIP_REMAINING(batch, "No stdio large file support");
@@ -105,28 +105,28 @@ S_run_tests(TestBatch *batch) {
     }
 
     check_val = fseeko64(fh, gb4_plus, SEEK_SET);
-    TEST_INT_EQ(batch, check_val, 0, "fseeko64 above 4 GB");
+    LONG_EQ(check_val, 0, "fseeko64 above 4 GB");
 
     offset = ftello64(fh);
     OK((offset == gb4_plus), "ftello64 above 4 GB");
 
     check_val = fprintf(fh, "X");
-    TEST_INT_EQ(batch, check_val, 1, "print above 4 GB");
+    LONG_EQ(check_val, 1, "print above 4 GB");
 
     check_val = fseeko64(fh, gb2_plus, SEEK_SET);
-    TEST_INT_EQ(batch, check_val, 0, "fseeko64 above 2 GB");
+    LONG_EQ(check_val, 0, "fseeko64 above 2 GB");
 
     offset = ftello64(fh);
     OK((offset == gb2_plus), "ftello64 above 2 GB");
 
     check_val = fseeko64(fh, -1, SEEK_END);
-    TEST_INT_EQ(batch, check_val, 0, "seek to near end");
+    LONG_EQ(check_val, 0, "seek to near end");
 
     check_char = fgetc(fh);
-    TEST_INT_EQ(batch, check_char, 'X', "read value after multiple seeks");
+    LONG_EQ(check_char, 'X', "read value after multiple seeks");
 
     check_val = fclose(fh);
-    TEST_INT_EQ(batch, check_val, 0, "fclose succeeds after all that");
+    LONG_EQ(check_val, 0, "fclose succeeds after all that");
 
     /* Truncate, just in case the call to remove fails. */
     fh = fopen64("_charm_large_file_test", "w+");
@@ -152,7 +152,7 @@ S_run_tests(TestBatch *batch) {
     OK(offset == gb4_plus, "lseek64 in place above 4 GB");
 
     check_val = write(fd, "X", 1);
-    TEST_INT_EQ(batch, check_val, 1, "write() above 4 GB");
+    LONG_EQ(check_val, 1, "write() above 4 GB");
 
     offset = lseek64(fd, gb2_plus, SEEK_SET);
     OK(offset == gb2_plus, "lseek64 above 2 GB");
@@ -164,21 +164,21 @@ S_run_tests(TestBatch *batch) {
     OK(offset == gb4_plus, "seek to near end");
 
     check_val = read(fd, &check_char, 1);
-    TEST_INT_EQ(batch, check_val, 1, "read() after multiple lseek64 calls");
-    TEST_INT_EQ(batch, check_char, 'X',
+    LONG_EQ(check_val, 1, "read() after multiple lseek64 calls");
+    LONG_EQ(check_char, 'X',
                 "read() correct data after multiple lseek64 calls");
 #ifdef HAS_64BIT_PREAD
     check_char = 0;
     check_val = pread64(fd, &check_char, 1, gb4_plus);
-    TEST_INT_EQ(batch, check_val, 1, "pread64");
-    TEST_INT_EQ(batch, check_char, 'X', "pread64() correct data");
+    LONG_EQ(check_val, 1, "pread64");
+    LONG_EQ(check_char, 'X', "pread64() correct data");
 #else
     SKIP(batch, "no pread64");
     SKIP(batch, "no pread64");
 #endif
 
     check_val = close(fd);
-    TEST_INT_EQ(batch, check_val, 0, "close succeeds after all that");
+    LONG_EQ(check_val, 0, "close succeeds after all that");
 #endif
 
     /* Truncate, just in case the call to remove fails. */

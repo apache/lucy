@@ -8,13 +8,13 @@
 #include "Charmonizer/Test.c";
 
 static void
-S_run_tests(TestBatch *batch) {
-    TEST_INT_EQ(batch, 0, 0, "sanity check");
+S_run_tests(void) {
+    LONG_EQ(0, 0, "sanity check");
 }
 
 int main(int argc, char **argv) {
-    TestBatch *batch = Test_start(1);
-    S_run_tests(batch);
+    Test_start(1);
+    S_run_tests();
     return !Test_finish();
 }
 

@@ -173,8 +173,8 @@ chaz_Test_fail(chaz_TestBatch *batch, const char *message) {
 }
 
 void
-chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected,
-                      const char *message) {
+chaz_Test_long_eq(chaz_TestBatch *batch, long got, long expected,
+                  const char *message) {
     va_list args;
 
     /* Increment test number. */
