@@ -110,7 +110,7 @@ S_TestBatch_run_test(chaz_TestBatch *batch) {
 }
 
 void
-chaz_Test_test_true(chaz_TestBatch *batch, int value, const char *message) {
+chaz_Test_ok(chaz_TestBatch *batch, int value, const char *message) {
     va_list args;
 
     /* Increment test number. */

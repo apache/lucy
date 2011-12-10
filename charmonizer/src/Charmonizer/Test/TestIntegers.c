@@ -30,10 +30,10 @@ S_run_tests(TestBatch *batch) {
         long one = 1;
         long big_endian = !(*((char *)(&one)));
 #ifdef BIG_END
-        TEST_TRUE(batch, big_endian, "BIG_END");
+        OK(big_endian, "BIG_END");
 #else
  #if defined(LITTLE_END)
-        TEST_TRUE(batch, !big_endian, "LITTLE_END");
+        OK(!big_endian, "LITTLE_END");
  #else
         FAIL(batch, "Either BIG_END or LITTLE_END should be defined");
  #endif
@@ -59,7 +59,7 @@ S_run_tests(TestBatch *batch) {
 
     {
         bool_t the_truth = true;
-        TEST_TRUE(batch, the_truth, "bool_t true");
+        OK(the_truth, "bool_t true");
         TEST_FALSE(batch, false, "false is false");
     }
 #ifdef HAS_I8_T
@@ -92,14 +92,14 @@ S_run_tests(TestBatch *batch) {
     {
         int32_t foo = -100;
         uint32_t bar = 4000000000UL;
-        TEST_TRUE(batch, (foo == -100), "int32_t is signed");
-        TEST_TRUE(batch, (bar == 4000000000UL), "uint32_t is unsigned");
-        TEST_TRUE(batch, (sizeof(int32_t) == 4), "int32_t is 4 bytes");
-        TEST_TRUE(batch, (sizeof(uint32_t) == 4), "uint32_t is 4 bytes");
-        TEST_TRUE(batch, (I32_MAX == I32_C(2147483647)), "I32_MAX");
+        OK((foo == -100), "int32_t is signed");
+        OK((bar == 4000000000UL), "uint32_t is unsigned");
+        OK((sizeof(int32_t) == 4), "int32_t is 4 bytes");
+        OK((sizeof(uint32_t) == 4), "uint32_t is 4 bytes");
+        OK((I32_MAX == I32_C(2147483647)), "I32_MAX");
         /* The (-2147483647 - 1) avoids a compiler warning. */
-        TEST_TRUE(batch, (I32_MIN == I32_C(-2147483647 - 1)), "I32_MIN");
-        TEST_TRUE(batch, (U32_MAX == U32_C(4294967295)), "U32_MAX");
+        OK((I32_MIN == I32_C(-2147483647 - 1)), "I32_MIN");
+        OK((U32_MAX == U32_C(4294967295)), "U32_MAX");
     }
 #endif
 #ifdef HAS_I64_T
@@ -107,11 +107,10 @@ S_run_tests(TestBatch *batch) {
         char buf[100];
         int64_t foo = -100;
         uint64_t bar = U64_C(18000000000000000000);
-        TEST_TRUE(batch, (foo == -100), "int64_t is signed");
-        TEST_TRUE(batch, (bar == U64_C(18000000000000000000)),
-                  "uint64_t is unsigned");
-        TEST_TRUE(batch, (sizeof(int64_t) == 8), "int64_t is 8 bytes");
-        TEST_TRUE(batch, (sizeof(uint64_t) == 8), "uint64_t is 8 bytes");
+        OK((foo == -100), "int64_t is signed");
+        OK((bar == U64_C(18000000000000000000)), "uint64_t is unsigned");
+        OK((sizeof(int64_t) == 8), "int64_t is 8 bytes");
+        OK((sizeof(uint64_t) == 8), "uint64_t is 8 bytes");
         sprintf(buf, "%"I64P, foo);
         TEST_STR_EQ(batch, buf, "-100", "I64P");
         sprintf(buf, "%"U64P, bar);

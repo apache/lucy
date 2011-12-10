@@ -57,7 +57,7 @@ S_run_tests(TestBatch *batch) {
     SKIP(batch, "No GNUC variadic macros");
 #endif
 
-    TEST_TRUE(batch, really_has_var_macs, "either ISO or GNUC");
+    OK(really_has_var_macs, "either ISO or GNUC");
 }
 
 int main(int argc, char **argv) {

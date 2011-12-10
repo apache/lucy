@@ -108,7 +108,7 @@ S_run_tests(TestBatch *batch) {
     TEST_INT_EQ(batch, check_val, 0, "fseeko64 above 4 GB");
 
     offset = ftello64(fh);
-    TEST_TRUE(batch, (offset == gb4_plus), "ftello64 above 4 GB");
+    OK((offset == gb4_plus), "ftello64 above 4 GB");
 
     check_val = fprintf(fh, "X");
     TEST_INT_EQ(batch, check_val, 1, "print above 4 GB");
@@ -117,7 +117,7 @@ S_run_tests(TestBatch *batch) {
     TEST_INT_EQ(batch, check_val, 0, "fseeko64 above 2 GB");
 
     offset = ftello64(fh);
-    TEST_TRUE(batch, (offset == gb2_plus), "ftello64 above 2 GB");
+    OK((offset == gb2_plus), "ftello64 above 2 GB");
 
     check_val = fseeko64(fh, -1, SEEK_END);
     TEST_INT_EQ(batch, check_val, 0, "seek to near end");
@@ -146,22 +146,22 @@ S_run_tests(TestBatch *batch) {
     }
 
     offset = lseek64(fd, gb4_plus, SEEK_SET);
-    TEST_TRUE(batch, offset == gb4_plus, "lseek64 above 4 GB");
+    OK(offset == gb4_plus, "lseek64 above 4 GB");
 
     offset = lseek64(fd, 0, SEEK_CUR);
-    TEST_TRUE(batch, offset == gb4_plus, "lseek64 in place above 4 GB");
+    OK(offset == gb4_plus, "lseek64 in place above 4 GB");
 
     check_val = write(fd, "X", 1);
     TEST_INT_EQ(batch, check_val, 1, "write() above 4 GB");
 
     offset = lseek64(fd, gb2_plus, SEEK_SET);
-    TEST_TRUE(batch, offset == gb2_plus, "lseek64 above 2 GB");
+    OK(offset == gb2_plus, "lseek64 above 2 GB");
 
     offset = lseek64(fd, 0, SEEK_CUR);
-    TEST_TRUE(batch, (offset == gb2_plus), "lseek64 in place above 2 GB");
+    OK((offset == gb2_plus), "lseek64 in place above 2 GB");
 
     offset = lseek64(fd, -1, SEEK_END);
-    TEST_TRUE(batch, offset == gb4_plus, "seek to near end");
+    OK(offset == gb4_plus, "seek to near end");
 
     check_val = read(fd, &check_char, 1);
     TEST_INT_EQ(batch, check_val, 1, "read() after multiple lseek64 calls");
