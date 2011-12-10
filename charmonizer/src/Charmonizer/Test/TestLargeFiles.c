@@ -82,26 +82,28 @@ S_run_tests(TestBatch *batch) {
     LONG_EQ(sizeof(off64_t), 8, "off64_t type has 8 bytes");
 
 #ifndef HAS_64BIT_STDIO
-    SKIP_REMAINING(batch, "No stdio large file support");
+    SKIP_REMAINING("No stdio large file support");
+    return;
 #endif
 #ifndef STAT_TESTS_ENABLED
-    SKIP_REMAINING(batch, "Need stat with st_size and st_blocks");
+    SKIP_REMAINING("Need stat with st_size and st_blocks");
+    return;
 #else
     /* Check for sparse files. */
     if (!S_check_sparse_files()) {
-        SKIP_REMAINING(batch, "Can't verify large file support "
+        SKIP_REMAINING("Can't verify large file support "
                        "without sparse files");
         return;
     }
     if (!S_can_create_big_files()) {
-        SKIP_REMAINING(batch, "Unsafe to create 5GB sparse files "
-                       "on this system");
+        SKIP_REMAINING("Unsafe to create 5GB sparse files on this system");
         return;
     }
 
     fh = fopen64("_charm_large_file_test", "w+");
     if (fh == NULL) {
-        SKIP_REMAINING(batch, "Failed to open file");
+        SKIP_REMAINING("Failed to open file");
+        return;
     }
 
     check_val = fseeko64(fh, gb4_plus, SEEK_SET);
@@ -136,13 +138,15 @@ S_run_tests(TestBatch *batch) {
     remove("_charm_large_file_test");
 
 #ifndef HAS_64BIT_LSEEK
-    SKIP_REMAINING(batch, "No 64-bit lseek");
+    SKIP_REMAINING("No 64-bit lseek");
+    return;
 #else
     fd = open("_charm_large_file_test",
               O_RDWR | O_CREAT | LARGEFILE_OPEN_FLAG, 0666);
     if (fd == -1) {
         FAIL("open failed");
-        SKIP_REMAINING(batch, "open failed");
+        SKIP_REMAINING("open failed");
+        return;
     }
 
     offset = lseek64(fd, gb4_plus, SEEK_SET);

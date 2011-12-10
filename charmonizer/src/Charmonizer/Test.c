@@ -205,7 +205,7 @@ chaz_Test_skip(chaz_TestBatch *batch, const char *message) {
 }
 
 void
-chaz_Test_report_skip_remaining(chaz_TestBatch *batch, const char *message) {
+chaz_Test_skip_remaining(chaz_TestBatch *batch, const char *message) {
     va_list args;
     unsigned remaining = batch->num_tests - batch->test_num;
 

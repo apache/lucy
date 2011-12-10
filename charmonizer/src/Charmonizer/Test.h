@@ -59,14 +59,6 @@ chaz_Test_new_batch(unsigned num_tests);
 #define CHAZ_TEST_SKIP(batch, message) \
     chaz_Test_skip(batch, message)
 
-/* Print a message indicating that all remaining tests will be skipped and
- * return.
- */
-#define CHAZ_TEST_SKIP_REMAINING(batch, message) \
-    do { \
-        chaz_Test_report_skip_remaining(batch, message); \
-        return; \
-    } while (0)
 
 void
 chaz_Test_plan(chaz_TestBatch *batch);
@@ -108,9 +100,13 @@ chaz_Test_double_eq(chaz_TestBatch *batch, double got, double expected,
 void
 chaz_Test_skip(chaz_TestBatch *batch, const char *message);
 
+/* Print a message indicating that all remaining tests will be skipped and
+ * then call SKIP once for each.
+ */
+#define CHAZ_TEST_SKIP_REMAINING(_message) \
+    chaz_Test_skip_remaining(chaz_Test_current, (_message))
 void
-chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
-                                const char *message);
+chaz_Test_skip_remaining(chaz_TestBatch* batch, const char *message);
 
 /* Global TestBatch implicitly accessed by testing macros. */
 extern chaz_TestBatch *chaz_Test_current;
@@ -124,6 +120,7 @@ extern chaz_TestBatch *chaz_Test_current;
   #define DOUBLE_EQ                    CHAZ_TEST_DOUBLE_EQ
   #define PASS                         CHAZ_TEST_PASS
   #define FAIL                         CHAZ_TEST_FAIL
+  #define SKIP_REMAINING               CHAZ_TEST_SKIP_REMAINING
   #define TestBatch                    chaz_TestBatch
   #define Test_init                    chaz_Test_init
   #define Test_new_batch               chaz_Test_new_batch
@@ -136,8 +133,7 @@ extern chaz_TestBatch *chaz_Test_current;
   #define Test_fail                    chaz_Test_fail
   #define Test_skip                    chaz_Test_skip
   #define SKIP                         CHAZ_TEST_SKIP
-  #define Test_report_skip_remaining   chaz_Test_report_skip_remaining
-  #define SKIP_REMAINING               CHAZ_TEST_SKIP_REMAINING
+  #define Test_skip_remaining          chaz_Test_skip_remaining
 #endif
 
 #ifdef __cplusplus

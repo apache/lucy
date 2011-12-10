@@ -33,7 +33,8 @@ S_run_tests(TestBatch *batch) {
     FAIL(0, "#defines agree");
   #endif
 #else
-    SKIP_REMAINING(batch, "No variadic macro support");
+    SKIP_REMAINING("No variadic macro support");
+    return;
 #endif
 
 
