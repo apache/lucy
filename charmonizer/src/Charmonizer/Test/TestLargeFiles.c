@@ -269,11 +269,8 @@ S_can_create_big_files(void) {
 #endif /* STAT_TESTS_ENABLED */
 
 int main(int argc, char **argv) {
-    TestBatch *batch;
-
-    Test_init();
-    batch = Test_new_batch("LargeFiles", 20, S_run_tests);
-    batch->run_test(batch);
-    batch->destroy(batch);
-    return 0;
+    TestBatch *batch = Test_start(20);
+    S_run_tests(batch);
+    return !Test_finish();
 }
+

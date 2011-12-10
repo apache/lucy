@@ -28,6 +28,17 @@ extern "C" {
 
 typedef struct chaz_TestBatch chaz_TestBatch;
 
+/* Begin a test run.
+ */
+chaz_TestBatch*
+chaz_Test_start(unsigned num_tests);
+
+/* End a test run.  Returns true if all tests were run and there were no
+ * failures, false otherwise.
+ */
+int
+chaz_Test_finish(void);
+
 /* Destructor.
  */
 typedef void
@@ -128,7 +139,12 @@ void
 chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
                                 const char *pat, ...);
 
+/* Global TestBatch implicitly accessed by testing macros. */
+extern chaz_TestBatch *chaz_Test_current;
+
 #ifdef CHAZ_USE_SHORT_NAMES
+  #define Test_start                   chaz_Test_start
+  #define Test_finish                  chaz_Test_finish
   #define TestBatch_destroy_t          chaz_TestBatch_destroy_t
   #define TestBatch_test_func_t        chaz_TestBatch_test_func_t
   #define TestBatch_run_test_t         chaz_TestBatch_run_test_t

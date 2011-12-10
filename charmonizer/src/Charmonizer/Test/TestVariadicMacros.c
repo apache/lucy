@@ -60,13 +60,9 @@ S_run_tests(TestBatch *batch) {
     TEST_TRUE(batch, really_has_var_macs, "either ISO or GNUC");
 }
 
-
 int main(int argc, char **argv) {
-    TestBatch *batch;
-
-    Test_init();
-    batch = Test_new_batch("VariadicMacros", 4, S_run_tests);
-    batch->run_test(batch);
-    batch->destroy(batch);
-    return 0;
+    TestBatch *batch = Test_start(4);
+    S_run_tests(batch);
+    return !Test_finish();
 }
+

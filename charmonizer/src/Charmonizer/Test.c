@@ -20,6 +20,9 @@
 #include <string.h>
 #include "Charmonizer/Test.h"
 
+chaz_TestBatch*
+chaz_Test_current = NULL;
+
 static void
 S_TestBatch_destroy(chaz_TestBatch *batch);
 
@@ -70,6 +73,27 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
     batch->run_test        = S_TestBatch_run_test;
 
     return batch;
+}
+
+chaz_TestBatch*
+chaz_Test_start(unsigned num_tests) {
+    if (chaz_Test_current) {
+        fprintf(stderr, "Already started testing\n");
+        return NULL;
+    }
+    chaz_Test_init();
+    chaz_Test_current = chaz_Test_new_batch(NULL, num_tests, NULL);
+    CHAZ_TEST_PLAN(chaz_Test_current);
+    return chaz_Test_current;
+}
+
+int
+chaz_Test_finish(void) {
+    int remainder = chaz_Test_current->num_tests
+                    - chaz_Test_current->num_passed
+                    - chaz_Test_current->num_skipped;
+    chaz_Test_current->destroy(chaz_Test_current);
+    return !remainder;
 }
 
 void

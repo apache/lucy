@@ -156,13 +156,9 @@ S_run_tests(TestBatch *batch) {
 #endif
 }
 
-
 int main(int argc, char **argv) {
-    TestBatch *batch;
-
-    Test_init();
-    batch = Test_new_batch("Headers", 2, S_run_tests);
-    batch->run_test(batch);
-    batch->destroy(batch);
-    return 0;
+    TestBatch *batch = Test_start(2);
+    S_run_tests(batch);
+    return !Test_finish();
 }
+
