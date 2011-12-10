@@ -192,16 +192,19 @@ chaz_Test_long_eq(chaz_TestBatch *batch, long got, long expected,
 }
 
 void
-chaz_Test_test_float_eq(chaz_TestBatch *batch, double got, double expected,
-                        const char *message) {
+chaz_Test_double_eq(chaz_TestBatch *batch, double got, double expected,
+                    double slop, const char *message) {
     va_list args;
-    double diff = expected / got;
+    double diff = expected - got;
+    if (diff < 0) {
+        diff = 0 - diff;
+    }
 
     /* Increment test number. */
     batch->test_num++;
 
     /* Evaluate condition and pass or fail. */
-    if (diff > 0.00001) {
+    if (diff < slop) {
         printf("ok %u - %s\n", batch->test_num, message);
         batch->num_passed++;
     }
