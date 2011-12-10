@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <string.h>
 #include "Charmonizer/Test.h"
 
@@ -28,12 +27,6 @@ S_TestBatch_destroy(chaz_TestBatch *batch);
 
 static void
 S_TestBatch_run_test(chaz_TestBatch *batch);
-
-#define CHAZ_TEST_PRINT_MESS(_pattern, _args) \
-    va_start(_args, _pattern); \
-    vprintf(_pattern, _args); \
-    va_end(_args); \
-    printf("\n");
 
 void
 chaz_Test_init(void) {
@@ -117,7 +110,7 @@ S_TestBatch_run_test(chaz_TestBatch *batch) {
 }
 
 void
-chaz_Test_test_true(chaz_TestBatch *batch, int value, const char *pat, ...) {
+chaz_Test_test_true(chaz_TestBatch *batch, int value, const char *message) {
     va_list args;
 
     /* Increment test number. */
@@ -125,19 +118,17 @@ chaz_Test_test_true(chaz_TestBatch *batch, int value, const char *pat, ...) {
 
     /* Test condition and pass or fail. */
     if (value) {
-        printf("ok %u - ", batch->test_num);
+        printf("ok %u - %s\n", batch->test_num, message);
         batch->num_passed++;
     }
     else {
-        printf("not ok %u - ", batch->test_num);
+        printf("not ok %u - %s\n", batch->test_num, message);
         batch->num_failed++;
     }
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-chaz_Test_test_false(chaz_TestBatch *batch, int value, const char *pat, ...) {
+chaz_Test_test_false(chaz_TestBatch *batch, int value, const char *message) {
     va_list args;
 
     /* Increment test number. */
@@ -145,20 +136,18 @@ chaz_Test_test_false(chaz_TestBatch *batch, int value, const char *pat, ...) {
 
     /* Test condition and pass or fail. */
     if (value == 0) {
-        printf("ok %u - ", batch->test_num);
+        printf("ok %u - %s\n", batch->test_num, message);
         batch->num_passed++;
     }
     else {
-        printf("not ok %u - ", batch->test_num);
+        printf("not ok %u - %s\n", batch->test_num, message);
         batch->num_failed++;
     }
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got, const char *expected,
-                 const char *pat, ...) {
+chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got,
+                      const char *expected, const char *message) {
     va_list args;
 
     /* Increment test number. */
@@ -166,71 +155,63 @@ chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got, const char *expect
 
     /* Test condition and pass or fail. */
     if (strcmp(expected, got) == 0) {
-        printf("ok %u - ", batch->test_num);
+        printf("ok %u - %s\n", batch->test_num, message);
         batch->num_passed++;
     }
     else {
-        printf("not ok %u - Expected '%s', got '%s'\n    ", batch->test_num,
-               expected, got);
+        printf("not ok %u - Expected '%s', got '%s'\n    # %s\n",
+               batch->test_num, expected, got, message);
         batch->num_failed++;
     }
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 
 void
-chaz_Test_pass(chaz_TestBatch *batch, const char *pat, ...) {
+chaz_Test_pass(chaz_TestBatch *batch, const char *message) {
     va_list args;
 
     /* Increment test number. */
     batch->test_num++;
 
     /* Indicate pass, update pass counter. */
-    printf("ok %u - ", batch->test_num);
+    printf("ok %u - %s\n", batch->test_num, message);
     batch->num_passed++;
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-chaz_Test_fail(chaz_TestBatch *batch, const char *pat, ...) {
+chaz_Test_fail(chaz_TestBatch *batch, const char *message) {
     va_list args;
 
     /* Increment test number. */
     batch->test_num++;
 
     /* Indicate failure, update pass counter. */
-    printf("not ok %u - ", batch->test_num);
+    printf("not ok %u - %s\n", batch->test_num, message);
     batch->num_failed++;
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
 chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected,
-                 const char *pat, ...) {
+                      const char *message) {
     va_list args;
 
     /* Increment test number. */
     batch->test_num++;
 
     if (expected == got) {
-        printf("ok %u - ", batch->test_num);
+        printf("ok %u - %s\n", batch->test_num, message);
         batch->num_passed++;
     }
     else {
-        printf("not ok %u - Expected '%ld', got '%ld'\n    ", batch->test_num,
-               expected, got);
+        printf("not ok %u - Expected '%ld', got '%ld'\n    # %s",
+               batch->test_num, expected, got, message);
         batch->num_failed++;
     }
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
 chaz_Test_test_float_eq(chaz_TestBatch *batch, double got, double expected,
-                   const char *pat, ...) {
+                        const char *message) {
     va_list args;
     double diff = expected / got;
 
@@ -239,40 +220,35 @@ chaz_Test_test_float_eq(chaz_TestBatch *batch, double got, double expected,
 
     /* Evaluate condition and pass or fail. */
     if (diff > 0.00001) {
-        printf("ok %u - ", batch->test_num);
+        printf("ok %u - %s\n", batch->test_num, message);
         batch->num_passed++;
     }
     else {
-        printf("not ok %u - Expected '%f', got '%f'\n    ", batch->test_num,
-               expected, got);
+        printf("not ok %u - Expected '%f', got '%f'\n    # %s\n",
+               batch->test_num, expected, got, message);
         batch->num_failed++;
     }
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-chaz_Test_skip(chaz_TestBatch *batch, const char *pat, ...) {
+chaz_Test_skip(chaz_TestBatch *batch, const char *message) {
     va_list args;
 
     /* Increment test number. */
     batch->test_num++;
 
     /* Indicate that test is being skipped, update pass counter. */
-    printf("ok %u # SKIP ", batch->test_num);
+    printf("ok %u # SKIP %s\n", batch->test_num, message);
     batch->num_skipped++;
-
-    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-chaz_Test_report_skip_remaining(chaz_TestBatch *batch, const char *pat, ...) {
+chaz_Test_report_skip_remaining(chaz_TestBatch *batch, const char *message) {
     va_list args;
     unsigned remaining = batch->num_tests - batch->test_num;
 
     /* Indicate that tests are being skipped, update skip counter. */
-    printf("# Skipping all %u remaining tests: ", remaining);
-    CHAZ_TEST_PRINT_MESS(pat, args);
+    printf("# Skipping all %u remaining tests: %s\n", remaining, message);
     while (batch->test_num < batch->num_tests) {
         CHAZ_TEST_SKIP(batch, "");
     }

@@ -108,36 +108,36 @@ chaz_Test_plan(chaz_TestBatch *batch);
 
 void
 chaz_Test_test_true(chaz_TestBatch *batch, int expression,
-                    const char *pat, ...);
+                    const char *message);
 
 void
 chaz_Test_test_false(chaz_TestBatch *batch, int expression,
-                     const char *pat, ...);
+                     const char *message);
 
 void
 chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got,
-                      const char *expected, const char *pat, ...);
+                      const char *expected, const char *message);
 
 void
-chaz_Test_pass(chaz_TestBatch *batch, const char *pat, ...);
+chaz_Test_pass(chaz_TestBatch *batch, const char *message);
 
 void
-chaz_Test_fail(chaz_TestBatch *batch, const char *pat, ...);
+chaz_Test_fail(chaz_TestBatch *batch, const char *message);
 
 void
 chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected,
-                      const char *pat, ...);
+                      const char *message);
 
 void
 chaz_Test_test_float_eq(chaz_TestBatch *batch, double got,
-                        double expected, const char *pat, ...);
+                        double expected, const char *message);
 
 void
-chaz_Test_skip(chaz_TestBatch *batch, const char *pat, ...);
+chaz_Test_skip(chaz_TestBatch *batch, const char *message);
 
 void
 chaz_Test_report_skip_remaining(chaz_TestBatch* batch,
-                                const char *pat, ...);
+                                const char *message);
 
 /* Global TestBatch implicitly accessed by testing macros. */
 extern chaz_TestBatch *chaz_Test_current;
