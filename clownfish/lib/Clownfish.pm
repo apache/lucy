@@ -23,6 +23,57 @@ use XSLoader;
 BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
+    package Clownfish::Util;
+    use base qw( Exporter );
+    use Scalar::Util qw( blessed );
+    use Carp;
+    use Fcntl;
+
+    BEGIN {
+        our @EXPORT_OK = qw(
+            slurp_text
+            current
+            strip_c_comments
+            verify_args
+            a_isa_b
+            write_if_changed
+            trim_whitespace
+            is_dir
+            make_dir
+            make_path
+        );
+    }
+
+    sub verify_args {
+        my $defaults = shift;    # leave the rest of @_ intact
+
+        # Verify that args came in pairs.
+        if ( @_ % 2 ) {
+            my ( $package, $filename, $line ) = caller(1);
+            $@ = "Parameter error: odd number of args at $filename line $line\n";
+            return 0;
+        }
+
+        # Verify keys, ignore values.
+        while (@_) {
+            my ( $var, undef ) = ( shift, shift );
+            next if exists $defaults->{$var};
+            my ( $package, $filename, $line ) = caller(1);
+            $@ = "Invalid parameter: '$var' at $filename line $line\n";
+            return 0;
+        }
+
+        return 1;
+    }
+
+    sub a_isa_b {
+        my ( $thing, $class ) = @_;
+        return 0 unless blessed($thing);
+        return $thing->isa($class);
+    }
+}
+
+{
     package Clownfish::Base;
 }
 
@@ -650,6 +701,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
     package Clownfish::Binding::Perl::Subroutine;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
     use Carp;
     use Clownfish::Util qw( verify_args );
 
