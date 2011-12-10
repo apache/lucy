@@ -134,7 +134,7 @@ sub _get_boot_func   { $boot_func{ +shift } }
 sub write_bindings {
     my $self           = shift;
     my $ordered        = $self->_get_hierarchy->ordered_classes;
-    my $registry       = Clownfish::Binding::Perl::Class->registry;
+    my $registered     = Clownfish::Binding::Perl::Class->registered;
     my $hand_rolled_xs = "";
     my $generated_xs   = "";
     my $xs             = "";
@@ -144,7 +144,11 @@ sub write_bindings {
     my %has_constructors;
     my %has_methods;
     my %has_xs_code;
-    while ( my ( $class_name, $class_binding ) = each %$registry ) {
+    for my $class (@$registered) {
+        my $class_name = $class->get_class_name;
+        my $class_binding
+            = Clownfish::Binding::Perl::Class->singleton($class_name)
+            or next;
         $has_constructors{$class_name} = 1
             if $class_binding->get_bind_constructors;
         $has_methods{$class_name} = 1
@@ -164,8 +168,9 @@ sub write_bindings {
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
         next unless delete $has_constructors{$class_name};
-        my $class_binding = $registry->{$class_name};
-        my @bound         = $class_binding->constructor_bindings;
+        my $class_binding
+            = Clownfish::Binding::Perl::Class->singleton($class_name);
+        my @bound = $class_binding->constructor_bindings;
         $generated_xs .= $_->xsub_def . "\n" for @bound;
         push @xsubs, @bound;
     }
@@ -174,7 +179,8 @@ sub write_bindings {
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
         next unless delete $has_methods{$class_name};
-        my $class_binding = $registry->{$class_name};
+        my $class_binding
+            = Clownfish::Binding::Perl::Class->singleton($class_name);
         my @bound         = $class_binding->method_bindings;
         $generated_xs .= $_->xsub_def . "\n" for @bound;
         push @xsubs, @bound;
@@ -182,7 +188,8 @@ sub write_bindings {
 
     # Hand-rolled XS.
     for my $class_name ( keys %has_xs_code ) {
-        my $class_binding = $registry->{$class_name};
+        my $class_binding
+            = Clownfish::Binding::Perl::Class->singleton($class_name);
         $hand_rolled_xs .= $class_binding->get_xs_code . "\n";
     }
     %has_xs_code = ();
@@ -315,16 +322,18 @@ sub prepare_pod {
     my %has_pod;
     my %modified;
 
-    my $registry = Clownfish::Binding::Perl::Class->registry;
+    my $registered = Clownfish::Binding::Perl::Class->registered;
     $has_pod{ $_->get_class_name } = 1
-        for grep { $_->get_pod_spec } values %$registry;
+        for grep { $_->get_pod_spec } @$registered;
 
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
-        my $class_binding = $registry->{$class_name} or next;
+        my $class_binding
+            = Clownfish::Binding::Perl::Class->singleton($class_name)
+            or next;
         next unless delete $has_pod{$class_name};
-        my $pod = $class_binding->create_pod;
-        confess("Failed to generate POD for $class_name") unless $pod;
+        my $pod = $class_binding->create_pod
+            or confess("Failed to generate POD for $class_name");
 
         # Compare against existing file; rewrite if changed.
         my $pod_file_path
