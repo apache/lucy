@@ -16,6 +16,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCPerlClass.h"
@@ -36,6 +37,10 @@ struct CFCPerlClass {
     char *xs_code;
     CFCPerlPod *pod_spec;
 };
+
+static CFCPerlClass **registry = NULL;
+static size_t registry_size = 0;
+static size_t registry_cap  = 0;
 
 CFCPerlClass*
 CFCPerlClass_new(CFCParcel *parcel, const char *class_name, CFCClass *client, 
@@ -69,6 +74,62 @@ CFCPerlClass_destroy(CFCPerlClass *self) {
     FREEMEM(self->class_name);
     FREEMEM(self->xs_code);
     CFCBase_destroy((CFCBase*)self);
+}
+
+static int
+S_compare_cfcperlclass(const void *va, const void *vb) {
+    CFCPerlClass *a = *(CFCPerlClass**)va;
+    CFCPerlClass *b = *(CFCPerlClass**)vb;
+    return strcmp(a->class_name, b->class_name);
+}
+
+void
+CFCPerlClass_add_to_registry(CFCPerlClass *self) {
+    if (registry_size == registry_cap) {
+        size_t new_cap = registry_cap + 10;
+        registry = (CFCPerlClass**)REALLOCATE(registry,
+                       (new_cap + 1) * sizeof(CFCPerlClass*));
+        for (size_t i = registry_cap; i <= new_cap; i++) {
+            registry[i] = NULL;
+        }
+        registry_cap = new_cap;
+    }
+    CFCPerlClass *existing = CFCPerlClass_singleton(self->class_name);
+    if (existing) {
+        CFCUtil_die("Class '%s' already registered", self->class_name);
+    }
+    registry[registry_size] = (CFCPerlClass*)CFCBase_incref((CFCBase*)self);
+    registry_size++;
+    qsort(registry, registry_size, sizeof(CFCPerlClass*),
+          S_compare_cfcperlclass);
+}
+
+CFCPerlClass*
+CFCPerlClass_singleton(const char *class_name) {
+    CFCUTIL_NULL_CHECK(class_name);
+    for (size_t i = 0; i < registry_size; i++) {
+        CFCPerlClass *existing = registry[i];
+        if (strcmp(class_name, existing->class_name) == 0) {
+            return existing;
+        }
+    }
+    return NULL;
+}
+
+CFCPerlClass**
+CFCPerlClass_registry() {
+    return registry;
+}
+
+void
+CFCPerlClass_clear_registry(void) {
+    for (size_t i = 0; i < registry_size; i++) {
+        CFCBase_decref((CFCBase*)registry[i]);
+    }
+    FREEMEM(registry);
+    registry_size = 0;
+    registry_cap  = 0;
+    registry      = NULL;
 }
 
 CFCClass*

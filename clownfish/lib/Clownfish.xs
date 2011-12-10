@@ -2009,6 +2009,33 @@ PPCODE:
     CFCPerlClass_destroy(self);
 
 void
+_add_to_registry(self)
+    CFCPerlClass *self;
+PPCODE:
+    CFCPerlClass_add_to_registry(self);
+
+SV*
+singleton(unused_sv, class_name)
+    SV *unused_sv;
+    const char *class_name;
+CODE:
+    CFCPerlClass *binding = CFCPerlClass_singleton(class_name);
+    RETVAL = S_cfcbase_to_perlref(binding);
+OUTPUT: RETVAL
+
+SV*
+registered(...)
+CODE:
+    CFCPerlClass **registry = CFCPerlClass_registry();
+    RETVAL = S_array_of_cfcbase_to_av((CFCBase**)registry);
+OUTPUT: RETVAL
+
+void
+_clear_registry(...)
+PPCODE:
+    CFCPerlClass_clear_registry();
+
+void
 _set_or_get(self, ...)
     CFCPerlClass *self;
 ALIAS:

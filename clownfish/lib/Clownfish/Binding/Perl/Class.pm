@@ -22,8 +22,6 @@ use Clownfish::Util qw( verify_args );
 use Clownfish::Binding::Perl::Pod;
 use Carp;
 
-our %registry;
-
 our %register_PARAMS = (
     parcel            => undef,
     class_name        => undef,
@@ -45,8 +43,6 @@ sub register {
     # Validate.
     confess("Missing required param 'class_name'")
         unless $args{class_name};
-    confess("$args{class_name} already registered")
-        if exists $registry{ $args{class_name} };
 
     # Retrieve Clownfish::Class client, if it will be needed.
     my $client;
@@ -74,18 +70,9 @@ sub register {
     $bind_constructors{$self} = $args{bind_constructors};
 
     # Add to registry.
-    $registry{ $args{class_name} } = $self;
+    _add_to_registry($self);
 
     return $self;
-}
-
-sub singleton {
-    my ( undef, $class_name ) = @_;
-    return $registry{$class_name};
-}
-
-sub registered {
-	[ values %registry ]
 }
 
 sub DESTROY {
@@ -94,6 +81,8 @@ sub DESTROY {
     delete $bind_constructors{$self};
     _destroy($self);
 }
+
+END { __PACKAGE__->_clear_registry }
 
 sub get_bind_methods      { $bind_methods{ +shift } }
 sub get_bind_constructors { $bind_constructors{ +shift } }
@@ -205,7 +194,7 @@ sub create_pod {
         $inheritance_pod .= $class->get_class_name;
         for my $ancestor (@ancestors) {
             my $class_name = $ancestor->get_class_name;           
-            if ( $registry{$class_name} ) {
+            if ( __PACKAGE__->singleton($class_name) ) {
                 $inheritance_pod .= " isa L<$class_name>";
             } 
             else {

@@ -40,6 +40,18 @@ CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
 void
 CFCPerlClass_destroy(CFCPerlClass *self);
 
+void
+CFCPerlClass_add_to_registry(CFCPerlClass *self);
+
+CFCPerlClass*
+CFCPerlClass_singleton(const char *class_name);
+
+CFCPerlClass**
+CFCPerlClass_registry();
+
+void
+CFCPerlClass_clear_registry(void);
+
 struct CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self);
 
