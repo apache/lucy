@@ -212,7 +212,7 @@ chaz_Test_skip_remaining(chaz_TestBatch *batch, const char *message) {
     /* Indicate that tests are being skipped, update skip counter. */
     printf("# Skipping all %u remaining tests: %s\n", remaining, message);
     while (batch->test_num < batch->num_tests) {
-        CHAZ_TEST_SKIP(batch, "");
+        chaz_Test_skip(batch, "");
     }
 }
 

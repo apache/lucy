@@ -54,7 +54,7 @@ S_run_tests(TestBatch *batch) {
 #ifdef HAS_INTTYPES_H
     LONG_EQ(sizeof(int8_t), 1, "HAS_INTTYPES_H");
 #else
-    SKIP(batch, "No inttypes.h");
+    SKIP("No inttypes.h");
 #endif
 
     {

@@ -45,7 +45,7 @@ S_run_tests(TestBatch *batch) {
     ISO_TEST(buf, "%s", "iso");
     STR_EQ(buf, "iso", "ISO variadic macros work");
 #else
-    SKIP(batch, "No ISO variadic macros");
+    SKIP("No ISO variadic macros");
 #endif
 
 #ifdef HAS_GNUC_VARIADIC_MACROS
@@ -55,7 +55,7 @@ S_run_tests(TestBatch *batch) {
     GNU_TEST(buf, "%s", "gnu");
     STR_EQ(buf, "gnu", "GNUC variadic macros work");
 #else
-    SKIP(batch, "No GNUC variadic macros");
+    SKIP("No GNUC variadic macros");
 #endif
 
     OK(really_has_var_macs, "either ISO or GNUC");

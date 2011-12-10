@@ -50,7 +50,7 @@ S_run_tests(TestBatch *batch) {
         LONG_EQ(5, entry.d_namlen, "d_namlen");
     }
 #else
-    SKIP(batch, "no d_namlen member on this platform");
+    SKIP("no d_namlen member on this platform");
 #endif
 #ifdef CHY_HAS_DIRENT_D_TYPE
     {
@@ -59,7 +59,7 @@ S_run_tests(TestBatch *batch) {
         LONG_EQ(5, entry.d_type, "d_type");
     }
 #else
-    SKIP(batch, "no d_type member on this platform");
+    SKIP("no d_type member on this platform");
 #endif
 }
 

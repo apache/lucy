@@ -177,8 +177,8 @@ S_run_tests(TestBatch *batch) {
     LONG_EQ(check_val, 1, "pread64");
     LONG_EQ(check_char, 'X', "pread64() correct data");
 #else
-    SKIP(batch, "no pread64");
-    SKIP(batch, "no pread64");
+    SKIP("no pread64");
+    SKIP("no pread64");
 #endif
 
     check_val = close(fd);
