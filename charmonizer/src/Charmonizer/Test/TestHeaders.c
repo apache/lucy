@@ -145,7 +145,7 @@
 #endif
 
 static void
-S_run_tests(TestBatch *batch) {
+S_run_tests(void) {
     PASS("Compiled successfully with all detected headers");
 
     /* Don't bother checking all -- just use stdio as an example. */
@@ -157,8 +157,8 @@ S_run_tests(TestBatch *batch) {
 }
 
 int main(int argc, char **argv) {
-    TestBatch *batch = Test_start(2);
-    S_run_tests(batch);
+    Test_start(2);
+    S_run_tests();
     return !Test_finish();
 }
 

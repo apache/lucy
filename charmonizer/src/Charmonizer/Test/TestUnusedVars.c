@@ -20,7 +20,7 @@
 #include "Charmonizer/Test.h"
 
 static void
-S_run_tests(TestBatch *batch) {
+S_run_tests(void) {
 #ifdef UNUSED_VAR
     PASS("UNUSED_VAR macro is defined");
 #else
@@ -35,8 +35,8 @@ S_run_tests(TestBatch *batch) {
 }
 
 int main(int argc, char **argv) {
-    TestBatch *batch = Test_start(2);
-    S_run_tests(batch);
+    Test_start(2);
+    S_run_tests();
     return !Test_finish();
 }
 

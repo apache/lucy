@@ -68,7 +68,7 @@ S_can_create_big_files(void);
 #endif
 
 static void
-S_run_tests(TestBatch *batch) {
+S_run_tests(void) {
     FILE *fh;
     off64_t offset;
     int check_val;
@@ -273,8 +273,8 @@ S_can_create_big_files(void) {
 #endif /* STAT_TESTS_ENABLED */
 
 int main(int argc, char **argv) {
-    TestBatch *batch = Test_start(20);
-    S_run_tests(batch);
+    Test_start(20);
+    S_run_tests();
     return !Test_finish();
 }
 

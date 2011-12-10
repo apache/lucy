@@ -27,7 +27,7 @@ static INLINE const char* S_inline_function() {
 #endif
 
 static void
-S_run_tests(TestBatch *batch) {
+S_run_tests(void) {
 
 #ifdef HAS_FUNC_MACRO
     STR_EQ(FUNC_MACRO, "S_run_tests", "FUNC_MACRO");
@@ -56,8 +56,8 @@ S_run_tests(TestBatch *batch) {
 
 
 int main(int argc, char **argv) {
-    TestBatch *batch = Test_start(4);
-    S_run_tests(batch);
+    Test_start(4);
+    S_run_tests();
     return !Test_finish();
 }
 

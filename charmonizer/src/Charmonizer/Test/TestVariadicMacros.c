@@ -22,7 +22,7 @@
 #include "Charmonizer/Test.h"
 
 static void
-S_run_tests(TestBatch *batch) {
+S_run_tests(void) {
     char buf[10];
     chaz_bool_t really_has_var_macs = false;
 
@@ -62,8 +62,8 @@ S_run_tests(TestBatch *batch) {
 }
 
 int main(int argc, char **argv) {
-    TestBatch *batch = Test_start(4);
-    S_run_tests(batch);
+    Test_start(4);
+    S_run_tests();
     return !Test_finish();
 }
 
