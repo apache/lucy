@@ -37,8 +37,6 @@ our %register_PARAMS = (
 
 our %bind_methods;
 our %bind_constructors;
-our %make_pod;
-our %pod_spec;
 
 sub register {
     my ( $either, %args ) = @_;
@@ -65,15 +63,16 @@ sub register {
             unless $args{client};
     }
 
+    # Create Pod spec if needed.
+    my $pod_spec;
+    if ( $args{make_pod} ) {
+        $pod_spec = Clownfish::Binding::Perl::Pod->new( %{ $args{make_pod} } );
+    }
+
     # Create object.
-    my $self = _new( @args{qw( parcel class_name client xs_code )} );
+    my $self = _new( @args{qw( parcel class_name client xs_code pod_spec )} );
     $bind_methods{$self}      = $args{bind_methods};
     $bind_constructors{$self} = $args{bind_constructors};
-    if ( $args{make_pod} ) {
-        $make_pod{$self} = $args{make_pod};
-        $pod_spec{$self}
-            = Clownfish::Binding::Perl::Pod->new( %{ $args{make_pod} } );
-    }
 
     # Add to registry.
     $registry{ $args{class_name} } = $self;
@@ -85,15 +84,11 @@ sub DESTROY {
     my $self = shift;
     delete $bind_methods{$self};
     delete $bind_constructors{$self};
-    delete $make_pod{$self};
-    delete $pod_spec{$self};
     _destroy($self);
 }
 
 sub get_bind_methods      { $bind_methods{ +shift } }
 sub get_bind_constructors { $bind_constructors{ +shift } }
-sub get_make_pod          { $make_pod{ +shift } }
-sub get_pod_spec          { $pod_spec{ +shift } }
 
 sub constructor_bindings {
     my $self  = shift;
@@ -168,8 +163,7 @@ sub method_bindings {
 
 sub create_pod {
     my $self       = shift;
-    my $pod_args   = $self->get_make_pod or return;
-    my $pod_spec   = $self->get_pod_spec;
+    my $pod_spec   = $self->get_pod_spec or return;
     my $class_name = $self->get_class_name;
     my $class      = $self->get_client or die "No client for $class_name";
     my $docucom    = $class->get_docucomment;

@@ -26,6 +26,7 @@
 #include "CFCFunction.h"
 #include "CFCDocuComment.h"
 #include "CFCSymbol.h"
+#include "CFCPerlPod.h"
 
 struct CFCPerlClass {
     CFCBase base;
@@ -33,25 +34,29 @@ struct CFCPerlClass {
     char *class_name;
     CFCClass *client;
     char *xs_code;
+    CFCPerlPod *pod_spec;
 };
 
 CFCPerlClass*
 CFCPerlClass_new(CFCParcel *parcel, const char *class_name, CFCClass *client, 
-                 const char *xs_code) {
+                 const char *xs_code, CFCPerlPod *pod_spec) {
     CFCPerlClass *self
         = (CFCPerlClass*)CFCBase_allocate(sizeof(CFCPerlClass),
                                           "Clownfish::Binding::Perl::Class");
-    return CFCPerlClass_init(self, parcel, class_name, client, xs_code);
+    return CFCPerlClass_init(self, parcel, class_name, client, xs_code,
+                             pod_spec);
 }
 
 CFCPerlClass*
-CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel, const char *class_name,
-                  CFCClass *client, const char *xs_code) {
+CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel,
+                  const char *class_name, CFCClass *client,
+                  const char *xs_code, CFCPerlPod *pod_spec) {
     CFCUTIL_NULL_CHECK(parcel);
     CFCUTIL_NULL_CHECK(class_name);
     self->parcel = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
     self->client = (CFCClass*)CFCBase_incref((CFCBase*)client);
     self->class_name = CFCUtil_strdup(class_name);
+    self->pod_spec = (CFCPerlPod*)CFCBase_incref((CFCBase*)pod_spec);
     self->xs_code = xs_code ? CFCUtil_strdup(xs_code) : NULL;
     return self;
 }
@@ -60,6 +65,7 @@ void
 CFCPerlClass_destroy(CFCPerlClass *self) {
     CFCBase_decref((CFCBase*)self->parcel);
     CFCBase_decref((CFCBase*)self->client);
+    CFCBase_decref((CFCBase*)self->pod_spec);
     FREEMEM(self->class_name);
     FREEMEM(self->xs_code);
     CFCBase_destroy((CFCBase*)self);
@@ -78,5 +84,10 @@ CFCPerlClass_get_class_name(CFCPerlClass *self) {
 const char*
 CFCPerlClass_get_xs_code(CFCPerlClass *self) {
     return self->xs_code;
+}
+
+CFCPerlPod*
+CFCPerlClass_get_pod_spec(CFCPerlClass *self) {
+    return self->pod_spec;
 }
 

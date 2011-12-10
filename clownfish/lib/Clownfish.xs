@@ -1986,17 +1986,18 @@ OUTPUT: RETVAL
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Class
 
 SV*
-_new(parcel, class_name, client, xs_code_sv)
+_new(parcel, class_name, client, xs_code_sv, pod_spec)
     CFCParcel  *parcel;
     const char *class_name;
     CFCClass   *client;
     SV         *xs_code_sv;
+    CFCPerlPod *pod_spec;
 CODE:
     const char *xs_code = SvOK(xs_code_sv)
                           ? SvPV_nolen(xs_code_sv)
                           : NULL;
     CFCPerlClass *self
-        = CFCPerlClass_new(parcel, class_name, client,xs_code);
+        = CFCPerlClass_new(parcel, class_name, client, xs_code, pod_spec);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -2014,6 +2015,7 @@ ALIAS:
     get_class_name     = 2
     get_client         = 4
     get_xs_code        = 6
+    get_pod_spec       = 8
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -2032,6 +2034,11 @@ PPCODE:
                 retval = value
                          ? newSVpvn(value, strlen(value))
                          : newSV(0);
+            }
+            break;
+        case 8: {
+                CFCPerlPod *value = CFCPerlClass_get_pod_spec(self);
+                retval = S_cfcbase_to_perlref(value);
             }
             break;
     END_SET_OR_GET_SWITCH

@@ -25,15 +25,17 @@ typedef struct CFCPerlClass CFCPerlClass;
 struct CFCParcel;
 struct CFCClass;
 struct CFCFunction;
+struct CFCPerlPod;
 
 CFCPerlClass*
 CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name,
-                 struct CFCClass *client, const char *xs_code);
+                 struct CFCClass *client, const char *xs_code,
+                 struct CFCPerlPod *pod_spec);
 
 CFCPerlClass*
 CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
                   const char *class_name, struct CFCClass *client,
-                  const char *xs_code);
+                  const char *xs_code, struct CFCPerlPod *pod_spec);
 
 void
 CFCPerlClass_destroy(CFCPerlClass *self);
@@ -47,6 +49,8 @@ CFCPerlClass_get_class_name(CFCPerlClass *self);
 const char*
 CFCPerlClass_get_xs_code(CFCPerlClass *self);
 
+struct CFCPerlPod*
+CFCPerlClass_get_pod_spec(CFCPerlClass *self);
 
 #ifdef __cplusplus
 }
