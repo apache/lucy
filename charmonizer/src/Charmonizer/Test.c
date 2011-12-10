@@ -19,14 +19,16 @@
 #include <string.h>
 #include "Charmonizer/Test.h"
 
+struct chaz_TestBatch {
+    unsigned test_num;
+    unsigned num_tests;
+    unsigned num_passed;
+    unsigned num_failed;
+    unsigned num_skipped;
+};
+
 chaz_TestBatch*
 chaz_Test_current = NULL;
-
-static void
-S_TestBatch_destroy(chaz_TestBatch *batch);
-
-static void
-S_TestBatch_run_test(chaz_TestBatch *batch);
 
 void
 chaz_Test_init(void) {
@@ -38,32 +40,21 @@ chaz_Test_init(void) {
 }
 
 chaz_TestBatch*
-chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
-                    chaz_TestBatch_test_func_t test_func) {
+chaz_Test_new_batch(unsigned num_tests) {
     chaz_TestBatch *batch = (chaz_TestBatch*)malloc(sizeof(chaz_TestBatch));
     if (!batch) {
         fprintf(stderr, "Out of memory\n");
         return NULL;
     }
-    batch_name = batch_name ? batch_name : "";
 
     /* Assign. */
     batch->num_tests       = num_tests;
-    batch->test_func       = test_func;
-    batch->name            = (char*)malloc(strlen(batch_name) + 1);
-    if (!batch->name) {
-        fprintf(stderr, "Out of memory\n");
-        return NULL;
-    }
-    strcpy(batch->name, batch_name);
 
     /* Initialize. */
     batch->test_num        = 0;
     batch->num_passed      = 0;
     batch->num_failed      = 0;
     batch->num_skipped     = 0;
-    batch->destroy         = S_TestBatch_destroy;
-    batch->run_test        = S_TestBatch_run_test;
 
     return batch;
 }
@@ -75,7 +66,7 @@ chaz_Test_start(unsigned num_tests) {
         return NULL;
     }
     chaz_Test_init();
-    chaz_Test_current = chaz_Test_new_batch(NULL, num_tests, NULL);
+    chaz_Test_current = chaz_Test_new_batch(num_tests);
     CHAZ_TEST_PLAN(chaz_Test_current);
     return chaz_Test_current;
 }
@@ -85,28 +76,14 @@ chaz_Test_finish(void) {
     int remainder = chaz_Test_current->num_tests
                     - chaz_Test_current->num_passed
                     - chaz_Test_current->num_skipped;
-    chaz_Test_current->destroy(chaz_Test_current);
+    free(chaz_Test_current);
+    chaz_Test_current = NULL;
     return !remainder;
 }
 
 void
 chaz_Test_plan(chaz_TestBatch *batch) {
     printf("1..%u\n", batch->num_tests);
-}
-
-static void
-S_TestBatch_destroy(chaz_TestBatch *batch) {
-    free(batch->name);
-    free(batch);
-}
-
-static void
-S_TestBatch_run_test(chaz_TestBatch *batch) {
-    /* Print start. */
-    CHAZ_TEST_PLAN(batch);
-
-    /* Run the batch. */
-    batch->test_func(batch);
 }
 
 void

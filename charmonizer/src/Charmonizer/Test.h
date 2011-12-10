@@ -39,34 +39,6 @@ chaz_Test_start(unsigned num_tests);
 int
 chaz_Test_finish(void);
 
-/* Destructor.
- */
-typedef void
-(*chaz_TestBatch_destroy_t)(chaz_TestBatch *batch);
-
-/* This function, which is unique to each TestBatch, actually runs the test
- * sequence.
- */
-typedef void
-(*chaz_TestBatch_test_func_t)(chaz_TestBatch *batch);
-
-/* Print a header, execute the test sequence, print a report.
- */
-typedef void
-(*chaz_TestBatch_run_test_t)(chaz_TestBatch *batch);
-
-struct chaz_TestBatch {
-    char         *name;
-    unsigned      test_num;
-    unsigned      num_tests;
-    unsigned      num_passed;
-    unsigned      num_failed;
-    unsigned      num_skipped;
-    chaz_TestBatch_destroy_t      destroy;
-    chaz_TestBatch_test_func_t    test_func;
-    chaz_TestBatch_run_test_t     run_test;
-};
-
 /* Unbuffer stdout.  Perform any other setup needed.
  */
 void
@@ -75,8 +47,7 @@ chaz_Test_init(void);
 /* Constructor for TestBatch.
  */
 chaz_TestBatch*
-chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
-                    chaz_TestBatch_test_func_t test_func);
+chaz_Test_new_batch(unsigned num_tests);
 
 /* Note: maybe add line numbers later.
  */
@@ -153,9 +124,6 @@ extern chaz_TestBatch *chaz_Test_current;
   #define DOUBLE_EQ                    CHAZ_TEST_DOUBLE_EQ
   #define PASS                         CHAZ_TEST_PASS
   #define FAIL                         CHAZ_TEST_FAIL
-  #define TestBatch_destroy_t          chaz_TestBatch_destroy_t
-  #define TestBatch_test_func_t        chaz_TestBatch_test_func_t
-  #define TestBatch_run_test_t         chaz_TestBatch_run_test_t
   #define TestBatch                    chaz_TestBatch
   #define Test_init                    chaz_Test_init
   #define Test_new_batch               chaz_Test_new_batch
