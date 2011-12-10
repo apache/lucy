@@ -82,8 +82,6 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
  */
 #define CHAZ_TEST_PLAN              chaz_Test_plan
 #define CHAZ_TEST_TEST_STR_EQ       chaz_Test_test_str_eq
-#define CHAZ_TEST_PASS              chaz_Test_pass
-#define CHAZ_TEST_FAIL              chaz_Test_fail
 #define CHAZ_TEST_TEST_INT_EQ       chaz_Test_test_int_eq
 #define CHAZ_TEST_TEST_FLOAT_EQ     chaz_Test_test_float_eq
 
@@ -115,9 +113,13 @@ void
 chaz_Test_str_eq(chaz_TestBatch *batch, const char *got,
                  const char *expected, const char *message);
 
+#define CHAZ_TEST_PASS(_message) \
+	chaz_Test_pass(chaz_Test_current, (_message))
 void
 chaz_Test_pass(chaz_TestBatch *batch, const char *message);
 
+#define CHAZ_TEST_FAIL(_message) \
+	chaz_Test_fail(chaz_Test_current, (_message))
 void
 chaz_Test_fail(chaz_TestBatch *batch, const char *message);
 
@@ -144,6 +146,8 @@ extern chaz_TestBatch *chaz_Test_current;
   #define Test_finish                  chaz_Test_finish
   #define OK                           CHAZ_TEST_OK
   #define STR_EQ                       CHAZ_TEST_STR_EQ
+  #define PASS                         CHAZ_TEST_PASS
+  #define FAIL                         CHAZ_TEST_FAIL
   #define TestBatch_destroy_t          chaz_TestBatch_destroy_t
   #define TestBatch_test_func_t        chaz_TestBatch_test_func_t
   #define TestBatch_run_test_t         chaz_TestBatch_run_test_t
@@ -154,9 +158,7 @@ extern chaz_TestBatch *chaz_Test_current;
   #define PLAN                         CHAZ_TEST_PLAN
   #define Test_str_eq                  chaz_Test_str_eq
   #define Test_pass                    chaz_Test_pass
-  #define PASS                         CHAZ_TEST_PASS
   #define Test_fail                    chaz_Test_fail
-  #define FAIL                         CHAZ_TEST_FAIL
   #define Test_test_int_eq             chaz_Test_test_int_eq
   #define TEST_INT_EQ                  CHAZ_TEST_TEST_INT_EQ
   #define Test_test_float_eq           chaz_Test_test_float_eq

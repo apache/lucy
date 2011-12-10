@@ -35,7 +35,7 @@ S_run_tests(TestBatch *batch) {
  #if defined(LITTLE_END)
         OK(!big_endian, "LITTLE_END");
  #else
-        FAIL(batch, "Either BIG_END or LITTLE_END should be defined");
+        FAIL("Either BIG_END or LITTLE_END should be defined");
  #endif
 #endif
     }

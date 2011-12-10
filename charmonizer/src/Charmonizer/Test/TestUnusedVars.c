@@ -22,15 +22,15 @@
 static void
 S_run_tests(TestBatch *batch) {
 #ifdef UNUSED_VAR
-    PASS(batch, "UNUSED_VAR macro is defined");
+    PASS("UNUSED_VAR macro is defined");
 #else
-    FAIL(batch, "UNUSED_VAR macro is defined");
+    FAIL("UNUSED_VAR macro is defined");
 #endif
 
 #ifdef UNREACHABLE_RETURN
-    PASS(batch, "UNREACHABLE_RETURN macro is defined");
+    PASS("UNREACHABLE_RETURN macro is defined");
 #else
-    FAIL(batch, "UNREACHABLE_RETURN macro is defined");
+    FAIL("UNREACHABLE_RETURN macro is defined");
 #endif
 }
 

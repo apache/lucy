@@ -48,7 +48,7 @@ S_run_tests(TestBatch *batch) {
 #endif
 
 #ifdef INLINE
-    PASS(batch, S_inline_function());
+    PASS(S_inline_function());
 #else
     SKIP(batch, "no INLINE functions");
 #endif

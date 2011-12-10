@@ -141,7 +141,7 @@ S_run_tests(TestBatch *batch) {
     fd = open("_charm_large_file_test",
               O_RDWR | O_CREAT | LARGEFILE_OPEN_FLAG, 0666);
     if (fd == -1) {
-        FAIL(batch, "open failed");
+        FAIL("open failed");
         SKIP_REMAINING(batch, "open failed");
     }
 

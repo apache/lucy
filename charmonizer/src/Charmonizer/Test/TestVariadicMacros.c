@@ -28,9 +28,9 @@ S_run_tests(TestBatch *batch) {
 
 #if defined(HAS_ISO_VARIADIC_MACROS) || defined(HAS_GNUC_VARIADIC_MACROS)
   #ifdef HAS_VARIADIC_MACROS
-    PASS(batch, "#defines agree");
+    PASS("#defines agree");
   #else
-    FAIL(batch, 0, "#defines agree");
+    FAIL(0, "#defines agree");
   #endif
 #else
     SKIP_REMAINING(batch, "No variadic macro support");
