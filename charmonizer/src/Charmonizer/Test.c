@@ -128,24 +128,6 @@ chaz_Test_ok(chaz_TestBatch *batch, int value, const char *message) {
 }
 
 void
-chaz_Test_test_false(chaz_TestBatch *batch, int value, const char *message) {
-    va_list args;
-
-    /* Increment test number. */
-    batch->test_num++;
-
-    /* Test condition and pass or fail. */
-    if (value == 0) {
-        printf("ok %u - %s\n", batch->test_num, message);
-        batch->num_passed++;
-    }
-    else {
-        printf("not ok %u - %s\n", batch->test_num, message);
-        batch->num_failed++;
-    }
-}
-
-void
 chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got,
                       const char *expected, const char *message) {
     va_list args;

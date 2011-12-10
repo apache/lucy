@@ -60,7 +60,7 @@ S_run_tests(TestBatch *batch) {
     {
         bool_t the_truth = true;
         OK(the_truth, "bool_t true");
-        TEST_FALSE(batch, false, "false is false");
+        OK(!false, "false is false");
     }
 #ifdef HAS_I8_T
     {

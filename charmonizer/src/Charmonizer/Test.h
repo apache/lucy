@@ -81,7 +81,6 @@ chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
 /* Note: maybe add line numbers later.
  */
 #define CHAZ_TEST_PLAN              chaz_Test_plan
-#define CHAZ_TEST_TEST_FALSE        chaz_Test_test_false
 #define CHAZ_TEST_TEST_STR_EQ       chaz_Test_test_str_eq
 #define CHAZ_TEST_PASS              chaz_Test_pass
 #define CHAZ_TEST_FAIL              chaz_Test_fail
@@ -109,10 +108,6 @@ chaz_Test_plan(chaz_TestBatch *batch);
 	chaz_Test_ok(chaz_Test_current, (_expression), (_message))
 void
 chaz_Test_ok(chaz_TestBatch *batch, int expression, const char *message);
-
-void
-chaz_Test_test_false(chaz_TestBatch *batch, int expression,
-                     const char *message);
 
 void
 chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got,
@@ -154,8 +149,6 @@ extern chaz_TestBatch *chaz_Test_current;
   #define Test_new_batch               chaz_Test_new_batch
   #define Test_plan                    chaz_Test_plan
   #define PLAN                         CHAZ_TEST_PLAN
-  #define Test_test_false              chaz_Test_test_false
-  #define TEST_FALSE                   CHAZ_TEST_TEST_FALSE
   #define Test_test_str_eq             chaz_Test_test_str_eq
   #define TEST_STR_EQ                  CHAZ_TEST_TEST_STR_EQ
   #define Test_pass                    chaz_Test_pass
