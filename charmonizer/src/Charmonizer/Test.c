@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#define CHAZ_USE_SHORT_NAMES
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -23,19 +21,19 @@
 #include "Charmonizer/Test.h"
 
 static void
-S_TestBatch_destroy(TestBatch *batch);
+S_TestBatch_destroy(chaz_TestBatch *batch);
 
 static void
-S_TestBatch_run_test(TestBatch *batch);
+S_TestBatch_run_test(chaz_TestBatch *batch);
 
-#define PRINT_SUPPLIED_MESS(_pattern, _args) \
+#define CHAZ_TEST_PRINT_MESS(_pattern, _args) \
     va_start(_args, _pattern); \
     vprintf(_pattern, _args); \
     va_end(_args); \
     printf("\n");
 
 void
-Test_init(void) {
+chaz_Test_init(void) {
     /* Unbuffer stdout. */
     int check_val = setvbuf(stdout, NULL, _IONBF, 0);
     if (check_val != 0) {
@@ -43,10 +41,10 @@ Test_init(void) {
     }
 }
 
-TestBatch*
-Test_new_batch(const char *batch_name, unsigned num_tests,
-               TestBatch_test_func_t test_func) {
-    TestBatch *batch = (TestBatch*)malloc(sizeof(TestBatch));
+chaz_TestBatch*
+chaz_Test_new_batch(const char *batch_name, unsigned num_tests,
+                    chaz_TestBatch_test_func_t test_func) {
+    chaz_TestBatch *batch = (chaz_TestBatch*)malloc(sizeof(chaz_TestBatch));
 
     /* Assign. */
     batch->num_tests       = num_tests;
@@ -65,27 +63,27 @@ Test_new_batch(const char *batch_name, unsigned num_tests,
 }
 
 void
-Test_plan(TestBatch *batch) {
+chaz_Test_plan(chaz_TestBatch *batch) {
     printf("1..%u\n", batch->num_tests);
 }
 
 static void
-S_TestBatch_destroy(TestBatch *batch) {
+S_TestBatch_destroy(chaz_TestBatch *batch) {
     free(batch->name);
     free(batch);
 }
 
 static void
-S_TestBatch_run_test(TestBatch *batch) {
+S_TestBatch_run_test(chaz_TestBatch *batch) {
     /* Print start. */
-    PLAN(batch);
+    CHAZ_TEST_PLAN(batch);
 
     /* Run the batch. */
     batch->test_func(batch);
 }
 
 void
-Test_test_true(TestBatch *batch, int value, const char *pat, ...) {
+chaz_Test_test_true(chaz_TestBatch *batch, int value, const char *pat, ...) {
     va_list args;
 
     /* Increment test number. */
@@ -101,11 +99,11 @@ Test_test_true(TestBatch *batch, int value, const char *pat, ...) {
         batch->num_failed++;
     }
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-Test_test_false(TestBatch *batch, int value, const char *pat, ...) {
+chaz_Test_test_false(chaz_TestBatch *batch, int value, const char *pat, ...) {
     va_list args;
 
     /* Increment test number. */
@@ -121,11 +119,11 @@ Test_test_false(TestBatch *batch, int value, const char *pat, ...) {
         batch->num_failed++;
     }
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-Test_test_str_eq(TestBatch *batch, const char *got, const char *expected,
+chaz_Test_test_str_eq(chaz_TestBatch *batch, const char *got, const char *expected,
                  const char *pat, ...) {
     va_list args;
 
@@ -143,12 +141,12 @@ Test_test_str_eq(TestBatch *batch, const char *got, const char *expected,
         batch->num_failed++;
     }
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 
 void
-Test_pass(TestBatch *batch, const char *pat, ...) {
+chaz_Test_pass(chaz_TestBatch *batch, const char *pat, ...) {
     va_list args;
 
     /* Increment test number. */
@@ -158,11 +156,11 @@ Test_pass(TestBatch *batch, const char *pat, ...) {
     printf("ok %u - ", batch->test_num);
     batch->num_passed++;
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-Test_fail(TestBatch *batch, const char *pat, ...) {
+chaz_Test_fail(chaz_TestBatch *batch, const char *pat, ...) {
     va_list args;
 
     /* Increment test number. */
@@ -172,11 +170,11 @@ Test_fail(TestBatch *batch, const char *pat, ...) {
     printf("not ok %u - ", batch->test_num);
     batch->num_failed++;
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-Test_test_int_eq(TestBatch *batch, long got, long expected,
+chaz_Test_test_int_eq(chaz_TestBatch *batch, long got, long expected,
                  const char *pat, ...) {
     va_list args;
 
@@ -193,11 +191,11 @@ Test_test_int_eq(TestBatch *batch, long got, long expected,
         batch->num_failed++;
     }
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-Test_test_float_eq(TestBatch *batch, double got, double expected,
+chaz_Test_test_float_eq(chaz_TestBatch *batch, double got, double expected,
                    const char *pat, ...) {
     va_list args;
     double diff = expected / got;
@@ -216,11 +214,11 @@ Test_test_float_eq(TestBatch *batch, double got, double expected,
         batch->num_failed++;
     }
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-Test_skip(TestBatch *batch, const char *pat, ...) {
+chaz_Test_skip(chaz_TestBatch *batch, const char *pat, ...) {
     va_list args;
 
     /* Increment test number. */
@@ -230,19 +228,19 @@ Test_skip(TestBatch *batch, const char *pat, ...) {
     printf("ok %u # SKIP ", batch->test_num);
     batch->num_skipped++;
 
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
 }
 
 void
-Test_report_skip_remaining(TestBatch *batch, const char *pat, ...) {
+chaz_Test_report_skip_remaining(chaz_TestBatch *batch, const char *pat, ...) {
     va_list args;
     unsigned remaining = batch->num_tests - batch->test_num;
 
     /* Indicate that tests are being skipped, update skip counter. */
     printf("# Skipping all %u remaining tests: ", remaining);
-    PRINT_SUPPLIED_MESS(pat, args);
+    CHAZ_TEST_PRINT_MESS(pat, args);
     while (batch->test_num < batch->num_tests) {
-        SKIP(batch, "");
+        CHAZ_TEST_SKIP(batch, "");
     }
 }
 
