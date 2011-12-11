@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include <ctype.h>
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-#include "ppport.h"
 
 #ifndef true
   #define true 1

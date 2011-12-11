@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-#include "ppport.h"
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
 
 #define CFC_NEED_FUNCTION_STRUCT_DEF
 #include "CFCFunction.h"
