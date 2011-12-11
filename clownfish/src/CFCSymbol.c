@@ -128,13 +128,13 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     // Validate.
     CFCUTIL_NULL_CHECK(parcel);
     if (!S_validate_exposure(exposure)) {
-        croak("Invalid exposure: '%s'", exposure ? exposure : "[NULL]");
+        CFCUtil_die("Invalid exposure: '%s'", exposure ? exposure : "[NULL]");
     }
     if (class_name && !S_validate_class_name(class_name)) {
-        croak("Invalid class_name: '%s'", class_name);
+        CFCUtil_die("Invalid class_name: '%s'", class_name);
     }
     if (!micro_sym || !S_validate_identifier(micro_sym)) {
-        croak("Invalid micro_sym: '%s'",  micro_sym ? micro_sym : "[NULL]");
+        CFCUtil_die("Invalid micro_sym: '%s'",  micro_sym ? micro_sym : "[NULL]");
     }
 
     // Derive class_cnick if necessary, then validate.
@@ -150,13 +150,13 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     }
     else if (class_cnick) {
         // Sanity check class_cnick without class_name.
-        croak("Can't supply class_cnick without class_name");
+        CFCUtil_die("Can't supply class_cnick without class_name");
     }
     else {
         real_cnick = NULL;
     }
     if (real_cnick && !S_validate_class_cnick(real_cnick)) {
-        croak("Invalid class_cnick: '%s'", real_cnick);
+        CFCUtil_die("Invalid class_cnick: '%s'", real_cnick);
     }
 
     // Assign.

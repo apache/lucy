@@ -47,7 +47,7 @@ S_strip(char *comment) {
     if (strstr(comment, "/**") != comment
         || strstr(comment, "*/") != (comment + len - 2)
        ) {
-        croak("Malformed comment");
+        CFCUtil_die("Malformed comment");
     }
 
     // Capture text minus beginning "/**", ending "*/", and left border.
@@ -129,14 +129,14 @@ CFCDocuComment_parse(const char *raw_text) {
         // Extract param name.
         char *ptr = candidate + sizeof("@param") - 1;
         if (!isspace(*ptr) || ptr > text_limit) {
-            croak("Malformed @param directive in '%s'", raw_text);
+            CFCUtil_die("Malformed @param directive in '%s'", raw_text);
         }
         while (isspace(*ptr) && ptr < text_limit) { ptr++; }
         char *param_name = ptr;
         while ((isalnum(*ptr) || *ptr == '_') && ptr < text_limit) { ptr++; }
         size_t param_name_len = ptr - param_name;
         if (!param_name_len) {
-            croak("Malformed @param directive in '%s'", raw_text);
+            CFCUtil_die("Malformed @param directive in '%s'", raw_text);
         }
 
         // Extract param description.
@@ -174,7 +174,7 @@ CFCDocuComment_parse(const char *raw_text) {
             break;
         }
         else if (ptr > text_limit) {
-            croak("Overran end of string while parsing '%s'", raw_text);
+            CFCUtil_die("Overran end of string while parsing '%s'", raw_text);
         }
         candidate = strstr(ptr, "@param");
     }

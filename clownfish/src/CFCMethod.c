@@ -92,7 +92,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
                int is_final, int is_abstract) {
     // Validate macro_sym, derive micro_sym.
     if (!S_validate_macro_sym(macro_sym)) {
-        croak("Invalid macro_sym: '%s'", macro_sym ? macro_sym : "[NULL]");
+        CFCUtil_die("Invalid macro_sym: '%s'",
+                    macro_sym ? macro_sym : "[NULL]");
     }
     char *micro_sym = CFCUtil_strdup(macro_sym);
     size_t i;
@@ -108,7 +109,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 
     // Verify that the first element in the arg list is a self.
     CFCVariable **args = CFCParamList_get_variables(param_list);
-    if (!args[0]) { croak("Missing 'self' argument"); }
+    if (!args[0]) { CFCUtil_die("Missing 'self' argument"); }
     CFCType *type = CFCVariable_get_type(args[0]);
     const char *specifier = CFCType_get_specifier(type);
     const char *prefix    = CFCMethod_get_prefix(self);
@@ -119,8 +120,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     int mismatch = strcmp(wanted, specifier);
     FREEMEM(wanted);
     if (mismatch) {
-        croak("First arg type doesn't match class: '%s' '%s", class_name,
-              specifier);
+        CFCUtil_die("First arg type doesn't match class: '%s' '%s",
+                    class_name, specifier);
     }
 
     self->macro_sym     = CFCUtil_strdup(macro_sym);
@@ -210,13 +211,13 @@ CFCMethod_override(CFCMethod *self, CFCMethod *orig) {
     if (CFCMethod_final(orig)) {
         const char *orig_class = CFCMethod_get_class_name(orig);
         const char *my_class   = CFCMethod_get_class_name(self);
-        croak("Attempt to override final method '%s' from '%s' by '%s'",
-              orig->macro_sym, orig_class, my_class);
+        CFCUtil_die("Attempt to override final method '%s' from '%s' by '%s'",
+                    orig->macro_sym, orig_class, my_class);
     }
     if (!CFCMethod_compatible(self, orig)) {
         const char *func      = CFCMethod_implementing_func_sym(self);
         const char *orig_func = CFCMethod_implementing_func_sym(orig);
-        croak("Non-matching signatures for %s and %s", func, orig_func);
+        CFCUtil_die("Non-matching signatures for %s and %s", func, orig_func);
     }
 
     // Mark the Method as no longer novel.

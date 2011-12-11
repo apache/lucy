@@ -263,25 +263,6 @@ CFCUtil_flength(void *file) {
     return len;
 }
 
-void
-CFCUtil_die(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    vfprintf(stderr, format, args);
-    va_end(args);
-    fprintf(stderr, "\n");
-    exit(1);
-}
-
-void
-CFCUtil_warn(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    vfprintf(stderr, format, args);
-    va_end(args);
-    fprintf(stderr, "\n");
-}
-
 // Note: this has to be defined before including the Perl headers because they
 // redefine stat() in an incompatible way on certain systems (Windows).
 int
@@ -439,6 +420,27 @@ CFCUtil_closedir(void *dirhandle, const char *dir) {
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+
+void
+CFCUtil_die(const char* format, ...) {
+    SV *errsv = get_sv("@", 1);
+    va_list args;
+    va_start(args, format);
+    sv_vsetpvf_mg(errsv, format, &args);
+    va_end(args);
+    croak(NULL);
+}
+
+void
+CFCUtil_warn(const char* format, ...) {
+    SV *mess = newSVpv("", 0);
+    va_list args;
+    va_start(args, format);
+    sv_vsetpvf(mess, format, &args);
+    va_end(args);
+    fprintf(stderr, "%s\n", SvPV_nolen(mess));
+    SvREFCNT_dec(mess);
+}
 
 void*
 CFCUtil_make_perl_obj(void *ptr, const char *klass) {

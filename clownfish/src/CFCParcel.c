@@ -64,14 +64,14 @@ CFCParcel_singleton(const char *name, const char *cnick) {
         CFCParcel *existing = registry[i];
         if (strcmp(existing->name, name) == 0) {
             if (cnick && strcmp(existing->cnick, cnick) != 0) {
-                croak("cnick '%s' for parcel '%s' conflicts with '%s'",
-                      cnick, name, existing->cnick);
+                CFCUtil_die("cnick '%s' for parcel '%s' conflicts with '%s'",
+                            cnick, name, existing->cnick);
             }
             return existing;
         }
     }
     if (i == MAX_PARCELS) {
-        croak("Exceeded maximum number of parcels (%d)", MAX_PARCELS);
+        CFCUtil_die("Exceeded maximum number of parcels (%d)", MAX_PARCELS);
     }
 
     // Register new parcel.
@@ -114,14 +114,14 @@ CFCParcel*
 CFCParcel_init(CFCParcel *self, const char *name, const char *cnick) {
     // Validate name.
     if (!name || !S_validate_name_or_cnick(name)) {
-        croak("Invalid name: '%s'", name ? name : "[NULL]");
+        CFCUtil_die("Invalid name: '%s'", name ? name : "[NULL]");
     }
     self->name = CFCUtil_strdup(name);
 
     // Validate or derive cnick.
     if (cnick) {
         if (!S_validate_name_or_cnick(cnick)) {
-            croak("Invalid cnick: '%s'", cnick);
+            CFCUtil_die("Invalid cnick: '%s'", cnick);
         }
         self->cnick = CFCUtil_strdup(cnick);
     }

@@ -72,7 +72,7 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
     CFCUTIL_NULL_CHECK(return_type);
     CFCUTIL_NULL_CHECK(param_list);
     if (!S_validate_micro_sym(micro_sym)) {
-        croak("Invalid micro_sym: '%s'", micro_sym);
+        CFCUtil_die("Invalid micro_sym: '%s'", micro_sym);
     }
     self->return_type = (CFCType*)CFCBase_incref((CFCBase*)return_type);
     self->param_list  = (CFCParamList*)CFCBase_incref((CFCBase*)param_list);

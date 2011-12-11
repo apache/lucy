@@ -153,7 +153,7 @@ CFCFile_add_block(CFCFile *self, CFCBase *block) {
         self->blocks[num_blocks] = NULL;
     }
     else {
-        croak("Wrong kind of object: '%s'", cfc_class);
+        CFCUtil_die("Wrong kind of object: '%s'", cfc_class);
     }
 }
 
@@ -162,11 +162,11 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
             const char *ext) {
     size_t needed = CFCFile_path_buf_size(self, base_dir);
     if (strlen(ext) > 4) {
-        croak("ext cannot be more than 4 characters.");
+        CFCUtil_die("ext cannot be more than 4 characters.");
     }
     if (needed > buf_size) {
-        croak("Need buf_size of %lu, but got %lu", (unsigned long)needed,
-              (unsigned long)buf_size);
+        CFCUtil_die("Need buf_size of %lu, but got %lu",
+                    (unsigned long)needed, (unsigned long)buf_size);
     }
     if (base_dir) {
         sprintf(buf, "%s" CFCUTIL_PATH_SEP "%s%s", base_dir, self->path_part,
