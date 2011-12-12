@@ -202,14 +202,14 @@ LucyX::Remote::SearchServer - Make a Searcher remotely accessible.
 
 =head1 DESCRIPTION 
 
-The SearchServer class, in conjunction with
-L<SearchClient|LucyX::Remote::SearchClient>, makes it possible to run
-a search on one machine and report results on another.  
+The SearchServer class, in conjunction with either
+L<SearchClient|LucyX::Remote::SearchClient> or
+L<ClusterSearcher|LucyX::Remote::ClusterSearcher>, makes it possible to run a
+search on one machine and report results on another.  
 
-By aggregating several SearchClients under a
-L<PolySearcher|Lucy::Search::PolySearcher>, the cost of searching
-what might have been a prohibitively large monolithic index can be distributed
-across multiple nodes, each with its own, smaller index.
+By aggregating several SearchClients under a ClusterSearcher, the cost of
+searching what might have been a prohibitively large monolithic index can be
+distributed across multiple nodes, each with its own, smaller index.
 
 =head1 METHODS
 

@@ -24,11 +24,8 @@ __BINDING__
 
 my $synopsis = <<'END_SYNOPSIS';
     my $schema = MySchema->new;
-    for my $server_name (@server_names) {
-        push @searchers, LucyX::Remote::SearchClient->new(
-            peer_address => "$server_name:$port",
-            schema       => $schema,
-        );
+    for my $index (@index_paths) {
+        push @searchers, Lucy::Search::IndexSearcher->new( index => $index );
     }
     my $poly_searcher = Lucy::Search::PolySearcher->new(
         schema    => $schema,

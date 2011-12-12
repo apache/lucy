@@ -183,7 +183,7 @@ L<NoMatchQuery|Lucy::Search::NoMatchQuery>, plus
 L<Lucy::Search::QueryParser>.
 
 For distributed searching, see L<LucyX::Remote::SearchServer>,
-L<LucyX::Remote::SearchClient>, and L<Lucy::Search::PolySearcher>.
+L<LucyX::Remote::SearchClient>, and L<LucyX::Remote::ClusterSearcher>.
 
 =head2 Backwards Compatibility Policy
 

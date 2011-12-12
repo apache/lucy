@@ -19,10 +19,7 @@ parcel Lucy;
 /** Aggregate results from multiple Searchers.
  *
  * The primary use for PolySearcher is to aggregate results from several
- * remote L<Searchers|Lucy::Search::Searcher> via
- * L<LucyX::Remote::SearchClient>, diffusing the cost of searching a large
- * corpus over multiple machines.  It is also possible to aggregate results
- * from multiple Searchers on a single machine.
+ * indexes on a single machine.
  */
 
 class Lucy::Search::PolySearcher
