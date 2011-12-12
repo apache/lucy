@@ -26,7 +26,13 @@ use Fcntl;
 my $ignore = qr/(
       \.svn
     | \.git
+    | c.t.000-sanity-check.t
+    | clownfish.src.CFCLexHeader
+    | devel.bin.release_commands.pl
     | modules.analysis.snowstem.source
+    | modules.unicode.utf8proc
+    | lemon.lemon.c
+    | lemon.lempar.c
     | perl.sample
     )/x;
 my $scratch_template = catfile( tmpdir(), 'lucytidy_scratch_XXXXXX' );
