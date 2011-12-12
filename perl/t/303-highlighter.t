@@ -55,7 +55,7 @@ sub highlight {
 
 package main;
 
-use Test::More tests => 37;
+use Test::More tests => 38;
 use Lucy::Test;
 
 binmode( STDOUT, ":utf8" );
@@ -246,6 +246,24 @@ like(
     $target->to_perl,
     qr#^$encoded_phi <strong>$encoded_phi</strong> $encoded_phi$#i,
     "Highlight_Excerpt pays attention to offset"
+);
+
+$target = make_cb("");
+$hl->_highlight_excerpt(
+    raw_excerpt => "$phi Oook. Urk. Ick. $phi",
+    spans       => make_spans(
+        [ 2, 10, 1.0 ],
+        [ 2,  4, 1.0 ],
+        [ 8,  9, 1.0 ],
+        [ 8,  4, 1.0 ],
+    ),
+    top         => 0,
+    highlighted => $target,
+);
+like(
+    $target->to_perl,
+    qr#^$encoded_phi <strong>Oook\. Urk\. Ick\.</strong> $encoded_phi$#i,
+    "Highlight_Excerpt works with overlapping spans"
 );
 
 $hl = Lucy::Highlight::Highlighter->new(
