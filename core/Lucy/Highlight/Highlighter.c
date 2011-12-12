@@ -165,6 +165,7 @@ Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc) {
             = Compiler_Highlight_Spans(self->compiler, self->searcher,
                                        doc_vec, self->field);
         VArray *score_spans = maybe_spans ? maybe_spans : VA_new(0);
+        VA_Sort(score_spans, NULL, NULL);
         HeatMap *heat_map
             = HeatMap_new(score_spans, (self->excerpt_length * 2) / 3);
         int32_t top
@@ -177,8 +178,8 @@ Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc) {
         top = Highlighter_Raw_Excerpt(self, (CharBuf*)field_val,
                                       (CharBuf*)fragment, raw_excerpt, top,
                                       heat_map, sentences);
-        Highlighter_highlight_excerpt(self, HeatMap_Get_Spans(heat_map),
-                                      raw_excerpt, highlighted, top);
+        Highlighter_highlight_excerpt(self, score_spans, raw_excerpt,
+                                      highlighted, top);
 
         DECREF(sentences);
         DECREF(heat_map);
@@ -448,7 +449,8 @@ void
 Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
                               CharBuf *raw_excerpt, CharBuf *highlighted,
                               int32_t top) {
-    int32_t        last_end        = 0;
+    int32_t        hl_start        = 0;
+    int32_t        hl_end          = 0;
     ZombieCharBuf *temp            = ZCB_WRAP(raw_excerpt);
     CharBuf       *encode_buf      = NULL;
     int32_t        raw_excerpt_end = top + CB_Length(raw_excerpt);
@@ -465,31 +467,52 @@ Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
             int32_t relative_start = span->offset - top;
             int32_t relative_end   = relative_start + span->length;
 
-            if (relative_start > last_end) {
+            if (relative_start <= hl_end) {
+                if (relative_end > hl_end) {
+                    hl_end = relative_end;
+                }
+            }
+            else {
                 CharBuf *encoded;
-                int32_t non_highlighted_len = relative_start - last_end;
+
+                if (hl_start < hl_end) {
+                    // Highlight previous section
+                    int32_t highlighted_len = hl_end - hl_start;
+                    ZombieCharBuf *to_cat = ZCB_WRAP((CharBuf*)temp);
+                    ZCB_Truncate(to_cat, highlighted_len);
+                    encoded = S_do_encode(self, (CharBuf*)to_cat, &encode_buf);
+                    CharBuf *hl_frag = Highlighter_Highlight(self, encoded);
+                    CB_Cat(highlighted, hl_frag);
+                    ZCB_Nip(temp, highlighted_len);
+                    DECREF(hl_frag);
+                    DECREF(encoded);
+                }
+
+                int32_t non_highlighted_len = relative_start - hl_end;
                 ZombieCharBuf *to_cat = ZCB_WRAP((CharBuf*)temp);
                 ZCB_Truncate(to_cat, non_highlighted_len);
                 encoded = S_do_encode(self, (CharBuf*)to_cat, &encode_buf);
                 CB_Cat(highlighted, (CharBuf*)encoded);
                 ZCB_Nip(temp, non_highlighted_len);
                 DECREF(encoded);
+
+                hl_start = relative_start;
+                hl_end   = relative_end;
             }
-            if (relative_end > relative_start) {
-                CharBuf *encoded;
-                CharBuf *hl_frag;
-                int32_t highlighted_len = relative_end - relative_start;
-                ZombieCharBuf *to_cat = ZCB_WRAP((CharBuf*)temp);
-                ZCB_Truncate(to_cat, highlighted_len);
-                encoded = S_do_encode(self, (CharBuf*)to_cat, &encode_buf);
-                hl_frag = Highlighter_Highlight(self, encoded);
-                CB_Cat(highlighted, hl_frag);
-                ZCB_Nip(temp, highlighted_len);
-                DECREF(hl_frag);
-                DECREF(encoded);
-            }
-            last_end = relative_end;
         }
+    }
+
+    if (hl_start < hl_end) {
+        // Highlight final section
+        int32_t highlighted_len = hl_end - hl_start;
+        ZombieCharBuf *to_cat = ZCB_WRAP((CharBuf*)temp);
+        ZCB_Truncate(to_cat, highlighted_len);
+        CharBuf *encoded = S_do_encode(self, (CharBuf*)to_cat, &encode_buf);
+        CharBuf *hl_frag = Highlighter_Highlight(self, encoded);
+        CB_Cat(highlighted, hl_frag);
+        ZCB_Nip(temp, highlighted_len);
+        DECREF(hl_frag);
+        DECREF(encoded);
     }
 
     // Last text, beyond last highlight span.
