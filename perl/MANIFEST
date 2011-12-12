@@ -14,6 +14,7 @@ lib/Lucy/Analysis/PolyAnalyzer.pm
 lib/Lucy/Analysis/RegexTokenizer.pm
 lib/Lucy/Analysis/SnowballStemmer.pm
 lib/Lucy/Analysis/SnowballStopFilter.pm
+lib/Lucy/Analysis/StandardTokenizer.pm
 lib/Lucy/Analysis/Token.pm
 lib/Lucy/Docs/Cookbook.pod
 lib/Lucy/Docs/Cookbook/CustomQuery.pod
@@ -249,6 +250,7 @@ t/154-regex_tokenizer.t
 t/155-snowball_stop_filter.t
 t/156-snowball_stemmer.t
 t/157-normalizer.t
+t/158-standard_tokenizer.t
 t/200-doc.t
 t/201-hit_doc.t
 t/204-doc_reader.t
@@ -373,6 +375,7 @@ t/core/154-regex_tokenizer.t
 t/core/155-snowball_stop_filter.t
 t/core/156-snowball_stemmer.t
 t/core/157-normalizer.t
+t/core/158-standard_tokenizer.t
 t/core/206-snapshot.t
 t/core/216-schema.t
 t/core/220-doc_writer.t

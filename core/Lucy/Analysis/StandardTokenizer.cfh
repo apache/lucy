@@ -1,0 +1,57 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Split a string into tokens.
+ *
+ * Generically, "tokenizing" is a process of breaking up a string into an
+ * array of "tokens".  For instance, the string "three blind mice" might be
+ * tokenized into "three", "blind", "mice".
+ *
+ * Lucy::Analysis::StandardTokenizer breaks up the text at the word
+ * boundaries defined in Unicode Standard Annex #29. It then returns those
+ * words that start with an alphabetic or numeric character.
+ */
+class Lucy::Analysis::StandardTokenizer
+    inherits Lucy::Analysis::Analyzer {
+
+    inert incremented StandardTokenizer*
+    new();
+
+    /** Constructor.  Takes no arguments.
+     */
+    public inert StandardTokenizer*
+    init(StandardTokenizer *self);
+
+    public incremented Inversion*
+    Transform(StandardTokenizer *self, Inversion *inversion);
+
+    public incremented Inversion*
+    Transform_Text(StandardTokenizer *self, CharBuf *text);
+
+    /** Tokenize the supplied string and add any Tokens generated to the
+     * supplied Inversion.
+     */
+    void
+    Tokenize_Str(StandardTokenizer *self, const char *text, size_t len,
+                 Inversion *inversion);
+
+    public bool_t
+    Equals(StandardTokenizer *self, Obj *other);
+}
+
+
