@@ -81,9 +81,9 @@ test_normalization(TestBatch *batch) {
         CharBuf *form = (CharBuf*)Hash_Fetch_Str(
                             test, "normalization_form", 18);
         bool_t case_fold = Bool_Get_Value((BoolNum*)Hash_Fetch_Str(
-                                test, "case_fold", 9));
+                                              test, "case_fold", 9));
         bool_t strip_accents = Bool_Get_Value((BoolNum*)Hash_Fetch_Str(
-                                    test, "strip_accents", 13));
+                                                  test, "strip_accents", 13));
         Normalizer *normalizer = Normalizer_new(form, case_fold, strip_accents);
         VArray *words = (VArray*)Hash_Fetch_Str(test, "words", 5);
         VArray *norms = (VArray*)Hash_Fetch_Str(test, "norms", 5);

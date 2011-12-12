@@ -21,6 +21,8 @@ use Test::More tests => 3;
 use Lucy::Test::TestUtils qw( test_analyzer );
 
 my $normalizer = Lucy::Analysis::Normalizer->new;
-test_analyzer( $normalizer, "NAI\x{0308}VETE\x{0301}",
-               ["na\xefvet\xe9"], "normalized and case folded" );
+test_analyzer(
+    $normalizer,       "NAI\x{0308}VETE\x{0301}",
+    ["na\xefvet\xe9"], "normalized and case folded"
+);
 

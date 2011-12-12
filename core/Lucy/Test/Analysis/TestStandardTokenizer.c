@@ -43,15 +43,15 @@ test_tokenizer(TestBatch *batch) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
 
     ZombieCharBuf *word = ZCB_WRAP_STR(
-        " ."
-        "tha\xCC\x82t's"
-        ":"
-        "1,02\xC2\xADZ4.38"
-        "\xE0\xB8\x81\xC2\xAD\xC2\xAD"
-        "\xF0\xA0\x80\x80"
-        "a"
-        "/",
-        35);
+                              " ."
+                              "tha\xCC\x82t's"
+                              ":"
+                              "1,02\xC2\xADZ4.38"
+                              "\xE0\xB8\x81\xC2\xAD\xC2\xAD"
+                              "\xF0\xA0\x80\x80"
+                              "a"
+                              "/",
+                              35);
     VArray *got = StandardTokenizer_Split(tokenizer, (CharBuf*)word);
     CharBuf *token = (CharBuf*)VA_Fetch(got, 0);
     TEST_TRUE(batch,

@@ -68,7 +68,7 @@ Inversion*
 Normalizer_transform(Normalizer *self, Inversion *inversion) {
     // allocate additional space because utf8proc_reencode adds a
     // terminating null char
-    int32_t static_buffer[INITIAL_BUFSIZE+1];
+    int32_t static_buffer[INITIAL_BUFSIZE + 1];
     int32_t *buffer = static_buffer;
     ssize_t bufsize = INITIAL_BUFSIZE;
     Token *token;
@@ -120,12 +120,12 @@ Normalizer_dump(Normalizer *self) {
     int options = self->options;
 
     CharBuf *form = options & UTF8PROC_COMPOSE ?
-        options & UTF8PROC_COMPAT ?
-            CB_new_from_trusted_utf8("NFKC", 4) :
-            CB_new_from_trusted_utf8("NFC", 3) :
-        options & UTF8PROC_COMPAT ?
-            CB_new_from_trusted_utf8("NFKD", 4) :
-            CB_new_from_trusted_utf8("NFD", 3);
+                    options & UTF8PROC_COMPAT ?
+                    CB_new_from_trusted_utf8("NFKC", 4) :
+                    CB_new_from_trusted_utf8("NFC", 3) :
+                        options & UTF8PROC_COMPAT ?
+                        CB_new_from_trusted_utf8("NFKD", 4) :
+                        CB_new_from_trusted_utf8("NFD", 3);
 
     Hash_Store_Str(dump, "normalization_form", 18, (Obj*)form);
 
@@ -145,12 +145,12 @@ Normalizer_load(Normalizer *self, Obj *dump) {
     Normalizer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
 
-    CharBuf *form = (CharBuf*)CERTIFY(Hash_Fetch_Str(
-                        source, "normalization_form", 18), CHARBUF);
-    bool_t case_fold = Bool_Get_Value((BoolNum*)CERTIFY(Hash_Fetch_Str(
-                            source, "case_fold", 9), BOOLNUM));
-    bool_t strip_accents = Bool_Get_Value((BoolNum*)CERTIFY(Hash_Fetch_Str(
-                                source, "strip_accents", 13), BOOLNUM));
+    Obj *obj = Hash_Fetch_Str(source, "normalization_form", 18);
+    CharBuf *form = (CharBuf*)CERTIFY(obj, CHARBUF);
+    obj = Hash_Fetch_Str(source, "case_fold", 9);
+    bool_t case_fold = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
+    obj = Hash_Fetch_Str(source, "strip_accents", 13);
+    bool_t strip_accents = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
 
     return Normalizer_init(loaded, form, case_fold, strip_accents);
 }

@@ -87,7 +87,7 @@ StandardTokenizer_transform(StandardTokenizer *self, Inversion *inversion) {
 
     while (NULL != (token = Inversion_Next(inversion))) {
         StandardTokenizer_Tokenize_Str(self, token->text, token->len,
-                                    new_inversion);
+                                       new_inversion);
     }
 
     return new_inversion;
@@ -97,16 +97,16 @@ Inversion*
 StandardTokenizer_transform_text(StandardTokenizer *self, CharBuf *text) {
     Inversion *new_inversion = Inversion_new(NULL);
     StandardTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text),
-                                CB_Get_Size(text), new_inversion);
+                                   CB_Get_Size(text), new_inversion);
     return new_inversion;
 }
 
 void
 StandardTokenizer_tokenize_str(StandardTokenizer *self, const char *text,
                                size_t len, Inversion *inversion) {
-    if (len >= 1 && (uint8_t)text[len-1] >= 0xC0
-    ||  len >= 2 && (uint8_t)text[len-2] >= 0xE0
-    ||  len >= 3 && (uint8_t)text[len-3] >= 0xF0) {
+    if (len >= 1 && (uint8_t)text[len - 1] >= 0xC0
+        ||  len >= 2 && (uint8_t)text[len - 2] >= 0xE0
+        ||  len >= 3 && (uint8_t)text[len - 3] >= 0xF0) {
         THROW(ERR, "Invalid UTF-8 sequence");
     }
 
@@ -166,33 +166,33 @@ S_parse_word(const char *text, size_t len, lucy_StringIter *iter,
     while (iter->byte_pos < len) {
         wb = S_wb_lookup(text + iter->byte_pos);
 
-        switch(wb) {
-          case WB_ALetter:
-          case WB_Numeric:
-            if (state == WB_Katakana) { goto word_break; }
-            break;
-          case WB_Katakana:
-            if (state == WB_ALetter || state == WB_Numeric) {
+        switch (wb) {
+            case WB_ALetter:
+            case WB_Numeric:
+                if (state == WB_Katakana) { goto word_break; }
+                break;
+            case WB_Katakana:
+                if (state == WB_ALetter || state == WB_Numeric) {
+                    goto word_break;
+                }
+                break;
+            case WB_ExtendNumLet:
+                break;
+            case WB_Extend_Format:
+                // keep state
+                wb = state;
+                break;
+            case WB_MidNumLet:
+            case WB_MidLetter:
+            case WB_MidNum:
+                if (state == WB_ALetter && wb != WB_MidNum
+                    ||  state == WB_Numeric && wb != WB_MidLetter) {
+                    wb = S_skip_extend_format(text, len, iter);
+                    if (wb == state) { break; }
+                }
                 goto word_break;
-            }
-            break;
-          case WB_ExtendNumLet:
-            break;
-          case WB_Extend_Format:
-            // keep state
-            wb = state;
-            break;
-          case WB_MidNumLet:
-          case WB_MidLetter:
-          case WB_MidNum:
-            if (state == WB_ALetter && wb != WB_MidNum
-            ||  state == WB_Numeric && wb != WB_MidLetter) {
-                wb = S_skip_extend_format(text, len, iter);
-                if (wb == state) { break; }
-            }
-            goto word_break;
-          default:
-            goto word_break;
+            default:
+                goto word_break;
         }
 
         state = wb;
@@ -201,7 +201,7 @@ S_parse_word(const char *text, size_t len, lucy_StringIter *iter,
     }
 
     Token *token;
-  word_break:
+word_break:
     token = Token_new(text + start.byte_pos, end.byte_pos - start.byte_pos,
                       start.char_pos, end.char_pos, 1.0f, 1);
     Inversion_Append(inversion, token);
