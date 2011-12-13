@@ -672,6 +672,7 @@ sub ACTION_dist {
         devel
         clownfish
         CHANGES
+        CONTRIBUTING
         LICENSE
         NOTICE
         README
