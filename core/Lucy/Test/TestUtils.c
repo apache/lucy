@@ -100,11 +100,13 @@ S_random_code_point(void) {
                     code_point = (num % (0x10FFFF - 0x10000)) + 0x10000;
                 }
         }
-        if (code_point <= 0xD7FF
-            || (code_point >= 0xE000 && code_point <= 0x10FFFF)
-           ) {
-            break;
+        if (code_point > 0x10FFFF) {
+            continue; // Too high.
         }
+        if (code_point > 0xD7FF && code_point < 0xE000) {
+            continue; // UTF-16 surrogate.
+        }
+        break;
     }
     return code_point;
 }
