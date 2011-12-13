@@ -23,11 +23,11 @@ use File::Spec::Functions qw( catfile updir catdir );
 use Config;
 use Cwd qw( getcwd );
 
-my $base_dir       = updir();
-my $PPPORT_H_PATH  = catfile(qw( include ppport.h ));
+my $base_dir       = catdir( updir(), updir() );
+my $PPPORT_H_PATH  = catfile( updir(), qw( include ppport.h ) );
 my $LEMON_DIR      = catdir( $base_dir, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
-my $CFC_SOURCE_DIR = 'src';
+my $CFC_SOURCE_DIR = catdir( updir(), 'src' );
 
 sub extra_ccflags {
     my $self = shift;
@@ -60,7 +60,6 @@ sub extra_ccflags {
     # Compile as C++ under MSVC.  Turn off stupid warnings, too.
     if ( $self->config('cc') =~ /^cl\b/ ) {
         $extra_ccflags .= '/TP -D_CRT_SECURE_NO_WARNINGS ';
-        $extra_ccflags .= '-D_SCL_SECURE_NO_WARNINGS ';
     }
 
     if ( defined $gcc_version ) {
@@ -162,7 +161,7 @@ sub ACTION_lexers {
         next
             if $self->up_to_date( [ $l_file, @$y_files ],
                     [ $c_file, $h_file ] );
-        system( 'flex', '--nounistd', '-o', $c_file, "--header-file=$h_file", $l_file )
+        system( 'flex', '-o', $c_file, "--header-file=$h_file", $l_file )
             and die "flex failed";
     }
 }

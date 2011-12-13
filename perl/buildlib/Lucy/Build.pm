@@ -16,10 +16,10 @@
 use strict;
 use warnings;
 
-use lib '../clownfish/blib/arch';
-use lib '../clownfish/blib/lib';
-use lib 'clownfish/blib/arch';
-use lib 'clownfish/blib/lib';
+use lib '../clownfish/perl/blib/arch';
+use lib '../clownfish/perl/blib/lib';
+use lib 'clownfish/perl/blib/arch';
+use lib 'clownfish/perl/blib/lib';
 
 package Lucy::Build::CBuilder;
 BEGIN { our @ISA = "ExtUtils::CBuilder"; }
@@ -126,7 +126,7 @@ my $UCD_INC_DIR = catdir( $base_dir, qw( modules unicode ucd ) );
 my $UTF8PROC_SRC_DIR = catdir( $base_dir, qw( modules unicode utf8proc ) );
 my $UTF8PROC_C = catfile( $UTF8PROC_SRC_DIR, 'utf8proc.c' );
 my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
-my $CLOWNFISH_DIR   = catdir( $base_dir, 'clownfish' );
+my $CLOWNFISH_DIR   = catdir( $base_dir, 'clownfish', 'perl' );
 my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
 my $AUTOGEN_DIR      = 'autogen';
 my $XS_SOURCE_DIR    = 'xs';

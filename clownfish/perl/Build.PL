@@ -18,6 +18,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 use Clownfish::Build;
+use File::Spec::Functions qw( updir catdir );
 
 my $builder = Clownfish::Build->new(
     module_name => 'Clownfish',
@@ -30,8 +31,8 @@ my $builder = Clownfish::Build->new(
         'ExtUtils::ParseXS'  => 2.16,
         'Devel::PPPort'      => 3.13,
     },
-    include_dirs   => ['include'],
-    c_source       => 'src',
+    include_dirs   => [ catdir( updir(), 'include' ) ],
+    c_source       => catdir( updir(),   'src' ),
     add_to_cleanup => [
         qw(
             MANIFEST.bak
