@@ -169,7 +169,6 @@ sub ACTION_lexers {
 sub ACTION_code {
     my $self = shift;
     $self->dispatch('ppport');
-    $self->dispatch('lexers');
     $self->dispatch('parsers');
     $self->SUPER::ACTION_code;
 }
