@@ -16,16 +16,12 @@
 use strict;
 use warnings;
 
-package MyType;
-use base qw( Clownfish::Type );
-
-package main;
 use Test::More tests => 11;
 use Clownfish::Parcel;
 
 my $neato_parcel = Clownfish::Parcel->singleton( name => 'Neato' );
 
-my $type = MyType->new( parcel => 'Neato', specifier => 'mytype_t' );
+my $type = Clownfish::Type->new( parcel => 'Neato', specifier => 'mytype_t' );
 is( $type->get_parcel, $neato_parcel,
     "constructor changes parcel name to Parcel singleton" );
 

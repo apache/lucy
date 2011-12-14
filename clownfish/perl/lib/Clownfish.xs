@@ -88,8 +88,7 @@ S_sv_eat_c_string(char *string) {
 MODULE = Clownfish    PACKAGE = Clownfish::CBlock
 
 SV*
-_new(klass, contents)
-    const char *klass;
+_new(contents)
     const char *contents;
 CODE:
     CFCCBlock *self = CFCCBlock_new(contents);
@@ -122,8 +121,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Class
 
 SV*
-_create(klass, parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
-    const char *klass;
+_create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
     CFCParcel *parcel;
     SV *exposure_sv;
     SV *class_name_sv;
@@ -430,6 +428,9 @@ parse(klass, text)
     const char *klass;
     const char *text;
 CODE:
+    if (strcmp(klass, "Clownfish::DocuComment")) {
+        croak("No subclassing allowed");
+    }
     CFCDocuComment *self = CFCDocuComment_parse(text);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
@@ -504,9 +505,12 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Dumpable
 
 SV*
-_new(klass)
+new(klass)
     const char *klass;
 CODE:
+    if (strcmp(klass, "Clownfish::Dumpable")) {
+        croak("No subclassing allowed");
+    }
     CFCDumpable *self = CFCDumpable_new();
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
@@ -529,8 +533,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::File
 
 SV*
-_new(klass, source_class)
-    const char *klass;
+_new(source_class)
     const char *source_class;
 CODE:
     CFCFile *self = CFCFile_new(source_class);
@@ -637,8 +640,7 @@ OUTPUT: RETVAL
 MODULE = Clownfish    PACKAGE = Clownfish::Function
 
 SV*
-_new(klass, parcel, exposure_sv, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, is_inline)
-    const char *klass;
+_new(parcel, exposure_sv, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, is_inline)
     CFCParcel *parcel;
     SV *exposure_sv;
     SV *class_name_sv;
@@ -722,8 +724,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Hierarchy
 
 SV*
-_new(klass, source, dest, parser)
-    const char *klass;
+_new(source, dest, parser)
     const char *source;
     const char *dest;
     CFCParser *parser;
@@ -791,8 +792,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Method
 
 SV*
-_new(klass, parcel, exposure_sv, class_name_sv, class_cnick_sv, macro_sym, return_type, param_list, docucomment, is_final, is_abstract)
-    const char *klass;
+_new(parcel, exposure_sv, class_name_sv, class_cnick_sv, macro_sym, return_type, param_list, docucomment, is_final, is_abstract)
     CFCParcel *parcel;
     SV *exposure_sv;
     SV *class_name_sv;
@@ -950,7 +950,6 @@ MODULE = Clownfish    PACKAGE = Clownfish::ParamList
 
 SV*
 _new(klass, variadic)
-    const char *klass;
     int variadic;
 CODE:
     CFCParamList *self = CFCParamList_new(variadic);
@@ -1040,8 +1039,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Parcel
 
 SV*
-_singleton(klass, name_sv, cnick_sv)
-    const char *klass;
+_singleton(name_sv, cnick_sv)
     SV *name_sv;
     SV *cnick_sv;
 CODE:
@@ -1121,8 +1119,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Symbol
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
-    const char *klass;
+_new(parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
     CFCParcel *parcel;
     const char *exposure;
     SV *class_name_sv;
@@ -1140,8 +1137,8 @@ CODE:
                               : NULL;
     CFCSymbol *self = CFCSymbol_new(parcel, exposure, class_name, class_cnick,
                                     micro_sym);
-    RETVAL = newSV(0);
-    sv_setref_pv(RETVAL, klass, (void*)self);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 int
@@ -1252,8 +1249,7 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Type
 
 SV*
-_new(klass, flags, parcel, specifier, indirection, c_string)
-    const char *klass;
+_new(flags, parcel, specifier, indirection, c_string)
     int flags;
     CFCParcel *parcel;
     const char *specifier;
@@ -1267,8 +1263,7 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_integer(klass, flags, specifier)
-    const char *klass;
+_new_integer(flags, specifier)
     int flags;
     const char *specifier;
 CODE:
@@ -1278,8 +1273,7 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_float(klass, flags, specifier)
-    const char *klass;
+_new_float(flags, specifier)
     int flags;
     const char *specifier;
 CODE:
@@ -1289,8 +1283,7 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_object(klass, flags, parcel, specifier, indirection)
-    const char *klass;
+_new_object(flags, parcel, specifier, indirection)
     int flags;
     CFCParcel *parcel;
     const char *specifier;
@@ -1302,8 +1295,7 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_composite(klass, flags, child_sv, indirection, array)
-    const char *klass;
+_new_composite(flags, child_sv, indirection, array)
     int flags;
     SV *child_sv;
     int indirection;
@@ -1323,8 +1315,7 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_void(klass, is_const)
-    const char *klass;
+_new_void(is_const)
     int is_const;
 CODE:
     CFCType *self = CFCType_new_void(is_const);
@@ -1333,8 +1324,7 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_va_list(klass)
-    const char *klass;
+_new_va_list()
 CODE:
     CFCType *self = CFCType_new_va_list();
     RETVAL = S_cfcbase_to_perlref(self);
@@ -1342,8 +1332,7 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_new_arbitrary(klass, parcel, specifier)
-    const char *klass;
+_new_arbitrary(parcel, specifier)
     CFCParcel *parcel;
     const char *specifier;
 CODE:
@@ -1624,8 +1613,7 @@ OUTPUT: RETVAL
 MODULE = Clownfish   PACKAGE = Clownfish::Variable
 
 SV*
-_new(klass, parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_sv, inert_sv)
-    const char *klass;
+_new(parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_sv, inert_sv)
     CFCParcel *parcel;
     const char *exposure;
     SV *class_name_sv;
@@ -1852,20 +1840,6 @@ PPCODE:
     CFCBindFile_write_h(file, dest, header, footer);
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Subroutine
-
-SV*
-_new(klass, param_list, class_name, alias, use_labeled_params)
-    const char *klass;
-    CFCParamList *param_list;
-    const char *class_name;
-    const char *alias;
-    int use_labeled_params;
-CODE:
-    CFCPerlSub *self = CFCPerlSub_new(klass, param_list, class_name,
-                                      alias, use_labeled_params);
-    RETVAL = S_cfcbase_to_perlref(self);
-    CFCBase_decref((CFCBase*)self);
-OUTPUT: RETVAL
 
 void
 DESTROY(self)
@@ -2209,6 +2183,9 @@ SV*
 new(klass)
     const char *klass;
 CODE:
+    if (strcmp(klass, "Clownfish::Parser")) {
+        croak("No subclassing allowed");
+    }
     CFCParser *self = CFCParser_new();
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);

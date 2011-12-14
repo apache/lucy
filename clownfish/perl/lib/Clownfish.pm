@@ -87,10 +87,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         confess("Missing required param 'contents'")
             unless defined $args{contents};
-        return $either->_new( $args{contents} );
+        return _new( $args{contents} );
     }
 }
 
@@ -140,11 +141,10 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub create {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%create_PARAMS, %args ) or confess $@;
         $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-        my $package = ref($either) || $either;
         return _create(
-            $package,
             @args{
                 qw( parcel exposure class_name cnick micro_sym
                     docucomment source_class parent_class_name final inert )
@@ -161,12 +161,6 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 {
     package Clownfish::Dumpable;
     BEGIN { push our @ISA, 'Clownfish::Base' }
-
-    sub new {
-        my $either = shift;
-        my $package = ref($either) || $either;
-        return $either->_new();
-    }
 }
 
 {
@@ -179,9 +173,9 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
-        my $package = ref($either) || $either;
-        return $either->_new( $args{source_class} );
+        return _new( $args{source_class} );
     }
 }
 
@@ -205,11 +199,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         $args{inline} ||= 0;
         $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-        my $package = ref($either) || $either;
-        return $package->_new(
+        return _new(
             @args{
                 qw( parcel exposure class_name class_cnick micro_sym
                     return_type param_list docucomment inline )
@@ -231,10 +225,10 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
-        my $package = ref($either) || $either;
         my $parser = Clownfish::Parser->new;
-        return $package->_new( @args{qw( source dest )}, $parser );
+        return _new( @args{qw( source dest )}, $parser );
     }
 
     sub _do_parse_file {
@@ -266,11 +260,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         $args{abstract} ||= 0;
         $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
         $args{final} ||= 0;
-        my $package = ref($either) || $either;
-        return $package->_new(
+        return _new(
             @args{
                 qw( parcel exposure class_name class_cnick macro_sym
                     return_type param_list docucomment final abstract )
@@ -290,9 +284,9 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
-        my $class_name = ref($either)           || $either;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         my $variadic   = delete $args{variadic} || 0;
-        return $class_name->_new($variadic);
+        return _new($variadic);
     }
 }
 
@@ -315,8 +309,8 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     sub singleton {
         my ( $either, %args ) = @_;
         verify_args( \%singleton_PARAMS, %args ) or confess $@;
-        my $package = ref($either) || $either;
-        return $package->_singleton( @args{qw( name cnick )} );
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
+        return _singleton( @args{qw( name cnick )} );
     }
 
     sub acquire {
@@ -352,9 +346,9 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-        my $class_class = ref($either) || $either;
-        return $class_class->_new(
+        return _new(
             @args{qw( parcel exposure class_name class_cnick micro_sym )} );
     }
 }
@@ -386,6 +380,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     sub new {
         my ( $either, %args ) = @_;
         my $package = ref($either) || $either;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
 
         my $flags = 0;
@@ -410,8 +405,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         my $specifier   = $args{specifier}   || '';
         my $c_string    = $args{c_string}    || '';
 
-        return $package->_new( $flags, $parcel, $specifier, $indirection,
-            $c_string );
+        return _new( $flags, $parcel, $specifier, $indirection, $c_string );
     }
 
     our %new_integer_PARAMS = (
@@ -421,11 +415,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new_integer {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_integer_PARAMS, %args ) or confess $@;
         my $flags = 0;
         $flags |= CONST if $args{const};
-        my $package = ref($either) || $either;
-        return $package->_new_integer( $flags, $args{specifier} );
+        return _new_integer( $flags, $args{specifier} );
     }
 
     our %new_float_PARAMS = (
@@ -435,11 +429,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new_float {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_float_PARAMS, %args ) or confess $@;
         my $flags = 0;
         $flags |= CONST if $args{const};
-        my $package = ref($either) || $either;
-        return $package->_new_float( $flags, $args{specifier} );
+        return _new_float( $flags, $args{specifier} );
     }
 
     our %new_object_PARAMS = (
@@ -454,6 +448,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new_object {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_object_PARAMS, %args ) or confess $@;
         my $flags = 0;
         $flags |= INCREMENTED if $args{incremented};
@@ -465,7 +460,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         my $package = ref($either) || $either;
         confess("Missing required param 'specifier'")
             unless defined $args{specifier};
-        return $package->_new_object( $flags, $parcel, $args{specifier},
+        return _new_object( $flags, $parcel, $args{specifier},
             $args{indirection} );
     }
 
@@ -478,30 +473,29 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new_composite {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_composite_PARAMS, %args ) or confess $@;
         my $flags = 0;
         $flags |= NULLABLE if $args{nullable};
         my $indirection = $args{indirection} || 0;
         my $array = defined $args{array} ? $args{array} : "";
-        my $package = ref($either) || $either;
-        return $package->_new_composite( $flags, $args{child}, $indirection,
-            $array );
+        return _new_composite( $flags, $args{child}, $indirection, $array );
     }
 
     our %new_void_PARAMS = ( const => undef, );
 
     sub new_void {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_void_PARAMS, %args ) or confess $@;
-        my $package = ref($either) || $either;
-        return $package->_new_void( !!$args{const} );
+        return _new_void( !!$args{const} );
     }
 
     sub new_va_list {
         my $either = shift;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( {}, @_ ) or confess $@;
-        my $package = ref($either) || $either;
-        return $either->_new_va_list();
+        return _new_va_list();
     }
 
     our %new_arbitrary_PARAMS = (
@@ -511,10 +505,10 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new_arbitrary {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_arbitrary_PARAMS, %args ) or confess $@;
-        my $package = ref($either) || $either;
         my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
-        return $package->_new_arbitrary( $parcel, $args{specifier} );
+        return _new_arbitrary( $parcel, $args{specifier} );
     }
 }
 
@@ -536,11 +530,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
     sub new {
         my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         $args{exposure} ||= 'local';
         $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
-        my $package = ref($either) || $either;
-        return $package->_new(
+        return _new(
             @args{
                 qw( parcel exposure class_name class_cnick micro_sym type inert )
                 }
@@ -704,20 +698,6 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     BEGIN { push our @ISA, 'Clownfish::Base' }
     use Carp;
     use Clownfish::Util qw( verify_args );
-
-    our %new_PARAMS = (
-        param_list         => undef,
-        alias              => undef,
-        class_name         => undef,
-        use_labeled_params => undef,
-    );
-
-    sub new {
-        my ( $either, %args ) = @_;
-        verify_args( \%new_PARAMS, %args ) or confess $@;
-        return _new( ref($either) || $either,
-            @args{qw( param_list class_name alias use_labeled_params )} );
-    }
 
     sub xsub_def { confess "Abstract method" }
 }

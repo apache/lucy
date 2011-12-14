@@ -15,27 +15,22 @@
 
 use strict;
 use warnings;
-
-package MyPrimitiveType;
-use base qw( Clownfish::Type );
-
-sub new {
-    my $either = shift;
-    return $either->SUPER::new( @_, primitive => 1, );
-}
-
-package main;
 use Test::More tests => 4;
+use Clownfish;
 
-my $type = MyPrimitiveType->new( specifier => 'hump_t' );
+my $type = new_primitive_type( specifier => 'hump_t' );
 ok( $type->is_primitive, "is_primitive" );
 
-my $other = MyPrimitiveType->new( specifier => 'hump_t' );
+my $other = new_primitive_type( specifier => 'hump_t' );
 ok( $type->equals($other), "equals()" );
 
-$other = MyPrimitiveType->new( specifier => 'dump_t' );
+$other = new_primitive_type( specifier => 'dump_t' );
 ok( !$type->equals($other), "equals() spoiled by specifier" );
 
-$other = MyPrimitiveType->new( specifier => 'hump_t', const => 1 );
+$other = new_primitive_type( specifier => 'hump_t', const => 1 );
 ok( !$type->equals($other), "equals() spoiled by const" );
+
+sub new_primitive_type {
+    return Clownfish::Type->new( @_, primitive => 1 );
+}
 
