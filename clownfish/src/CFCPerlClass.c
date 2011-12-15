@@ -42,12 +42,16 @@ static CFCPerlClass **registry = NULL;
 static size_t registry_size = 0;
 static size_t registry_cap  = 0;
 
+const static CFCMeta CFCPERLCLASS_META = {
+    "Clownfish::Binding::Perl::Class",
+    sizeof(CFCPerlClass),
+    (CFCBase_destroy_t)CFCPerlClass_destroy
+};
+
 CFCPerlClass*
 CFCPerlClass_new(CFCParcel *parcel, const char *class_name, CFCClass *client, 
                  const char *xs_code, CFCPerlPod *pod_spec) {
-    CFCPerlClass *self
-        = (CFCPerlClass*)CFCBase_allocate(sizeof(CFCPerlClass),
-                                          "Clownfish::Binding::Perl::Class");
+    CFCPerlClass *self = (CFCPerlClass*)CFCBase_allocate(&CFCPERLCLASS_META);
     return CFCPerlClass_init(self, parcel, class_name, client, xs_code,
                              pod_spec);
 }

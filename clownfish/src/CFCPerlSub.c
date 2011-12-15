@@ -31,16 +31,6 @@
 #endif
 
 CFCPerlSub*
-CFCPerlSub_new(const char *klass, CFCParamList *param_list,
-               const char *class_name, const char *alias,
-               int use_labeled_params) {
-    CFCPerlSub *self
-        = (CFCPerlSub*)CFCBase_allocate(sizeof(CFCPerlSub), klass);
-    return CFCPerlSub_init(self, param_list, class_name, alias,
-                           use_labeled_params);
-}
-
-CFCPerlSub*
 CFCPerlSub_init(CFCPerlSub *self, CFCParamList *param_list,
                 const char *class_name, const char *alias,
                 int use_labeled_params) {

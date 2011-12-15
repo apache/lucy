@@ -43,10 +43,15 @@ struct CFCParser {
     CFCMemPool *pool;
 };
 
+const static CFCMeta CFCPARSER_META = {
+    "Clownfish::Parser",
+    sizeof(CFCParser),
+    (CFCBase_destroy_t)CFCParser_destroy
+};
+
 CFCParser*
 CFCParser_new(void) {
-    CFCParser *self = (CFCParser*)CFCBase_allocate(sizeof(CFCParser),
-                                                   "Clownfish::Parser");
+    CFCParser *self = (CFCParser*)CFCBase_allocate(&CFCPARSER_META);
     return CFCParser_init(self);
 }
 

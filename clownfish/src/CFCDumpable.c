@@ -61,10 +61,15 @@ struct CFCDumpable {
     CFCBase base;
 };
 
+const static CFCMeta CFCDUMPABLE_META = {
+    "Clownfish::Dumpable",
+    sizeof(CFCDumpable),
+    (CFCBase_destroy_t)CFCDumpable_destroy
+};
+
 CFCDumpable*
 CFCDumpable_new(void) {
-    CFCDumpable *self = (CFCDumpable*)CFCBase_allocate(sizeof(CFCDumpable),
-                                                       "Clownfish::Dumpable");
+    CFCDumpable *self = (CFCDumpable*)CFCBase_allocate(&CFCDUMPABLE_META);
     return CFCDumpable_init(self);
 }
 

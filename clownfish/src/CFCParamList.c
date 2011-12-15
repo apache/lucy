@@ -37,10 +37,15 @@ struct CFCParamList {
 static void
 S_generate_c_strings(CFCParamList *self);
 
+const static CFCMeta CFCPARAMLIST_META = {
+    "Clownfish::ParamList",
+    sizeof(CFCParamList),
+    (CFCBase_destroy_t)CFCParamList_destroy
+};
+
 CFCParamList*
 CFCParamList_new(int variadic) {
-    CFCParamList *self = (CFCParamList*)CFCBase_allocate(sizeof(CFCParamList),
-                                                         "Clownfish::ParamList");
+    CFCParamList *self = (CFCParamList*)CFCBase_allocate(&CFCPARAMLIST_META);
     return CFCParamList_init(self, variadic);
 }
 

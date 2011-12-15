@@ -24,10 +24,15 @@ struct CFCCBlock {
     char *contents;
 };
 
+const static CFCMeta CFCCBLOCK_META = {
+    "Clownfish::CBlock",
+    sizeof(CFCCBlock),
+    (CFCBase_destroy_t)CFCCBlock_destroy
+};
+
 CFCCBlock*
 CFCCBlock_new(const char *contents) {
-    CFCCBlock *self = (CFCCBlock*)CFCBase_allocate(sizeof(CFCCBlock),
-                                                   "Clownfish::CBlock");
+    CFCCBlock *self = (CFCCBlock*)CFCBase_allocate(&CFCCBLOCK_META);
     return CFCCBlock_init(self, contents);
 }
 

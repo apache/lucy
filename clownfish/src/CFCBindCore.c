@@ -47,12 +47,16 @@ S_write_parcel_h(CFCBindCore *self);
 static void
 S_write_parcel_c(CFCBindCore *self);
 
+const static CFCMeta CFCBINDCORE_META = {
+    "Clownfish::Binding::Core",
+    sizeof(CFCBindCore),
+    (CFCBase_destroy_t)CFCBindCore_destroy
+};
+
 CFCBindCore*
 CFCBindCore_new(CFCHierarchy *hierarchy, const char *dest, const char *header,
                 const char *footer) {
-    CFCBindCore *self
-        = (CFCBindCore*)CFCBase_allocate(sizeof(CFCBindCore),
-                                         "Clownfish::Binding::Core");
+    CFCBindCore *self = (CFCBindCore*)CFCBase_allocate(&CFCBINDCORE_META);
     return CFCBindCore_init(self, hierarchy, dest, header, footer);
 }
 

@@ -92,11 +92,15 @@ S_vt_singleton_def(CFCBindClass *self);
 static char*
 S_short_names(CFCBindClass *self);
 
+const static CFCMeta CFCBINDCLASS_META = {
+    "Clownfish::Binding::Core::Class", 
+    sizeof(CFCBindClass),
+    (CFCBase_destroy_t)CFCBindClass_destroy
+};
+
 CFCBindClass*
 CFCBindClass_new(CFCClass *client) {
-    CFCBindClass *self 
-        = (CFCBindClass*)CFCBase_allocate(sizeof(CFCBindClass),
-                                          "Clownfish::Binding::Core::Class");
+    CFCBindClass *self = (CFCBindClass*)CFCBase_allocate(&CFCBINDCLASS_META);
     return CFCBindClass_init(self, client);
 }
 

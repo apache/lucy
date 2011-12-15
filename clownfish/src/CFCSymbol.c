@@ -27,12 +27,17 @@
 #include "CFCParcel.h"
 #include "CFCUtil.h"
 
+const static CFCMeta CFCSYMBOL_META = {
+    "Clownfish::Symbol",
+    sizeof(CFCSymbol),
+    (CFCBase_destroy_t)CFCSymbol_destroy
+};
+
 CFCSymbol*
 CFCSymbol_new(struct CFCParcel *parcel, const char *exposure,
               const char *class_name, const char *class_cnick,
               const char *micro_sym) {
-    CFCSymbol *self = (CFCSymbol*)CFCBase_allocate(sizeof(CFCSymbol),
-                                                   "Clownfish::Symbol");
+    CFCSymbol *self = (CFCSymbol*)CFCBase_allocate(&CFCSYMBOL_META);
     return CFCSymbol_init(self, parcel, exposure, class_name, class_cnick,
                           micro_sym);
 }

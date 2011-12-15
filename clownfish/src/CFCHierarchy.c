@@ -62,11 +62,15 @@ S_fetch_file(CFCHierarchy *self, const char *source_class);
 static int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified);
 
+const static CFCMeta CFCHIERARCHY_META = {
+    "Clownfish::Hierarchy",
+    sizeof(CFCHierarchy),
+    (CFCBase_destroy_t)CFCHierarchy_destroy
+};
+
 CFCHierarchy*
 CFCHierarchy_new(const char *source, const char *dest, CFCParser *parser) {
-    CFCHierarchy *self
-        = (CFCHierarchy*)CFCBase_allocate(sizeof(CFCHierarchy),
-                                          "Clownfish::Hierarchy");
+    CFCHierarchy *self = (CFCHierarchy*)CFCBase_allocate(&CFCHIERARCHY_META);
     return CFCHierarchy_init(self, source, dest, parser);
 }
 

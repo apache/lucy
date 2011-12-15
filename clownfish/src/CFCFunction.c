@@ -30,14 +30,19 @@
 #include "CFCDocuComment.h"
 #include "CFCUtil.h"
 
+const static CFCMeta CFCFUNCTION_META = {
+    "Clownfish::Function",
+    sizeof(CFCFunction),
+    (CFCBase_destroy_t)CFCFunction_destroy
+};
+
 CFCFunction*
 CFCFunction_new(CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *class_cnick,
                 const char *micro_sym, CFCType *return_type,
                 CFCParamList *param_list, CFCDocuComment *docucomment,
                 int is_inline) {
-    CFCFunction *self = (CFCFunction*)CFCBase_allocate(sizeof(CFCFunction),
-                                                       "Clownfish::Function");
+    CFCFunction *self = (CFCFunction*)CFCBase_allocate(&CFCFUNCTION_META);
     return CFCFunction_init(self, parcel, exposure, class_name, class_cnick,
                             micro_sym, return_type, param_list, docucomment,
                             is_inline);

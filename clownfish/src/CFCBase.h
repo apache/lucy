@@ -24,13 +24,20 @@ extern "C" {
 #include <stddef.h>
 
 typedef struct CFCBase CFCBase;
+typedef struct CFCMeta CFCMeta;
+typedef void (*CFCBase_destroy_t)(CFCBase *self);
 
 #ifdef CFC_NEED_BASE_STRUCT_DEF
 struct CFCBase {
-    char *cfc_class;
+    const CFCMeta *meta;
     void *perl_obj;
 };
 #endif
+struct CFCMeta {
+    char *cfc_class;
+    size_t obj_alloc_size;
+    CFCBase_destroy_t destroy;
+};
 
 /** Allocate a new CFC object.
  *
@@ -38,7 +45,7 @@ struct CFCBase {
  * @param klass Class name.
  */
 CFCBase*
-CFCBase_allocate(size_t size, const char *klass);
+CFCBase_allocate(const CFCMeta *meta);
 
 /** Clean up CFCBase member variables as necessary and free the object blob
  * itself.

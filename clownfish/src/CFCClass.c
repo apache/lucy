@@ -102,14 +102,19 @@ S_create_dumpables(CFCClass *self);
 static void
 S_bequeath_methods(CFCClass *self);
 
+const static CFCMeta CFCCLASS_META = {
+    "Clownfish::Class",
+    sizeof(CFCClass),
+    (CFCBase_destroy_t)CFCClass_destroy
+};
+
 CFCClass*
 CFCClass_create(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *cnick,
                 const char *micro_sym, CFCDocuComment *docucomment,
                 const char *source_class, const char *parent_class_name,
                 int is_final, int is_inert) {
-    CFCClass *self = (CFCClass*)CFCBase_allocate(sizeof(CFCClass),
-                                                 "Clownfish::Class");
+    CFCClass *self = (CFCClass*)CFCBase_allocate(&CFCCLASS_META);
     return CFCClass_do_create(self, parcel, exposure, class_name, cnick,
                               micro_sym, docucomment, source_class,
                               parent_class_name, is_final, is_inert);

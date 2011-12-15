@@ -38,12 +38,17 @@ struct CFCVariable {
     int   inert;
 };
 
+const static CFCMeta CFCVARIABLE_META = {
+    "Clownfish::Variable",
+    sizeof(CFCVariable),
+    (CFCBase_destroy_t)CFCVariable_destroy
+};
+
 CFCVariable*
 CFCVariable_new(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *class_cnick,
                 const char *micro_sym, struct CFCType *type, int inert) {
-    CFCVariable *self = (CFCVariable*)CFCBase_allocate(sizeof(CFCVariable),
-                                                       "Clownfish::Variable");
+    CFCVariable *self = (CFCVariable*)CFCBase_allocate(&CFCVARIABLE_META);
     return CFCVariable_init(self, parcel, exposure, class_name, class_cnick,
                             micro_sym, type, inert);
 }

@@ -78,12 +78,17 @@ S_strip(char *comment) {
     FREEMEM(scratch);
 }
 
+const static CFCMeta CFCDOCUCOMMENT_META = {
+    "Clownfish::DocuComment",
+    sizeof(CFCDocuComment),
+    (CFCBase_destroy_t)CFCDocuComment_destroy
+};
+
 CFCDocuComment*
 CFCDocuComment_parse(const char *raw_text) {
     char *text = CFCUtil_strdup(raw_text);
     CFCDocuComment *self
-        = (CFCDocuComment*)CFCBase_allocate(sizeof(CFCDocuComment),
-                                            "Clownfish::DocuComment");
+        = (CFCDocuComment*)CFCBase_allocate(&CFCDOCUCOMMENT_META);
 
     // Strip whitespace, comment open, close, and left border.
     CFCUtil_trim_whitespace(text);

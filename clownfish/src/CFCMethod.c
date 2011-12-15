@@ -48,13 +48,18 @@ struct CFCMethod {
 static void
 S_update_typedefs(CFCMethod *self, const char *short_sym);
 
+const static CFCMeta CFCMETHOD_META = {
+    "Clownfish::Method",
+    sizeof(CFCMethod),
+    (CFCBase_destroy_t)CFCMethod_destroy
+};
+
 CFCMethod*
 CFCMethod_new(CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *macro_sym,
               CFCType *return_type, CFCParamList *param_list,
               CFCDocuComment *docucomment, int is_final, int is_abstract) {
-    CFCMethod *self = (CFCMethod*)CFCBase_allocate(sizeof(CFCMethod),
-                                                   "Clownfish::Method");
+    CFCMethod *self = (CFCMethod*)CFCBase_allocate(&CFCMETHOD_META);
     return CFCMethod_init(self, parcel, exposure, class_name, class_cnick,
                           macro_sym, return_type, param_list, docucomment,
                           is_final, is_abstract);

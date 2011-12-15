@@ -38,11 +38,16 @@ struct CFCPerlConstructor {
     CFCFunction *init_func;
 };
 
+const static CFCMeta CFCPERLCONSTRUCTOR_META = {
+    "Clownfish::Binding::Perl::Constructor",
+    sizeof(CFCPerlConstructor),
+    (CFCBase_destroy_t)CFCPerlConstructor_destroy
+};
+
 CFCPerlConstructor*
 CFCPerlConstructor_new(CFCClass *klass, const char *alias) {
     CFCPerlConstructor *self
-        = (CFCPerlConstructor*)CFCBase_allocate(sizeof(CFCPerlConstructor),
-                                                "Clownfish::Binding::Perl::Constructor");
+        = (CFCPerlConstructor*)CFCBase_allocate(&CFCPERLCONSTRUCTOR_META);
     return CFCPerlConstructor_init(self, klass, alias);
 }
 

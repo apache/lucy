@@ -41,11 +41,16 @@ struct CFCFile {
     char *path_part;
 };
 
+const static CFCMeta CFCFILE_META = {
+    "Clownfish::File",
+    sizeof(CFCFile),
+    (CFCBase_destroy_t)CFCFile_destroy
+};
+
 CFCFile*
 CFCFile_new(const char *source_class) {
 
-    CFCFile *self = (CFCFile*)CFCBase_allocate(sizeof(CFCFile),
-                                               "Clownfish::File");
+    CFCFile *self = (CFCFile*)CFCBase_allocate(&CFCFILE_META);
     return CFCFile_init(self, source_class);
 }
 

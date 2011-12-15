@@ -99,10 +99,15 @@ S_validate_name_or_cnick(const char *orig) {
     return true;
 }
 
+const static CFCMeta CFCPARCEL_META = {
+    "Clownfish::Parcel",
+    sizeof(CFCParcel),
+    (CFCBase_destroy_t)CFCParcel_destroy
+};
+
 CFCParcel*
 CFCParcel_new(const char *name, const char *cnick) {
-    CFCParcel *self = (CFCParcel*)CFCBase_allocate(sizeof(CFCParcel),
-                                                   "Clownfish::Parcel");
+    CFCParcel *self = (CFCParcel*)CFCBase_allocate(&CFCPARCEL_META);
     return CFCParcel_init(self, name, cnick);
 }
 

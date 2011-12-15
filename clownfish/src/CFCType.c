@@ -43,11 +43,16 @@ struct CFCType {
     struct CFCType *child;
 };
 
+const static CFCMeta CFCTYPE_META= {
+    "Clownfish::Type",
+    sizeof(CFCType),
+    (CFCBase_destroy_t)CFCType_destroy
+};
+
 CFCType*
 CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
             int indirection, const char *c_string) {
-    CFCType *self = (CFCType*)CFCBase_allocate(sizeof(CFCType),
-                                               "Clownfish::Type");
+    CFCType *self = (CFCType*)CFCBase_allocate(&CFCTYPE_META);
     return CFCType_init(self, flags, parcel, specifier, indirection,
                         c_string);
 }

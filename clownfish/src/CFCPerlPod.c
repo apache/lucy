@@ -50,11 +50,16 @@ struct CFCPerlPod {
     size_t   num_constructors;
 };
 
+const static CFCMeta CFCPERLPOD_META = {
+    "Clownfish::Binding::Perl::Pod",
+    sizeof(CFCPerlPod),
+    (CFCBase_destroy_t)CFCPerlPod_destroy
+};
+
 CFCPerlPod*
 CFCPerlPod_new(const char *synopsis, const char *description) {
     CFCPerlPod *self
-        = (CFCPerlPod*)CFCBase_allocate(sizeof(CFCPerlPod),
-                                        "Clownfish::Binding::Perl::Pod");
+        = (CFCPerlPod*)CFCBase_allocate(&CFCPERLPOD_META);
     return CFCPerlPod_init(self, synopsis, description);
 }
 

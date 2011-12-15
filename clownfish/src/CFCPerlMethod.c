@@ -49,11 +49,16 @@ S_xsub_def_labeled_params(CFCPerlMethod *self);
 static char*
 S_xsub_def_positional_args(CFCPerlMethod *self);
 
+const static CFCMeta CFCPERLMETHOD_META = {
+    "Clownfish::Binding::Perl::Method",
+    sizeof(CFCPerlMethod),
+    (CFCBase_destroy_t)CFCPerlMethod_destroy
+};
+
 CFCPerlMethod*
 CFCPerlMethod_new(CFCMethod *method, const char *alias) {
     CFCPerlMethod *self
-        = (CFCPerlMethod*)CFCBase_allocate(sizeof(CFCPerlMethod),
-                                          "Clownfish::Binding::Perl::Method");
+        = (CFCPerlMethod*)CFCBase_allocate(&CFCPERLMETHOD_META);
     return CFCPerlMethod_init(self, method, alias);
 }
 

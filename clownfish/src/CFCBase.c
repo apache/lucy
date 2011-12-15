@@ -25,16 +25,15 @@
 #include "CFCUtil.h"
 
 CFCBase*
-CFCBase_allocate(size_t size, const char *klass) {
-    CFCBase *self = (CFCBase*)CALLOCATE(size, 1);
-    self->perl_obj = CFCUtil_make_perl_obj(self, klass);
-    self->cfc_class = CFCUtil_strdup(klass);
+CFCBase_allocate(const CFCMeta *meta) {
+    CFCBase *self = (CFCBase*)CALLOCATE(meta->obj_alloc_size, 1);
+    self->perl_obj = CFCUtil_make_perl_obj(self, meta->cfc_class);
+    self->meta = meta;
     return self;
 }
 
 void
 CFCBase_destroy(CFCBase *self) {
-    FREEMEM(self->cfc_class);
     FREEMEM(self);
 }
 
@@ -70,7 +69,7 @@ CFCBase_get_perl_obj(CFCBase *self) {
 
 const char*
 CFCBase_get_cfc_class(CFCBase *self) {
-    return self->cfc_class;
+    return self->meta->cfc_class;
 }
 
 
