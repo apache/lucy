@@ -56,7 +56,7 @@ my $should_be_foo = Clownfish::Class->fetch_singleton(
     parcel     => 'Neato',
     class_name => 'Foo',
 );
-is( $foo, $should_be_foo, "fetch_singleton" );
+is( $$foo, $$should_be_foo, "fetch_singleton" );
 
 my $foo_jr = Clownfish::Class->create(
     parcel            => 'Neato',
@@ -116,10 +116,10 @@ like( $@, qr/grow_tree/, "call grow_tree only once." );
 eval { $foo_jr->add_method($do_stuff) };
 like( $@, qr/grow_tree/, "Forbid add_method after grow_tree." );
 
-is( $foo_jr->get_parent,            $foo,      "grow_tree, one level" );
-is( $final_foo->get_parent,         $foo_jr,   "grow_tree, two levels" );
-is( $foo->novel_method("Do_Stuff"), $do_stuff, 'novel_method' );
-is( $foo_jr->method("Do_Stuff"),    $do_stuff, "inherited method" );
+is( ${ $foo_jr->get_parent },    $$foo,    "grow_tree, one level" );
+is( ${ $final_foo->get_parent }, $$foo_jr, "grow_tree, two levels" );
+is( ${ $foo->novel_method("Do_Stuff") }, $$do_stuff, 'novel_method' );
+is( ${ $foo_jr->method("Do_Stuff") },    $$do_stuff, "inherited method" );
 ok( !$foo_jr->novel_method("Do_Stuff"),    'inherited method not novel' );
 ok( $final_foo->method("Do_Stuff")->final, "Finalize inherited method" );
 ok( !$foo_jr->method("Do_Stuff")->final, "Don't finalize method in parent" );

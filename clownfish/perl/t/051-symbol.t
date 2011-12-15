@@ -49,7 +49,7 @@ ok( !$public_exposure->equals($parcel_exposure),
 
 my $lucifer_parcel = Clownfish::Parcel->singleton( name => 'Lucifer' );
 my $lucifer = new_symbol( parcel => 'Lucifer' );
-ok( $lucifer_parcel == $lucifer->get_parcel, "derive parcel" );
+ok( $$lucifer_parcel == ${ $lucifer->get_parcel }, "derive parcel" );
 is( $lucifer->get_prefix, "lucifer_", "get_prefix" );
 is( $lucifer->get_Prefix, "Lucifer_", "get_Prefix" );
 is( $lucifer->get_PREFIX, "LUCIFER_", "get_PREFIX" );
