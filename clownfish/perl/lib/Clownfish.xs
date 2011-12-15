@@ -50,13 +50,13 @@
 
 static SV*
 S_cfcbase_to_perlref(void *thing) {
+    SV *ref = newSV(0);
     if (thing) {
-        SV *perl_obj = (SV*)CFCBase_get_perl_obj((CFCBase*)thing);
-        return newRV(perl_obj);
+        const char *klass = CFCBase_get_cfc_class((CFCBase*)thing);
+        CFCBase_incref((CFCBase*)thing);
+        sv_setref_pv(ref, klass, (void*)thing);
     }
-    else {
-        return newSV(0);
-    }
+    return ref;
 }
 
 // Transform a NULL-terminated array of CFCBase* into a Perl arrayref.
@@ -85,6 +85,15 @@ S_sv_eat_c_string(char *string) {
     }
 }
 
+MODULE = Clownfish    PACKAGE = Clownfish::Base
+
+void
+DESTROY(self)
+    CFCBase *self;
+PPCODE:
+    CFCBase_decref((CFCBase*)self);
+
+
 MODULE = Clownfish    PACKAGE = Clownfish::CBlock
 
 SV*
@@ -95,12 +104,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCCBlock *self;
-PPCODE:
-    CFCCBlock_destroy(self);
 
 void
 _set_or_get(self, ...)
@@ -151,12 +154,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCClass *self;
-PPCODE:
-    CFCClass_destroy(self);
 
 SV*
 _fetch_singleton(parcel, class_name)
@@ -437,12 +434,6 @@ CODE:
 OUTPUT: RETVAL
 
 void
-DESTROY(self)
-    CFCDocuComment *self;
-PPCODE:
-    CFCDocuComment_destroy(self);
-
-void
 _set_or_get(self, ...)
     CFCDocuComment *self;
 ALIAS:
@@ -517,12 +508,6 @@ CODE:
 OUTPUT: RETVAL
 
 void
-DESTROY(self)
-    CFCDumpable *self;
-PPCODE:
-    CFCDumpable_destroy(self);
-
-void
 add_dumpables(self, klass)
     CFCDumpable *self;
     CFCClass *klass;
@@ -540,12 +525,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-_destroy(self)
-    CFCFile *self;
-PPCODE:
-    CFCFile_destroy(self);
 
 void
 add_block(self, block)
@@ -667,12 +646,6 @@ CODE:
 OUTPUT: RETVAL
 
 void
-DESTROY(self)
-    CFCFunction *self;
-PPCODE:
-    CFCFunction_destroy(self);
-
-void
 _set_or_get(self, ...)
     CFCFunction *self;
 ALIAS:
@@ -733,12 +706,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCHierarchy *self;
-PPCODE:
-    CFCHierarchy_destroy(self);
 
 void
 build(self)
@@ -816,12 +783,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCMethod *self;
-PPCODE:
-    CFCMethod_destroy(self);
 
 int
 compatible(self, other)
@@ -958,12 +919,6 @@ CODE:
 OUTPUT: RETVAL
 
 void
-DESTROY(self)
-    CFCParamList *self;
-PPCODE:
-    CFCParamList_destroy(self);
-
-void
 add_param(self, variable, value_sv)
     CFCParamList *self;
     CFCVariable  *variable;
@@ -1048,12 +1003,6 @@ CODE:
     CFCParcel *self = CFCParcel_singleton(name, cnick);
     RETVAL = S_cfcbase_to_perlref(self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCParcel *self;
-PPCODE:
-    CFCParcel_destroy(self);
 
 int
 equals(self, other)
@@ -1148,12 +1097,6 @@ equals(self, other)
 CODE:
     RETVAL = CFCSymbol_equals(self, other);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCSymbol *self;
-PPCODE:
-    CFCSymbol_destroy(self);
 
 void
 _set_or_get(self, ...)
@@ -1340,12 +1283,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCType *self;
-PPCODE:
-    CFCType_destroy(self);
 
 int
 equals(self, other)
@@ -1647,12 +1584,6 @@ CODE:
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
-void
-DESTROY(self)
-    CFCVariable *self;
-PPCODE:
-    CFCVariable_destroy(self);
-
 int
 equals(self, other)
     CFCVariable *self;
@@ -1708,12 +1639,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self);
-    CFCBindCore *self;
-PPCODE:
-    CFCBindCore_destroy(self);
 
 int
 write_all_modified(self, ...)
@@ -1808,12 +1733,6 @@ CODE:
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
-void
-DESTROY(self)
-    CFCBindClass *self;
-PPCODE:
-    CFCBindClass_destroy(self);
-
 SV*
 to_c(self)
     CFCBindClass *self;
@@ -1840,12 +1759,6 @@ PPCODE:
     CFCBindFile_write_h(file, dest, header, footer);
 
 MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::Subroutine
-
-void
-DESTROY(self)
-    CFCPerlSub *self;
-PPCODE:
-    CFCPerlSub_destroy(self);
 
 void
 _set_or_get(self, ...)
@@ -1917,12 +1830,6 @@ CODE:
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
-void
-DESTROY(self)
-    CFCPerlMethod *self;
-PPCODE:
-    CFCPerlMethod_destroy(self);
-
 SV*
 xsub_def(self)
     CFCPerlMethod *self;
@@ -1942,12 +1849,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCPerlConstructor *self;
-PPCODE:
-    CFCPerlConstructor_destroy(self);
 
 SV*
 xsub_def(self)
@@ -1980,7 +1881,7 @@ void
 _destroy(self)
     CFCPerlClass *self;
 PPCODE:
-    CFCPerlClass_destroy(self);
+    CFCBase_decref((CFCBase*)self);
 
 void
 _add_to_registry(self)
@@ -2056,12 +1957,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-DESTROY(self)
-    CFCPerlPod *self;
-PPCODE:
-    CFCPerlPod_destroy(self);
 
 void
 _add_method(self, name, pod_sv)
@@ -2191,12 +2086,6 @@ CODE:
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
-void
-DESTROY(self)
-    CFCParser *self;
-PPCODE:
-    CFCParser_destroy(self);
-
 SV*
 parse(self, string)
     CFCParser  *self;
@@ -2245,13 +2134,4 @@ CODE:
     CFCParcel *parcel = CFCParser_get_parcel();
     RETVAL = S_cfcbase_to_perlref((CFCBase*)parcel);
 OUTPUT: RETVAL
-
-
-MODULE = Clownfish    PACKAGE = Clownfish::MemPool
-
-void
-DESTROY(self)
-    CFCMemPool *self;
-PPCODE:
-    CFCMemPool_destroy(self);
 

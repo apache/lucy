@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-#include "ppport.h"
-
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCUtil.h"
@@ -27,7 +21,7 @@
 CFCBase*
 CFCBase_allocate(const CFCMeta *meta) {
     CFCBase *self = (CFCBase*)CALLOCATE(meta->obj_alloc_size, 1);
-    self->perl_obj = CFCUtil_make_perl_obj(self, meta->cfc_class);
+    self->refcount = 1;
     self->meta = meta;
     return self;
 }
@@ -40,7 +34,7 @@ CFCBase_destroy(CFCBase *self) {
 CFCBase*
 CFCBase_incref(CFCBase *self) {
     if (self) {
-        SvREFCNT_inc((SV*)self->perl_obj);
+        self->refcount++;
     }
     return self;
 }
@@ -48,23 +42,16 @@ CFCBase_incref(CFCBase *self) {
 unsigned
 CFCBase_decref(CFCBase *self) {
     if (!self) { return 0; }
-    unsigned modified_refcount = SvREFCNT((SV*)self->perl_obj) - 1;
-    /* When the SvREFCNT for this Perl object falls to zero, DESTROY will be
-     * invoked from Perl space for the class that the Perl object was blessed
-     * into.  Thus even though the very simple CFC object model does not
-     * generally support polymorphism, we get it for object destruction. */
-    SvREFCNT_dec((SV*)self->perl_obj);
+    unsigned modified_refcount = self->refcount - 1;
+    if (modified_refcount == 0) {
+        self->meta->destroy(self);
+    }
     return modified_refcount;
 }
 
 unsigned
 CFCBase_get_refcount(CFCBase *self) {
-    return SvREFCNT((SV*)self->perl_obj);
-}
-
-void*
-CFCBase_get_perl_obj(CFCBase *self) {
-    return self->perl_obj;
+    return self->refcount;
 }
 
 const char*

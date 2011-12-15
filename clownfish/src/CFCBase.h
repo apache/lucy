@@ -30,7 +30,7 @@ typedef void (*CFCBase_destroy_t)(CFCBase *self);
 #ifdef CFC_NEED_BASE_STRUCT_DEF
 struct CFCBase {
     const CFCMeta *meta;
-    void *perl_obj;
+    int refcount;
 };
 #endif
 struct CFCMeta {
@@ -71,11 +71,6 @@ CFCBase_decref(CFCBase *self);
  */
 unsigned
 CFCBase_get_refcount(CFCBase *self);
-
-/** Return the CFC object's cached Perl object.
- */
-void*
-CFCBase_get_perl_obj(CFCBase *self);
 
 /** Return the class name of the CFC object.  (Not the class name of any
  * parsed object the CFC object might represent.)
