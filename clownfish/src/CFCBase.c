@@ -58,6 +58,11 @@ CFCBase_decref(CFCBase *self) {
     return modified_refcount;
 }
 
+unsigned
+CFCBase_get_refcount(CFCBase *self) {
+    return SvREFCNT((SV*)self->perl_obj);
+}
+
 void*
 CFCBase_get_perl_obj(CFCBase *self) {
     return self->perl_obj;

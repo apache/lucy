@@ -60,6 +60,11 @@ CFCBase_incref(CFCBase *self);
 unsigned
 CFCBase_decref(CFCBase *self);
 
+/** Return the CFC object's refcount.
+ */
+unsigned
+CFCBase_get_refcount(CFCBase *self);
+
 /** Return the CFC object's cached Perl object.
  */
 void*
