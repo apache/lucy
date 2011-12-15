@@ -27,6 +27,7 @@ typedef struct CFCBase CFCBase;
 
 #ifdef CFC_NEED_BASE_STRUCT_DEF
 struct CFCBase {
+    char *cfc_class;
     void *perl_obj;
 };
 #endif

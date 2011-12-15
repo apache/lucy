@@ -28,11 +28,13 @@ CFCBase*
 CFCBase_allocate(size_t size, const char *klass) {
     CFCBase *self = (CFCBase*)CALLOCATE(size, 1);
     self->perl_obj = CFCUtil_make_perl_obj(self, klass);
+    self->cfc_class = CFCUtil_strdup(klass);
     return self;
 }
 
 void
 CFCBase_destroy(CFCBase *self) {
+    FREEMEM(self->cfc_class);
     FREEMEM(self);
 }
 
@@ -63,7 +65,7 @@ CFCBase_get_perl_obj(CFCBase *self) {
 
 const char*
 CFCBase_get_cfc_class(CFCBase *self) {
-    return HvNAME(SvSTASH((SV*)self->perl_obj));
+    return self->cfc_class;
 }
 
 
