@@ -66,8 +66,8 @@ sub register {
 
     # Create object.
     my $self = _new( @args{qw( parcel class_name client xs_code pod_spec )} );
-    $bind_methods{$self}      = $args{bind_methods};
-    $bind_constructors{$self} = $args{bind_constructors};
+    $bind_methods{$$self}      = $args{bind_methods};
+    $bind_constructors{$$self} = $args{bind_constructors};
 
     # Add to registry.
     _add_to_registry($self);
@@ -76,16 +76,17 @@ sub register {
 }
 
 sub DESTROY {
+    return;    # Leak intentionally for now.
     my $self = shift;
-    delete $bind_methods{$self};
-    delete $bind_constructors{$self};
+    delete $bind_methods{$$self};
+    delete $bind_constructors{$$self};
     _destroy($self);
 }
 
 END { __PACKAGE__->_clear_registry }
 
-sub get_bind_methods      { $bind_methods{ +shift } }
-sub get_bind_constructors { $bind_constructors{ +shift } }
+sub get_bind_methods      { $bind_methods{ ${ +shift } } }
+sub get_bind_constructors { $bind_constructors{ ${ +shift } } }
 
 sub constructor_bindings {
     my $self  = shift;

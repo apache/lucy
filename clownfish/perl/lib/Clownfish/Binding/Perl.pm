@@ -101,6 +101,7 @@ sub new {
 }
 
 sub DESTROY {
+    return;    # Leak intentionally for now.
     my $self = shift;
     delete $parcel{$self};
     delete $hierarchy{$self};
