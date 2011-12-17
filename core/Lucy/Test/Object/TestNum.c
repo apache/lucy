@@ -177,15 +177,15 @@ test_Equals_and_Compare_To(TestBatch *batch) {
     TEST_TRUE(batch, Int32_Compare_To(i32, (Obj*)f32) < 0,
               "Integer32 comparison to Float32");
 
-    TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_TRUE), 
+    TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_TRUE),
               "CFISH_TRUE Equals itself");
-    TEST_TRUE(batch, Bool_Equals(CFISH_FALSE, (Obj*)CFISH_FALSE), 
+    TEST_TRUE(batch, Bool_Equals(CFISH_FALSE, (Obj*)CFISH_FALSE),
               "CFISH_FALSE Equals itself");
-    TEST_FALSE(batch, Bool_Equals(CFISH_FALSE, (Obj*)CFISH_TRUE), 
+    TEST_FALSE(batch, Bool_Equals(CFISH_FALSE, (Obj*)CFISH_TRUE),
                "CFISH_FALSE not Equals CFISH_TRUE ");
-    TEST_FALSE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_FALSE), 
+    TEST_FALSE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_FALSE),
                "CFISH_TRUE not Equals CFISH_FALSE ");
-    TEST_FALSE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CHARBUF), 
+    TEST_FALSE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CHARBUF),
                "CFISH_TRUE not Equals random other object ");
 
     DECREF(i64);

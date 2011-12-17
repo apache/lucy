@@ -22,8 +22,8 @@ use Clownfish::Parcel;
 my $neato_parcel = Clownfish::Parcel->singleton( name => 'Neato' );
 
 my $type = Clownfish::Type->new( parcel => 'Neato', specifier => 'mytype_t' );
-is( ${ $type->get_parcel }, $$neato_parcel,
-    "constructor changes parcel name to Parcel singleton" );
+is( ${ $type->get_parcel },
+    $$neato_parcel, "constructor changes parcel name to Parcel singleton" );
 
 is( $type->to_c, '', "to_c()" );
 $type->set_c_string("mytype_t");

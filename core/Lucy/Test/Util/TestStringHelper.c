@@ -29,8 +29,8 @@
 #define TRAIL_OK(n) (n >= 0x80 && n <= 0xBF)
 static bool_t
 S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
-	const uint8_t *string = (const uint8_t*)maybe_utf8;
-	const uint8_t *const end = string + size;
+    const uint8_t *string = (const uint8_t*)maybe_utf8;
+    const uint8_t *const end = string + size;
     while (string < end) {
         int count = StrHelp_UTF8_COUNT[*string];
         bool_t valid = false;
@@ -79,7 +79,7 @@ S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
         else if (count == 4) {
             if (string[0] == 0xF0) {
                 if (string[1] >= 0x90 && string[1] <= 0xBF
-                    && TRAIL_OK(string[2]) 
+                    && TRAIL_OK(string[2])
                     && TRAIL_OK(string[3])
                    ) {
                     valid = true;
@@ -225,25 +225,25 @@ test_utf8_valid(TestBatch *batch) {
     // Bad continuations.
     S_test_validity(batch, "\xE2\x98\xBA\xE2\x98\xBA", 6, true,
                     "SmileySmiley");
-    S_test_validity(batch, "\xE2\xBA\xE2\x98\xBA", 5, false, 
+    S_test_validity(batch, "\xE2\xBA\xE2\x98\xBA", 5, false,
                     "missing first continuation byte");
-    S_test_validity(batch, "\xE2\x98\xE2\x98\xBA", 5, false, 
+    S_test_validity(batch, "\xE2\x98\xE2\x98\xBA", 5, false,
                     "missing second continuation byte");
-    S_test_validity(batch, "\xE2\xE2\x98\xBA", 4, false, 
+    S_test_validity(batch, "\xE2\xE2\x98\xBA", 4, false,
                     "missing both continuation bytes");
-    S_test_validity(batch, "\xBA\xE2\x98\xBA\xE2\xBA", 5, false, 
+    S_test_validity(batch, "\xBA\xE2\x98\xBA\xE2\xBA", 5, false,
                     "missing first continuation byte (end)");
-    S_test_validity(batch, "\xE2\x98\xBA\xE2\x98", 5, false, 
+    S_test_validity(batch, "\xE2\x98\xBA\xE2\x98", 5, false,
                     "missing second continuation byte (end)");
-    S_test_validity(batch, "\xE2\x98\xBA\xE2", 4, false, 
+    S_test_validity(batch, "\xE2\x98\xBA\xE2", 4, false,
                     "missing both continuation bytes (end)");
-    S_test_validity(batch, "\xBA\xE2\x98\xBA", 4, false, 
+    S_test_validity(batch, "\xBA\xE2\x98\xBA", 4, false,
                     "isolated continuation byte 0xBA");
-    S_test_validity(batch, "\x98\xE2\x98\xBA", 4, false, 
+    S_test_validity(batch, "\x98\xE2\x98\xBA", 4, false,
                     "isolated continuation byte 0x98");
-    S_test_validity(batch, "\xE2\x98\xBA\xBA", 4, false, 
+    S_test_validity(batch, "\xE2\x98\xBA\xBA", 4, false,
                     "isolated continuation byte 0xBA (end)");
-    S_test_validity(batch, "\xE2\x98\xBA\x98", 4, false, 
+    S_test_validity(batch, "\xE2\x98\xBA\x98", 4, false,
                     "isolated continuation byte 0x98 (end)");
 }
 
@@ -287,11 +287,11 @@ test_utf8proc_normalization(TestBatch *batch) {
         // Normalize once.
         uint8_t *normalized;
         int32_t check = utf8proc_map(CB_Get_Ptr8(source), CB_Get_Size(source),
-            &normalized,
-            UTF8PROC_STABLE  |
-            UTF8PROC_COMPOSE |
-            UTF8PROC_COMPAT  |
-            UTF8PROC_CASEFOLD);
+                                     &normalized,
+                                     UTF8PROC_STABLE  |
+                                     UTF8PROC_COMPOSE |
+                                     UTF8PROC_COMPAT  |
+                                     UTF8PROC_CASEFOLD);
         if (check < 0) {
             lucy_Json_set_tolerant(1);
             CharBuf *json = lucy_Json_to_json((Obj*)source);
@@ -308,10 +308,10 @@ test_utf8proc_normalization(TestBatch *batch) {
         size_t normalized_len = strlen((char*)normalized);
         uint8_t *dupe;
         int32_t dupe_check = utf8proc_map(normalized, normalized_len, &dupe,
-            UTF8PROC_STABLE  |
-            UTF8PROC_COMPOSE |
-            UTF8PROC_COMPAT  |
-            UTF8PROC_CASEFOLD);
+                                          UTF8PROC_STABLE  |
+                                          UTF8PROC_COMPOSE |
+                                          UTF8PROC_COMPAT  |
+                                          UTF8PROC_CASEFOLD);
         if (dupe_check < 0) {
             THROW(ERR, "Unexpected normalization error: %i32", dupe_check);
         }

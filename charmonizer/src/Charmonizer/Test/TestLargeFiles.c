@@ -50,7 +50,7 @@ S_check_sparse_files(void);
 
 /* Helper for check_sparse_files().
  */
-static chaz_bool_t 
+static chaz_bool_t
 S_test_sparse_file(long offset, struct stat *st);
 
 /* See if trying to write a 5 GB file in a subprocess bombs out.  If it
@@ -170,7 +170,7 @@ S_run_tests(void) {
     check_val = read(fd, &check_char, 1);
     LONG_EQ(check_val, 1, "read() after multiple lseek64 calls");
     LONG_EQ(check_char, 'X',
-                "read() correct data after multiple lseek64 calls");
+            "read() correct data after multiple lseek64 calls");
 #ifdef HAS_64BIT_PREAD
     check_char = 0;
     check_val = pread64(fd, &check_char, 1, gb4_plus);

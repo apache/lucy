@@ -148,7 +148,7 @@ ProximityQuery_make_compiler(ProximityQuery *self, Searcher *searcher,
             = ProximityCompiler_new(self, searcher, boost, self->within);
         if (!subordinate) {
             ProximityCompiler_Normalize(compiler);
-        }   
+        }
         return (Compiler*)compiler;
     }
 }

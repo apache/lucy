@@ -74,8 +74,7 @@ CFCPerlSub_destroy(CFCPerlSub *self) {
 }
 
 char*
-CFCPerlSub_params_hash_def(CFCPerlSub *self)
-{
+CFCPerlSub_params_hash_def(CFCPerlSub *self) {
     if (!self->use_labeled_params) {
         return NULL;
     }
@@ -177,7 +176,7 @@ S_allot_params_arg(CFCType *type, const char *label, int required) {
             const char *prim_type = prim_type_to_allot_macro[i].prim_type;
             if (strcmp(prim_type, type_c_string) == 0) {
                 const char *allot = prim_type_to_allot_macro[i].allot_macro;
-                char pattern[] = "%s(&%s, \"%s\", %u, %s)"; 
+                char pattern[] = "%s(&%s, \"%s\", %u, %s)";
                 size_t size = sizeof(pattern)
                               + strlen(allot)
                               + label_len * 2
@@ -237,7 +236,7 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
         FREEMEM(arg);
     }
     allot_params
-        = CFCUtil_cat(allot_params, "        NULL);\n", 
+        = CFCUtil_cat(allot_params, "        NULL);\n",
                       "    if (!args_ok) {\n"
                       "        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));\n"
                       "    }", NULL);

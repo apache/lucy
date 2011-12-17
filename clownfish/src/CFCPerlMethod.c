@@ -122,7 +122,7 @@ S_xsub_body(CFCPerlMethod *self) {
 
     if (CFCType_is_void(CFCMethod_get_return_type(method))) {
         // Invoke method in void context.
-        body = CFCUtil_cat(body, full_func_sym, "(", name_list, 
+        body = CFCUtil_cat(body, full_func_sym, "(", name_list,
                            ");\n    XSRETURN(0);", NULL);
     }
     else {
@@ -133,7 +133,7 @@ S_xsub_body(CFCPerlMethod *self) {
         body = CFCUtil_cat(body, type_str, " retval = ", full_func_sym, "(",
                            name_list, ");\n    ST(0) = ", assignment, ";",
                            NULL);
-        if (CFCType_is_object(return_type) 
+        if (CFCType_is_object(return_type)
             && CFCType_incremented(return_type)
            ) {
             body = CFCUtil_cat(body, "\n    CFISH_DECREF(retval);", NULL);
@@ -156,7 +156,7 @@ S_self_assign_statement(CFCPerlMethod *self, CFCType *type,
         CFCUtil_die("Not an object type: %s", type_c);
     }
     const char *vtable_var = CFCType_get_vtable_var(type);
-    
+
     // Make an exception for deserialize -- allow self to be NULL if called as
     // a class method.
     char *binding_func = strcmp(method_name, "deserialize") == 0
@@ -166,7 +166,7 @@ S_self_assign_statement(CFCPerlMethod *self, CFCType *type,
     size_t size = sizeof(pattern)
                   + strlen(type_c) * 2
                   + strlen(binding_func)
-                  + strlen(vtable_var) 
+                  + strlen(vtable_var)
                   + 10;
     char *statement = (char*)MALLOCATE(size);
     sprintf(statement, pattern, type_c, type_c, binding_func, vtable_var);
@@ -235,7 +235,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
             min_required = i + 1;
         }
     }
-    char *xs_name_list = num_vars > 0 
+    char *xs_name_list = num_vars > 0
                          ? CFCUtil_strdup(CFCVariable_micro_sym(arg_vars[0]))
                          : CFCUtil_strdup("");
     for (unsigned i = 1; i < num_vars; i++) {
@@ -248,7 +248,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
                                        NULL);
         }
     }
-    const char num_args_pattern[] = 
+    const char num_args_pattern[] =
         "if (items %s %u) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%s)\", GvNAME(CvGV(cv))); }";
     size_t num_args_check_size = sizeof(num_args_pattern)
                                  + strlen(xs_name_list)
@@ -285,7 +285,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
             char *conversion
                 = CFCPerlTypeMap_from_perl(var_type, perl_stack_var);
             if (val) {
-                char pattern[] = 
+                char pattern[] =
                     "\n    %s %s = ( items >= %u && XSBind_sv_defined(ST(%u)) )"
                     " ? %s : %s;";
                 size_t size = sizeof(pattern)
@@ -310,7 +310,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
         }
     }
 
-    char pattern[] = 
+    char pattern[] =
         "XS(%s);\n"
         "XS(%s) {\n"
         "    dXSARGS;\n"

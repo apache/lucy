@@ -88,7 +88,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     sprintf(self->local_dec, "%s;", self->local_c);
     const char *full_sym = CFCVariable_full_sym(self);
     size_t full_size = strlen(type_str) + sizeof(" ") + strlen(full_sym) +
-                  strlen(postfix) + 1;
+                       strlen(postfix) + 1;
     self->global_c = (char*)MALLOCATE(full_size);
     sprintf(self->global_c, "%s %s%s", type_str, full_sym, postfix);
 

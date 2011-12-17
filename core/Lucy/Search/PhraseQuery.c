@@ -141,7 +141,7 @@ PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
             = PhraseCompiler_new(self, searcher, boost);
         if (!subordinate) {
             PhraseCompiler_Normalize(compiler);
-        }   
+        }
         return (Compiler*)compiler;
     }
 }

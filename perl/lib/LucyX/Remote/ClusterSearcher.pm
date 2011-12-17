@@ -129,10 +129,14 @@ sub _multi_rpc {
             $remaining--;
         }
     }
+
+=end disabled
+
 =cut
+
     my @responses;
     for ( my $i = 0; $i < $num_shards; $i++ ) {
-        my $response  = $self->_retrieve_response_from_shard($i);
+        my $response = $self->_retrieve_response_from_shard($i);
         $responses[$i] = $response->{retval};
     }
     return \@responses;
@@ -160,25 +164,31 @@ sub _serialize_request {
 # Send a serialized request to one shard.
 sub _send_request_to_shard {
     my ( $self, $shard_num, $request ) = @_;
-    my $sock      = $socks{$$self}[$shard_num];
+    my $sock = $socks{$$self}[$shard_num];
     print $sock $$request or confess $!;
+
 =begin disabled
     my $check_val = $sock->syswrite($$request);
     confess $! unless $check_val == length($$request);
+
+=end disabled
+
 =cut
+
 }
 
 # Retrieve the response from a shard.
 sub _retrieve_response_from_shard {
     my ( $self, $shard_num ) = @_;
-    my $sock = $socks{$$self}[$shard_num];
+    my $sock       = $socks{$$self}[$shard_num];
     my $packed_len = "";
     my $serialized = "";
-    my $check_val = $sock->read( $packed_len, 4 );
+    my $check_val  = $sock->read( $packed_len, 4 );
     confess $! unless $check_val == 4;
     my $arg_len = unpack( 'N', $packed_len );
     $check_val = $sock->read( $serialized, $arg_len );
     confess $! unless $check_val == $arg_len;
+
 =begin disabled
     my $check_val;
     $! = undef;
@@ -201,7 +211,11 @@ sub _retrieve_response_from_shard {
     my $arg_len = unpack( 'N', $packed_len );
     $check_val = $sock->sysread( $serialized, $arg_len );
     confess $! unless $check_val == $arg_len;
+
+=end disabled
+
 =cut
+
     return thaw($serialized);
 }
 
@@ -264,10 +278,10 @@ sub terminate {
 
 sub fetch_doc {
     my ( $self, $doc_id ) = @_;
-    my $starts = $starts{$$self};
-    my $tick   = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
-    my $start  = $starts->get($tick);
-    my %args   = ( doc_id => $doc_id - $start, _action => 'fetch_doc' );
+    my $starts  = $starts{$$self};
+    my $tick    = Lucy::Index::PolyReader::sub_tick( $starts, $doc_id );
+    my $start   = $starts->get($tick);
+    my %args    = ( doc_id => $doc_id - $start, _action => 'fetch_doc' );
     my $hit_doc = $self->_single_rpc( \%args, $tick );
     $hit_doc->set_doc_id($doc_id);
     return $hit_doc;

@@ -125,7 +125,7 @@ CFCPerlConstructor_xsub_def(CFCPerlConstructor *self) {
         }
     }
 
-    const char pattern[] = 
+    const char pattern[] =
         "XS(%s);\n"
         "XS(%s) {\n"
         "    dXSARGS;\n"

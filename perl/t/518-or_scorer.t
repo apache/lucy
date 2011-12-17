@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 1617; 
+use Test::More tests => 1617;
 use Lucy::Test;
 use LucyX::Search::MockMatcher;
 use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );

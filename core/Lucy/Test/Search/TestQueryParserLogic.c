@@ -416,7 +416,7 @@ logical_test_a_OR_b_AND_c_AND_d(uint32_t boolop) {
     Query *b_query    = make_leaf_query(NULL, "b");
     Query *c_query    = make_leaf_query(NULL, "c");
     Query *d_query    = make_leaf_query(NULL, "d");
-    Query *right      = make_poly_query(BOOLOP_AND, b_query, c_query, d_query, 
+    Query *right      = make_poly_query(BOOLOP_AND, b_query, c_query, d_query,
                                         NULL);
     Query *tree       = make_poly_query(BOOLOP_OR, a_query, right, NULL);
     UNUSED_VAR(boolop);
@@ -430,7 +430,7 @@ logical_test_a_OR_b_AND_c_OR_d(uint32_t boolop) {
     Query *c_query    = make_leaf_query(NULL, "c");
     Query *d_query    = make_leaf_query(NULL, "d");
     Query *middle     = make_poly_query(BOOLOP_AND, b_query, c_query, NULL);
-    Query *tree       = make_poly_query(BOOLOP_OR, a_query, middle, d_query, 
+    Query *tree       = make_poly_query(BOOLOP_OR, a_query, middle, d_query,
                                         NULL);
     UNUSED_VAR(boolop);
     return TestQP_new("a OR b AND c OR d", tree, NULL, 4);

@@ -72,7 +72,7 @@ NOTQuery_make_compiler(NOTQuery *self, Searcher *searcher, float boost,
     NOTCompiler *compiler = NOTCompiler_new(self, searcher, boost);
     if (!subordinate) {
         NOTCompiler_Normalize(compiler);
-    }   
+    }
     return (Compiler*)compiler;
 }
 

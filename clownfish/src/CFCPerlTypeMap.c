@@ -49,13 +49,13 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
             // Share buffers rather than copy between Perl scalars and
             // Clownfish string types.
             result = CFCUtil_cat(CFCUtil_strdup(""), "(", struct_sym,
-                                 "*)XSBind_sv_to_cfish_obj(", xs_var, 
-                                 ", ", vtable_var, 
+                                 "*)XSBind_sv_to_cfish_obj(", xs_var,
+                                 ", ", vtable_var,
                                  ", alloca(cfish_ZCB_size()))", NULL);
         }
         else {
             result = CFCUtil_cat(CFCUtil_strdup(""), "(", struct_sym,
-                                 "*)XSBind_sv_to_cfish_obj(", xs_var, 
+                                 "*)XSBind_sv_to_cfish_obj(", xs_var,
                                  ", ", vtable_var, ", NULL)", NULL);
         }
     }
@@ -132,8 +132,8 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
 
     if (CFCType_is_object(type)) {
         result = CFCUtil_cat(CFCUtil_strdup(""), "(", cf_var,
-                             " == NULL ? newSV(0) : " 
-                             "XSBind_cfish_to_perl((cfish_Obj*)", 
+                             " == NULL ? newSV(0) : "
+                             "XSBind_cfish_to_perl((cfish_Obj*)",
                              cf_var, "))", NULL);
     }
     else if (CFCType_is_primitive(type)) {
@@ -155,7 +155,7 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
             sprintf(result, "newSViv(%s)", cf_var);
         }
         else if (strcmp(specifier, "long") == 0) {
-            char pattern[] = 
+            char pattern[] =
                 "((sizeof(long) <= sizeof(IV)) ? "
                 "newSViv((IV)%s) : newSVnv((NV)%s))";
             sprintf(result, pattern, cf_var, cf_var);
@@ -201,8 +201,8 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
         if (strcmp(type_str, "void*") == 0) {
             // Assume that void* is a reference SV -- either a hashref or an
             // arrayref.
-            result = CFCUtil_cat(CFCUtil_strdup(""), "newRV_inc((SV*)", 
-                                 cf_var,")", NULL);
+            result = CFCUtil_cat(CFCUtil_strdup(""), "newRV_inc((SV*)",
+                                 cf_var, ")", NULL);
         }
     }
 
@@ -292,14 +292,14 @@ CFCPerlTypeMap_write_xs_typemap(CFCHierarchy *hierarchy) {
                             ", NULL);\n\n", NULL);
 
         output = CFCUtil_cat(output, vtable_var, "_\n"
-            "    $arg = (SV*)Cfish_Obj_To_Host((cfish_Obj*)$var);\n"
-            "    CFISH_DECREF($var);\n"
-            "\n", NULL);
+                             "    $arg = (SV*)Cfish_Obj_To_Host((cfish_Obj*)$var);\n"
+                             "    CFISH_DECREF($var);\n"
+                             "\n", NULL);
     }
 
     char *content = CFCUtil_strdup("");
     content = CFCUtil_cat(content, typemap_start, start, "\n\n",
-                          typemap_input, input, "\n\n", 
+                          typemap_input, input, "\n\n",
                           typemap_output, output, "\n\n", NULL);
     CFCUtil_write_if_changed("typemap", content, strlen(content));
 

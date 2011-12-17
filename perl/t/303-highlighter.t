@@ -253,9 +253,9 @@ $hl->_highlight_excerpt(
     raw_excerpt => "$phi Oook. Urk. Ick. $phi",
     spans       => make_spans(
         [ 2, 10, 1.0 ],
-        [ 2,  4, 1.0 ],
-        [ 8,  9, 1.0 ],
-        [ 8,  4, 1.0 ],
+        [ 2, 4,  1.0 ],
+        [ 8, 9,  1.0 ],
+        [ 8, 4,  1.0 ],
     ),
     top         => 0,
     highlighted => $target,
@@ -393,7 +393,7 @@ is_deeply(
 );
 
 $q = $searcher->glean_query("foo");
-my $compiler = $q->make_compiler(searcher => $searcher);
+my $compiler = $q->make_compiler( searcher => $searcher );
 $hl = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
     query    => $compiler,

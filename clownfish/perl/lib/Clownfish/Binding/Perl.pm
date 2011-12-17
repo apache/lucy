@@ -182,7 +182,7 @@ sub write_bindings {
         next unless delete $has_methods{$class_name};
         my $class_binding
             = Clownfish::Binding::Perl::Class->singleton($class_name);
-        my @bound         = $class_binding->method_bindings;
+        my @bound = $class_binding->method_bindings;
         $generated_xs .= $_->xsub_def . "\n" for @bound;
         push @xsubs, @bound;
     }

@@ -49,7 +49,7 @@ const static CFCMeta CFCPERLCLASS_META = {
 };
 
 CFCPerlClass*
-CFCPerlClass_new(CFCParcel *parcel, const char *class_name, CFCClass *client, 
+CFCPerlClass_new(CFCParcel *parcel, const char *class_name, CFCClass *client,
                  const char *xs_code, CFCPerlPod *pod_spec) {
     CFCPerlClass *self = (CFCPerlClass*)CFCBase_allocate(&CFCPERLCLASS_META);
     return CFCPerlClass_init(self, parcel, class_name, client, xs_code,
@@ -92,7 +92,7 @@ CFCPerlClass_add_to_registry(CFCPerlClass *self) {
     if (registry_size == registry_cap) {
         size_t new_cap = registry_cap + 10;
         registry = (CFCPerlClass**)REALLOCATE(registry,
-                       (new_cap + 1) * sizeof(CFCPerlClass*));
+                                              (new_cap + 1) * sizeof(CFCPerlClass*));
         for (size_t i = registry_cap; i <= new_cap; i++) {
             registry[i] = NULL;
         }

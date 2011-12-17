@@ -115,7 +115,8 @@ sub serve {
                 }
 
                 # Process the method call.
-                $dispatch{$method} or confess "ERROR: Bad method name: $method\n";
+                $dispatch{$method}
+                    or confess "ERROR: Bad method name: $method\n";
                 my $response   = $dispatch{$method}->( $self, $args );
                 my $frozen     = nfreeze($response);
                 my $packed_len = pack( 'N', length($frozen) );
@@ -125,7 +126,7 @@ sub serve {
                 # Remote signal to close the server.
                 if ( $method eq 'terminate' ) {
                     my @all_handles = $read_set->handles;
-                    $read_set->remove(\@all_handles);
+                    $read_set->remove( \@all_handles );
                     $client_sock->close;
                     $main_sock->close;
                     return;

@@ -284,7 +284,7 @@ CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, CFCFunction *func,
         while (isspace(*after_comma)) { after_comma++; }
         pod = CFCUtil_cat(pod, "(", after_comma, ")\n\n", NULL);
     }
-    else { 
+    else {
         // num_args == 1, leave off 'self'.
         pod = CFCUtil_cat(pod, "()\n\n", NULL);
     }

@@ -122,11 +122,11 @@ my $SNOWSTEM_SRC_DIR
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
 my $SNOWSTOP_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstop source ) );
-my $UCD_INC_DIR = catdir( $base_dir, qw( modules unicode ucd ) );
+my $UCD_INC_DIR      = catdir( $base_dir, qw( modules unicode ucd ) );
 my $UTF8PROC_SRC_DIR = catdir( $base_dir, qw( modules unicode utf8proc ) );
 my $UTF8PROC_C = catfile( $UTF8PROC_SRC_DIR, 'utf8proc.c' );
 my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
-my $CLOWNFISH_DIR   = catdir( $base_dir, 'clownfish', 'perl' );
+my $CLOWNFISH_DIR = catdir( $base_dir, 'clownfish', 'perl' );
 my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
 my $AUTOGEN_DIR      = 'autogen';
 my $XS_SOURCE_DIR    = 'xs';
@@ -182,7 +182,7 @@ sub ACTION_charmony {
     if ( $ENV{CHARM_VALGRIND} ) {
         unshift @command, "valgrind", "--leak-check=yes";
     }
-    print join(" ", @command), $/;
+    print join( " ", @command ), $/;
 
     system(@command) and die "Failed to write $CHARMONY_PATH: $!";
 }
@@ -510,8 +510,9 @@ sub ACTION_compile_custom_xs {
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'Lucy', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
-        getcwd(), $CORE_SOURCE_DIR, $AUTOGEN_DIR, $XS_SOURCE_DIR,
-        $SNOWSTEM_INC_DIR, $UCD_INC_DIR, $UTF8PROC_SRC_DIR
+        getcwd(),       $CORE_SOURCE_DIR,  $AUTOGEN_DIR,
+        $XS_SOURCE_DIR, $SNOWSTEM_INC_DIR, $UCD_INC_DIR,
+        $UTF8PROC_SRC_DIR
     );
     my @objects;
 
@@ -755,7 +756,7 @@ sub ACTION_clean {
             and die "Clownfish clean failed";
     }
     $self->_run_make( dir => $CHARMONIZER_ORIG_DIR, args => ['clean'] );
-    $self->_run_make( dir => $LEMON_DIR, args => ['clean'] );
+    $self->_run_make( dir => $LEMON_DIR,            args => ['clean'] );
     $self->SUPER::ACTION_clean;
 }
 

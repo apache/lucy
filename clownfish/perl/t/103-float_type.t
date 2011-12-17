@@ -38,7 +38,7 @@ for my $specifier (qw( float double)) {
     isa_ok( $type, "Clownfish::Type" );
     ok( $type && $type->is_floating, "parsed const specifier is_floating()" );
     ok( $type && $type->const,       "parsed const specifier is_floating()" );
-    SKIP: {
+SKIP: {
         skip( "No way to catch parser exception at present", 1 );
         my $bogus = $specifier . "y";
         ok( !$parser->parse($bogus),

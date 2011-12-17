@@ -23,9 +23,9 @@ use File::Spec::Functions qw( catfile updir catdir );
 use Config;
 use Cwd qw( getcwd );
 
-my $base_dir       = catdir( updir(), updir() );
-my $PPPORT_H_PATH  = catfile( updir(), qw( include ppport.h ) );
-my $LEMON_DIR      = catdir( $base_dir, 'lemon' );
+my $base_dir = catdir( updir(), updir() );
+my $PPPORT_H_PATH = catfile( updir(), qw( include ppport.h ) );
+my $LEMON_DIR = catdir( $base_dir, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CFC_SOURCE_DIR = catdir( updir(), 'src' );
 
@@ -124,8 +124,8 @@ sub ACTION_lemon {
     print "Building the Lemon parser generator...\n\n";
     $self->_run_make(
         dir  => $LEMON_DIR,
-        args => [], 
-    );  
+        args => [],
+    );
 }
 
 # Run all .y files through lemon.
@@ -160,7 +160,7 @@ sub ACTION_lexers {
         $h_file =~ s/\.l$/.h/ or die "no match";
         next
             if $self->up_to_date( [ $l_file, @$y_files ],
-                    [ $c_file, $h_file ] );
+            [ $c_file, $h_file ] );
         system( 'flex', '-o', $c_file, "--header-file=$h_file", $l_file )
             and die "flex failed";
     }

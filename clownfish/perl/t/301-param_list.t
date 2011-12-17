@@ -26,8 +26,7 @@ my $parser = Clownfish::Parser->new;
 $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
-isa_ok( $parser->parse($_),
-    "Clownfish::Variable", "param_variable: $_" )
+isa_ok( $parser->parse($_), "Clownfish::Variable", "param_variable: $_" )
     for ( 'uint32_t baz', 'CharBuf *stuff', 'float **ptr', );
 
 my $param_list = $parser->parse("(Obj *self, int num)");

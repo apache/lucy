@@ -55,8 +55,7 @@ ok( !$method->compatible($macro_sym_differs),
 ok( !$macro_sym_differs->compatible($method), "... reversed" );
 
 my $extra_param = Clownfish::Method->new( %args,
-    param_list =>
-        $parser->parse('(Foo *self, int32_t count = 0, int b)'), );
+    param_list => $parser->parse('(Foo *self, int32_t count = 0, int b)'), );
 ok( !$method->compatible($macro_sym_differs),
     "extra param spoils compatible()"
 );

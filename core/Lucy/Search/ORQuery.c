@@ -43,7 +43,7 @@ ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost,
     ORCompiler *compiler = ORCompiler_new(self, searcher, boost);
     if (!subordinate) {
         ORCompiler_Normalize(compiler);
-    }   
+    }
     return (Compiler*)compiler;
 }
 

@@ -58,28 +58,28 @@ void
 chaz_Test_plan(chaz_TestBatch *batch);
 
 #define CHAZ_TEST_OK(_expression, _message) \
-	chaz_Test_ok(chaz_Test_current, (_expression), (_message))
+    chaz_Test_ok(chaz_Test_current, (_expression), (_message))
 void
 chaz_Test_ok(chaz_TestBatch *batch, int expression, const char *message);
 
 #define CHAZ_TEST_STR_EQ(_got, _expected, _message) \
-	chaz_Test_str_eq(chaz_Test_current, (_got), (_expected), (_message))
+    chaz_Test_str_eq(chaz_Test_current, (_got), (_expected), (_message))
 void
 chaz_Test_str_eq(chaz_TestBatch *batch, const char *got,
                  const char *expected, const char *message);
 
 #define CHAZ_TEST_PASS(_message) \
-	chaz_Test_pass(chaz_Test_current, (_message))
+    chaz_Test_pass(chaz_Test_current, (_message))
 void
 chaz_Test_pass(chaz_TestBatch *batch, const char *message);
 
 #define CHAZ_TEST_FAIL(_message) \
-	chaz_Test_fail(chaz_Test_current, (_message))
+    chaz_Test_fail(chaz_Test_current, (_message))
 void
 chaz_Test_fail(chaz_TestBatch *batch, const char *message);
 
 #define CHAZ_TEST_LONG_EQ(_got, _expected, _message) \
-	chaz_Test_long_eq(chaz_Test_current, (_got), (_expected), (_message))
+    chaz_Test_long_eq(chaz_Test_current, (_got), (_expected), (_message))
 void
 chaz_Test_long_eq(chaz_TestBatch *batch, long got, long expected,
                   const char *message);

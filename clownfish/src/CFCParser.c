@@ -137,15 +137,13 @@ CFCParser_allocate(CFCParser *self, size_t size) {
 }
 
 void
-CFCParser_set_result(CFCParser *self, CFCBase *result)
-{
+CFCParser_set_result(CFCParser *self, CFCBase *result) {
     CFCBase_decref(self->result);
     self->result = CFCBase_incref(result);
 }
 
 void
-CFCParser_set_errors(CFCParser *self, int errors)
-{
+CFCParser_set_errors(CFCParser *self, int errors) {
     self->errors = errors;
 }
 

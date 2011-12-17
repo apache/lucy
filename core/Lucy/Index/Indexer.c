@@ -417,7 +417,7 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
     // Get a list of segments to recycle.  Validate and confirm that there are
     // no dupes in the list.
     VArray *to_merge = IxManager_Recycle(self->manager, self->polyreader,
-                                 self->del_writer, cutoff, self->optimize);
+                                         self->del_writer, cutoff, self->optimize);
 
     Hash *seen = Hash_new(VA_Get_Size(to_merge));
     for (uint32_t i = 0, max = VA_Get_Size(to_merge); i < max; i++) {

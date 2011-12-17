@@ -74,10 +74,12 @@ sub _rpc {
     my $serialized = nfreeze($args);
     my $packed_len = pack( 'N', length($serialized) );
     print $sock "$packed_len$serialized" or confess $!;
+
 =begin disabled
     my $check_val = $sock->syswrite("$packed_len$serialized");
     confess $! if $check_val != length($serialized) + 4;
 =cut
+
     my $check_val;
 
     # Bail out if we're either closing or shutting down the server remotely.

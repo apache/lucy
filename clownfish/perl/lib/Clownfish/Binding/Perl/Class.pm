@@ -61,7 +61,8 @@ sub register {
     # Create Pod spec if needed.
     my $pod_spec;
     if ( $args{make_pod} ) {
-        $pod_spec = Clownfish::Binding::Perl::Pod->new( %{ $args{make_pod} } );
+        $pod_spec
+            = Clownfish::Binding::Perl::Pod->new( %{ $args{make_pod} } );
     }
 
     # Create object.
@@ -194,10 +195,10 @@ sub create_pod {
         $inheritance_pod = "=head1 INHERITANCE\n\n";
         $inheritance_pod .= $class->get_class_name;
         for my $ancestor (@ancestors) {
-            my $class_name = $ancestor->get_class_name;           
+            my $class_name = $ancestor->get_class_name;
             if ( __PACKAGE__->singleton($class_name) ) {
                 $inheritance_pod .= " isa L<$class_name>";
-            } 
+            }
             else {
                 $inheritance_pod .= " isa $class_name";
             }

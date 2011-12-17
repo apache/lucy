@@ -25,7 +25,7 @@ use Lucy::Test::TestUtils qw( modulo_set doc_ids_from_td_coll );
 my $sim = Lucy::Index::Similarity->new;
 
 for my $req_interval ( 1 .. 10, 75 ) {
-    for my $opt_interval ( 1 .. 10, 75, 1000 ) { # 1000 = no matches
+    for my $opt_interval ( 1 .. 10, 75, 1000 ) {    # 1000 = no matches
         check_matcher( $req_interval, $opt_interval );
         check_matcher( $opt_interval, $req_interval );
     }

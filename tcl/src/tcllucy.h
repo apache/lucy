@@ -20,5 +20,5 @@
 #include <string.h>
 
 typedef struct {
-  char *field;
-}lucy_termquery;
+    char *field;
+} lucy_termquery;

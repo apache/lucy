@@ -39,15 +39,15 @@ extern "C" {
  * If off64_t or its equivalent is available, this will be defined:
  *
  * HAS_64BIT_OFFSET_TYPE
- * 
+ *
  * If 64-bit variants of fopen, ftell, and fseek are available, this will be
  * defined:
  *
  * HAS_64BIT_STDIO
- * 
+ *
  * If 64-bit variants of pread and lseek are available, then corresponding
  * symbols will be defined:
- * 
+ *
  * HAS_64BIT_PREAD
  * HAS_64BIT_LSEEK
  *

@@ -74,7 +74,7 @@ for my $port (@ports) {
                 number  => $number,
                 port    => $port,
             );
-            $indexer->add_doc(\%doc);
+            $indexer->add_doc( \%doc );
             $number += 2;
         }
         $indexer->commit;
@@ -114,7 +114,8 @@ my $solo_cluster_searcher = LucyX::Remote::ClusterSearcher->new(
 is( $solo_cluster_searcher->doc_freq( field => 'content', term => 'x' ),
     3, "doc_freq" );
 is( $solo_cluster_searcher->doc_max, 3, "doc_max" );
-isa_ok( $solo_cluster_searcher->fetch_doc(1), "Lucy::Document::HitDoc", "fetch_doc" );
+isa_ok( $solo_cluster_searcher->fetch_doc(1),
+    "Lucy::Document::HitDoc", "fetch_doc" );
 isa_ok( $solo_cluster_searcher->fetch_doc_vec(1),
     "Lucy::Index::DocVector", "fetch_doc_vec" );
 
@@ -183,11 +184,8 @@ my @reversed;
 while ( my $hit = $hits->next ) {
     push @reversed, $hit->{number};
 }
-is_deeply(
-    \@got,
-    [ reverse @reversed ],
-    "Sort hits accross multiple shards"
-);
+is_deeply( \@got, [ reverse @reversed ],
+    "Sort hits accross multiple shards" );
 
 END {
     $solo_cluster_searcher->close if defined $solo_cluster_searcher;

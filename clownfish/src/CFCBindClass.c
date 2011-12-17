@@ -93,7 +93,7 @@ static char*
 S_short_names(CFCBindClass *self);
 
 const static CFCMeta CFCBINDCLASS_META = {
-    "Clownfish::Binding::Core::Class", 
+    "Clownfish::Binding::Core::Class",
     sizeof(CFCBindClass),
     (CFCBase_destroy_t)CFCBindClass_destroy
 };

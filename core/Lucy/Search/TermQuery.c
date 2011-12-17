@@ -106,7 +106,7 @@ TermQuery_make_compiler(TermQuery *self, Searcher *searcher, float boost,
     TermCompiler *compiler = TermCompiler_new((Query*)self, searcher, boost);
     if (!subordinate) {
         TermCompiler_Normalize(compiler);
-    }   
+    }
     return (Compiler*)compiler;
 
 }

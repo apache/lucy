@@ -131,7 +131,7 @@ S_make_method_obj(CFCClass *klass, const char *method_name) {
     else if (strcmp(method_name, "Load") == 0) {
         CFCType *dump_type = CFCType_new_object(0, cf_parcel, "Obj", 1);
         CFCVariable *dump_var = CFCVariable_new(cf_parcel, NULL, NULL,
-                                                NULL, "dump", dump_type, 
+                                                NULL, "dump", dump_type,
                                                 false);
         param_list = CFCParamList_new(false);
         CFCParamList_add_param(param_list, self_var, NULL);
@@ -315,7 +315,7 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
             "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%f64\", (double)self->%s));\n";
         char bool_pattern[] =
             "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_Bool_singleton(self->%s));\n";
-        const char *pattern; 
+        const char *pattern;
         if (strcmp(specifier, "bool_t") == 0
             || strcmp(specifier, "chy_bool_t") == 0
            ) {

@@ -171,7 +171,7 @@ OS_mkdir(const char *filepath) {
     #if (defined(SHELL_IS_POSIX) || defined (SHELL_IS_CMD_EXE))
     char *mkdir_command = "mkdir";
     #endif
-    unsigned size = strlen(mkdir_command) + 1 + strlen (filepath) + 1;
+    unsigned size = strlen(mkdir_command) + 1 + strlen(filepath) + 1;
     char *command = (char*)malloc(size);
     sprintf(command, "%s %s", mkdir_command, filepath);
     OS_run_quietly(command);
@@ -185,7 +185,7 @@ OS_rmdir(const char *filepath) {
     #elif defined(SHELL_IS_CMD_EXE)
     char *rmdir_command = "rmdir /q";
     #endif
-    unsigned size = strlen(rmdir_command) + 1 + strlen (filepath) + 1;
+    unsigned size = strlen(rmdir_command) + 1 + strlen(filepath) + 1;
     char *command = (char*)malloc(size);
     sprintf(command, "%s %s", rmdir_command, filepath);
     OS_run_quietly(command);

@@ -57,7 +57,7 @@ for my $chy_specifier (@chy_specifiers) {
     isa_ok( $type, "Clownfish::Type" );
     ok( $type && $type->is_integer, "parsed const Type is_integer()" );
     ok( $type && $type->const,      "parsed const Type is const()" );
-    SKIP: {
+SKIP: {
         skip( "No way to catch parser exception at present", 1 );
         my $bogus = $chy_specifier . "oot_toot";
         ok( !$parser->parse($bogus),
@@ -73,7 +73,7 @@ for my $c_specifier (@c_specifiers) {
     isa_ok( $type, "Clownfish::Type" );
     ok( $type && $type->is_integer, "parsed const Type is_integer()" );
     ok( $type && $type->const,      "parsed const Type is const()" );
-    SKIP: {
+SKIP: {
         skip( "No way to catch parser exception at present", 1 );
         my $bogus = $c_specifier . "y";
         ok( !$parser->parse($bogus),

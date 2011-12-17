@@ -50,7 +50,8 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         # Verify that args came in pairs.
         if ( @_ % 2 ) {
             my ( $package, $filename, $line ) = caller(1);
-            $@ = "Parameter error: odd number of args at $filename line $line\n";
+            $@
+                = "Parameter error: odd number of args at $filename line $line\n";
             return 0;
         }
 
@@ -285,7 +286,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
-        my $variadic   = delete $args{variadic} || 0;
+        my $variadic = delete $args{variadic} || 0;
         return _new($variadic);
     }
 }

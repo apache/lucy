@@ -87,7 +87,7 @@ ReqOptQuery_make_compiler(RequiredOptionalQuery *self, Searcher *searcher,
         = ReqOptCompiler_new(self, searcher, boost);
     if (!subordinate) {
         ReqOptCompiler_Normalize(compiler);
-    }   
+    }
     return (Compiler*)compiler;
 }
 

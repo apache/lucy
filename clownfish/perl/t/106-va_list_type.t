@@ -32,7 +32,6 @@ ok( $type && $type->is_va_list, "parse va_list" );
 SKIP: {
     skip( "No way to catch parser exception at present", 1 );
     ok( !$parser->parse('va_listable'),
-        "va_list_type_specifier guards against partial word matches"
-    );
+        "va_list_type_specifier guards against partial word matches" );
 }
 
