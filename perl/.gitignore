@@ -1,11 +1,14 @@
+*.pod
 Build
-_build
+MYMETA.json
 MYMETA.yml
+_build/
 autogen/
+blib/
 charmony.h
-ppport.h
-typemap
-blib
 lib/Lucy.c
 lib/Lucy.xs
+lib/Lucy/Autobinding.pm
+ppport.h
+typemap
 
