@@ -252,6 +252,10 @@ PPCODE:
     else if (strEQ(package, "TestVArray")) {
         lucy_TestVArray_run_tests();
     }
+    // Lucy::Highlight
+    else if (strEQ(package, "TestHighlighter")) {
+        lucy_TestHighlighter_run_tests();
+    }
     else {
         THROW(LUCY_ERR, "Unknown test id: %s", package);
     }

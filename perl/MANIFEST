@@ -265,7 +265,6 @@ t/221-sort_writer.t
 t/224-lex_reader.t
 t/233-background_merger.t
 t/302-many_fields.t
-t/303-highlighter.t
 t/304-verify_utf8.t
 t/305-indexer.t
 t/306-dynamic_schema.t
@@ -326,6 +325,7 @@ t/binding/156-snowball_stemmer.t
 t/binding/157-normalizer.t
 t/binding/158-standard_tokenizer.t
 t/binding/206-snapshot.t
+t/binding/303-highlighter.t
 t/binding/506-collector.t
 t/binding/702-sample.t
 t/binding/800-stack.t
@@ -388,6 +388,7 @@ t/core/231-blob_type.t
 t/core/232-numeric_type.t
 t/core/234-field_type.t
 t/core/301-segment.t
+t/core/303-highlighter.t
 t/core/501-termquery.t
 t/core/502-phrasequery.t
 t/core/515-range_query.t

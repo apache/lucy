@@ -64,6 +64,17 @@ Span_set_weight(Span *self, float weight) {
     self->weight = weight;
 }
 
+bool_t
+Span_equals(Span *self, Obj *other) {
+    Span *twin = (Span*)other;
+    if (self == twin)                 { return true; }
+    if (!Obj_Is_A(other, SPAN))       { return false; }
+    if (self->offset != twin->offset) { return false; }
+    if (self->length != twin->length) { return false; }
+    if (self->weight != twin->weight) { return false; }
+    return true;
+}
+
 int32_t
 Span_compare_to(Span *self, Obj *other) {
     Span *competitor = (Span*)CERTIFY(other, SPAN);

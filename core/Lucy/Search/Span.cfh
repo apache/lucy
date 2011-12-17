@@ -74,6 +74,9 @@ class Lucy::Search::Span inherits Lucy::Object::Obj {
     public void
     Set_Weight(Span *self, float weight);
 
+    public bool_t
+    Equals(Span *self, Obj *other);
+
     public int32_t
     Compare_To(Span *self, Obj *other);
 }
