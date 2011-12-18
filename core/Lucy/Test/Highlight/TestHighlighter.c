@@ -363,6 +363,7 @@ test_Create_Excerpt(TestBatch *batch, Searcher *searcher, Obj *query,
     DECREF(highlighter);
     DECREF(hit);
     DECREF(hits);
+    DECREF(query);
 }
 
 static void
