@@ -251,6 +251,7 @@ CFCClass_destroy(CFCClass *self) {
     FREEMEM(self->full_vtable_hidden);
     FREEMEM(self->full_vtable_type);
     FREEMEM(self->privacy_symbol);
+    FREEMEM(self->include_h);
     CFCSymbol_destroy((CFCSymbol*)self);
 }
 

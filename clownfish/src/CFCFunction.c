@@ -68,14 +68,15 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
                  int is_inline) {
 
     exposure = exposure ? exposure : "parcel";
-    CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
-                   class_cnick, micro_sym);
     CFCUTIL_NULL_CHECK(class_name);
     CFCUTIL_NULL_CHECK(return_type);
     CFCUTIL_NULL_CHECK(param_list);
     if (!S_validate_micro_sym(micro_sym)) {
+        CFCBase_decref((CFCBase*)self);
         CFCUtil_die("Invalid micro_sym: '%s'", micro_sym);
     }
+    CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name,
+                   class_cnick, micro_sym);
     self->return_type = (CFCType*)CFCBase_incref((CFCBase*)return_type);
     self->param_list  = (CFCParamList*)CFCBase_incref((CFCBase*)param_list);
     self->docucomment = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);

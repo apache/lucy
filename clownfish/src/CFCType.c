@@ -358,6 +358,7 @@ CFCType_destroy(CFCType *self) {
     FREEMEM(self->specifier);
     FREEMEM(self->c_string);
     FREEMEM(self->array);
+    FREEMEM(self->vtable_var);
     CFCBase_destroy((CFCBase*)self);
 }
 

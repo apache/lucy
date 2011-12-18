@@ -331,6 +331,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
+    package Clownfish::Parser;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
+}
+
+{
     package Clownfish::Symbol;
     BEGIN { push our @ISA, 'Clownfish::Base' }
     use Clownfish::Util qw( verify_args );

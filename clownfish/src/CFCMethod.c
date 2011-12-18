@@ -95,6 +95,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
                int is_final, int is_abstract) {
     // Validate macro_sym, derive micro_sym.
     if (!S_validate_macro_sym(macro_sym)) {
+        CFCBase_decref((CFCBase*)self);
         CFCUtil_die("Invalid macro_sym: '%s'",
                     macro_sym ? macro_sym : "[NULL]");
     }

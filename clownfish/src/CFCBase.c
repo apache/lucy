@@ -42,7 +42,7 @@ CFCBase_incref(CFCBase *self) {
 unsigned
 CFCBase_decref(CFCBase *self) {
     if (!self) { return 0; }
-    unsigned modified_refcount = self->refcount - 1;
+    unsigned modified_refcount = --self->refcount;
     if (modified_refcount == 0) {
         self->meta->destroy(self);
     }
