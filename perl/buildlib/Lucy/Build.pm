@@ -423,10 +423,23 @@ sub _valgrind_base_command {
         . "--suppressions=../devel/conf/lucyperl.supp ";
 }
 
+# Run the entire test suite under Valgrind.
+#
+# For this to work, Lucy must be compiled with the LUCY_VALGRIND environment
+# variable set to a true value, under a debugging Perl.
+#
+# A custom suppressions file will probably be needed -- use your judgment.
+# To pass in one or more local suppressions files, provide a comma separated
+# list like so:
+#
+#   $ ./Build test_valgrind --suppressions=foo.supp,bar.supp
 sub ACTION_test_valgrind {
     my $self = shift;
     die "Must be run under a perl that was compiled with -DDEBUGGING"
         unless $self->config('ccflags') =~ /-D?DEBUGGING\b/;
+    if ( !$ENV{LUCY_VALGRIND} ) {
+        warn "\$ENV{LUCY_VALGRIND} not true -- possible false positives";
+    }
     $self->dispatch('code');
     $self->dispatch('suppressions');
 
