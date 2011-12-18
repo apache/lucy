@@ -48,6 +48,9 @@ static CFCClassRegEntry *registry = NULL;
 static size_t registry_size = 0;
 static size_t registry_cap  = 0;
 
+// Store a new CFCClass in a registry.
+static void
+S_register(CFCClass *self);
 
 struct CFCClass {
     CFCSymbol symbol;
@@ -204,7 +207,7 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->is_inert = !!is_inert;
 
     // Store in registry.
-    CFCClass_register(self);
+    S_register(self);
 
     return self;
 }
@@ -255,8 +258,8 @@ CFCClass_destroy(CFCClass *self) {
     CFCSymbol_destroy((CFCSymbol*)self);
 }
 
-void
-CFCClass_register(CFCClass *self) {
+static void
+S_register(CFCClass *self) {
     if (registry_size == registry_cap) {
         size_t new_cap = registry_cap + 10;
         registry = (CFCClassRegEntry*)REALLOCATE(
@@ -274,8 +277,8 @@ CFCClass_register(CFCClass *self) {
     CFCClass *existing = CFCClass_fetch_singleton(parcel, class_name);
     const char *key = self->full_struct_sym;
     if (existing) {
-        CFCUtil_die("New class %s conflicts with existing class %s",
-                    CFCClass_get_class_name(self),
+        CFCBase_decref((CFCBase*)self);
+        CFCUtil_die("Conflict with existing class %s",
                     CFCClass_get_class_name(existing));
     }
     registry[registry_size].key   = CFCUtil_strdup(key);
@@ -314,7 +317,14 @@ void
 CFCClass_clear_registry(void) {
     size_t i;
     for (i = 0; i < registry_size; i++) {
-        CFCBase_decref((CFCBase*)registry[i].klass);
+        CFCClass *klass = registry[i].klass;
+        if (klass->parent) {
+            // Break circular ref.
+            CFCBase_decref((CFCBase*)klass->parent);
+            klass->parent = NULL;
+        }
+        CFCBase_decref((CFCBase*)klass);
+        FREEMEM(registry[i].key);
     }
     FREEMEM(registry);
     registry_size = 0;
@@ -693,8 +703,9 @@ CFCClass_get_cnick(CFCClass *self) {
 
 void
 CFCClass_set_parent(CFCClass *self, CFCClass *parent) {
-    CFCBase_decref((CFCBase*)self->parent);
+    CFCClass *old_parent = self->parent;
     self->parent = (CFCClass*)CFCBase_incref((CFCBase*)parent);
+    CFCBase_decref((CFCBase*)old_parent);
 }
 
 CFCClass*

@@ -165,12 +165,6 @@ CODE:
 OUTPUT: RETVAL
 
 void
-_register(self)
-    CFCClass *self;
-PPCODE:
-    CFCClass_register(self);
-
-void
 _clear_registry(...)
 PPCODE:
     CFCClass_clear_registry();

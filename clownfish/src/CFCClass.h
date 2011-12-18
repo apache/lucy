@@ -50,9 +50,6 @@ CFCClass*
 CFCClass_fetch_singleton(struct CFCParcel *parcel, const char *class_name);
 
 void
-CFCClass_register(CFCClass *self);
-
-void
 CFCClass_clear_registry(void);
 
 void

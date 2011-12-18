@@ -19,6 +19,11 @@ use warnings;
 package Clownfish;
 our $VERSION = '0.01';
 
+END {
+    Clownfish::Class->_clear_registry();
+    Clownfish::Parcel->reap_singletons();
+}
+
 use XSLoader;
 BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
@@ -105,8 +110,6 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         verify_args
         a_isa_b
     );
-
-    END { __PACKAGE__->_clear_registry() }
 
     our %create_PARAMS = (
         source_class      => undef,
@@ -298,10 +301,6 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     use Scalar::Util qw( blessed );
     use Carp;
 
-    END {
-        __PACKAGE__->reap_singletons();
-    }
-
     our %singleton_PARAMS = (
         name  => undef,
         cnick => undef,
@@ -328,6 +327,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
             return Clownfish::Parcel->singleton( name => $thing );
         }
     }
+}
+
+{
+    package Clownfish::Parser;
+    BEGIN { push our @ISA, 'Clownfish::Base' }
 }
 
 {
