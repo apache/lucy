@@ -36,15 +36,6 @@ typedef struct CFCVariable CFCVariable;
 struct CFCParcel;
 struct CFCType;
 
-    my $var = Clownfish::Variable->new(
-        parcel      => 'Crustacean',
-        type        => $int32_t_type,            # required
-        micro_sym   => 'average_lifespan',       # required
-        exposure    => 'parcel',                 # default: 'local'
-        class_name  => "Crustacean::Lobster",    # default: undef
-        class_cnick => "Lobster",                # default: undef
-    );
-
 /** 
  * @param type A Clownfish::Type.
  * @param micro_sym The variable's name, without any namespacing prefixes.

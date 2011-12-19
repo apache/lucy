@@ -60,11 +60,6 @@ CFCType*
 CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
              const char *specifier, int indirection, const char *c_string);
 
-    my $type = Clownfish::Type->new_integer(
-        const     => 1,       # default: undef
-        specifier => 'char',  # required
-    );
-
 /** Return a Type representing an integer primitive.
  *
  * Support is limited to a subset of the standard C integer types:
@@ -103,19 +98,6 @@ CFCType_new_integer(int flags, const char *specifier);
  */
 CFCType*
 CFCType_new_float(int flags, const char *specifier);
-
-
-=head2 new_object
-
-    my $type = Clownfish::Type->new_object(
-        specifier   => "Lobster",       # required
-        parcel      => "Crustacean",    # default: the default Parcel.
-        const       => undef,           # default undef
-        indirection => 1,               # default 1
-        incremented => 1,               # default 0
-        decremented => 0,               # default 0
-        nullable    => 1,               # default 0
-    );
 
 /** Create a Type representing an object.
  *
