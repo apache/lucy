@@ -691,12 +691,11 @@ PPCODE:
 MODULE = Clownfish    PACKAGE = Clownfish::Hierarchy
 
 SV*
-_new(source, dest, parser)
+_new(source, dest)
     const char *source;
     const char *dest;
-    CFCParser *parser;
 CODE:
-    CFCHierarchy *self = CFCHierarchy_new(source, dest, parser);
+    CFCHierarchy *self = CFCHierarchy_new(source, dest);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL

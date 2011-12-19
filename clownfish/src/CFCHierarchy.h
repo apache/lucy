@@ -24,15 +24,12 @@ extern "C" {
 typedef struct CFCHierarchy CFCHierarchy;
 struct CFCClass;
 struct CFCFile;
-struct CFCParser;
 
 CFCHierarchy*
-CFCHierarchy_new(const char *source, const char *dest,
-                 struct CFCParser *parser);
+CFCHierarchy_new(const char *source, const char *dest);
 
 CFCHierarchy*
-CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
-                  struct CFCParser *parser);
+CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest);
 
 void
 CFCHierarchy_destroy(CFCHierarchy *self);

@@ -231,14 +231,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         my ( $either, %args ) = @_;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
-        my $parser = Clownfish::Parser->new;
-        return _new( @args{qw( source dest )}, $parser );
-    }
-
-    sub _do_parse_file {
-        my ( $parser, $content, $source_class ) = @_;
-        $content = $parser->strip_plain_comments($content);
-        return $parser->file( $content, 0, source_class => $source_class, );
+        return _new( @args{qw( source dest )} );
     }
 }
 

@@ -69,14 +69,13 @@ const static CFCMeta CFCHIERARCHY_META = {
 };
 
 CFCHierarchy*
-CFCHierarchy_new(const char *source, const char *dest, CFCParser *parser) {
+CFCHierarchy_new(const char *source, const char *dest) {
     CFCHierarchy *self = (CFCHierarchy*)CFCBase_allocate(&CFCHIERARCHY_META);
-    return CFCHierarchy_init(self, source, dest, parser);
+    return CFCHierarchy_init(self, source, dest);
 }
 
 CFCHierarchy*
-CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
-                  CFCParser *parser) {
+CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest) {
     if (!source || !strlen(source) || !dest || !strlen(dest)) {
         CFCUtil_die("Both 'source' and 'dest' are required");
     }
@@ -86,7 +85,7 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest,
     self->num_trees = 0;
     self->files     = (CFCFile**)CALLOCATE(1, sizeof(CFCFile*));
     self->num_files = 0;
-    self->parser    = (CFCParser*)CFCBase_incref((CFCBase*)parser);
+    self->parser    = CFCParser_new();
     return self;
 }
 
