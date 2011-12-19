@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+#ifndef H_CFCDOCUCOMMENT
+#define H_CFCDOCUCOMMENT
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct CFCDocuComment CFCDocuComment;
 
 CFCDocuComment*
@@ -40,4 +47,10 @@ CFCDocuComment_get_param_docs(CFCDocuComment *self);
 // May be NULL.
 const char*
 CFCDocuComment_get_retval(CFCDocuComment *self);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* H_CFCDOCUCOMMENT */
 
