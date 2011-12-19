@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+/** Clownfish::Util - Miscellaneous helper functions.
+ *
+ * Clownfish::Util provides a few convenience functions used internally by
+ * other Clownfish modules.
+ */
+
 #ifndef H_CFCUTIL
 #define H_CFCUTIL
 
@@ -91,6 +97,9 @@ CFCUtil_wrapped_free(void *ptr);
 #define FREEMEM(_ptr) \
     CFCUtil_wrapped_free(_ptr)
 
+/** Given two filepaths, return true if the second exists and has a
+ * modification time which more recent than that of the first. 
+ */
 int
 CFCUtil_current(const char *orig, const char *dest);
 
@@ -100,6 +109,10 @@ CFCUtil_current(const char *orig, const char *dest);
 void
 CFCUtil_write_file(const char *filename, const char *content, size_t len);
 
+/** Test whether there's a file at <code>path</code> which already matches
+ * <code>content</code> exactly.  If something has changed, write the file.
+ * Otherwise do nothing (and avoid bumping the file's modification time).
+ */
 void
 CFCUtil_write_if_changed(const char *path, const char *content, size_t len);
 

@@ -18,29 +18,3 @@ use Clownfish;
 
 1;
 
-__END__
-
-__POD__
-
-=head1 NAME
-
-Clownfish::Parser - Parse Clownfish header files.
-
-=head1 SYNOPSIS
-
-     my $class_def = $parser->class($class_text);
-
-=head1 DESCRIPTION
-
-Clownfish::Parser is a combined lexer/parser which parses Clownfish header
-files.  It is not at all strict, as it relies heavily on the C parser to pick
-up errors such as misspelled type names.
-
-=head1 METHODS
-
-=head2 new
-
-Constructor, takes no arguments.
-
-=cut
-

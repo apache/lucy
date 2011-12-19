@@ -18,17 +18,3 @@ use Clownfish;
 
 1;
 
-__END__
-
-__POD__
-
-=head1 NAME
-
-Clownfish::Base - Base class for all CFC objects.
-
-=head1 DESCRIPTION
-
-    # TODO
-
-=cut
-

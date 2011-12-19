@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/** Clownfish::DocuComment - Formatted comment a la Doxygen.
+ */
+
 #ifndef H_CFCDOCUCOMMENT
 #define H_CFCDOCUCOMMENT
 
@@ -23,6 +26,8 @@ extern "C" {
 
 typedef struct CFCDocuComment CFCDocuComment;
 
+/** Parse comment text.
+ */
 CFCDocuComment*
 CFCDocuComment_parse(const char *raw_text);
 

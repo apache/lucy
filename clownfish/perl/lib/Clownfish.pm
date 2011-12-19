@@ -49,6 +49,8 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         );
     }
 
+    # Verify that named parameters exist in a defaults hash.  Returns false
+    # and sets $@ if a problem is detected.
     sub verify_args {
         my $defaults = shift;    # leave the rest of @_ intact
 
@@ -306,6 +308,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         return _singleton( @args{qw( name cnick )} );
     }
 
+    #    $parcel = Clownfish::Parcel->aquire($parcel_name_or_parcel_object);
+    #
+    # Aquire a parcel one way or another.  If the supplied argument is a
+    # Parcel, return it.  If it's not defined, return the default Parcel.  If
+    # it's a name, invoke singleton().
     sub acquire {
         my ( undef, $thing ) = @_;
         if ( !defined $thing ) {

@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+/** Clownfish::Symbol - Base class for Clownfish symbols.
+ *
+ * Clownfish::Symbol serves as a parent class for entities which may live in
+ * the global namespace, such as classes, functions, methods, and variables.
+ */
+
 #ifndef H_CFCSYMBOL
 #define H_CFCSYMBOL
 
@@ -46,6 +52,20 @@ struct CFCSymbol {
 int
 CFCSymbol_validate_class_name_component(const char *name);
 
+/**
+ * @param parcel A Clownfish::Parcel.  If not supplied, will be assigned to the
+ * default Parcel.
+ * @param exposure The scope in which the symbol is exposed.  Must be
+ * 'public', 'parcel', 'private', or 'local'.
+ * @param class_name A optional class name, consisting of one or more
+ * components separated by "::".  Each component must start with a capital
+ * letter, contain at least one lower-case letter, and consist entirely of the
+ * characters [A-Za-z0-9].
+ * @param class_cnick The C nickname associated with the supplied class
+ * name.  If not supplied, will be derived if possible from C<class_name> by
+ * extracting the last class name component.
+ * @param micro_sym The local identifier for the symbol.
+ */
 CFCSymbol*
 CFCSymbol_new(struct CFCParcel *parcel, const char *exposure, const char *class_name,
               const char *class_cnick, const char *micro_sym);
@@ -58,6 +78,8 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel, const char *exposure,
 void
 CFCSymbol_destroy(CFCSymbol *self);
 
+/** Return true if the symbols are "equal", false otherwise.
+ */
 int
 CFCSymbol_equals(CFCSymbol *self, CFCSymbol *other);
 
@@ -75,33 +97,55 @@ CFCSymbol_get_class_cnick(CFCSymbol *self);
 const char*
 CFCSymbol_get_exposure(CFCSymbol *self);
 
+/** Return true if the Symbol's exposure is "public".
+ */
 int
 CFCSymbol_public(CFCSymbol *self);
 
+/** Return true if the Symbol's exposure is "parcel".
+ */
 int
 CFCSymbol_parcel(CFCSymbol *self);
 
+/** Return true if the Symbol's exposure is "private".
+ */
 int
 CFCSymbol_private(CFCSymbol *self);
 
+/** Return true if the Symbol's exposure is "local".
+ */
 int
 CFCSymbol_local(CFCSymbol *self);
 
+/** Accessor for the Symbol's micro_sym.
+ */
 const char*
 CFCSymbol_micro_sym(CFCSymbol *self);
 
+/** Returns the C representation for the symbol minus the parcel's prefix,
+ * e.g.  "Lobster_average_lifespan".
+ */
 const char*
 CFCSymbol_short_sym(CFCSymbol *self);
 
+/** Returns the fully qualified C representation for the symbol, e.g.
+ * "crust_Lobster_average_lifespan".
+ */
 const char*
 CFCSymbol_full_sym(CFCSymbol *self);
 
+/** Get the Symbol's all-lowercase prefix, delegating to <code>parcel</code>.
+ */
 const char*
 CFCSymbol_get_prefix(CFCSymbol *self);
 
+/** Get the Symbol's Titlecase prefix, delegating to <code>parcel</code>.
+ */
 const char*
 CFCSymbol_get_Prefix(CFCSymbol *self);
 
+/** Get the Symbol's all-uppercase prefix, delegating to <code>parcel</code>.
+ */
 const char*
 CFCSymbol_get_PREFIX(CFCSymbol *self);
 

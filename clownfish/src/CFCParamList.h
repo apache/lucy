@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/** Clownfish::ParamList - parameter list.
+ */
+
 #ifndef H_CFCPARAMLIST
 #define H_CFCPARAMLIST
 
@@ -24,6 +27,9 @@ extern "C" {
 typedef struct CFCParamList CFCParamList;
 struct CFCVariable;
 
+/**
+ * @param variadic Should be true if the function is variadic.
+ */
 CFCParamList*
 CFCParamList_new(int variadic);
 
@@ -33,6 +39,12 @@ CFCParamList_init(CFCParamList *self, int variadic);
 void
 CFCParamList_destroy(CFCParamList *self);
 
+/** Add a parameter to the ParamList.
+ * 
+ * @param variable A Clownfish::Variable.
+ * @param value The parameter's default value, which should be NULL
+ * if there is no default and thus the parameter is required.
+ */
 void
 CFCParamList_add_param(CFCParamList *self, struct CFCVariable *variable,
                        const char *value);
@@ -49,12 +61,25 @@ CFCParamList_set_variadic(CFCParamList *self, int variadic);
 int
 CFCParamList_variadic(CFCParamList *self);
 
+/** Return the number of variables in the ParamList, including "self" for
+ * methods.
+ */
 size_t
 CFCParamList_num_vars(CFCParamList *self);
 
+
+/** Return a list of the variable's types and names, joined by commas.  For
+ * example:
+ *
+ *     Obj* self, Foo* foo, Bar* bar
+ */
 const char*
 CFCParamList_to_c(CFCParamList *self);
 
+/** Return the variable's names, joined by commas.  For example:
+ * 
+ *     self, foo, bar
+ */
 const char*
 CFCParamList_name_list(CFCParamList *self);
 

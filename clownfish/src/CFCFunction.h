@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/** Clownfish::Function - Metadata describing a function.
+ */
+
 #ifndef H_CFCFUNCTION
 #define H_CFCFUNCTION
 
@@ -39,7 +42,23 @@ struct CFCFunction {
 };
 #endif
 
-
+/**
+ * @param parcel A Clownfish::Parcel.
+ * @param exposure The function's exposure (see L<Clownfish::Symbol>).
+ * @param class_name The full name of the class in whose namespace the
+ * function resides.
+ * @param class_cnick The C nickname for the class. 
+ * @param micro_sym The lower case name of the function, without any
+ * namespacing prefixes.
+ * @param return_type A Clownfish::Type representing the function's
+ * return type.
+ * @param param_list A Clownfish::ParamList representing the
+ * function's argument list.
+ * @param docucomment A Clownfish::DocuComment describing the
+ * function.
+ * @param is_inline Should be true if the function should be inlined by the
+ * compiler.
+ */
 CFCFunction*
 CFCFunction_new(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *class_cnick,
@@ -69,12 +88,18 @@ CFCFunction_get_docucomment(CFCFunction *self);
 int
 CFCFunction_inline(CFCFunction *self);
 
+/** Returns true if the function has a void return type, false otherwise.
+ */
 int
 CFCFunction_void(CFCFunction *self);
 
+/** A synonym for full_sym().
+ */
 const char*
 CFCFunction_full_func_sym(CFCFunction *self);
 
+/** A synonym for short_sym().
+ */
 const char*
 CFCFunction_short_func_sym(CFCFunction *self);
 

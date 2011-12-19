@@ -14,6 +14,24 @@
  * limitations under the License.
  */
 
+/** Clownfish::Dumpable - Auto-generate code for "dumpable" classes.
+ *
+ * If a class declares that it has the attribute "dumpable", but does not
+ * declare either Dump or Load(), Clownfish::Dumpable will attempt to
+ * auto-generate those methods if methods inherited from the parent class do
+ * not suffice.
+ * 
+ *     class Foo::Bar inherits Foo : dumpable {
+ *         Thing *thing;
+ * 
+ *         public inert incremented Bar*
+ *         new();
+ * 
+ *         void
+ *         Destroy(Bar *self);
+ *     }
+ */
+
 #ifndef H_CFCDUMPABLE
 #define H_CFCDUMPABLE
 
@@ -24,6 +42,8 @@ extern "C" {
 typedef struct CFCDumpable CFCDumpable;
 struct CFCClass;
 
+/** Constructor. 
+ */
 CFCDumpable*
 CFCDumpable_new(void);
 
@@ -33,6 +53,10 @@ CFCDumpable_init(CFCDumpable *self);
 void
 CFCDumpable_destroy(CFCDumpable *self);
 
+
+/** Analyze a class with the attribute "dumpable" and add Dump() or Load()
+ * methods as necessary.
+ */
 void
 CFCDumpable_add_dumpables(CFCDumpable *self, struct CFCClass *klass);
 

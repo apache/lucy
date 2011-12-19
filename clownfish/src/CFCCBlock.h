@@ -14,6 +14,28 @@
  * limitations under the License.
  */
 
+/** Clownfish::CBlock - A block of embedded C code.
+ *
+ * CBlock exists to support embedding literal C code within Clownfish header
+ * files:
+ *
+ *     class Crustacean::Lobster {
+ *         ...
+ * 
+ *         inert inline void
+ *         say_hello(Lobster *self);
+ *     }
+ *
+ *     __C__
+ *     #include <stdio.h>
+ *     static CHY_INLINE void
+ *     crust_Lobster_say_hello(crust_Lobster *self)
+ *     {
+ *         printf("Prepare to die, human scum.\n");
+ *     }
+ *     __END_C__
+ */
+
 #ifndef H_CFCCBLOCK
 #define H_CFCCBLOCK
 
@@ -23,6 +45,10 @@ extern "C" {
 
 typedef struct CFCCBlock CFCCBlock;
 
+/** CBlock Constructor. 
+ *
+ * @param contents The contents of the CBlock, not including delimiters.
+ */
 CFCCBlock*
 CFCCBlock_new(const char *contents);
 
@@ -32,6 +58,8 @@ CFCCBlock_init(CFCCBlock *self, const char *contents);
 void
 CFCCBlock_destroy(CFCCBlock *self);
 
+/** Accessor.
+ */
 const char*
 CFCCBlock_get_contents(CFCCBlock *self);
 
