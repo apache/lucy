@@ -41,7 +41,6 @@
 
 #include "CFCPerlSub.h"
 #include "CFCPerlMethod.h"
-#include "CFCPerlClass.h"
 #include "CFCPerlConstructor.h"
 #include "CFCPerlPod.h"
 #include "CFCPerlTypeMap.h"
