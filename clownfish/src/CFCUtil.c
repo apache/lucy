@@ -416,6 +416,8 @@ CFCUtil_closedir(void *dirhandle, const char *dir) {
 
 /***************************************************************************/
 
+#ifdef CFCPERL
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -442,18 +444,26 @@ CFCUtil_warn(const char* format, ...) {
     SvREFCNT_dec(mess);
 }
 
-void*
-CFCUtil_make_perl_obj(void *ptr, const char *klass) {
-    SV *inner_obj = newSV(0);
-    SvOBJECT_on(inner_obj);
-    PL_sv_objcount++;
-    SvUPGRADE(inner_obj, SVt_PVMG);
-    sv_setiv(inner_obj, PTR2IV(ptr));
+#else 
 
-    // Connect class association.
-    HV *stash = gv_stashpvn((char*)klass, strlen(klass), TRUE);
-    SvSTASH_set(inner_obj, (HV*)SvREFCNT_inc(stash));
-
-    return  inner_obj;
+void
+CFCUtil_die(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+    exit(1);
 }
+
+void
+CFCUtil_warn(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+}
+
+#endif /* CFCPERL */
 

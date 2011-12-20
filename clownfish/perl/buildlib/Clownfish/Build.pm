@@ -31,7 +31,9 @@ my $CFC_SOURCE_DIR = catdir( updir(), 'src' );
 
 sub extra_ccflags {
     my $self = shift;
-    my $extra_ccflags = defined $ENV{CFLAGS} ? "$ENV{CFLAGS} " : "";
+    my $extra_ccflags = "-DCFCPERL ";
+    $extra_ccflags .= "$ENV{CFLAGS} " if defined $ENV{CFLAGS};
+
     my $gcc_version 
         = $ENV{REAL_GCC_VERSION}
         || $self->config('gccversion')
