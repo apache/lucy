@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+/** Clownfish::Binding::Core::Method - Generate core C code for a method.
+ *
+ * Clownfish::Method is an abstract specification; this class generates C code
+ * which implements the specification.
+ */
+
 #ifndef H_CFCBINDMETHOD
 #define H_CFCBINDMETHOD
 
@@ -24,21 +30,42 @@ extern "C" {
 struct CFCMethod;
 struct CFCClass;
 
+/** Return C code for the static inline vtable method invocation function.
+ * @param method A L<Clownfish::Method>.
+ * @param class The L<Clownfish::Class> which will be invoking the method.
+ * (LobsterClaw needs its own method invocation function even if the method
+ * was defined in Claw.)
+ */
 char*
 CFCBindMeth_method_def(struct CFCMethod *method, struct CFCClass *klass);
 
+/** Return C code expressing a typedef declaration for the method.
+ */
 char*
 CFCBindMeth_typdef_dec(struct CFCMethod *method);
 
+/** Return C code declaring the Callback object for this method.
+ */
 char*
 CFCBindMeth_callback_dec(struct CFCMethod *method);
 
+/** Return C code defining the Callback object for this method, which stores
+ * introspection data and a pointer to the callback function.
+ */
 char*
 CFCBindMeth_callback_obj_def(struct CFCMethod *method, const char* offset);
 
+/** Return C code implementing a version of the method which throws an
+ * "abstract method" error at runtime, for methods which are declared as
+ * "abstract" in a Clownfish header file.
+ */
 char*
 CFCBindMeth_abstract_method_def(struct CFCMethod *method);
 
+/** Return C code implementing a callback to the Host for this method.  This
+ * code is used when a Host method has overridden a method in a Clownfish
+ * class.
+ */
 char*
 CFCBindMeth_callback_def(struct CFCMethod *method);
 

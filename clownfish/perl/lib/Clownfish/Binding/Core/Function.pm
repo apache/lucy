@@ -18,21 +18,3 @@ use Clownfish;
 
 1;
 
-__END__
-
-__POD__
-
-=head1 NAME
-
-Clownfish::Binding::Core::Function - Generate core C code for a function.
-
-=head1 CLASS METHODS
-
-=head2 func_declaration
-
-    my $declaration 
-        = Clownfish::Binding::Core::Function->func_declaration($function);
-
-Return C code declaring the function's C implementation.
-
-=cut

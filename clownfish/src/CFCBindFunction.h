@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/** Clownfish::Binding::Core::Function - Generate core C code for a function.
+ */
+
 #ifndef H_CFCBINDFUNCTION
 #define H_CFCBINDFUNCTION
 
@@ -23,6 +26,8 @@ extern "C" {
 
 struct CFCFunction;
 
+/** Return C code declaring the function's C implementation.
+ */
 char*
 CFCBindFunc_func_declaration(struct CFCFunction *func);
 
