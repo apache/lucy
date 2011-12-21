@@ -21,7 +21,6 @@ use Clownfish::Util qw( verify_args );
 use Carp;
 
 our %registry;
-sub registry { \%registry }
 
 our %register_PARAMS = (
     parcel            => undef,
@@ -443,15 +442,17 @@ the source code.)
 
 =back
 
-=head1 registry
+=head2 singleton
 
-    my $registry = Clownfish::Binding::Perl::Class->registry;
-    while ( my $class_name, $class_binding ) = each %$registry ) {
-        ...
-    }
+    my $binding = Clownfish::Binding::Perl::Class->singleton($class_name);
 
-Return the hash registry used by register().  The keys are class names, and
-the values are Clownfish::Binding::Perl::Class objects.
+Given a class name, return a class binding if one exists.
+
+=head2 registered
+
+	my $registered = Clownfish::Binding::Perl::Class->registered;
+
+All registered bindings.
 
 =head1 OBJECT METHODS
 
