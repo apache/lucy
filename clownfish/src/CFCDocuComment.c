@@ -79,7 +79,7 @@ S_strip(char *comment) {
 }
 
 const static CFCMeta CFCDOCUCOMMENT_META = {
-    "Clownfish::DocuComment",
+    "Clownfish::CFC::DocuComment",
     sizeof(CFCDocuComment),
     (CFCBase_destroy_t)CFCDocuComment_destroy
 };

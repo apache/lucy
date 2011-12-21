@@ -74,8 +74,8 @@ my %primitives_to_perl = (
 
 sub from_perl {
     my ( $type, $xs_var ) = @_;
-    confess("Not a Clownfish::Type")
-        unless blessed($type) && $type->isa('Clownfish::Type');
+    confess("Not a Clownfish::CFC::Type")
+        unless blessed($type) && $type->isa('Clownfish::CFC::Type');
 
     if ( $type->is_object ) {
         my $struct_sym = $type->get_specifier;
@@ -102,8 +102,8 @@ sub from_perl {
 
 sub to_perl {
     my ( $type, $cf_var ) = @_;
-    confess("Not a Clownfish::Type")
-        unless ref($type) && $type->isa('Clownfish::Type');
+    confess("Not a Clownfish::CFC::Type")
+        unless ref($type) && $type->isa('Clownfish::CFC::Type');
     my $type_str = $type->to_c;
 
     if ( $type->is_object ) {
@@ -249,7 +249,7 @@ $type.
 
 =over
 
-=item * B<type> - A Clownfish::Type, which will be used to select the
+=item * B<type> - A Clownfish::CFC::Type, which will be used to select the
 mapping code.
 
 =item * B<xs_var> - The C name of the Perl scalar from which we are extracting
@@ -265,7 +265,7 @@ Return an expression converts from a variable of type $type to a Perl scalar.
 
 =over
 
-=item * B<type> - A Clownfish::Type, which will be used to select the
+=item * B<type> - A Clownfish::CFC::Type, which will be used to select the
 mapping code.
 
 =item * B<cf_var> - The name of the variable from which we are extracting a
@@ -283,7 +283,7 @@ value.
 
 =over
 
-=item * B<hierarchy> - A L<Clownfish::Hierarchy>.
+=item * B<hierarchy> - A L<Clownfish::CFC::Hierarchy>.
 
 =back 
 

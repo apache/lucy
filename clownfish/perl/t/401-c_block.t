@@ -18,19 +18,19 @@ use warnings;
 
 use Test::More tests => 5;
 
-use Clownfish::CBlock;
-use Clownfish::Parser;
+use Clownfish::CFC::CBlock;
+use Clownfish::CFC::Parser;
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 
-my $block = Clownfish::CBlock->new( contents => 'int foo;' );
-isa_ok( $block, "Clownfish::CBlock" );
+my $block = Clownfish::CFC::CBlock->new( contents => 'int foo;' );
+isa_ok( $block, "Clownfish::CFC::CBlock" );
 is( $block->get_contents, 'int foo;', "get_contents" );
-eval { Clownfish::CBlock->new };
+eval { Clownfish::CFC::CBlock->new };
 like( $@, qr/contents/, "content required" );
 
 $block = $parser->parse(qq| __C__\n#define FOO_BAR 1\n__END_C__  |);
 
-isa_ok( $block, "Clownfish::CBlock" );
+isa_ok( $block, "Clownfish::CFC::CBlock" );
 is( $block->get_contents, "#define FOO_BAR 1\n", "parse embed_c" );
 

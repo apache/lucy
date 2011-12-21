@@ -18,11 +18,11 @@ use warnings;
 
 use Test::More tests => 6;
 
-BEGIN { use_ok('Clownfish::Function') }
-use Clownfish::Parser;
-use Clownfish::Parcel;
+BEGIN { use_ok('Clownfish::CFC::Function') }
+use Clownfish::CFC::Parser;
+use Clownfish::CFC::Parcel;
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
@@ -35,18 +35,18 @@ my %args = (
     micro_sym   => 'return_an_obj',
 );
 
-my $func = Clownfish::Function->new(%args);
-isa_ok( $func, "Clownfish::Function" );
+my $func = Clownfish::CFC::Function->new(%args);
+isa_ok( $func, "Clownfish::CFC::Function" );
 
-eval { my $death = Clownfish::Function->new( %args, extra_arg => undef ) };
+eval { my $death = Clownfish::CFC::Function->new( %args, extra_arg => undef ) };
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
-eval { Clownfish::Function->new( %args, micro_sym => 'Uh_Oh' ); };
+eval { Clownfish::CFC::Function->new( %args, micro_sym => 'Uh_Oh' ); };
 like( $@, qr/Uh_Oh/, "invalid micro_sym kills constructor" );
 
 $parser->set_class_name("Neato::Obj");
 $parser->set_class_cnick("Obj");
-isa_ok( $parser->parse($_), "Clownfish::Function",
+isa_ok( $parser->parse($_), "Clownfish::CFC::Function",
     "function declaration: $_" )
     for (
     'inert int running_count(int biscuit);',

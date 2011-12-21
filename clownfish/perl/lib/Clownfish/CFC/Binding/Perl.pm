@@ -18,17 +18,17 @@ use warnings;
 
 package Clownfish::CFC::Binding::Perl;
 
-use Clownfish::Hierarchy;
+use Clownfish::CFC::Hierarchy;
 use Carp;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
 
-use Clownfish::Parcel;
-use Clownfish::Class;
-use Clownfish::Function;
-use Clownfish::Method;
-use Clownfish::Variable;
-use Clownfish::Util qw( verify_args a_isa_b write_if_changed );
+use Clownfish::CFC::Parcel;
+use Clownfish::CFC::Class;
+use Clownfish::CFC::Function;
+use Clownfish::CFC::Method;
+use Clownfish::CFC::Variable;
+use Clownfish::CFC::Util qw( verify_args a_isa_b write_if_changed );
 use Clownfish::CFC::Binding::Perl::Class;
 use Clownfish::CFC::Binding::Perl::Method;
 use Clownfish::CFC::Binding::Perl::Constructor;
@@ -46,9 +46,9 @@ sub new {
     my $either = shift;
     verify_args( \%new_PARAMS, @_ ) or confess $@;
     my $self = bless { %new_PARAMS, @_, }, ref($either) || $either;
-    if ( !a_isa_b( $self->{parcel}, 'Clownfish::Parcel' ) ) {
+    if ( !a_isa_b( $self->{parcel}, 'Clownfish::CFC::Parcel' ) ) {
         $self->{parcel}
-            = Clownfish::Parcel->singleton( name => $self->{parcel} );
+            = Clownfish::CFC::Parcel->singleton( name => $self->{parcel} );
     }
     my $parcel = $self->{parcel};
     for ( keys %new_PARAMS ) {
@@ -439,7 +439,7 @@ __POD__
 
 =head1 NAME
 
-Clownfish::CFC::Binding::Perl - Perl bindings for a Clownfish::Hierarchy.
+Clownfish::CFC::Binding::Perl - Perl bindings for a Clownfish::CFC::Hierarchy.
 
 =head1 DESCRIPTION
 
@@ -448,7 +448,7 @@ Perl code to bind C code for a Clownfish class hierarchy to Perl.
 
 In theory this module could be much more flexible and its API could be more
 elegant.  There are many ways which you could walk the parsed parcels,
-classes, methods, etc. in a Clownfish::Hierarchy and generate binding code.
+classes, methods, etc. in a Clownfish::CFC::Hierarchy and generate binding code.
 However, our needs are very limited, so we are content with a "one size fits
 one" solution.
 
@@ -486,10 +486,10 @@ If it is "Crustacean", the following files will be generated.
 =item * B<boot_class> - The name of the main class, which will own the shared
 object.
 
-=item * B<parcel> - The L<Clownfish::Parcel> to which the C<boot_class>
+=item * B<parcel> - The L<Clownfish::CFC::Parcel> to which the C<boot_class>
 belongs.
 
-=item * B<hierarchy> - A Clownfish::Hierarchy.
+=item * B<hierarchy> - A Clownfish::CFC::Hierarchy.
 
 =item * B<lib_dir> - location of the Perl lib directory to which files will be
 written.

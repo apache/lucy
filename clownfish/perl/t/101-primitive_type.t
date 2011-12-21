@@ -31,6 +31,6 @@ $other = new_primitive_type( specifier => 'hump_t', const => 1 );
 ok( !$type->equals($other), "equals() spoiled by const" );
 
 sub new_primitive_type {
-    return Clownfish::Type->new( @_, primitive => 1 );
+    return Clownfish::CFC::Type->new( @_, primitive => 1 );
 }
 

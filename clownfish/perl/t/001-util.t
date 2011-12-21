@@ -18,7 +18,7 @@ use warnings;
 
 use Test::More tests => 15;
 use File::stat qw( stat );
-use Clownfish::Util qw(
+use Clownfish::CFC::Util qw(
     slurp_text
     current
     verify_args

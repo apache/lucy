@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::Parcel - Collection of code.
+/** Clownfish::CFC::Parcel - Collection of code.
  *
  * A Parcel is a cohesive collection of code, which could, in theory, be
  * published as as a single entity.
@@ -24,7 +24,7 @@
  * 
  *     prefix_ClassNick_local_symbol
  * 
- * Clownfish::Parcel supports the first tier, specifying initial prefixes.
+ * Clownfish::CFC::Parcel supports the first tier, specifying initial prefixes.
  * These prefixes come in three capitalization variants: prefix_, Prefix_, and
  * PREFIX_.
  */
@@ -70,7 +70,7 @@ CFCParcel_default_parcel(void);
 
 /** Return the Parcel under which Obj, CharBuf, VArray, Hash, etc. live.  At
  * some point in the future, these core object types may move to the
- * "Clownfish" Parcel, but for now they are within "Lucy".
+ * "Clownfish" CFC" Parcel, but for now they are within "Lucy".
  */
 CFCParcel*
 CFCParcel_clownfish_parcel(void);

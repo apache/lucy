@@ -49,7 +49,7 @@ static void
 S_update_typedefs(CFCMethod *self, const char *short_sym);
 
 const static CFCMeta CFCMETHOD_META = {
-    "Clownfish::Method",
+    "Clownfish::CFC::Method",
     sizeof(CFCMethod),
     (CFCBase_destroy_t)CFCMethod_destroy
 };

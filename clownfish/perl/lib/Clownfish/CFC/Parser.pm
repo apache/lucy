@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Clownfish::Function;
+package Clownfish::CFC::Parser;
 use Clownfish;
 
 1;

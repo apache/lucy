@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::CFC::Binding::Perl::Class;
-use Clownfish::Util qw( verify_args );
+use Clownfish::CFC::Util qw( verify_args );
 use Carp;
 
 our %registry;
@@ -43,12 +43,12 @@ sub register {
     confess("$self->{class_name} already registered")
         if exists $registry{ $self->{class_name} };
 
-    # Retrieve Clownfish::Class client, if it will be needed.
+    # Retrieve Clownfish::CFC::Class client, if it will be needed.
     if (   $self->{bind_methods}
         || $self->{bind_constructors}
         || $self->{make_pod} )
     {
-        $self->{client} = Clownfish::Class->fetch_singleton(
+        $self->{client} = Clownfish::CFC::Class->fetch_singleton(
             parcel     => $self->{parcel},
             class_name => $self->{class_name},
         );
@@ -396,7 +396,7 @@ __POD__
 =head1 NAME
 
 Clownfish::CFC::Binding::Perl::Class - Generate Perl binding code for a
-Clownfish::Class.
+Clownfish::CFC::Class.
 
 =head1 CLASS METHODS
 
@@ -413,11 +413,11 @@ Clownfish::Class.
 
 Create a new class binding and lodge it in the registry.  May only be called
 once for each unique class name, and must be called after all classes have
-been parsed (via Clownfish::Hierarchy's build()).
+been parsed (via Clownfish::CFC::Hierarchy's build()).
 
 =over
 
-=item * B<parcel> - A L<Clownfish::Parcel> or parcel name.
+=item * B<parcel> - A L<Clownfish::CFC::Parcel> or parcel name.
 
 =item * B<class_name> - The name of the class to be registered.
 
@@ -459,7 +459,7 @@ All registered bindings.
 =head2 get_class_name get_bind_methods get_bind_methods get_make_pod
 get_xs_code get_client
 
-Accessors.  C<get_client> retrieves the Clownfish::Class module to be
+Accessors.  C<get_client> retrieves the Clownfish::CFC::Class module to be
 bound.
 
 =head2 constructor_bindings

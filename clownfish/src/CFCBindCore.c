@@ -252,7 +252,7 @@ S_write_parcel_c(CFCBindCore *self) {
         CFCBase **blocks = CFCFile_blocks(file);
         for (int j = 0; blocks[j] != NULL; j++) {
             const char *cfc_class = CFCBase_get_cfc_class(blocks[j]);
-            if (strcmp(cfc_class, "Clownfish::Class") == 0) {
+            if (strcmp(cfc_class, "Clownfish::CFC::Class") == 0) {
                 CFCClass *klass = (CFCClass*)blocks[j];
 
                 CFCBindClass *class_binding = CFCBindClass_new(klass);

@@ -19,7 +19,7 @@ use warnings;
 package Clownfish::CFC::Binding::Perl::Constructor;
 use base qw( Clownfish::CFC::Binding::Perl::Subroutine );
 use Carp;
-use Clownfish::ParamList;
+use Clownfish::CFC::ParamList;
 
 sub new {
     my ( $either, %args ) = @_;
@@ -132,7 +132,7 @@ a single argument.
 
 =over
 
-=item * B<class> - A L<Clownfish::Class>.
+=item * B<class> - A L<Clownfish::CFC::Class>.
 
 =item * B<alias> - A specifier for the name of the constructor, and
 optionally, a specifier for the implementing function.  If C<alias> has a pipe

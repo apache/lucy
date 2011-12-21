@@ -18,11 +18,11 @@ use warnings;
 
 use Test::More tests => 10;
 
-BEGIN { use_ok('Clownfish::DocuComment') }
-use Clownfish::Parser;
+BEGIN { use_ok('Clownfish::CFC::DocuComment') }
+use Clownfish::CFC::Parser;
 
-my $parser = Clownfish::Parser->new;
-isa_ok( $parser->parse('/** foo. */'), "Clownfish::DocuComment" );
+my $parser = Clownfish::CFC::Parser->new;
+isa_ok( $parser->parse('/** foo. */'), "Clownfish::CFC::DocuComment" );
 
 my $text = <<'END_COMMENT';
 /**

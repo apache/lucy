@@ -18,9 +18,9 @@ use warnings;
 
 use Test::More tests => 2;
 
-use Clownfish::Parser;
+use Clownfish::CFC::Parser;
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
@@ -33,7 +33,7 @@ my %args = (
     parcel      => 'Neato',
 );
 
-my $not_final_method = Clownfish::Method->new(%args);
+my $not_final_method = Clownfish::CFC::Method->new(%args);
 my $final_method     = $not_final_method->finalize;
 ok( !$not_final_method->final, "not final by default" );
 ok( $final_method->final,      "finalize" );

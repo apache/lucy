@@ -39,7 +39,7 @@ struct CFCVariable {
 };
 
 const static CFCMeta CFCVARIABLE_META = {
-    "Clownfish::Variable",
+    "Clownfish::CFC::Variable",
     sizeof(CFCVariable),
     (CFCBase_destroy_t)CFCVariable_destroy
 };

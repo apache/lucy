@@ -16,7 +16,7 @@
 
 /** Clownfish::CFC::Binding::Core::Class - Generate core C code for a class.
  *
- * Clownfish::Class is an abstract specification for a class.  This module
+ * Clownfish::CFC::Class is an abstract specification for a class.  This module
  * autogenerates the C code with implements that specification.
  */
 
@@ -32,7 +32,7 @@ typedef struct CFCBindClass CFCBindClass;
 struct CFCClass;
 
 /**
- * @param client A Clownfish::Class.
+ * @param client A Clownfish::CFC::Class.
  */
 struct CFCBindClass*
 CFCBindClass_new(struct CFCClass *client);

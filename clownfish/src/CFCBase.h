@@ -17,7 +17,7 @@
 #ifndef H_CFCBASE
 #define H_CFCBASE
 
-/** Clownfish::Base - Base class for all CFC objects.
+/** Clownfish::CFC::Base - Base class for all CFC objects.
  */
 
 #ifdef __cplusplus

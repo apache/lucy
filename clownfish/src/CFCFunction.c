@@ -31,7 +31,7 @@
 #include "CFCUtil.h"
 
 const static CFCMeta CFCFUNCTION_META = {
-    "Clownfish::Function",
+    "Clownfish::CFC::Function",
     sizeof(CFCFunction),
     (CFCBase_destroy_t)CFCFunction_destroy
 };

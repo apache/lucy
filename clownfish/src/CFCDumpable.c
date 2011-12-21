@@ -43,7 +43,7 @@ S_add_dump_method(CFCClass *klass);
 static void
 S_add_load_method(CFCClass *klass);
 
-// Create a Clownfish::Method object for either Dump() or Load().
+// Create a Clownfish::CFC::Method object for either Dump() or Load().
 static CFCMethod*
 S_make_method_obj(CFCClass *klass, const char *method_name);
 
@@ -62,7 +62,7 @@ struct CFCDumpable {
 };
 
 const static CFCMeta CFCDUMPABLE_META = {
-    "Clownfish::Dumpable",
+    "Clownfish::CFC::Dumpable",
     sizeof(CFCDumpable),
     (CFCBase_destroy_t)CFCDumpable_destroy
 };

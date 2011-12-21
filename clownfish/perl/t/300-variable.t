@@ -17,19 +17,19 @@ use strict;
 use warnings;
 
 use Test::More tests => 13;
-use Clownfish::Type;
-use Clownfish::Parser;
+use Clownfish::CFC::Type;
+use Clownfish::CFC::Parser;
 
-BEGIN { use_ok('Clownfish::Variable') }
+BEGIN { use_ok('Clownfish::CFC::Variable') }
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
 sub new_type { $parser->parse(shift) }
 
 eval {
-    my $death = Clownfish::Variable->new(
+    my $death = Clownfish::CFC::Variable->new(
         micro_sym => 'foo',
         type      => new_type('int'),
         extra_arg => undef,
@@ -37,12 +37,12 @@ eval {
 };
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
-eval { my $death = Clownfish::Variable->new( micro_sym => 'foo' ) };
+eval { my $death = Clownfish::CFC::Variable->new( micro_sym => 'foo' ) };
 like( $@, qr/type/, "type is required" );
-eval { my $death = Clownfish::Variable->new( type => new_type('int32_t') ) };
+eval { my $death = Clownfish::CFC::Variable->new( type => new_type('int32_t') ) };
 like( $@, qr/micro_sym/, "micro_sym is required" );
 
-my $var = Clownfish::Variable->new(
+my $var = Clownfish::CFC::Variable->new(
     micro_sym => 'foo',
     type      => new_type('float*')
 );
@@ -50,14 +50,14 @@ is( $var->local_c,           'float* foo',  "local_c" );
 is( $var->local_declaration, 'float* foo;', "declaration" );
 ok( $var->local, "default to local access" );
 
-$var = Clownfish::Variable->new(
+$var = Clownfish::CFC::Variable->new(
     micro_sym => 'foo',
     type      => new_type('float[1]')
 );
 is( $var->local_c, 'float foo[1]',
     "to_c appends array to var name rather than type specifier" );
 
-$var = Clownfish::Variable->new(
+$var = Clownfish::CFC::Variable->new(
     parcel      => 'Neato',
     micro_sym   => 'foo',
     type        => new_type("Foo*"),
@@ -66,7 +66,7 @@ $var = Clownfish::Variable->new(
 );
 is( $var->global_c, 'neato_Foo* neato_LobClaw_foo', "global_c" );
 
-isa_ok( $parser->parse($_), "Clownfish::Variable",
+isa_ok( $parser->parse($_), "Clownfish::CFC::Variable",
     "var_declaration_statement: $_" )
     for (
     'parcel int foo;',

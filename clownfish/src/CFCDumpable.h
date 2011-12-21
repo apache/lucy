@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-/** Clownfish::Dumpable - Auto-generate code for "dumpable" classes.
+/** Clownfish::CFC::Dumpable - Auto-generate code for "dumpable" classes.
  *
  * If a class declares that it has the attribute "dumpable", but does not
- * declare either Dump or Load(), Clownfish::Dumpable will attempt to
+ * declare either Dump or Load(), Clownfish::CFC::Dumpable will attempt to
  * auto-generate those methods if methods inherited from the parent class do
  * not suffice.
  * 

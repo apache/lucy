@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-/** Clownfish::Hierarchy - A class hierarchy.
+/** Clownfish::CFC::Hierarchy - A class hierarchy.
  *
- * A Clownfish::Hierarchy consists of all the classes defined in files within
+ * A Clownfish::CFC::Hierarchy consists of all the classes defined in files within
  * a source directory and its subdirectories.
  *
  * There may be more than one tree within the Hierarchy, since all "inert"

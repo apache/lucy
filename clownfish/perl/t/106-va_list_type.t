@@ -17,15 +17,15 @@ use strict;
 use warnings;
 
 use Test::More tests => 4;
-use Clownfish::Type;
-use Clownfish::Parser;
+use Clownfish::CFC::Type;
+use Clownfish::CFC::Parser;
 
-my $va_list_type = Clownfish::Type->new_va_list;
+my $va_list_type = Clownfish::CFC::Type->new_va_list;
 is( $va_list_type->get_specifier,
     "va_list", "specifier defaults to 'va_list'" );
 is( $va_list_type->to_c, "va_list", "to_c" );
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 
 my $type = $parser->parse('va_list');
 ok( $type && $type->is_va_list, "parse va_list" );

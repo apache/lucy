@@ -20,15 +20,15 @@ package Clownfish;
 our $VERSION = '0.01';
 
 END {
-    Clownfish::Class->_clear_registry();
-    Clownfish::Parcel->reap_singletons();
+    Clownfish::CFC::Class->_clear_registry();
+    Clownfish::CFC::Parcel->reap_singletons();
 }
 
 use XSLoader;
 BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
-    package Clownfish::Util;
+    package Clownfish::CFC::Util;
     use base qw( Exporter );
     use Scalar::Util qw( blessed );
     use Carp;
@@ -82,13 +82,13 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Base;
+    package Clownfish::CFC::Base;
 }
 
 {
-    package Clownfish::CBlock;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
-    use Clownfish::Util qw( verify_args );
+    package Clownfish::CFC::CBlock;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     our %new_PARAMS = ( contents => undef, );
@@ -104,11 +104,11 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Class;
-    BEGIN { push our @ISA, 'Clownfish::Symbol' }
+    package Clownfish::CFC::Class;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Symbol' }
     use Carp;
     use Config;
-    use Clownfish::Util qw(
+    use Clownfish::CFC::Util qw(
         verify_args
         a_isa_b
     );
@@ -136,20 +136,20 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         # Maybe prepend parcel prefix.
         my $parcel = $args{parcel};
         if ( defined $parcel ) {
-            if ( !a_isa_b( $parcel, "Clownfish::Parcel" ) ) {
-                $parcel = Clownfish::Parcel->singleton( name => $parcel );
+            if ( !a_isa_b( $parcel, "Clownfish::CFC::Parcel" ) ) {
+                $parcel = Clownfish::CFC::Parcel->singleton( name => $parcel );
             }
         }
         return _fetch_singleton( $parcel, $args{class_name} );
     }
 
-    sub new { confess("The constructor for Clownfish::Class is create()") }
+    sub new { confess("The constructor for Clownfish::CFC::Class is create()") }
 
     sub create {
         my ( $either, %args ) = @_;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%create_PARAMS, %args ) or confess $@;
-        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
         return _create(
             @args{
                 qw( parcel exposure class_name cnick micro_sym
@@ -160,19 +160,19 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::DocuComment;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
+    package Clownfish::CFC::DocuComment;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
 }
 
 {
-    package Clownfish::Dumpable;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
+    package Clownfish::CFC::Dumpable;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
 }
 
 {
-    package Clownfish::File;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
-    use Clownfish::Util qw( verify_args );
+    package Clownfish::CFC::File;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     our %new_PARAMS = ( source_class => undef, );
@@ -186,10 +186,10 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Function;
-    BEGIN { push our @ISA, 'Clownfish::Symbol' }
+    package Clownfish::CFC::Function;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Symbol' }
     use Carp;
-    use Clownfish::Util qw( verify_args a_isa_b );
+    use Clownfish::CFC::Util qw( verify_args a_isa_b );
 
     my %new_PARAMS = (
         return_type => undef,
@@ -208,7 +208,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         $args{inline} ||= 0;
-        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
         return _new(
             @args{
                 qw( parcel exposure class_name class_cnick micro_sym
@@ -219,10 +219,10 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Hierarchy;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
+    package Clownfish::CFC::Hierarchy;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
     use Carp;
-    use Clownfish::Util qw( verify_args );
+    use Clownfish::CFC::Util qw( verify_args );
 
     our %new_PARAMS = (
         source => undef,
@@ -238,9 +238,9 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Method;
-    BEGIN { push our @ISA, 'Clownfish::Function' }
-    use Clownfish::Util qw( verify_args );
+    package Clownfish::CFC::Method;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Function' }
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     my %new_PARAMS = (
@@ -261,7 +261,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         verify_args( \%new_PARAMS, %args ) or confess $@;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
         $args{abstract} ||= 0;
-        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
         $args{final} ||= 0;
         return _new(
             @args{
@@ -273,9 +273,9 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::ParamList;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
-    use Clownfish::Util qw( verify_args );
+    package Clownfish::CFC::ParamList;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     our %new_PARAMS = ( variadic => undef, );
@@ -290,9 +290,9 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Parcel;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
-    use Clownfish::Util qw( verify_args );
+    package Clownfish::CFC::Parcel;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
     use Scalar::Util qw( blessed );
     use Carp;
 
@@ -308,7 +308,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         return _singleton( @args{qw( name cnick )} );
     }
 
-    #    $parcel = Clownfish::Parcel->aquire($parcel_name_or_parcel_object);
+    #    $parcel = Clownfish::CFC::Parcel->aquire($parcel_name_or_parcel_object);
     #
     # Aquire a parcel one way or another.  If the supplied argument is a
     # Parcel, return it.  If it's not defined, return the default Parcel.  If
@@ -316,33 +316,33 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
     sub acquire {
         my ( undef, $thing ) = @_;
         if ( !defined $thing ) {
-            return Clownfish::Parcel->default_parcel;
+            return Clownfish::CFC::Parcel->default_parcel;
         }
         elsif ( blessed($thing) ) {
-            confess("Not a Clownfish::Parcel")
-                unless $thing->isa('Clownfish::Parcel');
+            confess("Not a Clownfish::CFC::Parcel")
+                unless $thing->isa('Clownfish::CFC::Parcel');
             return $thing;
         }
         else {
-            return Clownfish::Parcel->singleton( name => $thing );
+            return Clownfish::CFC::Parcel->singleton( name => $thing );
         }
     }
 }
 
 {
-    package Clownfish::Parser;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
+    package Clownfish::CFC::Parser;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
 }
 
 {
-    package Clownfish::Parser;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
+    package Clownfish::CFC::Parser;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
 }
 
 {
-    package Clownfish::Symbol;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
-    use Clownfish::Util qw( verify_args );
+    package Clownfish::CFC::Symbol;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     my %new_PARAMS = (
@@ -357,16 +357,16 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
-        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
         return _new(
             @args{qw( parcel exposure class_name class_cnick micro_sym )} );
     }
 }
 
 {
-    package Clownfish::Type;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
-    use Clownfish::Util qw( verify_args a_isa_b );
+    package Clownfish::CFC::Type;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args a_isa_b );
     use Scalar::Util qw( blessed );
     use Carp;
 
@@ -408,7 +408,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
         my $parcel
             = $args{parcel}
-            ? Clownfish::Parcel->acquire( $args{parcel} )
+            ? Clownfish::CFC::Parcel->acquire( $args{parcel} )
             : $args{parcel};
 
         my $indirection = $args{indirection} || 0;
@@ -466,7 +466,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         $flags |= NULLABLE    if $args{nullable};
         $flags |= CONST       if $args{const};
         $args{indirection} = 1 unless defined $args{indirection};
-        my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
+        my $parcel = Clownfish::CFC::Parcel->acquire( $args{parcel} );
         my $package = ref($either) || $either;
         confess("Missing required param 'specifier'")
             unless defined $args{specifier};
@@ -517,15 +517,15 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         my ( $either, %args ) = @_;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_arbitrary_PARAMS, %args ) or confess $@;
-        my $parcel = Clownfish::Parcel->acquire( $args{parcel} );
+        my $parcel = Clownfish::CFC::Parcel->acquire( $args{parcel} );
         return _new_arbitrary( $parcel, $args{specifier} );
     }
 }
 
 {
-    package Clownfish::Variable;
-    BEGIN { push our @ISA, 'Clownfish::Symbol' }
-    use Clownfish::Util qw( verify_args );
+    package Clownfish::CFC::Variable;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Symbol' }
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     our %new_PARAMS = (
@@ -543,7 +543,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         $args{exposure} ||= 'local';
-        $args{parcel} = Clownfish::Parcel->acquire( $args{parcel} );
+        $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
         return _new(
             @args{
                 qw( parcel exposure class_name class_cnick micro_sym type inert )
@@ -554,7 +554,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
     package Clownfish::CFC::Binding::Core;
-    use Clownfish::Util qw( verify_args );
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     our %new_PARAMS = (
@@ -573,7 +573,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
     package Clownfish::CFC::Binding::Core::Class;
-    use Clownfish::Util qw( a_isa_b verify_args );
+    use Clownfish::CFC::Util qw( a_isa_b verify_args );
     use Carp;
 
     our %new_PARAMS = ( client => undef, );
@@ -587,7 +587,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
     package Clownfish::CFC::Binding::Core::File;
-    use Clownfish::Util qw( verify_args );
+    use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
     my %write_h_PARAMS = (

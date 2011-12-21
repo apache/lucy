@@ -17,23 +17,23 @@ use strict;
 use warnings;
 
 use Test::More tests => 52;
-use Clownfish::Class;
-use Clownfish::Parser;
+use Clownfish::CFC::Class;
+use Clownfish::CFC::Parser;
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 
-my $thing = Clownfish::Variable->new(
+my $thing = Clownfish::CFC::Variable->new(
     parcel     => 'Neato',
     class_name => 'Foo',
     type       => $parser->parse('Thing*'),
     micro_sym  => 'thing',
 );
-my $widget = Clownfish::Variable->new(
+my $widget = Clownfish::CFC::Variable->new(
     class_name => 'Widget',
     type       => $parser->parse('Widget*'),
     micro_sym  => 'widget',
 );
-my $tread_water = Clownfish::Function->new(
+my $tread_water = Clownfish::CFC::Function->new(
     parcel      => 'Neato',
     class_name  => 'Foo',
     return_type => $parser->parse('void'),
@@ -45,20 +45,20 @@ my %foo_create_args = (
     class_name => 'Foo',
 );
 
-my $foo = Clownfish::Class->create(%foo_create_args);
+my $foo = Clownfish::CFC::Class->create(%foo_create_args);
 $foo->add_function($tread_water);
 $foo->add_member_var($thing);
 $foo->add_inert_var($widget);
-eval { Clownfish::Class->create(%foo_create_args) };
+eval { Clownfish::CFC::Class->create(%foo_create_args) };
 like( $@, qr/conflict/i,
     "Can't call create for the same class more than once" );
-my $should_be_foo = Clownfish::Class->fetch_singleton(
+my $should_be_foo = Clownfish::CFC::Class->fetch_singleton(
     parcel     => 'Neato',
     class_name => 'Foo',
 );
 is( $$foo, $$should_be_foo, "fetch_singleton" );
 
-my $foo_jr = Clownfish::Class->create(
+my $foo_jr = Clownfish::CFC::Class->create(
     parcel            => 'Neato',
     class_name        => 'Foo::FooJr',
     parent_class_name => 'Foo',
@@ -69,7 +69,7 @@ ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
 is( $foo_jr->get_struct_sym,  'FooJr',       "struct_sym" );
 is( $foo_jr->full_struct_sym, 'neato_FooJr', "full_struct_sym" );
 
-my $final_foo = Clownfish::Class->create(
+my $final_foo = Clownfish::CFC::Class->create(
     parcel            => 'Neato',
     class_name        => 'Foo::FooJr::FinalFoo',
     parent_class_name => 'Foo::FooJr',
@@ -99,7 +99,7 @@ my %inert_args = (
     inert      => 1,
 );
 eval {
-    my $class = Clownfish::Class->create(%inert_args);
+    my $class = Clownfish::CFC::Class->create(%inert_args);
     $class->add_method($inert_do_stuff);
 };
 like(
@@ -148,7 +148,7 @@ is( $parser->parse("class Fu::$_ inherits $_ { }")->get_parent_class_name,
 my $class_content
     = 'public class Foo::Foodie cnick Foodie inherits Foo { private int num; }';
 my $class = $parser->parse($class_content);
-isa_ok( $class, "Clownfish::Class", "class_declaration FooJr" );
+isa_ok( $class, "Clownfish::CFC::Class", "class_declaration FooJr" );
 ok( ( scalar grep { $_->micro_sym eq 'num' } @{ $class->member_vars } ),
     "parsed private member var" );
 
@@ -184,7 +184,7 @@ $class_content = q|
 |;
 
 $class = $parser->parse($class_content);
-isa_ok( $class, "Clownfish::Class", "class_declaration Dog" );
+isa_ok( $class, "Clownfish::CFC::Class", "class_declaration Dog" );
 ok( ( scalar grep { $_->micro_sym eq 'num_dogs' } @{ $class->inert_vars } ),
     "parsed inert var" );
 ok( ( scalar grep { $_->micro_sym eq 'mom' } @{ $class->member_vars } ),
@@ -218,7 +218,7 @@ $class_content = qq|
         parcel inert void lie_still();
     }|;
 $class = $parser->parse($class_content);
-isa_ok( $class, "Clownfish::Class", "inert class_declaration" );
+isa_ok( $class, "Clownfish::CFC::Class", "inert class_declaration" );
 ok( $class->inert, "inert modifier parsed and passed to constructor" );
 
 $class_content = qq|

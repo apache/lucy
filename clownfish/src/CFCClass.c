@@ -106,7 +106,7 @@ static void
 S_bequeath_methods(CFCClass *self);
 
 const static CFCMeta CFCCLASS_META = {
-    "Clownfish::Class",
+    "Clownfish::CFC::Class",
     sizeof(CFCClass),
     (CFCBase_destroy_t)CFCClass_destroy
 };

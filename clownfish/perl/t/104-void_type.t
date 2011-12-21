@@ -17,26 +17,26 @@ use strict;
 use warnings;
 
 use Test::More tests => 11;
-use Clownfish::Type;
-use Clownfish::Parser;
+use Clownfish::CFC::Type;
+use Clownfish::CFC::Parser;
 
-my $void_type = Clownfish::Type->new_void;
+my $void_type = Clownfish::CFC::Type->new_void;
 is( $void_type->get_specifier, "void", "specifier defaults to 'void'" );
 is( $void_type->to_c,          "void", "to_c" );
 ok( $void_type->is_void, "is_void" );
 
-$void_type = Clownfish::Type->new_void( const => 1 );
+$void_type = Clownfish::CFC::Type->new_void( const => 1 );
 ok( $void_type->const, "const" );
 like( $void_type->to_c, qr/const/, "'const' in C representation" );
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 
 $void_type = $parser->parse('void');
-isa_ok( $void_type, "Clownfish::Type" );
+isa_ok( $void_type, "Clownfish::CFC::Type" );
 ok( $void_type && $void_type->is_void,
     "Parser calls new_void() when parsing 'void'" );
 my $const_void_type = $parser->parse('const void');
-isa_ok( $const_void_type, "Clownfish::Type" );
+isa_ok( $const_void_type, "Clownfish::CFC::Type" );
 ok( $const_void_type && $const_void_type->is_void,
     "Parser calls new_void() when parsing 'const void'"
 );

@@ -18,20 +18,20 @@ use warnings;
 
 use Test::More tests => 88;
 
-BEGIN { use_ok('Clownfish::Parser') }
+BEGIN { use_ok('Clownfish::CFC::Parser') }
 
-my $parser = Clownfish::Parser->new;
-isa_ok( $parser, "Clownfish::Parser" );
+my $parser = Clownfish::CFC::Parser->new;
+isa_ok( $parser, "Clownfish::CFC::Parser" );
 
 isa_ok( $parser->parse("parcel Fish;"),
-    "Clownfish::Parcel", "parcel_definition" );
+    "Clownfish::CFC::Parcel", "parcel_definition" );
 isa_ok( $parser->parse("parcel Crustacean cnick Crust;"),
-    "Clownfish::Parcel", "parcel_definition with cnick" );
+    "Clownfish::CFC::Parcel", "parcel_definition with cnick" );
 
 # Set and leave parcel.
 my $parcel = $parser->parse('parcel Crustacean cnick Crust;')
     or die "failed to process parcel_definition";
-is( ${ Clownfish::Parser->get_parcel },
+is( ${ Clownfish::CFC::Parser->get_parcel },
     $$parcel, "parcel_definition sets internal \$parcel var" );
 
 for (qw( foo _foo foo_yoo FOO Foo fOO f00 foo_foo_foo )) {
@@ -45,7 +45,7 @@ for (qw( void float uint32_t int64_t uint8_t bool_t )) {
 }
 
 isa_ok( $parser->parse("bool_t"),
-    "Clownfish::Type", "Charmony integer specifier bool_t" );
+    "Clownfish::CFC::Type", "Charmony integer specifier bool_t" );
 
 is( $parser->parse("$_*")->get_specifier,
     "crust_$_", "object_type_specifier $_" )
@@ -56,7 +56,7 @@ ok( $parser->parse("const char")->const, "type_qualifier const" );
 ok( $parser->parse("$_ int32_t foo;")->$_, "exposure_specifier $_" )
     for qw( public private parcel );
 
-isa_ok( $parser->parse($_), "Clownfish::Type", "type $_" )
+isa_ok( $parser->parse($_), "Clownfish::CFC::Type", "type $_" )
     for ( 'const char *', 'Obj*', 'i32_t', 'char[]', 'long[1]', 'i64_t[30]' );
 
 is( $parser->parse("(int32_t foo = $_)")->get_initial_values->[0],
@@ -94,7 +94,7 @@ my %param_lists = (
 );
 while ( my ( $param_list, $num_params ) = each %param_lists ) {
     my $parsed = $parser->parse($param_list);
-    isa_ok( $parsed, "Clownfish::ParamList", "param_list: $param_list" );
+    isa_ok( $parsed, "Clownfish::CFC::ParamList", "param_list: $param_list" );
 }
 ok( $parser->parse("(int foo, ...)")->variadic, "variadic param list" );
 my $param_list = $parser->parse(q|(int foo = 0xFF, char *bar ="blah")|);

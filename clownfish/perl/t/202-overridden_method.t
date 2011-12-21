@@ -18,10 +18,10 @@ use warnings;
 
 use Test::More tests => 1;
 
-use Clownfish::Method;
-use Clownfish::Parser;
+use Clownfish::CFC::Method;
+use Clownfish::CFC::Parser;
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
@@ -34,8 +34,8 @@ my %args = (
     parcel      => 'Neato',
 );
 
-my $orig      = Clownfish::Method->new(%args);
-my $overrider = Clownfish::Method->new(
+my $orig      = Clownfish::CFC::Method->new(%args);
+my $overrider = Clownfish::CFC::Method->new(
     %args,
     param_list  => $parser->parse('(FooJr *self)'),
     class_name  => 'Neato::Foo::FooJr',

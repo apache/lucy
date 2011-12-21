@@ -47,7 +47,7 @@ ok( !$public_exposure->equals($parcel_exposure),
     "different exposure spoils equals"
 );
 
-my $lucifer_parcel = Clownfish::Parcel->singleton( name => 'Lucifer' );
+my $lucifer_parcel = Clownfish::CFC::Parcel->singleton( name => 'Lucifer' );
 my $lucifer = new_symbol( parcel => 'Lucifer' );
 ok( $$lucifer_parcel == ${ $lucifer->get_parcel }, "derive parcel" );
 is( $lucifer->get_prefix, "lucifer_", "get_prefix" );
@@ -74,7 +74,7 @@ is( $eep->short_sym, "Ork_ah_ah",     "short_sym" );
 is( $eep->full_sym,  "eep_Ork_ah_ah", "full_sym" );
 
 sub new_symbol {
-    return Clownfish::Symbol->new(
+    return Clownfish::CFC::Symbol->new(
         micro_sym => 'sym',
         exposure  => 'parcel',
         @_

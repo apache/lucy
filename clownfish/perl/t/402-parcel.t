@@ -18,12 +18,12 @@ use warnings;
 
 use Test::More tests => 7;
 
-BEGIN { use_ok('Clownfish::Parcel') }
+BEGIN { use_ok('Clownfish::CFC::Parcel') }
 
 # Register singleton.
-Clownfish::Parcel->singleton( name => 'Crustacean', cnick => 'Crust', );
+Clownfish::CFC::Parcel->singleton( name => 'Crustacean', cnick => 'Crust', );
 
-my $thing = Clownfish::Symbol->new(
+my $thing = Clownfish::CFC::Symbol->new(
     micro_sym => 'sym',
     exposure  => 'parcel',
 );
@@ -31,7 +31,7 @@ is( $thing->get_prefix, '', 'get_prefix with no parcel' );
 is( $thing->get_Prefix, '', 'get_Prefix with no parcel' );
 is( $thing->get_PREFIX, '', 'get_PREFIx with no parcel' );
 
-$thing = Clownfish::Symbol->new(
+$thing = Clownfish::CFC::Symbol->new(
     micro_sym => 'sym',
     parcel    => 'Crustacean',
     exposure  => 'parcel'

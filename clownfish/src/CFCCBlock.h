@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::CBlock - A block of embedded C code.
+/** Clownfish::CFC::CBlock - A block of embedded C code.
  *
  * CBlock exists to support embedding literal C code within Clownfish header
  * files:

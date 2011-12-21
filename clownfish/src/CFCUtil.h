@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-/** Clownfish::Util - Miscellaneous helper functions.
+/** Clownfish::CFC::Util - Miscellaneous helper functions.
  *
- * Clownfish::Util provides a few convenience functions used internally by
+ * Clownfish::CFC::Util provides a few convenience functions used internally by
  * other Clownfish modules.
  */
 

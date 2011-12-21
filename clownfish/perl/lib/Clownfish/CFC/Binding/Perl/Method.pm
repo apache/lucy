@@ -18,7 +18,7 @@ use warnings;
 
 package Clownfish::CFC::Binding::Perl::Method;
 use base qw( Clownfish::CFC::Binding::Perl::Subroutine );
-use Clownfish::Util qw( verify_args );
+use Clownfish::CFC::Util qw( verify_args );
 use Clownfish::CFC::Binding::Perl::TypeMap qw( from_perl to_perl );
 use Carp;
 
@@ -275,7 +275,7 @@ will be set up to accept a single positional argument.
 
 =over
 
-=item * B<method> - A L<Clownfish::Method>.
+=item * B<method> - A L<Clownfish::CFC::Method>.
 
 =back
 

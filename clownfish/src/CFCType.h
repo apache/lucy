@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::Type - A variable's type.
+/** Clownfish::CFC::Type - A variable's type.
  */
 
 #ifndef H_CFCTYPE
@@ -45,7 +45,7 @@ struct CFCParcel;
  * 
  * @param flags Flags which apply to the Type.  Supplying incompatible flags
  * will trigger an error.
- * @param parcel A Clownfish::Parcel.
+ * @param parcel A Clownfish::CFC::Parcel.
  * @param specifier The C name for the type, not including any indirection or
  * array subscripts.  
  * @param indirection integer indicating level of indirection. Example: the C
@@ -109,8 +109,8 @@ CFCType_new_float(int flags, const char *specifier);
  *
  * @param flags Allowed flags: OBJECT, STRING_TYPE, CONST, NULLABLE,
  * INCREMENTED, DECREMENTED.
- * @param parcel A Clownfish::Parcel.
- * @param specifier Required.  Must follow the rules for Clownfish::Class
+ * @param parcel A Clownfish::CFC::Parcel.
+ * @param specifier Required.  Must follow the rules for Clownfish::CFC::Class
  * class name components.
  * @param indirection Level of indirection.  Must be 1 if supplied.
  */
@@ -122,7 +122,7 @@ CFCType_new_object(int flags, struct CFCParcel *parcel, const char *specifier,
  * single, uniform subtype.
  *
  * @param flags Allowed flags: COMPOSITE, NULLABLE
- * @param child The Clownfish::Type which the composite is comprised of.
+ * @param child The Clownfish::CFC::Type which the composite is comprised of.
  * @param indirection integer indicating level of indirection. Example: the C type
  * "float**" has indirection 2.
  * @param array A string describing an array postfix.  
@@ -131,7 +131,7 @@ CFCType*
 CFCType_new_composite(int flags, CFCType *child, int indirection,
                       const char *array);
 
-/** Return a Clownfish::Type representing a the 'void' keyword in C.  It can
+/** Return a Clownfish::CFC::Type representing a the 'void' keyword in C.  It can
  * be used either for a void return type, or in conjuction with with
  * new_composite() to support the <code>void*</code> opaque pointer type.
  *
@@ -167,7 +167,7 @@ CFCType_new_va_list(void);
  *    Lobster_foo_t -> crust_Lobster_foo_t  # prefix prepended
  *
  * @param specifier The name of the type, which must end in "_t".
- * @param parcel A Clownfish::Parcel.
+ * @param parcel A Clownfish::CFC::Parcel.
  */
 CFCType*
 CFCType_new_arbitrary(struct CFCParcel *parcel, const char *specifier);
@@ -175,7 +175,7 @@ CFCType_new_arbitrary(struct CFCParcel *parcel, const char *specifier);
 void
 CFCType_destroy(CFCType *self);
 
-/** Returns true if two Clownfish::Type objects are equivalent.
+/** Returns true if two Clownfish::CFC::Type objects are equivalent.
  */
 int
 CFCType_equals(CFCType *self, CFCType *other);

@@ -19,12 +19,12 @@ use warnings;
 package Clownfish::CFC::Binding::Perl::Subroutine;
 use Carp;
 use Scalar::Util qw( blessed );
-use Clownfish::Class;
-use Clownfish::Function;
-use Clownfish::Method;
-use Clownfish::Variable;
-use Clownfish::ParamList;
-use Clownfish::Util qw( verify_args );
+use Clownfish::CFC::Class;
+use Clownfish::CFC::Function;
+use Clownfish::CFC::Method;
+use Clownfish::CFC::Variable;
+use Clownfish::CFC::ParamList;
+use Clownfish::CFC::Util qw( verify_args );
 
 our %new_PARAMS = (
     param_list         => undef,
@@ -118,8 +118,8 @@ my %prim_type_to_allot_macro = (
 
 sub _allot_params_arg {
     my ( $type, $label, $required ) = @_;
-    confess("Not a Clownfish::Type")
-        unless blessed($type) && $type->isa('Clownfish::Type');
+    confess("Not a Clownfish::CFC::Type")
+        unless blessed($type) && $type->isa('Clownfish::CFC::Type');
     my $len = length($label);
     my $req_string = $required ? 'true' : 'false';
 
@@ -195,7 +195,7 @@ __POD__
 =head1 NAME
 
 Clownfish::CFC::Binding::Perl::Subroutine - Abstract base binding for a
-Clownfish::Function.
+Clownfish::CFC::Function.
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ Abstract constructor.
 
 =over
 
-=item * B<param_list> - A L<Clownfish::ParamList>.
+=item * B<param_list> - A L<Clownfish::CFC::ParamList>.
 
 =item * B<alias> - The local, unqualified name for the Perl subroutine that
 will be used to invoke the function.

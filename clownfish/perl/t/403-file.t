@@ -18,10 +18,10 @@ use warnings;
 
 use Test::More tests => 17;
 
-use Clownfish::File;
-use Clownfish::Parser;
+use Clownfish::CFC::File;
+use Clownfish::CFC::Parser;
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 
 my $parcel_declaration = "parcel Stuff;";
 my $class_content      = qq|
@@ -64,9 +64,9 @@ is( $bar->get_type->get_specifier, 'stuff_Bar', 'parcel def is sticky' );
 
 my $blocks = $file->blocks;
 is( scalar @$blocks, 3, "all three blocks" );
-isa_ok( $blocks->[0], "Clownfish::Parcel" );
-isa_ok( $blocks->[1], "Clownfish::Class" );
-isa_ok( $blocks->[2], "Clownfish::CBlock" );
+isa_ok( $blocks->[0], "Clownfish::CFC::Parcel" );
+isa_ok( $blocks->[1], "Clownfish::CFC::Class" );
+isa_ok( $blocks->[2], "Clownfish::CFC::CBlock" );
 
 $file = $parser->_parse_file( $class_content, 'Stuff::Thing' );
 ($class) = @{ $file->classes };

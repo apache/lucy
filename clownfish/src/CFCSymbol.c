@@ -28,7 +28,7 @@
 #include "CFCUtil.h"
 
 const static CFCMeta CFCSYMBOL_META = {
-    "Clownfish::Symbol",
+    "Clownfish::CFC::Symbol",
     sizeof(CFCSymbol),
     (CFCBase_destroy_t)CFCSymbol_destroy
 };

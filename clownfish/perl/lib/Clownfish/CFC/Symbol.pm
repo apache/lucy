@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Clownfish::Parcel;
+package Clownfish::CFC::Symbol;
 use Clownfish;
 
 1;

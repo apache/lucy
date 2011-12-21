@@ -63,7 +63,7 @@ static int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified);
 
 const static CFCMeta CFCHIERARCHY_META = {
-    "Clownfish::Hierarchy",
+    "Clownfish::CFC::Hierarchy",
     sizeof(CFCHierarchy),
     (CFCBase_destroy_t)CFCHierarchy_destroy
 };

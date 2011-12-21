@@ -215,12 +215,12 @@ sub ACTION_lemon {
 sub _compile_clownfish {
     my $self = shift;
 
-    require Clownfish::Hierarchy;
+    require Clownfish::CFC::Hierarchy;
     require Clownfish::CFC::Binding::Perl;
     require Clownfish::CFC::Binding::Perl::Class;
 
     # Compile Clownfish.
-    my $hierarchy = Clownfish::Hierarchy->new(
+    my $hierarchy = Clownfish::CFC::Hierarchy->new(
         source => $CORE_SOURCE_DIR,
         dest   => $AUTOGEN_DIR,
     );

@@ -18,10 +18,10 @@ use warnings;
 
 use Test::More tests => 30;
 
-BEGIN { use_ok('Clownfish::Method') }
-use Clownfish::Parser;
+BEGIN { use_ok('Clownfish::CFC::Method') }
+use Clownfish::CFC::Parser;
 
-my $parser = Clownfish::Parser->new;
+my $parser = Clownfish::CFC::Parser->new;
 $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
@@ -34,62 +34,62 @@ my %args = (
     macro_sym   => 'Return_An_Obj',
 );
 
-my $method = Clownfish::Method->new(%args);
-isa_ok( $method, "Clownfish::Method" );
+my $method = Clownfish::CFC::Method->new(%args);
+isa_ok( $method, "Clownfish::CFC::Method" );
 
 ok( $method->parcel, "parcel exposure by default" );
 
-eval { my $death = Clownfish::Method->new( %args, extra_arg => undef ) };
+eval { my $death = Clownfish::CFC::Method->new( %args, extra_arg => undef ) };
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
-eval { Clownfish::Method->new( %args, macro_sym => 'return_an_obj' ); };
+eval { Clownfish::CFC::Method->new( %args, macro_sym => 'return_an_obj' ); };
 like( $@, qr/macro_sym/, "Invalid macro_sym kills constructor" );
 
-my $dupe = Clownfish::Method->new(%args);
+my $dupe = Clownfish::CFC::Method->new(%args);
 ok( $method->compatible($dupe), "compatible()" );
 
-my $macro_sym_differs = Clownfish::Method->new( %args, macro_sym => 'Eat' );
+my $macro_sym_differs = Clownfish::CFC::Method->new( %args, macro_sym => 'Eat' );
 ok( !$method->compatible($macro_sym_differs),
     "different macro_sym spoils compatible()"
 );
 ok( !$macro_sym_differs->compatible($method), "... reversed" );
 
-my $extra_param = Clownfish::Method->new( %args,
+my $extra_param = Clownfish::CFC::Method->new( %args,
     param_list => $parser->parse('(Foo *self, int32_t count = 0, int b)'), );
 ok( !$method->compatible($macro_sym_differs),
     "extra param spoils compatible()"
 );
 ok( !$extra_param->compatible($method), "... reversed" );
 
-my $default_differs = Clownfish::Method->new( %args,
+my $default_differs = Clownfish::CFC::Method->new( %args,
     param_list => $parser->parse('(Foo *self, int32_t count = 1)'), );
 ok( !$method->compatible($default_differs),
     "different initial_value spoils compatible()"
 );
 ok( !$default_differs->compatible($method), "... reversed" );
 
-my $missing_default = Clownfish::Method->new( %args,
+my $missing_default = Clownfish::CFC::Method->new( %args,
     param_list => $parser->parse('(Foo *self, int32_t count)'), );
 ok( !$method->compatible($missing_default),
     "missing initial_value spoils compatible()"
 );
 ok( !$missing_default->compatible($method), "... reversed" );
 
-my $param_name_differs = Clownfish::Method->new( %args,
+my $param_name_differs = Clownfish::CFC::Method->new( %args,
     param_list => $parser->parse('(Foo *self, int32_t countess)'), );
 ok( !$method->compatible($param_name_differs),
     "different param name spoils compatible()"
 );
 ok( !$param_name_differs->compatible($method), "... reversed" );
 
-my $param_type_differs = Clownfish::Method->new( %args,
+my $param_type_differs = Clownfish::CFC::Method->new( %args,
     param_list => $parser->parse('(Foo *self, uint32_t count)'), );
 ok( !$method->compatible($param_type_differs),
     "different param type spoils compatible()"
 );
 ok( !$param_type_differs->compatible($method), "... reversed" );
 
-my $self_type_differs = Clownfish::Method->new(
+my $self_type_differs = Clownfish::CFC::Method->new(
     %args,
     class_name  => 'Neato::Bar',
     class_cnick => 'Bar',
@@ -99,7 +99,7 @@ ok( $method->compatible($self_type_differs),
     "different self type still compatible(), since can't test inheritance" );
 ok( $self_type_differs->compatible($method), "... reversed" );
 
-my $not_final = Clownfish::Method->new(%args);
+my $not_final = Clownfish::CFC::Method->new(%args);
 my $final     = $not_final->finalize;
 
 eval { $method->override($final); };
@@ -114,7 +114,7 @@ for my $meth_meth (qw( short_method_sym full_method_sym full_offset_sym)) {
 
 $parser->set_class_name("Neato::Obj");
 $parser->set_class_cnick("Obj");
-isa_ok( $parser->parse($_), "Clownfish::Method", "method declaration: $_" )
+isa_ok( $parser->parse($_), "Clownfish::CFC::Method", "method declaration: $_" )
     for (
     'public int Do_Foo(Obj *self);',
     'parcel Obj* Gimme_An_Obj(Obj *self);',

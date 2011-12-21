@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::ParamList - parameter list.
+/** Clownfish::CFC::ParamList - parameter list.
  */
 
 #ifndef H_CFCPARAMLIST
@@ -41,7 +41,7 @@ CFCParamList_destroy(CFCParamList *self);
 
 /** Add a parameter to the ParamList.
  * 
- * @param variable A Clownfish::Variable.
+ * @param variable A Clownfish::CFC::Variable.
  * @param value The parameter's default value, which should be NULL
  * if there is no default and thus the parameter is required.
  */

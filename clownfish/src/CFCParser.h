@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-/** Clownfish::Parser - Parse Clownfish header files.
+/** Clownfish::CFC::Parser - Parse Clownfish header files.
  *
- * Clownfish::Parser is a combined lexer/parser which parses Clownfish header
+ * Clownfish::CFC::Parser is a combined lexer/parser which parses Clownfish header
  * files.  It is not at all strict, as it relies heavily on the C parser to
  * pick up errors such as misspelled type names.  
  */
