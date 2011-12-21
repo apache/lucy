@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package Clownfish::Build;
+package Clownfish::CFC::Build;
 use base qw( Module::Build );
 
 use File::Spec::Functions qw( catfile updir catdir );

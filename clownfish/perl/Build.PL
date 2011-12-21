@@ -17,10 +17,10 @@ use 5.008003;
 use strict;
 use warnings;
 use lib 'buildlib';
-use Clownfish::Build;
+use Clownfish::CFC::Build;
 use File::Spec::Functions qw( updir catdir );
 
-my $builder = Clownfish::Build->new(
+my $builder = Clownfish::CFC::Build->new(
     module_name => 'Clownfish',
     license     => 'apache',
     dist_author =>
