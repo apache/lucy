@@ -82,6 +82,18 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
+    package Clownfish::Binding::Perl::TypeMap;
+    use base qw( Exporter );
+
+    BEGIN { our @EXPORT_OK = qw( from_perl to_perl ) }
+
+    sub write_xs_typemap {
+        my ( undef, %args ) = @_;
+        _write_xs_typemap( $args{hierarchy} );
+    }
+}
+
+{
     package Clownfish::Base;
 }
 
@@ -630,38 +642,12 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
     package Clownfish::Binding::Perl::Constructor;
-    BEGIN { push our @ISA, 'Clownfish::Binding::Perl::Subroutine' }
-    use Carp;
-    use Clownfish::Util qw( verify_args );
-
-    our %new_PARAMS = (
-        class => undef,
-        alias => undef,
-    );
-
-    sub new {
-        my ( $either, %args ) = @_;
-        confess $@ unless verify_args( \%new_PARAMS, %args );
-        return _new( @args{qw( class alias )} );
-    }
+    use Clownfish::Binding::Perl::Class;
 }
 
 {
     package Clownfish::Binding::Perl::Method;
-    BEGIN { push our @ISA, 'Clownfish::Binding::Perl::Subroutine' }
-    use Clownfish::Util qw( verify_args );
-    use Carp;
-
-    our %new_PARAMS = (
-        method => undef,
-        alias  => undef,
-    );
-
-    sub new {
-        my ( $either, %args ) = @_;
-        confess $@ unless verify_args( \%new_PARAMS, %args );
-        return _new( @args{qw( method alias )} );
-    }
+    use Clownfish::Binding::Perl::Method;
 }
 
 {
@@ -705,23 +691,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 
 {
     package Clownfish::Binding::Perl::Subroutine;
-    BEGIN { push our @ISA, 'Clownfish::Base' }
-    use Carp;
-    use Clownfish::Util qw( verify_args );
-
-    sub xsub_def { confess "Abstract method" }
-}
-
-{
-    package Clownfish::Binding::Perl::TypeMap;
-    use base qw( Exporter );
-
-    our @EXPORT_OK = qw( from_perl to_perl );
-
-    sub write_xs_typemap {
-        my ( undef, %args ) = @_;
-        _write_xs_typemap( $args{hierarchy} );
-    }
+    use Clownfish::Binding::Perl::Subroutine;
 }
 
 1;

@@ -13,8 +13,95 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+use strict;
+use warnings;
+
 package Clownfish::Binding::Perl::Constructor;
-use Clownfish;
+use base qw( Clownfish::Binding::Perl::Subroutine );
+use Carp;
+use Clownfish::ParamList;
+
+sub new {
+    my ( $either, %args ) = @_;
+    my $class          = delete $args{class};
+    my $alias          = delete $args{alias};
+    my $init_func_name = $alias =~ s/^(\w+)\|(\w+)$/$1/ ? $2 : 'init';
+    my $class_name     = $class->get_class_name;
+
+    # Find the implementing function.
+    my $func;
+    for my $function ( @{ $class->functions } ) {
+        next unless $function->micro_sym eq $init_func_name;
+        $func = $function;
+        last;
+    }
+    confess("Missing or invalid init() function for $class_name")
+        unless $func;
+
+    my $self = $either->SUPER::new(
+        param_list         => $func->get_param_list,
+        class_name         => $class_name,
+        use_labeled_params => 1,
+        alias              => $alias,
+        %args
+    );
+    $self->{init_func} = $func;
+    return $self;
+}
+
+sub xsub_def {
+    my $self         = shift;
+    my $c_name       = $self->c_name;
+    my $param_list   = $self->{param_list};
+    my $name_list    = $param_list->name_list;
+    my $arg_inits    = $param_list->get_initial_values;
+    my $arg_vars     = $param_list->get_variables;
+    my $func_sym     = $self->{init_func}->full_func_sym;
+    my $allot_params = $self->build_allot_params;
+
+    # Compensate for swallowed refcounts.
+    my $refcount_mods = "";
+    for ( my $i = 1; $i <= $#$arg_vars; $i++ ) {
+        my $var  = $arg_vars->[$i];
+        my $type = $var->get_type;
+        if ( $type->is_object and $type->decremented ) {
+            my $name = $var->micro_sym;
+            $refcount_mods .= "\n    CFISH_INCREF($name);";
+        }
+    }
+
+    # Last, so that earlier exceptions while fetching params don't trigger bad
+    # DESTROY.
+    my $self_var  = $arg_vars->[0];
+    my $self_type = $self_var->get_type->to_c;
+    my $self_assign
+        = qq|$self_type self = ($self_type)XSBind_new_blank_obj(ST(0));|;
+
+    return <<END_STUFF;
+XS($c_name);
+XS($c_name) {
+    dXSARGS;
+    CHY_UNUSED_VAR(cv);
+    if (items < 1) { CFISH_THROW(CFISH_ERR, "Usage: %s(class_name, ...)",  GvNAME(CvGV(cv))); }
+    SP -= items;
+
+    $allot_params
+    $self_assign$refcount_mods
+
+    $self_type retval = $func_sym($name_list);
+    if (retval) {
+        ST(0) = (SV*)Cfish_Obj_To_Host((cfish_Obj*)retval);
+        Cfish_Obj_Dec_RefCount((cfish_Obj*)retval);
+    }
+    else {
+        ST(0) = newSV(0);
+    }
+    sv_2mortal(ST(0));
+    XSRETURN(1);
+}
+
+END_STUFF
+}
 
 1;
 
@@ -60,3 +147,4 @@ should be bound.  The default function is "init".
 Generate the XSUB code.
 
 =cut
+
