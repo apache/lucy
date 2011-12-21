@@ -31,7 +31,7 @@ my $synopsis = <<'END_SYNOPSIS';
     }
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Index::DeletionsWriter",
     bind_methods => [
@@ -57,7 +57,7 @@ Clownfish::Binding::Perl::Class->register(
         ],
     },
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DefaultDeletionsWriter",
     bind_constructors => ["new"],

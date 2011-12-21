@@ -30,7 +30,7 @@ END_SYNOPSIS
 
 my $constructor = $synopsis;
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Store::FSFolder",
     bind_constructors => ["new"],

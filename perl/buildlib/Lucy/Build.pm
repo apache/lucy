@@ -216,8 +216,8 @@ sub _compile_clownfish {
     my $self = shift;
 
     require Clownfish::Hierarchy;
-    require Clownfish::Binding::Perl;
-    require Clownfish::Binding::Perl::Class;
+    require Clownfish::CFC::Binding::Perl;
+    require Clownfish::CFC::Binding::Perl::Class;
 
     # Compile Clownfish.
     my $hierarchy = Clownfish::Hierarchy->new(
@@ -242,7 +242,7 @@ sub _compile_clownfish {
         }
     }
 
-    my $binding = Clownfish::Binding::Perl->new(
+    my $binding = Clownfish::CFC::Binding::Perl->new(
         parcel     => 'Lucy',
         hierarchy  => $hierarchy,
         lib_dir    => $LIB_DIR,

@@ -22,7 +22,7 @@ __END__
 
 __BINDING__
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Store::FSFileHandle",
     bind_constructors => ['_open|do_open'],

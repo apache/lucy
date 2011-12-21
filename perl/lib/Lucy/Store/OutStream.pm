@@ -56,7 +56,7 @@ my $synopsis = <<'END_SYNOPSIS';    # Don't use this yet.
     $outstream->write_u64($file_position);
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Store::OutStream",
     xs_code      => $xs_code,

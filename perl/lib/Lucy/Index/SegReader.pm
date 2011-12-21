@@ -39,7 +39,7 @@ my $synopsis = <<'END_SYNOPSIS';
     }
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::SegReader",
     bind_methods      => [qw( Get_Seg_Name Get_Seg_Num Register )],

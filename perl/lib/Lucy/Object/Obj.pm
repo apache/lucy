@@ -193,7 +193,7 @@ All Lucy classes implement a DESTROY method; if you override it in a
 subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.
 END_DESCRIPTION
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Object::Obj",
     xs_code      => $xs_code,

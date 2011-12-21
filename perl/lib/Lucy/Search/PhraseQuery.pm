@@ -30,7 +30,7 @@ my $synopsis = <<'END_SYNOPSIS';
     my $hits = $searcher->hits( query => $phrase_query );
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Search::PhraseQuery",
     bind_methods      => [qw( Get_Field Get_Terms )],
@@ -41,7 +41,7 @@ Clownfish::Binding::Perl::Class->register(
         methods     => [qw( get_field get_terms )],
     },
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Search::PhraseCompiler",
     bind_constructors => ["do_new"],

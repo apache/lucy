@@ -34,7 +34,7 @@ my $constructor = <<'END_CONSTRUCTOR';
     my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
 END_CONSTRUCTOR
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Analysis::StandardTokenizer",
     bind_constructors => ["new"],

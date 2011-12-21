@@ -619,33 +619,33 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Binding::Perl;
-    use Clownfish::Binding::Perl;
+    package Clownfish::CFC::Binding::Perl;
+    use Clownfish::CFC::Binding::Perl;
 }
 
 {
-    package Clownfish::Binding::Perl::Class;
-    use Clownfish::Binding::Perl::Class;
+    package Clownfish::CFC::Binding::Perl::Class;
+    use Clownfish::CFC::Binding::Perl::Class;
 }
 
 {
-    package Clownfish::Binding::Perl::Constructor;
-    use Clownfish::Binding::Perl::Class;
+    package Clownfish::CFC::Binding::Perl::Constructor;
+    use Clownfish::CFC::Binding::Perl::Class;
 }
 
 {
-    package Clownfish::Binding::Perl::Method;
-    use Clownfish::Binding::Perl::Method;
+    package Clownfish::CFC::Binding::Perl::Method;
+    use Clownfish::CFC::Binding::Perl::Method;
 }
 
 {
-    package Clownfish::Binding::Perl::Subroutine;
-    use Clownfish::Binding::Perl::Subroutine;
+    package Clownfish::CFC::Binding::Perl::Subroutine;
+    use Clownfish::CFC::Binding::Perl::Subroutine;
 }
 
 {
-    package Clownfish::Binding::Perl::TypeMap;
-    use Clownfish::Binding::Perl::TypeMap;
+    package Clownfish::CFC::Binding::Perl::TypeMap;
+    use Clownfish::CFC::Binding::Perl::TypeMap;
 }
 
 

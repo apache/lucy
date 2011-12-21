@@ -22,7 +22,7 @@ __END__
 
 __BINDING__
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::SegLexicon",
     bind_methods      => [qw( Get_Term_Info Get_Field_Num )],

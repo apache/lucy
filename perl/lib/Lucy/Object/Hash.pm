@@ -75,7 +75,7 @@ PPCODE:
 }
 END_XS_CODE
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Object::Hash",
     xs_code      => $xs_code,

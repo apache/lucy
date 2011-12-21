@@ -37,7 +37,7 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Search::TermQuery",
     bind_methods      => [qw( Get_Field Get_Term )],
@@ -48,7 +48,7 @@ Clownfish::Binding::Perl::Class->register(
         methods     => [qw( get_field get_term )],
     },
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Search::TermCompiler",
     bind_constructors => ["do_new"],

@@ -32,7 +32,7 @@ PPCODE:
     lucy_SortWriter_set_default_mem_thresh(mem_thresh);
 END_XS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::SortWriter",
     xs_code           => $xs_code,

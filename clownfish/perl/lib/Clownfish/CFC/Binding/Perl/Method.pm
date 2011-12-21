@@ -16,10 +16,10 @@
 use strict;
 use warnings;
 
-package Clownfish::Binding::Perl::Method;
-use base qw( Clownfish::Binding::Perl::Subroutine );
+package Clownfish::CFC::Binding::Perl::Method;
+use base qw( Clownfish::CFC::Binding::Perl::Subroutine );
 use Clownfish::Util qw( verify_args );
-use Clownfish::Binding::Perl::TypeMap qw( from_perl to_perl );
+use Clownfish::CFC::Binding::Perl::TypeMap qw( from_perl to_perl );
 use Carp;
 
 our %new_PARAMS = (
@@ -254,11 +254,11 @@ __POD__
 
 =head1 NAME
 
-Clownfish::Binding::Perl::Method - Binding for an object method.
+Clownfish::CFC::Binding::Perl::Method - Binding for an object method.
 
 =head1 DESCRIPTION
 
-This class isa Clownfish::Binding::Perl::Subroutine -- see its
+This class isa Clownfish::CFC::Binding::Perl::Subroutine -- see its
 documentation for various code-generating routines.
 
 Method bindings use labeled parameters if the C function takes more than one
@@ -269,7 +269,7 @@ will be set up to accept a single positional argument.
 
 =head2 new
 
-    my $binding = Clownfish::Binding::Perl::Method->new(
+    my $binding = Clownfish::CFC::Binding::Perl::Method->new(
         method => $method,    # required
     );
 

@@ -26,7 +26,7 @@ my $constructor = <<'END_CONSTRUCTOR';
     my $no_match_query = Lucy::Search::NoMatchQuery->new;
 END_CONSTRUCTOR
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Search::NoMatchQuery",
     bind_constructors => ["new"],

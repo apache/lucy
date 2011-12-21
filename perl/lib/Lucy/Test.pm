@@ -270,13 +270,13 @@ PPCODE:
     lucy_TestQPSyntax_run_tests(index);
 END_XS_CODE
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Test::TestSchema",
     bind_constructors => ["new"],
 );
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Test",
     xs_code           => $xs_code,

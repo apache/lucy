@@ -31,7 +31,7 @@ my $synopsis = <<'END_SYNOPSIS';
     my $hits = $searcher->hits( query => $proximity_query );
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "LucyX::Search::ProximityQuery",
     bind_methods      => [qw( Get_Field Get_Terms )],
@@ -42,7 +42,7 @@ Clownfish::Binding::Perl::Class->register(
         methods     => [qw( get_field get_terms get_within )],
     },
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "LucyX::Search::ProximityCompiler",
     bind_constructors => ["do_new"],

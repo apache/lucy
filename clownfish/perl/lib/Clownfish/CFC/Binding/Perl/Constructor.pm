@@ -16,8 +16,8 @@
 use strict;
 use warnings;
 
-package Clownfish::Binding::Perl::Constructor;
-use base qw( Clownfish::Binding::Perl::Subroutine );
+package Clownfish::CFC::Binding::Perl::Constructor;
+use base qw( Clownfish::CFC::Binding::Perl::Subroutine );
 use Carp;
 use Clownfish::ParamList;
 
@@ -111,11 +111,11 @@ __POD__
 
 =head1 NAME
 
-Clownfish::Binding::Perl::Constructor - Binding for an object method.
+Clownfish::CFC::Binding::Perl::Constructor - Binding for an object method.
 
 =head1 DESCRIPTION
 
-This class isa Clownfish::Binding::Perl::Subroutine -- see its
+This class isa Clownfish::CFC::Binding::Perl::Subroutine -- see its
 documentation for various code-generating routines.
 
 Constructors are always bound to accept labeled params, even if there is only
@@ -125,7 +125,7 @@ a single argument.
 
 =head2 new
 
-    my $constructor_binding = Clownfish::Binding::Perl::Constructor->new(
+    my $constructor_binding = Clownfish::CFC::Binding::Perl::Constructor->new(
         class => $class,
         alias => "_new|init2",
     );

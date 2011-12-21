@@ -78,7 +78,7 @@ PPCODE:
 }
 END_XS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Analysis::Token",
     bind_methods => [

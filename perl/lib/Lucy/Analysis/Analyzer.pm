@@ -22,7 +22,7 @@ __END__
 
 __BINDING__
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Analysis::Analyzer",
     bind_methods      => [qw( Transform Transform_Text Split )],

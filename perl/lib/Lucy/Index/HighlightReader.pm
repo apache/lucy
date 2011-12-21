@@ -22,12 +22,12 @@ __END__
 
 __BINDING__
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::HighlightReader",
     bind_constructors => ["new"],
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DefaultHighlightReader",
     bind_constructors => ["new"],

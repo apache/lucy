@@ -174,7 +174,7 @@ B<boost> - A floating point weight which affects how this document scores.
 
 END_ADD_DOC_POD
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Index::Indexer",
     xs_code      => $xs_code,

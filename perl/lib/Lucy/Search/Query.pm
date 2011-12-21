@@ -46,7 +46,7 @@ my $constructor = <<'END_CONSTRUCTOR_CODE_SAMPLE';
     );
 END_CONSTRUCTOR_CODE_SAMPLE
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Search::Query",
     bind_methods => [

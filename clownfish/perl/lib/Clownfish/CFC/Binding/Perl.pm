@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package Clownfish::Binding::Perl;
+package Clownfish::CFC::Binding::Perl;
 
 use Clownfish::Hierarchy;
 use Carp;
@@ -29,9 +29,9 @@ use Clownfish::Function;
 use Clownfish::Method;
 use Clownfish::Variable;
 use Clownfish::Util qw( verify_args a_isa_b write_if_changed );
-use Clownfish::Binding::Perl::Class;
-use Clownfish::Binding::Perl::Method;
-use Clownfish::Binding::Perl::Constructor;
+use Clownfish::CFC::Binding::Perl::Class;
+use Clownfish::CFC::Binding::Perl::Method;
+use Clownfish::CFC::Binding::Perl::Constructor;
 
 our %new_PARAMS = (
     parcel     => undef,
@@ -80,7 +80,7 @@ sub new {
 sub write_bindings {
     my $self           = shift;
     my $ordered        = $self->{hierarchy}->ordered_classes;
-    my $registered     = Clownfish::Binding::Perl::Class->registered;
+    my $registered     = Clownfish::CFC::Binding::Perl::Class->registered;
     my $hand_rolled_xs = "";
     my $generated_xs   = "";
     my $xs             = "";
@@ -93,7 +93,7 @@ sub write_bindings {
     for my $class (@$registered) {
         my $class_name = $class->get_class_name;
         my $class_binding
-            = Clownfish::Binding::Perl::Class->singleton($class_name)
+            = Clownfish::CFC::Binding::Perl::Class->singleton($class_name)
             or next;
         $has_constructors{$class_name} = 1
             if $class_binding->get_bind_constructors;
@@ -115,7 +115,7 @@ sub write_bindings {
         my $class_name = $class->get_class_name;
         next unless delete $has_constructors{$class_name};
         my $class_binding
-            = Clownfish::Binding::Perl::Class->singleton($class_name);
+            = Clownfish::CFC::Binding::Perl::Class->singleton($class_name);
         my @bound = $class_binding->constructor_bindings;
         $generated_xs .= $_->xsub_def . "\n" for @bound;
         push @xsubs, @bound;
@@ -126,7 +126,7 @@ sub write_bindings {
         my $class_name = $class->get_class_name;
         next unless delete $has_methods{$class_name};
         my $class_binding
-            = Clownfish::Binding::Perl::Class->singleton($class_name);
+            = Clownfish::CFC::Binding::Perl::Class->singleton($class_name);
         my @bound = $class_binding->method_bindings;
         $generated_xs .= $_->xsub_def . "\n" for @bound;
         push @xsubs, @bound;
@@ -135,7 +135,7 @@ sub write_bindings {
     # Hand-rolled XS.
     for my $class_name ( keys %has_xs_code ) {
         my $class_binding
-            = Clownfish::Binding::Perl::Class->singleton($class_name);
+            = Clownfish::CFC::Binding::Perl::Class->singleton($class_name);
         $hand_rolled_xs .= $class_binding->get_xs_code . "\n";
     }
     %has_xs_code = ();
@@ -267,14 +267,14 @@ sub prepare_pod {
     my %has_pod;
     my %modified;
 
-    my $registered = Clownfish::Binding::Perl::Class->registered;
+    my $registered = Clownfish::CFC::Binding::Perl::Class->registered;
     $has_pod{ $_->get_class_name } = 1
         for grep { $_->get_make_pod } @$registered;
 
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
         my $class_binding
-            = Clownfish::Binding::Perl::Class->singleton($class_name)
+            = Clownfish::CFC::Binding::Perl::Class->singleton($class_name)
             or next;
         next unless delete $has_pod{$class_name};
         my $pod = $class_binding->create_pod
@@ -427,7 +427,7 @@ END_STUFF
 
 sub write_xs_typemap {
     my $self = shift;
-    Clownfish::Binding::Perl::TypeMap->write_xs_typemap(
+    Clownfish::CFC::Binding::Perl::TypeMap->write_xs_typemap(
         hierarchy => $self->{hierarchy}, );
 }
 
@@ -439,11 +439,11 @@ __POD__
 
 =head1 NAME
 
-Clownfish::Binding::Perl - Perl bindings for a Clownfish::Hierarchy.
+Clownfish::CFC::Binding::Perl - Perl bindings for a Clownfish::Hierarchy.
 
 =head1 DESCRIPTION
 
-Clownfish::Binding::Perl presents an interface for auto-generating XS and
+Clownfish::CFC::Binding::Perl presents an interface for auto-generating XS and
 Perl code to bind C code for a Clownfish class hierarchy to Perl.
 
 In theory this module could be much more flexible and its API could be more
@@ -472,7 +472,7 @@ If it is "Crustacean", the following files will be generated.
 
 =head2 new
 
-    my $perl_binding = Clownfish::Binding::Perl->new(
+    my $perl_binding = Clownfish::CFC::Binding::Perl->new(
         boot_class => 'Crustacean',                    # required
         parcel     => 'Crustacean',                    # required
         hierarchy  => $hierarchy,                      # required

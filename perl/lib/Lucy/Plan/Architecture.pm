@@ -71,7 +71,7 @@ my $constructor = <<'END_CONSTRUCTOR';
     my $arch = Lucy::Plan::Architecture->new;
 END_CONSTRUCTOR
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Plan::Architecture",
     bind_methods => [

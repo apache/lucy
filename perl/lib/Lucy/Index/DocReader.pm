@@ -27,7 +27,7 @@ my $synopsis = <<'END_SYNOPSIS';
     my $doc        = $doc_reader->fetch_doc($doc_id);
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DocReader",
     bind_constructors => ["new"],
@@ -37,7 +37,7 @@ Clownfish::Binding::Perl::Class->register(
         methods  => [qw( fetch_doc aggregator )],
     },
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DefaultDocReader",
     bind_constructors => ["new"],

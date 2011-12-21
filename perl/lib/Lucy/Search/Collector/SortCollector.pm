@@ -22,7 +22,7 @@ __END__
 
 __BINDING__
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Search::Collector::SortCollector",
     bind_methods      => [qw( Pop_Match_Docs Get_Total_Hits )],

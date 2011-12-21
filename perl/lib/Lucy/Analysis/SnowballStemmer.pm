@@ -37,7 +37,7 @@ my $constructor = <<'END_CONSTRUCTOR';
     my $stemmer = Lucy::Analysis::SnowballStemmer->new( language => 'es' );
 END_CONSTRUCTOR
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Analysis::SnowballStemmer",
     bind_constructors => ["new"],

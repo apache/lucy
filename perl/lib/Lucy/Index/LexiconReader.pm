@@ -27,7 +27,7 @@ my $synopsis = <<'END_SYNOPSIS';
     my $lexicon    = $lex_reader->lexicon( field => 'title' );
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::LexiconReader",
     bind_methods      => [qw( Lexicon Doc_Freq Fetch_Term_Info )],
@@ -37,7 +37,7 @@ Clownfish::Binding::Perl::Class->register(
         methods  => [qw( lexicon doc_freq )],
     },
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DefaultLexiconReader",
     bind_constructors => ["new"],

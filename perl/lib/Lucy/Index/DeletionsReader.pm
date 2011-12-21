@@ -22,13 +22,13 @@ __END__
 
 __BINDING__
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DeletionsReader",
     bind_constructors => ['new'],
     bind_methods      => [qw( Iterator Del_Count )],
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DefaultDeletionsReader",
     bind_constructors => ['new'],

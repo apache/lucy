@@ -40,7 +40,7 @@ my $synopsis = <<'END_SYNOPSIS';
     my $searcher = Lucy::Search::IndexSearcher->new( index => $reader );
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel     => "Lucy",
     class_name => "Lucy::Docs::FileLocking",
     make_pod   => { synopsis => $synopsis, },

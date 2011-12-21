@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package Clownfish::Binding::Perl::Subroutine;
+package Clownfish::CFC::Binding::Perl::Subroutine;
 use Carp;
 use Scalar::Util qw( blessed );
 use Clownfish::Class;
@@ -194,7 +194,7 @@ __POD__
 
 =head1 NAME
 
-Clownfish::Binding::Perl::Subroutine - Abstract base binding for a
+Clownfish::CFC::Binding::Perl::Subroutine - Abstract base binding for a
 Clownfish::Function.
 
 =head1 SYNOPSIS

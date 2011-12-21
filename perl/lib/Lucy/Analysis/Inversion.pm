@@ -54,7 +54,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "Lucy::Analysis::Inversion",
     bind_methods => [qw( Append Reset Invert Next )],

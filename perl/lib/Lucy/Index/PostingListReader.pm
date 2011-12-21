@@ -31,7 +31,7 @@ my $synopsis = <<'END_SYNOPSIS';
     );
 END_SYNOPSIS
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::PostingListReader",
     bind_constructors => ["new"],
@@ -41,7 +41,7 @@ Clownfish::Binding::Perl::Class->register(
         methods  => [qw( posting_list )],
     },
 );
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Index::DefaultPostingListReader",
     bind_constructors => ["new"],

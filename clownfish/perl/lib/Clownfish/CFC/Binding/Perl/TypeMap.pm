@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package Clownfish::Binding::Perl::TypeMap;
+package Clownfish::CFC::Binding::Perl::TypeMap;
 use base qw( Exporter );
 use Scalar::Util qw( blessed );
 use Carp;
@@ -229,7 +229,7 @@ __POD__
 
 =head1 NAME
 
-Clownfish::Binding::Perl::TypeMap - Convert between Clownfish and Perl via XS.
+Clownfish::CFC::Binding::Perl::TypeMap - Convert between Clownfish and Perl via XS.
 
 =head1 DESCRIPTION
 
@@ -277,7 +277,7 @@ value.
 
 =head2 write_xs_typemap 
 
-    Clownfish::Binding::Perl::Typemap->write_xs_typemap(
+    Clownfish::CFC::Binding::Perl::Typemap->write_xs_typemap(
         hierarchy => $hierarchy,
     );
 

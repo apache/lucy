@@ -44,7 +44,7 @@ __END__
 
 __BINDING__
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel       => "Lucy",
     class_name   => "LucyX::Search::MockMatcher",
     bind_constructors => ["_new|init"],

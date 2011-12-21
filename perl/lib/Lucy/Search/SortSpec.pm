@@ -39,7 +39,7 @@ my $constructor = <<'END_CONSTRUCTOR';
     my $sort_spec = Lucy::Search::SortSpec->new( rules => \@rules );
 END_CONSTRUCTOR
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Search::SortSpec",
     bind_methods      => [qw( Get_Rules )],

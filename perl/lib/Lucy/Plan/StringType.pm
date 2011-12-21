@@ -37,7 +37,7 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::Binding::Perl::Class->register(
+Clownfish::CFC::Binding::Perl::Class->register(
     parcel            => "Lucy",
     class_name        => "Lucy::Plan::StringType",
     bind_constructors => ["new|init2"],
