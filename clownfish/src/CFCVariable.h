@@ -36,7 +36,7 @@ typedef struct CFCVariable CFCVariable;
 struct CFCParcel;
 struct CFCType;
 
-/** 
+/**
  * @param type A Clownfish::CFC::Type.
  * @param micro_sym The variable's name, without any namespacing prefixes.
  * @param exposure See Clownfish::CFC::Symbol.

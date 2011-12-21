@@ -137,13 +137,16 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         my $parcel = $args{parcel};
         if ( defined $parcel ) {
             if ( !a_isa_b( $parcel, "Clownfish::CFC::Parcel" ) ) {
-                $parcel = Clownfish::CFC::Parcel->singleton( name => $parcel );
+                $parcel
+                    = Clownfish::CFC::Parcel->singleton( name => $parcel );
             }
         }
         return _fetch_singleton( $parcel, $args{class_name} );
     }
 
-    sub new { confess("The constructor for Clownfish::CFC::Class is create()") }
+    sub new {
+        confess("The constructor for Clownfish::CFC::Class is create()");
+    }
 
     sub create {
         my ( $either, %args ) = @_;
@@ -308,11 +311,11 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         return _singleton( @args{qw( name cnick )} );
     }
 
-    #    $parcel = Clownfish::CFC::Parcel->aquire($parcel_name_or_parcel_object);
-    #
-    # Aquire a parcel one way or another.  If the supplied argument is a
-    # Parcel, return it.  If it's not defined, return the default Parcel.  If
-    # it's a name, invoke singleton().
+ #    $parcel = Clownfish::CFC::Parcel->aquire($parcel_name_or_parcel_object);
+ #
+ # Aquire a parcel one way or another.  If the supplied argument is a
+ # Parcel, return it.  If it's not defined, return the default Parcel.  If
+ # it's a name, invoke singleton().
     sub acquire {
         my ( undef, $thing ) = @_;
         if ( !defined $thing ) {
@@ -647,7 +650,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     package Clownfish::CFC::Binding::Perl::TypeMap;
     use Clownfish::CFC::Binding::Perl::TypeMap;
 }
-
 
 1;
 

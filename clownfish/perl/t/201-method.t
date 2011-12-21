@@ -48,7 +48,8 @@ like( $@, qr/macro_sym/, "Invalid macro_sym kills constructor" );
 my $dupe = Clownfish::CFC::Method->new(%args);
 ok( $method->compatible($dupe), "compatible()" );
 
-my $macro_sym_differs = Clownfish::CFC::Method->new( %args, macro_sym => 'Eat' );
+my $macro_sym_differs
+    = Clownfish::CFC::Method->new( %args, macro_sym => 'Eat' );
 ok( !$method->compatible($macro_sym_differs),
     "different macro_sym spoils compatible()"
 );
@@ -114,7 +115,8 @@ for my $meth_meth (qw( short_method_sym full_method_sym full_offset_sym)) {
 
 $parser->set_class_name("Neato::Obj");
 $parser->set_class_cnick("Obj");
-isa_ok( $parser->parse($_), "Clownfish::CFC::Method", "method declaration: $_" )
+isa_ok( $parser->parse($_), "Clownfish::CFC::Method",
+    "method declaration: $_" )
     for (
     'public int Do_Foo(Obj *self);',
     'parcel Obj* Gimme_An_Obj(Obj *self);',

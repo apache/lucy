@@ -32,7 +32,9 @@ my %args = (
 # Clean up.
 rmtree( $args{dest} );
 
-eval { my $death = Clownfish::CFC::Hierarchy->new( %args, extra_arg => undef ) };
+eval {
+    my $death = Clownfish::CFC::Hierarchy->new( %args, extra_arg => undef );
+};
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
 my $hierarchy = Clownfish::CFC::Hierarchy->new(%args);

@@ -37,10 +37,10 @@ struct CFCVariable;
 /** Create and register a quasi-singleton.  May only be called once for each
  * unique parcel/class_name combination.
  *
- * @param parcel See Clownfish::CFC::Symbol. 
- * @param exposure See Clownfish::CFC::Symbol. 
- * @param class_name See Clownfish::CFC::Symbol. 
- * @param cnick See Clownfish::CFC::Symbol. 
+ * @param parcel See Clownfish::CFC::Symbol.
+ * @param exposure See Clownfish::CFC::Symbol.
+ * @param class_name See Clownfish::CFC::Symbol.
+ * @param cnick See Clownfish::CFC::Symbol.
  * @param micro_sym Defaults to "class".
  * @param docucomment An optional Clownfish::CFC::DocuComment attached to this class.
  * @param source_class - The name of the class that owns the file in which

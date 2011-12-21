@@ -42,12 +42,12 @@ struct CFCParcel;
 #define CFCTYPE_COMPOSITE   0x00001000
 
 /** Generic constructor.
- * 
+ *
  * @param flags Flags which apply to the Type.  Supplying incompatible flags
  * will trigger an error.
  * @param parcel A Clownfish::CFC::Parcel.
  * @param specifier The C name for the type, not including any indirection or
- * array subscripts.  
+ * array subscripts.
  * @param indirection integer indicating level of indirection. Example: the C
  * type "float**" has a specifier of "float" and indirection 2.
  * @param c_string The C representation of the type.
@@ -79,7 +79,7 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
  *     size_t
  *
  * Many others are not supported: "signed" or "unsigned" anything, "long
- * long", "ptrdiff_t", "off_t", etc.  
+ * long", "ptrdiff_t", "off_t", etc.
  *
  * The following Charmonizer typedefs are supported:
  *
@@ -125,7 +125,7 @@ CFCType_new_object(int flags, struct CFCParcel *parcel, const char *specifier,
  * @param child The Clownfish::CFC::Type which the composite is comprised of.
  * @param indirection integer indicating level of indirection. Example: the C type
  * "float**" has indirection 2.
- * @param array A string describing an array postfix.  
+ * @param array A string describing an array postfix.
  */
 CFCType*
 CFCType_new_composite(int flags, CFCType *child, int indirection,

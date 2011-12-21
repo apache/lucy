@@ -47,7 +47,7 @@ struct CFCFunction {
  * @param exposure The function's exposure (see L<Clownfish::CFC::Symbol>).
  * @param class_name The full name of the class in whose namespace the
  * function resides.
- * @param class_cnick The C nickname for the class. 
+ * @param class_cnick The C nickname for the class.
  * @param micro_sym The lower case name of the function, without any
  * namespacing prefixes.
  * @param return_type A Clownfish::CFC::Type representing the function's

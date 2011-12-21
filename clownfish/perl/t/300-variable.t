@@ -39,7 +39,9 @@ like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
 eval { my $death = Clownfish::CFC::Variable->new( micro_sym => 'foo' ) };
 like( $@, qr/type/, "type is required" );
-eval { my $death = Clownfish::CFC::Variable->new( type => new_type('int32_t') ) };
+eval {
+    my $death = Clownfish::CFC::Variable->new( type => new_type('int32_t') );
+};
 like( $@, qr/micro_sym/, "micro_sym is required" );
 
 my $var = Clownfish::CFC::Variable->new(

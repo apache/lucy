@@ -55,7 +55,7 @@ void
 CFCHierarchy_build(CFCHierarchy *self);
 
 /** Visit all File objects in the hierarchy.  If a parent node is modified, mark
- * all of its children as modified.  
+ * all of its children as modified.
  *
  * If the supplied argument is true, mark all Files as modified.
  */

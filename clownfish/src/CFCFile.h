@@ -17,7 +17,7 @@
 
 /** Clownfish::CFC::File - Structured representation of the contents of a Clownfish
  * source file.
- * 
+ *
  * An abstraction representing a file which contains Clownfish code.
  */
 #ifndef H_CFCFILE

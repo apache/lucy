@@ -20,13 +20,13 @@
  * declare either Dump or Load(), Clownfish::CFC::Dumpable will attempt to
  * auto-generate those methods if methods inherited from the parent class do
  * not suffice.
- * 
+ *
  *     class Foo::Bar inherits Foo : dumpable {
  *         Thing *thing;
- * 
+ *
  *         public inert incremented Bar*
  *         new();
- * 
+ *
  *         void
  *         Destroy(Bar *self);
  *     }
@@ -42,7 +42,7 @@ extern "C" {
 typedef struct CFCDumpable CFCDumpable;
 struct CFCClass;
 
-/** Constructor. 
+/** Constructor.
  */
 CFCDumpable*
 CFCDumpable_new(void);

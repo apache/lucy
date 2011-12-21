@@ -30,7 +30,7 @@ my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CFC_SOURCE_DIR = catdir( updir(), 'src' );
 
 sub extra_ccflags {
-    my $self = shift;
+    my $self          = shift;
     my $extra_ccflags = "-DCFCPERL ";
     $extra_ccflags .= "$ENV{CFLAGS} " if defined $ENV{CFLAGS};
 

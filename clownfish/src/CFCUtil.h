@@ -98,7 +98,7 @@ CFCUtil_wrapped_free(void *ptr);
     CFCUtil_wrapped_free(_ptr)
 
 /** Given two filepaths, return true if the second exists and has a
- * modification time which more recent than that of the first. 
+ * modification time which more recent than that of the first.
  */
 int
 CFCUtil_current(const char *orig, const char *dest);

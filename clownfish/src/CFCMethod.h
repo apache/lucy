@@ -97,7 +97,7 @@ CFCMethod_override(CFCMethod *self, CFCMethod *orig);
  * Method objects are shared between parent and child classes; if a shared
  * Method object were to become final, it would interfere with its own
  * inheritance.  So, we make a copy, slightly modified to indicate that it is
- * "final".  
+ * "final".
  */
 CFCMethod*
 CFCMethod_finalize(CFCMethod *self);

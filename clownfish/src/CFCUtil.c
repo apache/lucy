@@ -444,7 +444,7 @@ CFCUtil_warn(const char* format, ...) {
     SvREFCNT_dec(mess);
 }
 
-#else 
+#else
 
 void
 CFCUtil_die(const char* format, ...) {

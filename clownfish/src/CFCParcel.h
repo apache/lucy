@@ -21,9 +21,9 @@
  *
  * Clownfish supports two-tier manual namespacing, using a prefix, an optional
  * class nickname, and the local symbol:
- * 
+ *
  *     prefix_ClassNick_local_symbol
- * 
+ *
  * Clownfish::CFC::Parcel supports the first tier, specifying initial prefixes.
  * These prefixes come in three capitalization variants: prefix_, Prefix_, and
  * PREFIX_.

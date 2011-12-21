@@ -21,7 +21,7 @@
  *
  *     class Crustacean::Lobster {
  *         ...
- * 
+ *
  *         inert inline void
  *         say_hello(Lobster *self);
  *     }
@@ -45,7 +45,7 @@ extern "C" {
 
 typedef struct CFCCBlock CFCCBlock;
 
-/** CBlock Constructor. 
+/** CBlock Constructor.
  *
  * @param contents The contents of the CBlock, not including delimiters.
  */

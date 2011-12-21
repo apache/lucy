@@ -40,7 +40,7 @@ void
 CFCParamList_destroy(CFCParamList *self);
 
 /** Add a parameter to the ParamList.
- * 
+ *
  * @param variable A Clownfish::CFC::Variable.
  * @param value The parameter's default value, which should be NULL
  * if there is no default and thus the parameter is required.
@@ -77,7 +77,7 @@ const char*
 CFCParamList_to_c(CFCParamList *self);
 
 /** Return the variable's names, joined by commas.  For example:
- * 
+ *
  *     self, foo, bar
  */
 const char*

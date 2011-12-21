@@ -38,7 +38,9 @@ my %args = (
 my $func = Clownfish::CFC::Function->new(%args);
 isa_ok( $func, "Clownfish::CFC::Function" );
 
-eval { my $death = Clownfish::CFC::Function->new( %args, extra_arg => undef ) };
+eval {
+    my $death = Clownfish::CFC::Function->new( %args, extra_arg => undef );
+};
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
 eval { Clownfish::CFC::Function->new( %args, micro_sym => 'Uh_Oh' ); };
