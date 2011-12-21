@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-/** Clownfish::Binding::Core - Generate core C code for a
+/** Clownfish::CFC::Binding::Core - Generate core C code for a
  * Clownfish::Hierarchy.
  *
  * A Clownfish::Hierarchy describes an abstract specifiction for a class
- * hierarchy; Clownfish::Binding::Core is responsible for auto-generating C
+ * hierarchy; Clownfish::CFC::Binding::Core is responsible for auto-generating C
  * code which implements that specification.
  */
 #ifndef H_CFCBINDCORE

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::Binding::Core::Function - Generate core C code for a function.
+/** Clownfish::CFC::Binding::Core::Function - Generate core C code for a function.
  */
 
 #ifndef H_CFCBINDFUNCTION

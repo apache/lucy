@@ -316,8 +316,8 @@ sub ACTION_clownfish {
     print "Parsing Clownfish files...\n";
     my ( $hierarchy, $perl_binding, $pm_filepaths_with_xs )
         = $self->_compile_clownfish;
-    require Clownfish::Binding::Core;
-    my $core_binding = Clownfish::Binding::Core->new(
+    require Clownfish::CFC::Binding::Core;
+    my $core_binding = Clownfish::CFC::Binding::Core->new(
         hierarchy => $hierarchy,
         dest      => $AUTOGEN_DIR,
         header    => $self->autogen_header,

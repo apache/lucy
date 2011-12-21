@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Clownfish::Binding::Core::Method;
+package Clownfish::CFC::Binding::Core::File;
 use Clownfish;
 
 1;
+
 

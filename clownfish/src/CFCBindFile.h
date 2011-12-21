@@ -17,7 +17,7 @@
 #ifndef H_CFCBINDFILE
 #define H_CFCBINDFILE
 
-/** Clownfish::Binding::Core::File - Generate core C code for a Clownfish file.
+/** Clownfish::CFC::Binding::Core::File - Generate core C code for a Clownfish file.
  *
  * This module is the companion to Clownfish::File, generating the C code
  * needed to implement the file's specification.

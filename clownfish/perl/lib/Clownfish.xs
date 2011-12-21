@@ -1619,7 +1619,7 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core
 
 SV*
 _new(hierarchy, dest, header, footer)
@@ -1647,7 +1647,7 @@ CODE:
 OUTPUT: RETVAL
 
 
-MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Function
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Function
 
 SV*
 func_declaration(unused, func)
@@ -1657,7 +1657,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindFunc_func_declaration(func));
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Method
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Method
 
 SV*
 typedef_dec(unused, meth)
@@ -1707,7 +1707,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_obj_def(meth, offset));
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Aliases
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Aliases
 
 SV*
 c_aliases(...)
@@ -1715,7 +1715,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindAliases_c_aliases());
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::Class
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Class
 
 SV*
 _new(client)
@@ -1740,7 +1740,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindClass_to_c_header(self));
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::Binding::Core::File
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::File
 
 void
 _write_h(file, dest, header, footer)

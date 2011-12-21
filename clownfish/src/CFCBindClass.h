@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::Binding::Core::Class - Generate core C code for a class.
+/** Clownfish::CFC::Binding::Core::Class - Generate core C code for a class.
  *
  * Clownfish::Class is an abstract specification for a class.  This module
  * autogenerates the C code with implements that specification.

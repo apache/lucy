@@ -48,7 +48,7 @@ static void
 S_write_parcel_c(CFCBindCore *self);
 
 const static CFCMeta CFCBINDCORE_META = {
-    "Clownfish::Binding::Core",
+    "Clownfish::CFC::Binding::Core",
     sizeof(CFCBindCore),
     (CFCBase_destroy_t)CFCBindCore_destroy
 };

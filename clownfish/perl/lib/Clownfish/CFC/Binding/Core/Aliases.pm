@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Clownfish::Binding::Core::Function;
+package Clownfish::CFC::Binding::Core::Aliases;
 use Clownfish;
 
 1;

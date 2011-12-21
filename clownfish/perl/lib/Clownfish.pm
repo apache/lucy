@@ -553,7 +553,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Binding::Core;
+    package Clownfish::CFC::Binding::Core;
     use Clownfish::Util qw( verify_args );
     use Carp;
 
@@ -572,7 +572,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Binding::Core::Class;
+    package Clownfish::CFC::Binding::Core::Class;
     use Clownfish::Util qw( a_isa_b verify_args );
     use Carp;
 
@@ -586,7 +586,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Binding::Core::File;
+    package Clownfish::CFC::Binding::Core::File;
     use Clownfish::Util qw( verify_args );
     use Carp;
 
@@ -605,7 +605,7 @@ BEGIN { XSLoader::load( 'Clownfish', '0.01' ) }
 }
 
 {
-    package Clownfish::Binding::Core::Method;
+    package Clownfish::CFC::Binding::Core::Method;
 
     sub method_def {
         my ( undef, %args ) = @_;

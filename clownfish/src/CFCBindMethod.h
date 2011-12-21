@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::Binding::Core::Method - Generate core C code for a method.
+/** Clownfish::CFC::Binding::Core::Method - Generate core C code for a method.
  *
  * Clownfish::Method is an abstract specification; this class generates C code
  * which implements the specification.
