@@ -1752,31 +1752,6 @@ PPCODE:
     CFCBindFile_write_h(file, dest, header, footer);
 
 
-MODULE = Clownfish   PACKAGE = Clownfish::Binding::Perl::TypeMap
-
-SV*
-from_perl(type, xs_var)
-    CFCType *type;
-    const char *xs_var;
-CODE:
-    RETVAL = S_sv_eat_c_string(CFCPerlTypeMap_from_perl(type, xs_var));
-OUTPUT: RETVAL
-
-SV*
-to_perl(type, cf_var)
-    CFCType *type;
-    const char *cf_var;
-CODE:
-    RETVAL = S_sv_eat_c_string(CFCPerlTypeMap_to_perl(type, cf_var));
-OUTPUT: RETVAL
-
-void
-_write_xs_typemap(hierarchy)
-    CFCHierarchy *hierarchy;
-PPCODE:
-    CFCPerlTypeMap_write_xs_typemap(hierarchy);
-
-
 MODULE = Clownfish    PACKAGE = Clownfish::Parser
 
 SV*
