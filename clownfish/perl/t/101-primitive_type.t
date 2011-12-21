@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 use Test::More tests => 4;
-use Clownfish;
+use Clownfish::CFC;
 
 my $type = new_primitive_type( specifier => 'hump_t' );
 ok( $type->is_primitive, "is_primitive" );

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package Clownfish::CFC::Binding::Core::Class;
-use Clownfish;
+use Clownfish::CFC;
 
 1;
 

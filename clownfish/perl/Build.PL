@@ -21,11 +21,11 @@ use Clownfish::CFC::Build;
 use File::Spec::Functions qw( updir catdir );
 
 my $builder = Clownfish::CFC::Build->new(
-    module_name => 'Clownfish',
+    module_name => 'Clownfish::CFC',
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
-    dist_version_from => 'lib/Clownfish.pm',
+    dist_version_from => 'lib/Clownfish/CFC.pm',
     build_requires    => {
         'ExtUtils::CBuilder' => 0.18,
         'ExtUtils::ParseXS'  => 2.16,

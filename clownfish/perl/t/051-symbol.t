@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 44;
-use Clownfish;
+use Clownfish::CFC;
 
 for (qw( foo FOO 1Foo Foo_Bar FOOBAR 1FOOBAR )) {
     eval { my $thing = new_symbol( class_name => $_ ) };

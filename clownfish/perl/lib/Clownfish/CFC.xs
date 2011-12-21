@@ -85,7 +85,7 @@ S_sv_eat_c_string(char *string) {
     }
 }
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Base
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Base
 
 void
 DESTROY(self)
@@ -94,7 +94,7 @@ PPCODE:
     CFCBase_decref((CFCBase*)self);
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::CBlock
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::CBlock
 
 SV*
 _new(contents)
@@ -121,7 +121,7 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Class
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Class
 
 SV*
 _create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
@@ -412,7 +412,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::DocuComment
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::DocuComment
 
 SV*
 parse(klass, text)
@@ -487,7 +487,7 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Dumpable
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Dumpable
 
 SV*
 new(klass)
@@ -509,7 +509,7 @@ PPCODE:
     CFCDumpable_add_dumpables(self, klass);
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::File
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::File
 
 SV*
 _new(source_class)
@@ -610,7 +610,7 @@ CODE:
 OUTPUT: RETVAL
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Function
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Function
 
 SV*
 _new(parcel, exposure_sv, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, is_inline)
@@ -688,7 +688,7 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Hierarchy
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Hierarchy
 
 SV*
 _new(source, dest)
@@ -749,7 +749,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Method
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Method
 
 SV*
 _new(parcel, exposure_sv, class_name_sv, class_cnick_sv, macro_sym, return_type, param_list, docucomment, is_final, is_abstract)
@@ -900,7 +900,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::ParamList
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::ParamList
 
 SV*
 _new(klass, variadic)
@@ -984,7 +984,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Parcel
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Parcel
 
 SV*
 _singleton(name_sv, cnick_sv)
@@ -1058,7 +1058,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Symbol
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Symbol
 
 SV*
 _new(parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
@@ -1182,7 +1182,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Type
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Type
 
 SV*
 _new(flags, parcel, specifier, indirection, c_string)
@@ -1479,7 +1479,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Util
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Util
 
 SV*
 trim_whitespace(text)
@@ -1540,7 +1540,7 @@ CODE:
     RETVAL = CFCUtil_make_path(path);
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Variable
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Variable
 
 SV*
 _new(parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_sv, inert_sv)
@@ -1619,7 +1619,7 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core
 
 SV*
 _new(hierarchy, dest, header, footer)
@@ -1647,7 +1647,7 @@ CODE:
 OUTPUT: RETVAL
 
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Function
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Function
 
 SV*
 func_declaration(unused, func)
@@ -1657,7 +1657,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindFunc_func_declaration(func));
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Method
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Method
 
 SV*
 typedef_dec(unused, meth)
@@ -1707,7 +1707,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_obj_def(meth, offset));
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Aliases
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Aliases
 
 SV*
 c_aliases(...)
@@ -1715,7 +1715,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindAliases_c_aliases());
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::Class
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Class
 
 SV*
 _new(client)
@@ -1740,7 +1740,7 @@ CODE:
     RETVAL = S_sv_eat_c_string(CFCBindClass_to_c_header(self));
 OUTPUT: RETVAL
 
-MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Core::File
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::File
 
 void
 _write_h(file, dest, header, footer)
@@ -1752,7 +1752,7 @@ PPCODE:
     CFCBindFile_write_h(file, dest, header, footer);
 
 
-MODULE = Clownfish    PACKAGE = Clownfish::CFC::Parser
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Parser
 
 SV*
 new(klass)

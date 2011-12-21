@@ -1,7 +1,7 @@
 Build.PL
 buildlib/Clownfish/CFC/Build.pm
-lib/Clownfish.pm
-lib/Clownfish.xs
+lib/Clownfish/CFC.pm
+lib/Clownfish/CFC.xs
 lib/Clownfish/CFC/Base.pm
 lib/Clownfish/CFC/Binding/Core.pm
 lib/Clownfish/CFC/Binding/Core/Aliases.pm

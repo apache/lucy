@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package Clownfish::CFC::Parcel;
-use Clownfish;
+use Clownfish::CFC;
 
 1;
 
