@@ -64,7 +64,7 @@ sub register {
 }
 
 sub registered { [ values %registry ] }
-sub singleton { $registry{ $_[1] } }
+sub singleton  { $registry{ $_[1] } }
 
 sub get_class_name        { shift->{class_name} }
 sub get_bind_methods      { shift->{bind_methods} }
@@ -307,14 +307,14 @@ sub create_pod {
         $inheritance_pod = "=head1 INHERITANCE\n\n";
         $inheritance_pod .= $class->get_class_name;
         for my $ancestor (@ancestors) {
-            my $class_name = $ancestor->get_class_name;           
+            my $class_name = $ancestor->get_class_name;
             if ( $registry{$class_name} ) {
                 $inheritance_pod .= " isa L<$class_name>";
-            } 
+            }
             else {
                 $inheritance_pod .= " isa $class_name";
             }
-		}
+        }
         $inheritance_pod .= ".\n";
     }
 

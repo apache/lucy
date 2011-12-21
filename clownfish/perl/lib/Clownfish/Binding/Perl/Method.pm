@@ -33,9 +33,9 @@ sub new {
 
     # Derive arguments to SUPER constructor from supplied Method.
     my $method = delete $args{method};
-    $args{param_list}  ||= $method->get_param_list;
-    $args{alias}       ||= $method->micro_sym;
-    $args{class_name}  ||= $method->get_class_name;
+    $args{param_list} ||= $method->get_param_list;
+    $args{alias}      ||= $method->micro_sym;
+    $args{class_name} ||= $method->get_class_name;
     if ( !defined $args{use_labeled_params} ) {
         $args{use_labeled_params}
             = $method->get_param_list->num_vars > 2
@@ -142,7 +142,8 @@ sub _xsub_def_positional_args {
             . qq|GvNAME(CvGV(cv))); } |;
     }
     else {
-        $num_args_check = qq|if (items != $num_args) { |
+        $num_args_check
+            = qq|if (items != $num_args) { |
             . qq|CFISH_THROW(CFISH_ERR, "Usage: %s($xs_name_list)", |
             . qq|GvNAME(CvGV(cv))); } |;
     }
@@ -207,9 +208,8 @@ sub _xsub_def_labeled_params {
     my $body         = $self->_xsub_body;
 
     # Prepare error message for incorrect args.
-    my $name_list = $self_var->micro_sym . ", ...";
-    my $num_args_check
-        = qq|if (items < 1) { |
+    my $name_list      = $self_var->micro_sym . ", ...";
+    my $num_args_check = qq|if (items < 1) { |
         . qq|CFISH_THROW(CFISH_ERR, "Usage: %s(self, ...)\",  GvNAME(CvGV(cv))); }|;
 
     return <<END_STUFF;

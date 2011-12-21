@@ -80,7 +80,7 @@ sub new {
 sub write_bindings {
     my $self           = shift;
     my $ordered        = $self->{hierarchy}->ordered_classes;
-	my $registered     = Clownfish::Binding::Perl::Class->registered;
+    my $registered     = Clownfish::Binding::Perl::Class->registered;
     my $hand_rolled_xs = "";
     my $generated_xs   = "";
     my $xs             = "";
@@ -127,7 +127,7 @@ sub write_bindings {
         next unless delete $has_methods{$class_name};
         my $class_binding
             = Clownfish::Binding::Perl::Class->singleton($class_name);
-        my @bound         = $class_binding->method_bindings;
+        my @bound = $class_binding->method_bindings;
         $generated_xs .= $_->xsub_def . "\n" for @bound;
         push @xsubs, @bound;
     }
@@ -267,9 +267,9 @@ sub prepare_pod {
     my %has_pod;
     my %modified;
 
-	my $registered = Clownfish::Binding::Perl::Class->registered;
+    my $registered = Clownfish::Binding::Perl::Class->registered;
     $has_pod{ $_->get_class_name } = 1
-		for grep { $_->get_make_pod } @$registered;
+        for grep { $_->get_make_pod } @$registered;
 
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
