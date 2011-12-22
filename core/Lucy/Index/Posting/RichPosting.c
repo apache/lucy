@@ -89,7 +89,7 @@ RichPost_read_record(RichPosting *self, InStream *instream) {
             = (float*)REALLOCATE(self->prox_boosts, num_prox * sizeof(float));
     }
     uint32_t *positions    = self->prox;
-    uint32_t *prox_boosts  = self->prox_boosts;
+    float    *prox_boosts  = self->prox_boosts;
 
     while (num_prox--) {
         position += InStream_Read_C32(instream);
