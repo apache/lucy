@@ -16,12 +16,12 @@
 
 parcel Lucy;
 
-/** A simple PolyAnalyzer
+/** A simple analyzer chain
  *
- * EasyAnalyzer is a PolyAnalyzer consisting of a
+ * EasyAnalyzer is an analyzer chain consisting of a
  * L<StandardTokenizer|Lucy::Analysis::StandardTokenizer>, a
  * L<Normalizer|Lucy::Analysis::Normalizer>, and a
- * L<SnowballStemmer|Lucy::Analysis::SnowballStemmer>.
+ * L<EasyAnalyzer|Lucy::Analysis::EasyAnalyzer>.
  *
  * Supported languages:
  *
@@ -42,7 +42,12 @@ parcel Lucy;
  *     tr => Turkish,
  */
 class Lucy::Analysis::EasyAnalyzer
-    inherits Lucy::Analysis::PolyAnalyzer : dumpable {
+    inherits Lucy::Analysis::Analyzer : dumpable {
+
+    CharBuf *language;
+    StandardTokenizer *tokenizer;
+    Normalizer *normalizer;
+    SnowballStemmer *stemmer;
 
     inert incremented EasyAnalyzer*
     new(const CharBuf *language = NULL);
@@ -52,6 +57,24 @@ class Lucy::Analysis::EasyAnalyzer
      */
     public inert EasyAnalyzer*
     init(EasyAnalyzer *self, const CharBuf *language = NULL);
+
+    public incremented Inversion*
+    Transform(EasyAnalyzer *self, Inversion *inversion);
+
+    public incremented Inversion*
+    Transform_Text(EasyAnalyzer *self, CharBuf *text);
+
+    public incremented Hash*
+    Dump(EasyAnalyzer *self);
+
+    public incremented EasyAnalyzer*
+    Load(EasyAnalyzer *self, Obj *dump);
+
+    public bool_t
+    Equals(EasyAnalyzer *self, Obj *other);
+
+    public void
+    Destroy(EasyAnalyzer *self);
 }
 
 
