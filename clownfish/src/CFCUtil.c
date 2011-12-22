@@ -407,7 +407,7 @@ CFCUtil_dirnext(void *dirhandle) {
 
 void
 CFCUtil_closedir(void *dirhandle, const char *dir) {
-    if (closedir(dirhandle) == -1) {
+    if (closedir((DIR*)dirhandle) == -1) {
         CFCUtil_die("Error closing dir '%s': %s", dir, strerror(errno));
     }
 }

@@ -74,8 +74,8 @@ Normalizer_transform(Normalizer *self, Inversion *inversion) {
     Token *token;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        ssize_t len = utf8proc_decompose(token->text, token->len, buffer,
-                                         bufsize, self->options);
+        ssize_t len = utf8proc_decompose((uint8_t*)token->text, token->len,
+                                         buffer, bufsize, self->options);
 
         if (len > bufsize) {
             // buffer too small, (re)allocate
@@ -85,8 +85,8 @@ Normalizer_transform(Normalizer *self, Inversion *inversion) {
             // allocate additional INITIAL_BUFSIZE items
             bufsize = len + INITIAL_BUFSIZE;
             buffer = (int32_t*)MALLOCATE((bufsize + 1) * sizeof(int32_t));
-            len = utf8proc_decompose(token->text, token->len, buffer,
-                                     bufsize, self->options);
+            len = utf8proc_decompose((uint8_t*)token->text, token->len,
+                                     buffer, bufsize, self->options);
         }
         if (len < 0) {
             continue;

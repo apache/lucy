@@ -221,7 +221,7 @@ static const char off64_code[] =
 static const chaz_bool_t
 S_probe_off64(void) {
     size_t needed = sizeof(off64_code) + 100;
-    char *code_buf = malloc(needed);
+    char *code_buf = (char*)malloc(needed);
     int i;
     chaz_bool_t success = false;
     for (i = 0; i < NUM_OFF64_OPTIONS; i++) {
