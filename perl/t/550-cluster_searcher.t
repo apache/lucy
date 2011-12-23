@@ -43,6 +43,7 @@ sub new {
     my $num_type = Lucy::Plan::Int32Type->new( sortable => 1, indexed => 0 );
     my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
     $self->spec_field( name => 'content', type => $plain_type );
+    $self->spec_field( name => 'junk',    type => $plain_type );
     $self->spec_field( name => 'number',  type => $num_type );
     $self->spec_field( name => 'port',    type => $string_type );
     return $self;
@@ -71,6 +72,7 @@ for my $port (@ports) {
         for (qw( a b c )) {
             my %doc = (
                 content => "x $_ $port",
+                junk    => "xyz " x 4000, # should trigger partial reads
                 number  => $number,
                 port    => $port,
             );
@@ -91,7 +93,7 @@ for my $port (@ports) {
 }
 
 # Allow time for the servers to set up their sockets.
-sleep .25;
+sleep .5;
 
 my $test_client_sock = IO::Socket::INET->new(
     PeerAddr => "localhost:$ports[0]",
