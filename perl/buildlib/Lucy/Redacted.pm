@@ -54,7 +54,6 @@ sub hidden {
         Lucy::Redacted
         Lucy::Test::Object::TestCharBuf
         Lucy::Test::TestUtils
-        Lucy::Test::USConSchema
         Lucy::Util::BitVector
     );
 }

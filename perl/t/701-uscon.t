@@ -19,7 +19,6 @@ use lib 'buildlib';
 
 use Test::More tests => 9;
 use Lucy::Test::TestUtils qw( persistent_test_index_loc );
-use Lucy::Test::USConSchema;
 
 my $searcher = Lucy::Search::IndexSearcher->new(
     index => persistent_test_index_loc() );

@@ -37,10 +37,6 @@ our @EXPORT_OK = qw(
 
 use Lucy;
 use Lucy::Test;
-
-use lib 'sample';
-use Lucy::Test::USConSchema;
-
 use File::Spec::Functions qw( catdir catfile curdir );
 use Encode qw( _utf8_off );
 use File::Path qw( rmtree );
@@ -139,12 +135,28 @@ sub get_uscon_docs {
     return \%docs;
 }
 
+sub _uscon_schema {
+    my $schema     = Lucy::Plan::Schema->new;
+    my $analyzer   = Lucy::Analysis::EasyAnalyzer->new( language => 'en' );
+    my $title_type = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
+    my $content_type = Lucy::Plan::FullTextType->new(
+        analyzer      => $analyzer,
+        highlightable => 1,
+    );
+    my $url_type = Lucy::Plan::StringType->new( indexed => 0, );
+    my $cat_type = Lucy::Plan::StringType->new;
+    $schema->spec_field( name => 'title',    type => $title_type );
+    $schema->spec_field( name => 'content',  type => $content_type );
+    $schema->spec_field( name => 'url',      type => $url_type );
+    $schema->spec_field( name => 'category', type => $cat_type );
+    return $schema;
+}
+
 sub create_uscon_index {
     my $folder
         = Lucy::Store::FSFolder->new( path => persistent_test_index_loc() );
-    my $schema  = Lucy::Test::USConSchema->new;
     my $indexer = Lucy::Index::Indexer->new(
-        schema   => $schema,
+        schema   => _uscon_schema(),
         index    => $folder,
         truncate => 1,
         create   => 1,
@@ -154,20 +166,14 @@ sub create_uscon_index {
     $indexer->commit;
     undef $indexer;
 
-    $indexer = Lucy::Index::Indexer->new(
-        schema => $schema,
-        index  => $folder,
-    );
+    $indexer = Lucy::Index::Indexer->new( index => $folder );
     my $source_docs = get_uscon_docs();
     $indexer->add_doc( { content => $_->{bodytext} } )
         for values %$source_docs;
     $indexer->commit;
     undef $indexer;
 
-    $indexer = Lucy::Index::Indexer->new(
-        schema => $schema,
-        index  => $folder,
-    );
+    $indexer = Lucy::Index::Indexer->new( index => $folder );
     my @chars = ( 'a' .. 'z' );
     for ( 0 .. 1000 ) {
         my $content = '';

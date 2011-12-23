@@ -2,7 +2,6 @@ Build.PL
 buildlib/Lucy/Build.pm
 buildlib/Lucy/Redacted.pm
 buildlib/Lucy/Test/TestUtils.pm
-buildlib/Lucy/Test/USConSchema.pm
 INSTALL
 lib/Lucy.pm
 lib/Lucy.pod
