@@ -88,8 +88,6 @@ chaz_Test_plan(chaz_TestBatch *batch) {
 
 void
 chaz_Test_ok(chaz_TestBatch *batch, int value, const char *message) {
-    va_list args;
-
     /* Increment test number. */
     batch->test_num++;
 
@@ -107,8 +105,6 @@ chaz_Test_ok(chaz_TestBatch *batch, int value, const char *message) {
 void
 chaz_Test_str_eq(chaz_TestBatch *batch, const char *got,
                  const char *expected, const char *message) {
-    va_list args;
-
     /* Increment test number. */
     batch->test_num++;
 
@@ -127,8 +123,6 @@ chaz_Test_str_eq(chaz_TestBatch *batch, const char *got,
 
 void
 chaz_Test_pass(chaz_TestBatch *batch, const char *message) {
-    va_list args;
-
     /* Increment test number. */
     batch->test_num++;
 
@@ -139,8 +133,6 @@ chaz_Test_pass(chaz_TestBatch *batch, const char *message) {
 
 void
 chaz_Test_fail(chaz_TestBatch *batch, const char *message) {
-    va_list args;
-
     /* Increment test number. */
     batch->test_num++;
 
@@ -152,8 +144,6 @@ chaz_Test_fail(chaz_TestBatch *batch, const char *message) {
 void
 chaz_Test_long_eq(chaz_TestBatch *batch, long got, long expected,
                   const char *message) {
-    va_list args;
-
     /* Increment test number. */
     batch->test_num++;
 
@@ -171,7 +161,6 @@ chaz_Test_long_eq(chaz_TestBatch *batch, long got, long expected,
 void
 chaz_Test_double_eq(chaz_TestBatch *batch, double got, double expected,
                     double slop, const char *message) {
-    va_list args;
     double diff = expected - got;
     if (diff < 0) {
         diff = 0 - diff;
@@ -194,8 +183,6 @@ chaz_Test_double_eq(chaz_TestBatch *batch, double got, double expected,
 
 void
 chaz_Test_skip(chaz_TestBatch *batch, const char *message) {
-    va_list args;
-
     /* Increment test number. */
     batch->test_num++;
 
@@ -206,7 +193,6 @@ chaz_Test_skip(chaz_TestBatch *batch, const char *message) {
 
 void
 chaz_Test_skip_remaining(chaz_TestBatch *batch, const char *message) {
-    va_list args;
     unsigned remaining = batch->num_tests - batch->test_num;
 
     /* Indicate that tests are being skipped, update skip counter. */
