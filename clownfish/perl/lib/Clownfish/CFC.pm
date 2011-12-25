@@ -557,6 +557,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 
 {
     package Clownfish::CFC::Binding::Core;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
     use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
@@ -576,6 +577,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 
 {
     package Clownfish::CFC::Binding::Core::Class;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
     use Clownfish::CFC::Util qw( a_isa_b verify_args );
     use Carp;
 

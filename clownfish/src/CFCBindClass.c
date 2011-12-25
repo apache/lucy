@@ -424,6 +424,8 @@ CFCBindClass_to_c(CFCBindClass *self) {
     sprintf(code, pattern, include_h, offsets, cb_funcs, cb_objects, cb_var,
             class_name_def, vtable_def, autocode);
 
+    FREEMEM(novel_methods);
+    FREEMEM(offsets);
     FREEMEM(cb_funcs);
     FREEMEM(cb_objects);
     FREEMEM(cb_var);
@@ -750,6 +752,8 @@ S_short_names(CFCBindClass *self) {
             CFCMethod_full_method_sym(meth, cnick, full_sym, size);
             short_names = CFCUtil_cat(short_names, "  #define ", short_sym,
                                       " ", full_sym, "\n", NULL);
+            FREEMEM(short_sym);
+            FREEMEM(full_sym);
         }
     }
     short_names = CFCUtil_cat(short_names, "#endif /* ",

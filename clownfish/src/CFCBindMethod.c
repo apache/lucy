@@ -426,6 +426,8 @@ S_invalid_callback_def(CFCMethod *method) {
     sprintf(callback_def, pattern, ret_type_str, override_sym, params, unused,
             full_method_sym, unreachable);
 
+    FREEMEM(full_method_sym);
+    FREEMEM(unreachable);
     FREEMEM(unused);
     return callback_def;
 }

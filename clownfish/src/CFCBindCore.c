@@ -232,6 +232,7 @@ S_write_parcel_h(CFCBindCore *self) {
                                  CFCUTIL_PATH_SEP, "parcel.h", NULL);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
+    FREEMEM(filepath);
 
     FREEMEM(aliases);
     FREEMEM(typedefs);
@@ -296,6 +297,7 @@ S_write_parcel_c(CFCBindCore *self) {
                                  CFCUTIL_PATH_SEP, "parcel.c", NULL);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
+    FREEMEM(filepath);
 
     FREEMEM(privacy_syms);
     FREEMEM(includes);
