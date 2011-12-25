@@ -1788,11 +1788,11 @@ CODE:
 OUTPUT: RETVAL
 
 void
-set_parcel(unused, parcel)
-    SV *unused;
+set_parcel(self, parcel)
+    CFCParser *self;
     CFCParcel *parcel;
 PPCODE:
-    CFCParser_set_parcel(parcel);
+    CFCParser_set_parcel(self, parcel);
 
 void
 set_class_name(self, class_name)
@@ -1809,9 +1809,10 @@ PPCODE:
     CFCParser_set_class_cnick(self, class_cnick);
 
 SV*
-get_parcel(...)
+get_parcel(self)
+    CFCParser *self;
 CODE:
-    CFCParcel *parcel = CFCParser_get_parcel();
+    CFCParcel *parcel = CFCParser_get_parcel(self);
     RETVAL = S_cfcbase_to_perlref((CFCBase*)parcel);
 OUTPUT: RETVAL
 

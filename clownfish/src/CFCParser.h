@@ -71,10 +71,10 @@ const char*
 CFCParser_get_text(CFCParser *self);
 
 void
-CFCParser_set_parcel(struct CFCParcel *parcel);
+CFCParser_set_parcel(CFCParser *self, struct CFCParcel *parcel);
 
 struct CFCParcel*
-CFCParser_get_parcel(void);
+CFCParser_get_parcel(CFCParser *self);
 
 void
 CFCParser_set_class_name(CFCParser *self, const char *class_name);

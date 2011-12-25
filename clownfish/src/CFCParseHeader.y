@@ -45,7 +45,7 @@ S_start_class(CFCParser *state, CFCDocuComment *docucomment, char *exposure,
     }
     CFCParser_set_class_name(state, class_name);
     CFCParser_set_class_cnick(state, class_cnick);
-    CFCClass *klass = CFCClass_create(CFCParser_get_parcel(), exposure,
+    CFCClass *klass = CFCClass_create(CFCParser_get_parcel(state), exposure,
                                       class_name, class_cnick, NULL,
                                       docucomment, source_class, inheritance,
                                       is_final, is_inert);
@@ -70,7 +70,7 @@ S_new_var(CFCParser *state, char *exposure, char *modifiers, CFCType *type,
         class_name  = CFCParser_get_class_name(state);
         class_cnick = CFCParser_get_class_cnick(state);
     }
-    CFCVariable *var = CFCVariable_new(CFCParser_get_parcel(), exposure, 
+    CFCVariable *var = CFCVariable_new(CFCParser_get_parcel(state), exposure,
                                        class_name, class_cnick,
                                        name, type, inert);
 
@@ -84,7 +84,7 @@ static CFCBase*
 S_new_sub(CFCParser *state, CFCDocuComment *docucomment, 
           char *exposure, char *declaration_modifier_list,
           CFCType *type, char *name, CFCParamList *param_list) {
-    CFCParcel  *parcel      = CFCParser_get_parcel();
+    CFCParcel  *parcel      = CFCParser_get_parcel(state);
     const char *class_name  = CFCParser_get_class_name(state);
     const char *class_cnick = CFCParser_get_class_cnick(state);
 
@@ -170,7 +170,7 @@ S_new_type(CFCParser *state, int flags, char *type_name,
     else if (type_name_len > 2
              && !strcmp(type_name + type_name_len - 2, "_t")
             ) {
-        type = CFCType_new_arbitrary(CFCParser_get_parcel(), type_name);
+        type = CFCType_new_arbitrary(CFCParser_get_parcel(state), type_name);
     }
     else if (indirection > 0) {
         /* The only remaining possibility is an object type, and we can let
@@ -180,7 +180,7 @@ S_new_type(CFCParser *state, int flags, char *type_name,
             flags |= composite_flags;
             composite_flags = 0;
         }
-        type = CFCType_new_object(flags, CFCParser_get_parcel(), type_name, 1);
+        type = CFCType_new_object(flags, CFCParser_get_parcel(state), type_name, 1);
     }
     else {
         CFCUtil_die("Invalid type specification at/near '%s'", type_name);
@@ -320,7 +320,7 @@ parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) SEMICOLON.
     }
     A = CFCParcel_singleton(C, NULL);
     CFCBase_incref((CFCBase*)A);
-    CFCParser_set_parcel(A);
+    CFCParser_set_parcel(state, A);
 }
 
 parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) cnick(D) SEMICOLON.
@@ -330,7 +330,7 @@ parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) cnick(D) SEMICOLO
     }
     A = CFCParcel_singleton(C, D);
     CFCBase_incref((CFCBase*)A);
-    CFCParser_set_parcel(A);
+    CFCParser_set_parcel(state, A);
 }
 
 class_declaration(A) ::= class_defs(B) RIGHT_CURLY_BRACE.

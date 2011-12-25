@@ -41,6 +41,7 @@ struct CFCParser {
     char *class_cnick;
     char *source_class;
     CFCMemPool *pool;
+    CFCParcel  *parcel;
 };
 
 const static CFCMeta CFCPARSER_META = {
@@ -67,6 +68,7 @@ CFCParser_init(CFCParser *self) {
     self->class_cnick  = NULL;
     self->source_class = NULL;
     self->pool         = NULL;
+    self->parcel       = NULL;
     return self;
 }
 
@@ -77,12 +79,12 @@ CFCParser_destroy(CFCParser *self) {
     FREEMEM(self->class_cnick);
     CFCBase_decref((CFCBase*)self->pool);
     CFCBase_decref(self->result);
+    CFCBase_decref((CFCBase*)self->parcel);
     CFCBase_destroy((CFCBase*)self);
 }
 
 CFCParser *CFCParser_current_state  = NULL;
 void      *CFCParser_current_parser = NULL;
-CFCParcel *CFCParser_current_parcel = NULL;
 
 CFCBase*
 CFCParser_parse(CFCParser *self, const char *string) {
@@ -114,7 +116,7 @@ CFCParser_parse(CFCParser *self, const char *string) {
 CFCFile*
 CFCParser_parse_file(CFCParser *self, const char *string,
                      const char *source_class) {
-    CFCParser_set_parcel(NULL);
+    CFCParser_set_parcel(self, NULL);
     self->source_class = CFCUtil_strdup(source_class);
     CFCParseHeader(self->header_parser, CFC_TOKENTYPE_FILE_START, NULL, self);
     CFCFile *result = (CFCFile*)CFCParser_parse(self, string);
@@ -148,15 +150,15 @@ CFCParser_set_errors(CFCParser *self, int errors) {
 }
 
 void
-CFCParser_set_parcel(CFCParcel *parcel) {
+CFCParser_set_parcel(CFCParser *self, CFCParcel *parcel) {
     CFCBase_incref((CFCBase*)parcel);
-    CFCBase_decref((CFCBase*)CFCParser_current_parcel);
-    CFCParser_current_parcel = parcel;
+    CFCBase_decref((CFCBase*)self->parcel);
+    self->parcel = parcel;
 }
 
 CFCParcel*
-CFCParser_get_parcel(void) {
-    return CFCParser_current_parcel;
+CFCParser_get_parcel(CFCParser *self) {
+    return self->parcel;
 }
 
 void
