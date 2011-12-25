@@ -131,7 +131,7 @@ S_find_cfh(char *dir, char **cfh_list, size_t num_cfh) {
         size_t needed = strlen(dir) + 1 + name_len + 1;
         if (needed > full_path_cap) {
             full_path_cap = needed;
-            full_path = (char*)MALLOCATE(full_path_cap);
+            full_path = (char*)REALLOCATE(full_path, full_path_cap);
         }
         int full_path_len = sprintf(full_path, "%s" CFCUTIL_PATH_SEP "%s",
                                     dir, entry);
@@ -204,6 +204,7 @@ S_parse_cf_files(CFCHierarchy *self) {
         size_t unused;
         char *content = CFCUtil_slurp_text(source_path, &unused);
         CFCFile *file = CFCParser_parse_file(self->parser, content, source_class);
+        FREEMEM(content);
         if (!file) {
             CFCUtil_die("parser error for %s", source_path);
         }
@@ -219,6 +220,7 @@ S_parse_cf_files(CFCHierarchy *self) {
             }
             all_classes[num_classes++] = classes_in_file[j];
         }
+        CFCBase_decref((CFCBase*)file);
     }
     all_classes[num_classes] = NULL;
 
@@ -287,6 +289,8 @@ S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
     if (!CFCUtil_current(source_path, h_path)) {
         modified = true;
     }
+    FREEMEM(h_path);
+    FREEMEM(source_path);
     if (modified) {
         CFCFile_set_modified(file, modified);
     }
