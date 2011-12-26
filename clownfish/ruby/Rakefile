@@ -16,8 +16,7 @@
 require 'rbconfig'
 require 'rake/clean' 
 
-# Loading ./ruby/Rakefile
-CLOWNFISH_RUBY_DIR      = File.join(File.absolute_path('.'))
+CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
 CLOWNFISH_INCLUDE_DIR   = File.join('..','include')
 CLOWNFISH_SRC_DIR       = File.join('..','src')
 LEMON_SRC_DIR           = File.join('..','..','lemon')
