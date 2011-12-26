@@ -372,7 +372,9 @@ Bool_singleton(bool_t value) {
 
 void
 Bool_destroy(BoolNum *self) {
-    UNUSED_VAR(self);
+    if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
+        SUPER_DESTROY(self, BOOLNUM);
+    }
 }
 
 bool_t
@@ -424,6 +426,11 @@ Bool_serialize(BoolNum *self, OutStream *outstream) {
 BoolNum*
 Bool_deserialize(BoolNum *self, InStream *instream) {
     bool_t value = (bool_t)InStream_Read_U8(instream);
+    if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
+        Bool_dec_refcount_t super_decref
+            = (Bool_dec_refcount_t)SUPER_METHOD(BOOLNUM, Bool, Dec_RefCount);
+        super_decref(self);
+    }
     return value ? CFISH_TRUE : CFISH_FALSE;
 }
 
