@@ -399,6 +399,7 @@ sub ACTION_suppressions {
         . " ../devel/bin/valgrind_triggers.pl 2>&1";
     my $suppressions = `$command`;
     $suppressions =~ s/^==.*?\n//mg;
+    $suppressions =~ s/^--.*?\n//mg;
     my $rule_number = 1;
     while ( $suppressions =~ /<insert.a.*?>/ ) {
         $suppressions =~ s/^\s*<insert.a.*?>/{\n  <core_perl_$rule_number>/m;
@@ -420,6 +421,7 @@ sub _valgrind_base_command {
         . "--leak-check=yes "
         . "--show-reachable=yes "
         . "--num-callers=10 "
+        . "--dsymutil=yes "
         . "--suppressions=../devel/conf/lucyperl.supp ";
 }
 
