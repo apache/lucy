@@ -21,51 +21,42 @@ BEGIN { our @ISA = qw( Lucy::Search::Searcher ) }
 use Carp;
 use Storable qw( nfreeze thaw );
 use Scalar::Util qw( reftype );
-use Errno qw( EAGAIN );
 
 # Inside-out member vars.
 our %shards;
 our %num_shards;
 our %password;
-our %socks;
 our %starts;
 our %doc_max;
-our %select;
-our %sock_map;
 
 use IO::Socket::INET;
-use IO::Select;
 
 sub new {
     my ( $either, %args ) = @_;
-    my $shards   = delete $args{shards};
+    my $addrs    = delete $args{shards};
     my $password = delete $args{password};
     my $self     = $either->SUPER::new(%args);
     confess("'shards' must be an arrayref")
-        unless reftype($shards) eq 'ARRAY';
-    $shards{$$self}     = $shards;
-    $num_shards{$$self} = scalar @$shards;
+        unless reftype($addrs) eq 'ARRAY';
+    $num_shards{$$self} = scalar @$addrs;
     $password{$$self}   = $password;
 
     # Establish connections.
-    my $socks = $socks{$$self} = [];
-    for my $shard (@$shards) {
+    my @shards;
+    for my $addr (@$addrs) {
         my $sock = IO::Socket::INET->new(
-            PeerAddr => $shard,
+            PeerAddr => $addr,
             Proto    => 'tcp',
-            # Blocking => 0,
+            Blocking => 0,
         );
-        $sock->autoflush(1);
         confess("No socket: $!") unless $sock;
-        push @$socks, $sock;
+        push @shards,
+            {
+            addr => $addr,
+            sock => $sock,
+            };
     }
-
-    # Create an IO::Select object and a mapping from socket handles to shard
-    # numbers.
-    $select{$$self} = IO::Select->new($socks);
-    my $num = 0;
-    my %sock_to_shard_num_map = map { ( "$_" => $num++ ) } @$socks;
-    $sock_map{$$self} = \%sock_to_shard_num_map;
+    $shards{$$self} = \@shards;
 
     # Handshake with servers.
     my %handshake_args = ( password => $password, _action => 'handshake' );
@@ -90,65 +81,88 @@ sub new {
 
 sub DESTROY {
     my $self = shift;
-    $self->close if defined $socks{$$self};
+    $self->close if defined $shards{$$self};
     delete $shards{$$self};
     delete $num_shards{$$self};
     delete $password{$$self};
-    delete $socks{$$self};
     delete $starts{$$self};
     delete $doc_max{$$self};
-    delete $select{$$self};
-    delete $sock_map{$$self};
     $self->SUPER::DESTROY;
 }
 
 # Send a remote procedure call to all shards.
 sub _multi_rpc {
     my ( $self, $args ) = @_;
-    my $num_shards = $num_shards{$$self};
-    my $request    = $self->_serialize_request($args);
-    for ( my $i = 0; $i < $num_shards; $i++ ) {
-        $self->_send_request_to_shard( $i, $request );
-    }
-
-    # Bail out if we're either closing or shutting down the server remotely.
-    return if $args->{_action} eq 'done';
-    return if $args->{_action} eq 'terminate';
-
-=begin disabled
-    my @responses;
-    my $remaining = $num_shards;
-    my $select    = $select{$$self};
-    my $sock_map  = $sock_map{$$self};
-    while ($remaining) {
-        my @ready = $select->can_read;
-        for my $sock ( @{ $ready[0] } ) {
-            my $shard_num = $sock_map->{"$sock"};
-            my $response  = $self->_retrieve_response_from_shard($shard_num);
-            $responses[$shard_num] = $response->{retval};
-            $remaining--;
-        }
-    }
-
-=end disabled
-
-=cut
-
-    my @responses;
-    for ( my $i = 0; $i < $num_shards; $i++ ) {
-        my $response = $self->_retrieve_response_from_shard($i);
-        $responses[$i] = $response->{retval};
-    }
-    return \@responses;
+    return $self->_rpc( $args, $shards{$$self} );
 }
 
 # Send a remote procedure call to one shard.
 sub _single_rpc {
     my ( $self, $args, $shard_num ) = @_;
-    my $request = $self->_serialize_request($args);
-    $self->_send_request_to_shard( $shard_num, $request );
-    my $response = $self->_retrieve_response_from_shard($shard_num);
-    return $response->{retval};
+    my $shard = $shards{$$self}[$shard_num];
+    my $responses = $self->_rpc( $args, [$shard] );
+    return $responses->[0];
+}
+
+sub _rpc {
+    my ( $self, $args, $shards ) = @_;
+
+    my $request  = $self->_serialize_request($args);
+    my $timeout  = 5;
+    my $shutdown = $args->{_action} eq 'done'
+        || $args->{_action} eq 'terminate';
+
+    my ( $rin, $win, $ein ) = ( '', '', '' );
+
+    # Initialize shards to send the request
+    for my $shard (@$shards) {
+        my $fileno = $shard->{sock}->fileno;
+        vec( $win, $fileno, 1 ) = 1;
+        $shard->{response} = undef;
+        $shard->{error}    = undef;
+        $shard->{buf}      = $request;
+        $shard->{sent}     = 0;
+        $shard->{callback} = \&_cb_send;
+        $shard->{shutdown} = $shutdown;
+    }
+
+    my $remaining = @$shards;
+
+    # Event loop
+    while ( $remaining > 0 ) {
+        my ( $rout, $wout, $eout );
+
+        my $n = select( $rout = $rin, $wout = $win, $eout = $ein, $timeout );
+
+        confess("select: $!")  if $n == -1;
+        confess("I/O timeout") if $n == 0;
+
+        for my $shard (@$shards) {
+            next if !$shard->{callback};
+            my $fileno = $shard->{sock}->fileno;
+            next if !vec( $rout, $fileno, 1 ) && !vec( $wout, $fileno, 1 );
+            # Dispatch event
+            $shard->{callback}->( $shard, \$rin, \$win, \$ein );
+            --$remaining if !$shard->{callback};
+        }
+    }
+
+    # Collect responses and cleanup
+    my @responses;
+    my @errors;
+    for my $shard (@$shards) {
+        if ( defined $shard->{error} ) {
+            push( @errors, $shard->{error} . ' @ ' . $shard->{addr} );
+        }
+        else {
+            push( @responses, $shard->{response}{retval} );
+        }
+        $shard->{response} = undef;
+        $shard->{error}    = undef;
+        $shard->{buf}      = undef;
+    }
+    confess( 'RPC error: ' . join( ', ', @errors ) ) if @errors;
+    return \@responses;
 }
 
 # Serialize a method name and hash-style parameters using the conventions
@@ -161,62 +175,86 @@ sub _serialize_request {
     return \$request;
 }
 
-# Send a serialized request to one shard.
-sub _send_request_to_shard {
-    my ( $self, $shard_num, $request ) = @_;
-    my $sock = $socks{$$self}[$shard_num];
-    print $sock $$request or confess $!;
+# Send a (partial) request to a shard
+sub _cb_send {
+    my ( $shard, $rin, $win, $ein ) = @_;
 
-=begin disabled
-    my $check_val = $sock->syswrite($$request);
-    confess $! unless $check_val == length($$request);
+    my $msg = substr( ${ $shard->{buf} }, $shard->{sent} );
+    my $sent = $shard->{sock}->send($msg);
 
-=end disabled
+    if ( !defined($sent) ) {
+        $shard->{error}    = $!;
+        $shard->{callback} = undef;
+        vec( $$win, $shard->{sock}->fileno, 1 ) = 0;
+        return;
+    }
 
-=cut
+    $shard->{sent} += $sent;
 
-}
-
-# Retrieve the response from a shard.
-sub _retrieve_response_from_shard {
-    my ( $self, $shard_num ) = @_;
-    my $sock       = $socks{$$self}[$shard_num];
-    my $packed_len = "";
-    my $serialized = "";
-    my $check_val  = $sock->read( $packed_len, 4 );
-    confess $! unless $check_val == 4;
-    my $arg_len = unpack( 'N', $packed_len );
-    $check_val = $sock->read( $serialized, $arg_len );
-    confess $! unless $check_val == $arg_len;
-
-=begin disabled
-    my $check_val;
-    $! = undef;
-    while (1) {
-        my $check_val = $sock->sysread( $packed_len, 4 );
-        if (!defined $check_val) {
-            confess $! unless $! == EAGAIN;
-            $! = undef;
-        }
-        elsif ($check_val == 4) {
-            last;
-        }
-        elsif ($check_val == 0) {
-            confess "Socket closed";
+    if ( $sent >= length($msg) ) {
+        # Complete
+        my $fileno = $shard->{sock}->fileno;
+        vec( $$win, $fileno, 1 ) = 0;
+        if ( $shard->{shutdown} ) {
+            # Bail out if we're either closing or shutting down the server
+            # remotely.
+            $shard->{callback} = undef;
         }
         else {
-            confess "Tried to read 4 bytes, got $check_val";
+            # Setup shard to read response length
+            $shard->{buf}      = '';
+            $shard->{callback} = \&_cb_recv_length;
+            vec( $$rin, $fileno, 1 ) = 1;
         }
     }
-    my $arg_len = unpack( 'N', $packed_len );
-    $check_val = $sock->sysread( $serialized, $arg_len );
-    confess $! unless $check_val == $arg_len;
+}
 
-=end disabled
+# Receive a (partial) response length from a shard
+sub _cb_recv_length {
+    my ( $shard, $rin, $win, $ein ) = @_;
 
-=cut
+    my $data;
+    my $r = $shard->{sock}->recv( $data, 4 - length( $shard->{buf} ) );
 
-    return thaw($serialized);
+    if ( !defined($r) || length($data) == 0 ) {
+        $shard->{error} = !defined($r) ? $! : 'Remote shutdown';
+        $shard->{callback} = undef;
+        vec( $$rin, $shard->{sock}->fileno, 1 ) = 0;
+        return;
+    }
+
+    $shard->{buf} .= $data;
+
+    if ( length( $shard->{buf} ) >= 4 ) {
+        # Complete, setup shard to receive response
+        $shard->{response_size} = unpack( 'N', $shard->{buf} );
+        $shard->{buf}           = '';
+        $shard->{callback}      = \&_cb_recv_response;
+    }
+}
+
+# Receive a (partial) response from a shard
+sub _cb_recv_response {
+    my ( $shard, $rin, $win, $ein ) = @_;
+
+    my $data;
+    my $remaining = $shard->{response_size} - length( $shard->{buf} );
+    my $r = $shard->{sock}->recv( $data, $remaining );
+
+    if ( !defined($r) || length($data) == 0 ) {
+        $shard->{error} = !defined($r) ? $! : 'Remote shutdown';
+        $shard->{callback} = undef;
+        vec( $$rin, $shard->{sock}->fileno, 1 ) = 0;
+        return;
+    }
+
+    $shard->{buf} .= $data;
+
+    if ( length( $shard->{buf} ) >= $shard->{response_size} ) {
+        # Finished
+        $shard->{response} = thaw( $shard->{buf} );
+        $shard->{callback} = undef;
+    }
 }
 
 sub top_docs {
@@ -312,16 +350,12 @@ sub doc_freq {
 
 sub close {
     my $self = shift;
-    return unless $socks{$$self} && $select{$$self};
+    return unless $shards{$$self};
     $self->_multi_rpc( { _action => 'done' } );
-    if ( $select{$$self} ) {
-        $select{$$self}->remove( $socks{$$self} );
+    for my $shard ( @{ $shards{$$self} } ) {
+        close $shard->{sock} or confess("Error when closing socket: $!");
     }
-    for my $sock ( @{ $socks{$$self} } ) {
-        close $sock or confess("Error when closing socket: $!");
-    }
-    delete $socks{$$self};
-    delete $select{$$self};
+    delete $shards{$$self};
 }
 
 1;
