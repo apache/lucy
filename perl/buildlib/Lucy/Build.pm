@@ -673,7 +673,9 @@ END_AUTOGEN
 sub ACTION_dist {
     my $self = shift;
 
+    # Create POD but make sure not to include build artifacts.
     $self->dispatch('pod');
+    _clean_prereq_builds($self);
 
     # We build our Perl release tarball from $REPOS_ROOT/perl, rather than
     # from the top-level.
@@ -764,25 +766,24 @@ sub ACTION_semiclean {
     }
 }
 
-sub ACTION_clean {
+# Run the cleanup targets for independent prerequisite builds.
+sub _clean_prereq_builds {
     my $self = shift;
     if ( -e $CLOWNFISH_BUILD ) {
-        system("$^X $CLOWNFISH_BUILD clean")
+        my $old_dir = getcwd();
+        chdir $CLOWNFISH_DIR;
+        system("$^X Build realclean")
             and die "Clownfish clean failed";
+        chdir $old_dir;
     }
     $self->_run_make( dir => $CHARMONIZER_ORIG_DIR, args => ['clean'] );
     $self->_run_make( dir => $LEMON_DIR,            args => ['clean'] );
-    $self->SUPER::ACTION_clean;
 }
 
-sub ACTION_realclean {
+sub ACTION_clean {
     my $self = shift;
-    if ( -e $CLOWNFISH_BUILD ) {
-        system("$^X $CLOWNFISH_BUILD realclean")
-            and die "Clownfish realclean failed";
-    }
-
-    $self->SUPER::ACTION_realclean;
+    _clean_prereq_builds($self);
+    $self->SUPER::ACTION_clean;
 }
 
 1;
