@@ -49,6 +49,8 @@ S_run_tests(TestBatch *batch) {
 #ifdef HAS_LONG_LONG
     LONG_EQ(SIZEOF_LONG_LONG, sizeof(long long),
             "HAS_LONG_LONG and SIZEOF_LONG_LONG");
+#else
+    SKIP("No 'long long' type");
 #endif
 
 #ifdef HAS_INTTYPES_H
