@@ -689,6 +689,7 @@ sub ACTION_dist {
         charmonizer
         devel
         clownfish
+        lemon
         CHANGES
         CONTRIBUTING
         LICENSE
