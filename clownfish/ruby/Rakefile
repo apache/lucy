@@ -20,6 +20,7 @@ CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
 CLOWNFISH_INCLUDE_DIR   = File.join('..','include')
 CLOWNFISH_SRC_DIR       = File.join('..','src')
 LEMON_SRC_DIR           = File.join('..','..','lemon')
+RUBY_EXT_CFC            = File.join('.','ext','Clownfish')
 
 desc "Build lemon"
 task :build_lemon do
@@ -37,6 +38,17 @@ task :clownfish => [:parse_y_files] do
       abort "Failed cc compile"
     end
   end
+  Rake::Task['cfc_ext'].invoke
+end
+
+desc "Build CFC Ext"
+task :cfc_ext => [:clownfish] do
+    Dir.chdir(RUBY_EXT_CFC) do
+        ruby 'extconf.rb'
+        if system('make').nil?
+            abort "Failed to make cfc ruby extension"
+        end
+    end
 end
 
 desc "Lemonize the y file"
@@ -131,4 +143,6 @@ end
 CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.out')
 CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.c')
 CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.h')
+CLEAN.include(RUBY_EXT_CFC + '/CFC.o')
+CLEAN.include(RUBY_EXT_CFC + '/CFC.bundle')
 
