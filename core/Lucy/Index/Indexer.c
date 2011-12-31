@@ -425,6 +425,8 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
             = (SegReader*)CERTIFY(VA_Fetch(to_merge, i), SEGREADER);
         CharBuf *seg_name = SegReader_Get_Seg_Name(seg_reader);
         if (Hash_Fetch(seen, (Obj*)seg_name)) {
+            DECREF(seen);
+            DECREF(to_merge);
             THROW(ERR, "Recycle() tried to merge segment '%o' twice",
                   seg_name);
         }
