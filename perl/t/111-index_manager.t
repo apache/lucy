@@ -117,12 +117,10 @@ $manager->set_deletion_lock_interval(6);
 is( $manager->get_deletion_lock_interval,
     6, "set/get deletion lock interval" );
 
-SKIP: {
-    skip( "Known leak", 1 ) if $ENV{LUCY_VALGRIND};
-    my $indexer = Lucy::Index::Indexer->new(
-        index   => $folder,
-        manager => BogusManager->new,
-    );
-    eval { $indexer->commit };
-    like( $@, qr/recycle/i, "duplicated segment via recycle triggers error" );
-}
+my $indexer = Lucy::Index::Indexer->new(
+    index   => $folder,
+    manager => BogusManager->new,
+);
+eval { $indexer->commit };
+like( $@, qr/recycle/i, "duplicated segment via recycle triggers error" );
+
