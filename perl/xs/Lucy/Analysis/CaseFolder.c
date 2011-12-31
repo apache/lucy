@@ -26,6 +26,10 @@
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"
 
+#ifndef _to_utf8_lower_flags
+  #define _to_utf8_lower_flags Perl__to_utf8_lower_flags
+#endif
+
 static size_t
 S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
                  uint8_t **buf, uint8_t **limit) {
