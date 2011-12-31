@@ -33,11 +33,10 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/StringHelper.h"
 
-// Obtain/release read locks and commit locks.  If self->manager is
-// NULL, do nothing.
-static void
+// Obtain/release read locks and commit locks.
+static bool_t
 S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_filename);
-static void
+static bool_t 
 S_obtain_deletion_lock(PolyReader *self);
 static void
 S_release_read_lock(PolyReader *self);
@@ -269,7 +268,12 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
     PolyReader_init(self, NULL, folder, snapshot, manager, NULL);
     DECREF(folder);
 
-    if (manager) { S_obtain_deletion_lock(self); }
+    if (manager) { 
+        if (!S_obtain_deletion_lock(self)) {
+            DECREF(self);
+            THROW(LOCKERR, "Couldn't get deletion lock");
+        }
+    }
 
     while (1) {
         CharBuf *target_snap_file;
@@ -298,7 +302,11 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
 
         // Get a read lock on the most recent snapshot file if indicated.
         if (manager) {
-            S_obtain_read_lock(self, target_snap_file);
+            if (!S_obtain_read_lock(self, target_snap_file)) {
+                DECREF(self);
+                THROW(LOCKERR, "Couldn't get read lock for %o",
+                      target_snap_file);
+            }
         }
 
         // Testing only.
@@ -380,28 +388,30 @@ S_derive_folder(Obj *index) {
     return folder;
 }
 
-static void
+static bool_t 
 S_obtain_deletion_lock(PolyReader *self) {
     self->deletion_lock = IxManager_Make_Deletion_Lock(self->manager);
     Lock_Clear_Stale(self->deletion_lock);
     if (!Lock_Obtain(self->deletion_lock)) {
         DECREF(self->deletion_lock);
         self->deletion_lock = NULL;
-        THROW(LOCKERR, "Couldn't get commit lock");
+        return false;
     }
+    return true;
 }
 
-static void
+static bool_t
 S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_file_name) {
-    if (!self->manager) { return; }
     self->read_lock = IxManager_Make_Snapshot_Read_Lock(self->manager,
                                                         snapshot_file_name);
 
     Lock_Clear_Stale(self->read_lock);
     if (!Lock_Obtain(self->read_lock)) {
         DECREF(self->read_lock);
-        THROW(LOCKERR, "Couldn't get read lock for %o", snapshot_file_name);
+        self->read_lock = NULL;
+        return false;
     }
+    return true;
 }
 
 static void
