@@ -81,6 +81,9 @@ BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 sub extra_ccflags {
     my $self      = shift;
     my $gcc_flags = '-std=gnu99 -D_GNU_SOURCE ';
+    if ( $Config{osname} =~ /openbsd/i && !$Config{usethreads} ) {
+        $gcc_flags .= '-DLUCY_NOTHREADS ';
+    }
     if ( defined $ENV{LUCY_VALGRIND} ) {
         return "$gcc_flags -DLUCY_VALGRIND -fno-inline-functions ";
     }
@@ -621,7 +624,10 @@ sub ACTION_compile_custom_xs {
     my $lib_file = catfile( $archdir, "Lucy.$Config{dlext}" );
     if ( !$self->up_to_date( [ @objects, $AUTOGEN_DIR ], $lib_file ) ) {
         # TODO: use Charmonizer to determine whether pthreads are userland.
-        my $link_flags = $Config{osname} =~ /openbsd/i ? '-lpthread ' : '';
+        my $link_flags = '';
+        if ( $Config{osname} =~ /openbsd/i && $Config{usethreads} ) {
+            $link_flags = '-lpthread ';
+        }
         $cbuilder->link(
             module_name        => 'Lucy',
             objects            => \@objects,

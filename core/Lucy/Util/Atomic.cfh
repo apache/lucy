@@ -29,8 +29,22 @@ __C__
 static CHY_INLINE chy_bool_t
 lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
 
+/************************** Single threaded *******************************/
+#ifdef LUCY_NOTHREADS
+
+static CHY_INLINE chy_bool_t
+lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
+    if (*target == old_value) {
+        *target = new_value;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 /************************** Mac OS X 10.4 and later ***********************/
-#ifdef CHY_HAS_OSATOMIC_CAS_PTR
+#elif defined(CHY_HAS_OSATOMIC_CAS_PTR)
 #include <libkern/OSAtomic.h>
 
 static CHY_INLINE chy_bool_t
