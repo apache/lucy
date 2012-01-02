@@ -72,7 +72,7 @@ for my $port (@ports) {
         for (qw( a b c )) {
             my %doc = (
                 content => "x $_ $port",
-                junk    => "xyz " x 4000, # should trigger partial reads
+                junk    => "xyz " x 4000,    # should trigger partial reads
                 number  => $number,
                 port    => $port,
             );
@@ -83,11 +83,10 @@ for my $port (@ports) {
 
         my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
         my $server = LucyX::Remote::SearchServer->new(
-            port     => $port,
             searcher => $searcher,
             password => 'foo',
         );
-        $server->serve;
+        $server->serve( port => $port );
         exit(0);
     }
 }
