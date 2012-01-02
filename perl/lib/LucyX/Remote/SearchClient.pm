@@ -23,7 +23,6 @@ use Storable qw( nfreeze thaw );
 
 # Inside-out member vars.
 our %peer_address;
-our %password;
 our %sock;
 
 use IO::Socket::INET;
@@ -31,10 +30,8 @@ use IO::Socket::INET;
 sub new {
     my ( $either, %args ) = @_;
     my $peer_address = delete $args{peer_address};
-    my $password     = delete $args{password};
     my $self         = $either->SUPER::new(%args);
     $peer_address{$$self} = $peer_address;
-    $password{$$self}     = $password;
 
     # Establish a connection.
     my $sock = $sock{$$self} = IO::Socket::INET->new(
@@ -43,7 +40,7 @@ sub new {
     );
     confess("No socket: $!") unless $sock;
     $sock->autoflush(1);
-    my %handshake_args = ( _action => 'handshake', password => $password );
+    my %handshake_args = ( _action => 'handshake' );
     my $response = $self->_rpc( \%handshake_args );
     confess("Failed to connect") unless $response;
 
@@ -54,7 +51,6 @@ sub DESTROY {
     my $self = shift;
     $self->close if defined $sock{$$self};
     delete $peer_address{$$self};
-    delete $password{$$self};
     delete $sock{$$self};
     $self->SUPER::DESTROY;
 }
@@ -178,11 +174,6 @@ Constructor.  Takes hash-style params.
 
 B<peer_address> - The name/IP and the port number which the client should
 attempt to connect to.
-
-=item *
-
-B<password> - Optional password to be supplied to the SearchServer when
-initializing socket connection.
 
 =back
 

@@ -72,7 +72,6 @@ else {
     my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
     my $server = LucyX::Remote::SearchServer->new(
         searcher => $searcher,
-        password => 'foo',
     );
     $server->serve( port => $PORT_NUM );
     exit(0);
@@ -93,7 +92,6 @@ else {
 my $searchclient = LucyX::Remote::SearchClient->new(
     schema       => SortSchema->new,
     peer_address => "localhost:$PORT_NUM",
-    password     => 'foo',
 );
 
 is( $searchclient->doc_freq( field => 'content', term => 'x' ),
