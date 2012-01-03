@@ -71,11 +71,10 @@ else {
 
     my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
     my $server = LucyX::Remote::SearchServer->new(
-        port     => $PORT_NUM,
         searcher => $searcher,
         password => 'foo',
     );
-    $server->serve;
+    $server->serve( port => $PORT_NUM );
     exit(0);
 }
 
