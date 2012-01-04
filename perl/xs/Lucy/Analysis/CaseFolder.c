@@ -26,10 +26,6 @@
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"
 
-#ifndef _to_utf8_lower_flags
-  #define _to_utf8_lower_flags Perl__to_utf8_lower_flags
-#endif
-
 static size_t
 S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
                  uint8_t **buf, uint8_t **limit) {
@@ -38,10 +34,16 @@ S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
     uint8_t            *dest_start = dest;
     uint8_t *const      end        = source + len;
     uint8_t             utf8_buf[7];
+    dTHX;
 
     while (source < end) {
         STRLEN buf_utf8_len;
-        (void)to_utf8_lower(source, utf8_buf, &buf_utf8_len);
+        #if (PERL_VERSION == 15 && PERL_SUBVERSION >= 6)
+        Perl__to_utf8_lower_flags(aTHX_ source, utf8_buf, &buf_utf8_len,
+                                  0, NULL);
+        #else
+        Perl_to_utf8_lower(aTHX_ source, utf8_buf, &buf_utf8_len);
+        #endif
 
         // Grow if necessary.
         if (((STRLEN)(*limit - dest)) < buf_utf8_len) {
