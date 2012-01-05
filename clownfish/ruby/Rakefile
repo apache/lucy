@@ -43,7 +43,7 @@ end
 
 desc "Build CFC Ext"
 task :cfc_ext => [:clownfish] do
-    Dir.chdir(RUBY_EXT_CFC) do
+    Dir.chdir(RUBY_EXT_CFC + "/CFC") do
         ruby 'extconf.rb'
         if system('make').nil?
             abort "Failed to make cfc ruby extension"
@@ -145,4 +145,6 @@ CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.c')
 CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.h')
 CLEAN.include(RUBY_EXT_CFC + '/CFC.o')
 CLEAN.include(RUBY_EXT_CFC + '/CFC.bundle')
+CLEAN.include(RUBY_EXT_CFC + '/CFC/Hierarchy/Hierarchy.bundle')
+CLEAN.include(RUBY_EXT_CFC + '/CFC/Hierarchy/Hierarchy.o')
 
