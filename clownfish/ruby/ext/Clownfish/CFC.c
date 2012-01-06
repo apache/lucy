@@ -17,9 +17,9 @@
 #include "ruby.h"
 #include "CFC.h"
 
-VALUE mClownfish;
-VALUE mCFC;
-VALUE cHierarchy;
+static VALUE mClownfish;
+static VALUE mCFC;
+static VALUE cHierarchy;
 
 static VALUE cfc_hierarchy_alloc(VALUE klass) {
     CFCHierarchy *self = CFCHierarchy_allocate();
@@ -46,6 +46,8 @@ static VALUE cfc_hierarchy_build(VALUE self_rb) {
 
     Data_Get_Struct(self_rb, CFCHierarchy, self);
     CFCHierarchy_build(self);
+
+    return Qnil;
 }
 
 void Init_CFC() { 
