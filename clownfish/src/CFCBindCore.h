@@ -41,6 +41,9 @@ struct CFCHierarchy;
  * typically copyright information.
  */
 CFCBindCore*
+CFCBindCore_allocate();
+
+CFCBindCore*
 CFCBindCore_new(struct CFCHierarchy *hierarchy, const char *dest,
                 const char *header, const char *footer);
 
