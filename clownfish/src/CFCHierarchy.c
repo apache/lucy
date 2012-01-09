@@ -69,13 +69,8 @@ const static CFCMeta CFCHIERARCHY_META = {
 };
 
 CFCHierarchy*
-CFCHierarchy_allocate() {
-    return (CFCHierarchy*)CFCBase_allocate(&CFCHIERARCHY_META);
-}
-
-CFCHierarchy*
 CFCHierarchy_new(const char *source, const char *dest) {
-    CFCHierarchy *self = CFCHierarchy_allocate();
+    CFCHierarchy *self = (CFCHierarchy*)CFCBase_allocate(&CFCHIERARCHY_META);
     return CFCHierarchy_init(self, source, dest);
 }
 

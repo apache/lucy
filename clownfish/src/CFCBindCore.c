@@ -54,14 +54,9 @@ const static CFCMeta CFCBINDCORE_META = {
 };
 
 CFCBindCore*
-CFCBindCore_allocate() {
-    return (CFCBindCore*)CFCBase_allocate(&CFCBINDCORE_META);
-}
-
-CFCBindCore*
 CFCBindCore_new(CFCHierarchy *hierarchy, const char *dest, const char *header,
                 const char *footer) {
-    CFCBindCore *self = CFCBindCore_allocate();
+    CFCBindCore *self = (CFCBindCore*)CFCBase_allocate(&CFCBINDCORE_META);
     return CFCBindCore_init(self, hierarchy, dest, header, footer);
 }
 
