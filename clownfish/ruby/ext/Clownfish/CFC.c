@@ -23,27 +23,25 @@ static VALUE mCFC;
 static VALUE cBindCore;
 static VALUE cHierarchy;
 
-static VALUE cfc_binding_core_alloc(VALUE klass) {
-    CFCBindCore *self = CFCBindCore_allocate();
-
-    VALUE self_rb = Data_Wrap_Struct(klass, 0, CFCBindCore_destroy, self);
-
-    return self_rb;
+static VALUE S_CFC_Binding_Core_Alloc(VALUE klass) {
+    void *ptr = NULL;
+    return Data_Wrap_Struct(klass, NULL, NULL, ptr);
 }
 
-static VALUE cfc_binding_core_init(VALUE self_rb, VALUE hierarchy, VALUE dest, VALUE header, VALUE footer) {
+static VALUE S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE dest, VALUE header, VALUE footer) {
     CFCHierarchy* hierarchy_obj;
-    CFCBindCore *self;
+    CFCBindCore* self;
 
     Data_Get_Struct(hierarchy,CFCHierarchy,hierarchy_obj);
     Data_Get_Struct(self_rb, CFCBindCore, self);
 
-    CFCBindCore_init(self, hierarchy_obj, StringValuePtr(dest), StringValuePtr(header), StringValuePtr(footer));
+    self = CFCBindCore_new(hierarchy_obj,StringValuePtr(dest), StringValuePtr(header), StringValuePtr(footer));
 
+    DATA_PTR(self_rb) = self;
     return self_rb;
 }
 
-static VALUE cfc_binding_core_write_all_modified(int argc, VALUE *argv, VALUE self_rb) {
+static VALUE S_CFC_Binding_Core_Write_All_Modified(int argc, VALUE *argv, VALUE self_rb) {
     CFCBindCore *self;
 
     int modified = argc > 0 && RTEST(argv[0]) ? 1 : 0;
@@ -54,27 +52,23 @@ static VALUE cfc_binding_core_write_all_modified(int argc, VALUE *argv, VALUE se
     return Qnil;
 }
 
-static VALUE cfc_hierarchy_alloc(VALUE klass) {
-    CFCHierarchy *self = CFCHierarchy_allocate();
+static VALUE S_CFC_Hierarchy_Alloc(VALUE klass) {
+    void *ptr = NULL;
+    return Data_Wrap_Struct(klass, NULL, NULL, ptr);
+}
 
-    VALUE self_rb = Data_Wrap_Struct(klass, 0, CFCHierarchy_destroy, self);
+static VALUE S_CFC_Hierarchy_Init(VALUE self_rb, VALUE source, VALUE dest) {
+    CFCHierarchy* self;
 
+    Data_Get_Struct(self_rb,CFCHierarchy, self);
+
+    self = CFCHierarchy_new(StringValuePtr(source), StringValuePtr(dest));
+
+    DATA_PTR(self_rb) = self;
     return self_rb;
 }
 
-static VALUE cfc_hierarchy_init(VALUE self_rb, VALUE source, VALUE dest) {
-
-    char *s = StringValuePtr(source);
-    char *d = StringValuePtr(dest);
-    CFCHierarchy *self;
-
-    Data_Get_Struct(self_rb, CFCHierarchy, self);
-    CFCHierarchy_init(self, s, d);
-
-    return self_rb;
-}
-
-static VALUE cfc_hierarchy_build(VALUE self_rb) {
+static VALUE S_CFC_Hierarchy_Build(VALUE self_rb) {
     CFCHierarchy *self;
 
     Data_Get_Struct(self_rb, CFCHierarchy, self);
@@ -90,12 +84,12 @@ void Init_CFC() {
     cHierarchy  = rb_define_class_under(mCFC, "Hierarchy", rb_cObject);
     cBindCore   = rb_define_class_under(mBinding, "Core", rb_cObject);
 
-    rb_define_alloc_func(cHierarchy, cfc_hierarchy_alloc);
-    rb_define_method(cHierarchy, "initialize", cfc_hierarchy_init, 2);
-    rb_define_method(cHierarchy, "build", cfc_hierarchy_build, 0);
+    rb_define_alloc_func(cHierarchy, S_CFC_Hierarchy_Alloc);
+    rb_define_method(cHierarchy, "initialize", S_CFC_Hierarchy_Init, 2);
+    rb_define_method(cHierarchy, "build", S_CFC_Hierarchy_Build, 0);
 
-    rb_define_alloc_func(cBindCore, cfc_binding_core_alloc);
-    rb_define_method(cBindCore, "initialize", cfc_binding_core_init, 4);
-    rb_define_method(cBindCore, "write_all_modified", cfc_binding_core_write_all_modified, -1);
+    rb_define_alloc_func(cBindCore, S_CFC_Binding_Core_Alloc);
+    rb_define_method(cBindCore, "initialize", S_CFC_Binding_Core_Init, 4);
+    rb_define_method(cBindCore, "write_all_modified", S_CFC_Binding_Core_Write_All_Modified, -1);
 }
 
