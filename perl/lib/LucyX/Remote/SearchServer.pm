@@ -24,7 +24,6 @@ use Scalar::Util qw( reftype );
 
 # Inside-out member vars.
 our %searcher;
-our %password;
 
 use IO::Socket::INET;
 use IO::Select;
@@ -32,11 +31,8 @@ use IO::Select;
 sub new {
     my ( $either, %args ) = @_;
     my $searcher = delete $args{searcher};
-    my $password = delete $args{password};
     my $self     = $either->SUPER::new(%args);
     $searcher{$$self} = $searcher;
-    confess("Missing required param 'password'") unless defined $password;
-    $password{$$self} = $password;
 
     return $self;
 }
@@ -44,7 +40,6 @@ sub new {
 sub DESTROY {
     my $self = shift;
     delete $searcher{$$self};
-    delete $password{$$self};
     $self->SUPER::DESTROY;
 }
 
@@ -140,13 +135,6 @@ sub serve_rpc {
 sub do_handshake {
     my ( $self, $args ) = @_;
     my $retval = 1;
-    if ( defined $password{$$self} ) {
-        if ( !defined $args->{password}
-            || $password{$$self} ne $args->{password} )
-        {
-            $retval = 0;
-        }
-    }
     return { retval => $retval };
 }
 
@@ -220,7 +208,6 @@ distributed across multiple nodes, each with its own, smaller index.
 
     my $search_server = LucyX::Remote::SearchServer->new(
         searcher => $searcher, # required
-        password => $pass,     # optional
     );
 
 Constructor.  Takes hash-style parameters.
@@ -231,11 +218,6 @@ Constructor.  Takes hash-style parameters.
 
 B<searcher> - the L<Searcher|Lucy::Search::IndexSearcher> that the SearchServer
 will wrap.
-
-=item *
-
-B<password> - an optional password which, if supplied, must also be supplied
-by clients.
 
 =back
 

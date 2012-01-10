@@ -25,7 +25,6 @@ use Scalar::Util qw( reftype );
 # Inside-out member vars.
 our %shards;
 our %num_shards;
-our %password;
 our %starts;
 our %doc_max;
 
@@ -34,12 +33,10 @@ use IO::Socket::INET;
 sub new {
     my ( $either, %args ) = @_;
     my $addrs    = delete $args{shards};
-    my $password = delete $args{password};
     my $self     = $either->SUPER::new(%args);
     confess("'shards' must be an arrayref")
         unless reftype($addrs) eq 'ARRAY';
     $num_shards{$$self} = scalar @$addrs;
-    $password{$$self}   = $password;
 
     # Establish connections.
     my @shards;
@@ -59,7 +56,7 @@ sub new {
     $shards{$$self} = \@shards;
 
     # Handshake with servers.
-    my %handshake_args = ( password => $password, _action => 'handshake' );
+    my %handshake_args = ( _action => 'handshake' );
     my $responses = $self->_multi_rpc( \%handshake_args );
     for my $response (@$responses) {
         confess unless $response;
@@ -84,7 +81,6 @@ sub DESTROY {
     $self->close if defined $shards{$$self};
     delete $shards{$$self};
     delete $num_shards{$$self};
-    delete $password{$$self};
     delete $starts{$$self};
     delete $doc_max{$$self};
     $self->SUPER::DESTROY;
@@ -399,11 +395,6 @@ B<schema> - A Schema, which must match the Schema used by each remote node.
 
 B<shards> - An array of host:port pairs running LucyX::Remote::SearchServer
 instances, which identifying the shards that make up the composite index.
-
-=item *
-
-B<password> - Optional password to be supplied to the SearchServers when
-initializing socket connections.
 
 =back
 

@@ -84,7 +84,6 @@ for my $port (@ports) {
         my $searcher = Lucy::Search::IndexSearcher->new( index => $folder );
         my $server = LucyX::Remote::SearchServer->new(
             searcher => $searcher,
-            password => 'foo',
         );
         $server->serve( port => $port );
         exit(0);
@@ -109,7 +108,6 @@ else {
 my $solo_cluster_searcher = LucyX::Remote::ClusterSearcher->new(
     schema   => SortSchema->new,
     shards   => ["localhost:$ports[0]"],
-    password => 'foo',
 );
 
 is( $solo_cluster_searcher->doc_freq( field => 'content', term => 'x' ),
@@ -129,7 +127,6 @@ is( $hits->total_hits, 1, "retrieved hit from search server" );
 my $cluster_searcher = LucyX::Remote::ClusterSearcher->new(
     schema   => SortSchema->new,
     shards   => [ map {"localhost:$_"} @ports ],
-    password => 'foo',
 );
 
 $hits = $cluster_searcher->hits( query => 'b' );
