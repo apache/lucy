@@ -26,6 +26,7 @@ my %section_headers = (
     Improvement   => 'Improvements',
     "New Feature" => 'New features',
     Task          => 'Tasks',
+    'Sub-task'    => 'Tasks',
     Test          => 'Tests',
 );
 
