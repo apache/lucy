@@ -1,5 +1,50 @@
 Revision history for Lucy
 
+0.3.0  XXXX-XX-XX
+
+  Bugfixes:
+
+    * [LUCY-175] - Missing stdarg.h breaks build
+    * [LUCY-176] - More INCREF/DECREF symbol collisions under Windows
+    * [LUCY-178] - Discriminate between stdio and POSIX in large file support
+                   probing.
+    * [LUCY-180] - ORQuery, ANDQuery, RequiredOptionalQuery optimizations
+                   affect scoring
+    * [LUCY-181] - Perl Documentation fix - Remove links to classes within
+                   docs, that are not exposed to Perl
+    * [LUCY-182] - highlighter bug when searching for duplicate terms [wordX
+                   wordX]
+    * [LUCY-183] - Eliminate spurious "extra" query normalization
+    * [LUCY-185] - Improve error handling when required params not supplied
+    * [LUCY-186] - Terminate connection from SearchClient properly
+    * [LUCY-187] - Adapt to GC changes in Perl 5.15
+    * [LUCY-188] - Highlighter should accept weighted Queries (Compilers)
+    * [LUCY-193] - Occasional schema file name collision under 'truncate'
+    * [LUCY-195] - Revisit pthreads linking on OpenBSD.
+    * [LUCY-206] - Work around broken export in Perl 5.15.6
+
+  Improvements:
+
+    * [LUCY-142] - Port Clownfish compiler to C
+    * [LUCY-143] - Convert Clownfish::Parser to Lemon
+    * [LUCY-179] - Tighten UTF-8 validity checks.
+    * [LUCY-197] - Clean whitespace for 0.3.0
+
+  New features:
+
+    * [LUCY-173] - Bundle Lemon parser generator
+    * [LUCY-189] - Bundle utf8proc
+    * [LUCY-191] - Unicode normalization
+    * [LUCY-196] - UAX #29 tokenizer
+    * [LUCY-203] - Implement EasyAnalyzer
+
+  Tasks:
+
+    * [LUCY-133] - Eliminate JSON::XS dependency
+    * [LUCY-134] - Eliminate Parse::RecDescent dependency
+    * [LUCY-137] - Dependency licensing in grant code
+
+
 0.2.0  2011-07-24
 
   Bugfixes:
