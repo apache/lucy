@@ -198,6 +198,40 @@ test_Raw_Excerpt(TestBatch *batch, Searcher *searcher, Obj *query) {
     DECREF(heat_map);
     DECREF(raw_excerpt);
 
+    // Words longer than excerpt len
+
+    field_val   = (CharBuf *)ZCB_WRAP_STR("abc/def/ghi/jkl/mno", 19);
+    sentences = VA_new(1);
+    VA_Push(sentences, (Obj*)Span_new(0, 19, 0.0f));
+
+    raw_excerpt = CB_new(0);
+    spans       = VA_new(1);
+    VA_Push(spans, (Obj*)Span_new(0, 3, 1.0f));
+    heat_map = HeatMap_new(spans, 133);
+    DECREF(spans);
+    top = Highlighter_Raw_Excerpt(highlighter, field_val, field_val,
+                                  raw_excerpt, 0, heat_map, sentences);
+    TEST_TRUE(batch,
+              CB_Equals_Str(raw_excerpt, "abc/d" ELLIPSIS, 8),
+              "Long word");
+    DECREF(heat_map);
+    DECREF(raw_excerpt);
+
+    raw_excerpt = CB_new(0);
+    spans       = VA_new(1);
+    VA_Push(spans, (Obj*)Span_new(8, 3, 1.0f));
+    heat_map = HeatMap_new(spans, 133);
+    DECREF(spans);
+    top = Highlighter_Raw_Excerpt(highlighter, field_val, field_val,
+                                  raw_excerpt, 0, heat_map, sentences);
+    TEST_TRUE(batch,
+              CB_Equals_Str(raw_excerpt, ELLIPSIS " c/d" ELLIPSIS, 10),
+              "Long word");
+    DECREF(heat_map);
+    DECREF(raw_excerpt);
+
+    DECREF(sentences);
+
     DECREF(highlighter);
 }
 
@@ -481,7 +515,7 @@ test_highlighting(TestBatch *batch) {
 
 void
 TestHighlighter_run_tests() {
-    TestBatch *batch = TestBatch_new(32);
+    TestBatch *batch = TestBatch_new(34);
 
     TestBatch_Plan(batch);
 
