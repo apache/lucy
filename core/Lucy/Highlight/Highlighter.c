@@ -379,6 +379,11 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
         // not need to make room.
         this_excerpt_len += ELLIPSIS_LEN;
 
+        // Remember original position
+        ZombieCharBuf *orig_temp = ZCB_WRAP((CharBuf*)field_val);
+        int32_t orig_start = start;
+        int32_t orig_len   = this_excerpt_len;
+
         // Move the start back one in case the character right before the
         // excerpt starts is whitespace.
         if (start) {
@@ -404,6 +409,20 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
             }
         } while (ZCB_Get_Size(temp));
 
+        if (ZCB_Get_Size(temp) == 0) {
+            // Word is longer than excerpt_length. Reset to original position
+            // truncating the word.
+            temp             = orig_temp;
+            start            = orig_start;
+            this_excerpt_len = orig_len;
+            int32_t diff = this_excerpt_len - self->excerpt_length;
+            if (diff > 0) {
+                ZCB_Nip(temp, diff);
+                start            += diff;
+                this_excerpt_len -= diff;
+            }
+        }
+
         ZCB_Truncate(temp, self->excerpt_length - ELLIPSIS_LEN);
         CB_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
         CB_Cat_Char(raw_excerpt, ' ');
@@ -416,6 +435,11 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
         CB_Truncate(raw_excerpt, end - start);
     }
     else {
+        // Remember original excerpt
+        CharBuf *orig_raw_excerpt = CB_Clone(raw_excerpt);
+        // Check for prepended ellipsis
+        int32_t min_size = found_starting_edge ? 0 : 4;
+
         do {
             uint32_t code_point = CB_Code_Point_From(raw_excerpt, 1);
             CB_Chop(raw_excerpt, 1);
@@ -438,8 +462,18 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
 
                 break;
             }
-        } while (CB_Get_Size(raw_excerpt));
+        } while (CB_Get_Size(raw_excerpt) > min_size);
+
+        if (CB_Get_Size(raw_excerpt) == min_size) {
+            // Word is longer than excerpt_length. Reset to original excerpt
+            // truncating the word.
+            CB_Mimic(raw_excerpt, (Obj*)orig_raw_excerpt);
+            CB_Chop(raw_excerpt, 1);
+        }
+
         CB_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
+
+        DECREF(orig_raw_excerpt);
     }
 
     return start;
