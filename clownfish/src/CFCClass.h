@@ -136,10 +136,10 @@ struct CFCMethod*
 CFCClass_method(CFCClass *self, const char *sym);
 
 /** Return a Method object if the Method corresponding to the supplied sym is
- * novel.
+ * implemented in this class.
  */
 struct CFCMethod*
-CFCClass_novel_method(CFCClass *self, const char *sym);
+CFCClass_fresh_method(CFCClass *self, const char *sym);
 
 /** Bequeath all inherited methods and members to children.
  */
@@ -152,15 +152,15 @@ CFCClass_grow_tree(CFCClass *self);
 CFCClass**
 CFCClass_tree_to_ladder(CFCClass *self);
 
-/** Return an array of all novel methods.
+/** Return an array of all methods implemented in this class.
  */
 struct CFCMethod**
-CFCClass_novel_methods(CFCClass *self);
+CFCClass_fresh_methods(CFCClass *self);
 
-/** Return an array of all novel member variables.
+/** Return an array of all member variables declared in this class.
  */
 struct CFCVariable**
-CFCClass_novel_member_vars(CFCClass *self);
+CFCClass_fresh_member_vars(CFCClass *self);
 
 /** Return an array of all child classes.
  */

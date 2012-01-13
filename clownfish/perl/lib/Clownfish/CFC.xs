@@ -253,11 +253,11 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-novel_method(self, sym)
+fresh_method(self, sym)
     CFCClass *self;
     const char *sym;
 CODE:
-    CFCMethod *method = CFCClass_novel_method(self, sym);
+    CFCMethod *method = CFCClass_fresh_method(self, sym);
     RETVAL = S_cfcbase_to_perlref(method);
 OUTPUT: RETVAL
 
@@ -286,8 +286,8 @@ ALIAS:
     member_vars           = 38
     inert_vars            = 40
     tree_to_ladder        = 42
-    novel_methods         = 44
-    novel_member_vars     = 46
+    fresh_methods         = 44
+    fresh_member_vars     = 46
     privacy_symbol        = 48
 PPCODE:
 {
@@ -392,15 +392,15 @@ PPCODE:
                 break;
             }
         case 44: {
-                CFCMethod **novel = CFCClass_novel_methods(self);
-                retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
-                FREEMEM(novel);
+                CFCMethod **fresh = CFCClass_fresh_methods(self);
+                retval = S_array_of_cfcbase_to_av((CFCBase**)fresh);
+                FREEMEM(fresh);
                 break;
             }
         case 46: {
-                CFCVariable **novel = CFCClass_novel_member_vars(self);
-                retval = S_array_of_cfcbase_to_av((CFCBase**)novel);
-                FREEMEM(novel);
+                CFCVariable **fresh = CFCClass_fresh_member_vars(self);
+                retval = S_array_of_cfcbase_to_av((CFCBase**)fresh);
+                FREEMEM(fresh);
                 break;
             }
         case 48: {

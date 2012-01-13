@@ -122,7 +122,7 @@ sub method_bindings {
         # the object using VTable method dispatch.  Doing things this way
         # allows SUPER:: invocations from Perl-space to work properly.
         for my $descendant ( @{ $client->tree_to_ladder } ) {  # includes self
-            my $real_method = $descendant->novel_method( lc($meth_name) );
+            my $real_method = $descendant->fresh_method( lc($meth_name) );
             next unless $real_method;
 
             # Create the binding, add it to the array.

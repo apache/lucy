@@ -176,7 +176,7 @@ sub error {$Lucy::Object::Err::error}
         return;
     }
 
-    sub novel_host_methods {
+    sub fresh_host_methods {
         my ( undef, $package ) = @_;
         no strict 'refs';
         my $stash = \%{"$package\::"};

@@ -169,9 +169,8 @@ CFCMethod_final(CFCMethod *self);
 int
 CFCMethod_abstract(CFCMethod *self);
 
-/** Returns true if the method's class is the first in the inheritance
- * hierarchy in which the method was declared -- i.e. the method is neither
- * inherited nor overridden.
+/** Returns true if this method is the first implemenation in the inheritance
+ * hierarchy in which the method was declared.
  */
 int
 CFCMethod_novel(CFCMethod *self);

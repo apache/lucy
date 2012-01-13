@@ -42,10 +42,10 @@ lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent) {
 }
 
 lucy_VArray*
-lucy_VTable_novel_host_methods(const lucy_CharBuf *class_name) {
+lucy_VTable_fresh_host_methods(const lucy_CharBuf *class_name) {
     return (lucy_VArray*)lucy_Host_callback_obj(
                LUCY_VTABLE,
-               "novel_host_methods", 1,
+               "fresh_host_methods", 1,
                CFISH_ARG_STR("class_name", class_name));
 }
 

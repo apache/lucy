@@ -126,8 +126,8 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent) {
 
     VTable *singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)subclass_name);
     if (singleton == NULL) {
-        VArray *novel_host_methods;
-        uint32_t num_novel;
+        VArray *fresh_host_methods;
+        uint32_t num_fresh;
 
         if (parent == NULL) {
             CharBuf *parent_class = VTable_find_parent_class(subclass_name);
@@ -150,15 +150,15 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent) {
         singleton->name = CB_Clone(subclass_name);
 
         // Allow host methods to override.
-        novel_host_methods = VTable_novel_host_methods(subclass_name);
-        num_novel = VA_Get_Size(novel_host_methods);
-        if (num_novel) {
-            Hash *meths = Hash_new(num_novel);
+        fresh_host_methods = VTable_fresh_host_methods(subclass_name);
+        num_fresh = VA_Get_Size(fresh_host_methods);
+        if (num_fresh) {
+            Hash *meths = Hash_new(num_fresh);
             uint32_t i;
             CharBuf *scrunched = CB_new(0);
             ZombieCharBuf *callback_name = ZCB_BLANK();
-            for (i = 0; i < num_novel; i++) {
-                CharBuf *meth = (CharBuf*)VA_fetch(novel_host_methods, i);
+            for (i = 0; i < num_fresh; i++) {
+                CharBuf *meth = (CharBuf*)VA_fetch(fresh_host_methods, i);
                 S_scrunch_charbuf(meth, scrunched);
                 Hash_Store(meths, (Obj*)scrunched, INCREF(&EMPTY));
             }
@@ -177,7 +177,7 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent) {
             DECREF(scrunched);
             DECREF(meths);
         }
-        DECREF(novel_host_methods);
+        DECREF(fresh_host_methods);
 
         // Register the new class, both locally and with host.
         if (VTable_add_to_registry(singleton)) {

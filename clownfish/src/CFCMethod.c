@@ -143,8 +143,8 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     sprintf(self->full_override_sym, "%s_OVERRIDE", full_func_sym);
 
     // Assume that this method is novel until we discover when applying
-    // inheritance that it was overridden.
-    self->is_novel = 1;
+    // inheritance that it overrides another.
+    self->is_novel = true;
 
     // Cache typedefs.
     S_update_typedefs(self, CFCSymbol_short_sym((CFCSymbol*)self));
@@ -240,7 +240,7 @@ CFCMethod_finalize(CFCMethod *self) {
                         self->function.param_list,
                         self->function.docucomment, true,
                         self->is_abstract);
-    finalized->is_novel = self->is_final; // Is this right?
+    finalized->is_novel = false;
     S_update_typedefs(finalized, CFCSymbol_short_sym((CFCSymbol*)self));
     return finalized;
 }

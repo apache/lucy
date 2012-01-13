@@ -462,7 +462,7 @@ CFCClass_method(CFCClass *self, const char *sym) {
 }
 
 CFCMethod*
-CFCClass_novel_method(CFCClass *self, const char *sym) {
+CFCClass_fresh_method(CFCClass *self, const char *sym) {
     CFCMethod *method = CFCClass_method(self, sym);
     if (method) {
         const char *cnick = CFCClass_get_cnick(self);
@@ -540,7 +540,12 @@ S_bequeath_methods(CFCClass *self) {
         // if child class is a final class.
         if (child->is_final) {
             for (i = 0; i < num_methods; i++) {
-                methods[i] = CFCMethod_finalize(methods[i]);
+                if (CFCMethod_final(methods[i])) {
+                    CFCBase_incref((CFCBase*)methods[i]);
+                }
+                else {
+                    methods[i] = CFCMethod_finalize(methods[i]);
+                }
             }
         }
         else {
@@ -637,33 +642,33 @@ CFCClass_tree_to_ladder(CFCClass *self) {
 }
 
 static CFCSymbol**
-S_novel_syms(CFCClass *self, CFCSymbol **syms) {
+S_fresh_syms(CFCClass *self, CFCSymbol **syms) {
     const char *cnick = CFCClass_get_cnick(self);
     size_t count = 0;
     while (syms[count] != NULL) { count++; }
     size_t amount = (count + 1) * sizeof(CFCSymbol*);
-    CFCSymbol **novel = (CFCSymbol**)MALLOCATE(amount);
-    size_t num_novel = 0;
+    CFCSymbol **fresh = (CFCSymbol**)MALLOCATE(amount);
+    size_t num_fresh = 0;
     size_t i;
     for (i = 0; i < count; i++) {
         CFCSymbol *sym = syms[i];
         const char *sym_cnick = CFCSymbol_get_class_cnick(sym);
         if (strcmp(sym_cnick, cnick) == 0) {
-            novel[num_novel++] = sym;
+            fresh[num_fresh++] = sym;
         }
     }
-    novel[num_novel] = NULL;
-    return novel;
+    fresh[num_fresh] = NULL;
+    return fresh;
 }
 
 CFCMethod**
-CFCClass_novel_methods(CFCClass *self) {
-    return (CFCMethod**)S_novel_syms(self, (CFCSymbol**)self->methods);
+CFCClass_fresh_methods(CFCClass *self) {
+    return (CFCMethod**)S_fresh_syms(self, (CFCSymbol**)self->methods);
 }
 
 CFCVariable**
-CFCClass_novel_member_vars(CFCClass *self) {
-    return (CFCVariable**)S_novel_syms(self, (CFCSymbol**)self->member_vars);
+CFCClass_fresh_member_vars(CFCClass *self) {
+    return (CFCVariable**)S_fresh_syms(self, (CFCSymbol**)self->member_vars);
 }
 
 CFCClass**

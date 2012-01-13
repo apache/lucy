@@ -31,7 +31,7 @@ lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent) {
 }
 
 lucy_VArray*
-lucy_VTable_novel_host_methods(const lucy_CharBuf *class_name) {
+lucy_VTable_fresh_host_methods(const lucy_CharBuf *class_name) {
     THROW(LUCY_ERR, "TODO");
     UNREACHABLE_RETURN(lucy_VArray*);
 }

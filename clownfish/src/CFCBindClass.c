@@ -64,7 +64,7 @@ S_vtable_definition(CFCBindClass *self);
 static char*
 S_callback_declarations(CFCBindClass *self);
 
-// Declare typedefs for novel methods, to ease casting.
+// Declare typedefs for fresh methods, to ease casting.
 static char*
 S_method_typedefs(CFCBindClass *self);
 
@@ -131,9 +131,9 @@ CFCBindClass_destroy(CFCBindClass *self) {
 }
 
 static int
-S_method_is_novel(CFCMethod *method, CFCMethod **novel_methods) {
-    for (int i = 0; novel_methods[i] != NULL; i++) {
-        if (method == novel_methods[i]) { return 1; }
+S_method_is_fresh(CFCMethod *method, CFCMethod **fresh_methods) {
+    for (int i = 0; fresh_methods[i] != NULL; i++) {
+        if (method == fresh_methods[i]) { return 1; }
     }
     return 0;
 }
@@ -305,7 +305,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
     char *vtable_def      = S_vtable_definition(self);
 
     CFCMethod **methods  = CFCClass_methods(client);
-    CFCMethod **novel_methods = CFCClass_novel_methods(client);
+    CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
 
     char *offsets    = CFCUtil_strdup("");
     char *cb_funcs   = CFCUtil_strdup("");
@@ -321,7 +321,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
-        int method_is_novel = S_method_is_novel(method, novel_methods);
+        int method_is_fresh = S_method_is_fresh(method, fresh_methods);
         size_t off_sym_size 
             = CFCMethod_full_offset_sym(method, cnick, NULL, 0);
         char *full_offset_sym = (char*)MALLOCATE(off_sym_size);
@@ -340,7 +340,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
         FREEMEM(full_offset_sym);
 
         // Create a default implementation for abstract methods.
-        if (method_is_novel && CFCMethod_abstract(method)) {
+        if (method_is_fresh && CFCMethod_abstract(method)) {
             char *method_def = CFCBindMeth_abstract_method_def(method);
             cb_funcs = CFCUtil_cat(cb_funcs, method_def, "\n", NULL);
             FREEMEM(method_def);
@@ -350,7 +350,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
         // host.
         if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
             const char *full_cb_sym = CFCMethod_full_callback_sym(method);
-            if (method_is_novel) {
+            if (method_is_fresh) {
                 char *cb_def = CFCBindMeth_callback_def(method);
                 char *cb_obj_def
                     = CFCBindMeth_callback_obj_def(method, offset_str);
@@ -424,7 +424,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
     sprintf(code, pattern, include_h, offsets, cb_funcs, cb_objects, cb_var,
             class_name_def, vtable_def, autocode);
 
-    FREEMEM(novel_methods);
+    FREEMEM(fresh_methods);
     FREEMEM(offsets);
     FREEMEM(cb_funcs);
     FREEMEM(cb_objects);
@@ -556,32 +556,32 @@ S_vtable_definition(CFCBindClass *self) {
 // Declare cfish_Callback objects.
 static char*
 S_callback_declarations(CFCBindClass *self) {
-    CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
+    CFCMethod** fresh_methods = CFCClass_fresh_methods(self->client);
     char *declarations = CFCUtil_strdup("");
-    for (int i = 0; novel_methods[i] != NULL; i++) {
-        CFCMethod *method = novel_methods[i];
+    for (int i = 0; fresh_methods[i] != NULL; i++) {
+        CFCMethod *method = fresh_methods[i];
         if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
             char *callback = CFCBindMeth_callback_dec(method);
             declarations = CFCUtil_cat(declarations, callback, NULL);
             FREEMEM(callback);
         }
     }
-    FREEMEM(novel_methods);
+    FREEMEM(fresh_methods);
     return declarations;
 }
 
-// Declare typedefs for novel methods, to ease casting.
+// Declare typedefs for every fresh method implementation, to ease casting.
 static char*
 S_method_typedefs(CFCBindClass *self) {
-    CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
+    CFCMethod** fresh_methods = CFCClass_fresh_methods(self->client);
     char *typedefs = CFCUtil_strdup("");
-    for (int i = 0; novel_methods[i] != NULL; i++) {
-        CFCMethod *method = novel_methods[i];
+    for (int i = 0; fresh_methods[i] != NULL; i++) {
+        CFCMethod *method = fresh_methods[i];
         char *typedef_str = CFCBindMeth_typdef_dec(method);
         typedefs = CFCUtil_cat(typedefs, typedef_str, "\n", NULL);
         FREEMEM(typedef_str);
     }
-    FREEMEM(novel_methods);
+    FREEMEM(fresh_methods);
     return typedefs;
 }
 
@@ -601,7 +601,7 @@ S_parent_include(CFCBindClass *self) {
 static char*
 S_sub_declarations(CFCBindClass *self) {
     CFCFunction **functions = CFCClass_functions(self->client);
-    CFCMethod** novel_methods = CFCClass_novel_methods(self->client);
+    CFCMethod** fresh_methods = CFCClass_fresh_methods(self->client);
     char *declarations = CFCUtil_strdup("");
     for (int i = 0; functions[i] != NULL; i++) {
         CFCFunction *func = functions[i];
@@ -609,13 +609,13 @@ S_sub_declarations(CFCBindClass *self) {
         declarations = CFCUtil_cat(declarations, dec, "\n\n", NULL);
         FREEMEM(dec);
     }
-    for (int i = 0; novel_methods[i] != NULL; i++) {
-        CFCMethod *method = novel_methods[i];
+    for (int i = 0; fresh_methods[i] != NULL; i++) {
+        CFCMethod *method = fresh_methods[i];
         char *dec = CFCBindFunc_func_declaration((CFCFunction*)method);
         declarations = CFCUtil_cat(declarations, dec, "\n\n", NULL);
         FREEMEM(dec);
     }
-    FREEMEM(novel_methods);
+    FREEMEM(fresh_methods);
     return declarations;
 }
 
@@ -725,9 +725,9 @@ S_short_names(CFCBindClass *self) {
     }
 
     if (!CFCClass_inert(client)) {
-        CFCMethod **novel_methods = CFCClass_novel_methods(client);
-        for (int i = 0; novel_methods[i] != NULL; i++) {
-            CFCMethod *meth = novel_methods[i];
+        CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
+        for (int i = 0; fresh_methods[i] != NULL; i++) {
+            CFCMethod *meth = fresh_methods[i];
             const char *short_typedef = CFCMethod_short_typedef(meth);
             const char *full_typedef  = CFCMethod_full_typedef(meth);
             short_names = CFCUtil_cat(short_names, "  #define ",
@@ -738,7 +738,7 @@ S_short_names(CFCBindClass *self) {
             short_names = CFCUtil_cat(short_names, "  #define ", short_func,
                                       " ", full_func, "\n", NULL);
         }
-        FREEMEM(novel_methods);
+        FREEMEM(fresh_methods);
 
         CFCMethod  **methods = CFCClass_methods(client);
         const char  *cnick   = CFCClass_get_cnick(client);

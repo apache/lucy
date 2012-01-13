@@ -118,21 +118,21 @@ like( $@, qr/grow_tree/, "Forbid add_method after grow_tree." );
 
 is( ${ $foo_jr->get_parent },    $$foo,    "grow_tree, one level" );
 is( ${ $final_foo->get_parent }, $$foo_jr, "grow_tree, two levels" );
-is( ${ $foo->novel_method("Do_Stuff") }, $$do_stuff, 'novel_method' );
+is( ${ $foo->fresh_method("Do_Stuff") }, $$do_stuff, 'fresh_method' );
 is( ${ $foo_jr->method("Do_Stuff") },    $$do_stuff, "inherited method" );
-ok( !$foo_jr->novel_method("Do_Stuff"),    'inherited method not novel' );
+ok( !$foo_jr->fresh_method("Do_Stuff"),    'inherited method not "fresh"' );
 ok( $final_foo->method("Do_Stuff")->final, "Finalize inherited method" );
 ok( !$foo_jr->method("Do_Stuff")->final, "Don't finalize method in parent" );
 is_deeply( $foo->inert_vars,        [$widget],      "inert vars" );
 is_deeply( $foo->functions,         [$tread_water], "inert funcs" );
 is_deeply( $foo->methods,           [$do_stuff],    "methods" );
-is_deeply( $foo->novel_methods,     [$do_stuff],    "novel_methods" );
-is_deeply( $foo->novel_member_vars, [$thing],       "novel_member_vars" );
+is_deeply( $foo->fresh_methods,     [$do_stuff],    "fresh_methods" );
+is_deeply( $foo->fresh_member_vars, [$thing],       "fresh_member_vars" );
 is_deeply( $foo_jr->member_vars,    [$thing],       "inherit member vars" );
 is_deeply( $foo_jr->functions,         [], "don't inherit inert funcs" );
-is_deeply( $foo_jr->novel_member_vars, [], "novel_member_vars" );
+is_deeply( $foo_jr->fresh_member_vars, [], "fresh_member_vars" );
 is_deeply( $foo_jr->inert_vars,        [], "don't inherit inert vars" );
-is_deeply( $final_foo->novel_methods,  [], "novel_methods" );
+is_deeply( $final_foo->fresh_methods,  [], "fresh_methods" );
 
 like( $foo_jr->get_autocode, qr/load/i, "autogenerate Dump/Load" );
 is_deeply( $foo->tree_to_ladder, [ $foo, $foo_jr, $final_foo ],

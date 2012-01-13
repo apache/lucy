@@ -42,5 +42,5 @@ my $overrider = Clownfish::CFC::Method->new(
     class_cnick => 'FooJr'
 );
 $overrider->override($orig);
-ok( !$overrider->novel );
+ok( !$overrider->novel, "A Method which overrides another is not 'novel'" );
 

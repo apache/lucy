@@ -82,11 +82,10 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     inert nullable CharBuf*
     find_parent_class(const CharBuf *class_name);
 
-    /** List all of the methods that a class has overridden via the host
-     * language.
+    /** List all of the methods defined directly within a host subclass.
      */
     inert incremented VArray*
-    novel_host_methods(const CharBuf *class_name);
+    fresh_host_methods(const CharBuf *class_name);
 
     /** Replace a function pointer in the VTable.
      */

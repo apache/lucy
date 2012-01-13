@@ -87,8 +87,8 @@ $resurrected->store( "ooga", $booga );
 is( $resurrected->fetch("ooga"),
     "booga", "subclassed object still performs correctly at the C level" );
 
-my $methods = Lucy::Object::VTable->novel_host_methods('MyHash');
-is_deeply( $methods->to_perl, ['oodle'], "novel_host_methods" );
+my $methods = Lucy::Object::VTable->fresh_host_methods('MyHash');
+is_deeply( $methods->to_perl, ['oodle'], "fresh_host_methods" );
 
 my $folder = RAMFolderOfDeath->new;
 eval { $folder->slurp_file('foo') };    # calls open_in, which dies per above.
