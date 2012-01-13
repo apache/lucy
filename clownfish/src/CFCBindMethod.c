@@ -58,6 +58,13 @@ S_maybe_unreachable(CFCType *return_type);
 static char*
 S_callback_params(CFCMethod *method);
 
+/* Adapt the refcounts of parameters and return types, since Host_callback_xxx
+ * has no impact on refcounts aside from Host_callback_obj returning an
+ * incremented Obj.
+ */
+static char*
+S_callback_refcount_mods(CFCMethod *method);
+
 /* Return a function which throws a runtime error indicating which variable
  * couldn't be mapped.  TODO: it would be better to resolve all these cases at
  * compile-time.
@@ -67,16 +74,19 @@ S_invalid_callback_def(CFCMethod *method);
 
 // Create a callback for a method which operates in a void context.
 static char*
-S_void_callback_def(CFCMethod *method, const char *callback_params);
+S_void_callback_def(CFCMethod *method, const char *callback_params,
+                    const char *refcount_mods);
 
 // Create a callback which returns a primitive type.
 static char*
-S_primitive_callback_def(CFCMethod *method, const char *callback_params);
+S_primitive_callback_def(CFCMethod *method, const char *callback_params,
+                         const char *refcount_mods);
 
 /* Create a callback which returns an object type -- either a generic object or
  * a string. */
 static char*
-S_obj_callback_def(CFCMethod *method, const char *callback_params);
+S_obj_callback_def(CFCMethod *method, const char *callback_params,
+                   const char *refcount_mods);
 
 char*
 CFCBindMeth_method_def(CFCMethod *method, CFCClass *klass) {
@@ -303,6 +313,7 @@ CFCBindMeth_callback_def(CFCMethod *method) {
     CFCType *return_type = CFCMethod_get_return_type(method);
     char *params = S_callback_params(method);
     char *callback_def = NULL;
+    char *refcount_mods = S_callback_refcount_mods(method);
 
     if (!params) {
         // Can't map vars, because there's at least one type in the argument
@@ -311,16 +322,17 @@ CFCBindMeth_callback_def(CFCMethod *method) {
         callback_def = S_invalid_callback_def(method);
     }
     else if (CFCType_is_void(return_type)) {
-        callback_def = S_void_callback_def(method, params);
+        callback_def = S_void_callback_def(method, params, refcount_mods);
     }
     else if (CFCType_is_object(return_type)) {
-        callback_def = S_obj_callback_def(method, params);
+        callback_def = S_obj_callback_def(method, params, refcount_mods);
     }
     else {
-        callback_def = S_primitive_callback_def(method, params);
+        callback_def = S_primitive_callback_def(method, params, refcount_mods);
     }
 
     FREEMEM(params);
+    FREEMEM(refcount_mods);
     return callback_def;
 }
 
@@ -391,6 +403,43 @@ S_callback_params(CFCMethod *method) {
 }
 
 static char*
+S_callback_refcount_mods(CFCMethod *method) {
+    char *refcount_mods = CFCUtil_strdup("");
+    CFCType *return_type = CFCMethod_get_return_type(method);
+    CFCParamList *param_list = CFCMethod_get_param_list(method);
+    CFCVariable **arg_vars = CFCParamList_get_variables(param_list);
+
+    // Host_callback_obj returns an incremented object.  If this method does
+    // not return an incremented object, we must cancel out that refcount.
+    // (No function can return a decremented object.)
+    if (CFCType_is_object(return_type) && !CFCType_incremented(return_type)) {
+        refcount_mods = CFCUtil_cat(refcount_mods,
+                                    "\n    CFISH_DECREF(retval);", NULL);
+    }
+
+    // The Host_callback_xxx functions have no effect on the refcounts of
+    // arguments, so we need to adjust them after the fact.
+    for (int i = 0; arg_vars[i] != NULL; i++) {
+        CFCVariable *var  = arg_vars[i];
+        CFCType     *type = CFCVariable_get_type(var);
+        const char  *name = CFCVariable_micro_sym(var);
+        if (!CFCType_is_object(type)) {
+            continue;
+        }
+        else if (CFCType_incremented(type)) {
+            refcount_mods = CFCUtil_cat(refcount_mods, "\n    CFISH_INCREF(",
+                                        name, ");", NULL);
+        }
+        else if (CFCType_decremented(type)) {
+            refcount_mods = CFCUtil_cat(refcount_mods, "\n    CFISH_DECREF(",
+                                        name, ");", NULL);
+        }
+    }
+    
+    return refcount_mods;
+}
+
+static char*
 S_invalid_callback_def(CFCMethod *method) {
     const char *class_cnick = CFCMethod_get_class_cnick(method);
     size_t meth_sym_size = CFCMethod_full_method_sym(method, class_cnick, NULL, 0);
@@ -433,26 +482,30 @@ S_invalid_callback_def(CFCMethod *method) {
 }
 
 static char*
-S_void_callback_def(CFCMethod *method, const char *callback_params) {
+S_void_callback_def(CFCMethod *method, const char *callback_params,
+                    const char *refcount_mods) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     const char pattern[] =
         "void\n"
         "%s(%s) {\n"
-        "    cfish_Host_callback(%s);\n"
+        "    cfish_Host_callback(%s);%s\n"
         "}\n";
     size_t size = sizeof(pattern)
                   + strlen(override_sym)
                   + strlen(params)
                   + strlen(callback_params)
+                  + strlen(refcount_mods)
                   + 200;
     char *callback_def = (char*)MALLOCATE(size);
-    sprintf(callback_def, pattern, override_sym, params, callback_params);
+    sprintf(callback_def, pattern, override_sym, params, callback_params,
+            refcount_mods);
     return callback_def;
 }
 
 static char*
-S_primitive_callback_def(CFCMethod *method, const char *callback_params) {
+S_primitive_callback_def(CFCMethod *method, const char *callback_params,
+                         const char *refcount_mods) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     CFCType *return_type = CFCMethod_get_return_type(method);
@@ -474,7 +527,7 @@ S_primitive_callback_def(CFCMethod *method, const char *callback_params) {
     char pattern[] =
         "%s\n"
         "%s(%s) {\n"
-        "    return (%s)%s(%s);\n"
+        "    return (%s)%s(%s);%s\n"
         "}\n";
     size_t size = sizeof(pattern)
                   + strlen(ret_type_str)
@@ -483,16 +536,18 @@ S_primitive_callback_def(CFCMethod *method, const char *callback_params) {
                   + strlen(ret_type_str)
                   + strlen(cb_func_name)
                   + strlen(callback_params)
+                  + strlen(refcount_mods)
                   + 20;
     char *callback_def = (char*)MALLOCATE(size);
     sprintf(callback_def, pattern, ret_type_str, override_sym, params,
-            ret_type_str, cb_func_name, callback_params);
+            ret_type_str, cb_func_name, callback_params, refcount_mods);
 
     return callback_def;
 }
 
 static char*
-S_obj_callback_def(CFCMethod *method, const char *callback_params) {
+S_obj_callback_def(CFCMethod *method, const char *callback_params,
+                   const char *refcount_mods) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     CFCType *return_type = CFCMethod_get_return_type(method);
@@ -513,10 +568,6 @@ S_obj_callback_def(CFCMethod *method, const char *callback_params) {
         sprintf(nullable_check, pattern, macro_sym);
     }
 
-    const char *decrement = CFCType_incremented(return_type)
-                            ? ""
-                            : "\n    CFISH_DECREF(retval);";
-
     char pattern[] =
         "%s\n"
         "%s(%s) {\n"
@@ -532,12 +583,12 @@ S_obj_callback_def(CFCMethod *method, const char *callback_params) {
                   + strlen(cb_func_name)
                   + strlen(callback_params)
                   + strlen(nullable_check)
-                  + strlen(decrement)
+                  + strlen(refcount_mods)
                   + 30;
     char *callback_def = (char*)MALLOCATE(size);
     sprintf(callback_def, pattern, ret_type_str, override_sym, params,
             ret_type_str, ret_type_str, cb_func_name, callback_params,
-            nullable_check, decrement);
+            nullable_check, refcount_mods);
 
     FREEMEM(nullable_check);
     return callback_def;
