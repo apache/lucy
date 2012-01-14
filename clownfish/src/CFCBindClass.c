@@ -349,8 +349,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
         // Define callbacks for methods that can be overridden via the
         // host.
         if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
-            const char *full_cb_sym = CFCMethod_full_callback_sym(method);
-            if (method_is_fresh) {
+            if (method_is_fresh && CFCMethod_novel(method)) {
                 char *cb_def = CFCBindMeth_callback_def(method);
                 char *cb_obj_def
                     = CFCBindMeth_callback_obj_def(method, offset_str);
@@ -359,6 +358,10 @@ CFCBindClass_to_c(CFCBindClass *self) {
                 FREEMEM(cb_def);
                 FREEMEM(cb_obj_def);
             }
+            CFCMethod *novel
+                = CFCClass_find_novel_method(client,
+                                             CFCMethod_micro_sym(method));
+            const char *full_cb_sym = CFCMethod_full_callback_sym(novel);
             cb_var = CFCUtil_cat(cb_var, "&", full_cb_sym, ",\n    ", NULL);
         }
 

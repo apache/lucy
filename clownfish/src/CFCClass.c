@@ -671,6 +671,21 @@ CFCClass_fresh_member_vars(CFCClass *self) {
     return (CFCVariable**)S_fresh_syms(self, (CFCSymbol**)self->member_vars);
 }
 
+CFCMethod*
+CFCClass_find_novel_method(CFCClass *self, const char *sym) {
+    if (!self->tree_grown) {
+        CFCUtil_die("Can't call original_method before grow_tree");
+    }
+    CFCClass *ancestor = self;
+    do {
+        CFCMethod *method = CFCClass_method(ancestor, sym);
+        if (method && CFCMethod_novel(method)) {
+            return method;
+        }
+    } while (NULL != (ancestor = CFCClass_get_parent(ancestor)));
+    return NULL;
+}
+
 CFCClass**
 CFCClass_children(CFCClass *self) {
     return self->children;

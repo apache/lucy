@@ -141,6 +141,12 @@ CFCClass_method(CFCClass *self, const char *sym);
 struct CFCMethod*
 CFCClass_fresh_method(CFCClass *self, const char *sym);
 
+/** Traverse all ancestors to find the first class which declared the method
+ * and return it.  Cannot be called before grow_tree().
+ */
+struct CFCMethod*
+CFCClass_find_novel_method(CFCClass *self, const char *sym);
+
 /** Bequeath all inherited methods and members to children.
  */
 void
