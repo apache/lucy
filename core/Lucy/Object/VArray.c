@@ -109,12 +109,7 @@ VA_serialize(VArray *self, OutStream *outstream) {
 VArray*
 VA_deserialize(VArray *self, InStream *instream) {
     uint32_t size = InStream_Read_C32(instream);
-    if (self) {
-        self->size = size;
-        self->cap = size + 1;
-        self->elems = (Obj**)CALLOCATE(self->cap, sizeof(Obj*));
-    }
-    else { self = VA_new(size); }
+    VA_Grow(self, size);
     for (uint32_t tick = InStream_Read_C32(instream);
          tick < size;
          tick += InStream_Read_C32(instream)

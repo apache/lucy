@@ -35,7 +35,7 @@ class Lucy::Search::MatchDoc inherits Lucy::Object::Obj {
     Serialize(MatchDoc *self, OutStream *outstream);
 
     public incremented MatchDoc*
-    Deserialize(MatchDoc *self, InStream *instream);
+    Deserialize(decremented MatchDoc *self, InStream *instream);
 
     int32_t
     Get_Doc_ID(MatchDoc *self);

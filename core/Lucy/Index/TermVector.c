@@ -94,8 +94,10 @@ TV_serialize(TermVector *self, OutStream *target) {
 
 TermVector*
 TV_deserialize(TermVector *self, InStream *instream) {
-    CharBuf  *field  = (CharBuf*)CB_deserialize(NULL, instream);
-    CharBuf  *text   = (CharBuf*)CB_deserialize(NULL, instream);
+    CharBuf *field
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    CharBuf *text
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
     uint32_t num_pos = InStream_Read_C32(instream);
 
     // Read positional data.
@@ -111,8 +113,7 @@ TV_deserialize(TermVector *self, InStream *instream) {
     I32Array *start_offsets = I32Arr_new_steal(starts, num_pos);
     I32Array *end_offsets   = I32Arr_new_steal(ends, num_pos);
 
-    self = self ? self : (TermVector*)VTable_Make_Obj(TERMVECTOR);
-    self = TV_init(self, field, text, positions, start_offsets, end_offsets);
+    TV_init(self, field, text, positions, start_offsets, end_offsets);
 
     DECREF(positions);
     DECREF(start_offsets);

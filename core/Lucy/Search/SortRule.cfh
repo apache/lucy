@@ -63,7 +63,7 @@ class Lucy::Search::SortRule inherits Lucy::Object::Obj {
     Get_Reverse(SortRule *self);
 
     public incremented SortRule*
-    Deserialize(SortRule *self, InStream *instream);
+    Deserialize(decremented SortRule *self, InStream *instream);
 
     public void
     Serialize(SortRule *self, OutStream *outstream);

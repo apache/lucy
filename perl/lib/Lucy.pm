@@ -200,6 +200,11 @@ sub error {$Lucy::Object::Err::error}
         }
     }
 
+    our %singleton_PARAMS = (
+        class_name => undef,
+        parent     => undef,
+    );
+
     no warnings 'redefine';
     sub DESTROY { }    # leak all
 }

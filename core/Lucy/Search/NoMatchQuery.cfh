@@ -52,7 +52,7 @@ class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
     Serialize(NoMatchQuery *self, OutStream *outstream);
 
     public incremented NoMatchQuery*
-    Deserialize(NoMatchQuery *self, InStream *instream);
+    Deserialize(decremented NoMatchQuery *self, InStream *instream);
 
     public bool_t
     Equals(NoMatchQuery *self, Obj *other);
@@ -77,9 +77,6 @@ class Lucy::Search::NoMatchCompiler
 
     public incremented nullable Matcher*
     Make_Matcher(NoMatchCompiler *self, SegReader *reader, bool_t need_score);
-
-    public incremented NoMatchCompiler*
-    Deserialize(NoMatchCompiler *self, InStream *instream);
 }
 
 

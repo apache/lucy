@@ -239,7 +239,7 @@ class Lucy::Object::CharBuf cnick CB
     Serialize(CharBuf *self, OutStream *outstream);
 
     public incremented CharBuf*
-    Deserialize(CharBuf *self, InStream *instream);
+    Deserialize(decremented CharBuf *self, InStream *instream);
 
     /** Remove Unicode whitespace characters from both top and tail.
      */

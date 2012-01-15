@@ -103,17 +103,13 @@ Sim_serialize(Similarity *self, OutStream *target) {
 
 Similarity*
 Sim_deserialize(Similarity *self, InStream *instream) {
-    CharBuf *class_name = CB_deserialize(NULL, instream);
-    if (!self) {
-        VTable *vtable = VTable_singleton(class_name, SIMILARITY);
-        self = (Similarity*)VTable_Make_Obj(vtable);
-    }
-    else if (!CB_Equals(class_name, (Obj*)Sim_Get_Class_Name(self))) {
+    CharBuf *class_name
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    if (!CB_Equals(class_name, (Obj*)Sim_Get_Class_Name(self))) {
         THROW(ERR, "Class name mismatch: '%o' '%o'", Sim_Get_Class_Name(self),
               class_name);
     }
     DECREF(class_name);
-
     Sim_init(self);
     return self;
 }

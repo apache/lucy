@@ -206,8 +206,7 @@ Hash_deserialize(Hash *self, InStream *instream) {
     uint32_t num_other    = size - num_charbufs;
     CharBuf *key          = num_charbufs ? CB_new(0) : NULL;
 
-    if (self) { Hash_init(self, size); }
-    else      { self = Hash_new(size); }
+    Hash_init(self, size);
 
     // Read key-value pairs with CharBuf keys.
     while (num_charbufs--) {

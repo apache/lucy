@@ -151,7 +151,7 @@ Float32_serialize(Float32 *self, OutStream *outstream) {
 Float32*
 Float32_deserialize(Float32 *self, InStream *instream) {
     float value = InStream_Read_F32(instream);
-    return self ? Float32_init(self, value) : Float32_new(value);
+    return Float32_init(self, value);
 }
 
 /***************************************************************************/
@@ -213,7 +213,7 @@ Float64_serialize(Float64 *self, OutStream *outstream) {
 Float64*
 Float64_deserialize(Float64 *self, InStream *instream) {
     double value = InStream_Read_F64(instream);
-    return self ? Float64_init(self, value) : Float64_new(value);
+    return Float64_init(self, value);
 }
 
 /***************************************************************************/
@@ -274,7 +274,7 @@ Int32_serialize(Integer32 *self, OutStream *outstream) {
 Integer32*
 Int32_deserialize(Integer32 *self, InStream *instream) {
     int32_t value = (int32_t)InStream_Read_C32(instream);
-    return self ? Int32_init(self, value) : Int32_new(value);
+    return Int32_init(self, value);
 }
 
 /***************************************************************************/
@@ -353,7 +353,7 @@ Int64_serialize(Integer64 *self, OutStream *outstream) {
 Integer64*
 Int64_deserialize(Integer64 *self, InStream *instream) {
     int64_t value = (int64_t)InStream_Read_C64(instream);
-    return self ? Int64_init(self, value) : Int64_new(value);
+    return Int64_init(self, value);
 }
 
 /***************************************************************************/

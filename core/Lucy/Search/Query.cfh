@@ -75,7 +75,7 @@ class Lucy::Search::Query inherits Lucy::Object::Obj : dumpable {
     Serialize(Query *self, OutStream *outstream);
 
     public incremented Query*
-    Deserialize(Query *self, InStream *instream);
+    Deserialize(decremented Query *self, InStream *instream);
 }
 
 

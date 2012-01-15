@@ -166,7 +166,7 @@ class Lucy::Object::Obj {
      * in which case they should create the object from nothing.
      */
     public incremented Obj*
-    Deserialize(Obj *self, InStream *instream);
+    Deserialize(decremented Obj *self, InStream *instream);
 
     /** Return a representation of the object using only scalars, hashes, and
      * arrays.  Some implementations support JSON serialization via Dump() and

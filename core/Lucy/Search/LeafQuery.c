@@ -93,11 +93,14 @@ LeafQuery_serialize(LeafQuery *self, OutStream *outstream) {
 
 LeafQuery*
 LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
-    self = self ? self : (LeafQuery*)VTable_Make_Obj(LEAFQUERY);
-    self->field = InStream_Read_U8(instream)
-                  ? CB_deserialize(NULL, instream)
-                  : NULL;
-    self->text  = CB_deserialize(NULL, instream);
+    if (InStream_Read_U8(instream)) {
+        self->field
+            = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    }
+    else {
+        self->field = NULL;
+    }
+    self->text = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
     self->boost = InStream_Read_F32(instream);
     return self;
 }

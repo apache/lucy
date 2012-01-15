@@ -38,15 +38,15 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     inert size_t offset_of_parent;
 
     /** Return a singleton.  If a VTable can be found in the registry based on
-     * the subclass name, it will be returned.  Otherwise, a new VTable will
-     * be created using [parent] as a base.
+     * the supplied class name, it will be returned.  Otherwise, a new VTable
+     * will be created using [parent] as a base.
      *
      * If [parent] is NULL, an attempt will be made to find it using
      * VTable_find_parent_class().  If the attempt fails, an error will
      * result.
      */
     inert VTable*
-    singleton(const CharBuf *subclass_name, VTable *parent);
+    singleton(const CharBuf *class_name, VTable *parent);
 
     /** Register a vtable, so that it can be retrieved by class name.
      *

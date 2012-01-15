@@ -33,12 +33,12 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_deserialize(either_sv, instream)
-    SV *either_sv;
+_deserialize(self, instream)
+    lucy_VArray *self;
     lucy_InStream *instream;
 CODE:
-    CHY_UNUSED_VAR(either_sv);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_VA_deserialize(NULL, instream));
+    lucy_VArray *thawed = Lucy_VA_Deserialize(self, instream);
+    RETVAL = (SV*)Lucy_VA_To_Host(thawed);
 OUTPUT: RETVAL
 
 SV*

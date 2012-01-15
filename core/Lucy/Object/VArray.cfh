@@ -162,7 +162,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     Serialize(VArray *self, OutStream *outstream);
 
     public incremented VArray*
-    Deserialize(VArray *self, InStream *instream);
+    Deserialize(decremented VArray *self, InStream *instream);
 
     public void
     Destroy(VArray *self);

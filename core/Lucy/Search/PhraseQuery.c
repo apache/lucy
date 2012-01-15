@@ -81,10 +81,11 @@ PhraseQuery_serialize(PhraseQuery *self, OutStream *outstream) {
 
 PhraseQuery*
 PhraseQuery_deserialize(PhraseQuery *self, InStream *instream) {
-    float    boost = InStream_Read_F32(instream);
-    CharBuf *field = CB_deserialize(NULL, instream);
-    VArray  *terms = VA_deserialize(NULL, instream);
-    self = self ? self : (PhraseQuery*)VTable_Make_Obj(PHRASEQUERY);
+    float boost = InStream_Read_F32(instream);
+    CharBuf *field
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    VArray *terms
+        = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
     return S_do_init(self, field, terms, boost);
 }
 
@@ -203,8 +204,11 @@ PhraseCompiler_serialize(PhraseCompiler *self, OutStream *outstream) {
 
 PhraseCompiler*
 PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream) {
-    self = self ? self : (PhraseCompiler*)VTable_Make_Obj(PHRASECOMPILER);
-    Compiler_deserialize((Compiler*)self, instream);
+    PhraseCompiler_deserialize_t super_deserialize
+        = (PhraseCompiler_deserialize_t)SUPER_METHOD(PHRASECOMPILER,
+                                                     PhraseCompiler,
+                                                     Deserialize);
+    self = super_deserialize(self, instream);
     self->idf               = InStream_Read_F32(instream);
     self->raw_weight        = InStream_Read_F32(instream);
     self->query_norm_factor = InStream_Read_F32(instream);

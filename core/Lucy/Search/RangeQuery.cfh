@@ -68,7 +68,7 @@ class Lucy::Search::RangeQuery inherits Lucy::Search::Query
     Serialize(RangeQuery *self, OutStream *outstream);
 
     public incremented RangeQuery*
-    Deserialize(RangeQuery *self, InStream *instream);
+    Deserialize(decremented RangeQuery *self, InStream *instream);
 
     public void
     Destroy(RangeQuery *self);
@@ -85,9 +85,6 @@ class Lucy::Search::RangeCompiler inherits Lucy::Search::Compiler {
 
     public incremented nullable Matcher*
     Make_Matcher(RangeCompiler *self, SegReader *reader, bool_t need_score);
-
-    public incremented RangeCompiler*
-    Deserialize(RangeCompiler *self, InStream *instream);
 }
 
 

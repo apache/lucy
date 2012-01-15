@@ -103,7 +103,6 @@ NoMatchQuery_serialize(NoMatchQuery *self, OutStream *outstream) {
 
 NoMatchQuery*
 NoMatchQuery_deserialize(NoMatchQuery *self, InStream *instream) {
-    self = self ? self : (NoMatchQuery*)VTable_Make_Obj(NOMATCHQUERY);
     NoMatchQuery_init(self);
     self->fails_to_match = !!InStream_Read_I8(instream);
     return self;
@@ -124,12 +123,6 @@ NoMatchCompiler_init(NoMatchCompiler *self, NoMatchQuery *parent,
                      Searcher *searcher, float boost) {
     return (NoMatchCompiler*)Compiler_init((Compiler*)self, (Query*)parent,
                                            searcher, NULL, boost);
-}
-
-NoMatchCompiler*
-NoMatchCompiler_deserialize(NoMatchCompiler *self, InStream *instream) {
-    self = self ? self : (NoMatchCompiler*)VTable_Make_Obj(NOMATCHCOMPILER);
-    return (NoMatchCompiler*)Compiler_deserialize((Compiler*)self, instream);
 }
 
 Matcher*

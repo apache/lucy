@@ -87,7 +87,7 @@ class Lucy::Object::Float32 inherits Lucy::Object::FloatNum {
     Serialize(Float32 *self, OutStream *outstream);
 
     public incremented Float32*
-    Deserialize(Float32 *self, InStream *instream);
+    Deserialize(decremented Float32 *self, InStream *instream);
 
     public incremented Float32*
     Clone(Float32 *self);
@@ -130,7 +130,7 @@ class Lucy::Object::Float64 inherits Lucy::Object::FloatNum {
     Serialize(Float64 *self, OutStream *outstream);
 
     public incremented Float64*
-    Deserialize(Float64 *self, InStream *instream);
+    Deserialize(decremented Float64 *self, InStream *instream);
 
     public incremented Float64*
     Clone(Float64 *self);
@@ -174,7 +174,7 @@ class Lucy::Object::Integer32 cnick Int32
     Serialize(Integer32 *self, OutStream *outstream);
 
     public incremented Integer32*
-    Deserialize(Integer32 *self, InStream *instream);
+    Deserialize(decremented Integer32 *self, InStream *instream);
 
     public incremented Integer32*
     Clone(Integer32 *self);
@@ -222,7 +222,7 @@ class Lucy::Object::Integer64 cnick Int64
     Serialize(Integer64 *self, OutStream *outstream);
 
     public incremented Integer64*
-    Deserialize(Integer64 *self, InStream *instream);
+    Deserialize(decremented Integer64 *self, InStream *instream);
 
     public incremented Integer64*
     Clone(Integer64 *self);
@@ -273,7 +273,7 @@ class Lucy::Object::BoolNum cnick Bool inherits Lucy::Object::IntNum {
     Serialize(BoolNum *self, OutStream *outstream);
 
     public incremented BoolNum*
-    Deserialize(BoolNum *self, InStream *instream);
+    Deserialize(decremented BoolNum *self, InStream *instream);
 
     /* Returns self. */
     public incremented BoolNum*

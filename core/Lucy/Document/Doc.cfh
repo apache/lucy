@@ -86,7 +86,7 @@ public class Lucy::Document::Doc inherits Lucy::Object::Obj
     Serialize(Doc *self, OutStream *outstream);
 
     public incremented Doc*
-    Deserialize(Doc *self, InStream *instream);
+    Deserialize(decremented Doc *self, InStream *instream);
 
     public incremented Hash*
     Dump(Doc *self);

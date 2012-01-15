@@ -62,7 +62,7 @@ class Lucy::Search::PhraseQuery inherits Lucy::Search::Query
     Serialize(PhraseQuery *self, OutStream *outstream);
 
     public incremented PhraseQuery*
-    Deserialize(PhraseQuery *self, InStream *instream);
+    Deserialize(decremented PhraseQuery *self, InStream *instream);
 
     public void
     Destroy(PhraseQuery *self);
@@ -106,7 +106,7 @@ class Lucy::Search::PhraseCompiler
     Serialize(PhraseCompiler *self, OutStream *outstream);
 
     public incremented PhraseCompiler*
-    Deserialize(PhraseCompiler *self, InStream *instream);
+    Deserialize(decremented PhraseCompiler *self, InStream *instream);
 }
 
 

@@ -461,7 +461,6 @@ CB_serialize(CharBuf *self, OutStream *target) {
 CharBuf*
 CB_deserialize(CharBuf *self, InStream *instream) {
     size_t size = InStream_Read_C32(instream);
-    self = self ? self : (CharBuf*)VTable_Make_Obj(CHARBUF);
     if (size >= self->cap) { S_grow(self, size); }
     InStream_Read_Bytes(instream, self->ptr, size);
     self->size = size;

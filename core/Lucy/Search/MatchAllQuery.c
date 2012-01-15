@@ -81,14 +81,6 @@ MatchAllCompiler_init(MatchAllCompiler *self, MatchAllQuery *parent,
                                             searcher, NULL, boost);
 }
 
-MatchAllCompiler*
-MatchAllCompiler_deserialize(MatchAllCompiler *self, InStream *instream) {
-    self = self
-           ? self
-           : (MatchAllCompiler*)VTable_Make_Obj(MATCHALLCOMPILER);
-    return (MatchAllCompiler*)Compiler_deserialize((Compiler*)self, instream);
-}
-
 Matcher*
 MatchAllCompiler_make_matcher(MatchAllCompiler *self, SegReader *reader,
                               bool_t need_score) {

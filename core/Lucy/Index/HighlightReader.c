@@ -181,16 +181,20 @@ DefHLReader_destroy(DefaultHighlightReader *self) {
 
 DocVector*
 DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id) {
+    InStream *const ix_in  = self->ix_in;
+    InStream *const dat_in = self->dat_in;
     DocVector *doc_vec = DocVec_new();
 
-    InStream_Seek(self->ix_in, doc_id * 8);
-    int64_t file_pos = InStream_Read_I64(self->ix_in);
-    InStream_Seek(self->dat_in, file_pos);
+    InStream_Seek(ix_in, doc_id * 8);
+    int64_t file_pos = InStream_Read_I64(ix_in);
+    InStream_Seek(dat_in, file_pos);
 
-    uint32_t num_fields = InStream_Read_C32(self->dat_in);
+    uint32_t num_fields = InStream_Read_C32(dat_in);
     while (num_fields--) {
-        CharBuf *field = CB_deserialize(NULL, self->dat_in);
-        ByteBuf *field_buf  = BB_deserialize(NULL, self->dat_in);
+        CharBuf *field
+            = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), dat_in);
+        ByteBuf *field_buf
+            = BB_Deserialize((ByteBuf*)VTable_Make_Obj(BYTEBUF), dat_in);
         DocVec_Add_Field_Buf(doc_vec, field, field_buf);
         DECREF(field_buf);
         DECREF(field);

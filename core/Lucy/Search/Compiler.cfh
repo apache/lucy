@@ -155,7 +155,7 @@ class Lucy::Search::Compiler inherits Lucy::Search::Query {
     Serialize(Compiler *self, OutStream *outstream);
 
     public incremented Compiler*
-    Deserialize(Compiler *self, InStream *instream);
+    Deserialize(decremented Compiler *self, InStream *instream);
 
     public bool_t
     Equals(Compiler *self, Obj *other);

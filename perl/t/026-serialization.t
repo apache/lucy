@@ -87,6 +87,7 @@ SKIP: {
 sub run_test_cycle {
     my ( $orig, $transform ) = @_;
     my $class = ref($orig);
+    my $vtable = $orig->get_vtable;
 
     my $frozen = freeze($orig);
     my $thawed = thaw($frozen);
@@ -99,7 +100,7 @@ sub run_test_cycle {
     $outstream->close;
     my $instream = Lucy::Store::InStream->open( file => $ram_file )
         or confess Lucy->error;
-    my $deserialized = $class->deserialize($instream);
+    my $deserialized = $vtable->make_obj->deserialize($instream);
 
     is( $transform->($deserialized),
         $transform->($orig), "$class: call deserialize via class name" );

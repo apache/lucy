@@ -51,7 +51,7 @@ class Lucy::Index::DocVector cnick DocVec
     Serialize(DocVector *self, OutStream *outstream);
 
     public incremented DocVector*
-    Deserialize(DocVector *self, InStream *instream);
+    Deserialize(decremented DocVector *self, InStream *instream);
 
     public void
     Destroy(DocVector *self);

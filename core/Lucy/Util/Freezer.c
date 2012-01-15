@@ -29,7 +29,8 @@ Freezer_freeze(Obj *obj, OutStream *outstream) {
 
 Obj*
 Freezer_thaw(InStream *instream) {
-    CharBuf *class_name = CB_deserialize(NULL, instream);
+    CharBuf *class_name
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Obj *blank = VTable_Make_Obj(vtable);
     DECREF(class_name);

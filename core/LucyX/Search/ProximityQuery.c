@@ -86,11 +86,12 @@ ProximityQuery_serialize(ProximityQuery *self, OutStream *outstream) {
 
 ProximityQuery*
 ProximityQuery_deserialize(ProximityQuery *self, InStream *instream) {
-    float     boost  = InStream_Read_F32(instream);
-    CharBuf  *field  = CB_deserialize(NULL, instream);
-    VArray   *terms  = VA_deserialize(NULL, instream);
-    uint32_t  within = InStream_Read_C32(instream);
-    self = self ? self : (ProximityQuery*)VTable_Make_Obj(PROXIMITYQUERY);
+    float boost = InStream_Read_F32(instream);
+    CharBuf *field 
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    VArray *terms 
+        = VA_deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
+    uint32_t within = InStream_Read_C32(instream);
     return S_do_init(self, field, terms, boost, within);
 }
 
@@ -210,7 +211,11 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
 
 void
 ProximityCompiler_serialize(ProximityCompiler *self, OutStream *outstream) {
-    Compiler_serialize((Compiler*)self, outstream);
+    ProximityCompiler_serialize_t super_serialize
+            = (ProximityCompiler_serialize_t)SUPER_METHOD(PROXIMITYCOMPILER,
+                                                          ProximityCompiler,
+                                                          Serialize);
+    super_serialize(self, outstream);
     OutStream_Write_F32(outstream, self->idf);
     OutStream_Write_F32(outstream, self->raw_weight);
     OutStream_Write_F32(outstream, self->query_norm_factor);
@@ -220,8 +225,11 @@ ProximityCompiler_serialize(ProximityCompiler *self, OutStream *outstream) {
 
 ProximityCompiler*
 ProximityCompiler_deserialize(ProximityCompiler *self, InStream *instream) {
-    self = self ? self : (ProximityCompiler*)VTable_Make_Obj(PROXIMITYCOMPILER);
-    Compiler_deserialize((Compiler*)self, instream);
+    ProximityCompiler_deserialize_t super_deserialize
+            = (ProximityCompiler_deserialize_t)SUPER_METHOD(PROXIMITYCOMPILER,
+                                                            ProximityCompiler,
+                                                            Deserialize);
+    self = super_deserialize(self, instream);
     self->idf               = InStream_Read_F32(instream);
     self->raw_weight        = InStream_Read_F32(instream);
     self->query_norm_factor = InStream_Read_F32(instream);

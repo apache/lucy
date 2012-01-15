@@ -58,9 +58,6 @@ class Lucy::Search::MatchAllCompiler
     public incremented nullable Matcher*
     Make_Matcher(MatchAllCompiler *self, SegReader *reader,
                  bool_t need_score);
-
-    public incremented MatchAllCompiler*
-    Deserialize(MatchAllCompiler *self, InStream *instream);
 }
 
 

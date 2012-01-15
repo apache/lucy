@@ -53,9 +53,10 @@ DocVec_serialize(DocVector *self, OutStream *outstream) {
 
 DocVector*
 DocVec_deserialize(DocVector *self, InStream *instream) {
-    self = self ? self : (DocVector*)VTable_Make_Obj(DOCVECTOR);
-    self->field_bufs    = Hash_deserialize(NULL, instream);
-    self->field_vectors = Hash_deserialize(NULL, instream);
+    self->field_bufs
+        = Hash_Deserialize((Hash*)VTable_Make_Obj(HASH), instream);
+    self->field_vectors
+        = Hash_Deserialize((Hash*)VTable_Make_Obj(HASH), instream);
     return self;
 }
 

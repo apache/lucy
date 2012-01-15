@@ -124,7 +124,7 @@ class Lucy::Object::ByteBuf cnick BB inherits Lucy::Object::Obj {
     Serialize(ByteBuf *self, OutStream *outstream);
 
     public incremented ByteBuf*
-    Deserialize(ByteBuf *self, InStream *instream);
+    Deserialize(decremented ByteBuf *self, InStream *instream);
 }
 
 /**

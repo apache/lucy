@@ -77,16 +77,12 @@ PolyQuery*
 PolyQuery_deserialize(PolyQuery *self, InStream *instream) {
     float    boost        = InStream_Read_F32(instream);
     uint32_t num_children = InStream_Read_U32(instream);
-
-    if (!self) { THROW(ERR, "Abstract class"); }
     PolyQuery_init(self, NULL);
     PolyQuery_Set_Boost(self, boost);
-
     VA_Grow(self->children, num_children);
     while (num_children--) {
         VA_Push(self->children, THAW(instream));
     }
-
     return self;
 }
 
@@ -173,19 +169,22 @@ void
 PolyCompiler_serialize(PolyCompiler *self, OutStream *outstream) {
     CB_Serialize(PolyCompiler_Get_Class_Name(self), outstream);
     VA_Serialize(self->children, outstream);
-    Compiler_serialize((Compiler*)self, outstream);
+    PolyCompiler_serialize_t super_serialize
+        = (PolyCompiler_serialize_t)SUPER_METHOD(POLYCOMPILER, PolyCompiler,
+                                                 Serialize);
+    super_serialize(self, outstream);
 }
 
 PolyCompiler*
 PolyCompiler_deserialize(PolyCompiler *self, InStream *instream) {
-    CharBuf *class_name = CB_deserialize(NULL, instream);
-    if (!self) {
-        VTable *vtable = VTable_singleton(class_name, NULL);
-        self = (PolyCompiler*)VTable_Make_Obj(vtable);
-    }
-    DECREF(class_name);
-    self->children = VA_deserialize(NULL, instream);
-    return (PolyCompiler*)Compiler_deserialize((Compiler*)self, instream);
+    CharBuf *class_name
+            = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    DECREF(class_name); // TODO Don't serialize class name.
+    self->children
+        = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
+    PolyCompiler_deserialize_t super_deserialize
+        = (PolyCompiler_deserialize_t)SUPER_METHOD(POLYCOMPILER, PolyCompiler,
+                                                   Deserialize);
+    return super_deserialize(self, instream);
 }
-
 

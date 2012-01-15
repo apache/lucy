@@ -50,7 +50,7 @@ class Lucy::Index::TermVector cnick TV
     Get_End_Offsets(TermVector *self);
 
     public incremented TermVector*
-    Deserialize(TermVector *self, InStream *instream);
+    Deserialize(decremented TermVector *self, InStream *instream);
 
     public bool_t
     Equals(TermVector *self, Obj *other);

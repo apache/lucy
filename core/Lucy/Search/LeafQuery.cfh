@@ -61,7 +61,7 @@ class Lucy::Search::LeafQuery inherits Lucy::Search::Query
     Serialize(LeafQuery *self, OutStream *outstream);
 
     public incremented LeafQuery*
-    Deserialize(LeafQuery *self, InStream *instream);
+    Deserialize(decremented LeafQuery *self, InStream *instream);
 
     /** Throws an error.
      */

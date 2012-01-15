@@ -52,8 +52,8 @@ TopDocs_serialize(TopDocs *self, OutStream *outstream) {
 
 TopDocs*
 TopDocs_deserialize(TopDocs *self, InStream *instream) {
-    self = self ? self : (TopDocs*)VTable_Make_Obj(TOPDOCS);
-    self->match_docs = VA_deserialize(NULL, instream);
+    self->match_docs
+        = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
     self->total_hits = InStream_Read_C32(instream);
     return self;
 }

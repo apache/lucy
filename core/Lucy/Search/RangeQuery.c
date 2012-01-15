@@ -137,15 +137,15 @@ RangeQuery_serialize(RangeQuery *self, OutStream *outstream) {
 RangeQuery*
 RangeQuery_deserialize(RangeQuery *self, InStream *instream) {
     // Deserialize components.
-    float boost     = InStream_Read_F32(instream);
-    CharBuf *field  = CB_deserialize(NULL, instream);
+    float boost = InStream_Read_F32(instream);
+    CharBuf *field
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
     Obj *lower_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
     Obj *upper_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
     bool_t include_lower = InStream_Read_U8(instream);
     bool_t include_upper = InStream_Read_U8(instream);
 
     // Init object.
-    self = self ? self : (RangeQuery*)VTable_Make_Obj(RANGEQUERY);
     RangeQuery_init(self, field, lower_term, upper_term, include_lower,
                     include_upper);
     RangeQuery_Set_Boost(self, boost);
@@ -180,12 +180,6 @@ RangeCompiler_init(RangeCompiler *self, RangeQuery *parent,
                    Searcher *searcher, float boost) {
     return (RangeCompiler*)Compiler_init((Compiler*)self, (Query*)parent,
                                          searcher, NULL, boost);
-}
-
-RangeCompiler*
-RangeCompiler_deserialize(RangeCompiler *self, InStream *instream) {
-    self = self ? self : (RangeCompiler*)VTable_Make_Obj(RANGECOMPILER);
-    return (RangeCompiler*)Compiler_deserialize((Compiler*)self, instream);
 }
 
 Matcher*

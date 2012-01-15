@@ -64,8 +64,8 @@ TermQuery_serialize(TermQuery *self, OutStream *outstream) {
 
 TermQuery*
 TermQuery_deserialize(TermQuery *self, InStream *instream) {
-    self = self ? self : (TermQuery*)VTable_Make_Obj(TERMQUERY);
-    self->field = CB_deserialize(NULL, instream);
+    self->field
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
     self->term  = (Obj*)THAW(instream);
     self->boost = InStream_Read_F32(instream);
     return self;
@@ -170,7 +170,10 @@ TermCompiler_equals(TermCompiler *self, Obj *other) {
 
 void
 TermCompiler_serialize(TermCompiler *self, OutStream *outstream) {
-    Compiler_serialize((Compiler*)self, outstream);
+    TermCompiler_serialize_t super_serialize
+        = (TermCompiler_serialize_t)SUPER_METHOD(TERMCOMPILER, TermCompiler,
+                                                 Serialize);
+    super_serialize(self, outstream);
     OutStream_Write_F32(outstream, self->idf);
     OutStream_Write_F32(outstream, self->raw_weight);
     OutStream_Write_F32(outstream, self->query_norm_factor);
@@ -179,8 +182,10 @@ TermCompiler_serialize(TermCompiler *self, OutStream *outstream) {
 
 TermCompiler*
 TermCompiler_deserialize(TermCompiler *self, InStream *instream) {
-    self = self ? self : (TermCompiler*)VTable_Make_Obj(TERMCOMPILER);
-    Compiler_deserialize((Compiler*)self, instream);
+    TermCompiler_deserialize_t super_deserialize
+        = (TermCompiler_deserialize_t)SUPER_METHOD(TERMCOMPILER, TermCompiler,
+                                                   Deserialize);
+    self = super_deserialize(self, instream);
     self->idf               = InStream_Read_F32(instream);
     self->raw_weight        = InStream_Read_F32(instream);
     self->query_norm_factor = InStream_Read_F32(instream);

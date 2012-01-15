@@ -42,7 +42,7 @@ class Lucy::Search::SortSpec inherits Lucy::Object::Obj {
     init(SortSpec *self, VArray *rules);
 
     public incremented SortSpec*
-    Deserialize(SortSpec *self, InStream *instream);
+    Deserialize(decremented SortSpec *self, InStream *instream);
 
     public void
     Serialize(SortSpec *self, OutStream *outstream);

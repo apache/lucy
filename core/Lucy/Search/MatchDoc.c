@@ -51,11 +51,11 @@ MatchDoc_serialize(MatchDoc *self, OutStream *outstream) {
 
 MatchDoc*
 MatchDoc_deserialize(MatchDoc *self, InStream *instream) {
-    self = self ? self : (MatchDoc*)VTable_Make_Obj(MATCHDOC);
     self->doc_id = InStream_Read_C32(instream);
     self->score  = InStream_Read_F32(instream);
     if (InStream_Read_U8(instream)) {
-        self->values = VA_deserialize(NULL, instream);
+        self->values
+            = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
     }
     return self;
 }

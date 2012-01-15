@@ -74,12 +74,9 @@ lucy_Doc_serialize(lucy_Doc *self, lucy_OutStream *outstream) {
 lucy_Doc*
 lucy_Doc_deserialize(lucy_Doc *self, lucy_InStream *instream) {
     int32_t doc_id = (int32_t)Lucy_InStream_Read_C32(instream);
-
-    self = self ? self : (lucy_Doc*)Lucy_VTable_Make_Obj(LUCY_DOC);
     lucy_Doc_init(self, NULL, doc_id);
     lucy_Host_callback(self, "deserialize_fields", 1,
                        CFISH_ARG_OBJ("instream", instream));
-
     return self;
 }
 

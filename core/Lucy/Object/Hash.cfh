@@ -140,7 +140,7 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     Serialize(Hash *self, OutStream *outstream);
 
     public incremented Hash*
-    Deserialize(Hash *self, InStream *instream);
+    Deserialize(decremented Hash *self, InStream *instream);
 
     public void
     Destroy(Hash *self);

@@ -56,7 +56,7 @@ class Lucy::Search::TopDocs inherits Lucy::Object::Obj {
     Serialize(TopDocs *self, OutStream *outstream);
 
     public incremented TopDocs*
-    Deserialize(TopDocs *self, InStream *instream);
+    Deserialize(decremented TopDocs *self, InStream *instream);
 
     public void
     Destroy(TopDocs *self);

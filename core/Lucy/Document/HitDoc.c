@@ -46,14 +46,17 @@ HitDoc_get_score(HitDoc *self) {
 
 void
 HitDoc_serialize(HitDoc *self, OutStream *outstream) {
-    Doc_serialize((Doc*)self, outstream);
+    HitDoc_serialize_t super_serialize
+        = (HitDoc_serialize_t)SUPER_METHOD(HITDOC, HitDoc, Serialize);
+    super_serialize(self, outstream);
     OutStream_Write_F32(outstream, self->score);
 }
 
 HitDoc*
 HitDoc_deserialize(HitDoc *self, InStream *instream) {
-    self = self ? self : (HitDoc*)VTable_Make_Obj(HITDOC);
-    Doc_deserialize((Doc*)self, instream);
+    HitDoc_deserialize_t super_deserialize
+        = (HitDoc_deserialize_t)SUPER_METHOD(HITDOC, HitDoc, Deserialize);
+    self = super_deserialize(self, instream);
     self->score = InStream_Read_F32(instream);
     return self;
 }

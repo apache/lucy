@@ -119,20 +119,20 @@ VTable_init_registry() {
 }
 
 VTable*
-VTable_singleton(const CharBuf *subclass_name, VTable *parent) {
+VTable_singleton(const CharBuf *class_name, VTable *parent) {
     if (VTable_registry == NULL) {
         VTable_init_registry();
     }
 
-    VTable *singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)subclass_name);
+    VTable *singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)class_name);
     if (singleton == NULL) {
         VArray *fresh_host_methods;
         uint32_t num_fresh;
 
         if (parent == NULL) {
-            CharBuf *parent_class = VTable_find_parent_class(subclass_name);
+            CharBuf *parent_class = VTable_find_parent_class(class_name);
             if (parent_class == NULL) {
-                THROW(ERR, "Class '%o' doesn't descend from %o", subclass_name,
+                THROW(ERR, "Class '%o' doesn't descend from %o", class_name,
                       OBJ->name);
             }
             else {
@@ -147,10 +147,10 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent) {
         // Turn clone into child.
         singleton->parent = parent;
         DECREF(singleton->name);
-        singleton->name = CB_Clone(subclass_name);
+        singleton->name = CB_Clone(class_name);
 
         // Allow host methods to override.
-        fresh_host_methods = VTable_fresh_host_methods(subclass_name);
+        fresh_host_methods = VTable_fresh_host_methods(class_name);
         num_fresh = VA_Get_Size(fresh_host_methods);
         if (num_fresh) {
             Hash *meths = Hash_new(num_fresh);
@@ -186,10 +186,10 @@ VTable_singleton(const CharBuf *subclass_name, VTable *parent) {
         }
         else {
             DECREF(singleton);
-            singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)subclass_name);
+            singleton = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)class_name);
             if (!singleton) {
                 THROW(ERR, "Failed to either insert or fetch VTable for '%o'",
-                      subclass_name);
+                      class_name);
             }
         }
     }

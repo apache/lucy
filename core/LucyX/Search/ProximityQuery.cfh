@@ -68,7 +68,7 @@ class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
     Serialize(ProximityQuery *self, OutStream *outstream);
 
     public incremented ProximityQuery*
-    Deserialize(ProximityQuery *self, InStream *instream);
+    Deserialize(decremented ProximityQuery *self, InStream *instream);
 
     public void
     Destroy(ProximityQuery *self);
@@ -113,7 +113,7 @@ class LucyX::Search::ProximityCompiler
     Serialize(ProximityCompiler *self, OutStream *outstream);
 
     public incremented ProximityCompiler*
-    Deserialize(ProximityCompiler *self, InStream *instream);
+    Deserialize(decremented ProximityCompiler *self, InStream *instream);
 }
 
 

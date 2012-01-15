@@ -137,7 +137,7 @@ class Lucy::Index::Similarity cnick Sim
     Serialize(Similarity *self, OutStream *outstream);
 
     public incremented Similarity*
-    Deserialize(Similarity *self, InStream *instream);
+    Deserialize(decremented Similarity *self, InStream *instream);
 }
 
 

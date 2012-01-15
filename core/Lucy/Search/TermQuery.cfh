@@ -60,7 +60,7 @@ class Lucy::Search::TermQuery inherits Lucy::Search::Query
     Serialize(TermQuery *self, OutStream *outstream);
 
     public incremented TermQuery*
-    Deserialize(TermQuery *self, InStream *instream);
+    Deserialize(decremented TermQuery *self, InStream *instream);
 
     public bool_t
     Equals(TermQuery *self, Obj *other);
@@ -105,7 +105,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
     Serialize(TermCompiler *self, OutStream *outstream);
 
     public incremented TermCompiler*
-    Deserialize(TermCompiler *self, InStream *instream);
+    Deserialize(decremented TermCompiler *self, InStream *instream);
 }
 
 

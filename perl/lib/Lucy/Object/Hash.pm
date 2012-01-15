@@ -26,12 +26,12 @@ my $xs_code = <<'END_XS_CODE';
 MODULE =  Lucy    PACKAGE = Lucy::Object::Hash
 
 SV*
-_deserialize(either_sv, instream)
-    SV *either_sv;
+_deserialize(self, instream)
+    lucy_Hash *self;
     lucy_InStream *instream;
 CODE:
-    CHY_UNUSED_VAR(either_sv);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_Hash_deserialize(NULL, instream));
+    lucy_Hash *thawed = Lucy_Hash_Deserialize(self, instream);
+    RETVAL = (SV*)Lucy_Hash_To_Host(thawed);
 OUTPUT: RETVAL
 
 SV*

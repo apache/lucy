@@ -52,7 +52,7 @@ abstract class Lucy::Search::PolyQuery
     Serialize(PolyQuery *self, OutStream *outstream);
 
     public incremented PolyQuery*
-    Deserialize(PolyQuery *self, InStream *instream);
+    Deserialize(decremented PolyQuery *self, InStream *instream);
 
     public bool_t
     Equals(PolyQuery *self, Obj *other);
@@ -92,7 +92,7 @@ class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
     Serialize(PolyCompiler *self, OutStream *outstream);
 
     public incremented PolyCompiler*
-    Deserialize(PolyCompiler *self, InStream *instream);
+    Deserialize(decremented PolyCompiler *self, InStream *instream);
 }
 
 

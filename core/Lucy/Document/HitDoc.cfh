@@ -63,7 +63,7 @@ class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
     Serialize(HitDoc *self, OutStream *outstream);
 
     public incremented HitDoc*
-    Deserialize(HitDoc *self, InStream *instream);
+    Deserialize(decremented HitDoc *self, InStream *instream);
 }
 
 

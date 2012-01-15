@@ -59,10 +59,10 @@ SortRule_destroy(SortRule *self) {
 
 SortRule*
 SortRule_deserialize(SortRule *self, InStream *instream) {
-    self = self ? self : (SortRule*)VTable_Make_Obj(SORTRULE);
     self->type = InStream_Read_C32(instream);
     if (self->type == SortRule_FIELD) {
-        self->field = CB_deserialize(NULL, instream);
+        self->field
+            = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
     }
     self->reverse = InStream_Read_C32(instream);
     return self;

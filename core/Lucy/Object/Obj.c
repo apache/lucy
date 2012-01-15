@@ -76,16 +76,11 @@ Obj_serialize(Obj *self, OutStream *outstream) {
 
 Obj*
 Obj_deserialize(Obj *self, InStream *instream) {
-    CharBuf *class_name = CB_deserialize(NULL, instream);
-    if (!self) {
-        VTable *vtable = VTable_singleton(class_name, OBJ);
-        self = VTable_Make_Obj(vtable);
-    }
-    else {
-        CharBuf *my_class = VTable_Get_Name(self->vtable);
-        if (!CB_Equals(class_name, (Obj*)my_class)) {
-            THROW(ERR, "Class mismatch: %o %o", class_name, my_class);
-        }
+    CharBuf *class_name
+        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    CharBuf *my_class = VTable_Get_Name(self->vtable);
+    if (!CB_Equals(class_name, (Obj*)my_class)) {
+        THROW(ERR, "Class mismatch: %o %o", class_name, my_class);
     }
     DECREF(class_name);
     return Obj_init(self);
