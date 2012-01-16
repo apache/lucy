@@ -134,6 +134,7 @@ my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
 my $AUTOGEN_DIR      = 'autogen';
 my $XS_SOURCE_DIR    = 'xs';
 my $LIB_DIR          = 'lib';
+my $BUILDLIB_DIR     = 'buildlib';
 my $XS_FILEPATH      = catfile( $LIB_DIR, "Lucy.xs" );
 my $AUTOBIND_PM_PATH = catfile( $LIB_DIR, 'Lucy', 'Autobinding.pm' );
 
@@ -221,6 +222,7 @@ sub _compile_clownfish {
     require Clownfish::CFC::Hierarchy;
     require Clownfish::CFC::Binding::Perl;
     require Clownfish::CFC::Binding::Perl::Class;
+    use Module::Load;
 
     # Compile Clownfish.
     my $hierarchy = Clownfish::CFC::Hierarchy->new(
@@ -230,19 +232,15 @@ sub _compile_clownfish {
     $hierarchy->build;
 
     # Process all __BINDING__ blocks.
-    my $pm_filepaths = $self->rscan_dir( $LIB_DIR, qr/\.pm$/ );
+    my $pm_filepaths = $self->rscan_dir( $BUILDLIB_DIR, qr/\.pm$/ );
     my @pm_filepaths_with_xs;
     for my $pm_filepath (@$pm_filepaths) {
-        open( my $pm_fh, '<', $pm_filepath )
-            or die "Can't open '$pm_filepath': $!";
-        my $pm_content = do { local $/; <$pm_fh> };
-        my ($autobind_frag)
-            = $pm_content =~ /^__BINDING__\s*(.*?)(?:^__\w+__|\Z)/sm;
-        if ($autobind_frag) {
-            push @pm_filepaths_with_xs, $pm_filepath;
-            eval $autobind_frag;
-            confess("Invalid __BINDING__ from $pm_filepath: $@") if $@;
-        }
+        next unless $pm_filepath =~ /Binding/;
+        load $pm_filepath;
+        my $package_name = $pm_filepath;
+        $package_name =~ s/buildlib\/(Lucy.*)\.pm$/$1/;
+        $package_name =~ s/\//::/g;
+        $package_name->bind_all;
     }
 
     my $binding = Clownfish::CFC::Binding::Perl->new(
