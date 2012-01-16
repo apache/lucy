@@ -20,31 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $type   = Lucy::Plan::StringType->new;
-    my $schema = Lucy::Plan::Schema->new;
-    $schema->spec_field( name => 'category', type => $type );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $type = Lucy::Plan::StringType->new(
-        boost    => 0.1,    # default: 1.0
-        indexed  => 1,      # default: true
-        stored   => 1,      # default: true
-        sortable => 1,      # default: false
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::StringType",
-    bind_constructors => ["new|init2"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    },
-);
-
 

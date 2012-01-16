@@ -19,31 +19,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    use Sys::Hostname qw( hostname );
-    my $hostname = hostname() or die "Can't get unique hostname";
-    my $manager = Lucy::Index::IndexManager->new( host => $hostname );
-
-    # Index time:
-    my $indexer = Lucy::Index::Indexer->new(
-        index   => '/path/to/index',
-        manager => $manager,
-    );
-
-    # Search time:
-    my $reader = Lucy::Index::IndexReader->open(
-        index   => '/path/to/index',
-        manager => $manager,
-    );
-    my $searcher = Lucy::Search::IndexSearcher->new( index => $reader );
-END_SYNOPSIS
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy::Docs::FileLocking",
-    make_pod   => { synopsis => $synopsis, },
-);
-
 

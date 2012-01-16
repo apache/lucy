@@ -20,40 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Index::SortCache
-
-SV*
-value(self, ...)
-    lucy_SortCache *self;
-CODE:
-{
-    int32_t ord = 0;
-    chy_bool_t args_ok
-        = XSBind_allot_params(&(ST(0)), 1, items,
-                              "Lucy::Index::SortCache::value_PARAMS",
-                              ALLOT_I32(&ord, "ord", 3, false),
-                              NULL);
-    if (!args_ok) {
-        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-    }
-    {
-        lucy_Obj *blank = Lucy_SortCache_Make_Blank(self);
-        lucy_Obj *value = Lucy_SortCache_Value(self, ord, blank);
-        RETVAL = XSBind_cfish_to_perl(value);
-        CFISH_DECREF(blank);
-    }
-}
-OUTPUT: RETVAL
-END_XS_CODE
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::SortCache",
-    xs_code           => $xs_code,
-    bind_methods      => [qw( Ordinal Find )],
-);
-
 

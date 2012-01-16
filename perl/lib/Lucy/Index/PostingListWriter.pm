@@ -20,23 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $xs_code = <<'END_XS';
-MODULE = Lucy    PACKAGE = Lucy::Index::PostingListWriter
-
-void
-set_default_mem_thresh(mem_thresh)
-    size_t mem_thresh;
-PPCODE:
-    lucy_PListWriter_set_default_mem_thresh(mem_thresh);
-END_XS
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::PostingListWriter",
-    xs_code           => $xs_code,
-    bind_constructors => ["new"],
-);
-
 

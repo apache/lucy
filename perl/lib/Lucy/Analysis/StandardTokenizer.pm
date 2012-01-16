@@ -20,28 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
-
-    # Then... once you have a tokenizer, put it into a PolyAnalyzer:
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stemmer ], );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Analysis::StandardTokenizer",
-    bind_constructors => ["new"],
-    make_pod          => {
-        constructor => { sample => $constructor },
-        synopsis    => $synopsis,
-    },
-);
-
 

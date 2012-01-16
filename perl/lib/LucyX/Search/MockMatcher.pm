@@ -42,15 +42,7 @@ sub new {
 
 __END__
 
-__BINDING__
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "LucyX::Search::MockMatcher",
-    bind_constructors => ["_new|init"],
-);
-
-__POD__
 
 =head1 NAME
 

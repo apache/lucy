@@ -190,15 +190,7 @@ BEGIN { our @ISA = qw( Lucy::Search::Matcher ) }
 
 __END__
 
-__BINDING__
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "LucyX::Search::FilterMatcher",
-    bind_constructors => ["new"],
-);
-
-__POD__
 
 =head1 NAME
 

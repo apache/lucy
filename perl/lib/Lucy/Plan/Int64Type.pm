@@ -20,29 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $schema     = Lucy::Plan::Schema->new;
-    my $int64_type = Lucy::Plan::Int64Type->new;
-    $schema->spec_field( name => 'count', type => $int64_type );
-END_SYNOPSIS
-my $constructor = <<'END_CONSTRUCTOR';
-    my $int64_type = Lucy::Plan::Int64Type->new(
-        indexed  => 0,    # default true
-        stored   => 0,    # default true
-        sortable => 1,    # default false
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::Int64Type",
-    bind_constructors => ["new|init2"],
-    #make_pod          => {
-    #    synopsis    => $synopsis,
-    #    constructor => { sample => $constructor },
-    #},
-);
-
 

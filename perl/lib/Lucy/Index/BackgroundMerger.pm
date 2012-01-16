@@ -20,44 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $bg_merger = Lucy::Index::BackgroundMerger->new(
-        index  => '/path/to/index',
-    );
-    $bg_merger->commit;
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $bg_merger = Lucy::Index::BackgroundMerger->new(
-        index   => '/path/to/index',    # required
-        manager => $manager             # default: created internally
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Index::BackgroundMerger",
-    bind_methods => [
-        qw(
-            Commit
-            Prepare_Commit
-            Optimize
-            )
-    ],
-    bind_constructors => ["new"],
-    make_pod          => {
-        methods => [
-            qw(
-                commit
-                prepare_commit
-                optimize
-                )
-        ],
-        synopsis     => $synopsis,
-        constructors => [ { sample => $constructor } ],
-    },
-);
-
 

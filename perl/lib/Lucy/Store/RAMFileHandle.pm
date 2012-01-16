@@ -20,13 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Store::RAMFileHandle",
-    bind_methods      => [qw( Get_File )],
-    bind_constructors => ['_open|do_open'],
-);
-
 

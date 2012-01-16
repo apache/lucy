@@ -20,29 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::SegWriter",
-    bind_constructors => ["new"],
-    bind_methods      => [
-        qw(
-            Add_Writer
-            Register
-            Fetch
-            )
-    ],
-    make_pod => {
-        methods => [
-            qw(
-                add_doc
-                add_writer
-                register
-                fetch
-                )
-        ],
-    }
-);
-
 

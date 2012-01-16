@@ -20,31 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $phrase_query = Lucy::Search::PhraseQuery->new( 
-        field => 'content',
-        terms => [qw( the who )],
-    );
-    my $hits = $searcher->hits( query => $phrase_query );
-END_SYNOPSIS
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::PhraseQuery",
-    bind_methods      => [qw( Get_Field Get_Terms )],
-    bind_constructors => ["new"],
-    make_pod          => {
-        constructor => { sample => '' },
-        synopsis    => $synopsis,
-        methods     => [qw( get_field get_terms )],
-    },
-);
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::PhraseCompiler",
-    bind_constructors => ["do_new"],
-);
-
 

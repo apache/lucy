@@ -20,13 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::DocVector",
-    bind_methods      => [qw( Term_Vector Field_Buf Add_Field_Buf )],
-    bind_constructors => ["new"],
-);
-
 

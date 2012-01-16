@@ -20,29 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    sub walk {
-        my $query = shift;
-        if ( $query->isa("Lucy::Search::PolyQuery") ) {
-            if    ( $query->isa("Lucy::Search::ORQuery") )  { ... }
-            elsif ( $query->isa("Lucy::Search::ANDQuery") ) { ... }
-            elsif ( $query->isa("Lucy::Search::RequiredOptionalQuery") ) {
-                ...
-            }
-            elsif ( $query->isa("Lucy::Search::NOTQuery") ) { ... }
-        }
-        else { ... }
-    }
-END_SYNOPSIS
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::PolyQuery",
-    bind_methods      => [qw( Add_Child Set_Children Get_Children )],
-    bind_constructors => ["new"],
-    make_pod          => { synopsis => $synopsis, },
-);
-
 

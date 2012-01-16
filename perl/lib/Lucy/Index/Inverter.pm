@@ -20,26 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::Inverter",
-    bind_constructors => ["new"],
-    bind_methods      => [
-        qw(
-            Get_Doc
-            Iterate
-            Next
-            Clear
-            Get_Field_Name
-            Get_Value
-            Get_Type
-            Get_Analyzer
-            Get_Similarity
-            Get_Inversion
-            )
-    ],
-);
-
 

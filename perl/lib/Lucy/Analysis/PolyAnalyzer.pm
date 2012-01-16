@@ -20,44 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $schema = Lucy::Plan::Schema->new;
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
-        language => 'en',
-    );
-    my $type = Lucy::Plan::FullTextType->new(
-        analyzer => $polyanalyzer,
-    );
-    $schema->spec_field( name => 'title',   type => $type );
-    $schema->spec_field( name => 'content', type => $type );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
-        language  => 'es',
-    );
-    
-    # or...
-
-    my $case_folder  = Lucy::Analysis::CaseFolder->new;
-    my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
-    my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $whitespace_tokenizer, $stemmer, ], );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Analysis::PolyAnalyzer",
-    bind_constructors => ["new"],
-    bind_methods      => [qw( Get_Analyzers )],
-    make_pod          => {
-        methods     => [qw( get_analyzers )],
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    },
-);
-
 

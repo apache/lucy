@@ -20,28 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    while (1) {
-        my $bg_merger = eval {
-            Lucy::Index::BackgroundMerger->new( index => $index );
-        };
-        if ( blessed($@) and $@->isa("Lucy::Store::LockErr") ) {
-            warn "Retrying...\n";
-        }
-        elsif (!$bg_merger) {
-            # Re-throw.
-            die "Failed to open BackgroundMerger: $@";
-        }
-        ...
-    }
-END_SYNOPSIS
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy::Store::LockErr",
-    make_pod   => { synopsis => $synopsis }
-);
-
 

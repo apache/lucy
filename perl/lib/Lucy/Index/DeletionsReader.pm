@@ -20,19 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::DeletionsReader",
-    bind_constructors => ['new'],
-    bind_methods      => [qw( Iterator Del_Count )],
-);
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::DefaultDeletionsReader",
-    bind_constructors => ['new'],
-    bind_methods      => [qw( Read_Deletions )],
-);
-
 

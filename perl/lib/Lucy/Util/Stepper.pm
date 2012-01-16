@@ -20,12 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Util::Stepper",
-    bind_methods => [qw( Read_Record )],
-);
-
 

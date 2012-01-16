@@ -20,43 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $searcher = Lucy::Search::IndexSearcher->new( 
-        index => '/path/to/index' 
-    );
-    my $hits = $searcher->hits(
-        query      => 'foo bar',
-        offset     => 0,
-        num_wanted => 100,
-    );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $searcher = Lucy::Search::IndexSearcher->new( 
-        index => '/path/to/index' 
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::IndexSearcher",
-    bind_methods      => [qw( Get_Reader )],
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-        methods     => [
-            qw( hits
-                collect
-                doc_max
-                doc_freq
-                fetch_doc
-                get_schema
-                get_reader )
-        ],
-    },
-);
-
 

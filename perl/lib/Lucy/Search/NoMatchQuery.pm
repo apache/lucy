@@ -20,17 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $no_match_query = Lucy::Search::NoMatchQuery->new;
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::NoMatchQuery",
-    bind_constructors => ["new"],
-    make_pod          => { constructor => { sample => $constructor }, }
-);
-
 

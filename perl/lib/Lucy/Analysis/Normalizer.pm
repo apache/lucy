@@ -20,32 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $normalizer = Lucy::Analysis::Normalizer->new;
-    
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $normalizer, $tokenizer, $stemmer ],
-    );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $normalizer = Lucy::Analysis::Normalizer->new(
-        normalization_form => 'NFKC',
-        case_fold          => 1,
-        strip_accents      => 0,
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Analysis::Normalizer",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor }
-    },
-);
-
 

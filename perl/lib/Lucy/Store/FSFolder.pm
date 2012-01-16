@@ -20,24 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $folder = Lucy::Store::FSFolder->new(
-        path   => '/path/to/folder',
-    );
-END_SYNOPSIS
-
-my $constructor = $synopsis;
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Store::FSFolder",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    },
-);
-
 

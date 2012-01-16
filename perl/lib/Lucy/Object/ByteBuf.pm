@@ -20,47 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy     PACKAGE = Lucy::Object::ByteBuf
-
-SV*
-new(either_sv, sv)
-    SV *either_sv;
-    SV *sv;
-CODE:
-{
-    STRLEN size;
-    char *ptr = SvPV(sv, size);
-    lucy_ByteBuf *self = (lucy_ByteBuf*)XSBind_new_blank_obj(either_sv);
-    lucy_BB_init(self, size);
-    Lucy_BB_Mimic_Bytes(self, ptr, size);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
-}
-OUTPUT: RETVAL
-
-SV*
-_deserialize(self, instream)
-    lucy_ByteBuf *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_ByteBuf *thawed = Lucy_BB_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_BB_To_Host(thawed);
-OUTPUT: RETVAL
-END_XS_CODE
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Object::ByteBuf",
-    xs_code      => $xs_code,
-    bind_methods => [
-        qw(
-            Get_Size
-            Get_Capacity
-            Cat
-            )
-    ],
-);
-
 

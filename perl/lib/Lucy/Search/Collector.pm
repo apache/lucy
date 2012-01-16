@@ -20,43 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $constructor = <<'END_CONSTRUCTOR';
-    package MyCollector;
-    use base qw( Lucy::Search::Collector );
-    our %foo;
-    sub new {
-        my $self = shift->SUPER::new;
-        my %args = @_;
-        $foo{$$self} = $args{foo};
-        return $self;
-    }
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Search::Collector",
-    bind_methods => [
-        qw(
-            Collect
-            Set_Reader
-            Set_Base
-            Set_Matcher
-            Need_Score
-            )
-    ],
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => "    # Abstract base class.\n",
-        constructor => { sample => $constructor },
-        methods     => [qw( collect )],
-    },
-);
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::Collector::OffsetCollector",
-    bind_constructors => ["new"],
-);
-
 

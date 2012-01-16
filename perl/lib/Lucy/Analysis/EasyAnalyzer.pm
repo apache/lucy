@@ -20,34 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $schema = Lucy::Plan::Schema->new;
-    my $analyzer = Lucy::Analysis::EasyAnalyzer->new(
-        language => 'en',
-    );
-    my $type = Lucy::Plan::FullTextType->new(
-        analyzer => $analyzer,
-    );
-    $schema->spec_field( name => 'title',   type => $type );
-    $schema->spec_field( name => 'content', type => $type );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $analyzer = Lucy::Analysis::EasyAnalyzer->new(
-        language  => 'es',
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Analysis::EasyAnalyzer",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    },
-);
-
 

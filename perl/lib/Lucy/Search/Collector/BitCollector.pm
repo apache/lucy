@@ -20,36 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $bit_vec = Lucy::Object::BitVector->new(
-        capacity => $searcher->doc_max + 1,
-    );
-    my $bit_collector = Lucy::Search::Collector::BitCollector->new(
-        bit_vector => $bit_vec, 
-    );
-    $searcher->collect(
-        collector => $bit_collector,
-        query     => $query,
-    );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $bit_collector = Lucy::Search::Collector::BitCollector->new(
-        bit_vector => $bit_vec,    # required
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::Collector::BitCollector",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-        methods     => [qw( collect )],
-    },
-);
-
 

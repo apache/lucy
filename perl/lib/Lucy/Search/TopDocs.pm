@@ -20,19 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Search::TopDocs",
-    bind_methods => [
-        qw(
-            Get_Match_Docs
-            Get_Total_Hits
-            Set_Total_Hits
-            )
-    ],
-    bind_constructors => ["new"],
-);
-
 

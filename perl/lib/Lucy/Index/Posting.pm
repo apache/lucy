@@ -20,15 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Index::Posting",
-    bind_methods => [qw( Get_Doc_ID )],
-#    make_pod => {
-#        synopsis => "    # Abstract base class.\n",
-#    },
-);
-
 

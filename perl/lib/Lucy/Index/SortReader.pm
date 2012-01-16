@@ -20,18 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::SortReader",
-    bind_constructors => ["new"],
-    bind_methods      => [qw( Fetch_Sort_Cache )],
-);
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::DefaultSortReader",
-    bind_constructors => ["new"],
-);
-
 

@@ -20,38 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $term_query = Lucy::Search::TermQuery->new(
-        field => 'content',
-        term  => 'foo', 
-    );
-    my $hits = $searcher->hits( query => $term_query );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $term_query = Lucy::Search::TermQuery->new(
-        field => 'content',    # required
-        term  => 'foo',        # required
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::TermQuery",
-    bind_methods      => [qw( Get_Field Get_Term )],
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-        methods     => [qw( get_field get_term )],
-    },
-);
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::TermCompiler",
-    bind_constructors => ["do_new"],
-);
-
 

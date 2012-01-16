@@ -20,31 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $folder = Lucy::Store::RAMFolder->new;
-    
-    # or sometimes...
-    my $folder = Lucy::Store::RAMFolder->new(
-        path => $relative_path,
-    );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $folder = Lucy::Store::RAMFolder->new(
-        path => $relative_path,   # default: empty string
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Store::RAMFolder",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    }
-);
-
 

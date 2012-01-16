@@ -20,13 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::SegPostingList",
-    bind_methods      => [qw( Get_Post_Stream Get_Count )],
-    bind_constructors => ["new"],
-);
-
 

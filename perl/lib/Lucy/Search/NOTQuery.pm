@@ -20,35 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $not_bar_query = Lucy::Search::NOTQuery->new( 
-        negated_query => $bar_query,
-    );
-    my $foo_and_not_bar_query = Lucy::Search::ANDQuery->new(
-        children => [ $foo_query, $not_bar_query ].
-    );
-    my $hits = $searcher->hits( query => $foo_and_not_bar_query );
-    ...
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $not_query = Lucy::Search::NOTQuery->new( 
-        negated_query => $query,
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::NOTQuery",
-    bind_constructors => ["new"],
-    bind_methods      => [qw( Get_Negated_Query Set_Negated_Query )],
-    make_pod          => {
-        methods     => [qw( get_negated_query set_negated_query )],
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    }
-);
-
 

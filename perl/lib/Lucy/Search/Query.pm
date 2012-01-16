@@ -20,46 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    # Query is an abstract base class.
-    package MyQuery;
-    use base qw( Lucy::Search::Query );
-    
-    sub make_compiler {
-        my ( $self, %args ) = @_;
-        my $subordinate = delete $args{subordinate};
-        my $compiler = MyCompiler->new( %args, parent => $self );
-        $compiler->normalize unless $subordinate;
-        return $compiler;
-    }
-    
-    package MyCompiler;
-    use base ( Lucy::Search::Compiler );
-    ...
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR_CODE_SAMPLE';
-    my $query = MyQuery->SUPER::new(
-        boost => 2.5,
-    );
-END_CONSTRUCTOR_CODE_SAMPLE
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Search::Query",
-    bind_methods => [
-        qw( Set_Boost
-            Get_Boost
-            _make_compiler|Make_Compiler )
-    ],
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-        methods     => [qw( make_compiler set_boost get_boost )],
-    },
-);
-
 

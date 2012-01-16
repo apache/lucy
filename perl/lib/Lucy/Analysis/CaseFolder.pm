@@ -20,28 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $case_folder = Lucy::Analysis::CaseFolder->new;
-
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stemmer ],
-    );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $case_folder = Lucy::Analysis::CaseFolder->new;
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Analysis::CaseFolder",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    },
-);
-
 

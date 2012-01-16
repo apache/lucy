@@ -20,27 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $lex_reader = $seg_reader->obtain("Lucy::Index::LexiconReader");
-    my $lexicon    = $lex_reader->lexicon( field => 'title' );
-END_SYNOPSIS
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::LexiconReader",
-    bind_methods      => [qw( Lexicon Doc_Freq Fetch_Term_Info )],
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis => $synopsis,
-        methods  => [qw( lexicon doc_freq )],
-    },
-);
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::DefaultLexiconReader",
-    bind_constructors => ["new"],
-);
-
 

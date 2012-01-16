@@ -20,13 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::FilePurger",
-    bind_methods      => [qw( Purge )],
-    bind_constructors => ["new"],
-);
-
 

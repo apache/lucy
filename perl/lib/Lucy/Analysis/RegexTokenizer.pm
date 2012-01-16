@@ -20,38 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-my $synopsis = <<'END_SYNOPSIS';
-    my $whitespace_tokenizer
-        = Lucy::Analysis::RegexTokenizer->new( pattern => '\S+' );
-
-    # or...
-    my $word_char_tokenizer
-        = Lucy::Analysis::RegexTokenizer->new( pattern => '\w+' );
-
-    # or...
-    my $apostrophising_tokenizer = Lucy::Analysis::RegexTokenizer->new;
-
-    # Then... once you have a tokenizer, put it into a PolyAnalyzer:
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $word_char_tokenizer, $stemmer ], );
-END_SYNOPSIS
-
-my $constructor = <<'END_CONSTRUCTOR';
-    my $word_char_tokenizer = Lucy::Analysis::RegexTokenizer->new(
-        pattern => '\w+',    # required
-    );
-END_CONSTRUCTOR
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Analysis::RegexTokenizer",
-    bind_constructors => ["_new"],
-    make_pod          => {
-        constructor => { sample => $constructor },
-        synopsis    => $synopsis,
-    },
-);
-
 

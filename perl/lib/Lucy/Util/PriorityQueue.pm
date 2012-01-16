@@ -20,22 +20,4 @@ use Lucy;
 
 __END__
 
-__BINDING__
-
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Util::PriorityQueue",
-    bind_methods => [
-        qw(
-            Less_Than
-            Insert
-            Pop
-            Pop_All
-            Peek
-            Get_Size
-            )
-    ],
-    bind_constructors => ["new"],
-);
-
 
