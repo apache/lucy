@@ -39,5 +39,8 @@
 #include "CFCBindFunction.h"
 #include "CFCBindMethod.h"
 
+#include "CFCPerlSub.h"
+#include "CFCPerlMethod.h"
+#include "CFCPerlConstructor.h"
 #include "CFCPerlTypeMap.h"
 

@@ -39,7 +39,7 @@ struct CFCPerlConstructor {
 };
 
 const static CFCMeta CFCPERLCONSTRUCTOR_META = {
-    "Clownfish::Binding::Perl::Constructor",
+    "Clownfish::CFC::Binding::Perl::Constructor",
     sizeof(CFCPerlConstructor),
     (CFCBase_destroy_t)CFCPerlConstructor_destroy
 };

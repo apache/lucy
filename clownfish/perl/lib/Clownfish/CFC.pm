@@ -82,18 +82,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 }
 
 {
-    package Clownfish::CFC::Binding::Perl::TypeMap;
-    use base qw( Exporter );
-
-    BEGIN { our @EXPORT_OK = qw( from_perl to_perl ) }
-
-    sub write_xs_typemap {
-        my ( undef, %args ) = @_;
-        _write_xs_typemap( $args{hierarchy} );
-    }
-}
-
-{
     package Clownfish::CFC::Base;
 }
 
@@ -647,17 +635,59 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 
 {
     package Clownfish::CFC::Binding::Perl::Constructor;
-    use Clownfish::CFC::Binding::Perl::Class;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Binding::Perl::Subroutine' }
+    use Carp;
+    use Clownfish::CFC::Util qw( verify_args );
+
+    our %new_PARAMS = (
+        class => undef,
+        alias => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        confess $@ unless verify_args( \%new_PARAMS, %args );
+        return _new( @args{qw( class alias )} );
+    }
 }
 
 {
     package Clownfish::CFC::Binding::Perl::Method;
-    use Clownfish::CFC::Binding::Perl::Method;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Binding::Perl::Subroutine' }
+    use Clownfish::CFC::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = (
+        method => undef,
+        alias  => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        confess $@ unless verify_args( \%new_PARAMS, %args );
+        return _new( @args{qw( method alias )} );
+    }
 }
 
 {
     package Clownfish::CFC::Binding::Perl::Subroutine;
-    use Clownfish::CFC::Binding::Perl::Subroutine;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Carp;
+    use Clownfish::CFC::Util qw( verify_args );
+
+    sub xsub_def { confess "Abstract method" }
+}
+
+{
+    package Clownfish::CFC::Binding::Perl::TypeMap;
+    use base qw( Exporter );
+
+    our @EXPORT_OK = qw( from_perl to_perl );
+
+    sub write_xs_typemap {
+        my ( undef, %args ) = @_;
+        _write_xs_typemap( $args{hierarchy} );
+    }
 }
 
 1;

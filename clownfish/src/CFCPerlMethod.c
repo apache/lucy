@@ -50,7 +50,7 @@ static char*
 S_xsub_def_positional_args(CFCPerlMethod *self);
 
 const static CFCMeta CFCPERLMETHOD_META = {
-    "Clownfish::Binding::Perl::Method",
+    "Clownfish::CFC::Binding::Perl::Method",
     sizeof(CFCPerlMethod),
     (CFCBase_destroy_t)CFCPerlMethod_destroy
 };
