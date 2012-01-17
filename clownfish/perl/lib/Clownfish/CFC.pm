@@ -82,6 +82,18 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 }
 
 {
+    package Clownfish::CFC::Binding::Perl::TypeMap;
+    use base qw( Exporter );
+
+    BEGIN { our @EXPORT_OK = qw( from_perl to_perl ) }
+
+    sub write_xs_typemap {
+        my ( undef, %args ) = @_;
+        _write_xs_typemap( $args{hierarchy} );
+    }
+}
+
+{
     package Clownfish::CFC::Base;
 }
 
@@ -646,11 +658,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 {
     package Clownfish::CFC::Binding::Perl::Subroutine;
     use Clownfish::CFC::Binding::Perl::Subroutine;
-}
-
-{
-    package Clownfish::CFC::Binding::Perl::TypeMap;
-    use Clownfish::CFC::Binding::Perl::TypeMap;
 }
 
 1;
