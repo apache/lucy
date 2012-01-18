@@ -222,7 +222,6 @@ sub _compile_clownfish {
     require Clownfish::CFC::Hierarchy;
     require Clownfish::CFC::Binding::Perl;
     require Clownfish::CFC::Binding::Perl::Class;
-    use Module::Load;
 
     # Compile Clownfish.
     my $hierarchy = Clownfish::CFC::Hierarchy->new(
@@ -236,7 +235,7 @@ sub _compile_clownfish {
     my @pm_filepaths_with_xs;
     for my $pm_filepath (@$pm_filepaths) {
         next unless $pm_filepath =~ /Binding/;
-        load $pm_filepath;
+        require $pm_filepath;
         my $package_name = $pm_filepath;
         $package_name =~ s/buildlib\/(Lucy.*)\.pm$/$1/;
         $package_name =~ s/\//::/g;
@@ -402,6 +401,7 @@ sub ACTION_suppressions {
     $suppressions =~ s/^==.*?\n//mg;
     $suppressions =~ s/^--.*?\n//mg;
     my $rule_number = 1;
+
     while ( $suppressions =~ /<insert.a.*?>/ ) {
         $suppressions =~ s/^\s*<insert.a.*?>/{\n  <core_perl_$rule_number>/m;
         $rule_number++;
