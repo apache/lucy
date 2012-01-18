@@ -1853,6 +1853,195 @@ CODE:
 OUTPUT: RETVAL
 
 
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Class
+
+SV*
+_new(parcel, class_name, client, xs_code_sv, pod_spec)
+    CFCParcel  *parcel;
+    const char *class_name;
+    CFCClass   *client;
+    SV         *xs_code_sv;
+    CFCPerlPod *pod_spec;
+CODE:
+    const char *xs_code = SvOK(xs_code_sv)
+                          ? SvPV_nolen(xs_code_sv)
+                          : NULL;
+    CFCPerlClass *self
+        = CFCPerlClass_new(parcel, class_name, client, xs_code, pod_spec);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_destroy(self)
+    CFCPerlClass *self;
+PPCODE:
+    CFCBase_decref((CFCBase*)self);
+
+void
+_add_to_registry(self)
+    CFCPerlClass *self;
+PPCODE:
+    CFCPerlClass_add_to_registry(self);
+
+SV*
+singleton(unused_sv, class_name)
+    SV *unused_sv;
+    const char *class_name;
+CODE:
+    CFCPerlClass *binding = CFCPerlClass_singleton(class_name);
+    RETVAL = S_cfcbase_to_perlref(binding);
+OUTPUT: RETVAL
+
+SV*
+registered(...)
+CODE:
+    CFCPerlClass **registry = CFCPerlClass_registry();
+    RETVAL = S_array_of_cfcbase_to_av((CFCBase**)registry);
+OUTPUT: RETVAL
+
+void
+_clear_registry(...)
+PPCODE:
+    CFCPerlClass_clear_registry();
+
+void
+_set_or_get(self, ...)
+    CFCPerlClass *self;
+ALIAS:
+    get_class_name     = 2
+    get_client         = 4
+    get_xs_code        = 6
+    get_pod_spec       = 8
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *value = CFCPerlClass_get_class_name(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 4: {
+                CFCClass *value = CFCPerlClass_get_client(self);
+                retval = S_cfcbase_to_perlref(value);
+            }
+            break;
+        case 6: {
+                const char *value = CFCPerlClass_get_xs_code(self);
+                retval = value
+                         ? newSVpvn(value, strlen(value))
+                         : newSV(0);
+            }
+            break;
+        case 8: {
+                CFCPerlPod *value = CFCPerlClass_get_pod_spec(self);
+                retval = S_cfcbase_to_perlref(value);
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Pod
+
+SV*
+_new(synopsis, description)
+    const char *synopsis;
+    const char *description;
+CODE:
+    CFCPerlPod *self = CFCPerlPod_new(synopsis, description);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_add_method(self, name, pod_sv)
+    CFCPerlPod *self;
+    const char *name;
+    SV *pod_sv;
+PPCODE:
+    const char *pod = SvPOK(pod_sv) ? SvPVutf8_nolen(pod_sv) : NULL;
+    CFCPerlPod_add_method(self, name, pod);
+
+void
+_add_constructor(self, name_sv, pod_sv, func_sv, sample_sv)
+    CFCPerlPod *self;
+    SV *name_sv;
+    SV *pod_sv;
+    SV *func_sv;
+    SV *sample_sv;
+PPCODE:
+    const char *name   = SvPOK(name_sv)   ? SvPVutf8_nolen(name_sv)   : NULL;
+    const char *pod    = SvPOK(pod_sv)    ? SvPVutf8_nolen(pod_sv)    : NULL;
+    const char *func   = SvPOK(func_sv)   ? SvPVutf8_nolen(func_sv)   : NULL;
+    const char *sample = SvPOK(sample_sv) ? SvPVutf8_nolen(sample_sv) : NULL;
+    CFCPerlPod_add_constructor(self, name, pod, func, sample);
+
+SV*
+methods_pod(self, klass)
+    CFCPerlPod *self;
+    CFCClass   *klass;
+CODE:
+    char *methods_pod = CFCPerlPod_methods_pod(self, klass);
+    RETVAL = S_sv_eat_c_string(methods_pod);
+OUTPUT: RETVAL
+
+SV*
+constructors_pod(self, klass)
+    CFCPerlPod *self;
+    CFCClass   *klass;
+CODE:
+    char *constructors_pod = CFCPerlPod_constructors_pod(self, klass);
+    RETVAL = S_sv_eat_c_string(constructors_pod);
+OUTPUT: RETVAL
+
+void
+_set_or_get(self, ...)
+    CFCPerlPod *self;
+ALIAS:
+    get_synopsis       = 2
+    get_description    = 4
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *value = CFCPerlPod_get_synopsis(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 4: {
+                const char *value = CFCPerlPod_get_description(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
+
+SV*
+_perlify_doc_text(self, source)
+    CFCPerlPod   *self;
+    const char   *source;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCPerlPod_perlify_doc_text(self, source));
+OUTPUT: RETVAL
+
+SV*
+_gen_subroutine_pod(self, func, sub_name, klass, code_sample, class_name, is_constructor)
+    CFCPerlPod *self;
+    CFCFunction *func;
+    const char *sub_name;
+    CFCClass *klass;
+    const char *code_sample;
+    const char *class_name;
+    int is_constructor;
+CODE:
+    char *value = CFCPerlPod_gen_subroutine_pod(self, func, sub_name, klass,
+                                                code_sample, class_name,
+                                                is_constructor);
+    RETVAL = S_sv_eat_c_string(value);
+OUTPUT: RETVAL
+
+
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::TypeMap
 
 SV*

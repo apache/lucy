@@ -17,10 +17,10 @@ use strict;
 use warnings;
 
 package Clownfish::CFC::Binding::Perl::Class;
+use base qw( Clownfish::CFC::Base );
 use Clownfish::CFC::Util qw( verify_args );
+use Clownfish::CFC::Binding::Perl::Pod;
 use Carp;
-
-our %registry;
 
 our %register_PARAMS = (
     parcel            => undef,
@@ -32,61 +32,77 @@ our %register_PARAMS = (
     client            => undef,
 );
 
+our %bind_methods;
+our %bind_constructors;
+
 sub register {
-    my $either = shift;
-    verify_args( \%register_PARAMS, @_ ) or confess $@;
-    my $self = bless { %register_PARAMS, @_, }, ref($either) || $either;
+     my ( $either, %args ) = @_;
+     verify_args( \%register_PARAMS, %args ) or confess $@;
+     $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
 
     # Validate.
     confess("Missing required param 'class_name'")
-        unless $self->{class_name};
-    confess("$self->{class_name} already registered")
-        if exists $registry{ $self->{class_name} };
+        unless $args{class_name};
 
     # Retrieve Clownfish::CFC::Class client, if it will be needed.
-    if (   $self->{bind_methods}
-        || $self->{bind_constructors}
-        || $self->{make_pod} )
+    my $client;
+    if (   $args{bind_methods}
+        || $args{bind_constructors}
+        || $args{make_pod} )
     {
-        $self->{client} = Clownfish::CFC::Class->fetch_singleton(
-            parcel     => $self->{parcel},
-            class_name => $self->{class_name},
+        $args{client} = Clownfish::CFC::Class->fetch_singleton(
+            parcel     => $args{parcel},
+            class_name => $args{class_name},
         );
-        confess("Can't fetch singleton for $self->{class_name}")
-            unless $self->{client};
+        confess("Can't fetch singleton for $args{class_name}")
+            unless $args{client};
     }
 
+    # Create Pod spec if needed.
+    my $pod_spec;
+    if ( $args{make_pod} ) {
+        $pod_spec
+            = Clownfish::CFC::Binding::Perl::Pod->new( %{ $args{make_pod} } );
+    }
+
+    # Create object.
+    my $self = _new( @args{qw( parcel class_name client xs_code )}, $pod_spec );
+    $bind_methods{$$self}      = $args{bind_methods};
+    $bind_constructors{$$self} = $args{bind_constructors};
+
     # Add to registry.
-    $registry{ $self->{class_name} } = $self;
+    _add_to_registry($self);
 
     return $self;
 }
 
-sub registered { [ values %registry ] }
-sub singleton  { $registry{ $_[1] } }
+sub DESTROY {
+    return;    # Leak intentionally for now.
+    my $self = shift;
+    delete $bind_methods{$$self};
+    delete $bind_constructors{$$self};
+    _destroy($self);
+}
 
-sub get_class_name        { shift->{class_name} }
-sub get_bind_methods      { shift->{bind_methods} }
-sub get_bind_constructors { shift->{bind_constructors} }
-sub get_make_pod          { shift->{make_pod} }
-sub get_client            { shift->{client} }
-sub get_xs_code           { shift->{xs_code} }
+sub get_bind_methods      { $bind_methods{ ${ +shift } } }
+sub get_bind_constructors { $bind_constructors{ ${ +shift } } }
 
 sub constructor_bindings {
     my $self  = shift;
     my @bound = map {
         my $xsub = Clownfish::CFC::Binding::Perl::Constructor->new(
-            class => $self->{client},
+            class => $self->get_client,
             alias => $_,
         );
-    } @{ $self->{bind_constructors} };
+    } @{ $self->get_bind_constructors };
     return @bound;
 }
 
 sub method_bindings {
-    my $self      = shift;
-    my $client    = $self->{client};
-    my $meth_list = $self->{bind_methods};
+    my $self       = shift;
+    my $client     = $self->get_client;
+    my $meth_list  = $self->get_bind_methods;
+    my $class_name = $self->get_class_name;
     my @bound;
 
     # Assemble a list of methods to be bound for this class.
@@ -109,12 +125,12 @@ sub method_bindings {
         # Safety checks against excess binding code or private methods.
         if ( !$method->novel ) {
             confess(  "Binding spec'd for method '$meth_name' in class "
-                    . "$self->{class_name}, but it's overridden and "
+                    . "$class_name, but it's overridden and "
                     . "should be bound via the parent class" );
         }
         elsif ( $method->private ) {
             confess(  "Binding spec'd for method '$meth_name' in class "
-                    . "$self->{class_name}, but it's private" );
+                    . "$class_name, but it's private" );
         }
 
         # Create an XSub binding for each override.  Each of these directly
@@ -136,163 +152,34 @@ sub method_bindings {
 
     # Verify that we processed all methods.
     my @leftover_meths = keys %meth_to_bind;
-    confess("Leftover for $self->{class_name}: '@leftover_meths'")
+    confess("Leftover for $class_name: '@leftover_meths'")
         if @leftover_meths;
 
     return @bound;
 }
 
-sub _gen_subroutine_pod {
-    my ( $self, %args ) = @_;
-    my ( $func, $sub_name, $class, $code_sample, $class_name )
-        = @args{qw( func name class sample class_name )};
-    my $param_list = $func->get_param_list;
-    my $args       = "";
-    my $num_vars   = $param_list->num_vars;
-
-    # Only allow "public" subs to be exposed as part of the public API.
-    confess("$class_name->$sub_name is not public") unless $func->public;
-
-    # Get documentation, which may be inherited.
-    my $docucom = $func->get_docucomment;
-    if ( !$docucom ) {
-        my $micro_sym = $func->micro_sym;
-        my $parent    = $class;
-        while ( $parent = $parent->get_parent ) {
-            my $parent_func = $parent->method($micro_sym);
-            last unless $parent_func;
-            $docucom = $parent_func->get_docucomment;
-            last if $docucom;
-        }
-    }
-    confess("No DocuComment for '$sub_name' in '$class_name'")
-        unless $docucom;
-
-    # Build string summarizing arguments to use in header.
-    if ( $num_vars > 2 or ( $args{is_constructor} && $num_vars > 1 ) ) {
-        $args = " I<[labeled params]> ";
-    }
-    elsif ( $param_list->num_vars ) {
-        $args = $func->get_param_list->name_list;
-        $args =~ s/self.*?(?:,\s*|$)//;    # kill self param
-    }
-
-    # Add code sample.
-    my $pod = "=head2 $sub_name($args)\n\n";
-    if ( defined($code_sample) && length($code_sample) ) {
-        $pod .= "$code_sample\n";
-    }
-
-    # Incorporate "description" text from DocuComment.
-    if ( my $long_doc = $docucom->get_description ) {
-        $pod .= _perlify_doc_text($long_doc) . "\n\n";
-    }
-
-    # Add params in a list.
-    my $param_names = $docucom->get_param_names;
-    my $param_docs  = $docucom->get_param_docs;
-    if (@$param_names) {
-        $pod .= "=over\n\n";
-        for ( my $i = 0; $i <= $#$param_names; $i++ ) {
-            $pod .= "=item *\n\n";
-            $pod .= "B<$param_names->[$i]> - $param_docs->[$i]\n\n";
-        }
-        $pod .= "=back\n\n";
-    }
-
-    # Add return value description, if any.
-    if ( defined( my $retval = $docucom->get_retval ) ) {
-        $pod .= "Returns: $retval\n\n";
-    }
-
-    return $pod;
-}
-
 sub create_pod {
-    my $self     = shift;
-    my $pod_args = $self->{make_pod} or return;
-    my $class    = $self->{client} or die "No client for $self->{class_name}";
-    my $class_name = $class->get_class_name;
+    my $self       = shift;
+    my $pod_spec   = $self->get_pod_spec or return;
+    my $class_name = $self->get_class_name;
+    my $class      = $self->get_client or die "No client for $class_name";
     my $docucom    = $class->get_docucomment;
     confess("No DocuComment for '$class_name'") unless $docucom;
-    my $brief = $docucom->get_brief;
-    my $description
-        = _perlify_doc_text( $pod_args->{description} || $docucom->get_long );
+    my $brief       = $docucom->get_brief;
+    my $description = $pod_spec->_perlify_doc_text( $pod_spec->get_description
+            || $docucom->get_long );
 
     # Create SYNOPSIS.
-    my $synopsis_pod = '';
-    if ( defined $pod_args->{synopsis} ) {
-        $synopsis_pod = qq|=head1 SYNOPSIS\n\n$pod_args->{synopsis}\n|;
+    my $synopsis_pod = $pod_spec->get_synopsis;
+    if ($synopsis_pod) {
+        $synopsis_pod = qq|=head1 SYNOPSIS\n\n$synopsis_pod\n|;
     }
 
     # Create CONSTRUCTORS.
-    my $constructor_pod = "";
-    my $constructors = $pod_args->{constructors} || [];
-    if ( defined $pod_args->{constructor} ) {
-        push @$constructors, $pod_args->{constructor};
-    }
-    if (@$constructors) {
-        $constructor_pod = "=head1 CONSTRUCTORS\n\n";
-        for my $spec (@$constructors) {
-            if ( !ref $spec ) {
-                $constructor_pod .= _perlify_doc_text($spec);
-            }
-            else {
-                my $func_name   = $spec->{func} || 'init';
-                my $init_func   = $class->function($func_name);
-                my $ctor_name   = $spec->{name} || 'new';
-                my $code_sample = $spec->{sample};
-                $constructor_pod .= _perlify_doc_text(
-                    $self->_gen_subroutine_pod(
-                        func           => $init_func,
-                        name           => $ctor_name,
-                        sample         => $code_sample,
-                        class          => $class,
-                        class_name     => $class_name,
-                        is_constructor => 1,
-                    )
-                );
-            }
-        }
-    }
+    my $constructor_pod = $pod_spec->constructors_pod($class);
 
     # Create METHODS, possibly including an ABSTRACT METHODS section.
-    my @method_docs;
-    my $methods_pod = "";
-    my @abstract_method_docs;
-    my $abstract_methods_pod = "";
-    for my $spec ( @{ $pod_args->{methods} } ) {
-        my $meth_name = ref($spec) ? $spec->{name} : $spec;
-        my $method = $class->method($meth_name);
-        confess("Can't find method '$meth_name' in class '$class_name'")
-            unless $method;
-        my $method_pod;
-        if ( ref($spec) ) {
-            $method_pod = $spec->{pod};
-        }
-        else {
-            $method_pod = $self->_gen_subroutine_pod(
-                func       => $method,
-                name       => $meth_name,
-                sample     => '',
-                class      => $class,
-                class_name => $class_name
-            );
-        }
-        if ( $method->abstract ) {
-            push @abstract_method_docs, _perlify_doc_text($method_pod);
-        }
-        else {
-            push @method_docs, _perlify_doc_text($method_pod);
-        }
-    }
-    if (@method_docs) {
-        $methods_pod = join( "", "=head1 METHODS\n\n", @method_docs );
-    }
-    if (@abstract_method_docs) {
-        $abstract_methods_pod = join( "", "=head1 ABSTRACT METHODS\n\n",
-            @abstract_method_docs );
-    }
+    my $methods_pod = $pod_spec->methods_pod($class);
 
     # Build an INHERITANCE section describing class ancestry.
     my $child = $class;
@@ -307,7 +194,7 @@ sub create_pod {
         $inheritance_pod .= $class->get_class_name;
         for my $ancestor (@ancestors) {
             my $class_name = $ancestor->get_class_name;
-            if ( $registry{$class_name} ) {
+            if ( __PACKAGE__->singleton($class_name) ) {
                 $inheritance_pod .= " isa L<$class_name>";
             }
             else {
@@ -348,8 +235,6 @@ $description
 
 $constructor_pod
 
-$abstract_methods_pod
-
 $methods_pod
 
 $inheritance_pod
@@ -363,28 +248,6 @@ END_POD
     $pod =~ s/^==/=/gm;
 
     return $pod;
-}
-
-sub _perlify_doc_text {
-    my $documentation = shift;
-
-    # Remove double-equals hack needed to fool perldoc, PAUSE, etc. :P
-    $documentation =~ s/^==/=/mg;
-
-    # Change <code>foo</code> to C<< foo >>.
-    $documentation =~ s#<code>(.*?)</code>#C<< $1 >>#gsm;
-
-    # Lowercase all method names: Open_In() => open_in()
-    $documentation
-        =~ s/([A-Z][A-Za-z0-9]*(?:_[A-Z][A-Za-z0-9]*)*\(\))/\L$1\E/gsm;
-
-    # Change all instances of NULL to 'undef'
-    $documentation =~ s/NULL/undef/g;
-
-    # Change "Err_error" to "Lucy->error".
-    $documentation =~ s/Err_error/Lucy->error/g;
-
-    return $documentation;
 }
 
 1;
@@ -456,7 +319,7 @@ All registered bindings.
 
 =head1 OBJECT METHODS
 
-=head2 get_class_name get_bind_methods get_bind_methods get_make_pod
+=head2 get_class_name get_bind_methods get_bind_methods get_pod_spec
 get_xs_code get_client
 
 Accessors.  C<get_client> retrieves the Clownfish::CFC::Class module to be
@@ -483,4 +346,3 @@ the C<bind_methods> spec.
 Auto-generate POD according to the make_pod spec, if such a spec was supplied.
 
 =cut
-

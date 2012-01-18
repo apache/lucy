@@ -43,7 +43,7 @@ static size_t registry_size = 0;
 static size_t registry_cap  = 0;
 
 const static CFCMeta CFCPERLCLASS_META = {
-    "Clownfish::Binding::Perl::Class",
+    "Clownfish::CFC::Binding::Perl::Class",
     sizeof(CFCPerlClass),
     (CFCBase_destroy_t)CFCPerlClass_destroy
 };
