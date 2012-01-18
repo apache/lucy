@@ -223,13 +223,13 @@ sub create_pod {
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-==head1 NAME
+=head1 NAME
 
 $class_name - $brief
 
 $synopsis_pod
 
-==head1 DESCRIPTION
+=head1 DESCRIPTION
 
 $description
 
@@ -239,13 +239,9 @@ $methods_pod
 
 $inheritance_pod
 
-==cut
+=cut
 
 END_POD
-
-    # Kill off stupid hack which allows us to embed pod in this file without
-    # messing up what you see when you perldoc it.
-    $pod =~ s/^==/=/gm;
 
     return $pod;
 }

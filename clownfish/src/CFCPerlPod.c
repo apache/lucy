@@ -327,11 +327,8 @@ char*
 CFCPerlPod_perlify_doc_text(CFCPerlPod *self, const char *source) {
     (void)self; // unused
 
-    // Remove double-equals hack needed to fool perldoc, PAUSE, etc. :P
-    // char *copy = S_global_replace(source, "==", "=");
-    char *copy = CFCUtil_strdup(source);
-
     // Change <code>foo</code> to C<< foo >>.
+    char *copy = CFCUtil_strdup(source);
     char *orig = copy;
     copy = S_global_replace(orig, "<code>", "C<< ");
     FREEMEM(orig);

@@ -648,7 +648,7 @@ All objects in the Lucy:: hierarchy descend from
 Lucy::Object::Obj.  All classes are implemented as blessed scalar
 references, with the scalar storing a pointer to a C struct.
 
-==head2 Subclassing
+=head2 Subclassing
 
 The recommended way to subclass Lucy::Object::Obj and its descendants is
 to use the inside-out design pattern.  (See L<Class::InsideOut> for an
@@ -666,25 +666,25 @@ C<$$self> can be used as an inside-out ID.
 
 Caveats:
 
-==over
+=over
 
-==item *
+=item *
 
 Inside-out aficionados will have noted that the "cached scalar id" stratagem
 recommended above isn't compatible with ithreads -- but Lucy doesn't
 support ithreads anyway, so it doesn't matter.
 
-==item *
+=item *
 
 Overridden methods must not return undef unless the API specifies that
 returning undef is permissible.  (Failure to adhere to this rule currently
 results in a segfault rather than an exception.)
 
-==back
+=back
 
-==head1 CONSTRUCTOR
+=head1 CONSTRUCTOR
 
-==head2 new()
+=head2 new()
 
 Abstract constructor -- must be invoked via a subclass.  Attempting to
 instantiate objects of class "Lucy::Object::Obj" directly causes an
@@ -692,9 +692,9 @@ error.
 
 Takes no arguments; if any are supplied, an error will be reported.
 
-==head1 DESTRUCTOR
+=head1 DESTRUCTOR
 
-==head2 DESTROY
+=head2 DESTROY
 
 All Lucy classes implement a DESTROY method; if you override it in a
 subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.

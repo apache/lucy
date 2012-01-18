@@ -587,7 +587,7 @@ END_XS_CODE
 END_SYNOPSIS
 
     my $constructor = <<'END_NEW';
-==head2 new( I<[labeled params]> )
+=head2 new( I<[labeled params]> )
 
     my $indexer = Lucy::Index::Indexer->new(
         schema   => $schema,             # required at index creation
@@ -597,39 +597,39 @@ END_SYNOPSIS
         manager  => $manager             # default: created internally
     );
 
-==over
+=over
 
-==item *
+=item *
 
 B<schema> - A Schema.  Required when index is being created; if not supplied,
 will be extracted from the index folder.
 
-==item *
+=item *
 
 B<index> - Either a filepath to an index or a Folder.
 
-==item *
+=item *
 
 B<create> - If true and the index directory does not exist, attempt to create
 it.
 
-==item *
+=item *
 
 B<truncate> - If true, proceed with the intention of discarding all previous
 indexing data.  The old data will remain intact and visible until commit()
 succeeds.
 
-==item *
+=item *
 
 B<manager> - An IndexManager.
 
-==back
+=back
 END_NEW
 
     # Override is necessary because there's no standard way to explain
     # hash/hashref across multiple host languages.
     my $add_doc_pod = <<'END_ADD_DOC_POD';
-==head2 add_doc(...)
+=head2 add_doc(...)
 
     $indexer->add_doc($doc);
     $indexer->add_doc( { field_name => $field_value } );
@@ -641,18 +641,18 @@ END_NEW
 Add a document to the index.  Accepts either a single argument or labeled
 params.
 
-==over
+=over
 
-==item *
+=item *
 
 B<doc> - Either a Lucy::Document::Doc object, or a hashref (which will
 be attached to a Lucy::Document::Doc object internally).
 
-==item *
+=item *
 
 B<boost> - A floating point weight which affects how this document scores.
 
-==back
+=back
 
 END_ADD_DOC_POD
 
