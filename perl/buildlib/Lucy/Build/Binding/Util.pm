@@ -14,20 +14,19 @@
 # limitations under the License.
 package Lucy::Build::Binding::Util;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_debug;
-     $class->bind_indexfilenames;
-     $class->bind_memorypool;
-     $class->bind_priorityqueue;
-     $class->bind_sortexternal;
-     $class->bind_stepper;
-     $class->bind_stringhelper;
+    my $class = shift;
+    $class->bind_debug;
+    $class->bind_indexfilenames;
+    $class->bind_memorypool;
+    $class->bind_priorityqueue;
+    $class->bind_sortexternal;
+    $class->bind_stepper;
+    $class->bind_stringhelper;
 }
 
 sub bind_debug {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Util::Debug
 
 #include "Lucy/Util/Debug.h"
@@ -97,16 +96,16 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy::Util::Debug",
-    xs_code    => $xs_code,
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::Debug",
+        xs_code    => $xs_code,
+    );
 
 }
 
 sub bind_indexfilenames {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Util::IndexFileNames
 
 uint64_t
@@ -128,44 +127,44 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy::Util::IndexFileNames",
-    xs_code    => $xs_code,
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::IndexFileNames",
+        xs_code    => $xs_code,
+    );
 
 }
 
 sub bind_memorypool {
-     Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Util::MemoryPool",
-    bind_constructors => ["new"],
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Util::MemoryPool",
+        bind_constructors => ["new"],
+    );
 
 }
 
 sub bind_priorityqueue {
-     Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Util::PriorityQueue",
-    bind_methods => [
-        qw(
-            Less_Than
-            Insert
-            Pop
-            Pop_All
-            Peek
-            Get_Size
-            )
-    ],
-    bind_constructors => ["new"],
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Util::PriorityQueue",
+        bind_methods => [
+            qw(
+                Less_Than
+                Insert
+                Pop
+                Pop_All
+                Peek
+                Get_Size
+                )
+        ],
+        bind_constructors => ["new"],
+    );
 
 }
 
 sub bind_sortexternal {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Util::SortExternal
 
 IV
@@ -175,37 +174,37 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Util::SortExternal",
-    xs_code      => $xs_code,
-    bind_methods => [
-        qw(
-            Flush
-            Flip
-            Add_Run
-            Refill
-            Sort_Cache
-            Cache_Count
-            Clear_Cache
-            Set_Mem_Thresh
-            )
-    ],
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Util::SortExternal",
+        xs_code      => $xs_code,
+        bind_methods => [
+            qw(
+                Flush
+                Flip
+                Add_Run
+                Refill
+                Sort_Cache
+                Cache_Count
+                Clear_Cache
+                Set_Mem_Thresh
+                )
+        ],
+    );
 
 }
 
 sub bind_stepper {
-     Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Util::Stepper",
-    bind_methods => [qw( Read_Record )],
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Util::Stepper",
+        bind_methods => [qw( Read_Record )],
+    );
 
 }
 
 sub bind_stringhelper {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Util::StringHelper
 
 =for comment 
@@ -296,11 +295,11 @@ PPCODE:
 }
 END_XS_CODE
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy::Util::StringHelper",
-    xs_code    => $xs_code,
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::StringHelper",
+        xs_code    => $xs_code,
+    );
 
 }
 

@@ -14,43 +14,42 @@
 # limitations under the License.
 package Lucy::Build::Binding::Highlight;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_heatmap;
-     $class->bind_highlighter;
+    my $class = shift;
+    $class->bind_heatmap;
+    $class->bind_highlighter;
 }
 
 sub bind_heatmap {
-     my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $heat_map = Lucy::Highlight::HeatMap->new(
         spans  => \@highlight_spans,
         window => 100,
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Highlight::HeatMap",
-    bind_methods => [
-        qw(
-            Calc_Proximity_Boost
-            Generate_Proximity_Boosts
-            Flatten_Spans
-            Get_Spans
-            )
-    ],
-    bind_constructors => ["new"],
-    #make_pod          => {
-    #    synopsis    => "    # TODO.\n",
-    #    constructor => { sample => $constructor },
-    #},
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Highlight::HeatMap",
+        bind_methods => [
+            qw(
+                Calc_Proximity_Boost
+                Generate_Proximity_Boosts
+                Flatten_Spans
+                Get_Spans
+                )
+        ],
+        bind_constructors => ["new"],
+        #make_pod          => {
+        #    synopsis    => "    # TODO.\n",
+        #    constructor => { sample => $constructor },
+        #},
+    );
 
 }
 
 sub bind_highlighter {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $highlighter = Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
         query    => $query,
@@ -63,7 +62,7 @@ sub bind_highlighter {
     }
 END_SYNOPSIS
 
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $highlighter = Lucy::Highlight::Highlighter->new(
         searcher       => $searcher,    # required
         query          => $query,       # required
@@ -72,51 +71,51 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Highlight::Highlighter",
-    bind_methods => [
-        qw(
-            Highlight
-            Encode
-            Create_Excerpt
-            _find_best_fragment|Find_Best_Fragment
-            _raw_excerpt|Raw_Excerpt
-            _highlight_excerpt|Highlight_Excerpt
-            Find_Sentences
-            Set_Pre_Tag
-            Get_Pre_Tag
-            Set_Post_Tag
-            Get_Post_Tag
-            Get_Searcher
-            Get_Query
-            Get_Compiler
-            Get_Excerpt_Length
-            Get_Field
-            )
-    ],
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-        methods     => [
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Highlight::Highlighter",
+        bind_methods => [
             qw(
-                create_excerpt
-                highlight
-                encode
-                set_pre_tag
-                get_pre_tag
-                set_post_tag
-                get_post_tag
-                get_searcher
-                get_query
-                get_compiler
-                get_excerpt_length
-                get_field
+                Highlight
+                Encode
+                Create_Excerpt
+                _find_best_fragment|Find_Best_Fragment
+                _raw_excerpt|Raw_Excerpt
+                _highlight_excerpt|Highlight_Excerpt
+                Find_Sentences
+                Set_Pre_Tag
+                Get_Pre_Tag
+                Set_Post_Tag
+                Get_Post_Tag
+                Get_Searcher
+                Get_Query
+                Get_Compiler
+                Get_Excerpt_Length
+                Get_Field
                 )
-        ]
-    },
-);
+        ],
+        bind_constructors => ["new"],
+        make_pod          => {
+            synopsis    => $synopsis,
+            constructor => { sample => $constructor },
+            methods     => [
+                qw(
+                    create_excerpt
+                    highlight
+                    encode
+                    set_pre_tag
+                    get_pre_tag
+                    set_post_tag
+                    get_post_tag
+                    get_searcher
+                    get_query
+                    get_compiler
+                    get_excerpt_length
+                    get_field
+                    )
+            ]
+        },
+    );
 
 }
 

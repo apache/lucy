@@ -14,24 +14,23 @@
 # limitations under the License.
 package Lucy::Build::Binding::Docs;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_devguide;
-     $class->bind_filelocking;
+    my $class = shift;
+    $class->bind_devguide;
+    $class->bind_filelocking;
 }
 
 sub bind_devguide {
-     Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy::Docs::DevGuide",
-    make_pod   => {},
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel     => "Lucy",
+        class_name => "Lucy::Docs::DevGuide",
+        make_pod   => {},
+    );
 
 }
 
 sub bind_filelocking {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
     my $hostname = hostname() or die "Can't get unique hostname";
     my $manager = Lucy::Index::IndexManager->new( host => $hostname );
@@ -50,11 +49,11 @@ sub bind_filelocking {
     my $searcher = Lucy::Search::IndexSearcher->new( index => $reader );
 END_SYNOPSIS
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy::Docs::FileLocking",
-    make_pod   => { synopsis => $synopsis, },
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel     => "Lucy",
+        class_name => "Lucy::Docs::FileLocking",
+        make_pod   => { synopsis => $synopsis, },
+    );
 
 }
 

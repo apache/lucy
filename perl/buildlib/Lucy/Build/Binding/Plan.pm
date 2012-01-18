@@ -14,23 +14,22 @@
 # limitations under the License.
 package Lucy::Build::Binding::Plan;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_architecture;
-     $class->bind_blobtype;
-     $class->bind_fieldtype;
-     $class->bind_float32type;
-     $class->bind_float64type;
-     $class->bind_fulltexttype;
-     $class->bind_int32type;
-     $class->bind_int64type;
-     $class->bind_schema;
-     $class->bind_stringtype;
+    my $class = shift;
+    $class->bind_architecture;
+    $class->bind_blobtype;
+    $class->bind_fieldtype;
+    $class->bind_float32type;
+    $class->bind_float64type;
+    $class->bind_fulltexttype;
+    $class->bind_int32type;
+    $class->bind_int64type;
+    $class->bind_schema;
+    $class->bind_stringtype;
 }
 
 sub bind_architecture {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     package MyArchitecture;
     use base qw( Lucy::Plan::Architecture );
 
@@ -75,75 +74,75 @@ sub bind_architecture {
     }
 END_SYNOPSIS
 
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $arch = Lucy::Plan::Architecture->new;
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Plan::Architecture",
-    bind_methods => [
-        qw(
-            Index_Interval
-            Skip_Interval
-            Init_Seg_Reader
-            Register_Doc_Writer
-            Register_Doc_Reader
-            Register_Deletions_Writer
-            Register_Deletions_Reader
-            Register_Lexicon_Reader
-            Register_Posting_List_Writer
-            Register_Posting_List_Reader
-            Register_Sort_Writer
-            Register_Sort_Reader
-            Register_Highlight_Writer
-            Register_Highlight_Reader
-            Make_Similarity
-            )
-    ],
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis => $synopsis,
-        methods  => [
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Plan::Architecture",
+        bind_methods => [
             qw(
-                register_doc_writer
-                register_doc_reader
+                Index_Interval
+                Skip_Interval
+                Init_Seg_Reader
+                Register_Doc_Writer
+                Register_Doc_Reader
+                Register_Deletions_Writer
+                Register_Deletions_Reader
+                Register_Lexicon_Reader
+                Register_Posting_List_Writer
+                Register_Posting_List_Reader
+                Register_Sort_Writer
+                Register_Sort_Reader
+                Register_Highlight_Writer
+                Register_Highlight_Reader
+                Make_Similarity
                 )
         ],
-        constructors => [ { sample => $constructor } ],
-    }
-);
+        bind_constructors => ["new"],
+        make_pod          => {
+            synopsis => $synopsis,
+            methods  => [
+                qw(
+                    register_doc_writer
+                    register_doc_reader
+                    )
+            ],
+            constructors => [ { sample => $constructor } ],
+        }
+    );
 
 }
 
 sub bind_blobtype {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $string_type = Lucy::Plan::StringType->new;
     my $blob_type   = Lucy::Plan::BlobType->new( stored => 1 );
     my $schema      = Lucy::Plan::Schema->new;
     $schema->spec_field( name => 'id',   type => $string_type );
     $schema->spec_field( name => 'jpeg', type => $blob_type );
 END_SYNOPSIS
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $blob_type = Lucy::Plan::BlobType->new(
         stored => 1,  # default: false
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::BlobType",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    },
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Plan::BlobType",
+        bind_constructors => ["new"],
+        make_pod          => {
+            synopsis    => $synopsis,
+            constructor => { sample => $constructor },
+        },
+    );
 
 }
 
 sub bind_fieldtype {
-     my $synopis = <<'END_SYNOPSIS';
+    my $synopis = <<'END_SYNOPSIS';
 
     my @sortable;
     for my $field ( @{ $schema->all_fields } ) {
@@ -154,43 +153,43 @@ sub bind_fieldtype {
 
 END_SYNOPSIS
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Plan::FieldType",
-    bind_methods => [
-        qw(
-            Get_Boost
-            Indexed
-            Stored
-            Sortable
-            Binary
-            Compare_Values
-            )
-    ],
-    bind_constructors => ["new|init2"],
-    make_pod          => {
-        synopsis => $synopis,
-        methods  => [
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Plan::FieldType",
+        bind_methods => [
             qw(
-                get_boost
-                indexed
-                stored
-                sortable
-                binary
+                Get_Boost
+                Indexed
+                Stored
+                Sortable
+                Binary
+                Compare_Values
                 )
         ],
-    }
-);
+        bind_constructors => ["new|init2"],
+        make_pod          => {
+            synopsis => $synopis,
+            methods  => [
+                qw(
+                    get_boost
+                    indexed
+                    stored
+                    sortable
+                    binary
+                    )
+            ],
+        }
+    );
 
 }
 
 sub bind_float32type {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $schema       = Lucy::Plan::Schema->new;
     my $float32_type = Lucy::Plan::FloatType->new;
     $schema->spec_field( name => 'intensity', type => $float32_type );
 END_SYNOPSIS
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $float32_type = Lucy::Plan::Float32Type->new(
         indexed  => 0,    # default true
         stored   => 0,    # default true
@@ -198,25 +197,25 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::Float32Type",
-    bind_constructors => ["new|init2"],
-    #make_pod          => {
-    #    synopsis    => $synopsis,
-    #    constructor => { sample => $constructor },
-    #},
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Plan::Float32Type",
+        bind_constructors => ["new|init2"],
+        #make_pod          => {
+        #    synopsis    => $synopsis,
+        #    constructor => { sample => $constructor },
+        #},
+    );
 
 }
 
 sub bind_float64type {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $schema       = Lucy::Plan::Schema->new;
     my $float64_type = Lucy::Plan::FloatType->new;
     $schema->spec_field( name => 'intensity', type => $float64_type );
 END_SYNOPSIS
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $float64_type = Lucy::Plan::Float64Type->new(
         indexed  => 0     # default true
         stored   => 0,    # default true
@@ -224,20 +223,20 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::Float64Type",
-    bind_constructors => ["new|init2"],
-    #make_pod          => {
-    #    synopsis    => $synopsis,
-    #    constructor => { sample => $constructor },
-    #},
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Plan::Float64Type",
+        bind_constructors => ["new|init2"],
+        #make_pod          => {
+        #    synopsis    => $synopsis,
+        #    constructor => { sample => $constructor },
+        #},
+    );
 
 }
 
 sub bind_fulltexttype {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         language => 'en',
     );
@@ -249,7 +248,7 @@ sub bind_fulltexttype {
     $schema->spec_field( name => 'content', type => $type );
 END_SYNOPSIS
 
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $type = Lucy::Plan::FullTextType->new(
         analyzer      => $analyzer,    # required
         boost         => 2.0,          # default: 1.0
@@ -260,37 +259,37 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::FullTextType",
-    bind_constructors => ["new|init2"],
-    bind_methods      => [
-        qw(
-            Set_Highlightable
-            Highlightable
-            )
-    ],
-    make_pod => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-        methods     => [
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Plan::FullTextType",
+        bind_constructors => ["new|init2"],
+        bind_methods      => [
             qw(
-                set_highlightable
-                highlightable
+                Set_Highlightable
+                Highlightable
                 )
         ],
-    },
-);
+        make_pod => {
+            synopsis    => $synopsis,
+            constructor => { sample => $constructor },
+            methods     => [
+                qw(
+                    set_highlightable
+                    highlightable
+                    )
+            ],
+        },
+    );
 
 }
 
 sub bind_int32type {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $schema     = Lucy::Plan::Schema->new;
     my $int32_type = Lucy::Plan::Int32Type->new;
     $schema->spec_field( name => 'count', type => $int32_type );
 END_SYNOPSIS
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $int32_type = Lucy::Plan::Int32Type->new(
         indexed  => 0,    # default true
         stored   => 0,    # default true
@@ -298,25 +297,25 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::Int32Type",
-    bind_constructors => ["new|init2"],
-    #make_pod          => {
-    #    synopsis    => $synopsis,
-    #    constructor => { sample => $constructor },
-    #},
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Plan::Int32Type",
+        bind_constructors => ["new|init2"],
+        #make_pod          => {
+        #    synopsis    => $synopsis,
+        #    constructor => { sample => $constructor },
+        #},
+    );
 
 }
 
 sub bind_int64type {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $schema     = Lucy::Plan::Schema->new;
     my $int64_type = Lucy::Plan::Int64Type->new;
     $schema->spec_field( name => 'count', type => $int64_type );
 END_SYNOPSIS
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $int64_type = Lucy::Plan::Int64Type->new(
         indexed  => 0,    # default true
         stored   => 0,    # default true
@@ -324,20 +323,20 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::Int64Type",
-    bind_constructors => ["new|init2"],
-    #make_pod          => {
-    #    synopsis    => $synopsis,
-    #    constructor => { sample => $constructor },
-    #},
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Plan::Int64Type",
+        bind_constructors => ["new|init2"],
+        #make_pod          => {
+        #    synopsis    => $synopsis,
+        #    constructor => { sample => $constructor },
+        #},
+    );
 
 }
 
 sub bind_schema {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     use Lucy::Plan::Schema;
     use Lucy::Plan::FullTextType;
     use Lucy::Analysis::PolyAnalyzer;
@@ -353,57 +352,57 @@ sub bind_schema {
     $schema->spec_field( name => 'content', type => $type );
 END_SYNOPSIS
 
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $schema = Lucy::Plan::Schema->new;
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "Lucy::Plan::Schema",
-    bind_methods => [
-        qw(
-            Architecture
-            Get_Architecture
-            Get_Similarity
-            Fetch_Type
-            Fetch_Analyzer
-            Fetch_Sim
-            Num_Fields
-            All_Fields
-            Spec_Field
-            Write
-            Eat
-            )
-    ],
-    bind_constructors => [qw( new )],
-    make_pod          => {
-        methods => [
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Plan::Schema",
+        bind_methods => [
             qw(
-                spec_field
-                num_fields
-                all_fields
-                fetch_type
-                fetch_sim
-                architecture
-                get_architecture
-                get_similarity
+                Architecture
+                Get_Architecture
+                Get_Similarity
+                Fetch_Type
+                Fetch_Analyzer
+                Fetch_Sim
+                Num_Fields
+                All_Fields
+                Spec_Field
+                Write
+                Eat
                 )
         ],
-        synopsis     => $synopsis,
-        constructors => [ { sample => $constructor } ],
-    },
-);
+        bind_constructors => [qw( new )],
+        make_pod          => {
+            methods => [
+                qw(
+                    spec_field
+                    num_fields
+                    all_fields
+                    fetch_type
+                    fetch_sim
+                    architecture
+                    get_architecture
+                    get_similarity
+                    )
+            ],
+            synopsis     => $synopsis,
+            constructors => [ { sample => $constructor } ],
+        },
+    );
 
 }
 
 sub bind_stringtype {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $type   = Lucy::Plan::StringType->new;
     my $schema = Lucy::Plan::Schema->new;
     $schema->spec_field( name => 'category', type => $type );
 END_SYNOPSIS
 
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $type = Lucy::Plan::StringType->new(
         boost    => 0.1,    # default: 1.0
         indexed  => 1,      # default: true
@@ -412,15 +411,15 @@ my $constructor = <<'END_CONSTRUCTOR';
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Plan::StringType",
-    bind_constructors => ["new|init2"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    },
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Plan::StringType",
+        bind_constructors => ["new|init2"],
+        make_pod          => {
+            synopsis    => $synopsis,
+            constructor => { sample => $constructor },
+        },
+    );
 
 }
 

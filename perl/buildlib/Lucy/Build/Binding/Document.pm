@@ -14,15 +14,14 @@
 # limitations under the License.
 package Lucy::Build::Binding::Document;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_doc;
-     $class->bind_hitdoc;
+    my $class = shift;
+    $class->bind_doc;
+    $class->bind_hitdoc;
 }
 
 sub bind_doc {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Document::Doc
 
 SV*
@@ -74,7 +73,7 @@ PPCODE:
     lucy_Doc_set_fields(self, fields);
 END_XS_CODE
 
-my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $doc = Lucy::Document::Doc->new(
         fields => { foo => 'foo foo', bar => 'bar bar' },
     );
@@ -86,28 +85,28 @@ Doc objects allow access to field values via hashref overloading:
     print "foo: $doc->{foo}\n";
 END_SYNOPSIS
 
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $doc = Lucy::Document::Doc->new(
         fields => { foo => 'foo foo', bar => 'bar bar' },
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Document::Doc",
-    xs_code           => $xs_code,
-    bind_methods      => [qw( Set_Doc_ID Get_Doc_ID )],
-    make_pod          => {
-        methods     => [qw( set_doc_id get_doc_id get_fields )],
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-    }
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Document::Doc",
+        xs_code      => $xs_code,
+        bind_methods => [qw( Set_Doc_ID Get_Doc_ID )],
+        make_pod     => {
+            methods     => [qw( set_doc_id get_doc_id get_fields )],
+            synopsis    => $synopsis,
+            constructor => { sample => $constructor },
+        }
+    );
 
 }
 
 sub bind_hitdoc {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Document::HitDoc
 
 SV*
@@ -146,7 +145,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     while ( my $hit_doc = $hits->next ) {
         print "$hit_doc->{title}\n";
         print $hit_doc->get_score . "\n";
@@ -154,16 +153,16 @@ my $synopsis = <<'END_SYNOPSIS';
     }
 END_SYNOPSIS
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Document::HitDoc",
-    bind_methods      => [qw( Set_Score Get_Score )],
-    xs_code           => $xs_code,
-    make_pod          => {
-        methods  => [qw( set_score get_score )],
-        synopsis => $synopsis,
-    },
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Document::HitDoc",
+        bind_methods => [qw( Set_Score Get_Score )],
+        xs_code      => $xs_code,
+        make_pod     => {
+            methods  => [qw( set_score get_score )],
+            synopsis => $synopsis,
+        },
+    );
 
 }
 

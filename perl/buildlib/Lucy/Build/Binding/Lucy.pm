@@ -14,15 +14,14 @@
 # limitations under the License.
 package Lucy::Build::Binding::Lucy;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_lucy;
-     $class->bind_test;
+    my $class = shift;
+    $class->bind_lucy;
+    $class->bind_test;
 }
 
 sub bind_lucy {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy
 
 BOOT:
@@ -62,16 +61,16 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel     => "Lucy",
-    class_name => "Lucy",
-    xs_code    => $xs_code,
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel     => "Lucy",
+        class_name => "Lucy",
+        xs_code    => $xs_code,
+    );
 
 }
 
 sub bind_test {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Test::TestUtils
 
 SV*
@@ -301,17 +300,17 @@ PPCODE:
     lucy_TestQPSyntax_run_tests(index);
 END_XS_CODE
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Test::TestSchema",
-    bind_constructors => ["new"],
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Test::TestSchema",
+        bind_constructors => ["new"],
+    );
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Test",
-    xs_code           => $xs_code,
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel     => "Lucy",
+        class_name => "Lucy::Test",
+        xs_code    => $xs_code,
+    );
 }
 
 1;

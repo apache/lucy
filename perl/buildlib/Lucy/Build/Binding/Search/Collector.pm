@@ -14,15 +14,14 @@
 # limitations under the License.
 package Lucy::Build::Binding::Search::Collector;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_bitcollector;
-     $class->bind_sortcollector;
+    my $class = shift;
+    $class->bind_bitcollector;
+    $class->bind_sortcollector;
 }
 
 sub bind_bitcollector {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $bit_vec = Lucy::Object::BitVector->new(
         capacity => $searcher->doc_max + 1,
     );
@@ -35,32 +34,32 @@ sub bind_bitcollector {
     );
 END_SYNOPSIS
 
-my $constructor = <<'END_CONSTRUCTOR';
+    my $constructor = <<'END_CONSTRUCTOR';
     my $bit_collector = Lucy::Search::Collector::BitCollector->new(
         bit_vector => $bit_vec,    # required
     );
 END_CONSTRUCTOR
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::Collector::BitCollector",
-    bind_constructors => ["new"],
-    make_pod          => {
-        synopsis    => $synopsis,
-        constructor => { sample => $constructor },
-        methods     => [qw( collect )],
-    },
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Search::Collector::BitCollector",
+        bind_constructors => ["new"],
+        make_pod          => {
+            synopsis    => $synopsis,
+            constructor => { sample => $constructor },
+            methods     => [qw( collect )],
+        },
+    );
 
 }
 
 sub bind_sortcollector {
-     Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Search::Collector::SortCollector",
-    bind_methods      => [qw( Pop_Match_Docs Get_Total_Hits )],
-    bind_constructors => ["new"],
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Search::Collector::SortCollector",
+        bind_methods      => [qw( Pop_Match_Docs Get_Total_Hits )],
+        bind_constructors => ["new"],
+    );
 
 }
 

@@ -14,16 +14,15 @@
 # limitations under the License.
 package Lucy::Build::Binding::Index::Posting;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_matchposting;
-     $class->bind_richposting;
-     $class->bind_scoreposting;
+    my $class = shift;
+    $class->bind_matchposting;
+    $class->bind_richposting;
+    $class->bind_scoreposting;
 }
 
 sub bind_matchposting {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     # MatchPosting is used indirectly, by specifying in FieldType subclass.
     package MySchema::Category;
     use base qw( Lucy::Plan::FullTextType );
@@ -33,20 +32,20 @@ sub bind_matchposting {
     }
 END_SYNOPSIS
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::Posting::MatchPosting",
-    bind_constructors => ["new"],
-    bind_methods      => [qw( Get_Freq )],
-#    make_pod => {
-#        synopsis => $synopsis,
-#    }
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Index::Posting::MatchPosting",
+        bind_constructors => ["new"],
+        bind_methods      => [qw( Get_Freq )],
+        #    make_pod => {
+        #        synopsis => $synopsis,
+        #    }
+    );
 
 }
 
 sub bind_richposting {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     # RichPosting is used indirectly, by specifying in FieldType subclass.
     package MySchema::Category;
     use base qw( Lucy::Plan::FullTextType );
@@ -56,19 +55,19 @@ sub bind_richposting {
     }
 END_SYNOPSIS
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::Posting::RichPosting",
-    bind_constructors => ["new"],
-#    make_pod => {
-#        synopsis => $synopsis,
-#    }
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Index::Posting::RichPosting",
+        bind_constructors => ["new"],
+        #    make_pod => {
+        #        synopsis => $synopsis,
+        #    }
+    );
 
 }
 
 sub bind_scoreposting {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Index::Posting::ScorePosting
 
 SV*
@@ -90,7 +89,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     # ScorePosting is used indirectly, by specifying in FieldType subclass.
     package MySchema::Category;
     use base qw( Lucy::Plan::FullTextType );
@@ -101,15 +100,15 @@ my $synopsis = <<'END_SYNOPSIS';
     # }
 END_SYNOPSIS
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Index::Posting::ScorePosting",
-    xs_code           => $xs_code,
-    bind_constructors => ["new"],
-#    make_pod => {
-#        synopsis => $synopsis,
-#    }
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Index::Posting::ScorePosting",
+        xs_code           => $xs_code,
+        bind_constructors => ["new"],
+        #    make_pod => {
+        #        synopsis => $synopsis,
+        #    }
+    );
 
 }
 

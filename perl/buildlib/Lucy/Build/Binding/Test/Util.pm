@@ -14,14 +14,13 @@
 # limitations under the License.
 package Lucy::Build::Binding::Test::Util;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_bbsortex;
+    my $class = shift;
+    $class->bind_bbsortex;
 }
 
 sub bind_bbsortex {
-     my $xs_code = <<'END_XS_CODE';
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Test::Util::BBSortEx
 
 SV*
@@ -65,12 +64,12 @@ CODE:
 
 END_XS_CODE
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "Lucy::Test::Util::BBSortEx",
-    bind_constructors => ["new"],
-    xs_code           => $xs_code,
-);
+    Clownfish::CFC::Binding::Perl::Class->register(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Test::Util::BBSortEx",
+        bind_constructors => ["new"],
+        xs_code           => $xs_code,
+    );
 
 }
 
