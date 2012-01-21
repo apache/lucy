@@ -22,7 +22,7 @@ use Clownfish::CFC::Util qw( verify_args );
 use Clownfish::CFC::Binding::Perl::Pod;
 use Carp;
 
-our %register_PARAMS = (
+our %new_PARAMS = (
     parcel            => undef,
     class_name        => undef,
     bind_methods      => undef,
@@ -35,9 +35,9 @@ our %register_PARAMS = (
 our %bind_methods;
 our %bind_constructors;
 
-sub register {
+sub new {
      my ( $either, %args ) = @_;
-     verify_args( \%register_PARAMS, %args ) or confess $@;
+     verify_args( \%new_PARAMS, %args ) or confess $@;
      $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
 
     # Validate.
@@ -69,9 +69,6 @@ sub register {
     my $self = _new( @args{qw( parcel class_name client xs_code )}, $pod_spec );
     $bind_methods{$$self}      = $args{bind_methods};
     $bind_constructors{$$self} = $args{bind_constructors};
-
-    # Add to registry.
-    _add_to_registry($self);
 
     return $self;
 }

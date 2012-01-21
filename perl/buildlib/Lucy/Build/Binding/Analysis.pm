@@ -30,14 +30,14 @@ sub bind_all {
 }
 
 sub bind_analyzer {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::Analyzer",
         bind_methods      => [qw( Transform Transform_Text Split )],
         bind_constructors => ["new"],
         make_pod          => { synopsis => "    # Abstract base class.\n", }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_casefolder {
@@ -53,7 +53,7 @@ END_SYNOPSIS
     my $case_folder = Lucy::Analysis::CaseFolder->new;
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::CaseFolder",
         bind_constructors => ["new"],
@@ -62,7 +62,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_easyanalyzer {
@@ -84,7 +84,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::EasyAnalyzer",
         bind_constructors => ["new"],
@@ -93,7 +93,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_inversion {
@@ -129,13 +129,13 @@ CODE:
 OUTPUT: RETVAL
 END_XS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Analysis::Inversion",
         bind_methods => [qw( Append Reset Invert Next )],
         xs_code      => $xs,
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_normalizer {
@@ -155,7 +155,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::Normalizer",
         bind_constructors => ["new"],
@@ -164,7 +164,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor }
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_polyanalyzer {
@@ -194,7 +194,7 @@ END_SYNOPSIS
         analyzers => [ $case_folder, $whitespace_tokenizer, $stemmer, ], );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::PolyAnalyzer",
         bind_constructors => ["new"],
@@ -205,7 +205,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_regextokenizer {
@@ -231,7 +231,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::RegexTokenizer",
         bind_constructors => ["_new"],
@@ -240,7 +240,7 @@ END_CONSTRUCTOR
             synopsis    => $synopsis,
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_snowballstemmer {
@@ -259,7 +259,7 @@ END_SYNOPSIS
     my $stemmer = Lucy::Analysis::SnowballStemmer->new( language => 'es' );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::SnowballStemmer",
         bind_constructors => ["new"],
@@ -268,7 +268,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor }
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_snowballstopfilter {
@@ -292,7 +292,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::SnowballStopFilter",
         bind_constructors => ["new"],
@@ -301,7 +301,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor }
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_standardtokenizer {
@@ -317,7 +317,7 @@ END_SYNOPSIS
     my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Analysis::StandardTokenizer",
         bind_constructors => ["new"],
@@ -326,7 +326,7 @@ END_CONSTRUCTOR
             synopsis    => $synopsis,
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_token {
@@ -386,7 +386,7 @@ PPCODE:
 }
 END_XS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Analysis::Token",
         bind_methods => [
@@ -399,6 +399,7 @@ END_XS
         ],
         xs_code => $xs,
     );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

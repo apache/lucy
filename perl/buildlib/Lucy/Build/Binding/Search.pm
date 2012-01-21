@@ -20,6 +20,7 @@ sub bind_all {
     $class->bind_andquery;
     $class->bind_bitvecmatcher;
     $class->bind_collector;
+    $class->bind_offsetcollector;
     $class->bind_compiler;
     $class->bind_hitqueue;
     $class->bind_hits;
@@ -34,6 +35,7 @@ sub bind_all {
     $class->bind_orquery;
     $class->bind_orscorer;
     $class->bind_phrasequery;
+    $class->bind_phrasecompiler;
     $class->bind_polyquery;
     $class->bind_polysearcher;
     $class->bind_query;
@@ -46,16 +48,17 @@ sub bind_all {
     $class->bind_sortspec;
     $class->bind_span;
     $class->bind_termquery;
+    $class->bind_termcompiler;
     $class->bind_topdocs;
 }
 
 sub bind_andmatcher {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::ANDMatcher",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_andquery {
@@ -73,7 +76,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::ANDQuery",
         bind_constructors => ["new"],
@@ -83,16 +86,16 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_bitvecmatcher {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::BitVecMatcher",
         bind_constructors => [qw( new )],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_collector {
@@ -108,7 +111,7 @@ sub bind_collector {
     }
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::Collector",
         bind_methods => [
@@ -127,12 +130,16 @@ END_CONSTRUCTOR
             methods     => [qw( collect )],
         },
     );
-    Clownfish::CFC::Binding::Perl::Class->register(
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_offsetcollector {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::Collector::OffsetCollector",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_compiler {
@@ -156,7 +163,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR_CODE_SAMPLE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::Compiler",
         bind_methods => [
@@ -189,16 +196,16 @@ END_CONSTRUCTOR_CODE_SAMPLE
             constructor => { sample => $constructor },
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_hitqueue {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::HitQueue",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_hits {
@@ -213,7 +220,7 @@ sub bind_hits {
     }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::Hits",
         bind_methods => [
@@ -228,7 +235,7 @@ END_SYNOPSIS
             methods  => [qw( next total_hits )],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_indexsearcher {
@@ -249,7 +256,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::IndexSearcher",
         bind_methods      => [qw( Get_Reader )],
@@ -268,7 +275,7 @@ END_CONSTRUCTOR
             ],
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_leafquery {
@@ -297,7 +304,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::LeafQuery",
         bind_methods      => [qw( Get_Field Get_Text )],
@@ -308,7 +315,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_matchallquery {
@@ -316,17 +323,17 @@ sub bind_matchallquery {
     my $match_all_query = Lucy::Search::MatchAllQuery->new;
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::MatchAllQuery",
         bind_constructors => ["new"],
         make_pod          => { constructor => { sample => $constructor }, }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_matchdoc {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::MatchDoc",
         bind_methods => [
@@ -341,7 +348,7 @@ sub bind_matchdoc {
         ],
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_matcher {
@@ -353,7 +360,7 @@ END_SYNOPSIS
     my $matcher = MyMatcher->SUPER::new;
 END_CONSTRUCTOR_CODE_SAMPLE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::Matcher",
         bind_methods      => [qw( Next Advance Get_Doc_ID Score Collect )],
@@ -364,16 +371,16 @@ END_CONSTRUCTOR_CODE_SAMPLE
             methods     => [qw( next advance get_doc_id score )],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_notmatcher {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::NOTMatcher",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_notquery {
@@ -394,7 +401,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::NOTQuery",
         bind_constructors => ["new"],
@@ -405,7 +412,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_nomatchquery {
@@ -413,13 +420,13 @@ sub bind_nomatchquery {
     my $no_match_query = Lucy::Search::NoMatchQuery->new;
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::NoMatchQuery",
         bind_constructors => ["new"],
         make_pod          => { constructor => { sample => $constructor }, }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_orquery {
@@ -437,7 +444,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::ORQuery",
         bind_constructors => ["new"],
@@ -447,16 +454,16 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor, }
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_orscorer {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::ORScorer",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_phrasequery {
@@ -468,7 +475,7 @@ sub bind_phrasequery {
     my $hits = $searcher->hits( query => $phrase_query );
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::PhraseQuery",
         bind_methods      => [qw( Get_Field Get_Terms )],
@@ -479,12 +486,16 @@ END_SYNOPSIS
             methods     => [qw( get_field get_terms )],
         },
     );
-    Clownfish::CFC::Binding::Perl::Class->register(
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_phrasecompiler {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::PhraseCompiler",
         bind_constructors => ["do_new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_polyquery {
@@ -503,14 +514,14 @@ sub bind_polyquery {
     }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::PolyQuery",
         bind_methods      => [qw( Add_Child Set_Children Get_Children )],
         bind_constructors => ["new"],
         make_pod          => { synopsis => $synopsis, },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_polysearcher {
@@ -533,7 +544,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::PolySearcher",
         bind_constructors => ["new"],
@@ -550,7 +561,7 @@ END_CONSTRUCTOR
             ],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_query {
@@ -578,7 +589,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR_CODE_SAMPLE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::Query",
         bind_methods => [
@@ -593,7 +604,7 @@ END_CONSTRUCTOR_CODE_SAMPLE
             methods     => [qw( make_compiler set_boost get_boost )],
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_queryparser {
@@ -615,7 +626,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::QueryParser",
         bind_methods => [
@@ -659,7 +670,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_rangequery {
@@ -691,7 +702,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::RangeQuery",
         bind_constructors => ["new"],
@@ -700,16 +711,16 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_requiredoptionalmatcher {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::RequiredOptionalMatcher",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_requiredoptionalquery {
@@ -729,7 +740,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::RequiredOptionalQuery",
         bind_methods => [
@@ -746,7 +757,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_searcher {
@@ -760,7 +771,7 @@ sub bind_searcher {
     }
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::Searcher",
         bind_methods => [
@@ -792,7 +803,7 @@ END_CONSTRUCTOR
             ],
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_sortrule {
@@ -837,7 +848,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::SortRule",
         xs_code           => $xs_code,
@@ -849,7 +860,7 @@ END_CONSTRUCTOR
             methods     => [qw( get_field get_reverse )],
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_sortspec {
@@ -870,7 +881,7 @@ END_SYNOPSIS
     my $sort_spec = Lucy::Search::SortSpec->new( rules => \@rules );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::SortSpec",
         bind_methods      => [qw( Get_Rules )],
@@ -880,7 +891,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_span {
@@ -902,7 +913,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::Span",
         bind_methods => [
@@ -927,7 +938,7 @@ END_CONSTRUCTOR
             ],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_termquery {
@@ -946,7 +957,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::TermQuery",
         bind_methods      => [qw( Get_Field Get_Term )],
@@ -957,16 +968,20 @@ END_CONSTRUCTOR
             methods     => [qw( get_field get_term )],
         },
     );
-    Clownfish::CFC::Binding::Perl::Class->register(
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_termcompiler {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::TermCompiler",
         bind_constructors => ["do_new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_topdocs {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Search::TopDocs",
         bind_methods => [
@@ -978,7 +993,7 @@ sub bind_topdocs {
         ],
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

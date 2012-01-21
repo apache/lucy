@@ -78,7 +78,7 @@ END_SYNOPSIS
     my $arch = Lucy::Plan::Architecture->new;
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Plan::Architecture",
         bind_methods => [
@@ -112,7 +112,7 @@ END_CONSTRUCTOR
             constructors => [ { sample => $constructor } ],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_blobtype {
@@ -129,7 +129,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::BlobType",
         bind_constructors => ["new"],
@@ -138,7 +138,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_fieldtype {
@@ -153,7 +153,7 @@ sub bind_fieldtype {
 
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Plan::FieldType",
         bind_methods => [
@@ -180,7 +180,7 @@ END_SYNOPSIS
             ],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_float32type {
@@ -197,7 +197,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Float32Type",
         bind_constructors => ["new|init2"],
@@ -206,7 +206,7 @@ END_CONSTRUCTOR
         #    constructor => { sample => $constructor },
         #},
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_float64type {
@@ -223,7 +223,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Float64Type",
         bind_constructors => ["new|init2"],
@@ -232,7 +232,7 @@ END_CONSTRUCTOR
         #    constructor => { sample => $constructor },
         #},
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_fulltexttype {
@@ -259,7 +259,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::FullTextType",
         bind_constructors => ["new|init2"],
@@ -280,7 +280,7 @@ END_CONSTRUCTOR
             ],
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_int32type {
@@ -297,7 +297,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Int32Type",
         bind_constructors => ["new|init2"],
@@ -306,7 +306,7 @@ END_CONSTRUCTOR
         #    constructor => { sample => $constructor },
         #},
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_int64type {
@@ -323,7 +323,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Int64Type",
         bind_constructors => ["new|init2"],
@@ -332,7 +332,7 @@ END_CONSTRUCTOR
         #    constructor => { sample => $constructor },
         #},
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_schema {
@@ -356,7 +356,7 @@ END_SYNOPSIS
     my $schema = Lucy::Plan::Schema->new;
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Plan::Schema",
         bind_methods => [
@@ -392,7 +392,7 @@ END_CONSTRUCTOR
             constructors => [ { sample => $constructor } ],
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_stringtype {
@@ -411,7 +411,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::StringType",
         bind_constructors => ["new|init2"],
@@ -420,7 +420,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

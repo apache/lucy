@@ -18,6 +18,7 @@ sub bind_all {
     my $class = shift;
     $class->bind_lucy;
     $class->bind_test;
+    $class->bind_testschema;
 }
 
 sub bind_lucy {
@@ -61,12 +62,12 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy",
         xs_code    => $xs_code,
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_test {
@@ -300,17 +301,21 @@ PPCODE:
     lucy_TestQPSyntax_run_tests(index);
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Test::TestSchema",
-        bind_constructors => ["new"],
-    );
-
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Test",
         xs_code    => $xs_code,
     );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_testschema {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel            => "Lucy",
+        class_name        => "Lucy::Test::TestSchema",
+        bind_constructors => ["new"],
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

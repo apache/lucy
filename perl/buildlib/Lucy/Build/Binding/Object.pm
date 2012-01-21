@@ -24,7 +24,8 @@ sub bind_all {
     $class->bind_host;
     $class->bind_i32array;
     $class->bind_lockfreeregistry;
-    $class->bind_num;
+    $class->bind_float32;
+    $class->bind_float64;
     $class->bind_obj;
     $class->bind_varray;
     $class->bind_vtable;
@@ -45,7 +46,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::BitVector",
         bind_methods => [
@@ -89,7 +90,7 @@ END_CONSTRUCTOR
             ],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_bytebuf {
@@ -121,7 +122,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::ByteBuf",
         xs_code      => $xs_code,
@@ -133,7 +134,7 @@ END_XS_CODE
                 )
         ],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_charbuf {
@@ -196,12 +197,12 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::CharBuf",
         xs_code    => $xs_code,
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_err {
@@ -223,14 +224,14 @@ sub bind_err {
     }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Object::Err",
         bind_methods      => [qw( Cat_Mess Get_Mess )],
         make_pod          => { synopsis => $synopsis },
         bind_constructors => ["_new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_hash {
@@ -287,7 +288,7 @@ PPCODE:
 }
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::Hash",
         xs_code      => $xs_code,
@@ -305,7 +306,7 @@ END_XS_CODE
         ],
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_host {
@@ -386,12 +387,12 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::Host",
         xs_code    => $xs_code,
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_i32array {
@@ -461,26 +462,26 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::I32Array",
         xs_code      => $xs_code,
         bind_methods => [qw( Get Get_Size )],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lockfreeregistry {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Object::LockFreeRegistry",
         bind_methods      => [qw( Register Fetch )],
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_num {
+sub bind_float32 {
     my $float32_xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::Float32
 
@@ -497,6 +498,16 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Object::Float32",
+        xs_code      => $float32_xs_code,
+        bind_methods => [qw( Set_Value Get_Value )],
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_float64 {
     my $float64_xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::Float64
 
@@ -513,19 +524,13 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::Float32",
-        xs_code      => $float32_xs_code,
-        bind_methods => [qw( Set_Value Get_Value )],
-    );
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::Float64",
         xs_code      => $float64_xs_code,
         bind_methods => [qw( Set_Value Get_Value )],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_obj {
@@ -700,7 +705,7 @@ All Lucy classes implement a DESTROY method; if you override it in a
 subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.
 END_DESCRIPTION
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::Obj",
         xs_code      => $xs_code,
@@ -740,7 +745,7 @@ END_DESCRIPTION
             ],
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_varray {
@@ -812,7 +817,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::VArray",
         xs_code      => $xs_code,
@@ -828,7 +833,7 @@ END_XS_CODE
         ],
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_vtable {
@@ -877,13 +882,13 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::VTable",
         xs_code      => $xs_code,
         bind_methods => [qw( Get_Name Get_Parent )],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

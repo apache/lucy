@@ -22,6 +22,8 @@ sub bind_all {
     $class->bind_folder;
     $class->bind_instream;
     $class->bind_lock;
+    $class->bind_lockfilelock;
+    $class->bind_sharedlock;
     $class->bind_lockerr;
     $class->bind_lockfactory;
     $class->bind_outstream;
@@ -31,12 +33,12 @@ sub bind_all {
 }
 
 sub bind_fsfilehandle {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::FSFileHandle",
         bind_constructors => ['_open|do_open'],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_fsfolder {
@@ -48,7 +50,7 @@ END_SYNOPSIS
 
     my $constructor = $synopsis;
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::FSFolder",
         bind_constructors => ["new"],
@@ -57,7 +59,7 @@ END_SYNOPSIS
             constructor => { sample => $constructor },
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_filehandle {
@@ -114,18 +116,18 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::FileHandle",
         xs_code           => $xs_code,
         bind_methods      => [qw( Length Close )],
         bind_constructors => ['_open|do_open'],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_folder {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Store::Folder",
         bind_methods => [
@@ -146,7 +148,7 @@ sub bind_folder {
         bind_constructors => ["new"],
         make_pod          => { synopsis => "    # Abstract base class.\n", },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_instream {
@@ -207,7 +209,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Store::InStream",
         xs_code      => $xs_code,
@@ -232,7 +234,7 @@ END_XS_CODE
         ],
         bind_constructors => ['open|do_open'],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lock {
@@ -256,7 +258,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Store::Lock",
         bind_methods => [
@@ -286,17 +288,25 @@ END_CONSTRUCTOR
             ],
         },
     );
-    Clownfish::CFC::Binding::Perl::Class->register(
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_lockfilelock {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::LockFileLock",
         bind_constructors => ["new"],
     );
-    Clownfish::CFC::Binding::Perl::Class->register(
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_sharedlock {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::SharedLock",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lockerr {
@@ -316,12 +326,12 @@ sub bind_lockerr {
     }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::LockErr",
         make_pod   => { synopsis => $synopsis }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lockfactory {
@@ -349,7 +359,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::LockFactory",
         bind_methods      => [qw( Make_Lock Make_Shared_Lock )],
@@ -360,7 +370,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_outstream {
@@ -398,7 +408,7 @@ END_XS_CODE
     $outstream->write_u64($file_position);
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Store::OutStream",
         xs_code      => $xs_code,
@@ -423,27 +433,27 @@ END_SYNOPSIS
         ],
         bind_constructors => ['open|do_open'],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_ramfile {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::RAMFile",
         bind_methods      => [qw( Get_Contents )],
         bind_constructors => ['new'],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_ramfilehandle {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::RAMFileHandle",
         bind_methods      => [qw( Get_File )],
         bind_constructors => ['_open|do_open'],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_ramfolder {
@@ -462,7 +472,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::RAMFolder",
         bind_constructors => ["new"],
@@ -471,7 +481,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

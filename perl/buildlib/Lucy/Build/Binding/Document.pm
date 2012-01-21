@@ -91,7 +91,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Document::Doc",
         xs_code      => $xs_code,
@@ -102,7 +102,7 @@ END_CONSTRUCTOR
             constructor => { sample => $constructor },
         }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_hitdoc {
@@ -153,7 +153,7 @@ END_XS_CODE
     }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Document::HitDoc",
         bind_methods => [qw( Set_Score Get_Score )],
@@ -163,7 +163,7 @@ END_SYNOPSIS
             synopsis => $synopsis,
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

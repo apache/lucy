@@ -14,34 +14,34 @@
 # limitations under the License.
 package LucyX::Build::Binding::Search;
 
-
 sub bind_all {
-     my $class = shift;
-     $class->bind_filter;
-     $class->bind_mockmatcher;
-     $class->bind_proximityquery;
+    my $class = shift;
+    $class->bind_filter;
+    $class->bind_mockmatcher;
+    $class->bind_proximityquery;
+    $class->bind_proximitycompiler;
 }
 
 sub bind_filter {
-     Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "LucyX::Search::FilterMatcher",
-    bind_constructors => ["new"],
-);
-
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel            => "Lucy",
+        class_name        => "LucyX::Search::FilterMatcher",
+        bind_constructors => ["new"],
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_mockmatcher {
-     Clownfish::CFC::Binding::Perl::Class->register(
-    parcel       => "Lucy",
-    class_name   => "LucyX::Search::MockMatcher",
-    bind_constructors => ["_new|init"],
-);
-
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel            => "Lucy",
+        class_name        => "LucyX::Search::MockMatcher",
+        bind_constructors => ["_new|init"],
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_proximityquery {
-     my $synopsis = <<'END_SYNOPSIS';
+    my $synopsis = <<'END_SYNOPSIS';
     my $proximity_query = LucyX::Search::ProximityQuery->new( 
         field  => 'content',
         terms  => [qw( the who )],
@@ -50,23 +50,27 @@ sub bind_proximityquery {
     my $hits = $searcher->hits( query => $proximity_query );
 END_SYNOPSIS
 
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "LucyX::Search::ProximityQuery",
-    bind_methods      => [qw( Get_Field Get_Terms )],
-    bind_constructors => ["new"],
-    make_pod          => {
-        constructor => { sample => '' },
-        synopsis    => $synopsis,
-        methods     => [qw( get_field get_terms get_within )],
-    },
-);
-Clownfish::CFC::Binding::Perl::Class->register(
-    parcel            => "Lucy",
-    class_name        => "LucyX::Search::ProximityCompiler",
-    bind_constructors => ["do_new"],
-);
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel            => "Lucy",
+        class_name        => "LucyX::Search::ProximityQuery",
+        bind_methods      => [qw( Get_Field Get_Terms )],
+        bind_constructors => ["new"],
+        make_pod          => {
+            constructor => { sample => '' },
+            synopsis    => $synopsis,
+            methods     => [qw( get_field get_terms get_within )],
+        },
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
 
+sub bind_proximitycompiler {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel            => "Lucy",
+        class_name        => "LucyX::Search::ProximityCompiler",
+        bind_constructors => ["do_new"],
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

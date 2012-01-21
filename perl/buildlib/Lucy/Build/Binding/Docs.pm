@@ -21,12 +21,12 @@ sub bind_all {
 }
 
 sub bind_devguide {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Docs::DevGuide",
         make_pod   => {},
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_filelocking {
@@ -49,12 +49,12 @@ sub bind_filelocking {
     my $searcher = Lucy::Search::IndexSearcher->new( index => $reader );
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Docs::FileLocking",
         make_pod   => { synopsis => $synopsis, },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

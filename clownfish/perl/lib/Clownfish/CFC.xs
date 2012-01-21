@@ -1879,10 +1879,12 @@ PPCODE:
     CFCBase_decref((CFCBase*)self);
 
 void
-_add_to_registry(self)
-    CFCPerlClass *self;
+register(unused, binding)
+    SV *unused;
+    CFCPerlClass *binding;
 PPCODE:
-    CFCPerlClass_add_to_registry(self);
+    (void)unused;
+    CFCPerlClass_add_to_registry(binding);
 
 SV*
 singleton(unused_sv, class_name)

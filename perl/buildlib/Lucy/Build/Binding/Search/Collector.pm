@@ -40,7 +40,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::Collector::BitCollector",
         bind_constructors => ["new"],
@@ -50,17 +50,17 @@ END_CONSTRUCTOR
             methods     => [qw( collect )],
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_sortcollector {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::Collector::SortCollector",
         bind_methods      => [qw( Pop_Match_Docs Get_Total_Hits )],
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

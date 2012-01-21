@@ -28,7 +28,7 @@ sub bind_heatmap {
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Highlight::HeatMap",
         bind_methods => [
@@ -45,7 +45,7 @@ END_CONSTRUCTOR
         #    constructor => { sample => $constructor },
         #},
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_highlighter {
@@ -71,7 +71,7 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Highlight::Highlighter",
         bind_methods => [
@@ -116,7 +116,7 @@ END_CONSTRUCTOR
             ]
         },
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

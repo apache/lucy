@@ -96,12 +96,12 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::Debug",
         xs_code    => $xs_code,
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_indexfilenames {
@@ -127,25 +127,25 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::IndexFileNames",
         xs_code    => $xs_code,
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_memorypool {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Util::MemoryPool",
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_priorityqueue {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Util::PriorityQueue",
         bind_methods => [
@@ -160,7 +160,7 @@ sub bind_priorityqueue {
         ],
         bind_constructors => ["new"],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_sortexternal {
@@ -174,7 +174,7 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Util::SortExternal",
         xs_code      => $xs_code,
@@ -191,16 +191,16 @@ END_XS_CODE
                 )
         ],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_stepper {
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Util::Stepper",
         bind_methods => [qw( Read_Record )],
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_stringhelper {
@@ -295,12 +295,12 @@ PPCODE:
 }
 END_XS_CODE
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::StringHelper",
         xs_code    => $xs_code,
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;

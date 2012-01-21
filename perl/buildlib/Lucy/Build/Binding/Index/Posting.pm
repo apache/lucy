@@ -32,7 +32,7 @@ sub bind_matchposting {
     }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::Posting::MatchPosting",
         bind_constructors => ["new"],
@@ -41,7 +41,7 @@ END_SYNOPSIS
         #        synopsis => $synopsis,
         #    }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_richposting {
@@ -55,7 +55,7 @@ sub bind_richposting {
     }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::Posting::RichPosting",
         bind_constructors => ["new"],
@@ -63,7 +63,7 @@ END_SYNOPSIS
         #        synopsis => $synopsis,
         #    }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_scoreposting {
@@ -100,7 +100,7 @@ END_XS_CODE
     # }
 END_SYNOPSIS
 
-    Clownfish::CFC::Binding::Perl::Class->register(
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::Posting::ScorePosting",
         xs_code           => $xs_code,
@@ -109,7 +109,7 @@ END_SYNOPSIS
         #        synopsis => $synopsis,
         #    }
     );
-
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 1;
