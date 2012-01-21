@@ -1954,27 +1954,31 @@ CODE:
 OUTPUT: RETVAL
 
 void
-_add_method(self, name, pod_sv)
+_add_method(self, alias, method_sv, sample_sv, pod_sv)
     CFCPerlPod *self;
-    const char *name;
+    const char *alias;
+    SV *method_sv;
+    SV *sample_sv;
     SV *pod_sv;
 PPCODE:
-    const char *pod = SvPOK(pod_sv) ? SvPVutf8_nolen(pod_sv) : NULL;
-    CFCPerlPod_add_method(self, name, pod);
+    const char *method = SvPOK(method_sv) ? SvPVutf8_nolen(method_sv) : NULL;
+    const char *sample = SvPOK(sample_sv) ? SvPVutf8_nolen(sample_sv) : NULL;
+    const char *pod    = SvPOK(pod_sv)    ? SvPVutf8_nolen(pod_sv)    : NULL;
+    CFCPerlPod_add_method(self, alias, method, sample, pod);
 
 void
-_add_constructor(self, name_sv, pod_sv, func_sv, sample_sv)
+_add_constructor(self, alias_sv, init_sv, sample_sv, pod_sv)
     CFCPerlPod *self;
-    SV *name_sv;
-    SV *pod_sv;
-    SV *func_sv;
+    SV *alias_sv;
+    SV *init_sv;
     SV *sample_sv;
+    SV *pod_sv;
 PPCODE:
-    const char *name   = SvPOK(name_sv)   ? SvPVutf8_nolen(name_sv)   : NULL;
-    const char *pod    = SvPOK(pod_sv)    ? SvPVutf8_nolen(pod_sv)    : NULL;
-    const char *func   = SvPOK(func_sv)   ? SvPVutf8_nolen(func_sv)   : NULL;
+    const char *alias  = SvPOK(alias_sv)  ? SvPVutf8_nolen(alias_sv)  : NULL;
+    const char *init   = SvPOK(init_sv)   ? SvPVutf8_nolen(init_sv)   : NULL;
     const char *sample = SvPOK(sample_sv) ? SvPVutf8_nolen(sample_sv) : NULL;
-    CFCPerlPod_add_constructor(self, name, pod, func, sample);
+    const char *pod    = SvPOK(pod_sv)    ? SvPVutf8_nolen(pod_sv)    : NULL;
+    CFCPerlPod_add_constructor(self, alias, init, sample, pod);
 
 SV*
 methods_pod(self, klass)

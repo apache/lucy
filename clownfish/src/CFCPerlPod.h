@@ -38,13 +38,35 @@ CFCPerlPod_init(CFCPerlPod *self, const char *synopsis,
 void
 CFCPerlPod_destroy(CFCPerlPod *self);
 
+/** Add pod for a method.
+ * 
+ * @param alias The name of the method, spelled as it will be used from
+ * Perl-space.
+ * @param method The name of the method from the Clownfish class.  If not
+ * supplied, an attempt will be made to locate the correct method using
+ * <code>alias</code>.
+ * @param sample An optional Perl usage sample.
+ * @param pod Optional verbatim POD, which will override all POD which would
+ * otherwise have been generated.
+ */
 void
-CFCPerlPod_add_method(CFCPerlPod *self, const char *name, const char *pod);
+CFCPerlPod_add_method(CFCPerlPod *self, const char *alias, const char *method,
+                      const char *sample, const char *pod);
 
+/** Add pod for a constructor.
+ * 
+ * @param alias The name of the constructor, spelled as it will be used from
+ * Perl-space.
+ * @param initializer The name of the initialization routine from the
+ * Clownfish class.  Defaults to "init".
+ * @param sample An optional Perl usage sample.
+ * @param pod Optional verbatim POD, which will override all POD which would
+ * otherwise have been generated.
+ */
 void
-CFCPerlPod_add_constructor(CFCPerlPod *self, const char *name,
-                           const char *pod, const char *func,
-                           const char *sample);
+CFCPerlPod_add_constructor(CFCPerlPod *self, const char *alias,
+                           const char *initializer, const char *sample,
+                           const char *pod);
 
 char*
 CFCPerlPod_methods_pod(CFCPerlPod *self, struct CFCClass *klass);

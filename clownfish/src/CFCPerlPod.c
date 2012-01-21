@@ -34,7 +34,7 @@
 #endif
 
 typedef struct NamePod {
-    char *name;
+    char *alias;
     char *func;
     char *sample;
     char *pod;
@@ -80,7 +80,7 @@ CFCPerlPod_destroy(CFCPerlPod *self) {
     FREEMEM(self->synopsis);
     FREEMEM(self->description);
     for (size_t i = 0; i < self->num_methods; i++) {
-        FREEMEM(self->methods[i].name);
+        FREEMEM(self->methods[i].alias);
         FREEMEM(self->methods[i].pod);
         FREEMEM(self->methods[i].func);
         FREEMEM(self->methods[i].sample);
@@ -90,30 +90,31 @@ CFCPerlPod_destroy(CFCPerlPod *self) {
 }
 
 void
-CFCPerlPod_add_method(CFCPerlPod *self, const char *name, const char *pod) {
-    CFCUTIL_NULL_CHECK(name);
+CFCPerlPod_add_method(CFCPerlPod *self, const char *alias, const char *method,
+                      const char *sample, const char *pod) {
+    CFCUTIL_NULL_CHECK(alias);
     self->num_methods++;
     size_t size = self->num_methods * sizeof(NamePod);
     self->methods = (NamePod*)REALLOCATE(self->methods, size);
     NamePod *slot = &self->methods[self->num_methods - 1];
-    slot->name   = CFCUtil_strdup(name);
+    slot->alias  = CFCUtil_strdup(alias);
+    slot->func   = method ? CFCUtil_strdup(method) : NULL;
+    slot->sample = CFCUtil_strdup(sample ? sample : "");
     slot->pod    = pod ? CFCUtil_strdup(pod) : NULL;
-    slot->func   = NULL;
-    slot->sample = NULL;
 }
 
 void
-CFCPerlPod_add_constructor(CFCPerlPod *self, const char *name,
-                           const char *pod, const char *func,
-                           const char *sample) {
+CFCPerlPod_add_constructor(CFCPerlPod *self, const char *alias,
+                           const char *initializer, const char *sample,
+                           const char *pod) {
     self->num_constructors++;
     size_t size = self->num_constructors * sizeof(NamePod);
     self->constructors = (NamePod*)REALLOCATE(self->constructors, size);
     NamePod *slot = &self->constructors[self->num_constructors - 1];
-    slot->name   = CFCUtil_strdup(name ? name : "new");
-    slot->pod    = pod ? CFCUtil_strdup(pod) : NULL;
-    slot->func   = CFCUtil_strdup(func ? func : "init");
+    slot->alias  = CFCUtil_strdup(alias ? alias : "new");
+    slot->func   = CFCUtil_strdup(initializer ? initializer : "init");
     slot->sample = CFCUtil_strdup(sample ? sample : "");
+    slot->pod    = pod ? CFCUtil_strdup(pod) : NULL;
 }
 
 const char*
@@ -134,19 +135,24 @@ CFCPerlPod_methods_pod(CFCPerlPod *self, CFCClass *klass) {
     char *methods_pod  = CFCUtil_strdup("");
     for (size_t i = 0; i < self->num_methods; i++) {
         NamePod meth_spec = self->methods[i];
-        CFCMethod *method = CFCClass_method(klass, meth_spec.name);
+        CFCMethod *method = CFCClass_method(klass, meth_spec.func);
+        if (!method) {
+            method = CFCClass_method(klass, meth_spec.alias);
+        }
         if (!method) {
             CFCUtil_die("Can't find method '%s' in class '%s'",
-                        meth_spec.name, CFCClass_get_class_name(klass));
+                        meth_spec.alias, CFCClass_get_class_name(klass));
         }
         char *meth_pod;
         if (meth_spec.pod) {
             meth_pod = CFCPerlPod_perlify_doc_text(self, meth_spec.pod);
         }
         else {
-            char *raw = CFCPerlPod_gen_subroutine_pod(self, (CFCFunction*)method,
-                                                      meth_spec.name, klass,
-                                                      NULL, class_name, false);
+            char *raw
+                = CFCPerlPod_gen_subroutine_pod(self, (CFCFunction*)method,
+                                                meth_spec.alias, klass,
+                                                meth_spec.sample, class_name,
+                                                false);
             meth_pod = CFCPerlPod_perlify_doc_text(self, raw);
             FREEMEM(raw);
         }
@@ -190,7 +196,7 @@ CFCPerlPod_constructors_pod(CFCPerlPod *self, CFCClass *klass) {
         else {
             CFCFunction *init_func = CFCClass_function(klass, slot.func);
             char *sub_pod
-                = CFCPerlPod_gen_subroutine_pod(self, init_func, slot.name, klass,
+                = CFCPerlPod_gen_subroutine_pod(self, init_func, slot.alias, klass,
                                                 slot.sample, class_name, true);
             char *perlified = CFCPerlPod_perlify_doc_text(self, sub_pod);
             pod = CFCUtil_cat(pod, perlified, NULL);

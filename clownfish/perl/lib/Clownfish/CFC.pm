@@ -693,18 +693,54 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         push @$constructors, $args{constructor} if $args{constructor};
         my $self = _new( $synopsis, $description );
 
-        for (@$methods) {
-            if ( ref($_) ) {
-                _add_method( $self, $_->{name}, $_->{pod} );
+        for my $meth (@$methods) {
+            if ( ref($meth) ) {
+                $self->add_method(
+                    alias => $meth->{alias} || $meth->{name},
+                    method => $meth->{method},
+                    sample => $meth->{sample},
+                    pod    => $meth->{pod},
+                );
             }
             else {
-                _add_method( $self, $_, undef );
+                $self->add_method( alias => $meth );
             }
         }
         for my $con (@$constructors) {
-            _add_constructor( $self, @{$con}{qw( name pod func sample )} );
+            $self->add_constructor(
+                alias       => $con->{alias}       || $con->{name},
+                initializer => $con->{initializer} || $con->{func},
+                sample      => $con->{sample},
+                pod         => $con->{pod},
+            );
         }
         return $self;
+    }
+
+    my %add_method_PARAMS = (
+        alias  => undef,
+        method => undef,
+        sample => undef,
+        pod    => undef,
+    );
+
+    sub add_method {
+        my ( $self, %args ) = @_;
+        verify_args( \%add_method_PARAMS, %args ) or confess $@;
+        _add_method( $self, @args{qw( alias method sample pod )} );
+    }
+
+    my %add_constructor_PARAMS = (
+        alias       => undef,
+        initializer => undef,
+        sample      => undef,
+        pod         => undef,
+    );
+
+    sub add_constructor {
+        my ( $self, %args ) = @_;
+        verify_args( \%add_constructor_PARAMS, %args ) or confess $@;
+        _add_constructor( $self, @args{qw( alias initializer sample pod )} );
     }
 }
 

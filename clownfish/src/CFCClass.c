@@ -434,6 +434,10 @@ CFCClass_has_attribute(CFCClass *self, const char *name) {
 
 static CFCFunction*
 S_find_func(CFCFunction **funcs, const char *sym) {
+    if (!sym) {
+        return NULL;
+    }
+
     const size_t MAX_LEN = 128;
     char lcsym[MAX_LEN + 1];
     size_t sym_len = strlen(sym);
