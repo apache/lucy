@@ -25,11 +25,12 @@ typedef struct CFCPerlConstructor CFCPerlConstructor;
 struct CFCClass;
 
 CFCPerlConstructor*
-CFCPerlConstructor_new(struct CFCClass *klass, const char *alias);
+CFCPerlConstructor_new(struct CFCClass *klass, const char *alias,
+                       const char *initializer);
 
 CFCPerlConstructor*
 CFCPerlConstructor_init(CFCPerlConstructor *self, struct CFCClass *klass,
-                        const char *alias);
+                        const char *alias, const char *initializer);
 
 void
 CFCPerlConstructor_destroy(CFCPerlConstructor *self);

@@ -87,18 +87,12 @@ sub write_bindings {
     my @xsubs;
 
     # Build up a roster of all requested bindings.
-    my %has_constructors;
-    my %has_methods;
     my %has_xs_code;
     for my $class (@$registered) {
         my $class_name = $class->get_class_name;
         my $class_binding
             = Clownfish::CFC::Binding::Perl::Class->singleton($class_name)
             or next;
-        $has_constructors{$class_name} = 1
-            if $class_binding->get_bind_constructors;
-        $has_methods{$class_name} = 1
-            if $class_binding->get_bind_methods;
         $has_xs_code{$class_name} = 1
             if $class_binding->get_xs_code;
     }
@@ -113,23 +107,23 @@ sub write_bindings {
     # Constructors.
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
-        next unless delete $has_constructors{$class_name};
         my $class_binding
             = Clownfish::CFC::Binding::Perl::Class->singleton($class_name);
-        my @bound = $class_binding->constructor_bindings;
-        $generated_xs .= $_->xsub_def . "\n" for @bound;
-        push @xsubs, @bound;
+        next unless $class_binding;
+        my $bound = $class_binding->constructor_bindings;
+        $generated_xs .= $_->xsub_def . "\n" for @$bound;
+        push @xsubs, @$bound;
     }
 
     # Methods.
     for my $class (@$ordered) {
         my $class_name = $class->get_class_name;
-        next unless delete $has_methods{$class_name};
         my $class_binding
             = Clownfish::CFC::Binding::Perl::Class->singleton($class_name);
-        my @bound = $class_binding->method_bindings;
-        $generated_xs .= $_->xsub_def . "\n" for @bound;
-        push @xsubs, @bound;
+        next unless $class_binding;
+        my $bound = $class_binding->method_bindings;
+        $generated_xs .= $_->xsub_def . "\n" for @$bound;
+        push @xsubs, @$bound;
     }
 
     # Hand-rolled XS.
@@ -141,16 +135,6 @@ sub write_bindings {
     %has_xs_code = ();
 
     # Verify that all binding specs were processed.
-    my @leftover_ctor = keys %has_constructors;
-    if (@leftover_ctor) {
-        confess(  "Constructor bindings spec'd for non-existant classes: "
-                . "'@leftover_ctor'" );
-    }
-    my @leftover_bound = keys %has_methods;
-    if (@leftover_bound) {
-        confess(  "Method bindings spec'd for non-existant classes: "
-                . "'@leftover_bound'" );
-    }
     my @leftover_xs = keys %has_xs_code;
     if (@leftover_xs) {
         confess(  "Hand-rolled XS spec'd for non-existant classes: "

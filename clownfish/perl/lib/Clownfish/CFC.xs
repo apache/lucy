@@ -1836,11 +1836,13 @@ OUTPUT: RETVAL
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Constructor
 
 SV*
-_new(klass, alias)
+_new(klass, alias, init_sv)
     CFCClass *klass;
     const char *alias;
+    SV *init_sv;
 CODE:
-    CFCPerlConstructor *self = CFCPerlConstructor_new(klass, alias);
+    const char *init = SvOK(init_sv) ? SvPVutf8_nolen(init_sv) : NULL;
+    CFCPerlConstructor *self = CFCPerlConstructor_new(klass, alias, init);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -1851,7 +1853,6 @@ xsub_def(self)
 CODE:
     RETVAL = S_sv_eat_c_string(CFCPerlConstructor_xsub_def(self));
 OUTPUT: RETVAL
-
 
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Class
 
@@ -1871,12 +1872,6 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
-
-void
-_destroy(self)
-    CFCPerlClass *self;
-PPCODE:
-    CFCBase_decref((CFCBase*)self);
 
 void
 register(unused, binding)
@@ -1906,6 +1901,52 @@ void
 _clear_registry(...)
 PPCODE:
     CFCPerlClass_clear_registry();
+
+void
+_bind_method(self, alias_sv, meth_sv)
+    CFCPerlClass *self;
+    SV *alias_sv;
+    SV *meth_sv;
+PPCODE:
+    const char *alias = SvOK(alias_sv) ? SvPVutf8_nolen(alias_sv) : NULL;
+    const char *meth  = SvOK(meth_sv)  ? SvPVutf8_nolen(meth_sv)  : NULL;
+    CFCPerlClass_bind_method(self, alias, meth);
+
+void
+_bind_constructor(self, alias_sv, init_sv)
+    CFCPerlClass *self;
+    SV *alias_sv;
+    SV *init_sv;
+PPCODE:
+    const char *alias = SvOK(alias_sv) ? SvPVutf8_nolen(alias_sv) : NULL;
+    const char *init  = SvOK(init_sv)  ? SvPVutf8_nolen(init_sv)  : NULL;
+    CFCPerlClass_bind_constructor(self, alias, init);
+
+SV*
+method_bindings(self)
+    CFCPerlClass *self;
+CODE:
+    CFCPerlMethod **bound = CFCPerlClass_method_bindings(self);
+    RETVAL = S_array_of_cfcbase_to_av((CFCBase**)bound);
+    FREEMEM(bound);
+OUTPUT: RETVAL
+
+SV*
+constructor_bindings(self)
+    CFCPerlClass *self;
+CODE:
+    CFCPerlConstructor **bound = CFCPerlClass_constructor_bindings(self);
+    RETVAL = S_array_of_cfcbase_to_av((CFCBase**)bound);
+    FREEMEM(bound);
+OUTPUT: RETVAL
+
+SV*
+create_pod(self)
+    CFCPerlClass *self;
+CODE:
+    char *pod = CFCPerlClass_create_pod(self);
+    RETVAL = S_sv_eat_c_string(pod);
+OUTPUT: RETVAL
 
 void
 _set_or_get(self, ...)

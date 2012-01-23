@@ -630,7 +630,99 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 
 {
     package Clownfish::CFC::Binding::Perl::Class;
-    use Clownfish::CFC::Binding::Perl::Class;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Carp;
+    use Clownfish::CFC::Util qw( verify_args );
+
+    our %new_PARAMS = (
+        parcel            => undef,
+        class_name        => undef,
+        bind_methods      => undef,
+        bind_constructors => undef,
+        make_pod          => undef,
+        xs_code           => undef,
+        client            => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
+
+        # Validate.
+        confess("Missing required param 'class_name'")
+            unless $args{class_name};
+
+        # Retrieve Clownfish::CFC::Class client, if it will be needed.
+        my $client;
+        if (   $args{bind_methods}
+            || $args{bind_constructors}
+            || $args{make_pod} )
+        {
+            $args{client} = Clownfish::CFC::Class->fetch_singleton(
+                parcel     => $args{parcel},
+                class_name => $args{class_name},
+            );
+            confess("Can't fetch singleton for $args{class_name}")
+                unless $args{client};
+        }
+
+        # Create Pod spec if needed.
+        my $pod_spec;
+        if ( $args{make_pod} ) {
+            $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new(
+                %{ $args{make_pod} } );
+        }
+
+        # Create object.
+        my $self = _new( @args{qw( parcel class_name client xs_code )},
+            $pod_spec );
+
+        my $meth_list = $args{bind_methods} || [];
+        for my $meth_namespec (@$meth_list) {
+            my ( $alias, $name )
+                = $meth_namespec =~ /^(.*?)\|(.*)$/
+                ? ( $1, $2 )
+                : ( lc($meth_namespec), $meth_namespec );
+            $self->bind_method( alias => $alias, method => $name );
+        }
+
+        my $cons_list = $args{bind_constructors} || [];
+        for my $cons_namespec (@$cons_list) {
+            my ( $alias, $initializer )
+                = $cons_namespec =~ /^(.*?)\|(.*)$/
+                ? ( $1, $2 )
+                : ( $cons_namespec, undef );
+            $self->bind_constructor(
+                alias       => $alias,
+                initializer => $initializer,
+            );
+        }
+
+        return $self;
+    }
+
+    our %bind_method_PARAMS = (
+        alias  => undef,
+        method => undef,
+    );
+
+    sub bind_method {
+        my ( $self, %args ) = @_;
+        verify_args( \%bind_method_PARAMS, %args ) or confess $@;
+        _bind_method( $self, @args{qw( alias method )} );
+    }
+
+    our %bind_constructor_PARAMS = (
+        alias       => undef,
+        initializer => undef,
+    );
+
+    sub bind_constructor {
+        my ( $self, %args ) = @_;
+        verify_args( \%bind_constructor_PARAMS, %args ) or confess $@;
+        _bind_constructor( $self, @args{qw( alias initializer )} );
+    }
 }
 
 {
@@ -640,14 +732,15 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     use Clownfish::CFC::Util qw( verify_args );
 
     our %new_PARAMS = (
-        class => undef,
-        alias => undef,
+        class       => undef,
+        alias       => undef,
+        initializer => undef,
     );
 
     sub new {
         my ( $either, %args ) = @_;
         confess $@ unless verify_args( \%new_PARAMS, %args );
-        return _new( @args{qw( class alias )} );
+        return _new( @args{qw( class alias initializer )} );
     }
 }
 

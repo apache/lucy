@@ -45,32 +45,20 @@ const static CFCMeta CFCPERLCONSTRUCTOR_META = {
 };
 
 CFCPerlConstructor*
-CFCPerlConstructor_new(CFCClass *klass, const char *alias) {
+CFCPerlConstructor_new(CFCClass *klass, const char *alias,
+                       const char *initializer) {
     CFCPerlConstructor *self
         = (CFCPerlConstructor*)CFCBase_allocate(&CFCPERLCONSTRUCTOR_META);
-    return CFCPerlConstructor_init(self, klass, alias);
+    return CFCPerlConstructor_init(self, klass, alias, initializer);
 }
 
 CFCPerlConstructor*
 CFCPerlConstructor_init(CFCPerlConstructor *self, CFCClass *klass,
-                        const char *alias) {
-    // Extract alias from the alias spec, which may include a pipe.  If it
-    // does, then the Perl-space alias is on the left, and the name of the
-    // init function is on the right: alias|init_func
+                        const char *alias, const char *initializer) {
     CFCUTIL_NULL_CHECK(alias);
-    char *real_alias = CFCUtil_strdup(alias);
-    char *init_func_name;
-    const char *alias_end = strchr(alias, '|');
-    if (alias_end) {
-        size_t alias_len = alias_end - alias;
-        real_alias[alias_len] = '\0';
-        init_func_name = CFCUtil_strdup(alias_end + 1);
-    }
-    else {
-        init_func_name = CFCUtil_strdup("init");
-    }
-
+    CFCUTIL_NULL_CHECK(klass);
     const char *class_name = CFCClass_get_class_name(klass);
+    initializer = initializer ? initializer : "init";
 
     // Find the implementing function.
     self->init_func = NULL;
@@ -78,20 +66,18 @@ CFCPerlConstructor_init(CFCPerlConstructor *self, CFCClass *klass,
     for (size_t i = 0; funcs[i] != NULL; i++) {
         CFCFunction *func = funcs[i];
         const char *func_name = CFCFunction_micro_sym(func);
-        if (strcmp(init_func_name, func_name) == 0) {
+        if (strcmp(initializer, func_name) == 0) {
             self->init_func = (CFCFunction*)CFCBase_incref((CFCBase*)func);
             break;
         }
     }
     if (!self->init_func) {
         CFCUtil_die("Missing or invalid '%s' function for '%s'",
-                    init_func_name, class_name);
+                    initializer, class_name);
     }
     CFCParamList *param_list = CFCFunction_get_param_list(self->init_func);
-    CFCPerlSub_init((CFCPerlSub*)self, param_list, class_name, real_alias,
+    CFCPerlSub_init((CFCPerlSub*)self, param_list, class_name, alias,
                     true);
-    FREEMEM(init_func_name);
-    FREEMEM(real_alias);
     return self;
 }
 

@@ -86,6 +86,13 @@ CFCPerlPod_destroy(CFCPerlPod *self) {
         FREEMEM(self->methods[i].sample);
     }
     FREEMEM(self->methods);
+    for (size_t i = 0; i < self->num_constructors; i++) {
+        FREEMEM(self->constructors[i].alias);
+        FREEMEM(self->constructors[i].pod);
+        FREEMEM(self->constructors[i].func);
+        FREEMEM(self->constructors[i].sample);
+    }
+    FREEMEM(self->constructors);
     CFCBase_destroy((CFCBase*)self);
 }
 

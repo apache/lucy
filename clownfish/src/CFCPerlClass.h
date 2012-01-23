@@ -26,6 +26,8 @@ struct CFCParcel;
 struct CFCClass;
 struct CFCFunction;
 struct CFCPerlPod;
+struct CFCPerlMethod;
+struct CFCPerlConstructor;
 
 CFCPerlClass*
 CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name,
@@ -51,6 +53,23 @@ CFCPerlClass_registry();
 
 void
 CFCPerlClass_clear_registry(void);
+
+void
+CFCPerlClass_bind_method(CFCPerlClass *self, const char *alias,
+                         const char *method);
+
+void
+CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
+                              const char *initializer);
+
+struct CFCPerlMethod**
+CFCPerlClass_method_bindings(CFCPerlClass *self);
+
+struct CFCPerlConstructor**
+CFCPerlClass_constructor_bindings(CFCPerlClass *self);
+
+char*
+CFCPerlClass_create_pod(CFCPerlClass *self);
 
 struct CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self);
