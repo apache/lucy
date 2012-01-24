@@ -26,8 +26,8 @@ sub bind_filter {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "LucyX::Search::FilterMatcher",
-        bind_constructors => ["new"],
     );
+    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -35,8 +35,8 @@ sub bind_mockmatcher {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "LucyX::Search::MockMatcher",
-        bind_constructors => ["_new|init"],
     );
+    $binding->bind_constructor( alias => '_new' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -53,14 +53,14 @@ END_SYNOPSIS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "LucyX::Search::ProximityQuery",
-        bind_methods      => [qw( Get_Field Get_Terms )],
-        bind_constructors => ["new"],
         make_pod          => {
             constructor => { sample => '' },
             synopsis    => $synopsis,
             methods     => [qw( get_field get_terms get_within )],
         },
     );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw( Get_Field Get_Terms );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -68,8 +68,8 @@ sub bind_proximitycompiler {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "LucyX::Search::ProximityCompiler",
-        bind_constructors => ["do_new"],
     );
+    $binding->bind_constructor( alias => 'do_new' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

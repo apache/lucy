@@ -31,19 +31,17 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Highlight::HeatMap",
-        bind_methods => [
-            qw(
-                Calc_Proximity_Boost
-                Generate_Proximity_Boosts
-                Flatten_Spans
-                Get_Spans
-                )
-        ],
-        bind_constructors => ["new"],
         #make_pod          => {
         #    synopsis    => "    # TODO.\n",
         #    constructor => { sample => $constructor },
         #},
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Calc_Proximity_Boost
+        Generate_Proximity_Boosts
+        Flatten_Spans
+        Get_Spans
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -74,27 +72,6 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Highlight::Highlighter",
-        bind_methods => [
-            qw(
-                Highlight
-                Encode
-                Create_Excerpt
-                _find_best_fragment|Find_Best_Fragment
-                _raw_excerpt|Raw_Excerpt
-                _highlight_excerpt|Highlight_Excerpt
-                Find_Sentences
-                Set_Pre_Tag
-                Get_Pre_Tag
-                Set_Post_Tag
-                Get_Post_Tag
-                Get_Searcher
-                Get_Query
-                Get_Compiler
-                Get_Excerpt_Length
-                Get_Field
-                )
-        ],
-        bind_constructors => ["new"],
         make_pod          => {
             synopsis    => $synopsis,
             constructor => { sample => $constructor },
@@ -115,6 +92,34 @@ END_CONSTRUCTOR
                     )
             ]
         },
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Highlight
+        Encode
+        Create_Excerpt
+        Find_Sentences
+        Set_Pre_Tag
+        Get_Pre_Tag
+        Set_Post_Tag
+        Get_Post_Tag
+        Get_Searcher
+        Get_Query
+        Get_Compiler
+        Get_Excerpt_Length
+        Get_Field
+    );
+    $binding->bind_method(
+        alias  => '_find_best_fragment',
+        method => 'Find_Best_Fragment'
+    );
+    $binding->bind_method(
+        alias  => '_raw_excerpt',
+        method => 'Raw_Excerpt'
+    );
+    $binding->bind_method(
+        alias  => '_highlight_excerpt',
+        method => 'Highlight_Excerpt'
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

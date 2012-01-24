@@ -35,7 +35,6 @@ Clownfish::CFC::Class.
         parcel       => 'MyProject' ,                         # required
         class_name   => 'Foo::FooJr',                         # required
         bind_methods => [qw( Do_Stuff _get_foo|Get_Foo )],    # default: undef
-        bind_constructors => [qw( new _new2|init2 )],         # default: undef
         make_pod          => [qw( get_foo )],                 # default: undef
         xs_code           => undef,                           # default: undef
     );
@@ -59,11 +58,6 @@ bindings should be auto-generated, supplied using Clownfish's C<Macro_Name>
 method-naming convention.  The Perl subroutine name will be derived by
 lowercasing C<Method_Name> to C<method_name>, but this can be overridden by
 prepending an alias and a pipe: e.g. C<_get_foo|Get_Foo>.
-
-=item * B<bind_constructors> - An array of constructor names.  The default
-implementing function is the class's C<init> function, unless it is overridden
-using a pipe-separated string: C<_new2|init2> would create a Perl subroutine
-"_new2" which would invoke C<myproj_FooJr_init2>.
 
 =item * B<make_pod> - A specification for generating POD.  TODO: document this
 spec, or break it up into multiple methods.  (For now, just see examples from

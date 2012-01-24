@@ -95,13 +95,13 @@ END_CONSTRUCTOR
         parcel       => "Lucy",
         class_name   => "Lucy::Document::Doc",
         xs_code      => $xs_code,
-        bind_methods => [qw( Set_Doc_ID Get_Doc_ID )],
         make_pod     => {
             methods     => [qw( set_doc_id get_doc_id get_fields )],
             synopsis    => $synopsis,
             constructor => { sample => $constructor },
         }
     );
+    $binding->bind_method( method => $_ ) for qw( Set_Doc_ID Get_Doc_ID );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -156,13 +156,13 @@ END_SYNOPSIS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Document::HitDoc",
-        bind_methods => [qw( Set_Score Get_Score )],
         xs_code      => $xs_code,
         make_pod     => {
             methods  => [qw( set_score get_score )],
             synopsis => $synopsis,
         },
     );
+    $binding->bind_method( method => $_ ) for qw( Set_Score Get_Score );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

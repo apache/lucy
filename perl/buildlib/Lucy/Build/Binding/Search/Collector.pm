@@ -43,13 +43,13 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::Collector::BitCollector",
-        bind_constructors => ["new"],
         make_pod          => {
             synopsis    => $synopsis,
             constructor => { sample => $constructor },
             methods     => [qw( collect )],
         },
     );
+    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -57,8 +57,11 @@ sub bind_sortcollector {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Search::Collector::SortCollector",
-        bind_methods      => [qw( Pop_Match_Docs Get_Total_Hits )],
-        bind_constructors => ["new"],
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Pop_Match_Docs
+        Get_Total_Hits
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

@@ -139,8 +139,8 @@ sub bind_memorypool {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Util::MemoryPool",
-        bind_constructors => ["new"],
     );
+    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -148,17 +148,15 @@ sub bind_priorityqueue {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Util::PriorityQueue",
-        bind_methods => [
-            qw(
-                Less_Than
-                Insert
-                Pop
-                Pop_All
-                Peek
-                Get_Size
-                )
-        ],
-        bind_constructors => ["new"],
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Less_Than
+        Insert
+        Pop
+        Pop_All
+        Peek
+        Get_Size
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -178,18 +176,16 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Util::SortExternal",
         xs_code      => $xs_code,
-        bind_methods => [
-            qw(
-                Flush
-                Flip
-                Add_Run
-                Refill
-                Sort_Cache
-                Cache_Count
-                Clear_Cache
-                Set_Mem_Thresh
-                )
-        ],
+    );
+    $binding->bind_method( method => $_ ) for qw(
+        Flush
+        Flip
+        Add_Run
+        Refill
+        Sort_Cache
+        Cache_Count
+        Clear_Cache
+        Set_Mem_Thresh
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -198,8 +194,8 @@ sub bind_stepper {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Util::Stepper",
-        bind_methods => [qw( Read_Record )],
     );
+    $binding->bind_method( method => $_ ) for qw( Read_Record );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

@@ -49,25 +49,6 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Object::BitVector",
-        bind_methods => [
-            qw( Get
-                Set
-                Clear
-                Clear_All
-                And
-                Or
-                And_Not
-                Xor
-                Flip
-                Flip_Block
-                Next_Hit
-                To_Array
-                Grow
-                Count
-                Get_Capacity
-                )
-        ],
-        bind_constructors => ["new"],
         make_pod          => {
             synopsis    => $synopsis,
             constructor => { sample => $constructor },
@@ -89,6 +70,24 @@ END_CONSTRUCTOR
                     )
             ],
         }
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Get
+        Set
+        Clear
+        Clear_All
+        And
+        Or
+        And_Not
+        Xor
+        Flip
+        Flip_Block
+        Next_Hit
+        To_Array
+        Grow
+        Count
+        Get_Capacity
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -126,13 +125,11 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Object::ByteBuf",
         xs_code      => $xs_code,
-        bind_methods => [
-            qw(
-                Get_Size
-                Get_Capacity
-                Cat
-                )
-        ],
+    );
+    $binding->bind_method( method => $_ ) for qw(
+        Get_Size
+        Get_Capacity
+        Cat
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -227,10 +224,10 @@ END_SYNOPSIS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Object::Err",
-        bind_methods      => [qw( Cat_Mess Get_Mess )],
         make_pod          => { synopsis => $synopsis },
-        bind_constructors => ["_new"],
     );
+    $binding->bind_constructor( alias => '_new' );
+    $binding->bind_method( method => $_ ) for qw( Cat_Mess Get_Mess );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -292,19 +289,17 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Object::Hash",
         xs_code      => $xs_code,
-        bind_methods => [
-            qw(
-                Fetch
-                Delete
-                Keys
-                Values
-                Find_Key
-                Clear
-                Iterate
-                Get_Size
-                )
-        ],
-        bind_constructors => ["new"],
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Fetch
+        Delete
+        Keys
+        Values
+        Find_Key
+        Clear
+        Iterate
+        Get_Size
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -466,8 +461,8 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Object::I32Array",
         xs_code      => $xs_code,
-        bind_methods => [qw( Get Get_Size )],
     );
+    $binding->bind_method( method => $_ ) for qw( Get Get_Size );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -475,9 +470,9 @@ sub bind_lockfreeregistry {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Object::LockFreeRegistry",
-        bind_methods      => [qw( Register Fetch )],
-        bind_constructors => ["new"],
     );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw( Register Fetch );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -502,8 +497,8 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Object::Float32",
         xs_code      => $float32_xs_code,
-        bind_methods => [qw( Set_Value Get_Value )],
     );
+    $binding->bind_method( method => $_ ) for qw( Set_Value Get_Value );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -528,8 +523,8 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Object::Float64",
         xs_code      => $float64_xs_code,
-        bind_methods => [qw( Set_Value Get_Value )],
     );
+    $binding->bind_method( method => $_ ) for qw( Set_Value Get_Value );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -709,27 +704,6 @@ END_DESCRIPTION
         parcel       => "Lucy",
         class_name   => "Lucy::Object::Obj",
         xs_code      => $xs_code,
-        bind_methods => [
-            qw(
-                Get_RefCount
-                Inc_RefCount
-                Dec_RefCount
-                Get_VTable
-                To_String
-                To_I64
-                To_F64
-                Dump
-                _load|Load
-                Clone
-                Mimic
-                Equals
-                Hash_Sum
-                Serialize
-                Deserialize
-                Destroy
-                )
-        ],
-        bind_constructors => ["new"],
         make_pod          => {
             synopsis    => $synopsis,
             description => $description,
@@ -745,6 +719,25 @@ END_DESCRIPTION
             ],
         }
     );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Get_RefCount
+        Inc_RefCount
+        Dec_RefCount
+        Get_VTable
+        To_String
+        To_I64
+        To_F64
+        Dump
+        Clone
+        Mimic
+        Equals
+        Hash_Sum
+        Serialize
+        Deserialize
+        Destroy
+    );
+    $binding->bind_method( alias => '_load', method => 'Load' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -821,17 +814,15 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Object::VArray",
         xs_code      => $xs_code,
-        bind_methods => [
-            qw(
-                Push
-                Push_VArray
-                Unshift
-                Excise
-                Resize
-                Get_Size
-                )
-        ],
-        bind_constructors => ["new"],
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Push
+        Push_VArray
+        Unshift
+        Excise
+        Resize
+        Get_Size
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -886,8 +877,8 @@ END_XS_CODE
         parcel       => "Lucy",
         class_name   => "Lucy::Object::VTable",
         xs_code      => $xs_code,
-        bind_methods => [qw( Get_Name Get_Parent )],
     );
+    $binding->bind_method( method => $_ ) for qw( Get_Name Get_Parent );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

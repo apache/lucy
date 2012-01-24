@@ -81,26 +81,6 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Plan::Architecture",
-        bind_methods => [
-            qw(
-                Index_Interval
-                Skip_Interval
-                Init_Seg_Reader
-                Register_Doc_Writer
-                Register_Doc_Reader
-                Register_Deletions_Writer
-                Register_Deletions_Reader
-                Register_Lexicon_Reader
-                Register_Posting_List_Writer
-                Register_Posting_List_Reader
-                Register_Sort_Writer
-                Register_Sort_Reader
-                Register_Highlight_Writer
-                Register_Highlight_Reader
-                Make_Similarity
-                )
-        ],
-        bind_constructors => ["new"],
         make_pod          => {
             synopsis => $synopsis,
             methods  => [
@@ -111,6 +91,24 @@ END_CONSTRUCTOR
             ],
             constructors => [ { sample => $constructor } ],
         }
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Index_Interval
+        Skip_Interval
+        Init_Seg_Reader
+        Register_Doc_Writer
+        Register_Doc_Reader
+        Register_Deletions_Writer
+        Register_Deletions_Reader
+        Register_Lexicon_Reader
+        Register_Posting_List_Writer
+        Register_Posting_List_Reader
+        Register_Sort_Writer
+        Register_Sort_Reader
+        Register_Highlight_Writer
+        Register_Highlight_Reader
+        Make_Similarity
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -132,12 +130,12 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::BlobType",
-        bind_constructors => ["new"],
         make_pod          => {
             synopsis    => $synopsis,
             constructor => { sample => $constructor },
         },
     );
+    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -156,17 +154,6 @@ END_SYNOPSIS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Plan::FieldType",
-        bind_methods => [
-            qw(
-                Get_Boost
-                Indexed
-                Stored
-                Sortable
-                Binary
-                Compare_Values
-                )
-        ],
-        bind_constructors => ["new|init2"],
         make_pod          => {
             synopsis => $synopis,
             methods  => [
@@ -179,6 +166,15 @@ END_SYNOPSIS
                     )
             ],
         }
+    );
+    $binding->bind_constructor( alias => 'new', initializer => 'init2' );
+    $binding->bind_method( method => $_ ) for qw(
+        Get_Boost
+        Indexed
+        Stored
+        Sortable
+        Binary
+        Compare_Values
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -200,12 +196,12 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Float32Type",
-        bind_constructors => ["new|init2"],
         #make_pod          => {
         #    synopsis    => $synopsis,
         #    constructor => { sample => $constructor },
         #},
     );
+    $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -226,12 +222,12 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Float64Type",
-        bind_constructors => ["new|init2"],
         #make_pod          => {
         #    synopsis    => $synopsis,
         #    constructor => { sample => $constructor },
         #},
     );
+    $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -262,13 +258,6 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::FullTextType",
-        bind_constructors => ["new|init2"],
-        bind_methods      => [
-            qw(
-                Set_Highlightable
-                Highlightable
-                )
-        ],
         make_pod => {
             synopsis    => $synopsis,
             constructor => { sample => $constructor },
@@ -279,6 +268,11 @@ END_CONSTRUCTOR
                     )
             ],
         },
+    );
+    $binding->bind_constructor( alias => 'new', initializer => 'init2' );
+    $binding->bind_method( method => $_ ) for qw(
+        Set_Highlightable
+        Highlightable
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -300,12 +294,12 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Int32Type",
-        bind_constructors => ["new|init2"],
         #make_pod          => {
         #    synopsis    => $synopsis,
         #    constructor => { sample => $constructor },
         #},
     );
+    $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -326,12 +320,12 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::Int64Type",
-        bind_constructors => ["new|init2"],
         #make_pod          => {
         #    synopsis    => $synopsis,
         #    constructor => { sample => $constructor },
         #},
     );
+    $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -359,22 +353,6 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Plan::Schema",
-        bind_methods => [
-            qw(
-                Architecture
-                Get_Architecture
-                Get_Similarity
-                Fetch_Type
-                Fetch_Analyzer
-                Fetch_Sim
-                Num_Fields
-                All_Fields
-                Spec_Field
-                Write
-                Eat
-                )
-        ],
-        bind_constructors => [qw( new )],
         make_pod          => {
             methods => [
                 qw(
@@ -391,6 +369,20 @@ END_CONSTRUCTOR
             synopsis     => $synopsis,
             constructors => [ { sample => $constructor } ],
         },
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw(
+        Architecture
+        Get_Architecture
+        Get_Similarity
+        Fetch_Type
+        Fetch_Analyzer
+        Fetch_Sim
+        Num_Fields
+        All_Fields
+        Spec_Field
+        Write
+        Eat
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -414,12 +406,12 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Plan::StringType",
-        bind_constructors => ["new|init2"],
         make_pod          => {
             synopsis    => $synopsis,
             constructor => { sample => $constructor },
         },
     );
+    $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

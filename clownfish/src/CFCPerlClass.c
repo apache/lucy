@@ -173,17 +173,27 @@ CFCPerlClass_bind_method(CFCPerlClass *self, const char *alias,
     self->meth_aliases[self->num_methods] = (char*)CFCUtil_strdup(alias);
     self->meth_names[self->num_methods]   = (char*)CFCUtil_strdup(method);
     self->num_methods++;
+    if (!self->client) {
+        CFCUtil_die("Can't bind_method %s -- can't find client for %s",
+                    alias, self->class_name);
+    }
 }
 
 void
 CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
                               const char *initializer) {
+    alias       = alias       ? alias       : "new";
+    initializer = initializer ? initializer : "init";
     size_t size = (self->num_cons + 1) * sizeof(char*);
     self->cons_aliases = (char**)REALLOCATE(self->cons_aliases, size);
     self->cons_inits   = (char**)REALLOCATE(self->cons_inits,   size);
     self->cons_aliases[self->num_cons] = (char*)CFCUtil_strdup(alias);
     self->cons_inits[self->num_cons]   = (char*)CFCUtil_strdup(initializer);
     self->num_cons++;
+    if (!self->client) {
+        CFCUtil_die("Can't bind_constructor %s -- can't find client for %s",
+                    alias, self->class_name);
+    }
 }
 
 CFCPerlMethod**

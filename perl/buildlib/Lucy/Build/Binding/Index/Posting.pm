@@ -35,12 +35,12 @@ END_SYNOPSIS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::Posting::MatchPosting",
-        bind_constructors => ["new"],
-        bind_methods      => [qw( Get_Freq )],
         #    make_pod => {
         #        synopsis => $synopsis,
         #    }
     );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_ ) for qw( Get_Freq );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -58,11 +58,11 @@ END_SYNOPSIS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::Posting::RichPosting",
-        bind_constructors => ["new"],
         #    make_pod => {
         #        synopsis => $synopsis,
         #    }
     );
+    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -104,11 +104,11 @@ END_SYNOPSIS
         parcel            => "Lucy",
         class_name        => "Lucy::Index::Posting::ScorePosting",
         xs_code           => $xs_code,
-        bind_constructors => ["new"],
         #    make_pod => {
         #        synopsis => $synopsis,
         #    }
     );
+    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

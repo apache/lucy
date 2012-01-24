@@ -67,9 +67,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Test::Util::BBSortEx",
-        bind_constructors => ["new"],
         xs_code           => $xs_code,
     );
+    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

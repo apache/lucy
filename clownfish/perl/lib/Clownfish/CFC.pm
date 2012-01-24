@@ -637,8 +637,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     our %new_PARAMS = (
         parcel            => undef,
         class_name        => undef,
-        bind_methods      => undef,
-        bind_constructors => undef,
         make_pod          => undef,
         xs_code           => undef,
         client            => undef,
@@ -653,19 +651,11 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         confess("Missing required param 'class_name'")
             unless $args{class_name};
 
-        # Retrieve Clownfish::CFC::Class client, if it will be needed.
-        my $client;
-        if (   $args{bind_methods}
-            || $args{bind_constructors}
-            || $args{make_pod} )
-        {
-            $args{client} = Clownfish::CFC::Class->fetch_singleton(
-                parcel     => $args{parcel},
-                class_name => $args{class_name},
-            );
-            confess("Can't fetch singleton for $args{class_name}")
-                unless $args{client};
-        }
+        # Retrieve Clownfish::CFC::Class client, if available.
+        $args{client} ||= Clownfish::CFC::Class->fetch_singleton(
+            parcel     => $args{parcel},
+            class_name => $args{class_name},
+        );
 
         # Create Pod spec if needed.
         my $pod_spec;
@@ -674,32 +664,8 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
                 %{ $args{make_pod} } );
         }
 
-        # Create object.
-        my $self = _new( @args{qw( parcel class_name client xs_code )},
+        return _new( @args{qw( parcel class_name client xs_code )},
             $pod_spec );
-
-        my $meth_list = $args{bind_methods} || [];
-        for my $meth_namespec (@$meth_list) {
-            my ( $alias, $name )
-                = $meth_namespec =~ /^(.*?)\|(.*)$/
-                ? ( $1, $2 )
-                : ( lc($meth_namespec), $meth_namespec );
-            $self->bind_method( alias => $alias, method => $name );
-        }
-
-        my $cons_list = $args{bind_constructors} || [];
-        for my $cons_namespec (@$cons_list) {
-            my ( $alias, $initializer )
-                = $cons_namespec =~ /^(.*?)\|(.*)$/
-                ? ( $1, $2 )
-                : ( $cons_namespec, undef );
-            $self->bind_constructor(
-                alias       => $alias,
-                initializer => $initializer,
-            );
-        }
-
-        return $self;
     }
 
     our %bind_method_PARAMS = (
