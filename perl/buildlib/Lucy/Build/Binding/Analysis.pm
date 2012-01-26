@@ -140,9 +140,9 @@ OUTPUT: RETVAL
 END_XS
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Analysis::Inversion",
-        xs_code      => $xs,
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::Inversion",
+        xs_code    => $xs,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
@@ -413,7 +413,7 @@ END_XS
         xs_code    => $xs,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
-    
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

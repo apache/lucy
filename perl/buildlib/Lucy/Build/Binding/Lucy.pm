@@ -336,8 +336,8 @@ END_XS_CODE
 
 sub bind_testschema {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Test::TestSchema",
+        parcel     => "Lucy",
+        class_name => "Lucy::Test::TestSchema",
     );
     $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);

@@ -24,7 +24,7 @@ sub bind_all {
 
 sub bind_devguide {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+    my $binding  = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Docs::DevGuide",
     );

@@ -140,8 +140,8 @@ END_XS_CODE
 
 sub bind_memorypool {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Util::MemoryPool",
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::MemoryPool",
     );
     $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -158,8 +158,8 @@ sub bind_priorityqueue {
     );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Util::PriorityQueue",
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::PriorityQueue",
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -190,9 +190,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Util::SortExternal",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::SortExternal",
+        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
@@ -203,8 +203,8 @@ sub bind_stepper {
     my @bound = qw( Read_Record );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Util::Stepper",
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::Stepper",
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 

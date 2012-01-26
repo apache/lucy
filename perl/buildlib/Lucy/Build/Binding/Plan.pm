@@ -104,8 +104,8 @@ END_CONSTRUCTOR
     $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Plan::Architecture",
+        parcel     => "Lucy",
+        class_name => "Lucy::Plan::Architecture",
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -176,8 +176,8 @@ END_SYNOPSIS
 
 sub bind_float32type {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Plan::Float32Type",
+        parcel     => "Lucy",
+        class_name => "Lucy::Plan::Float32Type",
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -185,8 +185,8 @@ sub bind_float32type {
 
 sub bind_float64type {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Plan::Float64Type",
+        parcel     => "Lucy",
+        class_name => "Lucy::Plan::Float64Type",
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -238,8 +238,8 @@ END_CONSTRUCTOR
 
 sub bind_int32type {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Plan::Int32Type",
+        parcel     => "Lucy",
+        class_name => "Lucy::Plan::Int32Type",
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -247,8 +247,8 @@ sub bind_int32type {
 
 sub bind_int64type {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Plan::Int64Type",
+        parcel     => "Lucy",
+        class_name => "Lucy::Plan::Int64Type",
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);

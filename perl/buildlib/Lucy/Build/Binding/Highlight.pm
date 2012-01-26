@@ -30,7 +30,7 @@ sub bind_heatmap {
         Get_Spans
     );
 
-    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
     my $heat_map = Lucy::Highlight::HeatMap->new(
         spans  => \@highlight_spans,
@@ -93,8 +93,8 @@ END_CONSTRUCTOR
     $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Highlight::Highlighter",
+        parcel     => "Lucy",
+        class_name => "Lucy::Highlight::Highlighter",
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_ ) for @bound;

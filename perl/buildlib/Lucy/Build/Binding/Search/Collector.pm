@@ -48,8 +48,8 @@ END_CONSTRUCTOR
     $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Search::Collector::BitCollector",
+        parcel     => "Lucy",
+        class_name => "Lucy::Search::Collector::BitCollector",
     );
     $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
@@ -61,11 +61,11 @@ sub bind_sortcollector {
     my @bound = qw( Pop_Match_Docs Get_Total_Hits );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Search::Collector::SortCollector",
+        parcel     => "Lucy",
+        class_name => "Lucy::Search::Collector::SortCollector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound; 
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

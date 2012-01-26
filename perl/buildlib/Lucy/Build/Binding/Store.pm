@@ -36,8 +36,8 @@ sub bind_all {
 
 sub bind_fsfilehandle {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::FSFileHandle",
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::FSFileHandle",
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -55,8 +55,8 @@ END_SYNOPSIS
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::FSFolder",
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::FSFolder",
     );
     $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
@@ -121,9 +121,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::FileHandle",
-        xs_code           => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::FileHandle",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -237,9 +237,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Store::InStream",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::InStream",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -300,8 +300,8 @@ END_CONSTRUCTOR
 
 sub bind_lockfilelock {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::LockFileLock",
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::LockFileLock",
     );
     $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -309,8 +309,8 @@ sub bind_lockfilelock {
 
 sub bind_sharedlock {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::SharedLock",
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::SharedLock",
     );
     $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -438,9 +438,9 @@ PPCODE:
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Store::OutStream",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::OutStream",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -452,8 +452,8 @@ sub bind_ramfile {
     my @bound = qw( Get_Contents );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::RAMFile",
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::RAMFile",
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -465,8 +465,8 @@ sub bind_ramfilehandle {
     my @bound = qw( Get_File );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::RAMFileHandle",
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::RAMFileHandle",
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;

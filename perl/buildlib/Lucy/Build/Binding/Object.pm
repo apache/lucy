@@ -71,11 +71,11 @@ END_CONSTRUCTOR
     $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::BitVector",
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::BitVector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound; 
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -117,9 +117,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::ByteBuf",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::ByteBuf",
+        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
@@ -295,9 +295,9 @@ PPCODE:
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::Hash",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::Hash",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -461,9 +461,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::I32Array",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::I32Array",
+        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
@@ -474,8 +474,8 @@ sub bind_lockfreeregistry {
     my @bound = qw( Register Fetch );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Object::LockFreeRegistry",
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::LockFreeRegistry",
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -503,9 +503,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::Float32",
-        xs_code      => $float32_xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::Float32",
+        xs_code    => $float32_xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
@@ -532,9 +532,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::Float64",
-        xs_code      => $float64_xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::Float64",
+        xs_code    => $float64_xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
@@ -835,9 +835,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::VArray",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::VArray",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
@@ -894,9 +894,9 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::VTable",
-        xs_code      => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::VTable",
+        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 

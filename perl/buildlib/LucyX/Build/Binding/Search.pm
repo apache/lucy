@@ -26,8 +26,8 @@ sub bind_all {
 
 sub bind_filter {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "LucyX::Search::FilterMatcher",
+        parcel     => "Lucy",
+        class_name => "LucyX::Search::FilterMatcher",
     );
     $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -35,8 +35,8 @@ sub bind_filter {
 
 sub bind_mockmatcher {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "LucyX::Search::MockMatcher",
+        parcel     => "Lucy",
+        class_name => "LucyX::Search::MockMatcher",
     );
     $binding->bind_constructor( alias => '_new' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -72,8 +72,8 @@ END_SYNOPSIS
 
 sub bind_proximitycompiler {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "LucyX::Search::ProximityCompiler",
+        parcel     => "Lucy",
+        class_name => "LucyX::Search::ProximityCompiler",
     );
     $binding->bind_constructor( alias => 'do_new' );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
