@@ -72,6 +72,7 @@ END_XS_CODE
         xs_code           => $xs_code,
     );
     $binding->bind_constructor;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

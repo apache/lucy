@@ -32,17 +32,24 @@ sub bind_all {
 }
 
 sub bind_analyzer {
+    my @bound = qw( Transform Transform_Text Split );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    $pod_spec->set_synopsis("    # Abstract base class.\n");
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::Analyzer",
-        make_pod          => { synopsis => "    # Abstract base class.\n", }
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::Analyzer",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Transform Transform_Text Split );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_casefolder {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $case_folder = Lucy::Analysis::CaseFolder->new;
 
@@ -50,24 +57,24 @@ sub bind_casefolder {
         analyzers => [ $case_folder, $tokenizer, $stemmer ],
     );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $case_folder = Lucy::Analysis::CaseFolder->new;
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::CaseFolder",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::CaseFolder",
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_easyanalyzer {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $schema = Lucy::Plan::Schema->new;
     my $analyzer = Lucy::Analysis::EasyAnalyzer->new(
@@ -79,26 +86,27 @@ sub bind_easyanalyzer {
     $schema->spec_field( name => 'title',   type => $type );
     $schema->spec_field( name => 'content', type => $type );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $analyzer = Lucy::Analysis::EasyAnalyzer->new(
         language  => 'es',
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::EasyAnalyzer",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::EasyAnalyzer",
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_inversion {
+    my @bound = qw( Append Reset Invert Next );
+
     my $xs = <<'END_XS';
 MODULE = Lucy   PACKAGE = Lucy::Analysis::Inversion
 
@@ -136,11 +144,13 @@ END_XS
         class_name   => "Lucy::Analysis::Inversion",
         xs_code      => $xs,
     );
-    $binding->bind_method( method => $_ ) for qw( Append Reset Invert Next );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_normalizer {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $normalizer = Lucy::Analysis::Normalizer->new;
     
@@ -148,7 +158,6 @@ sub bind_normalizer {
         analyzers => [ $normalizer, $tokenizer, $stemmer ],
     );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $normalizer = Lucy::Analysis::Normalizer->new(
         normalization_form => 'NFKC',
@@ -156,20 +165,24 @@ END_SYNOPSIS
         strip_accents      => 0,
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::Normalizer",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor }
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::Normalizer",
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_polyanalyzer {
+    my @exposed = qw( Get_Analyzers );
+    my @bound   = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $schema = Lucy::Plan::Schema->new;
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
@@ -181,7 +194,6 @@ sub bind_polyanalyzer {
     $schema->spec_field( name => 'title',   type => $type );
     $schema->spec_field( name => 'content', type => $type );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
         language  => 'es',
@@ -195,22 +207,23 @@ END_SYNOPSIS
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $whitespace_tokenizer, $stemmer, ], );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::PolyAnalyzer",
-        make_pod          => {
-            methods     => [qw( get_analyzers )],
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::PolyAnalyzer",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Get_Analyzers );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_regextokenizer {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $whitespace_tokenizer
         = Lucy::Analysis::RegexTokenizer->new( pattern => '\S+' );
@@ -226,26 +239,26 @@ sub bind_regextokenizer {
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $word_char_tokenizer, $stemmer ], );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $word_char_tokenizer = Lucy::Analysis::RegexTokenizer->new(
         pattern => '\w+',    # required
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::RegexTokenizer",
-        make_pod          => {
-            constructor => { sample => $constructor },
-            synopsis    => $synopsis,
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::RegexTokenizer",
     );
     $binding->bind_constructor( alias => '_new' );
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_snowballstemmer {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $stemmer = Lucy::Analysis::SnowballStemmer->new( language => 'es' );
     
@@ -256,24 +269,24 @@ sub bind_snowballstemmer {
 This class is a wrapper around the Snowball stemming library, so it supports
 the same languages.  
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $stemmer = Lucy::Analysis::SnowballStemmer->new( language => 'es' );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::SnowballStemmer",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor }
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::SnowballStemmer",
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_snowballstopfilter {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $stopfilter = Lucy::Analysis::SnowballStopFilter->new(
         language => 'fr',
@@ -282,7 +295,6 @@ sub bind_snowballstopfilter {
         analyzers => [ $case_folder, $tokenizer, $stopfilter, $stemmer ],
     );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $stopfilter = Lucy::Analysis::SnowballStopFilter->new(
         language => 'de',
@@ -293,20 +305,21 @@ END_SYNOPSIS
         stoplist => \%stoplist,
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::SnowballStopFilter",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor }
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::SnowballStopFilter",
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_standardtokenizer {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
 
@@ -314,24 +327,30 @@ sub bind_standardtokenizer {
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
         analyzers => [ $case_folder, $tokenizer, $stemmer ], );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Analysis::StandardTokenizer",
-        make_pod          => {
-            constructor => { sample => $constructor },
-            synopsis    => $synopsis,
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::StandardTokenizer",
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_token {
+    my @bound = qw(
+        Get_Start_Offset
+        Get_End_Offset
+        Get_Boost
+        Get_Pos_Inc
+    );
+
     my $xs = <<'END_XS';
 MODULE = Lucy    PACKAGE = Lucy::Analysis::Token
 
@@ -389,16 +408,12 @@ PPCODE:
 END_XS
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Analysis::Token",
-        xs_code => $xs,
+        parcel     => "Lucy",
+        class_name => "Lucy::Analysis::Token",
+        xs_code    => $xs,
     );
-    $binding->bind_method( method => $_ ) for qw(
-        Get_Start_Offset
-        Get_End_Offset
-        Get_Boost
-        Get_Pos_Inc
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

@@ -24,47 +24,25 @@ sub bind_all {
 }
 
 sub bind_matchposting {
-    my $synopsis = <<'END_SYNOPSIS';
-    # MatchPosting is used indirectly, by specifying in FieldType subclass.
-    package MySchema::Category;
-    use base qw( Lucy::Plan::FullTextType );
-    sub posting {
-        my $self = shift;
-        return Lucy::Index::Posting::MatchPosting->new(@_);
-    }
-END_SYNOPSIS
+    my @bound = qw( Get_Freq );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::Posting::MatchPosting",
-        #    make_pod => {
-        #        synopsis => $synopsis,
-        #    }
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Posting::MatchPosting",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Get_Freq );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_richposting {
-    my $synopsis = <<'END_SYNOPSIS';
-    # RichPosting is used indirectly, by specifying in FieldType subclass.
-    package MySchema::Category;
-    use base qw( Lucy::Plan::FullTextType );
-    sub posting {
-        my $self = shift;
-        return Lucy::Index::Posting::RichPosting->new(@_);
-    }
-END_SYNOPSIS
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::Posting::RichPosting",
-        #    make_pod => {
-        #        synopsis => $synopsis,
-        #    }
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Posting::RichPosting",
     );
     $binding->bind_constructor;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -91,26 +69,13 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';
-    # ScorePosting is used indirectly, by specifying in FieldType subclass.
-    package MySchema::Category;
-    use base qw( Lucy::Plan::FullTextType );
-    # (It's the default, so you don't need to spec it.)
-    # sub posting {
-    #     my $self = shift;
-    #     return Lucy::Index::Posting::ScorePosting->new(@_);
-    # }
-END_SYNOPSIS
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::Posting::ScorePosting",
-        xs_code           => $xs_code,
-        #    make_pod => {
-        #        synopsis => $synopsis,
-        #    }
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Posting::ScorePosting",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

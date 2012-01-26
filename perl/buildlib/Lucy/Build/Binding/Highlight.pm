@@ -23,32 +23,51 @@ sub bind_all {
 }
 
 sub bind_heatmap {
+    my @bound = qw(
+        Calc_Proximity_Boost
+        Generate_Proximity_Boosts
+        Flatten_Spans
+        Get_Spans
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
     my $heat_map = Lucy::Highlight::HeatMap->new(
         spans  => \@highlight_spans,
         window => 100,
     );
 END_CONSTRUCTOR
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Highlight::HeatMap",
-        #make_pod          => {
-        #    synopsis    => "    # TODO.\n",
-        #    constructor => { sample => $constructor },
-        #},
+        parcel     => "Lucy",
+        class_name => "Lucy::Highlight::HeatMap",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Calc_Proximity_Boost
-        Generate_Proximity_Boosts
-        Flatten_Spans
-        Get_Spans
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    #$binding->set_pod_spec($pod_spec); TODO
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_highlighter {
+    my @exposed = qw(
+        Create_Excerpt
+        Highlight
+        Encode
+        Set_Pre_Tag
+        Get_Pre_Tag
+        Set_Post_Tag
+        Get_Post_Tag
+        Get_Searcher
+        Get_Query
+        Get_Compiler
+        Get_Excerpt_Length
+        Get_Field
+    );
+    my @bound = ( @exposed, 'Find_Sentences' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $highlighter = Lucy::Highlight::Highlighter->new(
         searcher => $searcher,
@@ -61,7 +80,6 @@ sub bind_highlighter {
         ...
     }
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $highlighter = Lucy::Highlight::Highlighter->new(
         searcher       => $searcher,    # required
@@ -70,47 +88,16 @@ END_SYNOPSIS
         excerpt_length => 150,          # default: 200
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Highlight::Highlighter",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-            methods     => [
-                qw(
-                    create_excerpt
-                    highlight
-                    encode
-                    set_pre_tag
-                    get_pre_tag
-                    set_post_tag
-                    get_post_tag
-                    get_searcher
-                    get_query
-                    get_compiler
-                    get_excerpt_length
-                    get_field
-                    )
-            ]
-        },
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Highlight
-        Encode
-        Create_Excerpt
-        Find_Sentences
-        Set_Pre_Tag
-        Get_Pre_Tag
-        Set_Post_Tag
-        Get_Post_Tag
-        Get_Searcher
-        Get_Query
-        Get_Compiler
-        Get_Excerpt_Length
-        Get_Field
-    );
+    $binding->bind_method( method => $_ ) for @bound;
     $binding->bind_method(
         alias  => '_find_best_fragment',
         method => 'Find_Best_Fragment'
@@ -123,6 +110,8 @@ END_CONSTRUCTOR
         alias  => '_highlight_excerpt',
         method => 'Highlight_Excerpt'
     );
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

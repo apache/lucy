@@ -34,47 +34,7 @@ sub bind_all {
 }
 
 sub bind_bitvector {
-    my $synopsis = <<'END_SYNOPSIS';
-    my $bit_vec = Lucy::Object::BitVector->new( capacity => 8 );
-    my $other   = Lucy::Object::BitVector->new( capacity => 8 );
-    $bit_vec->set($_) for ( 0, 2, 4, 6 );
-    $other->set($_)   for ( 1, 3, 5, 7 );
-    $bit_vec->or($other);
-    print "$_\n" for @{ $bit_vec->to_array };    # prints 0 through 7.
-END_SYNOPSIS
-    my $constructor = <<'END_CONSTRUCTOR';
-    my $bit_vec = Lucy::Object::BitVector->new( 
-        capacity => $doc_max + 1,   # default 0,
-    );
-END_CONSTRUCTOR
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::BitVector",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-            methods     => [
-                qw( get
-                    set
-                    clear
-                    clear_all
-                    and
-                    or
-                    and_not
-                    xor
-                    flip
-                    flip_block
-                    next_hit
-                    to_array
-                    grow
-                    count
-                    )
-            ],
-        }
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @exposed = qw(
         Get
         Set
         Clear
@@ -89,12 +49,45 @@ END_CONSTRUCTOR
         To_Array
         Grow
         Count
-        Get_Capacity
     );
+    my @bound = ( @exposed, qw( Get_Capacity ) );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    my $bit_vec = Lucy::Object::BitVector->new( capacity => 8 );
+    my $other   = Lucy::Object::BitVector->new( capacity => 8 );
+    $bit_vec->set($_) for ( 0, 2, 4, 6 );
+    $other->set($_)   for ( 1, 3, 5, 7 );
+    $bit_vec->or($other);
+    print "$_\n" for @{ $bit_vec->to_array };    # prints 0 through 7.
+END_SYNOPSIS
+    my $constructor = <<'END_CONSTRUCTOR';
+    my $bit_vec = Lucy::Object::BitVector->new( 
+        capacity => $doc_max + 1,   # default 0,
+    );
+END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Object::BitVector",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound; 
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_bytebuf {
+    my @bound = qw(
+        Get_Size
+        Get_Capacity
+        Cat
+    );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Object::ByteBuf
 
@@ -128,11 +121,8 @@ END_XS_CODE
         class_name   => "Lucy::Object::ByteBuf",
         xs_code      => $xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw(
-        Get_Size
-        Get_Capacity
-        Cat
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -201,10 +191,14 @@ END_XS_CODE
         class_name => "Lucy::Object::CharBuf",
         xs_code    => $xs_code,
     );
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_err {
+    my @bound = qw( Cat_Mess Get_Mess );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Scalar::Util qw( blessed );
     my $bg_merger;
@@ -222,18 +216,31 @@ sub bind_err {
         }
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Object::Err",
-        make_pod          => { synopsis => $synopsis },
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::Err",
     );
     $binding->bind_constructor( alias => '_new' );
-    $binding->bind_method( method => $_ ) for qw( Cat_Mess Get_Mess );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_hash {
+    my @bound = qw(
+        Fetch
+        Delete
+        Keys
+        Values
+        Find_Key
+        Clear
+        Iterate
+        Get_Size
+    );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE =  Lucy    PACKAGE = Lucy::Object::Hash
 
@@ -293,16 +300,8 @@ END_XS_CODE
         xs_code      => $xs_code,
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Fetch
-        Delete
-        Keys
-        Values
-        Find_Key
-        Clear
-        Iterate
-        Get_Size
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -393,6 +392,8 @@ END_XS_CODE
 }
 
 sub bind_i32array {
+    my @bound = qw( Get Get_Size );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy PACKAGE = Lucy::Object::I32Array
 
@@ -464,21 +465,27 @@ END_XS_CODE
         class_name   => "Lucy::Object::I32Array",
         xs_code      => $xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw( Get Get_Size );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lockfreeregistry {
+    my @bound = qw( Register Fetch );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Object::LockFreeRegistry",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Register Fetch );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_float32 {
+    my @bound = qw( Set_Value Get_Value );
+
     my $float32_xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::Float32
 
@@ -500,11 +507,14 @@ END_XS_CODE
         class_name   => "Lucy::Object::Float32",
         xs_code      => $float32_xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw( Set_Value Get_Value );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_float64 {
+    my @bound = qw( Set_Value Get_Value );
+
     my $float64_xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::Float64
 
@@ -526,11 +536,126 @@ END_XS_CODE
         class_name   => "Lucy::Object::Float64",
         xs_code      => $float64_xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw( Set_Value Get_Value );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_obj {
+    my @bound = qw(
+        Get_RefCount
+        Inc_RefCount
+        Dec_RefCount
+        Get_VTable
+        To_String
+        To_I64
+        To_F64
+        Dump
+        Clone
+        Mimic
+        Equals
+        Hash_Sum
+        Serialize
+        Deserialize
+        Destroy
+    );
+
+    my @exposed = qw(
+        To_String
+        To_I64
+        To_F64
+        Equals
+        Dump
+        Load
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    package MyObj;
+    use base qw( Lucy::Object::Obj );
+    
+    # Inside-out member var.
+    my %foo;
+    
+    sub new {
+        my ( $class, %args ) = @_;
+        my $foo = delete $args{foo};
+        my $self = $class->SUPER::new(%args);
+        $foo{$$self} = $foo;
+        return $self;
+    }
+    
+    sub get_foo {
+        my $self = shift;
+        return $foo{$$self};
+    }
+    
+    sub DESTROY {
+        my $self = shift;
+        delete $foo{$$self};
+        $self->SUPER::DESTROY;
+    }
+END_SYNOPSIS
+    my $description = <<'END_DESCRIPTION';
+All objects in the Lucy:: hierarchy descend from
+Lucy::Object::Obj.  All classes are implemented as blessed scalar
+references, with the scalar storing a pointer to a C struct.
+
+=head2 Subclassing
+
+The recommended way to subclass Lucy::Object::Obj and its descendants is
+to use the inside-out design pattern.  (See L<Class::InsideOut> for an
+introduction to inside-out techniques.)
+
+Since the blessed scalar stores a C pointer value which is unique per-object,
+C<$$self> can be used as an inside-out ID.
+
+    # Accessor for 'foo' member variable.
+    sub get_foo {
+        my $self = shift;
+        return $foo{$$self};
+    }
+
+
+Caveats:
+
+=over
+
+=item *
+
+Inside-out aficionados will have noted that the "cached scalar id" stratagem
+recommended above isn't compatible with ithreads -- but Lucy doesn't
+support ithreads anyway, so it doesn't matter.
+
+=item *
+
+Overridden methods must not return undef unless the API specifies that
+returning undef is permissible.  (Failure to adhere to this rule currently
+results in a segfault rather than an exception.)
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new()
+
+Abstract constructor -- must be invoked via a subclass.  Attempting to
+instantiate objects of class "Lucy::Object::Obj" directly causes an
+error.
+
+Takes no arguments; if any are supplied, an error will be reported.
+
+=head1 DESTRUCTOR
+
+=head2 DESTROY
+
+All Lucy classes implement a DESTROY method; if you override it in a
+subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.
+END_DESCRIPTION
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->set_description($description);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Object::Obj
 
@@ -618,132 +743,29 @@ PPCODE:
 }
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';
-    package MyObj;
-    use base qw( Lucy::Object::Obj );
-    
-    # Inside-out member var.
-    my %foo;
-    
-    sub new {
-        my ( $class, %args ) = @_;
-        my $foo = delete $args{foo};
-        my $self = $class->SUPER::new(%args);
-        $foo{$$self} = $foo;
-        return $self;
-    }
-    
-    sub get_foo {
-        my $self = shift;
-        return $foo{$$self};
-    }
-    
-    sub DESTROY {
-        my $self = shift;
-        delete $foo{$$self};
-        $self->SUPER::DESTROY;
-    }
-END_SYNOPSIS
-
-    my $description = <<'END_DESCRIPTION';
-All objects in the Lucy:: hierarchy descend from
-Lucy::Object::Obj.  All classes are implemented as blessed scalar
-references, with the scalar storing a pointer to a C struct.
-
-=head2 Subclassing
-
-The recommended way to subclass Lucy::Object::Obj and its descendants is
-to use the inside-out design pattern.  (See L<Class::InsideOut> for an
-introduction to inside-out techniques.)
-
-Since the blessed scalar stores a C pointer value which is unique per-object,
-C<$$self> can be used as an inside-out ID.
-
-    # Accessor for 'foo' member variable.
-    sub get_foo {
-        my $self = shift;
-        return $foo{$$self};
-    }
-
-
-Caveats:
-
-=over
-
-=item *
-
-Inside-out aficionados will have noted that the "cached scalar id" stratagem
-recommended above isn't compatible with ithreads -- but Lucy doesn't
-support ithreads anyway, so it doesn't matter.
-
-=item *
-
-Overridden methods must not return undef unless the API specifies that
-returning undef is permissible.  (Failure to adhere to this rule currently
-results in a segfault rather than an exception.)
-
-=back
-
-=head1 CONSTRUCTOR
-
-=head2 new()
-
-Abstract constructor -- must be invoked via a subclass.  Attempting to
-instantiate objects of class "Lucy::Object::Obj" directly causes an
-error.
-
-Takes no arguments; if any are supplied, an error will be reported.
-
-=head1 DESTRUCTOR
-
-=head2 DESTROY
-
-All Lucy classes implement a DESTROY method; if you override it in a
-subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.
-END_DESCRIPTION
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Object::Obj",
-        xs_code      => $xs_code,
-        make_pod          => {
-            synopsis    => $synopsis,
-            description => $description,
-            methods     => [
-                qw(
-                    to_string
-                    to_i64
-                    to_f64
-                    equals
-                    dump
-                    load
-                    )
-            ],
-        }
+        parcel     => "Lucy",
+        class_name => "Lucy::Object::Obj",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Get_RefCount
-        Inc_RefCount
-        Dec_RefCount
-        Get_VTable
-        To_String
-        To_I64
-        To_F64
-        Dump
-        Clone
-        Mimic
-        Equals
-        Hash_Sum
-        Serialize
-        Deserialize
-        Destroy
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method( alias => '_load', method => 'Load' );
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_varray {
+    my @bound = qw(
+        Push
+        Push_VArray
+        Unshift
+        Excise
+        Resize
+        Get_Size
+    );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::VArray
 
@@ -818,18 +840,14 @@ END_XS_CODE
         xs_code      => $xs_code,
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Push
-        Push_VArray
-        Unshift
-        Excise
-        Resize
-        Get_Size
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_vtable {
+    my @bound = qw( Get_Name Get_Parent );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::VTable
 
@@ -880,7 +898,8 @@ END_XS_CODE
         class_name   => "Lucy::Object::VTable",
         xs_code      => $xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw( Get_Name Get_Parent );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

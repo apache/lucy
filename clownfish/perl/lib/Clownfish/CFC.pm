@@ -635,11 +635,9 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     use Clownfish::CFC::Util qw( verify_args );
 
     our %new_PARAMS = (
-        parcel            => undef,
-        class_name        => undef,
-        make_pod          => undef,
-        xs_code           => undef,
-        client            => undef,
+        parcel     => undef,
+        class_name => undef,
+        xs_code    => undef,
     );
 
     sub new {
@@ -657,15 +655,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
             class_name => $args{class_name},
         );
 
-        # Create Pod spec if needed.
-        my $pod_spec;
-        if ( $args{make_pod} ) {
-            $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new(
-                %{ $args{make_pod} } );
-        }
-
-        return _new( @args{qw( parcel class_name client xs_code )},
-            $pod_spec );
+        return _new( @args{qw( parcel class_name client xs_code )} );
     }
 
     our %bind_method_PARAMS = (
@@ -733,48 +723,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
     use Clownfish::CFC::Util qw( verify_args );
     use Carp;
-
-    our %new_PARAMS = (
-        description  => undef,
-        synopsis     => undef,
-        constructor  => undef,
-        constructors => undef,
-        methods      => undef,
-    );
-
-    sub new {
-        my ( $either, %args ) = @_;
-        verify_args( \%new_PARAMS, %args ) or confess $@;
-        my $synopsis     = $args{synopsis}     || '';
-        my $description  = $args{description}  || '';
-        my $methods      = $args{methods}      || [];
-        my $constructors = $args{constructors} || [];
-        push @$constructors, $args{constructor} if $args{constructor};
-        my $self = _new( $synopsis, $description );
-
-        for my $meth (@$methods) {
-            if ( ref($meth) ) {
-                $self->add_method(
-                    alias => $meth->{alias} || $meth->{name},
-                    method => $meth->{method},
-                    sample => $meth->{sample},
-                    pod    => $meth->{pod},
-                );
-            }
-            else {
-                $self->add_method( alias => $meth );
-            }
-        }
-        for my $con (@$constructors) {
-            $self->add_constructor(
-                alias       => $con->{alias}       || $con->{name},
-                initializer => $con->{initializer} || $con->{func},
-                sample      => $con->{sample},
-                pod         => $con->{pod},
-            );
-        }
-        return $self;
-    }
 
     my %add_method_PARAMS = (
         alias  => undef,

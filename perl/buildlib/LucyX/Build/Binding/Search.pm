@@ -43,6 +43,10 @@ sub bind_mockmatcher {
 }
 
 sub bind_proximityquery {
+    my @exposed = qw( Get_Field Get_Terms Get_Within );
+    my @bound   = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $proximity_query = LucyX::Search::ProximityQuery->new( 
         field  => 'content',
@@ -51,18 +55,18 @@ sub bind_proximityquery {
     );
     my $hits = $searcher->hits( query => $proximity_query );
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new' );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "LucyX::Search::ProximityQuery",
-        make_pod          => {
-            constructor => { sample => '' },
-            synopsis    => $synopsis,
-            methods     => [qw( get_field get_terms get_within )],
-        },
+        parcel     => "Lucy",
+        class_name => "LucyX::Search::ProximityQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Get_Field Get_Terms );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

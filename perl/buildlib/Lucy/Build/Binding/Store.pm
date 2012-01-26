@@ -44,27 +44,29 @@ sub bind_fsfilehandle {
 }
 
 sub bind_fsfolder {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $folder = Lucy::Store::FSFolder->new(
-        path   => '/path/to/folder',
+        path => '/path/to/folder',
     );
 END_SYNOPSIS
-
     my $constructor = $synopsis;
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::FSFolder",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        },
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_filehandle {
+    my @bound = qw( Length Close );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Store::FileHandle
 
@@ -124,18 +126,13 @@ END_XS_CODE
         xs_code           => $xs_code,
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
-    $binding->bind_method( method => $_ ) for qw( Length Close );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_folder {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Store::Folder",
-        make_pod          => { synopsis => "    # Abstract base class.\n", },
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @bound = qw(
         Open_Out
         Open_In
         MkDir
@@ -148,10 +145,40 @@ sub bind_folder {
         Close
         Get_Path
     );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    $pod_spec->set_synopsis("    # Abstract base class.\n");
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::Folder",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_instream {
+    my @bound = qw(
+        Seek
+        Tell
+        Length
+        Reopen
+        Close
+        Read_I8
+        Read_I32
+        Read_I64
+        Read_U8
+        Read_U32
+        Read_U64
+        Read_C32
+        Read_C64
+        Read_F32
+        Read_F64
+    );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Store::InStream
 
@@ -215,27 +242,29 @@ END_XS_CODE
         xs_code      => $xs_code,
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
-    $binding->bind_method( method => $_ ) for qw(
-        Seek
-        Tell
-        Length
-        Reopen
-        Close
-        Read_I8
-        Read_I32
-        Read_I64
-        Read_U8
-        Read_U32
-        Read_U64
-        Read_C32
-        Read_C64
-        Read_F32
-        Read_F64
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lock {
+    my @exposed = qw(
+        Obtain
+        Request
+        Release
+        Is_Locked
+        Clear_Stale
+    );
+    my @bound = (
+        @exposed,
+        qw(
+            Get_Name
+            Get_Lock_Path
+            Get_Host
+            )
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $lock = $lock_factory->make_lock(
         name    => 'write',
@@ -245,7 +274,6 @@ sub bind_lock {
     do_stuff();
     $lock->release;
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $lock = Lucy::Store::Lock->new(
         name     => 'commit',     # required
@@ -255,35 +283,18 @@ END_SYNOPSIS
         interval => 1000,         # default: 100
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Store::Lock",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-            methods     => [
-                qw(
-                    obtain
-                    request
-                    release
-                    is_locked
-                    clear_stale
-                    )
-            ],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::Lock",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Obtain
-        Request
-        Is_Locked
-        Release
-        Clear_Stale
-        Get_Name
-        Get_Lock_Path
-        Get_Host
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -306,6 +317,7 @@ sub bind_sharedlock {
 }
 
 sub bind_lockerr {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     while (1) {
         my $bg_merger = eval {
@@ -321,16 +333,25 @@ sub bind_lockerr {
         ...
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::LockErr",
-        make_pod   => { synopsis => $synopsis }
     );
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lockfactory {
+    my @exposed = qw(
+        Make_Lock
+        Make_Shared_Lock
+    );
+    my @bound = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
     my $hostname = hostname() or die "Can't get unique hostname";
@@ -347,32 +368,46 @@ sub bind_lockfactory {
         interval => 100,
     );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $lock_factory = Lucy::Store::LockFactory->new(
         folder => $folder,      # required
         host   => $hostname,    # required
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::LockFactory",
-        make_pod          => {
-            methods     => [qw( make_lock make_shared_lock)],
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        }
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::LockFactory",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Make_Lock
-        Make_Shared_Lock
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_outstream {
+    my @bound = qw(
+        Tell
+        Length
+        Flush
+        Close
+        Absorb
+        Write_I8
+        Write_I32
+        Write_I64
+        Write_U8
+        Write_U32
+        Write_U64
+        Write_C32
+        Write_C64
+        Write_F32
+        Write_F64
+    );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Store::OutStream
 
@@ -402,58 +437,45 @@ PPCODE:
 }
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';    # Don't use this yet.
-    my $outstream = $folder->open_out($filename) or die $@;
-    $outstream->write_u64($file_position);
-END_SYNOPSIS
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Store::OutStream",
         xs_code      => $xs_code,
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
-    $binding->bind_method( method => $_ ) for qw(
-        Tell
-        Length
-        Flush
-        Close
-        Absorb
-        Write_I8
-        Write_I32
-        Write_I64
-        Write_U8
-        Write_U32
-        Write_U64
-        Write_C32
-        Write_C64
-        Write_F32
-        Write_F64
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_ramfile {
+    my @bound = qw( Get_Contents );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::RAMFile",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Get_Contents );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_ramfilehandle {
+    my @bound = qw( Get_File );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Store::RAMFileHandle",
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
-    $binding->bind_method( method => $_ ) for qw( Get_File );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_ramfolder {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $folder = Lucy::Store::RAMFolder->new;
     
@@ -462,22 +484,21 @@ sub bind_ramfolder {
         path => $relative_path,
     );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $folder = Lucy::Store::RAMFolder->new(
         path => $relative_path,   # default: empty string
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Store::RAMFolder",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        }
+        parcel     => "Lucy",
+        class_name => "Lucy::Store::RAMFolder",
     );
     $binding->bind_constructor;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

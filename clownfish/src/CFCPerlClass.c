@@ -60,22 +60,21 @@ const static CFCMeta CFCPERLCLASS_META = {
 
 CFCPerlClass*
 CFCPerlClass_new(CFCParcel *parcel, const char *class_name, CFCClass *client,
-                 const char *xs_code, CFCPerlPod *pod_spec) {
+                 const char *xs_code) {
     CFCPerlClass *self = (CFCPerlClass*)CFCBase_allocate(&CFCPERLCLASS_META);
-    return CFCPerlClass_init(self, parcel, class_name, client, xs_code,
-                             pod_spec);
+    return CFCPerlClass_init(self, parcel, class_name, client, xs_code);
 }
 
 CFCPerlClass*
 CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel,
                   const char *class_name, CFCClass *client,
-                  const char *xs_code, CFCPerlPod *pod_spec) {
+                  const char *xs_code) {
     CFCUTIL_NULL_CHECK(parcel);
     CFCUTIL_NULL_CHECK(class_name);
     self->parcel = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
     self->client = (CFCClass*)CFCBase_incref((CFCBase*)client);
     self->class_name = CFCUtil_strdup(class_name);
-    self->pod_spec = (CFCPerlPod*)CFCBase_incref((CFCBase*)pod_spec);
+    self->pod_spec   = NULL;
     self->xs_code = xs_code ? CFCUtil_strdup(xs_code) : NULL;
     self->meth_aliases = NULL;
     self->meth_names   = NULL;
@@ -410,6 +409,13 @@ CFCPerlClass_get_class_name(CFCPerlClass *self) {
 const char*
 CFCPerlClass_get_xs_code(CFCPerlClass *self) {
     return self->xs_code;
+}
+
+void
+CFCPerlClass_set_pod_spec(CFCPerlClass *self, CFCPerlPod *pod_spec) {
+    CFCPerlPod *old_pod_spec = self->pod_spec;
+    self->pod_spec = (CFCPerlPod*)CFCBase_incref((CFCBase*)pod_spec);
+    CFCBase_decref((CFCBase*)old_pod_spec);
 }
 
 CFCPerlPod*

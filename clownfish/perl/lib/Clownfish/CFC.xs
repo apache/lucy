@@ -1857,18 +1857,17 @@ OUTPUT: RETVAL
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Class
 
 SV*
-_new(parcel, class_name, client, xs_code_sv, pod_spec)
+_new(parcel, class_name, client, xs_code_sv)
     CFCParcel  *parcel;
     const char *class_name;
     CFCClass   *client;
     SV         *xs_code_sv;
-    CFCPerlPod *pod_spec;
 CODE:
     const char *xs_code = SvOK(xs_code_sv)
                           ? SvPV_nolen(xs_code_sv)
                           : NULL;
     CFCPerlClass *self
-        = CFCPerlClass_new(parcel, class_name, client, xs_code, pod_spec);
+        = CFCPerlClass_new(parcel, class_name, client, xs_code);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -1955,6 +1954,7 @@ ALIAS:
     get_class_name     = 2
     get_client         = 4
     get_xs_code        = 6
+    set_pod_spec       = 7
     get_pod_spec       = 8
 PPCODE:
 {
@@ -1976,6 +1976,17 @@ PPCODE:
                          : newSV(0);
             }
             break;
+        case 7: {
+                CFCPerlPod *pod_spec = NULL;
+                if (SvOK(ST(1))
+                    && sv_derived_from(ST(1), "Clownfish::CFC::Binding::Perl::Pod")
+                   ) {
+                    IV objint = SvIV((SV*)SvRV(ST(1)));
+                    pod_spec = INT2PTR(CFCPerlPod*, objint);
+                }
+                CFCPerlClass_set_pod_spec(self, pod_spec);
+                break;
+            }
         case 8: {
                 CFCPerlPod *value = CFCPerlClass_get_pod_spec(self);
                 retval = S_cfcbase_to_perlref(value);
@@ -1987,11 +1998,11 @@ PPCODE:
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Pod
 
 SV*
-_new(synopsis, description)
-    const char *synopsis;
-    const char *description;
+new(unused)
+    SV *unused;
 CODE:
-    CFCPerlPod *self = CFCPerlPod_new(synopsis, description);
+    (void)unused;
+    CFCPerlPod *self = CFCPerlPod_new();
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -2045,14 +2056,26 @@ void
 _set_or_get(self, ...)
     CFCPerlPod *self;
 ALIAS:
+    set_synopsis       = 1
     get_synopsis       = 2
+    set_description    = 3
     get_description    = 4
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
+        case 1: {
+                const char *val = SvOK(ST(1)) ? SvPVutf8_nolen(ST(1)) : NULL;
+                CFCPerlPod_set_synopsis(self, val);
+            }
+            break;
         case 2: {
                 const char *value = CFCPerlPod_get_synopsis(self);
                 retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 3: {
+                const char *val = SvOK(ST(1)) ? SvPVutf8_nolen(ST(1)) : NULL;
+                CFCPerlPod_set_description(self, val);
             }
             break;
         case 4: {

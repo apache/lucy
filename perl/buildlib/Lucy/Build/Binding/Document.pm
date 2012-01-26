@@ -23,6 +23,30 @@ sub bind_all {
 }
 
 sub bind_doc {
+    my @bound = qw( Set_Doc_ID Get_Doc_ID );
+    my @exposed = ( @bound, 'Get_Fields' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    my $doc = Lucy::Document::Doc->new(
+        fields => { foo => 'foo foo', bar => 'bar bar' },
+    );
+    $indexer->add_doc($doc);
+
+Doc objects allow access to field values via hashref overloading:
+
+    $doc->{foo} = 'new value for field "foo"';
+    print "foo: $doc->{foo}\n";
+END_SYNOPSIS
+    my $constructor = <<'END_CONSTRUCTOR';
+    my $doc = Lucy::Document::Doc->new(
+        fields => { foo => 'foo foo', bar => 'bar bar' },
+    );
+END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Document::Doc
 
@@ -75,39 +99,32 @@ PPCODE:
     lucy_Doc_set_fields(self, fields);
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';
-    my $doc = Lucy::Document::Doc->new(
-        fields => { foo => 'foo foo', bar => 'bar bar' },
-    );
-    $indexer->add_doc($doc);
-
-Doc objects allow access to field values via hashref overloading:
-
-    $doc->{foo} = 'new value for field "foo"';
-    print "foo: $doc->{foo}\n";
-END_SYNOPSIS
-
-    my $constructor = <<'END_CONSTRUCTOR';
-    my $doc = Lucy::Document::Doc->new(
-        fields => { foo => 'foo foo', bar => 'bar bar' },
-    );
-END_CONSTRUCTOR
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Document::Doc",
-        xs_code      => $xs_code,
-        make_pod     => {
-            methods     => [qw( set_doc_id get_doc_id get_fields )],
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        }
+        parcel     => "Lucy",
+        class_name => "Lucy::Document::Doc",
+        xs_code    => $xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw( Set_Doc_ID Get_Doc_ID );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_hitdoc {
+    my @exposed = qw( Set_Score Get_Score );
+    my @bound   = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    while ( my $hit_doc = $hits->next ) {
+        print "$hit_doc->{title}\n";
+        print $hit_doc->get_score . "\n";
+        ...
+    }
+END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Document::HitDoc
 
@@ -147,24 +164,14 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';
-    while ( my $hit_doc = $hits->next ) {
-        print "$hit_doc->{title}\n";
-        print $hit_doc->get_score . "\n";
-        ...
-    }
-END_SYNOPSIS
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Document::HitDoc",
-        xs_code      => $xs_code,
-        make_pod     => {
-            methods  => [qw( set_score get_score )],
-            synopsis => $synopsis,
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Document::HitDoc",
+        xs_code    => $xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw( Set_Score Get_Score );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

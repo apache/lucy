@@ -23,15 +23,17 @@ sub bind_all {
 }
 
 sub bind_devguide {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Docs::DevGuide",
-        make_pod   => {},
     );
+    $binding->set_pod_spec($pod_spec);
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_filelocking {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
     my $hostname = hostname() or die "Can't get unique hostname";
@@ -50,12 +52,14 @@ sub bind_filelocking {
     );
     my $searcher = Lucy::Search::IndexSearcher->new( index => $reader );
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Docs::FileLocking",
-        make_pod   => { synopsis => $synopsis, },
     );
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

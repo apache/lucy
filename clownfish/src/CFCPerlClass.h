@@ -31,13 +31,12 @@ struct CFCPerlConstructor;
 
 CFCPerlClass*
 CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name,
-                 struct CFCClass *client, const char *xs_code,
-                 struct CFCPerlPod *pod_spec);
+                 struct CFCClass *client, const char *xs_code);
 
 CFCPerlClass*
 CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
                   const char *class_name, struct CFCClass *client,
-                  const char *xs_code, struct CFCPerlPod *pod_spec);
+                  const char *xs_code);
 
 void
 CFCPerlClass_destroy(CFCPerlClass *self);
@@ -79,6 +78,9 @@ CFCPerlClass_get_class_name(CFCPerlClass *self);
 
 const char*
 CFCPerlClass_get_xs_code(CFCPerlClass *self);
+
+void
+CFCPerlClass_set_pod_spec(CFCPerlClass *self, struct CFCPerlPod *pod_spec);
 
 struct CFCPerlPod*
 CFCPerlClass_get_pod_spec(CFCPerlClass *self);

@@ -20,6 +20,8 @@ sub bind_all {
     my $class = shift;
     $class->bind_lucy;
     $class->bind_test;
+    $class->bind_testutils;
+    $class->bind_testqueryparsersyntax;
     $class->bind_testschema;
 }
 
@@ -74,14 +76,6 @@ END_XS_CODE
 
 sub bind_test {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Test::TestUtils
-
-SV*
-doc_set()
-CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_TestUtils_doc_set());
-OUTPUT: RETVAL
-
 MODULE = Lucy   PACKAGE = Lucy::Test
 
 void
@@ -293,7 +287,36 @@ PPCODE:
         THROW(LUCY_ERR, "Unknown test id: %s", package);
     }
 }
+END_XS_CODE
 
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Test",
+        xs_code    => $xs_code,
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_testutils {
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy   PACKAGE = Lucy::Test::TestUtils
+
+SV*
+doc_set()
+CODE:
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_TestUtils_doc_set());
+OUTPUT: RETVAL
+END_XS_CODE
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Test::TestUtils",
+        xs_code    => $xs_code,
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_testqueryparsersyntax {
+    my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Test::Search::TestQueryParserSyntax
 
 void
@@ -305,7 +328,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Test",
+        class_name => "Lucy::Test::Search::TestQueryParserSyntax",
         xs_code    => $xs_code,
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);

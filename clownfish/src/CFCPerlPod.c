@@ -57,17 +57,16 @@ const static CFCMeta CFCPERLPOD_META = {
 };
 
 CFCPerlPod*
-CFCPerlPod_new(const char *synopsis, const char *description) {
+CFCPerlPod_new(void) {
     CFCPerlPod *self
         = (CFCPerlPod*)CFCBase_allocate(&CFCPERLPOD_META);
-    return CFCPerlPod_init(self, synopsis, description);
+    return CFCPerlPod_init(self);
 }
 
 CFCPerlPod*
-CFCPerlPod_init(CFCPerlPod *self, const char *synopsis,
-                const char *description) {
-    self->synopsis         = CFCUtil_strdup(synopsis ? synopsis : "");
-    self->description      = CFCUtil_strdup(description ? description : "");
+CFCPerlPod_init(CFCPerlPod *self) {
+    self->synopsis         = CFCUtil_strdup("");
+    self->description      = CFCUtil_strdup("");
     self->methods          = NULL;
     self->constructors     = NULL;
     self->num_methods      = 0;
@@ -124,9 +123,21 @@ CFCPerlPod_add_constructor(CFCPerlPod *self, const char *alias,
     slot->pod    = pod ? CFCUtil_strdup(pod) : NULL;
 }
 
+void
+CFCPerlPod_set_synopsis(CFCPerlPod *self, const char *synopsis) {
+    FREEMEM(self->synopsis);
+    self->synopsis = CFCUtil_strdup(synopsis);
+}
+
 const char*
 CFCPerlPod_get_synopsis(CFCPerlPod *self) {
     return self->synopsis;
+}
+
+void
+CFCPerlPod_set_description(CFCPerlPod *self, const char *description) {
+    FREEMEM(self->description);
+    self->description = CFCUtil_strdup(description);
 }
 
 const char*

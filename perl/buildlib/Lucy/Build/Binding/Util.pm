@@ -134,6 +134,7 @@ END_XS_CODE
         class_name => "Lucy::Util::IndexFileNames",
         xs_code    => $xs_code,
     );
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -147,12 +148,7 @@ sub bind_memorypool {
 }
 
 sub bind_priorityqueue {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Util::PriorityQueue",
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @bound = qw(
         Less_Than
         Insert
         Pop
@@ -160,10 +156,29 @@ sub bind_priorityqueue {
         Peek
         Get_Size
     );
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Util::PriorityQueue",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_sortexternal {
+    my @bound = qw(
+        Flush
+        Flip
+        Add_Run
+        Refill
+        Sort_Cache
+        Cache_Count
+        Clear_Cache
+        Set_Mem_Thresh
+    );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Util::SortExternal
 
@@ -179,25 +194,20 @@ END_XS_CODE
         class_name   => "Lucy::Util::SortExternal",
         xs_code      => $xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw(
-        Flush
-        Flip
-        Add_Run
-        Refill
-        Sort_Cache
-        Cache_Count
-        Clear_Cache
-        Set_Mem_Thresh
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_stepper {
+    my @bound = qw( Read_Record );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Util::Stepper",
     );
-    $binding->bind_method( method => $_ ) for qw( Read_Record );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -298,6 +308,7 @@ END_XS_CODE
         class_name => "Lucy::Util::StringHelper",
         xs_code    => $xs_code,
     );
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

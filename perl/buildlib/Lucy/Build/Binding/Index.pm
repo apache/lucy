@@ -64,49 +64,53 @@ sub bind_all {
 }
 
 sub bind_backgroundmerger {
+    my @exposed = qw( Commit Prepare_Commit Optimize );
+    my @bound   = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $bg_merger = Lucy::Index::BackgroundMerger->new(
         index  => '/path/to/index',
     );
     $bg_merger->commit;
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $bg_merger = Lucy::Index::BackgroundMerger->new(
         index   => '/path/to/index',    # required
         manager => $manager             # default: created internally
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Index::BackgroundMerger",
-        make_pod          => {
-            methods => [
-                qw(
-                    commit
-                    prepare_commit
-                    optimize
-                    )
-            ],
-            synopsis     => $synopsis,
-            constructors => [ { sample => $constructor } ],
-        },
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Commit
-        Prepare_Commit
-        Optimize
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_datareader {
+    my @exposed = qw(
+        Get_Schema
+        Get_Folder
+        Get_Snapshot
+        Get_Segments
+        Get_Segment
+        Get_Seg_Tick
+        Aggregator
+    );
+    my @bound = ( @exposed, 'Close' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     # Abstract base class.
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $reader = MyDataReader->new(
         schema   => $seg_reader->get_schema,      # default undef
@@ -116,79 +120,23 @@ END_SYNOPSIS
         seg_tick => $seg_reader->get_seg_tick,    # default -1
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Index::DataReader",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor, },
-            methods     => [
-                qw(
-                    get_schema
-                    get_folder
-                    get_snapshot
-                    get_segments
-                    get_segment
-                    get_seg_tick
-                    aggregator
-                    )
-            ]
-        },
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Get_Schema
-        Get_Folder
-        Get_Segments
-        Get_Snapshot
-        Get_Seg_Tick
-        Get_Segment
-        Aggregator
-        Close
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_datawriter {
-    my $synopsis = <<END_SYNOPSIS;
-    # Abstract base class.
-END_SYNOPSIS
-
-    my $constructor = <<'END_CONSTRUCTOR';
-    my $writer = MyDataWriter->new(
-        snapshot   => $snapshot,      # required
-        segment    => $segment,       # required
-        polyreader => $polyreader,    # required
-    );
-END_CONSTRUCTOR
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::DataWriter",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-            methods     => [
-                qw(
-                    add_inverted_doc
-                    add_segment
-                    delete_segment
-                    merge_segment
-                    finish
-                    format
-                    metadata
-                    get_snapshot
-                    get_segment
-                    get_polyreader
-                    get_schema
-                    get_folder
-                    )
-            ],
-        },
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @exposed = qw(
         Add_Inverted_Doc
         Add_Segment
         Delete_Segment
@@ -202,30 +150,75 @@ END_CONSTRUCTOR
         Get_Schema
         Get_Folder
     );
+    my @bound = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<END_SYNOPSIS;
+    # Abstract base class.
+END_SYNOPSIS
+    my $constructor = <<'END_CONSTRUCTOR';
+    my $writer = MyDataWriter->new(
+        snapshot   => $snapshot,      # required
+        segment    => $segment,       # required
+        polyreader => $polyreader,    # required
+    );
+END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::DataWriter",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_deletionsreader {
+    my @bound = qw( Iterator Del_Count );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::DeletionsReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Iterator Del_Count );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_defaultdeletionsreader {
+    my @bound = qw( Read_Deletions );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::DefaultDeletionsReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Read_Deletions );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_deletionswriter {
+    my @exposed = qw(
+        Delete_By_Term
+        Delete_By_Query
+        Updated
+        Seg_Del_Count
+    );
+    my @bound = (
+        @exposed,
+        qw(
+            Generate_Doc_Map
+            Delete_By_Doc_ID
+            Seg_Deletions
+            )
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $polyreader  = $del_writer->get_polyreader;
     my $seg_readers = $polyreader->seg_readers;
@@ -234,31 +227,16 @@ sub bind_deletionswriter {
         ...
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::DeletionsWriter",
-        make_pod => {
-            synopsis => $synopsis,
-            methods  => [
-                qw(
-                    delete_by_term
-                    delete_by_query
-                    updated
-                    seg_del_count
-                    )
-            ],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::DeletionsWriter",
     );
-    $binding->bind_method( method => $_ ) for qw(
-        Generate_Doc_Map
-        Delete_By_Term
-        Delete_By_Query
-        Delete_By_Doc_ID
-        Updated
-        Seg_Deletions
-        Seg_Del_Count
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -272,21 +250,25 @@ sub bind_defaultdeletionswriter {
 }
 
 sub bind_docreader {
+    my @bound = qw( Fetch_Doc );
+    my @exposed = ( @bound, 'Aggregator' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
     my $doc        = $doc_reader->fetch_doc($doc_id);
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::DocReader",
-        make_pod          => {
-            synopsis => $synopsis,
-            methods  => [qw( fetch_doc aggregator )],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::DocReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Fetch_Doc );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -300,16 +282,13 @@ sub bind_defaultdocreader {
 }
 
 sub bind_docvector {
+    my @bound = qw( Term_Vector Field_Buf Add_Field_Buf );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::DocVector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Term_Vector
-        Field_Buf
-        Add_Field_Buf
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -323,12 +302,13 @@ sub bind_docwriter {
 }
 
 sub bind_filepurger {
+    my @bound = qw( Purge );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::FilePurger",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Purge );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -360,6 +340,37 @@ sub bind_highlightwriter {
 }
 
 sub bind_indexmanager {
+    my @exposed = qw(
+        Make_Write_Lock
+        Recycle
+        Set_Folder
+        Get_Folder
+        Get_Host
+        Set_Write_Lock_Timeout
+        Get_Write_Lock_Timeout
+        Set_Write_Lock_Interval
+        Get_Write_Lock_Interval
+    );
+    my @bound = (
+        @exposed,
+        qw(
+            Make_Deletion_Lock
+            Make_Merge_Lock
+            Make_Snapshot_Read_Lock
+            Highest_Seg_Num
+            Make_Snapshot_Filename
+            Set_Merge_Lock_Timeout
+            Get_Merge_Lock_Timeout
+            Set_Merge_Lock_Interval
+            Get_Merge_Lock_Interval
+            Set_Deletion_Lock_Timeout
+            Get_Deletion_Lock_Timeout
+            Set_Deletion_Lock_Interval
+            Get_Deletion_Lock_Interval
+            )
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
     my $hostname = hostname() or die "Can't get unique hostname";
@@ -380,63 +391,78 @@ sub bind_indexmanager {
     );
     my $searcher = Lucy::Search::IndexSearcher->new( index => $reader );
 END_SYNOPSIS
-
     my $constructor = <<'END_CONSTRUCTOR';
     my $manager = Lucy::Index::IndexManager->new(
         host => $hostname,    # default: ""
     );
 END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::IndexManager",
-        make_pod => {
-            methods => [
-                qw(
-                    make_write_lock
-                    recycle
-                    set_folder
-                    get_folder
-                    get_host
-                    set_write_lock_timeout
-                    get_write_lock_timeout
-                    set_write_lock_interval
-                    get_write_lock_interval
-                    )
-            ],
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::IndexManager",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Recycle
-        Make_Write_Lock
-        Make_Deletion_Lock
-        Make_Merge_Lock
-        Make_Snapshot_Read_Lock
-        Highest_Seg_Num
-        Make_Snapshot_Filename
-        Set_Folder
-        Get_Folder
-        Get_Host
-        Set_Write_Lock_Timeout
-        Get_Write_Lock_Timeout
-        Set_Write_Lock_Interval
-        Get_Write_Lock_Interval
-        Set_Merge_Lock_Timeout
-        Get_Merge_Lock_Timeout
-        Set_Merge_Lock_Interval
-        Get_Merge_Lock_Interval
-        Set_Deletion_Lock_Timeout
-        Get_Deletion_Lock_Timeout
-        Set_Deletion_Lock_Interval
-        Get_Deletion_Lock_Interval
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_indexreader {
+    my @bound = qw(
+        Doc_Max
+        Doc_Count
+        Del_Count
+        Fetch
+        Obtain
+        Seg_Readers
+        Get_Components
+    );
+    my @exposed = qw(
+        Doc_Max
+        Doc_Count
+        Del_Count
+        Seg_Readers
+        Offsets
+        Fetch
+        Obtain
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    my $reader = Lucy::Index::IndexReader->open(
+        index => '/path/to/index',
+    );
+    my $seg_readers = $reader->seg_readers;
+    for my $seg_reader (@$seg_readers) {
+        my $seg_name = $seg_reader->get_segment->get_name;
+        my $num_docs = $seg_reader->doc_max;
+        print "Segment $seg_name ($num_docs documents):\n";
+        my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
+        for my $doc_id ( 1 .. $num_docs ) {
+            my $doc = $doc_reader->fetch_doc($doc_id);
+            print "  $doc_id: $doc->{title}\n";
+        }
+    }
+END_SYNOPSIS
+    my $constructor = <<'END_CONSTRUCTOR';
+    my $reader = Lucy::Index::IndexReader->open(
+        index    => '/path/to/index', # required
+        snapshot => $snapshot,
+        manager  => $index_manager,
+    );
+END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor(
+        alias       => 'open',
+        initializer => 'do_open',
+        sample      => $constructor,
+    );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Index::IndexReader
 
@@ -458,73 +484,128 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';
-    my $reader = Lucy::Index::IndexReader->open(
-        index => '/path/to/index',
-    );
-    my $seg_readers = $reader->seg_readers;
-    for my $seg_reader (@$seg_readers) {
-        my $seg_name = $seg_reader->get_segment->get_name;
-        my $num_docs = $seg_reader->doc_max;
-        print "Segment $seg_name ($num_docs documents):\n";
-        my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
-        for my $doc_id ( 1 .. $num_docs ) {
-            my $doc = $doc_reader->fetch_doc($doc_id);
-            print "  $doc_id: $doc->{title}\n";
-        }
-    }
-END_SYNOPSIS
-
-    my $constructor = <<'END_CONSTRUCTOR';
-    my $reader = Lucy::Index::IndexReader->open(
-        index    => '/path/to/index', # required
-        snapshot => $snapshot,
-        manager  => $index_manager,
-    );
-END_CONSTRUCTOR
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::IndexReader",
-        xs_code      => $xs_code,
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => {
-                name   => 'open',
-                func   => 'do_open',
-                sample => $constructor,
-            },
-            methods => [
-                qw(
-                    doc_max
-                    doc_count
-                    del_count
-                    seg_readers
-                    offsets
-                    fetch
-                    obtain
-                    )
-            ]
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::IndexReader",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor(
         alias       => 'open',
         initializer => 'do_open',
     );
-    $binding->bind_method( method => $_ ) for qw(
-        Doc_Max
-        Doc_Count
-        Del_Count
-        Fetch
-        Obtain
-        Seg_Readers
-        Get_Components
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method( alias => '_offsets', method => 'Offsets' );
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_indexer {
+    my @exposed = qw(
+        Add_Index
+        Optimize
+        Commit
+        Prepare_Commit
+        Delete_By_Term
+        Delete_By_Query
+    );
+    my @bound = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    my $indexer = Lucy::Index::Indexer->new(
+        schema => $schema,
+        index  => '/path/to/index',
+        create => 1,
+    );
+    while ( my ( $title, $content ) = each %source_docs ) {
+        $indexer->add_doc({
+            title   => $title,
+            content => $content,
+        });
+    }
+    $indexer->commit;
+END_SYNOPSIS
+    my $constructor = <<'END_NEW';
+=head2 new( I<[labeled params]> )
+
+    my $indexer = Lucy::Index::Indexer->new(
+        schema   => $schema,             # required at index creation
+        index    => '/path/to/index',    # required
+        create   => 1,                   # default: 0
+        truncate => 1,                   # default: 0
+        manager  => $manager             # default: created internally
+    );
+
+=over
+
+=item *
+
+B<schema> - A Schema.  Required when index is being created; if not supplied,
+will be extracted from the index folder.
+
+=item *
+
+B<index> - Either a filepath to an index or a Folder.
+
+=item *
+
+B<create> - If true and the index directory does not exist, attempt to create
+it.
+
+=item *
+
+B<truncate> - If true, proceed with the intention of discarding all previous
+indexing data.  The old data will remain intact and visible until commit()
+succeeds.
+
+=item *
+
+B<manager> - An IndexManager.
+
+=back
+END_NEW
+    my $add_doc_pod = <<'END_ADD_DOC_POD';
+=head2 add_doc(...)
+
+    $indexer->add_doc($doc);
+    $indexer->add_doc( { field_name => $field_value } );
+    $indexer->add_doc(
+        doc   => { field_name => $field_value },
+        boost => 2.5,         # default: 1.0
+    );
+
+Add a document to the index.  Accepts either a single argument or labeled
+params.
+
+=over
+
+=item *
+
+B<doc> - Either a Lucy::Document::Doc object, or a hashref (which will
+be attached to a Lucy::Document::Doc object internally).
+
+=item *
+
+B<boost> - A floating point weight which affects how this document scores.
+
+=back
+
+END_ADD_DOC_POD
+    $pod_spec->set_synopsis($synopsis);
+
+    # Override necessary because of different handling for flags.
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor );
+
+    # Override is necessary because there's no standard way to explain
+    # hash/hashref across multiple host languages.
+    $pod_spec->add_method(
+        method => 'Add_Doc',
+        alias  => 'add_doc',
+        pod    => $add_doc_pod,
+    );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy  PACKAGE = Lucy::Index::Indexer
 
@@ -592,130 +673,20 @@ PPCODE:
 }
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';
-    my $indexer = Lucy::Index::Indexer->new(
-        schema => $schema,
-        index  => '/path/to/index',
-        create => 1,
-    );
-    while ( my ( $title, $content ) = each %source_docs ) {
-        $indexer->add_doc({
-            title   => $title,
-            content => $content,
-        });
-    }
-    $indexer->commit;
-END_SYNOPSIS
-
-    my $constructor = <<'END_NEW';
-=head2 new( I<[labeled params]> )
-
-    my $indexer = Lucy::Index::Indexer->new(
-        schema   => $schema,             # required at index creation
-        index    => '/path/to/index',    # required
-        create   => 1,                   # default: 0
-        truncate => 1,                   # default: 0
-        manager  => $manager             # default: created internally
-    );
-
-=over
-
-=item *
-
-B<schema> - A Schema.  Required when index is being created; if not supplied,
-will be extracted from the index folder.
-
-=item *
-
-B<index> - Either a filepath to an index or a Folder.
-
-=item *
-
-B<create> - If true and the index directory does not exist, attempt to create
-it.
-
-=item *
-
-B<truncate> - If true, proceed with the intention of discarding all previous
-indexing data.  The old data will remain intact and visible until commit()
-succeeds.
-
-=item *
-
-B<manager> - An IndexManager.
-
-=back
-END_NEW
-
-    # Override is necessary because there's no standard way to explain
-    # hash/hashref across multiple host languages.
-    my $add_doc_pod = <<'END_ADD_DOC_POD';
-=head2 add_doc(...)
-
-    $indexer->add_doc($doc);
-    $indexer->add_doc( { field_name => $field_value } );
-    $indexer->add_doc(
-        doc   => { field_name => $field_value },
-        boost => 2.5,         # default: 1.0
-    );
-
-Add a document to the index.  Accepts either a single argument or labeled
-params.
-
-=over
-
-=item *
-
-B<doc> - Either a Lucy::Document::Doc object, or a hashref (which will
-be attached to a Lucy::Document::Doc object internally).
-
-=item *
-
-B<boost> - A floating point weight which affects how this document scores.
-
-=back
-
-END_ADD_DOC_POD
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel       => "Lucy",
         class_name   => "Lucy::Index::Indexer",
         xs_code      => $xs_code,
-        make_pod          => {
-            methods => [
-                { name => 'add_doc', pod => $add_doc_pod },
-                qw(
-                    add_index
-                    optimize
-                    commit
-                    prepare_commit
-                    delete_by_term
-                    delete_by_query
-                    )
-            ],
-            synopsis     => $synopsis,
-            constructors => [ { pod => $constructor } ],
-        },
     );
     $binding->bind_constructor( alias => '_new' );
-    $binding->bind_method( method => $_ ) for qw(
-        Delete_By_Term
-        Delete_By_Query
-        Add_Index
-        Commit
-        Prepare_Commit
-        Optimize
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_inverter {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::Inverter",
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @bound = qw(
         Get_Doc
         Iterate
         Next
@@ -727,10 +698,27 @@ sub bind_inverter {
         Get_Similarity
         Get_Inversion
     );
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Inverter",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lexicon {
+    my @exposed = qw(
+        Seek
+        Next
+        Get_Term
+        Reset
+    );
+    my @bound = ( @exposed, 'Get_Field' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $lex_reader = $seg_reader->obtain('Lucy::Index::LexiconReader');
     my $lexicon = $lex_reader->lexicon( field => 'content' );
@@ -738,46 +726,40 @@ sub bind_lexicon {
        print $lexicon->get_term . "\n";
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::Lexicon",
-        make_pod          => {
-            synopsis => $synopsis,
-            methods  => [qw( seek next get_term reset )],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Lexicon",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Seek
-        Next
-        Reset
-        Get_Term
-        Get_Field
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_lexiconreader {
+    my @exposed = qw( Lexicon Doc_Freq );
+    my @bound = ( @exposed, 'Fetch_Term_Info' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $lex_reader = $seg_reader->obtain("Lucy::Index::LexiconReader");
     my $lexicon    = $lex_reader->lexicon( field => 'title' );
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::LexiconReader",
-        make_pod          => {
-            synopsis => $synopsis,
-            methods  => [qw( lexicon doc_freq )],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::LexiconReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Lexicon
-        Doc_Freq
-        Fetch_Term_Info
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -809,6 +791,9 @@ sub bind_polylexicon {
 }
 
 sub bind_polyreader {
+    my @bound = qw( Get_Seg_Readers );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $polyreader = Lucy::Index::IndexReader->open( 
         index => '/path/to/index',
@@ -819,6 +804,7 @@ sub bind_polyreader {
         print " $doc_id: $doc->{title}\n";
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Index::PolyReader
@@ -834,30 +820,46 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::PolyReader",
-        make_pod          => { synopsis => $synopsis },
-        xs_code           => $xs_code,
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::PolyReader",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
-    $binding->bind_method( method => $_ ) for qw( Get_Seg_Readers );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_posting {
+    my @bound = qw( Get_Doc_ID );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::Posting",
-        #    make_pod => {
-        #        synopsis => "    # Abstract base class.\n",
-        #    },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Posting",
     );
-    $binding->bind_method( method => $_ ) for qw( Get_Doc_ID );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_postinglist {
+    my @bound = qw(
+        Seek
+        Get_Posting
+        Get_Doc_Freq
+        Make_Matcher
+    );
+    my @exposed = qw(
+        Next
+        Advance
+        Get_Doc_ID
+        Get_Doc_Freq
+        Seek
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $posting_list_reader 
         = $seg_reader->obtain("Lucy::Index::PostingListReader");
@@ -869,34 +871,25 @@ sub bind_postinglist {
         say "Matching doc id: $doc_id";
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::PostingList",
-        make_pod          => {
-            synopsis => $synopsis,
-            methods  => [
-                qw(
-                    next
-                    advance
-                    get_doc_id
-                    get_doc_freq
-                    seek
-                    )
-            ],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::PostingList",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Seek
-        Get_Posting
-        Get_Doc_Freq
-        Make_Matcher
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_postinglistreader {
+    my @exposed = qw( Posting_List );
+    my @bound = ( @exposed, 'Get_Lex_Reader' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $posting_list_reader 
         = $seg_reader->obtain("Lucy::Index::PostingListReader");
@@ -905,20 +898,17 @@ sub bind_postinglistreader {
         term  => 'foo',
     );
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::PostingListReader",
-        make_pod          => {
-            synopsis => $synopsis,
-            methods  => [qw( posting_list )],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::PostingListReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Posting_List
-        Get_Lex_Reader
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -948,33 +938,44 @@ END_XS
         xs_code           => $xs_code,
     );
     $binding->bind_constructor;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_seglexicon {
+    my @bound = qw( Get_Term_Info Get_Field_Num );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::SegLexicon",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Get_Term_Info
-        Get_Field_Num
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_segpostinglist {
+    my @bound = qw( Get_Post_Stream Get_Count );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::SegPostingList",
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::SegPostingList",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Get_Post_Stream Get_Count );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_segreader {
+    my @exposed = qw(
+        Get_Seg_Name
+        Get_Seg_Num
+    );
+    my @bound = ( @exposed, 'Register' );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $polyreader = Lucy::Index::IndexReader->open(
         index => '/path/to/index',
@@ -991,49 +992,68 @@ sub bind_segreader {
         }
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::SegReader",
-        make_pod          => {
-            synopsis => $synopsis,
-            methods  => [qw( Get_Seg_Name Get_Seg_Num )],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::SegReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Get_Seg_Name
-        Get_Seg_Num
-        Register
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_segwriter {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel            => "Lucy",
-        class_name        => "Lucy::Index::SegWriter",
-        make_pod => {
-            methods => [
-                qw(
-                    add_doc
-                    add_writer
-                    register
-                    fetch
-                    )
-            ],
-        }
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @bound = qw(
         Add_Writer
         Register
         Fetch
     );
+    my @exposed = ( 'Add_Doc', @bound );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::SegWriter",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_segment {
+    my @bound = qw(
+        Add_Field
+        Fetch_Metadata
+        Field_Num
+        Field_Name
+        Get_Name
+        Get_Number
+        Set_Count
+        Get_Count
+        Write_File
+        Read_File
+    );
+    my @exposed = qw(
+        Add_Field
+        Store_Metadata
+        Fetch_Metadata
+        Field_Num
+        Field_Name
+        Get_Name
+        Get_Number
+        Set_Count
+        Get_Count
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     # Index-time.
     package MyDataWriter;
@@ -1065,48 +1085,54 @@ sub bind_segment {
         return $self;
     }
 END_SYNOPSIS
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::Segment",
-        make_pod          => {
-            synopsis => $synopsis,
-            methods  => [
-                qw(
-                    add_field
-                    store_metadata
-                    fetch_metadata
-                    field_num
-                    field_name
-                    get_name
-                    get_number
-                    set_count
-                    get_count
-                    )
-            ],
-        },
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Segment",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Add_Field
-        Fetch_Metadata
-        Field_Num
-        Field_Name
-        Get_Name
-        Get_Number
-        Set_Count
-        Get_Count
-        Write_File
-        Read_File
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method(
         alias  => '_store_metadata',
         method => 'Store_Metadata',
     );
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_similarity {
+    my @bound = qw(
+        IDF
+        TF
+        Encode_Norm
+        Decode_Norm
+        Query_Norm
+        Length_Norm
+        Coord
+    );
+    my @exposed = qw(
+        Length_Norm
+    );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    package MySimilarity;
+
+    sub length_norm { return 1.0 }    # disable length normalization
+
+    package MyFullTextType;
+    use base qw( Lucy::Plan::FullTextType );
+
+    sub make_similarity { MySimilarity->new }
+END_SYNOPSIS
+    my $constructor = qq|    my \$sim = Lucy::Index::Similarity->new;\n|;
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Index::Similarity
 
@@ -1119,76 +1145,20 @@ CODE:
 OUTPUT: RETVAL
 END_XS_CODE
 
-    my $synopsis = <<'END_SYNOPSIS';
-    package MySimilarity;
-
-    sub length_norm { return 1.0 }    # disable length normalization
-
-    package MyFullTextType;
-    use base qw( Lucy::Plan::FullTextType );
-
-    sub make_similarity { MySimilarity->new }
-END_SYNOPSIS
-
-    my $constructor = qq|    my \$sim = Lucy::Index::Similarity->new;\n|;
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::Similarity",
-        xs_code      => $xs_code,
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-            methods     => [qw( length_norm )],
-        }
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Similarity",
+        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        IDF
-        TF
-        Encode_Norm
-        Decode_Norm
-        Query_Norm
-        Length_Norm
-        Coord
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_snapshot {
-    my $synopsis = <<'END_SYNOPSIS';
-    my $snapshot = Lucy::Index::Snapshot->new;
-    $snapshot->read_file( folder => $folder );    # load most recent snapshot
-    my $files = $snapshot->list;
-    print "$_\n" for @$files;
-END_SYNOPSIS
-
-    my $constructor = <<'END_CONSTRUCTOR';
-    my $snapshot = Lucy::Index::Snapshot->new;
-END_CONSTRUCTOR
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::Snapshot",
-        make_pod          => {
-            synopsis    => $synopsis,
-            constructor => { sample => $constructor },
-            methods     => [
-                qw(
-                    list
-                    num_entries
-                    add_entry
-                    delete_entry
-                    read_file
-                    write_file
-                    set_path
-                    get_path
-                    )
-            ],
-        },
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @exposed = qw(
         List
         Num_Entries
         Add_Entry
@@ -1198,10 +1168,36 @@ END_CONSTRUCTOR
         Set_Path
         Get_Path
     );
+    my @bound = @exposed;
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    my $snapshot = Lucy::Index::Snapshot->new;
+    $snapshot->read_file( folder => $folder );    # load most recent snapshot
+    my $files = $snapshot->list;
+    print "$_\n" for @$files;
+END_SYNOPSIS
+    my $constructor = <<'END_CONSTRUCTOR';
+    my $snapshot = Lucy::Index::Snapshot->new;
+END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Snapshot",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->set_pod_spec($pod_spec);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_sortcache {
+    my @bound = qw( Ordinal Find );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Index::SortCache
 
@@ -1234,17 +1230,19 @@ END_XS_CODE
         class_name   => "Lucy::Index::SortCache",
         xs_code      => $xs_code,
     );
-    $binding->bind_method( method => $_ ) for qw( Ordinal Find );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_sortreader {
+    my @bound = qw( Fetch_Sort_Cache );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::SortReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw( Fetch_Sort_Cache );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -1254,6 +1252,7 @@ sub bind_defaultsortreader {
         class_name        => "Lucy::Index::DefaultSortReader",
     );
     $binding->bind_constructor;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -1274,16 +1273,12 @@ END_XS
         xs_code           => $xs_code,
     );
     $binding->bind_constructor;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_terminfo {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel       => "Lucy",
-        class_name   => "Lucy::Index::TermInfo",
-    );
-    $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
+    my @bound = qw(
         Get_Doc_Freq
         Get_Lex_FilePos
         Get_Post_FilePos
@@ -1294,20 +1289,31 @@ sub bind_terminfo {
         Set_Skip_FilePos
         Reset
     );
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel       => "Lucy",
+        class_name   => "Lucy::Index::TermInfo",
+    );
+    $binding->bind_constructor;
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_termvector {
+    my @bound = qw(
+        Get_Positions
+        Get_Start_Offsets
+        Get_End_Offsets
+    );
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel            => "Lucy",
         class_name        => "Lucy::Index::TermVector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_ ) for qw(
-        Get_Positions
-        Get_Start_Offsets
-        Get_End_Offsets
-    );
+    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
