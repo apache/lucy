@@ -102,9 +102,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Document::Doc",
-        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -167,9 +167,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Document::HitDoc",
-        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

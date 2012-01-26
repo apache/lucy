@@ -1857,17 +1857,11 @@ OUTPUT: RETVAL
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Class
 
 SV*
-_new(parcel, class_name, client, xs_code_sv)
+_new(parcel, class_name)
     CFCParcel  *parcel;
     const char *class_name;
-    CFCClass   *client;
-    SV         *xs_code_sv;
 CODE:
-    const char *xs_code = SvOK(xs_code_sv)
-                          ? SvPV_nolen(xs_code_sv)
-                          : NULL;
-    CFCPerlClass *self
-        = CFCPerlClass_new(parcel, class_name, client, xs_code);
+    CFCPerlClass *self = CFCPerlClass_new(parcel, class_name);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -1920,6 +1914,13 @@ PPCODE:
     const char *alias = SvOK(alias_sv) ? SvPVutf8_nolen(alias_sv) : NULL;
     const char *init  = SvOK(init_sv)  ? SvPVutf8_nolen(init_sv)  : NULL;
     CFCPerlClass_bind_constructor(self, alias, init);
+
+void
+append_xs(self, xs)
+    CFCPerlClass *self;
+    const char *xs;
+PPCODE:
+    CFCPerlClass_append_xs(self, xs);
 
 SV*
 method_bindings(self)

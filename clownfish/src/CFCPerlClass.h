@@ -30,13 +30,11 @@ struct CFCPerlMethod;
 struct CFCPerlConstructor;
 
 CFCPerlClass*
-CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name,
-                 struct CFCClass *client, const char *xs_code);
+CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name);
 
 CFCPerlClass*
 CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
-                  const char *class_name, struct CFCClass *client,
-                  const char *xs_code);
+                  const char *class_name);
 
 void
 CFCPerlClass_destroy(CFCPerlClass *self);
@@ -75,6 +73,11 @@ CFCPerlClass_get_client(CFCPerlClass *self);
 
 const char*
 CFCPerlClass_get_class_name(CFCPerlClass *self);
+
+/** Concatenate verbatim XS code.
+ */
+void
+CFCPerlClass_append_xs(CFCPerlClass *self, const char *xs);
 
 const char*
 CFCPerlClass_get_xs_code(CFCPerlClass *self);

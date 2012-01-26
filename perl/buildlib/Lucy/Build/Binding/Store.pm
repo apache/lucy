@@ -123,10 +123,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::FileHandle",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -239,10 +239,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::InStream",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -440,10 +440,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::OutStream",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

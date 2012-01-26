@@ -119,9 +119,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::ByteBuf",
-        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -189,8 +189,8 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::CharBuf",
-        xs_code    => $xs_code,
     );
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -297,10 +297,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::Hash",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -386,8 +386,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::Host",
-        xs_code    => $xs_code,
     );
+    $binding->append_xs($xs_code);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -463,9 +464,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::I32Array",
-        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -505,9 +506,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::Float32",
-        xs_code    => $float32_xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($float32_xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -534,9 +535,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::Float64",
-        xs_code    => $float64_xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($float64_xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -746,11 +747,11 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::Obj",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method( alias => '_load', method => 'Load' );
+    $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -837,10 +838,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::VArray",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -896,9 +897,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::VTable",
-        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

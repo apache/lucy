@@ -101,8 +101,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::Debug",
-        xs_code    => $xs_code,
     );
+    $binding->append_xs($xs_code);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -132,8 +133,8 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::IndexFileNames",
-        xs_code    => $xs_code,
     );
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -192,9 +193,9 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::SortExternal",
-        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -306,8 +307,8 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::StringHelper",
-        xs_code    => $xs_code,
     );
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

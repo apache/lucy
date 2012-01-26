@@ -59,23 +59,22 @@ const static CFCMeta CFCPERLCLASS_META = {
 };
 
 CFCPerlClass*
-CFCPerlClass_new(CFCParcel *parcel, const char *class_name, CFCClass *client,
-                 const char *xs_code) {
+CFCPerlClass_new(CFCParcel *parcel, const char *class_name) {
     CFCPerlClass *self = (CFCPerlClass*)CFCBase_allocate(&CFCPERLCLASS_META);
-    return CFCPerlClass_init(self, parcel, class_name, client, xs_code);
+    return CFCPerlClass_init(self, parcel, class_name);
 }
 
 CFCPerlClass*
 CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel,
-                  const char *class_name, CFCClass *client,
-                  const char *xs_code) {
+                  const char *class_name) {
     CFCUTIL_NULL_CHECK(parcel);
     CFCUTIL_NULL_CHECK(class_name);
     self->parcel = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
-    self->client = (CFCClass*)CFCBase_incref((CFCBase*)client);
     self->class_name = CFCUtil_strdup(class_name);
-    self->pod_spec   = NULL;
-    self->xs_code = xs_code ? CFCUtil_strdup(xs_code) : NULL;
+    // Client may be NULL, since fetch_singleton() does not always succeed.
+    self->client = CFCClass_fetch_singleton(parcel, class_name); 
+    self->pod_spec     = NULL;
+    self->xs_code      = NULL;
     self->meth_aliases = NULL;
     self->meth_names   = NULL;
     self->num_methods  = 0;
@@ -404,6 +403,14 @@ CFCPerlClass_get_client(CFCPerlClass *self) {
 const char*
 CFCPerlClass_get_class_name(CFCPerlClass *self) {
     return self->class_name;
+}
+
+void
+CFCPerlClass_append_xs(CFCPerlClass *self, const char *xs) {
+    if (!self->xs_code) {
+        self->xs_code = CFCUtil_strdup("");
+    }
+    self->xs_code = CFCUtil_cat(self->xs_code, xs, NULL);
 }
 
 const char*

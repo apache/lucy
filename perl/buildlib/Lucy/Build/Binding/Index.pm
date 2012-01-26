@@ -487,7 +487,6 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::IndexReader",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor(
         alias       => 'open',
@@ -495,6 +494,7 @@ END_XS_CODE
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method( alias => '_offsets', method => 'Offsets' );
+    $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -676,10 +676,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::Indexer",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor( alias => '_new' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -822,11 +822,11 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::PolyReader",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -935,8 +935,8 @@ END_XS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::PostingListWriter",
-        xs_code    => $xs_code,
     );
+    $binding->append_xs($xs_code);
     $binding->bind_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1148,10 +1148,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::Similarity",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1228,9 +1228,10 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::SortCache",
-        xs_code    => $xs_code,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs_code);
+
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -1270,9 +1271,9 @@ END_XS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::SortWriter",
-        xs_code    => $xs_code,
     );
     $binding->bind_constructor;
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

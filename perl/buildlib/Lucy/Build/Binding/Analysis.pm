@@ -142,9 +142,9 @@ END_XS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Inversion",
-        xs_code    => $xs,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -410,9 +410,9 @@ END_XS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Token",
-        xs_code    => $xs,
     );
     $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->append_xs($xs);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

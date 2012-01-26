@@ -637,25 +637,13 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     our %new_PARAMS = (
         parcel     => undef,
         class_name => undef,
-        xs_code    => undef,
     );
 
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         $args{parcel} = Clownfish::CFC::Parcel->acquire( $args{parcel} );
-
-        # Validate.
-        confess("Missing required param 'class_name'")
-            unless $args{class_name};
-
-        # Retrieve Clownfish::CFC::Class client, if available.
-        $args{client} ||= Clownfish::CFC::Class->fetch_singleton(
-            parcel     => $args{parcel},
-            class_name => $args{class_name},
-        );
-
-        return _new( @args{qw( parcel class_name client xs_code )} );
+        return _new( @args{qw( parcel class_name )} );
     }
 
     our %bind_method_PARAMS = (
