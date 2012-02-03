@@ -2,6 +2,20 @@ Revision history for Lucy
 
 0.3.0  2012-01-15
 
+  New features:
+
+    * [LUCY-173] - Bundle Lemon parser generator
+    * [LUCY-189] - Bundle utf8proc
+    * [LUCY-191] - Unicode normalization
+      The new analyzer Lucy::Analysis::Normalizer provides Unicode
+      normalization, case folding and stripping of accents.
+    * [LUCY-196] - UAX #29 tokenizer
+      The new analyzer Lucy::Analysis::StandardTokenizer tokenizes according
+      to the UAX #29 word break rules.
+    * [LUCY-203] - Implement EasyAnalyzer
+      EasyAnalyzer is simple analysis chain using the StandardTokenizer, the
+      Normalizer, and the SnowballStemmer.
+
   Bugfixes:
 
     * [LUCY-175] - Missing stdarg.h breaks build
@@ -29,14 +43,11 @@ Revision history for Lucy
     * [LUCY-143] - Convert Clownfish::Parser to Lemon
     * [LUCY-179] - Tighten UTF-8 validity checks.
     * [LUCY-197] - Clean whitespace for 0.3.0
-
-  New features:
-
-    * [LUCY-173] - Bundle Lemon parser generator
-    * [LUCY-189] - Bundle utf8proc
-    * [LUCY-191] - Unicode normalization
-    * [LUCY-196] - UAX #29 tokenizer
-    * [LUCY-203] - Implement EasyAnalyzer
+    * [LUCY-204] - Process ClusterSearcher RPCs in parallel
+    * [LUCY-205] - Parallel processing for SearchServer
+      This introduces an incompatible API change: The port argument has moved
+      from the constructor to the serve method and the password argument has
+      been removed.
 
   Tasks:
 
