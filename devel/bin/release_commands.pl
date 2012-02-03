@@ -236,6 +236,8 @@ information on ASF voting procedures, see:
 [ ] +0
 [ ] -1 Do not release RC $rc as Apache Lucy (incubating) version $x_y_z_version because...
 
+Here's my +1.
+
 Thanks!
 END_LUCY_DEV_VOTE
 
