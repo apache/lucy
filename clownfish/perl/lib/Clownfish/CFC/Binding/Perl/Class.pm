@@ -237,6 +237,9 @@ sub create_pod {
             if ( !ref $spec ) {
                 $constructor_pod .= _perlify_doc_text($spec);
             }
+            elsif ( $spec->{pod} ) {
+                $constructor_pod .= _perlify_doc_text( $spec->{pod} );
+            }
             else {
                 my $func_name   = $spec->{func} || 'init';
                 my $init_func   = $class->function($func_name);
