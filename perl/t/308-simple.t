@@ -48,7 +48,7 @@ while ( my $hit = $lucy->next ) {
 
 $lucy->add_doc( { band => 'Cream' } );
 is( $lucy->search( query => 'cream' ), 4,
-    "search uses correct PolyAnalyzer" );
+    "search uses correct EasyAnalyzer" );
 
 SKIP: {
     skip( "fork on Windows not supported by Lucy", 1 )

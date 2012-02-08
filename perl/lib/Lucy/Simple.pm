@@ -21,7 +21,7 @@ use Carp;
 use Scalar::Util qw( weaken reftype refaddr );
 
 use Lucy::Plan::Schema;
-use Lucy::Analysis::PolyAnalyzer;
+use Lucy::Analysis::EasyAnalyzer;
 use Lucy::Index::Indexer;
 use Lucy::Search::IndexSearcher;
 
@@ -48,7 +48,7 @@ sub new {
         ref($either) || $either;
 
     # Get type and schema.
-    my $analyzer = Lucy::Analysis::PolyAnalyzer->new( language => $language );
+    my $analyzer = Lucy::Analysis::EasyAnalyzer->new( language => $language );
     $self->{type} = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
     my $schema = $self->{schema} = Lucy::Plan::Schema->new;
 
