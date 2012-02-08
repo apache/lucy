@@ -20,7 +20,6 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestArchitecture.h"
 #include "Lucy/Test/TestSchema.h"
-#include "Lucy/Analysis/CaseFolder.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Plan/FullTextType.h"
 #include "Lucy/Plan/Architecture.h"
@@ -60,7 +59,6 @@ test_Equals(TestBatch *batch) {
     CharBuf    *content      = (CharBuf*)ZCB_WRAP_STR("content", 7);
     FullTextType *type = (FullTextType*)TestSchema_Fetch_Type(spec_differs,
                                                               content);
-    CaseFolder *case_folder = CaseFolder_new();
 
     TEST_TRUE(batch, TestSchema_Equals(schema, (Obj*)schema), "Equals");
 
@@ -76,7 +74,6 @@ test_Equals(TestBatch *batch) {
     DECREF(schema);
     DECREF(arch_differs);
     DECREF(spec_differs);
-    DECREF(case_folder);
 }
 
 static void

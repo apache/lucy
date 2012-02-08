@@ -21,7 +21,7 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Analysis/TestPolyAnalyzer.h"
 #include "Lucy/Analysis/PolyAnalyzer.h"
-#include "Lucy/Analysis/CaseFolder.h"
+#include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Analysis/SnowballStopFilter.h"
 #include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
@@ -57,7 +57,7 @@ static void
 test_analysis(TestBatch *batch) {
     CharBuf            *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2);
     CharBuf            *source_text = CB_newf("Eats, shoots and leaves.");
-    CaseFolder         *case_folder = CaseFolder_new();
+    Normalizer         *normalizer  = Normalizer_new(NULL, true, false);
     StandardTokenizer  *tokenizer   = StandardTokenizer_new();
     SnowballStopFilter *stopfilter  = SnowStop_new(EN, NULL);
     SnowballStemmer    *stemmer     = SnowStemmer_new(EN);
@@ -76,12 +76,12 @@ test_analysis(TestBatch *batch) {
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder));
+        VA_Push(analyzers, INCREF(normalizer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
         VA_Push(expected, (Obj*)CB_newf("eats, shoots and leaves."));
         TestUtils_test_analyzer(batch, (Analyzer*)polyanalyzer, source_text,
-                                expected, "With CaseFolder");
+                                expected, "With Normalizer");
         DECREF(expected);
         DECREF(polyanalyzer);
         DECREF(analyzers);
@@ -89,7 +89,7 @@ test_analysis(TestBatch *batch) {
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder));
+        VA_Push(analyzers, INCREF(normalizer));
         VA_Push(analyzers, INCREF(tokenizer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
@@ -106,7 +106,7 @@ test_analysis(TestBatch *batch) {
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder));
+        VA_Push(analyzers, INCREF(normalizer));
         VA_Push(analyzers, INCREF(tokenizer));
         VA_Push(analyzers, INCREF(stopfilter));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
@@ -123,7 +123,7 @@ test_analysis(TestBatch *batch) {
 
     {
         VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(case_folder));
+        VA_Push(analyzers, INCREF(normalizer));
         VA_Push(analyzers, INCREF(tokenizer));
         VA_Push(analyzers, INCREF(stopfilter));
         VA_Push(analyzers, INCREF(stemmer));
@@ -142,7 +142,7 @@ test_analysis(TestBatch *batch) {
     DECREF(stemmer);
     DECREF(stopfilter);
     DECREF(tokenizer);
-    DECREF(case_folder);
+    DECREF(normalizer);
     DECREF(source_text);
 }
 

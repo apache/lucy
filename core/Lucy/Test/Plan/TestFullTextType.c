@@ -21,15 +21,15 @@
 #include "Lucy/Test/Plan/TestFullTextType.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/FullTextType.h"
-#include "Lucy/Analysis/CaseFolder.h"
+#include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     StandardTokenizer *tokenizer     = StandardTokenizer_new();
-    CaseFolder        *case_folder   = CaseFolder_new();
+    Normalizer        *normalizer    = Normalizer_new(NULL, true, false);
     FullTextType      *type          = FullTextType_new((Analyzer*)tokenizer);
-    FullTextType      *other         = FullTextType_new((Analyzer*)case_folder);
+    FullTextType      *other         = FullTextType_new((Analyzer*)normalizer);
     FullTextType      *boost_differs = FullTextType_new((Analyzer*)tokenizer);
     FullTextType      *not_indexed   = FullTextType_new((Analyzer*)tokenizer);
     FullTextType      *not_stored    = FullTextType_new((Analyzer*)tokenizer);
@@ -72,7 +72,7 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     DECREF(boost_differs);
     DECREF(other);
     DECREF(type);
-    DECREF(case_folder);
+    DECREF(normalizer);
     DECREF(tokenizer);
 }
 

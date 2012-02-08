@@ -21,9 +21,9 @@ use Test::More tests => 7;
 use Lucy::Test::TestUtils qw( test_analyzer );
 
 my $source_text = 'Eats, shoots and leaves.';
-my $case_folder = Lucy::Analysis::CaseFolder->new;
+my $normalizer  = Lucy::Analysis::Normalizer->new;
 my $polyanalyzer
-    = Lucy::Analysis::PolyAnalyzer->new( analyzers => [$case_folder], );
+    = Lucy::Analysis::PolyAnalyzer->new( analyzers => [$normalizer], );
 test_analyzer(
     $polyanalyzer, $source_text,
     ['eats, shoots and leaves.'],
