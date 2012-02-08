@@ -38,7 +38,7 @@ use base qw( Lucy::Plan::Schema );
 sub new {
     my $self       = shift->SUPER::new(@_);
     my $unsortable = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::RegexTokenizer->new, );
+        analyzer => Lucy::Analysis::StandardTokenizer->new, );
     my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
     my $int32_type = Lucy::Plan::Int32Type->new(
         indexed  => 0,

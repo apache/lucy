@@ -32,12 +32,12 @@ BEGIN {
 
 package SortSchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::RegexTokenizer;
+use Lucy::Analysis::StandardTokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
     my $plain_type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::RegexTokenizer->new );
+        analyzer => Lucy::Analysis::StandardTokenizer->new );
     my $string_type = Lucy::Plan::StringType->new( sortable => 1 );
     $self->spec_field( name => 'content', type => $plain_type );
     $self->spec_field( name => 'number',  type => $string_type );

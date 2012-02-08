@@ -22,21 +22,21 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/FullTextType.h"
 #include "Lucy/Analysis/CaseFolder.h"
-#include "Lucy/Analysis/RegexTokenizer.h"
+#include "Lucy/Analysis/StandardTokenizer.h"
 
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
-    RegexTokenizer *tokenizer     = RegexTokenizer_new(NULL);
-    CaseFolder     *case_folder   = CaseFolder_new();
-    FullTextType   *type          = FullTextType_new((Analyzer*)tokenizer);
-    FullTextType   *other         = FullTextType_new((Analyzer*)case_folder);
-    FullTextType   *boost_differs = FullTextType_new((Analyzer*)tokenizer);
-    FullTextType   *not_indexed   = FullTextType_new((Analyzer*)tokenizer);
-    FullTextType   *not_stored    = FullTextType_new((Analyzer*)tokenizer);
-    FullTextType   *highlightable = FullTextType_new((Analyzer*)tokenizer);
-    Obj            *dump          = (Obj*)FullTextType_Dump(type);
-    Obj            *clone         = Obj_Load(dump, dump);
-    Obj            *another_dump  = (Obj*)FullTextType_Dump_For_Schema(type);
+    StandardTokenizer *tokenizer     = StandardTokenizer_new();
+    CaseFolder        *case_folder   = CaseFolder_new();
+    FullTextType      *type          = FullTextType_new((Analyzer*)tokenizer);
+    FullTextType      *other         = FullTextType_new((Analyzer*)case_folder);
+    FullTextType      *boost_differs = FullTextType_new((Analyzer*)tokenizer);
+    FullTextType      *not_indexed   = FullTextType_new((Analyzer*)tokenizer);
+    FullTextType      *not_stored    = FullTextType_new((Analyzer*)tokenizer);
+    FullTextType      *highlightable = FullTextType_new((Analyzer*)tokenizer);
+    Obj               *dump          = (Obj*)FullTextType_Dump(type);
+    Obj               *clone         = Obj_Load(dump, dump);
+    Obj               *another_dump  = (Obj*)FullTextType_Dump_For_Schema(type);
 
     FullTextType_Set_Boost(boost_differs, 1.5);
     FullTextType_Set_Indexed(not_indexed, false);
@@ -78,10 +78,10 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 
 static void
 test_Compare_Values(TestBatch *batch) {
-    RegexTokenizer *tokenizer = RegexTokenizer_new(NULL);
-    FullTextType   *type      = FullTextType_new((Analyzer*)tokenizer);
-    ZombieCharBuf  *a         = ZCB_WRAP_STR("a", 1);
-    ZombieCharBuf  *b         = ZCB_WRAP_STR("b", 1);
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
+    FullTextType      *type      = FullTextType_new((Analyzer*)tokenizer);
+    ZombieCharBuf     *a         = ZCB_WRAP_STR("a", 1);
+    ZombieCharBuf     *b         = ZCB_WRAP_STR("b", 1);
 
     TEST_TRUE(batch,
               FullTextType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,

@@ -32,12 +32,12 @@ BEGIN {
 
 package SortSchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::RegexTokenizer;
+use Lucy::Analysis::StandardTokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
     my $plain_type = Lucy::Plan::FullTextType->new(
-        analyzer      => Lucy::Analysis::RegexTokenizer->new,
+        analyzer      => Lucy::Analysis::StandardTokenizer->new,
         highlightable => 1,
     );
     my $num_type = Lucy::Plan::Int32Type->new( sortable => 1, indexed => 0 );

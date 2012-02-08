@@ -23,7 +23,7 @@ my $schema = Lucy::Plan::Schema->new;
 $schema->spec_field(
     name => 'content',
     type => Lucy::Plan::FullTextType->new(
-        analyzer      => Lucy::Analysis::RegexTokenizer->new,
+        analyzer      => Lucy::Analysis::StandardTokenizer->new,
         highlightable => 1,
     ),
 );

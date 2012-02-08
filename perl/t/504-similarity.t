@@ -24,11 +24,11 @@ sub make_similarity { LucyX::Index::LongFieldSim->new }
 
 package MySchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::RegexTokenizer;
+use Lucy::Analysis::StandardTokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
-    my $analyzer   = Lucy::Analysis::RegexTokenizer->new;
+    my $analyzer   = Lucy::Analysis::StandardTokenizer->new;
     my $plain_type = Lucy::Plan::FullTextType->new( analyzer => $analyzer, );
     my $long_field_type
         = MySchema::LongTextField->new( analyzer => $analyzer, );

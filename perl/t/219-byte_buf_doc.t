@@ -63,7 +63,7 @@ sub architecture { MyArchitecture->new }
 
 sub new {
     my $self      = shift->SUPER::new(@_);
-    my $tokenizer = Lucy::Analysis::RegexTokenizer->new;
+    my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
     my $type      = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
     $self->spec_field( name => 'value', type => $type );
     return $self;

@@ -21,7 +21,7 @@
 #include "Lucy/Test/Plan/TestArchitecture.h"
 #include "Lucy/Test/TestSchema.h"
 #include "Lucy/Analysis/CaseFolder.h"
-#include "Lucy/Analysis/RegexTokenizer.h"
+#include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Plan/FullTextType.h"
 #include "Lucy/Plan/Architecture.h"
 
@@ -33,7 +33,7 @@ TestSchema_new() {
 
 TestSchema*
 TestSchema_init(TestSchema *self) {
-    RegexTokenizer *tokenizer = RegexTokenizer_new(NULL);
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType *type = FullTextType_new((Analyzer*)tokenizer);
 
     Schema_init((Schema*)self);

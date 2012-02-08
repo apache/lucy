@@ -18,7 +18,7 @@ use warnings;
 
 package MySchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::RegexTokenizer;
+use Lucy::Analysis::StandardTokenizer;
 
 our %fields = ();
 
@@ -29,7 +29,7 @@ use Lucy::Test;
 
 my $schema = MySchema->new;
 my $type   = Lucy::Plan::FullTextType->new(
-    analyzer => Lucy::Analysis::RegexTokenizer->new, );
+    analyzer => Lucy::Analysis::StandardTokenizer->new, );
 
 for my $num_fields ( 1 .. 10 ) {
     # Build an index with $num_fields fields, and the same content in each.

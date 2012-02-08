@@ -68,12 +68,12 @@ sub make_similarity { RichSim->new }
 
 package MySchema;
 use base qw( Lucy::Plan::Schema );
-use Lucy::Analysis::RegexTokenizer;
+use Lucy::Analysis::StandardTokenizer;
 
 sub new {
     my $self       = shift->SUPER::new(@_);
     my $plain_type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::RegexTokenizer->new );
+        analyzer => Lucy::Analysis::StandardTokenizer->new );
     my $boosted_type
         = MySchema::boosted->new( analyzer => MyRegexTokenizer->new, );
     $self->spec_field( name => 'plain',   type => $plain_type );

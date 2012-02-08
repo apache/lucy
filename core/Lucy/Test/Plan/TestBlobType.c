@@ -21,7 +21,6 @@
 #include "Lucy/Test/Plan/TestBlobType.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/BlobType.h"
-#include "Lucy/Analysis/RegexTokenizer.h"
 
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {

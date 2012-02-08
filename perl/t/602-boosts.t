@@ -25,7 +25,7 @@ use base qw( Lucy::Plan::Schema );
 sub new {
     my $self = shift->SUPER::new(@_);
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer => Lucy::Analysis::RegexTokenizer->new );
+        analyzer => Lucy::Analysis::StandardTokenizer->new );
     $self->spec_field( name => 'content',  type => $type );
     $self->spec_field( name => 'category', type => $type );
     return $self;
@@ -36,7 +36,7 @@ use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self       = shift->SUPER::new(@_);
-    my $tokenizer  = Lucy::Analysis::RegexTokenizer->new;
+    my $tokenizer  = Lucy::Analysis::StandardTokenizer->new;
     my $plain_type = Lucy::Plan::FullTextType->new( analyzer => $tokenizer );
     my $boosted_type = Lucy::Plan::FullTextType->new(
         analyzer => $tokenizer,

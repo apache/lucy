@@ -24,7 +24,7 @@ my $stemmer = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
 test_analyzer( $stemmer, 'ponies', ['poni'], "single word stemmed" );
 test_analyzer( $stemmer, 'pony',   ['poni'], "stem, not just truncate" );
 
-my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
+my $tokenizer    = Lucy::Analysis::StandardTokenizer->new;
 my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
     analyzers => [ $tokenizer, $stemmer ], );
 test_analyzer(

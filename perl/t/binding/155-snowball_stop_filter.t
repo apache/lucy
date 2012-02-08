@@ -23,7 +23,7 @@ use Lucy::Test::TestUtils qw( test_analyzer );
 my $stopfilter = Lucy::Analysis::SnowballStopFilter->new( language => 'en' );
 test_analyzer( $stopfilter, 'the', [], "single stopword stopalized" );
 
-my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
+my $tokenizer    = Lucy::Analysis::StandardTokenizer->new;
 my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
     analyzers => [ $tokenizer, $stopfilter ], );
 test_analyzer( $polyanalyzer, 'i am the walrus',

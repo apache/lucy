@@ -23,7 +23,7 @@ use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self         = shift->SUPER::new(@_);
-    my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
+    my $tokenizer    = Lucy::Analysis::StandardTokenizer->new;
     my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new( language => 'en' );
     my $plain = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
     my $easyanalyzed

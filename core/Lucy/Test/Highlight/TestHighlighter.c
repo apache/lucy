@@ -21,7 +21,7 @@
 #include "Lucy/Test/Highlight/TestHighlighter.h"
 #include "Lucy/Highlight/Highlighter.h"
 
-#include "Lucy/Analysis/RegexTokenizer.h"
+#include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Document/HitDoc.h"
 #include "Lucy/Highlight/HeatMap.h"
@@ -455,7 +455,7 @@ test_Find_Sentences(TestBatch *batch, Searcher *searcher, Obj *query) {
 static void
 test_highlighting(TestBatch *batch) {
     Schema *schema = Schema_new();
-    RegexTokenizer *tokenizer = RegexTokenizer_new(NULL);
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType *plain_type = FullTextType_new((Analyzer*)tokenizer);
     FullTextType_Set_Highlightable(plain_type, true);
     FullTextType *dunked_type = FullTextType_new((Analyzer*)tokenizer);
