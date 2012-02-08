@@ -41,7 +41,7 @@ L<Lucy::Plan::FullTextType> - Field type for full text search.
 
 =item *
 
-L<Lucy::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
+L<Lucy::Analysis::EasyAnalyzer> - A one-size-fits-all parser/tokenizer.
 
 =item *
 
@@ -63,7 +63,7 @@ After we load our modules...
 
     use Lucy::Plan::Schema;
     use Lucy::Plan::FullTextType;
-    use Lucy::Analysis::PolyAnalyzer;
+    use Lucy::Analysis::EasyAnalyzer;
     use Lucy::Index::Indexer;
 
 ... the first item we're going need is a L<Schema|Lucy::Plan::Schema>. 
@@ -73,11 +73,11 @@ they're defined.  We'll start off with three fields: title, content and url.
 
     # Create Schema.
     my $schema = Lucy::Plan::Schema->new;
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
+    my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new(
         language => 'en',
     );
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer => $polyanalyzer,
+        analyzer => $easyanalyzer,
     );
     $schema->spec_field( name => 'title',   type => $type );
     $schema->spec_field( name => 'content', type => $type );

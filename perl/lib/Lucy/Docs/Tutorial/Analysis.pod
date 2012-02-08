@@ -19,7 +19,7 @@ Lucy::Docs::Tutorial::Analysis - How to choose and use Analyzers.
 
 =head1 DESCRIPTION
 
-Try swapping out the PolyAnalyzer in our Schema for a RegexTokenizer:
+Try swapping out the EasyAnalyzer in our Schema for a RegexTokenizer:
 
     my $tokenizer = Lucy::Analysis::RegexTokenizer->new;
     my $type = Lucy::Plan::FullTextType->new(
@@ -29,26 +29,26 @@ Try swapping out the PolyAnalyzer in our Schema for a RegexTokenizer:
 Search for C<senate>, C<Senate>, and C<Senator> before and after making the
 change and re-indexing.
 
-Under PolyAnalyzer, the results are identical for all three searches, but
+Under EasyAnalyzer, the results are identical for all three searches, but
 under RegexTokenizer, searches are case-sensitive, and the result sets for
 C<Senate> and C<Senator> are distinct.
 
-=head2 PolyAnalyzer
+=head2 EasyAnalyzer
 
-What's happening is that PolyAnalyzer is performing more aggressive processing
+What's happening is that EasyAnalyzer is performing more aggressive processing
 than RegexTokenizer.  In addition to tokenizing, it's also converting all text to
 lower case so that searches are case-insensitive, and using a "stemming"
 algorithm to reduce related words to a common stem (C<senat>, in this case).
 
-PolyAnalyzer is actually multiple Analyzers wrapped up in a single package.
-In this case, it's three-in-one, since specifying a PolyAnalyzer with 
+EasyAnalyzer is actually multiple Analyzers wrapped up in a single package.
+In this case, it's three-in-one, since specifying a EasyAnalyzer with
 C<< language => 'en' >> is equivalent to this snippet:
 
-    my $case_folder  = Lucy::Analysis::CaseFolder->new;
     my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
+    my $normalizer   = Lucy::Analysis::Normalizer->new;
     my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stemmer ], 
+        analyzers => [ $tokenizer, $normalizer, $stemmer ],
     );
 
 You can add or subtract Analyzers from there if you like.  Try adding a fourth
@@ -59,16 +59,16 @@ and "maybe".
         language => 'en',
     );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stopfilter, $stemmer ], 
+        analyzers => [ $tokenizer, $normalizer, $stopfilter, $stemmer ],
     );
 
 Also, try removing the SnowballStemmer.
 
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer ], 
+        analyzers => [ $tokenizer, $normalizer ],
     );
 
-The original choice of a stock English PolyAnalyzer probably still yields the
+The original choice of a stock English EasyAnalyzer probably still yields the
 best results for this document collection, but you get the idea: sometimes you
 want a different Analyzer.
 

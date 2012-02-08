@@ -37,7 +37,7 @@ Later, we'll add support for trailing wildcards.
 
 Our initial parser implentation will generate queries against a single fixed
 field, "content", and it will analyze text using a fixed choice of English
-PolyAnalyzer.  We won't subclass Lucy::Search::QueryParser just yet.
+EasyAnalyzer.  We won't subclass Lucy::Search::QueryParser just yet.
 
     package FlatQueryParser;
     use Lucy::Search::TermQuery;
@@ -46,7 +46,7 @@ PolyAnalyzer.  We won't subclass Lucy::Search::QueryParser just yet.
     use Carp;
     
     sub new { 
-        my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
+        my $analyzer = Lucy::Analysis::EasyAnalyzer->new(
             language => 'en',
         );
         return bless { 
@@ -96,9 +96,9 @@ single token and splits on whitespace everywhere else.
     }
 
 The main parsing routine creates an array of tokens by calling _tokenize(),
-runs the tokens through through the PolyAnalyzer, creates TermQuery or
+runs the tokens through through the EasyAnalyzer, creates TermQuery or
 PhraseQuery objects according to how many tokens emerge from the
-PolyAnalyzer's split() method, and adds each of the sub-queries to the primary
+EasyAnalyzer's split() method, and adds each of the sub-queries to the primary
 ORQuery.
 
     sub parse {
@@ -147,7 +147,7 @@ routines to accomplish that expansion, we're now going to subclass Lucy::Search:
 and take advantage of some of its existing methods.
 
 Our first parser implementation had the "content" field name and the choice of
-English PolyAnalyzer hard-coded for simplicity, but we don't need to do that
+English EasyAnalyzer hard-coded for simplicity, but we don't need to do that
 once we subclass Lucy::Search::QueryParser.  QueryParser's constructor --
 which we will inherit, allowing us to eliminate our own constructor --
 requires a Schema which conveys field
@@ -212,7 +212,7 @@ parent class implementation on TermQuery and PhraseQuery.
     }
 
 Ordinarily, those asterisks would have been stripped when running tokens
-through the PolyAnalyzer -- query strings containing "foo*" would produce
+through the EasyAnalyzer -- query strings containing "foo*" would produce
 TermQueries for the term "foo".  Our override intercepts tokens with trailing
 asterisks and processes them as PrefixQueries before C<SUPER::expand_leaf> can
 discard them, so that a search for "foo*" can match "food", "foosball", and so

@@ -25,19 +25,19 @@ my $uscon_source  = '/usr/local/apache2/htdocs/us_constitution';
 use File::Spec::Functions qw( catfile );
 use Lucy::Plan::Schema;
 use Lucy::Plan::FullTextType;
-use Lucy::Analysis::PolyAnalyzer;
+use Lucy::Analysis::EasyAnalyzer;
 use Lucy::Index::Indexer;
 
 # Create Schema.
 my $schema = Lucy::Plan::Schema->new;
-my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
+my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new(
     language => 'en',
 );
 my $title_type = Lucy::Plan::FullTextType->new( 
-    analyzer => $polyanalyzer, 
+    analyzer => $easyanalyzer,
 );
 my $content_type = Lucy::Plan::FullTextType->new(
-    analyzer      => $polyanalyzer,
+    analyzer      => $easyanalyzer,
     highlightable => 1,
 );
 my $url_type = Lucy::Plan::StringType->new( indexed => 0, );

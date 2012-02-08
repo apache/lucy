@@ -201,11 +201,11 @@ sub bind_fulltexttype {
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
+    my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new(
         language => 'en',
     );
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer => $polyanalyzer,
+        analyzer => $easyanalyzer,
     );
     my $schema = Lucy::Plan::Schema->new;
     $schema->spec_field( name => 'title',   type => $type );
@@ -271,14 +271,14 @@ sub bind_schema {
     my $synopsis = <<'END_SYNOPSIS';
     use Lucy::Plan::Schema;
     use Lucy::Plan::FullTextType;
-    use Lucy::Analysis::PolyAnalyzer;
+    use Lucy::Analysis::EasyAnalyzer;
     
     my $schema = Lucy::Plan::Schema->new;
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
+    my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new(
         language => 'en',
     );
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer => $polyanalyzer,
+        analyzer => $easyanalyzer,
     );
     $schema->spec_field( name => 'title',   type => $type );
     $schema->spec_field( name => 'content', type => $type );

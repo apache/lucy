@@ -186,7 +186,7 @@ sub bind_polyanalyzer {
     my $synopsis = <<'END_SYNOPSIS';
     my $schema = Lucy::Plan::Schema->new;
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
-        language => 'en',
+        analyzers => \@analyzers,
     );
     my $type = Lucy::Plan::FullTextType->new(
         analyzer => $polyanalyzer,
@@ -195,17 +195,11 @@ sub bind_polyanalyzer {
     $schema->spec_field( name => 'content', type => $type );
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
-    my $analyzer = Lucy::Analysis::PolyAnalyzer->new(
-        language  => 'es',
-    );
-    
-    # or...
-
-    my $case_folder  = Lucy::Analysis::CaseFolder->new;
     my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
+    my $normalizer   = Lucy::Analysis::Normalizer->new;
     my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $whitespace_tokenizer, $stemmer, ], );
+        analyzers => [ $tokenizer, $normalizer, $stemmer, ], );
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor );

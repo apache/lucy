@@ -29,16 +29,16 @@ First, plan out your index structure, create the index, and add documents:
     
     use Lucy::Index::Indexer;
     use Lucy::Plan::Schema;
-    use Lucy::Analysis::PolyAnalyzer;
+    use Lucy::Analysis::EasyAnalyzer;
     use Lucy::Plan::FullTextType;
     
     # Create a Schema which defines index fields.
     my $schema = Lucy::Plan::Schema->new;
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
+    my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new(
         language => 'en',
     );
     my $type = Lucy::Plan::FullTextType->new(
-        analyzer => $polyanalyzer,
+        analyzer => $easyanalyzer,
     );
     $schema->spec_field( name => 'title',   type => $type );
     $schema->spec_field( name => 'content', type => $type );
@@ -162,7 +162,7 @@ L<Lucy::Search::IndexSearcher> - Search an index.
 
 =item *
 
-L<Lucy::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
+L<Lucy::Analysis::EasyAnalyzer> - A one-size-fits-all parser/tokenizer.
 
 =back
 
