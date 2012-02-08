@@ -195,7 +195,7 @@ sub bind_polyanalyzer {
     $schema->spec_field( name => 'content', type => $type );
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
-    my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
+    my $tokenizer    = Lucy::Analysis::StandardTokenizer->new;
     my $normalizer   = Lucy::Analysis::Normalizer->new;
     my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
