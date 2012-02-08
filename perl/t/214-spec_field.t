@@ -18,20 +18,16 @@ use warnings;
 
 use Lucy::Test;
 
-package PolyAnalyzerSpec;
-use base qw( Lucy::Plan::FullTextType );
-sub analyzer { Lucy::Analysis::PolyAnalyzer->new( language => 'en' ) }
-
 package MySchema;
 use base qw( Lucy::Plan::Schema );
 
 sub new {
     my $self         = shift->SUPER::new(@_);
     my $tokenizer    = Lucy::Analysis::RegexTokenizer->new;
-    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( language => 'en' );
+    my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new( language => 'en' );
     my $plain = Lucy::Plan::FullTextType->new( analyzer => $tokenizer, );
-    my $polyanalyzed
-        = Lucy::Plan::FullTextType->new( analyzer => $polyanalyzer );
+    my $easyanalyzed
+        = Lucy::Plan::FullTextType->new( analyzer => $easyanalyzer );
     my $string_spec          = Lucy::Plan::StringType->new;
     my $unindexedbutanalyzed = Lucy::Plan::FullTextType->new(
         analyzer => $tokenizer,
@@ -39,7 +35,7 @@ sub new {
     );
     my $unanalyzedunindexed = Lucy::Plan::StringType->new( indexed => 0, );
     $self->spec_field( name => 'analyzed',     type => $plain );
-    $self->spec_field( name => 'polyanalyzed', type => $polyanalyzed );
+    $self->spec_field( name => 'easyanalyzed', type => $easyanalyzed );
     $self->spec_field( name => 'string',       type => $string_spec );
     $self->spec_field(
         name => 'unindexedbutanalyzed',
@@ -64,7 +60,7 @@ my $indexer = Lucy::Index::Indexer->new(
 
 $indexer->add_doc( { $_ => 'United States' } ) for qw(
     analyzed
-    polyanalyzed
+    easyanalyzed
     string
     unindexedbutanalyzed
     unanalyzedunindexed
@@ -91,7 +87,7 @@ sub check {
 }
 
 check( 'analyzed',             'States',        1 );
-check( 'polyanalyzed',         'state',         1 );
+check( 'easyanalyzed',         'state',         1 );
 check( 'string',               'United States', 1 );
 check( 'unindexedbutanalyzed', 'state',         0 );
 check( 'unindexedbutanalyzed', 'United States', 0 );

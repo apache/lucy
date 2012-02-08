@@ -118,7 +118,7 @@ is( $hits->total_hits, 1, "QueryParser fields param works" );
 
 my $analyzer_parser = Lucy::Search::QueryParser->new(
     schema   => $schema,
-    analyzer => Lucy::Analysis::PolyAnalyzer->new( language => 'en' ),
+    analyzer => Lucy::Analysis::EasyAnalyzer->new( language => 'en' ),
 );
 
 $hits = $searcher->hits( query => 'United States' );
