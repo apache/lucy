@@ -73,7 +73,8 @@ Then, search the index:
 
 =head1 DESCRIPTION
 
-Apache Lucy is a high-performance, modular search engine library.
+The Apache Lucy search engine library delivers high-performance, modular
+full-text search.
 
 =head2 Features
 

@@ -310,9 +310,9 @@ Greetings,
 The Apache Lucy team is pleased to announce the release of version $x_y_z_version
 from the Apache Incubator!
 
-Apache Lucy is full-text search engine library written in C and targeted at
-dynamic languages.  For a list of issues resolved in this version, please see
-the release notes:
+The Apache Lucy search engine library provides full-text search for dynamic
+programming languages.  For a list of issues resolved in this version, please
+see the release notes:
 
   http://www.apache.org/dist/incubator/lucy/CHANGES-$x_y_z_version.txt
 

@@ -1,8 +1,8 @@
 Build Instructions
 ==================
 
-Apache Lucy is a C library targeted at dynamic languages.  Currently it is
-available via Perl bindings.
+The Apache Lucy search engine library provides full-text search for dynamic
+programming languages.  Currently it is available via Perl bindings.
 
 To build Lucy with Perl bindings, chdir to the "perl" subdirectory underneath
 the "lucy" top level and follow the instructions in the INSTALL document
