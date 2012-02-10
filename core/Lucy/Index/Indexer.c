@@ -116,6 +116,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     }
     else {
         if (!latest_snapfile) {
+            S_release_write_lock(self);
             THROW(ERR, "No Schema supplied, and can't find one in the index");
         }
         else {
