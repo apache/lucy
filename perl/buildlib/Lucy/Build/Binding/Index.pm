@@ -508,6 +508,7 @@ sub bind_indexer {
         Prepare_Commit
         Delete_By_Term
         Delete_By_Query
+        Get_Schema
     );
     my @bound = @exposed;
 

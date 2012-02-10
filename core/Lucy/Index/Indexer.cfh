@@ -134,6 +134,11 @@ class Lucy::Index::Indexer inherits Lucy::Object::Obj {
     public void
     Prepare_Commit(Indexer *self);
 
+    /** Accessor for schema.
+     */
+    public Schema*
+    Get_Schema(Indexer *self);
+
     /** Accessor for seg_writer member var.
      */
     public SegWriter*

@@ -554,6 +554,11 @@ Indexer_commit(Indexer *self) {
     S_release_write_lock(self);
 }
 
+Schema*
+Indexer_get_schema(Indexer *self) {
+    return self->schema;
+}
+
 SegWriter*
 Indexer_get_seg_writer(Indexer *self) {
     return self->seg_writer;
