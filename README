@@ -3,8 +3,8 @@ Apache Lucy
 
 OVERVIEW
 
-Apache Lucy is a fulltext search engine library, written in C and targeted at
-dynamic language users.
+The Apache Lucy search engine library provides full-text search for dynamic
+programming languages.
 
 DISCLAIMER
 
