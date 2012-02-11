@@ -401,7 +401,6 @@ t/core/528-leaf_query.t
 t/core/529-no_match_query.t
 t/core/530-series_matcher.t
 t/core/531-or_query.t
-xs/Lucy/Analysis/CaseFolder.c
 xs/Lucy/Analysis/RegexTokenizer.c
 xs/Lucy/Document/Doc.c
 xs/Lucy/Index/DocReader.c

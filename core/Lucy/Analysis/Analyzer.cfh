@@ -20,9 +20,9 @@ parcel Lucy;
  *
  * An Analyzer is a filter which processes text, transforming it from one form
  * into another.  For instance, an analyzer might break up a long text into
- * smaller pieces (L<RegexTokenizer|Lucy::Analysis::RegexTokenizer>), or it might
- * perform case folding to facilitate case-insensitive search
- * (L<CaseFolder|Lucy::Analysis::CaseFolder>).
+ * smaller pieces (L<RegexTokenizer|Lucy::Analysis::RegexTokenizer>), or it
+ * might perform case folding to facilitate case-insensitive search
+ * (L<Normalizer|Lucy::Analysis::Normalizer>).
  */
 abstract class Lucy::Analysis::Analyzer
     inherits Lucy::Object::Obj : dumpable {

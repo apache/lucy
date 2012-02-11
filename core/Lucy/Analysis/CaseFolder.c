@@ -18,7 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Analysis/CaseFolder.h"
-#include "Lucy/Analysis/Token.h"
+#include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Analysis/Inversion.h"
 
 CaseFolder*
@@ -30,14 +30,24 @@ CaseFolder_new() {
 CaseFolder*
 CaseFolder_init(CaseFolder *self) {
     Analyzer_init((Analyzer*)self);
-    self->work_buf = BB_new(0);
+    self->normalizer = Normalizer_new(NULL, true, false);
     return self;
 }
 
 void
 CaseFolder_destroy(CaseFolder *self) {
-    DECREF(self->work_buf);
+    DECREF(self->normalizer);
     SUPER_DESTROY(self, CASEFOLDER);
+}
+
+Inversion*
+CaseFolder_transform(CaseFolder *self, Inversion *inversion) {
+    return Normalizer_Transform(self->normalizer, inversion);
+}
+
+Inversion*
+CaseFolder_transform_text(CaseFolder *self, CharBuf *text) {
+    return Normalizer_Transform_Text(self->normalizer, text);
 }
 
 bool_t
