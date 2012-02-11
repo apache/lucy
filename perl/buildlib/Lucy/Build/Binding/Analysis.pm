@@ -54,7 +54,7 @@ sub bind_casefolder {
     my $case_folder = Lucy::Analysis::CaseFolder->new;
 
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stemmer ],
+        analyzers => [ $tokenizer, $case_folder, $stemmer ],
     );
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
@@ -155,7 +155,7 @@ sub bind_normalizer {
     my $normalizer = Lucy::Analysis::Normalizer->new;
     
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $normalizer, $tokenizer, $stemmer ],
+        analyzers => [ $tokenizer, $normalizer, $stemmer ],
     );
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
@@ -231,7 +231,7 @@ sub bind_regextokenizer {
 
     # Then... once you have a tokenizer, put it into a PolyAnalyzer:
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $word_char_tokenizer, $stemmer ], );
+        analyzers => [ $word_char_tokenizer, $normalizer, $stemmer ], );
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
     my $word_char_tokenizer = Lucy::Analysis::RegexTokenizer->new(
@@ -257,7 +257,7 @@ sub bind_snowballstemmer {
     my $stemmer = Lucy::Analysis::SnowballStemmer->new( language => 'es' );
     
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stemmer ],
+        analyzers => [ $tokenizer, $normalizer, $stemmer ],
     );
 
 This class is a wrapper around the Snowball stemming library, so it supports
@@ -286,7 +286,7 @@ sub bind_snowballstopfilter {
         language => 'fr',
     );
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stopfilter, $stemmer ],
+        analyzers => [ $tokenizer, $normalizer, $stopfilter, $stemmer ],
     );
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
@@ -319,7 +319,7 @@ sub bind_standardtokenizer {
 
     # Then... once you have a tokenizer, put it into a PolyAnalyzer:
     my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
-        analyzers => [ $case_folder, $tokenizer, $stemmer ], );
+        analyzers => [ $tokenizer, $normalizer, $stemmer ], );
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
     my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
