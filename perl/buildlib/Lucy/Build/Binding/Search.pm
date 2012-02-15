@@ -104,15 +104,6 @@ sub bind_bitvecmatcher {
 
 sub bind_collector {
     my @exposed = qw( Collect );
-    my @bound   = (
-        @exposed,
-        qw(
-            Set_Reader
-            Set_Base
-            Set_Matcher
-            Need_Score
-            )
-    );
 
     my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
@@ -160,7 +151,6 @@ sub bind_compiler {
         Get_Similarity
         Highlight_Spans
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -206,7 +196,6 @@ sub bind_hitqueue {
 
 sub bind_hits {
     my @exposed = qw( Next Total_Hits );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -233,17 +222,14 @@ END_SYNOPSIS
 }
 
 sub bind_indexsearcher {
-    my @bound   = qw( Get_Reader );
-    my @exposed = (
-        qw(
-            Hits
-            Collect
-            Doc_Max
-            Doc_Freq
-            Fetch_Doc
-            Get_Schema
-            ),
-        @bound
+    my @exposed = qw(
+        Hits
+        Collect
+        Doc_Max
+        Doc_Freq
+        Fetch_Doc
+        Get_Schema
+        Get_Reader
     );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -278,7 +264,6 @@ END_CONSTRUCTOR
 
 sub bind_leafquery {
     my @exposed = qw( Get_Field Get_Text );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -336,15 +321,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_matchdoc {
-    my @bound = qw(
-        Get_Doc_ID
-        Set_Doc_ID
-        Get_Score
-        Set_Score
-        Get_Values
-        Set_Values
-    );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Search::MatchDoc",
@@ -361,7 +337,6 @@ sub bind_matcher {
         Get_Doc_ID
         Score
     );
-    my @bound = ( @exposed, 'Collect' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -398,7 +373,6 @@ sub bind_notquery {
         Get_Negated_Query
         Set_Negated_Query
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -488,7 +462,6 @@ sub bind_orscorer {
 
 sub bind_phrasequery {
     my @exposed = qw( Get_Field Get_Terms );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -522,12 +495,6 @@ sub bind_phrasecompiler {
 }
 
 sub bind_polyquery {
-    my @bound = qw(
-        Add_Child
-        Set_Children
-        Get_Children
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     sub walk {
@@ -597,8 +564,7 @@ END_CONSTRUCTOR
 }
 
 sub bind_query {
-    my @bound = qw( Set_Boost Get_Boost );
-    my @exposed = ( 'Make_Compiler', @bound );
+    my @exposed = qw( Make_Compiler Set_Boost Get_Boost );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -655,15 +621,6 @@ sub bind_queryparser {
         Make_OR_Query
         Make_NOT_Query
         Make_Req_Opt_Query
-    );
-    my @bound = (
-        @exposed,
-        qw(
-            Get_Analyzer
-            Get_Schema
-            Get_Fields
-            Heed_Colons
-            )
     );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -754,7 +711,6 @@ sub bind_requiredoptionalquery {
         Get_Optional_Query
         Set_Optional_Query
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -795,14 +751,6 @@ sub bind_searcher {
         Fetch_Doc
         Get_Schema
     );
-    my @bound = (
-        @exposed,
-        qw(
-            Top_Docs
-            Fetch_Doc_Vec
-            Close
-            )
-    );
 
     my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
@@ -830,7 +778,6 @@ END_CONSTRUCTOR
 
 sub bind_sortrule {
     my @exposed = qw( Get_Field Get_Reverse );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -888,8 +835,6 @@ END_XS_CODE
 }
 
 sub bind_sortspec {
-    my @bound = qw( Get_Rules );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $sort_spec = Lucy::Search::SortSpec->new(
@@ -928,7 +873,6 @@ sub bind_span {
         Set_Weight
         Get_Weight
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -963,7 +907,6 @@ END_CONSTRUCTOR
 
 sub bind_termquery {
     my @exposed = qw( Get_Field Get_Term );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -1003,12 +946,6 @@ sub bind_termcompiler {
 }
 
 sub bind_topdocs {
-    my @bound = qw(
-        Get_Match_Docs
-        Get_Total_Hits
-        Set_Total_Hits
-    );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Search::TopDocs",

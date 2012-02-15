@@ -32,8 +32,6 @@ sub bind_all {
 }
 
 sub bind_analyzer {
-    my @bound = qw( Transform Transform_Text Split );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     $pod_spec->set_synopsis("    # Abstract base class.\n");
 
@@ -104,8 +102,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_inversion {
-    my @bound = qw( Append Reset Invert Next );
-
     my $xs = <<'END_XS';
 MODULE = Lucy   PACKAGE = Lucy::Analysis::Inversion
 
@@ -178,7 +174,6 @@ END_CONSTRUCTOR
 
 sub bind_polyanalyzer {
     my @exposed = qw( Get_Analyzers );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -335,12 +330,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_token {
-    my @bound = qw(
-        Get_Start_Offset
-        Get_End_Offset
-        Get_Boost
-        Get_Pos_Inc
-    );
     my @hand_rolled = qw(
         Set_Text
         Get_Text

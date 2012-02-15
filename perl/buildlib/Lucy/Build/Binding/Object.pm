@@ -50,7 +50,6 @@ sub bind_bitvector {
         Grow
         Count
     );
-    my @bound = ( @exposed, qw( Get_Capacity ) );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -81,12 +80,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_bytebuf {
-    my @bound = qw(
-        Get_Size
-        Get_Capacity
-        Cat
-    );
-
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Object::ByteBuf
 
@@ -194,8 +187,6 @@ END_XS_CODE
 }
 
 sub bind_err {
-    my @bound = qw( Cat_Mess Get_Mess );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Scalar::Util qw( blessed );
@@ -227,16 +218,6 @@ END_SYNOPSIS
 }
 
 sub bind_hash {
-    my @bound = qw(
-        Fetch
-        Delete
-        Keys
-        Values
-        Find_Key
-        Clear
-        Iterate
-        Get_Size
-    );
     my @hand_rolled = qw(
         Store
         Next
@@ -394,8 +375,6 @@ END_XS_CODE
 }
 
 sub bind_i32array {
-    my @bound = qw( Get Get_Size );
-
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy PACKAGE = Lucy::Object::I32Array
 
@@ -472,8 +451,6 @@ END_XS_CODE
 }
 
 sub bind_lockfreeregistry {
-    my @bound = qw( Register Fetch );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::LockFreeRegistry",
@@ -484,8 +461,6 @@ sub bind_lockfreeregistry {
 }
 
 sub bind_float32 {
-    my @bound = qw( Set_Value Get_Value );
-
     my $float32_xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::Float32
 
@@ -512,8 +487,6 @@ END_XS_CODE
 }
 
 sub bind_float64 {
-    my @bound = qw( Set_Value Get_Value );
-
     my $float64_xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::Float64
 
@@ -540,23 +513,6 @@ END_XS_CODE
 }
 
 sub bind_obj {
-    my @bound = qw(
-        Get_RefCount
-        Inc_RefCount
-        Dec_RefCount
-        Get_VTable
-        To_String
-        To_I64
-        To_F64
-        Dump
-        Clone
-        Mimic
-        Equals
-        Hash_Sum
-        Serialize
-        Deserialize
-        Destroy
-    );
     my @exposed = qw(
         To_String
         To_I64
@@ -757,14 +713,6 @@ END_XS_CODE
 }
 
 sub bind_varray {
-    my @bound = qw(
-        Push
-        Push_VArray
-        Unshift
-        Excise
-        Resize
-        Get_Size
-    );
     my @hand_rolled = qw(
         Shallow_Copy
         Shift
@@ -854,7 +802,6 @@ END_XS_CODE
 }
 
 sub bind_vtable {
-    my @bound = qw( Get_Name Get_Parent );
     my @hand_rolled = qw( Make_Obj );
 
     my $xs_code = <<'END_XS_CODE';

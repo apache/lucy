@@ -58,8 +58,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_sortcollector {
-    my @bound = qw( Pop_Match_Docs Get_Total_Hits );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Search::Collector::SortCollector",

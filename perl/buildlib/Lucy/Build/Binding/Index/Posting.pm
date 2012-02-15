@@ -24,8 +24,6 @@ sub bind_all {
 }
 
 sub bind_matchposting {
-    my @bound = qw( Get_Freq );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::Posting::MatchPosting",

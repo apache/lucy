@@ -65,7 +65,6 @@ sub bind_all {
 
 sub bind_backgroundmerger {
     my @exposed = qw( Commit Prepare_Commit Optimize );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -104,7 +103,6 @@ sub bind_datareader {
         Get_Seg_Tick
         Aggregator
     );
-    my @bound = ( @exposed, 'Close' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -148,7 +146,6 @@ sub bind_datawriter {
         Get_Schema
         Get_Folder
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<END_SYNOPSIS;
@@ -176,8 +173,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_deletionsreader {
-    my @bound = qw( Iterator Del_Count );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::DeletionsReader",
@@ -188,7 +183,6 @@ sub bind_deletionsreader {
 }
 
 sub bind_defaultdeletionsreader {
-    my @bound   = qw( Read_Deletions );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::DefaultDeletionsReader",
@@ -203,14 +197,6 @@ sub bind_deletionswriter {
         Delete_By_Query
         Updated
         Seg_Del_Count
-    );
-    my @bound = (
-        @exposed,
-        qw(
-            Generate_Doc_Map
-            Delete_By_Doc_ID
-            Seg_Deletions
-            )
     );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -244,8 +230,7 @@ sub bind_defaultdeletionswriter {
 }
 
 sub bind_docreader {
-    my @bound = qw( Fetch_Doc );
-    my @exposed = ( @bound, 'Aggregator' );
+    my @exposed = qw( Fetch_Doc Aggregator );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -275,7 +260,6 @@ sub bind_defaultdocreader {
 }
 
 sub bind_docvector {
-    my @bound   = qw( Term_Vector Field_Buf Add_Field_Buf );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::DocVector",
@@ -294,7 +278,6 @@ sub bind_docwriter {
 }
 
 sub bind_filepurger {
-    my @bound   = qw( Purge );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::FilePurger",
@@ -342,24 +325,6 @@ sub bind_indexmanager {
         Set_Write_Lock_Interval
         Get_Write_Lock_Interval
     );
-    my @bound = (
-        @exposed,
-        qw(
-            Make_Deletion_Lock
-            Make_Merge_Lock
-            Make_Snapshot_Read_Lock
-            Highest_Seg_Num
-            Make_Snapshot_Filename
-            Set_Merge_Lock_Timeout
-            Get_Merge_Lock_Timeout
-            Set_Merge_Lock_Interval
-            Get_Merge_Lock_Interval
-            Set_Deletion_Lock_Timeout
-            Get_Deletion_Lock_Timeout
-            Set_Deletion_Lock_Interval
-            Get_Deletion_Lock_Interval
-            )
-    );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -402,15 +367,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_indexreader {
-    my @bound = qw(
-        Doc_Max
-        Doc_Count
-        Del_Count
-        Fetch
-        Obtain
-        Seg_Readers
-        Get_Components
-    );
     my @exposed = qw(
         Doc_Max
         Doc_Count
@@ -499,7 +455,6 @@ sub bind_indexer {
         Delete_By_Query
         Get_Schema
     );
-    my @bound = @exposed;
     my @hand_rolled = qw( Add_Doc );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -677,19 +632,6 @@ END_XS_CODE
 }
 
 sub bind_inverter {
-    my @bound = qw(
-        Get_Doc
-        Iterate
-        Next
-        Clear
-        Get_Field_Name
-        Get_Value
-        Get_Type
-        Get_Analyzer
-        Get_Similarity
-        Get_Inversion
-    );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::Inverter",
@@ -706,7 +648,6 @@ sub bind_lexicon {
         Get_Term
         Reset
     );
-    my @bound = ( @exposed, 'Get_Field' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -731,7 +672,6 @@ END_SYNOPSIS
 
 sub bind_lexiconreader {
     my @exposed = qw( Lexicon Doc_Freq );
-    my @bound = ( @exposed, 'Fetch_Term_Info' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -779,8 +719,6 @@ sub bind_polylexicon {
 }
 
 sub bind_polyreader {
-    my @bound = qw( Get_Seg_Readers );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $polyreader = Lucy::Index::IndexReader->open( 
@@ -820,8 +758,6 @@ END_XS_CODE
 }
 
 sub bind_posting {
-    my @bound = qw( Get_Doc_ID );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::Posting",
@@ -831,12 +767,6 @@ sub bind_posting {
 }
 
 sub bind_postinglist {
-    my @bound = qw(
-        Seek
-        Get_Posting
-        Get_Doc_Freq
-        Make_Matcher
-    );
     my @exposed = qw(
         Next
         Advance
@@ -872,7 +802,6 @@ END_SYNOPSIS
 
 sub bind_postinglistreader {
     my @exposed = qw( Posting_List );
-    my @bound = ( @exposed, 'Get_Lex_Reader' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -927,8 +856,6 @@ END_XS
 }
 
 sub bind_seglexicon {
-    my @bound = qw( Get_Term_Info Get_Field_Num );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::SegLexicon",
@@ -939,8 +866,6 @@ sub bind_seglexicon {
 }
 
 sub bind_segpostinglist {
-    my @bound = qw( Get_Post_Stream Get_Count );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::SegPostingList",
@@ -955,7 +880,6 @@ sub bind_segreader {
         Get_Seg_Name
         Get_Seg_Num
     );
-    my @bound = ( @exposed, 'Register' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -988,12 +912,12 @@ END_SYNOPSIS
 }
 
 sub bind_segwriter {
-    my @bound = qw(
+    my @exposed = qw(
+        Add_Doc
         Add_Writer
         Register
         Fetch
     );
-    my @exposed = ( 'Add_Doc', @bound );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
@@ -1009,18 +933,6 @@ sub bind_segwriter {
 }
 
 sub bind_segment {
-    my @bound = qw(
-        Add_Field
-        Fetch_Metadata
-        Field_Num
-        Field_Name
-        Get_Name
-        Get_Number
-        Set_Count
-        Get_Count
-        Write_File
-        Read_File
-    );
     my @exposed = qw(
         Add_Field
         Store_Metadata
@@ -1083,15 +995,6 @@ END_SYNOPSIS
 }
 
 sub bind_similarity {
-    my @bound = qw(
-        IDF
-        TF
-        Encode_Norm
-        Decode_Norm
-        Query_Norm
-        Length_Norm
-        Coord
-    );
     my @exposed = qw(
         Length_Norm
     );
@@ -1148,7 +1051,6 @@ sub bind_snapshot {
         Set_Path
         Get_Path
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -1175,7 +1077,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_sortcache {
-    my @bound = qw( Ordinal Find );
     my @hand_rolled = qw( Value );
 
     my $xs_code = <<'END_XS_CODE';
@@ -1216,7 +1117,6 @@ END_XS_CODE
 }
 
 sub bind_sortreader {
-    my @bound   = qw( Fetch_Sort_Cache );
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::SortReader",
@@ -1258,18 +1158,6 @@ END_XS
 }
 
 sub bind_terminfo {
-    my @bound = qw(
-        Get_Doc_Freq
-        Get_Lex_FilePos
-        Get_Post_FilePos
-        Get_Skip_FilePos
-        Set_Doc_Freq
-        Set_Lex_FilePos
-        Set_Post_FilePos
-        Set_Skip_FilePos
-        Reset
-    );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::TermInfo",
@@ -1280,12 +1168,6 @@ sub bind_terminfo {
 }
 
 sub bind_termvector {
-    my @bound = qw(
-        Get_Positions
-        Get_Start_Offsets
-        Get_End_Offsets
-    );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Index::TermVector",

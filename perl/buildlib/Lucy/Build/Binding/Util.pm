@@ -149,15 +149,6 @@ sub bind_memorypool {
 }
 
 sub bind_priorityqueue {
-    my @bound = qw(
-        Less_Than
-        Insert
-        Pop
-        Pop_All
-        Peek
-        Get_Size
-    );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::PriorityQueue",
@@ -168,17 +159,6 @@ sub bind_priorityqueue {
 }
 
 sub bind_sortexternal {
-    my @bound = qw(
-        Flush
-        Flip
-        Add_Run
-        Refill
-        Sort_Cache
-        Cache_Count
-        Clear_Cache
-        Set_Mem_Thresh
-    );
-
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Util::SortExternal
 
@@ -199,8 +179,6 @@ END_XS_CODE
 }
 
 sub bind_stepper {
-    my @bound = qw( Read_Record );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::Stepper",

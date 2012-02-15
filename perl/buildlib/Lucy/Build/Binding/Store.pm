@@ -65,8 +65,6 @@ END_SYNOPSIS
 }
 
 sub bind_filehandle {
-    my @bound = qw( Length Close );
-
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Store::FileHandle
 
@@ -131,20 +129,6 @@ END_XS_CODE
 }
 
 sub bind_folder {
-    my @bound = qw(
-        Open_Out
-        Open_In
-        MkDir
-        List_R
-        Exists
-        Rename
-        Hard_Link
-        Delete
-        Slurp_File
-        Close
-        Get_Path
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     $pod_spec->set_synopsis("    # Abstract base class.\n");
 
@@ -159,23 +143,6 @@ sub bind_folder {
 }
 
 sub bind_instream {
-    my @bound = qw(
-        Seek
-        Tell
-        Length
-        Reopen
-        Close
-        Read_I8
-        Read_I32
-        Read_I64
-        Read_U8
-        Read_U32
-        Read_U64
-        Read_C32
-        Read_C64
-        Read_F32
-        Read_F64
-    );
     my @hand_rolled = qw(
         Read_Raw_C64
     );
@@ -255,14 +222,6 @@ sub bind_lock {
         Release
         Is_Locked
         Clear_Stale
-    );
-    my @bound = (
-        @exposed,
-        qw(
-            Get_Name
-            Get_Lock_Path
-            Get_Host
-            )
     );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -349,7 +308,6 @@ sub bind_lockfactory {
         Make_Lock
         Make_Shared_Lock
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -389,24 +347,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_outstream {
-    my @bound = qw(
-        Tell
-        Length
-        Flush
-        Close
-        Absorb
-        Write_I8
-        Write_I32
-        Write_I64
-        Write_U8
-        Write_U32
-        Write_U64
-        Write_C32
-        Write_C64
-        Write_F32
-        Write_F64
-    );
-
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Store::OutStream
 
@@ -447,8 +387,6 @@ END_XS_CODE
 }
 
 sub bind_ramfile {
-    my @bound = qw( Get_Contents );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::RAMFile",
@@ -459,8 +397,6 @@ sub bind_ramfile {
 }
 
 sub bind_ramfilehandle {
-    my @bound = qw( Get_File );
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::RAMFileHandle",

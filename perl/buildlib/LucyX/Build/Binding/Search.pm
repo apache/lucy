@@ -44,7 +44,6 @@ sub bind_mockmatcher {
 
 sub bind_proximityquery {
     my @exposed = qw( Get_Field Get_Terms Get_Within );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';

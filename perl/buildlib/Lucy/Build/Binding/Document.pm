@@ -23,8 +23,7 @@ sub bind_all {
 }
 
 sub bind_doc {
-    my @bound = qw( Set_Doc_ID Get_Doc_ID );
-    my @exposed = ( @bound, 'Get_Fields' );
+    my @exposed     = qw( Set_Doc_ID Get_Doc_ID Get_Fields );
     my @hand_rolled = qw( Set_Fields Get_Fields );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -113,7 +112,6 @@ END_XS_CODE
 
 sub bind_hitdoc {
     my @exposed = qw( Set_Score Get_Score );
-    my @bound   = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';

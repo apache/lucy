@@ -32,24 +32,6 @@ sub bind_all {
 
 sub bind_architecture {
     my @exposed = qw( Register_Doc_Writer Register_Doc_Reader );
-    my @bound   = (
-        @exposed,
-        qw(
-            Index_Interval
-            Skip_Interval
-            Init_Seg_Reader
-            Register_Deletions_Writer
-            Register_Deletions_Reader
-            Register_Lexicon_Reader
-            Register_Posting_List_Writer
-            Register_Posting_List_Reader
-            Register_Sort_Writer
-            Register_Sort_Reader
-            Register_Highlight_Writer
-            Register_Highlight_Reader
-            Make_Similarity
-            )
-    );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -148,7 +130,6 @@ sub bind_fieldtype {
         Sortable
         Binary
     );
-    my @bound = ( @exposed, 'Compare_Values' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -195,7 +176,6 @@ sub bind_fulltexttype {
         Set_Highlightable
         Highlightable
     );
-    my @bound = @exposed;
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -262,7 +242,6 @@ sub bind_schema {
         Get_Architecture
         Get_Similarity
     );
-    my @bound = ( @exposed, qw( Fetch_Analyzer Write Eat ) );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';

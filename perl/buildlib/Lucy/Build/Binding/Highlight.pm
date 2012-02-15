@@ -23,13 +23,6 @@ sub bind_all {
 }
 
 sub bind_heatmap {
-    my @bound = qw(
-        Calc_Proximity_Boost
-        Generate_Proximity_Boosts
-        Flatten_Spans
-        Get_Spans
-    );
-
     my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
     my $heat_map = Lucy::Highlight::HeatMap->new(
@@ -64,7 +57,6 @@ sub bind_highlighter {
         Get_Excerpt_Length
         Get_Field
     );
-    my @bound = ( @exposed, 'Find_Sentences' );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
