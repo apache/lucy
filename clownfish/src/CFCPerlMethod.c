@@ -130,6 +130,9 @@ S_xsub_body(CFCPerlMethod *self) {
         CFCType *return_type = CFCMethod_get_return_type(method);
         const char *type_str = CFCType_to_c(return_type);
         char *assignment = CFCPerlTypeMap_to_perl(return_type, "retval");
+        if (!assignment) {
+            CFCUtil_die("Can't find typemap for '%s'", type_str);
+        }
         body = CFCUtil_cat(body, type_str, " retval = ", full_func_sym, "(",
                            name_list, ");\n    ST(0) = ", assignment, ";",
                            NULL);
@@ -284,6 +287,9 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
             sprintf(perl_stack_var, "ST(%u)", i);
             char *conversion
                 = CFCPerlTypeMap_from_perl(var_type, perl_stack_var);
+            if (!conversion) {
+                CFCUtil_die("Can't map type '%s'", type_c);
+            }
             if (val) {
                 char pattern[] =
                     "\n    %s %s = ( items >= %u && XSBind_sv_defined(ST(%u)) )"

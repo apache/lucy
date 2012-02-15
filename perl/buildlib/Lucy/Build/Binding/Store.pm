@@ -125,7 +125,6 @@ END_XS_CODE
         class_name => "Lucy::Store::FileHandle",
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -154,7 +153,6 @@ sub bind_folder {
         class_name => "Lucy::Store::Folder",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -177,6 +175,9 @@ sub bind_instream {
         Read_C64
         Read_F32
         Read_F64
+    );
+    my @hand_rolled = qw(
+        Read_Raw_C64
     );
 
     my $xs_code = <<'END_XS_CODE';
@@ -241,7 +242,7 @@ END_XS_CODE
         class_name => "Lucy::Store::InStream",
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -292,7 +293,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Store::Lock",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -383,7 +383,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Store::LockFactory",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -442,7 +441,6 @@ END_XS_CODE
         class_name => "Lucy::Store::OutStream",
     );
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -456,7 +454,6 @@ sub bind_ramfile {
         class_name => "Lucy::Store::RAMFile",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -469,7 +466,6 @@ sub bind_ramfilehandle {
         class_name => "Lucy::Store::RAMFileHandle",
     );
     $binding->bind_constructor( alias => '_open', initializer => 'do_open' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

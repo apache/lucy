@@ -108,7 +108,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Plan::Architecture",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -168,7 +167,6 @@ END_SYNOPSIS
         class_name => "Lucy::Plan::FieldType",
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -230,7 +228,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Plan::FullTextType",
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -295,7 +292,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Plan::Schema",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

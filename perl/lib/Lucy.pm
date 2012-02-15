@@ -250,7 +250,7 @@ sub error {$Lucy::Object::Err::error}
     package Lucy::Index::PolyReader;
     use Lucy qw( to_clownfish );
 
-    sub try_read_snapshot {
+    sub _try_read_snapshot {
         my ( undef, %args ) = @_;
         my ( $snapshot, $folder, $path ) = @args{qw( snapshot folder path )};
         eval { $snapshot->read_file( folder => $folder, path => $path ); };
@@ -258,7 +258,7 @@ sub error {$Lucy::Object::Err::error}
         else      { return undef }
     }
 
-    sub try_open_segreaders {
+    sub _try_open_segreaders {
         my ( $self, $segments ) = @_;
         my $schema   = $self->get_schema;
         my $folder   = $self->get_folder;
@@ -300,7 +300,7 @@ sub error {$Lucy::Object::Err::error}
 {
     package Lucy::Index::SegReader;
 
-    sub try_init_components {
+    sub _try_init_components {
         my $self = shift;
         my $arch = $self->get_schema->get_architecture;
         eval { $arch->init_seg_reader($self); };

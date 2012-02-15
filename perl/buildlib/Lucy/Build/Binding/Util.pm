@@ -163,7 +163,6 @@ sub bind_priorityqueue {
         class_name => "Lucy::Util::PriorityQueue",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -194,7 +193,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Util::SortExternal",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -207,7 +205,6 @@ sub bind_stepper {
         parcel     => "Lucy",
         class_name => "Lucy::Util::Stepper",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

@@ -42,7 +42,6 @@ sub bind_analyzer {
         class_name => "Lucy::Analysis::Analyzer",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -143,7 +142,6 @@ END_XS
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Inversion",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -210,7 +208,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Analysis::PolyAnalyzer",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -344,6 +341,10 @@ sub bind_token {
         Get_Boost
         Get_Pos_Inc
     );
+    my @hand_rolled = qw(
+        Set_Text
+        Get_Text
+    ); 
 
     my $xs = <<'END_XS';
 MODULE = Lucy    PACKAGE = Lucy::Analysis::Token
@@ -405,8 +406,8 @@ END_XS
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Token",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs);
+    $binding->exclude_method($_) for @hand_rolled;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

@@ -135,7 +135,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::Collector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -191,7 +190,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
         class_name => "Lucy::Search::Compiler",
     );
     $binding->bind_constructor( alias => 'do_new' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -229,7 +227,6 @@ END_SYNOPSIS
         class_name => "Lucy::Search::Hits",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -274,7 +271,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::IndexSearcher",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -317,7 +313,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::LeafQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -355,7 +350,6 @@ sub bind_matchdoc {
         class_name => "Lucy::Search::MatchDoc",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -385,7 +379,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
         class_name => "Lucy::Search::Matcher",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -432,7 +425,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::NOTQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -515,7 +507,6 @@ END_SYNOPSIS
         class_name => "Lucy::Search::PhraseQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -559,7 +550,6 @@ END_SYNOPSIS
         class_name => "Lucy::Search::PolyQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -642,7 +632,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
         class_name => "Lucy::Search::Query",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method(
         alias  => '_make_compiler',
         method => 'Make_Compiler',
@@ -703,7 +692,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::QueryParser",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -792,7 +780,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::RequiredOptionalQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -836,7 +823,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::Searcher",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -895,7 +881,6 @@ END_XS_CODE
         class_name => "Lucy::Search::SortRule",
     );
     $binding->bind_constructor( alias => '_new' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
@@ -929,7 +914,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::SortSpec",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -972,7 +956,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::Span",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1005,7 +988,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Search::TermQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1032,7 +1014,6 @@ sub bind_topdocs {
         class_name => "Lucy::Search::TopDocs",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

@@ -22,6 +22,11 @@ sub bind_all {
 }
 
 sub bind_bbsortex {
+    my @hand_rolled = qw(
+        Fetch
+        Peek
+        Feed
+    );
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Test::Util::BBSortEx
 
@@ -71,6 +76,7 @@ END_XS_CODE
         class_name => "Lucy::Test::Util::BBSortEx",
     );
     $binding->bind_constructor;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

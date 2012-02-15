@@ -89,7 +89,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Index::BackgroundMerger",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -129,7 +128,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Index::DataReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -172,7 +170,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Index::DataWriter",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -186,7 +183,6 @@ sub bind_deletionsreader {
         class_name => "Lucy::Index::DeletionsReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -198,7 +194,6 @@ sub bind_defaultdeletionsreader {
         class_name => "Lucy::Index::DefaultDeletionsReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -234,7 +229,6 @@ END_SYNOPSIS
         parcel     => "Lucy",
         class_name => "Lucy::Index::DeletionsWriter",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -266,7 +260,6 @@ END_SYNOPSIS
         class_name => "Lucy::Index::DocReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -288,7 +281,6 @@ sub bind_docvector {
         class_name => "Lucy::Index::DocVector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -308,7 +300,6 @@ sub bind_filepurger {
         class_name => "Lucy::Index::FilePurger",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -405,7 +396,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Index::IndexManager",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -492,7 +482,6 @@ END_XS_CODE
         alias       => 'open',
         initializer => 'do_open',
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method( alias => '_offsets', method => 'Offsets' );
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
@@ -511,6 +500,7 @@ sub bind_indexer {
         Get_Schema
     );
     my @bound = @exposed;
+    my @hand_rolled = qw( Add_Doc );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -679,7 +669,7 @@ END_XS_CODE
         class_name => "Lucy::Index::Indexer",
     );
     $binding->bind_constructor( alias => '_new' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
@@ -705,7 +695,6 @@ sub bind_inverter {
         class_name => "Lucy::Index::Inverter",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -735,7 +724,6 @@ END_SYNOPSIS
         class_name => "Lucy::Index::Lexicon",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -758,7 +746,6 @@ END_SYNOPSIS
         class_name => "Lucy::Index::LexiconReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -826,7 +813,6 @@ END_XS_CODE
     );
     $binding->bind_constructor;
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
@@ -840,7 +826,6 @@ sub bind_posting {
         parcel     => "Lucy",
         class_name => "Lucy::Index::Posting",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -880,7 +865,6 @@ END_SYNOPSIS
         class_name => "Lucy::Index::PostingList",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -907,7 +891,6 @@ END_SYNOPSIS
         class_name => "Lucy::Index::PostingListReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -951,7 +934,6 @@ sub bind_seglexicon {
         class_name => "Lucy::Index::SegLexicon",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -964,7 +946,6 @@ sub bind_segpostinglist {
         class_name => "Lucy::Index::SegPostingList",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -1001,7 +982,6 @@ END_SYNOPSIS
         class_name => "Lucy::Index::SegReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1023,7 +1003,6 @@ sub bind_segwriter {
         class_name => "Lucy::Index::SegWriter",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1094,7 +1073,6 @@ END_SYNOPSIS
         class_name => "Lucy::Index::Segment",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method(
         alias  => '_store_metadata',
         method => 'Store_Metadata',
@@ -1117,6 +1095,7 @@ sub bind_similarity {
     my @exposed = qw(
         Length_Norm
     );
+    my @hand_rolled = qw( Get_Norm_Decoder );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -1151,7 +1130,7 @@ END_XS_CODE
         class_name => "Lucy::Index::Similarity",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
@@ -1190,7 +1169,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Index::Snapshot",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1198,6 +1176,7 @@ END_CONSTRUCTOR
 
 sub bind_sortcache {
     my @bound = qw( Ordinal Find );
+    my @hand_rolled = qw( Value );
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Index::SortCache
@@ -1230,7 +1209,7 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Index::SortCache",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -1243,7 +1222,6 @@ sub bind_sortreader {
         class_name => "Lucy::Index::SortReader",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -1297,7 +1275,6 @@ sub bind_terminfo {
         class_name => "Lucy::Index::TermInfo",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -1314,7 +1291,6 @@ sub bind_termvector {
         class_name => "Lucy::Index::TermVector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

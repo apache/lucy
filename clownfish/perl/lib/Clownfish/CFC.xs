@@ -1916,6 +1916,13 @@ PPCODE:
     CFCPerlClass_bind_constructor(self, alias, init);
 
 void
+exclude_method(self, method)
+    CFCPerlClass *self;
+    const char *method;
+PPCODE:
+    CFCPerlClass_exclude_method(self, method);
+
+void
 append_xs(self, xs)
     CFCPerlClass *self;
     const char *xs;

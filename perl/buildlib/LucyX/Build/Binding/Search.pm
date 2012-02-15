@@ -64,7 +64,6 @@ END_SYNOPSIS
         class_name => "LucyX::Search::ProximityQuery",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

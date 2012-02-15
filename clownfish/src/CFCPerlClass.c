@@ -29,9 +29,12 @@
 #include "CFCFunction.h"
 #include "CFCDocuComment.h"
 #include "CFCSymbol.h"
+#include "CFCVariable.h"
+#include "CFCType.h"
 #include "CFCPerlPod.h"
 #include "CFCPerlMethod.h"
 #include "CFCPerlConstructor.h"
+#include "CFCPerlTypeMap.h"
 
 struct CFCPerlClass {
     CFCBase base;
@@ -43,6 +46,8 @@ struct CFCPerlClass {
     char **meth_aliases;
     char **meth_names;
     size_t num_methods;
+    char **excluded;
+    size_t num_excluded;
     char **cons_aliases;
     char **cons_inits;
     size_t num_cons;
@@ -78,6 +83,8 @@ CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel,
     self->meth_aliases = NULL;
     self->meth_names   = NULL;
     self->num_methods  = 0;
+    self->excluded     = NULL;
+    self->num_excluded = 0;
     self->cons_aliases = NULL;
     self->cons_inits   = NULL;
     self->num_cons     = 0;
@@ -97,6 +104,10 @@ CFCPerlClass_destroy(CFCPerlClass *self) {
     }
     FREEMEM(self->meth_aliases);
     FREEMEM(self->meth_names);
+    for (size_t i = 0; i < self->num_excluded; i++) {
+        FREEMEM(self->excluded[i]);
+    }
+    FREEMEM(self->excluded);
     for (size_t i = 0; i < self->num_cons; i++) {
         FREEMEM(self->cons_aliases);
         FREEMEM(self->cons_inits);
@@ -178,6 +189,14 @@ CFCPerlClass_bind_method(CFCPerlClass *self, const char *alias,
 }
 
 void
+CFCPerlClass_exclude_method(CFCPerlClass *self, const char *method) {
+    size_t size = (self->num_excluded + 1) * sizeof(char*);
+    self->excluded = (char**)REALLOCATE(self->excluded, size);
+    self->excluded[self->num_excluded] = (char*)CFCUtil_strdup(method);
+    self->num_excluded++;
+}
+
+void
 CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
                               const char *initializer) {
     alias       = alias       ? alias       : "new";
@@ -194,33 +213,74 @@ CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
     }
 }
 
+static int
+S_method_can_be_bound(CFCMethod *method) {
+    int success = 1;
+    CFCParamList *param_list = CFCMethod_get_param_list(method);
+    CFCVariable **arg_vars = CFCParamList_get_variables(param_list);
+
+    for (size_t i = 0; arg_vars[i] != NULL; i++) {
+        CFCType *type = CFCVariable_get_type(arg_vars[i]);
+        char *conversion = CFCPerlTypeMap_from_perl(type, "foo");
+        if (conversion) { FREEMEM(conversion); }
+        else            { success = 0; }
+    }
+
+    CFCType *return_type = CFCMethod_get_return_type(method);
+    if (!CFCType_is_void(return_type)) {
+        char *conversion = CFCPerlTypeMap_to_perl(return_type, "foo");
+        if (conversion) { FREEMEM(conversion); }
+        else            { success = 0; }
+    }
+
+    return success;
+}
+
 CFCPerlMethod**
 CFCPerlClass_method_bindings(CFCPerlClass *self) {
     CFCClass       *client     = self->client;
     const char     *class_name = self->class_name;
     size_t          num_bound  = 0;
+    CFCMethod     **fresh_methods = CFCClass_fresh_methods(client);
+    CFCClass      **descendants   = CFCClass_tree_to_ladder(client);
     CFCPerlMethod **bound 
         = (CFCPerlMethod**)CALLOCATE(1, sizeof(CFCPerlMethod*));
+ 
+     // Iterate over the class's fresh methods.
+    for (size_t i = 0; fresh_methods[i] != NULL; i++) {
+        CFCMethod  *method    = fresh_methods[i];
+        const char *alias     = CFCMethod_micro_sym(method);
+        const char *meth_name = CFCMethod_get_macro_sym(method);
 
-    // Iterate over the list of methods to be bound.
-    for (size_t i = 0; i < self->num_methods; i++) {
-        const char *meth_name = self->meth_names[i];
-        CFCMethod *method = CFCClass_method(client, meth_name);
+        // Only deal with methods when they are novel (i.e. first declared).
+        if (!CFCMethod_novel(method)) { continue; }
 
-        // Safety checks against bad specs, excess binding code or private
-        // methods.
-        if (!method) {
-            CFCUtil_die("Can't find method '%s' for class '%s'", meth_name,
-                        class_name);
+        // Skip private methods.
+        if (CFCSymbol_private((CFCSymbol*)method)) { continue; }
+
+        // Skip methods which have been explicitly excluded.
+        int is_excluded = 0;
+        for (size_t j = 0; j < self->num_excluded; j++) {
+            if (strcmp(self->excluded[j], meth_name) == 0) {
+                is_excluded = 1;
+                break;
+            }
         }
-        else if (!CFCMethod_novel(method)) {
-            CFCUtil_die("Binding spec'd for method '%s' in class '%s', "
-                        "but it's overridden and should be bound via the "
-                        "parent class", meth_name, class_name);
+        if (is_excluded) { continue; }
+
+        // Skip methods with types which cannot be mapped automatically.
+        if (!S_method_can_be_bound(method)) {
+            continue;
         }
-        else if (CFCSymbol_private((CFCSymbol*)method)) {
-            CFCUtil_die("Can't bind private method '%s' in class '%s', ",
-                        meth_name, class_name);
+
+        // See if the user wants the method to have a specific alias.
+        for (size_t j = 0; j < self->num_methods; j++) {
+            const char *maybe = self->meth_names[j];
+            if (strcmp(maybe, meth_name) == 0) {
+                if (self->meth_aliases[j]) {
+                    alias = self->meth_aliases[j];
+                }
+            }
         }
 
         /* Create an XSub binding for each override.  Each of these directly
@@ -228,7 +288,6 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
          * the object using VTable method dispatch.  Doing things this way
          * allows SUPER:: invocations from Perl-space to work properly.
          */
-        CFCClass **descendants = CFCClass_tree_to_ladder(client);
         for (size_t j = 0; descendants[j] != NULL; j++) {
             CFCClass *descendant = descendants[j];
             CFCMethod *real_method
@@ -236,15 +295,18 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
             if (!real_method) { continue; }
 
             // Create the binding, add it to the array.
-            CFCPerlMethod *meth_binding
-                = CFCPerlMethod_new(real_method, self->meth_aliases[i]);
+            CFCPerlMethod *meth_binding = CFCPerlMethod_new(real_method, alias);
             size_t size = (num_bound + 2) * sizeof(CFCPerlMethod*);
             bound = (CFCPerlMethod**)REALLOCATE(bound, size);
             bound[num_bound] = meth_binding;
             num_bound++;
             bound[num_bound] = NULL;
         }
+
     }
+
+    FREEMEM(fresh_methods);
+    FREEMEM(descendants);
 
     return bound;
 }

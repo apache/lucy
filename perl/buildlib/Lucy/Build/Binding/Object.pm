@@ -75,7 +75,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Object::BitVector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -120,7 +119,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::ByteBuf",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -223,7 +221,6 @@ END_SYNOPSIS
         class_name => "Lucy::Object::Err",
     );
     $binding->bind_constructor( alias => '_new' );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -239,6 +236,10 @@ sub bind_hash {
         Clear
         Iterate
         Get_Size
+    );
+    my @hand_rolled = qw(
+        Store
+        Next
     );
 
     my $xs_code = <<'END_XS_CODE';
@@ -299,7 +300,7 @@ END_XS_CODE
         class_name => "Lucy::Object::Hash",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -465,7 +466,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::I32Array",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -479,7 +479,6 @@ sub bind_lockfreeregistry {
         class_name => "Lucy::Object::LockFreeRegistry",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -507,7 +506,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::Float32",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($float32_xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -536,7 +534,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::Float64",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($float64_xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -560,7 +557,6 @@ sub bind_obj {
         Deserialize
         Destroy
     );
-
     my @exposed = qw(
         To_String
         To_I64
@@ -568,6 +564,9 @@ sub bind_obj {
         Equals
         Dump
         Load
+    );
+    my @hand_rolled = qw(
+        Is_A
     );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -749,8 +748,8 @@ END_XS_CODE
         class_name => "Lucy::Object::Obj",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->bind_method( alias => '_load', method => 'Load' );
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
@@ -765,6 +764,14 @@ sub bind_varray {
         Excise
         Resize
         Get_Size
+    );
+    my @hand_rolled = qw(
+        Shallow_Copy
+        Shift
+        Pop
+        Delete
+        Store
+        Fetch
     );
 
     my $xs_code = <<'END_XS_CODE';
@@ -840,7 +847,7 @@ END_XS_CODE
         class_name => "Lucy::Object::VArray",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -848,6 +855,7 @@ END_XS_CODE
 
 sub bind_vtable {
     my @bound = qw( Get_Name Get_Parent );
+    my @hand_rolled = qw( Make_Obj );
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Object::VTable
@@ -898,7 +906,7 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::VTable",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

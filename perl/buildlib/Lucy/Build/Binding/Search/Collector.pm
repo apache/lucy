@@ -65,7 +65,6 @@ sub bind_sortcollector {
         class_name => "Lucy::Search::Collector::SortCollector",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

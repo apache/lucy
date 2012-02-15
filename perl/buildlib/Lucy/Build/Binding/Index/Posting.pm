@@ -31,7 +31,6 @@ sub bind_matchposting {
         class_name => "Lucy::Index::Posting::MatchPosting",
     );
     $binding->bind_constructor;
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -47,6 +46,8 @@ sub bind_richposting {
 }
 
 sub bind_scoreposting {
+    my @hand_rolled = qw( Get_Prox );
+
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Index::Posting::ScorePosting
 
@@ -75,6 +76,7 @@ END_XS_CODE
     );
     $binding->bind_constructor;
     $binding->append_xs($xs_code);
+    $binding->exclude_method($_) for @hand_rolled;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

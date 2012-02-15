@@ -25,6 +25,7 @@ sub bind_all {
 sub bind_doc {
     my @bound = qw( Set_Doc_ID Get_Doc_ID );
     my @exposed = ( @bound, 'Get_Fields' );
+    my @hand_rolled = qw( Set_Fields Get_Fields );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -103,8 +104,8 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Document::Doc",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
+    $binding->exclude_method($_) for @hand_rolled;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -168,7 +169,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Document::HitDoc",
     );
-    $binding->bind_method( method => $_, alias => lc($_) ) for @bound;
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 

@@ -59,6 +59,9 @@ void
 CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
                               const char *initializer);
 
+void
+CFCPerlClass_exclude_method(CFCPerlClass *self, const char *method);
+
 struct CFCPerlMethod**
 CFCPerlClass_method_bindings(CFCPerlClass *self);
 

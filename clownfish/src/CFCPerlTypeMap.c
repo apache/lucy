@@ -118,10 +118,6 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
         }
     }
 
-    if (!result) {
-        CFCUtil_die("Missing typemap for '%s'", CFCType_to_c(type));
-    }
-
     return result;
 }
 
@@ -204,10 +200,6 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
             result = CFCUtil_cat(CFCUtil_strdup(""), "newRV_inc((SV*)",
                                  cf_var, ")", NULL);
         }
-    }
-
-    if (!result) {
-        CFCUtil_die("Missing typemap for '%s'", CFCType_to_c(type));
     }
 
     return result;
