@@ -44,6 +44,9 @@ sub bind_all {
     $class->bind_polylexicon;
     $class->bind_polyreader;
     $class->bind_posting;
+    $class->bind_matchposting;
+    $class->bind_richposting;
+    $class->bind_scoreposting;
     $class->bind_postinglist;
     $class->bind_postinglistreader;
     $class->bind_defaultpostinglistreader;
@@ -739,6 +742,56 @@ sub bind_posting {
         parcel     => "Lucy",
         class_name => "Lucy::Index::Posting",
     );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_matchposting {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Posting::MatchPosting",
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_richposting {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Posting::RichPosting",
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_scoreposting {
+    my @hand_rolled = qw( Get_Prox );
+
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy   PACKAGE = Lucy::Index::Posting::ScorePosting
+
+SV*
+get_prox(self)
+    lucy_ScorePosting *self;
+CODE:
+{
+    AV *out_av            = newAV();
+    uint32_t *positions  = Lucy_ScorePost_Get_Prox(self);
+    uint32_t i, max;
+
+    for (i = 0, max = Lucy_ScorePost_Get_Freq(self); i < max; i++) {
+        SV *pos_sv = newSVuv(positions[i]);
+        av_push(out_av, pos_sv);
+    }
+
+    RETVAL = newRV_noinc((SV*)out_av);
+}
+OUTPUT: RETVAL
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Index::Posting::ScorePosting",
+    );
+    $binding->append_xs($xs_code);
+    $binding->exclude_method($_) for @hand_rolled;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

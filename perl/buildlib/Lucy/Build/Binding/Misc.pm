@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-package Lucy::Build::Binding::Lucy;
+package Lucy::Build::Binding::Misc;
 use strict;
 use warnings;
 
@@ -23,6 +23,7 @@ sub bind_all {
     $class->bind_testutils;
     $class->bind_testqueryparsersyntax;
     $class->bind_testschema;
+    $class->bind_bbsortex;
 }
 
 sub bind_lucy {
@@ -346,4 +347,65 @@ sub bind_testschema {
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
+sub bind_bbsortex {
+    my @hand_rolled = qw(
+        Fetch
+        Peek
+        Feed
+    );
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy    PACKAGE = Lucy::Test::Util::BBSortEx
+
+SV*
+fetch(self)
+    lucy_BBSortEx *self;
+CODE:
+{
+    void *address = Lucy_BBSortEx_Fetch(self);
+    if (address) {
+        RETVAL = XSBind_cfish_to_perl(*(lucy_Obj**)address);
+        CFISH_DECREF(*(lucy_Obj**)address);
+    }
+    else {
+        RETVAL = newSV(0);
+    }
+}
+OUTPUT: RETVAL
+
+SV*
+peek(self)
+    lucy_BBSortEx *self;
+CODE:
+{
+    void *address = Lucy_BBSortEx_Peek(self);
+    if (address) {
+        RETVAL = XSBind_cfish_to_perl(*(lucy_Obj**)address);
+    }
+    else {
+        RETVAL = newSV(0);
+    }
+}
+OUTPUT: RETVAL
+
+void
+feed(self, bb)
+    lucy_BBSortEx *self;
+    lucy_ByteBuf *bb;
+CODE:
+    CFISH_INCREF(bb);
+    Lucy_BBSortEx_Feed(self, &bb);
+
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Test::Util::BBSortEx",
+    );
+    $binding->exclude_method($_) for @hand_rolled;
+    $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
 1;
+
