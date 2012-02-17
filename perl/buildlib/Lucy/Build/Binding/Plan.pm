@@ -89,7 +89,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Plan::Architecture",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -116,7 +115,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Plan::BlobType",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -270,7 +268,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Plan::Schema",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

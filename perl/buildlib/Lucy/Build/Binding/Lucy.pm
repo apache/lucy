@@ -343,7 +343,6 @@ sub bind_testschema {
         parcel     => "Lucy",
         class_name => "Lucy::Test::TestSchema",
     );
-    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

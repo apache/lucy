@@ -73,7 +73,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Object::BitVector",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -113,6 +112,7 @@ END_XS_CODE
         class_name => "Lucy::Object::ByteBuf",
     );
     $binding->append_xs($xs_code);
+    $binding->exclude_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -182,6 +182,7 @@ END_XS_CODE
         class_name => "Lucy::Object::CharBuf",
     );
     $binding->append_xs($xs_code);
+    $binding->exclude_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -280,7 +281,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::Hash",
     );
-    $binding->bind_constructor;
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
@@ -446,6 +446,7 @@ END_XS_CODE
         class_name => "Lucy::Object::I32Array",
     );
     $binding->append_xs($xs_code);
+    $binding->exclude_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -455,8 +456,6 @@ sub bind_lockfreeregistry {
         parcel     => "Lucy",
         class_name => "Lucy::Object::LockFreeRegistry",
     );
-    $binding->bind_constructor;
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -482,6 +481,7 @@ END_XS_CODE
         class_name => "Lucy::Object::Float32",
     );
     $binding->append_xs($float32_xs_code);
+    $binding->exclude_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -508,6 +508,7 @@ END_XS_CODE
         class_name => "Lucy::Object::Float64",
     );
     $binding->append_xs($float64_xs_code);
+    $binding->exclude_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -703,7 +704,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::Obj",
     );
-    $binding->bind_constructor;
     $binding->bind_method( alias => '_load', method => 'Load' );
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
@@ -794,7 +794,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Object::VArray",
     );
-    $binding->bind_constructor;
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 

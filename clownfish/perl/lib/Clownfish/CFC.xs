@@ -1923,6 +1923,12 @@ PPCODE:
     CFCPerlClass_exclude_method(self, method);
 
 void
+exclude_constructor(self)
+    CFCPerlClass *self;
+PPCODE:
+    CFCPerlClass_exclude_constructor(self);
+
+void
 append_xs(self, xs)
     CFCPerlClass *self;
     const char *xs;

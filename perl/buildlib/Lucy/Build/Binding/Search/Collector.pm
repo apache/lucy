@@ -51,7 +51,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Search::Collector::BitCollector",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -62,8 +61,6 @@ sub bind_sortcollector {
         parcel     => "Lucy",
         class_name => "Lucy::Search::Collector::SortCollector",
     );
-    $binding->bind_constructor;
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

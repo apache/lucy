@@ -39,7 +39,6 @@ sub bind_analyzer {
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Analyzer",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -64,7 +63,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::CaseFolder",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -95,7 +93,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::EasyAnalyzer",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -166,7 +163,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Normalizer",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -202,7 +198,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::PolyAnalyzer",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -265,7 +260,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::SnowballStemmer",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -298,7 +292,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::SnowballStopFilter",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -323,7 +316,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::StandardTokenizer",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -397,6 +389,7 @@ END_XS
     );
     $binding->append_xs($xs);
     $binding->exclude_method($_) for @hand_rolled;
+    $binding->exclude_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

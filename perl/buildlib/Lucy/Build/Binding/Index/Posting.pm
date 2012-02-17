@@ -28,8 +28,6 @@ sub bind_matchposting {
         parcel     => "Lucy",
         class_name => "Lucy::Index::Posting::MatchPosting",
     );
-    $binding->bind_constructor;
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -38,8 +36,6 @@ sub bind_richposting {
         parcel     => "Lucy",
         class_name => "Lucy::Index::Posting::RichPosting",
     );
-    $binding->bind_constructor;
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -72,7 +68,6 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Index::Posting::ScorePosting",
     );
-    $binding->bind_constructor;
     $binding->append_xs($xs_code);
     $binding->exclude_method($_) for @hand_rolled;
 

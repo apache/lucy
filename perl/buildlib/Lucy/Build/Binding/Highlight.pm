@@ -36,7 +36,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Highlight::HeatMap",
     );
-    $binding->bind_constructor;
     #$binding->set_pod_spec($pod_spec); TODO
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -87,7 +86,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Highlight::Highlighter",
     );
-    $binding->bind_constructor;
     $binding->bind_method(
         alias  => '_find_best_fragment',
         method => 'Find_Best_Fragment'

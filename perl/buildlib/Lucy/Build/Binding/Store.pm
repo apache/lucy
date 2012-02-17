@@ -58,7 +58,6 @@ END_SYNOPSIS
         parcel     => "Lucy",
         class_name => "Lucy::Store::FSFolder",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -136,7 +135,6 @@ sub bind_folder {
         parcel     => "Lucy",
         class_name => "Lucy::Store::Folder",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -251,7 +249,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Store::Lock",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -262,7 +259,6 @@ sub bind_lockfilelock {
         parcel     => "Lucy",
         class_name => "Lucy::Store::LockFileLock",
     );
-    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -271,7 +267,6 @@ sub bind_sharedlock {
         parcel     => "Lucy",
         class_name => "Lucy::Store::SharedLock",
     );
-    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -340,7 +335,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Store::LockFactory",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -391,8 +385,6 @@ sub bind_ramfile {
         parcel     => "Lucy",
         class_name => "Lucy::Store::RAMFile",
     );
-    $binding->bind_constructor;
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -428,7 +420,6 @@ END_CONSTRUCTOR
         parcel     => "Lucy",
         class_name => "Lucy::Store::RAMFolder",
     );
-    $binding->bind_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

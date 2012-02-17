@@ -59,8 +59,15 @@ void
 CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
                               const char *initializer);
 
+/** Don't generate a binding for the specified method automatically.
+ */
 void
 CFCPerlClass_exclude_method(CFCPerlClass *self, const char *method);
+
+/** Don't generate a constructor named "new" from "init" automatically.
+ */
+void
+CFCPerlClass_exclude_constructor(CFCPerlClass *self);
 
 struct CFCPerlMethod**
 CFCPerlClass_method_bindings(CFCPerlClass *self);

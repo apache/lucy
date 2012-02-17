@@ -105,6 +105,7 @@ END_XS_CODE
     );
     $binding->append_xs($xs_code);
     $binding->exclude_method($_) for @hand_rolled;
+    $binding->exclude_constructor;
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -169,6 +170,7 @@ END_XS_CODE
     );
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
+    $binding->exclude_constructor;
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

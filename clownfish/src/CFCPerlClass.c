@@ -51,6 +51,7 @@ struct CFCPerlClass {
     char **cons_aliases;
     char **cons_inits;
     size_t num_cons;
+    int    exclude_cons;
 };
 
 static CFCPerlClass **registry = NULL;
@@ -88,6 +89,7 @@ CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel,
     self->cons_aliases = NULL;
     self->cons_inits   = NULL;
     self->num_cons     = 0;
+    self->exclude_cons = 0;
     return self;
 }
 
@@ -213,10 +215,14 @@ CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
     }
 }
 
+void
+CFCPerlClass_exclude_constructor(CFCPerlClass *self) {
+    self->exclude_cons = 1;
+}
+
 static int
-S_method_can_be_bound(CFCMethod *method) {
+S_can_be_bound(CFCParamList *param_list, CFCType *return_type) {
     int success = 1;
-    CFCParamList *param_list = CFCMethod_get_param_list(method);
     CFCVariable **arg_vars = CFCParamList_get_variables(param_list);
 
     for (size_t i = 0; arg_vars[i] != NULL; i++) {
@@ -225,8 +231,6 @@ S_method_can_be_bound(CFCMethod *method) {
         if (conversion) { FREEMEM(conversion); }
         else            { success = 0; }
     }
-
-    CFCType *return_type = CFCMethod_get_return_type(method);
     if (!CFCType_is_void(return_type)) {
         char *conversion = CFCPerlTypeMap_to_perl(return_type, "foo");
         if (conversion) { FREEMEM(conversion); }
@@ -269,7 +273,9 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
         if (is_excluded) { continue; }
 
         // Skip methods with types which cannot be mapped automatically.
-        if (!S_method_can_be_bound(method)) {
+        CFCParamList *param_list  = CFCMethod_get_param_list(method);
+        CFCType      *return_type = CFCMethod_get_return_type(method);
+        if (!S_can_be_bound(param_list, return_type)) {
             continue;
         }
 
@@ -311,19 +317,60 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
     return bound;
 }
 
+static const char NEW[] = "new";
+
 CFCPerlConstructor**
 CFCPerlClass_constructor_bindings(CFCPerlClass *self) {
-    CFCClass   *client     = self->client;
-    size_t      num_bound  = 0;
+    CFCClass     *client    = self->client;
+    CFCFunction **functions = CFCClass_functions(self->client);
+    size_t        num_bound = 0;
     CFCPerlConstructor **bound 
         = (CFCPerlConstructor**)CALLOCATE(1, sizeof(CFCPerlConstructor*));
 
-    // Iterate over the list of constructors to be bound.
-    for (size_t i = 0; i < self->num_cons; i++) {
+    // Iterate over the list of possible initialization functions.
+    for (size_t i = 0; functions[i] != NULL; i++) {
+        CFCFunction  *function    = functions[i];
+        const char   *micro_sym   = CFCFunction_micro_sym(function);
+        CFCParamList *param_list  = CFCFunction_get_param_list(function);
+        CFCType      *return_type = CFCFunction_get_return_type(function);
+        const char   *alias       = NULL;
+
+        // Find user-specified alias.
+        for (size_t j = 0; j < self->num_cons; j++) {
+            if (strcmp(micro_sym, self->cons_inits[j]) == 0) {
+                alias = self->cons_aliases[j];
+                if (!S_can_be_bound(param_list, return_type)) {
+                    CFCUtil_die("Can't bind %s as %s -- types can't be mapped",
+                                micro_sym, alias);
+                }
+                break;
+            }
+        }
+
+        // Automatically bind init() to new() when possible.
+        if (!alias
+            && !self->exclude_cons
+            && strcmp(micro_sym, "init") == 0
+            && S_can_be_bound(param_list, return_type)
+           ) {
+            int saw_new = 0;
+            for (size_t j = 0; j < self->num_cons; j++) {
+                if (strcmp(self->cons_aliases[j], "new") == 0) {
+                    saw_new = 1;
+                }
+            }
+            if (!saw_new) {
+                alias = NEW;
+            }
+        }
+
+        if (!alias) {
+            continue;
+        }
+
         // Create the binding, add it to the array.
         CFCPerlConstructor *cons_binding
-            = CFCPerlConstructor_new(client, self->cons_aliases[i],
-                                     self->cons_inits[i]);
+            = CFCPerlConstructor_new(client, alias, micro_sym);
         size_t size = (num_bound + 2) * sizeof(CFCPerlConstructor*);
         bound = (CFCPerlConstructor**)REALLOCATE(bound, size);
         bound[num_bound] = cons_binding;

@@ -144,7 +144,6 @@ sub bind_memorypool {
         parcel     => "Lucy",
         class_name => "Lucy::Util::MemoryPool",
     );
-    $binding->bind_constructor;
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -153,8 +152,6 @@ sub bind_priorityqueue {
         parcel     => "Lucy",
         class_name => "Lucy::Util::PriorityQueue",
     );
-    $binding->bind_constructor;
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
