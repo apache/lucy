@@ -1751,6 +1751,15 @@ _write_h(file, dest, header, footer)
 PPCODE:
     CFCBindFile_write_h(file, dest, header, footer);
 
+MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl
+
+SV*
+_new()
+CODE:
+    CFCPerl *self = CFCPerl_new();
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
 
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Subroutine
 

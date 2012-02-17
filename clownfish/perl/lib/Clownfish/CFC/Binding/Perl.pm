@@ -17,6 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::CFC::Binding::Perl;
+use base qw( Clownfish::CFC::Base );
 
 use Clownfish::CFC::Hierarchy;
 use Carp;
@@ -33,6 +34,20 @@ use Clownfish::CFC::Binding::Perl::Class;
 use Clownfish::CFC::Binding::Perl::Method;
 use Clownfish::CFC::Binding::Perl::Constructor;
 
+our %parcel;
+our %hierarchy;
+our %lib_dir;
+our %boot_class;
+our %header;
+our %footer;
+our %xs_path;
+our %pm_path;
+our %boot_h_file;
+our %boot_c_file;
+our %boot_h_path;
+our %boot_c_path;
+our %boot_func;
+
 our %new_PARAMS = (
     parcel     => undef,
     hierarchy  => undef,
@@ -43,43 +58,80 @@ our %new_PARAMS = (
 );
 
 sub new {
-    my $either = shift;
-    verify_args( \%new_PARAMS, @_ ) or confess $@;
-    my $self = bless { %new_PARAMS, @_, }, ref($either) || $either;
-    if ( !a_isa_b( $self->{parcel}, 'Clownfish::CFC::Parcel' ) ) {
-        $self->{parcel}
-            = Clownfish::CFC::Parcel->singleton( name => $self->{parcel} );
+    my ( $either, %args ) = @_;
+    verify_args( \%new_PARAMS, %args ) or confess $@;
+    my $self = _new();
+    if ( !a_isa_b( $args{parcel}, 'Clownfish::CFC::Parcel' ) ) {
+        $args{parcel}
+            = Clownfish::CFC::Parcel->singleton( name => $args{parcel} );
     }
-    my $parcel = $self->{parcel};
     for ( keys %new_PARAMS ) {
-        confess("$_ is mandatory") unless defined $self->{$_};
+        confess("$_ is mandatory") unless defined $args{$_};
     }
+    my $parcel = $parcel{$self} = $args{parcel};
+    $hierarchy{$self}  = $args{hierarchy};
+    $lib_dir{$self}    = $args{lib_dir};
+    $boot_class{$self} = $args{boot_class};
+    $header{$self}     = $args{header};
+    $footer{$self}     = $args{footer};
 
     # Derive filenames.
-    my $lib                = $self->{lib_dir};
-    my $dest_dir           = $self->{hierarchy}->get_dest;
-    my @file_components    = split( '::', $self->{boot_class} );
+    my $lib                = $self->_get_lib_dir;
+    my $dest_dir           = $self->_get_hierarchy->get_dest;
+    my @file_components    = split( '::', $self->_get_boot_class );
     my @xs_file_components = @file_components;
     $xs_file_components[-1] .= '.xs';
-    $self->{xs_path} = catfile( $lib, @xs_file_components );
+    $xs_path{$self} = catfile( $lib, @xs_file_components );
 
-    $self->{pm_path} = catfile( $lib, @file_components, 'Autobinding.pm' );
-    $self->{boot_h_file} = $parcel->get_prefix . "boot.h";
-    $self->{boot_c_file} = $parcel->get_prefix . "boot.c";
-    $self->{boot_h_path} = catfile( $dest_dir, $self->{boot_h_file} );
-    $self->{boot_c_path} = catfile( $dest_dir, $self->{boot_c_file} );
+    $pm_path{$self} = catfile( $lib, @file_components, 'Autobinding.pm' );
+    $boot_h_file{$self} = $parcel->get_prefix . "boot.h";
+    $boot_c_file{$self} = $parcel->get_prefix . "boot.c";
+    $boot_h_path{$self} = catfile( $dest_dir, $self->_get_boot_h_file );
+    $boot_c_path{$self} = catfile( $dest_dir, $self->_get_boot_c_file );
 
     # Derive the name of the bootstrap function.
-    $self->{boot_func}
-        = $parcel->get_prefix . $self->{boot_class} . '_bootstrap';
-    $self->{boot_func} =~ s/\W/_/g;
+    $boot_func{$self}
+        = $parcel->get_prefix . $self->_get_boot_class . '_bootstrap';
+    $boot_func{$self} =~ s/\W/_/g;
 
     return $self;
 }
 
+sub DESTROY {
+    my $self = shift;
+    delete $parcel{$self};
+    delete $hierarchy{$self};
+    delete $lib_dir{$self};
+    delete $boot_class{$self};
+    delete $header{$self};
+    delete $footer{$self};
+    delete $xs_path{$self};
+    delete $pm_path{$self};
+    delete $boot_h_file{$self};
+    delete $boot_c_file{$self};
+    delete $boot_h_path{$self};
+    delete $boot_c_path{$self};
+    delete $boot_func{$self};
+    $self->SUPER::DESTROY;
+}
+
+sub _get_parcel      { $parcel{ +shift } }
+sub _get_hierarchy   { $hierarchy{ +shift } }
+sub _get_lib_dir     { $lib_dir{ +shift } }
+sub _get_boot_class  { $boot_class{ +shift } }
+sub _get_header      { $header{ +shift } }
+sub _get_footer      { $footer{ +shift } }
+sub _get_xs_path     { $xs_path{ +shift } }
+sub _get_pm_path     { $pm_path{ +shift } }
+sub _get_boot_h_file { $boot_h_file{ +shift } }
+sub _get_boot_c_file { $boot_c_file{ +shift } }
+sub _get_boot_h_path { $boot_h_path{ +shift } }
+sub _get_boot_c_path { $boot_c_path{ +shift } }
+sub _get_boot_func   { $boot_func{ +shift } }
+
 sub write_bindings {
     my $self           = shift;
-    my $ordered        = $self->{hierarchy}->ordered_classes;
+    my $ordered        = $self->_get_hierarchy->ordered_classes;
     my $registered     = Clownfish::CFC::Binding::Perl::Class->registered;
     my $hand_rolled_xs = "";
     my $generated_xs   = "";
@@ -158,12 +210,13 @@ sub write_bindings {
     my $xs_file_contents = $self->_xs_file_contents( $generated_xs, $xs_init,
         $hand_rolled_xs );
     my $pm_file_contents = $self->_pm_file_contents($params_hash_defs);
-    write_if_changed( $self->{xs_path}, $xs_file_contents );
-    write_if_changed( $self->{pm_path}, $pm_file_contents );
+    write_if_changed( $self->_get_xs_path, $xs_file_contents );
+    write_if_changed( $self->_get_pm_path, $pm_file_contents );
 }
 
 sub _xs_file_contents {
     my ( $self, $generated_xs, $xs_init, $hand_rolled_xs ) = @_;
+    my $boot_h_file = $self->_get_boot_h_file;
     return <<END_STUFF;
 /* DO NOT EDIT!!!! This is an auto-generated file. */
 
@@ -185,7 +238,7 @@ sub _xs_file_contents {
 
 #include "XSBind.h"
 #include "parcel.h"
-#include "$self->{boot_h_file}"
+#include "$boot_h_file"
 
 #include "Lucy/Object/Host.h"
 #include "Lucy/Util/Memory.h"
@@ -245,8 +298,8 @@ END_STUFF
 
 sub prepare_pod {
     my $self    = shift;
-    my $lib_dir = $self->{lib_dir};
-    my $ordered = $self->{hierarchy}->ordered_classes;
+    my $lib_dir = $self->_get_lib_dir;
+    my $ordered = $self->_get_hierarchy->ordered_classes;
     my @files_written;
     my %has_pod;
     my %modified;
@@ -291,26 +344,29 @@ sub write_boot {
 
 sub _write_boot_h {
     my $self      = shift;
-    my $hierarchy = $self->{hierarchy};
-    my $filepath  = catfile( $hierarchy->get_dest, $self->{boot_h_file} );
-    my $guard     = uc("$self->{boot_class}_BOOT");
+    my $hierarchy = $self->_get_hierarchy;
+    my $filepath  = catfile( $hierarchy->get_dest, $self->_get_boot_h_file );
+    my $header    = $self->_get_header;
+    my $footer    = $self->_get_footer;
+    my $boot_func = $self->_get_boot_func;
+    my $guard     = uc($self->_get_boot_class . '_BOOT');
     $guard =~ s/\W+/_/g;
 
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$filepath': $!");
     print $fh <<END_STUFF;
-$self->{header}
+$header
 
 #ifndef $guard
 #define $guard 1
 
 void
-$self->{boot_func}();
+$boot_func();
 
 #endif /* $guard */
 
-$self->{footer}
+$footer
 END_STUFF
 }
 
@@ -341,7 +397,11 @@ my %ks_compat = (
 
 sub _write_boot_c {
     my $self           = shift;
-    my $hierarchy      = $self->{hierarchy};
+    my $hierarchy      = $self->_get_hierarchy;
+    my $header         = $self->_get_header;
+    my $footer         = $self->_get_footer;
+    my $boot_h_file    = $self->_get_boot_h_file;
+    my $boot_func      = $self->_get_boot_func;
     my $ordered        = $hierarchy->ordered_classes;
     my $num_classes    = scalar @$ordered;
     my $pound_includes = "";
@@ -382,29 +442,29 @@ sub _write_boot_c {
         $isa_pushes .= qq|    isa = get_av("$class_name\::ISA", 1);\n|;
         $isa_pushes .= qq|    av_push(isa, newSVpv("$parent_class", 0));\n|;
     }
-    my $filepath = catfile( $hierarchy->get_dest, $self->{boot_c_file} );
+    my $filepath = catfile( $hierarchy->get_dest, $self->_get_boot_c_file );
     unlink $filepath;
     sysopen( my $fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
         or confess("Can't open '$filepath': $!");
     print $fh <<END_STUFF;
-$self->{header}
+$header
 
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "$self->{boot_h_file}"
+#include "$boot_h_file"
 #include "parcel.h"
 $pound_includes
 
 void
-$self->{boot_func}() {
+$boot_func() {
     AV *isa;
     cfish_ZombieCharBuf *alias = CFISH_ZCB_WRAP_STR("", 0);
 $registrations
 $isa_pushes
 }
 
-$self->{footer}
+$footer
 
 END_STUFF
 }
@@ -412,7 +472,7 @@ END_STUFF
 sub write_xs_typemap {
     my $self = shift;
     Clownfish::CFC::Binding::Perl::TypeMap->write_xs_typemap(
-        hierarchy => $self->{hierarchy}, );
+        hierarchy => $self->_get_hierarchy, );
 }
 
 1;

@@ -14,36 +14,33 @@
  * limitations under the License.
  */
 
+#define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
-#include "CFCCBlock.h"
-#include "CFCClass.h"
-#include "CFCDocuComment.h"
-#include "CFCDumpable.h"
-#include "CFCFile.h"
-#include "CFCFunction.h"
-#include "CFCHierarchy.h"
-#include "CFCMethod.h"
-#include "CFCMemPool.h"
-#include "CFCParamList.h"
-#include "CFCParcel.h"
-#include "CFCParser.h"
-#include "CFCSymbol.h"
-#include "CFCType.h"
-#include "CFCUtil.h"
-#include "CFCVariable.h"
-
-#include "CFCBindCore.h"
-#include "CFCBindAliases.h"
-#include "CFCBindClass.h"
-#include "CFCBindFile.h"
-#include "CFCBindFunction.h"
-#include "CFCBindMethod.h"
-
 #include "CFCPerl.h"
-#include "CFCPerlSub.h"
-#include "CFCPerlMethod.h"
-#include "CFCPerlClass.h"
-#include "CFCPerlConstructor.h"
-#include "CFCPerlPod.h"
-#include "CFCPerlTypeMap.h"
+
+struct CFCPerl {
+    CFCBase base;
+};
+
+const static CFCMeta CFCPERL_META = {
+    "Clownfish::CFC::Binding::Perl",
+    sizeof(CFCPerl),
+    (CFCBase_destroy_t)CFCPerl_destroy
+};
+
+CFCPerl*
+CFCPerl_new(void) {
+    CFCPerl *self = (CFCPerl*)CFCBase_allocate(&CFCPERL_META);
+    return CFCPerl_init(self);
+}
+
+CFCPerl*
+CFCPerl_init(CFCPerl *self) {
+    return self;
+}
+
+void
+CFCPerl_destroy(CFCPerl *self) {
+    CFCBase_destroy((CFCBase*)self);
+}
 
