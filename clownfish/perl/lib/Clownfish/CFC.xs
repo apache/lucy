@@ -1754,12 +1754,109 @@ PPCODE:
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl
 
 SV*
-_new()
+_new(parcel, hierarchy, lib_dir, boot_class, header, footer)
+    CFCParcel *parcel;
+    CFCHierarchy *hierarchy;
+    const char *lib_dir;
+    const char *boot_class;
+    const char *header;
+    const char *footer;
 CODE:
-    CFCPerl *self = CFCPerl_new();
+    CFCPerl *self = CFCPerl_new(parcel, hierarchy, lib_dir, boot_class,
+                                header, footer);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
+
+
+void
+_set_or_get(self, ...)
+    CFCPerl *self;
+ALIAS:
+    _get_parcel      = 2
+    _get_hierarchy   = 4
+    _get_lib_dir     = 6
+    _get_boot_class  = 8
+    _get_header      = 10
+    _get_footer      = 12
+    _get_xs_path     = 14
+    _get_pm_path     = 16
+    _get_boot_h_file = 18
+    _get_boot_c_file = 20
+    _get_boot_h_path = 22
+    _get_boot_c_path = 24
+    _get_boot_func   = 26
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                CFCParcel *value = CFCPerl_get_parcel(self);
+                retval = S_cfcbase_to_perlref(value);
+            }
+            break;
+        case 4: {
+                CFCHierarchy *value = CFCPerl_get_hierarchy(self);
+                retval = S_cfcbase_to_perlref(value);
+            }
+            break;
+        case 6: {
+                const char *value = CFCPerl_get_lib_dir(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 8: {
+                const char *value = CFCPerl_get_boot_class(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 10: {
+                const char *value = CFCPerl_get_header(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 12: {
+                const char *value = CFCPerl_get_footer(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 14: {
+                const char *value = CFCPerl_get_xs_path(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 16: {
+                const char *value = CFCPerl_get_pm_path(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 18: {
+                const char *value = CFCPerl_get_boot_h_file(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 20: {
+                const char *value = CFCPerl_get_boot_c_file(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 22: {
+                const char *value = CFCPerl_get_boot_h_path(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 24: {
+                const char *value = CFCPerl_get_boot_c_path(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 26: {
+                const char *value = CFCPerl_get_boot_func(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Subroutine
 

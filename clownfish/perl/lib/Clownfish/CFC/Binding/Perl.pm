@@ -34,20 +34,6 @@ use Clownfish::CFC::Binding::Perl::Class;
 use Clownfish::CFC::Binding::Perl::Method;
 use Clownfish::CFC::Binding::Perl::Constructor;
 
-our %parcel;
-our %hierarchy;
-our %lib_dir;
-our %boot_class;
-our %header;
-our %footer;
-our %xs_path;
-our %pm_path;
-our %boot_h_file;
-our %boot_c_file;
-our %boot_h_path;
-our %boot_c_path;
-our %boot_func;
-
 our %new_PARAMS = (
     parcel     => undef,
     hierarchy  => undef,
@@ -60,74 +46,13 @@ our %new_PARAMS = (
 sub new {
     my ( $either, %args ) = @_;
     verify_args( \%new_PARAMS, %args ) or confess $@;
-    my $self = _new();
     if ( !a_isa_b( $args{parcel}, 'Clownfish::CFC::Parcel' ) ) {
         $args{parcel}
             = Clownfish::CFC::Parcel->singleton( name => $args{parcel} );
     }
-    for ( keys %new_PARAMS ) {
-        confess("$_ is mandatory") unless defined $args{$_};
-    }
-    my $parcel = $parcel{$self} = $args{parcel};
-    $hierarchy{$self}  = $args{hierarchy};
-    $lib_dir{$self}    = $args{lib_dir};
-    $boot_class{$self} = $args{boot_class};
-    $header{$self}     = $args{header};
-    $footer{$self}     = $args{footer};
-
-    # Derive filenames.
-    my $lib                = $self->_get_lib_dir;
-    my $dest_dir           = $self->_get_hierarchy->get_dest;
-    my @file_components    = split( '::', $self->_get_boot_class );
-    my @xs_file_components = @file_components;
-    $xs_file_components[-1] .= '.xs';
-    $xs_path{$self} = catfile( $lib, @xs_file_components );
-
-    $pm_path{$self} = catfile( $lib, @file_components, 'Autobinding.pm' );
-    $boot_h_file{$self} = $parcel->get_prefix . "boot.h";
-    $boot_c_file{$self} = $parcel->get_prefix . "boot.c";
-    $boot_h_path{$self} = catfile( $dest_dir, $self->_get_boot_h_file );
-    $boot_c_path{$self} = catfile( $dest_dir, $self->_get_boot_c_file );
-
-    # Derive the name of the bootstrap function.
-    $boot_func{$self}
-        = $parcel->get_prefix . $self->_get_boot_class . '_bootstrap';
-    $boot_func{$self} =~ s/\W/_/g;
-
-    return $self;
+    return _new(
+        @args{qw( parcel hierarchy lib_dir boot_class header footer )} );
 }
-
-sub DESTROY {
-    my $self = shift;
-    delete $parcel{$self};
-    delete $hierarchy{$self};
-    delete $lib_dir{$self};
-    delete $boot_class{$self};
-    delete $header{$self};
-    delete $footer{$self};
-    delete $xs_path{$self};
-    delete $pm_path{$self};
-    delete $boot_h_file{$self};
-    delete $boot_c_file{$self};
-    delete $boot_h_path{$self};
-    delete $boot_c_path{$self};
-    delete $boot_func{$self};
-    $self->SUPER::DESTROY;
-}
-
-sub _get_parcel      { $parcel{ +shift } }
-sub _get_hierarchy   { $hierarchy{ +shift } }
-sub _get_lib_dir     { $lib_dir{ +shift } }
-sub _get_boot_class  { $boot_class{ +shift } }
-sub _get_header      { $header{ +shift } }
-sub _get_footer      { $footer{ +shift } }
-sub _get_xs_path     { $xs_path{ +shift } }
-sub _get_pm_path     { $pm_path{ +shift } }
-sub _get_boot_h_file { $boot_h_file{ +shift } }
-sub _get_boot_c_file { $boot_c_file{ +shift } }
-sub _get_boot_h_path { $boot_h_path{ +shift } }
-sub _get_boot_c_path { $boot_c_path{ +shift } }
-sub _get_boot_func   { $boot_func{ +shift } }
 
 sub write_bindings {
     my $self           = shift;

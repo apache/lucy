@@ -22,15 +22,60 @@ extern "C" {
 #endif
 
 typedef struct CFCPerl CFCPerl;
+struct CFCParcel;
+struct CFCHierarchy;
 
 CFCPerl*
-CFCPerl_new(void);
+CFCPerl_new(struct CFCParcel *parcel, struct CFCHierarchy *hierarchy,
+            const char *lib_dir, const char *boot_class, const char *header,
+            const char *footer);
 
 CFCPerl*
-CFCPerl_init(CFCPerl *self);
+CFCPerl_init(CFCPerl *self, struct CFCParcel *parcel,
+             struct CFCHierarchy *hierarchy, const char *lib_dir,
+             const char *boot_class, const char *header, const char *footer);
 
 void
 CFCPerl_destroy(CFCPerl *self);
+
+struct CFCParcel*
+CFCPerl_get_parcel(CFCPerl *self);
+
+struct CFCHierarchy*
+CFCPerl_get_hierarchy(CFCPerl *self);
+
+const char*
+CFCPerl_get_lib_dir(CFCPerl *self);
+
+const char*
+CFCPerl_get_boot_class(CFCPerl *self);
+
+const char*
+CFCPerl_get_header(CFCPerl *self);
+
+const char*
+CFCPerl_get_footer(CFCPerl *self);
+
+const char*
+CFCPerl_get_xs_path(CFCPerl *self);
+
+const char*
+CFCPerl_get_pm_path(CFCPerl *self);
+
+const char*
+CFCPerl_get_boot_h_file(CFCPerl *self);
+
+const char*
+CFCPerl_get_boot_c_file(CFCPerl *self);
+
+const char*
+CFCPerl_get_boot_h_path(CFCPerl *self);
+
+const char*
+CFCPerl_get_boot_c_path(CFCPerl *self);
+
+const char*
+CFCPerl_get_boot_func(CFCPerl *self);
 
 #ifdef __cplusplus
 }
