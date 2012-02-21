@@ -38,6 +38,13 @@ CFCPerl_init(CFCPerl *self, struct CFCParcel *parcel,
 void
 CFCPerl_destroy(CFCPerl *self);
 
+char*
+CFCPerl_pm_file_contents(CFCPerl *self, const char *params_hash_defs);
+
+char*
+CFCPerl_xs_file_contents(CFCPerl *self, const char *generated_xs,
+                         const char *xs_init, const char *hand_rolled_xs);
+
 struct CFCParcel*
 CFCPerl_get_parcel(CFCPerl *self);
 

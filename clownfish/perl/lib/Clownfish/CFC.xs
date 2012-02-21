@@ -1857,6 +1857,27 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+SV*
+_pm_file_contents(self, params_hash_defs)
+    CFCPerl *self;
+    const char *params_hash_defs;
+CODE:
+    char *contents = CFCPerl_pm_file_contents(self, params_hash_defs);
+    RETVAL = S_sv_eat_c_string(contents);
+OUTPUT: RETVAL
+
+SV*
+_xs_file_contents(self, generated_xs, xs_init, hand_rolled_xs)
+    CFCPerl *self;
+    const char *generated_xs;
+    const char *xs_init;
+    const char *hand_rolled_xs;
+CODE:
+    char *contents = CFCPerl_xs_file_contents(self, generated_xs, xs_init,
+                                              hand_rolled_xs);
+    RETVAL = S_sv_eat_c_string(contents);
+OUTPUT: RETVAL
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Subroutine
 

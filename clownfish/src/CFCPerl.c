@@ -15,6 +15,7 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 #include <ctype.h>
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
@@ -135,6 +136,103 @@ CFCPerl_destroy(CFCPerl *self) {
     FREEMEM(self->boot_c_path);
     FREEMEM(self->boot_func);
     CFCBase_destroy((CFCBase*)self);
+}
+
+char*
+CFCPerl_pm_file_contents(CFCPerl *self, const char *params_hash_defs) {
+    const char pattern[] = 
+    "# DO NOT EDIT!!!! This is an auto-generated file.\n"
+    "\n"
+    "# Licensed to the Apache Software Foundation (ASF) under one or more\n"
+    "# contributor license agreements.  See the NOTICE file distributed with\n"
+    "# this work for additional information regarding copyright ownership.\n"
+    "# The ASF licenses this file to You under the Apache License, Version 2.0\n"
+    "# (the \"License\"); you may not use this file except in compliance with\n"
+    "# the License.  You may obtain a copy of the License at\n"
+    "#\n"
+    "#     http://www.apache.org/licenses/LICENSE-2.0\n"
+    "#\n"
+    "# Unless required by applicable law or agreed to in writing, software\n"
+    "# distributed under the License is distributed on an \"AS IS\" BASIS,\n"
+    "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
+    "# See the License for the specific language governing permissions and\n"
+    "# limitations under the License.\n"
+    "\n"
+    "use strict;\n"
+    "use warnings;\n"
+    "\n"
+    "package Lucy::Autobinding;\n"
+    "\n"
+    "init_autobindings();\n"
+    "\n"
+    "%s\n"
+    "\n"
+    "1;\n"
+    "\n";
+    size_t size = sizeof(pattern) + strlen(params_hash_defs) + 20;
+    char *contents = (char*)MALLOCATE(size);
+    sprintf(contents, pattern, params_hash_defs);
+    return contents;
+}
+
+
+char*
+CFCPerl_xs_file_contents(CFCPerl *self, const char *generated_xs,
+                         const char *xs_init, const char *hand_rolled_xs) {
+    const char pattern[] = 
+    "/* DO NOT EDIT!!!! This is an auto-generated file. */\n"
+    "\n"
+    "/* Licensed to the Apache Software Foundation (ASF) under one or more\n"
+    " * contributor license agreements.  See the NOTICE file distributed with\n"
+    " * this work for additional information regarding copyright ownership.\n"
+    " * The ASF licenses this file to You under the Apache License, Version 2.0\n"
+    " * (the \"License\"); you may not use this file except in compliance with\n"
+    " * the License.  You may obtain a copy of the License at\n"
+    " *\n"
+    " *     http://www.apache.org/licenses/LICENSE-2.0\n"
+    " *\n"
+    " * Unless required by applicable law or agreed to in writing, software\n"
+    " * distributed under the License is distributed on an \"AS IS\" BASIS,\n"
+    " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
+    " * See the License for the specific language governing permissions and\n"
+    " * limitations under the License.\n"
+    " */\n"
+    "\n"
+    "#include \"XSBind.h\"\n"
+    "#include \"parcel.h\"\n"
+    "#include \"%s\"\n"
+    "\n"
+    "#include \"Lucy/Object/Host.h\"\n"
+    "#include \"Lucy/Util/Memory.h\"\n"
+    "#include \"Lucy/Util/StringHelper.h\"\n"
+    "\n"
+    "%s\n"
+    "\n"
+    "MODULE = Lucy   PACKAGE = Lucy::Autobinding\n"
+    "\n"
+    "void\n"
+    "init_autobindings()\n"
+    "PPCODE:\n"
+    "{\n"
+    "    char* file = __FILE__;\n"
+    "    CHY_UNUSED_VAR(cv);\n"
+    "    CHY_UNUSED_VAR(items); %s\n"
+    "}\n"
+    "\n"
+    "%s\n"
+    "\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(self->boot_h_file)
+                  + strlen(generated_xs)
+                  + strlen(xs_init)
+                  + strlen(hand_rolled_xs)
+                  + 30;
+    char *contents = (char*)MALLOCATE(size);
+    sprintf(contents, pattern, self->boot_h_file, generated_xs, xs_init,
+            hand_rolled_xs);
+
+    return contents;
 }
 
 CFCParcel*
