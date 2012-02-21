@@ -64,6 +64,8 @@ END_CONSTRUCTOR
         class_name => "Lucy::Analysis::CaseFolder",
     );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Analysis::CaseFolder');
+    $binding->add_class_alias('KinoSearch::Analysis::LCNormalizer');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -199,6 +201,7 @@ END_CONSTRUCTOR
         class_name => "Lucy::Analysis::PolyAnalyzer",
     );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Analysis::PolyAnalyzer');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -234,6 +237,7 @@ END_CONSTRUCTOR
     );
     $binding->bind_constructor( alias => '_new' );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Analysis::Tokenizer');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -261,6 +265,7 @@ END_CONSTRUCTOR
         class_name => "Lucy::Analysis::SnowballStemmer",
     );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Analysis::Stemmer');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -293,6 +298,7 @@ END_CONSTRUCTOR
         class_name => "Lucy::Analysis::SnowballStopFilter",
     );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Analysis::Stopalizer');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

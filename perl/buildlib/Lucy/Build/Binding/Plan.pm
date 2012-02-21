@@ -116,6 +116,8 @@ END_CONSTRUCTOR
         class_name => "Lucy::Plan::BlobType",
     );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Plan::BlobType'); 
+    $binding->add_class_alias('KinoSearch::FieldType::BlobType');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -147,6 +149,8 @@ END_SYNOPSIS
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias("KinoSearch::Plan::FieldType");
+    $binding->add_class_alias("KinoSearch::FieldType");
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -207,6 +211,8 @@ END_CONSTRUCTOR
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Plan::FullTextType');
+    $binding->add_class_alias('KinoSearch::FieldType::FullTextType');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -269,6 +275,8 @@ END_CONSTRUCTOR
         class_name => "Lucy::Plan::Schema",
     );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias("KinoSearch::Plan::Schema");
+    $binding->add_class_alias("KinoSearch::Schema");
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
@@ -297,6 +305,8 @@ END_CONSTRUCTOR
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
     $binding->set_pod_spec($pod_spec);
+    $binding->add_class_alias('KinoSearch::Plan::StringType');
+    $binding->add_class_alias('KinoSearch::FieldType::StringType');
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

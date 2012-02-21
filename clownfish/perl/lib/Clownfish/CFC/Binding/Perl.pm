@@ -213,31 +213,6 @@ $footer
 END_STUFF
 }
 
-my %ks_compat = (
-    'Lucy::Plan::Schema' =>
-        [qw( KinoSearch::Plan::Schema KinoSearch::Schema )],
-    'Lucy::Plan::FieldType' =>
-        [qw( KinoSearch::Plan::FieldType KinoSearch::FieldType )],
-    'Lucy::Plan::FullTextType' => [
-        qw( KinoSearch::Plan::FullTextType KinoSearch::FieldType::FullTextType )
-    ],
-    'Lucy::Plan::StringType' => [
-        qw( KinoSearch::Plan::StringType KinoSearch::FieldType::StringType )],
-    'Lucy::Plan::BlobType' =>
-        [qw( KinoSearch::Plan::BlobType KinoSearch::FieldType::BlobType )],
-    'Lucy::Analysis::PolyAnalyzer' =>
-        [qw( KinoSearch::Analysis::PolyAnalyzer )],
-    'Lucy::Analysis::RegexTokenizer' =>
-        [qw( KinoSearch::Analysis::Tokenizer )],
-    'Lucy::Analysis::CaseFolder' => [
-        qw( KinoSearch::Analysis::CaseFolder KinoSearch::Analysis::LCNormalizer )
-    ],
-    'Lucy::Analysis::SnowballStopFilter' =>
-        [qw( KinoSearch::Analysis::Stopalizer )],
-    'Lucy::Analysis::SnowballStemmer' =>
-        [qw( KinoSearch::Analysis::Stemmer )],
-);
-
 sub _write_boot_c {
     my $self           = shift;
     my $hierarchy      = $self->_get_hierarchy;
@@ -267,9 +242,11 @@ sub _write_boot_c {
         # Add aliases for selected KinoSearch classes which allow old indexes
         # to be read.
         my $class_name = $class->get_class_name;
-        my $aliases    = $ks_compat{$class_name};
-        if ($aliases) {
+        my $class_binding
+            = Clownfish::CFC::Binding::Perl::Class->singleton($class_name);
+        if ($class_binding) {
             my $vtable_var = $class->full_vtable_var;
+            my $aliases    = $class_binding->get_class_aliases;
             for my $alias (@$aliases) {
                 my $len = length($alias);
                 $registrations

@@ -2136,6 +2136,27 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+void
+add_class_alias(self, alias)
+    CFCPerlClass *self;
+    const char *alias;
+PPCODE:
+    CFCPerlClass_add_class_alias(self, alias);
+
+SV*
+get_class_aliases(self)
+    CFCPerlClass *self;
+CODE:
+    AV *array = newAV();
+    char **aliases = CFCPerlClass_get_class_aliases(self);
+    for (size_t i = 0; aliases[i] != NULL; i++) {
+        SV *alias = newSVpvn(aliases[i], strlen(aliases[i]));
+        av_push(array, alias);
+    }
+    RETVAL = newRV_noinc((SV*)array);
+OUTPUT: RETVAL
+
+
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Pod
 
 SV*

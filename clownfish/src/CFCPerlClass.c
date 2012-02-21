@@ -52,6 +52,8 @@ struct CFCPerlClass {
     char **cons_inits;
     size_t num_cons;
     int    exclude_cons;
+    char **class_aliases;
+    size_t num_class_aliases;
 };
 
 static CFCPerlClass **registry = NULL;
@@ -79,17 +81,19 @@ CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel,
     self->class_name = CFCUtil_strdup(class_name);
     // Client may be NULL, since fetch_singleton() does not always succeed.
     self->client = CFCClass_fetch_singleton(parcel, class_name); 
-    self->pod_spec     = NULL;
-    self->xs_code      = NULL;
-    self->meth_aliases = NULL;
-    self->meth_names   = NULL;
-    self->num_methods  = 0;
-    self->excluded     = NULL;
-    self->num_excluded = 0;
-    self->cons_aliases = NULL;
-    self->cons_inits   = NULL;
-    self->num_cons     = 0;
-    self->exclude_cons = 0;
+    self->pod_spec          = NULL;
+    self->xs_code           = NULL;
+    self->meth_aliases      = NULL;
+    self->meth_names        = NULL;
+    self->num_methods       = 0;
+    self->excluded          = NULL;
+    self->num_excluded      = 0;
+    self->cons_aliases      = NULL;
+    self->cons_inits        = NULL;
+    self->num_cons          = 0;
+    self->exclude_cons      = 0;
+    self->class_aliases     = (char**)CALLOCATE(1, sizeof(char*));
+    self->num_class_aliases = 0;
     return self;
 }
 
@@ -116,6 +120,10 @@ CFCPerlClass_destroy(CFCPerlClass *self) {
     }
     FREEMEM(self->cons_aliases);
     FREEMEM(self->cons_inits);
+    for (size_t i = 0; i < self->num_class_aliases; i++) {
+        FREEMEM(self->class_aliases[i]);
+    }
+    FREEMEM(self->class_aliases);
     CFCBase_destroy((CFCBase*)self);
 }
 
@@ -537,5 +545,25 @@ CFCPerlClass_set_pod_spec(CFCPerlClass *self, CFCPerlPod *pod_spec) {
 CFCPerlPod*
 CFCPerlClass_get_pod_spec(CFCPerlClass *self) {
     return self->pod_spec;
+}
+
+void
+CFCPerlClass_add_class_alias(CFCPerlClass *self, const char *alias) {
+    for (size_t i = 0; i < self->num_class_aliases; i++) {
+        if (strcmp(alias, self->class_aliases[i]) == 0) {
+            CFCUtil_die("Alias '%s' already added for class '%s'", alias,
+                        self->class_name);
+        }
+    }
+    size_t size = (self->num_class_aliases + 2) * sizeof(char*);
+    self->class_aliases = (char**)REALLOCATE(self->class_aliases, size);
+    self->class_aliases[self->num_class_aliases] = CFCUtil_strdup(alias);
+    self->num_class_aliases++;
+    self->class_aliases[self->num_class_aliases] = NULL;
+}
+
+char**
+CFCPerlClass_get_class_aliases(CFCPerlClass *self) {
+    return self->class_aliases;
 }
 

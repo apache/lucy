@@ -98,6 +98,20 @@ CFCPerlClass_set_pod_spec(CFCPerlClass *self, struct CFCPerlPod *pod_spec);
 struct CFCPerlPod*
 CFCPerlClass_get_pod_spec(CFCPerlClass *self);
 
+/** Alias a class name to this class.
+ *
+ * TODO: remove this feature as soon as KinoSearch compatibility is no longer
+ * necessary.
+ */
+void
+CFCPerlClass_add_class_alias(CFCPerlClass *self, const char *alias);
+
+/** Return a NULL-terminated list of class names which will be aliased to this
+ * class.
+ */
+char**
+CFCPerlClass_get_class_aliases(CFCPerlClass *self);
+
 #ifdef __cplusplus
 }
 #endif
