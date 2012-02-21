@@ -101,8 +101,8 @@ CFCPerlClass_destroy(CFCPerlClass *self) {
     FREEMEM(self->class_name);
     FREEMEM(self->xs_code);
     for (size_t i = 0; i < self->num_methods; i++) {
-        FREEMEM(self->meth_aliases);
-        FREEMEM(self->meth_names);
+        FREEMEM(self->meth_aliases[i]);
+        FREEMEM(self->meth_names[i]);
     }
     FREEMEM(self->meth_aliases);
     FREEMEM(self->meth_names);
@@ -111,8 +111,8 @@ CFCPerlClass_destroy(CFCPerlClass *self) {
     }
     FREEMEM(self->excluded);
     for (size_t i = 0; i < self->num_cons; i++) {
-        FREEMEM(self->cons_aliases);
-        FREEMEM(self->cons_inits);
+        FREEMEM(self->cons_aliases[i]);
+        FREEMEM(self->cons_inits[i]);
     }
     FREEMEM(self->cons_aliases);
     FREEMEM(self->cons_inits);
