@@ -1878,6 +1878,20 @@ CODE:
     RETVAL = S_sv_eat_c_string(contents);
 OUTPUT: RETVAL
 
+SV*
+write_pod(self)
+    CFCPerl *self;
+CODE:
+    char **written = CFCPerl_write_pod(self);
+    AV *modified = newAV();
+    for (size_t i = 0; written[i] != NULL; i++) {
+        SV *path = S_sv_eat_c_string(written[i]);
+        av_push(modified, path);
+    }
+    FREEMEM(written);
+    RETVAL = newRV_noinc((SV*)modified);
+OUTPUT: RETVAL
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Subroutine
 

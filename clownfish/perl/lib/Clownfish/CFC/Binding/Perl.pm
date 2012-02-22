@@ -139,46 +139,6 @@ sub write_bindings {
     write_if_changed( $self->_get_pm_path, $pm_file_contents );
 }
 
-sub prepare_pod {
-    my $self    = shift;
-    my $lib_dir = $self->_get_lib_dir;
-    my $ordered = $self->_get_hierarchy->ordered_classes;
-    my @files_written;
-    my %has_pod;
-    my %modified;
-
-    my $registered = Clownfish::CFC::Binding::Perl::Class->registered;
-    $has_pod{ $_->get_class_name } = 1
-        for grep { $_->get_pod_spec } @$registered;
-
-    for my $class (@$ordered) {
-        my $class_name = $class->get_class_name;
-        my $class_binding
-            = Clownfish::CFC::Binding::Perl::Class->singleton($class_name)
-            or next;
-        next unless delete $has_pod{$class_name};
-        my $pod = $class_binding->create_pod
-            or confess("Failed to generate POD for $class_name");
-
-        # Compare against existing file; rewrite if changed.
-        my $pod_file_path
-            = catfile( $lib_dir, split( '::', $class_name ) ) . ".pod";
-        my $existing = "";
-        if ( -e $pod_file_path ) {
-            open( my $pod_fh, "<", $pod_file_path )
-                or confess("Can't open '$pod_file_path': $!");
-            $existing = do { local $/; <$pod_fh> };
-        }
-        if ( $pod ne $existing ) {
-            $modified{$pod_file_path} = $pod;
-        }
-    }
-    my @leftover = keys %has_pod;
-    confess("Couldn't match pod to class for '@leftover'") if @leftover;
-
-    return \%modified;
-}
-
 sub write_boot {
     my $self = shift;
     $self->_write_boot_h;
@@ -372,23 +332,6 @@ typically copyright information.
 
 Generate the XS bindings (including "Autobind.pm) for all classes in the
 hierarchy.
-
-=head2 prepare_pod 
-
-    my $filepaths_and_pod = $perl_binding->prepare_pod;
-    while ( my ( $filepath, $pod ) = each %$filepaths_and_pod ) {
-        add_to_cleanup($filepath);
-        spew_file( $filepath, $pod );
-    }
-
-Auto-generate POD for all classes bindings which were spec'd with C<make_pod>
-directives.  See whether a .pod file exists and is up to date.
-
-Return a hash representing POD files that need to be modified; the keys are
-filepaths, and the values are the POD file content.
-
-The caller must take responsibility for actually writing out the POD files,
-after adding the filepaths to cleanup records and so on.
 
 =head2 write_boot
 

@@ -222,7 +222,7 @@ CFCUtil_slurp_text(const char *file_path, size_t *len_ptr) {
     return contents;
 }
 
-void
+int
 CFCUtil_write_if_changed(const char *path, const char *content, size_t len) {
     FILE *f = fopen(path, "r");
     if (f) { // Does file exist?
@@ -237,10 +237,11 @@ CFCUtil_write_if_changed(const char *path, const char *content, size_t len) {
         }
         FREEMEM(existing);
         if (changed == false) {
-            return;
+            return false;
         }
     }
     CFCUtil_write_file(path, content, len);
+    return true;
 }
 
 long

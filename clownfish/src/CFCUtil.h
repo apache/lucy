@@ -112,8 +112,10 @@ CFCUtil_write_file(const char *filename, const char *content, size_t len);
 /** Test whether there's a file at <code>path</code> which already matches
  * <code>content</code> exactly.  If something has changed, write the file.
  * Otherwise do nothing (and avoid bumping the file's modification time).
+ *
+ * @return true if the file was written, false otherwise.
  */
-void
+int
 CFCUtil_write_if_changed(const char *path, const char *content, size_t len);
 
 /* Read an entire file (as text) into memory.

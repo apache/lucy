@@ -264,15 +264,9 @@ sub _write_pod {
     if ( !$binding ) {
         ( undef, $binding ) = $self->_compile_clownfish;
     }
-    my $pod_files = $binding->prepare_pod( lib_dir => $LIB_DIR );
     print "Writing POD...\n";
-    while ( my ( $filepath, $pod ) = each %$pod_files ) {
-        $self->add_to_cleanup($filepath);
-        unlink $filepath;
-        sysopen( my $pod_fh, $filepath, O_CREAT | O_EXCL | O_WRONLY )
-            or confess("Can't open '$filepath': $!");
-        print $pod_fh $pod;
-    }
+    my $pod_files = $binding->write_pod;
+    $self->add_to_cleanup($_) for @$pod_files;
 }
 
 sub ACTION_cfc {

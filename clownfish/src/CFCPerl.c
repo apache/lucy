@@ -21,8 +21,10 @@
 #include "CFCBase.h"
 #include "CFCPerl.h"
 #include "CFCParcel.h"
+#include "CFCClass.h"
 #include "CFCHierarchy.h"
 #include "CFCUtil.h"
+#include "CFCPerlClass.h"
 
 struct CFCPerl {
     CFCBase base;
@@ -40,6 +42,11 @@ struct CFCPerl {
     char *boot_c_path;
     char *boot_func;
 };
+
+// Modify a string in place, swapping out "::" for the path separator
+// character.
+static void
+S_double_colons_to_path_sep(char *text);
 
 const static CFCMeta CFCPERL_META = {
     "Clownfish::CFC::Binding::Perl",
@@ -75,23 +82,13 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
     // Derive path to generated .xs file.
     self->xs_path = CFCUtil_cat(CFCUtil_strdup(""), lib_dir, CFCUTIL_PATH_SEP,
                                 boot_class, ".xs", NULL);
-    size_t pos = 0;
-    for (char *ptr = self->xs_path; *ptr != '\0'; ptr++) {
-        if (strcmp(ptr, "::") == 0) {
-            self->xs_path[pos++] = CFCUTIL_PATH_SEP_CHAR;
-            ptr++;
-        }
-        else {
-            self->xs_path[pos++] = *ptr;
-        }
-    }
-    self->xs_path[pos] = '\0';
+    S_double_colons_to_path_sep(self->xs_path);
 
     // Derive path to generated .pm file.
-    self->pm_path = CFCUtil_strdup(self->xs_path);
-    self->pm_path[strlen(self->pm_path) - strlen(".xs")] = '\0';
-    self->pm_path = CFCUtil_cat(self->pm_path, CFCUTIL_PATH_SEP,
+    self->pm_path = CFCUtil_cat(CFCUtil_strdup(""), lib_dir, CFCUTIL_PATH_SEP,
+                                boot_class, CFCUTIL_PATH_SEP,
                                 "Autobinding.pm", NULL);
+    S_double_colons_to_path_sep(self->pm_path);
 
     // Derive the name of the files containing bootstrapping code.
     const char *prefix   = CFCParcel_get_prefix(parcel);
@@ -136,6 +133,66 @@ CFCPerl_destroy(CFCPerl *self) {
     FREEMEM(self->boot_c_path);
     FREEMEM(self->boot_func);
     CFCBase_destroy((CFCBase*)self);
+}
+
+static void
+S_double_colons_to_path_sep(char *text) {
+    size_t pos = 0;
+    for (char *ptr = text; *ptr != '\0'; ptr++) {
+        if (strncmp(ptr, "::", 2) == 0) {
+            text[pos++] = CFCUTIL_PATH_SEP_CHAR;
+            ptr++;
+        }
+        else {
+            text[pos++] = *ptr;
+        }
+    }
+    text[pos] = '\0';
+}
+
+char**
+CFCPerl_write_pod(CFCPerl *self) {
+    CFCPerlClass **registry  = CFCPerlClass_registry();
+    size_t num_registered = 0;
+    while (registry[num_registered] != NULL) { num_registered++; }
+    char     **pod_paths = (char**)CALLOCATE(num_registered + 1, sizeof(char*));
+    char     **pods      = (char**)CALLOCATE(num_registered + 1, sizeof(char*));
+    CFCClass **ordered   = CFCHierarchy_ordered_classes(self->hierarchy);
+    size_t     count     = 0;
+
+    // Generate POD, but don't write.  That way, if there's an error while
+    // generating pod, we leak memory but don't clutter up the file system.
+    for (size_t i = 0; i < num_registered; i++) {
+        const char *class_name = CFCPerlClass_get_class_name(registry[i]);
+        char *pod = CFCPerlClass_create_pod(registry[i]);
+        if (!pod) { continue; }
+        char *pod_path
+            = CFCUtil_cat(CFCUtil_strdup(""), self->lib_dir, CFCUTIL_PATH_SEP,
+                          class_name, ".pod", NULL);
+        S_double_colons_to_path_sep(pod_path);
+
+        pods[count] = pod;
+        pod_paths[count] = pod_path;
+        count++;
+    }
+
+    // Write out any POD files that have changed.
+    size_t num_written = 0;
+    for (size_t i = 0; i < count; i++) {
+        char *pod      = pods[i];
+        char *pod_path = pod_paths[i];
+        if (CFCUtil_write_if_changed(pod_path, pod, strlen(pod))) {
+            pod_paths[num_written] = pod_path;
+            num_written++;
+        }
+        else {
+            FREEMEM(pod_path);
+        }
+        FREEMEM(pod);
+    }
+    pod_paths[num_written] = NULL;
+
+    return pod_paths;
 }
 
 char*

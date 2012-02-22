@@ -38,6 +38,14 @@ CFCPerl_init(CFCPerl *self, struct CFCParcel *parcel,
 void
 CFCPerl_destroy(CFCPerl *self);
 
+/** Auto-generate POD for all class bindings where pod specs were created.
+ * See whether a .pod file exists and is up-to-date; if not, write it out.
+ * 
+ * @return an array of filepaths where POD was written out.
+ */
+char**
+CFCPerl_write_pod(CFCPerl *self);
+
 char*
 CFCPerl_pm_file_contents(CFCPerl *self, const char *params_hash_defs);
 
