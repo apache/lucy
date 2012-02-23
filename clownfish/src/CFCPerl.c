@@ -43,10 +43,9 @@ struct CFCPerl {
     char *boot_func;
 };
 
-// Modify a string in place, swapping out "::" for the path separator
-// character.
+// Modify a string in place, swapping out "::" for the supplied character.
 static void
-S_double_colons_to_path_sep(char *text);
+S_replace_double_colons(char *text, char replacement);
 
 const static CFCMeta CFCPERL_META = {
     "Clownfish::CFC::Binding::Perl",
@@ -82,13 +81,13 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
     // Derive path to generated .xs file.
     self->xs_path = CFCUtil_cat(CFCUtil_strdup(""), lib_dir, CFCUTIL_PATH_SEP,
                                 boot_class, ".xs", NULL);
-    S_double_colons_to_path_sep(self->xs_path);
+    S_replace_double_colons(self->xs_path, CFCUTIL_PATH_SEP_CHAR);
 
     // Derive path to generated .pm file.
     self->pm_path = CFCUtil_cat(CFCUtil_strdup(""), lib_dir, CFCUTIL_PATH_SEP,
                                 boot_class, CFCUTIL_PATH_SEP,
                                 "Autobinding.pm", NULL);
-    S_double_colons_to_path_sep(self->pm_path);
+    S_replace_double_colons(self->pm_path, CFCUTIL_PATH_SEP_CHAR);
 
     // Derive the name of the files containing bootstrapping code.
     const char *prefix   = CFCParcel_get_prefix(parcel);
@@ -136,11 +135,11 @@ CFCPerl_destroy(CFCPerl *self) {
 }
 
 static void
-S_double_colons_to_path_sep(char *text) {
+S_replace_double_colons(char *text, char replacement) {
     size_t pos = 0;
     for (char *ptr = text; *ptr != '\0'; ptr++) {
         if (strncmp(ptr, "::", 2) == 0) {
-            text[pos++] = CFCUTIL_PATH_SEP_CHAR;
+            text[pos++] = replacement;
             ptr++;
         }
         else {
@@ -169,7 +168,7 @@ CFCPerl_write_pod(CFCPerl *self) {
         char *pod_path
             = CFCUtil_cat(CFCUtil_strdup(""), self->lib_dir, CFCUTIL_PATH_SEP,
                           class_name, ".pod", NULL);
-        S_double_colons_to_path_sep(pod_path);
+        S_replace_double_colons(pod_path, CFCUTIL_PATH_SEP_CHAR);
 
         pods[count] = pod;
         pod_paths[count] = pod_path;
@@ -193,6 +192,159 @@ CFCPerl_write_pod(CFCPerl *self) {
     pod_paths[num_written] = NULL;
 
     return pod_paths;
+}
+
+static void
+S_write_boot_h(CFCPerl *self) {
+    char *guard = CFCUtil_cat(CFCUtil_strdup(""), self->boot_class,
+                              "_BOOT", NULL);
+    S_replace_double_colons(guard, '_');
+    for (char *ptr = guard; *ptr != '\0'; ptr++) {
+        if (isalpha(*ptr)) {
+            *ptr = toupper(*ptr);
+        }
+    }
+
+    const char pattern[] = 
+        "%s\n"
+        "\n"
+        "#ifndef %s\n"
+        "#define %s 1\n"
+        "\n"
+        "void\n"
+        "%s();\n"
+        "\n"
+        "#endif /* %s */\n"
+        "\n"
+        "%s\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(self->header)
+                  + strlen(guard)
+                  + strlen(guard)
+                  + strlen(self->boot_func)
+                  + strlen(guard)
+                  + strlen(self->footer)
+                  + 20;
+    char *content = (char*)MALLOCATE(size);
+    sprintf(content, pattern, self->header, guard, guard, self->boot_func,
+            guard, self->footer);
+    CFCUtil_write_file(self->boot_h_path, content, strlen(content));
+
+    FREEMEM(content);
+    FREEMEM(guard);
+}
+
+static void
+S_write_boot_c(CFCPerl *self) {
+    CFCClass **ordered   = CFCHierarchy_ordered_classes(self->hierarchy);
+    char *pound_includes = CFCUtil_strdup("");
+    char *registrations  = CFCUtil_strdup("");
+    char *isa_pushes     = CFCUtil_strdup("");
+
+    for (size_t i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        const char *class_name = CFCClass_get_class_name(klass);
+        const char *include_h  = CFCClass_include_h(klass);
+        pound_includes = CFCUtil_cat(pound_includes, "#include \"",
+                                     include_h, "\"\n", NULL);
+
+        if (CFCClass_inert(klass)) { continue; }
+
+        // Ignore return value from VTable_add_to_registry, since it's OK if
+        // multiple threads contend for adding these permanent VTables and some
+        // fail.
+        registrations
+            = CFCUtil_cat(registrations, "    cfish_VTable_add_to_registry(",
+                          CFCClass_full_vtable_var(klass), ");\n", NULL);
+
+        // Add aliases for selected KinoSearch classes which allow old indexes
+        // to be read.
+        CFCPerlClass *class_binding = CFCPerlClass_singleton(class_name);
+        if (class_binding) {
+            const char *vtable_var = CFCClass_full_vtable_var(klass);
+            char **aliases
+                = CFCPerlClass_get_class_aliases(class_binding);
+            for (size_t j = 0; aliases[j] != NULL; j++) {
+                const char *alias = aliases[j];
+                size_t alias_len  = strlen(alias);
+                const char pattern[] =
+                    "%s"
+                    "    Cfish_ZCB_Assign_Str(alias, \"%s\", %u);\n"
+                    "    cfish_VTable_add_alias_to_registry(%s,\n"
+                    "        (cfish_CharBuf*)alias);\n";
+
+                size_t new_size = sizeof(pattern)
+                                  + strlen(registrations)
+                                  + alias_len
+                                  + 20    // stringified alias_len
+                                  + strlen(vtable_var)
+                                  + 50;
+                char *new_registrations = (char*)MALLOCATE(new_size);
+                sprintf(new_registrations, pattern, registrations, alias,
+                        (unsigned)alias_len, vtable_var);
+                FREEMEM(registrations);
+                registrations = new_registrations;
+            }
+        }
+
+        CFCClass *parent = CFCClass_get_parent(klass);
+        if (parent) {
+            const char *parent_class_name = CFCClass_get_class_name(parent);
+            isa_pushes
+                = CFCUtil_cat(isa_pushes, "    isa = get_av(\"",
+                              class_name, "::ISA\", 1);\n", NULL);
+            isa_pushes
+                = CFCUtil_cat(isa_pushes, "    av_push(isa, newSVpv(\"", 
+                              parent_class_name, "\", 0));\n", NULL);
+        }
+    }
+
+    const char pattern[] =
+        "%s\n"
+        "\n"
+        "#include \"EXTERN.h\"\n"
+        "#include \"perl.h\"\n"
+        "#include \"XSUB.h\"\n"
+        "#include \"%s\"\n"
+        "#include \"parcel.h\"\n"
+        "%s\n"
+        "\n"
+        "void\n"
+        "%s() {\n"
+        "    AV *isa;\n"
+        "    cfish_ZombieCharBuf *alias = CFISH_ZCB_WRAP_STR(\"\", 0);\n"
+        "%s\n"
+        "%s\n"
+        "}\n"
+        "\n"
+        "%s\n"
+        "\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(self->header)
+                  + strlen(self->boot_h_file)
+                  + strlen(pound_includes)
+                  + strlen(self->boot_func)
+                  + strlen(registrations)
+                  + strlen(isa_pushes)
+                  + strlen(self->footer)
+                  + 100;
+    char *content = (char*)MALLOCATE(size);
+    sprintf(content, pattern, self->header, self->boot_h_file, pound_includes,
+            self->boot_func, registrations, isa_pushes, self->footer);
+    CFCUtil_write_file(self->boot_c_path, content, strlen(content));
+
+    FREEMEM(content);
+    FREEMEM(isa_pushes);
+    FREEMEM(registrations);
+    FREEMEM(pound_includes);
+}
+
+void
+CFCPerl_write_boot(CFCPerl *self) {
+    S_write_boot_h(self);
+    S_write_boot_c(self);
 }
 
 char*

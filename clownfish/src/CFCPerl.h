@@ -46,6 +46,9 @@ CFCPerl_destroy(CFCPerl *self);
 char**
 CFCPerl_write_pod(CFCPerl *self);
 
+void
+CFCPerl_write_boot(CFCPerl *self);
+
 char*
 CFCPerl_pm_file_contents(CFCPerl *self, const char *params_hash_defs);
 

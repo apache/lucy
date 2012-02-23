@@ -1892,6 +1892,12 @@ CODE:
     RETVAL = newRV_noinc((SV*)modified);
 OUTPUT: RETVAL
 
+void
+write_boot(self)
+    CFCPerl *self;
+PPCODE:
+    CFCPerl_write_boot(self);
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Subroutine
 
