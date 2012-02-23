@@ -49,6 +49,12 @@ CFCPerl_write_pod(CFCPerl *self);
 void
 CFCPerl_write_boot(CFCPerl *self);
 
+void
+CFCPerl_write_bindings(CFCPerl *self);
+
+void
+CFCPerl_write_xs_typemap(CFCPerl *self);
+
 char*
 CFCPerl_pm_file_contents(CFCPerl *self, const char *params_hash_defs);
 

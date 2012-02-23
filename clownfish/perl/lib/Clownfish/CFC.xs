@@ -1898,6 +1898,18 @@ write_boot(self)
 PPCODE:
     CFCPerl_write_boot(self);
 
+void
+write_bindings(self)
+    CFCPerl *self;
+PPCODE:
+    CFCPerl_write_bindings(self);
+
+void
+write_xs_typemap(self)
+    CFCPerl *self;
+PPCODE:
+    CFCPerl_write_xs_typemap(self);
+
 
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl::Subroutine
 

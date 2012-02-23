@@ -25,6 +25,10 @@
 #include "CFCHierarchy.h"
 #include "CFCUtil.h"
 #include "CFCPerlClass.h"
+#include "CFCPerlSub.h"
+#include "CFCPerlConstructor.h"
+#include "CFCPerlMethod.h"
+#include "CFCPerlTypeMap.h"
 
 struct CFCPerl {
     CFCBase base;
@@ -442,6 +446,128 @@ CFCPerl_xs_file_contents(CFCPerl *self, const char *generated_xs,
             hand_rolled_xs);
 
     return contents;
+}
+
+void
+CFCPerl_write_bindings(CFCPerl *self) {
+    CFCClass **ordered = CFCHierarchy_ordered_classes(self->hierarchy);
+    CFCPerlClass **registry = CFCPerlClass_registry();
+    char *hand_rolled_xs = CFCUtil_strdup("");
+    char *generated_xs   = CFCUtil_strdup("");
+    size_t num_xsubs     = 0;
+    CFCPerlSub **xsubs   = CALLOCATE(num_xsubs + 1, sizeof(CFCPerlSub*));
+
+    // Pound-includes for generated headers.
+    for (size_t i = 0; ordered[i] != NULL; i++) {
+        const char *include_h = CFCClass_include_h(ordered[i]);
+        generated_xs = CFCUtil_cat(generated_xs, "#include \"", include_h,
+                                   "\"\n", NULL);
+    }
+    generated_xs = CFCUtil_cat(generated_xs, "\n", NULL);
+
+    // Constructors.
+    for (size_t i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        const char *class_name = CFCClass_get_class_name(klass);
+        CFCPerlClass *class_binding = CFCPerlClass_singleton(class_name);
+        if (class_binding) {
+            CFCPerlConstructor **bound
+                = CFCPerlClass_constructor_bindings(class_binding);
+            for (size_t j = 0; bound[j] != NULL; j++) {
+                char *xsub_def = CFCPerlConstructor_xsub_def(bound[j]);
+                generated_xs = CFCUtil_cat(generated_xs, xsub_def, "\n",
+                                           NULL);
+                FREEMEM(xsub_def);
+
+                // Add to xsubs array.
+                size_t new_size = (num_xsubs + 2) * sizeof(CFCPerlSub*);
+                xsubs = (CFCPerlSub**)REALLOCATE(xsubs, new_size);
+                xsubs[num_xsubs++] = (CFCPerlSub*)bound[j];
+                xsubs[num_xsubs]   = NULL;
+            }
+            FREEMEM(bound);
+        }
+    }
+
+    // Methods.
+    for (size_t i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        const char *class_name = CFCClass_get_class_name(klass);
+        CFCPerlClass *class_binding = CFCPerlClass_singleton(class_name);
+        if (class_binding) {
+            CFCPerlMethod **bound
+                = CFCPerlClass_method_bindings(class_binding);
+            for (size_t j = 0; bound[j] != NULL; j++) {
+                char *xsub_def = CFCPerlMethod_xsub_def(bound[j]);
+                generated_xs = CFCUtil_cat(generated_xs, xsub_def, "\n",
+                                           NULL);
+                FREEMEM(xsub_def);
+
+                // Add to xsubs array.
+                size_t new_size = (num_xsubs + 2) * sizeof(CFCPerlSub*);
+                xsubs = (CFCPerlSub**)REALLOCATE(xsubs, new_size);
+                xsubs[num_xsubs++] = (CFCPerlSub*)bound[j];
+                xsubs[num_xsubs]   = NULL;
+            }
+            FREEMEM(bound);
+        }
+    }
+
+    // Hand-rolled XS.
+    for (size_t i = 0; registry[i] != NULL; i++) {
+        CFCPerlClass *class_binding = registry[i];
+        const char *xs = CFCPerlClass_get_xs_code(registry[i]);
+        hand_rolled_xs = CFCUtil_cat(hand_rolled_xs, xs, "\n", NULL);
+    }
+
+    // Build up code for booting XSUBs at module load time.
+    char *xs_init = CFCUtil_strdup("");
+    for (size_t i = 0; xsubs[i] != NULL; i++) {
+        CFCPerlSub *xsub = xsubs[i];
+        const char *c_name = CFCPerlSub_c_name(xsub);
+        const char *perl_name = CFCPerlSub_perl_name(xsub);
+        if (strlen(xs_init)) {
+            xs_init = CFCUtil_cat(xs_init, "\n    ", NULL);
+        }
+        xs_init = CFCUtil_cat(xs_init, "newXS(\"", perl_name, "\", ", c_name,
+                              ", file);", NULL);
+    }
+
+    // Params hashes for arg checking of XSUBs that take labeled params.
+    char *params_hash_defs = CFCUtil_strdup("");
+    for (size_t i = 0; xsubs[i] != NULL; i++) {
+        CFCPerlSub *xsub = xsubs[i];
+        char *def = CFCPerlSub_params_hash_def(xsub);
+        if (def) {
+            if (strlen(params_hash_defs)) {
+                params_hash_defs = CFCUtil_cat(params_hash_defs, "\n", NULL);
+            }
+            params_hash_defs = CFCUtil_cat(params_hash_defs, def, NULL);
+        }
+    }
+
+    // Write out if there have been any changes.
+    char *xs_file_contents
+        = CFCPerl_xs_file_contents(self, generated_xs, xs_init,
+                                   hand_rolled_xs);
+    char *pm_file_contents
+        = CFCPerl_pm_file_contents(self, params_hash_defs);
+    CFCUtil_write_if_changed(self->xs_path, xs_file_contents,
+                             strlen(xs_file_contents));
+    CFCUtil_write_if_changed(self->pm_path, pm_file_contents,
+                             strlen(pm_file_contents));
+
+    FREEMEM(pm_file_contents);
+    FREEMEM(xs_file_contents);
+    FREEMEM(params_hash_defs);
+    FREEMEM(hand_rolled_xs);
+    FREEMEM(xs_init);
+    FREEMEM(generated_xs);
+}
+
+void
+CFCPerl_write_xs_typemap(CFCPerl *self) {
+    CFCPerlTypeMap_write_xs_typemap(self->hierarchy);
 }
 
 CFCParcel*
