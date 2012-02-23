@@ -124,7 +124,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     int mismatch = strcmp(wanted, specifier);
     FREEMEM(wanted);
     if (mismatch) {
-        CFCUtil_die("First arg type doesn't match class: '%s' '%s",
+        CFCUtil_die("First arg type doesn't match class: '%s' '%s'",
                     class_name, specifier);
     }
 
