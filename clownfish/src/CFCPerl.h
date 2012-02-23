@@ -55,52 +55,6 @@ CFCPerl_write_bindings(CFCPerl *self);
 void
 CFCPerl_write_xs_typemap(CFCPerl *self);
 
-char*
-CFCPerl_pm_file_contents(CFCPerl *self, const char *params_hash_defs);
-
-char*
-CFCPerl_xs_file_contents(CFCPerl *self, const char *generated_xs,
-                         const char *xs_init, const char *hand_rolled_xs);
-
-struct CFCParcel*
-CFCPerl_get_parcel(CFCPerl *self);
-
-struct CFCHierarchy*
-CFCPerl_get_hierarchy(CFCPerl *self);
-
-const char*
-CFCPerl_get_lib_dir(CFCPerl *self);
-
-const char*
-CFCPerl_get_boot_class(CFCPerl *self);
-
-const char*
-CFCPerl_get_header(CFCPerl *self);
-
-const char*
-CFCPerl_get_footer(CFCPerl *self);
-
-const char*
-CFCPerl_get_xs_path(CFCPerl *self);
-
-const char*
-CFCPerl_get_pm_path(CFCPerl *self);
-
-const char*
-CFCPerl_get_boot_h_file(CFCPerl *self);
-
-const char*
-CFCPerl_get_boot_c_file(CFCPerl *self);
-
-const char*
-CFCPerl_get_boot_h_path(CFCPerl *self);
-
-const char*
-CFCPerl_get_boot_c_path(CFCPerl *self);
-
-const char*
-CFCPerl_get_boot_func(CFCPerl *self);
-
 #ifdef __cplusplus
 }
 #endif

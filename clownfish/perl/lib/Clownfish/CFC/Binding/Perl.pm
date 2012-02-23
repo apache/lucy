@@ -19,20 +19,8 @@ use warnings;
 package Clownfish::CFC::Binding::Perl;
 use base qw( Clownfish::CFC::Base );
 
-use Clownfish::CFC::Hierarchy;
 use Carp;
-use File::Spec::Functions qw( catfile );
-use Fcntl;
-
-use Clownfish::CFC::Parcel;
-use Clownfish::CFC::Class;
-use Clownfish::CFC::Function;
-use Clownfish::CFC::Method;
-use Clownfish::CFC::Variable;
-use Clownfish::CFC::Util qw( verify_args a_isa_b write_if_changed );
-use Clownfish::CFC::Binding::Perl::Class;
-use Clownfish::CFC::Binding::Perl::Method;
-use Clownfish::CFC::Binding::Perl::Constructor;
+use Clownfish::CFC::Util qw( verify_args a_isa_b );
 
 our %new_PARAMS = (
     parcel     => undef,
