@@ -18,5 +18,3 @@ use Clownfish::CFC;
 
 1;
 
-__END__
-

@@ -21,12 +21,27 @@
 extern "C" {
 #endif
 
+/** Clownfish::CFC::Binding::Perl::Method - Binding for an object method.
+ *
+ * 
+ * This class isa Clownfish::CFC::Binding::Perl::Subroutine -- see its
+ * documentation for various code-generating routines.
+ * 
+ * Method bindings use labeled parameters if the C function takes more than one
+ * argument (other than "self").  If there is only one argument, the binding
+ * will be set up to accept a single positional argument.
+ */
 typedef struct CFCPerlMethod CFCPerlMethod;
 struct CFCMethod;
 
 CFCPerlMethod*
 CFCPerlMethod_new(struct CFCMethod *method, const char *alias);
 
+/**
+ * @param method A Clownfish::CFC::Method.
+ * @param alias The perl name for the method.  Defaults to the lowercased name
+ * of the supplied Clownfish Method.
+ */
 CFCPerlMethod*
 CFCPerlMethod_init(CFCPerlMethod *self, struct CFCMethod *method,
                    const char *alias);
@@ -34,6 +49,8 @@ CFCPerlMethod_init(CFCPerlMethod *self, struct CFCMethod *method,
 void
 CFCPerlMethod_destroy(CFCPerlMethod *self);
 
+/** Generate C code for the XSUB.
+ */
 char*
 CFCPerlMethod_xsub_def(CFCPerlMethod *self);
 

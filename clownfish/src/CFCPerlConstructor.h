@@ -24,6 +24,23 @@ extern "C" {
 typedef struct CFCPerlConstructor CFCPerlConstructor;
 struct CFCClass;
 
+/** Clownfish::CFC::Binding::Perl::Constructor - Binding for an object method.
+ *
+ * This class isa Clownfish::CFC::Binding::Perl::Subroutine -- see its
+ * documentation for various code-generating routines.
+ * 
+ * Constructors are always bound to accept labeled params, even if there is only
+ * a single argument.
+ */
+
+/**
+ * @param class A L<Clownfish::CFC::Class>.
+ * @param alias A specifier for the name of the constructor, and
+ * optionally, a specifier for the implementing function.  If C<alias> has a pipe
+ * character in it, the text to the left of the pipe will be used as the Perl
+ * alias, and the text to the right will be used to determine which C function
+ * should be bound.  The default function is "init".
+ */
 CFCPerlConstructor*
 CFCPerlConstructor_new(struct CFCClass *klass, const char *alias,
                        const char *initializer);
@@ -35,6 +52,8 @@ CFCPerlConstructor_init(CFCPerlConstructor *self, struct CFCClass *klass,
 void
 CFCPerlConstructor_destroy(CFCPerlConstructor *self);
 
+/** Generate C code for the XSUB.
+ */
 char*
 CFCPerlConstructor_xsub_def(CFCPerlConstructor *self);
 

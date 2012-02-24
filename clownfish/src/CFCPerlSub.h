@@ -39,6 +39,23 @@ struct CFCPerlSub {
 };
 #endif
 
+/** Clownfish::CFC::Binding::Perl::Subroutine - Abstract base binding for a
+ * Clownfish::CFC::Function.
+ * 
+ * This class is used to generate binding code for invoking Clownfish's
+ * functions and methods across the Perl/C barrier.
+ */ 
+
+/** Abstract constructor.
+ * 
+ * @param param_list A Clownfish::CFC::ParamList.
+ * @param class_name The name of the Perl class that the subroutine belongs
+ * to.
+ * @param alias The local, unqualified name for the Perl subroutine that
+ * will be used to invoke the function.
+ * @param use_labeled_params True if the binding should take hash-style
+ * labeled parameters, false if it should take positional arguments.
+ */
 CFCPerlSub*
 CFCPerlSub_init(CFCPerlSub *self, struct CFCParamList *param_list,
                 const char *class_name, const char *alias,
@@ -47,6 +64,10 @@ CFCPerlSub_init(CFCPerlSub *self, struct CFCParamList *param_list,
 void
 CFCPerlSub_destroy(CFCPerlSub *self);
 
+/** Return Perl code initializing a package-global hash where all the keys are
+ * the names of labeled params.  The hash's name consists of the the binding's
+ * perl_name() plus "_PARAMS".
+ */
 char*
 CFCPerlSub_params_hash_def(CFCPerlSub *self);
 
@@ -56,18 +77,33 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self);
 struct CFCParamList*
 CFCPerlSub_get_param_list(CFCPerlSub *self);
 
+/** Accessor.
+ */
 const char*
 CFCPerlSub_get_class_name(CFCPerlSub *self);
 
+/** Accessor.
+ */
 int
 CFCPerlSub_use_labeled_params(CFCPerlSub *self);
 
+/**
+ * @return the fully-qualified perl sub name.
+ */
 const char*
 CFCPerlSub_perl_name(CFCPerlSub *self);
 
+/**
+ * @return the fully-qualified name of the C function that implements the
+ * XSUB.
+ */
 const char*
 CFCPerlSub_c_name(CFCPerlSub *self);
 
+/**
+ * @return a string containing the names of arguments to feed to bound C
+ * function, joined by commas.
+ */
 const char*
 CFCPerlSub_c_name_list(CFCPerlSub *self);
 

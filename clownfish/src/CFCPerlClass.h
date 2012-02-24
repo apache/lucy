@@ -29,6 +29,14 @@ struct CFCPerlPod;
 struct CFCPerlMethod;
 struct CFCPerlConstructor;
 
+/** Clownfish::CFC::Binding::Perl::Class - Generate Perl binding code for a
+ * Clownfish::CFC::Class.
+ */
+
+/** 
+ * @param parcel A Clownfish::CFC::Parcel.
+ * @param class_name The name of the class to be registered.
+ */
 CFCPerlClass*
 CFCPerlClass_new(struct CFCParcel *parcel, const char *class_name);
 
@@ -39,12 +47,19 @@ CFCPerlClass_init(CFCPerlClass *self, struct CFCParcel *parcel,
 void
 CFCPerlClass_destroy(CFCPerlClass *self);
 
+/** Add a new class binding to the registry.  Each unique parcel/class-name
+ * combination may only be registered once.
+ */
 void
 CFCPerlClass_add_to_registry(CFCPerlClass *self);
 
+/** Given a class name, return a class binding if one exists.
+ */
 CFCPerlClass*
 CFCPerlClass_singleton(const char *class_name);
 
+/** All registered bindings.
+ */
 CFCPerlClass**
 CFCPerlClass_registry();
 
@@ -69,18 +84,29 @@ CFCPerlClass_exclude_method(CFCPerlClass *self, const char *method);
 void
 CFCPerlClass_exclude_constructor(CFCPerlClass *self);
 
+/** Return an array of Clownfish::CFC::Binding::Perl::Method objects.
+ */
 struct CFCPerlMethod**
 CFCPerlClass_method_bindings(CFCPerlClass *self);
 
+/** Return an array of Clownfish::CFC::Binding::Perl::Constructor objects.
+ */
 struct CFCPerlConstructor**
 CFCPerlClass_constructor_bindings(CFCPerlClass *self);
 
+/** Auto-generate POD according to the make_pod spec, if such a spec was
+ * supplied.
+ */
 char*
 CFCPerlClass_create_pod(CFCPerlClass *self);
 
+/** Accessor for the Clownfish::CFC::Class module to be bound.
+ */
 struct CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self);
 
+/** Accessor. 
+ */
 const char*
 CFCPerlClass_get_class_name(CFCPerlClass *self);
 
@@ -89,6 +115,8 @@ CFCPerlClass_get_class_name(CFCPerlClass *self);
 void
 CFCPerlClass_append_xs(CFCPerlClass *self, const char *xs);
 
+/** Accessor for verbatim XS code.
+ */
 const char*
 CFCPerlClass_get_xs_code(CFCPerlClass *self);
 

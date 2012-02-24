@@ -18,39 +18,3 @@ use Clownfish::CFC;
 
 1;
 
-__END__
-
-__POD__
-
-=head1 NAME
-
-Clownfish::CFC::Binding::Perl::Method - Binding for an object method.
-
-=head1 DESCRIPTION
-
-This class isa Clownfish::CFC::Binding::Perl::Subroutine -- see its
-documentation for various code-generating routines.
-
-Method bindings use labeled parameters if the C function takes more than one
-argument (other than C<self>).  If there is only one argument, the binding
-will be set up to accept a single positional argument.
-
-=head1 METHODS
-
-=head2 new
-
-    my $binding = Clownfish::CFC::Binding::Perl::Method->new(
-        method => $method,    # required
-    );
-
-=over
-
-=item * B<method> - A L<Clownfish::CFC::Method>.
-
-=back
-
-=head2 xsub_def
-
-Generate the XSUB code.
-
-=cut
