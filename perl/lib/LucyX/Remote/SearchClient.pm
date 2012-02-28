@@ -74,6 +74,7 @@ sub _rpc {
 =begin disabled
     my $check_val = $sock->syswrite("$packed_len$serialized");
     confess $! if $check_val != length($serialized) + 4;
+
 =cut
 
     my $check_val;
