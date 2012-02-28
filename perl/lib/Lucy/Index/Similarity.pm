@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package Lucy::Index::Similarity;
-use Lucy;
+use Lucy; our $VERSION = $Lucy::VERSION;
 
 1;
 

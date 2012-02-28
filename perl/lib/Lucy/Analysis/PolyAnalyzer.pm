@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package Lucy::Analysis::PolyAnalyzer;
-use Lucy;
+use Lucy; our $VERSION = $Lucy::VERSION;
 
 1;
 

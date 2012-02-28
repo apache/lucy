@@ -21,7 +21,7 @@ use Carp;
 use Scalar::Util qw( blessed );
 use Compress::Zlib qw( compress );
 use Lucy::Util::StringHelper qw( cat_bytes );
-use Lucy qw( to_perl );
+use Lucy qw( to_perl ); our $VERSION = $Lucy::VERSION;
 use bytes;
 no bytes;
 

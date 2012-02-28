@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package Lucy::Search::PolySearcher;
-use Lucy;
+use Lucy; our $VERSION = $Lucy::VERSION;
 
 1;
 
