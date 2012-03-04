@@ -19,6 +19,9 @@ use warnings;
 package Lucy::Test::TestUtils;
 use base qw( Exporter );
 
+our $VERSION = '0.003000';
+$VERSION = eval $VERSION;
+
 our @EXPORT_OK = qw(
     working_dir
     create_working_dir

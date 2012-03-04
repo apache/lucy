@@ -16,6 +16,9 @@ package LucyX::Build::Binding::Search;
 use strict;
 use warnings;
 
+our $VERSION = '0.003000';
+$VERSION = eval $VERSION;
+
 sub bind_all {
     my $class = shift;
     $class->bind_filter;

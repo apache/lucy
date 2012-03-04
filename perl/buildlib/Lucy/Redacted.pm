@@ -23,6 +23,9 @@ BEGIN {
     our @EXPORT_OK = qw( list );
 }
 
+our $VERSION = '0.003000';
+$VERSION = eval $VERSION;
+
 # Return a partial list of Lucy classes which were once public but are
 # now either deprecated, removed, or moved.
 
