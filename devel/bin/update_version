@@ -17,6 +17,7 @@
 use strict;
 use warnings;
 use FindBin qw( $Bin );
+use File::Find;
 
 # make sure we are at the top-level dir
 if ( !-d 'perl' and !-d 'core' ) {
@@ -45,21 +46,36 @@ print "Using version: $x_y_z_version ( $x_yyyzzz_version )\n";
 
 my $buf;
 
-# the actual work
+# Update Lucy.pm.
 $buf = read_file('perl/lib/Lucy.pm');
 $buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/
     or die "no match";
 $buf =~ s/XSLoader::load\( 'Lucy', '(.+?)'/XSLoader::load\( 'Lucy', '$x_yyyzzz_version'/
     or die "no match";
 write_file( 'perl/lib/Lucy.pm', $buf );
+
+# Update Lucy.pod.
 $buf = read_file('perl/lib/Lucy.pod');
 $buf =~ s/(^=head1\s+VERSION\s+)([\d.]+)/$1$x_y_z_version/m
     or die "no match";
 write_file( 'perl/lib/Lucy.pod', $buf );
+
+# Update Build.PL
 $buf = read_file('perl/Build.PL');
 $buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_version'/
     or die "no match";
 write_file( 'perl/Build.PL', $buf );
+
+# Update all other Perl modules.
+find sub {
+    return unless /[.]pm$/;
+    my $name = $_;
+    return if $name eq 'Lucy.pm';
+    my $buf = read_file($name);
+    $buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/g
+        or die "no match in $File::Find::name";
+    write_file($name, $buf);
+}, 'perl';
 
 # utility functions
 sub read_file {
