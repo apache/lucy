@@ -19,7 +19,7 @@ use warnings;
 package LucyX::Index::ByteBufDocReader;
 use base qw( Lucy::Index::DocReader );
 use Lucy::Document::HitDoc;
-our $VERSION = 0.003000;
+our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 use Carp;
 
