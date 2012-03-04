@@ -14,7 +14,9 @@
 # limitations under the License.
 
 package Lucy::Analysis::Analyzer;
-use Lucy; our $VERSION = $Lucy::VERSION;
+use Lucy;
+our $VERSION = 0.003000;
+$VERSION = eval $VERSION;
 
 1;
 

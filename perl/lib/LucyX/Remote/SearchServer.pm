@@ -18,7 +18,8 @@ use warnings;
 
 package LucyX::Remote::SearchServer;
 BEGIN { our @ISA = qw( Lucy::Object::Obj ) }
-use Lucy; our $VERSION = $Lucy::VERSION;
+our $VERSION = 0.003000;
+$VERSION = eval $VERSION;
 use Carp;
 use Storable qw( nfreeze thaw );
 use Scalar::Util qw( reftype );

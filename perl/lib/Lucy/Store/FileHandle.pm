@@ -14,7 +14,9 @@
 # limitations under the License.
 
 package Lucy::Store::FileHandle;
-use Lucy; our $VERSION = $Lucy::VERSION;
+use Lucy;
+our $VERSION = 0.003000;
+$VERSION = eval $VERSION;
 
 1;
 

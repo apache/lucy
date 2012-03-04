@@ -21,9 +21,12 @@ use Carp;
 use Scalar::Util qw( blessed );
 use Compress::Zlib qw( compress );
 use Lucy::Util::StringHelper qw( cat_bytes );
-use Lucy qw( to_perl ); our $VERSION = $Lucy::VERSION;
+use Lucy qw( to_perl );
 use bytes;
 no bytes;
+
+our $VERSION = 0.003000;
+$VERSION = eval $VERSION;
 
 # Inside-out member vars.
 our %ix_out;
