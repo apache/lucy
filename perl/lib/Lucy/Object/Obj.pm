@@ -72,6 +72,7 @@ Calls deserialize(), and copies the object pointer.  Since deserialize is an
 abstract method, it will confess() unless implemented.
 
 =end comment
+
 =cut
 
 void
