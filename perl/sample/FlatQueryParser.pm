@@ -24,6 +24,9 @@ use Lucy::Search::ORQuery;
 use PrefixQuery;
 use Carp;
 
+our $VERSION = '0.003000';
+$VERSION = eval $VERSION;
+
 # Inherit new()
 
 sub parse {
