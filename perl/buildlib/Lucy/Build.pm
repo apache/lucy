@@ -680,8 +680,20 @@ sub autogen_header {
 END_AUTOGEN
 }
 
+sub _check_module_build_for_dist {
+    eval "use Module::Build 0.38;";
+    die "./Build dist reqiures Module::Build 0.38 or higher--this is only "
+        . Module::Build->VERSION . $/ if $@;
+}
+
+sub ACTION_distdir {
+    _check_module_build_for_dist;
+    shift->SUPER::ACTION_distdir(@_);
+}
+
 sub ACTION_dist {
     my $self = shift;
+    _check_module_build_for_dist;
 
     # Create POD but make sure not to include build artifacts.
     $self->dispatch('pod');
