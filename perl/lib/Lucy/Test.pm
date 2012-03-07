@@ -14,14 +14,17 @@
 # limitations under the License.
 
 package Lucy::Test;
-use Lucy; our $VERSION = $Lucy::VERSION;
+use Lucy;
+our $VERSION = 0.003000;
+$VERSION = eval $VERSION;
 
 # Set the default memory threshold for PostingListWriter to a low number so
 # that we simulate large indexes by performing a lot of PostingPool flushes.
 Lucy::Index::PostingListWriter::set_default_mem_thresh(0x1000);
 
 package Lucy::Test::TestCharmonizer;
-use Lucy; our $VERSION = $Lucy::VERSION;
+our $VERSION = 0.003000;
+$VERSION = eval $VERSION;
 use Config;
 use File::Spec::Functions qw( catfile updir );
 

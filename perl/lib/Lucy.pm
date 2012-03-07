@@ -47,7 +47,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Util::IndexFileNames;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     BEGIN {
         push our @ISA, 'Exporter';
         our @EXPORT_OK = qw(
@@ -59,7 +60,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Util::StringHelper;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     BEGIN {
         push our @ISA, 'Exporter';
         our @EXPORT_OK = qw(
@@ -76,7 +78,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Analysis::Inversion;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     our %new_PARAMS = (
         # params
@@ -86,7 +89,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Analysis::Token;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     our %new_PARAMS = (
         text         => undef,
@@ -99,7 +103,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Analysis::RegexTokenizer;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     sub compile_token_re { return qr/$_[1]/ }
 
@@ -113,7 +118,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Document::Doc;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     use Storable qw( nfreeze thaw );
     use bytes;
     no bytes;
@@ -145,7 +151,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Document::HitDoc;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     our %new_PARAMS = (
         fields => undef,
@@ -156,26 +163,31 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::I32Array;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     our %new_PARAMS = ( ints => undef );
 }
 
 {
     package Lucy::Object::LockFreeRegistry;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     no warnings 'redefine';
     sub DESTROY { }    # leak all
 }
 
 {
     package Lucy::Object::Obj;
-    use Lucy qw( to_clownfish to_perl ); our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
+    use Lucy qw( to_clownfish to_perl );
     sub load { return $_[0]->_load( to_clownfish( $_[1] ) ) }
 }
 
 {
     package Lucy::Object::VTable;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     sub find_parent_class {
         my ( undef, $package ) = @_;
@@ -216,7 +228,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Index::Indexer;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     sub new {
         my ( $either, %args ) = @_;
@@ -231,7 +244,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Index::IndexReader;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     use Carp;
 
     sub new {
@@ -255,7 +269,9 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Index::PolyReader;
-    use Lucy qw( to_clownfish ); our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
+    use Lucy qw( to_clownfish );
 
     sub try_read_snapshot {
         my ( undef, %args ) = @_;
@@ -296,7 +312,9 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Index::Segment;
-    use Lucy qw( to_clownfish ); our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
+    use Lucy qw( to_clownfish );
     sub store_metadata {
         my ( $self, %args ) = @_;
         $self->_store_metadata( %args,
@@ -306,7 +324,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Index::SegReader;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     sub try_init_components {
         my $self = shift;
@@ -319,13 +338,15 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Index::SortCache;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     our %value_PARAMS = ( ord => undef, );
 }
 
 {
     package Lucy::Search::Compiler;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     use Carp;
     use Scalar::Util qw( blessed );
 
@@ -343,7 +364,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Search::Query;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     sub make_compiler {
         my ( $self, %args ) = @_;
@@ -354,7 +376,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Search::SortRule;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     my %types = (
         field  => FIELD(),
@@ -372,13 +395,15 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::BitVector;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     sub to_arrayref { shift->to_array->to_arrayref }
 }
 
 {
     package Lucy::Object::ByteBuf;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     {
         # Override autogenerated deserialize binding.
         no warnings 'redefine';
@@ -388,14 +413,16 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::ViewByteBuf;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     use Carp;
     sub new { confess "ViewByteBuf objects can only be created from C." }
 }
 
 {
     package Lucy::Object::CharBuf;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     {
         # Defeat obscure bugs in the XS auto-generation by redefining clone()
@@ -410,14 +437,16 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::ViewCharBuf;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     use Carp;
     sub new { confess "ViewCharBuf has no public constructor." }
 }
 
 {
     package Lucy::Object::ZombieCharBuf;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     use Carp;
     sub new { confess "ZombieCharBuf objects can only be created from C." }
     no warnings 'redefine';
@@ -426,7 +455,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::Err;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     sub do_to_string { shift->to_string }
     use Scalar::Util qw( blessed );
     use Carp qw( confess longmess );
@@ -464,14 +494,16 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::Hash;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     no warnings 'redefine';
     sub deserialize { shift->_deserialize(@_) }
 }
 
 {
     package Lucy::Object::VArray;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     no warnings 'redefine';
     sub clone       { CORE::shift->_clone }
     sub deserialize { CORE::shift->_deserialize(@_) }
@@ -479,7 +511,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Store::FileHandle;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     BEGIN {
         push our @ISA, 'Exporter';
         our @EXPORT_OK = qw( build_fh_flags );
@@ -505,7 +538,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Store::FSFileHandle;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     sub open {
         my ( $either, %args ) = @_;
@@ -517,14 +551,16 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Store::FSFolder;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     use File::Spec::Functions qw( rel2abs );
     sub absolutify { return rel2abs( $_[1] ) }
 }
 
 {
     package Lucy::Store::RAMFileHandle;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
 
     sub open {
         my ( $either, %args ) = @_;
@@ -536,7 +572,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Util::Debug;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     BEGIN {
         push our @ISA, 'Exporter';
         our @EXPORT_OK = qw(
@@ -554,7 +591,8 @@ sub error {$Lucy::Object::Err::error}
 
 {
     package Lucy::Object::Host;
-    use Lucy; our $VERSION = $Lucy::VERSION;
+    our $VERSION = 0.003000;
+    $VERSION = eval $VERSION;
     BEGIN {
         if ( !__PACKAGE__->isa('Lucy::Object::Obj') ) {
             push our @ISA, 'Lucy::Object::Obj';
