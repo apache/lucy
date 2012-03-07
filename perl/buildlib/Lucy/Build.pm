@@ -737,6 +737,24 @@ sub ACTION_dist {
     move( "MANIFEST.bak", "MANIFEST" ) or die "move() failed: $!";
 }
 
+sub ACTION_distmeta {
+    my $self = shift;
+    $self->SUPER::ACTION_distmeta(@_);
+    # Make sure everything has a version.
+    require CPAN::Meta;
+    my $v = version->new($self->dist_version);
+    my $meta = CPAN::Meta->load_file('META.json');
+    my $provides = $meta->provides;
+    while (my ($pkg, $data) = each %{ $provides }) {
+        die "$pkg, defined in $data->{file}, has no version\n"
+            unless $data->{version};
+        die "$pkg, defined in $data->{file}, is "
+            . version->new($data->{version})->normal
+            . " but should be " . $v->normal . "\n"
+            unless $data->{version} == $v;
+    }
+}
+
 # Generate a list of files for PAUSE, search.cpan.org, etc to ignore.
 sub _gen_pause_exclusion_list {
     my $self = shift;
