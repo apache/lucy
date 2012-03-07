@@ -17,7 +17,7 @@ package Lucy::Util::Debug;
 use strict;
 use warnings;
 
-use Lucy;
+use Lucy; our $VERSION = $Lucy::VERSION;
 
 1;
 

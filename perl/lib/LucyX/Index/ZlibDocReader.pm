@@ -18,6 +18,7 @@ use warnings;
 
 package LucyX::Index::ZlibDocReader;
 use base qw( Lucy::Index::DocReader );
+use Lucy; our $VERSION = $Lucy::VERSION;
 use Lucy::Util::StringHelper qw( utf8_valid utf8_flag_on );
 use Compress::Zlib qw( uncompress );
 use Carp;

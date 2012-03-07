@@ -15,9 +15,9 @@
 
 use strict;
 use warnings;
-use Lucy;
 
 package LucyX::Search::MockMatcher;
+use Lucy; our $VERSION = $Lucy::VERSION;
 
 sub new {
     my ( $either, %args ) = @_;

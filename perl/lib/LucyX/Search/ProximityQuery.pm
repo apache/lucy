@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package LucyX::Search::ProximityQuery;
-use Lucy;
+use Lucy; our $VERSION = $Lucy::VERSION;
 
 1;
 
