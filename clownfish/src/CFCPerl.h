@@ -99,6 +99,8 @@ CFCPerl_write_boot(CFCPerl *self);
 void
 CFCPerl_write_bindings(CFCPerl *self);
 
+/** Generate the "typemap" file needed by the XS compiler.
+ */
 void
 CFCPerl_write_xs_typemap(CFCPerl *self);
 

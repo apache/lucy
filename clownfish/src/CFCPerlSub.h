@@ -71,24 +71,29 @@ CFCPerlSub_destroy(CFCPerlSub *self);
 char*
 CFCPerlSub_params_hash_def(CFCPerlSub *self);
 
+/** Generate code which will invoke XSBind_allot_params() to parse labeled
+ * parameters supplied to an XSUB.
+ */
 char*
 CFCPerlSub_build_allot_params(CFCPerlSub *self);
 
+/** Accessor for param list.
+ */
 struct CFCParamList*
 CFCPerlSub_get_param_list(CFCPerlSub *self);
 
-/** Accessor.
+/** Accessor for class name.
  */
 const char*
 CFCPerlSub_get_class_name(CFCPerlSub *self);
 
-/** Accessor.
+/** Accessor for use_labeled_params.
  */
 int
 CFCPerlSub_use_labeled_params(CFCPerlSub *self);
 
 /**
- * @return the fully-qualified perl sub name.
+ * @return the fully-qualified perl subroutine name.
  */
 const char*
 CFCPerlSub_perl_name(CFCPerlSub *self);

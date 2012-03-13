@@ -34,12 +34,10 @@ struct CFCClass;
  */
 
 /**
- * @param class A L<Clownfish::CFC::Class>.
- * @param alias A specifier for the name of the constructor, and
- * optionally, a specifier for the implementing function.  If C<alias> has a pipe
- * character in it, the text to the left of the pipe will be used as the Perl
- * alias, and the text to the right will be used to determine which C function
- * should be bound.  The default function is "init".
+ * @param klass A L<Clownfish::CFC::Class>.
+ * @param alias The Perl name for the constructor.
+ * @param initializer The name of the function which should be bound (default
+ * "init").
  */
 CFCPerlConstructor*
 CFCPerlConstructor_new(struct CFCClass *klass, const char *alias,

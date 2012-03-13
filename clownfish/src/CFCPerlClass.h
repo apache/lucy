@@ -58,44 +58,61 @@ CFCPerlClass_add_to_registry(CFCPerlClass *self);
 CFCPerlClass*
 CFCPerlClass_singleton(const char *class_name);
 
-/** All registered bindings.
+/** All registered class bindings.
  */
 CFCPerlClass**
 CFCPerlClass_registry();
 
+/** Release all memory and references held by the registry.
+ */
 void
 CFCPerlClass_clear_registry(void);
 
+/** Override the specification for a method being made available from Perl.
+ * The default spec is to make the method available under a lower-cased alias
+ * of the Clownfish method name.
+ *
+ * @param alias The Perl name for the method.
+ * @param method The Clownfish name for the method.
+ */
 void
 CFCPerlClass_bind_method(CFCPerlClass *self, const char *alias,
                          const char *method);
 
+/** Specify that a constructor should be made available from Perl-space.
+ *
+ * @param alias The Perl name for the constructor (default "new").
+ * @param initializer The Clownfish name for the initialization function which
+ * will be invoked (default "init").
+ */
 void
 CFCPerlClass_bind_constructor(CFCPerlClass *self, const char *alias,
                               const char *initializer);
 
-/** Don't generate a binding for the specified method automatically.
+/** Block the automatic generation of a method binding.
  */
 void
 CFCPerlClass_exclude_method(CFCPerlClass *self, const char *method);
 
-/** Don't generate a constructor named "new" from "init" automatically.
+/** Block the automatic generation of a constructor binding.
  */
 void
 CFCPerlClass_exclude_constructor(CFCPerlClass *self);
 
-/** Return an array of Clownfish::CFC::Binding::Perl::Method objects.
+/** Return an array of Clownfish::CFC::Binding::Perl::Method objects
+ * representing all bound methods.
  */
 struct CFCPerlMethod**
 CFCPerlClass_method_bindings(CFCPerlClass *self);
 
-/** Return an array of Clownfish::CFC::Binding::Perl::Constructor objects.
+/** Return an array of Clownfish::CFC::Binding::Perl::Constructor objects
+ * representing all bound constructors.
  */
 struct CFCPerlConstructor**
 CFCPerlClass_constructor_bindings(CFCPerlClass *self);
 
-/** Auto-generate POD according to the make_pod spec, if such a spec was
- * supplied.
+/** Auto-generate POD according to the spec supplied via set_pod_spec().  If
+ * no spec was supplied, return NULL.
  */
 char*
 CFCPerlClass_create_pod(CFCPerlClass *self);
@@ -105,7 +122,7 @@ CFCPerlClass_create_pod(CFCPerlClass *self);
 struct CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self);
 
-/** Accessor. 
+/** Accessor for class name. 
  */
 const char*
 CFCPerlClass_get_class_name(CFCPerlClass *self);
@@ -120,9 +137,14 @@ CFCPerlClass_append_xs(CFCPerlClass *self, const char *xs);
 const char*
 CFCPerlClass_get_xs_code(CFCPerlClass *self);
 
+/** Supply a specification which will cause POD to be generated for this class
+ * binding.
+ */
 void
 CFCPerlClass_set_pod_spec(CFCPerlClass *self, struct CFCPerlPod *pod_spec);
 
+/** Accessor for pod spec.
+ */
 struct CFCPerlPod*
 CFCPerlClass_get_pod_spec(CFCPerlClass *self);
 

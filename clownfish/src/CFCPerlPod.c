@@ -145,7 +145,6 @@ CFCPerlPod_get_description(CFCPerlPod *self) {
     return self->description;
 }
 
-// Create METHODS, possibly including an ABSTRACT METHODS section.
 char*
 CFCPerlPod_methods_pod(CFCPerlPod *self, CFCClass *klass) {
     const char *class_name = CFCClass_get_class_name(klass);
@@ -196,7 +195,6 @@ CFCPerlPod_methods_pod(CFCPerlPod *self, CFCClass *klass) {
     return pod;
 }
 
-// Create CONSTRUCTORS.
 char*
 CFCPerlPod_constructors_pod(CFCPerlPod *self, CFCClass *klass) {
     if (!self->num_constructors) {
@@ -268,17 +266,17 @@ S_global_replace(const char *string, const char *match,
 
 char*
 CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, CFCFunction *func,
-                              const char *sub_name, CFCClass *klass,
+                              const char *alias, CFCClass *klass,
                               const char *code_sample,
                               const char *class_name, int is_constructor) {
     // Only allow "public" subs to be exposed as part of the public API.
     if (!CFCSymbol_public((CFCSymbol*)func)) {
-        CFCUtil_die("%s#%s is not public", class_name, sub_name);
+        CFCUtil_die("%s#%s is not public", class_name, alias);
     }
 
     CFCParamList *param_list = CFCFunction_get_param_list(func);
     int num_vars = CFCParamList_num_vars(param_list);
-    char *pod = CFCUtil_cat(CFCUtil_strdup(""), "=head2 ", sub_name, NULL);
+    char *pod = CFCUtil_cat(CFCUtil_strdup(""), "=head2 ", alias, NULL);
 
     // Get documentation, which may be inherited.
     CFCDocuComment *docucomment = CFCFunction_get_docucomment(func);
@@ -294,7 +292,7 @@ CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, CFCFunction *func,
         }
     }
     if (!docucomment) {
-        CFCUtil_die("No DocuComment for '%s' in '%s'", sub_name, class_name);
+        CFCUtil_die("No DocuComment for '%s' in '%s'", alias, class_name);
     }
 
     // Build string summarizing arguments to use in header.
