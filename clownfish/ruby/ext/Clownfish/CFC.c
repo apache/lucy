@@ -52,6 +52,15 @@ static VALUE S_CFC_Binding_Core_Write_All_Modified(int argc, VALUE *argv, VALUE 
     return Qnil;
 }
 
+static void
+S_init_Binding_Core(void) {
+    cBindCore = rb_define_class_under(mBinding, "Core", rb_cObject);
+    rb_define_alloc_func(cBindCore, S_CFC_Binding_Core_Alloc);
+    rb_define_method(cBindCore, "initialize", S_CFC_Binding_Core_Init, 4);
+    rb_define_method(cBindCore, "write_all_modified",
+                     S_CFC_Binding_Core_Write_All_Modified, -1);
+}
+
 static VALUE S_CFC_Hierarchy_Alloc(VALUE klass) {
     void *ptr = NULL;
     return Data_Wrap_Struct(klass, NULL, NULL, ptr);
@@ -77,19 +86,19 @@ static VALUE S_CFC_Hierarchy_Build(VALUE self_rb) {
     return Qnil;
 }
 
+static void
+S_init_Hierarchy(void) {
+    cHierarchy = rb_define_class_under(mCFC, "Hierarchy", rb_cObject);
+    rb_define_alloc_func(cHierarchy, S_CFC_Hierarchy_Alloc);
+    rb_define_method(cHierarchy, "initialize", S_CFC_Hierarchy_Init, 2);
+    rb_define_method(cHierarchy, "build", S_CFC_Hierarchy_Build, 0);
+}
+
 void Init_CFC() { 
     mClownfish  = rb_define_module("Clownfish");
     mCFC        = rb_define_module_under(mClownfish, "CFC");
     mBinding    = rb_define_module_under(mCFC, "Binding");
-    cHierarchy  = rb_define_class_under(mCFC, "Hierarchy", rb_cObject);
-    cBindCore   = rb_define_class_under(mBinding, "Core", rb_cObject);
-
-    rb_define_alloc_func(cHierarchy, S_CFC_Hierarchy_Alloc);
-    rb_define_method(cHierarchy, "initialize", S_CFC_Hierarchy_Init, 2);
-    rb_define_method(cHierarchy, "build", S_CFC_Hierarchy_Build, 0);
-
-    rb_define_alloc_func(cBindCore, S_CFC_Binding_Core_Alloc);
-    rb_define_method(cBindCore, "initialize", S_CFC_Binding_Core_Init, 4);
-    rb_define_method(cBindCore, "write_all_modified", S_CFC_Binding_Core_Write_All_Modified, -1);
+    S_init_Binding_Core();
+    S_init_Hierarchy();
 }
 
