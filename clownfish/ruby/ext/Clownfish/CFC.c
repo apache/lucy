@@ -23,12 +23,15 @@ static VALUE mCFC;
 static VALUE cBindCore;
 static VALUE cHierarchy;
 
-static VALUE S_CFC_Binding_Core_Alloc(VALUE klass) {
+static VALUE
+S_CFC_Binding_Core_Alloc(VALUE klass) {
     void *ptr = NULL;
     return Data_Wrap_Struct(klass, NULL, NULL, ptr);
 }
 
-static VALUE S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE dest, VALUE header, VALUE footer) {
+static VALUE
+S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE dest,
+                        VALUE header, VALUE footer) {
     CFCHierarchy* hierarchy_obj;
     CFCBindCore* self;
 
@@ -41,7 +44,8 @@ static VALUE S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE dest,
     return self_rb;
 }
 
-static VALUE S_CFC_Binding_Core_Write_All_Modified(int argc, VALUE *argv, VALUE self_rb) {
+static VALUE
+S_CFC_Binding_Core_Write_All_Modified(int argc, VALUE *argv, VALUE self_rb) {
     CFCBindCore *self;
 
     int modified = argc > 0 && RTEST(argv[0]) ? 1 : 0;
@@ -61,12 +65,14 @@ S_init_Binding_Core(void) {
                      S_CFC_Binding_Core_Write_All_Modified, -1);
 }
 
-static VALUE S_CFC_Hierarchy_Alloc(VALUE klass) {
+static VALUE
+S_CFC_Hierarchy_Alloc(VALUE klass) {
     void *ptr = NULL;
     return Data_Wrap_Struct(klass, NULL, NULL, ptr);
 }
 
-static VALUE S_CFC_Hierarchy_Init(VALUE self_rb, VALUE source, VALUE dest) {
+static VALUE
+S_CFC_Hierarchy_Init(VALUE self_rb, VALUE source, VALUE dest) {
     CFCHierarchy* self;
 
     Data_Get_Struct(self_rb,CFCHierarchy, self);
@@ -77,7 +83,8 @@ static VALUE S_CFC_Hierarchy_Init(VALUE self_rb, VALUE source, VALUE dest) {
     return self_rb;
 }
 
-static VALUE S_CFC_Hierarchy_Build(VALUE self_rb) {
+static VALUE
+S_CFC_Hierarchy_Build(VALUE self_rb) {
     CFCHierarchy *self;
 
     Data_Get_Struct(self_rb, CFCHierarchy, self);
@@ -94,7 +101,8 @@ S_init_Hierarchy(void) {
     rb_define_method(cHierarchy, "build", S_CFC_Hierarchy_Build, 0);
 }
 
-void Init_CFC() { 
+void
+Init_CFC() { 
     mClownfish  = rb_define_module("Clownfish");
     mCFC        = rb_define_module_under(mClownfish, "CFC");
     mBinding    = rb_define_module_under(mCFC, "Binding");
