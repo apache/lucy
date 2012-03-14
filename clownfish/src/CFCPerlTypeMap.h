@@ -36,7 +36,7 @@ struct CFCType;
 /** Return an expression which converts from a Perl scalar to a variable of
  * the specified type.
  * 
- * @param type A Clownfish::CFC::Type, which will be used to select the
+ * @param type A Clownfish::CFC::Model::Type, which will be used to select the
  * mapping code.
  * @param xs_var The C name of the Perl scalar from which we are extracting
  * a value.
@@ -47,7 +47,7 @@ CFCPerlTypeMap_from_perl(struct CFCType *type, const char *xs_var);
 /** Return an expression converts from a variable of type $type to a Perl
  * scalar.
  * 
- * @param type A Clownfish::CFC::Type, which will be used to select the
+ * @param type A Clownfish::CFC::Model::Type, which will be used to select the
  * mapping code.
  * @param cf_var The name of the variable from which we are extracting a
  * value.

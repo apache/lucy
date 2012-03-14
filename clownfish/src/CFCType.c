@@ -44,7 +44,7 @@ struct CFCType {
 };
 
 const static CFCMeta CFCTYPE_META = {
-    "Clownfish::CFC::Type",
+    "Clownfish::CFC::Model::Type",
     sizeof(CFCType),
     (CFCBase_destroy_t)CFCType_destroy
 };

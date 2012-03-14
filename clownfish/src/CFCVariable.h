@@ -19,8 +19,9 @@
 
 /** Clownfish::CFC::Variable - A Clownfish variable.
  *
- * A variable, having a L<Type|Clownfish::CFC::Type>, a micro_sym (i.e. name), an
- * exposure, and optionally, a location in the global namespace hierarchy.
+ * A variable, having a L<Type|Clownfish::CFC::Model::Type>, a micro_sym (i.e.
+ * name), an exposure, and optionally, a location in the global namespace
+ * hierarchy.
  *
  * Variable objects which exist only within a local scope, e.g. those within
  * parameter lists, do not need to know about class.  In contrast, inert class
@@ -37,7 +38,7 @@ struct CFCParcel;
 struct CFCType;
 
 /**
- * @param type A Clownfish::CFC::Type.
+ * @param type A Clownfish::CFC::Model::Type.
  * @param micro_sym The variable's name, without any namespacing prefixes.
  * @param exposure See Clownfish::CFC::Symbol.
  * @param class_name See Clownfish::CFC::Symbol.
@@ -83,8 +84,8 @@ CFCVariable_local_c(CFCVariable *self);
 const char*
 CFCVariable_global_c(CFCVariable *self);
 
-/** Returns C code appropriate for declaring the variable in a local scope, such
- * as within a struct definition, or as an automatic variable within a C
+/** Returns C code appropriate for declaring the variable in a local scope,
+ * such as within a struct definition, or as an automatic variable within a C
  * function.  For example:
  *
  *     int32_t average_lifespan;

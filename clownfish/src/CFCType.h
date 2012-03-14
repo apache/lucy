@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::Type - A variable's type.
+/** Clownfish::CFC::Model::Type - A variable's type.
  */
 
 #ifndef H_CFCTYPE
@@ -122,18 +122,19 @@ CFCType_new_object(int flags, struct CFCParcel *parcel, const char *specifier,
  * single, uniform subtype.
  *
  * @param flags Allowed flags: COMPOSITE, NULLABLE
- * @param child The Clownfish::CFC::Type which the composite is comprised of.
- * @param indirection integer indicating level of indirection. Example: the C type
- * "float**" has indirection 2.
+ * @param child The Clownfish::CFC::Model::Type which the composite is
+ * comprised of.
+ * @param indirection integer indicating level of indirection.  Example: the C
+ * type "float**" has indirection 2.
  * @param array A string describing an array postfix.
  */
 CFCType*
 CFCType_new_composite(int flags, CFCType *child, int indirection,
                       const char *array);
 
-/** Return a Clownfish::CFC::Type representing a the 'void' keyword in C.  It can
- * be used either for a void return type, or in conjuction with with
- * new_composite() to support the <code>void*</code> opaque pointer type.
+/** Return a Clownfish::CFC::Model::Type representing a the 'void' keyword in
+ * C.  It can be used either for a void return type, or in conjuction with
+ * with new_composite() to support the <code>void*</code> opaque pointer type.
  *
  * @param is_const Should be true if the type is const.  (Useful in the
  * context of <code>const void*</code>).
@@ -175,7 +176,7 @@ CFCType_new_arbitrary(struct CFCParcel *parcel, const char *specifier);
 void
 CFCType_destroy(CFCType *self);
 
-/** Returns true if two Clownfish::CFC::Type objects are equivalent.
+/** Returns true if two Clownfish::CFC::Model::Type objects are equivalent.
  */
 int
 CFCType_equals(CFCType *self, CFCType *other);

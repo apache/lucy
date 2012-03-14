@@ -175,7 +175,7 @@ CFCMethod_abstract(CFCMethod *self);
 int
 CFCMethod_novel(CFCMethod *self);
 
-/** Return the Clownfish::CFC::Type for <code>self</code>.
+/** Return the Clownfish::CFC::Model::Type for <code>self</code>.
  */
 
 struct CFCType*

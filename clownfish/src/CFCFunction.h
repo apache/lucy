@@ -50,8 +50,8 @@ struct CFCFunction {
  * @param class_cnick The C nickname for the class.
  * @param micro_sym The lower case name of the function, without any
  * namespacing prefixes.
- * @param return_type A Clownfish::CFC::Type representing the function's
- * return type.
+ * @param return_type A Clownfish::CFC::Model::Type representing the
+ * function's return type.
  * @param param_list A Clownfish::CFC::ParamList representing the
  * function's argument list.
  * @param docucomment A Clownfish::CFC::DocuComment describing the
