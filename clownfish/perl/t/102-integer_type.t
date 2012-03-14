@@ -17,10 +17,10 @@ use strict;
 use warnings;
 
 use Test::More tests => 87;
-use Clownfish::CFC::Type;
+use Clownfish::CFC::Model::Type;
 use Clownfish::CFC::Parser;
 
-my $integer_type = Clownfish::CFC::Type->new_integer(
+my $integer_type = Clownfish::CFC::Model::Type->new_integer(
     specifier => 'int32_t',
     const     => 1,
 );
@@ -51,10 +51,10 @@ my @c_specifiers = qw(
 
 for my $chy_specifier (@chy_specifiers) {
     my $type = $parser->parse($chy_specifier);
-    isa_ok( $type, "Clownfish::CFC::Type" );
+    isa_ok( $type, "Clownfish::CFC::Model::Type" );
     ok( $type && $type->is_integer, "parsed Type is_integer()" );
     $type = $parser->parse("const $chy_specifier");
-    isa_ok( $type, "Clownfish::CFC::Type" );
+    isa_ok( $type, "Clownfish::CFC::Model::Type" );
     ok( $type && $type->is_integer, "parsed const Type is_integer()" );
     ok( $type && $type->const,      "parsed const Type is const()" );
 SKIP: {
@@ -67,10 +67,10 @@ SKIP: {
 
 for my $c_specifier (@c_specifiers) {
     my $type = $parser->parse($c_specifier);
-    isa_ok( $type, "Clownfish::CFC::Type" );
+    isa_ok( $type, "Clownfish::CFC::Model::Type" );
     ok( $type && $type->is_integer, "parsed Type is_integer()" );
     $type = $parser->parse("const $c_specifier");
-    isa_ok( $type, "Clownfish::CFC::Type" );
+    isa_ok( $type, "Clownfish::CFC::Model::Type" );
     ok( $type && $type->is_integer, "parsed const Type is_integer()" );
     ok( $type && $type->const,      "parsed const Type is const()" );
 SKIP: {

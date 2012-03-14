@@ -17,10 +17,10 @@ use strict;
 use warnings;
 
 use Test::More tests => 15;
-use Clownfish::CFC::Type;
+use Clownfish::CFC::Model::Type;
 use Clownfish::CFC::Parser;
 
-my $float_type = Clownfish::CFC::Type->new_float(
+my $float_type = Clownfish::CFC::Model::Type->new_float(
     specifier => 'float',
     const     => 1,
 );
@@ -32,10 +32,10 @@ my $parser = Clownfish::CFC::Parser->new;
 
 for my $specifier (qw( float double)) {
     my $type = $parser->parse($specifier);
-    isa_ok( $type, "Clownfish::CFC::Type" );
+    isa_ok( $type, "Clownfish::CFC::Model::Type" );
     ok( $type && $type->is_floating, "parsed specifier is_floating()" );
     $type = $parser->parse("const $specifier");
-    isa_ok( $type, "Clownfish::CFC::Type" );
+    isa_ok( $type, "Clownfish::CFC::Model::Type" );
     ok( $type && $type->is_floating, "parsed const specifier is_floating()" );
     ok( $type && $type->const,       "parsed const specifier is_floating()" );
 SKIP: {

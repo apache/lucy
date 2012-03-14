@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 23;
-use Clownfish::CFC::Type;
+use Clownfish::CFC::Model::Type;
 use Clownfish::CFC::Parser;
 
 my $parser = Clownfish::CFC::Parser->new;
@@ -46,26 +46,26 @@ for my $input (@composite_type_strings) {
     ok( $type && $type->is_composite, $input );
 }
 
-eval { my $type = Clownfish::CFC::Type->new_composite };
+eval { my $type = Clownfish::CFC::Model::Type->new_composite };
 like( $@, qr/child/i, "child required" );
 
-my $foo_type = Clownfish::CFC::Type->new_object( specifier => 'Foo' );
-my $composite_type = Clownfish::CFC::Type->new_composite(
+my $foo_type = Clownfish::CFC::Model::Type->new_object( specifier => 'Foo' );
+my $composite_type = Clownfish::CFC::Model::Type->new_composite(
     child       => $foo_type,
     indirection => 1,
 );
 is( $composite_type->get_specifier,
     'Foo', "get_specifier delegates to child" );
 
-my $other = Clownfish::CFC::Type->new_composite(
+my $other = Clownfish::CFC::Model::Type->new_composite(
     child       => $foo_type,
     indirection => 1,
 );
 ok( $composite_type->equals($other), "equals" );
 ok( $composite_type->is_composite,   "is_composite" );
 
-my $bar_type = Clownfish::CFC::Type->new_object( specifier => 'Bar' );
-my $bar_composite = Clownfish::CFC::Type->new_composite(
+my $bar_type = Clownfish::CFC::Model::Type->new_object( specifier => 'Bar' );
+my $bar_composite = Clownfish::CFC::Model::Type->new_composite(
     child       => $bar_type,
     indirection => 1,
 );

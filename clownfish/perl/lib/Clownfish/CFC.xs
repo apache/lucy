@@ -1182,7 +1182,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Type
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Type
 
 SV*
 _new(flags, parcel, specifier, indirection, c_string)
@@ -1238,12 +1238,12 @@ _new_composite(flags, child_sv, indirection, array)
     const char *array;
 CODE:
     CFCType *child = NULL;
-    if (SvOK(child_sv) && sv_derived_from(child_sv, "Clownfish::CFC::Type")) {
+    if (SvOK(child_sv) && sv_derived_from(child_sv, "Clownfish::CFC::Model::Type")) {
         IV objint = SvIV((SV*)SvRV(child_sv));
         child = INT2PTR(CFCType*, objint);
     }
     else {
-        croak("Param 'child' not a Clownfish::CFC::Type");
+        croak("Param 'child' not a Clownfish::CFC::Model::Type");
     }
     CFCType *self = CFCType_new_composite(flags, child, indirection, array);
     RETVAL = S_cfcbase_to_perlref(self);
@@ -1564,12 +1564,12 @@ CODE:
     int inert               = SvOK(inert_sv)
                               ? !!SvTRUE(inert_sv) : 0;
     CFCType *type = NULL;
-    if (SvOK(type_sv) && sv_derived_from(type_sv, "Clownfish::CFC::Type")) {
+    if (SvOK(type_sv) && sv_derived_from(type_sv, "Clownfish::CFC::Model::Type")) {
         IV objint = SvIV((SV*)SvRV(type_sv));
         type = INT2PTR(CFCType*, objint);
     }
     else {
-        croak("Param 'type' is not a Clownfish::CFC::Type");
+        croak("Param 'type' is not a Clownfish::CFC::Model::Type");
     }
     CFCVariable *self = CFCVariable_new(parcel, exposure, class_name,
                                         class_cnick, micro_sym, type, inert);

@@ -27,7 +27,7 @@ lib/Clownfish/CFC/ParamList.pm
 lib/Clownfish/CFC/Parcel.pm
 lib/Clownfish/CFC/Parser.pm
 lib/Clownfish/CFC/Symbol.pm
-lib/Clownfish/CFC/Type.pm
+lib/Clownfish/CFC/Model/Type.pm
 lib/Clownfish/CFC/Util.pm
 lib/Clownfish/CFC/Variable.pm
 MANIFEST			This list of files

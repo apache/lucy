@@ -28,7 +28,7 @@ CFCParamList*	CLOWNFISH_TYPE
 CFCParcel*	CLOWNFISH_TYPE
 CFCParser*	CLOWNFISH_TYPE
 CFCSymbol*	CLOWNFISH_TYPE
-CFCType*	CLOWNFISH_TYPE
+CFCType*	CLOWNFISH_MODEL
 CFCVariable*	CLOWNFISH_TYPE
 CFCBindCore*	CLOWNFISH_BINDING_CORE
 CFCBindClass*	CLOWNFISH_BINDING_CORE_TYPE
@@ -40,6 +40,18 @@ CFCPerlMethod*	CLOWNFISH_BINDING_PERL_COMMON
 CFCPerlPod*	CLOWNFISH_BINDING_PERL_COMMON
 
 INPUT
+
+CLOWNFISH_MODEL
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::Model::$1/;\$t}\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a ${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::Model::$1/;\$t}\");
+	}
 
 CLOWNFISH_TYPE
 	if (!SvOK($arg)) {
@@ -116,6 +128,9 @@ CLOWNFISH_BINDING_PERL_COMMON
 
 
 OUTPUT
+
+CLOWNFISH_MODEL
+	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::Model::$1/;\$t}\", (void*)$var);
 
 CLOWNFISH_TYPE
 	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::$1/;\$t}\", (void*)$var);

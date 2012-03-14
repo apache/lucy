@@ -17,17 +17,17 @@ use strict;
 use warnings;
 
 use Test::More tests => 10;
-use Clownfish::CFC::Type;
+use Clownfish::CFC::Model::Type;
 use Clownfish::CFC::Parser;
 
-my $foo_type = Clownfish::CFC::Type->new_arbitrary(
+my $foo_type = Clownfish::CFC::Model::Type->new_arbitrary(
     parcel    => 'Neato',
     specifier => "foo_t",
 );
 is( $foo_type->get_specifier, "foo_t", "get_specifier" );
 is( $foo_type->to_c,          "foo_t", "to_c" );
 
-my $compare_t_type = Clownfish::CFC::Type->new_arbitrary(
+my $compare_t_type = Clownfish::CFC::Model::Type->new_arbitrary(
     parcel    => 'Neato',
     specifier => "Sort_compare_t",
 );
@@ -35,7 +35,7 @@ is( $compare_t_type->get_specifier,
     "neato_Sort_compare_t", "Prepend prefix to specifier" );
 is( $compare_t_type->to_c, "neato_Sort_compare_t", "to_c" );
 
-my $twin = Clownfish::CFC::Type->new_arbitrary(
+my $twin = Clownfish::CFC::Model::Type->new_arbitrary(
     parcel    => 'Neato',
     specifier => "foo_t",
 );

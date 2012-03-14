@@ -17,10 +17,10 @@ use strict;
 use warnings;
 
 use Test::More tests => 4;
-use Clownfish::CFC::Type;
+use Clownfish::CFC::Model::Type;
 use Clownfish::CFC::Parser;
 
-my $va_list_type = Clownfish::CFC::Type->new_va_list;
+my $va_list_type = Clownfish::CFC::Model::Type->new_va_list;
 is( $va_list_type->get_specifier,
     "va_list", "specifier defaults to 'va_list'" );
 is( $va_list_type->to_c, "va_list", "to_c" );

@@ -367,7 +367,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 }
 
 {
-    package Clownfish::CFC::Type;
+    package Clownfish::CFC::Model::Type;
     BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
     use Clownfish::CFC::Util qw( verify_args a_isa_b );
     use Scalar::Util qw( blessed );

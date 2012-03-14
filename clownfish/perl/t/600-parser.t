@@ -45,7 +45,7 @@ for (qw( void float uint32_t int64_t uint8_t bool_t )) {
 }
 
 isa_ok( $parser->parse("bool_t"),
-    "Clownfish::CFC::Type", "Charmony integer specifier bool_t" );
+    "Clownfish::CFC::Model::Type", "Charmony integer specifier bool_t" );
 
 is( $parser->parse("$_*")->get_specifier,
     "crust_$_", "object_type_specifier $_" )
@@ -56,7 +56,7 @@ ok( $parser->parse("const char")->const, "type_qualifier const" );
 ok( $parser->parse("$_ int32_t foo;")->$_, "exposure_specifier $_" )
     for qw( public private parcel );
 
-isa_ok( $parser->parse($_), "Clownfish::CFC::Type", "type $_" )
+isa_ok( $parser->parse($_), "Clownfish::CFC::Model::Type", "type $_" )
     for ( 'const char *', 'Obj*', 'i32_t', 'char[]', 'long[1]', 'i64_t[30]' );
 
 is( $parser->parse("(int32_t foo = $_)")->get_initial_values->[0],

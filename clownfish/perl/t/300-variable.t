@@ -17,8 +17,6 @@ use strict;
 use warnings;
 
 use Test::More tests => 13;
-use Clownfish::CFC::Type;
-use Clownfish::CFC::Parser;
 
 BEGIN { use_ok('Clownfish::CFC::Variable') }
 

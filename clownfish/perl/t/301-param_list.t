@@ -19,8 +19,6 @@ use warnings;
 use Test::More tests => 13;
 
 BEGIN { use_ok('Clownfish::CFC::ParamList') }
-use Clownfish::CFC::Type;
-use Clownfish::CFC::Parser;
 
 my $parser = Clownfish::CFC::Parser->new;
 $parser->parse('parcel Neato;')
