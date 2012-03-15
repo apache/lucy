@@ -101,12 +101,12 @@ CFCPerlPod_get_description(CFCPerlPod *self);
 char*
 CFCPerlPod_perlify_doc_text(CFCPerlPod *self, const char *source);
 
-/** Autogenerate pod for either a Clownfish::CFC::Method or a
- * Clownfish::CFC::Function.
+/** Autogenerate pod for either a Clownfish::CFC::Model::Method or a
+ * Clownfish::CFC::Model::Function.
  * 
  * @param func The Method or Function.
  * @param alias The Perl name for the subroutine.
- * @param klass The Clownfish::CFC::Class.
+ * @param klass The Clownfish::CFC::Model::Class.
  * @param code_sample Optional example usage code.
  * @param is_construtor Indicate whether this is a constructor, as the default
  * argument handling is different for constructors.

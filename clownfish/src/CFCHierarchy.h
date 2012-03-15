@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::Hierarchy - A class hierarchy.
+/** Clownfish::CFC::Model::Hierarchy - A class hierarchy.
  *
- * A Clownfish::CFC::Hierarchy consists of all the classes defined in files within
- * a source directory and its subdirectories.
+ * A Clownfish::CFC::Model::Hierarchy consists of all the classes defined in
+ * files within a source directory and its subdirectories.
  *
  * There may be more than one tree within the Hierarchy, since all "inert"
  * classes are root nodes, and since Clownfish does not officially define any

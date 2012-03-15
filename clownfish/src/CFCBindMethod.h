@@ -16,8 +16,8 @@
 
 /** Clownfish::CFC::Binding::Core::Method - Generate core C code for a method.
  *
- * Clownfish::CFC::Method is an abstract specification; this class generates C code
- * which implements the specification.
+ * Clownfish::CFC::Model::Method is an abstract specification; this class
+ * generates C code which implements the specification.
  */
 
 #ifndef H_CFCBINDMETHOD
@@ -31,10 +31,10 @@ struct CFCMethod;
 struct CFCClass;
 
 /** Return C code for the static inline vtable method invocation function.
- * @param method A L<Clownfish::CFC::Method>.
- * @param class The L<Clownfish::CFC::Class> which will be invoking the method.
- * (LobsterClaw needs its own method invocation function even if the method
- * was defined in Claw.)
+ * @param method A L<Clownfish::CFC::Model::Method>.
+ * @param class The L<Clownfish::CFC::Model::Class> which will be invoking the
+ * method.  (LobsterClaw needs its own method invocation function even if the
+ * method was defined in Claw.)
  */
 char*
 CFCBindMeth_method_def(struct CFCMethod *method, struct CFCClass *klass);

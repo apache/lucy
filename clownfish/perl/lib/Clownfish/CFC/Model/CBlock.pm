@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Clownfish::CFC::Class;
+package Clownfish::CFC::Model::CBlock;
 use Clownfish::CFC;
 
 1;

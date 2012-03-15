@@ -38,7 +38,7 @@ CFCPerlMethod*
 CFCPerlMethod_new(struct CFCMethod *method, const char *alias);
 
 /**
- * @param method A Clownfish::CFC::Method.
+ * @param method A Clownfish::CFC::Model::Method.
  * @param alias The perl name for the method.  Defaults to the lowercased name
  * of the supplied Clownfish Method.
  */

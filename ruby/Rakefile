@@ -196,7 +196,7 @@ END_AUTOGEN
 end
 
 def compile_clownfish  
-    hierarchy_obj = Clownfish::CFC::Hierarchy.new(CORE_SOURCE_DIR, AUTOGEN_DIR)
+    hierarchy_obj = Clownfish::CFC::Model::Hierarchy.new(CORE_SOURCE_DIR, AUTOGEN_DIR)
     hierarchy_obj.build
     
     return hierarchy_obj

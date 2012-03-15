@@ -30,11 +30,11 @@ struct CFCPerlMethod;
 struct CFCPerlConstructor;
 
 /** Clownfish::CFC::Binding::Perl::Class - Generate Perl binding code for a
- * Clownfish::CFC::Class.
+ * Clownfish::CFC::Model::Class.
  */
 
 /** 
- * @param parcel A Clownfish::CFC::Parcel.
+ * @param parcel A Clownfish::CFC::Model::Parcel.
  * @param class_name The name of the class to be registered.
  */
 CFCPerlClass*
@@ -117,7 +117,7 @@ CFCPerlClass_constructor_bindings(CFCPerlClass *self);
 char*
 CFCPerlClass_create_pod(CFCPerlClass *self);
 
-/** Accessor for the Clownfish::CFC::Class module to be bound.
+/** Accessor for the Clownfish::CFC::Model::Class module to be bound.
  */
 struct CFCClass*
 CFCPerlClass_get_client(CFCPerlClass *self);

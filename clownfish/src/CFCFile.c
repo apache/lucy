@@ -42,7 +42,7 @@ struct CFCFile {
 };
 
 const static CFCMeta CFCFILE_META = {
-    "Clownfish::CFC::File",
+    "Clownfish::CFC::Model::File",
     sizeof(CFCFile),
     (CFCBase_destroy_t)CFCFile_destroy
 };
@@ -127,7 +127,7 @@ CFCFile_add_block(CFCFile *self, CFCBase *block) {
     const char *cfc_class = CFCBase_get_cfc_class(block);
 
     // Add to classes array if the block is a CFCClass.
-    if (strcmp(cfc_class, "Clownfish::CFC::Class") == 0) {
+    if (strcmp(cfc_class, "Clownfish::CFC::Model::Class") == 0) {
         size_t num_class_blocks = 0;
         while (self->classes[num_class_blocks] != NULL) {
             num_class_blocks++;
@@ -141,9 +141,9 @@ CFCFile_add_block(CFCFile *self, CFCBase *block) {
     }
 
     // Add to blocks array.
-    if (strcmp(cfc_class, "Clownfish::CFC::Class") == 0
-        || strcmp(cfc_class, "Clownfish::CFC::Parcel") == 0
-        || strcmp(cfc_class, "Clownfish::CFC::CBlock") == 0
+    if (strcmp(cfc_class, "Clownfish::CFC::Model::Class") == 0
+        || strcmp(cfc_class, "Clownfish::CFC::Model::Parcel") == 0
+        || strcmp(cfc_class, "Clownfish::CFC::Model::CBlock") == 0
        ) {
         size_t num_blocks = 0;
         while (self->blocks[num_blocks] != NULL) {

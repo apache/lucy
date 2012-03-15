@@ -34,7 +34,7 @@ struct CFCClass;
  */
 
 /**
- * @param klass A L<Clownfish::CFC::Class>.
+ * @param klass A L<Clownfish::CFC::Model::Class>.
  * @param alias The Perl name for the constructor.
  * @param initializer The name of the function which should be bound (default
  * "init").

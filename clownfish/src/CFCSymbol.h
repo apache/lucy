@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::Symbol - Base class for Clownfish symbols.
+/** Clownfish::CFC::Model::Symbol - Base class for Clownfish symbols.
  *
- * Clownfish::CFC::Symbol serves as a parent class for entities which may live in
- * the global namespace, such as classes, functions, methods, and variables.
+ * Clownfish::CFC::Model::Symbol serves as a parent class for entities which
+ * may live in the global namespace, such as classes, functions, methods, and
+ * variables.
  */
 
 #ifndef H_CFCSYMBOL
@@ -53,8 +54,8 @@ int
 CFCSymbol_validate_class_name_component(const char *name);
 
 /**
- * @param parcel A Clownfish::CFC::Parcel.  If not supplied, will be assigned to the
- * default Parcel.
+ * @param parcel A Clownfish::CFC::Model::Parcel.  If not supplied, will be
+ * assigned to the default Parcel.
  * @param exposure The scope in which the symbol is exposed.  Must be
  * 'public', 'parcel', 'private', or 'local'.
  * @param class_name A optional class name, consisting of one or more

@@ -45,7 +45,7 @@ struct CFCParcel;
  *
  * @param flags Flags which apply to the Type.  Supplying incompatible flags
  * will trigger an error.
- * @param parcel A Clownfish::CFC::Parcel.
+ * @param parcel A Clownfish::CFC::Model::Parcel.
  * @param specifier The C name for the type, not including any indirection or
  * array subscripts.
  * @param indirection integer indicating level of indirection. Example: the C
@@ -109,9 +109,9 @@ CFCType_new_float(int flags, const char *specifier);
  *
  * @param flags Allowed flags: OBJECT, STRING_TYPE, CONST, NULLABLE,
  * INCREMENTED, DECREMENTED.
- * @param parcel A Clownfish::CFC::Parcel.
- * @param specifier Required.  Must follow the rules for Clownfish::CFC::Class
- * class name components.
+ * @param parcel A Clownfish::CFC::Model::Parcel.
+ * @param specifier Required.  Must follow the rules for
+ * Clownfish::CFC::Model::Class class name components.
  * @param indirection Level of indirection.  Must be 1 if supplied.
  */
 CFCType*
@@ -168,7 +168,7 @@ CFCType_new_va_list(void);
  *    Lobster_foo_t -> crust_Lobster_foo_t  # prefix prepended
  *
  * @param specifier The name of the type, which must end in "_t".
- * @param parcel A Clownfish::CFC::Parcel.
+ * @param parcel A Clownfish::CFC::Model::Parcel.
  */
 CFCType*
 CFCType_new_arbitrary(struct CFCParcel *parcel, const char *specifier);

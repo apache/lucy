@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::Function - Metadata describing a function.
+/** Clownfish::CFC::Model::Function - Metadata describing a function.
  */
 
 #ifndef H_CFCFUNCTION
@@ -43,8 +43,9 @@ struct CFCFunction {
 #endif
 
 /**
- * @param parcel A Clownfish::CFC::Parcel.
- * @param exposure The function's exposure (see L<Clownfish::CFC::Symbol>).
+ * @param parcel A Clownfish::CFC::Model::Parcel.
+ * @param exposure The function's exposure (see
+ * L<Clownfish::CFC::Model::Symbol>).
  * @param class_name The full name of the class in whose namespace the
  * function resides.
  * @param class_cnick The C nickname for the class.
@@ -52,9 +53,9 @@ struct CFCFunction {
  * namespacing prefixes.
  * @param return_type A Clownfish::CFC::Model::Type representing the
  * function's return type.
- * @param param_list A Clownfish::CFC::ParamList representing the
+ * @param param_list A Clownfish::CFC::Model::ParamList representing the
  * function's argument list.
- * @param docucomment A Clownfish::CFC::DocuComment describing the
+ * @param docucomment A Clownfish::CFC::Model::DocuComment describing the
  * function.
  * @param is_inline Should be true if the function should be inlined by the
  * compiler.

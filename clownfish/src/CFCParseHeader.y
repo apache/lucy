@@ -397,7 +397,7 @@ class_defs(A) ::= class_defs(B) var_declaration_statement(C).
 class_defs(A) ::= class_defs(B) subroutine_declaration_statement(C).
 {
     A = B;
-    if (strcmp(CFCBase_get_cfc_class(C), "Clownfish::CFC::Function") == 0) {
+    if (strcmp(CFCBase_get_cfc_class(C), "Clownfish::CFC::Model::Function") == 0) {
         CFCClass_add_function(A, (CFCFunction*)C);
     }
     else {

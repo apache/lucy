@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::Parcel - Collection of code.
+/** Clownfish::CFC::Model::Parcel - Collection of code.
  *
  * A Parcel is a cohesive collection of code, which could, in theory, be
  * published as as a single entity.
@@ -24,9 +24,9 @@
  *
  *     prefix_ClassNick_local_symbol
  *
- * Clownfish::CFC::Parcel supports the first tier, specifying initial prefixes.
- * These prefixes come in three capitalization variants: prefix_, Prefix_, and
- * PREFIX_.
+ * Clownfish::CFC::Model::Parcel supports the first tier, specifying initial
+ * prefixes.  These prefixes come in three capitalization variants: prefix_,
+ * Prefix_, and PREFIX_.
  */
 
 #ifndef H_CFCPARCEL

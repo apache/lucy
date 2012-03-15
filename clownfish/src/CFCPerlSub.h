@@ -40,7 +40,7 @@ struct CFCPerlSub {
 #endif
 
 /** Clownfish::CFC::Binding::Perl::Subroutine - Abstract base binding for a
- * Clownfish::CFC::Function.
+ * Clownfish::CFC::Model::Function.
  * 
  * This class is used to generate binding code for invoking Clownfish's
  * functions and methods across the Perl/C barrier.
@@ -48,7 +48,7 @@ struct CFCPerlSub {
 
 /** Abstract constructor.
  * 
- * @param param_list A Clownfish::CFC::ParamList.
+ * @param param_list A Clownfish::CFC::Model::ParamList.
  * @param class_name The name of the Perl class that the subroutine belongs
  * to.
  * @param alias The local, unqualified name for the Perl subroutine that

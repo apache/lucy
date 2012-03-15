@@ -63,7 +63,7 @@ CFCPerlTypeMap_to_perl(struct CFCType *type, const char *cf_var);
  * between them when checking arguments.  Keeping the entries up-to-date
  * manually as classes come and go would be a pain.
  * 
- * @param hierarchy A Clownfish::CFC::Hierarchy.
+ * @param hierarchy A Clownfish::CFC::Model::Hierarchy.
  */
 void
 CFCPerlTypeMap_write_xs_typemap(struct CFCHierarchy *hierarchy);

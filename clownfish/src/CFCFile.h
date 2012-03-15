@@ -15,8 +15,8 @@
  */
 
 
-/** Clownfish::CFC::File - Structured representation of the contents of a Clownfish
- * source file.
+/** Clownfish::CFC::Model::File - Structured representation of the contents of
+ * a Clownfish source file.
  *
  * An abstraction representing a file which contains Clownfish code.
  */
@@ -48,7 +48,8 @@ void
 CFCFile_destroy(CFCFile *self);
 
 /** Add an element to the blocks array.  The block must be either a
- * Clownfish::CFC::Class, a Clownfish::CFC::Parcel, or a Clownfish::CFC::CBlock.
+ * Clownfish::CFC::Model::Class, a Clownfish::CFC::Model::Parcel, or a
+ * Clownfish::CFC::Model::CBlock.
  */
 void
 CFCFile_add_block(CFCFile *self, CFCBase *block);
@@ -83,7 +84,7 @@ CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size,
 struct CFCBase**
 CFCFile_blocks(CFCFile *self);
 
-/** Return all Clownfish::CFC::Class blocks from the file as an array.
+/** Return all Clownfish::CFC::Model::Class blocks from the file as an array.
  */
 struct CFCClass**
 CFCFile_classes(CFCFile *self);

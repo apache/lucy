@@ -18,7 +18,7 @@ use warnings;
 
 use Test::More tests => 18;
 
-use Clownfish::CFC::Hierarchy;
+use Clownfish::CFC::Model::Hierarchy;
 use Clownfish::CFC::Util qw( a_isa_b );
 use File::Spec::Functions qw( catfile splitpath );
 use Fcntl;
@@ -33,12 +33,13 @@ my %args = (
 rmtree( $args{dest} );
 
 eval {
-    my $death = Clownfish::CFC::Hierarchy->new( %args, extra_arg => undef );
+    my $death
+        = Clownfish::CFC::Model::Hierarchy->new( %args, extra_arg => undef );
 };
 like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
-my $hierarchy = Clownfish::CFC::Hierarchy->new(%args);
-isa_ok( $hierarchy, "Clownfish::CFC::Hierarchy" );
+my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(%args);
+isa_ok( $hierarchy, "Clownfish::CFC::Model::Hierarchy" );
 is( $hierarchy->get_source, $args{source}, "get_source" );
 is( $hierarchy->get_dest,   $args{dest},   "get_dest" );
 
@@ -48,10 +49,11 @@ my @files = @{ $hierarchy->files };
 is( scalar @files, 3, "recursed and found all three files" );
 my %files;
 for my $file (@files) {
-    die "not a File" unless isa_ok( $file, "Clownfish::CFC::File" );
+    die "not a File" unless isa_ok( $file, "Clownfish::CFC::Model::File" );
     ok( !$file->get_modified, "start off not modified" );
     my ($class)
-        = grep { a_isa_b( $_, "Clownfish::CFC::Class" ) } @{ $file->blocks };
+        = grep { a_isa_b( $_, "Clownfish::CFC::Model::Class" ) }
+        @{ $file->blocks };
     die "no class" unless $class;
     $files{ $class->get_class_name } = $file;
 }
@@ -62,7 +64,7 @@ my $util   = $files{'Animal::Util'} or die "No Util";
 my $classes = $hierarchy->ordered_classes;
 is( scalar @$classes, 3, "all classes" );
 for my $class (@$classes) {
-    die "not a Class" unless isa_ok( $class, "Clownfish::CFC::Class" );
+    die "not a Class" unless isa_ok( $class, "Clownfish::CFC::Model::Class" );
 }
 
 # Generate fake C files, with times set to one second ago.

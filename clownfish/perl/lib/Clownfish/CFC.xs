@@ -94,7 +94,7 @@ PPCODE:
     CFCBase_decref((CFCBase*)self);
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::CBlock
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::CBlock
 
 SV*
 _new(contents)
@@ -121,7 +121,7 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Class
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Class
 
 SV*
 _create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
@@ -300,7 +300,7 @@ PPCODE:
         case 5: {
                 CFCClass *parent = NULL;
                 if (SvOK(ST(1))
-                    && sv_derived_from(ST(1), "Clownfish::CFC::Class")
+                    && sv_derived_from(ST(1), "Clownfish::CFC::Model::Class")
                    ) {
                     IV objint = SvIV((SV*)SvRV(ST(1)));
                     parent = INT2PTR(CFCClass*, objint);
@@ -412,14 +412,14 @@ PPCODE:
 }
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::DocuComment
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::DocuComment
 
 SV*
 parse(klass, text)
     const char *klass;
     const char *text;
 CODE:
-    if (strcmp(klass, "Clownfish::CFC::DocuComment")) {
+    if (strcmp(klass, "Clownfish::CFC::Model::DocuComment")) {
         croak("No subclassing allowed");
     }
     CFCDocuComment *self = CFCDocuComment_parse(text);
@@ -509,7 +509,7 @@ PPCODE:
     CFCDumpable_add_dumpables(self, klass);
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::File
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::File
 
 SV*
 _new(source_class)
@@ -610,7 +610,7 @@ CODE:
 OUTPUT: RETVAL
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Function
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Function
 
 SV*
 _new(parcel, exposure_sv, class_name_sv, class_cnick_sv, micro_sym_sv, return_type, param_list, docucomment, is_inline)
@@ -688,7 +688,7 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Hierarchy
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Hierarchy
 
 SV*
 _new(source, dest)
@@ -749,7 +749,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Method
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Method
 
 SV*
 _new(parcel, exposure_sv, class_name_sv, class_cnick_sv, macro_sym, return_type, param_list, docucomment, is_final, is_abstract)
@@ -900,7 +900,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::ParamList
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::ParamList
 
 SV*
 _new(klass, variadic)
@@ -984,7 +984,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Parcel
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Parcel
 
 SV*
 _singleton(name_sv, cnick_sv)
@@ -1058,7 +1058,7 @@ PPCODE:
 }
 
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Symbol
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Symbol
 
 SV*
 _new(parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv)
@@ -1540,7 +1540,7 @@ CODE:
     RETVAL = CFCUtil_make_path(path);
 OUTPUT: RETVAL
 
-MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Variable
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Model::Variable
 
 SV*
 _new(parcel, exposure, class_name_sv, class_cnick_sv, micro_sym_sv, type_sv, inert_sv)

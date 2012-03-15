@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::DocuComment - Formatted comment a la Doxygen.
+/** Clownfish::CFC::Model::DocuComment - Formatted comment a la Doxygen.
  */
 
 #ifndef H_CFCDOCUCOMMENT

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::Class - An object representing a single class definition.
+/** Clownfish::CFC::Model::Class - An object representing a single class
+ * definition.
  *
- * Clownfish::CFC::Class objects are stored as quasi-singletons, one for each
- * unique parcel/class_name combination.
+ * Clownfish::CFC::Model::Class objects are stored as quasi-singletons, one
+ * for each unique parcel/class_name combination.
  */
 
 #ifndef H_CFCCLASS
@@ -37,18 +38,20 @@ struct CFCVariable;
 /** Create and register a quasi-singleton.  May only be called once for each
  * unique parcel/class_name combination.
  *
- * @param parcel See Clownfish::CFC::Symbol.
- * @param exposure See Clownfish::CFC::Symbol.
- * @param class_name See Clownfish::CFC::Symbol.
- * @param cnick See Clownfish::CFC::Symbol.
+ * @param parcel See Clownfish::CFC::Model::Symbol.
+ * @param exposure See Clownfish::CFC::Model::Symbol.
+ * @param class_name See Clownfish::CFC::Model::Symbol.
+ * @param cnick See Clownfish::CFC::Model::Symbol.
  * @param micro_sym Defaults to "class".
- * @param docucomment An optional Clownfish::CFC::DocuComment attached to this class.
+ * @param docucomment An optional Clownfish::CFC::Model::DocuComment attached
+ * to this class.
  * @param source_class - The name of the class that owns the file in which
  * this class was declared.  Should be "Foo" if "Foo::FooJr" is defined in
  * <code>Foo.cfh</code>.
  * @param parent_class_name - The name of this class's parent class.  Needed
  * in order to establish the class hierarchy.
- * @param docucomment A Clownfish::CFC::DocuComment describing this Class.
+ * @param docucomment A Clownfish::CFC::Model::DocuComment describing this
+ * Class.
  * @param is_inert Should be true if the class is inert, i.e. cannot be
  * instantiated.
  * @param is_final Should be true if the class is final.
@@ -73,7 +76,7 @@ CFCClass_destroy(CFCClass *self);
 
 /** Retrieve a Class, if one has already been created.
  *
- * @param A Clownfish::CFC::Parcel.
+ * @param A Clownfish::CFC::Model::Parcel.
  * @param class_name The name of the Class.
  */
 CFCClass*

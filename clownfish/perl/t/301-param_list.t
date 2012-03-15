@@ -18,17 +18,20 @@ use warnings;
 
 use Test::More tests => 13;
 
-BEGIN { use_ok('Clownfish::CFC::ParamList') }
+BEGIN { use_ok('Clownfish::CFC::Model::ParamList') }
 
 my $parser = Clownfish::CFC::Parser->new;
 $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
-isa_ok( $parser->parse($_), "Clownfish::CFC::Variable", "param_variable: $_" )
-    for ( 'uint32_t baz', 'CharBuf *stuff', 'float **ptr', );
+isa_ok(
+    $parser->parse($_),
+    "Clownfish::CFC::Model::Variable",
+    "param_variable: $_"
+) for ( 'uint32_t baz', 'CharBuf *stuff', 'float **ptr', );
 
 my $param_list = $parser->parse("(Obj *self, int num)");
-isa_ok( $param_list, "Clownfish::CFC::ParamList" );
+isa_ok( $param_list, "Clownfish::CFC::Model::ParamList" );
 ok( !$param_list->variadic, "not variadic" );
 is( $param_list->to_c, 'neato_Obj* self, int num', "to_c" );
 is( $param_list->name_list, 'self, num', "name_list" );
@@ -42,6 +45,9 @@ is_deeply(
 );
 is( $param_list->to_c, 'neato_Obj* self, int num, ...', "to_c" );
 is( $param_list->num_vars, 2, "num_vars" );
-isa_ok( $param_list->get_variables->[0],
-    "Clownfish::CFC::Variable", "get_variables..." );
+isa_ok(
+    $param_list->get_variables->[0],
+    "Clownfish::CFC::Model::Variable",
+    "get_variables..."
+);
 

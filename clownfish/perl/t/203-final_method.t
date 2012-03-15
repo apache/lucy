@@ -33,7 +33,7 @@ my %args = (
     parcel      => 'Neato',
 );
 
-my $not_final_method = Clownfish::CFC::Method->new(%args);
+my $not_final_method = Clownfish::CFC::Model::Method->new(%args);
 my $final_method     = $not_final_method->finalize;
 ok( !$not_final_method->final, "not final by default" );
 ok( $final_method->final,      "finalize" );

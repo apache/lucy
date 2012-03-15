@@ -17,7 +17,7 @@
 #ifndef H_CFCVARIABLE
 #define H_CFCVARIABLE
 
-/** Clownfish::CFC::Variable - A Clownfish variable.
+/** Clownfish::CFC::Model::Variable - A Clownfish variable.
  *
  * A variable, having a L<Type|Clownfish::CFC::Model::Type>, a micro_sym (i.e.
  * name), an exposure, and optionally, a location in the global namespace
@@ -40,9 +40,9 @@ struct CFCType;
 /**
  * @param type A Clownfish::CFC::Model::Type.
  * @param micro_sym The variable's name, without any namespacing prefixes.
- * @param exposure See Clownfish::CFC::Symbol.
- * @param class_name See Clownfish::CFC::Symbol.
- * @param class_cnick See Clownfish::CFC::Symbol.
+ * @param exposure See Clownfish::CFC::Model::Symbol.
+ * @param class_name See Clownfish::CFC::Model::Symbol.
+ * @param class_cnick See Clownfish::CFC::Model::Symbol.
  */
 CFCVariable*
 CFCVariable_new(struct CFCParcel *parcel, const char *exposure,

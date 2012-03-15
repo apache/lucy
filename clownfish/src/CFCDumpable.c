@@ -43,7 +43,7 @@ S_add_dump_method(CFCClass *klass);
 static void
 S_add_load_method(CFCClass *klass);
 
-// Create a Clownfish::CFC::Method object for either Dump() or Load().
+// Create a Clownfish::CFC::Model::Method object for either Dump() or Load().
 static CFCMethod*
 S_make_method_obj(CFCClass *klass, const char *method_name);
 

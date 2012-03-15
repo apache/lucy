@@ -18,7 +18,7 @@ use warnings;
 
 use Test::More tests => 1;
 
-use Clownfish::CFC::Method;
+use Clownfish::CFC::Model::Method;
 use Clownfish::CFC::Parser;
 
 my $parser = Clownfish::CFC::Parser->new;
@@ -34,8 +34,8 @@ my %args = (
     parcel      => 'Neato',
 );
 
-my $orig      = Clownfish::CFC::Method->new(%args);
-my $overrider = Clownfish::CFC::Method->new(
+my $orig      = Clownfish::CFC::Model::Method->new(%args);
+my $overrider = Clownfish::CFC::Model::Method->new(
     %args,
     param_list  => $parser->parse('(FooJr *self)'),
     class_name  => 'Neato::Foo::FooJr',

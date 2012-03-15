@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-/** Clownfish::CFC::Method - Metadata describing an instance method.
+/** Clownfish::CFC::Model::Method - Metadata describing an instance method.
  *
- * Clownfish::CFC::Method is a specialized subclass of Clownfish::CFC::Function, with
- * the first argument required to be an Obj.
+ * Clownfish::CFC::Model::Method is a specialized subclass of
+ * Clownfish::CFC::Model::Function, with the first argument required to be an
+ * Obj.
  *
  * When compiling Clownfish code to C, Method objects generate all the code
  * that Function objects do, but also create symbols for indirect invocation via
@@ -38,17 +39,17 @@ struct CFCParamList;
 struct CFCDocuComment;
 
 /**
- * @param parcel See Clownfish::CFC::Function.
- * @param exposure See Clownfish::CFC::Function.  Defaults to "parcel" if not
- * supplied.
- * @param class_name See Clownfish::CFC::Function.
- * @param class_cnick See Clownfish::CFC::Function.
+ * @param parcel See Clownfish::CFC::Model::Function.
+ * @param exposure See Clownfish::CFC::Model::Function.  Defaults to "parcel"
+ * if not supplied.
+ * @param class_name See Clownfish::CFC::Model::Function.
+ * @param class_cnick See Clownfish::CFC::Model::Function.
  * @param macro_sym - The mixed case name which will be used when invoking the
  * method.
- * @param return_type See Clownfish::CFC::Function.
- * @param param_list - A Clownfish::CFC::ParamList.  The first element must be an
- * object of the class identified by C<class_name>.
- * @param docucomment see Clownfish::CFC::Function.  May be NULL.
+ * @param return_type See Clownfish::CFC::Model::Function.
+ * @param param_list - A Clownfish::CFC::Model::ParamList.  The first element
+ * must be an object of the class identified by C<class_name>.
+ * @param docucomment see Clownfish::CFC::Model::Function.  May be NULL.
  * @param is_final - Indicate whether the method is final.
  * @param is_abstract - Indicate whether the method is abstract.
  */

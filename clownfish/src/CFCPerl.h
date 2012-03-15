@@ -25,21 +25,22 @@ typedef struct CFCPerl CFCPerl;
 struct CFCParcel;
 struct CFCHierarchy;
 
-/** Clownfish::CFC::Binding::Perl - Perl bindings for a Clownfish::CFC::Hierarchy.
+/** Clownfish::CFC::Binding::Perl - Perl bindings for a
+ * Clownfish::CFC::Model::Hierarchy.
  * 
- * Clownfish::CFC::Binding::Perl presents an interface for auto-generating XS and
- * Perl code to bind C code for a Clownfish class hierarchy to Perl.
+ * Clownfish::CFC::Binding::Perl presents an interface for auto-generating XS
+ * and Perl code to bind C code for a Clownfish class hierarchy to Perl.
  * 
  * In theory this module could be much more flexible and its API could be more
  * elegant.  There are many ways which you could walk the parsed parcels,
- * classes, methods, etc. in a Clownfish::CFC::Hierarchy and generate binding code.
- * However, our needs are very limited, so we are content with a "one size fits
- * one" solution.
+ * classes, methods, etc. in a Clownfish::CFC::Model::Hierarchy and generate
+ * binding code.  However, our needs are very limited, so we are content with
+ * a "one size fits one" solution.
  * 
- * In particular, this module assumes that the XS bindings for all classes in the
- * hierarchy should be assembled into a single shared object which belongs to the
- * primary, "boot" class.  There's no reason why it could not write one .xs file
- * per class, or one per parcel, instead.
+ * In particular, this module assumes that the XS bindings for all classes in
+ * the hierarchy should be assembled into a single shared object which belongs
+ * to the primary, "boot" class.  There's no reason why it could not write one
+ * .xs file per class, or one per parcel, instead.
  * 
  * The files written by this class are derived from the name of the boot class.
  * If it is "Crustacean", the following files will be generated.
@@ -54,9 +55,9 @@ struct CFCHierarchy;
  */
 
 /** 
- * @param parcel The L<Clownfish::CFC::Parcel> to which the C<boot_class>
- * belongs.
- * @param hierarchy A Clownfish::CFC::Hierarchy.
+ * @param parcel The L<Clownfish::CFC::Model::Parcel> to which the
+ * C<boot_class> belongs.
+ * @param hierarchy A Clownfish::CFC::Model::Hierarchy.
  * @param lib_dir location of the Perl lib directory to which files will be
  * written.
  * @param boot_class The name of the main class, which will own the shared

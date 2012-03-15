@@ -23,10 +23,16 @@ BEGIN { use_ok('Clownfish::CFC::Parser') }
 my $parser = Clownfish::CFC::Parser->new;
 isa_ok( $parser, "Clownfish::CFC::Parser" );
 
-isa_ok( $parser->parse("parcel Fish;"),
-    "Clownfish::CFC::Parcel", "parcel_definition" );
-isa_ok( $parser->parse("parcel Crustacean cnick Crust;"),
-    "Clownfish::CFC::Parcel", "parcel_definition with cnick" );
+isa_ok(
+    $parser->parse("parcel Fish;"),
+    "Clownfish::CFC::Model::Parcel",
+    "parcel_definition"
+);
+isa_ok(
+    $parser->parse("parcel Crustacean cnick Crust;"),
+    "Clownfish::CFC::Model::Parcel",
+    "parcel_definition with cnick"
+);
 
 # Set and leave parcel.
 my $parcel = $parser->parse('parcel Crustacean cnick Crust;')
@@ -94,7 +100,11 @@ my %param_lists = (
 );
 while ( my ( $param_list, $num_params ) = each %param_lists ) {
     my $parsed = $parser->parse($param_list);
-    isa_ok( $parsed, "Clownfish::CFC::ParamList", "param_list: $param_list" );
+    isa_ok(
+        $parsed,
+        "Clownfish::CFC::Model::ParamList",
+        "param_list: $param_list"
+    );
 }
 ok( $parser->parse("(int foo, ...)")->variadic, "variadic param list" );
 my $param_list = $parser->parse(q|(int foo = 0xFF, char *bar ="blah")|);

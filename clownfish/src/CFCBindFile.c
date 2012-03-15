@@ -61,10 +61,10 @@ CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
     for (int i = 0; blocks[i] != NULL; i++) {
         const char *cfc_class = CFCBase_get_cfc_class(blocks[i]);
 
-        if (strcmp(cfc_class, "Clownfish::CFC::Parcel") == 0) {
+        if (strcmp(cfc_class, "Clownfish::CFC::Model::Parcel") == 0) {
             ;
         }
-        else if (strcmp(cfc_class, "Clownfish::CFC::Class") == 0) {
+        else if (strcmp(cfc_class, "Clownfish::CFC::Model::Class") == 0) {
             CFCBindClass *class_binding
                 = CFCBindClass_new((CFCClass*)blocks[i]);
             char *c_header = CFCBindClass_to_c_header(class_binding);
@@ -72,7 +72,7 @@ CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
             FREEMEM(c_header);
             CFCBase_decref((CFCBase*)class_binding);
         }
-        else if (strcmp(cfc_class, "Clownfish::CFC::CBlock") == 0) {
+        else if (strcmp(cfc_class, "Clownfish::CFC::Model::CBlock") == 0) {
             const char *block_contents 
                 = CFCCBlock_get_contents((CFCCBlock*)blocks[i]);
             content = CFCUtil_cat(content, block_contents, "\n", NULL);
