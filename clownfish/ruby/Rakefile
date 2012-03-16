@@ -34,7 +34,7 @@ end
 
 desc "Build Clownfish"
 task :clownfish => [:parse_y_files] do
-  Dir.glob(File.join(CLOWNFISH_SRC_DIR, '*.c')).each do|c_file|
+  Dir.glob(File.join(CLOWNFISH_SRC_DIR, '**', '*.c')).each do|c_file|
     obj_file = c_file.ext(rbconfig['OBJEXT'])
     command = "#{cc_command} #{includes} #{extra_ccflags} -o #{obj_file} -c #{c_file}"
     puts command
@@ -43,6 +43,12 @@ task :clownfish => [:parse_y_files] do
     end
   end
   Rake::Task['cfc_ext'].invoke
+end
+
+# Clean up compiled object files.
+obj_glob = File.join(CLOWNFISH_SRC_DIR, '**', '*.' + rbconfig['OBJEXT'])
+Dir.glob(obj_glob).each do |file|
+  CLEAN.include(file);
 end
 
 desc "Build CFC Ext"
@@ -55,19 +61,35 @@ task :cfc_ext => [:clownfish] do
     end
 end
 
+# Clean up Ruby extension.
+Dir.glob(File.join('ext', '**', '*.' + rbconfig['OBJEXT'])).each do |file|
+  CLEAN.include(file);
+end
+Dir.glob(File.join('ext', '**', '*.' + rbconfig['DLEXT'])).each do |file|
+  CLEAN.include(file);
+end
+CLEAN.include(File.join('ext', 'Clownfish', 'Makefile'))
+
 desc "Lemonize the y file"
 task :parse_y_files => [:build_lemon] do
   puts "Parsing y files"
-  Dir.glob("#{CLOWNFISH_SRC_DIR}/*.y").each do |y_file|
-    c_file = y_file.gsub(/\.y$/,'.c')
-    h_file = y_file.gsub(/\.y$/,'.h')
-    report_file = y_file.gsub(/\.y$/,'.out')
+  Dir.glob(File.join(CLOWNFISH_SRC_DIR, '**', '*.y')).each do |y_file|
+    c_file = y_file.ext('c')
+    h_file = y_file.ext('h')
+    report_file = y_file.ext('out')
     command = File.join(LEMON_SRC_DIR,'lemon') + ' -c ' + y_file    
     puts command
     if system(command).nil?
       abort "Problem parsing y file with lemon"
     end
   end
+end
+
+# Clean up after Lemonized files.
+Dir.glob(File.join(CLOWNFISH_SRC_DIR, '**', '*.y')).each do |y_file|
+  CLEAN.include(y_file.ext('c'))
+  CLEAN.include(y_file.ext('h'))
+  CLEAN.include(y_file.ext('out'))
 end
 
 task :default => [:clownfish]
@@ -144,9 +166,4 @@ def run_make(dir, params)
   chdir(current_dir) if dir
 end
 
-CLEAN.include(File.join(CLOWNFISH_SRC_DIR, 'CFCParseHeader.out'))
-CLEAN.include(File.join(CLOWNFISH_SRC_DIR, 'CFCParseHeader.c'))
-CLEAN.include(File.join(CLOWNFISH_SRC_DIR, 'CFCParseHeader.h'))
-CLEAN.include(File.join(RUBY_EXT_CFC, 'CFC').ext(rbconfig['OBJEXT']))
-CLEAN.include(File.join(RUBY_EXT_CFC, 'CFC').ext(rbconfig['DLEXT']))
 
