@@ -36,6 +36,7 @@ desc "Build Clownfish"
 task :clownfish => [:parse_y_files] do
   Dir.glob(File.join(CLOWNFISH_SRC_DIR, '**', '*.c')).each do|c_file|
     obj_file = c_file.ext(rbconfig['OBJEXT'])
+    next if uptodate?(obj_file, [c_file])
     command = "#{cc_command} #{includes} #{extra_ccflags} -o #{obj_file} -c #{c_file}"
     puts command
     if system(command).nil?
@@ -53,12 +54,20 @@ end
 
 desc "Build CFC Ext"
 task :cfc_ext => [:clownfish] do
+  makefile_path = File.join('ext', 'Clownfish', 'Makefile')
+  dependencies  = Dir.glob(File.join(CLOWNFISH_SRC_DIR, '**', '*.h'))
+  dependencies << File.join(RUBY_EXT_CFC, "extconf.rb")
+  dependencies << 'Rakefile'
+  if !uptodate?(makefile_path, dependencies)
     Dir.chdir(RUBY_EXT_CFC) do
-        ruby 'extconf.rb'
-        if system('make').nil?
-            abort "Failed to make cfc ruby extension"
-        end
+      ruby 'extconf.rb'
     end
+  end
+  Dir.chdir(RUBY_EXT_CFC) do
+    if system('make').nil?
+      abort "Failed to make cfc ruby extension"
+    end
+  end
 end
 
 # Clean up Ruby extension.
@@ -77,12 +86,14 @@ task :parse_y_files => [:build_lemon] do
     c_file = y_file.ext('c')
     h_file = y_file.ext('h')
     report_file = y_file.ext('out')
+    next if uptodate?(c_file, [y_file]);
     command = File.join(LEMON_SRC_DIR,'lemon') + ' -c ' + y_file    
     puts command
     if system(command).nil?
       abort "Problem parsing y file with lemon"
     end
   end
+  puts "Done."
 end
 
 # Clean up after Lemonized files.
