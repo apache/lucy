@@ -16,6 +16,10 @@
 require 'rbconfig'
 require 'rake/clean' 
 
+def rbconfig
+  RbConfig::CONFIG
+end
+
 CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
 CLOWNFISH_INCLUDE_DIR   = File.join('..','include')
 CLOWNFISH_SRC_DIR       = File.join('..','src')
@@ -30,8 +34,8 @@ end
 
 desc "Build Clownfish"
 task :clownfish => [:parse_y_files] do
-  Dir.glob("../src/*.c").each do|c_file|
-    obj_file = c_file.gsub(/\.c$/,'.o')
+  Dir.glob(File.join(CLOWNFISH_SRC_DIR, '*.c')).each do|c_file|
+    obj_file = c_file.ext(rbconfig['OBJEXT'])
     command = "#{cc_command} #{includes} #{extra_ccflags} -o #{obj_file} -c #{c_file}"
     puts command
     if system(command).nil?
@@ -58,7 +62,7 @@ task :parse_y_files => [:build_lemon] do
     c_file = y_file.gsub(/\.y$/,'.c')
     h_file = y_file.gsub(/\.y$/,'.h')
     report_file = y_file.gsub(/\.y$/,'.out')
-    command = File.join(LEMON_SRC_DIR,'lemon') + ' -c ' + File.join(y_file)    
+    command = File.join(LEMON_SRC_DIR,'lemon') + ' -c ' + y_file    
     puts command
     if system(command).nil?
       abort "Problem parsing y file with lemon"
@@ -69,7 +73,7 @@ end
 task :default => [:clownfish]
 
 def cc_command
-  RbConfig::CONFIG["CC"]
+  rbconfig["CC"]
 end
 
 def extra_ccflags 
@@ -104,7 +108,7 @@ def includes
 end
 
 def make_command
-  command = RbConfig::CONFIG["make-prog"]
+  command = rbconfig["make-prog"]
   if !command
     if RUBY_PLATFORM =~ /mswin/i
       cc = cc_command
@@ -140,11 +144,9 @@ def run_make(dir, params)
   chdir(current_dir) if dir
 end
 
-CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.out')
-CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.c')
-CLEAN.include(CLOWNFISH_SRC_DIR + '/CFCParseHeader.h')
-CLEAN.include(RUBY_EXT_CFC + '/CFC.o')
-CLEAN.include(RUBY_EXT_CFC + '/CFC.bundle')
-CLEAN.include(RUBY_EXT_CFC + '/CFC/CFC.bundle')
-CLEAN.include(RUBY_EXT_CFC + '/CFC/CFC.o')
+CLEAN.include(File.join(CLOWNFISH_SRC_DIR, 'CFCParseHeader.out'))
+CLEAN.include(File.join(CLOWNFISH_SRC_DIR, 'CFCParseHeader.c'))
+CLEAN.include(File.join(CLOWNFISH_SRC_DIR, 'CFCParseHeader.h'))
+CLEAN.include(File.join(RUBY_EXT_CFC, 'CFC').ext(rbconfig['OBJEXT']))
+CLEAN.include(File.join(RUBY_EXT_CFC, 'CFC').ext(rbconfig['DLEXT']))
 
