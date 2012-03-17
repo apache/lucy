@@ -28,7 +28,6 @@ ANDMatcher_new(VArray *children, Similarity *sim) {
 
 ANDMatcher*
 ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) {
-    uint32_t i;
 
     // Init.
     PolyMatcher_init((PolyMatcher*)self, children, sim);
@@ -37,7 +36,7 @@ ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) {
     // Assign.
     self->more             = self->num_kids ? true : false;
     self->kids             = (Matcher**)MALLOCATE(self->num_kids * sizeof(Matcher*));
-    for (i = 0; i < self->num_kids; i++) {
+    for (uint32_t i = 0; i < self->num_kids; i++) {
         Matcher *child = (Matcher*)VA_Fetch(children, i);
         self->kids[i] = child;
         if (!Matcher_Next(child)) { self->more = false; }
@@ -91,11 +90,10 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target) {
 
     // Second step: reconcile.
     while (1) {
-        uint32_t i;
         bool_t agreement = true;
 
         // Scoot all Matchers up.
-        for (i = 0; i < num_kids; i++) {
+        for (uint32_t i = 0; i < num_kids; i++) {
             Matcher *const child = kids[i];
             int32_t candidate = Matcher_Get_Doc_ID(child);
 
@@ -121,7 +119,7 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target) {
         }
 
         // If Matchers don't agree, send back through the loop.
-        for (i = 0; i < num_kids; i++) {
+        for (uint32_t i = 0; i < num_kids; i++) {
             Matcher *const child = kids[i];
             const int32_t candidate = Matcher_Get_Doc_ID(child);
             if (candidate != highest) {
@@ -148,11 +146,10 @@ ANDMatcher_get_doc_id(ANDMatcher *self) {
 
 float
 ANDMatcher_score(ANDMatcher *self) {
-    uint32_t i;
     Matcher **const kids = self->kids;
     float score = 0.0f;
 
-    for (i = 0; i < self->num_kids; i++) {
+    for (uint32_t i = 0; i < self->num_kids; i++) {
         score += Matcher_Score(kids[i]);
     }
 

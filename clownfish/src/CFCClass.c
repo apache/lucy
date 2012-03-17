@@ -216,23 +216,22 @@ void
 CFCClass_destroy(CFCClass *self) {
     CFCBase_decref((CFCBase*)self->docucomment);
     CFCBase_decref((CFCBase*)self->parent);
-    size_t i;
-    for (i = 0; self->children[i] != NULL; i++) {
+    for (size_t i = 0; self->children[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->children[i]);
     }
-    for (i = 0; self->functions[i] != NULL; i++) {
+    for (size_t i = 0; self->functions[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->functions[i]);
     }
-    for (i = 0; self->methods[i] != NULL; i++) {
+    for (size_t i = 0; self->methods[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->methods[i]);
     }
-    for (i = 0; self->member_vars[i] != NULL; i++) {
+    for (size_t i = 0; self->member_vars[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->member_vars[i]);
     }
-    for (i = 0; self->inert_vars[i] != NULL; i++) {
+    for (size_t i = 0; self->inert_vars[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->inert_vars[i]);
     }
-    for (i = 0; self->attributes[i] != NULL; i++) {
+    for (size_t i = 0; self->attributes[i] != NULL; i++) {
         CFCClassAttribute *attribute = self->attributes[i];
         FREEMEM(attribute->name);
         FREEMEM(attribute->value);
@@ -265,8 +264,7 @@ S_register(CFCClass *self) {
         registry = (CFCClassRegEntry*)REALLOCATE(
                        registry,
                        (new_cap + 1) * sizeof(CFCClassRegEntry));
-        size_t i;
-        for (i = registry_cap; i <= new_cap; i++) {
+        for (size_t i = registry_cap; i <= new_cap; i++) {
             registry[i].key = NULL;
             registry[i].klass = NULL;
         }
@@ -304,8 +302,7 @@ CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name) {
     }
     char key[MAX_LEN + 1];
     sprintf(key, "%s%s", prefix, struct_sym);
-    size_t i;
-    for (i = 0; i < registry_size; i++) {
+    for (size_t i = 0; i < registry_size; i++) {
         if (strcmp(registry[i].key, key) == 0) {
             return registry[i].klass;
         }
@@ -315,8 +312,7 @@ CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name) {
 
 void
 CFCClass_clear_registry(void) {
-    size_t i;
-    for (i = 0; i < registry_size; i++) {
+    for (size_t i = 0; i < registry_size; i++) {
         CFCClass *klass = registry[i].klass;
         if (klass->parent) {
             // Break circular ref.
@@ -423,8 +419,7 @@ CFCClass_add_attribute(CFCClass *self, const char *name, const char *value) {
 int
 CFCClass_has_attribute(CFCClass *self, const char *name) {
     CFCUTIL_NULL_CHECK(name);
-    size_t i;
-    for (i = 0; i < self->num_attributes; i++) {
+    for (size_t i = 0; i < self->num_attributes; i++) {
         if (strcmp(name, self->attributes[i]->name) == 0) {
             return true;
         }
@@ -442,11 +437,10 @@ S_find_func(CFCFunction **funcs, const char *sym) {
     char lcsym[MAX_LEN + 1];
     size_t sym_len = strlen(sym);
     if (sym_len > MAX_LEN) { CFCUtil_die("sym too long: '%s'", sym); }
-    size_t i;
-    for (i = 0; i <= sym_len; i++) {
+    for (size_t i = 0; i <= sym_len; i++) {
         lcsym[i] = tolower(sym[i]);
     }
-    for (i = 0; funcs[i] != NULL; i++) {
+    for (size_t i = 0; funcs[i] != NULL; i++) {
         CFCFunction *func = funcs[i];
         if (strcmp(lcsym, CFCFunction_micro_sym(func)) == 0) {
             return func;
@@ -481,8 +475,7 @@ CFCClass_fresh_method(CFCClass *self, const char *sym) {
 // Pass down member vars to from parent to children.
 static void
 S_bequeath_member_vars(CFCClass *self) {
-    size_t i;
-    for (i = 0; self->children[i] != NULL; i++) {
+    for (size_t i = 0; self->children[i] != NULL; i++) {
         CFCClass *child = self->children[i];
         size_t num_vars = self->num_member_vars + child->num_member_vars;
         size_t size = (num_vars + 1) * sizeof(CFCVariable*);
@@ -493,8 +486,7 @@ S_bequeath_member_vars(CFCClass *self) {
                 child->num_member_vars * sizeof(CFCVariable*));
         memcpy(child->member_vars, self->member_vars,
                self->num_member_vars * sizeof(CFCVariable*));
-        size_t j;
-        for (j = 0; self->member_vars[j] != NULL; j++) {
+        for (size_t j = 0; self->member_vars[j] != NULL; j++) {
             CFCBase_incref((CFCBase*)child->member_vars[j]);
         }
         child->num_member_vars = num_vars;
@@ -505,8 +497,7 @@ S_bequeath_member_vars(CFCClass *self) {
 
 static void
 S_bequeath_methods(CFCClass *self) {
-    size_t child_num;
-    for (child_num = 0; self->children[child_num] != NULL; child_num++) {
+    for (size_t child_num = 0; self->children[child_num] != NULL; child_num++) {
         CFCClass *child = self->children[child_num];
 
         // Create array of methods, preserving exact order so vtables match up.
@@ -516,8 +507,7 @@ S_bequeath_methods(CFCClass *self) {
                                   (max_methods + 1) * sizeof(CFCMethod*));
 
         // Gather methods which child inherits or overrides.
-        size_t i;
-        for (i = 0; i < self->num_methods; i++) {
+        for (size_t i = 0; i < self->num_methods; i++) {
             CFCMethod *method = self->methods[i];
             const char *macro_sym = CFCMethod_get_macro_sym(method);
             CFCMethod *child_method = CFCClass_method(child, macro_sym);
@@ -532,7 +522,7 @@ S_bequeath_methods(CFCClass *self) {
 
         // Append novel child methods to array.  Child methods which were just
         // marked via CFCMethod_override() a moment ago are skipped.
-        for (i = 0; i < child->num_methods; i++) {
+        for (size_t i = 0; i < child->num_methods; i++) {
             CFCMethod *method = child->methods[i];
             if (CFCMethod_novel(method)) {
                 methods[num_methods++] = method;
@@ -543,7 +533,7 @@ S_bequeath_methods(CFCClass *self) {
         // Manage refcounts and assign new array.  Transform to final methods
         // if child class is a final class.
         if (child->is_final) {
-            for (i = 0; i < num_methods; i++) {
+            for (size_t i = 0; i < num_methods; i++) {
                 if (CFCMethod_final(methods[i])) {
                     CFCBase_incref((CFCBase*)methods[i]);
                 }
@@ -553,11 +543,11 @@ S_bequeath_methods(CFCClass *self) {
             }
         }
         else {
-            for (i = 0; i < num_methods; i++) {
+            for (size_t i = 0; i < num_methods; i++) {
                 CFCBase_incref((CFCBase*)methods[i]);
             }
         }
-        for (i = 0; i < child->num_methods; i++) {
+        for (size_t i = 0; i < child->num_methods; i++) {
             CFCBase_decref((CFCBase*)child->methods[i]);
         }
         FREEMEM(child->methods);
@@ -573,8 +563,7 @@ S_bequeath_methods(CFCClass *self) {
 // Let the children know who their parent class is.
 static void
 S_establish_ancestry(CFCClass *self) {
-    size_t i;
-    for (i = 0; i < self->num_kids; i++) {
+    for (size_t i = 0; i < self->num_kids; i++) {
         CFCClass *child = self->children[i];
         // This is a circular reference and thus a memory leak, but we don't
         // care, because we have to have everything in memory at once anyway.
@@ -586,8 +575,7 @@ S_establish_ancestry(CFCClass *self) {
 static size_t
 S_family_tree_size(CFCClass *self) {
     size_t count = 1; // self
-    size_t i;
-    for (i = 0; i < self->num_kids; i++) {
+    for (size_t i = 0; i < self->num_kids; i++) {
         count += S_family_tree_size(self->children[i]);
     }
     return count;
@@ -617,8 +605,7 @@ CFCClass_grow_tree(CFCClass *self) {
 static void
 S_generate_automethods(CFCClass *self) {
     S_create_dumpables(self);
-    size_t i;
-    for (i = 0; i < self->num_kids; i++) {
+    for (size_t i = 0; i < self->num_kids; i++) {
         S_generate_automethods(self->children[i]);
     }
 }
@@ -632,12 +619,10 @@ CFCClass_tree_to_ladder(CFCClass *self) {
     ladder[ladder_len] = NULL;
     size_t step = 0;
     ladder[step++] = self;
-    size_t i;
-    for (i = 0; i < self->num_kids; i++) {
+    for (size_t i = 0; i < self->num_kids; i++) {
         CFCClass *child = self->children[i];
         CFCClass **child_ladder = CFCClass_tree_to_ladder(child);
-        size_t j;
-        for (j = 0; child_ladder[j] != NULL; j++) {
+        for (size_t j = 0; child_ladder[j] != NULL; j++) {
             ladder[step++] = child_ladder[j];
         }
         FREEMEM(child_ladder);
@@ -653,8 +638,7 @@ S_fresh_syms(CFCClass *self, CFCSymbol **syms) {
     size_t amount = (count + 1) * sizeof(CFCSymbol*);
     CFCSymbol **fresh = (CFCSymbol**)MALLOCATE(amount);
     size_t num_fresh = 0;
-    size_t i;
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         CFCSymbol *sym = syms[i];
         const char *sym_cnick = CFCSymbol_get_class_cnick(sym);
         if (strcmp(sym_cnick, cnick) == 0) {
