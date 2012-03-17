@@ -149,15 +149,13 @@ def make_command
   command = rbconfig["make-prog"]
   if !command
     if RUBY_PLATFORM =~ /mswin/i
-      cc = cc_command
-      if cc =~ /^cl\b/
+      if cc_command =~ /^cl\b/
         command = "nmake"
-      else
-        command = "dmake"
       end
-    else
-      command = "make"
     end
+  end
+  if !command
+    command = 'make'
   end
   return command
 end
@@ -167,7 +165,7 @@ def run_make(dir, params)
   chdir(dir) if dir
   command = params.clone
   command.unshift("CC=#{cc_command}")
-  if RUBY_PLATFORM =~ /mswin/i
+  if RUBY_PLATFORM =~ /(mswin|mingw)/i
     if cc_command =~ /^cl\b/ 
       command.unshift("-f", "Makefile.MSVC")
     else
