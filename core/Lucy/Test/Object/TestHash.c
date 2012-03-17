@@ -58,9 +58,8 @@ test_Store_and_Fetch(TestBatch *batch) {
     ZombieCharBuf *twenty       = ZCB_WRAP_STR("20", 2);
     ZombieCharBuf *forty        = ZCB_WRAP_STR("40", 2);
     ZombieCharBuf *foo          = ZCB_WRAP_STR("foo", 3);
-    int32_t i;
 
-    for (i = 0; i < 100; i++) {
+    for (int32_t i = 0; i < 100; i++) {
         CharBuf *cb = CB_newf("%i32", i);
         Hash_Store(hash, (Obj*)cb, (Obj*)cb);
         Hash_Store(dupe, (Obj*)cb, INCREF(cb));
@@ -71,7 +70,7 @@ test_Store_and_Fetch(TestBatch *batch) {
     TEST_INT_EQ(batch, Hash_Get_Capacity(hash), starting_cap,
                 "Initial capacity sufficient (no rebuilds)");
 
-    for (i = 0; i < 100; i++) {
+    for (int32_t i = 0; i < 100; i++) {
         Obj *key  = VA_Fetch(expected, i);
         Obj *elem = Hash_Fetch(hash, key);
         VA_Push(got, (Obj*)INCREF(elem));
@@ -117,13 +116,12 @@ test_Store_and_Fetch(TestBatch *batch) {
 
 static void
 test_Keys_Values_Iter(TestBatch *batch) {
-    uint32_t i;
     Hash     *hash     = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected = VA_new(100);
     VArray   *keys;
     VArray   *values;
 
-    for (i = 0; i < 500; i++) {
+    for (uint32_t i = 0; i < 500; i++) {
         CharBuf *cb = CB_newf("%u32", i);
         Hash_Store(hash, (Obj*)cb, (Obj*)cb);
         VA_Push(expected, INCREF(cb));
@@ -207,9 +205,8 @@ static void
 test_serialization(TestBatch *batch) {
     Hash  *wanted = Hash_new(0);
     Hash  *got;
-    uint32_t  i;
 
-    for (i = 0; i < 10; i++) {
+    for (uint32_t i = 0; i < 10; i++) {
         CharBuf *cb = TestUtils_random_string(rand() % 1200);
         Integer32 *num = Int32_new(i);
         Hash_Store(wanted, (Obj*)cb, (Obj*)num);
@@ -226,13 +223,12 @@ test_serialization(TestBatch *batch) {
 
 static void
 test_stress(TestBatch *batch) {
-    uint32_t i;
     Hash     *hash     = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected = VA_new(1000);
     VArray   *keys;
     VArray   *values;
 
-    for (i = 0; i < 1000; i++) {
+    for (uint32_t i = 0; i < 1000; i++) {
         CharBuf *cb = TestUtils_random_string(rand() % 1200);
         while (Hash_Fetch(hash, (Obj*)cb)) {
             DECREF(cb);
@@ -245,7 +241,7 @@ test_stress(TestBatch *batch) {
     VA_Sort(expected, NULL, NULL);
 
     // Overwrite for good measure.
-    for (i = 0; i < 1000; i++) {
+    for (uint32_t i = 0; i < 1000; i++) {
         CharBuf *cb = (CharBuf*)VA_Fetch(expected, i);
         Hash_Store(hash, (Obj*)cb, INCREF(cb));
     }

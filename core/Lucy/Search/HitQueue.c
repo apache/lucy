@@ -46,7 +46,6 @@ HitQueue*
 HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
           uint32_t wanted) {
     if (sort_spec) {
-        uint32_t i;
         VArray   *rules      = SortSpec_Get_Rules(sort_spec);
         uint32_t  num_rules  = VA_Get_Size(rules);
         uint32_t  action_num = 0;
@@ -60,7 +59,7 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
         self->actions     = (uint8_t*)MALLOCATE(num_rules * sizeof(uint8_t));
         self->field_types = (FieldType**)CALLOCATE(num_rules, sizeof(FieldType*));
 
-        for (i = 0; i < num_rules; i++) {
+        for (uint32_t i = 0; i < num_rules; i++) {
             SortRule *rule      = (SortRule*)VA_Fetch(rules, i);
             int32_t   rule_type = SortRule_Get_Type(rule);
             bool_t    reverse   = SortRule_Get_Reverse(rule);

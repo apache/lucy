@@ -44,8 +44,7 @@ CFCParcel*
 CFCParcel_singleton(const char *name, const char *cnick) {
     // Set up registry.
     if (first_time) {
-        size_t i;
-        for (i = 1; i < MAX_PARCELS; i++) { registry[i] = NULL; }
+        for (size_t i = 1; i < MAX_PARCELS; i++) { registry[i] = NULL; }
         first_time = false;
     }
 
@@ -83,8 +82,7 @@ CFCParcel_reap_singletons(void) {
         // default parcel.
         CFCBase_decref((CFCBase*)registry[0]);
     }
-    int i;
-    for (i = 1; registry[i] != NULL; i++) {
+    for (int i = 1; registry[i] != NULL; i++) {
         CFCParcel *parcel = registry[i];
         CFCBase_decref((CFCBase*)parcel);
     }
@@ -146,8 +144,7 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick) {
     else {
         self->Prefix[cnick_len] = '\0';
     }
-    size_t i;
-    for (i = 0; i < amount; i++) {
+    for (size_t i = 0; i < amount; i++) {
         self->prefix[i] = tolower(self->Prefix[i]);
         self->PREFIX[i] = toupper(self->Prefix[i]);
     }

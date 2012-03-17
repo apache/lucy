@@ -93,7 +93,6 @@ S_do_consolidate(CompoundFileWriter *self) {
     VArray    *merged       = VA_new(VA_Get_Size(files));
     CharBuf   *cf_file      = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
     OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)cf_file);
-    uint32_t   i, max;
     bool_t     rename_success;
 
     if (!outstream) { RETHROW(INCREF(Err_get_error())); }
@@ -106,7 +105,7 @@ S_do_consolidate(CompoundFileWriter *self) {
     CharBuf *infilepath = CB_new(30);
     size_t base_len = 0;
     VA_Sort(files, NULL, NULL);
-    for (i = 0, max = VA_Get_Size(files); i < max; i++) {
+    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
         CharBuf *infilename = (CharBuf*)VA_Fetch(files, i);
 
         if (!CB_Ends_With_Str(infilename, ".json", 5)) {

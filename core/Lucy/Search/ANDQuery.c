@@ -47,8 +47,7 @@ ANDQuery_to_string(ANDQuery *self) {
     if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *retval = CB_new_from_trusted_utf8("(", 1);
-        uint32_t i;
-        for (i = 0; i < num_kids; i++) {
+        for (uint32_t i = 0; i < num_kids; i++) {
             CharBuf *kid_string = Obj_To_String(VA_Fetch(self->children, i));
             CB_Cat(retval, kid_string);
             DECREF(kid_string);
@@ -107,11 +106,10 @@ ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
         return Compiler_Make_Matcher(only_child, reader, need_score);
     }
     else {
-        uint32_t i;
         VArray *child_matchers = VA_new(num_kids);
 
         // Add child matchers one by one.
-        for (i = 0; i < num_kids; i++) {
+        for (uint32_t i = 0; i < num_kids; i++) {
             Compiler *child = (Compiler*)VA_Fetch(self->children, i);
             Matcher *child_matcher
                 = Compiler_Make_Matcher(child, reader, need_score);

@@ -63,8 +63,7 @@ S_cfcbase_to_perlref(void *thing) {
 static SV*
 S_array_of_cfcbase_to_av(CFCBase **things) {
     AV *av = newAV();
-    size_t i;
-    for (i = 0; things[i] != NULL; i++) {
+    for (size_t i = 0; things[i] != NULL; i++) {
         SV *val = S_cfcbase_to_perlref(things[i]);
         av_store(av, i, val);
     }
@@ -458,8 +457,7 @@ PPCODE:
         case 8: {
                 AV *av = newAV();
                 const char **names = CFCDocuComment_get_param_names(self);
-                size_t i;
-                for (i = 0; names[i] != NULL; i++) {
+                for (size_t i = 0; names[i] != NULL; i++) {
                     SV *val_sv = newSVpvn(names[i], strlen(names[i]));
                     av_store(av, i, val_sv);
                 }
@@ -470,8 +468,7 @@ PPCODE:
         case 10: {
                 AV *av = newAV();
                 const char **docs = CFCDocuComment_get_param_docs(self);
-                size_t i;
-                for (i = 0; docs[i] != NULL; i++) {
+                for (size_t i = 0; docs[i] != NULL; i++) {
                     SV *val_sv = newSVpvn(docs[i], strlen(docs[i]));
                     av_store(av, i, val_sv);
                 }
@@ -936,9 +933,8 @@ PPCODE:
         case 2: {
                 AV *av = newAV();
                 CFCVariable **vars = CFCParamList_get_variables(self);
-                size_t i;
                 size_t num_vars = CFCParamList_num_vars(self);
-                for (i = 0; i < num_vars; i++) {
+                for (size_t i = 0; i < num_vars; i++) {
                     SV *ref = S_cfcbase_to_perlref(vars[i]);
                     av_store(av, i, ref);
                 }
@@ -949,9 +945,8 @@ PPCODE:
         case 4: {
                 AV *av = newAV();
                 const char **values = CFCParamList_get_initial_values(self);
-                size_t i;
                 size_t num_vars = CFCParamList_num_vars(self);
-                for (i = 0; i < num_vars; i++) {
+                for (size_t i = 0; i < num_vars; i++) {
                     if (values[i] != NULL) {
                         SV *val_sv = newSVpvn(values[i], strlen(values[i]));
                         av_store(av, i, val_sv);

@@ -100,8 +100,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
                     macro_sym ? macro_sym : "[NULL]");
     }
     char *micro_sym = CFCUtil_strdup(macro_sym);
-    size_t i;
-    for (i = 0; micro_sym[i] != '\0'; i++) {
+    for (size_t i = 0; micro_sym[i] != '\0'; i++) {
         micro_sym[i] = tolower(micro_sym[i]);
     }
 
@@ -177,8 +176,7 @@ CFCMethod_compatible(CFCMethod *self, CFCMethod *other) {
     CFCVariable **other_args = CFCParamList_get_variables(other_param_list);
     const char  **my_vals    = CFCParamList_get_initial_values(my_param_list);
     const char  **other_vals = CFCParamList_get_initial_values(other_param_list);
-    size_t i;
-    for (i = 1; ; i++) {  // start at 1, skipping self
+    for (size_t i = 1; ; i++) {  // start at 1, skipping self
         if (!!my_args[i] != !!other_args[i]) { return false; }
         if (!!my_vals[i] != !!other_vals[i]) { return false; }
         if (my_vals[i]) {

@@ -70,10 +70,9 @@ test_Buf(TestBatch *batch) {
     OutStream  *outstream = OutStream_open((Obj*)file);
     size_t      size      = IO_STREAM_BUF_SIZE * 2 + 5;
     InStream   *instream;
-    uint32_t i;
     char       *buf;
 
-    for (i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; i++) {
         OutStream_Write_U8(outstream, 'a');
     }
     OutStream_Close(outstream);

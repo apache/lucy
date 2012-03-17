@@ -50,10 +50,9 @@ CFCFunction_new(CFCParcel *parcel, const char *exposure,
 
 static int
 S_validate_micro_sym(const char *micro_sym) {
-    size_t i;
     size_t len = strlen(micro_sym);
     if (!len) { return false; }
-    for (i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         char c = micro_sym[i];
         if (!islower(c) && !isdigit(c) && c != '_') { return false; }
     }

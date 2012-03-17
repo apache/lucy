@@ -78,8 +78,7 @@ CFCParamList_add_param(CFCParamList *self, CFCVariable *variable,
 
 void
 CFCParamList_destroy(CFCParamList *self) {
-    size_t i;
-    for (i = 0; i < self->num_vars; i++) {
+    for (size_t i = 0; i < self->num_vars; i++) {
         CFCBase_decref((CFCBase*)self->variables[i]);
         FREEMEM(self->values[i]);
     }
@@ -94,10 +93,9 @@ static void
 S_generate_c_strings(CFCParamList *self) {
     size_t c_string_size = 1;
     size_t name_list_size = 1;
-    size_t i;
 
     // Calc space requirements and allocate memory.
-    for (i = 0; i < self->num_vars; i++) {
+    for (size_t i = 0; i < self->num_vars; i++) {
         CFCVariable *var = self->variables[i];
         c_string_size += sizeof(", ");
         c_string_size += strlen(CFCVariable_local_c(var));
@@ -115,7 +113,7 @@ S_generate_c_strings(CFCParamList *self) {
     self->name_list[0] = '\0';
 
     // Build the strings.
-    for (i = 0; i < self->num_vars; i++) {
+    for (size_t i = 0; i < self->num_vars; i++) {
         CFCVariable *var = self->variables[i];
         strcat(self->c_string, CFCVariable_local_c(var));
         strcat(self->name_list, CFCVariable_micro_sym(var));

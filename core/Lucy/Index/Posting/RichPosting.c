@@ -122,10 +122,9 @@ RichPost_add_inversion_to_pool(RichPosting *self, PostingPool *post_pool,
         char *const start = raw_posting->blob + token->len;
         char *dest = start;
         uint32_t last_prox = 0;
-        uint32_t i;
 
         // Positions and boosts.
-        for (i = 0; i < freq; i++) {
+        for (uint32_t i = 0; i < freq; i++) {
             Token *const t = tokens[i];
             const uint32_t prox_delta = t->pos - last_prox;
             const float boost = field_boost * t->boost;

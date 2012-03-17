@@ -288,7 +288,6 @@ static lucy_TestQPSyntax_test_t syntax_test_funcs[] = {
 
 void
 TestQPSyntax_run_tests(Folder *index) {
-    uint32_t i;
     TestBatch     *batch      = TestBatch_new(66);
     IndexSearcher *searcher   = IxSearcher_new((Obj*)index);
     QueryParser   *qparser    = QParser_new(IxSearcher_Get_Schema(searcher),
@@ -297,7 +296,7 @@ TestQPSyntax_run_tests(Folder *index) {
 
     TestBatch_Plan(batch);
 
-    for (i = 0; leaf_test_funcs[i] != NULL; i++) {
+    for (uint32_t i = 0; leaf_test_funcs[i] != NULL; i++) {
         lucy_TestQPSyntax_test_t test_func = leaf_test_funcs[i];
         TestQueryParser *test_case = test_func();
         Query *tree     = QParser_Tree(qparser, test_case->query_string);
@@ -318,7 +317,7 @@ TestQPSyntax_run_tests(Folder *index) {
         DECREF(test_case);
     }
 
-    for (i = 0; syntax_test_funcs[i] != NULL; i++) {
+    for (uint32_t i = 0; syntax_test_funcs[i] != NULL; i++) {
         lucy_TestQPSyntax_test_t test_func = syntax_test_funcs[i];
         TestQueryParser *test_case = test_func();
         Query *tree   = QParser_Tree(qparser, test_case->query_string);

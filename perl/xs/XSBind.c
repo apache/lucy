@@ -277,10 +277,9 @@ static cfish_VArray*
 S_perl_array_to_cfish_array(AV *parray) {
     const uint32_t  size   = av_len(parray) + 1;
     cfish_VArray   *retval = cfish_VA_new(size);
-    uint32_t i;
 
     // Iterate over array elems.
-    for (i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; i++) {
         SV **elem_sv = av_fetch(parray, i, false);
         if (elem_sv) {
             cfish_Obj *elem = XSBind_perl_to_cfish(*elem_sv);
@@ -299,9 +298,8 @@ S_cfish_array_to_perl_array(cfish_VArray *varray) {
 
     // Iterate over array elems.
     if (num_elems) {
-        uint32_t i;
         av_fill(perl_array, num_elems - 1);
-        for (i = 0; i < num_elems; i++) {
+        for (uint32_t i = 0; i < num_elems; i++) {
             cfish_Obj *val = Cfish_VA_Fetch(varray, i);
             if (val == NULL) {
                 continue;

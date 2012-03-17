@@ -247,7 +247,6 @@ TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher,
     VArray          *spans   = VA_new(0);
     TermVector *term_vector;
     I32Array *starts, *ends;
-    uint32_t i, max;
     UNUSED_VAR(searcher);
 
     if (!CB_Equals(parent->field, (Obj*)field)) { return spans; }
@@ -258,7 +257,7 @@ TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher,
 
     starts = TV_Get_Start_Offsets(term_vector);
     ends   = TV_Get_End_Offsets(term_vector);
-    for (i = 0, max = I32Arr_Get_Size(starts); i < max; i++) {
+    for (uint32_t i = 0, max = I32Arr_Get_Size(starts); i < max; i++) {
         int32_t start  = I32Arr_Get(starts, i);
         int32_t length = I32Arr_Get(ends, i) - start;
         VA_Push(spans,

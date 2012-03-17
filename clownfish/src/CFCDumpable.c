@@ -189,8 +189,7 @@ S_add_dump_method(CFCClass *klass) {
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **fresh = CFCClass_fresh_member_vars(klass);
-        size_t i;
-        for (i = 0; fresh[i] != NULL; i++) {
+        for (size_t i = 0; fresh[i] != NULL; i++) {
             S_process_dump_member(klass, fresh[i], buf, BUF_SIZE);
         }
         FREEMEM(fresh);
@@ -212,8 +211,7 @@ S_add_dump_method(CFCClass *klass) {
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
-        size_t i;
-        for (i = 0; members[i] != NULL; i++) {
+        for (size_t i = 0; members[i] != NULL; i++) {
             S_process_dump_member(klass, members[i], buf, BUF_SIZE);
         }
     }
@@ -256,8 +254,7 @@ S_add_load_method(CFCClass *klass) {
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **fresh = CFCClass_fresh_member_vars(klass);
-        size_t i;
-        for (i = 0; fresh[i] != NULL; i++) {
+        for (size_t i = 0; fresh[i] != NULL; i++) {
             S_process_load_member(klass, fresh[i], buf, BUF_SIZE);
         }
         FREEMEM(fresh);
@@ -283,8 +280,7 @@ S_add_load_method(CFCClass *klass) {
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
-        size_t i;
-        for (i = 0; members[i] != NULL; i++) {
+        for (size_t i = 0; members[i] != NULL; i++) {
             S_process_load_member(klass, members[i], buf, BUF_SIZE);
         }
     }

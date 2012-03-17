@@ -108,7 +108,6 @@ Seg_read_file(Segment *self, Folder *folder) {
     else { self->count = Obj_To_I64(count); }
 
     // Get list of field nums.
-    uint32_t i;
     VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata,
                                                     "field_names", 11);
     uint32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
@@ -123,7 +122,7 @@ Seg_read_file(Segment *self, Folder *folder) {
     self->by_name = Hash_new(num_fields);
 
     // Copy the list of fields from the source.
-    for (i = 0; i < num_fields; i++) {
+    for (uint32_t i = 0; i < num_fields; i++) {
         CharBuf *name = (CharBuf*)VA_Fetch(source_by_num, i);
         Seg_Add_Field(self, name);
     }

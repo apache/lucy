@@ -32,7 +32,6 @@ static CHY_INLINE void
 SI_push_args(void *vobj, va_list args, uint32_t num_args) {
     lucy_Obj *obj = (lucy_Obj*)vobj;
     SV *invoker;
-    uint32_t i;
     dSP;
 
     uint32_t stack_slots_needed = num_args < 2
@@ -54,7 +53,7 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args) {
     PUSHMARK(SP);
     PUSHs(sv_2mortal(invoker));
 
-    for (i = 0; i < num_args; i++) {
+    for (uint32_t i = 0; i < num_args; i++) {
         uint32_t arg_type = va_arg(args, uint32_t);
         char *label = va_arg(args, char*);
         if (num_args > 1) {

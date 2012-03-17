@@ -104,12 +104,11 @@ CFCFile_init(CFCFile *self, const char *source_class) {
 
 void
 CFCFile_destroy(CFCFile *self) {
-    size_t i;
-    for (i = 0; self->blocks[i] != NULL; i++) {
+    for (size_t i = 0; self->blocks[i] != NULL; i++) {
         CFCBase_decref(self->blocks[i]);
     }
     FREEMEM(self->blocks);
-    for (i = 0; self->classes[i] != NULL; i++) {
+    for (size_t i = 0; self->classes[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->classes[i]);
     }
     FREEMEM(self->classes);
@@ -178,8 +177,7 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
     else {
         sprintf(buf, "%s%s", self->path_part, ext);
     }
-    size_t i;
-    for (i = 0; buf[i] != '\0'; i++) {
+    for (size_t i = 0; buf[i] != '\0'; i++) {
         #ifdef _WIN32
         if (buf[i] == '/') { buf[i] = '\\'; }
         #else

@@ -148,8 +148,7 @@ PriQ_pop_all(PriorityQueue *self) {
 
     // Map the queue nodes onto the array in reverse order.
     if (self->size) {
-        uint32_t i;
-        for (i = self->size; i--;) {
+        for (uint32_t i = self->size; i--;) {
             Obj *const elem = PriQ_Pop(self);
             VA_Store(retval, i, elem);
         }

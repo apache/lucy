@@ -93,9 +93,8 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
     self->array       = NULL;
     self->child       = NULL;
     if (flags & CFCTYPE_OBJECT) {
-        int i;
         self->vtable_var = CFCUtil_strdup(specifier);
-        for (i = 0; self->vtable_var[i] != 0; i++) {
+        for (int i = 0; self->vtable_var[i] != 0; i++) {
             self->vtable_var[i] = toupper(self->vtable_var[i]);
         }
     }
@@ -172,8 +171,7 @@ static const char *float_specifiers[] = {
 CFCType*
 CFCType_new_float(int flags, const char *specifier) {
     // Validate specifier.
-    size_t i;
-    for (i = 0; ; i++) {
+    for (size_t i = 0; ; i++) {
         if (!float_specifiers[i]) {
             CFCUtil_die("Unknown float specifier: '%s'", specifier);
         }
@@ -284,8 +282,7 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
     }
     char c_string[MAX_LEN + 1];
     strcpy(c_string, child_c_string);
-    int i;
-    for (i = 0; i < indirection; i++) {
+    for (int i = 0; i < indirection; i++) {
         strncat(c_string, "*", 1);
     }
 
@@ -338,8 +335,7 @@ CFCType_new_arbitrary(CFCParcel *parcel, const char *specifier) {
     }
 
     // Validate specifier.
-    size_t i, max;
-    for (i = 0, max = strlen(full_specifier); i < max; i++) {
+    for (size_t i = 0, max = strlen(full_specifier); i < max; i++) {
         if (!isalnum(full_specifier[i]) && full_specifier[i] != '_') {
             CFCUtil_die("Illegal specifier: '%s'", full_specifier);
         }

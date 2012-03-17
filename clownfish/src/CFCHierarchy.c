@@ -91,11 +91,10 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest) {
 
 void
 CFCHierarchy_destroy(CFCHierarchy *self) {
-    size_t i;
-    for (i = 0; self->trees[i] != NULL; i++) {
+    for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->trees[i]);
     }
-    for (i = 0; self->files[i] != NULL; i++) {
+    for (size_t i = 0; self->files[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->files[i]);
     }
     FREEMEM(self->trees);
@@ -109,8 +108,7 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
 void
 CFCHierarchy_build(CFCHierarchy *self) {
     S_parse_cf_files(self);
-    size_t i;
-    for (i = 0; self->trees[i] != NULL; i++) {
+    for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass_grow_tree(self->trees[i]);
     }
 }
@@ -171,8 +169,7 @@ S_parse_cf_files(CFCHierarchy *self) {
     size_t source_class_max = 0;
 
     // Process any file that has at least one class declaration.
-    int i;
-    for (i = 0; all_source_paths[i] != NULL; i++) {
+    for (int i = 0; all_source_paths[i] != NULL; i++) {
         // Derive the name of the class that owns the module file.
         char *source_path = all_source_paths[i];
         size_t source_path_len = strlen(source_path);
@@ -180,13 +177,12 @@ S_parse_cf_files(CFCHierarchy *self) {
             CFCUtil_die("'%s' doesn't start with '%s'", source_path,
                         source_dir);
         }
-        size_t j;
         size_t source_class_len = 0;
         if (source_class_max < source_path_len * 2 + 1) {
             source_class_max = source_path_len * 2 + 1;
             source_class = (char*)REALLOCATE(source_class, source_class_max);
         }
-        for (j = source_dir_len; j < source_path_len - strlen(".cfh"); j++) {
+        for (size_t j = source_dir_len; j < source_path_len - strlen(".cfh"); j++) {
             char c = source_path[j];
             if (isalnum(c)) {
                 source_class[source_class_len++] = c;
@@ -211,7 +207,7 @@ S_parse_cf_files(CFCHierarchy *self) {
         S_add_file(self, file);
 
         CFCClass **classes_in_file = CFCFile_classes(file);
-        for (j = 0; classes_in_file[j] != NULL; j++) {
+        for (size_t j = 0; classes_in_file[j] != NULL; j++) {
             if (num_classes == all_classes_cap) {
                 all_classes_cap += 10;
                 all_classes = (CFCClass**)REALLOCATE(
@@ -225,12 +221,11 @@ S_parse_cf_files(CFCHierarchy *self) {
     all_classes[num_classes] = NULL;
 
     // Wrangle the classes into hierarchies and figure out inheritance.
-    for (i = 0; all_classes[i] != NULL; i++) {
+    for (int i = 0; all_classes[i] != NULL; i++) {
         CFCClass *klass = all_classes[i];
         const char *parent_name = CFCClass_get_parent_class_name(klass);
         if (parent_name) {
-            size_t j;
-            for (j = 0; ; j++) {
+            for (size_t j = 0; ; j++) {
                 CFCClass *maybe_parent = all_classes[j];
                 if (!maybe_parent) {
                     CFCUtil_die("Parent class '%s' not defined", parent_name);
@@ -249,7 +244,7 @@ S_parse_cf_files(CFCHierarchy *self) {
     }
 
     FREEMEM(all_classes);
-    for (i = 0; all_source_paths[i] != NULL; i++) {
+    for (int i = 0; all_source_paths[i] != NULL; i++) {
         FREEMEM(all_source_paths[i]);
     }
     FREEMEM(all_source_paths);
@@ -260,8 +255,7 @@ int
 CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified) {
     // Seed the recursive write.
     int somebody_is_modified = false;
-    size_t i;
-    for (i = 0; self->trees[i] != NULL; i++) {
+    for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass *tree = self->trees[i];
         if (S_do_propagate_modified(self, tree, modified)) {
             somebody_is_modified = true;
@@ -297,9 +291,8 @@ S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
 
     // Proceed to the next generation.
     int somebody_is_modified = modified;
-    size_t i;
     CFCClass **children = CFCClass_children(klass);
-    for (i = 0; children[i] != NULL; i++) {
+    for (size_t i = 0; children[i] != NULL; i++) {
         CFCClass *kid = children[i];
         if (CFCClass_final(klass)) {
             CFCUtil_die("Attempt to inherit from final class '%s' by '%s'",
@@ -318,8 +311,7 @@ static void
 S_add_tree(CFCHierarchy *self, CFCClass *klass) {
     CFCUTIL_NULL_CHECK(klass);
     const char *full_struct_sym = CFCClass_full_struct_sym(klass);
-    size_t i;
-    for (i = 0; self->trees[i] != NULL; i++) {
+    for (size_t i = 0; self->trees[i] != NULL; i++) {
         const char *existing = CFCClass_full_struct_sym(self->trees[i]);
         if (strcmp(full_struct_sym, existing) == 0) {
             CFCUtil_die("Tree '%s' alread added", full_struct_sym);
@@ -339,12 +331,10 @@ CFCHierarchy_ordered_classes(CFCHierarchy *self) {
     size_t max_classes = 10;
     CFCClass **ladder = (CFCClass**)MALLOCATE(
                             (max_classes + 1) * sizeof(CFCClass*));
-    size_t i;
-    for (i = 0; self->trees[i] != NULL; i++) {
+    for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass *tree = self->trees[i];
         CFCClass **child_ladder = CFCClass_tree_to_ladder(tree);
-        size_t j;
-        for (j = 0; child_ladder[j] != NULL; j++) {
+        for (size_t j = 0; child_ladder[j] != NULL; j++) {
             if (num_classes == max_classes) {
                 max_classes += 10;
                 ladder = (CFCClass**)REALLOCATE(
@@ -360,8 +350,7 @@ CFCHierarchy_ordered_classes(CFCHierarchy *self) {
 
 static CFCFile*
 S_fetch_file(CFCHierarchy *self, const char *source_class) {
-    size_t i;
-    for (i = 0; self->files[i] != NULL; i++) {
+    for (size_t i = 0; self->files[i] != NULL; i++) {
         const char *existing = CFCFile_get_source_class(self->files[i]);
         if (strcmp(source_class, existing) == 0) {
             return self->files[i];
@@ -375,8 +364,7 @@ S_add_file(CFCHierarchy *self, CFCFile *file) {
     CFCUTIL_NULL_CHECK(file);
     const char *source_class = CFCFile_get_source_class(file);
     CFCClass **classes = CFCFile_classes(file);
-    size_t i;
-    for (i = 0; self->files[i] != NULL; i++) {
+    for (size_t i = 0; self->files[i] != NULL; i++) {
         CFCFile *existing = self->files[i];
         const char *old_source_class = CFCFile_get_source_class(existing);
         if (strcmp(source_class, old_source_class) == 0) {
@@ -384,11 +372,9 @@ S_add_file(CFCHierarchy *self, CFCFile *file) {
                         source_class);
         }
         CFCClass **existing_classes = CFCFile_classes(existing);
-        size_t j;
-        for (j = 0; classes[j] != NULL; j++) {
+        for (size_t j = 0; classes[j] != NULL; j++) {
             const char *new_class_name = CFCClass_get_class_name(classes[j]);
-            size_t k;
-            for (k = 0; existing_classes[k] != NULL; k++) {
+            for (size_t k = 0; existing_classes[k] != NULL; k++) {
                 const char *existing_class_name
                     = CFCClass_get_class_name(existing_classes[k]);
                 if (strcmp(new_class_name, existing_class_name) == 0) {

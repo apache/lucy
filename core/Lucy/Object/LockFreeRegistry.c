@@ -109,10 +109,9 @@ LFReg_fetch(LockFreeRegistry *self, Obj *key) {
 
 void
 LFReg_destroy(LockFreeRegistry *self) {
-    size_t i;
     LFRegEntry **entries = (LFRegEntry**)self->entries;
 
-    for (i = 0; i < self->capacity; i++) {
+    for (size_t i = 0; i < self->capacity; i++) {
         LFRegEntry *entry = entries[i];
         while (entry) {
             LFRegEntry *next_entry = entry->next;
