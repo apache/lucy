@@ -110,25 +110,30 @@ def cc_command
 end
 
 def extra_ccflags 
-  ccflags  = '-std=gnu99 -fno-common -fno-strict-aliasing -pipe -fstack-protector -O3 '
-  ccflags += ENV['CFLAGS'] if ENV['CFLAGS']
+  ccflags = '-DCFCRUBY '
   
-  if !defined?(cc_command)
-    abort "Invalid GCC version: gcc_version"
+  if defined?(rbconfig["CFLAGS"])
+    ccflags += rbconfig['CFLAGS'] + ' '
+  end
+
+  if ENV.has_key?('CFLAGS')
+    ccflags += ENV['CFLAGS']
   end
   
   if ENV.has_key?('LUCY_VALGRIND')
     ccflags += "-fno-inline-functions "
   end
   
+  # Compile as C++ under MSVC.  Turn off stupid warnings, too.
   if cc_command =~ /^cl\b/ 
     ccflags += '/TP -D_CRT_SECURE_NO_WARNINGS '
   end
   
+  # Blindly include GCC-specific flags even though we don't know that the
+  # compiler is GCC.
   if ccflags !~ /-std=/
     ccflags += "-std=gnu99 "
   end
-  
   if ccflags !~ /-D_GNU_SOURCE/ 
     ccflags += "-D_GNU_SOURCE "
   end
