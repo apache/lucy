@@ -17,11 +17,12 @@
 #include "ruby.h"
 #include "CFC.h"
 
-static VALUE mBinding;
 static VALUE mClownfish;
 static VALUE mCFC;
-static VALUE cBindCore;
+static VALUE mModel;
 static VALUE cHierarchy;
+static VALUE mBinding;
+static VALUE cBindCore;
 
 static VALUE
 S_CFC_Binding_Core_Alloc(VALUE klass) {
@@ -95,7 +96,7 @@ S_CFC_Hierarchy_Build(VALUE self_rb) {
 
 static void
 S_init_Hierarchy(void) {
-    cHierarchy = rb_define_class_under(mCFC, "Hierarchy", rb_cObject);
+    cHierarchy = rb_define_class_under(mModel, "Hierarchy", rb_cObject);
     rb_define_alloc_func(cHierarchy, S_CFC_Hierarchy_Alloc);
     rb_define_method(cHierarchy, "initialize", S_CFC_Hierarchy_Init, 2);
     rb_define_method(cHierarchy, "build", S_CFC_Hierarchy_Build, 0);
@@ -106,6 +107,7 @@ Init_CFC() {
     mClownfish  = rb_define_module("Clownfish");
     mCFC        = rb_define_module_under(mClownfish, "CFC");
     mBinding    = rb_define_module_under(mCFC, "Binding");
+    mModel      = rb_define_module_under(mCFC, "Model");
     S_init_Binding_Core();
     S_init_Hierarchy();
 }
