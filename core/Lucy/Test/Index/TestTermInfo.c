@@ -24,31 +24,31 @@
 void 
 test_freqfilepos(TestBatch *batch) {
     TermInfo* tinfo = TInfo_new(10);
-    TInfo_set_post_filepos(tinfo, 20);
-    TInfo_set_skip_filepos(tinfo, 40);
-    TInfo_set_lex_filepos(tinfo, 50);
+    TInfo_Set_Post_FilePos(tinfo, 20);
+    TInfo_Set_Skip_FilePos(tinfo, 40);
+    TInfo_Set_Lex_FilePos(tinfo, 50);
 
-    TermInfo* cloned_tinfo = TInfo_clone(tinfo);
+    TermInfo* cloned_tinfo = TInfo_Clone(tinfo);
 
     TEST_FALSE(batch, Lucy_TInfo_Equals(tinfo, (lucy_Obj*)cloned_tinfo),"the clone should be a separate C struct");
-    TEST_INT_EQ(batch, TInfo_get_doc_freq(tinfo), 10, "new sets doc_freq correctly" );
-    TEST_INT_EQ(batch, TInfo_get_doc_freq(tinfo), 10, "... doc_freq cloned" );
-    TEST_INT_EQ(batch, TInfo_get_post_filepos(tinfo), 20, "... post_filepos cloned" );
-    TEST_INT_EQ(batch, TInfo_get_skip_filepos(tinfo), 40, "... skip_filepos cloned" );
-    TEST_INT_EQ(batch, TInfo_get_lex_filepos(tinfo),  50, "... lex_filepos cloned" );
+    TEST_INT_EQ(batch, TInfo_Get_Doc_Freq(tinfo), 10, "new sets doc_freq correctly" );
+    TEST_INT_EQ(batch, TInfo_Get_Doc_Freq(tinfo), 10, "... doc_freq cloned" );
+    TEST_INT_EQ(batch, TInfo_Get_Post_FilePos(tinfo), 20, "... post_filepos cloned" );
+    TEST_INT_EQ(batch, TInfo_Get_Skip_FilePos(tinfo), 40, "... skip_filepos cloned" );
+    TEST_INT_EQ(batch, TInfo_Get_Lex_FilePos(tinfo),  50, "... lex_filepos cloned" );
 
-    TInfo_set_doc_freq(tinfo, 5);
-    TEST_INT_EQ(batch, TInfo_get_doc_freq(tinfo), 5,  "set/get doc_freq" );
-    TEST_INT_EQ(batch, TInfo_get_doc_freq(cloned_tinfo), 10, "setting orig doesn't affect clone" );
+    TInfo_Set_Doc_Freq(tinfo, 5);
+    TEST_INT_EQ(batch, TInfo_Get_Doc_Freq(tinfo), 5,  "set/get doc_freq" );
+    TEST_INT_EQ(batch, TInfo_Get_Doc_Freq(cloned_tinfo), 10, "setting orig doesn't affect clone" );
 
-    TInfo_set_post_filepos(tinfo, 15);
-    TEST_INT_EQ(batch, TInfo_get_post_filepos(tinfo), 15, "set/get post_filepos" );
+    TInfo_Set_Post_FilePos(tinfo, 15);
+    TEST_INT_EQ(batch, TInfo_Get_Post_FilePos(tinfo), 15, "set/get post_filepos" );
 
-    TInfo_set_skip_filepos(tinfo, 35);
-    TEST_INT_EQ(batch, TInfo_get_skip_filepos(tinfo), 35, "set/get skip_filepos" );
+    TInfo_Set_Skip_FilePos(tinfo, 35);
+    TEST_INT_EQ(batch, TInfo_Get_Skip_FilePos(tinfo), 35, "set/get skip_filepos" );
 
-    TInfo_set_lex_filepos(tinfo, 45);
-    TEST_INT_EQ(batch, TInfo_get_lex_filepos(tinfo), 45, "set/get lex_filepos" );
+    TInfo_Set_Lex_FilePos(tinfo, 45);
+    TEST_INT_EQ(batch, TInfo_Get_Lex_FilePos(tinfo), 45, "set/get lex_filepos" );
 
     DECREF(tinfo);
     DECREF(cloned_tinfo);
