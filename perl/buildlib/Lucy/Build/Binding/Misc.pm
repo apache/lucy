@@ -167,6 +167,9 @@ PPCODE:
     else if (strEQ(package, "TestSnapshot")) {
         lucy_TestSnapshot_run_tests();
     }
+    else if (strEQ(package, "TestTermInfo")) {
+        lucy_TestTermInfo_run_tests();
+    }
     // Lucy::Search
     else if (strEQ(package, "TestANDQuery")) {
         lucy_TestANDQuery_run_tests();

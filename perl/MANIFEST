@@ -249,7 +249,6 @@ t/201-hit_doc.t
 t/204-doc_reader.t
 t/205-seg_reader.t
 t/207-seg_lexicon.t
-t/208-terminfo.t
 t/209-seg_lexicon_heavy.t
 t/210-deldocs.t
 t/211-seg_posting_list.t
@@ -378,6 +377,7 @@ t/core/156-snowball_stemmer.t
 t/core/157-normalizer.t
 t/core/158-standard_tokenizer.t
 t/core/206-snapshot.t
+t/core/208-terminfo.t
 t/core/216-schema.t
 t/core/220-doc_writer.t
 t/core/221-highlight_writer.t
