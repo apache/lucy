@@ -50,7 +50,7 @@ struct CFCHierarchy {
 };
 
 static void
-S_parse_cf_files(CFCHierarchy *self);
+S_parse_cf_files(CFCHierarchy *self, const char *source_dir);
 
 static void
 S_connect_classes(CFCHierarchy *self);
@@ -118,7 +118,7 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
 
 void
 CFCHierarchy_build(CFCHierarchy *self) {
-    S_parse_cf_files(self);
+    S_parse_cf_files(self, self->source);
     S_connect_classes(self);
     for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass_grow_tree(self->trees[i]);
@@ -126,7 +126,7 @@ CFCHierarchy_build(CFCHierarchy *self) {
 }
 
 static char**
-S_find_cfh(char *dir, char **cfh_list, size_t num_cfh) {
+S_find_cfh(const char *dir, char **cfh_list, size_t num_cfh) {
     void *dirhandle = CFCUtil_opendir(dir);
     size_t full_path_cap = strlen(dir) * 2;
     char *full_path = (char*)MALLOCATE(full_path_cap);
@@ -168,10 +168,9 @@ S_find_cfh(char *dir, char **cfh_list, size_t num_cfh) {
 }
 
 static void
-S_parse_cf_files(CFCHierarchy *self) {
+S_parse_cf_files(CFCHierarchy *self, const char *source_dir) {
     char **all_source_paths = (char**)CALLOCATE(1, sizeof(char*));
-    all_source_paths = S_find_cfh(self->source, all_source_paths, 0);
-    const char *source_dir = self->source;
+    all_source_paths = S_find_cfh(source_dir, all_source_paths, 0);
     size_t source_dir_len  = strlen(source_dir);
     char *source_class = NULL;
     size_t source_class_max = 0;
