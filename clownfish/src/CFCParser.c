@@ -40,6 +40,7 @@ struct CFCParser {
     char *class_name;
     char *class_cnick;
     char *source_class;
+    char *source_dir;
     CFCMemPool *pool;
     CFCParcel  *parcel;
 };
@@ -115,13 +116,16 @@ CFCParser_parse(CFCParser *self, const char *string) {
 
 CFCFile*
 CFCParser_parse_file(CFCParser *self, const char *string,
-                     const char *source_class) {
+                     const char *source_class, const char *source_dir) {
     CFCParser_set_parcel(self, NULL);
     self->source_class = CFCUtil_strdup(source_class);
+    self->source_dir   = CFCUtil_strdup(source_dir);
     CFCParseHeader(self->header_parser, CFC_TOKENTYPE_FILE_START, NULL, self);
     CFCFile *result = (CFCFile*)CFCParser_parse(self, string);
     FREEMEM(self->source_class);
+    FREEMEM(self->source_dir);
     self->source_class = NULL;
+    self->source_dir = NULL;
     return result;
 }
 
@@ -207,5 +211,10 @@ CFCParser_set_source_class(CFCParser *self, const char *source_class) {
 const char*
 CFCParser_get_source_class(CFCParser *self) {
     return self->source_class;
+}
+
+const char*
+CFCParser_get_source_dir(CFCParser *self) {
+    return self->source_dir;
 }
 

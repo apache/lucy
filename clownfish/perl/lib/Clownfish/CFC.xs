@@ -509,10 +509,11 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::File
 
 SV*
-_new(source_class)
+_new(source_class, source_dir)
     const char *source_class;
+    const char *source_dir;
 CODE:
-    CFCFile *self = CFCFile_new(source_class);
+    CFCFile *self = CFCFile_new(source_class, source_dir);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -2241,12 +2242,13 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_parse_file(self, string, source_class)
+_parse_file(self, string, source_class, source_dir)
     CFCParser  *self;
     const char *string;
     const char *source_class;
+    const char *source_dir;
 CODE:
-    CFCFile *got = CFCParser_parse_file(self, string, source_class);
+    CFCFile *got = CFCParser_parse_file(self, string, source_class, source_dir);
     RETVAL = S_cfcbase_to_perlref(got);
     CFCBase_decref((CFCBase*)got);
 OUTPUT: RETVAL

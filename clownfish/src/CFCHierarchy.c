@@ -206,7 +206,8 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir) {
         // Slurp, parse, add parsed file to pool.
         size_t unused;
         char *content = CFCUtil_slurp_text(source_path, &unused);
-        CFCFile *file = CFCParser_parse_file(self->parser, content, source_class);
+        CFCFile *file = CFCParser_parse_file(self->parser, content,
+                                             source_class, source_dir);
         FREEMEM(content);
         if (!file) {
             CFCUtil_die("parser error for %s", source_path);
@@ -282,9 +283,10 @@ int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
     const char *source_class = CFCClass_get_source_class(klass);
     CFCFile *file = S_fetch_file(self, source_class);
-    size_t cfh_buf_size = CFCFile_path_buf_size(file, self->source);
+    const char *source_dir = CFCFile_get_source_dir(file);
+    size_t cfh_buf_size = CFCFile_path_buf_size(file, source_dir);
     char *source_path = (char*)MALLOCATE(cfh_buf_size);
-    CFCFile_cfh_path(file, source_path, cfh_buf_size, self->source);
+    CFCFile_cfh_path(file, source_path, cfh_buf_size, source_dir);
     size_t h_buf_size = CFCFile_path_buf_size(file, self->dest);
     char *h_path = (char*)MALLOCATE(h_buf_size);
     CFCFile_h_path(file, h_path, h_buf_size, self->dest);

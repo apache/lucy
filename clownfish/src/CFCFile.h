@@ -39,10 +39,10 @@ struct CFCClass;
  * header file should be 'Foo/Bar.h' within the target include directory.
 */
 CFCFile*
-CFCFile_new(const char *source_class);
+CFCFile_new(const char *source_class, const char *source_dir);
 
 CFCFile*
-CFCFile_init(CFCFile *self, const char *source_class);
+CFCFile_init(CFCFile *self, const char *source_class, const char *source_dir);
 
 void
 CFCFile_destroy(CFCFile *self);
@@ -99,6 +99,9 @@ CFCFile_get_modified(CFCFile *self);
 
 const char*
 CFCFile_get_source_class(CFCFile *self);
+
+const char*
+CFCFile_get_source_dir(CFCFile *self);
 
 /** Return a string used for an include guard in a C header (e.g.
  * "H_CRUSTACEAN_LOBSTER"), unique per file.

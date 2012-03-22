@@ -35,6 +35,7 @@ struct CFCFile {
     CFCClass **classes;
     int modified;
     char *source_class;
+    char *source_dir;
     char *guard_name;
     char *guard_start;
     char *guard_close;
@@ -48,17 +49,18 @@ const static CFCMeta CFCFILE_META = {
 };
 
 CFCFile*
-CFCFile_new(const char *source_class) {
+CFCFile_new(const char *source_class, const char *source_dir) {
 
     CFCFile *self = (CFCFile*)CFCBase_allocate(&CFCFILE_META);
-    return CFCFile_init(self, source_class);
+    return CFCFile_init(self, source_class, source_dir);
 }
 
 CFCFile*
-CFCFile_init(CFCFile *self, const char *source_class) {
+CFCFile_init(CFCFile *self, const char *source_class, const char *source_dir) {
     CFCUTIL_NULL_CHECK(source_class);
     self->modified = false;
     self->source_class = CFCUtil_strdup(source_class);
+    self->source_dir   = CFCUtil_strdup(source_dir);
     self->blocks = (CFCBase**)CALLOCATE(1, sizeof(CFCBase*));
     self->classes = (CFCClass**)CALLOCATE(1, sizeof(CFCBase*));
 
@@ -116,6 +118,7 @@ CFCFile_destroy(CFCFile *self) {
     FREEMEM(self->guard_start);
     FREEMEM(self->guard_close);
     FREEMEM(self->source_class);
+    FREEMEM(self->source_dir);
     FREEMEM(self->path_part);
     CFCBase_destroy((CFCBase*)self);
 }
@@ -239,6 +242,11 @@ CFCFile_get_modified(CFCFile *self) {
 const char*
 CFCFile_get_source_class(CFCFile *self) {
     return self->source_class;
+}
+
+const char*
+CFCFile_get_source_dir(CFCFile *self) {
+    return self->source_dir;
 }
 
 const char*
