@@ -228,9 +228,9 @@ sub _compile_clownfish {
 
     # Compile Clownfish.
     my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(
-        source => $CORE_SOURCE_DIR,
         dest   => $AUTOGEN_DIR,
     );
+    $hierarchy->add_source_dir($CORE_SOURCE_DIR);
     $hierarchy->build;
 
     # Process all __BINDING__ blocks.

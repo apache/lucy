@@ -239,7 +239,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         my ( $either, %args ) = @_;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
         verify_args( \%new_PARAMS, %args ) or confess $@;
-        return _new( @args{qw( source dest )} );
+        return _new( @args{qw( dest )} );
     }
 }
 
