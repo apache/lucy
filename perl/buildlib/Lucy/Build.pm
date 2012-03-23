@@ -340,8 +340,8 @@ sub ACTION_clownfish {
         $perl_binding->write_bindings;
         $self->_write_pod($perl_binding);
 
-        # Copy .cfh files to blib/lib/Clownfish/_cfh
-        my $inc_dir = catdir( $self->blib, 'lib', 'Clownfish', '_cfh' );
+        # Copy .cfh files to blib/lib/Clownfish/_include
+        my $inc_dir = catdir( $self->blib, 'lib', 'Clownfish', '_include' );
         for my $file (@$cfh_filepaths) {
             my $rel  = abs2rel( $file, $CORE_SOURCE_DIR );
             my $dest = catfile( $inc_dir, $rel );
