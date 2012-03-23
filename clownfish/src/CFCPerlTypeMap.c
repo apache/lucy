@@ -299,5 +299,6 @@ CFCPerlTypeMap_write_xs_typemap(CFCHierarchy *hierarchy) {
     FREEMEM(output);
     FREEMEM(input);
     FREEMEM(start);
+    FREEMEM(classes);
 }
 

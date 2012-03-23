@@ -160,7 +160,6 @@ CFCPerl_write_pod(CFCPerl *self) {
     while (registry[num_registered] != NULL) { num_registered++; }
     char     **pod_paths = (char**)CALLOCATE(num_registered + 1, sizeof(char*));
     char     **pods      = (char**)CALLOCATE(num_registered + 1, sizeof(char*));
-    CFCClass **ordered   = CFCHierarchy_ordered_classes(self->hierarchy);
     size_t     count     = 0;
 
     // Generate POD, but don't write.  That way, if there's an error while
@@ -343,6 +342,7 @@ S_write_boot_c(CFCPerl *self) {
     FREEMEM(isa_pushes);
     FREEMEM(registrations);
     FREEMEM(pound_includes);
+    FREEMEM(ordered);
 }
 
 void
