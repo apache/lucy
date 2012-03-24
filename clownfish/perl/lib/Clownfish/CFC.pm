@@ -121,6 +121,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         docucomment       => undef,
         inert             => undef,
         final             => undef,
+        included          => undef,
         parcel            => undef,
         exposure          => 'parcel',
     );
@@ -157,8 +158,8 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
             = Clownfish::CFC::Model::Parcel->acquire( $args{parcel} );
         return _create(
             @args{
-                qw( parcel exposure class_name cnick micro_sym
-                    docucomment source_class parent_class_name final inert )
+                qw( parcel exposure class_name cnick micro_sym docucomment
+                    source_class parent_class_name final inert included)
                 }
         );
     }

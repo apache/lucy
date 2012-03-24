@@ -34,7 +34,7 @@ my $c_block = "__C__\nint foo;\n__END_C__\n";
 
 my $file
     = $parser->_parse_file( "$parcel_declaration\n$class_content\n$c_block",
-    'Stuff::Thing', '.' );
+    'Stuff::Thing', '.', 0 );
 
 is( $file->get_source_class, "Stuff::Thing", "get_source_class" );
 
@@ -68,7 +68,7 @@ isa_ok( $blocks->[0], "Clownfish::CFC::Model::Parcel" );
 isa_ok( $blocks->[1], "Clownfish::CFC::Model::Class" );
 isa_ok( $blocks->[2], "Clownfish::CFC::Model::CBlock" );
 
-$file = $parser->_parse_file( $class_content, 'Stuff::Thing', '.' );
+$file = $parser->_parse_file( $class_content, 'Stuff::Thing', '.', 0 );
 ($class) = @{ $file->classes };
 ( $foo, $bar ) = @{ $class->member_vars };
 is( $foo->get_type->get_specifier, 'Foo', 'file production resets parcel' );

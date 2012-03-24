@@ -123,7 +123,7 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Class
 
 SV*
-_create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert)
+_create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, source_class_sv, parent_class_name_sv, is_final, is_inert, is_included)
     CFCParcel *parcel;
     SV *exposure_sv;
     SV *class_name_sv;
@@ -134,6 +134,7 @@ _create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment,
     SV *parent_class_name_sv;
     bool is_final;
     bool is_inert;
+    bool is_included;
 CODE:
     const char *exposure =
         SvOK(exposure_sv) ? SvPV_nolen(exposure_sv) : NULL;
@@ -149,7 +150,8 @@ CODE:
         SvOK(parent_class_name_sv) ? SvPV_nolen(parent_class_name_sv) : NULL;
     CFCClass *self = CFCClass_create(parcel, exposure, class_name, cnick,
                                      micro_sym, docucomment, source_class,
-                                     parent_class_name, is_final, is_inert);
+                                     parent_class_name, is_final, is_inert,
+                                     is_included);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -2273,13 +2275,15 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_parse_file(self, string, source_class, source_dir)
+_parse_file(self, string, source_class, source_dir, included)
     CFCParser  *self;
     const char *string;
     const char *source_class;
     const char *source_dir;
+    bool included;
 CODE:
-    CFCFile *got = CFCParser_parse_file(self, string, source_class, source_dir);
+    CFCFile *got = CFCParser_parse_file(self, string, source_class, source_dir,
+                                        included);
     RETVAL = S_cfcbase_to_perlref(got);
     CFCBase_decref((CFCBase*)got);
 OUTPUT: RETVAL

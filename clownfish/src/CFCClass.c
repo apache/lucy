@@ -74,6 +74,7 @@ struct CFCClass {
     char *parent_class_name;
     int is_final;
     int is_inert;
+    int is_included;
     char *struct_sym;
     char *full_struct_sym;
     char *short_vtable_var;
@@ -116,11 +117,12 @@ CFCClass_create(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *cnick,
                 const char *micro_sym, CFCDocuComment *docucomment,
                 const char *source_class, const char *parent_class_name,
-                int is_final, int is_inert) {
+                int is_final, int is_inert, int is_included) {
     CFCClass *self = (CFCClass*)CFCBase_allocate(&CFCCLASS_META);
     return CFCClass_do_create(self, parcel, exposure, class_name, cnick,
                               micro_sym, docucomment, source_class,
-                              parent_class_name, is_final, is_inert);
+                              parent_class_name, is_final, is_inert,
+                              is_included);
 }
 
 CFCClass*
@@ -128,7 +130,8 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
                    const char *exposure, const char *class_name,
                    const char *cnick, const char *micro_sym,
                    CFCDocuComment *docucomment, const char *source_class,
-                   const char *parent_class_name, int is_final, int is_inert) {
+                   const char *parent_class_name, int is_final, int is_inert,
+                   int is_included) {
     CFCUTIL_NULL_CHECK(class_name);
     exposure  = exposure  ? exposure  : "parcel";
     micro_sym = micro_sym ? micro_sym : "class";
@@ -203,8 +206,9 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->include_h[j] = '\0';
     strcat(self->include_h, ".h");
 
-    self->is_final = !!is_final;
-    self->is_inert = !!is_inert;
+    self->is_final    = !!is_final;
+    self->is_inert    = !!is_inert;
+    self->is_included = !!is_included;
 
     // Store in registry.
     S_register(self);
@@ -751,6 +755,11 @@ CFCClass_final(CFCClass *self) {
 int
 CFCClass_inert(CFCClass *self) {
     return self->is_inert;
+}
+
+int
+CFCClass_included(CFCClass *self) {
+    return self->is_included;
 }
 
 const char*
