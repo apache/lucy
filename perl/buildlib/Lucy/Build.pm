@@ -192,6 +192,10 @@ sub ACTION_charmony {
     print join( " ", @command ), $/;
 
     system(@command) and die "Failed to write $CHARMONY_PATH: $!";
+
+    # Copy charmony.h to Clownfish include dir
+    my $inc_dir = catdir( $self->blib, 'arch', 'Clownfish', '_include' );
+    $self->copy_if_modified( from => $CHARMONY_PATH, to_dir => $inc_dir, );
 }
 
 # Build the charmonizer tests.
@@ -340,8 +344,8 @@ sub ACTION_clownfish {
         $perl_binding->write_bindings;
         $self->_write_pod($perl_binding);
 
-        # Copy .cfh files to blib/lib/Clownfish/_include
-        my $inc_dir = catdir( $self->blib, 'lib', 'Clownfish', '_include' );
+        # Copy .cfh files to blib/arch/Clownfish/_include
+        my $inc_dir = catdir( $self->blib, 'arch', 'Clownfish', '_include' );
         for my $file (@$cfh_filepaths) {
             my $rel  = abs2rel( $file, $CORE_SOURCE_DIR );
             my $dest = catfile( $inc_dir, $rel );
