@@ -253,21 +253,24 @@ S_write_parcel_c(CFCBindCore *self) {
         CFCBase **blocks = CFCFile_blocks(file);
         for (int j = 0; blocks[j] != NULL; j++) {
             const char *cfc_class = CFCBase_get_cfc_class(blocks[j]);
-            if (strcmp(cfc_class, "Clownfish::CFC::Model::Class") == 0) {
-                CFCClass *klass = (CFCClass*)blocks[j];
-
-                CFCBindClass *class_binding = CFCBindClass_new(klass);
-                char *c_code = CFCBindClass_to_c(class_binding);
-                content = CFCUtil_cat(content, c_code, "\n", NULL);
-                FREEMEM(c_code);
-                CFCBase_decref((CFCBase*)class_binding);
-                const char *privacy_sym = CFCClass_privacy_symbol(klass);
-                privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
-                                           privacy_sym, "\n", NULL);
-                const char *include_h = CFCClass_include_h(klass);
-                includes = CFCUtil_cat(includes, "#include \"", include_h,
-                                       "\"\n", NULL);
+            if (strcmp(cfc_class, "Clownfish::CFC::Model::Class") != 0) {
+                continue;
             }
+
+            CFCClass *klass = (CFCClass*)blocks[j];
+            if (CFCClass_included(klass)) { continue; }
+
+            CFCBindClass *class_binding = CFCBindClass_new(klass);
+            char *c_code = CFCBindClass_to_c(class_binding);
+            content = CFCUtil_cat(content, c_code, "\n", NULL);
+            FREEMEM(c_code);
+            CFCBase_decref((CFCBase*)class_binding);
+            const char *privacy_sym = CFCClass_privacy_symbol(klass);
+            privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
+                                       privacy_sym, "\n", NULL);
+            const char *include_h = CFCClass_include_h(klass);
+            includes = CFCUtil_cat(includes, "#include \"", include_h,
+                                   "\"\n", NULL);
         }
     }
 

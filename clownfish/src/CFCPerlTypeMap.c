@@ -273,6 +273,8 @@ CFCPerlTypeMap_write_xs_typemap(CFCHierarchy *hierarchy) {
     char *output = CFCUtil_strdup("");
     for (int i = 0; classes[i] != NULL; i++) {
         CFCClass *klass = classes[i];
+        if (CFCClass_included(klass)) { continue; }
+
         const char *full_struct_sym = CFCClass_full_struct_sym(klass);
         const char *vtable_var      = CFCClass_full_vtable_var(klass);
 
