@@ -48,13 +48,18 @@ CFCHierarchy_init(CFCHierarchy *self, const char *dest);
 void
 CFCHierarchy_destroy(CFCHierarchy *self);
 
-/** Add path C<source_dir> to source directories.
+/** Add path C<source_dir> to the list of source directories.
  */
 void
 CFCHierarchy_add_source_dir(CFCHierarchy *self, const char *source_dir);
 
-/** Parse every Clownfish header file which can be found under C<source>,
- * building up the object hierarchy.
+/** Add path C<include_dir> to the list of include directories.
+ */
+void
+CFCHierarchy_add_include_dir(CFCHierarchy *self, const char *include_dir);
+
+/** Parse every Clownfish header file which can be found under any of the
+ * source and include directories, building up the object hierarchy.
  */
 void
 CFCHierarchy_build(CFCHierarchy *self);
@@ -81,6 +86,12 @@ CFCHierarchy_get_source_dir(CFCHierarchy *self, size_t i);
 
 size_t
 CFCHierarchy_get_num_source_dirs(CFCHierarchy *self);
+
+const char*
+CFCHierarchy_get_include_dir(CFCHierarchy *self, size_t i);
+
+size_t
+CFCHierarchy_get_num_include_dirs(CFCHierarchy *self);
 
 const char*
 CFCHierarchy_get_dest(CFCHierarchy *self);
