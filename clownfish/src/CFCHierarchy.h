@@ -96,6 +96,12 @@ CFCHierarchy_get_num_include_dirs(CFCHierarchy *self);
 const char*
 CFCHierarchy_get_dest(CFCHierarchy *self);
 
+const char*
+CFCHierarchy_get_include_dest(CFCHierarchy *self);
+
+const char*
+CFCHierarchy_get_source_dest(CFCHierarchy *self);
+
 #ifdef __cplusplus
 }
 #endif

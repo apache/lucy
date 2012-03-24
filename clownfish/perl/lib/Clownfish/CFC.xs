@@ -755,14 +755,26 @@ void
 _set_or_get(self, ...)
     CFCHierarchy *self;
 ALIAS:
-    get_dest          = 4
+    get_dest          = 2
+    get_include_dest  = 4
+    get_source_dest   = 6
     files             = 8
     ordered_classes   = 10
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
-        case 4: {
+        case 2: {
                 const char *value = CFCHierarchy_get_dest(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 4: {
+                const char *value = CFCHierarchy_get_include_dest(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 6: {
+                const char *value = CFCHierarchy_get_source_dest(self);
                 retval = newSVpv(value, strlen(value));
             }
             break;
@@ -1651,13 +1663,12 @@ PPCODE:
 MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core
 
 SV*
-_new(hierarchy, dest, header, footer)
+_new(hierarchy, header, footer)
     CFCHierarchy *hierarchy;
-    const char   *dest;
     const char   *header;
     const char   *footer;
 CODE:
-    CFCBindCore *self = CFCBindCore_new(hierarchy, dest, header, footer);
+    CFCBindCore *self = CFCBindCore_new(hierarchy, header, footer);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL

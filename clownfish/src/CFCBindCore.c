@@ -31,7 +31,6 @@
 struct CFCBindCore {
     CFCBase base;
     CFCHierarchy *hierarchy;
-    char         *dest;
     char         *header;
     char         *footer;
 };
@@ -54,21 +53,19 @@ const static CFCMeta CFCBINDCORE_META = {
 };
 
 CFCBindCore*
-CFCBindCore_new(CFCHierarchy *hierarchy, const char *dest, const char *header,
+CFCBindCore_new(CFCHierarchy *hierarchy, const char *header,
                 const char *footer) {
     CFCBindCore *self = (CFCBindCore*)CFCBase_allocate(&CFCBINDCORE_META);
-    return CFCBindCore_init(self, hierarchy, dest, header, footer);
+    return CFCBindCore_init(self, hierarchy, header, footer);
 }
 
 CFCBindCore*
-CFCBindCore_init(CFCBindCore *self, CFCHierarchy *hierarchy, const char *dest,
+CFCBindCore_init(CFCBindCore *self, CFCHierarchy *hierarchy,
                  const char *header, const char *footer) {
     CFCUTIL_NULL_CHECK(hierarchy);
-    CFCUTIL_NULL_CHECK(dest);
     CFCUTIL_NULL_CHECK(header);
     CFCUTIL_NULL_CHECK(footer);
     self->hierarchy = (CFCHierarchy*)CFCBase_incref((CFCBase*)hierarchy);
-    self->dest      = CFCUtil_strdup(dest);
     self->header    = CFCUtil_strdup(header);
     self->footer    = CFCUtil_strdup(footer);
     return self;
@@ -77,7 +74,6 @@ CFCBindCore_init(CFCBindCore *self, CFCHierarchy *hierarchy, const char *dest,
 void
 CFCBindCore_destroy(CFCBindCore *self) {
     CFCBase_decref((CFCBase*)self->hierarchy);
-    FREEMEM(self->dest);
     FREEMEM(self->header);
     FREEMEM(self->footer);
     CFCBase_destroy((CFCBase*)self);
@@ -86,7 +82,6 @@ CFCBindCore_destroy(CFCBindCore *self) {
 int
 CFCBindCore_write_all_modified(CFCBindCore *self, int modified) {
     CFCHierarchy *hierarchy = self->hierarchy;
-    const char   *dest      = self->dest;
     const char   *header    = self->header;
     const char   *footer    = self->footer;
 
@@ -95,10 +90,11 @@ CFCBindCore_write_all_modified(CFCBindCore *self, int modified) {
 
     // Iterate over all File objects, writing out those which don't have
     // up-to-date auto-generated files.
+    const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
     CFCFile **files = CFCHierarchy_files(hierarchy);
     for (int i = 0; files[i] != NULL; i++) {
         if (CFCFile_get_modified(files[i])) {
-            CFCBindFile_write_h(files[i], dest, header, footer);
+            CFCBindFile_write_h(files[i], inc_dest, header, footer);
         }
     }
 
@@ -228,7 +224,8 @@ S_write_parcel_h(CFCBindCore *self) {
             self->footer);
 
     // Unlink then write file.
-    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
+    const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
+    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), inc_dest,
                                  CFCUTIL_PATH_SEP, "parcel.h", NULL);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
@@ -300,7 +297,8 @@ S_write_parcel_c(CFCBindCore *self) {
             content, self->footer);
 
     // Unlink then open file.
-    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
+    const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
+    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), src_dest,
                                  CFCUTIL_PATH_SEP, "parcel.c", NULL);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
