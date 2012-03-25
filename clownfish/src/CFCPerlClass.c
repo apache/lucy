@@ -251,12 +251,15 @@ S_can_be_bound(CFCParamList *param_list, CFCType *return_type) {
 CFCPerlMethod**
 CFCPerlClass_method_bindings(CFCPerlClass *self) {
     CFCClass       *client     = self->client;
+    CFCClass       *parent     = CFCClass_get_parent(client);
     const char     *class_name = self->class_name;
     size_t          num_bound  = 0;
     CFCMethod     **fresh_methods = CFCClass_fresh_methods(client);
     CFCClass      **descendants   = CFCClass_tree_to_ladder(client);
     CFCPerlMethod **bound 
         = (CFCPerlMethod**)CALLOCATE(1, sizeof(CFCPerlMethod*));
+
+    int parent_included = (parent && CFCClass_included(parent));
  
      // Iterate over the class's fresh methods.
     for (size_t i = 0; fresh_methods[i] != NULL; i++) {
@@ -264,8 +267,9 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
         const char *alias     = CFCMethod_micro_sym(method);
         const char *meth_name = CFCMethod_get_macro_sym(method);
 
-        // Only deal with methods when they are novel (i.e. first declared).
-        if (!CFCMethod_novel(method)) { continue; }
+        // Only deal with methods when they are novel (i.e. first declared)
+        // or the parent class is included.
+        if (!CFCMethod_novel(method) && !parent_included) { continue; }
 
         // Skip private methods.
         if (CFCSymbol_private((CFCSymbol*)method)) { continue; }
