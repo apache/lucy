@@ -252,7 +252,7 @@ S_write_boot_c(CFCPerl *self) {
         pound_includes = CFCUtil_cat(pound_includes, "#include \"",
                                      include_h, "\"\n", NULL);
 
-        if (CFCClass_inert(klass)) { continue; }
+        if (CFCClass_inert(klass) || CFCClass_included(klass)) { continue; }
 
         // Ignore return value from VTable_add_to_registry, since it's OK if
         // multiple threads contend for adding these permanent VTables and some
