@@ -55,6 +55,7 @@ struct CFCVariable;
  * @param is_inert Should be true if the class is inert, i.e. cannot be
  * instantiated.
  * @param is_final Should be true if the class is final.
+ * @param is_included Should be true if the class is from an include dir.
  */
 CFCClass*
 CFCClass_create(struct CFCParcel *parcel, const char *exposure,

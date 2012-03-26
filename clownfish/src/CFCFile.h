@@ -37,6 +37,7 @@ struct CFCClass;
  * source_class is "Foo::Bar", that implies that the source file could be
  * found at 'Foo/Bar.cfh' within the source directory and that the output C
  * header file should be 'Foo/Bar.h' within the target include directory.
+ * @param source_dir The source directory in which the file was found.
 */
 CFCFile*
 CFCFile_new(const char *source_class, const char *source_dir);
