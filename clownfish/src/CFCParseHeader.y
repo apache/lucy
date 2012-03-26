@@ -295,7 +295,8 @@ result ::= file(A).
 
 file(A) ::= FILE_START. /* Pseudo token, not passed by lexer. */
 {
-    A = CFCFile_new(CFCParser_get_source_class(state));
+    A = CFCFile_new(CFCParser_get_source_class(state),
+                    CFCParser_get_source_dir(state));
 }
 file(A) ::= file(B) major_block(C).
 {
