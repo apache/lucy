@@ -705,6 +705,13 @@ PPCODE:
     CFCHierarchy_add_source_dir(self, source_dir);
 
 void
+add_include_dir(self, include_dir)
+    CFCHierarchy *self;
+    const char *include_dir;
+PPCODE:
+    CFCHierarchy_add_include_dir(self, include_dir);
+
+void
 get_source_dirs(self)
     CFCHierarchy *self;
 PPCODE:
@@ -713,6 +720,18 @@ PPCODE:
     EXTEND(SP, n);
     for (i = 0; i < n; ++i) {
         const char *value = CFCHierarchy_get_source_dir(self, i);
+        PUSHs(sv_2mortal(newSVpv(value, strlen(value))));
+    }
+
+void
+get_include_dirs(self)
+    CFCHierarchy *self;
+PPCODE:
+    size_t n = CFCHierarchy_get_num_include_dirs(self);
+    size_t i;
+    EXTEND(SP, n);
+    for (i = 0; i < n; ++i) {
+        const char *value = CFCHierarchy_get_include_dir(self, i);
         PUSHs(sv_2mortal(newSVpv(value, strlen(value))));
     }
 

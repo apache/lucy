@@ -39,6 +39,8 @@ struct CFCHierarchy {
     CFCBase base;
     size_t num_sources;
     char **sources;
+    size_t num_includes;
+    char **includes;
     char *dest;
     CFCParser *parser;
     CFCClass **trees;
@@ -88,6 +90,8 @@ CFCHierarchy_init(CFCHierarchy *self, const char *dest) {
     }
     self->sources      = (char**)CALLOCATE(1, sizeof(char*));
     self->num_sources  = 0;
+    self->includes     = (char**)CALLOCATE(1, sizeof(char*));
+    self->num_includes = 0;
     self->dest         = CFCUtil_strdup(dest);
     self->trees        = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
     self->num_trees    = 0;
@@ -115,22 +119,35 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
     for (size_t i = 0; self->sources[i] != NULL; i++) {
         FREEMEM(self->sources[i]);
     }
+    for (size_t i = 0; self->includes[i] != NULL; i++) {
+        FREEMEM(self->includes[i]);
+    }
     FREEMEM(self->trees);
     FREEMEM(self->files);
     FREEMEM(self->classes);
     FREEMEM(self->sources);
+    FREEMEM(self->includes);
     FREEMEM(self->dest);
     CFCBase_decref((CFCBase*)self->parser);
     CFCBase_destroy((CFCBase*)self);
 }
 
 void
-CFCHierarchy_add_source_dir(CFCHierarchy *self, const char *source) {
+CFCHierarchy_add_source_dir(CFCHierarchy *self, const char *source_dir) {
     size_t n = self->num_sources;
     self->sources      = (char**)REALLOCATE(self->sources, n + 2);
-    self->sources[n]   = CFCUtil_strdup(source);
+    self->sources[n]   = CFCUtil_strdup(source_dir);
     self->sources[n+1] = NULL;
     self->num_sources  = n + 1;
+}
+
+void
+CFCHierarchy_add_include_dir(CFCHierarchy *self, const char *include_dir) {
+    size_t n = self->num_includes;
+    self->includes      = (char**)REALLOCATE(self->includes, n + 2);
+    self->includes[n]   = CFCUtil_strdup(include_dir);
+    self->includes[n+1] = NULL;
+    self->num_includes  = n + 1;
 }
 
 void
@@ -436,6 +453,16 @@ CFCHierarchy_get_source_dir(CFCHierarchy *self, size_t i) {
 size_t
 CFCHierarchy_get_num_source_dirs(CFCHierarchy *self) {
     return self->num_sources;
+}
+
+const char*
+CFCHierarchy_get_include_dir(CFCHierarchy *self, size_t i) {
+    return i < self->num_includes ? self->includes[i] : NULL;
+}
+
+size_t
+CFCHierarchy_get_num_include_dirs(CFCHierarchy *self) {
+    return self->num_includes;
 }
 
 const char*
