@@ -42,6 +42,8 @@ struct CFCHierarchy {
     size_t num_includes;
     char **includes;
     char *dest;
+    char *inc_dest;
+    char *src_dest;
     CFCParser *parser;
     CFCClass **trees;
     size_t num_trees;
@@ -51,6 +53,9 @@ struct CFCHierarchy {
     size_t classes_cap;
     size_t num_classes;
 };
+
+static void
+S_do_make_path(const char *path);
 
 static void
 S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included);
@@ -102,6 +107,14 @@ CFCHierarchy_init(CFCHierarchy *self, const char *dest) {
                             (self->classes_cap + 1), sizeof(CFCClass*));
     self->num_classes  = 0;
     self->parser       = CFCParser_new();
+
+    self->inc_dest = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
+                                 CFCUTIL_PATH_SEP, "include", NULL);
+    self->src_dest = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
+                                 CFCUTIL_PATH_SEP, "source", NULL);
+    S_do_make_path(self->inc_dest);
+    S_do_make_path(self->src_dest);
+
     return self;
 }
 
@@ -128,8 +141,20 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
     FREEMEM(self->sources);
     FREEMEM(self->includes);
     FREEMEM(self->dest);
+    FREEMEM(self->inc_dest);
+    FREEMEM(self->src_dest);
     CFCBase_decref((CFCBase*)self->parser);
     CFCBase_destroy((CFCBase*)self);
+}
+
+static void
+S_do_make_path(const char *path) {
+    if (!CFCUtil_is_dir(path)) {
+        CFCUtil_make_path(path);
+        if (!CFCUtil_is_dir(path)) {
+            CFCUtil_die("Can't make path %s", path);
+        }
+    }
 }
 
 void
@@ -472,6 +497,16 @@ CFCHierarchy_get_num_include_dirs(CFCHierarchy *self) {
 const char*
 CFCHierarchy_get_dest(CFCHierarchy *self) {
     return self->dest;
+}
+
+const char*
+CFCHierarchy_get_include_dest(CFCHierarchy *self) {
+    return self->inc_dest;
+}
+
+const char*
+CFCHierarchy_get_source_dest(CFCHierarchy *self) {
+    return self->src_dest;
 }
 
 

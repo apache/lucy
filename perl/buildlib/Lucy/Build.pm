@@ -140,6 +140,9 @@ my $LIB_DIR          = 'lib';
 my $BUILDLIB_DIR     = 'buildlib';
 my $XS_FILEPATH      = catfile( $LIB_DIR, "Lucy.xs" );
 my $AUTOBIND_PM_PATH = catfile( $LIB_DIR, 'Lucy', 'Autobinding.pm' );
+# TODO: Get these from $hierarchy
+my $AUTOGEN_INC_DIR    = catfile( 'autogen', 'include' );
+my $AUTOGEN_SOURCE_DIR = catfile( 'autogen', 'source' );
 
 sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
 
@@ -295,10 +298,6 @@ sub ACTION_clownfish {
     $self->dispatch('charmonizer_tests');
     $self->dispatch('cfc');
 
-    # Create destination dir, copy xs helper files.
-    if ( !-d $AUTOGEN_DIR ) {
-        mkdir $AUTOGEN_DIR or die "Can't mkdir '$AUTOGEN_DIR': $!";
-    }
     $self->add_to_cleanup($AUTOGEN_DIR);
 
     my $buildlib_pm_filepaths = $self->rscan_dir( $BUILDLIB_DIR, qr/\.pm$/ );
@@ -318,7 +317,6 @@ sub ACTION_clownfish {
     require Clownfish::CFC::Binding::Core;
     my $core_binding = Clownfish::CFC::Binding::Core->new(
         hierarchy => $hierarchy,
-        dest      => $AUTOGEN_DIR,
         header    => $self->autogen_header,
         footer    => '',
     );
@@ -533,7 +531,7 @@ sub ACTION_compile_custom_xs {
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'Lucy', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
-        getcwd(),       $CORE_SOURCE_DIR,  $AUTOGEN_DIR,
+        getcwd(),       $CORE_SOURCE_DIR,  $AUTOGEN_INC_DIR,
         $XS_SOURCE_DIR, $SNOWSTEM_INC_DIR, $UCD_INC_DIR,
         $UTF8PROC_SRC_DIR
     );
@@ -541,11 +539,11 @@ sub ACTION_compile_custom_xs {
 
     # Compile C source files.
     my $c_files = [];
-    push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,  qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,    qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $AUTOGEN_DIR,      qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR, qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR, qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,    qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,      qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $AUTOGEN_SOURCE_DIR, qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR,   qr/\.c$/ ) };
+    push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR,   qr/\.c$/ ) };
     push @$c_files, $UTF8PROC_C;
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;

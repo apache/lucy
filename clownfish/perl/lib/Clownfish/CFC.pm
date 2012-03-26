@@ -570,7 +570,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 
     our %new_PARAMS = (
         hierarchy => undef,
-        dest      => undef,
         header    => undef,
         footer    => undef,
     );
@@ -578,7 +577,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
-        return _new( @args{qw( hierarchy dest header footer )} );
+        return _new( @args{qw( hierarchy header footer )} );
     }
 }
 

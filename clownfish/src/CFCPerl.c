@@ -95,15 +95,16 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
 
     // Derive the name of the files containing bootstrapping code.
     const char *prefix   = CFCParcel_get_prefix(parcel);
-    const char *dest_dir = CFCHierarchy_get_dest(hierarchy);
+    const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
+    const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
     self->boot_h_file = CFCUtil_cat(CFCUtil_strdup(""), prefix, "boot.h",
                                     NULL);
     self->boot_c_file = CFCUtil_cat(CFCUtil_strdup(""), prefix, "boot.c",
                                     NULL);
-    self->boot_h_path = CFCUtil_cat(CFCUtil_strdup(""), dest_dir,
+    self->boot_h_path = CFCUtil_cat(CFCUtil_strdup(""), inc_dest,
                                     CFCUTIL_PATH_SEP, self->boot_h_file,
                                     NULL);
-    self->boot_c_path = CFCUtil_cat(CFCUtil_strdup(""), dest_dir,
+    self->boot_c_path = CFCUtil_cat(CFCUtil_strdup(""), src_dest,
                                     CFCUTIL_PATH_SEP, self->boot_c_file,
                                     NULL);
 

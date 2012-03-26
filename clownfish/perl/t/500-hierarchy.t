@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 use Clownfish::CFC::Model::Hierarchy;
 use Clownfish::CFC::Util qw( a_isa_b );
@@ -41,6 +41,12 @@ like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(%args);
 isa_ok( $hierarchy, "Clownfish::CFC::Model::Hierarchy" );
 is( $hierarchy->get_dest, $args{dest}, "get_dest" );
+
+my $inc_dest = catfile( $args{dest}, "include" );
+is( $hierarchy->get_include_dest, $inc_dest, "get_include_dest" );
+
+my $src_dest = catfile( $args{dest}, "source" );
+is( $hierarchy->get_source_dest, $src_dest, "get_source_dest" );
 
 $hierarchy->add_source_dir($source);
 is_deeply( [ $hierarchy->get_source_dirs ], [ $source ], "get_source_dirs" );
