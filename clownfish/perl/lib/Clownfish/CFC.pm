@@ -232,8 +232,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     use Clownfish::CFC::Util qw( verify_args );
 
     our %new_PARAMS = (
-        source => undef,
-        dest   => undef,
+        dest => undef,
     );
 
     sub new {
