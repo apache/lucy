@@ -689,14 +689,32 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Hierarchy
 
 SV*
-_new(source, dest)
-    const char *source;
+_new(dest)
     const char *dest;
 CODE:
-    CFCHierarchy *self = CFCHierarchy_new(source, dest);
+    CFCHierarchy *self = CFCHierarchy_new(dest);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
+
+void
+add_source_dir(self, source_dir)
+    CFCHierarchy *self;
+    const char *source_dir;
+PPCODE:
+    CFCHierarchy_add_source_dir(self, source_dir);
+
+void
+get_source_dirs(self)
+    CFCHierarchy *self;
+PPCODE:
+    size_t n = CFCHierarchy_get_num_source_dirs(self);
+    size_t i;
+    EXTEND(SP, n);
+    for (i = 0; i < n; ++i) {
+        const char *value = CFCHierarchy_get_source_dir(self, i);
+        PUSHs(sv_2mortal(newSVpv(value, strlen(value))));
+    }
 
 void
 build(self)
@@ -716,18 +734,12 @@ void
 _set_or_get(self, ...)
     CFCHierarchy *self;
 ALIAS:
-    get_source        = 2
     get_dest          = 4
     files             = 8
     ordered_classes   = 10
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
-        case 2: {
-                const char *value = CFCHierarchy_get_source(self);
-                retval = newSVpv(value, strlen(value));
-            }
-            break;
         case 4: {
                 const char *value = CFCHierarchy_get_dest(self);
                 retval = newSVpv(value, strlen(value));

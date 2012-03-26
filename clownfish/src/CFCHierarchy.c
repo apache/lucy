@@ -37,7 +37,8 @@
 
 struct CFCHierarchy {
     CFCBase base;
-    char *source;
+    size_t num_sources;
+    char **sources;
     char *dest;
     CFCParser *parser;
     CFCClass **trees;
@@ -75,17 +76,18 @@ const static CFCMeta CFCHIERARCHY_META = {
 };
 
 CFCHierarchy*
-CFCHierarchy_new(const char *source, const char *dest) {
+CFCHierarchy_new(const char *dest) {
     CFCHierarchy *self = (CFCHierarchy*)CFCBase_allocate(&CFCHIERARCHY_META);
-    return CFCHierarchy_init(self, source, dest);
+    return CFCHierarchy_init(self, dest);
 }
 
 CFCHierarchy*
-CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest) {
-    if (!source || !strlen(source) || !dest || !strlen(dest)) {
-        CFCUtil_die("Both 'source' and 'dest' are required");
+CFCHierarchy_init(CFCHierarchy *self, const char *dest) {
+    if (!dest || !strlen(dest)) {
+        CFCUtil_die("'dest' is required");
     }
-    self->source       = CFCUtil_strdup(source);
+    self->sources      = (char**)CALLOCATE(1, sizeof(char*));
+    self->num_sources  = 0;
     self->dest         = CFCUtil_strdup(dest);
     self->trees        = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
     self->num_trees    = 0;
@@ -107,18 +109,32 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
     for (size_t i = 0; self->files[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->files[i]);
     }
+    for (size_t i = 0; self->sources[i] != NULL; i++) {
+        FREEMEM(self->sources[i]);
+    }
     FREEMEM(self->trees);
     FREEMEM(self->files);
     FREEMEM(self->classes);
-    FREEMEM(self->source);
+    FREEMEM(self->sources);
     FREEMEM(self->dest);
     CFCBase_decref((CFCBase*)self->parser);
     CFCBase_destroy((CFCBase*)self);
 }
 
 void
+CFCHierarchy_add_source_dir(CFCHierarchy *self, const char *source) {
+    size_t n = self->num_sources;
+    self->sources      = (char**)REALLOCATE(self->sources, n + 2);
+    self->sources[n]   = CFCUtil_strdup(source);
+    self->sources[n+1] = NULL;
+    self->num_sources  = n + 1;
+}
+
+void
 CFCHierarchy_build(CFCHierarchy *self) {
-    S_parse_cf_files(self, self->source);
+    for (size_t i = 0; self->sources[i] != NULL; i++) {
+        S_parse_cf_files(self, self->sources[i]);
+    }
     S_connect_classes(self);
     for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass_grow_tree(self->trees[i]);
@@ -409,8 +425,13 @@ CFCHierarchy_files(CFCHierarchy *self) {
 }
 
 const char*
-CFCHierarchy_get_source(CFCHierarchy *self) {
-    return self->source;
+CFCHierarchy_get_source_dir(CFCHierarchy *self, size_t i) {
+    return i < self->num_sources ? self->sources[i] : NULL;
+}
+
+size_t
+CFCHierarchy_get_num_source_dirs(CFCHierarchy *self) {
+    return self->num_sources;
 }
 
 const char*

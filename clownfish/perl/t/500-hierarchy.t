@@ -24,8 +24,8 @@ use File::Spec::Functions qw( catfile splitpath );
 use Fcntl;
 use File::Path qw( rmtree mkpath );
 
+my $source = 't/cfsource';
 my %args = (
-    source => 't/cfsource',
     dest   => 't/cfdest',
 );
 
@@ -40,8 +40,10 @@ like( $@, qr/extra_arg/, "Extra arg kills constructor" );
 
 my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(%args);
 isa_ok( $hierarchy, "Clownfish::CFC::Model::Hierarchy" );
-is( $hierarchy->get_source, $args{source}, "get_source" );
-is( $hierarchy->get_dest,   $args{dest},   "get_dest" );
+is( $hierarchy->get_dest, $args{dest}, "get_dest" );
+
+$hierarchy->add_source_dir($source);
+is_deeply( [ $hierarchy->get_source_dirs ], [ $source ], "get_source_dirs" );
 
 $hierarchy->build;
 
@@ -81,7 +83,7 @@ for my $file (@files) {
         or die "utime failed for '$h_path': $!";
 }
 
-my $path_to_animal_cf = $animal->cfh_path( $args{source} );
+my $path_to_animal_cf = $animal->cfh_path( $source );
 utime( undef, undef, $path_to_animal_cf )
     or die "utime for '$path_to_animal_cf' failed";    # touch
 
