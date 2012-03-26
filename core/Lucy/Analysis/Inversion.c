@@ -150,7 +150,7 @@ Inversion_invert(Inversion *self) {
     for (; tokens < limit; tokens++) {
         Token *const cur_token = *tokens;
         cur_token->pos = token_pos;
-        token_pos += cur_token->pos_inc;
+        token_pos = (int32_t)((uint32_t)token_pos + (uint32_t)cur_token->pos_inc);
         if (token_pos < cur_token->pos) {
             THROW(ERR, "Token positions out of order: %i32 %i32",
                   cur_token->pos, token_pos);
