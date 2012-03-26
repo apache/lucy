@@ -53,7 +53,7 @@ struct CFCHierarchy {
 };
 
 static void
-S_parse_cf_files(CFCHierarchy *self, const char *source_dir);
+S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included);
 
 static void
 S_connect_classes(CFCHierarchy *self);
@@ -153,7 +153,7 @@ CFCHierarchy_add_include_dir(CFCHierarchy *self, const char *include_dir) {
 void
 CFCHierarchy_build(CFCHierarchy *self) {
     for (size_t i = 0; self->sources[i] != NULL; i++) {
-        S_parse_cf_files(self, self->sources[i]);
+        S_parse_cf_files(self, self->sources[i], 0);
     }
     S_connect_classes(self);
     for (size_t i = 0; self->trees[i] != NULL; i++) {
@@ -204,7 +204,7 @@ S_find_cfh(const char *dir, char **cfh_list, size_t num_cfh) {
 }
 
 static void
-S_parse_cf_files(CFCHierarchy *self, const char *source_dir) {
+S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
     char **all_source_paths = (char**)CALLOCATE(1, sizeof(char*));
     all_source_paths = S_find_cfh(source_dir, all_source_paths, 0);
     size_t source_dir_len  = strlen(source_dir);
@@ -243,7 +243,8 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir) {
         size_t unused;
         char *content = CFCUtil_slurp_text(source_path, &unused);
         CFCFile *file = CFCParser_parse_file(self->parser, content,
-                                             source_class, source_dir);
+                                             source_class, source_dir,
+                                             is_included);
         FREEMEM(content);
         if (!file) {
             CFCUtil_die("parser error for %s", source_path);

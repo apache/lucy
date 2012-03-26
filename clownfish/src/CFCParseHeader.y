@@ -43,12 +43,13 @@ S_start_class(CFCParser *state, CFCDocuComment *docucomment, char *exposure,
         is_final = !!strstr(declaration_modifier_list, "final");
         is_inert = !!strstr(declaration_modifier_list, "inert");
     }
+    int is_included = CFCParser_included(state);
     CFCParser_set_class_name(state, class_name);
     CFCParser_set_class_cnick(state, class_cnick);
     CFCClass *klass = CFCClass_create(CFCParser_get_parcel(state), exposure,
                                       class_name, class_cnick, NULL,
                                       docucomment, source_class, inheritance,
-                                      is_final, is_inert);
+                                      is_final, is_inert, is_included);
     CFCBase_decref((CFCBase*)docucomment);
     return klass;
 }

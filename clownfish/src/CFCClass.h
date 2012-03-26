@@ -61,7 +61,7 @@ CFCClass_create(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *cnick,
                 const char *micro_sym, struct CFCDocuComment *docucomment,
                 const char *source_class, const char *parent_class_name,
-                int is_final, int is_inert);
+                int is_final, int is_inert, int is_included);
 
 CFCClass*
 CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
@@ -69,7 +69,7 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
                    const char *cnick, const char *micro_sym,
                    struct CFCDocuComment *docucomment,
                    const char *source_class, const char *parent_class_name,
-                   int is_final, int is_inert);
+                   int is_final, int is_inert, int is_included);
 
 void
 CFCClass_destroy(CFCClass *self);
@@ -229,6 +229,9 @@ CFCClass_final(CFCClass *self);
 
 int
 CFCClass_inert(CFCClass *self);
+
+int
+CFCClass_included(CFCClass *self);
 
 const char*
 CFCClass_get_struct_sym(CFCClass *self);
