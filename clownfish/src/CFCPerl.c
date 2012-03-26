@@ -375,7 +375,7 @@ S_pm_file_contents(CFCPerl *self, const char *params_hash_defs) {
     "use strict;\n"
     "use warnings;\n"
     "\n"
-    "package Lucy::Autobinding;\n"
+    "package %s::Autobinding;\n"
     "\n"
     "init_autobindings();\n"
     "\n"
@@ -383,9 +383,12 @@ S_pm_file_contents(CFCPerl *self, const char *params_hash_defs) {
     "\n"
     "1;\n"
     "\n";
-    size_t size = sizeof(pattern) + strlen(params_hash_defs) + 20;
+    size_t size = sizeof(pattern)
+                  + strlen(self->boot_class)
+                  + strlen(params_hash_defs)
+                  + 20;
     char *contents = (char*)MALLOCATE(size);
-    sprintf(contents, pattern, params_hash_defs);
+    sprintf(contents, pattern, self->boot_class, params_hash_defs);
     return contents;
 }
 
@@ -421,7 +424,7 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
     "\n"
     "%s\n"
     "\n"
-    "MODULE = Lucy   PACKAGE = Lucy::Autobinding\n"
+    "MODULE = %s   PACKAGE = %s::Autobinding\n"
     "\n"
     "void\n"
     "init_autobindings()\n"
@@ -438,12 +441,13 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
     size_t size = sizeof(pattern)
                   + strlen(self->boot_h_file)
                   + strlen(generated_xs)
+                  + strlen(self->boot_class) * 2
                   + strlen(xs_init)
                   + strlen(hand_rolled_xs)
                   + 30;
     char *contents = (char*)MALLOCATE(size);
-    sprintf(contents, pattern, self->boot_h_file, generated_xs, xs_init,
-            hand_rolled_xs);
+    sprintf(contents, pattern, self->boot_h_file, generated_xs,
+            self->boot_class, self->boot_class, xs_init, hand_rolled_xs);
 
     return contents;
 }
