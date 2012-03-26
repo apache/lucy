@@ -53,6 +53,9 @@ static void
 S_parse_cf_files(CFCHierarchy *self);
 
 static void
+S_connect_classes(CFCHierarchy *self);
+
+static void
 S_add_file(CFCHierarchy *self, CFCFile *file);
 
 static void
@@ -116,6 +119,7 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
 void
 CFCHierarchy_build(CFCHierarchy *self) {
     S_parse_cf_files(self);
+    S_connect_classes(self);
     for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass_grow_tree(self->trees[i]);
     }
@@ -224,6 +228,15 @@ S_parse_cf_files(CFCHierarchy *self) {
     }
     self->classes[self->num_classes] = NULL;
 
+    for (int i = 0; all_source_paths[i] != NULL; i++) {
+        FREEMEM(all_source_paths[i]);
+    }
+    FREEMEM(all_source_paths);
+    FREEMEM(source_class);
+}
+
+static void
+S_connect_classes(CFCHierarchy *self) {
     // Wrangle the classes into hierarchies and figure out inheritance.
     for (int i = 0; self->classes[i] != NULL; i++) {
         CFCClass *klass = self->classes[i];
@@ -246,12 +259,6 @@ S_parse_cf_files(CFCHierarchy *self) {
             S_add_tree(self, klass);
         }
     }
-
-    for (int i = 0; all_source_paths[i] != NULL; i++) {
-        FREEMEM(all_source_paths[i]);
-    }
-    FREEMEM(all_source_paths);
-    FREEMEM(source_class);
 }
 
 int
