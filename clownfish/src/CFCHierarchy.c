@@ -109,6 +109,9 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
     for (size_t i = 0; self->files[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->files[i]);
     }
+    for (size_t i = 0; self->classes[i] != NULL; i++) {
+        CFCBase_decref((CFCBase*)self->classes[i]);
+    }
     for (size_t i = 0; self->sources[i] != NULL; i++) {
         FREEMEM(self->sources[i]);
     }
@@ -238,7 +241,8 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir) {
                                   self->classes,
                                   (self->classes_cap + 1) * sizeof(CFCClass*));
             }
-            self->classes[self->num_classes++] = classes_in_file[j];
+            self->classes[self->num_classes++]
+                = (CFCClass*)CFCBase_incref((CFCBase*)classes_in_file[j]);
         }
         CFCBase_decref((CFCBase*)file);
     }
