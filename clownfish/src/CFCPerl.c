@@ -248,12 +248,14 @@ S_write_boot_c(CFCPerl *self) {
 
     for (size_t i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
+        if (CFCClass_included(klass)) { continue; }
+
         const char *class_name = CFCClass_get_class_name(klass);
         const char *include_h  = CFCClass_include_h(klass);
         pound_includes = CFCUtil_cat(pound_includes, "#include \"",
                                      include_h, "\"\n", NULL);
 
-        if (CFCClass_inert(klass) || CFCClass_included(klass)) { continue; }
+        if (CFCClass_inert(klass)) { continue; }
 
         // Ignore return value from VTable_add_to_registry, since it's OK if
         // multiple threads contend for adding these permanent VTables and some
@@ -312,6 +314,8 @@ S_write_boot_c(CFCPerl *self) {
         "#include \"XSUB.h\"\n"
         "#include \"%s\"\n"
         "#include \"parcel.h\"\n"
+        "#include \"Lucy/Object/CharBuf.h\"\n"
+        "#include \"Lucy/Object/VTable.h\"\n"
         "%s\n"
         "\n"
         "void\n"
