@@ -1,0 +1,110 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+
+/** Query which matches individual terms.
+ *
+ * TermQuery is a subclass of L<Lucy::Search::Query> for matching
+ * individual terms in a specific field.
+ */
+
+class Lucy::Search::TermQuery inherits Lucy::Search::Query
+    : dumpable {
+
+    CharBuf *field;
+    Obj     *term;
+
+    inert incremented TermQuery*
+    new(const CharBuf *field, const Obj *term);
+
+    /**
+     * @param field Field name.
+     * @param term Term text.
+     */
+    public inert TermQuery*
+    init(TermQuery *self, const CharBuf *field, const Obj *term);
+
+    /** Accessor for object's <code>field</code> member.
+     */
+    public CharBuf*
+    Get_Field(TermQuery *self);
+
+    /** Accessor for object's <code>term</code> member.
+     */
+    public Obj*
+    Get_Term(TermQuery *self);
+
+    public incremented Compiler*
+    Make_Compiler(TermQuery *self, Searcher *searcher, float boost);
+
+    public incremented CharBuf*
+    To_String(TermQuery *self);
+
+    public void
+    Serialize(TermQuery *self, OutStream *outstream);
+
+    public incremented TermQuery*
+    Deserialize(TermQuery *self, InStream *instream);
+
+    public bool_t
+    Equals(TermQuery *self, Obj *other);
+
+    public void
+    Destroy(TermQuery *self);
+}
+
+class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
+    float idf;
+    float raw_weight;
+    float query_norm_factor;
+    float normalized_weight;
+
+    inert incremented TermCompiler*
+    new(Query *parent, Searcher *searcher, float boost);
+
+    inert TermCompiler*
+    init(TermCompiler *self, Query *parent, Searcher *searcher,
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(TermCompiler *self, SegReader *reader, bool_t need_score);
+
+    public float
+    Get_Weight(TermCompiler *self);
+
+    public float
+    Sum_Of_Squared_Weights(TermCompiler *self);
+
+    public void
+    Apply_Norm_Factor(TermCompiler *self, float factor);
+
+    public incremented VArray*
+    Highlight_Spans(TermCompiler *self, Searcher *searcher,
+                    DocVector *doc_vec, const CharBuf *field);
+
+    public bool_t
+    Equals(TermCompiler *self, Obj *other);
+
+    public void
+    Serialize(TermCompiler *self, OutStream *outstream);
+
+    public incremented TermCompiler*
+    Deserialize(TermCompiler *self, InStream *instream);
+}
+
+

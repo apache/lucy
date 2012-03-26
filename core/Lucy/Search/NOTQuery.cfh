@@ -1,0 +1,84 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Invert the result set of another Query.
+ *
+ * A NOTQuery wraps another L<Query|Lucy::Search::Query> and matches
+ * against its inverse document set.  All matching docs recieve a score of
+ * 0.0.
+ *
+ * NOTQuery is often used in conjunction with
+ * L<ANDQuery|Lucy::Search::ANDQuery> to provide "a AND NOT b"
+ * semantics.
+ */
+
+class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
+    : dumpable {
+
+    /**
+     * @param negated_query The Query to be inverted.
+     */
+    inert incremented NOTQuery*
+    new(Query *negated_query);
+
+    /**
+     * @param negated_query The Query whose result set should be inverted.
+     */
+    public inert NOTQuery*
+    init(NOTQuery *self, Query *negated_query);
+
+    /** Accessor for the object's negated query. */
+    public Query*
+    Get_Negated_Query(NOTQuery *self);
+
+    /** Setter for the object's negated query. */
+    public void
+    Set_Negated_Query(NOTQuery *self, Query *negated_query);
+
+    public incremented Compiler*
+    Make_Compiler(NOTQuery *self, Searcher *searcher, float boost);
+
+    public incremented CharBuf*
+    To_String(NOTQuery *self);
+
+    public bool_t
+    Equals(NOTQuery *self, Obj *other);
+}
+
+class Lucy::Search::NOTCompiler
+    inherits Lucy::Search::PolyCompiler {
+
+    inert incremented NOTCompiler*
+    new(NOTQuery *parent, Searcher *searcher, float boost);
+
+    inert NOTCompiler*
+    init(NOTCompiler *self, NOTQuery *parent, Searcher *searcher,
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(NOTCompiler *self, SegReader *reader, bool_t need_score);
+
+    public float
+    Sum_Of_Squared_Weights(NOTCompiler *self);
+
+    public incremented VArray*
+    Highlight_Spans(NOTCompiler *self, Searcher *searcher,
+                    DocVector *doc_vec, const CharBuf *field);
+}
+
+

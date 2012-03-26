@@ -1,0 +1,88 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Read a segment's sort caches.
+ */
+class Lucy::Index::SortCache inherits Lucy::Object::Obj {
+
+    CharBuf   *field;
+    FieldType *type;
+    void      *ords;
+    int32_t    doc_max;
+    int32_t    cardinality;
+    int32_t    ord_width;
+    int32_t    null_ord;
+    bool_t     native_ords;
+
+    public inert SortCache*
+    init(SortCache *self, const CharBuf *field, FieldType *type,
+         void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+         int32_t ord_width);
+
+    /** Assign the value for ordinal <code>ord</code> to <code>blank</code>.
+     *
+     * @return either <code>blank</code> (no longer blank), or NULL if the
+     * value for <code>ord</code> is NULL.
+     */
+    public abstract nullable Obj*
+    Value(SortCache *self, int32_t ord, Obj *blank);
+
+    /** Return an object appropriate for use as an argument to Value().
+     */
+    public abstract incremented Obj*
+    Make_Blank(SortCache *self);
+
+    public void*
+    Get_Ords(SortCache *self);
+
+    public int32_t
+    Get_Cardinality(SortCache *self);
+
+    public int32_t
+    Get_Ord_Width(SortCache *self);
+
+    public int32_t
+    Get_Null_Ord(SortCache *self);
+
+    public int32_t
+    Ordinal(SortCache *self, int32_t doc_id);
+
+    /** Attempt to find the ordinal of the supplied <code>term</code>.  If the
+     * term cannot be found, return the ordinal of the term that would appear
+     * immediately before it in sort order.
+     *
+     * @return an integer between -1 and the highest ordinal.
+     */
+    public int32_t
+    Find(SortCache *self, Obj *term = NULL);
+
+    /** Early versions of SortCache had a bug where ords were written using
+     * native byte order rather than big-endian byte order.  The "native_ords"
+     * setting indicates whether this SortCache has such a bug.
+     */
+    void
+    Set_Native_Ords(SortCache *self, bool_t native_ords);
+
+    bool_t
+    Get_Native_Ords(SortCache *self);
+
+    public void
+    Destroy(SortCache *self);
+}
+
+

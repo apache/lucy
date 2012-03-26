@@ -1,0 +1,70 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Term-Document pairings.
+ *
+ * PostingList is an iterator which supplies a list of document ids that match
+ * a given term.
+ *
+ * See L<Lucy::Docs::IRTheory> for definitions of "posting" and "posting
+ * list".
+ */
+class Lucy::Index::PostingList cnick PList
+    inherits Lucy::Search::Matcher {
+
+    public inert PostingList*
+    init(PostingList *self);
+
+    /** Return the iterator's current Posting.  Should not be called before
+     * the iterator is initialized or after it empties.
+     */
+    abstract Posting*
+    Get_Posting(PostingList *self);
+
+    /** Return the number of documents that the PostingList contains.  (This
+     * number will include any documents which have been marked as deleted but
+     * not yet purged.)
+     */
+    public abstract uint32_t
+    Get_Doc_Freq(PostingList *self);
+
+    /** Prepare the PostingList object to iterate over matches for documents
+     * that match <code>target</code>.
+     *
+     * @param target The term to match.  If NULL, the iterator will be empty.
+     */
+    public abstract void
+    Seek(PostingList *self, Obj *target = NULL);
+
+    abstract void
+    Seek_Lex(PostingList *self, Lexicon *lexicon);
+
+    /** Invoke Post_Make_Matcher() for this PostingList's posting.
+     */
+    abstract Matcher*
+    Make_Matcher(PostingList *self, Similarity *similarity,
+                 Compiler *compiler, bool_t need_score);
+
+    /** Indexing helper function.
+     */
+    abstract RawPosting*
+    Read_Raw(PostingList *self, int32_t last_doc_id, CharBuf *term_text,
+             MemoryPool *mem_pool);
+}
+
+

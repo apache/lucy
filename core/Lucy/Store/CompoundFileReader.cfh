@@ -1,0 +1,114 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Read from a compound file.
+ *
+ * A CompoundFileReader provides access to the files contained within the
+ * compound file format written by CompoundFileWriter.  The InStream objects
+ * it spits out behave largely like InStreams opened against discrete files --
+ * e.g. Seek(0) seeks to the beginning of the sub-file, not the beginning of
+ * the compound file.
+ *
+ * Each of the InStreams spawned maintains its own memory buffer; however,
+ * they all share a single filehandle.  This allows Lucy to get around
+ * the limitations that many operating systems place on the number of
+ * available filehandles.
+ */
+
+class Lucy::Store::CompoundFileReader cnick CFReader
+    inherits Lucy::Store::Folder {
+
+    Folder       *real_folder;
+    Hash         *records;
+    InStream     *instream;
+    int32_t       format;
+
+    inert incremented nullable CompoundFileReader*
+    open(Folder *folder);
+
+    /** Return a new CompoundFileReader or set Err_error and return NULL.
+     *
+     * @param folder A folder containing compound files.
+     */
+    inert nullable CompoundFileReader*
+    do_open(CompoundFileReader *self, Folder *folder);
+
+    Folder*
+    Get_Real_Folder(CompoundFileReader *self);
+
+    void
+    Set_Path(CompoundFileReader *self, const CharBuf *path);
+
+    public void
+    Close(CompoundFileReader *self);
+
+    public void
+    Destroy(CompoundFileReader *self);
+
+    bool_t
+    Local_Delete(CompoundFileReader *self, const CharBuf *name);
+
+    bool_t
+    Local_Exists(CompoundFileReader *self, const CharBuf *name);
+
+    bool_t
+    Local_Is_Directory(CompoundFileReader *self, const CharBuf *name);
+
+    incremented nullable FileHandle*
+    Local_Open_FileHandle(CompoundFileReader *self, const CharBuf *name,
+                          uint32_t flags);
+
+    incremented nullable InStream*
+    Local_Open_In(CompoundFileReader *self, const CharBuf *name);
+
+    bool_t
+    Local_MkDir(CompoundFileReader *self, const CharBuf *name);
+
+    nullable Folder*
+    Local_Find_Folder(CompoundFileReader *self, const CharBuf *name);
+
+    incremented nullable DirHandle*
+    Local_Open_Dir(CompoundFileReader *self);
+}
+
+/** DirHandle for CompoundFileReader.
+ */
+class Lucy::Store::CFReaderDirHandle cnick CFReaderDH
+    inherits Lucy::Store::DirHandle {
+
+    CompoundFileReader *cf_reader;
+    VArray             *elems;
+    int32_t             tick;
+
+    inert incremented CFReaderDirHandle*
+    new(CompoundFileReader *cf_reader);
+
+    inert CFReaderDirHandle*
+    init(CFReaderDirHandle *self, CompoundFileReader *cf_reader);
+
+    bool_t
+    Next(CFReaderDirHandle *self);
+
+    bool_t
+    Entry_Is_Dir(CFReaderDirHandle *self);
+
+    bool_t
+    Close(CFReaderDirHandle *self);
+}
+
+

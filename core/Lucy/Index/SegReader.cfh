@@ -1,0 +1,103 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Single-segment IndexReader.
+ *
+ * SegReader interprets the data within a single segment of an index.
+ *
+ * Generally speaking, only advanced users writing subclasses which manipulate
+ * data at the segment level need to deal with the SegReader API directly.
+ *
+ * Nearly all of SegReader's functionality is implemented by pluggable
+ * components spawned by L<Architecture|Lucy::Plan::Architecture>'s
+ * factory methods.
+ */
+
+class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
+
+    int32_t  doc_max;
+    int32_t  del_count;
+    int64_t  seg_num;
+    CharBuf *seg_name;
+
+    inert incremented SegReader*
+    new(Schema *schema, Folder *folder, Snapshot *snapshot = NULL,
+        VArray *segments, int32_t seg_tick);
+
+    /**
+     * @param schema A Schema.
+     * @param folder A Folder.
+     * @param snapshot A Snapshot, which must contain the files needed by the
+     * Segment.
+     * @param segments An array of Segment objects.
+     * @param seg_tick The array index of the Segment object within
+     * <code>segments</code> that this particular SegReader is assigned to.
+     */
+    inert SegReader*
+    init(SegReader *self, Schema *schema, Folder *folder,
+         Snapshot *snapshot = NULL, VArray *segments, int32_t seg_tick);
+
+    public void
+    Destroy(SegReader *self);
+
+    /** Constructor helper.
+     *
+     * @return either NULL indicating success, or a CharBuf with an error
+     * message.
+     */
+    incremented CharBuf*
+    Try_Init_Components(SegReader *self);
+
+    /** Add a component to the SegReader.  Using the same <code>api</code> key
+     * twice is an error.
+     *
+     * @param api The name of the DataReader subclass that defines the
+     * interface implemented by <code>component</code>.
+     * @param component A DataReader.
+     */
+    public void
+    Register(SegReader *self, const CharBuf *api,
+             decremented DataReader *component);
+
+    /** Return the name of the segment.
+     */
+    public CharBuf*
+    Get_Seg_Name(SegReader *self);
+
+    /** Return the number of the segment.
+     */
+    public int64_t
+    Get_Seg_Num(SegReader *self);
+
+    public int32_t
+    Del_Count(SegReader *self);
+
+    public int32_t
+    Doc_Max(SegReader *self);
+
+    public int32_t
+    Doc_Count(SegReader *self);
+
+    public incremented I32Array*
+    Offsets(SegReader *self);
+
+    public incremented VArray*
+    Seg_Readers(SegReader *self);
+}
+
+

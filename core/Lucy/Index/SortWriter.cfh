@@ -1,0 +1,76 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Writer for sortable fields.
+ *
+ * Changes for format version 3:
+ *
+ *   * Big-endian byte order instead of native byte order for ".ord" files.
+ *   * "ord_widths" key added to metadata.
+ *   * In variable-width cache formats, NULL entries get a file pointer in the
+ *     ".ix" file instead of -1.
+ */
+
+class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
+
+    VArray     *field_writers;
+    Hash       *counts;
+    Hash       *null_ords;
+    Hash       *ord_widths;
+    OutStream  *temp_ord_out;
+    OutStream  *temp_ix_out;
+    OutStream  *temp_dat_out;
+    MemoryPool *mem_pool;
+    size_t      mem_thresh;
+    bool_t      flush_at_finish;
+
+    inert int32_t current_file_format;
+
+    inert incremented SortWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader);
+
+    inert SortWriter*
+    init(SortWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    /* Test only. */
+    inert void
+    set_default_mem_thresh(size_t mem_thresh);
+
+    public void
+    Add_Inverted_Doc(SortWriter *self, Inverter *inverter, int32_t doc_id);
+
+    public void
+    Add_Segment(SortWriter *self, SegReader *reader,
+                I32Array *doc_map = NULL);
+
+    public incremented Hash*
+    Metadata(SortWriter *self);
+
+    public int32_t
+    Format(SortWriter *self);
+
+    public void
+    Finish(SortWriter *self);
+
+    public void
+    Destroy(SortWriter *self);
+}
+
+

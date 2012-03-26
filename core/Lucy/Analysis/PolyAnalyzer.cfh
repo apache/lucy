@@ -1,0 +1,89 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Multiple Analyzers in series.
+ *
+ * A PolyAnalyzer is a series of L<Analyzers|Lucy::Analysis::Analyzer>,
+ * each of which will be called upon to "analyze" text in turn.  You can
+ * either provide the Analyzers yourself, or you can specify a supported
+ * language, in which case a PolyAnalyzer consisting of a
+ * L<CaseFolder|Lucy::Analysis::CaseFolder>, a
+ * L<RegexTokenizer|Lucy::Analysis::RegexTokenizer>, and a
+ * L<SnowballStemmer|Lucy::Analysis::SnowballStemmer> will be generated for you.
+ *
+ * Supported languages:
+ *
+ *     en => English,
+ *     da => Danish,
+ *     de => German,
+ *     es => Spanish,
+ *     fi => Finnish,
+ *     fr => French,
+ *     hu => Hungarian,
+ *     it => Italian,
+ *     nl => Dutch,
+ *     no => Norwegian,
+ *     pt => Portuguese,
+ *     ro => Romanian,
+ *     ru => Russian,
+ *     sv => Swedish,
+ *     tr => Turkish,
+ */
+class Lucy::Analysis::PolyAnalyzer
+    inherits Lucy::Analysis::Analyzer : dumpable {
+
+    VArray  *analyzers;
+
+    inert incremented PolyAnalyzer*
+    new(const CharBuf *language = NULL, VArray *analyzers = NULL);
+
+    /**
+     * @param language An ISO code from the list of supported languages.
+     * @param analyzers An array of Analyzers.  The order of the analyzers
+     * matters.  Don't put a SnowballStemmer before a RegexTokenizer (can't stem whole
+     * documents or paragraphs -- just individual words), or a SnowballStopFilter
+     * after a SnowballStemmer (stemmed words, e.g. "themselv", will not appear in a
+     * stoplist).  In general, the sequence should be: normalize, tokenize,
+     * stopalize, stem.
+     */
+    public inert PolyAnalyzer*
+    init(PolyAnalyzer *self, const CharBuf *language = NULL,
+         VArray *analyzers = NULL);
+
+    /** Getter for "analyzers" member.
+     */
+    public VArray*
+    Get_Analyzers(PolyAnalyzer *self);
+
+    public incremented Inversion*
+    Transform(PolyAnalyzer *self, Inversion *inversion);
+
+    public incremented Inversion*
+    Transform_Text(PolyAnalyzer *self, CharBuf *text);
+
+    public bool_t
+    Equals(PolyAnalyzer *self, Obj *other);
+
+    public incremented PolyAnalyzer*
+    Load(PolyAnalyzer *self, Obj *dump);
+
+    public void
+    Destroy(PolyAnalyzer *self);
+}
+
+

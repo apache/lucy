@@ -1,0 +1,76 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** A specification for a search query.
+ *
+ * Query objects are simple containers which contain the minimum information
+ * necessary to define a search query.
+ *
+ * The most common way to generate Query objects is to feed a search string
+ * such as 'foo AND bar' to a L<QueryParser's|Lucy::Search::QueryParser>
+ * Parse() method, which outputs an abstract syntax tree built up from various
+ * Query subclasses such as L<ANDQuery|Lucy::Search::ANDQuery> and
+ * L<TermQuery|Lucy::Search::TermQuery>.  However, it is also possible
+ * to use custom Query objects to build a search specification which cannot be
+ * easily represented using a search string.
+ *
+ * Subclasses of Query must implement Make_Compiler(), which is the first step
+ * in compiling a Query down to a L<Matcher|Lucy::Search::Matcher> which
+ * can actually match and score documents.
+ */
+
+class Lucy::Search::Query inherits Lucy::Object::Obj : dumpable {
+
+    float boost;
+
+    /** Abstract constructor.
+     *
+     * @param boost A scoring multiplier, affecting the Query's relative
+     * contribution to each document's score.  Typically defaults to 1.0, but
+     * subclasses which do not contribute to document scores such as NOTQuery
+     * and MatchAllQuery default to 0.0 instead.
+     */
+    public inert Query*
+    init(Query *self, float boost = 1.0);
+
+    /** Abstract factory method returning a Compiler derived from this Query.
+     *
+     * @param searcher A Searcher.
+     * @param boost A scoring multiplier. Defaults to the Query's own boost.
+     */
+    public abstract incremented Compiler*
+    Make_Compiler(Query *self, Searcher *searcher, float boost);
+
+    /** Set the Query's boost.
+     */
+    public void
+    Set_Boost(Query *self, float boost);
+
+    /** Get the Query's boost.
+     */
+    public float
+    Get_Boost(Query *self);
+
+    public void
+    Serialize(Query *self, OutStream *outstream);
+
+    public incremented Query*
+    Deserialize(Query *self, InStream *instream);
+}
+
+

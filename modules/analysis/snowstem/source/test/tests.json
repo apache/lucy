@@ -1,0 +1,392 @@
+{
+   "da" : {
+      "stems" : [
+         "a",
+         "blot",
+         "find",
+         "grusdyng",
+         "indsigtsfuld",
+         "lid",
+         "oks",
+         "rør",
+         "stor",
+         "udbred"
+      ],
+      "words" : [
+         "a",
+         "blotter",
+         "find",
+         "grusdyngerne",
+         "indsigtsfulde",
+         "lidet",
+         "okse",
+         "røres",
+         "storheden",
+         "udbredtes"
+      ]
+   },
+   "de" : {
+      "stems" : [
+         "a",
+         "befestigt",
+         "edl",
+         "froscharm",
+         "hau",
+         "kontrakt",
+         "new",
+         "schmachtig",
+         "trink",
+         "vitalitat"
+      ],
+      "words" : [
+         "a",
+         "befestigte",
+         "edlen",
+         "froscharme",
+         "hau",
+         "kontrakt",
+         "new",
+         "schmächtig",
+         "trinken",
+         "vitalitat"
+      ]
+   },
+   "en" : {
+      "stems" : [
+         "'",
+         "borough",
+         "cours",
+         "enlarg",
+         "growl",
+         "labour",
+         "oblivion",
+         "quagmir",
+         "silurus",
+         "tori"
+      ],
+      "words" : [
+         "'",
+         "borough",
+         "courses",
+         "enlarging",
+         "growling",
+         "labourers",
+         "oblivion",
+         "quagmire",
+         "silurus",
+         "tory"
+      ]
+   },
+   "es" : {
+      "stems" : [
+         "a",
+         "autent",
+         "coment",
+         "desenton",
+         "eventual",
+         "implement",
+         "march",
+         "pas",
+         "reconozc",
+         "suced"
+      ],
+      "words" : [
+         "a",
+         "auténtico",
+         "comentó",
+         "desentonados",
+         "eventuales",
+         "implementar",
+         "marcharían",
+         "pasando",
+         "reconozcan",
+         "sucedido"
+      ]
+   },
+   "fi" : {
+      "stems" : [
+         "aa",
+         "allekirjoit",
+         "aset",
+         "bonnier",
+         "eduskuntaryhm",
+         "erikoissairaanhoido",
+         "fält",
+         "harper",
+         "hirsin",
+         "hyökän"
+      ],
+      "words" : [
+         "aa",
+         "allekirjoitti",
+         "aseteta",
+         "bonnierin",
+         "eduskuntaryhmissä",
+         "erikoissairaanhoidossa",
+         "fält",
+         "harper",
+         "hirsinen",
+         "hyökänneen"
+      ]
+   },
+   "fr" : {
+      "stems" : [
+         "a",
+         "bar",
+         "conférent",
+         "disput",
+         "expans",
+         "impuiss",
+         "mérit",
+         "pétrifi",
+         "rel",
+         "souvent"
+      ],
+      "words" : [
+         "a",
+         "bar",
+         "conférences",
+         "dispute",
+         "expansif",
+         "impuissants",
+         "méritait",
+         "pétrifié",
+         "relis",
+         "souvent"
+      ]
+   },
+   "hu" : {
+      "stems" : [
+         "abazin",
+         "bajlódt",
+         "bombázás",
+         "kar",
+         "kirángatt",
+         "kutya",
+         "kötvény",
+         "lovard",
+         "meghívás",
+         "minisztérium"
+      ],
+      "words" : [
+         "abazinok",
+         "bajlódtam",
+         "bombázása",
+         "karddal",
+         "kirángattam",
+         "kutyánk",
+         "kötvényeik",
+         "lovardába",
+         "meghívás",
+         "minisztériumokban"
+      ]
+   },
+   "it" : {
+      "stems" : [
+         "a",
+         "avvi",
+         "compless",
+         "donatell",
+         "got",
+         "letterar",
+         "orribil",
+         "r",
+         "scans",
+         "suggell"
+      ],
+      "words" : [
+         "a",
+         "avviarono",
+         "complessive",
+         "donatella",
+         "gote",
+         "letterario",
+         "orribili",
+         "r",
+         "scansava",
+         "suggella"
+      ]
+   },
+   "nl" : {
+      "stems" : [
+         "a",
+         "betreft",
+         "dommel",
+         "geparkeerd",
+         "inwinn",
+         "meegat",
+         "oorspronk",
+         "rimpel",
+         "telefonisch",
+         "vierspor"
+      ],
+      "words" : [
+         "a",
+         "betreft",
+         "dommel",
+         "geparkeerd",
+         "inwinnen",
+         "meegaat",
+         "oorspronkelijkheid",
+         "rimpelig",
+         "telefonisch",
+         "viersporig"
+      ]
+   },
+   "no" : {
+      "stems" : [
+         "a",
+         "budskap",
+         "fiend",
+         "gradvis",
+         "italiensk",
+         "lovutk",
+         "oppnemn",
+         "risikomoment",
+         "status",
+         "tyv"
+      ],
+      "words" : [
+         "a",
+         "budskapet",
+         "fiender",
+         "gradvis",
+         "italienske",
+         "lovutkast",
+         "oppnemnast",
+         "risikomomentet",
+         "statusen",
+         "tyv"
+      ]
+   },
+   "pt" : {
+      "stems" : [
+         "a",
+         "autor",
+         "coloc",
+         "desmont",
+         "estre",
+         "honr",
+         "macdowell",
+         "pag",
+         "reag",
+         "subsídi"
+      ],
+      "words" : [
+         "a",
+         "autora",
+         "coloco",
+         "desmontaram",
+         "estreou",
+         "honram",
+         "macdowell",
+         "pagando",
+         "reagem",
+         "subsídios"
+      ]
+   },
+   "ro" : {
+      "stems" : [
+         "a",
+         "boaş",
+         "corespondenţ",
+         "etichet",
+         "incertitudin",
+         "lea",
+         "nepot",
+         "povârniş",
+         "sancţiun",
+         "tach"
+      ],
+      "words" : [
+         "a",
+         "boaşele",
+         "corespondenţă",
+         "etichetelor",
+         "incertitudinilor",
+         "lea",
+         "nepotul",
+         "povârnişul",
+         "sancţiuni",
+         "tache"
+      ]
+   },
+   "ru" : {
+      "stems" : [
+         "а",
+         "всем",
+         "жалк",
+         "клад",
+         "накрахмален",
+         "осил",
+         "полезн",
+         "противоположн",
+         "сладчайш",
+         "тщеслав"
+      ],
+      "words" : [
+         "а",
+         "всеми",
+         "жалким",
+         "кладя",
+         "накрахмаленные",
+         "осилила",
+         "полезны",
+         "противоположность",
+         "сладчайший",
+         "тщеславен"
+      ]
+   },
+   "sv" : {
+      "stems" : [
+         "a",
+         "brist",
+         "fot",
+         "gull",
+         "kall",
+         "låt",
+         "otänkbart",
+         "sjuhundr",
+         "sval",
+         "upptänk"
+      ],
+      "words" : [
+         "a",
+         "brister",
+         "fots",
+         "gull",
+         "kalla",
+         "låtelse",
+         "otänkbart",
+         "sjuhundrade",
+         "svalor",
+         "upptänkligt"
+      ]
+   },
+   "tr" : {
+      "stems" : [
+         "a",
+         "başgöstere",
+         "değil",
+         "gazze'ye",
+         "ilginçlik",
+         "kopma",
+         "nmzdek",
+         "selahiyet",
+         "turizm",
+         "yön"
+      ],
+      "words" : [
+         "a",
+         "başgösteren",
+         "değillerdir",
+         "gazze'ye",
+         "ilginçliğinden",
+         "kopmaya",
+         "nmzdeki",
+         "selahiyetleri",
+         "turizmine",
+         "yönler"
+      ]
+   }
+}

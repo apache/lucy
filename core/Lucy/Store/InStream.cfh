@@ -1,0 +1,197 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Read index files.
+ *
+ * InStream objects are the primary interface for reading from index files.
+ * They are high-level (relatively speaking), media-agnostic wrappers
+ * around low-level, media-specific FileHandle objects.
+ *
+ * InStreams provide a number of routines for safely decoding common constructs
+ * such as big-endian or compressed integers; for the most part, these
+ * routines throw exceptions rather than require manual checking of return
+ * values for error conditions.
+ *
+ * Multiple InStream objects often share the same underlying FileHandle; this
+ * practice is safe because InStreams do not modify or rely upon the file
+ * position or other state within the FileHandle.
+ */
+class Lucy::Store::InStream inherits Lucy::Object::Obj {
+
+    int64_t     offset;
+    int64_t     len;
+    char       *buf;
+    char       *limit;
+    CharBuf    *filename;
+    FileHandle *file_handle;
+    FileWindow *window;
+
+    inert incremented nullable InStream*
+    open(Obj *file);
+
+    /** Return a new InStream, or set Err_error and return NULL on failure.
+     *
+     * @param file A FileHandle, a file path, or a RAMFile.
+     */
+    inert nullable InStream*
+    do_open(InStream *self, Obj *file);
+
+    /** Clone the instream, but specify a new offset, length, and possibly
+     * filename.  Initial file position will be set to the top of the file
+     * (taking <code>offset</code> into account).
+     *
+     * @param filename An alias filename.  If NULL, the filename of the
+     * underlying FileHandle will be used.
+     * @param offset Top of the file as seen by the new InStream, in bytes
+     * from the top of the file as seen by the underlying FileHandle.
+     * @param len Length of the file as seen by the new InStream.
+     */
+    incremented InStream*
+    Reopen(InStream *self, const CharBuf *filename = NULL, int64_t offset,
+           int64_t len);
+
+    /** Clone the InStream.  Clones share the same underlying FileHandle and
+     * start at the current file position, but are able to seek and read
+     * independently.
+     */
+    public incremented InStream*
+    Clone(InStream *self);
+
+    /** Decrement the number of streams using the underlying FileHandle.  When
+     * the number drops to zero, possibly release system resources.
+     */
+    void
+    Close(InStream *self);
+
+    public void
+    Destroy(InStream *self);
+
+    /** Seek to <code>target</code>.
+     */
+    final void
+    Seek(InStream *self, int64_t target);
+
+    /** Return the current file position.
+     */
+    final int64_t
+    Tell(InStream *self);
+
+    /** Return the length of the "file" in bytes.
+     */
+    final int64_t
+    Length(InStream *self);
+
+    /** Fill the InStream's buffer, letting the FileHandle decide how many bytes
+     * of data to fill it with.
+     */
+    void
+    Refill(InStream *self);
+
+    /** Pour an exact number of bytes into the InStream's buffer.
+     */
+    void
+    Fill(InStream *self, int64_t amount);
+
+    /** Get the InStream's buffer.  Check to see whether <code>request</code>
+     * bytes are already in the buffer.  If not, fill the buffer with either
+     * <code>request</code> bytes or the number of bytes remaining before EOF,
+     * whichever is smaller.
+     *
+     * @param request Advisory byte size request.
+     * @return Pointer to the InStream's internal buffer.
+     */
+    final char*
+    Buf(InStream *self, size_t request);
+
+    /** Set the buf to a new value, checking for overrun.  The idiom is for
+     * the caller to call Buf(), use no more bytes than requested, then use
+     * Advance_Buf() to update the InStream object.
+     */
+    final void
+    Advance_Buf(InStream *self, char *buf);
+
+    /** Read <code>len</code> bytes from the InStream into <code>buf</code>.
+     */
+    final void
+    Read_Bytes(InStream *self, char *buf, size_t len);
+
+    /** Read a signed 8-bit integer.
+     */
+    final int8_t
+    Read_I8(InStream *self);
+
+    /** Read an unsigned 8-bit integer.
+     */
+    final uint8_t
+    Read_U8(InStream *self);
+
+    /** Read a signed 32-bit integer.
+     */
+    final int32_t
+    Read_I32(InStream *self);
+
+    /** Read an unsigned 32-bit integer.
+     */
+    final uint32_t
+    Read_U32(InStream *self);
+
+    /** Read a signed 64-bit integer.
+     */
+    final int64_t
+    Read_I64(InStream *self);
+
+    /** Read an unsigned 64-bit integer.
+     */
+    final uint64_t
+    Read_U64(InStream *self);
+
+    /** Read an IEEE 764 32-bit floating point number.
+     */
+    final float
+    Read_F32(InStream *self);
+
+    /** Read an IEEE 764 64-bit floating point number.
+     */
+    final double
+    Read_F64(InStream *self);
+
+    /** Read in a compressed 32-bit unsigned integer.
+     */
+    uint32_t
+    Read_C32(InStream *self);
+
+    /** Read a 64-bit integer, using the same encoding as a C32 but occupying
+     * as many as 10 bytes.
+     */
+    final uint64_t
+    Read_C64(InStream *self);
+
+    /** Read the bytes for a C32/C64 into <code>buf</code>.  Return the number
+     * of bytes read.  The caller must ensure that sufficient space exists in
+     * <code>buf</code> (worst case is 10 bytes).
+     */
+    final int
+    Read_Raw_C64(InStream *self, char *buf);
+
+    /** Accessor for filename member.
+     */
+    CharBuf*
+    Get_Filename(InStream *self);
+}
+
+

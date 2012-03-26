@@ -1,0 +1,94 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Writer for a term dictionary.
+ */
+class Lucy::Index::LexiconWriter cnick LexWriter
+    inherits Lucy::Index::DataWriter {
+
+    TermStepper      *term_stepper;
+    TermStepper      *tinfo_stepper;
+    CharBuf          *dat_file;
+    CharBuf          *ix_file;
+    CharBuf          *ixix_file;
+    OutStream        *dat_out;
+    OutStream        *ix_out;
+    OutStream        *ixix_out;
+    Hash             *counts;
+    Hash             *ix_counts;
+    bool_t            temp_mode;
+    int32_t           index_interval;
+    int32_t           skip_interval;
+    int32_t           count;
+    int32_t           ix_count;
+
+    inert int32_t current_file_format;
+
+    inert incremented LexiconWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader);
+
+    inert LexiconWriter*
+    init(LexiconWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    /** Prepare to write the .lex and .lexx files for a field.
+     */
+    void
+    Start_Field(LexiconWriter *self, int32_t field_num);
+
+    /** Finish writing the current field.  Close files, generate metadata.
+     */
+    void
+    Finish_Field(LexiconWriter *self, int32_t field_num);
+
+    /** Prepare to write terms to a temporary file.
+     */
+    void
+    Enter_Temp_Mode(LexiconWriter *self, const CharBuf *field,
+                    OutStream *temp_outstream);
+
+    /** Stop writing terms to temp file.  Abandon (but don't close) the file.
+     */
+    void
+    Leave_Temp_Mode(LexiconWriter *self);
+
+    /** Add a Term's text and its associated TermInfo (which has the Term's
+     * field number).
+     */
+    void
+    Add_Term(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo);
+
+    public void
+    Add_Segment(LexiconWriter *self, SegReader *reader,
+                I32Array *doc_map = NULL);
+
+    public incremented Hash*
+    Metadata(LexiconWriter *self);
+
+    public int32_t
+    Format(LexiconWriter *self);
+
+    public void
+    Finish(LexiconWriter *self);
+
+    public void
+    Destroy(LexiconWriter *self);
+}
+
+

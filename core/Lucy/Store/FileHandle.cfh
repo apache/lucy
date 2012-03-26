@@ -1,0 +1,153 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Abstract class for reading and writing to files.
+ *
+ * FileHandle abstracts low-level unbuffered read/write and memory mapping
+ * operations.  Implementations might reference data in a local file system, a
+ * RAM "file", a custom-constructed compound file, etc.
+ *
+ * Desired behaviors for a FileHandle are expressed via flags supplied to the
+ * constructor:
+ *
+ *     * FH_READ_ONLY - Read only.
+ *     * FH_WRITE_ONLY - Write only.
+ *     * FH_CREATE - Create the file if it does not yet exist.
+ *     * FH_EXCLUSIVE - The attempt to open the file should fail if the file
+ *       already exists.
+ */
+
+abstract class Lucy::Store::FileHandle cnick FH
+    inherits Lucy::Object::Obj {
+
+    CharBuf *path;
+    uint32_t flags;
+
+    /* Integer which is incremented each time a FileHandle is created and
+     * decremented when a FileHandle is destroyed.  Since so many classes use
+     * FileHandle objects, they're the canary in the coal mine for detecting
+     * object-destruction memory leaks.
+     */
+    inert int32_t object_count;
+
+    /** Abstract constructor.
+     *
+     * @param path The path to the file.
+     * @param flags A 32-bit integer with bits set to indicate desired
+     * behaviors.
+     */
+    inert nullable FileHandle*
+    do_open(FileHandle *self, const CharBuf *path = NULL, uint32_t flags);
+
+    /** Ensure that the FileWindow's buffer provides access to file data for
+     * <code>len</code> bytes starting at <code>offset</code>.
+     *
+     * @param window A FileWindow.
+     * @param offset File position to begin at.
+     * @param len Number of bytes to expose via the window.
+     * @return true on success, false on failure (sets Err_error)
+     */
+    abstract bool_t
+    Window(FileHandle *self, FileWindow *window, int64_t offset, int64_t len);
+
+    /** Clean up the FileWindow, doing whatever is necessary to free its
+     * buffer and reset its internal variables.
+     *
+     * @return true on success, false on failure (sets Err_error)
+     */
+    abstract bool_t
+    Release_Window(FileHandle *self, FileWindow *window);
+
+    /** Copy file content into the supplied buffer.
+     *
+     * @param dest Supplied memory.
+     * @param offset File position to begin at.
+     * @param len Number of bytes to copy.
+     * @return true on success, false on failure (sets Err_error)
+     */
+    abstract bool_t
+    Read(FileHandle *self, char *dest, int64_t offset, size_t len);
+
+    /** Write supplied content.
+     *
+     * @param data Content to write.
+     * @param len Number of bytes to write.
+     * @return true on success, false on failure (sets Err_error)
+     */
+    abstract bool_t
+    Write(FileHandle *self, const void *data, size_t len);
+
+    /** Return the current length of the file in bytes, or set Err_error and
+     * return -1 on failure.
+     */
+    abstract int64_t
+    Length(FileHandle *self);
+
+    /** Advisory call alerting the FileHandle that it should prepare to occupy
+     * <code>len</code> bytes.  The default implementation is a no-op.
+     *
+     * @return true on success, false on failure (sets Err_error).
+     */
+    bool_t
+    Grow(FileHandle *self, int64_t len);
+
+    /** Close the FileHandle, possibly releasing resources.  Implementations
+     * should be be able to handle multiple invocations, returning success
+     * unless something unexpected happens.
+     *
+     * @return true on success, false on failure (sets Err_error)
+     */
+    abstract bool_t
+    Close(FileHandle *self);
+
+    /** Set the object's <code>path</code> attribute.
+     */
+    void
+    Set_Path(FileHandle *self, const CharBuf *path);
+
+    /** Return the object's <code>path</code> attribute.
+     */
+    nullable CharBuf*
+    Get_Path(FileHandle *self);
+
+    /** Invokes Close(), but ignores whether it succeeds or fails.
+     */
+    public void
+    Destroy(FileHandle *self);
+}
+
+__C__
+
+#define LUCY_FH_READ_ONLY  0x1
+#define LUCY_FH_WRITE_ONLY 0x2
+#define LUCY_FH_CREATE     0x4
+#define LUCY_FH_EXCLUSIVE  0x8
+
+// Default size for the memory buffer used by both InStream and OutStream.
+#define LUCY_IO_STREAM_BUF_SIZE 1024
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define IO_STREAM_BUF_SIZE          LUCY_IO_STREAM_BUF_SIZE
+  #define FH_READ_ONLY                LUCY_FH_READ_ONLY
+  #define FH_WRITE_ONLY               LUCY_FH_WRITE_ONLY
+  #define FH_CREATE                   LUCY_FH_CREATE
+  #define FH_EXCLUSIVE                LUCY_FH_EXCLUSIVE
+#endif
+__END_C__
+
+

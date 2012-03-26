@@ -1,0 +1,101 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Unit of text.
+ *
+ * Token is the fundamental unit used by Apache Lucy's Analyzer subclasses.
+ * Each Token has 5 attributes: <code>text</code>, <code>start_offset</code>,
+ * <code>end_offset</code>, <code>boost</code>, and <code>pos_inc</code>.
+ *
+ * The <code>text</code> attribute is a Unicode string encoded as UTF-8.
+ *
+ * <code>start_offset</code> is the start point of the token text, measured in
+ * Unicode code points from the top of the stored field;
+ * <code>end_offset</code> delimits the corresponding closing boundary.
+ * <code>start_offset</code> and <code>end_offset</code> locate the Token
+ * within a larger context, even if the Token's text attribute gets modified
+ * -- by stemming, for instance.  The Token for "beating" in the text "beating
+ * a dead horse" begins life with a start_offset of 0 and an end_offset of 7;
+ * after stemming, the text is "beat", but the start_offset is still 0 and the
+ * end_offset is still 7.  This allows "beating" to be highlighted correctly
+ * after a search matches "beat".
+ *
+ * <code>boost</code> is a per-token weight.  Use this when you want to assign
+ * more or less importance to a particular token, as you might for emboldened
+ * text within an HTML document, for example.  (Note: The field this token
+ * belongs to must be spec'd to use a posting of type
+ * L<Lucy::Index::Posting::RichPosting>.)
+ *
+ * <code>pos_inc</code is the POSition INCrement, measured in Tokens.  This
+ * attribute, which defaults to 1, is a an advanced tool for manipulating
+ * phrase matching.  Ordinarily, Tokens are assigned consecutive position
+ * numbers: 0, 1, and 2 for <code>"three blind mice"</code>.  However, if you
+ * set the position increment for "blind" to, say, 1000, then the three tokens
+ * will end up assigned to positions 0, 1, and 1001 -- and will no longer
+ * produce a phrase match for the query <code>"three blind mice"</code>.
+ */
+class Lucy::Analysis::Token inherits Lucy::Object::Obj {
+
+    char     *text;
+    size_t    len;
+    uint32_t  start_offset;
+    uint32_t  end_offset;
+    float     boost;
+    int32_t   pos_inc;
+    int32_t   pos;
+
+    inert incremented Token*
+    new(const char *text, size_t len, uint32_t start_offset,
+        uint32_t end_offset, float boost = 1.0, int32_t pos_inc = 1);
+
+    inert Token*
+    init(Token *self, const char *text, size_t len,
+         uint32_t start_offset, uint32_t end_offset,
+         float boost = 1.0, int32_t pos_inc = 1);
+
+    /** Sort_quicksort-compatible comparison routine.
+     */
+    inert int
+    compare(void *context, const void *va, const void *vb);
+
+    uint32_t
+    Get_Start_Offset(Token *self);
+
+    uint32_t
+    Get_End_Offset(Token *self);
+
+    float
+    Get_Boost(Token *self);
+
+    int32_t
+    Get_Pos_Inc(Token *self);
+
+    char*
+    Get_Text(Token *self);
+
+    size_t
+    Get_Len(Token *self);
+
+    void
+    Set_Text(Token *self, char *text, size_t len);
+
+    public void
+    Destroy(Token *self);
+}
+
+

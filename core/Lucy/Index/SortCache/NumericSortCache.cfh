@@ -1,0 +1,114 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+class Lucy::Index::SortCache::NumericSortCache cnick NumSortCache
+    inherits Lucy::Index::SortCache {
+
+    InStream  *ord_in;
+    InStream  *dat_in;
+
+    inert NumericSortCache*
+    init(NumericSortCache *self, const CharBuf *field, FieldType *type,
+         int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+         int32_t ord_width, InStream *ord_in, InStream *dat_in);
+
+    public void
+    Destroy(NumericSortCache *self);
+}
+
+class Lucy::Index::SortCache::Float64SortCache cnick F64SortCache
+    inherits Lucy::Index::SortCache::NumericSortCache {
+
+    public inert incremented Float64SortCache*
+    new(const CharBuf *field, FieldType *type, int32_t cardinality,
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
+        InStream *ord_in, InStream *dat_in);
+
+    public inert Float64SortCache*
+    init(Float64SortCache *self, const CharBuf *field, FieldType *type,
+         int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+         int32_t ord_width, InStream *ord_in, InStream *dat_in);
+
+    public nullable Obj*
+    Value(Float64SortCache *self, int32_t ord, Obj *blank);
+
+    public incremented Float64*
+    Make_Blank(Float64SortCache *self);
+}
+
+class Lucy::Index::SortCache::Float32SortCache cnick F32SortCache
+    inherits Lucy::Index::SortCache::NumericSortCache {
+
+    public inert incremented Float32SortCache*
+    new(const CharBuf *field, FieldType *type, int32_t cardinality,
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
+        InStream *ord_in, InStream *dat_in);
+
+    public inert Float32SortCache*
+    init(Float32SortCache *self, const CharBuf *field, FieldType *type,
+         int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+         int32_t ord_width, InStream *ord_in, InStream *dat_in);
+
+    public nullable Obj*
+    Value(Float32SortCache *self, int32_t ord, Obj *blank);
+
+    public incremented Float32*
+    Make_Blank(Float32SortCache *self);
+}
+
+class Lucy::Index::SortCache::Int32SortCache cnick I32SortCache
+    inherits Lucy::Index::SortCache::NumericSortCache {
+
+    public inert incremented Int32SortCache*
+    new(const CharBuf *field, FieldType *type, int32_t cardinality,
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
+        InStream *ord_in, InStream *dat_in);
+
+    public inert Int32SortCache*
+    init(Int32SortCache *self, const CharBuf *field, FieldType *type,
+         int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+         int32_t ord_width, InStream *ord_in, InStream *dat_in);
+
+    public nullable Obj*
+    Value(Int32SortCache *self, int32_t ord, Obj *blank);
+
+    public incremented Integer32*
+    Make_Blank(Int32SortCache *self);
+}
+
+class Lucy::Index::SortCache::Int64SortCache cnick I64SortCache
+    inherits Lucy::Index::SortCache::NumericSortCache {
+
+    public inert incremented Int64SortCache*
+    new(const CharBuf *field, FieldType *type, int32_t cardinality,
+        int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
+        InStream *ord_in, InStream *dat_in);
+
+    public inert Int64SortCache*
+    init(Int64SortCache *self, const CharBuf *field, FieldType *type,
+         int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+         int32_t ord_width, InStream *ord_in, InStream *dat_in);
+
+    public nullable Obj*
+    Value(Int64SortCache *self, int32_t ord, Obj *blank);
+
+    public incremented Integer64*
+    Make_Blank(Int64SortCache *self);
+}
+
+

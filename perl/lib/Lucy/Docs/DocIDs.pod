@@ -1,0 +1,47 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy::Docs::DocIDs - Characteristics of Apache Lucy document ids.
+
+=head1 DESCRIPTION
+
+=head2 Document ids are signed 32-bit integers
+
+Document ids in Apache Lucy start at 1.  Because 0 is never a valid doc id, we
+can use it as a sentinel value:
+
+    while ( my $doc_id = $posting_list->next ) {
+        ...
+    }
+
+=head2 Document ids are ephemeral
+
+The document ids used by Lucy are associated with a single index
+snapshot.  The moment an index is updated, the mapping of document ids to
+documents is subject to change.
+
+Since IndexReader objects represent a point-in-time view of an index, document
+ids are guaranteed to remain static for the life of the reader.  However,
+because they are not permanent, Lucy document ids cannot be used as
+foreign keys to locate records in external data sources.  If you truly need a
+primary key field, you must define it and populate it yourself.
+
+Furthermore, the order of document ids does not tell you anything about the
+sequence in which documents were added to the index.
+
+=cut
+

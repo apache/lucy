@@ -1,0 +1,80 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Iterator for a field's terms.
+ *
+ * A Lexicon is an iterator which provides access to all the unique terms for
+ * a given field in sorted order.
+ *
+ * If an index consists of two documents with a 'content' field holding "three
+ * blind mice" and "three musketeers" respectively, then iterating through the
+ * 'content' field's lexicon would produce this list:
+ *
+ *     blind
+ *     mice
+ *     musketeers
+ *     three
+ */
+
+class Lucy::Index::Lexicon cnick Lex inherits Lucy::Object::Obj {
+
+    CharBuf *field;
+
+    public inert Lexicon*
+    init(Lexicon *self, const CharBuf *field);
+
+    public void
+    Destroy(Lexicon *self);
+
+    /** Seek the Lexicon to the first iterator state which is greater than or
+     * equal to <code>target</code>.  If <code>target</code> is NULL,
+     * reset the iterator.
+     */
+    public abstract void
+    Seek(Lexicon *self, Obj *target = NULL);
+
+    /** Proceed to the next term.
+     *
+     * @return true until the iterator is exhausted, then false.
+     */
+    public abstract bool_t
+    Next(Lexicon *self);
+
+    /** Reset the iterator.  Next() must be called to proceed to the first
+     * element.
+     */
+    public abstract void
+    Reset(Lexicon *self);
+
+    /** Return the number of documents that the current term appears in at
+     * least once.  Deleted documents may be included in the count.
+     */
+    public abstract int32_t
+    Doc_Freq(Lexicon *self);
+
+    /** Return the current term, or NULL if the iterator is not in a valid
+     * state.
+     */
+    public abstract nullable Obj*
+    Get_Term(Lexicon *self);
+
+    public CharBuf*
+    Get_Field(Lexicon *self);
+}
+
+

@@ -1,0 +1,170 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Query-to-Matcher compiler.
+ *
+ * The purpose of the Compiler class is to take a specification in the form of
+ * a L<Query|Lucy::Search::Query> object and compile a
+ * L<Matcher|Lucy::Search::Matcher> object that can do real work.
+ *
+ * The simplest Compiler subclasses -- such as those associated with
+ * constant-scoring Query types -- might simply implement a Make_Matcher()
+ * method which passes along information verbatim from the Query to the
+ * Matcher's constructor.
+ *
+ * However it is common for the Compiler to perform some calculations which
+ * affect it's "weight" -- a floating point multiplier that the Matcher will
+ * factor into each document's score.  If that is the case, then the Compiler
+ * subclass may wish to override Get_Weight(), Sum_Of_Squared_Weights(), and
+ * Apply_Norm_Factor().
+ *
+ * Compiling a Matcher is a two stage process.
+ *
+ * The first stage takes place during the Compiler's constructor, which is
+ * where the Query object meets a L<Searcher|Lucy::Search::Searcher>
+ * object for the first time.  Searchers operate on a specific document
+ * collection and they can tell you certain statistical information about the
+ * collection -- such as how many total documents are in the collection, or
+ * how many documents in the collection a particular term is present in.
+ * Lucy's core Compiler classes plug this information into the classic
+ * TF/IDF weighting algorithm to adjust the Compiler's weight; custom
+ * subclasses might do something similar.
+ *
+ * The second stage of compilation is Make_Matcher(), method, which is where
+ * the Compiler meets a L<SegReader|Lucy::Index::SegReader> object.
+ * SegReaders are associated with a single segment within a single index on a
+ * single machine, and are thus lower-level than Searchers, which may
+ * represent a document collection spread out over a search cluster
+ * (comprising several indexes and many segments).  The Compiler object can
+ * use new information supplied by the SegReader -- such as whether a term is
+ * missing from the local index even though it is present within the larger
+ * collection represented by the Searcher -- when figuring out what to feed to
+ * the Matchers's constructor, or whether Make_Matcher() should return a
+ * Matcher at all.
+ */
+class Lucy::Search::Compiler inherits Lucy::Search::Query {
+
+    Query        *parent;
+    Similarity   *sim;
+
+    /** Abstract constructor.
+     *
+     * @param parent The parent Query.
+     * @param searcher A Lucy::Search::Searcher, such as an
+     * IndexSearcher.
+     * @param similarity A Similarity.
+     * @param boost An arbitrary scoring multiplier.  Defaults to the boost of
+     * the parent Query.
+     */
+    public inert Compiler*
+    init(Compiler *self, Query *parent, Searcher *searcher,
+         Similarity *similarity = NULL, float boost);
+
+    /** Factory method returning a Matcher.
+     *
+     * @param reader A SegReader.
+     * @param need_score Indicate whether the Matcher must implement Score().
+     * @return a Matcher, or NULL if the Matcher would have matched no
+     * documents.
+     */
+    public abstract incremented nullable Matcher*
+    Make_Matcher(Compiler *self, SegReader *reader, bool_t need_score);
+
+    /** Return the Compiler's numerical weight, a scoring multiplier.  By
+     * default, returns the object's boost.
+     */
+    public float
+    Get_Weight(Compiler *self);
+
+    /** Accessor for the Compiler's Similarity object.
+     */
+    public nullable Similarity*
+    Get_Similarity(Compiler *self);
+
+    /** Accessor for the Compiler's parent Query object.
+     */
+    public Query*
+    Get_Parent(Compiler *self);
+
+    /** Compute and return a raw weighting factor.  (This quantity is used by
+     * Normalize()).  By default, simply returns 1.0.
+     */
+    public float
+    Sum_Of_Squared_Weights(Compiler *self);
+
+    /** Apply a floating point normalization multiplier.  For a TermCompiler,
+     * this involves multiplying its own weight by the supplied factor;
+     * combining classes such as ORCompiler would apply the factor recursively
+     * to their children.
+     *
+     * The default implementation is a no-op; subclasses may wish to multiply
+     * their internal weight by the supplied factor.
+     *
+     * @param factor The multiplier.
+     */
+    public void
+    Apply_Norm_Factor(Compiler *self, float factor);
+
+    /**  Take a newly minted Compiler object and apply query-specific
+     * normalization factors.  Should be called at or near the end of
+     * construction.
+     *
+     * For a TermQuery, the scoring formula is approximately:
+     *
+     *     (tf_d * idf_t / norm_d) * (tf_q * idf_t / norm_q)
+     *
+     * Normalize() is theoretically concerned with applying the second half of
+     * that formula to a the Compiler's weight. What actually happens depends
+     * on how the Compiler and Similarity methods called internally are
+     * implemented.
+     */
+    public void
+    Normalize(Compiler *self);
+
+    /** Return an array of Span objects, indicating where in the given field
+     * the text that matches the parent Query occurs and how well each snippet
+     * matches.  The Span's offset and length are measured in Unicode code
+     * points.
+     *
+     * The default implementation returns an empty array.
+     *
+     * @param searcher A Searcher.
+     * @param doc_vec A DocVector.
+     * @param field The name of the field.
+     */
+    public incremented VArray*
+    Highlight_Spans(Compiler *self, Searcher *searcher,
+                    DocVector *doc_vec, const CharBuf *field);
+
+    public void
+    Serialize(Compiler *self, OutStream *outstream);
+
+    public incremented Compiler*
+    Deserialize(Compiler *self, InStream *instream);
+
+    public bool_t
+    Equals(Compiler *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(Compiler *self);
+
+    public void
+    Destroy(Compiler *self);
+}
+
+

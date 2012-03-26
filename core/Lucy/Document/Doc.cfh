@@ -1,0 +1,104 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** A document.
+ *
+ * A Doc object is akin to a row in a database, in that it is made up of one
+ * or more fields, each of which has a value.
+ */
+
+public class Lucy::Document::Doc inherits Lucy::Object::Obj
+    : dumpable {
+
+    void        *fields;
+    int32_t      doc_id;
+
+    inert incremented Doc*
+    new(void *fields = NULL, int32_t doc_id = 0);
+
+    /**
+     * @param fields Field-value pairs.
+     * @param doc_id Internal Lucy document id.  Default of 0 (an
+     * invalid doc id).
+     */
+    public inert Doc*
+    init(Doc *self, void *fields = NULL, int32_t doc_id = 0);
+
+    /** Set internal Lucy document id.
+     */
+    public void
+    Set_Doc_ID(Doc *self, int32_t doc_id);
+
+    /** Retrieve internal Lucy document id.
+     */
+    public int32_t
+    Get_Doc_ID(Doc *self);
+
+    /** Store a field value in the Doc.
+     */
+    void
+    Store(Doc *self, const CharBuf *field, Obj *value);
+
+    /** Set the doc's field's attribute.
+     */
+    void
+    Set_Fields(Doc *self, void *fields);
+
+    /** Return the Doc's backing fields hash.
+     */
+    public nullable void*
+    Get_Fields(Doc *self);
+
+    /** Return the number of fields in the Doc.
+     */
+    public uint32_t
+    Get_Size(Doc *self);
+
+    /** Retrieve the field's value, or NULL if the field is not present.  If
+     * the field is a text type, assign it to <code>target</code>.  Otherwise,
+     * return the interior object.  Callers must check to verify the kind of
+     * object returned.
+     */
+    nullable Obj*
+    Extract(Doc *self, CharBuf *field, ViewCharBuf *target);
+
+    /* Unimplemented methods.
+     */
+    public bool_t
+    Equals(Doc *self, Obj *other);
+
+    public void
+    Serialize(Doc *self, OutStream *outstream);
+
+    public incremented Doc*
+    Deserialize(Doc *self, InStream *instream);
+
+    public incremented Hash*
+    Dump(Doc *self);
+
+    public incremented Doc*
+    Load(Doc *self, Obj *dump);
+
+    void*
+    To_Host(Doc *self);
+
+    public void
+    Destroy(Doc *self);
+}
+
+

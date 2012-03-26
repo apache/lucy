@@ -1,0 +1,125 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Read from an inverted index.
+ *
+ * IndexReader is the interface through which
+ * L<IndexSearcher|Lucy::Search::IndexSearcher> objects access the
+ * content of an index.
+ *
+ * IndexReader objects always represent a point-in-time view of an index as it
+ * existed at the moment the reader was created.  If you want search results
+ * to reflect modifications to an index, you must create a new IndexReader
+ * after the update process completes.
+ *
+ * IndexReaders are composites; most of the work is done by individual
+ * L<DataReader|Lucy::Index::DataReader> sub-components, which may be
+ * accessed via Fetch() and Obtain().  The most efficient and powerful access
+ * to index data happens at the segment level via
+ * L<SegReader|Lucy::Index::SegReader>'s sub-components.
+ */
+
+class Lucy::Index::IndexReader cnick IxReader
+    inherits Lucy::Index::DataReader {
+
+    Hash            *components;
+    IndexManager    *manager;
+    Lock            *read_lock;
+    Lock            *deletion_lock;
+
+    public inert nullable IndexReader*
+    init(IndexReader *self, Schema *schema = NULL, Folder *folder,
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         int32_t seg_tick = -1, IndexManager *manager = NULL);
+
+    public inert incremented nullable IndexReader*
+    open(Obj *index, Snapshot *snapshot = NULL,
+         IndexManager *manager = NULL);
+
+    /** IndexReader is an abstract base class; open() returns the IndexReader
+     * subclass PolyReader, which channels the output of 0 or more SegReaders.
+     *
+     * @param index Either a string filepath or a Folder.
+     * @param snapshot A Snapshot.  If not supplied, the most recent snapshot
+     * file will be used.
+     * @param manager An L<IndexManager|Lucy::Index::IndexManager>.
+     * Read-locking is off by default; supplying this argument turns it on.
+     */
+    public inert nullable IndexReader*
+    do_open(IndexReader *self, Obj *index, Snapshot *snapshot = NULL,
+            IndexManager *manager = NULL);
+
+    /** Return the maximum number of documents available to the reader, which
+     * is also the highest possible internal document id.  Documents which
+     * have been marked as deleted but not yet purged from the index are
+     * included in this count.
+     */
+    public abstract int32_t
+    Doc_Max(IndexReader *self);
+
+    /** Return the number of documents available to the reader, subtracting
+     * any that are marked as deleted.
+     */
+    public abstract int32_t
+    Doc_Count(IndexReader *self);
+
+    /** Return the number of documents which have been marked as deleted but
+     * not yet purged from the index.
+     */
+    public abstract int32_t
+    Del_Count(IndexReader *self);
+
+    /** Return an array with one entry for each segment, corresponding to
+     * segment doc_id start offset.
+     */
+    public abstract incremented I32Array*
+    Offsets(IndexReader *self);
+
+    /** Return an array of all the SegReaders represented within the
+     * IndexReader.
+     */
+    public abstract incremented VArray*
+    Seg_Readers(IndexReader *self);
+
+    /** Fetch a component, or throw an error if the component can't be found.
+     *
+     * @param api The name of the DataReader subclass that the desired
+     * component must implement.
+     */
+    public DataReader*
+    Obtain(IndexReader *self, const CharBuf *api);
+
+    /** Fetch a component, or return NULL if the component can't be found.
+     *
+     * @param api The name of the DataReader subclass that the desired
+     * component must implement.
+     */
+    public nullable DataReader*
+    Fetch(IndexReader *self, const CharBuf *api);
+
+    public void
+    Close(IndexReader *self);
+
+    Hash*
+    Get_Components(IndexReader *self);
+
+    public void
+    Destroy(IndexReader *self);
+}
+
+

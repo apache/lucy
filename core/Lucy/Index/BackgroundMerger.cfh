@@ -1,0 +1,90 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Consolidate index segments in the background.
+ *
+ * Adding documents to an index is usually fast, but every once in a while the
+ * index must be compacted and an update takes substantially longer to
+ * complete.  See L<Lucy::Docs::Cookbook::FastUpdates> for how to use
+ * this class to control worst-case index update performance.
+ *
+ * As with L<Indexer|Lucy::Index::Indexer>, see
+ * L<Lucy::Docs::FileLocking> if your index is on a shared volume.
+ */
+class Lucy::Index::BackgroundMerger cnick BGMerger
+    inherits Lucy::Object::Obj {
+
+    Schema            *schema;
+    Folder            *folder;
+    Segment           *segment;
+    IndexManager      *manager;
+    PolyReader        *polyreader;
+    Snapshot          *snapshot;
+    SegWriter         *seg_writer;
+    DeletionsWriter   *del_writer;
+    FilePurger        *file_purger;
+    Lock              *write_lock;
+    Lock              *merge_lock;
+    CharBuf           *snapfile;
+    Hash              *doc_maps;
+    int64_t            cutoff;
+    bool_t             optimize;
+    bool_t             needs_commit;
+    bool_t             prepared;
+
+    public inert incremented BackgroundMerger*
+    new(Obj *index, IndexManager *manager = NULL);
+
+    /** Open a new BackgroundMerger.
+     *
+     * @param index Either a string filepath or a Folder.
+     * @param manager An IndexManager.  If not supplied, an IndexManager with
+     * a 10-second write lock timeout will be created.
+     */
+    public inert BackgroundMerger*
+    init(BackgroundMerger *self, Obj *index, IndexManager *manager = NULL);
+
+    /** Optimize the index for search-time performance.  This may take a
+     * while, as it can involve rewriting large amounts of data.
+     */
+    public void
+    Optimize(BackgroundMerger *self);
+
+    /** Commit any changes made to the index.  Until this is called, none of
+     * the changes made during an indexing session are permanent.
+     *
+     * Calls Prepare_Commit() implicitly if it has not already been called.
+     */
+    public void
+    Commit(BackgroundMerger *self);
+
+    /** Perform the expensive setup for Commit() in advance, so that Commit()
+     * completes quickly.
+     *
+     * Towards the end of Prepare_Commit(), the BackgroundMerger attempts to
+     * re-acquire the write lock, which is then held until Commit() finishes
+     * and releases it.
+     */
+    public void
+    Prepare_Commit(BackgroundMerger *self);
+
+    public void
+    Destroy(BackgroundMerger *self);
+}
+
+

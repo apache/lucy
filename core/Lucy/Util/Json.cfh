@@ -1,0 +1,58 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Encode/decode JSON.
+ *
+ * Provides utility functions for encoding/decoding JSON.
+ */
+class Lucy::Util::Json inherits Lucy::Object::Obj {
+
+    /** Encode <code>dump</code> as JSON.
+     */
+    inert incremented CharBuf*
+    to_json(Obj *dump);
+
+    /** Decode the supplied JSON and return a data structure made
+     * of Hashes, VArrays, and CharBufs.
+     */
+    inert incremented Obj*
+    from_json(CharBuf *json);
+
+    /** Encode <code>dump</code> as JSON and attempt to write to the indicated
+     * file.
+     * @return true if the write succeeds, false on failure (sets Err_error).
+     */
+    inert bool_t
+    spew_json(Obj *dump, Folder *folder, const CharBuf *path);
+
+    /** Decode the JSON in the file at <code>path</code> and return a data
+     * structure made of Hashes, VArrays, and CharBufs.  Returns NULL and sets
+     * Err_error if the file can't be can't be opened or if the file doesn't
+     * contain valid JSON.
+     */
+    inert incremented nullable Obj*
+    slurp_json(Folder *folder, const CharBuf *path);
+
+    /** Allow the encoder to output strings, etc, instead of throwing an error
+     * on anything other than a hash or an array.  Testing only.
+     */
+    inert void
+    set_tolerant(bool_t tolerant);
+}
+
+

@@ -1,0 +1,56 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+class Lucy::Index::LexIndex inherits Lucy::Index::Lexicon {
+
+    FieldType   *field_type;
+    InStream    *ixix_in;
+    InStream    *ix_in;
+    int64_t     *offsets;
+    int32_t      tick;
+    int32_t      size;
+    int32_t      index_interval;
+    int32_t      skip_interval;
+    TermStepper *term_stepper;
+    TermInfo    *tinfo;
+
+    inert incremented LexIndex*
+    new(Schema *schema, Folder *folder, Segment *segment,
+        const CharBuf *field);
+
+    inert LexIndex*
+    init(LexIndex *self, Schema *schema, Folder *folder, Segment *segment,
+         const CharBuf *field);
+
+    public void
+    Seek(LexIndex *self, Obj *target = NULL);
+
+    int32_t
+    Get_Term_Num(LexIndex *self);
+
+    nullable TermInfo*
+    Get_Term_Info(LexIndex *self);
+
+    public nullable Obj*
+    Get_Term(LexIndex *self);
+
+    public void
+    Destroy(LexIndex *self);
+}
+
+

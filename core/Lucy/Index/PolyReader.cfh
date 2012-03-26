@@ -1,0 +1,106 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Multi-segment implementation of IndexReader.
+ *
+ * PolyReader conflates index data from multiple segments.  For instance, if
+ * an index contains three segments with 10 documents each, PolyReader's
+ * Doc_Max() method will return 30.
+ *
+ * Some of PolyReader's L<DataReader|Lucy::Index::DataReader> components
+ * may be less efficient or complete than the single-segment implementations
+ * accessed via L<SegReader|Lucy::Index::SegReader>.
+ */
+class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
+
+    VArray   *sub_readers;
+    int32_t   doc_max;
+    int32_t   del_count;
+    I32Array *offsets;
+
+    public inert incremented nullable PolyReader*
+    open(Obj *index, Snapshot *snapshot = NULL, IndexManager *manager = NULL);
+
+    /**
+     * @param index Either a string filepath or a L<Lucy::Folder>.
+     * @param snapshot A Snapshot.  If not supplied, the most recent snapshot
+     * file will be used.
+     * @param manager An L<IndexManager|Lucy::Index::IndexManager>.
+     * Read-locking is off by default; supplying this argument turns it on.
+     */
+    public inert nullable PolyReader*
+    do_open(PolyReader *self, Obj *index, Snapshot *snapshot = NULL,
+            IndexManager *manager = NULL);
+
+    public inert incremented PolyReader*
+    new(Schema *schema = NULL, Folder *folder, Snapshot *snapshot = NULL,
+        IndexManager *manager = NULL, VArray *sub_readers = NULL);
+
+    public inert PolyReader*
+    init(PolyReader *self, Schema *schema = NULL, Folder *folder,
+         Snapshot *snapshot = NULL, IndexManager *manager = NULL,
+         VArray *sub_readers = NULL);
+
+    /** Attempt to open a SegReader for each Segment that the Snapshot knows
+     * about.  If an exception occurs, catch it and return its error message.
+     * If the opening succeeds, return a VArray full of SegReaders.
+     */
+    incremented Obj*
+    Try_Open_SegReaders(PolyReader *self, VArray *segments);
+
+    /** Attempt to read a snapshot file.  If the operation succeeds, return
+     * NULL.  If an exception occurs, catch it and return its error message.
+     */
+    inert incremented nullable CharBuf*
+    try_read_snapshot(Snapshot *snapshot, Folder *folder,
+                      const CharBuf *path);
+
+    inert CharBuf* race_condition_debug1;
+    inert int32_t  debug1_num_passes;
+
+    /** Determine which sub-reader a document id belongs to.
+     */
+    inert uint32_t
+    sub_tick(I32Array *offsets, int32_t doc_id);
+
+    public int32_t
+    Doc_Max(PolyReader *self);
+
+    public int32_t
+    Doc_Count(PolyReader *self);
+
+    public int32_t
+    Del_Count(PolyReader *self);
+
+    public incremented I32Array*
+    Offsets(PolyReader *self);
+
+    public incremented VArray*
+    Seg_Readers(PolyReader *self);
+
+    VArray*
+    Get_Seg_Readers(PolyReader *self);
+
+    public void
+    Close(PolyReader *self);
+
+    public void
+    Destroy(PolyReader *self);
+}
+
+

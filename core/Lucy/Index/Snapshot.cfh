@@ -1,0 +1,107 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Point-in-time index file list.
+ *
+ * A Snapshot is list of index files and folders.  Because index files, once
+ * written, are never modified, a Snapshot defines a point-in-time view of the
+ * data in an index.
+ *
+ * L<IndexReader|Lucy::Index::IndexReader> objects interpret the data
+ * associated with a single Snapshot.
+ */
+
+class Lucy::Index::Snapshot inherits Lucy::Object::Obj : dumpable {
+
+    Hash        *entries;
+    CharBuf     *path;
+
+    inert int32_t current_file_format;
+
+    public inert incremented Snapshot*
+    new();
+
+    /**
+     * Constructor.  Takes no arguments.
+     */
+    public inert Snapshot*
+    init(Snapshot *self);
+
+    /** Return an array of all entries.
+     */
+    public incremented VArray*
+    List(Snapshot *self);
+
+    /** Return the number of entries (including directories).
+     */
+    public uint32_t
+    Num_Entries(Snapshot *self);
+
+    /** Add a filepath to the snapshot.
+     */
+    public void
+    Add_Entry(Snapshot *self, const CharBuf *entry);
+
+    /** Delete a filepath from the snapshot.
+     *
+     * @return true if the entry existed and was successfully deleted, false
+     * otherwise.
+     */
+    public bool_t
+    Delete_Entry(Snapshot *self, const CharBuf *entry);
+
+    /** Decode a snapshot file and initialize the object to reflect its
+     * contents.
+     *
+     * @param folder A Folder.
+     * @param path The location of the snapshot file.  If not supplied, the
+     * most recent snapshot file in the base directory will be chosen.
+     * @return the object, allowing an assignment idiom.
+     */
+    public Snapshot*
+    Read_File(Snapshot *self, Folder *folder, const CharBuf *path = NULL);
+
+    /** Write a snapshot file.  The caller must lock the index while this
+     * operation takes place, and the operation will fail if the snapshot file
+     * already exists.
+     *
+     * @param folder A Folder.
+     * @param path The path of the file to write.  If NULL, a file name will
+     * be chosen which supersedes the latest snapshot file in the index
+     * folder.
+     */
+    public void
+    Write_File(Snapshot *self, Folder *folder, const CharBuf *path = NULL);
+
+    /** Set the path to the file that the Snapshot object serves as a proxy
+     * for.
+     */
+    public void
+    Set_Path(Snapshot *self, const CharBuf *path);
+
+    /** Get the path to the snapshot file.  Initially NULL; updated by
+     * Read_File(), Write_File(), and Set_Path().
+     */
+    public nullable CharBuf*
+    Get_Path(Snapshot *self);
+
+    public void
+    Destroy(Snapshot *self);
+}
+
+

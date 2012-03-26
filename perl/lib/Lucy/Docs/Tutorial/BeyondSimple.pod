@@ -1,0 +1,153 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy::Docs::Tutorial::BeyondSimple - A more flexible app structure.
+
+=head1 DESCRIPTION
+
+=head2 Goal
+
+In this tutorial chapter, we'll refactor the apps we built in
+L<Lucy::Docs::Tutorial::Simple> so that they look exactly the same from
+the end user's point of view, but offer the developer greater possibilites for
+expansion.  
+
+To achieve this, we'll ditch Lucy::Simple and replace it with the
+classes that it uses internally:
+
+=over
+
+=item *
+
+L<Lucy::Plan::Schema> - Plan out your index.
+
+=item *
+
+L<Lucy::Plan::FullTextType> - Field type for full text search.
+
+=item *
+
+L<Lucy::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
+
+=item *
+
+L<Lucy::Index::Indexer> - Manipulate index content.
+
+=item *
+
+L<Lucy::Search::IndexSearcher> - Search an index.
+
+=item *
+
+L<Lucy::Search::Hits> - Iterate over hits returned by a Searcher.
+
+=back
+
+=head2 Adaptations to indexer.pl
+
+After we load our modules...
+
+    use Lucy::Plan::Schema;
+    use Lucy::Plan::FullTextType;
+    use Lucy::Analysis::PolyAnalyzer;
+    use Lucy::Index::Indexer;
+
+... the first item we're going need is a L<Schema|Lucy::Plan::Schema>. 
+
+The primary job of a Schema is to specify what fields are available and how
+they're defined.  We'll start off with three fields: title, content and url.
+
+    # Create Schema.
+    my $schema = Lucy::Plan::Schema->new;
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
+        language => 'en',
+    );
+    my $type = Lucy::Plan::FullTextType->new(
+        analyzer => $polyanalyzer,
+    );
+    $schema->spec_field( name => 'title',   type => $type );
+    $schema->spec_field( name => 'content', type => $type );
+    $schema->spec_field( name => 'url',     type => $type );
+
+All of the fields are spec'd out using the "FullTextType" FieldType,
+indicating that they will be searchable as "full text" -- which means that
+they can be searched for individual words.  The "analyzer", which is unique to
+FullTextType fields, is what breaks up the text into searchable tokens.
+
+Next, we'll swap our Lucy::Simple object out for a Lucy::Index::Indexer.
+The substitution will be straightforward because Simple has merely been
+serving as a thin wrapper around an inner Indexer, and we'll just be peeling
+away the wrapper.
+
+First, replace the constructor:
+
+    # Create Indexer.
+    my $indexer = Lucy::Index::Indexer->new(
+        index    => $path_to_index,
+        schema   => $schema,
+        create   => 1,
+        truncate => 1,
+    );
+
+Next, have the C<$indexer> object C<add_doc> where we were having the
+C<$lucy> object C<add_doc> before:
+
+    foreach my $filename (@filenames) {
+        my $doc = slurp_and_parse_file($filename);
+        $indexer->add_doc($doc);
+    }
+
+There's only one extra step required: at the end of the app, you must call
+commit() explicitly to close the indexing session and commit your changes.
+(Lucy::Simple hides this detail, calling commit() implicitly when it needs to).
+
+    $indexer->commit;
+
+=head2 Adaptations to search.cgi
+
+In our search app as in our indexing app, Lucy::Simple has served as a
+thin wrapper -- this time around L<Lucy::Search::IndexSearcher> and
+L<Lucy::Search::Hits>.  Swapping out Simple for these two classes is
+also straightforward:
+
+    use Lucy::Search::IndexSearcher;
+    
+    my $searcher = Lucy::Search::IndexSearcher->new( 
+        index => $path_to_index,
+    );
+    my $hits = $searcher->hits(    # returns a Hits object, not a hit count
+        query      => $q,
+        offset     => $offset,
+        num_wanted => $page_size,
+    );
+    my $hit_count = $hits->total_hits;  # get the hit count here
+    
+    ...
+    
+    while ( my $hit = $hits->next ) {
+        ...
+    }
+
+=head2 Hooray!
+
+Congratulations!  Your apps do the same thing as before... but now they'll be
+easier to customize.  
+
+In our next chapter, L<Lucy::Docs::Tutorial::FieldType>, we'll explore
+how to assign different behaviors to different fields.
+
+

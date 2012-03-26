@@ -1,0 +1,175 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Abstract class representing an interprocess mutex lock.
+ *
+ * The Lock class produces an interprocess mutex lock.  The default subclass
+ * uses dot-lock files, but alternative implementations are possible.
+ *
+ * Each lock must have a name which is unique per resource to be locked.  Each
+ * lock also has a "host" id which should be unique per machine; it is used to
+ * help clear away stale locks.
+ */
+
+abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
+
+    Folder      *folder;
+    CharBuf     *name;
+    CharBuf     *lock_path;
+    CharBuf     *host;
+    int32_t      timeout;
+    int32_t      interval;
+
+    /** Abstract constructor.
+     *
+     * @param folder A Folder.
+     * @param name String identifying the resource to be locked, which must
+     * consist solely of characters matching [-_.A-Za-z0-9].
+     * @param host A unique per-machine identifier.
+     * @param timeout Time in milliseconds to keep retrying before abandoning
+     * the attempt to Obtain() a lock.
+     * @param interval Time in milliseconds between retries.
+     */
+    public inert Lock*
+    init(Lock *self, Folder *folder, const CharBuf *name,
+         const CharBuf *host, int32_t timeout = 0, int32_t interval = 100);
+
+    /** Returns true if the Lock is shared, false if the Lock is exclusive.
+     */
+    public abstract bool_t
+    Shared(Lock *self);
+
+    /** Call Request() once per <code>interval</code> until Request() returns
+     * success or the <code>timeout</code> has been reached.
+     *
+     * @return true on success, false on failure (sets Err_error).
+     */
+    public bool_t
+    Obtain(Lock *self);
+
+    /** Make one attempt to acquire the lock.
+     *
+     * The semantics of Request() differ depending on whether Shared() returns
+     * true.  If the Lock is Shared(), then Request() should not fail if
+     * another lock is held against the resource identified by
+     * <code>name</code> (though it might fail for other reasons).  If it is
+     * not Shared() -- i.e. it's an exclusive (write) lock -- then other locks
+     * should cause Request() to fail.
+     *
+     * @return true on success, false on failure (sets Err_error).
+     */
+    public abstract bool_t
+    Request(Lock *self);
+
+    /** Release the lock.
+     */
+    public abstract void
+    Release(Lock *self);
+
+    /** Indicate whether the resource identified by this lock's name is
+     * currently locked.
+     *
+     * @return true if the resource is locked, false otherwise.
+     */
+    public abstract bool_t
+    Is_Locked(Lock *self);
+
+    /** Release all locks that meet the following three conditions: the lock
+     * name matches, the host id matches, and the process id that the lock
+     * was created under no longer identifies an active process.
+     */
+    public abstract void
+    Clear_Stale(Lock *self);
+
+    CharBuf*
+    Get_Name(Lock *self);
+
+    CharBuf*
+    Get_Host(Lock *self);
+
+    CharBuf*
+    Get_Lock_Path(Lock *self);
+
+    public void
+    Destroy(Lock *self);
+}
+
+class Lucy::Store::LockFileLock cnick LFLock
+    inherits Lucy::Store::Lock {
+
+    CharBuf *link_path;
+
+    inert incremented LockFileLock*
+    new(Folder *folder, const CharBuf *name, const CharBuf *host,
+        int32_t timeout = 0, int32_t interval = 100);
+
+    public inert LockFileLock*
+    init(LockFileLock *self, Folder *folder, const CharBuf *name,
+         const CharBuf *host, int32_t timeout = 0, int32_t interval = 100);
+
+    public bool_t
+    Shared(LockFileLock *self);
+
+    public bool_t
+    Request(LockFileLock *self);
+
+    public void
+    Release(LockFileLock *self);
+
+    public bool_t
+    Is_Locked(LockFileLock *self);
+
+    public void
+    Clear_Stale(LockFileLock *self);
+
+    /** Delete a given lock file which meets these conditions...
+     *
+     *    - lock name matches.
+     *    - host id matches.
+     *
+     * If delete_mine is false, don't delete a lock file which matches this
+     * process's pid.  If delete_other is false, don't delete lock files which
+     * don't match this process's pid.
+     */
+    bool_t
+    Maybe_Delete_File(LockFileLock *self, const CharBuf *filepath,
+                      bool_t delete_mine, bool_t delete_other);
+
+    public void
+    Destroy(LockFileLock *self);
+}
+
+/** Lock exception.
+ *
+ * LockErr is a subclass of L<Err|Lucy::Object::Err> which indicates
+ * that a file locking problem occurred.
+ */
+class Lucy::Store::LockErr inherits Lucy::Object::Err {
+
+    public inert incremented LockErr*
+    new(CharBuf *message);
+
+    public inert LockErr*
+    init(LockErr *self, CharBuf *message);
+
+    public incremented LockErr*
+    Make(LockErr *self);
+}
+
+

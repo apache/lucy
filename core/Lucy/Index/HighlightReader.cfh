@@ -1,0 +1,96 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Read a segment's highlighting data.
+ *
+ * Read segment data used for creating highlighted excerpts.
+ */
+class Lucy::Index::HighlightReader cnick HLReader
+    inherits Lucy::Index::DataReader {
+
+    inert HighlightReader*
+    init(HighlightReader *self, Schema *schema = NULL, Folder *folder = NULL,
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         int32_t seg_tick = -1);
+
+    /** Return the DocVector object for the given doc id.
+     */
+    public abstract incremented DocVector*
+    Fetch_Doc_Vec(HighlightReader *self, int32_t doc_id);
+
+    public incremented nullable HighlightReader*
+    Aggregator(HighlightReader *self, VArray *readers, I32Array *offsets);
+}
+
+class Lucy::Index::PolyHighlightReader cnick PolyHLReader
+    inherits Lucy::Index::HighlightReader {
+
+    VArray   *readers;
+    I32Array *offsets;
+
+    inert incremented PolyHighlightReader*
+    new(VArray *readers, I32Array *offsets);
+
+    inert PolyHighlightReader*
+    init(PolyHighlightReader *self, VArray *readers, I32Array *offsets);
+
+    public incremented DocVector*
+    Fetch_Doc_Vec(PolyHighlightReader *self, int32_t doc_id);
+
+    public void
+    Close(PolyHighlightReader *self);
+
+    public void
+    Destroy(PolyHighlightReader *self);
+}
+
+class Lucy::Index::DefaultHighlightReader cnick DefHLReader
+    inherits Lucy::Index::HighlightReader {
+
+    InStream *ix_in;
+    InStream *dat_in;
+
+    /** Constructors.
+     */
+    inert incremented DefaultHighlightReader*
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+        int32_t seg_tick);
+
+    inert DefaultHighlightReader*
+    init(DefaultHighlightReader *self, Schema *schema, Folder *folder,
+         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+
+    /** Return the DocVector object for the given doc id.
+     */
+    public incremented DocVector*
+    Fetch_Doc_Vec(DefaultHighlightReader *self, int32_t doc_id);
+
+    /** Return the raw bytes of an entry.
+     */
+    void
+    Read_Record(DefaultHighlightReader *self, int32_t doc_id,
+                ByteBuf *buffer);
+
+    public void
+    Close(DefaultHighlightReader *self);
+
+    public void
+    Destroy(DefaultHighlightReader *self);
+}
+
+

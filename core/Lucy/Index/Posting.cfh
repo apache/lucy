@@ -1,0 +1,96 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Vessel holding statistical data for a posting.
+ *
+ * A Posting, in Apache Lucy, is a vessel which stores information about a
+ * term-document match.  (See L<Lucy::Docs::IRTheory> for the
+ * academic definition of "posting".)
+ *
+ * Subclasses include
+ * L<MatchPosting|Lucy::Index::Posting::MatchPosting>, the simplest
+ * posting format, and
+ * L<ScorePosting|Lucy::Index::Posting::ScorePosting>, the default.
+ */
+class Lucy::Index::Posting cnick Post inherits Lucy::Util::Stepper {
+
+    int32_t doc_id;
+
+    public inert Posting*
+    init(Posting *self);
+
+    /** Create a RawPosting object, suitable for index-time sorting.
+     *
+     * Updates the state of the document id, but nothing else.
+     */
+    abstract incremented RawPosting*
+    Read_Raw(Posting *self, InStream *instream, int32_t last_doc_id,
+             CharBuf *term_text, MemoryPool *mem_pool);
+
+    /** Process an Inversion into RawPosting objects and add them all to the
+     * supplied PostingPool.
+     */
+    abstract void
+    Add_Inversion_To_Pool(Posting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
+                          float length_norm);
+
+    public void
+    Set_Doc_ID(Posting *self, int32_t doc_id);
+
+    public int32_t
+    Get_Doc_ID(Posting *self);
+
+    /** Factory method for creating a Matcher.
+     */
+    abstract incremented Matcher*
+    Make_Matcher(Posting *self, Similarity *sim, PostingList *plist,
+                 Compiler *compiler, bool_t need_score);
+}
+
+abstract class Lucy::Index::Posting::PostingWriter cnick PostWriter
+    inherits Lucy::Index::DataWriter {
+
+    int32_t field_num;
+
+    inert PostingWriter*
+    init(PostingWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader, int32_t field_num);
+
+    /** Take a RawPosting that was flattened earlier and write it to the
+     * index. */
+    abstract void
+    Write_Posting(PostingWriter *self, RawPosting *posting);
+
+    /** Start a new term.  Update the TermInfo to reflect the state of the
+     * PostingWriter.
+     */
+    abstract void
+    Start_Term(PostingWriter *self, TermInfo *tinfo);
+
+    /** Update the TermInfo to reflect the internal state of the
+     * PostingWriter so that skip information can be written.
+     *
+     * TODO: This is an ugly hack which needs refactoring.
+     */
+    abstract void
+    Update_Skip_Info(PostingWriter *self, TermInfo *tinfo);
+}
+
+

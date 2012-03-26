@@ -1,0 +1,99 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+class Lucy::Index::DeletionsReader cnick DelReader
+    inherits Lucy::Index::DataReader {
+
+    inert DeletionsReader*
+    init(DeletionsReader *self, Schema *schema = NULL, Folder *folder = NULL,
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         int32_t seg_tick = -1);
+
+    /** Return the number of docs which have been marked as deleted in this
+     * segment.
+     */
+    abstract int32_t
+    Del_Count(DeletionsReader *self);
+
+    /** Return a Matcher which iterates over the set of all deleted doc nums
+     * for this segment.
+     */
+    abstract incremented Matcher*
+    Iterator(DeletionsReader *self);
+
+    public incremented nullable DeletionsReader*
+    Aggregator(DeletionsReader *self, VArray *readers, I32Array *offsets);
+}
+
+class Lucy::Index::PolyDeletionsReader cnick PolyDelReader
+    inherits Lucy::Index::DeletionsReader {
+
+    VArray   *readers;
+    I32Array *offsets;
+    int32_t   del_count;
+
+    inert incremented PolyDeletionsReader*
+    new(VArray *readers, I32Array *offsets);
+
+    inert PolyDeletionsReader*
+    init(PolyDeletionsReader *self, VArray *readers, I32Array *offsets);
+
+    int32_t
+    Del_Count(PolyDeletionsReader *self);
+
+    incremented Matcher*
+    Iterator(PolyDeletionsReader *self);
+
+    public void
+    Close(PolyDeletionsReader *self);
+
+    public void
+    Destroy(PolyDeletionsReader *self);
+}
+
+class Lucy::Index::DefaultDeletionsReader cnick DefDelReader
+    inherits Lucy::Index::DeletionsReader {
+
+    BitVector *deldocs;
+    int32_t    del_count;
+
+    inert incremented DefaultDeletionsReader*
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+        int32_t seg_tick);
+
+    inert DefaultDeletionsReader*
+    init(DefaultDeletionsReader *self, Schema *schema, Folder *folder,
+         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+
+    int32_t
+    Del_Count(DefaultDeletionsReader *self);
+
+    incremented Matcher*
+    Iterator(DefaultDeletionsReader *self);
+
+    nullable BitVector*
+    Read_Deletions(DefaultDeletionsReader *self);
+
+    public void
+    Close(DefaultDeletionsReader *self);
+
+    public void
+    Destroy(DefaultDeletionsReader *self);
+}
+
+

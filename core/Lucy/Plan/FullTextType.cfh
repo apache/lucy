@@ -1,0 +1,91 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Full-text search field type.
+ *
+ * Lucy::Plan::FullTextType is an implementation of
+ * L<Lucy::Plan::FieldType> tuned for "full text search".
+ *
+ * Full text fields are associated with an
+ * L<Analyzer|Lucy::Analysis::Analyzer>, which is used to tokenize and
+ * normalize the text so that it can be searched for individual words.
+ *
+ * For an exact-match, single value field type using character data, see
+ * L<StringType|Lucy::Plan::StringType>.
+ */
+class Lucy::Plan::FullTextType
+    inherits Lucy::Plan::TextType : dumpable {
+
+    bool_t      highlightable;
+    Analyzer   *analyzer;
+
+    /**
+     * @param analyzer An Analyzer.
+     * @param boost floating point per-field boost.
+     * @param indexed boolean indicating whether the field should be indexed.
+     * @param stored boolean indicating whether the field should be stored.
+     * @param sortable boolean indicating whether the field should be sortable.
+     * @param highlightable boolean indicating whether the field should be
+     * highlightable.
+     */
+    public inert FullTextType*
+    init(FullTextType *self, Analyzer *analyzer);
+
+    inert FullTextType*
+    init2(FullTextType *self, Analyzer *analyzer, float boost = 1.0,
+          bool_t indexed = true, bool_t stored = true,
+          bool_t sortable = false, bool_t highlightable = false);
+
+    public inert incremented FullTextType*
+    new(Analyzer *analyzer);
+
+    /** Indicate whether to store data required by
+     * L<Lucy::Highlight::Highlighter> for excerpt selection and search
+     * term highlighting.
+     */
+    public void
+    Set_Highlightable(FullTextType *self, bool_t highlightable);
+
+    /** Accessor for "highlightable" property.
+     */
+    public bool_t
+    Highlightable(FullTextType *self);
+
+    public Analyzer*
+    Get_Analyzer(FullTextType *self);
+
+    public incremented Similarity*
+    Make_Similarity(FullTextType *self);
+
+    incremented Hash*
+    Dump_For_Schema(FullTextType *self);
+
+    public incremented Hash*
+    Dump(FullTextType *self);
+
+    public incremented FullTextType*
+    Load(FullTextType *self, Obj *dump);
+
+    public bool_t
+    Equals(FullTextType *self, Obj *other);
+
+    public void
+    Destroy(FullTextType *self);
+}
+
+

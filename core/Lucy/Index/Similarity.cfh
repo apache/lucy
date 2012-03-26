@@ -1,0 +1,143 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Judge how well a document matches a query.
+ *
+ * After determining whether a document matches a given query, a score must be
+ * calculated which indicates how I<well> the document matches the query.  The
+ * Similarity class is used to judge how "similar" the query and the document
+ * are to each other; the closer the resemblance, they higher the document
+ * scores.
+ *
+ * The default implementation uses Lucene's modified cosine similarity
+ * measure.  Subclasses might tweak the existing algorithms, or might be used
+ * in conjunction with custom Query subclasses to implement arbitrary scoring
+ * schemes.
+ *
+ * Most of the methods operate on single fields, but some are used to combine
+ * scores from multiple fields.
+ */
+
+class Lucy::Index::Similarity cnick Sim
+    inherits Lucy::Object::Obj : dumpable {
+
+    float  *norm_decoder;
+
+    inert incremented Similarity*
+    new();
+
+    /** Constructor. Takes no arguments.
+     */
+    public inert Similarity*
+    init(Similarity *self);
+
+    /** Factory method for creating a Posting.
+     */
+    public incremented Posting*
+    Make_Posting(Similarity *self);
+
+    /** Factory method for creating a PostingWriter.
+     */
+    incremented PostingWriter*
+    Make_Posting_Writer(Similarity *self, Schema *schema, Snapshot *snapshot,
+                        Segment *segment, PolyReader *polyreader,
+                        int32_t field_num);
+
+    /** Return a score factor based on the frequency of a term in a given
+     * document.  The default implementation is sqrt(freq).  Other
+     * implementations typically produce ascending scores with ascending
+     * freqs, since the more times a doc matches, the more relevant it is
+     * likely to be.
+     */
+    public float
+    TF(Similarity *self, float freq);
+
+    /** Calculate the Inverse Document Frequecy for a term in a given
+     * collection.
+     *
+     * @param doc_freq The number of documents that the term appears in.
+     * @param total_docs The number of documents in the collection.
+     */
+    public float
+    IDF(Similarity *self, int64_t doc_freq, int64_t total_docs);
+
+    /** Calculate a score factor based on the number of terms which match.
+     */
+    public float
+    Coord(Similarity *self, uint32_t overlap, uint32_t max_overlap);
+
+    /** Dampen the scores of long documents.
+     *
+     * After a field is broken up into terms at index-time, each term must be
+     * assigned a weight.  One of the factors in calculating this weight is
+     * the number of tokens that the original field was broken into.
+     *
+     * Typically, we assume that the more tokens in a field, the less
+     * important any one of them is -- so that, e.g. 5 mentions of "Kafka" in
+     * a short article are given more heft than 5 mentions of "Kafka" in an
+     * entire book.  The default implementation of length_norm expresses this
+     * using an inverted square root.
+     *
+     * However, the inverted square root has a tendency to reward very short
+     * fields highly, which isn't always appropriate for fields you expect to
+     * have a lot of tokens on average.
+     */
+    public float
+    Length_Norm(Similarity *self, uint32_t num_tokens);
+
+    /** Normalize a Query's weight so that it is comparable to other Queries.
+     */
+    public float
+    Query_Norm(Similarity *self, float sum_of_squared_weights);
+
+    /** encode_norm and decode_norm encode and decode between 32-bit IEEE
+     * floating point numbers and a 5-bit exponent, 3-bit mantissa float.  The
+     * range covered by the single-byte encoding is 7x10^9 to 2x10^-9.  The
+     * accuracy is about one significant decimal digit.
+     */
+    uint32_t
+    Encode_Norm(Similarity *self, float f);
+
+    /** See encode_norm.
+     */
+    float
+    Decode_Norm(Similarity *self, uint32_t input);
+
+    float*
+    Get_Norm_Decoder(Similarity *self);
+
+    public void
+    Destroy(Similarity *self);
+
+    public incremented Obj*
+    Dump(Similarity *self);
+
+    public incremented Similarity*
+    Load(Similarity *self, Obj *dump);
+
+    public bool_t
+    Equals(Similarity *self, Obj *other);
+
+    public void
+    Serialize(Similarity *self, OutStream *outstream);
+
+    public incremented Similarity*
+    Deserialize(Similarity *self, InStream *instream);
+}
+
+

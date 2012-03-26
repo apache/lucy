@@ -1,0 +1,52 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+class LucyX::Search::FilterMatcher inherits Lucy::Search::Matcher {
+
+    BitVector   *bits;
+    int32_t      doc_max;
+    int32_t      doc_id;
+
+    /**
+     * @param bits A BitVector with each doc id that should match set to
+     * true.
+     * @param doc_max The largest doc id that could possibly match.
+     */
+    inert incremented FilterMatcher*
+    new(BitVector *bits, int32_t doc_max);
+
+    inert FilterMatcher*
+    init(FilterMatcher *self, BitVector *bits, int32_t doc_max);
+
+    public void
+    Destroy(FilterMatcher *self);
+
+    public int32_t
+    Next(FilterMatcher* self);
+
+    public int32_t
+    Skip_To(FilterMatcher* self, int32_t target);
+
+    public float
+    Score(FilterMatcher* self);
+
+    public int32_t
+    Get_Doc_ID(FilterMatcher* self);
+}
+
+

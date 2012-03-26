@@ -1,0 +1,59 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Track highest sorting hits.
+ *
+ * HitQueue sorts MatchDoc objects according to a SortSpec.  Good matches
+ * float to the top of the queue and poor matches fall out the bottom.
+ */
+
+class Lucy::Search::HitQueue cnick HitQ
+    inherits Lucy::Util::PriorityQueue {
+
+    FieldType     **field_types;
+    uint8_t        *actions;
+    uint32_t        num_actions;
+    bool_t          need_values;
+
+    inert incremented HitQueue*
+    new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
+
+    /**
+     * @param schema A Schema.  Required if <code>sort_spec</code> supplied.
+     * @param sort_spec A SortSpec.  If not supplied, the HitQueue will sort
+     * by descending score first and ascending doc id second.
+     * @param wanted Max elements the queue can hold.
+     */
+    inert HitQueue*
+    init(HitQueue *self, Schema *schema = NULL, SortSpec *sort_spec = NULL,
+         uint32_t wanted);
+
+    public void
+    Destroy(HitQueue *self);
+
+    /** If sorting on fields, first verifies that the MatchDoc has a valid
+     * values array, then invokes parent method.
+     */
+    incremented nullable Obj*
+    Jostle(HitQueue *self, decremented Obj *element);
+
+    bool_t
+    Less_Than(HitQueue *self, Obj *a, Obj *b);
+}
+
+

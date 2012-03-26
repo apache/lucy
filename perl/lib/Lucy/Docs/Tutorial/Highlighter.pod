@@ -1,0 +1,76 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy::Docs::Tutorial::Highlighter - Augment search results with
+highlighted excerpts.
+
+=head1 DESCRIPTION
+
+Adding relevant excerpts with highlighted search terms to your search results
+display makes it much easier for end users to scan the page and assess which
+hits look promising, dramatically improving their search experience.
+
+=head2 Adaptations to indexer.pl
+
+L<Lucy::Highlight::Highlighter> uses information generated at index
+time.  To save resources, highlighting is disabled by default and must be
+turned on for individual fields.
+
+    my $highlightable = Lucy::Plan::FullTextType->new(
+        analyzer      => $polyanalyzer,
+        highlightable => 1,
+    );
+    $schema->spec_field( name => 'content', type => $highlightable );
+
+=head2 Adaptations to search.cgi
+
+To add highlighting and excerpting to the search.cgi sample app, create a
+C<$highlighter> object outside the hits iterating loop...
+
+    my $highlighter = Lucy::Highlight::Highlighter->new(
+        searcher => $searcher,
+        query    => $q,
+        field    => 'content'
+    );
+
+... then modify the loop and the per-hit display to generate and include the
+excerpt.
+
+    # Create result list.
+    my $report = '';
+    while ( my $hit = $hits->next ) {
+        my $score   = sprintf( "%0.3f", $hit->get_score );
+        my $excerpt = $highlighter->create_excerpt($hit);
+        $report .= qq|
+            <p>
+              <a href="$hit->{url}"><strong>$hit->{title}</strong></a>
+              <em>$score</em>
+              <br />
+              $excerpt
+              <br />
+              <span class="excerptURL">$hit->{url}</span>
+            </p>
+        |;
+    }
+
+=head2 Next chapter: Query objects
+
+Our next tutorial chapter, L<Lucy::Docs::Tutorial::QueryObjects>,
+illustrates how to build an "advanced search" interface using
+L<Query|Lucy::Search::Query> objects instead of query strings.
+
+

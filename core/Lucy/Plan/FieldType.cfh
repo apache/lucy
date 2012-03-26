@@ -1,0 +1,187 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+__C__
+
+#define lucy_FType_TEXT    1
+#define lucy_FType_BLOB    2
+#define lucy_FType_INT32   3
+#define lucy_FType_INT64   4
+#define lucy_FType_FLOAT32 5
+#define lucy_FType_FLOAT64 6
+#define lucy_FType_PRIMITIVE_ID_MASK 0x7
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define FType_TEXT              lucy_FType_TEXT
+  #define FType_BLOB              lucy_FType_BLOB
+  #define FType_INT32             lucy_FType_INT32
+  #define FType_INT64             lucy_FType_INT64
+  #define FType_FLOAT32           lucy_FType_FLOAT32
+  #define FType_FLOAT64           lucy_FType_FLOAT64
+  #define FType_PRIMITIVE_ID_MASK lucy_FType_PRIMITIVE_ID_MASK
+#endif
+
+__END_C__
+
+/** Define a field's behavior.
+ *
+ * FieldType is an abstract class defining a set of traits and behaviors which
+ * may be associated with one or more field names.
+ *
+ * Properties which are common to all field types include <code>boost</code>,
+ * <code>indexed</code>, <code>stored</code>, <code>sortable</code>,
+ * <code>binary</code>, and <code>similarity</code>.
+ *
+ * The <code>boost</code> property is a floating point scoring multiplier
+ * which defaults to 1.0.  Values greater than 1.0 cause the field to
+ * contribute more to a document's score, lower values, less.
+ *
+ * The <code>indexed</code> property indicates whether the field should be
+ * indexed (so that it can be searched).
+ *
+ * The <code>stored</code> property indicates whether to store the raw field
+ * value, so that it can be retrieved when a document turns up in a search.
+ *
+ * The <code>sortable</code> property indicates whether search results should
+ * be sortable based on the contents of the field.
+ *
+ * The <code>binary</code> property indicates whether the field contains
+ * binary or text data.  Unlike most other properties, <code>binary</code> is
+ * not settable.
+ *
+ * The <code>similarity</code> property is a
+ * L<Similarity|Lucy::Index::Similarity> object which defines matching
+ * and scoring behavior for the field.  It is required if the field is
+ * <code>indexed</code>.
+ */
+abstract class Lucy::Plan::FieldType cnick FType
+    inherits Lucy::Object::Obj {
+
+    float         boost;
+    bool_t        indexed;
+    bool_t        stored;
+    bool_t        sortable;
+
+    inert FieldType*
+    init(FieldType *self);
+
+    inert FieldType*
+    init2(FieldType *self, float boost = 1.0, bool_t indexed = false,
+          bool_t stored = false, bool_t sortable = false);
+
+    /** Setter for <code>boost</code>.
+     */
+    public void
+    Set_Boost(FieldType *self, float boost);
+
+    /** Accessor for <code>boost</code>.
+     */
+    public float
+    Get_Boost(FieldType *self);
+
+    /** Setter for <code>indexed</code>.
+     */
+    public void
+    Set_Indexed(FieldType *self, bool_t indexed);
+
+    /** Accessor for <code>indexed</code>.
+     */
+    public bool_t
+    Indexed(FieldType *self);
+
+    /** Setter for <code>stored</code>.
+     */
+    public void
+    Set_Stored(FieldType *self, bool_t stored);
+
+    /** Accessor for <code>stored</code>.
+     */
+    public bool_t
+    Stored(FieldType *self);
+
+    /** Setter for <code>sortable</code>.
+     */
+    public void
+    Set_Sortable(FieldType *self, bool_t sortable);
+
+    /** Accessor for <code>sortable</code>.
+     */
+    public bool_t
+    Sortable(FieldType *self);
+
+    /** Indicate whether the field contains binary data.
+     */
+    public bool_t
+    Binary(FieldType *self);
+
+    /** Compare two values for the field.  The default implementation
+     * dispatches to the Compare_To() method of argument <code>a</code>.
+     *
+     * @return a negative number if a is "less than" b, 0 if they are "equal",
+     * and a positive number if a is "greater than" b.
+     */
+    public int32_t
+    Compare_Values(FieldType *self, Obj *a, Obj *b);
+
+    /** NULL-safe comparison wrapper which sorts NULLs towards the back.
+     */
+    inert inline int32_t
+    null_back_compare_values(FieldType *self, Obj *a, Obj *b);
+
+    /** Produce a Stepper suitable for use by a Lexicon.
+     */
+    abstract incremented TermStepper*
+    Make_Term_Stepper(FieldType *self);
+
+    /** Internal id used for switch() ops.  Unique for each primitive type.
+     */
+    abstract int8_t
+    Primitive_ID(FieldType *self);
+
+    /** Produce a special mimimal dump which does not include Similarity or
+     * Analyzer dumps.  For exclusive internal use by Schema.
+     */
+    abstract incremented Hash*
+    Dump_For_Schema(FieldType *self);
+
+    /** Compares all common properties.
+     */
+    public bool_t
+    Equals(FieldType *self, Obj *other);
+}
+
+__C__
+
+static CHY_INLINE int32_t
+lucy_FType_null_back_compare_values(lucy_FieldType *self,
+                                    lucy_Obj *a, lucy_Obj *b) {
+    if (a == NULL) {
+        if (b == NULL) { return 0; }
+        else { return 1; }
+    }
+    else if (b == NULL) {
+        return -1;
+    }
+    else {
+        return Lucy_FType_Compare_Values(self, a, b);
+    }
+}
+
+__END_C__
+
+

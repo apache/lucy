@@ -1,0 +1,87 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** File System implementation of Folder.
+ *
+ * Implementation of L<Lucy::Store::Folder> using a single file system
+ * directory and multiple files.
+ */
+
+class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
+
+    inert incremented FSFolder*
+    new(const CharBuf *path);
+
+    /**
+     * @param path Location of the index. If the specified directory does
+     * not exist already, it will NOT be created, in order to prevent
+     * misconfigured read applications from spawning bogus files -- so it may
+     * be necessary to create the directory yourself.
+     */
+    public inert FSFolder*
+    init(FSFolder *self, const CharBuf *path);
+
+    /** Attempt to create the directory specified by <code>path</code>.
+     */
+    public void
+    Initialize(FSFolder *self);
+
+    /** Verify that <code>path</code> is a directory.  TODO: check
+     * permissions.
+     */
+    public bool_t
+    Check(FSFolder *self);
+
+    public void
+    Close(FSFolder *self);
+
+    incremented nullable FileHandle*
+    Local_Open_FileHandle(FSFolder *self, const CharBuf *name,
+                          uint32_t flags);
+
+    incremented nullable DirHandle*
+    Local_Open_Dir(FSFolder *self);
+
+    bool_t
+    Local_MkDir(FSFolder *self, const CharBuf *name);
+
+    bool_t
+    Local_Exists(FSFolder *self, const CharBuf *name);
+
+    bool_t
+    Local_Is_Directory(FSFolder *self, const CharBuf *name);
+
+    nullable Folder*
+    Local_Find_Folder(FSFolder *self, const CharBuf *name);
+
+    bool_t
+    Local_Delete(FSFolder *self, const CharBuf *name);
+
+    public bool_t
+    Rename(FSFolder *self, const CharBuf* from, const CharBuf *to);
+
+    public bool_t
+    Hard_Link(FSFolder *self, const CharBuf *from, const CharBuf *to);
+
+    /** Transform a relative path into an abolute path.
+     */
+    inert incremented CharBuf*
+    absolutify(const CharBuf *path);
+}
+
+

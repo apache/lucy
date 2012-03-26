@@ -1,0 +1,60 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Reduce related words to a shared root.
+ *
+ * SnowballStemmer is an L<Analyzer|Lucy::Analysis::Analyzer> which reduces
+ * related words to a root form (using the "Snowball" stemming library).  For
+ * instance, "horse", "horses", and "horsing" all become "hors" -- so that a
+ * search for 'horse' will also match documents containing 'horses' and
+ * 'horsing'.
+ */
+
+class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
+    inherits Lucy::Analysis::Analyzer : dumpable {
+
+    void *snowstemmer;
+    CharBuf *language;
+
+    inert incremented SnowballStemmer*
+    new(const CharBuf *language);
+
+    /**
+     * @param language A two-letter ISO code identifying a language supported
+     * by Snowball.
+     */
+    public inert SnowballStemmer*
+    init(SnowballStemmer *self, const CharBuf *language);
+
+    public incremented Inversion*
+    Transform(SnowballStemmer *self, Inversion *inversion);
+
+    public incremented Hash*
+    Dump(SnowballStemmer *self);
+
+    public incremented SnowballStemmer*
+    Load(SnowballStemmer *self, Obj *dump);
+
+    public bool_t
+    Equals(SnowballStemmer *self, Obj *other);
+
+    public void
+    Destroy(SnowballStemmer *self);
+}
+
+

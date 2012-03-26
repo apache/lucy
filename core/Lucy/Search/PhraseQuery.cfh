@@ -1,0 +1,111 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Query matching an ordered list of terms.
+ *
+ * PhraseQuery is a subclass of L<Lucy::Search::Query> for matching
+ * against an ordered sequence of terms.
+ */
+
+class Lucy::Search::PhraseQuery inherits Lucy::Search::Query
+    : dumpable {
+
+    CharBuf       *field;
+    VArray        *terms;
+
+    inert incremented PhraseQuery*
+    new(const CharBuf *field, VArray *terms);
+
+    /**
+     * @param field The field that the phrase must occur in.
+     * @param terms The ordered array of terms that must match.
+     */
+    public inert PhraseQuery*
+    init(PhraseQuery *self, const CharBuf *field, VArray *terms);
+
+    /** Accessor for object's field attribute.
+     */
+    public CharBuf*
+    Get_Field(PhraseQuery *self);
+
+    /** Accessor for object's array of terms.
+     */
+    public VArray*
+    Get_Terms(PhraseQuery *self);
+
+    public incremented Compiler*
+    Make_Compiler(PhraseQuery *self, Searcher *searcher, float boost);
+
+    public bool_t
+    Equals(PhraseQuery *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(PhraseQuery *self);
+
+    public void
+    Serialize(PhraseQuery *self, OutStream *outstream);
+
+    public incremented PhraseQuery*
+    Deserialize(PhraseQuery *self, InStream *instream);
+
+    public void
+    Destroy(PhraseQuery *self);
+}
+
+class Lucy::Search::PhraseCompiler
+    inherits Lucy::Search::Compiler {
+
+    float idf;
+    float raw_weight;
+    float query_norm_factor;
+    float normalized_weight;
+
+    inert incremented PhraseCompiler*
+    new(PhraseQuery *parent, Searcher *searcher, float boost);
+
+    inert PhraseCompiler*
+    init(PhraseCompiler *self, PhraseQuery *parent, Searcher *searcher,
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(PhraseCompiler *self, SegReader *reader, bool_t need_score);
+
+    public float
+    Get_Weight(PhraseCompiler *self);
+
+    public float
+    Sum_Of_Squared_Weights(PhraseCompiler *self);
+
+    public void
+    Apply_Norm_Factor(PhraseCompiler *self, float factor);
+
+    public incremented VArray*
+    Highlight_Spans(PhraseCompiler *self, Searcher *searcher,
+                    DocVector *doc_vec, const CharBuf *field);
+
+    public bool_t
+    Equals(PhraseCompiler *self, Obj *other);
+
+    public void
+    Serialize(PhraseCompiler *self, OutStream *outstream);
+
+    public incremented PhraseCompiler*
+    Deserialize(PhraseCompiler *self, InStream *instream);
+}
+
+

@@ -1,0 +1,59 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Non-tokenized text type.
+ *
+ * Lucy::Plan::StringType is used for "exact-match" strings.
+ */
+class Lucy::Plan::StringType
+    inherits Lucy::Plan::TextType : dumpable {
+
+    /**
+     * @param boost floating point per-field boost.
+     * @param indexed boolean indicating whether the field should be indexed.
+     * @param stored boolean indicating whether the field should be stored.
+     * @param sortable boolean indicating whether the field should be
+     * sortable.
+     */
+    public inert StringType*
+    init(StringType *self);
+
+    inert StringType*
+    init2(StringType *self, float boost = 1.0, bool_t indexed = true,
+          bool_t stored = true, bool_t sortable = false);
+
+    public inert incremented StringType*
+    new();
+
+    public incremented Similarity*
+    Make_Similarity(StringType *self);
+
+    incremented Hash*
+    Dump_For_Schema(StringType *self);
+
+    public incremented Hash*
+    Dump(StringType *self);
+
+    public incremented StringType*
+    Load(StringType *self, Obj *dump);
+
+    public bool_t
+    Equals(StringType *self, Obj *other);
+}
+
+

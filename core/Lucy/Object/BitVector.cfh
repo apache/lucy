@@ -1,0 +1,163 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** An array of bits.
+ *
+ * BitVector is a growable array of bits.  All bits are initially zero.
+ */
+
+class Lucy::Object::BitVector cnick BitVec
+    inherits Lucy::Object::Obj {
+
+    uint32_t  cap;
+    uint8_t  *bits;
+
+    inert incremented BitVector*
+    new(uint32_t capacity = 0);
+
+    /**
+     * @param capacity The number of bits that the initial array should be
+     * able to hold.
+     */
+    public inert BitVector*
+    init(BitVector *self, uint32_t capacity = 0);
+
+    /** Return true if the bit at <code>tick</code> has been set, false if it
+     * hasn't (regardless of whether it lies within the bounds of the
+     * object's capacity).
+     *
+     * @param tick The requested bit.
+     */
+    public bool_t
+    Get(BitVector *self, uint32_t tick);
+
+    /** Set the bit at <code>tick</code> to 1.
+     *
+     * @param tick The bit to be set.
+     */
+    public void
+    Set(BitVector *self, uint32_t tick);
+
+    /** Accessor for the BitVector's underlying bit array.
+     */
+    nullable uint8_t*
+    Get_Raw_Bits(BitVector *self);
+
+    /** Accessor for capacity.
+     */
+    uint32_t
+    Get_Capacity(BitVector *self);
+
+    /** Returns the next set bit equal to or greater than <code>tick</code>,
+     * or -1 if no such bit exists.
+     */
+    public int32_t
+    Next_Hit(BitVector *self, uint32_t tick);
+
+    /** Clear the indicated bit. (i.e. set it to 0).
+     *
+     * @param tick The bit to be cleared.
+     */
+    public void
+    Clear(BitVector *self, uint32_t tick);
+
+    /** Clear all bits.
+     */
+    public void
+    Clear_All(BitVector *self);
+
+    /** If the BitVector does not already have enough room to hold the
+     * indicated number of bits, allocate more memory so that it can.
+     *
+     * @param capacity Least number of bits the BitVector should accomodate.
+     */
+    public void
+    Grow(BitVector *self, uint32_t capacity);
+
+    /** Modify the contents of this BitVector so that it has the same bits set
+     * as <code>other</code>.
+     *
+     * @param other Another BitVector.
+     */
+    public void
+    Mimic(BitVector *self, Obj *other);
+
+    /** Modify the BitVector so that only bits which remain set are those
+     * which 1) were already set in this BitVector, and 2) were also set in
+     * the other BitVector.
+     *
+     * @param other Another BitVector.
+     */
+    public void
+    And(BitVector *self, const BitVector *other);
+
+    /** Modify the BitVector, setting all bits which are set in the other
+     * BitVector if they were not already set.
+     *
+     * @param other Another BitVector.
+     */
+    public void
+    Or(BitVector *self, const BitVector *other);
+
+    /** Modify the BitVector, performing an XOR operation against the other.
+     *
+     * @param other Another BitVector.
+     */
+    public void
+    Xor(BitVector *self, const BitVector *other);
+
+    /** Modify the BitVector, clearing all bits which are set in the other.
+     *
+     * @param other Another BitVector.
+     */
+    public void
+    And_Not(BitVector *self, const BitVector *other);
+
+    /** Invert the value of a bit.
+     *
+     * @param tick The bit to invert.
+     */
+    public void
+    Flip(BitVector *self, uint32_t tick);
+
+    /** Invert each bit within a contiguous block.
+     *
+     * @param offset Lower bound.
+     * @param length The number of bits to flip.
+     */
+    public void
+    Flip_Block(BitVector *self, uint32_t offset, uint32_t length);
+
+    /** Return a count of the number of set bits.
+     */
+    public uint32_t
+    Count(BitVector *self);
+
+    /** Return an array where each element represents a set bit.
+     */
+    public incremented I32Array*
+    To_Array(BitVector *self);
+
+    public void
+    Destroy(BitVector *self);
+
+    public incremented BitVector*
+    Clone(BitVector *self);
+}
+
+

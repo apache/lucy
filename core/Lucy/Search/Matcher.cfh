@@ -1,0 +1,75 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Match a set of document ids.
+ *
+ * A Matcher iterates over a set of ascending document ids.  Some Matchers
+ * implement Score() and can assign relevance scores to the docs that they
+ * match.  Other implementations may be match-only.
+ */
+
+abstract class Lucy::Search::Matcher inherits Lucy::Object::Obj {
+
+    /** Abstract constructor.
+     */
+    public inert Matcher*
+    init(Matcher* self);
+
+    /** Proceed to the next doc id.
+     *
+     * @return A positive doc id, or 0 once the iterator is exhausted.
+     */
+    public abstract int32_t
+    Next(Matcher *self);
+
+    /** Advance the iterator to the first doc id greater than or equal to
+     * <code>target</code>. The default implementation simply calls Next()
+     * over and over, but subclasses have the option of doing something more
+     * efficient.
+     *
+     * @param target A positive doc id, which must be greater than the current
+     * doc id once the iterator has been initialized.
+     * @return A positive doc id, or 0 once the iterator is exhausted.
+     */
+    public int32_t
+    Advance(Matcher *self, int32_t target);
+
+    /** Return the current doc id.  Valid only after a successful call to
+     * Next() or Advance() and must not be called otherwise.
+     */
+    public abstract int32_t
+    Get_Doc_ID(Matcher *self);
+
+    /** Return the score of the current document.
+     *
+     * Only Matchers which are used for scored search need implement Score().
+     */
+    public abstract float
+    Score(Matcher *self);
+
+    /** Collect hits.
+     *
+     * @param collector The Collector to collect hits with.
+     * @param deletions A deletions iterator.
+     */
+    void
+    Collect(Matcher *self, Collector *collector,
+            Matcher *deletions = NULL);
+}
+
+

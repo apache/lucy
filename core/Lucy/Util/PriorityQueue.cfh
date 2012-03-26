@@ -1,0 +1,87 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Heap sort / priority queue.
+ *
+ * PriorityQueue implements a textbook heap sort / priority queue algorithm.
+ *
+ * Subclasses must define the abstract method Less_Than.
+ */
+
+class Lucy::Util::PriorityQueue cnick PriQ
+    inherits Lucy::Object::Obj {
+    uint32_t   size;
+    uint32_t   max_size;
+
+    /* This particular priority queue variant leaves slot 0 open in order to
+     * keep the relationship between node rank and index clear in the up_heap
+     * and down_heap routines.
+     */
+    Obj **heap;
+
+    /**
+     * @param max_size Max elements the queue can hold.
+     */
+    inert PriorityQueue*
+    init(PriorityQueue *self, uint32_t max_size);
+
+    /** Compare queue elements.
+     */
+    abstract bool_t
+    Less_Than(PriorityQueue *self, Obj *a, Obj *b);
+
+    /** Possibly insert an element. Add to the Queue if either...
+     * a) the queue isn't full, or
+     * b) the element belongs in the queue and should displace another.
+     */
+    bool_t
+    Insert(PriorityQueue *self, decremented Obj *element);
+
+    /** Equivalent to Insert(), except for the return value.  If the Queue has
+     * room, the element is inserted and Jostle() returns NULL.  If not, then
+     * the item which falls out of the bottom of the Queue is returned.
+     */
+    incremented nullable Obj*
+    Jostle(PriorityQueue *self, decremented Obj *element);
+
+    /** Pop the *least* item off of the priority queue.
+     */
+    incremented nullable Obj*
+    Pop(PriorityQueue *self);
+
+    /** Empty out the PriorityQueue into a sorted array.
+     */
+    incremented VArray*
+    Pop_All(PriorityQueue *self);
+
+    /** Return the least item in the queue, but don't remove it.
+     */
+    nullable Obj*
+    Peek(PriorityQueue *self);
+
+    /** Accessor for "size" member.
+     */
+    uint32_t
+    Get_Size(PriorityQueue *self);
+
+    public void
+    Destroy(PriorityQueue *self);
+}
+
+

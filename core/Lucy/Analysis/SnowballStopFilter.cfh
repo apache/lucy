@@ -1,0 +1,112 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Suppress a "stoplist" of common words.
+ *
+ * A "stoplist" is collection of "stopwords": words which are common enough to
+ * be of little value when determining search results.  For example, so many
+ * documents in English contain "the", "if", and "maybe" that it may improve
+ * both performance and relevance to block them.
+ *
+ * Before filtering stopwords:
+ *
+ *     ("i", "am", "the", "walrus")
+ *
+ * After filtering stopwords:
+ *
+ *     ("walrus")
+ *
+ * SnowballStopFilter provides default stoplists for several languages, courtesy of
+ * the Snowball project (<http://snowball.tartarus.org>), or you may supply
+ * your own.
+ *
+ *     |-----------------------|
+ *     | ISO CODE | LANGUAGE   |
+ *     |-----------------------|
+ *     | da       | Danish     |
+ *     | de       | German     |
+ *     | en       | English    |
+ *     | es       | Spanish    |
+ *     | fi       | Finnish    |
+ *     | fr       | French     |
+ *     | hu       | Hungarian  |
+ *     | it       | Italian    |
+ *     | nl       | Dutch      |
+ *     | no       | Norwegian  |
+ *     | pt       | Portuguese |
+ *     | sv       | Swedish    |
+ *     | ru       | Russian    |
+ *     |-----------------------|
+ */
+
+class Lucy::Analysis::SnowballStopFilter cnick SnowStop
+    inherits Lucy::Analysis::Analyzer : dumpable {
+
+    Hash *stoplist;
+
+    inert const uint8_t** snow_da;
+    inert const uint8_t** snow_de;
+    inert const uint8_t** snow_en;
+    inert const uint8_t** snow_es;
+    inert const uint8_t** snow_fi;
+    inert const uint8_t** snow_fr;
+    inert const uint8_t** snow_hu;
+    inert const uint8_t** snow_it;
+    inert const uint8_t** snow_nl;
+    inert const uint8_t** snow_no;
+    inert const uint8_t** snow_pt;
+    inert const uint8_t** snow_ru;
+    inert const uint8_t** snow_sv;
+
+    inert incremented SnowballStopFilter*
+    new(const CharBuf *language = NULL, Hash *stoplist = NULL);
+
+    /**
+     * @param stoplist A hash with stopwords as the keys.
+     * @param language The ISO code for a supported language.
+     */
+    public inert SnowballStopFilter*
+    init(SnowballStopFilter *self, const CharBuf *language = NULL,
+         Hash *stoplist = NULL);
+
+    /** Return a Hash with the Snowball stoplist for the supplied language.
+     */
+    inert incremented Hash*
+    gen_stoplist(const CharBuf *language);
+
+    public incremented Inversion*
+    Transform(SnowballStopFilter *self, Inversion *inversion);
+
+    public bool_t
+    Equals(SnowballStopFilter *self, Obj *other);
+
+    public void
+    Destroy(SnowballStopFilter *self);
+}
+
+class Lucy::Analysis::SnowballStopFilter::NoCloneHash inherits Lucy::Object::Hash {
+    inert incremented NoCloneHash*
+    new(uint32_t capacity = 0);
+
+    inert NoCloneHash*
+    init(NoCloneHash *self, uint32_t capacity = 0);
+
+    public incremented Obj*
+    Make_Key(NoCloneHash *self, Obj *key, int32_t hash_sum);
+}
+

@@ -1,0 +1,239 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy::Docs::FileFormat - Overview of index file format.
+
+=head1 OVERVIEW
+
+It is not necessary to understand the current implementation details of the
+index file format in order to use Apache Lucy effectively, but it may be
+helpful if you are interested in tweaking for high performance, exotic usage,
+or debugging and development.  
+
+On a file system, an index is a directory.  The files inside have a
+hierarchical relationship: an index is made up of "segments", each of which is
+an independent inverted index with its own subdirectory; each segment is made
+up of several component parts.
+
+    [index]--|
+             |--snapshot_XXX.json
+             |--schema_XXX.json
+             |--write.lock
+             |
+             |--seg_1--|
+             |         |--segmeta.json
+             |         |--cfmeta.json
+             |         |--cf.dat-------|
+             |                         |--[lexicon]
+             |                         |--[postings]
+             |                         |--[documents]
+             |                         |--[highlight]
+             |                         |--[deletions]
+             |
+             |--seg_2--|
+             |         |--segmeta.json
+             |         |--cfmeta.json
+             |         |--cf.dat-------|
+             |                         |--[lexicon]
+             |                         |--[postings]
+             |                         |--[documents]
+             |                         |--[highlight]
+             |                         |--[deletions]
+             |
+             |--[...]--| 
+
+=head1 Write-once philosophy
+
+All segment directory names consist of the string "seg_" followed by a number
+in base 36: seg_1, seg_5m, seg_p9s2 and so on, with higher numbers indicating
+more recent segments.  Once a segment is finished and committed, its name is
+never re-used and its files are never modified.
+
+Old segments become obsolete and can be removed when their data has been
+consolidated into new segments during the process of segment merging and
+optimization.  A fully-optimized index has only one segment.
+
+=head1 Top-level entries
+
+There are a handful of "top-level" files and directories which belong to the
+entire index rather than to a particular segment.
+
+=head2 snapshot_XXX.json
+
+A "snapshot" file, e.g. C<snapshot_m7p.json>, is list of index files and
+directories.  Because index files, once written, are never modified, the list
+of entries in a snapshot defines a point-in-time view of the data in an index.
+
+Like segment directories, snapshot files also utilize the
+unique-base-36-number naming convention; the higher the number, the more
+recent the file.  The appearance of a new snapshot file within the index
+directory constitutes an index update.  While a new segment is being written
+new files may be added to the index directory, but until a new snapshot file
+gets written, a Searcher opening the index for reading won't know about them.
+
+=head2 schema_XXX.json
+
+The schema file is a Schema object describing the index's format, serialized
+as JSON.  It, too, is versioned, and a given snapshot file will reference one
+and only one schema file.
+
+=head2 locks 
+
+By default, only one indexing process may safely modify the index at any given
+time.  Processes reserve an index by laying claim to the C<write.lock> file
+within the C<locks/> directory.  A smattering of other lock files may be used
+from time to time, as well.
+
+=head1 A segment's component parts
+
+By default, each segment has up to five logical components: lexicon, postings,
+document storage, highlight data, and deletions.  Binary data from these
+components gets stored in virtual files within the "cf.dat" compound file;
+metadata is stored in a shared "segmeta.json" file.
+
+=head2 segmeta.json
+
+The segmeta.json file is a central repository for segment metadata.  In
+addition to information such as document counts and field numbers, it also
+warehouses arbitrary metadata on behalf of individual index components.
+
+=head2 Lexicon 
+
+Each indexed field gets its own lexicon in each segment.  The exact files
+involved depend on the field's type, but generally speaking there will be two
+parts.  First, there's a primary C<lexicon-XXX.dat> file which houses a
+complete term list associating terms with corpus frequency statistics,
+postings file locations, etc.  Second, one or more "lexicon index" files may
+be present which contain periodic samples from the primary lexicon file to
+facilitate fast lookups.
+
+=head2 Postings
+
+"Posting" is a technical term from the field of 
+L<information retrieval|Lucy::Docs::IRTheory>, defined as a single
+instance of a one term indexing one document.  If you are looking at the index
+in the back of a book, and you see that "freedom" is referenced on pages 8,
+86, and 240, that would be three postings, which taken together form a
+"posting list".  The same terminology applies to an index in electronic form.
+
+Each segment has one postings file per indexed field.  When a search is
+performed for a single term, first that term is looked up in the lexicon.  If
+the term exists in the segment, the record in the lexicon will contain
+information about which postings file to look at and where to look.
+
+The first thing any posting record tells you is a document id.  By iterating
+over all the postings associated with a term, you can find all the documents
+that match that term, a process which is analogous to looking up page numbers
+in a book's index.  However, each posting record typically contains other
+information in addition to document id, e.g. the positions at which the term
+occurs within the field.
+
+=head2 Documents
+
+The document storage section is a simple database, organized into two files:
+
+=over
+
+=item * 
+
+B<documents.dat> - Serialized documents.
+
+=item *
+
+B<documents.ix> - Document storage index, a solid array of 64-bit integers
+where each integer location corresponds to a document id, and the value at
+that location points at a file position in the documents.dat file.
+
+=back
+
+=head2 Highlight data 
+
+The files which store data used for excerpting and highlighting are organized
+similarly to the files used to store documents.
+
+=over
+
+=item * 
+
+B<highlight.dat> - Chunks of serialized highlight data, one per doc id.
+
+=item *
+
+B<highlight.ix> - Highlight data index -- as with the C<documents.ix> file, a
+solid array of 64-bit file pointers.
+
+=back
+
+=head2 Deletions
+
+When a document is "deleted" from a segment, it is not actually purged right
+away; it is merely marked as "deleted" via a deletions file.  Deletions files
+contains bit vectors with one bit for each document in the segment; if bit
+#254 is set then document 254 is deleted, and if that document turns up in a
+search it will be masked out.
+
+It is only when a segment's contents are rewritten to a new segment during the
+segment-merging process that deleted documents truly go away.
+
+=head1 Compound Files
+
+If you peer inside an index directory, you won't actually find any files named
+"documents.dat", "highlight.ix", etc. unless there is an indexing process
+underway.  What you will find instead is one "cf.dat" and one "cfmeta.json"
+file per segment.
+
+To minimize the need for file descriptors at search-time, all per-segment
+binary data files are concatenated together in "cf.dat" at the close of each
+indexing session.  Information about where each file begins and ends is stored
+in C<cfmeta.json>.  When the segment is opened for reading, a single file
+descriptor per "cf.dat" file can be shared among several readers.
+
+=head1 A Typical Search
+
+Here's a simplified narrative, dramatizing how a search for "freedom" against
+a given segment plays out:
+
+=over
+
+=item 1
+
+The searcher asks the relevant Lexicon Index, "Do you know anything about
+'freedom'?"  Lexicon Index replies, "Can't say for sure, but if the main
+Lexicon file does, 'freedom' is probably somewhere around byte 21008".  
+
+=item 2
+
+The main Lexicon tells the searcher "One moment, let me scan our records...
+Yes, we have 2 documents which contain 'freedom'.  You'll find them in
+seg_6/postings-4.dat starting at byte 66991."
+
+=item 3
+
+The Postings file says "Yep, we have 'freedom', all right!  Document id 40
+has 1 'freedom', and document 44 has 8.  If you need to know more, like if any
+'freedom' is part of the phrase 'freedom of speech', ask me about positions!
+
+=item 4
+
+If the searcher is only looking for 'freedom' in isolation, that's where it
+stops.  It now knows enough to assign the documents scores against "freedom",
+with the 8-freedom document likely ranking higher than the single-freedom
+document.
+
+=back
+
+

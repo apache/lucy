@@ -1,0 +1,166 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Abstract base class for marking documents as deleted.
+ *
+ * Subclasses of DeletionsWriter provide a low-level mechanism for declaring a
+ * document deleted from an index.
+ *
+ * Because files in an index are never modified, and because it is not
+ * practical to delete entire segments, a DeletionsWriter does not actually
+ * remove documents from the index.  Instead, it communicates to a search-time
+ * companion DeletionsReader which documents are deleted in such a way that it
+ * can create a Matcher iterator.
+ *
+ * Documents are truly deleted only when the segments which contain them are
+ * merged into new ones.
+ */
+
+abstract class Lucy::Index::DeletionsWriter cnick DelWriter
+    inherits Lucy::Index::DataWriter {
+
+    inert DeletionsWriter*
+    init(DeletionsWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    /** Delete all documents in the index that index the supplied term.
+     *
+     * @param field The name of an indexed field. (If it is not spec'd as
+     * <code>indexed</code>, an error will occur.)
+     * @param term The term which identifies docs to be marked as deleted.  If
+     * <code>field</code> is associated with an Analyzer, <code>term</code>
+     * will be processed automatically (so don't pre-process it yourself).
+     */
+    public abstract void
+    Delete_By_Term(DeletionsWriter *self, const CharBuf *field, Obj *term);
+
+    /** Delete all documents in the index that match <code>query</code>.
+     *
+     * @param query A L<Query|Lucy::Search::Query>.
+     */
+    public abstract void
+    Delete_By_Query(DeletionsWriter *self, Query *query);
+
+    /** Delete the document identified in the PolyReader by the supplied id.
+     */
+    public abstract void
+    Delete_By_Doc_ID(DeletionsWriter *self, int32_t doc_id);
+
+    /** Returns true if there are updates that need to be written.
+     */
+    public abstract bool_t
+    Updated(DeletionsWriter *self);
+
+    /** Produce an array of int32_t which wraps around deleted documents.  The
+     * position in the array represents the original doc id, and the value
+     * represents the new doc id.  Deleted docs are assigned the value - 0, so
+     * if you had 4 docs and doc 2 was deleted, the array would have the
+     * values...  (1, 0, 2, 3).
+     *
+     * @param offset Value which gets added to each valid document id.
+     * With an offset of 1000, the array in the previous example would be
+     * { 1001, 0, 1002, 1003 }.
+     */
+    public incremented I32Array*
+    Generate_Doc_Map(DeletionsWriter *self, Matcher *deletions,
+                     int32_t doc_max, int32_t offset);
+
+    /** Return a deletions iterator for the supplied SegReader, which must be
+     * a component within the PolyReader that was supplied at
+     * construction-time.
+     */
+    public abstract incremented nullable Matcher*
+    Seg_Deletions(DeletionsWriter *self, SegReader *seg_reader);
+
+    /** Return the number of deletions for a given segment.
+     *
+     * @param seg_name The name of the segment.
+     */
+    public abstract int32_t
+    Seg_Del_Count(DeletionsWriter *self, const CharBuf *seg_name);
+}
+
+/** Implements DeletionsWriter using BitVector files.
+ */
+class Lucy::Index::DefaultDeletionsWriter cnick DefDelWriter
+    inherits Lucy::Index::DeletionsWriter {
+
+    VArray        *seg_readers;
+    Hash          *name_to_tick;
+    I32Array      *seg_starts;
+    VArray        *bit_vecs;
+    bool_t        *updated;
+    IndexSearcher *searcher;
+
+    inert int32_t current_file_format;
+
+    /**
+     * @param schema A Schema.
+     * @param segment A Segment.
+     * @param snapshot A Snapshot.
+     * @param polyreader An PolyReader.
+     */
+    inert incremented DefaultDeletionsWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader);
+
+    inert DefaultDeletionsWriter*
+    init(DefaultDeletionsWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    public void
+    Delete_By_Term(DefaultDeletionsWriter *self, const CharBuf *field,
+                   Obj *term);
+
+    public void
+    Delete_By_Query(DefaultDeletionsWriter *self, Query *query);
+
+    public void
+    Delete_By_Doc_ID(DefaultDeletionsWriter *self, int32_t doc_id);
+
+    public bool_t
+    Updated(DefaultDeletionsWriter *self);
+
+    public incremented nullable Matcher*
+    Seg_Deletions(DefaultDeletionsWriter *self, SegReader *seg_reader);
+
+    public int32_t
+    Seg_Del_Count(DefaultDeletionsWriter *self, const CharBuf *seg_name);
+
+    public void
+    Add_Segment(DefaultDeletionsWriter *self, SegReader *reader,
+                I32Array *doc_map = NULL);
+
+    public void
+    Merge_Segment(DefaultDeletionsWriter *self, SegReader *reader,
+                  I32Array *doc_map = NULL);
+
+    public void
+    Finish(DefaultDeletionsWriter *self);
+
+    public int32_t
+    Format(DefaultDeletionsWriter* self);
+
+    public incremented Hash*
+    Metadata(DefaultDeletionsWriter *self);
+
+    public void
+    Destroy(DefaultDeletionsWriter *self);
+}
+
+

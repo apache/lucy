@@ -1,0 +1,63 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Union multiple result sets.
+ *
+ * ORQuery is a composite L<Query|Lucy::Search::Query> which matches
+ * when any of its children match, so its result set is the union of their
+ * result sets.  Matching documents recieve a summed score from all matching
+ * child Queries.
+ */
+
+class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery
+    : dumpable {
+
+    inert incremented ORQuery*
+    new(VArray *children = NULL);
+
+    /**
+     * @param children An array of child Queries.
+     */
+    public inert ORQuery*
+    init(ORQuery *self, VArray *children = NULL);
+
+    public incremented Compiler*
+    Make_Compiler(ORQuery *self, Searcher *searcher, float boost);
+
+    public incremented CharBuf*
+    To_String(ORQuery *self);
+
+    public bool_t
+    Equals(ORQuery *self, Obj *other);
+}
+
+class Lucy::Search::ORCompiler
+    inherits Lucy::Search::PolyCompiler {
+
+    inert incremented ORCompiler*
+    new(ORQuery *parent, Searcher *searcher, float boost);
+
+    inert ORCompiler*
+    init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(ORCompiler *self, SegReader *reader, bool_t need_score);
+}
+
+

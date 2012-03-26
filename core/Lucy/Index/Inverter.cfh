@@ -1,0 +1,176 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Invert documents.
+ *
+ * Inverter's role is to prepare the content of a Doc for addition to various
+ * DataWriters, by associating fields with FieldTypes, inverting their
+ * content when appropriate, and marshalling them into an iterable form.
+ */
+
+class Lucy::Index::Inverter inherits Lucy::Object::Obj {
+
+    Schema        *schema;
+    Segment       *segment;
+    Doc           *doc;
+    VArray        *entries;    /* Entries for the current Doc. */
+    VArray        *entry_pool; /* Cached entry per field. */
+    InverterEntry *current;    /* Current entry while iterating. */
+    InverterEntry *blank;      /* Used when iterator is exhausted. */
+    float          boost;
+    int32_t        tick;
+    bool_t         sorted;
+
+    inert incremented Inverter*
+    new(Schema *schema, Segment *segment);
+
+    inert Inverter*
+    init(Inverter *self, Schema *schema, Segment *segment);
+
+    /** Invert the document, first calling Set_Doc(), then Add_Field() for
+     * each field in the Doc.
+     */
+    public void
+    Invert_Doc(Inverter *self, Doc *doc);
+
+    /** Set the object's <code>doc</code> member.  Calls Clear() as side
+     * effect.
+     */
+    public void
+    Set_Doc(Inverter *self, Doc *doc);
+
+    /** Set the object's <code>boost</code> member.
+     */
+    public void
+    Set_Boost(Inverter *self, float boost);
+
+    /** Add a field to the Inverter.  If the field is indexed/analyzed, invert
+     * it.
+     *
+     * The InverterEntry's value should have already been set to the field's
+     * value when Add_Field() is called.
+     */
+    void
+    Add_Field(Inverter *self, InverterEntry *entry);
+
+    /** Remove the cached Doc and everything derived from it.
+     */
+    public void
+    Clear(Inverter *self);
+
+    /** Reset the iterator and prepare to cycle through any fields that have
+     * been added.
+     *
+     * @return the number of fields which will be iterated over.
+     */
+    public uint32_t
+    Iterate(Inverter *self);
+
+    /** Proceed to the next field.  Fields are iterated in order of Segment
+     * field number.
+     */
+    public int32_t
+    Next(Inverter *self);
+
+    /** Return the current doc, or NULL if there isn't one.
+     */
+    public nullable Doc*
+    Get_Doc(Inverter *self);
+
+    /** Return the current boost.
+     */
+    public float
+    Get_Boost(Inverter *self);
+
+    /** Return the current field's name, or NULL if the iterator is exhausted.
+     */
+    public nullable CharBuf*
+    Get_Field_Name(Inverter *self);
+
+    /** Return the current field's value, or NULL if the iterator is
+     * exhausted.
+     */
+    public nullable Obj*
+    Get_Value(Inverter *self);
+
+    /** Return the FieldType for the current field, or NULL if the iterator is
+     * exhausted.
+     */
+    public nullable FieldType*
+    Get_Type(Inverter *self);
+
+    /** Return the Analyzer for the current field, or NULL if the iterator is
+     * exhausted.
+     */
+    public nullable Analyzer*
+    Get_Analyzer(Inverter *self);
+
+    /** Return the Analyzer for the current field, or NULL if the iterator is
+     * exhausted.
+     */
+    public nullable Similarity*
+    Get_Similarity(Inverter *self);
+
+    /** Return the Inversion for the current field, provided that that field
+     * is indexed; return NULL if the iterator is exhausted.
+     */
+    public nullable Inversion*
+    Get_Inversion(Inverter *self);
+
+    public void
+    Destroy(Inverter *self);
+}
+
+/** Cached information about fields.
+ *
+ * Inverter needs to check certain field characteristics frequently.  Since
+ * field definitions are unchanging, we cache them in an InverterEntry object.
+ */
+private final class Lucy::Index::Inverter::InverterEntry cnick InvEntry
+    inherits Lucy::Object::Obj {
+
+    int32_t      field_num;
+    CharBuf     *field;
+    Obj         *value;
+    Inversion   *inversion;
+    FieldType   *type;
+    Analyzer    *analyzer;
+    Similarity  *sim;
+    bool_t       indexed;
+    bool_t       highlightable;
+
+    inert incremented InverterEntry*
+    new(Schema *schema = NULL, const CharBuf *field_name, int32_t field_num);
+
+    inert InverterEntry*
+    init(InverterEntry *self = NULL, Schema *schema,
+         const CharBuf *field_name, int32_t field_num);
+
+    public int32_t
+    Compare_To(InverterEntry *self, Obj *other);
+
+    /** Expunge all transient data.
+     */
+    void
+    Clear(InverterEntry *self);
+
+    public void
+    Destroy(InverterEntry *self);
+}
+
+

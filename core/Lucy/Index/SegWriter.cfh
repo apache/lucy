@@ -1,0 +1,127 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+
+/** Write one segment of an index.
+ *
+ * SegWriter is a conduit through which information fed to Indexer passes.  It
+ * manages L<Segment|Lucy::Index::Segment> and Inverter, invokes the
+ * L<Analyzer|Lucy::Analysis::Analyzer> chain, and feeds low
+ * level L<DataWriters|Lucy::Index::DataWriter> such as
+ * PostingListWriter and DocWriter.
+ *
+ * The sub-components of a SegWriter are determined by
+ * L<Architecture|Lucy::Plan::Architecture>.  DataWriter components
+ * which are added to the stack of writers via Add_Writer() have
+ * Add_Inverted_Doc() invoked for each document supplied to SegWriter's
+ * Add_Doc().
+ */
+class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
+
+    Inverter          *inverter;
+    VArray            *writers;
+    Hash              *by_api;
+    DeletionsWriter   *del_writer;
+
+    inert incremented SegWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader);
+
+    /**
+     * @param schema A Schema.
+     * @param snapshot The Snapshot that will be committed at the end of the
+     * indexing session.
+     * @param segment The Segment in progress.
+     * @param polyreader A PolyReader representing all existing data in the
+     * index.  (If the index is brand new, the PolyReader will have no
+     * sub-readers).
+     */
+    inert SegWriter*
+    init(SegWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    /**
+     * Register a DataWriter component with the SegWriter.  (Note that
+     * registration simply makes the writer available via Fetch(), so you may
+     * also want to call Add_Writer()).
+     *
+     * @param api The name of the DataWriter api which <code>writer</code>
+     * implements.
+     * @param component A DataWriter.
+     */
+    public void
+    Register(SegWriter *self, const CharBuf *api,
+             decremented DataWriter *component);
+
+    /** Retrieve a registered component.
+     *
+     * @param api The name of the DataWriter api which the component
+     * implements.
+     */
+    public nullable Obj*
+    Fetch(SegWriter *self, const CharBuf *api);
+
+    /** Add a DataWriter to the SegWriter's stack of writers.
+     */
+    public void
+    Add_Writer(SegWriter *self, decremented DataWriter *writer);
+
+    /** Create the segment directory.  If it already exists, delete any files
+     * within it (which are presumed to have been left over from a crashed
+     * indexing session).
+     */
+    void
+    Prep_Seg_Dir(SegWriter *self);
+
+    /** Add a document to the segment.  Inverts <code>doc</code>, increments
+     * the Segment's internal document id, then calls Add_Inverted_Doc(),
+     * feeding all sub-writers.
+     */
+    public void
+    Add_Doc(SegWriter *self, Doc *doc, float boost = 1.0);
+
+    void
+    Set_Del_Writer(SegWriter *self, DeletionsWriter *del_writer = NULL);
+
+    /** Accessor for DeletionsWriter member.
+     */
+    DeletionsWriter*
+    Get_Del_Writer(SegWriter *self);
+
+    public void
+    Add_Inverted_Doc(SegWriter *self, Inverter *inverter, int32_t doc_id);
+
+    public void
+    Add_Segment(SegWriter *self, SegReader *reader,
+                I32Array *doc_map = NULL);
+
+    public void
+    Merge_Segment(SegWriter *self, SegReader *reader,
+                  I32Array *doc_map = NULL);
+
+    public void
+    Delete_Segment(SegWriter *self, SegReader *reader);
+
+    public void
+    Finish(SegWriter *self);
+
+    public void
+    Destroy(SegWriter *self);
+}
+
+

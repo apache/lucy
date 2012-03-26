@@ -1,0 +1,55 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Backing storage used by RAMFolder and RAMFileHandle.
+ */
+class Lucy::Store::RAMFile inherits Lucy::Object::Obj {
+
+    bool_t   read_only;
+    ByteBuf *contents;
+
+    inert incremented RAMFile*
+    new(ByteBuf *contents = NULL, bool_t read_only = false);
+
+    /**
+     * @param contents Existing file contents, if any.
+     * @param read_only Indicate that the file contents may not be modified.
+     */
+    inert RAMFile*
+    init(RAMFile *self, ByteBuf *contents = NULL, bool_t read_only = false);
+
+    /** Accessor for the file's contents.
+     */
+    ByteBuf*
+    Get_Contents(RAMFile *self);
+
+    /** Accessor for <code>read_only</code> property.
+     */
+    bool_t
+    Read_Only(RAMFile *self);
+
+    /** Set the object's <code>read_only</code> property.
+     */
+    void
+    Set_Read_Only(RAMFile *self, bool_t read_only);
+
+    public void
+    Destroy(RAMFile *self);
+}
+
+

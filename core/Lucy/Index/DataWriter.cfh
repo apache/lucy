@@ -1,0 +1,146 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Write data to an index.
+ *
+ * DataWriter is an abstract base class for writing index data, generally in
+ * segment-sized chunks. Each component of an index -- e.g. stored fields,
+ * lexicon, postings, deletions -- is represented by a
+ * DataWriter/L<DataReader|Lucy::Index::DataReader> pair.
+ *
+ * Components may be specified per index by subclassing
+ * L<Architecture|Lucy::Plan::Architecture>.
+ */
+
+public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
+
+    Snapshot    *snapshot;
+    Segment     *segment;
+    PolyReader  *polyreader;
+    Schema      *schema;
+    Folder      *folder;
+
+    /**
+     * @param snapshot The Snapshot that will be committed at the end of the
+     * indexing session.
+     * @param segment The Segment in progress.
+     * @param polyreader A PolyReader representing all existing data in the
+     * index.  (If the index is brand new, the PolyReader will have no
+     * sub-readers).
+     */
+    public inert DataWriter*
+    init(DataWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader);
+
+    /** Process a document, previously inverted by <code>inverter</code>.
+     *
+     * @param inverter An Inverter wrapping an inverted document.
+     * @param doc_id Internal number assigned to this document within the
+     * segment.
+     */
+    public abstract void
+    Add_Inverted_Doc(DataWriter *self, Inverter *inverter, int32_t doc_id);
+
+    /** Add content from an existing segment into the one currently being
+     * written.
+     *
+     * @param reader The SegReader containing content to add.
+     * @param doc_map An array of integers mapping old document ids to
+     * new.  Deleted documents are mapped to 0, indicating that they should be
+     * skipped.
+     */
+    public abstract void
+    Add_Segment(DataWriter *self, SegReader *reader,
+                I32Array *doc_map = NULL);
+
+    /** Remove a segment's data.  The default implementation is a no-op, as
+     * all files within the segment directory will be automatically deleted.
+     * Subclasses which manage their own files outside of the segment system
+     * should override this method and use it as a trigger for cleaning up
+     * obsolete data.
+     *
+     * @param reader The SegReader containing content to merge, which must
+     * represent a segment which is part of the the current snapshot.
+     */
+    public void
+    Delete_Segment(DataWriter *self, SegReader *reader);
+
+    /** Move content from an existing segment into the one currently being
+     * written.
+     *
+     * The default implementation calls Add_Segment() then Delete_Segment().
+     *
+     * @param reader The SegReader containing content to merge, which must
+     * represent a segment which is part of the the current snapshot.
+     * @param doc_map An array of integers mapping old document ids to
+     * new.  Deleted documents are mapped to 0, indicating that they should be
+     * skipped.
+     */
+    public void
+    Merge_Segment(DataWriter *self, SegReader *reader,
+                  I32Array *doc_map = NULL);
+
+    /** Complete the segment: close all streams, store metadata, etc.
+     */
+    public abstract void
+    Finish(DataWriter *self);
+
+    /** Arbitrary metadata to be serialized and stored by the Segment.  The
+     * default implementation supplies a Hash with a single key-value pair for
+     * "format".
+     */
+    public incremented Hash*
+    Metadata(DataWriter *self);
+
+    /** Every writer must specify a file format revision number, which should
+     * increment each time the format changes. Responsibility for revision
+     * checking is left to the companion DataReader.
+     */
+    public abstract int32_t
+    Format(DataWriter *self);
+
+    /** Accessor for "snapshot" member var.
+     */
+    public Snapshot*
+    Get_Snapshot(DataWriter *self);
+
+    /** Accessor for "segment" member var.
+     */
+    public Segment*
+    Get_Segment(DataWriter *self);
+
+    /** Accessor for "polyreader" member var.
+     */
+    public PolyReader*
+    Get_PolyReader(DataWriter *self);
+
+    /** Accessor for "schema" member var.
+     */
+    public Schema*
+    Get_Schema(DataWriter *self);
+
+    /** Accessor for "folder" member var.
+     */
+    public Folder*
+    Get_Folder(DataWriter *self);
+
+    public void
+    Destroy(DataWriter *self);
+}
+
+

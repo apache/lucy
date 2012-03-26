@@ -1,0 +1,58 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Consolidate segment files.
+ *
+ * CompoundFileWriter combines all the data files in a directory into a single
+ * "compound" file named "cf.dat".  Metadata describing filename and
+ * filepointer information is stored in a "cfmeta.json" file.
+ *
+ * Nested subdirectories and files ending in ".json" are excluded from
+ * consolidation.
+ *
+ * Any given directory may only be consolidated once.
+ */
+
+class Lucy::Store::CompoundFileWriter cnick CFWriter
+    inherits Lucy::Object::Obj {
+
+    Folder      *folder;
+
+    inert int32_t current_file_format;
+
+    inert incremented CompoundFileWriter*
+    new(Folder *folder);
+
+    inert CompoundFileWriter*
+    init(CompoundFileWriter *self, Folder *folder);
+
+    /** Perform the consolidation operation, building the cf.dat and
+     * cfmeta.json files.
+     *
+     * The commit point is a rename op, where a temp file gets renamed to the
+     * cfmeta file.  After the commit completes, the source files are deleted.
+     */
+    void
+    Consolidate(CompoundFileWriter *self);
+
+    public void
+    Destroy(CompoundFileWriter *self);
+}
+
+

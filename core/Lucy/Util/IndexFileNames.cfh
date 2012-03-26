@@ -1,0 +1,49 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Utilities for parsing, interpreting and generating index file names.
+ */
+inert class Lucy::Util::IndexFileNames cnick IxFileNames {
+
+    /** Skip past the first instance of an underscore in the CharBuf, then
+     * attempt to decode a base 36 number.  For example, "snapshot_5.json"
+     * yields 5, and "seg_a1" yields 27.
+     *
+     * @return a generation number, or 0 if no number can be extracted.
+     */
+    inert uint64_t
+    extract_gen(const CharBuf *name);
+
+    /** Return the name of the latest generation snapshot file in the Folder,
+     * or NULL if no such file exists.
+     */
+    inert incremented nullable CharBuf*
+    latest_snapshot(Folder *folder);
+
+    /** Split the <code>path</code> on '/' and assign the last component to
+     * <code>target</code>, which will remain valid only as long as
+     * <code>path</code> is unmodified.  Trailing slashes will be stripped.
+     *
+     * @param target The target string to assign to.
+     * @return target, allowing an assignment idiom.
+     */
+    inert incremented ZombieCharBuf*
+    local_part(const CharBuf *path, ZombieCharBuf *target);
+}
+
+

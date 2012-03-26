@@ -1,0 +1,52 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Private scan-only Lexicon helper class.
+ */
+class Lucy::Index::RawLexicon cnick RawLex
+    inherits Lucy::Index::Lexicon {
+
+    InStream      *instream;
+    TermStepper   *term_stepper;
+    TermStepper   *tinfo_stepper;
+    int64_t        start;
+    int64_t        end;
+    int64_t        len;
+
+    inert incremented RawLexicon*
+    new(Schema *schema, const CharBuf *field, InStream *instream,
+        int64_t start, int64_t end);
+
+    inert RawLexicon*
+    init(RawLexicon *self, Schema *schema, const CharBuf *field,
+         InStream *instream, int64_t start, int64_t end);
+
+    public void
+    Destroy(RawLexicon *self);
+
+    public bool_t
+    Next(RawLexicon *self);
+
+    public nullable Obj*
+    Get_Term(RawLexicon *self);
+
+    public int32_t
+    Doc_Freq(RawLexicon *self);
+}
+
+

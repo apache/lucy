@@ -1,0 +1,149 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+__C__
+#include <stddef.h>
+#include "Lucy/Object/Obj.h"
+#include "Lucy/Util/SortUtils.h"
+
+#define LUCY_SORTEX_DEFAULT_MEM_THRESHOLD 0x1000000
+#ifdef LUCY_USE_SHORT_NAMES
+  #define SORTEX_DEFAULT_MEM_THRESHOLD LUCY_SORTEX_DEFAULT_MEM_THRESHOLD
+#endif
+__END_C__
+
+/** Abstract external sorter.
+ *
+ * SortExternal objects are sort pools which allow you to sort large amounts
+ * of data.  To achieve this, you Feed() all values into the SortExternal
+ * object, Flip() the object from write mode to read mode, then Fetch() the
+ * values one at a time in sorted order.
+ *
+ * It's expected that the total memory footprint of the sortable objects will
+ * eventually exceed a specified threshold; at that point, the SortExternal
+ * object will call the abstract method Flush().  It's expected that Flush()
+ * implementations will empty out the current sort cache, write a sorted "run"
+ * to external storage, and add a new child SortExternal object to the top
+ * level object's "runs" array to represent the flushed content.
+ *
+ * During the read phase, the child objects retrieve values from external
+ * storage by calling the abstract method Refill().  The top-level
+ * SortExternal object then interleaves multiple sorted streams to produce a
+ * single unified stream of sorted values.
+ */
+abstract class Lucy::Util::SortExternal cnick SortEx
+    inherits Lucy::Object::Obj {
+
+    uint8_t       *cache;
+    uint32_t       cache_cap;
+    uint32_t       cache_max;
+    uint32_t       cache_tick;
+    uint8_t       *scratch;
+    uint32_t       scratch_cap;
+    VArray        *runs;
+    uint32_t       num_slices;
+    uint8_t      **slice_starts;
+    uint32_t      *slice_sizes;
+    uint32_t       mem_thresh;
+    size_t         width;
+    bool_t         flipped;
+
+    inert SortExternal*
+    init(SortExternal *self, size_t width);
+
+    /** Compare two sortable elements.
+     */
+    abstract int
+    Compare(SortExternal *self, void *va, void *vb);
+
+    /** Flush all elements currently in the cache.
+     *
+     * Presumably this entails sorting everything, writing the sorted elements
+     * to disk, spawning a child object to represent those elements, and
+     * adding that child to the top level object via Add_Run().
+     */
+    abstract void
+    Flush(SortExternal *self);
+
+    /** Add data to the sort pool.
+     *
+     * @param data Pointer to the data being added, which must be exactly
+     * <code>width</code> bytes in size.
+     */
+    void
+    Feed(SortExternal *self, void *data);
+
+    /** Flip the sortex from write mode to read mode.
+     */
+    void
+    Flip(SortExternal *self);
+
+    /** Fetch the next sorted item from the sort pool.  Invalid prior to
+     * calling Flip(). Returns NULL when all elements have been exhausted.
+     */
+    nullable void*
+    Fetch(SortExternal *self);
+
+    /** Preview the next item that Fetch will return, but don't pop it.
+     * Invalid prior to calling Flip().
+     */
+    nullable void*
+    Peek(SortExternal *self);
+
+    /** Add a run to the sortex's collection.
+     */
+    void
+    Add_Run(SortExternal *self, decremented SortExternal *run);
+
+    /** Refill the cache of a run.  Will only be called on child objects, not
+     * the main object.
+     */
+    abstract uint32_t
+    Refill(SortExternal *self);
+
+    /** Sort all items currently in the main cache.
+     */
+    void
+    Sort_Cache(SortExternal *self);
+
+    /** Reset cache variables so that cache gives the appearance of having
+     * been initialized.
+     *
+     * Subclasses may take steps to release items held in cache, if any.
+     */
+    void
+    Clear_Cache(SortExternal *self);
+
+    /** Return the number of items presently in the cache.
+     */
+    uint32_t
+    Cache_Count(SortExternal *self);
+
+    /** Allocate more memory to the cache.
+     */
+    void
+    Grow_Cache(SortExternal *self, uint32_t new_cache_cap);
+
+    void
+    Set_Mem_Thresh(SortExternal *self, uint32_t mem_thresh);
+
+    public void
+    Destroy(SortExternal *self);
+}
+
+

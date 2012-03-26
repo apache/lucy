@@ -1,0 +1,157 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Write index files.
+ *
+ * OutStream objects are the primary interface for writing index files.  They
+ * are media-agnostic wrappers around low-level, media-specific, unbuffered
+ * FileHandle objects, providing output buffering and routines for writing
+ * common constructs such as big-endian or compressed integers.
+ *
+ * OutStreams are write-once and cannot seek -- they must write all their data
+ * in order.  Furthermore, each OutStream is associated with exactly one,
+ * unique FileHandle -- unlike InStreams, which can share a common FileHandle.
+ */
+class Lucy::Store::OutStream inherits Lucy::Object::Obj {
+
+    char          *buf;
+    int64_t        buf_start;
+    size_t         buf_pos;
+    FileHandle    *file_handle;
+    CharBuf       *path;
+
+    inert incremented nullable OutStream*
+    open(Obj *file);
+
+    /** Return a new OutStream or set Err_error and return NULL on failure.
+     */
+    inert nullable OutStream*
+    do_open(OutStream *self, Obj *file);
+
+    /** Accessor for <code>path</code> member.
+     */
+    CharBuf*
+    Get_Path(OutStream *self);
+
+    /** Return the current file position.
+     */
+    final int64_t
+    Tell(OutStream *self);
+
+    /** Write 0 or more null bytes to the OutStream until its file position is
+     * a multiple of <code>modulus</code>.
+     *
+     * @return the new file position.
+     */
+    final int64_t
+    Align(OutStream *self, int64_t modulus);
+
+    /** Flush output buffer to target FileHandle.
+     */
+    final void
+    Flush(OutStream *self);
+
+    /** Return the current length of the file in bytes.
+     */
+    final int64_t
+    Length(OutStream *self);
+
+    /** Advisory call informing the OutStream that it should prepare to occupy
+     * <code>length</code> bytes.
+     */
+    void
+    Grow(OutStream *self, int64_t length);
+
+    /** Write <code>len</code> bytes from <code>buf</code> to the OutStream.
+     */
+    final void
+    Write_Bytes(OutStream *self, const void *buf, size_t len);
+
+    /** Write a signed 8-bit integer.
+     */
+    final void
+    Write_I8(OutStream *self, int8_t value);
+
+    /** Write an unsigned 8-bit integer.
+     */
+    final void
+    Write_U8(OutStream *self, uint8_t value);
+
+    /** Write a signed 32-bit integer.
+     */
+    final void
+    Write_I32(OutStream *self, int32_t value);
+
+    /** Write an unsigned 32-bit integer.
+     */
+    final void
+    Write_U32(OutStream *self, uint32_t value);
+
+    /** Write a signed 64-bit integer.
+     */
+    final void
+    Write_I64(OutStream *self, int64_t value);
+
+    /** Write an unsigned 64-bit integer.
+     */
+    final void
+    Write_U64(OutStream *self, uint64_t value);
+
+    /** Write a 32-bit integer using a compressed format.
+     */
+    final void
+    Write_C32(OutStream *self, uint32_t value);
+
+    /** Write a 64-bit integer using a compressed format.
+     */
+    final void
+    Write_C64(OutStream *self, uint64_t value);
+
+    /** Write an IEEE 764 32-bit floating point number in big-endian byte
+     * order.
+     */
+    final void
+    Write_F32(OutStream *self, float value);
+
+    /** Write an IEEE 764 64-bit double-precision floating point number in
+     * big-endian byte order.
+     */
+    final void
+    Write_F64(OutStream *self, double value);
+
+    /** Write a string as a C32 indicating length of content in bytes,
+     * followed by the content.
+     */
+    final void
+    Write_String(OutStream *self, const char *buf, size_t len);
+
+    /** Write the entire contents of an InStream to the OutStream.
+     */
+    void
+    Absorb(OutStream *self, InStream *instream);
+
+    /** Close down the stream.
+     */
+    void
+    Close(OutStream *self);
+
+    public void
+    Destroy(OutStream *self);
+}
+
+

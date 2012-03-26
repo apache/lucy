@@ -1,0 +1,81 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** An offset, a length, and a weight.
+ *
+ * Span objects store information about a span across an array of...
+ * something. The unit is context-dependent.
+ *
+ * Text is one possibility, in which case offset and length might be measured
+ * in Unicode code points.  However, the Span could also refer to a span
+ * within an array of tokens, for example -- in which case the start and
+ * offset might be measured in token positions.
+ */
+class Lucy::Search::Span inherits Lucy::Object::Obj {
+
+    int32_t offset;
+    int32_t length;
+    float   weight;
+
+    inert incremented Span*
+    new(int32_t offset, int32_t length, float weight = 0.0);
+
+    /**
+     * @param offset Integer offset, unit is context-dependent.
+     * @param length Integer length, unit is context-dependent.
+     * @param weight A floating point weight.
+     */
+    public inert Span*
+    init(Span *self, int32_t offset, int32_t length,
+         float weight = 0.0);
+
+    /** Accessor for <code>offset</code> attribute.
+     */
+    public int32_t
+    Get_Offset(Span *self);
+
+    /** Setter for <code>offset</code> attribute.
+     */
+    public void
+    Set_Offset(Span *self, int32_t offset);
+
+    /** Accessor for <code>length</code> attribute.
+     */
+    public int32_t
+    Get_Length(Span *self);
+
+    /** Setter for <code>length</code> attribute.
+     */
+    public void
+    Set_Length(Span *self, int32_t length);
+
+    /** Accessor for <code>weight</code> attribute.
+     */
+    public float
+    Get_Weight(Span *self);
+
+    /** Setter for <code>weight</code> attribute.
+     */
+    public void
+    Set_Weight(Span *self, float weight);
+
+    public int32_t
+    Compare_To(Span *self, Obj *other);
+}
+
+

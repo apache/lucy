@@ -1,0 +1,65 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Top-scoring documents.
+ *
+ * A TopDocs object encapsulates the highest-scoring N documents and their
+ * associated scores.
+ */
+class Lucy::Search::TopDocs inherits Lucy::Object::Obj {
+
+    VArray *match_docs;
+    uint32_t   total_hits;
+
+    inert incremented TopDocs*
+    new(VArray *match_docs, uint32_t total_hits);
+
+    inert TopDocs*
+    init(TopDocs *self, VArray *match_docs, uint32_t total_hits);
+
+    /** Accessor for <code>match_docs</code> member.
+     */
+    VArray*
+    Get_Match_Docs(TopDocs *self);
+
+    /** Setter for <code>match_docs</code> member.
+     */
+    void
+    Set_Match_Docs(TopDocs *self, VArray *match_docs);
+
+    /** Accessor for <code>total_hits</code> member.
+     */
+    uint32_t
+    Get_Total_Hits(TopDocs *self);
+
+    /** Setter for <code>total_hits</code> member.
+     */
+    void
+    Set_Total_Hits(TopDocs *self, uint32_t total_hits);
+
+    public void
+    Serialize(TopDocs *self, OutStream *outstream);
+
+    public incremented TopDocs*
+    Deserialize(TopDocs *self, InStream *instream);
+
+    public void
+    Destroy(TopDocs *self);
+}
+
+

@@ -1,0 +1,245 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy - Apache Lucy search engine library.
+
+=head1 VERSION
+
+0.1.0
+
+=head1 SYNOPSIS
+
+First, plan out your index structure, create the index, and add documents:
+
+    # indexer.pl
+    
+    use Lucy::Index::Indexer;
+    use Lucy::Plan::Schema;
+    use Lucy::Analysis::PolyAnalyzer;
+    use Lucy::Plan::FullTextType;
+    
+    # Create a Schema which defines index fields.
+    my $schema = Lucy::Plan::Schema->new;
+    my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new( 
+        language => 'en',
+    );
+    my $type = Lucy::Plan::FullTextType->new(
+        analyzer => $polyanalyzer,
+    );
+    $schema->spec_field( name => 'title',   type => $type );
+    $schema->spec_field( name => 'content', type => $type );
+    
+    # Create the index and add documents.
+    my $indexer = Lucy::Index::Indexer->new(
+        schema => $schema,   
+        index  => '/path/to/index',
+        create => 1,
+    );
+    while ( my ( $title, $content ) = each %source_docs ) {
+        $indexer->add_doc({
+            title   => $title,
+            content => $content,
+        });
+    }
+    $indexer->commit;
+
+Then, search the index:
+
+    # search.pl
+    
+    use Lucy::Search::IndexSearcher;
+    
+    my $searcher = Lucy::Search::IndexSearcher->new( 
+        index => '/path/to/index' 
+    );
+    my $hits = $searcher->hits( query => "foo bar" );
+    while ( my $hit = $hits->next ) {
+        print "$hit->{title}\n";
+    }
+
+=head1 DESCRIPTION
+
+Apache Lucy is a high-performance, modular search engine library.
+
+=head2 Features
+
+=over
+
+=item *
+
+Extremely fast.  A single machine can handle millions of documents.
+
+=item *
+
+Scalable to multiple machines.
+
+=item *
+
+Incremental indexing (addition/deletion of documents to/from an existing
+index).
+
+=item *
+
+Configurable near-real-time index updates.
+
+=item *
+
+Unicode support.
+
+=item *
+
+Support for boolean operators AND, OR, and AND NOT; parenthetical groupings;
+prepended +plus and -minus.
+
+=item *
+
+Algorithmic selection of relevant excerpts and highlighting of search terms
+within excerpts.
+
+=item *
+
+Highly customizable query and indexing APIs.
+
+=item *
+
+Customizable sorting.
+
+=item *
+
+Phrase matching.
+
+=item *
+
+Stemming.
+
+=item *
+
+Stoplists.
+
+=back
+
+=head2 Getting Started
+
+L<Lucy::Simple> provides a stripped down API which may suffice for many
+tasks.
+
+L<Lucy::Docs::Tutorial> demonstrates how to build a basic CGI search
+application.  
+
+The tutorial spends most of its time on these five classes:
+
+=over 
+
+=item *
+
+L<Lucy::Plan::Schema> - Plan out your index.
+
+=item *
+
+L<Lucy::Plan::FieldType> - Define index fields.
+
+=item *
+
+L<Lucy::Index::Indexer> - Manipulate index content.
+
+=item *
+
+L<Lucy::Search::IndexSearcher> - Search an index.
+
+=item *
+
+L<Lucy::Analysis::PolyAnalyzer> - A one-size-fits-all parser/tokenizer.
+
+=back
+
+=head2 Delving Deeper
+
+L<Lucy::Docs::Cookbook> augments the tutorial with more advanced
+recipes.
+
+For creating complex queries, see L<Lucy::Search::Query> and its
+subclasses L<TermQuery|Lucy::Search::TermQuery>,
+L<PhraseQuery|Lucy::Search::PhraseQuery>,
+L<ANDQuery|Lucy::Search::ANDQuery>,
+L<ORQuery|Lucy::Search::ORQuery>,
+L<NOTQuery|Lucy::Search::NOTQuery>,
+L<RequiredOptionalQuery|Lucy::Search::RequiredOptionalQuery>,
+L<MatchAllQuery|Lucy::Search::MatchAllQuery>, and
+L<NoMatchQuery|Lucy::Search::NoMatchQuery>, plus
+L<Lucy::Search::QueryParser>.
+
+For distributed searching, see L<LucyX::Remote::SearchServer>,
+L<LucyX::Remote::SearchClient>, and L<Lucy::Search::PolySearcher>.
+
+=head2 Backwards Compatibility Policy
+
+Lucy will spin off stable forks into new namespaces periodically.  The first
+will be named "Lucy1".  Users who require strong backwards compatibility
+should use a stable fork.
+
+The main namespace, "Lucy", is an API-unstable development branch (as hinted
+at by its 0.x.x version number).  Superficial interface changes happen
+frequently.  Hard file format compatibility breaks which require reindexing
+are rare, as we generally try to provide continuity across multiple releases,
+but we reserve the right to make such changes.
+
+=head1 CLASS METHODS
+
+The Lucy module itself does not have a large interface, providing only a
+single public class method.
+
+=head2 error
+
+    my $instream = $folder->open_in( file => 'foo' ) or die Lucy->error;
+
+Access a shared variable which is set by some routines on failure.  It will
+always be either a L<Lucy::Object::Err> object or undef.
+
+=head1 SUPPORT
+
+The Apache Lucy homepage, where you'll find links to our mailing lists and so
+on, is L<http://incubator.apache.org/lucy>.  Please direct support questions
+to the Lucy users mailing list.
+
+=head1 BUGS
+
+Not thread-safe.
+
+Some exceptions leak memory.
+
+If you find a bug, please inquire on the Lucy users mailing list about it,
+then report it on the Lucy issue tracker once it has been confirmed:
+L<https://issues.apache.org/jira/browse/LUCY>.
+
+=head1 DISCLAIMER
+
+Apache Lucy is an effort undergoing incubation at The Apache Software
+Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of
+all newly accepted projects until a further review indicates that the
+infrastructure, communications, and decision making process have stabilized in
+a manner consistent with other successful ASF projects. While incubation
+status is not necessarily a reflection of the completeness or stability of the
+code, it does indicate that the project has yet to be fully endorsed by the
+ASF.
+
+=head1 COPYRIGHT
+
+Apache Lucy is distributed under the Apache License, Version 2.0, as
+described in the file C<LICENSE> included with the distribution.
+
+=cut
+

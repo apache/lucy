@@ -1,0 +1,143 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Process hits.
+ *
+ * A Collector decides what to do with the hits that a
+ * L<Matcher|Lucy::Search::Matcher> iterates through, based on how the
+ * abstract Collect() method is implemented.
+ *
+ * Collectors operate on individual segments, but must operate within the
+ * context of a larger collection.  Each time the collector moves to a new
+ * segment, Set_Reader(), Set_Base() and Set_Matcher() will be called, and the
+ * collector must take the updated information into account.
+ */
+
+abstract class Lucy::Search::Collector cnick Coll
+    inherits Lucy::Object::Obj {
+
+    SegReader *reader;
+    Matcher   *matcher;
+    int32_t    base;
+
+    /** Abstract constructor.  Takes no arguments.
+     */
+    public inert Collector*
+    init(Collector *self);
+
+    public void
+    Destroy(Collector *self);
+
+    /** Do something with a doc id.  (For instance, keep track of the docs
+     * with the ten highest scores.)
+     *
+     * @param doc_id A segment document id.
+     */
+    public abstract void
+    Collect(Collector *self, int32_t doc_id);
+
+    /** Setter for "reader".
+     */
+    public void
+    Set_Reader(Collector *self, SegReader *reader);
+
+    /** Set the "base" document id, an offset which must be added to the
+     * <code>doc_id</code> supplied via Collect() to get the doc id for the
+     * larger index.
+     */
+    public void
+    Set_Base(Collector *self, int32_t base);
+
+    /** Indicate whether the Collector will call Score() on its Matcher.
+     */
+    public abstract bool_t
+    Need_Score(Collector *self);
+
+    /** Setter for "matcher".
+     */
+    public void
+    Set_Matcher(Collector *self, Matcher *matcher);
+}
+
+/** Collector which records doc nums in a BitVector.
+ *
+ * BitCollector is a Collector which saves matching document ids in a
+ * L<BitVector|Lucy::Object::BitVector>.  It is useful for recording the
+ * entire set of documents which matches a query.
+ */
+class Lucy::Search::Collector::BitCollector cnick BitColl
+    inherits Lucy::Search::Collector {
+
+    BitVector    *bit_vec;
+
+    /**
+     * @param bit_vector A Lucy::Object::BitVector.
+     */
+    public inert BitCollector*
+    init(BitCollector *self, BitVector *bit_vector);
+
+    public void
+    Destroy(BitCollector *self);
+
+    /** Set bit in the object's BitVector for the supplied doc id.
+     */
+    public void
+    Collect(BitCollector *self, int32_t doc_id);
+
+    /** Returns false, since BitCollector requires only doc ids.
+     */
+    public bool_t
+    Need_Score(BitCollector *self);
+}
+
+class Lucy::Search::Collector::OffsetCollector cnick OffsetColl
+    inherits Lucy::Search::Collector {
+
+    int32_t    offset;
+    Collector *inner_coll;
+
+    inert incremented OffsetCollector*
+    new(Collector *collector, int32_t offset);
+
+    /** Wrap another Collector, adding a constant offset to each document
+     * number.  Useful when combining results from multiple independent
+     * indexes.
+     */
+    inert OffsetCollector*
+    init(OffsetCollector *self, Collector *collector, int32_t offset);
+
+    public void
+    Destroy(OffsetCollector *self);
+
+    public void
+    Collect(OffsetCollector *self, int32_t doc_id);
+
+    public bool_t
+    Need_Score(OffsetCollector *self);
+
+    public void
+    Set_Reader(OffsetCollector *self, SegReader *reader);
+
+    public void
+    Set_Base(OffsetCollector *self, int32_t base);
+
+    public void
+    Set_Matcher(OffsetCollector *self, Matcher *matcher);
+}
+
+

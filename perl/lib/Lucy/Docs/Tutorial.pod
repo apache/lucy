@@ -1,0 +1,89 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy::Docs::Tutorial - Step-by-step introduction to Apache Lucy.
+
+=head1 ABSTRACT 
+
+Explore Apache Lucy's basic functionality by starting with a minimalist CGI
+search app based on L<Lucy::Simple> and transforming it, step by step, into an
+"advanced search" interface utilizing more flexible core modules like
+L<Lucy::Index::Indexer> and L<Lucy::Search::IndexSearcher>.
+
+=head1 DESCRIPTION
+
+=head2 Chapters
+
+=over
+
+=item *
+
+L<Lucy::Docs::Tutorial::Simple> - Build a bare-bones search app using
+L<Lucy::Simple>.
+
+=item *
+
+L<Lucy::Docs::Tutorial::BeyondSimple> - Rebuild the app using core
+classes like L<Indexer|Lucy::Index::Indexer> and
+L<IndexSearcher|Lucy::Search::IndexSearcher> in place of Lucy::Simple.
+
+=item *
+
+L<Lucy::Docs::Tutorial::FieldType> - Experiment with different field
+characteristics using subclasses of L<Lucy::Plan::FieldType>.
+
+=item *
+
+L<Lucy::Docs::Tutorial::Analysis> - Examine how the choice of
+L<Lucy::Analysis::Analyzer> subclass affects search results.
+
+=item *
+
+L<Lucy::Docs::Tutorial::Highlighter> - Augment search results with
+highlighted excerpts.
+
+=item *
+
+L<Lucy::Docs::Tutorial::QueryObjects> - Unlock advanced search features
+by using Query objects instead of query strings.
+
+=back
+
+=head2 Source materials
+
+The source material used by the tutorial app -- a multi-text-file presentation
+of the United States constitution -- can be found in the C<sample> directory
+at the root of the Lucy distribution, along with finished indexing and search
+apps.
+
+    sample/indexer.pl        # indexing app
+    sample/search.cgi        # search app
+    sample/us_constitution   # corpus
+
+=head2 Conventions
+
+The user is expected to be familiar with OO Perl and basic CGI programming.
+
+The code in this tutorial assumes a Unix-flavored operating system and the
+Apache webserver, but will work with minor modifications on other setups.
+
+=head1 SEE ALSO
+
+More advanced and esoteric subjects are covered in
+L<Lucy::Docs::Cookbook>.
+
+

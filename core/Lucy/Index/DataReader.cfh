@@ -1,0 +1,101 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Abstract base class for reading index data.
+ *
+ * DataReader is the companion class to
+ * L<DataWriter|Lucy::Index::DataWriter>.  Every index component will
+ * implement one of each.
+ */
+
+class Lucy::Index::DataReader inherits Lucy::Object::Obj {
+
+    Schema      *schema;
+    Folder      *folder;
+    Snapshot    *snapshot;
+    VArray      *segments;
+    Segment     *segment;
+    int32_t      seg_tick;
+
+    /**
+     * @param schema A Schema.
+     * @param folder A Folder.
+     * @param snapshot A Snapshot.
+     * @param segments An array of Segments.
+     * @param seg_tick The array index of the Segment object within the
+     * <code>segments</code> array that this particular DataReader is assigned
+     * to, if any.  A value of -1 indicates that no Segment should be
+     * assigned.
+     */
+    public inert DataReader*
+    init(DataReader *self, Schema *schema = NULL, Folder *folder = NULL,
+         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         int32_t seg_tick = -1);
+
+    /** Create a reader which aggregates the output of several lower level
+     * readers.  Return NULL if such a reader is not valid.
+     *
+     * @param readers An array of DataReaders.
+     * @param offsets Doc id start offsets for each reader.
+     */
+    public abstract incremented nullable DataReader*
+    Aggregator(DataReader *self, VArray *readers, I32Array *offsets);
+
+    /** Accessor for "schema" member var.
+     */
+    public nullable Schema*
+    Get_Schema(DataReader *self);
+
+    /** Accessor for "folder" member var.
+     */
+    public nullable Folder*
+    Get_Folder(DataReader *self);
+
+    /** Accessor for "snapshot" member var.
+     */
+    public nullable Snapshot*
+    Get_Snapshot(DataReader *self);
+
+    /** Accessor for "segments" member var.
+     */
+    public nullable VArray*
+    Get_Segments(DataReader *self);
+
+    /** Accessor for "segment" member var.
+     */
+    public nullable Segment*
+    Get_Segment(DataReader *self);
+
+    /** Accessor for "seg_tick" member var.
+     */
+    public int32_t
+    Get_Seg_Tick(DataReader *self);
+
+    /** Release external resources, e.g. streams.  Implementations must be
+     * safe for multiple calls.  Once called, no other operations may be
+     * performed upon either the reader or any component subreaders other than
+     * object destruction.
+     */
+    public abstract void
+    Close(DataReader *self);
+
+    public void
+    Destroy(DataReader *self);
+}
+
+

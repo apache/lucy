@@ -1,0 +1,92 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Match a range of values.
+ *
+ * RangeQuery matches documents where the value for a particular field falls
+ * within a given range.
+ */
+
+class Lucy::Search::RangeQuery inherits Lucy::Search::Query
+    : dumpable {
+
+    CharBuf  *field;
+    Obj      *lower_term;
+    Obj      *upper_term;
+    bool_t    include_lower;
+    bool_t    include_upper;
+
+    inert incremented RangeQuery*
+    new(const CharBuf *field, Obj *lower_term = NULL, Obj *upper_term = NULL,
+        bool_t include_lower = true, bool_t include_upper = true);
+
+    /** Takes 5 parameters; <code>field</code> is required, as
+     * is at least one of either <code>lower_term</code> or
+     * <code>upper_term</code>.
+     *
+     * @param field The name of a <code>sortable</code> field.
+     * @param lower_term Lower delimiter.  If not supplied, all values
+     * less than <code>upper_term</code> will pass.
+     * @param upper_term Upper delimiter.  If not supplied, all values greater
+     * than <code>lower_term</code> will pass.
+     * @param include_lower Indicates whether docs which match
+     * <code>lower_term</code> should be included in the results.
+     * @param include_upper Indicates whether docs which match
+     * <code>upper_term</code> should be included in the results.
+     */
+    public inert RangeQuery*
+    init(RangeQuery *self, const CharBuf *field,
+         Obj *lower_term = NULL, Obj *upper_term = NULL,
+         bool_t include_lower = true, bool_t include_upper = true);
+
+    public bool_t
+    Equals(RangeQuery *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(RangeQuery *self);
+
+    public incremented RangeCompiler*
+    Make_Compiler(RangeQuery *self, Searcher *searcher, float boost);
+
+    public void
+    Serialize(RangeQuery *self, OutStream *outstream);
+
+    public incremented RangeQuery*
+    Deserialize(RangeQuery *self, InStream *instream);
+
+    public void
+    Destroy(RangeQuery *self);
+}
+
+class Lucy::Search::RangeCompiler inherits Lucy::Search::Compiler {
+
+    inert incremented RangeCompiler*
+    new(RangeQuery *parent, Searcher *searcher, float boost);
+
+    inert RangeCompiler*
+    init(RangeCompiler *self, RangeQuery *parent, Searcher *searcher,
+         float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(RangeCompiler *self, SegReader *reader, bool_t need_score);
+
+    public incremented RangeCompiler*
+    Deserialize(RangeCompiler *self, InStream *instream);
+}
+
+

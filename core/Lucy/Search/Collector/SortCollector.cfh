@@ -1,0 +1,84 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Collect top-sorting documents.
+ *
+ * A SortCollector sorts hits according to a SortSpec, keeping the highest
+ * ranking N documents in a priority queue.
+ */
+class Lucy::Search::Collector::SortCollector cnick SortColl
+    inherits Lucy::Search::Collector {
+
+    uint32_t        wanted;
+    uint32_t        total_hits;
+    HitQueue       *hit_q;
+    MatchDoc       *bumped;
+    VArray         *rules;
+    SortCache     **sort_caches;
+    void          **ord_arrays;
+    uint8_t        *actions;
+    uint8_t        *auto_actions;
+    uint8_t        *derived_actions;
+    uint32_t        num_rules;
+    uint32_t        num_actions;
+    float           bubble_score;
+    int32_t         bubble_doc;
+    int32_t         seg_doc_max;
+    bool_t          need_score;
+    bool_t          need_values;
+
+    inert incremented SortCollector*
+    new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
+
+    /**
+     * @param schema A Schema.  Required if <code>sort_spec</code> provided.
+     * @param sort_spec A SortSpec.  If NULL, sort by descending score first
+     * and ascending doc id second.
+     * @param wanted Maximum number of hits to collect.
+     */
+    inert SortCollector*
+    init(SortCollector *self, Schema *schema = NULL,
+         SortSpec *sort_spec = NULL, uint32_t wanted);
+
+    /** Keep highest ranking docs.
+     */
+    public void
+    Collect(SortCollector *self, int32_t doc_id);
+
+    /** Empty out the HitQueue and return an array of sorted MatchDocs.
+     */
+    incremented VArray*
+    Pop_Match_Docs(SortCollector *self);
+
+    /** Accessor for "total_hits" member, which tracks the number of times
+     * that Collect() was called.
+     */
+    uint32_t
+    Get_Total_Hits(SortCollector *self);
+
+    public void
+    Set_Reader(SortCollector *self, SegReader *reader);
+
+    public bool_t
+    Need_Score(SortCollector *self);
+
+    public void
+    Destroy(SortCollector *self);
+}
+
+

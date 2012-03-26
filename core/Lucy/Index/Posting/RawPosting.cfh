@@ -1,0 +1,103 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Sortable, serialized Posting.
+ *
+ * RawPosting is a specialized subclass of Posting for private use only.  It
+ * is used at index-time for fast reading, writing, sorting and merging of
+ * index posting data by PostingPool.
+ *
+ * RawPosting's Destroy method throws an error.  All RawPosting objects belong
+ * to a particular MemoryPool, which takes responsibility for freeing them.
+ *
+ * The last struct member, [blob], is a "flexible array" member.  RawPosting
+ * objects are assigned one continuous memory block of variable size,
+ * depending on how much data needs to fit in blob.
+ *
+ * The first part of blob is the term's text content, the length of which is
+ * indicated by [content_len].  At the end of the content, encoded auxilliary
+ * posting information begins, ready to be blasted out verbatim to a postings
+ * file once the after the doc id is written.
+ */
+
+class Lucy::Index::RawPosting cnick RawPost
+    inherits Lucy::Index::Posting {
+
+    uint32_t  freq;
+    uint32_t  content_len;
+    uint32_t  aux_len;
+    char[1]   blob; /* flexible array */
+
+    /** Constructor.  Uses pre-allocated memory.
+     */
+    inert incremented RawPosting*
+    new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
+        char *term_text, size_t term_text_len);
+
+    uint32_t
+    Get_RefCount(RawPosting* self);
+
+    incremented RawPosting*
+    Inc_RefCount(RawPosting* self);
+
+    uint32_t
+    Dec_RefCount(RawPosting* self);
+
+    /** Throws an error.
+     */
+    public void
+    Destroy(RawPosting *self);
+}
+
+class Lucy::Index::Posting::RawPostingWriter cnick RawPostWriter
+    inherits Lucy::Index::Posting::PostingWriter {
+
+    OutStream *outstream;
+    int32_t    last_doc_id;
+
+    inert incremented RawPostingWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader, OutStream *outstream);
+
+    inert RawPostingWriter*
+    init(RawPostingWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader, OutStream *outstream);
+
+    public void
+    Destroy(RawPostingWriter *self);
+
+    void
+    Start_Term(RawPostingWriter *self, TermInfo *tinfo);
+
+    void
+    Update_Skip_Info(RawPostingWriter *self, TermInfo *tinfo);
+
+    void
+    Write_Posting(RawPostingWriter *self, RawPosting *posting);
+}
+
+__C__
+extern lucy_RawPosting LUCY_RAWPOSTING_BLANK;
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define RAWPOSTING_BLANK         LUCY_RAWPOSTING_BLANK
+#endif
+__END_C__
+
+

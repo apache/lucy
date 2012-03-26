@@ -1,0 +1,82 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Default posting type.
+ *
+ * ScorePosting is the default posting format in Apache Lucy.  The
+ * term-document pairing used by MatchPosting is supplemented by additional
+ * frequency, position, and weighting information.
+ */
+class Lucy::Index::Posting::ScorePosting cnick ScorePost
+    inherits Lucy::Index::Posting::MatchPosting {
+
+    float     weight;
+    float    *norm_decoder;
+    uint32_t *prox;
+    uint32_t  prox_cap;
+
+    inert incremented ScorePosting*
+    new(Similarity *similarity);
+
+    inert ScorePosting*
+    init(ScorePosting *self, Similarity *similarity);
+
+    public void
+    Destroy(ScorePosting *self);
+
+    void
+    Read_Record(ScorePosting *self, InStream *instream);
+
+    incremented RawPosting*
+    Read_Raw(ScorePosting *self, InStream *instream, int32_t last_doc_id,
+             CharBuf *term_text, MemoryPool *mem_pool);
+
+    void
+    Add_Inversion_To_Pool(ScorePosting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
+                          float length_norm);
+
+    public void
+    Reset(ScorePosting *self);
+
+    incremented ScorePostingMatcher*
+    Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist,
+                 Compiler *compiler, bool_t need_score);
+
+    nullable uint32_t*
+    Get_Prox(ScorePosting *self);
+}
+
+class Lucy::Index::Posting::ScorePostingMatcher cnick ScorePostMatcher
+    inherits Lucy::Search::TermMatcher {
+
+    float *score_cache;
+
+    inert ScorePostingMatcher*
+    init(ScorePostingMatcher *self, Similarity *sim, PostingList *plist,
+         Compiler *compiler);
+
+    public float
+    Score(ScorePostingMatcher* self);
+
+    public void
+    Destroy(ScorePostingMatcher *self);
+}
+
+

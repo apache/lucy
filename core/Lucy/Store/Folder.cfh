@@ -1,0 +1,273 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Abstract class representing a directory.
+ *
+ * A "file" within a Folder might be a real file on disk -- or it might be a
+ * RAM buffer.  Similarly, Delete() might delete a file from the file system, or
+ * a key-value pair from a hash, or something else.
+ *
+ * The archetypal implementation of Folder,
+ * L<FSFolder|Lucy::Store::FSFolder>, represents a directory on
+ * the file system holding a collection of files.
+ */
+abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
+
+    CharBuf *path;
+    Hash    *entries;
+
+    public inert nullable Folder*
+    init(Folder *self, const CharBuf *path);
+
+    public void
+    Destroy(Folder *self);
+
+    /** Getter for <code>path</code> member var.
+     */
+    public CharBuf*
+    Get_Path(Folder *self);
+
+    /** Setter for <code>path</code> member var.
+     */
+    void
+    Set_Path(Folder *self, const CharBuf *path);
+
+    /** Open an OutStream, or set Err_error and return NULL on failure.
+     *
+     * @param path A relative filepath.
+     * @return an OutStream.
+     */
+    public incremented nullable OutStream*
+    Open_Out(Folder *self,  const CharBuf *path);
+
+    /** Open an InStream, or set Err_error and return NULL on failure.
+     *
+     * @param path A relative filepath.
+     * @return an InStream.
+     */
+    public incremented nullable InStream*
+    Open_In(Folder *self, const CharBuf *path);
+
+    /** Open a FileHandle, or set Err_error and return NULL on failure.
+     *
+     * @param path A relative filepath.
+     * @param flags FileHandle flags.
+     * @return a FileHandle.
+     */
+    public incremented nullable FileHandle*
+    Open_FileHandle(Folder *self, const CharBuf *path, uint32_t flags);
+
+    /** Open a DirHandle or set Err_error and return NULL on failure.
+     *
+     * @param path Path to a subdirectory, relative to the Folder's path.  If
+     * empty or NULL, returns a DirHandle for this Folder.
+     * @return a DirHandle.
+     */
+    public incremented nullable DirHandle*
+    Open_Dir(Folder *self, const CharBuf *path = NULL);
+
+    /** Create a subdirectory.
+     *
+     * @param path A relative filepath.
+     * @return true on success, false on failure (sets Err_error).
+     */
+    public bool_t
+    MkDir(Folder *self, const CharBuf *path);
+
+    /** List all local entries within a directory.  Set Err_error and return
+     * NULL if something goes wrong.
+     *
+     * @param path A relative filepath optionally specifying a subdirectory.
+     * @return an unsorted array of filenames.
+     */
+    incremented VArray*
+    List(Folder *self, const CharBuf *path = NULL);
+
+    /** Recursively list all files and directories in the Folder.
+     *
+     * @param path A relative filepath optionally specifying a subdirectory.
+     * @return an unsorted array of relative filepaths.
+     */
+    incremented VArray*
+    List_R(Folder *self, const CharBuf *path = NULL);
+
+    /** Indicate whether an entity exists at <code>path</code>.
+     *
+     * @param path A relative filepath.
+     * @return true if <code>path</code> exists.
+     */
+    public bool_t
+    Exists(Folder *self, const CharBuf *path);
+
+    /** Indicate whether a directory exists at <code>path</code>.
+     *
+     * @param path A relative filepath.
+     * @return true if <code>path</code> is a directory.
+     */
+    bool_t
+    Is_Directory(Folder *self, const CharBuf *path);
+
+    /** Delete an entry from the folder.
+     *
+     * @param path A relative filepath.
+     * @return true if the deletion was successful.
+     */
+    public bool_t
+    Delete(Folder *self, const CharBuf *path);
+
+    /** Delete recursively, starting at <code>path</code>
+     *
+     * @param path A relative filepath specifying a file or subdirectory.
+     * @return true if the whole tree is deleted successfully, false if any
+     * part remains.
+     */
+    public bool_t
+    Delete_Tree(Folder *self, const CharBuf *path);
+
+    /** Rename a file or directory, or set Err_error and return false on
+     * failure.  If an entry exists at <code>to</code>, the results are
+     * undefined.
+     *
+     * @param from The filepath prior to renaming.
+     * @param to The filepath after renaming.
+     * @return true on success, false on failure.
+     */
+    public abstract bool_t
+    Rename(Folder *self, const CharBuf *from, const CharBuf *to);
+
+    /** Create a hard link at path <code>to</code> pointing at the existing
+     * file <code>from</code>, or set Err_error and return false on failure.
+     *
+     * @return true on success, false on failure.
+     */
+    public abstract bool_t
+    Hard_Link(Folder *self, const CharBuf *from, const CharBuf *to);
+
+    /** Read a file and return its contents.
+     *
+     * @param path A relative filepath.
+     * @param return the file's contents.
+     */
+    public incremented ByteBuf*
+    Slurp_File(Folder *self, const CharBuf *path);
+
+    /** Collapse the contents of the directory into a compound file.
+     */
+    void
+    Consolidate(Folder *self, const CharBuf *path);
+
+    /** Given a filepath, return the Folder representing everything except
+     * the last component.  E.g. the 'foo/bar' Folder for '/foo/bar/baz.txt',
+     * the 'foo' Folder for 'foo/bar', etc.
+     *
+     * If <code>path</code> is invalid, because an intermediate directory
+     * either doesn't exist or isn't a directory, return NULL.
+     */
+    nullable Folder*
+    Enclosing_Folder(Folder *self, const CharBuf *path);
+
+    /** Return the Folder at the subdirectory specified by <code>path</code>.
+     * If <code>path</code> is NULL or an empty string, return this Folder.
+     * If the entity at <code>path</code> either doesn't exist or isn't a
+     * subdirectory, return NULL.
+     *
+     * @param path A relative filepath specifying a subdirectory.
+     * @return A Folder.
+     */
+    nullable Folder*
+    Find_Folder(Folder *self, const CharBuf *path);
+
+    /** Perform implementation-specific initialization.  For example: FSFolder
+     * creates its own directory.
+     */
+    public abstract void
+    Initialize(Folder *self);
+
+    /** Verify that operations may be performed on this Folder.
+     *
+     * @return true on success.
+     */
+    public abstract bool_t
+    Check(Folder *self);
+
+    /** Close the folder and release implementation-specific resources.
+     */
+    public abstract void
+    Close(Folder *self);
+
+    /** Open a FileHandle for a local file, or set Err_error and return NULL
+     * on failure.
+     */
+    abstract incremented nullable FileHandle*
+    Local_Open_FileHandle(Folder *self, const CharBuf *name, uint32_t flags);
+
+    /** Open an InStream for a local file, or set Err_error and return NULL on
+     * failure.
+     */
+    incremented nullable InStream*
+    Local_Open_In(Folder *self, const CharBuf *name);
+
+    /** Open a DirHandle to iterate over the local entries in this Folder, or
+     * set Err_error and return NULL on failure.
+     */
+    abstract incremented nullable DirHandle*
+    Local_Open_Dir(Folder *self);
+
+    /** Create a local subdirectory.
+     *
+     * @param name The name of the subdirectory.
+     * @return true on success, false on failure (sets Err_error)
+     */
+    abstract bool_t
+    Local_MkDir(Folder *self, const CharBuf *name);
+
+    /** Indicate whether a local entry exists for the supplied
+     * <code>name</code>.
+     *
+     * @param name The name of the local entry.
+     */
+    abstract bool_t
+    Local_Exists(Folder *self, const CharBuf *name);
+
+    /** Indicate whether a local subdirectory exists with the supplied
+     * <code>name</code>.
+     *
+     * @param name The name of the local subdirectory.
+     */
+    abstract bool_t
+    Local_Is_Directory(Folder *self, const CharBuf *name);
+
+    /** Return the Folder object representing the specified directory, if such
+     * a directory exists.
+     *
+     * @param name The name of a local directory.
+     * @return a Folder.
+     */
+    abstract nullable Folder*
+    Local_Find_Folder(Folder *self, const CharBuf *name);
+
+    /** Delete a local entry.
+     *
+     * @param name The name of the entry to be deleted.
+     * @return true if the deletion was successful.
+     */
+    abstract bool_t
+    Local_Delete(Folder *self, const CharBuf *name);
+}
+
+

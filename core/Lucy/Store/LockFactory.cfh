@@ -1,0 +1,74 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Create Locks.
+ *
+ * LockFactory is used to spin off interprocess mutex locks used by various
+ * index reading and writing components.  The default implementation uses
+ * lockfiles, but LockFactory subclasses which are implemented using
+ * alternatives such as flock() are possible.
+ */
+
+class Lucy::Store::LockFactory cnick LockFact
+    inherits Lucy::Object::Obj {
+
+    Folder  *folder;
+    CharBuf *host;
+
+    inert incremented LockFactory*
+    new(Folder *folder, const CharBuf *host);
+
+    /**
+     * @param folder A L<Lucy::Store::Folder>.
+     * @param host An identifier which should be unique per-machine.
+     */
+    public inert LockFactory*
+    init(LockFactory *self, Folder *folder, const CharBuf *host);
+
+    /** Return a Lock object, which, once Obtain() returns successfully,
+     * maintains an exclusive lock on a resource.
+     *
+     * @param name A file-system-friendly id which identifies the
+     * resource to be locked.
+     * @param timeout Time in milliseconds to keep retrying before abandoning
+     * the attempt to Obtain() a lock.
+     * @param interval Time in milliseconds between retries.
+     */
+    public incremented Lock*
+    Make_Lock(LockFactory *self, const CharBuf *name, int32_t timeout = 0,
+              int32_t interval = 100);
+
+    /** Return a Lock object for which Shared() returns true, and which
+     * maintains a non-exclusive lock on a resource once Obtain() returns
+     * success.
+     *
+     * @param name A file-system-friendly id which identifies the
+     * resource to be locked.
+     * @param timeout Time in milliseconds to keep retrying before abandoning
+     * the attempt to Obtain() a lock.
+     * @param interval Time in milliseconds between retries.
+     */
+    public incremented Lock*
+    Make_Shared_Lock(LockFactory *self, const CharBuf *name,
+                     int32_t timeout = 0, int32_t interval = 100);
+
+    public void
+    Destroy(LockFactory *self);
+}
+
+

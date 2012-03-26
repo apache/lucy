@@ -1,0 +1,69 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * A document read from an index.
+ *
+ * HitDoc is the search-time relative of the index-time class Doc; it is
+ * augmented by a numeric score attribute that Doc doesn't have.
+ */
+
+class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
+
+    float score;
+
+    inert incremented HitDoc*
+    new(void *fields = NULL, int32_t doc_id = 0, float score = 0.0);
+
+    /** Constructor.
+     *
+     * @param fields A hash of field name / field value pairs.
+     * @param doc_id Internal document id.
+     * @param score Number indicating how well the doc scored against a query.
+     */
+    inert HitDoc*
+    init(HitDoc *self, void *fields = NULL, int32_t doc_id = 0,
+         float score = 0.0);
+
+    /** Set score attribute.
+     */
+    public void
+    Set_Score(HitDoc *self, float score);
+
+    /** Get score attribute.
+     */
+    public float
+    Get_Score(HitDoc *self);
+
+    public bool_t
+    Equals(HitDoc *self, Obj *other);
+
+    public incremented Hash*
+    Dump(HitDoc *self);
+
+    public incremented HitDoc*
+    Load(HitDoc *self, Obj *dump);
+
+    public void
+    Serialize(HitDoc *self, OutStream *outstream);
+
+    public incremented HitDoc*
+    Deserialize(HitDoc *self, InStream *instream);
+}
+
+

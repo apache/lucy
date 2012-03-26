@@ -1,0 +1,174 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Create and highlight excerpts.
+ *
+ * The Highlighter can be used to select relevant snippets from a document,
+ * and to surround search terms with highlighting tags.  It handles both stems
+ * and phrases correctly and efficiently, using special-purpose data generated
+ * at index-time.
+*/
+class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
+
+    Searcher   *searcher;
+    Query      *query;
+    CharBuf    *field;
+    uint32_t    excerpt_length;
+    uint32_t    window_width;
+    uint32_t    slop;
+    CharBuf    *pre_tag;
+    CharBuf    *post_tag;
+    Compiler   *compiler;
+
+    inert incremented Highlighter*
+    new(Searcher *searcher, Obj *query, const CharBuf *field,
+        uint32_t excerpt_length = 200);
+
+    /**
+     * @param searcher An object which inherits from
+     * L<Searcher|Lucy::Search::Searcher>, such as an
+     * L<IndexSearcher|Lucy::Search::IndexSearcher>.
+     * @param query Query object or a query string.
+     * @param field The name of the field from which to draw the excerpt.  The
+     * field must marked as be C<highlightable> (see
+     * L<FieldType|Lucy::Plan::FieldType>).
+     * @param excerpt_length Maximum length of the excerpt, in characters.
+     */
+    public inert Highlighter*
+    init(Highlighter *self, Searcher *searcher, Obj *query,
+         const CharBuf *field, uint32_t excerpt_length = 200);
+
+    /** Take a HitDoc object and return a highlighted excerpt as a string if
+     * the HitDoc has a value for the specified <code>field</code>.
+     */
+    public incremented CharBuf*
+    Create_Excerpt(Highlighter *self, HitDoc *hit_doc);
+
+    /** Encode text with HTML entities. This method is called internally by
+     * Create_Excerpt() for each text fragment when assembling an excerpt.  A
+     * subclass can override this if the text should be encoded differently or
+     * not at all.
+     */
+    public incremented CharBuf*
+    Encode(Highlighter *self, CharBuf *text);
+
+    /** Find sentence boundaries within the specified range, returning them as
+     * an array of Spans.  The "offset" of each Span indicates the start of
+     * the sentence, and is measured from 0, not from <code>offset</code>.
+     * The Span's "length" member indicates the sentence length in code
+     * points.
+     *
+     * @param text The string to scan.
+     * @param offset The place to start looking for offsets, measured in
+     * Unicode code points from the top of <code>text</code>.
+     * @param length The number of code points from <code>offset</code> to
+     * scan. The default value of 0 is a sentinel which indicates to scan
+     * until the end of the string.
+     */
+    incremented VArray*
+    Find_Sentences(Highlighter *self, CharBuf *text, int32_t offset = 0,
+                   int32_t length = 0);
+
+    /** Highlight a small section of text.  By default, prepends pre-tag and
+     * appends post-tag.  This method is called internally by Create_Excerpt()
+     * when assembling an excerpt.
+     */
+    public incremented CharBuf*
+    Highlight(Highlighter *self, const CharBuf *text);
+
+    /** Setter.  The default value is "<strong>".
+     */
+    public void
+    Set_Pre_Tag(Highlighter *self, const CharBuf *pre_tag);
+
+    /** Setter.  The default value is "</strong>".
+     */
+    public void
+    Set_Post_Tag(Highlighter *self, const CharBuf *post_tag);
+
+    /** Accessor.
+     */
+    public CharBuf*
+    Get_Pre_Tag(Highlighter *self);
+
+    /** Accessor.
+     */
+    public CharBuf*
+    Get_Post_Tag(Highlighter *self);
+
+    /** Accessor.
+     */
+    public CharBuf*
+    Get_Field(Highlighter *self);
+
+    /** Accessor.
+     */
+    public uint32_t
+    Get_Excerpt_Length(Highlighter *self);
+
+    /** Accessor.
+     */
+    public Searcher*
+    Get_Searcher(Highlighter *self);
+
+    /** Accessor.
+     */
+    public Query*
+    Get_Query(Highlighter *self);
+
+    /** Accessor for the Lucy::Search::Compiler object derived from
+     * <code>query</code> and <code>searcher</code>.
+     */
+    public Compiler*
+    Get_Compiler(Highlighter *self);
+
+    /** Decide based on heat map the best fragment of field to concentrate on.
+     * Place the result into <code>fragment<code> and return its offset in
+     * code points from the top of the field.
+     *
+     * (Helper function for Create_Excerpt only exposed for testing purposes.)
+     */
+    int32_t
+    Find_Best_Fragment(Highlighter *self, const CharBuf *field_val,
+                       ViewCharBuf *fragment, HeatMap *heat_map);
+
+    /** Take the fragment and determine the best edges for it based on
+     * sentence boundaries when possible.  Add ellipses when boundaries cannot
+     * be found.
+     *
+     * (Helper function for Create_Excerpt only exposed for testing purposes.)
+     */
+    int32_t
+    Raw_Excerpt(Highlighter *self, const CharBuf *field_val,
+                const CharBuf *fragment, CharBuf *raw_excerpt, int32_t top,
+                HeatMap *heat_map, VArray *sentences);
+
+    /** Take the text in raw_excerpt, add highlight tags, encode, and place
+     * the result into <code>highlighted</code>.
+     *
+     * (Helper function for Create_Excerpt only exposed for testing purposes.)
+     */
+    void
+    Highlight_Excerpt(Highlighter *self, VArray *spans, CharBuf *raw_excerpt,
+                      CharBuf *highlighted, int32_t top);
+
+    public void
+    Destroy(Highlighter *self);
+}
+
+

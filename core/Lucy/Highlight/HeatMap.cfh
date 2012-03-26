@@ -1,0 +1,82 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Density of relevant data in a string.
+ *
+ * A HeatMap stores a number for each location in a string, indicating the
+ * "heat" (density) of relevant data in areas which match a search query.
+ */
+
+class Lucy::Highlight::HeatMap inherits Lucy::Object::Obj {
+
+    VArray   *spans;
+    uint32_t  window;
+
+    inert incremented HeatMap*
+    new(VArray *spans, uint32_t window = 133);
+
+    /**
+     * @param spans An array of Spans, which need not be sorted and will not
+     * be modified.
+     * @param window The greatest distance between which heat points may
+     * reinforce each other.
+     */
+    public inert HeatMap*
+    init(HeatMap *self, VArray *spans, uint32_t window = 133);
+
+    /** Reduce/slice overlapping spans.  Say we have two spans:
+     *
+     *   Span 1: positions 11-20, score .3
+     *   Span 2: positions 16-30, score .5
+     *
+     * After merging, there will be three.
+     *
+     *   Span 1: positions 11-16, score .3
+     *   Span 2: positions 16-20, score .8
+     *   Span 3: positions 20-30, score .5
+     *
+     * @param spans An array of Spans, which must be sorted by offset then
+     * length.
+     */
+    incremented VArray*
+    Flatten_Spans(HeatMap *self, VArray *spans);
+
+    /** If the two spans overlap or abut, return a bonus equal to their summed
+     * scores; as they move further apart, tail the bonus down until it hits 0
+     * at the edge of the <code>window</code>.
+     */
+    float
+    Calc_Proximity_Boost(HeatMap *self, Span *span1, Span *span2);
+
+    /** Iterate through a sorted array of spans, generating a new span for
+     * each pair that yields a non-zero proximity boost.
+     *
+     * @param spans An array of Spans, which must be sorted by offset then
+     * length.
+     */
+    incremented VArray*
+    Generate_Proximity_Boosts(HeatMap *self, VArray *spans);
+
+    VArray*
+    Get_Spans(HeatMap *self);
+
+    public void
+    Destroy(HeatMap *self);
+}
+
+

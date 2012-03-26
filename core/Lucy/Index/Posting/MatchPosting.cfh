@@ -1,0 +1,131 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Match but not score documents.
+ *
+ * Use MatchPosting for fields which only need to be matched, not scored.  For
+ * instance, if you need to determine that that a query matches a particular
+ * category, but don't want the match to contribute to the document score, use
+ * MatchPosting for the field.
+ */
+class Lucy::Index::Posting::MatchPosting cnick MatchPost
+    inherits Lucy::Index::Posting {
+
+    Similarity *sim;
+    uint32_t    freq;
+
+    inert incremented MatchPosting*
+    new(Similarity *similarity);
+
+    inert MatchPosting*
+    init(MatchPosting *self, Similarity *similarity);
+
+    public void
+    Destroy(MatchPosting *self);
+
+    int32_t
+    Get_Freq(MatchPosting *self);
+
+    void
+    Read_Record(MatchPosting *self, InStream *instream);
+
+    incremented RawPosting*
+    Read_Raw(MatchPosting *self, InStream *instream, int32_t last_doc_id,
+             CharBuf *term_text, MemoryPool *mem_pool);
+
+    void
+    Add_Inversion_To_Pool(MatchPosting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
+                          float length_norm);
+
+    public void
+    Reset(MatchPosting *self);
+
+    incremented MatchPostingMatcher*
+    Make_Matcher(MatchPosting *self, Similarity *sim, PostingList *plist,
+                 Compiler *compiler, bool_t need_score);
+}
+
+class Lucy::Index::Posting::MatchPostingMatcher cnick MatchPostMatcher
+    inherits Lucy::Search::TermMatcher {
+
+    inert MatchPostingMatcher*
+    init(MatchPostingMatcher *self, Similarity *similarity,
+         PostingList *posting_list, Compiler *compiler);
+
+    public float
+    Score(MatchPostingMatcher *self);
+}
+
+class Lucy::Index::Posting::MatchPostingWriter cnick MatchPostWriter
+    inherits Lucy::Index::Posting::PostingWriter {
+
+    OutStream *outstream;
+    int32_t    last_doc_id;
+
+    inert incremented MatchPostingWriter*
+    new(Schema *schema, Snapshot *snapshot, Segment *segment,
+        PolyReader *polyreader, int32_t field_num);
+
+    inert MatchPostingWriter*
+    init(MatchPostingWriter *self, Schema *schema, Snapshot *snapshot,
+         Segment *segment, PolyReader *polyreader, int32_t field_num);
+
+    public void
+    Destroy(MatchPostingWriter *self);
+
+    void
+    Write_Posting(MatchPostingWriter *self, RawPosting *posting);
+
+    void
+    Start_Term(MatchPostingWriter *self, TermInfo *tinfo);
+
+    void
+    Update_Skip_Info(MatchPostingWriter *self, TermInfo *tinfo);
+}
+
+class Lucy::Index::Posting::MatchPosting::MatchTermInfoStepper
+    cnick MatchTInfoStepper inherits Lucy::Index::TermStepper {
+
+    int32_t skip_interval;
+
+    inert incremented MatchTermInfoStepper*
+    new(Schema *schema);
+
+    inert MatchTermInfoStepper*
+    init(MatchTermInfoStepper *self, Schema *schema);
+
+    public void
+    Reset(MatchTermInfoStepper *self);
+
+    public void
+    Write_Key_Frame(MatchTermInfoStepper *self, OutStream *outstream,
+                    Obj *value);
+
+    public void
+    Write_Delta(MatchTermInfoStepper *self, OutStream *outstream, Obj *value);
+
+    public void
+    Read_Key_Frame(MatchTermInfoStepper *self, InStream *instream);
+
+    public void
+    Read_Delta(MatchTermInfoStepper *self, InStream *instream);
+}
+
+

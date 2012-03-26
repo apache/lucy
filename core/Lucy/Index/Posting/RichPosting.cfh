@@ -1,0 +1,71 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Posting with per-position boost.
+ *
+ * RichPosting is similar to
+ * L<ScorePosting|Lucy::Index::Posting::ScorePosting>, but weighting is
+ * per-position rather than per-field.  To exploit this, you need a custom
+ * L<Analyzer|Lucy::Analysis::Analyzer> which assigns varying boosts to
+ * individual L<Token|Lucy::Analysis::Token> objects.
+ *
+ * A typical application for RichPosting is an HTMLAnalyzer which assigns
+ * boost based on the visual size and weight of the marked up text: H1
+ * blocks get the greatest weight, H2 blocks almost as much, etc.
+ */
+class Lucy::Index::Posting::RichPosting cnick RichPost
+    inherits Lucy::Index::Posting::ScorePosting {
+
+    float  *prox_boosts;
+
+    inert incremented RichPosting*
+    new(Similarity *similarity);
+
+    inert RichPosting*
+    init(RichPosting *self, Similarity *similarity);
+
+    public void
+    Destroy(RichPosting *self);
+
+    void
+    Read_Record(RichPosting *self, InStream *instream);
+
+    incremented RawPosting*
+    Read_Raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
+             CharBuf *term_text, MemoryPool *mem_pool);
+
+    void
+    Add_Inversion_To_Pool(RichPosting *self, PostingPool *post_pool,
+                          Inversion *inversion, FieldType *type,
+                          int32_t doc_id, float doc_boost,
+                          float length_norm);
+
+    incremented RichPostingMatcher*
+    Make_Matcher(RichPosting *self, Similarity *sim, PostingList *plist,
+                 Compiler *compiler, bool_t need_score);
+}
+
+class Lucy::Index::Posting::RichPostingMatcher cnick RichPostMatcher
+    inherits Lucy::Index::Posting::ScorePostingMatcher {
+
+    inert RichPostingMatcher*
+    init(RichPostingMatcher *self, Similarity *similarity,
+         PostingList *posting_list, Compiler *compiler);
+}
+
+

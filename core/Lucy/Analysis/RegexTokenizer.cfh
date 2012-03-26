@@ -1,0 +1,100 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Split a string into tokens.
+ *
+ * Generically, "tokenizing" is a process of breaking up a string into an
+ * array of "tokens".  For instance, the string "three blind mice" might be
+ * tokenized into "three", "blind", "mice".
+ *
+ * Lucy::Analysis::RegexTokenizer decides where it should break up the text
+ * based on a regular expression compiled from a supplied <code>pattern</code>
+ * matching one token.  If our source string is...
+ *
+ *     "Eats, Shoots and Leaves."
+ *
+ * ... then a "whitespace tokenizer" with a <code>pattern</code> of
+ * <code>"\\S+"</code> produces...
+ *
+ *     Eats,
+ *     Shoots
+ *     and
+ *     Leaves.
+ *
+ * ... while a "word character tokenizer" with a <code>pattern</code> of
+ * <code>"\\w+"</code> produces...
+ *
+ *     Eats
+ *     Shoots
+ *     and
+ *     Leaves
+ *
+ * ... the difference being that the word character tokenizer skips over
+ * punctuation as well as whitespace when determining token boundaries.
+ */
+class Lucy::Analysis::RegexTokenizer
+    inherits Lucy::Analysis::Analyzer {
+
+    CharBuf *pattern;
+    void    *token_re;
+
+    inert incremented RegexTokenizer*
+    new(const CharBuf *pattern = NULL);
+
+    /**
+     * @param pattern A string specifying a Perl-syntax regular expression
+     * which should match one token.  The default value is
+     * <code>\w+(?:[\x{2019}']\w+)*</code>, which matches "it's" as well as
+     * "it" and "O'Henry's" as well as "Henry".
+     */
+    public inert RegexTokenizer*
+    init(RegexTokenizer *self, const CharBuf *pattern = NULL);
+
+    public incremented Inversion*
+    Transform(RegexTokenizer *self, Inversion *inversion);
+
+    public incremented Inversion*
+    Transform_Text(RegexTokenizer *self, CharBuf *text);
+
+    /** Tokenize the supplied string and add any Tokens generated to the
+     * supplied Inversion.
+     */
+    void
+    Tokenize_Str(RegexTokenizer *self, const char *text, size_t len,
+                 Inversion *inversion);
+
+    /** Set the compiled regular expression for matching a token.  Also sets
+     * <code>pattern</code> as a side effect.
+     */
+    void
+    Set_Token_RE(RegexTokenizer *self, void *token_re);
+
+    public incremented Obj*
+    Dump(RegexTokenizer *self);
+
+    public incremented RegexTokenizer*
+    Load(RegexTokenizer *self, Obj *dump);
+
+    public bool_t
+    Equals(RegexTokenizer *self, Obj *other);
+
+    public void
+    Destroy(RegexTokenizer *self);
+}
+
+

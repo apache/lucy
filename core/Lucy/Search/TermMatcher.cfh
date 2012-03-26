@@ -1,0 +1,57 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Base class for TermMatchers.
+ *
+ * Each subclass of Posting is associated with a corresponding subclass of
+ * TermMatcher.
+ */
+class Lucy::Search::TermMatcher inherits Lucy::Search::Matcher {
+
+    float           weight;
+    Compiler       *compiler;
+    Similarity     *sim;
+    PostingList    *plist;
+    Posting        *posting;
+
+    inert TermMatcher*
+    init(TermMatcher *self, Similarity *similarity, PostingList *posting_list,
+         Compiler *compiler);
+
+    public void
+    Destroy(TermMatcher *self);
+
+    public int32_t
+    Next(TermMatcher* self);
+
+    public int32_t
+    Advance(TermMatcher* self, int32_t target);
+
+    public int32_t
+    Get_Doc_ID(TermMatcher* self);
+}
+
+__C__
+#define LUCY_TERMMATCHER_SCORE_CACHE_SIZE 32
+#ifdef LUCY_USE_SHORT_NAMES
+  #define TERMMATCHER_SCORE_CACHE_SIZE LUCY_TERMMATCHER_SCORE_CACHE_SIZE
+#endif
+__END_C__
+
+

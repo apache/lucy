@@ -1,0 +1,210 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Policies governing index updating, locking, and file deletion.
+ *
+ * IndexManager is an advanced-use class for controlling index locking,
+ * updating, merging, and deletion behaviors.
+ *
+ * IndexManager and L<Architecture|Lucy::Plan::Architecture> are
+ * complementary classes: Architecture is used to define traits and behaviors
+ * which cannot change for the life of an index; IndexManager is used for
+ * defining rules which may change from process to process.
+ */
+class Lucy::Index::IndexManager cnick IxManager
+    inherits Lucy::Object::Obj {
+
+    Folder      *folder;
+    CharBuf     *host;
+    LockFactory *lock_factory;
+    uint32_t     write_lock_timeout;
+    uint32_t     write_lock_interval;
+    uint32_t     merge_lock_timeout;
+    uint32_t     merge_lock_interval;
+    uint32_t     deletion_lock_timeout;
+    uint32_t     deletion_lock_interval;
+
+    public inert incremented IndexManager*
+    new(const CharBuf *host = NULL, LockFactory *lock_factory = NULL);
+
+    /**
+     * @param host An identifier which should be unique per-machine.
+     * @param lock_factory A LockFactory.
+     */
+    public inert IndexManager*
+    init(IndexManager *self, const CharBuf *host = NULL,
+         LockFactory *lock_factory = NULL);
+
+    public void
+    Destroy(IndexManager *self);
+
+    /**
+     * Setter for <code>folder</code> member.  Typical clients (Indexer,
+     * IndexReader) will use this method to install their own Folder instance.
+     */
+    public void
+    Set_Folder(IndexManager *self, Folder *folder = NULL);
+
+    /** Getter for <code>folder</code> member.
+     */
+    public nullable Folder*
+    Get_Folder(IndexManager *self);
+
+    /** Getter for <code>host</code> member.
+     */
+    public CharBuf*
+    Get_Host(IndexManager *self);
+
+    /** Return an array of SegReaders representing segments that should be
+     * consolidated.  Implementations must balance index-time churn against
+     * search-time degradation due to segment proliferation. The default
+     * implementation prefers small segments or segments with a high
+     * proportion of deletions.
+     *
+     * @param reader A PolyReader.
+     * @param del_writer A DeletionsWriter.
+     * @param cutoff A segment number which all returned SegReaders must
+     * exceed.
+     * @param optimize A boolean indicating whether to spend extra time
+     * optimizing the index for search-time performance.
+     */
+    public incremented VArray*
+    Recycle(IndexManager *self, PolyReader *reader,
+            DeletionsWriter *del_writer, int64_t cutoff,
+            bool_t optimize = false);
+
+    /** Return a tick.  All segments below that tick will be merged.
+     * Exposed for testing purposes only.
+     *
+     * @param doc_counts Segment doc counts, in ascending order.
+     */
+    uint32_t
+    Choose_Sparse(IndexManager *self, I32Array *doc_counts);
+
+    /** Create the Lock which controls access to modifying the logical content
+     * of the index.
+     */
+    public incremented Lock*
+    Make_Write_Lock(IndexManager *self);
+
+    /** Create the Lock which grants permission to delete obsolete snapshot
+     * files or any file listed within an existing snapshot file.
+     */
+    public incremented Lock*
+    Make_Deletion_Lock(IndexManager *self);
+
+    public incremented Lock*
+    Make_Merge_Lock(IndexManager *self);
+
+    /** Write supplied data to "merge.json".  Throw an exception if the write
+     * fails.
+     */
+    public void
+    Write_Merge_Data(IndexManager *self, int64_t cutoff);
+
+    /** Look for the "merge.json" file dropped by BackgroundMerger.  If it's
+     * not there, return NULL.  If it's there but can't be decoded, return an
+     * empty Hash.  If successfully decoded, return contents.
+     */
+    public incremented Hash*
+    Read_Merge_Data(IndexManager *self);
+
+    public bool_t
+    Remove_Merge_Data(IndexManager *self);
+
+    /** Create a shared lock on a snapshot file, which serves as a proxy for
+     * all the files it lists and indicates that they must not be deleted.
+     */
+    public incremented Lock*
+    Make_Snapshot_Read_Lock(IndexManager *self, const CharBuf *filename);
+
+    /** Return the highest number for a segment directory which contains a
+     * segmeta file in the snapshot.
+     */
+    public int64_t
+    Highest_Seg_Num(IndexManager *self, Snapshot *snapshot);
+
+    /** Return the name of a new snapshot file, which shall contain a base-36
+     * "generation" embedded inside it greater than the generation of any
+     * snapshot file currently in the index folder.
+     */
+    public incremented CharBuf*
+    Make_Snapshot_Filename(IndexManager *self);
+
+    /** Setter for write lock timeout.  Default: 1000 milliseconds.
+     */
+    public void
+    Set_Write_Lock_Timeout(IndexManager *self, uint32_t timeout);
+
+    /** Getter for write lock timeout.
+     */
+    public uint32_t
+    Get_Write_Lock_Timeout(IndexManager *self);
+
+    /** Setter for write lock retry interval.  Default: 100 milliseconds.
+     */
+    public void
+    Set_Write_Lock_Interval(IndexManager *self, uint32_t timeout);
+
+    /** Getter for write lock retry interval.
+     */
+    public uint32_t
+    Get_Write_Lock_Interval(IndexManager *self);
+
+    /** Setter for merge lock timeout.  Default: 0 milliseconds (no retries).
+     */
+    public void
+    Set_Merge_Lock_Timeout(IndexManager *self, uint32_t timeout);
+
+    /** Getter for merge lock timeout.
+     */
+    public uint32_t
+    Get_Merge_Lock_Timeout(IndexManager *self);
+
+    /** Setter for merge lock retry interval.  Default: 1000 milliseconds.
+     */
+    public void
+    Set_Merge_Lock_Interval(IndexManager *self, uint32_t timeout);
+
+    /** Getter for merge lock retry interval.
+     */
+    public uint32_t
+    Get_Merge_Lock_Interval(IndexManager *self);
+
+    /** Setter for deletion lock timeout.  Default: 1000 milliseconds.
+     */
+    public void
+    Set_Deletion_Lock_Timeout(IndexManager *self, uint32_t timeout);
+
+    /** Getter for deletion lock timeout.
+     */
+    public uint32_t
+    Get_Deletion_Lock_Timeout(IndexManager *self);
+
+    /** Setter for deletion lock retry interval.  Default: 100 milliseconds.
+     */
+    public void
+    Set_Deletion_Lock_Interval(IndexManager *self, uint32_t timeout);
+
+    /** Getter for deletion lock retry interval.
+     */
+    public uint32_t
+    Get_Deletion_Lock_Interval(IndexManager *self);
+}
+
+

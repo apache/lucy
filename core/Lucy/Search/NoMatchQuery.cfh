@@ -1,0 +1,84 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Query which matches no documents.
+ *
+ * NoMatchQuery is a utility class representing a query which matches nothing.
+ * Typical usage might include e.g. returning a NoMatchQuery when a
+ * L<QueryParser|Lucy::Search::QueryParser> is asked to parse an empty
+ * string.
+ */
+class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
+    : dumpable {
+
+    bool_t fails_to_match;
+
+    inert incremented NoMatchQuery*
+    new();
+
+    /** Constructor. Takes no arguments.
+     */
+    public inert NoMatchQuery*
+    init(NoMatchQuery *self);
+
+    void
+    Set_Fails_To_Match(NoMatchQuery *self, bool_t fails_to_match);
+
+    bool_t
+    Get_Fails_To_Match(NoMatchQuery *self);
+
+    public incremented Obj*
+    Dump(NoMatchQuery *self);
+
+    public incremented NoMatchQuery*
+    Load(NoMatchQuery *self, Obj *dump);
+
+    public void
+    Serialize(NoMatchQuery *self, OutStream *outstream);
+
+    public incremented NoMatchQuery*
+    Deserialize(NoMatchQuery *self, InStream *instream);
+
+    public bool_t
+    Equals(NoMatchQuery *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(NoMatchQuery *self);
+
+    public incremented Compiler*
+    Make_Compiler(NoMatchQuery *self, Searcher *searcher, float boost);
+}
+
+class Lucy::Search::NoMatchCompiler
+    inherits Lucy::Search::Compiler {
+
+    inert incremented NoMatchCompiler*
+    new(NoMatchQuery *parent, Searcher *searcher, float boost);
+
+    inert NoMatchCompiler*
+    init(NoMatchCompiler *self, NoMatchQuery *parent,
+         Searcher *searcher, float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(NoMatchCompiler *self, SegReader *reader, bool_t need_score);
+
+    public incremented NoMatchCompiler*
+    Deserialize(NoMatchCompiler *self, InStream *instream);
+}
+
+

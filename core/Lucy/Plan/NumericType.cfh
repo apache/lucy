@@ -1,0 +1,148 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+class Lucy::Plan::NumericType cnick NumType
+    inherits Lucy::Plan::FieldType : dumpable {
+
+    public inert NumericType*
+    init(NumericType *self);
+
+    inert NumericType*
+    init2(NumericType *self, float boost = 1.0, bool_t indexed = true,
+          bool_t stored = true, bool_t sortable = false);
+
+    /** Returns true.
+     */
+    public bool_t
+    Binary(NumericType *self);
+
+    /** Return the primitive type specifier for the object type, e.g.
+     * f64_t for Float64, uint32_t for UInteger32, etc.
+     */
+    abstract incremented CharBuf*
+    Specifier(NumericType *self);
+
+    incremented Hash*
+    Dump_For_Schema(NumericType *self);
+
+    public incremented Hash*
+    Dump(NumericType *self);
+
+    public incremented NumericType*
+    Load(NumericType *self, Obj *dump);
+}
+
+abstract class Lucy::Plan::FloatType
+    inherits Lucy::Plan::NumericType : dumpable { }
+
+class Lucy::Plan::Float64Type
+    inherits Lucy::Plan::FloatType : dumpable {
+
+    public inert Float64Type*
+    new();
+
+    public inert Float64Type*
+    init(Float64Type *self);
+
+    inert Float64Type*
+    init2(Float64Type *self, float boost = 1.0, bool_t indexed = true,
+          bool_t stored = true, bool_t sortable = true);
+
+    int8_t
+    Primitive_ID(Float64Type *self);
+
+    incremented CharBuf*
+    Specifier(Float64Type *self);
+
+    public bool_t
+    Equals(Float64Type *self, Obj *other);
+}
+
+class Lucy::Plan::Float32Type
+    inherits Lucy::Plan::FloatType : dumpable {
+
+    public inert Float32Type*
+    new();
+
+    public inert Float32Type*
+    init(Float32Type *self);
+
+    inert Float32Type*
+    init2(Float32Type *self, float boost = 1.0, bool_t indexed = true,
+          bool_t stored = true, bool_t sortable = false);
+
+    int8_t
+    Primitive_ID(Float32Type *self);
+
+    incremented CharBuf*
+    Specifier(Float32Type *self);
+
+    public bool_t
+    Equals(Float32Type *self, Obj *other);
+}
+
+abstract class Lucy::Plan::IntType
+    inherits Lucy::Plan::NumericType : dumpable { }
+
+class Lucy::Plan::Int32Type
+    inherits Lucy::Plan::IntType : dumpable {
+
+    public inert Int32Type*
+    new();
+
+    public inert Int32Type*
+    init(Int32Type *self);
+
+    inert Int32Type*
+    init2(Int32Type *self, float boost = 1.0, bool_t indexed = true,
+          bool_t stored = true, bool_t sortable = false);
+
+    int8_t
+    Primitive_ID(Int32Type *self);
+
+    incremented CharBuf*
+    Specifier(Int32Type *self);
+
+    public bool_t
+    Equals(Int32Type *self, Obj *other);
+}
+
+class Lucy::Plan::Int64Type
+    inherits Lucy::Plan::IntType : dumpable {
+
+    public inert Int64Type*
+    new();
+
+    public inert Int64Type*
+    init(Int64Type *self);
+
+    inert Int64Type*
+    init2(Int64Type *self, float boost = 1.0, bool_t indexed = true,
+          bool_t stored = true, bool_t sortable = false);
+
+    int8_t
+    Primitive_ID(Int64Type *self);
+
+    incremented CharBuf*
+    Specifier(Int64Type *self);
+
+    public bool_t
+    Equals(Int64Type *self, Obj *other);
+}
+
+

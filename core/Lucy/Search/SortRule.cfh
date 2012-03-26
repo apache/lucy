@@ -1,0 +1,75 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Element of a SortSpec.
+ *
+ * SortRules are the building blocks used to assemble
+ * L<SortSpecs|Lucy::Search::SortSpec>; each SortRule defines a single
+ * level of sorting.  For example, sorting first by "category" then by score
+ * requires a SortSpec with two SortRule elements.
+ */
+class Lucy::Search::SortRule inherits Lucy::Object::Obj {
+
+    int32_t   type;
+    CharBuf  *field;
+    bool_t    reverse;
+
+    inert int32_t FIELD;
+    inert int32_t SCORE;
+    inert int32_t DOC_ID;
+
+    public inert incremented SortRule*
+    new(int32_t type = 0, const CharBuf *field = NULL,
+        bool_t reverse = false);
+
+    /**
+     * @param type Indicate whether to sort by score, field, etc.  (The
+     * default is to sort by a field.)
+     * @param field The name of a <code>sortable</code> field.
+     * @param reverse If true, reverse the order of the sort for this rule.
+     */
+    public inert incremented SortRule*
+    init(SortRule *self, int32_t type = 0, const CharBuf *field = NULL,
+         bool_t reverse = false);
+
+    /** Accessor for "field" member.
+     */
+    public nullable CharBuf*
+    Get_Field(SortRule *self);
+
+    /** Accessor for "type" member.
+     */
+    public int32_t
+    Get_Type(SortRule *self);
+
+    /** Accessor for "reverse" member.
+     */
+    public bool_t
+    Get_Reverse(SortRule *self);
+
+    public incremented SortRule*
+    Deserialize(SortRule *self, InStream *instream);
+
+    public void
+    Serialize(SortRule *self, OutStream *outstream);
+
+    public void
+    Destroy(SortRule *self);
+}
+
+

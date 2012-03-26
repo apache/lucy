@@ -1,0 +1,83 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Abstract encoder/decoder.
+ *
+ * Many Lucy files consist of a single variable length record type
+ * repeated over and over.  A Stepper both reads and writes such a file.
+ *
+ * Since the write algorithms for different Stepper types may require
+ * differing argument lists, it is left to the subclass to define the routine.
+ *
+ * Sometimes it is possible to change a file's format by changing only a
+ * Stepper.  In that case, a compatibility version of the old class may be
+ * squirreled away as a plugin, to be accessed only when reading files written
+ * to the old format.  This cuts down on special-case code in the most current
+ * version.
+ *
+ * Furthermore, isolating I/O code within a Stepper typically clarifies the
+ * logic of the class which calls Stepper_Read_Record.
+ */
+
+class Lucy::Util::Stepper inherits Lucy::Object::Obj {
+
+    inert Stepper*
+    init(Stepper *self);
+
+    public abstract void
+    Reset(Stepper* self);
+
+    /** Update internal state to reflect <code>value</code> and write a frame
+     * to <code>outstream</code> that can be read using Read_Key_Frame().
+     *
+     * @param outstream An OutStream.
+     * @param value State information.
+     */
+    public abstract void
+    Write_Key_Frame(Stepper *self, OutStream *outstream, Obj *value);
+
+    /** Update internal state to reflect <code>value</code> and write a frame
+     * to <code>outstream</code> that can be read using Read_Delta().
+     *
+     * @param outstream An OutStream.
+     * @param value State information.
+     */
+    public abstract void
+    Write_Delta(Stepper *self, OutStream *outstream, Obj *value);
+
+    /** Update intern state using information read from <code>instream</code>.
+     *
+     * @param instream An InStream.
+     */
+    public abstract void
+    Read_Key_Frame(Stepper *self, InStream *instream);
+
+    /** Update state using a combination of information from
+     * <code>instream</code> and the current internal state.
+     */
+    public abstract void
+    Read_Delta(Stepper *self, InStream *instream);
+
+    /** Read the next record from the instream, storing state in [self].
+     */
+    abstract void
+    Read_Record(Stepper *self, InStream *instream);
+}
+
+

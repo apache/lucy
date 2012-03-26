@@ -1,0 +1,76 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** In-memory FileHandle.
+ *
+ * RAM-based implementation of FileHandle, to be used in conjunction with
+ * RAMFolder.
+ */
+class Lucy::Store::RAMFileHandle cnick RAMFH
+    inherits Lucy::Store::FileHandle {
+
+    RAMFile *ram_file;
+    int64_t  len;
+
+    inert incremented nullable RAMFileHandle*
+    open(const CharBuf *path = NULL, uint32_t flags, RAMFile *file = NULL);
+
+    /**
+     * Return a new RAMFileHandle, or set Err_error and return NULL on
+     * failure.
+     *
+     * @param path Filepath.
+     * @param flags FileHandle flags.
+     * @param file An existing RAMFile; if not supplied, the FH_CREATE flag
+     * must be passed or an error will occur.
+     */
+    inert nullable RAMFileHandle*
+    do_open(RAMFileHandle *self, const CharBuf *path = NULL, uint32_t flags,
+            RAMFile *file = NULL);
+
+    /** Access the backing RAMFile.
+     */
+    RAMFile*
+    Get_File(RAMFileHandle *self);
+
+    bool_t
+    Grow(RAMFileHandle *self, int64_t len);
+
+    public void
+    Destroy(RAMFileHandle *self);
+
+    bool_t
+    Window(RAMFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
+
+    bool_t
+    Release_Window(RAMFileHandle *self, FileWindow *window);
+
+    bool_t
+    Read(RAMFileHandle *self, char *dest, int64_t offset, size_t len);
+
+    bool_t
+    Write(RAMFileHandle *self, const void *data, size_t len);
+
+    int64_t
+    Length(RAMFileHandle *self);
+
+    bool_t
+    Close(RAMFileHandle *self);
+}
+
+

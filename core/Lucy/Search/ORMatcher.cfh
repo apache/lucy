@@ -1,0 +1,103 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+__C__
+#include "Lucy/Search/Matcher.h"
+
+/* A wrapper for a Matcher which caches the result of Matcher_Get_Doc_ID().
+ */
+typedef struct lucy_HeapedMatcherDoc {
+    lucy_Matcher *matcher;
+    int32_t   doc;
+} lucy_HeapedMatcherDoc;
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define HeapedMatcherDoc              lucy_HeapedMatcherDoc
+#endif
+
+__END_C__
+
+/** Matcher which unions the doc id sets of other Matchers using a priority
+ * queue.
+ */
+
+class Lucy::Search::ORMatcher inherits Lucy::Search::PolyMatcher {
+
+    lucy_HeapedMatcherDoc **heap;
+    lucy_HeapedMatcherDoc **pool;    /* Pool of HMDs to minimize mallocs */
+    char                   *blob;    /* single allocation for all HMDs */
+    lucy_HeapedMatcherDoc  *top_hmd; /* cached top elem */
+    uint32_t                size;
+    uint32_t                max_size;
+
+    inert incremented ORMatcher*
+    new(VArray *children);
+
+    /**
+     * @param children An array of Matchers.
+     */
+    inert incremented ORMatcher*
+    init(ORMatcher *self, VArray *children);
+
+    public void
+    Destroy(ORMatcher *self);
+
+    public int32_t
+    Next(ORMatcher *self);
+
+    public int32_t
+    Advance(ORMatcher *self, int32_t target);
+
+    public int32_t
+    Get_Doc_ID(ORMatcher *self);
+}
+
+/**
+ * Union results of multiple Matchers.
+ *
+ * ORScorer collates the output of multiple scoring child Matchers, summing
+ * their scores whenever they match the same document.
+ */
+class Lucy::Search::ORScorer inherits Lucy::Search::ORMatcher {
+
+    float            *scores;
+    int32_t           doc_id;
+
+    inert incremented ORScorer*
+    new(VArray *children, Similarity *similarity);
+
+    inert ORScorer*
+    init(ORScorer *self, VArray *children, Similarity *similarity);
+
+    public void
+    Destroy(ORScorer *self);
+
+    public int32_t
+    Next(ORScorer *self);
+
+    public int32_t
+    Advance(ORScorer *self, int32_t target);
+
+    public float
+    Score(ORScorer *self);
+
+    public int32_t
+    Get_Doc_ID(ORScorer *self);
+}
+
+

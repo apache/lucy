@@ -1,0 +1,149 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Build inverted indexes.
+ *
+ * The Indexer class is Apache Lucy's primary tool for managing the content of
+ * inverted indexes, which may later be searched using
+ * L<IndexSearcher|Lucy::Search::IndexSearcher>.
+ *
+ * In general, only one Indexer at a time may write to an index safely.  If a
+ * write lock cannot be secured, new() will throw an exception.
+ *
+ * If an index is located on a shared volume, each writer application must
+ * identify itself by supplying an
+ * L<IndexManager|Lucy::Index::IndexManager> with a unique
+ * <code>host</code> id to Indexer's constructor or index corruption will
+ * occur.  See L<Lucy::Docs::FileLocking> for a detailed discussion.
+ *
+ * Note: at present, Delete_By_Term() and Delete_By_Query() only affect
+ * documents which had been previously committed to the index -- and not any
+ * documents added this indexing session but not yet committed.  This may
+ * change in a future update.
+ */
+class Lucy::Index::Indexer inherits Lucy::Object::Obj {
+
+    Schema            *schema;
+    Folder            *folder;
+    Segment           *segment;
+    IndexManager      *manager;
+    PolyReader        *polyreader;
+    Snapshot          *snapshot;
+    SegWriter         *seg_writer;
+    DeletionsWriter   *del_writer;
+    FilePurger        *file_purger;
+    Lock              *write_lock;
+    Lock              *merge_lock;
+    Doc               *stock_doc;
+    CharBuf           *snapfile;
+    bool_t             truncate;
+    bool_t             optimize;
+    bool_t             needs_commit;
+    bool_t             prepared;
+
+    public inert int32_t TRUNCATE;
+    public inert int32_t CREATE;
+
+    public inert incremented Indexer*
+    new(Schema *schema = NULL, Obj *index, IndexManager *manager = NULL,
+        int32_t flags = 0);
+
+    /** Open a new Indexer.  If the index already exists, update it.
+     *
+     * @param schema A Schema.
+     * @param index Either a string filepath or a Folder.
+     * @param manager An IndexManager.
+     * @param flags Flags governing behavior.
+     */
+    public inert Indexer*
+    init(Indexer *self, Schema *schema = NULL, Obj *index,
+         IndexManager *manager = NULL, int32_t flags = 0);
+
+    /** Add a document to the index.
+     *
+     * @param doc A Lucy::Document::Doc object.
+     * @param boost A floating point weight which affects how this document
+     * scores.
+     */
+    public void
+    Add_Doc(Indexer *self, Doc *doc, float boost = 1.0);
+
+    /** Absorb an existing index into this one.  The two indexes must
+     * have matching Schemas.
+     *
+     * @param index Either an index path name or a Folder.
+     */
+    public void
+    Add_Index(Indexer *self, Obj *index);
+
+    /** Mark documents which contain the supplied term as deleted, so that
+     * they will be excluded from search results and eventually removed
+     * altogether.  The change is not apparent to search apps until after
+     * Commit() succeeds.
+     *
+     * @param field The name of an indexed field. (If it is not spec'd as
+     * <code>indexed</code>, an error will occur.)
+     * @param term The term which identifies docs to be marked as deleted.  If
+     * <code>field</code> is associated with an Analyzer, <code>term</code>
+     * will be processed automatically (so don't pre-process it yourself).
+     */
+    public void
+    Delete_By_Term(Indexer *self, CharBuf *field, Obj *term);
+
+    /** Mark documents which match the supplied Query as deleted.
+     *
+     * @param query A L<Query|Lucy::Search::Query>.
+     */
+    public void
+    Delete_By_Query(Indexer *self, Query *query);
+
+    /** Optimize the index for search-time performance.  This may take a
+     * while, as it can involve rewriting large amounts of data.
+     */
+    public void
+    Optimize(Indexer *self);
+
+    /** Commit any changes made to the index.  Until this is called, none of
+     * the changes made during an indexing session are permanent.
+     *
+     * Calling Commit() invalidates the Indexer, so if you want to make more
+     * changes you'll need a new one.
+     */
+    public void
+    Commit(Indexer *self);
+
+    /** Perform the expensive setup for Commit() in advance, so that Commit()
+     * completes quickly.  (If Prepare_Commit() is not called explicitly by
+     * the user, Commit() will call it internally.)
+     */
+    public void
+    Prepare_Commit(Indexer *self);
+
+    /** Accessor for seg_writer member var.
+     */
+    public SegWriter*
+    Get_Seg_Writer(Indexer *self);
+
+    Doc*
+    Get_Stock_Doc(Indexer *self);
+
+    public void
+    Destroy(Indexer *self);
+}
+
+

@@ -1,0 +1,82 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Join results for two Queries, one required, one optional.
+ *
+ * RequiredOptionalQuery joins the result sets of one Query which MUST match,
+ * and one Query which SHOULD match.  When only the required Query matches,
+ * its score is passed along; when both match, the scores are summed.
+ */
+
+class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
+    inherits Lucy::Search::PolyQuery {
+
+    inert incremented RequiredOptionalQuery*
+    new(Query *required_query, Query *optional_query);
+
+    /**
+     * @param required_query Query must must match.
+     * @param optional_query Query which should match.
+     */
+    public inert RequiredOptionalQuery*
+    init(RequiredOptionalQuery *self, Query *required_query,
+         Query *optional_query);
+
+    /** Getter for the required Query. */
+    public Query*
+    Get_Required_Query(RequiredOptionalQuery *self);
+
+    /** Setter for the required Query. */
+    public void
+    Set_Required_Query(RequiredOptionalQuery *self, Query *required_query);
+
+    /** Getter for the optional Query. */
+    public Query*
+    Get_Optional_Query(RequiredOptionalQuery *self);
+
+    /** Setter for the optional Query. */
+    public void
+    Set_Optional_Query(RequiredOptionalQuery *self, Query *optional_query);
+
+    public incremented Compiler*
+    Make_Compiler(RequiredOptionalQuery *self, Searcher *searcher,
+                  float boost);
+
+    public incremented CharBuf*
+    To_String(RequiredOptionalQuery *self);
+
+    public bool_t
+    Equals(RequiredOptionalQuery *self, Obj *other);
+}
+
+class Lucy::Search::RequiredOptionalCompiler cnick ReqOptCompiler
+    inherits Lucy::Search::PolyCompiler {
+
+    inert incremented RequiredOptionalCompiler*
+    new(RequiredOptionalQuery *parent, Searcher *searcher, float boost);
+
+    inert RequiredOptionalCompiler*
+    init(RequiredOptionalCompiler *self, RequiredOptionalQuery *parent,
+         Searcher *searcher, float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(RequiredOptionalCompiler *self, SegReader *reader,
+                 bool_t need_score);
+}
+
+

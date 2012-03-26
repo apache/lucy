@@ -1,0 +1,77 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Shared (read) lock.
+ *
+ * SharedLock's interface is nearly identical to that of its parent class
+ * L<Lucy::Store::Lock>, taking the same constructor arguments and
+ * implementing the same list of methods.  It differs from Lock only in the
+ * semantics of two methods.
+ *
+ * First, Obtain() will not fail if another lock is held against the resource
+ * identified by <code>name</code> (though it might fail for other reasons).
+ *
+ * Second, Is_Locked() returns true so long as some lock, somewhere is holding
+ * a lock on <code>name</code>.  That lock could be this instance, or it could
+ * be another -- so is entirely possible to call Release() successfully on a
+ * SharedLock object yet still have Is_Locked() return true.
+ *
+ * As currently implemented, SharedLock differs from Lock in that each caller
+ * gets its own lockfile.  Lockfiles still have filenames which begin with the
+ * lock name and end with ".lock", but each is also assigned a unique number
+ * which gets pasted between: "foo-44.lock" instead of "foo.lock".  A
+ * SharedLock is considered fully released when no lock files with a given
+ * lock name are left.
+ */
+class Lucy::Store::SharedLock cnick ShLock
+    inherits Lucy::Store::LockFileLock {
+
+    inert incremented SharedLock*
+    new(Folder *folder, const CharBuf *name, const CharBuf *host,
+        int32_t timeout = 0, int32_t interval = 100);
+
+    /**
+     * @param folder The Lucy::Store::Folder where the lock file will
+     * reside.
+     * @param name String identifying the resource to be locked.
+     * @param host An identifier which should be unique per-machine.
+     * @param timeout Time in milliseconds to keep retrying before abandoning
+     * the attempt to Obtain() a lock.
+     * @param interval Time in milliseconds between retries.
+     */
+    public inert SharedLock*
+    init(SharedLock *self, Folder *folder, const CharBuf *name,
+         const CharBuf *host, int32_t timeout = 0, int32_t interval = 100);
+
+    public bool_t
+    Shared(SharedLock *self);
+
+    public bool_t
+    Request(SharedLock *self);
+
+    public void
+    Release(SharedLock *self);
+
+    public bool_t
+    Is_Locked(SharedLock *self);
+
+    public void
+    Clear_Stale(SharedLock *self);
+}
+
+

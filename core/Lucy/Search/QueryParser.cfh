@@ -1,0 +1,265 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Transform a string into a Query object.
+ *
+ * QueryParser accepts search strings as input and produces
+ * L<Lucy::Search::Query> objects, suitable for feeding into
+ * L<IndexSearcher|Lucy::Search::IndexSearcher> and other
+ * L<Searcher|Lucy::Search::Searcher> subclasses.
+ *
+ * The following syntactical constructs are recognized by QueryParser:
+ *
+ *     * Boolean operators 'AND', 'OR', and 'AND NOT'.
+ *     * Prepented +plus and -minus, indicating that the labeled entity
+ *       should be either required or forbidden -- be it a single word, a
+ *       phrase, or a parenthetical group.
+ *     * Logical groups, delimited by parentheses.
+ *     * Phrases, delimited by double quotes.
+ *
+ * Additionally, the following syntax can be enabled via Set_Heed_Colons():
+ *
+ *     * Field-specific constructs, in the form of 'fieldname:termtext' or
+ *       'fieldname:(foo bar)'.  (The field specified by 'fieldname:' will be
+ *       used instead of the QueryParser's default fields).
+ *
+ *
+ */
+class Lucy::Search::QueryParser cnick QParser
+    inherits Lucy::Object::Obj {
+
+    Schema   *schema;
+    Analyzer *analyzer;
+    CharBuf  *default_boolop;
+    VArray   *fields;
+    CharBuf  *phrase_label;
+    CharBuf  *bool_group_label;
+    bool_t    heed_colons;
+    uint32_t  label_inc;
+
+    inert incremented QueryParser*
+    new(Schema *schema, Analyzer *analyzer = NULL,
+        const CharBuf *default_boolop = NULL, VArray *fields = NULL);
+
+    /** Constructor.
+     *
+     * @param schema A L<Schema|Lucy::Plan::Schema>.
+     * @param analyzer An L<Analyzer|Lucy::Analysis::Analyzer>.
+     * Ordinarily, the analyzers specified by each field's definition will be
+     * used, but if C<analyzer> is supplied, it will override and be used for
+     * all fields.  This can lead to mismatches between what is in the index
+     * and what is being searched for, so use caution.
+     * @param fields The names of the fields which will be searched against.
+     * Defaults to those fields which are defined as indexed in the supplied
+     * Schema.
+     * @param default_boolop Two possible values: 'AND' and 'OR'.  The default
+     * is 'OR', which means: return documents which match any of the query
+     * terms.  If you want only documents which match all of the query terms,
+     * set this to 'AND'.
+     */
+    public inert QueryParser*
+    init(QueryParser *self, Schema *schema, Analyzer *analyzer = NULL,
+        const CharBuf *default_boolop = NULL, VArray *fields = NULL);
+
+    /** Build a Query object from the contents of a query string.  At present,
+     * implemented internally by calling Tree(), Expand(), and Prune().
+     *
+     * @param query_string The string to be parsed.  May be NULL.
+     * @return a Query.
+     */
+    public incremented Query*
+    Parse(QueryParser *self, const CharBuf *query_string = NULL);
+
+    /** Parse the logical structure of a query string, building a tree
+     * comprised of Query objects.  Leaf nodes in the tree will most often be
+     * LeafQuery objects but might be MatchAllQuery or NoMatchQuery objects as
+     * well.  Internal nodes will be objects which subclass PolyQuery:
+     * ANDQuery, ORQuery, NOTQuery, and RequiredOptionalQuery.
+     *
+     * The output of Tree() is an intermediate form which must be passed
+     * through Expand() before being used to feed a search.
+     *
+     * @param query_string The string to be parsed.
+     * @return a Query.
+     */
+    public incremented Query*
+    Tree(QueryParser *self, const CharBuf *query_string);
+
+    /** Walk the hierarchy of a Query tree, descending through all PolyQuery
+     * nodes and calling Expand_Leaf() on any LeafQuery nodes encountered.
+     *
+     * @param query A Query object.
+     * @return A Query -- usually the same one that was supplied after
+     * in-place modification, but possibly another.
+     */
+    public incremented Query*
+    Expand(QueryParser *self, Query *query);
+
+    /** Convert a LeafQuery into either a TermQuery, a PhraseQuery, or an
+     * ORQuery joining multiple TermQueries/PhraseQueries to accommodate
+     * multiple fields.  LeafQuery text will be passed through the relevant
+     * Analyzer for each field.  Quoted text will be transformed into
+     * PhraseQuery objects.  Unquoted text will be converted to either a
+     * TermQuery or a PhraseQuery depending on how many tokens are generated.
+     *
+     * @param query A Query.  Only LeafQuery objects will be processed; others
+     * will be passed through.
+     * @return A Query.
+     */
+    public incremented Query*
+    Expand_Leaf(QueryParser *self, Query *query);
+
+    /** Prevent certain Query structures from returning too many results.
+     * Query objects built via Tree() and Expand() can generate "return the
+     * world" result sets, such as in the case of
+     * <code>NOT a_term_not_in_the_index</code>; Prune() walks the hierarchy
+     * and eliminates such branches.
+     *
+     *      'NOT foo'               => [NOMATCH]
+     *      'foo OR NOT bar'        => 'foo'
+     *      'foo OR (-bar AND -baz) => 'foo'
+     *
+     * Prune() also eliminates some double-negative constructs -- even though
+     * such constructs may not actually return the world:
+     *
+     *      'foo AND -(-bar)'      => 'foo'
+     *
+     * In this example, safety is taking precedence over logical consistency.
+     * If you want logical consistency instead, call Tree() then Expand(),
+     * skipping Prune().
+     *
+     *
+     * @param query A Query.
+     * @return a Query; in most cases, the supplied Query after in-place
+     * modification.
+     */
+    public incremented Query*
+    Prune(QueryParser *self, Query *query = NULL);
+
+    /** Factory method creating a TermQuery.
+     *
+     * @param field Field name.
+     * @param term Term text.
+     * @return A Query.
+     */
+    public incremented Query*
+    Make_Term_Query(QueryParser *self, const CharBuf *field, Obj *term);
+
+    /** Factory method creating a PhraseQuery.
+     *
+     * @param field Field that the phrase must occur in.
+     * @param terms Ordered array of terms that must match.
+     * @return A Query.
+     */
+    public incremented Query*
+    Make_Phrase_Query(QueryParser *self, const CharBuf *field, VArray *terms);
+
+    /** Factory method creating an ORQuery.
+     *
+     * @param children Array of child Queries.
+     * @return A Query.
+     */
+    public incremented Query*
+    Make_OR_Query(QueryParser *self, VArray *children = NULL);
+
+    /** Factory method creating an ANDQuery.
+     *
+     * @param children Array of child Queries.
+     * @return A Query.
+     */
+    public incremented Query*
+    Make_AND_Query(QueryParser *self, VArray *children = NULL);
+
+    /** Factory method creating a NOTQuery.
+     *
+     * @param negated_query Query to be inverted.
+     * @return A Query.
+     */
+    public incremented Query*
+    Make_NOT_Query(QueryParser *self, Query *negated_query);
+
+    /** Factory method creating a RequiredOptionalQuery.
+     *
+     * @param required_query Query must must match.
+     * @param optional_query Query which should match.
+     * @return A Query.
+     */
+    public incremented Query*
+    Make_Req_Opt_Query(QueryParser *self, Query *required_query,
+                       Query *optional_query);
+
+    nullable Analyzer*
+    Get_Analyzer(QueryParser *self);
+
+    Schema*
+    Get_Schema(QueryParser *self);
+
+    CharBuf*
+    Get_Default_BoolOp(QueryParser *self);
+
+    VArray*
+    Get_Fields(QueryParser *self);
+
+    bool_t
+    Heed_Colons(QueryParser *self);
+
+    /** Enable/disable parsing of <code>fieldname:foo</code> constructs.
+     */
+    public void
+    Set_Heed_Colons(QueryParser *self, bool_t heed_colons);
+
+    public void
+    Destroy(QueryParser *self);
+}
+
+/** Private utility class.
+ */
+class Lucy::QueryParser::ParserClause inherits Lucy::Object::Obj {
+
+    uint32_t occur;
+    Query *query;
+
+    inert incremented ParserClause*
+    new(Query *query, uint32_t occur);
+
+    inert ParserClause*
+    init(ParserClause *self, Query *query, uint32_t occur);
+
+    public void
+    Destroy(ParserClause *self);
+}
+
+/** Private utility class.
+ */
+class Lucy::QueryParser::ParserToken inherits Lucy::Object::Obj {
+
+    uint32_t type;
+    CharBuf *text;
+
+    inert incremented ParserToken*
+    new(uint32_t type, const char *text = NULL, size_t len = 0);
+
+    inert ParserToken*
+    init(ParserToken *self, uint32_t type, const char *text = NULL,
+         size_t len = 0);
+
+    public void
+    Destroy(ParserToken *self);
+}
+
+

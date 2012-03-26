@@ -1,0 +1,51 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Concatenates multiple Matcher iterators.
+ */
+class Lucy::Search::SeriesMatcher inherits Lucy::Search::Matcher {
+
+    I32Array  *offsets;
+    VArray    *matchers;
+    Matcher   *current_matcher;
+    int32_t    doc_id;
+    int32_t    tick;
+    int32_t    num_matchers;
+    int32_t    current_offset;
+    int32_t    next_offset;
+
+    public inert incremented SeriesMatcher*
+    new(VArray *matchers, I32Array *offsets);
+
+    public inert SeriesMatcher*
+    init(SeriesMatcher *self, VArray *matchers, I32Array *offsets);
+
+    public int32_t
+    Next(SeriesMatcher *self);
+
+    public int32_t
+    Advance(SeriesMatcher *self, int32_t target);
+
+    public int32_t
+    Get_Doc_ID(SeriesMatcher *self);
+
+    public void
+    Destroy(SeriesMatcher *self);
+}
+
+

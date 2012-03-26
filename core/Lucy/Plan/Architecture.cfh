@@ -1,0 +1,160 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Configure major components of an index.
+ *
+ * By default, a Lucy index consists of several main parts: lexicon,
+ * postings, stored documents, deletions, and highlight data.  The readers and
+ * writers for that data are spawned by Architecture.  Each component operates
+ * at the segment level; Architecture's factory methods are used to build up
+ * L<SegWriter|Lucy::Index::SegWriter> and
+ * L<SegReader|Lucy::Index::SegReader>.
+ */
+class Lucy::Plan::Architecture cnick Arch inherits Lucy::Object::Obj {
+
+    public inert incremented Architecture*
+    new();
+
+    /** Constructor.  Takes no arguments.
+     */
+    public inert Architecture*
+    init(Architecture *self);
+
+    /** Initialize a SegWriter, adding DataWriter components.
+     *
+     * @param writer A SegWriter.
+     */
+    public void
+    Init_Seg_Writer(Architecture *self, SegWriter *writer);
+
+    /** Spawn a LexiconWriter and Register() it with the supplied SegWriter,
+     * but don't add it to the SegWriter's writer stack.
+     *
+     * @param writer A SegWriter.
+     */
+    public void
+    Register_Lexicon_Writer(Architecture *self, SegWriter *writer);
+
+    /** Spawn a PostingListWriter and Register() it with the supplied
+     * SegWriter, adding it to the SegWriter's writer stack.  The SegWriter
+     * must contain a previously registered LexiconWriter.
+     *
+     * @param writer A SegWriter.
+     */
+    public void
+    Register_Posting_List_Writer(Architecture *self, SegWriter *writer);
+
+    /** Spawn a DataWriter and Register() it with the supplied SegWriter,
+     * adding it to the SegWriter's writer stack.
+     *
+     * @param writer A SegWriter.
+     */
+    public void
+    Register_Doc_Writer(Architecture *self, SegWriter *writer);
+
+    /** Spawn a SortWriter and Register() it with the supplied SegWriter,
+     * adding it to the SegWriter's writer stack.
+     *
+     * @param writer A SegWriter.
+     */
+    public void
+    Register_Sort_Writer(Architecture *self, SegWriter *writer);
+
+    /** Spawn a HighlightWriter and Register() it with the supplied SegWriter,
+     * adding it to the SegWriter's writer stack.
+     *
+     * @param writer A SegWriter.
+     */
+    public void
+    Register_Highlight_Writer(Architecture *self, SegWriter *writer);
+
+    /** Spawn a DeletionsWriter and Register() it with the supplied SegWriter,
+     * also calling Set_Del_Writer().
+     *
+     * @param writer A SegWriter.
+     */
+    public void
+    Register_Deletions_Writer(Architecture *self, SegWriter *writer);
+
+    /** Initialize a SegReader, registering DataReaders.
+     */
+    public void
+    Init_Seg_Reader(Architecture *self, SegReader *reader);
+
+    /** Spawn a DocReader and Register() it with the supplied SegReader.
+     *
+     * @param reader A SegReader.
+     */
+    public void
+    Register_Doc_Reader(Architecture *self, SegReader *reader);
+
+    /** Spawn a PostingListReader and Register() it with the supplied SegReader.
+     *
+     * @param reader A SegReader.
+     */
+    public void
+    Register_Posting_List_Reader(Architecture *self, SegReader *reader);
+
+    /** Spawn a SortReader and Register() it with the supplied SegReader.
+     *
+     * @param reader A SegReader.
+     */
+    public void
+    Register_Sort_Reader(Architecture *self, SegReader *reader);
+
+    /** Spawn a HighlightReader and Register() it with the supplied
+     * SegReader.
+     *
+     * @param reader A SegReader.
+     */
+    public void
+    Register_Highlight_Reader(Architecture *self, SegReader *reader);
+
+    /** Spawn a LexiconReader and Register() it with the supplied SegReader.
+     *
+     * @param reader A SegReader.
+     */
+    public void
+    Register_Lexicon_Reader(Architecture *self, SegReader *reader);
+
+    /** Spawn a DeletionsReader and Register() it with the supplied SegReader.
+     *
+     * @param reader A SegReader.
+     */
+    public void
+    Register_Deletions_Reader(Architecture *self, SegReader *reader);
+
+    /** Factory method for creating a new Similarity object.
+     */
+    public Similarity*
+    Make_Similarity(Architecture *self);
+
+    public int32_t
+    Index_Interval(Architecture *self);
+
+    public int32_t
+    Skip_Interval(Architecture *self);
+
+    /** Returns true for any Architecture object. Subclasses should override
+     * this weak check.
+     */
+    public bool_t
+    Equals(Architecture *self, Obj *other);
+}
+
+

@@ -1,0 +1,65 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Query which matches all documents.
+ *
+ * MatchAllQuery is a utility class which matches all documents.  Each match
+ * is assigned a score of 0.0, so that in composite queries, any document
+ * which matches against another part of the query will be ranked higher than
+ * a document which matches only via the MatchAllQuery.
+ */
+abstract class Lucy::Search::MatchAllQuery
+    inherits Lucy::Search::Query : dumpable {
+
+    inert incremented MatchAllQuery*
+    new();
+
+    /** Constructor.  Takes no arguments.
+     */
+    public inert MatchAllQuery*
+    init(MatchAllQuery *self);
+
+    public bool_t
+    Equals(MatchAllQuery *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(MatchAllQuery *self);
+
+    public incremented Compiler*
+    Make_Compiler(MatchAllQuery *self, Searcher *searcher, float boost);
+}
+
+class Lucy::Search::MatchAllCompiler
+    inherits Lucy::Search::Compiler {
+
+    inert incremented MatchAllCompiler*
+    new(MatchAllQuery *parent, Searcher *searcher, float boost);
+
+    inert MatchAllCompiler*
+    init(MatchAllCompiler *self, MatchAllQuery *parent,
+         Searcher *searcher, float boost);
+
+    public incremented nullable Matcher*
+    Make_Matcher(MatchAllCompiler *self, SegReader *reader,
+                 bool_t need_score);
+
+    public incremented MatchAllCompiler*
+    Deserialize(MatchAllCompiler *self, InStream *instream);
+}
+
+

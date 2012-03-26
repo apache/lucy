@@ -1,0 +1,158 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy::Docs::Tutorial::QueryObjects - Use Query objects instead of query
+strings.
+
+=head1 DESCRIPTION
+
+Until now, our search app has had only a single search box.  In this tutorial
+chapter, we'll move towards an "advanced search" interface, by adding a
+"category" drop-down menu.  Three new classes will be required:
+
+=over
+
+=item *
+
+L<QueryParser|Lucy::Search::QueryParser> - Turn a query string into a
+L<Query|Lucy::Search::Query> object.
+
+=item *
+
+L<TermQuery|Lucy::Search::TermQuery> - Query for a specific term within
+a specific field.
+
+=item *
+
+L<ANDQuery|Lucy::Search::ANDQuery> - "AND" together multiple Query
+objects to produce an intersected result set.
+
+=back
+
+=head2 Adaptations to indexer.pl
+
+Our new "category" field will be a StringType field rather than a FullTextType
+field, because we will only be looking for exact matches.  It needs to be
+indexed, but since we won't display its value, it doesn't need to be stored.
+
+    my $cat_type = Lucy::Plan::StringType->new( stored => 0 );
+    $schema->spec_field( name => 'category', type => $cat_type );
+
+There will be three possible values: "article", "amendment", and "preamble",
+which we'll hack out of the source file's name during our C<parse_file>
+subroutine:
+
+    my $category
+        = $filename =~ /art/      ? 'article'
+        : $filename =~ /amend/    ? 'amendment'
+        : $filename =~ /preamble/ ? 'preamble'
+        :                           die "Can't derive category for $filename";
+    return {
+        title    => $title,
+        content  => $bodytext,
+        url      => "/us_constitution/$filename",
+        category => $category,
+    };
+
+=head2 Adaptations to search.cgi
+
+The "category" constraint will be added to our search interface using an HTML
+"select" element:
+
+    # Build up the HTML "select" object for the "category" field.
+    sub generate_category_select {
+        my $cat = shift;
+        my $select = qq|
+          <select name="category">
+            <option value="">All Sections</option>
+            <option value="article">Articles</option>
+            <option value="amendment">Amendments</option>
+          </select>|;
+        if ($cat) {
+            $select =~ s/"$cat"/"$cat" selected/;
+        }
+        return $select;
+    }
+
+We'll start off by loading our new modules and extracting our new CGI
+parameter.
+
+    use Lucy::Search::QueryParser;
+    use Lucy::Search::TermQuery;
+    use Lucy::Search::ANDQuery;
+    
+    ... 
+    
+    my $category = decode( "UTF-8", $cgi->param('category') || '' );
+
+QueryParser's constructor requires a "schema" argument.  We can get that from
+our IndexSearcher:
+
+    # Create an IndexSearcher and a QueryParser.
+    my $searcher = Lucy::Search::IndexSearcher->new( 
+        index => $path_to_index, 
+    );
+    my $qparser  = Lucy::Search::QueryParser->new( 
+        schema => $searcher->get_schema,
+    );
+
+Previously, we have been handing raw query strings to IndexSearcher.  Behind
+the scenes, IndexSearcher has been using a QueryParser to turn those query
+strings into Query objects.  Now, we will bring QueryParser into the
+foreground and parse the strings explicitly.
+
+    my $query = $qparser->parse($q);
+
+If the user has specified a category, we'll use an ANDQuery to join our parsed
+query together with a TermQuery representing the category.
+
+    if ($category) {
+        my $category_query = Lucy::Search::TermQuery->new(
+            field => 'category', 
+            term  => $category,
+        );
+        $query = Lucy::Search::ANDQuery->new(
+            children => [ $query, $category_query ]
+        );
+    }
+
+Now when we execute the query...
+
+    # Execute the Query and get a Hits object.
+    my $hits = $searcher->hits(
+        query      => $query,
+        offset     => $offset,
+        num_wanted => $page_size,
+    );
+
+... we'll get a result set which is the intersection of the parsed query and
+the category query.
+
+=head1 Congratulations!
+
+You've made it to the end of the tutorial.
+
+=head1 SEE ALSO
+
+For additional thematic documentation, see the Apache Lucy
+L<Cookbook|Lucy::Docs::Cookbook>.
+
+ANDQuery has a companion class, L<ORQuery|Lucy::Search::ORQuery>, and a
+close relative,
+L<RequiredOptionalQuery|Lucy::Search::RequiredOptionalQuery>.
+
+

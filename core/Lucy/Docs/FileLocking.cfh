@@ -1,0 +1,83 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Manage indexes on shared volumes.
+ *
+ * Normally, index locking is an invisible process.  Exclusive write access is
+ * controlled via lockfiles within the index directory and problems only arise
+ * if multiple processes attempt to acquire the write lock simultaneously;
+ * search-time processes do not ordinarily require locking at all.
+ *
+ * On shared volumes, however, the default locking mechanism fails, and manual
+ * intervention becomes necessary.
+ *
+ * Both read and write applications accessing an index on a shared volume need
+ * to identify themselves with a unique <code>host</code> id, e.g. hostname or
+ * ip address.  Knowing the host id makes it possible to tell which lockfiles
+ * belong to other machines and therefore must not be removed when the
+ * lockfile's pid number appears not to correspond to an active process.
+ *
+ * At index-time, the danger is that multiple indexing processes from
+ * different machines which fail to specify a unique <code>host</code> id can
+ * delete each others' lockfiles and then attempt to modify the index at the
+ * same time, causing index corruption.  The search-time problem is more
+ * complex.
+ *
+ * Once an index file is no longer listed in the most recent snapshot, Indexer
+ * attempts to delete it as part of a post-Commit() cleanup routine.  It is
+ * possible that at the moment an Indexer is deleting files which it believes
+ * no longer needed, a Searcher referencing an earlier snapshot is in fact
+ * using them.  The more often that an index is either updated or searched,
+ * the more likely it is that this conflict will arise from time to time.
+ *
+ * Ordinarily, the deletion attempts are not a problem.   On a typical unix
+ * volume, the files will be deleted in name only: any process which holds an
+ * open filehandle against a given file will continue to have access, and the
+ * file won't actually get vaporized until the last filehandle is cleared.
+ * Thanks to "delete on last close semantics", an Indexer can't truly delete
+ * the file out from underneath an active Searcher.   On Windows, where file
+ * deletion fails whenever any process holds an open handle, the situation is
+ * different but still workable: Indexer just keeps retrying after each commit
+ * until deletion finally succeeds.
+ *
+ * On NFS, however, the system breaks, because NFS allows files to be deleted
+ * out from underneath active processes.  Should this happen, the unlucky read
+ * process will crash with a "Stale NFS filehandle" exception.
+ *
+ * Under normal circumstances, it is neither necessary nor desirable for
+ * IndexReaders to secure read locks against an index, but for NFS we have to
+ * make an exception.  LockFactory's Make_Shared_Lock() method exists for this
+ * reason; supplying an IndexManager instance to IndexReader's constructor
+ * activates an internal locking mechanism using Make_Shared_Lock() which
+ * prevents concurrent indexing processes from deleting files that are needed
+ * by active readers.
+ *
+ * Since shared locks are implemented using lockfiles located in the index
+ * directory (as are exclusive locks), reader applications must have write
+ * access for read locking to work.  Stale lock files from crashed processes
+ * are ordinarily cleared away the next time the same machine -- as identified
+ * by the <code>host</code> parameter -- opens another IndexReader. (The
+ * classic technique of timing out lock files is not feasible because search
+ * processes may lie dormant indefinitely.) However, please be aware that if
+ * the last thing a given machine does is crash, lock files belonging to it
+ * may persist, preventing deletion of obsolete index data.
+ */
+
+inert class Lucy::Docs::FileLocking { }
+
+

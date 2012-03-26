@@ -1,0 +1,47 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+class Lucy::Index::RawPostingList cnick RawPList
+    inherits Lucy::Index::PostingList {
+
+    Posting       *posting;
+    InStream      *instream;
+    int64_t        start;
+    int64_t        end;
+    int64_t        len;
+
+    inert incremented RawPostingList*
+    new(Schema *schema, const CharBuf *field, InStream *instream,
+        int64_t start, int64_t end);
+
+    inert RawPostingList*
+    init(RawPostingList *self, Schema *schema, const CharBuf *field,
+         InStream *instream, int64_t lex_start, int64_t lex_end);
+
+    public void
+    Destroy(RawPostingList *self);
+
+    RawPosting*
+    Read_Raw(RawPostingList *self, int32_t last_doc_id, CharBuf *term_text,
+             MemoryPool *mem_pool);
+
+    Posting*
+    Get_Posting(RawPostingList *self);
+}
+
+

@@ -1,0 +1,61 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Lucy::Docs::Cookbook - Apache Lucy recipes.
+
+=head1 DESCRIPTION
+
+The Cookbook provides thematic documentation covering some of Apache Lucy's
+more sophisticated features.  For a step-by-step introduction to Lucy,
+see L<Lucy::Docs::Tutorial>.
+
+=head2 Chapters
+
+=over
+
+=item *
+
+L<Lucy::Docs::Cookbook::FastUpdates> - While index updates are fast on
+average, worst-case update performance may be significantly slower. To make
+index updates consistently quick, we must manually intervene to control the
+process of index segment consolidation.
+
+=item *
+
+L<Lucy::Docs::Cookbook::CustomQuery> - Explore Lucy's support for
+custom query types by creating a "PrefixQuery" class to handle trailing
+wildcards.
+
+=item *
+
+L<Lucy::Docs::Cookbook::CustomQueryParser> - Define your own custom
+search query syntax using Lucy::Search::QueryParser and
+L<Parse::RecDescent>.
+
+=back
+
+=head2 Materials
+
+Some of the recipes in the Cookbook reference the completed
+L<Tutorial|Lucy::Docs::Tutorial> application.  These materials can be
+found in the C<sample> directory at the root of the Lucy distribution:
+
+    sample/indexer.pl        # indexing app
+    sample/search.cgi        # search app
+    sample/us_constitution   # corpus
+
+
