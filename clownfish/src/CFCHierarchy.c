@@ -44,6 +44,9 @@ struct CFCHierarchy {
     size_t num_trees;
     CFCFile **files;
     size_t num_files;
+    CFCClass **classes;
+    size_t classes_cap;
+    size_t num_classes;
 };
 
 static void
@@ -79,13 +82,17 @@ CFCHierarchy_init(CFCHierarchy *self, const char *source, const char *dest) {
     if (!source || !strlen(source) || !dest || !strlen(dest)) {
         CFCUtil_die("Both 'source' and 'dest' are required");
     }
-    self->source    = CFCUtil_strdup(source);
-    self->dest      = CFCUtil_strdup(dest);
-    self->trees     = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
-    self->num_trees = 0;
-    self->files     = (CFCFile**)CALLOCATE(1, sizeof(CFCFile*));
-    self->num_files = 0;
-    self->parser    = CFCParser_new();
+    self->source       = CFCUtil_strdup(source);
+    self->dest         = CFCUtil_strdup(dest);
+    self->trees        = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
+    self->num_trees    = 0;
+    self->files        = (CFCFile**)CALLOCATE(1, sizeof(CFCFile*));
+    self->num_files    = 0;
+    self->classes_cap  = 10;
+    self->classes      = (CFCClass**)CALLOCATE(
+                            (self->classes_cap + 1), sizeof(CFCClass*));
+    self->num_classes  = 0;
+    self->parser       = CFCParser_new();
     return self;
 }
 
@@ -99,6 +106,7 @@ CFCHierarchy_destroy(CFCHierarchy *self) {
     }
     FREEMEM(self->trees);
     FREEMEM(self->files);
+    FREEMEM(self->classes);
     FREEMEM(self->source);
     FREEMEM(self->dest);
     CFCBase_decref((CFCBase*)self->parser);
@@ -161,10 +169,6 @@ S_parse_cf_files(CFCHierarchy *self) {
     all_source_paths = S_find_cfh(self->source, all_source_paths, 0);
     const char *source_dir = self->source;
     size_t source_dir_len  = strlen(source_dir);
-    size_t all_classes_cap = 10;
-    size_t num_classes     = 0;
-    CFCClass **all_classes = (CFCClass**)MALLOCATE(
-                                 (all_classes_cap + 1) * sizeof(CFCClass*));
     char *source_class = NULL;
     size_t source_class_max = 0;
 
@@ -208,25 +212,25 @@ S_parse_cf_files(CFCHierarchy *self) {
 
         CFCClass **classes_in_file = CFCFile_classes(file);
         for (size_t j = 0; classes_in_file[j] != NULL; j++) {
-            if (num_classes == all_classes_cap) {
-                all_classes_cap += 10;
-                all_classes = (CFCClass**)REALLOCATE(
-                                  all_classes,
-                                  (all_classes_cap + 1) * sizeof(CFCClass*));
+            if (self->num_classes == self->classes_cap) {
+                self->classes_cap += 10;
+                self->classes = (CFCClass**)REALLOCATE(
+                                  self->classes,
+                                  (self->classes_cap + 1) * sizeof(CFCClass*));
             }
-            all_classes[num_classes++] = classes_in_file[j];
+            self->classes[self->num_classes++] = classes_in_file[j];
         }
         CFCBase_decref((CFCBase*)file);
     }
-    all_classes[num_classes] = NULL;
+    self->classes[self->num_classes] = NULL;
 
     // Wrangle the classes into hierarchies and figure out inheritance.
-    for (int i = 0; all_classes[i] != NULL; i++) {
-        CFCClass *klass = all_classes[i];
+    for (int i = 0; self->classes[i] != NULL; i++) {
+        CFCClass *klass = self->classes[i];
         const char *parent_name = CFCClass_get_parent_class_name(klass);
         if (parent_name) {
             for (size_t j = 0; ; j++) {
-                CFCClass *maybe_parent = all_classes[j];
+                CFCClass *maybe_parent = self->classes[j];
                 if (!maybe_parent) {
                     CFCUtil_die("Parent class '%s' not defined", parent_name);
                 }
@@ -243,7 +247,6 @@ S_parse_cf_files(CFCHierarchy *self) {
         }
     }
 
-    FREEMEM(all_classes);
     for (int i = 0; all_source_paths[i] != NULL; i++) {
         FREEMEM(all_source_paths[i]);
     }
