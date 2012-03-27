@@ -145,7 +145,6 @@ cfish_XSBind_enable_overload(void *pobj);
  * a NULL-terminated series of ALLOT_ macros.
  *
  *     cfish_XSBind_allot_params(stack, start, num_stack_elems,
- *         "Lucy::Search::TermQuery::new_PARAMS",
  *          ALLOT_OBJ(&field, "field", 5, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
  *          ALLOT_OBJ(&term, "term", 4, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
  *          NULL);
@@ -176,8 +175,8 @@ cfish_XSBind_enable_overload(void *pobj);
  *     keylen -- The length of the parameter name in bytes.
  *     required -- A boolean indicating whether the parameter is required.
  *
- * If a required parameter is not present, allot_params() will immediately
- * cease processing of parameters, set Err_error and return false.
+ * If a required parameter is not present, allot_params() will set Err_error
+ * and return false.
  *
  * Use the following macro if a Clownfish object is desired:
  *
@@ -192,19 +191,20 @@ cfish_XSBind_enable_overload(void *pobj);
  *
  *     ALLOT_SV(ptr, key, keylen, required)
  *
+ * All possible valid param names must be passed via the ALLOT_ macros; if a
+ * user-supplied param cannot be matched up with an ALLOT_ macro,
+ * allot_params() will set Err_error and return false.
+ *
  * @param stack The Perl stack.
  * @param start Where on the Perl stack to start looking for params.  For
  * methods, this would typically be 1; for functions, most likely 0.
  * @param num_stack_elems The number of arguments passed to the Perl function
  * (generally, the XS variable "items").
- * @param params_hash_name The name of a package global hash.  Any param
- * labels which are not present in this hash will trigger an exception.
  * @return true on success, false on failure (sets Err_error).
  */
 chy_bool_t
 cfish_XSBind_allot_params(SV** stack, int32_t start,
-                          int32_t num_stack_elems,
-                          char* params_hash_name, ...);
+                          int32_t num_stack_elems, ...);
 
 #define XSBIND_WANT_I8       0x1
 #define XSBIND_WANT_I16      0x2

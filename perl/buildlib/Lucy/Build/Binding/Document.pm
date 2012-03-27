@@ -62,7 +62,6 @@ CODE:
     int32_t doc_id = 0;
     chy_bool_t args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
-                              "Lucy::Document::Doc::new_PARAMS",
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),
                               NULL);
@@ -141,7 +140,6 @@ CODE:
     float score = 0.0f;
     chy_bool_t args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
-                              "Lucy::Document::HitDoc::new_PARAMS",
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),
                               ALLOT_F32(&score, "score", 5, false),

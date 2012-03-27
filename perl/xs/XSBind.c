@@ -472,8 +472,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
 }
 
 chy_bool_t
-XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
-                    char *unused, ...) {
+XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
     va_list args;
     int32_t args_left = (num_stack_elems - start) / 2;
     void *verified_labels = alloca(sizeof(int64_t) + num_stack_elems / 64);
@@ -489,7 +488,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
     }
 
     void *target;
-    va_start(args, unused);
+    va_start(args, num_stack_elems);
     while (NULL != (target = va_arg(args, void*))) {
         char *label     = va_arg(args, char*);
         int   label_len = va_arg(args, int);

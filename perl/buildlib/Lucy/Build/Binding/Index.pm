@@ -575,7 +575,6 @@ PPCODE:
     else if (items > 2) {
         chy_bool_t args_ok
             = XSBind_allot_params(&(ST(0)), 1, items,
-                                  "Lucy::Index::Indexer::add_doc_PARAMS",
                                   ALLOT_SV(&doc_sv, "doc", 3, true),
                                   ALLOT_F32(&boost, "boost", 5, false),
                                   NULL);
@@ -1110,7 +1109,6 @@ CODE:
     int32_t ord = 0;
     chy_bool_t args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
-                              "Lucy::Index::SortCache::value_PARAMS",
                               ALLOT_I32(&ord, "ord", 3, false),
                               NULL);
     if (!args_ok) {

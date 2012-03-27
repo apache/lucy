@@ -391,7 +391,6 @@ CODE:
 
     chy_bool_t args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
-                              "Lucy::Object::I32Array::new_PARAMS",
                               ALLOT_SV(&ints_sv, "ints", 4, true),
                               NULL);
     if (!args_ok) {
@@ -829,7 +828,6 @@ CODE:
     lucy_VTable  *parent     = NULL;
     chy_bool_t args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
-                              "Lucy::Object::VTable::singleton_PARAMS",
                               ALLOT_OBJ(&class_name, "class_name", 10, true,
                                         LUCY_CHARBUF, alloca(cfish_ZCB_size())),
                               ALLOT_OBJ(&parent, "parent", 6, false,

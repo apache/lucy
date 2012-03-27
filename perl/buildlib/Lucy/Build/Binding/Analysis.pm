@@ -117,7 +117,6 @@ CODE:
         SV *text_sv = NULL;
         chy_bool_t args_ok
             = XSBind_allot_params(&(ST(0)), 1, items,
-                                  "Lucy::Analysis::Inversion::new_PARAMS",
                                   ALLOT_SV(&text_sv, "text", 4, false),
                                   NULL);
         if (!args_ok) {
@@ -352,7 +351,6 @@ CODE:
 
     chy_bool_t args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
-                              "Lucy::Analysis::Token::new_PARAMS",
                               ALLOT_SV(&text_sv, "text", 4, true),
                               ALLOT_U32(&start_off, "start_offset", 12, true),
                               ALLOT_U32(&end_off, "end_offset", 10, true),
