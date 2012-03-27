@@ -18,6 +18,7 @@
 #define NEED_newRV_noinc
 #include "XSBind.h"
 #include "Lucy/Util/StringHelper.h"
+#include "Lucy/Util/NumberUtils.h"
 
 // Convert a Perl hash into a Clownfish Hash.  Caller takes responsibility for
 // a refcount.
@@ -472,18 +473,10 @@ S_extract_from_sv(SV *value, void *target, const char *label,
 
 chy_bool_t
 XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
-                    char* params_hash_name, ...) {
+                    char *unused, ...) {
     va_list args;
-    HV *params_hash = get_hv(params_hash_name, 0);
     int32_t args_left = (num_stack_elems - start) / 2;
-
-    // Retrieve the params hash, which must be a package global.
-    if (params_hash == NULL) {
-        cfish_CharBuf *mess = CFISH_MAKE_MESS("Can't find hash named %s",
-                                              params_hash_name);
-        cfish_Err_set_error(cfish_Err_new(mess));
-        return false;
-    }
+    void *verified_labels = alloca(sizeof(int64_t) + num_stack_elems / 64);
 
     // Verify that our args come in pairs. Return success if there are no
     // args.
@@ -495,21 +488,8 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         return false;
     }
 
-    // Validate param names.
-    for (int32_t i = start; i < num_stack_elems; i += 2) {
-        SV *const key_sv = stack[i];
-        STRLEN key_len;
-        const char *key = SvPV(key_sv, key_len); // assume ASCII labels
-        if (!hv_exists(params_hash, key, key_len)) {
-            cfish_CharBuf *mess
-                = CFISH_MAKE_MESS("Invalid parameter: '%s'", key);
-            cfish_Err_set_error(cfish_Err_new(mess));
-            return false;
-        }
-    }
-
     void *target;
-    va_start(args, params_hash_name);
+    va_start(args, unused);
     while (NULL != (target = va_arg(args, void*))) {
         char *label     = va_arg(args, char*);
         int   label_len = va_arg(args, int);
@@ -518,36 +498,56 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems,
         cfish_VTable *vtable = va_arg(args, cfish_VTable*);
         void *allocation = va_arg(args, void*);
 
-        // Iterate through stack looking for a label match. Work backwards so
-        // that if the label is doubled up we get the last one.
-        chy_bool_t got_arg = false;
-        for (int32_t i = num_stack_elems; i >= start + 2; i -= 2) {
-            int32_t tick = i - 2;
+        // Iterate through the stack looking for labels which match this param
+        // name.  If the label appears more than once, keep track of where it
+        // appears *last*, as the last time a param appears overrides all
+        // previous appearances.
+        int32_t found_arg = -1;
+        for (int32_t tick = start; tick < num_stack_elems; tick += 2) {
             SV *const key_sv = stack[tick];
             if (SvCUR(key_sv) == (STRLEN)label_len) {
                 if (memcmp(SvPVX(key_sv), label, label_len) == 0) {
-                    SV *value = stack[tick + 1];
-                    got_arg = S_extract_from_sv(value, target, label,
-                                                required, type, vtable,
-                                                allocation);
-                    if (!got_arg) {
-                        CFISH_ERR_ADD_FRAME(cfish_Err_get_error());
-                        return false;
-                    }
-                    break;
+                    found_arg = tick;
+                    lucy_NumUtil_u1set(verified_labels, tick);
                 }
             }
         }
 
-        // Enforce required params.
-        if (required && !got_arg) {
+        if (found_arg == -1) {
+            // Didn't find this parameter. Throw an error if it was required.
+            if (required) {
+                cfish_CharBuf *mess
+                    = CFISH_MAKE_MESS("Missing required parameter: '%s'",
+                                      label);
+                cfish_Err_set_error(cfish_Err_new(mess));
+                return false;
+            }
+        }
+        else {
+            // Found the arg.  Extract the value.
+            SV *value = stack[found_arg + 1];
+            chy_bool_t got_arg = S_extract_from_sv(value, target, label,
+                                                   required, type, vtable,
+                                                   allocation);
+            if (!got_arg) {
+                CFISH_ERR_ADD_FRAME(cfish_Err_get_error());
+                return false;
+            }
+        }
+    }
+    va_end(args);
+
+    // Ensure that all parameter labels were valid.
+    for (int32_t tick = start; tick < num_stack_elems; tick += 2) {
+        if (!lucy_NumUtil_u1get(verified_labels, tick)) {
+            SV *const key_sv = stack[tick];
+            char *key = SvPV_nolen(key_sv);
             cfish_CharBuf *mess
-                = CFISH_MAKE_MESS("Missing required parameter: '%s'", label);
+                = CFISH_MAKE_MESS("Invalid parameter: '%s'", key);
             cfish_Err_set_error(cfish_Err_new(mess));
             return false;
         }
     }
-    va_end(args);
 
     return true;
 }
