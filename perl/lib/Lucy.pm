@@ -77,31 +77,6 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Analysis::Inversion;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    our %new_PARAMS = (
-        # params
-        text => undef
-    );
-}
-
-{
-    package Lucy::Analysis::Token;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    our %new_PARAMS = (
-        text         => undef,
-        start_offset => undef,
-        end_offset   => undef,
-        pos_inc      => 1,
-        boost        => 1.0,
-    );
-}
-
-{
     package Lucy::Analysis::RegexTokenizer;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
@@ -124,11 +99,6 @@ sub error {$Lucy::Object::Err::error}
     use bytes;
     no bytes;
 
-    our %new_PARAMS = (
-        fields => undef,
-        doc_id => 0,
-    );
-
     use overload
         fallback => 1,
         '%{}'    => \&get_fields;
@@ -147,25 +117,6 @@ sub error {$Lucy::Object::Err::error}
         $instream->read( $buf, $len );
         $self->set_fields( thaw($buf) );
     }
-}
-
-{
-    package Lucy::Document::HitDoc;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    our %new_PARAMS = (
-        fields => undef,
-        score  => 0,
-        doc_id => 0,
-    );
-}
-
-{
-    package Lucy::Object::I32Array;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    our %new_PARAMS = ( ints => undef );
 }
 
 {
@@ -222,11 +173,6 @@ sub error {$Lucy::Object::Err::error}
         }
     }
 
-    our %singleton_PARAMS = (
-        class_name => undef,
-        parent     => undef,
-    );
-
     no warnings 'redefine';
     sub DESTROY { }    # leak all
 }
@@ -243,8 +189,6 @@ sub error {$Lucy::Object::Err::error}
         $flags |= TRUNCATE if delete $args{'truncate'};
         return $either->_new( %args, flags => $flags );
     }
-
-    our %add_doc_PARAMS = ( doc => undef, boost => 1.0 );
 }
 
 {
@@ -340,13 +284,6 @@ sub error {$Lucy::Object::Err::error}
         if ($@) { return Lucy::Object::CharBuf->new($@); }
         return;
     }
-}
-
-{
-    package Lucy::Index::SortCache;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    our %value_PARAMS = ( ord => undef, );
 }
 
 {

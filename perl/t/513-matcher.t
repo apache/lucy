@@ -116,7 +116,6 @@ sub test_search {
     my $collector
         = Lucy::Search::Collector::SortCollector->new( wanted => 100 );
     $matcher->collect(
-        %Lucy::Search::Matcher::collect_PARAMS,
         collector => $collector,
         deletions => $del_enum,
         %args,
