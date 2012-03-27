@@ -290,6 +290,7 @@ ALIAS:
     fresh_methods         = 44
     fresh_member_vars     = 46
     privacy_symbol        = 48
+    included              = 50
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -408,6 +409,9 @@ PPCODE:
                 const char *value = CFCClass_privacy_symbol(self);
                 retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
             }
+            break;
+        case 50:
+            retval = newSViv(CFCClass_included(self));
             break;
     END_SET_OR_GET_SWITCH
 }
