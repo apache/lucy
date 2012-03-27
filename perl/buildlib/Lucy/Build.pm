@@ -139,7 +139,6 @@ my $XS_SOURCE_DIR    = 'xs';
 my $LIB_DIR          = 'lib';
 my $BUILDLIB_DIR     = 'buildlib';
 my $XS_FILEPATH      = catfile( $LIB_DIR, "Lucy.xs" );
-my $AUTOBIND_PM_PATH = catfile( $LIB_DIR, 'Lucy', 'Autobinding.pm' );
 # TODO: Get these from $hierarchy
 my $AUTOGEN_INC_DIR    = catfile( 'autogen', 'include' );
 my $AUTOGEN_SOURCE_DIR = catfile( 'autogen', 'source' );
@@ -337,7 +336,6 @@ sub ACTION_clownfish {
 
     if ($modified) {
         $self->add_to_cleanup($XS_FILEPATH);
-        $self->add_to_cleanup($AUTOBIND_PM_PATH);
         $perl_binding->write_boot;
         $perl_binding->write_bindings;
         $self->_write_pod($perl_binding);

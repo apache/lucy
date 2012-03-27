@@ -39,7 +39,6 @@ struct CFCPerl {
     char *header;
     char *footer;
     char *xs_path;
-    char *pm_path;
     char *boot_h_file;
     char *boot_c_file;
     char *boot_h_path;
@@ -87,12 +86,6 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
                                 boot_class, ".xs", NULL);
     S_replace_double_colons(self->xs_path, CFCUTIL_PATH_SEP_CHAR);
 
-    // Derive path to generated .pm file.
-    self->pm_path = CFCUtil_cat(CFCUtil_strdup(""), lib_dir, CFCUTIL_PATH_SEP,
-                                boot_class, CFCUTIL_PATH_SEP,
-                                "Autobinding.pm", NULL);
-    S_replace_double_colons(self->pm_path, CFCUTIL_PATH_SEP_CHAR);
-
     // Derive the name of the files containing bootstrapping code.
     const char *prefix   = CFCParcel_get_prefix(parcel);
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
@@ -130,7 +123,6 @@ CFCPerl_destroy(CFCPerl *self) {
     FREEMEM(self->header);
     FREEMEM(self->footer);
     FREEMEM(self->xs_path);
-    FREEMEM(self->pm_path);
     FREEMEM(self->boot_h_file);
     FREEMEM(self->boot_c_file);
     FREEMEM(self->boot_h_path);
@@ -357,44 +349,6 @@ CFCPerl_write_boot(CFCPerl *self) {
 }
 
 static char*
-S_pm_file_contents(CFCPerl *self, const char *params_hash_defs) {
-    const char pattern[] = 
-    "# DO NOT EDIT!!!! This is an auto-generated file.\n"
-    "\n"
-    "# Licensed to the Apache Software Foundation (ASF) under one or more\n"
-    "# contributor license agreements.  See the NOTICE file distributed with\n"
-    "# this work for additional information regarding copyright ownership.\n"
-    "# The ASF licenses this file to You under the Apache License, Version 2.0\n"
-    "# (the \"License\"); you may not use this file except in compliance with\n"
-    "# the License.  You may obtain a copy of the License at\n"
-    "#\n"
-    "#     http://www.apache.org/licenses/LICENSE-2.0\n"
-    "#\n"
-    "# Unless required by applicable law or agreed to in writing, software\n"
-    "# distributed under the License is distributed on an \"AS IS\" BASIS,\n"
-    "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
-    "# See the License for the specific language governing permissions and\n"
-    "# limitations under the License.\n"
-    "\n"
-    "use strict;\n"
-    "use warnings;\n"
-    "\n"
-    "package %s::Autobinding;\n"
-    "\n"
-    "%s\n"
-    "\n"
-    "1;\n"
-    "\n";
-    size_t size = sizeof(pattern)
-                  + strlen(self->boot_class)
-                  + strlen(params_hash_defs)
-                  + 20;
-    char *contents = (char*)MALLOCATE(size);
-    sprintf(contents, pattern, self->boot_class, params_hash_defs);
-    return contents;
-}
-
-static char*
 S_xs_file_contents(CFCPerl *self, const char *generated_xs,
                    const char *xs_init, const char *hand_rolled_xs) {
     const char pattern[] = 
@@ -466,19 +420,6 @@ S_add_xs_init(char *xs_init, CFCPerlSub *xsub) {
     return xs_init;
 }
 
-// Params hashes for arg checking of XSUBs that take labeled params.
-static char*
-S_add_params_hash_def(char *params_hash_defs, CFCPerlSub *xsub) {
-    char *def = CFCPerlSub_params_hash_def(xsub);
-    if (def) {
-        if (strlen(params_hash_defs)) {
-            params_hash_defs = CFCUtil_cat(params_hash_defs, "\n", NULL);
-        }
-        params_hash_defs = CFCUtil_cat(params_hash_defs, def, NULL);
-    }
-    return params_hash_defs;
-}
-
 void
 CFCPerl_write_bindings(CFCPerl *self) {
     CFCClass **ordered = CFCHierarchy_ordered_classes(self->hierarchy);
@@ -486,7 +427,6 @@ CFCPerl_write_bindings(CFCPerl *self) {
     char *hand_rolled_xs   = CFCUtil_strdup("");
     char *generated_xs     = CFCUtil_strdup("");
     char *xs_init          = CFCUtil_strdup("");
-    char *params_hash_defs = CFCUtil_strdup("");
 
     // Pound-includes for generated headers.
     for (size_t i = 0; ordered[i] != NULL; i++) {
@@ -515,8 +455,7 @@ CFCPerl_write_bindings(CFCPerl *self) {
                                        NULL);
             FREEMEM(xsub_def);
 
-            // Add params hash def, XSUB initialization at boot.
-            params_hash_defs = S_add_params_hash_def(params_hash_defs, xsub);
+            // Add XSUB initialization at boot.
             xs_init = S_add_xs_init(xs_init, xsub);
         }
         FREEMEM(constructors);
@@ -533,8 +472,7 @@ CFCPerl_write_bindings(CFCPerl *self) {
                                        NULL);
             FREEMEM(xsub_def);
 
-            // Add params hash def, XSUB initialization at boot.
-            params_hash_defs = S_add_params_hash_def(params_hash_defs, xsub);
+            // Add XSUB initialization at boot.
             xs_init = S_add_xs_init(xs_init, xsub);
         }
         FREEMEM(methods);
@@ -550,15 +488,10 @@ CFCPerl_write_bindings(CFCPerl *self) {
     // Write out if there have been any changes.
     char *xs_file_contents
         = S_xs_file_contents(self, generated_xs, xs_init, hand_rolled_xs);
-    char *pm_file_contents = S_pm_file_contents(self, params_hash_defs);
     CFCUtil_write_if_changed(self->xs_path, xs_file_contents,
                              strlen(xs_file_contents));
-    CFCUtil_write_if_changed(self->pm_path, pm_file_contents,
-                             strlen(pm_file_contents));
 
-    FREEMEM(pm_file_contents);
     FREEMEM(xs_file_contents);
-    FREEMEM(params_hash_defs);
     FREEMEM(hand_rolled_xs);
     FREEMEM(xs_init);
     FREEMEM(generated_xs);

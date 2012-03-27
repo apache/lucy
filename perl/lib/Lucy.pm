@@ -36,8 +36,6 @@ BEGIN {
     our @EXPORT_OK = qw( to_clownfish to_perl kdump );
 }
 
-use Lucy::Autobinding;
-
 sub kdump {
     require Data::Dumper;
     my $kdumper = Data::Dumper->new( [@_] );

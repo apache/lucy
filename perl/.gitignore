@@ -8,7 +8,6 @@
 /charmony.h
 /lib/Lucy.c
 /lib/Lucy.xs
-/lib/Lucy/Autobinding.pm
 /ppport.h
 /typemap
 
