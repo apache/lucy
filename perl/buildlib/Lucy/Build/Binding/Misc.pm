@@ -198,6 +198,9 @@ PPCODE:
     else if (strEQ(package, "TestSeriesMatcher")) {
         lucy_TestSeriesMatcher_run_tests();
     }
+    else if (strEQ(package, "TestSpan")) {
+        lucy_TestSpan_run_tests();
+    }
     else if (strEQ(package, "TestRangeQuery")) {
         lucy_TestRangeQuery_run_tests();
     }
