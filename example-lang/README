@@ -2,7 +2,7 @@ The "example-lang" directory contains a template for adding a language binding
 to Lucy and its object model layer, Clownfish.  See the DevGuide for an
 overview of Lucy's layers:
 
-    http://incubator.apache.org/lucy/docs/perl/Lucy/Docs/DevGuide.html
+    http://lucy.apache.org/docs/perl/Lucy/Docs/DevGuide.html
 
 To get started, copy "example-lang" to a directory named after the language
 you'd like to bind to:

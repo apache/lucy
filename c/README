@@ -1,7 +1,7 @@
 The "c" directory contains the C host language implementation of Apache Lucy.
 See the DevGuide for an overview of Lucy's layers:
 
-    http://incubator.apache.org/lucy/docs/perl/Lucy/Docs/DevGuide.html
+    http://lucy.apache.org/docs/perl/Lucy/Docs/DevGuide.html
 
 Most of the C files within the "c/src" directory contain stubs for
 routines whose interfaces are defined within "trunk/core".  

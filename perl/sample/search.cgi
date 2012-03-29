@@ -229,7 +229,7 @@ sub blast_out_content {
   </div><!--bodytext-->
     <p style="font-size: smaller; color: #666">
       <em>
-        Powered by <a href="http://incubator.apache.org/lucy/"
+        Powered by <a href="http://lucy.apache.org/"
         >Apache Lucy<small><sup>TM</sup></small></a>
       </em>
     </p>

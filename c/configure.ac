@@ -13,7 +13,7 @@ dnl WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 dnl See the License for the specific language governing permissions and
 dnl limitations under the License.
 
-AC_INIT([liblucy], [0.3.0], [The Apache Lucy Project <lucy-dev@incubator.apache.org], [http://incubator.apache.org/lucy/])
+AC_INIT([liblucy], [0.3.0], [The Apache Lucy Project <dev@lucy.apache.org], [http://lucy.apache.org/])
 dnl AM_CONFIG_HEADER(src/acconfig.h)
 AC_PROG_CC
 AC_PROG_CXX

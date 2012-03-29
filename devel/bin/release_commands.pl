@@ -42,7 +42,7 @@ say qq|# Commands needed to execute ReleaseGuide for Apache Lucy $x_y_z_version 
 say qq|#######################################################################\n|;
 
 say qq|# If your code signing key is not already available from pgp.mit.edu|;
-say qq|# and <http://www.apache.org/dist/incubator/lucy/KEYS>, publish it.|;
+say qq|# and <http://www.apache.org/dist/lucy/KEYS>, publish it.|;
 say qq|[...]\n|;
 
 if ( $rc < 2 ) {
@@ -56,20 +56,20 @@ if ( $rc < 2 ) {
 
 if ( $micro == 0 && $rc < 2) {
     say qq|# Since this is the first release in a series (i.e. X.Y.0), create a branch.|;
-    say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/trunk |
-        . qq|https://svn.apache.org/repos/asf/incubator/lucy/branches/$major.$minor |
+    say qq|svn copy https://svn.apache.org/repos/asf/lucy/trunk |
+        . qq|https://svn.apache.org/repos/asf/lucy/branches/$major.$minor |
         . qq|-m "Branching for $x_y_z_version release"\n|;
 }
 
 say qq|# Create a tag for the release candidate.|;
 say
-    qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/branches/$major.$minor |
-    . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
+    qq|svn copy https://svn.apache.org/repos/asf/lucy/branches/$major.$minor |
+    . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-incubating-$full_rc_version |
     . qq|-m "Tagging release candidate $rc for $x_y_z_version."\n|;
 
 
 say qq|# Export a pristine copy of the source from the release candidate tag.|;
-say qq|svn export https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
+say qq|svn export https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-incubating-$full_rc_version |
  . qq|apache-lucy-incubating-$x_y_z_version\n|;
 
 say qq|# Tar and gzip the export.|;
@@ -136,20 +136,20 @@ say qq|# After both Lucy PPMC and Incubator PMC votes have passed...|;
 say qq|#######################################################################\n|;
 
 say qq|# Tag the release.|;
-say qq|svn copy https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version |
- . qq|https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$x_y_z_version |
+say qq|svn copy https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-incubating-$full_rc_version |
+ . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-incubating-$x_y_z_version |
  . qq|-m "Tagging release $x_y_z_version."\n|;
 
 say qq|# Copy release artifacts to dist directory, remove RC dir.|;
 say qq|ssh $apache_id\@people.apache.org|;
 say qq|cd public_html/|;
-say qq|cp -p apache-lucy-incubating-$full_rc_version/* /www/www.apache.org/dist/incubator/lucy/|;
+say qq|cp -p apache-lucy-incubating-$full_rc_version/* /www/www.apache.org/dist/lucy/|;
 say qq|rm -rf apache-lucy-incubating-$full_rc_version/\n|;
 
 say qq|# Carefully remove the artifacts for any previous releases superseded|;
 say qq|# by this one.  DO NOT overwrite any release artifact files, as that|;
 say qq|# triggers the Infra team's security alarm bells.|;
-say qq|cd /www/www.apache.org/dist/incubator/lucy/|;
+say qq|cd /www/www.apache.org/dist/lucy/|;
 say qq|[...]\n|;
 
 say qq|# Update the issue tracker.|;
@@ -187,7 +187,7 @@ say qq|# email, or optionally, use the boilerplate announcement text below.|;
 say qq|[...]\n|;
 
 say qq|#######################################################################|;
-say qq|# Boilerplate VOTE email for lucy-dev\@incubator.a.o|;
+say qq|# Boilerplate VOTE email for dev\@lucy.a.o|;
 say qq|# Suggested subject:|;
 say qq|#|;
 say qq|#    [VOTE] Apache Lucy (incubating) $x_y_z_version RC $rc|;
@@ -211,7 +211,7 @@ This candidate was assembled according to the process documented at:
 
 It was cut from an "svn export" of the tag at:
 
-    https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version
+    https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-incubating-$full_rc_version
 
 Please vote on releasing this candidate as Apache Lucy (incubating) version
 $x_y_z_version.  The vote will be held open for at least the next 72 hours.
@@ -222,7 +222,7 @@ Incubator PMC are binding; the vote passes if there are at least three binding
 +1 votes and more +1 votes than -1 votes. 
 
 Should this vote pass, a ratifying vote of the Incubator PMC will be held on
-general\@incubator.a.o.  Any votes cast by Incubator PMC members here will be
+general\@lucy.a.o.  Any votes cast by Incubator PMC members here will be
 carried forward into that vote.
 
 For suggestions as to how to evaluate Apache Lucy release candidates, and for
@@ -242,7 +242,7 @@ Thanks!
 END_LUCY_DEV_VOTE
 
 say qq|#######################################################################|;
-say qq|# Boilerplate VOTE email for general\@incubator.a.o|;
+say qq|# Boilerplate VOTE email for general\@lucy.a.o|;
 say qq|# Suggested subject:|;
 say qq|#|;
 say qq|#    [VOTE] Apache Lucy (incubating) $x_y_z_version RC $rc|;
@@ -268,7 +268,7 @@ This candidate was assembled according to the process documented at:
 
 It was cut from an "svn export" of the tag at:
 
-    https://svn.apache.org/repos/asf/incubator/lucy/tags/apache-lucy-incubating-$full_rc_version
+    https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-incubating-$full_rc_version
 
 For suggestions as to how to evaluate Apache Lucy release candidates, and for
 information on ASF voting procedures, see:
@@ -314,26 +314,15 @@ The Apache Lucy search engine library provides full-text search for dynamic
 programming languages.  For a list of issues resolved in this version, please
 see the release notes:
 
-  http://www.apache.org/dist/incubator/lucy/CHANGES-$x_y_z_version.txt
+  http://www.apache.org/dist/lucy/CHANGES-$x_y_z_version.txt
 
 The most recent release can be obtained from our download page:
 
-  http://incubator.apache.org/lucy/download.html
+  http://lucy.apache.org/download.html
 
 For general information on Apache Lucy, please visit the project website:
 
-  http://incubator.apache.org/lucy/
-
-Disclaimer:
-
-  Apache Lucy is an effort undergoing incubation at The Apache Software
-  Foundation (ASF), sponsored by the Apache Incubator. Incubation is required
-  of all newly accepted projects until a further review indicates that the 
-  infrastructure, communications, and decision making process have stabilized
-  in a manner consistent with other successful ASF projects.  While incubation
-  status is not necessarily a reflection of the completeness or stability of
-  the code, it does indicate that the project has yet to be fully endorsed by
-  the ASF.
+  http://lucy.apache.org/
 
 Regards, 
 

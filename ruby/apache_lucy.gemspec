@@ -3,8 +3,8 @@ Gem::Specification.new do |spec|
   spec.version     = '0.3.0'
   spec.summary     = "Full text search engine library."
   spec.author      = "Apache Lucy project"
-  spec.email       = 'lucy-dev@incubator.apache.org'
+  spec.email       = 'dev@lucy.apache.org'
   spec.files       = ["lib/apache_lucy.rb"]
-  spec.homepage    = 'http://incubator.apache.org/lucy'
+  spec.homepage    = 'http://lucy.apache.org'
 end
 
