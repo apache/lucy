@@ -12,14 +12,14 @@ MAKE A PLAN:
   the public API, send a note to the Lucy developer's list describing your
   plans:
 
-    http://incubator.apache.org/lucy/mailing_lists.html
+    http://lucy.apache.org/mailing_lists.html
   
 GET THE CODE:
 
   Lucy's codebase is housed in a Subversion repository.  Run this command to
   check out the mainline:
 
-    svn co http://svn.apache.org/repos/asf/incubator/lucy/trunk lucy
+    svn co http://svn.apache.org/repos/asf/lucy/trunk lucy
 
   If you prefer Git, we maintain read-only mirrors of our codebase on
   git.apache.org.

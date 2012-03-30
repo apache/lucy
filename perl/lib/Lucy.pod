@@ -213,7 +213,7 @@ always be either a L<Lucy::Object::Err> object or undef.
 =head1 SUPPORT
 
 The Apache Lucy homepage, where you'll find links to our mailing lists and so
-on, is L<http://incubator.apache.org/lucy>.  Please direct support questions
+on, is L<http://lucy.apache.org>.  Please direct support questions
 to the Lucy users mailing list.
 
 =head1 BUGS
@@ -225,17 +225,6 @@ Some exceptions leak memory.
 If you find a bug, please inquire on the Lucy users mailing list about it,
 then report it on the Lucy issue tracker once it has been confirmed:
 L<https://issues.apache.org/jira/browse/LUCY>.
-
-=head1 DISCLAIMER
-
-Apache Lucy is an effort undergoing incubation at The Apache Software
-Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of
-all newly accepted projects until a further review indicates that the
-infrastructure, communications, and decision making process have stabilized in
-a manner consistent with other successful ASF projects. While incubation
-status is not necessarily a reflection of the completeness or stability of the
-code, it does indicate that the project has yet to be fully endorsed by the
-ASF.
 
 =head1 COPYRIGHT
 

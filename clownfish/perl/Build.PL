@@ -24,7 +24,7 @@ my $builder = Clownfish::CFC::Build->new(
     module_name => 'Clownfish::CFC',
     license     => 'apache',
     dist_author =>
-        'The Apache Lucy Project <lucy-dev at incubator dot apache dot org>',
+        'The Apache Lucy Project <dev at lucy dot apache dot org>',
     dist_version_from => 'lib/Clownfish/CFC.pm',
     build_requires    => {
         'ExtUtils::CBuilder' => 0.18,
