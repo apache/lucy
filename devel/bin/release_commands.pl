@@ -99,16 +99,16 @@ say qq|ssh $apache_id\@people.apache.org|;
 say qq|mkdir public_html/apache-lucy-$full_rc_version|;
 say qq|exit|;
 say qq|scp -p apache-lucy-$x_y_z_version.tar.gz* |
- . qq|people.apache.org:~/public_html/apache-lucy-$full_rc_version|;
+ . qq|$apache_id\@people.apache.org:~/public_html/apache-lucy-$full_rc_version|;
 say qq|scp -p CHANGES-$x_y_z_version.txt |
- . qq|people.apache.org:~/public_html/apache-lucy-$full_rc_version\n|;
+ . qq|$apache_id\@people.apache.org:~/public_html/apache-lucy-$full_rc_version\n|;
 
 say qq|# Modify permissions.|;
 say qq|ssh $apache_id\@people.apache.org|;
 say qq|cd public_html/apache-lucy-$full_rc_version/|;
 say qq|find . -type f -exec chmod 664 {} \\;|;
 say qq|find . -type d -exec chmod 775 {} \\;|;
-say qq|chgrp -R incubator *\n|;
+say qq|chgrp -R lucy *\n|;
 
 say qq|# Perform whatever QC seems prudent on the tarball, installing it|;
 say qq|# on test systems, etc.|;
@@ -119,20 +119,12 @@ say qq|# Voting|;
 say qq|#######################################################################\n|;
 
 say qq|# Call a release vote on the dev list, referring to the artifacts|;
-say qq|# made public in the previous step and using the first of the two|;
-say qq|# boilerplate emails below.|;
-say qq|[...]\n|;
-
-say qq|# Once the PPMC vote has passed, call a release vote on the Incubator|;
-say qq|# general@ list, using the second of the boilerplate emails below.|;
-say qq|# Each release requires at least 3 Incubator PMC votes to pass; even |;
-say qq|# if we get those three +1 votes from our Mentors during the PPMC|;
-say qq|# vote thread on the dev list, we need to give the rest of the|;
-say qq|# Incubator PMC 72 hours to vote.|;
+say qq|# made public in the previous step and using the boilerplate email|;
+say qq|# below.|;
 say qq|[...]\n|;
 
 say qq|#######################################################################|;
-say qq|# After both Lucy PPMC and Incubator PMC votes have passed...|;
+say qq|# After the vote has passed...|;
 say qq|#######################################################################\n|;
 
 say qq|# Tag the release.|;
@@ -178,7 +170,6 @@ say qq|# Send emails announcing the release to:|;
 say qq|#|;
 say qq|#     * The user list.|;
 say qq|#     * The dev list.|;
-say qq|#     * The Incubator general@ list.|;
 say qq|#     * The announce\@a.o list.  Be sure to send from your apache.org|;
 say qq|#       address|;
 say qq|#|;
@@ -190,15 +181,14 @@ say qq|#######################################################################|;
 say qq|# Boilerplate VOTE email for dev\@lucy.a.o|;
 say qq|# Suggested subject:|;
 say qq|#|;
-say qq|#    [VOTE] Apache Lucy (incubating) $x_y_z_version RC $rc|;
+say qq|#    [VOTE] Apache Lucy $x_y_z_version RC $rc|;
 say qq|#|;
 say qq|#######################################################################\n|;
 
 say <<END_LUCY_DEV_VOTE;
 Hello,
 
-Release candidate $rc for Apache Lucy (incubating) version $x_y_z_version can
-be found at:
+Release candidate $rc for Apache Lucy version $x_y_z_version can be found at:
 
     http://people.apache.org/~$apache_id/apache-lucy-$full_rc_version/
 
@@ -213,17 +203,13 @@ It was cut from an "svn export" of the tag at:
 
     https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version
 
-Please vote on releasing this candidate as Apache Lucy (incubating) version
-$x_y_z_version.  The vote will be held open for at least the next 72 hours.
+Please vote on releasing this candidate as Apache Lucy version $x_y_z_version.
+The vote will be held open for at least the next 72 hours.
 
 All interested parties are welcome to inspect the release candidate and
-express approval or disapproval.  Votes from members of the Lucy PPMC and/or
-Incubator PMC are binding; the vote passes if there are at least three binding
-+1 votes and more +1 votes than -1 votes. 
-
-Should this vote pass, a ratifying vote of the Incubator PMC will be held on
-general\@lucy.a.o.  Any votes cast by Incubator PMC members here will be
-carried forward into that vote.
+express approval or disapproval.  Votes from members of the Lucy PMC are
+binding; the vote passes if there are at least three binding +1 votes and more
++1 votes than -1 votes. 
 
 For suggestions as to how to evaluate Apache Lucy release candidates, and for
 information on ASF voting procedures, see:
@@ -232,9 +218,9 @@ information on ASF voting procedures, see:
     http://wiki.apache.org/lucy/ReleasePrep
     http://www.apache.org/foundation/voting.html
 
-[ ] +1 Release RC $rc as Apache Lucy (incubating) version $x_y_z_version.
+[ ] +1 Release RC $rc as Apache Lucy version $x_y_z_version.
 [ ] +0
-[ ] -1 Do not release RC $rc as Apache Lucy (incubating) version $x_y_z_version because...
+[ ] -1 Do not release RC $rc as Apache Lucy version $x_y_z_version because...
 
 Here's my +1.
 
@@ -242,73 +228,17 @@ Thanks!
 END_LUCY_DEV_VOTE
 
 say qq|#######################################################################|;
-say qq|# Boilerplate VOTE email for general\@lucy.a.o|;
-say qq|# Suggested subject:|;
-say qq|#|;
-say qq|#    [VOTE] Apache Lucy (incubating) $x_y_z_version RC $rc|;
-say qq|#|;
-say qq|# NOTE -- YOU MUST FILL IN THE LINK TO THE LUCY PPMC VOTE THREAD AND|;
-say qq|#         THE VOTE TALLIES FOR INCUBATOR PMC MEMBERS!!!|;
-say qq|#######################################################################\n|;
-
-say <<END_GENERAL_AT_INCUBATOR_VOTE;
-Hello,
-
-Release candidate $rc for Apache Lucy (incubating) version $x_y_z_version can
-be found at:
-
-    http://people.apache.org/~$apache_id/apache-lucy-$full_rc_version/
-
-See the CHANGES file at the top level of the archive for information about the
-content of this release.
-
-This candidate was assembled according to the process documented at:
-
-    http://wiki.apache.org/lucy/ReleaseGuide
-
-It was cut from an "svn export" of the tag at:
-
-    https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version
-
-For suggestions as to how to evaluate Apache Lucy release candidates, and for
-information on ASF voting procedures, see:
-
-    http://wiki.apache.org/lucy/ReleaseVerification
-    http://wiki.apache.org/lucy/ReleasePrep
-    http://www.apache.org/foundation/voting.html
-
-Apache Lucy PPMC vote thread:
-
-    ###LINK_TO_LUCY_PPMC_VOTE_THREAD###
-
-    ###PPMC_VOTE_TALLY###
-
-    * indicates Lucy PPMC member
-    + indicates Incubator PMC member
-
-Please vote on releasing this candidate as Apache Lucy (incubating) version
-$x_y_z_version.  The vote will be held open for at least the next 72 hours.
-
-[ ] +1 Release RC $rc as Apache Lucy (incubating) version $x_y_z_version.
-[ ] +0
-[ ] -1 Do not release RC $rc as Apache Lucy (incubating) version $x_y_z_version because...
-
-Thanks!
-END_GENERAL_AT_INCUBATOR_VOTE
-
-say qq|#######################################################################|;
 say qq|# Boilerplate ANNOUNCE email|;
 say qq|# Suggested subject:|;
 say qq|#|;
-say qq|#    [ANNOUNCE] Apache Lucy (incubating) $x_y_z_version released|;
+say qq|#    [ANNOUNCE] Apache Lucy $x_y_z_version released|;
 say qq|#|;
 say qq|#######################################################################\n|;
 
 say <<END_ANNOUNCE_EMAIL;
 Greetings,
 
-The Apache Lucy team is pleased to announce the release of version $x_y_z_version
-from the Apache Incubator!
+The Apache Lucy team is pleased to announce the release of version $x_y_z_version!
 
 The Apache Lucy search engine library provides full-text search for dynamic
 programming languages.  For a list of issues resolved in this version, please
