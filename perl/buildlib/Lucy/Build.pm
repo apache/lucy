@@ -21,43 +21,6 @@ use lib '../clownfish/perl/blib/lib';
 use lib 'clownfish/perl/blib/arch';
 use lib 'clownfish/perl/blib/lib';
 
-package Lucy::Build::CBuilder;
-BEGIN { our @ISA = "ExtUtils::CBuilder"; }
-use Config;
-our $VERSION = '0.003000';
-$VERSION = eval $VERSION;
-
-my %cc;
-
-sub new {
-    my ( $class, %args ) = @_;
-    require ExtUtils::CBuilder;
-    my $self = $class->SUPER::new(%args);
-    $cc{"$self"} = $args{'config'}->{'cc'};
-    return $self;
-}
-
-sub get_cc { $cc{"$_[0]"} }
-
-sub DESTROY {
-    my $self = shift;
-    delete $cc{"$self"};
-}
-
-# This method isn't implemented by CBuilder for Windows, so we issue a basic
-# link command that works on at least one system and hope for the best.
-sub link_executable {
-    my ( $self, %args ) = @_;
-    if ( $self->get_cc eq 'cl' ) {
-        my ( $objects, $exe_file ) = @args{qw( objects exe_file )};
-        $self->do_system("link /out:$exe_file @$objects");
-        return $exe_file;
-    }
-    else {
-        return $self->SUPER::link_executable(%args);
-    }
-}
-
 package Lucy::Build;
 use base qw( Module::Build );
 our $VERSION = 0.003000;
@@ -526,9 +489,10 @@ sub ACTION_compile_custom_xs {
     $self->dispatch('ppport');
     $self->dispatch('parsers');
 
+    require ExtUtils::CBuilder;
     require ExtUtils::ParseXS;
 
-    my $cbuilder = Lucy::Build::CBuilder->new( config => $self->config );
+    my $cbuilder = ExtUtils::CBuilder->new( config => $self->config );
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'Lucy', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
