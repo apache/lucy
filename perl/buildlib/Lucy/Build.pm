@@ -32,11 +32,6 @@ my %cc;
 sub new {
     my ( $class, %args ) = @_;
     require ExtUtils::CBuilder;
-    if ( $ENV{LUCY_VALGRIND} ) {
-        $args{config} ||= {};
-        $args{config}{optimize} ||= $Config{optimize};
-        $args{config}{optimize} =~ s/\-O\d+/-O1/g;
-    }
     my $self = $class->SUPER::new(%args);
     $cc{"$self"} = $args{'config'}->{'cc'};
     return $self;
@@ -143,7 +138,17 @@ my $XS_FILEPATH      = catfile( $LIB_DIR, "Lucy.xs" );
 my $AUTOGEN_INC_DIR    = catfile( 'autogen', 'include' );
 my $AUTOGEN_SOURCE_DIR = catfile( 'autogen', 'source' );
 
-sub new { shift->SUPER::new( recursive_test_files => 1, @_ ) }
+sub new {
+    my $self = shift->SUPER::new( recursive_test_files => 1, @_ );
+
+    if ( $ENV{LUCY_VALGRIND} ) {
+        my $optimize = $self->config('optimize') || '';
+        $optimize =~ s/\-O\d+/-O1/g;
+        $self->config( optimize => $optimize );
+    }
+
+    return $self;
+}
 
 sub _run_make {
     my ( $self, %params ) = @_;
