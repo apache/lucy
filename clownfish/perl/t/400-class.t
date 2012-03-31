@@ -69,11 +69,15 @@ ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
 is( $foo_jr->get_struct_sym,  'FooJr',       "struct_sym" );
 is( $foo_jr->full_struct_sym, 'neato_FooJr', "full_struct_sym" );
 
+my $file_spec = Clownfish::CFC::Model::FileSpec->new(
+    source_dir  => '.',
+    path_part   => 'Foo/FooJr',
+);
 my $final_foo = Clownfish::CFC::Model::Class->create(
     parcel            => 'Neato',
     class_name        => 'Foo::FooJr::FinalFoo',
     parent_class_name => 'Foo::FooJr',
-    path_part         => 'Foo/FooJr',
+    file_spec         => $file_spec,
     final             => 1,
 );
 $final_foo->add_attribute( dumpable => 1 );

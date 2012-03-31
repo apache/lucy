@@ -20,6 +20,7 @@
 #include "CFCDocuComment.h"
 #include "CFCDumpable.h"
 #include "CFCFile.h"
+#include "CFCFileSpec.h"
 #include "CFCFunction.h"
 #include "CFCHierarchy.h"
 #include "CFCMethod.h"

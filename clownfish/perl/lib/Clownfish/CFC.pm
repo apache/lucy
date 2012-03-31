@@ -114,14 +114,13 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     );
 
     our %create_PARAMS = (
-        path_part         => undef,
+        file_spec         => undef,
         class_name        => undef,
         cnick             => undef,
         parent_class_name => undef,
         docucomment       => undef,
         inert             => undef,
         final             => undef,
-        included          => undef,
         parcel            => undef,
         exposure          => 'parcel',
     );
@@ -159,7 +158,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         return _create(
             @args{
                 qw( parcel exposure class_name cnick micro_sym docucomment
-                    path_part parent_class_name final inert included)
+                    file_spec parent_class_name final inert)
                 }
         );
     }
@@ -181,10 +180,26 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     use Clownfish::CFC::Util qw( verify_args );
     use Carp;
 
+    our %new_PARAMS = ( spec => undef );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        return _new( $args{spec} );
+    }
+}
+
+{
+    package Clownfish::CFC::Model::FileSpec;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
+    use Carp;
+
     our %new_PARAMS = (
         source_dir  => undef,
         path_part   => undef,
-        is_included => undef,
+        is_included => 0,
     );
 
     sub new {

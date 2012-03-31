@@ -30,20 +30,16 @@ extern "C" {
 typedef struct CFCFile CFCFile;
 struct CFCBase;
 struct CFCClass;
+struct CFCFileSpec;
 
 /**
- * @param path_part - The path of the file, relative to the source directory
- * and excluding the .cfh extension. Should be "Foo/Bar" if the source file
- * is found at 'Foo/Bar.cfh' within the source directory. That implies that
- * the output C header file should be 'Foo/Bar.h' within the target include
- * directory.
- * @param source_dir The source directory in which the file was found.
+ * @param spec - A CFCFileSpec object describing the file
 */
 CFCFile*
-CFCFile_new(const char *source_dir, const char *path_part);
+CFCFile_new(struct CFCFileSpec *spec);
 
 CFCFile*
-CFCFile_init(CFCFile *self, const char *source_dir, const char *path_part);
+CFCFile_init(CFCFile *self, struct CFCFileSpec *spec);
 
 void
 CFCFile_destroy(CFCFile *self);
@@ -99,10 +95,13 @@ int
 CFCFile_get_modified(CFCFile *self);
 
 const char*
-CFCFile_get_path_part(CFCFile *self);
+CFCFile_get_source_dir(CFCFile *self);
 
 const char*
-CFCFile_get_source_dir(CFCFile *self);
+CFCFile_get_path_part(CFCFile *self);
+
+int
+CFCFile_included(CFCFile *self);
 
 /** Return a string used for an include guard in a C header (e.g.
  * "H_CRUSTACEAN_LOBSTER"), unique per file.

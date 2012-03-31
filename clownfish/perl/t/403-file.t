@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 use Clownfish::CFC::Model::File;
 use Clownfish::CFC::Parser;
@@ -32,11 +32,17 @@ my $class_content      = qq|
 |;
 my $c_block = "__C__\nint foo;\n__END_C__\n";
 
+my $file_spec = Clownfish::CFC::Model::FileSpec->new(
+    source_dir  => '.',
+    path_part   => 'Stuff/Thing',
+);
 my $file
     = $parser->_parse_file( "$parcel_declaration\n$class_content\n$c_block",
-    '.', 'Stuff/Thing', 0 );
+    $file_spec );
 
+is( $file->get_source_dir, ".", "get_source_dir" );
 is( $file->get_path_part, "Stuff/Thing", "get_path_part" );
+ok( !$file->included, "included" );
 
 my $guard_name = $file->guard_name;
 is( $guard_name, "H_STUFF_THING", "guard_name" );
@@ -68,7 +74,7 @@ isa_ok( $blocks->[0], "Clownfish::CFC::Model::Parcel" );
 isa_ok( $blocks->[1], "Clownfish::CFC::Model::Class" );
 isa_ok( $blocks->[2], "Clownfish::CFC::Model::CBlock" );
 
-$file = $parser->_parse_file( $class_content, '.', 'Stuff/Thing', 0 );
+$file = $parser->_parse_file( $class_content, $file_spec );
 ($class) = @{ $file->classes };
 ( $foo, $bar ) = @{ $class->member_vars };
 is( $foo->get_type->get_specifier, 'Foo', 'file production resets parcel' );

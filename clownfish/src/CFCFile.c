@@ -26,6 +26,7 @@
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCFile.h"
+#include "CFCFileSpec.h"
 #include "CFCUtil.h"
 #include "CFCClass.h"
 
@@ -33,9 +34,8 @@ struct CFCFile {
     CFCBase base;
     CFCBase **blocks;
     CFCClass **classes;
+    CFCFileSpec *spec;
     int modified;
-    char *source_dir;
-    char *path_part;
     char *guard_name;
     char *guard_start;
     char *guard_close;
@@ -48,24 +48,23 @@ const static CFCMeta CFCFILE_META = {
 };
 
 CFCFile*
-CFCFile_new(const char *source_dir, const char *path_part) {
+CFCFile_new(CFCFileSpec *spec) {
 
     CFCFile *self = (CFCFile*)CFCBase_allocate(&CFCFILE_META);
-    return CFCFile_init(self, source_dir, path_part);
+    return CFCFile_init(self, spec);
 }
 
 CFCFile*
-CFCFile_init(CFCFile *self, const char *source_dir, const char *path_part) {
-    CFCUTIL_NULL_CHECK(source_dir);
-    CFCUTIL_NULL_CHECK(path_part);
+CFCFile_init(CFCFile *self, CFCFileSpec *spec) {
+    CFCUTIL_NULL_CHECK(spec);
     self->modified   = false;
-    self->source_dir = CFCUtil_strdup(source_dir);
-    self->path_part  = CFCUtil_strdup(path_part);
+    self->spec       = (CFCFileSpec*)CFCBase_incref((CFCBase*)spec);
     self->blocks     = (CFCBase**)CALLOCATE(1, sizeof(CFCBase*));
     self->classes    = (CFCClass**)CALLOCATE(1, sizeof(CFCBase*));
 
     // Derive include guard name, plus C code for opening and closing the
     // guard.
+    const char *path_part = CFCFileSpec_get_path_part(self->spec);
     size_t len = strlen(path_part);
     self->guard_name = (char*)MALLOCATE(len + sizeof("H_") + 1);
     self->guard_start = (char*)MALLOCATE(len * 2 + 40);
@@ -102,8 +101,7 @@ CFCFile_destroy(CFCFile *self) {
     FREEMEM(self->guard_name);
     FREEMEM(self->guard_start);
     FREEMEM(self->guard_close);
-    FREEMEM(self->source_dir);
-    FREEMEM(self->path_part);
+    CFCBase_decref((CFCBase*)self->spec);
     CFCBase_destroy((CFCBase*)self);
 }
 
@@ -157,12 +155,13 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
         CFCUtil_die("Need buf_size of %lu, but got %lu",
                     (unsigned long)needed, (unsigned long)buf_size);
     }
+    const char *path_part = CFCFileSpec_get_path_part(self->spec);
     if (base_dir) {
-        sprintf(buf, "%s" CFCUTIL_PATH_SEP "%s%s", base_dir, self->path_part,
+        sprintf(buf, "%s" CFCUTIL_PATH_SEP "%s%s", base_dir, path_part,
                 ext);
     }
     else {
-        sprintf(buf, "%s%s", self->path_part, ext);
+        sprintf(buf, "%s%s", path_part, ext);
     }
     for (size_t i = 0; buf[i] != '\0'; i++) {
         #ifdef _WIN32
@@ -175,7 +174,8 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
 
 size_t
 CFCFile_path_buf_size(CFCFile *self, const char *base_dir) {
-    size_t size = strlen(self->path_part);
+    const char *path_part = CFCFileSpec_get_path_part(self->spec);
+    size_t size = strlen(path_part);
     size += 4; // Max extension length.
     size += 1; // NULL-termination.
     if (base_dir) {
@@ -225,12 +225,17 @@ CFCFile_get_modified(CFCFile *self) {
 
 const char*
 CFCFile_get_source_dir(CFCFile *self) {
-    return self->source_dir;
+    return CFCFileSpec_get_source_dir(self->spec);
 }
 
 const char*
 CFCFile_get_path_part(CFCFile *self) {
-    return self->path_part;
+    return CFCFileSpec_get_path_part(self->spec);
+}
+
+int
+CFCFile_included(CFCFile *self) {
+    return CFCFileSpec_included(self->spec);
 }
 
 const char*

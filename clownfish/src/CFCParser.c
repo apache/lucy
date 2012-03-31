@@ -22,6 +22,7 @@
 #include "CFCParser.h"
 #include "CFCParcel.h"
 #include "CFCFile.h"
+#include "CFCFileSpec.h"
 #include "CFCUtil.h"
 #include "CFCMemPool.h"
 #include "CFCLexHeader.h"
@@ -39,9 +40,7 @@ struct CFCParser {
     int errors;
     char *class_name;
     char *class_cnick;
-    char *source_dir;
-    char *path_part;
-    int is_included;
+    CFCFileSpec *file_spec;
     CFCMemPool *pool;
     CFCParcel  *parcel;
 };
@@ -68,9 +67,7 @@ CFCParser_init(CFCParser *self) {
     self->errors       = false;
     self->class_name   = NULL;
     self->class_cnick  = NULL;
-    self->source_dir   = NULL;
-    self->path_part    = NULL;
-    self->is_included  = 0;
+    self->file_spec    = NULL;
     self->pool         = NULL;
     self->parcel       = NULL;
     return self;
@@ -81,6 +78,7 @@ CFCParser_destroy(CFCParser *self) {
     CFCParseHeaderFree(self->header_parser, free);
     FREEMEM(self->class_name);
     FREEMEM(self->class_cnick);
+    CFCBase_decref((CFCBase*)self->file_spec);
     CFCBase_decref((CFCBase*)self->pool);
     CFCBase_decref(self->result);
     CFCBase_decref((CFCBase*)self->parcel);
@@ -119,19 +117,12 @@ CFCParser_parse(CFCParser *self, const char *string) {
 
 CFCFile*
 CFCParser_parse_file(CFCParser *self, const char *string,
-                     const char *source_dir, const char *path_part,
-                     int is_included) {
+                     CFCFileSpec *file_spec) {
     CFCParser_set_parcel(self, NULL);
-    self->source_dir   = CFCUtil_strdup(source_dir);
-    self->path_part    = CFCUtil_strdup(path_part);
-    self->is_included  = is_included;
+    CFCParser_set_file_spec(self, file_spec);
     CFCParseHeader(self->header_parser, CFC_TOKENTYPE_FILE_START, NULL, self);
     CFCFile *result = (CFCFile*)CFCParser_parse(self, string);
-    FREEMEM(self->path_part);
-    FREEMEM(self->source_dir);
-    self->source_dir  = NULL;
-    self->path_part   = NULL;
-    self->is_included = 0;
+    CFCParser_set_file_spec(self, NULL);
     return result;
 }
 
@@ -204,23 +195,13 @@ CFCParser_get_class_cnick(CFCParser *self) {
 }
 
 void
-CFCParser_set_path_part(CFCParser *self, const char *path_part) {
-    FREEMEM(self->path_part);
-    self->path_part = CFCUtil_strdup(path_part);
+CFCParser_set_file_spec(CFCParser *self, CFCFileSpec *file_spec) {
+    CFCBase_decref((CFCBase*)self->file_spec);
+    self->file_spec = (CFCFileSpec*)CFCBase_incref((CFCBase*)file_spec);
 }
 
-const char*
-CFCParser_get_path_part(CFCParser *self) {
-    return self->path_part;
-}
-
-const char*
-CFCParser_get_source_dir(CFCParser *self) {
-    return self->source_dir;
-}
-
-int
-CFCParser_included(CFCParser *self) {
-    return self->is_included;
+CFCFileSpec*
+CFCParser_get_file_spec(CFCParser *self) {
+    return self->file_spec;
 }
 

@@ -123,18 +123,17 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Class
 
 SV*
-_create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, path_part_sv, parent_class_name_sv, is_final, is_inert, is_included)
+_create(parcel, exposure_sv, class_name_sv, cnick_sv, micro_sym_sv, docucomment, file_spec, parent_class_name_sv, is_final, is_inert)
     CFCParcel *parcel;
     SV *exposure_sv;
     SV *class_name_sv;
     SV *cnick_sv;
     SV *micro_sym_sv;
     CFCDocuComment *docucomment;
-    SV *path_part_sv;
+    CFCFileSpec *file_spec;
     SV *parent_class_name_sv;
     bool is_final;
     bool is_inert;
-    bool is_included;
 CODE:
     const char *exposure =
         SvOK(exposure_sv) ? SvPV_nolen(exposure_sv) : NULL;
@@ -144,14 +143,11 @@ CODE:
         SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
     const char *micro_sym =
         SvOK(micro_sym_sv) ? SvPV_nolen(micro_sym_sv) : NULL;
-    const char *path_part =
-        SvOK(path_part_sv) ? SvPV_nolen(path_part_sv) : NULL;
     const char *parent_class_name =
         SvOK(parent_class_name_sv) ? SvPV_nolen(parent_class_name_sv) : NULL;
     CFCClass *self = CFCClass_create(parcel, exposure, class_name, cnick,
-                                     micro_sym, docucomment, path_part,
-                                     parent_class_name, is_final, is_inert,
-                                     is_included);
+                                     micro_sym, docucomment, file_spec,
+                                     parent_class_name, is_final, is_inert);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -515,11 +511,10 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::File
 
 SV*
-_new(source_dir, path_part)
-    const char *source_dir;
-    const char *path_part;
+_new(spec)
+    CFCFileSpec *spec;
 CODE:
-    CFCFile *self = CFCFile_new(source_dir, path_part);
+    CFCFile *self = CFCFile_new(spec);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -543,6 +538,8 @@ ALIAS:
     guard_close        = 10
     blocks             = 12
     classes            = 14
+    get_source_dir     = 16
+    included           = 18
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -579,6 +576,14 @@ PPCODE:
             retval = S_array_of_cfcbase_to_av(
                          (CFCBase**)CFCFile_classes(self));
             break;
+        case 16: {
+                const char *value = CFCFile_get_source_dir(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 18:
+            retval = newSViv(CFCFile_included(self));
+            break;
     END_SET_OR_GET_SWITCH
 }
 
@@ -612,6 +617,46 @@ CODE:
     SvCUR_set(RETVAL, strlen(buf));
 }
 OUTPUT: RETVAL
+
+
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::FileSpec
+
+SV*
+_new(source_dir, path_part, is_included)
+    const char *source_dir;
+    const char *path_part;
+    bool is_included;
+CODE:
+    CFCFileSpec *self = CFCFileSpec_new(source_dir, path_part, is_included);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_set_or_get(self, ...)
+    CFCFileSpec *self;
+ALIAS:
+    get_source_dir     = 2
+    get_path_part      = 4
+    included           = 6
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: {
+                const char *value = CFCFileSpec_get_source_dir(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 4: {
+                const char *value = CFCFileSpec_get_path_part(self);
+                retval = newSVpv(value, strlen(value));
+            }
+            break;
+        case 6:
+            retval = newSViv(CFCFileSpec_included(self));
+            break;
+    END_SET_OR_GET_SWITCH
+}
 
 
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Function
@@ -2290,15 +2335,12 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_parse_file(self, string, source_dir, path_part, included)
-    CFCParser  *self;
-    const char *string;
-    const char *source_dir;
-    const char *path_part;
-    bool included;
+_parse_file(self, string, file_spec)
+    CFCParser   *self;
+    const char  *string;
+    CFCFileSpec *file_spec;
 CODE:
-    CFCFile *got = CFCParser_parse_file(self, string, source_dir, path_part,
-                                        included);
+    CFCFile *got = CFCParser_parse_file(self, string, file_spec);
     RETVAL = S_cfcbase_to_perlref(got);
     CFCBase_decref((CFCBase*)got);
 OUTPUT: RETVAL

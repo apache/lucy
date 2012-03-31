@@ -34,6 +34,7 @@ struct CFCDocuComment;
 struct CFCFunction;
 struct CFCMethod;
 struct CFCVariable;
+struct CFCFileSpec;
 
 /** Create and register a quasi-singleton.  May only be called once for each
  * unique parcel/class_name combination.
@@ -45,32 +46,28 @@ struct CFCVariable;
  * @param micro_sym Defaults to "class".
  * @param docucomment An optional Clownfish::CFC::Model::DocuComment attached
  * to this class.
- * @param path_part - The path of the file in which this class was declared,
- * relative to the source directory and excluding the .cfh extension. Should
- * be "Foo/Bar" if the class is defined in <code>Foo/Bar.cfh</code>.
- * @param parent_class_name - The name of this class's parent class.  Needed
- * in order to establish the class hierarchy.
+ * @param file_spec - Clownfish::CFC::Model::FileSpec of the file in which
+ * this class was declared
  * @param docucomment A Clownfish::CFC::Model::DocuComment describing this
  * Class.
  * @param is_inert Should be true if the class is inert, i.e. cannot be
  * instantiated.
  * @param is_final Should be true if the class is final.
- * @param is_included Should be true if the class is from an include dir.
  */
 CFCClass*
 CFCClass_create(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *cnick,
                 const char *micro_sym, struct CFCDocuComment *docucomment,
-                const char *path_part, const char *parent_class_name,
-                int is_final, int is_inert, int is_included);
+                struct CFCFileSpec *file_spec, const char *parent_class_name,
+                int is_final, int is_inert);
 
 CFCClass*
 CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
                    const char *exposure, const char *class_name,
                    const char *cnick, const char *micro_sym,
                    struct CFCDocuComment *docucomment,
-                   const char *path_part, const char *parent_class_name,
-                   int is_final, int is_inert, int is_included);
+                   struct CFCFileSpec *file_spec, const char *parent_class_name,
+                   int is_final, int is_inert);
 
 void
 CFCClass_destroy(CFCClass *self);
@@ -222,6 +219,9 @@ CFCClass_get_autocode(CFCClass *self);
 const char*
 CFCClass_get_path_part(CFCClass *self);
 
+int
+CFCClass_included(CFCClass *self);
+
 const char*
 CFCClass_get_parent_class_name(CFCClass *self);
 
@@ -230,9 +230,6 @@ CFCClass_final(CFCClass *self);
 
 int
 CFCClass_inert(CFCClass *self);
-
-int
-CFCClass_included(CFCClass *self);
 
 const char*
 CFCClass_get_struct_sym(CFCClass *self);

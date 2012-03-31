@@ -31,6 +31,7 @@
 #include "CFCHierarchy.h"
 #include "CFCClass.h"
 #include "CFCFile.h"
+#include "CFCFileSpec.h"
 #include "CFCSymbol.h"
 #include "CFCUtil.h"
 #include "CFCParser.h"
@@ -263,12 +264,13 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
         memcpy(path_part, src, path_part_len);
         path_part[path_part_len] = '\0';
 
+        CFCFileSpec *file_spec = CFCFileSpec_new(source_dir, path_part,
+                                                 is_included);
+
         // Slurp, parse, add parsed file to pool.
         size_t unused;
         char *content = CFCUtil_slurp_text(source_path, &unused);
-        CFCFile *file = CFCParser_parse_file(self->parser, content,
-                                             source_dir, path_part,
-                                             is_included);
+        CFCFile *file = CFCParser_parse_file(self->parser, content, file_spec);
         FREEMEM(content);
         if (!file) {
             CFCUtil_die("parser error for %s", source_path);
@@ -287,6 +289,7 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
                 = (CFCClass*)CFCBase_incref((CFCBase*)classes_in_file[j]);
         }
         CFCBase_decref((CFCBase*)file);
+        CFCBase_decref((CFCBase*)file_spec);
     }
     self->classes[self->num_classes] = NULL;
 

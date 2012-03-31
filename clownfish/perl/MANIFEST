@@ -20,6 +20,7 @@ lib/Clownfish/CFC/Model/Class.pm
 lib/Clownfish/CFC/Model/DocuComment.pm
 lib/Clownfish/CFC/Dumpable.pm
 lib/Clownfish/CFC/Model/File.pm
+lib/Clownfish/CFC/Model/FileSpec.pm
 lib/Clownfish/CFC/Model/Function.pm
 lib/Clownfish/CFC/Model/Hierarchy.pm
 lib/Clownfish/CFC/Model/Method.pm
