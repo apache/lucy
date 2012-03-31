@@ -45,9 +45,9 @@ struct CFCVariable;
  * @param micro_sym Defaults to "class".
  * @param docucomment An optional Clownfish::CFC::Model::DocuComment attached
  * to this class.
- * @param source_class - The name of the class that owns the file in which
- * this class was declared.  Should be "Foo" if "Foo::FooJr" is defined in
- * <code>Foo.cfh</code>.
+ * @param path_part - The path of the file in which this class was declared,
+ * relative to the source directory and excluding the .cfh extension. Should
+ * be "Foo/Bar" if the class is defined in <code>Foo/Bar.cfh</code>.
  * @param parent_class_name - The name of this class's parent class.  Needed
  * in order to establish the class hierarchy.
  * @param docucomment A Clownfish::CFC::Model::DocuComment describing this
@@ -61,7 +61,7 @@ CFCClass*
 CFCClass_create(struct CFCParcel *parcel, const char *exposure,
                 const char *class_name, const char *cnick,
                 const char *micro_sym, struct CFCDocuComment *docucomment,
-                const char *source_class, const char *parent_class_name,
+                const char *path_part, const char *parent_class_name,
                 int is_final, int is_inert, int is_included);
 
 CFCClass*
@@ -69,7 +69,7 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
                    const char *exposure, const char *class_name,
                    const char *cnick, const char *micro_sym,
                    struct CFCDocuComment *docucomment,
-                   const char *source_class, const char *parent_class_name,
+                   const char *path_part, const char *parent_class_name,
                    int is_final, int is_inert, int is_included);
 
 void
@@ -220,7 +220,7 @@ const char*
 CFCClass_get_autocode(CFCClass *self);
 
 const char*
-CFCClass_get_source_class(CFCClass *self);
+CFCClass_get_path_part(CFCClass *self);
 
 const char*
 CFCClass_get_parent_class_name(CFCClass *self);

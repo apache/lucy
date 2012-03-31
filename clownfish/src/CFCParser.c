@@ -39,8 +39,8 @@ struct CFCParser {
     int errors;
     char *class_name;
     char *class_cnick;
-    char *source_class;
     char *source_dir;
+    char *path_part;
     int is_included;
     CFCMemPool *pool;
     CFCParcel  *parcel;
@@ -68,7 +68,9 @@ CFCParser_init(CFCParser *self) {
     self->errors       = false;
     self->class_name   = NULL;
     self->class_cnick  = NULL;
-    self->source_class = NULL;
+    self->source_dir   = NULL;
+    self->path_part    = NULL;
+    self->is_included  = 0;
     self->pool         = NULL;
     self->parcel       = NULL;
     return self;
@@ -117,18 +119,19 @@ CFCParser_parse(CFCParser *self, const char *string) {
 
 CFCFile*
 CFCParser_parse_file(CFCParser *self, const char *string,
-                     const char *source_class, const char *source_dir,
+                     const char *source_dir, const char *path_part,
                      int is_included) {
     CFCParser_set_parcel(self, NULL);
-    self->source_class = CFCUtil_strdup(source_class);
     self->source_dir   = CFCUtil_strdup(source_dir);
+    self->path_part    = CFCUtil_strdup(path_part);
     self->is_included  = is_included;
     CFCParseHeader(self->header_parser, CFC_TOKENTYPE_FILE_START, NULL, self);
     CFCFile *result = (CFCFile*)CFCParser_parse(self, string);
-    FREEMEM(self->source_class);
+    FREEMEM(self->path_part);
     FREEMEM(self->source_dir);
-    self->source_class = NULL;
-    self->source_dir = NULL;
+    self->source_dir  = NULL;
+    self->path_part   = NULL;
+    self->is_included = 0;
     return result;
 }
 
@@ -201,19 +204,14 @@ CFCParser_get_class_cnick(CFCParser *self) {
 }
 
 void
-CFCParser_set_source_class(CFCParser *self, const char *source_class) {
-    FREEMEM(self->source_class);
-    if (source_class) {
-        self->source_class = CFCUtil_strdup(source_class);
-    }
-    else {
-        self->source_class = NULL;
-    }
+CFCParser_set_path_part(CFCParser *self, const char *path_part) {
+    FREEMEM(self->path_part);
+    self->path_part = CFCUtil_strdup(path_part);
 }
 
 const char*
-CFCParser_get_source_class(CFCParser *self) {
-    return self->source_class;
+CFCParser_get_path_part(CFCParser *self) {
+    return self->path_part;
 }
 
 const char*

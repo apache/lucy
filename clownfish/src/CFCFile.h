@@ -32,18 +32,18 @@ struct CFCBase;
 struct CFCClass;
 
 /**
- * @param source_class The class name associated with the source file,
- * regardless of how what classes are defined in the source file. Example: If
- * source_class is "Foo::Bar", that implies that the source file could be
- * found at 'Foo/Bar.cfh' within the source directory and that the output C
- * header file should be 'Foo/Bar.h' within the target include directory.
+ * @param path_part - The path of the file, relative to the source directory
+ * and excluding the .cfh extension. Should be "Foo/Bar" if the source file
+ * is found at 'Foo/Bar.cfh' within the source directory. That implies that
+ * the output C header file should be 'Foo/Bar.h' within the target include
+ * directory.
  * @param source_dir The source directory in which the file was found.
 */
 CFCFile*
-CFCFile_new(const char *source_class, const char *source_dir);
+CFCFile_new(const char *source_dir, const char *path_part);
 
 CFCFile*
-CFCFile_init(CFCFile *self, const char *source_class, const char *source_dir);
+CFCFile_init(CFCFile *self, const char *source_dir, const char *path_part);
 
 void
 CFCFile_destroy(CFCFile *self);
@@ -62,7 +62,7 @@ size_t
 CFCFile_path_buf_size(CFCFile *self, const char *base_dir);
 
 /** Given a base directory, return a path name derived from the File's
- * source_class with a ".c" extension.
+ * path_part with a ".c" extension.
  */
 void
 CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size,
@@ -99,7 +99,7 @@ int
 CFCFile_get_modified(CFCFile *self);
 
 const char*
-CFCFile_get_source_class(CFCFile *self);
+CFCFile_get_path_part(CFCFile *self);
 
 const char*
 CFCFile_get_source_dir(CFCFile *self);

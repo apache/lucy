@@ -34,12 +34,11 @@ struct CFCFile {
     CFCBase **blocks;
     CFCClass **classes;
     int modified;
-    char *source_class;
     char *source_dir;
+    char *path_part;
     char *guard_name;
     char *guard_start;
     char *guard_close;
-    char *path_part;
 };
 
 const static CFCMeta CFCFILE_META = {
@@ -49,57 +48,43 @@ const static CFCMeta CFCFILE_META = {
 };
 
 CFCFile*
-CFCFile_new(const char *source_class, const char *source_dir) {
+CFCFile_new(const char *source_dir, const char *path_part) {
 
     CFCFile *self = (CFCFile*)CFCBase_allocate(&CFCFILE_META);
-    return CFCFile_init(self, source_class, source_dir);
+    return CFCFile_init(self, source_dir, path_part);
 }
 
 CFCFile*
-CFCFile_init(CFCFile *self, const char *source_class, const char *source_dir) {
-    CFCUTIL_NULL_CHECK(source_class);
-    self->modified = false;
-    self->source_class = CFCUtil_strdup(source_class);
-    self->source_dir   = CFCUtil_strdup(source_dir);
-    self->blocks = (CFCBase**)CALLOCATE(1, sizeof(CFCBase*));
-    self->classes = (CFCClass**)CALLOCATE(1, sizeof(CFCBase*));
+CFCFile_init(CFCFile *self, const char *source_dir, const char *path_part) {
+    CFCUTIL_NULL_CHECK(source_dir);
+    CFCUTIL_NULL_CHECK(path_part);
+    self->modified   = false;
+    self->source_dir = CFCUtil_strdup(source_dir);
+    self->path_part  = CFCUtil_strdup(path_part);
+    self->blocks     = (CFCBase**)CALLOCATE(1, sizeof(CFCBase*));
+    self->classes    = (CFCClass**)CALLOCATE(1, sizeof(CFCBase*));
 
     // Derive include guard name, plus C code for opening and closing the
     // guard.
-    size_t len = strlen(source_class);
+    size_t len = strlen(path_part);
     self->guard_name = (char*)MALLOCATE(len + sizeof("H_") + 1);
     self->guard_start = (char*)MALLOCATE(len * 2 + 40);
     self->guard_close = (char*)MALLOCATE(len + 20);
     memcpy(self->guard_name, "H_", 2);
     size_t i, j;
-    for (i = 0, j = 2; i < len; i++, j++) {
-        char c = source_class[i];
-        if (c == ':') {
-            self->guard_name[j] = '_';
-            i++;
+    for (i = 0, j = 2; i < len; i++) {
+        char c = path_part[i];
+        if (c == CFCUTIL_PATH_SEP_CHAR) {
+            self->guard_name[j++] = '_';
         }
-        else {
-            self->guard_name[j] = toupper(c);
+        else if (isalnum(c)) {
+            self->guard_name[j++] = toupper(c);
         }
     }
     self->guard_name[j] = '\0';
     sprintf(self->guard_start, "#ifndef %s\n#define %s 1\n", self->guard_name,
             self->guard_name);
     sprintf(self->guard_close, "#endif /* %s */\n", self->guard_name);
-
-    // Cache partial path derived from source_class.
-    self->path_part = (char*)MALLOCATE(len + 1);
-    for (i = 0, j = 0; i < len; i++, j++) {
-        char c = source_class[i];
-        if (c == ':') {
-            self->path_part[j] = CFCUTIL_PATH_SEP_CHAR;
-            i++;
-        }
-        else {
-            self->path_part[j] = c;
-        }
-    }
-    self->path_part[j] = '\0';
 
     return self;
 }
@@ -117,7 +102,6 @@ CFCFile_destroy(CFCFile *self) {
     FREEMEM(self->guard_name);
     FREEMEM(self->guard_start);
     FREEMEM(self->guard_close);
-    FREEMEM(self->source_class);
     FREEMEM(self->source_dir);
     FREEMEM(self->path_part);
     CFCBase_destroy((CFCBase*)self);
@@ -240,13 +224,13 @@ CFCFile_get_modified(CFCFile *self) {
 }
 
 const char*
-CFCFile_get_source_class(CFCFile *self) {
-    return self->source_class;
+CFCFile_get_source_dir(CFCFile *self) {
+    return self->source_dir;
 }
 
 const char*
-CFCFile_get_source_dir(CFCFile *self) {
-    return self->source_dir;
+CFCFile_get_path_part(CFCFile *self) {
+    return self->path_part;
 }
 
 const char*

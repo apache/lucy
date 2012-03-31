@@ -36,7 +36,7 @@ static CFCClass*
 S_start_class(CFCParser *state, CFCDocuComment *docucomment, char *exposure,
               char *declaration_modifier_list, char *class_name,
               char *class_cnick, char *inheritance) {
-    const char *source_class = CFCParser_get_source_class(state);
+    const char *path_part = CFCParser_get_path_part(state);
     int is_final = false;
     int is_inert = false;
     if (declaration_modifier_list) {
@@ -48,7 +48,7 @@ S_start_class(CFCParser *state, CFCDocuComment *docucomment, char *exposure,
     CFCParser_set_class_cnick(state, class_cnick);
     CFCClass *klass = CFCClass_create(CFCParser_get_parcel(state), exposure,
                                       class_name, class_cnick, NULL,
-                                      docucomment, source_class, inheritance,
+                                      docucomment, path_part, inheritance,
                                       is_final, is_inert, is_included);
     CFCBase_decref((CFCBase*)docucomment);
     return klass;
@@ -296,8 +296,8 @@ result ::= file(A).
 
 file(A) ::= FILE_START. /* Pseudo token, not passed by lexer. */
 {
-    A = CFCFile_new(CFCParser_get_source_class(state),
-                    CFCParser_get_source_dir(state));
+    A = CFCFile_new(CFCParser_get_source_dir(state),
+                    CFCParser_get_path_part(state));
 }
 file(A) ::= file(B) major_block(C).
 {

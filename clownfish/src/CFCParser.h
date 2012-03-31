@@ -50,7 +50,7 @@ CFCParser_parse(CFCParser *self, const char *string);
 
 struct CFCFile*
 CFCParser_parse_file(CFCParser *self, const char *string,
-                     const char *source_class, const char *source_dir,
+                     const char *source_dir, const char *path_part,
                      int is_included);
 
 char*
@@ -90,10 +90,10 @@ const char*
 CFCParser_get_class_cnick(CFCParser *self);
 
 void
-CFCParser_set_source_class(CFCParser *self, const char *source_class);
+CFCParser_set_path_part(CFCParser *self, const char *path_part);
 
 const char*
-CFCParser_get_source_class(CFCParser *self);
+CFCParser_get_path_part(CFCParser *self);
 
 const char*
 CFCParser_get_source_dir(CFCParser *self);

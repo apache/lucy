@@ -70,7 +70,7 @@ static void
 S_add_tree(CFCHierarchy *self, CFCClass *klass);
 
 static CFCFile*
-S_fetch_file(CFCHierarchy *self, const char *source_class);
+S_fetch_file(CFCHierarchy *self, const char *path_part);
 
 // Recursive helper function for CFCUtil_propagate_modified.
 static int
@@ -236,8 +236,8 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
     char **all_source_paths = (char**)CALLOCATE(1, sizeof(char*));
     all_source_paths = S_find_cfh(source_dir, all_source_paths, 0);
     size_t source_dir_len  = strlen(source_dir);
-    char *source_class = NULL;
-    size_t source_class_max = 0;
+    char *path_part = NULL;
+    size_t path_part_max = 0;
 
     // Process any file that has at least one class declaration.
     for (int i = 0; all_source_paths[i] != NULL; i++) {
@@ -248,30 +248,26 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
             CFCUtil_die("'%s' doesn't start with '%s'", source_path,
                         source_dir);
         }
-        size_t source_class_len = 0;
-        if (source_class_max < source_path_len * 2 + 1) {
-            source_class_max = source_path_len * 2 + 1;
-            source_class = (char*)REALLOCATE(source_class, source_class_max);
+        size_t path_part_len = source_path_len
+                               - source_dir_len
+                               - strlen(".cfh");
+        if (path_part_max < path_part_len + 1) {
+            path_part_max = path_part_len + 1;
+            path_part = (char*)REALLOCATE(path_part, path_part_max);
         }
-        for (size_t j = source_dir_len; j < source_path_len - strlen(".cfh"); j++) {
-            char c = source_path[j];
-            if (isalnum(c)) {
-                source_class[source_class_len++] = c;
-            }
-            else {
-                if (source_class_len != 0) {
-                    source_class[source_class_len++] = ':';
-                    source_class[source_class_len++] = ':';
-                }
-            }
+        const char *src = source_path + source_dir_len;
+        while (*src == CFCUTIL_PATH_SEP_CHAR) {
+            ++src;
+            --path_part_len;
         }
-        source_class[source_class_len] = '\0';
+        memcpy(path_part, src, path_part_len);
+        path_part[path_part_len] = '\0';
 
         // Slurp, parse, add parsed file to pool.
         size_t unused;
         char *content = CFCUtil_slurp_text(source_path, &unused);
         CFCFile *file = CFCParser_parse_file(self->parser, content,
-                                             source_class, source_dir,
+                                             source_dir, path_part,
                                              is_included);
         FREEMEM(content);
         if (!file) {
@@ -298,7 +294,7 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
         FREEMEM(all_source_paths[i]);
     }
     FREEMEM(all_source_paths);
-    FREEMEM(source_class);
+    FREEMEM(path_part);
 }
 
 static void
@@ -347,9 +343,12 @@ CFCHierarchy_propagate_modified(CFCHierarchy *self, int modified) {
 
 int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
-    const char *source_class = CFCClass_get_source_class(klass);
-    CFCFile *file = S_fetch_file(self, source_class);
+    const char *path_part = CFCClass_get_path_part(klass);
+    CFCUTIL_NULL_CHECK(path_part);
+    CFCFile *file = S_fetch_file(self, path_part);
+    CFCUTIL_NULL_CHECK(file);
     const char *source_dir = CFCFile_get_source_dir(file);
+    CFCUTIL_NULL_CHECK(source_dir);
     size_t cfh_buf_size = CFCFile_path_buf_size(file, source_dir);
     char *source_path = (char*)MALLOCATE(cfh_buf_size);
     CFCFile_cfh_path(file, source_path, cfh_buf_size, source_dir);
@@ -426,10 +425,10 @@ CFCHierarchy_ordered_classes(CFCHierarchy *self) {
 }
 
 static CFCFile*
-S_fetch_file(CFCHierarchy *self, const char *source_class) {
+S_fetch_file(CFCHierarchy *self, const char *path_part) {
     for (size_t i = 0; self->files[i] != NULL; i++) {
-        const char *existing = CFCFile_get_source_class(self->files[i]);
-        if (strcmp(source_class, existing) == 0) {
+        const char *existing = CFCFile_get_path_part(self->files[i]);
+        if (strcmp(path_part, existing) == 0) {
             return self->files[i];
         }
     }
@@ -439,14 +438,14 @@ S_fetch_file(CFCHierarchy *self, const char *source_class) {
 static void
 S_add_file(CFCHierarchy *self, CFCFile *file) {
     CFCUTIL_NULL_CHECK(file);
-    const char *source_class = CFCFile_get_source_class(file);
+    const char *path_part = CFCFile_get_path_part(file);
     CFCClass **classes = CFCFile_classes(file);
     for (size_t i = 0; self->files[i] != NULL; i++) {
         CFCFile *existing = self->files[i];
-        const char *old_source_class = CFCFile_get_source_class(existing);
-        if (strcmp(source_class, old_source_class) == 0) {
-            CFCUtil_die("File for source class %s already registered",
-                        source_class);
+        const char *old_path_part = CFCFile_get_path_part(existing);
+        if (strcmp(path_part, old_path_part) == 0) {
+            CFCUtil_die("File %s.cfh already registered",
+                        path_part);
         }
         CFCClass **existing_classes = CFCFile_classes(existing);
         for (size_t j = 0; classes[j] != NULL; j++) {

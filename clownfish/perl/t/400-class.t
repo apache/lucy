@@ -73,12 +73,12 @@ my $final_foo = Clownfish::CFC::Model::Class->create(
     parcel            => 'Neato',
     class_name        => 'Foo::FooJr::FinalFoo',
     parent_class_name => 'Foo::FooJr',
-    source_class      => 'Foo::FooJr',
+    path_part         => 'Foo/FooJr',
     final             => 1,
 );
 $final_foo->add_attribute( dumpable => 1 );
 ok( $final_foo->final, "final" );
-is( $final_foo->include_h, 'Foo/FooJr.h', "inlude_h uses source_class" );
+is( $final_foo->include_h, 'Foo/FooJr.h', "inlude_h uses path_part" );
 is( $final_foo->get_parent_class_name, 'Foo::FooJr',
     "get_parent_class_name" );
 

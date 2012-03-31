@@ -122,7 +122,7 @@ my $file_clash  = 't/cfclash/file';
 
     eval { $hierarchy->build; };
 
-    like( $@, qr/File for source class Animal::Dog already registered/, "source/source filename clash" );
+    like( $@, qr/File Animal\/Dog.cfh already registered/, "source/source filename clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
 }
