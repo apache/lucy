@@ -523,9 +523,7 @@ sub ACTION_compile_custom_xs {
 
     require ExtUtils::ParseXS;
 
-    my $cbuilder
-        = Lucy::Build::CBuilder->new( config => { cc => $self->config('cc') },
-        );
+    my $cbuilder = Lucy::Build::CBuilder->new( config => $self->config );
     my $archdir = catdir( $self->blib, 'arch', 'auto', 'Lucy', );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
     my @include_dirs = (
