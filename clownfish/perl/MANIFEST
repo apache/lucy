@@ -51,10 +51,11 @@ t/202-overridden_method.t
 t/203-final_method.t
 t/300-variable.t
 t/301-param_list.t
-t/400-class.t
-t/401-c_block.t
-t/402-parcel.t
-t/403-file.t
+t/400-file_spec.t
+t/401-class.t
+t/402-c_block.t
+t/403-parcel.t
+t/404-file.t
 t/500-hierarchy.t
 t/600-parser.t
 t/cfsource/Animal.cfh
