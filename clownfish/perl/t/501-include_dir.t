@@ -127,25 +127,20 @@ my $file_clash  = 't/cfclash/file';
     Clownfish::CFC::Model::Class->_clear_registry();
 }
 
-SKIP: {
-    skip( "source/include class name clash not yet implemented", 1 );
-
+{
     my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
 
     $hierarchy->add_source_dir($source);
     $hierarchy->add_include_dir($class_clash);
 
-    $hierarchy->build;
+    eval { $hierarchy->build; };
 
-    my $classes = $hierarchy->ordered_classes;
-    is( scalar @$classes, 3, "source/include  class name clash" );
+    like( $@, qr/Conflict with existing class Animal::Dog/, "source/include class name clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
 }
 
-SKIP: {
-    skip( "source/include filename clash not yet implemented", 1 );
-
+{
     my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
 
     $hierarchy->add_source_dir($source);

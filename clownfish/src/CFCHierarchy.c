@@ -264,6 +264,22 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
         memcpy(path_part, src, path_part_len);
         path_part[path_part_len] = '\0';
 
+        // Make sure path_part is unique
+        CFCFile *existing = S_fetch_file(self, path_part);
+        if (existing) {
+            if (is_included && !CFCFile_included(existing)) {
+                // Allow filename clash between source and include dirs
+                CFCUtil_warn("Warning: File %s.cfh from source dir takes "
+                             "precedence over file from include dir",
+                             path_part);
+                // Ignore file
+                continue;
+            }
+            else {
+                CFCUtil_die("File %s.cfh already registered", path_part);
+            }
+        }
+
         CFCFileSpec *file_spec = CFCFileSpec_new(source_dir, path_part,
                                                  is_included);
 
@@ -441,15 +457,9 @@ S_fetch_file(CFCHierarchy *self, const char *path_part) {
 static void
 S_add_file(CFCHierarchy *self, CFCFile *file) {
     CFCUTIL_NULL_CHECK(file);
-    const char *path_part = CFCFile_get_path_part(file);
     CFCClass **classes = CFCFile_classes(file);
     for (size_t i = 0; self->files[i] != NULL; i++) {
         CFCFile *existing = self->files[i];
-        const char *old_path_part = CFCFile_get_path_part(existing);
-        if (strcmp(path_part, old_path_part) == 0) {
-            CFCUtil_die("File %s.cfh already registered",
-                        path_part);
-        }
         CFCClass **existing_classes = CFCFile_classes(existing);
         for (size_t j = 0; classes[j] != NULL; j++) {
             const char *new_class_name = CFCClass_get_class_name(classes[j]);
