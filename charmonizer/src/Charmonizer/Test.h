@@ -49,11 +49,7 @@ chaz_Test_init(void);
 chaz_TestBatch*
 chaz_Test_new_batch(unsigned num_tests);
 
-/* Note: maybe add line numbers later.
- */
 #define CHAZ_TEST_PLAN              chaz_Test_plan
-#define CHAZ_TEST_TEST_STR_EQ       chaz_Test_test_str_eq
-
 void
 chaz_Test_plan(chaz_TestBatch *batch);
 
