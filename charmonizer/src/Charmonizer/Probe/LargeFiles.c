@@ -66,22 +66,22 @@ static unbuff_combo unbuff_combos[] = {
 
 /* Check for a 64-bit file pointer type.
  */
-static const chaz_bool_t
+static const int
 S_probe_off64(void);
 
 /* Check what name 64-bit ftell, fseek go by.
  */
-static chaz_bool_t
+static int
 S_probe_stdio64(stdio64_combo *combo);
 
 /* Check for a 64-bit lseek.
  */
-static chaz_bool_t
+static int
 S_probe_lseek(unbuff_combo *combo);
 
 /* Check for a 64-bit pread.
  */
-static chaz_bool_t
+static int
 S_probe_pread64(unbuff_combo *combo);
 
 /* Vars for holding lfs commands, once they're discovered. */
@@ -94,10 +94,10 @@ static char off64_type[10];
 
 void
 LargeFiles_run(void) {
-    chaz_bool_t found_off64_t = false;
-    chaz_bool_t found_stdio64 = false;
-    chaz_bool_t found_lseek = false;
-    chaz_bool_t found_pread64 = false;
+    int found_off64_t = false;
+    int found_stdio64 = false;
+    int found_lseek   = false;
+    int found_pread64 = false;
     unsigned i;
     const char *stat_includes = "#include <stdio.h>\n#include <sys/stat.h>";
 
@@ -218,17 +218,17 @@ static const char off64_code[] =
     QUOTE(      return 0;                             )
     QUOTE(  }                                         );
 
-static const chaz_bool_t
+static const int
 S_probe_off64(void) {
     size_t needed = sizeof(off64_code) + 100;
     char *code_buf = (char*)malloc(needed);
     int i;
-    chaz_bool_t success = false;
+    int success = false;
     for (i = 0; i < NUM_OFF64_OPTIONS; i++) {
         const char *candidate = off64_options[i];
         char *output;
         size_t output_len;
-        chaz_bool_t has_sys_types_h = HeadCheck_check_header("sys/types.h");
+        int has_sys_types_h = HeadCheck_check_header("sys/types.h");
         const char *sys_types_include = has_sys_types_h
                                         ? "#include <sys/types.h>"
                                         : "";
@@ -267,7 +267,7 @@ static const char stdio64_code[] =
     QUOTE(  }                                          );
 
 
-static chaz_bool_t
+static int
 S_probe_stdio64(stdio64_combo *combo) {
     char *output = NULL;
     size_t output_len;
@@ -278,7 +278,7 @@ S_probe_stdio64(stdio64_combo *combo) {
                     + strlen(combo->fseek_command)
                     + 20;
     char *code_buf = (char*)malloc(needed);
-    chaz_bool_t success = false;
+    int success = false;
 
     /* Prepare the source code. */
     sprintf(code_buf, stdio64_code, combo->includes, off64_type,
@@ -317,7 +317,7 @@ static const char lseek_code[] =
     QUOTE(      return 0;                                             )
     QUOTE(  }                                                         );
 
-static chaz_bool_t
+static int
 S_probe_lseek(unbuff_combo *combo) {
     char *output = NULL;
     size_t output_len;
@@ -326,7 +326,7 @@ S_probe_lseek(unbuff_combo *combo) {
                     + strlen(combo->lseek_command)
                     + 20;
     char *code_buf = (char*)malloc(needed);
-    chaz_bool_t success = false;
+    int success = false;
 
     /* Verify compilation. */
     sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
@@ -358,7 +358,7 @@ static const char pread64_code[] =
     QUOTE(      return 0;                          )
     QUOTE(  }                                      );
 
-static chaz_bool_t
+static int
 S_probe_pread64(unbuff_combo *combo) {
     char *output = NULL;
     size_t output_len;
@@ -367,7 +367,7 @@ S_probe_pread64(unbuff_combo *combo) {
                     + strlen(combo->pread64_command)
                     + 20;
     char *code_buf = (char*)malloc(needed);
-    chaz_bool_t success = false;
+    int success = false;
 
     /* Verify compilation. */
     sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);

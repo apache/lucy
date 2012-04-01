@@ -23,8 +23,6 @@
 extern "C" {
 #endif
 
-typedef int chaz_bool_t;
-
 #ifndef true
   #define true 1
   #define false 0

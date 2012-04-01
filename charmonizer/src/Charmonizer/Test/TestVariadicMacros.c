@@ -24,7 +24,7 @@
 static void
 S_run_tests(void) {
     char buf[10];
-    chaz_bool_t really_has_var_macs = false;
+    int really_has_var_macs = false;
 
 #if defined(HAS_ISO_VARIADIC_MACROS) || defined(HAS_GNUC_VARIADIC_MACROS)
   #ifdef HAS_VARIADIC_MACROS

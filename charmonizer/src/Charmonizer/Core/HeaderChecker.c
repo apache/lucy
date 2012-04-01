@@ -25,7 +25,7 @@
 
 typedef struct Header {
     const char  *name;
-    chaz_bool_t  exists;
+    int  exists;
 } Header;
 
 /* "hello_world.c" without the hello or the world. */
@@ -57,7 +57,7 @@ S_add_to_cache(Header *header);
  * checks if header exists in array first.
  */
 static void
-S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists);
+S_maybe_add_to_cache(const char *header_name, int exists);
 
 void
 HeadCheck_init(void) {
@@ -71,7 +71,7 @@ HeadCheck_init(void) {
     cache_size = 1;
 }
 
-chaz_bool_t
+int
 HeadCheck_check_header(const char *header_name) {
     Header  *header;
     Header   key;
@@ -96,9 +96,9 @@ HeadCheck_check_header(const char *header_name) {
     return header->exists;
 }
 
-chaz_bool_t
+int
 HeadCheck_check_many_headers(const char **header_names) {
-    chaz_bool_t success;
+    int success;
     int i;
     char *code_buf = Util_strdup("");
     size_t needed = sizeof(test_code) + 20;
@@ -134,7 +134,7 @@ static const char contains_code[] =
     QUOTE(  %s                                            )
     QUOTE(  int main() { return offsetof(%s, %s); }       );
 
-chaz_bool_t
+int
 HeadCheck_contains_member(const char *struct_name, const char *member,
                           const char *includes) {
     long needed = sizeof(contains_code)
@@ -143,7 +143,7 @@ HeadCheck_contains_member(const char *struct_name, const char *member,
                   + strlen(includes)
                   + 10;
     char *buf = (char*)malloc(needed);
-    chaz_bool_t retval;
+    int retval;
     sprintf(buf, contains_code, includes, struct_name, member);
     retval = CC_test_compile(buf, strlen(buf));
     free(buf);
@@ -191,7 +191,7 @@ S_add_to_cache(Header *header) {
 }
 
 static void
-S_maybe_add_to_cache(const char *header_name, chaz_bool_t exists) {
+S_maybe_add_to_cache(const char *header_name, int exists) {
     Header *header;
     Header  key;
     Header *fake = &key;

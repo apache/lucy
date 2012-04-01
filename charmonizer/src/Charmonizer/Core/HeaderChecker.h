@@ -34,18 +34,18 @@ chaz_HeadCheck_init(void);
 /* Check for a particular header and return true if it's available.  The
  * test-compile is only run the first time a given request is made.
  */
-chaz_bool_t
+int
 chaz_HeadCheck_check_header(const char *header_name);
 
 /* Attempt to compile a file which pulls in all the headers specified by name
  * in a null-terminated array.  If the compile succeeds, add them all to the
  * internal register and return true.
  */
-chaz_bool_t
+int
 chaz_HeadCheck_check_many_headers(const char **header_names);
 
 /* Return true if the member is present in the struct. */
-chaz_bool_t
+int
 chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
                                const char *includes);
 

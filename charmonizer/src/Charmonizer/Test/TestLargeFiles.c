@@ -45,18 +45,18 @@
 
 /* Determine whether we can use sparse files.
  */
-static chaz_bool_t
+static int 
 S_check_sparse_files(void);
 
 /* Helper for check_sparse_files().
  */
-static chaz_bool_t
+static int
 S_test_sparse_file(long offset, struct stat *st);
 
 /* See if trying to write a 5 GB file in a subprocess bombs out.  If it
  * doesn't, then the test suite can safely verify large file support.
  */
-static chaz_bool_t
+static int
 S_can_create_big_files(void);
 
 #endif /* criteria for defining STAT_TESTS_ENABLED */
@@ -196,7 +196,7 @@ S_run_tests(void) {
 
 #ifdef STAT_TESTS_ENABLED
 
-static chaz_bool_t
+static int
 S_check_sparse_files(void) {
     struct stat st_a, st_b;
 
@@ -211,10 +211,10 @@ S_check_sparse_files(void) {
     return st_a.st_blocks == st_b.st_blocks ? true : false;
 }
 
-static chaz_bool_t
+static int
 S_test_sparse_file(long offset, struct stat *st) {
     FILE *sparse_fh;
-    chaz_bool_t result = false;
+    int result = false;
 
     /* Make sure the file's not there, then open. */
     remove("_charm_sparse");
@@ -239,9 +239,9 @@ S_test_sparse_file(long offset, struct stat *st) {
     return true;
 }
 
-static chaz_bool_t
+static int
 S_can_create_big_files(void) {
-    chy_bool_t result = 0;
+    int result = 0;
     FILE *fh = fopen64("_charm_large_file_test", "w+");
     if (!fh) {
         return false;

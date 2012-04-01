@@ -59,7 +59,7 @@ static const char rmdir_code[] =
     QUOTE(      return 0;                                          )
     QUOTE(  }                                                      );
 
-static chaz_bool_t
+static int
 S_compile_posix_mkdir(const char *header) {
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
@@ -83,7 +83,7 @@ S_compile_posix_mkdir(const char *header) {
     return mkdir_available;
 }
 
-static chaz_bool_t
+static int
 S_compile_win_mkdir(void) {
     mkdir_available = CC_test_compile(win_mkdir_code, strlen(win_mkdir_code));
     if (mkdir_available) {
@@ -102,7 +102,7 @@ S_try_mkdir(void) {
     if (S_compile_posix_mkdir("sys/stat.h")) { return; }
 }
 
-static chaz_bool_t
+static int
 S_compile_rmdir(const char *header) {
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
@@ -129,11 +129,11 @@ void
 DirManip_run(void) {
     FILE *f;
     char dir_sep[3];
-    chaz_bool_t remove_zaps_dirs = false;
-    chaz_bool_t has_dirent_h = HeadCheck_check_header("dirent.h");
-    chaz_bool_t has_direct_h = HeadCheck_check_header("direct.h");
-    chaz_bool_t has_dirent_d_namlen = false;
-    chaz_bool_t has_dirent_d_type   = false;
+    int remove_zaps_dirs = false;
+    int has_dirent_h = HeadCheck_check_header("dirent.h");
+    int has_direct_h = HeadCheck_check_header("direct.h");
+    int has_dirent_d_namlen = false;
+    int has_dirent_d_type   = false;
 
     ConfWriter_start_module("DirManip");
     S_try_mkdir();

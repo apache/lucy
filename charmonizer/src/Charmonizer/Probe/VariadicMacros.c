@@ -49,9 +49,9 @@ void
 VariadicMacros_run(void) {
     char *output;
     size_t output_len;
-    chaz_bool_t has_varmacros      = false;
-    chaz_bool_t has_iso_varmacros  = false;
-    chaz_bool_t has_gnuc_varmacros = false;
+    int has_varmacros      = false;
+    int has_iso_varmacros  = false;
+    int has_gnuc_varmacros = false;
 
     ConfWriter_start_module("VariadicMacros");
 

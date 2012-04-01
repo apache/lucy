@@ -38,10 +38,10 @@ static const char osatomic_casptr_code[] =
 
 void
 AtomicOps_run(void) {
-    chaz_bool_t  has_libkern_osatomic_h = false;
-    chaz_bool_t  has_osatomic_cas_ptr   = false;
-    chaz_bool_t  has_sys_atomic_h       = false;
-    chaz_bool_t  has_intrin_h           = false;
+    int has_libkern_osatomic_h = false;
+    int has_osatomic_cas_ptr   = false;
+    int has_sys_atomic_h       = false;
+    int has_intrin_h           = false;
 
     ConfWriter_start_module("AtomicOps");
 

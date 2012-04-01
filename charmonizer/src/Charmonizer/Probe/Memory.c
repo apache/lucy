@@ -34,13 +34,13 @@ static const char alloca_code[] =
 
 void
 Memory_run(void) {
-    chaz_bool_t has_sys_mman_h = false;
-    chaz_bool_t has_alloca_h   = false;
-    chaz_bool_t has_malloc_h   = false;
-    chaz_bool_t need_stdlib_h  = false;
-    chaz_bool_t has_alloca     = false;
-    chaz_bool_t has_builtin_alloca    = false;
-    chaz_bool_t has_underscore_alloca = false;
+    int has_sys_mman_h = false;
+    int has_alloca_h   = false;
+    int has_malloc_h   = false;
+    int need_stdlib_h  = false;
+    int has_alloca     = false;
+    int has_builtin_alloca    = false;
+    int has_underscore_alloca = false;
     char code_buf[sizeof(alloca_code) + 100];
 
     ConfWriter_start_module("Memory");

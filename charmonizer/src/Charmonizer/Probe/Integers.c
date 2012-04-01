@@ -27,7 +27,7 @@
 
 /* Determine endian-ness of this machine.
  */
-static chaz_bool_t
+static int
 S_machine_is_big_endian(void);
 
 static const char sizes_code[] =
@@ -73,14 +73,14 @@ Integers_run(void) {
     int sizeof_long       = -1;
     int sizeof_long_long  = -1;
     int sizeof___int64    = -1;
-    chaz_bool_t has_8     = false;
-    chaz_bool_t has_16    = false;
-    chaz_bool_t has_32    = false;
-    chaz_bool_t has_64    = false;
-    chaz_bool_t has_long_long = false;
-    chaz_bool_t has___int64   = false;
-    chaz_bool_t has_inttypes  = HeadCheck_check_header("inttypes.h");
-    chaz_bool_t has_stdint    = HeadCheck_check_header("stdint.h");
+    int has_8             = false;
+    int has_16            = false;
+    int has_32            = false;
+    int has_64            = false;
+    int has_long_long     = false;
+    int has___int64       = false;
+    int has_inttypes      = HeadCheck_check_header("inttypes.h");
+    int has_stdint        = HeadCheck_check_header("stdint.h");
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -470,7 +470,7 @@ Integers_run(void) {
     ConfWriter_end_module();
 }
 
-static chaz_bool_t
+static int
 S_machine_is_big_endian(void) {
     long one = 1;
     return !(*((char*)(&one)));

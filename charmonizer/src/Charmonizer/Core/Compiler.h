@@ -30,21 +30,21 @@ extern "C" {
 /* Attempt to compile and link an executable.  Return true if the executable
  * file exists after the attempt.
  */
-chaz_bool_t
+int
 chaz_CC_compile_exe(const char *source_path, const char *exe_path,
                     const char *code, size_t code_len);
 
 /* Attempt to compile an object file.  Return true if the object file
  * exists after the attempt.
  */
-chaz_bool_t
+int
 chaz_CC_compile_obj(const char *source_path, const char *obj_path,
                     const char *code, size_t code_len);
 
 /* Attempt to compile the supplied source code and return true if the
  * effort succeeds.
  */
-chaz_bool_t
+int
 chaz_CC_test_compile(const char *source, size_t source_len);
 
 /* Attempt to compile the supplied source code.  If successful, capture the

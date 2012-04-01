@@ -48,8 +48,8 @@ S_probe_dev_null(void);
 static void
 S_build_charm_run(void);
 
-static chaz_bool_t charm_run_initialized = false;
-static chaz_bool_t charm_run_ok = false;
+static int charm_run_initialized = false;
+static int charm_run_ok = false;
 
 void
 OS_init(void) {

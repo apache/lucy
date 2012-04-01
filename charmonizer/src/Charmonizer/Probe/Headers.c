@@ -92,7 +92,7 @@ const char *win_headers[] = {
     NULL
 };
 
-chaz_bool_t
+int
 Headers_check(const char *header_name) {
     return HeadCheck_check_header(header_name);
 }
@@ -100,8 +100,8 @@ Headers_check(const char *header_name) {
 void
 Headers_run(void) {
     int i;
-    chaz_bool_t has_posix = false;
-    chaz_bool_t has_c89   = false;
+    int has_posix = false;
+    int has_c89   = false;
 
     keeper_count = 0;
 

@@ -29,7 +29,7 @@ extern "C" {
 /* Check whether a particular header file is available.  The test-compile is
  * only run the first time a given request is made.
  */
-chaz_bool_t
+int
 chaz_Headers_check(const char *header_name);
 
 /* Run the Headers module.

@@ -126,7 +126,7 @@ S_inc_dir_string(void) {
     return inc_dir_string;
 }
 
-chaz_bool_t
+int
 CC_compile_exe(const char *source_path, const char *exe_name,
                const char *code, size_t code_len) {
     const char *exe_ext        = OS_exe_ext();
@@ -144,7 +144,7 @@ CC_compile_exe(const char *source_path, const char *exe_name,
                                  + strlen(cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
-    chaz_bool_t result;
+    int result;
     (void)code_len; /* Unused. */
 
     /* Write the source file. */
@@ -187,7 +187,7 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     return result;
 }
 
-chaz_bool_t
+int
 CC_compile_obj(const char *source_path, const char *obj_name,
                const char *code, size_t code_len) {
     const char *obj_ext        = OS_obj_ext();
@@ -203,7 +203,7 @@ CC_compile_obj(const char *source_path, const char *obj_name,
                                  + strlen(cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
-    chaz_bool_t result;
+    int result;
     (void)code_len; /* Unused. */
 
     /* Write the source file. */
@@ -234,9 +234,9 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     return result;
 }
 
-chaz_bool_t
+int
 CC_test_compile(const char *source, size_t source_len) {
-    chaz_bool_t compile_succeeded;
+    int compile_succeeded;
     if (!Util_remove_and_verify(try_obj_name)) {
         Util_die("Failed to delete file '%s'", try_obj_name);
     }
@@ -249,7 +249,7 @@ CC_test_compile(const char *source, size_t source_len) {
 char*
 CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
     char *captured_output = NULL;
-    chaz_bool_t compile_succeeded;
+    int compile_succeeded;
 
     /* Clear out previous versions and test to make sure removal worked. */
     if (!Util_remove_and_verify(try_exe_name)) {

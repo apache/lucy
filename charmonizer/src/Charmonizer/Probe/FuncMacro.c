@@ -71,10 +71,10 @@ FuncMacro_run(void) {
     int i;
     char *output;
     size_t output_len;
-    chaz_bool_t has_funcmac      = false;
-    chaz_bool_t has_iso_funcmac  = false;
-    chaz_bool_t has_gnuc_funcmac = false;
-    chaz_bool_t has_inline       = false;
+    int has_funcmac      = false;
+    int has_iso_funcmac  = false;
+    int has_gnuc_funcmac = false;
+    int has_inline       = false;
 
     ConfWriter_start_module("FuncMacro");
 
