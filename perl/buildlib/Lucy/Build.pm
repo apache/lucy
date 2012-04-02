@@ -39,28 +39,6 @@ use Cwd qw( getcwd );
 
 BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 
-sub extra_ccflags {
-    my $self      = shift;
-    my $gcc_flags = '-std=gnu99 -D_GNU_SOURCE ';
-    if ( $Config{osname} =~ /openbsd/i && !$Config{usethreads} ) {
-        $gcc_flags .= '-DLUCY_NOTHREADS ';
-    }
-    if ( defined $ENV{LUCY_VALGRIND} ) {
-        return "$gcc_flags -DLUCY_VALGRIND -fno-inline-functions ";
-    }
-    elsif ( defined $ENV{LUCY_DEBUG} ) {
-        return "$gcc_flags -DLUCY_DEBUG -pedantic -Wall -Wextra "
-            . "-Wno-variadic-macros ";
-    }
-    elsif ( $self->config('gccversion') ) {
-        return $gcc_flags;
-    }
-    elsif ( $self->config('cc') =~ /^cl\b/ ) {
-        # Compile as C++ under MSVC.
-        return '/TP -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS ';
-    }
-}
-
 =for Rationale
 
 When the distribution tarball for the Perl binding of Lucy is built, core/,
@@ -110,6 +88,29 @@ sub new {
         $self->config( optimize => $optimize );
     }
 
+    my $extra_ccflags = $self->extra_compiler_flags;
+    if ( $self->config('gccversion') ) {
+        push @$extra_ccflags, qw( -std=gnu99 -D_GNU_SOURCE );
+        if ( $Config{osname} =~ /openbsd/i && !$Config{usethreads} ) {
+            push @$extra_ccflags, '-DLUCY_NOTHREADS';
+        }
+        if ( defined $ENV{LUCY_VALGRIND} ) {
+            push @$extra_ccflags, qw( -DLUCY_VALGRIND -fno-inline-functions );
+        }
+        elsif ( defined $ENV{LUCY_DEBUG} ) {
+            push @$extra_ccflags, qw(
+                -DLUCY_DEBUG -pedantic -Wall -Wextra -Wno-variadic-macros
+            );
+        }
+    }
+    elsif ( $self->config('cc') =~ /^cl\b/ ) {
+        # Compile as C++ under MSVC.
+        push @$extra_ccflags, qw(
+            /TP -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+        );
+    }
+    $self->extra_compiler_flags(@$extra_ccflags);
+
     return $self;
 }
 
@@ -153,7 +154,10 @@ sub ACTION_charmony {
     $self->add_to_cleanup($CHARMONY_PATH);
 
     # Prepare arguments to charmonize.
-    my $flags = $self->config('ccflags') . ' ' . $self->extra_ccflags;
+    my $flags = join( ' ',
+        $self->config('ccflags'),
+        @{ $self->extra_compiler_flags },
+    );
     $flags =~ s/"/\\"/g;
     my @command = ( $CHARMONIZE_EXE_PATH, $self->config('cc'), $flags );
     if ( $ENV{CHARM_VALGRIND} ) {
@@ -175,7 +179,9 @@ sub ACTION_charmonizer_tests {
     print "Building Charmonizer Tests...\n\n";
     my $flags = join( " ",
         $self->config('ccflags'),
-        $self->extra_ccflags, '-I' . rel2abs( getcwd() ) );
+        @{ $self->extra_compiler_flags },
+        '-I' . rel2abs( getcwd() ),
+    );
     $flags =~ s/"/\\"/g;
     $self->_run_make(
         dir  => $CHARMONIZER_ORIG_DIR,
@@ -521,7 +527,7 @@ sub ACTION_compile_custom_xs {
         $self->add_to_cleanup($ccs_file);
         $cbuilder->compile(
             source               => $c_file,
-            extra_compiler_flags => $self->extra_ccflags,
+            extra_compiler_flags => $self->extra_compiler_flags,
             include_dirs         => \@include_dirs,
             object_file          => $o_file,
         );
@@ -553,7 +559,7 @@ sub ACTION_compile_custom_xs {
     if ( !$self->up_to_date( $perl_binding_c_file, $perl_binding_o_file ) ) {
         $cbuilder->compile(
             source               => $perl_binding_c_file,
-            extra_compiler_flags => $self->extra_ccflags,
+            extra_compiler_flags => $self->extra_compiler_flags,
             include_dirs         => \@include_dirs,
             object_file          => $perl_binding_o_file,
             # 'defines' is an undocumented parameter to compile(), so we
