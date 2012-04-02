@@ -104,9 +104,9 @@ StandardTokenizer_transform_text(StandardTokenizer *self, CharBuf *text) {
 void
 StandardTokenizer_tokenize_str(StandardTokenizer *self, const char *text,
                                size_t len, Inversion *inversion) {
-    if (len >= 1 && (uint8_t)text[len - 1] >= 0xC0
-        ||  len >= 2 && (uint8_t)text[len - 2] >= 0xE0
-        ||  len >= 3 && (uint8_t)text[len - 3] >= 0xF0) {
+    if ((len >= 1 && (uint8_t)text[len - 1] >= 0xC0)
+        ||  (len >= 2 && (uint8_t)text[len - 2] >= 0xE0)
+        ||  (len >= 3 && (uint8_t)text[len - 3] >= 0xF0)) {
         THROW(ERR, "Invalid UTF-8 sequence");
     }
 
@@ -185,8 +185,8 @@ S_parse_word(const char *text, size_t len, lucy_StringIter *iter,
             case WB_MidNumLet:
             case WB_MidLetter:
             case WB_MidNum:
-                if (state == WB_ALetter && wb != WB_MidNum
-                    ||  state == WB_Numeric && wb != WB_MidLetter) {
+                if ((state == WB_ALetter && wb != WB_MidNum)
+                    ||  (state == WB_Numeric && wb != WB_MidLetter)) {
                     wb = S_skip_extend_format(text, len, iter);
                     if (wb == state) { break; }
                 }
