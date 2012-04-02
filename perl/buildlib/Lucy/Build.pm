@@ -111,6 +111,13 @@ sub new {
     }
     $self->extra_compiler_flags(@$extra_ccflags);
 
+    # TODO: use Charmonizer to determine whether pthreads are userland.
+    if ( $Config{osname} =~ /openbsd/i && $Config{usethreads} ) {
+        my $extra_ldflags = $self->extra_linker_flags;
+        push @$extra_ldflags, '-lpthread';
+        $self->extra_linker_flags(@$extra_ldflags);
+    }
+
     return $self;
 }
 
@@ -602,16 +609,11 @@ sub ACTION_compile_custom_xs {
     # .o => .(a|bundle)
     my $lib_file = catfile( $archdir, "Lucy.$Config{dlext}" );
     if ( !$self->up_to_date( [ @objects, $AUTOGEN_DIR ], $lib_file ) ) {
-        # TODO: use Charmonizer to determine whether pthreads are userland.
-        my $link_flags = '';
-        if ( $Config{osname} =~ /openbsd/i && $Config{usethreads} ) {
-            $link_flags = '-lpthread ';
-        }
         $cbuilder->link(
             module_name        => 'Lucy',
             objects            => \@objects,
             lib_file           => $lib_file,
-            extra_linker_flags => $link_flags,
+            extra_linker_flags => $self->extra_linker_flags,
         );
     }
 }
