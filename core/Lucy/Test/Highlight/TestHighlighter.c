@@ -414,8 +414,8 @@ test_Find_Sentences(TestBatch *batch, Searcher *searcher, Obj *query) {
 
     VArray *got = Highlighter_Find_Sentences(highlighter, text, 101, 50);
     VArray *wanted = VA_new(2);
-    VA_push(wanted, (Obj*)Span_new(120, 19, 0.0f));
-    VA_push(wanted, (Obj*)Span_new(140, 19, 0.0f));
+    VA_Push(wanted, (Obj*)Span_new(120, 19, 0.0f));
+    VA_Push(wanted, (Obj*)Span_new(140, 19, 0.0f));
     TEST_TRUE(batch,
               VA_Equals(got, (Obj*)wanted),
               "find_sentences with explicit args");
@@ -431,7 +431,7 @@ test_Find_Sentences(TestBatch *batch, Searcher *searcher, Obj *query) {
     got = Highlighter_Find_Sentences(highlighter, text, 0, 0);
     wanted = VA_new(15);
     for (int i = 0; i < 15; ++i) {
-        VA_push(wanted, (Obj*)Span_new(i * 20, 19, 0.0f));
+        VA_Push(wanted, (Obj*)Span_new(i * 20, 19, 0.0f));
     }
     TEST_TRUE(batch,
               VA_Equals(got, (Obj*)wanted),
@@ -442,7 +442,7 @@ test_Find_Sentences(TestBatch *batch, Searcher *searcher, Obj *query) {
     text = (CharBuf*)ZCB_WRAP_STR(" Foo", 4);
     got = Highlighter_Find_Sentences(highlighter, text, 0, 0);
     wanted = VA_new(1);
-    VA_push(wanted, (Obj*)Span_new(1, 3, 0.0f));
+    VA_Push(wanted, (Obj*)Span_new(1, 3, 0.0f));
     TEST_TRUE(batch,
               VA_Equals(got, (Obj*)wanted),
               "Skip leading whitespace but get first sentence");
