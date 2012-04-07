@@ -302,6 +302,7 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
             i++;
             comparison1 = compare(context, elems + i, pivot);
             if (comparison1 >= 0) { break; }
+            if (i == right)       { break; }
         }
 
         // Find an element from the right that is less than or equal to the
@@ -310,7 +311,7 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
             j--;
             comparison2 = compare(context, elems + j, pivot);
             if (comparison2 <= 0) { break; }
-            if (j == left)         { break; }
+            if (j == left)        { break; }
         }
 
         // Bail out of loop when we meet in the middle.
@@ -406,6 +407,7 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
             i++;
             comparison1 = compare(context, elems + i, pivot);
             if (comparison1 >= 0) { break; }
+            if (i == right)       { break; }
         }
 
         // Find an element from the right that is less than or equal to the
@@ -414,7 +416,7 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
             j--;
             comparison2 = compare(context, elems + j, pivot);
             if (comparison2 <= 0) { break; }
-            if (j == left)         { break; }
+            if (j == left)        { break; }
         }
 
         // Bail out of loop when we meet in the middle.
