@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTHIGHLIGHTER
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
