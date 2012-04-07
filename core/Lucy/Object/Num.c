@@ -49,30 +49,21 @@ Num_equals(Num *self, Obj *other) {
     return true;
 }
 
-int32_t
-Num_compare_to(Num *self, Obj *other) {
-    Num *twin = (Num*)CERTIFY(other, NUM);
-    double f64_diff = Num_To_F64(self) - Num_To_F64(twin);
-    if (f64_diff) {
-        if (f64_diff < 0)      { return -1; }
-        else if (f64_diff > 0) { return 1;  }
-    }
-    else {
-        int64_t i64_diff = Num_To_I64(self) - Num_To_I64(twin);
-        if (i64_diff) {
-            if (i64_diff < 0)      { return -1; }
-            else if (i64_diff > 0) { return 1;  }
-        }
-    }
-    return 0;
-}
-
 /***************************************************************************/
 
 FloatNum*
 FloatNum_init(FloatNum *self) {
     ABSTRACT_CLASS_CHECK(self, FLOATNUM);
     return (FloatNum*)Num_init((Num*)self);
+}
+
+int32_t
+FloatNum_compare_to(FloatNum *self, Obj *other) {
+    Num *twin = (Num*)CERTIFY(other, NUM);
+    double f64_diff = FloatNum_To_F64(self) - Num_To_F64(twin);
+    if (f64_diff < 0)      { return -1; }
+    else if (f64_diff > 0) { return 1;  }
+    return 0;
 }
 
 CharBuf*
@@ -86,6 +77,18 @@ IntNum*
 IntNum_init(IntNum *self) {
     ABSTRACT_CLASS_CHECK(self, INTNUM);
     return (IntNum*)Num_init((Num*)self);
+}
+
+int32_t
+IntNum_compare_to(IntNum *self, Obj *other) {
+    if (!Obj_Is_A(other, INTNUM)) {
+        return -Obj_Compare_To(other, (Obj*)self);
+    }
+    int64_t self_value  = IntNum_To_I64(self);
+    int64_t other_value = Obj_To_I64(other);
+    if (self_value < other_value)      { return -1; }
+    else if (self_value > other_value) { return 1;  }
+    return 0;
 }
 
 CharBuf*

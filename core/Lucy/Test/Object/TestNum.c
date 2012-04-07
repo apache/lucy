@@ -177,18 +177,10 @@ test_Equals_and_Compare_To(TestBatch *batch) {
     TEST_TRUE(batch, Int32_Compare_To(i32, (Obj*)f32) < 0,
               "Integer32 comparison to Float32");
 
-    /*
-     * This needs GCC 4.5 and -fexcess-precision=standard to work. With
-     * older GCCs, we might have to resort to ugly hacks.
-     */
     Int64_Set_Value(i64, 0x6666666666666666LL);
     Integer64 *i64_copy = Int64_new(0x6666666666666666LL);
-#if 0
     TEST_TRUE(batch, Int64_Compare_To(i64, (Obj*)i64_copy) == 0,
               "Integer64 comparison to same number");
-#else
-    SKIP(batch, "Integer64 comparison to same number");
-#endif
 
     TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_TRUE),
               "CFISH_TRUE Equals itself");
