@@ -288,7 +288,7 @@ Int64_new(int64_t value) {
 Integer64*
 Int64_init(Integer64 *self, int64_t value) {
     self->value = value;
-    return (Integer64*)FloatNum_init((FloatNum*)self);
+    return (Integer64*)IntNum_init((IntNum*)self);
 }
 
 int64_t
