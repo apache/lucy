@@ -37,11 +37,11 @@
 
 uint64_t
 TestUtils_random_u64() {
-    uint64_t num = ((uint64_t)rand()   << 60)
-                   | ((uint64_t)rand() << 45)
-                   | ((uint64_t)rand() << 30)
-                   | ((uint64_t)rand() << 15)
-                   | ((uint64_t)rand() << 0);
+    uint64_t num = ((uint64_t)(rand()   & 0x7FFF) << 60)
+                   | ((uint64_t)(rand() & 0x7FFF) << 45)
+                   | ((uint64_t)(rand() & 0x7FFF) << 30)
+                   | ((uint64_t)(rand() & 0x7FFF) << 15)
+                   | ((uint64_t)(rand() & 0x7FFF) << 0);
     return num;
 }
 
