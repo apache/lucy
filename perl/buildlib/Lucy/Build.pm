@@ -90,7 +90,7 @@ sub new {
 
     my $extra_ccflags = $self->extra_compiler_flags;
     if ( $self->config('gccversion') ) {
-        push @$extra_ccflags, qw( -std=gnu99 -D_GNU_SOURCE );
+        push @$extra_ccflags, qw( -std=c99 -D_GNU_SOURCE );
         if ( $Config{osname} =~ /openbsd/i && !$Config{usethreads} ) {
             push @$extra_ccflags, '-DLUCY_NOTHREADS';
         }

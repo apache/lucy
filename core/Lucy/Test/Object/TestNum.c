@@ -177,6 +177,11 @@ test_Equals_and_Compare_To(TestBatch *batch) {
     TEST_TRUE(batch, Int32_Compare_To(i32, (Obj*)f32) < 0,
               "Integer32 comparison to Float32");
 
+    Int64_Set_Value(i64, 0x6666666666666666LL);
+    Integer64 *i64_copy = Int64_new(0x6666666666666666LL);
+    TEST_TRUE(batch, Int64_Compare_To(i64, (Obj*)i64_copy) == 0,
+              "Integer64 comparison to same number");
+
     TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CFISH_TRUE),
               "CFISH_TRUE Equals itself");
     TEST_TRUE(batch, Bool_Equals(CFISH_FALSE, (Obj*)CFISH_FALSE),
@@ -188,6 +193,7 @@ test_Equals_and_Compare_To(TestBatch *batch) {
     TEST_FALSE(batch, Bool_Equals(CFISH_TRUE, (Obj*)CHARBUF),
                "CFISH_TRUE not Equals random other object ");
 
+    DECREF(i64_copy);
     DECREF(i64);
     DECREF(i32);
     DECREF(f64);
@@ -291,7 +297,7 @@ test_serialization(TestBatch *batch) {
 
 void
 TestNum_run_tests() {
-    TestBatch *batch = TestBatch_new(57);
+    TestBatch *batch = TestBatch_new(58);
     TestBatch_Plan(batch);
 
     test_To_String(batch);

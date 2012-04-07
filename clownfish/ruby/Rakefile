@@ -132,7 +132,7 @@ def extra_ccflags
   # Blindly include GCC-specific flags even though we don't know that the
   # compiler is GCC.
   if ccflags !~ /-std=/
-    ccflags += "-std=gnu99 "
+    ccflags += "-std=c99 "
   end
   if ccflags !~ /-D_GNU_SOURCE/ 
     ccflags += "-D_GNU_SOURCE "

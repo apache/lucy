@@ -48,7 +48,7 @@ sub extra_ccflags {
         if ( defined $gcc_version ) {
             $extra_ccflags .= "-DLUCY_DEBUG ";
             $extra_ccflags
-                .= "-DPERL_GCC_PEDANTIC -std=gnu99 -pedantic -Wall ";
+                .= "-DPERL_GCC_PEDANTIC -std=c99 -pedantic -Wall ";
             $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct
             $extra_ccflags .= "-Wno-variadic-macros "
                 if $gcc_version > 3.4;    # at least not on gcc 3.4
@@ -67,7 +67,7 @@ sub extra_ccflags {
     if ( defined $gcc_version ) {
         # Tell GCC explicitly to run with maximum options.
         if ( $extra_ccflags !~ m/-std=/ ) {
-            $extra_ccflags .= "-std=gnu99 ";
+            $extra_ccflags .= "-std=c99 ";
         }
         if ( $extra_ccflags !~ m/-D_GNU_SOURCE/ ) {
             $extra_ccflags .= "-D_GNU_SOURCE ";
