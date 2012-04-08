@@ -513,13 +513,71 @@ test_highlighting(TestBatch *batch) {
     DECREF(schema);
 }
 
+static void
+test_hl_selection(TestBatch *batch) {
+    Schema *schema = Schema_new();
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
+    FullTextType *plain_type = FullTextType_new((Analyzer*)tokenizer);
+    FullTextType_Set_Highlightable(plain_type, true);
+    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    Schema_Spec_Field(schema, content, (FieldType*)plain_type);
+    DECREF(plain_type);
+    DECREF(tokenizer);
+
+    RAMFolder *folder = RAMFolder_new(NULL);
+    Indexer *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
+
+    static char test_string[] =
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla NNN bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla MMM bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
+        "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. ";
+    Doc *doc = Doc_new(NULL, 0);
+    CharBuf *string = (CharBuf *)ZCB_WRAP_STR(test_string, strlen(test_string));
+    Doc_Store(doc, content, (Obj*)string);
+    Indexer_Add_Doc(indexer, doc, 1.0f);
+    DECREF(doc);
+
+    Indexer_Commit(indexer);
+    DECREF(indexer);
+
+    Searcher *searcher = (Searcher*)IxSearcher_new((Obj*)folder);
+    Obj *query = (Obj*)ZCB_WRAP_STR("NNN MMM", 7);
+    Highlighter *highlighter = Highlighter_new(searcher, query, content, 200);
+    Hits *hits = Searcher_Hits(searcher, query, 0, 10, NULL);
+    HitDoc *hit = Hits_Next(hits);
+    CharBuf *excerpt = Highlighter_Create_Excerpt(highlighter, hit);
+    CharBuf *mmm = (CharBuf*)ZCB_WRAP_STR("MMM", 3);
+    CharBuf *nnn = (CharBuf*)ZCB_WRAP_STR("NNN", 3);
+    TEST_TRUE(batch, CB_Find(excerpt, mmm) >= 0 || CB_Find(excerpt, nnn) >= 0,
+              "Sentence boundary algo doesn't chop terms");
+
+    DECREF(excerpt);
+    DECREF(hit);
+    DECREF(hits);
+    DECREF(highlighter);
+    DECREF(searcher);
+    DECREF(folder);
+    DECREF(schema);
+}
+
 void
 TestHighlighter_run_tests() {
-    TestBatch *batch = TestBatch_new(34);
+    TestBatch *batch = TestBatch_new(35);
 
     TestBatch_Plan(batch);
 
     test_highlighting(batch);
+    test_hl_selection(batch);
 
     DECREF(batch);
 }
