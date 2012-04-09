@@ -38,20 +38,6 @@ else {
     );
 }
 
-=for Rationale
-
-When the distribution tarball for the Perl bindings is built, core/, and any
-other needed files/directories are copied into the perl/ directory within the
-main source directory.  Then the distro is built from the contents of the
-perl/ directory, leaving out all the files in ruby/, etc. However, during
-development, the files are accessed from their original locations.
-
-=cut
-
-my $is_distro_not_devel = -e 'core';
-my $base_dir = rel2abs( $is_distro_not_devel ? getcwd() : updir() );
-my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
-
 my $AUTOGEN_DIR  = 'autogen';
 my $LIB_DIR      = 'lib';
 my $BUILDLIB_DIR = 'buildlib';
@@ -84,6 +70,30 @@ sub new {
         catfile( $AUTOGEN_DIR, 'include' ),
     );
     $self->include_dirs($include_dirs);
+
+=for Rationale
+
+When the distribution tarball for the Perl bindings is built, core/, and any
+other needed files/directories are copied into the perl/ directory within the
+main source directory.  Then the distro is built from the contents of the
+perl/ directory, leaving out all the files in ruby/, etc. However, during
+development, the files are accessed from their original locations.
+
+=cut
+
+    my $cf_source = $self->clownfish_params('source');
+    if ( !defined($cf_source) ) {
+        if ( -e 'core' ) {
+            $cf_source = [ 'core' ];
+        }
+        else {
+            $cf_source = [ catdir( updir(), 'core' ) ];
+        }
+    }
+    elsif ( !ref($cf_source) ) {
+        $cf_source = [ $cf_source ];
+    }
+    $self->clownfish_params( source => $cf_source );
 
     my $cf_include = $self->clownfish_params('include');
     if ( !defined($cf_include) ) {
@@ -142,15 +152,31 @@ sub cf_system_library_file {
     die("No Clownfish library file found for module $module_name");
 }
 
+sub _cfh_filepaths {
+    my $self = shift;
+    my @paths;
+    my $source_dirs = $self->clownfish_params('source');
+    for my $source_dir (@$source_dirs) {
+        push @paths, @{ $self->rscan_dir( $source_dir, qr/\.cfh$/ ) };
+    }
+    return \@paths;
+}
+
 sub ACTION_copy_clownfish_includes {
     my $self = shift;
+
     # Copy .cfh files to blib/arch/Clownfish/_include
-    my $cfh_filepaths = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.cfh$/ );
-    my $inc_dir = catdir( $self->blib, 'arch', 'Clownfish', '_include' );
-    for my $file (@$cfh_filepaths) {
-        my $rel  = abs2rel( $file, $CORE_SOURCE_DIR );
-        my $dest = catfile( $inc_dir, $rel );
-        $self->copy_if_modified( from => $file, to => $dest );
+    my $inc_dir     = catdir( $self->blib, 'arch', 'Clownfish', '_include' );
+    my $source_dirs = $self->clownfish_params('source');
+
+    for my $source_dir (@$source_dirs) {
+        my $cfh_filepaths = $self->rscan_dir( $source_dir, qr/\.cfh$/ );
+
+        for my $file (@$cfh_filepaths) {
+            my $rel  = abs2rel( $file, $source_dir );
+            my $dest = catfile( $inc_dir, $rel );
+            $self->copy_if_modified( from => $file, to => $dest );
+        }
     }
 }
 
@@ -165,8 +191,11 @@ sub _compile_clownfish {
     my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(
         dest => $AUTOGEN_DIR,
     );
-    $hierarchy->add_source_dir($CORE_SOURCE_DIR);
+    my $source_dirs  = $self->clownfish_params('source');
     my $include_dirs = $self->clownfish_params('include');
+    for my $source_dir (@$source_dirs) {
+        $hierarchy->add_source_dir($source_dir);
+    }
     for my $include_dir (@$include_dirs) {
         $hierarchy->add_include_dir($include_dir);
     }
@@ -225,7 +254,7 @@ sub ACTION_clownfish {
     my $xs_filepath = catfile( $LIB_DIR, @module_dir, "$class_name.xs" );
 
     my $buildlib_pm_filepaths = $self->rscan_dir( $BUILDLIB_DIR, qr/\.pm$/ );
-    my $cfh_filepaths = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.cfh$/ );
+    my $cfh_filepaths = $self->_cfh_filepaths;
 
     # XXX joes thinks this is dubious
     # Don't bother parsing Clownfish files if everything's up to date.
@@ -321,10 +350,17 @@ sub ACTION_compile_custom_xs {
     my @objects;
 
     # Compile C source files.
-    my $autogen_source_dir = catfile( $AUTOGEN_DIR, 'source' );
+
     my $c_files = [];
-    push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,    qr/\.c$/ ) };
+
+    my $source_dirs = $self->clownfish_params('source');
+    for my $source_dir (@$source_dirs) {
+        push @$c_files, @{ $self->rscan_dir( $source_dir, qr/\.c$/ ) };
+    }
+
+    my $autogen_source_dir = catfile( $AUTOGEN_DIR, 'source' );
     push @$c_files, @{ $self->rscan_dir( $autogen_source_dir, qr/\.c$/ ) };
+
     my $c_sources = $self->clownfish_params('extra_c_sources') || [];
     for my $c_source (@$c_sources) {
         if ( -d $c_source ) {
@@ -337,6 +373,7 @@ sub ACTION_compile_custom_xs {
             die("Invalid C source '$c_source'");
         }
     }
+
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
