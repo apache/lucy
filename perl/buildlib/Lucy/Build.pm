@@ -37,6 +37,19 @@ use Fcntl;
 use Carp;
 use Cwd qw( getcwd );
 
+# Add a custom Module::Build hashref property to pass additional build
+# parameters
+if ( $Module::Build::VERSION <= 0.30 ) {
+    __PACKAGE__->add_property( clownfish_params => {} );
+}
+else {
+    # TODO: add sub for property check
+    __PACKAGE__->add_property(
+        'clownfish_params',
+        default => {},
+    );
+}
+
 BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 
 =for Rationale
