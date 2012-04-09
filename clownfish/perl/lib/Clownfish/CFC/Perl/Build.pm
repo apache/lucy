@@ -85,6 +85,15 @@ sub new {
     );
     $self->include_dirs($include_dirs);
 
+    my $cf_include = $self->clownfish_params('include');
+    if ( !defined($cf_include) ) {
+        $cf_include = [];
+    }
+    elsif ( !ref($cf_include) ) {
+        $cf_include = [ $cf_include ];
+    }
+    $self->clownfish_params( include => $cf_include );
+
     my $autogen_header = $self->clownfish_params('autogen_header');
     if ( !defined($autogen_header) ) {
         $self->clownfish_params( autogen_header => <<'END_AUTOGEN' );
@@ -100,6 +109,37 @@ END_AUTOGEN
     }
 
     return $self;
+}
+
+sub cf_system_include_dirs {
+    my $self_or_class = shift;
+
+    my @include_dirs;
+    for my $location ( qw( site vendor ) ) {
+        my $install_dir = $Config{"install${location}arch"};
+        my $include_dir = catdir( $install_dir, 'Clownfish', '_include' );
+        next unless -d $include_dir;
+        push(@include_dirs, $include_dir);
+    }
+
+    return @include_dirs;
+}
+
+sub cf_system_library_file {
+    my ( $self_or_class, $module_name ) = @_;
+
+    my @module_parts = split( '::', $module_name );
+    my $class_name   = $module_parts[-1];
+
+    for my $location ( qw( site vendor ) ) {
+        my $install_dir = $Config{"install${location}arch"};
+        my $lib_file = catfile(
+            $install_dir, 'auto', @module_parts, "$class_name.$Config{dlext}",
+        );
+        return $lib_file if -f $lib_file;
+    }
+
+    die("No Clownfish library file found for module $module_name");
 }
 
 sub ACTION_copy_clownfish_includes {
@@ -126,6 +166,10 @@ sub _compile_clownfish {
         dest => $AUTOGEN_DIR,
     );
     $hierarchy->add_source_dir($CORE_SOURCE_DIR);
+    my $include_dirs = $self->clownfish_params('include');
+    for my $include_dir (@$include_dirs) {
+        $hierarchy->add_include_dir($include_dir);
+    }
     $hierarchy->build;
 
     # Process all Binding classes in buildlib.
