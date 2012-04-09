@@ -226,7 +226,7 @@ sub _compile_clownfish {
         next unless $pm_filepath =~ /Binding/;
         require $pm_filepath;
         my $package_name = $pm_filepath;
-        $package_name =~ s/buildlib\/(Lucy.*)\.pm$/$1/;
+        $package_name =~ s/buildlib\/(.*)\.pm$/$1/;
         $package_name =~ s/\//::/g;
         $package_name->bind_all;
     }
