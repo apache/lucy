@@ -87,7 +87,6 @@ my $AUTOGEN_DIR      = 'autogen';
 my $XS_SOURCE_DIR    = 'xs';
 my $LIB_DIR          = 'lib';
 my $BUILDLIB_DIR     = 'buildlib';
-my $AUTOGEN_SOURCE_DIR = catfile( $AUTOGEN_DIR, 'source' );
 
 sub new {
     my $self = shift->SUPER::new( recursive_test_files => 1, @_ );
@@ -139,6 +138,15 @@ sub new {
         $UTF8PROC_SRC_DIR,
     );
     $self->include_dirs($include_dirs);
+
+    my $c_sources = $self->clownfish_params('extra_c_sources') || [];
+    push( @$c_sources,
+        $XS_SOURCE_DIR,
+        $SNOWSTEM_SRC_DIR,
+        $SNOWSTOP_SRC_DIR,
+        $UTF8PROC_C,
+    );
+    $self->clownfish_params( extra_c_sources => $c_sources );
 
     return $self;
 }
@@ -547,13 +555,22 @@ sub ACTION_compile_custom_xs {
     my @objects;
 
     # Compile C source files.
+    my $autogen_source_dir = catfile( $AUTOGEN_DIR, 'source' );
     my $c_files = [];
     push @$c_files, @{ $self->rscan_dir( $CORE_SOURCE_DIR,    qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $XS_SOURCE_DIR,      qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $AUTOGEN_SOURCE_DIR, qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $SNOWSTEM_SRC_DIR,   qr/\.c$/ ) };
-    push @$c_files, @{ $self->rscan_dir( $SNOWSTOP_SRC_DIR,   qr/\.c$/ ) };
-    push @$c_files, $UTF8PROC_C;
+    push @$c_files, @{ $self->rscan_dir( $autogen_source_dir, qr/\.c$/ ) };
+    my $c_sources = $self->clownfish_params('extra_c_sources') || [];
+    for my $c_source (@$c_sources) {
+        if ( -d $c_source ) {
+            push @$c_files, @{ $self->rscan_dir( $c_source, qr/\.c$/ ) };
+        }
+        elsif ( $c_source =~ /\.c$/ ) {
+            push @$c_files, $c_source;
+        }
+        else {
+            die("Invalid C source '$c_source'");
+        }
+    }
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
