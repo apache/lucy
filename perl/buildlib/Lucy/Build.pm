@@ -231,11 +231,15 @@ sub _compile_clownfish {
         $package_name->bind_all;
     }
 
+    my $module_name  = $self->module_name;
+    my @module_parts = split( '::', $module_name );
+    my $parcel       = $module_parts[-1];
+
     my $binding = Clownfish::CFC::Binding::Perl->new(
-        parcel     => 'Lucy',
+        parcel     => $parcel,
         hierarchy  => $hierarchy,
         lib_dir    => $LIB_DIR,
-        boot_class => 'Lucy',
+        boot_class => $module_name,
         header     => $self->autogen_header,
         footer     => '',
     );
