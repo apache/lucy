@@ -180,10 +180,6 @@ sub ACTION_charmony {
     print join( " ", @command ), $/;
 
     system(@command) and die "Failed to write $CHARMONY_PATH: $!";
-
-    # Copy charmony.h to Clownfish include dir
-    my $inc_dir = catdir( $self->blib, 'arch', 'Clownfish', '_include' );
-    $self->copy_if_modified( from => $CHARMONY_PATH, to_dir => $inc_dir, );
 }
 
 # Build the charmonizer tests.
@@ -224,6 +220,35 @@ sub ACTION_cfc {
         print "\nFinished building Clownfish compiler.\n\n";
     }
     chdir($old_dir);
+}
+
+sub ACTION_copy_clownfish_includes {
+    my $self = shift;
+
+    $self->dispatch('charmony');
+
+    $self->SUPER::ACTION_copy_clownfish_includes;
+
+    my $inc_dir = catdir( $self->blib, 'arch', 'Clownfish', '_include' );
+
+    # Install charmony.h
+    $self->copy_if_modified(
+        from => $CHARMONY_PATH,
+        to   => catfile( $inc_dir, 'charmony.h' ),
+    );
+
+    # Install Lucy/Util/ToolSet.h
+    my @toolset_h = qw( Lucy Util ToolSet.h );
+    $self->copy_if_modified(
+        from => catfile( $CORE_SOURCE_DIR, @toolset_h ),
+        to   => catfile( $inc_dir,         @toolset_h ),
+    );
+
+    # Install XSBind.h
+    $self->copy_if_modified(
+        from => catfile( $XS_SOURCE_DIR, 'XSBind.h' ),
+        to   => catfile( $inc_dir,       'XSBind.h' ),
+    );
 }
 
 sub ACTION_clownfish {
