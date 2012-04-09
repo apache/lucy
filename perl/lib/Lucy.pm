@@ -27,7 +27,7 @@ $VERSION = eval $VERSION;
 use XSLoader;
 # This loads a large number of disparate subs.
 BEGIN {
-    XSLoader::load( 'Lucy', '0.003000' );
+    XSLoader::load( 'Lucy', '0.3.0' );
     _init_autobindings();
 }
 
