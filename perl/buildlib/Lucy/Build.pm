@@ -74,9 +74,7 @@ my $AUTOGEN_DIR      = 'autogen';
 my $XS_SOURCE_DIR    = 'xs';
 my $LIB_DIR          = 'lib';
 my $BUILDLIB_DIR     = 'buildlib';
-# TODO: Get these from $hierarchy
-my $AUTOGEN_INC_DIR    = catfile( 'autogen', 'include' );
-my $AUTOGEN_SOURCE_DIR = catfile( 'autogen', 'source' );
+my $AUTOGEN_SOURCE_DIR = catfile( $AUTOGEN_DIR, 'source' );
 
 sub new {
     my $self = shift->SUPER::new( recursive_test_files => 1, @_ );
@@ -116,6 +114,18 @@ sub new {
         push @$extra_ldflags, '-lpthread';
         $self->extra_linker_flags(@$extra_ldflags);
     }
+
+    my $include_dirs = $self->include_dirs;
+    push( @$include_dirs,
+        getcwd(),
+        catfile( $AUTOGEN_DIR, 'include' ),
+        $CORE_SOURCE_DIR,
+        $XS_SOURCE_DIR,
+        $SNOWSTEM_INC_DIR,
+        $UCD_INC_DIR,
+        $UTF8PROC_SRC_DIR,
+    );
+    $self->include_dirs($include_dirs);
 
     return $self;
 }
@@ -521,11 +531,6 @@ sub ACTION_compile_custom_xs {
     my $libdir   = catdir( $LIB_DIR, @module_dir );
     my $archdir  = catdir( $self->blib, 'arch', 'auto', @module_parts );
     mkpath( $archdir, 0, 0777 ) unless -d $archdir;
-    my @include_dirs = (
-        getcwd(),       $CORE_SOURCE_DIR,  $AUTOGEN_INC_DIR,
-        $XS_SOURCE_DIR, $SNOWSTEM_INC_DIR, $UCD_INC_DIR,
-        $UTF8PROC_SRC_DIR
-    );
     my @objects;
 
     # Compile C source files.
@@ -548,7 +553,7 @@ sub ACTION_compile_custom_xs {
         $cbuilder->compile(
             source               => $c_file,
             extra_compiler_flags => $self->extra_compiler_flags,
-            include_dirs         => \@include_dirs,
+            include_dirs         => $self->include_dirs,
             object_file          => $o_file,
         );
     }
@@ -574,7 +579,7 @@ sub ACTION_compile_custom_xs {
         $cbuilder->compile(
             source               => $perl_binding_c_file,
             extra_compiler_flags => $self->extra_compiler_flags,
-            include_dirs         => \@include_dirs,
+            include_dirs         => $self->include_dirs,
             object_file          => $perl_binding_o_file,
             # 'defines' is an undocumented parameter to compile(), so we
             # should officially roll our own variant and generate compiler
