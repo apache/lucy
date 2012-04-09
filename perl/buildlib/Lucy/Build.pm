@@ -72,7 +72,6 @@ my $SNOWSTOP_SRC_DIR
     = catdir( $base_dir, qw( modules analysis snowstop source ) );
 my $UCD_INC_DIR      = catdir( $base_dir, qw( modules unicode ucd ) );
 my $UTF8PROC_SRC_DIR = catdir( $base_dir, qw( modules unicode utf8proc ) );
-my $UTF8PROC_C = catfile( $UTF8PROC_SRC_DIR, 'utf8proc.c' );
 my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
 my $CLOWNFISH_DIR = catdir( $base_dir, 'clownfish', 'perl' );
 my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
@@ -114,14 +113,15 @@ sub new {
     );
     $self->include_dirs($include_dirs);
 
-    my $c_sources = $self->clownfish_params('extra_c_sources') || [];
-    push( @$c_sources,
+    my $source_dirs = [];
+    push( @$source_dirs,
+        $CORE_SOURCE_DIR,
         $XS_SOURCE_DIR,
         $SNOWSTEM_SRC_DIR,
         $SNOWSTOP_SRC_DIR,
-        $UTF8PROC_C,
+        $UTF8PROC_SRC_DIR,
     );
-    $self->clownfish_params( extra_c_sources => $c_sources );
+    $self->clownfish_params( source => $source_dirs );
 
     $self->clownfish_params( autogen_header => $self->autogen_header );
 

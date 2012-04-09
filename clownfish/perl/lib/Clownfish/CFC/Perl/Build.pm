@@ -361,19 +361,6 @@ sub ACTION_compile_custom_xs {
     my $autogen_source_dir = catfile( $AUTOGEN_DIR, 'source' );
     push @$c_files, @{ $self->rscan_dir( $autogen_source_dir, qr/\.c$/ ) };
 
-    my $c_sources = $self->clownfish_params('extra_c_sources') || [];
-    for my $c_source (@$c_sources) {
-        if ( -d $c_source ) {
-            push @$c_files, @{ $self->rscan_dir( $c_source, qr/\.c$/ ) };
-        }
-        elsif ( $c_source =~ /\.c$/ ) {
-            push @$c_files, $c_source;
-        }
-        else {
-            die("Invalid C source '$c_source'");
-        }
-    }
-
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
