@@ -112,7 +112,7 @@ SnowStop_gen_stoplist(const CharBuf *language) {
     for (uint32_t i = 0; words[i] != NULL; i++) {
         char *word = (char*)words[i];
         ViewCharBuf *stop = ViewCB_new_from_trusted_utf8(word, strlen(word));
-        NoCloneHash_Store(stoplist, (Obj*)stop, INCREF(&EMPTY));
+        NoCloneHash_Store(stoplist, (Obj*)stop, (Obj*)CB_newf(""));
         DECREF(stop);
     }
     DECREF(lang);
