@@ -488,24 +488,14 @@ CFCHierarchy_files(CFCHierarchy *self) {
     return self->files;
 }
 
-const char*
-CFCHierarchy_get_source_dir(CFCHierarchy *self, size_t i) {
-    return i < self->num_sources ? self->sources[i] : NULL;
+const char**
+CFCHierarchy_get_source_dirs(CFCHierarchy *self) {
+    return (const char **)self->sources;
 }
 
-size_t
-CFCHierarchy_get_num_source_dirs(CFCHierarchy *self) {
-    return self->num_sources;
-}
-
-const char*
-CFCHierarchy_get_include_dir(CFCHierarchy *self, size_t i) {
-    return i < self->num_includes ? self->includes[i] : NULL;
-}
-
-size_t
-CFCHierarchy_get_num_include_dirs(CFCHierarchy *self) {
-    return self->num_includes;
+const char**
+CFCHierarchy_get_include_dirs(CFCHierarchy *self) {
+    return (const char **)self->includes;
 }
 
 const char*

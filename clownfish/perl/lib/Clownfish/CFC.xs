@@ -59,6 +59,18 @@ S_cfcbase_to_perlref(void *thing) {
     return ref;
 }
 
+// Transform a NULL-terminated array of char* into a Perl arrayref.
+static SV*
+S_string_array_to_av(const char **strings) {
+    AV *av = newAV();
+    for (size_t i = 0; strings[i] != NULL; i++) {
+        SV *val = newSVpvn(strings[i], strlen(strings[i]));
+        av_store(av, i, val);
+    }
+    SV *retval = newRV_noinc((SV*)av);
+    return retval;
+}
+
 // Transform a NULL-terminated array of CFCBase* into a Perl arrayref.
 static SV*
 S_array_of_cfcbase_to_av(CFCBase **things) {
@@ -457,27 +469,15 @@ PPCODE:
             }
             break;
         case 8: {
-                AV *av = newAV();
                 const char **names = CFCDocuComment_get_param_names(self);
-                for (size_t i = 0; names[i] != NULL; i++) {
-                    SV *val_sv = newSVpvn(names[i], strlen(names[i]));
-                    av_store(av, i, val_sv);
-                }
-                retval = newRV((SV*)av);
-                SvREFCNT_dec(av);
-                break;
+                retval = S_string_array_to_av(names);
             }
+            break;
         case 10: {
-                AV *av = newAV();
                 const char **docs = CFCDocuComment_get_param_docs(self);
-                for (size_t i = 0; docs[i] != NULL; i++) {
-                    SV *val_sv = newSVpvn(docs[i], strlen(docs[i]));
-                    av_store(av, i, val_sv);
-                }
-                retval = newRV((SV*)av);
-                SvREFCNT_dec(av);
-                break;
+                retval = S_string_array_to_av(docs);
             }
+            break;
         case 12: {
                 const char *rv = CFCDocuComment_get_retval(self);
                 retval = rv ? newSVpvn(rv, strlen(rv)) : newSV(0);
@@ -763,30 +763,6 @@ PPCODE:
     CFCHierarchy_add_include_dir(self, include_dir);
 
 void
-get_source_dirs(self)
-    CFCHierarchy *self;
-PPCODE:
-    size_t n = CFCHierarchy_get_num_source_dirs(self);
-    size_t i;
-    EXTEND(SP, n);
-    for (i = 0; i < n; ++i) {
-        const char *value = CFCHierarchy_get_source_dir(self, i);
-        PUSHs(sv_2mortal(newSVpv(value, strlen(value))));
-    }
-
-void
-get_include_dirs(self)
-    CFCHierarchy *self;
-PPCODE:
-    size_t n = CFCHierarchy_get_num_include_dirs(self);
-    size_t i;
-    EXTEND(SP, n);
-    for (i = 0; i < n; ++i) {
-        const char *value = CFCHierarchy_get_include_dir(self, i);
-        PUSHs(sv_2mortal(newSVpv(value, strlen(value))));
-    }
-
-void
 build(self)
     CFCHierarchy *self;
 PPCODE:
@@ -809,6 +785,8 @@ ALIAS:
     get_source_dest   = 6
     files             = 8
     ordered_classes   = 10
+    get_source_dirs   = 12
+    get_include_dirs  = 14
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -835,6 +813,16 @@ PPCODE:
                 CFCClass **ladder = CFCHierarchy_ordered_classes(self);
                 retval = S_array_of_cfcbase_to_av((CFCBase**)ladder);
                 FREEMEM(ladder);
+            }
+            break;
+        case 12: {
+                const char **source_dirs = CFCHierarchy_get_source_dirs(self);
+                retval = S_string_array_to_av(source_dirs);
+            }
+            break;
+        case 14: {
+                const char **include_dirs = CFCHierarchy_get_include_dirs(self);
+                retval = S_string_array_to_av(include_dirs);
             }
             break;
     END_SET_OR_GET_SWITCH
@@ -2158,13 +2146,8 @@ SV*
 get_class_aliases(self)
     CFCPerlClass *self;
 CODE:
-    AV *array = newAV();
-    char **aliases = CFCPerlClass_get_class_aliases(self);
-    for (size_t i = 0; aliases[i] != NULL; i++) {
-        SV *alias = newSVpvn(aliases[i], strlen(aliases[i]));
-        av_push(array, alias);
-    }
-    RETVAL = newRV_noinc((SV*)array);
+    const char **aliases = CFCPerlClass_get_class_aliases(self);
+    RETVAL = S_string_array_to_av(aliases);
 OUTPUT: RETVAL
 
 

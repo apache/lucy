@@ -80,17 +80,11 @@ CFCHierarchy_ordered_classes(CFCHierarchy *self);
 struct CFCFile**
 CFCHierarchy_files(CFCHierarchy *self);
 
-const char*
-CFCHierarchy_get_source_dir(CFCHierarchy *self, size_t i);
+const char**
+CFCHierarchy_get_source_dirs(CFCHierarchy *self);
 
-size_t
-CFCHierarchy_get_num_source_dirs(CFCHierarchy *self);
-
-const char*
-CFCHierarchy_get_include_dir(CFCHierarchy *self, size_t i);
-
-size_t
-CFCHierarchy_get_num_include_dirs(CFCHierarchy *self);
+const char**
+CFCHierarchy_get_include_dirs(CFCHierarchy *self);
 
 const char*
 CFCHierarchy_get_dest(CFCHierarchy *self);

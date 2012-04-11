@@ -261,7 +261,7 @@ S_write_boot_c(CFCPerl *self) {
         CFCPerlClass *class_binding = CFCPerlClass_singleton(class_name);
         if (class_binding) {
             const char *vtable_var = CFCClass_full_vtable_var(klass);
-            char **aliases
+            const char **aliases
                 = CFCPerlClass_get_class_aliases(class_binding);
             for (size_t j = 0; aliases[j] != NULL; j++) {
                 const char *alias = aliases[j];

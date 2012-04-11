@@ -566,8 +566,8 @@ CFCPerlClass_add_class_alias(CFCPerlClass *self, const char *alias) {
     self->class_aliases[self->num_class_aliases] = NULL;
 }
 
-char**
+const char**
 CFCPerlClass_get_class_aliases(CFCPerlClass *self) {
-    return self->class_aliases;
+    return (const char **)self->class_aliases;
 }
 

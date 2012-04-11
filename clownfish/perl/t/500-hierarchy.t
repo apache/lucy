@@ -49,7 +49,7 @@ my $src_dest = catfile( $args{dest}, "source" );
 is( $hierarchy->get_source_dest, $src_dest, "get_source_dest" );
 
 $hierarchy->add_source_dir($source);
-is_deeply( [ $hierarchy->get_source_dirs ], [ $source ], "get_source_dirs" );
+is_deeply( $hierarchy->get_source_dirs, [ $source ], "get_source_dirs" );
 
 $hierarchy->build;
 

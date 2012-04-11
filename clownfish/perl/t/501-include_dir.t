@@ -37,10 +37,10 @@ my $file_clash  = 't/cfclash/file';
     my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
 
     $hierarchy->add_source_dir($ext);
-    is_deeply( [ $hierarchy->get_source_dirs ], [ $ext ], "get_source_dirs" );
+    is_deeply( $hierarchy->get_source_dirs, [ $ext ], "get_source_dirs" );
 
     $hierarchy->add_include_dir($source);
-    is_deeply( [ $hierarchy->get_include_dirs ], [ $source ], "get_include_dirs" );
+    is_deeply( $hierarchy->get_include_dirs, [ $source ], "get_include_dirs" );
 
     $hierarchy->build;
 
@@ -78,10 +78,8 @@ my $file_clash  = 't/cfclash/file';
 
     $hierarchy->add_source_dir($source);
     $hierarchy->add_source_dir($ext);
-    is_deeply( [ $hierarchy->get_source_dirs ], [ $source, $ext ], "get_source_dirs" );
-
-    my @include_dirs = $hierarchy->get_include_dirs;
-    is( scalar(@include_dirs), 0, "get_include_dirs" );
+    is_deeply( $hierarchy->get_source_dirs, [ $source, $ext ], "get_source_dirs" );
+    is_deeply( $hierarchy->get_include_dirs, [], "get_include_dirs" );
 
     $hierarchy->build;
 

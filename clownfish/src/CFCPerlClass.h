@@ -159,7 +159,7 @@ CFCPerlClass_add_class_alias(CFCPerlClass *self, const char *alias);
 /** Return a NULL-terminated list of class names which will be aliased to this
  * class.
  */
-char**
+const char**
 CFCPerlClass_get_class_aliases(CFCPerlClass *self);
 
 #ifdef __cplusplus
