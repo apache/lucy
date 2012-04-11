@@ -30,7 +30,8 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     CaseFolder *clone       = (CaseFolder*)CaseFolder_Load(other, dump);
 
     TEST_TRUE(batch, CaseFolder_Equals(case_folder, (Obj*)other), "Equals");
-    TEST_FALSE(batch, CaseFolder_Equals(case_folder, (Obj*)&EMPTY), "Not Equals");
+    TEST_FALSE(batch, CaseFolder_Equals(case_folder, (Obj*)CFISH_TRUE),
+               "Not Equals");
     TEST_TRUE(batch, CaseFolder_Equals(case_folder, (Obj*)clone),
               "Dump => Load round trip");
 

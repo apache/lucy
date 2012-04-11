@@ -30,7 +30,8 @@ S_make_stopfilter(void *unused, ...) {
 
     va_start(args, unused);
     while (NULL != (stopword = va_arg(args, char*))) {
-        Hash_Store_Str(stoplist, stopword, strlen(stopword), INCREF(&EMPTY));
+        Hash_Store_Str(stoplist, stopword, strlen(stopword),
+                       (Obj*)CB_newf(""));
     }
     va_end(args);
 

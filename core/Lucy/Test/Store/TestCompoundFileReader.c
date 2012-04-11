@@ -47,7 +47,8 @@ S_folder_with_contents() {
     OutStream_Close(bar_out);
     DECREF(foo_out);
     DECREF(bar_out);
-    RAMFolder_Consolidate(folder, (CharBuf*)&EMPTY);
+    ZombieCharBuf *empty = ZCB_BLANK();
+    RAMFolder_Consolidate(folder, (CharBuf*)empty);
     return (Folder*)folder;
 }
 

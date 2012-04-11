@@ -32,11 +32,11 @@ test_Equals(TestBatch *batch) {
     TEST_TRUE(batch, Hash_Equals(hash, (Obj*)other),
               "Empty hashes are equal");
 
-    Hash_Store_Str(hash, "foo", 3, INCREF(&EMPTY));
+    Hash_Store_Str(hash, "foo", 3, (Obj*)CFISH_TRUE);
     TEST_FALSE(batch, Hash_Equals(hash, (Obj*)other),
                "Add one pair and Equals returns false");
 
-    Hash_Store_Str(other, "foo", 3, INCREF(&EMPTY));
+    Hash_Store_Str(other, "foo", 3, (Obj*)CFISH_TRUE);
     TEST_TRUE(batch, Hash_Equals(hash, (Obj*)other),
               "Add a matching pair and Equals returns true");
 

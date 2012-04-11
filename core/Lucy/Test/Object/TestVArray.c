@@ -35,19 +35,19 @@ test_Equals(TestBatch *batch) {
     TEST_TRUE(batch, VA_Equals(array, (Obj*)other),
               "Empty arrays are equal");
 
-    VA_Push(array, INCREF(&EMPTY));
+    VA_Push(array, (Obj*)CFISH_TRUE);
     TEST_FALSE(batch, VA_Equals(array, (Obj*)other),
                "Add one elem and Equals returns false");
 
-    VA_Push(other, INCREF(&EMPTY));
+    VA_Push(other, (Obj*)CFISH_TRUE);
     TEST_TRUE(batch, VA_Equals(array, (Obj*)other),
               "Add a matching elem and Equals returns true");
 
-    VA_Store(array, 2, INCREF(&EMPTY));
+    VA_Store(array, 2, (Obj*)CFISH_TRUE);
     TEST_FALSE(batch, VA_Equals(array, (Obj*)other),
                "Add elem after a NULL and Equals returns false");
 
-    VA_Store(other, 2, INCREF(&EMPTY));
+    VA_Store(other, 2, (Obj*)CFISH_TRUE);
     TEST_TRUE(batch, VA_Equals(array, (Obj*)other),
               "Empty elems don't spoil Equals");
 

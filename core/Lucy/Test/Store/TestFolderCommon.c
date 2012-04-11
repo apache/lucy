@@ -104,7 +104,8 @@ test_Local_Find_Folder(TestBatch *batch, set_up_t set_up,
     local = Folder_Local_Find_Folder(folder, &nope);
     TEST_TRUE(batch, local == NULL, "Non-existent entry yields NULL");
 
-    local = Folder_Local_Find_Folder(folder, (CharBuf*)&EMPTY);
+    ZombieCharBuf *empty = ZCB_BLANK();
+    local = Folder_Local_Find_Folder(folder, (CharBuf*)empty);
     TEST_TRUE(batch, local == NULL, "Empty string yields NULL");
 
     local = Folder_Local_Find_Folder(folder, &foo_bar);

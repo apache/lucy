@@ -31,7 +31,8 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 
     TEST_TRUE(batch, MatchAllQuery_Equals(query, (Obj*)clone),
               "Dump => Load round trip");
-    TEST_FALSE(batch, MatchAllQuery_Equals(query, (Obj*)&EMPTY), "Equals");
+    TEST_FALSE(batch, MatchAllQuery_Equals(query, (Obj*)CFISH_TRUE),
+               "Equals");
 
     DECREF(query);
     DECREF(dump);
