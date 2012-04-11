@@ -162,6 +162,24 @@ sub _cfh_filepaths {
     return \@paths;
 }
 
+sub cf_copy_include_file {
+    my ($self, @path) = @_;
+
+    my $dest_dir     = catdir( $self->blib, 'arch', 'Clownfish', '_include' );
+    my $include_dirs = $self->include_dirs;
+    for my $include_dir (@$include_dirs) {
+        my $file = catfile ( $include_dir, @path );
+        if ( -e $file ) {
+            $self->copy_if_modified(
+                from => $file,
+                to   => catfile( $dest_dir, @path ),
+            );
+            return;
+        }
+    }
+    die( "Clownfish include file " . catfile(@path) . " not found" );
+}
+
 sub ACTION_copy_clownfish_includes {
     my $self = shift;
 
@@ -542,6 +560,13 @@ of Clownfish modules.
 Returns the path to the C library of system-wide installed Clownfish module
 named $module_name. Should be added to extra_linker_flags for all module
 dependencies.
+
+=head2 $builder->cf_copy_include_file(@path);
+
+Look for a file with path components @path in all of the Module::Build
+include dirs and copy it to blib, so it will be installed in a Clownfish
+system include directory. Typically used for additional .h files that the
+.cfh files need.
 
 =head2 my $value = $builder->clownfish_params($key);
 
