@@ -92,12 +92,3 @@ class Lucy::Index::Posting::RawPostingWriter cnick RawPostWriter
     Write_Posting(RawPostingWriter *self, RawPosting *posting);
 }
 
-__C__
-extern lucy_RawPosting LUCY_RAWPOSTING_BLANK;
-
-#ifdef LUCY_USE_SHORT_NAMES
-  #define RAWPOSTING_BLANK         LUCY_RAWPOSTING_BLANK
-#endif
-__END_C__
-
-

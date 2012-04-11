@@ -365,13 +365,21 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
     uint32_t last_text_size = CB_Get_Size(last_term_text);
     SkipStepper_Set_ID_And_Filepos(skip_stepper, 0, 0);
 
+    // Initialize sentinel to be used on the last iter, using an empty string
+    // in order to make LexiconWriter Do The Right Thing.
+    size_t sentinel_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING)
+                           + 20;  // blob length + cushion
+    char empty_string[] = "";
+    RawPosting *sentinel = RawPost_new(alloca(sentinel_size), 0, 1,
+                                       empty_string, 0);
+
     while (1) {
         bool_t same_text_as_last = true;
 
         if (posting == NULL) {
             // On the last iter, use an empty string to make LexiconWriter
             // DTRT.
-            posting = &RAWPOSTING_BLANK;
+            posting = sentinel;
             same_text_as_last = false;
         }
         else {
@@ -409,7 +417,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
         }
 
         // Bail on last iter before writing invalid posting data.
-        if (posting == &RAWPOSTING_BLANK) { break; }
+        if (posting == sentinel) { break; }
 
         // Write posting data.
         PostWriter_Write_Posting(post_writer, posting);

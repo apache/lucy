@@ -30,17 +30,6 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/StringHelper.h"
 
-RawPosting RAWPOSTING_BLANK = {
-    RAWPOSTING,
-    {1},                   // ref.count
-    0,                     // doc_id
-    1,                     // freq
-    0,                     // content_len
-    0,                     // aux_len
-    { '\0' }               // blob
-};
-
-
 RawPosting*
 RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
             char *term_text, size_t term_text_len) {
