@@ -45,35 +45,23 @@ use Cwd qw( getcwd );
 
 BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 
-=for Rationale
+my @BASE_PATH = __PACKAGE__->cf_base_path;
 
-When the distribution tarball for the Perl binding of Lucy is built, core/,
-charmonizer/, and any other needed files/directories are copied into the
-perl/ directory within the main Lucy directory.  Then the distro is built from
-the contents of the perl/ directory, leaving out all the files in ruby/, etc.
-However, during development, the files are accessed from their original
-locations.
-
-=cut
-
-my $is_distro_not_devel = -e 'core';
-my $base_dir = rel2abs( $is_distro_not_devel ? getcwd() : updir() );
-
-my $CHARMONIZER_ORIG_DIR = catdir( $base_dir, 'charmonizer' );
+my $CHARMONIZER_ORIG_DIR = catdir( @BASE_PATH, 'charmonizer' );
 my $CHARMONIZE_EXE_PATH
     = catfile( $CHARMONIZER_ORIG_DIR, "charmonize$Config{_exe}" );
 my $CHARMONY_PATH  = 'charmony.h';
-my $LEMON_DIR      = catdir( $base_dir, 'lemon' );
+my $LEMON_DIR      = catdir( @BASE_PATH, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $SNOWSTEM_SRC_DIR
-    = catdir( $base_dir, qw( modules analysis snowstem source ) );
+    = catdir( @BASE_PATH, qw( modules analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
 my $SNOWSTOP_SRC_DIR
-    = catdir( $base_dir, qw( modules analysis snowstop source ) );
-my $UCD_INC_DIR      = catdir( $base_dir, qw( modules unicode ucd ) );
-my $UTF8PROC_SRC_DIR = catdir( $base_dir, qw( modules unicode utf8proc ) );
-my $CORE_SOURCE_DIR = catdir( $base_dir, 'core' );
-my $CLOWNFISH_DIR = catdir( $base_dir, 'clownfish', 'perl' );
+    = catdir( @BASE_PATH, qw( modules analysis snowstop source ) );
+my $UCD_INC_DIR      = catdir( @BASE_PATH, qw( modules unicode ucd ) );
+my $UTF8PROC_SRC_DIR = catdir( @BASE_PATH, qw( modules unicode utf8proc ) );
+my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
+my $CLOWNFISH_DIR = catdir( @BASE_PATH, 'clownfish', 'perl' );
 my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
 my $XS_SOURCE_DIR    = 'xs';
 my $LIB_DIR          = 'lib';
