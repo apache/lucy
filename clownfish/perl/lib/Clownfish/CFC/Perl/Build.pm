@@ -86,7 +86,7 @@ sub new {
 
     my $cf_source = $self->clownfish_params('source');
     if ( !defined($cf_source) ) {
-        $cf_source = [ catdir( @BASE_PATH, 'core' ) ];
+        $cf_source = [];
     }
     elsif ( !ref($cf_source) ) {
         $cf_source = [ $cf_source ];
@@ -493,7 +493,9 @@ the Perl bindings for Clownfish modules.
 =head1 SYNOPSIS
 
     use Clownfish::CFC::Perl::Build;
+    use File::Spec::Functions qw( catdir );
 
+    my @cf_base_path = Clownfish::CFC::Perl::Build->cf_base_path;
     my @cf_sys_includes = Clownfish::CFC::Perl::Build->cf_system_include_dirs;
     my $other_lib = Clownfish::CFC::Perl::Build->cf_system_library_file(
         'Other::Module',
@@ -507,6 +509,7 @@ the Perl bindings for Clownfish modules.
         include_dirs       => [ @cf_sys_includes ],
         extra_linker_flags => $other_lib,
         clownfish_params => {
+            source  => [ catdir( @cf_base_path, 'core' ) ],
             include => [ @cf_sys_includes ],
         },
         requires => {
