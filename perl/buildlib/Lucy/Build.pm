@@ -53,17 +53,9 @@ my $CHARMONIZE_EXE_PATH
 my $CHARMONY_PATH  = 'charmony.h';
 my $LEMON_DIR      = catdir( @BASE_PATH, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
-my $SNOWSTEM_SRC_DIR
-    = catdir( @BASE_PATH, qw( modules analysis snowstem source ) );
-my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
-my $SNOWSTOP_SRC_DIR
-    = catdir( @BASE_PATH, qw( modules analysis snowstop source ) );
-my $UCD_INC_DIR      = catdir( @BASE_PATH, qw( modules unicode ucd ) );
-my $UTF8PROC_SRC_DIR = catdir( @BASE_PATH, qw( modules unicode utf8proc ) );
 my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
 my $CLOWNFISH_DIR = catdir( @BASE_PATH, 'clownfish', 'perl' );
 my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
-my $XS_SOURCE_DIR    = 'xs';
 my $LIB_DIR          = 'lib';
 
 sub new {
@@ -90,26 +82,6 @@ sub new {
         }
     }
     $self->extra_compiler_flags(@$extra_ccflags);
-
-    my $include_dirs = $self->include_dirs;
-    push( @$include_dirs,
-        $CORE_SOURCE_DIR,
-        $XS_SOURCE_DIR,
-        $SNOWSTEM_INC_DIR,
-        $UCD_INC_DIR,
-        $UTF8PROC_SRC_DIR,
-    );
-    $self->include_dirs($include_dirs);
-
-    my $source_dirs = [];
-    push( @$source_dirs,
-        $CORE_SOURCE_DIR,
-        $XS_SOURCE_DIR,
-        $SNOWSTEM_SRC_DIR,
-        $SNOWSTOP_SRC_DIR,
-        $UTF8PROC_SRC_DIR,
-    );
-    $self->clownfish_params( source => $source_dirs );
 
     $self->clownfish_params( autogen_header => $self->autogen_header );
 
