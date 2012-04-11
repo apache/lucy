@@ -80,9 +80,10 @@ sub new {
     my $include_dirs = $self->include_dirs;
     push( @$include_dirs,
         curdir(), # for ppport.h
-        catfile( $AUTOGEN_DIR, 'include' ),
+        catdir( $AUTOGEN_DIR, 'include' ),
     );
     $self->include_dirs($include_dirs);
+
     my $cf_source = $self->clownfish_params('source');
     if ( !defined($cf_source) ) {
         $cf_source = [ catdir( @BASE_PATH, 'core' ) ];
@@ -90,6 +91,7 @@ sub new {
     elsif ( !ref($cf_source) ) {
         $cf_source = [ $cf_source ];
     }
+    push( @$cf_source, catdir( $AUTOGEN_DIR, 'source' ) );
     $self->clownfish_params( source => $cf_source );
 
     my $cf_include = $self->clownfish_params('include');
@@ -159,6 +161,7 @@ sub _cfh_filepaths {
     my @paths;
     my $source_dirs = $self->clownfish_params('source');
     for my $source_dir (@$source_dirs) {
+        next unless -e $source_dir;
         push @paths, @{ $self->rscan_dir( $source_dir, qr/\.cfh$/ ) };
     }
     return \@paths;
@@ -370,17 +373,11 @@ sub ACTION_compile_custom_xs {
     my @objects;
 
     # Compile C source files.
-
     my $c_files = [];
-
     my $source_dirs = $self->clownfish_params('source');
     for my $source_dir (@$source_dirs) {
         push @$c_files, @{ $self->rscan_dir( $source_dir, qr/\.c$/ ) };
     }
-
-    my $autogen_source_dir = catfile( $AUTOGEN_DIR, 'source' );
-    push @$c_files, @{ $self->rscan_dir( $autogen_source_dir, qr/\.c$/ ) };
-
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
