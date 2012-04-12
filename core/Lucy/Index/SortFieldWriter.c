@@ -172,7 +172,7 @@ S_find_unique_value(Hash *uniq_vals, Obj *val) {
     int32_t  hash_sum  = Obj_Hash_Sum(val);
     Obj     *uniq_val  = Hash_Find_Key(uniq_vals, val, hash_sum);
     if (!uniq_val) {
-        Hash_Store(uniq_vals, val, INCREF(&EMPTY));
+        Hash_Store(uniq_vals, val, (Obj*)CFISH_TRUE);
         uniq_val = Hash_Find_Key(uniq_vals, val, hash_sum);
     }
     return uniq_val;
@@ -431,7 +431,7 @@ SortFieldWriter_refill(SortFieldWriter *self) {
           ) {
         Obj *val = SortCache_Value(sort_cache, self->run_ord, blank);
         if (val) {
-            Hash_Store(uniq_vals, val, INCREF(&EMPTY));
+            Hash_Store(uniq_vals, val, (Obj*)CFISH_TRUE);
             break;
         }
         self->run_ord++;

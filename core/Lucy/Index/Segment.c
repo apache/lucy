@@ -43,7 +43,7 @@ Seg_init(Segment *self, int64_t number) {
     self->by_name   = Hash_new(0);
 
     // Start field numbers at 1, not 0.
-    VA_Push(self->by_num, INCREF(&EMPTY));
+    VA_Push(self->by_num, (Obj*)CB_newf(""));
 
     // Assign.
     self->number = number;

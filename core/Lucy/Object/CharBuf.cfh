@@ -398,12 +398,9 @@ __C__
 #define CFISH_ZCB_WRAP_STR(ptr, size) \
     lucy_ZCB_wrap_str(alloca(lucy_ZCB_size()), ptr, size)
 
-extern lucy_ZombieCharBuf CFISH_ZCB_EMPTY;
-
 #ifdef LUCY_USE_SHORT_NAMES
   #define ZCB_BLANK             CFISH_ZCB_BLANK
   #define ZCB_LITERAL(_string)  CFISH_ZCB_LITERAL(_string)
-  #define EMPTY                 CFISH_ZCB_EMPTY
   #define ZCB_WRAP              CFISH_ZCB_WRAP
   #define ZCB_WRAP_STR          CFISH_ZCB_WRAP_STR
 #endif

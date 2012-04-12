@@ -431,7 +431,7 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
             THROW(ERR, "Recycle() tried to merge segment '%o' twice",
                   seg_name);
         }
-        Hash_Store(seen, (Obj*)seg_name, INCREF(&EMPTY));
+        Hash_Store(seen, (Obj*)seg_name, (Obj*)CFISH_TRUE);
     }
     DECREF(seen);
 

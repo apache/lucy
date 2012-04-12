@@ -59,7 +59,7 @@ Snapshot_destroy(Snapshot *self) {
 
 void
 Snapshot_add_entry(Snapshot *self, const CharBuf *entry) {
-    Hash_Store(self->entries, (Obj*)entry, INCREF(&EMPTY));
+    Hash_Store(self->entries, (Obj*)entry, (Obj*)CFISH_TRUE);
 }
 
 bool_t
@@ -132,7 +132,7 @@ Snapshot_read_file(Snapshot *self, Folder *folder, const CharBuf *path) {
         for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
             CharBuf *entry
                 = (CharBuf*)CERTIFY(VA_Fetch(list, i), CHARBUF);
-            Hash_Store(self->entries, (Obj*)entry, INCREF(&EMPTY));
+            Hash_Store(self->entries, (Obj*)entry, (Obj*)CFISH_TRUE);
         }
 
         DECREF(list);

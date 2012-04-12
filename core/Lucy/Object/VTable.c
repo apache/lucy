@@ -27,6 +27,7 @@
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
 #include "Lucy/Object/LockFreeRegistry.h"
+#include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Util/Atomic.h"
 #include "Lucy/Util/Memory.h"
@@ -159,7 +160,7 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
             for (uint32_t i = 0; i < num_fresh; i++) {
                 CharBuf *meth = (CharBuf*)VA_fetch(fresh_host_methods, i);
                 S_scrunch_charbuf(meth, scrunched);
-                Hash_Store(meths, (Obj*)scrunched, INCREF(&EMPTY));
+                Hash_Store(meths, (Obj*)scrunched, (Obj*)CFISH_TRUE);
             }
             cfish_Callback **callbacks
                 = (cfish_Callback**)singleton->callbacks;

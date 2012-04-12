@@ -48,8 +48,6 @@ S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
 static void
 S_die_invalid_pattern(const char *pattern);
 
-ZombieCharBuf EMPTY = { ZOMBIECHARBUF, {1}, "", 0, 0 };
-
 CharBuf*
 CB_new(size_t size) {
     CharBuf *self = (CharBuf*)VTable_Make_Obj(CHARBUF);

@@ -250,7 +250,14 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix) {
 DirHandle*
 Folder_open_dir(Folder *self, const CharBuf *path) {
     DirHandle *dh = NULL;
-    Folder *folder = Folder_Find_Folder(self, path ? path : (CharBuf*)&EMPTY);
+    Folder *folder;
+    if (path) {
+        folder = Folder_Find_Folder(self, path);
+    }
+    else {
+        ZombieCharBuf *empty = ZCB_BLANK();
+        folder = Folder_Find_Folder(self, (CharBuf*)empty);
+    }
     if (!folder) {
         Err_set_error(Err_new(CB_newf("Invalid path: '%o'", path)));
     }

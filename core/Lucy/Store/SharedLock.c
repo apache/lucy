@@ -40,7 +40,7 @@ ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name,
 
     // Override.
     DECREF(self->lock_path);
-    self->lock_path = (CharBuf*)INCREF(&EMPTY);
+    self->lock_path = CB_newf("");
 
     return self;
 }
@@ -57,8 +57,9 @@ ShLock_request(SharedLock *self) {
     ShLock_request_t super_request
         = (ShLock_request_t)SUPER_METHOD(SHAREDLOCK, ShLock, Request);
 
-    // EMPTY lock_path indicates whether this particular instance is locked.
-    if (self->lock_path != (CharBuf*)&EMPTY
+    // Empty lock_path indicates whether this particular instance is locked.
+    if (self->lock_path
+        && !CB_Equals_Str(self->lock_path, "", 0)
         && Folder_Exists(self->folder, self->lock_path)
        ) {
         // Don't allow double obtain.
@@ -80,14 +81,14 @@ ShLock_request(SharedLock *self) {
 
 void
 ShLock_release(SharedLock *self) {
-    if (self->lock_path != (CharBuf*)&EMPTY) {
+    if (self->lock_path && !CB_Equals_Str(self->lock_path, "", 0)) {
         ShLock_release_t super_release
             = (ShLock_release_t)SUPER_METHOD(SHAREDLOCK, ShLock, Release);
         super_release(self);
 
         // Empty out lock_path.
         DECREF(self->lock_path);
-        self->lock_path = (CharBuf*)INCREF(&EMPTY);
+        self->lock_path = CB_newf("");
     }
 }
 

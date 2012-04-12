@@ -59,7 +59,7 @@ FilePurger_init(FilePurger *self, Folder *folder, Snapshot *snapshot,
 
     // Don't allow the locks directory to be zapped.
     self->disallowed = Hash_new(0);
-    Hash_Store_Str(self->disallowed, "locks", 5, INCREF(&EMPTY));
+    Hash_Store_Str(self->disallowed, "locks", 5, (Obj*)CFISH_TRUE);
 
     return self;
 }
@@ -96,7 +96,7 @@ FilePurger_purge(FilePurger *self) {
             if (Hash_Fetch(self->disallowed, (Obj*)entry)) { continue; }
             if (!Folder_Delete(folder, entry)) {
                 if (Folder_Exists(folder, entry)) {
-                    Hash_Store(failures, (Obj*)entry, INCREF(&EMPTY));
+                    Hash_Store(failures, (Obj*)entry, (Obj*)CFISH_TRUE);
                 }
             }
         }
@@ -160,12 +160,12 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
                     THROW(ERR, "Can't open segment dir '%o'", filepath);
                 }
 
-                Hash_Store(candidates, (Obj*)cutoff_seg, INCREF(&EMPTY));
-                Hash_Store(candidates, (Obj*)merge_json, INCREF(&EMPTY));
+                Hash_Store(candidates, (Obj*)cutoff_seg, (Obj*)CFISH_TRUE);
+                Hash_Store(candidates, (Obj*)merge_json, (Obj*)CFISH_TRUE);
                 while (DH_Next(dh)) {
                     // TODO: recursively delete subdirs within seg dir.
                     CB_setf(filepath, "%o/%o", cutoff_seg, entry);
-                    Hash_Store(candidates, (Obj*)filepath, INCREF(&EMPTY));
+                    Hash_Store(candidates, (Obj*)filepath, (Obj*)CFISH_TRUE);
                 }
                 DECREF(filepath);
                 DECREF(dh);
@@ -235,7 +235,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
                 // candidates for deletion.
                 for (uint32_t i = 0, max = VA_Get_Size(referenced); i < max; i++) {
                     CharBuf *file = (CharBuf*)VA_Fetch(referenced, i);
-                    Hash_Store(candidates, (Obj*)file, INCREF(&EMPTY));
+                    Hash_Store(candidates, (Obj*)file, (Obj*)CFISH_TRUE);
                 }
                 VA_Push(snapshots, INCREF(snapshot));
             }
@@ -270,12 +270,12 @@ S_find_all_referenced(Folder *folder, VArray *entries) {
     Hash *uniqued = Hash_new(VA_Get_Size(entries));
     for (uint32_t i = 0, max = VA_Get_Size(entries); i < max; i++) {
         CharBuf *entry = (CharBuf*)VA_Fetch(entries, i);
-        Hash_Store(uniqued, (Obj*)entry, INCREF(&EMPTY));
+        Hash_Store(uniqued, (Obj*)entry, (Obj*)CFISH_TRUE);
         if (Folder_Is_Directory(folder, entry)) {
             VArray *contents = Folder_List_R(folder, entry);
             for (uint32_t j = VA_Get_Size(contents); j--;) {
                 CharBuf *sub_entry = (CharBuf*)VA_Fetch(contents, j);
-                Hash_Store(uniqued, (Obj*)sub_entry, INCREF(&EMPTY));
+                Hash_Store(uniqued, (Obj*)sub_entry, (Obj*)CFISH_TRUE);
             }
             DECREF(contents);
         }
