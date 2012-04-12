@@ -16,7 +16,6 @@
 
 #define C_LUCY_DOCREADER
 #define C_LUCY_DEFAULTDOCREADER
-#define C_LUCY_ZOMBIECHARBUF
 #include "XSBind.h"
 
 #include "Lucy/Index/DocReader.h"

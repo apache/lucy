@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#define C_LUCY_CHARBUF
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
@@ -25,18 +24,38 @@
 #include "Lucy/Store/RAMFolder.h"
 #include "Lucy/Util/Json.h"
 
-static CharBuf cfmeta_file = ZCB_LITERAL("cfmeta.json");
-static CharBuf cfmeta_temp = ZCB_LITERAL("cfmeta.json.temp");
-static CharBuf cf_file     = ZCB_LITERAL("cf.dat");
-static CharBuf foo         = ZCB_LITERAL("foo");
-static CharBuf bar         = ZCB_LITERAL("bar");
-static CharBuf seg_1       = ZCB_LITERAL("seg_1");
+static CharBuf *cfmeta_file = NULL;
+static CharBuf *cfmeta_temp = NULL;
+static CharBuf *cf_file     = NULL;
+static CharBuf *foo         = NULL;
+static CharBuf *bar         = NULL;
+static CharBuf *seg_1       = NULL;
+
+static void
+S_init_strings(void) {
+    cfmeta_file = CB_newf("cfmeta.json");
+    cfmeta_temp = CB_newf("cfmeta.json.temp");
+    cf_file     = CB_newf("cf.dat");
+    foo         = CB_newf("foo");
+    bar         = CB_newf("bar");
+    seg_1       = CB_newf("seg_1");
+}
+
+static void
+S_destroy_strings(void) {
+    DECREF(cfmeta_file);
+    DECREF(cfmeta_temp);
+    DECREF(cf_file);
+    DECREF(foo);
+    DECREF(bar);
+    DECREF(seg_1);
+}
 
 static Folder*
 S_folder_with_contents() {
-    RAMFolder *folder  = RAMFolder_new(&seg_1);
-    OutStream *foo_out = RAMFolder_Open_Out(folder, &foo);
-    OutStream *bar_out = RAMFolder_Open_Out(folder, &bar);
+    RAMFolder *folder  = RAMFolder_new(seg_1);
+    OutStream *foo_out = RAMFolder_Open_Out(folder, foo);
+    OutStream *bar_out = RAMFolder_Open_Out(folder, bar);
     OutStream_Write_Bytes(foo_out, "foo", 3);
     OutStream_Write_Bytes(bar_out, "bar", 3);
     OutStream_Close(foo_out);
@@ -52,10 +71,10 @@ test_Consolidate(TestBatch *batch) {
     FileHandle *fh;
 
     // Fake up detritus from failed consolidation.
-    fh = Folder_Open_FileHandle(folder, &cf_file,
+    fh = Folder_Open_FileHandle(folder, cf_file,
                                 FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     DECREF(fh);
-    fh = Folder_Open_FileHandle(folder, &cfmeta_temp,
+    fh = Folder_Open_FileHandle(folder, cfmeta_temp,
                                 FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     DECREF(fh);
 
@@ -64,13 +83,13 @@ test_Consolidate(TestBatch *batch) {
     PASS(batch, "Consolidate completes despite leftover files");
     DECREF(cf_writer);
 
-    TEST_TRUE(batch, Folder_Exists(folder, &cf_file),
+    TEST_TRUE(batch, Folder_Exists(folder, cf_file),
               "cf.dat file written");
-    TEST_TRUE(batch, Folder_Exists(folder, &cfmeta_file),
+    TEST_TRUE(batch, Folder_Exists(folder, cfmeta_file),
               "cfmeta.json file written");
-    TEST_FALSE(batch, Folder_Exists(folder, &foo),
+    TEST_FALSE(batch, Folder_Exists(folder, foo),
                "original file zapped");
-    TEST_FALSE(batch, Folder_Exists(folder, &cfmeta_temp),
+    TEST_FALSE(batch, Folder_Exists(folder, cfmeta_temp),
                "detritus from failed consolidation zapped");
 
     DECREF(folder);
@@ -86,7 +105,7 @@ test_offsets(TestBatch *batch) {
     CFWriter_Consolidate(cf_writer);
 
     cf_metadata = (Hash*)CERTIFY(
-                      Json_slurp_json(folder, &cfmeta_file), HASH);
+                      Json_slurp_json(folder, cfmeta_file), HASH);
     files = (Hash*)CERTIFY(
                 Hash_Fetch_Str(cf_metadata, "files", 5), HASH);
 
@@ -121,9 +140,11 @@ void
 TestCFWriter_run_tests() {
     TestBatch *batch = TestBatch_new(7);
 
+    S_init_strings();
     TestBatch_Plan(batch);
     test_Consolidate(batch);
     test_offsets(batch);
+    S_destroy_strings();
 
     DECREF(batch);
 }

@@ -16,7 +16,6 @@
 
 #include <stdio.h> // for remove()
 
-#define C_LUCY_CHARBUF
 #define C_LUCY_FSFILEHANDLE
 #define C_LUCY_FILEWINDOW
 #include "Lucy/Util/ToolSet.h"

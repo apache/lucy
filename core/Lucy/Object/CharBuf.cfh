@@ -389,9 +389,6 @@ __C__
 
 #define CFISH_ZCB_BLANK() lucy_ZCB_new(alloca(lucy_ZCB_size()))
 
-#define CFISH_ZCB_LITERAL(string) \
-    { LUCY_ZOMBIECHARBUF, {1}, string "", sizeof(string) -1, sizeof(string) }
-
 #define CFISH_ZCB_WRAP(source) \
     lucy_ZCB_wrap(alloca(lucy_ZCB_size()), source)
 
@@ -400,7 +397,6 @@ __C__
 
 #ifdef LUCY_USE_SHORT_NAMES
   #define ZCB_BLANK             CFISH_ZCB_BLANK
-  #define ZCB_LITERAL(_string)  CFISH_ZCB_LITERAL(_string)
   #define ZCB_WRAP              CFISH_ZCB_WRAP
   #define ZCB_WRAP_STR          CFISH_ZCB_WRAP_STR
 #endif

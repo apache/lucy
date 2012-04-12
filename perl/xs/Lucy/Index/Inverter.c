@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_INVERTER
-#define C_LUCY_ZOMBIECHARBUF
 #define C_LUCY_INVERTERENTRY
 #include "XSBind.h"
 #include "Lucy/Index/Inverter.h"
