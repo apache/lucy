@@ -249,18 +249,6 @@ CFCClass_short_vtable_var(CFCClass *self);
 const char*
 CFCClass_full_vtable_var(CFCClass *self);
 
-const char*
-CFCClass_full_vtable_hidden(CFCClass *self);
-
-/** The fully qualified C type specifier for this class's vtable, including
- * the parcel prefix.  Each vtable needs to have its own type because each has
- * a variable number of methods at the end of the struct, and it's not
- * possible to initialize a static struct with a flexible array at the end
- * under C89.
- */
-const char*
-CFCClass_full_vtable_type(CFCClass *self);
-
 /** Access the symbol which unlocks the class struct definition and other
  * private information.
  */

@@ -78,10 +78,6 @@ S_inert_var_declarations(CFCBindClass *self);
 static char*
 S_method_defs(CFCBindClass *self);
 
-// Define the virtual table singleton object.
-static char*
-S_vt_singleton_def(CFCBindClass *self);
-
 // Define short names for all of the symbols associated with this class.
 static char*
 S_short_names(CFCBindClass *self);
@@ -186,13 +182,13 @@ S_to_c_header_inert(CFCBindClass *self) {
 static char*
 S_to_c_header_dynamic(CFCBindClass *self) {
     const char *privacy_symbol  = CFCClass_privacy_symbol(self->client);
+    const char *vt_var          = CFCClass_full_vtable_var(self->client);
     char *struct_def            = S_struct_definition(self);
     char *parent_include        = S_parent_include(self);
     char *sub_declarations      = S_sub_declarations(self);
     char *inert_var_defs        = S_inert_var_declarations(self);
     char *method_typedefs       = S_method_typedefs(self);
     char *method_defs           = S_method_defs(self);
-    char *vt_singleton_def      = S_vt_singleton_def(self);
     char *callback_declarations = S_callback_declarations(self);
     char *short_names           = S_short_names(self);
 
@@ -243,7 +239,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
         "/* Define the VTable singleton for this class.\n"
         " */\n"
         "\n"
-        "%s\n"
+        "extern cfish_VTable *%s;\n"
         "\n"
         "/* Define \"short names\" for this class's symbols.\n"
         " */\n"
@@ -261,7 +257,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
                   + strlen(callback_declarations)
                   + strlen(method_typedefs)
                   + strlen(method_defs)
-                  + strlen(vt_singleton_def)
+                  + strlen(vt_var)
                   + strlen(short_names)
                   + 100;
 
@@ -269,7 +265,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     sprintf(content, pattern, parent_include, privacy_symbol, struct_def,
             privacy_symbol, inert_var_defs, sub_declarations,
             callback_declarations, method_typedefs, method_defs,
-            vt_singleton_def, short_names);
+            vt_var, short_names);
 
     FREEMEM(struct_def);
     FREEMEM(parent_include);
@@ -277,7 +273,6 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     FREEMEM(inert_var_defs);
     FREEMEM(method_typedefs);
     FREEMEM(method_defs);
-    FREEMEM(vt_singleton_def);
     FREEMEM(callback_declarations);
     FREEMEM(short_names);
     return content;
@@ -293,8 +288,7 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
 
     const char *include_h = CFCClass_include_h(client);
     const char *autocode  = CFCClass_get_autocode(client);
-    const char *vt_type   = CFCClass_full_vtable_type(client);
-    const char *vt_hidden = CFCClass_full_vtable_hidden(client);
+    const char *vt_var    = CFCClass_full_vtable_var(client);
     const char *cnick     = CFCClass_get_cnick(client);
 
     CFCMethod **methods  = CFCClass_methods(client);
@@ -329,8 +323,9 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
 
         // Create offset in bytes for the method from the top of the VTable
         // object.
-        char *offset_str = CFCUtil_cat(CFCUtil_strdup(""), "(offsetof(", vt_type,
-                                       ", methods) + ", meth_num_str,
+        char *offset_str = CFCUtil_cat(CFCUtil_strdup(""),
+                                       "(offsetof(cfish_VTable, methods) + ",
+                                       meth_num_str,
                                        " * sizeof(cfish_method_t))", NULL);
         offsets = CFCUtil_cat(offsets, "size_t ", full_offset_sym, " = ",
                               offset_str, ";\n", NULL);
@@ -410,7 +405,7 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "/* Define this class's VTable.\n"
         " */\n"
         "\n"
-        "%s %s;\n"
+        "cfish_VTable *%s;\n"
         "\n"
         "/* Include auxilary automatically generated code for this class.\n"
         " */\n"
@@ -424,13 +419,12 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                   + strlen(cb_objects)
                   + strlen(cb_var)
                   + strlen(method_var)
-                  + strlen(vt_type)
-                  + strlen(vt_hidden)
+                  + strlen(vt_var)
                   + strlen(autocode)
                   + 100;
     char *code = (char*)MALLOCATE(size);
     sprintf(code, pattern, include_h, offsets, cb_funcs, cb_objects, cb_var,
-            method_var, vt_type, vt_hidden, autocode);
+            method_var, vt_var, autocode);
 
     FREEMEM(method_var);
     FREEMEM(fresh_methods);
@@ -466,6 +460,31 @@ S_struct_definition(CFCBindClass *self) {
 
     FREEMEM(member_decs);
     return struct_def;
+}
+
+// Return C code allocating the class's VTable.
+char*
+CFCBindClass_to_vtable_allocate(CFCBindClass *self) {
+    CFCClass *client = self->client;
+
+    if (CFCClass_inert(client)) {
+        return CFCUtil_strdup("");
+    }
+
+    const char *vt_var      = CFCClass_full_vtable_var(client);
+    size_t      num_methods = CFCClass_num_methods(client);
+
+    char pattern[] =
+        "    %s = cfish_VTable_allocate(%d);\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(vt_var)
+                  + 20  // for num_methods
+                  + 20;
+    char *code = (char*)MALLOCATE(size);
+    sprintf(code, pattern, vt_var, num_methods);
+
+    return code;
 }
 
 // Return C code bootstrapping the class's VTable.
@@ -633,47 +652,6 @@ S_method_defs(CFCBindClass *self) {
     return method_defs;
 }
 
-
-// Define the virtual table singleton object.
-static char*
-S_vt_singleton_def(CFCBindClass *self) {
-    CFCClass   *client      = self->client;
-    const char *vt_type     = CFCClass_full_vtable_type(client);
-    const char *vt_var      = CFCClass_full_vtable_var(client);
-    const char *vt_hidden   = CFCClass_full_vtable_hidden(client);
-    size_t      num_methods = CFCClass_num_methods(client);
-
-    const char pattern[] =
-        "typedef struct %s {\n"
-        "    cfish_VTable *vtable;\n"
-        "    cfish_ref_t ref;\n"
-        "    cfish_VTable *parent;\n"
-        "    cfish_CharBuf *name;\n"
-        "    uint32_t flags;\n"
-        "    void *x;\n"
-        "    size_t obj_alloc_size;\n"
-        "    size_t vt_alloc_size;\n"
-        "    void *callbacks;\n"
-        "    cfish_method_t methods[%lu];\n"
-        "} %s;\n"
-        "extern struct %s %s;\n"
-        "#define %s ((cfish_VTable*)&%s)\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(vt_type)
-                  + 40 // num_methods
-                  + strlen(vt_type)
-                  + strlen(vt_type)
-                  + strlen(vt_hidden)
-                  + strlen(vt_var)
-                  + strlen(vt_hidden)
-                  + 30;
-    char *def = (char*)MALLOCATE(size);
-    sprintf(def, pattern, vt_type, (unsigned long)num_methods, vt_type,
-            vt_type, vt_hidden, vt_var, vt_hidden);
-
-    return def;
-}
 
 // Define short names for all of the symbols associated with this class.
 static char*

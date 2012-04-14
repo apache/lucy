@@ -264,6 +264,7 @@ S_write_parcel_c(CFCBindCore *self) {
     char *privacy_syms = CFCUtil_strdup("");
     char *includes     = CFCUtil_strdup("");
     char *c_data       = CFCUtil_strdup("");
+    char *vt_allocate  = CFCUtil_strdup("");
     char *vt_bootstrap = CFCUtil_strdup("");
     char *vt_register  = CFCUtil_strdup("");
     CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
@@ -278,6 +279,9 @@ S_write_parcel_c(CFCBindCore *self) {
         char *class_c_data = CFCBindClass_to_c_data(class_binding);
         c_data = CFCUtil_cat(c_data, class_c_data, "\n", NULL);
         FREEMEM(class_c_data);
+        char *vt_alloc = CFCBindClass_to_vtable_allocate(class_binding);
+        vt_allocate = CFCUtil_cat(vt_allocate, vt_alloc, NULL);
+        FREEMEM(vt_alloc);
         char *vt_boot = CFCBindClass_to_vtable_bootstrap(class_binding);
         vt_bootstrap = CFCUtil_cat(vt_bootstrap, vt_boot, NULL);
         FREEMEM(vt_boot);
@@ -315,6 +319,8 @@ S_write_parcel_c(CFCBindCore *self) {
         "\n"
         "%s"
         "\n"
+        "%s"
+        "\n"
         "    %sinit_parcel();\n"
         "}\n"
         "\n"
@@ -325,14 +331,16 @@ S_write_parcel_c(CFCBindCore *self) {
                   + strlen(includes)
                   + strlen(c_data)
                   + strlen(prefix)
+                  + strlen(vt_allocate)
                   + strlen(vt_bootstrap)
                   + strlen(vt_register)
                   + strlen(prefix)
                   + strlen(self->footer)
-                  + 50;
+                  + 100;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, privacy_syms, includes,
-            c_data, prefix, vt_bootstrap, vt_register, prefix, self->footer);
+            c_data, prefix, vt_allocate, vt_bootstrap, vt_register, prefix,
+            self->footer);
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
@@ -345,6 +353,7 @@ S_write_parcel_c(CFCBindCore *self) {
     FREEMEM(privacy_syms);
     FREEMEM(includes);
     FREEMEM(c_data);
+    FREEMEM(vt_allocate);
     FREEMEM(vt_bootstrap);
     FREEMEM(vt_register);
 }

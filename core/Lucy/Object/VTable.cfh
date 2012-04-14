@@ -38,6 +38,9 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     inert size_t offset_of_parent;
 
     inert VTable*
+    allocate(size_t num_methods);
+
+    inert VTable*
     bootstrap(VTable *self, VTable *parent, const char *name, int flags,
               void *x, size_t obj_alloc_size, void *callbacks,
               cfish_method_t *methods);

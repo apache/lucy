@@ -42,6 +42,15 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 LockFreeRegistry *VTable_registry = NULL;
 
 VTable*
+VTable_allocate(size_t num_methods) {
+    size_t vt_alloc_size = offsetof(cfish_VTable, methods)
+                           + num_methods * sizeof(cfish_method_t);
+    VTable *self = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
+    self->vt_alloc_size = vt_alloc_size;
+    return self;
+}
+
+VTable*
 VTable_bootstrap(VTable *self, VTable *parent, const char *name, int flags,
                  void *x, size_t obj_alloc_size, void *callbacks,
                  cfish_method_t *methods) {
@@ -66,12 +75,9 @@ VTable_bootstrap(VTable *self, VTable *parent, const char *name, int flags,
     self->obj_alloc_size = obj_alloc_size;
     self->callbacks      = callbacks;
 
-    int n;
-    for (n = 0; methods[n]; ++n) {
-        self->methods[n] = methods[n];
+    for (int i = 0; methods[i]; ++i) {
+        self->methods[i] = methods[i];
     }
-    self->vt_alloc_size = offsetof(cfish_VTable, methods)
-                          + n * sizeof(cfish_method_t);
 
     return self;
 }

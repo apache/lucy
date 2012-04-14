@@ -286,7 +286,6 @@ ALIAS:
     full_struct_sym       = 20
     short_vtable_var      = 22
     full_vtable_var       = 24
-    full_vtable_type      = 26
     include_h             = 28
     get_docucomment       = 30
     children              = 32
@@ -361,11 +360,6 @@ PPCODE:
             break;
         case 24: {
                 const char *value = CFCClass_full_vtable_var(self);
-                retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
-            }
-            break;
-        case 26: {
-                const char *value = CFCClass_full_vtable_type(self);
                 retval = value ? newSVpvn(value, strlen(value)) : newSV(0);
             }
             break;

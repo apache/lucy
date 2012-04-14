@@ -95,6 +95,7 @@ struct alias aliases[] = {
 
     {"cfish_VTable", "lucy_VTable"},
     {"CFISH_VTABLE", "LUCY_VTABLE"},
+    {"cfish_VTable_allocate", "lucy_VTable_allocate"},
     {"cfish_VTable_bootstrap", "lucy_VTable_bootstrap"},
     {"cfish_VTable_add_to_registry", "lucy_VTable_add_to_registry"},
     {"cfish_VTable_add_alias_to_registry", "lucy_VTable_add_alias_to_registry"},
