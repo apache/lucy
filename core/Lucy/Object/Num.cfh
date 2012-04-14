@@ -243,10 +243,13 @@ class Lucy::Object::Integer64 cnick Int64
  */
 class Lucy::Object::BoolNum cnick Bool inherits Lucy::Object::IntNum {
     bool_t value;
-    ViewCharBuf *string;
+    CharBuf *string;
 
     inert BoolNum *true_singleton;
     inert BoolNum *false_singleton;
+
+    inert void
+    init_class();
 
     /** Return either CFISH_TRUE or CFISH_FALSE depending on the supplied
      * value.

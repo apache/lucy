@@ -361,12 +361,19 @@ Int64_deserialize(Integer64 *self, InStream *instream) {
 
 /***************************************************************************/
 
-static ViewCharBuf true_string  = { VIEWCHARBUF, {1}, "true",  4, 0 };
-static ViewCharBuf false_string = { VIEWCHARBUF, {1}, "false", 5, 0 };
-static BoolNum true_obj  = { BOOLNUM, {1}, true, &true_string };
-static BoolNum false_obj = { BOOLNUM, {1}, false, &false_string };
-BoolNum *Bool_true_singleton  = &true_obj;
-BoolNum *Bool_false_singleton = &false_obj;
+
+BoolNum *Bool_true_singleton;
+BoolNum *Bool_false_singleton;
+
+void
+Bool_init_class() {
+    Bool_true_singleton          = (BoolNum*)VTable_Make_Obj(BOOLNUM);
+    Bool_true_singleton->value   = true;
+    Bool_true_singleton->string  = CB_newf("true");
+    Bool_false_singleton         = (BoolNum*)VTable_Make_Obj(BOOLNUM);
+    Bool_false_singleton->value  = false;
+    Bool_false_singleton->string = CB_newf("false");
+}
 
 BoolNum*
 Bool_singleton(bool_t value) {
@@ -413,7 +420,7 @@ Bool_hash_sum(BoolNum *self) {
 
 CharBuf*
 Bool_to_string(BoolNum *self) {
-    return (CharBuf*)ViewCB_Inc_RefCount(self->string);
+    return (CharBuf*)CB_Inc_RefCount(self->string);
 }
 
 bool_t

@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+#include "Lucy/Object/Num.h"
+
 void
 lucy_init_parcel() {
+    lucy_Bool_init_class();
 }
 
