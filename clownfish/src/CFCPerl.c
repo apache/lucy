@@ -235,7 +235,7 @@ static void
 S_write_boot_c(CFCPerl *self) {
     CFCClass **ordered   = CFCHierarchy_ordered_classes(self->hierarchy);
     char *pound_includes = CFCUtil_strdup("");
-    char *registrations  = CFCUtil_strdup("");
+    char *alias_adds     = CFCUtil_strdup("");
     char *isa_pushes     = CFCUtil_strdup("");
     const char *prefix   = CFCParcel_get_prefix(self->parcel);
 
@@ -249,13 +249,6 @@ S_write_boot_c(CFCPerl *self) {
                                      include_h, "\"\n", NULL);
 
         if (CFCClass_inert(klass)) { continue; }
-
-        // Ignore return value from VTable_add_to_registry, since it's OK if
-        // multiple threads contend for adding these permanent VTables and some
-        // fail.
-        registrations
-            = CFCUtil_cat(registrations, "    cfish_VTable_add_to_registry(",
-                          CFCClass_full_vtable_var(klass), ");\n", NULL);
 
         // Add aliases for selected KinoSearch classes which allow old indexes
         // to be read.
@@ -274,16 +267,16 @@ S_write_boot_c(CFCPerl *self) {
                     "        (cfish_CharBuf*)alias);\n";
 
                 size_t new_size = sizeof(pattern)
-                                  + strlen(registrations)
+                                  + strlen(alias_adds)
                                   + alias_len
                                   + 20    // stringified alias_len
                                   + strlen(vtable_var)
                                   + 50;
-                char *new_registrations = (char*)MALLOCATE(new_size);
-                sprintf(new_registrations, pattern, registrations, alias,
+                char *new_alias_adds = (char*)MALLOCATE(new_size);
+                sprintf(new_alias_adds, pattern, alias_adds, alias,
                         (unsigned)alias_len, vtable_var);
-                FREEMEM(registrations);
-                registrations = new_registrations;
+                FREEMEM(alias_adds);
+                alias_adds = new_alias_adds;
             }
         }
 
@@ -315,10 +308,11 @@ S_write_boot_c(CFCPerl *self) {
         "%s() {\n"
         "    %sbootstrap_parcel();\n"
         "\n"
-        "    AV *isa;\n"
         "    cfish_ZombieCharBuf *alias = CFISH_ZCB_WRAP_STR(\"\", 0);\n"
-        "%s\n"
-        "%s\n"
+        "%s"
+        "\n"
+        "    AV *isa;\n"
+        "%s"
         "}\n"
         "\n"
         "%s\n"
@@ -330,18 +324,18 @@ S_write_boot_c(CFCPerl *self) {
                   + strlen(pound_includes)
                   + strlen(self->boot_func)
                   + strlen(prefix)
-                  + strlen(registrations)
+                  + strlen(alias_adds)
                   + strlen(isa_pushes)
                   + strlen(self->footer)
                   + 100;
     char *content = (char*)MALLOCATE(size);
     sprintf(content, pattern, self->header, self->boot_h_file, pound_includes,
-            self->boot_func, prefix, registrations, isa_pushes, self->footer);
+            self->boot_func, prefix, alias_adds, isa_pushes, self->footer);
     CFCUtil_write_file(self->boot_c_path, content, strlen(content));
 
     FREEMEM(content);
     FREEMEM(isa_pushes);
-    FREEMEM(registrations);
+    FREEMEM(alias_adds);
     FREEMEM(pound_includes);
     FREEMEM(ordered);
 }

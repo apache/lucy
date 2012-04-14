@@ -514,6 +514,32 @@ CFCBindClass_to_vtable_bootstrap(CFCBindClass *self) {
     return code;
 }
 
+// Return C code registering the class's VTable.
+char*
+CFCBindClass_to_vtable_register(CFCBindClass *self) {
+    CFCClass    *client     = self->client;
+
+    if (CFCClass_inert(client)) {
+        return CFCUtil_strdup("");
+    }
+
+    const char  *vt_var     = CFCClass_full_vtable_var(client);
+
+    // Ignore return value from VTable_add_to_registry, since it's OK if
+    // multiple threads contend for adding these permanent VTables and some
+    // fail.
+    char pattern[] =
+        "    cfish_VTable_add_to_registry(%s);\n";
+
+    size_t size = sizeof(pattern)
+                  + strlen(vt_var)
+                  + 20;
+    char *code = (char*)MALLOCATE(size);
+    sprintf(code, pattern, vt_var);
+
+    return code;
+}
+
 // Declare cfish_Callback objects.
 static char*
 S_callback_declarations(CFCBindClass *self) {

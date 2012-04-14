@@ -262,6 +262,7 @@ S_write_parcel_c(CFCBindCore *self) {
     char *includes     = CFCUtil_strdup("");
     char *c_data       = CFCUtil_strdup("");
     char *vt_bootstrap = CFCUtil_strdup("");
+    char *vt_register  = CFCUtil_strdup("");
     CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
     if (!ordered[0]) {
         CFCUtil_die("No classes found.");
@@ -277,6 +278,9 @@ S_write_parcel_c(CFCBindCore *self) {
         char *vt_boot = CFCBindClass_to_vtable_bootstrap(class_binding);
         vt_bootstrap = CFCUtil_cat(vt_bootstrap, vt_boot, NULL);
         FREEMEM(vt_boot);
+        char *vt_reg = CFCBindClass_to_vtable_register(class_binding);
+        vt_register = CFCUtil_cat(vt_register, vt_reg, NULL);
+        FREEMEM(vt_reg);
         CFCBase_decref((CFCBase*)class_binding);
         const char *privacy_sym = CFCClass_privacy_symbol(klass);
         privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
@@ -305,6 +309,8 @@ S_write_parcel_c(CFCBindCore *self) {
         "void\n"
         "%sbootstrap_parcel() {\n"
         "%s"
+        "\n"
+        "%s"
         "}\n"
         "\n"
         "%s\n";
@@ -315,11 +321,12 @@ S_write_parcel_c(CFCBindCore *self) {
                   + strlen(c_data)
                   + strlen(prefix)
                   + strlen(vt_bootstrap)
+                  + strlen(vt_register)
                   + strlen(self->footer)
                   + 50;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, privacy_syms, includes,
-            c_data, prefix, vt_bootstrap, self->footer);
+            c_data, prefix, vt_bootstrap, vt_register, self->footer);
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
@@ -333,5 +340,6 @@ S_write_parcel_c(CFCBindCore *self) {
     FREEMEM(includes);
     FREEMEM(c_data);
     FREEMEM(vt_bootstrap);
+    FREEMEM(vt_register);
 }
 
