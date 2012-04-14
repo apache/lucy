@@ -1804,10 +1804,10 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-to_c(self)
+to_c_data(self)
     CFCBindClass *self;
 CODE:
-    RETVAL = S_sv_eat_c_string(CFCBindClass_to_c(self));
+    RETVAL = S_sv_eat_c_string(CFCBindClass_to_c_data(self));
 OUTPUT: RETVAL
 
 SV*

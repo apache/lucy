@@ -26,6 +26,7 @@
 #include "CFCClass.h"
 #include "CFCFile.h"
 #include "CFCHierarchy.h"
+#include "CFCParcel.h"
 #include "CFCUtil.h"
 
 struct CFCBindCore {
@@ -114,10 +115,15 @@ CFCBindCore_write_all_modified(CFCBindCore *self, int modified) {
 static void
 S_write_parcel_h(CFCBindCore *self) {
     CFCHierarchy *hierarchy = self->hierarchy;
+    CFCParcel    *parcel    = NULL;
 
     // Declare object structs for all instantiable classes.
+    // Obtain parcel prefix for use in bootstrap function name.
     char *typedefs = CFCUtil_strdup("");
     CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
+    if (!ordered[0]) {
+        CFCUtil_die("No classes found.");
+    }
     for (int i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
         if (!CFCClass_inert(klass)) {
@@ -125,7 +131,12 @@ S_write_parcel_h(CFCBindCore *self) {
             typedefs = CFCUtil_cat(typedefs, "typedef struct ", full_struct,
                                    " ", full_struct, ";\n", NULL);
         }
+        if (parcel && CFCClass_get_parcel(klass) != parcel) {
+            CFCUtil_die("Multiple parcels not yet supported.");
+        }
+        parcel = CFCClass_get_parcel(klass);
     }
+    const char *prefix = CFCParcel_get_prefix(parcel);
     FREEMEM(ordered);
 
     // Create Clownfish aliases if necessary.
@@ -205,6 +216,9 @@ S_write_parcel_h(CFCBindCore *self) {
         "    size_t         offset;\n"
         "} cfish_Callback;\n"
         "\n"
+        "void\n"
+        "%sbootstrap_parcel();\n"
+        "\n"
         "#ifdef __cplusplus\n"
         "}\n"
         "#endif\n"
@@ -217,10 +231,11 @@ S_write_parcel_h(CFCBindCore *self) {
                   + strlen(self->header)
                   + strlen(aliases)
                   + strlen(typedefs)
+                  + strlen(prefix)
                   + strlen(self->footer)
                   + 50;
     char *file_content = (char*)MALLOCATE(size);
-    sprintf(file_content, pattern, self->header, aliases, typedefs,
+    sprintf(file_content, pattern, self->header, aliases, typedefs, prefix,
             self->footer);
 
     // Unlink then write file.
@@ -239,62 +254,72 @@ S_write_parcel_h(CFCBindCore *self) {
 static void
 S_write_parcel_c(CFCBindCore *self) {
     CFCHierarchy *hierarchy = self->hierarchy;
+    CFCParcel    *parcel    = NULL;
 
     // Aggregate C code from all files.
-    char *content      = CFCUtil_strdup("");
+    // Obtain parcel prefix for use in bootstrap function name.
     char *privacy_syms = CFCUtil_strdup("");
     char *includes     = CFCUtil_strdup("");
-    CFCFile **files    = CFCHierarchy_files(hierarchy);
-    for (int i = 0; files[i] != NULL; i++) {
-        CFCFile *file = files[i];
-        CFCBase **blocks = CFCFile_blocks(file);
-        for (int j = 0; blocks[j] != NULL; j++) {
-            const char *cfc_class = CFCBase_get_cfc_class(blocks[j]);
-            if (strcmp(cfc_class, "Clownfish::CFC::Model::Class") != 0) {
-                continue;
-            }
-
-            CFCClass *klass = (CFCClass*)blocks[j];
-            if (CFCClass_included(klass)) { continue; }
-
-            CFCBindClass *class_binding = CFCBindClass_new(klass);
-            char *c_code = CFCBindClass_to_c(class_binding);
-            content = CFCUtil_cat(content, c_code, "\n", NULL);
-            FREEMEM(c_code);
-            CFCBase_decref((CFCBase*)class_binding);
-            const char *privacy_sym = CFCClass_privacy_symbol(klass);
-            privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
-                                       privacy_sym, "\n", NULL);
-            const char *include_h = CFCClass_include_h(klass);
-            includes = CFCUtil_cat(includes, "#include \"", include_h,
-                                   "\"\n", NULL);
-        }
+    char *c_data       = CFCUtil_strdup("");
+    char *vt_bootstrap = CFCUtil_strdup("");
+    CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
+    if (!ordered[0]) {
+        CFCUtil_die("No classes found.");
     }
+    for (int i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        if (CFCClass_included(klass)) { continue; }
+
+        CFCBindClass *class_binding = CFCBindClass_new(klass);
+        char *class_c_data = CFCBindClass_to_c_data(class_binding);
+        c_data = CFCUtil_cat(c_data, class_c_data, "\n", NULL);
+        FREEMEM(class_c_data);
+        char *vt_boot = CFCBindClass_to_vtable_bootstrap(class_binding);
+        vt_bootstrap = CFCUtil_cat(vt_bootstrap, vt_boot, NULL);
+        FREEMEM(vt_boot);
+        CFCBase_decref((CFCBase*)class_binding);
+        const char *privacy_sym = CFCClass_privacy_symbol(klass);
+        privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
+                                   privacy_sym, "\n", NULL);
+        const char *include_h = CFCClass_include_h(klass);
+        includes = CFCUtil_cat(includes, "#include \"", include_h,
+                               "\"\n", NULL);
+        if (parcel && CFCClass_get_parcel(klass) != parcel) {
+            CFCUtil_die("Multiple parcels not yet supported.");
+        }
+        parcel = CFCClass_get_parcel(klass);
+    }
+    const char *prefix = CFCParcel_get_prefix(parcel);
+    FREEMEM(ordered);
 
     char pattern[] =
         "%s\n"
         "\n"
-        "#define C_LUCY_ZOMBIECHARBUF\n"
-        "#define C_LUCY_VTABLE\n"
         "%s\n"
         "#include \"parcel.h\"\n"
-        "#include \"Lucy/Object/CharBuf.h\"\n"
         "#include \"Lucy/Object/VTable.h\"\n"
         "%s\n"
         "\n"
         "%s\n"
+        "\n"
+        "void\n"
+        "%sbootstrap_parcel() {\n"
+        "%s"
+        "}\n"
         "\n"
         "%s\n";
     size_t size = sizeof(pattern)
                   + strlen(self->header)
                   + strlen(privacy_syms)
                   + strlen(includes)
-                  + strlen(content)
+                  + strlen(c_data)
+                  + strlen(prefix)
+                  + strlen(vt_bootstrap)
                   + strlen(self->footer)
                   + 50;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, privacy_syms, includes,
-            content, self->footer);
+            c_data, prefix, vt_bootstrap, self->footer);
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
@@ -306,7 +331,7 @@ S_write_parcel_c(CFCBindCore *self) {
 
     FREEMEM(privacy_syms);
     FREEMEM(includes);
-    FREEMEM(content);
-    FREEMEM(file_content);
+    FREEMEM(c_data);
+    FREEMEM(vt_bootstrap);
 }
 

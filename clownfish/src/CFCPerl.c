@@ -237,6 +237,7 @@ S_write_boot_c(CFCPerl *self) {
     char *pound_includes = CFCUtil_strdup("");
     char *registrations  = CFCUtil_strdup("");
     char *isa_pushes     = CFCUtil_strdup("");
+    const char *prefix   = CFCParcel_get_prefix(self->parcel);
 
     for (size_t i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
@@ -312,6 +313,8 @@ S_write_boot_c(CFCPerl *self) {
         "\n"
         "void\n"
         "%s() {\n"
+        "    %sbootstrap_parcel();\n"
+        "\n"
         "    AV *isa;\n"
         "    cfish_ZombieCharBuf *alias = CFISH_ZCB_WRAP_STR(\"\", 0);\n"
         "%s\n"
@@ -326,13 +329,14 @@ S_write_boot_c(CFCPerl *self) {
                   + strlen(self->boot_h_file)
                   + strlen(pound_includes)
                   + strlen(self->boot_func)
+                  + strlen(prefix)
                   + strlen(registrations)
                   + strlen(isa_pushes)
                   + strlen(self->footer)
                   + 100;
     char *content = (char*)MALLOCATE(size);
     sprintf(content, pattern, self->header, self->boot_h_file, pound_includes,
-            self->boot_func, registrations, isa_pushes, self->footer);
+            self->boot_func, prefix, registrations, isa_pushes, self->footer);
     CFCUtil_write_file(self->boot_c_path, content, strlen(content));
 
     FREEMEM(content);

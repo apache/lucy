@@ -16,6 +16,7 @@
 
 #define C_LUCY_VTABLE
 #define C_LUCY_OBJ
+#define C_LUCY_CHARBUF
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
@@ -39,6 +40,41 @@ static void
 S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 
 LockFreeRegistry *VTable_registry = NULL;
+
+VTable*
+VTable_bootstrap(VTable *self, VTable *parent, const char *name, int flags,
+                 void *x, size_t obj_alloc_size, void *callbacks,
+                 cfish_method_t *methods) {
+    // Create CharBuf manually, since the CharBuf VTable might not be
+    // bootstrapped yet.
+    CharBuf *name_cb = (CharBuf*)Memory_wrapped_calloc(sizeof(CharBuf), 1);
+    size_t name_len  = strlen(name);
+
+    name_cb->vtable    = CHARBUF;
+    name_cb->ref.count = 1;
+    name_cb->ptr       = (char*)MALLOCATE(name_len + 1);
+    name_cb->size      = name_len;
+    name_cb->cap       = name_len + 1;
+    strcpy(name_cb->ptr, name);
+
+    self->vtable         = CFISH_VTABLE;
+    self->ref.count      = 1;
+    self->parent         = parent;
+    self->name           = name_cb;
+    self->flags          = flags;
+    self->x              = x;
+    self->obj_alloc_size = obj_alloc_size;
+    self->callbacks      = callbacks;
+
+    int n;
+    for (n = 0; methods[n]; ++n) {
+        self->methods[n] = methods[n];
+    }
+    self->vt_alloc_size = offsetof(cfish_VTable, methods)
+                          + n * sizeof(cfish_method_t);
+
+    return self;
+}
 
 void
 VTable_destroy(VTable *self) {

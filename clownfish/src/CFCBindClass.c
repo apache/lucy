@@ -34,7 +34,7 @@ struct CFCBindClass {
     CFCBase base;
     CFCClass *client;
     char *full_callbacks_var;
-    char *full_name_var;
+    char *full_methods_var;
     char *short_names_macro;
 };
 
@@ -49,12 +49,6 @@ S_to_c_header_dynamic(CFCBindClass *self);
 // Create the definition for the instantiable object struct.
 static char*
 S_struct_definition(CFCBindClass *self);
-
-/* C code defining the ZombieCharBuf which contains the class name for this
- * class.
- */
-static char*
-S_name_var_definition(CFCBindClass *self);
 
 // Return C code defining the class's VTable.
 static char*
@@ -112,10 +106,10 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
     const char *full_vtable_var = CFCClass_full_vtable_var(client);
     const char *PREFIX = CFCClass_get_PREFIX(client);
     self->full_callbacks_var = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
-    self->full_name_var      = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
+    self->full_methods_var   = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
     self->short_names_macro  = (char*)MALLOCATE(strlen(PREFIX) + 20);
     sprintf(self->full_callbacks_var, "%s_CALLBACKS", full_vtable_var);
-    sprintf(self->full_name_var, "%s_CLASS_NAME", full_vtable_var);
+    sprintf(self->full_methods_var, "%s_METHODS", full_vtable_var);
     sprintf(self->short_names_macro, "%sUSE_SHORT_NAMES", PREFIX);
 
     return self;
@@ -124,7 +118,7 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 void
 CFCBindClass_destroy(CFCBindClass *self) {
     FREEMEM(self->full_callbacks_var);
-    FREEMEM(self->full_name_var);
+    FREEMEM(self->full_methods_var);
     FREEMEM(self->short_names_macro);
     CFCBase_decref((CFCBase*)self->client);
     CFCBase_destroy((CFCBase*)self);
@@ -290,7 +284,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
 }
 
 char*
-CFCBindClass_to_c(CFCBindClass *self) {
+CFCBindClass_to_c_data(CFCBindClass *self) {
     CFCClass *client = self->client;
 
     if (CFCClass_inert(client)) {
@@ -300,9 +294,8 @@ CFCBindClass_to_c(CFCBindClass *self) {
     const char *include_h = CFCClass_include_h(client);
     const char *autocode  = CFCClass_get_autocode(client);
     const char *vt_type   = CFCClass_full_vtable_type(client);
+    const char *vt_hidden = CFCClass_full_vtable_hidden(client);
     const char *cnick     = CFCClass_get_cnick(client);
-    char *class_name_def  = S_name_var_definition(self);
-    char *vtable_def      = S_vtable_definition(self);
 
     CFCMethod **methods  = CFCClass_methods(client);
     CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
@@ -318,6 +311,10 @@ CFCBindClass_to_c(CFCBindClass *self) {
     char *cb_var = CFCUtil_strdup("");
     cb_var = CFCUtil_cat(cb_var, "cfish_Callback *", self->full_callbacks_var,
                          "[] = {\n    ", NULL);
+
+    char *method_var = CFCUtil_strdup("");
+    method_var = CFCUtil_cat(method_var, "cfish_method_t ",
+                             self->full_methods_var, "[] = {\n    ", NULL);
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
@@ -365,11 +362,18 @@ CFCBindClass_to_c(CFCBindClass *self) {
             cb_var = CFCUtil_cat(cb_var, "&", full_cb_sym, ",\n    ", NULL);
         }
 
+        // Define method implementations.
+        const char *implementing_sym = CFCMethod_implementing_func_sym(method);
+        method_var = CFCUtil_cat(method_var, "(cfish_method_t)",
+                                 implementing_sym, ",\n    ", NULL);
+
         FREEMEM(offset_str);
     }
 
     // Close callbacks variable definition.
     cb_var =  CFCUtil_cat(cb_var, "NULL\n};\n", NULL);
+    // Close methods variable definition.
+    method_var =  CFCUtil_cat(method_var, "NULL\n};\n", NULL);
 
     const char pattern[] =
         "#include \"%s\"\n"
@@ -398,7 +402,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n"
-        "/* Define the variable which holds this class's class name.\n"
+        "/* Define this class's method implementations.\n"
         " */\n"
         "\n"
         "%s\n"
@@ -406,7 +410,7 @@ CFCBindClass_to_c(CFCBindClass *self) {
         "/* Define this class's VTable.\n"
         " */\n"
         "\n"
-        "%s\n"
+        "%s %s;\n"
         "\n"
         "/* Include auxilary automatically generated code for this class.\n"
         " */\n"
@@ -419,21 +423,21 @@ CFCBindClass_to_c(CFCBindClass *self) {
                   + strlen(cb_funcs)
                   + strlen(cb_objects)
                   + strlen(cb_var)
-                  + strlen(class_name_def)
-                  + strlen(vtable_def)
+                  + strlen(method_var)
+                  + strlen(vt_type)
+                  + strlen(vt_hidden)
                   + strlen(autocode)
                   + 100;
     char *code = (char*)MALLOCATE(size);
     sprintf(code, pattern, include_h, offsets, cb_funcs, cb_objects, cb_var,
-            class_name_def, vtable_def, autocode);
+            method_var, vt_type, vt_hidden, autocode);
 
+    FREEMEM(method_var);
     FREEMEM(fresh_methods);
     FREEMEM(offsets);
     FREEMEM(cb_funcs);
     FREEMEM(cb_objects);
     FREEMEM(cb_var);
-    FREEMEM(class_name_def);
-    FREEMEM(vtable_def);
     return code;
 }
 
@@ -464,38 +468,17 @@ S_struct_definition(CFCBindClass *self) {
     return struct_def;
 }
 
-static char*
-S_name_var_definition(CFCBindClass *self) {
-    const char *class_name  = CFCClass_get_class_name(self->client);
-    unsigned class_name_len = (unsigned)strlen(class_name);
+// Return C code bootstrapping the class's VTable.
+char*
+CFCBindClass_to_vtable_bootstrap(CFCBindClass *self) {
+    CFCClass *client = self->client;
 
-    const char pattern[] =
-        "static cfish_ZombieCharBuf %s = {\n"
-        "    CFISH_ZOMBIECHARBUF,\n"
-        "    {1}, /* ref.count */\n"
-        "    \"%s\",\n"
-        "    %u,\n"
-        "    0\n"
-        "};\n\n";
-    size_t size = sizeof(pattern)
-                  + strlen(self->full_name_var)
-                  + class_name_len
-                  + 15 // class_name_len
-                  + 20;
-    char *name_var_def = (char*)MALLOCATE(size);
-    sprintf(name_var_def, pattern, self->full_name_var, class_name,
-            class_name_len);
+    if (CFCClass_inert(client)) {
+        return CFCUtil_strdup("");
+    }
 
-    return name_var_def;
-}
-
-// Return C code defining the class's VTable.
-static char*
-S_vtable_definition(CFCBindClass *self) {
-    CFCClass    *client     = self->client;
     CFCClass    *parent     = CFCClass_get_parent(client);
-    CFCMethod  **methods    = CFCClass_methods(client);
-    const char  *vt_type    = CFCClass_full_vtable_type(client);
+    const char  *class_name = CFCClass_get_class_name(client);
     const char  *vt_var     = CFCClass_full_vtable_var(client);
     const char  *struct_sym = CFCClass_full_struct_sym(client);
 
@@ -504,56 +487,31 @@ S_vtable_definition(CFCBindClass *self) {
                              ? CFCClass_full_vtable_var(parent)
                              : "NULL"; // No parent, e.g. Obj or inert classes.
 
-    // Spec functions which implement the methods, casting to quiet compiler.
-    char *method_str = CFCUtil_strdup("");
-    int num_methods = 0;
-    for (; methods[num_methods] != NULL; num_methods++) {
-        CFCMethod *method = methods[num_methods];
-        const char *implementing_sym = CFCMethod_implementing_func_sym(method);
-        size_t size = strlen(method_str) + strlen(implementing_sym) + 50;
-        method_str = (char*)REALLOCATE(method_str, size);
-        if (strlen(method_str)) {
-            strcat(method_str, ",\n");
-        }
-        strcat(method_str, "        (cfish_method_t)");
-        strcat(method_str, implementing_sym);
-    }
-
     char pattern[] =
-        "\n"
-        "%s %s_vt = {\n"
-        "    CFISH_VTABLE, /* vtable vtable */\n"
-        "    {1}, /* ref.count */\n"
-        "    %s, /* parent */\n"
-        "    (cfish_CharBuf*)&%s,\n"
-        "    0, /* flags */\n"
-        "    NULL, /* \"void *x\" member reserved for future use */\n"
-        "    sizeof(%s), /* obj_alloc_size */\n"
-        "    offsetof(cfish_VTable, methods)\n"
-        "        + %d * sizeof(cfish_method_t), /* vt_alloc_size */\n"
-        "    &%s,  /* callbacks */\n"
-        "    {\n"
-        "%s\n"
-        "    }\n"
-        "};\n\n";
+        "    cfish_VTable_bootstrap(\n"
+        "        %s, /* vtable */\n"
+        "        %s, /* parent */\n"
+        "        \"%s\", /* name */\n"
+        "        0, /* flags */\n"
+        "        NULL, /* \"void *x\" member reserved for future use */\n"
+        "        sizeof(%s), /* obj_alloc_size */\n"
+        "        %s, /* callbacks */\n"
+        "        %s /* methods */\n"
+        "    );\n";
 
     size_t size = sizeof(pattern)
-                  + strlen(vt_type)
                   + strlen(vt_var)
                   + strlen(parent_ref)
-                  + strlen(self->full_name_var)
+                  + strlen(class_name)
                   + strlen(struct_sym)
-                  + 10 /* num_methods */
                   + strlen(self->full_callbacks_var)
-                  + strlen(method_str)
+                  + strlen(self->full_methods_var)
                   + 40;
-    char *vtable_def = (char*)MALLOCATE(size);
-    sprintf(vtable_def, pattern, vt_type, vt_var, parent_ref,
-            self->full_name_var, struct_sym, num_methods,
-            self->full_callbacks_var, method_str);
+    char *code = (char*)MALLOCATE(size);
+    sprintf(code, pattern, vt_var, parent_ref, class_name, struct_sym,
+            self->full_callbacks_var, self->full_methods_var);
 
-    FREEMEM(method_str);
-    return vtable_def;
+    return code;
 }
 
 // Declare cfish_Callback objects.
