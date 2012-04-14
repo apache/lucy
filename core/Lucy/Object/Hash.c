@@ -33,10 +33,7 @@
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/Memory.h"
 
-static HashTombStone TOMBSTONE = {
-    HASHTOMBSTONE,
-    {1}
-};
+static HashTombStone *TOMBSTONE;
 
 #define HashEntry lucy_HashEntry
 
@@ -57,6 +54,11 @@ SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum);
 // Double the number of buckets and redistribute all entries.
 static INLINE HashEntry*
 SI_rebuild_hash(Hash *self);
+
+void
+Hash_init_class() {
+    TOMBSTONE = (HashTombStone*)VTable_Make_Obj(HASHTOMBSTONE);
+}
 
 Hash*
 Hash_new(uint32_t capacity) {
@@ -259,8 +261,8 @@ Hash_do_store(Hash *self, Obj *key, Obj *value,
     while (1) {
         tick &= mask;
         HashEntry *entry = entries + tick;
-        if (entry->key == (Obj*)&TOMBSTONE || !entry->key) {
-            if (entry->key == (Obj*)&TOMBSTONE) {
+        if (entry->key == (Obj*)TOMBSTONE || !entry->key) {
+            if (entry->key == (Obj*)TOMBSTONE) {
                 // Take note of diminished tombstone clutter.
                 self->threshold++;
             }
@@ -342,7 +344,7 @@ Hash_delete(Hash *self, const Obj *key) {
     if (entry) {
         Obj *value = entry->value;
         DECREF(entry->key);
-        entry->key       = (Obj*)&TOMBSTONE;
+        entry->key       = (Obj*)TOMBSTONE;
         entry->value     = NULL;
         entry->hash_sum  = 0;
         self->size--;
@@ -384,7 +386,7 @@ Hash_next(Hash *self, Obj **key, Obj **value) {
         else {
             HashEntry *const entry
                 = (HashEntry*)self->entries + self->iter_tick;
-            if (entry->key && entry->key != (Obj*)&TOMBSTONE) {
+            if (entry->key && entry->key != (Obj*)TOMBSTONE) {
                 // Success!
                 *key   = entry->key;
                 *value = entry->value;
@@ -464,7 +466,7 @@ SI_rebuild_hash(Hash *self) {
     self->size      = 0;
 
     for (; entry < limit; entry++) {
-        if (!entry->key || entry->key == (Obj*)&TOMBSTONE) {
+        if (!entry->key || entry->key == (Obj*)TOMBSTONE) {
             continue;
         }
         Hash_do_store(self, entry->key, entry->value,

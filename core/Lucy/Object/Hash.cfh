@@ -32,6 +32,9 @@ class Lucy::Object::Hash inherits Lucy::Object::Obj {
     uint32_t       threshold;    /* rehashing trigger point */
     int32_t        iter_tick;    /* used when iterating */
 
+    inert void
+    init_class();
+
     inert incremented Hash*
     new(uint32_t capacity = 0);
 

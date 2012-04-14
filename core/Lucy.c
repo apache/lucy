@@ -15,9 +15,11 @@
  */
 
 #include "Lucy/Object/Num.h"
+#include "Lucy/Object/Hash.h"
 
 void
 lucy_init_parcel() {
     lucy_Bool_init_class();
+    lucy_Hash_init_class();
 }
 
