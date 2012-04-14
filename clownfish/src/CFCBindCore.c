@@ -219,6 +219,9 @@ S_write_parcel_h(CFCBindCore *self) {
         "void\n"
         "%sbootstrap_parcel();\n"
         "\n"
+        "void\n"
+        "%sinit_parcel();\n"
+        "\n"
         "#ifdef __cplusplus\n"
         "}\n"
         "#endif\n"
@@ -231,12 +234,12 @@ S_write_parcel_h(CFCBindCore *self) {
                   + strlen(self->header)
                   + strlen(aliases)
                   + strlen(typedefs)
-                  + strlen(prefix)
+                  + 2 * strlen(prefix)
                   + strlen(self->footer)
                   + 50;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, aliases, typedefs, prefix,
-            self->footer);
+            prefix, self->footer);
 
     // Unlink then write file.
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
@@ -311,6 +314,8 @@ S_write_parcel_c(CFCBindCore *self) {
         "%s"
         "\n"
         "%s"
+        "\n"
+        "    %sinit_parcel();\n"
         "}\n"
         "\n"
         "%s\n";
@@ -322,11 +327,12 @@ S_write_parcel_c(CFCBindCore *self) {
                   + strlen(prefix)
                   + strlen(vt_bootstrap)
                   + strlen(vt_register)
+                  + strlen(prefix)
                   + strlen(self->footer)
                   + 50;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, privacy_syms, includes,
-            c_data, prefix, vt_bootstrap, vt_register, self->footer);
+            c_data, prefix, vt_bootstrap, vt_register, prefix, self->footer);
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
