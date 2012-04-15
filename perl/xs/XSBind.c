@@ -475,7 +475,9 @@ chy_bool_t
 XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
     va_list args;
     int32_t args_left = (num_stack_elems - start) / 2;
-    void *verified_labels = alloca(sizeof(int64_t) + num_stack_elems / 64);
+    size_t size = sizeof(int64_t) + num_stack_elems / 64;
+    void *verified_labels = alloca(size);
+    memset(verified_labels, 0, size);
 
     // Verify that our args come in pairs. Return success if there are no
     // args.
