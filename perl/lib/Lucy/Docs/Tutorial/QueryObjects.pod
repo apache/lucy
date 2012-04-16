@@ -71,7 +71,8 @@ subroutine:
 =head2 Adaptations to search.cgi
 
 The "category" constraint will be added to our search interface using an HTML
-"select" element:
+"select" element (this routine will need to be integrated into the HTML
+generation section of search.cgi):
 
     # Build up the HTML "select" object for the "category" field.
     sub generate_category_select {
