@@ -45,7 +45,7 @@ L<StringType|Lucy::Plan::StringType>, which doesn't use an
 Analyzer to break up text into individual fields.  Furthermore, we'll mark
 this StringType as unindexed, so that its content won't be searchable at all.
 
-    my $url_type = Lucy::Plan::StringType( indexed => 0 );
+    my $url_type = Lucy::Plan::StringType->new( indexed => 0 );
     $schema->spec_field( name => 'url', type => $url_type );
 
 To observe the change in behavior, try searching for C<us_constitution> both
