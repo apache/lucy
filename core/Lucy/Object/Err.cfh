@@ -46,6 +46,9 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
 
     CharBuf *mess;
 
+    inert void
+    init_class();
+
     inert incremented Err*
     new(decremented CharBuf *mess);
 

@@ -16,10 +16,12 @@
 
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/Hash.h"
+#include "Lucy/Object/Err.h"
 
 void
 lucy_init_parcel() {
     lucy_Bool_init_class();
     lucy_Hash_init_class();
+    lucy_Err_init_class();
 }
 

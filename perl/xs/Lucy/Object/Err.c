@@ -17,6 +17,31 @@
 #include "XSBind.h"
 #include "Lucy/Object/Host.h"
 
+// Anonymous XSUB helper for Err#trap().  It wraps the supplied C function
+// so that it can be run inside a Perl eval block.
+static SV *attempt_xsub = NULL;
+
+XS(lucy_Err_attempt_via_xs) {
+    dXSARGS;
+    CHY_UNUSED_VAR(cv);
+    SP -= items;
+    if (items != 2) {
+        CFISH_THROW(CFISH_ERR, "Usage: $sub->(routine, context)");
+    };
+    IV routine_iv = SvIV(ST(0));
+    IV context_iv = SvIV(ST(1));
+    cfish_Err_attempt_t routine = INT2PTR(cfish_Err_attempt_t, routine_iv);
+    void *context               = INT2PTR(void*, context_iv);
+    routine(context);
+    XSRETURN(0);
+}
+
+void
+lucy_Err_init_class(void) {
+    char *file = (char*)__FILE__;
+    attempt_xsub = (SV*)newXS(NULL, lucy_Err_attempt_via_xs, file);
+}
+
 lucy_Err*
 lucy_Err_get_error() {
     lucy_Err *error
@@ -88,7 +113,7 @@ lucy_Err_trap(cfish_Err_attempt_t routine, void *context) {
     PUSHs(sv_2mortal(context_sv));
     PUTBACK;
 
-    int count = call_pv("Lucy::Object::Err::run", G_EVAL | G_DISCARD);
+    int count = call_sv(attempt_xsub, G_EVAL | G_DISCARD);
     if (count != 0) {
         lucy_CharBuf *mess
             = lucy_CB_newf("'attempt' returned too many values: %i32",

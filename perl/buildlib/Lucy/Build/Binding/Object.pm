@@ -222,17 +222,6 @@ CODE:
     cfish_Err *error = XSBind_trap(routine_sv, context_sv);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(error);
 OUTPUT: RETVAL
-
-void
-run(routine_sv, context_sv)
-    SV *routine_sv;
-    SV *context_sv;
-PPCODE:
-    IV routine_iv = SvIV(routine_sv);
-    IV context_iv = SvIV(context_sv);
-    cfish_Err_attempt_t routine = INT2PTR(cfish_Err_attempt_t, routine_iv);
-    void *context               = INT2PTR(void*, context_iv);
-    routine(context);
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
