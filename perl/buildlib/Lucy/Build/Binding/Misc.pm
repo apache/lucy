@@ -114,6 +114,9 @@ PPCODE:
         lucy_TestStandardTokenizer_run_tests();
     }
     // Lucy::Object
+    else if (strEQ(package, "TestErr")) {
+        lucy_TestErr_run_tests();
+    }
     else if (strEQ(package, "TestObj")) {
         lucy_TestObj_run_tests();
     }
