@@ -74,4 +74,48 @@ lucy_Err_warn_mess(lucy_CharBuf *message) {
     SvREFCNT_dec(error_sv);
 }
 
+lucy_Err*
+lucy_Err_trap(cfish_Err_attempt_t routine, void *context) {
+    lucy_Err *error = NULL;
+    SV *routine_sv = newSViv(PTR2IV(routine));
+    SV *context_sv = newSViv(PTR2IV(context));
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(routine_sv));
+    PUSHs(sv_2mortal(context_sv));
+    PUTBACK;
+
+    int count = call_pv("Lucy::Object::Err::run", G_EVAL | G_DISCARD);
+    if (count != 0) {
+        lucy_CharBuf *mess
+            = lucy_CB_newf("'attempt' returned too many values: %i32",
+                           (int32_t)count);
+        error = lucy_Err_new(mess);
+    }
+    else {
+        SV *dollar_at = get_sv("@", FALSE);
+        if (SvTRUE(dollar_at)) {
+            if (sv_isobject(dollar_at)
+                && sv_derived_from(dollar_at,"Lucy::Object::Err")
+               ) {
+                IV error_iv = SvIV(SvRV(dollar_at));
+                error = INT2PTR(lucy_Err*, error_iv);
+                CFISH_INCREF(error);
+            }
+            else {
+                STRLEN len;
+                char *ptr = SvPVutf8(dollar_at, len);
+                lucy_CharBuf *mess = lucy_CB_new_from_trusted_utf8(ptr, len);
+                error = lucy_Err_new(mess);
+            }
+        }
+    }
+    FREETMPS;
+    LEAVE;
+
+    return error;
+}
 

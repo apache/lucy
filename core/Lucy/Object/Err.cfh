@@ -16,6 +16,16 @@
 
 parcel Lucy;
 
+__C__
+typedef void 
+(*lucy_Err_attempt_t)(void *context);
+
+#define cfish_Err_attempt_t lucy_Err_attempt_t
+#ifdef LUCY_USE_SHORT_NAMES
+  #define Err_attempt_t cfish_Err_attempt_t
+#endif
+__END_C__
+
 /**
  * Exception.
  *
@@ -76,6 +86,17 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
      */
     public inert nullable Err*
     get_error();
+
+    /** Run <code>routine</code> within the host's exception handling
+     * environment, catching and returning any errors that occur.
+     * 
+     * If an unrecognized host exception is trapped, it will be wrapped in an
+     * Err so that it can be handled by Clownfish code.
+     *
+     * @return an Err, or NULL if no exception occurs.
+     */
+    public inert incremented nullable Err*
+    trap(cfish_Err_attempt_t routine, void *context);
 
     /** Print an error message to stderr with some C contextual information.
      * Usually invoked via the WARN(pattern, ...) macro.

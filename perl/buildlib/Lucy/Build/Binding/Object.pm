@@ -211,12 +211,28 @@ sub bind_err {
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
 
+    my $xs_code = <<'END_XS_CODE';
+MODULE =  Lucy    PACKAGE = Lucy::Object::Err
+
+void
+run(routine_sv, context_sv)
+    SV *routine_sv;
+    SV *context_sv;
+PPCODE:
+    IV routine_iv = SvIV(routine_sv);
+    IV context_iv = SvIV(context_sv);
+    cfish_Err_attempt_t routine = INT2PTR(cfish_Err_attempt_t, routine_iv);
+    void *context               = INT2PTR(void*, context_iv);
+    routine(context);
+END_XS_CODE
+
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Object::Err",
     );
     $binding->bind_constructor( alias => '_new' );
     $binding->set_pod_spec($pod_spec);
+    $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
