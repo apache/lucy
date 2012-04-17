@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
+
 #define C_LUCY_TESTOBJ
 #include "Lucy/Util/ToolSet.h"
 
@@ -113,10 +115,78 @@ test_Is_A(TestBatch *batch) {
     DECREF(charbuf);
 }
 
+static void
+S_attempt_init(void *context) {
+    Obj_init((Obj*)context);
+}
+
+static void
+S_attempt_Clone(void *context) {
+    Obj_Clone((Obj*)context);
+}
+
+static void
+S_attempt_Make(void *context) {
+    Obj_Make((Obj*)context);
+}
+
+static void
+S_attempt_Compare_To(void *context) {
+    Obj_Compare_To((Obj*)context, (Obj*)context);
+}
+
+static void
+S_attempt_To_I64(void *context) {
+    Obj_To_I64((Obj*)context);
+}
+
+static void
+S_attempt_To_F64(void *context) {
+    Obj_To_F64((Obj*)context);
+}
+
+static void
+S_attempt_Load(void *context) {
+    Obj_Load((Obj*)context, (Obj*)context);
+}
+
+static void
+S_attempt_Mimic(void *context) {
+    Obj_Mimic((Obj*)context, (Obj*)context);
+}
+
+static void
+S_verify_abstract_error(TestBatch *batch, Err_attempt_t routine,
+                        void *context, const char *name) {
+    char message[100];
+    sprintf(message, "%s() is abstract", name);
+    Err *error = Err_trap(routine, context);
+    TEST_TRUE(batch, error != NULL
+              && Err_Is_A(error, ERR) 
+              && CB_Find_Str(Err_Get_Mess(error), "bstract", 7) != -1,
+              message);
+    DECREF(error);
+}
+
+static void
+test_abstract_routines(TestBatch *batch) {
+    Obj *blank = VTable_Make_Obj(OBJ);
+    S_verify_abstract_error(batch, S_attempt_init, blank, "init");
+
+    Obj *obj = S_new_testobj();
+    S_verify_abstract_error(batch, S_attempt_Clone,      obj, "Clone");
+    S_verify_abstract_error(batch, S_attempt_Make,       obj, "Make");
+    S_verify_abstract_error(batch, S_attempt_Compare_To, obj, "Compare_To");
+    S_verify_abstract_error(batch, S_attempt_To_I64,     obj, "To_I64");
+    S_verify_abstract_error(batch, S_attempt_To_F64,     obj, "To_F64");
+    S_verify_abstract_error(batch, S_attempt_Load,       obj, "Load");
+    S_verify_abstract_error(batch, S_attempt_Mimic,      obj, "Mimic");
+    DECREF(obj);
+}
 
 void
 TestObj_run_tests() {
-    TestBatch *batch = TestBatch_new(12);
+    TestBatch *batch = TestBatch_new(20);
 
     TestBatch_Plan(batch);
 
@@ -126,6 +196,7 @@ TestObj_run_tests() {
     test_Equals(batch);
     test_Hash_Sum(batch);
     test_Is_A(batch);
+    test_abstract_routines(batch);
 
     DECREF(batch);
 }

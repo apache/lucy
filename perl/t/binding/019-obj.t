@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 18;
 
 package TestObj;
 use base qw( Lucy::Object::Obj );
@@ -65,17 +65,9 @@ ok( defined $TestObj::version,
         . "package globals in the Lucy:: namespace"
 );
 
-# TODO: Port this test to C.
-eval { my $foo = Lucy::Object::Obj->new };
-like( $@, qr/abstract/i, "Obj is an abstract class" );
-
 my $object = TestObj->new;
 isa_ok( $object, "Lucy::Object::Obj",
     "Clownfish objects can be subclassed outside the Lucy hierarchy" );
-
-# TODO: Port this test to C.
-eval { my $twin = $object->clone };
-like( $@, qr/abstract/i, "clone throws an abstract method exception" );
 
 ok( $object->is_a("Lucy::Object::Obj"), "custom is_a correct" );
 ok( !$object->is_a("Lucy::Object"),     "custom is_a too long" );
