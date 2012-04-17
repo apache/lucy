@@ -136,6 +136,12 @@ cfish_XSBind_bb_to_sv(const cfish_ByteBuf *bb);
 SV*
 cfish_XSBind_cb_to_sv(const cfish_CharBuf *cb);
 
+/** Perl-specific wrapper for Err#trap.  The "routine" must be either a
+ * subroutine reference or the name of a subroutine.
+ */
+cfish_Err*
+cfish_XSBind_trap(SV *routine, SV *context);
+
 /** Turn on overloading for the supplied Perl object and its class.
  */
 void
@@ -303,6 +309,7 @@ cfish_XSBind_allot_params(SV** stack, int32_t start,
 #define XSBind_perl_to_cfish           cfish_XSBind_perl_to_cfish
 #define XSBind_bb_to_sv                cfish_XSBind_bb_to_sv
 #define XSBind_cb_to_sv                cfish_XSBind_cb_to_sv
+#define XSBind_trap                    cfish_XSBind_trap
 #define XSBind_enable_overload         cfish_XSBind_enable_overload
 #define XSBind_allot_params            cfish_XSBind_allot_params
 #define ALLOT_I8                       XSBIND_ALLOT_I8

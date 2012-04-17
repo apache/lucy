@@ -70,8 +70,10 @@ struct alias aliases[] = {
     {"CFISH_FLOAT64", "LUCY_FLOAT64"},
     {"cfish_Bool_singleton", "lucy_Bool_singleton"},
 
+    {"cfish_Err", "lucy_Err"},
     {"CFISH_ERR", "LUCY_ERR"},
     {"cfish_Err_new", "lucy_Err_new"},
+    {"cfish_Err_trap", "lucy_Err_trap"},
     {"cfish_Err_set_error", "lucy_Err_set_error"},
     {"cfish_Err_get_error", "lucy_Err_get_error"},
 

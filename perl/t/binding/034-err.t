@@ -15,11 +15,56 @@
 
 use strict;
 use warnings;
-
-use Test::More tests => 1;
 use Lucy::Test;
 
-my $err = Lucy::Object::Err->new("Bad stuff happened");
+package Nirvana;
 
-isa_ok( $err, 'Lucy::Object::Err', "new" );
+sub enter {
+    die Lucy::Object::Err->new("blam");
+}
+
+package GloriousDeath;
+use base qw( Lucy::Object::Err );
+
+package main;
+use Test::More tests => 10;
+
+isa_ok( Lucy::Object::Err->new("Bad stuff happened"),
+    'Lucy::Object::Err', "new" );
+
+my $glorious = GloriousDeath->new("Banzai");
+isa_ok( $glorious, 'GloriousDeath',     "subclass" );
+isa_ok( $glorious, 'Lucy::Object::Err', "subclass" );
+
+isa_ok( Lucy::Object::Err::trap( "bite_the_dust", undef ),
+    'Lucy::Object::Err', "trap string call" );
+
+isa_ok( Lucy::Object::Err::trap( "Nirvana::enter", undef ),
+    'Lucy::Object::Err', "trap string call in another package" );
+
+isa_ok( Lucy::Object::Err::trap( \&bite_the_dust, undef ),
+    'Lucy::Object::Err', "trap sub ref" );
+
+isa_ok( Lucy::Object::Err::trap( \&Nirvana::enter, undef ),
+    'Lucy::Object::Err', "trap sub ref to another package" );
+
+isa_ok( Lucy::Object::Err::trap( \&judge_gladiator, "down" ),
+    'Lucy::Object::Err', "pass argument to 'trap'" );
+
+my $last_words = sub { die "Rosebud" };
+isa_ok( Lucy::Object::Err::trap( $last_words, undef ),
+    'Lucy::Object::Err', "Wrap host exception in Err" );
+
+my $succeed = sub { };
+ok( !defined( Lucy::Object::Err::trap( $succeed, undef ) ),
+    "nothing to trap" );
+
+sub bite_the_dust { die Lucy::Object::Err->new("gasp") }
+
+sub judge_gladiator {
+    my $thumb = shift;
+    if ( $thumb and $thumb eq 'down' ) {
+        die GloriousDeath->new("gurgle");
+    }
+}
 

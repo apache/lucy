@@ -214,6 +214,15 @@ END_SYNOPSIS
     my $xs_code = <<'END_XS_CODE';
 MODULE =  Lucy    PACKAGE = Lucy::Object::Err
 
+SV*
+trap(routine_sv, context_sv)
+    SV *routine_sv;
+    SV *context_sv;
+CODE:
+    cfish_Err *error = XSBind_trap(routine_sv, context_sv);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(error);
+OUTPUT: RETVAL
+
 void
 run(routine_sv, context_sv)
     SV *routine_sv;

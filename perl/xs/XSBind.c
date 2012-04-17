@@ -351,6 +351,33 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash) {
     return newRV_noinc((SV*)perl_hash);
 }
 
+struct trap_context {
+    SV *routine;
+    SV *context;
+};
+
+static void
+S_attempt_perl_call(void *context) {
+    struct trap_context *args = (struct trap_context*)context;
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVsv(args->context)));
+    PUTBACK;
+    call_sv(args->routine, G_DISCARD);
+    FREETMPS;
+    LEAVE;
+}
+
+cfish_Err*
+XSBind_trap(SV *routine, SV *context) {
+    struct trap_context args;
+    args.routine = routine;
+    args.context = context;
+    return cfish_Err_trap(S_attempt_perl_call, &args);
+}
+
 void
 XSBind_enable_overload(void *pobj) {
     SV *perl_obj = (SV*)pobj;
