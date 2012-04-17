@@ -139,6 +139,8 @@ S_write_parcel_h(CFCBindCore *self) {
         CFCUtil_die("No source classes found.");
     }
     const char *prefix = CFCParcel_get_prefix(parcel);
+    const char *Prefix = CFCParcel_get_Prefix(parcel);
+    const char *PREFIX = CFCParcel_get_PREFIX(parcel);
     FREEMEM(ordered);
 
     // Create Clownfish aliases if necessary.
@@ -172,9 +174,9 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "/* Access the function pointer for a given method from the vtable.\n"
         " */\n"
-        "#define LUCY_METHOD(_vtable, _class_nick, _meth_name) \\\n"
+        "#define %sMETHOD(_vtable, _class_nick, _meth_name) \\\n"
         "     cfish_method(_vtable, \\\n"
-        "     Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET)\n"
+        "     %s ## _class_nick ## _ ## _meth_name ## _OFFSET)\n"
         "\n"
         "static CHY_INLINE cfish_method_t\n"
         "cfish_method(const void *vtable, size_t offset) {\n"
@@ -185,9 +187,9 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "/* Access the function pointer for the given method in the superclass's\n"
         " * vtable. */\n"
-        "#define LUCY_SUPER_METHOD(_vtable, _class_nick, _meth_name) \\\n"
+        "#define %sSUPER_METHOD(_vtable, _class_nick, _meth_name) \\\n"
         "     cfish_super_method(_vtable, \\\n"
-        "     Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET)\n"
+        "     %s ## _class_nick ## _ ## _meth_name ## _OFFSET)\n"
         "\n"
         "extern size_t cfish_VTable_offset_of_parent;\n"
         "static CHY_INLINE cfish_method_t\n"
@@ -200,15 +202,15 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "/* Return a boolean indicating whether a method has been overridden.\n"
         " */\n"
-        "#define LUCY_OVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\\n"
+        "#define %sOVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\\n"
         "        (cfish_method(*((cfish_VTable**)_self), \\\n"
-        "            Lucy_ ## _class_nick ## _ ## _meth_name ## _OFFSET )\\\n"
-        "            != (cfish_method_t)lucy_ ## _class_nick ## _ ## _micro_name )\n"
+        "            %s ## _class_nick ## _ ## _meth_name ## _OFFSET )\\\n"
+        "            != (cfish_method_t)%s ## _class_nick ## _ ## _micro_name )\n"
         "\n"
         "#ifdef CFISH_USE_SHORT_NAMES\n"
-        "  #define METHOD                   LUCY_METHOD\n"
-        "  #define SUPER_METHOD             LUCY_SUPER_METHOD\n"
-        "  #define OVERRIDDEN               LUCY_OVERRIDDEN\n"
+        "  #define METHOD                   %sMETHOD\n"
+        "  #define SUPER_METHOD             %sSUPER_METHOD\n"
+        "  #define OVERRIDDEN               %sOVERRIDDEN\n"
         "#endif\n"
         "\n"
         "typedef struct cfish_Callback {\n"
@@ -236,12 +238,22 @@ S_write_parcel_h(CFCBindCore *self) {
                   + strlen(self->header)
                   + strlen(aliases)
                   + strlen(typedefs)
+                  + strlen(PREFIX) + strlen(Prefix)
+                  + strlen(PREFIX) + strlen(Prefix)
+                  + strlen(PREFIX) + strlen(Prefix) + strlen(prefix)
+                  + 3 * strlen(PREFIX)
                   + 2 * strlen(prefix)
                   + strlen(self->footer)
-                  + 50;
+                  + 100;
     char *file_content = (char*)MALLOCATE(size);
-    sprintf(file_content, pattern, self->header, aliases, typedefs, prefix,
-            prefix, self->footer);
+    sprintf(file_content, pattern,
+            self->header, aliases, typedefs,
+            PREFIX, Prefix,
+            PREFIX, Prefix,
+            PREFIX, Prefix, prefix,
+            PREFIX, PREFIX, PREFIX,
+            prefix, prefix,
+            self->footer);
 
     // Unlink then write file.
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
