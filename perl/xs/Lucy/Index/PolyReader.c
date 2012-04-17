@@ -27,13 +27,3 @@ PolyReader_try_open_segreaders(PolyReader *self, VArray *segments) {
                              ARG_OBJ("segments", segments));
 }
 
-CharBuf*
-PolyReader_try_read_snapshot(Snapshot *snapshot, Folder *folder,
-                             const CharBuf *path) {
-    return (CharBuf*)Host_callback_obj(POLYREADER, "_try_read_snapshot", 3,
-                                       ARG_OBJ("snapshot", snapshot),
-                                       ARG_OBJ("folder", folder),
-                                       ARG_STR("path", path));
-}
-
-

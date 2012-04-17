@@ -223,15 +223,6 @@ sub error {$Lucy::Object::Err::error}
     $VERSION = eval $VERSION;
     use Lucy qw( to_clownfish );
 
-
-    sub _try_read_snapshot {
-        my ( undef, %args ) = @_;
-        my ( $snapshot, $folder, $path ) = @args{qw( snapshot folder path )};
-        eval { $snapshot->read_file( folder => $folder, path => $path ); };
-        if   ($@) { return Lucy::Object::CharBuf->new($@) }
-        else      { return undef }
-    }
-
     sub _try_open_segreaders {
         my ( $self, $segments ) = @_;
         my $schema   = $self->get_schema;

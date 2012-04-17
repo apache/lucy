@@ -27,11 +27,3 @@ PolyReader_try_open_segreaders(PolyReader *self, VArray *segments) {
     UNREACHABLE_RETURN(Obj*);
 }
 
-CharBuf*
-PolyReader_try_read_snapshot(Snapshot *snapshot, Folder *folder,
-                             const CharBuf *path) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(CharBuf*);
-}
-
-

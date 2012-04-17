@@ -43,6 +43,15 @@ S_release_read_lock(PolyReader *self);
 static void
 S_release_deletion_lock(PolyReader *self);
 
+// Try to read a Snapshot file.
+struct try_read_snapshot_context {
+    Snapshot *snapshot;
+    Folder   *folder;
+    CharBuf  *path;
+};
+static void
+S_try_read_snapshot(void *context);
+
 static Folder*
 S_derive_folder(Obj *index);
 
@@ -167,6 +176,13 @@ PolyReader_destroy(PolyReader *self) {
     DECREF(self->sub_readers);
     DECREF(self->offsets);
     SUPER_DESTROY(self, POLYREADER);
+}
+
+static void
+S_try_read_snapshot(void *context) {
+    struct try_read_snapshot_context *args
+        = (struct try_read_snapshot_context*)context;
+    Snapshot_Read_File(args->snapshot, args->folder, args->path);
 }
 
 Obj*
@@ -323,8 +339,11 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         // If a Snapshot object was passed in, the file has already been read.
         // If that's not the case, we must read the file we just picked.
         if (!snapshot) {
-            CharBuf *error = PolyReader_try_read_snapshot(self->snapshot, folder,
-                                                          target_snap_file);
+            struct try_read_snapshot_context context;
+            context.snapshot = self->snapshot;
+            context.folder   = folder;
+            context.path     = target_snap_file;
+            Err *error = Err_trap(S_try_read_snapshot, &context);
 
             if (error) {
                 S_release_read_lock(self);
@@ -336,7 +355,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                 }
                 else { // Real error.
                     if (manager) { S_release_deletion_lock(self); }
-                    Err_throw_mess(ERR, error);
+                    RETHROW(error);
                 }
             }
         }

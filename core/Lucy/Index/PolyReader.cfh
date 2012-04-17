@@ -63,13 +63,6 @@ class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
     incremented Obj*
     Try_Open_SegReaders(PolyReader *self, VArray *segments);
 
-    /** Attempt to read a snapshot file.  If the operation succeeds, return
-     * NULL.  If an exception occurs, catch it and return its error message.
-     */
-    inert incremented nullable CharBuf*
-    try_read_snapshot(Snapshot *snapshot, Folder *folder,
-                      const CharBuf *path);
-
     inert CharBuf* race_condition_debug1;
     inert int32_t  debug1_num_passes;
 
