@@ -121,9 +121,6 @@ S_write_parcel_h(CFCBindCore *self) {
     // Obtain parcel prefix for use in bootstrap function name.
     char *typedefs = CFCUtil_strdup("");
     CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
-    if (!ordered[0]) {
-        CFCUtil_die("No classes found.");
-    }
     for (int i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
         if (!CFCClass_inert(klass)) {
@@ -131,10 +128,15 @@ S_write_parcel_h(CFCBindCore *self) {
             typedefs = CFCUtil_cat(typedefs, "typedef struct ", full_struct,
                                    " ", full_struct, ";\n", NULL);
         }
-        if (parcel && CFCClass_get_parcel(klass) != parcel) {
-            CFCUtil_die("Multiple parcels not yet supported.");
+        if (!CFCClass_included(klass)) {
+            if (parcel && CFCClass_get_parcel(klass) != parcel) {
+                CFCUtil_die("Multiple parcels not yet supported.");
+            }
+            parcel = CFCClass_get_parcel(klass);
         }
-        parcel = CFCClass_get_parcel(klass);
+    }
+    if (!parcel) {
+        CFCUtil_die("No source classes found.");
     }
     const char *prefix = CFCParcel_get_prefix(parcel);
     FREEMEM(ordered);
@@ -268,9 +270,6 @@ S_write_parcel_c(CFCBindCore *self) {
     char *vt_bootstrap = CFCUtil_strdup("");
     char *vt_register  = CFCUtil_strdup("");
     CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
-    if (!ordered[0]) {
-        CFCUtil_die("No classes found.");
-    }
     for (int i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
         if (CFCClass_included(klass)) { continue; }
@@ -295,10 +294,15 @@ S_write_parcel_c(CFCBindCore *self) {
         const char *include_h = CFCClass_include_h(klass);
         includes = CFCUtil_cat(includes, "#include \"", include_h,
                                "\"\n", NULL);
-        if (parcel && CFCClass_get_parcel(klass) != parcel) {
-            CFCUtil_die("Multiple parcels not yet supported.");
+        if (!CFCClass_included(klass)) {
+            if (parcel && CFCClass_get_parcel(klass) != parcel) {
+                CFCUtil_die("Multiple parcels not yet supported.");
+            }
+            parcel = CFCClass_get_parcel(klass);
         }
-        parcel = CFCClass_get_parcel(klass);
+    }
+    if (!parcel) {
+        CFCUtil_die("No source classes found.");
     }
     const char *prefix = CFCParcel_get_prefix(parcel);
     FREEMEM(ordered);
