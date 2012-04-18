@@ -90,6 +90,7 @@ S_validate_class_name(const char *class_name) {
 
 int
 CFCSymbol_validate_class_name_component(const char *name) {
+    if (!name || !strlen(name)) { return false; }
     if (!S_validate_class_name(name)) { return false; }
     if (strchr(name, ':') != NULL) { return false; }
     return true;
