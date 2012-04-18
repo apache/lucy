@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 55;
+use Test::More tests => 54;
 use Clownfish::CFC::Model::Type;
 use Clownfish::CFC::Parser;
 
@@ -26,7 +26,7 @@ my $parser = Clownfish::CFC::Parser->new;
 my $parcel = $parser->parse('parcel Neato;')
     or die "failed to process parcel_definition";
 
-for my $bad_specifier (qw( foo fooBar Foo_Bar FOOBAR 1Foo 1FOO )) {
+for my $bad_specifier (qw( foo Foo_Bar FOOBAR 1Foo 1FOO )) {
     eval {
         my $type = Clownfish::CFC::Model::Type->new_object(
             parcel    => 'Neato',

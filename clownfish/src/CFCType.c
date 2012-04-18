@@ -223,21 +223,38 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
         flags |= CFCTYPE_STRING_TYPE;
     }
 
-    const char *prefix = CFCParcel_get_prefix(parcel);
     const size_t MAX_SPECIFIER_LEN = 256;
     char full_specifier[MAX_SPECIFIER_LEN + 1];
     char small_specifier[MAX_SPECIFIER_LEN + 1];
-    if (strlen(prefix) + strlen(specifier) > MAX_SPECIFIER_LEN) {
-        CFCUtil_die("Specifier and/or parcel prefix too long");
-    }
-    if (strstr(specifier, prefix) != specifier) {
+    if (isupper(*specifier)) {
+        const char *prefix = CFCParcel_get_prefix(parcel);
+        if (strlen(prefix) + strlen(specifier) > MAX_SPECIFIER_LEN) {
+            CFCUtil_die("Specifier and/or parcel prefix too long");
+        }
         sprintf(full_specifier, "%s%s", prefix, specifier);
         strcpy(small_specifier, specifier);
     }
-    else {
-        strcpy(full_specifier, specifier);
-        strcpy(small_specifier, specifier + strlen(prefix));
+    else if (!isalpha(*specifier)) {
+        CFCUtil_die("Invalid specifier: '%s'", specifier);
     }
+    else {
+        if (strlen(specifier) > MAX_SPECIFIER_LEN) {
+            CFCUtil_die("Specifier too long");
+        }
+        const char *probe = specifier;
+        while (*probe) {
+            if (isupper(*probe)) {
+                break;
+            }
+            else if (!isalnum(*probe) && *probe != '_') {
+                CFCUtil_die("Invalid specifier: '%s'", specifier);
+            }
+            probe++;
+        }
+        strcpy(full_specifier, specifier);
+        strcpy(small_specifier, probe);
+    }
+
     if (!CFCSymbol_validate_class_name_component(small_specifier)) {
         CFCUtil_die("Invalid specifier: '%s'", specifier);
     }
