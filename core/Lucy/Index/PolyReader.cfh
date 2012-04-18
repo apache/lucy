@@ -56,13 +56,6 @@ class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
          Snapshot *snapshot = NULL, IndexManager *manager = NULL,
          VArray *sub_readers = NULL);
 
-    /** Attempt to open a SegReader for each Segment that the Snapshot knows
-     * about.  If an exception occurs, catch it and return its error message.
-     * If the opening succeeds, return a VArray full of SegReaders.
-     */
-    incremented Obj*
-    Try_Open_SegReaders(PolyReader *self, VArray *segments);
-
     inert CharBuf* race_condition_debug1;
     inert int32_t  debug1_num_passes;
 

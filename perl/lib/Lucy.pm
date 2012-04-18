@@ -218,41 +218,6 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Index::PolyReader;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Lucy qw( to_clownfish );
-
-    sub _try_open_segreaders {
-        my ( $self, $segments ) = @_;
-        my $schema   = $self->get_schema;
-        my $folder   = $self->get_folder;
-        my $snapshot = $self->get_snapshot;
-        my $seg_readers
-            = Lucy::Object::VArray->new( capacity => scalar @$segments );
-        my $segs = to_clownfish($segments);    # FIXME: Don't convert twice.
-        eval {
-            # Create a SegReader for each segment in the index.
-            my $num_segs = scalar @$segments;
-            for ( my $seg_tick = 0; $seg_tick < $num_segs; $seg_tick++ ) {
-                my $seg_reader = Lucy::Index::SegReader->new(
-                    schema   => $schema,
-                    folder   => $folder,
-                    segments => $segs,
-                    seg_tick => $seg_tick,
-                    snapshot => $snapshot,
-                );
-                $seg_readers->push($seg_reader);
-            }
-        };
-        if ($@) {
-            return Lucy::Object::CharBuf->new($@);
-        }
-        return $seg_readers;
-    }
-}
-
-{
     package Lucy::Index::Segment;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
