@@ -54,8 +54,8 @@ S_start_class(CFCParser *state, CFCDocuComment *docucomment, char *exposure,
 }
 
 static CFCVariable*
-S_new_var(CFCParser *state, char *exposure, char *modifiers, CFCType *type,
-          char *name) {
+S_new_var(CFCParser *state, CFCParcel *parcel, char *exposure, char *modifiers,
+          CFCType *type, char *name) {
     int inert = false;
     if (modifiers) {
         if (strcmp(modifiers, "inert") != 0) {
@@ -70,9 +70,8 @@ S_new_var(CFCParser *state, char *exposure, char *modifiers, CFCType *type,
         class_name  = CFCParser_get_class_name(state);
         class_cnick = CFCParser_get_class_cnick(state);
     }
-    CFCVariable *var = CFCVariable_new(CFCParser_get_parcel(state), exposure,
-                                       class_name, class_cnick,
-                                       name, type, inert);
+    CFCVariable *var = CFCVariable_new(parcel, exposure, class_name,
+                                       class_cnick, name, type, inert);
 
     /* Consume tokens. */
     CFCBase_decref((CFCBase*)type);
@@ -409,26 +408,28 @@ class_defs(A) ::= class_defs(B) subroutine_declaration_statement(C).
 var_declaration_statement(A) ::= 
     type(D) declarator(E) SEMICOLON.
 {
-    A = S_new_var(state, CFCParser_dupe(state, "parcel"), NULL, D, E);
+    A = S_new_var(state, CFCParser_get_parcel(state),
+                  CFCParser_dupe(state, "parcel"), NULL, D, E);
 }
 var_declaration_statement(A) ::= 
     exposure_specifier(B)
     type(D) declarator(E) SEMICOLON.
 {
-    A = S_new_var(state, B, NULL, D, E);
+    A = S_new_var(state, CFCParser_get_parcel(state), B, NULL, D, E);
 }
 var_declaration_statement(A) ::= 
     declaration_modifier_list(C)
     type(D) declarator(E) SEMICOLON.
 {
-    A = S_new_var(state, CFCParser_dupe(state, "parcel"), C, D, E);
+    A = S_new_var(state, CFCParser_get_parcel(state),
+                  CFCParser_dupe(state, "parcel"), C, D, E);
 }
 var_declaration_statement(A) ::= 
     exposure_specifier(B)
     declaration_modifier_list(C)
     type(D) declarator(E) SEMICOLON.
 {
-    A = S_new_var(state, B, C, D, E);
+    A = S_new_var(state, CFCParser_get_parcel(state), B, C, D, E);
 }
 
 subroutine_declaration_statement(A) ::= 
@@ -590,7 +591,7 @@ declarator(A) ::= IDENTIFIER(B).
 
 param_variable(A) ::= type(B) declarator(C).
 {
-    A = S_new_var(state, NULL, NULL, B, C);
+    A = S_new_var(state, NULL, NULL, NULL, B, C);
 }
 
 param_list(A) ::= LEFT_PAREN RIGHT_PAREN.
