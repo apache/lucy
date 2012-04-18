@@ -43,6 +43,14 @@ S_release_read_lock(PolyReader *self);
 static void
 S_release_deletion_lock(PolyReader *self);
 
+// Try to open all SegReaders.
+struct try_open_elements_context {
+    PolyReader *self;
+    VArray     *seg_readers;
+};
+void
+S_try_open_elements(void *context);
+
 // Try to read a Snapshot file.
 struct try_read_snapshot_context {
     Snapshot *snapshot;
@@ -205,13 +213,16 @@ S_try_open_segreader(void *context) {
                                  args->segments, args->seg_tick);
 }
 
-Obj*
-S_try_open_elements(PolyReader *self) {
-    VArray   *files             = Snapshot_List(self->snapshot);
-    Folder   *folder            = PolyReader_Get_Folder(self);
-    uint32_t  num_segs          = 0;
-    uint64_t  latest_schema_gen = 0;
-    CharBuf  *schema_file       = NULL;
+void
+S_try_open_elements(void *context) {
+    struct try_open_elements_context *args
+        = (struct try_open_elements_context*)context;
+    PolyReader *self              = args->self;
+    VArray     *files             = Snapshot_List(self->snapshot);
+    Folder     *folder            = PolyReader_Get_Folder(self);
+    uint32_t    num_segs          = 0;
+    uint64_t    latest_schema_gen = 0;
+    CharBuf    *schema_file       = NULL;
 
     // Find schema file, count segments.
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
@@ -234,9 +245,8 @@ S_try_open_elements(PolyReader *self) {
 
     // Read Schema.
     if (!schema_file) {
-        CharBuf *mess = MAKE_MESS("Can't find a schema file.");
         DECREF(files);
-        return (Obj*)Err_new(mess);
+        THROW(ERR, "Can't find a schema file.");
     }
     else {
         Hash *dump = (Hash*)Json_slurp_json(folder, schema_file);
@@ -252,7 +262,7 @@ S_try_open_elements(PolyReader *self) {
             CharBuf *mess = MAKE_MESS("Failed to parse %o", schema_file);
             DECREF(schema_file);
             DECREF(files);
-            return (Obj*)Err_new(mess);
+            Err_throw_mess(ERR, mess);
         }
     }
 
@@ -276,7 +286,7 @@ S_try_open_elements(PolyReader *self) {
                 DECREF(segment);
                 DECREF(segments);
                 DECREF(files);
-                return (Obj*)Err_new(mess);
+                Err_throw_mess(ERR, mess);
             }
         }
     }
@@ -285,32 +295,30 @@ S_try_open_elements(PolyReader *self) {
     VA_Sort(segments, NULL, NULL);
 
     // Open individual SegReaders.
-    struct try_open_segreader_context context;
-    context.schema   = PolyReader_Get_Schema(self);
-    context.folder   = folder;
-    context.snapshot = PolyReader_Get_Snapshot(self);
-    context.segments = segments;
-    context.result   = NULL;
-    VArray *seg_readers = VA_new(num_segs);
+    struct try_open_segreader_context seg_context;
+    seg_context.schema   = PolyReader_Get_Schema(self);
+    seg_context.folder   = folder;
+    seg_context.snapshot = PolyReader_Get_Snapshot(self);
+    seg_context.segments = segments;
+    seg_context.result   = NULL;
+    args->seg_readers = VA_new(num_segs);
     Err *error = NULL;
     for (uint32_t seg_tick = 0; seg_tick < num_segs; seg_tick++) {
-        context.seg_tick = seg_tick;
-        error = Err_trap(S_try_open_segreader, &context);
+        seg_context.seg_tick = seg_tick;
+        error = Err_trap(S_try_open_segreader, &seg_context);
         if (error) {
             break;
         }
-        VA_Push(seg_readers, (Obj*)context.result);
-        context.result = NULL;
+        VA_Push(args->seg_readers, (Obj*)seg_context.result);
+        seg_context.result = NULL;
     }
 
     DECREF(segments);
     DECREF(files);
     if (error) {
-        DECREF(seg_readers);
-        return (Obj*)error;
-    }
-    else {
-        return (Obj*)seg_readers;
+        DECREF(args->seg_readers);
+        args->seg_readers = NULL;
+        RETHROW(error);
     }
 }
 
@@ -409,22 +417,25 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
          * failed to open something, see if we can find a newer snapshot file.
          * If we can, then the exception was due to the race condition.  If
          * not, we have a real exception, so throw an error. */
-        Obj *result = S_try_open_elements(self);
-        if (Obj_Is_A(result, ERR)) { // Error occurred.
+        struct try_open_elements_context context;
+        context.self        = self;
+        context.seg_readers = NULL;
+        Err *error = Err_trap(S_try_open_elements, &context);
+        if (error) {
             S_release_read_lock(self);
             DECREF(target_snap_file);
             if (last_gen < gen) { // Index updated, so try again.
-                DECREF(result);
+                DECREF(error);
                 last_gen = gen;
             }
             else { // Real error.
                 if (manager) { S_release_deletion_lock(self); }
-                RETHROW(result);
+                RETHROW(error);
             }
         }
         else { // Succeeded.
-            S_init_sub_readers(self, (VArray*)result);
-            DECREF(result);
+            S_init_sub_readers(self, (VArray*)context.seg_readers);
+            DECREF(context.seg_readers);
             DECREF(target_snap_file);
             break;
         }
