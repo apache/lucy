@@ -55,14 +55,6 @@ class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
     public void
     Destroy(SegReader *self);
 
-    /** Constructor helper.
-     *
-     * @return either NULL indicating success, or a CharBuf with an error
-     * message.
-     */
-    incremented CharBuf*
-    Try_Init_Components(SegReader *self);
-
     /** Add a component to the SegReader.  Using the same <code>api</code> key
      * twice is an error.
      *

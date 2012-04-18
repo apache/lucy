@@ -29,6 +29,10 @@
 #include "Lucy/Search/Matcher.h"
 #include "Lucy/Store/Folder.h"
 
+// Try to initialize all sub-readers.
+static void
+S_try_init_components(void *context);
+
 SegReader*
 SegReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
               VArray *segments, int32_t seg_tick) {
@@ -49,11 +53,11 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
     self->doc_max    = (int32_t)Seg_Get_Count(segment);
     self->seg_name   = (CharBuf*)INCREF(Seg_Get_Name(segment));
     self->seg_num    = Seg_Get_Number(segment);
-    mess = SegReader_Try_Init_Components(self);
-    if (mess) {
-        // An error occurred, so clean up self and throw an exception.
+    Err *error = Err_trap(S_try_init_components, self);
+    if (error) {
+        // An error occurred, so clean up self and rethrow the exception.
         DECREF(self);
-        Err_throw_mess(ERR, mess);
+        RETHROW(error);
     }
 
     DeletionsReader *del_reader
@@ -62,6 +66,14 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
     self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
 
     return self;
+}
+
+static void
+S_try_init_components(void *context) {
+    SegReader *self = (SegReader*)context;
+    Schema *schema = SegReader_Get_Schema(self);
+    Architecture *arch = Schema_Get_Architecture(schema);
+    Arch_Init_Seg_Reader(arch, self);
 }
 
 void

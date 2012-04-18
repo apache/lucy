@@ -230,20 +230,6 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Index::SegReader;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    sub _try_init_components {
-        my $self = shift;
-        my $arch = $self->get_schema->get_architecture;
-        eval { $arch->init_seg_reader($self); };
-        if ($@) { return Lucy::Object::CharBuf->new($@); }
-        return;
-    }
-}
-
-{
     package Lucy::Search::Compiler;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
