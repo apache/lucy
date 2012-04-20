@@ -202,15 +202,14 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "/* Return a boolean indicating whether a method has been overridden.\n"
         " */\n"
-        "#define %sOVERRIDDEN(_self, _class_nick, _meth_name, _micro_name) \\\n"
-        "        (cfish_method(*((cfish_VTable**)_self), \\\n"
-        "            %s ## _class_nick ## _ ## _meth_name ## _OFFSET )\\\n"
-        "            != (cfish_method_t)%s ## _class_nick ## _ ## _micro_name )\n"
+        "#define CFISH_OVERRIDDEN(_self, _full_meth, _full_func) \\\n"
+        "    (cfish_method(*((cfish_VTable**)_self), _full_meth ## _OFFSET )\\\n"
+        "        != (cfish_method_t)_full_func)\n"
         "\n"
         "#ifdef CFISH_USE_SHORT_NAMES\n"
         "  #define METHOD                   %sMETHOD\n"
         "  #define SUPER_METHOD             CFISH_SUPER_METHOD\n"
-        "  #define OVERRIDDEN               %sOVERRIDDEN\n"
+        "  #define OVERRIDDEN               CFISH_OVERRIDDEN\n"
         "#endif\n"
         "\n"
         "typedef struct cfish_Callback {\n"
@@ -239,8 +238,7 @@ S_write_parcel_h(CFCBindCore *self) {
                   + strlen(aliases)
                   + strlen(typedefs)
                   + strlen(PREFIX) + strlen(Prefix)
-                  + strlen(PREFIX) + strlen(Prefix) + strlen(prefix)
-                  + 2 * strlen(PREFIX)
+                  + strlen(PREFIX)
                   + 2 * strlen(prefix)
                   + strlen(self->footer)
                   + 100;
@@ -248,8 +246,7 @@ S_write_parcel_h(CFCBindCore *self) {
     sprintf(file_content, pattern,
             self->header, aliases, typedefs,
             PREFIX, Prefix,
-            PREFIX, Prefix, prefix,
-            PREFIX, PREFIX,
+            PREFIX,
             prefix, prefix,
             self->footer);
 

@@ -668,7 +668,7 @@ Highlighter_encode(Highlighter *self, CharBuf *text) {
 
 static CharBuf*
 S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
-    if (OVERRIDDEN(self, Highlighter, Encode, encode)) {
+    if (OVERRIDDEN(self, Lucy_Highlighter_Encode, lucy_Highlighter_encode)) {
         return Highlighter_Encode(self, text);
     }
     else {
