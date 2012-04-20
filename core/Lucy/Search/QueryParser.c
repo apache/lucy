@@ -58,9 +58,9 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 // A function that attempts to match a substring and if successful, stores the
 // begin and end of the match in the supplied pointers and returns true.
 typedef bool_t
-(*lucy_QueryParser_match_t)(CharBuf *input, char **begin_match,
+(*Lucy_QueryParser_Match_t)(CharBuf *input, char **begin_match,
                             char **end_match);
-#define match_t lucy_QueryParser_match_t
+#define match_t Lucy_QueryParser_Match_t
 
 // Find a quote/end-of-string -delimited phrase.
 static bool_t

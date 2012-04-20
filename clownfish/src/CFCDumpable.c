@@ -159,13 +159,16 @@ S_add_dump_method(CFCClass *klass) {
     CFCClass_add_method(klass, method);
     CFCBase_decref((CFCBase*)method);
     const char *full_func_sym = CFCMethod_implementing_func_sym(method);
-    const char *full_typedef  = CFCMethod_full_typedef(method);
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
     const char *cnick         = CFCClass_get_cnick(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
+
+    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0); 
+    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
+    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =
@@ -184,6 +187,7 @@ S_add_dump_method(CFCClass *klass) {
         char *autocode = (char*)MALLOCATE(amount);
         sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
                 full_typedef, vtable_var, cnick);
+        FREEMEM(full_typedef);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **fresh = CFCClass_fresh_member_vars(klass);
@@ -223,13 +227,16 @@ S_add_load_method(CFCClass *klass) {
     CFCClass_add_method(klass, method);
     CFCBase_decref((CFCBase*)method);
     const char *full_func_sym = CFCMethod_implementing_func_sym(method);
-    const char *full_typedef  = CFCMethod_full_typedef(method);
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
     const char *cnick         = CFCClass_get_cnick(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
+
+    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0); 
+    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
+    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =
@@ -249,6 +256,7 @@ S_add_load_method(CFCClass *klass) {
         char *autocode = (char*)MALLOCATE(amount);
         sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
                 full_typedef, vtable_var, cnick, full_struct, full_struct);
+        FREEMEM(full_typedef);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **fresh = CFCClass_fresh_member_vars(klass);

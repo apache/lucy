@@ -119,7 +119,7 @@ PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
 PolyAnalyzer*
 PolyAnalyzer_load(PolyAnalyzer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    PolyAnalyzer_load_t super_load = (PolyAnalyzer_load_t)SUPER_METHOD(
+    PolyAnalyzer_Load_t super_load = (PolyAnalyzer_Load_t)SUPER_METHOD(
                                          POLYANALYZER, PolyAnalyzer, Load);
     PolyAnalyzer *loaded = super_load(self, dump);
     VArray *analyzer_dumps = (VArray*)CERTIFY(

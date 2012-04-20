@@ -18,11 +18,11 @@ parcel Lucy;
 
 __C__
 typedef void 
-(*lucy_Err_attempt_t)(void *context);
+(*Lucy_Err_Attempt_t)(void *context);
 
-#define cfish_Err_attempt_t lucy_Err_attempt_t
+#define Cfish_Err_Attempt_t Lucy_Err_Attempt_t
 #ifdef LUCY_USE_SHORT_NAMES
-  #define Err_attempt_t cfish_Err_attempt_t
+  #define Err_Attempt_t Cfish_Err_Attempt_t
 #endif
 __END_C__
 
@@ -99,7 +99,7 @@ class Lucy::Object::Err inherits Lucy::Object::Obj {
      * @return an Err, or NULL if no exception occurs.
      */
     public inert incremented nullable Err*
-    trap(cfish_Err_attempt_t routine, void *context);
+    trap(Cfish_Err_Attempt_t routine, void *context);
 
     /** Print an error message to stderr with some C contextual information.
      * Usually invoked via the WARN(pattern, ...) macro.

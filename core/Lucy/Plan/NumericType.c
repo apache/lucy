@@ -156,7 +156,7 @@ Float64Type_equals(Float64Type *self, Obj *other) {
     if (self == (Float64Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, FLOAT64TYPE)) { return false; }
-    Float64Type_equals_t super_equals = (Float64Type_equals_t)SUPER_METHOD(
+    Float64Type_Equals_t super_equals = (Float64Type_Equals_t)SUPER_METHOD(
                                             FLOAT64TYPE, Float64Type, Equals);
     return super_equals(self, other);
 }
@@ -198,7 +198,7 @@ Float32Type_equals(Float32Type *self, Obj *other) {
     if (self == (Float32Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, FLOAT32TYPE)) { return false; }
-    Float32Type_equals_t super_equals = (Float32Type_equals_t)SUPER_METHOD(
+    Float32Type_Equals_t super_equals = (Float32Type_Equals_t)SUPER_METHOD(
                                             FLOAT32TYPE, Float32Type, Equals);
     return super_equals(self, other);
 }
@@ -240,7 +240,7 @@ Int32Type_equals(Int32Type *self, Obj *other) {
     if (self == (Int32Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, INT32TYPE)) { return false; }
-    Int32Type_equals_t super_equals = (Int32Type_equals_t)SUPER_METHOD(
+    Int32Type_Equals_t super_equals = (Int32Type_Equals_t)SUPER_METHOD(
                                           INT32TYPE, Int32Type, Equals);
     return super_equals(self, other);
 }
@@ -282,7 +282,7 @@ Int64Type_equals(Int64Type *self, Obj *other) {
     if (self == (Int64Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, INT64TYPE)) { return false; }
-    Int64Type_equals_t super_equals = (Int64Type_equals_t)SUPER_METHOD(
+    Int64Type_Equals_t super_equals = (Int64Type_Equals_t)SUPER_METHOD(
                                           INT64TYPE, Int64Type, Equals);
     return super_equals(self, other);
 }

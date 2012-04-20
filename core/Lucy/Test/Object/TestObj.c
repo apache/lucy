@@ -156,7 +156,7 @@ S_attempt_Mimic(void *context) {
 }
 
 static void
-S_verify_abstract_error(TestBatch *batch, Err_attempt_t routine,
+S_verify_abstract_error(TestBatch *batch, Err_Attempt_t routine,
                         void *context, const char *name) {
     char message[100];
     sprintf(message, "%s() is abstract", name);

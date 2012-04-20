@@ -45,9 +45,6 @@ struct CFCMethod {
     int is_novel;
 };
 
-static void
-S_update_typedefs(CFCMethod *self, const char *short_sym);
-
 const static CFCMeta CFCMETHOD_META = {
     "Clownfish::CFC::Model::Method",
     sizeof(CFCMethod),
@@ -145,9 +142,6 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     // inheritance that it overrides another.
     self->is_novel = true;
 
-    // Cache typedefs.
-    S_update_typedefs(self, CFCSymbol_short_sym((CFCSymbol*)self));
-
     return self;
 }
 
@@ -239,7 +233,6 @@ CFCMethod_finalize(CFCMethod *self) {
                         self->function.docucomment, true,
                         self->is_abstract);
     finalized->is_novel = false;
-    S_update_typedefs(finalized, CFCSymbol_short_sym((CFCSymbol*)self));
     return finalized;
 }
 
@@ -293,33 +286,30 @@ CFCMethod_micro_sym(CFCMethod *self) {
     return CFCSymbol_micro_sym((CFCSymbol*)self);
 }
 
-static void
-S_update_typedefs(CFCMethod *self, const char *short_sym) {
-    FREEMEM(self->short_typedef);
-    FREEMEM(self->full_typedef);
-    if (short_sym) {
-        const char *prefix = CFCMethod_get_prefix(self);
-        size_t amount = strlen(short_sym) + 3;
-        self->short_typedef = (char*)MALLOCATE(amount);
-        sprintf(self->short_typedef, "%s_t", short_sym);
-        amount += strlen(prefix);
-        self->full_typedef = (char*)MALLOCATE(amount);
-        sprintf(self->full_typedef, "%s%s_t", prefix, short_sym);
+size_t
+CFCMethod_short_typedef(CFCMethod *self, const char *invoker, char *buf,
+                        size_t buf_size) {
+    CFCUTIL_NULL_CHECK(invoker);
+    size_t needed = CFCMethod_short_method_sym(self, invoker, NULL, 0)
+                    + strlen("_t");
+    if (buf_size >= needed) {
+        CFCMethod_short_method_sym(self, invoker, buf, buf_size);
+        strcat(buf, "_t");
     }
-    else {
-        self->short_typedef = NULL;
-        self->full_typedef = NULL;
-    }
+    return needed;
 }
 
-const char*
-CFCMethod_short_typedef(CFCMethod *self) {
-    return self->short_typedef;
-}
-
-const char*
-CFCMethod_full_typedef(CFCMethod *self) {
-    return self->full_typedef;
+size_t
+CFCMethod_full_typedef(CFCMethod *self, const char *invoker, char *buf,
+                       size_t buf_size) {
+    CFCUTIL_NULL_CHECK(invoker);
+    size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0)
+                    + strlen("_t");
+    if (buf_size >= needed) {
+        CFCMethod_full_method_sym(self, invoker, buf, buf_size);
+        strcat(buf, "_t");
+    }
+    return needed;
 }
 
 const char*

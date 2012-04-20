@@ -138,18 +138,21 @@ CFCMethod_get_macro_sym(CFCMethod *self);
 const char*
 CFCMethod_micro_sym(CFCMethod *self);
 
-/** Returns the typedef symbol for this method, which is derived from the
- * class nick of the first class in which the method was declared, e.g.
- * "Claw_pinch_t".
+/** Create the typedef symbol for this method, e.g "Claw_Pinch_t".
+ *
+ * @return the number of bytes which the symbol would occupy.
  */
-const char*
-CFCMethod_short_typedef(CFCMethod *self);
+size_t
+CFCMethod_short_typedef(CFCMethod *self, const char *invoker, char *buf,
+                        size_t buf_size);
 
-/** Returns the fully-qualified typedef symbol including parcel prefix, e.g.
- * "crust_Claw_pinch_t".
+/** Create the fully-qualified typedef symbol, e.g. "Crust_Claw_Pinch_t".
+ *
+ * @return the number of bytes which the symbol would occupy.
  */
-const char*
-CFCMethod_full_typedef(CFCMethod *self);
+size_t
+CFCMethod_full_typedef(CFCMethod *self, const char *invoker, char *buf,
+                       size_t buf_size);
 
 /** Returns the fully qualified name of the variable which stores the method's
  * Callback object, e.g. "crust_LobClaw_pinch_CALLBACK".

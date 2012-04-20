@@ -169,8 +169,8 @@ void
 PolyCompiler_serialize(PolyCompiler *self, OutStream *outstream) {
     CB_Serialize(PolyCompiler_Get_Class_Name(self), outstream);
     VA_Serialize(self->children, outstream);
-    PolyCompiler_serialize_t super_serialize
-        = (PolyCompiler_serialize_t)SUPER_METHOD(POLYCOMPILER, PolyCompiler,
+    PolyCompiler_Serialize_t super_serialize
+        = (PolyCompiler_Serialize_t)SUPER_METHOD(POLYCOMPILER, PolyCompiler,
                                                  Serialize);
     super_serialize(self, outstream);
 }
@@ -182,8 +182,8 @@ PolyCompiler_deserialize(PolyCompiler *self, InStream *instream) {
     DECREF(class_name); // TODO Don't serialize class name.
     self->children
         = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
-    PolyCompiler_deserialize_t super_deserialize
-        = (PolyCompiler_deserialize_t)SUPER_METHOD(POLYCOMPILER, PolyCompiler,
+    PolyCompiler_Deserialize_t super_deserialize
+        = (PolyCompiler_Deserialize_t)SUPER_METHOD(POLYCOMPILER, PolyCompiler,
                                                    Deserialize);
     return super_deserialize(self, instream);
 }

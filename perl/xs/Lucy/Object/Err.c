@@ -30,7 +30,7 @@ XS(lucy_Err_attempt_via_xs) {
     };
     IV routine_iv = SvIV(ST(0));
     IV context_iv = SvIV(ST(1));
-    cfish_Err_attempt_t routine = INT2PTR(cfish_Err_attempt_t, routine_iv);
+    Cfish_Err_Attempt_t routine = INT2PTR(Cfish_Err_Attempt_t, routine_iv);
     void *context               = INT2PTR(void*, context_iv);
     routine(context);
     XSRETURN(0);
@@ -74,8 +74,8 @@ lucy_Err_do_throw(lucy_Err *err) {
 
 void*
 lucy_Err_to_host(lucy_Err *self) {
-    lucy_Err_to_host_t super_to_host
-        = (lucy_Err_to_host_t)LUCY_SUPER_METHOD(LUCY_ERR, Err, To_Host);
+    Lucy_Err_To_Host_t super_to_host
+        = (Lucy_Err_To_Host_t)LUCY_SUPER_METHOD(LUCY_ERR, Err, To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;
@@ -83,7 +83,7 @@ lucy_Err_to_host(lucy_Err *self) {
 
 void
 lucy_Err_throw_mess(lucy_VTable *vtable, lucy_CharBuf *message) {
-    lucy_Err_make_t make = (lucy_Err_make_t)LUCY_METHOD(
+    Lucy_Err_Make_t make = (Lucy_Err_Make_t)LUCY_METHOD(
                                CFISH_CERTIFY(vtable, LUCY_VTABLE), Err, Make);
     lucy_Err *err = (lucy_Err*)CFISH_CERTIFY(make(NULL), LUCY_ERR);
     Lucy_Err_Cat_Mess(err, message);
@@ -100,7 +100,7 @@ lucy_Err_warn_mess(lucy_CharBuf *message) {
 }
 
 lucy_Err*
-lucy_Err_trap(cfish_Err_attempt_t routine, void *context) {
+lucy_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
     lucy_Err *error = NULL;
     SV *routine_sv = newSViv(PTR2IV(routine));
     SV *context_sv = newSViv(PTR2IV(context));

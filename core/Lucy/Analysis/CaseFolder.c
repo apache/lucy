@@ -61,15 +61,15 @@ CaseFolder_equals(CaseFolder *self, Obj *other) {
 
 Hash*
 CaseFolder_dump(CaseFolder *self) {
-    CaseFolder_dump_t super_dump
-        = (CaseFolder_dump_t)SUPER_METHOD(CASEFOLDER, CaseFolder, Dump);
+    CaseFolder_Dump_t super_dump
+        = (CaseFolder_Dump_t)SUPER_METHOD(CASEFOLDER, CaseFolder, Dump);
     return super_dump(self);
 }
 
 CaseFolder*
 CaseFolder_load(CaseFolder *self, Obj *dump) {
-    CaseFolder_load_t super_load
-        = (CaseFolder_load_t)SUPER_METHOD(CASEFOLDER, CaseFolder, Load);
+    CaseFolder_Load_t super_load
+        = (CaseFolder_Load_t)SUPER_METHOD(CASEFOLDER, CaseFolder, Load);
     CaseFolder *loaded = super_load(self, dump);
     return CaseFolder_init(loaded);
 }

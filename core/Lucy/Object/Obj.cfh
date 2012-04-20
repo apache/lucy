@@ -190,8 +190,8 @@ class Lucy::Object::Obj {
 __C__
 static CHY_INLINE void
 lucy_Obj_super_destroy(lucy_Obj *self, lucy_VTable *vtable) {
-    lucy_Obj_destroy_t super_destroy
-        = (lucy_Obj_destroy_t)cfish_super_method(vtable,
+    Lucy_Obj_Destroy_t super_destroy
+        = (Lucy_Obj_Destroy_t)cfish_super_method(vtable,
                                                  Lucy_Obj_Destroy_OFFSET);
     super_destroy(self);
 }

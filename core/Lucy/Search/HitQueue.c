@@ -119,8 +119,8 @@ HitQ_destroy(HitQueue *self) {
 Obj*
 HitQ_jostle(HitQueue *self, Obj *element) {
     MatchDoc *match_doc = (MatchDoc*)CERTIFY(element, MATCHDOC);
-    HitQ_jostle_t super_jostle
-        = (HitQ_jostle_t)SUPER_METHOD(HITQUEUE, HitQ, Jostle);
+    HitQ_Jostle_t super_jostle
+        = (HitQ_Jostle_t)SUPER_METHOD(HITQUEUE, HitQ, Jostle);
     if (self->need_values) {
         CERTIFY(match_doc->values, VARRAY);
     }

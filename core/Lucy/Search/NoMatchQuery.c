@@ -77,8 +77,8 @@ NoMatchQuery_get_fails_to_match(NoMatchQuery *self) {
 
 Obj*
 NoMatchQuery_dump(NoMatchQuery *self) {
-    NoMatchQuery_dump_t super_dump
-        = (NoMatchQuery_dump_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Dump);
+    NoMatchQuery_Dump_t super_dump
+        = (NoMatchQuery_Dump_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "fails_to_match", 14,
                    (Obj*)Bool_singleton(self->fails_to_match));
@@ -88,8 +88,8 @@ NoMatchQuery_dump(NoMatchQuery *self) {
 NoMatchQuery*
 NoMatchQuery_load(NoMatchQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    NoMatchQuery_load_t super_load
-        = (NoMatchQuery_load_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Load);
+    NoMatchQuery_Load_t super_load
+        = (NoMatchQuery_Load_t)SUPER_METHOD(NOMATCHQUERY, NoMatchQuery, Load);
     NoMatchQuery *loaded = super_load(self, dump);
     Obj *fails = Cfish_Hash_Fetch_Str(source, "fails_to_match", 14);
     loaded->fails_to_match = fails ? Obj_To_Bool(fails) : true;

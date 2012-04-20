@@ -24,7 +24,7 @@
 void*
 lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
     chy_bool_t first_time = self->ref.count < 4 ? true : false;
-    lucy_LFReg_to_host_t to_host = (lucy_LFReg_to_host_t)LUCY_SUPER_METHOD(
+    Lucy_LFReg_To_Host_t to_host = (Lucy_LFReg_To_Host_t)LUCY_SUPER_METHOD(
                                        LUCY_LOCKFREEREGISTRY, LFReg, To_Host);
     SV *host_obj = (SV*)to_host(self);
     if (first_time) {

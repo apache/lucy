@@ -42,7 +42,7 @@ CFCBindMeth_method_def(struct CFCMethod *method, struct CFCClass *klass);
 /** Return C code expressing a typedef declaration for the method.
  */
 char*
-CFCBindMeth_typdef_dec(struct CFCMethod *method);
+CFCBindMeth_typedef_dec(struct CFCMethod *method, struct CFCClass *klass);
 
 /** Return C code declaring the Callback object for this method.
  */

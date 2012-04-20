@@ -68,8 +68,8 @@ Err_cat_mess(Err *self, const CharBuf *mess) {
 void
 THROW(VTable *vtable, char *pattern, ...) {
     va_list args;
-    Err_make_t make
-        = (Err_make_t)METHOD(CERTIFY(vtable, VTABLE), Err, Make);
+    Err_Make_t make
+        = (Err_Make_t)METHOD(CERTIFY(vtable, VTABLE), Err, Make);
     Err *err = (Err*)CERTIFY(make(NULL), ERR);
     CharBuf *mess = Err_Get_Mess(err);
 
@@ -172,8 +172,8 @@ void
 Err_throw_at(VTable *vtable, const char *file, int line,
              const char *func, const char *pattern, ...) {
     va_list args;
-    Err_make_t make
-        = (Err_make_t)METHOD(CERTIFY(vtable, VTABLE), Err, Make);
+    Err_Make_t make
+        = (Err_Make_t)METHOD(CERTIFY(vtable, VTABLE), Err, Make);
     Err *err = (Err*)CERTIFY(make(NULL), ERR);
     CharBuf *mess = Err_Get_Mess(err);
 

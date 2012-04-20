@@ -20,10 +20,10 @@ __C__
 #include "Lucy/Util/SortUtils.h"
 
 typedef chy_bool_t
-(*lucy_VA_gather_test_t)(lucy_VArray *self, uint32_t tick, void *data);
+(*Lucy_VA_Gather_Test_t)(lucy_VArray *self, uint32_t tick, void *data);
 
 #ifdef LUCY_USE_SHORT_NAMES
-  #define lucy_VA_gather_test_t lucy_VA_gather_test_t
+  #define Lucy_VA_Gather_Test_t Lucy_VA_Gather_Test_t
 #endif
 __END_C__
 
@@ -119,7 +119,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
      * @param context Argument supplied to the comparison routine.
      */
     void
-    Sort(VArray *self, lucy_Sort_compare_t compare = NULL,
+    Sort(VArray *self, Lucy_Sort_Compare_t compare = NULL,
          void *context = NULL);
 
     /** Set the size for the VArray.  If the new size is larger than the
@@ -147,7 +147,7 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     /** Return all elements for which <code>test</code> returns true.
      */
     public incremented VArray*
-    Gather(VArray *self, lucy_VA_gather_test_t test, void *data);
+    Gather(VArray *self, Lucy_VA_Gather_Test_t test, void *data);
 
     public bool_t
     Equals(VArray *self, Obj *other);

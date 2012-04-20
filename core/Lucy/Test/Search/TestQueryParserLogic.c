@@ -768,9 +768,9 @@ prune_test_not_and_not() {
 /***************************************************************************/
 
 typedef TestQueryParser*
-(*lucy_TestQPLogic_logical_test_t)(uint32_t boolop_sym);
+(*Lucy_TestQPLogic_Logical_Test_t)(uint32_t boolop_sym);
 
-static lucy_TestQPLogic_logical_test_t logical_test_funcs[] = {
+static Lucy_TestQPLogic_Logical_Test_t logical_test_funcs[] = {
     logical_test_empty_phrase,
     logical_test_empty_parens,
     logical_test_nested_empty_parens,
@@ -836,9 +836,9 @@ static lucy_TestQPLogic_logical_test_t logical_test_funcs[] = {
 };
 
 typedef TestQueryParser*
-(*lucy_TestQPLogic_prune_test_t)();
+(*Lucy_TestQPLogic_Prune_Test_t)();
 
-static lucy_TestQPLogic_prune_test_t prune_test_funcs[] = {
+static Lucy_TestQPLogic_Prune_Test_t prune_test_funcs[] = {
     prune_test_null_querystring,
     prune_test_matchall,
     prune_test_nomatch,
@@ -892,7 +892,7 @@ TestQPLogic_run_tests() {
 
     // Run logical tests with default boolop of OR.
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
-        lucy_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
+        Lucy_TestQPLogic_Logical_Test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case = test_func(BOOLOP_OR);
         Query *tree     = QParser_Tree(or_parser, test_case->query_string);
         Query *parsed   = QParser_Parse(or_parser, test_case->query_string);
@@ -910,7 +910,7 @@ TestQPLogic_run_tests() {
 
     // Run logical tests with default boolop of AND.
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
-        lucy_TestQPLogic_logical_test_t test_func = logical_test_funcs[i];
+        Lucy_TestQPLogic_Logical_Test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case = test_func(BOOLOP_AND);
         Query *tree     = QParser_Tree(and_parser, test_case->query_string);
         Query *parsed   = QParser_Parse(and_parser, test_case->query_string);
@@ -928,7 +928,7 @@ TestQPLogic_run_tests() {
 
     // Run tests for QParser_Prune().
     for (i = 0; prune_test_funcs[i] != NULL; i++) {
-        lucy_TestQPLogic_prune_test_t test_func = prune_test_funcs[i];
+        Lucy_TestQPLogic_Prune_Test_t test_func = prune_test_funcs[i];
         TestQueryParser *test_case = test_func();
         CharBuf *qstring = test_case->tree
                            ? Query_To_String(test_case->tree)

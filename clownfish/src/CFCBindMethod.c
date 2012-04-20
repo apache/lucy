@@ -134,7 +134,6 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char *invoker_struct = CFCClass_full_struct_sym(klass);
     const char *common_struct 
         = CFCType_get_specifier(CFCMethod_self_type(method));
-    const char *typedef_str = CFCMethod_full_typedef(method);
 
     size_t meth_sym_size = CFCMethod_full_method_sym(method, cnick, NULL, 0);
     char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
@@ -143,6 +142,10 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     size_t offset_sym_size = CFCMethod_full_offset_sym(method, cnick, NULL, 0);
     char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
     CFCMethod_full_offset_sym(method, cnick, full_offset_sym, offset_sym_size);
+
+    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0);
+    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
+    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
 
     // Prepare parameter lists, minus invoker.  The invoker gets forced to
     // "self" later.
@@ -176,8 +179,8 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
                   + strlen(invoker_struct)
                   + strlen(params_minus_invoker)
                   + strlen(full_offset_sym)
-                  + strlen(typedef_str)
-                  + strlen(typedef_str)
+                  + strlen(full_typedef)
+                  + strlen(full_typedef)
                   + strlen(maybe_return)
                   + strlen(common_struct)
                   + strlen(arg_names_minus_invoker)
@@ -185,19 +188,25 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     char *method_def = (char*)MALLOCATE(size);
     sprintf(method_def, pattern, full_offset_sym, ret_type_str,
             full_meth_sym, invoker_struct, params_minus_invoker,
-            full_offset_sym, typedef_str, typedef_str, maybe_return,
+            full_offset_sym, full_typedef, full_typedef, maybe_return,
             common_struct, arg_names_minus_invoker);
 
     FREEMEM(full_offset_sym);
     FREEMEM(full_meth_sym);
+    FREEMEM(full_typedef);
     return method_def;
 }
 
 char*
-CFCBindMeth_typdef_dec(struct CFCMethod *method) {
+CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
+    const char *cnick = CFCClass_get_cnick(klass);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     const char *ret_type = CFCType_to_c(CFCMethod_get_return_type(method));
-    const char *full_typedef = CFCMethod_full_typedef(method);
+
+    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0);
+    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
+    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
+
     size_t size = strlen(params)
                   + strlen(ret_type)
                   + strlen(full_typedef)
@@ -205,6 +214,7 @@ CFCBindMeth_typdef_dec(struct CFCMethod *method) {
                   + sizeof("\0");
     char *buf = (char*)MALLOCATE(size);
     sprintf(buf, "typedef %s\n(*%s)(%s);\n", ret_type, full_typedef, params);
+    FREEMEM(full_typedef);
     return buf;
 }
 

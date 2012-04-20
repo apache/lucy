@@ -211,8 +211,8 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
 
 void
 ProximityCompiler_serialize(ProximityCompiler *self, OutStream *outstream) {
-    ProximityCompiler_serialize_t super_serialize
-            = (ProximityCompiler_serialize_t)SUPER_METHOD(PROXIMITYCOMPILER,
+    ProximityCompiler_Serialize_t super_serialize
+            = (ProximityCompiler_Serialize_t)SUPER_METHOD(PROXIMITYCOMPILER,
                                                           ProximityCompiler,
                                                           Serialize);
     super_serialize(self, outstream);
@@ -225,8 +225,8 @@ ProximityCompiler_serialize(ProximityCompiler *self, OutStream *outstream) {
 
 ProximityCompiler*
 ProximityCompiler_deserialize(ProximityCompiler *self, InStream *instream) {
-    ProximityCompiler_deserialize_t super_deserialize
-            = (ProximityCompiler_deserialize_t)SUPER_METHOD(PROXIMITYCOMPILER,
+    ProximityCompiler_Deserialize_t super_deserialize
+            = (ProximityCompiler_Deserialize_t)SUPER_METHOD(PROXIMITYCOMPILER,
                                                             ProximityCompiler,
                                                             Deserialize);
     self = super_deserialize(self, instream);

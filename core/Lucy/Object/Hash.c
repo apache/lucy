@@ -144,12 +144,12 @@ Hash_load(Hash *self, Obj *dump) {
 
         // Dispatch to an alternate Load() method.
         if (vtable) {
-            Obj_load_t load = (Obj_load_t)METHOD(vtable, Obj, Load);
+            Obj_Load_t load = (Obj_Load_t)METHOD(vtable, Obj, Load);
             if (load == Obj_load) {
                 THROW(ERR, "Abstract method Load() not defined for %o",
                       VTable_Get_Name(vtable));
             }
-            else if (load != (Obj_load_t)Hash_load) { // stop inf loop
+            else if (load != (Obj_Load_t)Hash_load) { // stop inf loop
                 return load(NULL, dump);
             }
         }

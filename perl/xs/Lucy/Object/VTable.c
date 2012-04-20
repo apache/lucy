@@ -58,7 +58,7 @@ lucy_VTable_find_parent_class(const lucy_CharBuf *class_name) {
 void*
 lucy_VTable_to_host(lucy_VTable *self) {
     chy_bool_t first_time = self->ref.count < 4 ? true : false;
-    lucy_VTable_to_host_t to_host = (lucy_VTable_to_host_t)LUCY_SUPER_METHOD(
+    Lucy_VTable_To_Host_t to_host = (Lucy_VTable_To_Host_t)LUCY_SUPER_METHOD(
                                         LUCY_VTABLE, VTable, To_Host);
     SV *host_obj = (SV*)to_host(self);
     if (first_time) {

@@ -204,8 +204,8 @@ PhraseCompiler_serialize(PhraseCompiler *self, OutStream *outstream) {
 
 PhraseCompiler*
 PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream) {
-    PhraseCompiler_deserialize_t super_deserialize
-        = (PhraseCompiler_deserialize_t)SUPER_METHOD(PHRASECOMPILER,
+    PhraseCompiler_Deserialize_t super_deserialize
+        = (PhraseCompiler_Deserialize_t)SUPER_METHOD(PHRASECOMPILER,
                                                      PhraseCompiler,
                                                      Deserialize);
     self = super_deserialize(self, instream);

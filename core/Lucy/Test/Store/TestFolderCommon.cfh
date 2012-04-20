@@ -18,12 +18,12 @@ parcel Lucy;
 
 __C__
 typedef lucy_Folder*
-lucy_TestFolderCommon_set_up_t(void);
+Lucy_TestFolderCommon_Set_Up_t(void);
 typedef void
-lucy_TestFolderCommon_tear_down_t(void);
+Lucy_TestFolderCommon_Tear_Down_t(void);
 #ifdef LUCY_USE_SHORT_NAMES
-  #define TestFolderCommon_set_up_t    lucy_TestFolderCommon_set_up_t
-  #define TestFolderCommon_tear_down_t lucy_TestFolderCommon_tear_down_t
+  #define TestFolderCommon_Set_Up_t    Lucy_TestFolderCommon_Set_Up_t
+  #define TestFolderCommon_Tear_Down_t Lucy_TestFolderCommon_Tear_Down_t
 #endif
 __END_C__
 
@@ -33,8 +33,8 @@ inert class Lucy::Test::Store::TestFolderCommon {
 
     inert void
     run_tests(void *test_batch,
-              lucy_TestFolderCommon_set_up_t set_up,
-              lucy_TestFolderCommon_tear_down_t tear_down);
+              Lucy_TestFolderCommon_Set_Up_t set_up,
+              Lucy_TestFolderCommon_Tear_Down_t tear_down);
 }
 
 

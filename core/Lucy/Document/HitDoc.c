@@ -46,16 +46,16 @@ HitDoc_get_score(HitDoc *self) {
 
 void
 HitDoc_serialize(HitDoc *self, OutStream *outstream) {
-    HitDoc_serialize_t super_serialize
-        = (HitDoc_serialize_t)SUPER_METHOD(HITDOC, HitDoc, Serialize);
+    HitDoc_Serialize_t super_serialize
+        = (HitDoc_Serialize_t)SUPER_METHOD(HITDOC, HitDoc, Serialize);
     super_serialize(self, outstream);
     OutStream_Write_F32(outstream, self->score);
 }
 
 HitDoc*
 HitDoc_deserialize(HitDoc *self, InStream *instream) {
-    HitDoc_deserialize_t super_deserialize
-        = (HitDoc_deserialize_t)SUPER_METHOD(HITDOC, HitDoc, Deserialize);
+    HitDoc_Deserialize_t super_deserialize
+        = (HitDoc_Deserialize_t)SUPER_METHOD(HITDOC, HitDoc, Deserialize);
     self = super_deserialize(self, instream);
     self->score = InStream_Read_F32(instream);
     return self;
@@ -63,8 +63,8 @@ HitDoc_deserialize(HitDoc *self, InStream *instream) {
 
 Hash*
 HitDoc_dump(HitDoc *self) {
-    HitDoc_dump_t super_dump
-        = (HitDoc_dump_t)SUPER_METHOD(HITDOC, HitDoc, Dump);
+    HitDoc_Dump_t super_dump
+        = (HitDoc_Dump_t)SUPER_METHOD(HITDOC, HitDoc, Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "score", 5, (Obj*)CB_newf("%f64", self->score));
     return dump;
@@ -73,8 +73,8 @@ HitDoc_dump(HitDoc *self) {
 HitDoc*
 HitDoc_load(HitDoc *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    HitDoc_load_t super_load
-        = (HitDoc_load_t)SUPER_METHOD(HITDOC, HitDoc, Load);
+    HitDoc_Load_t super_load
+        = (HitDoc_Load_t)SUPER_METHOD(HITDOC, HitDoc, Load);
     HitDoc *loaded = super_load(self, dump);
     Obj *score = CERTIFY(Hash_Fetch_Str(source, "score", 5), OBJ);
     loaded->score = (float)Obj_To_F64(score);

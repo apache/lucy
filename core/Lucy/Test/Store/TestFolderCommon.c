@@ -24,8 +24,8 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 
-#define set_up_t    lucy_TestFolderCommon_set_up_t
-#define tear_down_t lucy_TestFolderCommon_tear_down_t
+#define set_up_t    Lucy_TestFolderCommon_Set_Up_t
+#define tear_down_t Lucy_TestFolderCommon_Tear_Down_t
 
 static CharBuf *foo           = NULL;
 static CharBuf *bar           = NULL;

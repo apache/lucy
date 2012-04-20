@@ -106,8 +106,8 @@ lucy_Doc_extract(lucy_Doc *self, lucy_CharBuf *field,
 
 void*
 lucy_Doc_to_host(lucy_Doc *self) {
-    lucy_Doc_to_host_t super_to_host
-        = (lucy_Doc_to_host_t)LUCY_SUPER_METHOD(LUCY_DOC, Doc, To_Host);
+    Lucy_Doc_To_Host_t super_to_host
+        = (Lucy_Doc_To_Host_t)LUCY_SUPER_METHOD(LUCY_DOC, Doc, To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;

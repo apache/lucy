@@ -883,6 +883,8 @@ ALIAS:
     short_method_sym  = 1
     full_method_sym   = 2
     full_offset_sym   = 3
+    short_typedef     = 4
+    full_typedef      = 5
 CODE:
     size_t size = 0;
     switch (ix) {
@@ -894,6 +896,12 @@ CODE:
             break;
         case 3:
             size = CFCMethod_full_offset_sym(self, invoker, NULL, 0);
+            break;
+        case 4:
+            size = CFCMethod_short_typedef(self, invoker, NULL, 0);
+            break;
+        case 5:
+            size = CFCMethod_full_typedef(self, invoker, NULL, 0);
             break;
         default: croak("Unexpected ix: %d", (int)ix);
     }
@@ -910,6 +918,12 @@ CODE:
         case 3:
             CFCMethod_full_offset_sym(self, invoker, buf, size);
             break;
+        case 4:
+            CFCMethod_short_typedef(self, invoker, buf, size);
+            break;
+        case 5:
+            CFCMethod_full_typedef(self, invoker, buf, size);
+            break;
         default: croak("Unexpected ix: %d", (int)ix);
     }
     SvCUR_set(RETVAL, strlen(buf));
@@ -920,8 +934,6 @@ _set_or_get(self, ...)
     CFCMethod *self;
 ALIAS:
     get_macro_sym      = 2
-    short_typedef      = 4
-    full_typedef       = 6
     full_callback_sym  = 8
     full_override_sym  = 10
     abstract           = 12
@@ -934,16 +946,6 @@ PPCODE:
         case 2: {
                 const char *macro_sym = CFCMethod_get_macro_sym(self);
                 retval = newSVpvn(macro_sym, strlen(macro_sym));
-            }
-            break;
-        case 4: {
-                const char *short_typedef = CFCMethod_short_typedef(self);
-                retval = newSVpvn(short_typedef, strlen(short_typedef));
-            }
-            break;
-        case 6: {
-                const char *value = CFCMethod_full_typedef(self);
-                retval = newSVpvn(value, strlen(value));
             }
             break;
         case 8: {
@@ -1729,14 +1731,6 @@ CODE:
 OUTPUT: RETVAL
 
 MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Method
-
-SV*
-typedef_dec(unused, meth)
-    SV *unused;
-    CFCMethod *meth;
-CODE:
-    RETVAL = S_sv_eat_c_string(CFCBindMeth_typdef_dec(meth));
-OUTPUT: RETVAL
 
 SV*
 abstract_method_def(unused, meth)
