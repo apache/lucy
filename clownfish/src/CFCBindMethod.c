@@ -102,11 +102,10 @@ CFCBindMeth_method_def(CFCMethod *method, CFCClass *klass) {
  * this method may not be overridden. */
 static char*
 S_final_method_def(CFCMethod *method, CFCClass *klass) {
-    const char *cnick = CFCClass_get_cnick(klass);
     const char *self_type = CFCType_to_c(CFCMethod_self_type(method));
-    size_t meth_sym_size = CFCMethod_full_method_sym(method, cnick, NULL, 0);
+    size_t meth_sym_size = CFCMethod_full_method_sym(method, klass, NULL, 0);
     char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, cnick, full_meth_sym, meth_sym_size);
+    CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
     const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *arg_names 
         = CFCParamList_name_list(CFCMethod_get_param_list(method));
@@ -129,23 +128,22 @@ S_final_method_def(CFCMethod *method, CFCClass *klass) {
 
 static char*
 S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
-    const char *cnick = CFCClass_get_cnick(klass);
     CFCParamList *param_list = CFCMethod_get_param_list(method);
     const char *invoker_struct = CFCClass_full_struct_sym(klass);
     const char *common_struct 
         = CFCType_get_specifier(CFCMethod_self_type(method));
 
-    size_t meth_sym_size = CFCMethod_full_method_sym(method, cnick, NULL, 0);
+    size_t meth_sym_size = CFCMethod_full_method_sym(method, klass, NULL, 0);
     char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, cnick, full_meth_sym, meth_sym_size);
+    CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
 
-    size_t offset_sym_size = CFCMethod_full_offset_sym(method, cnick, NULL, 0);
+    size_t offset_sym_size = CFCMethod_full_offset_sym(method, klass, NULL, 0);
     char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
-    CFCMethod_full_offset_sym(method, cnick, full_offset_sym, offset_sym_size);
+    CFCMethod_full_offset_sym(method, klass, full_offset_sym, offset_sym_size);
 
-    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0);
+    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0);
     char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
+    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
 
     // Prepare parameter lists, minus invoker.  The invoker gets forced to
     // "self" later.
@@ -199,13 +197,12 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
 
 char*
 CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
-    const char *cnick = CFCClass_get_cnick(klass);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     const char *ret_type = CFCType_to_c(CFCMethod_get_return_type(method));
 
-    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0);
+    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0);
     char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
+    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
 
     size_t size = strlen(params)
                   + strlen(ret_type)
@@ -451,11 +448,9 @@ S_callback_refcount_mods(CFCMethod *method) {
 
 static char*
 S_invalid_callback_def(CFCMethod *method) {
-    const char *class_cnick = CFCMethod_get_class_cnick(method);
-    size_t meth_sym_size = CFCMethod_full_method_sym(method, class_cnick, NULL, 0);
+    size_t meth_sym_size = CFCMethod_full_method_sym(method, NULL, NULL, 0);
     char *full_method_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, class_cnick, full_method_sym,
-                              meth_sym_size);
+    CFCMethod_full_method_sym(method, NULL, full_method_sym, meth_sym_size);
 
     const char *override_sym = CFCMethod_full_override_sym(method);
     CFCParamList *param_list = CFCMethod_get_param_list(method);

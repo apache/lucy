@@ -161,18 +161,17 @@ S_add_dump_method(CFCClass *klass) {
     const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
-    const char *cnick         = CFCClass_get_cnick(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
-    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0); 
+    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0); 
     char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
+    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
 
-    size_t full_meth_size = CFCMethod_full_method_sym(method, cnick, NULL, 0); 
+    size_t full_meth_size = CFCMethod_full_method_sym(method, klass, NULL, 0); 
     char *full_meth = (char*)MALLOCATE(full_meth_size);
-    CFCMethod_full_method_sym(method, cnick, full_meth, full_meth_size);
+    CFCMethod_full_method_sym(method, klass, full_meth, full_meth_size);
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =
@@ -235,18 +234,17 @@ S_add_load_method(CFCClass *klass) {
     const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
-    const char *cnick         = CFCClass_get_cnick(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
-    size_t full_typedef_size = CFCMethod_full_typedef(method, cnick, NULL, 0); 
+    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0); 
     char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
+    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
 
-    size_t full_meth_size = CFCMethod_full_method_sym(method, cnick, NULL, 0); 
+    size_t full_meth_size = CFCMethod_full_method_sym(method, klass, NULL, 0); 
     char *full_meth = (char*)MALLOCATE(full_meth_size);
-    CFCMethod_full_method_sym(method, cnick, full_meth, full_meth_size);
+    CFCMethod_full_method_sym(method, klass, full_meth, full_meth_size);
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =

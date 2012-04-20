@@ -878,7 +878,7 @@ OUTPUT: RETVAL
 SV*
 _various_method_syms(self, invoker)
     CFCMethod *self;
-    const char *invoker;
+    CFCClass  *invoker;
 ALIAS:
     short_method_sym  = 1
     full_method_sym   = 2

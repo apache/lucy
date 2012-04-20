@@ -22,6 +22,7 @@
 #include "CFCFunction.h"
 #include "CFCMethod.h"
 #include "CFCType.h"
+#include "CFCClass.h"
 #include "CFCUtil.h"
 #include "CFCParamList.h"
 #include "CFCParcel.h"
@@ -237,36 +238,49 @@ CFCMethod_finalize(CFCMethod *self) {
 }
 
 size_t
-CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_short_method_sym(CFCMethod *self, CFCClass *invoker, char *buf,
                            size_t buf_size) {
-    CFCUTIL_NULL_CHECK(invoker);
-    size_t needed = strlen(invoker) + 1 + strlen(self->macro_sym) + 1;
+    const char *cnick;
+    if (invoker) {
+        cnick = CFCClass_get_cnick(invoker);
+    }
+    else {
+        cnick = CFCMethod_get_class_cnick(self);
+    }
+    size_t needed = strlen(cnick) + 1 + strlen(self->macro_sym) + 1;
     if (buf_size >= needed) {
-        sprintf(buf, "%s_%s", invoker, self->macro_sym);
+        sprintf(buf, "%s_%s", cnick, self->macro_sym);
     }
     return needed;
 }
 
 size_t
-CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_full_method_sym(CFCMethod *self, CFCClass *invoker, char *buf,
                           size_t buf_size) {
-    CFCUTIL_NULL_CHECK(invoker);
-    const char *Prefix = CFCMethod_get_Prefix(self);
+    const char *Prefix;
+    const char *cnick;
+    if (invoker) {
+        Prefix = CFCClass_get_Prefix(invoker);
+        cnick  = CFCClass_get_cnick(invoker);
+    }
+    else {
+        Prefix = CFCMethod_get_Prefix(self);
+        cnick  = CFCMethod_get_class_cnick(self);
+    }
     size_t needed = strlen(Prefix)
-                    + strlen(invoker)
+                    + strlen(cnick)
                     + 1
                     + strlen(self->macro_sym)
                     + 1;
     if (buf_size >= needed) {
-        sprintf(buf, "%s%s_%s", Prefix, invoker, self->macro_sym);
+        sprintf(buf, "%s%s_%s", Prefix, cnick, self->macro_sym);
     }
     return needed;
 }
 
 size_t
-CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_full_offset_sym(CFCMethod *self, CFCClass *invoker, char *buf,
                           size_t buf_size) {
-    CFCUTIL_NULL_CHECK(invoker);
     size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0)
                     + strlen("_OFFSET");
     if (buf_size >= needed) {
@@ -287,9 +301,8 @@ CFCMethod_micro_sym(CFCMethod *self) {
 }
 
 size_t
-CFCMethod_short_typedef(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_short_typedef(CFCMethod *self, CFCClass *invoker, char *buf,
                         size_t buf_size) {
-    CFCUTIL_NULL_CHECK(invoker);
     size_t needed = CFCMethod_short_method_sym(self, invoker, NULL, 0)
                     + strlen("_t");
     if (buf_size >= needed) {
@@ -300,9 +313,8 @@ CFCMethod_short_typedef(CFCMethod *self, const char *invoker, char *buf,
 }
 
 size_t
-CFCMethod_full_typedef(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_full_typedef(CFCMethod *self, CFCClass *invoker, char *buf,
                        size_t buf_size) {
-    CFCUTIL_NULL_CHECK(invoker);
     size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0)
                     + strlen("_t");
     if (buf_size >= needed) {

@@ -35,6 +35,7 @@ extern "C" {
 typedef struct CFCMethod CFCMethod;
 struct CFCParcel;
 struct CFCType;
+struct CFCClass;
 struct CFCParamList;
 struct CFCDocuComment;
 
@@ -106,30 +107,36 @@ CFCMethod_finalize(CFCMethod *self);
 /**
  * Create the symbol used to invoke the method without the parcel Prefix, e.g.
  * "LobClaw_Pinch".
+ * @param invoker Class for which the symbol is created. If invoker is NULL,
+ * use the class where the method is defined.
  *
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_short_method_sym(CFCMethod *self, const char *invoker, char *buf,
-                           size_t buf_size);
+CFCMethod_short_method_sym(CFCMethod *self, struct CFCClass *invoker,
+                           char *buf, size_t buf_size);
 
 /**
  * Create the fully-qualified symbol used to invoke the method, e.g.
  * "Crust_LobClaw_Pinch".
+ * @param invoker Class for which the symbol is created. If invoker is NULL,
+ * use the class where the method is defined.
  *
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_full_method_sym(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_full_method_sym(CFCMethod *self, struct CFCClass *invoker, char *buf,
                           size_t buf_size);
 
 /** Create the fully qualified name of the variable which stores the method's
- * vtable offset, e.g. "crust_LobClaw_pinch_OFFSET".
+ * vtable offset, e.g. "Crust_LobClaw_Pinch_OFFSET".
+ * @param invoker Class for which the symbol is created. If invoker is NULL,
+ * use the class where the method is defined.
  *
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_full_offset_sym(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_full_offset_sym(CFCMethod *self, struct CFCClass *invoker, char *buf,
                           size_t buf_size);
 
 const char*
@@ -139,19 +146,23 @@ const char*
 CFCMethod_micro_sym(CFCMethod *self);
 
 /** Create the typedef symbol for this method, e.g "Claw_Pinch_t".
+ * @param invoker Class for which the symbol is created. If invoker is NULL,
+ * use the class where the method is defined.
  *
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_short_typedef(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_short_typedef(CFCMethod *self, struct CFCClass *invoker, char *buf,
                         size_t buf_size);
 
 /** Create the fully-qualified typedef symbol, e.g. "Crust_Claw_Pinch_t".
+ * @param invoker Class for which the symbol is created. If invoker is NULL,
+ * use the class where the method is defined.
  *
  * @return the number of bytes which the symbol would occupy.
  */
 size_t
-CFCMethod_full_typedef(CFCMethod *self, const char *invoker, char *buf,
+CFCMethod_full_typedef(CFCMethod *self, struct CFCClass *invoker, char *buf,
                        size_t buf_size);
 
 /** Returns the fully qualified name of the variable which stores the method's

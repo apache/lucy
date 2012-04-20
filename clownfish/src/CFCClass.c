@@ -499,11 +499,6 @@ S_bequeath_methods(CFCClass *self) {
                 methods[num_methods++] = child_method;
             }
             else {
-                // TODO: If the child is in another parcel and we simply copy
-                // the method of the parent, the C name of child's method
-                // will start with the parent's parcel. This still should work
-                // in most cases, but it looks wrong and might break stuff
-                // later.
                 methods[num_methods++] = method;
             }
         }
