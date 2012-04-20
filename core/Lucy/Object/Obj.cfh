@@ -191,8 +191,7 @@ __C__
 static CHY_INLINE void
 lucy_Obj_super_destroy(lucy_Obj *self, lucy_VTable *vtable) {
     Lucy_Obj_Destroy_t super_destroy
-        = (Lucy_Obj_Destroy_t)cfish_super_method(vtable,
-                                                 Lucy_Obj_Destroy_OFFSET);
+        = CFISH_SUPER_METHOD(vtable, Lucy_Obj_Destroy);
     super_destroy(self);
 }
 
