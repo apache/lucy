@@ -139,8 +139,6 @@ S_write_parcel_h(CFCBindCore *self) {
         CFCUtil_die("No source classes found.");
     }
     const char *prefix = CFCParcel_get_prefix(parcel);
-    const char *Prefix = CFCParcel_get_Prefix(parcel);
-    const char *PREFIX = CFCParcel_get_PREFIX(parcel);
     FREEMEM(ordered);
 
     // Create Clownfish aliases if necessary.
@@ -174,9 +172,8 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "/* Access the function pointer for a given method from the vtable.\n"
         " */\n"
-        "#define %sMETHOD(_vtable, _class_nick, _meth_name) \\\n"
-        "     cfish_method(_vtable, \\\n"
-        "     %s ## _class_nick ## _ ## _meth_name ## _OFFSET)\n"
+        "#define CFISH_METHOD(_vtable, _full_meth) \\\n"
+        "     ((_full_meth ## _t)cfish_method(_vtable, _full_meth ## _OFFSET))\n"
         "\n"
         "static CHY_INLINE cfish_method_t\n"
         "cfish_method(const void *vtable, size_t offset) {\n"
@@ -207,7 +204,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "        != (cfish_method_t)_full_func)\n"
         "\n"
         "#ifdef CFISH_USE_SHORT_NAMES\n"
-        "  #define METHOD                   %sMETHOD\n"
+        "  #define METHOD                   CFISH_METHOD\n"
         "  #define SUPER_METHOD             CFISH_SUPER_METHOD\n"
         "  #define OVERRIDDEN               CFISH_OVERRIDDEN\n"
         "#endif\n"
@@ -237,16 +234,12 @@ S_write_parcel_h(CFCBindCore *self) {
                   + strlen(self->header)
                   + strlen(aliases)
                   + strlen(typedefs)
-                  + strlen(PREFIX) + strlen(Prefix)
-                  + strlen(PREFIX)
                   + 2 * strlen(prefix)
                   + strlen(self->footer)
                   + 100;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern,
             self->header, aliases, typedefs,
-            PREFIX, Prefix,
-            PREFIX,
             prefix, prefix,
             self->footer);
 

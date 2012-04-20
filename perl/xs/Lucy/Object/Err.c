@@ -83,8 +83,8 @@ lucy_Err_to_host(lucy_Err *self) {
 
 void
 lucy_Err_throw_mess(lucy_VTable *vtable, lucy_CharBuf *message) {
-    Lucy_Err_Make_t make = (Lucy_Err_Make_t)LUCY_METHOD(
-                               CFISH_CERTIFY(vtable, LUCY_VTABLE), Err, Make);
+    Lucy_Err_Make_t make
+        = CFISH_METHOD(CFISH_CERTIFY(vtable, LUCY_VTABLE), Lucy_Err_Make);
     lucy_Err *err = (lucy_Err*)CFISH_CERTIFY(make(NULL), LUCY_ERR);
     Lucy_Err_Cat_Mess(err, message);
     CFISH_DECREF(message);

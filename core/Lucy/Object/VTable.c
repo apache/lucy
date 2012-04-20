@@ -257,7 +257,7 @@ VTable_init_obj(VTable *self, void *allocation) {
 
 Obj*
 VTable_load_obj(VTable *self, Obj *dump) {
-    Obj_Load_t load = (Obj_Load_t)METHOD(self, Obj, Load);
+    Obj_Load_t load = METHOD(self, Lucy_Obj_Load);
     if (load == Obj_load) {
         THROW(ERR, "Abstract method Load() not defined for %o", self->name);
     }
