@@ -82,7 +82,7 @@ SnowStemmer_transform(SnowballStemmer *self, Inversion *inversion) {
 Hash*
 SnowStemmer_dump(SnowballStemmer *self) {
     SnowStemmer_Dump_t super_dump
-        = (SnowStemmer_Dump_t)SUPER_METHOD(SNOWBALLSTEMMER, SnowStemmer, Dump);
+        = SUPER_METHOD(SNOWBALLSTEMMER, Lucy_SnowStemmer_Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(self->language));
     return dump;
@@ -91,7 +91,7 @@ SnowStemmer_dump(SnowballStemmer *self) {
 SnowballStemmer*
 SnowStemmer_load(SnowballStemmer *self, Obj *dump) {
     SnowStemmer_Load_t super_load
-        = (SnowStemmer_Load_t)SUPER_METHOD(SNOWBALLSTEMMER, SnowStemmer, Load);
+        = SUPER_METHOD(SNOWBALLSTEMMER, Lucy_SnowStemmer_Load);
     SnowballStemmer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *language 

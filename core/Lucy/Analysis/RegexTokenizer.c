@@ -52,7 +52,7 @@ RegexTokenizer_transform_text(RegexTokenizer *self, CharBuf *text) {
 Obj*
 RegexTokenizer_dump(RegexTokenizer *self) {
     RegexTokenizer_Dump_t super_dump
-        = (RegexTokenizer_Dump_t)SUPER_METHOD(REGEXTOKENIZER, RegexTokenizer, Dump);
+        = SUPER_METHOD(REGEXTOKENIZER, Lucy_RegexTokenizer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "pattern", 7, CB_Dump(self->pattern));
     return (Obj*)dump;
@@ -62,7 +62,7 @@ RegexTokenizer*
 RegexTokenizer_load(RegexTokenizer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     RegexTokenizer_Load_t super_load
-        = (RegexTokenizer_Load_t)SUPER_METHOD(REGEXTOKENIZER, RegexTokenizer, Load);
+        = SUPER_METHOD(REGEXTOKENIZER, Lucy_RegexTokenizer_Load);
     RegexTokenizer *loaded = super_load(self, dump);
     CharBuf *pattern 
         = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "pattern", 7), CHARBUF);

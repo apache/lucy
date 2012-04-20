@@ -438,7 +438,7 @@ Bool_deserialize(BoolNum *self, InStream *instream) {
     bool_t value = (bool_t)InStream_Read_U8(instream);
     if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
         Bool_Dec_RefCount_t super_decref
-            = (Bool_Dec_RefCount_t)SUPER_METHOD(BOOLNUM, Bool, Dec_RefCount);
+            = SUPER_METHOD(BOOLNUM, Lucy_Bool_Dec_RefCount);
         super_decref(self);
     }
     return value ? CFISH_TRUE : CFISH_FALSE;

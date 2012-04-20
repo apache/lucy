@@ -75,7 +75,7 @@ lucy_Err_do_throw(lucy_Err *err) {
 void*
 lucy_Err_to_host(lucy_Err *self) {
     Lucy_Err_To_Host_t super_to_host
-        = (Lucy_Err_To_Host_t)LUCY_SUPER_METHOD(LUCY_ERR, Err, To_Host);
+        = CFISH_SUPER_METHOD(LUCY_ERR, Lucy_Err_To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;

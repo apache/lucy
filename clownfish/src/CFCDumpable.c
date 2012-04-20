@@ -170,26 +170,32 @@ S_add_dump_method(CFCClass *klass) {
     char *full_typedef = (char*)MALLOCATE(full_typedef_size);
     CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
 
+    size_t full_meth_size = CFCMethod_full_method_sym(method, cnick, NULL, 0); 
+    char *full_meth = (char*)MALLOCATE(full_meth_size);
+    CFCMethod_full_method_sym(method, cnick, full_meth, full_meth_size);
+
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =
             "cfish_Obj*\n"
             "%s(%s *self)\n"
             "{\n"
-            "    %s super_dump = (%s)SUPER_METHOD(%s, %s, Dump);\n"
+            "    %s super_dump = SUPER_METHOD(%s, %s);\n"
             "    cfish_Hash *dump = (cfish_Hash*)super_dump(self);\n";
         size_t amount = sizeof(pattern)
                         + strlen(full_func_sym)
                         + strlen(full_struct)
-                        + strlen(full_typedef) * 2
+                        + strlen(full_typedef) 
                         + strlen(vtable_var)
-                        + strlen(cnick)
+                        + strlen(full_meth)
                         + 50;
         char *autocode = (char*)MALLOCATE(amount);
         sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
-                full_typedef, vtable_var, cnick);
-        FREEMEM(full_typedef);
+                vtable_var, full_meth);
         CFCClass_append_autocode(klass, autocode);
+        FREEMEM(full_meth);
+        FREEMEM(full_typedef);
         FREEMEM(autocode);
+
         CFCVariable **fresh = CFCClass_fresh_member_vars(klass);
         for (size_t i = 0; fresh[i] != NULL; i++) {
             S_process_dump_member(klass, fresh[i], buf, BUF_SIZE);
@@ -238,27 +244,33 @@ S_add_load_method(CFCClass *klass) {
     char *full_typedef = (char*)MALLOCATE(full_typedef_size);
     CFCMethod_full_typedef(method, cnick, full_typedef, full_typedef_size);
 
+    size_t full_meth_size = CFCMethod_full_method_sym(method, cnick, NULL, 0); 
+    char *full_meth = (char*)MALLOCATE(full_meth_size);
+    CFCMethod_full_method_sym(method, cnick, full_meth, full_meth_size);
+
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =
             "cfish_Obj*\n"
             "%s(%s *self, cfish_Obj *dump)\n"
             "{\n"
             "    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);\n"
-            "    %s super_load = (%s)SUPER_METHOD(%s, %s, Load);\n"
+            "    %s super_load = SUPER_METHOD(%s, %s);\n"
             "    %s *loaded = (%s*)super_load(self, dump);\n";
         size_t amount = sizeof(pattern)
                         + strlen(full_func_sym)
                         + strlen(full_struct) * 3
-                        + strlen(full_typedef) * 2
+                        + strlen(full_typedef)
                         + strlen(vtable_var)
-                        + strlen(cnick)
+                        + strlen(full_meth)
                         + 50;
         char *autocode = (char*)MALLOCATE(amount);
         sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
-                full_typedef, vtable_var, cnick, full_struct, full_struct);
-        FREEMEM(full_typedef);
+                vtable_var, full_meth, full_struct, full_struct);
         CFCClass_append_autocode(klass, autocode);
+        FREEMEM(full_meth);
+        FREEMEM(full_typedef);
         FREEMEM(autocode);
+
         CFCVariable **fresh = CFCClass_fresh_member_vars(klass);
         for (size_t i = 0; fresh[i] != NULL; i++) {
             S_process_load_member(klass, fresh[i], buf, BUF_SIZE);

@@ -54,8 +54,7 @@ BBSortEx_clear_cache(BBSortEx *self) {
     }
     self->mem_consumed = 0;
     BBSortEx_Clear_Cache_t super_clear_cache
-        = (BBSortEx_Clear_Cache_t)SUPER_METHOD(
-              self->vtable, SortEx, Clear_Cache);
+        = SUPER_METHOD(self->vtable, Lucy_BBSortEx_Clear_Cache);
     super_clear_cache(self);
 }
 

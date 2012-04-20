@@ -205,9 +205,7 @@ PhraseCompiler_serialize(PhraseCompiler *self, OutStream *outstream) {
 PhraseCompiler*
 PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream) {
     PhraseCompiler_Deserialize_t super_deserialize
-        = (PhraseCompiler_Deserialize_t)SUPER_METHOD(PHRASECOMPILER,
-                                                     PhraseCompiler,
-                                                     Deserialize);
+        = SUPER_METHOD(PHRASECOMPILER, Lucy_PhraseCompiler_Deserialize);
     self = super_deserialize(self, instream);
     self->idf               = InStream_Read_F32(instream);
     self->raw_weight        = InStream_Read_F32(instream);

@@ -80,8 +80,7 @@ Boat_capsize() is a function, Boat_Capsize() is a method.
     Battleship_capsize(Battleship *self) 
     {
         // Superclass method invocation.
-        Boat_capsize_t capsize = (Boat_capsize_t)SUPER_METHOD(
-            BATTLESHIP, Battleship, Capsize);
+        Boat_capsize_t capsize = SUPER_METHOD(BATTLESHIP, Battleship_Capsize);
         capsize((Boat*)self);  
 
         // Subclass-specific behavior.
@@ -93,8 +92,7 @@ Boat_capsize() is a function, Boat_Capsize() is a method.
     RubDing_capsize(RubberDinghy *self) 
     {
         // Superclass method invocation.
-        Boat_capsize_t capsize = (Boat_capsize_t)SUPER_METHOD(
-            RUBBERDINGHY, RubDing, Capsize);
+        Boat_capsize_t capsize = SUPER_METHOD(RUBBERDINGHY, RubDing_Capsize);
         capsize((Boat*)self);  
 
         // Subclass-specific behavior.

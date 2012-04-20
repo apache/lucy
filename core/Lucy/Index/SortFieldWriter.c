@@ -129,8 +129,7 @@ SortFieldWriter_clear_cache(SortFieldWriter *self) {
         Hash_Clear(self->uniq_vals);
     }
     SortFieldWriter_Clear_Cache_t super_clear_cache
-        = (SortFieldWriter_Clear_Cache_t)SUPER_METHOD(
-              self->vtable, SortFieldWriter, Clear_Cache);
+        = SUPER_METHOD(self->vtable, Lucy_SortFieldWriter_Clear_Cache);
     super_clear_cache(self);
 }
 

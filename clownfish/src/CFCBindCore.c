@@ -187,9 +187,9 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "/* Access the function pointer for the given method in the superclass's\n"
         " * vtable. */\n"
-        "#define %sSUPER_METHOD(_vtable, _class_nick, _meth_name) \\\n"
-        "     cfish_super_method(_vtable, \\\n"
-        "     %s ## _class_nick ## _ ## _meth_name ## _OFFSET)\n"
+        "#define CFISH_SUPER_METHOD(_vtable, _full_meth) \\\n"
+        "     ((_full_meth ## _t)cfish_super_method(_vtable, \\\n"
+        "                                           _full_meth ## _OFFSET))\n"
         "\n"
         "extern size_t cfish_VTable_offset_of_parent;\n"
         "static CHY_INLINE cfish_method_t\n"
@@ -209,7 +209,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "#ifdef CFISH_USE_SHORT_NAMES\n"
         "  #define METHOD                   %sMETHOD\n"
-        "  #define SUPER_METHOD             %sSUPER_METHOD\n"
+        "  #define SUPER_METHOD             CFISH_SUPER_METHOD\n"
         "  #define OVERRIDDEN               %sOVERRIDDEN\n"
         "#endif\n"
         "\n"
@@ -239,9 +239,8 @@ S_write_parcel_h(CFCBindCore *self) {
                   + strlen(aliases)
                   + strlen(typedefs)
                   + strlen(PREFIX) + strlen(Prefix)
-                  + strlen(PREFIX) + strlen(Prefix)
                   + strlen(PREFIX) + strlen(Prefix) + strlen(prefix)
-                  + 3 * strlen(PREFIX)
+                  + 2 * strlen(PREFIX)
                   + 2 * strlen(prefix)
                   + strlen(self->footer)
                   + 100;
@@ -249,9 +248,8 @@ S_write_parcel_h(CFCBindCore *self) {
     sprintf(file_content, pattern,
             self->header, aliases, typedefs,
             PREFIX, Prefix,
-            PREFIX, Prefix,
             PREFIX, Prefix, prefix,
-            PREFIX, PREFIX, PREFIX,
+            PREFIX, PREFIX,
             prefix, prefix,
             self->footer);
 
