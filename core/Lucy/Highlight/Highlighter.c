@@ -438,7 +438,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
         // Remember original excerpt
         CharBuf *orig_raw_excerpt = CB_Clone(raw_excerpt);
         // Check for prepended ellipsis
-        int32_t min_size = found_starting_edge ? 0 : 4;
+        uint32_t min_size = found_starting_edge ? 0 : 4;
 
         do {
             uint32_t code_point = CB_Code_Point_From(raw_excerpt, 1);

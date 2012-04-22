@@ -95,7 +95,7 @@ Normalizer_transform(Normalizer *self, Inversion *inversion) {
         len = utf8proc_reencode(buffer, len, self->options);
 
         if (len >= 0) {
-            if (len > token->len) {
+            if (len > (ssize_t)token->len) {
                 FREEMEM(token->text);
                 token->text = (char*)MALLOCATE(len + 1);
             }

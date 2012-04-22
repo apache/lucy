@@ -654,7 +654,7 @@ S_unescape_text(char *const top, char *const end) {
 
 static INLINE bool_t
 SI_check_keyword(char *json, char* end, const char *keyword, size_t len) {
-    if (end - json > len
+    if ((size_t)(end - json) > len
         && strncmp(json, keyword, len) == 0
         && json[len] != '_'
         && !isalnum(json[len])
