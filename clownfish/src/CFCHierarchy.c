@@ -305,6 +305,7 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
             }
             self->classes[self->num_classes++]
                 = (CFCClass*)CFCBase_incref((CFCBase*)classes_in_file[j]);
+            self->classes[self->num_classes] = NULL;
         }
         CFCBase_decref((CFCBase*)file);
         CFCBase_decref((CFCBase*)file_spec);
