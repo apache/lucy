@@ -21,6 +21,10 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestMemory.h"
 
+#ifndef SIZE_MAX
+  #define SIZE_MAX ((size_t)-1)
+#endif
+
 static void
 test_oversize__growth_rate(TestBatch *batch) {
     bool_t   success             = true;
