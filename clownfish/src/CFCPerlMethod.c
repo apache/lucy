@@ -21,8 +21,10 @@
 #include "CFCPerlSub.h"
 #include "CFCPerlMethod.h"
 #include "CFCUtil.h"
+#include "CFCClass.h"
 #include "CFCMethod.h"
 #include "CFCType.h"
+#include "CFCParcel.h"
 #include "CFCParamList.h"
 #include "CFCPerlTypeMap.h"
 #include "CFCVariable.h"
@@ -104,11 +106,33 @@ CFCPerlMethod_xsub_def(CFCPerlMethod *self) {
 static char*
 S_xsub_body(CFCPerlMethod *self) {
     CFCMethod    *method        = self->method;
-    const char   *full_func_sym = CFCMethod_implementing_func_sym(method);
     CFCParamList *param_list    = CFCMethod_get_param_list(method);
     CFCVariable **arg_vars      = CFCParamList_get_variables(param_list);
     const char   *name_list     = CFCParamList_name_list(param_list);
     char *body = CFCUtil_strdup("");
+
+    CFCParcel *parcel = CFCMethod_get_parcel(method);
+    const char *class_name = CFCMethod_get_class_name(method);
+    CFCClass *klass = CFCClass_fetch_singleton(parcel, class_name);
+    if (!klass) {
+        CFCUtil_die("Can't find a CFCClass for '%s'", class_name);
+    }
+
+    // Extract the method function pointer.
+    size_t typedef_size
+        = CFCMethod_full_typedef(method, klass, NULL, 0);
+    char *full_typedef = (char*)MALLOCATE(typedef_size);
+    CFCMethod_full_typedef(method, klass, full_typedef, typedef_size);
+
+    size_t meth_size
+        = CFCMethod_full_method_sym(method, klass, NULL, 0);
+    char *full_meth = (char*)MALLOCATE(meth_size);
+    CFCMethod_full_method_sym(method, klass, full_meth, meth_size);
+    body = CFCUtil_cat(body, full_typedef, " method = CFISH_METHOD(",
+                       CFCClass_full_vtable_var(klass), ", ",
+                       full_meth, ");\n    ", NULL);
+    FREEMEM(full_typedef);
+    FREEMEM(full_meth);
 
     // Compensate for functions which eat refcounts.
     for (int i = 0; arg_vars[i] != NULL; i++) {
@@ -122,7 +146,7 @@ S_xsub_body(CFCPerlMethod *self) {
 
     if (CFCType_is_void(CFCMethod_get_return_type(method))) {
         // Invoke method in void context.
-        body = CFCUtil_cat(body, full_func_sym, "(", name_list,
+        body = CFCUtil_cat(body, "method(", name_list,
                            ");\n    XSRETURN(0);", NULL);
     }
     else {
@@ -133,7 +157,7 @@ S_xsub_body(CFCPerlMethod *self) {
         if (!assignment) {
             CFCUtil_die("Can't find typemap for '%s'", type_str);
         }
-        body = CFCUtil_cat(body, type_str, " retval = ", full_func_sym, "(",
+        body = CFCUtil_cat(body, type_str, " retval = method(",
                            name_list, ");\n    ST(0) = ", assignment, ";",
                            NULL);
         if (CFCType_is_object(return_type)
