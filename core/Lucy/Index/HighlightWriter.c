@@ -136,7 +136,7 @@ HLWriter_add_inverted_doc(HighlightWriter *self, Inverter *inverter,
 
 ByteBuf*
 HLWriter_tv_buf(HighlightWriter *self, Inversion *inversion) {
-    char       *last_text = "";
+    const char *last_text = "";
     size_t      last_len = 0;
     ByteBuf    *tv_buf = BB_new(20 + Inversion_Get_Size(inversion) * 8);
     uint32_t    num_postings = 0;

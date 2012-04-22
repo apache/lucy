@@ -71,18 +71,18 @@ inert class Lucy::Object::Host {
     /** Invoke an object method in a void context.
      */
     inert void
-    callback(void *self, char *method, uint32_t num_args, ...);
+    callback(void *self, const char *method, uint32_t num_args, ...);
 
     /** Invoke an object method, expecting an integer.
      */
     inert int64_t
-    callback_i64(void *self, char *method, uint32_t num_args, ...);
+    callback_i64(void *self, const char *method, uint32_t num_args, ...);
 
     /** Invoke an object method, expecting a 64-bit floating point return
      * value.
      */
     inert double
-    callback_f64(void *self, char *method, uint32_t num_args, ...);
+    callback_f64(void *self, const char *method, uint32_t num_args, ...);
 
     /** Invoke an object method, expecting a Obj-derived object back, or
      * possibly NULL.  In order to ensure that the host environment doesn't
@@ -90,19 +90,19 @@ inert class Lucy::Object::Host {
      * caller will have to deal with.
      */
     inert incremented nullable Obj*
-    callback_obj(void *self, char *method, uint32_t num_args, ...);
+    callback_obj(void *self, const char *method, uint32_t num_args, ...);
 
     /** Invoke an object method, expecting a host string of some kind back,
      * which will be converted into a newly allocated CharBuf.
      */
     inert incremented nullable CharBuf*
-    callback_str(void *self, char *method, uint32_t num_args, ...);
+    callback_str(void *self, const char *method, uint32_t num_args, ...);
 
     /** Invoke an object method, expecting a host data structure back.  It's
      * up to the caller to know how to process it.
      */
     inert nullable void*
-    callback_host(void *self, char *method, uint32_t num_args, ...);
+    callback_host(void *self, const char *method, uint32_t num_args, ...);
 }
 
 

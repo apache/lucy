@@ -44,7 +44,7 @@
 
 #include <stdio.h>
 static void
-warn(char *string) {
+warn(const char *string) {
     fprintf(stderr, "ERROR: %s\n", string);
 }
 

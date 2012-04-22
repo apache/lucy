@@ -25,7 +25,8 @@
 #include "Lucy/Util/Memory.h"
 
 static SV*
-S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args);
+S_do_callback_sv(void *vobj, const char *method, uint32_t num_args,
+                 va_list args);
 
 // Convert all arguments to Perl and place them on the Perl stack.
 static CHY_INLINE void
@@ -106,7 +107,7 @@ SI_push_args(void *vobj, va_list args, uint32_t num_args) {
 }
 
 void
-lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) {
+lucy_Host_callback(void *vobj, const char *method, uint32_t num_args, ...) {
     va_list args;
 
     va_start(args, num_args);
@@ -123,7 +124,7 @@ lucy_Host_callback(void *vobj, char *method, uint32_t num_args, ...) {
 }
 
 int64_t
-lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...) {
+lucy_Host_callback_i64(void *vobj, const char *method, uint32_t num_args, ...) {
     va_list args;
     SV *return_sv;
     int64_t retval;
@@ -153,7 +154,7 @@ lucy_Host_callback_i64(void *vobj, char *method, uint32_t num_args, ...) {
 }
 
 double
-lucy_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...) {
+lucy_Host_callback_f64(void *vobj, const char *method, uint32_t num_args, ...) {
     va_list args;
     SV *return_sv;
     double retval;
@@ -170,7 +171,7 @@ lucy_Host_callback_f64(void *vobj, char *method, uint32_t num_args, ...) {
 }
 
 lucy_Obj*
-lucy_Host_callback_obj(void *vobj, char *method, uint32_t num_args, ...) {
+lucy_Host_callback_obj(void *vobj, const char *method, uint32_t num_args, ...) {
     va_list args;
     SV *temp_retval;
     lucy_Obj *retval = NULL;
@@ -188,7 +189,7 @@ lucy_Host_callback_obj(void *vobj, char *method, uint32_t num_args, ...) {
 }
 
 lucy_CharBuf*
-lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...) {
+lucy_Host_callback_str(void *vobj, const char *method, uint32_t num_args, ...) {
     va_list args;
     SV *temp_retval;
     lucy_CharBuf *retval = NULL;
@@ -211,7 +212,7 @@ lucy_Host_callback_str(void *vobj, char *method, uint32_t num_args, ...) {
 }
 
 void*
-lucy_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...) {
+lucy_Host_callback_host(void *vobj, const char *method, uint32_t num_args, ...) {
     va_list args;
     SV *retval;
 
@@ -227,7 +228,8 @@ lucy_Host_callback_host(void *vobj, char *method, uint32_t num_args, ...) {
 }
 
 static SV*
-S_do_callback_sv(void *vobj, char *method, uint32_t num_args, va_list args) {
+S_do_callback_sv(void *vobj, const char *method, uint32_t num_args,
+                 va_list args) {
     SV *return_val;
     SI_push_args(vobj, args, num_args);
     int num_returned = call_method(method, G_SCALAR);

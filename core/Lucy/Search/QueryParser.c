@@ -90,11 +90,11 @@ S_extract_paren_groups(QueryParser *self, const CharBuf *query_string,
 // matching is bordered on the right by either whitespace or the end of the
 // string.
 static bool_t
-S_consume_ascii_token(ViewCharBuf *qstring, char *ptr, size_t size);
+S_consume_ascii_token(ViewCharBuf *qstring, const char *ptr, size_t size);
 
 // Consume the supplied text if there's a match.
 static bool_t
-S_consume_ascii(ViewCharBuf *qstring, char *ptr, size_t size);
+S_consume_ascii(ViewCharBuf *qstring, const char *ptr, size_t size);
 
 // Consume what looks like a field name followed by a colon.
 static bool_t
@@ -736,7 +736,7 @@ QParser_prune(QueryParser *self, Query *query) {
 }
 
 static bool_t
-S_consume_ascii(ViewCharBuf *qstring, char *ptr, size_t len) {
+S_consume_ascii(ViewCharBuf *qstring, const char *ptr, size_t len) {
     if (ViewCB_Starts_With_Str(qstring, ptr, len)) {
         ViewCB_Nip(qstring, len);
         return true;
@@ -745,7 +745,7 @@ S_consume_ascii(ViewCharBuf *qstring, char *ptr, size_t len) {
 }
 
 static bool_t
-S_consume_ascii_token(ViewCharBuf *qstring, char *ptr, size_t len) {
+S_consume_ascii_token(ViewCharBuf *qstring, const char *ptr, size_t len) {
     if (ViewCB_Starts_With_Str(qstring, ptr, len)) {
         if (len == ViewCB_Get_Size(qstring)
             || StrHelp_is_whitespace(ViewCB_Code_Point_At(qstring, len))

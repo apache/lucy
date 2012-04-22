@@ -45,7 +45,7 @@ test_tolerance(TestBatch *batch) {
 }
 
 // Test escapes for control characters ASCII 0-31.
-static char* control_escapes[] = {
+static const char* control_escapes[] = {
     "\\u0000",
     "\\u0001",
     "\\u0002",
@@ -82,7 +82,7 @@ static char* control_escapes[] = {
 };
 
 // Test quote and backslash escape in isolation, then in context.
-static char* quote_escapes_source[] = {
+static const char* quote_escapes_source[] = {
     "\"",
     "\\",
     "abc\"",
@@ -93,7 +93,7 @@ static char* quote_escapes_source[] = {
     "\"\\",
     NULL
 };
-static char* quote_escapes_json[] = {
+static const char* quote_escapes_json[] = {
     "\\\"",
     "\\\\",
     "abc\\\"",
@@ -113,9 +113,9 @@ test_escapes(TestBatch *batch) {
     for (int i = 0; control_escapes[i] != NULL; i++) {
         CB_Truncate(string, 0);
         CB_Cat_Char(string, i);
-        char    *escaped = control_escapes[i];
-        CharBuf *json    = Json_to_json((Obj*)string);
-        CharBuf *decoded = (CharBuf*)Json_from_json(json);
+        const char *escaped = control_escapes[i];
+        CharBuf    *json    = Json_to_json((Obj*)string);
+        CharBuf    *decoded = (CharBuf*)Json_from_json(json);
 
         CB_setf(json_wanted, "\"%s\"", escaped);
         CB_Trim(json);
@@ -130,8 +130,8 @@ test_escapes(TestBatch *batch) {
     }
 
     for (int i = 0; quote_escapes_source[i] != NULL; i++) {
-        char *source  = quote_escapes_source[i];
-        char *escaped = quote_escapes_json[i];
+        const char *source  = quote_escapes_source[i];
+        const char *escaped = quote_escapes_json[i];
         CB_setf(string, source, strlen(source));
         CharBuf *json    = Json_to_json((Obj*)string);
         CharBuf *decoded = (CharBuf*)Json_from_json(json);

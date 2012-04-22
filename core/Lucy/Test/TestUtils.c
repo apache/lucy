@@ -232,7 +232,7 @@ TestUtils_freeze_thaw(Obj *object) {
 
 void
 TestUtils_test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
-                        VArray *expected, char *message) {
+                        VArray *expected, const char *message) {
     Token *seed = Token_new((char*)CB_Get_Ptr8(source), CB_Get_Size(source),
                             0, 0, 1.0f, 1);
     Inversion *starter = Inversion_new(seed);

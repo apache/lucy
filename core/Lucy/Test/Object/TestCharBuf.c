@@ -27,7 +27,7 @@ static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
 
 static CharBuf*
-S_get_cb(char *string) {
+S_get_cb(const char *string) {
     return CB_new_from_utf8(string, strlen(string));
 }
 

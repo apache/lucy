@@ -25,7 +25,7 @@ inert class Lucy::Test::Object::TestLockFreeRegistry cnick TestLFReg {
  */
 class Lucy::Test::Object::StupidHashCharBuf inherits Lucy::Object::CharBuf {
     inert incremented StupidHashCharBuf*
-    new(char *text);
+    new(const char *text);
 
     /** Always returns 1, guaranteeing collisions. */
     public int32_t

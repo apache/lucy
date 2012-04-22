@@ -24,7 +24,7 @@
 #include "Lucy/Object/LockFreeRegistry.h"
 
 StupidHashCharBuf*
-StupidHashCharBuf_new(char *text) {
+StupidHashCharBuf_new(const char *text) {
     return (StupidHashCharBuf*)CB_new_from_utf8(text, strlen(text));
 }
 
