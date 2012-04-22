@@ -310,6 +310,7 @@ S_write_parcel_c(CFCBindCore *self) {
     char pattern[] =
         "%s\n"
         "\n"
+        "#define C_LUCY_VTABLE\n"
         "%s\n"
         "#include \"parcel.h\"\n"
         "#include \"Lucy/Object/VTable.h\"\n"
