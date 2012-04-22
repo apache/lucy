@@ -103,25 +103,33 @@ CFCBindMeth_method_def(CFCMethod *method, CFCClass *klass) {
 static char*
 S_final_method_def(CFCMethod *method, CFCClass *klass) {
     const char *self_type = CFCType_to_c(CFCMethod_self_type(method));
-    size_t meth_sym_size = CFCMethod_full_method_sym(method, klass, NULL, 0);
-    char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
     const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *arg_names 
         = CFCParamList_name_list(CFCMethod_get_param_list(method));
 
-    char pattern[] = "#define %s(%s) \\\n    %s((%s)%s)\n";
+    size_t meth_sym_size = CFCMethod_full_method_sym(method, klass, NULL, 0);
+    char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
+    CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
+    
+    size_t offset_sym_size = CFCMethod_full_offset_sym(method, klass, NULL, 0); 
+    offset_sym_size += 50;
+    char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
+    CFCMethod_full_offset_sym(method, klass, full_offset_sym, offset_sym_size);
+
+    const char pattern[] = "extern size_t %s;\n#define %s(%s) \\\n    %s((%s)%s)\n";
     size_t size = sizeof(pattern)
+                  + strlen(full_offset_sym)
                   + strlen(full_meth_sym)
                   + strlen(arg_names)
                   + strlen(full_func_sym)
                   + strlen(self_type)
                   + strlen(arg_names)
-                  + 20;
+                  + 200;
     char *method_def = (char*)MALLOCATE(size);
-    sprintf(method_def, pattern, full_meth_sym, arg_names, full_func_sym,
-            self_type, arg_names);
+    sprintf(method_def, pattern, full_offset_sym, full_meth_sym, arg_names,
+            full_func_sym, self_type, arg_names);
 
+    FREEMEM(full_offset_sym);
     FREEMEM(full_meth_sym);
     return method_def;
 }
