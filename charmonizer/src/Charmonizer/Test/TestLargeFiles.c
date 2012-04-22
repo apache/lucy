@@ -236,7 +236,7 @@ S_test_sparse_file(long offset, struct stat *st) {
     stat("_charm_sparse", st);
 
     remove("_charm_sparse");
-    return true;
+    return result;
 }
 
 static int

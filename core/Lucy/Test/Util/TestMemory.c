@@ -84,7 +84,6 @@ test_oversize__ceiling(TestBatch *batch) {
 
 static void
 test_oversize__rounding(TestBatch *batch) {
-    bool_t success = true;
     int widths[] = { 1, 2, 4, 0 };
 
     for (int width_tick = 0; widths[width_tick] != 0; width_tick++) {
@@ -95,7 +94,6 @@ test_oversize__rounding(TestBatch *batch) {
             if (bytes % sizeof(void*) != 0) {
                 FAIL(batch, "Rounding failure for %d, width %d",
                      i, width);
-                success = false;
                 return;
             }
         }

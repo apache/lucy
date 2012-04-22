@@ -146,7 +146,6 @@ test_to_base36(TestBatch *batch) {
 
 static void
 test_utf8_round_trip(TestBatch *batch) {
-    bool_t failed = false;
     uint32_t code_point;
     for (code_point = 0; code_point <= 0x10FFFF; code_point++) {
         char buffer[4];

@@ -43,7 +43,6 @@ SegReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 SegReader*
 SegReader_init(SegReader *self, Schema *schema, Folder *folder,
                Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
-    CharBuf *mess;
     Segment *segment;
 
     IxReader_init((IndexReader*)self, schema, folder, snapshot, segments,

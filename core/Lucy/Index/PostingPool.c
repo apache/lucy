@@ -350,7 +350,6 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
     CharBuf       *const last_term_text = CB_new(0);
     LexiconWriter *const lex_writer     = self->lex_writer;
     SkipStepper   *const skip_stepper   = self->skip_stepper;
-    int32_t        last_doc_id          = 0;
     int32_t        last_skip_doc        = 0;
     int64_t        last_skip_filepos    = 0;
     const int32_t  skip_interval
@@ -411,9 +410,6 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                          posting->content_len);
             last_text_buf  = (char*)CB_Get_Ptr8(last_term_text);
             last_text_size = CB_Get_Size(last_term_text);
-
-            // Starting a new term, thus a new delta doc sequence at 0.
-            last_doc_id = 0;
         }
 
         // Bail on last iter before writing invalid posting data.
@@ -444,9 +440,6 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             SkipStepper_Write_Record(skip_stepper, skip_stream,
                                      last_skip_doc, last_skip_filepos);
         }
-
-        // Remember last doc id because we need it for delta encoding.
-        last_doc_id = posting->doc_id;
 
         // Retrieve the next posting from the sort pool.
         // DECREF(posting);  // No!!  DON'T destroy!!!
