@@ -37,8 +37,6 @@
 struct CFCMethod {
     CFCFunction function;
     char *macro_sym;
-    char *short_typedef;
-    char *full_typedef;
     char *full_callback_sym;
     char *full_override_sym;
     int is_final;
@@ -126,8 +124,6 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     }
 
     self->macro_sym     = CFCUtil_strdup(macro_sym);
-    self->short_typedef = NULL;
-    self->full_typedef  = NULL;
     self->is_final      = is_final;
     self->is_abstract   = is_abstract;
 
@@ -149,8 +145,6 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 void
 CFCMethod_destroy(CFCMethod *self) {
     FREEMEM(self->macro_sym);
-    FREEMEM(self->short_typedef);
-    FREEMEM(self->full_typedef);
     FREEMEM(self->full_callback_sym);
     FREEMEM(self->full_override_sym);
     CFCFunction_destroy((CFCFunction*)self);
