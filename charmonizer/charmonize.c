@@ -29,6 +29,7 @@
 #include "Charmonizer/Probe/Integers.h"
 #include "Charmonizer/Probe/LargeFiles.h"
 #include "Charmonizer/Probe/Memory.h"
+#include "Charmonizer/Probe/SymbolVisibility.h"
 #include "Charmonizer/Probe/UnusedVars.h"
 #include "Charmonizer/Probe/VariadicMacros.h"
 #include "Charmonizer/Core/HeaderChecker.h"
@@ -56,6 +57,7 @@ int main(int argc, char **argv) {
     chaz_Floats_run();
     chaz_LargeFiles_run();
     chaz_Memory_run();
+    chaz_SymbolVisibility_run();
     chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
 
