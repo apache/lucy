@@ -141,6 +141,9 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char *common_struct 
         = CFCType_get_specifier(CFCMethod_self_type(method));
 
+    const char *visibility = CFCClass_included(klass)
+                             ? "CHY_IMPORT" : "CHY_EXPORT";
+
     size_t meth_sym_size = CFCMethod_full_method_sym(method, klass, NULL, 0);
     char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
     CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
@@ -170,7 +173,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char *maybe_return = CFCType_is_void(return_type) ? "" : "return ";
 
     const char pattern[] =
-        "extern size_t %s;\n"
+        "extern %s size_t %s;\n"
         "static CHY_INLINE %s\n"
         "%s(const %s *self%s) {\n"
         "    char *const method_address = *(char**)self + %s;\n"
@@ -179,6 +182,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
         "}\n";
 
     size_t size = sizeof(pattern)
+                  + strlen(visibility)
                   + strlen(full_offset_sym)
                   + strlen(ret_type_str)
                   + strlen(full_meth_sym)
@@ -192,7 +196,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
                   + strlen(arg_names_minus_invoker)
                   + 40;
     char *method_def = (char*)MALLOCATE(size);
-    sprintf(method_def, pattern, full_offset_sym, ret_type_str,
+    sprintf(method_def, pattern, visibility, full_offset_sym, ret_type_str,
             full_meth_sym, invoker_struct, params_minus_invoker,
             full_offset_sym, full_typedef, full_typedef, maybe_return,
             common_struct, arg_names_minus_invoker);

@@ -378,6 +378,14 @@ sub ACTION_compile_custom_xs {
     for my $source_dir (@$source_dirs) {
         push @$c_files, @{ $self->rscan_dir( $source_dir, qr/\.c$/ ) };
     }
+    # Compile with -fvisibility=hidden on GCC >= 4.0
+    my $cc_flags = $self->extra_compiler_flags;
+    if ( $self->config('gccversion') ) {
+        my @version_nums = split( /\./, $self->config('gccversion') );
+        if ( $version_nums[0] >= 4 ) {
+            $cc_flags = [ @$cc_flags, '-fvisibility=hidden' ];
+        }
+    }
     for my $c_file (@$c_files) {
         my $o_file   = $c_file;
         my $ccs_file = $c_file;
@@ -389,7 +397,7 @@ sub ACTION_compile_custom_xs {
         $self->add_to_cleanup($ccs_file);
         $cbuilder->compile(
             source               => $c_file,
-            extra_compiler_flags => $self->extra_compiler_flags,
+            extra_compiler_flags => $cc_flags,
             include_dirs         => $self->include_dirs,
             object_file          => $o_file,
         );
@@ -413,6 +421,7 @@ sub ACTION_compile_custom_xs {
     unshift @objects, $perl_binding_o_file;
     $self->add_to_cleanup($perl_binding_o_file);
     if ( !$self->up_to_date( $perl_binding_c_file, $perl_binding_o_file ) ) {
+        # Don't use -fvisibility=hidden for XS
         $cbuilder->compile(
             source               => $perl_binding_c_file,
             extra_compiler_flags => $self->extra_compiler_flags,

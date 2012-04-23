@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#define C_CFISH_XSBIND
 #define C_LUCY_OBJ
 #define NEED_newRV_noinc
 #include "XSBind.h"

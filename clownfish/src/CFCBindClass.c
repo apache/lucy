@@ -183,6 +183,9 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *method_defs           = S_method_defs(self);
     char *short_names           = S_short_names(self);
 
+    const char *visibility = CFCClass_included(self->client)
+                             ? "CHY_IMPORT" : "CHY_EXPORT";
+
     char pattern[] =
         "#include \"charmony.h\"\n"
         "#include \"parcel.h\"\n"
@@ -221,10 +224,10 @@ S_to_c_header_dynamic(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n"
-        "/* Define the VTable singleton for this class.\n"
+        "/* Declare the VTable singleton for this class.\n"
         " */\n"
         "\n"
-        "extern cfish_VTable *%s;\n"
+        "extern %s cfish_VTable *%s;\n"
         "\n"
         "/* Define \"short names\" for this class's symbols.\n"
         " */\n"
@@ -241,6 +244,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
                   + strlen(sub_declarations)
                   + strlen(method_typedefs)
                   + strlen(method_defs)
+                  + strlen(visibility)
                   + strlen(vt_var)
                   + strlen(short_names)
                   + 100;
@@ -248,7 +252,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *content = (char*)MALLOCATE(size);
     sprintf(content, pattern, parent_include, privacy_symbol, struct_def,
             privacy_symbol, inert_var_defs, sub_declarations, method_typedefs,
-            method_defs, vt_var, short_names);
+            method_defs, visibility, vt_var, short_names);
 
     FREEMEM(struct_def);
     FREEMEM(parent_include);
@@ -545,12 +549,17 @@ S_parent_include(CFCBindClass *self) {
 // Add a C function definition for each method and each function.
 static char*
 S_sub_declarations(CFCBindClass *self) {
+    const char *visibility = CFCClass_included(self->client)
+                             ? "CHY_IMPORT " : "CHY_EXPORT ";
     CFCFunction **functions = CFCClass_functions(self->client);
     CFCMethod** fresh_methods = CFCClass_fresh_methods(self->client);
     char *declarations = CFCUtil_strdup("");
     for (int i = 0; functions[i] != NULL; i++) {
         CFCFunction *func = functions[i];
         char *dec = CFCBindFunc_func_declaration(func);
+        if (!CFCFunction_inline(func)) {
+            declarations = CFCUtil_cat(declarations, visibility, NULL);
+        }
         declarations = CFCUtil_cat(declarations, dec, "\n\n", NULL);
         FREEMEM(dec);
     }
@@ -567,12 +576,14 @@ S_sub_declarations(CFCBindClass *self) {
 // Declare class (a.k.a. "inert") variables.
 static char*
 S_inert_var_declarations(CFCBindClass *self) {
+    const char *visibility = CFCClass_included(self->client)
+                             ? "CHY_IMPORT " : "CHY_EXPORT ";
     CFCVariable **inert_vars = CFCClass_inert_vars(self->client);
     char *declarations = CFCUtil_strdup("");
     for (int i = 0; inert_vars[i] != NULL; i++) {
         const char *global_c = CFCVariable_global_c(inert_vars[i]);
-        declarations = CFCUtil_cat(declarations, "extern ", global_c, ";\n",
-                                   NULL);
+        declarations = CFCUtil_cat(declarations, "extern ", visibility,
+                                   global_c, ";\n", NULL);
     }
     return declarations;
 }
