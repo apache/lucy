@@ -139,18 +139,20 @@ sub cf_system_include_dirs {
     return @include_dirs;
 }
 
-sub cf_system_library_file {
+sub cf_linker_flags {
     my ( $self_or_class, $module_name ) = @_;
 
     my @module_parts = split( '::', $module_name );
     my $class_name   = $module_parts[-1];
+    my $ext          = $Config{dlext};
+    $ext = 'lib' if lc($ext) eq 'dll';
 
     for my $location ( qw( site vendor ) ) {
         my $install_dir = $Config{"install${location}arch"};
         my $lib_file = catfile(
-            $install_dir, 'auto', @module_parts, "$class_name.$Config{dlext}",
+            $install_dir, 'auto', @module_parts, "$class_name.$ext",
         );
-        return $lib_file if -f $lib_file;
+        return ( $lib_file ) if -f $lib_file;
     }
 
     die("No Clownfish library file found for module $module_name");
@@ -473,6 +475,14 @@ sub ACTION_compile_custom_xs {
             lib_file           => $lib_file,
             extra_linker_flags => $self->extra_linker_flags,
         );
+        # Install .lib file on Windows
+        my $implib_file = catfile( $libdir, "$class_name.lib" );
+        if ( -e $implib_file ) {
+            $self->copy_if_modified(
+                from => $implib_file,
+                to   => catfile( $archdir, "$class_name.lib" ),
+            );
+        }
     }
 }
 
@@ -504,9 +514,9 @@ the Perl bindings for Clownfish modules.
     use Clownfish::CFC::Perl::Build;
     use File::Spec::Functions qw( catdir );
 
-    my @cf_base_path = Clownfish::CFC::Perl::Build->cf_base_path;
+    my @cf_base_path    = Clownfish::CFC::Perl::Build->cf_base_path;
     my @cf_sys_includes = Clownfish::CFC::Perl::Build->cf_system_include_dirs;
-    my $other_lib = Clownfish::CFC::Perl::Build->cf_system_library_file(
+    my @cf_linker_flags = Clownfish::CFC::Perl::Build->cf_linker_flags(
         'Other::Module',
     );
 
@@ -516,7 +526,7 @@ the Perl bindings for Clownfish modules.
         dist_author        => 'The Author <author@example.com>',
         dist_version       => '0.1.0',
         include_dirs       => [ @cf_sys_includes ],
-        extra_linker_flags => $other_lib,
+        extra_linker_flags => [ @cf_linker_flags ],
         clownfish_params => {
             source  => [ catdir( @cf_base_path, 'core' ) ],
             include => [ @cf_sys_includes ],
@@ -573,10 +583,10 @@ Currently either () or ('..').
 Returns a list of Clownfish include directories of system-wide installations
 of Clownfish modules.
 
-=head2 my $path = Clownfish::CFC::Perl::Build->cf_system_library_file($module_name);
+=head2 my @flags = Clownfish::CFC::Perl::Build->cf_linker_flags($module_name);
 
-Returns the path to the C library of system-wide installed Clownfish module
-named $module_name. Should be added to extra_linker_flags for all module
+Returns the linker flags needed to link against Clownfish module named
+$module_name. Should be added to extra_linker_flags for all module
 dependencies.
 
 =head2 $builder->cf_copy_include_file(@path);
