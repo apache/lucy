@@ -166,10 +166,10 @@ CFCMethod_full_typedef(CFCMethod *self, struct CFCClass *invoker, char *buf,
                        size_t buf_size);
 
 /** Returns the fully qualified name of the variable which stores the method's
- * Callback object, e.g. "crust_LobClaw_pinch_CALLBACK".
+ * introspection data, e.g. "crust_LobClaw_pinch_META".
  */
 const char*
-CFCMethod_full_callback_sym(CFCMethod *self);
+CFCMethod_full_method_meta_sym(CFCMethod *self);
 
 /** Returns the fully qualified name of the function which implements the
  * callback to the host in the event that a host method has been defined which

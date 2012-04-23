@@ -52,8 +52,7 @@ VTable_allocate(size_t num_methods) {
 
 VTable*
 VTable_bootstrap(VTable *self, VTable *parent, const char *name, int flags,
-                 void *x, size_t obj_alloc_size, void *callbacks,
-                 cfish_method_t *methods) {
+                 void *x, size_t obj_alloc_size, void *method_meta) {
     // Create CharBuf manually, since the CharBuf VTable might not be
     // bootstrapped yet.
     CharBuf *name_cb = (CharBuf*)Memory_wrapped_calloc(sizeof(CharBuf), 1);
@@ -73,10 +72,18 @@ VTable_bootstrap(VTable *self, VTable *parent, const char *name, int flags,
     self->flags          = flags;
     self->x              = x;
     self->obj_alloc_size = obj_alloc_size;
-    self->callbacks      = callbacks;
+    self->method_meta    = method_meta;
 
-    for (int i = 0; methods[i]; ++i) {
-        self->methods[i] = methods[i];
+    if (parent) {
+        size_t parent_methods_size = parent->vt_alloc_size
+                                     - offsetof(cfish_VTable, methods);
+        memcpy(self->methods, parent->methods, parent_methods_size);
+    }
+
+    cfish_MethodMetaData **md_objs = (cfish_MethodMetaData**)method_meta;
+    for (uint32_t i = 0; md_objs[i] != NULL; i++) {
+        cfish_MethodMetaData *const md_obj = md_objs[i];
+        VTable_override(self, md_obj->func, *md_obj->offset);
     }
 
     return self;
@@ -204,16 +211,20 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
                 S_scrunch_charbuf(meth, scrunched);
                 Hash_Store(meths, (Obj*)scrunched, (Obj*)CFISH_TRUE);
             }
-            cfish_Callback **callbacks
-                = (cfish_Callback**)singleton->callbacks;
-            for (uint32_t i = 0; callbacks[i] != NULL; i++) {
-                cfish_Callback *const callback = callbacks[i];
-                ZCB_Assign_Str(callback_name, callback->name,
-                               callback->name_len);
-                S_scrunch_charbuf((CharBuf*)callback_name, scrunched);
-                if (Hash_Fetch(meths, (Obj*)scrunched)) {
-                    VTable_Override(singleton, callback->func,
-                                    callback->offset);
+            for (VTable *vtable = parent; vtable; vtable = vtable->parent) {
+                cfish_MethodMetaData **md_objs
+                    = (cfish_MethodMetaData**)vtable->method_meta;
+                for (uint32_t i = 0; md_objs[i] != NULL; i++) {
+                    cfish_MethodMetaData *const md_obj = md_objs[i];
+                    if (md_obj->callback_func) {
+                        ZCB_Assign_Str(callback_name, md_obj->name,
+                                       md_obj->name_len);
+                        S_scrunch_charbuf((CharBuf*)callback_name, scrunched);
+                        if (Hash_Fetch(meths, (Obj*)scrunched)) {
+                            VTable_Override(singleton, md_obj->callback_func,
+                                            *md_obj->offset);
+                        }
+                    }
                 }
             }
             DECREF(scrunched);

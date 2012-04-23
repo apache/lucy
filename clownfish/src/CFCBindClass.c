@@ -33,8 +33,7 @@
 struct CFCBindClass {
     CFCBase base;
     CFCClass *client;
-    char *full_callbacks_var;
-    char *full_methods_var;
+    char *full_method_meta_var;
     char *short_names_macro;
 };
 
@@ -53,10 +52,6 @@ S_struct_definition(CFCBindClass *self);
 // Return C code defining the class's VTable.
 static char*
 S_vtable_definition(CFCBindClass *self);
-
-// Declare cfish_Callback objects.
-static char*
-S_callback_declarations(CFCBindClass *self);
 
 // Declare typedefs for fresh methods, to ease casting.
 static char*
@@ -101,11 +96,9 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 
     const char *full_vtable_var = CFCClass_full_vtable_var(client);
     const char *PREFIX = CFCClass_get_PREFIX(client);
-    self->full_callbacks_var = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
-    self->full_methods_var   = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
-    self->short_names_macro  = (char*)MALLOCATE(strlen(PREFIX) + 20);
-    sprintf(self->full_callbacks_var, "%s_CALLBACKS", full_vtable_var);
-    sprintf(self->full_methods_var, "%s_METHODS", full_vtable_var);
+    self->full_method_meta_var = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
+    self->short_names_macro    = (char*)MALLOCATE(strlen(PREFIX) + 20);
+    sprintf(self->full_method_meta_var, "%s_META", full_vtable_var);
     sprintf(self->short_names_macro, "%sUSE_SHORT_NAMES", PREFIX);
 
     return self;
@@ -113,8 +106,7 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 
 void
 CFCBindClass_destroy(CFCBindClass *self) {
-    FREEMEM(self->full_callbacks_var);
-    FREEMEM(self->full_methods_var);
+    FREEMEM(self->full_method_meta_var);
     FREEMEM(self->short_names_macro);
     CFCBase_decref((CFCBase*)self->client);
     CFCBase_destroy((CFCBase*)self);
@@ -189,7 +181,6 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *inert_var_defs        = S_inert_var_declarations(self);
     char *method_typedefs       = S_method_typedefs(self);
     char *method_defs           = S_method_defs(self);
-    char *callback_declarations = S_callback_declarations(self);
     char *short_names           = S_short_names(self);
 
     char pattern[] =
@@ -215,12 +206,6 @@ S_to_c_header_dynamic(CFCBindClass *self) {
         "\n"
         "/* Declare both this class's inert functions and the C functions which\n"
         " * implement this class's dynamic methods.\n"
-        " */\n"
-        "\n"
-        "%s\n"
-        "\n"
-        "/* Declare the cfish_Callback objects which provide the introspection\n"
-        " * information needed to perform method overriding at runtime.\n"
         " */\n"
         "\n"
         "%s\n"
@@ -254,7 +239,6 @@ S_to_c_header_dynamic(CFCBindClass *self) {
                   + strlen(privacy_symbol)
                   + strlen(inert_var_defs)
                   + strlen(sub_declarations)
-                  + strlen(callback_declarations)
                   + strlen(method_typedefs)
                   + strlen(method_defs)
                   + strlen(vt_var)
@@ -263,9 +247,8 @@ S_to_c_header_dynamic(CFCBindClass *self) {
 
     char *content = (char*)MALLOCATE(size);
     sprintf(content, pattern, parent_include, privacy_symbol, struct_def,
-            privacy_symbol, inert_var_defs, sub_declarations,
-            callback_declarations, method_typedefs, method_defs,
-            vt_var, short_names);
+            privacy_symbol, inert_var_defs, sub_declarations, method_typedefs,
+            method_defs, vt_var, short_names);
 
     FREEMEM(struct_def);
     FREEMEM(parent_include);
@@ -273,7 +256,6 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     FREEMEM(inert_var_defs);
     FREEMEM(method_typedefs);
     FREEMEM(method_defs);
-    FREEMEM(callback_declarations);
     FREEMEM(short_names);
     return content;
 }
@@ -295,19 +277,15 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
 
     char *offsets    = CFCUtil_strdup("");
     char *cb_funcs   = CFCUtil_strdup("");
-    char *cb_objects = CFCUtil_strdup("");
+    char *md_objects = CFCUtil_strdup("");
 
-    /* Start a NULL-terminated array of cfish_Callback vars.  Since C89
+    /* Start a NULL-terminated array of cfish_MethodMetaData vars.  Since C89
      * doesn't allow us to initialize a pointer to an anonymous array inside a
      * global struct, we have to give it a real symbol and then store a pointer
      * to that symbol inside the VTable struct. */
-    char *cb_var = CFCUtil_strdup("");
-    cb_var = CFCUtil_cat(cb_var, "cfish_Callback *", self->full_callbacks_var,
-                         "[] = {\n    ", NULL);
-
-    char *method_var = CFCUtil_strdup("");
-    method_var = CFCUtil_cat(method_var, "cfish_method_t ",
-                             self->full_methods_var, "[] = {\n    ", NULL);
+    char *md_var = CFCUtil_strdup("");
+    md_var = CFCUtil_cat(md_var, "cfish_MethodMetaData *",
+                         self->full_method_meta_var, "[] = {\n    ", NULL);
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
@@ -337,37 +315,26 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
             FREEMEM(method_def);
         }
 
-        // Define callbacks for methods that can be overridden via the
-        // host.
-        if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
-            if (method_is_fresh && CFCMethod_novel(method)) {
+        // Define method metadata for initialization and callbacks.
+        if (method_is_fresh) {
+            if ((CFCMethod_public(method) || CFCMethod_abstract(method))
+                && CFCMethod_novel(method)) {
                 char *cb_def = CFCBindMeth_callback_def(method);
-                char *cb_obj_def
-                    = CFCBindMeth_callback_obj_def(method, offset_str);
                 cb_funcs = CFCUtil_cat(cb_funcs, cb_def, "\n", NULL);
-                cb_objects = CFCUtil_cat(cb_objects, cb_obj_def, NULL);
                 FREEMEM(cb_def);
-                FREEMEM(cb_obj_def);
             }
-            CFCMethod *novel
-                = CFCClass_find_novel_method(client,
-                                             CFCMethod_micro_sym(method));
-            const char *full_cb_sym = CFCMethod_full_callback_sym(novel);
-            cb_var = CFCUtil_cat(cb_var, "&", full_cb_sym, ",\n    ", NULL);
+            char *md_obj_def = CFCBindMeth_method_meta_def(method);
+            md_objects = CFCUtil_cat(md_objects, md_obj_def, NULL);
+            FREEMEM(md_obj_def);
+            const char *full_md_sym = CFCMethod_full_method_meta_sym(method);
+            md_var = CFCUtil_cat(md_var, "&", full_md_sym, ",\n    ", NULL);
         }
-
-        // Define method implementations.
-        const char *implementing_sym = CFCMethod_implementing_func_sym(method);
-        method_var = CFCUtil_cat(method_var, "(cfish_method_t)",
-                                 implementing_sym, ",\n    ", NULL);
 
         FREEMEM(offset_str);
     }
 
-    // Close callbacks variable definition.
-    cb_var =  CFCUtil_cat(cb_var, "NULL\n};\n", NULL);
-    // Close methods variable definition.
-    method_var =  CFCUtil_cat(method_var, "NULL\n};\n", NULL);
+    // Close method metadata variable definition.
+    md_var =  CFCUtil_cat(md_var, "NULL\n};\n", NULL);
 
     const char pattern[] =
         "#include \"%s\"\n"
@@ -384,19 +351,14 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n"
-        "/* Define the cfish_Callback objects which provide introspection\n"
-        " * information and allow runtime overriding of dynamic methods.\n"
+        "/* Define the cfish_MethodMetaData objects which provide\n"
+        " * introspection information and allow runtime overriding of\n"
+        " * dynamic methods.\n"
         " */\n"
         "\n"
         "%s\n"
         "\n"
-        "/* Assemble all the cfish_Callback objects for this class so that\n"
-        " * they can be searched when performing method overriding.\n"
-        " */\n"
-        "\n"
-        "%s\n"
-        "\n"
-        "/* Define this class's method implementations.\n"
+        "/* Assemble all the cfish_MethodMetaData objects for this class.\n"
         " */\n"
         "\n"
         "%s\n"
@@ -415,22 +377,20 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                   + strlen(include_h)
                   + strlen(offsets)
                   + strlen(cb_funcs)
-                  + strlen(cb_objects)
-                  + strlen(cb_var)
-                  + strlen(method_var)
+                  + strlen(md_objects)
+                  + strlen(md_var)
                   + strlen(vt_var)
                   + strlen(autocode)
                   + 100;
     char *code = (char*)MALLOCATE(size);
-    sprintf(code, pattern, include_h, offsets, cb_funcs, cb_objects, cb_var,
-            method_var, vt_var, autocode);
+    sprintf(code, pattern, include_h, offsets, cb_funcs, md_objects, md_var,
+            vt_var, autocode);
 
-    FREEMEM(method_var);
     FREEMEM(fresh_methods);
     FREEMEM(offsets);
     FREEMEM(cb_funcs);
-    FREEMEM(cb_objects);
-    FREEMEM(cb_var);
+    FREEMEM(md_objects);
+    FREEMEM(md_var);
     return code;
 }
 
@@ -513,8 +473,7 @@ CFCBindClass_to_vtable_bootstrap(CFCBindClass *self) {
         "        0, /* flags */\n"
         "        NULL, /* \"void *x\" member reserved for future use */\n"
         "        sizeof(%s), /* obj_alloc_size */\n"
-        "        %s, /* callbacks */\n"
-        "        %s /* methods */\n"
+        "        %s /* method_meta */\n"
         "    );\n";
 
     size_t size = sizeof(pattern)
@@ -522,12 +481,11 @@ CFCBindClass_to_vtable_bootstrap(CFCBindClass *self) {
                   + strlen(parent_ref)
                   + strlen(class_name)
                   + strlen(struct_sym)
-                  + strlen(self->full_callbacks_var)
-                  + strlen(self->full_methods_var)
+                  + strlen(self->full_method_meta_var)
                   + 40;
     char *code = (char*)MALLOCATE(size);
     sprintf(code, pattern, vt_var, parent_ref, class_name, struct_sym,
-            self->full_callbacks_var, self->full_methods_var);
+            self->full_method_meta_var);
 
     return code;
 }
@@ -556,23 +514,6 @@ CFCBindClass_to_vtable_register(CFCBindClass *self) {
     sprintf(code, pattern, vt_var);
 
     return code;
-}
-
-// Declare cfish_Callback objects.
-static char*
-S_callback_declarations(CFCBindClass *self) {
-    CFCMethod** fresh_methods = CFCClass_fresh_methods(self->client);
-    char *declarations = CFCUtil_strdup("");
-    for (int i = 0; fresh_methods[i] != NULL; i++) {
-        CFCMethod *method = fresh_methods[i];
-        if (CFCMethod_public(method) || CFCMethod_abstract(method)) {
-            char *callback = CFCBindMeth_callback_dec(method);
-            declarations = CFCUtil_cat(declarations, callback, NULL);
-            FREEMEM(callback);
-        }
-    }
-    FREEMEM(fresh_methods);
-    return declarations;
 }
 
 // Declare typedefs for every method, to ease casting.

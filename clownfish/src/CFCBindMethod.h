@@ -44,16 +44,11 @@ CFCBindMeth_method_def(struct CFCMethod *method, struct CFCClass *klass);
 char*
 CFCBindMeth_typedef_dec(struct CFCMethod *method, struct CFCClass *klass);
 
-/** Return C code declaring the Callback object for this method.
+/** Return C code defining the MethodMetaData object for this method, which
+ * stores introspection data and a pointer to the callback function.
  */
 char*
-CFCBindMeth_callback_dec(struct CFCMethod *method);
-
-/** Return C code defining the Callback object for this method, which stores
- * introspection data and a pointer to the callback function.
- */
-char*
-CFCBindMeth_callback_obj_def(struct CFCMethod *method, const char* offset);
+CFCBindMeth_method_meta_def(struct CFCMethod *method);
 
 /** Return C code implementing a version of the method which throws an
  * "abstract method" error at runtime, for methods which are declared as

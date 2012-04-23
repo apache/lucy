@@ -224,31 +224,41 @@ CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
 }
 
 char*
-CFCBindMeth_callback_dec(CFCMethod *method) {
-    const char *full_callback_sym = CFCMethod_full_callback_sym(method);
-    size_t size = strlen(full_callback_sym) + 50;
-    char *callback_dec = (char*)MALLOCATE(size);
-    sprintf(callback_dec, "extern cfish_Callback %s;\n", full_callback_sym);
-    return callback_dec;
-}
+CFCBindMeth_method_meta_def(CFCMethod *method) {
+    const char *full_md_sym   = CFCMethod_full_method_meta_sym(method);
+    const char *macro_sym     = CFCMethod_get_macro_sym(method);
+    unsigned    macro_sym_len = strlen(macro_sym);
+    const char *impl_sym      = CFCMethod_implementing_func_sym(method);
 
-char*
-CFCBindMeth_callback_obj_def(CFCMethod *method, const char *offset) {
-    const char *macro_sym         = CFCMethod_get_macro_sym(method);
-    unsigned    macro_sym_len     = strlen(macro_sym);
-    const char *full_override_sym = CFCMethod_full_override_sym(method);
-    const char *full_callback_sym = CFCMethod_full_callback_sym(method);
+    const char *full_override_sym = "NULL";
+    if ((CFCMethod_public(method) || CFCMethod_abstract(method))
+        && CFCMethod_novel(method)) {
+        full_override_sym = CFCMethod_full_override_sym(method);
+    }
+
+    size_t offset_sym_size = CFCMethod_full_offset_sym(method, NULL, NULL, 0);
+    char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
+    CFCMethod_full_offset_sym(method, NULL, full_offset_sym, offset_sym_size);
+
     char pattern[] =
-        "cfish_Callback %s = {\"%s\", %u, (cfish_method_t)%s, %s};\n";
+        "cfish_MethodMetaData %s = {\n"
+        "    \"%s\", %u, /* name and name_len */\n"
+        "    (cfish_method_t)%s, /* func */\n"
+        "    (cfish_method_t)%s, /* callback_func */\n"
+        "    &%s /* offset */\n"
+        "};\n";
     size_t size = sizeof(pattern)
+                  + strlen(full_md_sym)
                   + macro_sym_len
+                  + strlen(impl_sym)
                   + strlen(full_override_sym)
-                  + strlen(full_callback_sym)
-                  + strlen(offset)
+                  + strlen(full_offset_sym)
                   + 30;
     char *def = (char*)MALLOCATE(size);
-    sprintf(def, pattern, full_callback_sym, macro_sym, macro_sym_len,
-            full_override_sym, offset);
+    sprintf(def, pattern, full_md_sym, macro_sym, macro_sym_len, impl_sym,
+            full_override_sym, full_offset_sym);
+
+    FREEMEM(full_offset_sym);
     return def;
 }
 

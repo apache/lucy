@@ -31,7 +31,7 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     void              *x;            /* Reserved for future expansion */
     size_t             obj_alloc_size;
     size_t             vt_alloc_size;
-    void              *callbacks;
+    void              *method_meta;
     lucy_method_t[1]   methods; /* flexible array */
 
     inert LockFreeRegistry *registry;
@@ -42,8 +42,7 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
 
     inert VTable*
     bootstrap(VTable *self, VTable *parent, const char *name, int flags,
-              void *x, size_t obj_alloc_size, void *callbacks,
-              cfish_method_t *methods);
+              void *x, size_t obj_alloc_size, void *method_meta);
 
     /** Return a singleton.  If a VTable can be found in the registry based on
      * the supplied class name, it will be returned.  Otherwise, a new VTable
