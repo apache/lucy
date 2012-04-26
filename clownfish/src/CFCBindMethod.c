@@ -112,7 +112,6 @@ S_final_method_def(CFCMethod *method, CFCClass *klass) {
     CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
     
     size_t offset_sym_size = CFCMethod_full_offset_sym(method, klass, NULL, 0); 
-    offset_sym_size += 50;
     char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
     CFCMethod_full_offset_sym(method, klass, full_offset_sym, offset_sym_size);
 
@@ -124,7 +123,7 @@ S_final_method_def(CFCMethod *method, CFCClass *klass) {
                   + strlen(full_func_sym)
                   + strlen(self_type)
                   + strlen(arg_names)
-                  + 200;
+                  + 20;
     char *method_def = (char*)MALLOCATE(size);
     sprintf(method_def, pattern, full_offset_sym, full_meth_sym, arg_names,
             full_func_sym, self_type, arg_names);
