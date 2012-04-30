@@ -36,28 +36,8 @@ void
 SymbolVisibility_run(void) {
     int can_control_visibility = false;
     char code_buf[sizeof(symbol_exporting_code) + 100];
-    char export_gcc[] = "__attribute__ ((visibility (\"default\")))";
 
     ConfWriter_start_module("SymbolVisibility");
-
-    /* GCC. */
-    sprintf(code_buf, symbol_exporting_code, export_gcc);
-    if (CC_test_compile(code_buf, strlen(code_buf))) {
-        can_control_visibility = true;
-        ConfWriter_append_conf("#define CHY_EXPORT %s\n", export_gcc);
-        ConfWriter_append_conf("#define CHY_IMPORT\n");
-    }
-    if (!can_control_visibility) {
-        char export_gcc_win[] = "__attribute__ ((dllexport))";
-        sprintf(code_buf, symbol_exporting_code, export_gcc_win);
-        if (CC_test_compile(code_buf, strlen(code_buf))) {
-            can_control_visibility = true;
-            ConfWriter_append_conf("#define CHY_EXPORT %s\n", export_gcc_win);
-            ConfWriter_append_conf(
-                "#define CHY_IMPORT __attribute__ ((dllimport))\n"
-            );
-        }
-    }
 
     /* Windows. */
     if (!can_control_visibility) {
@@ -69,6 +49,17 @@ SymbolVisibility_run(void) {
             ConfWriter_append_conf(
                 "#define CHY_IMPORT __declspec(dllimport)\n"
             );
+        }
+    }
+
+    /* GCC. */
+    if (!can_control_visibility) {
+        char export_gcc[] = "__attribute__ ((visibility (\"default\")))";
+        sprintf(code_buf, symbol_exporting_code, export_gcc);
+        if (CC_test_compile(code_buf, strlen(code_buf))) {
+            can_control_visibility = true;
+            ConfWriter_append_conf("#define CHY_EXPORT %s\n", export_gcc);
+            ConfWriter_append_conf("#define CHY_IMPORT\n");
         }
     }
 
