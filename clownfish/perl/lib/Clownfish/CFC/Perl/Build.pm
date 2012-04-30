@@ -501,6 +501,70 @@ sub ACTION_code {
     $self->SUPER::ACTION_code;
 }
 
+# Monkey patch ExtUtils::CBuilder::Platform::Windows::GCC::format_linker_cmd
+# to make extensions work on MinGW.
+#
+# nwellnhof: The original ExtUtils::CBuilder implementation uses dlltool and a
+# strange incremental linking scheme. I think this is only needed for ancient
+# versions of GNU ld. It somehow breaks exporting of symbols via
+# __declspec(dllexport). Starting with version 2.17, one can pass .def files
+# to GNU ld directly, which requires only a single command and gets the
+# exports right.
+{
+    no warnings 'redefine';
+    require ExtUtils::CBuilder::Platform::Windows::GCC;
+    *ExtUtils::CBuilder::Platform::Windows::GCC::format_linker_cmd = sub {
+      my ($self, %spec) = @_;
+      my $cf = $self->{config};
+
+      # The Config.pm variable 'libperl' is hardcoded to the full name
+      # of the perl import library (i.e. 'libperl56.a'). GCC will not
+      # find it unless the 'lib' prefix & the extension are stripped.
+      $spec{libperl} =~ s/^(?:lib)?([^.]+).*$/-l$1/;
+
+      unshift( @{$spec{other_ldflags}}, '-nostartfiles' )
+        if ( $spec{startup} && @{$spec{startup}} );
+
+      # From ExtUtils::MM_Win32:
+      #
+      ## one thing for GCC/Mingw32:
+      ## we try to overcome non-relocateable-DLL problems by generating
+      ##    a (hopefully unique) image-base from the dll's name
+      ## -- BKS, 10-19-1999
+      File::Basename::basename( $spec{output} ) =~ /(....)(.{0,4})/;
+      $spec{image_base} = sprintf( "0x%x0000", unpack('n', $1 ^ $2) );
+
+      %spec = $self->write_linker_script(%spec)
+        if $spec{use_scripts};
+
+      foreach my $path ( @{$spec{libpath}} ) {
+        $path = "-L$path";
+      }
+
+      my @cmds; # Stores the series of commands needed to build the module.
+
+      # split off any -arguments included in ld
+      my @ld = split / (?=-)/, $spec{ld};
+
+      push @cmds, [ grep {defined && length} (
+        @ld                       ,
+        '-o', $spec{output}       ,
+        "-Wl,--image-base,$spec{image_base}" ,
+        @{$spec{lddlflags}}       ,
+        @{$spec{libpath}}         ,
+        @{$spec{startup}}         ,
+        @{$spec{objects}}         ,
+        @{$spec{other_ldflags}}   ,
+        $spec{libperl}            ,
+        @{$spec{perllibs}}        ,
+        $spec{def_file}           ,
+        $spec{map_file} ? ('-Map', $spec{map_file}) : ''
+      ) ];
+
+      return @cmds;
+    };
+}
+
 1;
 
 __END__
