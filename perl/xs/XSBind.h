@@ -41,11 +41,7 @@ extern "C" {
 #define NEED_newRV_noinc_GLOBAL
 #include "ppport.h"
 
-#ifdef C_CFISH_XSBIND
 #define XSBIND_EXTERN CHY_EXPORT
-#else
-#define XSBIND_EXTERN CHY_IMPORT
-#endif
 
 /** Given either a class name or a perl object, manufacture a new Clownfish
  * object suitable for supplying to a cfish_Foo_init() function.
