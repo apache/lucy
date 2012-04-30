@@ -142,10 +142,15 @@ sub cf_system_include_dirs {
 sub cf_linker_flags {
     my ( $self_or_class, $module_name ) = @_;
 
+    my $dlext = $Config{dlext};
+    # Only needed on Windows
+    return () if $dlext ne 'dll';
+
+    # Find library to link against
     my @module_parts = split( '::', $module_name );
     my $class_name   = $module_parts[-1];
-    my $ext          = $Config{dlext};
-    $ext = 'lib' if lc($ext) eq 'dll';
+    # Link against import library on MSVC
+    my $ext          = $Config{cc} =~ /^cl\b/ ? 'lib' : $dlext;
 
     for my $location ( qw( site vendor ) ) {
         my $install_dir = $Config{"install${location}arch"};
@@ -382,7 +387,7 @@ sub ACTION_compile_custom_xs {
     }
     # Compile with -fvisibility=hidden on GCC >= 4.0
     my $cc_flags = $self->extra_compiler_flags;
-    if ( $self->config('gccversion') ) {
+    if ( $self->config('gccversion') && $Config{dlext} ne 'dll' ) {
         my @version_nums = split( /\./, $self->config('gccversion') );
         if ( $version_nums[0] >= 4 ) {
             $cc_flags = [ @$cc_flags, '-fvisibility=hidden' ];

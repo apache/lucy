@@ -24,15 +24,17 @@ use Exporter;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 
-use XSLoader;
-# This loads a large number of disparate subs.
-BEGIN {
-    XSLoader::load( 'Lucy', '0.3.0' );
-    _init_autobindings();
-}
+# On most UNIX variants, this flag makes DynaLoader pass RTLD_GLOBAL to
+# dl_open, so extensions can resolve the needed symbols without explicitly
+# linking against the DSO.
+sub dl_load_flags { 1 }
 
 BEGIN {
-    push our @ISA, 'Exporter';
+    require DynaLoader;
+    our @ISA = qw( DynaLoader Exporter );
+    # This loads a large number of disparate subs.
+    bootstrap Lucy '0.3.0';
+    _init_autobindings();
     our @EXPORT_OK = qw( to_clownfish to_perl kdump );
 }
 
