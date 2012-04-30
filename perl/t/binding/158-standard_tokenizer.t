@@ -21,7 +21,7 @@ use Lucy::Test;
 
 my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
 my $other     = Lucy::Analysis::StandardTokenizer->new;
-ok( $other->equals($other), "Equals" );
+ok( $tokenizer->equals($other), "Equals" );
 
 my $text = $tokenizer->split("o'malley's")->[0];
 is( $text, "o'malley's", "multiple apostrophes" );
