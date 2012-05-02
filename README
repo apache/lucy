@@ -1,0 +1,209 @@
+========
+SYNOPSIS
+========
+
+Clownfish's current handling of object struct definitions has certain
+drawbacks:
+
+  * If an upstream parcel adds, removes or rearranges its member variables,
+    downstream extensions will break.
+  * Subclasses have direct access to all ancestor class member variables,
+    including those defined in upstream parcels.
+  * The current implementation violates "strict aliasing".
+
+The files in this directory are a proof-of-concept which illustrates one
+possible strategy for addressing these issues, adapting techniques used
+for implementing multiple inheritance in C++.
+
+=======
+DETAILS
+=======
+
+In the current Clownfish implementation, subclasses tack their member
+variables onto the end of the parent struct.
+
+    struct cfish_Obj {
+        cfish_VTable *vtable;
+        cfish_ref_t   ref;
+    };
+    struct Query {
+        cfish_VTable *vtable;
+        cfish_ref_t   ref;
+        float         boost;
+    };
+    struct lucy_TermQuery {
+        cfish_VTable  *vtable;
+        cfish_ref_t    ref;
+        float          boost;
+        cfish_CharBuf *field;
+        cfish_Obj     *term;
+    };
+
+This is true even when the subclass is in a different parcel:
+
+    struct ext_MyTermQuery {
+        cfish_VTable  *vtable;
+        cfish_ref_t    ref;
+        float          boost;
+        cfish_CharBuf *field;
+        cfish_Obj     *term;
+        int32_t        number;
+    };
+
+Laying out subclass structs identically to their ancestors allows us to cast
+the object pointers between different types.
+
+    TermQuery *as_term_query = (TermQuery*)my_term_query;
+    Query     *as_query      = (Query*)my_term_query;
+    printf("As MyTermQuery: %f\n", my_term_query->boost);
+    printf("As TermQuery: %f\n",   as_term_query->boost);
+    printf("As Query: %f\n",       as_query->boost);
+
+However, it also freezes the upstream struct layout.  For example, Lucy
+cannot switch the positions of "term" and "field" within the TermQuery struct
+without causing the downstream extension MyTermQuery to break.
+
+Additionally, the present system violates the C standard's "strict aliasing"
+rules, which state that different data pointer types may not reference the
+same memory location.  Here's an excerpt from a thread on the Python
+developers list where they wrestle with the same issue:
+
+    http://mail.python.org/pipermail/python-dev/2003-July/036909.html
+
+    > Does this mean that code like:
+    > 
+    >     void f (PyObject *a, PyDictObject *b)
+    >     {
+    >         a->ob_refcnt += 1;
+    >         b->ob_refcnt -= 1;
+    >     }
+    >     [...]
+    >         f((PyObject *)somedict, somedict);
+    > 
+    > is disallowed?
+
+    Correct. 
+
+There isn't really a good way for Clownfish to declare the upstream struct
+opaque while tacking new variables onto the end of it:
+
+    // Invalid unless the struct definition for lucy_TermQuery is known.
+    struct ext_MyTermQuery {
+        struct lucy_TermQuery;
+        int32_t number;
+    };
+
+We could pull some funny business with runtime pointer math, but it would make
+writing extensions awkward because struct members cannot be accessed directly.
+
+    struct MyTermQueryData {
+        int32_t number;
+    };
+
+    static inline MyTermQueryData*
+    S_child_data(MyTermQuery *self) {
+        size_t offset = Cfish_VTable_Get_Obj_Alloc_Size(LUCY_TERMQUERY);
+        return (MyTermQueryData*)((char*)self + offset);
+    }
+
+    static int32_t
+    S_MyTermQuery_get_number(MyTermQuery *self) {
+        return S_child_data(self)->number;     // <---------- yuck.
+    }
+
+(Note that certain memory alignment pitfalls are not dealt with in that code
+sample or others which follow.)
+
+However, if we grow the struct definition *backwards*, so that the parent
+struct comes *after* the subclass member variables in memory, the subclass
+gets direct access to its own variables.
+
+    struct ext_MyTermQuery {
+        cfish_VTable *vtable;
+        int32_t       number;
+        // struct lucy_TermQuery superself;  <--- implicit
+    };
+
+    static int32_t
+    S_MyTermQuery_get_number(MyTermQuery *self) {
+       return self->number;     // <---------- idomatic, efficient C
+    }
+
+At runtime, when heap memory is allocated for a MyTermQuery object, the size
+of the parent TermQuery struct is known.  Here's some verbose sample code
+demonstrating how a MyTermQuery object can be initialized:
+
+    size_t size = sizeof(ext_MyTermQuery)
+                  + Cfish_VTable_Get_Obj_Alloc_Size(LUCY_TERMQUERY);
+    ext_MyTermQuery *self = (ext_MyTermQuery*)malloc(size);
+    self->vtable = EXT_MYTERMQUERY;
+    self->number = number;
+    lucy_TermQuery *superself
+        = (lucy_TermQuery*)((char*)self + sizeof(ext_MyTermQuery));
+    superself->vtable = LUCY_TERMQUERY;
+    lucy_TermQuery_init(superself, field, term);
+    return self;
+
+Within a parcel, parent object structs can be embedded directly...
+
+    struct lucy_TermQuery {
+        cfish_VTable  *vtable;
+        float          boost;
+        cfish_CharBuf *field;
+        cfish_Obj     *term;
+        lucy_Query     superself; // <---- explicit
+    };
+
+... which allows subclasses direct access:
+
+    float boost = term_query->superself.boost;
+
+Of course the problem now is that once subclasses no longer duplicate the
+memory layout of their ancestors, a simple cast no longer suffices -- we need
+to use "pointer fixups" a la C++ to make sure that the "self" that gets sent
+to a method has the layout the method needs.
+
+This proof-of-concept project adapts Clownfish-style OFFSET vars to encode
+both the method offset and fixup information.  The "pointer fixup" goes in the
+upper 32-bits, and the method offset goes in the lower 32 bits.
+
+    static inline void
+    Dog_speak(Dog *self) {
+        const uint64_t offsets = Dog_speak_OFFSETS;
+        void *const view = (char*)self + (int32_t)(offsets >> 32);
+        char *const method_address = *(char**)self + (uint32_t)offsets;
+        Dog_speak_t method = *((Dog_speak_t*)method_address);
+        method(view);
+    }
+
+For more information, see the source files.
+
+PRO:
+
+  * Upstream parcels can add, remove, or rearrange member variables at will
+    without breaking the ABI.
+  * Our basic object model will no longer violate strict aliasing rules.  We
+    may eventually be able to compile without -fno-strict-aliasing and reap
+    the optimization benefits.
+  * Encapsulation-friendly.  A subclass only has direct access to the member
+    vars of ancestor classes defined within the same parcel. 
+ 
+CON:
+
+  * Increased complexity, though that complexity is mostly hidden away in
+    CFC and autogenerated code.
+  * Increased object memory footprint: 1 pointer for every ancestor.  (We
+    should be able to cut this down to "1 pointer for each ancestor with
+    member variables".)
+  * Each method invocation now has a couple more ops.
+  * Additional boot code.
+  * More OFFSET vars: we're back to needing approximately one for each
+    method/invocant pairing.
+  * Changes to Lucy code will be required in addition to the changes to CFC.
+
+The additional ops per method invocation and startup costs should be measured,
+but hopefully the method invocation ops will prove negligible on a modern
+pipelining processor -- the memory fetch costs per invocation have not
+changed.
+
+
