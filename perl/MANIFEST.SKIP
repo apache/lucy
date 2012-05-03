@@ -30,6 +30,10 @@
 Lucy\.xs$
 ^typemap$
 
+# Don't ship developer-only tests.
+038-lock_free_registry\.t
+801-pod_checker\.t
+
 # Makemaker generated files and dirs.
 ^MANIFEST\.
 ^Makefile$
