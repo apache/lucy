@@ -25,9 +25,6 @@ abstract class Lucy::Object::Num inherits Lucy::Object::Obj {
 
     public bool_t
     Equals(Num *self, Obj *other);
-
-    public int32_t
-    Compare_To(Num *self, Obj *other);
 }
 
 /** Abstract base class for floating point numbers.
@@ -36,6 +33,9 @@ abstract class Lucy::Object::FloatNum inherits Lucy::Object::Num {
 
     inert FloatNum*
     init(FloatNum *self);
+
+    public int32_t
+    Compare_To(FloatNum *self, Obj *other);
 
     public incremented CharBuf*
     To_String(FloatNum *self);
@@ -48,6 +48,9 @@ abstract class Lucy::Object::IntNum inherits Lucy::Object::Num {
 
     inert IntNum*
     init(IntNum *self);
+
+    public int32_t
+    Compare_To(IntNum *self, Obj *other);
 
     public incremented CharBuf*
     To_String(IntNum *self);
