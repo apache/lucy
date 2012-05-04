@@ -23,7 +23,7 @@ BEGIN {
     our @EXPORT_OK = qw( list );
 }
 
-our $VERSION = '0.003000';
+our $VERSION = '0.003001';
 $VERSION = eval $VERSION;
 
 # Return a partial list of Lucy classes which were once public but are
