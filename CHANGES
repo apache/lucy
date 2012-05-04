@@ -1,5 +1,18 @@
 Revision history for Lucy
 
+0.3.1  XXXX-XX-XX
+
+  Bugfixes:
+
+    * [LUCY-213] - Explicit version number for each Perl module
+    * [LUCY-216] - t/152-inversion.t failure
+    * [LUCY-235] - Don't ship dev-only tests with CPAN tarball
+
+  Tasks:
+
+    * [LUCY-218] - Adapt codebase for TLP status
+
+
 0.3.0  2012-01-15
 
   New features:
