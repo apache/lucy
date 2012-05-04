@@ -32,7 +32,7 @@ use base qw( Clownfish::CFC::Perl::Build );
 no lib '../clownfish/perl/lib';
 no lib 'clownfish/perl/lib';
 
-our $VERSION = 0.003000;
+our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 
 use File::Spec::Functions qw( catdir catfile updir rel2abs );
