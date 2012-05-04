@@ -574,14 +574,7 @@ sub ACTION_compile_custom_xs {
     }
 
     # .c => .o
-    my $lucy_pm_file = catfile( $LIB_DIR, 'Lucy.pm' );
-    open( my $lucy_pm_fh, '<', $lucy_pm_file )
-        or confess "Can't open '$lucy_pm_file': $!";
-    my $lucy_pm_contents = do { local $/; <$lucy_pm_fh> };
-    close $lucy_pm_fh or confess $!;
-    $lucy_pm_contents =~ /^our \$VERSION = '([\d.]+)';/m
-        or confess "Can't extract version number from '$lucy_pm_file'";
-    my $version = $1;
+    my $version = $self->dist_version;
     my $perl_binding_o_file = catfile( $LIB_DIR, "Lucy$Config{_o}" );
     unshift @objects, $perl_binding_o_file;
     $self->add_to_cleanup($perl_binding_o_file);

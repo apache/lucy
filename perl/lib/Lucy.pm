@@ -26,7 +26,7 @@ $VERSION = eval $VERSION;
 
 use XSLoader;
 # This loads a large number of disparate subs.
-BEGIN { XSLoader::load( 'Lucy', '0.003001' ) }
+BEGIN { XSLoader::load( 'Lucy', '0.3.1' ) }
 
 BEGIN {
     push our @ISA, 'Exporter';
