@@ -48,7 +48,7 @@ my $buf;
 
 # Update Lucy.pm.
 $buf = read_file('perl/lib/Lucy.pm');
-$buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/
+$buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/g
     or die "no match";
 $buf =~ s/XSLoader::load\( 'Lucy', '(.+?)'/XSLoader::load\( 'Lucy', '$x_y_z_version'/
     or die "no match";
