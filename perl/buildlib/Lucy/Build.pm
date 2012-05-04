@@ -65,7 +65,7 @@ sub link_executable {
 
 package Lucy::Build;
 use base qw( Module::Build );
-our $VERSION = '0.003000';
+our $VERSION = '0.003001';
 $VERSION = eval $VERSION;
 
 use File::Spec::Functions
