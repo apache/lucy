@@ -198,12 +198,13 @@ say qq|###############################################################\n|;
 say <<END_LUCY_DEV_VOTE;
 Hello,
 
-Release candidate $rc for Apache Lucy version $x_y_z_version can be found at:
+Release candidate $rc for Apache Lucy version $x_y_z_version can be
+found at:
 
     http://people.apache.org/~$apache_id/apache-lucy-$full_rc_version/
 
-See the CHANGES file at the top level of the archive for information about the
-content of this release.
+See the CHANGES file at the top level of the archive for information
+about the content of this release.
 
 This candidate was assembled according to the process documented at:
 
@@ -213,24 +214,25 @@ It was cut from an "svn export" of the tag at:
 
     https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version
 
-Please vote on releasing this candidate as Apache Lucy version $x_y_z_version.
-The vote will be held open for at least the next 72 hours.
+Please vote on releasing this candidate as Apache Lucy version
+$x_y_z_version.  The vote will be held open for at least the next 72
+hours.
 
-All interested parties are welcome to inspect the release candidate and
-express approval or disapproval.  Votes from members of the Lucy PMC are
-binding; the vote passes if there are at least three binding +1 votes and more
-+1 votes than -1 votes. 
+All interested parties are welcome to inspect the release candidate
+and express approval or disapproval.  Votes from members of the Lucy
+PMC are binding; the vote passes if there are at least three binding
++1 votes and more +1 votes than -1 votes. 
 
-For suggestions as to how to evaluate Apache Lucy release candidates, and for
-information on ASF voting procedures, see:
+For suggestions as to how to evaluate Apache Lucy release candidates,
+and for information on ASF voting procedures, see:
 
     http://wiki.apache.org/lucy/ReleaseVerification
     http://wiki.apache.org/lucy/ReleasePrep
     http://www.apache.org/foundation/voting.html
 
-[ ] +1 Release RC $rc as Apache Lucy version $x_y_z_version.
+[ ] +1 Release RC $rc as Apache Lucy $x_y_z_version.
 [ ] +0
-[ ] -1 Do not release RC $rc as Apache Lucy version $x_y_z_version because...
+[ ] -1 Do not release RC $rc as Apache Lucy $x_y_z_version because...
 
 Here's my +1.
 
@@ -248,11 +250,12 @@ say qq|###############################################################\n|;
 say <<END_ANNOUNCE_EMAIL;
 Greetings,
 
-The Apache Lucy team is pleased to announce the release of version $x_y_z_version!
+The Apache Lucy team is pleased to announce the release of
+version $x_y_z_version!
 
-The Apache Lucy search engine library provides full-text search for dynamic
-programming languages.  For a list of issues resolved in this version, please
-see the release notes:
+The Apache Lucy search engine library provides full-text search
+for dynamic programming languages.  For a list of issues resolved
+in this version, please see the release notes:
 
   http://www.apache.org/dist/lucy/CHANGES-$x_y_z_version.txt
 
@@ -260,13 +263,15 @@ The most recent release can be obtained from our download page:
 
   http://lucy.apache.org/download.html
 
-For general information on Apache Lucy, please visit the project website:
+For general information on Apache Lucy, please visit the project
+website:
 
   http://lucy.apache.org/
 
 Regards, 
 
-$name, on behalf of the Apache Lucy development team and community
+$name, on behalf of the Apache Lucy development team
+and community
 
 END_ANNOUNCE_EMAIL
 
