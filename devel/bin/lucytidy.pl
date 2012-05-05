@@ -28,7 +28,6 @@ my $ignore = qr/(
     | \.git
     | c.t.000-sanity-check.t
     | clownfish.src.CFCLexHeader
-    | devel.bin.release_commands.pl
     | modules.analysis.snowstem.source
     | modules.unicode.utf8proc
     | lemon.lemon.c
