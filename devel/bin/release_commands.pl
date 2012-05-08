@@ -73,6 +73,13 @@ say qq|svn copy |
     . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version |
     . qq|-m "Tagging release candidate $rc for $x_y_z_version."\n|;
 
+say qq|# Create an RC directory in our dev area on dist.apache.org.|;
+say qq|svn mkdir -m "Create RC dir for apache-lucy-$full_rc_version" |
+    . qq|https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version|;
+say qq|svn co |
+    . qq|https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version|;
+say qq|cd apache-lucy-$full_rc_version\n|;
+
 say qq|# Export a pristine copy of the source from the release candidate|;
 say qq|# tag.|;
 say qq|svn export |
@@ -102,21 +109,14 @@ say qq|gpg --armor --output apache-lucy-$x_y_z_version.tar.gz.asc |
 say qq|# Break out CHANGES as a separate file.|;
 say qq|cp -p apache-lucy-$x_y_z_version/CHANGES CHANGES-$x_y_z_version.txt\n|;
 
-say qq|# Copy files to people.apache.org.|;
-say qq|ssh $apache_id\@people.apache.org|;
-say qq|mkdir public_html/apache-lucy-$full_rc_version|;
-say qq|exit|;
-say qq|scp -p apache-lucy-$x_y_z_version.tar.gz* |
-    . qq|$apache_id\@people.apache.org:~/public_html/apache-lucy-$full_rc_version|;
-say qq|scp -p CHANGES-$x_y_z_version.txt |
-    . qq|$apache_id\@people.apache.org:~/public_html/apache-lucy-$full_rc_version\n|;
-
-say qq|# Modify permissions.|;
-say qq|ssh $apache_id\@people.apache.org|;
-say qq|cd public_html/apache-lucy-$full_rc_version/|;
-say qq|find . -type f -exec chmod 664 {} \\;|;
-say qq|find . -type d -exec chmod 775 {} \\;|;
-say qq|chgrp -R lucy *\n|;
+say qq|# Add the artifacts and commit to the dev area on dist.apache.org.|;
+say qq|svn add |
+    . qq|apache-lucy-$x_y_z_version.tar.gz |
+    . qq|apache-lucy-$x_y_z_version.tar.gz.md5 |
+    . qq|apache-lucy-$x_y_z_version.tar.gz.sha |
+    . qq|apache-lucy-$x_y_z_version.tar.gz.asc |
+    . qq|CHANGES-$x_y_z_version.txt |;
+say qq|svn ci -m "Add apache-lucy-$x_y_z_version artifacts"\n|;
 
 say qq|# Perform whatever QC seems prudent on the tarball, installing it|;
 say qq|# on test systems, etc.|;
@@ -141,16 +141,32 @@ say qq|svn copy |
     . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$x_y_z_version |
     . qq|-m "Tagging release $x_y_z_version."\n|;
 
-say qq|# Copy release artifacts to dist directory, remove RC dir.|;
+say qq|# Copy release artifacts to the production dist directory and|;
+say qq|# remove the RC dir.  The "svnmucc" app, which ships with Subversion|;
+say qq|# 1.7, is required.  If you don't have it, you can ssh to|;
+say qq|# people.apache.org and run the commands from there.|;
 say qq|ssh $apache_id\@people.apache.org|;
-say qq|cd public_html/|;
-say qq|cp -p apache-lucy-$full_rc_version/* /www/www.apache.org/dist/lucy/|;
-say qq|rm -rf apache-lucy-$full_rc_version/\n|;
+say qq|svnmucc -m "Publish Apache Lucy $x_y_z_version" |
+    . qq|-U https://dist.apache.org/repos/dist/ |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz release/lucy/ |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.md5 release/lucy/ |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.sha release/lucy/ |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.asc release/lucy/ |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/CHANGES-$x_y_z_version.txt release/lucy/ |
+    . qq|rm dev/lucy/apache-lucy-$full_rc_version\n|;
 
 say qq|# Carefully remove the artifacts for any previous releases superseded|;
-say qq|# by this one.  DO NOT overwrite any release artifact files, as that|;
-say qq|# triggers the Infra team's security alarm bells.|;
-say qq|cd /www/www.apache.org/dist/lucy/|;
+say qq|# by this one.|;
+if ( $micro > 0 ) {
+    my $prev = sprintf( "%d.%d.%d", $major, $minor, $micro - 1 );
+    say qq|svnmucc -m "Remove Apache Lucy $prev" |
+        . qq|-U https://dist.apache.org/repos/dist/release/lucy/ |
+        . qq|rm apache-lucy-$prev.tar.gz |
+        . qq|rm apache-lucy-$prev.tar.gz.md5 |
+        . qq|rm apache-lucy-$prev.tar.gz.sha |
+        . qq|rm apache-lucy-$prev.tar.gz.asc |
+        . qq|rm CHANGES-$prev.txt |;
+}
 say qq|[...]\n|;
 
 say qq|# Update the issue tracker.|;
@@ -201,7 +217,7 @@ Hello,
 Release candidate $rc for Apache Lucy version $x_y_z_version can be
 found at:
 
-    http://people.apache.org/~$apache_id/apache-lucy-$full_rc_version/
+    http://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version/
 
 See the CHANGES file at the top level of the archive for information
 about the content of this release.
