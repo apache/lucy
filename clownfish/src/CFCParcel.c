@@ -37,6 +37,8 @@ struct CFCParcel {
     char *PREFIX;
 };
 
+static CFCParcel *default_parcel = NULL;
+
 #define JSON_STRING 1
 #define JSON_HASH   2
 
@@ -62,56 +64,74 @@ S_skip_whitespace(const char **json);
 static void
 S_destroy_json(JSONNode *node);
 
-#define MAX_PARCELS 100
-static CFCParcel *registry[MAX_PARCELS + 1];
-static int first_time = true;
+static CFCParcel **registry = NULL;
+static size_t num_registered = 0;
 
 CFCParcel*
 CFCParcel_singleton(const char *name, const char *cnick) {
-    // Set up registry.
-    if (first_time) {
-        for (size_t i = 1; i < MAX_PARCELS; i++) { registry[i] = NULL; }
-        first_time = false;
+    // Return an existing singleton if the parcel has already been registered.
+    CFCParcel *existing = CFCParcel_fetch(name);
+    if (existing) {
+        if (cnick && strcmp(existing->cnick, cnick) != 0) {
+            CFCUtil_die("cnick '%s' for parcel '%s' conflicts with '%s'",
+                        cnick, name, existing->cnick);
+        }
+        return existing;
     }
 
+    // Register new parcel.
+    CFCParcel *singleton = CFCParcel_new(name, cnick);
+    CFCParcel_register(singleton);
+
+    return singleton;
+}
+
+CFCParcel*
+CFCParcel_fetch(const char *name) {
     // Return the default parcel for either a blank name or a NULL name.
     if (!name || !strlen(name)) {
         return CFCParcel_default_parcel();
     }
 
-    // Return an existing singleton if the parcel has already been registered.
-    size_t i;
-    for (i = 1; registry[i] != NULL; i++) {
+    for (size_t i = 0; i < num_registered ; i++) {
         CFCParcel *existing = registry[i];
         if (strcmp(existing->name, name) == 0) {
-            if (cnick && strcmp(existing->cnick, cnick) != 0) {
-                CFCUtil_die("cnick '%s' for parcel '%s' conflicts with '%s'",
-                            cnick, name, existing->cnick);
-            }
             return existing;
         }
     }
-    if (i == MAX_PARCELS) {
-        CFCUtil_die("Exceeded maximum number of parcels (%d)", MAX_PARCELS);
+
+    return NULL;
+}
+
+void
+CFCParcel_register(CFCParcel *self) {
+    CFCParcel *existing = CFCParcel_fetch(self->name);
+    if (existing) {
+        CFCUtil_die("Parcel '%s' already registered", self->name);
     }
-
-    // Register new parcel.
-    CFCParcel *singleton = CFCParcel_new(name, cnick);
-    registry[i] = singleton;
-
-    return singleton;
+    if (!num_registered) {
+        // Init default parcel as first.
+        registry = (CFCParcel**)CALLOCATE(3, sizeof(CFCParcel*));
+        CFCParcel *def = CFCParcel_default_parcel();
+        registry[0] = (CFCParcel*)CFCBase_incref((CFCBase*)def);
+        num_registered++;
+    }
+    size_t size = (num_registered + 2) * sizeof(CFCParcel*);
+    registry = (CFCParcel**)REALLOCATE(registry, size);
+    registry[num_registered++] = (CFCParcel*)CFCBase_incref((CFCBase*)self);
+    registry[num_registered]   = NULL;
 }
 
 void
 CFCParcel_reap_singletons(void) {
-    if (registry[0]) {
-        // default parcel.
-        CFCBase_decref((CFCBase*)registry[0]);
+    for (size_t i = 0; i < num_registered; i++) {
+        CFCBase_decref((CFCBase*)registry[i]);
     }
-    for (int i = 1; registry[i] != NULL; i++) {
-        CFCParcel *parcel = registry[i];
-        CFCBase_decref((CFCBase*)parcel);
-    }
+    FREEMEM(registry);
+    num_registered = 0;
+    registry = NULL;
+    CFCBase_decref((CFCBase*)default_parcel);
+    default_parcel = NULL;
 }
 
 static int
@@ -181,11 +201,11 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick) {
     return self;
 }
 
-CFCParcel*
-CFCParcel_new_from_json(const char *json) {
+static CFCParcel*
+S_new_from_json(const char *json, const char *path) {
     JSONNode *parsed = S_parse_json_for_parcel(json);
     if (!parsed) {
-        CFCUtil_die("Invalid JSON parcel definition");
+        CFCUtil_die("Invalid JSON parcel definition in '%s'", path);
     }
     const char *name     = NULL;
     const char *nickname = NULL;
@@ -193,23 +213,24 @@ CFCParcel_new_from_json(const char *json) {
         JSONNode *key   = parsed->kids[i];
         JSONNode *value = parsed->kids[i + 1];
         if (key->type != JSON_STRING) {
-            CFCUtil_die("JSON parsing error");
+            CFCUtil_die("JSON parsing error (filepath '%s')", path);
         }
         if (strcmp(key->string, "name") == 0) {
             if (value->type != JSON_STRING) {
-                CFCUtil_die("'name' must be a string");
+                CFCUtil_die("'name' must be a string (filepath %s)", path);
             }
             name = value->string;
         }
         else if (strcmp(key->string, "nickname") == 0) {
             if (value->type != JSON_STRING) {
-                CFCUtil_die("'name' must be a string");
+                CFCUtil_die("'nickname' must be a string (filepath %s)",
+                            path);
             }
             nickname = value->string;
         }
     }
     if (!name) {
-        CFCUtil_die("Missing required key 'name'");
+        CFCUtil_die("Missing required key 'name' (filepath '%s')", path);
     }
     CFCParcel *self = CFCParcel_new(name, nickname);
 
@@ -222,13 +243,18 @@ CFCParcel_new_from_json(const char *json) {
             ;
         }
         else {
-            CFCUtil_die("Unrecognized key in parcel definition: '%s'",
-                        key->string);
+            CFCUtil_die("Unrecognized key: '%s' (filepath '%s')",
+                        key->string, path);
         }
     }
 
     S_destroy_json(parsed);
     return self;
+}
+
+CFCParcel*
+CFCParcel_new_from_json(const char *json) {
+    return S_new_from_json(json, "[NULL]");
 }
 
 void
@@ -241,13 +267,10 @@ CFCParcel_destroy(CFCParcel *self) {
     CFCBase_destroy((CFCBase*)self);
 }
 
-static CFCParcel *default_parcel = NULL;
-
 CFCParcel*
 CFCParcel_default_parcel(void) {
     if (default_parcel == NULL) {
-        default_parcel = CFCParcel_new("DEFAULT", "");
-        registry[0] = default_parcel;
+        default_parcel = CFCParcel_new("", "");
     }
     return default_parcel;
 }

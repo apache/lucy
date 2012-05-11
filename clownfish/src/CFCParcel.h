@@ -49,6 +49,17 @@ typedef struct CFCParcel CFCParcel;
 CFCParcel*
 CFCParcel_singleton(const char *name, const char *cnick);
 
+/** Return the parcel which has been registered for <code>name</code>.
+ */
+CFCParcel*
+CFCParcel_fetch(const char *name);
+
+/** Register the supplied parcel.  Throws an error if a parcel with the same
+ * name has already been registered.
+ */
+void
+CFCParcel_register(CFCParcel *self);
+
 /** Decref all singletons at shutdown.
  */
 void
