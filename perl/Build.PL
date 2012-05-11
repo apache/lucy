@@ -49,6 +49,7 @@ my $builder = Lucy::Build->new(
         resources => {
             homepage   => 'http://lucy.apache.org',
             repository => 'http://svn.apache.org/repos/asf/lucy',
+            bugtracker => 'https://issues.apache.org/jira/browse/LUCY',
         },
     },
     include_dirs => [
