@@ -32,6 +32,7 @@
 #include "CFCClass.h"
 #include "CFCFile.h"
 #include "CFCFileSpec.h"
+#include "CFCParcel.h"
 #include "CFCSymbol.h"
 #include "CFCUtil.h"
 #include "CFCParser.h"
@@ -54,6 +55,10 @@ struct CFCHierarchy {
     size_t classes_cap;
     size_t num_classes;
 };
+
+// CFCUtil_walk() callback which parses .cfp files.
+static void
+S_parse_parcel_files(const char *path, void *context);
 
 static void
 S_do_make_path(const char *path);
@@ -181,6 +186,12 @@ CFCHierarchy_add_include_dir(CFCHierarchy *self, const char *include_dir) {
 void
 CFCHierarchy_build(CFCHierarchy *self) {
     for (size_t i = 0; self->sources[i] != NULL; i++) {
+        CFCUtil_walk(self->sources[i], S_parse_parcel_files, NULL);
+    }
+    for (size_t i = 0; self->includes[i] != NULL; i++) {
+        CFCUtil_walk(self->includes[i], S_parse_parcel_files, NULL);
+    }
+    for (size_t i = 0; self->sources[i] != NULL; i++) {
         S_parse_cf_files(self, self->sources[i], 0);
     }
     for (size_t i = 0; self->includes[i] != NULL; i++) {
@@ -189,6 +200,33 @@ CFCHierarchy_build(CFCHierarchy *self) {
     S_connect_classes(self);
     for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass_grow_tree(self->trees[i]);
+    }
+}
+
+static void
+S_parse_parcel_files(const char *path, void *context) {
+    (void)context; // unused
+
+    // Ignore hidden files.
+    if (strstr(path, CFCUTIL_PATH_SEP ".") != NULL) {
+        return;
+    }
+
+    // Parse .cfp files and register the parcels they define.
+    size_t path_len = strlen(path);
+    if (path_len > 4 && (strcmp((path + path_len - 4), ".cfp") == 0)) {
+        CFCParcel *parcel = CFCParcel_new_from_file(path);
+        CFCParcel *existing = CFCParcel_fetch(CFCParcel_get_name(parcel));
+        if (existing) {
+            if (!CFCParcel_equals(parcel, existing)) {
+                CFCUtil_die("Incompatible parcel '%s' already registered",
+                            CFCParcel_get_name(parcel));
+            }
+        }
+        else {
+            CFCParcel_register(parcel);
+        }
+        CFCBase_decref((CFCBase*)parcel);
     }
 }
 
