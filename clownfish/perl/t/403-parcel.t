@@ -16,9 +16,23 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 
 BEGIN { use_ok('Clownfish::CFC::Model::Parcel') }
+
+isa_ok(
+    Clownfish::CFC::Model::Parcel->new( name => "Foo" ),
+    "Clownfish::CFC::Model::Parcel",
+    "new"
+);
+
+isa_ok(
+    Clownfish::CFC::Model::Parcel->new_from_json(
+        json => ' { "name": "Crustacean", "nickname": "Crust" } ',
+    ),
+    "Clownfish::CFC::Model::Parcel",
+    "new_from_json"
+);
 
 # Register singleton.
 Clownfish::CFC::Model::Parcel->singleton(

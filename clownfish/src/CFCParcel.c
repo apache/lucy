@@ -16,6 +16,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifndef true
   #define true 1
@@ -35,6 +36,31 @@ struct CFCParcel {
     char *Prefix;
     char *PREFIX;
 };
+
+#define JSON_STRING 1
+#define JSON_HASH   2
+
+typedef struct JSONNode {
+    int type;
+    char *string;
+    struct JSONNode **kids;
+    size_t num_kids;
+} JSONNode;
+
+static JSONNode*
+S_parse_json_for_parcel(const char *json);
+
+static JSONNode*
+S_parse_json_hash(const char **json);
+
+static JSONNode*
+S_parse_json_string(const char **json);
+
+static void
+S_skip_whitespace(const char **json);
+
+static void
+S_destroy_json(JSONNode *node);
 
 #define MAX_PARCELS 100
 static CFCParcel *registry[MAX_PARCELS + 1];
@@ -155,6 +181,56 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick) {
     return self;
 }
 
+CFCParcel*
+CFCParcel_new_from_json(const char *json) {
+    JSONNode *parsed = S_parse_json_for_parcel(json);
+    if (!parsed) {
+        CFCUtil_die("Invalid JSON parcel definition");
+    }
+    const char *name     = NULL;
+    const char *nickname = NULL;
+    for (size_t i = 0, max = parsed->num_kids; i < max; i += 2) {
+        JSONNode *key   = parsed->kids[i];
+        JSONNode *value = parsed->kids[i + 1];
+        if (key->type != JSON_STRING) {
+            CFCUtil_die("JSON parsing error");
+        }
+        if (strcmp(key->string, "name") == 0) {
+            if (value->type != JSON_STRING) {
+                CFCUtil_die("'name' must be a string");
+            }
+            name = value->string;
+        }
+        else if (strcmp(key->string, "nickname") == 0) {
+            if (value->type != JSON_STRING) {
+                CFCUtil_die("'name' must be a string");
+            }
+            nickname = value->string;
+        }
+    }
+    if (!name) {
+        CFCUtil_die("Missing required key 'name'");
+    }
+    CFCParcel *self = CFCParcel_new(name, nickname);
+
+    for (size_t i = 0, max = parsed->num_kids; i < max; i += 2) {
+        JSONNode *key   = parsed->kids[i];
+        JSONNode *value = parsed->kids[i + 1];
+        if (strcmp(key->string, "name") == 0
+            || strcmp(key->string, "nickname") == 0
+           ) {
+            ;
+        }
+        else {
+            CFCUtil_die("Unrecognized key in parcel definition: '%s'",
+                        key->string);
+        }
+    }
+
+    S_destroy_json(parsed);
+    return self;
+}
+
 void
 CFCParcel_destroy(CFCParcel *self) {
     FREEMEM(self->name);
@@ -211,5 +287,151 @@ CFCParcel_get_Prefix(CFCParcel *self) {
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self) {
     return self->PREFIX;
+}
+
+/*****************************************************************************
+ * The hack JSON parser coded up below is only meant to parse Clownfish parcel
+ * file content.  It is limited in its capabilities because so little is legal
+ * in a .cfp file.
+ */
+
+static JSONNode*
+S_parse_json_for_parcel(const char *json) {
+    if (!json) {
+        return NULL;
+    }
+    S_skip_whitespace(&json);
+    if (*json != '{') {
+        return NULL;
+    }
+    JSONNode *parsed = S_parse_json_hash(&json);
+    S_skip_whitespace(&json);
+    if (*json != '\0') {
+        S_destroy_json(parsed);
+        parsed = NULL;
+    }
+    return parsed;
+}
+
+static void
+S_append_kid(JSONNode *node, JSONNode *child) {
+    size_t size = (node->num_kids + 2) * sizeof(JSONNode*);
+    node->kids = (JSONNode**)realloc(node->kids, size);
+    node->kids[node->num_kids++] = child;
+    node->kids[node->num_kids]   = NULL;
+}
+
+static JSONNode*
+S_parse_json_hash(const char **json) {
+    const char *text = *json;
+    S_skip_whitespace(&text);
+    if (*text != '{') {
+        return NULL;
+    }
+    text++;
+    JSONNode *node = (JSONNode*)calloc(1, sizeof(JSONNode));
+    node->type = JSON_HASH;
+    while (1) {
+        // Parse key.
+        S_skip_whitespace(&text);
+        if (*text == '}') {
+            text++;
+            break;
+        }
+        else if (*text == '"') {
+            JSONNode *key = S_parse_json_string(&text);
+            S_skip_whitespace(&text);
+            if (!key || *text != ':') {
+                S_destroy_json(node);
+                return NULL;
+            }
+            text++;
+            S_append_kid(node, key);
+        }
+        else {
+            S_destroy_json(node);
+            return NULL;
+        }
+
+        // Parse value.
+        S_skip_whitespace(&text);
+        JSONNode *value = NULL;
+        if (*text == '"') {
+            value = S_parse_json_string(&text);
+        }
+        else if (*text == '{') {
+            value = S_parse_json_hash(&text);
+        }
+        if (!value) {
+            S_destroy_json(node);
+            return NULL;
+        }
+        S_append_kid(node, value);
+
+        // Parse comma.
+        S_skip_whitespace(&text);
+        if (*text == ',') {
+            text++;
+        }
+        else if (*text == '}') {
+            text++;
+            break;
+        }
+        else {
+            S_destroy_json(node);
+            return NULL;
+        }
+    }
+
+    // Move pointer.
+    *json = text;
+
+    return node;
+}
+
+// Parse a double quoted string.  Don't allow escapes.
+static JSONNode*
+S_parse_json_string(const char **json) {
+    const char *text = *json; 
+    if (*text != '\"') {
+        return NULL;
+    }
+    text++;
+    const char *start = text;
+    while (*text != '"') {
+        if (*text == '\\' || *text == '\0') {
+            return NULL;
+        }
+        text++;
+    }
+    JSONNode *node = (JSONNode*)calloc(1, sizeof(JSONNode));
+    node->type = JSON_STRING;
+    node->string = CFCUtil_strndup(start, text - start);
+
+    // Move pointer.
+    text++;
+    *json = text;
+
+    return node;
+}
+
+static void
+S_skip_whitespace(const char **json) {
+    while (isspace(json[0][0])) { *json = *json + 1; }
+}
+
+static void
+S_destroy_json(JSONNode *node) {
+    if (!node) {
+        return;
+    }
+    if (node->kids) {
+        for (size_t i = 0; node->kids[i] != NULL; i++) {
+            S_destroy_json(node->kids[i]);
+        }
+    }
+    free(node->string);
+    free(node->kids);
+    free(node);
 }
 

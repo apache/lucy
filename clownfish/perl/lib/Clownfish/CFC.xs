@@ -1061,6 +1061,27 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Parcel
 
 SV*
+_new(name_sv, cnick_sv)
+    SV *name_sv;
+    SV *cnick_sv;
+CODE:
+    const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
+    const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
+    CFCParcel *self = CFCParcel_new(name, cnick);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+SV*
+_new_from_json(json)
+    const char *json;
+CODE:
+    CFCParcel *self = CFCParcel_new_from_json(json);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+SV*
 _singleton(name_sv, cnick_sv)
     SV *name_sv;
     SV *cnick_sv;
