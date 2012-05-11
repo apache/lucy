@@ -230,52 +230,31 @@ S_parse_parcel_files(const char *path, void *context) {
     }
 }
 
-static char**
-S_find_cfh(const char *dir, char **cfh_list, size_t num_cfh) {
-    void *dirhandle = CFCUtil_opendir(dir);
-    size_t full_path_cap = strlen(dir) * 2;
-    char *full_path = (char*)MALLOCATE(full_path_cap);
-    const char *entry = NULL;
-    while (NULL != (entry = CFCUtil_dirnext(dirhandle))) {
-        // Ignore updirs and hidden files.
-        if (strncmp(entry, ".", 1) == 0) {
-            continue;
-        }
-
-        size_t name_len = strlen(entry);
-        size_t needed = strlen(dir) + 1 + name_len + 1;
-        if (needed > full_path_cap) {
-            full_path_cap = needed;
-            full_path = (char*)REALLOCATE(full_path, full_path_cap);
-        }
-        int full_path_len = sprintf(full_path, "%s" CFCUTIL_PATH_SEP "%s",
-                                    dir, entry);
-        const char *cfh_suffix = strstr(full_path, ".cfh");
-
-        if (cfh_suffix == full_path + (full_path_len - 4)) {
-            cfh_list = (char**)REALLOCATE(cfh_list,
-                                          (num_cfh + 2) * sizeof(char*));
-            cfh_list[num_cfh++] = CFCUtil_strdup(full_path);
-            cfh_list[num_cfh] = NULL;
-        }
-        else if (CFCUtil_is_dir(full_path)) {
-            cfh_list = S_find_cfh(full_path, cfh_list, num_cfh);
-            num_cfh = 0;
-            if (cfh_list) {
-                while (cfh_list[num_cfh] != NULL) { num_cfh++; }
-            }
-        }
+static void
+S_find_cfh(const char *path, void *context) {
+    char ***cfh_ptr = (char***)context;
+    char **cfh_list = *cfh_ptr;
+    // Ignore updirs and hidden files.
+    if (strstr(path, CFCUTIL_PATH_SEP ".") != NULL) {
+        return;
+    }
+    size_t path_len = strlen(path);
+    if (path_len > 4 && (strcmp((path + path_len - 4), ".cfh") == 0)) {
+        size_t num_cfh = 0;
+        while (cfh_list[num_cfh] != NULL) { num_cfh++; }
+        size_t size = (num_cfh + 2) * sizeof(char*);
+        cfh_list = (char**)REALLOCATE(cfh_list, size);
+        cfh_list[num_cfh] = CFCUtil_strdup(path);
+        cfh_list[num_cfh + 1] = NULL;
     }
 
-    FREEMEM(full_path);
-    CFCUtil_closedir(dirhandle, dir);
-    return cfh_list;
+    *cfh_ptr = cfh_list;
 }
 
 static void
 S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
     char **all_source_paths = (char**)CALLOCATE(1, sizeof(char*));
-    all_source_paths = S_find_cfh(source_dir, all_source_paths, 0);
+    CFCUtil_walk(source_dir, S_find_cfh, &all_source_paths);
     size_t source_dir_len  = strlen(source_dir);
     char *path_part = NULL;
     size_t path_part_max = 0;
