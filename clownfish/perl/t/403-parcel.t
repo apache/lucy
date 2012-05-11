@@ -16,7 +16,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
+use File::Spec::Functions qw( catfile );
 
 BEGIN { use_ok('Clownfish::CFC::Model::Parcel') }
 
@@ -32,6 +33,14 @@ isa_ok(
     ),
     "Clownfish::CFC::Model::Parcel",
     "new_from_json"
+);
+
+isa_ok(
+    Clownfish::CFC::Model::Parcel->new_from_file(
+        path => catfile(qw( t cfsource Animal.cfp )),
+    ),
+    "Clownfish::CFC::Model::Parcel",
+    "new_from_file"
 );
 
 # Register singleton.

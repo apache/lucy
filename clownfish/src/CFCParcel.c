@@ -257,6 +257,15 @@ CFCParcel_new_from_json(const char *json) {
     return S_new_from_json(json, "[NULL]");
 }
 
+CFCParcel*
+CFCParcel_new_from_file(const char *path) {
+    size_t len;
+    char *json = CFCUtil_slurp_text(path, &len);
+    CFCParcel *self = S_new_from_json(json, path);
+    FREEMEM(json);
+    return self;
+}
+
 void
 CFCParcel_destroy(CFCParcel *self) {
     FREEMEM(self->name);

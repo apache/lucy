@@ -69,6 +69,9 @@ CFCParcel*
 CFCParcel_new(const char *name, const char *cnick);
 
 CFCParcel*
+CFCParcel_new_from_file(const char *path);
+
+CFCParcel*
 CFCParcel_new_from_json(const char *json);
 
 CFCParcel*

@@ -1073,6 +1073,15 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+_new_from_file(path)
+    const char *path;
+CODE:
+    CFCParcel *self = CFCParcel_new_from_file(path);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+SV*
 _new_from_json(json)
     const char *json;
 CODE:

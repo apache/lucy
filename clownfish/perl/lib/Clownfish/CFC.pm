@@ -357,6 +357,17 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         return _new_from_json( $args{json} );
     }
 
+    our %new_from_file_PARAMS = (
+        path => undef,
+    );
+
+    sub new_from_file {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_from_file_PARAMS, %args ) or confess $@;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
+        return _new_from_file( $args{path} );
+    }
+
 #    $parcel = Clownfish::CFC::Model::Parcel->aquire($parcel_name_or_parcel_object);
 #
 # Aquire a parcel one way or another.  If the supplied argument is a
