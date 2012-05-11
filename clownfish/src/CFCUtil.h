@@ -170,6 +170,15 @@ CFCUtil_make_dir(const char *dir);
 int
 CFCUtil_make_path(const char *path);
 
+/* Walk the file system, recursing into subdirectories.  Invoke the supplied
+ * callback for each valid, accessible file system entry.
+ */
+typedef void
+(*CFCUtil_walk_callback_t)(const char *path, void *context);
+void
+CFCUtil_walk(const char *dir, CFCUtil_walk_callback_t callback,
+             void *context);
+
 /* Print an error message to stderr and exit.
  */
 void
