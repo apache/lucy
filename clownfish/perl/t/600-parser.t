@@ -28,15 +28,16 @@ isa_ok(
     "Clownfish::CFC::Model::Parcel",
     "parcel_definition"
 );
-isa_ok(
-    $parser->parse("parcel Crustacean cnick Crust;"),
-    "Clownfish::CFC::Model::Parcel",
-    "parcel_definition with cnick"
-);
 
 # Set and leave parcel.
-my $parcel = $parser->parse('parcel Crustacean cnick Crust;')
+my $registered = Clownfish::CFC::Model::Parcel->new(
+    name  => 'Crustacean',
+    cnick => 'Crust',
+);
+$registered->register;
+my $parcel = $parser->parse('parcel Crustacean;')
     or die "failed to process parcel_definition";
+is( $$parcel, $$registered, "Fetch registered parcel" );
 is( ${ $parser->get_parcel },
     $$parcel, "parcel_definition sets internal \$parcel var" );
 

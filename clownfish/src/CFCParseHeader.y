@@ -329,21 +329,6 @@ parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) SEMICOLON.
     CFCParser_set_parcel(state, A);
 }
 
-parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) cnick(D) SEMICOLON.
-{
-    if (strcmp(B, "parcel") != 0) {
-         CFCUtil_die("A syntax error was detected when parsing '%s'", B);
-    }
-    A = CFCParcel_fetch(C);
-    if (!A) {
-        A = CFCParcel_new(C, D);
-        CFCParcel_register(A);
-        CFCBase_decref((CFCBase*)A);
-    }
-    CFCBase_incref((CFCBase*)A);
-    CFCParser_set_parcel(state, A);
-}
-
 class_declaration(A) ::= class_defs(B) RIGHT_CURLY_BRACE.
 {
     A = B;
