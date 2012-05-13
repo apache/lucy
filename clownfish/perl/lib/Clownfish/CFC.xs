@@ -1091,15 +1091,22 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_singleton(name_sv, cnick_sv)
+fetch(unused, name_sv)
+    SV *unused;
     SV *name_sv;
-    SV *cnick_sv;
 CODE:
+    (void)unused;
     const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
-    const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
-    CFCParcel *self = CFCParcel_singleton(name, cnick);
+    CFCParcel *self = CFCParcel_fetch(name);
     RETVAL = S_cfcbase_to_perlref(self);
 OUTPUT: RETVAL
+
+
+void
+register(self)
+    CFCParcel *self;
+PPCODE:
+    CFCParcel_register(self);
 
 int
 equals(self, other)

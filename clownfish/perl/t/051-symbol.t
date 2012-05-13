@@ -47,8 +47,8 @@ ok( !$public_exposure->equals($parcel_exposure),
     "different exposure spoils equals"
 );
 
-my $lucifer_parcel
-    = Clownfish::CFC::Model::Parcel->singleton( name => 'Lucifer' );
+my $lucifer_parcel = Clownfish::CFC::Model::Parcel->new( name => 'Lucifer' );
+$lucifer_parcel->register;
 my $lucifer = new_symbol( parcel => 'Lucifer' );
 ok( $$lucifer_parcel == ${ $lucifer->get_parcel }, "derive parcel" );
 is( $lucifer->get_prefix, "lucifer_", "get_prefix" );

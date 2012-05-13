@@ -19,8 +19,8 @@ use warnings;
 use Test::More tests => 11;
 use Clownfish::CFC::Model::Parcel;
 
-my $neato_parcel
-    = Clownfish::CFC::Model::Parcel->singleton( name => 'Neato' );
+my $neato_parcel = Clownfish::CFC::Model::Parcel->new( name => 'Neato' );
+$neato_parcel->register;
 
 my $type = Clownfish::CFC::Model::Type->new(
     parcel    => 'Neato',

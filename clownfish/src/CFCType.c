@@ -213,7 +213,7 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
 
     // Use default parcel if none supplied.
     if (!parcel) {
-        parcel = CFCParcel_singleton(NULL, NULL);
+        parcel = CFCParcel_default_parcel();
     }
 
     // Add flags.

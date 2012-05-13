@@ -44,10 +44,10 @@ isa_ok(
 );
 
 # Register singleton.
-Clownfish::CFC::Model::Parcel->singleton(
+Clownfish::CFC::Model::Parcel->new(
     name  => 'Crustacean',
     cnick => 'Crust',
-);
+)->register;
 
 my $thing = Clownfish::CFC::Model::Symbol->new(
     micro_sym => 'sym',

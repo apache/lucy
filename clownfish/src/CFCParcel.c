@@ -68,25 +68,6 @@ static CFCParcel **registry = NULL;
 static size_t num_registered = 0;
 
 CFCParcel*
-CFCParcel_singleton(const char *name, const char *cnick) {
-    // Return an existing singleton if the parcel has already been registered.
-    CFCParcel *existing = CFCParcel_fetch(name);
-    if (existing) {
-        if (cnick && strcmp(existing->cnick, cnick) != 0) {
-            CFCUtil_die("cnick '%s' for parcel '%s' conflicts with '%s'",
-                        cnick, name, existing->cnick);
-        }
-        return existing;
-    }
-
-    // Register new parcel.
-    CFCParcel *singleton = CFCParcel_new(name, cnick);
-    CFCParcel_register(singleton);
-
-    return singleton;
-}
-
-CFCParcel*
 CFCParcel_fetch(const char *name) {
     // Return the default parcel for either a blank name or a NULL name.
     if (!name || !strlen(name)) {
@@ -286,7 +267,13 @@ CFCParcel_default_parcel(void) {
 
 CFCParcel*
 CFCParcel_clownfish_parcel(void) {
-    return CFCParcel_singleton("Lucy", "Lucy");
+    CFCParcel *parcel = CFCParcel_fetch("Lucy");
+    if (!parcel) {
+        parcel = CFCParcel_new("Lucy", "Lucy");
+        CFCParcel_register(parcel);
+        CFCBase_decref((CFCBase*)parcel);
+    }
+    return parcel;
 }
 
 int

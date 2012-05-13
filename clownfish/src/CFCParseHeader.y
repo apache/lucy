@@ -319,7 +319,12 @@ parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) SEMICOLON.
          * declaration and exposure specifier). */
          CFCUtil_die("A syntax error was detected when parsing '%s'", B);
     }
-    A = CFCParcel_singleton(C, NULL);
+    A = CFCParcel_fetch(C);
+    if (!A) {
+        A = CFCParcel_new(C, NULL);
+        CFCParcel_register(A);
+        CFCBase_decref((CFCBase*)A);
+    }
     CFCBase_incref((CFCBase*)A);
     CFCParser_set_parcel(state, A);
 }
@@ -329,7 +334,12 @@ parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) cnick(D) SEMICOLO
     if (strcmp(B, "parcel") != 0) {
          CFCUtil_die("A syntax error was detected when parsing '%s'", B);
     }
-    A = CFCParcel_singleton(C, D);
+    A = CFCParcel_fetch(C);
+    if (!A) {
+        A = CFCParcel_new(C, D);
+        CFCParcel_register(A);
+        CFCBase_decref((CFCBase*)A);
+    }
     CFCBase_incref((CFCBase*)A);
     CFCParser_set_parcel(state, A);
 }

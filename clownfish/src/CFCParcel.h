@@ -38,17 +38,6 @@ extern "C" {
 
 typedef struct CFCParcel CFCParcel;
 
-/** Add a Parcel singleton to a global registry.  May be called multiple times,
- * but only with compatible arguments.
- *
- * @param name The name of the parcel.
- * @param cnick The C nickname for the parcel, which will be used as a prefix
- * for generated global symbols.  Must be mixed case and start with a capital
- * letter.  Defaults to <code>name</code>
- */
-CFCParcel*
-CFCParcel_singleton(const char *name, const char *cnick);
-
 /** Return the parcel which has been registered for <code>name</code>.
  */
 CFCParcel*

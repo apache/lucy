@@ -136,10 +136,7 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         # Maybe prepend parcel prefix.
         my $parcel = $args{parcel};
         if ( defined $parcel ) {
-            if ( !a_isa_b( $parcel, "Clownfish::CFC::Model::Parcel" ) ) {
-                $parcel = Clownfish::CFC::Model::Parcel->singleton(
-                    name => $parcel );
-            }
+            $parcel = Clownfish::CFC::Model::Parcel->acquire($parcel);
         }
         return _fetch_singleton( $parcel, $args{class_name} );
     }
@@ -322,18 +319,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     use Scalar::Util qw( blessed );
     use Carp;
 
-    our %singleton_PARAMS = (
-        name  => undef,
-        cnick => undef,
-    );
-
-    sub singleton {
-        my ( $either, %args ) = @_;
-        verify_args( \%singleton_PARAMS, %args ) or confess $@;
-        confess "no subclassing allowed" unless $either eq __PACKAGE__;
-        return _singleton( @args{qw( name cnick )} );
-    }
-
     our %new_PARAMS = (
         name  => undef,
         cnick => undef,
@@ -368,11 +353,11 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         return _new_from_file( $args{path} );
     }
 
-#    $parcel = Clownfish::CFC::Model::Parcel->aquire($parcel_name_or_parcel_object);
+#    $parcel = Clownfish::CFC::Model::Parcel->acquire($parcel_name_or_parcel_object);
 #
 # Aquire a parcel one way or another.  If the supplied argument is a
 # Parcel, return it.  If it's not defined, return the default Parcel.  If
-# it's a name, invoke singleton().
+# it's a name, fetch an existing Parcel or register a new one.
     sub acquire {
         my ( undef, $thing ) = @_;
         if ( !defined $thing ) {
@@ -384,7 +369,13 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
             return $thing;
         }
         else {
-            return Clownfish::CFC::Model::Parcel->singleton( name => $thing );
+            my $parcel = Clownfish::CFC::Model::Parcel->fetch($thing);
+            if ( !$parcel ) {
+                $parcel
+                    = Clownfish::CFC::Model::Parcel->new( name => $thing, );
+                $parcel->register;
+            }
+            return $parcel;
         }
     }
 }
@@ -717,10 +708,8 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
-        if ( !a_isa_b( $args{parcel}, 'Clownfish::CFC::Model::Parcel' ) ) {
-            $args{parcel} = Clownfish::CFC::Model::Parcel->singleton(
-                name => $args{parcel} );
-        }
+        $args{parcel}
+            = Clownfish::CFC::Model::Parcel->acquire( $args{parcel} );
         return _new(
             @args{qw( parcel hierarchy lib_dir boot_class header footer )} );
     }

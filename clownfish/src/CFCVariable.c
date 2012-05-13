@@ -61,7 +61,7 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     // Validate params.
     CFCUTIL_NULL_CHECK(type);
     if (!parcel) {
-        parcel = CFCParcel_singleton(NULL, NULL);
+        parcel = CFCParcel_default_parcel();
     }
 
     // Default exposure to "local".
