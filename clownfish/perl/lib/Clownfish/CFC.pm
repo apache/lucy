@@ -615,6 +615,24 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 }
 
 {
+    package Clownfish::CFC::Model::Version;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
+    use Carp;
+
+    our %new_PARAMS = (
+        vstring => undef,
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        return _new( $args{vstring} );
+    }
+}
+
+{
     package Clownfish::CFC::Binding::Core;
     BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
     use Clownfish::CFC::Util qw( verify_args );

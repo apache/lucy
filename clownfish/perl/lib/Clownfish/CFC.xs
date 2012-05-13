@@ -1723,6 +1723,45 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
+MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Model::Version
+
+SV*
+_new(vstring)
+    const char *vstring;
+CODE:
+    CFCVersion *self = CFCVersion_new(vstring);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+void
+_set_or_get(self, ...)
+    CFCVersion *self;
+ALIAS:
+    get_major         = 2
+    get_vstring       = 4
+PPCODE:
+{
+    START_SET_OR_GET_SWITCH
+        case 2: 
+            retval = newSVuv(CFCVersion_get_major(self));
+            break;
+        case 4: {
+                const char *value = CFCVersion_get_vstring(self);
+                retval = newSVpvn(value, strlen(value));
+            }
+            break;
+    END_SET_OR_GET_SWITCH
+}
+
+int
+compare_to(self, other)
+    CFCVersion *self;
+    CFCVersion *other;
+CODE:
+    RETVAL = CFCVersion_compare_to(self, other);
+OUTPUT: RETVAL
+
 MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core
 
 SV*
