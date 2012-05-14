@@ -66,6 +66,18 @@ $buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_version'/
     or die "no match";
 write_file( 'perl/Build.PL', $buf );
 
+# Update Lucy.cfp.
+$buf = read_file('core/Lucy.cfp');
+$buf =~ s/("version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
+    or die "no match";
+write_file( 'core/Lucy.cfp', $buf );
+
+# Update temporary hack in CFCParcel.
+$buf = read_file('clownfish/src/CFCParcel.c');
+$buf =~ s/"v\d\.\d\.\d"/"v$x_y_z_version"/
+    or die "no match";
+write_file( 'clownfish/src/CFCParcel.c', $buf );
+
 # Update all other Perl modules.
 find sub {
     return unless /[.]pm$/;

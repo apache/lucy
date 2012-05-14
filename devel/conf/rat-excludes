@@ -68,6 +68,10 @@ modules/unicode/utf8proc/utf8proc.c
 # The text of the US constitution is in the public domain.
 perl/sample/us_constitution/*.txt
 
+# Clownfish parcel files (.cfp) are in JSON format and cannot have comments.
+core/Lucy.cfp
+clownfish/perl/t/cfsource/Animal.cfp
+
 # gitignore files should be ignored
 .gitignore
 charmonizer/.gitignore
