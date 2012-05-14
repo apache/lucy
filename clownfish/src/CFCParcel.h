@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 typedef struct CFCParcel CFCParcel;
+struct CFCVersion;
 
 /** Return the parcel which has been registered for <code>name</code>.
  */
@@ -55,7 +56,8 @@ void
 CFCParcel_reap_singletons(void);
 
 CFCParcel*
-CFCParcel_new(const char *name, const char *cnick);
+CFCParcel_new(const char *name, const char *cnick,
+              struct CFCVersion *version);
 
 CFCParcel*
 CFCParcel_new_from_file(const char *path);
@@ -64,7 +66,8 @@ CFCParcel*
 CFCParcel_new_from_json(const char *json);
 
 CFCParcel*
-CFCParcel_init(CFCParcel *self, const char *name, const char *cnick);
+CFCParcel_init(CFCParcel *self, const char *name, const char *cnick,
+               struct CFCVersion *version);
 
 void
 CFCParcel_destroy(CFCParcel *self);
@@ -89,6 +92,9 @@ CFCParcel_get_name(CFCParcel *self);
 
 const char*
 CFCParcel_get_cnick(CFCParcel *self);
+
+struct CFCVersion*
+CFCParcel_get_version(CFCParcel *self);
 
 /** Return the all-lowercase version of the Parcel's prefix.
  */

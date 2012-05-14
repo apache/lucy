@@ -1061,13 +1061,14 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Parcel
 
 SV*
-_new(name_sv, cnick_sv)
+_new(name_sv, cnick_sv, version)
     SV *name_sv;
     SV *cnick_sv;
+    CFCVersion *version;
 CODE:
     const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
     const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
-    CFCParcel *self = CFCParcel_new(name, cnick);
+    CFCParcel *self = CFCParcel_new(name, cnick, version);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -1137,6 +1138,7 @@ ALIAS:
     get_prefix = 6
     get_Prefix = 8
     get_PREFIX = 10
+    get_version = 12
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -1163,6 +1165,11 @@ PPCODE:
         case 10: {
                 const char *value = CFCParcel_get_PREFIX(self);
                 retval = newSVpvn(value, strlen(value));
+            }
+            break;
+        case 12: {
+                CFCVersion *value = CFCParcel_get_version(self);
+                retval = S_cfcbase_to_perlref(value);
             }
             break;
     END_SET_OR_GET_SWITCH

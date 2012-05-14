@@ -320,15 +320,16 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     use Carp;
 
     our %new_PARAMS = (
-        name  => undef,
-        cnick => undef,
+        name    => undef,
+        cnick   => undef,
+        version => undef,
     );
 
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
-        return _new( @args{qw( name cnick )} );
+        return _new( @args{qw( name cnick version )} );
     }
 
     our %new_from_json_PARAMS = (

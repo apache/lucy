@@ -321,7 +321,7 @@ parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) SEMICOLON.
     }
     A = CFCParcel_fetch(C);
     if (!A) {
-        A = CFCParcel_new(C, NULL);
+        A = CFCParcel_new(C, NULL, NULL);
         CFCParcel_register(A);
         CFCBase_decref((CFCBase*)A);
     }

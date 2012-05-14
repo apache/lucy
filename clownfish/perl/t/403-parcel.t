@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 use File::Spec::Functions qw( catfile );
 
 BEGIN { use_ok('Clownfish::CFC::Model::Parcel') }
@@ -27,10 +27,15 @@ isa_ok(
     "new"
 );
 
+my $json = qq|
+        {
+            "name": "Crustacean",
+            "nickname": "Crust",
+            "version": "v0.1.0"
+        }
+|;
 isa_ok(
-    Clownfish::CFC::Model::Parcel->new_from_json(
-        json => ' { "name": "Crustacean", "nickname": "Crust" } ',
-    ),
+    Clownfish::CFC::Model::Parcel->new_from_json( json => $json ),
     "Clownfish::CFC::Model::Parcel",
     "new_from_json"
 );
@@ -44,10 +49,12 @@ isa_ok(
 );
 
 # Register singleton.
-Clownfish::CFC::Model::Parcel->new(
+my $parcel = Clownfish::CFC::Model::Parcel->new(
     name  => 'Crustacean',
     cnick => 'Crust',
-)->register;
+);
+$parcel->register;
+is( $parcel->get_version->get_vstring, 'v0', "get_version" );
 
 my $thing = Clownfish::CFC::Model::Symbol->new(
     micro_sym => 'sym',

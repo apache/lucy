@@ -26,12 +26,14 @@
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCParcel.h"
+#include "CFCVersion.h"
 #include "CFCUtil.h"
 
 struct CFCParcel {
     CFCBase base;
     char *name;
     char *cnick;
+    CFCVersion *version;
     char *prefix;
     char *Prefix;
     char *PREFIX;
@@ -131,13 +133,14 @@ const static CFCMeta CFCPARCEL_META = {
 };
 
 CFCParcel*
-CFCParcel_new(const char *name, const char *cnick) {
+CFCParcel_new(const char *name, const char *cnick, CFCVersion *version) {
     CFCParcel *self = (CFCParcel*)CFCBase_allocate(&CFCPARCEL_META);
-    return CFCParcel_init(self, name, cnick);
+    return CFCParcel_init(self, name, cnick, version);
 }
 
 CFCParcel*
-CFCParcel_init(CFCParcel *self, const char *name, const char *cnick) {
+CFCParcel_init(CFCParcel *self, const char *name, const char *cnick,
+               CFCVersion *version) {
     // Validate name.
     if (!name || !S_validate_name_or_cnick(name)) {
         CFCUtil_die("Invalid name: '%s'", name ? name : "[NULL]");
@@ -154,6 +157,14 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick) {
     else {
         // Default cnick to name.
         self->cnick = CFCUtil_strdup(name);
+    }
+
+    // Default to version v0.
+    if (version) {
+        self->version = (CFCVersion*)CFCBase_incref((CFCBase*)version);
+    }
+    else {
+        self->version = CFCVersion_new("v0");
     }
 
     // Derive prefix, Prefix, PREFIX.
@@ -190,6 +201,7 @@ S_new_from_json(const char *json, const char *path) {
     }
     const char *name     = NULL;
     const char *nickname = NULL;
+    CFCVersion *version  = NULL;
     for (size_t i = 0, max = parsed->num_kids; i < max; i += 2) {
         JSONNode *key   = parsed->kids[i];
         JSONNode *value = parsed->kids[i + 1];
@@ -209,17 +221,29 @@ S_new_from_json(const char *json, const char *path) {
             }
             nickname = value->string;
         }
+        else if (strcmp(key->string, "version") == 0) {
+            if (value->type != JSON_STRING) {
+                CFCUtil_die("'version' must be a string (filepath %s)",
+                            path);
+            }
+            version = CFCVersion_new(value->string);
+        }
     }
     if (!name) {
         CFCUtil_die("Missing required key 'name' (filepath '%s')", path);
     }
-    CFCParcel *self = CFCParcel_new(name, nickname);
+    if (!version) {
+        CFCUtil_die("Missing required key 'version' (filepath '%s')", path);
+    }
+    CFCParcel *self = CFCParcel_new(name, nickname, version);
+    CFCBase_decref((CFCBase*)version);
 
     for (size_t i = 0, max = parsed->num_kids; i < max; i += 2) {
         JSONNode *key   = parsed->kids[i];
         JSONNode *value = parsed->kids[i + 1];
         if (strcmp(key->string, "name") == 0
             || strcmp(key->string, "nickname") == 0
+            || strcmp(key->string, "version") == 0
            ) {
             ;
         }
@@ -251,6 +275,7 @@ void
 CFCParcel_destroy(CFCParcel *self) {
     FREEMEM(self->name);
     FREEMEM(self->cnick);
+    CFCBase_decref((CFCBase*)self->version);
     FREEMEM(self->prefix);
     FREEMEM(self->Prefix);
     FREEMEM(self->PREFIX);
@@ -260,7 +285,7 @@ CFCParcel_destroy(CFCParcel *self) {
 CFCParcel*
 CFCParcel_default_parcel(void) {
     if (default_parcel == NULL) {
-        default_parcel = CFCParcel_new("", "");
+        default_parcel = CFCParcel_new("", "", NULL);
     }
     return default_parcel;
 }
@@ -269,8 +294,10 @@ CFCParcel*
 CFCParcel_clownfish_parcel(void) {
     CFCParcel *parcel = CFCParcel_fetch("Lucy");
     if (!parcel) {
-        parcel = CFCParcel_new("Lucy", "Lucy");
+        CFCVersion *version = CFCVersion_new("v0.3.0");
+        parcel = CFCParcel_new("Lucy", "Lucy", version);
         CFCParcel_register(parcel);
+        CFCBase_decref((CFCBase*)version);
         CFCBase_decref((CFCBase*)parcel);
     }
     return parcel;
@@ -280,6 +307,9 @@ int
 CFCParcel_equals(CFCParcel *self, CFCParcel *other) {
     if (strcmp(self->name, other->name)) { return false; }
     if (strcmp(self->cnick, other->cnick)) { return false; }
+    if (CFCVersion_compare_to(self->version, other->version) != 0) {
+        return false;
+    }
     return true;
 }
 
@@ -291,6 +321,11 @@ CFCParcel_get_name(CFCParcel *self) {
 const char*
 CFCParcel_get_cnick(CFCParcel *self) {
     return self->cnick;
+}
+
+CFCVersion*
+CFCParcel_get_version(CFCParcel *self) {
+    return self->version;
 }
 
 const char*
