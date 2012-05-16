@@ -31,7 +31,7 @@ parcel Lucy;
  * merged into new ones.
  */
 
-abstract class Lucy::Index::DeletionsWriter cnick DelWriter
+public abstract class Lucy::Index::DeletionsWriter cnick DelWriter
     inherits Lucy::Index::DataWriter {
 
     inert DeletionsWriter*

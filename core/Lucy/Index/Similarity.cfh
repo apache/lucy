@@ -33,7 +33,7 @@ parcel Lucy;
  * scores from multiple fields.
  */
 
-class Lucy::Index::Similarity cnick Sim
+public class Lucy::Index::Similarity cnick Sim
     inherits Lucy::Object::Obj : dumpable {
 
     float  *norm_decoder;

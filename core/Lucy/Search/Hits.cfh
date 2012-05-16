@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * Hits objects are iterators used to access the results of a search.
  */
-class Lucy::Search::Hits inherits Lucy::Object::Obj {
+public class Lucy::Search::Hits inherits Lucy::Object::Obj {
 
     Searcher   *searcher;
     TopDocs    *top_docs;

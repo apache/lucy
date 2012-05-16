@@ -23,7 +23,7 @@ parcel Lucy;
  * match.  Other implementations may be match-only.
  */
 
-abstract class Lucy::Search::Matcher inherits Lucy::Object::Obj {
+public abstract class Lucy::Search::Matcher inherits Lucy::Object::Obj {
 
     /** Abstract constructor.
      */

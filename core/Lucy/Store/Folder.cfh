@@ -26,7 +26,7 @@ parcel Lucy;
  * L<FSFolder|Lucy::Store::FSFolder>, represents a directory on
  * the file system holding a collection of files.
  */
-abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
+public abstract class Lucy::Store::Folder inherits Lucy::Object::Obj {
 
     CharBuf *path;
     Hash    *entries;

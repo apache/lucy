@@ -28,7 +28,7 @@ parcel Lucy;
  * factory methods.
  */
 
-class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
+public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
 
     int32_t  doc_max;
     int32_t  del_count;

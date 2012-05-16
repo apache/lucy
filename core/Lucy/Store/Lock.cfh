@@ -27,7 +27,7 @@ parcel Lucy;
  * help clear away stale locks.
  */
 
-abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
+public abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
 
     Folder      *folder;
     CharBuf     *name;
@@ -160,7 +160,7 @@ class Lucy::Store::LockFileLock cnick LFLock
  * LockErr is a subclass of L<Err|Lucy::Object::Err> which indicates
  * that a file locking problem occurred.
  */
-class Lucy::Store::LockErr inherits Lucy::Object::Err {
+public class Lucy::Store::LockErr inherits Lucy::Object::Err {
 
     public inert incremented LockErr*
     new(CharBuf *message);

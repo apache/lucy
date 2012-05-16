@@ -47,7 +47,7 @@ parcel Lucy;
  * ... the difference being that the word character tokenizer skips over
  * punctuation as well as whitespace when determining token boundaries.
  */
-class Lucy::Analysis::RegexTokenizer
+public class Lucy::Analysis::RegexTokenizer
     inherits Lucy::Analysis::Analyzer {
 
     CharBuf *pattern;

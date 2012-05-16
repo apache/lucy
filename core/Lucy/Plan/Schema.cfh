@@ -25,7 +25,7 @@ parcel Lucy;
  * field definitions may not be changed.  However, it is possible to add new
  * fields during subsequent indexing sessions.
  */
-class Lucy::Plan::Schema inherits Lucy::Object::Obj {
+public class Lucy::Plan::Schema inherits Lucy::Object::Obj {
 
     Architecture      *arch;
     Similarity        *sim;

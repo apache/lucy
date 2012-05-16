@@ -23,7 +23,7 @@ parcel Lucy;
  * L<Lucy::Search::PolySearcher>.
  */
 
-class Lucy::Search::Searcher inherits Lucy::Object::Obj {
+public class Lucy::Search::Searcher inherits Lucy::Object::Obj {
 
     Schema      *schema;
     QueryParser *qparser;

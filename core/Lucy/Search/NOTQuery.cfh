@@ -27,7 +27,7 @@ parcel Lucy;
  * semantics.
  */
 
-class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
+public class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
     : dumpable {
 
     /**

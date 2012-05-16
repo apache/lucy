@@ -54,7 +54,7 @@ parcel Lucy;
  *     |-----------------------|
  */
 
-class Lucy::Analysis::SnowballStopFilter cnick SnowStop
+public class Lucy::Analysis::SnowballStopFilter cnick SnowStop
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     Hash *stoplist;

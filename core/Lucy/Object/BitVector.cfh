@@ -21,7 +21,7 @@ parcel Lucy;
  * BitVector is a growable array of bits.  All bits are initially zero.
  */
 
-class Lucy::Object::BitVector cnick BitVec
+public class Lucy::Object::BitVector cnick BitVec
     inherits Lucy::Object::Obj {
 
     uint32_t  cap;

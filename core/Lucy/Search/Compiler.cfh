@@ -57,7 +57,7 @@ parcel Lucy;
  * the Matchers's constructor, or whether Make_Matcher() should return a
  * Matcher at all.
  */
-class Lucy::Search::Compiler inherits Lucy::Search::Query {
+public class Lucy::Search::Compiler inherits Lucy::Search::Query {
 
     Query        *parent;
     Similarity   *sim;

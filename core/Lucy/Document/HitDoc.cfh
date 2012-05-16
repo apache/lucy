@@ -23,7 +23,7 @@ parcel Lucy;
  * augmented by a numeric score attribute that Doc doesn't have.
  */
 
-class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
+public class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
 
     float score;
 

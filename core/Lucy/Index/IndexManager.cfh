@@ -26,7 +26,7 @@ parcel Lucy;
  * which cannot change for the life of an index; IndexManager is used for
  * defining rules which may change from process to process.
  */
-class Lucy::Index::IndexManager cnick IxManager
+public class Lucy::Index::IndexManager cnick IxManager
     inherits Lucy::Object::Obj {
 
     Folder      *folder;

@@ -47,7 +47,7 @@ parcel Lucy;
  *     sv => Swedish,
  *     tr => Turkish,
  */
-class Lucy::Analysis::PolyAnalyzer
+public class Lucy::Analysis::PolyAnalyzer
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     VArray  *analyzers;

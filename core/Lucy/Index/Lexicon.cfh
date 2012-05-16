@@ -31,7 +31,7 @@ parcel Lucy;
  *     three
  */
 
-class Lucy::Index::Lexicon cnick Lex inherits Lucy::Object::Obj {
+public class Lucy::Index::Lexicon cnick Lex inherits Lucy::Object::Obj {
 
     CharBuf *field;
 

@@ -26,7 +26,7 @@ parcel Lucy;
  * As with L<Indexer|Lucy::Index::Indexer>, see
  * L<Lucy::Docs::FileLocking> if your index is on a shared volume.
  */
-class Lucy::Index::BackgroundMerger cnick BGMerger
+public class Lucy::Index::BackgroundMerger cnick BGMerger
     inherits Lucy::Object::Obj {
 
     Schema            *schema;

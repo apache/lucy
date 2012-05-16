@@ -22,7 +22,7 @@ parcel Lucy;
  * against an ordered sequence of terms.
  */
 
-class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
+public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
     : dumpable {
 
     CharBuf       *field;

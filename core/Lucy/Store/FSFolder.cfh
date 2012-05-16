@@ -22,7 +22,7 @@ parcel Lucy;
  * directory and multiple files.
  */
 
-class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
+public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
 
     inert incremented FSFolder*
     new(const CharBuf *path);

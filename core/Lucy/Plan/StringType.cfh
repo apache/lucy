@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * Lucy::Plan::StringType is used for "exact-match" strings.
  */
-class Lucy::Plan::StringType
+public class Lucy::Plan::StringType
     inherits Lucy::Plan::TextType : dumpable {
 
     /**

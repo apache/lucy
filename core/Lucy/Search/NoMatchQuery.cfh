@@ -23,7 +23,7 @@ parcel Lucy;
  * L<QueryParser|Lucy::Search::QueryParser> is asked to parse an empty
  * string.
  */
-class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
+public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
     : dumpable {
 
     bool_t fails_to_match;

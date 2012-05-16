@@ -25,7 +25,7 @@ parcel Lucy;
  * 'horsing'.
  */
 
-class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
+public class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     void *snowstemmer;

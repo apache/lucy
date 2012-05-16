@@ -19,7 +19,7 @@ parcel Lucy;
 /** Base class for all Lucy objects.
  */
 
-class Lucy::Object::Obj {
+public class Lucy::Object::Obj {
 
     VTable *vtable;
     lucy_ref_t ref;

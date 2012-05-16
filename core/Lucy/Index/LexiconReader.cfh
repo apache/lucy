@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * LexiconReader reads term dictionary information.
  */
-abstract class Lucy::Index::LexiconReader cnick LexReader
+public abstract class Lucy::Index::LexiconReader cnick LexReader
     inherits Lucy::Index::DataReader {
 
     inert LexiconReader*

@@ -22,7 +22,7 @@ parcel Lucy;
  * indexes on a single machine.
  */
 
-class Lucy::Search::PolySearcher
+public class Lucy::Search::PolySearcher
     inherits Lucy::Search::Searcher {
 
     VArray    *searchers;

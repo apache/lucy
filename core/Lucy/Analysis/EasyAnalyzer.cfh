@@ -41,7 +41,7 @@ parcel Lucy;
  *     sv => Swedish,
  *     tr => Turkish,
  */
-class Lucy::Analysis::EasyAnalyzer
+public class Lucy::Analysis::EasyAnalyzer
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     CharBuf *language;

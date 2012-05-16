@@ -25,7 +25,7 @@ parcel Lucy;
  * L<PhraseQuery|Lucy::Search::PhraseQuery> objects, as attempting to
  * search a LeafQuery causes an error.
  */
-class Lucy::Search::LeafQuery inherits Lucy::Search::Query
+public class Lucy::Search::LeafQuery inherits Lucy::Search::Query
     : dumpable {
 
     CharBuf *field;

@@ -22,7 +22,7 @@ parcel Lucy;
  * are retrieved from the index.  The default implementation returns
  * L<HitDoc|Lucy::Document::HitDoc> objects.
  */
-class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
+public class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
 
     inert DocReader*
     init(DocReader *self, Schema *schema = NULL, Folder *folder = NULL,

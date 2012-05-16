@@ -34,7 +34,7 @@ parcel Lucy;
  * L<SegReader|Lucy::Index::SegReader>'s sub-components.
  */
 
-class Lucy::Index::IndexReader cnick IxReader
+public class Lucy::Index::IndexReader cnick IxReader
     inherits Lucy::Index::DataReader {
 
     Hash            *components;

@@ -26,7 +26,7 @@ parcel Lucy;
  * may be less efficient or complete than the single-segment implementations
  * accessed via L<SegReader|Lucy::Index::SegReader>.
  */
-class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
+public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
 
     VArray   *sub_readers;
     int32_t   doc_max;

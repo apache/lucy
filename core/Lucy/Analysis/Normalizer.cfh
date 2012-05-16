@@ -27,7 +27,7 @@ parcel Lucy;
  * because it might add or remove characters.
  */
 
-class Lucy::Analysis::Normalizer
+public class Lucy::Analysis::Normalizer
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     int options;

@@ -23,7 +23,7 @@ parcel Lucy;
  * its score is passed along; when both match, the scores are summed.
  */
 
-class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
+public class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
     inherits Lucy::Search::PolyQuery {
 
     inert incremented RequiredOptionalQuery*

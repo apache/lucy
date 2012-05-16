@@ -24,7 +24,7 @@ parcel Lucy;
  * might perform case folding to facilitate case-insensitive search
  * (L<Normalizer|Lucy::Analysis::Normalizer>).
  */
-abstract class Lucy::Analysis::Analyzer
+public abstract class Lucy::Analysis::Analyzer
     inherits Lucy::Object::Obj : dumpable {
 
     public inert Analyzer*

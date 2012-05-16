@@ -25,7 +25,7 @@ parcel Lucy;
  * searches will be case-insensitive.
  */
 
-class Lucy::Analysis::CaseFolder
+public class Lucy::Analysis::CaseFolder
     inherits Lucy::Analysis::Analyzer : dumpable {
 
     Normalizer *normalizer;

@@ -21,7 +21,7 @@ parcel Lucy;
  * BlobType is an implementation of FieldType tuned for use with fields
  * containing binary data, which cannot be indexed or searched -- only stored.
  */
-class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType
+public class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType
     : dumpable {
 
     /**

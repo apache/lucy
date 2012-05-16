@@ -31,7 +31,7 @@ parcel Lucy;
  * Add_Inverted_Doc() invoked for each document supplied to SegWriter's
  * Add_Doc().
  */
-class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
+public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
 
     Inverter          *inverter;
     VArray            *writers;

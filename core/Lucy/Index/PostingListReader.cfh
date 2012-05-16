@@ -21,7 +21,7 @@ parcel Lucy;
  * PostingListReaders produce L<PostingList|Lucy::Index::PostingList>
  * objects which convey document matching information.
  */
-class Lucy::Index::PostingListReader cnick PListReader
+public class Lucy::Index::PostingListReader cnick PListReader
     inherits Lucy::Index::DataReader {
 
     inert PostingListReader*

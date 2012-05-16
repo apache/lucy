@@ -26,7 +26,7 @@ parcel Lucy;
  * within an array of tokens, for example -- in which case the start and
  * offset might be measured in token positions.
  */
-class Lucy::Search::Span inherits Lucy::Object::Obj {
+public class Lucy::Search::Span inherits Lucy::Object::Obj {
 
     int32_t offset;
     int32_t length;

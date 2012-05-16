@@ -22,7 +22,7 @@ parcel Lucy;
  * L<Lucy::Store::Folder>, primarily used for testing and development.
  */
 
-class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
+public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
 
     inert incremented RAMFolder*
     new(const CharBuf *path = NULL);
