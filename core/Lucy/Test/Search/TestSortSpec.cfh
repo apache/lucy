@@ -1,0 +1,38 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+inert class Lucy::Test::Search::TestSortSpec {
+    inert void
+    run_tests();
+}
+
+class Lucy::Test::Search::TestReverseType inherits Lucy::Plan::Int32Type {
+    public inert TestReverseType*
+    new();
+
+    public inert TestReverseType*
+    init(TestReverseType *self);
+
+    inert TestReverseType*
+    init2(TestReverseType *self, float boost = 1.0, bool_t indexed = true,
+          bool_t stored = true, bool_t sortable = false);
+
+    public int32_t
+    Compare_Values(TestReverseType *self, Obj *a, Obj *b);
+}
+
