@@ -39,47 +39,26 @@ static const char *obj_ext = "";
 static const char *local_command_start = "./";
 #endif
 
-static void
-S_probe_dev_null(void);
-
 void
 OS_init(void) {
     if (Util_verbosity) {
         printf("Initializing Charmonizer/Core/OperatingSystem...\n");
     }
 
-    S_probe_dev_null();
-}
-
-static void
-S_probe_dev_null(void) {
     if (Util_verbosity) {
         printf("Trying to find a bit-bucket a la /dev/null...\n");
     }
 
-#ifdef _WIN32
-    strcpy(dev_null, "nul");
-#else
-    {
-        const char *const options[] = {
-            "/dev/null",
-            "/dev/nul",
-            NULL
-        };
-        int i;
-
-        /* Iterate through names of possible devnulls trying to open them. */
-        for (i = 0; options[i] != NULL; i++) {
-            if (Util_can_open_file(options[i])) {
-                strcpy(dev_null, options[i]);
-                return;
-            }
-        }
-
+    if (Util_can_open_file("/dev/null")) {
+        strcpy(dev_null, "/dev/null");
+    }
+    else if (Util_can_open_file("nul")) {
+        strcpy(dev_null, "nul");
+    }
+    else {
         /* Bail out because we couldn't find anything like /dev/null. */
         Util_die("Couldn't find anything like /dev/null");
     }
-#endif
 }
 
 const char*
