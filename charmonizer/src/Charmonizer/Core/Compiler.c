@@ -51,9 +51,6 @@ static const char *object_flag       = "-o ";
 static const char *exe_flag          = "-o ";
 #endif
 
-static void
-S_do_test_compile(void);
-
 void
 CC_init(const char *compiler_command, const char *compiler_flags) {
     const char *code = "int main() { return 0; }\n";

@@ -42,15 +42,6 @@ static const char *local_command_start = "./";
 static void
 S_probe_dev_null(void);
 
-/* Compile a small wrapper application which is used to redirect error output
- * to dev_null.
- */
-static void
-S_build_charm_run(void);
-
-static int charm_run_initialized = false;
-static int charm_run_ok = false;
-
 void
 OS_init(void) {
     if (Util_verbosity) {

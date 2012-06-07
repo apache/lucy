@@ -127,7 +127,6 @@ static const char cygwin_code[] =
 
 void
 DirManip_run(void) {
-    FILE *f;
     char dir_sep[3];
     int remove_zaps_dirs = false;
     int has_dirent_h = HeadCheck_check_header("dirent.h");
