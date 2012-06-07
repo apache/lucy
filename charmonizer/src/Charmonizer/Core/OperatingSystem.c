@@ -26,18 +26,12 @@
 #include "Charmonizer/Core/OperatingSystem.h"
 
 static char dev_null[20] = "";
-
-#ifdef _WIN32
-#define SHELL_IS_CMD_EXE
-static const char *exe_ext = ".exe";
-static const char *obj_ext = ".obj";
-static const char *local_command_start = ".\\";
-#else
-#define SHELL_IS_POSIX
-static const char *exe_ext = "";
-static const char *obj_ext = "";
-static const char *local_command_start = "./";
-#endif
+static char exe_ext[5]   = "";
+static char obj_ext[5]   = "";
+static char local_command_start[3] = "";
+static int  shell_type = 0;
+#define SHELL_TYPE_POSIX    1
+#define SHELL_TYPE_CMD_EXE  2
 
 void
 OS_init(void) {
@@ -49,11 +43,21 @@ OS_init(void) {
         printf("Trying to find a bit-bucket a la /dev/null...\n");
     }
 
+    /* Detect shell based on whether the bitbucket is "/dev/null" or "nul". */
     if (Util_can_open_file("/dev/null")) {
+        fprintf(stderr, "OOP!\n");
         strcpy(dev_null, "/dev/null");
+        strcpy(exe_ext, "");
+        strcpy(obj_ext, "");
+        strcpy(local_command_start, "./");
+        shell_type = SHELL_TYPE_POSIX;
     }
     else if (Util_can_open_file("nul")) {
         strcpy(dev_null, "nul");
+        strcpy(exe_ext, ".exe");
+        strcpy(obj_ext, ".obj");
+        strcpy(local_command_start, ".\\");
+        shell_type = SHELL_TYPE_CMD_EXE;
     }
     else {
         /* Bail out because we couldn't find anything like /dev/null. */
@@ -119,17 +123,23 @@ OS_run_local(const char *arg1, ...) {
 int
 OS_run_quietly(const char *command) {
     int retval = 1;
-#ifdef _WIN32
-    char pattern[] = "%s > NUL 2> NUL";
-    size_t size = sizeof(pattern) + strlen(command) + 10;
-    char *quiet_command = (char*)malloc(size);
-    sprintf(quiet_command, pattern, command);
-#else
-    char pattern[] = "%s > %s 2>&1";
-    size_t size = sizeof(pattern) + strlen(command) + strlen(dev_null) + 10;
-    char *quiet_command = (char*)malloc(size);
-    sprintf(quiet_command, pattern, command, dev_null);
-#endif
+    char *quiet_command = NULL;
+    if (shell_type == SHELL_TYPE_POSIX) {
+        char pattern[] = "%s > %s 2>&1";
+        size_t size
+            = sizeof(pattern) + strlen(command) + strlen(dev_null) + 10;
+        quiet_command = (char*)malloc(size);
+        sprintf(quiet_command, pattern, command, dev_null);
+    }
+    else if (shell_type == SHELL_TYPE_CMD_EXE) {
+        char pattern[] = "%s > NUL 2> NUL";
+        size_t size = sizeof(pattern) + strlen(command) + 10;
+        quiet_command = (char*)malloc(size);
+        sprintf(quiet_command, pattern, command);
+    }
+    else {
+        Util_die("Don't know the shell type");
+    }
     retval = system(quiet_command);
     free(quiet_command);
 
@@ -138,26 +148,35 @@ OS_run_quietly(const char *command) {
 
 void
 OS_mkdir(const char *filepath) {
-    #if (defined(SHELL_IS_POSIX) || defined (SHELL_IS_CMD_EXE))
-    const char *mkdir_command = "mkdir";
-    #endif
-    unsigned size = strlen(mkdir_command) + 1 + strlen(filepath) + 1;
-    char *command = (char*)malloc(size);
-    sprintf(command, "%s %s", mkdir_command, filepath);
+    char *command = NULL;
+    if (shell_type == SHELL_TYPE_POSIX || shell_type == SHELL_TYPE_CMD_EXE) {
+        unsigned size = sizeof("mkdir") + 1 + strlen(filepath) + 1;
+        command = (char*)malloc(size);
+        sprintf(command, "mkdir %s", filepath);
+    }
+    else {
+        Util_die("Don't know the shell type");
+    }
     OS_run_quietly(command);
     free(command);
 }
 
 void
 OS_rmdir(const char *filepath) {
-    #ifdef SHELL_IS_POSIX
-    const char *rmdir_command = "rmdir";
-    #elif defined(SHELL_IS_CMD_EXE)
-    const char *rmdir_command = "rmdir /q";
-    #endif
-    unsigned size = strlen(rmdir_command) + 1 + strlen(filepath) + 1;
-    char *command = (char*)malloc(size);
-    sprintf(command, "%s %s", rmdir_command, filepath);
+    char *command = NULL;
+    if (shell_type == SHELL_TYPE_POSIX) {
+        unsigned size = strlen("rmdir") + 1 + strlen(filepath) + 1;
+        command = (char*)malloc(size);
+        sprintf(command, "rmdir %s", filepath);
+    }
+    else if (shell_type == SHELL_TYPE_CMD_EXE) {
+        unsigned size = strlen("rmdir /q") + 1 + strlen(filepath) + 1;
+        command = (char*)malloc(size);
+        sprintf(command, "rmdir /q %s", filepath);
+    }
+    else {
+        Util_die("Don't know the shell type");
+    }
     OS_run_quietly(command);
     free(command);
 }
