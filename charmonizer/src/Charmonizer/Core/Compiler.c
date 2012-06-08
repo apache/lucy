@@ -23,6 +23,11 @@
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
+/* Detect macros which may help to identify some compilers.
+ */
+static void
+S_detect_known_compilers(void);
+
 /* Temporary files. */
 #define TRY_SOURCE_PATH  "_charmonizer_try.c"
 #define TRY_BASENAME     "_charmonizer_try"
@@ -37,6 +42,9 @@ static char     *try_obj_name = NULL;
 static char      include_flag[10] = "";
 static char      object_flag[10]  = "";
 static char      exe_flag[10]     = "";
+static int       defines___GNUC__  = 0;
+static int       defines__MSC_VER  = 0;
+static int       defines___clang__ = 0;
 
 void
 CC_init(const char *compiler_command, const char *compiler_flags) {
@@ -86,6 +94,34 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     if (!compile_succeeded) {
         Util_die("Failed to compile a small test file");
     }
+
+    S_detect_known_compilers();
+}
+
+static const char detect_macro_code[] =
+    QUOTE(  int main() {                   )
+    QUOTE(  #ifndef %s                     )
+    QUOTE(  #error "nope"                  )
+    QUOTE(  #endif                         )
+    QUOTE(      return 0;                  )
+    QUOTE(  }                              );
+
+static int
+S_detect_macro(const char *macro) {
+    size_t size = sizeof(detect_macro_code) + strlen(macro) + 20;
+    char *code = (char*)malloc(size);
+    int retval;
+    sprintf(code, detect_macro_code, macro);
+    retval = CC_test_compile(code, strlen(code));
+    free(code);
+    return retval;
+}
+
+static void
+S_detect_known_compilers(void) {
+    defines___GNUC__  = S_detect_macro("__GNUC__");
+    defines__MSC_VER  = S_detect_macro("_MSC_VER");
+    defines___clang__ = S_detect_macro("__clang__");
 }
 
 void
@@ -159,17 +195,15 @@ CC_compile_exe(const char *source_path, const char *exe_name,
         system(command);
     }
 
-#ifdef _MSC_VER
-    /* Zap MSVC junk. */
-    /* TODO: Key this off the compiler supplied as argument, not the compiler
-     * used to compile Charmonizer. */
-    sprintf(junk, "%s.obj", exe_name);
-    remove(junk);
-    sprintf(junk, "%s.ilk", exe_name);
-    remove(junk);
-    sprintf(junk, "%s.pdb", exe_name);
-    remove(junk);
-#endif
+    if (defines__MSC_VER) {
+        /* Zap MSVC junk. */
+        sprintf(junk, "%s.obj", exe_name);
+        remove(junk);
+        sprintf(junk, "%s.ilk", exe_name);
+        remove(junk);
+        sprintf(junk, "%s.pdb", exe_name);
+        remove(junk);
+    }
 
     /* See if compilation was successful.  Remove the source file. */
     result = Util_can_open_file(exe_file);
@@ -289,5 +323,4 @@ CC_add_inc_dir(const char *dir) {
     inc_dirs[num_dirs - 1] = Util_strdup(dir);
     inc_dirs[num_dirs] = NULL;
 }
-
 
