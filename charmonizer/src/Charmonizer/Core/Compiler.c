@@ -34,26 +34,14 @@ static char     *cc_flags     = NULL;
 static char    **inc_dirs     = NULL;
 static char     *try_exe_name = NULL;
 static char     *try_obj_name = NULL;
-
-/* Detect a supported compiler, or assume a generic GCC-compatible compiler
- * and hope for the best.  */
-#ifdef __GNUC__
-static const char *include_flag      = "-I ";
-static const char *object_flag       = "-o ";
-static const char *exe_flag          = "-o ";
-#elif defined(_MSC_VER)
-static const char *include_flag      = "/I";
-static const char *object_flag       = "/Fo";
-static const char *exe_flag          = "/Fe";
-#else
-static const char *include_flag      = "-I ";
-static const char *object_flag       = "-o ";
-static const char *exe_flag          = "-o ";
-#endif
+static char      include_flag[10] = "";
+static char      object_flag[10]  = "";
+static char      exe_flag[10]     = "";
 
 void
 CC_init(const char *compiler_command, const char *compiler_flags) {
     const char *code = "int main() { return 0; }\n";
+    int compile_succeeded = 0;
 
     if (Util_verbosity) { printf("Creating compiler object...\n"); }
 
@@ -83,7 +71,19 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     if (Util_verbosity) {
         printf("Trying to compile a small test file...\n");
     }
-    if (!CC_test_compile(code, strlen(code))) {
+    /* Try POSIX argument style. */
+    strcpy(include_flag, "-I ");
+    strcpy(object_flag,  "-o ");
+    strcpy(exe_flag,     "-o ");
+    compile_succeeded = CC_test_compile(code, strlen(code));
+    if (!compile_succeeded) {
+        /* Try MSVC argument style. */
+        strcpy(include_flag, "/I");
+        strcpy(object_flag,  "/Fo");
+        strcpy(exe_flag,     "/Fe");
+        compile_succeeded = CC_test_compile(code, strlen(code));
+    }
+    if (!compile_succeeded) {
         Util_die("Failed to compile a small test file");
     }
 }
