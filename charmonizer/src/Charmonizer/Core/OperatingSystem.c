@@ -45,7 +45,6 @@ OS_init(void) {
 
     /* Detect shell based on whether the bitbucket is "/dev/null" or "nul". */
     if (Util_can_open_file("/dev/null")) {
-        fprintf(stderr, "OOP!\n");
         strcpy(dev_null, "/dev/null");
         strcpy(exe_ext, "");
         strcpy(obj_ext, "");
