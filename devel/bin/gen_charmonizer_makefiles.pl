@@ -134,6 +134,18 @@ sub clean_rule_win {
     qq|clean:\n\tCMD /c FOR %i IN (\$(CLEANABLE)) DO IF EXIST %i DEL /F %i|;
 }
 
+sub meld_rule { confess "abstract method" }
+
+sub meld_rule_posix {
+    qq|meld:\n\t\$(PERL) buildbin/meld.pl --probes=\$(PROBES) |
+        . qq|--files=\$(FILES) --out=\$(OUT)|;
+}
+
+sub meld_rule_win {
+    qq|meld:\n\t\$(PERL) buildbin\\meld.pl --probes=\$(PROBES) |
+        . qq|--files=\$(FILES) --out=\$(OUT)|;
+}
+
 sub gen_makefile {
     my ( $self, %args ) = @_;
     my ( $h_files, $c_files, $c_tests, $c_test_cases )
@@ -142,6 +154,7 @@ sub gen_makefile {
     # Derive chunks of Makefile content.
     my $progname              = $self->execify('charmonize.c');
     my $c2o_rule              = $self->c2o_rule;
+    my $meld_rule             = $self->meld_rule;
     my $progname_link_command = $self->build_link_command(
         objects => ['$(OBJS)'],
         target  => '$(PROGNAME)',
@@ -179,6 +192,10 @@ CC= $self->{cc}
 DEFS=
 CFLAGS= -Isrc \$(DEFS) $self->{extra_cflags}
 PROGNAME= $progname
+PROBES=
+FILES=
+OUT=
+PERL=/usr/bin/perl
 
 TESTS= $test_execs
 
@@ -193,6 +210,8 @@ CLEANABLE= \$(OBJS) \$(PROGNAME) \$(TEST_OBJS) \$(TESTS) $self->{extra_clean}
 $c2o_rule
 
 all: \$(PROGNAME)
+
+$meld_rule
 
 \$(PROGNAME): \$(OBJS)
 \t$progname_link_command
@@ -224,6 +243,7 @@ sub new {
 }
 
 sub clean_rule { shift->clean_rule_posix }
+sub meld_rule  { shift->meld_rule_posix }
 sub pathify    { shift->unixify(@_) }
 
 package Charmonizer::Build::Makefile::MSVC;
@@ -256,6 +276,7 @@ sub build_link_command {
 
 sub pathify    { shift->winnify(@_) }
 sub clean_rule { shift->clean_rule_win }
+sub meld_rule  { shift->meld_rule_win }
 
 package Charmonizer::Build::Makefile::MinGW;
 BEGIN { our @ISA = qw( Charmonizer::Build::Makefile ) }
@@ -273,6 +294,7 @@ sub new {
 
 sub pathify    { shift->winnify(@_) }
 sub clean_rule { shift->clean_rule_win }
+sub meld_rule  { shift->meld_rule_win }
 
 ### actual script follows
 package main;

@@ -19,6 +19,10 @@ CC= cc
 DEFS=
 CFLAGS= -Isrc $(DEFS) 
 PROGNAME= charmonize
+PROBES=
+FILES=
+OUT=
+PERL=/usr/bin/perl
 
 TESTS= TestDirManip TestFuncMacro TestHeaders TestIntegers TestLargeFiles TestUnusedVars TestVariadicMacros
 
@@ -34,6 +38,9 @@ CLEANABLE= $(OBJS) $(PROGNAME) $(TEST_OBJS) $(TESTS)
 	$(CC) $(CFLAGS) -c $*.c -o $@
 
 all: $(PROGNAME)
+
+meld:
+	$(PERL) buildbin/meld.pl --probes=$(PROBES) --files=$(FILES) --out=$(OUT)
 
 $(PROGNAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(PROGNAME)
