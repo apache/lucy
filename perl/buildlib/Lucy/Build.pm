@@ -48,8 +48,7 @@ BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 my @BASE_PATH = __PACKAGE__->cf_base_path;
 
 my $CHARMONIZER_ORIG_DIR = catdir( @BASE_PATH, 'charmonizer' );
-my $CHARMONIZE_EXE_PATH
-    = catfile( $CHARMONIZER_ORIG_DIR, "charmonize$Config{_exe}" );
+my $CHARMONIZE_EXE_PATH  = "charmonize$Config{_exe}";
 my $CHARMONY_PATH  = 'charmony.h';
 my $LEMON_DIR      = catdir( @BASE_PATH, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
@@ -110,10 +109,18 @@ sub _run_make {
 sub ACTION_charmonize {
     my $self = shift;
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
+    my $meld_c = rel2abs("charmonize.c");
+    my $charmonize_main = catfile( $CHARMONIZER_ORIG_DIR, 'charmonize.c' );
     $self->_run_make(
         dir  => $CHARMONIZER_ORIG_DIR,
-        args => [],
+        args => [ "meld", "PERL=$^X", "FILES=$charmonize_main", "OUT=$meld_c" ],
     );
+    if ( !$self->up_to_date( $CHARMONIZE_EXE_PATH, $meld_c ) ) {
+        my $cc = $Config{cc};
+        my $outflag = $cc =~ /cl\b/ ? "/Fe" : "-o ";
+        system("$cc $meld_c $outflag$CHARMONIZE_EXE_PATH")
+            and die "Failed to compile $CHARMONIZE_EXE_PATH";
+    }
 }
 
 # Run the charmonize executable, creating the charmony.h file.
