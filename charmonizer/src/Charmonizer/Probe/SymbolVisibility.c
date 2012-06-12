@@ -38,6 +38,7 @@ SymbolVisibility_run(void) {
     char code_buf[sizeof(symbol_exporting_code) + 100];
 
     ConfWriter_start_module("SymbolVisibility");
+    CC_set_warnings_as_errors(1);
 
     /* Windows. */
     if (!can_control_visibility) {
@@ -62,6 +63,7 @@ SymbolVisibility_run(void) {
             ConfWriter_append_conf("#define CHY_IMPORT\n");
         }
     }
+    CC_set_warnings_as_errors(0);
 
     /* Default. */
     if (!can_control_visibility) {

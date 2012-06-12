@@ -72,6 +72,9 @@ chaz_CC_init(const char *cc_command, const char *cc_flags);
 void
 chaz_CC_clean_up(void);
 
+void
+chaz_CC_set_warnings_as_errors(const int flag);
+
 #ifdef CHAZ_USE_SHORT_NAMES
   #define CC_compile_exe              chaz_CC_compile_exe
   #define CC_compile_obj              chaz_CC_compile_obj
@@ -80,6 +83,7 @@ chaz_CC_clean_up(void);
   #define CC_test_compile             chaz_CC_test_compile
   #define CC_capture_output           chaz_CC_capture_output
   #define CC_init                     chaz_CC_init
+  #define CC_set_warnings_as_errors   chaz_CC_set_warnings_as_errors
 #endif
 
 #ifdef __cplusplus

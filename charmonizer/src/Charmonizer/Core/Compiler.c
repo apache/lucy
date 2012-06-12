@@ -42,9 +42,16 @@ static char     *try_obj_name = NULL;
 static char      include_flag[10] = "";
 static char      object_flag[10]  = "";
 static char      exe_flag[10]     = "";
+static char      error_flag[10]   = "";
 static int       defines___GNUC__  = 0;
 static int       defines__MSC_VER  = 0;
 static int       defines___clang__ = 0;
+static int       warnings_as_errors = 0;    
+
+void
+CC_set_warnings_as_errors(const int flag) {
+    warnings_as_errors = flag;
+}
 
 void
 CC_init(const char *compiler_command, const char *compiler_flags) {
@@ -169,7 +176,15 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     char    *junk              = (char*)malloc(junk_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
     char    *inc_dir_string    = S_inc_dir_string();
+    if (warnings_as_errors) {
+        if (defines__MSC_VER)  {
+            strcpy(error_flag, "/WX");
+        } else {
+            strcpy(error_flag, "-Werror");
+        }
+    }
     size_t   command_max_size  = strlen(cc_command)
+                                 + strlen(error_flag)
                                  + strlen(source_path)
                                  + strlen(exe_flag)
                                  + exe_file_buf_len
@@ -184,10 +199,11 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s%s %s %s",
-            cc_command, source_path,
-            exe_flag, exe_file,
-            inc_dir_string, cc_flags);
+    sprintf(command, "%s %s %s %s%s %s %s",
+            cc_command, error_flag, 
+            source_path, exe_flag, 
+            exe_file, inc_dir_string, 
+            cc_flags);
     if (Util_verbosity < 2) {
         OS_run_quietly(command);
     }
@@ -226,7 +242,16 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
     char    *inc_dir_string    = S_inc_dir_string();
+    if (warnings_as_errors) {
+        if (defines__MSC_VER)  {
+            strcpy(error_flag, "/WX");
+        } else {
+            strcpy(error_flag, "-Werror");
+        }
+    }
+
     size_t   command_max_size  = strlen(cc_command)
+                                 + strlen(error_flag)
                                  + strlen(source_path)
                                  + strlen(object_flag)
                                  + obj_file_buf_len
@@ -241,10 +266,10 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s%s %s %s",
-            cc_command, source_path,
-            object_flag, obj_file,
-            inc_dir_string,
+    sprintf(command, "%s %s %s %s%s %s %s",
+            cc_command, error_flag,
+            source_path, object_flag, 
+            obj_file, inc_dir_string,
             cc_flags);
     if (Util_verbosity < 2) {
         OS_run_quietly(command);
