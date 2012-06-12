@@ -139,7 +139,7 @@ sub pare_charm_file {
     # Remove pound-includes for files being inlined.
     $content =~ s/^#include "Charmonizer[^\n]+\n//msg;
 
-    print <<END_STUFF;
+    return <<END_STUFF;
 /***************************************************************************/
 
 $content

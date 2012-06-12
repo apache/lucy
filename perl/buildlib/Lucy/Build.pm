@@ -110,12 +110,14 @@ sub ACTION_charmonize {
     my $self = shift;
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
     my $meld_c = rel2abs("charmonize.c");
+    $self->add_to_cleanup($meld_c);
+    $self->add_to_cleanup($CHARMONIZE_EXE_PATH);
     my $charmonize_main = catfile( $CHARMONIZER_ORIG_DIR, 'charmonize.c' );
     $self->_run_make(
         dir  => $CHARMONIZER_ORIG_DIR,
         args => [ "meld", "PERL=$^X", "FILES=$charmonize_main", "OUT=$meld_c" ],
     );
-    if ( !$self->up_to_date( $CHARMONIZE_EXE_PATH, $meld_c ) ) {
+    if ( !$self->up_to_date( $meld_c, $CHARMONIZE_EXE_PATH ) ) {
         my $cc = $Config{cc};
         my $outflag = $cc =~ /cl\b/ ? "/Fe" : "-o ";
         system("$cc $meld_c $outflag$CHARMONIZE_EXE_PATH")
