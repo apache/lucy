@@ -51,6 +51,7 @@ static int       warnings_as_errors = 0;
 void
 CC_set_warnings_as_errors(const int flag) {
     warnings_as_errors = flag;
+    error_flag = "";
 }
 
 void
