@@ -146,7 +146,7 @@ S_append_def_to_conf(const char *sym, const char *value) {
 
 void
 ConfWriter_add_typedef(const char *type, const char *alias) {
-    S_push_def_list_item(type, alias, CONFELEM_TYPEDEF);
+    S_push_def_list_item(alias, type, CONFELEM_TYPEDEF);
 }
 
 static void
@@ -209,7 +209,7 @@ ConfWriter_end_module(void) {
                 S_append_def_to_conf(defs[i].str1, defs[i].str2);
                 break;
             case CONFELEM_TYPEDEF:
-                S_append_typedef_to_conf(defs[i].str1, defs[i].str2);
+                S_append_typedef_to_conf(defs[i].str2, defs[i].str1);
                 break;
             case CONFELEM_SYS_INCLUDE:
                 S_append_sys_include_to_conf(defs[i].str1);
@@ -230,21 +230,12 @@ ConfWriter_end_module(void) {
     );
     for (i = 0; i < def_count; i++) {
         switch (defs[i].type) {
-            case CONFELEM_DEF: {
+            case CONFELEM_DEF: 
+            case CONFELEM_TYPEDEF:
+                {
                     const char *sym = defs[i].str1;
                     const char *value = defs[i].str2;
                     if (!value || strcmp(sym, value) != 0) {
-                        const char *prefix = S_sym_is_uppercase(sym)
-                                             ? "CHY_" : "chy_";
-                        ConfWriter_append_conf("  #define %s %s%s\n", sym,
-                                               prefix, sym);
-                    }
-                }
-                break;
-            case CONFELEM_TYPEDEF: {
-                    const char *sym = defs[i].str2;
-                    const char *value = defs[i].str1;
-                    if (strcmp(sym, value) != 0) {
                         const char *prefix = S_sym_is_uppercase(sym)
                                              ? "CHY_" : "chy_";
                         ConfWriter_append_conf("  #define %s %s%s\n", sym,
