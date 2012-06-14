@@ -80,11 +80,6 @@ ConfWriter_open_charmony_h(const char *charmony_start) {
            );
 }
 
-FILE*
-ConfWriter_get_charmony_fh(void) {
-    return charmony_fh;
-}
-
 void
 ConfWriter_clean_up(void) {
     /* Write the last bit of charmony.h and close. */

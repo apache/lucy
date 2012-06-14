@@ -66,11 +66,6 @@ Probe_clean_up(void) {
     if (Util_verbosity) { printf("Cleanup complete.\n"); }
 }
 
-FILE*
-Probe_get_charmony_fh(void) {
-    return ConfWriter_get_charmony_fh();
-}
-
 static const char charm_h_code[] =
     QUOTE(  #ifndef CHARM_H                                                  )
     QUOTE(  #define CHARM_H 1                                                )

@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
 
@@ -39,11 +38,6 @@ chaz_ConfWriter_init(void);
  */
 void
 chaz_ConfWriter_open_charmony_h(const char *charmony_start);
-
-/* Return the config file's file handle.
- */
-FILE*
-chaz_ConfWriter_get_charmony_fh(void);
 
 /* Close the include guard on charmony.h, then close the file.  Delete temp
  * files and perform any other needed cleanup.
@@ -114,7 +108,6 @@ chaz_ConfWriter_end_module(void);
 #ifdef   CHAZ_USE_SHORT_NAMES
   #define ConfWriter_init                   chaz_ConfWriter_init
   #define ConfWriter_open_charmony_h        chaz_ConfWriter_open_charmony_h
-  #define ConfWriter_get_charmony_fh        chaz_ConfWriter_get_charmony_fh
   #define ConfWriter_clean_up               chaz_ConfWriter_clean_up
   #define ConfWriter_build_charm_run        chaz_ConfWriter_build_charm_run
   #define ConfWriter_start_module           chaz_ConfWriter_start_module

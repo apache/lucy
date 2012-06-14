@@ -48,17 +48,9 @@ chaz_Probe_init(const char *cc_command, const char *cc_flags,
 void
 chaz_Probe_clean_up(void);
 
-/* Access the FILE* used to write charmony.h, so that you can write your own
- * content to it.  Should not be called before chaz_Probe_init() or after
- * chaz_Probe_clean_up().
- */
-FILE*
-chaz_Probe_get_charmony_fh(void);
-
 #ifdef CHAZ_USE_SHORT_NAMES
   #define Probe_init            chaz_Probe_init
   #define Probe_clean_up        chaz_Probe_clean_up
-  #define Probe_get_charmony_fh chaz_Probe_get_charmony_fh
 #endif
 
 #ifdef __cplusplus
