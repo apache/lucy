@@ -166,15 +166,23 @@ DirManip_run(void) {
 
     if (mkdir_num_args == 2) {
         /* It's two args, but the command isn't "mkdir". */
-        ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir, _mode)\n",
-                               mkdir_command);
-        ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 0\n");
+        char scratch[50];
+        if (strlen(mkdir_command) > 30) {
+            Util_die("Command too long: '%s'", mkdir_command);
+        }
+        sprintf(scratch, "%s(_dir, _mode)", mkdir_command);
+        ConfWriter_add_def("makedir(_dir, _mode)", scratch);
+        ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "0");
     }
     else if (mkdir_num_args == 1) {
         /* It's one arg... mode arg will be ignored. */
-        ConfWriter_append_conf("#define chy_makedir(_dir, _mode) %s(_dir)\n",
-                               mkdir_command);
-        ConfWriter_append_conf("#define CHY_MAKEDIR_MODE_IGNORED 1\n");
+        char scratch[50];
+        if (strlen(mkdir_command) > 30) {
+            Util_die("Command too long: '%s'", mkdir_command);
+        }
+        sprintf(scratch, "%s(_dir)", mkdir_command);
+        ConfWriter_add_def("makedir(_dir, _mode)", scratch);
+        ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
     }
 
     if (CC_test_compile(cygwin_code, strlen(cygwin_code))) {
@@ -187,7 +195,11 @@ DirManip_run(void) {
         strcpy(dir_sep, "/");
     }
 
-    ConfWriter_append_conf("#define CHY_DIR_SEP \"%s\"\n", dir_sep);
+    {
+        char scratch[5];
+        sprintf(scratch, "\"%s\"", dir_sep);
+        ConfWriter_add_def("DIR_SEP", scratch);
+    }
 
     /* See whether remove works on directories. */
     OS_mkdir("_charm_test_remove_me");
@@ -196,13 +208,6 @@ DirManip_run(void) {
         ConfWriter_add_def("REMOVE_ZAPS_DIRS", NULL);
     }
     OS_rmdir("_charm_test_remove_me");
-
-    /* Shorten. */
-    ConfWriter_start_short_names();
-    ConfWriter_shorten_macro("DIR_SEP");
-    ConfWriter_shorten_function("makedir");
-    ConfWriter_shorten_macro("MAKEDIR_MODE_IGNORED");
-    ConfWriter_end_short_names();
 
     ConfWriter_end_module();
 }
