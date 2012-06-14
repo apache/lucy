@@ -106,28 +106,6 @@ Memory_run(void) {
         }
     }
 
-    /* Shorten */
-    ConfWriter_start_short_names();
-    if (has_sys_mman_h) {
-        ConfWriter_shorten_macro("HAS_SYS_MMAN_H");
-    }
-    if (has_alloca_h) {
-        ConfWriter_shorten_macro("HAS_ALLOCA_H");
-    }
-    if (has_malloc_h) {
-        ConfWriter_shorten_macro("HAS_MALLOC_H");
-        if (!has_alloca && has_underscore_alloca) {
-            ConfWriter_shorten_function("alloca");
-        }
-    }
-    if (need_stdlib_h) {
-        ConfWriter_shorten_macro("ALLOCA_IN_STDLIB_H");
-    }
-    if (!has_alloca && has_builtin_alloca) {
-        ConfWriter_shorten_function("alloca");
-    }
-    ConfWriter_end_short_names();
-
     ConfWriter_end_module();
 }
 

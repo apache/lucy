@@ -68,22 +68,6 @@ AtomicOps_run(void) {
         ConfWriter_add_def("HAS_INTRIN_H", NULL);
     }
 
-    /* Shorten */
-    ConfWriter_start_short_names();
-    if (has_libkern_osatomic_h) {
-        ConfWriter_shorten_macro("HAS_LIBKERN_OSATOMIC_H");
-        if (has_osatomic_cas_ptr) {
-            ConfWriter_shorten_macro("HAS_OSATOMIC_CAS_PTR");
-        }
-    }
-    if (has_sys_atomic_h) {
-        ConfWriter_shorten_macro("HAS_SYS_ATOMIC_H");
-    }
-    if (has_intrin_h) {
-        ConfWriter_shorten_macro("HAS_INTRIN_H");
-    }
-    ConfWriter_end_short_names();
-
     ConfWriter_end_module();
 }
 

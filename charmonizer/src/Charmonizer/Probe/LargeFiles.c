@@ -168,40 +168,6 @@ LargeFiles_run(void) {
         ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_BLOCKS\n");
     }
 
-    /* Short names. */
-    ConfWriter_start_short_names();
-    if (found_off64_t) {
-        ConfWriter_shorten_macro("HAS_64BIT_OFFSET_TYPE");
-        if (strcmp(off64_type, "off64_t") != 0) {
-            ConfWriter_shorten_typedef("off64_t");
-        }
-    }
-    if (found_stdio64) {
-        ConfWriter_shorten_macro("HAS_64BIT_STDIO");
-        if (strcmp(fopen_command, "fopen64") != 0) {
-            ConfWriter_shorten_function("fopen64");
-        }
-        if (strcmp(fopen_command, "ftello64") != 0) {
-            ConfWriter_shorten_function("ftello64");
-        }
-        if (strcmp(fopen_command, "fseeko64") != 0) {
-            ConfWriter_shorten_function("fseeko64");
-        }
-    }
-    if (found_lseek) {
-        ConfWriter_shorten_macro("HAS_64BIT_LSEEK");
-        if (strcmp(lseek_command, "lseek64") != 0) {
-            ConfWriter_shorten_function("lseek64");
-        }
-    }
-    if (found_pread64) {
-        ConfWriter_shorten_macro("HAS_64BIT_PREAD");
-        if (strcmp(pread64_command, "pread64") != 0) {
-            ConfWriter_shorten_function("pread64");
-        }
-    }
-    ConfWriter_end_short_names();
-
     ConfWriter_end_module();
 }
 

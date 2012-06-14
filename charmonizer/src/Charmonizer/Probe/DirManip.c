@@ -200,14 +200,8 @@ DirManip_run(void) {
     /* Shorten. */
     ConfWriter_start_short_names();
     ConfWriter_shorten_macro("DIR_SEP");
-    if (has_dirent_h)     { ConfWriter_shorten_macro("HAS_DIRENT_H"); }
-    if (has_direct_h)     { ConfWriter_shorten_macro("HAS_DIRECT_H"); }
-    if (has_dirent_d_namlen) { ConfWriter_shorten_macro("HAS_DIRENT_D_NAMLEN"); }
-    if (has_dirent_d_type)   { ConfWriter_shorten_macro("HAS_DIRENT_D_TYPE"); }
     ConfWriter_shorten_function("makedir");
     ConfWriter_shorten_macro("MAKEDIR_MODE_IGNORED");
-    if (remove_zaps_dirs) { ConfWriter_shorten_macro("REMOVE_ZAPS_DIRS"); }
-
     ConfWriter_end_short_names();
 
     ConfWriter_end_module();

@@ -69,12 +69,6 @@ SymbolVisibility_run(void) {
         ConfWriter_add_def("IMPORT", NULL);
     }
 
-    /* Shorten */
-    ConfWriter_start_short_names();
-    ConfWriter_shorten_macro("EXPORT");
-    ConfWriter_shorten_macro("IMPORT");
-    ConfWriter_end_short_names();
-
     ConfWriter_end_module();
 }
 

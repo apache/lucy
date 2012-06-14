@@ -31,12 +31,6 @@ UnusedVars_run(void) {
     ConfWriter_add_def("UNUSED_VAR(x)", "((void)x)");
     ConfWriter_add_def("UNREACHABLE_RETURN(type)", "return (type)0");
 
-    /* Shorten. */
-    ConfWriter_start_short_names();
-    ConfWriter_shorten_macro("UNUSED_VAR");
-    ConfWriter_shorten_macro("UNREACHABLE_RETURN");
-    ConfWriter_end_short_names();
-
     ConfWriter_end_module();
 }
 

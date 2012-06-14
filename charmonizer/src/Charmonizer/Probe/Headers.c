@@ -168,21 +168,6 @@ Headers_run(void) {
         ConfWriter_add_def(aff_buf, NULL);
     }
 
-    /* Shorten. */
-    ConfWriter_start_short_names();
-    if (has_posix) {
-        ConfWriter_shorten_macro("HAS_POSIX");
-    }
-    if (has_c89) {
-        ConfWriter_shorten_macro("HAS_C89");
-        ConfWriter_shorten_macro("HAS_C90");
-    }
-    for (i = 0; keepers[i] != NULL; i++) {
-        S_encode_affirmation(keepers[i]);
-        ConfWriter_shorten_macro(aff_buf);
-    }
-    ConfWriter_end_short_names();
-
     ConfWriter_end_module();
 }
 

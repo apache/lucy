@@ -45,16 +45,6 @@ Floats_run(void) {
     ConfWriter_add_def("F64_NEGINF", "(chy_f64neginf.d)");
     ConfWriter_add_def("F64_NAN", "(chy_f64nan.d)");
 
-    /* Shorten. */
-    ConfWriter_start_short_names();
-    ConfWriter_shorten_macro("F32_INF");
-    ConfWriter_shorten_macro("F32_NEGINF");
-    ConfWriter_shorten_macro("F32_NAN");
-    ConfWriter_shorten_macro("F64_INF");
-    ConfWriter_shorten_macro("F64_NEGINF");
-    ConfWriter_shorten_macro("F64_NAN");
-    ConfWriter_end_short_names();
-
     ConfWriter_end_module();
 }
 

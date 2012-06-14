@@ -222,8 +222,50 @@ ConfWriter_end_module(void) {
                          (int)defs[i].type);
         }
     }
-    S_clear_def_list();
+
+    /* Write out short names. */
+    ConfWriter_append_conf(
+        "\n#if defined(CHY_USE_SHORT_NAMES) "
+        "|| defined(CHAZ_USE_SHORT_NAMES)\n"
+    );
+    for (i = 0; i < def_count; i++) {
+        switch (defs[i].type) {
+            case CONFELEM_DEF: {
+                    const char *sym = defs[i].str1;
+                    const char *value = defs[i].str2;
+                    if (!value || strcmp(sym, value) != 0) {
+                        const char *prefix = S_sym_is_uppercase(sym)
+                                             ? "CHY_" : "chy_";
+                        ConfWriter_append_conf("  #define %s %s%s\n", sym,
+                                               prefix, sym);
+                    }
+                }
+                break;
+            case CONFELEM_TYPEDEF: {
+                    const char *sym = defs[i].str2;
+                    const char *value = defs[i].str1;
+                    if (strcmp(sym, value) != 0) {
+                        const char *prefix = S_sym_is_uppercase(sym)
+                                             ? "CHY_" : "chy_";
+                        ConfWriter_append_conf("  #define %s %s%s\n", sym,
+                                               prefix, sym);
+                    }
+                }
+                break;
+            case CONFELEM_SYS_INCLUDE:
+            case CONFELEM_LOCAL_INCLUDE:
+                /* no-op */
+                break;
+            default:
+                Util_die("Internal error: bad element type %d",
+                         (int)defs[i].type);
+        }
+    }
+
+    ConfWriter_append_conf("#endif /* USE_SHORT_NAMES */\n");
     ConfWriter_append_conf("\n");
+
+    S_clear_def_list();
 }
 
 void
