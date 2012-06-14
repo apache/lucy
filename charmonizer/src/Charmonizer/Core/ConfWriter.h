@@ -56,6 +56,26 @@ chaz_ConfWriter_clean_up(void);
 void
 chaz_ConfWriter_append_conf(const char *fmt, ...);
 
+/* Add a pound-define.
+ */
+void
+chaz_ConfWriter_add_def(const char *sym, const char *value);
+
+/* Add a typedef.
+ */
+void
+chaz_ConfWriter_add_typedef(const char *type, const char *alias);
+
+/* Pound-include a system header (within angle brackets).
+ */
+void
+chaz_ConfWriter_add_sys_include(const char *header);
+
+/* Pound-include a locally created header (within quotes).
+ */
+void
+chaz_ConfWriter_add_local_include(const char *header);
+
 /* Start a short names block.
  */
 void
@@ -102,6 +122,10 @@ chaz_ConfWriter_end_module(void);
   #define ConfWriter_start_short_names      chaz_ConfWriter_start_short_names
   #define ConfWriter_end_short_names        chaz_ConfWriter_end_short_names
   #define ConfWriter_append_conf            chaz_ConfWriter_append_conf
+  #define ConfWriter_add_def                chaz_ConfWriter_add_def
+  #define ConfWriter_add_typedef            chaz_ConfWriter_add_typedef
+  #define ConfWriter_add_sys_include        chaz_ConfWriter_add_sys_include
+  #define ConfWriter_add_local_include      chaz_ConfWriter_add_local_include
   #define ConfWriter_shorten_macro          chaz_ConfWriter_shorten_macro
   #define ConfWriter_shorten_typedef        chaz_ConfWriter_shorten_typedef
   #define ConfWriter_shorten_function       chaz_ConfWriter_shorten_function

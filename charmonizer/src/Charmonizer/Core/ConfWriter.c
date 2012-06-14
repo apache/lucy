@@ -79,6 +79,62 @@ ConfWriter_append_conf(const char *fmt, ...) {
     va_end(args);
 }
 
+static int
+S_sym_is_uppercase(const char *sym) {
+    unsigned i;
+    for (i = 0; sym[i] != 0; i++) {
+        if (!isupper(sym[i])) {
+            if (islower(sym[i])) {
+                return false;
+            }
+            else if (sym[i] != '_') {
+                return true;
+            }
+        }
+    }
+    return true;
+}
+
+void
+ConfWriter_add_def(const char *sym, const char *value) {
+    if (value) {
+        if (S_sym_is_uppercase(sym)) {
+            fprintf(charmony_fh, "#define CHY_%s %s\n", sym, value);
+        }
+        else {
+            fprintf(charmony_fh, "#define chy_%s %s\n", sym, value);
+        }
+    }
+    else {
+        if (S_sym_is_uppercase(sym)) {
+            fprintf(charmony_fh, "#define CHY_%s\n", sym);
+        }
+        else {
+            fprintf(charmony_fh, "#define chy_%s\n", sym);
+        }
+    }
+}
+
+void
+ConfWriter_add_typedef(const char *type, const char *alias) {
+    if (S_sym_is_uppercase(alias)) {
+        fprintf(charmony_fh, "typedef %s CHY_%s;\n", type, alias);
+    }
+    else {
+        fprintf(charmony_fh, "typedef %s chy_%s;\n", type, alias);
+    }
+}
+
+void
+ConfWriter_add_sys_include(const char *header) {
+    fprintf(charmony_fh, "#include <%s>\n", header);
+}
+
+void
+ConfWriter_add_local_include(const char *header) {
+    fprintf(charmony_fh, "#include \"%s\"\n", header);
+}
+
 void
 ConfWriter_start_short_names(void) {
     ConfWriter_append_conf(
