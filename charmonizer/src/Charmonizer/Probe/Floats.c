@@ -37,13 +37,13 @@ Floats_run(void) {
         "static const chy_floatu64 chy_f64inf    = {CHY_U64_C(0x7ff0000000000000)};\n"
         "static const chy_floatu64 chy_f64neginf = {CHY_U64_C(0xfff0000000000000)};\n"
         "static const chy_floatu64 chy_f64nan    = {CHY_U64_C(0x7ff8000000000000)};\n"
-        "#define CHY_F32_INF (chy_f32inf.f)\n"
-        "#define CHY_F32_NEGINF (chy_f32neginf.f)\n"
-        "#define CHY_F32_NAN (chy_f32nan.f)\n"
-        "#define CHY_F64_INF (chy_f64inf.d)\n"
-        "#define CHY_F64_NEGINF (chy_f64neginf.d)\n"
-        "#define CHY_F64_NAN (chy_f64nan.d)\n"
     );
+    ConfWriter_add_def("F32_INF", "(chy_f32inf.f)");
+    ConfWriter_add_def("F32_NEGINF", "(chy_f32neginf.f)");
+    ConfWriter_add_def("F32_NAN", "(chy_f32nan.f)");
+    ConfWriter_add_def("F64_INF", "(chy_f64inf.d)");
+    ConfWriter_add_def("F64_NEGINF", "(chy_f64neginf.d)");
+    ConfWriter_add_def("F64_NAN", "(chy_f64nan.d)");
 
     /* Shorten. */
     ConfWriter_start_short_names();

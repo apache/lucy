@@ -140,10 +140,10 @@ DirManip_run(void) {
 
     /* Header checks. */
     if (has_dirent_h) {
-        ConfWriter_append_conf("#define CHY_HAS_DIRENT_H\n");
+        ConfWriter_add_def("HAS_DIRENT_H", NULL);
     }
     if (has_direct_h) {
-        ConfWriter_append_conf("#define CHY_HAS_DIRECT_H\n");
+        ConfWriter_add_def("HAS_DIRECT_H", NULL);
     }
 
     /* Check for members in struct dirent. */
@@ -153,14 +153,14 @@ DirManip_run(void) {
                                   "#include <sys/types.h>\n#include <dirent.h>"
                               );
         if (has_dirent_d_namlen) {
-            ConfWriter_append_conf("#define CHY_HAS_DIRENT_D_NAMLEN\n", dir_sep);
+            ConfWriter_add_def("HAS_DIRENT_D_NAMLEN", NULL);
         }
         has_dirent_d_type = HeadCheck_contains_member(
                                 "struct dirent", "d_type",
                                 "#include <sys/types.h>\n#include <dirent.h>"
                             );
         if (has_dirent_d_type) {
-            ConfWriter_append_conf("#define CHY_HAS_DIRENT_D_TYPE\n", dir_sep);
+            ConfWriter_add_def("HAS_DIRENT_D_TYPE", NULL);
         }
     }
 
@@ -193,7 +193,7 @@ DirManip_run(void) {
     OS_mkdir("_charm_test_remove_me");
     if (0 == remove("_charm_test_remove_me")) {
         remove_zaps_dirs = true;
-        ConfWriter_append_conf("#define CHY_REMOVE_ZAPS_DIRS\n");
+        ConfWriter_add_def("REMOVE_ZAPS_DIRS", NULL);
     }
     OS_rmdir("_charm_test_remove_me");
 

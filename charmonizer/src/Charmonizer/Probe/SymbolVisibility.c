@@ -46,10 +46,8 @@ SymbolVisibility_run(void) {
         sprintf(code_buf, symbol_exporting_code, export_win);
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             can_control_visibility = true;
-            ConfWriter_append_conf("#define CHY_EXPORT %s\n", export_win);
-            ConfWriter_append_conf(
-                "#define CHY_IMPORT __declspec(dllimport)\n"
-            );
+            ConfWriter_add_def("EXPORT", export_win);
+            ConfWriter_add_def("IMPORT", "__declspec(dllimport)");
         }
     }
 
@@ -59,16 +57,16 @@ SymbolVisibility_run(void) {
         sprintf(code_buf, symbol_exporting_code, export_gcc);
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             can_control_visibility = true;
-            ConfWriter_append_conf("#define CHY_EXPORT %s\n", export_gcc);
-            ConfWriter_append_conf("#define CHY_IMPORT\n");
+            ConfWriter_add_def("EXPORT", export_gcc);
+            ConfWriter_add_def("IMPORT", NULL);
         }
     }
     CC_set_warnings_as_errors(0);
 
     /* Default. */
     if (!can_control_visibility) {
-        ConfWriter_append_conf("#define CHY_EXPORT\n");
-        ConfWriter_append_conf("#define CHY_IMPORT\n");
+        ConfWriter_add_def("EXPORT", NULL);
+        ConfWriter_add_def("IMPORT", NULL);
     }
 
     /* Shorten */

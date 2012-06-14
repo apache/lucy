@@ -110,7 +110,7 @@ Headers_run(void) {
     /* Try for all POSIX headers in one blast. */
     if (HeadCheck_check_many_headers((const char**)posix_headers)) {
         has_posix = true;
-        ConfWriter_append_conf("#define CHY_HAS_POSIX\n");
+        ConfWriter_add_def("HAS_POSIX", NULL);
         for (i = 0; posix_headers[i] != NULL; i++) {
             S_keep(posix_headers[i]);
         }
@@ -127,8 +127,8 @@ Headers_run(void) {
     /* Test for all c89 headers in one blast. */
     if (HeadCheck_check_many_headers((const char**)c89_headers)) {
         has_c89 = true;
-        ConfWriter_append_conf("#define CHY_HAS_C89\n");
-        ConfWriter_append_conf("#define CHY_HAS_C90\n");
+        ConfWriter_add_def("HAS_C89", NULL);
+        ConfWriter_add_def("HAS_C90", NULL);
         for (i = 0; c89_headers[i] != NULL; i++) {
             S_keep(c89_headers[i]);
         }
@@ -165,7 +165,7 @@ Headers_run(void) {
     /* Append the config with every header detected so far. */
     for (i = 0; keepers[i] != NULL; i++) {
         S_encode_affirmation(keepers[i]);
-        ConfWriter_append_conf("#define CHY_%s\n", aff_buf);
+        ConfWriter_add_def(aff_buf, NULL);
     }
 
     /* Shorten. */

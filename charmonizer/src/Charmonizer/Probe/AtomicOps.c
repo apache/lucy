@@ -47,25 +47,25 @@ AtomicOps_run(void) {
 
     if (HeadCheck_check_header("libkern/OSAtomic.h")) {
         has_libkern_osatomic_h = true;
-        ConfWriter_append_conf("#define CHY_HAS_LIBKERN_OSATOMIC_H\n");
+        ConfWriter_add_def("HAS_LIBKERN_OSATOMIC_H", NULL);
 
         /* Check for OSAtomicCompareAndSwapPtr, introduced in later versions
          * of OSAtomic.h. */
         has_osatomic_cas_ptr = CC_test_compile(osatomic_casptr_code,
                                                strlen(osatomic_casptr_code));
         if (has_osatomic_cas_ptr) {
-            ConfWriter_append_conf("#define CHY_HAS_OSATOMIC_CAS_PTR\n");
+            ConfWriter_add_def("HAS_OSATOMIC_CAS_PTR", NULL);
         }
     }
     if (HeadCheck_check_header("sys/atomic.h")) {
         has_sys_atomic_h = true;
-        ConfWriter_append_conf("#define CHY_HAS_SYS_ATOMIC_H\n");
+        ConfWriter_add_def("HAS_SYS_ATOMIC_H", NULL);
     }
     if (HeadCheck_check_header("windows.h")
         && HeadCheck_check_header("intrin.h")
        ) {
         has_intrin_h = true;
-        ConfWriter_append_conf("#define CHY_HAS_INTRIN_H\n");
+        ConfWriter_add_def("HAS_INTRIN_H", NULL);
     }
 
     /* Shorten */

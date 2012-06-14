@@ -88,15 +88,16 @@ Integers_run(void) {
     char i64_t_postfix[10];
     char u64_t_postfix[10];
     char code_buf[1000];
+    char scratch[50];
 
     ConfWriter_start_module("Integers");
 
     /* Document endian-ness. */
     if (S_machine_is_big_endian()) {
-        ConfWriter_append_conf("#define CHY_BIG_END\n");
+        ConfWriter_add_def("BIG_END", NULL);
     }
     else {
-        ConfWriter_append_conf("#define CHY_LITTLE_END\n");
+        ConfWriter_add_def("LITTLE_END", NULL);
     }
 
     /* Record sizeof() for several common integer types. */
@@ -204,37 +205,42 @@ Integers_run(void) {
 
     /* Write out some conditional defines. */
     if (has_inttypes) {
-        ConfWriter_append_conf("#define CHY_HAS_INTTYPES_H\n");
+        ConfWriter_add_def("HAS_INTTYPES_H", NULL);
     }
     if (has_stdint) {
-        ConfWriter_append_conf("#define CHY_HAS_STDINT_H\n");
+        ConfWriter_add_def("HAS_STDINT_H", NULL);
     }
     if (has_long_long) {
-        ConfWriter_append_conf("#define CHY_HAS_LONG_LONG\n");
+        ConfWriter_add_def("HAS_LONG_LONG", NULL);
     }
     if (has___int64) {
-        ConfWriter_append_conf("#define CHY_HAS___INT64\n");
+        ConfWriter_add_def("HAS___INT64", NULL);
     }
 
     /* Write out sizes. */
-    ConfWriter_append_conf("#define CHY_SIZEOF_CHAR %d\n",  sizeof_char);
-    ConfWriter_append_conf("#define CHY_SIZEOF_SHORT %d\n", sizeof_short);
-    ConfWriter_append_conf("#define CHY_SIZEOF_INT %d\n",   sizeof_int);
-    ConfWriter_append_conf("#define CHY_SIZEOF_LONG %d\n",  sizeof_long);
-    ConfWriter_append_conf("#define CHY_SIZEOF_PTR %d\n",   sizeof_ptr);
+    sprintf(scratch, "%d", sizeof_char);
+    ConfWriter_add_def("SIZEOF_CHAR", scratch);
+    sprintf(scratch, "%d", sizeof_short);
+    ConfWriter_add_def("SIZEOF_SHORT", scratch);
+    sprintf(scratch, "%d", sizeof_int);
+    ConfWriter_add_def("SIZEOF_INT", scratch);
+    sprintf(scratch, "%d", sizeof_long);
+    ConfWriter_add_def("SIZEOF_LONG", scratch);
+    sprintf(scratch, "%d", sizeof_ptr);
+    ConfWriter_add_def("SIZEOF_PTR", scratch);
     if (has_long_long) {
-        ConfWriter_append_conf("#define CHY_SIZEOF_LONG_LONG %d\n",
-                               sizeof_long_long);
+        sprintf(scratch, "%d", sizeof_long_long);
+        ConfWriter_add_def("SIZEOF_LONG_LONG", scratch);
     }
     if (has___int64) {
-        ConfWriter_append_conf("#define CHY_SIZEOF___INT64 %d\n",
-                               sizeof___int64);
+        sprintf(scratch, "%d", sizeof___int64);
+        ConfWriter_add_def("SIZEOF___INT64", scratch);
     }
 
     /* Write affirmations, typedefs and maximums/minimums. */
-    ConfWriter_append_conf("typedef int chy_bool_t;\n");
+    ConfWriter_add_typedef("int", "bool_t");
     if (has_stdint) {
-        ConfWriter_append_conf("#include <stdint.h>\n");
+        ConfWriter_add_sys_include("stdint.h");
     }
     else {
         /* we support only the following subset of stdint.h
@@ -248,76 +254,68 @@ Integers_run(void) {
          *   uint64_t
          */
         if (has_8) {
-            ConfWriter_append_conf(
-                "typedef signed char int8_t;\n"
-                "typedef unsigned char uint8_t;\n"
-            );
+            ConfWriter_add_typedef("signed char", "int8_t");
+            ConfWriter_add_typedef("unsigned char", "uint8_t");
         }
         if (has_16) {
-            ConfWriter_append_conf(
-                "typedef short int16_t;\n"
-                "typedef unsigned short uint16_t;\n"
-            );
+            ConfWriter_add_typedef("signed short", "int16_t");
+            ConfWriter_add_typedef("unsigned short", "uint16_t");
         }
         if (has_32) {
-            ConfWriter_append_conf(
-                "typedef %s int32_t;\n", i32_t_type
-            );
-            ConfWriter_append_conf(
-                "typedef unsigned %s uint32_t;\n", i32_t_type
-            );
+            ConfWriter_add_typedef(i32_t_type, "int32_t");
+            sprintf(scratch, "unsigned %s", i32_t_type);
+            ConfWriter_add_typedef(scratch, "uint32_t");
         }
         if (has_64) {
-            ConfWriter_append_conf(
-                "typedef %s int64_t;\n", i64_t_type
-            );
-            ConfWriter_append_conf(
-                "typedef unsigned %s uint64_t;\n", i64_t_type
-            );
+            ConfWriter_add_typedef(i64_t_type, "int64_t");
+            sprintf(scratch, "unsigned %s", i64_t_type);
+            ConfWriter_add_typedef(scratch, "uint64_t");
         }
     }
     if (has_8) {
-        ConfWriter_append_conf(
-            "#define CHY_HAS_I8_T\n"
-            "typedef signed char chy_i8_t;\n"
-            "typedef unsigned char chy_u8_t;\n"
-            "#define CHY_I8_MAX 0x7F\n"
-            "#define CHY_I8_MIN (-I8_MAX - 1)\n"
-            "#define CHY_U8_MAX (I8_MAX * 2 + 1)\n"
-        );
+        ConfWriter_add_def("HAS_I8_T", NULL);
+        ConfWriter_add_typedef("signed char", "i8_t");
+        ConfWriter_add_typedef("unsigned char", "u8_t");
+        /* FIXME: use integer literals. */
+        ConfWriter_add_def("I8_MAX", "0x7F");
+        ConfWriter_add_def("I8_MIN", "(-I8_MAX - 1)");
+        ConfWriter_add_def("U8_MAX", "(I8_MAX * 2 + 1)");
     }
     if (has_16) {
-        ConfWriter_append_conf(
-            "#define CHY_HAS_I16_T\n"
-            "typedef short chy_i16_t;\n"
-            "typedef unsigned short chy_u16_t;\n"
-            "#define CHY_I16_MAX 0x7FFF\n"
-            "#define CHY_I16_MIN (-I16_MAX - 1)\n"
-            "#define CHY_U16_MAX (I16_MAX * 2 + 1)\n"
-        );
+        ConfWriter_add_def("HAS_I16_T", NULL);
+        ConfWriter_add_typedef("short", "i16_t");
+        ConfWriter_add_typedef("unsigned short", "u16_t");
+        /* FIXME: use integer literals. */
+        ConfWriter_add_def("I16_MAX", "0x7FFF");
+        ConfWriter_add_def("I16_MIN", "(-I16_MAX - 1)");
+        ConfWriter_add_def("U16_MAX", "(I16_MAX * 2 + 1)");
     }
     if (has_32) {
-        ConfWriter_append_conf("#define CHY_HAS_I32_T\n");
-        ConfWriter_append_conf("typedef %s chy_i32_t;\n", i32_t_type);
-        ConfWriter_append_conf("typedef unsigned %s chy_u32_t;\n",
-                               i32_t_type);
-        ConfWriter_append_conf("#define CHY_I32_MAX 0x7FFFFFFF%s\n",
-                               i32_t_postfix);
-        ConfWriter_append_conf("#define CHY_I32_MIN (-I32_MAX - 1)\n");
-        ConfWriter_append_conf("#define CHY_U32_MAX (I32_MAX * 2%s + 1%s)\n",
-                               u32_t_postfix, u32_t_postfix);
+        ConfWriter_add_def("HAS_I32_T", NULL);
+        ConfWriter_add_typedef(i32_t_type, "i32_t");
+        sprintf(scratch, "unsigned %s", i32_t_type);
+        ConfWriter_add_typedef(scratch, "u32_t");
+        /* FIXME: use integer literals. */
+        sprintf(scratch, "0x7FFFFFFF%s", i32_t_postfix);
+        ConfWriter_add_def("I32_MAX", scratch);
+        ConfWriter_add_def("I32_MIN", "(-I32_MAX - 1)");
+        sprintf(scratch, "(I32_MAX * 2%s + 1%s)", u32_t_postfix,
+                u32_t_postfix);
+        ConfWriter_add_def("U32_MAX", scratch);
     }
     if (has_64) {
-        ConfWriter_append_conf("#define CHY_HAS_I64_T\n");
-        ConfWriter_append_conf("typedef %s chy_i64_t;\n", i64_t_type);
-        ConfWriter_append_conf("typedef unsigned %s chy_u64_t;\n",
-                               i64_t_type);
-        ConfWriter_append_conf("#define CHY_I64_MAX 0x7FFFFFFFFFFFFFFF%s\n",
-                               i64_t_postfix);
-        ConfWriter_append_conf("#define CHY_I64_MIN (-I64_MAX - 1%s)\n",
-                               i64_t_postfix);
-        ConfWriter_append_conf("#define CHY_U64_MAX (I64_MAX * 2%s + 1%s)\n",
-                               u64_t_postfix, u64_t_postfix);
+        ConfWriter_add_def("HAS_I64_T", NULL);
+        ConfWriter_add_typedef(i64_t_type, "i64_t");
+        sprintf(scratch, "unsigned %s", i64_t_type);
+        ConfWriter_add_typedef(scratch, "u64_t");
+        /* FIXME: use integer literals. */
+        sprintf(scratch, "0x7FFFFFFFFFFFFFFF%s", i64_t_postfix);
+        ConfWriter_add_def("I64_MAX", scratch);
+        sprintf(scratch, "(-I64_MAX - 1%s)", i64_t_postfix);
+        ConfWriter_add_def("I64_MIN", scratch);
+        sprintf(scratch, "(I64_MAX * 2%s + 1%s)", u64_t_postfix,
+                u64_t_postfix);
+        ConfWriter_add_def("U64_MAX", scratch);
     }
 
     /* Create the I64P and U64P printf macros. */
@@ -350,10 +348,10 @@ Integers_run(void) {
             if (output_len != 0
                 && strcmp(output, "18446744073709551615") == 0
                ) {
-                ConfWriter_append_conf("#define CHY_I64P \"%sd\"\n",
-                                       options[i]);
-                ConfWriter_append_conf("#define CHY_U64P \"%su\"\n",
-                                       options[i]);
+                sprintf(scratch, "\"%sd\"", options[i]);
+                ConfWriter_add_def("I64P", scratch);
+                sprintf(scratch, "\"%su\"", options[i]);
+                ConfWriter_add_def("U64P", scratch);
                 break;
             }
         }
@@ -363,31 +361,33 @@ Integers_run(void) {
     /* Write out the 32-bit and 64-bit literal macros. */
     if (has_32) {
         if (strcmp(i32_t_postfix, "") == 0) {
-            ConfWriter_append_conf("#define CHY_I32_C(n) n\n");
-            ConfWriter_append_conf("#define CHY_U32_C(n) n##%s\n",
-                                   u32_t_postfix);
+            ConfWriter_add_def("I32_C(n)", "n");
+            sprintf(scratch, "n##%s", u32_t_postfix);
+            ConfWriter_add_def("U32_C(n)", scratch);
         }
         else {
-            ConfWriter_append_conf("#define CHY_I32_C(n) n##%s\n",
-                                   i32_t_postfix);
-            ConfWriter_append_conf("#define CHY_U32_C(n) n##%s\n",
-                                   u32_t_postfix);
+            sprintf(scratch, "n##%s", i32_t_postfix);
+            ConfWriter_add_def("I32_C(n)", scratch);
+            sprintf(scratch, "n##%s", u32_t_postfix);
+            ConfWriter_add_def("U32_C(n)", scratch);
         }
     }
     if (has_64) {
-        ConfWriter_append_conf("#define CHY_I64_C(n) n##%s\n", i64_t_postfix);
-        ConfWriter_append_conf("#define CHY_U64_C(n) n##%s\n", u64_t_postfix);
+        sprintf(scratch, "n##%s", i64_t_postfix);
+        ConfWriter_add_def("I64_C(n)", scratch);
+        sprintf(scratch, "n##%s", u64_t_postfix);
+        ConfWriter_add_def("U64_C(n)", scratch);
     }
 
     /* Create macro for promoting pointers to integers. */
     if (has_64) {
         if (sizeof_ptr == 8) {
-            ConfWriter_append_conf("#define CHY_PTR_TO_I64(ptr) "
-                                   "((chy_i64_t)(chy_u64_t)(ptr))\n");
+            ConfWriter_add_def("PTR_TO_I64(ptr)",
+                               "((chy_i64_t)(chy_u64_t)(ptr))");
         }
         else {
-            ConfWriter_append_conf("#define CHY_PTR_TO_I64(ptr) "
-                                   "((chy_i64_t)(chy_u32_t)(ptr))\n");
+            ConfWriter_add_def("PTR_TO_I64(ptr)",
+                               "((chy_i64_t)(chy_u32_t)(ptr))");
         }
     }
 

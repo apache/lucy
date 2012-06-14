@@ -106,8 +106,8 @@ LargeFiles_run(void) {
     /* Find off64_t or equivalent. */
     found_off64_t = S_probe_off64();
     if (found_off64_t) {
-        ConfWriter_append_conf("#define CHY_HAS_64BIT_OFFSET_TYPE\n");
-        ConfWriter_append_conf("#define chy_off64_t %s\n",  off64_type);
+        ConfWriter_add_def("HAS_64BIT_OFFSET_TYPE", NULL);
+        ConfWriter_add_def("off64_t",  off64_type);
     }
 
     /* See if stdio variants with 64-bit support exist. */
@@ -115,13 +115,13 @@ LargeFiles_run(void) {
         stdio64_combo combo = stdio64_combos[i];
         if (S_probe_stdio64(&combo)) {
             found_stdio64 = true;
-            ConfWriter_append_conf("#define CHY_HAS_64BIT_STDIO\n");
+            ConfWriter_add_def("HAS_64BIT_STDIO", NULL);
             strcpy(fopen_command, combo.fopen_command);
             strcpy(fseek_command, combo.fseek_command);
             strcpy(ftell_command, combo.ftell_command);
-            ConfWriter_append_conf("#define chy_fopen64 %s\n",  fopen_command);
-            ConfWriter_append_conf("#define chy_ftello64 %s\n", ftell_command);
-            ConfWriter_append_conf("#define chy_fseeko64 %s\n", fseek_command);
+            ConfWriter_add_def("fopen64",  fopen_command);
+            ConfWriter_add_def("ftello64", ftell_command);
+            ConfWriter_add_def("fseeko64", fseek_command);
             break;
         }
     }
@@ -132,10 +132,9 @@ LargeFiles_run(void) {
             unbuff_combo combo = unbuff_combos[i];
             found_lseek = S_probe_lseek(&combo);
             if (found_lseek) {
-                ConfWriter_append_conf("#define CHY_HAS_64BIT_LSEEK\n");
+                ConfWriter_add_def("HAS_64BIT_LSEEK", NULL);
                 strcpy(lseek_command, combo.lseek_command);
-                ConfWriter_append_conf("#define chy_lseek64 %s\n",
-                                       lseek_command);
+                ConfWriter_add_def("lseek64", lseek_command);
                 break;
             }
         }
@@ -143,10 +142,9 @@ LargeFiles_run(void) {
             unbuff_combo combo = unbuff_combos[i];
             found_pread64 = S_probe_pread64(&combo);
             if (found_pread64) {
-                ConfWriter_append_conf("#define CHY_HAS_64BIT_PREAD\n");
+                ConfWriter_add_def("HAS_64BIT_PREAD", NULL);
                 strcpy(pread64_command, combo.pread64_command);
-                ConfWriter_append_conf("#define chy_pread64 %s\n",
-                                       pread64_command);
+                ConfWriter_add_def("pread64", pread64_command);
                 found_pread64 = true;
                 break;
             }

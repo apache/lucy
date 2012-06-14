@@ -56,7 +56,7 @@ Memory_run(void) {
         };
         if (chaz_HeadCheck_check_many_headers((const char**)mman_headers)) {
             has_sys_mman_h = true;
-            chaz_ConfWriter_append_conf("#define CHY_HAS_SYS_MMAN_H\n\n");
+            ConfWriter_add_def("HAS_SYS_MMAN_H", NULL);
         }
     }
 
@@ -65,16 +65,16 @@ Memory_run(void) {
     if (CC_test_compile(code_buf, strlen(code_buf))) {
         has_alloca_h = true;
         has_alloca   = true;
-        ConfWriter_append_conf("#define CHY_HAS_ALLOCA_H\n");
-        ConfWriter_append_conf("#define chy_alloca alloca\n");
+        ConfWriter_add_def("HAS_ALLOCA_H", NULL);
+        ConfWriter_add_def("alloca", "alloca");
     }
     if (!has_alloca) {
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_alloca    = true;
             need_stdlib_h = true;
-            ConfWriter_append_conf("#define CHY_ALLOCA_IN_STDLIB_H\n");
-            ConfWriter_append_conf("#define chy_alloca alloca\n");
+            ConfWriter_add_def("ALLOCA_IN_STDLIB_H", NULL);
+            ConfWriter_add_def("alloca", "alloca");
         }
     }
     if (!has_alloca) {
@@ -82,7 +82,7 @@ Memory_run(void) {
                 "__builtin_alloca");
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_builtin_alloca = true;
-            ConfWriter_append_conf("#define chy_alloca __builtin_alloca\n");
+            ConfWriter_add_def("alloca", "__builtin_alloca");
         }
     }
 
@@ -92,8 +92,8 @@ Memory_run(void) {
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_malloc_h = true;
             has_alloca   = true;
-            ConfWriter_append_conf("#define CHY_HAS_MALLOC_H\n");
-            ConfWriter_append_conf("#define chy_alloca alloca\n");
+            ConfWriter_add_def("HAS_MALLOC_H", NULL);
+            ConfWriter_add_def("alloca", "alloca");
         }
     }
     if (!(has_alloca || has_builtin_alloca)) {
@@ -101,8 +101,8 @@ Memory_run(void) {
         if (CC_test_compile(code_buf, strlen(code_buf))) {
             has_malloc_h = true;
             has_underscore_alloca = true;
-            ConfWriter_append_conf("#define CHY_HAS_MALLOC_H\n");
-            ConfWriter_append_conf("#define chy_alloca _alloca\n");
+            ConfWriter_add_def("HAS_MALLOC_H", NULL);
+            ConfWriter_add_def("chy_alloca", "_alloca");
         }
     }
 

@@ -60,8 +60,8 @@ VariadicMacros_run(void) {
     if (output != NULL) {
         has_varmacros = true;
         has_iso_varmacros = true;
-        ConfWriter_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
-        ConfWriter_append_conf("#define CHY_HAS_ISO_VARIADIC_MACROS\n");
+        ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
+        ConfWriter_add_def("HAS_ISO_VARIADIC_MACROS", NULL);
     }
 
     /* Test for GNU-style variadic macros. */
@@ -70,9 +70,9 @@ VariadicMacros_run(void) {
         has_gnuc_varmacros = true;
         if (has_varmacros == false) {
             has_varmacros = true;
-            ConfWriter_append_conf("#define CHY_HAS_VARIADIC_MACROS\n");
+            ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
         }
-        ConfWriter_append_conf("#define CHY_HAS_GNUC_VARIADIC_MACROS\n");
+        ConfWriter_add_def("HAS_GNUC_VARIADIC_MACROS", NULL);
     }
 
     /* Shorten. */

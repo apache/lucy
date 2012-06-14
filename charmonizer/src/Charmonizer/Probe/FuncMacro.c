@@ -101,19 +101,16 @@ FuncMacro_run(void) {
         const char *macro_text = has_iso_funcmac
                                  ? "__func__"
                                  : "__FUNCTION__";
-        ConfWriter_append_conf(
-            "#define CHY_HAS_FUNC_MACRO\n"
-            "#define CHY_FUNC_MACRO %s\n",
-            macro_text
-        );
+        ConfWriter_add_def("HAS_FUNC_MACRO", NULL);
+        ConfWriter_add_def("FUNC_MACRO", macro_text);
     }
 
     /* Write out specific defines. */
     if (has_iso_funcmac) {
-        ConfWriter_append_conf("#define CHY_HAS_ISO_FUNC_MACRO\n");
+        ConfWriter_add_def("HAS_ISO_FUNC_MACRO", NULL);
     }
     if (has_gnuc_funcmac) {
-        ConfWriter_append_conf("#define CHY_HAS_GNUC_FUNC_MACRO\n");
+        ConfWriter_add_def("HAS_GNUC_FUNC_MACRO", NULL);
     }
 
     /* Check for inline keyword. */
@@ -123,13 +120,13 @@ FuncMacro_run(void) {
         output = S_try_inline(inline_option, &output_len);
         if (output != NULL) {
             has_inline = true;
-            ConfWriter_append_conf("#define CHY_INLINE %s\n", inline_option);
+            ConfWriter_add_def("INLINE", inline_option);
             free(output);
             break;
         }
     }
     if (!has_inline) {
-        ConfWriter_append_conf("#define CHY_INLINE\n");
+        ConfWriter_add_def("INLINE", NULL);
     }
 
     /* Shorten. */
