@@ -26,8 +26,32 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef enum ConfElemType {
+    CONFELEM_DEF,
+    CONFELEM_TYPEDEF,
+    CONFELEM_SYS_INCLUDE,
+    CONFELEM_LOCAL_INCLUDE
+} ConfElemType;
+
+typedef struct ConfElem {
+    char *str1;
+    char *str2;
+    ConfElemType type;
+} ConfElem;
+
 /* Static vars. */
 static FILE *charmony_fh  = NULL;
+static ConfElem *defs      = NULL;
+static size_t    def_cap   = 0;
+static size_t    def_count = 0;
+
+/* Push a new elem onto the def list. */
+static void
+S_push_def_list_item(const char *str1, const char *str2, ConfElemType type);
+
+/* Free the def list. */
+static void
+S_clear_def_list(void);
 
 void
 ConfWriter_init(void) {
@@ -97,6 +121,11 @@ S_sym_is_uppercase(const char *sym) {
 
 void
 ConfWriter_add_def(const char *sym, const char *value) {
+    S_push_def_list_item(sym, value, CONFELEM_DEF);
+}
+
+static void
+S_append_def_to_conf(const char *sym, const char *value) {
     if (value) {
         if (S_sym_is_uppercase(sym)) {
             fprintf(charmony_fh, "#define CHY_%s %s\n", sym, value);
@@ -117,6 +146,11 @@ ConfWriter_add_def(const char *sym, const char *value) {
 
 void
 ConfWriter_add_typedef(const char *type, const char *alias) {
+    S_push_def_list_item(type, alias, CONFELEM_TYPEDEF);
+}
+
+static void
+S_append_typedef_to_conf(const char *type, const char *alias) {
     if (S_sym_is_uppercase(alias)) {
         fprintf(charmony_fh, "typedef %s CHY_%s;\n", type, alias);
     }
@@ -127,11 +161,21 @@ ConfWriter_add_typedef(const char *type, const char *alias) {
 
 void
 ConfWriter_add_sys_include(const char *header) {
+    S_push_def_list_item(header, NULL, CONFELEM_SYS_INCLUDE);
+}
+
+static void
+S_append_sys_include_to_conf(const char *header) {
     fprintf(charmony_fh, "#include <%s>\n", header);
 }
 
 void
 ConfWriter_add_local_include(const char *header) {
+    S_push_def_list_item(header, NULL, CONFELEM_LOCAL_INCLUDE);
+}
+
+static void
+S_append_local_include_to_conf(const char *header) {
     fprintf(charmony_fh, "#include \"%s\"\n", header);
 }
 
@@ -158,6 +202,27 @@ ConfWriter_start_module(const char *module_name) {
 
 void
 ConfWriter_end_module(void) {
+    size_t i;
+    for (i = 0; i < def_count; i++) {
+        switch (defs[i].type) {
+            case CONFELEM_DEF:
+                S_append_def_to_conf(defs[i].str1, defs[i].str2);
+                break;
+            case CONFELEM_TYPEDEF:
+                S_append_typedef_to_conf(defs[i].str1, defs[i].str2);
+                break;
+            case CONFELEM_SYS_INCLUDE:
+                S_append_sys_include_to_conf(defs[i].str1);
+                break;
+            case CONFELEM_LOCAL_INCLUDE:
+                S_append_local_include_to_conf(defs[i].str1);
+                break;
+            default:
+                Util_die("Internal error: bad element type %d",
+                         (int)defs[i].type);
+        }
+    }
+    S_clear_def_list();
     ConfWriter_append_conf("\n");
 }
 
@@ -176,4 +241,28 @@ ConfWriter_shorten_function(const char *sym) {
     ConfWriter_append_conf("  #define %s chy_%s\n", sym, sym);
 }
 
+static void
+S_push_def_list_item(const char *str1, const char *str2, ConfElemType type) {
+    if (def_count >= def_cap) {
+        def_cap += 10;
+        defs = (ConfElem*)realloc(defs, def_cap * sizeof(ConfElem));
+    }
+    defs[def_count].str1 = str1 ? Util_strdup(str1) : NULL;
+    defs[def_count].str2 = str2 ? Util_strdup(str2) : NULL;
+    defs[def_count].type = type;
+    def_count++;
+}
+
+static void
+S_clear_def_list(void) {
+    size_t i;
+    for (i = 0; i < def_count; i++) {
+        free(defs[i].str1);
+        free(defs[i].str2);
+    }
+    free(defs);
+    defs      = NULL;
+    def_cap   = 0;
+    def_count = 0;
+}
 
