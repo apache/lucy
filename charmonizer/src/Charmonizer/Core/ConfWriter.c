@@ -175,19 +175,6 @@ S_append_local_include_to_conf(const char *header) {
 }
 
 void
-ConfWriter_start_short_names(void) {
-    ConfWriter_append_conf(
-        "\n#if defined(CHY_USE_SHORT_NAMES) "
-        "|| defined(CHAZ_USE_SHORT_NAMES)\n"
-    );
-}
-
-void
-ConfWriter_end_short_names(void) {
-    ConfWriter_append_conf("#endif /* USE_SHORT_NAMES */\n");
-}
-
-void
 ConfWriter_start_module(const char *module_name) {
     if (chaz_Util_verbosity > 0) {
         printf("Running %s module...\n", module_name);
@@ -252,21 +239,6 @@ ConfWriter_end_module(void) {
     ConfWriter_append_conf("\n");
 
     S_clear_def_list();
-}
-
-void
-ConfWriter_shorten_macro(const char *sym) {
-    ConfWriter_append_conf("  #define %s CHY_%s\n", sym, sym);
-}
-
-void
-ConfWriter_shorten_typedef(const char *sym) {
-    ConfWriter_append_conf("  #define %s chy_%s\n", sym, sym);
-}
-
-void
-ConfWriter_shorten_function(const char *sym) {
-    ConfWriter_append_conf("  #define %s chy_%s\n", sym, sym);
 }
 
 static void
