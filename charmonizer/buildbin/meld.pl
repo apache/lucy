@@ -61,8 +61,17 @@ if ( !@probes ) {
     @probes = map { $_ =~ s/\.c$//; $_ } grep {/\.c$/} readdir $dh;
 }
 
+my @core = qw(
+    Compiler
+    ConfWriter
+    ConfWriterC
+    HeaderChecker
+    OperatingSystem
+    Util
+);
+
 # Add Core headers.
-for (qw( Defines Compiler ConfWriter HeaderChecker OperatingSystem Util )) {
+for ( 'Defines', @core ) {
     push @charm_files, catfile( qw( src Charmonizer Core ), "$_.h" );
 }
 push @charm_files, catfile(qw( src Charmonizer Probe.h ));
@@ -73,7 +82,7 @@ for ( sort @probes ) {
 }
 
 # Add Core implementation files.
-for (qw( Compiler ConfWriter HeaderChecker OperatingSystem Util )) {
+for (@core) {
     push @charm_files, catfile( qw( src Charmonizer Core ), "$_.c" );
 }
 push @charm_files, catfile(qw( src Charmonizer Probe.c ));
