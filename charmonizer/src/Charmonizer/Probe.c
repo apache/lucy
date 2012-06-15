@@ -35,8 +35,7 @@ static void
 S_remove_charm_h(void);
 
 void
-Probe_init(const char *cc_command, const char *cc_flags,
-           const char *charmony_start) {
+Probe_init(const char *cc_command, const char *cc_flags) {
     /* Proces CHARM_VERBOSITY environment variable. */
     const char *verbosity_env = getenv("CHARM_VERBOSITY");
     if (verbosity_env && strlen(verbosity_env)) {
@@ -48,7 +47,6 @@ Probe_init(const char *cc_command, const char *cc_flags,
     CC_init(cc_command, cc_flags);
     ConfWriter_init();
     HeadCheck_init();
-    ConfWriter_open_charmony_h(charmony_start);
     S_write_charm_h();
 
     if (Util_verbosity) { printf("Initialization complete.\n"); }

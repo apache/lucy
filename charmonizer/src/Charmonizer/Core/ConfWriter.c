@@ -45,6 +45,12 @@ static ConfElem *defs      = NULL;
 static size_t    def_cap   = 0;
 static size_t    def_count = 0;
 
+/* Open the charmony.h file handle.  Print supplied text to it, if non-null.
+ * Print an explanatory comment and open the include guard.
+ */
+static void
+S_open_charmony_h(const char *charmony_start);
+
 /* Push a new elem onto the def list. */
 static void
 S_push_def_list_item(const char *str1, const char *str2, ConfElemType type);
@@ -55,11 +61,12 @@ S_clear_def_list(void);
 
 void
 ConfWriter_init(void) {
+    S_open_charmony_h(NULL);
     return;
 }
 
-void
-ConfWriter_open_charmony_h(const char *charmony_start) {
+static void
+S_open_charmony_h(const char *charmony_start) {
     /* Open the filehandle. */
     charmony_fh = fopen("charmony.h", "w+");
     if (charmony_fh == NULL) {

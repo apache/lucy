@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     else {
         char *cc_command = argv[1];
         char *cc_flags   = argv[2];
-        chaz_Probe_init(cc_command, cc_flags, NULL);
+        chaz_Probe_init(cc_command, cc_flags);
     }
 
     /* Run probe modules. */

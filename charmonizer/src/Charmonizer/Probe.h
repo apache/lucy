@@ -36,11 +36,9 @@ extern "C" {
  *
  * @param cc_command the string used to invoke the C compiler via system()
  * @param cc_flags flags which will be passed on to the C compiler
- * @param charmony_start Code to prepend onto the front of charmony.h
  */
 void
-chaz_Probe_init(const char *cc_command, const char *cc_flags,
-                const char *charmony_start);
+chaz_Probe_init(const char *cc_command, const char *cc_flags);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
  * should be called only after everything else finishes.
