@@ -25,7 +25,10 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include <stdarg.h>
 #include "Charmonizer/Core/Defines.h"
+
+struct chaz_ConfWriter;
 
 /* Initialize elements needed by ConfWriter.  Must be called before anything
  * else, but after os and compiler are initialized.
@@ -73,6 +76,41 @@ chaz_ConfWriter_start_module(const char *module_name);
  */
 void
 chaz_ConfWriter_end_module(void);
+
+void
+chaz_ConfWriter_add_writer(struct chaz_ConfWriter *writer);
+
+#ifdef CHAZ_CONFWRITER_INTERNAL
+typedef void
+(*chaz_ConfWriter_clean_up_t)(void);
+typedef void
+(*chaz_ConfWriter_vappend_conf_t)(const char *fmt, va_list args); 
+typedef void
+(*chaz_ConfWriter_add_def_t)(const char *sym, const char *value);
+typedef void
+(*chaz_ConfWriter_add_typedef_t)(const char *type, const char *alias);
+typedef void
+(*chaz_ConfWriter_add_sys_include_t)(const char *header);
+typedef void
+(*chaz_ConfWriter_add_local_include_t)(const char *header);
+typedef void
+(*chaz_ConfWriter_start_module_t)(const char *module_name);
+typedef void
+(*chaz_ConfWriter_end_module_t)(void);
+typedef struct chaz_ConfWriter {
+    chaz_ConfWriter_clean_up_t          clean_up;
+    chaz_ConfWriter_vappend_conf_t      vappend_conf;
+    chaz_ConfWriter_add_def_t           add_def;
+    chaz_ConfWriter_add_typedef_t       add_typedef;
+    chaz_ConfWriter_add_sys_include_t   add_sys_include;
+    chaz_ConfWriter_add_local_include_t add_local_include;
+    chaz_ConfWriter_start_module_t      start_module;
+    chaz_ConfWriter_end_module_t        end_module;
+} chaz_ConfWriter;
+#ifdef CHAZ_USE_SHORT_NAMES
+  #define ConfWriter chaz_ConfWriter
+#endif /* CHAZ_USE_SHORT_NAMES */
+#endif /* CHAZ_CONFWRITER_INTERNAL */
 
 #ifdef   CHAZ_USE_SHORT_NAMES
   #define ConfWriter_init                   chaz_ConfWriter_init

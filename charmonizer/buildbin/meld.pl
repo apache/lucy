@@ -182,6 +182,7 @@ sub meld_start {
  */
 
 #define CHAZ_USE_SHORT_NAMES
+#define CHAZ_CONFWRITER_INTERNAL
 
 END_STUFF
 }

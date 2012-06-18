@@ -44,6 +44,7 @@ static FILE *charmony_fh  = NULL;
 static ConfElem *defs      = NULL;
 static size_t    def_cap   = 0;
 static size_t    def_count = 0;
+static ConfWriter CWC_conf_writer;
 
 /* Open the charmony.h file handle.  Print supplied text to it, if non-null.
  * Print an explanatory comment and open the include guard.
@@ -61,7 +62,16 @@ S_clear_def_list(void);
 
 void
 ConfWriterC_enable(void) {
+    CWC_conf_writer.clean_up          = chaz_ConfWriterC_clean_up;
+    CWC_conf_writer.vappend_conf      = chaz_ConfWriterC_vappend_conf;
+    CWC_conf_writer.add_def           = chaz_ConfWriterC_add_def;
+    CWC_conf_writer.add_typedef       = chaz_ConfWriterC_add_typedef;
+    CWC_conf_writer.add_sys_include   = chaz_ConfWriterC_add_sys_include;
+    CWC_conf_writer.add_local_include = chaz_ConfWriterC_add_local_include;
+    CWC_conf_writer.start_module      = chaz_ConfWriterC_start_module;
+    CWC_conf_writer.end_module        = chaz_ConfWriterC_end_module;
     S_open_charmony_h(NULL);
+    ConfWriter_add_writer(&CWC_conf_writer);
     return;
 }
 
