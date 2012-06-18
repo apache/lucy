@@ -37,18 +37,82 @@
 #include "Charmonizer/Core/ConfWriterC.h"
 #include "Charmonizer/Core/ConfWriterPerl.h"
 
-int main(int argc, char **argv) {
-    /* Parse and process arguments. */
-    if (argc != 3) {
+#define MAX_CC_LEN 128
+#define MAX_FLAGS_LEN 2048
+
+struct CLIArgs {
+    char cc_command[MAX_CC_LEN + 1];
+    char cc_flags[MAX_FLAGS_LEN + 1];
+    int  enable_c;
+    int  enable_perl;
+};
+
+/* Parse command line arguments. */
+static void
+S_parse_arguments(int argc, char **argv, struct CLIArgs *args) {
+    int i;
+    int output_enabled = 0;
+
+    /* Parse most args. */
+    for (i = 1; i < argc; i++) {
+        char *arg = argv[i];
+        if (strcmp(arg, "--") == 0) {
+            /* From here on out, everything will be a compiler flag. */
+            i++;
+            break;
+        }
+        if (strcmp(arg, "--enable-c") == 0) {
+            args->enable_c = 1;
+            output_enabled = 1;
+        }
+        else if (strcmp(arg, "--enable-perl") == 0) {
+            args->enable_perl = 1;
+            output_enabled = 1;
+        }
+        else if (memcmp(arg, "--cc=", 5) == 0) {
+            if (strlen(arg) > MAX_CC_LEN - 5) {
+                fprintf(stderr, "Exceeded max length for compiler command");
+                exit(1);
+            }
+            strcpy(args->cc_command, arg + 5);
+        }
+    }
+
+    /* Accumulate compiler flags. */
+    for (; i < argc; i++) {
+        char *arg = argv[i];
+        if (strlen(arg) + strlen(args->cc_flags) + 2 >= MAX_FLAGS_LEN) {
+            fprintf(stderr, "Exceeded max length for compiler flags");
+            exit(1);
+        }
+        strcat(args->cc_flags, " ");
+        strcat(args->cc_flags, arg);
+
+    }
+
+    /* Validate. */
+    if (!args->cc_command
+        || !strlen(args->cc_command)
+        || !output_enabled
+       ) {
         fprintf(stderr,
-                "Usage: ./charmonize CC_COMMAND CC_FLAGS\n");
+                "Usage: ./charmonize --cc=CC_COMMAND [--enable-c] "
+                "[--enable-perl] -- CC_FLAGS\n");
         exit(1);
     }
-    else {
-        char *cc_command = argv[1];
-        char *cc_flags   = argv[2];
-        chaz_Probe_init(cc_command, cc_flags);
+
+}
+
+int main(int argc, char **argv) {
+    struct CLIArgs args;
+    memset(&args, 0, sizeof(struct CLIArgs));
+
+    S_parse_arguments(argc, argv, &args);
+    chaz_Probe_init(args.cc_command, args.cc_flags);
+    if (args.enable_c) {
         chaz_ConfWriterC_enable();
+    }
+    if (args.enable_perl) {
         chaz_ConfWriterPerl_enable();
     }
 

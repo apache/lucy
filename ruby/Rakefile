@@ -118,7 +118,13 @@ desc "Run the charmonize executable, creating the charmony.h file"
 task :charmony => [:charmonize] do
   if !uptodate? CHARMONY_PATH, [CHARMONIZE_EXE_PATH]
     puts "Writing #{CHARMONY_PATH}...\n"
-    command = [CHARMONIZE_EXE_PATH, cc_command, all_ccflags]
+    command = [
+      CHARMONIZE_EXE_PATH, 
+      "--cc=\"#{cc_command}\"", 
+      "--enable-c",
+      "--",
+      all_ccflags
+    ]
     if ENV["CHARM_VALGRIND"]
       command.unshift("valgrind", "--leak-check=yes")
     end

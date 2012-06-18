@@ -137,18 +137,28 @@ sub ACTION_charmony {
     $self->add_to_cleanup($CHARMONY_PATH);
 
     # Prepare arguments to charmonize.
-    my $flags = join( ' ',
+    my @command = (
+        $CHARMONIZE_EXE_PATH,
+        '--cc=' . _quotify( $self->config('cc') ),
+        '--enable-c',
+        '--enable-perl',
+        '--',
         $self->config('ccflags'),
         @{ $self->extra_compiler_flags },
     );
-    $flags =~ s/"/\\"/g;
-    my @command = ( $CHARMONIZE_EXE_PATH, $self->config('cc'), $flags );
     if ( $ENV{CHARM_VALGRIND} ) {
         unshift @command, "valgrind", "--leak-check=yes";
     }
     print join( " ", @command ), $/;
 
     system(@command) and die "Failed to write $CHARMONY_PATH: $!";
+}
+
+sub _quotify {
+    my $string = shift;
+    $string =~ s/\\/\\\\/g;
+    $string =~ s/"/\\"/g;
+    return qq|"$string"|;
 }
 
 # Build the charmonizer tests.
