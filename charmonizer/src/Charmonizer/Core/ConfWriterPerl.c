@@ -15,8 +15,10 @@
  */
 
 #define CHAZ_USE_SHORT_NAMES
+#define CHAZ_CONFWRITER_INTERNAL
 
 #include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/ConfWriterPerl.h"
 #include <errno.h>
 #include <stdarg.h>
