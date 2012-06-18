@@ -65,6 +65,7 @@ my @core = qw(
     Compiler
     ConfWriter
     ConfWriterC
+    ConfWriterPerl
     HeaderChecker
     OperatingSystem
     Util

@@ -35,6 +35,7 @@
 #include "Charmonizer/Core/HeaderChecker.h"
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/ConfWriterC.h"
+#include "Charmonizer/Core/ConfWriterPerl.h"
 
 int main(int argc, char **argv) {
     /* Parse and process arguments. */
@@ -48,6 +49,7 @@ int main(int argc, char **argv) {
         char *cc_flags   = argv[2];
         chaz_Probe_init(cc_command, cc_flags);
         chaz_ConfWriterC_enable();
+        chaz_ConfWriterPerl_enable();
     }
 
     /* Run probe modules. */
