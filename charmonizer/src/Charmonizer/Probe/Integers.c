@@ -101,7 +101,7 @@ Integers_run(void) {
     }
 
     /* Record sizeof() for several common integer types. */
-    output = CC_capture_output(sizes_code, strlen(sizes_code), &output_len);
+    output = CC_capture_output(sizes_code, &output_len);
     if (output != NULL) {
         char *end_ptr = output;
 
@@ -118,7 +118,7 @@ Integers_run(void) {
 
     /* Determine whether long longs are available. */
     sprintf(code_buf, type64_code, "long long");
-    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         has_long_long    = true;
         sizeof_long_long = strtol(output, NULL, 10);
@@ -126,7 +126,7 @@ Integers_run(void) {
 
     /* Determine whether the __int64 type is available. */
     sprintf(code_buf, type64_code, "__int64");
-    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         has___int64 = true;
         sizeof___int64 = strtol(output, NULL, 10);
@@ -171,14 +171,13 @@ Integers_run(void) {
     }
     else if (has_64) {
         sprintf(code_buf, literal64_code, "LL");
-        output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+        output = CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(i64_t_postfix, "LL");
         }
         else {
             sprintf(code_buf, literal64_code, "i64");
-            output = CC_capture_output(code_buf, strlen(code_buf),
-                                       &output_len);
+            output = CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(i64_t_postfix, "i64");
             }
@@ -187,13 +186,13 @@ Integers_run(void) {
             }
         }
         sprintf(code_buf, literal64_code, "ULL");
-        output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+        output = CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(u64_t_postfix, "ULL");
         }
         else {
             sprintf(code_buf, literal64_code, "Ui64");
-            output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+            output = CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(u64_t_postfix, "Ui64");
             }
@@ -342,8 +341,7 @@ Integers_run(void) {
         for (i = 0; options[i] != NULL; i++) {
             /* Try to print 2**64-1, and see if we get it back intact. */
             sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
-            output = CC_capture_output(code_buf, strlen(code_buf),
-                                       &output_len);
+            output = CC_capture_output(code_buf, &output_len);
 
             if (output_len != 0
                 && strcmp(output, "18446744073709551615") == 0

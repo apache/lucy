@@ -100,13 +100,13 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     strcpy(include_flag, "-I ");
     strcpy(object_flag,  "-o ");
     strcpy(exe_flag,     "-o ");
-    compile_succeeded = CC_test_compile(code, strlen(code));
+    compile_succeeded = CC_test_compile(code);
     if (!compile_succeeded) {
         /* Try MSVC argument style. */
         strcpy(include_flag, "/I");
         strcpy(object_flag,  "/Fo");
         strcpy(exe_flag,     "/Fe");
-        compile_succeeded = CC_test_compile(code, strlen(code));
+        compile_succeeded = CC_test_compile(code);
     }
     if (!compile_succeeded) {
         Util_die("Failed to compile a small test file");
@@ -129,7 +129,7 @@ S_detect_macro(const char *macro) {
     char *code = (char*)malloc(size);
     int retval;
     sprintf(code, detect_macro_code, macro);
-    retval = CC_test_compile(code, strlen(code));
+    retval = CC_test_compile(code);
     free(code);
     return retval;
 }
@@ -178,7 +178,7 @@ S_inc_dir_string(void) {
 
 int
 CC_compile_exe(const char *source_path, const char *exe_name,
-               const char *code, size_t code_len) {
+               const char *code) {
     const char *exe_ext        = OS_exe_ext();
     size_t   exe_file_buf_size = strlen(exe_name) + strlen(exe_ext) + 1;
     char    *exe_file          = (char*)malloc(exe_file_buf_size);
@@ -196,7 +196,6 @@ CC_compile_exe(const char *source_path, const char *exe_name,
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
-    (void)code_len; /* Unused. */
 
     /* Write the source file. */
     Util_write_file(source_path, code);
@@ -239,7 +238,7 @@ CC_compile_exe(const char *source_path, const char *exe_name,
 
 int
 CC_compile_obj(const char *source_path, const char *obj_name,
-               const char *code, size_t code_len) {
+               const char *code) {
     const char *obj_ext        = OS_obj_ext();
     size_t   obj_file_buf_size = strlen(obj_name) + strlen(obj_ext) + 1;
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
@@ -255,7 +254,6 @@ CC_compile_obj(const char *source_path, const char *obj_name,
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
-    (void)code_len; /* Unused. */
 
     /* Write the source file. */
     Util_write_file(source_path, code);
@@ -286,19 +284,19 @@ CC_compile_obj(const char *source_path, const char *obj_name,
 }
 
 int
-CC_test_compile(const char *source, size_t source_len) {
+CC_test_compile(const char *source) {
     int compile_succeeded;
     if (!Util_remove_and_verify(try_obj_name)) {
         Util_die("Failed to delete file '%s'", try_obj_name);
     }
     compile_succeeded = CC_compile_obj(TRY_SOURCE_PATH, TRY_BASENAME,
-                                       source, source_len);
+                                       source);
     remove(try_obj_name);
     return compile_succeeded;
 }
 
 char*
-CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
+CC_capture_output(const char *source, size_t *output_len) {
     char *captured_output = NULL;
     int compile_succeeded;
 
@@ -312,7 +310,7 @@ CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
 
     /* Attempt compilation; if successful, run app and slurp output. */
     compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_BASENAME,
-                                       source, source_len);
+                                       source);
     if (compile_succeeded) {
         OS_run_local(try_exe_name, NULL);
         captured_output = Util_slurp_file(TARGET_PATH, output_len);

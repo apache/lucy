@@ -44,7 +44,7 @@ SymbolVisibility_run(void) {
     if (!can_control_visibility) {
         char export_win[] = "__declspec(dllexport)";
         sprintf(code_buf, symbol_exporting_code, export_win);
-        if (CC_test_compile(code_buf, strlen(code_buf))) {
+        if (CC_test_compile(code_buf)) {
             can_control_visibility = true;
             ConfWriter_add_def("EXPORT", export_win);
             ConfWriter_add_def("IMPORT", "__declspec(dllimport)");
@@ -55,7 +55,7 @@ SymbolVisibility_run(void) {
     if (!can_control_visibility) {
         char export_gcc[] = "__attribute__ ((visibility (\"default\")))";
         sprintf(code_buf, symbol_exporting_code, export_gcc);
-        if (CC_test_compile(code_buf, strlen(code_buf))) {
+        if (CC_test_compile(code_buf)) {
             can_control_visibility = true;
             ConfWriter_add_def("EXPORT", export_gcc);
             ConfWriter_add_def("IMPORT", NULL);

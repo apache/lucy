@@ -51,8 +51,7 @@ AtomicOps_run(void) {
 
         /* Check for OSAtomicCompareAndSwapPtr, introduced in later versions
          * of OSAtomic.h. */
-        has_osatomic_cas_ptr = CC_test_compile(osatomic_casptr_code,
-                                               strlen(osatomic_casptr_code));
+        has_osatomic_cas_ptr = CC_test_compile(osatomic_casptr_code);
         if (has_osatomic_cas_ptr) {
             ConfWriter_add_def("HAS_OSATOMIC_CAS_PTR", NULL);
         }

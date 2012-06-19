@@ -118,7 +118,7 @@ HeadCheck_check_many_headers(const char **header_names) {
     strcat(code_buf, test_code);
 
     /* If the code compiles, bulk add all header names to the cache. */
-    success = CC_test_compile(code_buf, strlen(code_buf));
+    success = CC_test_compile(code_buf);
     if (success) {
         for (i = 0; header_names[i] != NULL; i++) {
             S_maybe_add_to_cache(header_names[i], true);
@@ -145,7 +145,7 @@ HeadCheck_contains_member(const char *struct_name, const char *member,
     char *buf = (char*)malloc(needed);
     int retval;
     sprintf(buf, contains_code, includes, struct_name, member);
-    retval = CC_test_compile(buf, strlen(buf));
+    retval = CC_test_compile(buf);
     free(buf);
     return retval;
 }
@@ -172,7 +172,7 @@ S_discover_header(const char *header_name) {
 
     /* See whether code that tries to pull in this header compiles. */
     sprintf(include_test, "#include <%s>\n%s", header_name, test_code);
-    header->exists = CC_test_compile(include_test, strlen(include_test));
+    header->exists = CC_test_compile(include_test);
 
     free(include_test);
     return header;

@@ -56,7 +56,7 @@ static char*
 S_try_inline(const char *keyword, size_t *output_len) {
     char code[sizeof(inline_code) + 30];
     sprintf(code, inline_code, keyword);
-    return CC_capture_output(code, strlen(code), output_len);
+    return CC_capture_output(code, output_len);
 }
 
 static const char* inline_options[] = {
@@ -79,8 +79,7 @@ FuncMacro_run(void) {
     ConfWriter_start_module("FuncMacro");
 
     /* Check for ISO func macro. */
-    output = CC_capture_output(iso_func_code, strlen(iso_func_code),
-                               &output_len);
+    output = CC_capture_output(iso_func_code, &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac     = true;
         has_iso_funcmac = true;
@@ -88,8 +87,7 @@ FuncMacro_run(void) {
     free(output);
 
     /* Check for GNUC func macro. */
-    output = CC_capture_output(gnuc_func_code, strlen(gnuc_func_code),
-                               &output_len);
+    output = CC_capture_output(gnuc_func_code, &output_len);
     if (output != NULL && strncmp(output, "main", 4) == 0) {
         has_funcmac      = true;
         has_gnuc_funcmac = true;

@@ -199,7 +199,7 @@ S_probe_off64(void) {
 
         /* Execute the probe. */
         sprintf(code_buf, off64_code, sys_types_include, candidate);
-        output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+        output = CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             long sizeof_candidate = strtol(output, NULL, 10);
             free(output);
@@ -250,7 +250,7 @@ S_probe_stdio64(stdio64_combo *combo) {
             combo->fseek_command);
 
     /* Verify compilation and that the offset type has 8 bytes. */
-    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         long size = strtol(output, NULL, 10);
         if (size == 8) {
@@ -294,7 +294,7 @@ S_probe_lseek(unbuff_combo *combo) {
 
     /* Verify compilation. */
     sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
-    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         success = true;
         free(output);
@@ -335,7 +335,7 @@ S_probe_pread64(unbuff_combo *combo) {
 
     /* Verify compilation. */
     sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
-    output = CC_capture_output(code_buf, strlen(code_buf), &output_len);
+    output = CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         success = true;
         free(output);

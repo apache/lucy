@@ -56,7 +56,7 @@ VariadicMacros_run(void) {
     ConfWriter_start_module("VariadicMacros");
 
     /* Test for ISO-style variadic macros. */
-    output = CC_capture_output(iso_code, strlen(iso_code), &output_len);
+    output = CC_capture_output(iso_code, &output_len);
     if (output != NULL) {
         has_varmacros = true;
         has_iso_varmacros = true;
@@ -65,7 +65,7 @@ VariadicMacros_run(void) {
     }
 
     /* Test for GNU-style variadic macros. */
-    output = CC_capture_output(gnuc_code, strlen(gnuc_code), &output_len);
+    output = CC_capture_output(gnuc_code, &output_len);
     if (output != NULL) {
         has_gnuc_varmacros = true;
         if (has_varmacros == false) {

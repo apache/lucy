@@ -66,7 +66,7 @@ S_compile_posix_mkdir(const char *header) {
 
     /* Attempt compilation. */
     sprintf(code_buf, posix_mkdir_code, header);
-    mkdir_available = CC_test_compile(code_buf, strlen(code_buf));
+    mkdir_available = CC_test_compile(code_buf);
 
     /* Set vars on success. */
     if (mkdir_available) {
@@ -85,7 +85,7 @@ S_compile_posix_mkdir(const char *header) {
 
 static int
 S_compile_win_mkdir(void) {
-    mkdir_available = CC_test_compile(win_mkdir_code, strlen(win_mkdir_code));
+    mkdir_available = CC_test_compile(win_mkdir_code);
     if (mkdir_available) {
         strcpy(mkdir_command, "_mkdir");
         mkdir_num_args = 1;
@@ -107,7 +107,7 @@ S_compile_rmdir(const char *header) {
     size_t needed = sizeof(posix_mkdir_code) + 30;
     char *code_buf = (char*)malloc(needed);
     sprintf(code_buf, rmdir_code, header);
-    rmdir_available = CC_test_compile(code_buf, strlen(code_buf));
+    rmdir_available = CC_test_compile(code_buf);
     free(code_buf);
     return rmdir_available;
 }
@@ -185,7 +185,7 @@ DirManip_run(void) {
         ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
     }
 
-    if (CC_test_compile(cygwin_code, strlen(cygwin_code))) {
+    if (CC_test_compile(cygwin_code)) {
         strcpy(dir_sep, "/");
     }
     else if (HeadCheck_check_header("windows.h")) {
