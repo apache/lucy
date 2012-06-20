@@ -82,7 +82,8 @@ IS_DISTRO_NOT_DEVEL  = File.directory?('core')
 AUTOGEN_DIR          = "autogen"
 BASE_DIR             = File.absolute_path(IS_DISTRO_NOT_DEVEL ? '.' : '..')
 CHARMONIZER_ORIG_DIR = File.join(BASE_DIR, "charmonizer")
-CHARMONIZE_EXE_PATH  = exe_path(CHARMONIZER_ORIG_DIR, 'charmonize')
+CHARMONIZE_C_PATH    = File.absolute_path('charmonize.c')
+CHARMONIZE_EXE_PATH  = File.absolute_path(exe_path('charmonize'))
 CLOWNFISH_PATH       = File.join(BASE_DIR,"clownfish","ruby")
 CHARMONY_PATH        = "charmony.h"
 CORE_SOURCE_DIR      = File.join(BASE_DIR, "core")
@@ -111,8 +112,23 @@ end
 desc "Build the charmonize executable"
 task :charmonize do
   puts "Building #{CHARMONIZE_EXE_PATH}...\n"
-  run_make(CHARMONIZER_ORIG_DIR, [])
+  meld_c = File.absolute_path("charmonize.c")
+  charmonize_main = File.join(CHARMONIZER_ORIG_DIR, 'charmonize.c')
+  run_make_args = [ "meld", "FILES=#{charmonize_main}", "OUT=#{meld_c}" ]
+  run_make(CHARMONIZER_ORIG_DIR, run_make_args)
+
+  if !uptodate?(CHARMONIZE_EXE_PATH, [meld_c])
+    outflag = cc_command.match(/cl\b/) ? "/Fe" : "-o "
+    command = "#{cc_command} #{outflag}#{CHARMONIZE_EXE_PATH} #{meld_c}"
+    puts command
+    success = system(command)
+    if !success
+      raise "Failed to write charmony.h"
+    end
+  end
 end
+CLEAN.include(CHARMONIZE_C_PATH)
+CLEAN.include(CHARMONIZE_EXE_PATH)
 
 desc "Run the charmonize executable, creating the charmony.h file"
 task :charmony => [:charmonize] do
@@ -128,6 +144,7 @@ task :charmony => [:charmonize] do
     if ENV["CHARM_VALGRIND"]
       command.unshift("valgrind", "--leak-check=yes")
     end
+    puts command.join(" ")
     success = system(*command);
     if !success
       raise "Failed to write charmony.h"
