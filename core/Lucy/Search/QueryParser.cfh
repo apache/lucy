@@ -246,20 +246,20 @@ class Lucy::QueryParser::ParserClause inherits Lucy::Object::Obj {
 
 /** Private utility class.
  */
-class Lucy::QueryParser::ParserToken inherits Lucy::Object::Obj {
+class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
 
     uint32_t type;
     CharBuf *text;
 
-    inert incremented ParserToken*
+    inert incremented ParserElem*
     new(uint32_t type, const char *text = NULL, size_t len = 0);
 
-    inert ParserToken*
-    init(ParserToken *self, uint32_t type, const char *text = NULL,
+    inert ParserElem*
+    init(ParserElem *self, uint32_t type, const char *text = NULL,
          size_t len = 0);
 
     public void
-    Destroy(ParserToken *self);
+    Destroy(ParserElem *self);
 }
 
 

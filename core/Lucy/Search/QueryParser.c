@@ -16,7 +16,7 @@
 
 #define C_LUCY_QUERYPARSER
 #define C_LUCY_PARSERCLAUSE
-#define C_LUCY_PARSERTOKEN
+#define C_LUCY_PARSERELEM
 #define C_LUCY_VIEWCHARBUF
 #include <stdlib.h>
 #include <ctype.h>
@@ -249,7 +249,7 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
     ViewCB_Trim(qstring);
 
     if (S_consume_ascii(qstring, "(", 1)) {
-        VA_Push(parse_tree, (Obj*)ParserToken_new(TOKEN_OPEN_PAREN, NULL, 0));
+        VA_Push(parse_tree, (Obj*)ParserElem_new(TOKEN_OPEN_PAREN, NULL, 0));
         if (ViewCB_Code_Point_From(qstring, 1) == ')') {
             need_close_paren = true;
             ViewCB_Chop(qstring, 1);
@@ -258,7 +258,7 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
 
     ViewCharBuf *temp = (ViewCharBuf*)ZCB_BLANK();
     while (ViewCB_Get_Size(qstring)) {
-        ParserToken *token = NULL;
+        ParserElem *token = NULL;
 
         if (ViewCB_Trim_Top(qstring)) {
             // Fast-forward past whitespace.
@@ -266,35 +266,35 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
         }
         else if (S_consume_ascii(qstring, "+", 1)) {
             if (ViewCB_Trim_Top(qstring)) {
-                token = ParserToken_new(TOKEN_QUERY, "+", 1);
+                token = ParserElem_new(TOKEN_QUERY, "+", 1);
             }
             else {
-                token = ParserToken_new(TOKEN_PLUS, NULL, 0);
+                token = ParserElem_new(TOKEN_PLUS, NULL, 0);
             }
         }
         else if (S_consume_ascii(qstring, "-", 1)) {
             if (ViewCB_Trim_Top(qstring)) {
-                token = ParserToken_new(TOKEN_QUERY, "-", 1);
+                token = ParserElem_new(TOKEN_QUERY, "-", 1);
             }
             else {
-                token = ParserToken_new(TOKEN_MINUS, NULL, 0);
+                token = ParserElem_new(TOKEN_MINUS, NULL, 0);
             }
         }
         else if (S_consume_ascii_token(qstring, "AND", 3)) {
-            token = ParserToken_new(TOKEN_AND, NULL, 0);
+            token = ParserElem_new(TOKEN_AND, NULL, 0);
         }
         else if (S_consume_ascii_token(qstring, "OR", 2)) {
-            token = ParserToken_new(TOKEN_OR, NULL, 0);
+            token = ParserElem_new(TOKEN_OR, NULL, 0);
         }
         else if (S_consume_ascii_token(qstring, "NOT", 3)) {
-            token = ParserToken_new(TOKEN_NOT, NULL, 0);
+            token = ParserElem_new(TOKEN_NOT, NULL, 0);
         }
         else if (self->heed_colons && S_consume_field(qstring, temp)) {
-            token = ParserToken_new(TOKEN_FIELD, (char*)ViewCB_Get_Ptr8(temp),
+            token = ParserElem_new(TOKEN_FIELD, (char*)ViewCB_Get_Ptr8(temp),
                                     ViewCB_Get_Size(temp));
         }
         else if (S_consume_non_whitespace(qstring, temp)) {
-            token = ParserToken_new(TOKEN_QUERY, (char*)ViewCB_Get_Ptr8(temp),
+            token = ParserElem_new(TOKEN_QUERY, (char*)ViewCB_Get_Ptr8(temp),
                                     ViewCB_Get_Size(temp));
         }
         else {
@@ -306,7 +306,7 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
 
     if (need_close_paren) {
         VA_Push(parse_tree,
-                (Obj*)ParserToken_new(TOKEN_CLOSE_PAREN, NULL, 0));
+                (Obj*)ParserElem_new(TOKEN_CLOSE_PAREN, NULL, 0));
     }
 
     // Clean up.
@@ -316,11 +316,11 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
 }
 
 static void
-S_splice_out_token_type(VArray *elems, uint32_t token_type_mask) {
+S_splice_out_elem_type(VArray *elems, uint32_t mask) {
     for (uint32_t i = VA_Get_Size(elems); i--;) {
-        ParserToken *token = (ParserToken*)VA_Fetch(elems, i);
-        if (Obj_Is_A((Obj*)token, PARSERTOKEN)) {
-            if (token->type & token_type_mask) { VA_Excise(elems, i, 1); }
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+        if (Obj_Is_A((Obj*)elem, PARSERELEM)) {
+            if (elem->type & mask) { VA_Excise(elems, i, 1); }
         }
     }
 }
@@ -336,7 +336,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     VArray   *elems         = S_parse_flat_string(self, query_string);
 
     // Determine whether this subclause is bracketed by parens.
-    ParserToken *maybe_open_paren = (ParserToken*)VA_Fetch(elems, 0);
+    ParserElem *maybe_open_paren = (ParserElem*)VA_Fetch(elems, 0);
     if (maybe_open_paren != NULL
         && maybe_open_paren->type == TOKEN_OPEN_PAREN
        ) {
@@ -344,8 +344,8 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
         VA_Excise(elems, 0, 1);
         uint32_t num_elems = VA_Get_Size(elems);
         if (num_elems) {
-            ParserToken *maybe_close_paren
-                = (ParserToken*)VA_Fetch(elems, num_elems - 1);
+            ParserElem *maybe_close_paren
+                = (ParserElem*)VA_Fetch(elems, num_elems - 1);
             if (maybe_close_paren->type == TOKEN_CLOSE_PAREN) {
                 VA_Excise(elems, num_elems - 1, 1);
             }
@@ -355,36 +355,36 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     // Generate all queries.  Apply any fields.
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         CharBuf *field = default_field;
-        ParserToken *token = (ParserToken*)VA_Fetch(elems, i);
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
 
         // Apply field.
         if (i > 0) {
             // Field specifier must immediately precede any query.
-            ParserToken* maybe_field_token
-                = (ParserToken*)VA_Fetch(elems, i - 1);
-            if (maybe_field_token->type == TOKEN_FIELD) {
-                field = maybe_field_token->text;
+            ParserElem* maybe_field_elem
+                = (ParserElem*)VA_Fetch(elems, i - 1);
+            if (maybe_field_elem->type == TOKEN_FIELD) {
+                field = maybe_field_elem->text;
             }
         }
 
-        if (token->type == TOKEN_QUERY) {
+        if (elem->type == TOKEN_QUERY) {
             // Generate a LeafQuery from a Phrase.
-            if (CB_Starts_With(token->text, self->phrase_label)) {
+            if (CB_Starts_With(elem->text, self->phrase_label)) {
                 CharBuf *inner_text
-                    = (CharBuf*)Hash_Fetch(extractions, (Obj*)token->text);
+                    = (CharBuf*)Hash_Fetch(extractions, (Obj*)elem->text);
                 Query *query = (Query*)LeafQuery_new(field, inner_text);
                 ParserClause *clause = ParserClause_new(query, default_occur);
-                DECREF(Hash_Delete(extractions, (Obj*)token->text));
+                DECREF(Hash_Delete(extractions, (Obj*)elem->text));
                 VA_Store(elems, i, (Obj*)clause);
                 DECREF(query);
             }
             // Recursively parse parenthetical groupings.
-            else if (CB_Starts_With(token->text, self->bool_group_label)) {
+            else if (CB_Starts_With(elem->text, self->bool_group_label)) {
                 CharBuf *inner_text
-                    = (CharBuf*)Hash_Fetch(extractions, (Obj*)token->text);
+                    = (CharBuf*)Hash_Fetch(extractions, (Obj*)elem->text);
                 Query *query
                     = S_do_tree(self, inner_text, field, extractions);
-                DECREF(Hash_Delete(extractions, (Obj*)token->text));
+                DECREF(Hash_Delete(extractions, (Obj*)elem->text));
                 if (query) {
                     ParserClause *clause
                         = ParserClause_new(query, default_occur);
@@ -394,30 +394,30 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
             // What's left is probably a term, so generate a LeafQuery.
             else {
-                Query *query = (Query*)LeafQuery_new(field, token->text);
+                Query *query = (Query*)LeafQuery_new(field, elem->text);
                 ParserClause *clause = ParserClause_new(query, default_occur);
                 VA_Store(elems, i, (Obj*)clause);
                 DECREF(query);
             }
         }
     }
-    S_splice_out_token_type(elems, TOKEN_FIELD | TOKEN_QUERY);
+    S_splice_out_elem_type(elems, TOKEN_FIELD | TOKEN_QUERY);
 
     // Apply +, -, NOT.
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
         if (Obj_Is_A((Obj*)clause, PARSERCLAUSE)) {
             for (uint32_t j = i; j--;) {
-                ParserToken *token = (ParserToken*)VA_Fetch(elems, j);
-                if (Obj_Is_A((Obj*)token, PARSERTOKEN)) {
-                    if (token->type == TOKEN_MINUS
-                        || token->type == TOKEN_NOT
+                ParserElem *elem = (ParserElem*)VA_Fetch(elems, j);
+                if (Obj_Is_A((Obj*)elem, PARSERELEM)) {
+                    if (elem->type == TOKEN_MINUS
+                        || elem->type == TOKEN_NOT
                        ) {
                         clause->occur = clause->occur == MUST_NOT
                                         ? MUST
                                         : MUST_NOT;
                     }
-                    else if (token->type == TOKEN_PLUS) {
+                    else if (elem->type == TOKEN_PLUS) {
                         if (clause->occur == SHOULD) {
                             clause->occur = MUST;
                         }
@@ -429,7 +429,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
         }
     }
-    S_splice_out_token_type(elems, TOKEN_PLUS | TOKEN_MINUS | TOKEN_NOT);
+    S_splice_out_elem_type(elems, TOKEN_PLUS | TOKEN_MINUS | TOKEN_NOT);
 
     // Wrap negated queries with NOTQuery objects.
     for (uint32_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
@@ -444,8 +444,8 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     // Silently discard non-sensical combos of AND and OR, e.g.
     // 'OR a AND AND OR b AND'.
     for (uint32_t i = 0; i < VA_Get_Size(elems); i++) {
-        ParserToken *token = (ParserToken*)VA_Fetch(elems, i);
-        if (Obj_Is_A((Obj*)token, PARSERTOKEN)) {
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+        if (Obj_Is_A((Obj*)elem, PARSERELEM)) {
             uint32_t num_to_zap = 0;
             ParserClause *preceding = (ParserClause*)VA_Fetch(elems, i - 1);
             ParserClause *following = (ParserClause*)VA_Fetch(elems, i + 1);
@@ -466,8 +466,8 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
     // Apply AND.
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
-        ParserToken *token = (ParserToken*)VA_Fetch(elems, i + 1);
-        if (Obj_Is_A((Obj*)token, PARSERTOKEN) && token->type == TOKEN_AND) {
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
+        if (Obj_Is_A((Obj*)elem, PARSERELEM) && elem->type == TOKEN_AND) {
             ParserClause *preceding  = (ParserClause*)VA_Fetch(elems, i);
             VArray       *children   = VA_new(2);
             uint32_t      num_to_zap = 0;
@@ -480,10 +480,10 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
-                ParserToken  *maybe_and = (ParserToken*)VA_Fetch(elems, j);
+                ParserElem  *maybe_and = (ParserElem*)VA_Fetch(elems, j);
                 ParserClause *following
                     = (ParserClause*)VA_Fetch(elems, j + 1);
-                if (!Obj_Is_A((Obj*)maybe_and, PARSERTOKEN)
+                if (!Obj_Is_A((Obj*)maybe_and, PARSERELEM)
                     || maybe_and->type != TOKEN_AND
                    ) {
                     break;
@@ -507,8 +507,8 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
     // Apply OR.
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
-        ParserToken *token = (ParserToken*)VA_Fetch(elems, i + 1);
-        if (Obj_Is_A((Obj*)token, PARSERTOKEN) && token->type == TOKEN_OR) {
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
+        if (Obj_Is_A((Obj*)elem, PARSERELEM) && elem->type == TOKEN_OR) {
             ParserClause *preceding  = (ParserClause*)VA_Fetch(elems, i);
             VArray       *children   = VA_new(2);
             uint32_t      num_to_zap = 0;
@@ -521,10 +521,10 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
-                ParserToken  *maybe_or = (ParserToken*)VA_Fetch(elems, j);
+                ParserElem  *maybe_or = (ParserElem*)VA_Fetch(elems, j);
                 ParserClause *following
                     = (ParserClause*)VA_Fetch(elems, j + 1);
-                if (!Obj_Is_A((Obj*)maybe_or, PARSERTOKEN)
+                if (!Obj_Is_A((Obj*)maybe_or, PARSERELEM)
                     || maybe_or->type != TOKEN_OR
                    ) {
                     break;
@@ -1215,14 +1215,14 @@ ParserClause_destroy(ParserClause *self) {
 
 /********************************************************************/
 
-ParserToken*
-ParserToken_new(uint32_t type, const char *text, size_t len) {
-    ParserToken *self = (ParserToken*)VTable_Make_Obj(PARSERTOKEN);
-    return ParserToken_init(self, type, text, len);
+ParserElem*
+ParserElem_new(uint32_t type, const char *text, size_t len) {
+    ParserElem *self = (ParserElem*)VTable_Make_Obj(PARSERELEM);
+    return ParserElem_init(self, type, text, len);
 }
 
-ParserToken*
-ParserToken_init(ParserToken *self, uint32_t type, const char *text,
+ParserElem*
+ParserElem_init(ParserElem *self, uint32_t type, const char *text,
                  size_t len) {
     self->type = type;
     self->text = text ? CB_new_from_utf8(text, len) : NULL;
@@ -1230,9 +1230,9 @@ ParserToken_init(ParserToken *self, uint32_t type, const char *text,
 }
 
 void
-ParserToken_destroy(ParserToken *self) {
+ParserElem_destroy(ParserElem *self) {
     DECREF(self->text);
-    SUPER_DESTROY(self, PARSERTOKEN);
+    SUPER_DESTROY(self, PARSERELEM);
 }
 
 
