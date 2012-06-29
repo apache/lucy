@@ -227,23 +227,6 @@ public class Lucy::Search::QueryParser cnick QParser
     Destroy(QueryParser *self);
 }
 
-/** Private utility class.
- */
-class Lucy::QueryParser::ParserClause inherits Lucy::Object::Obj {
-
-    uint32_t occur;
-    Query *query;
-
-    inert incremented ParserClause*
-    new(Query *query, uint32_t occur);
-
-    inert ParserClause*
-    init(ParserClause *self, Query *query, uint32_t occur);
-
-    public void
-    Destroy(ParserClause *self);
-}
-
 __C__
 
 #define LUCY_QPARSER_SHOULD            0x00000001
@@ -258,6 +241,7 @@ __C__
 #define LUCY_QPARSER_TOKEN_AND         0x00000200
 #define LUCY_QPARSER_TOKEN_FIELD       0x00000400
 #define LUCY_QPARSER_TOKEN_STRING      0x00000800
+#define LUCY_QPARSER_TOKEN_QUERY       0x00001000
 
 __END_C__
 

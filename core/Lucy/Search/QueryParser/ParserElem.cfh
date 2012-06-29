@@ -21,6 +21,7 @@ parcel Lucy;
 class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
 
     uint32_t  type;
+    uint32_t  occur;
     Obj      *value;
 
     inert incremented ParserElem*
@@ -32,6 +33,9 @@ class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
     public void
     Destroy(ParserElem *self);
 
+    void
+    Set_Value(ParserElem *self, Obj *value);
+
     /** Return the value of the elem if it matches the specification, NULL
      * otherwise.
      */
@@ -40,5 +44,29 @@ class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
 
     uint32_t
     Get_Type(ParserElem *self);
+
+    /** Manipulate the value of <code>occur</code> so that the element becomes
+     * forbidden.
+     */
+    void
+    Negate(ParserElem *self);
+
+    /** Manipulate the value of <code>occur</code> so that the element becomes
+     * required.
+     */
+    void
+    Require(ParserElem *self);
+
+    /** If an element is required, make it optional.  If it's negated, leave
+     * it as is.
+     */
+    void
+    Unrequire(ParserElem *self);
+
+    void
+    Set_Occur(ParserElem *self, uint32_t occur);
+
+    uint32_t
+    Get_Occur(ParserElem *self);
 }
 

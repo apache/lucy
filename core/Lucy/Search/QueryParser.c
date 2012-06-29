@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_QUERYPARSER
-#define C_LUCY_PARSERCLAUSE
 #define C_LUCY_VIEWCHARBUF
 #include <stdlib.h>
 #include <ctype.h>
@@ -49,6 +48,7 @@
 #define TOKEN_AND         LUCY_QPARSER_TOKEN_AND
 #define TOKEN_FIELD       LUCY_QPARSER_TOKEN_FIELD
 #define TOKEN_STRING      LUCY_QPARSER_TOKEN_STRING
+#define TOKEN_QUERY       LUCY_QPARSER_TOKEN_QUERY
 
 // Recursing helper function for Tree().
 static Query*
@@ -371,11 +371,11 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             if (CB_Starts_With(text, self->phrase_label)) {
                 CharBuf *inner_text
                     = (CharBuf*)Hash_Fetch(extractions, (Obj*)text);
-                Query *query = (Query*)LeafQuery_new(field, inner_text);
-                ParserClause *clause = ParserClause_new(query, default_occur);
+                LeafQuery *query = LeafQuery_new(field, inner_text);
+                ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)query);
+                ParserElem_Set_Occur(new_elem, default_occur);
                 DECREF(Hash_Delete(extractions, (Obj*)text));
-                VA_Store(elems, i, (Obj*)clause);
-                DECREF(query);
+                VA_Store(elems, i, (Obj*)new_elem);
             }
             // Recursively parse parenthetical groupings.
             else if (CB_Starts_With(text, self->bool_group_label)) {
@@ -385,18 +385,19 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                     = S_do_tree(self, inner_text, field, extractions);
                 DECREF(Hash_Delete(extractions, (Obj*)text));
                 if (query) {
-                    ParserClause *clause
-                        = ParserClause_new(query, default_occur);
-                    VA_Store(elems, i, (Obj*)clause);
-                    DECREF(query);
+                    ParserElem *new_elem
+                        = ParserElem_new(TOKEN_QUERY, (Obj*)query);
+                    ParserElem_Set_Occur(new_elem, default_occur);
+                    VA_Store(elems, i, (Obj*)new_elem);
                 }
             }
             // What's left is probably a term, so generate a LeafQuery.
             else {
-                Query *query = (Query*)LeafQuery_new(field, text);
-                ParserClause *clause = ParserClause_new(query, default_occur);
-                VA_Store(elems, i, (Obj*)clause);
-                DECREF(query);
+                LeafQuery *query = LeafQuery_new(field, text);
+                ParserElem *new_elem
+                    = ParserElem_new(TOKEN_QUERY, (Obj*)query);
+                ParserElem_Set_Occur(new_elem, default_occur);
+                VA_Store(elems, i, (Obj*)new_elem);
             }
         }
     }
@@ -404,22 +405,16 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
     // Apply +, -, NOT.
     for (uint32_t i = VA_Get_Size(elems); i--;) {
-        ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
-        if (Obj_Is_A((Obj*)clause, PARSERCLAUSE)) {
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+        if (ParserElem_Get_Type(elem) == TOKEN_QUERY) {
             for (uint32_t j = i; j--;) {
-                ParserElem *elem = (ParserElem*)VA_Fetch(elems, j);
-                if (Obj_Is_A((Obj*)elem, PARSERELEM)) {
-                    uint32_t type = ParserElem_Get_Type(elem);
-                    if (type == TOKEN_MINUS || type == TOKEN_NOT) {
-                        clause->occur = clause->occur == MUST_NOT
-                                        ? MUST
-                                        : MUST_NOT;
-                    }
-                    else if (type == TOKEN_PLUS) {
-                        if (clause->occur == SHOULD) {
-                            clause->occur = MUST;
-                        }
-                    }
+                ParserElem *prev = (ParserElem*)VA_Fetch(elems, j);
+                uint32_t prev_type = ParserElem_Get_Type(prev);
+                if (prev_type == TOKEN_MINUS || prev_type == TOKEN_NOT) {
+                    ParserElem_Negate(elem);
+                }
+                else if (prev_type == TOKEN_PLUS) {
+                    ParserElem_Require(elem);
                 }
                 else {
                     break;
@@ -431,11 +426,14 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
     // Wrap negated queries with NOTQuery objects.
     for (uint32_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
-        ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
-        if (Obj_Is_A((Obj*)clause, PARSERCLAUSE) && clause->occur == MUST_NOT) {
-            Query *not_query = QParser_Make_NOT_Query(self, clause->query);
-            DECREF(clause->query);
-            clause->query = not_query;
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+        if (ParserElem_Get_Type(elem) == TOKEN_QUERY
+            && ParserElem_Get_Occur(elem) == MUST_NOT
+           ) {
+            Query *inner_query = (Query*)ParserElem_As(elem, QUERY);
+            Query *not_query = QParser_Make_NOT_Query(self, inner_query);
+            ParserElem_Set_Value(elem, (Obj*)not_query);
+            DECREF(not_query);
         }
     }
 
@@ -443,19 +441,19 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     // 'OR a AND AND OR b AND'.
     for (uint32_t i = 0; i < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
-        if (Obj_Is_A((Obj*)elem, PARSERELEM)) {
+        if (ParserElem_Get_Type(elem) != TOKEN_QUERY) {
             uint32_t num_to_zap = 0;
-            ParserClause *preceding = (ParserClause*)VA_Fetch(elems, i - 1);
-            ParserClause *following = (ParserClause*)VA_Fetch(elems, i + 1);
-            if (!preceding || !Obj_Is_A((Obj*)preceding, PARSERCLAUSE)) {
+            ParserElem *preceding = (ParserElem*)VA_Fetch(elems, i - 1);
+            ParserElem *following = (ParserElem*)VA_Fetch(elems, i + 1);
+            if (!preceding || ParserElem_Get_Type(preceding) != TOKEN_QUERY) {
                 num_to_zap = 1;
             }
-            if (!following || !Obj_Is_A((Obj*)following, PARSERCLAUSE)) {
+            if (!following || ParserElem_Get_Type(following) != TOKEN_QUERY) {
                 num_to_zap = 1;
             }
             for (uint32_t j = i + 1, jmax = VA_Get_Size(elems); j < jmax; j++) {
-                ParserClause *clause = (ParserClause*)VA_Fetch(elems, j);
-                if (Obj_Is_A((Obj*)clause, PARSERCLAUSE)) { break; }
+                ParserElem *maybe = (ParserElem*)VA_Fetch(elems, j);
+                if (ParserElem_Get_Type(maybe) == TOKEN_QUERY) { break; }
                 else { num_to_zap++; }
             }
             if (num_to_zap) { VA_Excise(elems, i, num_to_zap); }
@@ -465,37 +463,38 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     // Apply AND.
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
-        if (Obj_Is_A((Obj*)elem, PARSERELEM)
-            && ParserElem_Get_Type(elem) == TOKEN_AND
-           ) {
-            ParserClause *preceding  = (ParserClause*)VA_Fetch(elems, i);
+        if (ParserElem_Get_Type(elem) == TOKEN_AND) {
+            ParserElem   *preceding  = (ParserElem*)VA_Fetch(elems, i);
             VArray       *children   = VA_new(2);
             uint32_t      num_to_zap = 0;
 
             // Add first clause.
-            VA_Push(children, INCREF(preceding->query));
+            Query *preceding_query = (Query*)ParserElem_As(preceding, QUERY);
+            VA_Push(children, INCREF(preceding_query));
 
             // Add following clauses.
             for (uint32_t j = i + 1, jmax = VA_Get_Size(elems);
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
-                ParserElem  *maybe_and = (ParserElem*)VA_Fetch(elems, j);
-                ParserClause *following
-                    = (ParserClause*)VA_Fetch(elems, j + 1);
-                if (!Obj_Is_A((Obj*)maybe_and, PARSERELEM)
-                    || ParserElem_Get_Type(maybe_and) != TOKEN_AND
-                   ) {
+                ParserElem *maybe_and = (ParserElem*)VA_Fetch(elems, j);
+                ParserElem *following = (ParserElem*)VA_Fetch(elems, j + 1);
+                if (ParserElem_Get_Type(maybe_and) != TOKEN_AND) {
                     break;
                 }
-                else {
-                    CERTIFY(following, PARSERCLAUSE);
+                else if (ParserElem_Get_Type(following) == TOKEN_QUERY) {
+                    Query *next = (Query*)ParserElem_As(following, QUERY);
+                    VA_Push(children, INCREF(next));
                 }
-                VA_Push(children, INCREF(following->query));
+                else {
+                    THROW(ERR, "Unexpected type: %u32",
+                          ParserElem_Get_Type(following));
+                }
             }
-            DECREF(preceding->query);
-            preceding->query = QParser_Make_AND_Query(self, children);
-            preceding->occur = default_occur;
+            Query *and_query = QParser_Make_AND_Query(self, children);
+            ParserElem_Set_Value(preceding, (Obj*)and_query);
+            ParserElem_Set_Occur(preceding, default_occur);
+            DECREF(and_query);
             DECREF(children);
 
             VA_Excise(elems, i + 1, num_to_zap);
@@ -508,36 +507,38 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     // Apply OR.
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
-        if (Obj_Is_A((Obj*)elem, PARSERELEM)
-            && ParserElem_Get_Type(elem) == TOKEN_OR) {
-            ParserClause *preceding  = (ParserClause*)VA_Fetch(elems, i);
+        if (ParserElem_Get_Type(elem) == TOKEN_OR) {
+            ParserElem   *preceding  = (ParserElem*)VA_Fetch(elems, i);
             VArray       *children   = VA_new(2);
             uint32_t      num_to_zap = 0;
 
             // Add first clause.
-            VA_Push(children, INCREF(preceding->query));
+            Query *preceding_query = (Query*)ParserElem_As(preceding, QUERY);
+            VA_Push(children, INCREF(preceding_query));
 
             // Add following clauses.
             for (uint32_t j = i + 1, jmax = VA_Get_Size(elems);
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
-                ParserElem  *maybe_or = (ParserElem*)VA_Fetch(elems, j);
-                ParserClause *following
-                    = (ParserClause*)VA_Fetch(elems, j + 1);
-                if (!Obj_Is_A((Obj*)maybe_or, PARSERELEM)
-                    || ParserElem_Get_Type(maybe_or) != TOKEN_OR
-                   ) {
+                ParserElem *maybe_or  = (ParserElem*)VA_Fetch(elems, j);
+                ParserElem *following = (ParserElem*)VA_Fetch(elems, j + 1);
+                if (ParserElem_Get_Type(maybe_or) != TOKEN_OR) {
                     break;
                 }
-                else {
-                    CERTIFY(following, PARSERCLAUSE);
+                else if (ParserElem_Get_Type(following) == TOKEN_QUERY) {
+                    Query *next = (Query*)ParserElem_As(following, QUERY);
+                    VA_Push(children, INCREF(next));
                 }
-                VA_Push(children, INCREF(following->query));
+                else {
+                    THROW(ERR, "Unexpected type: %u32",
+                          ParserElem_Get_Type(following));
+                }
             }
-            DECREF(preceding->query);
-            preceding->query = QParser_Make_OR_Query(self, children);
-            preceding->occur = default_occur;
+            Query *or_query = QParser_Make_OR_Query(self, children);
+            ParserElem_Set_Value(preceding, (Obj*)or_query);
+            ParserElem_Set_Occur(preceding, default_occur);
+            DECREF(or_query);
             DECREF(children);
 
             VA_Excise(elems, i + 1, num_to_zap);
@@ -560,8 +561,9 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
         }
     }
     else if (VA_Get_Size(elems) == 1 && !apply_parens) {
-        ParserClause *clause = (ParserClause*)VA_Fetch(elems, 0);
-        retval = (Query*)INCREF(clause->query);
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, 0);
+        Query *query = (Query*)ParserElem_As(elem, QUERY);
+        retval = (Query*)INCREF(query);
     }
     else {
         uint32_t  num_elems = VA_Get_Size(elems);
@@ -573,15 +575,17 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
         // Demux elems into bins.
         for (uint32_t i = 0; i < num_elems; i++) {
-            ParserClause *clause = (ParserClause*)VA_Fetch(elems, i);
-            if (clause->occur == MUST) {
-                VA_Push(required, INCREF(clause->query));
+            ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+            uint32_t occur = ParserElem_Get_Occur(elem);
+            Query *query = (Query*)ParserElem_As(elem, QUERY);
+            if (occur == MUST) {
+                VA_Push(required, INCREF(query));
             }
-            else if (clause->occur == SHOULD) {
-                VA_Push(optional, INCREF(clause->query));
+            else if (occur == SHOULD) {
+                VA_Push(optional, INCREF(query));
             }
-            else if (clause->occur == MUST_NOT) {
-                VA_Push(negated, INCREF(clause->query));
+            else if (occur == MUST_NOT) {
+                VA_Push(negated, INCREF(query));
             }
         }
         uint32_t num_required = VA_Get_Size(required);
@@ -1191,26 +1195,5 @@ QParser_make_req_opt_query(QueryParser *self, Query *required_query,
                            Query *optional_query) {
     UNUSED_VAR(self);
     return (Query*)ReqOptQuery_new(required_query, optional_query);
-}
-
-/********************************************************************/
-
-ParserClause*
-ParserClause_new(Query *query, uint32_t occur) {
-    ParserClause *self = (ParserClause*)VTable_Make_Obj(PARSERCLAUSE);
-    return ParserClause_init(self, query, occur);
-}
-
-ParserClause*
-ParserClause_init(ParserClause *self, Query *query, uint32_t occur) {
-    self->query = (Query*)INCREF(query);
-    self->occur = occur;
-    return self;
-}
-
-void
-ParserClause_destroy(ParserClause *self) {
-    DECREF(self->query);
-    SUPER_DESTROY(self, PARSERCLAUSE);
 }
 

@@ -17,6 +17,7 @@
 #define C_LUCY_PARSERELEM
 #include "Lucy/Util/ToolSet.h"
 #include "Lucy/Search/QueryParser/ParserElem.h"
+#include "Lucy/Search/QueryParser.h"
 
 ParserElem*
 ParserElem_new(uint32_t type, Obj *value) {
@@ -28,6 +29,7 @@ ParserElem*
 ParserElem_init(ParserElem *self, uint32_t type, Obj *value) {
     self->type  = type;
     self->value = value;
+    self->occur = LUCY_QPARSER_SHOULD;
     return self;
 }
 
@@ -35,6 +37,13 @@ void
 ParserElem_destroy(ParserElem *self) {
     DECREF(self->value);
     SUPER_DESTROY(self, PARSERELEM);
+}
+
+void
+ParserElem_set_value(ParserElem *self, Obj *value) {
+    INCREF(value);
+    DECREF(self->value);
+    self->value = value;
 }
 
 Obj*
@@ -48,5 +57,58 @@ ParserElem_as(ParserElem *self, VTable *metaclass) {
 uint32_t
 ParserElem_get_type(ParserElem *self) {
     return self->type;
+}
+
+void
+ParserElem_set_occur(ParserElem *self, uint32_t occur) {
+    self->occur = occur;
+}
+
+uint32_t
+ParserElem_get_occur(ParserElem *self) {
+    return self->occur;
+}
+
+void
+ParserElem_require(ParserElem *self) {
+    switch (self->occur) {
+        case LUCY_QPARSER_SHOULD:
+            self->occur = LUCY_QPARSER_MUST;
+            break;
+        case LUCY_QPARSER_MUST_NOT:
+        case LUCY_QPARSER_MUST:
+            break;
+        default:
+            THROW(ERR, "Internal error in value of occur: %u32", self->occur);
+    }
+}
+
+void
+ParserElem_unrequire(ParserElem *self) {
+    switch (self->occur) {
+        case LUCY_QPARSER_MUST:
+            self->occur = LUCY_QPARSER_SHOULD;
+            break;
+        case LUCY_QPARSER_MUST_NOT:
+        case LUCY_QPARSER_SHOULD:
+            break;
+        default:
+            THROW(ERR, "Internal error in value of occur: %u32", self->occur);
+    }
+}
+
+void
+ParserElem_negate(ParserElem *self) {
+    switch (self->occur) {
+        case LUCY_QPARSER_SHOULD:
+        case LUCY_QPARSER_MUST:
+            self->occur = LUCY_QPARSER_MUST_NOT;
+            break;
+        case LUCY_QPARSER_MUST_NOT:
+            self->occur = LUCY_QPARSER_MUST; // Apply double negative.
+            break;
+        default:
+            THROW(ERR, "Internal error in value of occur: %u32", self->occur);
+    }
 }
 
