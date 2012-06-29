@@ -27,15 +27,27 @@ ParserElem_new(uint32_t type, const char *text, size_t len) {
 ParserElem*
 ParserElem_init(ParserElem *self, uint32_t type, const char *text,
                  size_t len) {
-    self->type = type;
-    self->text = text ? CB_new_from_utf8(text, len) : NULL;
+    self->type  = type;
+    self->value = text ? (Obj*)CB_new_from_utf8(text, len) : NULL;
     return self;
 }
 
 void
 ParserElem_destroy(ParserElem *self) {
-    DECREF(self->text);
+    DECREF(self->value);
     SUPER_DESTROY(self, PARSERELEM);
 }
 
+Obj*
+ParserElem_as(ParserElem *self, VTable *metaclass) {
+    if (self->value && Obj_Is_A(self->value, metaclass)) {
+        return self->value;
+    }
+    return NULL;
+}
+
+uint32_t
+ParserElem_get_type(ParserElem *self) {
+    return self->type;
+}
 

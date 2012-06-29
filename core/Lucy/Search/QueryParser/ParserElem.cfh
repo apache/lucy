@@ -20,8 +20,8 @@ parcel Lucy;
  */
 class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
 
-    uint32_t type;
-    CharBuf *text;
+    uint32_t  type;
+    Obj      *value;
 
     inert incremented ParserElem*
     new(uint32_t type, const char *text = NULL, size_t len = 0);
@@ -32,5 +32,14 @@ class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
 
     public void
     Destroy(ParserElem *self);
+
+    /** Return the value of the elem if it matches the specification, NULL
+     * otherwise.
+     */
+    nullable Obj*
+    As(ParserElem *self, VTable *metaclass);
+
+    uint32_t
+    Get_Type(ParserElem *self);
 }
 
