@@ -19,16 +19,15 @@
 #include "Lucy/Search/QueryParser/ParserElem.h"
 
 ParserElem*
-ParserElem_new(uint32_t type, const char *text, size_t len) {
+ParserElem_new(uint32_t type, Obj *value) {
     ParserElem *self = (ParserElem*)VTable_Make_Obj(PARSERELEM);
-    return ParserElem_init(self, type, text, len);
+    return ParserElem_init(self, type, value);
 }
 
 ParserElem*
-ParserElem_init(ParserElem *self, uint32_t type, const char *text,
-                 size_t len) {
+ParserElem_init(ParserElem *self, uint32_t type, Obj *value) {
     self->type  = type;
-    self->value = text ? (Obj*)CB_new_from_utf8(text, len) : NULL;
+    self->value = value;
     return self;
 }
 

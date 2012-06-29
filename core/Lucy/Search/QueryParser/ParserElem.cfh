@@ -24,11 +24,10 @@ class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
     Obj      *value;
 
     inert incremented ParserElem*
-    new(uint32_t type, const char *text = NULL, size_t len = 0);
+    new(uint32_t type, decremented Obj *value = NULL);
 
     inert ParserElem*
-    init(ParserElem *self, uint32_t type, const char *text = NULL,
-         size_t len = 0);
+    init(ParserElem *self, uint32_t type, decremented Obj *value = NULL);
 
     public void
     Destroy(ParserElem *self);

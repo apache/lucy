@@ -249,7 +249,7 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
     ViewCB_Trim(qstring);
 
     if (S_consume_ascii(qstring, "(", 1)) {
-        VA_Push(parse_tree, (Obj*)ParserElem_new(TOKEN_OPEN_PAREN, NULL, 0));
+        VA_Push(parse_tree, (Obj*)ParserElem_new(TOKEN_OPEN_PAREN, NULL));
         if (ViewCB_Code_Point_From(qstring, 1) == ')') {
             need_close_paren = true;
             ViewCB_Chop(qstring, 1);
@@ -266,36 +266,34 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
         }
         else if (S_consume_ascii(qstring, "+", 1)) {
             if (ViewCB_Trim_Top(qstring)) {
-                token = ParserElem_new(TOKEN_STRING, "+", 1);
+                token = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("+"));
             }
             else {
-                token = ParserElem_new(TOKEN_PLUS, NULL, 0);
+                token = ParserElem_new(TOKEN_PLUS, NULL);
             }
         }
         else if (S_consume_ascii(qstring, "-", 1)) {
             if (ViewCB_Trim_Top(qstring)) {
-                token = ParserElem_new(TOKEN_STRING, "-", 1);
+                token = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("-"));
             }
             else {
-                token = ParserElem_new(TOKEN_MINUS, NULL, 0);
+                token = ParserElem_new(TOKEN_MINUS, NULL);
             }
         }
         else if (S_consume_ascii_token(qstring, "AND", 3)) {
-            token = ParserElem_new(TOKEN_AND, NULL, 0);
+            token = ParserElem_new(TOKEN_AND, NULL);
         }
         else if (S_consume_ascii_token(qstring, "OR", 2)) {
-            token = ParserElem_new(TOKEN_OR, NULL, 0);
+            token = ParserElem_new(TOKEN_OR, NULL);
         }
         else if (S_consume_ascii_token(qstring, "NOT", 3)) {
-            token = ParserElem_new(TOKEN_NOT, NULL, 0);
+            token = ParserElem_new(TOKEN_NOT, NULL);
         }
         else if (self->heed_colons && S_consume_field(qstring, temp)) {
-            token = ParserElem_new(TOKEN_FIELD, (char*)ViewCB_Get_Ptr8(temp),
-                                    ViewCB_Get_Size(temp));
+            token = ParserElem_new(TOKEN_FIELD, (Obj*)ViewCB_Clone(temp));
         }
         else if (S_consume_non_whitespace(qstring, temp)) {
-            token = ParserElem_new(TOKEN_STRING, (char*)ViewCB_Get_Ptr8(temp),
-                                    ViewCB_Get_Size(temp));
+            token = ParserElem_new(TOKEN_STRING, (Obj*)ViewCB_Clone(temp));
         }
         else {
             THROW(ERR, "Failed to parse '%o'", qstring);
@@ -306,7 +304,7 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
 
     if (need_close_paren) {
         VA_Push(parse_tree,
-                (Obj*)ParserElem_new(TOKEN_CLOSE_PAREN, NULL, 0));
+                (Obj*)ParserElem_new(TOKEN_CLOSE_PAREN, NULL));
     }
 
     // Clean up.
