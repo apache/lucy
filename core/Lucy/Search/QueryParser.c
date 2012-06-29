@@ -23,6 +23,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/QueryParser.h"
+#include "Lucy/Search/QueryParser/ParserElem.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
@@ -37,18 +38,18 @@
 #include "Lucy/Search/TermQuery.h"
 #include "Lucy/Search/Query.h"
 
-#define SHOULD            0x00000001
-#define MUST              0x00000002
-#define MUST_NOT          0x00000004
-#define TOKEN_OPEN_PAREN  0x00000008
-#define TOKEN_CLOSE_PAREN 0x00000010
-#define TOKEN_MINUS       0x00000020
-#define TOKEN_PLUS        0x00000040
-#define TOKEN_NOT         0x00000080
-#define TOKEN_OR          0x00000100
-#define TOKEN_AND         0x00000200
-#define TOKEN_FIELD       0x00000400
-#define TOKEN_QUERY       0x00000800
+#define SHOULD            LUCY_QPARSER_SHOULD
+#define MUST              LUCY_QPARSER_MUST
+#define MUST_NOT          LUCY_QPARSER_MUST_NOT
+#define TOKEN_OPEN_PAREN  LUCY_QPARSER_TOKEN_OPEN_PAREN
+#define TOKEN_CLOSE_PAREN LUCY_QPARSER_TOKEN_CLOSE_PAREN
+#define TOKEN_MINUS       LUCY_QPARSER_TOKEN_MINUS
+#define TOKEN_PLUS        LUCY_QPARSER_TOKEN_PLUS
+#define TOKEN_NOT         LUCY_QPARSER_TOKEN_NOT
+#define TOKEN_OR          LUCY_QPARSER_TOKEN_OR
+#define TOKEN_AND         LUCY_QPARSER_TOKEN_AND
+#define TOKEN_FIELD       LUCY_QPARSER_TOKEN_FIELD
+#define TOKEN_QUERY       LUCY_QPARSER_TOKEN_QUERY
 
 // Recursing helper function for Tree().
 static Query*
@@ -1212,27 +1213,4 @@ ParserClause_destroy(ParserClause *self) {
     DECREF(self->query);
     SUPER_DESTROY(self, PARSERCLAUSE);
 }
-
-/********************************************************************/
-
-ParserElem*
-ParserElem_new(uint32_t type, const char *text, size_t len) {
-    ParserElem *self = (ParserElem*)VTable_Make_Obj(PARSERELEM);
-    return ParserElem_init(self, type, text, len);
-}
-
-ParserElem*
-ParserElem_init(ParserElem *self, uint32_t type, const char *text,
-                 size_t len) {
-    self->type = type;
-    self->text = text ? CB_new_from_utf8(text, len) : NULL;
-    return self;
-}
-
-void
-ParserElem_destroy(ParserElem *self) {
-    DECREF(self->text);
-    SUPER_DESTROY(self, PARSERELEM);
-}
-
 
