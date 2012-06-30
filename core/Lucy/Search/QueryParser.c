@@ -52,16 +52,24 @@
 
 // Recursing helper function for Tree().
 static Query*
-S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
-          Hash *extractions);
+S_do_tree(QueryParser *self, VArray *elems, CharBuf *default_field,
+          Hash *extractions, bool_t enclosed);
 
 static CharBuf*
 S_balance_parens_in_string(CharBuf *qstring);
+
+static VArray*
+S_parse_flat_string(QueryParser *self, CharBuf *query_string);
 
 // Drop unmatched right parens and add matching right parens at end to
 // close paren groups implicitly.
 static void
 S_balance_parens(QueryParser *self, VArray *elems);
+
+// Work from the inside out, reducing the leftmost, innermost paren groups
+// first, until the array of elems contains no parens.
+static void
+S_parse_subqueries(QueryParser *self, VArray *elems, Hash *extractions);
 
 static void
 S_compose_inner_queries(QueryParser *self, VArray *elems,
@@ -139,7 +147,7 @@ S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target);
 
 // Consume non-whitespace from qstring and store the match in target.
 static bool_t
-S_consume_non_whitespace(ViewCharBuf *qstring, ViewCharBuf *target);
+S_consume_non_whitespace_non_paren(ViewCharBuf *qstring, ViewCharBuf *target);
 
 #define RAND_STRING_LEN      16
 #define PHRASE_LABEL_LEN     (RAND_STRING_LEN + sizeof("_phrase") - 1)
@@ -274,9 +282,10 @@ QParser_tree(QueryParser *self, const CharBuf *query_string) {
     Hash    *extractions = Hash_new(0);
     CharBuf *mod1        = S_extract_phrases(self, query_string, extractions);
     CharBuf *mod2        = S_balance_parens_in_string(mod1);
-    CharBuf *mod3        = S_extract_paren_groups(self, mod2, extractions);
-    Query   *retval      = S_do_tree(self, mod3, NULL, extractions);
-    DECREF(mod3);
+    VArray  *elems       = S_parse_flat_string(self, mod2);
+    S_parse_subqueries(self, elems, extractions);
+    Query   *retval      = S_do_tree(self, elems, NULL, extractions, false);
+    DECREF(elems);
     DECREF(mod2);
     DECREF(mod1);
     DECREF(extractions);
@@ -288,17 +297,8 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
     VArray      *parse_tree       = VA_new(0);
     CharBuf     *qstring_copy     = CB_Clone(query_string);
     ViewCharBuf *qstring          = (ViewCharBuf*)ZCB_WRAP(qstring_copy);
-    bool_t       need_close_paren = false;
 
     ViewCB_Trim(qstring);
-
-    if (S_consume_ascii(qstring, "(", 1)) {
-        VA_Push(parse_tree, (Obj*)ParserElem_new(TOKEN_OPEN_PAREN, NULL));
-        if (ViewCB_Code_Point_From(qstring, 1) == ')') {
-            need_close_paren = true;
-            ViewCB_Chop(qstring, 1);
-        }
-    }
 
     ViewCharBuf *temp = (ViewCharBuf*)ZCB_BLANK();
     while (ViewCB_Get_Size(qstring)) {
@@ -307,6 +307,12 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
         if (ViewCB_Trim_Top(qstring)) {
             // Fast-forward past whitespace.
             continue;
+        }
+        else if (S_consume_ascii(qstring, "(", 1)) {
+            token = ParserElem_new(TOKEN_OPEN_PAREN, NULL);
+        }
+        else if (S_consume_ascii(qstring, ")", 1)) {
+            token = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
         }
         else if (S_consume_ascii(qstring, "+", 1)) {
             if (ViewCB_Trim_Top(qstring)) {
@@ -336,7 +342,7 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
         else if (self->heed_colons && S_consume_field(qstring, temp)) {
             token = ParserElem_new(TOKEN_FIELD, (Obj*)ViewCB_Clone(temp));
         }
-        else if (S_consume_non_whitespace(qstring, temp)) {
+        else if (S_consume_non_whitespace_non_paren(qstring, temp)) {
             token = ParserElem_new(TOKEN_STRING, (Obj*)ViewCB_Clone(temp));
         }
         else {
@@ -346,15 +352,64 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
         VA_Push(parse_tree, (Obj*)token);
     }
 
-    if (need_close_paren) {
-        VA_Push(parse_tree,
-                (Obj*)ParserElem_new(TOKEN_CLOSE_PAREN, NULL));
-    }
-
     // Clean up.
     DECREF(qstring_copy);
 
     return parse_tree;
+}
+
+static void
+S_parse_subqueries(QueryParser *self, VArray *elems, Hash *extractions) {
+    while (1) {
+        // Work from the inside out, starting with the leftmost innermost
+        // paren group.
+        size_t left = SIZE_MAX;
+        size_t right = SIZE_MAX;
+        CharBuf *field = NULL;
+        for (size_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
+            ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+            uint32_t type = ParserElem_Get_Type(elem);
+            if (type == TOKEN_OPEN_PAREN) {
+                left = i;
+            }
+            else if (type == TOKEN_CLOSE_PAREN) {
+                right = i;
+                break;
+            }
+            else if (type == TOKEN_FIELD && i < max - 1) {
+                // If a field applies to an enclosing paren, pass it along.
+                ParserElem *next_elem = (ParserElem*)VA_Fetch(elems, i + 1);
+                uint32_t next_type = ParserElem_Get_Type(next_elem);
+                if (next_type == TOKEN_OPEN_PAREN) {
+                    field = (CharBuf*)ParserElem_As(elem, CHARBUF);
+                }
+            }
+        }
+
+        // Break out of loop when there are no parens left.
+        if (right == SIZE_MAX) {
+            break;
+        }
+
+        // Create the subquery.
+        VArray *sub_elems = VA_Slice(elems, left + 1, right - left - 1);
+        Query *subquery = S_do_tree(self, sub_elems, field, extractions, true);
+        ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)subquery);
+        ParserElem_Set_Occur(new_elem, self->default_occur);
+        DECREF(sub_elems);
+
+        // Replace the elements used to create the subquery with the subquery
+        // itself.
+        if (left > 0) {
+            ParserElem *maybe_field = (ParserElem*)VA_Fetch(elems, left - 1);
+            uint32_t maybe_field_type = ParserElem_Get_Type(maybe_field);
+            if (maybe_field_type == TOKEN_FIELD) {
+                left -= 1;
+            }
+        }
+        VA_Excise(elems, left + 1, right - left);
+        VA_Store(elems, left, (Obj*)new_elem);
+    }
 }
 
 static void
@@ -366,11 +421,8 @@ S_discard_elems(VArray *elems, uint32_t type) {
 }
 
 static Query*
-S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
-          Hash *extractions) {
-    VArray *elems = S_parse_flat_string(self, query_string);
-    S_balance_parens(self, elems);
-    bool_t enclosed = false;
+S_do_tree(QueryParser *self, VArray *elems, CharBuf *default_field,
+          Hash *extractions, bool_t enclosed) {
     if (VA_Get_Size(elems)) {
         ParserElem *first = (ParserElem*)VA_Fetch(elems, 0);
         if (ParserElem_Get_Type(first) == TOKEN_OPEN_PAREN) {
@@ -401,7 +453,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     }
     S_discard_elems(elems, TOKEN_OR);
     Query *retval = S_compose_subquery(self, elems, enclosed);
-    DECREF(elems);
+
     return retval;
 }
 
@@ -494,20 +546,6 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
                 ParserElem_Set_Occur(new_elem, self->default_occur);
                 DECREF(Hash_Delete(extractions, (Obj*)text));
                 VA_Store(elems, i, (Obj*)new_elem);
-            }
-            // Recursively parse parenthetical groupings.
-            else if (CB_Starts_With(text, self->bool_group_label)) {
-                CharBuf *inner_text
-                    = (CharBuf*)Hash_Fetch(extractions, (Obj*)text);
-                Query *query
-                    = S_do_tree(self, inner_text, field, extractions);
-                DECREF(Hash_Delete(extractions, (Obj*)text));
-                if (query) {
-                    ParserElem *new_elem
-                        = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-                    ParserElem_Set_Occur(new_elem, self->default_occur);
-                    VA_Store(elems, i, (Obj*)new_elem);
-                }
             }
             // What's left is probably a term, so generate a LeafQuery.
             else {
@@ -934,11 +972,15 @@ S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target) {
 }
 
 static bool_t
-S_consume_non_whitespace(ViewCharBuf *qstring, ViewCharBuf *target) {
+S_consume_non_whitespace_non_paren(ViewCharBuf *qstring, ViewCharBuf *target) {
     uint32_t code_point = ViewCB_Code_Point_At(qstring, 0);
     bool_t   success    = false;
     ViewCB_Assign(target, (CharBuf*)qstring);
-    while (code_point && !StrHelp_is_whitespace(code_point)) {
+    while (code_point
+        && !StrHelp_is_whitespace(code_point)
+        && code_point != '('
+        && code_point != ')'
+       ) {
         ViewCB_Nip_One(qstring);
         code_point = ViewCB_Code_Point_At(qstring, 0);
         success = true;
