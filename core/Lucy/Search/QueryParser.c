@@ -55,9 +55,10 @@ static Query*
 S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
           Hash *extractions);
 
-// Determine whether the subclause is bracketed by parens.
-static bool_t
-S_enclosed_by_parens(QueryParser *self, VArray *elems);
+// Drop unmatched right parens and add matching right parens at end to
+// close paren groups implicitly.
+static void
+S_balance_parens(QueryParser *self, VArray *elems);
 
 static void
 S_compose_inner_queries(QueryParser *self, VArray *elems,
@@ -363,7 +364,16 @@ static Query*
 S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
           Hash *extractions) {
     VArray *elems = S_parse_flat_string(self, query_string);
-    bool_t enclosed = S_enclosed_by_parens(self, elems);
+    S_balance_parens(self, elems);
+    bool_t enclosed = false;
+    if (VA_Get_Size(elems)) {
+        ParserElem *first = (ParserElem*)VA_Fetch(elems, 0);
+        if (ParserElem_Get_Type(first) == TOKEN_OPEN_PAREN) {
+            enclosed = true;
+            DECREF(VA_Shift(elems));
+            DECREF(VA_Pop(elems));
+        }
+    }
     S_compose_inner_queries(self, elems, default_field, extractions);
     S_discard_elems(elems, TOKEN_FIELD);
     S_discard_elems(elems, TOKEN_STRING);
@@ -390,25 +400,33 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
     return retval;
 }
 
-static bool_t
-S_enclosed_by_parens(QueryParser *self, VArray *elems) {
-    bool_t enclosed = false;
-    ParserElem *maybe_open_paren = (ParserElem*)VA_Fetch(elems, 0);
-    if (maybe_open_paren != NULL
-        && ParserElem_Get_Type(maybe_open_paren) == TOKEN_OPEN_PAREN
-       ) {
-        enclosed = true;
-        VA_Excise(elems, 0, 1);
-        uint32_t num_elems = VA_Get_Size(elems);
-        if (num_elems) {
-            ParserElem *maybe_close_paren
-                = (ParserElem*)VA_Fetch(elems, num_elems - 1);
-            if (ParserElem_Get_Type(maybe_close_paren) == TOKEN_CLOSE_PAREN) {
-                VA_Excise(elems, num_elems - 1, 1);
+static void
+S_balance_parens(QueryParser *self, VArray *elems) {
+    // Count paren balance, eliminate unbalanced right parens.
+    int64_t paren_depth = 0;
+    size_t i = 0;
+    while (i < VA_Get_Size(elems)) {
+        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+        if (ParserElem_Get_Type(elem) == TOKEN_OPEN_PAREN) {
+            paren_depth++;
+        }
+        else if (ParserElem_Get_Type(elem) == TOKEN_CLOSE_PAREN) {
+            if (paren_depth > 0) {
+                paren_depth--;
+            }
+            else {
+                VA_Excise(elems, i, 1);
+                continue;
             }
         }
+        i++;
     }
-    return enclosed;
+
+    // Insert implicit parens.
+    while (paren_depth--) {
+        ParserElem *elem = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
+        VA_Push(elems, (Obj*)elem);
+    }
 }
 
 static void
