@@ -151,9 +151,14 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
     }
     VA_Sort(self->fields, NULL, NULL);
 
-    if (!(CB_Equals_Str(self->default_boolop, "OR", 2)
-          || CB_Equals_Str(self->default_boolop, "AND", 3))
-       ) {
+    // Derive default "occur" from default boolean operator.
+    if (CB_Equals_Str(self->default_boolop, "OR", 2)) {
+        self->default_occur = SHOULD;
+    }
+    else if (CB_Equals_Str(self->default_boolop, "AND", 3)) {
+        self->default_occur = MUST;
+    }
+    else {
         THROW(ERR, "Invalid value for default_boolop: %o", self->default_boolop);
     }
 
@@ -328,9 +333,6 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
           Hash *extractions) {
     Query    *retval;
     bool_t    apply_parens  = false;
-    uint32_t  default_occur = CB_Equals_Str(self->default_boolop, "AND", 3)
-                              ? MUST
-                              : SHOULD;
     VArray   *elems         = S_parse_flat_string(self, query_string);
 
     // Determine whether this subclause is bracketed by parens.
@@ -373,7 +375,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                     = (CharBuf*)Hash_Fetch(extractions, (Obj*)text);
                 LeafQuery *query = LeafQuery_new(field, inner_text);
                 ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-                ParserElem_Set_Occur(new_elem, default_occur);
+                ParserElem_Set_Occur(new_elem, self->default_occur);
                 DECREF(Hash_Delete(extractions, (Obj*)text));
                 VA_Store(elems, i, (Obj*)new_elem);
             }
@@ -387,7 +389,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                 if (query) {
                     ParserElem *new_elem
                         = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-                    ParserElem_Set_Occur(new_elem, default_occur);
+                    ParserElem_Set_Occur(new_elem, self->default_occur);
                     VA_Store(elems, i, (Obj*)new_elem);
                 }
             }
@@ -396,7 +398,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
                 LeafQuery *query = LeafQuery_new(field, text);
                 ParserElem *new_elem
                     = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-                ParserElem_Set_Occur(new_elem, default_occur);
+                ParserElem_Set_Occur(new_elem, self->default_occur);
                 VA_Store(elems, i, (Obj*)new_elem);
             }
         }
@@ -493,7 +495,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
             Query *and_query = QParser_Make_AND_Query(self, children);
             ParserElem_Set_Value(preceding, (Obj*)and_query);
-            ParserElem_Set_Occur(preceding, default_occur);
+            ParserElem_Set_Occur(preceding, self->default_occur);
             DECREF(and_query);
             DECREF(children);
 
@@ -537,7 +539,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
             Query *or_query = QParser_Make_OR_Query(self, children);
             ParserElem_Set_Value(preceding, (Obj*)or_query);
-            ParserElem_Set_Occur(preceding, default_occur);
+            ParserElem_Set_Occur(preceding, self->default_occur);
             DECREF(or_query);
             DECREF(children);
 
@@ -552,7 +554,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
         // No elems means no query. Maybe the search string was something
         // like 'NOT AND'
         if (apply_parens) {
-            retval = default_occur == SHOULD
+            retval = self->default_occur == SHOULD
                      ? QParser_Make_OR_Query(self, NULL)
                      : QParser_Make_AND_Query(self, NULL);
         }
