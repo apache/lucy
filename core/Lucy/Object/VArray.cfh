@@ -149,6 +149,16 @@ class Lucy::Object::VArray cnick VA inherits Lucy::Object::Obj {
     public incremented VArray*
     Gather(VArray *self, Lucy_VA_Gather_Test_t test, void *data);
 
+    /** Return a new array consisting of elements from a contiguous slice.  If
+     * the specified range is out of bounds, return an array with fewer
+     * elements -- potentially none.
+     *
+     * @param offset The index of the element to start at.
+     * @param length The maximum number of elements to slice.
+     */
+    public incremented VArray*
+    Slice(VArray *self, uint32_t offset, uint32_t length);
+
     public bool_t
     Equals(VArray *self, Obj *other);
 

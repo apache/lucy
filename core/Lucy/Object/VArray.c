@@ -343,4 +343,28 @@ VA_gather(VArray *self, Lucy_VA_Gather_Test_t test, void *data) {
     return gathered;
 }
 
+VArray*
+VA_slice(VArray *self, uint32_t offset, uint32_t length) {
+    // Adjust ranges if necessary.
+    if (offset >= self->size) {
+        offset = 0;
+        length = 0;
+    }
+    else if (length > UINT32_MAX - offset
+             || offset + length > self->size
+            ) {
+        length = self->size - offset;
+    }
+
+    // Copy elements.
+    VArray *slice = VA_new(length);
+    slice->size = length;
+    Obj **slice_elems = slice->elems;
+    Obj **my_elems    = self->elems;
+    for (uint32_t i = 0; i < length; i++) {
+        slice_elems[i] = INCREF(my_elems[offset + i]);
+    }
+
+    return slice;
+}
 

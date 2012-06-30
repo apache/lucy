@@ -216,6 +216,51 @@ test_Push_VArray(TestBatch *batch) {
 }
 
 static void
+test_Slice(TestBatch *batch) {
+    VArray *array = VA_new(0);
+    for (uint32_t i = 0; i < 10; i++) { VA_Push(array, (Obj*)CB_newf("%u32", i)); }
+    {
+        VArray *slice = VA_Slice(array, 0, 10);
+        TEST_TRUE(batch, VA_Equals(array, (Obj*)slice), "Slice entire array");
+        DECREF(slice);
+    }
+    {
+        VArray *slice = VA_Slice(array, 0, 11);
+        TEST_TRUE(batch, VA_Equals(array, (Obj*)slice),
+            "Exceed length");
+        DECREF(slice);
+    }
+    {
+        VArray *wanted = VA_new(0);
+        VA_Push(wanted, (Obj*)CB_newf("9"));
+        VArray *slice = VA_Slice(array, 9, 11);
+        TEST_TRUE(batch, VA_Equals(slice, (Obj*)wanted),
+            "Exceed length, start near end");
+        DECREF(slice);
+        DECREF(wanted);
+    }
+    {
+        VArray *slice = VA_Slice(array, 0, 0);
+        TEST_TRUE(batch, VA_Get_Size(slice) == 0, "empty slice");
+        DECREF(slice);
+    }
+    {
+        VArray *slice = VA_Slice(array, 20, 1);
+        TEST_TRUE(batch, VA_Get_Size(slice) ==  0, "exceed offset");
+        DECREF(slice);
+    }
+    {
+        VArray *wanted = VA_new(0);
+        VA_Push(wanted, (Obj*)CB_newf("9"));
+        VArray *slice = VA_Slice(array, 9, UINT32_MAX - 1);
+        TEST_TRUE(batch, VA_Get_Size(slice) == 1, "guard against overflow");
+        DECREF(slice);
+        DECREF(wanted);
+    }
+    DECREF(array);
+}
+
+static void
 test_Clone_and_Shallow_Copy(TestBatch *batch) {
     VArray *array = VA_new(0);
     VArray *twin;
@@ -271,7 +316,7 @@ test_serialization(TestBatch *batch) {
 
 void
 TestVArray_run_tests() {
-    TestBatch *batch = TestBatch_new(39);
+    TestBatch *batch = TestBatch_new(45);
 
     TestBatch_Plan(batch);
 
@@ -282,6 +327,7 @@ TestVArray_run_tests() {
     test_Resize(batch);
     test_Excise(batch);
     test_Push_VArray(batch);
+    test_Slice(batch);
     test_Clone_and_Shallow_Copy(batch);
     test_Dump_and_Load(batch);
     test_serialization(batch);
