@@ -55,6 +55,39 @@ static Query*
 S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
           Hash *extractions);
 
+// Determine whether the subclause is bracketed by parens.
+static bool_t
+S_enclosed_by_parens(QueryParser *self, VArray *elems);
+
+static void
+S_compose_inner_queries(QueryParser *self, VArray *elems,
+                        CharBuf *default_field, Hash *extractions);
+
+// Apply +, -, NOT.
+static void
+S_apply_plusses_and_negations(QueryParser *self, VArray *elems);
+
+// Wrap negated queries with NOTQuery objects.
+static void
+S_compose_not_queries(QueryParser *self, VArray *elems);
+
+// Silently discard non-sensical combos of AND and OR, e.g.
+// 'OR a AND AND OR b AND'.
+static void
+S_winnow_boolops(QueryParser *self, VArray *elems);
+
+// Join ANDQueries.
+static void
+S_compose_and_queries(QueryParser *self, VArray *elems);
+
+// Join ORQueries.
+static void
+S_compose_or_queries(QueryParser *self, VArray *elems);
+
+// Derive a single subquery from all Query objects in the clause.
+static Query*
+S_compose_subquery(QueryParser *self, VArray *elems, bool_t enclosed);
+
 // A function that attempts to match a substring and if successful, stores the
 // begin and end of the match in the supplied pointers and returns true.
 typedef bool_t
@@ -319,28 +352,52 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
 }
 
 static void
-S_splice_out_elem_type(VArray *elems, uint32_t mask) {
-    for (uint32_t i = VA_Get_Size(elems); i--;) {
+S_discard_elems(VArray *elems, uint32_t type) {
+    for (size_t i = VA_Get_Size(elems); i--;) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
-        if (Obj_Is_A((Obj*)elem, PARSERELEM)) {
-            if (ParserElem_Get_Type(elem) & mask) { VA_Excise(elems, i, 1); }
-        }
+        if (ParserElem_Get_Type(elem) == type) { VA_Excise(elems, i, 1); }
     }
 }
 
 static Query*
 S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
           Hash *extractions) {
-    Query    *retval;
-    bool_t    apply_parens  = false;
-    VArray   *elems         = S_parse_flat_string(self, query_string);
+    VArray *elems = S_parse_flat_string(self, query_string);
+    bool_t enclosed = S_enclosed_by_parens(self, elems);
+    S_compose_inner_queries(self, elems, default_field, extractions);
+    S_discard_elems(elems, TOKEN_FIELD);
+    S_discard_elems(elems, TOKEN_STRING);
+    S_apply_plusses_and_negations(self, elems);
+    S_discard_elems(elems, TOKEN_PLUS);
+    S_discard_elems(elems, TOKEN_MINUS);
+    S_discard_elems(elems, TOKEN_NOT);
+    S_compose_not_queries(self, elems);
+    S_winnow_boolops(self, elems);
+    if (VA_Get_Size(elems) > 2) {
+        S_compose_and_queries(self, elems);
+        // Don't double wrap '(a AND b)'.
+        if (VA_Get_Size(elems) == 1) { enclosed = false; }
+    }
+    S_discard_elems(elems, TOKEN_AND);
+    if (VA_Get_Size(elems) > 2) {
+        S_compose_or_queries(self, elems);
+        // Don't double wrap '(a OR b)'.
+        if (VA_Get_Size(elems) == 1) { enclosed = false; }
+    }
+    S_discard_elems(elems, TOKEN_OR);
+    Query *retval = S_compose_subquery(self, elems, enclosed);
+    DECREF(elems);
+    return retval;
+}
 
-    // Determine whether this subclause is bracketed by parens.
+static bool_t
+S_enclosed_by_parens(QueryParser *self, VArray *elems) {
+    bool_t enclosed = false;
     ParserElem *maybe_open_paren = (ParserElem*)VA_Fetch(elems, 0);
     if (maybe_open_paren != NULL
         && ParserElem_Get_Type(maybe_open_paren) == TOKEN_OPEN_PAREN
        ) {
-        apply_parens = true;
+        enclosed = true;
         VA_Excise(elems, 0, 1);
         uint32_t num_elems = VA_Get_Size(elems);
         if (num_elems) {
@@ -351,7 +408,12 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
         }
     }
+    return enclosed;
+}
 
+static void
+S_compose_inner_queries(QueryParser *self, VArray *elems,
+                        CharBuf *default_field, Hash *extractions) {
     // Generate all queries.  Apply any fields.
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         CharBuf *field = default_field;
@@ -403,9 +465,10 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
         }
     }
-    S_splice_out_elem_type(elems, TOKEN_FIELD | TOKEN_STRING);
+}
 
-    // Apply +, -, NOT.
+static void
+S_apply_plusses_and_negations(QueryParser *self, VArray *elems) {
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) == TOKEN_QUERY) {
@@ -424,9 +487,10 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             }
         }
     }
-    S_splice_out_elem_type(elems, TOKEN_PLUS | TOKEN_MINUS | TOKEN_NOT);
+}
 
-    // Wrap negated queries with NOTQuery objects.
+static void
+S_compose_not_queries(QueryParser *self, VArray *elems) {
     for (uint32_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) == TOKEN_QUERY
@@ -438,9 +502,10 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             DECREF(not_query);
         }
     }
+}
 
-    // Silently discard non-sensical combos of AND and OR, e.g.
-    // 'OR a AND AND OR b AND'.
+static void
+S_winnow_boolops(QueryParser *self, VArray *elems) {
     for (uint32_t i = 0; i < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) != TOKEN_QUERY) {
@@ -461,8 +526,11 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             if (num_to_zap) { VA_Excise(elems, i, num_to_zap); }
         }
     }
+}
 
-    // Apply AND.
+// Apply AND.
+static void
+S_compose_and_queries(QueryParser *self, VArray *elems) {
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
         if (ParserElem_Get_Type(elem) == TOKEN_AND) {
@@ -500,13 +568,12 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             DECREF(children);
 
             VA_Excise(elems, i + 1, num_to_zap);
-
-            // Don't double wrap '(a AND b)'.
-            if (VA_Get_Size(elems) == 1) { apply_parens = false; }
         }
     }
+}
 
-    // Apply OR.
+static void
+S_compose_or_queries(QueryParser *self, VArray *elems) {
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
         if (ParserElem_Get_Type(elem) == TOKEN_OR) {
@@ -544,16 +611,18 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             DECREF(children);
 
             VA_Excise(elems, i + 1, num_to_zap);
-
-            // Don't double wrap '(a OR b)'.
-            if (VA_Get_Size(elems) == 1) { apply_parens = false; }
         }
     }
+}
+
+static Query*
+S_compose_subquery(QueryParser *self, VArray *elems, bool_t enclosed) {
+    Query *retval;
 
     if (VA_Get_Size(elems) == 0) {
         // No elems means no query. Maybe the search string was something
         // like 'NOT AND'
-        if (apply_parens) {
+        if (enclosed) {
             retval = self->default_occur == SHOULD
                      ? QParser_Make_OR_Query(self, NULL)
                      : QParser_Make_AND_Query(self, NULL);
@@ -562,7 +631,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
             retval = (Query*)NoMatchQuery_new();
         }
     }
-    else if (VA_Get_Size(elems) == 1 && !apply_parens) {
+    else if (VA_Get_Size(elems) == 1 && !enclosed) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, 0);
         Query *query = (Query*)ParserElem_As(elem, QUERY);
         retval = (Query*)INCREF(query);
@@ -596,7 +665,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
         // Bind all mandatory matchers together in one Query.
         if (num_required || num_negated) {
-            if (apply_parens || num_required + num_negated > 1) {
+            if (enclosed || num_required + num_negated > 1) {
                 VArray *children = VA_Shallow_Copy(required);
                 VA_Push_VArray(children, negated);
                 req_query = QParser_Make_AND_Query(self, children);
@@ -612,7 +681,7 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
 
         // Bind all optional matchers together in one Query.
         if (num_optional) {
-            if (!apply_parens && num_optional == 1) {
+            if (!enclosed && num_optional == 1) {
                 opt_query = (Query*)INCREF(VA_Fetch(optional, 0));
             }
             else {
@@ -654,8 +723,6 @@ S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
         DECREF(optional);
         DECREF(required);
     }
-
-    DECREF(elems);
 
     return retval;
 }
@@ -1198,4 +1265,5 @@ QParser_make_req_opt_query(QueryParser *self, Query *required_query,
     UNUSED_VAR(self);
     return (Query*)ReqOptQuery_new(required_query, optional_query);
 }
+
 
