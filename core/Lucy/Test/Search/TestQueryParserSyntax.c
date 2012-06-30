@@ -223,6 +223,12 @@ syntax_test_unclosed_parens() {
 }
 
 static TestQueryParser*
+syntax_test_unmatched_parens() {
+    Query *tree = make_leaf_query(NULL, "a");
+    return TestQP_new(")a)", tree, NULL, 4);
+}
+
+static TestQueryParser*
 syntax_test_escaped_quotes_outside() {
     Query *tree = make_leaf_query(NULL, "\\\"a\\\"");
     return TestQP_new("\\\"a\\\"", tree, NULL, 4);
@@ -279,6 +285,7 @@ static Lucy_TestQPSyntax_Test_t syntax_test_funcs[] = {
     syntax_test_padded_plus,
     syntax_test_padded_minus,
     syntax_test_unclosed_parens,
+    syntax_test_unmatched_parens,
     syntax_test_escaped_quotes_outside,
     syntax_test_escaped_quotes_inside,
     syntax_test_identifier_field_name,
@@ -288,7 +295,7 @@ static Lucy_TestQPSyntax_Test_t syntax_test_funcs[] = {
 
 void
 TestQPSyntax_run_tests(Folder *index) {
-    TestBatch     *batch      = TestBatch_new(66);
+    TestBatch     *batch      = TestBatch_new(68);
     IndexSearcher *searcher   = IxSearcher_new((Obj*)index);
     QueryParser   *qparser    = QParser_new(IxSearcher_Get_Schema(searcher),
                                             NULL, NULL, NULL);
