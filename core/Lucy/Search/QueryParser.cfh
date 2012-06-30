@@ -48,10 +48,7 @@ public class Lucy::Search::QueryParser cnick QParser
     CharBuf    *default_boolop;
     VArray     *fields;
     QueryLexer *lexer;
-    CharBuf    *phrase_label;
-    CharBuf    *bool_group_label;
     bool_t      heed_colons;
-    uint32_t    label_inc;
     bool_t      default_occur;
 
     inert incremented QueryParser*

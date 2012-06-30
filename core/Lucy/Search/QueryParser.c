@@ -56,12 +56,6 @@ static Query*
 S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
                  bool_t enclosed);
 
-static CharBuf*
-S_balance_parens_in_string(CharBuf *qstring);
-
-static VArray*
-S_parse_flat_string(QueryParser *self, CharBuf *query_string);
-
 // Drop unmatched right parens and add matching right parens at end to
 // close paren groups implicitly.
 static void
@@ -101,59 +95,6 @@ S_compose_or_queries(QueryParser *self, VArray *elems);
 static Query*
 S_compose_subquery(QueryParser *self, VArray *elems, bool_t enclosed);
 
-// A function that attempts to match a substring and if successful, stores the
-// begin and end of the match in the supplied pointers and returns true.
-typedef bool_t
-(*Lucy_QueryParser_Match_t)(CharBuf *input, char **begin_match,
-                            char **end_match);
-#define match_t Lucy_QueryParser_Match_t
-
-// Find a quote/end-of-string -delimited phrase.
-static bool_t
-S_match_phrase(CharBuf *input, char**begin_match, char **end_match);
-
-// Find a non-nested parethetical group.
-static bool_t
-S_match_bool_group(CharBuf *input, char**begin_match, char **end_match);
-
-// Replace whatever match() matches with a label, storing the matched text as
-// a CharBuf in the supplied storage Hash.
-static CharBuf*
-S_extract_something(QueryParser *self, const CharBuf *query_string,
-                    CharBuf *label, Hash *extractions, match_t match);
-
-// Symbolically replace phrases in a query string.
-static CharBuf*
-S_extract_phrases(QueryParser *self, const CharBuf *query_string,
-                  Hash *extractions);
-
-// Symbolically replace parenthetical groupings in a query string.
-static CharBuf*
-S_extract_paren_groups(QueryParser *self, const CharBuf *query_string,
-                       Hash *extractions);
-
-// Consume text and possibly following whitespace, if there's a match and the
-// matching is bordered on the right by either whitespace or the end of the
-// string.
-static bool_t
-S_consume_ascii_token(ViewCharBuf *qstring, const char *ptr, size_t size);
-
-// Consume the supplied text if there's a match.
-static bool_t
-S_consume_ascii(ViewCharBuf *qstring, const char *ptr, size_t size);
-
-// Consume what looks like a field name followed by a colon.
-static bool_t
-S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target);
-
-// Consume non-whitespace from qstring and store the match in target.
-static bool_t
-S_consume_non_whitespace_non_paren(ViewCharBuf *qstring, ViewCharBuf *target);
-
-#define RAND_STRING_LEN      16
-#define PHRASE_LABEL_LEN     (RAND_STRING_LEN + sizeof("_phrase") - 1)
-#define BOOL_GROUP_LABEL_LEN (RAND_STRING_LEN + sizeof("_bool_group") - 1)
-
 QueryParser*
 QParser_new(Schema *schema, Analyzer *analyzer, const CharBuf *default_boolop,
             VArray *fields) {
@@ -166,7 +107,6 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
              const CharBuf *default_boolop, VArray *fields) {
     // Init.
     self->heed_colons = false;
-    self->label_inc   = 0;
     self->lexer       = QueryLexer_new();
 
     // Assign.
@@ -209,17 +149,6 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
         THROW(ERR, "Invalid value for default_boolop: %o", self->default_boolop);
     }
 
-    // Create string labels that presumably won't appear in a search.
-    self->phrase_label     = CB_new_from_trusted_utf8("_phrase", 7);
-    self->bool_group_label = CB_new_from_trusted_utf8("_bool_group", 11);
-    CB_Grow(self->phrase_label, PHRASE_LABEL_LEN + 5);
-    CB_Grow(self->bool_group_label, BOOL_GROUP_LABEL_LEN + 5);
-    for (uint32_t i = 0; i < RAND_STRING_LEN; i++) {
-        char rand_char = (rand() % 26) + 'A';
-        CB_Cat_Trusted_Str(self->phrase_label, &rand_char, 1);
-        CB_Cat_Trusted_Str(self->bool_group_label, &rand_char, 1);
-    }
-
     return self;
 }
 
@@ -230,8 +159,6 @@ QParser_destroy(QueryParser *self) {
     DECREF(self->default_boolop);
     DECREF(self->fields);
     DECREF(self->lexer);
-    DECREF(self->phrase_label);
-    DECREF(self->bool_group_label);
     SUPER_DESTROY(self, QUERYPARSER);
 }
 
@@ -289,72 +216,6 @@ QParser_tree(QueryParser *self, const CharBuf *query_string) {
     Query *query = S_parse_subquery(self, elems, NULL, false);
     DECREF(elems);
     return query;
-}
-
-static VArray*
-S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
-    VArray      *parse_tree       = VA_new(0);
-    CharBuf     *qstring_copy     = CB_Clone(query_string);
-    ViewCharBuf *qstring          = (ViewCharBuf*)ZCB_WRAP(qstring_copy);
-
-    ViewCB_Trim(qstring);
-
-    ViewCharBuf *temp = (ViewCharBuf*)ZCB_BLANK();
-    while (ViewCB_Get_Size(qstring)) {
-        ParserElem *token = NULL;
-
-        if (ViewCB_Trim_Top(qstring)) {
-            // Fast-forward past whitespace.
-            continue;
-        }
-        else if (S_consume_ascii(qstring, "(", 1)) {
-            token = ParserElem_new(TOKEN_OPEN_PAREN, NULL);
-        }
-        else if (S_consume_ascii(qstring, ")", 1)) {
-            token = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
-        }
-        else if (S_consume_ascii(qstring, "+", 1)) {
-            if (ViewCB_Trim_Top(qstring)) {
-                token = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("+"));
-            }
-            else {
-                token = ParserElem_new(TOKEN_PLUS, NULL);
-            }
-        }
-        else if (S_consume_ascii(qstring, "-", 1)) {
-            if (ViewCB_Trim_Top(qstring)) {
-                token = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("-"));
-            }
-            else {
-                token = ParserElem_new(TOKEN_MINUS, NULL);
-            }
-        }
-        else if (S_consume_ascii_token(qstring, "AND", 3)) {
-            token = ParserElem_new(TOKEN_AND, NULL);
-        }
-        else if (S_consume_ascii_token(qstring, "OR", 2)) {
-            token = ParserElem_new(TOKEN_OR, NULL);
-        }
-        else if (S_consume_ascii_token(qstring, "NOT", 3)) {
-            token = ParserElem_new(TOKEN_NOT, NULL);
-        }
-        else if (self->heed_colons && S_consume_field(qstring, temp)) {
-            token = ParserElem_new(TOKEN_FIELD, (Obj*)ViewCB_Clone(temp));
-        }
-        else if (S_consume_non_whitespace_non_paren(qstring, temp)) {
-            token = ParserElem_new(TOKEN_STRING, (Obj*)ViewCB_Clone(temp));
-        }
-        else {
-            THROW(ERR, "Failed to parse '%o'", qstring);
-        }
-
-        VA_Push(parse_tree, (Obj*)token);
-    }
-
-    // Clean up.
-    DECREF(qstring_copy);
-
-    return parse_tree;
 }
 
 static void
@@ -483,37 +344,6 @@ S_balance_parens(QueryParser *self, VArray *elems) {
         ParserElem *elem = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
         VA_Push(elems, (Obj*)elem);
     }
-}
-
-static CharBuf*
-S_balance_parens_in_string(CharBuf *qstring) {
-    CharBuf *modified = CB_new_from_trusted_utf8("", 0);
-    ZombieCharBuf *source = ZCB_WRAP(qstring);
-
-    // Count paren balance, eliminate unbalanced right parens.
-    int64_t paren_depth = 0;
-    uint32_t code_point;
-    while (0 != (code_point = ZCB_Nip_One(source))) {
-        if (code_point == '(') {
-            paren_depth++;
-        }
-        else if (code_point == ')') {
-            if (paren_depth > 0) {
-                paren_depth--;
-            }
-            else {
-                continue;
-            }
-        }
-        CB_Cat_Char(modified, code_point);
-    }
-
-    // Insert implicit parens.
-    while (paren_depth--) {
-        CB_Cat_Char(modified, ')');
-    }
-
-    return modified;
 }
 
 static void
@@ -887,100 +717,6 @@ QParser_prune(QueryParser *self, Query *query) {
     return (Query*)INCREF(query);
 }
 
-static bool_t
-S_consume_ascii(ViewCharBuf *qstring, const char *ptr, size_t len) {
-    if (ViewCB_Starts_With_Str(qstring, ptr, len)) {
-        ViewCB_Nip(qstring, len);
-        return true;
-    }
-    return false;
-}
-
-static bool_t
-S_consume_ascii_token(ViewCharBuf *qstring, const char *ptr, size_t len) {
-    if (ViewCB_Starts_With_Str(qstring, ptr, len)) {
-        if (len == ViewCB_Get_Size(qstring)
-            || StrHelp_is_whitespace(ViewCB_Code_Point_At(qstring, len))
-           ) {
-            ViewCB_Nip(qstring, len);
-            ViewCB_Trim_Top(qstring);
-            return true;
-        }
-    }
-    return false;
-}
-
-static bool_t
-S_consume_field(ViewCharBuf *qstring, ViewCharBuf *target) {
-    size_t tick = 0;
-
-    // Field names constructs must start with a letter or underscore.
-    uint32_t code_point = ViewCB_Code_Point_At(qstring, tick);
-    if (isalpha(code_point) || code_point == '_') {
-        tick++;
-    }
-    else {
-        return false;
-    }
-
-    // Only alphanumerics and underscores are allowed  in field names.
-    while (1) {
-        code_point = ViewCB_Code_Point_At(qstring, tick);
-        if (isalnum(code_point) || code_point == '_') {
-            tick++;
-        }
-        else if (code_point == ':') {
-            tick++;
-            break;
-        }
-        else {
-            return false;
-        }
-    }
-
-    // Field name constructs must be followed by something sensible.
-    uint32_t lookahead = ViewCB_Code_Point_At(qstring, tick);
-    if (!(isalnum(lookahead)
-          || lookahead == '_'
-          || lookahead > 127
-          || lookahead == '"'
-          || lookahead == '('
-         )
-       ) {
-        return false;
-    }
-
-    // Consume string data.
-    ViewCB_Assign(target, (CharBuf*)qstring);
-    ViewCB_Set_Size(target, tick - 1);
-    ViewCB_Nip(qstring, tick);
-    return true;
-}
-
-static bool_t
-S_consume_non_whitespace_non_paren(ViewCharBuf *qstring, ViewCharBuf *target) {
-    uint32_t code_point = ViewCB_Code_Point_At(qstring, 0);
-    bool_t   success    = false;
-    ViewCB_Assign(target, (CharBuf*)qstring);
-    while (code_point
-        && !StrHelp_is_whitespace(code_point)
-        && code_point != '('
-        && code_point != ')'
-       ) {
-        ViewCB_Nip_One(qstring);
-        code_point = ViewCB_Code_Point_At(qstring, 0);
-        success = true;
-    }
-    if (!success) {
-        return false;
-    }
-    else {
-        uint32_t new_size = ViewCB_Get_Size(target) - ViewCB_Get_Size(qstring);
-        ViewCB_Set_Size(target, new_size);
-        return true;
-    }
-}
-
 Query*
 QParser_expand(QueryParser *self, Query *query) {
     Query *retval = NULL;
@@ -1203,113 +939,6 @@ QParser_expand_leaf(QueryParser *self, Query *query) {
     return retval;
 }
 
-static CharBuf*
-S_extract_something(QueryParser *self, const CharBuf *query_string,
-                    CharBuf *label, Hash *extractions, match_t match) {
-    CharBuf *retval          = CB_Clone(query_string);
-    size_t   qstring_size    = CB_Get_Size(query_string);
-    size_t   orig_label_size = CB_Get_Size(label);
-    char    *begin_match;
-    char    *end_match;
-
-    while (match(retval, &begin_match, &end_match)) {
-        size_t   len          = end_match - begin_match;
-        size_t   retval_size  = CB_Get_Size(retval);
-        char    *retval_buf   = (char*)CB_Get_Ptr8(retval);
-        char    *retval_end   = retval_buf + retval_size;
-        size_t   before_match = begin_match - retval_buf;
-        size_t   after_match  = retval_end - end_match;
-        CharBuf *new_retval   = CB_new(qstring_size);
-
-        // Store inner text.
-        CB_catf(label, "%u32", self->label_inc++);
-        Hash_Store(extractions, (Obj*)label,
-                   (Obj*)CB_new_from_utf8(begin_match, len));
-
-        // Splice the label into the query string.
-        CB_Cat_Str(new_retval, retval_buf, before_match);
-        CB_Cat(new_retval, label);
-        CB_Cat_Str(new_retval, " ", 1); // Extra space for safety.
-        CB_Cat_Str(new_retval, end_match, after_match);
-        DECREF(retval);
-        retval = new_retval;
-        CB_Set_Size(label, orig_label_size);
-    }
-
-    return retval;
-}
-
-static CharBuf*
-S_extract_phrases(QueryParser *self, const CharBuf *query_string,
-                  Hash *extractions) {
-    return S_extract_something(self, query_string, self->phrase_label,
-                               extractions, S_match_phrase);
-}
-
-static bool_t
-S_match_phrase(CharBuf *input, char**begin_match, char **end_match) {
-    ZombieCharBuf *iterator = ZCB_WRAP(input);
-    uint32_t code_point;
-
-    while (0 != (code_point = ZCB_Code_Point_At(iterator, 0))) {
-        if (code_point == '\\') {
-            ZCB_Nip(iterator, 2);
-            continue;
-        }
-        if (code_point == '"') {
-            *begin_match = (char*)ZCB_Get_Ptr8(iterator);
-            *end_match   = *begin_match + ZCB_Get_Size(iterator);
-            ZCB_Nip_One(iterator);
-            while (0 != (code_point = ZCB_Nip_One(iterator))) {
-                if (code_point == '\\') {
-                    ZCB_Nip_One(iterator);
-                    continue;
-                }
-                else if (code_point == '"') {
-                    *end_match = (char*)ZCB_Get_Ptr8(iterator);
-                    return true;
-                }
-            }
-            return true;
-        }
-        ZCB_Nip_One(iterator);
-    }
-    return false;
-}
-
-static CharBuf*
-S_extract_paren_groups(QueryParser *self, const CharBuf *query_string,
-                       Hash *extractions) {
-    return S_extract_something(self, query_string, self->bool_group_label,
-                               extractions, S_match_bool_group);
-}
-
-static bool_t
-S_match_bool_group(CharBuf *input, char**begin_match, char **end_match) {
-    ZombieCharBuf *iterator = ZCB_WRAP(input);
-    uint32_t code_point;
-
-    while (0 != (code_point = ZCB_Code_Point_At(iterator, 0))) {
-        if (code_point == '(') {
-FOUND_OPEN_PAREN:
-            *begin_match = (char*)ZCB_Get_Ptr8(iterator);
-            *end_match   = *begin_match + ZCB_Get_Size(iterator);
-            ZCB_Nip_One(iterator);
-            while (0 != (code_point = ZCB_Code_Point_At(iterator, 0))) {
-                if (code_point == '(') { goto FOUND_OPEN_PAREN; }
-                ZCB_Nip_One(iterator);
-                if (code_point == ')') {
-                    *end_match = (char*)ZCB_Get_Ptr8(iterator);
-                    return true;
-                }
-            }
-            return true;
-        }
-        ZCB_Nip_One(iterator);
-    }
-    return false;
-}
-
 Query*
 QParser_make_term_query(QueryParser *self, const CharBuf *field, Obj *term) {
     UNUSED_VAR(self);
@@ -1347,5 +976,4 @@ QParser_make_req_opt_query(QueryParser *self, Query *required_query,
     UNUSED_VAR(self);
     return (Query*)ReqOptQuery_new(required_query, optional_query);
 }
-
 
