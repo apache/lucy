@@ -55,6 +55,9 @@ static Query*
 S_do_tree(QueryParser *self, CharBuf *query_string, CharBuf *default_field,
           Hash *extractions);
 
+static CharBuf*
+S_balance_parens_in_string(CharBuf *qstring);
+
 // Drop unmatched right parens and add matching right parens at end to
 // close paren groups implicitly.
 static void
@@ -270,8 +273,10 @@ Query*
 QParser_tree(QueryParser *self, const CharBuf *query_string) {
     Hash    *extractions = Hash_new(0);
     CharBuf *mod1        = S_extract_phrases(self, query_string, extractions);
-    CharBuf *mod2        = S_extract_paren_groups(self, mod1, extractions);
-    Query   *retval      = S_do_tree(self, mod2, NULL, extractions);
+    CharBuf *mod2        = S_balance_parens_in_string(mod1);
+    CharBuf *mod3        = S_extract_paren_groups(self, mod2, extractions);
+    Query   *retval      = S_do_tree(self, mod3, NULL, extractions);
+    DECREF(mod3);
     DECREF(mod2);
     DECREF(mod1);
     DECREF(extractions);
@@ -427,6 +432,37 @@ S_balance_parens(QueryParser *self, VArray *elems) {
         ParserElem *elem = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
         VA_Push(elems, (Obj*)elem);
     }
+}
+
+static CharBuf*
+S_balance_parens_in_string(CharBuf *qstring) {
+    CharBuf *modified = CB_new_from_trusted_utf8("", 0);
+    ZombieCharBuf *source = ZCB_WRAP(qstring);
+
+    // Count paren balance, eliminate unbalanced right parens.
+    int64_t paren_depth = 0;
+    uint32_t code_point;
+    while (0 != (code_point = ZCB_Nip_One(source))) {
+        if (code_point == '(') {
+            paren_depth++;
+        }
+        else if (code_point == ')') {
+            if (paren_depth > 0) {
+                paren_depth--;
+            }
+            else {
+                continue;
+            }
+        }
+        CB_Cat_Char(modified, code_point);
+    }
+
+    // Insert implicit parens.
+    while (paren_depth--) {
+        CB_Cat_Char(modified, ')');
+    }
+
+    return modified;
 }
 
 static void
