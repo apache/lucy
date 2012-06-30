@@ -22,6 +22,7 @@
 
 #include "Lucy/Search/QueryParser.h"
 #include "Lucy/Search/QueryParser/ParserElem.h"
+#include "Lucy/Search/QueryParser/QueryLexer.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
@@ -50,10 +51,10 @@
 #define TOKEN_STRING      LUCY_QPARSER_TOKEN_STRING
 #define TOKEN_QUERY       LUCY_QPARSER_TOKEN_QUERY
 
-// Recursing helper function for Tree().
+// Helper function for Tree().
 static Query*
-S_do_tree(QueryParser *self, VArray *elems, CharBuf *default_field,
-          Hash *extractions, bool_t enclosed);
+S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
+                 bool_t enclosed);
 
 static CharBuf*
 S_balance_parens_in_string(CharBuf *qstring);
@@ -69,11 +70,11 @@ S_balance_parens(QueryParser *self, VArray *elems);
 // Work from the inside out, reducing the leftmost, innermost paren groups
 // first, until the array of elems contains no parens.
 static void
-S_parse_subqueries(QueryParser *self, VArray *elems, Hash *extractions);
+S_parse_subqueries(QueryParser *self, VArray *elems);
 
 static void
 S_compose_inner_queries(QueryParser *self, VArray *elems,
-                        CharBuf *default_field, Hash *extractions);
+                        CharBuf *default_field);
 
 // Apply +, -, NOT.
 static void
@@ -166,6 +167,7 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
     // Init.
     self->heed_colons = false;
     self->label_inc   = 0;
+    self->lexer       = QueryLexer_new();
 
     // Assign.
     self->schema         = (Schema*)INCREF(schema);
@@ -227,6 +229,7 @@ QParser_destroy(QueryParser *self) {
     DECREF(self->analyzer);
     DECREF(self->default_boolop);
     DECREF(self->fields);
+    DECREF(self->lexer);
     DECREF(self->phrase_label);
     DECREF(self->bool_group_label);
     SUPER_DESTROY(self, QUERYPARSER);
@@ -260,6 +263,7 @@ QParser_heed_colons(QueryParser *self) {
 void
 QParser_set_heed_colons(QueryParser *self, bool_t heed_colons) {
     self->heed_colons = heed_colons;
+    QueryLexer_Set_Heed_Colons(self->lexer, heed_colons);
 }
 
 
@@ -279,17 +283,12 @@ QParser_parse(QueryParser *self, const CharBuf *query_string) {
 
 Query*
 QParser_tree(QueryParser *self, const CharBuf *query_string) {
-    Hash    *extractions = Hash_new(0);
-    CharBuf *mod1        = S_extract_phrases(self, query_string, extractions);
-    CharBuf *mod2        = S_balance_parens_in_string(mod1);
-    VArray  *elems       = S_parse_flat_string(self, mod2);
-    S_parse_subqueries(self, elems, extractions);
-    Query   *retval      = S_do_tree(self, elems, NULL, extractions, false);
+    VArray *elems = QueryLexer_Tokenize(self->lexer, query_string);
+    S_balance_parens(self, elems);
+    S_parse_subqueries(self, elems);
+    Query *query = S_parse_subquery(self, elems, NULL, false);
     DECREF(elems);
-    DECREF(mod2);
-    DECREF(mod1);
-    DECREF(extractions);
-    return retval;
+    return query;
 }
 
 static VArray*
@@ -359,7 +358,7 @@ S_parse_flat_string(QueryParser *self, CharBuf *query_string) {
 }
 
 static void
-S_parse_subqueries(QueryParser *self, VArray *elems, Hash *extractions) {
+S_parse_subqueries(QueryParser *self, VArray *elems) {
     while (1) {
         // Work from the inside out, starting with the leftmost innermost
         // paren group.
@@ -393,7 +392,7 @@ S_parse_subqueries(QueryParser *self, VArray *elems, Hash *extractions) {
 
         // Create the subquery.
         VArray *sub_elems = VA_Slice(elems, left + 1, right - left - 1);
-        Query *subquery = S_do_tree(self, sub_elems, field, extractions, true);
+        Query *subquery = S_parse_subquery(self, sub_elems, field, true);
         ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)subquery);
         ParserElem_Set_Occur(new_elem, self->default_occur);
         DECREF(sub_elems);
@@ -421,8 +420,8 @@ S_discard_elems(VArray *elems, uint32_t type) {
 }
 
 static Query*
-S_do_tree(QueryParser *self, VArray *elems, CharBuf *default_field,
-          Hash *extractions, bool_t enclosed) {
+S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
+                 bool_t enclosed) {
     if (VA_Get_Size(elems)) {
         ParserElem *first = (ParserElem*)VA_Fetch(elems, 0);
         if (ParserElem_Get_Type(first) == TOKEN_OPEN_PAREN) {
@@ -431,7 +430,7 @@ S_do_tree(QueryParser *self, VArray *elems, CharBuf *default_field,
             DECREF(VA_Pop(elems));
         }
     }
-    S_compose_inner_queries(self, elems, default_field, extractions);
+    S_compose_inner_queries(self, elems, default_field);
     S_discard_elems(elems, TOKEN_FIELD);
     S_discard_elems(elems, TOKEN_STRING);
     S_apply_plusses_and_negations(self, elems);
@@ -519,7 +518,7 @@ S_balance_parens_in_string(CharBuf *qstring) {
 
 static void
 S_compose_inner_queries(QueryParser *self, VArray *elems,
-                        CharBuf *default_field, Hash *extractions) {
+                        CharBuf *default_field) {
     // Generate all queries.  Apply any fields.
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         CharBuf *field = default_field;
@@ -536,25 +535,12 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
         }
 
         if (ParserElem_Get_Type(elem) == TOKEN_STRING) {
-            // Generate a LeafQuery from a Phrase.
             const CharBuf *text = (CharBuf*)ParserElem_As(elem, CHARBUF);
-            if (CB_Starts_With(text, self->phrase_label)) {
-                CharBuf *inner_text
-                    = (CharBuf*)Hash_Fetch(extractions, (Obj*)text);
-                LeafQuery *query = LeafQuery_new(field, inner_text);
-                ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-                ParserElem_Set_Occur(new_elem, self->default_occur);
-                DECREF(Hash_Delete(extractions, (Obj*)text));
-                VA_Store(elems, i, (Obj*)new_elem);
-            }
-            // What's left is probably a term, so generate a LeafQuery.
-            else {
-                LeafQuery *query = LeafQuery_new(field, text);
-                ParserElem *new_elem
-                    = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-                ParserElem_Set_Occur(new_elem, self->default_occur);
-                VA_Store(elems, i, (Obj*)new_elem);
-            }
+            LeafQuery *query = LeafQuery_new(field, text);
+            ParserElem *new_elem
+                = ParserElem_new(TOKEN_QUERY, (Obj*)query);
+            ParserElem_Set_Occur(new_elem, self->default_occur);
+            VA_Store(elems, i, (Obj*)new_elem);
         }
     }
 }

@@ -1,0 +1,45 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+class Lucy::Search::QueryParser::QueryLexer inherits Lucy::Object::Obj {
+
+    bool_t heed_colons;
+
+    inert incremented QueryLexer*
+    new();
+
+    inert QueryLexer*
+    init(QueryLexer *self);
+
+    /** Parse a query string into an array of tokens.
+     *
+     * @param query_string The string to be parsed.  May be NULL.
+     * @return an array of ParserElems.
+     */
+    incremented VArray*
+    Tokenize(QueryLexer *self, const CharBuf *query_string = NULL);
+
+    bool_t
+    Heed_Colons(QueryLexer *self);
+
+    /** Enable/disable parsing of <code>fieldname:foo</code> constructs.
+     */
+    void
+    Set_Heed_Colons(QueryLexer *self, bool_t heed_colons);
+}
+

@@ -43,15 +43,16 @@ parcel Lucy;
 public class Lucy::Search::QueryParser cnick QParser
     inherits Lucy::Object::Obj {
 
-    Schema   *schema;
-    Analyzer *analyzer;
-    CharBuf  *default_boolop;
-    VArray   *fields;
-    CharBuf  *phrase_label;
-    CharBuf  *bool_group_label;
-    bool_t    heed_colons;
-    uint32_t  label_inc;
-    bool_t    default_occur;
+    Schema     *schema;
+    Analyzer   *analyzer;
+    CharBuf    *default_boolop;
+    VArray     *fields;
+    QueryLexer *lexer;
+    CharBuf    *phrase_label;
+    CharBuf    *bool_group_label;
+    bool_t      heed_colons;
+    uint32_t    label_inc;
+    bool_t      default_occur;
 
     inert incremented QueryParser*
     new(Schema *schema, Analyzer *analyzer = NULL,
