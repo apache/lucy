@@ -150,7 +150,7 @@ Hash_load(Hash *self, Obj *dump) {
                       VTable_Get_Name(vtable));
             }
             else if (load != (Obj_Load_t)Hash_load) { // stop inf loop
-                return load(NULL, dump);
+                return VTable_Load_Obj(vtable, dump);
             }
         }
     }
