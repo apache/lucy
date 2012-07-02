@@ -41,11 +41,13 @@ sub bind_all {
     $class->bind_nomatchquery;
     $class->bind_orquery;
     $class->bind_orscorer;
+    $class->bind_parserelem;
     $class->bind_phrasequery;
     $class->bind_phrasecompiler;
     $class->bind_polyquery;
     $class->bind_polysearcher;
     $class->bind_query;
+    $class->bind_querylexer;
     $class->bind_queryparser;
     $class->bind_rangequery;
     $class->bind_requiredoptionalmatcher;
@@ -489,6 +491,85 @@ sub bind_orscorer {
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
+sub bind_parserelem {
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy   PACKAGE = Lucy::Search::QueryParser::ParserElem
+
+SV*
+new(either_sv, ...)
+    SV *either_sv;
+CODE:
+{
+    SV *type_sv;
+    SV *value_sv;
+
+    chy_bool_t args_ok
+        = XSBind_allot_params(&(ST(0)), 1, items,
+                              ALLOT_SV(&type_sv, "type", 4, true),
+                              ALLOT_SV(&value_sv, "value", 5, false),
+                              NULL);
+
+    if (!args_ok) {
+        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
+    }
+    const char *type_str = SvPVutf8_nolen(type_sv);
+    lucy_Obj *value = NULL;
+    uint32_t type = 0;
+
+    if (strcmp(type_str, "OPEN_PAREN") == 0) {
+        type = LUCY_QPARSER_TOKEN_OPEN_PAREN; 
+    }
+    else if (strcmp(type_str, "CLOSE_PAREN") == 0) {
+        type = LUCY_QPARSER_TOKEN_CLOSE_PAREN; 
+    }
+    else if (strcmp(type_str, "MINUS") == 0) {
+        type = LUCY_QPARSER_TOKEN_MINUS; 
+    }
+    else if (strcmp(type_str, "PLUS") == 0) {
+        type = LUCY_QPARSER_TOKEN_PLUS; 
+    }
+    else if (strcmp(type_str, "NOT") == 0) {
+        type = LUCY_QPARSER_TOKEN_NOT; 
+    }
+    else if (strcmp(type_str, "AND") == 0) {
+        type = LUCY_QPARSER_TOKEN_AND; 
+    }
+    else if (strcmp(type_str, "OR") == 0) {
+        type = LUCY_QPARSER_TOKEN_OR; 
+    }
+    else if (strcmp(type_str, "FIELD") == 0) {
+        type = LUCY_QPARSER_TOKEN_FIELD; 
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), LUCY_CHARBUF);
+    }
+    else if (strcmp(type_str, "STRING") == 0) {
+        type = LUCY_QPARSER_TOKEN_STRING; 
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), LUCY_CHARBUF);
+    }
+    else if (strcmp(type_str, "QUERY") == 0) {
+        type = LUCY_QPARSER_TOKEN_QUERY; 
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), LUCY_QUERY);
+    }
+    else {
+        CFISH_THROW(CFISH_ERR, "Bad type: '%s'", type_str);
+    }
+
+    lucy_ParserElem *self = (lucy_ParserElem*)XSBind_new_blank_obj(either_sv);
+    self = lucy_ParserElem_init(self, type, value);
+    RETVAL = XSBind_cfish_to_perl((cfish_Obj*)self);
+    CFISH_DECREF(self);
+}
+OUTPUT: RETVAL
+
+END_XS_CODE
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Search::QueryParser::ParserElem",
+    );
+    $binding->exclude_constructor;
+    $binding->append_xs($xs_code);
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
 sub bind_phrasequery {
     my @exposed = qw( Get_Field Get_Terms );
 
@@ -629,6 +710,14 @@ END_CONSTRUCTOR_CODE_SAMPLE
     );
     $binding->set_pod_spec($pod_spec);
 
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_querylexer {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Search::QueryParser::QueryLexer",
+    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

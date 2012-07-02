@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Private utility class.
  */
-class Lucy::QueryParser::ParserElem inherits Lucy::Object::Obj {
+class Lucy::Search::QueryParser::ParserElem inherits Lucy::Object::Obj {
 
     uint32_t  type;
     uint32_t  occur;
