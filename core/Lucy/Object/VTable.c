@@ -219,7 +219,10 @@ VTable_load_obj(VTable *self, Obj *dump) {
     if (load == Obj_load) {
         THROW(ERR, "Abstract method Load() not defined for %o", self->name);
     }
-    return load(NULL, dump);
+    Obj *invoker = VTable_Make_Obj(self);
+    Obj *loaded = load(invoker, dump);
+    DECREF(invoker);
+    return loaded;
 }
 
 static void

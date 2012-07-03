@@ -29,7 +29,7 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     Obj      *dump            = (Obj*)BlobType_Dump(type);
     Obj      *clone           = Obj_Load(dump, dump);
     Obj      *another_dump    = (Obj*)BlobType_Dump_For_Schema(type);
-    BlobType *another_clone   = BlobType_load(NULL, another_dump);
+    BlobType *another_clone   = BlobType_load(type, another_dump);
 
     TEST_TRUE(batch, BlobType_Equals(type, (Obj*)clone),
               "Dump => Load round trip");

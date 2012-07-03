@@ -45,7 +45,7 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 
     // (This step is normally performed by Schema_Load() internally.)
     Hash_Store_Str((Hash*)another_dump, "analyzer", 8, INCREF(tokenizer));
-    FullTextType *another_clone = FullTextType_load(NULL, another_dump);
+    FullTextType *another_clone = FullTextType_load(type, another_dump);
 
     TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)boost_differs),
                "Equals() false with different boost");
