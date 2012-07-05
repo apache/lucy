@@ -1,5 +1,12 @@
 Revision history for Lucy
 
+0.3.2  XXXX-XX-XX
+
+  Bugfixes:
+
+    * [LUCY-238] - Improve reliability of loading from JSON
+
+
 0.3.1  2012-05-04
 
   Bugfixes:
