@@ -14,7 +14,7 @@
 # limitations under the License.
 
 use Lucy;
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 $VERSION = eval $VERSION;
 
 1;

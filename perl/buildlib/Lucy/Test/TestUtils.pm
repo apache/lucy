@@ -19,7 +19,7 @@ use warnings;
 package Lucy::Test::TestUtils;
 use base qw( Exporter );
 
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 $VERSION = eval $VERSION;
 
 our @EXPORT_OK = qw(

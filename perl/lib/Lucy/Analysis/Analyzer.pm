@@ -15,7 +15,7 @@
 
 package Lucy::Analysis::Analyzer;
 use Lucy;
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 $VERSION = eval $VERSION;
 
 1;
