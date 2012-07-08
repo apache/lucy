@@ -165,12 +165,76 @@ test_spec_field(TestBatch *batch) {
     DECREF(folder);
 }
 
+static void
+S_add_many_fields_doc(Indexer *indexer, CharBuf *content, int num_fields) {
+    Doc *doc = Doc_new(NULL, 0);
+    for (int32_t i = 1; i <= num_fields; ++i) {
+        CharBuf *field = CB_newf("field%i32", i);
+        Doc_Store(doc, field, (Obj*)content);
+        DECREF(field);
+    }
+    Indexer_Add_Doc(indexer, doc, 1.0f);
+    DECREF(doc);
+}
+
+static void
+test_many_fields(TestBatch *batch) {
+    Schema            *schema    = Schema_new();
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
+    FullTextType      *type      = FullTextType_new((Analyzer*)tokenizer);
+    CharBuf           *query     = CB_newf("x");
+
+    for (int32_t num_fields = 1; num_fields <= 10; ++num_fields) {
+        // Build an index with num_fields fields, and the same content in each.
+        CharBuf *field = CB_newf("field%i32", num_fields);
+        Schema_Spec_Field(schema, field, (FieldType*)type);
+
+        RAMFolder *folder  = RAMFolder_new(NULL);
+        Indexer   *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
+
+        CharBuf *content;
+
+        for (int c = 'a'; c <= 'z'; ++c) {
+            content = CB_new(1);
+            CB_Cat_Char(content, c);
+            S_add_many_fields_doc(indexer, content, num_fields);
+            DECREF(content);
+        }
+
+        content = CB_newf("x x y");
+        S_add_many_fields_doc(indexer, content, num_fields);
+        DECREF(content);
+
+        Indexer_Commit(indexer);
+
+        // See if our search results match as expected.
+        IndexSearcher *searcher = IxSearcher_new((Obj*)folder);
+        Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, 100, NULL);
+        TEST_TRUE(batch, Hits_Total_Hits(hits) == 2,
+                  "correct number of hits for %d fields", num_fields);
+        HitDoc *top_hit = Hits_Next(hits);
+
+        DECREF(top_hit);
+        DECREF(hits);
+        DECREF(searcher);
+        DECREF(indexer);
+        DECREF(folder);
+        DECREF(field);
+    }
+
+    DECREF(query);
+    DECREF(type);
+    DECREF(tokenizer);
+    DECREF(schema);
+}
+
 void
 TestFieldMisc_run_tests() {
-    TestBatch *batch = TestBatch_new(10);
+    TestBatch *batch = TestBatch_new(20);
     TestBatch_Plan(batch);
     S_init_strings();
     test_spec_field(batch);
+    test_many_fields(batch);
     S_destroy_strings();
     DECREF(batch);
 }
