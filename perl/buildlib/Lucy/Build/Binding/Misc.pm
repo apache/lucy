@@ -133,6 +133,9 @@ PPCODE:
     else if (strEQ(package, "TestBlobType")) {
         lucy_TestBlobType_run_tests();
     }
+    else if (strEQ(package, "TestFieldMisc")) {
+        lucy_TestFieldMisc_run_tests();
+    }
     else if (strEQ(package, "TestFieldType")) {
         lucy_TestFType_run_tests();
     }
