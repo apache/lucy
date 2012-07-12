@@ -438,7 +438,9 @@ sub ACTION_dist {
 
     $self->dispatch('manifest');
     my $no_index = $self->_gen_pause_exclusion_list;
-    $self->meta_add( { no_index => $no_index } );
+    my $meta_add = $self->meta_add || {};
+    $meta_add->{no_index} = $no_index;
+    $self->meta_add( $meta_add );
     $self->SUPER::ACTION_dist;
 
     # Clean up.
