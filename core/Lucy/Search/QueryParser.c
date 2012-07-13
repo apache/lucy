@@ -255,7 +255,9 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
         VArray *sub_elems = VA_Slice(elems, left + 1, right - left - 1);
         Query *subquery = S_parse_subquery(self, sub_elems, field, true);
         ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)subquery);
-        ParserElem_Set_Occur(new_elem, self->default_occur);
+        if (self->default_occur == MUST) {
+            ParserElem_Require(new_elem);
+        }
         DECREF(sub_elems);
 
         // Replace the elements used to create the subquery with the subquery
@@ -369,7 +371,9 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
             LeafQuery *query = LeafQuery_new(field, text);
             ParserElem *new_elem
                 = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-            ParserElem_Set_Occur(new_elem, self->default_occur);
+            if (self->default_occur == MUST) {
+                ParserElem_Require(new_elem);
+            }
             VA_Store(elems, i, (Obj*)new_elem);
         }
     }
@@ -402,7 +406,7 @@ S_compose_not_queries(QueryParser *self, VArray *elems) {
     for (uint32_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) == TOKEN_QUERY
-            && ParserElem_Get_Occur(elem) == MUST_NOT
+            && ParserElem_Negated(elem)
            ) {
             Query *inner_query = (Query*)ParserElem_As(elem, QUERY);
             Query *not_query = QParser_Make_NOT_Query(self, inner_query);
@@ -471,7 +475,9 @@ S_compose_and_queries(QueryParser *self, VArray *elems) {
             }
             Query *and_query = QParser_Make_AND_Query(self, children);
             ParserElem_Set_Value(preceding, (Obj*)and_query);
-            ParserElem_Set_Occur(preceding, self->default_occur);
+            if (self->default_occur == MUST) {
+                ParserElem_Require(preceding);
+            }
             DECREF(and_query);
             DECREF(children);
 
@@ -514,7 +520,9 @@ S_compose_or_queries(QueryParser *self, VArray *elems) {
             }
             Query *or_query = QParser_Make_OR_Query(self, children);
             ParserElem_Set_Value(preceding, (Obj*)or_query);
-            ParserElem_Set_Occur(preceding, self->default_occur);
+            if (self->default_occur == MUST) {
+                ParserElem_Require(preceding);
+            }
             DECREF(or_query);
             DECREF(children);
 
@@ -555,16 +563,14 @@ S_compose_subquery(QueryParser *self, VArray *elems, bool_t enclosed) {
         // Demux elems into bins.
         for (uint32_t i = 0; i < num_elems; i++) {
             ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
-            uint32_t occur = ParserElem_Get_Occur(elem);
-            Query *query = (Query*)ParserElem_As(elem, QUERY);
-            if (occur == MUST) {
-                VA_Push(required, INCREF(query));
+            if (ParserElem_Required(elem)) {
+                VA_Push(required, INCREF(ParserElem_As(elem, QUERY)));
             }
-            else if (occur == SHOULD) {
-                VA_Push(optional, INCREF(query));
+            else if (ParserElem_Optional(elem)) {
+                VA_Push(optional, INCREF(ParserElem_As(elem, QUERY)));
             }
-            else if (occur == MUST_NOT) {
-                VA_Push(negated, INCREF(query));
+            else if (ParserElem_Negated(elem)) {
+                VA_Push(negated, INCREF(ParserElem_As(elem, QUERY)));
             }
         }
         uint32_t num_required = VA_Get_Size(required);

@@ -63,10 +63,19 @@ class Lucy::Search::QueryParser::ParserElem inherits Lucy::Object::Obj {
     void
     Unrequire(ParserElem *self);
 
-    void
-    Set_Occur(ParserElem *self, uint32_t occur);
+    /** Return true if the element MUST be present.
+     */
+    bool_t
+    Required(ParserElem *self);
 
-    uint32_t
-    Get_Occur(ParserElem *self);
+    /** Return true if the element SHOULD be present.
+     */
+    bool_t
+    Optional(ParserElem *self);
+
+    /** Return true if the element MUST NOT be present.
+     */
+    bool_t
+    Negated(ParserElem *self);
 }
 

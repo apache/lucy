@@ -60,16 +60,6 @@ ParserElem_get_type(ParserElem *self) {
 }
 
 void
-ParserElem_set_occur(ParserElem *self, uint32_t occur) {
-    self->occur = occur;
-}
-
-uint32_t
-ParserElem_get_occur(ParserElem *self) {
-    return self->occur;
-}
-
-void
 ParserElem_require(ParserElem *self) {
     switch (self->occur) {
         case LUCY_QPARSER_SHOULD:
@@ -110,5 +100,20 @@ ParserElem_negate(ParserElem *self) {
         default:
             THROW(ERR, "Internal error in value of occur: %u32", self->occur);
     }
+}
+
+bool_t
+ParserElem_optional(ParserElem *self) {
+    return self->occur == LUCY_QPARSER_SHOULD;
+}
+
+bool_t
+ParserElem_required(ParserElem *self) {
+    return self->occur == LUCY_QPARSER_MUST;
+}
+
+bool_t
+ParserElem_negated(ParserElem *self) {
+    return self->occur == LUCY_QPARSER_MUST_NOT;
 }
 
