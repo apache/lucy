@@ -171,7 +171,7 @@ TermCompiler_equals(TermCompiler *self, Obj *other) {
 void
 TermCompiler_serialize(TermCompiler *self, OutStream *outstream) {
     TermCompiler_Serialize_t super_serialize
-        = SUPER_METHOD(TERMCOMPILER, Lucy_TermCompiler_Serialize);
+        = SUPER_METHOD_PTR(TERMCOMPILER, Lucy_TermCompiler_Serialize);
     super_serialize(self, outstream);
     OutStream_Write_F32(outstream, self->idf);
     OutStream_Write_F32(outstream, self->raw_weight);
@@ -182,7 +182,7 @@ TermCompiler_serialize(TermCompiler *self, OutStream *outstream) {
 TermCompiler*
 TermCompiler_deserialize(TermCompiler *self, InStream *instream) {
     TermCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD(TERMCOMPILER, Lucy_TermCompiler_Deserialize);
+        = SUPER_METHOD_PTR(TERMCOMPILER, Lucy_TermCompiler_Deserialize);
     self = super_deserialize(self, instream);
     self->idf               = InStream_Read_F32(instream);
     self->raw_weight        = InStream_Read_F32(instream);

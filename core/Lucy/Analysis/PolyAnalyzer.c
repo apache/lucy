@@ -120,7 +120,7 @@ PolyAnalyzer*
 PolyAnalyzer_load(PolyAnalyzer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     PolyAnalyzer_Load_t super_load 
-        = SUPER_METHOD(POLYANALYZER, Lucy_PolyAnalyzer_Load);
+        = SUPER_METHOD_PTR(POLYANALYZER, Lucy_PolyAnalyzer_Load);
     PolyAnalyzer *loaded = super_load(self, dump);
     VArray *analyzer_dumps = (VArray*)CERTIFY(
                                  Hash_Fetch_Str(source, "analyzers", 9),

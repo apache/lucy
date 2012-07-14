@@ -183,7 +183,7 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
 void
 PolyReader_close(PolyReader *self) {
     PolyReader_Close_t super_close
-        = SUPER_METHOD(POLYREADER, Lucy_PolyReader_Close);
+        = SUPER_METHOD_PTR(POLYREADER, Lucy_PolyReader_Close);
     for (uint32_t i = 0, max = VA_Get_Size(self->sub_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(self->sub_readers, i);
         SegReader_Close(seg_reader);

@@ -212,7 +212,7 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
 void
 ProximityCompiler_serialize(ProximityCompiler *self, OutStream *outstream) {
     ProximityCompiler_Serialize_t super_serialize
-            = SUPER_METHOD(PROXIMITYCOMPILER, Lucy_ProximityCompiler_Serialize);
+            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, Lucy_ProximityCompiler_Serialize);
     super_serialize(self, outstream);
     OutStream_Write_F32(outstream, self->idf);
     OutStream_Write_F32(outstream, self->raw_weight);
@@ -224,7 +224,7 @@ ProximityCompiler_serialize(ProximityCompiler *self, OutStream *outstream) {
 ProximityCompiler*
 ProximityCompiler_deserialize(ProximityCompiler *self, InStream *instream) {
     ProximityCompiler_Deserialize_t super_deserialize
-            = SUPER_METHOD(PROXIMITYCOMPILER, Lucy_ProximityCompiler_Deserialize);
+            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, Lucy_ProximityCompiler_Deserialize);
     self = super_deserialize(self, instream);
     self->idf               = InStream_Read_F32(instream);
     self->raw_weight        = InStream_Read_F32(instream);

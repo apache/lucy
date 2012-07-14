@@ -71,7 +71,7 @@ EasyAnalyzer_transform_text(EasyAnalyzer *self, CharBuf *text) {
 Hash*
 EasyAnalyzer_dump(EasyAnalyzer *self) {
     EasyAnalyzer_Dump_t super_dump
-        = SUPER_METHOD(EASYANALYZER, Lucy_EasyAnalyzer_Dump);
+        = SUPER_METHOD_PTR(EASYANALYZER, Lucy_EasyAnalyzer_Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(self->language));
     return dump;
@@ -80,7 +80,7 @@ EasyAnalyzer_dump(EasyAnalyzer *self) {
 EasyAnalyzer*
 EasyAnalyzer_load(EasyAnalyzer *self, Obj *dump) {
     EasyAnalyzer_Load_t super_load
-        = SUPER_METHOD(EASYANALYZER, Lucy_EasyAnalyzer_Load);
+        = SUPER_METHOD_PTR(EASYANALYZER, Lucy_EasyAnalyzer_Load);
     EasyAnalyzer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *language

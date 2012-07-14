@@ -120,7 +120,7 @@ Obj*
 HitQ_jostle(HitQueue *self, Obj *element) {
     MatchDoc *match_doc = (MatchDoc*)CERTIFY(element, MATCHDOC);
     HitQ_Jostle_t super_jostle
-        = SUPER_METHOD(HITQUEUE, Lucy_HitQ_Jostle);
+        = SUPER_METHOD_PTR(HITQUEUE, Lucy_HitQ_Jostle);
     if (self->need_values) {
         CERTIFY(match_doc->values, VARRAY);
     }

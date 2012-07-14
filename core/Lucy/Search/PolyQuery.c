@@ -170,7 +170,7 @@ PolyCompiler_serialize(PolyCompiler *self, OutStream *outstream) {
     CB_Serialize(PolyCompiler_Get_Class_Name(self), outstream);
     VA_Serialize(self->children, outstream);
     PolyCompiler_Serialize_t super_serialize
-        = SUPER_METHOD(POLYCOMPILER, Lucy_PolyCompiler_Serialize);
+        = SUPER_METHOD_PTR(POLYCOMPILER, Lucy_PolyCompiler_Serialize);
     super_serialize(self, outstream);
 }
 
@@ -182,7 +182,7 @@ PolyCompiler_deserialize(PolyCompiler *self, InStream *instream) {
     self->children
         = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
     PolyCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD(POLYCOMPILER, Lucy_PolyCompiler_Deserialize);
+        = SUPER_METHOD_PTR(POLYCOMPILER, Lucy_PolyCompiler_Deserialize);
     return super_deserialize(self, instream);
 }
 

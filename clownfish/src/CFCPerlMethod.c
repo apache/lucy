@@ -128,7 +128,7 @@ S_xsub_body(CFCPerlMethod *self) {
         = CFCMethod_full_method_sym(method, klass, NULL, 0);
     char *full_meth = (char*)MALLOCATE(meth_size);
     CFCMethod_full_method_sym(method, klass, full_meth, meth_size);
-    body = CFCUtil_cat(body, full_typedef, " method = CFISH_METHOD(",
+    body = CFCUtil_cat(body, full_typedef, " method = CFISH_METHOD_PTR(",
                        CFCClass_full_vtable_var(klass), ", ",
                        full_meth, ");\n    ", NULL);
     FREEMEM(full_typedef);

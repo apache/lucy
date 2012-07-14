@@ -107,7 +107,7 @@ lucy_Doc_extract(lucy_Doc *self, lucy_CharBuf *field,
 void*
 lucy_Doc_to_host(lucy_Doc *self) {
     Lucy_Doc_To_Host_t super_to_host
-        = CFISH_SUPER_METHOD(LUCY_DOC, Lucy_Doc_To_Host);
+        = CFISH_SUPER_METHOD_PTR(LUCY_DOC, Lucy_Doc_To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;

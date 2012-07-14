@@ -55,7 +55,7 @@ bool_t
 ShLock_request(SharedLock *self) {
     uint32_t i = 0;
     ShLock_Request_t super_request
-        = SUPER_METHOD(SHAREDLOCK, Lucy_ShLock_Request);
+        = SUPER_METHOD_PTR(SHAREDLOCK, Lucy_ShLock_Request);
 
     // Empty lock_path indicates whether this particular instance is locked.
     if (self->lock_path
@@ -83,7 +83,7 @@ void
 ShLock_release(SharedLock *self) {
     if (self->lock_path && !CB_Equals_Str(self->lock_path, "", 0)) {
         ShLock_Release_t super_release
-            = SUPER_METHOD(SHAREDLOCK, Lucy_ShLock_Release);
+            = SUPER_METHOD_PTR(SHAREDLOCK, Lucy_ShLock_Release);
         super_release(self);
 
         // Empty out lock_path.

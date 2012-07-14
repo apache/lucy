@@ -178,7 +178,7 @@ S_add_dump_method(CFCClass *klass) {
             "cfish_Obj*\n"
             "%s(%s *self)\n"
             "{\n"
-            "    %s super_dump = SUPER_METHOD(%s, %s);\n"
+            "    %s super_dump = SUPER_METHOD_PTR(%s, %s);\n"
             "    cfish_Hash *dump = (cfish_Hash*)super_dump(self);\n";
         size_t amount = sizeof(pattern)
                         + strlen(full_func_sym)
@@ -252,7 +252,7 @@ S_add_load_method(CFCClass *klass) {
             "%s(%s *self, cfish_Obj *dump)\n"
             "{\n"
             "    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);\n"
-            "    %s super_load = SUPER_METHOD(%s, %s);\n"
+            "    %s super_load = SUPER_METHOD_PTR(%s, %s);\n"
             "    %s *loaded = (%s*)super_load(self, dump);\n";
         size_t amount = sizeof(pattern)
                         + strlen(full_func_sym)

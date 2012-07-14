@@ -115,7 +115,7 @@ Normalizer_transform(Normalizer *self, Inversion *inversion) {
 Hash*
 Normalizer_dump(Normalizer *self) {
     Normalizer_Dump_t super_dump
-        = SUPER_METHOD(NORMALIZER, Lucy_Normalizer_Dump);
+        = SUPER_METHOD_PTR(NORMALIZER, Lucy_Normalizer_Dump);
     Hash *dump = super_dump(self);
     int options = self->options;
 
@@ -141,7 +141,7 @@ Normalizer_dump(Normalizer *self) {
 Normalizer*
 Normalizer_load(Normalizer *self, Obj *dump) {
     Normalizer_Load_t super_load
-        = SUPER_METHOD(NORMALIZER, Lucy_Normalizer_Load);
+        = SUPER_METHOD_PTR(NORMALIZER, Lucy_Normalizer_Load);
     Normalizer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
 

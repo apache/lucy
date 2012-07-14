@@ -75,7 +75,7 @@ lucy_Err_do_throw(lucy_Err *err) {
 void*
 lucy_Err_to_host(lucy_Err *self) {
     Lucy_Err_To_Host_t super_to_host
-        = CFISH_SUPER_METHOD(LUCY_ERR, Lucy_Err_To_Host);
+        = CFISH_SUPER_METHOD_PTR(LUCY_ERR, Lucy_Err_To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;
@@ -84,7 +84,7 @@ lucy_Err_to_host(lucy_Err *self) {
 void
 lucy_Err_throw_mess(lucy_VTable *vtable, lucy_CharBuf *message) {
     Lucy_Err_Make_t make
-        = CFISH_METHOD(CFISH_CERTIFY(vtable, LUCY_VTABLE), Lucy_Err_Make);
+        = CFISH_METHOD_PTR(CFISH_CERTIFY(vtable, LUCY_VTABLE), Lucy_Err_Make);
     lucy_Err *err = (lucy_Err*)CFISH_CERTIFY(make(NULL), LUCY_ERR);
     Lucy_Err_Cat_Mess(err, message);
     CFISH_DECREF(message);

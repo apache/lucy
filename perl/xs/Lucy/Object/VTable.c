@@ -59,7 +59,7 @@ void*
 lucy_VTable_to_host(lucy_VTable *self) {
     chy_bool_t first_time = self->ref.count < 4 ? true : false;
     Lucy_VTable_To_Host_t to_host
-        = CFISH_SUPER_METHOD(LUCY_VTABLE, Lucy_VTable_To_Host);
+        = CFISH_SUPER_METHOD_PTR(LUCY_VTABLE, Lucy_VTable_To_Host);
     SV *host_obj = (SV*)to_host(self);
     if (first_time) {
         SvSHARE((SV*)self->ref.host_obj);
