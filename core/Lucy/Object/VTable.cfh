@@ -41,8 +41,8 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     allocate(size_t num_methods);
 
     inert VTable*
-    bootstrap(VTable *self, VTable *parent, const char *name, int flags,
-              void *x, size_t obj_alloc_size, void *method_meta);
+    init(VTable *self, VTable *parent, const char *name, int flags,
+         void *x, size_t obj_alloc_size, void *method_meta);
 
     /** Return a singleton.  If a VTable can be found in the registry based on
      * the supplied class name, it will be returned.  Otherwise, a new VTable

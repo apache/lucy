@@ -191,24 +191,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   fun:malloc
-   fun:lucy_Memory_wrapped_malloc
-   fun:lucy_VTable_bootstrap
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_bootstrap
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
    fun:calloc
    fun:lucy_Memory_wrapped_calloc
    fun:lucy_VTable_allocate

@@ -450,9 +450,9 @@ CFCBindClass_to_vtable_allocate(CFCBindClass *self) {
     return code;
 }
 
-// Return C code bootstrapping the class's VTable.
+// Return C code initializing the class's VTable.
 char*
-CFCBindClass_to_vtable_bootstrap(CFCBindClass *self) {
+CFCBindClass_to_vtable_init(CFCBindClass *self) {
     CFCClass *client = self->client;
 
     if (CFCClass_inert(client)) {
@@ -470,7 +470,7 @@ CFCBindClass_to_vtable_bootstrap(CFCBindClass *self) {
                              : "NULL"; // No parent, e.g. Obj or inert classes.
 
     char pattern[] =
-        "    cfish_VTable_bootstrap(\n"
+        "    cfish_VTable_init(\n"
         "        %s, /* vtable */\n"
         "        %s, /* parent */\n"
         "        \"%s\", /* name */\n"

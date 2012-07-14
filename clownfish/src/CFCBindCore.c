@@ -266,13 +266,13 @@ S_write_parcel_c(CFCBindCore *self) {
 
     // Aggregate C code from all files.
     // Obtain parcel prefix for use in bootstrap function name.
-    char *privacy_syms = CFCUtil_strdup("");
-    char *includes     = CFCUtil_strdup("");
-    char *c_data       = CFCUtil_strdup("");
-    char *vt_allocate  = CFCUtil_strdup("");
-    char *vt_bootstrap = CFCUtil_strdup("");
-    char *vt_register  = CFCUtil_strdup("");
-    CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
+    char *privacy_syms  = CFCUtil_strdup("");
+    char *includes      = CFCUtil_strdup("");
+    char *c_data        = CFCUtil_strdup("");
+    char *vt_allocate   = CFCUtil_strdup("");
+    char *vt_initialize = CFCUtil_strdup("");
+    char *vt_register   = CFCUtil_strdup("");
+    CFCClass **ordered  = CFCHierarchy_ordered_classes(hierarchy);
     for (int i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
         if (CFCClass_included(klass)) { continue; }
@@ -284,9 +284,9 @@ S_write_parcel_c(CFCBindCore *self) {
         char *vt_alloc = CFCBindClass_to_vtable_allocate(class_binding);
         vt_allocate = CFCUtil_cat(vt_allocate, vt_alloc, NULL);
         FREEMEM(vt_alloc);
-        char *vt_boot = CFCBindClass_to_vtable_bootstrap(class_binding);
-        vt_bootstrap = CFCUtil_cat(vt_bootstrap, vt_boot, NULL);
-        FREEMEM(vt_boot);
+        char *vt_init = CFCBindClass_to_vtable_init(class_binding);
+        vt_initialize = CFCUtil_cat(vt_initialize, vt_init, NULL);
+        FREEMEM(vt_init);
         char *vt_reg = CFCBindClass_to_vtable_register(class_binding);
         vt_register = CFCUtil_cat(vt_register, vt_reg, NULL);
         FREEMEM(vt_reg);
@@ -310,6 +310,20 @@ S_write_parcel_c(CFCBindCore *self) {
     const char *prefix = CFCParcel_get_prefix(parcel);
     FREEMEM(ordered);
 
+    const char *vt_bootstrap = "";
+    if (strcmp(prefix, "lucy_") == 0) {
+        vt_bootstrap =
+            "    /* Bootstrap VTables.\n"
+            "     */\n"
+            "    cfish_VTable_override(CFISH_VTABLE, (cfish_method_t)lucy_VTable_make_obj, Lucy_VTable_Make_Obj_OFFSET);\n"
+            "    CFISH_CHARBUF->vtable = CFISH_VTABLE;\n"
+            "    CFISH_CHARBUF->obj_alloc_size = sizeof(cfish_CharBuf);\n"
+            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_cat_trusted_str, Lucy_CB_Cat_Trusted_Str_OFFSET);\n"
+            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_grow, Lucy_CB_Grow_OFFSET);\n"
+            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_vcatf, Lucy_CB_VCatF_OFFSET);\n"
+            "\n";
+    }
+
     char pattern[] =
         "%s\n"
         "\n"
@@ -323,10 +337,17 @@ S_write_parcel_c(CFCBindCore *self) {
         "\n"
         "void\n"
         "%sbootstrap_parcel() {\n"
+        "    /* Allocate memory for VTables.\n"
+        "     */\n"
         "%s"
         "\n"
         "%s"
+        "    /* Initialize VTables.\n"
+        "     */\n"
+        "%s"
         "\n"
+        "    /* Register VTables.\n"
+        "     */\n"
         "%s"
         "\n"
         "    %sinit_parcel();\n"
@@ -341,14 +362,15 @@ S_write_parcel_c(CFCBindCore *self) {
                   + strlen(prefix)
                   + strlen(vt_allocate)
                   + strlen(vt_bootstrap)
+                  + strlen(vt_initialize)
                   + strlen(vt_register)
                   + strlen(prefix)
                   + strlen(self->footer)
                   + 100;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, privacy_syms, includes,
-            c_data, prefix, vt_allocate, vt_bootstrap, vt_register, prefix,
-            self->footer);
+            c_data, prefix, vt_allocate, vt_bootstrap, vt_initialize,
+            vt_register, prefix, self->footer);
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
@@ -362,7 +384,7 @@ S_write_parcel_c(CFCBindCore *self) {
     FREEMEM(includes);
     FREEMEM(c_data);
     FREEMEM(vt_allocate);
-    FREEMEM(vt_bootstrap);
+    FREEMEM(vt_initialize);
     FREEMEM(vt_register);
 }
 

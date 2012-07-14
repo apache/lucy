@@ -51,24 +51,12 @@ VTable_allocate(size_t num_methods) {
 }
 
 VTable*
-VTable_bootstrap(VTable *self, VTable *parent, const char *name, int flags,
-                 void *x, size_t obj_alloc_size, void *method_meta) {
-    // Create CharBuf manually, since the CharBuf VTable might not be
-    // bootstrapped yet.
-    CharBuf *name_cb = (CharBuf*)Memory_wrapped_calloc(sizeof(CharBuf), 1);
-    size_t name_len  = strlen(name);
-
-    name_cb->vtable    = CHARBUF;
-    name_cb->ref.count = 1;
-    name_cb->ptr       = (char*)MALLOCATE(name_len + 1);
-    name_cb->size      = name_len;
-    name_cb->cap       = name_len + 1;
-    strcpy(name_cb->ptr, name);
-
+VTable_init(VTable *self, VTable *parent, const char *name, int flags,
+            void *x, size_t obj_alloc_size, void *method_meta) {
     self->vtable         = CFISH_VTABLE;
     self->ref.count      = 1;
     self->parent         = parent;
-    self->name           = name_cb;
+    self->name           = CB_newf("%s", name);
     self->flags          = flags;
     self->x              = x;
     self->obj_alloc_size = obj_alloc_size;
