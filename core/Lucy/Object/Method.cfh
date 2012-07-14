@@ -32,6 +32,15 @@ class Lucy::Object::Method inherits Lucy::Object::Obj {
     init(Method *self, const CharBuf *name, lucy_method_t callback_func,
          size_t offset);
 
+    incremented Obj*
+    Inc_RefCount(Method *self);
+
+    uint32_t
+    Dec_RefCount(Method *self);
+
+    uint32_t
+    Get_RefCount(Method *self);
+
     public void
     Destroy(Method *self);
 }

@@ -18,9 +18,10 @@
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Object/VTable.h"
 #include "Lucy/Object/Method.h"
 #include "Lucy/Object/CharBuf.h"
+#include "Lucy/Object/Err.h"
+#include "Lucy/Object/VTable.h"
 
 Method*
 Method_new(const CharBuf *name, lucy_method_t callback_func, size_t offset) {
@@ -39,6 +40,25 @@ Method_init(Method *self, const CharBuf *name, lucy_method_t callback_func,
 
 void
 Method_destroy(Method *self) {
-    DECREF(self->name);
+    THROW(ERR, "Insane attempt to destroy Method '%o'", self->name);
 }
+
+Obj*
+Method_inc_refcount(Method *self) {
+    return (Obj*)self;
+}
+
+uint32_t
+Method_dec_refcount(Method *self) {
+    UNUSED_VAR(self);
+    return 1;
+}
+
+uint32_t
+Method_get_refcount(Method *self) {
+    UNUSED_VAR(self);
+    // See comments in VTable.c
+    return 1;
+}
+
 
