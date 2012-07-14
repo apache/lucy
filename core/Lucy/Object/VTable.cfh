@@ -37,11 +37,11 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     inert size_t offset_of_parent;
 
     inert VTable*
-    allocate(size_t num_methods);
+    allocate(VTable *parent, int flags, size_t obj_alloc_size,
+             size_t num_novel);
 
     inert VTable*
-    init(VTable *self, VTable *parent, const CharBuf *name, int flags,
-         size_t obj_alloc_size);
+    init(VTable *self, const CharBuf *name);
 
     inert void
     add_method(VTable *self, const CharBuf *name, lucy_method_t callback_func,

@@ -44,30 +44,36 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 LockFreeRegistry *VTable_registry = NULL;
 
 VTable*
-VTable_allocate(size_t num_methods) {
-    size_t vt_alloc_size = offsetof(cfish_VTable, method_ptrs)
-                           + num_methods * sizeof(cfish_method_t);
+VTable_allocate(VTable *parent, int flags, size_t obj_alloc_size,
+                size_t num_novel) {
+    size_t vt_alloc_size = parent
+                           ? parent->vt_alloc_size
+                           : offsetof(cfish_VTable, method_ptrs);
+    vt_alloc_size += num_novel * sizeof(cfish_method_t);
     VTable *self = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
-    self->vt_alloc_size = vt_alloc_size;
+    self->ref.count      = 1;
+    self->parent         = parent;
+    self->flags          = flags;
+    self->obj_alloc_size = obj_alloc_size;
+    self->vt_alloc_size  = vt_alloc_size;
+
     return self;
 }
 
 VTable*
-VTable_init(VTable *self, VTable *parent, const CharBuf *name, int flags,
-            size_t obj_alloc_size) {
-    self->vtable         = CFISH_VTABLE;
-    self->ref.count      = 1;
-    self->parent         = parent;
-    self->name           = CB_Clone(name);
-    self->flags          = flags;
-    self->obj_alloc_size = obj_alloc_size;
-    self->methods        = VA_new(0);
+VTable_init(VTable *self, const CharBuf *name) {
+    self->vtable  = CFISH_VTABLE;
+    self->name    = CB_Clone(name);
+    self->methods = VA_new(0);
 
+    VTable *parent = self->parent;
     if (parent) {
         size_t parent_ptrs_size = parent->vt_alloc_size
                                   - offsetof(cfish_VTable, method_ptrs);
         memcpy(self->method_ptrs, parent->method_ptrs, parent_ptrs_size);
     }
+
+    return self;
 }
 
 void

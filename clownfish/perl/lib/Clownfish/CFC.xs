@@ -934,7 +934,6 @@ _set_or_get(self, ...)
     CFCMethod *self;
 ALIAS:
     get_macro_sym     = 2
-    full_spec_sym     = 8
     full_override_sym = 10
     abstract          = 12
     novel             = 14
@@ -946,11 +945,6 @@ PPCODE:
         case 2: {
                 const char *macro_sym = CFCMethod_get_macro_sym(self);
                 retval = newSVpvn(macro_sym, strlen(macro_sym));
-            }
-            break;
-        case 8: {
-                const char *value = CFCMethod_full_spec_sym(self);
-                retval = newSVpvn(value, strlen(value));
             }
             break;
         case 10: {

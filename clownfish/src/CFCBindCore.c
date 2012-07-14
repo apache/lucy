@@ -258,12 +258,12 @@ S_write_parcel_c(CFCBindCore *self) {
 
     // Aggregate C code from all files.
     // Obtain parcel prefix for use in bootstrap function name.
-    char *privacy_syms  = CFCUtil_strdup("");
-    char *includes      = CFCUtil_strdup("");
-    char *c_data        = CFCUtil_strdup("");
-    char *vt_allocate   = CFCUtil_strdup("");
-    char *vt_initialize = CFCUtil_strdup("");
-    char *vt_register   = CFCUtil_strdup("");
+    char *privacy_syms = CFCUtil_strdup("");
+    char *includes     = CFCUtil_strdup("");
+    char *c_data       = CFCUtil_strdup("");
+    char *vt_specs = CFCUtil_strdup(
+        "static cfish_VTableSpec vtable_specs[] = {\n");
+    int num_specs = 0;
     CFCClass **ordered  = CFCHierarchy_ordered_classes(hierarchy);
     for (int i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
@@ -273,15 +273,15 @@ S_write_parcel_c(CFCBindCore *self) {
         char *class_c_data = CFCBindClass_to_c_data(class_binding);
         c_data = CFCUtil_cat(c_data, class_c_data, "\n", NULL);
         FREEMEM(class_c_data);
-        char *vt_alloc = CFCBindClass_to_vtable_allocate(class_binding);
-        vt_allocate = CFCUtil_cat(vt_allocate, vt_alloc, NULL);
-        FREEMEM(vt_alloc);
-        char *vt_init = CFCBindClass_to_vtable_init(class_binding);
-        vt_initialize = CFCUtil_cat(vt_initialize, vt_init, NULL);
-        FREEMEM(vt_init);
-        char *vt_reg = CFCBindClass_to_vtable_register(class_binding);
-        vt_register = CFCUtil_cat(vt_register, vt_reg, NULL);
-        FREEMEM(vt_reg);
+        if (!CFCClass_inert(klass)) {
+            if (num_specs != 0) {
+                vt_specs = CFCUtil_cat(vt_specs, ",\n", NULL);
+            }
+            char *vt_spec = CFCBindClass_spec_def(class_binding);
+            vt_specs = CFCUtil_cat(vt_specs, vt_spec, NULL);
+            FREEMEM(vt_spec);
+            ++num_specs;
+        }
         CFCBase_decref((CFCBase*)class_binding);
         const char *privacy_sym = CFCClass_privacy_symbol(klass);
         privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
@@ -300,6 +300,7 @@ S_write_parcel_c(CFCBindCore *self) {
         CFCUtil_die("No source classes found.");
     }
     const char *prefix = CFCParcel_get_prefix(parcel);
+    vt_specs = CFCUtil_cat(vt_specs, "\n};\n", NULL);
     FREEMEM(ordered);
 
     const char *vt_bootstrap = "";
@@ -307,11 +308,9 @@ S_write_parcel_c(CFCBindCore *self) {
         vt_bootstrap =
             "    /* Bootstrap VTables.\n"
             "     */\n"
-            "    cfish_VTable_override(CFISH_VTABLE, (cfish_method_t)lucy_VTable_make_obj, Lucy_VTable_Make_Obj_OFFSET);\n"
             "    cfish_VTable_override(CFISH_OBJ, (cfish_method_t)lucy_Obj_destroy, Lucy_Obj_Destroy_OFFSET);\n"
+            "    cfish_VTable_override(CFISH_VTABLE, (cfish_method_t)lucy_VTable_make_obj, Lucy_VTable_Make_Obj_OFFSET);\n"
             "    CFISH_CHARBUF->vtable = CFISH_VTABLE;\n"
-            "    CFISH_CHARBUF->parent = CFISH_OBJ;\n"
-            "    CFISH_CHARBUF->obj_alloc_size = sizeof(cfish_CharBuf);\n"
             "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_Obj_dec_refcount, Lucy_Obj_Dec_RefCount_OFFSET);\n"
             "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_Obj_inc_refcount, Lucy_Obj_Inc_RefCount_OFFSET);\n"
             "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_cat_trusted_str, Lucy_CB_Cat_Trusted_Str_OFFSET);\n"
@@ -320,11 +319,9 @@ S_write_parcel_c(CFCBindCore *self) {
             "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_grow, Lucy_CB_Grow_OFFSET);\n"
             "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_vcatf, Lucy_CB_VCatF_OFFSET);\n"
             "    CFISH_VARRAY->vtable = CFISH_VTABLE;\n"
-            "    CFISH_VARRAY->obj_alloc_size = sizeof(cfish_VArray);\n"
             "    cfish_VTable_override(CFISH_VARRAY, (cfish_method_t)lucy_VA_grow, Lucy_VA_Grow_OFFSET);\n"
             "    cfish_VTable_override(CFISH_VARRAY, (cfish_method_t)lucy_VA_push, Lucy_VA_Push_OFFSET);\n"
             "    CFISH_METHOD->vtable = CFISH_VTABLE;\n"
-            "    CFISH_METHOD->obj_alloc_size = sizeof(cfish_Method);\n"
             "\n";
     }
 
@@ -345,42 +342,64 @@ S_write_parcel_c(CFCBindCore *self) {
         "    size_t         *offset;\n"
         "} cfish_MethodSpec;\n"
         "\n"
+        "typedef struct cfish_VTableSpec {\n"
+        "    cfish_VTable     **vtable;\n"
+        "    cfish_VTable     **parent;\n"
+        "    const char        *name;\n"
+        "    size_t             obj_alloc_size;\n"
+        "    size_t             num_fresh;\n"
+        "    size_t             num_novel;\n"
+        "    cfish_MethodSpec  *method_specs;\n"
+        "} cfish_VTableSpec;\n"
+        "\n"
         "%s\n"
         "\n"
-        "static void\n"
-        "S_init_vtable(cfish_VTable *vtable, cfish_VTable *parent,\n"
-        "              const char *name, size_t obj_alloc_size,\n"
-        "              cfish_MethodSpec **method_specs) {\n"
-        "    cfish_CharBuf *cb = cfish_CB_newf(\"%%s\", name);\n"
-        "    cfish_VTable_init(vtable, parent, cb, 0, obj_alloc_size);\n"
-        "    CFISH_DECREF(cb);\n"
-        "    for (int i = 0; method_specs[i]; ++i) {\n"
-        "        cfish_MethodSpec *spec = method_specs[i];\n"
-        "        if (spec->is_novel) {\n"
-        "            cb = cfish_CB_newf(\"%%s\", spec->name);\n"
-        "            cfish_VTable_add_method(vtable, cb,\n"
-        "                                    spec->callback_func,\n"
-        "                                    *spec->offset);\n"
-        "            CFISH_DECREF(cb);\n"
-        "        }\n"
-        "        cfish_VTable_override(vtable, spec->func, *spec->offset);\n"
-        "    }\n"
-        "}\n"
+        "/* VTableSpec structs for initialization.\n"
+        " */\n"
+        "%s\n"
         "\n"
         "void\n"
         "%sbootstrap_parcel() {\n"
+        "    int num_vtable_specs = %d;\n"
+        "\n"
         "    /* Allocate memory for VTables.\n"
         "     */\n"
-        "%s"
+        "    for (int i = 0; i < num_vtable_specs; ++i) {\n"
+        "        cfish_VTableSpec *spec = &vtable_specs[i];\n"
+        "        cfish_VTable *parent = spec->parent ? *spec->parent : NULL;\n"
+        "        *spec->vtable = cfish_VTable_allocate(parent, 0,\n"
+        "                                              spec->obj_alloc_size,\n"
+        "                                              spec->num_novel);\n"
+        "    }\n"
         "\n"
         "%s"
         "    /* Initialize VTables.\n"
         "     */\n"
-        "%s"
+        "    for (int i = 0; i < num_vtable_specs; ++i) {\n"
+        "        cfish_VTableSpec *spec = &vtable_specs[i];\n"
+        "        cfish_CharBuf *cb = cfish_CB_newf(\"%%s\", spec->name);\n"
+        "        cfish_VTable_init(*spec->vtable, cb);\n"
+        "        CFISH_DECREF(cb);\n"
+        "        for (int i = 0; i < spec->num_fresh; ++i) {\n"
+        "            cfish_MethodSpec *mspec = &spec->method_specs[i];\n"
+        "            if (mspec->is_novel) {\n"
+        "                cb = cfish_CB_newf(\"%%s\", mspec->name);\n"
+        "                cfish_VTable_add_method(*spec->vtable, cb,\n"
+        "                                        mspec->callback_func,\n"
+        "                                        *mspec->offset);\n"
+        "                CFISH_DECREF(cb);\n"
+        "            }\n"
+        "            cfish_VTable_override(*spec->vtable, mspec->func,\n"
+        "                                  *mspec->offset);\n"
+        "        }\n"
+        "    }\n"
         "\n"
         "    /* Register VTables.\n"
         "     */\n"
-        "%s"
+        "    for (int i = 0; i < num_vtable_specs; ++i) {\n"
+        "        cfish_VTableSpec *spec = &vtable_specs[i];\n"
+        "        cfish_VTable_add_to_registry(*spec->vtable);\n"
+        "    }\n"
         "\n"
         "    %sinit_parcel();\n"
         "}\n"
@@ -391,18 +410,17 @@ S_write_parcel_c(CFCBindCore *self) {
                   + strlen(privacy_syms)
                   + strlen(includes)
                   + strlen(c_data)
+                  + strlen(vt_specs)
                   + strlen(prefix)
-                  + strlen(vt_allocate)
+                  + 10 // for num_specs
                   + strlen(vt_bootstrap)
-                  + strlen(vt_initialize)
-                  + strlen(vt_register)
                   + strlen(prefix)
                   + strlen(self->footer)
                   + 100;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, privacy_syms, includes,
-            c_data, prefix, vt_allocate, vt_bootstrap, vt_initialize,
-            vt_register, prefix, self->footer);
+            c_data, vt_specs, prefix, num_specs, vt_bootstrap, prefix,
+            self->footer);
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
@@ -415,8 +433,6 @@ S_write_parcel_c(CFCBindCore *self) {
     FREEMEM(privacy_syms);
     FREEMEM(includes);
     FREEMEM(c_data);
-    FREEMEM(vt_allocate);
-    FREEMEM(vt_initialize);
-    FREEMEM(vt_register);
+    FREEMEM(vt_specs);
 }
 

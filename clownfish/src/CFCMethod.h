@@ -165,12 +165,6 @@ size_t
 CFCMethod_full_typedef(CFCMethod *self, struct CFCClass *invoker, char *buf,
                        size_t buf_size);
 
-/** Returns the fully qualified name of the variable which stores the method's
- * initialization data.
- */
-const char*
-CFCMethod_full_spec_sym(CFCMethod *self);
-
 /** Returns the fully qualified name of the function which implements the
  * callback to the host in the event that a host method has been defined which
  * overrides this method, e.g. "crust_LobClaw_pinch_OVERRIDE".
