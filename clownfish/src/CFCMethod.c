@@ -37,7 +37,7 @@
 struct CFCMethod {
     CFCFunction function;
     char *macro_sym;
-    char *full_method_meta_sym;
+    char *full_spec_sym;
     char *full_override_sym;
     int is_final;
     int is_abstract;
@@ -130,9 +130,9 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     // Derive more symbols.
     const char *full_func_sym = CFCMethod_implementing_func_sym(self);
     size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
-    self->full_method_meta_sym = (char*)MALLOCATE(amount);
+    self->full_spec_sym     = (char*)MALLOCATE(amount);
     self->full_override_sym = (char*)MALLOCATE(amount);
-    sprintf(self->full_method_meta_sym, "%s_META", full_func_sym);
+    sprintf(self->full_spec_sym, "%s_SPEC", full_func_sym);
     sprintf(self->full_override_sym, "%s_OVERRIDE", full_func_sym);
 
     // Assume that this method is novel until we discover when applying
@@ -145,7 +145,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 void
 CFCMethod_destroy(CFCMethod *self) {
     FREEMEM(self->macro_sym);
-    FREEMEM(self->full_method_meta_sym);
+    FREEMEM(self->full_spec_sym);
     FREEMEM(self->full_override_sym);
     CFCFunction_destroy((CFCFunction*)self);
 }
@@ -319,8 +319,8 @@ CFCMethod_full_typedef(CFCMethod *self, CFCClass *invoker, char *buf,
 }
 
 const char*
-CFCMethod_full_method_meta_sym(CFCMethod *self) {
-    return self->full_method_meta_sym;
+CFCMethod_full_spec_sym(CFCMethod *self) {
+    return self->full_spec_sym;
 }
 
 const char*

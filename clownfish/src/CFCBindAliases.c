@@ -102,6 +102,7 @@ struct alias aliases[] = {
     {"CFISH_VTABLE", "LUCY_VTABLE"},
     {"cfish_VTable_allocate", "lucy_VTable_allocate"},
     {"cfish_VTable_init", "lucy_VTable_init"},
+    {"cfish_VTable_add_method", "lucy_VTable_add_method"},
     {"cfish_VTable_add_to_registry", "lucy_VTable_add_to_registry"},
     {"cfish_VTable_add_alias_to_registry", "lucy_VTable_add_alias_to_registry"},
     {"cfish_VTable_offset_of_parent", "lucy_VTable_offset_of_parent"},

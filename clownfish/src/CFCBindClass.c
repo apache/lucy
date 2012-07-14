@@ -33,7 +33,7 @@
 struct CFCBindClass {
     CFCBase base;
     CFCClass *client;
-    char *full_method_meta_var;
+    char *method_specs_var;
     char *short_names_macro;
 };
 
@@ -96,9 +96,9 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 
     const char *full_vtable_var = CFCClass_full_vtable_var(client);
     const char *PREFIX = CFCClass_get_PREFIX(client);
-    self->full_method_meta_var = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
-    self->short_names_macro    = (char*)MALLOCATE(strlen(PREFIX) + 20);
-    sprintf(self->full_method_meta_var, "%s_META", full_vtable_var);
+    self->method_specs_var  = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
+    self->short_names_macro = (char*)MALLOCATE(strlen(PREFIX) + 20);
+    sprintf(self->method_specs_var, "%s_METHODS", full_vtable_var);
     sprintf(self->short_names_macro, "%sUSE_SHORT_NAMES", PREFIX);
 
     return self;
@@ -106,7 +106,7 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 
 void
 CFCBindClass_destroy(CFCBindClass *self) {
-    FREEMEM(self->full_method_meta_var);
+    FREEMEM(self->method_specs_var);
     FREEMEM(self->short_names_macro);
     CFCBase_decref((CFCBase*)self->client);
     CFCBase_destroy((CFCBase*)self);
@@ -279,17 +279,17 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
     CFCMethod **methods  = CFCClass_methods(client);
     CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
 
-    char *offsets    = CFCUtil_strdup("");
-    char *cb_funcs   = CFCUtil_strdup("");
-    char *md_objects = CFCUtil_strdup("");
+    char *offsets  = CFCUtil_strdup("");
+    char *cb_funcs = CFCUtil_strdup("");
+    char *ms_defs  = CFCUtil_strdup("");
 
-    /* Start a NULL-terminated array of cfish_MethodMetaData vars.  Since C89
+    /* Start a NULL-terminated array of cfish_MethodSpec vars.  Since C89
      * doesn't allow us to initialize a pointer to an anonymous array inside a
      * global struct, we have to give it a real symbol and then store a pointer
      * to that symbol inside the VTable struct. */
-    char *md_var = CFCUtil_strdup("");
-    md_var = CFCUtil_cat(md_var, "cfish_MethodMetaData *",
-                         self->full_method_meta_var, "[] = {\n    ", NULL);
+    char *ms_var = CFCUtil_strdup("");
+    ms_var = CFCUtil_cat(ms_var, "static cfish_MethodSpec *",
+                         self->method_specs_var, "[] = {\n    ", NULL);
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
@@ -327,18 +327,18 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                 cb_funcs = CFCUtil_cat(cb_funcs, cb_def, "\n", NULL);
                 FREEMEM(cb_def);
             }
-            char *md_obj_def = CFCBindMeth_method_meta_def(method);
-            md_objects = CFCUtil_cat(md_objects, md_obj_def, NULL);
-            FREEMEM(md_obj_def);
-            const char *full_md_sym = CFCMethod_full_method_meta_sym(method);
-            md_var = CFCUtil_cat(md_var, "&", full_md_sym, ",\n    ", NULL);
+            char *ms_def = CFCBindMeth_spec_def(method);
+            ms_defs = CFCUtil_cat(ms_defs, ms_def, NULL);
+            FREEMEM(ms_def);
+            const char *full_md_sym = CFCMethod_full_spec_sym(method);
+            ms_var = CFCUtil_cat(ms_var, "&", full_md_sym, ",\n    ", NULL);
         }
 
         FREEMEM(offset_str);
     }
 
     // Close method metadata variable definition.
-    md_var =  CFCUtil_cat(md_var, "NULL\n};\n", NULL);
+    ms_var =  CFCUtil_cat(ms_var, "NULL\n};\n", NULL);
 
     const char pattern[] =
         "#include \"%s\"\n"
@@ -355,14 +355,13 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n"
-        "/* Define the cfish_MethodMetaData objects which provide\n"
-        " * introspection information and allow runtime overriding of\n"
-        " * dynamic methods.\n"
+        "/* Define the cfish_MethodSpec structs used during VTable\n"
+        " * initialization.\n"
         " */\n"
         "\n"
         "%s\n"
         "\n"
-        "/* Assemble all the cfish_MethodMetaData objects for this class.\n"
+        "/* Assemble all the cfish_MethodSpec structs for this class.\n"
         " */\n"
         "\n"
         "%s\n"
@@ -381,20 +380,20 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                   + strlen(include_h)
                   + strlen(offsets)
                   + strlen(cb_funcs)
-                  + strlen(md_objects)
-                  + strlen(md_var)
+                  + strlen(ms_defs)
+                  + strlen(ms_var)
                   + strlen(vt_var)
                   + strlen(autocode)
                   + 100;
     char *code = (char*)MALLOCATE(size);
-    sprintf(code, pattern, include_h, offsets, cb_funcs, md_objects, md_var,
+    sprintf(code, pattern, include_h, offsets, cb_funcs, ms_defs, ms_var,
             vt_var, autocode);
 
     FREEMEM(fresh_methods);
     FREEMEM(offsets);
     FREEMEM(cb_funcs);
-    FREEMEM(md_objects);
-    FREEMEM(md_var);
+    FREEMEM(ms_defs);
+    FREEMEM(ms_var);
     return code;
 }
 
@@ -470,14 +469,12 @@ CFCBindClass_to_vtable_init(CFCBindClass *self) {
                              : "NULL"; // No parent, e.g. Obj or inert classes.
 
     char pattern[] =
-        "    cfish_VTable_init(\n"
+        "    S_init_vtable(\n"
         "        %s, /* vtable */\n"
         "        %s, /* parent */\n"
         "        \"%s\", /* name */\n"
-        "        0, /* flags */\n"
-        "        NULL, /* \"void *x\" member reserved for future use */\n"
         "        sizeof(%s), /* obj_alloc_size */\n"
-        "        %s /* method_meta */\n"
+        "        %s /* method_specs */\n"
         "    );\n";
 
     size_t size = sizeof(pattern)
@@ -485,11 +482,11 @@ CFCBindClass_to_vtable_init(CFCBindClass *self) {
                   + strlen(parent_ref)
                   + strlen(class_name)
                   + strlen(struct_sym)
-                  + strlen(self->full_method_meta_var)
+                  + strlen(self->method_specs_var)
                   + 40;
     char *code = (char*)MALLOCATE(size);
     sprintf(code, pattern, vt_var, parent_ref, class_name, struct_sym,
-            self->full_method_meta_var);
+            self->method_specs_var);
 
     return code;
 }

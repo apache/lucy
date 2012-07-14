@@ -53,14 +53,13 @@ VTable_allocate(size_t num_methods) {
 }
 
 VTable*
-VTable_init(VTable *self, VTable *parent, const char *name, int flags,
-            void *x, size_t obj_alloc_size, void *method_meta) {
+VTable_init(VTable *self, VTable *parent, const CharBuf *name, int flags,
+            size_t obj_alloc_size) {
     self->vtable         = CFISH_VTABLE;
     self->ref.count      = 1;
     self->parent         = parent;
-    self->name           = CB_newf("%s", name);
+    self->name           = CB_Clone(name);
     self->flags          = flags;
-    self->x              = x;
     self->obj_alloc_size = obj_alloc_size;
     self->methods        = VA_new(0);
 
@@ -69,19 +68,13 @@ VTable_init(VTable *self, VTable *parent, const char *name, int flags,
                                   - offsetof(cfish_VTable, method_ptrs);
         memcpy(self->method_ptrs, parent->method_ptrs, parent_ptrs_size);
     }
+}
 
-    cfish_MethodMetaData **md_objs = (cfish_MethodMetaData**)method_meta;
-    for (uint32_t i = 0; md_objs[i] != NULL; i++) {
-        cfish_MethodMetaData *const md_obj = md_objs[i];
-        VTable_override(self, md_obj->func, *md_obj->offset);
-        CharBuf *method_name = CB_newf("%s", md_obj->name);
-        Method *method = Method_new(method_name, md_obj->callback_func,
-                                    *md_obj->offset);
-        VA_Push(self->methods, (Obj*)method);
-        DECREF(method_name);
-    }
-
-    return self;
+void
+VTable_add_method(VTable *self, const CharBuf *name,
+                  lucy_method_t callback_func, size_t offset) {
+    Method *method = Method_new(name, callback_func, offset);
+    VA_Push(self->methods, (Obj*)method);
 }
 
 void

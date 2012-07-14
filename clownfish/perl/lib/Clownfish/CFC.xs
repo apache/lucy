@@ -933,13 +933,13 @@ void
 _set_or_get(self, ...)
     CFCMethod *self;
 ALIAS:
-    get_macro_sym        = 2
-    full_method_meta_sym = 8
-    full_override_sym    = 10
-    abstract             = 12
-    novel                = 14
-    final                = 16
-    self_type            = 18
+    get_macro_sym     = 2
+    full_spec_sym     = 8
+    full_override_sym = 10
+    abstract          = 12
+    novel             = 14
+    final             = 16
+    self_type         = 18
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -949,7 +949,7 @@ PPCODE:
             }
             break;
         case 8: {
-                const char *value = CFCMethod_full_method_meta_sym(self);
+                const char *value = CFCMethod_full_spec_sym(self);
                 retval = newSVpvn(value, strlen(value));
             }
             break;
@@ -1840,10 +1840,10 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_method_meta_def(meth)
+_spec_def(meth)
     CFCMethod *meth;
 CODE:
-    RETVAL = S_sv_eat_c_string(CFCBindMeth_method_meta_def(meth));
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_spec_def(meth));
 OUTPUT: RETVAL
 
 MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Aliases

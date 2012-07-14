@@ -44,11 +44,11 @@ CFCBindMeth_method_def(struct CFCMethod *method, struct CFCClass *klass);
 char*
 CFCBindMeth_typedef_dec(struct CFCMethod *method, struct CFCClass *klass);
 
-/** Return C code defining the MethodMetaData object for this method, which
- * stores introspection data and a pointer to the callback function.
+/** Return C code defining the MethodSpec object for this method, which
+ * is used during VTable initialization.
  */
 char*
-CFCBindMeth_method_meta_def(struct CFCMethod *method);
+CFCBindMeth_spec_def(struct CFCMethod *method);
 
 /** Return C code implementing a version of the method which throws an
  * "abstract method" error at runtime, for methods which are declared as
