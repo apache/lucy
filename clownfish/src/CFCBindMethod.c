@@ -228,10 +228,9 @@ CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
 
 char*
 CFCBindMeth_method_meta_def(CFCMethod *method) {
-    const char *full_md_sym   = CFCMethod_full_method_meta_sym(method);
-    const char *macro_sym     = CFCMethod_get_macro_sym(method);
-    unsigned    macro_sym_len = strlen(macro_sym);
-    const char *impl_sym      = CFCMethod_implementing_func_sym(method);
+    const char *full_md_sym = CFCMethod_full_method_meta_sym(method);
+    const char *macro_sym   = CFCMethod_get_macro_sym(method);
+    const char *impl_sym    = CFCMethod_implementing_func_sym(method);
 
     const char *full_override_sym = "NULL";
     if ((CFCMethod_public(method) || CFCMethod_abstract(method))
@@ -245,20 +244,20 @@ CFCBindMeth_method_meta_def(CFCMethod *method) {
 
     char pattern[] =
         "cfish_MethodMetaData %s = {\n"
-        "    \"%s\", %u, /* name and name_len */\n"
+        "    \"%s\", /* name */\n"
         "    (cfish_method_t)%s, /* func */\n"
         "    (cfish_method_t)%s, /* callback_func */\n"
         "    &%s /* offset */\n"
         "};\n";
     size_t size = sizeof(pattern)
                   + strlen(full_md_sym)
-                  + macro_sym_len
+                  + strlen(macro_sym)
                   + strlen(impl_sym)
                   + strlen(full_override_sym)
                   + strlen(full_offset_sym)
                   + 30;
     char *def = (char*)MALLOCATE(size);
-    sprintf(def, pattern, full_md_sym, macro_sym, macro_sym_len, impl_sym,
+    sprintf(def, pattern, full_md_sym, macro_sym, impl_sym,
             full_override_sym, full_offset_sym);
 
     FREEMEM(full_offset_sym);

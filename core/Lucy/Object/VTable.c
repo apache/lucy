@@ -17,6 +17,7 @@
 #define C_LUCY_VTABLE
 #define C_LUCY_OBJ
 #define C_LUCY_CHARBUF
+#define C_LUCY_METHOD
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
@@ -28,6 +29,7 @@
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
 #include "Lucy/Object/LockFreeRegistry.h"
+#include "Lucy/Object/Method.h"
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Util/Atomic.h"
@@ -43,7 +45,7 @@ LockFreeRegistry *VTable_registry = NULL;
 
 VTable*
 VTable_allocate(size_t num_methods) {
-    size_t vt_alloc_size = offsetof(cfish_VTable, methods)
+    size_t vt_alloc_size = offsetof(cfish_VTable, method_ptrs)
                            + num_methods * sizeof(cfish_method_t);
     VTable *self = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
     self->vt_alloc_size = vt_alloc_size;
@@ -60,18 +62,23 @@ VTable_init(VTable *self, VTable *parent, const char *name, int flags,
     self->flags          = flags;
     self->x              = x;
     self->obj_alloc_size = obj_alloc_size;
-    self->method_meta    = method_meta;
+    self->methods        = VA_new(0);
 
     if (parent) {
-        size_t parent_methods_size = parent->vt_alloc_size
-                                     - offsetof(cfish_VTable, methods);
-        memcpy(self->methods, parent->methods, parent_methods_size);
+        size_t parent_ptrs_size = parent->vt_alloc_size
+                                  - offsetof(cfish_VTable, method_ptrs);
+        memcpy(self->method_ptrs, parent->method_ptrs, parent_ptrs_size);
     }
 
     cfish_MethodMetaData **md_objs = (cfish_MethodMetaData**)method_meta;
     for (uint32_t i = 0; md_objs[i] != NULL; i++) {
         cfish_MethodMetaData *const md_obj = md_objs[i];
         VTable_override(self, md_obj->func, *md_obj->offset);
+        CharBuf *method_name = CB_newf("%s", md_obj->name);
+        Method *method = Method_new(method_name, md_obj->callback_func,
+                                    *md_obj->offset);
+        VA_Push(self->methods, (Obj*)method);
+        DECREF(method_name);
     }
 
     return self;
@@ -200,17 +207,14 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
                 Hash_Store(meths, (Obj*)scrunched, (Obj*)CFISH_TRUE);
             }
             for (VTable *vtable = parent; vtable; vtable = vtable->parent) {
-                cfish_MethodMetaData **md_objs
-                    = (cfish_MethodMetaData**)vtable->method_meta;
-                for (uint32_t i = 0; md_objs[i] != NULL; i++) {
-                    cfish_MethodMetaData *const md_obj = md_objs[i];
-                    if (md_obj->callback_func) {
-                        ZCB_Assign_Str(callback_name, md_obj->name,
-                                       md_obj->name_len);
-                        S_scrunch_charbuf((CharBuf*)callback_name, scrunched);
+                uint32_t max = VA_Get_Size(vtable->methods);
+                for (uint32_t i = 0; i < max; i++) {
+                    Method *method = (Method*)VA_Fetch(vtable->methods, i);
+                    if (method->callback_func) {
+                        S_scrunch_charbuf(method->name, scrunched);
                         if (Hash_Fetch(meths, (Obj*)scrunched)) {
-                            VTable_Override(singleton, md_obj->callback_func,
-                                            *md_obj->offset);
+                            VTable_Override(singleton, method->callback_func,
+                                            method->offset);
                         }
                     }
                 }

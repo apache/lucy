@@ -305,7 +305,7 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         // Create offset in bytes for the method from the top of the VTable
         // object.
         char *offset_str = CFCUtil_cat(CFCUtil_strdup(""),
-                                       "(offsetof(cfish_VTable, methods) + ",
+                                       "(offsetof(cfish_VTable, method_ptrs) + ",
                                        meth_num_str,
                                        " * sizeof(cfish_method_t))", NULL);
         offsets = CFCUtil_cat(offsets, "size_t ", full_offset_sym, " = ",

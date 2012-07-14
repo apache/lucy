@@ -31,8 +31,8 @@ class Lucy::Object::VTable inherits Lucy::Object::Obj {
     void              *x;            /* Reserved for future expansion */
     size_t             obj_alloc_size;
     size_t             vt_alloc_size;
-    void              *method_meta;
-    lucy_method_t[1]   methods; /* flexible array */
+    VArray            *methods;
+    lucy_method_t[1]   method_ptrs; /* flexible array */
 
     inert LockFreeRegistry *registry;
     inert size_t offset_of_parent;

@@ -86,6 +86,9 @@ struct alias aliases[] = {
     {"Cfish_Hash_Store_Str", "Lucy_Hash_Store_Str"},
     {"Cfish_Hash_Store", "Lucy_Hash_Store"},
 
+    {"cfish_Method", "lucy_Method"},
+    {"CFISH_METHOD", "LUCY_METHOD"},
+
     {"cfish_VArray", "lucy_VArray"},
     {"CFISH_VARRAY", "LUCY_VARRAY"},
     {"cfish_VA_new", "lucy_VA_new"},
