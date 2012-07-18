@@ -22,6 +22,7 @@
 #include "Charmonizer/Core/ConfWriterC.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 #include "Charmonizer/Core/Compiler.h"
+#include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
