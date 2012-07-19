@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Specialized lock free hash table for storing VTables.
  */
-class Lucy::Object::LockFreeRegistry cnick LFReg inherits Lucy::Object::Obj {
+class Clownfish::LockFreeRegistry cnick LFReg inherits Lucy::Object::Obj {
 
     size_t  capacity;
     void   *entries;

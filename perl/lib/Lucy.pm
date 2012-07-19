@@ -123,7 +123,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::LockFreeRegistry;
+    package Clownfish::LockFreeRegistry;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     no warnings 'redefine';

@@ -18,7 +18,7 @@
 #define C_LUCY_LOCKFREEREGISTRY
 #include "XSBind.h"
 
-#include "Lucy/Object/LockFreeRegistry.h"
+#include "Clownfish/LockFreeRegistry.h"
 #include "Lucy/Object/Host.h"
 
 void*

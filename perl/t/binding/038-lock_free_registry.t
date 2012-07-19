@@ -38,7 +38,7 @@ use Time::HiRes qw( time usleep );
 use List::Util qw( shuffle );
 use Lucy::Test;
 
-my $registry = Lucy::Object::LockFreeRegistry->new( capacity => 32 );
+my $registry = Clownfish::LockFreeRegistry->new( capacity => 32 );
 
 sub register_many {
     my ( $nums, $delay ) = @_;

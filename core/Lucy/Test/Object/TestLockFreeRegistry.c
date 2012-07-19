@@ -21,7 +21,7 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestLockFreeRegistry.h"
-#include "Lucy/Object/LockFreeRegistry.h"
+#include "Clownfish/LockFreeRegistry.h"
 
 StupidHashCharBuf*
 StupidHashCharBuf_new(const char *text) {

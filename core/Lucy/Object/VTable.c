@@ -28,7 +28,7 @@
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
-#include "Lucy/Object/LockFreeRegistry.h"
+#include "Clownfish/LockFreeRegistry.h"
 #include "Lucy/Object/Method.h"
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"

@@ -470,7 +470,7 @@ END_XS_CODE
 sub bind_lockfreeregistry {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::LockFreeRegistry",
+        class_name => "Clownfish::LockFreeRegistry",
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

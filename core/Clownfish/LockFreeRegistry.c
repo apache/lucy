@@ -18,7 +18,7 @@
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Object/LockFreeRegistry.h"
+#include "Clownfish/LockFreeRegistry.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/VTable.h"
 #include "Lucy/Util/Atomic.h"

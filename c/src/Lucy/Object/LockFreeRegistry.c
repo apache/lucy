@@ -17,7 +17,7 @@
 #define C_LUCY_LOCKFREEREGISTRY
 
 #include "CFBind.h"
-#include "Lucy/Object/LockFreeRegistry.h"
+#include "Clownfish/LockFreeRegistry.h"
 
 void*
 lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
