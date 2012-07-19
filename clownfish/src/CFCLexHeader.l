@@ -23,6 +23,72 @@
         CFCParseHeader(CFCParser_current_parser, token_type, \
 			CFCParser_dupe(CFCParser_current_state, yytext), \
 			CFCParser_current_state)
+
+    struct cfc_StringID {
+        const char *string;
+        int token_type;
+    };
+    struct cfc_StringID reserved_word_map[] = {
+        {"NULL", CFC_TOKENTYPE_NULL },
+        {"abstract", CFC_TOKENTYPE_ABSTRACT },
+        {"bool_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"char", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"class", CFC_TOKENTYPE_CLASS },
+        {"cnick", CFC_TOKENTYPE_CNICK },
+        {"const", CFC_TOKENTYPE_CONST },
+        {"decremented", CFC_TOKENTYPE_DECREMENTED },
+        {"double", CFC_TOKENTYPE_FLOAT_TYPE_NAME },
+        {"false", CFC_TOKENTYPE_FALSE },
+        {"final", CFC_TOKENTYPE_FINAL },
+        {"float", CFC_TOKENTYPE_FLOAT_TYPE_NAME },
+        {"incremented", CFC_TOKENTYPE_INCREMENTED },
+        {"inert", CFC_TOKENTYPE_INERT },
+        {"inherits", CFC_TOKENTYPE_INHERITS },
+        {"inline", CFC_TOKENTYPE_INLINE },
+        {"int", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"int16_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"int32_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"int64_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"int8_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"local", CFC_TOKENTYPE_LOCAL },
+        {"long", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"nullable", CFC_TOKENTYPE_NULLABLE },
+        {"parcel", CFC_TOKENTYPE_PARCEL },
+        {"private", CFC_TOKENTYPE_PRIVATE },
+        {"public", CFC_TOKENTYPE_PUBLIC },
+        {"short", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"size_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"true", CFC_TOKENTYPE_TRUE },
+        {"uint16_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"uint32_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"uint64_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"uint8_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"va_list", CFC_TOKENTYPE_VA_LIST },
+        {"void", CFC_TOKENTYPE_VOID },
+    };
+    #define NUM_RESERVED_WORDS \
+        (sizeof(reserved_word_map) / sizeof(struct cfc_StringID))
+
+    static int
+    S_compare(const void *va, const void *vb) {
+        const char *a = (const char*)va;
+        struct cfc_StringID *b
+            = (struct cfc_StringID*)vb;
+        return strcmp(a, b->string);
+    };
+
+    static int
+    S_identifier_or_keyword(const char *word) {
+        struct cfc_StringID *got = (struct cfc_StringID*)
+            bsearch(word, reserved_word_map, NUM_RESERVED_WORDS,
+                    sizeof(struct cfc_StringID), S_compare);
+        if (got) {
+            return got->token_type;
+        }
+        else {
+            return CFC_TOKENTYPE_IDENTIFIER;
+        }
+    }
 %}
 
 %option noyywrap
@@ -33,44 +99,6 @@
 %x CBLOCK
 
 %%
-const       { PARSE(CFC_TOKENTYPE_CONST); }
-nullable    { PARSE(CFC_TOKENTYPE_NULLABLE); } 
-incremented { PARSE(CFC_TOKENTYPE_INCREMENTED); } 
-decremented { PARSE(CFC_TOKENTYPE_DECREMENTED); } 
-
-void       { PARSE(CFC_TOKENTYPE_VOID); }
-float      { PARSE(CFC_TOKENTYPE_FLOAT_TYPE_NAME); }
-double     { PARSE(CFC_TOKENTYPE_FLOAT_TYPE_NAME); }
-int8_t     { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-int16_t    { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-int32_t    { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-int64_t    { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-uint8_t    { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-uint16_t   { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-uint32_t   { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-uint64_t   { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-char       { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-short      { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-int        { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-long       { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-size_t     { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-bool_t     { PARSE(CFC_TOKENTYPE_INTEGER_TYPE_NAME); }
-va_list    { PARSE(CFC_TOKENTYPE_VA_LIST); }
-true       { PARSE(CFC_TOKENTYPE_TRUE); }
-false      { PARSE(CFC_TOKENTYPE_FALSE); }
-NULL       { PARSE(CFC_TOKENTYPE_NULL); }
-cnick      { PARSE(CFC_TOKENTYPE_CNICK); }
-inherits   { PARSE(CFC_TOKENTYPE_INHERITS); }
-parcel     { PARSE(CFC_TOKENTYPE_PARCEL); }
-class      { PARSE(CFC_TOKENTYPE_CLASS); }
-public     { PARSE(CFC_TOKENTYPE_PUBLIC); }
-private    { PARSE(CFC_TOKENTYPE_PRIVATE); }
-local      { PARSE(CFC_TOKENTYPE_LOCAL); }
-inert      { PARSE(CFC_TOKENTYPE_INERT); }
-inline     { PARSE(CFC_TOKENTYPE_INLINE); }
-abstract   { PARSE(CFC_TOKENTYPE_ABSTRACT); }
-final      { PARSE(CFC_TOKENTYPE_FINAL); }
-
 ::         { PARSE(CFC_TOKENTYPE_SCOPE_OP); }
 [*]        { PARSE(CFC_TOKENTYPE_ASTERISK); }
 \{         { PARSE(CFC_TOKENTYPE_LEFT_CURLY_BRACE); }
@@ -90,7 +118,7 @@ final      { PARSE(CFC_TOKENTYPE_FINAL); }
 -?[0-9]+               { PARSE(CFC_TOKENTYPE_INTEGER_LITERAL); }
 \"([^\"\\]|\\.)*\"     { PARSE(CFC_TOKENTYPE_STRING_LITERAL); }
 
-[a-zA-Z_][a-zA-Z0-9_]* { PARSE(CFC_TOKENTYPE_IDENTIFIER); }
+[a-zA-Z_][a-zA-Z0-9_]* { PARSE(S_identifier_or_keyword(yytext)); }
 
 __C__[[:space:]]*    { BEGIN(CBLOCK);  PARSE(CFC_TOKENTYPE_CBLOCK_START); }
 <CBLOCK>__END_C__    { BEGIN(INITIAL); PARSE(CFC_TOKENTYPE_CBLOCK_CLOSE); }
