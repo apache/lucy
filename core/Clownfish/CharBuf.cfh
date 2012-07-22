@@ -20,7 +20,7 @@ parcel Lucy;
  * Growable buffer holding Unicode characters.
  */
 
-class Lucy::Object::CharBuf cnick CB
+class Clownfish::CharBuf cnick CB
     inherits Lucy::Object::Obj {
 
     char    *ptr;
@@ -313,8 +313,8 @@ class Lucy::Object::CharBuf cnick CB
     Cat_Trusted_Str(CharBuf *self, const char *ptr, size_t size);
 }
 
-class Lucy::Object::ViewCharBuf cnick ViewCB
-    inherits Lucy::Object::CharBuf {
+class Clownfish::ViewCharBuf cnick ViewCB
+    inherits Clownfish::CharBuf {
 
     inert incremented ViewCharBuf*
     new_from_utf8(const char *utf8, size_t size);
@@ -351,8 +351,8 @@ class Lucy::Object::ViewCharBuf cnick ViewCB
     Destroy(ViewCharBuf *self);
 }
 
-class Lucy::Object::ZombieCharBuf cnick ZCB
-    inherits Lucy::Object::ViewCharBuf {
+class Clownfish::ZombieCharBuf cnick ZCB
+    inherits Clownfish::ViewCharBuf {
 
     /** Return a ZombieCharBuf with a blank string.
      */

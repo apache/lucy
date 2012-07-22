@@ -122,7 +122,7 @@ END_XS_CODE
 
 sub bind_charbuf {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy     PACKAGE = Lucy::Object::CharBuf
+MODULE = Lucy     PACKAGE = Clownfish::CharBuf
 
 SV*
 new(either_sv, sv)
@@ -162,7 +162,7 @@ CODE:
     RETVAL = XSBind_cb_to_sv(self);
 OUTPUT: RETVAL
 
-MODULE = Lucy     PACKAGE = Lucy::Object::ViewCharBuf
+MODULE = Lucy     PACKAGE = Clownfish::ViewCharBuf
 
 SV*
 _new(unused, sv)
@@ -182,7 +182,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::CharBuf",
+        class_name => "Clownfish::CharBuf",
     );
     $binding->append_xs($xs_code);
     $binding->exclude_constructor;

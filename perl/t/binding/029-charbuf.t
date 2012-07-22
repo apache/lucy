@@ -23,18 +23,18 @@ use Lucy::Test::TestUtils qw( utf8_test_strings );
 
 my ( $smiley, $not_a_smiley, $frowny ) = utf8_test_strings();
 
-my $charbuf = Lucy::Object::CharBuf->new($smiley);
-isa_ok( $charbuf, "Lucy::Object::CharBuf" );
+my $charbuf = Clownfish::CharBuf->new($smiley);
+isa_ok( $charbuf, "Clownfish::CharBuf" );
 is( $charbuf->to_perl, $smiley, "round trip UTF-8" );
 
-$charbuf = Lucy::Object::CharBuf->new($smiley);
+$charbuf = Clownfish::CharBuf->new($smiley);
 my $dupe = thaw( freeze($charbuf) );
-isa_ok( $dupe, "Lucy::Object::CharBuf",
+isa_ok( $dupe, "Clownfish::CharBuf",
     "thaw/freeze produces correct object" );
 is( $dupe->to_perl, $charbuf->to_perl, "freeze/thaw" );
 
 my $clone = $charbuf->clone;
-is( $clone->to_perl, Lucy::Object::CharBuf->new($smiley)->to_perl, "clone" );
+is( $clone->to_perl, Clownfish::CharBuf->new($smiley)->to_perl, "clone" );
 
 my $ram_file = Lucy::Store::RAMFile->new;
 my $outstream = Lucy::Store::OutStream->open( file => $ram_file )
@@ -44,7 +44,7 @@ $outstream->close;
 my $instream = Lucy::Store::InStream->open( file => $ram_file )
     or die Lucy->error;
 my $charbuf_vtable
-    = Clownfish::VTable->singleton( class_name => 'Lucy::Object::CharBuf',
+    = Clownfish::VTable->singleton( class_name => 'Clownfish::CharBuf',
     );
 my $deserialized = $charbuf_vtable->make_obj->deserialize($instream);
 is_deeply( $charbuf->to_perl, $deserialized->to_perl,

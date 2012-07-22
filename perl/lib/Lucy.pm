@@ -161,7 +161,7 @@ sub error {$Lucy::Object::Err::error}
         while ( my ( $symbol, $glob ) = each %$stash ) {
             next if ref $glob;
             next unless *$glob{CODE};
-            $methods->push( Lucy::Object::CharBuf->new($symbol) );
+            $methods->push( Clownfish::CharBuf->new($symbol) );
         }
         return $methods;
     }
@@ -308,7 +308,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::CharBuf;
+    package Clownfish::CharBuf;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
 
@@ -324,7 +324,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::ViewCharBuf;
+    package Clownfish::ViewCharBuf;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Carp;
@@ -332,7 +332,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::ZombieCharBuf;
+    package Clownfish::ZombieCharBuf;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Carp;
@@ -356,7 +356,7 @@ sub error {$Lucy::Object::Err::error}
         my ( $either, $message ) = @_;
         my ( undef, $file, $line ) = caller;
         $message .= ", $file line $line\n";
-        return $either->_new( mess => Lucy::Object::CharBuf->new($message) );
+        return $either->_new( mess => Clownfish::CharBuf->new($message) );
     }
 
     sub do_throw {

@@ -99,7 +99,7 @@ Test_race_condition_1: {
         to   => 'seg_1.hidden',
     );
     Lucy::Index::IndexReader::set_race_condition_debug1(
-        Lucy::Object::CharBuf->new($latest_snapshot_file) );
+        Clownfish::CharBuf->new($latest_snapshot_file) );
 
     $reader = Lucy::Index::IndexReader->open(
         index   => $folder,

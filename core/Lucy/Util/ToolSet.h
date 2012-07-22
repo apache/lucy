@@ -39,7 +39,7 @@ extern "C" {
 #include "Lucy/Object/Obj.h"
 #include "Lucy/Object/BitVector.h"
 #include "Lucy/Object/ByteBuf.h"
-#include "Lucy/Object/CharBuf.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Clownfish/Hash.h"
 #include "Lucy/Object/I32Array.h"

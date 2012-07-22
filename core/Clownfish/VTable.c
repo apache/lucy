@@ -25,7 +25,7 @@
 #include <ctype.h>
 
 #include "Clownfish/VTable.h"
-#include "Lucy/Object/CharBuf.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/LockFreeRegistry.h"

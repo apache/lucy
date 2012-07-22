@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "Lucy/Object/Obj.h"
-#include "Lucy/Object/CharBuf.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/VTable.h"

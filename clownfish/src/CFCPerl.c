@@ -300,7 +300,7 @@ S_write_boot_c(CFCPerl *self) {
         "#include \"XSUB.h\"\n"
         "#include \"%s\"\n"
         "#include \"parcel.h\"\n"
-        "#include \"Lucy/Object/CharBuf.h\"\n"
+        "#include \"Clownfish/CharBuf.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"

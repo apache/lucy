@@ -19,7 +19,7 @@
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/Method.h"
-#include "Lucy/Object/CharBuf.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Clownfish/VTable.h"
 

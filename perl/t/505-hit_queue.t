@@ -170,7 +170,7 @@ $hit_q = Lucy::Search::HitQueue->new(
 for my $doc_id ( shuffle( 1 .. 100 ) ) {
     my $fields = $docs[ $doc_id - 1 ];
     my $values = Lucy::Object::VArray->new( capacity => 1 );
-    $values->push( Lucy::Object::CharBuf->new( $fields->{number} ) );
+    $values->push( Clownfish::CharBuf->new( $fields->{number} ) );
     my $match_doc = Lucy::Search::MatchDoc->new(
         doc_id => $doc_id,
         score  => $doc_id,

@@ -22,8 +22,8 @@ use Lucy::Test;
 use Lucy qw( to_perl to_clownfish );
 
 my $hash = Clownfish::Hash->new( capacity => 10 );
-$hash->store( "foo", Lucy::Object::CharBuf->new("bar") );
-$hash->store( "baz", Lucy::Object::CharBuf->new("banana") );
+$hash->store( "foo", Clownfish::CharBuf->new("bar") );
+$hash->store( "baz", Clownfish::CharBuf->new("banana") );
 
 ok( !defined( $hash->fetch("blah") ),
     "fetch for a non-existent key returns undef" );

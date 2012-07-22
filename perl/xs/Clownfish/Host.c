@@ -20,7 +20,7 @@
 
 #include "Lucy/Object/Obj.h"
 #include "Clownfish/Host.h"
-#include "Lucy/Object/CharBuf.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Util/Memory.h"
 

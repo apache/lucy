@@ -22,7 +22,6 @@
 #include <sys/stat.h>
 
 #include "Lucy/Util/ToolSet.h"
-#include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Store/FSDirHandle.h"

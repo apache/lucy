@@ -23,7 +23,7 @@ use Lucy::Test;
 my ( $varray, $twin );
 
 $varray = Lucy::Object::VArray->new( capacity => 5 );
-$varray->push( Lucy::Object::CharBuf->new($_) ) for 1 .. 5;
+$varray->push( Clownfish::CharBuf->new($_) ) for 1 .. 5;
 $varray->delete(3);
 my $frozen = nfreeze($varray);
 my $thawed = thaw($frozen);

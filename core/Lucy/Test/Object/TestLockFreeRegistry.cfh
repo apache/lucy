@@ -23,7 +23,7 @@ inert class Lucy::Test::Object::TestLockFreeRegistry cnick TestLFReg {
 
 /** Private test-only class for stressing LockFreeRegistry.
  */
-class Lucy::Test::Object::StupidHashCharBuf inherits Lucy::Object::CharBuf {
+class Lucy::Test::Object::StupidHashCharBuf inherits Clownfish::CharBuf {
     inert incremented StupidHashCharBuf*
     new(const char *text);
 

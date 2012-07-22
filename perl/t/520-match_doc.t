@@ -37,8 +37,8 @@ is( $match_doc_copy->get_values, $match_doc->get_values,
     "empty values still empty after serialization" );
 
 my $values = Lucy::Object::VArray->new( capacity => 4 );
-$values->store( 0, Lucy::Object::CharBuf->new("foo") );
-$values->store( 3, Lucy::Object::CharBuf->new("bar") );
+$values->store( 0, Clownfish::CharBuf->new("foo") );
+$values->store( 3, Clownfish::CharBuf->new("bar") );
 $match_doc = Lucy::Search::MatchDoc->new(
     doc_id => 120,
     score  => 35,
