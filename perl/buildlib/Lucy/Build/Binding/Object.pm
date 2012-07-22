@@ -477,7 +477,7 @@ sub bind_lockfreeregistry {
 
 sub bind_float32 {
     my $float32_xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Object::Float32
+MODULE = Lucy   PACKAGE = Clownfish::Float32
 
 SV*
 new(either_sv, value)
@@ -494,7 +494,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::Float32",
+        class_name => "Clownfish::Float32",
     );
     $binding->append_xs($float32_xs_code);
     $binding->exclude_constructor;
@@ -504,7 +504,7 @@ END_XS_CODE
 
 sub bind_float64 {
     my $float64_xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Object::Float64
+MODULE = Lucy   PACKAGE = Clownfish::Float64
 
 SV*
 new(either_sv, value)
@@ -521,7 +521,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::Float64",
+        class_name => "Clownfish::Float64",
     );
     $binding->append_xs($float64_xs_code);
     $binding->exclude_constructor;

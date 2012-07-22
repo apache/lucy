@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Abstract base class for numbers.
  */
-abstract class Lucy::Object::Num inherits Lucy::Object::Obj {
+abstract class Clownfish::Num inherits Lucy::Object::Obj {
 
     inert Num*
     init(Num *self);
@@ -29,7 +29,7 @@ abstract class Lucy::Object::Num inherits Lucy::Object::Obj {
 
 /** Abstract base class for floating point numbers.
  */
-abstract class Lucy::Object::FloatNum inherits Lucy::Object::Num {
+abstract class Clownfish::FloatNum inherits Clownfish::Num {
 
     inert FloatNum*
     init(FloatNum *self);
@@ -44,7 +44,7 @@ abstract class Lucy::Object::FloatNum inherits Lucy::Object::Num {
 
 /** Abstract base class for Integers.
  */
-abstract class Lucy::Object::IntNum inherits Lucy::Object::Num {
+abstract class Clownfish::IntNum inherits Clownfish::Num {
 
     inert IntNum*
     init(IntNum *self);
@@ -58,7 +58,7 @@ abstract class Lucy::Object::IntNum inherits Lucy::Object::Num {
 
 /** Single precision floating point number.
  */
-class Lucy::Object::Float32 inherits Lucy::Object::FloatNum {
+class Clownfish::Float32 inherits Clownfish::FloatNum {
 
     float value;
 
@@ -101,7 +101,7 @@ class Lucy::Object::Float32 inherits Lucy::Object::FloatNum {
 
 /** Double precision floating point number.
  */
-class Lucy::Object::Float64 inherits Lucy::Object::FloatNum {
+class Clownfish::Float64 inherits Clownfish::FloatNum {
 
     double value;
 
@@ -144,8 +144,8 @@ class Lucy::Object::Float64 inherits Lucy::Object::FloatNum {
 
 /** 32-bit signed integer.
  */
-class Lucy::Object::Integer32 cnick Int32
-    inherits Lucy::Object::IntNum {
+class Clownfish::Integer32 cnick Int32
+    inherits Clownfish::IntNum {
 
     int32_t value;
 
@@ -189,8 +189,8 @@ class Lucy::Object::Integer32 cnick Int32
 /**
  * 64-bit signed integer.
  */
-class Lucy::Object::Integer64 cnick Int64
-    inherits Lucy::Object::IntNum {
+class Clownfish::Integer64 cnick Int64
+    inherits Clownfish::IntNum {
 
     int64_t value;
 
@@ -241,7 +241,7 @@ class Lucy::Object::Integer64 cnick Int64
  * There are only two singleton instances of this class: CFISH_TRUE and
  * CFISH_FALSE.
  */
-class Lucy::Object::BoolNum cnick Bool inherits Lucy::Object::IntNum {
+class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
     bool_t value;
     CharBuf *string;
 

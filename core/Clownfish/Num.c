@@ -26,7 +26,7 @@
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Object/Num.h"
+#include "Clownfish/Num.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Clownfish/VTable.h"

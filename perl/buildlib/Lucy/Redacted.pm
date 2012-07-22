@@ -49,7 +49,7 @@ sub redacted {
 sub hidden {
     return qw(
         Lucy::Analysis::Inversion
-        Lucy::Object::Num
+        Clownfish::Num
         Lucy::Plan::Int32Type
         Lucy::Plan::Int64Type
         Lucy::Plan::Float32Type
