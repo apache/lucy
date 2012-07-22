@@ -15,7 +15,7 @@
  */
 
 #include "XSBind.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 
 // Anonymous XSUB helper for Err#trap().  It wraps the supplied C function
 // so that it can be run inside a Perl eval block.

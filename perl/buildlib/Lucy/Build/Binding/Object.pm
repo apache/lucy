@@ -306,7 +306,7 @@ END_XS_CODE
 
 sub bind_host {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy     PACKAGE = Lucy::Object::Host
+MODULE = Lucy     PACKAGE = Clownfish::Host
 
 =for comment
 
@@ -325,7 +325,7 @@ _test_obj(...)
 CODE:
 {
     lucy_ByteBuf *test_obj = lucy_BB_new_bytes("blah", 4);
-    SV *pack_var = get_sv("Lucy::Object::Host::testobj", 1);
+    SV *pack_var = get_sv("Clownfish::Host::testobj", 1);
     RETVAL = (SV*)Lucy_BB_To_Host(test_obj);
     SvSetSV_nosteal(pack_var, RETVAL);
     CFISH_DECREF(test_obj);
@@ -384,7 +384,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::Host",
+        class_name => "Clownfish::Host",
     );
     $binding->append_xs($xs_code);
 

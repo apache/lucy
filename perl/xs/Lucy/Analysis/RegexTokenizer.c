@@ -21,7 +21,7 @@
 #include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"
 

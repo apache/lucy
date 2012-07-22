@@ -372,7 +372,7 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
     "#include \"parcel.h\"\n"
     "#include \"%s\"\n"
     "\n"
-    "#include \"Lucy/Object/Host.h\"\n"
+    "#include \"Clownfish/Host.h\"\n"
     "#include \"Lucy/Util/Memory.h\"\n"
     "#include \"Lucy/Util/StringHelper.h\"\n"
     "\n"

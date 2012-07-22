@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Object::Host;
+package Clownfish::Host;
 use Lucy;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;

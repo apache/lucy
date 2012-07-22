@@ -20,7 +20,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Util/Json.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"

@@ -19,7 +19,7 @@
 #include "XSBind.h"
 
 #include "Clownfish/LockFreeRegistry.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 
 void*
 lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {

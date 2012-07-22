@@ -478,7 +478,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::Host;
+    package Clownfish::Host;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     BEGIN {

@@ -20,8 +20,8 @@ use Test::More tests => 8;
 use Lucy::Test;
 use Lucy qw( to_perl to_clownfish );
 
-my $object = Lucy::Object::Host->new();
-isa_ok( $object, "Lucy::Object::Host" );
+my $object = Clownfish::Host->new();
+isa_ok( $object, "Clownfish::Host" );
 
 is( $object->_callback,     undef, "void callback" );
 is( $object->_callback_f64, 5,     "f64 callback" );

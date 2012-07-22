@@ -15,7 +15,7 @@
  */
 
 #include "Lucy/Util/ToolSet.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 #include "Lucy/Store/FSFolder.h"
 
 CharBuf*

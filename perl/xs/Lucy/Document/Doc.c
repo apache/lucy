@@ -17,7 +17,7 @@
 #define C_LUCY_DOC
 #include "XSBind.h"
 #include "Lucy/Document/Doc.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Memory.h"

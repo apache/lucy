@@ -19,7 +19,7 @@
 #include "XSBind.h"
 
 #include "Clownfish/VTable.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 #include "Lucy/Util/Memory.h"
 
 lucy_Obj*

@@ -66,7 +66,7 @@ __END_C__
  * If the invoker is a VTable, it will be used to make a class
  * callback rather than an object callback.
  */
-inert class Lucy::Object::Host {
+inert class Clownfish::Host {
 
     /** Invoke an object method in a void context.
      */

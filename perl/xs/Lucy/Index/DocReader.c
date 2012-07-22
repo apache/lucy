@@ -25,7 +25,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Plan/TextType.h"
 #include "Lucy/Plan/NumericType.h"
-#include "Lucy/Object/Host.h"
+#include "Clownfish/Host.h"
 #include "Lucy/Store/InStream.h"
 
 lucy_HitDoc*
