@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Abstract base class for numbers.
  */
-abstract class Clownfish::Num inherits Lucy::Object::Obj {
+abstract class Clownfish::Num inherits Clownfish::Obj {
 
     inert Num*
     init(Num *self);

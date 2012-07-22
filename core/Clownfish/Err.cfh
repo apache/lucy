@@ -42,7 +42,7 @@ __END_C__
  * temporarily, so that calling code may choose how to handle a particular
  * error condition.
  */
-public class Clownfish::Err inherits Lucy::Object::Obj {
+public class Clownfish::Err inherits Clownfish::Obj {
 
     CharBuf *mess;
 

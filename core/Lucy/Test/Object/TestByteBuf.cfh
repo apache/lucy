@@ -18,7 +18,7 @@ parcel Lucy;
 parcel Lucy;
 
 class Lucy::Test::Object::TestByteBuf cnick TestBB
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     inert void
     run_tests();

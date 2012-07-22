@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Read a segment's sort caches.
  */
-class Lucy::Index::SortCache inherits Lucy::Object::Obj {
+class Lucy::Index::SortCache inherits Clownfish::Obj {
 
     CharBuf   *field;
     FieldType *type;

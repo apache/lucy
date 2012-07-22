@@ -30,7 +30,7 @@ parcel Lucy;
  */
 
 class Lucy::Store::CompoundFileWriter cnick CFWriter
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     Folder      *folder;
 

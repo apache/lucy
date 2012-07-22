@@ -20,7 +20,7 @@ parcel Lucy;
  */
 
 class Lucy::Test::Search::TestQueryParser cnick TestQP
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     CharBuf *query_string;
     Query   *tree;

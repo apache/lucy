@@ -70,7 +70,7 @@ __END_C__
  * <code>indexed</code>.
  */
 public abstract class Lucy::Plan::FieldType cnick FType
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     float         boost;
     bool_t        indexed;

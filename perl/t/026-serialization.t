@@ -19,10 +19,10 @@ use warnings;
 use Test::More tests => 7;
 
 package BasicObj;
-use base qw( Lucy::Object::Obj );
+use base qw( Clownfish::Obj );
 
 package MyObj;
-use base qw( Lucy::Object::Obj );
+use base qw( Clownfish::Obj );
 
 my %extra;
 

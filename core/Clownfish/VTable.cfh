@@ -23,7 +23,7 @@ parcel Lucy;
  * behavior of VTables.)
  */
 
-class Clownfish::VTable inherits Lucy::Object::Obj {
+class Clownfish::VTable inherits Clownfish::Obj {
 
     VTable            *parent;
     CharBuf           *name;
@@ -87,7 +87,7 @@ class Clownfish::VTable inherits Lucy::Object::Obj {
     fetch_vtable(const CharBuf *class_name);
 
     /** Given a class name, return the name of a parent class which descends
-     * from Lucy::Object::Obj, or NULL if such a class can't be found.
+     * from Clownfish::Obj, or NULL if such a class can't be found.
      */
     inert nullable CharBuf*
     find_parent_class(const CharBuf *class_name);

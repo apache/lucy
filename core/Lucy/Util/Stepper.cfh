@@ -35,7 +35,7 @@ parcel Lucy;
  * logic of the class which calls Stepper_Read_Record.
  */
 
-class Lucy::Util::Stepper inherits Lucy::Object::Obj {
+class Lucy::Util::Stepper inherits Clownfish::Obj {
 
     inert Stepper*
     init(Stepper *self);

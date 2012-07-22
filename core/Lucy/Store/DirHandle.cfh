@@ -19,7 +19,7 @@ parcel Lucy;
 /** Iterate over the files in a directory.
  */
 abstract class Lucy::Store::DirHandle cnick DH
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     CharBuf  *dir;
     CharBuf  *entry;

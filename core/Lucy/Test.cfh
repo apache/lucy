@@ -20,7 +20,7 @@ parcel Lucy;
  */
 inert class Lucy::Test { }
 
-class Lucy::Test::TestBatch inherits Lucy::Object::Obj {
+class Lucy::Test::TestBatch inherits Clownfish::Obj {
     int64_t    test_num;
     int64_t    num_tests;
     int64_t    num_passed;

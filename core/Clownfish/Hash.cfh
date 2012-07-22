@@ -24,7 +24,7 @@ parcel Lucy;
  * this behavior can be changed by overridding Make_Key(), e.g. to implement
  * efficient hash sets.
  */
-class Clownfish::Hash inherits Lucy::Object::Obj {
+class Clownfish::Hash inherits Clownfish::Obj {
 
     void          *entries;
     uint32_t       capacity;
@@ -150,7 +150,7 @@ class Clownfish::Hash inherits Lucy::Object::Obj {
 }
 
 class Clownfish::Hash::HashTombStone
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     uint32_t
     Get_RefCount(HashTombStone* self);

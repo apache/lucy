@@ -29,7 +29,7 @@ parcel Lucy;
  */
 
 public abstract class Lucy::Search::Collector cnick Coll
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     SegReader *reader;
     Matcher   *matcher;

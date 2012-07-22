@@ -23,7 +23,7 @@ parcel Lucy;
  * level of sorting.  For example, sorting first by "category" then by score
  * requires a SortSpec with two SortRule elements.
  */
-public class Lucy::Search::SortRule inherits Lucy::Object::Obj {
+public class Lucy::Search::SortRule inherits Clownfish::Obj {
 
     int32_t   type;
     CharBuf  *field;

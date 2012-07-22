@@ -27,7 +27,7 @@ parcel Lucy;
  */
 
 class Lucy::Util::MemoryPool cnick MemPool
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     uint32_t     arena_size;
     VArray      *arenas;

@@ -23,7 +23,7 @@ parcel Lucy;
  * implement one of each.
  */
 
-public class Lucy::Index::DataReader inherits Lucy::Object::Obj {
+public class Lucy::Index::DataReader inherits Clownfish::Obj {
 
     Schema      *schema;
     Folder      *folder;

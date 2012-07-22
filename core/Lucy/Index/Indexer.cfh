@@ -36,7 +36,7 @@ parcel Lucy;
  * documents added this indexing session but not yet committed.  This may
  * change in a future update.
  */
-public class Lucy::Index::Indexer inherits Lucy::Object::Obj {
+public class Lucy::Index::Indexer inherits Clownfish::Obj {
 
     Schema            *schema;
     Folder            *folder;

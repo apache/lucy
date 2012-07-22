@@ -36,7 +36,7 @@ something similar to a free floating "standard library" and are not
 search-related.  At some point everything under Lucy::Object will probably
 migrate to a new namespace:
 
-    Lucy::Object::Obj       => Clownfish::Obj
+    Clownfish::Obj       => Clownfish::Obj
     Lucy::Object::CharBuf   => Clownfish::CharBuf
     Lucy::Object::VArray    => Clownfish::VArray
     Lucy::Object::Hash      => Clownfish::Hash

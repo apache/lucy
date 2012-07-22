@@ -89,7 +89,7 @@ lucy_Doc_extract(lucy_Doc *self, lucy_CharBuf *field,
 
     if (sv_ptr && XSBind_sv_defined(*sv_ptr)) {
         SV *const sv = *sv_ptr;
-        if (sv_isobject(sv) && sv_derived_from(sv, "Lucy::Object::Obj")) {
+        if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
             IV tmp = SvIV(SvRV(sv));
             retval = INT2PTR(lucy_Obj*, tmp);
         }

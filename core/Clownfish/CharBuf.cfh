@@ -21,7 +21,7 @@ parcel Lucy;
  */
 
 class Clownfish::CharBuf cnick CB
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     char    *ptr;
     size_t   size;

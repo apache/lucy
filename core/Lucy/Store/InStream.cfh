@@ -31,7 +31,7 @@ parcel Lucy;
  * practice is safe because InStreams do not modify or rely upon the file
  * position or other state within the FileHandle.
  */
-class Lucy::Store::InStream inherits Lucy::Object::Obj {
+class Lucy::Store::InStream inherits Clownfish::Obj {
 
     int64_t     offset;
     int64_t     len;

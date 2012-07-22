@@ -20,7 +20,7 @@ parcel Lucy;
  */
 
 class Lucy::Index::DocVector cnick DocVec
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     Hash    *field_bufs;
     Hash    *field_vectors;

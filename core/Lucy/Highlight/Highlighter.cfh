@@ -23,7 +23,7 @@ parcel Lucy;
  * and phrases correctly and efficiently, using special-purpose data generated
  * at index-time.
 */
-public class Lucy::Highlight::Highlighter inherits Lucy::Object::Obj {
+public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
 
     Searcher   *searcher;
     Query      *query;

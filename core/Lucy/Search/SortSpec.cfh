@@ -28,7 +28,7 @@ parcel Lucy;
  * sort-by-doc rule as the last SortRule.
  */
 
-public class Lucy::Search::SortSpec inherits Lucy::Object::Obj {
+public class Lucy::Search::SortSpec inherits Clownfish::Obj {
 
     VArray        *rules;
 

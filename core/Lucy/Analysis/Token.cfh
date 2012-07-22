@@ -49,7 +49,7 @@ parcel Lucy;
  * will end up assigned to positions 0, 1, and 1001 -- and will no longer
  * produce a phrase match for the query <code>"three blind mice"</code>.
  */
-class Lucy::Analysis::Token inherits Lucy::Object::Obj {
+class Lucy::Analysis::Token inherits Clownfish::Obj {
 
     char     *text;
     size_t    len;

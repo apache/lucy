@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** A portion of a file, viewed as an array of bytes.
  */
-class Lucy::Store::FileWindow inherits Lucy::Object::Obj {
+class Lucy::Store::FileWindow inherits Clownfish::Obj {
 
     char    *buf;
     int64_t  offset;

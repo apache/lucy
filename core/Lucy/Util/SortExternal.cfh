@@ -18,7 +18,7 @@ parcel Lucy;
 
 __C__
 #include <stddef.h>
-#include "Lucy/Object/Obj.h"
+#include "Clownfish/Obj.h"
 #include "Lucy/Util/SortUtils.h"
 
 #define LUCY_SORTEX_DEFAULT_MEM_THRESHOLD 0x1000000
@@ -47,7 +47,7 @@ __END_C__
  * single unified stream of sorted values.
  */
 abstract class Lucy::Util::SortExternal cnick SortEx
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     uint8_t       *cache;
     uint32_t       cache_cap;

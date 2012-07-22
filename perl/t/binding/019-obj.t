@@ -19,7 +19,7 @@ use warnings;
 use Test::More tests => 18;
 
 package TestObj;
-use base qw( Lucy::Object::Obj );
+use base qw( Clownfish::Obj );
 
 our $version = $Lucy::VERSION;
 
@@ -46,13 +46,13 @@ use base qw( TestObj );
 }
 
 package BadSerialize;
-use base qw( Lucy::Object::Obj );
+use base qw( Clownfish::Obj );
 {
     sub serialize { }
 }
 
 package BadDump;
-use base qw( Lucy::Object::Obj );
+use base qw( Clownfish::Obj );
 {
     sub dump { }
 }
@@ -66,10 +66,10 @@ ok( defined $TestObj::version,
 );
 
 my $object = TestObj->new;
-isa_ok( $object, "Lucy::Object::Obj",
+isa_ok( $object, "Clownfish::Obj",
     "Clownfish objects can be subclassed outside the Lucy hierarchy" );
 
-ok( $object->is_a("Lucy::Object::Obj"), "custom is_a correct" );
+ok( $object->is_a("Clownfish::Obj"), "custom is_a correct" );
 ok( !$object->is_a("Lucy::Object"),     "custom is_a too long" );
 ok( !$object->is_a("Lucy"),             "custom is_a substring" );
 ok( !$object->is_a(""),                 "custom is_a blank" );

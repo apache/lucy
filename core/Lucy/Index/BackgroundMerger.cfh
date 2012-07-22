@@ -27,7 +27,7 @@ parcel Lucy;
  * L<Lucy::Docs::FileLocking> if your index is on a shared volume.
  */
 public class Lucy::Index::BackgroundMerger cnick BGMerger
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     Schema            *schema;
     Folder            *folder;

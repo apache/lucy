@@ -22,7 +22,7 @@ parcel Lucy;
  * An Inversion is a collection of Token objects which you can add to, then
  * iterate over.
  */
-class Lucy::Analysis::Inversion inherits Lucy::Object::Obj {
+class Lucy::Analysis::Inversion inherits Clownfish::Obj {
 
     Token    **tokens;
     uint32_t   size;

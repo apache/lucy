@@ -22,7 +22,7 @@ parcel Lucy;
  * or more fields, each of which has a value.
  */
 
-public class Lucy::Document::Doc inherits Lucy::Object::Obj
+public class Lucy::Document::Doc inherits Clownfish::Obj
     : dumpable {
 
     void        *fields;

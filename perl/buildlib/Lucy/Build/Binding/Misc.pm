@@ -58,7 +58,7 @@ to_perl(sv)
     SV *sv;
 CODE:
 {
-    if (sv_isobject(sv) && sv_derived_from(sv, "Lucy::Object::Obj")) {
+    if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
         IV tmp = SvIV(SvRV(sv));
         lucy_Obj* obj = INT2PTR(lucy_Obj*, tmp);
         RETVAL = XSBind_cfish_to_perl(obj);

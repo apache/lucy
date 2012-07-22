@@ -19,7 +19,7 @@ parcel Lucy;
 /** Delete obsolete index files.
  */
 
-class Lucy::Index::FilePurger inherits Lucy::Object::Obj {
+class Lucy::Index::FilePurger inherits Clownfish::Obj {
 
     Folder       *folder;
     Snapshot     *snapshot;

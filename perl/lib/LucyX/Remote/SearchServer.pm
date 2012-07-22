@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package LucyX::Remote::SearchServer;
-BEGIN { our @ISA = qw( Lucy::Object::Obj ) }
+BEGIN { our @ISA = qw( Clownfish::Obj ) }
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 use Carp;

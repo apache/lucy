@@ -22,7 +22,7 @@ parcel Lucy;
  */
 
 public class Lucy::Object::BitVector cnick BitVec
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     uint32_t  cap;
     uint8_t  *bits;

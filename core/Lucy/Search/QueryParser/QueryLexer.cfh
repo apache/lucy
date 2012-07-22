@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Search::QueryParser::QueryLexer inherits Lucy::Object::Obj {
+class Lucy::Search::QueryParser::QueryLexer inherits Clownfish::Obj {
 
     bool_t heed_colons;
 

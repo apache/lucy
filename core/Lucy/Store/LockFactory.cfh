@@ -25,7 +25,7 @@ parcel Lucy;
  */
 
 public class Lucy::Store::LockFactory cnick LockFact
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     Folder  *folder;
     CharBuf *host;

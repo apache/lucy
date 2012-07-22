@@ -31,7 +31,7 @@ parcel Lucy;
  * storing metadata themselves.
  */
 
-public class Lucy::Index::Segment cnick Seg inherits Lucy::Object::Obj {
+public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
 
     CharBuf     *name;
     int64_t      count;

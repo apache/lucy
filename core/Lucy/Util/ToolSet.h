@@ -36,7 +36,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Lucy/Object/Obj.h"
+#include "Clownfish/Obj.h"
 #include "Lucy/Object/BitVector.h"
 #include "Clownfish/ByteBuf.h"
 #include "Clownfish/CharBuf.h"

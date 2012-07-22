@@ -22,7 +22,7 @@ parcel Lucy;
  * "heat" (density) of relevant data in areas which match a search query.
  */
 
-class Lucy::Highlight::HeatMap inherits Lucy::Object::Obj {
+class Lucy::Highlight::HeatMap inherits Clownfish::Obj {
 
     VArray   *spans;
     uint32_t  window;

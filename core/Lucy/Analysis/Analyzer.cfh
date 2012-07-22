@@ -25,7 +25,7 @@ parcel Lucy;
  * (L<Normalizer|Lucy::Analysis::Normalizer>).
  */
 public abstract class Lucy::Analysis::Analyzer
-    inherits Lucy::Object::Obj : dumpable {
+    inherits Clownfish::Obj : dumpable {
 
     public inert Analyzer*
     init(Analyzer *self);

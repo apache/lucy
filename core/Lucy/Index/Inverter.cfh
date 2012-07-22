@@ -23,7 +23,7 @@ parcel Lucy;
  * content when appropriate, and marshalling them into an iterable form.
  */
 
-class Lucy::Index::Inverter inherits Lucy::Object::Obj {
+class Lucy::Index::Inverter inherits Clownfish::Obj {
 
     Schema        *schema;
     Segment       *segment;
@@ -142,7 +142,7 @@ class Lucy::Index::Inverter inherits Lucy::Object::Obj {
  * field definitions are unchanging, we cache them in an InverterEntry object.
  */
 private final class Lucy::Index::Inverter::InverterEntry cnick InvEntry
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     int32_t      field_num;
     CharBuf     *field;

@@ -27,7 +27,7 @@ parcel Lucy;
  * defining rules which may change from process to process.
  */
 public class Lucy::Index::IndexManager cnick IxManager
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     Folder      *folder;
     CharBuf     *host;

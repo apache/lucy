@@ -27,7 +27,7 @@ parcel Lucy;
  * in order.  Furthermore, each OutStream is associated with exactly one,
  * unique FileHandle -- unlike InStreams, which can share a common FileHandle.
  */
-class Lucy::Store::OutStream inherits Lucy::Object::Obj {
+class Lucy::Store::OutStream inherits Clownfish::Obj {
 
     char          *buf;
     int64_t        buf_start;

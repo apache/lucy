@@ -20,7 +20,7 @@ parcel Lucy;
  */
 
 class Lucy::Index::TermVector cnick TV
-    inherits Lucy::Object::Obj {
+    inherits Clownfish::Obj {
 
     CharBuf *field;
     CharBuf *text;

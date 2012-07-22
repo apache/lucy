@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Object::I32Array cnick I32Arr inherits Lucy::Object::Obj {
+class Lucy::Object::I32Array cnick I32Arr inherits Clownfish::Obj {
     int32_t  *ints;
     uint32_t  size;
 

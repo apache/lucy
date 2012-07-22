@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Lucy/Object/Obj.h"
+#include "Clownfish/Obj.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"

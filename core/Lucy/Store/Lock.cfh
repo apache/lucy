@@ -27,7 +27,7 @@ parcel Lucy;
  * help clear away stale locks.
  */
 
-public abstract class Lucy::Store::Lock inherits Lucy::Object::Obj {
+public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
 
     Folder      *folder;
     CharBuf     *name;

@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * Provides utility functions for encoding/decoding JSON.
  */
-class Lucy::Util::Json inherits Lucy::Object::Obj {
+class Lucy::Util::Json inherits Clownfish::Obj {
 
     /** Encode <code>dump</code> as JSON.  Returns NULL and sets Err_error on
      * failure.

@@ -35,7 +35,7 @@ my %complex_data_structure = (
     b => { foo => 'foofoo', bar => 'barbar' },
 );
 my $kobj = to_clownfish( \%complex_data_structure );
-isa_ok( $kobj, 'Lucy::Object::Obj' );
+isa_ok( $kobj, 'Clownfish::Obj' );
 my $transformed = to_perl($kobj);
 is_deeply( $transformed, \%complex_data_structure,
     "transform from Perl to Clownfish data structures and back" );

@@ -545,7 +545,7 @@ sub bind_obj {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     package MyObj;
-    use base qw( Lucy::Object::Obj );
+    use base qw( Clownfish::Obj );
     
     # Inside-out member var.
     my %foo;
@@ -571,12 +571,12 @@ sub bind_obj {
 END_SYNOPSIS
     my $description = <<'END_DESCRIPTION';
 All objects in the Lucy:: hierarchy descend from
-Lucy::Object::Obj.  All classes are implemented as blessed scalar
+Clownfish::Obj.  All classes are implemented as blessed scalar
 references, with the scalar storing a pointer to a C struct.
 
 =head2 Subclassing
 
-The recommended way to subclass Lucy::Object::Obj and its descendants is
+The recommended way to subclass Clownfish::Obj and its descendants is
 to use the inside-out design pattern.  (See L<Class::InsideOut> for an
 introduction to inside-out techniques.)
 
@@ -613,7 +613,7 @@ results in a segfault rather than an exception.)
 =head2 new()
 
 Abstract constructor -- must be invoked via a subclass.  Attempting to
-instantiate objects of class "Lucy::Object::Obj" directly causes an
+instantiate objects of class "Clownfish::Obj" directly causes an
 error.
 
 Takes no arguments; if any are supplied, an error will be reported.
@@ -630,7 +630,7 @@ END_DESCRIPTION
     $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy     PACKAGE = Lucy::Object::Obj
+MODULE = Lucy     PACKAGE = Clownfish::Obj
 
 chy_bool_t
 is_a(self, class_name)
@@ -719,7 +719,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::Obj",
+        class_name => "Clownfish::Obj",
     );
     $binding->bind_method( alias => '_load', method => 'Load' );
     $binding->exclude_method($_) for @hand_rolled;

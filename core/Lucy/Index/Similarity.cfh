@@ -34,7 +34,7 @@ parcel Lucy;
  */
 
 public class Lucy::Index::Similarity cnick Sim
-    inherits Lucy::Object::Obj : dumpable {
+    inherits Clownfish::Obj : dumpable {
 
     float  *norm_decoder;
 

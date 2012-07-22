@@ -131,7 +131,7 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Lucy::Object::Obj;
+    package Clownfish::Obj;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Lucy qw( to_clownfish to_perl );
@@ -147,7 +147,7 @@ sub error {$Clownfish::Err::error}
         my ( undef, $package ) = @_;
         no strict 'refs';
         for my $parent ( @{"$package\::ISA"} ) {
-            return $parent if $parent->isa('Lucy::Object::Obj');
+            return $parent if $parent->isa('Clownfish::Obj');
         }
         return;
     }
@@ -482,8 +482,8 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     BEGIN {
-        if ( !__PACKAGE__->isa('Lucy::Object::Obj') ) {
-            push our @ISA, 'Lucy::Object::Obj';
+        if ( !__PACKAGE__->isa('Clownfish::Obj') ) {
+            push our @ISA, 'Clownfish::Obj';
         }
     }
 }

@@ -18,7 +18,7 @@
 
 #include "Clownfish/VTable.h"
 
-#include "Lucy/Object/Obj.h"
+#include "Clownfish/Obj.h"
 #include "Clownfish/Host.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"

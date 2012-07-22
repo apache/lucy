@@ -27,7 +27,7 @@ parcel Lucy;
  * L<Architecture|Lucy::Plan::Architecture>.
  */
 
-public class Lucy::Index::DataWriter inherits Lucy::Object::Obj {
+public class Lucy::Index::DataWriter inherits Clownfish::Obj {
 
     Snapshot    *snapshot;
     Segment     *segment;

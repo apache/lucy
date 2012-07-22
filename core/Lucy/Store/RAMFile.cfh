@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Backing storage used by RAMFolder and RAMFileHandle.
  */
-class Lucy::Store::RAMFile inherits Lucy::Object::Obj {
+class Lucy::Store::RAMFile inherits Clownfish::Obj {
 
     bool_t   read_only;
     ByteBuf *contents;
