@@ -289,7 +289,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::ByteBuf;
+    package Clownfish::ByteBuf;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     {
@@ -300,7 +300,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::ViewByteBuf;
+    package Clownfish::ViewByteBuf;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Carp;

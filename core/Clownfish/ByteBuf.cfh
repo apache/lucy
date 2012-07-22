@@ -20,7 +20,7 @@ parcel Lucy;
  * Growable buffer holding arbitrary bytes.
  */
 
-class Lucy::Object::ByteBuf cnick BB inherits Lucy::Object::Obj {
+class Clownfish::ByteBuf cnick BB inherits Lucy::Object::Obj {
 
     char    *buf;
     size_t   size;  /* number of valid bytes */
@@ -130,8 +130,8 @@ class Lucy::Object::ByteBuf cnick BB inherits Lucy::Object::Obj {
 /**
  * A ByteBuf that doesn't own its own string.
  */
-class Lucy::Object::ViewByteBuf cnick ViewBB
-    inherits Lucy::Object::ByteBuf {
+class Clownfish::ViewByteBuf cnick ViewBB
+    inherits Clownfish::ByteBuf {
 
     /** Return a pointer to a new "view" ByteBuf, offing a persective on the
      * passed-in string.

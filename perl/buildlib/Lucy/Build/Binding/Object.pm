@@ -83,7 +83,7 @@ END_CONSTRUCTOR
 
 sub bind_bytebuf {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy     PACKAGE = Lucy::Object::ByteBuf
+MODULE = Lucy     PACKAGE = Clownfish::ByteBuf
 
 SV*
 new(either_sv, sv)
@@ -112,7 +112,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::ByteBuf",
+        class_name => "Clownfish::ByteBuf",
     );
     $binding->append_xs($xs_code);
     $binding->exclude_constructor;

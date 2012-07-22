@@ -20,7 +20,7 @@
 #include "Lucy/Index/Inverter.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/Segment.h"
-#include "Lucy/Object/ByteBuf.h"
+#include "Clownfish/ByteBuf.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/BlobType.h"
 #include "Lucy/Plan/NumericType.h"

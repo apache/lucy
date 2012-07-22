@@ -161,5 +161,5 @@ while ( defined( my $item = $sortex->fetch ) ) {
 is_deeply( \@sort_output, \@orig, "Random binary strings of random length" );
 @sort_output = ();
 
-sub new_bytebuf { Lucy::Object::ByteBuf->new(shift) }
+sub new_bytebuf { Clownfish::ByteBuf->new(shift) }
 
