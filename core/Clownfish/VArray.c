@@ -22,7 +22,7 @@
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/VTable.h"
-#include "Lucy/Object/VArray.h"
+#include "Clownfish/VArray.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/Freezer.h"

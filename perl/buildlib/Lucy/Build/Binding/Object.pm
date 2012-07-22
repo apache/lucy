@@ -740,7 +740,7 @@ sub bind_varray {
     );
 
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Object::VArray
+MODULE = Lucy   PACKAGE = Clownfish::VArray
 
 SV*
 shallow_copy(self)
@@ -809,7 +809,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::VArray",
+        class_name => "Clownfish::VArray",
     );
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);

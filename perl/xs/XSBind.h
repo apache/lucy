@@ -31,7 +31,7 @@ extern "C" {
 #include "Lucy/Object/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
-#include "Lucy/Object/VArray.h"
+#include "Clownfish/VArray.h"
 #include "Clownfish/VTable.h"
 
 #include "EXTERN.h"

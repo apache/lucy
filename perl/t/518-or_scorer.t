@@ -38,7 +38,7 @@ sub check_matcher {
     my @intervals = @_;
     my @doc_id_arrays = map { modulo_set( $_, 100 ) } @intervals;
     my $child_matchers
-        = Lucy::Object::VArray->new( capacity => scalar @intervals );
+        = Clownfish::VArray->new( capacity => scalar @intervals );
     for my $doc_id_array (@doc_id_arrays) {
         if (@$doc_id_array) {
             my $mock = LucyX::Search::MockMatcher->new(

@@ -22,7 +22,7 @@ use Lucy::Test;
 
 my ( $varray, $twin );
 
-$varray = Lucy::Object::VArray->new( capacity => 5 );
+$varray = Clownfish::VArray->new( capacity => 5 );
 $varray->push( Clownfish::CharBuf->new($_) ) for 1 .. 5;
 $varray->delete(3);
 my $frozen = nfreeze($varray);
@@ -37,7 +37,7 @@ $outstream->close;
 my $instream = Lucy::Store::InStream->open( file => $ram_file )
     or die Lucy->error;
 my $vtable
-    = Clownfish::VTable->singleton( class_name => 'Lucy::Object::VArray', );
+    = Clownfish::VTable->singleton( class_name => 'Clownfish::VArray', );
 my $deserialized = $vtable->make_obj->deserialize($instream);
 is_deeply( $varray->to_perl, $deserialized->to_perl,
     "serialize/deserialize" );

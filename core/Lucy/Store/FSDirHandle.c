@@ -23,7 +23,7 @@
 
 #include "Lucy/Util/ToolSet.h"
 #include "Lucy/Object/Err.h"
-#include "Lucy/Object/VArray.h"
+#include "Clownfish/VArray.h"
 #include "Lucy/Store/FSDirHandle.h"
 
 #ifdef CHY_HAS_SYS_TYPES_H

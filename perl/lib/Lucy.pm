@@ -157,7 +157,7 @@ sub error {$Lucy::Object::Err::error}
         no strict 'refs';
         my $stash = \%{"$package\::"};
         my $methods
-            = Lucy::Object::VArray->new( capacity => scalar keys %$stash );
+            = Clownfish::VArray->new( capacity => scalar keys %$stash );
         while ( my ( $symbol, $glob ) = each %$stash ) {
             next if ref $glob;
             next unless *$glob{CODE};
@@ -389,7 +389,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::VArray;
+    package Clownfish::VArray;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     no warnings 'redefine';

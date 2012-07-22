@@ -31,7 +31,7 @@
 #include "Clownfish/LockFreeRegistry.h"
 #include "Clownfish/Method.h"
 #include "Clownfish/Num.h"
-#include "Lucy/Object/VArray.h"
+#include "Clownfish/VArray.h"
 #include "Lucy/Util/Atomic.h"
 #include "Lucy/Util/Memory.h"
 
