@@ -46,7 +46,7 @@ sub kdump {
     warn $kdumper->Dump;
 }
 
-sub error {$Lucy::Object::Err::error}
+sub error {$Clownfish::Err::error}
 
 {
     package Lucy::Util::IndexFileNames;
@@ -342,7 +342,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::Err;
+    package Clownfish::Err;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     sub do_to_string { shift->to_string }
@@ -371,9 +371,9 @@ sub error {$Lucy::Object::Err::error}
     sub set_error {
         my $val = $_[1];
         if ( defined $val ) {
-            confess("Not a Lucy::Object::Err")
+            confess("Not a Clownfish::Err")
                 unless ( blessed($val)
-                && $val->isa("Lucy::Object::Err") );
+                && $val->isa("Clownfish::Err") );
         }
         $error = $val;
     }

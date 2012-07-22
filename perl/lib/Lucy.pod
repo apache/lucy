@@ -208,7 +208,7 @@ single public class method.
     my $instream = $folder->open_in( file => 'foo' ) or die Lucy->error;
 
 Access a shared variable which is set by some routines on failure.  It will
-always be either a L<Lucy::Object::Err> object or undef.
+always be either a L<Clownfish::Err> object or undef.
 
 =head1 SUPPORT
 

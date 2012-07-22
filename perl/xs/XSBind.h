@@ -28,7 +28,7 @@ extern "C" {
 #include "Lucy/Object/Obj.h"
 #include "Clownfish/ByteBuf.h"
 #include "Clownfish/CharBuf.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/VArray.h"

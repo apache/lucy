@@ -212,7 +212,7 @@ END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
 
     my $xs_code = <<'END_XS_CODE';
-MODULE =  Lucy    PACKAGE = Lucy::Object::Err
+MODULE =  Lucy    PACKAGE = Clownfish::Err
 
 SV*
 trap(routine_sv, context_sv)
@@ -226,7 +226,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::Err",
+        class_name => "Clownfish::Err",
     );
     $binding->bind_constructor( alias => '_new' );
     $binding->set_pod_spec($pod_spec);

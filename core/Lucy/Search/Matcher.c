@@ -19,7 +19,7 @@
 #define CHY_USE_SHORT_NAMES
 
 #include "Lucy/Search/Matcher.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
 #include "Lucy/Search/Collector.h"
 

@@ -27,7 +27,7 @@
 #include "Clownfish/Hash.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/CharBuf.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Lucy/Util/Json.h"
 }
 

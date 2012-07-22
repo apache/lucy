@@ -19,7 +19,7 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestErr.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 
 static void
 test_To_String(TestBatch *batch) {

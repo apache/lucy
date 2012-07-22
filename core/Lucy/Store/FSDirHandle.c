@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 
 #include "Lucy/Util/ToolSet.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Clownfish/VArray.h"
 #include "Lucy/Store/FSDirHandle.h"
 

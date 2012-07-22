@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include "Lucy/Util/SortUtils.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 
 // Define four-byte and eight-byte types so that we can dereference void
 // pointers like integer pointers.  The only significance of using int32_t and

@@ -21,7 +21,7 @@
 #include "Lucy/Object/Obj.h"
 #include "Clownfish/Host.h"
 #include "Clownfish/CharBuf.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Lucy/Util/Memory.h"
 
 static SV*

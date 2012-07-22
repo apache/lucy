@@ -23,7 +23,7 @@
 
 #include "Clownfish/VTable.h"
 #include "Clownfish/VArray.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/SortUtils.h"

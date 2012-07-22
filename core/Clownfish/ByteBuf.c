@@ -26,7 +26,7 @@
 
 #include "Clownfish/VTable.h"
 #include "Clownfish/ByteBuf.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Memory.h"

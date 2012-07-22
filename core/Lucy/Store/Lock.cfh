@@ -157,10 +157,10 @@ class Lucy::Store::LockFileLock cnick LFLock
 
 /** Lock exception.
  *
- * LockErr is a subclass of L<Err|Lucy::Object::Err> which indicates
+ * LockErr is a subclass of L<Err|Clownfish::Err> which indicates
  * that a file locking problem occurred.
  */
-public class Lucy::Store::LockErr inherits Lucy::Object::Err {
+public class Lucy::Store::LockErr inherits Clownfish::Err {
 
     public inert incremented LockErr*
     new(CharBuf *message);

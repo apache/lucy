@@ -28,7 +28,7 @@
 
 #include "Clownfish/Num.h"
 #include "Clownfish/CharBuf.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"

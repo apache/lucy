@@ -16,7 +16,7 @@
 
 #include "Clownfish/Num.h"
 #include "Clownfish/Hash.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 
 void
 lucy_init_parcel() {

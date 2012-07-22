@@ -20,7 +20,7 @@
 
 #include "Clownfish/Method.h"
 #include "Clownfish/CharBuf.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
 
 Method*

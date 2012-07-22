@@ -67,7 +67,7 @@ lucy_Err_do_throw(lucy_Err *err) {
     PUSHMARK(SP);
     XPUSHs(sv_2mortal(error_sv));
     PUTBACK;
-    call_pv("Lucy::Object::Err::do_throw", G_DISCARD);
+    call_pv("Clownfish::Err::do_throw", G_DISCARD);
     FREETMPS;
     LEAVE;
 }
@@ -124,7 +124,7 @@ lucy_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
         SV *dollar_at = get_sv("@", FALSE);
         if (SvTRUE(dollar_at)) {
             if (sv_isobject(dollar_at)
-                && sv_derived_from(dollar_at,"Lucy::Object::Err")
+                && sv_derived_from(dollar_at,"Clownfish::Err")
                ) {
                 IV error_iv = SvIV(SvRV(dollar_at));
                 error = INT2PTR(lucy_Err*, error_iv);

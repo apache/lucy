@@ -21,7 +21,7 @@
 #define CHY_USE_SHORT_NAMES
 
 #include "Lucy/Util/StringHelper.h"
-#include "Lucy/Object/Err.h"
+#include "Clownfish/Err.h"
 #include "Lucy/Util/Memory.h"
 
 const uint8_t lucy_StrHelp_UTF8_COUNT[] = {

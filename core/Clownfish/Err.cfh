@@ -30,7 +30,7 @@ __END_C__
  * Exception.
  *
  * Most of the time when Lucy encounters an error, it tries to raise a
- * Lucy::Object::Err exception with an error message and context
+ * Clownfish::Err exception with an error message and context
  * information.
  *
  * At present, it is only safe to catch exceptions which are specifically
@@ -42,7 +42,7 @@ __END_C__
  * temporarily, so that calling code may choose how to handle a particular
  * error condition.
  */
-public class Lucy::Object::Err inherits Lucy::Object::Obj {
+public class Clownfish::Err inherits Lucy::Object::Obj {
 
     CharBuf *mess;
 
