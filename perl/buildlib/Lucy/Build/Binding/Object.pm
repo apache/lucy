@@ -242,7 +242,7 @@ sub bind_hash {
     );
 
     my $xs_code = <<'END_XS_CODE';
-MODULE =  Lucy    PACKAGE = Lucy::Object::Hash
+MODULE =  Lucy    PACKAGE = Clownfish::Hash
 
 SV*
 _deserialize(self, instream)
@@ -296,7 +296,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::Hash",
+        class_name => "Clownfish::Hash",
     );
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);

@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "Lucy/Object/Hash.h"
+#include "Clownfish/Hash.h"
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"

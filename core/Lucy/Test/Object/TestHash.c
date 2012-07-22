@@ -21,7 +21,7 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestHash.h"
-#include "Lucy/Object/Hash.h"
+#include "Clownfish/Hash.h"
 
 static void
 test_Equals(TestBatch *batch) {

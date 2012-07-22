@@ -79,8 +79,8 @@ eval { my $another_obj = TestObj->new( kill_me_now => 1 ) };
 like( $@, qr/kill_me_now/, "reject bad param" );
 
 my $stringified_perl_obj = "$object";
-require Lucy::Object::Hash;
-my $hash = Lucy::Object::Hash->new;
+require Clownfish::Hash;
+my $hash = Clownfish::Hash->new;
 $hash->store( foo => $object );
 is( $object->get_refcount, 2, "refcount increased via C code" );
 is( $object->get_refcount, 2, "refcount increased via C code" );
@@ -114,7 +114,7 @@ SKIP: {
 SKIP: {
     skip( "Exception thrown within callback leaks", 1 )
         if $ENV{LUCY_VALGRIND};
-    $hash = Lucy::Object::Hash->new;
+    $hash = Clownfish::Hash->new;
     $hash->store( foo => BadDump->new );
     eval { $hash->dump };
     like( $@, qr/NULL/,

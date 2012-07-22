@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package MyHash;
-use base qw( Lucy::Object::Hash );
+use base qw( Clownfish::Hash );
 
 sub oodle { }
 
@@ -61,7 +61,7 @@ use Storable qw( nfreeze );
 }
 
 my $stringified;
-my $storage = Lucy::Object::Hash->new;
+my $storage = Clownfish::Hash->new;
 
 {
     my $subclassed_hash = MyHash->new;

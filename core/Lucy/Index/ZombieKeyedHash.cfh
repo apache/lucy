@@ -19,7 +19,7 @@ parcel Lucy;
 /** Hash which creates keys allocated from a MemoryPool rather than malloc.
  */
 class Lucy::Index::SortFieldWriter::ZombieKeyedHash cnick ZKHash
-    inherits Lucy::Object::Hash {
+    inherits Clownfish::Hash {
 
     MemoryPool *mem_pool;
     uint8_t     prim_id;

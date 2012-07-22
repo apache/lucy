@@ -99,7 +99,7 @@ public class Lucy::Analysis::SnowballStopFilter cnick SnowStop
     Destroy(SnowballStopFilter *self);
 }
 
-class Lucy::Analysis::SnowballStopFilter::NoCloneHash inherits Lucy::Object::Hash {
+class Lucy::Analysis::SnowballStopFilter::NoCloneHash inherits Clownfish::Hash {
     inert incremented NoCloneHash*
     new(uint32_t capacity = 0);
 

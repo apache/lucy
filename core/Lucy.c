@@ -15,7 +15,7 @@
  */
 
 #include "Clownfish/Num.h"
-#include "Lucy/Object/Hash.h"
+#include "Clownfish/Hash.h"
 #include "Lucy/Object/Err.h"
 
 void

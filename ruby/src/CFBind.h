@@ -29,7 +29,7 @@ extern "C" {
 #include "Lucy/Object/ByteBuf.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
-#include "Lucy/Object/Hash.h"
+#include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
 #include "Lucy/Object/VArray.h"
 #include "Clownfish/VTable.h"

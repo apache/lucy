@@ -21,7 +21,7 @@ use Storable qw( nfreeze thaw );
 use Lucy::Test;
 use Lucy qw( to_perl to_clownfish );
 
-my $hash = Lucy::Object::Hash->new( capacity => 10 );
+my $hash = Clownfish::Hash->new( capacity => 10 );
 $hash->store( "foo", Lucy::Object::CharBuf->new("bar") );
 $hash->store( "baz", Lucy::Object::CharBuf->new("banana") );
 
@@ -40,7 +40,7 @@ $outstream->close;
 my $instream = Lucy::Store::InStream->open( file => $ram_file )
     or die Lucy->error;
 my $hash_vtable
-    = Clownfish::VTable->singleton( class_name => 'Lucy::Object::Hash' );
+    = Clownfish::VTable->singleton( class_name => 'Clownfish::Hash' );
 my $deserialized = $hash_vtable->make_obj->deserialize($instream);
 is_deeply( $hash->to_perl, $deserialized->to_perl, "serialize/deserialize" );
 
