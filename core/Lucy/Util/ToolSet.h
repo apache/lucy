@@ -45,7 +45,7 @@ extern "C" {
 #include "Lucy/Object/I32Array.h"
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Util/NumberUtils.h"
 #include "Lucy/Util/Memory.h"
 #include "Lucy/Util/StringHelper.h"

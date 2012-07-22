@@ -331,7 +331,7 @@ S_write_parcel_c(CFCBindCore *self) {
         "#define C_LUCY_VTABLE\n"
         "%s\n"
         "#include \"parcel.h\"\n"
-        "#include \"Lucy/Object/VTable.h\"\n"
+        "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"
         "typedef struct cfish_MethodSpec {\n"

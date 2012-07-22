@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Object/ByteBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Store/InStream.h"

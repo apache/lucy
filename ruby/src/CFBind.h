@@ -32,7 +32,7 @@ extern "C" {
 #include "Lucy/Object/Hash.h"
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 
 /* Strip the prefix from some common symbols where we know there's no
  * conflict.  It's a little inconsistent to do this rather than leave all

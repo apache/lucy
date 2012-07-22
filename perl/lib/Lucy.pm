@@ -139,7 +139,7 @@ sub error {$Lucy::Object::Err::error}
 }
 
 {
-    package Lucy::Object::VTable;
+    package Clownfish::VTable;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
 

@@ -20,7 +20,7 @@
 
 #include "Lucy/Search/Matcher.h"
 #include "Lucy/Object/Err.h"
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Search/Collector.h"
 
 Matcher*

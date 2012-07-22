@@ -23,7 +23,7 @@ parcel Lucy;
  * behavior of VTables.)
  */
 
-class Lucy::Object::VTable inherits Lucy::Object::Obj {
+class Clownfish::VTable inherits Lucy::Object::Obj {
 
     VTable            *parent;
     CharBuf           *name;

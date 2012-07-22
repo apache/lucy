@@ -821,7 +821,7 @@ sub bind_vtable {
     my @hand_rolled = qw( Make_Obj );
 
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Object::VTable
+MODULE = Lucy   PACKAGE = Clownfish::VTable
 
 SV*
 _get_registry()
@@ -866,7 +866,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Object::VTable",
+        class_name => "Clownfish::VTable",
     );
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);

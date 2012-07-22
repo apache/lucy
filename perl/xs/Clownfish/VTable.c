@@ -18,7 +18,7 @@
 #define C_LUCY_VTABLE
 #include "XSBind.h"
 
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Object/Host.h"
 #include "Lucy/Util/Memory.h"
 

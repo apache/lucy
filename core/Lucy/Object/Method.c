@@ -21,7 +21,7 @@
 #include "Lucy/Object/Method.h"
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 
 Method*
 Method_new(const CharBuf *name, lucy_method_t callback_func, size_t offset) {

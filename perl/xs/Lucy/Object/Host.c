@@ -16,7 +16,7 @@
 
 #include "XSBind.h"
 
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 
 #include "Lucy/Object/Obj.h"
 #include "Lucy/Object/Host.h"

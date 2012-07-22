@@ -87,7 +87,7 @@ $resurrected->store( "ooga", $booga );
 is( $resurrected->fetch("ooga"),
     "booga", "subclassed object still performs correctly at the C level" );
 
-my $methods = Lucy::Object::VTable->fresh_host_methods('MyHash');
+my $methods = Clownfish::VTable->fresh_host_methods('MyHash');
 is_deeply( $methods->to_perl, ['oodle'], "fresh_host_methods" );
 
 my $folder = RAMFolderOfDeath->new;

@@ -37,7 +37,7 @@ $outstream->close;
 my $instream = Lucy::Store::InStream->open( file => $ram_file )
     or die Lucy->error;
 my $vtable
-    = Lucy::Object::VTable->singleton( class_name => 'Lucy::Object::VArray', );
+    = Clownfish::VTable->singleton( class_name => 'Lucy::Object::VArray', );
 my $deserialized = $vtable->make_obj->deserialize($instream);
 is_deeply( $varray->to_perl, $deserialized->to_perl,
     "serialize/deserialize" );

@@ -32,7 +32,7 @@ extern "C" {
 #include "Lucy/Object/Hash.h"
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 
 #include "EXTERN.h"
 #include "perl.h"

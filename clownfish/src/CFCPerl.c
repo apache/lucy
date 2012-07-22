@@ -301,7 +301,7 @@ S_write_boot_c(CFCPerl *self) {
         "#include \"%s\"\n"
         "#include \"parcel.h\"\n"
         "#include \"Lucy/Object/CharBuf.h\"\n"
-        "#include \"Lucy/Object/VTable.h\"\n"
+        "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"
         "void\n"

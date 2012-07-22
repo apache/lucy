@@ -20,7 +20,7 @@
 
 #include "Clownfish/LockFreeRegistry.h"
 #include "Lucy/Object/Err.h"
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Util/Atomic.h"
 #include "Lucy/Util/Memory.h"
 

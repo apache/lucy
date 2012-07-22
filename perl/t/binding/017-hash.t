@@ -40,7 +40,7 @@ $outstream->close;
 my $instream = Lucy::Store::InStream->open( file => $ram_file )
     or die Lucy->error;
 my $hash_vtable
-    = Lucy::Object::VTable->singleton( class_name => 'Lucy::Object::Hash' );
+    = Clownfish::VTable->singleton( class_name => 'Lucy::Object::Hash' );
 my $deserialized = $hash_vtable->make_obj->deserialize($instream);
 is_deeply( $hash->to_perl, $deserialized->to_perl, "serialize/deserialize" );
 

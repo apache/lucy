@@ -44,7 +44,7 @@ $outstream->close;
 my $instream = Lucy::Store::InStream->open( file => $ram_file )
     or die Lucy->error;
 my $charbuf_vtable
-    = Lucy::Object::VTable->singleton( class_name => 'Lucy::Object::CharBuf',
+    = Clownfish::VTable->singleton( class_name => 'Lucy::Object::CharBuf',
     );
 my $deserialized = $charbuf_vtable->make_obj->deserialize($instream);
 is_deeply( $charbuf->to_perl, $deserialized->to_perl,

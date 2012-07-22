@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 
 #include "Lucy/Object/Hash.h"
 #include "Lucy/Object/CharBuf.h"

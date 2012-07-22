@@ -27,7 +27,7 @@
 #include "Lucy/Object/CharBuf.h"
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
-#include "Lucy/Object/VTable.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Memory.h"
