@@ -29,7 +29,7 @@
 #include "Lucy/Object/Err.h"
 #include "Lucy/Object/Hash.h"
 #include "Clownfish/LockFreeRegistry.h"
-#include "Lucy/Object/Method.h"
+#include "Clownfish/Method.h"
 #include "Lucy/Object/Num.h"
 #include "Lucy/Object/VArray.h"
 #include "Lucy/Util/Atomic.h"
