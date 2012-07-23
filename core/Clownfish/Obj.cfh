@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** Base class for all Lucy objects.
+/** Base class for all objects.
  */
 
 public class Clownfish::Obj {

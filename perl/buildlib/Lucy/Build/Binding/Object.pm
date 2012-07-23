@@ -570,9 +570,10 @@ sub bind_obj {
     }
 END_SYNOPSIS
     my $description = <<'END_DESCRIPTION';
-All objects in the Lucy:: hierarchy descend from
-Clownfish::Obj.  All classes are implemented as blessed scalar
-references, with the scalar storing a pointer to a C struct.
+Clownfish::Obj is the base class of the Clownfish object hierarchy.
+
+From the standpoint of a Perl programmer, all classes are implemented as
+blessed scalar references, with the scalar storing a pointer to a C struct.
 
 =head2 Subclassing
 
@@ -597,8 +598,7 @@ Caveats:
 =item *
 
 Inside-out aficionados will have noted that the "cached scalar id" stratagem
-recommended above isn't compatible with ithreads -- but Lucy doesn't
-support ithreads anyway, so it doesn't matter.
+recommended above isn't compatible with ithreads.
 
 =item *
 
@@ -622,7 +622,7 @@ Takes no arguments; if any are supplied, an error will be reported.
 
 =head2 DESTROY
 
-All Lucy classes implement a DESTROY method; if you override it in a
+All Clownfish classes implement a DESTROY method; if you override it in a
 subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.
 END_DESCRIPTION
     $pod_spec->set_synopsis($synopsis);
