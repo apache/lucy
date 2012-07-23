@@ -193,19 +193,23 @@ END_XS_CODE
 sub bind_err {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
+    package MyErr;
+    use base qw( Clownfish::Err );
+    
+    ...
+    
+    package main;
     use Scalar::Util qw( blessed );
-    my $bg_merger;
     while (1) {
-        $bg_merger = eval {
-            Lucy::Index::BackgroundMerger->new( index => $index );
+        eval {
+            do_stuff() or MyErr->throw("retry");
         };
-        last if $bg_merger;
-        if ( blessed($@) and $@->isa("Lucy::Store::LockErr") ) {
+        if ( blessed($@) and $@->isa("MyErr") ) {
             warn "Retrying...\n";
         }
         else {
             # Re-throw.
-            die "Failed to open BackgroundMerger: $@";
+            die "do_stuff() died: $@";
         }
     }
 END_SYNOPSIS

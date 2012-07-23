@@ -29,13 +29,8 @@ __END_C__
 /**
  * Exception.
  *
- * Most of the time when Lucy encounters an error, it tries to raise a
- * Clownfish::Err exception with an error message and context
- * information.
- *
- * At present, it is only safe to catch exceptions which are specifically
- * documented as catchable; most times when an Err is raised, Lucy leaks
- * memory.
+ * Clownfish::Err is the base class for exceptions in the Clownfish object
+ * hierarchy.
  *
  * The Err module also provides access to a per-thread Err shared variable via
  * set_error() and get_error().  It may be used to store an Err object
