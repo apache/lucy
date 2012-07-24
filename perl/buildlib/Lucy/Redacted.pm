@@ -37,6 +37,7 @@ sub redacted {
         Lucy::Index::Term
         Lucy::InvIndex
         Lucy::InvIndexer
+        Lucy::Object::Obj
         Lucy::QueryParser::QueryParser
         Lucy::Search::BooleanQuery
         Lucy::Search::QueryFilter

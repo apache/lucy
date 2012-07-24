@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 package TestObj;
 use base qw( Clownfish::Obj );
@@ -57,6 +57,9 @@ use base qw( Clownfish::Obj );
     sub dump { }
 }
 
+package LegacyObj;
+use base qw( Lucy::Object::Obj );
+
 package main;
 use Storable qw( freeze thaw );
 
@@ -74,6 +77,9 @@ ok( !$object->is_a("Lucy::Object"),     "custom is_a too long" );
 ok( !$object->is_a("Lucy"),             "custom is_a substring" );
 ok( !$object->is_a(""),                 "custom is_a blank" );
 ok( !$object->is_a("thing"),            "custom is_a wrong" );
+
+my $legacy_obj = LegacyObj->new;
+ok( $object->is_a("Clownfish::Obj"), "stub compat class Lucy::Object::Obj" );
 
 eval { my $another_obj = TestObj->new( kill_me_now => 1 ) };
 like( $@, qr/kill_me_now/, "reject bad param" );

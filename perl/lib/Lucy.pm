@@ -80,6 +80,12 @@ sub error {$Clownfish::Err::error}
 }
 
 {
+    # Temporary back compat.
+    package Lucy::Object::Obj;
+    BEGIN { our @ISA = qw( Clownfish::Obj ) }
+}
+
+{
     package Lucy::Analysis::RegexTokenizer;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
