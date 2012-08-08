@@ -50,6 +50,7 @@ $lucy->add_doc( { band => 'Cream' } );
 is( $lucy->search( query => 'cream' ), 4,
     "search uses correct PolyAnalyzer" );
 
+undef $lucy;
 SKIP: {
     skip( "fork on Windows not supported by Lucy", 1 )
         if $^O =~ /(mswin|cygwin)/i;
