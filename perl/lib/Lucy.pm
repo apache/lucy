@@ -272,6 +272,7 @@ sub error {$Clownfish::Err::error}
     package Lucy::Search::SortRule;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
+    use Carp;
 
     my %types = (
         field  => FIELD(),
