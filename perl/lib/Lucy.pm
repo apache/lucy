@@ -378,6 +378,7 @@ sub error {$Lucy::Object::Err::error}
     package Lucy::Search::SortRule;
     our $VERSION = '0.003002';
     $VERSION = eval $VERSION;
+    use Carp;
 
     my %types = (
         field  => FIELD(),
