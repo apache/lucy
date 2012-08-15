@@ -133,7 +133,9 @@ Util_warn(const char* format, ...) {
 int
 Util_remove_and_verify(const char *file_path) {
     /* Try to remove the file. */
-    remove(file_path);
+    if ( -1 ==  remove(file_path) ) {
+      Util_warn("Error removing [%s] due to the following error: [%s]\n", file_path, strerror(errno));    
+    }
 
     /* Return what *might* be success or failure. */
     return Util_can_open_file(file_path) ? 0 : 1;
