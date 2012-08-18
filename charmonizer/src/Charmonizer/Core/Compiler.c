@@ -42,6 +42,7 @@ static char     *try_obj_name = NULL;
 static char      include_flag[10] = "";
 static char      object_flag[10]  = "";
 static char      exe_flag[10]     = "";
+static char      no_link_flag[10] = "";
 static char      error_flag[10]   = "";
 static int       defines___GNUC__  = 0;
 static int       defines__MSC_VER  = 0;
@@ -100,12 +101,14 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     strcpy(include_flag, "-I ");
     strcpy(object_flag,  "-o ");
     strcpy(exe_flag,     "-o ");
+    strcpy(no_link_flag, "-c ");
     compile_succeeded = CC_test_compile(code);
     if (!compile_succeeded) {
         /* Try MSVC argument style. */
         strcpy(include_flag, "/I");
         strcpy(object_flag,  "/Fo");
         strcpy(exe_flag,     "/Fe");
+        strcpy(no_link_flag, "/c");
         compile_succeeded = CC_test_compile(code);
     }
     if (!compile_succeeded) {
@@ -245,6 +248,7 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
     char    *inc_dir_string    = S_inc_dir_string();
     size_t   command_max_size  = strlen(cc_command)
+                                 + strlen(no_link_flag)
                                  + strlen(error_flag)
                                  + strlen(source_path)
                                  + strlen(object_flag)
@@ -259,8 +263,8 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s%s %s %s",
-            cc_command, error_flag,
+    sprintf(command, "%s %s %s %s %s%s %s %s",
+            cc_command, no_link_flag, error_flag,
             source_path, object_flag, 
             obj_file, inc_dir_string,
             cc_flags);
