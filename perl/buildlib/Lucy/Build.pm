@@ -49,7 +49,8 @@ my @BASE_PATH = __PACKAGE__->cf_base_path;
 
 my $CHARMONIZER_ORIG_DIR = catdir( @BASE_PATH, 'charmonizer' );
 my $CHARMONIZE_EXE_PATH  = "charmonize$Config{_exe}";
-my $CHARMONY_PATH  = 'charmony.h';
+my $CHARMONY_H_PATH      = 'charmony.h';
+my $CHARMONY_PM_PATH     = 'Charmony.pm';
 my $LEMON_DIR      = catdir( @BASE_PATH, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
@@ -129,12 +130,15 @@ sub ACTION_charmonize {
 sub ACTION_charmony {
     my $self = shift;
     $self->dispatch('charmonize');
-    return if $self->up_to_date( $CHARMONIZE_EXE_PATH, $CHARMONY_PATH );
-    print "\nWriting $CHARMONY_PATH...\n\n";
+    return if $self->up_to_date( $CHARMONIZE_EXE_PATH, [
+        $CHARMONY_H_PATH, $CHARMONY_PM_PATH,
+    ] );
+    print "\nRunning $CHARMONIZE_EXE_PATH...\n\n";
 
     # Clean up after charmonize if it doesn't succeed on its own.
     $self->add_to_cleanup("_charm*");
-    $self->add_to_cleanup($CHARMONY_PATH);
+    $self->add_to_cleanup($CHARMONY_H_PATH);
+    $self->add_to_cleanup($CHARMONY_PM_PATH);
 
     # Prepare arguments to charmonize.
     my @command = (
@@ -151,7 +155,7 @@ sub ACTION_charmony {
     }
     print join( " ", @command ), $/;
 
-    system(@command) and die "Failed to write $CHARMONY_PATH: $!";
+    system(@command) and die "Failed to run $CHARMONIZE_EXE_PATH: $!";
 }
 
 sub _quotify {
