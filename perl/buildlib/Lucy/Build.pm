@@ -107,7 +107,7 @@ sub _run_make {
 }
 
 # Build the charmonize executable.
-sub ACTION_charmonize {
+sub ACTION_build_charmonize {
     my $self = shift;
     print "Building $CHARMONIZE_EXE_PATH...\n\n";
     my $meld_c = rel2abs("charmonize.c");
@@ -126,19 +126,20 @@ sub ACTION_charmonize {
     }
 }
 
-# Run the charmonize executable, creating the charmony.h file.
-sub ACTION_charmony {
+# Run the charmonize executable, creating the charmony.h and Charmony.pm
+# files.
+sub ACTION_run_charmonize {
     my $self = shift;
-    $self->dispatch('charmonize');
+    $self->dispatch('build_charmonize');
     return if $self->up_to_date( $CHARMONIZE_EXE_PATH, [
         $CHARMONY_H_PATH, $CHARMONY_PM_PATH,
     ] );
     print "\nRunning $CHARMONIZE_EXE_PATH...\n\n";
 
-    # Clean up after charmonize if it doesn't succeed on its own.
-    $self->add_to_cleanup("_charm*");
     $self->add_to_cleanup($CHARMONY_H_PATH);
     $self->add_to_cleanup($CHARMONY_PM_PATH);
+    # Clean up after charmonize if it doesn't succeed on its own.
+    $self->add_to_cleanup("_charm*");
 
     # Prepare arguments to charmonize.
     my @command = (
@@ -168,7 +169,7 @@ sub _quotify {
 # Build the charmonizer tests.
 sub ACTION_charmonizer_tests {
     my $self = shift;
-    $self->dispatch('charmony');
+    $self->dispatch('run_charmonize');
     print "Building Charmonizer Tests...\n\n";
     my $flags = join( " ",
         $self->config('ccflags'),
@@ -208,7 +209,7 @@ sub ACTION_cfc {
 sub ACTION_copy_clownfish_includes {
     my $self = shift;
 
-    $self->dispatch('charmony');
+    $self->dispatch('run_charmonize');
 
     $self->SUPER::ACTION_copy_clownfish_includes;
 
