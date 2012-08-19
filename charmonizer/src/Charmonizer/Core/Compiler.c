@@ -219,11 +219,11 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     if (defines__MSC_VER) {
         /* Zap MSVC junk. */
         sprintf(junk, "%s.obj", exe_name);
-        remove(junk);
+        OS_remove(junk);
         sprintf(junk, "%s.ilk", exe_name);
-        remove(junk);
+        OS_remove(junk);
         sprintf(junk, "%s.pdb", exe_name);
-        remove(junk);
+        OS_remove(junk);
     }
 
     /* See if compilation was successful.  Remove the source file. */
@@ -295,7 +295,7 @@ CC_test_compile(const char *source) {
     }
     compile_succeeded = CC_compile_obj(TRY_SOURCE_PATH, TRY_BASENAME,
                                        source);
-    remove(try_obj_name);
+    OS_remove(try_obj_name);
     return compile_succeeded;
 }
 
@@ -324,9 +324,9 @@ CC_capture_output(const char *source, size_t *output_len) {
     }
 
     /* Remove all the files we just created. */
-    remove(TRY_SOURCE_PATH);
+    OS_remove(TRY_SOURCE_PATH);
     OS_remove_exe(TRY_BASENAME);
-    remove(TARGET_PATH);
+    OS_remove(TARGET_PATH);
 
     return captured_output;
 }

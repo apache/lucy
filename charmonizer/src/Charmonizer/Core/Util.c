@@ -133,7 +133,7 @@ Util_warn(const char* format, ...) {
 int
 Util_remove_and_verify(const char *file_path) {
     /* Try to remove the file. */
-    remove(file_path);
+    OS_remove(file_path);
 
     /* Return what *might* be success or failure. */
     return Util_can_open_file(file_path) ? 0 : 1;

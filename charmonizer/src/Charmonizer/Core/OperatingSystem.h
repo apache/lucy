@@ -25,6 +25,11 @@
 extern "C" {
 #endif
 
+/* Safely remove a file named [name]. Needed because of Windows quirks.
+ */
+void
+chaz_OS_remove(const char *name);
+
 /* Remove an executable file named [name], appending the exe_ext if needed.
  */
 void
@@ -79,6 +84,7 @@ void
 chaz_OS_init(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
+  #define OS_remove                    chaz_OS_remove
   #define OS_remove_exe                chaz_OS_remove_exe
   #define OS_remove_obj                chaz_OS_remove_obj
   #define OS_run_local                 chaz_OS_run_local
