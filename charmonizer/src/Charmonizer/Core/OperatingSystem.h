@@ -26,8 +26,9 @@ extern "C" {
 #endif
 
 /* Safely remove a file named [name]. Needed because of Windows quirks.
+ * Returns true on success, false on failure.
  */
-void
+int
 chaz_OS_remove(const char *name);
 
 /* Remove an executable file named [name], appending the exe_ext if needed.

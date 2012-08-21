@@ -79,7 +79,7 @@ OS_dev_null(void) {
     return dev_null;
 }
 
-void
+int
 OS_remove(const char *name) {
     /*
      * On Windows it can happen that another process, typically a
@@ -88,6 +88,7 @@ OS_remove(const char *name) {
      * fail. As a workaround, files are renamed to a random name
      * before deletion.
      */
+    int retval;
 
     static const size_t num_random_chars = 16;
 
@@ -102,14 +103,15 @@ OS_remove(const char *name) {
     temp_name[name_len+num_random_chars] = '\0';
 
     if (rename(name, temp_name) == 0) {
-        remove(temp_name);
+        retval = !remove(temp_name);
     }
     else {
         // Error during rename, remove using old name.
-        remove(name);
+        retval = !remove(name);
     }
 
     free(temp_name);
+    return retval;
 }
 
 void
