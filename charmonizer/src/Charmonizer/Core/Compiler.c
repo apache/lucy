@@ -168,15 +168,15 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     /* TODO: Key this off the compiler supplied as argument, not the compiler
      * used to compile Charmonizer. */
     sprintf(junk, "%s.obj", exe_name);
-    if ( -1 ==  remove(junk) ) {
+    if (!OS_remove(junk)) {
       Util_warn("Error removing [%s] due to the following error: [%s]\n", junk, strerror(errno));    
     }
     sprintf(junk, "%s.ilk", exe_name);
-    if ( -1 ==  remove(junk) ) {
+    if (!OS_remove(junk)) {
       Util_warn("Error removing [%s] due to the following error: [%s]\n", junk, strerror(errno));    
     }
     sprintf(junk, "%s.pdb", exe_name);
-    if ( -1 ==  remove(junk) ) {
+    if (!OS_remove(junk)) {
       Util_warn("Error removing [%s] due to the following error: [%s]\n", junk, strerror(errno));    
     }
 #endif
@@ -249,7 +249,7 @@ CC_test_compile(const char *source, size_t source_len) {
     }
     compile_succeeded = CC_compile_obj(TRY_SOURCE_PATH, TRY_BASENAME,
                                        source, source_len);
-    if ( -1 ==  remove(try_obj_name) ) {
+    if (!OS_remove(try_obj_name)) {
       Util_warn("Error removing [%s] due to the following error: [%s]\n", try_obj_name, strerror(errno));    
     }
     return compile_succeeded;
@@ -280,11 +280,11 @@ CC_capture_output(const char *source, size_t source_len, size_t *output_len) {
     }
 
     /* Remove all the files we just created. */
-    if ( -1 ==  remove(TRY_SOURCE_PATH) ) {
+    if (!OS_remove(TRY_SOURCE_PATH)) {
       Util_warn("Error removing [%s] due to the following error: [%s]\n", TRY_SOURCE_PATH, strerror(errno));    
     }
     OS_remove_exe(TRY_BASENAME);
-    if ( -1 ==  remove(TARGET_PATH) ) {
+    if (!OS_remove(TARGET_PATH)) {
       Util_warn("Error removing [%s] due to the following error: [%s]\n", TARGET_PATH, strerror(errno));    
     }
 

@@ -106,11 +106,46 @@ OS_dev_null(void) {
     return dev_null;
 }
 
+int
+OS_remove(const char *name) {
+    /*
+     * On Windows it can happen that another process, typically a
+     * virus scanner, still has an open handle on the file. This can
+     * make the subsequent recreation of a file with the same name
+     * fail. As a workaround, files are renamed to a random name
+     * before deletion.
+     */
+    int retval;
+
+    static const size_t num_random_chars = 16;
+
+    size_t  name_len = strlen(name);
+    size_t  i;
+    char   *temp_name = (char*)malloc(name_len + num_random_chars + 1);
+
+    strcpy(temp_name, name);
+    for (i = 0; i < num_random_chars; i++) {
+        temp_name[name_len+i] = 'A' + rand() % 26;
+    }
+    temp_name[name_len+num_random_chars] = '\0';
+
+    if (rename(name, temp_name) == 0) {
+        retval = !remove(temp_name);
+    }
+    else {
+        // Error during rename, remove using old name.
+        retval = !remove(name);
+    }
+
+    free(temp_name);
+    return retval;
+}
+
 void
 OS_remove_exe(const char *name) {
     char *exe_name = (char*)malloc(strlen(name) + strlen(exe_ext) + 1);
     sprintf(exe_name, "%s%s", name, exe_ext);
-    remove(exe_name);
+    OS_remove(exe_name);
     free(exe_name);
 }
 
@@ -118,7 +153,7 @@ void
 OS_remove_obj(const char *name) {
     char *obj_name = (char*)malloc(strlen(name) + strlen(obj_ext) + 1);
     sprintf(obj_name, "%s%s", name, obj_ext);
-    remove(obj_name);
+    OS_remove(obj_name);
     free(obj_name);
 }
 

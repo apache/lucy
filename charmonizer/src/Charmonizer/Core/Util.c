@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Charmonizer/Core/Util.h"
+#include "Charmonizer/Core/OperatingSystem.h"
 
 /* Global verbosity setting. */
 int Util_verbosity = 1;
@@ -133,7 +134,7 @@ Util_warn(const char* format, ...) {
 int
 Util_remove_and_verify(const char *file_path) {
     /* Try to remove the file. */
-    if ( -1 ==  remove(file_path) ) {
+    if (!OS_remove(file_path)) {
       Util_warn("Error removing [%s] due to the following error: [%s]\n", file_path, strerror(errno));    
     }
 
