@@ -78,6 +78,6 @@ S_write_charm_h(void) {
 
 static void
 S_remove_charm_h(void) {
-    OS_remove("_charm.h");
+    Util_remove_and_verify("_charm.h");
 }
 
