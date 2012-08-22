@@ -31,16 +31,6 @@ extern "C" {
 int
 chaz_OS_remove(const char *name);
 
-/* Remove an executable file named [name], appending the exe_ext if needed.
- */
-void
-chaz_OS_remove_exe(const char *name);
-
-/* Remove an object file named [name], appending the obj_ext if needed.
- */
-void
-chaz_OS_remove_obj(const char *name);
-
 /* Concatenate all arguments in a NULL-terminated list into a single command
  * string, prepend the appropriate prefix, and invoke via system().
  */
@@ -86,8 +76,6 @@ chaz_OS_init(void);
 
 #ifdef CHAZ_USE_SHORT_NAMES
   #define OS_remove                    chaz_OS_remove
-  #define OS_remove_exe                chaz_OS_remove_exe
-  #define OS_remove_obj                chaz_OS_remove_obj
   #define OS_run_local                 chaz_OS_run_local
   #define OS_run_quietly               chaz_OS_run_quietly
   #define OS_mkdir                     chaz_OS_mkdir

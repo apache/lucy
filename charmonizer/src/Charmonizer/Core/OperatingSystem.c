@@ -114,22 +114,6 @@ OS_remove(const char *name) {
     return retval;
 }
 
-void
-OS_remove_exe(const char *name) {
-    char *exe_name = (char*)malloc(strlen(name) + strlen(exe_ext) + 1);
-    sprintf(exe_name, "%s%s", name, exe_ext);
-    OS_remove(exe_name);
-    free(exe_name);
-}
-
-void
-OS_remove_obj(const char *name) {
-    char *obj_name = (char*)malloc(strlen(name) + strlen(obj_ext) + 1);
-    sprintf(obj_name, "%s%s", name, obj_ext);
-    OS_remove(obj_name);
-    free(obj_name);
-}
-
 int
 OS_run_local(const char *arg1, ...) {
     va_list  args;
