@@ -133,13 +133,18 @@ Util_warn(const char* format, ...) {
 
 int
 Util_remove_and_verify(const char *file_path) {
-    /* Try to remove the file. */
-    if (!OS_remove(file_path)) {
-      Util_warn("Error removing [%s] due to the following error: [%s]\n", file_path, strerror(errno));    
+    /* Attempt to delete the file.  If it's gone after the attempt, return
+     * success, whether or not it was there to begin with.
+     * (ENOENT is POSIX not C89, but let's go with it for now.) */
+    int result = OS_remove(file_path);
+    if (result || errno == ENOENT) {
+        return 1;
     }
 
-    /* Return what *might* be success or failure. */
-    return Util_can_open_file(file_path) ? 0 : 1;
+    /* Issue a warning and return failure. */
+    Util_warn("Failed to remove '%s': %s at %s line %d",
+              file_path, strerror(errno), __FILE__, __LINE__);
+    return 0;
 }
 
 int
