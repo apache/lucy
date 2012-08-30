@@ -57,32 +57,29 @@ S_validate_exposure(const char *exposure) {
 
 static int
 S_validate_class_name(const char *class_name) {
-    const char *ptr;
+    // The last component must contain lowercase letters (for now).
+    const char *last_colon = strrchr(class_name, ':');
+    const char *substring = last_colon ? last_colon + 1 : class_name;
+    for (;;substring++) {
+        if (*substring == 0)          { return false; }
+        else if (*substring == ':')   { return false; }
+        else if (islower(*substring)) { break; }
+    }
 
     // Must be UpperCamelCase, separated by "::".
-    for (ptr = class_name; *ptr != 0;) {
-        if (!isupper(*ptr)) { return false; }
-
-        // Each component must contain lowercase letters.
-        const char *substring;
-        for (substring = ptr; ; substring++) {
-            if (*substring == 0)          { return false; }
-            else if (*substring == ':')   { return false; }
-            else if (islower(*substring)) { break; }
-        }
-
-        while (*ptr != 0) {
-            if (*ptr == 0) { break; }
-            else if (*ptr == ':') {
-                ptr++;
-                if (*ptr != ':') { return false; }
-                ptr++;
-                if (*ptr == 0) { return false; }
-                break;
-            }
-            else if (!isalnum(*ptr)) { return false; }
+    const char *ptr = class_name;
+    if (!isupper(*ptr)) { return false; }
+    while (*ptr != 0) {
+        if (*ptr == 0) { break; }
+        else if (*ptr == ':') {
+            ptr++;
+            if (*ptr != ':') { return false; }
+            ptr++;
+            if (!isupper(*ptr)) { return false; }
             ptr++;
         }
+        else if (!isalnum(*ptr)) { return false; }
+        else { ptr++; }
     }
 
     return true;

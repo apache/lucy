@@ -16,10 +16,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 40;
 use Clownfish::CFC;
 
-for (qw( foo FOO 1Foo Foo_Bar FOOBAR 1FOOBAR )) {
+for (qw( foo 1Foo Foo_Bar 1FOOBAR )) {
     eval { my $thing = new_symbol( class_name => $_ ) };
     like( $@, qr/class_name/, "Reject invalid class name $_" );
     my $bogus_middle = "Foo::" . $_ . "::Bar";
