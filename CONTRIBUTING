@@ -1,6 +1,6 @@
 ===========================
 Contributing to Apache Lucy
-==========================
+===========================
 
 MAKE A PLAN:
 
@@ -16,15 +16,10 @@ MAKE A PLAN:
   
 GET THE CODE:
 
-  Lucy's codebase is housed in a Subversion repository.  Run this command to
-  check out the mainline:
+  Lucy's codebase is available via Git from git.apache.org.  Start by creating
+  a clone of the repository:
 
-    svn co http://svn.apache.org/repos/asf/lucy/trunk lucy
-
-  If you prefer Git, we maintain read-only mirrors of our codebase on
-  git.apache.org.
-  
-    git clone git://git.apache.org/lucy.git lucy
+    git clone git://git.apache.org/lucy.git
 
   There is also a mirror on Github.
 
@@ -51,16 +46,13 @@ MAKE CHANGES:
 
 GENERATE A PATCH:
 
-  With Subversion, navigate to the top level of the checkout and capture the
-  output of 'svn diff':
-
-    cd lucy/
-    svn diff > my_changes.patch
-
-  With command-line Git, you can either capture the output of 'git diff', or
-  use 'git format-patch' to export a series of one or more commits.
+  The easiest way to create a patch with Git is to capture the output of
+  `git diff`:
 
     git diff > my_changes.patch
+
+  More experienced Git users may wish to generate patch sequences using
+  `git format-patch`.
 
 CONTRIBUTE YOUR PATCH
 
