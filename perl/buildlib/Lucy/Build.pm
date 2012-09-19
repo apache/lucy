@@ -16,21 +16,21 @@
 use strict;
 use warnings;
 
-use lib '../clownfish/perl/blib/arch';
-use lib '../clownfish/perl/blib/lib';
-use lib 'clownfish/perl/blib/arch';
-use lib 'clownfish/perl/blib/lib';
+use lib '../clownfish/cfc/perl/blib/arch';
+use lib '../clownfish/cfc/perl/blib/lib';
+use lib 'clownfish/cfc/perl/blib/arch';
+use lib 'clownfish/cfc/perl/blib/lib';
 
 package Lucy::Build;
 
 # We want to subclass Clownfish::CFC::Perl::Build, but Clownfish might not be
-# built yet. So we look in 'clownfish/perl/lib' directly and cleanup @INC
+# built yet. So we look in 'clownfish/cfc/perl/lib' directly and cleanup @INC
 # afterwards.
-use lib '../clownfish/perl/lib';
-use lib 'clownfish/perl/lib';
+use lib '../clownfish/cfc/perl/lib';
+use lib 'clownfish/cfc/perl/lib';
 use base qw( Clownfish::CFC::Perl::Build );
-no lib '../clownfish/perl/lib';
-no lib 'clownfish/perl/lib';
+no lib '../clownfish/cfc/perl/lib';
+no lib 'clownfish/cfc/perl/lib';
 
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
@@ -54,7 +54,7 @@ my $CHARMONY_PM_PATH     = 'Charmony.pm';
 my $LEMON_DIR      = catdir( @BASE_PATH, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
-my $CLOWNFISH_DIR = catdir( @BASE_PATH, 'clownfish', 'perl' );
+my $CLOWNFISH_DIR = catdir( @BASE_PATH, 'clownfish', 'cfc', 'perl' );
 my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
 my $LIB_DIR          = 'lib';
 
