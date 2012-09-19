@@ -1,0 +1,159 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Growable buffer holding arbitrary bytes.
+ */
+
+class Clownfish::ByteBuf cnick BB inherits Clownfish::Obj {
+
+    char    *buf;
+    size_t   size;  /* number of valid bytes */
+    size_t   cap;   /* allocated bytes, including terminating null */
+
+    /**
+     * @param capacity initial capacity of the ByteBuf, in bytes.
+     */
+    inert incremented ByteBuf*
+    new(size_t capacity);
+
+    inert ByteBuf*
+    init(ByteBuf *self, size_t capacity);
+
+    /** Return a pointer to a new ByteBuf which holds a copy of the passed-in
+     * string.
+     */
+    inert incremented ByteBuf*
+    new_bytes(const void *bytes, size_t size);
+
+    /** Return a pointer to a new ByteBuf which assumes ownership of the
+     * passed-in string.
+     */
+    inert incremented ByteBuf*
+    new_steal_bytes(void *bytes, size_t size, size_t capacity);
+
+    /** Lexical comparison of two ByteBufs, with level of indirection set to
+     * please qsort and friends.
+     */
+    inert int
+    compare(const void *va, const void *vb);
+
+    /** Set the object's size member.  If greater than the object's capacity,
+     * throws an error.
+     */
+    void
+    Set_Size(ByteBuf *self, size_t size);
+
+    /** Accessor for "size" member.
+     */
+    size_t
+    Get_Size(ByteBuf *self);
+
+    /** Accessor for raw internal buffer.
+     */
+    nullable char*
+    Get_Buf(ByteBuf *self);
+
+    /** Return the number of bytes in the Object's allocation.
+     */
+    size_t
+    Get_Capacity(ByteBuf *self);
+
+    public void
+    Mimic(ByteBuf *self, Obj *other);
+
+    void
+    Mimic_Bytes(ByteBuf *self, const void *bytes, size_t size);
+
+    /** Concatenate the passed-in bytes onto the end of the ByteBuf. Allocate
+     * more memory as needed.
+     */
+    void
+    Cat_Bytes(ByteBuf *self, const void *bytes, size_t size);
+
+    /** Concatenate the contents of <code>other</code> onto the end of the
+     * original ByteBuf. Allocate more memory as needed.
+     */
+    void
+    Cat(ByteBuf *self, const ByteBuf *other);
+
+    /** Assign more memory to the ByteBuf, if it doesn't already have enough
+     * room to hold <code>size</code> bytes.  Cannot shrink the allocation.
+     *
+     * @return a pointer to the raw buffer.
+     */
+    nullable char*
+    Grow(ByteBuf *self, size_t size);
+
+    /** Test whether the ByteBuf matches the passed-in bytes.
+     */
+    bool_t
+    Equals_Bytes(ByteBuf *self, const void *bytes, size_t size);
+
+    public int32_t
+    Compare_To(ByteBuf *self, Obj *other);
+
+    public incremented ByteBuf*
+    Clone(ByteBuf *self);
+
+    public void
+    Destroy(ByteBuf *self);
+
+    public bool_t
+    Equals(ByteBuf *self, Obj *other);
+
+    public int32_t
+    Hash_Sum(ByteBuf *self);
+
+    public void
+    Serialize(ByteBuf *self, OutStream *outstream);
+
+    public incremented ByteBuf*
+    Deserialize(decremented ByteBuf *self, InStream *instream);
+}
+
+/**
+ * A ByteBuf that doesn't own its own string.
+ */
+class Clownfish::ViewByteBuf cnick ViewBB
+    inherits Clownfish::ByteBuf {
+
+    /** Return a pointer to a new "view" ByteBuf, offing a persective on the
+     * passed-in string.
+     */
+    inert incremented ViewByteBuf*
+    new(char *buf, size_t size);
+
+    inert incremented ViewByteBuf*
+    init(ViewByteBuf *self, char *buf, size_t size);
+
+    /** Assign buf and size members to the passed in values.
+     */
+    void
+    Assign_Bytes(ViewByteBuf *self, char *buf, size_t size);
+
+    /** Assign buf and size members from the passed-in ByteBuf.
+     */
+    void
+    Assign(ViewByteBuf *self, const ByteBuf *other);
+
+    public void
+    Destroy(ViewByteBuf *self);
+}
+
+

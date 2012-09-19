@@ -1,0 +1,68 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+__C__
+typedef int
+(*Lucy_Sort_Compare_t)(void *context, const void *va, const void *vb);
+__END_C__
+
+/** Specialized sorting routines.
+ *
+ * SortUtils provides a merge sort algorithm which allows access to its
+ * internals, enabling specialized functions to jump in and only execute part
+ * of the sort.
+ *
+ * SortUtils also provides a quicksort with an additional context argument.
+ */
+inert class Clownfish::Util::SortUtils cnick Sort {
+
+    /** Perform a mergesort.  In addition to providing a contiguous array of
+     * elements to be sorted and their count, the caller must also provide a
+     * scratch buffer with room for at least as many elements as are to be
+     * sorted.
+     */
+    inert void
+    mergesort(void *elems, void *scratch, uint32_t num_elems, uint32_t width,
+              Lucy_Sort_Compare_t compare, void *context);
+
+    /** Merge two source arrays together using the classic mergesort merge
+     * algorithm, storing the result in <code>dest</code>.
+     *
+     * Most merge functions operate on a single contiguous array and copy the
+     * merged results results back into the source array before returning.
+     * These two differ in that it is possible to operate on two discontiguous
+     * source arrays.  Copying the results back into the source array is the
+     * responsibility of the caller.
+     *
+     * Lucy's external sort takes advantage of this when it is reading
+     * back pre-sorted runs from disk and merging the streams into a
+     * consolidated buffer.
+     */
+    inert void
+    merge(void *left_ptr,  uint32_t left_num_elems,
+          void *right_ptr, uint32_t right_num_elems,
+          void *dest, size_t width, Lucy_Sort_Compare_t compare, void *context);
+
+    /** Quicksort.
+     */
+    inert void
+    quicksort(void *elems, size_t num_elems, size_t width,
+              Lucy_Sort_Compare_t compare, void *context);
+}
+
+

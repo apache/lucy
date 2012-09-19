@@ -1,0 +1,73 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+inert class Clownfish::Util::Memory {
+
+    /** Attempt to allocate memory with malloc, but print an error and exit if the
+     * call fails.
+     */
+    inert nullable void*
+    wrapped_malloc(size_t count);
+
+    /** Attempt to allocate memory with calloc, but print an error and exit if the
+     * call fails.
+     */
+    inert nullable void*
+    wrapped_calloc(size_t count, size_t size);
+
+    /** Attempt to allocate memory with realloc, but print an error and exit if
+     * the call fails.
+     */
+    inert nullable void*
+    wrapped_realloc(void *ptr, size_t size);
+
+    /** Free memory.  (Wrapping is necessary in cases where memory allocated
+     * within the Lucy library has to be freed in an external environment where
+     * "free" may have been redefined.)
+     */
+    inert void
+    wrapped_free(void *ptr);
+
+    /** Provide a number which is somewhat larger than the supplied number, so
+     * that incremental array growth does not trigger pathological
+     * reallocation.
+     *
+     * @param minimum The minimum number of array elements.
+     * @param width The size of each array element in bytes.
+     */
+    inert size_t
+    oversize(size_t minimum, size_t width);
+}
+
+__C__
+
+#define LUCY_MALLOCATE    lucy_Memory_wrapped_malloc
+#define LUCY_CALLOCATE    lucy_Memory_wrapped_calloc
+#define LUCY_REALLOCATE   lucy_Memory_wrapped_realloc
+#define LUCY_FREEMEM      lucy_Memory_wrapped_free
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define MALLOCATE                       LUCY_MALLOCATE
+  #define CALLOCATE                       LUCY_CALLOCATE
+  #define REALLOCATE                      LUCY_REALLOCATE
+  #define FREEMEM                         LUCY_FREEMEM
+#endif
+
+__END_C__
+
+

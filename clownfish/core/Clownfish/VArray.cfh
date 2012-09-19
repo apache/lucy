@@ -1,0 +1,181 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+__C__
+#include "Clownfish/Util/SortUtils.h"
+
+typedef chy_bool_t
+(*Lucy_VA_Gather_Test_t)(lucy_VArray *self, uint32_t tick, void *data);
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define Lucy_VA_Gather_Test_t Lucy_VA_Gather_Test_t
+#endif
+__END_C__
+
+/** Variable-sized array.
+ */
+class Clownfish::VArray cnick VA inherits Clownfish::Obj {
+
+    Obj      **elems;
+    uint32_t   size;
+    uint32_t   cap;
+
+    inert incremented VArray*
+    new(uint32_t capacity);
+
+    /**
+     * @param capacity Initial number of elements that the object will be able
+     * to hold before reallocation.
+     */
+    inert VArray*
+    init(VArray *self, uint32_t capacity);
+
+    /** Push an item onto the end of a VArray.
+     */
+    void
+    Push(VArray *self, decremented Obj *element = NULL);
+
+    /** Push all the elements of another VArray onto the end of this one.
+     */
+    void
+    Push_VArray(VArray *self, VArray *other);
+
+    /** Pop an item off of the end of a VArray.
+     */
+    incremented nullable Obj*
+    Pop(VArray *self);
+
+    /** Unshift an item onto the front of a VArray.
+     */
+    void
+    Unshift(VArray *self, decremented Obj *element = NULL);
+
+    /** Shift an item off of the front of a VArray.
+     */
+    incremented nullable Obj*
+    Shift(VArray *self);
+
+    /** Ensure that the VArray has room for at least <code>capacity</code>
+     * elements.
+     */
+    void
+    Grow(VArray *self, uint32_t capacity);
+
+    /** Fetch the element at <code>tick</tick>.
+     */
+    nullable Obj*
+    Fetch(VArray *self, uint32_t tick);
+
+    /** Store an element at index <code>tick</code>, possibly displacing an
+     * existing element.
+     */
+    void
+    Store(VArray *self, uint32_t tick, decremented Obj *elem = NULL);
+
+    /** Replace an element in the VArray with NULL and return it.
+     *
+     * @return whatever was stored at <code>tick</code>.
+     */
+    incremented nullable Obj*
+    Delete(VArray *self, uint32_t tick);
+
+    /** Remove <code>length</code> elements from the array, starting at
+     * <code>offset</code>. Move elements over to fill in the gap.
+     */
+    void
+    Excise(VArray *self, uint32_t offset, uint32_t length);
+
+    /** Clone the VArray but merely increment the refcounts of its elements
+     * rather than clone them.
+     */
+    incremented VArray*
+    Shallow_Copy(VArray *self);
+
+    /** Dupe the VArray, cloning each internal element.
+     */
+    public incremented VArray*
+    Clone(VArray *self);
+
+    /** Quicksort the VArry using the supplied comparison routine.  Safety
+     * checks are the responsibility of the caller.
+     *
+     * @param compare Comparison routine.  The default uses Obj_Compare_To and
+     * sorts NULL elements towards the end.
+     * @param context Argument supplied to the comparison routine.
+     */
+    void
+    Sort(VArray *self, Lucy_Sort_Compare_t compare = NULL,
+         void *context = NULL);
+
+    /** Set the size for the VArray.  If the new size is larger than the
+     * current size, grow the object to accommodate NULL elements; if smaller
+     * than the current size, decrement and discard truncated elements.
+     */
+    void
+    Resize(VArray *self, uint32_t size);
+
+    /** Empty the VArray.
+     */
+    void
+    Clear(VArray *self);
+
+    /** Accessor for <code>size</code> member.
+     */
+    public uint32_t
+    Get_Size(VArray *self);
+
+    /** Accessor for <code>capacity</code> member.
+     */
+    uint32_t
+    Get_Capacity(VArray *self);
+
+    /** Return all elements for which <code>test</code> returns true.
+     */
+    public incremented VArray*
+    Gather(VArray *self, Lucy_VA_Gather_Test_t test, void *data);
+
+    /** Return a new array consisting of elements from a contiguous slice.  If
+     * the specified range is out of bounds, return an array with fewer
+     * elements -- potentially none.
+     *
+     * @param offset The index of the element to start at.
+     * @param length The maximum number of elements to slice.
+     */
+    public incremented VArray*
+    Slice(VArray *self, uint32_t offset, uint32_t length);
+
+    public bool_t
+    Equals(VArray *self, Obj *other);
+
+    public incremented VArray*
+    Dump(VArray *self);
+
+    public incremented VArray*
+    Load(VArray *self, Obj *dump);
+
+    public void
+    Serialize(VArray *self, OutStream *outstream);
+
+    public incremented VArray*
+    Deserialize(decremented VArray *self, InStream *instream);
+
+    public void
+    Destroy(VArray *self);
+}
+
+

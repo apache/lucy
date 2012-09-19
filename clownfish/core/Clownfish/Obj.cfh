@@ -1,0 +1,225 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Base class for all objects.
+ */
+
+public class Clownfish::Obj {
+
+    VTable *vtable;
+    lucy_ref_t ref;
+
+    /** Abstract initializer.
+     */
+    public inert Obj*
+    init(Obj* self);
+
+    /** Zero argument factory constructor.
+     */
+    public abstract incremented Obj*
+    Make(Obj *self);
+
+    /** Return an object's refcount.
+     */
+    uint32_t
+    Get_RefCount(Obj *self);
+
+    /** Increment an object's refcount.
+     *
+     * @return The object, allowing an assignment idiom.
+     */
+    incremented Obj*
+    Inc_RefCount(Obj *self);
+
+    /** NULL-safe invocation of Inc_RefCount().
+     *
+     * @return NULL if <code>self</code> is NULL, otherwise the return value
+     * of Inc_RefCount().
+     */
+    inert inline incremented Obj*
+    incref(Obj *self);
+
+    /** Decrement an object's refcount, calling Destroy() if it hits 0.
+     *
+     * @return the modified refcount.
+     */
+    uint32_t
+    Dec_RefCount(Obj *self);
+
+    /** NULL-safe invocation of Dec_RefCount().
+     *
+     * @return NULL if <code>self</code> is NULL, otherwise the return value
+     * of Dec_RefCount().
+     */
+    inert inline uint32_t
+    decref(Obj *self);
+
+    /** Return a host-language object wrapper for this object.
+     */
+    void*
+    To_Host(Obj *self);
+
+    /** Return a clone of the object.
+     */
+    public abstract incremented Obj*
+    Clone(Obj *self);
+
+    /** Generic destructor.  Frees the struct itself but not any complex
+     * member elements.
+     */
+    public void
+    Destroy(Obj *self);
+
+    /** Invoke the Destroy() method found in <code>vtable</code> on
+     * <code>self</code>.
+     *
+     * TODO: Eliminate this function if we can arrive at a proper SUPER syntax.
+     */
+    inert inline void
+    super_destroy(Obj *self, VTable *vtable);
+
+    /** Indicate whether two objects are the same.  By default, compares the
+     * memory address.
+     *
+     * @param other Another Obj.
+     */
+    public bool_t
+    Equals(Obj *self, Obj *other);
+
+    /** Indicate whether one object is less than, equal to, or greater than
+     * another.
+     *
+     * @param other Another Obj.
+     * @return 0 if the objects are equal, a negative number if
+     * <code>self</code> is less than <code>other</code>, and a positive
+     * number if <code>self</code> is greater than <code>other</code>.
+     */
+    public abstract int32_t
+    Compare_To(Obj *self, Obj *other);
+
+    /** Return a hash code for the object -- by default, the memory address.
+     */
+    public int32_t
+    Hash_Sum(Obj *self);
+
+    /** Return the object's VTable.
+     */
+    public VTable*
+    Get_VTable(Obj *self);
+
+    /** Return the name of the class that the object belongs to.
+     */
+    public CharBuf*
+    Get_Class_Name(Obj *self);
+
+    /** Indicate whether the object is a descendent of <code>ancestor</code>.
+     */
+    public bool_t
+    Is_A(Obj *self, VTable *ancestor);
+
+    /** Generic stringification: "ClassName@hex_mem_address".
+     */
+    public incremented CharBuf*
+    To_String(Obj *self);
+
+    /** Convert the object to a 64-bit integer.
+     */
+    public abstract int64_t
+    To_I64(Obj *self);
+
+    /** Convert the object to a double precision floating point number.
+     */
+    public abstract double
+    To_F64(Obj *self);
+
+    /** Evaluate the object in a boolean context.  By default, invokes
+     * To_I64() and returns true if it is non-zero.
+     */
+    public bool_t
+    To_Bool(Obj *self);
+
+    /** Serialize the object by writing to the supplied OutStream.
+     */
+    public void
+    Serialize(Obj *self, OutStream *outstream);
+
+    /** Inflate an object by reading the serialized form from the instream.
+     * The assumption is that the object has been allocated, assigned a
+     * refcount and a vtable, but that everything else is uninitialized.
+     */
+    public incremented Obj*
+    Deserialize(decremented Obj *self, InStream *instream);
+
+    /** Return a representation of the object using only scalars, hashes, and
+     * arrays.  Some implementations support JSON serialization via Dump() and
+     * its companion method, Load(); for others, Dump() is only a debugging
+     * aid.  The default simply calls To_String().
+     */
+    public incremented Obj*
+    Dump(Obj *self);
+
+    /** Create an object from the output of a call to Dump().
+     *
+     * @param dump The output of Dump().
+     */
+    public abstract incremented Obj*
+    Load(Obj *self, Obj *dump);
+
+    /** Update the internal state of the object to mimic that of
+     * <code>other</code>.
+     */
+    public abstract void
+    Mimic(Obj *self, Obj *other);
+}
+
+__C__
+static CHY_INLINE void
+lucy_Obj_super_destroy(lucy_Obj *self, lucy_VTable *vtable) {
+    Lucy_Obj_Destroy_t super_destroy
+        = CFISH_SUPER_METHOD_PTR(vtable, Lucy_Obj_Destroy);
+    super_destroy(self);
+}
+
+#define LUCY_SUPER_DESTROY(_self, _vtable) \
+    lucy_Obj_super_destroy((lucy_Obj*)_self, _vtable)
+
+static CHY_INLINE lucy_Obj*
+lucy_Obj_incref(lucy_Obj *self) {
+    if (self != NULL) { return Lucy_Obj_Inc_RefCount(self); }
+    else { return NULL; }
+}
+
+#define CFISH_INCREF(_self) lucy_Obj_incref((lucy_Obj*)_self)
+
+static CHY_INLINE uint32_t
+lucy_Obj_decref(lucy_Obj *self) {
+    if (self != NULL) { return Lucy_Obj_Dec_RefCount(self); }
+    else { return 0; }
+}
+
+#define CFISH_DECREF(_self) lucy_Obj_decref((lucy_Obj*)_self)
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define SUPER_DESTROY(_self, _vtable)   LUCY_SUPER_DESTROY(_self, _vtable)
+  #define INCREF(_self)                   CFISH_INCREF(_self)
+  #define DECREF(_self)                   CFISH_DECREF(_self)
+#endif
+
+__END_C__
+
+

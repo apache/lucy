@@ -1,0 +1,165 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Hashtable.
+ *
+ * Values are stored by reference and may be any kind of Obj. By default, keys
+ * are cloned and so must belong to a class that implements Clone(); however,
+ * this behavior can be changed by overridding Make_Key(), e.g. to implement
+ * efficient hash sets.
+ */
+class Clownfish::Hash inherits Clownfish::Obj {
+
+    void          *entries;
+    uint32_t       capacity;
+    uint32_t       size;
+    uint32_t       threshold;    /* rehashing trigger point */
+    int32_t        iter_tick;    /* used when iterating */
+
+    inert void
+    init_class();
+
+    inert incremented Hash*
+    new(uint32_t capacity = 0);
+
+    /**
+     * @param capacity The number of elements that the hash will be asked to
+     * hold initially.
+     */
+    inert Hash*
+    init(Hash *self, uint32_t capacity = 0);
+
+    /** Empty the hash of all key-value pairs.
+     */
+    void
+    Clear(Hash *self);
+
+    /** Store a key-value pair.  If <code>key</code> is not already present,
+     * Make_Key() will be called to manufacture the internally used key.
+     */
+    void
+    Store(Hash *self, Obj *key, decremented Obj *value);
+
+    void
+    Store_Str(Hash *self, const char *str, size_t len,
+              decremented Obj *value);
+
+    /** Fetch the value associated with <code>key</code>.
+     *
+     * @return the value, or NULL if <code>key</code> is not present.
+     */
+    nullable Obj*
+    Fetch(Hash *self, const Obj *key);
+
+    nullable Obj*
+    Fetch_Str(Hash *self, const char *key, size_t key_len);
+
+    /** Attempt to delete a key-value pair from the hash.
+     *
+     * @return the value if <code>key</code> exists and thus deletion
+     * succeeds; otherwise NULL.
+     */
+    incremented nullable Obj*
+    Delete(Hash *self, const Obj *key);
+
+    incremented nullable Obj*
+    Delete_Str(Hash *self, const char *key, size_t key_ley);
+
+    /** Prepare to iterate over all the key-value pairs in the hash.
+     *
+     * @return the number of pairs which will be iterated over.
+     */
+    uint32_t
+    Iterate(Hash *self);
+
+    /** Retrieve the next key-value pair from the hash, setting the supplied
+     * pointers to point at them.
+     *
+     * @return true while iterating, false when the iterator has been
+     * exhausted.
+     */
+    bool_t
+    Next(Hash *self, Obj **key, Obj **value);
+
+    /** Search for a key which Equals the key supplied, and return the key
+     * rather than its value.
+     */
+    nullable Obj*
+    Find_Key(Hash *self, const Obj *key, int32_t hash_sum);
+
+    /** Return an VArray of pointers to the hash's keys.
+     */
+    incremented VArray*
+    Keys(Hash *self);
+
+    /** Return an VArray of pointers to the hash's values.
+     */
+    incremented VArray*
+    Values(Hash *self);
+
+    /** Create a key to be stored within the hash entry.  Implementations must
+     * supply an object which produces the same Hash_Sum() value and tests
+     * true for Equals().  By default, calls Clone().
+     */
+    public incremented Obj*
+    Make_Key(Hash *self, Obj *key, int32_t hash_sum);
+
+    uint32_t
+    Get_Capacity(Hash *self);
+
+    /** Accessor for Hash's "size" member.
+     *
+     * @return the number of key-value pairs.
+     */
+    public uint32_t
+    Get_Size(Hash *self);
+
+    public bool_t
+    Equals(Hash *self, Obj *other);
+
+    public incremented Hash*
+    Dump(Hash *self);
+
+    public incremented Obj*
+    Load(Hash *self, Obj *dump);
+
+    public void
+    Serialize(Hash *self, OutStream *outstream);
+
+    public incremented Hash*
+    Deserialize(decremented Hash *self, InStream *instream);
+
+    public void
+    Destroy(Hash *self);
+}
+
+class Clownfish::Hash::HashTombStone
+    inherits Clownfish::Obj {
+
+    uint32_t
+    Get_RefCount(HashTombStone* self);
+
+    incremented HashTombStone*
+    Inc_RefCount(HashTombStone* self);
+
+    uint32_t
+    Dec_RefCount(HashTombStone* self);
+}
+
+
