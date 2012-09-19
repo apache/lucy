@@ -29,8 +29,6 @@
 #include "Clownfish/CharBuf.h"
 
 #include "Clownfish/Err.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
 
@@ -447,25 +445,6 @@ CB_load(CharBuf *self, Obj *dump) {
     CharBuf *source = (CharBuf*)CERTIFY(dump, CHARBUF);
     UNUSED_VAR(self);
     return CB_Clone(source);
-}
-
-void
-CB_serialize(CharBuf *self, OutStream *target) {
-    OutStream_Write_C32(target, self->size);
-    OutStream_Write_Bytes(target, self->ptr, self->size);
-}
-
-CharBuf*
-CB_deserialize(CharBuf *self, InStream *instream) {
-    size_t size = InStream_Read_C32(instream);
-    if (size >= self->cap) { S_grow(self, size); }
-    InStream_Read_Bytes(instream, self->ptr, size);
-    self->size = size;
-    self->ptr[size] = '\0';
-    if (!StrHelp_utf8_valid(self->ptr, size)) {
-        DIE_INVALID_UTF8(self->ptr, size);
-    }
-    return self;
 }
 
 void

@@ -30,8 +30,6 @@
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 
 Num*
 Num_init(Num *self) {
@@ -146,17 +144,6 @@ Float32_mimic(Float32 *self, Obj *other) {
     self->value = twin->value;
 }
 
-void
-Float32_serialize(Float32 *self, OutStream *outstream) {
-    OutStream_Write_F32(outstream, self->value);
-}
-
-Float32*
-Float32_deserialize(Float32 *self, InStream *instream) {
-    float value = InStream_Read_F32(instream);
-    return Float32_init(self, value);
-}
-
 /***************************************************************************/
 
 Float64*
@@ -208,17 +195,6 @@ Float64_hash_sum(Float64 *self) {
     return ints[0] ^ ints[1];
 }
 
-void
-Float64_serialize(Float64 *self, OutStream *outstream) {
-    OutStream_Write_F64(outstream, self->value);
-}
-
-Float64*
-Float64_deserialize(Float64 *self, InStream *instream) {
-    double value = InStream_Read_F64(instream);
-    return Float64_init(self, value);
-}
-
 /***************************************************************************/
 
 Integer32*
@@ -267,17 +243,6 @@ Int32_mimic(Integer32 *self, Obj *other) {
 int32_t
 Int32_hash_sum(Integer32 *self) {
     return self->value;
-}
-
-void
-Int32_serialize(Integer32 *self, OutStream *outstream) {
-    OutStream_Write_C32(outstream, (uint32_t)self->value);
-}
-
-Integer32*
-Int32_deserialize(Integer32 *self, InStream *instream) {
-    int32_t value = (int32_t)InStream_Read_C32(instream);
-    return Int32_init(self, value);
 }
 
 /***************************************************************************/
@@ -348,17 +313,6 @@ Int64_equals(Integer64 *self, Obj *other) {
     return true;
 }
 
-void
-Int64_serialize(Integer64 *self, OutStream *outstream) {
-    OutStream_Write_C64(outstream, (uint64_t)self->value);
-}
-
-Integer64*
-Int64_deserialize(Integer64 *self, InStream *instream) {
-    int64_t value = (int64_t)InStream_Read_C64(instream);
-    return Int64_init(self, value);
-}
-
 /***************************************************************************/
 
 
@@ -426,22 +380,6 @@ Bool_to_string(BoolNum *self) {
 bool_t
 Bool_equals(BoolNum *self, Obj *other) {
     return self == (BoolNum*)other;
-}
-
-void
-Bool_serialize(BoolNum *self, OutStream *outstream) {
-    OutStream_Write_U8(outstream, (uint8_t)self->value);
-}
-
-BoolNum*
-Bool_deserialize(BoolNum *self, InStream *instream) {
-    bool_t value = (bool_t)InStream_Read_U8(instream);
-    if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
-        Bool_Dec_RefCount_t super_decref
-            = SUPER_METHOD_PTR(BOOLNUM, Lucy_Bool_Dec_RefCount);
-        super_decref(self);
-    }
-    return value ? CFISH_TRUE : CFISH_FALSE;
 }
 
 BoolNum*

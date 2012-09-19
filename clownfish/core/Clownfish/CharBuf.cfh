@@ -235,12 +235,6 @@ class Clownfish::CharBuf cnick CB
     public incremented CharBuf*
     Load(CharBuf *self, Obj *dump);
 
-    public void
-    Serialize(CharBuf *self, OutStream *outstream);
-
-    public incremented CharBuf*
-    Deserialize(decremented CharBuf *self, InStream *instream);
-
     /** Remove Unicode whitespace characters from both top and tail.
      */
     uint32_t

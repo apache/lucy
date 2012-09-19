@@ -86,12 +86,6 @@ class Clownfish::Float32 inherits Clownfish::FloatNum {
     public int32_t
     Hash_Sum(Float32 *self);
 
-    public void
-    Serialize(Float32 *self, OutStream *outstream);
-
-    public incremented Float32*
-    Deserialize(decremented Float32 *self, InStream *instream);
-
     public incremented Float32*
     Clone(Float32 *self);
 
@@ -128,12 +122,6 @@ class Clownfish::Float64 inherits Clownfish::FloatNum {
 
     public int32_t
     Hash_Sum(Float64 *self);
-
-    public void
-    Serialize(Float64 *self, OutStream *outstream);
-
-    public incremented Float64*
-    Deserialize(decremented Float64 *self, InStream *instream);
 
     public incremented Float64*
     Clone(Float64 *self);
@@ -172,12 +160,6 @@ class Clownfish::Integer32 cnick Int32
 
     public int32_t
     Hash_Sum(Integer32 *self);
-
-    public void
-    Serialize(Integer32 *self, OutStream *outstream);
-
-    public incremented Integer32*
-    Deserialize(decremented Integer32 *self, InStream *instream);
 
     public incremented Integer32*
     Clone(Integer32 *self);
@@ -220,12 +202,6 @@ class Clownfish::Integer64 cnick Int64
 
     public bool_t
     Equals(Integer64 *self, Obj *other);
-
-    public void
-    Serialize(Integer64 *self, OutStream *outstream);
-
-    public incremented Integer64*
-    Deserialize(decremented Integer64 *self, InStream *instream);
 
     public incremented Integer64*
     Clone(Integer64 *self);
@@ -274,12 +250,6 @@ class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
 
     public int32_t
     Hash_Sum(BoolNum *self);
-
-    public void
-    Serialize(BoolNum *self, OutStream *outstream);
-
-    public incremented BoolNum*
-    Deserialize(decremented BoolNum *self, InStream *instream);
 
     /* Returns self. */
     public incremented BoolNum*

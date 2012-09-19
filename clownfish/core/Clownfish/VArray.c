@@ -25,10 +25,7 @@
 #include "Clownfish/VArray.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
-#include "Lucy/Util/Freezer.h"
 #include "Clownfish/Util/SortUtils.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 
 VArray*
 VA_new(uint32_t capacity) {
@@ -88,37 +85,6 @@ VA_load(VArray *self, Obj *dump) {
     }
 
     return loaded;
-}
-
-void
-VA_serialize(VArray *self, OutStream *outstream) {
-    uint32_t last_valid_tick = 0;
-    OutStream_Write_C32(outstream, self->size);
-    for (uint32_t i = 0; i < self->size; i++) {
-        Obj *elem = self->elems[i];
-        if (elem) {
-            OutStream_Write_C32(outstream, i - last_valid_tick);
-            FREEZE(elem, outstream);
-            last_valid_tick = i;
-        }
-    }
-    // Terminate.
-    OutStream_Write_C32(outstream, self->size - last_valid_tick);
-}
-
-VArray*
-VA_deserialize(VArray *self, InStream *instream) {
-    uint32_t size = InStream_Read_C32(instream);
-    VA_Grow(self, size);
-    for (uint32_t tick = InStream_Read_C32(instream);
-         tick < size;
-         tick += InStream_Read_C32(instream)
-        ) {
-        Obj *obj = THAW(instream);
-        self->elems[tick] = obj;
-    }
-    self->size = size;
-    return self;
 }
 
 VArray*

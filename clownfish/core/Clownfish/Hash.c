@@ -28,9 +28,6 @@
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VArray.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/Freezer.h"
 #include "Clownfish/Util/Memory.h"
 
 static HashTombStone *TOMBSTONE;
@@ -166,69 +163,6 @@ Hash_load(Hash *self, Obj *dump) {
 
     return (Obj*)loaded;
 
-}
-
-void
-Hash_serialize(Hash *self, OutStream *outstream) {
-    Obj *key;
-    Obj *val;
-    uint32_t charbuf_count = 0;
-    OutStream_Write_C32(outstream, self->size);
-
-    // Write CharBuf keys first.  CharBuf keys are the common case; grouping
-    // them together is a form of run-length-encoding and saves space, since
-    // we omit the per-key class name.
-    Hash_Iterate(self);
-    while (Hash_Next(self, &key, &val)) {
-        if (Obj_Is_A(key, CHARBUF)) { charbuf_count++; }
-    }
-    OutStream_Write_C32(outstream, charbuf_count);
-    Hash_Iterate(self);
-    while (Hash_Next(self, &key, &val)) {
-        if (Obj_Is_A(key, CHARBUF)) {
-            Obj_Serialize(key, outstream);
-            FREEZE(val, outstream);
-        }
-    }
-
-    // Punt on the classes of the remaining keys.
-    Hash_Iterate(self);
-    while (Hash_Next(self, &key, &val)) {
-        if (!Obj_Is_A(key, CHARBUF)) {
-            FREEZE(key, outstream);
-            FREEZE(val, outstream);
-        }
-    }
-}
-
-Hash*
-Hash_deserialize(Hash *self, InStream *instream) {
-    uint32_t size         = InStream_Read_C32(instream);
-    uint32_t num_charbufs = InStream_Read_C32(instream);
-    uint32_t num_other    = size - num_charbufs;
-    CharBuf *key          = num_charbufs ? CB_new(0) : NULL;
-
-    Hash_init(self, size);
-
-    // Read key-value pairs with CharBuf keys.
-    while (num_charbufs--) {
-        uint32_t len = InStream_Read_C32(instream);
-        char *key_buf = CB_Grow(key, len);
-        InStream_Read_Bytes(instream, key_buf, len);
-        key_buf[len] = '\0';
-        CB_Set_Size(key, len);
-        Hash_Store(self, (Obj*)key, THAW(instream));
-    }
-    DECREF(key);
-
-    // Read remaining key/value pairs.
-    while (num_other--) {
-        Obj *k = THAW(instream);
-        Hash_Store(self, k, THAW(instream));
-        DECREF(k);
-    }
-
-    return self;
 }
 
 void
