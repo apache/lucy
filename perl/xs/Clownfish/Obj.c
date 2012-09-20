@@ -25,7 +25,7 @@
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 static void
 S_lazy_init_host_obj(lucy_Obj *self) {

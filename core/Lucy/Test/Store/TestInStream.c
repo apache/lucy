@@ -28,7 +28,7 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Store/RAMFileHandle.h"
-#include "Lucy/Util/NumberUtils.h"
+#include "Clownfish/Util/NumberUtils.h"
 
 static void
 test_refill(TestBatch *batch) {

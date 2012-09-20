@@ -32,8 +32,8 @@
 #include "Clownfish/Method.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/VArray.h"
-#include "Lucy/Util/Atomic.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Atomic.h"
+#include "Clownfish/Util/Memory.h"
 
 size_t VTable_offset_of_parent = offsetof(VTable, parent);
 

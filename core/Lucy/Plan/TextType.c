@@ -21,7 +21,7 @@
 #include "Lucy/Plan/TextType.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 
 CharBuf*
 TextType_make_blank(TextType *self) {

@@ -25,7 +25,7 @@
 #include "Lucy/Search/SortRule.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/SortUtils.h"
+#include "Clownfish/Util/SortUtils.h"
 
 SortSpec*
 SortSpec_new(VArray *rules) {

@@ -17,7 +17,7 @@
 parcel Lucy;
 
 __C__
-#include "Lucy/Util/SortUtils.h"
+#include "Clownfish/Util/SortUtils.h"
 
 typedef chy_bool_t
 (*Lucy_VA_Gather_Test_t)(lucy_VArray *self, uint32_t tick, void *data);

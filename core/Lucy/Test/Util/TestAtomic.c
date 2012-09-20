@@ -18,7 +18,7 @@
 
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestAtomic.h"
-#include "Lucy/Util/Atomic.h"
+#include "Clownfish/Util/Atomic.h"
 
 static void
 test_cas_ptr(TestBatch *batch) {

@@ -27,7 +27,7 @@
 #include "Clownfish/Err.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 Err*
 Err_new(CharBuf *mess) {

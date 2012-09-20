@@ -29,7 +29,7 @@
 #include "Clownfish/Err.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 static void
 S_grow(ByteBuf *self, size_t size);

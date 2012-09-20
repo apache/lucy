@@ -20,7 +20,7 @@
 
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Analysis/Token.h"
-#include "Lucy/Util/SortUtils.h"
+#include "Clownfish/Util/SortUtils.h"
 
 #ifndef SIZE_MAX
   #define SIZE_MAX ((size_t)-1)

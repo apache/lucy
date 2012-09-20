@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-inert class Lucy::Util::StringHelper cnick StrHelp {
+inert class Clownfish::Util::StringHelper cnick StrHelp {
 
     /* A table where the values indicate the number of bytes in a UTF-8
      * sequence implied by the leading utf8 byte.

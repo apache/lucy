@@ -21,7 +21,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 
 TermStepper*
 TermStepper_init(TermStepper *self) {

@@ -22,7 +22,7 @@
 #include "Clownfish/Host.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 static SV*
 S_do_callback_sv(void *vobj, const char *method, uint32_t num_args,

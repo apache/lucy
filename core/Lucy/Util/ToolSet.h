@@ -46,9 +46,9 @@ extern "C" {
 #include "Clownfish/Num.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Util/NumberUtils.h"
-#include "Lucy/Util/Memory.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/NumberUtils.h"
+#include "Clownfish/Util/Memory.h"
+#include "Clownfish/Util/StringHelper.h"
 
 #ifdef __cplusplus
 }

@@ -24,7 +24,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 
 CompoundFileReader*
 CFReader_open(Folder *folder) {

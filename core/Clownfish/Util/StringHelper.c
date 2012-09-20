@@ -20,9 +20,9 @@
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 #include "Clownfish/Err.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 const uint8_t lucy_StrHelp_UTF8_COUNT[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

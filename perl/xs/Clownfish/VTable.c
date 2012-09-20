@@ -20,7 +20,7 @@
 
 #include "Clownfish/VTable.h"
 #include "Clownfish/Host.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 lucy_Obj*
 lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj) {

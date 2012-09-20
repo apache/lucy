@@ -19,7 +19,7 @@ parcel Lucy;
 __C__
 #include <stddef.h>
 #include "Clownfish/Obj.h"
-#include "Lucy/Util/SortUtils.h"
+#include "Clownfish/Util/SortUtils.h"
 
 #define LUCY_SORTEX_DEFAULT_MEM_THRESHOLD 0x1000000
 #ifdef LUCY_USE_SHORT_NAMES

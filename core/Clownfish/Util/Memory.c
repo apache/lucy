@@ -19,7 +19,7 @@
 #include <stdio.h>
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 void*
 Memory_wrapped_malloc(size_t count) {

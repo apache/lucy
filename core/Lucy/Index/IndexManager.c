@@ -29,7 +29,7 @@
 #include "Lucy/Store/LockFactory.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 
 IndexManager*
 IxManager_new(const CharBuf *host, LockFactory *lock_factory) {

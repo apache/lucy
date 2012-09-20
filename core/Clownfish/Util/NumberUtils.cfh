@@ -21,7 +21,7 @@ parcel Lucy;
  * Provide utilities for dealing with endian issues, sub-byte-width arrays,
  * compressed integers, and so on.
  */
-inert class Lucy::Util::NumberUtils cnick NumUtil {
+inert class Clownfish::Util::NumberUtils cnick NumUtil {
 
     inert const uint8_t[8] u1masks;
     inert const uint8_t[4] u2masks;

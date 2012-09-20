@@ -19,7 +19,7 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestStringHelper.h"
 #include "Lucy/Test/TestUtils.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 #include "utf8proc.h"
 #include "Lucy/Util/Json.h"
 

@@ -26,7 +26,7 @@
 #include "Lucy/Plan/NumericType.h"
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Plan/TextType.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 
 static lucy_InverterEntry*
 S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {

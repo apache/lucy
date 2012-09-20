@@ -22,8 +22,8 @@
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Clownfish/Host.h"
-#include "Lucy/Util/Memory.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/Memory.h"
+#include "Clownfish/Util/StringHelper.h"
 
 static void
 S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re);

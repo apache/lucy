@@ -19,7 +19,7 @@
 #define CHY_USE_SHORT_NAMES
 
 #include <string.h>
-#include "Lucy/Util/SortUtils.h"
+#include "Clownfish/Util/SortUtils.h"
 #include "Clownfish/Err.h"
 
 // Define four-byte and eight-byte types so that we can dereference void

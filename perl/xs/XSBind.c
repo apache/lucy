@@ -17,8 +17,8 @@
 #define C_LUCY_OBJ
 #define NEED_newRV_noinc
 #include "XSBind.h"
-#include "Lucy/Util/StringHelper.h"
-#include "Lucy/Util/NumberUtils.h"
+#include "Clownfish/Util/StringHelper.h"
+#include "Clownfish/Util/NumberUtils.h"
 
 // Convert a Perl hash into a Clownfish Hash.  Caller takes responsibility for
 // a refcount.

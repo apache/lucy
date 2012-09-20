@@ -22,7 +22,7 @@
 #include "Lucy/Index/PostingList.h"
 #include "Lucy/Index/Lexicon.h"
 #include "Lucy/Index/Posting.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 PostingList*
 PList_init(PostingList *self) {

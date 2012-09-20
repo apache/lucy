@@ -16,7 +16,7 @@
 
 #define C_LUCY_ATOMIC
 #define LUCY_USE_SHORT_NAMES
-#include "Lucy/Util/Atomic.h"
+#include "Clownfish/Util/Atomic.h"
 
 /********************************** Windows ********************************/
 #ifdef CHY_HAS_WINDOWS_H

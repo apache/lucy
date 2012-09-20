@@ -22,7 +22,7 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Util/TestNumberUtils.h"
-#include "Lucy/Util/NumberUtils.h"
+#include "Clownfish/Util/NumberUtils.h"
 
 static void
 test_u1(TestBatch *batch) {

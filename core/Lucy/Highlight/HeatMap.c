@@ -20,7 +20,7 @@
 
 #include "Lucy/Highlight/HeatMap.h"
 #include "Lucy/Search/Span.h"
-#include "Lucy/Util/SortUtils.h"
+#include "Clownfish/Util/SortUtils.h"
 
 HeatMap*
 HeatMap_new(VArray *spans, uint32_t window) {

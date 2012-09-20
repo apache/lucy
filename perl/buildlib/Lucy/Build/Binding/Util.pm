@@ -189,7 +189,7 @@ sub bind_stepper {
 
 sub bind_stringhelper {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Util::StringHelper
+MODULE = Lucy   PACKAGE = Clownfish::Util::StringHelper
 
 =for comment 
 
@@ -281,7 +281,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
-        class_name => "Lucy::Util::StringHelper",
+        class_name => "Clownfish::Util::StringHelper",
     );
     $binding->append_xs($xs_code);
 

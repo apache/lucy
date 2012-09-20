@@ -31,7 +31,7 @@
 #include "Lucy/Store/Lock.h"
 #include "Lucy/Util/Json.h"
 #include "Lucy/Util/IndexFileNames.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 
 // Obtain/release read locks and commit locks.
 static bool_t

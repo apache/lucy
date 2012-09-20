@@ -20,7 +20,7 @@
 #include "Clownfish/Host.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 lucy_Doc*
 lucy_Doc_init(lucy_Doc *self, void *fields, int32_t doc_id) {

@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-inert class Lucy::Util::Memory {
+inert class Clownfish::Util::Memory {
 
     /** Attempt to allocate memory with malloc, but print an error and exit if the
      * call fails.

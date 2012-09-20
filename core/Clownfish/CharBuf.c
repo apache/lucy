@@ -31,8 +31,8 @@
 #include "Clownfish/Err.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/Memory.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/Memory.h"
+#include "Clownfish/Util/StringHelper.h"
 
 // Helper function for throwing invalid UTF-8 error. Since THROW uses
 // a CharBuf internally, calling THROW with invalid UTF-8 would create an

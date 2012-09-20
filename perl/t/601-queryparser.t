@@ -77,7 +77,7 @@ sub make_req_opt_query { shift; MyReqOptQuery->new(@_) }
 
 package main;
 use Test::More tests => 224;
-use Lucy::Util::StringHelper qw( utf8_flag_on utf8ify );
+use Clownfish::Util::StringHelper qw( utf8_flag_on utf8ify );
 use Lucy::Test::TestUtils qw( create_index );
 
 my $folder       = Lucy::Store::RAMFolder->new;

@@ -21,8 +21,8 @@
 #include "Clownfish/LockFreeRegistry.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Util/Atomic.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Atomic.h"
+#include "Clownfish/Util/Memory.h"
 
 typedef struct lucy_LFRegEntry {
     Obj *key;

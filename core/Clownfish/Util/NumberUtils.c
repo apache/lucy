@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#include "Lucy/Util/NumberUtils.h"
+#include "Clownfish/Util/NumberUtils.h"
 
 const uint8_t NumUtil_u1masks[8] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80

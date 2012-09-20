@@ -62,7 +62,7 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Lucy::Util::StringHelper;
+    package Clownfish::Util::StringHelper;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     BEGIN {

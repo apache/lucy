@@ -30,7 +30,7 @@
 #include "Clownfish/VTable.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 
 Obj*
 Obj_init(Obj *self) {

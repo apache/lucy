@@ -28,7 +28,7 @@
 #include "Lucy/Index/TermInfo.h"
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/StringHelper.h"
+#include "Clownfish/Util/StringHelper.h"
 
 RawPosting*
 RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,

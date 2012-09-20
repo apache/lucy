@@ -32,9 +32,9 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Lucy/Util/Memory.h"
+#include "Clownfish/Util/Memory.h"
 #include "Lucy/Util/MemoryPool.h"
-#include "Lucy/Util/SortUtils.h"
+#include "Clownfish/Util/SortUtils.h"
 
 int32_t SortWriter_current_file_format = 3;
 
