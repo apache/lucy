@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-package Lucy;
+package Clownfish;
 
 use 5.008003;
 use Exporter;
@@ -33,33 +33,12 @@ BEGIN {
     require DynaLoader;
     our @ISA = qw( DynaLoader Exporter );
     # This loads a large number of disparate subs.
-    bootstrap Lucy '0.3.0';
+    bootstrap Clownfish '0.3.0';
     _init_autobindings();
     our @EXPORT_OK = qw( to_clownfish to_perl kdump );
 }
 
-sub kdump {
-    require Data::Dumper;
-    my $kdumper = Data::Dumper->new( [@_] );
-    $kdumper->Sortkeys( sub { return [ sort keys %{ $_[0] } ] } );
-    $kdumper->Indent(1);
-    warn $kdumper->Dump;
-}
-
 sub error {$Clownfish::Err::error}
-
-{
-    package Lucy::Util::IndexFileNames;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    BEGIN {
-        push our @ISA, 'Exporter';
-        our @EXPORT_OK = qw(
-            extract_gen
-            latest_snapshot
-        );
-    }
-}
 
 {
     package Clownfish::Util::StringHelper;
@@ -80,55 +59,6 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    # Temporary back compat.
-    package Lucy::Object::Obj;
-    BEGIN { our @ISA = qw( Clownfish::Obj ) }
-}
-
-{
-    package Lucy::Analysis::RegexTokenizer;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    sub compile_token_re { return qr/$_[1]/ }
-
-    sub new {
-        my ( $either, %args ) = @_;
-        my $token_re = delete $args{token_re};
-        $args{pattern} = "$token_re" if $token_re;
-        return $either->_new(%args);
-    }
-}
-
-{
-    package Lucy::Document::Doc;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Storable qw( nfreeze thaw );
-    use bytes;
-    no bytes;
-
-    use overload
-        fallback => 1,
-        '%{}'    => \&get_fields;
-
-    sub serialize_fields {
-        my ( $self, $outstream ) = @_;
-        my $buf = nfreeze( $self->get_fields );
-        $outstream->write_c32( bytes::length($buf) );
-        $outstream->print($buf);
-    }
-
-    sub deserialize_fields {
-        my ( $self, $instream ) = @_;
-        my $len = $instream->read_c32;
-        my $buf;
-        $instream->read( $buf, $len );
-        $self->set_fields( thaw($buf) );
-    }
-}
-
-{
     package Clownfish::LockFreeRegistry;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
@@ -140,7 +70,7 @@ sub error {$Clownfish::Err::error}
     package Clownfish::Obj;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
-    use Lucy qw( to_clownfish to_perl );
+    use Clownfish qw( to_clownfish to_perl );
     sub load { return $_[0]->_load( to_clownfish( $_[1] ) ) }
 }
 
@@ -184,115 +114,6 @@ sub error {$Clownfish::Err::error}
 
     no warnings 'redefine';
     sub DESTROY { }    # leak all
-}
-
-{
-    package Lucy::Index::Indexer;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    sub new {
-        my ( $either, %args ) = @_;
-        my $flags = 0;
-        $flags |= CREATE   if delete $args{'create'};
-        $flags |= TRUNCATE if delete $args{'truncate'};
-        return $either->_new( %args, flags => $flags );
-    }
-}
-
-{
-    package Lucy::Index::IndexReader;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Carp;
-
-    sub new {
-        confess(
-            "IndexReader is an abstract class; use open() instead of new()");
-    }
-    sub lexicon {
-        my $self       = shift;
-        my $lex_reader = $self->fetch("Lucy::Index::LexiconReader");
-        return $lex_reader->lexicon(@_) if $lex_reader;
-        return;
-    }
-    sub posting_list {
-        my $self         = shift;
-        my $plist_reader = $self->fetch("Lucy::Index::PostingListReader");
-        return $plist_reader->posting_list(@_) if $plist_reader;
-        return;
-    }
-    sub offsets { shift->_offsets->to_arrayref }
-}
-
-{
-    package Lucy::Index::Segment;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Lucy qw( to_clownfish );
-    sub store_metadata {
-        my ( $self, %args ) = @_;
-        $self->_store_metadata( %args,
-            metadata => to_clownfish( $args{metadata} ) );
-    }
-}
-
-{
-    package Lucy::Search::Compiler;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Carp;
-    use Scalar::Util qw( blessed );
-
-    sub new {
-        my ( $either, %args ) = @_;
-        if ( !defined $args{boost} ) {
-            confess("'parent' is not a Query")
-                unless ( blessed( $args{parent} )
-                and $args{parent}->isa("Lucy::Search::Query") );
-            $args{boost} = $args{parent}->get_boost;
-        }
-        return $either->do_new(%args);
-    }
-}
-
-{
-    package Lucy::Search::Query;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    sub make_compiler {
-        my ( $self, %args ) = @_;
-        $args{boost} = $self->get_boost unless defined $args{boost};
-        return $self->_make_compiler(%args);
-    }
-}
-
-{
-    package Lucy::Search::SortRule;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Carp;
-
-    my %types = (
-        field  => FIELD(),
-        score  => SCORE(),
-        doc_id => DOC_ID(),
-    );
-
-    sub new {
-        my ( $either, %args ) = @_;
-        my $type = delete $args{type} || 'field';
-        confess("Invalid type: '$type'") unless defined $types{$type};
-        return $either->_new( %args, type => $types{$type} );
-    }
-}
-
-{
-    package Lucy::Object::BitVector;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    sub to_arrayref { shift->to_array->to_arrayref }
 }
 
 {
@@ -405,86 +226,6 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Lucy::Store::FileHandle;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    BEGIN {
-        push our @ISA, 'Exporter';
-        our @EXPORT_OK = qw( build_fh_flags );
-    }
-
-    sub build_fh_flags {
-        my $args  = shift;
-        my $flags = 0;
-        $flags |= FH_CREATE     if delete $args->{create};
-        $flags |= FH_READ_ONLY  if delete $args->{read_only};
-        $flags |= FH_WRITE_ONLY if delete $args->{write_only};
-        $flags |= FH_EXCLUSIVE  if delete $args->{exclusive};
-        return $flags;
-    }
-
-    sub open {
-        my ( $either, %args ) = @_;
-        $args{flags} ||= 0;
-        $args{flags} |= build_fh_flags( \%args );
-        return $either->_open(%args);
-    }
-}
-
-{
-    package Lucy::Store::FSFileHandle;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    sub open {
-        my ( $either, %args ) = @_;
-        $args{flags} ||= 0;
-        $args{flags} |= Lucy::Store::FileHandle::build_fh_flags( \%args );
-        return $either->_open(%args);
-    }
-}
-
-{
-    package Lucy::Store::FSFolder;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use File::Spec::Functions qw( rel2abs );
-    sub absolutify { return rel2abs( $_[1] ) }
-}
-
-{
-    package Lucy::Store::RAMFileHandle;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    sub open {
-        my ( $either, %args ) = @_;
-        $args{flags} ||= 0;
-        $args{flags} |= Lucy::Store::FileHandle::build_fh_flags( \%args );
-        return $either->_open(%args);
-    }
-}
-
-{
-    package Lucy::Util::Debug;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    BEGIN {
-        push our @ISA, 'Exporter';
-        our @EXPORT_OK = qw(
-            DEBUG
-            DEBUG_PRINT
-            DEBUG_ENABLED
-            ASSERT
-            set_env_cache
-            num_allocated
-            num_freed
-            num_globals
-        );
-    }
-}
-
-{
     package Clownfish::Host;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
@@ -496,7 +237,4 @@ sub error {$Clownfish::Err::error}
 }
 
 1;
-
-__END__
-
 
