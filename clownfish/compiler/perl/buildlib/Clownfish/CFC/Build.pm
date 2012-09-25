@@ -22,8 +22,9 @@ use base qw( Module::Build );
 use File::Spec::Functions qw( catfile updir catdir );
 use Config;
 use Cwd qw( getcwd );
+use Carp;
 
-my $base_dir = catdir( updir(), updir() );
+my $base_dir = catdir( updir(), updir(), updir() );
 my $PPPORT_H_PATH = catfile( updir(), qw( include ppport.h ) );
 my $LEMON_DIR = catdir( $base_dir, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
