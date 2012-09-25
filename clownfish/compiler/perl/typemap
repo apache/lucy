@@ -1,0 +1,154 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+TYPEMAP
+CFCBase*	CLOWNFISH_TYPE
+CFCCBlock*	CLOWNFISH_MODEL
+CFCClass*	CLOWNFISH_MODEL
+CFCDocuComment*	CLOWNFISH_MODEL
+CFCDumpable*	CLOWNFISH_TYPE
+CFCFile*	CLOWNFISH_MODEL
+CFCFileSpec*	CLOWNFISH_MODEL
+CFCFunction*	CLOWNFISH_MODEL
+CFCHierarchy*	CLOWNFISH_MODEL
+CFCMethod*	CLOWNFISH_MODEL
+CFCMemPool*	CLOWNFISH_TYPE
+CFCParamList*	CLOWNFISH_MODEL
+CFCParcel*	CLOWNFISH_MODEL
+CFCParser*	CLOWNFISH_TYPE
+CFCSymbol*	CLOWNFISH_MODEL
+CFCType*	CLOWNFISH_MODEL
+CFCVariable*	CLOWNFISH_MODEL
+CFCVersion*	CLOWNFISH_MODEL
+CFCBindCore*	CLOWNFISH_BINDING_CORE
+CFCBindClass*	CLOWNFISH_BINDING_CORE_TYPE
+CFCPerl*	CLOWNFISH_BINDING_PERL
+CFCPerlSub*	CLOWNFISH_BINDING_PERL_SUBROUTINE
+CFCPerlClass*	CLOWNFISH_BINDING_PERL_COMMON
+CFCPerlConstructor*	CLOWNFISH_BINDING_PERL_COMMON
+CFCPerlMethod*	CLOWNFISH_BINDING_PERL_COMMON
+CFCPerlPod*	CLOWNFISH_BINDING_PERL_COMMON
+
+INPUT
+
+CLOWNFISH_MODEL
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::Model::$1/;\$t}\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a ${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::Model::$1/;\$t}\");
+	}
+
+CLOWNFISH_TYPE
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::$1/;\$t}\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a ${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::$1/;\$t}\");
+	}
+
+CLOWNFISH_BINDING_CORE
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"Clownfish::CFC::Binding::Core\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a Clownfish::CFC::Binding::Core\");
+	}
+
+CLOWNFISH_BINDING_CORE_TYPE
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"${(my $t = $type) =~ s/CFCBind(\w+).*/Clownfish::CFC::Binding::Core::$1/;\$t}\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a ${(my $t = $type) =~ s/CFCBind(\w+).*/Clownfish::CFC::Binding::Core::$1/;\$t}\");
+	}
+
+CLOWNFISH_BINDING_PERL
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"Clownfish::CFC::Binding::Perl\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a Clownfish::CFC::Binding::Perl\");
+	}
+
+
+CLOWNFISH_BINDING_PERL_SUBROUTINE
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"Clownfish::CFC::Binding::Perl::Subroutine\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a Clownfish::CFC::Binding::Perl::Subroutine\");
+	}
+
+CLOWNFISH_BINDING_PERL_COMMON
+	if (!SvOK($arg)) {
+        $var = NULL;
+    }
+	else if (sv_derived_from($arg, \"${(my $t = $type) =~ s/CFCPerl(\w+).*/Clownfish::CFC::Binding::Perl::$1/;\$t}\")) {
+		IV objint = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, objint);
+	}
+    else {
+		croak(\"Not a ${(my $t = $type) =~ s/CFCPerl(\w+).*/Clownfish::CFC::Binding::Perl::$1/;\$t}\");
+	}
+
+
+OUTPUT
+
+CLOWNFISH_MODEL
+	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::Model::$1/;\$t}\", (void*)$var);
+
+CLOWNFISH_TYPE
+	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFC(\w+).*/Clownfish::CFC::$1/;\$t}\", (void*)$var);
+
+CLOWNFISH_BINDING_CORE
+	sv_setref_pv($arg, \"Clownfish::CFC::Binding::Core\", (void*)$var);
+
+CLOWNFISH_BINDING_CORE_TYPE
+	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFCBind(\w+).*/Clownfish::CFC::Binding::Core::$1/;\$t}\", (void*)$var);
+
+CLOWNFISH_BINDING_PERL
+	sv_setref_pv($arg, \"Clownfish::CFC::Binding::Perl\", (void*)$var);
+
+CLOWNFISH_BINDING_PERL_COMMON
+	sv_setref_pv($arg, \"${(my $t = $type) =~ s/CFCPerl(\w+).*/Clownfish::CFC::Binding::Perl::$1/;\$t}\", (void*)$var);
+
+CLOWNFISH_BINDING_PERL_SUBROUTINE
+	sv_setref_pv($arg, \"Clownfish::CFC::Binding::Perl::Subroutine\", (void*)$var);
+
