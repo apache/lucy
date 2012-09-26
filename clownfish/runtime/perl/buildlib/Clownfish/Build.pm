@@ -48,8 +48,6 @@ my $CHARMONIZER_ORIG_DIR
 my $CHARMONIZE_EXE_PATH  = "charmonize$Config{_exe}";
 my $CHARMONY_H_PATH      = 'charmony.h';
 my $CHARMONY_PM_PATH     = 'Charmony.pm';
-my $LEMON_DIR      = catdir( @BASE_PATH, updir(), updir(), 'lemon' );
-my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
 my $CFC_DIR = catdir( @BASE_PATH, updir(), 'compiler', 'perl' );
 my $CFC_BUILD  = catfile( $CFC_DIR, 'Build' );
@@ -177,16 +175,6 @@ sub ACTION_charmonizer_tests {
     $self->_run_make(
         dir  => $CHARMONIZER_ORIG_DIR,
         args => [ "DEFS=$flags", "tests" ],
-    );
-}
-
-# Build the Lemon parser generator.
-sub ACTION_lemon {
-    my $self = shift;
-    print "Building the Lemon parser generator...\n\n";
-    $self->_run_make(
-        dir  => $LEMON_DIR,
-        args => [],
     );
 }
 
@@ -339,30 +327,6 @@ sub ACTION_test_valgrind {
     }
 }
 
-# Run all .y files through lemon.
-sub ACTION_parsers {
-    my $self = shift;
-    $self->dispatch('lemon');
-    my $y_files = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.y$/ );
-    for my $y_file (@$y_files) {
-        my $c_file = $y_file;
-        my $h_file = $y_file;
-        $c_file =~ s/\.y$/.c/ or die "no match";
-        $h_file =~ s/\.y$/.h/ or die "no match";
-        next if $self->up_to_date( $y_file, [ $c_file, $h_file ] );
-        $self->add_to_cleanup( $c_file, $h_file );
-        system( $LEMON_EXE_PATH, '-q', $y_file ) and die "lemon failed";
-    }
-}
-
-sub ACTION_compile_custom_xs {
-    my $self = shift;
-
-    $self->dispatch('parsers');
-
-    $self->SUPER::ACTION_compile_custom_xs;
-}
-
 sub autogen_header {
     my $self = shift;
     return <<"END_AUTOGEN";
@@ -393,135 +357,6 @@ sub autogen_header {
 END_AUTOGEN
 }
 
-sub _check_module_build_for_dist {
-    eval "use Module::Build 0.38;";
-    die "./Build dist reqiures Module::Build 0.38 or higher--this is only "
-        . Module::Build->VERSION . $/ if $@;
-}
-
-sub ACTION_distdir {
-    _check_module_build_for_dist;
-    shift->SUPER::ACTION_distdir(@_);
-}
-
-sub ACTION_dist {
-    my $self = shift;
-    _check_module_build_for_dist;
-
-    # Create POD but make sure not to include build artifacts.
-    $self->dispatch('pod');
-    _clean_prereq_builds($self);
-
-    # We build our Perl release tarball from $REPOS_ROOT/perl, rather than
-    # from the top-level.
-    #
-    # Because some items we need are outside this directory, we need to copy a
-    # bunch of stuff.  After the tarball is packaged up, we delete the copied
-    # directories.
-    my @items_to_copy = qw(
-        core
-        modules
-        charmonizer
-        devel
-        clownfish
-        lemon
-        CHANGES
-        CONTRIBUTING
-        LICENSE
-        NOTICE
-        README
-    );
-    print "Copying files...\n";
-
-    for my $item (@items_to_copy) {
-        confess("'$item' already exists") if -e $item;
-        system("cp -R ../$item $item");
-    }
-
-    $self->dispatch('manifest');
-    my $no_index = $self->_gen_pause_exclusion_list;
-    my $meta_add = $self->meta_add || {};
-    $meta_add->{no_index} = $no_index;
-    $self->meta_add( $meta_add );
-    $self->SUPER::ACTION_dist;
-
-    # Clean up.
-    print "Removing copied files...\n";
-    rmtree($_) for @items_to_copy;
-    unlink("META.yml");
-    move( "MANIFEST.bak", "MANIFEST" ) or die "move() failed: $!";
-}
-
-sub ACTION_distmeta {
-    my $self = shift;
-    $self->SUPER::ACTION_distmeta(@_);
-    # Make sure everything has a version.
-    require CPAN::Meta;
-    my $v = version->new($self->dist_version);
-    my $meta = CPAN::Meta->load_file('META.json');
-    my $provides = $meta->provides;
-    while (my ($pkg, $data) = each %{ $provides }) {
-        die "$pkg, defined in $data->{file}, has no version\n"
-            unless $data->{version};
-        die "$pkg, defined in $data->{file}, is "
-            . version->new($data->{version})->normal
-            . " but should be " . $v->normal . "\n"
-            unless $data->{version} == $v;
-    }
-}
-
-# Generate a list of files for PAUSE, search.cpan.org, etc to ignore.
-sub _gen_pause_exclusion_list {
-    my $self = shift;
-
-    # Only exclude files that are actually on-board.
-    open( my $man_fh, '<', 'MANIFEST' ) or die "Can't open MANIFEST: $!";
-    my @manifest_entries = <$man_fh>;
-    chomp @manifest_entries;
-
-    my @excluded_files;
-    for my $entry (@manifest_entries) {
-        # Allow README and Changes.
-        next if $entry =~ m#^(README|Changes)#;
-
-        # Allow public modules.
-        if ( $entry =~ m#^(perl/)?lib\b.+\.(pm|pod)$# ) {
-            open( my $fh, '<', $entry ) or die "Can't open '$entry': $!";
-            my $content = do { local $/; <$fh> };
-            next if $content =~ /=head1\s*NAME/;
-        }
-
-        # Disallow everything else.
-        push @excluded_files, $entry;
-    }
-
-    # Exclude redacted modules.
-    if ( eval { require "buildlib/Lucy/Redacted.pm" } ) {
-        my @redacted = map {
-            my @parts = split( /\W+/, $_ );
-            catfile( $LIB_DIR, @parts ) . '.pm'
-        } Lucy::Redacted->redacted, Lucy::Redacted->hidden;
-        push @excluded_files, @redacted;
-    }
-
-    my %uniquifier;
-    @excluded_files = sort grep { !$uniquifier{$_}++ } @excluded_files;
-    return { file => \@excluded_files };
-}
-
-sub ACTION_semiclean {
-    my $self = shift;
-    print "Cleaning up most build files.\n";
-    my @candidates
-        = grep { $_ !~ /(charmonizer|^_charm|charmony|charmonize|snowstem)/ }
-        $self->cleanup;
-    for my $path ( map { glob($_) } @candidates ) {
-        next unless -e $path;
-        rmtree($path);
-        confess("Failed to remove '$path'") if -e $path;
-    }
-}
-
 # Run the cleanup targets for independent prerequisite builds.
 sub _clean_prereq_builds {
     my $self = shift;
@@ -533,7 +368,6 @@ sub _clean_prereq_builds {
         chdir $old_dir;
     }
     $self->_run_make( dir => $CHARMONIZER_ORIG_DIR, args => ['clean'] );
-    $self->_run_make( dir => $LEMON_DIR,            args => ['clean'] );
 }
 
 sub ACTION_clean {
@@ -544,4 +378,3 @@ sub ACTION_clean {
 
 1;
 
-__END__
