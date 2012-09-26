@@ -16,21 +16,17 @@
 use strict;
 use warnings;
 
-use lib '../clownfish/compiler/perl/blib/arch';
-use lib '../clownfish/compiler/perl/blib/lib';
-use lib 'clownfish/compiler/perl/blib/arch';
-use lib 'clownfish/compiler/perl/blib/lib';
+use lib '../../compiler/perl/blib/arch';
+use lib '../../compiler/perl/blib/lib';
 
-package Lucy::Build;
+package Clownfish::Build;
 
 # We want to subclass Clownfish::CFC::Perl::Build, but CFC might not be built
 # yet. So we look in 'clownfish/compiler/perl/lib' directly and cleanup @INC
 # afterwards.
-use lib '../clownfish/compiler/perl/lib';
-use lib 'clownfish/compiler/perl/lib';
+use lib '../../compiler/perl/lib';
 use base qw( Clownfish::CFC::Perl::Build );
-no lib '../clownfish/compiler/perl/lib';
-no lib 'clownfish/compiler/perl/lib';
+no lib '../../compiler/perl/lib';
 
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
@@ -47,15 +43,16 @@ BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 
 my @BASE_PATH = __PACKAGE__->cf_base_path;
 
-my $CHARMONIZER_ORIG_DIR = catdir( @BASE_PATH, 'charmonizer' );
+my $CHARMONIZER_ORIG_DIR
+    = rel2abs( catdir( @BASE_PATH, updir(), updir(), 'charmonizer' ) );
 my $CHARMONIZE_EXE_PATH  = "charmonize$Config{_exe}";
 my $CHARMONY_H_PATH      = 'charmony.h';
 my $CHARMONY_PM_PATH     = 'Charmony.pm';
-my $LEMON_DIR      = catdir( @BASE_PATH, 'lemon' );
+my $LEMON_DIR      = catdir( @BASE_PATH, updir(), updir(), 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
-my $CLOWNFISH_DIR = catdir( @BASE_PATH, 'clownfish', 'compiler', 'perl' );
-my $CLOWNFISH_BUILD  = catfile( $CLOWNFISH_DIR, 'Build' );
+my $CFC_DIR = catdir( @BASE_PATH, updir(), 'compiler', 'perl' );
+my $CFC_BUILD  = catfile( $CFC_DIR, 'Build' );
 my $LIB_DIR          = 'lib';
 
 sub new {
@@ -196,7 +193,7 @@ sub ACTION_lemon {
 sub ACTION_cfc {
     my $self    = shift;
     my $old_dir = getcwd();
-    chdir($CLOWNFISH_DIR);
+    chdir($CFC_DIR);
     if ( !-f 'Build' ) {
         print "\nBuilding Clownfish compiler... \n";
         system("$^X Build.PL");
@@ -528,9 +525,9 @@ sub ACTION_semiclean {
 # Run the cleanup targets for independent prerequisite builds.
 sub _clean_prereq_builds {
     my $self = shift;
-    if ( -e $CLOWNFISH_BUILD ) {
+    if ( -e $CFC_BUILD ) {
         my $old_dir = getcwd();
-        chdir $CLOWNFISH_DIR;
+        chdir $CFC_DIR;
         system("$^X Build realclean")
             and die "Clownfish clean failed";
         chdir $old_dir;

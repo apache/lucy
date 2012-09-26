@@ -18,9 +18,9 @@ use strict;
 use warnings;
 use lib 'buildlib';
 use File::Spec::Functions qw( catdir );
-use Lucy::Build;
+use Clownfish::Build;
 
-my @BASE_PATH        = Lucy::Build->cf_base_path;
+my @BASE_PATH        = Clownfish::Build->cf_base_path;
 my $MODULES_DIR      = catdir( @BASE_PATH, 'modules' );
 my $SNOWSTEM_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
@@ -30,8 +30,8 @@ my $UTF8PROC_SRC_DIR = catdir( $MODULES_DIR, qw( unicode utf8proc ) );
 my $CORE_SOURCE_DIR  = catdir( @BASE_PATH, 'core' );
 my $XS_SOURCE_DIR    = 'xs';
 
-my $builder = Lucy::Build->new(
-    module_name => 'Lucy',
+my $builder = Clownfish::Build->new(
+    module_name => 'Clownfish',
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <dev at lucy dot apache dot org>',
@@ -44,7 +44,7 @@ my $builder = Lucy::Build->new(
         'ExtUtils::ParseXS'  => 2.18,
         'Devel::PPPort'      => 3.13,
     },
-    meta_merge => { keywords => [qw( search lucy lucene )], },
+    meta_merge => { keywords => [qw( clownfish )], },
     meta_add   => {
         resources => {
             homepage   => 'http://lucy.apache.org',
@@ -70,7 +70,7 @@ my $builder = Lucy::Build->new(
     },
     add_to_cleanup => [
         qw(
-            Lucy-*
+            Clownfish-*
             MANIFEST.bak
             perltidy.ERR
             *.pdb
