@@ -1,0 +1,258 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+__C__
+typedef void 
+(*Lucy_Err_Attempt_t)(void *context);
+
+#define Cfish_Err_Attempt_t Lucy_Err_Attempt_t
+#ifdef LUCY_USE_SHORT_NAMES
+  #define Err_Attempt_t Cfish_Err_Attempt_t
+#endif
+__END_C__
+
+/**
+ * Exception.
+ *
+ * Clownfish::Err is the base class for exceptions in the Clownfish object
+ * hierarchy.
+ *
+ * The Err module also provides access to a per-thread Err shared variable via
+ * set_error() and get_error().  It may be used to store an Err object
+ * temporarily, so that calling code may choose how to handle a particular
+ * error condition.
+ */
+public class Clownfish::Err inherits Clownfish::Obj {
+
+    CharBuf *mess;
+
+    inert void
+    init_class();
+
+    inert incremented Err*
+    new(decremented CharBuf *mess);
+
+    inert Err*
+    init(Err *self, decremented CharBuf *mess);
+
+    public void
+    Destroy(Err *self);
+
+    public incremented CharBuf*
+    To_String(Err *self);
+
+    void*
+    To_Host(Err *self);
+
+    /** Concatenate the supplied argument onto the internal "mess".
+     */
+    public void
+    Cat_Mess(Err *self, const CharBuf *mess);
+
+    public CharBuf*
+    Get_Mess(Err *self);
+
+    /** Add information about the current stack frame onto <code>mess</code>.
+     */
+    void
+    Add_Frame(Err *self, const char *file, int line, const char *func);
+
+    public incremented Err*
+    Make(Err *self);
+
+    /** Set the value of "error", a per-thread Err shared variable.
+     */
+    public inert void
+    set_error(decremented Err *error);
+
+    /** Retrieve per-thread Err shared variable "error".
+     */
+    public inert nullable Err*
+    get_error();
+
+    /** Run <code>routine</code> within the host's exception handling
+     * environment, catching and returning any errors that occur.
+     * 
+     * If an unrecognized host exception is trapped, it will be wrapped in an
+     * Err so that it can be handled by Clownfish code.
+     *
+     * @return an Err, or NULL if no exception occurs.
+     */
+    public inert incremented nullable Err*
+    trap(Cfish_Err_Attempt_t routine, void *context);
+
+    /** Print an error message to stderr with some C contextual information.
+     * Usually invoked via the WARN(pattern, ...) macro.
+     */
+    inert void
+    warn_at(const char *file, int line, const char *func,
+            const char *pattern, ...);
+
+    /** Raise an exception. Usually invoked via the THROW macro.
+     */
+    inert void
+    throw_at(VTable *vtable, const char *file, int line, const char *func,
+               const char *pattern, ...);
+
+    /** Throw an existing exception after tacking on additional context data.
+     */
+    inert void
+    rethrow(Err *error, const char *file, int line, const char *func);
+
+    /** Raise an exception.  Clean up the supplied message by decrementing its
+     * refcount.
+     *
+     * @param vtable The vtable for the Err class to throw.
+     * @param message Error message, to be output verbatim.
+     */
+    inert void
+    throw_mess(VTable *vtable, decremented CharBuf *message);
+
+    /** Invoke host exception handling.
+     */
+    inert void
+    do_throw(decremented Err *self);
+
+    /** Invoke host warning mechanism.  Clean up the supplied message by
+     * decrementing its refcount.
+     *
+     * @param message Error message, to be output verbatim.
+     */
+    inert void
+    warn_mess(decremented CharBuf *message);
+
+    /** Create a formatted error message.  Ususally invoked via the MAKE_MESS
+     * macro.
+     */
+    inert CharBuf*
+    make_mess(const char *file, int line, const char *func,
+              const char *pattern, ...);
+
+    /** Verify that <code>obj</code> is either NULL or inherits from
+     * the class represented by <code>vtable</code>.
+     *
+     * @return the object.
+     */
+    inert nullable Obj*
+    downcast(Obj *obj, VTable *vtable, const char *file, int line,
+                const char *func);
+
+    /** Verify that <code>obj</code> is not NULL and inherits from the class
+     * represented by <code>vtable</code>.
+     *
+     * @return the object.
+     */
+    inert Obj*
+    certify(Obj *obj, VTable *vtable, const char *file, int line,
+            const char *func);
+
+    /** Verify that an object belongs to a subclass and not an abstract class.
+     */
+    inert inline void
+    abstract_class_check(Obj *obj, VTable *vtable);
+
+    /** On Windows, return a newly allocated buffer containing the string
+     * description for the the last error in the thread.
+     */
+    inert char*
+    win_error();
+}
+
+__C__
+#ifdef CHY_HAS_FUNC_MACRO
+ #define CFISH_ERR_FUNC_MACRO CHY_FUNC_MACRO
+#else
+ #define CFISH_ERR_FUNC_MACRO NULL
+#endif
+
+#define CFISH_ERR_ADD_FRAME(_error) \
+    Lucy_Err_Add_Frame(_error, __FILE__, __LINE__, \
+                       CFISH_ERR_FUNC_MACRO)
+
+#define CFISH_RETHROW(_error) \
+    lucy_Err_rethrow((lucy_Err*)_error, __FILE__, __LINE__, \
+                     CFISH_ERR_FUNC_MACRO)
+
+/** Macro version of lucy_Err_throw_at which inserts contextual information
+ * automatically, provided that the compiler supports the necessary features.
+ */
+#ifdef CHY_HAS_VARIADIC_MACROS
+ #ifdef CHY_HAS_ISO_VARIADIC_MACROS
+  #define CFISH_THROW(_vtable, ...) \
+    lucy_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
+                      __VA_ARGS__)
+  #define CFISH_WARN(...) \
+    lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, __VA_ARGS__)
+  #define CFISH_MAKE_MESS(...) \
+    lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
+                       __VA_ARGS__)
+ #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS)
+  #define CFISH_THROW(_vtable, args...) \
+    lucy_Err_throw_at(_vtable, __FILE__, __LINE__, \
+                      CFISH_ERR_FUNC_MACRO, ##args)
+  #define CFISH_WARN(args...) \
+    lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
+  #define CFISH_MAKE_MESS(args...) \
+    lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
+ #endif
+#else
+  void
+  CFISH_THROW(lucy_VTable *vtable, char* format, ...);
+  void
+  CFISH_WARN(char* format, ...);
+  lucy_CharBuf*
+  CFISH_MAKE_MESS(char* format, ...);
+#endif
+
+#define CFISH_DOWNCAST(_obj, _vtable) \
+    lucy_Err_downcast((lucy_Obj*)(_obj), (_vtable), \
+                      __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
+
+
+#define CFISH_CERTIFY(_obj, _vtable) \
+    lucy_Err_certify((lucy_Obj*)(_obj), (_vtable), \
+                     __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
+
+static CHY_INLINE void
+lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable) {
+    lucy_VTable *const my_vtable = *(lucy_VTable**)obj;
+    if (my_vtable == vtable) {
+        lucy_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
+                                             Lucy_Obj_Get_Class_Name(obj));
+        Lucy_Obj_Dec_RefCount(obj);
+        lucy_Err_throw_mess(LUCY_ERR, mess);
+    }
+}
+
+#define CFISH_ABSTRACT_CLASS_CHECK(_obj, _vtable) \
+    lucy_Err_abstract_class_check(((lucy_Obj*)_obj), _vtable)
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define THROW                 CFISH_THROW
+  #define RETHROW               CFISH_RETHROW
+  #define WARN                  CFISH_WARN
+  #define MAKE_MESS             CFISH_MAKE_MESS
+  #define ERR_ADD_FRAME         CFISH_ERR_ADD_FRAME
+  #define ERR_FUNC_MACRO        CFISH_ERR_FUNC_MACRO
+  #define DOWNCAST              CFISH_DOWNCAST
+  #define CERTIFY               CFISH_CERTIFY
+  #define ABSTRACT_CLASS_CHECK  CFISH_ABSTRACT_CLASS_CHECK
+#endif
+__END_C__
+
+

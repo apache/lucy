@@ -1,0 +1,108 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+__C__
+#define CFISH_HOST_ARGTYPE_I32    (int32_t)0x00000001
+#define CFISH_HOST_ARGTYPE_I64    (int32_t)0x00000002
+#define CFISH_HOST_ARGTYPE_F32    (int32_t)0x00000003
+#define CFISH_HOST_ARGTYPE_F64    (int32_t)0x00000004
+#define CFISH_HOST_ARGTYPE_STR    (int32_t)0x00000006
+#define CFISH_HOST_ARGTYPE_OBJ    (int32_t)0x00000007
+#define CFISH_HOST_ARGTYPE_MASK            0x00000007
+
+#define CFISH_ARG_I32(_label, _value) \
+    CFISH_HOST_ARGTYPE_I32, (_label), ((int32_t)_value)
+#define CFISH_ARG_I64(_label, _value) \
+    CFISH_HOST_ARGTYPE_I64, (_label), ((int64_t)_value)
+#define CFISH_ARG_I(_type, _label, _value) \
+    (sizeof(_type) <= 4 ? CFISH_HOST_ARGTYPE_I32 : CFISH_HOST_ARGTYPE_I64), \
+    (_label), (sizeof(_type) <= 4 ? (int32_t)_value : (int64_t)_value)
+#define CFISH_ARG_F32(_label, _value) \
+    CFISH_HOST_ARGTYPE_F32, (_label), ((double)_value)
+#define CFISH_ARG_F64(_label, _value) \
+    CFISH_HOST_ARGTYPE_F64, (_label), ((double)_value)
+#define CFISH_ARG_STR(_label, _value) \
+    CFISH_HOST_ARGTYPE_STR, (_label), ((lucy_CharBuf*)_value)
+#define CFISH_ARG_OBJ(_label, _value) \
+    CFISH_HOST_ARGTYPE_OBJ, (_label), ((lucy_Obj*)_value)
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define ARG_I32                 CFISH_ARG_I32
+  #define ARG_I64                 CFISH_ARG_I64
+  #define ARG_F32                 CFISH_ARG_F32
+  #define ARG_F64                 CFISH_ARG_F64
+  #define ARG_STR                 CFISH_ARG_STR
+  #define ARG_OBJ                 CFISH_ARG_OBJ
+#endif
+
+__END_C__
+
+/** Callbacks to the host environment.
+ *
+ * All the callback functions are variadic, and all are designed to take a
+ * series of arguments using the ARG_XXX macros.
+ *
+ *   int32_t area = (int32_t)Host_callback_i64(self, "calc_area", 2,
+ *        ARG_I32("length", len),  ARG_I32("width", width));
+ *
+ * The first argument is void* to avoid the need for tiresome casting to Obj*,
+ * but must always be a Clownfish object.
+ *
+ * If the invoker is a VTable, it will be used to make a class
+ * callback rather than an object callback.
+ */
+inert class Clownfish::Host {
+
+    /** Invoke an object method in a void context.
+     */
+    inert void
+    callback(void *self, const char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting an integer.
+     */
+    inert int64_t
+    callback_i64(void *self, const char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a 64-bit floating point return
+     * value.
+     */
+    inert double
+    callback_f64(void *self, const char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a Obj-derived object back, or
+     * possibly NULL.  In order to ensure that the host environment doesn't
+     * reclaim the return value, it's refcount is increased by one, which the
+     * caller will have to deal with.
+     */
+    inert incremented nullable Obj*
+    callback_obj(void *self, const char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a host string of some kind back,
+     * which will be converted into a newly allocated CharBuf.
+     */
+    inert incremented nullable CharBuf*
+    callback_str(void *self, const char *method, uint32_t num_args, ...);
+
+    /** Invoke an object method, expecting a host data structure back.  It's
+     * up to the caller to know how to process it.
+     */
+    inert nullable void*
+    callback_host(void *self, const char *method, uint32_t num_args, ...);
+}
+
+

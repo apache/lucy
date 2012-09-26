@@ -1,0 +1,157 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Virtual method dispatch table.
+ *
+ * VTables, which are the first element in any Clownfish object, are actually
+ * objects themselves.  (Their first element is a VTable which describes the
+ * behavior of VTables.)
+ */
+
+class Clownfish::VTable inherits Clownfish::Obj {
+
+    VTable            *parent;
+    CharBuf           *name;
+    uint32_t           flags;
+    size_t             obj_alloc_size;
+    size_t             vt_alloc_size;
+    VArray            *methods;
+    lucy_method_t[1]   method_ptrs; /* flexible array */
+
+    inert LockFreeRegistry *registry;
+    inert size_t offset_of_parent;
+
+    inert VTable*
+    allocate(VTable *parent, int flags, size_t obj_alloc_size,
+             size_t num_novel);
+
+    inert VTable*
+    init(VTable *self, const CharBuf *name);
+
+    inert void
+    add_method(VTable *self, const CharBuf *name, lucy_method_t callback_func,
+               size_t offset);
+
+    /** Return a singleton.  If a VTable can be found in the registry based on
+     * the supplied class name, it will be returned.  Otherwise, a new VTable
+     * will be created using [parent] as a base.
+     *
+     * If [parent] is NULL, an attempt will be made to find it using
+     * VTable_find_parent_class().  If the attempt fails, an error will
+     * result.
+     */
+    inert VTable*
+    singleton(const CharBuf *class_name, VTable *parent);
+
+    /** Register a vtable, so that it can be retrieved by class name.
+     *
+     * TODO: Move this functionality to some kind of class loader.
+     *
+     * @return true on success, false if the class was already registered.
+     */
+    inert bool_t
+    add_to_registry(VTable *vtable);
+
+    inert bool_t
+    add_alias_to_registry(VTable *vtable, CharBuf *alias);
+
+    /** Initialize the registry.
+     */
+    inert void
+    init_registry();
+
+    /** Tell the host about the new class.
+     */
+    inert void
+    register_with_host(VTable *vtable, VTable *parent);
+
+    /** Find a registered class and return its vtable.  May return NULL if the
+     * class is not registered.
+     */
+    inert nullable VTable*
+    fetch_vtable(const CharBuf *class_name);
+
+    /** Given a class name, return the name of a parent class which descends
+     * from Clownfish::Obj, or NULL if such a class can't be found.
+     */
+    inert nullable CharBuf*
+    find_parent_class(const CharBuf *class_name);
+
+    /** List all of the methods defined directly within a host subclass.
+     */
+    inert incremented VArray*
+    fresh_host_methods(const CharBuf *class_name);
+
+    /** Replace a function pointer in the VTable.
+     */
+    void
+    Override(VTable *self, lucy_method_t method_ptr, size_t offset);
+
+    /** Create an empty object of the type defined by the VTable: allocate,
+     * assign its vtable and give it an initial refcount of 1.  The caller is
+     * responsible for initialization.
+     */
+    Obj*
+    Make_Obj(VTable *self);
+
+    /** Take a raw memory allocation which is presumed to be of adequate size,
+     * assign its vtable and give it an initial refcount of 1.
+     */
+    Obj*
+    Init_Obj(VTable *self, void *allocation);
+
+    /** Create a new object using the supplied dump, assuming that Load() has
+     * been defined for the class.
+     */
+    Obj*
+    Load_Obj(VTable *self, Obj *dump);
+
+    /** Create a new object to go with the supplied host object.
+     */
+    Obj*
+    Foster_Obj(VTable *self, void *host_obj);
+
+    CharBuf*
+    Get_Name(VTable *self);
+
+    VTable*
+    Get_Parent(VTable *self);
+
+    size_t
+    Get_Obj_Alloc_Size(VTable *self);
+
+    public incremented VTable*
+    Clone(VTable *self);
+
+    incremented Obj*
+    Inc_RefCount(VTable *self);
+
+    uint32_t
+    Dec_RefCount(VTable *self);
+
+    uint32_t
+    Get_RefCount(VTable *self);
+
+    void*
+    To_Host(VTable *self);
+
+    public void
+    Destroy(VTable *self);
+}
+
+

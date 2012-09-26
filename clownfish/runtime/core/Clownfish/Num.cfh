@@ -1,0 +1,307 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Abstract base class for numbers.
+ */
+abstract class Clownfish::Num inherits Clownfish::Obj {
+
+    inert Num*
+    init(Num *self);
+
+    public bool_t
+    Equals(Num *self, Obj *other);
+}
+
+/** Abstract base class for floating point numbers.
+ */
+abstract class Clownfish::FloatNum inherits Clownfish::Num {
+
+    inert FloatNum*
+    init(FloatNum *self);
+
+    public int32_t
+    Compare_To(FloatNum *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(FloatNum *self);
+}
+
+
+/** Abstract base class for Integers.
+ */
+abstract class Clownfish::IntNum inherits Clownfish::Num {
+
+    inert IntNum*
+    init(IntNum *self);
+
+    public int32_t
+    Compare_To(IntNum *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(IntNum *self);
+}
+
+/** Single precision floating point number.
+ */
+class Clownfish::Float32 inherits Clownfish::FloatNum {
+
+    float value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Float32*
+    init(Float32* self, float value);
+
+    inert Float32*
+    new(float value);
+
+    void
+    Set_Value(Float32 *self, float value);
+
+    float
+    Get_Value(Float32 *self);
+
+    public int64_t
+    To_I64(Float32 *self);
+
+    public double
+    To_F64(Float32 *self);
+
+    public int32_t
+    Hash_Sum(Float32 *self);
+
+    public void
+    Serialize(Float32 *self, OutStream *outstream);
+
+    public incremented Float32*
+    Deserialize(decremented Float32 *self, InStream *instream);
+
+    public incremented Float32*
+    Clone(Float32 *self);
+
+    public void
+    Mimic(Float32 *self, Obj *other);
+}
+
+/** Double precision floating point number.
+ */
+class Clownfish::Float64 inherits Clownfish::FloatNum {
+
+    double value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Float64*
+    init(Float64* self, double value);
+
+    inert Float64*
+    new(double value);
+
+    void
+    Set_Value(Float64 *self, double value);
+
+    double
+    Get_Value(Float64 *self);
+
+    public int64_t
+    To_I64(Float64 *self);
+
+    public double
+    To_F64(Float64 *self);
+
+    public int32_t
+    Hash_Sum(Float64 *self);
+
+    public void
+    Serialize(Float64 *self, OutStream *outstream);
+
+    public incremented Float64*
+    Deserialize(decremented Float64 *self, InStream *instream);
+
+    public incremented Float64*
+    Clone(Float64 *self);
+
+    public void
+    Mimic(Float64 *self, Obj *other);
+}
+
+/** 32-bit signed integer.
+ */
+class Clownfish::Integer32 cnick Int32
+    inherits Clownfish::IntNum {
+
+    int32_t value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Integer32*
+    init(Integer32* self, int32_t value);
+
+    inert Integer32*
+    new(int32_t value);
+
+    void
+    Set_Value(Integer32 *self, int32_t value);
+
+    int32_t
+    Get_Value(Integer32 *self);
+
+    public int64_t
+    To_I64(Integer32 *self);
+
+    public double
+    To_F64(Integer32 *self);
+
+    public int32_t
+    Hash_Sum(Integer32 *self);
+
+    public void
+    Serialize(Integer32 *self, OutStream *outstream);
+
+    public incremented Integer32*
+    Deserialize(decremented Integer32 *self, InStream *instream);
+
+    public incremented Integer32*
+    Clone(Integer32 *self);
+
+    public void
+    Mimic(Integer32 *self, Obj *other);
+}
+
+/**
+ * 64-bit signed integer.
+ */
+class Clownfish::Integer64 cnick Int64
+    inherits Clownfish::IntNum {
+
+    int64_t value;
+
+    /**
+     * @param value Initial value.
+     */
+    inert Integer64*
+    init(Integer64* self, int64_t value);
+
+    inert Integer64*
+    new(int64_t value);
+
+    void
+    Set_Value(Integer64 *self, int64_t value);
+
+    int64_t
+    Get_Value(Integer64 *self);
+
+    public int64_t
+    To_I64(Integer64 *self);
+
+    public double
+    To_F64(Integer64 *self);
+
+    public int32_t
+    Hash_Sum(Integer64 *self);
+
+    public bool_t
+    Equals(Integer64 *self, Obj *other);
+
+    public void
+    Serialize(Integer64 *self, OutStream *outstream);
+
+    public incremented Integer64*
+    Deserialize(decremented Integer64 *self, InStream *instream);
+
+    public incremented Integer64*
+    Clone(Integer64 *self);
+
+    public void
+    Mimic(Integer64 *self, Obj *other);
+}
+
+
+/**
+ * Boolean type.
+ * 
+ * There are only two singleton instances of this class: CFISH_TRUE and
+ * CFISH_FALSE.
+ */
+class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
+    bool_t value;
+    CharBuf *string;
+
+    inert BoolNum *true_singleton;
+    inert BoolNum *false_singleton;
+
+    inert void
+    init_class();
+
+    /** Return either CFISH_TRUE or CFISH_FALSE depending on the supplied
+     * value.
+     */
+    inert BoolNum*
+    singleton(bool_t value);
+
+    public void
+    Destroy(BoolNum *self);
+
+    bool_t
+    Get_Value(BoolNum *self);
+
+    public int64_t
+    To_I64(BoolNum *self);
+
+    public double
+    To_F64(BoolNum *self);
+
+    public bool_t
+    To_Bool(BoolNum *self);
+
+    public int32_t
+    Hash_Sum(BoolNum *self);
+
+    public void
+    Serialize(BoolNum *self, OutStream *outstream);
+
+    public incremented BoolNum*
+    Deserialize(decremented BoolNum *self, InStream *instream);
+
+    /* Returns self. */
+    public incremented BoolNum*
+    Clone(BoolNum *self);
+
+    public bool_t
+    Equals(BoolNum *self, Obj *other);
+
+    public incremented CharBuf*
+    To_String(BoolNum *self);
+
+    incremented BoolNum*
+    Inc_RefCount(BoolNum *self);
+
+    uint32_t
+    Dec_RefCount(BoolNum *self);
+}
+
+__C__
+
+#define CFISH_TRUE  lucy_Bool_true_singleton
+#define CFISH_FALSE lucy_Bool_false_singleton
+
+__END_C__
+

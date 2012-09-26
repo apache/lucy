@@ -1,0 +1,83 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+inert class Clownfish::Util::StringHelper cnick StrHelp {
+
+    /* A table where the values indicate the number of bytes in a UTF-8
+     * sequence implied by the leading utf8 byte.
+     */
+    inert const uint8_t[] UTF8_COUNT;
+
+    /** Return the number of bytes that two strings have in common.
+     */
+    inert int32_t
+    overlap(const char *a, const char *b, size_t a_len,  size_t b_len);
+
+    /** Encode a NULL-terminated string representation of a value in base 36
+     * into <code>buffer</code>.
+     *
+     * @param value The number to be encoded.
+     * @param buffer A buffer at least MAX_BASE36_BYTES bytes long.
+     * @return the number of digits encoded (not including the terminating
+     * NULL).
+     */
+    inert uint32_t
+    to_base36(uint64_t value, void *buffer);
+
+    /** Return true if the string is valid UTF-8, false otherwise.
+     */
+    inert bool_t
+    utf8_valid(const char *ptr, size_t len);
+
+    /** Returns true if the code point qualifies as Unicode whitespace.
+     */
+    inert bool_t
+    is_whitespace(uint32_t code_point);
+
+    /** Encode a Unicode code point to a UTF-8 sequence.
+     *
+     * @param code_point A legal unicode code point.
+     * @param buffer Write buffer which must hold at least 4 bytes (the
+     * maximum legal length for a UTF-8 char).
+     */
+    inert uint32_t
+    encode_utf8_char(uint32_t code_point, void *buffer);
+
+    /** Decode a UTF-8 sequence to a Unicode code point.  Assumes valid UTF-8.
+     */
+    inert uint32_t
+    decode_utf8_char(const char *utf8);
+
+    /** Return the first non-continuation byte before the supplied pointer.
+     * If backtracking progresses beyond the supplied start, return NULL.
+     */
+    inert nullable const char*
+    back_utf8_char(const char *utf8, char *start);
+}
+
+__C__
+/** The maximum number of bytes encoded by to_base36(), including the
+ * terminating NULL.
+ */
+#define lucy_StrHelp_MAX_BASE36_BYTES 14
+#ifdef LUCY_USE_SHORT_NAMES
+  #define StrHelp_MAX_BASE36_BYTES lucy_StrHelp_MAX_BASE36_BYTES
+#endif
+__END_C__
+
+
