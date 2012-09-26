@@ -119,12 +119,6 @@ class Clownfish::ByteBuf cnick BB inherits Clownfish::Obj {
 
     public int32_t
     Hash_Sum(ByteBuf *self);
-
-    public void
-    Serialize(ByteBuf *self, OutStream *outstream);
-
-    public incremented ByteBuf*
-    Deserialize(decremented ByteBuf *self, InStream *instream);
 }
 
 /**

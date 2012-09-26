@@ -169,12 +169,6 @@ class Clownfish::VArray cnick VA inherits Clownfish::Obj {
     Load(VArray *self, Obj *dump);
 
     public void
-    Serialize(VArray *self, OutStream *outstream);
-
-    public incremented VArray*
-    Deserialize(decremented VArray *self, InStream *instream);
-
-    public void
     Destroy(VArray *self);
 }
 

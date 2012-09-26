@@ -27,8 +27,6 @@
 #include "Clownfish/VTable.h"
 #include "Clownfish/ByteBuf.h"
 #include "Clownfish/Err.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 #include "Clownfish/Util/Memory.h"
 
 static void
@@ -190,22 +188,6 @@ char*
 BB_grow(ByteBuf *self, size_t size) {
     if (size > self->cap) { S_grow(self, size); }
     return self->buf;
-}
-
-void
-BB_serialize(ByteBuf *self, OutStream *target) {
-    OutStream_Write_C32(target, self->size);
-    OutStream_Write_Bytes(target, self->buf, self->size);
-}
-
-ByteBuf*
-BB_deserialize(ByteBuf *self, InStream *instream) {
-    const size_t size = InStream_Read_C32(instream);
-    const size_t capacity = size ? size : sizeof(int64_t);
-    if (capacity > self->cap) { S_grow(self, capacity); }
-    self->size = size;
-    InStream_Read_Bytes(instream, self->buf, size);
-    return self;
 }
 
 int

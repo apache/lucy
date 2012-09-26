@@ -52,15 +52,6 @@ CODE:
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
-
-SV*
-_deserialize(self, instream)
-    lucy_ByteBuf *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_ByteBuf *thawed = Lucy_BB_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_BB_To_Host(thawed);
-OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
@@ -97,15 +88,6 @@ _clone(self)
     lucy_CharBuf *self;
 CODE:
     RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_CB_clone(self));
-OUTPUT: RETVAL
-
-SV*
-_deserialize(self, instream)
-    lucy_CharBuf *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_CharBuf *thawed = Lucy_CB_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_CB_To_Host(thawed);
 OUTPUT: RETVAL
 
 SV*
@@ -200,16 +182,6 @@ sub bind_hash {
 
     my $xs_code = <<'END_XS_CODE';
 MODULE =  Lucy    PACKAGE = Clownfish::Hash
-
-SV*
-_deserialize(self, instream)
-    lucy_Hash *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_Hash *thawed = Lucy_Hash_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_Hash_To_Host(thawed);
-OUTPUT: RETVAL
-
 SV*
 _fetch(self, key)
     lucy_Hash *self;
@@ -523,79 +495,6 @@ CODE:
     RETVAL = Lucy_Obj_Is_A(self, target);
 }
 OUTPUT: RETVAL
-
-void
-STORABLE_freeze(self, ...)
-    lucy_Obj *self;
-PPCODE:
-{
-    CHY_UNUSED_VAR(self);
-    if (items < 2 || !SvTRUE(ST(1))) {
-        SV *retval;
-        lucy_ByteBuf *serialized_bb;
-        lucy_RAMFileHandle *file_handle
-            = lucy_RAMFH_open(NULL, LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
-        lucy_OutStream *target = lucy_OutStream_open((lucy_Obj*)file_handle);
-
-        Lucy_Obj_Serialize(self, target);
-
-        Lucy_OutStream_Close(target);
-        serialized_bb
-            = Lucy_RAMFile_Get_Contents(Lucy_RAMFH_Get_File(file_handle));
-        retval = XSBind_bb_to_sv(serialized_bb);
-        CFISH_DECREF(file_handle);
-        CFISH_DECREF(target);
-
-        if (SvCUR(retval) == 0) { // Thwart Storable bug
-            THROW(LUCY_ERR, "Calling serialize produced an empty string");
-        }
-        ST(0) = sv_2mortal(retval);
-        XSRETURN(1);
-    }
-}
-
-=begin comment
-
-Calls deserialize(), and copies the object pointer.  Since deserialize is an
-abstract method, it will confess() unless implemented.
-
-=end comment
-
-=cut
-
-void
-STORABLE_thaw(blank_obj, cloning, serialized_sv)
-    SV *blank_obj;
-    SV *cloning;
-    SV *serialized_sv;
-PPCODE:
-{
-    char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
-    lucy_ZombieCharBuf *klass
-        = CFISH_ZCB_WRAP_STR(class_name, strlen(class_name));
-    lucy_VTable *vtable
-        = (lucy_VTable*)lucy_VTable_singleton((lucy_CharBuf*)klass, NULL);
-    STRLEN len;
-    char *ptr = SvPV(serialized_sv, len);
-    lucy_ViewByteBuf *contents = lucy_ViewBB_new(ptr, len);
-    lucy_RAMFile *ram_file = lucy_RAMFile_new((lucy_ByteBuf*)contents, true);
-    lucy_RAMFileHandle *file_handle
-        = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
-    lucy_InStream *instream = lucy_InStream_open((lucy_Obj*)file_handle);
-    lucy_Obj *self = Lucy_VTable_Foster_Obj(vtable, blank_obj);
-    lucy_Obj *deserialized = Lucy_Obj_Deserialize(self, instream);
-
-    CHY_UNUSED_VAR(cloning);
-    CFISH_DECREF(contents);
-    CFISH_DECREF(ram_file);
-    CFISH_DECREF(file_handle);
-    CFISH_DECREF(instream);
-
-    // Catch bad deserialize() override.
-    if (deserialized != self) {
-        THROW(LUCY_ERR, "Error when deserializing obj of class %o", klass);
-    }
-}
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
@@ -628,15 +527,6 @@ shallow_copy(self)
     lucy_VArray *self;
 CODE:
     RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Shallow_Copy(self));
-OUTPUT: RETVAL
-
-SV*
-_deserialize(self, instream)
-    lucy_VArray *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_VArray *thawed = Lucy_VA_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_VA_To_Host(thawed);
 OUTPUT: RETVAL
 
 SV*

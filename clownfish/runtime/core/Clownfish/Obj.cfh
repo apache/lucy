@@ -153,18 +153,6 @@ public class Clownfish::Obj {
     public bool_t
     To_Bool(Obj *self);
 
-    /** Serialize the object by writing to the supplied OutStream.
-     */
-    public void
-    Serialize(Obj *self, OutStream *outstream);
-
-    /** Inflate an object by reading the serialized form from the instream.
-     * The assumption is that the object has been allocated, assigned a
-     * refcount and a vtable, but that everything else is uninitialized.
-     */
-    public incremented Obj*
-    Deserialize(decremented Obj *self, InStream *instream);
-
     /** Return a representation of the object using only scalars, hashes, and
      * arrays.  Some implementations support JSON serialization via Dump() and
      * its companion method, Load(); for others, Dump() is only a debugging
