@@ -200,7 +200,6 @@ sub ACTION_copy_clownfish_includes {
 
     $self->cf_copy_include_file( 'charmony.h' );
     $self->cf_copy_include_file( 'XSBind.h' );
-    $self->cf_copy_include_file( qw( Lucy Util ToolSet.h ) );
 }
 
 sub ACTION_clownfish {
