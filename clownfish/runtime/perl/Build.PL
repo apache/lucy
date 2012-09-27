@@ -21,12 +21,6 @@ use File::Spec::Functions qw( catdir );
 use Clownfish::Build;
 
 my @BASE_PATH        = Clownfish::Build->cf_base_path;
-my $MODULES_DIR      = catdir( @BASE_PATH, 'modules' );
-my $SNOWSTEM_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstem source ) );
-my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
-my $SNOWSTOP_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstop source ) );
-my $UCD_INC_DIR      = catdir( $MODULES_DIR, qw( unicode ucd ) );
-my $UTF8PROC_SRC_DIR = catdir( $MODULES_DIR, qw( unicode utf8proc ) );
 my $CORE_SOURCE_DIR  = catdir( @BASE_PATH, 'core' );
 my $XS_SOURCE_DIR    = 'xs';
 
@@ -55,17 +49,11 @@ my $builder = Clownfish::Build->new(
     include_dirs => [
         $CORE_SOURCE_DIR,
         $XS_SOURCE_DIR,
-        $SNOWSTEM_INC_DIR,
-        $UCD_INC_DIR,
-        $UTF8PROC_SRC_DIR,
     ],
     clownfish_params => {
         source => [
             $CORE_SOURCE_DIR,
             $XS_SOURCE_DIR,
-            $SNOWSTEM_SRC_DIR,
-            $SNOWSTOP_SRC_DIR,
-            $UTF8PROC_SRC_DIR,
         ],
     },
     add_to_cleanup => [
