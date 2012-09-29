@@ -21,6 +21,7 @@ $VERSION = eval $VERSION;
 
 sub bind_all {
     my $class = shift;
+    $class->bind_clownfish;
     $class->bind_bytebuf;
     $class->bind_charbuf;
     $class->bind_err;
@@ -32,6 +33,56 @@ sub bind_all {
     $class->bind_obj;
     $class->bind_varray;
     $class->bind_vtable;
+}
+
+sub bind_clownfish {
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Clownfish    PACKAGE = Clownfish 
+
+BOOT:
+    lucy_Clownfish_bootstrap();
+
+IV
+_dummy_function()
+CODE:
+    RETVAL = 1;
+OUTPUT:
+    RETVAL
+
+SV*
+to_clownfish(sv)
+    SV *sv;
+CODE:
+{
+    lucy_Obj *obj = XSBind_perl_to_cfish(sv);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
+}
+OUTPUT: RETVAL
+
+SV*
+to_perl(sv)
+    SV *sv;
+CODE:
+{
+    if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
+        IV tmp = SvIV(SvRV(sv));
+        lucy_Obj* obj = INT2PTR(lucy_Obj*, tmp);
+        RETVAL = XSBind_cfish_to_perl(obj);
+    }
+    else {
+        RETVAL = newSVsv(sv);
+    }
+}
+OUTPUT: RETVAL
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Clownfish",
+        class_name => "Clownfish",
+    );
+    $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_bytebuf {
