@@ -19,9 +19,11 @@
 #include <string.h>
 
 #define C_LUCY_TESTBATCH
-#include "Lucy/Util/ToolSet.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Test.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/VTable.h"
 
 TestBatch*
 TestBatch_new(int64_t num_tests) {

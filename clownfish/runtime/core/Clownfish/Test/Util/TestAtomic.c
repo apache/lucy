@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-#include "Lucy/Util/ToolSet.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/Util/TestAtomic.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/Util/TestAtomic.h"
 #include "Clownfish/Util/Atomic.h"
 
 static void

@@ -16,6 +16,6 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-Lucy::Test::TestCharmonizer::run_tests("func_macro");
+use Clownfish::Test;
+Clownfish::Test::TestCharmonizer::run_tests("func_macro");
 

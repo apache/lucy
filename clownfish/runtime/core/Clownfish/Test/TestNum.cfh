@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
-inert class Lucy::Test::Object::TestNum {
+inert class Clownfish::Test::TestNum {
     inert void
     run_tests();
 }

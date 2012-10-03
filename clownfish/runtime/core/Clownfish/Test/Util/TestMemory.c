@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTMEMORYPOOL
-#define C_LUCY_MEMORYPOOL
-#include "Lucy/Util/ToolSet.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/Util/TestMemory.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/Util/TestMemory.h"
+#include "Clownfish/Util/Memory.h"
 
 #ifndef SIZE_MAX
   #define SIZE_MAX ((size_t)-1)

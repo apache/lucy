@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTUTILS
-#include "Lucy/Util/ToolSet.h"
 #include <string.h>
+#include <stdlib.h>
 
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test.h"
-#include "Lucy/Analysis/Analyzer.h"
-#include "Lucy/Analysis/Inversion.h"
-#include "Lucy/Analysis/Token.h"
-#include "Lucy/Search/TermQuery.h"
-#include "Lucy/Search/PhraseQuery.h"
-#include "Lucy/Search/LeafQuery.h"
-#include "Lucy/Search/ANDQuery.h"
-#include "Lucy/Search/NOTQuery.h"
-#include "Lucy/Search/ORQuery.h"
-#include "Lucy/Search/RangeQuery.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
-#include "Lucy/Store/RAMFile.h"
-#include "Lucy/Util/Freezer.h"
+#define C_LUCY_TESTUTILS
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
+
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Util/Memory.h"
+#include "Clownfish/CharBuf.h"
 
 uint64_t
 TestUtils_random_u64() {

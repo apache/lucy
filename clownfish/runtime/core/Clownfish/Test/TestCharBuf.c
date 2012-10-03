@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTCHARBUF
-#include "Lucy/Util/ToolSet.h"
 #include <string.h>
 #include <stdio.h>
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestCharBuf.h"
+#define C_LUCY_TESTCHARBUF
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
+
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test/TestCharBuf.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Num.h"
 
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;

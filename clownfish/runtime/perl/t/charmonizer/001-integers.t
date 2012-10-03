@@ -16,6 +16,6 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-Lucy::Test::TestCharmonizer::run_tests("integers");
+use Clownfish::Test;
+Clownfish::Test::TestCharmonizer::run_tests("integers");
 

@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-#include "Lucy/Util/ToolSet.h"
 #include <stdlib.h>
 #include <time.h>
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestHash.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
+
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test/TestHash.h"
 #include "Clownfish/Hash.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/VArray.h"
+#include "Clownfish/Num.h"
 
 static void
 test_Equals(TestBatch *batch) {

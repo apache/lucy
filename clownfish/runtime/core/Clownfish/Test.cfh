@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 /** Testing framework.
  */
-inert class Lucy::Test { }
+inert class Clownfish::Test { }
 
-class Lucy::Test::TestBatch inherits Clownfish::Obj {
+class Clownfish::Test::TestBatch inherits Clownfish::Obj {
     int64_t    test_num;
     int64_t    num_tests;
     int64_t    num_passed;

@@ -16,6 +16,6 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-Lucy::Test::TestCharmonizer::run_tests("dir_manip");
+use Clownfish::Test;
+Clownfish::Test::TestCharmonizer::run_tests("dir_manip");
 

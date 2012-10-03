@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-parcel Lucy;
-parcel Lucy;
+parcel Clownfish;
 
-class Lucy::Test::Object::TestCharBuf cnick TestCB
+class Clownfish::Test::TestCharBuf cnick TestCB
     inherits Clownfish::Obj {
 
     inert void

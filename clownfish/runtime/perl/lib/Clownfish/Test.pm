@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Test;
-use Lucy;
+package Clownfish::Test;
+use Clownfish;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 
@@ -22,7 +22,7 @@ $VERSION = eval $VERSION;
 # that we simulate large indexes by performing a lot of PostingPool flushes.
 Lucy::Index::PostingListWriter::set_default_mem_thresh(0x1000);
 
-package Lucy::Test::TestCharmonizer;
+package Clownfish::Test::TestCharmonizer;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 use Config;

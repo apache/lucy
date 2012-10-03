@@ -16,6 +16,6 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-Lucy::Test::run_tests("TestHash");
+use Clownfish::Test;
+Clownfish::Test::run_tests("TestHash");
 

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
-inert class Lucy::Test::TestUtils  {
+inert class Clownfish::Test::TestUtils  {
 
     /** Testing-only CharBuf factory which uses strlen().
      */

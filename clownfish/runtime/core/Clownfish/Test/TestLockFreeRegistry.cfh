@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
-inert class Lucy::Test::Object::TestLockFreeRegistry cnick TestLFReg {
+inert class Clownfish::Test::TestLockFreeRegistry cnick TestLFReg {
     inert void
     run_tests();
 }
 
 /** Private test-only class for stressing LockFreeRegistry.
  */
-class Lucy::Test::Object::StupidHashCharBuf inherits Clownfish::CharBuf {
+class Clownfish::Test::StupidHashCharBuf inherits Clownfish::CharBuf {
     inert incremented StupidHashCharBuf*
     new(const char *text);
 

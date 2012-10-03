@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTNUMBERUTILS
-#include "Lucy/Util/ToolSet.h"
 #include <stdlib.h>
 #include <time.h>
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Util/TestNumberUtils.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
+
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test/Util/TestNumberUtils.h"
 #include "Clownfish/Util/NumberUtils.h"
+#include "Clownfish/Util/Memory.h"
+#include "Clownfish/Err.h"
 
 static void
 test_u1(TestBatch *batch) {

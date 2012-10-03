@@ -16,11 +16,12 @@
 
 #include <string.h>
 
-#include "Lucy/Util/ToolSet.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestLockFreeRegistry.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test/TestLockFreeRegistry.h"
 #include "Clownfish/LockFreeRegistry.h"
 
 StupidHashCharBuf*

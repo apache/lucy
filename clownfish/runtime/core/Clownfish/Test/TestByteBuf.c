@@ -15,11 +15,13 @@
  */
 
 #define C_LUCY_TESTBYTEBUF
-#include "Lucy/Util/ToolSet.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestByteBuf.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test/TestByteBuf.h"
+#include "Clownfish/ByteBuf.h"
 
 static void
 test_Equals(TestBatch *batch) {

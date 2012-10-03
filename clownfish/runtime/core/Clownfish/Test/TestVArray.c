@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTVARRAY
-#include "Lucy/Util/ToolSet.h"
+#include <string.h>
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestVArray.h"
+#define C_LUCY_TESTVARRAY
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
+
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test/TestVArray.h"
+#include "Clownfish/VArray.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Num.h"
+#include "Clownfish/Err.h"
 
 static CharBuf*
 S_new_cb(const char *text) {

@@ -17,10 +17,14 @@
 #include <stdio.h>
 
 #define C_LUCY_TESTOBJ
-#include "Lucy/Util/ToolSet.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/Object/TestObj.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestObj.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/VTable.h"
+#include "Clownfish/Err.h"
 
 static Obj*
 S_new_testobj() {

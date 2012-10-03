@@ -15,11 +15,15 @@
  */
 
 #define C_LUCY_TESTNUM
-#include "Lucy/Util/ToolSet.h"
 
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestNum.h"
+#define LUCY_USE_SHORT_NAMES
+#define CHY_USE_SHORT_NAMES
+
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Test/TestNum.h"
+#include "Clownfish/Num.h"
+#include "Clownfish/CharBuf.h"
 
 static void
 test_To_String(TestBatch *batch) {
