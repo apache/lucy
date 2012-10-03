@@ -386,19 +386,9 @@ test_vcatf_x32(TestBatch *batch) {
     DECREF(got);
 }
 
-static void
-test_serialization(TestBatch *batch) {
-    CharBuf *wanted = S_get_cb("foo");
-    CharBuf *got    = (CharBuf*)TestUtils_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(batch, got && CB_Equals(wanted, (Obj*)got),
-              "Round trip through FREEZE/THAW");
-    DECREF(got);
-    DECREF(wanted);
-}
-
 void
 TestCB_run_tests() {
-    TestBatch *batch = TestBatch_new(55);
+    TestBatch *batch = TestBatch_new(54);
     TestBatch_Plan(batch);
 
     test_vcatf_s(batch);
@@ -424,7 +414,6 @@ TestCB_run_tests() {
     test_Trim(batch);
     test_To_F64(batch);
     test_To_I64(batch);
-    test_serialization(batch);
 
     DECREF(batch);
 }

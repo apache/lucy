@@ -133,19 +133,9 @@ test_Cat(TestBatch *batch) {
     DECREF(wanted);
 }
 
-static void
-test_serialization(TestBatch *batch) {
-    ByteBuf *wanted = BB_new_bytes("foobar", 6);
-    ByteBuf *got    = (ByteBuf*)TestUtils_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(batch, got && BB_Equals(wanted, (Obj*)got),
-              "Serialization round trip");
-    DECREF(wanted);
-    DECREF(got);
-}
-
 void
 TestBB_run_tests() {
-    TestBatch *batch = TestBatch_new(22);
+    TestBatch *batch = TestBatch_new(21);
     TestBatch_Plan(batch);
 
     test_Equals(batch);
@@ -154,7 +144,6 @@ TestBB_run_tests() {
     test_compare(batch);
     test_Mimic(batch);
     test_Cat(batch);
-    test_serialization(batch);
 
     DECREF(batch);
 }

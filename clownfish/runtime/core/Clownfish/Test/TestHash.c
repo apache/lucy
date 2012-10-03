@@ -207,26 +207,6 @@ test_Dump_and_Load(TestBatch *batch) {
 }
 
 static void
-test_serialization(TestBatch *batch) {
-    Hash  *wanted = Hash_new(0);
-    Hash  *got;
-
-    for (uint32_t i = 0; i < 10; i++) {
-        CharBuf *cb = TestUtils_random_string(rand() % 1200);
-        Integer32 *num = Int32_new(i);
-        Hash_Store(wanted, (Obj*)cb, (Obj*)num);
-        Hash_Store(wanted, (Obj*)num, (Obj*)cb);
-    }
-
-    got = (Hash*)TestUtils_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(batch, got && Hash_Equals(wanted, (Obj*)got),
-              "Round trip through serialization.");
-
-    DECREF(got);
-    DECREF(wanted);
-}
-
-static void
 test_stress(TestBatch *batch) {
     Hash     *hash     = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected = VA_new(1000);
@@ -266,7 +246,7 @@ test_stress(TestBatch *batch) {
 
 void
 TestHash_run_tests() {
-    TestBatch *batch = TestBatch_new(29);
+    TestBatch *batch = TestBatch_new(28);
 
     srand((unsigned int)time((time_t*)NULL));
 
@@ -275,7 +255,6 @@ TestHash_run_tests() {
     test_Store_and_Fetch(batch);
     test_Keys_Values_Iter(batch);
     test_Dump_and_Load(batch);
-    test_serialization(batch);
     test_stress(batch);
 
     DECREF(batch);

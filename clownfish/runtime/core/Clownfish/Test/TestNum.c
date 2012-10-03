@@ -266,42 +266,9 @@ test_Mimic(TestBatch *batch) {
     DECREF(f32);
 }
 
-static void
-test_serialization(TestBatch *batch) {
-    Float32   *f32 = Float32_new(1.33f);
-    Float64   *f64 = Float64_new(1.33);
-    Integer32 *i32 = Int32_new(-1);
-    Integer64 *i64 = Int64_new(-1);
-    Float32   *f32_thaw = (Float32*)TestUtils_freeze_thaw((Obj*)f32);
-    Float64   *f64_thaw = (Float64*)TestUtils_freeze_thaw((Obj*)f64);
-    Integer32 *i32_thaw = (Integer32*)TestUtils_freeze_thaw((Obj*)i32);
-    Integer64 *i64_thaw = (Integer64*)TestUtils_freeze_thaw((Obj*)i64);
-    BoolNum   *true_thaw = (BoolNum*)TestUtils_freeze_thaw((Obj*)CFISH_TRUE);
-
-    TEST_TRUE(batch, Float32_Equals(f32, (Obj*)f32_thaw),
-              "Float32 freeze/thaw");
-    TEST_TRUE(batch, Float64_Equals(f64, (Obj*)f64_thaw),
-              "Float64 freeze/thaw");
-    TEST_TRUE(batch, Int32_Equals(i32, (Obj*)i32_thaw),
-              "Integer32 freeze/thaw");
-    TEST_TRUE(batch, Int64_Equals(i64, (Obj*)i64_thaw),
-              "Integer64 freeze/thaw");
-    TEST_TRUE(batch, Bool_Equals(CFISH_TRUE, (Obj*)true_thaw),
-              "BoolNum freeze/thaw");
-
-    DECREF(i64_thaw);
-    DECREF(i32_thaw);
-    DECREF(f64_thaw);
-    DECREF(f32_thaw);
-    DECREF(i64);
-    DECREF(i32);
-    DECREF(f64);
-    DECREF(f32);
-}
-
 void
 TestNum_run_tests() {
-    TestBatch *batch = TestBatch_new(58);
+    TestBatch *batch = TestBatch_new(53);
     TestBatch_Plan(batch);
 
     test_To_String(batch);
@@ -309,7 +276,6 @@ TestNum_run_tests() {
     test_Equals_and_Compare_To(batch);
     test_Clone(batch);
     test_Mimic(batch);
-    test_serialization(batch);
 
     DECREF(batch);
 }
