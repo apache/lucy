@@ -22,6 +22,7 @@ $VERSION = eval $VERSION;
 sub bind_all {
     my $class = shift;
     $class->bind_clownfish;
+    $class->bind_test;
     $class->bind_bytebuf;
     $class->bind_charbuf;
     $class->bind_err;
@@ -79,6 +80,67 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Clownfish",
         class_name => "Clownfish",
+    );
+    $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_test {
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Clownfish   PACKAGE = Clownfish::Test
+
+void
+run_tests(package)
+    char *package;
+PPCODE:
+{
+    if (strEQ(package, "TestByteBuf")) {
+        lucy_TestBB_run_tests();
+    }
+    else if (strEQ(package, "TestCharBuf")) {
+        lucy_TestCB_run_tests();
+    }
+    else if (strEQ(package, "TestErr")) {
+        lucy_TestErr_run_tests();
+    }
+    else if (strEQ(package, "TestHash")) {
+        lucy_TestHash_run_tests();
+    }
+    else if (strEQ(package, "TestLockFreeRegistry")) {
+        lucy_TestLFReg_run_tests();
+    }
+    else if (strEQ(package, "TestObj")) {
+        lucy_TestObj_run_tests();
+    }
+    else if (strEQ(package, "TestNum")) {
+        lucy_TestNum_run_tests();
+    }
+    else if (strEQ(package, "TestVArray")) {
+        lucy_TestVArray_run_tests();
+    }
+    // Clownfish::Util
+    else if (strEQ(package, "TestAtomic")) {
+        lucy_TestAtomic_run_tests();
+    }
+    else if (strEQ(package, "TestMemory")) {
+        lucy_TestMemory_run_tests();
+    }
+    else if (strEQ(package, "TestNumberUtils")) {
+        lucy_TestNumUtil_run_tests();
+    }
+    else if (strEQ(package, "TestStringHelper")) {
+        lucy_TestStrHelp_run_tests();
+    }
+    else {
+        THROW(LUCY_ERR, "Unknown test id: %s", package);
+    }
+}
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Clownfish",
+        class_name => "Clownfish::Test",
     );
     $binding->append_xs($xs_code);
 
