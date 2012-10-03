@@ -29,7 +29,7 @@ sub run_tests {
     $name =~ s/_([a-z])/\u$1/g;
     my $path = catfile( 'charmonizer', "Test$name$Config{_exe}" );
     if ( !-e $path ) {
-        $path = catfile( updir(), $path );
+        $path = catfile( updir(), updir(), updir(), $path );
     }
     exec $path;
 }
