@@ -1,0 +1,129 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+inert class Lucy::Test::TestUtils  {
+
+    /** Testing-only CharBuf factory which uses strlen().
+     */
+    inert incremented CharBuf*
+    get_cb(const char *utf8);
+
+    /** Return a random unsigned 64-bit integer.
+     */
+    inert uint64_t
+    random_u64();
+
+    /** Return an array of <code>count</code> random 64-bit integers where
+     * <code>min <= n < limit</code>.
+     *
+     * If <code>buf</code> is NULL, it will be allocated, otherwise it will
+     * be used.
+     */
+    inert int64_t*
+    random_i64s(int64_t *buf, size_t count, int64_t min, int64_t limit);
+
+    /** Return an array of <code>count</code> random unsigned, 64-bit integers
+     * where <code>min <= n < limit</code>.
+     *
+     * If <code>buf</code> is NULL, it will be allocated, otherwise it will
+     * be used.
+     */
+    inert uint64_t*
+    random_u64s(uint64_t *buf, size_t count, uint64_t min, uint64_t limit);
+
+    /** Return an array of <code>count</code> random double-precision floating
+     * point numbers between 0 and 1.
+     *
+     * If <code>buf</code> is NULL, it will be allocated, otherwise it will
+     * be used.
+     */
+    inert double*
+    random_f64s(double *buf, size_t count);
+
+    /** Return a string with a random (legal) sequence of code points.
+     * @param length Length of the string in code points.
+     */
+    inert incremented CharBuf*
+    random_string(size_t length);
+
+    /** Return a VArray of CharBufs, each representing the content for a
+     * document in the shared collection.
+     */
+    inert incremented VArray*
+    doc_set();
+
+    /** Testing-only TermQuery factory.
+     */
+    inert incremented TermQuery*
+    make_term_query(const char *field, const char *term);
+
+    /** Testing-only PhraseQuery factory.
+     */
+    inert incremented PhraseQuery*
+    make_phrase_query(const char *field, ...);
+
+    /** Testing-only LeafQuery factory.
+     */
+    inert incremented LeafQuery*
+    make_leaf_query(const char *field, const char *term);
+
+    /** Return a new NOTQuery, decrementing the refcount for
+     * <code>negated_query</code>.
+     */
+    inert incremented NOTQuery*
+    make_not_query(Query *negated_query);
+
+    inert incremented RangeQuery*
+    make_range_query(const char *field, const char *lower_term = NULL,
+                     const char *upper_term = NULL,
+                     bool_t include_lower = true,
+                     bool_t include_upper = true);
+
+    /** Return either an ORQuery or an ANDQuery depending on the value of
+     * <code>boolop</code>.  Takes a NULL-terminated list of Query objects.
+     * Decrements the refcounts of all supplied children, under the assumption
+     * that they were created solely for inclusion within the aggregate query.
+     */
+    inert incremented PolyQuery*
+    make_poly_query(uint32_t boolop, ...);
+
+    /** Return the result of round-tripping the object through FREEZE and
+     * THAW.
+     */
+    inert incremented Obj*
+    freeze_thaw(Obj *object);
+
+    /** Verify an Analyzer's transform, transform_text, and split methods.
+     */
+    inert void
+    test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
+                  VArray *expected, const char *message);
+}
+
+__C__
+
+#define LUCY_TESTUTILS_BOOLOP_OR  1
+#define LUCY_TESTUTILS_BOOLOP_AND 2
+#ifdef LUCY_USE_SHORT_NAMES
+  #define BOOLOP_OR        LUCY_TESTUTILS_BOOLOP_OR
+  #define BOOLOP_AND       LUCY_TESTUTILS_BOOLOP_AND
+#endif
+
+__END_C__
+
+

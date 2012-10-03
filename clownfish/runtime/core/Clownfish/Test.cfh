@@ -1,0 +1,109 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Testing framework.
+ */
+inert class Lucy::Test { }
+
+class Lucy::Test::TestBatch inherits Clownfish::Obj {
+    int64_t    test_num;
+    int64_t    num_tests;
+    int64_t    num_passed;
+    int64_t    num_failed;
+    int64_t    num_skipped;
+
+    inert incremented TestBatch*
+    new(int64_t num_tests);
+
+    inert TestBatch*
+    init(TestBatch *self, int64_t num_tests);
+
+    void
+    Plan(TestBatch *self);
+
+    inert bool_t
+    test_true(void *vself, bool_t condition, const char *pattern, ...);
+
+    inert bool_t
+    test_false(void *vself, bool_t condition, const char *pattern, ...);
+
+    inert bool_t
+    test_int_equals(void *vself, long got, long expected,
+                    const char *pattern, ...);
+
+    inert bool_t
+    test_float_equals(void *vself, double got, double expected,
+                      const char *pattern, ...);
+
+    inert bool_t
+    test_string_equals(void *vself, const char *got, const char *expected,
+                       const char *pattern, ...);
+
+    inert bool_t
+    pass(void *vself, const char *pattern, ...);
+
+    inert bool_t
+    fail(void *vself, const char *pattern, ...);
+
+    inert void
+    skip(void *vself, const char *pattern, ...);
+
+    bool_t
+    VTest_True(TestBatch *self, bool_t condition, const char *pattern,
+               va_list args);
+
+    bool_t
+    VTest_False(TestBatch *self, bool_t condition, const char *pattern,
+                va_list args);
+
+    bool_t
+    VTest_Int_Equals(TestBatch *self, long got, long expected,
+                     const char *pattern, va_list args);
+
+    bool_t
+    VTest_Float_Equals(TestBatch *self, double got, double expected,
+                       const char *pattern, va_list args);
+
+    bool_t
+    VTest_String_Equals(TestBatch *self, const char *got, const char *expected,
+                       const char *pattern, va_list args);
+
+    bool_t
+    VPass(TestBatch *self, const char *pattern, va_list args);
+
+    bool_t
+    VFail(TestBatch *self, const char *pattern, va_list args);
+
+    void
+    VSkip(TestBatch *self, const char *pattern, va_list args);
+}
+
+__C__
+#ifdef LUCY_USE_SHORT_NAMES
+  #define TEST_TRUE                    lucy_TestBatch_test_true
+  #define TEST_FALSE                   lucy_TestBatch_test_false
+  #define TEST_INT_EQ                  lucy_TestBatch_test_int_equals
+  #define TEST_FLOAT_EQ                lucy_TestBatch_test_float_equals
+  #define TEST_STR_EQ                  lucy_TestBatch_test_string_equals
+  #define PASS                         lucy_TestBatch_pass
+  #define FAIL                         lucy_TestBatch_fail
+  #define SKIP                         lucy_TestBatch_skip
+#endif
+__END_C__
+
+
