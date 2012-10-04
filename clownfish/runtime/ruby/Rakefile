@@ -1,0 +1,112 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+require 'rbconfig'
+require 'rake/clean' 
+
+def rbconfig
+  RbConfig::CONFIG
+end
+
+BASE_PATH = '..'
+CHARMONIZER_ORIG_DIR = File.absolute_path( File.join( BASE_PATH, '..', '..', 'charmonizer' ) )
+CHARMONIZE_EXE_PATH  = 'charmonize' #TODO: probably will not work on win32
+CHARMONY_H_PATH      = 'charmony.h'
+CHARMONY_PM_PATH     = 'Charmony.rb'
+CORE_SOURCE_DIR      = File.absolute_path( BASE_PATH, 'core' );
+CFC_DIR              = File.join( BASE_PATH, '..', 'compiler', 'perl' );
+CFC_BUILD            = File.join( CFC_DIR, 'Build' );
+LIB_DIR              = 'lib';
+
+desc "Build Clownfish"
+task :build_clownfish => [:build_charmonizer_tests] do
+  puts "Building Clownfish"
+end
+
+desc "Building Charmonizer Tests"
+task :build_charmonizer_tests => [:charmonize] do
+  puts "Building Charmonizer Tests"
+end
+
+desc "Charmonize"
+task :charmonize => [:build_charmonize] do 
+  puts "Charmonizing"
+end
+
+desc "Building Charmonize"
+task :build_charmonize do 
+  puts "Buildling #{CHARMONIZE_EXE_PATH}"
+  meld_c = File.absolute_path('charmonize.c')
+
+  CLEAN.include(meld_c)
+  CLEAN.include(CHARMONIZE_EXE_PATH)
+
+  charmonize_main = File.join( CHARMONIZER_ORIG_DIR, 'charmonize.c' )
+
+  # TODO: Build.PL "PERL=$^X"
+  run_make(:dir => CHARMONIZER_ORIG_DIR, :args => [ "meld", "FILES=#{charmonize_main}", "OUT=#{meld_c}" ])
+
+  if !uptodate?(meld_c, [CHARMONIZE_EXE_PATH])
+    cc = cc_command
+    outflag = $cc =~ /cl\b/ ? "/Fe" : "-o ";
+    if system("#{cc} #{meld_c} #{outflag}${CHARMONIZE_EXE_PATH}").nil?
+      abort "Failed to compile #{CHARMONIZE_EXE_PATH}"
+    end
+  end
+
+end
+
+task :default => [:build_clownfish]
+
+def cc_command
+  rbconfig["CC"]
+end
+
+def run_make(params = {})
+  command     = params[:args]
+  dir         = params[:dir]
+  current_dir = Dir.pwd
+  chdir(dir) if dir
+  command.unshift("CC=#{cc_command}")
+  if RUBY_PLATFORM =~ /(mswin|mingw)/i
+    if cc_command =~ /^cl\b/ 
+      command.unshift("-f", "Makefile.MSVC")
+    else
+      command.unshift("-f", "Makefile.MinGW")
+    end
+  end
+  command.unshift(make_command)
+  success = system(*command)
+  if !success
+    raise "Make failed"
+  end
+  chdir(current_dir) if dir
+end
+
+def make_command
+  command = rbconfig["make-prog"]
+  if !command
+    if RUBY_PLATFORM =~ /mswin/i
+      if cc_command =~ /^cl\b/
+        command = "nmake"
+      end
+    end
+  end
+  if !command
+    command = 'make'
+  end
+  return command
+end
+
