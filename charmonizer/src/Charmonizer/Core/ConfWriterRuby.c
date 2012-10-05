@@ -82,9 +82,9 @@ S_open_config_rb(void) {
             "\n"
             "module Charmony\n"
             "\n"
-            "%%defs\n"
+            "defs = {}\n"
             "\n"
-            "def config\n\\%%defs\nend\n"
+            "def config\n\defs\nend\n"
             "\n"
            );
 }
@@ -162,9 +162,9 @@ S_ConfWriterRuby_add_def(const char *sym, const char *value) {
     }
     quoted_sym = S_ConfWriterRuby_quotify(sym, sym_buf, CFRUBY_MAX_BUF);
 
-    /* Quote value or use "undef". */
+    /* Quote value or use "nil". */
     if (!value) {
-        strcpy(value_buf, "undef");
+        strcpy(value_buf, "nil");
         quoted_value = value_buf;
     }
     else {
