@@ -33,17 +33,39 @@ LIB_DIR              = 'lib';
 desc "Build Clownfish"
 task :build_clownfish => [:build_charmonizer_tests] do
   puts "Building Clownfish"
+  old_dir = Dir.pwd
+  chdir(CFC_DIR);
+  if ( File.exists?('Rakefile') ) 
+    puts "\nBuilding Clownfish compiler... "
+    if system("rake").nil?
+      abort "Couldn't build rake"
+    end
+    puts "\nFinished building Clownfish compiler.\n"
+  end
+  chdir(old_dir);
 end
 
 desc "Building Charmonizer Tests"
 task :build_charmonizer_tests => [:charmonize] do
   puts "Building Charmonizer Tests"
+  flags = [
+    '-fno-common',
+    '-DFCRUBY',
+    '-fno-strict-aliasing',
+    '-pipe',
+    '-fstack-protector',
+    '-std=gnu99',
+    '-D_GNU_SOURCE',
+    '-I' + Dir.pwd
+  ].join(" ").gsub(/"/,'\"')
+
+  run_make( :dir => CHARMONIZER_ORIG_DIR, :args => [ "DEFS=#{flags}", "tests"])
 end
 
 desc "Charmonize"
 task :charmonize => [:build_charmonize] do 
   puts "Charmonizing"
-  return if !uptodate?(CHARMONIZE_EXE_PATH, [ CHARMONY_H_PATH, CHARMONY_RB_PATH ] )
+  #return if !uptodate?(CHARMONIZE_EXE_PATH, [ CHARMONY_H_PATH, CHARMONY_RB_PATH ] )
   puts "Running #{CHARMONIZE_EXE_PATH}...\n"
   CLEAN.include(CHARMONY_H_PATH)
   CLEAN.include(CHARMONY_RB_PATH)
@@ -112,6 +134,7 @@ def run_make(params = {})
     end
   end
   command.unshift(make_command)
+  puts command.join(" ")
   success = system(*command)
   if !success
     raise "Make failed"
