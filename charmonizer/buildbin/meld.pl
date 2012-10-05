@@ -66,6 +66,7 @@ my @core = qw(
     ConfWriter
     ConfWriterC
     ConfWriterPerl
+    ConfWriterRuby
     HeaderChecker
     OperatingSystem
     Util

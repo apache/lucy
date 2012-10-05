@@ -36,6 +36,7 @@
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/ConfWriterC.h"
 #include "Charmonizer/Core/ConfWriterPerl.h"
+#include "Charmonizer/Core/ConfWriterRuby.h"
 
 #define MAX_CC_LEN 128
 #define MAX_FLAGS_LEN 2048
@@ -45,6 +46,7 @@ struct CLIArgs {
     char cc_flags[MAX_FLAGS_LEN + 1];
     int  enable_c;
     int  enable_perl;
+    int  enable_ruby;
 };
 
 /* Parse command line arguments. */
@@ -67,6 +69,10 @@ S_parse_arguments(int argc, char **argv, struct CLIArgs *args) {
         }
         else if (strcmp(arg, "--enable-perl") == 0) {
             args->enable_perl = 1;
+            output_enabled = 1;
+        }
+        else if (strcmp(arg, "--enable-ruby") == 0) {
+            args->enable_ruby = 1;
             output_enabled = 1;
         }
         else if (memcmp(arg, "--cc=", 5) == 0) {
@@ -97,7 +103,7 @@ S_parse_arguments(int argc, char **argv, struct CLIArgs *args) {
        ) {
         fprintf(stderr,
                 "Usage: ./charmonize --cc=CC_COMMAND [--enable-c] "
-                "[--enable-perl] -- CC_FLAGS\n");
+                "[--enable-perl] [--enable-ruby] -- CC_FLAGS\n");
         exit(1);
     }
 
@@ -114,6 +120,9 @@ int main(int argc, char **argv) {
     }
     if (args.enable_perl) {
         chaz_ConfWriterPerl_enable();
+    }
+    if (args.enable_ruby) {
+        chaz_ConfWriterRuby_enable();
     }
 
     /* Run probe modules. */
