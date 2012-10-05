@@ -22,11 +22,11 @@ end
 
 BASE_PATH = '..'
 CHARMONIZER_ORIG_DIR = File.absolute_path( File.join( BASE_PATH, '..', '..', 'charmonizer' ) )
-CHARMONIZE_EXE_PATH  = 'charmonize' #TODO: probably will not work on win32
+CHARMONIZE_EXE_PATH  = './charmonize' #TODO: probably will not work on win32
 CHARMONY_H_PATH      = 'charmony.h'
-CHARMONY_PM_PATH     = 'Charmony.rb'
+CHARMONY_RB_PATH     = 'Charmony.rb'
 CORE_SOURCE_DIR      = File.absolute_path( BASE_PATH, 'core' );
-CFC_DIR              = File.join( BASE_PATH, '..', 'compiler', 'perl' );
+CFC_DIR              = File.join( BASE_PATH, '..', 'compiler', 'ruby' );
 CFC_BUILD            = File.join( CFC_DIR, 'Build' );
 LIB_DIR              = 'lib';
 
@@ -43,6 +43,30 @@ end
 desc "Charmonize"
 task :charmonize => [:build_charmonize] do 
   puts "Charmonizing"
+  return if !uptodate?(CHARMONIZE_EXE_PATH, [ CHARMONY_H_PATH, CHARMONY_RB_PATH ] )
+  puts "Running #{CHARMONIZE_EXE_PATH}...\n"
+  CLEAN.include(CHARMONY_H_PATH)
+  CLEAN.include(CHARMONY_RB_PATH)
+  CLEAN.include('_charm*')
+
+  # TODO: no clue if this is correct
+  command = [
+    CHARMONIZE_EXE_PATH,
+    '--cc=' + quotify( cc_command ),
+    '--enable-c',
+    '--enable-ruby',
+    '--',
+    extra_ccflags,
+  ]
+
+  if ( ENV['CHARM_VALGRIND'] )
+    command.unshift("valgrind", "--leak-check=yes")
+  end
+
+  if system(*command).nil?
+    abort "Failed to run #{CHARMONIZE_EXE_PATH}"
+  end
+
 end
 
 desc "Building Charmonize"
@@ -55,13 +79,13 @@ task :build_charmonize do
 
   charmonize_main = File.join( CHARMONIZER_ORIG_DIR, 'charmonize.c' )
 
-  # TODO: Build.PL "PERL=$^X"
+  # TODO: Build.PL "PERL=$^X" Right is defaulting to system perl?
   run_make(:dir => CHARMONIZER_ORIG_DIR, :args => [ "meld", "FILES=#{charmonize_main}", "OUT=#{meld_c}" ])
 
-  if !uptodate?(meld_c, [CHARMONIZE_EXE_PATH])
+  if !uptodate?(CHARMONIZE_EXE_PATH, [meld_c])
     cc = cc_command
     outflag = $cc =~ /cl\b/ ? "/Fe" : "-o ";
-    if system("#{cc} #{meld_c} #{outflag}${CHARMONIZE_EXE_PATH}").nil?
+    if system("#{cc} #{meld_c} #{outflag}#{CHARMONIZE_EXE_PATH}").nil?
       abort "Failed to compile #{CHARMONIZE_EXE_PATH}"
     end
   end
@@ -110,3 +134,38 @@ def make_command
   return command
 end
 
+def extra_ccflags 
+  ccflags = '-DCFCRUBY '
+  
+  if defined?(rbconfig["CFLAGS"])
+    ccflags += rbconfig['CFLAGS'] + ' '
+  end
+
+  if ENV.has_key?('CFLAGS')
+    ccflags += ENV['CFLAGS']
+  end
+  
+  if ENV.has_key?('LUCY_VALGRIND')
+    ccflags += "-fno-inline-functions "
+  end
+  
+  # Compile as C++ under MSVC.  Turn off stupid warnings, too.
+  if cc_command =~ /^cl\b/ 
+    ccflags += '/TP -D_CRT_SECURE_NO_WARNINGS '
+  end
+  
+  # Blindly include GCC-specific flags even though we don't know that the
+  # compiler is GCC.
+  if ccflags !~ /-std=/
+    ccflags += "-std=gnu99 "
+  end
+  if ccflags !~ /-D_GNU_SOURCE/ 
+    ccflags += "-D_GNU_SOURCE "
+  end
+  
+  return ccflags
+end
+
+def quotify(string)
+  return '"' + string.gsub(/[\\\"]/,'\\1') + '"'
+end
