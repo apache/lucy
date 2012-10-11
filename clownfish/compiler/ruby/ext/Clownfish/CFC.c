@@ -31,8 +31,7 @@ S_CFC_Binding_Core_Alloc(VALUE klass) {
 }
 
 static VALUE
-S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE dest,
-                        VALUE header, VALUE footer) {
+S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE header, VALUE footer) {
     CFCHierarchy* hierarchy_obj;
     CFCBindCore* self;
 
@@ -52,7 +51,7 @@ S_CFC_Binding_Core_Write_All_Modified(int argc, VALUE *argv, VALUE self_rb) {
     int modified = argc > 0 && RTEST(argv[0]) ? 1 : 0;
 
     Data_Get_Struct(self_rb, CFCBindCore, self);
-    CFCBindCore_write_all_modified(self,modified);
+    CFCBindCore_write_all_modified(self, modified);
 
     return Qnil;
 }
@@ -61,7 +60,7 @@ static void
 S_init_Binding_Core(void) {
     cBindCore = rb_define_class_under(mBinding, "Core", rb_cObject);
     rb_define_alloc_func(cBindCore, S_CFC_Binding_Core_Alloc);
-    rb_define_method(cBindCore, "initialize", S_CFC_Binding_Core_Init, 4);
+    rb_define_method(cBindCore, "initialize", S_CFC_Binding_Core_Init, 3);
     rb_define_method(cBindCore, "write_all_modified",
                      S_CFC_Binding_Core_Write_All_Modified, -1);
 }
