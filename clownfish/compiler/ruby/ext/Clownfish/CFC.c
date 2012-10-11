@@ -98,7 +98,7 @@ static void
 S_init_Hierarchy(void) {
     cHierarchy = rb_define_class_under(mModel, "Hierarchy", rb_cObject);
     rb_define_alloc_func(cHierarchy, S_CFC_Hierarchy_Alloc);
-    rb_define_method(cHierarchy, "initialize", S_CFC_Hierarchy_Init, 2);
+    rb_define_method(cHierarchy, "initialize", S_CFC_Hierarchy_Init, 1);
     rb_define_method(cHierarchy, "build", S_CFC_Hierarchy_Build, 0);
 }
 
