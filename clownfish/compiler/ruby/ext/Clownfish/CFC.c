@@ -39,7 +39,7 @@ S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE dest,
     Data_Get_Struct(hierarchy,CFCHierarchy,hierarchy_obj);
     Data_Get_Struct(self_rb, CFCBindCore, self);
 
-    self = CFCBindCore_new(hierarchy_obj,StringValuePtr(dest), StringValuePtr(header), StringValuePtr(footer));
+    self = CFCBindCore_new(hierarchy_obj, StringValuePtr(header), StringValuePtr(footer));
 
     DATA_PTR(self_rb) = self;
     return self_rb;
@@ -73,12 +73,12 @@ S_CFC_Hierarchy_Alloc(VALUE klass) {
 }
 
 static VALUE
-S_CFC_Hierarchy_Init(VALUE self_rb, VALUE source, VALUE dest) {
+S_CFC_Hierarchy_Init(VALUE self_rb, VALUE dest) {
     CFCHierarchy* self;
 
     Data_Get_Struct(self_rb,CFCHierarchy, self);
 
-    self = CFCHierarchy_new(StringValuePtr(source), StringValuePtr(dest));
+    self = CFCHierarchy_new(StringValuePtr(dest));
 
     DATA_PTR(self_rb) = self;
     return self_rb;
