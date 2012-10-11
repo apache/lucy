@@ -23,7 +23,7 @@ end
 CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
 CLOWNFISH_INCLUDE_DIR   = File.join('..','include')
 CLOWNFISH_SRC_DIR       = File.join('..','src')
-LEMON_SRC_DIR           = File.join('..','..','lemon')
+LEMON_SRC_DIR           = File.join('..','..','..','lemon')
 RUBY_EXT_CFC            = File.join('.','ext','Clownfish')
 
 desc "Build lemon"
