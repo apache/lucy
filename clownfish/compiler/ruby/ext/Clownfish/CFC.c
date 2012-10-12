@@ -31,9 +31,14 @@ S_CFC_Binding_Core_Alloc(VALUE klass) {
 }
 
 static VALUE
-S_CFC_Binding_Core_Init(VALUE self_rb, VALUE hierarchy, VALUE header, VALUE footer) {
+S_CFC_Binding_Core_Init(VALUE self_rb, VALUE params) {
+
     CFCHierarchy* hierarchy_obj;
     CFCBindCore* self;
+
+    VALUE hierarchy = rb_hash_aref(params, ID2SYM(rb_intern("hierarchy"))); 
+    VALUE header    = rb_hash_aref(params, ID2SYM(rb_intern("header"))); 
+    VALUE footer    = rb_hash_aref(params, ID2SYM(rb_intern("footer"))); 
 
     Data_Get_Struct(hierarchy,CFCHierarchy,hierarchy_obj);
     Data_Get_Struct(self_rb, CFCBindCore, self);
@@ -60,7 +65,7 @@ static void
 S_init_Binding_Core(void) {
     cBindCore = rb_define_class_under(mBinding, "Core", rb_cObject);
     rb_define_alloc_func(cBindCore, S_CFC_Binding_Core_Alloc);
-    rb_define_method(cBindCore, "initialize", S_CFC_Binding_Core_Init, 3);
+    rb_define_method(cBindCore, "initialize", S_CFC_Binding_Core_Init, 1);
     rb_define_method(cBindCore, "write_all_modified",
                      S_CFC_Binding_Core_Write_All_Modified, -1);
 }
@@ -72,8 +77,10 @@ S_CFC_Hierarchy_Alloc(VALUE klass) {
 }
 
 static VALUE
-S_CFC_Hierarchy_Init(VALUE self_rb, VALUE dest) {
+S_CFC_Hierarchy_Init(VALUE self_rb, VALUE params) {
     CFCHierarchy* self;
+  
+    VALUE dest = rb_hash_aref(params, ID2SYM(rb_intern("dest"))); 
 
     Data_Get_Struct(self_rb,CFCHierarchy, self);
 
