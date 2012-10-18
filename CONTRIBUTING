@@ -19,7 +19,11 @@ GET THE CODE:
   Lucy's codebase is available via Git from git.apache.org.  Start by creating
   a clone of the repository:
 
-    git clone git://git.apache.org/lucy.git
+    # Non Committers
+    git clone http://git-wip-us.apache.org/repos/asf/lucy.git
+
+    # Committers
+    git clone https://git-wip-us.apache.org/repos/asf/lucy.git
 
   There is also a mirror on Github.
 
