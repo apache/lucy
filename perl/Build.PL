@@ -37,7 +37,7 @@ my $builder = Lucy::Build->new(
     meta_add   => {
         resources => {
             homepage   => 'http://lucy.apache.org',
-            repository => 'http://svn.apache.org/repos/asf/lucy',
+            repository => 'http://git-wip-us.apache.org/repos/asf/lucy.git',
             bugtracker => 'https://issues.apache.org/jira/browse/LUCY',
         },
     },
