@@ -19,10 +19,14 @@ use warnings;
 package Lucy;
 
 use 5.008003;
-use Exporter;
 
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
+
+use Exporter 'import';
+BEGIN {
+    our @EXPORT_OK = qw( to_clownfish to_perl kdump );
+}
 
 # On most UNIX variants, this flag makes DynaLoader pass RTLD_GLOBAL to
 # dl_open, so extensions can resolve the needed symbols without explicitly
@@ -31,11 +35,10 @@ sub dl_load_flags { 1 }
 
 BEGIN {
     require DynaLoader;
-    our @ISA = qw( DynaLoader Exporter );
+    our @ISA = qw( DynaLoader );
     # This loads a large number of disparate subs.
     bootstrap Lucy '0.3.0';
     _init_autobindings();
-    our @EXPORT_OK = qw( to_clownfish to_perl kdump );
 }
 
 sub kdump {
