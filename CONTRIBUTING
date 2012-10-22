@@ -16,8 +16,8 @@ MAKE A PLAN:
   
 GET THE CODE:
 
-  Lucy's codebase is available via Git from git.apache.org.  Start by creating
-  a clone of the repository:
+  Lucy's codebase is available via Git from git-wip-us.apache.org.  Start by
+  creating a clone of the repository:
 
     # Non Committers
     git clone http://git-wip-us.apache.org/repos/asf/lucy.git
