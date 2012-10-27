@@ -40,7 +40,7 @@ S_CFC_Binding_Core_Init(VALUE self_rb, VALUE params) {
     VALUE header    = rb_hash_aref(params, ID2SYM(rb_intern("header"))); 
     VALUE footer    = rb_hash_aref(params, ID2SYM(rb_intern("footer"))); 
 
-    Data_Get_Struct(hierarchy,CFCHierarchy,hierarchy_obj);
+    Data_Get_Struct(hierarchy, CFCHierarchy, hierarchy_obj);
     Data_Get_Struct(self_rb, CFCBindCore, self);
 
     self = CFCBindCore_new(hierarchy_obj, StringValuePtr(header), StringValuePtr(footer));
@@ -91,6 +91,26 @@ S_CFC_Hierarchy_Init(VALUE self_rb, VALUE params) {
 }
 
 static VALUE
+S_CFC_Hierarchy_Add_Source_Dir(VALUE self_rb, VALUE source_dir) {
+    CFCHierarchy *self;
+
+    Data_Get_Struct(self_rb, CFCHierarchy, self);
+    CFCHierarchy_add_source_dir(self, StringValuePtr(source_dir));
+
+    return Qnil;
+}
+
+static VALUE
+S_CFC_Hierarchy_Add_Include_Dir(VALUE self_rb, VALUE include_dir) {
+    CFCHierarchy *self;
+
+    Data_Get_Struct(self_rb, CFCHierarchy, self);
+    CFCHierarchy_add_include_dir(self, StringValuePtr(include_dir));
+
+    return Qnil;
+}
+
+static VALUE
 S_CFC_Hierarchy_Build(VALUE self_rb) {
     CFCHierarchy *self;
 
@@ -106,6 +126,8 @@ S_init_Hierarchy(void) {
     rb_define_alloc_func(cHierarchy, S_CFC_Hierarchy_Alloc);
     rb_define_method(cHierarchy, "initialize", S_CFC_Hierarchy_Init, 1);
     rb_define_method(cHierarchy, "build", S_CFC_Hierarchy_Build, 0);
+    rb_define_method(cHierarchy, "add_source_dir", S_CFC_Hierarchy_Add_Source_Dir, 1);
+    rb_define_method(cHierarchy, "add_include_dir", S_CFC_Hierarchy_Add_Include_Dir, 1);
 }
 
 void
