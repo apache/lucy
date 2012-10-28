@@ -45,16 +45,6 @@ task :clownfish => [:parse_y_files] do
   end
   Rake::Task['cfc_ext'].invoke
 
-  require_relative 'ext/Clownfish/CFC'
-  hierarchy = Clownfish::CFC::Model::Hierarchy.new(:dest => "autogen")
-
-  hierarchy.add_source_dir('../core')
-  #heararchy.add_source_dir('ext')
-  hierarchy.add_source_dir('autogen/source')
-  hierarchy.build
-  
-  core_binding = Clownfish::CFC::Binding::Core.new(:hierarchy => hierarchy, :header => autogen_header, :footer => '')
-  core_binding.write_all_modified
 end
 
 # Clean up compiled object files.
