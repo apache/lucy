@@ -15,6 +15,7 @@
 
 require 'rbconfig'
 require 'rake/clean' 
+require 'rake/extensiontask'
 
 def rbconfig
   RbConfig::CONFIG
@@ -30,6 +31,15 @@ CFC_DIR              = File.join( BASE_PATH, '..', 'compiler', 'ruby' );
 CFC_BUILD            = File.join( CFC_DIR, 'Build' );
 LIB_DIR              = 'lib';
 
+Rake::ExtensionTask.new do |ext|
+  ext.name = 'Bind' 
+  ext.ext_dir = './ext'
+  ext.lib_dir = './lib'
+  ext.tmp_dir = './tmp'
+  ext.source_pattern = "*.c"
+  ext.config_options << '-std=gnu99 -D_GNU_SOURCE -fvsibility=hidden'
+end
+
 desc "Build Clownfish"
 task :build_clownfish => [:build_charmonizer_tests] do
   puts "Building Clownfish"
@@ -43,17 +53,20 @@ task :build_clownfish => [:build_charmonizer_tests] do
     puts "\nFinished building Clownfish compiler.\n"
   end
   chdir(old_dir);
-
   require_relative '../../compiler/ruby/ext/Clownfish/CFC'
   hierarchy = Clownfish::CFC::Model::Hierarchy.new(:dest => "autogen")
 
   hierarchy.add_source_dir('../core')
-  #heararchy.add_source_dir('ext')
+  hierarchy.add_source_dir('ext')
   hierarchy.add_source_dir('autogen/source')
   hierarchy.build
   
   core_binding = Clownfish::CFC::Binding::Core.new(:hierarchy => hierarchy, :header => autogen_header, :footer => '')
   core_binding.write_all_modified
+
+  puts "Building Binding Code"
+  Rake::Task['compile'].invoke
+
 end
 
 desc "Building Charmonizer Tests"
