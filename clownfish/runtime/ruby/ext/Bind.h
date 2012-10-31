@@ -36,6 +36,7 @@ extern "C" {
 
 VALUE Bind_cfish_to_ruby(cfish_Obj *obj);
 VALUE Bind_cb_to_ruby(const cfish_CharBuf *cb);
+static VALUE S_cfish_array_to_ruby_array(cfish_VArray *varray);
 
 #ifdef __cplusplus
 }
