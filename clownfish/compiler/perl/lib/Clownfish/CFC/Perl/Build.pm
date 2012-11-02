@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 package Clownfish::CFC::Perl::Build;
-use base qw( Module::Build );
+use base qw( Clownfish::CFC::Perl::Build::Charmonic );
 our $VERSION = '0.01';
 
 use File::Spec::Functions qw( catdir catfile curdir updir abs2rel rel2abs );

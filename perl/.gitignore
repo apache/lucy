@@ -6,7 +6,7 @@
 /_build/
 /autogen/
 /blib/
-/charmonize
+/charmonizer
 /charmonize.c
 /charmony.h
 /lib/Lucy.c

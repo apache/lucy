@@ -35,11 +35,8 @@ use File::Spec::Functions qw( catdir catfile updir rel2abs );
 use File::Path qw( rmtree );
 use File::Copy qw( move );
 use Config;
-use Env qw( @PATH );
 use Carp;
 use Cwd qw( getcwd );
-
-BEGIN { unshift @PATH, rel2abs( getcwd() ) }
 
 my @BASE_PATH = __PACKAGE__->cf_base_path;
 
@@ -47,9 +44,6 @@ my $CHARMONIZER_ORIG_DIR
     = rel2abs( catdir( @BASE_PATH, updir(), updir(), 'charmonizer' ) );
 my $COMMON_SOURCE_DIR    = catdir( @BASE_PATH, 'common' );
 my $CHARMONIZER_C        = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
-my $CHARMONIZER_EXE_PATH = "charmonizer$Config{_exe}";
-my $CHARMONY_H_PATH      = 'charmony.h';
-my $CHARMONY_PM_PATH     = 'Charmony.pm';
 my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
 my $CFC_DIR = catdir( @BASE_PATH, updir(), 'compiler', 'perl' );
 my $CFC_BUILD  = catfile( $CFC_DIR, 'Build' );
@@ -80,6 +74,8 @@ sub new {
     }
     $self->extra_compiler_flags(@$extra_ccflags);
 
+    $self->charmonizer_params( charmonizer_c => $CHARMONIZER_C );
+
     $self->clownfish_params( autogen_header => $self->autogen_header );
 
     return $self;
@@ -101,54 +97,6 @@ sub _run_make {
     unshift @command, "$Config{make}";
     system(@command) and confess("$Config{make} failed");
     chdir $current_directory if $dir;
-}
-
-# Compile and run the charmonizer executable, creating the charmony.h and
-# Charmony.pm files.
-sub ACTION_charmony {
-    my $self = shift;
-    $self->add_to_cleanup($CHARMONIZER_EXE_PATH);
-    if ( !$self->up_to_date( $CHARMONIZER_C, $CHARMONIZER_EXE_PATH ) ) {
-        print "\nCompiling $CHARMONIZER_EXE_PATH...\n\n";
-        my $cc = $self->config('cc');
-        my $outflag = $cc =~ /cl\b/ ? "/Fe" : "-o ";
-        system("$cc $CHARMONIZER_C $outflag$CHARMONIZER_EXE_PATH")
-            and die "Failed to compile $CHARMONIZER_EXE_PATH";
-    }
-
-    return if $self->up_to_date( $CHARMONIZER_EXE_PATH, [
-        $CHARMONY_H_PATH, $CHARMONY_PM_PATH,
-    ] );
-    print "\nRunning $CHARMONIZER_EXE_PATH...\n\n";
-
-    $self->add_to_cleanup($CHARMONY_H_PATH);
-    $self->add_to_cleanup($CHARMONY_PM_PATH);
-    # Clean up after charmonizer if it doesn't succeed on its own.
-    $self->add_to_cleanup("_charm*");
-
-    # Prepare arguments to charmonizer.
-    my @command = (
-        $CHARMONIZER_EXE_PATH,
-        '--cc=' . _quotify( $self->config('cc') ),
-        '--enable-c',
-        '--enable-perl',
-        '--',
-        $self->config('ccflags'),
-        @{ $self->extra_compiler_flags },
-    );
-    if ( $ENV{CHARM_VALGRIND} ) {
-        unshift @command, "valgrind", "--leak-check=yes";
-    }
-    print join( " ", @command ), $/;
-
-    system(@command) and die "Failed to run $CHARMONIZER_EXE_PATH: $!";
-}
-
-sub _quotify {
-    my $string = shift;
-    $string =~ s/\\/\\\\/g;
-    $string =~ s/"/\\"/g;
-    return qq|"$string"|;
 }
 
 # Build the charmonizer tests.
