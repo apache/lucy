@@ -84,7 +84,7 @@ S_open_config_rb(void) {
             "\n"
             "defs = {}\n"
             "\n"
-            "def config\n\defs\nend\n"
+            "def config\ndefs\nend\n"
             "\n"
            );
 }
