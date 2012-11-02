@@ -17,7 +17,12 @@ use strict;
 use warnings;
 
 package Clownfish::CFC::Build;
-use base qw( Module::Build );
+
+# In order to find Clownfish::CFC::Perl::Build::Charmonic, look in 'lib'
+# and cleanup @INC afterwards.
+use lib 'lib';
+use base qw( Clownfish::CFC::Perl::Build::Charmonic );
+no lib 'lib';
 
 use File::Spec::Functions qw( catfile updir catdir );
 use Config;
@@ -25,6 +30,8 @@ use Cwd qw( getcwd );
 use Carp;
 
 my $base_dir = catdir( updir(), updir(), updir() );
+my $COMMON_SOURCE_DIR = catdir( $base_dir, 'common' );
+my $CHARMONIZER_C     = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
 my $PPPORT_H_PATH = catfile( updir(), qw( include ppport.h ) );
 my $LEMON_DIR = catdir( $base_dir, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
@@ -84,6 +91,9 @@ sub new {
         %args,
         recursive_test_files => 1,
         extra_compiler_flags => __PACKAGE__->extra_ccflags,
+        charmonizer_params   => {
+            charmonizer_c => $CHARMONIZER_C,
+        },
     );
 }
 
@@ -171,6 +181,7 @@ sub ACTION_lexers {
 
 sub ACTION_code {
     my $self = shift;
+    $self->dispatch('charmony');
     $self->dispatch('ppport');
     $self->dispatch('parsers');
     $self->SUPER::ACTION_code;

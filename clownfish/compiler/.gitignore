@@ -1,10 +1,4 @@
 include/ppport.h
-perl/Build
-perl/MYMETA.json
-perl/MYMETA.yml
-perl/_build/
-perl/blib/
-perl/lib/Clownfish/CFC.c
 src/CFCParseHeader.c
 src/CFCParseHeader.h
 src/CFCParseHeader.out

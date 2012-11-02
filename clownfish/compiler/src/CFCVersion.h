@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
+#include "charmony.h"
 
 typedef struct CFCVersion CFCVersion;
 

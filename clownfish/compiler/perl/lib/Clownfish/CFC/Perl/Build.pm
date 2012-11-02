@@ -79,7 +79,7 @@ sub new {
 
     my $include_dirs = $self->include_dirs;
     push( @$include_dirs,
-        curdir(), # for ppport.h
+        curdir(), # for ppport.h and charmony.h
         catdir( $AUTOGEN_DIR, 'include' ),
     );
     $self->include_dirs($include_dirs);
