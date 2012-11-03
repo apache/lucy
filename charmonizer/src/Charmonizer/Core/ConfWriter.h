@@ -80,7 +80,6 @@ chaz_ConfWriter_end_module(void);
 void
 chaz_ConfWriter_add_writer(struct chaz_ConfWriter *writer);
 
-#ifdef CHAZ_CONFWRITER_INTERNAL
 typedef void
 (*chaz_ConfWriter_clean_up_t)(void);
 typedef void
@@ -110,7 +109,6 @@ typedef struct chaz_ConfWriter {
 #ifdef CHAZ_USE_SHORT_NAMES
   #define ConfWriter chaz_ConfWriter
 #endif /* CHAZ_USE_SHORT_NAMES */
-#endif /* CHAZ_CONFWRITER_INTERNAL */
 
 #ifdef   CHAZ_USE_SHORT_NAMES
   #define ConfWriter_init                   chaz_ConfWriter_init

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#define CHAZ_CONFWRITER_INTERNAL
 #define CHAZ_USE_SHORT_NAMES
 
 #include "Charmonizer/Core/Util.h"
