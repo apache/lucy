@@ -174,7 +174,7 @@ sub ACTION_lexers {
         next
             if $self->up_to_date( [ $l_file, @$y_files ],
             [ $c_file, $h_file ] );
-        system( 'flex', '-o', $c_file, "--header-file=$h_file", $l_file )
+        system( 'flex', '--nounistd', '-o', $c_file, "--header-file=$h_file", $l_file )
             and die "flex failed";
     }
 }
