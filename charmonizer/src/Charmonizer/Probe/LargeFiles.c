@@ -93,7 +93,7 @@ static char pread64_command[10];
 static char off64_type[10];
 
 void
-LargeFiles_run(void) {
+chaz_LargeFiles_run(void) {
     int found_off64_t = false;
     int found_stdio64 = false;
     int found_lseek   = false;
@@ -101,13 +101,13 @@ LargeFiles_run(void) {
     unsigned i;
     const char *stat_includes = "#include <stdio.h>\n#include <sys/stat.h>";
 
-    ConfWriter_start_module("LargeFiles");
+    chaz_ConfWriter_start_module("LargeFiles");
 
     /* Find off64_t or equivalent. */
     found_off64_t = S_probe_off64();
     if (found_off64_t) {
-        ConfWriter_add_def("HAS_64BIT_OFFSET_TYPE", NULL);
-        ConfWriter_add_def("off64_t",  off64_type);
+        chaz_ConfWriter_add_def("HAS_64BIT_OFFSET_TYPE", NULL);
+        chaz_ConfWriter_add_def("off64_t",  off64_type);
     }
 
     /* See if stdio variants with 64-bit support exist. */
@@ -115,13 +115,13 @@ LargeFiles_run(void) {
         stdio64_combo combo = stdio64_combos[i];
         if (S_probe_stdio64(&combo)) {
             found_stdio64 = true;
-            ConfWriter_add_def("HAS_64BIT_STDIO", NULL);
+            chaz_ConfWriter_add_def("HAS_64BIT_STDIO", NULL);
             strcpy(fopen_command, combo.fopen_command);
             strcpy(fseek_command, combo.fseek_command);
             strcpy(ftell_command, combo.ftell_command);
-            ConfWriter_add_def("fopen64",  fopen_command);
-            ConfWriter_add_def("ftello64", ftell_command);
-            ConfWriter_add_def("fseeko64", fseek_command);
+            chaz_ConfWriter_add_def("fopen64",  fopen_command);
+            chaz_ConfWriter_add_def("ftello64", ftell_command);
+            chaz_ConfWriter_add_def("fseeko64", fseek_command);
             break;
         }
     }
@@ -132,9 +132,9 @@ LargeFiles_run(void) {
             unbuff_combo combo = unbuff_combos[i];
             found_lseek = S_probe_lseek(&combo);
             if (found_lseek) {
-                ConfWriter_add_def("HAS_64BIT_LSEEK", NULL);
+                chaz_ConfWriter_add_def("HAS_64BIT_LSEEK", NULL);
                 strcpy(lseek_command, combo.lseek_command);
-                ConfWriter_add_def("lseek64", lseek_command);
+                chaz_ConfWriter_add_def("lseek64", lseek_command);
                 break;
             }
         }
@@ -142,9 +142,9 @@ LargeFiles_run(void) {
             unbuff_combo combo = unbuff_combos[i];
             found_pread64 = S_probe_pread64(&combo);
             if (found_pread64) {
-                ConfWriter_add_def("HAS_64BIT_PREAD", NULL);
+                chaz_ConfWriter_add_def("HAS_64BIT_PREAD", NULL);
                 strcpy(pread64_command, combo.pread64_command);
-                ConfWriter_add_def("pread64", pread64_command);
+                chaz_ConfWriter_add_def("pread64", pread64_command);
                 found_pread64 = true;
                 break;
             }
@@ -152,35 +152,35 @@ LargeFiles_run(void) {
     }
 
     /* Make checks needed for testing. */
-    if (HeadCheck_check_header("sys/stat.h")) {
-        ConfWriter_append_conf("#define CHAZ_HAS_SYS_STAT_H\n");
+    if (chaz_HeadCheck_check_header("sys/stat.h")) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_SYS_STAT_H\n");
     }
-    if (HeadCheck_check_header("io.h")) {
-        ConfWriter_append_conf("#define CHAZ_HAS_IO_H\n");
+    if (chaz_HeadCheck_check_header("io.h")) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_IO_H\n");
     }
-    if (HeadCheck_check_header("fcntl.h")) {
-        ConfWriter_append_conf("#define CHAZ_HAS_FCNTL_H\n");
+    if (chaz_HeadCheck_check_header("fcntl.h")) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_FCNTL_H\n");
     }
-    if (HeadCheck_contains_member("struct stat", "st_size", stat_includes)) {
-        ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_SIZE\n");
+    if (chaz_HeadCheck_contains_member("struct stat", "st_size", stat_includes)) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_SIZE\n");
     }
-    if (HeadCheck_contains_member("struct stat", "st_blocks", stat_includes)) {
-        ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_BLOCKS\n");
+    if (chaz_HeadCheck_contains_member("struct stat", "st_blocks", stat_includes)) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_BLOCKS\n");
     }
 
-    ConfWriter_end_module();
+    chaz_ConfWriter_end_module();
 }
 
 /* Code for finding an off64_t or some other 64-bit signed type. */
 static const char off64_code[] =
-    QUOTE(  %s                                        )
-    QUOTE(  #include "_charm.h"                       )
-    QUOTE(  int main()                                )
-    QUOTE(  {                                         )
-    QUOTE(      Charm_Setup;                          )
-    QUOTE(      printf("%%d", (int)sizeof(%s));       )
-    QUOTE(      return 0;                             )
-    QUOTE(  }                                         );
+    CHAZ_QUOTE(  %s                                        )
+    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  int main()                                )
+    CHAZ_QUOTE(  {                                         )
+    CHAZ_QUOTE(      Charm_Setup;                          )
+    CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
+    CHAZ_QUOTE(      return 0;                             )
+    CHAZ_QUOTE(  }                                         );
 
 static const int
 S_probe_off64(void) {
@@ -192,14 +192,14 @@ S_probe_off64(void) {
         const char *candidate = off64_options[i];
         char *output;
         size_t output_len;
-        int has_sys_types_h = HeadCheck_check_header("sys/types.h");
+        int has_sys_types_h = chaz_HeadCheck_check_header("sys/types.h");
         const char *sys_types_include = has_sys_types_h
                                         ? "#include <sys/types.h>"
                                         : "";
 
         /* Execute the probe. */
         sprintf(code_buf, off64_code, sys_types_include, candidate);
-        output = CC_capture_output(code_buf, &output_len);
+        output = chaz_CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             long sizeof_candidate = strtol(output, NULL, 10);
             free(output);
@@ -216,19 +216,19 @@ S_probe_off64(void) {
 
 /* Code for checking ftello64 and friends. */
 static const char stdio64_code[] =
-    QUOTE(  %s                                         )
-    QUOTE(  #include "_charm.h"                        )
-    QUOTE(  int main() {                               )
-    QUOTE(      %s pos;                                )
-    QUOTE(      FILE *f;                               )
-    QUOTE(      Charm_Setup;                           )
-    QUOTE(      f = %s("_charm_stdio64", "w");         )
-    QUOTE(      if (f == NULL) return -1;              )
-    QUOTE(      printf("%%d", (int)sizeof(%s));        )
-    QUOTE(      pos = %s(stdout);                      )
-    QUOTE(      %s(stdout, 0, SEEK_SET);               )
-    QUOTE(      return 0;                              )
-    QUOTE(  }                                          );
+    CHAZ_QUOTE(  %s                                         )
+    CHAZ_QUOTE(  #include "_charm.h"                        )
+    CHAZ_QUOTE(  int main() {                               )
+    CHAZ_QUOTE(      %s pos;                                )
+    CHAZ_QUOTE(      FILE *f;                               )
+    CHAZ_QUOTE(      Charm_Setup;                           )
+    CHAZ_QUOTE(      f = %s("_charm_stdio64", "w");         )
+    CHAZ_QUOTE(      if (f == NULL) return -1;              )
+    CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));        )
+    CHAZ_QUOTE(      pos = %s(stdout);                      )
+    CHAZ_QUOTE(      %s(stdout, 0, SEEK_SET);               )
+    CHAZ_QUOTE(      return 0;                              )
+    CHAZ_QUOTE(  }                                          );
 
 
 static int
@@ -250,7 +250,7 @@ S_probe_stdio64(stdio64_combo *combo) {
             combo->fseek_command);
 
     /* Verify compilation and that the offset type has 8 bytes. */
-    output = CC_capture_output(code_buf, &output_len);
+    output = chaz_CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         long size = strtol(output, NULL, 10);
         if (size == 8) {
@@ -259,8 +259,8 @@ S_probe_stdio64(stdio64_combo *combo) {
         free(output);
     }
 
-    if (!Util_remove_and_verify("_charm_stdio64")) {
-        Util_die("Failed to remove '_charm_stdio64'");
+    if (!chaz_Util_remove_and_verify("_charm_stdio64")) {
+        chaz_Util_die("Failed to remove '_charm_stdio64'");
     }
 
     return success;
@@ -268,18 +268,18 @@ S_probe_stdio64(stdio64_combo *combo) {
 
 /* Code for checking 64-bit lseek. */
 static const char lseek_code[] =
-    QUOTE(  %s                                                        )
-    QUOTE(  #include "_charm.h"                                       )
-    QUOTE(  int main() {                                              )
-    QUOTE(      int fd;                                               )
-    QUOTE(      Charm_Setup;                                          )
-    QUOTE(      fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666);  )
-    QUOTE(      if (fd == -1) { return -1; }                          )
-    QUOTE(      %s(fd, 0, SEEK_SET);                                  )
-    QUOTE(      printf("%%d", 1);                                     )
-    QUOTE(      if (close(fd)) { return -1; }                         )
-    QUOTE(      return 0;                                             )
-    QUOTE(  }                                                         );
+    CHAZ_QUOTE(  %s                                                        )
+    CHAZ_QUOTE(  #include "_charm.h"                                       )
+    CHAZ_QUOTE(  int main() {                                              )
+    CHAZ_QUOTE(      int fd;                                               )
+    CHAZ_QUOTE(      Charm_Setup;                                          )
+    CHAZ_QUOTE(      fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666);  )
+    CHAZ_QUOTE(      if (fd == -1) { return -1; }                          )
+    CHAZ_QUOTE(      %s(fd, 0, SEEK_SET);                                  )
+    CHAZ_QUOTE(      printf("%%d", 1);                                     )
+    CHAZ_QUOTE(      if (close(fd)) { return -1; }                         )
+    CHAZ_QUOTE(      return 0;                                             )
+    CHAZ_QUOTE(  }                                                         );
 
 static int
 S_probe_lseek(unbuff_combo *combo) {
@@ -294,14 +294,14 @@ S_probe_lseek(unbuff_combo *combo) {
 
     /* Verify compilation. */
     sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
-    output = CC_capture_output(code_buf, &output_len);
+    output = chaz_CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         success = true;
         free(output);
     }
 
-    if (!Util_remove_and_verify("_charm_lseek")) {
-        Util_die("Failed to remove '_charm_lseek'");
+    if (!chaz_Util_remove_and_verify("_charm_lseek")) {
+        chaz_Util_die("Failed to remove '_charm_lseek'");
     }
 
     free(code_buf);
@@ -311,16 +311,16 @@ S_probe_lseek(unbuff_combo *combo) {
 /* Code for checking 64-bit pread.  The pread call will fail, but that's fine
  * as long as it compiles. */
 static const char pread64_code[] =
-    QUOTE(  %s                                     )
-    QUOTE(  #include "_charm.h"                    )
-    QUOTE(  int main() {                           )
-    QUOTE(      int fd = 20;                       )
-    QUOTE(      char buf[1];                       )
-    QUOTE(      Charm_Setup;                       )
-    QUOTE(      printf("1");                       )
-    QUOTE(      %s(fd, buf, 1, 1);                 )
-    QUOTE(      return 0;                          )
-    QUOTE(  }                                      );
+    CHAZ_QUOTE(  %s                                     )
+    CHAZ_QUOTE(  #include "_charm.h"                    )
+    CHAZ_QUOTE(  int main() {                           )
+    CHAZ_QUOTE(      int fd = 20;                       )
+    CHAZ_QUOTE(      char buf[1];                       )
+    CHAZ_QUOTE(      Charm_Setup;                       )
+    CHAZ_QUOTE(      printf("1");                       )
+    CHAZ_QUOTE(      %s(fd, buf, 1, 1);                 )
+    CHAZ_QUOTE(      return 0;                          )
+    CHAZ_QUOTE(  }                                      );
 
 static int
 S_probe_pread64(unbuff_combo *combo) {
@@ -335,7 +335,7 @@ S_probe_pread64(unbuff_combo *combo) {
 
     /* Verify compilation. */
     sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
-    output = CC_capture_output(code_buf, &output_len);
+    output = chaz_CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         success = true;
         free(output);

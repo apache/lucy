@@ -27,7 +27,7 @@
 
 /* Static vars. */
 static FILE *config_rb_fh  = NULL;
-static ConfWriter CWRuby_conf_writer;
+static chaz_ConfWriter CWRuby_conf_writer;
 
 /* Open the Charmony.rb file handle.
  */
@@ -52,7 +52,7 @@ static void
 S_ConfWriterRuby_end_module(void);
 
 void
-ConfWriterRuby_enable(void) {
+chaz_ConfWriterRuby_enable(void) {
     CWRuby_conf_writer.clean_up          = S_ConfWriterRuby_clean_up;
     CWRuby_conf_writer.vappend_conf      = S_ConfWriterRuby_vappend_conf;
     CWRuby_conf_writer.add_def           = S_ConfWriterRuby_add_def;
@@ -62,7 +62,7 @@ ConfWriterRuby_enable(void) {
     CWRuby_conf_writer.start_module      = S_ConfWriterRuby_start_module;
     CWRuby_conf_writer.end_module        = S_ConfWriterRuby_end_module;
     S_open_config_rb();
-    ConfWriter_add_writer(&CWRuby_conf_writer);
+    chaz_ConfWriter_add_writer(&CWRuby_conf_writer);
     return;
 }
 
@@ -71,7 +71,7 @@ S_open_config_rb(void) {
     /* Open the filehandle. */
     config_rb_fh = fopen("Charmony.rb", "w+");
     if (config_rb_fh == NULL) {
-        Util_die("Can't open 'Charmony.rb': %s", strerror(errno));
+        chaz_Util_die("Can't open 'Charmony.rb': %s", strerror(errno));
     }
 
     /* Start the module. */
@@ -93,7 +93,7 @@ S_ConfWriterRuby_clean_up(void) {
     /* Write the last bit of Charmony.rb and close. */
     fprintf(config_rb_fh, "\nend\n\n");
     if (fclose(config_rb_fh)) {
-        Util_die("Couldn't close 'Charmony.rb': %s", strerror(errno));
+        chaz_Util_die("Couldn't close 'Charmony.rb': %s", strerror(errno));
     }
 }
 
@@ -157,7 +157,7 @@ S_ConfWriterRuby_add_def(const char *sym, const char *value) {
 
     /* Quote key. */
     if (!sym) {
-        Util_die("Can't handle NULL key");
+        chaz_Util_die("Can't handle NULL key");
     }
     quoted_sym = S_ConfWriterRuby_quotify(sym, sym_buf, CFRUBY_MAX_BUF);
 

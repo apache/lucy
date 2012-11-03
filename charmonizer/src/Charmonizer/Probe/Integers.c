@@ -31,39 +31,39 @@ static int
 S_machine_is_big_endian(void);
 
 static const char sizes_code[] =
-    QUOTE(  #include "_charm.h"                       )
-    QUOTE(  int main () {                             )
-    QUOTE(      Charm_Setup;                          )
-    QUOTE(      printf("%d ", (int)sizeof(char));     )
-    QUOTE(      printf("%d ", (int)sizeof(short));    )
-    QUOTE(      printf("%d ", (int)sizeof(int));      )
-    QUOTE(      printf("%d ", (int)sizeof(long));     )
-    QUOTE(      printf("%d ", (int)sizeof(void*));    )
-    QUOTE(      return 0;                             )
-    QUOTE(  }                                         );
+    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  int main () {                             )
+    CHAZ_QUOTE(      Charm_Setup;                          )
+    CHAZ_QUOTE(      printf("%d ", (int)sizeof(char));     )
+    CHAZ_QUOTE(      printf("%d ", (int)sizeof(short));    )
+    CHAZ_QUOTE(      printf("%d ", (int)sizeof(int));      )
+    CHAZ_QUOTE(      printf("%d ", (int)sizeof(long));     )
+    CHAZ_QUOTE(      printf("%d ", (int)sizeof(void*));    )
+    CHAZ_QUOTE(      return 0;                             )
+    CHAZ_QUOTE(  }                                         );
 
 static const char type64_code[] =
-    QUOTE(  #include "_charm.h"                       )
-    QUOTE(  int main()                                )
-    QUOTE(  {                                         )
-    QUOTE(      Charm_Setup;                          )
-    QUOTE(      printf("%%d", (int)sizeof(%s));       )
-    QUOTE(      return 0;                             )
-    QUOTE(  }                                         );
+    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  int main()                                )
+    CHAZ_QUOTE(  {                                         )
+    CHAZ_QUOTE(      Charm_Setup;                          )
+    CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
+    CHAZ_QUOTE(      return 0;                             )
+    CHAZ_QUOTE(  }                                         );
 
 static const char literal64_code[] =
-    QUOTE(  #include "_charm.h"                       )
-    QUOTE(  #define big 9000000000000000000%s         )
-    QUOTE(  int main()                                )
-    QUOTE(  {                                         )
-    QUOTE(      int truncated = (int)big;             )
-    QUOTE(      Charm_Setup;                          )
-    QUOTE(      printf("%%d\n", truncated);           )
-    QUOTE(      return 0;                             )
-    QUOTE(  }                                         );
+    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #define big 9000000000000000000%s         )
+    CHAZ_QUOTE(  int main()                                )
+    CHAZ_QUOTE(  {                                         )
+    CHAZ_QUOTE(      int truncated = (int)big;             )
+    CHAZ_QUOTE(      Charm_Setup;                          )
+    CHAZ_QUOTE(      printf("%%d\n", truncated);           )
+    CHAZ_QUOTE(      return 0;                             )
+    CHAZ_QUOTE(  }                                         );
 
 void
-Integers_run(void) {
+chaz_Integers_run(void) {
     char *output;
     size_t output_len;
     int sizeof_char       = -1;
@@ -79,8 +79,8 @@ Integers_run(void) {
     int has_64            = false;
     int has_long_long     = false;
     int has___int64       = false;
-    int has_inttypes      = HeadCheck_check_header("inttypes.h");
-    int has_stdint        = HeadCheck_check_header("stdint.h");
+    int has_inttypes      = chaz_HeadCheck_check_header("inttypes.h");
+    int has_stdint        = chaz_HeadCheck_check_header("stdint.h");
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -90,18 +90,18 @@ Integers_run(void) {
     char code_buf[1000];
     char scratch[50];
 
-    ConfWriter_start_module("Integers");
+    chaz_ConfWriter_start_module("Integers");
 
     /* Document endian-ness. */
     if (S_machine_is_big_endian()) {
-        ConfWriter_add_def("BIG_END", NULL);
+        chaz_ConfWriter_add_def("BIG_END", NULL);
     }
     else {
-        ConfWriter_add_def("LITTLE_END", NULL);
+        chaz_ConfWriter_add_def("LITTLE_END", NULL);
     }
 
     /* Record sizeof() for several common integer types. */
-    output = CC_capture_output(sizes_code, &output_len);
+    output = chaz_CC_capture_output(sizes_code, &output_len);
     if (output != NULL) {
         char *end_ptr = output;
 
@@ -118,7 +118,7 @@ Integers_run(void) {
 
     /* Determine whether long longs are available. */
     sprintf(code_buf, type64_code, "long long");
-    output = CC_capture_output(code_buf, &output_len);
+    output = chaz_CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         has_long_long    = true;
         sizeof_long_long = strtol(output, NULL, 10);
@@ -126,7 +126,7 @@ Integers_run(void) {
 
     /* Determine whether the __int64 type is available. */
     sprintf(code_buf, type64_code, "__int64");
-    output = CC_capture_output(code_buf, &output_len);
+    output = chaz_CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         has___int64 = true;
         sizeof___int64 = strtol(output, NULL, 10);
@@ -171,75 +171,75 @@ Integers_run(void) {
     }
     else if (has_64) {
         sprintf(code_buf, literal64_code, "LL");
-        output = CC_capture_output(code_buf, &output_len);
+        output = chaz_CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(i64_t_postfix, "LL");
         }
         else {
             sprintf(code_buf, literal64_code, "i64");
-            output = CC_capture_output(code_buf, &output_len);
+            output = chaz_CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(i64_t_postfix, "i64");
             }
             else {
-                Util_die("64-bit types, but no literal syntax found");
+                chaz_Util_die("64-bit types, but no literal syntax found");
             }
         }
         sprintf(code_buf, literal64_code, "ULL");
-        output = CC_capture_output(code_buf, &output_len);
+        output = chaz_CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(u64_t_postfix, "ULL");
         }
         else {
             sprintf(code_buf, literal64_code, "Ui64");
-            output = CC_capture_output(code_buf, &output_len);
+            output = chaz_CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(u64_t_postfix, "Ui64");
             }
             else {
-                Util_die("64-bit types, but no literal syntax found");
+                chaz_Util_die("64-bit types, but no literal syntax found");
             }
         }
     }
 
     /* Write out some conditional defines. */
     if (has_inttypes) {
-        ConfWriter_add_def("HAS_INTTYPES_H", NULL);
+        chaz_ConfWriter_add_def("HAS_INTTYPES_H", NULL);
     }
     if (has_stdint) {
-        ConfWriter_add_def("HAS_STDINT_H", NULL);
+        chaz_ConfWriter_add_def("HAS_STDINT_H", NULL);
     }
     if (has_long_long) {
-        ConfWriter_add_def("HAS_LONG_LONG", NULL);
+        chaz_ConfWriter_add_def("HAS_LONG_LONG", NULL);
     }
     if (has___int64) {
-        ConfWriter_add_def("HAS___INT64", NULL);
+        chaz_ConfWriter_add_def("HAS___INT64", NULL);
     }
 
     /* Write out sizes. */
     sprintf(scratch, "%d", sizeof_char);
-    ConfWriter_add_def("SIZEOF_CHAR", scratch);
+    chaz_ConfWriter_add_def("SIZEOF_CHAR", scratch);
     sprintf(scratch, "%d", sizeof_short);
-    ConfWriter_add_def("SIZEOF_SHORT", scratch);
+    chaz_ConfWriter_add_def("SIZEOF_SHORT", scratch);
     sprintf(scratch, "%d", sizeof_int);
-    ConfWriter_add_def("SIZEOF_INT", scratch);
+    chaz_ConfWriter_add_def("SIZEOF_INT", scratch);
     sprintf(scratch, "%d", sizeof_long);
-    ConfWriter_add_def("SIZEOF_LONG", scratch);
+    chaz_ConfWriter_add_def("SIZEOF_LONG", scratch);
     sprintf(scratch, "%d", sizeof_ptr);
-    ConfWriter_add_def("SIZEOF_PTR", scratch);
+    chaz_ConfWriter_add_def("SIZEOF_PTR", scratch);
     if (has_long_long) {
         sprintf(scratch, "%d", sizeof_long_long);
-        ConfWriter_add_def("SIZEOF_LONG_LONG", scratch);
+        chaz_ConfWriter_add_def("SIZEOF_LONG_LONG", scratch);
     }
     if (has___int64) {
         sprintf(scratch, "%d", sizeof___int64);
-        ConfWriter_add_def("SIZEOF___INT64", scratch);
+        chaz_ConfWriter_add_def("SIZEOF___INT64", scratch);
     }
 
     /* Write affirmations, typedefs and maximums/minimums. */
-    ConfWriter_add_typedef("int", "bool_t");
+    chaz_ConfWriter_add_typedef("int", "bool_t");
     if (has_stdint) {
-        ConfWriter_add_sys_include("stdint.h");
+        chaz_ConfWriter_add_sys_include("stdint.h");
     }
     else {
         /* we support only the following subset of stdint.h
@@ -253,68 +253,68 @@ Integers_run(void) {
          *   uint64_t
          */
         if (has_8) {
-            ConfWriter_add_typedef("signed char", "int8_t");
-            ConfWriter_add_typedef("unsigned char", "uint8_t");
+            chaz_ConfWriter_add_typedef("signed char", "int8_t");
+            chaz_ConfWriter_add_typedef("unsigned char", "uint8_t");
         }
         if (has_16) {
-            ConfWriter_add_typedef("signed short", "int16_t");
-            ConfWriter_add_typedef("unsigned short", "uint16_t");
+            chaz_ConfWriter_add_typedef("signed short", "int16_t");
+            chaz_ConfWriter_add_typedef("unsigned short", "uint16_t");
         }
         if (has_32) {
-            ConfWriter_add_typedef(i32_t_type, "int32_t");
+            chaz_ConfWriter_add_typedef(i32_t_type, "int32_t");
             sprintf(scratch, "unsigned %s", i32_t_type);
-            ConfWriter_add_typedef(scratch, "uint32_t");
+            chaz_ConfWriter_add_typedef(scratch, "uint32_t");
         }
         if (has_64) {
-            ConfWriter_add_typedef(i64_t_type, "int64_t");
+            chaz_ConfWriter_add_typedef(i64_t_type, "int64_t");
             sprintf(scratch, "unsigned %s", i64_t_type);
-            ConfWriter_add_typedef(scratch, "uint64_t");
+            chaz_ConfWriter_add_typedef(scratch, "uint64_t");
         }
     }
     if (has_8) {
-        ConfWriter_add_def("HAS_I8_T", NULL);
-        ConfWriter_add_typedef("signed char", "i8_t");
-        ConfWriter_add_typedef("unsigned char", "u8_t");
+        chaz_ConfWriter_add_def("HAS_I8_T", NULL);
+        chaz_ConfWriter_add_typedef("signed char", "i8_t");
+        chaz_ConfWriter_add_typedef("unsigned char", "u8_t");
         /* FIXME: use integer literals. */
-        ConfWriter_add_def("I8_MAX", "0x7F");
-        ConfWriter_add_def("I8_MIN", "(-I8_MAX - 1)");
-        ConfWriter_add_def("U8_MAX", "(I8_MAX * 2 + 1)");
+        chaz_ConfWriter_add_def("I8_MAX", "0x7F");
+        chaz_ConfWriter_add_def("I8_MIN", "(-I8_MAX - 1)");
+        chaz_ConfWriter_add_def("U8_MAX", "(I8_MAX * 2 + 1)");
     }
     if (has_16) {
-        ConfWriter_add_def("HAS_I16_T", NULL);
-        ConfWriter_add_typedef("short", "i16_t");
-        ConfWriter_add_typedef("unsigned short", "u16_t");
+        chaz_ConfWriter_add_def("HAS_I16_T", NULL);
+        chaz_ConfWriter_add_typedef("short", "i16_t");
+        chaz_ConfWriter_add_typedef("unsigned short", "u16_t");
         /* FIXME: use integer literals. */
-        ConfWriter_add_def("I16_MAX", "0x7FFF");
-        ConfWriter_add_def("I16_MIN", "(-I16_MAX - 1)");
-        ConfWriter_add_def("U16_MAX", "(I16_MAX * 2 + 1)");
+        chaz_ConfWriter_add_def("I16_MAX", "0x7FFF");
+        chaz_ConfWriter_add_def("I16_MIN", "(-I16_MAX - 1)");
+        chaz_ConfWriter_add_def("U16_MAX", "(I16_MAX * 2 + 1)");
     }
     if (has_32) {
-        ConfWriter_add_def("HAS_I32_T", NULL);
-        ConfWriter_add_typedef(i32_t_type, "i32_t");
+        chaz_ConfWriter_add_def("HAS_I32_T", NULL);
+        chaz_ConfWriter_add_typedef(i32_t_type, "i32_t");
         sprintf(scratch, "unsigned %s", i32_t_type);
-        ConfWriter_add_typedef(scratch, "u32_t");
+        chaz_ConfWriter_add_typedef(scratch, "u32_t");
         /* FIXME: use integer literals. */
         sprintf(scratch, "0x7FFFFFFF%s", i32_t_postfix);
-        ConfWriter_add_def("I32_MAX", scratch);
-        ConfWriter_add_def("I32_MIN", "(-I32_MAX - 1)");
+        chaz_ConfWriter_add_def("I32_MAX", scratch);
+        chaz_ConfWriter_add_def("I32_MIN", "(-I32_MAX - 1)");
         sprintf(scratch, "(I32_MAX * 2%s + 1%s)", u32_t_postfix,
                 u32_t_postfix);
-        ConfWriter_add_def("U32_MAX", scratch);
+        chaz_ConfWriter_add_def("U32_MAX", scratch);
     }
     if (has_64) {
-        ConfWriter_add_def("HAS_I64_T", NULL);
-        ConfWriter_add_typedef(i64_t_type, "i64_t");
+        chaz_ConfWriter_add_def("HAS_I64_T", NULL);
+        chaz_ConfWriter_add_typedef(i64_t_type, "i64_t");
         sprintf(scratch, "unsigned %s", i64_t_type);
-        ConfWriter_add_typedef(scratch, "u64_t");
+        chaz_ConfWriter_add_typedef(scratch, "u64_t");
         /* FIXME: use integer literals. */
         sprintf(scratch, "0x7FFFFFFFFFFFFFFF%s", i64_t_postfix);
-        ConfWriter_add_def("I64_MAX", scratch);
+        chaz_ConfWriter_add_def("I64_MAX", scratch);
         sprintf(scratch, "(-I64_MAX - 1%s)", i64_t_postfix);
-        ConfWriter_add_def("I64_MIN", scratch);
+        chaz_ConfWriter_add_def("I64_MIN", scratch);
         sprintf(scratch, "(I64_MAX * 2%s + 1%s)", u64_t_postfix,
                 u64_t_postfix);
-        ConfWriter_add_def("U64_MAX", scratch);
+        chaz_ConfWriter_add_def("U64_MAX", scratch);
     }
 
     /* Create the I64P and U64P printf macros. */
@@ -331,25 +331,25 @@ Integers_run(void) {
 
         /* Buffer to hold the code, and its start and end. */
         static const char format_64_code[] =
-            QUOTE(  #include "_charm.h"                           )
-            QUOTE(  int main() {                                  )
-            QUOTE(      Charm_Setup;                              )
-            QUOTE(      printf("%%%su", 18446744073709551615%s);  )
-            QUOTE(      return 0;                                 )
-            QUOTE( }                                              );
+            CHAZ_QUOTE(  #include "_charm.h"                           )
+            CHAZ_QUOTE(  int main() {                                  )
+            CHAZ_QUOTE(      Charm_Setup;                              )
+            CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
+            CHAZ_QUOTE(      return 0;                                 )
+            CHAZ_QUOTE( }                                              );
 
         for (i = 0; options[i] != NULL; i++) {
             /* Try to print 2**64-1, and see if we get it back intact. */
             sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
-            output = CC_capture_output(code_buf, &output_len);
+            output = chaz_CC_capture_output(code_buf, &output_len);
 
             if (output_len != 0
                 && strcmp(output, "18446744073709551615") == 0
                ) {
                 sprintf(scratch, "\"%sd\"", options[i]);
-                ConfWriter_add_def("I64P", scratch);
+                chaz_ConfWriter_add_def("I64P", scratch);
                 sprintf(scratch, "\"%su\"", options[i]);
-                ConfWriter_add_def("U64P", scratch);
+                chaz_ConfWriter_add_def("U64P", scratch);
                 break;
             }
         }
@@ -359,38 +359,38 @@ Integers_run(void) {
     /* Write out the 32-bit and 64-bit literal macros. */
     if (has_32) {
         if (strcmp(i32_t_postfix, "") == 0) {
-            ConfWriter_add_def("I32_C(n)", "n");
+            chaz_ConfWriter_add_def("I32_C(n)", "n");
             sprintf(scratch, "n##%s", u32_t_postfix);
-            ConfWriter_add_def("U32_C(n)", scratch);
+            chaz_ConfWriter_add_def("U32_C(n)", scratch);
         }
         else {
             sprintf(scratch, "n##%s", i32_t_postfix);
-            ConfWriter_add_def("I32_C(n)", scratch);
+            chaz_ConfWriter_add_def("I32_C(n)", scratch);
             sprintf(scratch, "n##%s", u32_t_postfix);
-            ConfWriter_add_def("U32_C(n)", scratch);
+            chaz_ConfWriter_add_def("U32_C(n)", scratch);
         }
     }
     if (has_64) {
         sprintf(scratch, "n##%s", i64_t_postfix);
-        ConfWriter_add_def("I64_C(n)", scratch);
+        chaz_ConfWriter_add_def("I64_C(n)", scratch);
         sprintf(scratch, "n##%s", u64_t_postfix);
-        ConfWriter_add_def("U64_C(n)", scratch);
+        chaz_ConfWriter_add_def("U64_C(n)", scratch);
     }
 
     /* Create macro for promoting pointers to integers. */
     if (has_64) {
         if (sizeof_ptr == 8) {
-            ConfWriter_add_def("PTR_TO_I64(ptr)",
-                               "((chy_i64_t)(chy_u64_t)(ptr))");
+            chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
+                                    "((chy_i64_t)(chy_u64_t)(ptr))");
         }
         else {
-            ConfWriter_add_def("PTR_TO_I64(ptr)",
-                               "((chy_i64_t)(chy_u32_t)(ptr))");
+            chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
+                                    "((chy_i64_t)(chy_u32_t)(ptr))");
         }
     }
 
     /* True and false. */
-    ConfWriter_append_conf(
+    chaz_ConfWriter_append_conf(
         "#ifndef true\n"
         "  #define true 1\n"
         "#endif\n"
@@ -399,7 +399,7 @@ Integers_run(void) {
         "#endif\n"
     );
 
-    ConfWriter_end_module();
+    chaz_ConfWriter_end_module();
 }
 
 static int

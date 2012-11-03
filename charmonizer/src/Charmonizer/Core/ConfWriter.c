@@ -23,18 +23,18 @@
 
 #define CW_MAX_WRITERS 10
 static struct {
-    ConfWriter *writers[CW_MAX_WRITERS];
+    chaz_ConfWriter *writers[CW_MAX_WRITERS];
     size_t num_writers;
 } CW;
 
 void
-ConfWriter_init(void) {
+chaz_ConfWriter_init(void) {
     CW.num_writers = 0;
     return;
 }
 
 void
-ConfWriter_clean_up(void) {
+chaz_ConfWriter_clean_up(void) {
     size_t i;
     for (i = 0; i < CW.num_writers; i++) {
         CW.writers[i]->clean_up();
@@ -42,7 +42,7 @@ ConfWriter_clean_up(void) {
 }
 
 void
-ConfWriter_append_conf(const char *fmt, ...) {
+chaz_ConfWriter_append_conf(const char *fmt, ...) {
     va_list args;
     size_t i;
     
@@ -54,7 +54,7 @@ ConfWriter_append_conf(const char *fmt, ...) {
 }
 
 void
-ConfWriter_add_def(const char *sym, const char *value) {
+chaz_ConfWriter_add_def(const char *sym, const char *value) {
     size_t i;
     for (i = 0; i < CW.num_writers; i++) {
         CW.writers[i]->add_def(sym, value);
@@ -62,7 +62,7 @@ ConfWriter_add_def(const char *sym, const char *value) {
 }
 
 void
-ConfWriter_add_typedef(const char *type, const char *alias) {
+chaz_ConfWriter_add_typedef(const char *type, const char *alias) {
     size_t i;
     for (i = 0; i < CW.num_writers; i++) {
         CW.writers[i]->add_typedef(type, alias);
@@ -70,7 +70,7 @@ ConfWriter_add_typedef(const char *type, const char *alias) {
 }
 
 void
-ConfWriter_add_sys_include(const char *header) {
+chaz_ConfWriter_add_sys_include(const char *header) {
     size_t i;
     for (i = 0; i < CW.num_writers; i++) {
         CW.writers[i]->add_sys_include(header);
@@ -78,7 +78,7 @@ ConfWriter_add_sys_include(const char *header) {
 }
 
 void
-ConfWriter_add_local_include(const char *header) {
+chaz_ConfWriter_add_local_include(const char *header) {
     size_t i;
     for (i = 0; i < CW.num_writers; i++) {
         CW.writers[i]->add_local_include(header);
@@ -86,7 +86,7 @@ ConfWriter_add_local_include(const char *header) {
 }
 
 void
-ConfWriter_start_module(const char *module_name) {
+chaz_ConfWriter_start_module(const char *module_name) {
     size_t i;
     if (chaz_Util_verbosity > 0) {
         printf("Running %s module...\n", module_name);
@@ -97,7 +97,7 @@ ConfWriter_start_module(const char *module_name) {
 }
 
 void
-ConfWriter_end_module(void) {
+chaz_ConfWriter_end_module(void) {
     size_t i;
     for (i = 0; i < CW.num_writers; i++) {
         CW.writers[i]->end_module();
@@ -105,7 +105,7 @@ ConfWriter_end_module(void) {
 }
 
 void
-ConfWriter_add_writer(ConfWriter *writer) {
+chaz_ConfWriter_add_writer(chaz_ConfWriter *writer) {
     CW.writers[CW.num_writers] = writer;
     CW.num_writers++;
 }

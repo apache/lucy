@@ -25,29 +25,29 @@
 #include <stdlib.h>
 
 static const char symbol_exporting_code[] =
-    QUOTE(  %s int exported_function() {   )
-    QUOTE(      return 42;                 )
-    QUOTE(  }                              )
-    QUOTE(  int main() {                   )
-    QUOTE(      return 0;                  )
-    QUOTE(  }                              );
+    CHAZ_QUOTE(  %s int exported_function() {   )
+    CHAZ_QUOTE(      return 42;                 )
+    CHAZ_QUOTE(  }                              )
+    CHAZ_QUOTE(  int main() {                   )
+    CHAZ_QUOTE(      return 0;                  )
+    CHAZ_QUOTE(  }                              );
 
 void
-SymbolVisibility_run(void) {
+chaz_SymbolVisibility_run(void) {
     int can_control_visibility = false;
     char code_buf[sizeof(symbol_exporting_code) + 100];
 
-    ConfWriter_start_module("SymbolVisibility");
-    CC_set_warnings_as_errors(1);
+    chaz_ConfWriter_start_module("SymbolVisibility");
+    chaz_CC_set_warnings_as_errors(1);
 
     /* Windows. */
     if (!can_control_visibility) {
         char export_win[] = "__declspec(dllexport)";
         sprintf(code_buf, symbol_exporting_code, export_win);
-        if (CC_test_compile(code_buf)) {
+        if (chaz_CC_test_compile(code_buf)) {
             can_control_visibility = true;
-            ConfWriter_add_def("EXPORT", export_win);
-            ConfWriter_add_def("IMPORT", "__declspec(dllimport)");
+            chaz_ConfWriter_add_def("EXPORT", export_win);
+            chaz_ConfWriter_add_def("IMPORT", "__declspec(dllimport)");
         }
     }
 
@@ -55,21 +55,21 @@ SymbolVisibility_run(void) {
     if (!can_control_visibility) {
         char export_gcc[] = "__attribute__ ((visibility (\"default\")))";
         sprintf(code_buf, symbol_exporting_code, export_gcc);
-        if (CC_test_compile(code_buf)) {
+        if (chaz_CC_test_compile(code_buf)) {
             can_control_visibility = true;
-            ConfWriter_add_def("EXPORT", export_gcc);
-            ConfWriter_add_def("IMPORT", NULL);
+            chaz_ConfWriter_add_def("EXPORT", export_gcc);
+            chaz_ConfWriter_add_def("IMPORT", NULL);
         }
     }
-    CC_set_warnings_as_errors(0);
+    chaz_CC_set_warnings_as_errors(0);
 
     /* Default. */
     if (!can_control_visibility) {
-        ConfWriter_add_def("EXPORT", NULL);
-        ConfWriter_add_def("IMPORT", NULL);
+        chaz_ConfWriter_add_def("EXPORT", NULL);
+        chaz_ConfWriter_add_def("IMPORT", NULL);
     }
 
-    ConfWriter_end_module();
+    chaz_ConfWriter_end_module();
 }
 
 

@@ -46,7 +46,7 @@ static FILE *charmony_fh  = NULL;
 static ConfElem *defs      = NULL;
 static size_t    def_cap   = 0;
 static size_t    def_count = 0;
-static ConfWriter CWC_conf_writer;
+static chaz_ConfWriter CWC_conf_writer;
 
 /* Open the charmony.h file handle.  Print supplied text to it, if non-null.
  * Print an explanatory comment and open the include guard.
@@ -80,7 +80,7 @@ static void
 S_ConfWriterC_end_module(void);
 
 void
-ConfWriterC_enable(void) {
+chaz_ConfWriterC_enable(void) {
     CWC_conf_writer.clean_up          = S_ConfWriterC_clean_up;
     CWC_conf_writer.vappend_conf      = S_ConfWriterC_vappend_conf;
     CWC_conf_writer.add_def           = S_ConfWriterC_add_def;
@@ -90,7 +90,7 @@ ConfWriterC_enable(void) {
     CWC_conf_writer.start_module      = S_ConfWriterC_start_module;
     CWC_conf_writer.end_module        = S_ConfWriterC_end_module;
     S_open_charmony_h(NULL);
-    ConfWriter_add_writer(&CWC_conf_writer);
+    chaz_ConfWriter_add_writer(&CWC_conf_writer);
     return;
 }
 
@@ -99,7 +99,7 @@ S_open_charmony_h(const char *charmony_start) {
     /* Open the filehandle. */
     charmony_fh = fopen("charmony.h", "w+");
     if (charmony_fh == NULL) {
-        Util_die("Can't open 'charmony.h': %s", strerror(errno));
+        chaz_Util_die("Can't open 'charmony.h': %s", strerror(errno));
     }
 
     /* Print supplied text (if any) along with warning, open include guard. */
@@ -121,7 +121,7 @@ S_ConfWriterC_clean_up(void) {
     /* Write the last bit of charmony.h and close. */
     fprintf(charmony_fh, "#endif /* H_CHARMONY */\n\n");
     if (fclose(charmony_fh)) {
-        Util_die("Couldn't close 'charmony.h': %s", strerror(errno));
+        chaz_Util_die("Couldn't close 'charmony.h': %s", strerror(errno));
     }
 }
 
@@ -229,8 +229,8 @@ S_ConfWriterC_end_module(void) {
                 S_append_local_include_to_conf(defs[i].str1);
                 break;
             default:
-                Util_die("Internal error: bad element type %d",
-                         (int)defs[i].type);
+                chaz_Util_die("Internal error: bad element type %d",
+                              (int)defs[i].type);
         }
     }
 
@@ -259,8 +259,8 @@ S_ConfWriterC_end_module(void) {
                 /* no-op */
                 break;
             default:
-                Util_die("Internal error: bad element type %d",
-                         (int)defs[i].type);
+                chaz_Util_die("Internal error: bad element type %d",
+                              (int)defs[i].type);
         }
     }
 
@@ -276,8 +276,8 @@ S_push_def_list_item(const char *str1, const char *str2, ConfElemType type) {
         def_cap += 10;
         defs = (ConfElem*)realloc(defs, def_cap * sizeof(ConfElem));
     }
-    defs[def_count].str1 = str1 ? Util_strdup(str1) : NULL;
-    defs[def_count].str2 = str2 ? Util_strdup(str2) : NULL;
+    defs[def_count].str1 = str1 ? chaz_Util_strdup(str1) : NULL;
+    defs[def_count].str2 = str2 ? chaz_Util_strdup(str2) : NULL;
     defs[def_count].type = type;
     def_count++;
 }

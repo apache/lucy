@@ -34,24 +34,24 @@ static int  shell_type = 0;
 #define SHELL_TYPE_CMD_EXE  2
 
 void
-OS_init(void) {
-    if (Util_verbosity) {
+chaz_OS_init(void) {
+    if (chaz_Util_verbosity) {
         printf("Initializing Charmonizer/Core/OperatingSystem...\n");
     }
 
-    if (Util_verbosity) {
+    if (chaz_Util_verbosity) {
         printf("Trying to find a bit-bucket a la /dev/null...\n");
     }
 
     /* Detect shell based on whether the bitbucket is "/dev/null" or "nul". */
-    if (Util_can_open_file("/dev/null")) {
+    if (chaz_Util_can_open_file("/dev/null")) {
         strcpy(dev_null, "/dev/null");
         strcpy(exe_ext, "");
         strcpy(obj_ext, "");
         strcpy(local_command_start, "./");
         shell_type = SHELL_TYPE_POSIX;
     }
-    else if (Util_can_open_file("nul")) {
+    else if (chaz_Util_can_open_file("nul")) {
         strcpy(dev_null, "nul");
         strcpy(exe_ext, ".exe");
         strcpy(obj_ext, ".obj");
@@ -60,27 +60,27 @@ OS_init(void) {
     }
     else {
         /* Bail out because we couldn't find anything like /dev/null. */
-        Util_die("Couldn't find anything like /dev/null");
+        chaz_Util_die("Couldn't find anything like /dev/null");
     }
 }
 
 const char*
-OS_exe_ext(void) {
+chaz_OS_exe_ext(void) {
     return exe_ext;
 }
 
 const char*
-OS_obj_ext(void) {
+chaz_OS_obj_ext(void) {
     return obj_ext;
 }
 
 const char*
-OS_dev_null(void) {
+chaz_OS_dev_null(void) {
     return dev_null;
 }
 
 int
-OS_remove(const char *name) {
+chaz_OS_remove(const char *name) {
     /*
      * On Windows it can happen that another process, typically a
      * virus scanner, still has an open handle on the file. This can
@@ -115,7 +115,7 @@ OS_remove(const char *name) {
 }
 
 int
-OS_run_local(const char *arg1, ...) {
+chaz_OS_run_local(const char *arg1, ...) {
     va_list  args;
     size_t   len     = strlen(local_command_start) + strlen(arg1);
     char    *command = (char*)malloc(len + 1);
@@ -139,7 +139,7 @@ OS_run_local(const char *arg1, ...) {
 }
 
 int
-OS_run_quietly(const char *command) {
+chaz_OS_run_quietly(const char *command) {
     int retval = 1;
     char *quiet_command = NULL;
     if (shell_type == SHELL_TYPE_POSIX) {
@@ -156,7 +156,7 @@ OS_run_quietly(const char *command) {
         sprintf(quiet_command, pattern, command);
     }
     else {
-        Util_die("Don't know the shell type");
+        chaz_Util_die("Don't know the shell type");
     }
     retval = system(quiet_command);
     free(quiet_command);
@@ -165,7 +165,7 @@ OS_run_quietly(const char *command) {
 }
 
 void
-OS_mkdir(const char *filepath) {
+chaz_OS_mkdir(const char *filepath) {
     char *command = NULL;
     if (shell_type == SHELL_TYPE_POSIX || shell_type == SHELL_TYPE_CMD_EXE) {
         unsigned size = sizeof("mkdir") + 1 + strlen(filepath) + 1;
@@ -173,14 +173,14 @@ OS_mkdir(const char *filepath) {
         sprintf(command, "mkdir %s", filepath);
     }
     else {
-        Util_die("Don't know the shell type");
+        chaz_Util_die("Don't know the shell type");
     }
-    OS_run_quietly(command);
+    chaz_OS_run_quietly(command);
     free(command);
 }
 
 void
-OS_rmdir(const char *filepath) {
+chaz_OS_rmdir(const char *filepath) {
     char *command = NULL;
     if (shell_type == SHELL_TYPE_POSIX) {
         unsigned size = strlen("rmdir") + 1 + strlen(filepath) + 1;
@@ -193,9 +193,9 @@ OS_rmdir(const char *filepath) {
         sprintf(command, "rmdir /q %s", filepath);
     }
     else {
-        Util_die("Don't know the shell type");
+        chaz_Util_die("Don't know the shell type");
     }
-    OS_run_quietly(command);
+    chaz_OS_run_quietly(command);
     free(command);
 }
 

@@ -27,7 +27,7 @@
 
 /* Static vars. */
 static FILE *config_pm_fh  = NULL;
-static ConfWriter CWPerl_conf_writer;
+static chaz_ConfWriter CWPerl_conf_writer;
 
 /* Open the Charmony.pm file handle.
  */
@@ -52,7 +52,7 @@ static void
 S_ConfWriterPerl_end_module(void);
 
 void
-ConfWriterPerl_enable(void) {
+chaz_ConfWriterPerl_enable(void) {
     CWPerl_conf_writer.clean_up          = S_ConfWriterPerl_clean_up;
     CWPerl_conf_writer.vappend_conf      = S_ConfWriterPerl_vappend_conf;
     CWPerl_conf_writer.add_def           = S_ConfWriterPerl_add_def;
@@ -62,7 +62,7 @@ ConfWriterPerl_enable(void) {
     CWPerl_conf_writer.start_module      = S_ConfWriterPerl_start_module;
     CWPerl_conf_writer.end_module        = S_ConfWriterPerl_end_module;
     S_open_config_pm();
-    ConfWriter_add_writer(&CWPerl_conf_writer);
+    chaz_ConfWriter_add_writer(&CWPerl_conf_writer);
     return;
 }
 
@@ -71,7 +71,7 @@ S_open_config_pm(void) {
     /* Open the filehandle. */
     config_pm_fh = fopen("Charmony.pm", "w+");
     if (config_pm_fh == NULL) {
-        Util_die("Can't open 'Charmony.pm': %s", strerror(errno));
+        chaz_Util_die("Can't open 'Charmony.pm': %s", strerror(errno));
     }
 
     /* Start the module. */
@@ -95,7 +95,7 @@ S_ConfWriterPerl_clean_up(void) {
     /* Write the last bit of Charmony.pm and close. */
     fprintf(config_pm_fh, "\n1;\n\n");
     if (fclose(config_pm_fh)) {
-        Util_die("Couldn't close 'Charmony.pm': %s", strerror(errno));
+        chaz_Util_die("Couldn't close 'Charmony.pm': %s", strerror(errno));
     }
 }
 
@@ -159,7 +159,7 @@ S_ConfWriterPerl_add_def(const char *sym, const char *value) {
 
     /* Quote key. */
     if (!sym) {
-        Util_die("Can't handle NULL key");
+        chaz_Util_die("Can't handle NULL key");
     }
     quoted_sym = S_ConfWriterPerl_quotify(sym, sym_buf, CFPERL_MAX_BUF);
 

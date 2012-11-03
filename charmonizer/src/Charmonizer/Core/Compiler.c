@@ -50,7 +50,7 @@ static int       defines___clang__ = 0;
 static int       warnings_as_errors = 0;    
 
 void
-CC_set_warnings_as_errors(const int flag) {
+chaz_CC_set_warnings_as_errors(const int flag) {
     warnings_as_errors = flag;
     if (warnings_as_errors) {
         if (defines__MSC_VER)  {
@@ -65,26 +65,26 @@ CC_set_warnings_as_errors(const int flag) {
 }
 
 void
-CC_init(const char *compiler_command, const char *compiler_flags) {
+chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     const char *code = "int main() { return 0; }\n";
     int compile_succeeded = 0;
 
-    if (Util_verbosity) { printf("Creating compiler object...\n"); }
+    if (chaz_Util_verbosity) { printf("Creating compiler object...\n"); }
 
     /* Assign. */
-    cc_command      = Util_strdup(compiler_command);
-    cc_flags        = Util_strdup(compiler_flags);
+    cc_command      = chaz_Util_strdup(compiler_command);
+    cc_flags        = chaz_Util_strdup(compiler_flags);
 
     /* Init. */
     inc_dirs              = (char**)calloc(sizeof(char*), 1);
 
     /* Add the current directory as an include dir. */
-    CC_add_inc_dir(".");
+    chaz_CC_add_inc_dir(".");
 
     /* Set names for the targets which we "try" to compile. */
     {
-        const char *exe_ext = OS_exe_ext();
-        const char *obj_ext = OS_obj_ext();
+        const char *exe_ext = chaz_OS_exe_ext();
+        const char *obj_ext = chaz_OS_obj_ext();
         size_t exe_len = strlen(TRY_BASENAME) + strlen(exe_ext) + 1;
         size_t obj_len = strlen(TRY_BASENAME) + strlen(obj_ext) + 1;
         try_exe_name = (char*)malloc(exe_len);
@@ -94,7 +94,7 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     }
 
     /* If we can't compile anything, game over. */
-    if (Util_verbosity) {
+    if (chaz_Util_verbosity) {
         printf("Trying to compile a small test file...\n");
     }
     /* Try POSIX argument style. */
@@ -102,29 +102,29 @@ CC_init(const char *compiler_command, const char *compiler_flags) {
     strcpy(object_flag,  "-o ");
     strcpy(exe_flag,     "-o ");
     strcpy(no_link_flag, "-c ");
-    compile_succeeded = CC_test_compile(code);
+    compile_succeeded = chaz_CC_test_compile(code);
     if (!compile_succeeded) {
         /* Try MSVC argument style. */
         strcpy(include_flag, "/I");
         strcpy(object_flag,  "/Fo");
         strcpy(exe_flag,     "/Fe");
         strcpy(no_link_flag, "/c");
-        compile_succeeded = CC_test_compile(code);
+        compile_succeeded = chaz_CC_test_compile(code);
     }
     if (!compile_succeeded) {
-        Util_die("Failed to compile a small test file");
+        chaz_Util_die("Failed to compile a small test file");
     }
 
     S_detect_known_compilers();
 }
 
 static const char detect_macro_code[] =
-    QUOTE(  int main() {                   )
-    QUOTE(  #ifndef %s                     )
-    QUOTE(  #error "nope"                  )
-    QUOTE(  #endif                         )
-    QUOTE(      return 0;                  )
-    QUOTE(  }                              );
+    CHAZ_QUOTE(  int main() {                   )
+    CHAZ_QUOTE(  #ifndef %s                     )
+    CHAZ_QUOTE(  #error "nope"                  )
+    CHAZ_QUOTE(  #endif                         )
+    CHAZ_QUOTE(      return 0;                  )
+    CHAZ_QUOTE(  }                              );
 
 static int
 S_detect_macro(const char *macro) {
@@ -132,7 +132,7 @@ S_detect_macro(const char *macro) {
     char *code = (char*)malloc(size);
     int retval;
     sprintf(code, detect_macro_code, macro);
-    retval = CC_test_compile(code);
+    retval = chaz_CC_test_compile(code);
     free(code);
     return retval;
 }
@@ -145,7 +145,7 @@ S_detect_known_compilers(void) {
 }
 
 void
-CC_clean_up(void) {
+chaz_CC_clean_up(void) {
     char **dirs;
 
     for (dirs = inc_dirs; *dirs != NULL; dirs++) {
@@ -180,9 +180,9 @@ S_inc_dir_string(void) {
 }
 
 int
-CC_compile_exe(const char *source_path, const char *exe_name,
-               const char *code) {
-    const char *exe_ext        = OS_exe_ext();
+chaz_CC_compile_exe(const char *source_path, const char *exe_name,
+                    const char *code) {
+    const char *exe_ext        = chaz_OS_exe_ext();
     size_t   exe_file_buf_size = strlen(exe_name) + strlen(exe_ext) + 1;
     char    *exe_file          = (char*)malloc(exe_file_buf_size);
     size_t   junk_buf_size     = exe_file_buf_size + 3;
@@ -201,7 +201,7 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     int result;
 
     /* Write the source file. */
-    Util_write_file(source_path, code);
+    chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
     sprintf(command, "%s %s %s %s%s %s %s",
@@ -209,8 +209,8 @@ CC_compile_exe(const char *source_path, const char *exe_name,
             source_path, exe_flag, 
             exe_file, inc_dir_string, 
             cc_flags);
-    if (Util_verbosity < 2) {
-        OS_run_quietly(command);
+    if (chaz_Util_verbosity < 2) {
+        chaz_OS_run_quietly(command);
     }
     else {
         system(command);
@@ -219,17 +219,17 @@ CC_compile_exe(const char *source_path, const char *exe_name,
     if (defines__MSC_VER) {
         /* Zap MSVC junk. */
         sprintf(junk, "%s.obj", exe_name);
-        Util_remove_and_verify(junk);
+        chaz_Util_remove_and_verify(junk);
         sprintf(junk, "%s.ilk", exe_name);
-        Util_remove_and_verify(junk);
+        chaz_Util_remove_and_verify(junk);
         sprintf(junk, "%s.pdb", exe_name);
-        Util_remove_and_verify(junk);
+        chaz_Util_remove_and_verify(junk);
     }
 
     /* See if compilation was successful.  Remove the source file. */
-    result = Util_can_open_file(exe_file);
-    if (!Util_remove_and_verify(source_path)) {
-        Util_die("Failed to remove '%s'", source_path);
+    result = chaz_Util_can_open_file(exe_file);
+    if (!chaz_Util_remove_and_verify(source_path)) {
+        chaz_Util_die("Failed to remove '%s'", source_path);
     }
 
     free(command);
@@ -240,9 +240,9 @@ CC_compile_exe(const char *source_path, const char *exe_name,
 }
 
 int
-CC_compile_obj(const char *source_path, const char *obj_name,
-               const char *code) {
-    const char *obj_ext        = OS_obj_ext();
+chaz_CC_compile_obj(const char *source_path, const char *obj_name,
+                    const char *code) {
+    const char *obj_ext        = chaz_OS_obj_ext();
     size_t   obj_file_buf_size = strlen(obj_name) + strlen(obj_ext) + 1;
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
@@ -260,7 +260,7 @@ CC_compile_obj(const char *source_path, const char *obj_name,
     int result;
 
     /* Write the source file. */
-    Util_write_file(source_path, code);
+    chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
     sprintf(command, "%s %s %s %s %s%s %s %s",
@@ -268,17 +268,17 @@ CC_compile_obj(const char *source_path, const char *obj_name,
             source_path, object_flag, 
             obj_file, inc_dir_string,
             cc_flags);
-    if (Util_verbosity < 2) {
-        OS_run_quietly(command);
+    if (chaz_Util_verbosity < 2) {
+        chaz_OS_run_quietly(command);
     }
     else {
         system(command);
     }
 
     /* See if compilation was successful.  Remove the source file. */
-    result = Util_can_open_file(obj_file);
-    if (!Util_remove_and_verify(source_path)) {
-        Util_die("Failed to remove '%s'", source_path);
+    result = chaz_Util_can_open_file(obj_file);
+    if (!chaz_Util_remove_and_verify(source_path)) {
+        chaz_Util_die("Failed to remove '%s'", source_path);
     }
 
     free(command);
@@ -288,51 +288,51 @@ CC_compile_obj(const char *source_path, const char *obj_name,
 }
 
 int
-CC_test_compile(const char *source) {
+chaz_CC_test_compile(const char *source) {
     int compile_succeeded;
-    if (!Util_remove_and_verify(try_obj_name)) {
-        Util_die("Failed to delete file '%s'", try_obj_name);
+    if (!chaz_Util_remove_and_verify(try_obj_name)) {
+        chaz_Util_die("Failed to delete file '%s'", try_obj_name);
     }
-    compile_succeeded = CC_compile_obj(TRY_SOURCE_PATH, TRY_BASENAME,
-                                       source);
-    Util_remove_and_verify(try_obj_name);
+    compile_succeeded = chaz_CC_compile_obj(TRY_SOURCE_PATH, TRY_BASENAME,
+                                            source);
+    chaz_Util_remove_and_verify(try_obj_name);
     return compile_succeeded;
 }
 
 char*
-CC_capture_output(const char *source, size_t *output_len) {
+chaz_CC_capture_output(const char *source, size_t *output_len) {
     char *captured_output = NULL;
     int compile_succeeded;
 
     /* Clear out previous versions and test to make sure removal worked. */
-    if (!Util_remove_and_verify(try_exe_name)) {
-        Util_die("Failed to delete file '%s'", try_exe_name);
+    if (!chaz_Util_remove_and_verify(try_exe_name)) {
+        chaz_Util_die("Failed to delete file '%s'", try_exe_name);
     }
-    if (!Util_remove_and_verify(TARGET_PATH)) {
-        Util_die("Failed to delete file '%s'", TARGET_PATH);
+    if (!chaz_Util_remove_and_verify(TARGET_PATH)) {
+        chaz_Util_die("Failed to delete file '%s'", TARGET_PATH);
     }
 
     /* Attempt compilation; if successful, run app and slurp output. */
-    compile_succeeded = CC_compile_exe(TRY_SOURCE_PATH, TRY_BASENAME,
-                                       source);
+    compile_succeeded = chaz_CC_compile_exe(TRY_SOURCE_PATH, TRY_BASENAME,
+                                            source);
     if (compile_succeeded) {
-        OS_run_local(try_exe_name, NULL);
-        captured_output = Util_slurp_file(TARGET_PATH, output_len);
+        chaz_OS_run_local(try_exe_name, NULL);
+        captured_output = chaz_Util_slurp_file(TARGET_PATH, output_len);
     }
     else {
         *output_len = 0;
     }
 
     /* Remove all the files we just created. */
-    Util_remove_and_verify(TRY_SOURCE_PATH);
-    Util_remove_and_verify(try_exe_name);
-    Util_remove_and_verify(TARGET_PATH);
+    chaz_Util_remove_and_verify(TRY_SOURCE_PATH);
+    chaz_Util_remove_and_verify(try_exe_name);
+    chaz_Util_remove_and_verify(TARGET_PATH);
 
     return captured_output;
 }
 
 void
-CC_add_inc_dir(const char *dir) {
+chaz_CC_add_inc_dir(const char *dir) {
     size_t num_dirs = 0;
     char **dirs = inc_dirs;
 
@@ -342,7 +342,7 @@ CC_add_inc_dir(const char *dir) {
     inc_dirs = (char**)realloc(inc_dirs, (num_dirs + 1) * sizeof(char*));
 
     /* Put the passed-in dir at the end of the list. */
-    inc_dirs[num_dirs - 1] = Util_strdup(dir);
+    inc_dirs[num_dirs - 1] = chaz_Util_strdup(dir);
     inc_dirs[num_dirs] = NULL;
 }
 

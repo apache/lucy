@@ -60,7 +60,7 @@ static void
 S_maybe_add_to_cache(const char *header_name, int exists);
 
 void
-HeadCheck_init(void) {
+chaz_HeadCheck_init(void) {
     Header *null_header = (Header*)malloc(sizeof(Header));
 
     /* Create terminating record for the dynamic array of Header objects. */
@@ -72,7 +72,7 @@ HeadCheck_init(void) {
 }
 
 int
-HeadCheck_check_header(const char *header_name) {
+chaz_HeadCheck_check_header(const char *header_name) {
     Header  *header;
     Header   key;
     Header  *fake = &key;
@@ -97,10 +97,10 @@ HeadCheck_check_header(const char *header_name) {
 }
 
 int
-HeadCheck_check_many_headers(const char **header_names) {
+chaz_HeadCheck_check_many_headers(const char **header_names) {
     int success;
     int i;
-    char *code_buf = Util_strdup("");
+    char *code_buf = chaz_Util_strdup("");
     size_t needed = sizeof(test_code) + 20;
 
     /* Build the source code string. */
@@ -118,7 +118,7 @@ HeadCheck_check_many_headers(const char **header_names) {
     strcat(code_buf, test_code);
 
     /* If the code compiles, bulk add all header names to the cache. */
-    success = CC_test_compile(code_buf);
+    success = chaz_CC_test_compile(code_buf);
     if (success) {
         for (i = 0; header_names[i] != NULL; i++) {
             S_maybe_add_to_cache(header_names[i], true);
@@ -130,13 +130,13 @@ HeadCheck_check_many_headers(const char **header_names) {
 }
 
 static const char contains_code[] =
-    QUOTE(  #include <stddef.h>                           )
-    QUOTE(  %s                                            )
-    QUOTE(  int main() { return offsetof(%s, %s); }       );
+    CHAZ_QUOTE(  #include <stddef.h>                           )
+    CHAZ_QUOTE(  %s                                            )
+    CHAZ_QUOTE(  int main() { return offsetof(%s, %s); }       );
 
 int
-HeadCheck_contains_member(const char *struct_name, const char *member,
-                          const char *includes) {
+chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
+                               const char *includes) {
     long needed = sizeof(contains_code)
                   + strlen(struct_name)
                   + strlen(member)
@@ -145,7 +145,7 @@ HeadCheck_contains_member(const char *struct_name, const char *member,
     char *buf = (char*)malloc(needed);
     int retval;
     sprintf(buf, contains_code, includes, struct_name, member);
-    retval = CC_test_compile(buf);
+    retval = chaz_CC_test_compile(buf);
     free(buf);
     return retval;
 }
@@ -168,11 +168,11 @@ S_discover_header(const char *header_name) {
     char *include_test = (char*)malloc(needed);
 
     /* Assign. */
-    header->name = Util_strdup(header_name);
+    header->name = chaz_Util_strdup(header_name);
 
     /* See whether code that tries to pull in this header compiles. */
     sprintf(include_test, "#include <%s>\n%s", header_name, test_code);
-    header->exists = CC_test_compile(include_test);
+    header->exists = chaz_CC_test_compile(include_test);
 
     free(include_test);
     return header;
@@ -205,7 +205,7 @@ S_maybe_add_to_cache(const char *header_name, int exists) {
     /* We've already done the test compile, so skip that step and add it. */
     if (header == NULL) {
         header = (Header*)malloc(sizeof(Header));
-        header->name   = Util_strdup(header_name);
+        header->name   = chaz_Util_strdup(header_name);
         header->exists = exists;
         S_add_to_cache(header);
     }

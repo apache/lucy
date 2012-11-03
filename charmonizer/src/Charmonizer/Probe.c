@@ -35,49 +35,49 @@ static void
 S_remove_charm_h(void);
 
 void
-Probe_init(const char *cc_command, const char *cc_flags) {
+chaz_Probe_init(const char *cc_command, const char *cc_flags) {
     /* Proces CHARM_VERBOSITY environment variable. */
     const char *verbosity_env = getenv("CHARM_VERBOSITY");
     if (verbosity_env && strlen(verbosity_env)) {
-        Util_verbosity = strtol(verbosity_env, NULL, 10);
+        chaz_Util_verbosity = strtol(verbosity_env, NULL, 10);
     }
 
     /* Dispatch other initializers. */
-    OS_init();
-    CC_init(cc_command, cc_flags);
-    ConfWriter_init();
-    HeadCheck_init();
+    chaz_OS_init();
+    chaz_CC_init(cc_command, cc_flags);
+    chaz_ConfWriter_init();
+    chaz_HeadCheck_init();
     S_write_charm_h();
 
-    if (Util_verbosity) { printf("Initialization complete.\n"); }
+    if (chaz_Util_verbosity) { printf("Initialization complete.\n"); }
 }
 
 void
-Probe_clean_up(void) {
-    if (Util_verbosity) { printf("Cleaning up...\n"); }
+chaz_Probe_clean_up(void) {
+    if (chaz_Util_verbosity) { printf("Cleaning up...\n"); }
 
     /* Dispatch various clean up routines. */
     S_remove_charm_h();
-    ConfWriter_clean_up();
-    CC_clean_up();
+    chaz_ConfWriter_clean_up();
+    chaz_CC_clean_up();
 
-    if (Util_verbosity) { printf("Cleanup complete.\n"); }
+    if (chaz_Util_verbosity) { printf("Cleanup complete.\n"); }
 }
 
 static const char charm_h_code[] =
-    QUOTE(  #ifndef CHARM_H                                                  )
-    QUOTE(  #define CHARM_H 1                                                )
-    QUOTE(  #include <stdio.h>                                               )
-    QUOTE(  #define Charm_Setup freopen("_charmonizer_target", "w", stdout)  )
-    QUOTE(  #endif                                                           );
+    CHAZ_QUOTE(  #ifndef CHARM_H                                                  )
+    CHAZ_QUOTE(  #define CHARM_H 1                                                )
+    CHAZ_QUOTE(  #include <stdio.h>                                               )
+    CHAZ_QUOTE(  #define Charm_Setup freopen("_charmonizer_target", "w", stdout)  )
+    CHAZ_QUOTE(  #endif                                                           );
 
 static void
 S_write_charm_h(void) {
-    Util_write_file("_charm.h", charm_h_code);
+    chaz_Util_write_file("_charm.h", charm_h_code);
 }
 
 static void
 S_remove_charm_h(void) {
-    Util_remove_and_verify("_charm.h");
+    chaz_Util_remove_and_verify("_charm.h");
 }
 

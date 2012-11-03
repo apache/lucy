@@ -24,14 +24,14 @@
 
 
 void
-UnusedVars_run(void) {
-    ConfWriter_start_module("UnusedVars");
+chaz_UnusedVars_run(void) {
+    chaz_ConfWriter_start_module("UnusedVars");
 
     /* Write the macros (no test, these are the same everywhere). */
-    ConfWriter_add_def("UNUSED_VAR(x)", "((void)x)");
-    ConfWriter_add_def("UNREACHABLE_RETURN(type)", "return (type)0");
+    chaz_ConfWriter_add_def("UNUSED_VAR(x)", "((void)x)");
+    chaz_ConfWriter_add_def("UNREACHABLE_RETURN(type)", "return (type)0");
 
-    ConfWriter_end_module();
+    chaz_ConfWriter_end_module();
 }
 
 
