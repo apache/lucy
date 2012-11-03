@@ -34,14 +34,11 @@ static const char *keepers[MAX_KEEPER_COUNT + 1] = { NULL };
 static void
 S_keep(const char *header_name);
 
-static size_t aff_buf_size = 0;
-static char *aff_buf = NULL;
-
-/* Transform "header.h" into "CHY_HAS_HEADER_H, storing the result in
- * [aff_buf].
+/* Transform "header.h" into "CHY_HAS_HEADER_H, storing the result into
+ * `buffer`.
  */
 static void
-S_encode_affirmation(const char *header_name);
+S_encode_affirmation(const char *header_name, char *buffer, size_t buf_size);
 
 #define NUM_C89_HEADERS 15
 const char *c89_headers[] = {
@@ -162,7 +159,8 @@ chaz_Headers_run(void) {
 
     /* Append the config with every header detected so far. */
     for (i = 0; keepers[i] != NULL; i++) {
-        S_encode_affirmation(keepers[i]);
+        char aff_buf[200];
+        S_encode_affirmation(keepers[i], aff_buf, 200);
         chaz_ConfWriter_add_def(aff_buf, NULL);
     }
 
@@ -179,20 +177,18 @@ S_keep(const char *header_name) {
 }
 
 static void
-S_encode_affirmation(const char *header_name) {
+S_encode_affirmation(const char *header_name, char *buffer, size_t buf_size) {
     char *buf, *buf_end;
     size_t len = strlen(header_name) + sizeof("HAS_");
-
-    /* Grow buffer and start off with "HAS_". */
-    if (aff_buf_size < len + 1) {
-        free(aff_buf);
-        aff_buf_size = len + 1;
-        aff_buf = (char*)malloc(aff_buf_size);
+    if (len + 1 > buf_size) {
+        chaz_Util_die("Buffer too small: %lu", (unsigned long)buf_size);
     }
-    strcpy(aff_buf, "HAS_");
+
+    /* Start off with "HAS_". */
+    strcpy(buffer, "HAS_");
 
     /* Transform one char at a time. */
-    for (buf = aff_buf + sizeof("HAS_") - 1, buf_end = aff_buf + len;
+    for (buf = buffer + sizeof("HAS_") - 1, buf_end = buffer + len;
          buf < buf_end;
          header_name++, buf++
         ) {

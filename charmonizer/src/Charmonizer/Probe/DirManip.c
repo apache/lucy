@@ -25,42 +25,24 @@
 #include <stdlib.h>
 
 static int   mkdir_num_args  = 0;
-static int   mkdir_available = 0;
 static char  mkdir_command_buf[7];
 static char *mkdir_command = mkdir_command_buf;
-static int   rmdir_available = 0;
-
-/* Source code for standard POSIX mkdir */
-static const char posix_mkdir_code[] =
-    CHAZ_QUOTE(  #include <%s>                                          )
-    CHAZ_QUOTE(  int main(int argc, char **argv) {                      )
-    CHAZ_QUOTE(      if (argc != 2) { return 1; }                       )
-    CHAZ_QUOTE(      if (mkdir(argv[1], 0777) != 0) { return 2; }       )
-    CHAZ_QUOTE(      return 0;                                          )
-    CHAZ_QUOTE(  }                                                      );
-
-/* Source code for Windows _mkdir. */
-static const char win_mkdir_code[] =
-    CHAZ_QUOTE(  #include <direct.h>                                    )
-    CHAZ_QUOTE(  int main(int argc, char **argv) {                      )
-    CHAZ_QUOTE(      if (argc != 2) { return 1; }                       )
-    CHAZ_QUOTE(      if (_mkdir(argv[1]) != 0) { return 2; }            )
-    CHAZ_QUOTE(      return 0;                                          )
-    CHAZ_QUOTE(  }                                                      );
 
 /* Source code for rmdir. */
-static const char rmdir_code[] =
-    CHAZ_QUOTE(  #include <%s>                                          )
-    CHAZ_QUOTE(  int main(int argc, char **argv) {                      )
-    CHAZ_QUOTE(      if (argc != 2) { return 1; }                       )
-    CHAZ_QUOTE(      if (rmdir(argv[1]) != 0) { return 2; }             )
-    CHAZ_QUOTE(      return 0;                                          )
-    CHAZ_QUOTE(  }                                                      );
-
 static int
 S_compile_posix_mkdir(const char *header) {
-    size_t needed = sizeof(posix_mkdir_code) + 30;
-    char *code_buf = (char*)malloc(needed);
+    static const char posix_mkdir_code[] =
+        CHAZ_QUOTE(  #include <%s>                                      )
+        CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
+        CHAZ_QUOTE(      if (argc != 2) { return 1; }                   )
+        CHAZ_QUOTE(      if (mkdir(argv[1], 0777) != 0) { return 2; }   )
+        CHAZ_QUOTE(      return 0;                                      )
+        CHAZ_QUOTE(  }                                                  );
+    char code_buf[sizeof(posix_mkdir_code) + 30];
+    int mkdir_available;
+    if (strlen(header) > 25) {
+        chaz_Util_die("Header name too long: '%s'", header);
+    }
 
     /* Attempt compilation. */
     sprintf(code_buf, posix_mkdir_code, header);
@@ -77,12 +59,20 @@ S_compile_posix_mkdir(const char *header) {
         }
     }
 
-    free(code_buf);
     return mkdir_available;
 }
 
 static int
 S_compile_win_mkdir(void) {
+    static const char win_mkdir_code[] =
+        CHAZ_QUOTE(  #include <direct.h>                                )
+        CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
+        CHAZ_QUOTE(      if (argc != 2) { return 1; }                   )
+        CHAZ_QUOTE(      if (_mkdir(argv[1]) != 0) { return 2; }        )
+        CHAZ_QUOTE(      return 0;                                      )
+        CHAZ_QUOTE(  }                                                  );
+    int mkdir_available;
+
     mkdir_available = chaz_CC_test_compile(win_mkdir_code);
     if (mkdir_available) {
         strcpy(mkdir_command, "_mkdir");
@@ -102,11 +92,20 @@ S_try_mkdir(void) {
 
 static int
 S_compile_rmdir(const char *header) {
-    size_t needed = sizeof(posix_mkdir_code) + 30;
-    char *code_buf = (char*)malloc(needed);
+    static const char rmdir_code[] =
+        CHAZ_QUOTE(  #include <%s>                                      )
+        CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
+        CHAZ_QUOTE(      if (argc != 2) { return 1; }                   )
+        CHAZ_QUOTE(      if (rmdir(argv[1]) != 0) { return 2; }         )
+        CHAZ_QUOTE(      return 0;                                      )
+        CHAZ_QUOTE(  }                                                  );
+    char code_buf[sizeof(rmdir_code) + 30];
+    int rmdir_available;
+    if (strlen(header) > 25) {
+        chaz_Util_die("Header name too long: '%s'", header);
+    }
     sprintf(code_buf, rmdir_code, header);
     rmdir_available = chaz_CC_test_compile(code_buf);
-    free(code_buf);
     return rmdir_available;
 }
 

@@ -182,8 +182,7 @@ static const char off64_code[] =
 
 static const int
 S_probe_off64(void) {
-    size_t needed = sizeof(off64_code) + 100;
-    char *code_buf = (char*)malloc(needed);
+    char code_buf[sizeof(off64_code) + 100];
     int i;
     int success = false;
     for (i = 0; i < NUM_OFF64_OPTIONS; i++) {
@@ -208,7 +207,6 @@ S_probe_off64(void) {
             }
         }
     }
-    free(code_buf);
     return success;
 }
 
@@ -233,13 +231,7 @@ static int
 S_probe_stdio64(stdio64_combo *combo) {
     char *output = NULL;
     size_t output_len;
-    size_t needed = sizeof(stdio64_code)
-                    + (2 * strlen(off64_type))
-                    + strlen(combo->fopen_command)
-                    + strlen(combo->ftell_command)
-                    + strlen(combo->fseek_command)
-                    + 20;
-    char *code_buf = (char*)malloc(needed);
+    char code_buf[sizeof(stdio64_code) + 200];
     int success = false;
 
     /* Prepare the source code. */
@@ -264,30 +256,24 @@ S_probe_stdio64(stdio64_combo *combo) {
     return success;
 }
 
-/* Code for checking 64-bit lseek. */
-static const char lseek_code[] =
-    CHAZ_QUOTE(  %s                                                        )
-    CHAZ_QUOTE(  #include "_charm.h"                                       )
-    CHAZ_QUOTE(  int main() {                                              )
-    CHAZ_QUOTE(      int fd;                                               )
-    CHAZ_QUOTE(      Charm_Setup;                                          )
-    CHAZ_QUOTE(      fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666);  )
-    CHAZ_QUOTE(      if (fd == -1) { return -1; }                          )
-    CHAZ_QUOTE(      %s(fd, 0, SEEK_SET);                                  )
-    CHAZ_QUOTE(      printf("%%d", 1);                                     )
-    CHAZ_QUOTE(      if (close(fd)) { return -1; }                         )
-    CHAZ_QUOTE(      return 0;                                             )
-    CHAZ_QUOTE(  }                                                         );
-
 static int
 S_probe_lseek(unbuff_combo *combo) {
+    static const char lseek_code[] =
+        CHAZ_QUOTE( %s                                                       )
+        CHAZ_QUOTE( #include "_charm.h"                                      )
+        CHAZ_QUOTE( int main() {                                             )
+        CHAZ_QUOTE(     int fd;                                              )
+        CHAZ_QUOTE(     Charm_Setup;                                         )
+        CHAZ_QUOTE(     fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666); )
+        CHAZ_QUOTE(     if (fd == -1) { return -1; }                         )
+        CHAZ_QUOTE(     %s(fd, 0, SEEK_SET);                                 )
+        CHAZ_QUOTE(     printf("%%d", 1);                                    )
+        CHAZ_QUOTE(     if (close(fd)) { return -1; }                        )
+        CHAZ_QUOTE(     return 0;                                            )
+        CHAZ_QUOTE( }                                                        );
+    char code_buf[sizeof(lseek_code) + 100];
     char *output = NULL;
     size_t output_len;
-    size_t needed = sizeof(lseek_code)
-                    + strlen(combo->includes)
-                    + strlen(combo->lseek_command)
-                    + 20;
-    char *code_buf = (char*)malloc(needed);
     int success = false;
 
     /* Verify compilation. */
@@ -302,33 +288,27 @@ S_probe_lseek(unbuff_combo *combo) {
         chaz_Util_die("Failed to remove '_charm_lseek'");
     }
 
-    free(code_buf);
     return success;
 }
 
-/* Code for checking 64-bit pread.  The pread call will fail, but that's fine
- * as long as it compiles. */
-static const char pread64_code[] =
-    CHAZ_QUOTE(  %s                                     )
-    CHAZ_QUOTE(  #include "_charm.h"                    )
-    CHAZ_QUOTE(  int main() {                           )
-    CHAZ_QUOTE(      int fd = 20;                       )
-    CHAZ_QUOTE(      char buf[1];                       )
-    CHAZ_QUOTE(      Charm_Setup;                       )
-    CHAZ_QUOTE(      printf("1");                       )
-    CHAZ_QUOTE(      %s(fd, buf, 1, 1);                 )
-    CHAZ_QUOTE(      return 0;                          )
-    CHAZ_QUOTE(  }                                      );
-
 static int
 S_probe_pread64(unbuff_combo *combo) {
+    /* Code for checking 64-bit pread.  The pread call will fail, but that's
+     * fine as long as it compiles. */
+    static const char pread64_code[] =
+        CHAZ_QUOTE(  %s                                     )
+        CHAZ_QUOTE(  #include "_charm.h"                    )
+        CHAZ_QUOTE(  int main() {                           )
+        CHAZ_QUOTE(      int fd = 20;                       )
+        CHAZ_QUOTE(      char buf[1];                       )
+        CHAZ_QUOTE(      Charm_Setup;                       )
+        CHAZ_QUOTE(      printf("1");                       )
+        CHAZ_QUOTE(      %s(fd, buf, 1, 1);                 )
+        CHAZ_QUOTE(      return 0;                          )
+        CHAZ_QUOTE(  }                                      );
+    char code_buf[sizeof(pread64_code) + 100];
     char *output = NULL;
     size_t output_len;
-    size_t needed = sizeof(pread64_code)
-                    + strlen(combo->includes)
-                    + strlen(combo->pread64_command)
-                    + 20;
-    char *code_buf = (char*)malloc(needed);
     int success = false;
 
     /* Verify compilation. */
@@ -339,7 +319,6 @@ S_probe_pread64(unbuff_combo *combo) {
         free(output);
     }
 
-    free(code_buf);
     return success;
 }
 

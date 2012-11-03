@@ -23,45 +23,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char osatomic_casptr_code[] =
-    CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
-    CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
-    CHAZ_QUOTE(  int main() {                                                   )
-    CHAZ_QUOTE(      int  foo = 1;                                              )
-    CHAZ_QUOTE(      int *foo_ptr = &foo;                                       )
-    CHAZ_QUOTE(      int *target = NULL;                                        )
-    CHAZ_QUOTE(      OSAtomicCompareAndSwapPtr(NULL, foo_ptr, (void**)&target); )
-    CHAZ_QUOTE(      return 0;                                                  )
-    CHAZ_QUOTE(  }                                                              );
+
+static int
+chaz_AtomicOps_osatomic_cas_ptr(void) {
+    static const char osatomic_casptr_code[] =
+        CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
+        CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
+        CHAZ_QUOTE(  int main() {                                                   )
+        CHAZ_QUOTE(      int  foo = 1;                                              )
+        CHAZ_QUOTE(      int *foo_ptr = &foo;                                       )
+        CHAZ_QUOTE(      int *target = NULL;                                        )
+        CHAZ_QUOTE(      OSAtomicCompareAndSwapPtr(NULL, foo_ptr, (void**)&target); )
+        CHAZ_QUOTE(      return 0;                                                  )
+        CHAZ_QUOTE(  }                                                              );
+     return chaz_CC_test_compile(osatomic_casptr_code);
+}
 
 void
 chaz_AtomicOps_run(void) {
-    int has_libkern_osatomic_h = false;
-    int has_osatomic_cas_ptr   = false;
-    int has_sys_atomic_h       = false;
-    int has_intrin_h           = false;
-
     chaz_ConfWriter_start_module("AtomicOps");
 
     if (chaz_HeadCheck_check_header("libkern/OSAtomic.h")) {
-        has_libkern_osatomic_h = true;
         chaz_ConfWriter_add_def("HAS_LIBKERN_OSATOMIC_H", NULL);
 
         /* Check for OSAtomicCompareAndSwapPtr, introduced in later versions
          * of OSAtomic.h. */
-        has_osatomic_cas_ptr = chaz_CC_test_compile(osatomic_casptr_code);
-        if (has_osatomic_cas_ptr) {
+        if (chaz_AtomicOps_osatomic_cas_ptr()) {
             chaz_ConfWriter_add_def("HAS_OSATOMIC_CAS_PTR", NULL);
         }
     }
     if (chaz_HeadCheck_check_header("sys/atomic.h")) {
-        has_sys_atomic_h = true;
         chaz_ConfWriter_add_def("HAS_SYS_ATOMIC_H", NULL);
     }
     if (chaz_HeadCheck_check_header("windows.h")
         && chaz_HeadCheck_check_header("intrin.h")
        ) {
-        has_intrin_h = true;
         chaz_ConfWriter_add_def("HAS_INTRIN_H", NULL);
     }
 

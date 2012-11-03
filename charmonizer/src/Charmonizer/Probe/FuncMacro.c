@@ -40,18 +40,17 @@ static const char gnuc_func_code[] =
     CHAZ_QUOTE(      return 0;                     )
     CHAZ_QUOTE(  }                                 );
 
-/* Code for verifying inline keyword. */
-static const char inline_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"               )
-    CHAZ_QUOTE(  static %s int foo() { return 1; } )
-    CHAZ_QUOTE(  int main() {                      )
-    CHAZ_QUOTE(      Charm_Setup;                  )
-    CHAZ_QUOTE(      printf("%%d", foo());         )
-    CHAZ_QUOTE(      return 0;                     )
-    CHAZ_QUOTE(  }                                 );
-
+/* Attempt to verify inline keyword. */
 static char*
 S_try_inline(const char *keyword, size_t *output_len) {
+    static const char inline_code[] =
+        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  static %s int foo() { return 1; } )
+        CHAZ_QUOTE(  int main() {                      )
+        CHAZ_QUOTE(      Charm_Setup;                  )
+        CHAZ_QUOTE(      printf("%%d", foo());         )
+        CHAZ_QUOTE(      return 0;                     )
+        CHAZ_QUOTE(  }                                 );
     char code[sizeof(inline_code) + 30];
     sprintf(code, inline_code, keyword);
     return chaz_CC_capture_output(code, output_len);

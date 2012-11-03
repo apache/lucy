@@ -26,9 +26,6 @@ typedef struct Header {
     int  exists;
 } Header;
 
-/* "hello_world.c" without the hello or the world. */
-static const char test_code[] = "int main() { return 0; }\n";
-
 /* Keep a sorted, dynamically-sized array of names of all headers we've
  * checked for so far.
  */
@@ -96,6 +93,7 @@ chaz_HeadCheck_check_header(const char *header_name) {
 
 int
 chaz_HeadCheck_check_many_headers(const char **header_names) {
+    static const char test_code[] = "int main() { return 0; }\n";
     int success;
     int i;
     char *code_buf = chaz_Util_strdup("");
@@ -127,14 +125,13 @@ chaz_HeadCheck_check_many_headers(const char **header_names) {
     return success;
 }
 
-static const char contains_code[] =
-    CHAZ_QUOTE(  #include <stddef.h>                           )
-    CHAZ_QUOTE(  %s                                            )
-    CHAZ_QUOTE(  int main() { return offsetof(%s, %s); }       );
-
 int
 chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
                                const char *includes) {
+    static const char contains_code[] =
+        CHAZ_QUOTE(  #include <stddef.h>                           )
+        CHAZ_QUOTE(  %s                                            )
+        CHAZ_QUOTE(  int main() { return offsetof(%s, %s); }       );
     long needed = sizeof(contains_code)
                   + strlen(struct_name)
                   + strlen(member)
@@ -161,6 +158,7 @@ S_compare_headers(const void *vptr_a, const void *vptr_b) {
 
 static Header*
 S_discover_header(const char *header_name) {
+    static const char test_code[] = "int main() { return 0; }\n";
     Header* header = (Header*)malloc(sizeof(Header));
     size_t  needed = strlen(header_name) + sizeof(test_code) + 50;
     char *include_test = (char*)malloc(needed);
