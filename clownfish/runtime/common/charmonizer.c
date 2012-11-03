@@ -1953,7 +1953,7 @@ chaz_ConfWriterRuby_open_config_rb(void) {
             "\n"
             "defs = {}\n"
             "\n"
-            "def config\n\defs\nend\n"
+            "def config\ndefs\nend\n"
             "\n"
            );
 }
@@ -4341,7 +4341,7 @@ chaz_VariadicMacros_run(void) {
 
 
 
-#line 1 "charmonizer/charmonize.c"
+#line 1 "clownfish/runtime/common/charmonizer.main"
 /* Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -4358,7 +4358,7 @@ chaz_VariadicMacros_run(void) {
  * limitations under the License.
  */
 
-/* Charmonize.c -- Create Charmony.
+/* Source fragment for the Clownfish runtime's charmonizer.c.
  */
 
 #include <stdio.h>
