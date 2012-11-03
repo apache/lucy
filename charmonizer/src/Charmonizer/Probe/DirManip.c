@@ -31,7 +31,7 @@ static struct {
 
 /* Source code for rmdir. */
 static int
-S_compile_posix_mkdir(const char *header) {
+chaz_DirManip_compile_posix_mkdir(const char *header) {
     static const char posix_mkdir_code[] =
         CHAZ_QUOTE(  #include <%s>                                      )
         CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
@@ -64,7 +64,7 @@ S_compile_posix_mkdir(const char *header) {
 }
 
 static int
-S_compile_win_mkdir(void) {
+chaz_DirManip_compile_win_mkdir(void) {
     static const char win_mkdir_code[] =
         CHAZ_QUOTE(  #include <direct.h>                                )
         CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
@@ -83,16 +83,16 @@ S_compile_win_mkdir(void) {
 }
 
 static void
-S_try_mkdir(void) {
+chaz_DirManip_try_mkdir(void) {
     if (chaz_HeadCheck_check_header("windows.h")) {
-        if (S_compile_win_mkdir())               { return; }
-        if (S_compile_posix_mkdir("direct.h"))   { return; }
+        if (chaz_DirManip_compile_win_mkdir())               { return; }
+        if (chaz_DirManip_compile_posix_mkdir("direct.h"))   { return; }
     }
-    if (S_compile_posix_mkdir("sys/stat.h")) { return; }
+    if (chaz_DirManip_compile_posix_mkdir("sys/stat.h")) { return; }
 }
 
 static int
-S_compile_rmdir(const char *header) {
+chaz_DirManip_compile_rmdir(const char *header) {
     static const char rmdir_code[] =
         CHAZ_QUOTE(  #include <%s>                                      )
         CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
@@ -111,10 +111,10 @@ S_compile_rmdir(const char *header) {
 }
 
 static void
-S_try_rmdir(void) {
-    if (S_compile_rmdir("unistd.h"))   { return; }
-    if (S_compile_rmdir("dirent.h"))   { return; }
-    if (S_compile_rmdir("direct.h"))   { return; }
+chaz_DirManip_try_rmdir(void) {
+    if (chaz_DirManip_compile_rmdir("unistd.h"))   { return; }
+    if (chaz_DirManip_compile_rmdir("dirent.h"))   { return; }
+    if (chaz_DirManip_compile_rmdir("direct.h"))   { return; }
 }
 
 static int
@@ -141,8 +141,8 @@ chaz_DirManip_run(void) {
     int has_dirent_d_type   = false;
 
     chaz_ConfWriter_start_module("DirManip");
-    S_try_mkdir();
-    S_try_rmdir();
+    chaz_DirManip_try_mkdir();
+    chaz_DirManip_try_rmdir();
 
     /* Header checks. */
     if (has_dirent_h) {

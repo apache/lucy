@@ -32,42 +32,42 @@ static chaz_ConfWriter CWPerl_conf_writer;
 /* Open the Charmony.pm file handle.
  */
 static void
-S_open_config_pm(void);
+chaz_ConfWriterPerl_open_config_pm(void);
 
 static void
-S_ConfWriterPerl_clean_up(void);
+chaz_ConfWriterPerl_clean_up(void);
 static void
-S_ConfWriterPerl_vappend_conf(const char *fmt, va_list args);
+chaz_ConfWriterPerl_vappend_conf(const char *fmt, va_list args);
 static void
-S_ConfWriterPerl_add_def(const char *sym, const char *value);
+chaz_ConfWriterPerl_add_def(const char *sym, const char *value);
 static void
-S_ConfWriterPerl_add_typedef(const char *type, const char *alias);
+chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias);
 static void
-S_ConfWriterPerl_add_sys_include(const char *header);
+chaz_ConfWriterPerl_add_sys_include(const char *header);
 static void
-S_ConfWriterPerl_add_local_include(const char *header);
+chaz_ConfWriterPerl_add_local_include(const char *header);
 static void
-S_ConfWriterPerl_start_module(const char *module_name);
+chaz_ConfWriterPerl_start_module(const char *module_name);
 static void
-S_ConfWriterPerl_end_module(void);
+chaz_ConfWriterPerl_end_module(void);
 
 void
 chaz_ConfWriterPerl_enable(void) {
-    CWPerl_conf_writer.clean_up          = S_ConfWriterPerl_clean_up;
-    CWPerl_conf_writer.vappend_conf      = S_ConfWriterPerl_vappend_conf;
-    CWPerl_conf_writer.add_def           = S_ConfWriterPerl_add_def;
-    CWPerl_conf_writer.add_typedef       = S_ConfWriterPerl_add_typedef;
-    CWPerl_conf_writer.add_sys_include   = S_ConfWriterPerl_add_sys_include;
-    CWPerl_conf_writer.add_local_include = S_ConfWriterPerl_add_local_include;
-    CWPerl_conf_writer.start_module      = S_ConfWriterPerl_start_module;
-    CWPerl_conf_writer.end_module        = S_ConfWriterPerl_end_module;
-    S_open_config_pm();
+    CWPerl_conf_writer.clean_up          = chaz_ConfWriterPerl_clean_up;
+    CWPerl_conf_writer.vappend_conf      = chaz_ConfWriterPerl_vappend_conf;
+    CWPerl_conf_writer.add_def           = chaz_ConfWriterPerl_add_def;
+    CWPerl_conf_writer.add_typedef       = chaz_ConfWriterPerl_add_typedef;
+    CWPerl_conf_writer.add_sys_include   = chaz_ConfWriterPerl_add_sys_include;
+    CWPerl_conf_writer.add_local_include = chaz_ConfWriterPerl_add_local_include;
+    CWPerl_conf_writer.start_module      = chaz_ConfWriterPerl_start_module;
+    CWPerl_conf_writer.end_module        = chaz_ConfWriterPerl_end_module;
+    chaz_ConfWriterPerl_open_config_pm();
     chaz_ConfWriter_add_writer(&CWPerl_conf_writer);
     return;
 }
 
 static void
-S_open_config_pm(void) {
+chaz_ConfWriterPerl_open_config_pm(void) {
     /* Open the filehandle. */
     chaz_CWPerl.fh = fopen("Charmony.pm", "w+");
     if (chaz_CWPerl.fh == NULL) {
@@ -91,7 +91,7 @@ S_open_config_pm(void) {
 }
 
 static void
-S_ConfWriterPerl_clean_up(void) {
+chaz_ConfWriterPerl_clean_up(void) {
     /* Write the last bit of Charmony.pm and close. */
     fprintf(chaz_CWPerl.fh, "\n1;\n\n");
     if (fclose(chaz_CWPerl.fh)) {
@@ -100,13 +100,13 @@ S_ConfWriterPerl_clean_up(void) {
 }
 
 static void
-S_ConfWriterPerl_vappend_conf(const char *fmt, va_list args) {
+chaz_ConfWriterPerl_vappend_conf(const char *fmt, va_list args) {
     (void)fmt;
     (void)args;
 }
 
 static char*
-S_ConfWriterPerl_quotify(const char *string, char *buf, size_t buf_size) {
+chaz_ConfWriterPerl_quotify(const char *string, char *buf, size_t buf_size) {
     char *quoted = buf;
 
     /* Don't bother with undef values here. */
@@ -151,7 +151,7 @@ S_ConfWriterPerl_quotify(const char *string, char *buf, size_t buf_size) {
 
 #define CFPERL_MAX_BUF 100
 static void
-S_ConfWriterPerl_add_def(const char *sym, const char *value) {
+chaz_ConfWriterPerl_add_def(const char *sym, const char *value) {
     char sym_buf[CFPERL_MAX_BUF + 1];
     char value_buf[CFPERL_MAX_BUF + 1];
     char *quoted_sym;
@@ -161,7 +161,7 @@ S_ConfWriterPerl_add_def(const char *sym, const char *value) {
     if (!sym) {
         chaz_Util_die("Can't handle NULL key");
     }
-    quoted_sym = S_ConfWriterPerl_quotify(sym, sym_buf, CFPERL_MAX_BUF);
+    quoted_sym = chaz_ConfWriterPerl_quotify(sym, sym_buf, CFPERL_MAX_BUF);
 
     /* Quote value or use "undef". */
     if (!value) {
@@ -169,7 +169,7 @@ S_ConfWriterPerl_add_def(const char *sym, const char *value) {
         quoted_value = value_buf;
     }
     else {
-        quoted_value = S_ConfWriterPerl_quotify(value, value_buf,
+        quoted_value = chaz_ConfWriterPerl_quotify(value, value_buf,
                                                 CFPERL_MAX_BUF);
     }
 
@@ -180,28 +180,28 @@ S_ConfWriterPerl_add_def(const char *sym, const char *value) {
 }
 
 static void
-S_ConfWriterPerl_add_typedef(const char *type, const char *alias) {
+chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias) {
     (void)type;
     (void)alias;
 }
 
 static void
-S_ConfWriterPerl_add_sys_include(const char *header) {
+chaz_ConfWriterPerl_add_sys_include(const char *header) {
     (void)header;
 }
 
 static void
-S_ConfWriterPerl_add_local_include(const char *header) {
+chaz_ConfWriterPerl_add_local_include(const char *header) {
     (void)header;
 }
 
 static void
-S_ConfWriterPerl_start_module(const char *module_name) {
+chaz_ConfWriterPerl_start_module(const char *module_name) {
     fprintf(chaz_CWPerl.fh, "# %s\n", module_name);
 }
 
 static void
-S_ConfWriterPerl_end_module(void) {
+chaz_ConfWriterPerl_end_module(void) {
     fprintf(chaz_CWPerl.fh, "\n");
 }
 

@@ -48,14 +48,14 @@ typedef struct chaz_LargeFiles_unbuff_combo {
 /* Check for a 64-bit file pointer type.
  */
 static const int
-S_probe_off64(void);
+chaz_LargeFiles_probe_off64(void);
 
 /* Check what name 64-bit ftell, fseek go by.
  */
 static void
 chaz_LargeFiles_probe_stdio64(void);
 static int
-S_probe_stdio64(chaz_LargeFiles_stdio64_combo *combo);
+chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo);
 
 /* Probe for 64-bit unbuffered i/o.
  */
@@ -65,12 +65,12 @@ chaz_LargeFiles_probe_unbuff(void);
 /* Check for a 64-bit lseek.
  */
 static int
-S_probe_lseek(chaz_LargeFiles_unbuff_combo *combo);
+chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo);
 
 /* Check for a 64-bit pread.
  */
 static int
-S_probe_pread64(chaz_LargeFiles_unbuff_combo *combo);
+chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo);
 
 void
 chaz_LargeFiles_run(void) {
@@ -81,7 +81,7 @@ chaz_LargeFiles_run(void) {
     chaz_ConfWriter_start_module("LargeFiles");
 
     /* Find off64_t or equivalent. */
-    found_off64_t = S_probe_off64();
+    found_off64_t = chaz_LargeFiles_probe_off64();
     if (found_off64_t) {
         chaz_ConfWriter_add_def("HAS_64BIT_OFFSET_TYPE", NULL);
         chaz_ConfWriter_add_def("off64_t",  chaz_LargeFiles.off64_type);
@@ -116,7 +116,7 @@ chaz_LargeFiles_run(void) {
 }
 
 static const int
-S_probe_off64(void) {
+chaz_LargeFiles_probe_off64(void) {
     static const char off64_code[] =
         CHAZ_QUOTE(  %s                                        )
         CHAZ_QUOTE(  #include "_charm.h"                       )
@@ -163,7 +163,7 @@ S_probe_off64(void) {
 }
 
 static int
-S_probe_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
+chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
     static const char stdio64_code[] =
         CHAZ_QUOTE(  %s                                         )
         CHAZ_QUOTE(  #include "_charm.h"                        )
@@ -221,7 +221,7 @@ chaz_LargeFiles_probe_stdio64(void) {
 
     for (i = 0; stdio64_combos[i].includes != NULL; i++) {
         chaz_LargeFiles_stdio64_combo combo = stdio64_combos[i];
-        if (S_probe_stdio64(&combo)) {
+        if (chaz_LargeFiles_try_stdio64(&combo)) {
             chaz_ConfWriter_add_def("HAS_64BIT_STDIO", NULL);
             chaz_ConfWriter_add_def("fopen64",  combo.fopen_command);
             chaz_ConfWriter_add_def("ftello64", combo.ftell_command);
@@ -232,7 +232,7 @@ chaz_LargeFiles_probe_stdio64(void) {
 }
 
 static int
-S_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
+chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
     static const char lseek_code[] =
         CHAZ_QUOTE( %s                                                       )
         CHAZ_QUOTE( #include "_charm.h"                                      )
@@ -267,7 +267,7 @@ S_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
 }
 
 static int
-S_probe_pread64(chaz_LargeFiles_unbuff_combo *combo) {
+chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo) {
     /* Code for checking 64-bit pread.  The pread call will fail, but that's
      * fine as long as it compiles. */
     static const char pread64_code[] =
@@ -309,7 +309,7 @@ chaz_LargeFiles_probe_unbuff(void) {
 
     for (i = 0; unbuff_combos[i].lseek_command != NULL; i++) {
         chaz_LargeFiles_unbuff_combo combo = unbuff_combos[i];
-        if (S_probe_lseek(&combo)) {
+        if (chaz_LargeFiles_probe_lseek(&combo)) {
             chaz_ConfWriter_add_def("HAS_64BIT_LSEEK", NULL);
             chaz_ConfWriter_add_def("lseek64", combo.lseek_command);
             break;
@@ -317,7 +317,7 @@ chaz_LargeFiles_probe_unbuff(void) {
     }
     for (i = 0; unbuff_combos[i].pread64_command != NULL; i++) {
         chaz_LargeFiles_unbuff_combo combo = unbuff_combos[i];
-        if (S_probe_pread64(&combo)) {
+        if (chaz_LargeFiles_probe_pread64(&combo)) {
             chaz_ConfWriter_add_def("HAS_64BIT_PREAD", NULL);
             chaz_ConfWriter_add_def("pread64", combo.pread64_command);
             break;

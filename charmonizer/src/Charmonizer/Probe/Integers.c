@@ -26,7 +26,7 @@
 /* Determine endian-ness of this machine.
  */
 static int
-S_machine_is_big_endian(void);
+chaz_Integers_machine_is_big_endian(void);
 
 static const char chaz_Integers_sizes_code[] =
     CHAZ_QUOTE(  #include "_charm.h"                       )
@@ -91,7 +91,7 @@ chaz_Integers_run(void) {
     chaz_ConfWriter_start_module("Integers");
 
     /* Document endian-ness. */
-    if (S_machine_is_big_endian()) {
+    if (chaz_Integers_machine_is_big_endian()) {
         chaz_ConfWriter_add_def("BIG_END", NULL);
     }
     else {
@@ -401,7 +401,7 @@ chaz_Integers_run(void) {
 }
 
 static int
-S_machine_is_big_endian(void) {
+chaz_Integers_machine_is_big_endian(void) {
     long one = 1;
     return !(*((char*)(&one)));
 }

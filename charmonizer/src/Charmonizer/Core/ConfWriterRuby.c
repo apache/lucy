@@ -32,42 +32,42 @@ static chaz_ConfWriter CWRuby_conf_writer;
 /* Open the Charmony.rb file handle.
  */
 static void
-S_open_config_rb(void);
+chaz_ConfWriterRuby_open_config_rb(void);
 
 static void
-S_ConfWriterRuby_clean_up(void);
+chaz_ConfWriterRuby_clean_up(void);
 static void
-S_ConfWriterRuby_vappend_conf(const char *fmt, va_list args);
+chaz_ConfWriterRuby_vappend_conf(const char *fmt, va_list args);
 static void
-S_ConfWriterRuby_add_def(const char *sym, const char *value);
+chaz_ConfWriterRuby_add_def(const char *sym, const char *value);
 static void
-S_ConfWriterRuby_add_typedef(const char *type, const char *alias);
+chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias);
 static void
-S_ConfWriterRuby_add_sys_include(const char *header);
+chaz_ConfWriterRuby_add_sys_include(const char *header);
 static void
-S_ConfWriterRuby_add_local_include(const char *header);
+chaz_ConfWriterRuby_add_local_include(const char *header);
 static void
-S_ConfWriterRuby_start_module(const char *module_name);
+chaz_ConfWriterRuby_start_module(const char *module_name);
 static void
-S_ConfWriterRuby_end_module(void);
+chaz_ConfWriterRuby_end_module(void);
 
 void
 chaz_ConfWriterRuby_enable(void) {
-    CWRuby_conf_writer.clean_up          = S_ConfWriterRuby_clean_up;
-    CWRuby_conf_writer.vappend_conf      = S_ConfWriterRuby_vappend_conf;
-    CWRuby_conf_writer.add_def           = S_ConfWriterRuby_add_def;
-    CWRuby_conf_writer.add_typedef       = S_ConfWriterRuby_add_typedef;
-    CWRuby_conf_writer.add_sys_include   = S_ConfWriterRuby_add_sys_include;
-    CWRuby_conf_writer.add_local_include = S_ConfWriterRuby_add_local_include;
-    CWRuby_conf_writer.start_module      = S_ConfWriterRuby_start_module;
-    CWRuby_conf_writer.end_module        = S_ConfWriterRuby_end_module;
-    S_open_config_rb();
+    CWRuby_conf_writer.clean_up          = chaz_ConfWriterRuby_clean_up;
+    CWRuby_conf_writer.vappend_conf      = chaz_ConfWriterRuby_vappend_conf;
+    CWRuby_conf_writer.add_def           = chaz_ConfWriterRuby_add_def;
+    CWRuby_conf_writer.add_typedef       = chaz_ConfWriterRuby_add_typedef;
+    CWRuby_conf_writer.add_sys_include   = chaz_ConfWriterRuby_add_sys_include;
+    CWRuby_conf_writer.add_local_include = chaz_ConfWriterRuby_add_local_include;
+    CWRuby_conf_writer.start_module      = chaz_ConfWriterRuby_start_module;
+    CWRuby_conf_writer.end_module        = chaz_ConfWriterRuby_end_module;
+    chaz_ConfWriterRuby_open_config_rb();
     chaz_ConfWriter_add_writer(&CWRuby_conf_writer);
     return;
 }
 
 static void
-S_open_config_rb(void) {
+chaz_ConfWriterRuby_open_config_rb(void) {
     /* Open the filehandle. */
     chaz_CWRuby.fh = fopen("Charmony.rb", "w+");
     if (chaz_CWRuby.fh == NULL) {
@@ -89,7 +89,7 @@ S_open_config_rb(void) {
 }
 
 static void
-S_ConfWriterRuby_clean_up(void) {
+chaz_ConfWriterRuby_clean_up(void) {
     /* Write the last bit of Charmony.rb and close. */
     fprintf(chaz_CWRuby.fh, "\nend\n\n");
     if (fclose(chaz_CWRuby.fh)) {
@@ -98,13 +98,13 @@ S_ConfWriterRuby_clean_up(void) {
 }
 
 static void
-S_ConfWriterRuby_vappend_conf(const char *fmt, va_list args) {
+chaz_ConfWriterRuby_vappend_conf(const char *fmt, va_list args) {
     (void)fmt;
     (void)args;
 }
 
 static char*
-S_ConfWriterRuby_quotify(const char *string, char *buf, size_t buf_size) {
+chaz_ConfWriterRuby_quotify(const char *string, char *buf, size_t buf_size) {
     char *quoted = buf;
 
     /* Don't bother with undef values here. */
@@ -149,7 +149,7 @@ S_ConfWriterRuby_quotify(const char *string, char *buf, size_t buf_size) {
 
 #define CFRUBY_MAX_BUF 100
 static void
-S_ConfWriterRuby_add_def(const char *sym, const char *value) {
+chaz_ConfWriterRuby_add_def(const char *sym, const char *value) {
     char sym_buf[CFRUBY_MAX_BUF + 1];
     char value_buf[CFRUBY_MAX_BUF + 1];
     char *quoted_sym;
@@ -159,7 +159,7 @@ S_ConfWriterRuby_add_def(const char *sym, const char *value) {
     if (!sym) {
         chaz_Util_die("Can't handle NULL key");
     }
-    quoted_sym = S_ConfWriterRuby_quotify(sym, sym_buf, CFRUBY_MAX_BUF);
+    quoted_sym = chaz_ConfWriterRuby_quotify(sym, sym_buf, CFRUBY_MAX_BUF);
 
     /* Quote value or use "nil". */
     if (!value) {
@@ -167,7 +167,7 @@ S_ConfWriterRuby_add_def(const char *sym, const char *value) {
         quoted_value = value_buf;
     }
     else {
-        quoted_value = S_ConfWriterRuby_quotify(value, value_buf,
+        quoted_value = chaz_ConfWriterRuby_quotify(value, value_buf,
                                                 CFRUBY_MAX_BUF);
     }
 
@@ -178,28 +178,28 @@ S_ConfWriterRuby_add_def(const char *sym, const char *value) {
 }
 
 static void
-S_ConfWriterRuby_add_typedef(const char *type, const char *alias) {
+chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias) {
     (void)type;
     (void)alias;
 }
 
 static void
-S_ConfWriterRuby_add_sys_include(const char *header) {
+chaz_ConfWriterRuby_add_sys_include(const char *header) {
     (void)header;
 }
 
 static void
-S_ConfWriterRuby_add_local_include(const char *header) {
+chaz_ConfWriterRuby_add_local_include(const char *header) {
     (void)header;
 }
 
 static void
-S_ConfWriterRuby_start_module(const char *module_name) {
+chaz_ConfWriterRuby_start_module(const char *module_name) {
     fprintf(chaz_CWRuby.fh, "# %s\n", module_name);
 }
 
 static void
-S_ConfWriterRuby_end_module(void) {
+chaz_ConfWriterRuby_end_module(void) {
     fprintf(chaz_CWRuby.fh, "\n");
 }
 

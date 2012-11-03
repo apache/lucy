@@ -52,51 +52,51 @@ static chaz_ConfWriter CWC_conf_writer;
  * Print an explanatory comment and open the include guard.
  */
 static void
-S_open_charmony_h(const char *charmony_start);
+chaz_ConfWriterC_open_charmony_h(const char *charmony_start);
 
 /* Push a new elem onto the def list. */
 static void
-S_push_def_list_item(const char *str1, const char *str2,
+chaz_ConfWriterC_push_def_list_item(const char *str1, const char *str2,
                      chaz_ConfElemType type);
 
 /* Free the def list. */
 static void
-S_clear_def_list(void);
+chaz_ConfWriterC_clear_def_list(void);
 
 static void
-S_ConfWriterC_clean_up(void);
+chaz_ConfWriterC_clean_up(void);
 static void
-S_ConfWriterC_vappend_conf(const char *fmt, va_list args);
+chaz_ConfWriterC_vappend_conf(const char *fmt, va_list args);
 static void
-S_ConfWriterC_add_def(const char *sym, const char *value);
+chaz_ConfWriterC_add_def(const char *sym, const char *value);
 static void
-S_ConfWriterC_add_typedef(const char *type, const char *alias);
+chaz_ConfWriterC_add_typedef(const char *type, const char *alias);
 static void
-S_ConfWriterC_add_sys_include(const char *header);
+chaz_ConfWriterC_add_sys_include(const char *header);
 static void
-S_ConfWriterC_add_local_include(const char *header);
+chaz_ConfWriterC_add_local_include(const char *header);
 static void
-S_ConfWriterC_start_module(const char *module_name);
+chaz_ConfWriterC_start_module(const char *module_name);
 static void
-S_ConfWriterC_end_module(void);
+chaz_ConfWriterC_end_module(void);
 
 void
 chaz_ConfWriterC_enable(void) {
-    CWC_conf_writer.clean_up          = S_ConfWriterC_clean_up;
-    CWC_conf_writer.vappend_conf      = S_ConfWriterC_vappend_conf;
-    CWC_conf_writer.add_def           = S_ConfWriterC_add_def;
-    CWC_conf_writer.add_typedef       = S_ConfWriterC_add_typedef;
-    CWC_conf_writer.add_sys_include   = S_ConfWriterC_add_sys_include;
-    CWC_conf_writer.add_local_include = S_ConfWriterC_add_local_include;
-    CWC_conf_writer.start_module      = S_ConfWriterC_start_module;
-    CWC_conf_writer.end_module        = S_ConfWriterC_end_module;
-    S_open_charmony_h(NULL);
+    CWC_conf_writer.clean_up          = chaz_ConfWriterC_clean_up;
+    CWC_conf_writer.vappend_conf      = chaz_ConfWriterC_vappend_conf;
+    CWC_conf_writer.add_def           = chaz_ConfWriterC_add_def;
+    CWC_conf_writer.add_typedef       = chaz_ConfWriterC_add_typedef;
+    CWC_conf_writer.add_sys_include   = chaz_ConfWriterC_add_sys_include;
+    CWC_conf_writer.add_local_include = chaz_ConfWriterC_add_local_include;
+    CWC_conf_writer.start_module      = chaz_ConfWriterC_start_module;
+    CWC_conf_writer.end_module        = chaz_ConfWriterC_end_module;
+    chaz_ConfWriterC_open_charmony_h(NULL);
     chaz_ConfWriter_add_writer(&CWC_conf_writer);
     return;
 }
 
 static void
-S_open_charmony_h(const char *charmony_start) {
+chaz_ConfWriterC_open_charmony_h(const char *charmony_start) {
     /* Open the filehandle. */
     chaz_ConfWriterC.fh = fopen("charmony.h", "w+");
     if (chaz_ConfWriterC.fh == NULL) {
@@ -118,7 +118,7 @@ S_open_charmony_h(const char *charmony_start) {
 }
 
 static void
-S_ConfWriterC_clean_up(void) {
+chaz_ConfWriterC_clean_up(void) {
     /* Write the last bit of charmony.h and close. */
     fprintf(chaz_ConfWriterC.fh, "#endif /* H_CHARMONY */\n\n");
     if (fclose(chaz_ConfWriterC.fh)) {
@@ -127,12 +127,12 @@ S_ConfWriterC_clean_up(void) {
 }
 
 static void
-S_ConfWriterC_vappend_conf(const char *fmt, va_list args) {
+chaz_ConfWriterC_vappend_conf(const char *fmt, va_list args) {
     vfprintf(chaz_ConfWriterC.fh, fmt, args);
 }
 
 static int
-S_sym_is_uppercase(const char *sym) {
+chaz_ConfWriterC_sym_is_uppercase(const char *sym) {
     unsigned i;
     for (i = 0; sym[i] != 0; i++) {
         if (!isupper(sym[i])) {
@@ -148,14 +148,14 @@ S_sym_is_uppercase(const char *sym) {
 }
 
 static void
-S_ConfWriterC_add_def(const char *sym, const char *value) {
-    S_push_def_list_item(sym, value, CHAZ_CONFELEM_DEF);
+chaz_ConfWriterC_add_def(const char *sym, const char *value) {
+    chaz_ConfWriterC_push_def_list_item(sym, value, CHAZ_CONFELEM_DEF);
 }
 
 static void
-S_append_def_to_conf(const char *sym, const char *value) {
+chaz_ConfWriterC_append_def_to_conf(const char *sym, const char *value) {
     if (value) {
-        if (S_sym_is_uppercase(sym)) {
+        if (chaz_ConfWriterC_sym_is_uppercase(sym)) {
             fprintf(chaz_ConfWriterC.fh, "#define CHY_%s %s\n", sym, value);
         }
         else {
@@ -163,7 +163,7 @@ S_append_def_to_conf(const char *sym, const char *value) {
         }
     }
     else {
-        if (S_sym_is_uppercase(sym)) {
+        if (chaz_ConfWriterC_sym_is_uppercase(sym)) {
             fprintf(chaz_ConfWriterC.fh, "#define CHY_%s\n", sym);
         }
         else {
@@ -173,13 +173,13 @@ S_append_def_to_conf(const char *sym, const char *value) {
 }
 
 static void
-S_ConfWriterC_add_typedef(const char *type, const char *alias) {
-    S_push_def_list_item(alias, type, CHAZ_CONFELEM_TYPEDEF);
+chaz_ConfWriterC_add_typedef(const char *type, const char *alias) {
+    chaz_ConfWriterC_push_def_list_item(alias, type, CHAZ_CONFELEM_TYPEDEF);
 }
 
 static void
-S_append_typedef_to_conf(const char *type, const char *alias) {
-    if (S_sym_is_uppercase(alias)) {
+chaz_ConfWriterC_append_typedef_to_conf(const char *type, const char *alias) {
+    if (chaz_ConfWriterC_sym_is_uppercase(alias)) {
         fprintf(chaz_ConfWriterC.fh, "typedef %s CHY_%s;\n", type, alias);
     }
     else {
@@ -188,47 +188,51 @@ S_append_typedef_to_conf(const char *type, const char *alias) {
 }
 
 static void
-S_ConfWriterC_add_sys_include(const char *header) {
-    S_push_def_list_item(header, NULL, CHAZ_CONFELEM_SYS_INCLUDE);
+chaz_ConfWriterC_add_sys_include(const char *header) {
+    chaz_ConfWriterC_push_def_list_item(header, NULL,
+                                        CHAZ_CONFELEM_SYS_INCLUDE);
 }
 
 static void
-S_append_sys_include_to_conf(const char *header) {
+chaz_ConfWriterC_append_sys_include_to_conf(const char *header) {
     fprintf(chaz_ConfWriterC.fh, "#include <%s>\n", header);
 }
 
 static void
-S_ConfWriterC_add_local_include(const char *header) {
-    S_push_def_list_item(header, NULL, CHAZ_CONFELEM_LOCAL_INCLUDE);
+chaz_ConfWriterC_add_local_include(const char *header) {
+    chaz_ConfWriterC_push_def_list_item(header, NULL,
+                                        CHAZ_CONFELEM_LOCAL_INCLUDE);
 }
 
 static void
-S_append_local_include_to_conf(const char *header) {
+chaz_ConfWriterC_append_local_include_to_conf(const char *header) {
     fprintf(chaz_ConfWriterC.fh, "#include \"%s\"\n", header);
 }
 
 static void
-S_ConfWriterC_start_module(const char *module_name) {
+chaz_ConfWriterC_start_module(const char *module_name) {
     fprintf(chaz_ConfWriterC.fh, "\n/* %s */\n", module_name);
 }
 
 static void
-S_ConfWriterC_end_module(void) {
+chaz_ConfWriterC_end_module(void) {
     size_t i;
     chaz_ConfElem *defs = chaz_ConfWriterC.defs;
     for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
         switch (defs[i].type) {
             case CHAZ_CONFELEM_DEF:
-                S_append_def_to_conf(defs[i].str1, defs[i].str2);
+                chaz_ConfWriterC_append_def_to_conf(defs[i].str1,
+                                                    defs[i].str2);
                 break;
             case CHAZ_CONFELEM_TYPEDEF:
-                S_append_typedef_to_conf(defs[i].str2, defs[i].str1);
+                chaz_ConfWriterC_append_typedef_to_conf(defs[i].str2,
+                                                        defs[i].str1);
                 break;
             case CHAZ_CONFELEM_SYS_INCLUDE:
-                S_append_sys_include_to_conf(defs[i].str1);
+                chaz_ConfWriterC_append_sys_include_to_conf(defs[i].str1);
                 break;
             case CHAZ_CONFELEM_LOCAL_INCLUDE:
-                S_append_local_include_to_conf(defs[i].str1);
+                chaz_ConfWriterC_append_local_include_to_conf(defs[i].str1);
                 break;
             default:
                 chaz_Util_die("Internal error: bad element type %d",
@@ -249,8 +253,9 @@ S_ConfWriterC_end_module(void) {
                     const char *sym = defs[i].str1;
                     const char *value = defs[i].str2;
                     if (!value || strcmp(sym, value) != 0) {
-                        const char *prefix = S_sym_is_uppercase(sym)
-                                             ? "CHY_" : "chy_";
+                        const char *prefix
+                            = chaz_ConfWriterC_sym_is_uppercase(sym)
+                              ? "CHY_" : "chy_";
                         fprintf(chaz_ConfWriterC.fh, "  #define %s %s%s\n",
                                 sym, prefix, sym);
                     }
@@ -269,11 +274,11 @@ S_ConfWriterC_end_module(void) {
     fprintf(chaz_ConfWriterC.fh, "#endif /* USE_SHORT_NAMES */\n");
     fprintf(chaz_ConfWriterC.fh, "\n");
 
-    S_clear_def_list();
+    chaz_ConfWriterC_clear_def_list();
 }
 
 static void
-S_push_def_list_item(const char *str1, const char *str2,
+chaz_ConfWriterC_push_def_list_item(const char *str1, const char *str2,
                      chaz_ConfElemType type) {
     if (chaz_ConfWriterC.def_count >= chaz_ConfWriterC.def_cap) { 
         size_t amount;
@@ -291,7 +296,7 @@ S_push_def_list_item(const char *str1, const char *str2,
 }
 
 static void
-S_clear_def_list(void) {
+chaz_ConfWriterC_clear_def_list(void) {
     size_t i;
     for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
         free(chaz_ConfWriterC.defs[i].str1);

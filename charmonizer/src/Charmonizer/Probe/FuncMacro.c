@@ -70,7 +70,7 @@ chaz_FuncMacro_probe_gnu() {
 
 /* Attempt to verify inline keyword. */
 static char*
-S_try_inline(const char *keyword, size_t *output_len) {
+chaz_FuncMacro_try_inline(const char *keyword, size_t *output_len) {
     static const char inline_code[] =
         CHAZ_QUOTE(  #include "_charm.h"               )
         CHAZ_QUOTE(  static %s int foo() { return 1; } )
@@ -98,7 +98,7 @@ chaz_FuncMacro_probe_inline(void) {
     for (i = 0; i < num_inline_options; i++) {
         const char *inline_option = inline_options[i];
         size_t output_len;
-        char *output = S_try_inline(inline_option, &output_len);
+        char *output = chaz_FuncMacro_try_inline(inline_option, &output_len);
         if (output != NULL) {
             has_inline = true;
             chaz_ConfWriter_add_def("INLINE", inline_option);

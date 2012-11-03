@@ -24,7 +24,7 @@
 /* Detect macros which may help to identify some compilers.
  */
 static void
-S_detect_known_compilers(void);
+chaz_CC_detect_known_compilers(void);
 
 /* Temporary files. */
 #define CHAZ_CC_TRY_SOURCE_PATH  "_charmonizer_try.c"
@@ -119,7 +119,7 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
         chaz_Util_die("Failed to compile a small test file");
     }
 
-    S_detect_known_compilers();
+    chaz_CC_detect_known_compilers();
 }
 
 static const char detect_macro_code[] =
@@ -131,7 +131,7 @@ static const char detect_macro_code[] =
     CHAZ_QUOTE(  }                              );
 
 static int
-S_detect_macro(const char *macro) {
+chaz_CC_detect_macro(const char *macro) {
     size_t size = sizeof(detect_macro_code) + strlen(macro) + 20;
     char *code = (char*)malloc(size);
     int retval;
@@ -142,10 +142,10 @@ S_detect_macro(const char *macro) {
 }
 
 static void
-S_detect_known_compilers(void) {
-    chaz_CC.defines___GNUC__  = S_detect_macro("__GNUC__");
-    chaz_CC.defines__MSC_VER  = S_detect_macro("_MSC_VER");
-    chaz_CC.defines___clang__ = S_detect_macro("__clang__");
+chaz_CC_detect_known_compilers(void) {
+    chaz_CC.defines___GNUC__  = chaz_CC_detect_macro("__GNUC__");
+    chaz_CC.defines__MSC_VER  = chaz_CC_detect_macro("_MSC_VER");
+    chaz_CC.defines___clang__ = chaz_CC_detect_macro("__clang__");
 }
 
 void
@@ -165,7 +165,7 @@ chaz_CC_clean_up(void) {
 }
 
 static char*
-S_inc_dir_string(void) {
+chaz_CC_inc_dir_string(void) {
     size_t needed = 0;
     char  *inc_dir_string;
     char **dirs;
@@ -192,7 +192,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     size_t   junk_buf_size     = exe_file_buf_size + 3;
     char    *junk              = (char*)malloc(junk_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
-    char    *inc_dir_string    = S_inc_dir_string();
+    char    *inc_dir_string    = chaz_CC_inc_dir_string();
     size_t   command_max_size  = strlen(chaz_CC.cc_command)
                                  + strlen(chaz_CC.error_flag)
                                  + strlen(source_path)
@@ -250,7 +250,7 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     size_t   obj_file_buf_size = strlen(obj_name) + strlen(obj_ext) + 1;
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
-    char    *inc_dir_string    = S_inc_dir_string();
+    char    *inc_dir_string    = chaz_CC_inc_dir_string();
     size_t   command_max_size  = strlen(chaz_CC.cc_command)
                                  + strlen(chaz_CC.no_link_flag)
                                  + strlen(chaz_CC.error_flag)
