@@ -45,7 +45,9 @@ my @BASE_PATH = __PACKAGE__->cf_base_path;
 
 my $CHARMONIZER_ORIG_DIR
     = rel2abs( catdir( @BASE_PATH, updir(), updir(), 'charmonizer' ) );
-my $CHARMONIZE_EXE_PATH  = "charmonize$Config{_exe}";
+my $COMMON_SOURCE_DIR    = catdir( @BASE_PATH, 'common' );
+my $CHARMONIZER_C        = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
+my $CHARMONIZER_EXE_PATH = "charmonizer$Config{_exe}";
 my $CHARMONY_H_PATH      = 'charmony.h';
 my $CHARMONY_PM_PATH     = 'Charmony.pm';
 my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
@@ -101,44 +103,32 @@ sub _run_make {
     chdir $current_directory if $dir;
 }
 
-# Build the charmonize executable.
-sub ACTION_build_charmonize {
+# Compile and run the charmonizer executable, creating the charmony.h and
+# Charmony.pm files.
+sub ACTION_charmony {
     my $self = shift;
-    print "Building $CHARMONIZE_EXE_PATH...\n\n";
-    my $meld_c = rel2abs("charmonize.c");
-    $self->add_to_cleanup($meld_c);
-    $self->add_to_cleanup($CHARMONIZE_EXE_PATH);
-    my $charmonize_main = catfile( $CHARMONIZER_ORIG_DIR, 'charmonize.c' );
-    $self->_run_make(
-        dir  => $CHARMONIZER_ORIG_DIR,
-        args => [ "meld", "PERL=$^X", "FILES=$charmonize_main", "OUT=$meld_c" ],
-    );
-    if ( !$self->up_to_date( $meld_c, $CHARMONIZE_EXE_PATH ) ) {
-        my $cc = $Config{cc};
+    $self->add_to_cleanup($CHARMONIZER_EXE_PATH);
+    if ( !$self->up_to_date( $CHARMONIZER_C, $CHARMONIZER_EXE_PATH ) ) {
+        print "\nCompiling $CHARMONIZER_EXE_PATH...\n\n";
+        my $cc = $self->config('cc');
         my $outflag = $cc =~ /cl\b/ ? "/Fe" : "-o ";
-        system("$cc $meld_c $outflag$CHARMONIZE_EXE_PATH")
-            and die "Failed to compile $CHARMONIZE_EXE_PATH";
+        system("$cc $CHARMONIZER_C $outflag$CHARMONIZER_EXE_PATH")
+            and die "Failed to compile $CHARMONIZER_EXE_PATH";
     }
-}
 
-# Run the charmonize executable, creating the charmony.h and Charmony.pm
-# files.
-sub ACTION_run_charmonize {
-    my $self = shift;
-    $self->dispatch('build_charmonize');
-    return if $self->up_to_date( $CHARMONIZE_EXE_PATH, [
+    return if $self->up_to_date( $CHARMONIZER_EXE_PATH, [
         $CHARMONY_H_PATH, $CHARMONY_PM_PATH,
     ] );
-    print "\nRunning $CHARMONIZE_EXE_PATH...\n\n";
+    print "\nRunning $CHARMONIZER_EXE_PATH...\n\n";
 
     $self->add_to_cleanup($CHARMONY_H_PATH);
     $self->add_to_cleanup($CHARMONY_PM_PATH);
-    # Clean up after charmonize if it doesn't succeed on its own.
+    # Clean up after charmonizer if it doesn't succeed on its own.
     $self->add_to_cleanup("_charm*");
 
-    # Prepare arguments to charmonize.
+    # Prepare arguments to charmonizer.
     my @command = (
-        $CHARMONIZE_EXE_PATH,
+        $CHARMONIZER_EXE_PATH,
         '--cc=' . _quotify( $self->config('cc') ),
         '--enable-c',
         '--enable-perl',
@@ -151,7 +141,7 @@ sub ACTION_run_charmonize {
     }
     print join( " ", @command ), $/;
 
-    system(@command) and die "Failed to run $CHARMONIZE_EXE_PATH: $!";
+    system(@command) and die "Failed to run $CHARMONIZER_EXE_PATH: $!";
 }
 
 sub _quotify {
@@ -164,7 +154,7 @@ sub _quotify {
 # Build the charmonizer tests.
 sub ACTION_charmonizer_tests {
     my $self = shift;
-    $self->dispatch('run_charmonize');
+    $self->dispatch('charmony');
     print "Building Charmonizer Tests...\n\n";
     my $flags = join( " ",
         $self->config('ccflags'),
@@ -194,7 +184,7 @@ sub ACTION_cfc {
 sub ACTION_copy_clownfish_includes {
     my $self = shift;
 
-    $self->dispatch('run_charmonize');
+    $self->dispatch('charmony');
 
     $self->SUPER::ACTION_copy_clownfish_includes;
 
