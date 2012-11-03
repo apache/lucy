@@ -26,19 +26,22 @@ chdir catdir( $Bin, updir(), updir() );
 
 my $CHAZ_DIR = 'charmonizer';
 my $MELD_EXE = catfile( $CHAZ_DIR, 'buildbin', 'meld.pl' );
-my $LUCY_CHAZ_MAIN = catfile( $CHAZ_DIR, 'charmonize.c' );
 
 # Clownfish runtime.
 {
-    my $out = catfile(qw( clownfish runtime common charmonizer.c ));
+    my $main = catfile(qw( clownfish runtime common charmonizer.main ));
+    my $out  = $main;
+    $out =~ s/\.main/.c/ or die "no match";
     unlink $out;
-    system( $MELD_EXE, '--probes=', "--files=$LUCY_CHAZ_MAIN", "--out=$out" );
+    system( $MELD_EXE, '--probes=', "--files=$main", "--out=$out" );
 }
 
 # Lucy core.
 {
-    my $out = catfile(qw( common charmonizer.c ));
+    my $main = catfile(qw( common charmonizer.main ));
+    my $out  = $main;
+    $out =~ s/\.main/.c/ or die "no match";
     unlink $out;
-    system( $MELD_EXE, '--probes=', "--files=$LUCY_CHAZ_MAIN", "--out=$out" );
+    system( $MELD_EXE, '--probes=', "--files=$main", "--out=$out" );
 }
 
