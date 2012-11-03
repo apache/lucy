@@ -42,10 +42,6 @@ extern "C" {
 void
 chaz_Floats_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define Floats_run    chaz_Floats_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

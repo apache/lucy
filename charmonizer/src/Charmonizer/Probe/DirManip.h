@@ -58,10 +58,6 @@ extern "C" {
  */
 void chaz_DirManip_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define DirManip_run    chaz_DirManip_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#define CHAZ_USE_SHORT_NAMES
-
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/ConfWriterRuby.h"

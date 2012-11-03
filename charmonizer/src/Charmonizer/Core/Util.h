@@ -73,18 +73,6 @@ chaz_Util_remove_and_verify(const char *file_path);
 int
 chaz_Util_can_open_file(const char *file_path);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define Util_verbosity              chaz_Util_verbosity
-  #define Util_write_file             chaz_Util_write_file
-  #define Util_slurp_file             chaz_Util_slurp_file
-  #define Util_flength                chaz_Util_flength
-  #define Util_die                    chaz_Util_die
-  #define Util_warn                   chaz_Util_warn
-  #define Util_strdup                 chaz_Util_strdup
-  #define Util_remove_and_verify      chaz_Util_remove_and_verify
-  #define Util_can_open_file          chaz_Util_can_open_file
-#endif
-
 #ifdef __cplusplus
 }
 #endif

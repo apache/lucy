@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#define CHAZ_USE_SHORT_NAMES
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

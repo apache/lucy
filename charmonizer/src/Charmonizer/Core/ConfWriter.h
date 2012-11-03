@@ -106,22 +106,6 @@ typedef struct chaz_ConfWriter {
     chaz_ConfWriter_start_module_t      start_module;
     chaz_ConfWriter_end_module_t        end_module;
 } chaz_ConfWriter;
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define ConfWriter chaz_ConfWriter
-#endif /* CHAZ_USE_SHORT_NAMES */
-
-#ifdef   CHAZ_USE_SHORT_NAMES
-  #define ConfWriter_init                   chaz_ConfWriter_init
-  #define ConfWriter_clean_up               chaz_ConfWriter_clean_up
-  #define ConfWriter_build_charm_run        chaz_ConfWriter_build_charm_run
-  #define ConfWriter_start_module           chaz_ConfWriter_start_module
-  #define ConfWriter_end_module             chaz_ConfWriter_end_module
-  #define ConfWriter_append_conf            chaz_ConfWriter_append_conf
-  #define ConfWriter_add_def                chaz_ConfWriter_add_def
-  #define ConfWriter_add_typedef            chaz_ConfWriter_add_typedef
-  #define ConfWriter_add_sys_include        chaz_ConfWriter_add_sys_include
-  #define ConfWriter_add_local_include      chaz_ConfWriter_add_local_include
-#endif
 
 #ifdef __cplusplus
 }

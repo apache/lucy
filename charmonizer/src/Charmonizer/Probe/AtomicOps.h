@@ -41,10 +41,6 @@ extern "C" {
  */
 void chaz_AtomicOps_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define AtomicOps_run    chaz_AtomicOps_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

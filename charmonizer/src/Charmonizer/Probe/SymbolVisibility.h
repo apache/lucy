@@ -26,10 +26,6 @@ extern "C" {
 
 void chaz_SymbolVisibility_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define SymbolVisibility_run    chaz_SymbolVisibility_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

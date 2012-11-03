@@ -29,10 +29,6 @@ extern "C" {
 void
 chaz_ConfWriterPerl_enable(void);
 
-#ifdef   CHAZ_USE_SHORT_NAMES
-  #define ConfWriterPerl_enable   chaz_ConfWriterPerl_enable
-#endif
-
 #ifdef __cplusplus
 }
 #endif

@@ -74,18 +74,6 @@ chaz_OS_dev_null(void);
 void
 chaz_OS_init(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define OS_remove                    chaz_OS_remove
-  #define OS_run_local                 chaz_OS_run_local
-  #define OS_run_quietly               chaz_OS_run_quietly
-  #define OS_mkdir                     chaz_OS_mkdir
-  #define OS_rmdir                     chaz_OS_rmdir
-  #define OS_exe_ext                   chaz_OS_exe_ext
-  #define OS_obj_ext                   chaz_OS_obj_ext
-  #define OS_dev_null                  chaz_OS_dev_null
-  #define OS_init                      chaz_OS_init
-#endif
-
 #ifdef __cplusplus
 }
 #endif

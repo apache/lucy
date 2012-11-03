@@ -46,11 +46,6 @@ chaz_Probe_init(const char *cc_command, const char *cc_flags);
 void
 chaz_Probe_clean_up(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define Probe_init            chaz_Probe_init
-  #define Probe_clean_up        chaz_Probe_clean_up
-#endif
-
 #ifdef __cplusplus
 }
 #endif

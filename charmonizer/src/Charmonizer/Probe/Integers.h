@@ -136,10 +136,6 @@ extern "C" {
  */
 void chaz_Integers_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define Integers_run    chaz_Integers_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

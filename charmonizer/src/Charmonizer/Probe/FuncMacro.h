@@ -49,10 +49,6 @@ extern "C" {
  */
 void chaz_FuncMacro_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define FuncMacro_run    chaz_FuncMacro_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

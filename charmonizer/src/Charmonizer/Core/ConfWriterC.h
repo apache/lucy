@@ -29,10 +29,6 @@ extern "C" {
 void
 chaz_ConfWriterC_enable(void);
 
-#ifdef   CHAZ_USE_SHORT_NAMES
-  #define ConfWriterC_enable                 chaz_ConfWriterC_enable
-#endif
-
 #ifdef __cplusplus
 }
 #endif

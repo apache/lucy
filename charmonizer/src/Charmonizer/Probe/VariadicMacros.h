@@ -42,10 +42,6 @@ extern "C" {
  */
 void chaz_VariadicMacros_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define VariadicMacros_run    chaz_VariadicMacros_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

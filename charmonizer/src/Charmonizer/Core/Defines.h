@@ -30,10 +30,6 @@ extern "C" {
 
 #define CHAZ_QUOTE(x) #x "\n"
 
-#if (defined(CHAZ_USE_SHORT_NAMES) || defined(CHY_USE_SHORT_NAMES))
-  #define QUOTE CHAZ_QUOTE
-#endif
-
 #ifdef __cplusplus
 }
 #endif

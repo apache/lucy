@@ -183,8 +183,6 @@ sub meld_start {
  * limitations under the License.
  */
 
-#define CHAZ_USE_SHORT_NAMES
-
 END_STUFF
 }
 

@@ -42,10 +42,6 @@ extern "C" {
  */
 void chaz_Memory_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define Memory_run    chaz_Memory_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

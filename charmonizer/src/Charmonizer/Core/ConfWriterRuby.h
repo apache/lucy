@@ -29,10 +29,6 @@ extern "C" {
 void
 chaz_ConfWriterRuby_enable(void);
 
-#ifdef   CHAZ_USE_SHORT_NAMES
-  #define ConfWriterRuby_enable   chaz_ConfWriterRuby_enable
-#endif
-
 #ifdef __cplusplus
 }
 #endif

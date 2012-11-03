@@ -36,10 +36,6 @@ extern "C" {
  */
 void chaz_UnusedVars_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define UnusedVars_run    chaz_UnusedVars_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

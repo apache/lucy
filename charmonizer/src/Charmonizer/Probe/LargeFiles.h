@@ -55,10 +55,6 @@ extern "C" {
  */
 void chaz_LargeFiles_run(void);
 
-#ifdef CHAZ_USE_SHORT_NAMES
-  #define LargeFiles_run    chaz_LargeFiles_run
-#endif
-
 #ifdef __cplusplus
 }
 #endif

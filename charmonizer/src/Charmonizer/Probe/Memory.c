@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#define CHAZ_USE_SHORT_NAMES
-
 #include "Charmonizer/Probe/Memory.h"
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/HeaderChecker.h"
