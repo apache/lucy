@@ -23,15 +23,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char alloca_code[] =
-    "#include <%s>\n"
-    CHAZ_QUOTE(  int main() {                   )
-    CHAZ_QUOTE(      void *foo = %s(1);         )
-    CHAZ_QUOTE(      return 0;                  )
-    CHAZ_QUOTE(  }                              );
+/* Probe for alloca() or equivalent. */
+static void
+chaz_Memory_probe_alloca(void);
 
 void
 chaz_Memory_run(void) {
+    chaz_ConfWriter_start_module("Memory");
+
+    chaz_Memory_probe_alloca();
+
+    chaz_ConfWriter_end_module();
+}
+
+static void
+chaz_Memory_probe_alloca(void) {
+    static const char alloca_code[] =
+        "#include <%s>\n"
+        CHAZ_QUOTE(  int main() {                   )
+        CHAZ_QUOTE(      void *foo = %s(1);         )
+        CHAZ_QUOTE(      return 0;                  )
+        CHAZ_QUOTE(  }                              );
     int has_sys_mman_h = false;
     int has_alloca_h   = false;
     int has_malloc_h   = false;
@@ -40,8 +52,6 @@ chaz_Memory_run(void) {
     int has_builtin_alloca    = false;
     int has_underscore_alloca = false;
     char code_buf[sizeof(alloca_code) + 100];
-
-    chaz_ConfWriter_start_module("Memory");
 
     {
         /* OpenBSD needs sys/types.h for sys/mman.h to work and mmap() to be
@@ -103,8 +113,6 @@ chaz_Memory_run(void) {
             chaz_ConfWriter_add_def("chy_alloca", "_alloca");
         }
     }
-
-    chaz_ConfWriter_end_module();
 }
 
 

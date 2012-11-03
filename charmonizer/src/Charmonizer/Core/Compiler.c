@@ -27,38 +27,44 @@ static void
 S_detect_known_compilers(void);
 
 /* Temporary files. */
-#define TRY_SOURCE_PATH  "_charmonizer_try.c"
-#define TRY_BASENAME     "_charmonizer_try"
-#define TARGET_PATH      "_charmonizer_target"
+#define CHAZ_CC_TRY_SOURCE_PATH  "_charmonizer_try.c"
+#define CHAZ_CC_TRY_BASENAME     "_charmonizer_try"
+#define CHAZ_CC_TARGET_PATH      "_charmonizer_target"
 
 /* Static vars. */
-static char     *cc_command   = NULL;
-static char     *cc_flags     = NULL;
-static char    **inc_dirs     = NULL;
-static char     *try_exe_name = NULL;
-static char     *try_obj_name = NULL;
-static char      include_flag[10] = "";
-static char      object_flag[10]  = "";
-static char      exe_flag[10]     = "";
-static char      no_link_flag[10] = "";
-static char      error_flag[10]   = "";
-static int       defines___GNUC__  = 0;
-static int       defines__MSC_VER  = 0;
-static int       defines___clang__ = 0;
-static int       warnings_as_errors = 0;    
+static struct {
+    char     *cc_command;
+    char     *cc_flags;
+    char    **inc_dirs;
+    char     *try_exe_name;
+    char     *try_obj_name;
+    char      include_flag[10];
+    char      object_flag[10];
+    char      exe_flag[10];
+    char      no_link_flag[10];
+    char      error_flag[10];
+    int       defines___GNUC__;
+    int       defines__MSC_VER;
+    int       defines___clang__;
+    int       warnings_as_errors;
+} chaz_CC = {
+    NULL, NULL, NULL, NULL, NULL,
+    "", "", "", "", "",
+    0, 0, 0, 0
+};
 
 void
 chaz_CC_set_warnings_as_errors(const int flag) {
-    warnings_as_errors = flag;
-    if (warnings_as_errors) {
-        if (defines__MSC_VER)  {
-            strcpy(error_flag, "/WX");
+    chaz_CC.warnings_as_errors = flag;
+    if (chaz_CC.warnings_as_errors) {
+        if (chaz_CC.defines__MSC_VER)  {
+            strcpy(chaz_CC.error_flag, "/WX");
         } else {
-            strcpy(error_flag, "-Werror");
+            strcpy(chaz_CC.error_flag, "-Werror");
         }
     }
     else {
-        strcpy(error_flag, "");
+        strcpy(chaz_CC.error_flag, "");
     }
 }
 
@@ -70,11 +76,11 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     if (chaz_Util_verbosity) { printf("Creating compiler object...\n"); }
 
     /* Assign. */
-    cc_command      = chaz_Util_strdup(compiler_command);
-    cc_flags        = chaz_Util_strdup(compiler_flags);
+    chaz_CC.cc_command      = chaz_Util_strdup(compiler_command);
+    chaz_CC.cc_flags        = chaz_Util_strdup(compiler_flags);
 
     /* Init. */
-    inc_dirs              = (char**)calloc(sizeof(char*), 1);
+    chaz_CC.inc_dirs              = (char**)calloc(sizeof(char*), 1);
 
     /* Add the current directory as an include dir. */
     chaz_CC_add_inc_dir(".");
@@ -83,12 +89,12 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     {
         const char *exe_ext = chaz_OS_exe_ext();
         const char *obj_ext = chaz_OS_obj_ext();
-        size_t exe_len = strlen(TRY_BASENAME) + strlen(exe_ext) + 1;
-        size_t obj_len = strlen(TRY_BASENAME) + strlen(obj_ext) + 1;
-        try_exe_name = (char*)malloc(exe_len);
-        try_obj_name = (char*)malloc(obj_len);
-        sprintf(try_exe_name, "%s%s", TRY_BASENAME, exe_ext);
-        sprintf(try_obj_name, "%s%s", TRY_BASENAME, obj_ext);
+        size_t exe_len = strlen(CHAZ_CC_TRY_BASENAME) + strlen(exe_ext) + 1;
+        size_t obj_len = strlen(CHAZ_CC_TRY_BASENAME) + strlen(obj_ext) + 1;
+        chaz_CC.try_exe_name = (char*)malloc(exe_len);
+        chaz_CC.try_obj_name = (char*)malloc(obj_len);
+        sprintf(chaz_CC.try_exe_name, "%s%s", CHAZ_CC_TRY_BASENAME, exe_ext);
+        sprintf(chaz_CC.try_obj_name, "%s%s", CHAZ_CC_TRY_BASENAME, obj_ext);
     }
 
     /* If we can't compile anything, game over. */
@@ -96,17 +102,17 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
         printf("Trying to compile a small test file...\n");
     }
     /* Try POSIX argument style. */
-    strcpy(include_flag, "-I ");
-    strcpy(object_flag,  "-o ");
-    strcpy(exe_flag,     "-o ");
-    strcpy(no_link_flag, "-c ");
+    strcpy(chaz_CC.include_flag, "-I ");
+    strcpy(chaz_CC.object_flag,  "-o ");
+    strcpy(chaz_CC.exe_flag,     "-o ");
+    strcpy(chaz_CC.no_link_flag, "-c ");
     compile_succeeded = chaz_CC_test_compile(code);
     if (!compile_succeeded) {
         /* Try MSVC argument style. */
-        strcpy(include_flag, "/I");
-        strcpy(object_flag,  "/Fo");
-        strcpy(exe_flag,     "/Fe");
-        strcpy(no_link_flag, "/c");
+        strcpy(chaz_CC.include_flag, "/I");
+        strcpy(chaz_CC.object_flag,  "/Fo");
+        strcpy(chaz_CC.exe_flag,     "/Fe");
+        strcpy(chaz_CC.no_link_flag, "/c");
         compile_succeeded = chaz_CC_test_compile(code);
     }
     if (!compile_succeeded) {
@@ -137,25 +143,25 @@ S_detect_macro(const char *macro) {
 
 static void
 S_detect_known_compilers(void) {
-    defines___GNUC__  = S_detect_macro("__GNUC__");
-    defines__MSC_VER  = S_detect_macro("_MSC_VER");
-    defines___clang__ = S_detect_macro("__clang__");
+    chaz_CC.defines___GNUC__  = S_detect_macro("__GNUC__");
+    chaz_CC.defines__MSC_VER  = S_detect_macro("_MSC_VER");
+    chaz_CC.defines___clang__ = S_detect_macro("__clang__");
 }
 
 void
 chaz_CC_clean_up(void) {
     char **dirs;
 
-    for (dirs = inc_dirs; *dirs != NULL; dirs++) {
+    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
         free(*dirs);
     }
-    free(inc_dirs);
+    free(chaz_CC.inc_dirs);
 
-    free(cc_command);
-    free(cc_flags);
+    free(chaz_CC.cc_command);
+    free(chaz_CC.cc_flags);
 
-    free(try_obj_name);
-    free(try_exe_name);
+    free(chaz_CC.try_obj_name);
+    free(chaz_CC.try_exe_name);
 }
 
 static char*
@@ -163,14 +169,14 @@ S_inc_dir_string(void) {
     size_t needed = 0;
     char  *inc_dir_string;
     char **dirs;
-    for (dirs = inc_dirs; *dirs != NULL; dirs++) {
-        needed += strlen(include_flag) + 2;
+    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
+        needed += strlen(chaz_CC.include_flag) + 2;
         needed += strlen(*dirs);
     }
     inc_dir_string = (char*)malloc(needed + 1);
     inc_dir_string[0] = '\0';
-    for (dirs = inc_dirs; *dirs != NULL; dirs++) {
-        strcat(inc_dir_string, include_flag);
+    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
+        strcat(inc_dir_string, chaz_CC.include_flag);
         strcat(inc_dir_string, *dirs);
         strcat(inc_dir_string, " ");
     }
@@ -187,13 +193,13 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     char    *junk              = (char*)malloc(junk_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
     char    *inc_dir_string    = S_inc_dir_string();
-    size_t   command_max_size  = strlen(cc_command)
-                                 + strlen(error_flag)
+    size_t   command_max_size  = strlen(chaz_CC.cc_command)
+                                 + strlen(chaz_CC.error_flag)
                                  + strlen(source_path)
-                                 + strlen(exe_flag)
+                                 + strlen(chaz_CC.exe_flag)
                                  + exe_file_buf_len
                                  + strlen(inc_dir_string)
-                                 + strlen(cc_flags)
+                                 + strlen(chaz_CC.cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
@@ -203,10 +209,10 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
 
     /* Prepare and run the compiler command. */
     sprintf(command, "%s %s %s %s%s %s %s",
-            cc_command, error_flag, 
-            source_path, exe_flag, 
+            chaz_CC.cc_command, chaz_CC.error_flag, 
+            source_path, chaz_CC.exe_flag, 
             exe_file, inc_dir_string, 
-            cc_flags);
+            chaz_CC.cc_flags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -214,7 +220,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
         system(command);
     }
 
-    if (defines__MSC_VER) {
+    if (chaz_CC.defines__MSC_VER) {
         /* Zap MSVC junk. */
         sprintf(junk, "%s.obj", exe_name);
         chaz_Util_remove_and_verify(junk);
@@ -245,14 +251,14 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
     char    *inc_dir_string    = S_inc_dir_string();
-    size_t   command_max_size  = strlen(cc_command)
-                                 + strlen(no_link_flag)
-                                 + strlen(error_flag)
+    size_t   command_max_size  = strlen(chaz_CC.cc_command)
+                                 + strlen(chaz_CC.no_link_flag)
+                                 + strlen(chaz_CC.error_flag)
                                  + strlen(source_path)
-                                 + strlen(object_flag)
+                                 + strlen(chaz_CC.object_flag)
                                  + obj_file_buf_len
                                  + strlen(inc_dir_string)
-                                 + strlen(cc_flags)
+                                 + strlen(chaz_CC.cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
@@ -262,10 +268,10 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
 
     /* Prepare and run the compiler command. */
     sprintf(command, "%s %s %s %s %s%s %s %s",
-            cc_command, no_link_flag, error_flag,
-            source_path, object_flag, 
+            chaz_CC.cc_command, chaz_CC.no_link_flag, chaz_CC.error_flag,
+            source_path, chaz_CC.object_flag, 
             obj_file, inc_dir_string,
-            cc_flags);
+            chaz_CC.cc_flags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -288,12 +294,12 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
 int
 chaz_CC_test_compile(const char *source) {
     int compile_succeeded;
-    if (!chaz_Util_remove_and_verify(try_obj_name)) {
-        chaz_Util_die("Failed to delete file '%s'", try_obj_name);
+    if (!chaz_Util_remove_and_verify(chaz_CC.try_obj_name)) {
+        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_obj_name);
     }
-    compile_succeeded = chaz_CC_compile_obj(TRY_SOURCE_PATH, TRY_BASENAME,
-                                            source);
-    chaz_Util_remove_and_verify(try_obj_name);
+    compile_succeeded = chaz_CC_compile_obj(CHAZ_CC_TRY_SOURCE_PATH,
+                                            CHAZ_CC_TRY_BASENAME, source);
+    chaz_Util_remove_and_verify(chaz_CC.try_obj_name);
     return compile_succeeded;
 }
 
@@ -303,28 +309,29 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     int compile_succeeded;
 
     /* Clear out previous versions and test to make sure removal worked. */
-    if (!chaz_Util_remove_and_verify(try_exe_name)) {
-        chaz_Util_die("Failed to delete file '%s'", try_exe_name);
+    if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
+        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
     }
-    if (!chaz_Util_remove_and_verify(TARGET_PATH)) {
-        chaz_Util_die("Failed to delete file '%s'", TARGET_PATH);
+    if (!chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH)) {
+        chaz_Util_die("Failed to delete file '%s'", CHAZ_CC_TARGET_PATH);
     }
 
     /* Attempt compilation; if successful, run app and slurp output. */
-    compile_succeeded = chaz_CC_compile_exe(TRY_SOURCE_PATH, TRY_BASENAME,
-                                            source);
+    compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                            CHAZ_CC_TRY_BASENAME, source);
     if (compile_succeeded) {
-        chaz_OS_run_local(try_exe_name, NULL);
-        captured_output = chaz_Util_slurp_file(TARGET_PATH, output_len);
+        chaz_OS_run_local(chaz_CC.try_exe_name, NULL);
+        captured_output
+            = chaz_Util_slurp_file(CHAZ_CC_TARGET_PATH, output_len);
     }
     else {
         *output_len = 0;
     }
 
     /* Remove all the files we just created. */
-    chaz_Util_remove_and_verify(TRY_SOURCE_PATH);
-    chaz_Util_remove_and_verify(try_exe_name);
-    chaz_Util_remove_and_verify(TARGET_PATH);
+    chaz_Util_remove_and_verify(CHAZ_CC_TRY_SOURCE_PATH);
+    chaz_Util_remove_and_verify(chaz_CC.try_exe_name);
+    chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
 }
@@ -332,15 +339,16 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
 void
 chaz_CC_add_inc_dir(const char *dir) {
     size_t num_dirs = 0;
-    char **dirs = inc_dirs;
+    char **dirs = chaz_CC.inc_dirs;
 
     /* Count up the present number of dirs, reallocate. */
     while (*dirs++ != NULL) { num_dirs++; }
     num_dirs += 1; /* Passed-in dir. */
-    inc_dirs = (char**)realloc(inc_dirs, (num_dirs + 1) * sizeof(char*));
+    chaz_CC.inc_dirs = (char**)realloc(chaz_CC.inc_dirs,
+                                       (num_dirs + 1) * sizeof(char*));
 
     /* Put the passed-in dir at the end of the list. */
-    inc_dirs[num_dirs - 1] = chaz_Util_strdup(dir);
-    inc_dirs[num_dirs] = NULL;
+    chaz_CC.inc_dirs[num_dirs - 1] = chaz_Util_strdup(dir);
+    chaz_CC.inc_dirs[num_dirs] = NULL;
 }
 

@@ -28,7 +28,7 @@
 static int
 S_machine_is_big_endian(void);
 
-static const char sizes_code[] =
+static const char chaz_Integers_sizes_code[] =
     CHAZ_QUOTE(  #include "_charm.h"                       )
     CHAZ_QUOTE(  int main () {                             )
     CHAZ_QUOTE(      Charm_Setup;                          )
@@ -40,7 +40,7 @@ static const char sizes_code[] =
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
-static const char type64_code[] =
+static const char chaz_Integers_type64_code[] =
     CHAZ_QUOTE(  #include "_charm.h"                       )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
@@ -49,7 +49,7 @@ static const char type64_code[] =
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
-static const char literal64_code[] =
+static const char chaz_Integers_literal64_code[] =
     CHAZ_QUOTE(  #include "_charm.h"                       )
     CHAZ_QUOTE(  #define big 9000000000000000000%s         )
     CHAZ_QUOTE(  int main()                                )
@@ -99,7 +99,7 @@ chaz_Integers_run(void) {
     }
 
     /* Record sizeof() for several common integer types. */
-    output = chaz_CC_capture_output(sizes_code, &output_len);
+    output = chaz_CC_capture_output(chaz_Integers_sizes_code, &output_len);
     if (output != NULL) {
         char *end_ptr = output;
 
@@ -115,7 +115,7 @@ chaz_Integers_run(void) {
     }
 
     /* Determine whether long longs are available. */
-    sprintf(code_buf, type64_code, "long long");
+    sprintf(code_buf, chaz_Integers_type64_code, "long long");
     output = chaz_CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         has_long_long    = true;
@@ -123,7 +123,7 @@ chaz_Integers_run(void) {
     }
 
     /* Determine whether the __int64 type is available. */
-    sprintf(code_buf, type64_code, "__int64");
+    sprintf(code_buf, chaz_Integers_type64_code, "__int64");
     output = chaz_CC_capture_output(code_buf, &output_len);
     if (output != NULL) {
         has___int64 = true;
@@ -168,13 +168,13 @@ chaz_Integers_run(void) {
         strcpy(u64_t_postfix, "UL");
     }
     else if (has_64) {
-        sprintf(code_buf, literal64_code, "LL");
+        sprintf(code_buf, chaz_Integers_literal64_code, "LL");
         output = chaz_CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(i64_t_postfix, "LL");
         }
         else {
-            sprintf(code_buf, literal64_code, "i64");
+            sprintf(code_buf, chaz_Integers_literal64_code, "i64");
             output = chaz_CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(i64_t_postfix, "i64");
@@ -183,13 +183,13 @@ chaz_Integers_run(void) {
                 chaz_Util_die("64-bit types, but no literal syntax found");
             }
         }
-        sprintf(code_buf, literal64_code, "ULL");
+        sprintf(code_buf, chaz_Integers_literal64_code, "ULL");
         output = chaz_CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(u64_t_postfix, "ULL");
         }
         else {
-            sprintf(code_buf, literal64_code, "Ui64");
+            sprintf(code_buf, chaz_Integers_literal64_code, "Ui64");
             output = chaz_CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(u64_t_postfix, "Ui64");

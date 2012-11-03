@@ -62,15 +62,14 @@ chaz_Probe_clean_up(void) {
     if (chaz_Util_verbosity) { printf("Cleanup complete.\n"); }
 }
 
-static const char charm_h_code[] =
-    CHAZ_QUOTE(  #ifndef CHARM_H                                                  )
-    CHAZ_QUOTE(  #define CHARM_H 1                                                )
-    CHAZ_QUOTE(  #include <stdio.h>                                               )
-    CHAZ_QUOTE(  #define Charm_Setup freopen("_charmonizer_target", "w", stdout)  )
-    CHAZ_QUOTE(  #endif                                                           );
-
 static void
 S_write_charm_h(void) {
+    static const char charm_h_code[] =
+        CHAZ_QUOTE(  #ifndef CHARM_H                                                  )
+        CHAZ_QUOTE(  #define CHARM_H 1                                                )
+        CHAZ_QUOTE(  #include <stdio.h>                                               )
+        CHAZ_QUOTE(  #define Charm_Setup freopen("_charmonizer_target", "w", stdout)  )
+        CHAZ_QUOTE(  #endif                                                           );
     chaz_Util_write_file("_charm.h", charm_h_code);
 }
 

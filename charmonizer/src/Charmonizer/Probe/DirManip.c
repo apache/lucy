@@ -24,9 +24,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int   mkdir_num_args  = 0;
-static char  mkdir_command_buf[7];
-static char *mkdir_command = mkdir_command_buf;
+static struct {
+    int  mkdir_num_args;
+    char mkdir_command[7];
+} chaz_DirManip = { 0, "" };
 
 /* Source code for rmdir. */
 static int
@@ -50,12 +51,12 @@ S_compile_posix_mkdir(const char *header) {
 
     /* Set vars on success. */
     if (mkdir_available) {
-        strcpy(mkdir_command, "mkdir");
+        strcpy(chaz_DirManip.mkdir_command, "mkdir");
         if (strcmp(header, "direct.h") == 0) {
-            mkdir_num_args = 1;
+            chaz_DirManip.mkdir_num_args = 1;
         }
         else {
-            mkdir_num_args = 2;
+            chaz_DirManip.mkdir_num_args = 2;
         }
     }
 
@@ -75,8 +76,8 @@ S_compile_win_mkdir(void) {
 
     mkdir_available = chaz_CC_test_compile(win_mkdir_code);
     if (mkdir_available) {
-        strcpy(mkdir_command, "_mkdir");
-        mkdir_num_args = 1;
+        strcpy(chaz_DirManip.mkdir_command, "_mkdir");
+        chaz_DirManip.mkdir_num_args = 1;
     }
     return mkdir_available;
 }
@@ -116,11 +117,19 @@ S_try_rmdir(void) {
     if (S_compile_rmdir("direct.h"))   { return; }
 }
 
-static const char cygwin_code[] =
-    CHAZ_QUOTE(#ifndef __CYGWIN__            )
-    CHAZ_QUOTE(  #error "Not Cygwin"         )
-    CHAZ_QUOTE(#endif                        )
-    CHAZ_QUOTE(int main() { return 0; }      );
+static int
+chaz_DirManip_is_cygwin(void) {
+    static int is_cygwin = -1;
+    static const char cygwin_code[] =
+        CHAZ_QUOTE(#ifndef __CYGWIN__            )
+        CHAZ_QUOTE(  #error "Not Cygwin"         )
+        CHAZ_QUOTE(#endif                        )
+        CHAZ_QUOTE(int main() { return 0; }      );
+    if (is_cygwin == -1) {
+        is_cygwin = chaz_CC_test_compile(cygwin_code);
+    }
+    return is_cygwin;
+}
 
 void
 chaz_DirManip_run(void) {
@@ -161,28 +170,28 @@ chaz_DirManip_run(void) {
         }
     }
 
-    if (mkdir_num_args == 2) {
+    if (chaz_DirManip.mkdir_num_args == 2) {
         /* It's two args, but the command isn't "mkdir". */
         char scratch[50];
-        if (strlen(mkdir_command) > 30) {
-            chaz_Util_die("Command too long: '%s'", mkdir_command);
+        if (strlen(chaz_DirManip.mkdir_command) > 30) {
+            chaz_Util_die("Command too long: '%s'", chaz_DirManip.mkdir_command);
         }
-        sprintf(scratch, "%s(_dir, _mode)", mkdir_command);
+        sprintf(scratch, "%s(_dir, _mode)", chaz_DirManip.mkdir_command);
         chaz_ConfWriter_add_def("makedir(_dir, _mode)", scratch);
         chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "0");
     }
-    else if (mkdir_num_args == 1) {
+    else if (chaz_DirManip.mkdir_num_args == 1) {
         /* It's one arg... mode arg will be ignored. */
         char scratch[50];
-        if (strlen(mkdir_command) > 30) {
-            chaz_Util_die("Command too long: '%s'", mkdir_command);
+        if (strlen(chaz_DirManip.mkdir_command) > 30) {
+            chaz_Util_die("Command too long: '%s'", chaz_DirManip.mkdir_command);
         }
-        sprintf(scratch, "%s(_dir)", mkdir_command);
+        sprintf(scratch, "%s(_dir)", chaz_DirManip.mkdir_command);
         chaz_ConfWriter_add_def("makedir(_dir, _mode)", scratch);
         chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
     }
 
-    if (chaz_CC_test_compile(cygwin_code)) {
+    if (chaz_DirManip_is_cygwin()) {
         strcpy(dir_sep, "/");
     }
     else if (chaz_HeadCheck_check_header("windows.h")) {

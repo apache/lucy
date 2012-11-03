@@ -23,19 +23,19 @@
 static struct {
     chaz_ConfWriter *writers[CW_MAX_WRITERS];
     size_t num_writers;
-} CW;
+} chaz_CW;
 
 void
 chaz_ConfWriter_init(void) {
-    CW.num_writers = 0;
+    chaz_CW.num_writers = 0;
     return;
 }
 
 void
 chaz_ConfWriter_clean_up(void) {
     size_t i;
-    for (i = 0; i < CW.num_writers; i++) {
-        CW.writers[i]->clean_up();
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->clean_up();
     }
 }
 
@@ -44,9 +44,9 @@ chaz_ConfWriter_append_conf(const char *fmt, ...) {
     va_list args;
     size_t i;
     
-    for (i = 0; i < CW.num_writers; i++) {
+    for (i = 0; i < chaz_CW.num_writers; i++) {
         va_start(args, fmt);
-        CW.writers[i]->vappend_conf(fmt, args);
+        chaz_CW.writers[i]->vappend_conf(fmt, args);
         va_end(args);
     }
 }
@@ -54,32 +54,32 @@ chaz_ConfWriter_append_conf(const char *fmt, ...) {
 void
 chaz_ConfWriter_add_def(const char *sym, const char *value) {
     size_t i;
-    for (i = 0; i < CW.num_writers; i++) {
-        CW.writers[i]->add_def(sym, value);
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->add_def(sym, value);
     }
 }
 
 void
 chaz_ConfWriter_add_typedef(const char *type, const char *alias) {
     size_t i;
-    for (i = 0; i < CW.num_writers; i++) {
-        CW.writers[i]->add_typedef(type, alias);
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->add_typedef(type, alias);
     }
 }
 
 void
 chaz_ConfWriter_add_sys_include(const char *header) {
     size_t i;
-    for (i = 0; i < CW.num_writers; i++) {
-        CW.writers[i]->add_sys_include(header);
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->add_sys_include(header);
     }
 }
 
 void
 chaz_ConfWriter_add_local_include(const char *header) {
     size_t i;
-    for (i = 0; i < CW.num_writers; i++) {
-        CW.writers[i]->add_local_include(header);
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->add_local_include(header);
     }
 }
 
@@ -89,22 +89,22 @@ chaz_ConfWriter_start_module(const char *module_name) {
     if (chaz_Util_verbosity > 0) {
         printf("Running %s module...\n", module_name);
     }
-    for (i = 0; i < CW.num_writers; i++) {
-        CW.writers[i]->start_module(module_name);
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->start_module(module_name);
     }
 }
 
 void
 chaz_ConfWriter_end_module(void) {
     size_t i;
-    for (i = 0; i < CW.num_writers; i++) {
-        CW.writers[i]->end_module();
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->end_module();
     }
 }
 
 void
 chaz_ConfWriter_add_writer(chaz_ConfWriter *writer) {
-    CW.writers[CW.num_writers] = writer;
-    CW.num_writers++;
+    chaz_CW.writers[chaz_CW.num_writers] = writer;
+    chaz_CW.num_writers++;
 }
 

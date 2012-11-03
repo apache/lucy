@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char symbol_exporting_code[] =
+static const char chaz_SymbolVisibility_symbol_exporting_code[] =
     CHAZ_QUOTE(  %s int exported_function() {   )
     CHAZ_QUOTE(      return 42;                 )
     CHAZ_QUOTE(  }                              )
@@ -33,7 +33,7 @@ static const char symbol_exporting_code[] =
 void
 chaz_SymbolVisibility_run(void) {
     int can_control_visibility = false;
-    char code_buf[sizeof(symbol_exporting_code) + 100];
+    char code_buf[sizeof(chaz_SymbolVisibility_symbol_exporting_code) + 100];
 
     chaz_ConfWriter_start_module("SymbolVisibility");
     chaz_CC_set_warnings_as_errors(1);
@@ -41,7 +41,8 @@ chaz_SymbolVisibility_run(void) {
     /* Windows. */
     if (!can_control_visibility) {
         char export_win[] = "__declspec(dllexport)";
-        sprintf(code_buf, symbol_exporting_code, export_win);
+        sprintf(code_buf, chaz_SymbolVisibility_symbol_exporting_code,
+                export_win);
         if (chaz_CC_test_compile(code_buf)) {
             can_control_visibility = true;
             chaz_ConfWriter_add_def("EXPORT", export_win);
@@ -52,7 +53,8 @@ chaz_SymbolVisibility_run(void) {
     /* GCC. */
     if (!can_control_visibility) {
         char export_gcc[] = "__attribute__ ((visibility (\"default\")))";
-        sprintf(code_buf, symbol_exporting_code, export_gcc);
+        sprintf(code_buf, chaz_SymbolVisibility_symbol_exporting_code,
+                export_gcc);
         if (chaz_CC_test_compile(code_buf)) {
             can_control_visibility = true;
             chaz_ConfWriter_add_def("EXPORT", export_gcc);

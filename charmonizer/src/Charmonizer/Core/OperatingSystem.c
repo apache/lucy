@@ -23,13 +23,15 @@
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
-static char dev_null[20] = "";
-static char exe_ext[5]   = "";
-static char obj_ext[5]   = "";
-static char local_command_start[3] = "";
-static int  shell_type = 0;
-#define SHELL_TYPE_POSIX    1
-#define SHELL_TYPE_CMD_EXE  2
+static struct {
+    char dev_null[20];
+    char exe_ext[5];
+    char obj_ext[5];
+    char local_command_start[3];
+    int  shell_type;
+} chaz_OS = { "", "", "", "", 0 };
+#define CHAZ_OS_POSIX    1
+#define CHAZ_OS_CMD_EXE  2
 
 void
 chaz_OS_init(void) {
@@ -43,18 +45,18 @@ chaz_OS_init(void) {
 
     /* Detect shell based on whether the bitbucket is "/dev/null" or "nul". */
     if (chaz_Util_can_open_file("/dev/null")) {
-        strcpy(dev_null, "/dev/null");
-        strcpy(exe_ext, "");
-        strcpy(obj_ext, "");
-        strcpy(local_command_start, "./");
-        shell_type = SHELL_TYPE_POSIX;
+        strcpy(chaz_OS.dev_null, "/dev/null");
+        strcpy(chaz_OS.exe_ext, "");
+        strcpy(chaz_OS.obj_ext, "");
+        strcpy(chaz_OS.local_command_start, "./");
+        chaz_OS.shell_type = CHAZ_OS_POSIX;
     }
     else if (chaz_Util_can_open_file("nul")) {
-        strcpy(dev_null, "nul");
-        strcpy(exe_ext, ".exe");
-        strcpy(obj_ext, ".obj");
-        strcpy(local_command_start, ".\\");
-        shell_type = SHELL_TYPE_CMD_EXE;
+        strcpy(chaz_OS.dev_null, "nul");
+        strcpy(chaz_OS.exe_ext, ".exe");
+        strcpy(chaz_OS.obj_ext, ".obj");
+        strcpy(chaz_OS.local_command_start, ".\\");
+        chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
     }
     else {
         /* Bail out because we couldn't find anything like /dev/null. */
@@ -64,17 +66,17 @@ chaz_OS_init(void) {
 
 const char*
 chaz_OS_exe_ext(void) {
-    return exe_ext;
+    return chaz_OS.exe_ext;
 }
 
 const char*
 chaz_OS_obj_ext(void) {
-    return obj_ext;
+    return chaz_OS.obj_ext;
 }
 
 const char*
 chaz_OS_dev_null(void) {
-    return dev_null;
+    return chaz_OS.dev_null;
 }
 
 int
@@ -115,13 +117,13 @@ chaz_OS_remove(const char *name) {
 int
 chaz_OS_run_local(const char *arg1, ...) {
     va_list  args;
-    size_t   len     = strlen(local_command_start) + strlen(arg1);
+    size_t   len     = strlen(chaz_OS.local_command_start) + strlen(arg1);
     char    *command = (char*)malloc(len + 1);
     int      retval;
     char    *arg;
 
     /* Append all supplied texts. */
-    sprintf(command, "%s%s", local_command_start, arg1);
+    sprintf(command, "%s%s", chaz_OS.local_command_start, arg1);
     va_start(args, arg1);
     while (NULL != (arg = va_arg(args, char*))) {
         len += strlen(arg);
@@ -140,14 +142,16 @@ int
 chaz_OS_run_quietly(const char *command) {
     int retval = 1;
     char *quiet_command = NULL;
-    if (shell_type == SHELL_TYPE_POSIX) {
+    if (chaz_OS.shell_type == CHAZ_OS_POSIX) {
         char pattern[] = "%s > %s 2>&1";
-        size_t size
-            = sizeof(pattern) + strlen(command) + strlen(dev_null) + 10;
+        size_t size = sizeof(pattern)
+                      + strlen(command)
+                      + strlen(chaz_OS.dev_null)
+                      + 10;
         quiet_command = (char*)malloc(size);
-        sprintf(quiet_command, pattern, command, dev_null);
+        sprintf(quiet_command, pattern, command, chaz_OS.dev_null);
     }
-    else if (shell_type == SHELL_TYPE_CMD_EXE) {
+    else if (chaz_OS.shell_type == CHAZ_OS_CMD_EXE) {
         char pattern[] = "%s > NUL 2> NUL";
         size_t size = sizeof(pattern) + strlen(command) + 10;
         quiet_command = (char*)malloc(size);
@@ -165,7 +169,9 @@ chaz_OS_run_quietly(const char *command) {
 void
 chaz_OS_mkdir(const char *filepath) {
     char *command = NULL;
-    if (shell_type == SHELL_TYPE_POSIX || shell_type == SHELL_TYPE_CMD_EXE) {
+    if (chaz_OS.shell_type == CHAZ_OS_POSIX
+        || chaz_OS.shell_type == CHAZ_OS_CMD_EXE
+       ) {
         unsigned size = sizeof("mkdir") + 1 + strlen(filepath) + 1;
         command = (char*)malloc(size);
         sprintf(command, "mkdir %s", filepath);
@@ -180,12 +186,12 @@ chaz_OS_mkdir(const char *filepath) {
 void
 chaz_OS_rmdir(const char *filepath) {
     char *command = NULL;
-    if (shell_type == SHELL_TYPE_POSIX) {
+    if (chaz_OS.shell_type == CHAZ_OS_POSIX) {
         unsigned size = strlen("rmdir") + 1 + strlen(filepath) + 1;
         command = (char*)malloc(size);
         sprintf(command, "rmdir %s", filepath);
     }
-    else if (shell_type == SHELL_TYPE_CMD_EXE) {
+    else if (chaz_OS.shell_type == CHAZ_OS_CMD_EXE) {
         unsigned size = strlen("rmdir /q") + 1 + strlen(filepath) + 1;
         command = (char*)malloc(size);
         sprintf(command, "rmdir /q %s", filepath);

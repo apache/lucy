@@ -22,23 +22,51 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Code for verifying ISO func macro. */
-static const char iso_func_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"               )
-    CHAZ_QUOTE(  int main() {                      )
-    CHAZ_QUOTE(      Charm_Setup;                  )
-    CHAZ_QUOTE(      printf("%s", __func__);       )
-    CHAZ_QUOTE(      return 0;                     )
-    CHAZ_QUOTE(  }                                 );
+/* Probe for ISO func macro. */
+static int
+chaz_FuncMacro_probe_iso() {
+    static const char iso_func_code[] =
+        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  int main() {                      )
+        CHAZ_QUOTE(      Charm_Setup;                  )
+        CHAZ_QUOTE(      printf("%s", __func__);       )
+        CHAZ_QUOTE(      return 0;                     )
+        CHAZ_QUOTE(  }                                 );
+    size_t output_len;
+    char *output;
+    int success = false;
 
-/* Code for verifying GNU func macro. */
-static const char gnuc_func_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"               )
-    CHAZ_QUOTE(  int main() {                      )
-    CHAZ_QUOTE(      Charm_Setup;                  )
-    CHAZ_QUOTE(      printf("%s", __FUNCTION__);   )
-    CHAZ_QUOTE(      return 0;                     )
-    CHAZ_QUOTE(  }                                 );
+    output = chaz_CC_capture_output(iso_func_code, &output_len);
+    if (output != NULL && strncmp(output, "main", 4) == 0) {
+        success = true;
+    }
+    free(output);
+
+    return success;
+}
+
+static int
+chaz_FuncMacro_probe_gnu() {
+    /* Code for verifying GNU func macro. */
+    static const char gnu_func_code[] =
+        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  int main() {                      )
+        CHAZ_QUOTE(      Charm_Setup;                  )
+        CHAZ_QUOTE(      printf("%s", __FUNCTION__);   )
+        CHAZ_QUOTE(      return 0;                     )
+        CHAZ_QUOTE(  }                                 );
+    size_t output_len;
+    char *output;
+    int success = false;
+
+    output = chaz_CC_capture_output(gnu_func_code, &output_len);
+    if (output != NULL && strncmp(output, "main", 4) == 0) {
+        success = true;
+    }
+    free(output);
+
+    return success;
+}
 
 /* Attempt to verify inline keyword. */
 static char*
@@ -56,12 +84,32 @@ S_try_inline(const char *keyword, size_t *output_len) {
     return chaz_CC_capture_output(code, output_len);
 }
 
-static const char* inline_options[] = {
-    "__inline",
-    "__inline__",
-    "inline"
-};
-static int num_inline_options = sizeof(inline_options) / sizeof(void*);
+static void
+chaz_FuncMacro_probe_inline(void) {
+    static const char* inline_options[] = {
+        "__inline",
+        "__inline__",
+        "inline"
+    };
+    const int num_inline_options = sizeof(inline_options) / sizeof(void*);
+    int has_inline = false;
+    int i;
+
+    for (i = 0; i < num_inline_options; i++) {
+        const char *inline_option = inline_options[i];
+        size_t output_len;
+        char *output = S_try_inline(inline_option, &output_len);
+        if (output != NULL) {
+            has_inline = true;
+            chaz_ConfWriter_add_def("INLINE", inline_option);
+            free(output);
+            break;
+        }
+    }
+    if (!has_inline) {
+        chaz_ConfWriter_add_def("INLINE", NULL);
+    }
+}
 
 void
 chaz_FuncMacro_run(void) {
@@ -71,25 +119,18 @@ chaz_FuncMacro_run(void) {
     int has_funcmac      = false;
     int has_iso_funcmac  = false;
     int has_gnuc_funcmac = false;
-    int has_inline       = false;
 
     chaz_ConfWriter_start_module("FuncMacro");
 
-    /* Check for ISO func macro. */
-    output = chaz_CC_capture_output(iso_func_code, &output_len);
-    if (output != NULL && strncmp(output, "main", 4) == 0) {
+    /* Check for func macros. */
+    if (chaz_FuncMacro_probe_iso()) {
         has_funcmac     = true;
         has_iso_funcmac = true;
     }
-    free(output);
-
-    /* Check for GNUC func macro. */
-    output = chaz_CC_capture_output(gnuc_func_code, &output_len);
-    if (output != NULL && strncmp(output, "main", 4) == 0) {
+    if (chaz_FuncMacro_probe_gnu()) {
         has_funcmac      = true;
         has_gnuc_funcmac = true;
     }
-    free(output);
 
     /* Write out common defines. */
     if (has_funcmac) {
@@ -109,20 +150,7 @@ chaz_FuncMacro_run(void) {
     }
 
     /* Check for inline keyword. */
-
-    for (i = 0; i < num_inline_options; i++) {
-        const char *inline_option = inline_options[i];
-        output = S_try_inline(inline_option, &output_len);
-        if (output != NULL) {
-            has_inline = true;
-            chaz_ConfWriter_add_def("INLINE", inline_option);
-            free(output);
-            break;
-        }
-    }
-    if (!has_inline) {
-        chaz_ConfWriter_add_def("INLINE", NULL);
-    }
+    chaz_FuncMacro_probe_inline();
 
     chaz_ConfWriter_end_module();
 }

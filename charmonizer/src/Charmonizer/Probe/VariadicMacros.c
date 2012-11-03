@@ -23,7 +23,7 @@
 
 
 /* Code for verifying ISO-style variadic macros. */
-static const char iso_code[] =
+static const char chaz_VariadicMacros_iso_code[] =
     CHAZ_QUOTE(  #include "_charm.h"                                   )
     CHAZ_QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
     "                printf(fmt, __VA_ARGS__)                        \n"
@@ -34,7 +34,7 @@ static const char iso_code[] =
     CHAZ_QUOTE(  }                                                     );
 
 /* Code for verifying GNU-style variadic macros. */
-static const char gnuc_code[] =
+static const char chaz_VariadicMacros_gnuc_code[] =
     CHAZ_QUOTE(  #include "_charm.h"                                   )
     CHAZ_QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
     CHAZ_QUOTE(  int main() {                                          )
@@ -54,7 +54,7 @@ chaz_VariadicMacros_run(void) {
     chaz_ConfWriter_start_module("VariadicMacros");
 
     /* Test for ISO-style variadic macros. */
-    output = chaz_CC_capture_output(iso_code, &output_len);
+    output = chaz_CC_capture_output(chaz_VariadicMacros_iso_code, &output_len);
     if (output != NULL) {
         has_varmacros = true;
         has_iso_varmacros = true;
@@ -63,7 +63,7 @@ chaz_VariadicMacros_run(void) {
     }
 
     /* Test for GNU-style variadic macros. */
-    output = chaz_CC_capture_output(gnuc_code, &output_len);
+    output = chaz_CC_capture_output(chaz_VariadicMacros_gnuc_code, &output_len);
     if (output != NULL) {
         has_gnuc_varmacros = true;
         if (has_varmacros == false) {
