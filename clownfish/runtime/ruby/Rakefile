@@ -21,9 +21,15 @@ def rbconfig
   RbConfig::CONFIG
 end
 
+def exe_path(*args)
+  File.join(args).ext(RbConfig::CONFIG["EXEEXT"])
+end
+
 BASE_PATH = '..'
 CHARMONIZER_ORIG_DIR = File.absolute_path( File.join( BASE_PATH, '..', '..', 'charmonizer' ) )
-CHARMONIZE_EXE_PATH  = './charmonize' #TODO: probably will not work on win32
+COMMON_SOURCE_DIR    = File.join(BASE_PATH, "common")
+CHARMONIZER_C        = File.join(COMMON_SOURCE_DIR, 'charmonizer.c')
+CHARMONIZER_EXE_PATH = File.absolute_path(exe_path('charmonizer'))
 CHARMONY_H_PATH      = 'charmony.h'
 CHARMONY_RB_PATH     = 'Charmony.rb'
 CORE_SOURCE_DIR      = File.absolute_path( BASE_PATH, 'core' );
@@ -86,57 +92,48 @@ task :build_charmonizer_tests => [:charmonize] do
   run_make( :dir => CHARMONIZER_ORIG_DIR, :args => [ "DEFS=#{flags}", "tests"])
 end
 
-desc "Charmonize"
-task :charmonize => [:build_charmonize] do 
-  puts "Charmonizing"
-  #return if !uptodate?(CHARMONIZE_EXE_PATH, [ CHARMONY_H_PATH, CHARMONY_RB_PATH ] )
-  puts "Running #{CHARMONIZE_EXE_PATH}...\n"
-  CLEAN.include(CHARMONY_H_PATH)
-  CLEAN.include(CHARMONY_RB_PATH)
-  CLEAN.include('_charm*')
-
-  # TODO: no clue if this is correct
-  command = [
-    CHARMONIZE_EXE_PATH,
-    '--cc=' + quotify( cc_command ),
-    '--enable-c',
-    '--enable-ruby',
-    '--',
-    extra_ccflags,
-  ]
-
-  if ( ENV['CHARM_VALGRIND'] )
-    command.unshift("valgrind", "--leak-check=yes")
-  end
-
-  if system(*command).nil?
-    abort "Failed to run #{CHARMONIZE_EXE_PATH}"
-  end
-
-end
-
-desc "Building Charmonize"
-task :build_charmonize do 
-  puts "Buildling #{CHARMONIZE_EXE_PATH}"
-  meld_c = File.absolute_path('charmonize.c')
-
-  CLEAN.include(meld_c)
-  CLEAN.include(CHARMONIZE_EXE_PATH)
-
-  charmonize_main = File.join( CHARMONIZER_ORIG_DIR, 'charmonize.c' )
-
-  # TODO: Build.PL "PERL=$^X" Right is defaulting to system perl?
-  run_make(:dir => CHARMONIZER_ORIG_DIR, :args => [ "meld", "FILES=#{charmonize_main}", "OUT=#{meld_c}" ])
-
-  if !uptodate?(CHARMONIZE_EXE_PATH, [meld_c])
-    cc = cc_command
-    outflag = $cc =~ /cl\b/ ? "/Fe" : "-o ";
-    if system("#{cc} #{meld_c} #{outflag}#{CHARMONIZE_EXE_PATH}").nil?
-      abort "Failed to compile #{CHARMONIZE_EXE_PATH}"
+desc "Build and run charmonizer, creating charmony.h and charmony.rb"
+task :charmony do
+  # Compile charmonizer executable.
+  if !uptodate? CHARMONIZER_EXE_PATH, [CHARMONIZER_C]
+    outflag = cc_command.match(/cl\b/) ? "/Fe" : "-o "
+    command = "#{cc_command} #{outflag}#{CHARMONIZER_EXE_PATH} #{CHARMONIZER_C}"
+    puts command
+    if !system(command)
+      raise "Failed to compile #{CHARMONIZER_EXE_PATH}"
     end
   end
 
+  # Return if charmonizer output is current.
+  if uptodate? CHARMONY_RB_PATH, [CHARMONIZER_EXE_PATH]
+    next
+  end
+  puts "Running #{CHARMONIZER_EXE_PATH}...\n"
+
+  # Prepare arguments to charmonizer.
+  command = [
+    CHARMONIZER_EXE_PATH,
+    '--cc=' + quotify(cc_command),
+    '--enable-c',
+    '--enable-ruby',
+    '--',
+    all_ccflags,
+  ]
+  if (ENV['CHARM_VALGRIND'])
+    command.unshift("valgrind", "--leak-check=yes")
+  end
+
+  # Run charmonizer.
+  puts command.join(" ")
+  if !system(*command)
+    raise "Failed to run #{CHARMONIZER_EXE_PATH}: " + $?
+  end
 end
+CLEAN.include(CHARMONIZER_EXE_PATH)
+CLEAN.include(CHARMONY_H_PATH)
+CLEAN.include(CHARMONY_RB_PATH)
+# Clean up after charmonizer if it doesn't succeed on its own.
+CLEAN.include("_charm*")
 
 task :default => [:build_clownfish]
 
@@ -181,7 +178,7 @@ def make_command
   return command
 end
 
-def extra_ccflags 
+def all_ccflags
   ccflags = '-DCFCRUBY '
   
   if defined?(rbconfig["CFLAGS"])
@@ -214,7 +211,7 @@ def extra_ccflags
 end
 
 def quotify(string)
-  return '"' + string.gsub(/[\\\"]/,'\\1') + '"'
+  return '"' + string.gsub(/([\\\"])/,'\\\\\\1') + '"'
 end
 
 def autogen_header

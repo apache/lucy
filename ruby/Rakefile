@@ -78,14 +78,20 @@ def run_make(dir, params)
   chdir(current_dir) if dir
 end
 
+def quotify(string)
+  return '"' + string.gsub(/([\\\"])/,'\\\\\\1') + '"'
+end
+
 IS_DISTRO_NOT_DEVEL  = File.directory?('core')
 AUTOGEN_DIR          = "autogen"
 BASE_DIR             = File.absolute_path(IS_DISTRO_NOT_DEVEL ? '.' : '..')
 CHARMONIZER_ORIG_DIR = File.join(BASE_DIR, "charmonizer")
-CHARMONIZE_C_PATH    = File.absolute_path('charmonize.c')
-CHARMONIZE_EXE_PATH  = File.absolute_path(exe_path('charmonize'))
+COMMON_SOURCE_DIR    = File.join(BASE_DIR, "common")
+CHARMONIZER_C        = File.join(COMMON_SOURCE_DIR, 'charmonizer.c')
+CHARMONIZER_EXE_PATH = File.absolute_path(exe_path('charmonizer'))
 CLOWNFISH_PATH       = File.join(BASE_DIR,"clownfish","ruby")
-CHARMONY_PATH        = "charmony.h"
+CHARMONY_H_PATH      = "charmony.h"
+CHARMONY_RB_PATH     = "Charmony.rb"
 CORE_SOURCE_DIR      = File.join(BASE_DIR, "core")
 
 desc "Build clownfish"
@@ -109,51 +115,48 @@ task :clownfish => [:charmonizer_tests] do
 
 end
 
-desc "Build the charmonize executable"
-task :charmonize do
-  puts "Building #{CHARMONIZE_EXE_PATH}...\n"
-  meld_c = File.absolute_path("charmonize.c")
-  charmonize_main = File.join(CHARMONIZER_ORIG_DIR, 'charmonize.c')
-  run_make_args = [ "meld", "FILES=#{charmonize_main}", "OUT=#{meld_c}" ]
-  run_make(CHARMONIZER_ORIG_DIR, run_make_args)
-
-  if !uptodate?(CHARMONIZE_EXE_PATH, [meld_c])
+desc "Build and run charmonizer, creating charmony.h and charmony.rb"
+task :charmony do
+  # Compile charmonizer executable.
+  if !uptodate? CHARMONIZER_EXE_PATH, [CHARMONIZER_C]
     outflag = cc_command.match(/cl\b/) ? "/Fe" : "-o "
-    command = "#{cc_command} #{outflag}#{CHARMONIZE_EXE_PATH} #{meld_c}"
+    command = "#{cc_command} #{outflag}#{CHARMONIZER_EXE_PATH} #{CHARMONIZER_C}"
     puts command
-    success = system(command)
-    if !success
-      raise "Failed to write charmony.h"
+    if !system(command)
+      raise "Failed to compile #{CHARMONIZER_EXE_PATH}"
     end
   end
-end
-CLEAN.include(CHARMONIZE_C_PATH)
-CLEAN.include(CHARMONIZE_EXE_PATH)
 
-desc "Run the charmonize executable, creating the charmony.h file"
-task :charmony => [:charmonize] do
-  if !uptodate? CHARMONY_PATH, [CHARMONIZE_EXE_PATH]
-    puts "Writing #{CHARMONY_PATH}...\n"
-    command = [
-      CHARMONIZE_EXE_PATH, 
-      "--cc=\"#{cc_command}\"", 
-      "--enable-c",
-      "--",
-      all_ccflags
-    ]
-    if ENV["CHARM_VALGRIND"]
-      command.unshift("valgrind", "--leak-check=yes")
-    end
-    puts command.join(" ")
-    success = system(*command);
-    if !success
-      raise "Failed to write charmony.h"
-    end
+  # Return if charmonizer output is current.
+  if uptodate? CHARMONY_RB_PATH, [CHARMONIZER_EXE_PATH]
+    next
+  end
+  puts "Running #{CHARMONIZER_EXE_PATH}...\n"
+
+  # Prepare arguments to charmonizer.
+  command = [
+    CHARMONIZER_EXE_PATH,
+    '--cc=' + quotify(cc_command),
+    '--enable-c',
+    '--enable-ruby',
+    '--',
+    all_ccflags,
+  ]
+  if (ENV['CHARM_VALGRIND'])
+    command.unshift("valgrind", "--leak-check=yes")
+  end
+
+  # Run charmonizer.
+  puts command.join(" ")
+  if !system(*command)
+    raise "Failed to run #{CHARMONIZER_EXE_PATH}: " + $?
   end
 end
-# Clean up after charmonize if it doesn't succeed on its own.
+CLEAN.include(CHARMONIZER_EXE_PATH)
+CLEAN.include(CHARMONY_H_PATH)
+CLEAN.include(CHARMONY_RB_PATH)
+# Clean up after charmonizer if it doesn't succeed on its own.
 CLEAN.include("_charm*")
-CLEAN.include(CHARMONY_PATH)
 
 desc "Build the charmonizer tests"
 task :charmonizer_tests => [:charmony] do
