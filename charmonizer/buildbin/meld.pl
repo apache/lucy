@@ -127,9 +127,10 @@ for my $file (@charm_files) {
 for my $file (@user_files) {
     my $content = slurp($file);
 
-    # Remove pound-includes for files being inlined.
-    $content =~ s/^#include "Charmonizer[^\n]+\n//msg;
+    # Comment out pound-includes for files being inlined.
+    $content =~ s|^(#include "Charmonizer[^\n]+)\n|/* $1 */\n|msg;
 
+    print $out_fh qq|#line 1 "$file"\n|;
     print $out_fh $content;
 }
 
@@ -139,16 +140,25 @@ exit;
 sub pare_charm_file {
     my $path    = shift;
     my $content = slurp($path);
+    my $num_newlines = $content =~ tr/\n/\n/;
 
     # Strip license header.
     $content =~ s#/\* Licensed to the Apache.+?\*/\n+##s
         or die "Couldn't find ASF license header in '$path'";
 
-    # Remove C++ guards (if this is a header).
-    $content =~ s/^#ifdef __cplusplus.*?#endif\n+//msg;
+    # Remove opening C++ guards (if this is a header).
+    $content =~ s/^#ifdef __cplusplus.*?#endif\n+//ms;
 
-    # Remove pound-includes for files being inlined.
-    $content =~ s/^#include "Charmonizer[^\n]+\n//msg;
+    # Add a #line directive.
+    my $new_num_newlines = $content =~ tr/\n/\n/;
+    my $starting_line = 1 + $num_newlines - $new_num_newlines;
+    $content = qq|#line $starting_line "$path"\n$content|;
+
+    # Remove closing C++ guards (if this is a header).
+    $content =~ s/^#ifdef __cplusplus.*?#endif\n+//ms;
+
+    # Comment out pound-includes for files being inlined.
+    $content =~ s|^(#include "Charmonizer[^\n]+)\n|/* $1 */\n|msg;
 
     return <<END_STUFF;
 /***************************************************************************/
