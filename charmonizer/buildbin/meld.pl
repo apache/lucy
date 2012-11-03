@@ -49,7 +49,12 @@ die $usage unless $outfile;
 $outfile    = rel2abs($outfile);
 @user_files = split( /,/, join( ',', @user_files ) );
 @probes     = split( /,/, join( ',', @probes ) );
-@user_files = map { rel2abs($_) } @user_files;
+
+# Slurp all user files.
+my %user_file_content;
+for my $file (@user_files) {
+    $user_file_content{$file} = slurp($file);
+}
 
 # Make sure we are in the charmonizer dir.
 chdir( catdir( $Bin, updir() ) );
@@ -125,7 +130,7 @@ for my $file (@charm_files) {
 
 # Process user specified files.
 for my $file (@user_files) {
-    my $content = slurp($file);
+    my $content = $user_file_content{$file};
 
     # Comment out pound-includes for files being inlined.
     $content =~ s|^(#include "Charmonizer[^\n]+)\n|/* $1 */\n|msg;
