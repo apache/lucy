@@ -420,7 +420,6 @@ FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
 static INLINE bool_t
 SI_init_read_only(FSFileHandle *self) {
-    LARGE_INTEGER large_int;
     char *filepath = (char*)CB_Get_Ptr8(self->path);
     SYSTEM_INFO sys_info;
 
@@ -447,13 +446,14 @@ SI_init_read_only(FSFileHandle *self) {
     }
 
     // Derive len.
-    GetFileSizeEx(self->win_fhandle, &large_int);
-    self->len = large_int.QuadPart;
-    if (self->len < 0) {
-        Err_set_error(Err_new(CB_newf("GetFileSizeEx for %o returned a negative length: '%i64'",
-                                      self->path, self->len)));
+    DWORD file_size_hi;
+    DWORD file_size_lo = GetFileSize(self->win_fhandle, &file_size_hi);
+    if (file_size_lo == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
+        Err_set_error(Err_new(CB_newf("GetFileSize for %o failed",
+                                      self->path)));
         return false;
     }
+    self->len = ((uint64_t)file_size_hi << 32) | file_size_lo;
 
     // Init mapping handle.
     self->buf = NULL;
