@@ -139,6 +139,11 @@ chaz_ConfWriter_add_def(const char *sym, const char *value);
 void
 chaz_ConfWriter_add_typedef(const char *type, const char *alias);
 
+/* Add a globally scoped typedef.
+ */
+void
+chaz_ConfWriter_add_global_typedef(const char *type, const char *alias);
+
 /* Pound-include a system header (within angle brackets).
  */
 void
@@ -171,6 +176,8 @@ typedef void
 typedef void
 (*chaz_ConfWriter_add_typedef_t)(const char *type, const char *alias);
 typedef void
+(*chaz_ConfWriter_add_global_typedef_t)(const char *type, const char *alias);
+typedef void
 (*chaz_ConfWriter_add_sys_include_t)(const char *header);
 typedef void
 (*chaz_ConfWriter_add_local_include_t)(const char *header);
@@ -179,14 +186,15 @@ typedef void
 typedef void
 (*chaz_ConfWriter_end_module_t)(void);
 typedef struct chaz_ConfWriter {
-    chaz_ConfWriter_clean_up_t          clean_up;
-    chaz_ConfWriter_vappend_conf_t      vappend_conf;
-    chaz_ConfWriter_add_def_t           add_def;
-    chaz_ConfWriter_add_typedef_t       add_typedef;
-    chaz_ConfWriter_add_sys_include_t   add_sys_include;
-    chaz_ConfWriter_add_local_include_t add_local_include;
-    chaz_ConfWriter_start_module_t      start_module;
-    chaz_ConfWriter_end_module_t        end_module;
+    chaz_ConfWriter_clean_up_t           clean_up;
+    chaz_ConfWriter_vappend_conf_t       vappend_conf;
+    chaz_ConfWriter_add_def_t            add_def;
+    chaz_ConfWriter_add_typedef_t        add_typedef;
+    chaz_ConfWriter_add_global_typedef_t add_global_typedef;
+    chaz_ConfWriter_add_sys_include_t    add_sys_include;
+    chaz_ConfWriter_add_local_include_t  add_local_include;
+    chaz_ConfWriter_start_module_t       start_module;
+    chaz_ConfWriter_end_module_t         end_module;
 } chaz_ConfWriter;
 
 #endif /* H_CHAZ_CONFWRITER */
@@ -968,6 +976,14 @@ chaz_ConfWriter_add_typedef(const char *type, const char *alias) {
 }
 
 void
+chaz_ConfWriter_add_global_typedef(const char *type, const char *alias) {
+    size_t i;
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->add_global_typedef(type, alias);
+    }
+}
+
+void
 chaz_ConfWriter_add_sys_include(const char *header) {
     size_t i;
     for (i = 0; i < chaz_CW.num_writers; i++) {
@@ -1027,6 +1043,7 @@ chaz_ConfWriter_add_writer(chaz_ConfWriter *writer) {
 typedef enum chaz_ConfElemType {
     CHAZ_CONFELEM_DEF,
     CHAZ_CONFELEM_TYPEDEF,
+    CHAZ_CONFELEM_GLOBAL_TYPEDEF,
     CHAZ_CONFELEM_SYS_INCLUDE,
     CHAZ_CONFELEM_LOCAL_INCLUDE
 } chaz_ConfElemType;
@@ -1070,6 +1087,8 @@ chaz_ConfWriterC_add_def(const char *sym, const char *value);
 static void
 chaz_ConfWriterC_add_typedef(const char *type, const char *alias);
 static void
+chaz_ConfWriterC_add_global_typedef(const char *type, const char *alias);
+static void
 chaz_ConfWriterC_add_sys_include(const char *header);
 static void
 chaz_ConfWriterC_add_local_include(const char *header);
@@ -1080,14 +1099,15 @@ chaz_ConfWriterC_end_module(void);
 
 void
 chaz_ConfWriterC_enable(void) {
-    CWC_conf_writer.clean_up          = chaz_ConfWriterC_clean_up;
-    CWC_conf_writer.vappend_conf      = chaz_ConfWriterC_vappend_conf;
-    CWC_conf_writer.add_def           = chaz_ConfWriterC_add_def;
-    CWC_conf_writer.add_typedef       = chaz_ConfWriterC_add_typedef;
-    CWC_conf_writer.add_sys_include   = chaz_ConfWriterC_add_sys_include;
-    CWC_conf_writer.add_local_include = chaz_ConfWriterC_add_local_include;
-    CWC_conf_writer.start_module      = chaz_ConfWriterC_start_module;
-    CWC_conf_writer.end_module        = chaz_ConfWriterC_end_module;
+    CWC_conf_writer.clean_up           = chaz_ConfWriterC_clean_up;
+    CWC_conf_writer.vappend_conf       = chaz_ConfWriterC_vappend_conf;
+    CWC_conf_writer.add_def            = chaz_ConfWriterC_add_def;
+    CWC_conf_writer.add_typedef        = chaz_ConfWriterC_add_typedef;
+    CWC_conf_writer.add_global_typedef = chaz_ConfWriterC_add_global_typedef;
+    CWC_conf_writer.add_sys_include    = chaz_ConfWriterC_add_sys_include;
+    CWC_conf_writer.add_local_include  = chaz_ConfWriterC_add_local_include;
+    CWC_conf_writer.start_module       = chaz_ConfWriterC_start_module;
+    CWC_conf_writer.end_module         = chaz_ConfWriterC_end_module;
     chaz_ConfWriterC_open_charmony_h(NULL);
     chaz_ConfWriter_add_writer(&CWC_conf_writer);
     return;
@@ -1186,6 +1206,18 @@ chaz_ConfWriterC_append_typedef_to_conf(const char *type, const char *alias) {
 }
 
 static void
+chaz_ConfWriterC_add_global_typedef(const char *type, const char *alias) {
+    chaz_ConfWriterC_push_def_list_item(alias, type,
+            CHAZ_CONFELEM_GLOBAL_TYPEDEF);
+}
+
+static void
+chaz_ConfWriterC_append_global_typedef_to_conf(const char *type,
+        const char *alias) {
+    fprintf(chaz_ConfWriterC.fh, "typedef %s %s;\n", type, alias);
+}
+
+static void
 chaz_ConfWriterC_add_sys_include(const char *header) {
     chaz_ConfWriterC_push_def_list_item(header, NULL,
                                         CHAZ_CONFELEM_SYS_INCLUDE);
@@ -1226,6 +1258,10 @@ chaz_ConfWriterC_end_module(void) {
                 chaz_ConfWriterC_append_typedef_to_conf(defs[i].str2,
                                                         defs[i].str1);
                 break;
+            case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
+                chaz_ConfWriterC_append_global_typedef_to_conf(defs[i].str2,
+                                                               defs[i].str1);
+                break;
             case CHAZ_CONFELEM_SYS_INCLUDE:
                 chaz_ConfWriterC_append_sys_include_to_conf(defs[i].str1);
                 break;
@@ -1259,6 +1295,7 @@ chaz_ConfWriterC_end_module(void) {
                     }
                 }
                 break;
+            case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
             case CHAZ_CONFELEM_SYS_INCLUDE:
             case CHAZ_CONFELEM_LOCAL_INCLUDE:
                 /* no-op */
@@ -1339,6 +1376,8 @@ chaz_ConfWriterPerl_add_def(const char *sym, const char *value);
 static void
 chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias);
 static void
+chaz_ConfWriterPerl_add_global_typedef(const char *type, const char *alias);
+static void
 chaz_ConfWriterPerl_add_sys_include(const char *header);
 static void
 chaz_ConfWriterPerl_add_local_include(const char *header);
@@ -1349,14 +1388,15 @@ chaz_ConfWriterPerl_end_module(void);
 
 void
 chaz_ConfWriterPerl_enable(void) {
-    CWPerl_conf_writer.clean_up          = chaz_ConfWriterPerl_clean_up;
-    CWPerl_conf_writer.vappend_conf      = chaz_ConfWriterPerl_vappend_conf;
-    CWPerl_conf_writer.add_def           = chaz_ConfWriterPerl_add_def;
-    CWPerl_conf_writer.add_typedef       = chaz_ConfWriterPerl_add_typedef;
-    CWPerl_conf_writer.add_sys_include   = chaz_ConfWriterPerl_add_sys_include;
-    CWPerl_conf_writer.add_local_include = chaz_ConfWriterPerl_add_local_include;
-    CWPerl_conf_writer.start_module      = chaz_ConfWriterPerl_start_module;
-    CWPerl_conf_writer.end_module        = chaz_ConfWriterPerl_end_module;
+    CWPerl_conf_writer.clean_up           = chaz_ConfWriterPerl_clean_up;
+    CWPerl_conf_writer.vappend_conf       = chaz_ConfWriterPerl_vappend_conf;
+    CWPerl_conf_writer.add_def            = chaz_ConfWriterPerl_add_def;
+    CWPerl_conf_writer.add_typedef        = chaz_ConfWriterPerl_add_typedef;
+    CWPerl_conf_writer.add_global_typedef = chaz_ConfWriterPerl_add_global_typedef;
+    CWPerl_conf_writer.add_sys_include    = chaz_ConfWriterPerl_add_sys_include;
+    CWPerl_conf_writer.add_local_include  = chaz_ConfWriterPerl_add_local_include;
+    CWPerl_conf_writer.start_module       = chaz_ConfWriterPerl_start_module;
+    CWPerl_conf_writer.end_module         = chaz_ConfWriterPerl_end_module;
     chaz_ConfWriterPerl_open_config_pm();
     chaz_ConfWriter_add_writer(&CWPerl_conf_writer);
     return;
@@ -1482,6 +1522,12 @@ chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias) {
 }
 
 static void
+chaz_ConfWriterPerl_add_global_typedef(const char *type, const char *alias) {
+    (void)type;
+    (void)alias;
+}
+
+static void
 chaz_ConfWriterPerl_add_sys_include(const char *header) {
     (void)header;
 }
@@ -1534,6 +1580,8 @@ chaz_ConfWriterRuby_add_def(const char *sym, const char *value);
 static void
 chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias);
 static void
+chaz_ConfWriterRuby_add_global_typedef(const char *type, const char *alias);
+static void
 chaz_ConfWriterRuby_add_sys_include(const char *header);
 static void
 chaz_ConfWriterRuby_add_local_include(const char *header);
@@ -1544,14 +1592,15 @@ chaz_ConfWriterRuby_end_module(void);
 
 void
 chaz_ConfWriterRuby_enable(void) {
-    CWRuby_conf_writer.clean_up          = chaz_ConfWriterRuby_clean_up;
-    CWRuby_conf_writer.vappend_conf      = chaz_ConfWriterRuby_vappend_conf;
-    CWRuby_conf_writer.add_def           = chaz_ConfWriterRuby_add_def;
-    CWRuby_conf_writer.add_typedef       = chaz_ConfWriterRuby_add_typedef;
-    CWRuby_conf_writer.add_sys_include   = chaz_ConfWriterRuby_add_sys_include;
-    CWRuby_conf_writer.add_local_include = chaz_ConfWriterRuby_add_local_include;
-    CWRuby_conf_writer.start_module      = chaz_ConfWriterRuby_start_module;
-    CWRuby_conf_writer.end_module        = chaz_ConfWriterRuby_end_module;
+    CWRuby_conf_writer.clean_up           = chaz_ConfWriterRuby_clean_up;
+    CWRuby_conf_writer.vappend_conf       = chaz_ConfWriterRuby_vappend_conf;
+    CWRuby_conf_writer.add_def            = chaz_ConfWriterRuby_add_def;
+    CWRuby_conf_writer.add_typedef        = chaz_ConfWriterRuby_add_typedef;
+    CWRuby_conf_writer.add_global_typedef = chaz_ConfWriterRuby_add_global_typedef;
+    CWRuby_conf_writer.add_sys_include    = chaz_ConfWriterRuby_add_sys_include;
+    CWRuby_conf_writer.add_local_include  = chaz_ConfWriterRuby_add_local_include;
+    CWRuby_conf_writer.start_module       = chaz_ConfWriterRuby_start_module;
+    CWRuby_conf_writer.end_module         = chaz_ConfWriterRuby_end_module;
     chaz_ConfWriterRuby_open_config_rb();
     chaz_ConfWriter_add_writer(&CWRuby_conf_writer);
     return;
@@ -1670,6 +1719,12 @@ chaz_ConfWriterRuby_add_def(const char *sym, const char *value) {
 
 static void
 chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias) {
+    (void)type;
+    (void)alias;
+}
+
+static void
+chaz_ConfWriterRuby_add_global_typedef(const char *type, const char *alias) {
     (void)type;
     (void)alias;
 }
