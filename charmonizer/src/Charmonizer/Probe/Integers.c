@@ -251,22 +251,22 @@ chaz_Integers_run(void) {
          *   uint64_t
          */
         if (has_8) {
-            chaz_ConfWriter_add_typedef("signed char", "int8_t");
-            chaz_ConfWriter_add_typedef("unsigned char", "uint8_t");
+            chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
+            chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
         }
         if (has_16) {
-            chaz_ConfWriter_add_typedef("signed short", "int16_t");
-            chaz_ConfWriter_add_typedef("unsigned short", "uint16_t");
+            chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
+            chaz_ConfWriter_add_global_typedef("unsigned short", "uint16_t");
         }
         if (has_32) {
-            chaz_ConfWriter_add_typedef(i32_t_type, "int32_t");
+            chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
             sprintf(scratch, "unsigned %s", i32_t_type);
-            chaz_ConfWriter_add_typedef(scratch, "uint32_t");
+            chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
         }
         if (has_64) {
-            chaz_ConfWriter_add_typedef(i64_t_type, "int64_t");
+            chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
             sprintf(scratch, "unsigned %s", i64_t_type);
-            chaz_ConfWriter_add_typedef(scratch, "uint64_t");
+            chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
         }
     }
     if (has_8) {
