@@ -282,7 +282,7 @@ S_random_int32() {
 static Obj*
 S_random_int64() {
     uint64_t num = TestUtils_random_u64();
-    return (Obj*)Int64_new(num & 0x7FFFFFFFFFFFFFFFLL);
+    return (Obj*)Int64_new(num & I64_C(0x7FFFFFFFFFFFFFFF));
 }
 
 static Obj*
