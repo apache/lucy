@@ -37,6 +37,10 @@
 #include "Lucy/Search/TermQuery.h"
 #include "Lucy/Search/Query.h"
 
+#ifndef SIZE_MAX
+  #define SIZE_MAX ((size_t)-1)
+#endif
+
 #define SHOULD            LUCY_QPARSER_SHOULD
 #define MUST              LUCY_QPARSER_MUST
 #define MUST_NOT          LUCY_QPARSER_MUST_NOT
