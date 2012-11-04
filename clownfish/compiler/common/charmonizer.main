@@ -1,0 +1,95 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Source fragment for Lucy's charmonizer.c.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "Charmonizer/Probe.h"
+#include "Charmonizer/Probe/Integers.h"
+
+#define MAX_CC_LEN 128
+#define MAX_FLAGS_LEN 2048
+
+struct CLIArgs {
+    char cc_command[MAX_CC_LEN + 1];
+    char cc_flags[MAX_FLAGS_LEN + 1];
+};
+
+/* Parse command line arguments. */
+static void
+S_parse_arguments(int argc, char **argv, struct CLIArgs *args) {
+    int i;
+
+    /* Parse most args. */
+    for (i = 1; i < argc; i++) {
+        char *arg = argv[i];
+        if (strcmp(arg, "--") == 0) {
+            /* From here on out, everything will be a compiler flag. */
+            i++;
+            break;
+        }
+        if (memcmp(arg, "--cc=", 5) == 0) {
+            if (strlen(arg) > MAX_CC_LEN - 5) {
+                fprintf(stderr, "Exceeded max length for compiler command");
+                exit(1);
+            }
+            strcpy(args->cc_command, arg + 5);
+        }
+    }
+
+    /* Accumulate compiler flags. */
+    for (; i < argc; i++) {
+        char *arg = argv[i];
+        if (strlen(arg) + strlen(args->cc_flags) + 2 >= MAX_FLAGS_LEN) {
+            fprintf(stderr, "Exceeded max length for compiler flags");
+            exit(1);
+        }
+        strcat(args->cc_flags, " ");
+        strcat(args->cc_flags, arg);
+    }
+
+    /* Validate. */
+    if (!args->cc_command
+        || !strlen(args->cc_command)
+       ) {
+        fprintf(stderr,
+                "Usage: ./charmonizer --cc=CC_COMMAND -- CC_FLAGS\n");
+        exit(1);
+    }
+
+}
+
+int main(int argc, char **argv) {
+    struct CLIArgs args;
+    memset(&args, 0, sizeof(struct CLIArgs));
+
+    S_parse_arguments(argc, argv, &args);
+    chaz_Probe_init(args.cc_command, args.cc_flags);
+    chaz_ConfWriterC_enable();
+
+    /* Run probe modules. */
+    chaz_Integers_run();
+
+    /* Clean up. */
+    chaz_Probe_clean_up();
+
+    return 0;
+}
+
+

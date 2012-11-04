@@ -30,7 +30,7 @@ use Cwd qw( getcwd );
 use Carp;
 
 my $base_dir = catdir( updir(), updir(), updir() );
-my $COMMON_SOURCE_DIR = catdir( $base_dir, 'common' );
+my $COMMON_SOURCE_DIR = catdir( updir(), 'common' );
 my $CHARMONIZER_C     = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
 my $PPPORT_H_PATH = catfile( updir(), qw( include ppport.h ) );
 my $LEMON_DIR = catdir( $base_dir, 'lemon' );
