@@ -39,8 +39,7 @@ my $CFC_SOURCE_DIR = catdir( updir(), 'src' );
 
 sub extra_ccflags {
     my $self          = shift;
-    my $extra_ccflags = "-DCFCPERL ";
-    $extra_ccflags .= "$ENV{CFLAGS} " if defined $ENV{CFLAGS};
+    my @extra_ccflags = qw( -DCFCPERL );
 
     my $gcc_version 
         = $ENV{REAL_GCC_VERSION}
@@ -50,39 +49,34 @@ sub extra_ccflags {
         $gcc_version =~ /^(\d+(\.\d+))/
             or die "Invalid GCC version: $gcc_version";
         $gcc_version = $1;
-    }
 
-    if ( defined $ENV{LUCY_DEBUG} ) {
-        if ( defined $gcc_version ) {
-            $extra_ccflags .= "-DLUCY_DEBUG ";
-            $extra_ccflags
-                .= "-DPERL_GCC_PEDANTIC -std=gnu99 -pedantic -Wall ";
-            $extra_ccflags .= "-Wextra " if $gcc_version >= 3.4;    # correct
-            $extra_ccflags .= "-Wno-variadic-macros "
+        # Tell GCC explicitly to run with maximum options.
+        push @extra_ccflags, qw( -std=gnu99 -D_GNU_SOURCE );
+
+        if ( defined $ENV{LUCY_DEBUG} ) {
+            push @extra_ccflags, qw(
+                -DLUCY_DEBUG -DPERL_GCC_PEDANTIC -pedantic -Wall
+            );
+            push @extra_ccflags, qw( -Wextra )
+                if $gcc_version >= 3.4;    # correct
+            push @extra_ccflags, qw( -Wno-variadic-macros )
                 if $gcc_version > 3.4;    # at least not on gcc 3.4
         }
+
+        if ( $ENV{LUCY_VALGRIND} ) {
+            push @extra_ccflags, qw( -fno-inline-functions );
+        }
     }
 
-    if ( $ENV{LUCY_VALGRIND} and defined $gcc_version ) {
-        $extra_ccflags .= "-fno-inline-functions ";
-    }
-
-    # Compile as C++ under MSVC.  Turn off stupid warnings, too.
+    # Compile as C++ under MSVC.
+    # Turn off stupid warnings, too.
+    # Redefine 'for' to fix broken 'for' scoping under MSVC6.
     if ( $self->config('cc') =~ /^cl\b/ ) {
-        $extra_ccflags .= '/TP -D_CRT_SECURE_NO_WARNINGS ';
+        push @extra_ccflags, qw( -TP -D_CRT_SECURE_NO_WARNINGS );
+        push @extra_ccflags, '-Dfor="if(0);else for"';
     }
 
-    if ( defined $gcc_version ) {
-        # Tell GCC explicitly to run with maximum options.
-        if ( $extra_ccflags !~ m/-std=/ ) {
-            $extra_ccflags .= "-std=gnu99 ";
-        }
-        if ( $extra_ccflags !~ m/-D_GNU_SOURCE/ ) {
-            $extra_ccflags .= "-D_GNU_SOURCE ";
-        }
-    }
-
-    return $extra_ccflags;
+    return \@extra_ccflags;
 }
 
 sub new {

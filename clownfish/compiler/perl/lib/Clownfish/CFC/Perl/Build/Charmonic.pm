@@ -77,7 +77,7 @@ sub ACTION_charmony {
         '--enable-perl',
         '--',
         $self->config('ccflags'),
-        @{ $self->extra_compiler_flags },
+        map { _quotify($_) } @{ $self->extra_compiler_flags },
     );
     if ( $ENV{CHARM_VALGRIND} ) {
         unshift @command, "valgrind", "--leak-check=yes";
@@ -91,7 +91,7 @@ sub _quotify {
     my $string = shift;
     $string =~ s/\\/\\\\/g;
     $string =~ s/"/\\"/g;
-    return qq|"$string"|;
+    return $string =~ /\s/ ? qq|"$string"| : $string;
 }
 
 1;

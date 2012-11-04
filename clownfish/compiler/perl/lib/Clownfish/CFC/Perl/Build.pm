@@ -65,8 +65,10 @@ sub new {
     elsif ( $self->config('cc') =~ /^cl\b/ ) {
         # Compile as C++ under MSVC.
         push @$extra_ccflags, qw(
-            /TP -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+            -TP -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
         );
+        # Redefine 'for' to fix broken 'for' scoping under MSVC6.
+        push @$extra_ccflags, '-Dfor="if(0);else for"';
     }
     $self->extra_compiler_flags(@$extra_ccflags);
 

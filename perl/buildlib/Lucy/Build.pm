@@ -115,9 +115,10 @@ sub ACTION_charmonizer_tests {
         '-I' . rel2abs( getcwd() ),
     );
     $flags =~ s/"/\\"/g;
+    my $defs = $^O =~ /mswin/i ? qq|DEFS="$flags"| : "DEFS=$flags";
     $self->_run_make(
         dir  => $CHARMONIZER_ORIG_DIR,
-        args => [ "DEFS=$flags", "tests" ],
+        args => [ $defs, "tests" ],
     );
 }
 
