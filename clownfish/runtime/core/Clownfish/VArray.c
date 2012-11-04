@@ -316,7 +316,7 @@ VA_slice(VArray *self, uint32_t offset, uint32_t length) {
         offset = 0;
         length = 0;
     }
-    else if (length > UINT32_MAX - offset
+    else if (length > U32_MAX - offset
              || offset + length > self->size
             ) {
         length = self->size - offset;

@@ -259,7 +259,7 @@ test_Slice(TestBatch *batch) {
     {
         VArray *wanted = VA_new(0);
         VA_Push(wanted, (Obj*)CB_newf("9"));
-        VArray *slice = VA_Slice(array, 9, UINT32_MAX - 1);
+        VArray *slice = VA_Slice(array, 9, U32_MAX - 1);
         TEST_TRUE(batch, VA_Get_Size(slice) == 1, "guard against overflow");
         DECREF(slice);
         DECREF(wanted);
