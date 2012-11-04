@@ -57,6 +57,11 @@ chaz_ConfWriter_add_def(const char *sym, const char *value);
 void
 chaz_ConfWriter_add_typedef(const char *type, const char *alias);
 
+/* Add a globally scoped typedef.
+ */
+void
+chaz_ConfWriter_add_global_typedef(const char *type, const char *alias);
+
 /* Pound-include a system header (within angle brackets).
  */
 void
@@ -89,6 +94,8 @@ typedef void
 typedef void
 (*chaz_ConfWriter_add_typedef_t)(const char *type, const char *alias);
 typedef void
+(*chaz_ConfWriter_add_global_typedef_t)(const char *type, const char *alias);
+typedef void
 (*chaz_ConfWriter_add_sys_include_t)(const char *header);
 typedef void
 (*chaz_ConfWriter_add_local_include_t)(const char *header);
@@ -97,14 +104,15 @@ typedef void
 typedef void
 (*chaz_ConfWriter_end_module_t)(void);
 typedef struct chaz_ConfWriter {
-    chaz_ConfWriter_clean_up_t          clean_up;
-    chaz_ConfWriter_vappend_conf_t      vappend_conf;
-    chaz_ConfWriter_add_def_t           add_def;
-    chaz_ConfWriter_add_typedef_t       add_typedef;
-    chaz_ConfWriter_add_sys_include_t   add_sys_include;
-    chaz_ConfWriter_add_local_include_t add_local_include;
-    chaz_ConfWriter_start_module_t      start_module;
-    chaz_ConfWriter_end_module_t        end_module;
+    chaz_ConfWriter_clean_up_t           clean_up;
+    chaz_ConfWriter_vappend_conf_t       vappend_conf;
+    chaz_ConfWriter_add_def_t            add_def;
+    chaz_ConfWriter_add_typedef_t        add_typedef;
+    chaz_ConfWriter_add_global_typedef_t add_global_typedef;
+    chaz_ConfWriter_add_sys_include_t    add_sys_include;
+    chaz_ConfWriter_add_local_include_t  add_local_include;
+    chaz_ConfWriter_start_module_t       start_module;
+    chaz_ConfWriter_end_module_t         end_module;
 } chaz_ConfWriter;
 
 #ifdef __cplusplus

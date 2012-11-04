@@ -43,6 +43,8 @@ chaz_ConfWriterPerl_add_def(const char *sym, const char *value);
 static void
 chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias);
 static void
+chaz_ConfWriterPerl_add_global_typedef(const char *type, const char *alias);
+static void
 chaz_ConfWriterPerl_add_sys_include(const char *header);
 static void
 chaz_ConfWriterPerl_add_local_include(const char *header);
@@ -53,14 +55,15 @@ chaz_ConfWriterPerl_end_module(void);
 
 void
 chaz_ConfWriterPerl_enable(void) {
-    CWPerl_conf_writer.clean_up          = chaz_ConfWriterPerl_clean_up;
-    CWPerl_conf_writer.vappend_conf      = chaz_ConfWriterPerl_vappend_conf;
-    CWPerl_conf_writer.add_def           = chaz_ConfWriterPerl_add_def;
-    CWPerl_conf_writer.add_typedef       = chaz_ConfWriterPerl_add_typedef;
-    CWPerl_conf_writer.add_sys_include   = chaz_ConfWriterPerl_add_sys_include;
-    CWPerl_conf_writer.add_local_include = chaz_ConfWriterPerl_add_local_include;
-    CWPerl_conf_writer.start_module      = chaz_ConfWriterPerl_start_module;
-    CWPerl_conf_writer.end_module        = chaz_ConfWriterPerl_end_module;
+    CWPerl_conf_writer.clean_up           = chaz_ConfWriterPerl_clean_up;
+    CWPerl_conf_writer.vappend_conf       = chaz_ConfWriterPerl_vappend_conf;
+    CWPerl_conf_writer.add_def            = chaz_ConfWriterPerl_add_def;
+    CWPerl_conf_writer.add_typedef        = chaz_ConfWriterPerl_add_typedef;
+    CWPerl_conf_writer.add_global_typedef = chaz_ConfWriterPerl_add_global_typedef;
+    CWPerl_conf_writer.add_sys_include    = chaz_ConfWriterPerl_add_sys_include;
+    CWPerl_conf_writer.add_local_include  = chaz_ConfWriterPerl_add_local_include;
+    CWPerl_conf_writer.start_module       = chaz_ConfWriterPerl_start_module;
+    CWPerl_conf_writer.end_module         = chaz_ConfWriterPerl_end_module;
     chaz_ConfWriterPerl_open_config_pm();
     chaz_ConfWriter_add_writer(&CWPerl_conf_writer);
     return;
@@ -181,6 +184,12 @@ chaz_ConfWriterPerl_add_def(const char *sym, const char *value) {
 
 static void
 chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias) {
+    (void)type;
+    (void)alias;
+}
+
+static void
+chaz_ConfWriterPerl_add_global_typedef(const char *type, const char *alias) {
     (void)type;
     (void)alias;
 }

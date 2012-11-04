@@ -43,6 +43,8 @@ chaz_ConfWriterRuby_add_def(const char *sym, const char *value);
 static void
 chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias);
 static void
+chaz_ConfWriterRuby_add_global_typedef(const char *type, const char *alias);
+static void
 chaz_ConfWriterRuby_add_sys_include(const char *header);
 static void
 chaz_ConfWriterRuby_add_local_include(const char *header);
@@ -53,14 +55,15 @@ chaz_ConfWriterRuby_end_module(void);
 
 void
 chaz_ConfWriterRuby_enable(void) {
-    CWRuby_conf_writer.clean_up          = chaz_ConfWriterRuby_clean_up;
-    CWRuby_conf_writer.vappend_conf      = chaz_ConfWriterRuby_vappend_conf;
-    CWRuby_conf_writer.add_def           = chaz_ConfWriterRuby_add_def;
-    CWRuby_conf_writer.add_typedef       = chaz_ConfWriterRuby_add_typedef;
-    CWRuby_conf_writer.add_sys_include   = chaz_ConfWriterRuby_add_sys_include;
-    CWRuby_conf_writer.add_local_include = chaz_ConfWriterRuby_add_local_include;
-    CWRuby_conf_writer.start_module      = chaz_ConfWriterRuby_start_module;
-    CWRuby_conf_writer.end_module        = chaz_ConfWriterRuby_end_module;
+    CWRuby_conf_writer.clean_up           = chaz_ConfWriterRuby_clean_up;
+    CWRuby_conf_writer.vappend_conf       = chaz_ConfWriterRuby_vappend_conf;
+    CWRuby_conf_writer.add_def            = chaz_ConfWriterRuby_add_def;
+    CWRuby_conf_writer.add_typedef        = chaz_ConfWriterRuby_add_typedef;
+    CWRuby_conf_writer.add_global_typedef = chaz_ConfWriterRuby_add_global_typedef;
+    CWRuby_conf_writer.add_sys_include    = chaz_ConfWriterRuby_add_sys_include;
+    CWRuby_conf_writer.add_local_include  = chaz_ConfWriterRuby_add_local_include;
+    CWRuby_conf_writer.start_module       = chaz_ConfWriterRuby_start_module;
+    CWRuby_conf_writer.end_module         = chaz_ConfWriterRuby_end_module;
     chaz_ConfWriterRuby_open_config_rb();
     chaz_ConfWriter_add_writer(&CWRuby_conf_writer);
     return;
@@ -179,6 +182,12 @@ chaz_ConfWriterRuby_add_def(const char *sym, const char *value) {
 
 static void
 chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias) {
+    (void)type;
+    (void)alias;
+}
+
+static void
+chaz_ConfWriterRuby_add_global_typedef(const char *type, const char *alias) {
     (void)type;
     (void)alias;
 }

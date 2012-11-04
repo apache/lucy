@@ -29,6 +29,7 @@
 typedef enum chaz_ConfElemType {
     CHAZ_CONFELEM_DEF,
     CHAZ_CONFELEM_TYPEDEF,
+    CHAZ_CONFELEM_GLOBAL_TYPEDEF,
     CHAZ_CONFELEM_SYS_INCLUDE,
     CHAZ_CONFELEM_LOCAL_INCLUDE
 } chaz_ConfElemType;
@@ -72,6 +73,8 @@ chaz_ConfWriterC_add_def(const char *sym, const char *value);
 static void
 chaz_ConfWriterC_add_typedef(const char *type, const char *alias);
 static void
+chaz_ConfWriterC_add_global_typedef(const char *type, const char *alias);
+static void
 chaz_ConfWriterC_add_sys_include(const char *header);
 static void
 chaz_ConfWriterC_add_local_include(const char *header);
@@ -82,14 +85,15 @@ chaz_ConfWriterC_end_module(void);
 
 void
 chaz_ConfWriterC_enable(void) {
-    CWC_conf_writer.clean_up          = chaz_ConfWriterC_clean_up;
-    CWC_conf_writer.vappend_conf      = chaz_ConfWriterC_vappend_conf;
-    CWC_conf_writer.add_def           = chaz_ConfWriterC_add_def;
-    CWC_conf_writer.add_typedef       = chaz_ConfWriterC_add_typedef;
-    CWC_conf_writer.add_sys_include   = chaz_ConfWriterC_add_sys_include;
-    CWC_conf_writer.add_local_include = chaz_ConfWriterC_add_local_include;
-    CWC_conf_writer.start_module      = chaz_ConfWriterC_start_module;
-    CWC_conf_writer.end_module        = chaz_ConfWriterC_end_module;
+    CWC_conf_writer.clean_up           = chaz_ConfWriterC_clean_up;
+    CWC_conf_writer.vappend_conf       = chaz_ConfWriterC_vappend_conf;
+    CWC_conf_writer.add_def            = chaz_ConfWriterC_add_def;
+    CWC_conf_writer.add_typedef        = chaz_ConfWriterC_add_typedef;
+    CWC_conf_writer.add_global_typedef = chaz_ConfWriterC_add_global_typedef;
+    CWC_conf_writer.add_sys_include    = chaz_ConfWriterC_add_sys_include;
+    CWC_conf_writer.add_local_include  = chaz_ConfWriterC_add_local_include;
+    CWC_conf_writer.start_module       = chaz_ConfWriterC_start_module;
+    CWC_conf_writer.end_module         = chaz_ConfWriterC_end_module;
     chaz_ConfWriterC_open_charmony_h(NULL);
     chaz_ConfWriter_add_writer(&CWC_conf_writer);
     return;
@@ -188,6 +192,18 @@ chaz_ConfWriterC_append_typedef_to_conf(const char *type, const char *alias) {
 }
 
 static void
+chaz_ConfWriterC_add_global_typedef(const char *type, const char *alias) {
+    chaz_ConfWriterC_push_def_list_item(alias, type,
+            CHAZ_CONFELEM_GLOBAL_TYPEDEF);
+}
+
+static void
+chaz_ConfWriterC_append_global_typedef_to_conf(const char *type,
+        const char *alias) {
+    fprintf(chaz_ConfWriterC.fh, "typedef %s %s;\n", type, alias);
+}
+
+static void
 chaz_ConfWriterC_add_sys_include(const char *header) {
     chaz_ConfWriterC_push_def_list_item(header, NULL,
                                         CHAZ_CONFELEM_SYS_INCLUDE);
@@ -228,6 +244,10 @@ chaz_ConfWriterC_end_module(void) {
                 chaz_ConfWriterC_append_typedef_to_conf(defs[i].str2,
                                                         defs[i].str1);
                 break;
+            case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
+                chaz_ConfWriterC_append_global_typedef_to_conf(defs[i].str2,
+                                                               defs[i].str1);
+                break;
             case CHAZ_CONFELEM_SYS_INCLUDE:
                 chaz_ConfWriterC_append_sys_include_to_conf(defs[i].str1);
                 break;
@@ -261,6 +281,7 @@ chaz_ConfWriterC_end_module(void) {
                     }
                 }
                 break;
+            case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
             case CHAZ_CONFELEM_SYS_INCLUDE:
             case CHAZ_CONFELEM_LOCAL_INCLUDE:
                 /* no-op */

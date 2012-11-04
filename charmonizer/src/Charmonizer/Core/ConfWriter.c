@@ -68,6 +68,14 @@ chaz_ConfWriter_add_typedef(const char *type, const char *alias) {
 }
 
 void
+chaz_ConfWriter_add_global_typedef(const char *type, const char *alias) {
+    size_t i;
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->add_global_typedef(type, alias);
+    }
+}
+
+void
 chaz_ConfWriter_add_sys_include(const char *header) {
     size_t i;
     for (i = 0; i < chaz_CW.num_writers; i++) {
