@@ -37,6 +37,17 @@ def _run_make(command=[], directory=None):
     if (directory != None):
         os.chdir(current_directory)
 
+class lemon(_Command):
+    description = "Compile the Lemon parser generator"
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        if not os.path.exists(LEMON_EXE_PATH):
+            _run_make(['CC=' + python_compiler], directory=LEMON_DIR)
+
 class my_clean(_clean):
     def run(self):
         _clean.run(self)
@@ -44,11 +55,8 @@ class my_clean(_clean):
 
 class my_build(_build):
     def run(self):
-        self.lemon()
+        self.run_command('lemon')
         _build.run(self)
-    def lemon(self):
-        if not os.path.exists(LEMON_EXE_PATH):
-            _run_make(['CC=' + python_compiler], directory=LEMON_DIR)
 
 c_filepaths = []
 for (dirpath, dirnames, files) in os.walk(CFC_SOURCE_DIR):
@@ -67,6 +75,10 @@ setup(name = 'clownfish-cfc',
       author = 'Apache Lucy Project',
       author_email = 'dev at lucy dot apache dot org',
       url = 'http://lucy.apache.org',
-      cmdclass = {'build': my_build, 'clean': my_clean},
+      cmdclass = {
+          'build': my_build,
+          'clean': my_clean,
+          'lemon': lemon,
+      },
       ext_modules = [cfc_extension])
 
