@@ -2,16 +2,24 @@ from distutils.core import setup, Extension
 from distutils.command.build import build as _build
 from distutils.command.clean import clean as _clean
 from distutils.cmd import Command as _Command
+from distutils.dep_util import newer_group
 import distutils.ccompiler
 import os
-import subprocess
+import glob
 import platform
+import shutil
+import subprocess
 import sysconfig
 
+BASE_DIR = os.path.abspath(os.path.join(os.pardir, os.pardir, os.pardir))
 PARENT_DIR      = os.path.abspath(os.pardir)
 CFC_SOURCE_DIR  = os.path.join(PARENT_DIR, 'src')
 CFC_INCLUDE_DIR = os.path.join(PARENT_DIR, 'include')
-BASE_DIR = os.path.abspath(os.path.join(os.pardir, os.pardir, os.pardir))
+COMMON_SOURCE_DIR    = os.path.join(PARENT_DIR, 'common')
+CHARMONIZER_C        = os.path.join(COMMON_SOURCE_DIR, 'charmonizer.c')
+CHARMONIZER_EXE_NAME = 'charmonizer' + sysconfig.get_config_var("EXE")
+CHARMONIZER_EXE_PATH = os.path.join(os.curdir, CHARMONIZER_EXE_NAME)
+CHARMONY_H_PATH      = 'charmony.h'
 LEMON_DIR = os.path.join(BASE_DIR, 'lemon')
 LEMON_EXE_NAME = 'lemon' + sysconfig.get_config_var("EXE")
 LEMON_EXE_PATH = os.path.join(LEMON_DIR, LEMON_EXE_NAME)
@@ -20,7 +28,13 @@ LEMON_EXE_PATH = os.path.join(LEMON_DIR, LEMON_EXE_NAME)
 # of distutils, so for now we'll kludge it and assume it's the same as the
 # compiler used to build python.
 python_compiler = sysconfig.get_config_var('CC')
+cflags = sysconfig.get_config_var('CFLAGS')
 compiler_type   = distutils.ccompiler.get_default_compiler()
+
+def _quotify(text):
+    text = text.replace('\\', '\\\\')
+    text = text.replace('"', '\\"')
+    return '"' + text + '"'
 
 def _run_make(command=[], directory=None):
     current_directory = os.getcwd();
@@ -37,6 +51,39 @@ def _run_make(command=[], directory=None):
     if (directory != None):
         os.chdir(current_directory)
 
+class charmony(_Command):
+    description = "Build and run charmonizer"
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        # Compile charmonizer.
+        if newer_group([CHARMONIZER_C], CHARMONIZER_EXE_PATH):
+            command = [python_compiler]
+            if compiler_type == 'msvc':
+                command.append('/Fe' + CHARMONIZER_EXE_PATH)
+            else:
+                command.extend(['-o', CHARMONIZER_EXE_PATH])
+            command.append(CHARMONIZER_C)
+            print(" ".join(command))
+            subprocess.check_call(command)
+
+        # Run charmonizer.
+        if newer_group([CHARMONIZER_EXE_PATH], CHARMONY_H_PATH):
+            command = [
+                CHARMONIZER_EXE_PATH,
+                '--cc=' + _quotify(python_compiler),
+                '--enable-c',
+                '--',
+                cflags
+            ]
+            if 'CHARM_VALGRIND' in os.environ:
+                command[0:0] = "valgrind", "--leak-check=yes";
+            print(" ".join(command))
+            subprocess.check_call(command)
+
 class lemon(_Command):
     description = "Compile the Lemon parser generator"
     user_options = []
@@ -49,12 +96,25 @@ class lemon(_Command):
             _run_make(['CC=' + python_compiler], directory=LEMON_DIR)
 
 class my_clean(_clean):
+    paths_to_clean = [
+        CHARMONIZER_EXE_PATH,
+        CHARMONY_H_PATH,
+        '_charm*',
+    ]
     def run(self):
         _clean.run(self)
         _run_make(command=['clean'], directory=LEMON_DIR)
+        for elem in self.paths_to_clean:
+            for path in glob.glob(elem):
+                print("removing " + path)
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+                else:
+                    os.unlink(path)
 
 class my_build(_build):
     def run(self):
+        self.run_command('charmony')
         self.run_command('lemon')
         _build.run(self)
 
@@ -66,7 +126,11 @@ for (dirpath, dirnames, files) in os.walk(CFC_SOURCE_DIR):
 
 cfc_extension = Extension('clownfish.cfc',
                           define_macros = [('CFCPYTHON', None)],
-                          include_dirs = [CFC_INCLUDE_DIR, CFC_SOURCE_DIR],
+                          include_dirs = [
+                              CFC_INCLUDE_DIR,
+                              CFC_SOURCE_DIR,
+                              os.curdir,
+                          ],
                           sources = c_filepaths)
 
 setup(name = 'clownfish-cfc',
@@ -79,6 +143,7 @@ setup(name = 'clownfish-cfc',
           'build': my_build,
           'clean': my_clean,
           'lemon': lemon,
+          'charmony': charmony,
       },
       ext_modules = [cfc_extension])
 
