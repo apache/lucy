@@ -42,7 +42,8 @@ test_oversize__growth_rate(TestBatch *batch) {
         }
         if (size > 0) {
             growth_count += 1;
-            double growth_rate = (double)next_size / (double)size;
+            double growth_rate = U64_TO_DOUBLE(next_size) /
+                                 U64_TO_DOUBLE(size);
             double sum = growth_rate + (growth_count - 1) * average_growth_rate;
             average_growth_rate = sum / growth_count;
             if (average_growth_rate < 1.1) {
@@ -63,7 +64,7 @@ test_oversize__growth_rate(TestBatch *batch) {
 
     for (int minimum = 1; minimum < 8; minimum++) {
         uint64_t next_size = Memory_oversize(minimum, sizeof(void*));
-        double growth_rate = (double)next_size / (double)minimum;
+        double growth_rate = U64_TO_DOUBLE(next_size) / (double)minimum;
         TEST_TRUE(batch, growth_rate > 1.2,
                   "Growth rate is higher for smaller arrays (%d, %.3f)", minimum,
                   growth_rate);
