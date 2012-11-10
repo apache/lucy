@@ -3472,6 +3472,18 @@ static const char chaz_Integers_literal64_code[] =
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
+static const char chaz_Integers_u64_to_double_code[] =
+    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  int main()                                )
+    CHAZ_QUOTE(  {                                         )
+    CHAZ_QUOTE(      unsigned __int64 int_num = 0;         )
+    CHAZ_QUOTE(      double float_num;                     )
+    CHAZ_QUOTE(      Charm_Setup;                          )
+    CHAZ_QUOTE(      float_num = (double)int_num;          )
+    CHAZ_QUOTE(      printf("%%f\n", float_num);           )
+    CHAZ_QUOTE(      return 0;                             )
+    CHAZ_QUOTE(  }                                         );
+
 void
 chaz_Integers_run(void) {
     char *output;
@@ -3491,6 +3503,7 @@ chaz_Integers_run(void) {
     int has___int64       = false;
     int has_inttypes      = chaz_HeadCheck_check_header("inttypes.h");
     int has_stdint        = chaz_HeadCheck_check_header("stdint.h");
+    int can_convert_u64_to_double = true;
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -3612,6 +3625,13 @@ chaz_Integers_run(void) {
         }
     }
 
+    /* Determine whether conversion of unsigned __int64 to double works */
+    if (has___int64) {
+        if (!chaz_CC_test_compile(chaz_Integers_u64_to_double_code)) {
+            can_convert_u64_to_double = false;
+        }
+    }
+
     /* Write out some conditional defines. */
     if (has_inttypes) {
         chaz_ConfWriter_add_def("HAS_INTTYPES_H", NULL);
@@ -3663,22 +3683,22 @@ chaz_Integers_run(void) {
          *   uint64_t
          */
         if (has_8) {
-            chaz_ConfWriter_add_typedef("signed char", "int8_t");
-            chaz_ConfWriter_add_typedef("unsigned char", "uint8_t");
+            chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
+            chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
         }
         if (has_16) {
-            chaz_ConfWriter_add_typedef("signed short", "int16_t");
-            chaz_ConfWriter_add_typedef("unsigned short", "uint16_t");
+            chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
+            chaz_ConfWriter_add_global_typedef("unsigned short", "uint16_t");
         }
         if (has_32) {
-            chaz_ConfWriter_add_typedef(i32_t_type, "int32_t");
+            chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
             sprintf(scratch, "unsigned %s", i32_t_type);
-            chaz_ConfWriter_add_typedef(scratch, "uint32_t");
+            chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
         }
         if (has_64) {
-            chaz_ConfWriter_add_typedef(i64_t_type, "int64_t");
+            chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
             sprintf(scratch, "unsigned %s", i64_t_type);
-            chaz_ConfWriter_add_typedef(scratch, "uint64_t");
+            chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
         }
     }
     if (has_8) {
@@ -3797,6 +3817,20 @@ chaz_Integers_run(void) {
             chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
                                     "((chy_i64_t)(chy_u32_t)(ptr))");
         }
+    }
+
+    /* Create macro for converting uint64_t to double. */
+    if (can_convert_u64_to_double) {
+        chaz_ConfWriter_add_def("U64_TO_DOUBLE(num)",
+                                "((double)(num))");
+    }
+    else {
+        chaz_ConfWriter_add_def(
+            "U64_TO_DOUBLE(num)",
+            "((num) & CHY_U64_C(0x8000000000000000) ? "
+            "(double)(int64_t)((num) & CHY_U64_C(0x7FFFFFFFFFFFFFFF)) + "
+            "9223372036854775808.0 : "
+            "(double)(int64_t)(num))");
     }
 
     /* True and false. */
