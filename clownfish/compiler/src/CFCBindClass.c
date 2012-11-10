@@ -281,14 +281,7 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
 
     char *offsets  = CFCUtil_strdup("");
     char *cb_funcs = CFCUtil_strdup("");
-
-    /* Start an array of cfish_MethodSpec structs.  Since C89 doesn't allow us
-     * to initialize a pointer to an anonymous array inside a global struct,
-     * we have to give it a real symbol and then store a pointer to that
-     * symbol inside the VTableSpec struct. */
-    char *ms_var = CFCUtil_strdup("");
-    ms_var = CFCUtil_cat(ms_var, "static cfish_MethodSpec ",
-                         self->method_specs_var, "[] = {\n", NULL);
+    char *ms_var   = CFCUtil_strdup("");
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
@@ -309,35 +302,44 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         FREEMEM(full_offset_sym);
     }
 
-    for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
-        CFCMethod *method = fresh_methods[meth_num];
+    if (fresh_methods[0] != NULL) {
+        /* Start an array of cfish_MethodSpec structs.  Since C89 doesn't allow 
+         * us to initialize a pointer to an anonymous array inside a global
+         * struct, we have to give it a real symbol and then store a pointer to
+         * that symbol inside the VTableSpec struct. */
+        ms_var = CFCUtil_cat(ms_var, "static cfish_MethodSpec ",
+                             self->method_specs_var, "[] = {\n", NULL);
 
-        // Create a default implementation for abstract methods.
-        if (CFCMethod_abstract(method)) {
-            char *method_def = CFCBindMeth_abstract_method_def(method);
-            cb_funcs = CFCUtil_cat(cb_funcs, method_def, "\n", NULL);
-            FREEMEM(method_def);
+        for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
+            CFCMethod *method = fresh_methods[meth_num];
+
+            // Create a default implementation for abstract methods.
+            if (CFCMethod_abstract(method)) {
+                char *method_def = CFCBindMeth_abstract_method_def(method);
+                cb_funcs = CFCUtil_cat(cb_funcs, method_def, "\n", NULL);
+                FREEMEM(method_def);
+            }
+
+            // Define callback.
+            if ((CFCMethod_public(method) || CFCMethod_abstract(method))
+                && CFCMethod_novel(method)) {
+                char *cb_def = CFCBindMeth_callback_def(method);
+                cb_funcs = CFCUtil_cat(cb_funcs, cb_def, "\n", NULL);
+                FREEMEM(cb_def);
+            }
+
+            // Define MethodSpec struct.
+            if (meth_num != 0) {
+                ms_var = CFCUtil_cat(ms_var, ",\n", NULL);
+            }
+            char *ms_def = CFCBindMeth_spec_def(method);
+            ms_var = CFCUtil_cat(ms_var, ms_def, NULL);
+            FREEMEM(ms_def);
         }
 
-        // Define callback.
-        if ((CFCMethod_public(method) || CFCMethod_abstract(method))
-            && CFCMethod_novel(method)) {
-            char *cb_def = CFCBindMeth_callback_def(method);
-            cb_funcs = CFCUtil_cat(cb_funcs, cb_def, "\n", NULL);
-            FREEMEM(cb_def);
-        }
-
-        // Define MethodSpec struct.
-        if (meth_num != 0) {
-            ms_var = CFCUtil_cat(ms_var, ",\n", NULL);
-        }
-        char *ms_def = CFCBindMeth_spec_def(method);
-        ms_var = CFCUtil_cat(ms_var, ms_def, NULL);
-        FREEMEM(ms_def);
+        // Close MethodSpec array definition.
+        ms_var =  CFCUtil_cat(ms_var, "\n};\n", NULL);
     }
-
-    // Close MethodSpec array definition.
-    ms_var =  CFCUtil_cat(ms_var, "\n};\n", NULL);
 
     const char pattern[] =
         "#include \"%s\"\n"
@@ -446,6 +448,7 @@ CFCBindClass_spec_def(CFCBindClass *self) {
         if (CFCMethod_novel(method)) { ++num_novel; }
     }
     FREEMEM(fresh_methods);
+    const char *ms_var = num_fresh ? self->method_specs_var : "NULL";
 
     char pattern[] =
         "    {\n"
@@ -465,11 +468,11 @@ CFCBindClass_spec_def(CFCBindClass *self) {
                   + strlen(struct_sym)
                   + 10 // for num_fresh
                   + 10 // for num_novel
-                  + strlen(self->method_specs_var)
+                  + strlen(ms_var)
                   + 100;
     char *code = (char*)MALLOCATE(size);
     sprintf(code, pattern, vt_var, parent_ref, class_name, struct_sym,
-            num_fresh, num_novel, self->method_specs_var);
+            num_fresh, num_novel, ms_var);
 
     FREEMEM(parent_ref);
     return code;
