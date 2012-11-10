@@ -535,8 +535,7 @@ CFCPerl_write_callbacks(CFCPerl *self) {
             CFCMethod *method = fresh_methods[meth_num];
 
             // Define callback.
-            if ((CFCMethod_public(method) || CFCMethod_abstract(method))
-                && CFCMethod_novel(method)) {
+            if (CFCMethod_novel(method) && !CFCMethod_final(method)) {
                 char *cb_def = CFCBindMeth_callback_def(method);
                 content = CFCUtil_cat(content, cb_def, "\n", NULL);
                 FREEMEM(cb_def);

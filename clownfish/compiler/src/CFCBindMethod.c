@@ -233,7 +233,7 @@ CFCBindMeth_spec_def(CFCMethod *method) {
     int         is_novel    = CFCMethod_novel(method);
 
     const char *full_override_sym = "NULL";
-    if ((CFCMethod_public(method) || CFCMethod_abstract(method)) && is_novel) {
+    if (is_novel && !CFCMethod_final(method)) {
         full_override_sym = CFCMethod_full_override_sym(method);
     }
 
@@ -375,8 +375,14 @@ CFCBindMeth_callback_def(CFCMethod *method) {
     else if (CFCType_is_object(return_type)) {
         callback_def = S_obj_callback_def(method, params, refcount_mods);
     }
-    else {
+    else if (CFCType_is_integer(return_type)
+             || CFCType_is_floating(return_type)
+        ) {
         callback_def = S_primitive_callback_def(method, params, refcount_mods);
+    }
+    else {
+        // Can't map return type.
+        callback_def = S_invalid_callback_def(method);
     }
 
     FREEMEM(params);
