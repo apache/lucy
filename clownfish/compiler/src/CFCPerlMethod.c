@@ -76,6 +76,12 @@ S_maybe_unreachable(CFCType *return_type);
 static char*
 S_callback_params(CFCMethod *method);
 
+/* Generate code which converts C types to Perl types and pushes arguments
+ * onto the Perl stack.
+ */
+static char*
+S_callback_start(CFCMethod *method);
+
 /* Adapt the refcounts of parameters and return types, since Host_callback_xxx
  * has no impact on refcounts aside from Host_callback_obj returning an
  * incremented Obj.
@@ -491,6 +497,86 @@ S_maybe_unreachable(CFCType *return_type) {
 }
 
 static char*
+S_callback_start(CFCMethod *method) {
+    CFCParamList *param_list = CFCMethod_get_param_list(method);
+    static const char pattern[] =
+        "    dSP;\n"
+        "    EXTEND(SP, %d);\n"
+        "    ENTER;\n"
+        "    SAVETMPS;\n"
+        "    PUSHMARK(SP);\n"
+        "    mPUSHs((SV*)Cfish_Obj_To_Host((cfish_Obj*)self));\n";
+    int num_args = CFCParamList_num_vars(param_list) - 1;
+    int num_to_extend = num_args == 0 ? 1
+                      : num_args == 1 ? 2
+                      : 1 + (num_args * 2);
+    char *params = (char*)MALLOCATE(sizeof(pattern) + 20);
+    sprintf(params, pattern, num_to_extend);
+
+    // Iterate over arguments, mapping them to Perl scalars.
+    CFCVariable **arg_vars = CFCParamList_get_variables(param_list);
+    for (int i = 1; arg_vars[i] != NULL; i++) {
+        CFCVariable *var      = arg_vars[i];
+        const char  *name     = CFCVariable_micro_sym(var);
+        CFCType     *type     = CFCVariable_get_type(var);
+        const char  *c_type   = CFCType_to_c(type);
+
+        // Add labels when there are two or more parameters.
+        if (num_args > 1) {
+            char num_buf[20];
+            sprintf(num_buf, "%d", (int)strlen(name));
+            params = CFCUtil_cat(params, "   mPUSHp(\"", name, "\", ",
+                                 num_buf, ");\n", NULL);
+        }
+
+        if (CFCType_is_string_type(type)) {
+            // Convert Clownfish string type to UTF-8 Perl string scalars.
+            params = CFCUtil_cat(params, "    mPUSHs(XSBind_cb_to_sv(",
+                                 "(cfish_CharBuf*)", name, "));\n", NULL);
+        }
+        else if (CFCType_is_object(type)) {
+            // Wrap other Clownfish object types in Perl objects.
+            params = CFCUtil_cat(params, "    mPUSHs(XSBind_cfish_to_perl(",
+                                 "(cfish_Obj*)", name, "));\n", NULL);
+        }
+        else if (CFCType_is_integer(type)) {
+            // Convert primitive integer types to IV Perl scalars.
+            int width = CFCType_get_width(type);
+            if (width != 0 && width <= 4) {
+                params = CFCUtil_cat(params, "   mPUSHi(",
+                                     name, ");\n", NULL);
+            }
+            else {
+                // If the Perl IV integer type is not wide enough, use
+                // doubles.  This may be lossy if the value is above 2**52,
+                // but practically speaking, it's important to handle numbers
+                // between 2**32 and 2**52 cleanly.
+                params = CFCUtil_cat(params,
+                                     "    if (sizeof(IV) >= sizeof(", c_type,
+                                     ")) { mPUSHi(", name, "); }\n",
+                                     "    else { mPUSHn((double)", name,
+                                     "); } // lossy \n", NULL);
+            }
+        }
+        else if (CFCType_is_floating(type)) {
+            // Convert primitive floating point types to NV Perl scalars.
+            params = CFCUtil_cat(params, "   mPUSHn(",
+                                 name, ");\n", NULL);
+        }
+        else {
+            // Can't map variable type.  Signal to caller.
+            FREEMEM(params);
+            return NULL;
+        }
+    }
+
+    // Restore the Perl stack pointer.
+    params = CFCUtil_cat(params, "    PUTBACK;\n", NULL);
+
+    return params;
+}
+
+static char*
 S_callback_params(CFCMethod *method) {
     const char *micro_sym = CFCSymbol_micro_sym((CFCSymbol*)method);
     CFCParamList *param_list = CFCMethod_get_param_list(method);
@@ -638,20 +724,34 @@ S_void_callback_def(CFCMethod *method, const char *callback_params,
                     const char *refcount_mods) {
     const char *override_sym = CFCMethod_full_override_sym(method);
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
+    const char *micro_sym = CFCMethod_micro_sym(method);
+    char       *start = S_callback_start(method);
     const char pattern[] =
         "void\n"
         "%s(%s) {\n"
-        "    cfish_Host_callback(%s);%s\n"
+        "%s"
+        "    int _count = call_method(\"%s\", G_VOID | G_DISCARD);\n"
+        "    if (_count != 0) {\n"
+        "        CFISH_THROW(CFISH_ERR, \"callback '%%s' returned too many values: %%i32\",\n"
+        "                    \"%s\", (int32_t)_count);\n"
+        "    }\n"
+        "    FREETMPS;\n"
+        "    LEAVE;%s\n"
         "}\n";
+
     size_t size = sizeof(pattern)
                   + strlen(override_sym)
                   + strlen(params)
-                  + strlen(callback_params)
+                  + strlen(start)
+                  + strlen(micro_sym)
+                  + strlen(micro_sym)
                   + strlen(refcount_mods)
-                  + 200;
+                  + 20;
     char *callback_def = (char*)MALLOCATE(size);
-    sprintf(callback_def, pattern, override_sym, params, callback_params,
-            refcount_mods);
+    sprintf(callback_def, pattern, override_sym, params, start, micro_sym,
+            micro_sym, refcount_mods);
+
+    FREEMEM(start);
     return callback_def;
 }
 
