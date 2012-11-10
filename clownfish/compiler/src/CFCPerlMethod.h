@@ -54,6 +54,13 @@ CFCPerlMethod_destroy(CFCPerlMethod *self);
 char*
 CFCPerlMethod_xsub_def(CFCPerlMethod *self);
 
+/** Return C code implementing a callback to Perl for this method.  This code
+ * is run when a Perl subclass has overridden a method in a Clownfish base
+ * class.
+ */
+char*
+CFCPerlMethod_callback_def(struct CFCMethod *method);
+
 #ifdef __cplusplus
 }
 #endif

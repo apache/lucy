@@ -62,13 +62,6 @@ CFCBindMeth_abstract_method_def(struct CFCMethod *method);
 char*
 CFCBindMeth_callback_dec(struct CFCMethod *method);
 
-/** Return C code implementing a callback to the Host for this method.  This
- * code is used when a Host method has overridden a method in a Clownfish
- * class.
- */
-char*
-CFCBindMeth_callback_def(struct CFCMethod *method);
-
 #ifdef __cplusplus
 }
 #endif

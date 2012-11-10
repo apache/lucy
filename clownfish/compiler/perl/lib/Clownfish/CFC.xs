@@ -1818,14 +1818,6 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-callback_def(unused, meth)
-    SV *unused;
-    CFCMethod *meth;
-CODE:
-    RETVAL = S_sv_eat_c_string(CFCBindMeth_callback_def(meth));
-OUTPUT: RETVAL
-
-SV*
 _method_def(meth, klass)
     CFCMethod *meth;
     CFCClass  *klass;
