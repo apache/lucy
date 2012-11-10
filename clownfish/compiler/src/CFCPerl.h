@@ -98,6 +98,11 @@ CFCPerl_write_boot(CFCPerl *self);
 void
 CFCPerl_write_bindings(CFCPerl *self);
 
+/** Generate routines which call back from C into Perl for all methods.
+ */
+void
+CFCPerl_write_callbacks(CFCPerl *self);
+
 /** Generate the "typemap" file needed by the XS compiler.
  */
 void

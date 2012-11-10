@@ -320,12 +320,12 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                 FREEMEM(method_def);
             }
 
-            // Define callback.
+            // Declare (but don't define) callback.
             if ((CFCMethod_public(method) || CFCMethod_abstract(method))
                 && CFCMethod_novel(method)) {
-                char *cb_def = CFCBindMeth_callback_def(method);
-                cb_funcs = CFCUtil_cat(cb_funcs, cb_def, "\n", NULL);
-                FREEMEM(cb_def);
+                char *cb_dec = CFCBindMeth_callback_dec(method);
+                cb_funcs = CFCUtil_cat(cb_funcs, cb_dec, "\n", NULL);
+                FREEMEM(cb_dec);
             }
 
             // Define MethodSpec struct.

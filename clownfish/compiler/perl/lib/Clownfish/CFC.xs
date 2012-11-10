@@ -1928,6 +1928,12 @@ PPCODE:
     CFCPerl_write_bindings(self);
 
 void
+write_callbacks(self)
+    CFCPerl *self;
+PPCODE:
+    CFCPerl_write_callbacks(self);
+
+void
 write_xs_typemap(self)
     CFCPerl *self;
 PPCODE:

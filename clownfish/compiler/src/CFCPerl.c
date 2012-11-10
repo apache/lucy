@@ -22,8 +22,10 @@
 #include "CFCPerl.h"
 #include "CFCParcel.h"
 #include "CFCClass.h"
+#include "CFCMethod.h"
 #include "CFCHierarchy.h"
 #include "CFCUtil.h"
+#include "CFCBindMethod.h"
 #include "CFCPerlClass.h"
 #include "CFCPerlSub.h"
 #include "CFCPerlConstructor.h"
@@ -493,6 +495,64 @@ CFCPerl_write_bindings(CFCPerl *self) {
     FREEMEM(hand_rolled_xs);
     FREEMEM(xs_init);
     FREEMEM(generated_xs);
+    FREEMEM(ordered);
+}
+
+void
+CFCPerl_write_callbacks(CFCPerl *self) {
+    CFCClass **ordered = CFCHierarchy_ordered_classes(self->hierarchy);
+    static const char start[] = 
+    "/* DO NOT EDIT!!!! This is an auto-generated file. */\n"
+    "\n"
+    "/* Licensed to the Apache Software Foundation (ASF) under one or more\n"
+    " * contributor license agreements.  See the NOTICE file distributed with\n"
+    " * this work for additional information regarding copyright ownership.\n"
+    " * The ASF licenses this file to You under the Apache License, Version 2.0\n"
+    " * (the \"License\"); you may not use this file except in compliance with\n"
+    " * the License.  You may obtain a copy of the License at\n"
+    " *\n"
+    " *     http://www.apache.org/licenses/LICENSE-2.0\n"
+    " *\n"
+    " * Unless required by applicable law or agreed to in writing, software\n"
+    " * distributed under the License is distributed on an \"AS IS\" BASIS,\n"
+    " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
+    " * See the License for the specific language governing permissions and\n"
+    " * limitations under the License.\n"
+    " */\n"
+    "\n"
+    "#include \"XSBind.h\"\n"
+    "#include \"parcel.h\"\n"
+    "#include \"Clownfish/Host.h\"\n"
+    "\n";
+    char *content = CFCUtil_strdup(start);
+
+    for (size_t i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        if (CFCClass_inert(klass)) { continue; }
+
+        CFCMethod **fresh_methods = CFCClass_fresh_methods(klass);
+        for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
+            CFCMethod *method = fresh_methods[meth_num];
+
+            // Define callback.
+            if ((CFCMethod_public(method) || CFCMethod_abstract(method))
+                && CFCMethod_novel(method)) {
+                char *cb_def = CFCBindMeth_callback_def(method);
+                content = CFCUtil_cat(content, cb_def, "\n", NULL);
+                FREEMEM(cb_def);
+            }
+        }
+        FREEMEM(fresh_methods);
+    }
+
+    // Write if changed.
+    const char *src_dest = CFCHierarchy_get_source_dest(self->hierarchy);
+    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), src_dest,
+                                 CFCUTIL_PATH_SEP, "callbacks.c", NULL);
+    CFCUtil_write_if_changed(filepath, content, strlen(content));
+
+    FREEMEM(filepath);
+    FREEMEM(content);
     FREEMEM(ordered);
 }
 
