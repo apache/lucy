@@ -60,6 +60,18 @@ static const char chaz_Integers_literal64_code[] =
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
+static const char chaz_Integers_u64_to_double_code[] =
+    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  int main()                                )
+    CHAZ_QUOTE(  {                                         )
+    CHAZ_QUOTE(      unsigned __int64 int_num = 0;         )
+    CHAZ_QUOTE(      double float_num;                     )
+    CHAZ_QUOTE(      Charm_Setup;                          )
+    CHAZ_QUOTE(      float_num = (double)int_num;          )
+    CHAZ_QUOTE(      printf("%%f\n", float_num);           )
+    CHAZ_QUOTE(      return 0;                             )
+    CHAZ_QUOTE(  }                                         );
+
 void
 chaz_Integers_run(void) {
     char *output;
@@ -79,6 +91,7 @@ chaz_Integers_run(void) {
     int has___int64       = false;
     int has_inttypes      = chaz_HeadCheck_check_header("inttypes.h");
     int has_stdint        = chaz_HeadCheck_check_header("stdint.h");
+    int can_convert_u64_to_double = true;
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -197,6 +210,13 @@ chaz_Integers_run(void) {
             else {
                 chaz_Util_die("64-bit types, but no literal syntax found");
             }
+        }
+    }
+
+    /* Determine whether conversion of unsigned __int64 to double works */
+    if (has___int64) {
+        if (!chaz_CC_test_compile(chaz_Integers_u64_to_double_code)) {
+            can_convert_u64_to_double = false;
         }
     }
 
@@ -385,6 +405,20 @@ chaz_Integers_run(void) {
             chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
                                     "((chy_i64_t)(chy_u32_t)(ptr))");
         }
+    }
+
+    /* Create macro for converting uint64_t to double. */
+    if (can_convert_u64_to_double) {
+        chaz_ConfWriter_add_def("U64_TO_DOUBLE(num)",
+                                "((double)(num))");
+    }
+    else {
+        chaz_ConfWriter_add_def(
+            "U64_TO_DOUBLE(num)",
+            "((num) & CHY_U64_C(0x8000000000000000) ? "
+            "(double)(int64_t)((num) & CHY_U64_C(0x7FFFFFFFFFFFFFFF)) + "
+            "9223372036854775808.0 : "
+            "(double)(int64_t)(num))");
     }
 
     /* True and false. */
