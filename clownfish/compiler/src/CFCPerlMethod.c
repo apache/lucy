@@ -651,13 +651,7 @@ S_void_callback_def(CFCMethod *method, const char *callback_start,
         "void\n"
         "%s(%s) {\n"
         "%s"
-        "    int _count = call_method(\"%s\", G_VOID | G_DISCARD);\n"
-        "    if (_count != 0) {\n"
-        "        CFISH_THROW(CFISH_ERR, \"callback '%%s' returned too many values: %%i32\",\n"
-        "                    \"%s\", (int32_t)_count);\n"
-        "    }\n"
-        "    FREETMPS;\n"
-        "    LEAVE;%s\n"
+        "    S_finish_callback_void(\"%s\");%s\n"
         "}\n";
 
     size_t size = sizeof(pattern)
@@ -665,12 +659,11 @@ S_void_callback_def(CFCMethod *method, const char *callback_start,
                   + strlen(params)
                   + strlen(callback_start)
                   + strlen(micro_sym)
-                  + strlen(micro_sym)
                   + strlen(refcount_mods)
                   + 20;
     char *callback_def = (char*)MALLOCATE(size);
     sprintf(callback_def, pattern, override_sym, params, callback_start,
-            micro_sym, micro_sym, refcount_mods);
+            micro_sym, refcount_mods);
 
     return callback_def;
 }
@@ -683,31 +676,13 @@ S_primitive_callback_def(CFCMethod *method, const char *callback_start,
     CFCType *return_type = CFCMethod_get_return_type(method);
     const char *ret_type_str = CFCType_to_c(return_type);
     const char *micro_sym = CFCMethod_micro_sym(method);
-    char *assign_retval = NULL;
+    char callback_func[50];
 
     if (CFCType_is_integer(return_type)) {
-        int width = CFCType_get_width(return_type);
-        if (width != 0 && width <= 4) {
-            char pattern[] = "    %s retval = (%s)SvIV(return_sv);\n";
-            size_t size = sizeof(pattern) + (2 * strlen(ret_type_str)) + 20;
-            assign_retval = (char*)MALLOCATE(size);
-            sprintf(assign_retval, pattern, ret_type_str, ret_type_str);
-        }
-        else {
-            char pattern[] =
-            "    %s retval = (sizeof(IV) >= sizeof(%s))\n"
-            "                ? (%s)SvIV(return_sv) : (%s)SvNV(return_sv);\n";
-            size_t size = sizeof(pattern) + (4 * strlen(ret_type_str)) + 20;
-            assign_retval = (char*)MALLOCATE(size);
-            sprintf(assign_retval, pattern, ret_type_str, ret_type_str,
-                    ret_type_str, ret_type_str);
-        }
+        strcpy(callback_func, "S_finish_callback_i64");
     }
     else if (CFCType_is_floating(return_type)) {
-        char pattern[] = "    %s retval = (%s)SvNV(return_sv);\n";
-        size_t size = sizeof(pattern) + (2 * strlen(ret_type_str)) + 20;
-        assign_retval = (char*)MALLOCATE(size);
-        sprintf(assign_retval, pattern, ret_type_str, ret_type_str);
+        strcpy(callback_func, "S_finish_callback_f64");
     }
     else {
         CFCUtil_die("Unexpected type: %s", ret_type_str);
@@ -717,36 +692,25 @@ S_primitive_callback_def(CFCMethod *method, const char *callback_start,
         "%s\n"
         "%s(%s) {\n"
         "%s"
-        "    int _count = call_method(\"%s\", G_SCALAR);\n"
-        "    if (_count != 1) {\n"
-        "        CFISH_THROW(CFISH_ERR, \"Bad number of return vals from '%%s': %%i32\",\n"
-        "                    \"%s\", (int32_t)_count);\n"
-        "    }\n"
-        "    SPAGAIN;\n"
-        "    SV *return_sv = POPs;\n"
-        "    PUTBACK;\n"
-        "%s"
-        "    FREETMPS;\n"
-        "    LEAVE;%s\n"
+        "    %s retval = (%s)%s(\"%s\");%s\n"
         "    return retval;\n"
         "}\n";
-
     size_t size = sizeof(pattern)
                   + strlen(ret_type_str)
                   + strlen(override_sym)
                   + strlen(params)
                   + strlen(callback_start)
+                  + strlen(ret_type_str)
+                  + strlen(ret_type_str)
+                  + strlen(callback_func)
                   + strlen(micro_sym)
-                  + strlen(micro_sym)
-                  + strlen(assign_retval)
                   + strlen(refcount_mods)
                   + 30;
     char *callback_def = (char*)MALLOCATE(size);
     sprintf(callback_def, pattern, ret_type_str, override_sym, params,
-            callback_start, micro_sym, micro_sym, assign_retval,
-            refcount_mods);
+            callback_start, ret_type_str, ret_type_str, callback_func,
+            micro_sym, refcount_mods);
 
-    FREEMEM(assign_retval);
     return callback_def;
 }
 
@@ -758,34 +722,13 @@ S_obj_callback_def(CFCMethod *method, const char *callback_start,
     CFCType *return_type = CFCMethod_get_return_type(method);
     const char *ret_type_str = CFCType_to_c(return_type);
     const char *micro_sym = CFCMethod_micro_sym(method);
-
-    char *nullable_check = CFCUtil_strdup("");
-    if (!CFCType_nullable(return_type)) {
-        const char *macro_sym = CFCMethod_get_macro_sym(method);
-        char pattern[] =
-            "\n    if (!retval) { CFISH_THROW(CFISH_ERR, "
-            "\"%s() for class '%%o' cannot return NULL\", "
-            "Cfish_Obj_Get_Class_Name((cfish_Obj*)self)); }";
-        size_t size = sizeof(pattern) + strlen(macro_sym) + 30;
-        nullable_check = (char*)REALLOCATE(nullable_check, size);
-        sprintf(nullable_check, pattern, macro_sym);
-    }
+    const char *nullable  = CFCType_nullable(return_type) ? "true" : "false";
 
     char pattern[] =
         "%s\n"
         "%s(%s) {\n"
         "%s"
-        "    int _count = call_method(\"%s\", G_SCALAR);\n"
-        "    if (_count != 1) {\n"
-        "        CFISH_THROW(CFISH_ERR, \"Bad number of return vals from '%%s': %%i32\",\n"
-        "                    \"%s\", (int32_t)_count);\n"
-        "    }\n"
-        "    SPAGAIN;\n"
-        "    SV *return_sv = POPs;\n"
-        "    PUTBACK;\n"
-        "    %s retval = (%s)XSBind_perl_to_cfish(return_sv);\n"
-        "    FREETMPS;\n"
-        "    LEAVE;%s%s\n"
+        "    %s retval = (%s)S_finish_callback_obj(self, \"%s\", %s);%s\n"
         "    return retval;\n"
         "}\n";
 
@@ -794,19 +737,17 @@ S_obj_callback_def(CFCMethod *method, const char *callback_start,
                   + strlen(override_sym)
                   + strlen(params)
                   + strlen(callback_start)
-                  + strlen(micro_sym)
-                  + strlen(micro_sym)
                   + strlen(ret_type_str)
                   + strlen(ret_type_str)
-                  + strlen(nullable_check)
+                  + strlen(micro_sym)
+                  + strlen(nullable)
                   + strlen(refcount_mods)
                   + 30;
     char *callback_def = (char*)MALLOCATE(size);
     sprintf(callback_def, pattern, ret_type_str, override_sym, params,
-            callback_start, micro_sym, micro_sym, ret_type_str, ret_type_str,
-            refcount_mods, nullable_check);
+            callback_start, ret_type_str, ret_type_str, micro_sym, nullable,
+            refcount_mods);
 
-    FREEMEM(nullable_check);
     return callback_def;
 }
 
