@@ -223,7 +223,6 @@ CFCMethod_finalize(CFCMethod *self) {
                         self->function.param_list,
                         self->function.docucomment, true,
                         self->is_abstract);
-    finalized->is_novel = false;
     return finalized;
 }
 
