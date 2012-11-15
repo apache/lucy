@@ -15,10 +15,15 @@
  */
 
 #define C_LUCY_OBJ
+#define C_LUCY_VTABLE
+#define C_LUCY_LOCKFREEREGISTRY
 #define NEED_newRV_noinc
 #include "XSBind.h"
+#include "Clownfish/Host.h"
+#include "Clownfish/LockFreeRegistry.h"
 #include "Clownfish/Util/StringHelper.h"
 #include "Clownfish/Util/NumberUtils.h"
+#include "Clownfish/Util/Memory.h"
 
 // Convert a Perl hash into a Clownfish Hash.  Caller takes responsibility for
 // a refcount.
@@ -579,4 +584,284 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
     return true;
 }
 
+/***************************************************************************
+ * The routines below are declared within the Clownfish core but left
+ * unimplemented and must be defined for each host language.
+ ***************************************************************************/
+
+/**************************** Clownfish::Obj *******************************/
+
+static void
+S_lazy_init_host_obj(lucy_Obj *self) {
+    SV *inner_obj = newSV(0);
+    SvOBJECT_on(inner_obj);
+    PL_sv_objcount++;
+    SvUPGRADE(inner_obj, SVt_PVMG);
+    sv_setiv(inner_obj, PTR2IV(self));
+
+    // Connect class association.
+    lucy_CharBuf *class_name = Lucy_VTable_Get_Name(self->vtable);
+    HV *stash = gv_stashpvn((char*)Lucy_CB_Get_Ptr8(class_name),
+                            Lucy_CB_Get_Size(class_name), TRUE);
+    SvSTASH_set(inner_obj, (HV*)SvREFCNT_inc(stash));
+
+    /* Up till now we've been keeping track of the refcount in
+     * self->ref.count.  We're replacing ref.count with ref.host_obj, which
+     * will assume responsibility for maintaining the refcount.  ref.host_obj
+     * starts off with a refcount of 1, so we need to transfer any refcounts
+     * in excess of that. */
+    size_t old_refcount = self->ref.count;
+    self->ref.host_obj = inner_obj;
+    while (old_refcount > 1) {
+        SvREFCNT_inc_simple_void_NN(inner_obj);
+        old_refcount--;
+    }
+}
+
+uint32_t
+lucy_Obj_get_refcount(lucy_Obj *self) {
+    return self->ref.count < 4
+           ? self->ref.count
+           : SvREFCNT((SV*)self->ref.host_obj);
+}
+
+lucy_Obj*
+lucy_Obj_inc_refcount(lucy_Obj *self) {
+    switch (self->ref.count) {
+        case 0:
+            CFISH_THROW(LUCY_ERR, "Illegal refcount of 0");
+            break; // useless
+        case 1:
+        case 2:
+            self->ref.count++;
+            break;
+        case 3:
+            S_lazy_init_host_obj(self);
+            // fall through
+        default:
+            SvREFCNT_inc_simple_void_NN((SV*)self->ref.host_obj);
+    }
+    return self;
+}
+
+uint32_t
+lucy_Obj_dec_refcount(lucy_Obj *self) {
+    uint32_t modified_refcount = I32_MAX;
+    switch (self->ref.count) {
+        case 0:
+            CFISH_THROW(LUCY_ERR, "Illegal refcount of 0");
+            break; // useless
+        case 1:
+            modified_refcount = 0;
+            Lucy_Obj_Destroy(self);
+            break;
+        case 2:
+        case 3:
+            modified_refcount = --self->ref.count;
+            break;
+        default:
+            modified_refcount = SvREFCNT((SV*)self->ref.host_obj) - 1;
+            // If the SV's refcount falls to 0, DESTROY will be invoked from
+            // Perl-space.
+            SvREFCNT_dec((SV*)self->ref.host_obj);
+    }
+    return modified_refcount;
+}
+
+void*
+lucy_Obj_to_host(lucy_Obj *self) {
+    if (self->ref.count < 4) { S_lazy_init_host_obj(self); }
+    return newRV_inc((SV*)self->ref.host_obj);
+}
+
+/*************************** Clownfish::VTable ******************************/
+
+lucy_Obj*
+lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj) {
+    lucy_Obj *obj
+        = (lucy_Obj*)lucy_Memory_wrapped_calloc(self->obj_alloc_size, 1);
+    SV *inner_obj = SvRV((SV*)host_obj);
+    obj->vtable = self;
+    sv_setiv(inner_obj, PTR2IV(obj));
+    obj->ref.host_obj = inner_obj;
+    return obj;
+}
+
+void
+lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent) {
+    // Register class with host.
+    lucy_Host_callback(LUCY_VTABLE, "_register", 2,
+                       CFISH_ARG_OBJ("singleton", singleton),
+                       CFISH_ARG_OBJ("parent", parent));
+}
+
+lucy_VArray*
+lucy_VTable_fresh_host_methods(const lucy_CharBuf *class_name) {
+    return (lucy_VArray*)lucy_Host_callback_obj(
+               LUCY_VTABLE,
+               "fresh_host_methods", 1,
+               CFISH_ARG_STR("class_name", class_name));
+}
+
+lucy_CharBuf*
+lucy_VTable_find_parent_class(const lucy_CharBuf *class_name) {
+    return lucy_Host_callback_str(LUCY_VTABLE, "find_parent_class", 1,
+                                  CFISH_ARG_STR("class_name", class_name));
+}
+
+void*
+lucy_VTable_to_host(lucy_VTable *self) {
+    chy_bool_t first_time = self->ref.count < 4 ? true : false;
+    Lucy_VTable_To_Host_t to_host
+        = CFISH_SUPER_METHOD_PTR(LUCY_VTABLE, Lucy_VTable_To_Host);
+    SV *host_obj = (SV*)to_host(self);
+    if (first_time) {
+        SvSHARE((SV*)self->ref.host_obj);
+    }
+    return host_obj;
+}
+
+
+/***************************** Clownfish::Err *******************************/
+
+// Anonymous XSUB helper for Err#trap().  It wraps the supplied C function
+// so that it can be run inside a Perl eval block.
+static SV *attempt_xsub = NULL;
+
+XS(lucy_Err_attempt_via_xs) {
+    dXSARGS;
+    CHY_UNUSED_VAR(cv);
+    SP -= items;
+    if (items != 2) {
+        CFISH_THROW(CFISH_ERR, "Usage: $sub->(routine, context)");
+    };
+    IV routine_iv = SvIV(ST(0));
+    IV context_iv = SvIV(ST(1));
+    Cfish_Err_Attempt_t routine = INT2PTR(Cfish_Err_Attempt_t, routine_iv);
+    void *context               = INT2PTR(void*, context_iv);
+    routine(context);
+    XSRETURN(0);
+}
+
+void
+lucy_Err_init_class(void) {
+    char *file = (char*)__FILE__;
+    attempt_xsub = (SV*)newXS(NULL, lucy_Err_attempt_via_xs, file);
+}
+
+lucy_Err*
+lucy_Err_get_error() {
+    lucy_Err *error
+        = (lucy_Err*)lucy_Host_callback_obj(LUCY_ERR, "get_error", 0);
+    CFISH_DECREF(error); // Cancel out incref from callback.
+    return error;
+}
+
+void
+lucy_Err_set_error(lucy_Err *error) {
+    lucy_Host_callback(LUCY_ERR, "set_error", 1,
+                       CFISH_ARG_OBJ("error", error));
+    CFISH_DECREF(error);
+}
+
+void
+lucy_Err_do_throw(lucy_Err *err) {
+    dSP;
+    SV *error_sv = (SV*)Lucy_Err_To_Host(err);
+    CFISH_DECREF(err);
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(error_sv));
+    PUTBACK;
+    call_pv("Clownfish::Err::do_throw", G_DISCARD);
+    FREETMPS;
+    LEAVE;
+}
+
+void*
+lucy_Err_to_host(lucy_Err *self) {
+    Lucy_Err_To_Host_t super_to_host
+        = CFISH_SUPER_METHOD_PTR(LUCY_ERR, Lucy_Err_To_Host);
+    SV *perl_obj = (SV*)super_to_host(self);
+    XSBind_enable_overload(perl_obj);
+    return perl_obj;
+}
+
+void
+lucy_Err_throw_mess(lucy_VTable *vtable, lucy_CharBuf *message) {
+    Lucy_Err_Make_t make
+        = CFISH_METHOD_PTR(CFISH_CERTIFY(vtable, LUCY_VTABLE), Lucy_Err_Make);
+    lucy_Err *err = (lucy_Err*)CFISH_CERTIFY(make(NULL), LUCY_ERR);
+    Lucy_Err_Cat_Mess(err, message);
+    CFISH_DECREF(message);
+    lucy_Err_do_throw(err);
+}
+
+void
+lucy_Err_warn_mess(lucy_CharBuf *message) {
+    SV *error_sv = XSBind_cb_to_sv(message);
+    CFISH_DECREF(message);
+    warn("%s", SvPV_nolen(error_sv));
+    SvREFCNT_dec(error_sv);
+}
+
+lucy_Err*
+lucy_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
+    lucy_Err *error = NULL;
+    SV *routine_sv = newSViv(PTR2IV(routine));
+    SV *context_sv = newSViv(PTR2IV(context));
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(routine_sv));
+    PUSHs(sv_2mortal(context_sv));
+    PUTBACK;
+
+    int count = call_sv(attempt_xsub, G_EVAL | G_DISCARD);
+    if (count != 0) {
+        lucy_CharBuf *mess
+            = lucy_CB_newf("'attempt' returned too many values: %i32",
+                           (int32_t)count);
+        error = lucy_Err_new(mess);
+    }
+    else {
+        SV *dollar_at = get_sv("@", FALSE);
+        if (SvTRUE(dollar_at)) {
+            if (sv_isobject(dollar_at)
+                && sv_derived_from(dollar_at,"Clownfish::Err")
+               ) {
+                IV error_iv = SvIV(SvRV(dollar_at));
+                error = INT2PTR(lucy_Err*, error_iv);
+                CFISH_INCREF(error);
+            }
+            else {
+                STRLEN len;
+                char *ptr = SvPVutf8(dollar_at, len);
+                lucy_CharBuf *mess = lucy_CB_new_from_trusted_utf8(ptr, len);
+                error = lucy_Err_new(mess);
+            }
+        }
+    }
+    FREETMPS;
+    LEAVE;
+
+    return error;
+}
+
+/*********************** Clownfish::LockFreeRegistry ************************/
+
+void*
+lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
+    chy_bool_t first_time = self->ref.count < 4 ? true : false;
+    Lucy_LFReg_To_Host_t to_host
+        = CFISH_SUPER_METHOD_PTR(LUCY_LOCKFREEREGISTRY, Lucy_LFReg_To_Host);
+    SV *host_obj = (SV*)to_host(self);
+    if (first_time) {
+        SvSHARE((SV*)self->ref.host_obj);
+    }
+    return host_obj;
+}
 
