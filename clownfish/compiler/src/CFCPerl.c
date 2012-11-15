@@ -374,7 +374,6 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
     "#include \"parcel.h\"\n"
     "#include \"%s\"\n"
     "\n"
-    "#include \"Clownfish/Host.h\"\n"
     "#include \"Clownfish/Util/Memory.h\"\n"
     "#include \"Clownfish/Util/StringHelper.h\"\n"
     "\n"

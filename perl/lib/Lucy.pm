@@ -470,17 +470,6 @@ sub error {$Clownfish::Err::error}
     }
 }
 
-{
-    package Clownfish::Host;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    BEGIN {
-        if ( !__PACKAGE__->isa('Clownfish::Obj') ) {
-            push our @ISA, 'Clownfish::Obj';
-        }
-    }
-}
-
 1;
 
 __END__

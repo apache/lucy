@@ -225,16 +225,5 @@ sub error {$Clownfish::Err::error}
     sub deserialize { CORE::shift->_deserialize(@_) }
 }
 
-{
-    package Clownfish::Host;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    BEGIN {
-        if ( !__PACKAGE__->isa('Clownfish::Obj') ) {
-            push our @ISA, 'Clownfish::Obj';
-        }
-    }
-}
-
 1;
 

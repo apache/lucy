@@ -111,13 +111,6 @@ struct alias aliases[] = {
     {"Cfish_VTable_Get_Name", "Lucy_VTable_Get_Name"},
     {"Cfish_VTable_Make_Obj", "Lucy_VTable_Make_Obj"},
 
-    {"cfish_Host_callback", "lucy_Host_callback"},
-    {"cfish_Host_callback_f64", "lucy_Host_callback_f64"},
-    {"cfish_Host_callback_host", "lucy_Host_callback_host"},
-    {"cfish_Host_callback_i64", "lucy_Host_callback_i64"},
-    {"cfish_Host_callback_obj", "lucy_Host_callback_obj"},
-    {"cfish_Host_callback_str", "lucy_Host_callback_str"},
-
     {"CFISH_USE_SHORT_NAMES", "LUCY_USE_SHORT_NAMES"},
 
     {NULL, NULL}
