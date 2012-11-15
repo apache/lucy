@@ -17,7 +17,6 @@
 #define C_LUCY_DOC
 #include "XSBind.h"
 #include "Lucy/Document/Doc.h"
-#include "Clownfish/Host.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Clownfish/Util/Memory.h"
@@ -64,19 +63,75 @@ lucy_Doc_store(lucy_Doc *self, const lucy_CharBuf *field, lucy_Obj *value) {
     SvREFCNT_dec(key_sv);
 }
 
+static SV*
+S_nfreeze_fields(lucy_Doc *self) {
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 1);
+    PUSHMARK(SP);
+    mPUSHs((SV*)newRV_inc((SV*)self->fields));
+    PUTBACK;
+    call_pv("Storable::nfreeze", G_SCALAR);
+    SPAGAIN;
+    SV *frozen = POPs;
+    SvREFCNT_inc(frozen);
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return frozen;
+}
+
 void
 lucy_Doc_serialize(lucy_Doc *self, lucy_OutStream *outstream) {
     Lucy_OutStream_Write_C32(outstream, self->doc_id);
-    lucy_Host_callback(self, "serialize_fields", 1,
-                       CFISH_ARG_OBJ("outstream", outstream));
+    SV *frozen = S_nfreeze_fields(self);
+    STRLEN len;
+    char *buf = SvPV(frozen, len);
+    Lucy_OutStream_Write_C64(outstream, len);
+    Lucy_OutStream_Write_Bytes(outstream, buf, len);
+    SvREFCNT_dec(frozen);
+}
+
+static HV*
+S_thaw_fields(lucy_InStream *instream) {
+    // Read frozen data into an SV buffer.
+    size_t len = (size_t)Lucy_InStream_Read_C64(instream);
+    SV *buf_sv = newSV(len + 1);
+    SvPOK_on(buf_sv);
+    SvCUR_set(buf_sv, len);
+    char *buf = SvPVX(buf_sv);
+    Lucy_InStream_Read_Bytes(instream, buf, len);
+
+    // Call back to Storable to thaw the frozen hash.
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 1);
+    PUSHMARK(SP);
+    mPUSHs(buf_sv);
+    PUTBACK;
+    call_pv("Storable::thaw", G_SCALAR);
+    SPAGAIN;
+    SV *frozen = POPs;
+    if (frozen && !SvROK(frozen)) {
+        CFISH_THROW(CFISH_ERR, "thaw failed");
+    }
+    HV *fields = (HV*)SvRV(frozen);
+    SvREFCNT_inc((SV*)fields);
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return fields;
 }
 
 lucy_Doc*
 lucy_Doc_deserialize(lucy_Doc *self, lucy_InStream *instream) {
     int32_t doc_id = (int32_t)Lucy_InStream_Read_C32(instream);
-    lucy_Doc_init(self, NULL, doc_id);
-    lucy_Host_callback(self, "deserialize_fields", 1,
-                       CFISH_ARG_OBJ("instream", instream));
+    HV *fields = S_thaw_fields(instream);
+    lucy_Doc_init(self, fields, doc_id);
+    SvREFCNT_dec(fields);
     return self;
 }
 

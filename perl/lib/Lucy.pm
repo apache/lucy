@@ -107,28 +107,11 @@ sub error {$Clownfish::Err::error}
     package Lucy::Document::Doc;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
-    use Storable qw( nfreeze thaw );
-    use bytes;
-    no bytes;
+    use Storable ();  # Needed by serialize/deserialize.
 
     use overload
         fallback => 1,
         '%{}'    => \&get_fields;
-
-    sub serialize_fields {
-        my ( $self, $outstream ) = @_;
-        my $buf = nfreeze( $self->get_fields );
-        $outstream->write_c32( bytes::length($buf) );
-        $outstream->print($buf);
-    }
-
-    sub deserialize_fields {
-        my ( $self, $instream ) = @_;
-        my $len = $instream->read_c32;
-        my $buf;
-        $instream->read( $buf, $len );
-        $self->set_fields( thaw($buf) );
-    }
 }
 
 {
