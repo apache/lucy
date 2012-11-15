@@ -79,8 +79,8 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
 
-    sub find_parent_class {
-        my ( undef, $package ) = @_;
+    sub _find_parent_class {
+        my $package = shift;
         no strict 'refs';
         for my $parent ( @{"$package\::ISA"} ) {
             return $parent if $parent->isa('Clownfish::Obj');
@@ -88,8 +88,8 @@ sub error {$Clownfish::Err::error}
         return;
     }
 
-    sub fresh_host_methods {
-        my ( undef, $package ) = @_;
+    sub _fresh_host_methods {
+        my $package = shift;
         no strict 'refs';
         my $stash = \%{"$package\::"};
         my $methods
@@ -103,9 +103,9 @@ sub error {$Clownfish::Err::error}
     }
 
     sub _register {
-        my ( undef, %args ) = @_;
-        my $singleton_class = $args{singleton}->get_name;
-        my $parent_class    = $args{parent}->get_name;
+        my ( $singleton, $parent ) = @_;
+        my $singleton_class = $singleton->get_name;
+        my $parent_class    = $parent->get_name;
         if ( !$singleton_class->isa($parent_class) ) {
             no strict 'refs';
             push @{"$singleton_class\::ISA"}, $parent_class;
