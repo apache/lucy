@@ -27,7 +27,6 @@ sub bind_all {
     $class->bind_charbuf;
     $class->bind_err;
     $class->bind_hash;
-    $class->bind_host;
     $class->bind_lockfreeregistry;
     $class->bind_float32;
     $class->bind_float64;
@@ -341,93 +340,6 @@ END_XS_CODE
         class_name => "Clownfish::Hash",
     );
     $binding->exclude_method($_) for @hand_rolled;
-    $binding->append_xs($xs_code);
-
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_host {
-    my $xs_code = <<'END_XS_CODE';
-MODULE = Clownfish     PACKAGE = Clownfish::Host
-
-=for comment
-
-These are all for testing purposes only.
-
-=cut
-
-IV
-_test(...)
-CODE:
-    RETVAL = items;
-OUTPUT: RETVAL
-
-SV*
-_test_obj(...)
-CODE:
-{
-    lucy_ByteBuf *test_obj = lucy_BB_new_bytes("blah", 4);
-    SV *pack_var = get_sv("Clownfish::Host::testobj", 1);
-    RETVAL = (SV*)Lucy_BB_To_Host(test_obj);
-    SvSetSV_nosteal(pack_var, RETVAL);
-    CFISH_DECREF(test_obj);
-    CHY_UNUSED_VAR(items);
-}
-OUTPUT: RETVAL
-
-void
-_callback(obj)
-    lucy_Obj *obj;
-PPCODE:
-{
-    lucy_ZombieCharBuf *blank = CFISH_ZCB_BLANK();
-    lucy_Host_callback(obj, "_test", 2,
-                       CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank),
-                       CFISH_ARG_I32("foo", 3));
-}
-
-int64_t
-_callback_i64(obj)
-    lucy_Obj *obj;
-CODE:
-{
-    lucy_ZombieCharBuf *blank = CFISH_ZCB_BLANK();
-    RETVAL
-        = lucy_Host_callback_i64(obj, "_test", 2,
-                                 CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank),
-                                 CFISH_ARG_I32("foo", 3));
-}
-OUTPUT: RETVAL
-
-double
-_callback_f64(obj)
-    lucy_Obj *obj;
-CODE:
-{
-    lucy_ZombieCharBuf *blank = CFISH_ZCB_BLANK();
-    RETVAL
-        = lucy_Host_callback_f64(obj, "_test", 2,
-                                 CFISH_ARG_OBJ("nothing", (lucy_CharBuf*)blank),
-                                 CFISH_ARG_I32("foo", 3));
-}
-OUTPUT: RETVAL
-
-SV*
-_callback_obj(obj)
-    lucy_Obj *obj;
-CODE:
-{
-    lucy_Obj *other = lucy_Host_callback_obj(obj, "_test_obj", 0);
-    RETVAL = (SV*)Lucy_Obj_To_Host(other);
-    CFISH_DECREF(other);
-}
-OUTPUT: RETVAL
-END_XS_CODE
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Clownfish",
-        class_name => "Clownfish::Host",
-    );
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

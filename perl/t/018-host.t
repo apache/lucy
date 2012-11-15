@@ -16,19 +16,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 3;
 use Lucy::Test;
 use Lucy qw( to_perl to_clownfish );
-
-my $object = Clownfish::Host->new();
-isa_ok( $object, "Clownfish::Host" );
-
-is( $object->_callback,     undef, "void callback" );
-is( $object->_callback_f64, 5,     "f64 callback" );
-is( $object->_callback_i64, 5,     "integer callback" );
-
-my $test_obj = $object->_callback_obj;
-isa_ok( $test_obj, "Clownfish::ByteBuf" );
 
 my %complex_data_structure = (
     a => [ 1, 2, 3, { ooga => 'booga' } ],
