@@ -21,9 +21,11 @@
 #include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
-#include "Clownfish/Host.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
+
+static SV*
+S_compile_token_re(const cfish_CharBuf *pattern);
 
 static void
 S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re);
@@ -34,8 +36,6 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re);
 lucy_RegexTokenizer*
 lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
                          const lucy_CharBuf *pattern) {
-    SV *token_re_sv;
-
     lucy_Analyzer_init((lucy_Analyzer*)self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
     if (pattern) {
@@ -53,13 +53,31 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
     }
 
     // Acquire a compiled regex engine for matching one token.
-    token_re_sv = (SV*)lucy_Host_callback_host(
-                      LUCY_REGEXTOKENIZER, "compile_token_re", 1,
-                      CFISH_ARG_STR("pattern", self->pattern));
+    SV *token_re_sv = S_compile_token_re(self->pattern);
     S_set_token_re_but_not_pattern(self, SvRV(token_re_sv));
     SvREFCNT_dec(token_re_sv);
 
     return self;
+}
+
+static SV*
+S_compile_token_re(const cfish_CharBuf *pattern) {
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 2);
+    PUSHMARK(SP);
+    PUSHmortal;
+    XPUSHs(XSBind_cb_to_sv(pattern));
+    PUTBACK;
+    call_pv("Lucy::Analysis::RegexTokenizer::compile_token_re", G_SCALAR);
+    SPAGAIN;
+    SV *token_re_sv = POPs;
+    SvREFCNT_inc(token_re_sv);
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return token_re_sv;
 }
 
 static void

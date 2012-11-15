@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
-#include "Lucy/Util/ToolSet.h"
-#include "Clownfish/Host.h"
+#include "XSBind.h"
 #include "Lucy/Store/FSFolder.h"
 
-CharBuf*
-FSFolder_absolutify(const CharBuf *path) {
-
-    return Host_callback_str(FSFOLDER, "absolutify", 1,
-                             ARG_STR("path", path));
+cfish_CharBuf*
+lucy_FSFolder_absolutify(const cfish_CharBuf *path) {
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 2);
+    PUSHMARK(SP);
+    PUSHmortal;
+    mPUSHs(XSBind_cb_to_sv(path));
+    PUTBACK;
+    call_pv("Lucy::Store::FSFolder::absolutify", G_SCALAR);
+    SPAGAIN;
+    cfish_CharBuf *absolutified
+        = (cfish_CharBuf*)XSBind_perl_to_cfish(POPs);
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return absolutified;
 }
 
