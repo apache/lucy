@@ -93,7 +93,7 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
 
-    sub compile_token_re { return qr/$_[1]/ }
+    sub _compile_token_re {qr/$_[0]/}
 
     sub new {
         my ( $either, %args ) = @_;
@@ -435,7 +435,7 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use File::Spec::Functions qw( rel2abs );
-    sub absolutify { return rel2abs( $_[1] ) }
+    sub _absolutify {rel2abs(shift)}
 }
 
 {

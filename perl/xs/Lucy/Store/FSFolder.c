@@ -24,10 +24,9 @@ lucy_FSFolder_absolutify(const cfish_CharBuf *path) {
     SAVETMPS;
     EXTEND(SP, 2);
     PUSHMARK(SP);
-    PUSHmortal;
     mPUSHs(XSBind_cb_to_sv(path));
     PUTBACK;
-    call_pv("Lucy::Store::FSFolder::absolutify", G_SCALAR);
+    call_pv("Lucy::Store::FSFolder::_absolutify", G_SCALAR);
     SPAGAIN;
     cfish_CharBuf *absolutified
         = (cfish_CharBuf*)XSBind_perl_to_cfish(POPs);
