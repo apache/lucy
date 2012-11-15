@@ -19,7 +19,6 @@
 #define C_LUCY_LOCKFREEREGISTRY
 #define NEED_newRV_noinc
 #include "XSBind.h"
-#include "Clownfish/Host.h"
 #include "Clownfish/LockFreeRegistry.h"
 #include "Clownfish/Util/StringHelper.h"
 #include "Clownfish/Util/NumberUtils.h"
@@ -689,24 +688,60 @@ lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj) {
 
 void
 lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent) {
-    // Register class with host.
-    lucy_Host_callback(LUCY_VTABLE, "_register", 2,
-                       CFISH_ARG_OBJ("singleton", singleton),
-                       CFISH_ARG_OBJ("parent", parent));
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 5);
+    PUSHMARK(SP);
+    PUSHmortal;
+    mPUSHp("singleton", 9);
+    mPUSHs((SV*)Lucy_VTable_To_Host(singleton));
+    mPUSHp("parent", 6);
+    mPUSHs((SV*)Lucy_VTable_To_Host(parent));
+    PUTBACK;
+    call_pv("Clownfish::VTable::_register", G_VOID | G_DISCARD);
+    FREETMPS;
+    LEAVE;
 }
 
 lucy_VArray*
 lucy_VTable_fresh_host_methods(const lucy_CharBuf *class_name) {
-    return (lucy_VArray*)lucy_Host_callback_obj(
-               LUCY_VTABLE,
-               "fresh_host_methods", 1,
-               CFISH_ARG_STR("class_name", class_name));
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 2);
+    PUSHMARK(SP);
+    PUSHmortal;
+    mPUSHs(XSBind_cb_to_sv(class_name));
+    PUTBACK;
+    call_pv("Clownfish::VTable::fresh_host_methods", G_SCALAR);
+    SPAGAIN;
+    cfish_VArray *methods = (cfish_VArray*)XSBind_perl_to_cfish(POPs);
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return methods;
 }
 
 lucy_CharBuf*
 lucy_VTable_find_parent_class(const lucy_CharBuf *class_name) {
-    return lucy_Host_callback_str(LUCY_VTABLE, "find_parent_class", 1,
-                                  CFISH_ARG_STR("class_name", class_name));
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 2);
+    PUSHMARK(SP);
+    PUSHmortal;
+    mPUSHs(XSBind_cb_to_sv(class_name));
+    PUTBACK;
+    call_pv("Clownfish::VTable::find_parent_class", G_SCALAR);
+    SPAGAIN;
+    SV *parent_class_sv = POPs;
+    PUTBACK;
+    cfish_CharBuf *parent_class
+        = (cfish_CharBuf*)XSBind_perl_to_cfish(parent_class_sv);
+    FREETMPS;
+    LEAVE;
+    return parent_class;
 }
 
 void*
@@ -751,17 +786,38 @@ lucy_Err_init_class(void) {
 
 lucy_Err*
 lucy_Err_get_error() {
-    lucy_Err *error
-        = (lucy_Err*)lucy_Host_callback_obj(LUCY_ERR, "get_error", 0);
-    CFISH_DECREF(error); // Cancel out incref from callback.
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    PUTBACK;
+    call_pv("Clownfish::Err::get_error", G_SCALAR);
+    SPAGAIN;
+    cfish_Err *error = (cfish_Err*)XSBind_perl_to_cfish(POPs);
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
     return error;
 }
 
 void
 lucy_Err_set_error(lucy_Err *error) {
-    lucy_Host_callback(LUCY_ERR, "set_error", 1,
-                       CFISH_ARG_OBJ("error", error));
-    CFISH_DECREF(error);
+    dSP;
+    ENTER;
+    SAVETMPS;
+    EXTEND(SP, 2);
+    PUSHMARK(SP);
+    PUSHmortal;
+    if (error) {
+        mPUSHs((SV*)Lucy_Err_To_Host(error));
+    }
+    else {
+        PUSHmortal;
+    }
+    PUTBACK;
+    call_pv("Clownfish::Err::set_error", G_VOID | G_DISCARD);
+    FREETMPS;
+    LEAVE;
 }
 
 void
