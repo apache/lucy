@@ -20,10 +20,6 @@
 #ifndef H_CFISH_XSBIND
 #define H_CFISH_XSBIND 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "charmony.h"
 #include "Clownfish/Obj.h"
 #include "Clownfish/ByteBuf.h"
@@ -42,6 +38,10 @@ extern "C" {
 #include "ppport.h"
 
 #define XSBIND_EXTERN CHY_EXPORT
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Given either a class name or a perl object, manufacture a new Clownfish
  * object suitable for supplying to a cfish_Foo_init() function.
