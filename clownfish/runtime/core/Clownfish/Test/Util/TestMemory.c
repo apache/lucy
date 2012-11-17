@@ -21,10 +21,6 @@
 #include "Clownfish/Test/Util/TestMemory.h"
 #include "Clownfish/Util/Memory.h"
 
-#ifndef SIZE_MAX
-  #define SIZE_MAX ((size_t)-1)
-#endif
-
 static void
 test_oversize__growth_rate(TestBatch *batch) {
     bool_t   success             = true;

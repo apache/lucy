@@ -22,10 +22,6 @@
 #include "Lucy/Analysis/Token.h"
 #include "Clownfish/Util/SortUtils.h"
 
-#ifndef SIZE_MAX
-  #define SIZE_MAX ((size_t)-1)
-#endif
-
 // After inversion, record how many like tokens occur in each group.
 static void
 S_count_clusters(Inversion *self);

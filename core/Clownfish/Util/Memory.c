@@ -57,10 +57,6 @@ Memory_wrapped_free(void *ptr) {
     free(ptr);
 }
 
-#ifndef SIZE_MAX
-#define SIZE_MAX ((size_t)-1)
-#endif
-
 size_t
 Memory_oversize(size_t minimum, size_t width) {
     // For larger arrays, grow by an excess of 1/8; grow faster when the array

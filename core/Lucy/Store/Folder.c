@@ -19,10 +19,6 @@
 #include <ctype.h>
 #include <limits.h>
 
-#ifndef SIZE_MAX
-  #define SIZE_MAX ((size_t)-1)
-#endif
-
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/CompoundFileReader.h"
 #include "Lucy/Store/CompoundFileWriter.h"
