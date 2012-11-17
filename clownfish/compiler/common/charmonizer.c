@@ -134,6 +134,11 @@ chaz_ConfWriter_append_conf(const char *fmt, ...);
 void
 chaz_ConfWriter_add_def(const char *sym, const char *value);
 
+/* Add a globally scoped pound-define.
+ */
+void
+chaz_ConfWriter_add_global_def(const char *sym, const char *value);
+
 /* Add a typedef.
  */
 void
@@ -174,6 +179,8 @@ typedef void
 typedef void
 (*chaz_ConfWriter_add_def_t)(const char *sym, const char *value);
 typedef void
+(*chaz_ConfWriter_add_global_def_t)(const char *sym, const char *value);
+typedef void
 (*chaz_ConfWriter_add_typedef_t)(const char *type, const char *alias);
 typedef void
 (*chaz_ConfWriter_add_global_typedef_t)(const char *type, const char *alias);
@@ -189,6 +196,7 @@ typedef struct chaz_ConfWriter {
     chaz_ConfWriter_clean_up_t           clean_up;
     chaz_ConfWriter_vappend_conf_t       vappend_conf;
     chaz_ConfWriter_add_def_t            add_def;
+    chaz_ConfWriter_add_global_def_t     add_global_def;
     chaz_ConfWriter_add_typedef_t        add_typedef;
     chaz_ConfWriter_add_global_typedef_t add_global_typedef;
     chaz_ConfWriter_add_sys_include_t    add_sys_include;
@@ -487,7 +495,8 @@ chaz_Probe_clean_up(void);
  * HAS_STDINT_H
  *
  * If stdint.h is is available, it will be pound-included in the configuration
- * header.  If it is not, the following typedefs will be defined if possible:
+ * header.  If it is not, the following typedefs and macros will be defined if
+ * possible:
  *
  * int8_t
  * int16_t
@@ -497,6 +506,23 @@ chaz_Probe_clean_up(void);
  * uint16_t
  * uint32_t
  * uint64_t
+ * INT8_MAX
+ * INT16_MAX
+ * INT32_MAX
+ * INT64_MAX
+ * INT8_MIN
+ * INT16_MIN
+ * INT32_MIN
+ * INT64_MIN
+ * UINT8_MAX
+ * UINT16_MAX
+ * UINT32_MAX
+ * UINT64_MAX
+ * SIZE_MAX
+ * INT32_C
+ * INT64_C
+ * UINT32_C
+ * UINT64_C
  *
  * The following typedefs will be created if a suitable integer type exists,
  * as will most often be the case.  However, if for example a char is 64 bits
@@ -968,6 +994,14 @@ chaz_ConfWriter_add_def(const char *sym, const char *value) {
 }
 
 void
+chaz_ConfWriter_add_global_def(const char *sym, const char *value) {
+    size_t i;
+    for (i = 0; i < chaz_CW.num_writers; i++) {
+        chaz_CW.writers[i]->add_global_def(sym, value);
+    }
+}
+
+void
 chaz_ConfWriter_add_typedef(const char *type, const char *alias) {
     size_t i;
     for (i = 0; i < chaz_CW.num_writers; i++) {
@@ -1042,6 +1076,7 @@ chaz_ConfWriter_add_writer(chaz_ConfWriter *writer) {
 
 typedef enum chaz_ConfElemType {
     CHAZ_CONFELEM_DEF,
+    CHAZ_CONFELEM_GLOBAL_DEF,
     CHAZ_CONFELEM_TYPEDEF,
     CHAZ_CONFELEM_GLOBAL_TYPEDEF,
     CHAZ_CONFELEM_SYS_INCLUDE,
@@ -1085,6 +1120,8 @@ chaz_ConfWriterC_vappend_conf(const char *fmt, va_list args);
 static void
 chaz_ConfWriterC_add_def(const char *sym, const char *value);
 static void
+chaz_ConfWriterC_add_global_def(const char *sym, const char *value);
+static void
 chaz_ConfWriterC_add_typedef(const char *type, const char *alias);
 static void
 chaz_ConfWriterC_add_global_typedef(const char *type, const char *alias);
@@ -1102,6 +1139,7 @@ chaz_ConfWriterC_enable(void) {
     CWC_conf_writer.clean_up           = chaz_ConfWriterC_clean_up;
     CWC_conf_writer.vappend_conf       = chaz_ConfWriterC_vappend_conf;
     CWC_conf_writer.add_def            = chaz_ConfWriterC_add_def;
+    CWC_conf_writer.add_global_def     = chaz_ConfWriterC_add_global_def;
     CWC_conf_writer.add_typedef        = chaz_ConfWriterC_add_typedef;
     CWC_conf_writer.add_global_typedef = chaz_ConfWriterC_add_global_typedef;
     CWC_conf_writer.add_sys_include    = chaz_ConfWriterC_add_sys_include;
@@ -1191,6 +1229,34 @@ chaz_ConfWriterC_append_def_to_conf(const char *sym, const char *value) {
 }
 
 static void
+chaz_ConfWriterC_add_global_def(const char *sym, const char *value) {
+    chaz_ConfWriterC_push_def_list_item(sym, value, CHAZ_CONFELEM_GLOBAL_DEF);
+}
+
+static void
+chaz_ConfWriterC_append_global_def_to_conf(const char *sym,
+        const char *value) {
+    char *name_end = strchr(sym, '(');
+    if (name_end == NULL) {
+        fprintf(chaz_ConfWriterC.fh, "#ifndef %s\n", sym);
+    }
+    else {
+        size_t  name_len = (size_t)(name_end - sym);
+        char   *name     = chaz_Util_strdup(sym);
+        name[name_len] = '\0';
+        fprintf(chaz_ConfWriterC.fh, "#ifndef %s\n", name);
+        free(name);
+    }
+    if (value) {
+        fprintf(chaz_ConfWriterC.fh, "  #define %s %s\n", sym, value);
+    }
+    else {
+        fprintf(chaz_ConfWriterC.fh, "  #define %s\n", sym);
+    }
+    fprintf(chaz_ConfWriterC.fh, "#endif\n");
+}
+
+static void
 chaz_ConfWriterC_add_typedef(const char *type, const char *alias) {
     chaz_ConfWriterC_push_def_list_item(alias, type, CHAZ_CONFELEM_TYPEDEF);
 }
@@ -1254,6 +1320,10 @@ chaz_ConfWriterC_end_module(void) {
                 chaz_ConfWriterC_append_def_to_conf(defs[i].str1,
                                                     defs[i].str2);
                 break;
+            case CHAZ_CONFELEM_GLOBAL_DEF:
+                chaz_ConfWriterC_append_global_def_to_conf(defs[i].str1,
+                                                           defs[i].str2);
+                break;
             case CHAZ_CONFELEM_TYPEDEF:
                 chaz_ConfWriterC_append_typedef_to_conf(defs[i].str2,
                                                         defs[i].str1);
@@ -1295,6 +1365,7 @@ chaz_ConfWriterC_end_module(void) {
                     }
                 }
                 break;
+            case CHAZ_CONFELEM_GLOBAL_DEF:
             case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
             case CHAZ_CONFELEM_SYS_INCLUDE:
             case CHAZ_CONFELEM_LOCAL_INCLUDE:
@@ -1374,6 +1445,8 @@ chaz_ConfWriterPerl_vappend_conf(const char *fmt, va_list args);
 static void
 chaz_ConfWriterPerl_add_def(const char *sym, const char *value);
 static void
+chaz_ConfWriterPerl_add_global_def(const char *sym, const char *value);
+static void
 chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias);
 static void
 chaz_ConfWriterPerl_add_global_typedef(const char *type, const char *alias);
@@ -1391,6 +1464,7 @@ chaz_ConfWriterPerl_enable(void) {
     CWPerl_conf_writer.clean_up           = chaz_ConfWriterPerl_clean_up;
     CWPerl_conf_writer.vappend_conf       = chaz_ConfWriterPerl_vappend_conf;
     CWPerl_conf_writer.add_def            = chaz_ConfWriterPerl_add_def;
+    CWPerl_conf_writer.add_global_def     = chaz_ConfWriterPerl_add_global_def;
     CWPerl_conf_writer.add_typedef        = chaz_ConfWriterPerl_add_typedef;
     CWPerl_conf_writer.add_global_typedef = chaz_ConfWriterPerl_add_global_typedef;
     CWPerl_conf_writer.add_sys_include    = chaz_ConfWriterPerl_add_sys_include;
@@ -1516,6 +1590,12 @@ chaz_ConfWriterPerl_add_def(const char *sym, const char *value) {
 }
 
 static void
+chaz_ConfWriterPerl_add_global_def(const char *sym, const char *value) {
+    (void)sym;
+    (void)value;
+}
+
+static void
 chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias) {
     (void)type;
     (void)alias;
@@ -1578,6 +1658,8 @@ chaz_ConfWriterRuby_vappend_conf(const char *fmt, va_list args);
 static void
 chaz_ConfWriterRuby_add_def(const char *sym, const char *value);
 static void
+chaz_ConfWriterRuby_add_global_def(const char *sym, const char *value);
+static void
 chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias);
 static void
 chaz_ConfWriterRuby_add_global_typedef(const char *type, const char *alias);
@@ -1595,6 +1677,7 @@ chaz_ConfWriterRuby_enable(void) {
     CWRuby_conf_writer.clean_up           = chaz_ConfWriterRuby_clean_up;
     CWRuby_conf_writer.vappend_conf       = chaz_ConfWriterRuby_vappend_conf;
     CWRuby_conf_writer.add_def            = chaz_ConfWriterRuby_add_def;
+    CWRuby_conf_writer.add_global_def     = chaz_ConfWriterRuby_add_global_def;
     CWRuby_conf_writer.add_typedef        = chaz_ConfWriterRuby_add_typedef;
     CWRuby_conf_writer.add_global_typedef = chaz_ConfWriterRuby_add_global_typedef;
     CWRuby_conf_writer.add_sys_include    = chaz_ConfWriterRuby_add_sys_include;
@@ -1715,6 +1798,12 @@ chaz_ConfWriterRuby_add_def(const char *sym, const char *value) {
 
     if (quoted_sym   != sym_buf)   { free(quoted_sym);   }
     if (quoted_value != value_buf) { free(quoted_value); }
+}
+
+static void
+chaz_ConfWriterRuby_add_global_def(const char *sym, const char *value) {
+    (void)sym;
+    (void)value;
 }
 
 static void
@@ -2625,7 +2714,7 @@ chaz_Integers_run(void) {
         chaz_ConfWriter_add_sys_include("stdint.h");
     }
     else {
-        /* we support only the following subset of stdint.h
+        /* We support only the following subset of stdint.h
          *   int8_t
          *   int16_t
          *   int32_t
@@ -2634,25 +2723,70 @@ chaz_Integers_run(void) {
          *   uint16_t
          *   uint32_t
          *   uint64_t
+         *   INT8_MAX
+         *   INT16_MAX
+         *   INT32_MAX
+         *   INT64_MAX
+         *   INT8_MIN
+         *   INT16_MIN
+         *   INT32_MIN
+         *   INT64_MIN
+         *   UINT8_MAX
+         *   UINT16_MAX
+         *   UINT32_MAX
+         *   UINT64_MAX
+         *   SIZE_MAX
+         *   INT32_C
+         *   INT64_C
+         *   UINT32_C
+         *   UINT64_C
          */
         if (has_8) {
             chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
             chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
+            chaz_ConfWriter_add_global_def("INT8_MAX", "127");
+            chaz_ConfWriter_add_global_def("INT8_MIN", "-128");
+            chaz_ConfWriter_add_global_def("UINT8_MAX", "255");
         }
         if (has_16) {
             chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
             chaz_ConfWriter_add_global_typedef("unsigned short", "uint16_t");
+            chaz_ConfWriter_add_global_def("INT16_MAX", "32767");
+            chaz_ConfWriter_add_global_def("INT16_MIN", "-32768");
+            chaz_ConfWriter_add_global_def("UINT16_MAX", "65535");
         }
         if (has_32) {
             chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
             sprintf(scratch, "unsigned %s", i32_t_type);
             chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
+            chaz_ConfWriter_add_global_def("INT32_MAX", "2147483647");
+            chaz_ConfWriter_add_global_def("INT32_MIN", "(-INT32_MAX-1)");
+            chaz_ConfWriter_add_global_def("UINT32_MAX", "4294967295U");
+            if (strcmp(i32_t_postfix, "") == 0) {
+                chaz_ConfWriter_add_global_def("INT32_C(n)", "n");
+            }
+            else {
+                sprintf(scratch, "n##%s", i32_t_postfix);
+                chaz_ConfWriter_add_global_def("INT32_C(n)", scratch);
+            }
+            sprintf(scratch, "n##%s", u32_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT32_C(n)", scratch);
         }
         if (has_64) {
             chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
             sprintf(scratch, "unsigned %s", i64_t_type);
             chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
+            sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INT64_MAX", scratch);
+            chaz_ConfWriter_add_global_def("INT64_MIN", "(-INT64_MAX-1)");
+            sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT64_MAX", scratch);
+            sprintf(scratch, "n##%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INT64_C(n)", scratch);
+            sprintf(scratch, "n##%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT64_C(n)", scratch);
         }
+        chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
     }
     if (has_8) {
         chaz_ConfWriter_add_def("HAS_I8_T", NULL);
