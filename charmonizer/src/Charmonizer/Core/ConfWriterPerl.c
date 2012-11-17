@@ -41,6 +41,8 @@ chaz_ConfWriterPerl_vappend_conf(const char *fmt, va_list args);
 static void
 chaz_ConfWriterPerl_add_def(const char *sym, const char *value);
 static void
+chaz_ConfWriterPerl_add_global_def(const char *sym, const char *value);
+static void
 chaz_ConfWriterPerl_add_typedef(const char *type, const char *alias);
 static void
 chaz_ConfWriterPerl_add_global_typedef(const char *type, const char *alias);
@@ -58,6 +60,7 @@ chaz_ConfWriterPerl_enable(void) {
     CWPerl_conf_writer.clean_up           = chaz_ConfWriterPerl_clean_up;
     CWPerl_conf_writer.vappend_conf       = chaz_ConfWriterPerl_vappend_conf;
     CWPerl_conf_writer.add_def            = chaz_ConfWriterPerl_add_def;
+    CWPerl_conf_writer.add_global_def     = chaz_ConfWriterPerl_add_global_def;
     CWPerl_conf_writer.add_typedef        = chaz_ConfWriterPerl_add_typedef;
     CWPerl_conf_writer.add_global_typedef = chaz_ConfWriterPerl_add_global_typedef;
     CWPerl_conf_writer.add_sys_include    = chaz_ConfWriterPerl_add_sys_include;
@@ -180,6 +183,12 @@ chaz_ConfWriterPerl_add_def(const char *sym, const char *value) {
 
     if (quoted_sym   != sym_buf)   { free(quoted_sym);   }
     if (quoted_value != value_buf) { free(quoted_value); }
+}
+
+static void
+chaz_ConfWriterPerl_add_global_def(const char *sym, const char *value) {
+    (void)sym;
+    (void)value;
 }
 
 static void

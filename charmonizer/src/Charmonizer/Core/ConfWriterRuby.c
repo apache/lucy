@@ -41,6 +41,8 @@ chaz_ConfWriterRuby_vappend_conf(const char *fmt, va_list args);
 static void
 chaz_ConfWriterRuby_add_def(const char *sym, const char *value);
 static void
+chaz_ConfWriterRuby_add_global_def(const char *sym, const char *value);
+static void
 chaz_ConfWriterRuby_add_typedef(const char *type, const char *alias);
 static void
 chaz_ConfWriterRuby_add_global_typedef(const char *type, const char *alias);
@@ -58,6 +60,7 @@ chaz_ConfWriterRuby_enable(void) {
     CWRuby_conf_writer.clean_up           = chaz_ConfWriterRuby_clean_up;
     CWRuby_conf_writer.vappend_conf       = chaz_ConfWriterRuby_vappend_conf;
     CWRuby_conf_writer.add_def            = chaz_ConfWriterRuby_add_def;
+    CWRuby_conf_writer.add_global_def     = chaz_ConfWriterRuby_add_global_def;
     CWRuby_conf_writer.add_typedef        = chaz_ConfWriterRuby_add_typedef;
     CWRuby_conf_writer.add_global_typedef = chaz_ConfWriterRuby_add_global_typedef;
     CWRuby_conf_writer.add_sys_include    = chaz_ConfWriterRuby_add_sys_include;
@@ -178,6 +181,12 @@ chaz_ConfWriterRuby_add_def(const char *sym, const char *value) {
 
     if (quoted_sym   != sym_buf)   { free(quoted_sym);   }
     if (quoted_value != value_buf) { free(quoted_value); }
+}
+
+static void
+chaz_ConfWriterRuby_add_global_def(const char *sym, const char *value) {
+    (void)sym;
+    (void)value;
 }
 
 static void

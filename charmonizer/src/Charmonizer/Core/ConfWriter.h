@@ -52,6 +52,11 @@ chaz_ConfWriter_append_conf(const char *fmt, ...);
 void
 chaz_ConfWriter_add_def(const char *sym, const char *value);
 
+/* Add a globally scoped pound-define.
+ */
+void
+chaz_ConfWriter_add_global_def(const char *sym, const char *value);
+
 /* Add a typedef.
  */
 void
@@ -92,6 +97,8 @@ typedef void
 typedef void
 (*chaz_ConfWriter_add_def_t)(const char *sym, const char *value);
 typedef void
+(*chaz_ConfWriter_add_global_def_t)(const char *sym, const char *value);
+typedef void
 (*chaz_ConfWriter_add_typedef_t)(const char *type, const char *alias);
 typedef void
 (*chaz_ConfWriter_add_global_typedef_t)(const char *type, const char *alias);
@@ -107,6 +114,7 @@ typedef struct chaz_ConfWriter {
     chaz_ConfWriter_clean_up_t           clean_up;
     chaz_ConfWriter_vappend_conf_t       vappend_conf;
     chaz_ConfWriter_add_def_t            add_def;
+    chaz_ConfWriter_add_global_def_t     add_global_def;
     chaz_ConfWriter_add_typedef_t        add_typedef;
     chaz_ConfWriter_add_global_typedef_t add_global_typedef;
     chaz_ConfWriter_add_sys_include_t    add_sys_include;
