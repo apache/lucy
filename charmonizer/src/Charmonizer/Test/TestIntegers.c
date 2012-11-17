@@ -55,7 +55,7 @@ S_run_tests(TestBatch *batch) {
         OK(the_truth, "bool_t true");
         OK(!false, "false is false");
     }
-#ifdef HAS_I8_T
+#ifdef HAS_INT8_T
     {
         int8_t foo = -100;
         uint8_t bar = 200;
@@ -68,7 +68,7 @@ S_run_tests(TestBatch *batch) {
         LONG_EQ(UINT8_MAX,  255, "UINT8_MAX");
     }
 #endif
-#ifdef HAS_I16_T
+#ifdef HAS_INT16_T
     {
         int16_t foo = -100;
         uint16_t bar = 30000;
@@ -81,7 +81,7 @@ S_run_tests(TestBatch *batch) {
         LONG_EQ(UINT16_MAX,  65535, "UINT16_MAX");
     }
 #endif
-#ifdef HAS_I32_T
+#ifdef HAS_INT32_T
     {
         int32_t foo = -100;
         uint32_t bar = 4000000000UL;
@@ -95,7 +95,7 @@ S_run_tests(TestBatch *batch) {
         OK((UINT32_MAX == UINT32_C(4294967295)), "UINT32_MAX");
     }
 #endif
-#ifdef HAS_I64_T
+#ifdef HAS_INT64_T
     {
         char buf[100];
         int64_t foo = -100;

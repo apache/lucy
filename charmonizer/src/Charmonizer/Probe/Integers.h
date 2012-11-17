@@ -76,44 +76,16 @@
  * UINT32_C
  * UINT64_C
  *
- * The following typedefs will be created if a suitable integer type exists,
- * as will most often be the case.  However, if for example a char is 64 bits
- * (as on certain Crays), no 8-bit types will be defined, or if no 64-bit
- * integer type is available, no 64-bit types will be defined, etc.
+ * The following typedefs will be created:
  *
  * bool_t
- * i8_t
- * u8_t
- * i16_t
- * u16_t
- * i32_t
- * u32_t
- * i64_t
- * u64_t
  *
- * Availability of the preceding integer typedefs is indicated by which of
- * these are defined:
+ * Availability of integer types is indicated by which of these are defined:
  *
- * HAS_I8_T
- * HAS_I16_T
- * HAS_I32_T
- * HAS_I64_T
- *
- * Maximums will be defined for all available integer types (save bool_t), and
- * minimums for all available signed types.
- *
- * I8_MAX
- * U8_MAX
- * I16_MAX
- * U16_MAX
- * I32_MAX
- * U32_MAX
- * I64_MAX
- * U64_MAX
- * I8_MIN
- * I16_MIN
- * I32_MIN
- * I64_MIN
+ * HAS_INT8_T
+ * HAS_INT16_T
+ * HAS_INT32_T
+ * HAS_INT64_T
  *
  * If 64-bit integers are available, this macro will promote pointers to i64_t
  * safely.
@@ -126,14 +98,6 @@
  *
  * I64P
  * U64P
- *
- * 32-bit and 64-bit literals can be spec'd via these macros, which append the
- * appropriate postfix:
- *
- * I32_C(n)
- * U32_C(n)
- * I64_C(n)
- * U64_C(n)
  *
  * These symbols will be defined if they are not already:
  *
