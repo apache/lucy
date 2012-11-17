@@ -77,13 +77,13 @@ Memory_oversize(size_t minimum, size_t width) {
     if (sizeof(size_t) == 8) { // 64-bit
         switch (width) {
             case 1:
-                amount = (amount + 7) & CHY_I64_C(0xFFFFFFFFFFFFFFF8);
+                amount = (amount + 7) & INT64_C(0xFFFFFFFFFFFFFFF8);
                 break;
             case 2:
-                amount = (amount + 3) & CHY_I64_C(0xFFFFFFFFFFFFFFFC);
+                amount = (amount + 3) & INT64_C(0xFFFFFFFFFFFFFFFC);
                 break;
             case 4:
-                amount = (amount + 1) & CHY_I64_C(0xFFFFFFFFFFFFFFFE);
+                amount = (amount + 1) & INT64_C(0xFFFFFFFFFFFFFFFE);
                 break;
             default:
                 break;

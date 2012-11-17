@@ -224,7 +224,7 @@ test_bigend_u16(TestBatch *batch) {
 static void
 test_bigend_u32(TestBatch *batch) {
     size_t    count     = 32;
-    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_C(1) + UINT32_MAX);
+    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, UINT64_C(1) + UINT32_MAX);
     size_t    amount    = (count + 1) * sizeof(uint32_t);
     char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
     char     *encoded   = allocated + 1; // Intentionally misaligned.

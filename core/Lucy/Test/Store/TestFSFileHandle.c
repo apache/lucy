@@ -107,11 +107,11 @@ test_Read_Write(TestBatch *batch) {
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
 
-    TEST_TRUE(batch, FSFH_Length(fh) == I64_C(0), "Length initially 0");
+    TEST_TRUE(batch, FSFH_Length(fh) == INT64_C(0), "Length initially 0");
     TEST_TRUE(batch, FSFH_Write(fh, foo, 3), "Write returns success");
-    TEST_TRUE(batch, FSFH_Length(fh) == I64_C(3), "Length after Write");
+    TEST_TRUE(batch, FSFH_Length(fh) == INT64_C(3), "Length after Write");
     TEST_TRUE(batch, FSFH_Write(fh, bar, 3), "Write returns success");
-    TEST_TRUE(batch, FSFH_Length(fh) == I64_C(6), "Length after 2 Writes");
+    TEST_TRUE(batch, FSFH_Length(fh) == INT64_C(6), "Length after 2 Writes");
 
     Err_set_error(NULL);
     TEST_FALSE(batch, FSFH_Read(fh, buf, 0, 2),
@@ -125,7 +125,7 @@ test_Read_Write(TestBatch *batch) {
     Err_set_error(NULL);
     fh = FSFH_open(test_filename, FH_READ_ONLY);
 
-    TEST_TRUE(batch, FSFH_Length(fh) == I64_C(6), "Length on Read");
+    TEST_TRUE(batch, FSFH_Length(fh) == INT64_C(6), "Length on Read");
     TEST_TRUE(batch, FSFH_Read(fh, buf, 0, 6), "Read returns success");
     TEST_TRUE(batch, strncmp(buf, "foobar", 6) == 0, "Read/Write");
     TEST_TRUE(batch, FSFH_Read(fh, buf, 2, 3), "Read returns success");

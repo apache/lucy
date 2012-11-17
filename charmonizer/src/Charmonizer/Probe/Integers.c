@@ -460,8 +460,8 @@ chaz_Integers_run(void) {
     else {
         chaz_ConfWriter_add_def(
             "U64_TO_DOUBLE(num)",
-            "((num) & CHY_U64_C(0x8000000000000000) ? "
-            "(double)(int64_t)((num) & CHY_U64_C(0x7FFFFFFFFFFFFFFF)) + "
+            "((num) & UINT64_C(0x8000000000000000) ? "
+            "(double)(int64_t)((num) & UINT64_C(0x7FFFFFFFFFFFFFFF)) + "
             "9223372036854775808.0 : "
             "(double)(int64_t)(num))");
     }

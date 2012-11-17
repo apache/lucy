@@ -145,7 +145,7 @@ test_Close(TestBatch *batch) {
 
 static void
 test_Seek_and_Tell(TestBatch *batch) {
-    int64_t     gb1      = I64_C(0x40000000);
+    int64_t     gb1      = INT64_C(0x40000000);
     int64_t     gb3      = gb1 * 3;
     int64_t     gb6      = gb1 * 6;
     int64_t     gb12     = gb1 * 12;

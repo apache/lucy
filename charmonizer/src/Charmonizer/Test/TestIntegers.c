@@ -89,24 +89,24 @@ S_run_tests(TestBatch *batch) {
         OK((bar == 4000000000UL), "uint32_t is unsigned");
         OK((sizeof(int32_t) == 4), "int32_t is 4 bytes");
         OK((sizeof(uint32_t) == 4), "uint32_t is 4 bytes");
-        OK((INT32_MAX == I32_C(2147483647)), "INT32_MAX");
+        OK((INT32_MAX == INT32_C(2147483647)), "INT32_MAX");
         /* The (-2147483647 - 1) avoids a compiler warning. */
-        OK((INT32_MIN == I32_C(-2147483647 - 1)), "INT32_MIN");
-        OK((UINT32_MAX == U32_C(4294967295)), "UINT32_MAX");
+        OK((INT32_MIN == -INT32_C(2147483647) - 1), "INT32_MIN");
+        OK((UINT32_MAX == UINT32_C(4294967295)), "UINT32_MAX");
     }
 #endif
 #ifdef HAS_I64_T
     {
         char buf[100];
         int64_t foo = -100;
-        uint64_t bar = U64_C(18000000000000000000);
+        uint64_t bar = UINT64_C(18000000000000000000);
         OK((foo == -100), "int64_t is signed");
-        OK((bar == U64_C(18000000000000000000)), "uint64_t is unsigned");
+        OK((bar == UINT64_C(18000000000000000000)), "uint64_t is unsigned");
         OK((sizeof(int64_t) == 8), "int64_t is 8 bytes");
         OK((sizeof(uint64_t) == 8), "uint64_t is 8 bytes");
-        OK((INT64_MAX == I64_C(0x7FFFFFFFFFFFFFFF)), "INT64_MAX");
-        OK((INT64_MIN == -I64_C(0x7FFFFFFFFFFFFFFF) - 1), "INT64_MIN");
-        OK((UINT64_MAX == U64_C(0xFFFFFFFFFFFFFFFF)), "UINT64_MAX");
+        OK((INT64_MAX == INT64_C(0x7FFFFFFFFFFFFFFF)), "INT64_MAX");
+        OK((INT64_MIN == -INT64_C(0x7FFFFFFFFFFFFFFF) - 1), "INT64_MIN");
+        OK((UINT64_MAX == UINT64_C(0xFFFFFFFFFFFFFFFF)), "UINT64_MAX");
         sprintf(buf, "%"I64P, foo);
         STR_EQ(buf, "-100", "I64P");
         sprintf(buf, "%"U64P, bar);

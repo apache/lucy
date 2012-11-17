@@ -29,12 +29,12 @@ chaz_Floats_run(void) {
     chaz_ConfWriter_append_conf(
         "typedef union { uint32_t i; float f; } chy_floatu32;\n"
         "typedef union { uint64_t i; double d; } chy_floatu64;\n"
-        "static const chy_floatu32 chy_f32inf    = {CHY_U32_C(0x7f800000)};\n"
-        "static const chy_floatu32 chy_f32neginf = {CHY_U32_C(0xff800000)};\n"
-        "static const chy_floatu32 chy_f32nan    = {CHY_U32_C(0x7fc00000)};\n"
-        "static const chy_floatu64 chy_f64inf    = {CHY_U64_C(0x7ff0000000000000)};\n"
-        "static const chy_floatu64 chy_f64neginf = {CHY_U64_C(0xfff0000000000000)};\n"
-        "static const chy_floatu64 chy_f64nan    = {CHY_U64_C(0x7ff8000000000000)};\n"
+        "static const chy_floatu32 chy_f32inf    = {UINT32_C(0x7f800000)};\n"
+        "static const chy_floatu32 chy_f32neginf = {UINT32_C(0xff800000)};\n"
+        "static const chy_floatu32 chy_f32nan    = {UINT32_C(0x7fc00000)};\n"
+        "static const chy_floatu64 chy_f64inf    = {UINT64_C(0x7ff0000000000000)};\n"
+        "static const chy_floatu64 chy_f64neginf = {UINT64_C(0xfff0000000000000)};\n"
+        "static const chy_floatu64 chy_f64nan    = {UINT64_C(0x7ff8000000000000)};\n"
     );
     chaz_ConfWriter_add_def("F32_INF", "(chy_f32inf.f)");
     chaz_ConfWriter_add_def("F32_NEGINF", "(chy_f32neginf.f)");

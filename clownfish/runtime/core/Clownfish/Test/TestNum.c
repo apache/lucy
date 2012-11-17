@@ -181,8 +181,8 @@ test_Equals_and_Compare_To(TestBatch *batch) {
     TEST_TRUE(batch, Int32_Compare_To(i32, (Obj*)f32) < 0,
               "Integer32 comparison to Float32");
 
-    Int64_Set_Value(i64, I64_C(0x6666666666666666));
-    Integer64 *i64_copy = Int64_new(I64_C(0x6666666666666666));
+    Int64_Set_Value(i64, INT64_C(0x6666666666666666));
+    Integer64 *i64_copy = Int64_new(INT64_C(0x6666666666666666));
     TEST_TRUE(batch, Int64_Compare_To(i64, (Obj*)i64_copy) == 0,
               "Integer64 comparison to same number");
 

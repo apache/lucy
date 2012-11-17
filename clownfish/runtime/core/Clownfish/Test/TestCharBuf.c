@@ -313,7 +313,7 @@ test_vcatf_i32(TestBatch *batch) {
 static void
 test_vcatf_i64(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar -5000000000 baz");
-    int64_t num = I64_C(-5000000000);
+    int64_t num = INT64_C(-5000000000);
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %i64 baz", num);
     TEST_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%i64");
@@ -346,7 +346,7 @@ test_vcatf_u32(TestBatch *batch) {
 static void
 test_vcatf_u64(TestBatch *batch) {
     CharBuf *wanted = S_get_cb("foo bar 5000000000 baz");
-    uint64_t num = U64_C(5000000000);
+    uint64_t num = UINT64_C(5000000000);
     CharBuf *got = S_get_cb("foo ");
     CB_catf(got, "bar %u64 baz", num);
     TEST_TRUE(batch, CB_Equals(wanted, (Obj*)got), "%%u64");

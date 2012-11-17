@@ -248,7 +248,7 @@ S_can_create_big_files(void) {
     }
     else {
         /* Bail unless seek succeeds. */
-        int64_t check_seek = fseeko64(fh, I64_C(5000000000), SEEK_SET);
+        int64_t check_seek = fseeko64(fh, INT64_C(5000000000), SEEK_SET);
         if (check_seek != -1) {
             /* Bail unless we write successfully. */
             if (fprintf(fh, "X") == 1) {

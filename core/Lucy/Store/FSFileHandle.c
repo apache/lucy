@@ -111,7 +111,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
         }
         else {
             // Derive length.
-            self->len = lseek64(self->fd, I64_C(0), SEEK_END);
+            self->len = lseek64(self->fd, INT64_C(0), SEEK_END);
             if (self->len == -1) {
                 Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s",
                                               self->path, strerror(errno))));
@@ -119,7 +119,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
                 return NULL;
             }
             else {
-                int64_t check_val = lseek64(self->fd, I64_C(0), SEEK_SET);
+                int64_t check_val = lseek64(self->fd, INT64_C(0), SEEK_SET);
                 if (check_val == -1) {
                     Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s",
                                                   self->path, strerror(errno))));
@@ -326,14 +326,14 @@ SI_init_read_only(FSFileHandle *self) {
     }
 
     // Derive len.
-    self->len = lseek64(self->fd, I64_C(0), SEEK_END);
+    self->len = lseek64(self->fd, INT64_C(0), SEEK_END);
     if (self->len == -1) {
         Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s", self->path,
                                       strerror(errno))));
         return false;
     }
     else {
-        int64_t check_val = lseek64(self->fd, I64_C(0), SEEK_SET);
+        int64_t check_val = lseek64(self->fd, INT64_C(0), SEEK_SET);
         if (check_val == -1) {
             Err_set_error(Err_new(CB_newf("lseek64 on %o failed: %s",
                                           self->path, strerror(errno))));

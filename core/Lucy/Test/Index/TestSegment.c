@@ -71,7 +71,7 @@ static void
 test_seg_name_and_num(TestBatch *batch) {
     Segment *segment_z = Seg_new(35);
     CharBuf *seg_z_name = Seg_num_to_name(35);
-    TEST_TRUE(batch, Seg_Get_Number(segment_z) == I64_C(35), "Get_Number");
+    TEST_TRUE(batch, Seg_Get_Number(segment_z) == INT64_C(35), "Get_Number");
     TEST_TRUE(batch, CB_Equals_Str(Seg_Get_Name(segment_z), "seg_z", 5),
               "Get_Name");
     TEST_TRUE(batch, CB_Equals_Str(seg_z_name, "seg_z", 5),
