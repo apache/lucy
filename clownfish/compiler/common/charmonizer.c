@@ -524,44 +524,16 @@ chaz_Probe_clean_up(void);
  * UINT32_C
  * UINT64_C
  *
- * The following typedefs will be created if a suitable integer type exists,
- * as will most often be the case.  However, if for example a char is 64 bits
- * (as on certain Crays), no 8-bit types will be defined, or if no 64-bit
- * integer type is available, no 64-bit types will be defined, etc.
+ * The following typedefs will be created:
  *
  * bool_t
- * i8_t
- * u8_t
- * i16_t
- * u16_t
- * i32_t
- * u32_t
- * i64_t
- * u64_t
  *
- * Availability of the preceding integer typedefs is indicated by which of
- * these are defined:
+ * Availability of integer types is indicated by which of these are defined:
  *
- * HAS_I8_T
- * HAS_I16_T
- * HAS_I32_T
- * HAS_I64_T
- *
- * Maximums will be defined for all available integer types (save bool_t), and
- * minimums for all available signed types.
- *
- * I8_MAX
- * U8_MAX
- * I16_MAX
- * U16_MAX
- * I32_MAX
- * U32_MAX
- * I64_MAX
- * U64_MAX
- * I8_MIN
- * I16_MIN
- * I32_MIN
- * I64_MIN
+ * HAS_INT8_T
+ * HAS_INT16_T
+ * HAS_INT32_T
+ * HAS_INT64_T
  *
  * If 64-bit integers are available, this macro will promote pointers to i64_t
  * safely.
@@ -574,14 +546,6 @@ chaz_Probe_clean_up(void);
  *
  * I64P
  * U64P
- *
- * 32-bit and 64-bit literals can be spec'd via these macros, which append the
- * appropriate postfix:
- *
- * I32_C(n)
- * U32_C(n)
- * I64_C(n)
- * U64_C(n)
  *
  * These symbols will be defined if they are not already:
  *
@@ -2708,7 +2672,21 @@ chaz_Integers_run(void) {
         chaz_ConfWriter_add_def("SIZEOF___INT64", scratch);
     }
 
-    /* Write affirmations, typedefs and maximums/minimums. */
+    /* Write affirmations. */
+    if (has_8) {
+        chaz_ConfWriter_add_def("HAS_INT8_T", NULL);
+    }
+    if (has_16) {
+        chaz_ConfWriter_add_def("HAS_INT16_T", NULL);
+    }
+    if (has_32) {
+        chaz_ConfWriter_add_def("HAS_INT32_T", NULL);
+    }
+    if (has_64) {
+        chaz_ConfWriter_add_def("HAS_INT64_T", NULL);
+    }
+
+    /* Write typedefs, maximums/minimums and literals macros. */
     chaz_ConfWriter_add_typedef("int", "bool_t");
     if (has_stdint) {
         chaz_ConfWriter_add_sys_include("stdint.h");
@@ -2788,51 +2766,6 @@ chaz_Integers_run(void) {
         }
         chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
     }
-    if (has_8) {
-        chaz_ConfWriter_add_def("HAS_I8_T", NULL);
-        chaz_ConfWriter_add_typedef("signed char", "i8_t");
-        chaz_ConfWriter_add_typedef("unsigned char", "u8_t");
-        /* FIXME: use integer literals. */
-        chaz_ConfWriter_add_def("I8_MAX", "0x7F");
-        chaz_ConfWriter_add_def("I8_MIN", "(-I8_MAX - 1)");
-        chaz_ConfWriter_add_def("U8_MAX", "(I8_MAX * 2 + 1)");
-    }
-    if (has_16) {
-        chaz_ConfWriter_add_def("HAS_I16_T", NULL);
-        chaz_ConfWriter_add_typedef("short", "i16_t");
-        chaz_ConfWriter_add_typedef("unsigned short", "u16_t");
-        /* FIXME: use integer literals. */
-        chaz_ConfWriter_add_def("I16_MAX", "0x7FFF");
-        chaz_ConfWriter_add_def("I16_MIN", "(-I16_MAX - 1)");
-        chaz_ConfWriter_add_def("U16_MAX", "(I16_MAX * 2 + 1)");
-    }
-    if (has_32) {
-        chaz_ConfWriter_add_def("HAS_I32_T", NULL);
-        chaz_ConfWriter_add_typedef(i32_t_type, "i32_t");
-        sprintf(scratch, "unsigned %s", i32_t_type);
-        chaz_ConfWriter_add_typedef(scratch, "u32_t");
-        /* FIXME: use integer literals. */
-        sprintf(scratch, "0x7FFFFFFF%s", i32_t_postfix);
-        chaz_ConfWriter_add_def("I32_MAX", scratch);
-        chaz_ConfWriter_add_def("I32_MIN", "(-I32_MAX - 1)");
-        sprintf(scratch, "(I32_MAX * 2%s + 1%s)", u32_t_postfix,
-                u32_t_postfix);
-        chaz_ConfWriter_add_def("U32_MAX", scratch);
-    }
-    if (has_64) {
-        chaz_ConfWriter_add_def("HAS_I64_T", NULL);
-        chaz_ConfWriter_add_typedef(i64_t_type, "i64_t");
-        sprintf(scratch, "unsigned %s", i64_t_type);
-        chaz_ConfWriter_add_typedef(scratch, "u64_t");
-        /* FIXME: use integer literals. */
-        sprintf(scratch, "0x7FFFFFFFFFFFFFFF%s", i64_t_postfix);
-        chaz_ConfWriter_add_def("I64_MAX", scratch);
-        sprintf(scratch, "(-I64_MAX - 1%s)", i64_t_postfix);
-        chaz_ConfWriter_add_def("I64_MIN", scratch);
-        sprintf(scratch, "(I64_MAX * 2%s + 1%s)", u64_t_postfix,
-                u64_t_postfix);
-        chaz_ConfWriter_add_def("U64_MAX", scratch);
-    }
 
     /* Create the I64P and U64P printf macros. */
     if (has_64) {
@@ -2873,36 +2806,15 @@ chaz_Integers_run(void) {
 
     }
 
-    /* Write out the 32-bit and 64-bit literal macros. */
-    if (has_32) {
-        if (strcmp(i32_t_postfix, "") == 0) {
-            chaz_ConfWriter_add_def("I32_C(n)", "n");
-            sprintf(scratch, "n##%s", u32_t_postfix);
-            chaz_ConfWriter_add_def("U32_C(n)", scratch);
-        }
-        else {
-            sprintf(scratch, "n##%s", i32_t_postfix);
-            chaz_ConfWriter_add_def("I32_C(n)", scratch);
-            sprintf(scratch, "n##%s", u32_t_postfix);
-            chaz_ConfWriter_add_def("U32_C(n)", scratch);
-        }
-    }
-    if (has_64) {
-        sprintf(scratch, "n##%s", i64_t_postfix);
-        chaz_ConfWriter_add_def("I64_C(n)", scratch);
-        sprintf(scratch, "n##%s", u64_t_postfix);
-        chaz_ConfWriter_add_def("U64_C(n)", scratch);
-    }
-
     /* Create macro for promoting pointers to integers. */
     if (has_64) {
         if (sizeof_ptr == 8) {
             chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
-                                    "((chy_i64_t)(chy_u64_t)(ptr))");
+                                    "((int64_t)(uint64_t)(ptr))");
         }
         else {
             chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
-                                    "((chy_i64_t)(chy_u32_t)(ptr))");
+                                    "((int64_t)(uint32_t)(ptr))");
         }
     }
 
@@ -2914,8 +2826,8 @@ chaz_Integers_run(void) {
     else {
         chaz_ConfWriter_add_def(
             "U64_TO_DOUBLE(num)",
-            "((num) & CHY_U64_C(0x8000000000000000) ? "
-            "(double)(int64_t)((num) & CHY_U64_C(0x7FFFFFFFFFFFFFFF)) + "
+            "((num) & UINT64_C(0x8000000000000000) ? "
+            "(double)(int64_t)((num) & UINT64_C(0x7FFFFFFFFFFFFFFF)) + "
             "9223372036854775808.0 : "
             "(double)(int64_t)(num))");
     }
