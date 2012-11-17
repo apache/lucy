@@ -260,7 +260,7 @@ chaz_Integers_run(void) {
         chaz_ConfWriter_add_sys_include("stdint.h");
     }
     else {
-        /* we support only the following subset of stdint.h
+        /* We support only the following subset of stdint.h
          *   int8_t
          *   int16_t
          *   int32_t
@@ -269,25 +269,70 @@ chaz_Integers_run(void) {
          *   uint16_t
          *   uint32_t
          *   uint64_t
+         *   INT8_MAX
+         *   INT16_MAX
+         *   INT32_MAX
+         *   INT64_MAX
+         *   INT8_MIN
+         *   INT16_MIN
+         *   INT32_MIN
+         *   INT64_MIN
+         *   UINT8_MAX
+         *   UINT16_MAX
+         *   UINT32_MAX
+         *   UINT64_MAX
+         *   SIZE_MAX
+         *   INT32_C
+         *   INT64_C
+         *   UINT32_C
+         *   UINT64_C
          */
         if (has_8) {
             chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
             chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
+            chaz_ConfWriter_add_global_def("INT8_MAX", "127");
+            chaz_ConfWriter_add_global_def("INT8_MIN", "-128");
+            chaz_ConfWriter_add_global_def("UINT8_MAX", "255");
         }
         if (has_16) {
             chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
             chaz_ConfWriter_add_global_typedef("unsigned short", "uint16_t");
+            chaz_ConfWriter_add_global_def("INT16_MAX", "32767");
+            chaz_ConfWriter_add_global_def("INT16_MIN", "-32768");
+            chaz_ConfWriter_add_global_def("UINT16_MAX", "65535");
         }
         if (has_32) {
             chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
             sprintf(scratch, "unsigned %s", i32_t_type);
             chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
+            chaz_ConfWriter_add_global_def("INT32_MAX", "2147483647");
+            chaz_ConfWriter_add_global_def("INT32_MIN", "(-INT32_MAX-1)");
+            chaz_ConfWriter_add_global_def("UINT32_MAX", "4294967295U");
+            if (strcmp(i32_t_postfix, "") == 0) {
+                chaz_ConfWriter_add_global_def("INT32_C(n)", "n");
+            }
+            else {
+                sprintf(scratch, "n##%s", i32_t_postfix);
+                chaz_ConfWriter_add_global_def("INT32_C(n)", scratch);
+            }
+            sprintf(scratch, "n##%s", u32_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT32_C(n)", scratch);
         }
         if (has_64) {
             chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
             sprintf(scratch, "unsigned %s", i64_t_type);
             chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
+            sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INT64_MAX", scratch);
+            chaz_ConfWriter_add_global_def("INT64_MIN", "(-INT64_MAX-1)");
+            sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT64_MAX", scratch);
+            sprintf(scratch, "n##%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INT64_C(n)", scratch);
+            sprintf(scratch, "n##%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT64_C(n)", scratch);
         }
+        chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
     }
     if (has_8) {
         chaz_ConfWriter_add_def("HAS_I8_T", NULL);

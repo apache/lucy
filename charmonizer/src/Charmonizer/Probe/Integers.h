@@ -47,7 +47,8 @@
  * HAS_STDINT_H
  *
  * If stdint.h is is available, it will be pound-included in the configuration
- * header.  If it is not, the following typedefs will be defined if possible:
+ * header.  If it is not, the following typedefs and macros will be defined if
+ * possible:
  *
  * int8_t
  * int16_t
@@ -57,6 +58,23 @@
  * uint16_t
  * uint32_t
  * uint64_t
+ * INT8_MAX
+ * INT16_MAX
+ * INT32_MAX
+ * INT64_MAX
+ * INT8_MIN
+ * INT16_MIN
+ * INT32_MIN
+ * INT64_MIN
+ * UINT8_MAX
+ * UINT16_MAX
+ * UINT32_MAX
+ * UINT64_MAX
+ * SIZE_MAX
+ * INT32_C
+ * INT64_C
+ * UINT32_C
+ * UINT64_C
  *
  * The following typedefs will be created if a suitable integer type exists,
  * as will most often be the case.  However, if for example a char is 64 bits

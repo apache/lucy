@@ -188,7 +188,17 @@ chaz_ConfWriterC_add_global_def(const char *sym, const char *value) {
 static void
 chaz_ConfWriterC_append_global_def_to_conf(const char *sym,
         const char *value) {
-    fprintf(chaz_ConfWriterC.fh, "#ifndef %s\n", sym);
+    char *name_end = strchr(sym, '(');
+    if (name_end == NULL) {
+        fprintf(chaz_ConfWriterC.fh, "#ifndef %s\n", sym);
+    }
+    else {
+        size_t  name_len = (size_t)(name_end - sym);
+        char   *name     = chaz_Util_strdup(sym);
+        name[name_len] = '\0';
+        fprintf(chaz_ConfWriterC.fh, "#ifndef %s\n", name);
+        free(name);
+    }
     if (value) {
         fprintf(chaz_ConfWriterC.fh, "  #define %s %s\n", sym, value);
     }
