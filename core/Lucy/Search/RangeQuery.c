@@ -245,7 +245,7 @@ static int32_t
 S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache) {
     RangeQuery *parent     = (RangeQuery*)self->parent;
     Obj        *upper_term = parent->upper_term;
-    int32_t     retval     = I32_MAX;
+    int32_t     retval     = INT32_MAX;
 
     if (upper_term) {
         int32_t hi_ord = SortCache_Find(sort_cache, upper_term);

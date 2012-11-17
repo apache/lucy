@@ -144,9 +144,9 @@ RAMFH_write(RAMFileHandle *self, const void *data, size_t len) {
 
 bool_t
 RAMFH_grow(RAMFileHandle *self, int64_t len) {
-    if (len > I32_MAX) {
+    if (len > INT32_MAX) {
         Err_set_error(Err_new(CB_newf("Can't support RAM files of size %i64 (> %i32)",
-                                      len, (int32_t)I32_MAX)));
+                                      len, (int32_t)INT32_MAX)));
         return false;
     }
     else if (self->ram_file->read_only) {

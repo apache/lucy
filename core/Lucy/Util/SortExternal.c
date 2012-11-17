@@ -44,7 +44,7 @@ SortEx_init(SortExternal *self, size_t width) {
     self->width        = width;
 
     // Init.
-    self->mem_thresh   = U32_MAX;
+    self->mem_thresh   = UINT32_MAX;
     self->cache        = NULL;
     self->cache_cap    = 0;
     self->cache_max    = 0;

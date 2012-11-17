@@ -63,7 +63,7 @@ TestUtils_random_f64s(double *buf, size_t count) {
     double *f64s = buf ? buf : (double*)CALLOCATE(count, sizeof(double));
     for (size_t i = 0; i < count; i++) {
         uint64_t num = TestUtils_random_u64();
-        f64s[i] = (double)num / U64_MAX;
+        f64s[i] = (double)num / UINT64_MAX;
     }
     return f64s;
 }

@@ -20,7 +20,7 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Object/TestI32Array.h"
 
-static int32_t source_ints[] = { -1, 0, I32_MIN, I32_MAX, 1 };
+static int32_t source_ints[] = { -1, 0, INT32_MIN, INT32_MAX, 1 };
 static size_t num_ints = sizeof(source_ints) / sizeof(int32_t);
 
 static void

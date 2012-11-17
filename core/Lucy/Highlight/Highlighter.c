@@ -590,7 +590,7 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
     Span    *sentence       = NULL;
     VArray  *sentences      = VA_new(10);
     int32_t  stop           = length == 0
-                              ? I32_MAX
+                              ? INT32_MAX
                               : offset + length;
     ZombieCharBuf *fragment = ZCB_WRAP(text);
     int32_t  pos            = ZCB_Trim_Top(fragment);

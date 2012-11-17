@@ -372,7 +372,7 @@ static void
 test_vcatf_x32(TestBatch *batch) {
     CharBuf *wanted;
     char buf[64];
-    unsigned long num = I32_MAX;
+    unsigned long num = INT32_MAX;
     CharBuf *got = S_get_cb("foo ");
 #if (SIZEOF_LONG == 4)
     sprintf(buf, "foo bar %.8lx baz", num);

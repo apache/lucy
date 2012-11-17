@@ -557,7 +557,7 @@ FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
     // ReadFile() takes a DWORD (unsigned 32-bit integer) as a length
     // argument, so throw a sensible error rather than wrap around.
-    if (len > U32_MAX) {
+    if (len > UINT32_MAX) {
         Err_set_error(Err_new(CB_newf("Can't read more than 4 GB (%u64)",
                                       (uint64_t)len)));
         return false;

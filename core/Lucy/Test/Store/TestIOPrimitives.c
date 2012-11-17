@@ -80,17 +80,17 @@ test_u8(TestBatch *batch) {
 
 static void
 test_i32(TestBatch *batch) {
-    int64_t    *ints = TestUtils_random_i64s(NULL, 1000, I32_MIN, I32_MAX);
+    int64_t    *ints = TestUtils_random_i64s(NULL, 1000, INT32_MIN, INT32_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
     uint32_t i;
 
     // Test boundaries.
-    ints[0] = I32_MIN;
-    ints[1] = I32_MIN + 1;
-    ints[2] = I32_MAX;
-    ints[3] = I32_MAX - 1;
+    ints[0] = INT32_MIN;
+    ints[1] = INT32_MIN + 1;
+    ints[2] = INT32_MAX;
+    ints[3] = INT32_MAX - 1;
 
     for (i = 0; i < 1000; i++) {
         OutStream_Write_I32(outstream, (int32_t)ints[i]);
@@ -118,7 +118,7 @@ test_i32(TestBatch *batch) {
 
 static void
 test_u32(TestBatch *batch) {
-    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, U32_MAX);
+    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, UINT32_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -127,8 +127,8 @@ test_u32(TestBatch *batch) {
     // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
-    ints[2] = U32_MAX;
-    ints[3] = U32_MAX - 1;
+    ints[2] = UINT32_MAX;
+    ints[3] = UINT32_MAX - 1;
 
     for (i = 0; i < 1000; i++) {
         OutStream_Write_U32(outstream, (uint32_t)ints[i]);
@@ -156,17 +156,17 @@ test_u32(TestBatch *batch) {
 
 static void
 test_i64(TestBatch *batch) {
-    int64_t    *ints = TestUtils_random_i64s(NULL, 1000, I64_MIN, I64_MAX);
+    int64_t    *ints = TestUtils_random_i64s(NULL, 1000, INT64_MIN, INT64_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
     uint32_t i;
 
     // Test boundaries.
-    ints[0] = I64_MIN;
-    ints[1] = I64_MIN + 1;
-    ints[2] = I64_MAX;
-    ints[3] = I64_MAX - 1;
+    ints[0] = INT64_MIN;
+    ints[1] = INT64_MIN + 1;
+    ints[2] = INT64_MAX;
+    ints[3] = INT64_MAX - 1;
 
     for (i = 0; i < 1000; i++) {
         OutStream_Write_I64(outstream, ints[i]);
@@ -195,7 +195,7 @@ test_i64(TestBatch *batch) {
 
 static void
 test_u64(TestBatch *batch) {
-    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, U64_MAX);
+    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, UINT64_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -204,8 +204,8 @@ test_u64(TestBatch *batch) {
     // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
-    ints[2] = U64_MAX;
-    ints[3] = U64_MAX - 1;
+    ints[2] = UINT64_MAX;
+    ints[3] = UINT64_MAX - 1;
 
     for (i = 0; i < 1000; i++) {
         OutStream_Write_U64(outstream, ints[i]);
@@ -233,7 +233,7 @@ test_u64(TestBatch *batch) {
 
 static void
 test_c32(TestBatch *batch) {
-    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, U32_MAX);
+    uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, UINT32_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -242,8 +242,8 @@ test_c32(TestBatch *batch) {
     // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
-    ints[2] = U32_MAX;
-    ints[3] = U32_MAX - 1;
+    ints[2] = UINT32_MAX;
+    ints[3] = UINT32_MAX - 1;
 
     for (i = 0; i < 1000; i++) {
         OutStream_Write_C32(outstream, (uint32_t)ints[i]);
@@ -271,7 +271,7 @@ test_c32(TestBatch *batch) {
 
 static void
 test_c64(TestBatch *batch) {
-    uint64_t   *ints   = TestUtils_random_u64s(NULL, 1000, 0, U64_MAX);
+    uint64_t   *ints   = TestUtils_random_u64s(NULL, 1000, 0, UINT64_MAX);
     RAMFile    *file     = RAMFile_new(NULL, false);
     RAMFile    *raw_file = RAMFile_new(NULL, false);
     OutStream  *outstream     = OutStream_open((Obj*)file);
@@ -283,8 +283,8 @@ test_c64(TestBatch *batch) {
     // Test boundaries.
     ints[0] = 0;
     ints[1] = 1;
-    ints[2] = U64_MAX;
-    ints[3] = U64_MAX - 1;
+    ints[2] = UINT64_MAX;
+    ints[3] = UINT64_MAX - 1;
 
     for (i = 0; i < 1000; i++) {
         OutStream_Write_C64(outstream, ints[i]);

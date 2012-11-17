@@ -84,8 +84,8 @@ PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
     self->plist            = NULL;
     self->lex_temp_in      = NULL;
     self->post_temp_in     = NULL;
-    self->lex_start        = I64_MAX;
-    self->post_start       = I64_MAX;
+    self->lex_start        = INT64_MAX;
+    self->post_start       = INT64_MAX;
     self->lex_end          = 0;
     self->post_end         = 0;
     self->skip_stepper     = SkipStepper_new();

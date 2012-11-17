@@ -405,12 +405,12 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
                 cutoff = Obj_To_I64(cutoff_obj);
             }
             else {
-                cutoff = I64_MAX;
+                cutoff = INT64_MAX;
             }
             DECREF(merge_data);
         }
         else {
-            cutoff = I64_MAX;
+            cutoff = INT64_MAX;
         }
         DECREF(merge_lock);
     }

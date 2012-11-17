@@ -66,7 +66,7 @@ SeriesMatcher_advance(SeriesMatcher *self, int32_t target) {
             while (1) {
                 uint32_t next_offset
                     = self->tick + 1 == self->num_matchers
-                      ? I32_MAX
+                      ? INT32_MAX
                       : I32Arr_Get(self->offsets, self->tick + 1);
                 self->current_matcher = (Matcher*)VA_Fetch(self->matchers,
                                                            self->tick);

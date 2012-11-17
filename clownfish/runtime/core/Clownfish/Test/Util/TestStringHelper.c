@@ -136,8 +136,8 @@ test_overlap(TestBatch *batch) {
 static void
 test_to_base36(TestBatch *batch) {
     char buffer[StrHelp_MAX_BASE36_BYTES];
-    StrHelp_to_base36(U64_MAX, buffer);
-    TEST_STR_EQ(batch, "3w5e11264sgsf", buffer, "base36 U64_MAX");
+    StrHelp_to_base36(UINT64_MAX, buffer);
+    TEST_STR_EQ(batch, "3w5e11264sgsf", buffer, "base36 UINT64_MAX");
     StrHelp_to_base36(1, buffer);
     TEST_STR_EQ(batch, "1", buffer, "base36 1");
     TEST_INT_EQ(batch, buffer[1], 0, "base36 NULL termination");

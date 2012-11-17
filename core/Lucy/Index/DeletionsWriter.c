@@ -50,7 +50,7 @@ I32Array*
 DelWriter_generate_doc_map(DeletionsWriter *self, Matcher *deletions,
                            int32_t doc_max, int32_t offset) {
     int32_t *doc_map = (int32_t*)CALLOCATE(doc_max + 1, sizeof(int32_t));
-    int32_t  next_deletion = deletions ? Matcher_Next(deletions) : I32_MAX;
+    int32_t  next_deletion = deletions ? Matcher_Next(deletions) : INT32_MAX;
     UNUSED_VAR(self);
 
     // 0 for a deleted doc, a new number otherwise

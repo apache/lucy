@@ -20,9 +20,6 @@
 #include "charmony.h"
 #include <stdio.h>
 #include <string.h>
-#ifdef HAS_INTTYPES_H
-    #include <inttypes.h>
-#endif
 
 static void
 S_run_tests(TestBatch *batch) {
@@ -53,12 +50,6 @@ S_run_tests(TestBatch *batch) {
     SKIP("No 'long long' type");
 #endif
 
-#ifdef HAS_INTTYPES_H
-    LONG_EQ(sizeof(int8_t), 1, "HAS_INTTYPES_H");
-#else
-    SKIP("No inttypes.h");
-#endif
-
     {
         bool_t the_truth = true;
         OK(the_truth, "bool_t true");
@@ -72,9 +63,9 @@ S_run_tests(TestBatch *batch) {
         LONG_EQ(bar, 200, "uint8_t is unsigned");
         LONG_EQ(sizeof(int8_t), 1, "i8_t is 1 byte");
         LONG_EQ(sizeof(uint8_t), 1, "u8_t is 1 byte");
-        LONG_EQ(I8_MAX,  127, "I8_MAX");
-        LONG_EQ(I8_MIN, -128, "I8_MIN");
-        LONG_EQ(U8_MAX,  255, "U8_MAX");
+        LONG_EQ(INT8_MAX,  127, "INT8_MAX");
+        LONG_EQ(INT8_MIN, -128, "INT8_MIN");
+        LONG_EQ(UINT8_MAX,  255, "UINT8_MAX");
     }
 #endif
 #ifdef HAS_I16_T
@@ -85,9 +76,9 @@ S_run_tests(TestBatch *batch) {
         LONG_EQ(bar, 30000, "uint16_t is unsigned");
         LONG_EQ(sizeof(int16_t), 2, "int16_t is 2 bytes");
         LONG_EQ(sizeof(uint16_t), 2, "uint16_t is 2 bytes");
-        LONG_EQ(I16_MAX,  32767, "I16_MAX");
-        LONG_EQ(I16_MIN, -32768, "I16_MIN");
-        LONG_EQ(U16_MAX,  65535, "U16_MAX");
+        LONG_EQ(INT16_MAX,  32767, "INT16_MAX");
+        LONG_EQ(INT16_MIN, -32768, "INT16_MIN");
+        LONG_EQ(UINT16_MAX,  65535, "UINT16_MAX");
     }
 #endif
 #ifdef HAS_I32_T
@@ -98,10 +89,10 @@ S_run_tests(TestBatch *batch) {
         OK((bar == 4000000000UL), "uint32_t is unsigned");
         OK((sizeof(int32_t) == 4), "int32_t is 4 bytes");
         OK((sizeof(uint32_t) == 4), "uint32_t is 4 bytes");
-        OK((I32_MAX == I32_C(2147483647)), "I32_MAX");
+        OK((INT32_MAX == I32_C(2147483647)), "INT32_MAX");
         /* The (-2147483647 - 1) avoids a compiler warning. */
-        OK((I32_MIN == I32_C(-2147483647 - 1)), "I32_MIN");
-        OK((U32_MAX == U32_C(4294967295)), "U32_MAX");
+        OK((INT32_MIN == I32_C(-2147483647 - 1)), "INT32_MIN");
+        OK((UINT32_MAX == U32_C(4294967295)), "UINT32_MAX");
     }
 #endif
 #ifdef HAS_I64_T
@@ -113,6 +104,9 @@ S_run_tests(TestBatch *batch) {
         OK((bar == U64_C(18000000000000000000)), "uint64_t is unsigned");
         OK((sizeof(int64_t) == 8), "int64_t is 8 bytes");
         OK((sizeof(uint64_t) == 8), "uint64_t is 8 bytes");
+        OK((INT64_MAX == I64_C(0x7FFFFFFFFFFFFFFF)), "INT64_MAX");
+        OK((INT64_MIN == -I64_C(0x7FFFFFFFFFFFFFFF) - 1), "INT64_MIN");
+        OK((UINT64_MAX == U64_C(0xFFFFFFFFFFFFFFFF)), "UINT64_MAX");
         sprintf(buf, "%"I64P, foo);
         STR_EQ(buf, "-100", "I64P");
         sprintf(buf, "%"U64P, bar);
@@ -122,7 +116,7 @@ S_run_tests(TestBatch *batch) {
 }
 
 int main(int argc, char **argv) {
-    TestBatch *batch = Test_start(37);
+    TestBatch *batch = Test_start(39);
     S_run_tests(batch);
     return !Test_finish();
 }

@@ -645,7 +645,7 @@ lucy_Obj_inc_refcount(lucy_Obj *self) {
 
 uint32_t
 lucy_Obj_dec_refcount(lucy_Obj *self) {
-    uint32_t modified_refcount = I32_MAX;
+    uint32_t modified_refcount = INT32_MAX;
     switch (self->ref.count) {
         case 0:
             CFISH_THROW(LUCY_ERR, "Illegal refcount of 0");

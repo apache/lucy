@@ -42,7 +42,7 @@ Matcher_advance(Matcher *self, int32_t target) {
 void
 Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions) {
     int32_t doc_id        = 0;
-    int32_t next_deletion = deletions ? 0 : I32_MAX;
+    int32_t next_deletion = deletions ? 0 : INT32_MAX;
 
     Coll_Set_Matcher(collector, self);
 
@@ -50,7 +50,7 @@ Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions) {
     while (1) {
         if (doc_id > next_deletion) {
             next_deletion = Matcher_Advance(deletions, doc_id);
-            if (next_deletion == 0) { next_deletion = I32_MAX; }
+            if (next_deletion == 0) { next_deletion = INT32_MAX; }
             continue;
         }
         else if (doc_id == next_deletion) {
@@ -60,7 +60,7 @@ Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions) {
                 while (doc_id == next_deletion) {
                     doc_id++;
                     next_deletion = Matcher_Advance(deletions, doc_id);
-                    if (next_deletion == 0) { next_deletion = I32_MAX; }
+                    if (next_deletion == 0) { next_deletion = INT32_MAX; }
                 }
                 // Verify that the artificial advance actually worked.
                 doc_id = Matcher_Advance(self, doc_id);

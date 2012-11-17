@@ -40,7 +40,7 @@ S_down_heap(PriorityQueue *self);
 
 PriorityQueue*
 PriQ_init(PriorityQueue *self, uint32_t max_size) {
-    if (max_size == U32_MAX) {
+    if (max_size == UINT32_MAX) {
         THROW(ERR, "max_size too large: %u32", max_size);
     }
     uint32_t heap_size = max_size + 1;

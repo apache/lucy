@@ -53,9 +53,9 @@ Sort_mergesort(void *elems, void *scratch, uint32_t num_elems, uint32_t width,
     if (num_elems < 2) { return; }
 
     // Validate.
-    if (num_elems >= I32_MAX) {
+    if (num_elems >= INT32_MAX) {
         THROW(ERR, "Provided %u64 elems, but can't handle more than %i32",
-              (uint64_t)num_elems, I32_MAX);
+              (uint64_t)num_elems, INT32_MAX);
     }
 
     // Dispatch by element size.
@@ -233,9 +233,9 @@ Sort_quicksort(void *elems, size_t num_elems, size_t width,
     if (num_elems < 2) { return; }
 
     // Validate.
-    if (num_elems >= I32_MAX) {
+    if (num_elems >= INT32_MAX) {
         THROW(ERR, "Provided %u64 elems, but can't handle more than %i32",
-              (uint64_t)num_elems, I32_MAX);
+              (uint64_t)num_elems, INT32_MAX);
     }
 
     if (width == 4) {

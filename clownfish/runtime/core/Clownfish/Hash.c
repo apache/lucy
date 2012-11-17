@@ -67,7 +67,7 @@ Hash*
 Hash_init(Hash *self, uint32_t capacity) {
     // Allocate enough space to hold the requested number of elements without
     // triggering a rebuild.
-    uint32_t requested_capacity = capacity < I32_MAX ? capacity : I32_MAX;
+    uint32_t requested_capacity = capacity < INT32_MAX ? capacity : INT32_MAX;
     uint32_t threshold;
     capacity = 16;
     while (1) {

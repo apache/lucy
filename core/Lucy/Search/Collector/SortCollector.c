@@ -99,7 +99,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     // Init.
     Coll_init((Collector*)self);
     self->total_hits    = 0;
-    self->bubble_doc    = I32_MAX;
+    self->bubble_doc    = INT32_MAX;
     self->bubble_score  = F32_NEGINF;
     self->seg_doc_max   = 0;
 
@@ -155,7 +155,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     // Prepare a MatchDoc-in-waiting.
     VArray *values = self->need_values ? VA_new(num_rules) : NULL;
     float   score  = self->need_score  ? F32_NEGINF : F32_NAN;
-    self->bumped = MatchDoc_new(I32_MAX, score, values);
+    self->bumped = MatchDoc_new(INT32_MAX, score, values);
     DECREF(values);
 
     return self;
@@ -225,8 +225,8 @@ SortColl_set_reader(SortCollector *self, SegReader *reader) {
         = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
 
     // Reset threshold variables and trigger auto-action behavior.
-    self->bumped->doc_id = I32_MAX;
-    self->bubble_doc     = I32_MAX;
+    self->bumped->doc_id = INT32_MAX;
+    self->bubble_doc     = INT32_MAX;
     self->bumped->score  = self->need_score ? F32_NEGINF : F32_NAN;
     self->bubble_score   = self->need_score ? F32_NEGINF : F32_NAN;
     self->actions        = self->auto_actions;
@@ -320,7 +320,7 @@ SortColl_collect(SortCollector *self, int32_t doc_id) {
                              ? VA_new(self->num_rules)
                              : NULL;
             float fake_score = self->need_score ? F32_NEGINF : F32_NAN;
-            self->bumped = MatchDoc_new(I32_MAX, fake_score, values);
+            self->bumped = MatchDoc_new(INT32_MAX, fake_score, values);
             DECREF(values);
         }
 

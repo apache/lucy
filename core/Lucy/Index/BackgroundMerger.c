@@ -309,8 +309,8 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                                                new_segment, merge_polyreader);
         DeletionsWriter *del_writer = SegWriter_Get_Del_Writer(seg_writer);
         int64_t  merge_seg_num = Seg_Get_Number(self->segment);
-        uint32_t seg_tick      = I32_MAX;
-        int32_t  offset        = I32_MAX;
+        uint32_t seg_tick      = INT32_MAX;
+        int32_t  offset        = INT32_MAX;
         CharBuf *seg_name      = NULL;
         Matcher *deletions     = NULL;
 
@@ -326,7 +326,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                 DECREF(offsets);
             }
         }
-        if (offset == I32_MAX) { THROW(ERR, "Failed sanity check"); }
+        if (offset == INT32_MAX) { THROW(ERR, "Failed sanity check"); }
 
         Hash_Iterate(updated_deletions);
         while (Hash_Next(updated_deletions,

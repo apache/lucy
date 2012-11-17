@@ -29,8 +29,8 @@ static void
 test_To_String(TestBatch *batch) {
     Float32   *f32 = Float32_new(1.33f);
     Float64   *f64 = Float64_new(1.33);
-    Integer32 *i32 = Int32_new(I32_MAX);
-    Integer64 *i64 = Int64_new(I64_MAX);
+    Integer32 *i32 = Int32_new(INT32_MAX);
+    Integer64 *i64 = Int64_new(INT64_MAX);
     CharBuf *f32_string = Float32_To_String(f32);
     CharBuf *f64_string = Float64_To_String(f64);
     CharBuf *i32_string = Int32_To_String(i32);
@@ -94,12 +94,12 @@ test_accessors(TestBatch *batch) {
     TEST_TRUE(batch, *(int64_t*)&got64 == *(int64_t*)&wanted64,
               "Float64_To_F64");
 
-    Int32_Set_Value(i32, I32_MIN);
-    TEST_INT_EQ(batch, Int32_Get_Value(i32), I32_MIN,
+    Int32_Set_Value(i32, INT32_MIN);
+    TEST_INT_EQ(batch, Int32_Get_Value(i32), INT32_MIN,
                 "I32 Set_Value Get_Value");
 
-    Int64_Set_Value(i64, I64_MIN);
-    TEST_TRUE(batch, Int64_Get_Value(i64) == I64_MIN,
+    Int64_Set_Value(i64, INT64_MIN);
+    TEST_TRUE(batch, Int64_Get_Value(i64) == INT64_MIN,
               "I64 Set_Value Get_Value");
 
     Int32_Set_Value(i32, -1);
@@ -130,8 +130,8 @@ static void
 test_Equals_and_Compare_To(TestBatch *batch) {
     Float32   *f32 = Float32_new(1.0);
     Float64   *f64 = Float64_new(1.0);
-    Integer32 *i32 = Int32_new(I32_MAX);
-    Integer64 *i64 = Int64_new(I64_MAX);
+    Integer32 *i32 = Int32_new(INT32_MAX);
+    Integer64 *i64 = Int64_new(INT64_MAX);
 
     TEST_TRUE(batch, Float32_Compare_To(f32, (Obj*)f64) == 0,
               "F32_Compare_To equal");
@@ -169,13 +169,13 @@ test_Equals_and_Compare_To(TestBatch *batch) {
     TEST_FALSE(batch, Float64_Equals(f64, (Obj*)f32),
                "F64_Equals greater than");
 
-    Float64_Set_Value(f64, I64_MAX * 2.0);
+    Float64_Set_Value(f64, INT64_MAX * 2.0);
     TEST_TRUE(batch, Float64_Compare_To(f64, (Obj*)i64) > 0,
               "Float64 comparison to Integer64");
     TEST_TRUE(batch, Int64_Compare_To(i64, (Obj*)f64) < 0,
               "Integer64 comparison to Float64");
 
-    Float32_Set_Value(f32, I32_MAX * 2.0f);
+    Float32_Set_Value(f32, INT32_MAX * 2.0f);
     TEST_TRUE(batch, Float32_Compare_To(f32, (Obj*)i32) > 0,
               "Float32 comparison to Integer32");
     TEST_TRUE(batch, Int32_Compare_To(i32, (Obj*)f32) < 0,
@@ -208,8 +208,8 @@ static void
 test_Clone(TestBatch *batch) {
     Float32   *f32 = Float32_new(1.33f);
     Float64   *f64 = Float64_new(1.33);
-    Integer32 *i32 = Int32_new(I32_MAX);
-    Integer64 *i64 = Int64_new(I64_MAX);
+    Integer32 *i32 = Int32_new(INT32_MAX);
+    Integer64 *i64 = Int64_new(INT64_MAX);
     Float32   *f32_dupe = Float32_Clone(f32);
     Float64   *f64_dupe = Float64_Clone(f64);
     Integer32 *i32_dupe = Int32_Clone(i32);
@@ -238,8 +238,8 @@ static void
 test_Mimic(TestBatch *batch) {
     Float32   *f32 = Float32_new(1.33f);
     Float64   *f64 = Float64_new(1.33);
-    Integer32 *i32 = Int32_new(I32_MAX);
-    Integer64 *i64 = Int64_new(I64_MAX);
+    Integer32 *i32 = Int32_new(INT32_MAX);
+    Integer64 *i64 = Int64_new(INT64_MAX);
     Float32   *f32_dupe = Float32_new(0.0f);
     Float64   *f64_dupe = Float64_new(0.0);
     Integer32 *i32_dupe = Int32_new(0);

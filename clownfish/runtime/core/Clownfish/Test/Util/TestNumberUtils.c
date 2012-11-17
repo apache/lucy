@@ -89,8 +89,8 @@ test_u4(TestBatch *batch) {
 
 static void
 test_c32(TestBatch *batch) {
-    uint64_t  mins[]   = { 0,   0x4000 - 100, (uint32_t)I32_MAX - 100, U32_MAX - 10 };
-    uint64_t  limits[] = { 500, 0x4000 + 100, (uint32_t)I32_MAX + 100, U32_MAX      };
+    uint64_t  mins[]   = { 0,   0x4000 - 100, (uint32_t)INT32_MAX - 100, UINT32_MAX - 10 };
+    uint64_t  limits[] = { 500, 0x4000 + 100, (uint32_t)INT32_MAX + 100, UINT32_MAX      };
     uint32_t  set_num;
     uint32_t  num_sets  = sizeof(mins) / sizeof(uint64_t);
     size_t    count     = 64;
@@ -139,9 +139,9 @@ test_c32(TestBatch *batch) {
     }
 
     target = encoded;
-    NumUtil_encode_c32(U32_MAX, &target);
+    NumUtil_encode_c32(UINT32_MAX, &target);
     target = encoded;
-    TEST_INT_EQ(batch, NumUtil_decode_c32(&target), U32_MAX, "c32 U32_MAX");
+    TEST_INT_EQ(batch, NumUtil_decode_c32(&target), UINT32_MAX, "c32 UINT32_MAX");
 
     FREEMEM(encoded);
     FREEMEM(ints);
@@ -149,8 +149,8 @@ test_c32(TestBatch *batch) {
 
 static void
 test_c64(TestBatch *batch) {
-    uint64_t  mins[]    = { 0,   0x4000 - 100, (uint64_t)U32_MAX - 100,  U64_MAX - 10 };
-    uint64_t  limits[]  = { 500, 0x4000 + 100, (uint64_t)U32_MAX + 1000, U64_MAX      };
+    uint64_t  mins[]    = { 0,   0x4000 - 100, (uint64_t)UINT32_MAX - 100,  UINT64_MAX - 10 };
+    uint64_t  limits[]  = { 500, 0x4000 + 100, (uint64_t)UINT32_MAX + 1000, UINT64_MAX      };
     uint32_t  set_num;
     uint32_t  num_sets  = sizeof(mins) / sizeof(uint64_t);
     size_t    count     = 64;
@@ -182,11 +182,11 @@ test_c64(TestBatch *batch) {
     }
 
     target = encoded;
-    NumUtil_encode_c64(U64_MAX, &target);
+    NumUtil_encode_c64(UINT64_MAX, &target);
     target = encoded;
 
     uint64_t got = NumUtil_decode_c64(&target);
-    TEST_TRUE(batch, got == U64_MAX, "c64 U64_MAX");
+    TEST_TRUE(batch, got == UINT64_MAX, "c64 UINT64_MAX");
 
     FREEMEM(encoded);
     FREEMEM(ints);
@@ -195,7 +195,7 @@ test_c64(TestBatch *batch) {
 static void
 test_bigend_u16(TestBatch *batch) {
     size_t    count     = 32;
-    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U16_MAX + 1);
+    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, UINT16_MAX + 1);
     size_t    amount    = (count + 1) * sizeof(uint16_t);
     char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
     char     *encoded   = allocated + 1; // Intentionally misaligned.
@@ -224,7 +224,7 @@ test_bigend_u16(TestBatch *batch) {
 static void
 test_bigend_u32(TestBatch *batch) {
     size_t    count     = 32;
-    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_C(1) + U32_MAX);
+    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_C(1) + UINT32_MAX);
     size_t    amount    = (count + 1) * sizeof(uint32_t);
     char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
     char     *encoded   = allocated + 1; // Intentionally misaligned.
@@ -253,7 +253,7 @@ test_bigend_u32(TestBatch *batch) {
 static void
 test_bigend_u64(TestBatch *batch) {
     size_t    count     = 32;
-    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, U64_MAX);
+    uint64_t *ints      = TestUtils_random_u64s(NULL, count, 0, UINT64_MAX);
     size_t    amount    = (count + 1) * sizeof(uint64_t);
     char     *allocated = (char*)CALLOCATE(amount, sizeof(char));
     char     *encoded   = allocated + 1; // Intentionally misaligned.
