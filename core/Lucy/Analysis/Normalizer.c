@@ -28,14 +28,14 @@
 #define INITIAL_BUFSIZE 63
 
 Normalizer*
-Normalizer_new(const CharBuf *form, bool_t case_fold, bool_t strip_accents) {
+Normalizer_new(const CharBuf *form, bool case_fold, bool strip_accents) {
     Normalizer *self = (Normalizer*)VTable_Make_Obj(NORMALIZER);
     return Normalizer_init(self, form, case_fold, strip_accents);
 }
 
 Normalizer*
-Normalizer_init(Normalizer *self, const CharBuf *form, bool_t case_fold,
-                bool_t strip_accents) {
+Normalizer_init(Normalizer *self, const CharBuf *form, bool case_fold,
+                bool strip_accents) {
     int options = UTF8PROC_STABLE;
 
     if (form == NULL
@@ -148,14 +148,14 @@ Normalizer_load(Normalizer *self, Obj *dump) {
     Obj *obj = Hash_Fetch_Str(source, "normalization_form", 18);
     CharBuf *form = (CharBuf*)CERTIFY(obj, CHARBUF);
     obj = Hash_Fetch_Str(source, "case_fold", 9);
-    bool_t case_fold = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
+    bool case_fold = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
     obj = Hash_Fetch_Str(source, "strip_accents", 13);
-    bool_t strip_accents = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
+    bool strip_accents = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
 
     return Normalizer_init(loaded, form, case_fold, strip_accents);
 }
 
-bool_t
+bool
 Normalizer_equals(Normalizer *self, Obj *other) {
     Normalizer *const twin = (Normalizer*)other;
     if (twin == self)                   { return true; }

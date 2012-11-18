@@ -290,7 +290,7 @@ S_skip_extend_format(const char *text, size_t len, lucy_StringIter *iter) {
     return wb;
 }
 
-bool_t
+bool
 StandardTokenizer_equals(StandardTokenizer *self, Obj *other) {
     StandardTokenizer *const twin = (StandardTokenizer*)other;
     if (twin == self)                        { return true; }

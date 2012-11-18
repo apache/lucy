@@ -31,7 +31,7 @@ parcel Lucy;
 public class Lucy::Plan::FullTextType
     inherits Lucy::Plan::TextType : dumpable {
 
-    bool_t      highlightable;
+    bool        highlightable;
     Analyzer   *analyzer;
 
     /**
@@ -48,8 +48,8 @@ public class Lucy::Plan::FullTextType
 
     inert FullTextType*
     init2(FullTextType *self, Analyzer *analyzer, float boost = 1.0,
-          bool_t indexed = true, bool_t stored = true,
-          bool_t sortable = false, bool_t highlightable = false);
+          bool indexed = true, bool stored = true,
+          bool sortable = false, bool highlightable = false);
 
     public inert incremented FullTextType*
     new(Analyzer *analyzer);
@@ -59,11 +59,11 @@ public class Lucy::Plan::FullTextType
      * term highlighting.
      */
     public void
-    Set_Highlightable(FullTextType *self, bool_t highlightable);
+    Set_Highlightable(FullTextType *self, bool highlightable);
 
     /** Accessor for "highlightable" property.
      */
-    public bool_t
+    public bool
     Highlightable(FullTextType *self);
 
     public Analyzer*
@@ -81,7 +81,7 @@ public class Lucy::Plan::FullTextType
     public incremented FullTextType*
     Load(FullTextType *self, Obj *dump);
 
-    public bool_t
+    public bool
     Equals(FullTextType *self, Obj *other);
 
     public void

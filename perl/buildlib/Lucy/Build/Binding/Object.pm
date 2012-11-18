@@ -319,7 +319,7 @@ CODE:
     SV *ints_sv = NULL;
     lucy_I32Array *self = NULL;
 
-    chy_bool_t args_ok
+    bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&ints_sv, "ints", 4, true),
                               NULL);
@@ -548,7 +548,7 @@ END_DESCRIPTION
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Clownfish::Obj
 
-chy_bool_t
+bool
 is_a(self, class_name)
     lucy_Obj *self;
     const lucy_CharBuf *class_name;
@@ -756,7 +756,7 @@ CODE:
     CHY_UNUSED_VAR(unused_sv);
     lucy_CharBuf *class_name = NULL;
     lucy_VTable  *parent     = NULL;
-    chy_bool_t args_ok
+    bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_OBJ(&class_name, "class_name", 10, true,
                                         LUCY_CHARBUF, alloca(cfish_ZCB_size())),

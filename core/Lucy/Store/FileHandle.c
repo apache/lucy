@@ -43,7 +43,7 @@ FH_destroy(FileHandle *self) {
     FH_object_count--;
 }
 
-bool_t
+bool
 FH_grow(FileHandle *self, int64_t length) {
     UNUSED_VAR(self);
     UNUSED_VAR(length);

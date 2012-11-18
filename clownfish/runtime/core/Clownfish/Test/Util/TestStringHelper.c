@@ -26,13 +26,13 @@
  * it implements the standard in a more linear, easy-to-grok way.
  */
 #define TRAIL_OK(n) (n >= 0x80 && n <= 0xBF)
-static bool_t
+static bool
 S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
     const uint8_t *string = (const uint8_t*)maybe_utf8;
     const uint8_t *const end = string + size;
     while (string < end) {
         int count = StrHelp_UTF8_COUNT[*string];
-        bool_t valid = false;
+        bool valid = false;
         if (count == 1) {
             if (string[0] <= 0x7F) {
                 valid = true;
@@ -183,9 +183,9 @@ test_utf8_round_trip(TestBatch *batch) {
 
 static void
 S_test_validity(TestBatch *batch, const char *content, size_t size,
-                bool_t expected, const char *description) {
-    bool_t sane = StrHelp_utf8_valid(content, size);
-    bool_t double_check = S_utf8_valid_alt(content, size);
+                bool expected, const char *description) {
+    bool sane = StrHelp_utf8_valid(content, size);
+    bool double_check = S_utf8_valid_alt(content, size);
     if (sane != double_check) {
         FAIL(batch, "Disagreement: %s", description);
     }

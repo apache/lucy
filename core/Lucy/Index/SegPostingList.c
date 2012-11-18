@@ -291,7 +291,7 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) {
 
 Matcher*
 SegPList_make_matcher(SegPostingList *self, Similarity *sim,
-                      Compiler *compiler, bool_t need_score) {
+                      Compiler *compiler, bool need_score) {
     return Post_Make_Matcher(self->posting, sim, (PostingList*)self, compiler,
                              need_score);
 }

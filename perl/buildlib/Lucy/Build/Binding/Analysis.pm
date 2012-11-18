@@ -115,7 +115,7 @@ CODE:
     // parse params, only if there's more than one arg
     if (items > 1) {
         SV *text_sv = NULL;
-        chy_bool_t args_ok
+        bool args_ok
             = XSBind_allot_params(&(ST(0)), 1, items,
                                   ALLOT_SV(&text_sv, "text", 4, false),
                                   NULL);
@@ -349,7 +349,7 @@ CODE:
     int32_t   pos_inc   = 1;
     float     boost     = 1.0f;
 
-    chy_bool_t args_ok
+    bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&text_sv, "text", 4, true),
                               ALLOT_U32(&start_off, "start_offset", 12, true),

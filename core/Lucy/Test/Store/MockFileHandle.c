@@ -35,7 +35,7 @@ MockFileHandle_init(MockFileHandle *self, const CharBuf *path,
     return self;
 }
 
-bool_t
+bool
 MockFileHandle_window(MockFileHandle *self, FileWindow *window,
                       int64_t offset, int64_t len) {
     UNUSED_VAR(self);
@@ -43,7 +43,7 @@ MockFileHandle_window(MockFileHandle *self, FileWindow *window,
     return true;
 }
 
-bool_t
+bool
 MockFileHandle_release_window(MockFileHandle *self, FileWindow *window) {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, 0, 0);
@@ -55,7 +55,7 @@ MockFileHandle_length(MockFileHandle *self) {
     return self->len;
 }
 
-bool_t
+bool
 MockFileHandle_close(MockFileHandle *self) {
     UNUSED_VAR(self);
     return true;

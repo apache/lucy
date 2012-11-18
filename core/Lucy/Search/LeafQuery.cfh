@@ -51,7 +51,7 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query
     public CharBuf*
     Get_Text(LeafQuery *self);
 
-    public bool_t
+    public bool
     Equals(LeafQuery *self, Obj *other);
 
     public incremented CharBuf*
@@ -67,7 +67,7 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query
      */
     public incremented Compiler*
     Make_Compiler(LeafQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 
     public void
     Destroy(LeafQuery *self);

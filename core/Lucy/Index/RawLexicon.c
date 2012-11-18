@@ -62,7 +62,7 @@ RawLex_destroy(RawLexicon *self) {
     SUPER_DESTROY(self, RAWLEXICON);
 }
 
-bool_t
+bool
 RawLex_next(RawLexicon *self) {
     if (InStream_Tell(self->instream) >= self->len) { return false; }
     TermStepper_Read_Delta(self->term_stepper, self->instream);

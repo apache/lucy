@@ -23,7 +23,7 @@
 
 static void
 test_oversize__growth_rate(TestBatch *batch) {
-    bool_t   success             = true;
+    bool     success             = true;
     uint64_t size                = 0;
     double   growth_count        = 0;
     double   average_growth_rate = 0.0;

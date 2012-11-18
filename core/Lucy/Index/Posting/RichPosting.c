@@ -182,7 +182,7 @@ RichPost_read_raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
 RichPostingMatcher*
 RichPost_make_matcher(RichPosting *self, Similarity *sim,
                       PostingList *plist, Compiler *compiler,
-                      bool_t need_score) {
+                      bool need_score) {
     RichPostingMatcher* matcher
         = (RichPostingMatcher*)VTable_Make_Obj(RICHPOSTINGMATCHER);
     UNUSED_VAR(self);

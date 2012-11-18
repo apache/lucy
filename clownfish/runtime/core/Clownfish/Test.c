@@ -56,73 +56,73 @@ TestBatch_plan(TestBatch *self) {
     printf("1..%" PRId64 "\n", self->num_tests);
 }
 
-bool_t
-TestBatch_test_true(void *vself, bool_t condition, const char *pattern, ...) {
+bool
+TestBatch_test_true(void *vself, bool condition, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VTest_True((TestBatch*)vself, condition,
+    bool result = TestBatch_VTest_True((TestBatch*)vself, condition,
                                          pattern, args);
     va_end(args);
     return result;
 }
 
-bool_t
-TestBatch_test_false(void *vself, bool_t condition, const char *pattern, ...) {
+bool
+TestBatch_test_false(void *vself, bool condition, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VTest_False((TestBatch*)vself, condition,
+    bool result = TestBatch_VTest_False((TestBatch*)vself, condition,
                                           pattern, args);
     va_end(args);
     return result;
 }
 
-bool_t
+bool
 TestBatch_test_int_equals(void *vself, long got, long expected,
                           const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VTest_Int_Equals((TestBatch*)vself, got,
+    bool result = TestBatch_VTest_Int_Equals((TestBatch*)vself, got,
                                                expected, pattern, args);
     va_end(args);
     return result;
 }
 
-bool_t
+bool
 TestBatch_test_float_equals(void *vself, double got, double expected,
                             const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VTest_Float_Equals((TestBatch*)vself, got,
+    bool result = TestBatch_VTest_Float_Equals((TestBatch*)vself, got,
                                                  expected, pattern, args);
     va_end(args);
     return result;
 }
 
-bool_t
+bool
 TestBatch_test_string_equals(void *vself, const char *got,
                              const char *expected, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VTest_String_Equals((TestBatch*)vself, got,
+    bool result = TestBatch_VTest_String_Equals((TestBatch*)vself, got,
                                                   expected, pattern, args);
     va_end(args);
     return result;
 }
 
-bool_t
+bool
 TestBatch_pass(void *vself, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VPass((TestBatch*)vself, pattern, args);
+    bool result = TestBatch_VPass((TestBatch*)vself, pattern, args);
     va_end(args);
     return result;
 }
 
-bool_t
+bool
 TestBatch_fail(void *vself, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool_t result = TestBatch_VFail((TestBatch*)vself, pattern, args);
+    bool result = TestBatch_VFail((TestBatch*)vself, pattern, args);
     va_end(args);
     return result;
 }
@@ -135,8 +135,8 @@ TestBatch_skip(void *vself, const char *pattern, ...) {
     va_end(args);
 }
 
-bool_t
-TestBatch_vtest_true(TestBatch *self, bool_t condition, const char *pattern,
+bool
+TestBatch_vtest_true(TestBatch *self, bool condition, const char *pattern,
                      va_list args) {
     // Increment test number.
     self->test_num++;
@@ -158,8 +158,8 @@ TestBatch_vtest_true(TestBatch *self, bool_t condition, const char *pattern,
     }
 }
 
-bool_t
-TestBatch_vtest_false(TestBatch *self, bool_t condition,
+bool
+TestBatch_vtest_false(TestBatch *self, bool condition,
                       const char *pattern, va_list args) {
     // Increment test number.
     self->test_num++;
@@ -181,7 +181,7 @@ TestBatch_vtest_false(TestBatch *self, bool_t condition,
     }
 }
 
-bool_t
+bool
 TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
                            const char *pattern, va_list args) {
     // Increment test number.
@@ -205,7 +205,7 @@ TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
     }
 }
 
-bool_t
+bool
 TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
                              const char *pattern, va_list args) {
     double diff = expected / got;
@@ -231,7 +231,7 @@ TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
     }
 }
 
-bool_t
+bool
 TestBatch_vtest_string_equals(TestBatch *self, const char *got,
                               const char *expected, const char *pattern,
                               va_list args) {
@@ -256,7 +256,7 @@ TestBatch_vtest_string_equals(TestBatch *self, const char *got,
     }
 }
 
-bool_t
+bool
 TestBatch_vpass(TestBatch *self, const char *pattern, va_list args) {
     // Increment test number.
     self->test_num++;
@@ -270,7 +270,7 @@ TestBatch_vpass(TestBatch *self, const char *pattern, va_list args) {
     return true;
 }
 
-bool_t
+bool
 TestBatch_vfail(TestBatch *self, const char *pattern, va_list args) {
     // Increment test number.
     self->test_num++;

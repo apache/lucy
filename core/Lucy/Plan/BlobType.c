@@ -20,26 +20,26 @@
 #include "Lucy/Plan/BlobType.h"
 
 BlobType*
-BlobType_new(bool_t stored) {
+BlobType_new(bool stored) {
     BlobType *self = (BlobType*)VTable_Make_Obj(BLOBTYPE);
     return BlobType_init(self, stored);
 }
 
 BlobType*
-BlobType_init(BlobType *self, bool_t stored) {
+BlobType_init(BlobType *self, bool stored) {
     FType_init((FieldType*)self);
     self->stored = stored;
     return self;
 }
 
-bool_t
+bool
 BlobType_binary(BlobType *self) {
     UNUSED_VAR(self);
     return true;
 }
 
 void
-BlobType_set_sortable(BlobType *self, bool_t sortable) {
+BlobType_set_sortable(BlobType *self, bool sortable) {
     UNUSED_VAR(self);
     if (sortable) { THROW(ERR, "BlobType fields can't be sortable"); }
 }
@@ -56,7 +56,7 @@ BlobType_primitive_id(BlobType *self) {
     return FType_BLOB;
 }
 
-bool_t
+bool
 BlobType_equals(BlobType *self, Obj *other) {
     BlobType *twin = (BlobType*)other;
     if (twin == self)               { return true; }

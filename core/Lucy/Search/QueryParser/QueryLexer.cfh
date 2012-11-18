@@ -18,7 +18,7 @@ parcel Lucy;
 
 class Lucy::Search::QueryParser::QueryLexer inherits Clownfish::Obj {
 
-    bool_t heed_colons;
+    bool heed_colons;
 
     inert incremented QueryLexer*
     new();
@@ -34,12 +34,12 @@ class Lucy::Search::QueryParser::QueryLexer inherits Clownfish::Obj {
     incremented VArray*
     Tokenize(QueryLexer *self, const CharBuf *query_string = NULL);
 
-    bool_t
+    bool
     Heed_Colons(QueryLexer *self);
 
     /** Enable/disable parsing of <code>fieldname:foo</code> constructs.
      */
     void
-    Set_Heed_Colons(QueryLexer *self, bool_t heed_colons);
+    Set_Heed_Colons(QueryLexer *self, bool heed_colons);
 }
 

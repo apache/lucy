@@ -27,7 +27,7 @@ class Lucy::Index::SortCache inherits Clownfish::Obj {
     int32_t    cardinality;
     int32_t    ord_width;
     int32_t    null_ord;
-    bool_t     native_ords;
+    bool       native_ords;
 
     public inert SortCache*
     init(SortCache *self, const CharBuf *field, FieldType *type,
@@ -76,9 +76,9 @@ class Lucy::Index::SortCache inherits Clownfish::Obj {
      * setting indicates whether this SortCache has such a bug.
      */
     void
-    Set_Native_Ords(SortCache *self, bool_t native_ords);
+    Set_Native_Ords(SortCache *self, bool native_ords);
 
-    bool_t
+    bool
     Get_Native_Ords(SortCache *self);
 
     public void

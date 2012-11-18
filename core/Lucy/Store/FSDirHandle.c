@@ -44,7 +44,7 @@ FSDH_destroy(FSDirHandle *self) {
     SUPER_DESTROY(self, FSDIRHANDLE);
 }
 
-static INLINE bool_t
+static INLINE bool
 SI_is_updir(const char *name, size_t len) {
     if (len == 2 && strncmp(name, "..", 2) == 0) {
         return true;
@@ -105,7 +105,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
     return self;
 }
 
-bool_t
+bool
 FSDH_entry_is_dir(FSDirHandle *self) {
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)self->sys_dir_entry;
     if (find_data) {
@@ -116,7 +116,7 @@ FSDH_entry_is_dir(FSDirHandle *self) {
     return false;
 }
 
-bool_t
+bool
 FSDH_entry_is_symlink(FSDirHandle *self) {
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)self->sys_dir_entry;
     if (find_data) {
@@ -127,7 +127,7 @@ FSDH_entry_is_symlink(FSDirHandle *self) {
     return false;
 }
 
-bool_t
+bool
 FSDH_close(FSDirHandle *self) {
     if (self->sys_dirhandle && self->sys_dirhandle != INVALID_HANDLE_VALUE) {
         HANDLE dirhandle = (HANDLE)self->sys_dirhandle;
@@ -157,7 +157,7 @@ FSDH_close(FSDirHandle *self) {
     }
 }
 
-bool_t
+bool
 FSDH_next(FSDirHandle *self) {
     HANDLE           dirhandle = (HANDLE)self->sys_dirhandle;
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)self->sys_dir_entry;
@@ -216,7 +216,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
     return self;
 }
 
-bool_t
+bool
 FSDH_next(FSDirHandle *self) {
     self->sys_dir_entry = (struct dirent*)readdir((DIR*)self->sys_dirhandle);
     if (!self->sys_dir_entry) {
@@ -240,7 +240,7 @@ FSDH_next(FSDirHandle *self) {
     }
 }
 
-bool_t
+bool
 FSDH_entry_is_dir(FSDirHandle *self) {
     struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
     if (!sys_dir_entry) { return false; }
@@ -268,7 +268,7 @@ FSDH_entry_is_dir(FSDirHandle *self) {
     return false;
 }
 
-bool_t
+bool
 FSDH_entry_is_symlink(FSDirHandle *self) {
     struct dirent *sys_dir_entry = (struct dirent*)self->sys_dir_entry;
     if (!sys_dir_entry) { return false; }
@@ -291,7 +291,7 @@ FSDH_entry_is_symlink(FSDirHandle *self) {
     #endif // CHY_HAS_DIRENT_D_TYPE
 }
 
-bool_t
+bool
 FSDH_close(FSDirHandle *self) {
     if (self->fullpath) {
         CB_Dec_RefCount(self->fullpath);

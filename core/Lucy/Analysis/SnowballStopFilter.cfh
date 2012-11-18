@@ -92,7 +92,7 @@ public class Lucy::Analysis::SnowballStopFilter cnick SnowStop
     public incremented Inversion*
     Transform(SnowballStopFilter *self, Inversion *inversion);
 
-    public bool_t
+    public bool
     Equals(SnowballStopFilter *self, Obj *other);
 
     public void

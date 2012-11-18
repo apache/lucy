@@ -19,7 +19,7 @@ parcel Clownfish;
 __C__
 #include "Clownfish/Util/SortUtils.h"
 
-typedef chy_bool_t
+typedef bool
 (*Lucy_VA_Gather_Test_t)(lucy_VArray *self, uint32_t tick, void *data);
 
 #ifdef LUCY_USE_SHORT_NAMES
@@ -159,7 +159,7 @@ class Clownfish::VArray cnick VA inherits Clownfish::Obj {
     public incremented VArray*
     Slice(VArray *self, uint32_t offset, uint32_t length);
 
-    public bool_t
+    public bool
     Equals(VArray *self, Obj *other);
 
     public incremented VArray*

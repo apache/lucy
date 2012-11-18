@@ -328,9 +328,7 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
         char bool_pattern[] =
             "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_Bool_singleton(self->%s));\n";
         const char *pattern;
-        if (strcmp(specifier, "bool_t") == 0
-            || strcmp(specifier, "chy_bool_t") == 0
-           ) {
+        if (strcmp(specifier, "bool") == 0) {
             pattern = bool_pattern;
         }
         else if (CFCType_is_integer(type)) {
@@ -389,9 +387,7 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
         CFCUtil_die("type_str too long: '%s'", type_str);
     }
     if (CFCType_is_integer(type)) {
-        if (strcmp(specifier, "bool_t") == 0
-            || strcmp(specifier, "chy_bool_t") == 0
-           ) {
+        if (strcmp(specifier, "bool") == 0) {
             sprintf(extraction, "Cfish_Obj_To_Bool(var)");
         }
         else {

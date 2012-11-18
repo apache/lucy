@@ -28,7 +28,7 @@ NumPriQ_new(uint32_t max_size) {
     return (NumPriorityQueue*)PriQ_init((PriorityQueue*)self, max_size);
 }
 
-bool_t
+bool
 NumPriQ_less_than(NumPriorityQueue *self, Obj *a, Obj *b) {
     Float64 *num_a = (Float64*)a;
     Float64 *num_b = (Float64*)b;

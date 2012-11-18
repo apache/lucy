@@ -52,7 +52,7 @@ cfish_XSBind_new_blank_obj(SV *either_sv);
 /** Test whether an SV is defined.  Handles "get" magic, unlike SvOK on its
  * own.
  */
-static CHY_INLINE chy_bool_t
+static CHY_INLINE bool
 cfish_XSBind_sv_defined(SV *sv) {
     if (!sv || !SvANY(sv)) { return false; }
     if (SvGMAGICAL(sv)) { mg_get(sv); }
@@ -210,7 +210,7 @@ cfish_XSBind_enable_overload(void *pobj);
  * (generally, the XS variable "items").
  * @return true on success, false on failure (sets Err_error).
  */
-XSBIND_EXTERN chy_bool_t
+XSBIND_EXTERN bool
 cfish_XSBind_allot_params(SV** stack, int32_t start,
                           int32_t num_stack_elems, ...);
 

@@ -111,7 +111,7 @@ test_offsets(TestBatch *batch) {
 
     CharBuf *file;
     Obj     *filestats;
-    bool_t   offsets_ok = true;
+    bool     offsets_ok = true;
 
     TEST_TRUE(batch, Hash_Get_Size(files) > 0, "Multiple files");
 

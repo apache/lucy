@@ -29,10 +29,10 @@ test_all(TestBatch *batch) {
     CharBuf   *foo           = (CharBuf*)ZCB_WRAP_STR("foo", 3);
     CharBuf   *boffo         = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
     CharBuf   *foo_boffo     = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
-    bool_t     saw_foo       = false;
-    bool_t     saw_boffo     = false;
-    bool_t     foo_was_dir   = false;
-    bool_t     boffo_was_dir = false;
+    bool       saw_foo       = false;
+    bool       saw_boffo     = false;
+    bool       foo_was_dir   = false;
+    bool       boffo_was_dir = false;
     int        count         = 0;
 
     // Set up folder contents.

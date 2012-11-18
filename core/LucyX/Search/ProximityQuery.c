@@ -95,7 +95,7 @@ ProximityQuery_deserialize(ProximityQuery *self, InStream *instream) {
     return S_do_init(self, field, terms, boost, within);
 }
 
-bool_t
+bool
 ProximityQuery_equals(ProximityQuery *self, Obj *other) {
     ProximityQuery *twin = (ProximityQuery*)other;
     if (twin == self)                     { return true; }
@@ -132,7 +132,7 @@ ProximityQuery_to_string(ProximityQuery *self) {
 
 Compiler*
 ProximityQuery_make_compiler(ProximityQuery *self, Searcher *searcher,
-                             float boost, bool_t subordinate) {
+                             float boost, bool subordinate) {
     if (VA_Get_Size(self->terms) == 1) {
         // Optimize for one-term "phrases".
         Obj *term = VA_Fetch(self->terms, 0);
@@ -234,7 +234,7 @@ ProximityCompiler_deserialize(ProximityCompiler *self, InStream *instream) {
     return self;
 }
 
-bool_t
+bool
 ProximityCompiler_equals(ProximityCompiler *self, Obj *other) {
     ProximityCompiler *twin = (ProximityCompiler*)other;
     if (!Obj_Is_A(other, PROXIMITYCOMPILER))                { return false; }
@@ -265,7 +265,7 @@ ProximityCompiler_apply_norm_factor(ProximityCompiler *self, float factor) {
 
 Matcher*
 ProximityCompiler_make_matcher(ProximityCompiler *self, SegReader *reader,
-                               bool_t need_score) {
+                               bool need_score) {
     UNUSED_VAR(need_score);
     ProximityQuery *const parent = (ProximityQuery*)self->parent;
     VArray *const      terms     = parent->terms;

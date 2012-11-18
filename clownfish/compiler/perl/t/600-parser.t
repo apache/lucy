@@ -46,13 +46,13 @@ for (qw( foo _foo foo_yoo FOO Foo fOO f00 foo_foo_foo )) {
     is( $var->micro_sym, $_, "identifier/declarator: $_" );
 }
 
-for (qw( void float uint32_t int64_t uint8_t bool_t )) {
+for (qw( void float uint32_t int64_t uint8_t bool )) {
     my $var = $parser->parse("int32_t $_;");
     ok( !defined($var), "reserved word not parsed as identifier: $_" );
 }
 
-isa_ok( $parser->parse("bool_t"),
-    "Clownfish::CFC::Model::Type", "Charmony integer specifier bool_t" );
+isa_ok( $parser->parse("bool"),
+    "Clownfish::CFC::Model::Type", "Charmony integer specifier bool" );
 
 is( $parser->parse("$_*")->get_specifier,
     "crust_$_", "object_type_specifier $_" )

@@ -172,7 +172,7 @@ SegLex_get_segment(SegLexicon *self) {
     return self->segment;
 }
 
-bool_t
+bool
 SegLex_next(SegLexicon *self) {
     // If we've run out of terms, null out and return.
     if (++self->term_num >= self->size) {

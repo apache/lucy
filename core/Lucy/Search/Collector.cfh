@@ -65,7 +65,7 @@ public abstract class Lucy::Search::Collector cnick Coll
 
     /** Indicate whether the Collector will call Score() on its Matcher.
      */
-    public abstract bool_t
+    public abstract bool
     Need_Score(Collector *self);
 
     /** Setter for "matcher".
@@ -101,7 +101,7 @@ public class Lucy::Search::Collector::BitCollector cnick BitColl
 
     /** Returns false, since BitCollector requires only doc ids.
      */
-    public bool_t
+    public bool
     Need_Score(BitCollector *self);
 }
 
@@ -127,7 +127,7 @@ class Lucy::Search::Collector::OffsetCollector cnick OffsetColl
     public void
     Collect(OffsetCollector *self, int32_t doc_id);
 
-    public bool_t
+    public bool
     Need_Score(OffsetCollector *self);
 
     public void

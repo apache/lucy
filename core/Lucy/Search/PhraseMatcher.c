@@ -134,7 +134,7 @@ PhraseMatcher_advance(PhraseMatcher *self, int32_t target) {
 
     // Find a doc which contains all the terms.
     while (1) {
-        bool_t agreement = true;
+        bool agreement = true;
 
         // Scoot all posting lists up to at least the current minimum.
         for (uint32_t i = 0; i < num_elements; i++) {

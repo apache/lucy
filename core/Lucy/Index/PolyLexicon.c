@@ -118,7 +118,7 @@ PolyLex_reset(PolyLexicon *self) {
     }
 }
 
-bool_t
+bool
 PolyLex_next(PolyLexicon *self) {
     SegLexQueue *lex_q = self->lex_q;
     SegLexicon *top_seg_lexicon = (SegLexicon*)SegLexQ_Peek(lex_q);
@@ -195,7 +195,7 @@ SegLexQ_new(uint32_t max_size) {
     return (SegLexQueue*)PriQ_init((PriorityQueue*)self, max_size);
 }
 
-bool_t
+bool
 SegLexQ_less_than(SegLexQueue *self, Obj *a, Obj *b) {
     SegLexicon *const lex_a  = (SegLexicon*)a;
     SegLexicon *const lex_b  = (SegLexicon*)b;

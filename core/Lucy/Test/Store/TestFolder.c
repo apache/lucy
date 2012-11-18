@@ -409,7 +409,7 @@ static void
 test_Delete(TestBatch *batch) {
     Folder *folder = (Folder*)RAMFolder_new(NULL);
     FileHandle *fh;
-    bool_t result;
+    bool result;
 
     Folder_MkDir(folder, foo);
     Folder_MkDir(folder, foo_bar);
@@ -445,7 +445,7 @@ static void
 test_Delete_Tree(TestBatch *batch) {
     Folder *folder = (Folder*)RAMFolder_new(NULL);
     FileHandle *fh;
-    bool_t result;
+    bool result;
 
     // Create tree to be deleted.
     Folder_MkDir(folder, foo);

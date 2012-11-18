@@ -380,7 +380,7 @@ int64_t
 CB_basex_to_i64(CharBuf *self, uint32_t base) {
     ZombieCharBuf *iterator = ZCB_WRAP(self);
     int64_t retval = 0;
-    bool_t is_negative = false;
+    bool is_negative = false;
 
     // Advance past minus sign.
     if (ZCB_Code_Point_At(iterator, 0) == '-') {
@@ -499,12 +499,12 @@ CB_cat(CharBuf *self, const CharBuf *other) {
     self->ptr[new_size] = '\0';
 }
 
-bool_t
+bool
 CB_starts_with(CharBuf *self, const CharBuf *prefix) {
     return CB_starts_with_str(self, prefix->ptr, prefix->size);
 }
 
-bool_t
+bool
 CB_starts_with_str(CharBuf *self, const char *prefix, size_t size) {
     if (size <= self->size
         && (memcmp(self->ptr, prefix, size) == 0)
@@ -516,7 +516,7 @@ CB_starts_with_str(CharBuf *self, const char *prefix, size_t size) {
     }
 }
 
-bool_t
+bool
 CB_equals(CharBuf *self, Obj *other) {
     CharBuf *const twin = (CharBuf*)other;
     if (twin == self)              { return true; }
@@ -530,7 +530,7 @@ CB_compare_to(CharBuf *self, Obj *other) {
     return CB_compare(&self, &other);
 }
 
-bool_t
+bool
 CB_equals_str(CharBuf *self, const char *ptr, size_t size) {
     if (self->size != size) {
         return false;
@@ -538,12 +538,12 @@ CB_equals_str(CharBuf *self, const char *ptr, size_t size) {
     return (memcmp(self->ptr, ptr, self->size) == 0);
 }
 
-bool_t
+bool
 CB_ends_with(CharBuf *self, const CharBuf *postfix) {
     return CB_ends_with_str(self, postfix->ptr, postfix->size);
 }
 
-bool_t
+bool
 CB_ends_with_str(CharBuf *self, const char *postfix, size_t postfix_len) {
     if (postfix_len <= self->size) {
         char *start = self->ptr + self->size - postfix_len;
@@ -758,7 +758,7 @@ CB_compare(const void *va, const void *vb) {
     return 0;
 }
 
-bool_t
+bool
 CB_less_than(const void *va, const void *vb) {
     return CB_compare(va, vb) < 0 ? 1 : 0;
 }

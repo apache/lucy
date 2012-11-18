@@ -89,7 +89,7 @@ PhraseQuery_deserialize(PhraseQuery *self, InStream *instream) {
     return S_do_init(self, field, terms, boost);
 }
 
-bool_t
+bool
 PhraseQuery_equals(PhraseQuery *self, Obj *other) {
     PhraseQuery *twin = (PhraseQuery*)other;
     if (twin == self)                  { return true; }
@@ -124,7 +124,7 @@ PhraseQuery_to_string(PhraseQuery *self) {
 
 Compiler*
 PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
-                          float boost, bool_t subordinate) {
+                          float boost, bool subordinate) {
     if (VA_Get_Size(self->terms) == 1) {
         // Optimize for one-term "phrases".
         Obj *term = VA_Fetch(self->terms, 0);
@@ -214,7 +214,7 @@ PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream) {
     return self;
 }
 
-bool_t
+bool
 PhraseCompiler_equals(PhraseCompiler *self, Obj *other) {
     PhraseCompiler *twin = (PhraseCompiler*)other;
     if (!Obj_Is_A(other, PHRASECOMPILER))                   { return false; }
@@ -244,7 +244,7 @@ PhraseCompiler_apply_norm_factor(PhraseCompiler *self, float factor) {
 
 Matcher*
 PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
-                            bool_t need_score) {
+                            bool need_score) {
     UNUSED_VAR(need_score);
     PhraseQuery *const parent    = (PhraseQuery*)self->parent;
     VArray *const      terms     = parent->terms;

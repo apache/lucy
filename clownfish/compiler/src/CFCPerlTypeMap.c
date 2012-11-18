@@ -109,7 +109,7 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
         else if (strcmp(specifier, "int8_t") == 0) {
             sprintf(result, "(int8_t)SvIV(%s)", xs_var);
         }
-        else if (strcmp(specifier, "chy_bool_t") == 0) {
+        else if (strcmp(specifier, "bool") == 0) {
             sprintf(result, "SvTRUE(%s) ? 1 : 0", xs_var);
         }
         else {
@@ -187,7 +187,7 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
         else if (strcmp(specifier, "int8_t") == 0) {
             sprintf(result, "newSViv(%s)", cf_var);
         }
-        else if (strcmp(specifier, "chy_bool_t") == 0) {
+        else if (strcmp(specifier, "bool") == 0) {
             sprintf(result, "newSViv(%s)", cf_var);
         }
         else {
@@ -211,7 +211,7 @@ static const char typemap_start[] =
     "# Auto-generated file.\n"
     "\n"
     "TYPEMAP\n"
-    "chy_bool_t\tCHY_BOOL\n"
+    "bool\tCHY_BOOL\n"
     "int8_t\tCHY_SIGNED_INT\n"
     "int16_t\tCHY_SIGNED_INT\n"
     "int32_t\tCHY_SIGNED_INT\n"

@@ -52,7 +52,7 @@ class Lucy::Index::TermVector cnick TV
     public incremented TermVector*
     Deserialize(decremented TermVector *self, InStream *instream);
 
-    public bool_t
+    public bool
     Equals(TermVector *self, Obj *other);
 
     public void

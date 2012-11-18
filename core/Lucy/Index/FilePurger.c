@@ -103,7 +103,7 @@ FilePurger_purge(FilePurger *self) {
 
         for (uint32_t i = 0, max = VA_Get_Size(snapshots); i < max; i++) {
             Snapshot *snapshot = (Snapshot*)VA_Fetch(snapshots, i);
-            bool_t snapshot_has_failures = false;
+            bool snapshot_has_failures = false;
             if (Hash_Get_Size(failures)) {
                 // Only delete snapshot files if all of their entries were
                 // successfully deleted.

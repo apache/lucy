@@ -51,19 +51,19 @@ static CharBuf*
 S_fullpath(FSFolder *self, const CharBuf *path);
 
 // Return true if the supplied path is a directory.
-static bool_t
+static bool
 S_dir_ok(const CharBuf *path);
 
 // Create a directory, or set Err_error and return false.
-bool_t
+bool
 S_create_dir(const CharBuf *path);
 
 // Return true unless the supplied path contains a slash.
-bool_t
+bool
 S_is_local_entry(const CharBuf *path);
 
 // Create a hard link.
-bool_t
+bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path);
 
 FSFolder*
@@ -89,7 +89,7 @@ FSFolder_initialize(FSFolder *self) {
     }
 }
 
-bool_t
+bool
 FSFolder_check(FSFolder *self) {
     return S_dir_ok(self->path);
 }
@@ -104,10 +104,10 @@ FSFolder_local_open_filehandle(FSFolder *self, const CharBuf *name,
     return (FileHandle*)fh;
 }
 
-bool_t
+bool
 FSFolder_local_mkdir(FSFolder *self, const CharBuf *name) {
     CharBuf *dir = S_fullpath(self, name);
-    bool_t result = S_create_dir(dir);
+    bool result = S_create_dir(dir);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
     DECREF(dir);
     return result;
@@ -120,7 +120,7 @@ FSFolder_local_open_dir(FSFolder *self) {
     return dh;
 }
 
-bool_t
+bool
 FSFolder_local_exists(FSFolder *self, const CharBuf *name) {
     if (Hash_Fetch(self->entries, (Obj*)name)) {
         return true;
@@ -131,7 +131,7 @@ FSFolder_local_exists(FSFolder *self, const CharBuf *name) {
     else {
         struct stat stat_buf;
         CharBuf *fullpath = S_fullpath(self, name);
-        bool_t retval = false;
+        bool retval = false;
         if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1) {
             retval = true;
         }
@@ -140,7 +140,7 @@ FSFolder_local_exists(FSFolder *self, const CharBuf *name) {
     }
 }
 
-bool_t
+bool
 FSFolder_local_is_directory(FSFolder *self, const CharBuf *name) {
     // Check for a cached object, then fall back to a system call.
     Obj *elem = Hash_Fetch(self->entries, (Obj*)name);
@@ -149,17 +149,17 @@ FSFolder_local_is_directory(FSFolder *self, const CharBuf *name) {
     }
     else {
         CharBuf *fullpath = S_fullpath(self, name);
-        bool_t result = S_dir_ok(fullpath);
+        bool result = S_dir_ok(fullpath);
         DECREF(fullpath);
         return result;
     }
 }
 
-bool_t
+bool
 FSFolder_rename(FSFolder *self, const CharBuf* from, const CharBuf *to) {
     CharBuf *from_path = S_fullpath(self, from);
     CharBuf *to_path   = S_fullpath(self, to);
-    bool_t   retval    = !rename((char*)CB_Get_Ptr8(from_path),
+    bool     retval    = !rename((char*)CB_Get_Ptr8(from_path),
                                  (char*)CB_Get_Ptr8(to_path));
     if (!retval) {
         Err_set_error(Err_new(CB_newf("rename from '%o' to '%o' failed: %s",
@@ -170,25 +170,25 @@ FSFolder_rename(FSFolder *self, const CharBuf* from, const CharBuf *to) {
     return retval;
 }
 
-bool_t
+bool
 FSFolder_hard_link(FSFolder *self, const CharBuf *from,
                    const CharBuf *to) {
     CharBuf *from_path = S_fullpath(self, from);
     CharBuf *to_path   = S_fullpath(self, to);
-    bool_t   retval    = S_hard_link(from_path, to_path);
+    bool     retval    = S_hard_link(from_path, to_path);
     DECREF(from_path);
     DECREF(to_path);
     return retval;
 }
 
-bool_t
+bool
 FSFolder_local_delete(FSFolder *self, const CharBuf *name) {
     CharBuf *fullpath = S_fullpath(self, name);
     char    *path_ptr = (char*)CB_Get_Ptr8(fullpath);
 #ifdef CHY_REMOVE_ZAPS_DIRS
-    bool_t result = !remove(path_ptr);
+    bool result = !remove(path_ptr);
 #else
-    bool_t result = !rmdir(path_ptr) || !remove(path_ptr);
+    bool result = !rmdir(path_ptr) || !remove(path_ptr);
 #endif
     DECREF(Hash_Delete(self->entries, (Obj*)name));
     DECREF(fullpath);
@@ -256,7 +256,7 @@ S_fullpath(FSFolder *self, const CharBuf *path) {
     return fullpath;
 }
 
-static bool_t
+static bool
 S_dir_ok(const CharBuf *path) {
     struct stat stat_buf;
     if (stat((char*)CB_Get_Ptr8(path), &stat_buf) != -1) {
@@ -265,7 +265,7 @@ S_dir_ok(const CharBuf *path) {
     return false;
 }
 
-bool_t
+bool
 S_create_dir(const CharBuf *path) {
     if (-1 == chy_makedir((char*)CB_Get_Ptr8(path), 0777)) {
         Err_set_error(Err_new(CB_newf("Couldn't create directory '%o': %s",
@@ -275,7 +275,7 @@ S_create_dir(const CharBuf *path) {
     return true;
 }
 
-bool_t
+bool
 S_is_local_entry(const CharBuf *path) {
     ZombieCharBuf *scratch = ZCB_WRAP(path);
     uint32_t code_point;
@@ -296,7 +296,7 @@ S_is_local_entry(const CharBuf *path) {
 
 #include <windows.h>
 
-bool_t
+bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path) {
     char *from8 = (char*)CB_Get_Ptr8(from_path);
     char *to8   = (char*)CB_Get_Ptr8(to_path);
@@ -315,7 +315,7 @@ S_hard_link(CharBuf *from_path, CharBuf *to_path) {
 
 #elif (defined(CHY_HAS_UNISTD_H))
 
-bool_t
+bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path) {
     char *from8 = (char*)CB_Get_Ptr8(from_path);
     char *to8   = (char*)CB_Get_Ptr8(to_path);

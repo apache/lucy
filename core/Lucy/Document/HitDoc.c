@@ -81,7 +81,7 @@ HitDoc_load(HitDoc *self, Obj *dump) {
     return loaded;
 }
 
-bool_t
+bool
 HitDoc_equals(HitDoc *self, Obj *other) {
     HitDoc *twin = (HitDoc*)other;
     if (twin == self)                     { return true;  }

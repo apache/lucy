@@ -51,10 +51,10 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
     Lock              *merge_lock;
     Doc               *stock_doc;
     CharBuf           *snapfile;
-    bool_t             truncate;
-    bool_t             optimize;
-    bool_t             needs_commit;
-    bool_t             prepared;
+    bool               truncate;
+    bool               optimize;
+    bool               needs_commit;
+    bool               prepared;
 
     public inert int32_t TRUNCATE;
     public inert int32_t CREATE;

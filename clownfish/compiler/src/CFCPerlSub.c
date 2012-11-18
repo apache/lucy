@@ -131,7 +131,7 @@ struct allot_macro_map prim_type_to_allot_macro[] = {
     { "int32_t",    "ALLOT_I32"    },
     { "int16_t",    "ALLOT_I16"    },
     { "int8_t",     "ALLOT_I8"     },
-    { "chy_bool_t", "ALLOT_BOOL"   },
+    { "bool",       "ALLOT_BOOL"   },
     { NULL, NULL }
 };
 
@@ -221,7 +221,7 @@ CFCPerlSub_build_allot_params(CFCPerlSub *self) {
     // Iterate over args in param list.
     allot_params
         = CFCUtil_cat(allot_params,
-                      "chy_bool_t args_ok = XSBind_allot_params(\n"
+                      "bool args_ok = XSBind_allot_params(\n"
                       "        &(ST(0)), 1, items, ", NULL);
     for (size_t i = 1; i < num_vars; i++) {
         CFCVariable *var = arg_vars[i];

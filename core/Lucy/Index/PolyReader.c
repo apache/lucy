@@ -34,9 +34,9 @@
 #include "Clownfish/Util/StringHelper.h"
 
 // Obtain/release read locks and commit locks.
-static bool_t
+static bool
 S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_filename);
-static bool_t 
+static bool 
 S_obtain_deletion_lock(PolyReader *self);
 static void
 S_release_read_lock(PolyReader *self);
@@ -380,7 +380,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         if (PolyReader_race_condition_debug1) {
             ZombieCharBuf *temp = ZCB_WRAP_STR("temp", 4);
             if (Folder_Exists(folder, (CharBuf*)temp)) {
-                bool_t success = Folder_Rename(folder, (CharBuf*)temp,
+                bool success = Folder_Rename(folder, (CharBuf*)temp,
                                                PolyReader_race_condition_debug1);
                 if (!success) { RETHROW(INCREF(Err_get_error())); }
             }
@@ -461,7 +461,7 @@ S_derive_folder(Obj *index) {
     return folder;
 }
 
-static bool_t 
+static bool 
 S_obtain_deletion_lock(PolyReader *self) {
     self->deletion_lock = IxManager_Make_Deletion_Lock(self->manager);
     Lock_Clear_Stale(self->deletion_lock);
@@ -473,7 +473,7 @@ S_obtain_deletion_lock(PolyReader *self) {
     return true;
 }
 
-static bool_t
+static bool
 S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_file_name) {
     self->read_lock = IxManager_Make_Snapshot_Read_Lock(self->manager,
                                                         snapshot_file_name);

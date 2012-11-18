@@ -30,8 +30,8 @@ class Lucy::Search::PhraseMatcher inherits Lucy::Search::Matcher {
     float           phrase_boost;
     Compiler       *compiler;
     float           weight;
-    bool_t          first_time;
-    bool_t          more;
+    bool            first_time;
+    bool            more;
 
     inert incremented PhraseMatcher*
     new(Similarity *similarity, VArray *posting_lists, Compiler *compiler);

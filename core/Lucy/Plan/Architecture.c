@@ -50,7 +50,7 @@ Arch_init(Architecture *self) {
     return self;
 }
 
-bool_t
+bool
 Arch_equals(Architecture *self, Obj *other) {
     Architecture *twin = (Architecture*)other;
     if (twin == self)                   { return true; }

@@ -169,7 +169,7 @@ test_Local_Find_Folder(TestBatch *batch, set_up_t set_up,
 static void
 test_Local_MkDir(TestBatch *batch, set_up_t set_up, tear_down_t tear_down) {
     Folder *folder = set_up();
-    bool_t result;
+    bool result;
 
     result = Folder_Local_MkDir(folder, foo);
     TEST_TRUE(batch, result, "Local_MkDir succeeds and returns true");
@@ -288,7 +288,7 @@ static void
 test_Rename(TestBatch *batch, set_up_t set_up, tear_down_t tear_down) {
     Folder *folder = set_up();
     OutStream *outstream;
-    bool_t result;
+    bool result;
 
     Folder_MkDir(folder, foo);
     Folder_MkDir(folder, foo_bar);
@@ -425,7 +425,7 @@ static void
 test_Hard_Link(TestBatch *batch, set_up_t set_up, tear_down_t tear_down) {
     Folder *folder = set_up();
     OutStream *outstream;
-    bool_t result;
+    bool result;
 
     Folder_MkDir(folder, foo);
     Folder_MkDir(folder, foo_bar);

@@ -35,13 +35,13 @@ abstract class Lucy::Store::DirHandle cnick DH
      *
      * @return true on success, false when finished.
      */
-    abstract bool_t
+    abstract bool
     Next(DirHandle *self);
 
     /** Attempt to close the DirHandle.  Returns true on success, sets
      * Err_error and returns false on failure.
      */
-    abstract bool_t
+    abstract bool
     Close(DirHandle *self);
 
     /** Return the object's <code>dir</code> attribute.
@@ -58,13 +58,13 @@ abstract class Lucy::Store::DirHandle cnick DH
 
     /** Returns true if the current entry is a directory, false otherwise.
      */
-    abstract bool_t
+    abstract bool
     Entry_Is_Dir(DirHandle *self);
 
     /** Returns true if the current entry is a symbolic link (or a Windows
      * junction), false otherwise.
      */
-    abstract bool_t
+    abstract bool
     Entry_Is_Symlink(DirHandle *self);
 
     /** Invokes Close(), but ignores any errors.

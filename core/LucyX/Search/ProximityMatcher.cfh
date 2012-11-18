@@ -30,8 +30,8 @@ class LucyX::Search::ProximityMatcher inherits Lucy::Search::Matcher {
     float           proximity_boost;
     Compiler       *compiler;
     float           weight;
-    bool_t          first_time;
-    bool_t          more;
+    bool            first_time;
+    bool            more;
     uint32_t        within;
 
     inert incremented ProximityMatcher*

@@ -22,7 +22,7 @@
 #ifdef CHY_HAS_WINDOWS_H
 #include <windows.h>
 
-chy_bool_t
+bool
 lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
                             void *new_value) {
     return InterlockedCompareExchangePointer(target, new_value, old_value)

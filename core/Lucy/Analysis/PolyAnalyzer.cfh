@@ -80,7 +80,7 @@ public class Lucy::Analysis::PolyAnalyzer
     public incremented Inversion*
     Transform_Text(PolyAnalyzer *self, CharBuf *text);
 
-    public bool_t
+    public bool
     Equals(PolyAnalyzer *self, Obj *other);
 
     public incremented PolyAnalyzer*

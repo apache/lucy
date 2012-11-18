@@ -59,13 +59,13 @@ QueryLexer_init(QueryLexer *self) {
     return self;
 }
 
-bool_t
+bool
 QueryLexer_heed_colons(QueryLexer *self) {
     return self->heed_colons;
 }
 
 void
-QueryLexer_set_heed_colons(QueryLexer *self, bool_t heed_colons) {
+QueryLexer_set_heed_colons(QueryLexer *self, bool heed_colons) {
     self->heed_colons = heed_colons;
 }
 

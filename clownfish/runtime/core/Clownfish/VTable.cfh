@@ -64,10 +64,10 @@ class Clownfish::VTable inherits Clownfish::Obj {
      *
      * @return true on success, false if the class was already registered.
      */
-    inert bool_t
+    inert bool
     add_to_registry(VTable *vtable);
 
-    inert bool_t
+    inert bool
     add_alias_to_registry(VTable *vtable, CharBuf *alias);
 
     /** Initialize the registry.

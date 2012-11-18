@@ -33,8 +33,8 @@ public class Lucy::Analysis::Normalizer
     int options;
 
     inert incremented Normalizer*
-    new(const CharBuf *normalization_form = NULL, bool_t case_fold = true,
-        bool_t strip_accents = false);
+    new(const CharBuf *normalization_form = NULL, bool case_fold = true,
+        bool strip_accents = false);
 
     /**
      * @param normalization_form Unicode normalization form, can be one of
@@ -44,7 +44,7 @@ public class Lucy::Analysis::Normalizer
      */
     public inert Normalizer*
     init(Normalizer *self, const CharBuf *normalization_form = NULL,
-        bool_t case_fold = true, bool_t strip_accents = false);
+        bool case_fold = true, bool strip_accents = false);
 
     public incremented Inversion*
     Transform(Normalizer *self, Inversion *inversion);
@@ -55,7 +55,7 @@ public class Lucy::Analysis::Normalizer
     public incremented Normalizer*
     Load(Normalizer *self, Obj *dump);
 
-    public bool_t
+    public bool
     Equals(Normalizer *self, Obj *other);
 }
 

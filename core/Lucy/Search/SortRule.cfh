@@ -27,7 +27,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
 
     int32_t   type;
     CharBuf  *field;
-    bool_t    reverse;
+    bool      reverse;
 
     inert int32_t FIELD;
     inert int32_t SCORE;
@@ -35,7 +35,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
 
     public inert incremented SortRule*
     new(int32_t type = 0, const CharBuf *field = NULL,
-        bool_t reverse = false);
+        bool reverse = false);
 
     /**
      * @param type Indicate whether to sort by score, field, etc.  (The
@@ -45,7 +45,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
      */
     public inert incremented SortRule*
     init(SortRule *self, int32_t type = 0, const CharBuf *field = NULL,
-         bool_t reverse = false);
+         bool reverse = false);
 
     /** Accessor for "field" member.
      */
@@ -59,7 +59,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
 
     /** Accessor for "reverse" member.
      */
-    public bool_t
+    public bool
     Get_Reverse(SortRule *self);
 
     public incremented SortRule*

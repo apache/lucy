@@ -41,12 +41,12 @@ inert class Clownfish::Util::StringHelper cnick StrHelp {
 
     /** Return true if the string is valid UTF-8, false otherwise.
      */
-    inert bool_t
+    inert bool
     utf8_valid(const char *ptr, size_t len);
 
     /** Returns true if the code point qualifies as Unicode whitespace.
      */
-    inert bool_t
+    inert bool
     is_whitespace(uint32_t code_point);
 
     /** Encode a Unicode code point to a UTF-8 sequence.

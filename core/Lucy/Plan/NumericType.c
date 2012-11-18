@@ -25,8 +25,8 @@ NumType_init(NumericType *self) {
 }
 
 NumericType*
-NumType_init2(NumericType *self, float boost, bool_t indexed, bool_t stored,
-              bool_t sortable) {
+NumType_init2(NumericType *self, float boost, bool indexed, bool stored,
+              bool sortable) {
     FType_init((FieldType*)self);
     self->boost      = boost;
     self->indexed    = indexed;
@@ -35,7 +35,7 @@ NumType_init2(NumericType *self, float boost, bool_t indexed, bool_t stored,
     return self;
 }
 
-bool_t
+bool
 NumType_binary(NumericType *self) {
     UNUSED_VAR(self);
     return true;
@@ -112,9 +112,9 @@ NumType_load(NumericType *self, Obj *dump) {
     Obj *indexed_dump = Hash_Fetch_Str(source, "indexed", 7);
     Obj *stored_dump  = Hash_Fetch_Str(source, "stored", 6);
     Obj *sort_dump    = Hash_Fetch_Str(source, "sortable", 8);
-    bool_t indexed  = indexed_dump ? Obj_To_Bool(indexed_dump) : true;
-    bool_t stored   = stored_dump  ? Obj_To_Bool(stored_dump)  : true;
-    bool_t sortable = sort_dump    ? Obj_To_Bool(sort_dump)    : false;
+    bool indexed  = indexed_dump ? Obj_To_Bool(indexed_dump) : true;
+    bool stored   = stored_dump  ? Obj_To_Bool(stored_dump)  : true;
+    bool sortable = sort_dump    ? Obj_To_Bool(sort_dump)    : false;
 
     return NumType_init2(loaded, boost, indexed, stored, sortable);
 }
@@ -133,8 +133,8 @@ Float64Type_init(Float64Type *self) {
 }
 
 Float64Type*
-Float64Type_init2(Float64Type *self, float boost, bool_t indexed,
-                  bool_t stored, bool_t sortable) {
+Float64Type_init2(Float64Type *self, float boost, bool indexed,
+                  bool stored, bool sortable) {
     return (Float64Type*)NumType_init2((NumericType*)self, boost, indexed,
                                        stored, sortable);
 }
@@ -151,7 +151,7 @@ Float64Type_primitive_id(Float64Type *self) {
     return FType_FLOAT64;
 }
 
-bool_t
+bool
 Float64Type_equals(Float64Type *self, Obj *other) {
     if (self == (Float64Type*)other) { return true; }
     if (!other) { return false; }
@@ -175,8 +175,8 @@ Float32Type_init(Float32Type *self) {
 }
 
 Float32Type*
-Float32Type_init2(Float32Type *self, float boost, bool_t indexed,
-                  bool_t stored, bool_t sortable) {
+Float32Type_init2(Float32Type *self, float boost, bool indexed,
+                  bool stored, bool sortable) {
     return (Float32Type*)NumType_init2((NumericType*)self, boost, indexed,
                                        stored, sortable);
 }
@@ -193,7 +193,7 @@ Float32Type_primitive_id(Float32Type *self) {
     return FType_FLOAT32;
 }
 
-bool_t
+bool
 Float32Type_equals(Float32Type *self, Obj *other) {
     if (self == (Float32Type*)other) { return true; }
     if (!other) { return false; }
@@ -217,8 +217,8 @@ Int32Type_init(Int32Type *self) {
 }
 
 Int32Type*
-Int32Type_init2(Int32Type *self, float boost, bool_t indexed,
-                bool_t stored, bool_t sortable) {
+Int32Type_init2(Int32Type *self, float boost, bool indexed,
+                bool stored, bool sortable) {
     return (Int32Type*)NumType_init2((NumericType*)self, boost, indexed,
                                      stored, sortable);
 }
@@ -235,7 +235,7 @@ Int32Type_primitive_id(Int32Type *self) {
     return FType_INT32;
 }
 
-bool_t
+bool
 Int32Type_equals(Int32Type *self, Obj *other) {
     if (self == (Int32Type*)other) { return true; }
     if (!other) { return false; }
@@ -259,8 +259,8 @@ Int64Type_init(Int64Type *self) {
 }
 
 Int64Type*
-Int64Type_init2(Int64Type *self, float boost, bool_t indexed,
-                bool_t stored, bool_t sortable) {
+Int64Type_init2(Int64Type *self, float boost, bool indexed,
+                bool stored, bool sortable) {
     return (Int64Type*)NumType_init2((NumericType*)self, boost, indexed,
                                      stored, sortable);
 }
@@ -277,7 +277,7 @@ Int64Type_primitive_id(Int64Type *self) {
     return FType_INT64;
 }
 
-bool_t
+bool
 Int64Type_equals(Int64Type *self, Obj *other) {
     if (self == (Int64Type*)other) { return true; }
     if (!other) { return false; }

@@ -88,10 +88,10 @@ Lock_get_host(Lock *self) {
     return self->host;
 }
 
-bool_t
+bool
 Lock_obtain(Lock *self) {
     int32_t time_left = self->interval == 0 ? 0 : self->timeout;
-    bool_t locked = Lock_Request(self);
+    bool locked = Lock_Request(self);
 
     while (!locked) {
         time_left -= self->interval;
@@ -122,17 +122,17 @@ LFLock_init(LockFileLock *self, Folder *folder, const CharBuf *name,
     return self;
 }
 
-bool_t
+bool
 LFLock_shared(LockFileLock *self) {
     UNUSED_VAR(self); return false;
 }
 
-bool_t
+bool
 LFLock_request(LockFileLock *self) {
     Hash   *file_data;
-    bool_t wrote_json;
-    bool_t success = false;
-    bool_t deletion_failed = false;
+    bool wrote_json;
+    bool success = false;
+    bool deletion_failed = false;
 
     if (Folder_Exists(self->folder, self->lock_path)) {
         Err_set_error((Err*)LockErr_new(CB_newf("Can't obtain lock: '%o' exists",
@@ -205,7 +205,7 @@ LFLock_release(LockFileLock *self) {
     }
 }
 
-bool_t
+bool
 LFLock_is_locked(LockFileLock *self) {
     return Folder_Exists(self->folder, self->lock_path);
 }
@@ -215,11 +215,11 @@ LFLock_clear_stale(LockFileLock *self) {
     LFLock_Maybe_Delete_File(self, self->lock_path, false, true);
 }
 
-bool_t
+bool
 LFLock_maybe_delete_file(LockFileLock *self, const CharBuf *path,
-                         bool_t delete_mine, bool_t delete_other) {
+                         bool delete_mine, bool delete_other) {
     Folder *folder  = self->folder;
-    bool_t  success = false;
+    bool    success = false;
     ZombieCharBuf *scratch = ZCB_WRAP(path);
 
     // Only delete locks that start with our lock name.

@@ -238,9 +238,9 @@ test_Local_Open_Dir(TestBatch *batch) {
     CompoundFileReader *cf_reader = CFReader_open(real_folder);
     DirHandle *dh;
     CharBuf *entry;
-    bool_t saw_foo       = false;
-    bool_t saw_stuff     = false;
-    bool_t stuff_was_dir = false;
+    bool saw_foo       = false;
+    bool saw_stuff     = false;
+    bool stuff_was_dir = false;
 
     CFReader_MkDir(cf_reader, stuff);
 

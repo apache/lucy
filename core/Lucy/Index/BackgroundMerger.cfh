@@ -43,9 +43,9 @@ public class Lucy::Index::BackgroundMerger cnick BGMerger
     CharBuf           *snapfile;
     Hash              *doc_maps;
     int64_t            cutoff;
-    bool_t             optimize;
-    bool_t             needs_commit;
-    bool_t             prepared;
+    bool               optimize;
+    bool               needs_commit;
+    bool               prepared;
 
     public inert incremented BackgroundMerger*
     new(Obj *index, IndexManager *manager = NULL);

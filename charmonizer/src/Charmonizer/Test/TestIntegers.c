@@ -51,8 +51,8 @@ S_run_tests(TestBatch *batch) {
 #endif
 
     {
-        bool_t the_truth = true;
-        OK(the_truth, "bool_t true");
+        bool the_truth = true;
+        OK(the_truth, "bool true");
         OK(!false, "false is false");
     }
 #ifdef HAS_INT8_T

@@ -76,7 +76,7 @@ class Lucy::Index::SegPostingList cnick SegPList
 
     Matcher*
     Make_Matcher(SegPostingList *self, Similarity *similarity,
-                 Compiler *compiler, bool_t need_score);
+                 Compiler *compiler, bool need_score);
 
     RawPosting*
     Read_Raw(SegPostingList *self, int32_t last_doc_id, CharBuf *term_text,

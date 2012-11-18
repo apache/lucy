@@ -37,7 +37,7 @@ RAMDH_init(RAMDirHandle *self, RAMFolder *folder) {
     return self;
 }
 
-bool_t
+bool
 RAMDH_close(RAMDirHandle *self) {
     if (self->elems) {
         VA_Dec_RefCount(self->elems);
@@ -50,7 +50,7 @@ RAMDH_close(RAMDirHandle *self) {
     return true;
 }
 
-bool_t
+bool
 RAMDH_next(RAMDirHandle *self) {
     if (self->elems) {
         self->tick++;
@@ -68,7 +68,7 @@ RAMDH_next(RAMDirHandle *self) {
     return false;
 }
 
-bool_t
+bool
 RAMDH_entry_is_dir(RAMDirHandle *self) {
     if (self->elems) {
         CharBuf *name = (CharBuf*)VA_Fetch(self->elems, self->tick);
@@ -79,7 +79,7 @@ RAMDH_entry_is_dir(RAMDirHandle *self) {
     return false;
 }
 
-bool_t
+bool
 RAMDH_entry_is_symlink(RAMDirHandle *self) {
     UNUSED_VAR(self);
     return false;

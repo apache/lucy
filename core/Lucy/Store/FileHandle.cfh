@@ -62,7 +62,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * @param len Number of bytes to expose via the window.
      * @return true on success, false on failure (sets Err_error)
      */
-    abstract bool_t
+    abstract bool
     Window(FileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
     /** Clean up the FileWindow, doing whatever is necessary to free its
@@ -70,7 +70,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      *
      * @return true on success, false on failure (sets Err_error)
      */
-    abstract bool_t
+    abstract bool
     Release_Window(FileHandle *self, FileWindow *window);
 
     /** Copy file content into the supplied buffer.
@@ -80,7 +80,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * @param len Number of bytes to copy.
      * @return true on success, false on failure (sets Err_error)
      */
-    abstract bool_t
+    abstract bool
     Read(FileHandle *self, char *dest, int64_t offset, size_t len);
 
     /** Write supplied content.
@@ -89,7 +89,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * @param len Number of bytes to write.
      * @return true on success, false on failure (sets Err_error)
      */
-    abstract bool_t
+    abstract bool
     Write(FileHandle *self, const void *data, size_t len);
 
     /** Return the current length of the file in bytes, or set Err_error and
@@ -103,7 +103,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      *
      * @return true on success, false on failure (sets Err_error).
      */
-    bool_t
+    bool
     Grow(FileHandle *self, int64_t len);
 
     /** Close the FileHandle, possibly releasing resources.  Implementations
@@ -112,7 +112,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      *
      * @return true on success, false on failure (sets Err_error)
      */
-    abstract bool_t
+    abstract bool
     Close(FileHandle *self);
 
     /** Set the object's <code>path</code> attribute.

@@ -39,7 +39,7 @@ LucyParseJsonTrace(FILE *trace, char *line_prefix);
 
 // Encode JSON for supplied "dump".  On failure, sets Err_error and returns
 // false.
-static bool_t
+static bool
 S_to_json(Obj *dump, CharBuf *json, int32_t depth);
 
 // Parse JSON from raw UTF-8 in memory.
@@ -67,11 +67,11 @@ S_unescape_text(char *const top, char *const end);
 // Check that the supplied text begins with the specified keyword, which must
 // then end on a word boundary (i.e. match "null" but not the first four
 // letters of "nullify").
-static INLINE bool_t
+static INLINE bool
 SI_check_keyword(char *json, char* end, const char *keyword, size_t len);
 
 // Make it possible to be loosen constraints during testing.
-static bool_t tolerant = false;
+static bool tolerant = false;
 
 // Indentation: two spaces per level.
 static const char indentation[]     = "  ";
@@ -115,7 +115,7 @@ Json_slurp_json(Folder *folder, const CharBuf *path) {
     return dump;
 }
 
-bool_t
+bool
 Json_spew_json(Obj *dump, Folder *folder, const CharBuf *path) {
     CharBuf *json = Json_to_json(dump);
     if (!json) {
@@ -165,7 +165,7 @@ Json_to_json(Obj *dump) {
 }
 
 void
-Json_set_tolerant(bool_t tolerance) {
+Json_set_tolerant(bool tolerance) {
     tolerant = tolerance;
 }
 
@@ -253,7 +253,7 @@ S_cat_whitespace(CharBuf *json, int32_t depth) {
     }
 }
 
-static bool_t
+static bool
 S_to_json(Obj *dump, CharBuf *json, int32_t depth) {
     // Guard against infinite recursion in self-referencing data structures.
     if (depth > MAX_DEPTH) {
@@ -489,7 +489,7 @@ static Float64*
 S_parse_number(char **json_ptr, char *const limit) {
     char *top = *json_ptr;
     char *end = top;
-    bool_t terminated = false;
+    bool terminated = false;
 
     // We can't assume NULL termination for the JSON string, so we need to
     // ensure that strtod() cannot overrun and access invalid memory.
@@ -528,7 +528,7 @@ S_parse_string(char **json_ptr, char *const limit) {
     // Find terminating double quote, determine whether there are any escapes.
     char *top = *json_ptr + 1;
     char *end = NULL;
-    bool_t saw_backslash = false;
+    bool saw_backslash = false;
     for (char *text = top; text < limit; text++) {
         if (*text == '"') {
             end = text;
@@ -651,7 +651,7 @@ S_unescape_text(char *const top, char *const end) {
     return CB_new_steal_from_trusted_str(target_buf, target_size, cap);
 }
 
-static INLINE bool_t
+static INLINE bool
 SI_check_keyword(char *json, char* end, const char *keyword, size_t len) {
     if ((size_t)(end - json) > len
         && strncmp(json, keyword, len) == 0

@@ -94,7 +94,7 @@ class Clownfish::Hash inherits Clownfish::Obj {
      * @return true while iterating, false when the iterator has been
      * exhausted.
      */
-    bool_t
+    bool
     Next(Hash *self, Obj **key, Obj **value);
 
     /** Search for a key which Equals the key supplied, and return the key
@@ -130,7 +130,7 @@ class Clownfish::Hash inherits Clownfish::Obj {
     public uint32_t
     Get_Size(Hash *self);
 
-    public bool_t
+    public bool
     Equals(Hash *self, Obj *other);
 
     public incremented Hash*

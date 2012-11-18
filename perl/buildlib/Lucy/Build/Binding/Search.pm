@@ -503,7 +503,7 @@ CODE:
     SV *type_sv;
     SV *value_sv;
 
-    chy_bool_t args_ok
+    bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&type_sv, "type", 4, true),
                               ALLOT_SV(&value_sv, "value", 5, false),

@@ -44,7 +44,7 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
     /** Verify that <code>path</code> is a directory.  TODO: check
      * permissions.
      */
-    public bool_t
+    public bool
     Check(FSFolder *self);
 
     public void
@@ -57,25 +57,25 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
     incremented nullable DirHandle*
     Local_Open_Dir(FSFolder *self);
 
-    bool_t
+    bool
     Local_MkDir(FSFolder *self, const CharBuf *name);
 
-    bool_t
+    bool
     Local_Exists(FSFolder *self, const CharBuf *name);
 
-    bool_t
+    bool
     Local_Is_Directory(FSFolder *self, const CharBuf *name);
 
     nullable Folder*
     Local_Find_Folder(FSFolder *self, const CharBuf *name);
 
-    bool_t
+    bool
     Local_Delete(FSFolder *self, const CharBuf *name);
 
-    public bool_t
+    public bool
     Rename(FSFolder *self, const CharBuf* from, const CharBuf *to);
 
-    public bool_t
+    public bool
     Hard_Link(FSFolder *self, const CharBuf *from, const CharBuf *to);
 
     /** Transform a relative path into an abolute path.

@@ -54,7 +54,7 @@
 // Helper function for Tree().
 static Query*
 S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
-                 bool_t enclosed);
+                 bool enclosed);
 
 // Drop unmatched right parens and add matching right parens at end to
 // close paren groups implicitly.
@@ -93,7 +93,7 @@ S_compose_or_queries(QueryParser *self, VArray *elems);
 
 // Derive a single subquery from all Query objects in the clause.
 static Query*
-S_compose_subquery(QueryParser *self, VArray *elems, bool_t enclosed);
+S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed);
 
 QueryParser*
 QParser_new(Schema *schema, Analyzer *analyzer, const CharBuf *default_boolop,
@@ -182,13 +182,13 @@ QParser_get_fields(QueryParser *self) {
     return self->fields;
 }
 
-bool_t
+bool
 QParser_heed_colons(QueryParser *self) {
     return self->heed_colons;
 }
 
 void
-QParser_set_heed_colons(QueryParser *self, bool_t heed_colons) {
+QParser_set_heed_colons(QueryParser *self, bool heed_colons) {
     self->heed_colons = heed_colons;
     QueryLexer_Set_Heed_Colons(self->lexer, heed_colons);
 }
@@ -284,7 +284,7 @@ S_discard_elems(VArray *elems, uint32_t type) {
 
 static Query*
 S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
-                 bool_t enclosed) {
+                 bool enclosed) {
     if (VA_Get_Size(elems)) {
         ParserElem *first = (ParserElem*)VA_Fetch(elems, 0);
         if (ParserElem_Get_Type(first) == TOKEN_OPEN_PAREN) {
@@ -532,7 +532,7 @@ S_compose_or_queries(QueryParser *self, VArray *elems) {
 }
 
 static Query*
-S_compose_subquery(QueryParser *self, VArray *elems, bool_t enclosed) {
+S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed) {
     Query *retval;
 
     if (VA_Get_Size(elems) == 0) {
@@ -641,7 +641,7 @@ S_compose_subquery(QueryParser *self, VArray *elems, bool_t enclosed) {
     return retval;
 }
 
-static bool_t
+static bool
 S_has_valid_clauses(Query *query) {
     if (Query_Is_A(query, NOTQUERY)) {
         return false;
@@ -740,7 +740,7 @@ QParser_expand(QueryParser *self, Query *query) {
             Query *new_child = QParser_Expand(self, child); // recurse
             if (new_child) {
                 if (Query_Is_A(new_child, NOMATCHQUERY)) {
-                    bool_t fails = NoMatchQuery_Get_Fails_To_Match(
+                    bool fails = NoMatchQuery_Get_Fails_To_Match(
                                        (NoMatchQuery*)new_child);
                     if (fails) {
                         VA_Push(new_kids, (Obj*)new_child);
@@ -844,8 +844,8 @@ QParser_expand_leaf(QueryParser *self, Query *query) {
     LeafQuery     *leaf_query  = (LeafQuery*)query;
     Schema        *schema      = self->schema;
     ZombieCharBuf *source_text = ZCB_BLANK();
-    bool_t         is_phrase   = false;
-    bool_t         ambiguous   = false;
+    bool           is_phrase   = false;
+    bool           ambiguous   = false;
 
     // Determine whether we can actually process the input.
     if (!Query_Is_A(query, LEAFQUERY))                { return NULL; }

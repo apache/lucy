@@ -101,13 +101,13 @@ BB_get_capacity(ByteBuf *self) {
     return self->cap;
 }
 
-static INLINE bool_t
+static INLINE bool
 SI_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
     if (self->size != size) { return false; }
     return (memcmp(self->buf, bytes, self->size) == 0);
 }
 
-bool_t
+bool
 BB_equals(ByteBuf *self, Obj *other) {
     ByteBuf *const twin = (ByteBuf*)other;
     if (twin == self)              { return true; }
@@ -115,7 +115,7 @@ BB_equals(ByteBuf *self, Obj *other) {
     return SI_equals_bytes(self, twin->buf, twin->size);
 }
 
-bool_t
+bool
 BB_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
     return SI_equals_bytes(self, bytes, size);
 }

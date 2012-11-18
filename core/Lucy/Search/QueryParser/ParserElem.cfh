@@ -65,17 +65,17 @@ class Lucy::Search::QueryParser::ParserElem inherits Clownfish::Obj {
 
     /** Return true if the element MUST be present.
      */
-    bool_t
+    bool
     Required(ParserElem *self);
 
     /** Return true if the element SHOULD be present.
      */
-    bool_t
+    bool
     Optional(ParserElem *self);
 
     /** Return true if the element MUST NOT be present.
      */
-    bool_t
+    bool
     Negated(ParserElem *self);
 }
 

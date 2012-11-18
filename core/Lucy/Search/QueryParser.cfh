@@ -48,8 +48,8 @@ public class Lucy::Search::QueryParser cnick QParser
     CharBuf    *default_boolop;
     VArray     *fields;
     QueryLexer *lexer;
-    bool_t      heed_colons;
-    bool_t      default_occur;
+    bool        heed_colons;
+    int32_t     default_occur;
 
     inert incremented QueryParser*
     new(Schema *schema, Analyzer *analyzer = NULL,
@@ -214,13 +214,13 @@ public class Lucy::Search::QueryParser cnick QParser
     VArray*
     Get_Fields(QueryParser *self);
 
-    bool_t
+    bool
     Heed_Colons(QueryParser *self);
 
     /** Enable/disable parsing of <code>fieldname:foo</code> constructs.
      */
     public void
-    Set_Heed_Colons(QueryParser *self, bool_t heed_colons);
+    Set_Heed_Colons(QueryParser *self, bool heed_colons);
 
     public void
     Destroy(QueryParser *self);

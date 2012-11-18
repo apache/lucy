@@ -62,7 +62,7 @@ Snapshot_add_entry(Snapshot *self, const CharBuf *entry) {
     Hash_Store(self->entries, (Obj*)entry, (Obj*)CFISH_TRUE);
 }
 
-bool_t
+bool
 Snapshot_delete_entry(Snapshot *self, const CharBuf *entry) {
     Obj *val = Hash_Delete(self->entries, (Obj*)entry);
     if (val) {

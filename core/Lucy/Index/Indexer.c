@@ -55,7 +55,7 @@ S_release_merge_lock(Indexer *self);
 // Verify a Folder or derive an FSFolder from a CharBuf path.  Call
 // Folder_Initialize() if "create" is true.
 static Folder*
-S_init_folder(Obj *index, bool_t create);
+S_init_folder(Obj *index, bool create);
 
 // Find the schema file within a snapshot.
 static CharBuf*
@@ -70,8 +70,8 @@ Indexer_new(Schema *schema, Obj *index, IndexManager *manager, int32_t flags) {
 Indexer*
 Indexer_init(Indexer *self, Schema *schema, Obj *index,
              IndexManager *manager, int32_t flags) {
-    bool_t    create   = (flags & Indexer_CREATE)   ? true : false;
-    bool_t    truncate = (flags & Indexer_TRUNCATE) ? true : false;
+    bool      create   = (flags & Indexer_CREATE)   ? true : false;
+    bool      truncate = (flags & Indexer_TRUNCATE) ? true : false;
     Folder   *folder   = S_init_folder(index, create);
     Snapshot *latest_snapshot = Snapshot_new();
 
@@ -239,7 +239,7 @@ Indexer_destroy(Indexer *self) {
 }
 
 static Folder*
-S_init_folder(Obj *index, bool_t create) {
+S_init_folder(Obj *index, bool create) {
     Folder *folder = NULL;
 
     // Validate or acquire a Folder.
@@ -384,12 +384,12 @@ S_find_schema_file(Snapshot *snapshot) {
     return retval;
 }
 
-static bool_t
+static bool
 S_maybe_merge(Indexer *self, VArray *seg_readers) {
-    bool_t    merge_happened  = false;
+    bool      merge_happened  = false;
     uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
     Lock     *merge_lock      = IxManager_Make_Merge_Lock(self->manager);
-    bool_t    got_merge_lock  = Lock_Obtain(merge_lock);
+    bool      got_merge_lock  = Lock_Obtain(merge_lock);
     int64_t   cutoff;
 
     if (got_merge_lock) {
@@ -471,7 +471,7 @@ void
 Indexer_prepare_commit(Indexer *self) {
     VArray   *seg_readers     = PolyReader_Get_Seg_Readers(self->polyreader);
     uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
-    bool_t    merge_happened  = false;
+    bool      merge_happened  = false;
 
     if (!self->write_lock || self->prepared) {
         THROW(ERR, "Can't call Prepare_Commit() more than once");
@@ -536,7 +536,7 @@ Indexer_commit(Indexer *self) {
     }
 
     if (self->needs_commit) {
-        bool_t success;
+        bool success;
 
         // Rename temp snapshot file.
         CharBuf *temp_snapfile = CB_Clone(self->snapfile);

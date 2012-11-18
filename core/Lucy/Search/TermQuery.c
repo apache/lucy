@@ -81,7 +81,7 @@ TermQuery_get_term(TermQuery *self) {
     return self->term;
 }
 
-bool_t
+bool
 TermQuery_equals(TermQuery *self, Obj *other) {
     TermQuery *twin = (TermQuery*)other;
     if (twin == self)                               { return true; }
@@ -102,7 +102,7 @@ TermQuery_to_string(TermQuery *self) {
 
 Compiler*
 TermQuery_make_compiler(TermQuery *self, Searcher *searcher, float boost,
-                        bool_t subordinate) {
+                        bool subordinate) {
     TermCompiler *compiler = TermCompiler_new((Query*)self, searcher, boost);
     if (!subordinate) {
         TermCompiler_Normalize(compiler);
@@ -156,7 +156,7 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
     return self;
 }
 
-bool_t
+bool
 TermCompiler_equals(TermCompiler *self, Obj *other) {
     TermCompiler *twin = (TermCompiler*)other;
     if (!Compiler_equals((Compiler*)self, other))           { return false; }
@@ -217,7 +217,7 @@ TermCompiler_get_weight(TermCompiler *self) {
 
 Matcher*
 TermCompiler_make_matcher(TermCompiler *self, SegReader *reader,
-                          bool_t need_score) {
+                          bool need_score) {
     TermQuery *tparent = (TermQuery*)self->parent;
     PostingListReader *plist_reader
         = (PostingListReader*)SegReader_Fetch(

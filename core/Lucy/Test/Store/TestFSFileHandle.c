@@ -176,7 +176,7 @@ test_Close(TestBatch *batch) {
     int saved_fd = fh->fd;
     fh->fd = -1;
     Err_set_error(NULL);
-    bool_t result = FSFH_Close(fh);
+    bool result = FSFH_Close(fh);
     TEST_FALSE(batch, result, "Failed Close() returns false");
     TEST_TRUE(batch, Err_get_error() != NULL,
               "Failed Close() sets Err_error");

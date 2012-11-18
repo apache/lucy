@@ -111,7 +111,7 @@ S_compare_doc_count(void *context, const void *va, const void *vb) {
     return SegReader_Doc_Count(a) - SegReader_Doc_Count(b);
 }
 
-static bool_t
+static bool
 S_check_cutoff(VArray *array, uint32_t tick, void *data) {
     SegReader *seg_reader = (SegReader*)VA_Fetch(array, tick);
     int64_t cutoff = *(int64_t*)data;
@@ -136,7 +136,7 @@ S_fibonacci(uint32_t n) {
 VArray*
 IxManager_recycle(IndexManager *self, PolyReader *reader,
                   DeletionsWriter *del_writer, int64_t cutoff,
-                  bool_t optimize) {
+                  bool optimize) {
     VArray *seg_readers = PolyReader_Get_Seg_Readers(reader);
     VArray *candidates  = VA_Gather(seg_readers, S_check_cutoff, &cutoff);
     VArray *recyclables = VA_new(VA_Get_Size(candidates));
@@ -256,7 +256,7 @@ void
 IxManager_write_merge_data(IndexManager *self, int64_t cutoff) {
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
     Hash *data = Hash_new(1);
-    bool_t success;
+    bool success;
     Hash_Store_Str(data, "cutoff", 6, (Obj*)CB_newf("%i64", cutoff));
     success = Json_spew_json((Obj*)data, self->folder, (CharBuf*)merge_json);
     DECREF(data);
@@ -284,7 +284,7 @@ IxManager_read_merge_data(IndexManager *self) {
     }
 }
 
-bool_t
+bool
 IxManager_remove_merge_data(IndexManager *self) {
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
     return Folder_Delete(self->folder, (CharBuf*)merge_json) != 0;

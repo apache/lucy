@@ -26,7 +26,7 @@ parcel Lucy;
 public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
     : dumpable {
 
-    bool_t fails_to_match;
+    bool fails_to_match;
 
     inert incremented NoMatchQuery*
     new();
@@ -37,9 +37,9 @@ public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
     init(NoMatchQuery *self);
 
     void
-    Set_Fails_To_Match(NoMatchQuery *self, bool_t fails_to_match);
+    Set_Fails_To_Match(NoMatchQuery *self, bool fails_to_match);
 
-    bool_t
+    bool
     Get_Fails_To_Match(NoMatchQuery *self);
 
     public incremented Obj*
@@ -54,7 +54,7 @@ public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
     public incremented NoMatchQuery*
     Deserialize(decremented NoMatchQuery *self, InStream *instream);
 
-    public bool_t
+    public bool
     Equals(NoMatchQuery *self, Obj *other);
 
     public incremented CharBuf*
@@ -62,7 +62,7 @@ public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query
 
     public incremented Compiler*
     Make_Compiler(NoMatchQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 }
 
 class Lucy::Search::NoMatchCompiler
@@ -76,7 +76,7 @@ class Lucy::Search::NoMatchCompiler
          Searcher *searcher, float boost);
 
     public incremented nullable Matcher*
-    Make_Matcher(NoMatchCompiler *self, SegReader *reader, bool_t need_score);
+    Make_Matcher(NoMatchCompiler *self, SegReader *reader, bool need_score);
 }
 
 

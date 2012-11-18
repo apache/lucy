@@ -102,17 +102,17 @@ ParserElem_negate(ParserElem *self) {
     }
 }
 
-bool_t
+bool
 ParserElem_optional(ParserElem *self) {
     return self->occur == LUCY_QPARSER_SHOULD;
 }
 
-bool_t
+bool
 ParserElem_required(ParserElem *self) {
     return self->occur == LUCY_QPARSER_MUST;
 }
 
-bool_t
+bool
 ParserElem_negated(ParserElem *self) {
     return self->occur == LUCY_QPARSER_MUST_NOT;
 }

@@ -20,13 +20,13 @@
 #include "Lucy/Store/RAMFile.h"
 
 RAMFile*
-RAMFile_new(ByteBuf *contents, bool_t read_only) {
+RAMFile_new(ByteBuf *contents, bool read_only) {
     RAMFile *self = (RAMFile*)VTable_Make_Obj(RAMFILE);
     return RAMFile_init(self, contents, read_only);
 }
 
 RAMFile*
-RAMFile_init(RAMFile *self, ByteBuf *contents, bool_t read_only) {
+RAMFile_init(RAMFile *self, ByteBuf *contents, bool read_only) {
     self->contents = contents ? (ByteBuf*)INCREF(contents) : BB_new(0);
     self->read_only = read_only;
     return self;
@@ -43,13 +43,13 @@ RAMFile_get_contents(RAMFile *self) {
     return self->contents;
 }
 
-bool_t
+bool
 RAMFile_read_only(RAMFile *self) {
     return self->read_only;
 }
 
 void
-RAMFile_set_read_only(RAMFile *self, bool_t read_only) {
+RAMFile_set_read_only(RAMFile *self, bool read_only) {
     self->read_only = read_only;
 }
 

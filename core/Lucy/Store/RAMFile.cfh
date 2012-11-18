@@ -20,18 +20,18 @@ parcel Lucy;
  */
 class Lucy::Store::RAMFile inherits Clownfish::Obj {
 
-    bool_t   read_only;
+    bool     read_only;
     ByteBuf *contents;
 
     inert incremented RAMFile*
-    new(ByteBuf *contents = NULL, bool_t read_only = false);
+    new(ByteBuf *contents = NULL, bool read_only = false);
 
     /**
      * @param contents Existing file contents, if any.
      * @param read_only Indicate that the file contents may not be modified.
      */
     inert RAMFile*
-    init(RAMFile *self, ByteBuf *contents = NULL, bool_t read_only = false);
+    init(RAMFile *self, ByteBuf *contents = NULL, bool read_only = false);
 
     /** Accessor for the file's contents.
      */
@@ -40,13 +40,13 @@ class Lucy::Store::RAMFile inherits Clownfish::Obj {
 
     /** Accessor for <code>read_only</code> property.
      */
-    bool_t
+    bool
     Read_Only(RAMFile *self);
 
     /** Set the object's <code>read_only</code> property.
      */
     void
-    Set_Read_Only(RAMFile *self, bool_t read_only);
+    Set_Read_Only(RAMFile *self, bool read_only);
 
     public void
     Destroy(RAMFile *self);

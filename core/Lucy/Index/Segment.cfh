@@ -54,7 +54,7 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
     /** Return true if the CharBuf is a segment name, i.e. matches this
      * pattern:  /^seg_\w+$/
      */
-    inert bool_t
+    inert bool
     valid_seg_name(const CharBuf *name);
 
     /** Register a new field and assign it a field number.  If the field was
@@ -144,7 +144,7 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
      * @return true if the file is read and decoded successfully, false
      * otherwise.
      */
-    public bool_t
+    public bool
     Read_File(Segment *self, Folder *folder);
 
     /** Compare by segment number.

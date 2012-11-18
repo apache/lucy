@@ -125,7 +125,7 @@ CFCType_new_integer(int flags, const char *specifier) {
              || !strcmp(specifier, "int")
              || !strcmp(specifier, "long")
              || !strcmp(specifier, "size_t")
-             || !strcmp(specifier, "bool_t") // Charmonizer type.
+             || !strcmp(specifier, "bool") // Charmonizer type.
             ) {
         width = 0;
     }
@@ -133,22 +133,13 @@ CFCType_new_integer(int flags, const char *specifier) {
         CFCUtil_die("Unknown integer specifier: '%s'", specifier);
     }
 
-    // Add Charmonizer prefix if necessary.
-    char full_specifier[32];
-    if (strcmp(specifier, "bool_t") == 0) {
-        strcpy(full_specifier, "chy_bool_t");
-    }
-    else {
-        strcpy(full_specifier, specifier);
-    }
-
     // Cache the C representation of this type.
     char c_string[32];
     if (flags & CFCTYPE_CONST) {
-        sprintf(c_string, "const %s", full_specifier);
+        sprintf(c_string, "const %s", specifier);
     }
     else {
-        strcpy(c_string, full_specifier);
+        strcpy(c_string, specifier);
     }
 
     // Add flags.
@@ -157,7 +148,7 @@ CFCType_new_integer(int flags, const char *specifier) {
     S_check_flags(flags, CFCTYPE_CONST | CFCTYPE_PRIMITIVE | CFCTYPE_INTEGER,
                   "Integer");
 
-    CFCType *self = CFCType_new(flags, NULL, full_specifier, 0, c_string);
+    CFCType *self = CFCType_new(flags, NULL, specifier, 0, c_string);
     self->width = width;
     return self;
 }

@@ -204,7 +204,7 @@ lucy_Doc_load(lucy_Doc *self, lucy_Obj *dump) {
     return loaded;
 }
 
-chy_bool_t
+bool
 lucy_Doc_equals(lucy_Doc *self, lucy_Obj *other) {
     lucy_Doc *twin = (lucy_Doc*)other;
     HV *my_fields;

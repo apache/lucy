@@ -90,7 +90,7 @@ public class Lucy::Analysis::RegexTokenizer
     public incremented RegexTokenizer*
     Load(RegexTokenizer *self, Obj *dump);
 
-    public bool_t
+    public bool
     Equals(RegexTokenizer *self, Obj *other);
 
     public void

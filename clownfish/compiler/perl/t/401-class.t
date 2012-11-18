@@ -168,7 +168,7 @@ $class_content = q|
         inert uint64_t num_dogs;
 
         private CharBuf *name;
-        private bool_t   likes_to_go_fetch;
+        private bool     likes_to_go_fetch;
         private void     Chase_Tail(Dog *self);
 
         ChewToy *squishy;

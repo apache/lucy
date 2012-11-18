@@ -48,7 +48,7 @@ DEBUG(message)
 PPCODE:
     LUCY_DEBUG("%s", message);
 
-chy_bool_t
+bool
 DEBUG_ENABLED()
 CODE:
     RETVAL = LUCY_DEBUG_ENABLED;
@@ -247,7 +247,7 @@ utf8ify(sv)
 PPCODE:
     sv_utf8_upgrade(sv);
 
-chy_bool_t
+bool
 utf8_valid(sv)
     SV *sv;
 CODE:

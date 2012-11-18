@@ -56,5 +56,5 @@ isa_ok(
     )
     for (
     'inert int running_count(int biscuit);',
-    'public inert Hash* init_fave_hash(int32_t num_buckets, bool_t o_rly);',
+    'public inert Hash* init_fave_hash(int32_t num_buckets, bool o_rly);',
     );

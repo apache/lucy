@@ -50,7 +50,7 @@ CaseFolder_transform_text(CaseFolder *self, CharBuf *text) {
     return Normalizer_Transform_Text(self->normalizer, text);
 }
 
-bool_t
+bool
 CaseFolder_equals(CaseFolder *self, Obj *other) {
     CaseFolder *const twin = (CaseFolder*)other;
     if (twin == self)                 { return true; }

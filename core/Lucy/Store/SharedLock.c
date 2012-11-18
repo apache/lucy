@@ -45,13 +45,13 @@ ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name,
     return self;
 }
 
-bool_t
+bool
 ShLock_shared(SharedLock *self) {
     UNUSED_VAR(self);
     return true;
 }
 
-bool_t
+bool
 ShLock_request(SharedLock *self) {
     uint32_t i = 0;
     ShLock_Request_t super_request
@@ -74,7 +74,7 @@ ShLock_request(SharedLock *self) {
         CB_setf(self->lock_path, "locks/%o-%u32.lock", self->name, ++i);
     } while (Folder_Exists(self->folder, self->lock_path));
 
-    bool_t success = super_request(self);
+    bool success = super_request(self);
     if (!success) { ERR_ADD_FRAME(Err_get_error()); }
     return success;
 }
@@ -124,7 +124,7 @@ ShLock_clear_stale(SharedLock *self) {
     DECREF(dh);
 }
 
-bool_t
+bool
 ShLock_is_locked(SharedLock *self) {
     DirHandle *dh;
     CharBuf   *entry;

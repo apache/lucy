@@ -31,7 +31,7 @@
     struct cfc_StringID reserved_word_map[] = {
         {"NULL", CFC_TOKENTYPE_NULL },
         {"abstract", CFC_TOKENTYPE_ABSTRACT },
-        {"bool_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
+        {"bool", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
         {"char", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
         {"class", CFC_TOKENTYPE_CLASS },
         {"cnick", CFC_TOKENTYPE_CNICK },

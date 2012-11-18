@@ -28,8 +28,8 @@ FType_init(FieldType *self) {
 }
 
 FieldType*
-FType_init2(FieldType *self, float boost, bool_t indexed, bool_t stored,
-            bool_t sortable) {
+FType_init2(FieldType *self, float boost, bool indexed, bool stored,
+            bool sortable) {
     self->boost              = boost;
     self->indexed            = indexed;
     self->stored             = stored;
@@ -44,17 +44,17 @@ FType_set_boost(FieldType *self, float boost) {
 }
 
 void
-FType_set_indexed(FieldType *self, bool_t indexed) {
+FType_set_indexed(FieldType *self, bool indexed) {
     self->indexed = !!indexed;
 }
 
 void
-FType_set_stored(FieldType *self, bool_t stored) {
+FType_set_stored(FieldType *self, bool stored) {
     self->stored = !!stored;
 }
 
 void
-FType_set_sortable(FieldType *self, bool_t sortable) {
+FType_set_sortable(FieldType *self, bool sortable) {
     self->sortable = !!sortable;
 }
 
@@ -63,22 +63,22 @@ FType_get_boost(FieldType *self) {
     return self->boost;
 }
 
-bool_t
+bool
 FType_indexed(FieldType *self) {
     return self->indexed;
 }
 
-bool_t
+bool
 FType_stored(FieldType *self) {
     return self->stored;
 }
 
-bool_t
+bool
 FType_sortable(FieldType *self) {
     return self->sortable;
 }
 
-bool_t
+bool
 FType_binary(FieldType *self) {
     UNUSED_VAR(self);
     return false;
@@ -96,7 +96,7 @@ FType_compare_values(FieldType *self, Obj *a, Obj *b) {
     return Obj_Compare_To(a, b);
 }
 
-bool_t
+bool
 FType_equals(FieldType *self, Obj *other) {
     FieldType *twin = (FieldType*)other;
     if (twin == self)                                     { return true; }

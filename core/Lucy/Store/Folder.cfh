@@ -86,7 +86,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param path A relative filepath.
      * @return true on success, false on failure (sets Err_error).
      */
-    public bool_t
+    public bool
     MkDir(Folder *self, const CharBuf *path);
 
     /** List all local entries within a directory.  Set Err_error and return
@@ -111,7 +111,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param path A relative filepath.
      * @return true if <code>path</code> exists.
      */
-    public bool_t
+    public bool
     Exists(Folder *self, const CharBuf *path);
 
     /** Indicate whether a directory exists at <code>path</code>.
@@ -119,7 +119,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param path A relative filepath.
      * @return true if <code>path</code> is a directory.
      */
-    bool_t
+    bool
     Is_Directory(Folder *self, const CharBuf *path);
 
     /** Delete an entry from the folder.
@@ -127,7 +127,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param path A relative filepath.
      * @return true if the deletion was successful.
      */
-    public bool_t
+    public bool
     Delete(Folder *self, const CharBuf *path);
 
     /** Delete recursively, starting at <code>path</code>
@@ -136,7 +136,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true if the whole tree is deleted successfully, false if any
      * part remains.
      */
-    public bool_t
+    public bool
     Delete_Tree(Folder *self, const CharBuf *path);
 
     /** Rename a file or directory, or set Err_error and return false on
@@ -147,7 +147,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param to The filepath after renaming.
      * @return true on success, false on failure.
      */
-    public abstract bool_t
+    public abstract bool
     Rename(Folder *self, const CharBuf *from, const CharBuf *to);
 
     /** Create a hard link at path <code>to</code> pointing at the existing
@@ -155,7 +155,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      *
      * @return true on success, false on failure.
      */
-    public abstract bool_t
+    public abstract bool
     Hard_Link(Folder *self, const CharBuf *from, const CharBuf *to);
 
     /** Read a file and return its contents.
@@ -202,7 +202,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      *
      * @return true on success.
      */
-    public abstract bool_t
+    public abstract bool
     Check(Folder *self);
 
     /** Close the folder and release implementation-specific resources.
@@ -233,7 +233,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param name The name of the subdirectory.
      * @return true on success, false on failure (sets Err_error)
      */
-    abstract bool_t
+    abstract bool
     Local_MkDir(Folder *self, const CharBuf *name);
 
     /** Indicate whether a local entry exists for the supplied
@@ -241,7 +241,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      *
      * @param name The name of the local entry.
      */
-    abstract bool_t
+    abstract bool
     Local_Exists(Folder *self, const CharBuf *name);
 
     /** Indicate whether a local subdirectory exists with the supplied
@@ -249,7 +249,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      *
      * @param name The name of the local subdirectory.
      */
-    abstract bool_t
+    abstract bool
     Local_Is_Directory(Folder *self, const CharBuf *name);
 
     /** Return the Folder object representing the specified directory, if such
@@ -266,7 +266,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param name The name of the entry to be deleted.
      * @return true if the deletion was successful.
      */
-    abstract bool_t
+    abstract bool
     Local_Delete(Folder *self, const CharBuf *name);
 }
 

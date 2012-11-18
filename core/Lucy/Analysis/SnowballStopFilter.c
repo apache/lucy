@@ -72,7 +72,7 @@ SnowStop_transform(SnowballStopFilter *self, Inversion *inversion) {
     return new_inversion;
 }
 
-bool_t
+bool
 SnowStop_equals(SnowballStopFilter *self, Obj *other) {
     SnowballStopFilter *const twin = (SnowballStopFilter*)other;
     if (twin == self)                         { return true; }

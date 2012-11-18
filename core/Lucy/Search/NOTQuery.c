@@ -59,7 +59,7 @@ NOTQuery_to_string(NOTQuery *self) {
     return retval;
 }
 
-bool_t
+bool
 NOTQuery_equals(NOTQuery *self, Obj *other) {
     if ((NOTQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, NOTQUERY)) { return false; }
@@ -68,7 +68,7 @@ NOTQuery_equals(NOTQuery *self, Obj *other) {
 
 Compiler*
 NOTQuery_make_compiler(NOTQuery *self, Searcher *searcher, float boost,
-                       bool_t subordinate) {
+                       bool subordinate) {
     NOTCompiler *compiler = NOTCompiler_new(self, searcher, boost);
     if (!subordinate) {
         NOTCompiler_Normalize(compiler);
@@ -110,7 +110,7 @@ NOTCompiler_highlight_spans(NOTCompiler *self, Searcher *searcher,
 
 Matcher*
 NOTCompiler_make_matcher(NOTCompiler *self, SegReader *reader,
-                         bool_t need_score) {
+                         bool need_score) {
     Compiler *negated_compiler
         = (Compiler*)CERTIFY(VA_Fetch(self->children, 0), COMPILER);
     Matcher *negated_matcher

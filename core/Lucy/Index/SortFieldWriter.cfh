@@ -46,7 +46,7 @@ class Lucy::Index::SortFieldWriter
     int64_t     dat_end;
     int32_t     run_cardinality;
     int32_t     run_max;
-    bool_t      var_width;
+    bool        var_width;
     int32_t    *sorted_ids;
     int32_t     run_ord;
     int32_t     run_tick;

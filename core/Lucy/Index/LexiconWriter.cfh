@@ -31,7 +31,7 @@ class Lucy::Index::LexiconWriter cnick LexWriter
     OutStream        *ixix_out;
     Hash             *counts;
     Hash             *ix_counts;
-    bool_t            temp_mode;
+    bool              temp_mode;
     int32_t           index_interval;
     int32_t           skip_interval;
     int32_t           count;

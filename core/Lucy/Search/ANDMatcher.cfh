@@ -22,8 +22,8 @@ parcel Lucy;
 class Lucy::Search::ANDMatcher inherits Lucy::Search::PolyMatcher {
 
     Matcher     **kids;
-    bool_t        more;
-    bool_t        first_time;
+    bool          more;
+    bool          first_time;
 
     inert incremented ANDMatcher*
     new(VArray *children, Similarity *sim);

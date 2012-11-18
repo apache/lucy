@@ -51,7 +51,7 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query
 
     public incremented Compiler*
     Make_Compiler(TermQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 
     public incremented CharBuf*
     To_String(TermQuery *self);
@@ -62,7 +62,7 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query
     public incremented TermQuery*
     Deserialize(decremented TermQuery *self, InStream *instream);
 
-    public bool_t
+    public bool
     Equals(TermQuery *self, Obj *other);
 
     public void
@@ -83,7 +83,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
          float boost);
 
     public incremented nullable Matcher*
-    Make_Matcher(TermCompiler *self, SegReader *reader, bool_t need_score);
+    Make_Matcher(TermCompiler *self, SegReader *reader, bool need_score);
 
     public float
     Get_Weight(TermCompiler *self);
@@ -98,7 +98,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
     Highlight_Spans(TermCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
-    public bool_t
+    public bool
     Equals(TermCompiler *self, Obj *other);
 
     public void

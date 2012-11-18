@@ -109,7 +109,7 @@ Compiler_to_string(Compiler *self) {
     return string;
 }
 
-bool_t
+bool
 Compiler_equals(Compiler *self, Obj *other) {
     Compiler *twin = (Compiler*)other;
     if (twin == self)                                    { return true; }

@@ -32,10 +32,10 @@ RAMFH_open(const CharBuf *path, uint32_t flags, RAMFile *file) {
 RAMFileHandle*
 RAMFH_do_open(RAMFileHandle *self, const CharBuf *path, uint32_t flags,
               RAMFile *file) {
-    bool_t must_create
+    bool must_create
         = (flags & (FH_CREATE | FH_EXCLUSIVE)) == (FH_CREATE | FH_EXCLUSIVE)
           ? true : false;
-    bool_t can_create
+    bool can_create
         = (flags & (FH_CREATE | FH_WRITE_ONLY)) == (FH_CREATE | FH_WRITE_ONLY)
           ? true : false;
 
@@ -75,7 +75,7 @@ RAMFH_destroy(RAMFileHandle *self) {
     SUPER_DESTROY(self, RAMFILEHANDLE);
 }
 
-bool_t
+bool
 RAMFH_window(RAMFileHandle *self, FileWindow *window, int64_t offset,
              int64_t len) {
     int64_t end = offset + len;
@@ -100,14 +100,14 @@ RAMFH_window(RAMFileHandle *self, FileWindow *window, int64_t offset,
     }
 }
 
-bool_t
+bool
 RAMFH_release_window(RAMFileHandle *self, FileWindow *window) {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, 0, 0);
     return true;
 }
 
-bool_t
+bool
 RAMFH_read(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
     int64_t end = offset + len;
     if (!(self->flags & FH_READ_ONLY)) {
@@ -131,7 +131,7 @@ RAMFH_read(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
     }
 }
 
-bool_t
+bool
 RAMFH_write(RAMFileHandle *self, const void *data, size_t len) {
     if (self->ram_file->read_only) {
         Err_set_error(Err_new(CB_newf("Attempt to write to read-only RAMFile")));
@@ -142,7 +142,7 @@ RAMFH_write(RAMFileHandle *self, const void *data, size_t len) {
     return true;
 }
 
-bool_t
+bool
 RAMFH_grow(RAMFileHandle *self, int64_t len) {
     if (len > INT32_MAX) {
         Err_set_error(Err_new(CB_newf("Can't support RAM files of size %i64 (> %i32)",
@@ -170,7 +170,7 @@ RAMFH_length(RAMFileHandle *self) {
     return self->len;
 }
 
-bool_t
+bool
 RAMFH_close(RAMFileHandle *self) {
     UNUSED_VAR(self);
     return true;

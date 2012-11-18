@@ -107,7 +107,7 @@ PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text) {
     return retval;
 }
 
-bool_t
+bool
 PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
     PolyAnalyzer *const twin = (PolyAnalyzer*)other;
     if (twin == self)                                       { return true; }

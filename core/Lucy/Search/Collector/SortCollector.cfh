@@ -39,8 +39,8 @@ class Lucy::Search::Collector::SortCollector cnick SortColl
     float           bubble_score;
     int32_t         bubble_doc;
     int32_t         seg_doc_max;
-    bool_t          need_score;
-    bool_t          need_values;
+    bool            need_score;
+    bool            need_values;
 
     inert incremented SortCollector*
     new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
@@ -74,7 +74,7 @@ class Lucy::Search::Collector::SortCollector cnick SortColl
     public void
     Set_Reader(SortCollector *self, SegReader *reader);
 
-    public bool_t
+    public bool
     Need_Score(SortCollector *self);
 
     public void

@@ -31,16 +31,16 @@ class Lucy::Store::RAMDirHandle cnick RAMDH
     inert RAMDirHandle*
     init(RAMDirHandle *self, RAMFolder *folder);
 
-    bool_t
+    bool
     Next(RAMDirHandle *self);
 
-    bool_t
+    bool
     Entry_Is_Dir(RAMDirHandle *self);
 
-    bool_t
+    bool
     Entry_Is_Symlink(RAMDirHandle *self);
 
-    bool_t
+    bool
     Close(RAMDirHandle *self);
 }
 

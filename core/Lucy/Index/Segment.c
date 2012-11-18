@@ -61,7 +61,7 @@ Seg_num_to_name(int64_t number) {
     return CB_newf("seg_%s", &base36);
 }
 
-bool_t
+bool
 Seg_valid_seg_name(const CharBuf *name) {
     if (CB_Starts_With_Str(name, "seg_", 4)) {
         ZombieCharBuf *scratch = ZCB_WRAP(name);
@@ -84,7 +84,7 @@ Seg_destroy(Segment *self) {
     SUPER_DESTROY(self, SEGMENT);
 }
 
-bool_t
+bool
 Seg_read_file(Segment *self, Folder *folder) {
     CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
     Hash    *metadata = (Hash*)Json_slurp_json(folder, filename);
@@ -143,7 +143,7 @@ Seg_write_file(Segment *self, Folder *folder) {
     Hash_Store_Str(self->metadata, "segmeta", 7, (Obj*)my_metadata);
 
     CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
-    bool_t result = Json_spew_json((Obj*)self->metadata, folder, filename);
+    bool result = Json_spew_json((Obj*)self->metadata, folder, filename);
     DECREF(filename);
     if (!result) { RETHROW(INCREF(Err_get_error())); }
 }

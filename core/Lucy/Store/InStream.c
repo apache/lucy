@@ -345,7 +345,7 @@ SI_read_bytes(InStream *self, char* buf, size_t len) {
             // read.
             const int64_t sub_file_pos  = SI_tell(self);
             const int64_t real_file_pos = sub_file_pos + self->offset;
-            bool_t success
+            bool success
                 = FH_Read(self->file_handle, buf, real_file_pos, len);
             if (!success) {
                 RETHROW(INCREF(Err_get_error()));

@@ -33,8 +33,8 @@ StringType_init(StringType *self) {
 }
 
 StringType*
-StringType_init2(StringType *self, float boost, bool_t indexed,
-                 bool_t stored, bool_t sortable) {
+StringType_init2(StringType *self, float boost, bool indexed,
+                 bool stored, bool sortable) {
     FType_init((FieldType*)self);
     self->boost      = boost;
     self->indexed    = indexed;
@@ -43,7 +43,7 @@ StringType_init2(StringType *self, float boost, bool_t indexed,
     return self;
 }
 
-bool_t
+bool
 StringType_equals(StringType *self, Obj *other) {
     StringType *twin = (StringType*)other;
     if (twin == self)                           { return true; }

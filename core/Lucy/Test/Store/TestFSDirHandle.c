@@ -39,10 +39,10 @@ test_all(TestBatch *batch) {
     CharBuf  *foo_boffo     = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
     CharBuf  *test_dir      = (CharBuf*)ZCB_WRAP_STR("_fsdir_test", 11);
     FSFolder *folder        = FSFolder_new(test_dir);
-    bool_t    saw_foo       = false;
-    bool_t    saw_boffo     = false;
-    bool_t    foo_was_dir   = false;
-    bool_t    boffo_was_dir = false;
+    bool      saw_foo       = false;
+    bool      saw_boffo     = false;
+    bool      foo_was_dir   = false;
+    bool      boffo_was_dir = false;
     int       count         = 0;
 
     // Clean up after previous failed runs.

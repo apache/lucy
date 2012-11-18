@@ -124,7 +124,7 @@ TV_deserialize(TermVector *self, InStream *instream) {
     return self;
 }
 
-bool_t
+bool
 TV_equals(TermVector *self, Obj *other) {
     TermVector *const twin = (TermVector*)other;
     int32_t *const posits       = self->positions->ints;

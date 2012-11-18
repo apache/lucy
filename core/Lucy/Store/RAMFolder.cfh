@@ -36,7 +36,7 @@ public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
     public void
     Initialize(RAMFolder *self);
 
-    public bool_t
+    public bool
     Check(RAMFolder *self);
 
     public void
@@ -48,25 +48,25 @@ public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
     incremented nullable DirHandle*
     Local_Open_Dir(RAMFolder *self);
 
-    bool_t
+    bool
     Local_MkDir(RAMFolder *self, const CharBuf *name);
 
-    bool_t
+    bool
     Local_Exists(RAMFolder *self, const CharBuf *name);
 
-    bool_t
+    bool
     Local_Is_Directory(RAMFolder *self, const CharBuf *name);
 
     nullable Folder*
     Local_Find_Folder(RAMFolder *self, const CharBuf *name);
 
-    bool_t
+    bool
     Local_Delete(RAMFolder *self, const CharBuf *name);
 
-    public bool_t
+    public bool
     Rename(RAMFolder *self, const CharBuf* from, const CharBuf *to);
 
-    public bool_t
+    public bool
     Hard_Link(RAMFolder *self, const CharBuf *from, const CharBuf *to);
 }
 

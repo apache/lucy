@@ -57,7 +57,7 @@ class Lucy::Index::Posting::RichPosting cnick RichPost
 
     incremented RichPostingMatcher*
     Make_Matcher(RichPosting *self, Similarity *sim, PostingList *plist,
-                 Compiler *compiler, bool_t need_score);
+                 Compiler *compiler, bool need_score);
 }
 
 class Lucy::Index::Posting::RichPostingMatcher cnick RichPostMatcher

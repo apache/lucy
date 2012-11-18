@@ -98,7 +98,7 @@ public class Clownfish::Obj {
      *
      * @param other Another Obj.
      */
-    public bool_t
+    public bool
     Equals(Obj *self, Obj *other);
 
     /** Indicate whether one object is less than, equal to, or greater than
@@ -129,7 +129,7 @@ public class Clownfish::Obj {
 
     /** Indicate whether the object is a descendent of <code>ancestor</code>.
      */
-    public bool_t
+    public bool
     Is_A(Obj *self, VTable *ancestor);
 
     /** Generic stringification: "ClassName@hex_mem_address".
@@ -150,7 +150,7 @@ public class Clownfish::Obj {
     /** Evaluate the object in a boolean context.  By default, invokes
      * To_I64() and returns true if it is non-zero.
      */
-    public bool_t
+    public bool
     To_Bool(Obj *self);
 
     /** Return a representation of the object using only scalars, hashes, and

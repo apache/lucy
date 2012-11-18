@@ -44,7 +44,7 @@ public class Lucy::Analysis::CaseFolder
     public incremented Inversion*
     Transform_Text(CaseFolder *self, CharBuf *text);
 
-    public bool_t
+    public bool
     Equals(CaseFolder *self, Obj *other);
 
     public incremented Hash*

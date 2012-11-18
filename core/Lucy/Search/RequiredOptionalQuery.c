@@ -73,7 +73,7 @@ ReqOptQuery_to_string(RequiredOptionalQuery *self) {
     return retval;
 }
 
-bool_t
+bool
 ReqOptQuery_equals(RequiredOptionalQuery *self, Obj *other) {
     if ((RequiredOptionalQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, REQUIREDOPTIONALQUERY)) { return false; }
@@ -82,7 +82,7 @@ ReqOptQuery_equals(RequiredOptionalQuery *self, Obj *other) {
 
 Compiler*
 ReqOptQuery_make_compiler(RequiredOptionalQuery *self, Searcher *searcher,
-                          float boost, bool_t subordinate) {
+                          float boost, bool subordinate) {
     RequiredOptionalCompiler *compiler
         = ReqOptCompiler_new(self, searcher, boost);
     if (!subordinate) {
@@ -113,7 +113,7 @@ ReqOptCompiler_init(RequiredOptionalCompiler *self,
 
 Matcher*
 ReqOptCompiler_make_matcher(RequiredOptionalCompiler *self, SegReader *reader,
-                            bool_t need_score) {
+                            bool need_score) {
     Schema     *schema       = SegReader_Get_Schema(reader);
     Similarity *sim          = Schema_Get_Similarity(schema);
     Compiler   *req_compiler = (Compiler*)VA_Fetch(self->children, 0);

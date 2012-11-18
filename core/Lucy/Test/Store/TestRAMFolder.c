@@ -161,7 +161,7 @@ test_Local_Find_Folder(TestBatch *batch) {
 static void
 test_Local_MkDir(TestBatch *batch) {
     RAMFolder *folder = RAMFolder_new(NULL);
-    bool_t result;
+    bool result;
 
     result = RAMFolder_Local_MkDir(folder, foo);
     TEST_TRUE(batch, result, "Local_MkDir succeeds and returns true");
@@ -270,7 +270,7 @@ static void
 test_Rename(TestBatch *batch) {
     RAMFolder *folder = RAMFolder_new(NULL);
     FileHandle *fh;
-    bool_t result;
+    bool result;
 
     RAMFolder_MkDir(folder, foo);
     RAMFolder_MkDir(folder, foo_bar);
@@ -391,7 +391,7 @@ static void
 test_Hard_Link(TestBatch *batch) {
     RAMFolder *folder = RAMFolder_new(NULL);
     FileHandle *fh;
-    bool_t result;
+    bool result;
 
     RAMFolder_MkDir(folder, foo);
     RAMFolder_MkDir(folder, foo_bar);

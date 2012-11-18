@@ -40,7 +40,7 @@ NoMatchQuery_init(NoMatchQuery *self) {
     return self;
 }
 
-bool_t
+bool
 NoMatchQuery_equals(NoMatchQuery *self, Obj *other) {
     NoMatchQuery *twin = (NoMatchQuery*)other;
     if (!Obj_Is_A(other, NOMATCHQUERY))                   { return false; }
@@ -57,7 +57,7 @@ NoMatchQuery_to_string(NoMatchQuery *self) {
 
 Compiler*
 NoMatchQuery_make_compiler(NoMatchQuery *self, Searcher *searcher,
-                           float boost, bool_t subordinate) {
+                           float boost, bool subordinate) {
     NoMatchCompiler *compiler = NoMatchCompiler_new(self, searcher, boost);
     if (!subordinate) {
         NoMatchCompiler_Normalize(compiler);
@@ -66,11 +66,11 @@ NoMatchQuery_make_compiler(NoMatchQuery *self, Searcher *searcher,
 }
 
 void
-NoMatchQuery_set_fails_to_match(NoMatchQuery *self, bool_t fails_to_match) {
+NoMatchQuery_set_fails_to_match(NoMatchQuery *self, bool fails_to_match) {
     self->fails_to_match = fails_to_match;
 }
 
-bool_t
+bool
 NoMatchQuery_get_fails_to_match(NoMatchQuery *self) {
     return self->fails_to_match;
 }
@@ -127,7 +127,7 @@ NoMatchCompiler_init(NoMatchCompiler *self, NoMatchQuery *parent,
 
 Matcher*
 NoMatchCompiler_make_matcher(NoMatchCompiler *self, SegReader *reader,
-                             bool_t need_score) {
+                             bool need_score) {
     UNUSED_VAR(self);
     UNUSED_VAR(reader);
     UNUSED_VAR(need_score);

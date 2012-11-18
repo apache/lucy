@@ -81,7 +81,7 @@ BitColl_collect(BitCollector *self, int32_t doc_id) {
     BitVec_Set(self->bit_vec, (self->base + doc_id));
 }
 
-bool_t
+bool
 BitColl_need_score(BitCollector *self) {
     UNUSED_VAR(self);
     return false;
@@ -128,7 +128,7 @@ OffsetColl_collect(OffsetCollector *self, int32_t doc_id) {
     Coll_Collect(self->inner_coll, (doc_id + self->offset));
 }
 
-bool_t
+bool
 OffsetColl_need_score(OffsetCollector *self) {
     return Coll_Need_Score(self->inner_coll);
 }

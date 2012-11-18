@@ -23,7 +23,7 @@ abstract class Clownfish::Num inherits Clownfish::Obj {
     inert Num*
     init(Num *self);
 
-    public bool_t
+    public bool
     Equals(Num *self, Obj *other);
 }
 
@@ -218,7 +218,7 @@ class Clownfish::Integer64 cnick Int64
     public int32_t
     Hash_Sum(Integer64 *self);
 
-    public bool_t
+    public bool
     Equals(Integer64 *self, Obj *other);
 
     public void
@@ -242,7 +242,7 @@ class Clownfish::Integer64 cnick Int64
  * CFISH_FALSE.
  */
 class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
-    bool_t value;
+    bool value;
     CharBuf *string;
 
     inert BoolNum *true_singleton;
@@ -255,12 +255,12 @@ class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
      * value.
      */
     inert BoolNum*
-    singleton(bool_t value);
+    singleton(bool value);
 
     public void
     Destroy(BoolNum *self);
 
-    bool_t
+    bool
     Get_Value(BoolNum *self);
 
     public int64_t
@@ -269,7 +269,7 @@ class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
     public double
     To_F64(BoolNum *self);
 
-    public bool_t
+    public bool
     To_Bool(BoolNum *self);
 
     public int32_t
@@ -285,7 +285,7 @@ class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
     public incremented BoolNum*
     Clone(BoolNum *self);
 
-    public bool_t
+    public bool
     Equals(BoolNum *self, Obj *other);
 
     public incremented CharBuf*

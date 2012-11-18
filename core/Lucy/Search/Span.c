@@ -64,7 +64,7 @@ Span_set_weight(Span *self, float weight) {
     self->weight = weight;
 }
 
-bool_t
+bool
 Span_equals(Span *self, Obj *other) {
     Span *twin = (Span*)other;
     if (self == twin)                 { return true; }

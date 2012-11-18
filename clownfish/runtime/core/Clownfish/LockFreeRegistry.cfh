@@ -32,7 +32,7 @@ class Clownfish::LockFreeRegistry cnick LFReg inherits Clownfish::Obj {
     public void
     Destroy(LockFreeRegistry *self);
 
-    bool_t
+    bool
     Register(LockFreeRegistry *self, Obj *key, Obj *value);
 
     nullable Obj*

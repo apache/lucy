@@ -244,7 +244,7 @@ S_maybe_merge(BackgroundMerger *self) {
     return num_to_merge;
 }
 
-static bool_t
+static bool
 S_merge_updated_deletions(BackgroundMerger *self) {
     Hash *updated_deletions = NULL;
 
@@ -420,7 +420,7 @@ BGMerger_prepare_commit(BackgroundMerger *self) {
         Snapshot *latest_snapshot
             = Snapshot_Read_File(Snapshot_new(), self->folder, NULL);
         CharBuf *latest_snapfile = Snapshot_Get_Path(latest_snapshot);
-        bool_t index_updated
+        bool index_updated
             = !CB_Equals(start_snapfile, (Obj*)latest_snapfile);
 
         if (index_updated) {
@@ -475,7 +475,7 @@ BGMerger_commit(BackgroundMerger *self) {
     }
 
     if (self->needs_commit) {
-        bool_t success = false;
+        bool success = false;
         CharBuf *temp_snapfile = CB_Clone(self->snapfile);
 
         // Rename temp snapshot file.

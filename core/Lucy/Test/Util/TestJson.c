@@ -195,7 +195,7 @@ test_spew_and_slurp(TestBatch *batch) {
     Folder *folder = (Folder*)RAMFolder_new(NULL);
 
     CharBuf *foo = (CharBuf*)ZCB_WRAP_STR("foo", 3);
-    bool_t result = Json_spew_json(dump, folder, foo);
+    bool result = Json_spew_json(dump, folder, foo);
     TEST_TRUE(batch, result, "spew_json returns true on success");
     TEST_TRUE(batch, Folder_Exists(folder, foo),
               "spew_json wrote file");

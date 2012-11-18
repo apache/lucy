@@ -71,7 +71,7 @@ class Lucy::Index::SegLexicon cnick SegLex
     public int32_t
     Doc_Freq(SegLexicon *self);
 
-    public bool_t
+    public bool
     Next(SegLexicon *self);
 }
 

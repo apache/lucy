@@ -86,7 +86,7 @@ PolyQuery_deserialize(PolyQuery *self, InStream *instream) {
     return self;
 }
 
-bool_t
+bool
 PolyQuery_equals(PolyQuery *self, Obj *other) {
     PolyQuery *twin = (PolyQuery*)other;
     if (twin == self)                                     { return true; }

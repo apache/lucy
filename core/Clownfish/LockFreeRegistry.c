@@ -46,7 +46,7 @@ LFReg_init(LockFreeRegistry *self, size_t capacity) {
     return self;
 }
 
-bool_t
+bool
 LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value) {
     LFRegEntry  *new_entry = NULL;
     int32_t      hash_sum  = Obj_Hash_Sum(key);

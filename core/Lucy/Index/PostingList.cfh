@@ -58,7 +58,7 @@ public class Lucy::Index::PostingList cnick PList
      */
     abstract Matcher*
     Make_Matcher(PostingList *self, Similarity *similarity,
-                 Compiler *compiler, bool_t need_score);
+                 Compiler *compiler, bool need_score);
 
     /** Indexing helper function.
      */

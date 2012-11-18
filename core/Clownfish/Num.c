@@ -39,7 +39,7 @@ Num_init(Num *self) {
     return self;
 }
 
-bool_t
+bool
 Num_equals(Num *self, Obj *other) {
     Num *twin = (Num*)other;
     if (twin == self) { return true; }
@@ -331,7 +331,7 @@ Int64_hash_sum(Integer64 *self) {
     return ints[0] ^ ints[1];
 }
 
-bool_t
+bool
 Int64_equals(Integer64 *self, Obj *other) {
     Num *twin = (Num*)other;
     if (twin == (Num*)self)         { return true; }
@@ -376,7 +376,7 @@ Bool_init_class() {
 }
 
 BoolNum*
-Bool_singleton(bool_t value) {
+Bool_singleton(bool value) {
     return value ? CFISH_TRUE : CFISH_FALSE;
 }
 
@@ -387,7 +387,7 @@ Bool_destroy(BoolNum *self) {
     }
 }
 
-bool_t
+bool
 Bool_get_value(BoolNum *self) {
     return self->value;
 }
@@ -402,7 +402,7 @@ Bool_to_i64(BoolNum *self) {
     return self->value;
 }
 
-bool_t
+bool
 Bool_to_bool(BoolNum *self) {
     return self->value;
 }
@@ -423,7 +423,7 @@ Bool_to_string(BoolNum *self) {
     return (CharBuf*)CB_Inc_RefCount(self->string);
 }
 
-bool_t
+bool
 Bool_equals(BoolNum *self, Obj *other) {
     return self == (BoolNum*)other;
 }
@@ -435,7 +435,7 @@ Bool_serialize(BoolNum *self, OutStream *outstream) {
 
 BoolNum*
 Bool_deserialize(BoolNum *self, InStream *instream) {
-    bool_t value = (bool_t)InStream_Read_U8(instream);
+    bool value = (bool)InStream_Read_U8(instream);
     if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
         Bool_Dec_RefCount_t super_decref
             = SUPER_METHOD_PTR(BOOLNUM, Lucy_Bool_Dec_RefCount);

@@ -24,7 +24,7 @@ class Lucy::Search::RequiredOptionalMatcher cnick ReqOptMatcher
 
     Matcher      *req_matcher;
     Matcher      *opt_matcher;
-    bool_t        opt_matcher_first_time;
+    bool          opt_matcher_first_time;
 
     inert incremented RequiredOptionalMatcher*
     new(Similarity *similarity, Matcher *required_matcher,

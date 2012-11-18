@@ -201,8 +201,8 @@ TestUtils_make_not_query(Query* negated_query) {
 
 RangeQuery*
 TestUtils_make_range_query(const char *field, const char *lower_term,
-                           const char *upper_term, bool_t include_lower,
-                           bool_t include_upper) {
+                           const char *upper_term, bool include_lower,
+                           bool include_upper) {
     CharBuf *f     = (CharBuf*)ZCB_WRAP_STR(field, strlen(field));
     CharBuf *lterm = (CharBuf*)ZCB_WRAP_STR(lower_term, strlen(lower_term));
     CharBuf *uterm = (CharBuf*)ZCB_WRAP_STR(upper_term, strlen(upper_term));

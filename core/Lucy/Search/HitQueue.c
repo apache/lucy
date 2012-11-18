@@ -62,7 +62,7 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
         for (uint32_t i = 0; i < num_rules; i++) {
             SortRule *rule      = (SortRule*)VA_Fetch(rules, i);
             int32_t   rule_type = SortRule_Get_Type(rule);
-            bool_t    reverse   = SortRule_Get_Reverse(rule);
+            bool      reverse   = SortRule_Get_Reverse(rule);
 
             if (rule_type == SortRule_SCORE) {
                 self->actions[action_num++] = reverse
@@ -135,7 +135,7 @@ SI_compare_by_value(HitQueue *self, uint32_t tick, MatchDoc *a, MatchDoc *b) {
     return FType_null_back_compare_values(field_type, a_val, b_val);
 }
 
-bool_t
+bool
 HitQ_less_than(HitQueue *self, Obj *obj_a, Obj *obj_b) {
     MatchDoc *const a = (MatchDoc*)obj_a;
     MatchDoc *const b = (MatchDoc*)obj_b;

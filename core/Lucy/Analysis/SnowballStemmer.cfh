@@ -50,7 +50,7 @@ public class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
     public incremented SnowballStemmer*
     Load(SnowballStemmer *self, Obj *dump);
 
-    public bool_t
+    public bool
     Equals(SnowballStemmer *self, Obj *other);
 
     public void

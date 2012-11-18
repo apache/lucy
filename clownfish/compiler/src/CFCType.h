@@ -83,7 +83,7 @@ CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
  *
  * The following Charmonizer typedefs are supported:
  *
- *     bool_t
+ *     bool
  *
  * @param flags Allowed flags: CONST, INTEGER, PRIMITIVE.
  * @param specifier Must match one of the supported types.

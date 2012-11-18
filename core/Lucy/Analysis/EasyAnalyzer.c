@@ -88,7 +88,7 @@ EasyAnalyzer_load(EasyAnalyzer *self, Obj *dump) {
     return EasyAnalyzer_init(loaded, language);
 }
 
-bool_t
+bool
 EasyAnalyzer_equals(EasyAnalyzer *self, Obj *other) {
     EasyAnalyzer *const twin = (EasyAnalyzer*)other;
     if (twin == self)                                     { return true; }

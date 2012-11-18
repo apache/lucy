@@ -34,7 +34,7 @@ public abstract class Lucy::Search::MatchAllQuery
     public inert MatchAllQuery*
     init(MatchAllQuery *self);
 
-    public bool_t
+    public bool
     Equals(MatchAllQuery *self, Obj *other);
 
     public incremented CharBuf*
@@ -42,7 +42,7 @@ public abstract class Lucy::Search::MatchAllQuery
 
     public incremented Compiler*
     Make_Compiler(MatchAllQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 }
 
 class Lucy::Search::MatchAllCompiler
@@ -57,7 +57,7 @@ class Lucy::Search::MatchAllCompiler
 
     public incremented nullable Matcher*
     Make_Matcher(MatchAllCompiler *self, SegReader *reader,
-                 bool_t need_score);
+                 bool need_score);
 }
 
 

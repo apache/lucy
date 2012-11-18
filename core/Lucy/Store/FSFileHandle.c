@@ -64,20 +64,20 @@ static INLINE void*
 SI_map(FSFileHandle *self, int64_t offset, int64_t len);
 
 // Release a memory mapped region assigned by SI_map.
-static INLINE bool_t
+static INLINE bool
 SI_unmap(FSFileHandle *self, char *ptr, int64_t len);
 
 // 32-bit or 64-bit inlined helpers for FSFH_window.
-static INLINE bool_t
+static INLINE bool
 SI_window(FSFileHandle *self, FileWindow *window, int64_t offset, int64_t len);
 
 // Architecture- and OS- specific initialization for a read-only FSFileHandle.
-static INLINE bool_t
+static INLINE bool
 SI_init_read_only(FSFileHandle *self);
 
 // Windows-specific routine needed for closing read-only handles.
 #ifdef CHY_HAS_WINDOWS_H
-static INLINE bool_t
+static INLINE bool
 SI_close_win_handles(FSFileHandle *self);
 #endif
 
@@ -157,7 +157,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
     return self;
 }
 
-bool_t
+bool
 FSFH_close(FSFileHandle *self) {
     // On 64-bit systems, cancel the whole-file mapping.
     if (IS_64_BIT && (self->flags & FH_READ_ONLY) && self->buf != NULL) {
@@ -183,7 +183,7 @@ FSFH_close(FSFileHandle *self) {
     return true;
 }
 
-bool_t
+bool
 FSFH_write(FSFileHandle *self, const void *data, size_t len) {
     if (len) {
         // Write data, track file length, check for errors.
@@ -210,7 +210,7 @@ FSFH_length(FSFileHandle *self) {
     return self->len;
 }
 
-bool_t
+bool
 FSFH_window(FSFileHandle *self, FileWindow *window, int64_t offset,
             int64_t len) {
     const int64_t end = offset + len;
@@ -237,21 +237,21 @@ FSFH_window(FSFileHandle *self, FileWindow *window, int64_t offset,
 
 #if IS_64_BIT
 
-static INLINE bool_t
+static INLINE bool
 SI_window(FSFileHandle *self, FileWindow *window, int64_t offset,
           int64_t len) {
     FileWindow_Set_Window(window, self->buf + offset, offset, len);
     return true;
 }
 
-bool_t
+bool
 FSFH_release_window(FSFileHandle *self, FileWindow *window) {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, 0, 0);
     return true;
 }
 
-bool_t
+bool
 FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     const int64_t end = offset + len;
 
@@ -277,7 +277,7 @@ FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
 #else
 
-static INLINE bool_t
+static INLINE bool
 SI_window(FSFileHandle *self, FileWindow *window, int64_t offset,
           int64_t len) {
     // Release the previously mmap'd region, if any.
@@ -300,7 +300,7 @@ SI_window(FSFileHandle *self, FileWindow *window, int64_t offset,
     return true;
 }
 
-bool_t
+bool
 FSFH_release_window(FSFileHandle *self, FileWindow *window) {
     if (!SI_unmap(self, window->buf, window->len)) { return false; }
     FileWindow_Set_Window(window, NULL, 0, 0);
@@ -313,7 +313,7 @@ FSFH_release_window(FSFileHandle *self, FileWindow *window) {
 
 #ifdef CHY_HAS_SYS_MMAN_H
 
-static INLINE bool_t
+static INLINE bool
 SI_init_read_only(FSFileHandle *self) {
     // Open.
     self->fd = open((char*)CB_Get_Ptr8(self->path),
@@ -372,7 +372,7 @@ SI_map(FSFileHandle *self, int64_t offset, int64_t len) {
     return buf;
 }
 
-static INLINE bool_t
+static INLINE bool
 SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     if (buf != NULL) {
         if (munmap(buf, len)) {
@@ -385,7 +385,7 @@ SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
 }
 
 #if !IS_64_BIT
-bool_t
+bool
 FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     int64_t check_val;
 
@@ -418,7 +418,7 @@ FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
 #elif defined(CHY_HAS_WINDOWS_H)
 
-static INLINE bool_t
+static INLINE bool
 SI_init_read_only(FSFileHandle *self) {
     char *filepath = (char*)CB_Get_Ptr8(self->path);
     SYSTEM_INFO sys_info;
@@ -495,7 +495,7 @@ SI_map(FSFileHandle *self, int64_t offset, int64_t len) {
     return buf;
 }
 
-static INLINE bool_t
+static INLINE bool
 SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     if (buf != NULL) {
         if (!UnmapViewOfFile(buf)) {
@@ -509,7 +509,7 @@ SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     return true;
 }
 
-static INLINE bool_t
+static INLINE bool
 SI_close_win_handles(FSFileHandle *self) {
     // Close both standard handle and mapping handle.
     if (self->win_maphandle) {
@@ -537,7 +537,7 @@ SI_close_win_handles(FSFileHandle *self) {
 }
 
 #if !IS_64_BIT
-bool_t
+bool
 FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     BOOL check_val;
     DWORD got;

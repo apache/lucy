@@ -76,7 +76,7 @@ class Clownfish::CharBuf cnick CB
      * set to please qsort and friends, and return true if <code>a</code> is
      * less than <code>b</code>.
      */
-    inert bool_t
+    inert bool
     less_than(const void *va, const void *vb);
 
     public void
@@ -155,22 +155,22 @@ class Clownfish::CharBuf cnick CB
 
     /** Test whether the CharBuf starts with the content of another.
      */
-    bool_t
+    bool
     Starts_With(CharBuf *self, const CharBuf *prefix);
 
     /** Test whether the CharBuf starts with the passed-in string.
      */
-    bool_t
+    bool
     Starts_With_Str(CharBuf *self, const char *prefix, size_t size);
 
     /** Test whether the CharBuf ends with the content of another.
      */
-    bool_t
+    bool
     Ends_With(CharBuf *self, const CharBuf *postfix);
 
     /** Test whether the CharBuf ends with the passed-in string.
      */
-    bool_t
+    bool
     Ends_With_Str(CharBuf *self, const char *postfix, size_t size);
 
     /** Return the location of the substring within the CharBuf (measured in
@@ -184,7 +184,7 @@ class Clownfish::CharBuf cnick CB
 
     /** Test whether the CharBuf matches the passed-in string.
      */
-    bool_t
+    bool
     Equals_Str(CharBuf *self, const char *ptr, size_t size);
 
     /** Return the number of Unicode code points in the object's string.
@@ -220,7 +220,7 @@ class Clownfish::CharBuf cnick CB
     public void
     Destroy(CharBuf *self);
 
-    public bool_t
+    public bool
     Equals(CharBuf *self, Obj *other);
 
     public int32_t

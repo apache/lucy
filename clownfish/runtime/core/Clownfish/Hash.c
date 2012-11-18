@@ -185,7 +185,7 @@ Hash_clear(Hash *self) {
 
 void
 Hash_do_store(Hash *self, Obj *key, Obj *value,
-              int32_t hash_sum, bool_t use_this_key) {
+              int32_t hash_sum, bool use_this_key) {
     HashEntry *entries = self->size >= self->threshold
                          ? SI_rebuild_hash(self)
                          : (HashEntry*)self->entries;
@@ -307,7 +307,7 @@ SI_kill_iter(Hash *self) {
     self->iter_tick = -1;
 }
 
-bool_t
+bool
 Hash_next(Hash *self, Obj **key, Obj **value) {
     while (1) {
         if (++self->iter_tick >= (int32_t)self->capacity) {
@@ -358,7 +358,7 @@ Hash_values(Hash *self) {
     return values;
 }
 
-bool_t
+bool
 Hash_equals(Hash *self, Obj *other) {
     Hash    *twin = (Hash*)other;
     Obj     *key;

@@ -39,7 +39,7 @@ class Lucy::Util::Json inherits Clownfish::Obj {
      * file.
      * @return true if the write succeeds, false on failure (sets Err_error).
      */
-    inert bool_t
+    inert bool
     spew_json(Obj *dump, Folder *folder, const CharBuf *path);
 
     /** Decode the JSON in the file at <code>path</code> and return a data
@@ -54,7 +54,7 @@ class Lucy::Util::Json inherits Clownfish::Obj {
      * on anything other than a hash or an array.  Testing only.
      */
     inert void
-    set_tolerant(bool_t tolerant);
+    set_tolerant(bool tolerant);
 }
 
 
@@ -63,7 +63,7 @@ __C__
 struct lucy_JsonParserState 
 {
     lucy_Obj   *result;
-    chy_bool_t  errors;
+    bool    errors;
 };
 typedef struct lucy_JsonParserState lucy_JsonParserState;
 

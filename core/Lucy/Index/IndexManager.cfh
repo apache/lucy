@@ -86,7 +86,7 @@ public class Lucy::Index::IndexManager cnick IxManager
     public incremented VArray*
     Recycle(IndexManager *self, PolyReader *reader,
             DeletionsWriter *del_writer, int64_t cutoff,
-            bool_t optimize = false);
+            bool optimize = false);
 
     /** Return a tick.  All segments below that tick will be merged.
      * Exposed for testing purposes only.
@@ -124,7 +124,7 @@ public class Lucy::Index::IndexManager cnick IxManager
     public incremented Hash*
     Read_Merge_Data(IndexManager *self);
 
-    public bool_t
+    public bool
     Remove_Merge_Data(IndexManager *self);
 
     /** Create a shared lock on a snapshot file, which serves as a proxy for

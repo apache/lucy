@@ -125,7 +125,7 @@ void
 IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
     VArray   *const seg_readers = self->seg_readers;
     I32Array *const seg_starts  = self->seg_starts;
-    bool_t    need_score        = Coll_Need_Score(collector);
+    bool      need_score        = Coll_Need_Score(collector);
     Compiler *compiler = Query_Is_A(query, COMPILER)
                          ? (Compiler*)INCREF(query)
                          : Query_Make_Compiler(query, (Searcher*)self,

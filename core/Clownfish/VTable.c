@@ -284,7 +284,7 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target) {
     }
 }
 
-bool_t
+bool
 VTable_add_to_registry(VTable *vtable) {
     if (VTable_registry == NULL) {
         VTable_init_registry();
@@ -294,14 +294,14 @@ VTable_add_to_registry(VTable *vtable) {
     }
     else {
         CharBuf *klass = CB_Clone(vtable->name);
-        bool_t retval
+        bool retval
             = LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable);
         DECREF(klass);
         return retval;
     }
 }
 
-bool_t
+bool
 VTable_add_alias_to_registry(VTable *vtable, CharBuf *alias) {
     if (VTable_registry == NULL) {
         VTable_init_registry();
@@ -311,7 +311,7 @@ VTable_add_alias_to_registry(VTable *vtable, CharBuf *alias) {
     }
     else {
         CharBuf *klass = CB_Clone(alias);
-        bool_t retval
+        bool retval
             = LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable);
         DECREF(klass);
         return retval;

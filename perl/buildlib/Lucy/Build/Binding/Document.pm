@@ -60,7 +60,7 @@ CODE:
 {
     SV* fields_sv = NULL;
     int32_t doc_id = 0;
-    chy_bool_t args_ok
+    bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),
@@ -138,7 +138,7 @@ CODE:
     SV *fields_sv = NULL;
     int32_t doc_id = 0;
     float score = 0.0f;
-    chy_bool_t args_ok
+    bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),

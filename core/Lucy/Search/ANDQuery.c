@@ -63,7 +63,7 @@ ANDQuery_to_string(ANDQuery *self) {
 }
 
 
-bool_t
+bool
 ANDQuery_equals(ANDQuery *self, Obj *other) {
     if ((ANDQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, ANDQUERY)) { return false; }
@@ -72,7 +72,7 @@ ANDQuery_equals(ANDQuery *self, Obj *other) {
 
 Compiler*
 ANDQuery_make_compiler(ANDQuery *self, Searcher *searcher, float boost,
-                       bool_t subordinate) {
+                       bool subordinate) {
     ANDCompiler *compiler = ANDCompiler_new(self, searcher, boost);
     if (!subordinate) {
         ANDCompiler_Normalize(compiler);
@@ -98,7 +98,7 @@ ANDCompiler_init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher,
 
 Matcher*
 ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
-                         bool_t need_score) {
+                         bool need_score) {
     uint32_t num_kids = VA_Get_Size(self->children);
 
     if (num_kids == 1) {

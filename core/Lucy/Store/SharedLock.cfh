@@ -58,16 +58,16 @@ class Lucy::Store::SharedLock cnick ShLock
     init(SharedLock *self, Folder *folder, const CharBuf *name,
          const CharBuf *host, int32_t timeout = 0, int32_t interval = 100);
 
-    public bool_t
+    public bool
     Shared(SharedLock *self);
 
-    public bool_t
+    public bool
     Request(SharedLock *self);
 
     public void
     Release(SharedLock *self);
 
-    public bool_t
+    public bool
     Is_Locked(SharedLock *self);
 
     public void

@@ -73,16 +73,16 @@ public abstract class Lucy::Plan::FieldType cnick FType
     inherits Clownfish::Obj {
 
     float         boost;
-    bool_t        indexed;
-    bool_t        stored;
-    bool_t        sortable;
+    bool          indexed;
+    bool          stored;
+    bool          sortable;
 
     inert FieldType*
     init(FieldType *self);
 
     inert FieldType*
-    init2(FieldType *self, float boost = 1.0, bool_t indexed = false,
-          bool_t stored = false, bool_t sortable = false);
+    init2(FieldType *self, float boost = 1.0, bool indexed = false,
+          bool stored = false, bool sortable = false);
 
     /** Setter for <code>boost</code>.
      */
@@ -97,36 +97,36 @@ public abstract class Lucy::Plan::FieldType cnick FType
     /** Setter for <code>indexed</code>.
      */
     public void
-    Set_Indexed(FieldType *self, bool_t indexed);
+    Set_Indexed(FieldType *self, bool indexed);
 
     /** Accessor for <code>indexed</code>.
      */
-    public bool_t
+    public bool
     Indexed(FieldType *self);
 
     /** Setter for <code>stored</code>.
      */
     public void
-    Set_Stored(FieldType *self, bool_t stored);
+    Set_Stored(FieldType *self, bool stored);
 
     /** Accessor for <code>stored</code>.
      */
-    public bool_t
+    public bool
     Stored(FieldType *self);
 
     /** Setter for <code>sortable</code>.
      */
     public void
-    Set_Sortable(FieldType *self, bool_t sortable);
+    Set_Sortable(FieldType *self, bool sortable);
 
     /** Accessor for <code>sortable</code>.
      */
-    public bool_t
+    public bool
     Sortable(FieldType *self);
 
     /** Indicate whether the field contains binary data.
      */
-    public bool_t
+    public bool
     Binary(FieldType *self);
 
     /** Compare two values for the field.  The default implementation
@@ -161,7 +161,7 @@ public abstract class Lucy::Plan::FieldType cnick FType
 
     /** Compares all common properties.
      */
-    public bool_t
+    public bool
     Equals(FieldType *self, Obj *other);
 }
 

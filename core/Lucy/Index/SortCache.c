@@ -50,13 +50,13 @@ SortCache_destroy(SortCache *self) {
     SUPER_DESTROY(self, SORTCACHE);
 }
 
-bool_t
+bool
 SortCache_get_native_ords(SortCache *self) {
     return self->native_ords;
 }
 
 void
-SortCache_set_native_ords(SortCache *self, bool_t native_ords) {
+SortCache_set_native_ords(SortCache *self, bool native_ords) {
     self->native_ords = native_ords;
 }
 

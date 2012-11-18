@@ -85,14 +85,14 @@ SegWriter_prep_seg_dir(SegWriter *self) {
 
     // Clear stale segment files from crashed indexing sessions.
     if (Folder_Exists(folder, seg_name)) {
-        bool_t result = Folder_Delete_Tree(folder, seg_name);
+        bool result = Folder_Delete_Tree(folder, seg_name);
         if (!result) {
             THROW(ERR, "Couldn't completely remove '%o'", seg_name);
         }
     }
 
     // Create the segment directory.
-    bool_t result = Folder_MkDir(folder, seg_name);
+    bool result = Folder_MkDir(folder, seg_name);
     if (!result) { RETHROW(INCREF(Err_get_error())); }
 }
 

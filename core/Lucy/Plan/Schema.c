@@ -92,7 +92,7 @@ S_add_unique(VArray *array, Obj *elem) {
     VA_Push(array, INCREF(elem));
 }
 
-bool_t
+bool
 Schema_equals(Schema *self, Obj *other) {
     Schema *twin = (Schema*)other;
     if (twin == self)                                 { return true; }
@@ -400,7 +400,7 @@ void
 Schema_write(Schema *self, Folder *folder, const CharBuf *filename) {
     Hash *dump = Schema_Dump(self);
     ZombieCharBuf *schema_temp = ZCB_WRAP_STR("schema.temp", 11);
-    bool_t success;
+    bool success;
     Folder_Delete(folder, (CharBuf*)schema_temp); // Just in case.
     Json_spew_json((Obj*)dump, folder, (CharBuf*)schema_temp);
     success = Folder_Rename(folder, (CharBuf*)schema_temp, filename);

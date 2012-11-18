@@ -23,12 +23,12 @@ class Lucy::Plan::NumericType cnick NumType
     init(NumericType *self);
 
     inert NumericType*
-    init2(NumericType *self, float boost = 1.0, bool_t indexed = true,
-          bool_t stored = true, bool_t sortable = false);
+    init2(NumericType *self, float boost = 1.0, bool indexed = true,
+          bool stored = true, bool sortable = false);
 
     /** Returns true.
      */
-    public bool_t
+    public bool
     Binary(NumericType *self);
 
     /** Return the primitive type specifier for the object type, e.g.
@@ -60,8 +60,8 @@ class Lucy::Plan::Float64Type
     init(Float64Type *self);
 
     inert Float64Type*
-    init2(Float64Type *self, float boost = 1.0, bool_t indexed = true,
-          bool_t stored = true, bool_t sortable = true);
+    init2(Float64Type *self, float boost = 1.0, bool indexed = true,
+          bool stored = true, bool sortable = true);
 
     int8_t
     Primitive_ID(Float64Type *self);
@@ -69,7 +69,7 @@ class Lucy::Plan::Float64Type
     incremented CharBuf*
     Specifier(Float64Type *self);
 
-    public bool_t
+    public bool
     Equals(Float64Type *self, Obj *other);
 }
 
@@ -83,8 +83,8 @@ class Lucy::Plan::Float32Type
     init(Float32Type *self);
 
     inert Float32Type*
-    init2(Float32Type *self, float boost = 1.0, bool_t indexed = true,
-          bool_t stored = true, bool_t sortable = false);
+    init2(Float32Type *self, float boost = 1.0, bool indexed = true,
+          bool stored = true, bool sortable = false);
 
     int8_t
     Primitive_ID(Float32Type *self);
@@ -92,7 +92,7 @@ class Lucy::Plan::Float32Type
     incremented CharBuf*
     Specifier(Float32Type *self);
 
-    public bool_t
+    public bool
     Equals(Float32Type *self, Obj *other);
 }
 
@@ -109,8 +109,8 @@ class Lucy::Plan::Int32Type
     init(Int32Type *self);
 
     inert Int32Type*
-    init2(Int32Type *self, float boost = 1.0, bool_t indexed = true,
-          bool_t stored = true, bool_t sortable = false);
+    init2(Int32Type *self, float boost = 1.0, bool indexed = true,
+          bool stored = true, bool sortable = false);
 
     int8_t
     Primitive_ID(Int32Type *self);
@@ -118,7 +118,7 @@ class Lucy::Plan::Int32Type
     incremented CharBuf*
     Specifier(Int32Type *self);
 
-    public bool_t
+    public bool
     Equals(Int32Type *self, Obj *other);
 }
 
@@ -132,8 +132,8 @@ class Lucy::Plan::Int64Type
     init(Int64Type *self);
 
     inert Int64Type*
-    init2(Int64Type *self, float boost = 1.0, bool_t indexed = true,
-          bool_t stored = true, bool_t sortable = false);
+    init2(Int64Type *self, float boost = 1.0, bool indexed = true,
+          bool stored = true, bool sortable = false);
 
     int8_t
     Primitive_ID(Int64Type *self);
@@ -141,7 +141,7 @@ class Lucy::Plan::Int64Type
     incremented CharBuf*
     Specifier(Int64Type *self);
 
-    public bool_t
+    public bool
     Equals(Int64Type *self, Obj *other);
 }
 

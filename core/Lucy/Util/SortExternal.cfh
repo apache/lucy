@@ -61,7 +61,7 @@ abstract class Lucy::Util::SortExternal cnick SortEx
     uint32_t      *slice_sizes;
     uint32_t       mem_thresh;
     size_t         width;
-    bool_t         flipped;
+    bool           flipped;
 
     inert SortExternal*
     init(SortExternal *self, size_t width);

@@ -573,7 +573,7 @@ PPCODE:
         doc_sv = ST(1);
     }
     else if (items > 2) {
-        chy_bool_t args_ok
+        bool args_ok
             = XSBind_allot_params(&(ST(0)), 1, items,
                                   ALLOT_SV(&doc_sv, "doc", 3, true),
                                   ALLOT_F32(&boost, "boost", 5, false),
@@ -1107,7 +1107,7 @@ value(self, ...)
 CODE:
 {
     int32_t ord = 0;
-    chy_bool_t args_ok
+    bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_I32(&ord, "ord", 3, false),
                               NULL);

@@ -183,7 +183,7 @@ Err_throw_at(VTable *vtable, const char *file, int line,
 }
 
 // Inlined, slightly optimized version of Obj_is_a.
-static INLINE bool_t
+static INLINE bool
 SI_obj_is_a(Obj *obj, VTable *target_vtable) {
     VTable *vtable = obj->vtable;
 

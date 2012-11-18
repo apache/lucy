@@ -43,7 +43,7 @@
 #ifndef CHY_HAS_WINDOWS_H
 #define ENABLE_SYMLINK_TESTS
 // Create the symlinks needed by test_protect_symlinks().
-static bool_t
+static bool
 S_create_test_symlinks(void);
 #endif /* CHY_HAS_WINDOWS_H */
 
@@ -108,7 +108,7 @@ test_protect_symlinks(TestBatch *batch) {
     }
     else {
         VArray *list = FSFolder_List_R(folder, NULL);
-        bool_t saw_bazooka_boffo = false;
+        bool saw_bazooka_boffo = false;
         for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
             CharBuf *entry = (CharBuf*)VA_Fetch(list, i);
             if (CB_Ends_With_Str(entry, "bazooka/boffo", 13)) {
@@ -186,7 +186,7 @@ TestFSFolder_run_tests() {
 #error "Don't have either windows.h or unistd.h"
 #endif
 
-static bool_t
+static bool
 S_create_test_symlinks(void) {
 #ifdef CHY_HAS_WINDOWS_H
     if (!CreateSymbolicLink("_fstest\\bar\\banana", "_fstest\\foo\\boffo", 0)

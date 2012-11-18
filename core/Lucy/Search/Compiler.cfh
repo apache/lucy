@@ -83,7 +83,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
      * documents.
      */
     public abstract incremented nullable Matcher*
-    Make_Matcher(Compiler *self, SegReader *reader, bool_t need_score);
+    Make_Matcher(Compiler *self, SegReader *reader, bool need_score);
 
     /** Return the Compiler's numerical weight, a scoring multiplier.  By
      * default, returns the object's boost.
@@ -157,7 +157,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
     public incremented Compiler*
     Deserialize(decremented Compiler *self, InStream *instream);
 
-    public bool_t
+    public bool
     Equals(Compiler *self, Obj *other);
 
     public incremented CharBuf*

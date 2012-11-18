@@ -258,7 +258,7 @@ S_perl_hash_to_cfish_hash(HV *phash) {
         }
         else {
             char *key_str = HeKEY(entry);
-            chy_bool_t pure_ascii = true;
+            bool pure_ascii = true;
             for (STRLEN i = 0; i < key_len; i++) {
                 if ((key_str[i] & 0x80) == 0x80) { pure_ascii = false; }
             }
@@ -394,11 +394,11 @@ XSBind_enable_overload(void *pobj) {
     SvAMAGIC_on(perl_obj);
 }
 
-static chy_bool_t
+static bool
 S_extract_from_sv(SV *value, void *target, const char *label,
-                  chy_bool_t required, int type, cfish_VTable *vtable,
+                  bool required, int type, cfish_VTable *vtable,
                   void *allocation) {
-    chy_bool_t valid_assignment = false;
+    bool valid_assignment = false;
 
     if (XSBind_sv_defined(value)) {
         switch (type) {
@@ -447,7 +447,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                 valid_assignment = true;
                 break;
             case XSBIND_WANT_BOOL:
-                *((chy_bool_t*)target) = !!SvTRUE(value);
+                *((bool*)target) = !!SvTRUE(value);
                 valid_assignment = true;
                 break;
             case XSBIND_WANT_F32:
@@ -502,7 +502,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
     return true;
 }
 
-chy_bool_t
+bool
 XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
     va_list args;
     size_t size = sizeof(int64_t) + num_stack_elems / 64;
@@ -557,7 +557,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
         else {
             // Found the arg.  Extract the value.
             SV *value = stack[found_arg + 1];
-            chy_bool_t got_arg = S_extract_from_sv(value, target, label,
+            bool got_arg = S_extract_from_sv(value, target, label,
                                                    required, type, vtable,
                                                    allocation);
             if (!got_arg) {
@@ -741,7 +741,7 @@ lucy_VTable_find_parent_class(const lucy_CharBuf *class_name) {
 
 void*
 lucy_VTable_to_host(lucy_VTable *self) {
-    chy_bool_t first_time = self->ref.count < 4 ? true : false;
+    bool first_time = self->ref.count < 4 ? true : false;
     Lucy_VTable_To_Host_t to_host
         = CFISH_SUPER_METHOD_PTR(LUCY_VTABLE, Lucy_VTable_To_Host);
     SV *host_obj = (SV*)to_host(self);
@@ -906,7 +906,7 @@ lucy_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
 
 void*
 lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
-    chy_bool_t first_time = self->ref.count < 4 ? true : false;
+    bool first_time = self->ref.count < 4 ? true : false;
     Lucy_LFReg_To_Host_t to_host
         = CFISH_SUPER_METHOD_PTR(LUCY_LOCKFREEREGISTRY, Lucy_LFReg_To_Host);
     SV *host_obj = (SV*)to_host(self);

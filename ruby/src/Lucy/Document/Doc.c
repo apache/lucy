@@ -79,10 +79,10 @@ lucy_Doc_load(lucy_Doc *self, lucy_Obj *dump) {
     UNREACHABLE_RETURN(lucy_Doc*);
 }
 
-chy_bool_t
+bool
 lucy_Doc_equals(lucy_Doc *self, lucy_Obj *other) {
     THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(chy_bool_t);
+    UNREACHABLE_RETURN(bool);
 }
 
 void

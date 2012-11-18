@@ -31,7 +31,7 @@ like( $integer_type->to_c, qr/const/, "'const' in C representation" );
 my $parser = Clownfish::CFC::Parser->new;
 
 my @chy_specifiers = qw(
-    bool_t
+    bool
 );
 my @c_specifiers = qw(
     char

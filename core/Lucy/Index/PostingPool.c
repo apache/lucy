@@ -373,7 +373,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                                        empty_string, 0);
 
     while (1) {
-        bool_t same_text_as_last = true;
+        bool same_text_as_last = true;
 
         if (posting == NULL) {
             // On the last iter, use an empty string to make LexiconWriter

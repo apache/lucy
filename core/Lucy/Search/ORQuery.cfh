@@ -38,12 +38,12 @@ public class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery
 
     public incremented Compiler*
     Make_Compiler(ORQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 
     public incremented CharBuf*
     To_String(ORQuery *self);
 
-    public bool_t
+    public bool
     Equals(ORQuery *self, Obj *other);
 }
 
@@ -58,7 +58,7 @@ class Lucy::Search::ORCompiler
          float boost);
 
     public incremented nullable Matcher*
-    Make_Matcher(ORCompiler *self, SegReader *reader, bool_t need_score);
+    Make_Matcher(ORCompiler *self, SegReader *reader, bool need_score);
 }
 
 

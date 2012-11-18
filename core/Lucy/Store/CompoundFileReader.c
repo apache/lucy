@@ -146,7 +146,7 @@ CFReader_local_open_filehandle(CompoundFileReader *self,
     return fh;
 }
 
-bool_t
+bool
 CFReader_local_delete(CompoundFileReader *self, const CharBuf *name) {
     Hash *record = (Hash*)Hash_Delete(self->records, (Obj*)name);
     DECREF(record);
@@ -205,14 +205,14 @@ CFReader_local_open_in(CompoundFileReader *self, const CharBuf *name) {
     }
 }
 
-bool_t
+bool
 CFReader_local_exists(CompoundFileReader *self, const CharBuf *name) {
     if (Hash_Fetch(self->records, (Obj*)name))        { return true; }
     if (Folder_Local_Exists(self->real_folder, name)) { return true; }
     return false;
 }
 
-bool_t
+bool
 CFReader_local_is_directory(CompoundFileReader *self, const CharBuf *name) {
     if (Hash_Fetch(self->records, (Obj*)name))              { return false; }
     if (Folder_Local_Is_Directory(self->real_folder, name)) { return true; }
@@ -224,14 +224,14 @@ CFReader_close(CompoundFileReader *self) {
     InStream_Close(self->instream);
 }
 
-bool_t
+bool
 CFReader_local_mkdir(CompoundFileReader *self, const CharBuf *name) {
     if (Hash_Fetch(self->records, (Obj*)name)) {
         Err_set_error(Err_new(CB_newf("Can't MkDir: '%o' exists", name)));
         return false;
     }
     else {
-        bool_t result = Folder_Local_MkDir(self->real_folder, name);
+        bool result = Folder_Local_MkDir(self->real_folder, name);
         if (!result) { ERR_ADD_FRAME(Err_get_error()); }
         return result;
     }
@@ -273,7 +273,7 @@ CFReaderDH_init(CFReaderDirHandle *self, CompoundFileReader *cf_reader) {
     return self;
 }
 
-bool_t
+bool
 CFReaderDH_close(CFReaderDirHandle *self) {
     if (self->elems) {
         VA_Dec_RefCount(self->elems);
@@ -286,7 +286,7 @@ CFReaderDH_close(CFReaderDirHandle *self) {
     return true;
 }
 
-bool_t
+bool
 CFReaderDH_next(CFReaderDirHandle *self) {
     if (self->elems) {
         self->tick++;
@@ -304,7 +304,7 @@ CFReaderDH_next(CFReaderDirHandle *self) {
     return false;
 }
 
-bool_t
+bool
 CFReaderDH_entry_is_dir(CFReaderDirHandle *self) {
     if (self->elems) {
         CharBuf *name = (CharBuf*)VA_Fetch(self->elems, self->tick);

@@ -57,7 +57,7 @@ class Lucy::Index::Posting::ScorePosting cnick ScorePost
 
     incremented ScorePostingMatcher*
     Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist,
-                 Compiler *compiler, bool_t need_score);
+                 Compiler *compiler, bool need_score);
 
     nullable uint32_t*
     Get_Prox(ScorePosting *self);

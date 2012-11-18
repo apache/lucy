@@ -56,9 +56,9 @@ public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
 
     public incremented Compiler*
     Make_Compiler(ProximityQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 
-    public bool_t
+    public bool
     Equals(ProximityQuery *self, Obj *other);
 
     public incremented CharBuf*
@@ -91,7 +91,7 @@ class LucyX::Search::ProximityCompiler
          float boost, uint32_t within);
 
     public incremented nullable Matcher*
-    Make_Matcher(ProximityCompiler *self, SegReader *reader, bool_t need_score);
+    Make_Matcher(ProximityCompiler *self, SegReader *reader, bool need_score);
 
     public float
     Get_Weight(ProximityCompiler *self);
@@ -106,7 +106,7 @@ class LucyX::Search::ProximityCompiler
     Highlight_Spans(ProximityCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
-    public bool_t
+    public bool
     Equals(ProximityCompiler *self, Obj *other);
 
     public void

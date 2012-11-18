@@ -54,7 +54,7 @@ LeafQuery_get_text(LeafQuery *self) {
     return self->text;
 }
 
-bool_t
+bool
 LeafQuery_equals(LeafQuery *self, Obj *other) {
     LeafQuery *twin = (LeafQuery*)other;
     if (twin == self)                  { return true; }
@@ -107,7 +107,7 @@ LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
 
 Compiler*
 LeafQuery_make_compiler(LeafQuery *self, Searcher *searcher, float boost,
-                        bool_t subordinate) {
+                        bool subordinate) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(boost);

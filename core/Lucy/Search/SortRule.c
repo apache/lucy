@@ -26,14 +26,14 @@ int32_t SortRule_SCORE  = 1;
 int32_t SortRule_DOC_ID = 2;
 
 SortRule*
-SortRule_new(int32_t type, const CharBuf *field, bool_t reverse) {
+SortRule_new(int32_t type, const CharBuf *field, bool reverse) {
     SortRule *self = (SortRule*)VTable_Make_Obj(SORTRULE);
     return SortRule_init(self, type, field, reverse);
 }
 
 SortRule*
 SortRule_init(SortRule *self, int32_t type, const CharBuf *field,
-              bool_t reverse) {
+              bool reverse) {
     self->field    = field ? CB_Clone(field) : NULL;
     self->type     = type;
     self->reverse  = reverse;
@@ -87,7 +87,7 @@ SortRule_get_type(SortRule *self) {
     return self->type;
 }
 
-bool_t
+bool
 SortRule_get_reverse(SortRule *self) {
     return self->reverse;
 }

@@ -28,7 +28,7 @@ class Lucy::Search::HitQueue cnick HitQ
     FieldType     **field_types;
     uint8_t        *actions;
     uint32_t        num_actions;
-    bool_t          need_values;
+    bool            need_values;
 
     inert incremented HitQueue*
     new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
@@ -52,7 +52,7 @@ class Lucy::Search::HitQueue cnick HitQ
     incremented nullable Obj*
     Jostle(HitQueue *self, decremented Obj *element);
 
-    bool_t
+    bool
     Less_Than(HitQueue *self, Obj *a, Obj *b);
 }
 

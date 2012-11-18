@@ -174,7 +174,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
     CharBuf   *path      = CB_new(40);
     int32_t    field_num = Seg_Field_Num(segment, field);
     int8_t     prim_id   = FType_Primitive_ID(type);
-    bool_t     var_width = (prim_id == FType_TEXT || prim_id == FType_BLOB)
+    bool       var_width = (prim_id == FType_TEXT || prim_id == FType_BLOB)
                            ? true
                            : false;
     CB_setf(path, "%o/sort-%i32.ord", seg_name, field_num);

@@ -130,7 +130,7 @@ inert class Clownfish::Util::NumberUtils cnick NumUtil {
     /** Interpret <code>array</code> as an array of bits; return true if the
      * bit at <code>tick</code> is set, false otherwise.
      */
-    inert inline bool_t
+    inert inline bool
     u1get(void *array, uint32_t tick);
 
     /** Interpret <code>array</code> as an array of bits; set the bit at
@@ -393,7 +393,7 @@ lucy_NumUtil_skip_cint(char **source_ptr) {
     *source_ptr = (char*)ptr;
 }
 
-static CHY_INLINE chy_bool_t
+static CHY_INLINE bool
 lucy_NumUtil_u1get(void *array, uint32_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
     const uint32_t byte_offset = tick >> 3;

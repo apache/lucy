@@ -50,7 +50,7 @@ public class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
     public float
     Get_Score(HitDoc *self);
 
-    public bool_t
+    public bool
     Equals(HitDoc *self, Obj *other);
 
     public incremented Hash*

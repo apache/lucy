@@ -52,7 +52,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
 
     /** Returns true if the Lock is shared, false if the Lock is exclusive.
      */
-    public abstract bool_t
+    public abstract bool
     Shared(Lock *self);
 
     /** Call Request() once per <code>interval</code> until Request() returns
@@ -60,7 +60,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      *
      * @return true on success, false on failure (sets Err_error).
      */
-    public bool_t
+    public bool
     Obtain(Lock *self);
 
     /** Make one attempt to acquire the lock.
@@ -74,7 +74,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      *
      * @return true on success, false on failure (sets Err_error).
      */
-    public abstract bool_t
+    public abstract bool
     Request(Lock *self);
 
     /** Release the lock.
@@ -87,7 +87,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      *
      * @return true if the resource is locked, false otherwise.
      */
-    public abstract bool_t
+    public abstract bool
     Is_Locked(Lock *self);
 
     /** Release all locks that meet the following three conditions: the lock
@@ -123,16 +123,16 @@ class Lucy::Store::LockFileLock cnick LFLock
     init(LockFileLock *self, Folder *folder, const CharBuf *name,
          const CharBuf *host, int32_t timeout = 0, int32_t interval = 100);
 
-    public bool_t
+    public bool
     Shared(LockFileLock *self);
 
-    public bool_t
+    public bool
     Request(LockFileLock *self);
 
     public void
     Release(LockFileLock *self);
 
-    public bool_t
+    public bool
     Is_Locked(LockFileLock *self);
 
     public void
@@ -147,9 +147,9 @@ class Lucy::Store::LockFileLock cnick LFLock
      * process's pid.  If delete_other is false, don't delete lock files which
      * don't match this process's pid.
      */
-    bool_t
+    bool
     Maybe_Delete_File(LockFileLock *self, const CharBuf *filepath,
-                      bool_t delete_mine, bool_t delete_other);
+                      bool delete_mine, bool delete_other);
 
     public void
     Destroy(LockFileLock *self);

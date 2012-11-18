@@ -43,7 +43,7 @@ public class Lucy::Object::BitVector cnick BitVec
      *
      * @param tick The requested bit.
      */
-    public bool_t
+    public bool
     Get(BitVector *self, uint32_t tick);
 
     /** Set the bit at <code>tick</code> to 1.

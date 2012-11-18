@@ -49,7 +49,7 @@ Obj_hash_sum(Obj *self) {
     return (int32_t)hash_sum;
 }
 
-bool_t
+bool
 Obj_is_a(Obj *self, VTable *ancestor) {
     VTable *vtable = self ? self->vtable : NULL;
 
@@ -63,7 +63,7 @@ Obj_is_a(Obj *self, VTable *ancestor) {
     return false;
 }
 
-bool_t
+bool
 Obj_equals(Obj *self, Obj *other) {
     return (self == other);
 }
@@ -102,7 +102,7 @@ Obj_to_string(Obj *self) {
 #endif
 }
 
-bool_t
+bool
 Obj_to_bool(Obj *self) {
     return !!Obj_To_I64(self);
 }

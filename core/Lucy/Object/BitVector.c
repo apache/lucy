@@ -152,7 +152,7 @@ BitVec_clear_all(BitVector *self) {
     memset(self->bits, 0, byte_size);
 }
 
-bool_t
+bool
 BitVec_get(BitVector *self, uint32_t tick) {
     if (tick >= self->cap) {
         return false;

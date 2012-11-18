@@ -153,7 +153,7 @@ public class Lucy::Plan::Architecture cnick Arch inherits Clownfish::Obj {
     /** Returns true for any Architecture object. Subclasses should override
      * this weak check.
      */
-    public bool_t
+    public bool
     Equals(Architecture *self, Obj *other);
 }
 

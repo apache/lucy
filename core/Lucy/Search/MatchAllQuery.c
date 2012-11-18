@@ -40,7 +40,7 @@ MatchAllQuery_init(MatchAllQuery *self) {
     return (MatchAllQuery*)Query_init((Query*)self, 0.0f);
 }
 
-bool_t
+bool
 MatchAllQuery_equals(MatchAllQuery *self, Obj *other) {
     MatchAllQuery *twin = (MatchAllQuery*)other;
     if (!Obj_Is_A(other, MATCHALLQUERY)) { return false; }
@@ -56,7 +56,7 @@ MatchAllQuery_to_string(MatchAllQuery *self) {
 
 Compiler*
 MatchAllQuery_make_compiler(MatchAllQuery *self, Searcher *searcher,
-                            float boost, bool_t subordinate) {
+                            float boost, bool subordinate) {
     MatchAllCompiler *compiler = MatchAllCompiler_new(self, searcher, boost);
     if (!subordinate) {
         MatchAllCompiler_Normalize(compiler);
@@ -83,7 +83,7 @@ MatchAllCompiler_init(MatchAllCompiler *self, MatchAllQuery *parent,
 
 Matcher*
 MatchAllCompiler_make_matcher(MatchAllCompiler *self, SegReader *reader,
-                              bool_t need_score) {
+                              bool need_score) {
     float weight = MatchAllCompiler_Get_Weight(self);
     UNUSED_VAR(need_score);
     return (Matcher*)MatchAllMatcher_new(weight, SegReader_Doc_Max(reader));

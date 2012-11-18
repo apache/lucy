@@ -55,12 +55,12 @@ public class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
 
     public incremented Compiler*
     Make_Compiler(RequiredOptionalQuery *self, Searcher *searcher,
-                  float boost, bool_t subordinate = false);
+                  float boost, bool subordinate = false);
 
     public incremented CharBuf*
     To_String(RequiredOptionalQuery *self);
 
-    public bool_t
+    public bool
     Equals(RequiredOptionalQuery *self, Obj *other);
 }
 
@@ -76,7 +76,7 @@ class Lucy::Search::RequiredOptionalCompiler cnick ReqOptCompiler
 
     public incremented nullable Matcher*
     Make_Matcher(RequiredOptionalCompiler *self, SegReader *reader,
-                 bool_t need_score);
+                 bool need_score);
 }
 
 

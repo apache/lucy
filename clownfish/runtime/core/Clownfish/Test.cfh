@@ -36,57 +36,57 @@ class Clownfish::Test::TestBatch inherits Clownfish::Obj {
     void
     Plan(TestBatch *self);
 
-    inert bool_t
-    test_true(void *vself, bool_t condition, const char *pattern, ...);
+    inert bool
+    test_true(void *vself, bool condition, const char *pattern, ...);
 
-    inert bool_t
-    test_false(void *vself, bool_t condition, const char *pattern, ...);
+    inert bool
+    test_false(void *vself, bool condition, const char *pattern, ...);
 
-    inert bool_t
+    inert bool
     test_int_equals(void *vself, long got, long expected,
                     const char *pattern, ...);
 
-    inert bool_t
+    inert bool
     test_float_equals(void *vself, double got, double expected,
                       const char *pattern, ...);
 
-    inert bool_t
+    inert bool
     test_string_equals(void *vself, const char *got, const char *expected,
                        const char *pattern, ...);
 
-    inert bool_t
+    inert bool
     pass(void *vself, const char *pattern, ...);
 
-    inert bool_t
+    inert bool
     fail(void *vself, const char *pattern, ...);
 
     inert void
     skip(void *vself, const char *pattern, ...);
 
-    bool_t
-    VTest_True(TestBatch *self, bool_t condition, const char *pattern,
+    bool
+    VTest_True(TestBatch *self, bool condition, const char *pattern,
                va_list args);
 
-    bool_t
-    VTest_False(TestBatch *self, bool_t condition, const char *pattern,
+    bool
+    VTest_False(TestBatch *self, bool condition, const char *pattern,
                 va_list args);
 
-    bool_t
+    bool
     VTest_Int_Equals(TestBatch *self, long got, long expected,
                      const char *pattern, va_list args);
 
-    bool_t
+    bool
     VTest_Float_Equals(TestBatch *self, double got, double expected,
                        const char *pattern, va_list args);
 
-    bool_t
+    bool
     VTest_String_Equals(TestBatch *self, const char *got, const char *expected,
                        const char *pattern, va_list args);
 
-    bool_t
+    bool
     VPass(TestBatch *self, const char *pattern, va_list args);
 
-    bool_t
+    bool
     VFail(TestBatch *self, const char *pattern, va_list args);
 
     void

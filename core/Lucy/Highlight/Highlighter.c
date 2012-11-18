@@ -258,7 +258,7 @@ Highlighter_find_best_fragment(Highlighter *self, const CharBuf *field_val,
 // Return true if the window represented by "offset" and "length" overlaps a
 // score span, or if there are no score spans so that no excerpt is measurably
 // superior.
-static bool_t
+static bool
 S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length) {
     VArray   *spans     = HeatMap_Get_Spans(heat_map);
     uint32_t  num_spans = VA_Get_Size(spans);
@@ -284,8 +284,8 @@ int32_t
 Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
                         const CharBuf *fragment, CharBuf *raw_excerpt,
                         int32_t top, HeatMap *heat_map, VArray *sentences) {
-    bool_t   found_starting_edge = false;
-    bool_t   found_ending_edge   = false;
+    bool     found_starting_edge = false;
+    bool     found_ending_edge   = false;
     int32_t  start = top;
     int32_t  end   = 0;
     double   field_len = CB_Length(field_val);

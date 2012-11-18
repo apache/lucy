@@ -62,7 +62,7 @@ static int8_t
 S_derive_action(SortRule *rule, SortCache *sort_cache);
 
 // Decide whether a doc should be inserted into the HitQueue.
-static INLINE bool_t
+static INLINE bool
 SI_competitive(SortCollector *self, int32_t doc_id);
 
 SortCollector*
@@ -176,7 +176,7 @@ SortColl_destroy(SortCollector *self) {
 static int8_t
 S_derive_action(SortRule *rule, SortCache *cache) {
     int32_t  rule_type = SortRule_Get_Type(rule);
-    bool_t reverse   = !!SortRule_Get_Reverse(rule);
+    bool reverse   = !!SortRule_Get_Reverse(rule);
 
     if (rule_type == SortRule_SCORE) {
         return COMPARE_BY_SCORE + reverse;
@@ -259,7 +259,7 @@ SortColl_get_total_hits(SortCollector *self) {
     return self->total_hits;
 }
 
-bool_t
+bool
 SortColl_need_score(SortCollector *self) {
     return self->need_score;
 }
@@ -400,7 +400,7 @@ SI_validate_doc_id(SortCollector *self, int32_t doc_id) {
     return doc_id;
 }
 
-static INLINE bool_t
+static INLINE bool
 SI_competitive(SortCollector *self, int32_t doc_id) {
     /* Ordinarily, we would cache local copies of more member variables in
      * const automatic variables in order to improve code clarity and provide

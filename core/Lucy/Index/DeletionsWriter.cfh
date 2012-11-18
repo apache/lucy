@@ -63,7 +63,7 @@ public abstract class Lucy::Index::DeletionsWriter cnick DelWriter
 
     /** Returns true if there are updates that need to be written.
      */
-    public abstract bool_t
+    public abstract bool
     Updated(DeletionsWriter *self);
 
     /** Produce an array of int32_t which wraps around deleted documents.  The
@@ -104,7 +104,7 @@ class Lucy::Index::DefaultDeletionsWriter cnick DefDelWriter
     Hash          *name_to_tick;
     I32Array      *seg_starts;
     VArray        *bit_vecs;
-    bool_t        *updated;
+    bool          *updated;
     IndexSearcher *searcher;
 
     inert int32_t current_file_format;
@@ -133,7 +133,7 @@ class Lucy::Index::DefaultDeletionsWriter cnick DefDelWriter
     public void
     Delete_By_Doc_ID(DefaultDeletionsWriter *self, int32_t doc_id);
 
-    public bool_t
+    public bool
     Updated(DefaultDeletionsWriter *self);
 
     public incremented nullable Matcher*

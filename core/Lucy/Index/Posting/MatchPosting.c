@@ -137,7 +137,7 @@ MatchPost_add_inversion_to_pool(MatchPosting *self, PostingPool *post_pool,
 MatchPostingMatcher*
 MatchPost_make_matcher(MatchPosting *self, Similarity *sim,
                        PostingList *plist, Compiler *compiler,
-                       bool_t need_score) {
+                       bool need_score) {
     MatchPostingMatcher *matcher
         = (MatchPostingMatcher*)VTable_Make_Obj(MATCHPOSTINGMATCHER);
     UNUSED_VAR(self);

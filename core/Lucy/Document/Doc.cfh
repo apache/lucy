@@ -79,7 +79,7 @@ public class Lucy::Document::Doc inherits Clownfish::Obj
 
     /* Unimplemented methods.
      */
-    public bool_t
+    public bool
     Equals(Doc *self, Obj *other);
 
     public void

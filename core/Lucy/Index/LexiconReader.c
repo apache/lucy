@@ -131,7 +131,7 @@ DefLexReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 // Indicate whether it is safe to build a SegLexicon using the given
 // parameters. Will return false if the field is not indexed or if no terms
 // are present for this field in this segment.
-static bool_t
+static bool
 S_has_data(Schema *schema, Folder *folder, Segment *segment, CharBuf *field) {
     FieldType *type = Schema_Fetch_Type(schema, field);
 
@@ -144,7 +144,7 @@ S_has_data(Schema *schema, Folder *folder, Segment *segment, CharBuf *field) {
         int32_t  field_num = Seg_Field_Num(segment, field);
         CharBuf *seg_name  = Seg_Get_Name(segment);
         CharBuf *file = CB_newf("%o/lexicon-%i32.dat", seg_name, field_num);
-        bool_t retval = Folder_Exists(folder, file);
+        bool retval = Folder_Exists(folder, file);
         DECREF(file);
         return retval;
     }

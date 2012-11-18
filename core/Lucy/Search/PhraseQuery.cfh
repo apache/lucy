@@ -50,9 +50,9 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query
 
     public incremented Compiler*
     Make_Compiler(PhraseQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 
-    public bool_t
+    public bool
     Equals(PhraseQuery *self, Obj *other);
 
     public incremented CharBuf*
@@ -84,7 +84,7 @@ class Lucy::Search::PhraseCompiler
          float boost);
 
     public incremented nullable Matcher*
-    Make_Matcher(PhraseCompiler *self, SegReader *reader, bool_t need_score);
+    Make_Matcher(PhraseCompiler *self, SegReader *reader, bool need_score);
 
     public float
     Get_Weight(PhraseCompiler *self);
@@ -99,7 +99,7 @@ class Lucy::Search::PhraseCompiler
     Highlight_Spans(PhraseCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, const CharBuf *field);
 
-    public bool_t
+    public bool
     Equals(PhraseCompiler *self, Obj *other);
 
     public void

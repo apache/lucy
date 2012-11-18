@@ -38,7 +38,7 @@ class Lucy::Index::PolyLexicon cnick PolyLex
     public void
     Seek(PolyLexicon *self, Obj *target = NULL);
 
-    public bool_t
+    public bool
     Next(PolyLexicon *self);
 
     public void
@@ -60,7 +60,7 @@ class Lucy::Index::SegLexQueue cnick SegLexQ
     inert incremented SegLexQueue*
     new(uint32_t max_size);
 
-    bool_t
+    bool
     Less_Than(SegLexQueue *self, Obj *a, Obj *b);
 }
 

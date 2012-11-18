@@ -43,14 +43,14 @@ class Lucy::Util::PriorityQueue cnick PriQ
 
     /** Compare queue elements.
      */
-    abstract bool_t
+    abstract bool
     Less_Than(PriorityQueue *self, Obj *a, Obj *b);
 
     /** Possibly insert an element. Add to the Queue if either...
      * a) the queue isn't full, or
      * b) the element belongs in the queue and should displace another.
      */
-    bool_t
+    bool
     Insert(PriorityQueue *self, decremented Obj *element);
 
     /** Equivalent to Insert(), except for the return value.  If the Queue has

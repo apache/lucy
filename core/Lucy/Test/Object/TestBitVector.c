@@ -191,7 +191,7 @@ S_verify_logical_op(BitVector *bit_vec, BitVector *set_1, BitVector *set_2,
     int i;
 
     for (i = 0; i < 50; i++) {
-        bool_t wanted;
+        bool wanted;
 
         switch (op) {
             case OP_OR:

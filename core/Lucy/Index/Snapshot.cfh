@@ -62,7 +62,7 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj : dumpable {
      * @return true if the entry existed and was successfully deleted, false
      * otherwise.
      */
-    public bool_t
+    public bool
     Delete_Entry(Snapshot *self, const CharBuf *entry);
 
     /** Decode a snapshot file and initialize the object to reflect its

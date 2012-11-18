@@ -90,7 +90,7 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target) {
 
     // Second step: reconcile.
     while (1) {
-        bool_t agreement = true;
+        bool agreement = true;
 
         // Scoot all Matchers up.
         for (uint32_t i = 0; i < num_kids; i++) {

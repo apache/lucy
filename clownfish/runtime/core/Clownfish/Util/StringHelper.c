@@ -76,7 +76,7 @@ StrHelp_to_base36(uint64_t num, void *buffer) {
     return size;
 }
 
-bool_t
+bool
 StrHelp_utf8_valid(const char *ptr, size_t size) {
     const uint8_t *string    = (const uint8_t*)ptr;
     const uint8_t *const end = string + size;
@@ -127,7 +127,7 @@ StrHelp_utf8_valid(const char *ptr, size_t size) {
     return true;
 }
 
-bool_t
+bool
 StrHelp_is_whitespace(uint32_t code_point) {
     switch (code_point) {
             // <control-0009>..<control-000D>

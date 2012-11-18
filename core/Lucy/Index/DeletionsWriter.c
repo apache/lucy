@@ -86,7 +86,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
     uint32_t num_seg_readers    = VA_Get_Size(self->seg_readers);
     self->seg_starts            = PolyReader_Offsets(polyreader);
     self->bit_vecs              = VA_new(num_seg_readers);
-    self->updated               = (bool_t*)CALLOCATE(num_seg_readers, sizeof(bool_t));
+    self->updated               = (bool*)CALLOCATE(num_seg_readers, sizeof(bool));
     self->searcher              = IxSearcher_new((Obj*)polyreader);
     self->name_to_tick          = Hash_new(num_seg_readers);
 
@@ -305,7 +305,7 @@ DefDelWriter_delete_by_doc_id(DefaultDeletionsWriter *self, int32_t doc_id) {
     }
 }
 
-bool_t
+bool
 DefDelWriter_updated(DefaultDeletionsWriter *self) {
     for (uint32_t i = 0, max = VA_Get_Size(self->seg_readers); i < max; i++) {
         if (self->updated[i]) { return true; }

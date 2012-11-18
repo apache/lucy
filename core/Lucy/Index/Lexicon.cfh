@@ -52,7 +52,7 @@ public class Lucy::Index::Lexicon cnick Lex inherits Clownfish::Obj {
      *
      * @return true until the iterator is exhausted, then false.
      */
-    public abstract bool_t
+    public abstract bool
     Next(Lexicon *self);
 
     /** Reset the iterator.  Next() must be called to proceed to the first

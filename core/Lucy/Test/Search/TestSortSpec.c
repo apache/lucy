@@ -143,8 +143,8 @@ TestReverseType_init(TestReverseType *self) {
 }
 
 TestReverseType*
-TestReverseType_init2(TestReverseType *self, float boost, bool_t indexed,
-                      bool_t stored, bool_t sortable) {
+TestReverseType_init2(TestReverseType *self, float boost, bool indexed,
+                      bool stored, bool sortable) {
     FType_init((FieldType*)self);
     self->boost      = boost;
     self->indexed    = indexed;
@@ -332,7 +332,7 @@ S_test_sorted_search(IndexSearcher *searcher, CharBuf *query,
 
     va_start(args, num_wanted);
     while (NULL != (field = va_arg(args, CharBuf*))) {
-        bool_t    reverse = va_arg(args, bool_t);
+        bool        reverse = va_arg(args, int);
         SortRule *rule    = SortRule_new(SortRule_FIELD, field, reverse);
         VA_Push(rules, (Obj*)rule);
     }

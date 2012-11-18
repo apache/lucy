@@ -202,7 +202,7 @@ ScorePost_read_raw(ScorePosting *self, InStream *instream,
 ScorePostingMatcher*
 ScorePost_make_matcher(ScorePosting *self, Similarity *sim,
                        PostingList *plist, Compiler *compiler,
-                       bool_t need_score) {
+                       bool need_score) {
     ScorePostingMatcher *matcher
         = (ScorePostingMatcher*)VTable_Make_Obj(SCOREPOSTINGMATCHER);
     UNUSED_VAR(self);

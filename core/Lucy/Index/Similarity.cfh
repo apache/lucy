@@ -130,7 +130,7 @@ public class Lucy::Index::Similarity cnick Sim
     public incremented Similarity*
     Load(Similarity *self, Obj *dump);
 
-    public bool_t
+    public bool
     Equals(Similarity *self, Obj *other);
 
     public void

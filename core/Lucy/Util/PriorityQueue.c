@@ -88,7 +88,7 @@ S_put(PriorityQueue *self, Obj *element) {
     S_up_heap(self);
 }
 
-bool_t
+bool
 PriQ_insert(PriorityQueue *self, Obj *element) {
     Obj *least = PriQ_Jostle(self, element);
     DECREF(least);

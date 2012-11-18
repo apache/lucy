@@ -91,8 +91,8 @@ inert class Lucy::Test::TestUtils  {
     inert incremented RangeQuery*
     make_range_query(const char *field, const char *lower_term = NULL,
                      const char *upper_term = NULL,
-                     bool_t include_lower = true,
-                     bool_t include_upper = true);
+                     bool include_lower = true,
+                     bool include_upper = true);
 
     /** Return either an ORQuery or an ANDQuery depending on the value of
      * <code>boolop</code>.  Takes a NULL-terminated list of Query objects.

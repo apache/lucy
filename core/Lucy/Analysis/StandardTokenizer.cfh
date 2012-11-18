@@ -50,7 +50,7 @@ public class Lucy::Analysis::StandardTokenizer
     Tokenize_Str(StandardTokenizer *self, const char *text, size_t len,
                  Inversion *inversion);
 
-    public bool_t
+    public bool
     Equals(StandardTokenizer *self, Obj *other);
 }
 

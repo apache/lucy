@@ -93,7 +93,7 @@ S_do_consolidate(CompoundFileWriter *self) {
     VArray    *merged       = VA_new(VA_Get_Size(files));
     CharBuf   *cf_file      = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
     OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)cf_file);
-    bool_t     rename_success;
+    bool       rename_success;
 
     if (!outstream) { RETHROW(INCREF(Err_get_error())); }
 

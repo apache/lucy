@@ -517,7 +517,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
               OutStream *dat_out) {
     int8_t    prim_id   = self->prim_id;
     int32_t   doc_max   = (int32_t)Seg_Get_Count(self->segment);
-    bool_t    has_nulls = self->count == doc_max ? false : true;
+    bool      has_nulls = self->count == doc_max ? false : true;
     size_t    size      = (doc_max + 1) * sizeof(int32_t);
     int32_t  *ords      = (int32_t*)MALLOCATE(size);
     int32_t   ord       = 0;

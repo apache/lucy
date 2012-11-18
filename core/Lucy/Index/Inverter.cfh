@@ -34,7 +34,7 @@ class Lucy::Index::Inverter inherits Clownfish::Obj {
     InverterEntry *blank;      /* Used when iterator is exhausted. */
     float          boost;
     int32_t        tick;
-    bool_t         sorted;
+    bool           sorted;
 
     inert incremented Inverter*
     new(Schema *schema, Segment *segment);
@@ -151,8 +151,8 @@ private final class Lucy::Index::Inverter::InverterEntry cnick InvEntry
     FieldType   *type;
     Analyzer    *analyzer;
     Similarity  *sim;
-    bool_t       indexed;
-    bool_t       highlightable;
+    bool         indexed;
+    bool         highlightable;
 
     inert incremented InverterEntry*
     new(Schema *schema = NULL, const CharBuf *field_name, int32_t field_num);

@@ -39,7 +39,7 @@ class Lucy::Index::RawLexicon cnick RawLex
     public void
     Destroy(RawLexicon *self);
 
-    public bool_t
+    public bool
     Next(RawLexicon *self);
 
     public nullable Obj*

@@ -278,7 +278,7 @@ VA_sort(VArray *self, Lucy_Sort_Compare_t compare, void *context) {
     Sort_quicksort(self->elems, self->size, sizeof(void*), compare, context);
 }
 
-bool_t
+bool
 VA_equals(VArray *self, Obj *other) {
     VArray *twin = (VArray*)other;
     if (twin == self)             { return true; }

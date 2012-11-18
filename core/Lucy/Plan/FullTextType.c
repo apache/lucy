@@ -35,8 +35,8 @@ FullTextType_init(FullTextType *self, Analyzer *analyzer) {
 
 FullTextType*
 FullTextType_init2(FullTextType *self, Analyzer *analyzer, float boost,
-                   bool_t indexed, bool_t stored, bool_t sortable,
-                   bool_t highlightable) {
+                   bool indexed, bool stored, bool sortable,
+                   bool highlightable) {
     FType_init((FieldType*)self);
 
     /* Assign */
@@ -56,7 +56,7 @@ FullTextType_destroy(FullTextType *self) {
     SUPER_DESTROY(self, FULLTEXTTYPE);
 }
 
-bool_t
+bool
 FullTextType_equals(FullTextType *self, Obj *other) {
     FullTextType *twin = (FullTextType*)other;
     if (twin == self)                                   { return true; }
@@ -127,10 +127,10 @@ FullTextType_load(FullTextType *self, Obj *dump) {
     Obj *stored_dump  = Hash_Fetch_Str(source, "stored", 6);
     Obj *sort_dump    = Hash_Fetch_Str(source, "sortable", 8);
     Obj *hl_dump      = Hash_Fetch_Str(source, "highlightable", 13);
-    bool_t indexed  = indexed_dump ? Obj_To_Bool(indexed_dump) : true;
-    bool_t stored   = stored_dump  ? Obj_To_Bool(stored_dump)  : true;
-    bool_t sortable = sort_dump    ? Obj_To_Bool(sort_dump)    : false;
-    bool_t hl       = hl_dump      ? Obj_To_Bool(hl_dump)      : false;
+    bool indexed  = indexed_dump ? Obj_To_Bool(indexed_dump) : true;
+    bool stored   = stored_dump  ? Obj_To_Bool(stored_dump)  : true;
+    bool sortable = sort_dump    ? Obj_To_Bool(sort_dump)    : false;
+    bool hl       = hl_dump      ? Obj_To_Bool(hl_dump)      : false;
 
     // Extract an Analyzer.
     Obj *analyzer_dump = Hash_Fetch_Str(source, "analyzer", 8);
@@ -158,7 +158,7 @@ FullTextType_load(FullTextType *self, Obj *dump) {
 }
 
 void
-FullTextType_set_highlightable(FullTextType *self, bool_t highlightable) {
+FullTextType_set_highlightable(FullTextType *self, bool highlightable) {
     self->highlightable = highlightable;
 }
 
@@ -167,7 +167,7 @@ FullTextType_get_analyzer(FullTextType *self) {
     return self->analyzer;
 }
 
-bool_t
+bool
 FullTextType_highlightable(FullTextType *self) {
     return self->highlightable;
 }

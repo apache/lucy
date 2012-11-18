@@ -153,7 +153,7 @@ S_new_type(CFCParser *state, int flags, char *type_name,
         || !strcmp(type_name, "int")
         || !strcmp(type_name, "long")
         || !strcmp(type_name, "size_t")
-        || !strcmp(type_name, "bool_t")
+        || !strcmp(type_name, "bool")
        ) {
         type = CFCType_new_integer(flags, type_name);
     }

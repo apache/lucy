@@ -47,13 +47,13 @@ RAMFolder_initialize(RAMFolder *self) {
     UNUSED_VAR(self);
 }
 
-bool_t
+bool
 RAMFolder_check(RAMFolder *self) {
     UNUSED_VAR(self);
     return true;
 }
 
-bool_t
+bool
 RAMFolder_local_mkdir(RAMFolder *self, const CharBuf *name) {
     if (Hash_Fetch(self->entries, (Obj*)name)) {
         Err_set_error(Err_new(CB_newf("Can't MkDir, '%o' already exists",
@@ -75,7 +75,7 @@ RAMFolder_local_open_filehandle(RAMFolder *self, const CharBuf *name,
     RAMFileHandle *fh;
     CharBuf *fullpath = S_fullpath(self, name);
     RAMFile *file = (RAMFile*)Hash_Fetch(self->entries, (Obj*)name);
-    bool_t can_create
+    bool can_create
         = (flags & (FH_WRITE_ONLY | FH_CREATE)) == (FH_WRITE_ONLY | FH_CREATE)
           ? true : false;
 
@@ -119,12 +119,12 @@ RAMFolder_local_open_dir(RAMFolder *self) {
     return (DirHandle*)dh;
 }
 
-bool_t
+bool
 RAMFolder_local_exists(RAMFolder *self, const CharBuf *name) {
     return !!Hash_Fetch(self->entries, (Obj*)name);
 }
 
-bool_t
+bool
 RAMFolder_local_is_directory(RAMFolder *self, const CharBuf *name) {
     Obj *entry = Hash_Fetch(self->entries, (Obj*)name);
     if (entry && Obj_Is_A(entry, FOLDER)) { return true; }
@@ -134,7 +134,7 @@ RAMFolder_local_is_directory(RAMFolder *self, const CharBuf *name) {
 #define OP_RENAME    1
 #define OP_HARD_LINK 2
 
-static bool_t
+static bool
 S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
                       Folder *from_folder, Folder *to_folder,
                       ZombieCharBuf *from_name, ZombieCharBuf *to_name,
@@ -200,7 +200,7 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
     if (op == OP_RENAME) {
         Obj *existing = Hash_Fetch(inner_to_folder->entries, (Obj*)to_name);
         if (existing) {
-            bool_t conflict = false;
+            bool conflict = false;
 
             // Return success fast if file is copied on top of itself.
             if (inner_from_folder == inner_to_folder
@@ -264,33 +264,33 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
     return true;
 }
 
-bool_t
+bool
 RAMFolder_rename(RAMFolder *self, const CharBuf* from, const CharBuf *to) {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
     ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
     ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
-    bool_t result = S_rename_or_hard_link(self, from, to, from_folder,
+    bool result = S_rename_or_hard_link(self, from, to, from_folder,
                                           to_folder, from_name, to_name,
                                           OP_RENAME);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
     return result;
 }
 
-bool_t
+bool
 RAMFolder_hard_link(RAMFolder *self, const CharBuf *from, const CharBuf *to) {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
     ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
     ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
-    bool_t result = S_rename_or_hard_link(self, from, to, from_folder,
+    bool result = S_rename_or_hard_link(self, from, to, from_folder,
                                           to_folder, from_name, to_name,
                                           OP_HARD_LINK);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
     return result;
 }
 
-bool_t
+bool
 RAMFolder_local_delete(RAMFolder *self, const CharBuf *name) {
     Obj *entry = Hash_Fetch(self->entries, (Obj*)name);
     if (entry) {

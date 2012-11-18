@@ -52,12 +52,12 @@ public class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
 
     public incremented Compiler*
     Make_Compiler(NOTQuery *self, Searcher *searcher, float boost,
-                  bool_t subordinate = false);
+                  bool subordinate = false);
 
     public incremented CharBuf*
     To_String(NOTQuery *self);
 
-    public bool_t
+    public bool
     Equals(NOTQuery *self, Obj *other);
 }
 
@@ -72,7 +72,7 @@ class Lucy::Search::NOTCompiler
          float boost);
 
     public incremented nullable Matcher*
-    Make_Matcher(NOTCompiler *self, SegReader *reader, bool_t need_score);
+    Make_Matcher(NOTCompiler *self, SegReader *reader, bool need_score);
 
     public float
     Sum_Of_Squared_Weights(NOTCompiler *self);

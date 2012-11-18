@@ -39,7 +39,7 @@ ORQuery_init(ORQuery *self, VArray *children) {
 
 Compiler*
 ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost,
-                      bool_t subordinate) {
+                      bool subordinate) {
     ORCompiler *compiler = ORCompiler_new(self, searcher, boost);
     if (!subordinate) {
         ORCompiler_Normalize(compiler);
@@ -47,7 +47,7 @@ ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost,
     return (Compiler*)compiler;
 }
 
-bool_t
+bool
 ORQuery_equals(ORQuery *self, Obj *other) {
     if ((ORQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, ORQUERY)) { return false; }
@@ -94,7 +94,7 @@ ORCompiler_init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
 
 Matcher*
 ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
-                        bool_t need_score) {
+                        bool need_score) {
     uint32_t num_kids = VA_Get_Size(self->children);
 
     if (num_kids == 1) {
