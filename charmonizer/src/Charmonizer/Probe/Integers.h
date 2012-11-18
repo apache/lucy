@@ -99,13 +99,6 @@
  *
  * PTR_TO_I64(ptr)
  *
- * If 64-bit integers are available, these macros will expand to the printf
- * conversion specification for signed and unsigned versions (most commonly
- * "lld" and "llu").
- *
- * I64P
- * U64P
- *
  * These symbols will be defined if they are not already:
  *
  * true
