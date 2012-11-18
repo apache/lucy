@@ -55,7 +55,7 @@ SI_posix_flags(uint32_t fh_flags) {
     return posix_flags;
 }
 
-#define IS_64_BIT (SIZEOF_PTR == 8 ? true : false)
+#define IS_64_BIT (SIZEOF_PTR == 8 ? 1 : 0)
 
 // Memory map a region of the file with shared (read-only) permissions.  If
 // the requested length is 0, return NULL.  If an error occurs, return NULL
