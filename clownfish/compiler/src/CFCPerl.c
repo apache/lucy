@@ -297,6 +297,7 @@ S_write_boot_c(CFCPerl *self) {
     const char pattern[] =
         "%s\n"
         "\n"
+        "#include \"charmony.h\"\n"
         "#include \"EXTERN.h\"\n"
         "#include \"perl.h\"\n"
         "#include \"XSUB.h\"\n"

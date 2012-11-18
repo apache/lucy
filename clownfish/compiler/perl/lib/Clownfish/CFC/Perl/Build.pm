@@ -70,6 +70,8 @@ sub new {
         # Redefine 'for' to fix broken 'for' scoping under MSVC6.
         push @$extra_ccflags, '-Dfor="if(0);else for"';
     }
+    # Define HAS_BOOL, so that the Perl headers don't redefine 'bool'.
+    push @$extra_ccflags, '-DHAS_BOOL';
     $self->extra_compiler_flags(@$extra_ccflags);
 
     # TODO: use Charmonizer to determine whether pthreads are userland.
