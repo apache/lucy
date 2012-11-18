@@ -270,7 +270,10 @@ chaz_Integers_run(void) {
 
     /* Write typedefs, maximums/minimums and literals macros. */
     chaz_ConfWriter_add_typedef("int", "bool_t");
-    if (has_stdint) {
+    if (has_inttypes) {
+        chaz_ConfWriter_add_sys_include("inttypes.h");
+    }
+    else if (has_stdint) {
         chaz_ConfWriter_add_sys_include("stdint.h");
     }
     else {
@@ -382,6 +385,12 @@ chaz_Integers_run(void) {
                 chaz_ConfWriter_add_def("I64P", scratch);
                 sprintf(scratch, "\"%su\"", options[i]);
                 chaz_ConfWriter_add_def("U64P", scratch);
+                if (!has_inttypes) {
+                    sprintf(scratch, "\"%sd\"", options[i]);
+                    chaz_ConfWriter_add_global_def("PRId64", scratch);
+                    sprintf(scratch, "\"%su\"", options[i]);
+                    chaz_ConfWriter_add_global_def("PRIu64", scratch);
+                }
                 break;
             }
         }

@@ -76,6 +76,13 @@
  * UINT32_C
  * UINT64_C
  *
+ * If inttypes.h is is available, it will be pound-included in the
+ * configuration header.  If it is not, the following macros will be defined if
+ * possible:
+ *
+ * PRId64
+ * PRIu64
+ *
  * The following typedefs will be created:
  *
  * bool_t
