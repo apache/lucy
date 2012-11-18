@@ -32,7 +32,7 @@ test_oversize__growth_rate(TestBatch *batch) {
         uint64_t next_size = Memory_oversize((size_t)size + 1, sizeof(void*));
         if (next_size < size) {
             success = false;
-            FAIL(batch, "Asked for %" I64P ", got smaller amount %" I64P,
+            FAIL(batch, "Asked for %" PRId64 ", got smaller amount %" PRId64,
                  size + 1, next_size);
             break;
         }

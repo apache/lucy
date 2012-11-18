@@ -53,7 +53,7 @@ TestBatch_init(TestBatch *self, int64_t num_tests) {
 
 void
 TestBatch_plan(TestBatch *self) {
-    printf("1..%" I64P "\n", self->num_tests);
+    printf("1..%" PRId64 "\n", self->num_tests);
 }
 
 bool_t
@@ -144,14 +144,14 @@ TestBatch_vtest_true(TestBatch *self, bool_t condition, const char *pattern,
     // Test condition and pass or fail.
     if (condition) {
         self->num_passed++;
-        printf("ok %" I64P " - ", self->test_num);
+        printf("ok %" PRId64 " - ", self->test_num);
         vprintf(pattern, args);
         printf("\n");
         return true;
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - ", self->test_num);
+        printf("not ok %" PRId64 " - ", self->test_num);
         vprintf(pattern, args);
         printf("\n");
         return false;
@@ -167,14 +167,14 @@ TestBatch_vtest_false(TestBatch *self, bool_t condition,
     // Test condition and pass or fail.
     if (!condition) {
         self->num_passed++;
-        printf("ok %" I64P " - ", self->test_num);
+        printf("ok %" PRId64 " - ", self->test_num);
         vprintf(pattern, args);
         printf("\n");
         return true;
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - ", self->test_num);
+        printf("not ok %" PRId64 " - ", self->test_num);
         vprintf(pattern, args);
         printf("\n");
         return false;
@@ -190,14 +190,14 @@ TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
     // Test condition and pass or fail.
     if (expected == got) {
         self->num_passed++;
-        printf("ok %" I64P " - ", self->test_num);
+        printf("ok %" PRId64 " - ", self->test_num);
         vprintf(pattern, args);
         printf("\n");
         return true;
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - Expected '%ld', got '%ld'\n    ",
+        printf("not ok %" PRId64 " - Expected '%ld', got '%ld'\n    ",
                self->test_num, expected, got);
         vprintf(pattern, args);
         printf("\n");
@@ -216,14 +216,14 @@ TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
     // Evaluate condition and pass or fail.
     if (diff > 0.00001) {
         self->num_passed++;
-        printf("ok %" I64P " - ", self->test_num);
+        printf("ok %" PRId64 " - ", self->test_num);
         vprintf(pattern, args);
         printf("\n");
         return true;
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - Expected '%f', got '%f'\n    ",
+        printf("not ok %" PRId64 " - Expected '%f', got '%f'\n    ",
                self->test_num, expected, got);
         vprintf(pattern, args);
         printf("\n");
@@ -241,14 +241,14 @@ TestBatch_vtest_string_equals(TestBatch *self, const char *got,
     // Test condition and pass or fail.
     if (strcmp(expected, got) == 0) {
         self->num_passed++;
-        printf("ok %" I64P " - ", self->test_num);
+        printf("ok %" PRId64 " - ", self->test_num);
         vprintf(pattern, args);
         printf("\n");
         return true;
     }
     else {
         self->num_failed++;
-        printf("not ok %" I64P " - Expected '%s', got '%s'\n    ",
+        printf("not ok %" PRId64 " - Expected '%s', got '%s'\n    ",
                self->test_num, expected, got);
         vprintf(pattern, args);
         printf("\n");
@@ -263,7 +263,7 @@ TestBatch_vpass(TestBatch *self, const char *pattern, va_list args) {
 
     // Update counter, indicate pass.
     self->num_passed++;
-    printf("ok %" I64P " - ", self->test_num);
+    printf("ok %" PRId64 " - ", self->test_num);
     vprintf(pattern, args);
     printf("\n");
 
@@ -277,7 +277,7 @@ TestBatch_vfail(TestBatch *self, const char *pattern, va_list args) {
 
     // Update counter, indicate failure.
     self->num_failed++;
-    printf("not ok %" I64P " - ", self->test_num);
+    printf("not ok %" PRId64 " - ", self->test_num);
     vprintf(pattern, args);
     printf("\n");
 
@@ -287,7 +287,7 @@ TestBatch_vfail(TestBatch *self, const char *pattern, va_list args) {
 void
 TestBatch_vskip(TestBatch *self, const char *pattern, va_list args) {
     self->test_num++;
-    printf("ok %" I64P " # SKIP ", self->test_num);
+    printf("ok %" PRId64 " # SKIP ", self->test_num);
     vprintf(pattern, args);
     printf("\n");
     self->num_skipped++;

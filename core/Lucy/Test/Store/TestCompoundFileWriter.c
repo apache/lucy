@@ -122,7 +122,7 @@ test_offsets(TestBatch *batch) {
         int64_t offs = Obj_To_I64(offset);
         if (offs % 8 != 0) {
             offsets_ok = false;
-            FAIL(batch, "Offset %" I64P " for %s not a multiple of 8",
+            FAIL(batch, "Offset %" PRId64 " for %s not a multiple of 8",
                  offset, CB_Get_Ptr8(file));
             break;
         }

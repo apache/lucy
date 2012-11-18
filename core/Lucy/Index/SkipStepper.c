@@ -51,7 +51,7 @@ SkipStepper_read_record(SkipStepper *self, InStream *instream) {
 CharBuf*
 SkipStepper_to_string(SkipStepper *self) {
     char *ptr = (char*)MALLOCATE(60);
-    size_t len = sprintf(ptr, "skip doc: %u file pointer: %" I64P,
+    size_t len = sprintf(ptr, "skip doc: %u file pointer: %" PRId64,
                          self->doc_id, self->filepos);
     return CB_new_steal_from_trusted_str(ptr, len, 60);
 }

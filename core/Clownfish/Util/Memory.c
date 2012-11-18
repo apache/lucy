@@ -25,7 +25,7 @@ void*
 Memory_wrapped_malloc(size_t count) {
     void *pointer = malloc(count);
     if (pointer == NULL && count != 0) {
-        fprintf(stderr, "Can't malloc %" U64P " bytes.\n", (uint64_t)count);
+        fprintf(stderr, "Can't malloc %" PRIu64 " bytes.\n", (uint64_t)count);
         exit(1);
     }
     return pointer;
@@ -35,7 +35,7 @@ void*
 Memory_wrapped_calloc(size_t count, size_t size) {
     void *pointer = calloc(count, size);
     if (pointer == NULL && count != 0) {
-        fprintf(stderr, "Can't calloc %" U64P " elements of size %" U64P ".\n",
+        fprintf(stderr, "Can't calloc %" PRIu64 " elements of size %" PRIu64 ".\n",
                 (uint64_t)count, (uint64_t)size);
         exit(1);
     }
@@ -46,7 +46,7 @@ void*
 Memory_wrapped_realloc(void *ptr, size_t size) {
     void *pointer = realloc(ptr, size);
     if (pointer == NULL && size != 0) {
-        fprintf(stderr, "Can't realloc %" U64P " bytes.\n", (uint64_t)size);
+        fprintf(stderr, "Can't realloc %" PRIu64 " bytes.\n", (uint64_t)size);
         exit(1);
     }
     return pointer;

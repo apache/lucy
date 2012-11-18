@@ -251,7 +251,7 @@ CB_vcatf(CharBuf *self, const char *pattern, va_list args) {
                         else {
                             S_die_invalid_pattern(pattern_start);
                         }
-                        size = sprintf(buf, "%" I64P, val);
+                        size = sprintf(buf, "%" PRId64, val);
                         CB_Cat_Trusted_Str(self, buf, size);
                     }
                     break;
@@ -273,7 +273,7 @@ CB_vcatf(CharBuf *self, const char *pattern, va_list args) {
                         else {
                             S_die_invalid_pattern(pattern_start);
                         }
-                        size = sprintf(buf, "%" U64P, val);
+                        size = sprintf(buf, "%" PRIu64, val);
                         CB_Cat_Trusted_Str(self, buf, size);
                     }
                     break;

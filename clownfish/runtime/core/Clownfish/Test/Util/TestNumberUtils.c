@@ -173,7 +173,7 @@ test_c64(TestBatch *batch) {
         for (size_t i = 0; i < count; i++) {
             uint64_t got = NumUtil_decode_c64(&target);
             TEST_TRUE(batch, got == ints[i],
-                      "c64 %" U64P " == %" U64P, got, ints[i]);
+                      "c64 %" PRIu64 " == %" PRIu64, got, ints[i]);
             if (target > limit) { THROW(ERR, "overrun"); }
             NumUtil_skip_cint(&skip);
         }

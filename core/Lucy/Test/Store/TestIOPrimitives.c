@@ -177,7 +177,7 @@ test_i64(TestBatch *batch) {
     for (i = 0; i < 1000; i++) {
         int64_t got = InStream_Read_I64(instream);
         if (got != ints[i]) {
-            FAIL(batch, "i64 round trip failed: %" I64P ", %" I64P,
+            FAIL(batch, "i64 round trip failed: %" PRId64 ", %" PRId64,
                  got, ints[i]);
             break;
         }
@@ -216,7 +216,7 @@ test_u64(TestBatch *batch) {
     for (i = 0; i < 1000; i++) {
         uint64_t got = InStream_Read_U64(instream);
         if (got != ints[i]) {
-            FAIL(batch, "u64 round trip failed: %" U64P ", %" U64P,
+            FAIL(batch, "u64 round trip failed: %" PRIu64 ", %" PRIu64,
                  got, ints[i]);
             break;
         }
@@ -297,7 +297,7 @@ test_c64(TestBatch *batch) {
     for (i = 0; i < 1000; i++) {
         uint64_t got = InStream_Read_C64(instream);
         if (got != ints[i]) {
-            FAIL(batch, "c64 round trip failed: %" U64P ", %" U64P,
+            FAIL(batch, "c64 round trip failed: %" PRIu64 ", %" PRIu64,
                  got, ints[i]);
             break;
         }
@@ -314,7 +314,7 @@ test_c64(TestBatch *batch) {
         uint64_t got = NumUtil_decode_c64(&buf);
         UNUSED_VAR(size);
         if (got != ints[i]) {
-            FAIL(batch, "Read_Raw_C64 failed: %" U64P ", %" U64P,
+            FAIL(batch, "Read_Raw_C64 failed: %" PRIu64 ", %" PRIu64,
                  got, ints[i]);
             break;
         }

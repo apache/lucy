@@ -107,10 +107,10 @@ S_run_tests(TestBatch *batch) {
         OK((INT64_MAX == INT64_C(0x7FFFFFFFFFFFFFFF)), "INT64_MAX");
         OK((INT64_MIN == -INT64_C(0x7FFFFFFFFFFFFFFF) - 1), "INT64_MIN");
         OK((UINT64_MAX == UINT64_C(0xFFFFFFFFFFFFFFFF)), "UINT64_MAX");
-        sprintf(buf, "%"I64P, foo);
-        STR_EQ(buf, "-100", "I64P");
-        sprintf(buf, "%"U64P, bar);
-        STR_EQ(buf, "18000000000000000000", "U64P");
+        sprintf(buf, "%"PRId64, foo);
+        STR_EQ(buf, "-100", "PRId64");
+        sprintf(buf, "%"PRIu64, bar);
+        STR_EQ(buf, "18000000000000000000", "PRIu64");
     }
 #endif
 }
