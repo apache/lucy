@@ -492,6 +492,36 @@ void chaz_AtomicOps_run(void);
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Probe/Booleans.h"
+/* Charmonizer/Probe/Booleans.h -- bool type.
+ *
+ * If stdbool.h is is available, it will be pound-included in the configuration
+ * header.  If it is not, the following typedef will be defined:
+ *
+ * bool
+ *
+ * These symbols will be defined if they are not already:
+ *
+ * true
+ * false
+ */
+
+#ifndef H_CHAZ_BOOLEANS
+#define H_CHAZ_BOOLEANS
+
+#include <stdio.h>
+
+/* Run the Booleans module.
+ */
+void chaz_Booleans_run(void);
+
+#endif /* H_CHAZ_BOOLEANS */
+
+
+
+
+/***************************************************************************/
+
 #line 21 "src/Charmonizer/Probe/DirManip.h"
 /* Charmonizer/Probe/DirManip.h
  */
@@ -2866,6 +2896,41 @@ chaz_AtomicOps_run(void) {
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Probe/Booleans.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Probe/Booleans.h" */
+
+void
+chaz_Booleans_run(void) {
+    int has_stdbool = chaz_HeadCheck_check_header("stdbool.h");
+
+    chaz_ConfWriter_start_module("Booleans");
+
+    if (has_stdbool) {
+        chaz_ConfWriter_add_def("HAS_STDBOOL_H", NULL);
+        chaz_ConfWriter_add_sys_include("stdbool.h");
+    }
+    else {
+        chaz_ConfWriter_append_conf(
+            "#ifndef __cplusplus\n"
+            "  typedef int bool;\n"
+            "  #ifndef true\n"
+            "    #define true 1\n"
+            "  #endif\n"
+            "  #ifndef false\n"
+            "    #define false 0\n"
+            "  #endif\n"
+            "#endif\n");
+    }
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Probe/DirManip.c"
 /* #include "Charmonizer/Core/ConfWriter.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
@@ -3884,16 +3949,6 @@ chaz_Integers_run(void) {
             "(double)(int64_t)(num))");
     }
 
-    /* True and false. */
-    chaz_ConfWriter_append_conf(
-        "#ifndef true\n"
-        "  #define true 1\n"
-        "#endif\n"
-        "#ifndef false\n"
-        "  #define false 0\n"
-        "#endif\n"
-    );
-
     chaz_ConfWriter_end_module();
 }
 
@@ -4614,6 +4669,7 @@ int main(int argc, char **argv) {
     chaz_Headers_run();
     chaz_AtomicOps_run();
     chaz_FuncMacro_run();
+    chaz_Booleans_run();
     chaz_Integers_run();
     chaz_Floats_run();
     chaz_LargeFiles_run();

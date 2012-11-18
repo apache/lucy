@@ -2837,16 +2837,6 @@ chaz_Integers_run(void) {
             "(double)(int64_t)(num))");
     }
 
-    /* True and false. */
-    chaz_ConfWriter_append_conf(
-        "#ifndef true\n"
-        "  #define true 1\n"
-        "#endif\n"
-        "#ifndef false\n"
-        "  #define false 0\n"
-        "#endif\n"
-    );
-
     chaz_ConfWriter_end_module();
 }
 
