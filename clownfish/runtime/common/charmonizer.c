@@ -776,13 +776,6 @@ chaz_Headers_run(void);
  *
  * PTR_TO_I64(ptr)
  *
- * If 64-bit integers are available, these macros will expand to the printf
- * conversion specification for signed and unsigned versions (most commonly
- * "lld" and "llu").
- *
- * I64P
- * U64P
- *
  * These symbols will be defined if they are not already:
  *
  * true
@@ -3745,128 +3738,124 @@ chaz_Integers_run(void) {
     if (has_inttypes) {
         chaz_ConfWriter_add_sys_include("inttypes.h");
     }
-    else if (has_stdint) {
-        chaz_ConfWriter_add_sys_include("stdint.h");
-    }
     else {
-        /* We support only the following subset of stdint.h
-         *   int8_t
-         *   int16_t
-         *   int32_t
-         *   int64_t
-         *   uint8_t
-         *   uint16_t
-         *   uint32_t
-         *   uint64_t
-         *   INT8_MAX
-         *   INT16_MAX
-         *   INT32_MAX
-         *   INT64_MAX
-         *   INT8_MIN
-         *   INT16_MIN
-         *   INT32_MIN
-         *   INT64_MIN
-         *   UINT8_MAX
-         *   UINT16_MAX
-         *   UINT32_MAX
-         *   UINT64_MAX
-         *   SIZE_MAX
-         *   INT32_C
-         *   INT64_C
-         *   UINT32_C
-         *   UINT64_C
-         */
-        if (has_8) {
-            chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
-            chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
-            chaz_ConfWriter_add_global_def("INT8_MAX", "127");
-            chaz_ConfWriter_add_global_def("INT8_MIN", "-128");
-            chaz_ConfWriter_add_global_def("UINT8_MAX", "255");
+        if (has_stdint) {
+            chaz_ConfWriter_add_sys_include("stdint.h");
         }
-        if (has_16) {
-            chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
-            chaz_ConfWriter_add_global_typedef("unsigned short", "uint16_t");
-            chaz_ConfWriter_add_global_def("INT16_MAX", "32767");
-            chaz_ConfWriter_add_global_def("INT16_MIN", "-32768");
-            chaz_ConfWriter_add_global_def("UINT16_MAX", "65535");
-        }
-        if (has_32) {
-            chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
-            sprintf(scratch, "unsigned %s", i32_t_type);
-            chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
-            chaz_ConfWriter_add_global_def("INT32_MAX", "2147483647");
-            chaz_ConfWriter_add_global_def("INT32_MIN", "(-INT32_MAX-1)");
-            chaz_ConfWriter_add_global_def("UINT32_MAX", "4294967295U");
-            if (strcmp(i32_t_postfix, "") == 0) {
-                chaz_ConfWriter_add_global_def("INT32_C(n)", "n");
+        else {
+            /* We support only the following subset of stdint.h
+             *   int8_t
+             *   int16_t
+             *   int32_t
+             *   int64_t
+             *   uint8_t
+             *   uint16_t
+             *   uint32_t
+             *   uint64_t
+             *   INT8_MAX
+             *   INT16_MAX
+             *   INT32_MAX
+             *   INT64_MAX
+             *   INT8_MIN
+             *   INT16_MIN
+             *   INT32_MIN
+             *   INT64_MIN
+             *   UINT8_MAX
+             *   UINT16_MAX
+             *   UINT32_MAX
+             *   UINT64_MAX
+             *   SIZE_MAX
+             *   INT32_C
+             *   INT64_C
+             *   UINT32_C
+             *   UINT64_C
+             */
+            if (has_8) {
+                chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
+                chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
+                chaz_ConfWriter_add_global_def("INT8_MAX", "127");
+                chaz_ConfWriter_add_global_def("INT8_MIN", "-128");
+                chaz_ConfWriter_add_global_def("UINT8_MAX", "255");
             }
-            else {
-                sprintf(scratch, "n##%s", i32_t_postfix);
-                chaz_ConfWriter_add_global_def("INT32_C(n)", scratch);
+            if (has_16) {
+                chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
+                chaz_ConfWriter_add_global_typedef("unsigned short",
+                                                   "uint16_t");
+                chaz_ConfWriter_add_global_def("INT16_MAX", "32767");
+                chaz_ConfWriter_add_global_def("INT16_MIN", "-32768");
+                chaz_ConfWriter_add_global_def("UINT16_MAX", "65535");
             }
-            sprintf(scratch, "n##%s", u32_t_postfix);
-            chaz_ConfWriter_add_global_def("UINT32_C(n)", scratch);
+            if (has_32) {
+                chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
+                sprintf(scratch, "unsigned %s", i32_t_type);
+                chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
+                chaz_ConfWriter_add_global_def("INT32_MAX", "2147483647");
+                chaz_ConfWriter_add_global_def("INT32_MIN", "(-INT32_MAX-1)");
+                chaz_ConfWriter_add_global_def("UINT32_MAX", "4294967295U");
+                if (strcmp(i32_t_postfix, "") == 0) {
+                    chaz_ConfWriter_add_global_def("INT32_C(n)", "n");
+                }
+                else {
+                    sprintf(scratch, "n##%s", i32_t_postfix);
+                    chaz_ConfWriter_add_global_def("INT32_C(n)", scratch);
+                }
+                sprintf(scratch, "n##%s", u32_t_postfix);
+                chaz_ConfWriter_add_global_def("UINT32_C(n)", scratch);
+            }
+            if (has_64) {
+                chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
+                sprintf(scratch, "unsigned %s", i64_t_type);
+                chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
+                sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
+                chaz_ConfWriter_add_global_def("INT64_MAX", scratch);
+                chaz_ConfWriter_add_global_def("INT64_MIN", "(-INT64_MAX-1)");
+                sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
+                chaz_ConfWriter_add_global_def("UINT64_MAX", scratch);
+                sprintf(scratch, "n##%s", i64_t_postfix);
+                chaz_ConfWriter_add_global_def("INT64_C(n)", scratch);
+                sprintf(scratch, "n##%s", u64_t_postfix);
+                chaz_ConfWriter_add_global_def("UINT64_C(n)", scratch);
+            }
+            chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
         }
+
+        /* Create the PRId64 and PRIu64 printf macros. */
         if (has_64) {
-            chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
-            sprintf(scratch, "unsigned %s", i64_t_type);
-            chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
-            sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
-            chaz_ConfWriter_add_global_def("INT64_MAX", scratch);
-            chaz_ConfWriter_add_global_def("INT64_MIN", "(-INT64_MAX-1)");
-            sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
-            chaz_ConfWriter_add_global_def("UINT64_MAX", scratch);
-            sprintf(scratch, "n##%s", i64_t_postfix);
-            chaz_ConfWriter_add_global_def("INT64_C(n)", scratch);
-            sprintf(scratch, "n##%s", u64_t_postfix);
-            chaz_ConfWriter_add_global_def("UINT64_C(n)", scratch);
-        }
-        chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
-    }
+            int i;
+            const char *options[] = {
+                "ll",
+                "l",
+                "L",
+                "q",  /* Some *BSDs */
+                "I64", /* Microsoft */
+                NULL,
+            };
 
-    /* Create the I64P and U64P printf macros. */
-    if (has_64) {
-        int i;
-        const char *options[] = {
-            "ll",
-            "l",
-            "L",
-            "q",  /* Some *BSDs */
-            "I64", /* Microsoft */
-            NULL,
-        };
+            /* Buffer to hold the code, and its start and end. */
+            static const char format_64_code[] =
+                CHAZ_QUOTE(  #include "_charm.h"                           )
+                CHAZ_QUOTE(  int main() {                                  )
+                CHAZ_QUOTE(      Charm_Setup;                              )
+                CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
+                CHAZ_QUOTE(      return 0;                                 )
+                CHAZ_QUOTE( }                                              );
 
-        /* Buffer to hold the code, and its start and end. */
-        static const char format_64_code[] =
-            CHAZ_QUOTE(  #include "_charm.h"                           )
-            CHAZ_QUOTE(  int main() {                                  )
-            CHAZ_QUOTE(      Charm_Setup;                              )
-            CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
-            CHAZ_QUOTE(      return 0;                                 )
-            CHAZ_QUOTE( }                                              );
+            for (i = 0; options[i] != NULL; i++) {
+                /* Try to print 2**64-1, and see if we get it back intact. */
+                sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
+                output = chaz_CC_capture_output(code_buf, &output_len);
 
-        for (i = 0; options[i] != NULL; i++) {
-            /* Try to print 2**64-1, and see if we get it back intact. */
-            sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
-            output = chaz_CC_capture_output(code_buf, &output_len);
-
-            if (output_len != 0
-                && strcmp(output, "18446744073709551615") == 0
-               ) {
-                sprintf(scratch, "\"%sd\"", options[i]);
-                chaz_ConfWriter_add_def("I64P", scratch);
-                sprintf(scratch, "\"%su\"", options[i]);
-                chaz_ConfWriter_add_def("U64P", scratch);
-                if (!has_inttypes) {
+                if (output_len != 0
+                    && strcmp(output, "18446744073709551615") == 0
+                   ) {
                     sprintf(scratch, "\"%sd\"", options[i]);
                     chaz_ConfWriter_add_global_def("PRId64", scratch);
                     sprintf(scratch, "\"%su\"", options[i]);
                     chaz_ConfWriter_add_global_def("PRIu64", scratch);
+                    break;
                 }
-                break;
             }
         }
-
     }
 
     /* Create macro for promoting pointers to integers. */
