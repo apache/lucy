@@ -531,10 +531,6 @@ chaz_Probe_clean_up(void);
  * PRId64
  * PRIu64
  *
- * The following typedefs will be created:
- *
- * bool_t
- *
  * Availability of integer types is indicated by which of these are defined:
  *
  * HAS_INT8_T
@@ -546,11 +542,6 @@ chaz_Probe_clean_up(void);
  * safely.
  *
  * PTR_TO_I64(ptr)
- *
- * These symbols will be defined if they are not already:
- *
- * true
- * false
  */
 
 #ifndef H_CHAZ_INTEGERS
@@ -2687,7 +2678,6 @@ chaz_Integers_run(void) {
     }
 
     /* Write typedefs, maximums/minimums and literals macros. */
-    chaz_ConfWriter_add_typedef("int", "bool_t");
     if (has_inttypes) {
         chaz_ConfWriter_add_sys_include("inttypes.h");
     }
