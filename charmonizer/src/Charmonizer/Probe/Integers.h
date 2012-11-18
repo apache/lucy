@@ -83,10 +83,6 @@
  * PRId64
  * PRIu64
  *
- * The following typedefs will be created:
- *
- * bool_t
- *
  * Availability of integer types is indicated by which of these are defined:
  *
  * HAS_INT8_T
@@ -98,11 +94,6 @@
  * safely.
  *
  * PTR_TO_I64(ptr)
- *
- * These symbols will be defined if they are not already:
- *
- * true
- * false
  */
 
 #ifndef H_CHAZ_INTEGERS

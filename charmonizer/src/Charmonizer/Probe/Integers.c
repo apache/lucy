@@ -269,7 +269,6 @@ chaz_Integers_run(void) {
     }
 
     /* Write typedefs, maximums/minimums and literals macros. */
-    chaz_ConfWriter_add_typedef("int", "bool_t");
     if (has_inttypes) {
         chaz_ConfWriter_add_sys_include("inttypes.h");
     }
