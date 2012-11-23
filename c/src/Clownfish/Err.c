@@ -16,6 +16,10 @@
 
 #include "CFBind.h"
 
+void
+lucy_Err_init_class(void) {
+}
+
 lucy_Err*
 lucy_Err_get_error() {
     THROW(LUCY_ERR, "TODO");
@@ -24,6 +28,11 @@ lucy_Err_get_error() {
 
 void
 lucy_Err_set_error(lucy_Err *error) {
+    THROW(LUCY_ERR, "TODO");
+}
+
+void
+lucy_Err_do_throw(lucy_Err *err) {
     THROW(LUCY_ERR, "TODO");
 }
 
@@ -43,4 +52,9 @@ lucy_Err_warn_mess(lucy_CharBuf *message) {
     THROW(LUCY_ERR, "TODO");
 }
 
+lucy_Err*
+lucy_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
+    THROW(LUCY_ERR, "TODO");
+    UNREACHABLE_RETURN(lucy_Err*);
+}
 
