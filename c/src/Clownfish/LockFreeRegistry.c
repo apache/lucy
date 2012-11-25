@@ -15,13 +15,15 @@
  */
 
 #define C_LUCY_LOCKFREEREGISTRY
+#define CHY_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 
-#include "CFBind.h"
 #include "Clownfish/LockFreeRegistry.h"
+#include "Clownfish/Err.h"
 
 void*
-lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
-    THROW(LUCY_ERR, "TODO");
+LFReg_to_host(LockFreeRegistry *self) {
+    THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }
 

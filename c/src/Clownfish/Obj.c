@@ -15,30 +15,44 @@
  */
 
 #define C_LUCY_OBJ
+#define CHY_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 
-#include "CFBind.h"
-
-uint32_t
-lucy_Obj_get_refcount(lucy_Obj *self) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(uint32_t);
-}
-
-lucy_Obj*
-lucy_Obj_inc_refcount(lucy_Obj *self) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Obj*);
-}
+#include "Clownfish/Obj.h"
+#include "Clownfish/Err.h"
 
 uint32_t
-lucy_Obj_dec_refcount(lucy_Obj *self) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(uint32_t);
+Obj_get_refcount(Obj *self) {
+    return self->ref.count;
+}
+
+Obj*
+Obj_inc_refcount(Obj *self) {
+    self->ref.count++;
+    return self;
+}
+
+uint32_t
+Obj_dec_refcount(Obj *self) {
+    uint32_t modified_refcount = INT32_MAX;
+    switch (self->ref.count) {
+        case 0:
+            THROW(ERR, "Illegal refcount of 0");
+            break; // useless
+        case 1:
+            modified_refcount = 0;
+            Obj_Destroy(self);
+            break;
+        default:
+            modified_refcount = --self->ref.count;
+            break;
+    }
+    return modified_refcount;
 }
 
 void*
-lucy_Obj_to_host(lucy_Obj *self) {
-    THROW(LUCY_ERR, "TODO");
+Obj_to_host(Obj *self) {
+    THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }
 

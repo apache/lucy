@@ -40,6 +40,7 @@ extern "C" {
  */
 #define THROW                CFISH_THROW
 #define WARN                 CFISH_WARN
+#define UNUSED_VAR           CHY_UNUSED_VAR
 #define UNREACHABLE_RETURN   CHY_UNREACHABLE_RETURN
 
 #ifdef __cplusplus

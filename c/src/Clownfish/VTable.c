@@ -14,37 +14,43 @@
  * limitations under the License.
  */
 
+#define CHY_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 #define C_LUCY_OBJ
 #define C_LUCY_VTABLE
 
-#include "CFBind.h"
+#include "Clownfish/VTable.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/VArray.h"
 
-lucy_Obj*
-lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Obj*);
+Obj*
+VTable_foster_obj(VTable *self, void *host_obj) {
+    THROW(ERR, "TODO");
+    UNREACHABLE_RETURN(Obj*);
 }
 
 void
-lucy_VTable_register_with_host(lucy_VTable *singleton, lucy_VTable *parent) {
-    THROW(LUCY_ERR, "TODO");
+VTable_register_with_host(VTable *singleton, VTable *parent) {
+    UNUSED_VAR(singleton);
+    UNUSED_VAR(parent);
 }
 
-lucy_VArray*
-lucy_VTable_fresh_host_methods(const lucy_CharBuf *class_name) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_VArray*);
+VArray*
+VTable_fresh_host_methods(const CharBuf *class_name) {
+    UNUSED_VAR(class_name);
+    return VA_new(0);
 }
 
-lucy_CharBuf*
-lucy_VTable_find_parent_class(const lucy_CharBuf *class_name) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_CharBuf*);
+CharBuf*
+VTable_find_parent_class(const CharBuf *class_name) {
+    THROW(ERR, "TODO");
+    UNREACHABLE_RETURN(CharBuf*);
 }
 
 void*
-lucy_VTable_to_host(lucy_VTable *self) {
-    THROW(LUCY_ERR, "TODO");
+VTable_to_host(VTable *self) {
+    THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }
 

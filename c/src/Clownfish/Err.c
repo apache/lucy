@@ -14,47 +14,88 @@
  * limitations under the License.
  */
 
-#include "CFBind.h"
+#define CHY_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
+
+#include <setjmp.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "Clownfish/Err.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/VTable.h"
+
+/* TODO: Thread safety */
+static Err *current_error;
+static Err *thrown_error;
+static jmp_buf  *current_env;
 
 void
-lucy_Err_init_class(void) {
+Err_init_class(void) {
 }
 
-lucy_Err*
-lucy_Err_get_error() {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Err*);
-}
-
-void
-lucy_Err_set_error(lucy_Err *error) {
-    THROW(LUCY_ERR, "TODO");
+Err*
+Err_get_error() {
+    return current_error;
 }
 
 void
-lucy_Err_do_throw(lucy_Err *err) {
-    THROW(LUCY_ERR, "TODO");
+Err_set_error(Err *error) {
+    if (current_error) {
+        DECREF(current_error);
+    }
+    current_error = error;
+}
+
+void
+Err_do_throw(Err *error) {
+    if (current_env) {
+        thrown_error = error;
+        longjmp(*current_env, 1);
+    }
+    else {
+        CharBuf *message = Err_get_mess(error);
+        fprintf(stderr, "%s", CB_Get_Ptr8(message));
+        exit(EXIT_FAILURE);
+    }
 }
 
 void*
-lucy_Err_to_host(lucy_Err *self) {
-    THROW(LUCY_ERR, "TODO");
+Err_to_host(Err *self) {
+    THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }
 
 void
-lucy_Err_throw_mess(lucy_VTable *vtable, lucy_CharBuf *message) {
-    THROW(LUCY_ERR, "TODO");
+Err_throw_mess(VTable *vtable, CharBuf *message) {
+    Err_Make_t make
+        = METHOD_PTR(CERTIFY(vtable, VTABLE), Lucy_Err_Make);
+    Err *err = (Err*)CERTIFY(make(NULL), ERR);
+    Err_Cat_Mess(err, message);
+    DECREF(message);
+    Err_do_throw(err);
 }
 
 void
-lucy_Err_warn_mess(lucy_CharBuf *message) {
-    THROW(LUCY_ERR, "TODO");
+Err_warn_mess(CharBuf *message) {
+    fprintf(stderr, "%s", CB_Get_Ptr8(message));
+    DECREF(message);
 }
 
-lucy_Err*
-lucy_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Err*);
+Err*
+Err_trap(Err_Attempt_t routine, void *context) {
+    jmp_buf  env;
+    jmp_buf *prev_env = current_env;
+    current_env = &env;
+
+    if (!setjmp(env)) {
+        routine(context);
+    }
+
+    current_env = prev_env;
+
+    Err *error = thrown_error;
+    thrown_error = NULL;
+    return error;
 }
 
