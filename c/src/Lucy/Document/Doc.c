@@ -15,79 +15,113 @@
  */
 
 #define C_LUCY_DOC
+#define CHY_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 
-#include "CFBind.h"
 #include "Lucy/Document/Doc.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Hash.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 
-lucy_Doc*
-lucy_Doc_init(lucy_Doc *self, void *fields, int32_t doc_id) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Doc*);
+Doc*
+Doc_init(Doc *self, void *fields, int32_t doc_id) {
+    Hash *hash;
+
+    if (fields) {
+        hash = (Hash *)CERTIFY(fields, HASH);
+        INCREF(hash);
+    }
+    else {
+        hash = Hash_new(0);
+    }
+    self->fields = hash;
+    self->doc_id = doc_id;
+
+    return self;
 }
 
 void
-lucy_Doc_set_fields(lucy_Doc *self, void *fields) {
-    THROW(LUCY_ERR, "TODO");
+Doc_set_fields(Doc *self, void *fields) {
+    DECREF(self->fields);
+    self->fields = CERTIFY(fields, HASH);
 }
 
 uint32_t
-lucy_Doc_get_size(lucy_Doc *self) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(uint32_t);
+Doc_get_size(Doc *self) {
+    Hash *hash = (Hash *)self->fields;
+    return Hash_Get_Size(hash);
 }
 
 void
-lucy_Doc_store(lucy_Doc *self, const lucy_CharBuf *field, lucy_Obj *value) {
-    THROW(LUCY_ERR, "TODO");
+Doc_store(Doc *self, const CharBuf *field, Obj *value) {
+    Hash *hash = (Hash *)self->fields;
+    Hash_Store(hash, (Obj *)field, value);
+    INCREF(value);
 }
 
 void
-lucy_Doc_serialize(lucy_Doc *self, lucy_OutStream *outstream) {
-    THROW(LUCY_ERR, "TODO");
+Doc_serialize(Doc *self, OutStream *outstream) {
+    Hash *hash = (Hash *)self->fields;
+    Hash_Serialize(hash, outstream);
+    OutStream_Write_C32(outstream, self->doc_id);
 }
 
-lucy_Doc*
-lucy_Doc_deserialize(lucy_Doc *self, lucy_InStream *instream) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Doc*);
+Doc*
+Doc_deserialize(Doc *self, InStream *instream) {
+     Hash *hash = (Hash*)VTable_Make_Obj(HASH);
+     self->fields = Hash_Deserialize(hash, instream);
+     self->doc_id = InStream_Read_C32(instream);
+     return self;
 }
 
-lucy_Obj*
-lucy_Doc_extract(lucy_Doc *self, lucy_CharBuf *field,
-                 lucy_ViewCharBuf *target) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Obj*);
+Obj*
+Doc_extract(Doc *self, CharBuf *field,
+                 ViewCharBuf *target) {
+    Hash *hash = (Hash *)self->fields;
+    Obj  *obj  = Hash_Fetch(hash, (Obj *)field);
+
+    if (obj && Obj_Is_A(obj, CHARBUF)) {
+        ViewCB_Assign(target, (CharBuf *)obj);
+    }
+
+    return obj;
 }
 
 void*
-lucy_Doc_to_host(lucy_Doc *self) {
-    THROW(LUCY_ERR, "TODO");
+Doc_to_host(Doc *self) {
+    THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }
 
-lucy_Hash*
-lucy_Doc_dump(lucy_Doc *self) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Hash*);
+Hash*
+Doc_dump(Doc *self) {
+    THROW(ERR, "TODO");
+    UNREACHABLE_RETURN(Hash*);
 }
 
-lucy_Doc*
-lucy_Doc_load(lucy_Doc *self, lucy_Obj *dump) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_Doc*);
+Doc*
+Doc_load(Doc *self, Obj *dump) {
+    THROW(ERR, "TODO");
+    UNREACHABLE_RETURN(Doc*);
 }
 
 bool
-lucy_Doc_equals(lucy_Doc *self, lucy_Obj *other) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(bool);
+Doc_equals(Doc *self, Obj *other) {
+    Doc *twin = (Doc*)other;
+
+    if (twin == self)                    { return true;  }
+    if (!Obj_Is_A(other, DOC)) { return false; }
+
+    return Hash_Equals(self->fields, twin->fields);
 }
 
 void
-lucy_Doc_destroy(lucy_Doc *self) {
-    THROW(LUCY_ERR, "TODO");
+Doc_destroy(Doc *self) {
+    DECREF(self->fields);
+    SUPER_DESTROY(self, DOC);
 }
 
 
