@@ -114,6 +114,22 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
 
     /** Optimize the index for search-time performance.  This may take a
      * while, as it can involve rewriting large amounts of data.
+     *
+     * Every Indexer session which changes index content and ends in a
+     * Commit() creates a new segment.  Once written, segments are never
+     * modified.  However, they are periodically recycled by feeding their
+     * content into the segment currently being written.
+     *
+     * The Optimize() method causes all existing index content to be fed back
+     * into the Indexer.  When Commit() completes after an Optimize(), the
+     * index will consist of one segment.  So Optimize() must be called
+     * before Commit().  Also, optimizing a fresh index created from scratch
+     * has no effect.
+     *
+     * Historically, there was a significant search-time performance benefit
+     * to collapsing down to a single segment versus even two segments.  Now
+     * the effect of collapsing is much less significant, and calling
+     * Optimize() is rarely justified.
      */
     public void
     Optimize(Indexer *self);
