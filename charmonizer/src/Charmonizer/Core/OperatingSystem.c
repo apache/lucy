@@ -115,54 +115,41 @@ chaz_OS_remove(const char *name) {
 }
 
 int
-chaz_OS_run_local(const char *arg1, ...) {
-    va_list  args;
-    size_t   len     = strlen(chaz_OS.local_command_start) + strlen(arg1);
-    char    *command = (char*)malloc(len + 1);
-    int      retval;
-    char    *arg;
-
-    /* Append all supplied texts. */
-    sprintf(command, "%s%s", chaz_OS.local_command_start, arg1);
-    va_start(args, arg1);
-    while (NULL != (arg = va_arg(args, char*))) {
-        len += strlen(arg);
-        command = (char*)realloc(command, len + 1);
-        strcat(command, arg);
-    }
-    va_end(args);
-
-    /* Run the command. */
-    retval = system(command);
-    free(command);
+chaz_OS_run_local_redirected(const char *command, const char *path) {
+    size_t size = strlen(command) + strlen(chaz_OS.local_command_start) + 20;
+    char *local_command = (char*)malloc(size);
+    int retval;
+    sprintf(local_command, "%s%s", chaz_OS.local_command_start, command);
+    retval = chaz_OS_run_redirected(local_command, path);
+    free(local_command);
     return retval;
 }
 
 int
 chaz_OS_run_quietly(const char *command) {
+    return chaz_OS_run_redirected(command, chaz_OS.dev_null);
+}
+
+int
+chaz_OS_run_redirected(const char *command, const char *path) {
     int retval = 1;
     char *quiet_command = NULL;
-    if (chaz_OS.shell_type == CHAZ_OS_POSIX) {
+    if (chaz_OS.shell_type == CHAZ_OS_POSIX
+        || chaz_OS.shell_type == CHAZ_OS_CMD_EXE
+        ) {
         char pattern[] = "%s > %s 2>&1";
         size_t size = sizeof(pattern)
                       + strlen(command)
-                      + strlen(chaz_OS.dev_null)
+                      + strlen(path)
                       + 10;
         quiet_command = (char*)malloc(size);
-        sprintf(quiet_command, pattern, command, chaz_OS.dev_null);
-    }
-    else if (chaz_OS.shell_type == CHAZ_OS_CMD_EXE) {
-        char pattern[] = "%s > NUL 2> NUL";
-        size_t size = sizeof(pattern) + strlen(command) + 10;
-        quiet_command = (char*)malloc(size);
-        sprintf(quiet_command, pattern, command);
+        sprintf(quiet_command, pattern, command, path);
     }
     else {
         chaz_Util_die("Don't know the shell type");
     }
     retval = system(quiet_command);
     free(quiet_command);
-
     return retval;
 }
 

@@ -31,18 +31,24 @@ extern "C" {
 int
 chaz_OS_remove(const char *name);
 
-/* Concatenate all arguments in a NULL-terminated list into a single command
- * string, prepend the appropriate prefix, and invoke via system().
- */
-int
-chaz_OS_run_local(const char *arg1, ...);
-
 /* Invoke a command and attempt to suppress output from both stdout and stderr
  * (as if they had been sent to /dev/null).  If it's not possible to run the
  * command quietly, run it anyway.
  */
 int
 chaz_OS_run_quietly(const char *command);
+
+/* Capture both stdout and stderr for a command to the supplied filepath.
+ */
+int
+chaz_OS_run_redirected(const char *command, const char *path);
+
+/* Run a command beginning with the name of an executable in the current
+ * working directory and capture both stdout and stderr to the supplied
+ * filepath.
+ */
+int
+chaz_OS_run_local_redirected(const char *command, const char *path);
 
 /* Attempt to create a directory.
  */
