@@ -68,6 +68,12 @@ chaz_CC_clean_up(void);
 void
 chaz_CC_set_warnings_as_errors(const int flag);
 
+int
+chaz_CC_gcc_version_num();
+
+const char*
+chaz_CC_gcc_version();
+
 #ifdef __cplusplus
 }
 #endif

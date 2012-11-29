@@ -42,14 +42,17 @@ static struct {
     char      exe_flag[10];
     char      no_link_flag[10];
     char      error_flag[10];
+    char      gcc_version_str[30];
     int       intval___GNUC__;
+    int       intval___GNUC_MINOR__;
+    int       intval___GNUC_PATCHLEVEL__;
     int       intval__MSC_VER;
     int       intval___clang__;
     int       warnings_as_errors;
 } chaz_CC = {
     NULL, NULL, NULL, NULL,
-    "", "", "", "", "",
-    0, 0, 0, 0
+    "", "", "", "", "", "",
+    0, 0, 0, 0, 0, 0
 };
 
 void
@@ -147,6 +150,15 @@ chaz_CC_detect_macro(const char *macro) {
 static void
 chaz_CC_detect_known_compilers(void) {
     chaz_CC.intval___GNUC__  = chaz_CC_detect_macro("__GNUC__");
+    if (chaz_CC.intval___GNUC__) {
+        chaz_CC.intval___GNUC_MINOR__
+            = chaz_CC_detect_macro("__GNUC_MINOR__");
+        chaz_CC.intval___GNUC_PATCHLEVEL__
+            = chaz_CC_detect_macro("__GNUC_PATCHLEVEL__");
+        sprintf(chaz_CC.gcc_version_str, "%d.%d.%d", chaz_CC.intval___GNUC__,
+                chaz_CC.intval___GNUC_MINOR__,
+                chaz_CC.intval___GNUC_PATCHLEVEL__);
+    }
     chaz_CC.intval__MSC_VER  = chaz_CC_detect_macro("_MSC_VER");
     chaz_CC.intval___clang__ = chaz_CC_detect_macro("__clang__");
 }
@@ -305,5 +317,17 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
+}
+
+int
+chaz_CC_gcc_version_num(void) {
+    return 10000 * chaz_CC.intval___GNUC__
+           + 100 * chaz_CC.intval___GNUC_MINOR__
+           + chaz_CC.intval___GNUC_PATCHLEVEL__;
+}
+
+const char*
+chaz_CC_gcc_version(void) {
+    return chaz_CC.intval___GNUC__ ? chaz_CC.gcc_version_str : NULL;
 }
 

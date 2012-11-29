@@ -75,6 +75,18 @@ chaz_Probe_init(struct chaz_CLIArgs *args);
 void
 chaz_Probe_clean_up(void);
 
+/* Return an integer version of the GCC version number which is
+ * (10000 * __GNU_C__ + 100 * __GNUC_MINOR__ + __GNUC_PATCHLEVEL__).
+ */
+int
+chaz_Probe_gcc_version_num(void);
+
+/* If the compiler is GCC (or claims compatibility), return an X.Y.Z string
+ * version of the GCC version; otherwise, return NULL.
+ */
+const char*
+chaz_Probe_gcc_version(void);
+
 #ifdef __cplusplus
 }
 #endif
