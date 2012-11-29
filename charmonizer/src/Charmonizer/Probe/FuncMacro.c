@@ -26,9 +26,8 @@
 static int
 chaz_FuncMacro_probe_iso() {
     static const char iso_func_code[] =
-        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  #include <stdio.h>                )
         CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      Charm_Setup;                  )
         CHAZ_QUOTE(      printf("%s", __func__);       )
         CHAZ_QUOTE(      return 0;                     )
         CHAZ_QUOTE(  }                                 );
@@ -49,9 +48,8 @@ static int
 chaz_FuncMacro_probe_gnu() {
     /* Code for verifying GNU func macro. */
     static const char gnu_func_code[] =
-        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  #include <stdio.h>                )
         CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      Charm_Setup;                  )
         CHAZ_QUOTE(      printf("%s", __FUNCTION__);   )
         CHAZ_QUOTE(      return 0;                     )
         CHAZ_QUOTE(  }                                 );
@@ -72,10 +70,9 @@ chaz_FuncMacro_probe_gnu() {
 static char*
 chaz_FuncMacro_try_inline(const char *keyword, size_t *output_len) {
     static const char inline_code[] =
-        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  #include <stdio.h>                )
         CHAZ_QUOTE(  static %s int foo() { return 1; } )
         CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      Charm_Setup;                  )
         CHAZ_QUOTE(      printf("%%d", foo());         )
         CHAZ_QUOTE(      return 0;                     )
         CHAZ_QUOTE(  }                                 );

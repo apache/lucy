@@ -119,10 +119,9 @@ static const int
 chaz_LargeFiles_probe_off64(void) {
     static const char off64_code[] =
         CHAZ_QUOTE(  %s                                        )
-        CHAZ_QUOTE(  #include "_charm.h"                       )
+        CHAZ_QUOTE(  #include <stdio.h>                        )
         CHAZ_QUOTE(  int main()                                )
         CHAZ_QUOTE(  {                                         )
-        CHAZ_QUOTE(      Charm_Setup;                          )
         CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
         CHAZ_QUOTE(      return 0;                             )
         CHAZ_QUOTE(  }                                         );
@@ -166,11 +165,10 @@ static int
 chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
     static const char stdio64_code[] =
         CHAZ_QUOTE(  %s                                         )
-        CHAZ_QUOTE(  #include "_charm.h"                        )
+        CHAZ_QUOTE(  #include <stdio.h>                         )
         CHAZ_QUOTE(  int main() {                               )
         CHAZ_QUOTE(      %s pos;                                )
         CHAZ_QUOTE(      FILE *f;                               )
-        CHAZ_QUOTE(      Charm_Setup;                           )
         CHAZ_QUOTE(      f = %s("_charm_stdio64", "w");         )
         CHAZ_QUOTE(      if (f == NULL) return -1;              )
         CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));        )
@@ -235,10 +233,9 @@ static int
 chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
     static const char lseek_code[] =
         CHAZ_QUOTE( %s                                                       )
-        CHAZ_QUOTE( #include "_charm.h"                                      )
+        CHAZ_QUOTE( #include <stdio.h>                                       )
         CHAZ_QUOTE( int main() {                                             )
         CHAZ_QUOTE(     int fd;                                              )
-        CHAZ_QUOTE(     Charm_Setup;                                         )
         CHAZ_QUOTE(     fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666); )
         CHAZ_QUOTE(     if (fd == -1) { return -1; }                         )
         CHAZ_QUOTE(     %s(fd, 0, SEEK_SET);                                 )
@@ -272,11 +269,10 @@ chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo) {
      * fine as long as it compiles. */
     static const char pread64_code[] =
         CHAZ_QUOTE(  %s                                     )
-        CHAZ_QUOTE(  #include "_charm.h"                    )
+        CHAZ_QUOTE(  #include <stdio.h>                     )
         CHAZ_QUOTE(  int main() {                           )
         CHAZ_QUOTE(      int fd = 20;                       )
         CHAZ_QUOTE(      char buf[1];                       )
-        CHAZ_QUOTE(      Charm_Setup;                       )
         CHAZ_QUOTE(      printf("1");                       )
         CHAZ_QUOTE(      %s(fd, buf, 1, 1);                 )
         CHAZ_QUOTE(      return 0;                          )

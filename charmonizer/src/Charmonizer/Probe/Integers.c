@@ -29,9 +29,8 @@ static int
 chaz_Integers_machine_is_big_endian(void);
 
 static const char chaz_Integers_sizes_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main () {                             )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(char));     )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(short));    )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(int));      )
@@ -41,32 +40,29 @@ static const char chaz_Integers_sizes_code[] =
     CHAZ_QUOTE(  }                                         );
 
 static const char chaz_Integers_type64_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
 static const char chaz_Integers_literal64_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  #define big 9000000000000000000%s         )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
     CHAZ_QUOTE(      int truncated = (int)big;             )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      printf("%%d\n", truncated);           )
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
 static const char chaz_Integers_u64_to_double_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
     CHAZ_QUOTE(      unsigned __int64 int_num = 0;         )
     CHAZ_QUOTE(      double float_num;                     )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      float_num = (double)int_num;          )
     CHAZ_QUOTE(      printf("%%f\n", float_num);           )
     CHAZ_QUOTE(      return 0;                             )
@@ -367,9 +363,8 @@ chaz_Integers_run(void) {
 
             /* Buffer to hold the code, and its start and end. */
             static const char format_64_code[] =
-                CHAZ_QUOTE(  #include "_charm.h"                           )
+                CHAZ_QUOTE(  #include <stdio.h>                            )
                 CHAZ_QUOTE(  int main() {                                  )
-                CHAZ_QUOTE(      Charm_Setup;                              )
                 CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
                 CHAZ_QUOTE(      return 0;                                 )
                 CHAZ_QUOTE( }                                              );

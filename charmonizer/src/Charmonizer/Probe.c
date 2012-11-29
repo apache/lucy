@@ -24,14 +24,6 @@
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
-/* Write the "_charm.h" file used by every probe.
- */
-static void
-chaz_Probe_write_charm_h(void);
-
-static void
-chaz_Probe_remove_charm_h(void);
-
 void
 chaz_Probe_init(const char *cc_command, const char *cc_flags) {
     /* Proces CHARM_VERBOSITY environment variable. */
@@ -45,7 +37,6 @@ chaz_Probe_init(const char *cc_command, const char *cc_flags) {
     chaz_CC_init(cc_command, cc_flags);
     chaz_ConfWriter_init();
     chaz_HeadCheck_init();
-    chaz_Probe_write_charm_h();
 
     if (chaz_Util_verbosity) { printf("Initialization complete.\n"); }
 }
@@ -55,26 +46,9 @@ chaz_Probe_clean_up(void) {
     if (chaz_Util_verbosity) { printf("Cleaning up...\n"); }
 
     /* Dispatch various clean up routines. */
-    chaz_Probe_remove_charm_h();
     chaz_ConfWriter_clean_up();
     chaz_CC_clean_up();
 
     if (chaz_Util_verbosity) { printf("Cleanup complete.\n"); }
-}
-
-static void
-chaz_Probe_write_charm_h(void) {
-    static const char charm_h_code[] =
-        CHAZ_QUOTE(  #ifndef CHARM_H                                                  )
-        CHAZ_QUOTE(  #define CHARM_H 1                                                )
-        CHAZ_QUOTE(  #include <stdio.h>                                               )
-        CHAZ_QUOTE(  #define Charm_Setup freopen("_charmonizer_target", "w", stdout)  )
-        CHAZ_QUOTE(  #endif                                                           );
-    chaz_Util_write_file("_charm.h", charm_h_code);
-}
-
-static void
-chaz_Probe_remove_charm_h(void) {
-    chaz_Util_remove_and_verify("_charm.h");
 }
 

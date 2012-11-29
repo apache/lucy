@@ -320,9 +320,10 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
                                             CHAZ_CC_TRY_BASENAME, source);
     if (compile_succeeded) {
-        chaz_OS_run_local(chaz_CC.try_exe_name, NULL);
-        captured_output
-            = chaz_Util_slurp_file(CHAZ_CC_TARGET_PATH, output_len);
+        chaz_OS_run_local_redirected(chaz_CC.try_exe_name,
+                                     CHAZ_CC_TARGET_PATH);
+        captured_output = chaz_Util_slurp_file(CHAZ_CC_TARGET_PATH,
+                                               output_len);
     }
     else {
         *output_len = 0;

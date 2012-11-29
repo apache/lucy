@@ -24,21 +24,19 @@
 
 /* Code for verifying ISO-style variadic macros. */
 static const char chaz_VariadicMacros_iso_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                                   )
+    CHAZ_QUOTE(  #include <stdio.h>                                    )
     CHAZ_QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
     "                printf(fmt, __VA_ARGS__)                        \n"
     CHAZ_QUOTE(  int main() {                                          )
-    CHAZ_QUOTE(      Charm_Setup;                                      )
     CHAZ_QUOTE(      ISO_TEST("%d %d", 1, 1);                          )
     CHAZ_QUOTE(      return 0;                                         )
     CHAZ_QUOTE(  }                                                     );
 
 /* Code for verifying GNU-style variadic macros. */
 static const char chaz_VariadicMacros_gnuc_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                                   )
+    CHAZ_QUOTE(  #include <stdio.h>                                    )
     CHAZ_QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
     CHAZ_QUOTE(  int main() {                                          )
-    CHAZ_QUOTE(      Charm_Setup;                                      )
     CHAZ_QUOTE(      GNU_TEST("%d %d", 1, 1);                          )
     CHAZ_QUOTE(      return 0;                                         )
     CHAZ_QUOTE(  }                                                     );
