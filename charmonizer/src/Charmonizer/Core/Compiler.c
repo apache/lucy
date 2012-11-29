@@ -42,9 +42,9 @@ static struct {
     char      exe_flag[10];
     char      no_link_flag[10];
     char      error_flag[10];
-    int       defines___GNUC__;
-    int       defines__MSC_VER;
-    int       defines___clang__;
+    int       intval___GNUC__;
+    int       intval__MSC_VER;
+    int       intval___clang__;
     int       warnings_as_errors;
 } chaz_CC = {
     NULL, NULL, NULL, NULL,
@@ -56,7 +56,7 @@ void
 chaz_CC_set_warnings_as_errors(const int flag) {
     chaz_CC.warnings_as_errors = flag;
     if (chaz_CC.warnings_as_errors) {
-        if (chaz_CC.defines__MSC_VER)  {
+        if (chaz_CC.intval__MSC_VER)  {
             strcpy(chaz_CC.error_flag, "/WX");
         } else {
             strcpy(chaz_CC.error_flag, "-Werror");
@@ -115,30 +115,40 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     chaz_CC_detect_known_compilers();
 }
 
-static const char detect_macro_code[] =
+static const char chaz_CC_detect_macro_code[] =
+    CHAZ_QUOTE(  #include <stdio.h>             )
     CHAZ_QUOTE(  int main() {                   )
     CHAZ_QUOTE(  #ifndef %s                     )
     CHAZ_QUOTE(  #error "nope"                  )
     CHAZ_QUOTE(  #endif                         )
+    CHAZ_QUOTE(      printf("%%d", %s);         )
     CHAZ_QUOTE(      return 0;                  )
     CHAZ_QUOTE(  }                              );
 
 static int
 chaz_CC_detect_macro(const char *macro) {
-    size_t size = sizeof(detect_macro_code) + strlen(macro) + 20;
+    size_t size = sizeof(chaz_CC_detect_macro_code)
+                  + (strlen(macro) * 2)
+                  + 20;
     char *code = (char*)malloc(size);
-    int retval;
-    sprintf(code, detect_macro_code, macro);
-    retval = chaz_CC_test_compile(code);
+    int retval = 0;
+    char *output;
+    size_t len;
+    sprintf(code, chaz_CC_detect_macro_code, macro, macro);
+    output = chaz_CC_capture_output(code, &len);
+    if (output) {
+        retval = atoi(output);
+        free(output);
+    }
     free(code);
     return retval;
 }
 
 static void
 chaz_CC_detect_known_compilers(void) {
-    chaz_CC.defines___GNUC__  = chaz_CC_detect_macro("__GNUC__");
-    chaz_CC.defines__MSC_VER  = chaz_CC_detect_macro("_MSC_VER");
-    chaz_CC.defines___clang__ = chaz_CC_detect_macro("__clang__");
+    chaz_CC.intval___GNUC__  = chaz_CC_detect_macro("__GNUC__");
+    chaz_CC.intval__MSC_VER  = chaz_CC_detect_macro("_MSC_VER");
+    chaz_CC.intval___clang__ = chaz_CC_detect_macro("__clang__");
 }
 
 void
@@ -184,7 +194,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
         system(command);
     }
 
-    if (chaz_CC.defines__MSC_VER) {
+    if (chaz_CC.intval__MSC_VER) {
         /* Zap MSVC junk. */
         sprintf(junk, "%s.obj", exe_name);
         chaz_Util_remove_and_verify(junk);
