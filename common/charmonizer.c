@@ -74,12 +74,6 @@ chaz_CC_test_compile(const char *source);
 char*
 chaz_CC_capture_output(const char *source, size_t *output_len);
 
-/* Add an include directory which will be used for all future compilation
- * attempts.
- */
-void
-chaz_CC_add_inc_dir(const char *dir);
-
 /** Initialize the compiler environment.
  */
 void
@@ -315,18 +309,24 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
 int
 chaz_OS_remove(const char *name);
 
-/* Concatenate all arguments in a NULL-terminated list into a single command
- * string, prepend the appropriate prefix, and invoke via system().
- */
-int
-chaz_OS_run_local(const char *arg1, ...);
-
 /* Invoke a command and attempt to suppress output from both stdout and stderr
  * (as if they had been sent to /dev/null).  If it's not possible to run the
  * command quietly, run it anyway.
  */
 int
 chaz_OS_run_quietly(const char *command);
+
+/* Capture both stdout and stderr for a command to the supplied filepath.
+ */
+int
+chaz_OS_run_redirected(const char *command, const char *path);
+
+/* Run a command beginning with the name of an executable in the current
+ * working directory and capture both stdout and stderr to the supplied
+ * filepath.
+ */
+int
+chaz_OS_run_local_redirected(const char *command, const char *path);
 
 /* Attempt to create a directory.
  */
@@ -991,7 +991,6 @@ chaz_CC_detect_known_compilers(void);
 static struct {
     char     *cc_command;
     char     *cc_flags;
-    char    **inc_dirs;
     char     *try_exe_name;
     char     *try_obj_name;
     char      include_flag[10];
@@ -1004,7 +1003,7 @@ static struct {
     int       defines___clang__;
     int       warnings_as_errors;
 } chaz_CC = {
-    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
     "", "", "", "", "",
     0, 0, 0, 0
 };
@@ -1034,12 +1033,6 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     /* Assign. */
     chaz_CC.cc_command      = chaz_Util_strdup(compiler_command);
     chaz_CC.cc_flags        = chaz_Util_strdup(compiler_flags);
-
-    /* Init. */
-    chaz_CC.inc_dirs              = (char**)calloc(sizeof(char*), 1);
-
-    /* Add the current directory as an include dir. */
-    chaz_CC_add_inc_dir(".");
 
     /* Set names for the targets which we "try" to compile. */
     {
@@ -1106,37 +1099,10 @@ chaz_CC_detect_known_compilers(void) {
 
 void
 chaz_CC_clean_up(void) {
-    char **dirs;
-
-    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
-        free(*dirs);
-    }
-    free(chaz_CC.inc_dirs);
-
     free(chaz_CC.cc_command);
     free(chaz_CC.cc_flags);
-
     free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
-}
-
-static char*
-chaz_CC_inc_dir_string(void) {
-    size_t needed = 0;
-    char  *inc_dir_string;
-    char **dirs;
-    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
-        needed += strlen(chaz_CC.include_flag) + 2;
-        needed += strlen(*dirs);
-    }
-    inc_dir_string = (char*)malloc(needed + 1);
-    inc_dir_string[0] = '\0';
-    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
-        strcat(inc_dir_string, chaz_CC.include_flag);
-        strcat(inc_dir_string, *dirs);
-        strcat(inc_dir_string, " ");
-    }
-    return inc_dir_string;
 }
 
 int
@@ -1148,13 +1114,11 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     size_t   junk_buf_size     = exe_file_buf_size + 3;
     char    *junk              = (char*)malloc(junk_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
-    char    *inc_dir_string    = chaz_CC_inc_dir_string();
     size_t   command_max_size  = strlen(chaz_CC.cc_command)
                                  + strlen(chaz_CC.error_flag)
                                  + strlen(source_path)
                                  + strlen(chaz_CC.exe_flag)
                                  + exe_file_buf_len
-                                 + strlen(inc_dir_string)
                                  + strlen(chaz_CC.cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
@@ -1164,10 +1128,10 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s%s %s %s",
+    sprintf(command, "%s %s %s %s%s %s",
             chaz_CC.cc_command, chaz_CC.error_flag, 
             source_path, chaz_CC.exe_flag, 
-            exe_file, inc_dir_string, 
+            exe_file,
             chaz_CC.cc_flags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
@@ -1193,7 +1157,6 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     }
 
     free(command);
-    free(inc_dir_string);
     free(junk);
     free(exe_file);
     return result;
@@ -1206,14 +1169,12 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     size_t   obj_file_buf_size = strlen(obj_name) + strlen(obj_ext) + 1;
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
-    char    *inc_dir_string    = chaz_CC_inc_dir_string();
     size_t   command_max_size  = strlen(chaz_CC.cc_command)
                                  + strlen(chaz_CC.no_link_flag)
                                  + strlen(chaz_CC.error_flag)
                                  + strlen(source_path)
                                  + strlen(chaz_CC.object_flag)
                                  + obj_file_buf_len
-                                 + strlen(inc_dir_string)
                                  + strlen(chaz_CC.cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
@@ -1223,10 +1184,10 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s %s%s %s %s",
+    sprintf(command, "%s %s %s %s %s%s %s",
             chaz_CC.cc_command, chaz_CC.no_link_flag, chaz_CC.error_flag,
             source_path, chaz_CC.object_flag, 
-            obj_file, inc_dir_string,
+            obj_file,
             chaz_CC.cc_flags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
@@ -1242,7 +1203,6 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     }
 
     free(command);
-    free(inc_dir_string);
     free(obj_file);
     return result;
 }
@@ -1276,9 +1236,10 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
                                             CHAZ_CC_TRY_BASENAME, source);
     if (compile_succeeded) {
-        chaz_OS_run_local(chaz_CC.try_exe_name, NULL);
-        captured_output
-            = chaz_Util_slurp_file(CHAZ_CC_TARGET_PATH, output_len);
+        chaz_OS_run_local_redirected(chaz_CC.try_exe_name,
+                                     CHAZ_CC_TARGET_PATH);
+        captured_output = chaz_Util_slurp_file(CHAZ_CC_TARGET_PATH,
+                                               output_len);
     }
     else {
         *output_len = 0;
@@ -1290,22 +1251,6 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
-}
-
-void
-chaz_CC_add_inc_dir(const char *dir) {
-    size_t num_dirs = 0;
-    char **dirs = chaz_CC.inc_dirs;
-
-    /* Count up the present number of dirs, reallocate. */
-    while (*dirs++ != NULL) { num_dirs++; }
-    num_dirs += 1; /* Passed-in dir. */
-    chaz_CC.inc_dirs = (char**)realloc(chaz_CC.inc_dirs,
-                                       (num_dirs + 1) * sizeof(char*));
-
-    /* Put the passed-in dir at the end of the list. */
-    chaz_CC.inc_dirs[num_dirs - 1] = chaz_Util_strdup(dir);
-    chaz_CC.inc_dirs[num_dirs] = NULL;
 }
 
 
@@ -2515,54 +2460,41 @@ chaz_OS_remove(const char *name) {
 }
 
 int
-chaz_OS_run_local(const char *arg1, ...) {
-    va_list  args;
-    size_t   len     = strlen(chaz_OS.local_command_start) + strlen(arg1);
-    char    *command = (char*)malloc(len + 1);
-    int      retval;
-    char    *arg;
-
-    /* Append all supplied texts. */
-    sprintf(command, "%s%s", chaz_OS.local_command_start, arg1);
-    va_start(args, arg1);
-    while (NULL != (arg = va_arg(args, char*))) {
-        len += strlen(arg);
-        command = (char*)realloc(command, len + 1);
-        strcat(command, arg);
-    }
-    va_end(args);
-
-    /* Run the command. */
-    retval = system(command);
-    free(command);
+chaz_OS_run_local_redirected(const char *command, const char *path) {
+    size_t size = strlen(command) + strlen(chaz_OS.local_command_start) + 20;
+    char *local_command = (char*)malloc(size);
+    int retval;
+    sprintf(local_command, "%s%s", chaz_OS.local_command_start, command);
+    retval = chaz_OS_run_redirected(local_command, path);
+    free(local_command);
     return retval;
 }
 
 int
 chaz_OS_run_quietly(const char *command) {
+    return chaz_OS_run_redirected(command, chaz_OS.dev_null);
+}
+
+int
+chaz_OS_run_redirected(const char *command, const char *path) {
     int retval = 1;
     char *quiet_command = NULL;
-    if (chaz_OS.shell_type == CHAZ_OS_POSIX) {
+    if (chaz_OS.shell_type == CHAZ_OS_POSIX
+        || chaz_OS.shell_type == CHAZ_OS_CMD_EXE
+        ) {
         char pattern[] = "%s > %s 2>&1";
         size_t size = sizeof(pattern)
                       + strlen(command)
-                      + strlen(chaz_OS.dev_null)
+                      + strlen(path)
                       + 10;
         quiet_command = (char*)malloc(size);
-        sprintf(quiet_command, pattern, command, chaz_OS.dev_null);
-    }
-    else if (chaz_OS.shell_type == CHAZ_OS_CMD_EXE) {
-        char pattern[] = "%s > NUL 2> NUL";
-        size_t size = sizeof(pattern) + strlen(command) + 10;
-        quiet_command = (char*)malloc(size);
-        sprintf(quiet_command, pattern, command);
+        sprintf(quiet_command, pattern, command, path);
     }
     else {
         chaz_Util_die("Don't know the shell type");
     }
     retval = system(quiet_command);
     free(quiet_command);
-
     return retval;
 }
 
@@ -2774,14 +2706,6 @@ chaz_Util_can_open_file(const char *file_path) {
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
-/* Write the "_charm.h" file used by every probe.
- */
-static void
-chaz_Probe_write_charm_h(void);
-
-static void
-chaz_Probe_remove_charm_h(void);
-
 void
 chaz_Probe_init(const char *cc_command, const char *cc_flags) {
     /* Proces CHARM_VERBOSITY environment variable. */
@@ -2795,7 +2719,6 @@ chaz_Probe_init(const char *cc_command, const char *cc_flags) {
     chaz_CC_init(cc_command, cc_flags);
     chaz_ConfWriter_init();
     chaz_HeadCheck_init();
-    chaz_Probe_write_charm_h();
 
     if (chaz_Util_verbosity) { printf("Initialization complete.\n"); }
 }
@@ -2805,27 +2728,10 @@ chaz_Probe_clean_up(void) {
     if (chaz_Util_verbosity) { printf("Cleaning up...\n"); }
 
     /* Dispatch various clean up routines. */
-    chaz_Probe_remove_charm_h();
     chaz_ConfWriter_clean_up();
     chaz_CC_clean_up();
 
     if (chaz_Util_verbosity) { printf("Cleanup complete.\n"); }
-}
-
-static void
-chaz_Probe_write_charm_h(void) {
-    static const char charm_h_code[] =
-        CHAZ_QUOTE(  #ifndef CHARM_H                                                  )
-        CHAZ_QUOTE(  #define CHARM_H 1                                                )
-        CHAZ_QUOTE(  #include <stdio.h>                                               )
-        CHAZ_QUOTE(  #define Charm_Setup freopen("_charmonizer_target", "w", stdout)  )
-        CHAZ_QUOTE(  #endif                                                           );
-    chaz_Util_write_file("_charm.h", charm_h_code);
-}
-
-static void
-chaz_Probe_remove_charm_h(void) {
-    chaz_Util_remove_and_verify("_charm.h");
 }
 
 
@@ -3182,9 +3088,8 @@ chaz_Floats_run(void) {
 static int
 chaz_FuncMacro_probe_iso() {
     static const char iso_func_code[] =
-        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  #include <stdio.h>                )
         CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      Charm_Setup;                  )
         CHAZ_QUOTE(      printf("%s", __func__);       )
         CHAZ_QUOTE(      return 0;                     )
         CHAZ_QUOTE(  }                                 );
@@ -3205,9 +3110,8 @@ static int
 chaz_FuncMacro_probe_gnu() {
     /* Code for verifying GNU func macro. */
     static const char gnu_func_code[] =
-        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  #include <stdio.h>                )
         CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      Charm_Setup;                  )
         CHAZ_QUOTE(      printf("%s", __FUNCTION__);   )
         CHAZ_QUOTE(      return 0;                     )
         CHAZ_QUOTE(  }                                 );
@@ -3228,10 +3132,9 @@ chaz_FuncMacro_probe_gnu() {
 static char*
 chaz_FuncMacro_try_inline(const char *keyword, size_t *output_len) {
     static const char inline_code[] =
-        CHAZ_QUOTE(  #include "_charm.h"               )
+        CHAZ_QUOTE(  #include <stdio.h>                )
         CHAZ_QUOTE(  static %s int foo() { return 1; } )
         CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      Charm_Setup;                  )
         CHAZ_QUOTE(      printf("%%d", foo());         )
         CHAZ_QUOTE(      return 0;                     )
         CHAZ_QUOTE(  }                                 );
@@ -3550,9 +3453,8 @@ static int
 chaz_Integers_machine_is_big_endian(void);
 
 static const char chaz_Integers_sizes_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main () {                             )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(char));     )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(short));    )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(int));      )
@@ -3562,32 +3464,29 @@ static const char chaz_Integers_sizes_code[] =
     CHAZ_QUOTE(  }                                         );
 
 static const char chaz_Integers_type64_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
 static const char chaz_Integers_literal64_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  #define big 9000000000000000000%s         )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
     CHAZ_QUOTE(      int truncated = (int)big;             )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      printf("%%d\n", truncated);           )
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
 static const char chaz_Integers_u64_to_double_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
     CHAZ_QUOTE(      unsigned __int64 int_num = 0;         )
     CHAZ_QUOTE(      double float_num;                     )
-    CHAZ_QUOTE(      Charm_Setup;                          )
     CHAZ_QUOTE(      float_num = (double)int_num;          )
     CHAZ_QUOTE(      printf("%%f\n", float_num);           )
     CHAZ_QUOTE(      return 0;                             )
@@ -3888,9 +3787,8 @@ chaz_Integers_run(void) {
 
             /* Buffer to hold the code, and its start and end. */
             static const char format_64_code[] =
-                CHAZ_QUOTE(  #include "_charm.h"                           )
+                CHAZ_QUOTE(  #include <stdio.h>                            )
                 CHAZ_QUOTE(  int main() {                                  )
-                CHAZ_QUOTE(      Charm_Setup;                              )
                 CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
                 CHAZ_QUOTE(      return 0;                                 )
                 CHAZ_QUOTE( }                                              );
@@ -4058,10 +3956,9 @@ static const int
 chaz_LargeFiles_probe_off64(void) {
     static const char off64_code[] =
         CHAZ_QUOTE(  %s                                        )
-        CHAZ_QUOTE(  #include "_charm.h"                       )
+        CHAZ_QUOTE(  #include <stdio.h>                        )
         CHAZ_QUOTE(  int main()                                )
         CHAZ_QUOTE(  {                                         )
-        CHAZ_QUOTE(      Charm_Setup;                          )
         CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
         CHAZ_QUOTE(      return 0;                             )
         CHAZ_QUOTE(  }                                         );
@@ -4105,11 +4002,10 @@ static int
 chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
     static const char stdio64_code[] =
         CHAZ_QUOTE(  %s                                         )
-        CHAZ_QUOTE(  #include "_charm.h"                        )
+        CHAZ_QUOTE(  #include <stdio.h>                         )
         CHAZ_QUOTE(  int main() {                               )
         CHAZ_QUOTE(      %s pos;                                )
         CHAZ_QUOTE(      FILE *f;                               )
-        CHAZ_QUOTE(      Charm_Setup;                           )
         CHAZ_QUOTE(      f = %s("_charm_stdio64", "w");         )
         CHAZ_QUOTE(      if (f == NULL) return -1;              )
         CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));        )
@@ -4174,10 +4070,9 @@ static int
 chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
     static const char lseek_code[] =
         CHAZ_QUOTE( %s                                                       )
-        CHAZ_QUOTE( #include "_charm.h"                                      )
+        CHAZ_QUOTE( #include <stdio.h>                                       )
         CHAZ_QUOTE( int main() {                                             )
         CHAZ_QUOTE(     int fd;                                              )
-        CHAZ_QUOTE(     Charm_Setup;                                         )
         CHAZ_QUOTE(     fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666); )
         CHAZ_QUOTE(     if (fd == -1) { return -1; }                         )
         CHAZ_QUOTE(     %s(fd, 0, SEEK_SET);                                 )
@@ -4211,11 +4106,10 @@ chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo) {
      * fine as long as it compiles. */
     static const char pread64_code[] =
         CHAZ_QUOTE(  %s                                     )
-        CHAZ_QUOTE(  #include "_charm.h"                    )
+        CHAZ_QUOTE(  #include <stdio.h>                     )
         CHAZ_QUOTE(  int main() {                           )
         CHAZ_QUOTE(      int fd = 20;                       )
         CHAZ_QUOTE(      char buf[1];                       )
-        CHAZ_QUOTE(      Charm_Setup;                       )
         CHAZ_QUOTE(      printf("1");                       )
         CHAZ_QUOTE(      %s(fd, buf, 1, 1);                 )
         CHAZ_QUOTE(      return 0;                          )
@@ -4471,21 +4365,19 @@ chaz_UnusedVars_run(void) {
 
 /* Code for verifying ISO-style variadic macros. */
 static const char chaz_VariadicMacros_iso_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                                   )
+    CHAZ_QUOTE(  #include <stdio.h>                                    )
     CHAZ_QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
     "                printf(fmt, __VA_ARGS__)                        \n"
     CHAZ_QUOTE(  int main() {                                          )
-    CHAZ_QUOTE(      Charm_Setup;                                      )
     CHAZ_QUOTE(      ISO_TEST("%d %d", 1, 1);                          )
     CHAZ_QUOTE(      return 0;                                         )
     CHAZ_QUOTE(  }                                                     );
 
 /* Code for verifying GNU-style variadic macros. */
 static const char chaz_VariadicMacros_gnuc_code[] =
-    CHAZ_QUOTE(  #include "_charm.h"                                   )
+    CHAZ_QUOTE(  #include <stdio.h>                                    )
     CHAZ_QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
     CHAZ_QUOTE(  int main() {                                          )
-    CHAZ_QUOTE(      Charm_Setup;                                      )
     CHAZ_QUOTE(      GNU_TEST("%d %d", 1, 1);                          )
     CHAZ_QUOTE(      return 0;                                         )
     CHAZ_QUOTE(  }                                                     );
