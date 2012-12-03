@@ -87,6 +87,22 @@ sub ACTION_charmony {
     system(@command) and die "Failed to run $CHARMONIZER_EXE_PATH: $!";
 }
 
+my $config;
+
+sub charmony {
+    my ( undef, $key ) = @_;
+    if (!$config) {
+        eval { require 'Charmony.pm'; };
+        if ( !$@ ) {
+            $config = Charmony->config;
+        }
+    }
+    if ($config) {
+        return $config->{$key};
+    }
+    return;
+}
+
 sub _quotify {
     my $string = shift;
     $string =~ s/\\/\\\\/g;
