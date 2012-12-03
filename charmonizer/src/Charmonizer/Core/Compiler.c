@@ -35,7 +35,6 @@ chaz_CC_detect_known_compilers(void);
 static struct {
     char     *cc_command;
     char     *cc_flags;
-    char    **inc_dirs;
     char     *try_exe_name;
     char     *try_obj_name;
     char      include_flag[10];
@@ -48,7 +47,7 @@ static struct {
     int       defines___clang__;
     int       warnings_as_errors;
 } chaz_CC = {
-    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
     "", "", "", "", "",
     0, 0, 0, 0
 };
@@ -78,12 +77,6 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     /* Assign. */
     chaz_CC.cc_command      = chaz_Util_strdup(compiler_command);
     chaz_CC.cc_flags        = chaz_Util_strdup(compiler_flags);
-
-    /* Init. */
-    chaz_CC.inc_dirs              = (char**)calloc(sizeof(char*), 1);
-
-    /* Add the current directory as an include dir. */
-    chaz_CC_add_inc_dir(".");
 
     /* Set names for the targets which we "try" to compile. */
     {
@@ -150,37 +143,10 @@ chaz_CC_detect_known_compilers(void) {
 
 void
 chaz_CC_clean_up(void) {
-    char **dirs;
-
-    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
-        free(*dirs);
-    }
-    free(chaz_CC.inc_dirs);
-
     free(chaz_CC.cc_command);
     free(chaz_CC.cc_flags);
-
     free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
-}
-
-static char*
-chaz_CC_inc_dir_string(void) {
-    size_t needed = 0;
-    char  *inc_dir_string;
-    char **dirs;
-    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
-        needed += strlen(chaz_CC.include_flag) + 2;
-        needed += strlen(*dirs);
-    }
-    inc_dir_string = (char*)malloc(needed + 1);
-    inc_dir_string[0] = '\0';
-    for (dirs = chaz_CC.inc_dirs; *dirs != NULL; dirs++) {
-        strcat(inc_dir_string, chaz_CC.include_flag);
-        strcat(inc_dir_string, *dirs);
-        strcat(inc_dir_string, " ");
-    }
-    return inc_dir_string;
 }
 
 int
@@ -192,13 +158,11 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     size_t   junk_buf_size     = exe_file_buf_size + 3;
     char    *junk              = (char*)malloc(junk_buf_size);
     size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
-    char    *inc_dir_string    = chaz_CC_inc_dir_string();
     size_t   command_max_size  = strlen(chaz_CC.cc_command)
                                  + strlen(chaz_CC.error_flag)
                                  + strlen(source_path)
                                  + strlen(chaz_CC.exe_flag)
                                  + exe_file_buf_len
-                                 + strlen(inc_dir_string)
                                  + strlen(chaz_CC.cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
@@ -208,10 +172,10 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s%s %s %s",
+    sprintf(command, "%s %s %s %s%s %s",
             chaz_CC.cc_command, chaz_CC.error_flag, 
             source_path, chaz_CC.exe_flag, 
-            exe_file, inc_dir_string, 
+            exe_file,
             chaz_CC.cc_flags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
@@ -237,7 +201,6 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     }
 
     free(command);
-    free(inc_dir_string);
     free(junk);
     free(exe_file);
     return result;
@@ -250,14 +213,12 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     size_t   obj_file_buf_size = strlen(obj_name) + strlen(obj_ext) + 1;
     char    *obj_file          = (char*)malloc(obj_file_buf_size);
     size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
-    char    *inc_dir_string    = chaz_CC_inc_dir_string();
     size_t   command_max_size  = strlen(chaz_CC.cc_command)
                                  + strlen(chaz_CC.no_link_flag)
                                  + strlen(chaz_CC.error_flag)
                                  + strlen(source_path)
                                  + strlen(chaz_CC.object_flag)
                                  + obj_file_buf_len
-                                 + strlen(inc_dir_string)
                                  + strlen(chaz_CC.cc_flags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
@@ -267,10 +228,10 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s %s%s %s %s",
+    sprintf(command, "%s %s %s %s %s%s %s",
             chaz_CC.cc_command, chaz_CC.no_link_flag, chaz_CC.error_flag,
             source_path, chaz_CC.object_flag, 
-            obj_file, inc_dir_string,
+            obj_file,
             chaz_CC.cc_flags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
@@ -286,7 +247,6 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     }
 
     free(command);
-    free(inc_dir_string);
     free(obj_file);
     return result;
 }
@@ -335,21 +295,5 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
-}
-
-void
-chaz_CC_add_inc_dir(const char *dir) {
-    size_t num_dirs = 0;
-    char **dirs = chaz_CC.inc_dirs;
-
-    /* Count up the present number of dirs, reallocate. */
-    while (*dirs++ != NULL) { num_dirs++; }
-    num_dirs += 1; /* Passed-in dir. */
-    chaz_CC.inc_dirs = (char**)realloc(chaz_CC.inc_dirs,
-                                       (num_dirs + 1) * sizeof(char*));
-
-    /* Put the passed-in dir at the end of the list. */
-    chaz_CC.inc_dirs[num_dirs - 1] = chaz_Util_strdup(dir);
-    chaz_CC.inc_dirs[num_dirs] = NULL;
 }
 

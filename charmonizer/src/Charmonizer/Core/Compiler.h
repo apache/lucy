@@ -55,12 +55,6 @@ chaz_CC_test_compile(const char *source);
 char*
 chaz_CC_capture_output(const char *source, size_t *output_len);
 
-/* Add an include directory which will be used for all future compilation
- * attempts.
- */
-void
-chaz_CC_add_inc_dir(const char *dir);
-
 /** Initialize the compiler environment.
  */
 void
