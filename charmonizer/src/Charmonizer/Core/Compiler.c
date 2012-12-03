@@ -331,3 +331,8 @@ chaz_CC_gcc_version(void) {
     return chaz_CC.intval___GNUC__ ? chaz_CC.gcc_version_str : NULL;
 }
 
+int
+chaz_CC_compiler_is_msvc(void) {
+    return !!chaz_CC.intval__MSC_VER;
+}
+

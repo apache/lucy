@@ -74,6 +74,9 @@ chaz_CC_gcc_version_num();
 const char*
 chaz_CC_gcc_version();
 
+int
+chaz_CC_compiler_is_msvc(void);
+
 #ifdef __cplusplus
 }
 #endif
