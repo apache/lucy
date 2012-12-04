@@ -110,9 +110,6 @@ chaz_FuncMacro_probe_inline(void) {
 
 void
 chaz_FuncMacro_run(void) {
-    int i;
-    char *output;
-    size_t output_len;
     int has_funcmac      = false;
     int has_iso_funcmac  = false;
     int has_gnuc_funcmac = false;

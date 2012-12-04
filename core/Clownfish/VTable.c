@@ -199,7 +199,6 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
         if (num_fresh) {
             Hash *meths = Hash_new(num_fresh);
             CharBuf *scrunched = CB_new(0);
-            ZombieCharBuf *callback_name = ZCB_BLANK();
             for (uint32_t i = 0; i < num_fresh; i++) {
                 CharBuf *meth = (CharBuf*)VA_fetch(fresh_host_methods, i);
                 S_scrunch_charbuf(meth, scrunched);

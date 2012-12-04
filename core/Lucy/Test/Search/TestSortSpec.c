@@ -477,7 +477,6 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(bike_cb));
     VA_Push(wanted, INCREF(car_cb));
     VA_Push(wanted, INCREF(airplane_cb));
-    CharBuf *tmp = (CharBuf*)VA_Fetch(results, 0);
     TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted), "sort by one criteria");
     DECREF(results);
 

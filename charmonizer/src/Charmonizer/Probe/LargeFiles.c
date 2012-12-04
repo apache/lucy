@@ -75,7 +75,6 @@ chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo);
 void
 chaz_LargeFiles_run(void) {
     int found_off64_t = false;
-    unsigned i;
     const char *stat_includes = "#include <stdio.h>\n#include <sys/stat.h>";
 
     chaz_ConfWriter_start_module("LargeFiles");
