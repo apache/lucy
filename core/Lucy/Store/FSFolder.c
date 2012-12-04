@@ -62,6 +62,14 @@ S_create_dir(const CharBuf *path);
 static bool
 S_is_local_entry(const CharBuf *path);
 
+// Return true if the supplied path is absolute.
+static bool
+S_is_absolute(const CharBuf *path);
+
+// Transform a possibly relative path into an absolute path.
+static CharBuf*
+S_absolutify(const CharBuf *path);
+
 // Create a hard link.
 static bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path);
@@ -74,7 +82,7 @@ FSFolder_new(const CharBuf *path) {
 
 FSFolder*
 FSFolder_init(FSFolder *self, const CharBuf *path) {
-    CharBuf *abs_path = FSFolder_absolutify(path);
+    CharBuf *abs_path = S_absolutify(path);
     Folder_init((Folder*)self, abs_path);
     DECREF(abs_path);
     return self;
@@ -297,6 +305,35 @@ S_is_local_entry(const CharBuf *path) {
 #include <windows.h>
 
 static bool
+S_is_absolute(const CharBuf *path) {
+    uint32_t code_point = CharBuf_Code_Point_At(path, 0);
+
+    if (isalpha(code_point)) {
+        code_point = CharBuf_Code_Point_At(path, 1);
+        if (code_point != ':') { return false; }
+        code_point = CharBuf_Code_Point_At(path, 2);
+    }
+
+    return code_point == '\\' || code_point == '/';
+}
+
+static CharBuf*
+S_absolutify(const CharBuf *path) {
+    if (S_is_absolute(path)) { return Lucy_CB_Clone(path); }
+
+    DWORD  cwd_len = GetCurrentDirectory(0, NULL);
+    char  *cwd     = (char*)MALLOCATE(cwd_len);
+    DWORD  res     = GetCurrentDirectory(cwd_len, cwd);
+    if (res == 0 || res > cwd_len) {
+        THROW(ERR, "GetCurrentDirectory failed");
+    }
+    CharBuf *abs_path = lucy_CB_newf("%s\\%o", cwd, path);
+    FREEMEM(cwd);
+
+    return abs_path;
+}
+
+static bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path) {
     char *from8 = (char*)CB_Get_Ptr8(from_path);
     char *to8   = (char*)CB_Get_Ptr8(to_path);
@@ -314,6 +351,23 @@ S_hard_link(CharBuf *from_path, CharBuf *to_path) {
 }
 
 #elif (defined(CHY_HAS_UNISTD_H))
+
+static bool
+S_is_absolute(const CharBuf *path) {
+    return Lucy_CB_Starts_With_Str(path, DIR_SEP, 1);
+}
+
+static CharBuf*
+S_absolutify(const CharBuf *path) {
+    if (S_is_absolute(path)) { return Lucy_CB_Clone(path); }
+
+    char *cwd = getcwd(NULL, 0);
+    if (!cwd) { THROW(ERR, "getcwd failed"); }
+    CharBuf *abs_path = lucy_CB_newf("%s%s%o", cwd, DIR_SEP, path);
+    free(cwd);
+
+    return abs_path;
+}
 
 static bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path) {

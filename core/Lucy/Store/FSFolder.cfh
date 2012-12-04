@@ -77,11 +77,6 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
 
     public bool
     Hard_Link(FSFolder *self, const CharBuf *from, const CharBuf *to);
-
-    /** Transform a relative path into an abolute path.
-     */
-    inert incremented CharBuf*
-    absolutify(const CharBuf *path);
 }
 
 

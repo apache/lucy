@@ -431,14 +431,6 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Lucy::Store::FSFolder;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use File::Spec::Functions qw( rel2abs );
-    sub _absolutify {rel2abs(shift)}
-}
-
-{
     package Lucy::Store::RAMFileHandle;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
