@@ -306,12 +306,12 @@ S_is_local_entry(const CharBuf *path) {
 
 static bool
 S_is_absolute(const CharBuf *path) {
-    uint32_t code_point = CharBuf_Code_Point_At(path, 0);
+    uint32_t code_point = CB_Code_Point_At(path, 0);
 
     if (isalpha(code_point)) {
-        code_point = CharBuf_Code_Point_At(path, 1);
+        code_point = CB_Code_Point_At(path, 1);
         if (code_point != ':') { return false; }
-        code_point = CharBuf_Code_Point_At(path, 2);
+        code_point = CB_Code_Point_At(path, 2);
     }
 
     return code_point == '\\' || code_point == '/';
@@ -319,7 +319,7 @@ S_is_absolute(const CharBuf *path) {
 
 static CharBuf*
 S_absolutify(const CharBuf *path) {
-    if (S_is_absolute(path)) { return Lucy_CB_Clone(path); }
+    if (S_is_absolute(path)) { return CB_Clone(path); }
 
     DWORD  cwd_len = GetCurrentDirectory(0, NULL);
     char  *cwd     = (char*)MALLOCATE(cwd_len);
@@ -327,7 +327,7 @@ S_absolutify(const CharBuf *path) {
     if (res == 0 || res > cwd_len) {
         THROW(ERR, "GetCurrentDirectory failed");
     }
-    CharBuf *abs_path = lucy_CB_newf("%s\\%o", cwd, path);
+    CharBuf *abs_path = CB_newf("%s\\%o", cwd, path);
     FREEMEM(cwd);
 
     return abs_path;
@@ -354,16 +354,16 @@ S_hard_link(CharBuf *from_path, CharBuf *to_path) {
 
 static bool
 S_is_absolute(const CharBuf *path) {
-    return Lucy_CB_Starts_With_Str(path, DIR_SEP, 1);
+    return CB_Starts_With_Str(path, DIR_SEP, 1);
 }
 
 static CharBuf*
 S_absolutify(const CharBuf *path) {
-    if (S_is_absolute(path)) { return Lucy_CB_Clone(path); }
+    if (S_is_absolute(path)) { return CB_Clone(path); }
 
     char *cwd = getcwd(NULL, 0);
     if (!cwd) { THROW(ERR, "getcwd failed"); }
-    CharBuf *abs_path = lucy_CB_newf("%s%s%o", cwd, DIR_SEP, path);
+    CharBuf *abs_path = CB_newf("%s" DIR_SEP "%o", cwd, path);
     free(cwd);
 
     return abs_path;
