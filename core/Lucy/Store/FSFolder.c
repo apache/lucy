@@ -55,15 +55,15 @@ static bool
 S_dir_ok(const CharBuf *path);
 
 // Create a directory, or set Err_error and return false.
-bool
+static bool
 S_create_dir(const CharBuf *path);
 
 // Return true unless the supplied path contains a slash.
-bool
+static bool
 S_is_local_entry(const CharBuf *path);
 
 // Create a hard link.
-bool
+static bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path);
 
 FSFolder*
@@ -265,7 +265,7 @@ S_dir_ok(const CharBuf *path) {
     return false;
 }
 
-bool
+static bool
 S_create_dir(const CharBuf *path) {
     if (-1 == chy_makedir((char*)CB_Get_Ptr8(path), 0777)) {
         Err_set_error(Err_new(CB_newf("Couldn't create directory '%o': %s",
@@ -275,7 +275,7 @@ S_create_dir(const CharBuf *path) {
     return true;
 }
 
-bool
+static bool
 S_is_local_entry(const CharBuf *path) {
     ZombieCharBuf *scratch = ZCB_WRAP(path);
     uint32_t code_point;
@@ -296,7 +296,7 @@ S_is_local_entry(const CharBuf *path) {
 
 #include <windows.h>
 
-bool
+static bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path) {
     char *from8 = (char*)CB_Get_Ptr8(from_path);
     char *to8   = (char*)CB_Get_Ptr8(to_path);
@@ -315,7 +315,7 @@ S_hard_link(CharBuf *from_path, CharBuf *to_path) {
 
 #elif (defined(CHY_HAS_UNISTD_H))
 
-bool
+static bool
 S_hard_link(CharBuf *from_path, CharBuf *to_path) {
     char *from8 = (char*)CB_Get_Ptr8(from_path);
     char *to8   = (char*)CB_Get_Ptr8(to_path);
