@@ -110,19 +110,14 @@ S_parse_arguments(int argc, char **argv, struct CLIArgs *args) {
 }
 
 int main(int argc, char **argv) {
-    struct CLIArgs args;
-    memset(&args, 0, sizeof(struct CLIArgs));
-
-    S_parse_arguments(argc, argv, &args);
-    chaz_Probe_init(args.cc_command, args.cc_flags);
-    if (args.enable_c) {
-        chaz_ConfWriterC_enable();
-    }
-    if (args.enable_perl) {
-        chaz_ConfWriterPerl_enable();
-    }
-    if (args.enable_ruby) {
-        chaz_ConfWriterRuby_enable();
+    /* Initialize. */
+    {
+        struct chaz_CLIArgs args;
+        int result = chaz_Probe_parse_cli_args(argc, argv, &args);
+        if (!result) {
+            chaz_Probe_die_usage();
+        }
+        chaz_Probe_init(&args);
     }
 
     /* Run probe modules. */

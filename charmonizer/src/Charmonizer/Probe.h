@@ -24,8 +24,40 @@ extern "C" {
 #include <stddef.h>
 #include <stdio.h>
 
-/* Set up the Charmonizer environment.  This should be called before anything
- * else.
+#define CHAZ_PROBE_MAX_CC_LEN 100
+#define CHAZ_PROBE_MAX_FLAGS_LEN 2000
+
+struct chaz_CLIArgs {
+    char cc[CHAZ_PROBE_MAX_CC_LEN + 1];
+    char ccflags[CHAZ_PROBE_MAX_FLAGS_LEN + 1];
+    int  charmony_h;
+    int  charmony_pm;
+    int  charmony_rb;
+    int  verbosity;
+};
+
+/* Parse command line arguments, initializing and filling in the supplied
+ * `args` struct.
+ *
+ *     APP_NAME --cc=CC_COMMAND
+ *              [--enable-c]
+ *              [--enable-perl]
+ *              [--enable-ruby]
+ *              [-- [CC_FLAGS]]
+ *
+ * @return true if argument parsing proceeds without incident, false if
+ * unexpected arguments are encountered or values are missing or invalid.
+ */
+int
+chaz_Probe_parse_cli_args(int argc, const char *argv[],
+                          struct chaz_CLIArgs *args);
+
+/* Exit after printing usage instructions to stderr.
+ */
+void
+chaz_Probe_die_usage(void);
+
+/* Set up the Charmonizer environment.
  *
  * If the environment variable CHARM_VERBOSITY has been set, it will be
  * processed at this time:
@@ -33,12 +65,9 @@ extern "C" {
  *      0 - silent
  *      1 - normal
  *      2 - debugging
- *
- * @param cc_command the string used to invoke the C compiler via system()
- * @param cc_flags flags which will be passed on to the C compiler
  */
 void
-chaz_Probe_init(const char *cc_command, const char *cc_flags);
+chaz_Probe_init(struct chaz_CLIArgs *args);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
  * should be called only after everything else finishes.
