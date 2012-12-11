@@ -68,6 +68,17 @@ chaz_CC_clean_up(void);
 void
 chaz_CC_set_warnings_as_errors(const int flag);
 
+/* Concatenate onto the end of the "extra" cflags.  A space will be inserted
+ * automatically.
+ */
+void
+chaz_CC_add_extra_cflags(const char *);
+
+/* Accessor for `extra_cflags`.
+ */
+const char*
+chaz_CC_get_extra_cflags(void);
+
 int
 chaz_CC_gcc_version_num();
 

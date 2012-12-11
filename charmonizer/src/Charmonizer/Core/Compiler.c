@@ -35,6 +35,7 @@ chaz_CC_detect_known_compilers(void);
 static struct {
     char     *cc_command;
     char     *cc_flags;
+    char     *extra_cflags;
     char     *try_exe_name;
     char     *try_obj_name;
     char      include_flag[10];
@@ -77,9 +78,10 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
 
     if (chaz_Util_verbosity) { printf("Creating compiler object...\n"); }
 
-    /* Assign. */
+    /* Assign, init. */
     chaz_CC.cc_command      = chaz_Util_strdup(compiler_command);
     chaz_CC.cc_flags        = chaz_Util_strdup(compiler_flags);
+    chaz_CC.extra_cflags    = chaz_Util_strdup("");
 
     /* Set names for the targets which we "try" to compile. */
     {
@@ -167,6 +169,7 @@ void
 chaz_CC_clean_up(void) {
     free(chaz_CC.cc_command);
     free(chaz_CC.cc_flags);
+    free(chaz_CC.extra_cflags);
     free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
 }
@@ -186,6 +189,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
                                  + strlen(chaz_CC.exe_flag)
                                  + exe_file_buf_len
                                  + strlen(chaz_CC.cc_flags)
+                                 + strlen(chaz_CC.extra_cflags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
@@ -194,11 +198,11 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s%s %s",
+    sprintf(command, "%s %s %s %s%s %s %s",
             chaz_CC.cc_command, chaz_CC.error_flag, 
             source_path, chaz_CC.exe_flag, 
             exe_file,
-            chaz_CC.cc_flags);
+            chaz_CC.cc_flags, chaz_CC.extra_cflags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -242,6 +246,7 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
                                  + strlen(chaz_CC.object_flag)
                                  + obj_file_buf_len
                                  + strlen(chaz_CC.cc_flags)
+                                 + strlen(chaz_CC.extra_cflags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
@@ -250,11 +255,11 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s %s%s %s",
+    sprintf(command, "%s %s %s %s %s%s %s %s",
             chaz_CC.cc_command, chaz_CC.no_link_flag, chaz_CC.error_flag,
             source_path, chaz_CC.object_flag, 
             obj_file,
-            chaz_CC.cc_flags);
+            chaz_CC.cc_flags, chaz_CC.extra_cflags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -317,6 +322,29 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
+}
+
+void
+chaz_CC_add_extra_cflags(const char *flags) {
+    if (!strlen(chaz_CC.extra_cflags)) {
+        free(chaz_CC.extra_cflags);
+        chaz_CC.extra_cflags = chaz_Util_strdup(flags);
+    }
+    else {
+        size_t size = strlen(chaz_CC.extra_cflags)
+                      + 1   // Space separation
+                      + strlen(flags)
+                      + 1;  // NULL termination
+        char *newflags = (char*)malloc(size);
+        sprintf(newflags, "%s %s", chaz_CC.extra_cflags, flags);
+        free(chaz_CC.extra_cflags);
+        chaz_CC.extra_cflags = newflags;
+    }
+}
+
+const char*
+chaz_CC_get_extra_cflags(void) {
+    return chaz_CC.extra_cflags;
 }
 
 int
