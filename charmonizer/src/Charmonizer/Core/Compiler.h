@@ -58,7 +58,7 @@ chaz_CC_capture_output(const char *source, size_t *output_len);
 /** Initialize the compiler environment.
  */
 void
-chaz_CC_init(const char *cc_command, const char *cc_flags);
+chaz_CC_init(const char *cc_command, const char *cflags);
 
 /* Clean up the environment.
  */
@@ -73,6 +73,16 @@ chaz_CC_set_warnings_as_errors(const int flag);
  */
 void
 chaz_CC_add_extra_cflags(const char *);
+
+/* Accessor for the compiler executable's string representation.
+ */
+const char*
+chaz_CC_get_cc(void);
+
+/* Accessor for `cflags`.
+ */
+const char*
+chaz_CC_get_cflags(void);
 
 /* Accessor for `extra_cflags`.
  */

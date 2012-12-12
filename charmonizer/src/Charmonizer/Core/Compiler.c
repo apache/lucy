@@ -34,7 +34,7 @@ chaz_CC_detect_known_compilers(void);
 /* Static vars. */
 static struct {
     char     *cc_command;
-    char     *cc_flags;
+    char     *cflags;
     char     *extra_cflags;
     char     *try_exe_name;
     char     *try_obj_name;
@@ -80,7 +80,7 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
 
     /* Assign, init. */
     chaz_CC.cc_command      = chaz_Util_strdup(compiler_command);
-    chaz_CC.cc_flags        = chaz_Util_strdup(compiler_flags);
+    chaz_CC.cflags          = chaz_Util_strdup(compiler_flags);
     chaz_CC.extra_cflags    = chaz_Util_strdup("");
 
     /* Set names for the targets which we "try" to compile. */
@@ -168,7 +168,7 @@ chaz_CC_detect_known_compilers(void) {
 void
 chaz_CC_clean_up(void) {
     free(chaz_CC.cc_command);
-    free(chaz_CC.cc_flags);
+    free(chaz_CC.cflags);
     free(chaz_CC.extra_cflags);
     free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
@@ -188,7 +188,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
                                  + strlen(source_path)
                                  + strlen(chaz_CC.exe_flag)
                                  + exe_file_buf_len
-                                 + strlen(chaz_CC.cc_flags)
+                                 + strlen(chaz_CC.cflags)
                                  + strlen(chaz_CC.extra_cflags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
@@ -202,7 +202,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
             chaz_CC.cc_command, chaz_CC.error_flag, 
             source_path, chaz_CC.exe_flag, 
             exe_file,
-            chaz_CC.cc_flags, chaz_CC.extra_cflags);
+            chaz_CC.cflags, chaz_CC.extra_cflags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -245,7 +245,7 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
                                  + strlen(source_path)
                                  + strlen(chaz_CC.object_flag)
                                  + obj_file_buf_len
-                                 + strlen(chaz_CC.cc_flags)
+                                 + strlen(chaz_CC.cflags)
                                  + strlen(chaz_CC.extra_cflags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
@@ -259,7 +259,7 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
             chaz_CC.cc_command, chaz_CC.no_link_flag, chaz_CC.error_flag,
             source_path, chaz_CC.object_flag, 
             obj_file,
-            chaz_CC.cc_flags, chaz_CC.extra_cflags);
+            chaz_CC.cflags, chaz_CC.extra_cflags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -340,6 +340,16 @@ chaz_CC_add_extra_cflags(const char *flags) {
         free(chaz_CC.extra_cflags);
         chaz_CC.extra_cflags = newflags;
     }
+}
+
+const char*
+chaz_CC_get_cc(void) {
+    return chaz_CC.cc_command;
+}
+
+const char*
+chaz_CC_get_cflags(void) {
+    return chaz_CC.cflags;
 }
 
 const char*

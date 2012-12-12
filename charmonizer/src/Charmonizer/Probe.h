@@ -25,11 +25,11 @@ extern "C" {
 #include <stdio.h>
 
 #define CHAZ_PROBE_MAX_CC_LEN 100
-#define CHAZ_PROBE_MAX_FLAGS_LEN 2000
+#define CHAZ_PROBE_MAX_CFLAGS_LEN 2000
 
 struct chaz_CLIArgs {
     char cc[CHAZ_PROBE_MAX_CC_LEN + 1];
-    char ccflags[CHAZ_PROBE_MAX_FLAGS_LEN + 1];
+    char cflags[CHAZ_PROBE_MAX_CFLAGS_LEN + 1];
     int  charmony_h;
     int  charmony_pm;
     int  charmony_rb;
@@ -43,7 +43,7 @@ struct chaz_CLIArgs {
  *              [--enable-c]
  *              [--enable-perl]
  *              [--enable-ruby]
- *              [-- [CC_FLAGS]]
+ *              [-- [CFLAGS]]
  *
  * @return true if argument parsing proceeds without incident, false if
  * unexpected arguments are encountered or values are missing or invalid.

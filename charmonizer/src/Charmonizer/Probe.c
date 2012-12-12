@@ -68,13 +68,13 @@ chaz_Probe_parse_cli_args(int argc, const char *argv[],
     /* Accumulate compiler flags. */
     for (; i < argc; i++) {
         const char *arg = argv[i];
-        size_t new_len = strlen(arg) + strlen(args->ccflags) + 2;
-        if (new_len >= CHAZ_PROBE_MAX_FLAGS_LEN) {
+        size_t new_len = strlen(arg) + strlen(args->cflags) + 2;
+        if (new_len >= CHAZ_PROBE_MAX_CFLAGS_LEN) {
             fprintf(stderr, "Exceeded max length for compiler flags");
             exit(1);
         }
-        strcat(args->ccflags, " ");
-        strcat(args->ccflags, arg);
+        strcat(args->cflags, " ");
+        strcat(args->cflags, arg);
     }
 
     /* Process CHARM_VERBOSITY environment variable. */
@@ -97,7 +97,7 @@ void
 chaz_Probe_die_usage(void) {
     fprintf(stderr,
             "Usage: ./charmonize --cc=CC_COMMAND [--enable-c] "
-            "[--enable-perl] [--enable-ruby] -- CC_FLAGS\n");
+            "[--enable-perl] [--enable-ruby] -- CFLAGS\n");
     exit(1);
 }
 
@@ -115,7 +115,7 @@ chaz_Probe_init(struct chaz_CLIArgs *args) {
 
     /* Dispatch other initializers. */
     chaz_OS_init();
-    chaz_CC_init(args->cc, args->ccflags);
+    chaz_CC_init(args->cc, args->cflags);
     chaz_ConfWriter_init();
     chaz_HeadCheck_init();
 
