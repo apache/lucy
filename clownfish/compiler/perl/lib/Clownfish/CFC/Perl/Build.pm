@@ -391,11 +391,11 @@ sub ACTION_compile_custom_xs {
         push @$c_files, @{ $self->rscan_dir( $source_dir, qr/\.c$/ ) };
     }
     # Compile with -fvisibility=hidden on GCC >= 4.0
-    my $cc_flags = $self->extra_compiler_flags;
+    my $extra_cflags = $self->charmony("EXTRA_CFLAGS");
     if ( $self->config('gccversion') && $Config{dlext} ne 'dll' ) {
         my @version_nums = split( /\./, $self->config('gccversion') );
         if ( $version_nums[0] >= 4 ) {
-            $cc_flags = [ @$cc_flags, '-fvisibility=hidden' ];
+            $extra_cflags .= ' -fvisibility=hidden';
         }
     }
     for my $c_file (@$c_files) {
@@ -409,7 +409,7 @@ sub ACTION_compile_custom_xs {
         $self->add_to_cleanup($ccs_file);
         $cbuilder->compile(
             source               => $c_file,
-            extra_compiler_flags => $cc_flags,
+            extra_compiler_flags => $extra_cflags,
             include_dirs         => $self->include_dirs,
             object_file          => $o_file,
         );

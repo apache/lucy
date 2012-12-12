@@ -63,14 +63,6 @@ sub new {
         if ( $Config{osname} =~ /openbsd/i && !$Config{usethreads} ) {
             push @$extra_ccflags, '-DLUCY_NOTHREADS';
         }
-        if ( defined $ENV{LUCY_VALGRIND} ) {
-            push @$extra_ccflags, qw( -DLUCY_VALGRIND -fno-inline-functions );
-        }
-        elsif ( defined $ENV{LUCY_DEBUG} ) {
-            push @$extra_ccflags, qw(
-                -DLUCY_DEBUG -pedantic -Wall -Wextra -Wno-variadic-macros
-            );
-        }
     }
     $self->extra_compiler_flags(@$extra_ccflags);
 
