@@ -77,7 +77,7 @@ chaz_CC_capture_output(const char *source, size_t *output_len);
 /** Initialize the compiler environment.
  */
 void
-chaz_CC_init(const char *cc_command, const char *cc_flags);
+chaz_CC_init(const char *cc_command, const char *cflags);
 
 /* Clean up the environment.
  */
@@ -86,6 +86,36 @@ chaz_CC_clean_up(void);
 
 void
 chaz_CC_set_warnings_as_errors(const int flag);
+
+/* Concatenate onto the end of the "extra" cflags.  A space will be inserted
+ * automatically.
+ */
+void
+chaz_CC_add_extra_cflags(const char *);
+
+/* Accessor for the compiler executable's string representation.
+ */
+const char*
+chaz_CC_get_cc(void);
+
+/* Accessor for `cflags`.
+ */
+const char*
+chaz_CC_get_cflags(void);
+
+/* Accessor for `extra_cflags`.
+ */
+const char*
+chaz_CC_get_extra_cflags(void);
+
+int
+chaz_CC_gcc_version_num();
+
+const char*
+chaz_CC_gcc_version();
+
+int
+chaz_CC_compiler_is_msvc(void);
 
 #endif /* H_CHAZ_COMPILER */
 
@@ -433,8 +463,40 @@ chaz_Util_can_open_file(const char *file_path);
 #include <stddef.h>
 #include <stdio.h>
 
-/* Set up the Charmonizer environment.  This should be called before anything
- * else.
+#define CHAZ_PROBE_MAX_CC_LEN 100
+#define CHAZ_PROBE_MAX_CFLAGS_LEN 2000
+
+struct chaz_CLIArgs {
+    char cc[CHAZ_PROBE_MAX_CC_LEN + 1];
+    char cflags[CHAZ_PROBE_MAX_CFLAGS_LEN + 1];
+    int  charmony_h;
+    int  charmony_pm;
+    int  charmony_rb;
+    int  verbosity;
+};
+
+/* Parse command line arguments, initializing and filling in the supplied
+ * `args` struct.
+ *
+ *     APP_NAME --cc=CC_COMMAND
+ *              [--enable-c]
+ *              [--enable-perl]
+ *              [--enable-ruby]
+ *              [-- [CFLAGS]]
+ *
+ * @return true if argument parsing proceeds without incident, false if
+ * unexpected arguments are encountered or values are missing or invalid.
+ */
+int
+chaz_Probe_parse_cli_args(int argc, const char *argv[],
+                          struct chaz_CLIArgs *args);
+
+/* Exit after printing usage instructions to stderr.
+ */
+void
+chaz_Probe_die_usage(void);
+
+/* Set up the Charmonizer environment.
  *
  * If the environment variable CHARM_VERBOSITY has been set, it will be
  * processed at this time:
@@ -442,18 +504,32 @@ chaz_Util_can_open_file(const char *file_path);
  *      0 - silent
  *      1 - normal
  *      2 - debugging
- *
- * @param cc_command the string used to invoke the C compiler via system()
- * @param cc_flags flags which will be passed on to the C compiler
  */
 void
-chaz_Probe_init(const char *cc_command, const char *cc_flags);
+chaz_Probe_init(struct chaz_CLIArgs *args);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
  * should be called only after everything else finishes.
  */
 void
 chaz_Probe_clean_up(void);
+
+/* Return an integer version of the GCC version number which is
+ * (10000 * __GNU_C__ + 100 * __GNUC_MINOR__ + __GNUC_PATCHLEVEL__).
+ */
+int
+chaz_Probe_gcc_version_num(void);
+
+/* If the compiler is GCC (or claims compatibility), return an X.Y.Z string
+ * version of the GCC version; otherwise, return NULL.
+ */
+const char*
+chaz_Probe_gcc_version(void);
+
+/* Returns true if the compiler is MSVC.
+ */
+int
+chaz_Probe_compiler_is_msvc(void);
 
 #endif /* Include guard. */
 
@@ -516,6 +592,35 @@ void chaz_AtomicOps_run(void);
 void chaz_Booleans_run(void);
 
 #endif /* H_CHAZ_BOOLEANS */
+
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Probe/BuildEnv.h"
+/* Charmonizer/Probe/BuildEnv.h -- Build environment.
+ *
+ * Capture various information about the build environment, including the C
+ * compiler's interface, the shell, the operating system, etc.
+ *
+ * The following symbols will be defined:
+ *
+ * CC - String representation of the C compiler executable.
+ * CFLAGS - C compiler flags.
+ * EXTRA_CFLAGS - Extra C compiler flags.
+ */
+
+#ifndef H_CHAZ_BUILDENV
+#define H_CHAZ_BUILDENV
+
+#include <stdio.h>
+
+/* Run the BuildEnv module.
+ */
+void chaz_BuildEnv_run(void);
+
+#endif /* H_CHAZ_BUILDENV */
 
 
 
@@ -1009,7 +1114,8 @@ chaz_CC_detect_known_compilers(void);
 /* Static vars. */
 static struct {
     char     *cc_command;
-    char     *cc_flags;
+    char     *cflags;
+    char     *extra_cflags;
     char     *try_exe_name;
     char     *try_obj_name;
     char      include_flag[10];
@@ -1017,21 +1123,24 @@ static struct {
     char      exe_flag[10];
     char      no_link_flag[10];
     char      error_flag[10];
-    int       defines___GNUC__;
-    int       defines__MSC_VER;
-    int       defines___clang__;
+    char      gcc_version_str[30];
+    int       intval___GNUC__;
+    int       intval___GNUC_MINOR__;
+    int       intval___GNUC_PATCHLEVEL__;
+    int       intval__MSC_VER;
+    int       intval___clang__;
     int       warnings_as_errors;
 } chaz_CC = {
     NULL, NULL, NULL, NULL,
-    "", "", "", "", "",
-    0, 0, 0, 0
+    "", "", "", "", "", "",
+    0, 0, 0, 0, 0, 0
 };
 
 void
 chaz_CC_set_warnings_as_errors(const int flag) {
     chaz_CC.warnings_as_errors = flag;
     if (chaz_CC.warnings_as_errors) {
-        if (chaz_CC.defines__MSC_VER)  {
+        if (chaz_CC.intval__MSC_VER)  {
             strcpy(chaz_CC.error_flag, "/WX");
         } else {
             strcpy(chaz_CC.error_flag, "-Werror");
@@ -1049,9 +1158,10 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
 
     if (chaz_Util_verbosity) { printf("Creating compiler object...\n"); }
 
-    /* Assign. */
+    /* Assign, init. */
     chaz_CC.cc_command      = chaz_Util_strdup(compiler_command);
-    chaz_CC.cc_flags        = chaz_Util_strdup(compiler_flags);
+    chaz_CC.cflags          = chaz_Util_strdup(compiler_flags);
+    chaz_CC.extra_cflags    = chaz_Util_strdup("");
 
     /* Set names for the targets which we "try" to compile. */
     {
@@ -1090,36 +1200,56 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     chaz_CC_detect_known_compilers();
 }
 
-static const char detect_macro_code[] =
+static const char chaz_CC_detect_macro_code[] =
+    CHAZ_QUOTE(  #include <stdio.h>             )
     CHAZ_QUOTE(  int main() {                   )
     CHAZ_QUOTE(  #ifndef %s                     )
     CHAZ_QUOTE(  #error "nope"                  )
     CHAZ_QUOTE(  #endif                         )
+    CHAZ_QUOTE(      printf("%%d", %s);         )
     CHAZ_QUOTE(      return 0;                  )
     CHAZ_QUOTE(  }                              );
 
 static int
 chaz_CC_detect_macro(const char *macro) {
-    size_t size = sizeof(detect_macro_code) + strlen(macro) + 20;
+    size_t size = sizeof(chaz_CC_detect_macro_code)
+                  + (strlen(macro) * 2)
+                  + 20;
     char *code = (char*)malloc(size);
-    int retval;
-    sprintf(code, detect_macro_code, macro);
-    retval = chaz_CC_test_compile(code);
+    int retval = 0;
+    char *output;
+    size_t len;
+    sprintf(code, chaz_CC_detect_macro_code, macro, macro);
+    output = chaz_CC_capture_output(code, &len);
+    if (output) {
+        retval = atoi(output);
+        free(output);
+    }
     free(code);
     return retval;
 }
 
 static void
 chaz_CC_detect_known_compilers(void) {
-    chaz_CC.defines___GNUC__  = chaz_CC_detect_macro("__GNUC__");
-    chaz_CC.defines__MSC_VER  = chaz_CC_detect_macro("_MSC_VER");
-    chaz_CC.defines___clang__ = chaz_CC_detect_macro("__clang__");
+    chaz_CC.intval___GNUC__  = chaz_CC_detect_macro("__GNUC__");
+    if (chaz_CC.intval___GNUC__) {
+        chaz_CC.intval___GNUC_MINOR__
+            = chaz_CC_detect_macro("__GNUC_MINOR__");
+        chaz_CC.intval___GNUC_PATCHLEVEL__
+            = chaz_CC_detect_macro("__GNUC_PATCHLEVEL__");
+        sprintf(chaz_CC.gcc_version_str, "%d.%d.%d", chaz_CC.intval___GNUC__,
+                chaz_CC.intval___GNUC_MINOR__,
+                chaz_CC.intval___GNUC_PATCHLEVEL__);
+    }
+    chaz_CC.intval__MSC_VER  = chaz_CC_detect_macro("_MSC_VER");
+    chaz_CC.intval___clang__ = chaz_CC_detect_macro("__clang__");
 }
 
 void
 chaz_CC_clean_up(void) {
     free(chaz_CC.cc_command);
-    free(chaz_CC.cc_flags);
+    free(chaz_CC.cflags);
+    free(chaz_CC.extra_cflags);
     free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
 }
@@ -1138,7 +1268,8 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
                                  + strlen(source_path)
                                  + strlen(chaz_CC.exe_flag)
                                  + exe_file_buf_len
-                                 + strlen(chaz_CC.cc_flags)
+                                 + strlen(chaz_CC.cflags)
+                                 + strlen(chaz_CC.extra_cflags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
@@ -1147,11 +1278,11 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s%s %s",
+    sprintf(command, "%s %s %s %s%s %s %s",
             chaz_CC.cc_command, chaz_CC.error_flag, 
             source_path, chaz_CC.exe_flag, 
             exe_file,
-            chaz_CC.cc_flags);
+            chaz_CC.cflags, chaz_CC.extra_cflags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -1159,7 +1290,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
         system(command);
     }
 
-    if (chaz_CC.defines__MSC_VER) {
+    if (chaz_CC.intval__MSC_VER) {
         /* Zap MSVC junk. */
         sprintf(junk, "%s.obj", exe_name);
         chaz_Util_remove_and_verify(junk);
@@ -1194,7 +1325,8 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
                                  + strlen(source_path)
                                  + strlen(chaz_CC.object_flag)
                                  + obj_file_buf_len
-                                 + strlen(chaz_CC.cc_flags)
+                                 + strlen(chaz_CC.cflags)
+                                 + strlen(chaz_CC.extra_cflags)
                                  + 200; /* command start, _charm_run, etc.  */
     char *command = (char*)malloc(command_max_size);
     int result;
@@ -1203,11 +1335,11 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s %s%s %s",
+    sprintf(command, "%s %s %s %s %s%s %s %s",
             chaz_CC.cc_command, chaz_CC.no_link_flag, chaz_CC.error_flag,
             source_path, chaz_CC.object_flag, 
             obj_file,
-            chaz_CC.cc_flags);
+            chaz_CC.cflags, chaz_CC.extra_cflags);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -1270,6 +1402,56 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
+}
+
+void
+chaz_CC_add_extra_cflags(const char *flags) {
+    if (!strlen(chaz_CC.extra_cflags)) {
+        free(chaz_CC.extra_cflags);
+        chaz_CC.extra_cflags = chaz_Util_strdup(flags);
+    }
+    else {
+        size_t size = strlen(chaz_CC.extra_cflags)
+                      + 1   // Space separation
+                      + strlen(flags)
+                      + 1;  // NULL termination
+        char *newflags = (char*)malloc(size);
+        sprintf(newflags, "%s %s", chaz_CC.extra_cflags, flags);
+        free(chaz_CC.extra_cflags);
+        chaz_CC.extra_cflags = newflags;
+    }
+}
+
+const char*
+chaz_CC_get_cc(void) {
+    return chaz_CC.cc_command;
+}
+
+const char*
+chaz_CC_get_cflags(void) {
+    return chaz_CC.cflags;
+}
+
+const char*
+chaz_CC_get_extra_cflags(void) {
+    return chaz_CC.extra_cflags;
+}
+
+int
+chaz_CC_gcc_version_num(void) {
+    return 10000 * chaz_CC.intval___GNUC__
+           + 100 * chaz_CC.intval___GNUC_MINOR__
+           + chaz_CC.intval___GNUC_PATCHLEVEL__;
+}
+
+const char*
+chaz_CC_gcc_version(void) {
+    return chaz_CC.intval___GNUC__ ? chaz_CC.gcc_version_str : NULL;
+}
+
+int
+chaz_CC_compiler_is_msvc(void) {
+    return !!chaz_CC.intval__MSC_VER;
 }
 
 
@@ -2721,23 +2903,122 @@ chaz_Util_can_open_file(const char *file_path) {
 /* #include "Charmonizer/Probe.h" */
 /* #include "Charmonizer/Core/HeaderChecker.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/ConfWriterC.h" */
+/* #include "Charmonizer/Core/ConfWriterPerl.h" */
+/* #include "Charmonizer/Core/ConfWriterRuby.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
+int
+chaz_Probe_parse_cli_args(int argc, const char *argv[],
+                          struct chaz_CLIArgs *args) {
+    int i;
+    int output_enabled = 0;
+
+    /* Zero out args struct. */
+    memset(args, 0, sizeof(struct chaz_CLIArgs));
+
+    /* Parse most args. */
+    for (i = 1; i < argc; i++) {
+        const char *arg = argv[i];
+        if (strcmp(arg, "--") == 0) {
+            /* From here on out, everything will be a compiler flag. */
+            i++;
+            break;
+        }
+        if (strcmp(arg, "--enable-c") == 0) {
+            args->charmony_h = 1;
+            output_enabled = 1;
+        }
+        else if (strcmp(arg, "--enable-perl") == 0) {
+            args->charmony_pm = 1;
+            output_enabled = 1;
+        }
+        else if (strcmp(arg, "--enable-ruby") == 0) {
+            args->charmony_rb = 1;
+            output_enabled = 1;
+        }
+        else if (memcmp(arg, "--cc=", 5) == 0) {
+            if (strlen(arg) > CHAZ_PROBE_MAX_CC_LEN - 5) {
+                fprintf(stderr, "Exceeded max length for compiler command");
+                exit(1);
+            }
+            strcpy(args->cc, arg + 5);
+        }
+    } /* preserve value of i */
+
+    /* Accumulate compiler flags. */
+    for (; i < argc; i++) {
+        const char *arg = argv[i];
+        size_t new_len = strlen(arg) + strlen(args->cflags) + 2;
+        if (new_len >= CHAZ_PROBE_MAX_CFLAGS_LEN) {
+            fprintf(stderr, "Exceeded max length for compiler flags");
+            exit(1);
+        }
+        strcat(args->cflags, " ");
+        strcat(args->cflags, arg);
+    }
+
+    /* Process CHARM_VERBOSITY environment variable. */
+    {
+        const char *verbosity_env = getenv("CHARM_VERBOSITY");
+        if (verbosity_env && strlen(verbosity_env)) {
+            args->verbosity = strtol(verbosity_env, NULL, 10);
+        }
+    }
+
+    /* Validate. */
+    if (!strlen(args->cc) || !output_enabled) {
+        return false;
+    }
+
+    return true;
+}
+
 void
-chaz_Probe_init(const char *cc_command, const char *cc_flags) {
-    /* Proces CHARM_VERBOSITY environment variable. */
-    const char *verbosity_env = getenv("CHARM_VERBOSITY");
-    if (verbosity_env && strlen(verbosity_env)) {
-        chaz_Util_verbosity = strtol(verbosity_env, NULL, 10);
+chaz_Probe_die_usage(void) {
+    fprintf(stderr,
+            "Usage: ./charmonize --cc=CC_COMMAND [--enable-c] "
+            "[--enable-perl] [--enable-ruby] -- CFLAGS\n");
+    exit(1);
+}
+
+void
+chaz_Probe_init(struct chaz_CLIArgs *args) {
+    int output_enabled = 0;
+
+    {
+        /* Process CHARM_VERBOSITY environment variable. */
+        const char *verbosity_env = getenv("CHARM_VERBOSITY");
+        if (verbosity_env && strlen(verbosity_env)) {
+            chaz_Util_verbosity = strtol(verbosity_env, NULL, 10);
+        }
     }
 
     /* Dispatch other initializers. */
     chaz_OS_init();
-    chaz_CC_init(cc_command, cc_flags);
+    chaz_CC_init(args->cc, args->cflags);
     chaz_ConfWriter_init();
     chaz_HeadCheck_init();
+
+    /* Enable output. */
+    if (args->charmony_h) {
+        chaz_ConfWriterC_enable();
+        output_enabled = true;
+    }
+    if (args->charmony_pm) {
+        chaz_ConfWriterPerl_enable();
+        output_enabled = true;
+    }
+    if (args->charmony_rb) {
+        chaz_ConfWriterRuby_enable();
+        output_enabled = true;
+    }
+    if (!output_enabled) {
+        fprintf(stderr, "No output formats enabled\n");
+        exit(1);
+    }
 
     if (chaz_Util_verbosity) { printf("Initialization complete.\n"); }
 }
@@ -2753,6 +3034,20 @@ chaz_Probe_clean_up(void) {
     if (chaz_Util_verbosity) { printf("Cleanup complete.\n"); }
 }
 
+int
+chaz_Probe_gcc_version_num(void) {
+    return chaz_CC_gcc_version_num();
+}
+
+const char*
+chaz_Probe_gcc_version(void) {
+    return chaz_CC_gcc_version_num() ? chaz_CC_gcc_version() : NULL;
+}
+
+int
+chaz_Probe_compiler_is_msvc(void) {
+    return chaz_CC_compiler_is_msvc();
+}
 
 /***************************************************************************/
 
@@ -2839,6 +3134,26 @@ chaz_Booleans_run(void) {
             "  #endif\n"
             "#endif\n");
     }
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/BuildEnv.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Probe/BuildEnv.h" */
+
+void
+chaz_BuildEnv_run(void) {
+    chaz_ConfWriter_start_module("BuildEnv");
+
+    chaz_ConfWriter_add_def("CC", chaz_CC_get_cc());
+    chaz_ConfWriter_add_def("CFLAGS", chaz_CC_get_cflags());
+    chaz_ConfWriter_add_def("EXTRA_CFLAGS", chaz_CC_get_extra_cflags());
 
     chaz_ConfWriter_end_module();
 }
@@ -4537,6 +4852,7 @@ chaz_VariadicMacros_run(void) {
 #include <string.h>
 /* #include "Charmonizer/Probe.h" */
 /* #include "Charmonizer/Probe/AtomicOps.h" */
+/* #include "Charmonizer/Probe/BuildEnv.h" */
 /* #include "Charmonizer/Probe/DirManip.h" */
 /* #include "Charmonizer/Probe/Floats.h" */
 /* #include "Charmonizer/Probe/FuncMacro.h" */
@@ -4553,94 +4869,44 @@ chaz_VariadicMacros_run(void) {
 /* #include "Charmonizer/Core/ConfWriterPerl.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 
-#define MAX_CC_LEN 128
-#define MAX_FLAGS_LEN 2048
-
-struct CLIArgs {
-    char cc_command[MAX_CC_LEN + 1];
-    char cc_flags[MAX_FLAGS_LEN + 1];
-    int  enable_c;
-    int  enable_perl;
-    int  enable_ruby;
-};
-
-/* Parse command line arguments. */
 static void
-S_parse_arguments(int argc, char **argv, struct CLIArgs *args) {
-    int i;
-    int output_enabled = 0;
-
-    /* Parse most args. */
-    for (i = 1; i < argc; i++) {
-        char *arg = argv[i];
-        if (strcmp(arg, "--") == 0) {
-            /* From here on out, everything will be a compiler flag. */
-            i++;
-            break;
+S_add_compiler_flags(struct chaz_CLIArgs *args) {
+    if (chaz_Probe_gcc_version_num()) {
+        if (getenv("LUCY_VALGRIND")) {
+            chaz_CC_add_extra_cflags("-DLUCY_VALGRIND -fno-inline-functions");
         }
-        if (strcmp(arg, "--enable-c") == 0) {
-            args->enable_c = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-perl") == 0) {
-            args->enable_perl = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-ruby") == 0) {
-            args->enable_ruby = 1;
-            output_enabled = 1;
-        }
-        else if (memcmp(arg, "--cc=", 5) == 0) {
-            if (strlen(arg) > MAX_CC_LEN - 5) {
-                fprintf(stderr, "Exceeded max length for compiler command");
-                exit(1);
-            }
-            strcpy(args->cc_command, arg + 5);
+        else if (getenv("LUCY_DEBUG")) {
+            chaz_CC_add_extra_cflags(
+                "-DLUCY_DEBUG -pedantic -Wall -Wextra "
+                "-Wno-variadic-macros "
+            );
         }
     }
-
-    /* Accumulate compiler flags. */
-    for (; i < argc; i++) {
-        char *arg = argv[i];
-        if (strlen(arg) + strlen(args->cc_flags) + 2 >= MAX_FLAGS_LEN) {
-            fprintf(stderr, "Exceeded max length for compiler flags");
-            exit(1);
-        }
-        strcat(args->cc_flags, " ");
-        strcat(args->cc_flags, arg);
-
-    }
-
-    /* Validate. */
-    if (!args->cc_command
-        || !strlen(args->cc_command)
-        || !output_enabled
-       ) {
-        fprintf(stderr,
-                "Usage: ./charmonize --cc=CC_COMMAND [--enable-c] "
-                "[--enable-perl] [--enable-ruby] -- CC_FLAGS\n");
-        exit(1);
-    }
-
 }
 
-int main(int argc, char **argv) {
-    struct CLIArgs args;
-    memset(&args, 0, sizeof(struct CLIArgs));
-
-    S_parse_arguments(argc, argv, &args);
-    chaz_Probe_init(args.cc_command, args.cc_flags);
-    if (args.enable_c) {
-        chaz_ConfWriterC_enable();
+int main(int argc, const char **argv) {
+    /* Initialize. */
+    {
+        struct chaz_CLIArgs args;
+        int result = chaz_Probe_parse_cli_args(argc, argv, &args);
+        if (!result) {
+            chaz_Probe_die_usage();
+        }
+        chaz_Probe_init(&args);
+        S_add_compiler_flags(&args);
     }
-    if (args.enable_perl) {
-        chaz_ConfWriterPerl_enable();
-    }
-    if (args.enable_ruby) {
-        chaz_ConfWriterRuby_enable();
+    {
+        int i;
+        for (i = 0; i < argc; i++) {
+            if (strncmp(argv[i], "--disable-threads", 17) == 0) {
+                chaz_CC_add_extra_cflags("-DLUCY_NOTHREADS");
+                break;
+            }
+        }
     }
 
     /* Run probe modules. */
+    chaz_BuildEnv_run();
     chaz_DirManip_run();
     chaz_Headers_run();
     chaz_AtomicOps_run();
