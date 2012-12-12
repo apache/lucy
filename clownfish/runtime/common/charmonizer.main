@@ -39,6 +39,21 @@
 #include "Charmonizer/Core/ConfWriterPerl.h"
 #include "Charmonizer/Core/ConfWriterRuby.h"
 
+static void
+S_add_compiler_flags(struct chaz_CLIArgs *args) {
+    if (chaz_Probe_gcc_version_num()) {
+        if (getenv("LUCY_VALGRIND")) {
+            chaz_CC_add_extra_cflags("-DLUCY_VALGRIND -fno-inline-functions");
+        }
+        else if (getenv("LUCY_DEBUG")) {
+            chaz_CC_add_extra_cflags(
+                "-DLUCY_DEBUG -pedantic -Wall -Wextra "
+                "-Wno-variadic-macros "
+            );
+        }
+    }
+}
+
 int main(int argc, const char **argv) {
     /* Initialize. */
     {
@@ -48,6 +63,16 @@ int main(int argc, const char **argv) {
             chaz_Probe_die_usage();
         }
         chaz_Probe_init(&args);
+        S_add_compiler_flags(&args);
+    }
+    {
+        int i;
+        for (i = 0; i < argc; i++) {
+            if (strncmp(argv[i], "--disable-threads", 17) == 0) {
+                chaz_CC_add_extra_cflags("-DLUCY_NOTHREADS");
+                break;
+            }
+        }
     }
 
     /* Run probe modules. */
