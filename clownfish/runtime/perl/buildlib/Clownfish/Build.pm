@@ -58,14 +58,6 @@ sub new {
         $self->config( optimize => $optimize );
     }
 
-    my $extra_ccflags = $self->extra_compiler_flags;
-    if ( $self->config('gccversion') ) {
-        if ( $Config{osname} =~ /openbsd/i && !$Config{usethreads} ) {
-            push @$extra_ccflags, '-DLUCY_NOTHREADS';
-        }
-    }
-    $self->extra_compiler_flags(@$extra_ccflags);
-
     $self->charmonizer_params( charmonizer_c => $CHARMONIZER_C );
 
     $self->clownfish_params( autogen_header => $self->autogen_header );
