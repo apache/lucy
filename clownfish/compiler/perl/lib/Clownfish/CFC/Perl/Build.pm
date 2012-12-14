@@ -59,10 +59,7 @@ sub new {
     my $self = shift->SUPER::new( @_ );
 
     my $extra_ccflags = $self->extra_compiler_flags;
-    if ( $self->config('gccversion') ) {
-        push @$extra_ccflags, qw( -std=gnu99 -D_GNU_SOURCE );
-    }
-    elsif ( $self->config('cc') =~ /^cl\b/ ) {
+    if ( $self->config('cc') =~ /^cl\b/ ) {
         # Compile as C++ under MSVC.
         push @$extra_ccflags, qw(
             -TP -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS

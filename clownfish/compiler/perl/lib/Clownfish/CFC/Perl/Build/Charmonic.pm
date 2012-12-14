@@ -79,10 +79,7 @@ sub ACTION_charmony {
     if ( !$self->config('usethreads') ) {
         push @command, '--disable-threads';
     }
-    push @command,
-        '--',
-        $self->config('ccflags'),
-        map { _quotify($_) } @{ $self->extra_compiler_flags };
+    push @command, ( '--', $self->config('ccflags') );
     if ( $ENV{CHARM_VALGRIND} ) {
         unshift @command, "valgrind", "--leak-check=yes";
     }
