@@ -66,6 +66,16 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 
         /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
         chaz_CC_add_extra_cflags("-Dfor=\"if(0);else for\"");
+
+        /* When compiling for Perl bindings, define HAS_BOOL so that the Perl
+         * headers don't redefine 'bool' in conflict with C++.
+         *
+         * TODO: Compile all files that #include Perl headers separately and
+         * remove this directive.
+         */
+        if (args->charmony_pm) {
+            chaz_CC_add_extra_cflags("-DHAS_BOOL");
+        }
     }
 }
 
