@@ -434,5 +434,6 @@ S_write_parcel_c(CFCBindCore *self) {
     FREEMEM(includes);
     FREEMEM(c_data);
     FREEMEM(vt_specs);
+    FREEMEM(file_content);
 }
 
