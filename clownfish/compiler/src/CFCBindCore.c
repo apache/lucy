@@ -325,6 +325,7 @@ S_write_parcel_c(CFCBindCore *self) {
         "#define C_LUCY_VTABLE\n"
         "%s\n"
         "#include \"parcel.h\"\n"
+        "#include \"callbacks.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"
@@ -359,4 +360,77 @@ S_write_parcel_c(CFCBindCore *self) {
     FREEMEM(vt_specs);
     FREEMEM(file_content);
 }
+
+/* Write the "callbacks.h" header file, which contains declarations of host
+ * callbacks.
+ */
+void
+CFCBindCore_write_callbacks_h(CFCBindCore *self) {
+    CFCHierarchy  *hierarchy   = self->hierarchy;
+    CFCClass     **ordered     = CFCHierarchy_ordered_classes(hierarchy);
+    char          *includes    = CFCUtil_strdup("");
+    char          *all_cb_decs = CFCUtil_strdup("");
+
+    for (int i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+
+        const char *include_h = CFCClass_include_h(klass);
+        includes = CFCUtil_cat(includes, "#include \"", include_h, "\"\n",
+                               NULL);
+
+        if (!CFCClass_included(klass)) {
+            CFCBindClass *class_binding = CFCBindClass_new(klass);
+            char *cb_decs = CFCBindClass_callback_decs(class_binding);
+            all_cb_decs = CFCUtil_cat(all_cb_decs, cb_decs, NULL);
+            FREEMEM(cb_decs);
+            CFCBase_decref((CFCBase*)class_binding);
+        }
+    }
+
+    FREEMEM(ordered);
+
+    const char pattern[] =
+        "%s\n"
+        "#ifndef CFCCALLBACKS_H\n"
+        "#define CFCCALLBACKS_H 1\n"
+        "\n"
+        "#ifdef __cplusplus\n"
+        "extern \"C\" {\n"
+        "#endif\n"
+        "\n"
+        "#include \"parcel.h\"\n"
+        "%s"
+        "\n"
+        "%s"
+        "\n"
+        "#ifdef __cplusplus\n"
+        "}\n"
+        "#endif\n"
+        "\n"
+        "#endif /* CFCCALLBACKS_H */\n"
+        "\n"
+        "%s\n"
+        "\n";
+    size_t size = sizeof(pattern)
+                  + strlen(self->header)
+                  + strlen(includes)
+                  + strlen(all_cb_decs)
+                  + strlen(self->footer)
+                  + 50;
+    char *file_content = (char*)MALLOCATE(size);
+    sprintf(file_content, pattern, self->header, includes, all_cb_decs,
+            self->footer);
+
+    // Unlink then write file.
+    const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
+    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "callbacks.h", inc_dest);
+    remove(filepath);
+    CFCUtil_write_file(filepath, file_content, strlen(file_content));
+    FREEMEM(filepath);
+
+    FREEMEM(includes);
+    FREEMEM(all_cb_decs);
+    FREEMEM(file_content);
+}
+
 

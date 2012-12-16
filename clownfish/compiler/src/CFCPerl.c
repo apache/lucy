@@ -32,6 +32,7 @@
 #include "CFCPerlConstructor.h"
 #include "CFCPerlMethod.h"
 #include "CFCPerlTypeMap.h"
+#include "CFCBindCore.h"
 
 struct CFCPerl {
     CFCBase base;
@@ -52,6 +53,9 @@ struct CFCPerl {
 // Modify a string in place, swapping out "::" for the supplied character.
 static void
 S_replace_double_colons(char *text, char replacement);
+
+static void
+S_write_callbacks_c(CFCPerl *self);
 
 const static CFCMeta CFCPERL_META = {
     "Clownfish::CFC::Binding::Perl",
@@ -445,11 +449,22 @@ CFCPerl_write_bindings(CFCPerl *self) {
 
 void
 CFCPerl_write_callbacks(CFCPerl *self) {
+    CFCBindCore *core_binding
+        = CFCBindCore_new(self->hierarchy, self->header, self->footer);
+    CFCBindCore_write_callbacks_h(core_binding);
+    CFCBase_decref((CFCBase*)core_binding);
+
+    S_write_callbacks_c(self);
+}
+
+static void
+S_write_callbacks_c(CFCPerl *self) {
     CFCClass **ordered = CFCHierarchy_ordered_classes(self->hierarchy);
     static const char pattern[] =
         "%s"
         "\n"
         "#include \"XSBind.h\"\n"
+        "#include \"callbacks.h\"\n"
         "#include \"parcel.h\"\n"
         "\n"
         "static void\n"

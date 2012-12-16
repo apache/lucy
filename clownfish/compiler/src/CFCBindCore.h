@@ -57,6 +57,12 @@ CFCBindCore_destroy(CFCBindCore *self);
 int
 CFCBindCore_write_all_modified(CFCBindCore *self, int modified);
 
+/** Write the "callbacks.h" header file, which contains declarations of host
+ * callbacks.
+ */
+void
+CFCBindCore_write_callbacks_h(CFCBindCore *self);
+
 #ifdef __cplusplus
 }
 #endif

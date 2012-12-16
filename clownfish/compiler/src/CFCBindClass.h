@@ -59,6 +59,11 @@ CFCBindClass_to_c_data(CFCBindClass *self);
 char*
 CFCBindClass_spec_def(CFCBindClass *self);
 
+/* Return the declarations of the host callbacks of this class.
+ */
+char*
+CFCBindClass_callback_decs(CFCBindClass *self);
+
 #ifdef __cplusplus
 }
 #endif

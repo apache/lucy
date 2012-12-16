@@ -256,9 +256,9 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
     CFCMethod **methods  = CFCClass_methods(client);
     CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
 
-    char *offsets  = CFCUtil_strdup("");
-    char *cb_funcs = CFCUtil_strdup("");
-    char *ms_var   = CFCUtil_strdup("");
+    char *offsets     = CFCUtil_strdup("");
+    char *method_defs = CFCUtil_strdup("");
+    char *ms_var      = CFCUtil_strdup("");
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
@@ -288,15 +288,8 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
             // Create a default implementation for abstract methods.
             if (CFCMethod_abstract(method)) {
                 char *method_def = CFCBindMeth_abstract_method_def(method);
-                cb_funcs = CFCUtil_cat(cb_funcs, method_def, "\n", NULL);
+                method_defs = CFCUtil_cat(method_defs, method_def, "\n", NULL);
                 FREEMEM(method_def);
-            }
-
-            // Declare (but don't define) callback.
-            if (CFCMethod_novel(method) && !CFCMethod_final(method)) {
-                char *cb_dec = CFCBindMeth_callback_dec(method);
-                cb_funcs = CFCUtil_cat(cb_funcs, cb_dec, "\n", NULL);
-                FREEMEM(cb_dec);
             }
 
             // Define MethodSpec struct.
@@ -319,8 +312,7 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n"
-        "/* Define functions which implement host callbacks for the methods\n"
-        " * of this class which can be overridden via the host.\n"
+        "/* Define abstract methods of this class.\n"
         " */\n"
         "\n"
         "%s\n"
@@ -341,12 +333,12 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n";
-    char *code = CFCUtil_sprintf(pattern, offsets, cb_funcs, ms_var, vt_var,
+    char *code = CFCUtil_sprintf(pattern, offsets, method_defs, ms_var, vt_var,
                                  autocode);
 
     FREEMEM(fresh_methods);
     FREEMEM(offsets);
-    FREEMEM(cb_funcs);
+    FREEMEM(method_defs);
     FREEMEM(ms_var);
     return code;
 }
@@ -419,6 +411,29 @@ CFCBindClass_spec_def(CFCBindClass *self) {
 
     FREEMEM(parent_ref);
     return code;
+}
+
+// Declare host callbacks.
+char*
+CFCBindClass_callback_decs(CFCBindClass *self) {
+    CFCClass   *client        = self->client;
+    CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
+    char       *cb_decs       = CFCUtil_strdup("");
+
+    for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
+        CFCMethod *method = fresh_methods[meth_num];
+
+        // Declare callback.
+        if (CFCMethod_novel(method) && !CFCMethod_final(method)) {
+            char *cb_dec = CFCBindMeth_callback_dec(method);
+            cb_decs = CFCUtil_cat(cb_decs, cb_dec, "\n", NULL);
+            FREEMEM(cb_dec);
+        }
+    }
+
+    FREEMEM(fresh_methods);
+
+    return cb_decs;
 }
 
 // Declare typedefs for every method, to ease casting.
