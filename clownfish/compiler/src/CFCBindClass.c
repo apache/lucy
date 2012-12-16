@@ -272,7 +272,6 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         return CFCUtil_strdup(CFCClass_get_autocode(client));
     }
 
-    const char *include_h = CFCClass_include_h(client);
     const char *autocode  = CFCClass_get_autocode(client);
     const char *vt_var    = CFCClass_full_vtable_var(client);
 
@@ -341,8 +340,6 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
     }
 
     const char pattern[] =
-        "#include \"%s\"\n"
-        "\n"
         "/* Offsets for method pointers, measured in bytes, from the top\n"
         " * of this class's vtable.\n"
         " */\n"
@@ -372,7 +369,6 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "%s\n"
         "\n";
     size_t size = sizeof(pattern)
-                  + strlen(include_h)
                   + strlen(offsets)
                   + strlen(cb_funcs)
                   + strlen(ms_var)
@@ -380,8 +376,7 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                   + strlen(autocode)
                   + 100;
     char *code = (char*)MALLOCATE(size);
-    sprintf(code, pattern, include_h, offsets, cb_funcs, ms_var, vt_var,
-            autocode);
+    sprintf(code, pattern, offsets, cb_funcs, ms_var, vt_var, autocode);
 
     FREEMEM(fresh_methods);
     FREEMEM(offsets);
