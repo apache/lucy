@@ -267,6 +267,11 @@ S_write_parcel_c(CFCBindCore *self) {
     CFCClass **ordered  = CFCHierarchy_ordered_classes(hierarchy);
     for (int i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
+
+        const char *include_h = CFCClass_include_h(klass);
+        includes = CFCUtil_cat(includes, "#include \"", include_h,
+                               "\"\n", NULL);
+
         if (CFCClass_included(klass)) { continue; }
 
         CFCBindClass *class_binding = CFCBindClass_new(klass);
@@ -286,15 +291,10 @@ S_write_parcel_c(CFCBindCore *self) {
         const char *privacy_sym = CFCClass_privacy_symbol(klass);
         privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
                                    privacy_sym, "\n", NULL);
-        const char *include_h = CFCClass_include_h(klass);
-        includes = CFCUtil_cat(includes, "#include \"", include_h,
-                               "\"\n", NULL);
-        if (!CFCClass_included(klass)) {
-            if (parcel && CFCClass_get_parcel(klass) != parcel) {
-                CFCUtil_die("Multiple parcels not yet supported.");
-            }
-            parcel = CFCClass_get_parcel(klass);
+        if (parcel && CFCClass_get_parcel(klass) != parcel) {
+            CFCUtil_die("Multiple parcels not yet supported.");
         }
+        parcel = CFCClass_get_parcel(klass);
     }
     if (!parcel) {
         CFCUtil_die("No source classes found.");
