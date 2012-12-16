@@ -36,16 +36,8 @@ class Clownfish::VTable inherits Clownfish::Obj {
     inert LockFreeRegistry *registry;
     inert size_t offset_of_parent;
 
-    inert VTable*
-    allocate(VTable *parent, int flags, size_t obj_alloc_size,
-             size_t num_novel);
-
-    inert VTable*
-    init(VTable *self, const CharBuf *name);
-
     inert void
-    add_method(VTable *self, const CharBuf *name, lucy_method_t callback_func,
-               size_t offset);
+    bootstrap(cfish_VTableSpec *specs, size_t num_specs);
 
     /** Return a singleton.  If a VTable can be found in the registry based on
      * the supplied class name, it will be returned.  Otherwise, a new VTable

@@ -86,9 +86,6 @@ struct alias aliases[] = {
     {"Cfish_Hash_Store_Str", "Lucy_Hash_Store_Str"},
     {"Cfish_Hash_Store", "Lucy_Hash_Store"},
 
-    {"cfish_Method", "lucy_Method"},
-    {"CFISH_METHOD", "LUCY_METHOD"},
-
     {"cfish_VArray", "lucy_VArray"},
     {"CFISH_VARRAY", "LUCY_VARRAY"},
     {"cfish_VA_new", "lucy_VA_new"},
@@ -100,13 +97,9 @@ struct alias aliases[] = {
 
     {"cfish_VTable", "lucy_VTable"},
     {"CFISH_VTABLE", "LUCY_VTABLE"},
-    {"cfish_VTable_allocate", "lucy_VTable_allocate"},
-    {"cfish_VTable_init", "lucy_VTable_init"},
-    {"cfish_VTable_add_method", "lucy_VTable_add_method"},
-    {"cfish_VTable_add_to_registry", "lucy_VTable_add_to_registry"},
+    {"cfish_VTable_bootstrap", "lucy_VTable_bootstrap"},
     {"cfish_VTable_add_alias_to_registry", "lucy_VTable_add_alias_to_registry"},
     {"cfish_VTable_offset_of_parent", "lucy_VTable_offset_of_parent"},
-    {"cfish_VTable_override", "lucy_VTable_override"},
     {"cfish_VTable_singleton", "lucy_VTable_singleton"},
     {"Cfish_VTable_Get_Name", "Lucy_VTable_Get_Name"},
     {"Cfish_VTable_Make_Obj", "Lucy_VTable_Make_Obj"},

@@ -43,44 +43,80 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 
 LockFreeRegistry *VTable_registry = NULL;
 
-VTable*
-VTable_allocate(VTable *parent, int flags, size_t obj_alloc_size,
-                size_t num_novel) {
-    size_t vt_alloc_size = parent
-                           ? parent->vt_alloc_size
-                           : offsetof(cfish_VTable, method_ptrs);
-    vt_alloc_size += num_novel * sizeof(cfish_method_t);
-    VTable *self = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
-    self->ref.count      = 1;
-    self->parent         = parent;
-    self->flags          = flags;
-    self->obj_alloc_size = obj_alloc_size;
-    self->vt_alloc_size  = vt_alloc_size;
+void
+VTable_bootstrap(VTableSpec *specs, size_t num_specs)
+{
+    /* Pass 1:
+     * - Allocate memory.
+     * - Initialize refcount, parent, flags, obj_alloc_size, vt_alloc_size.
+     * - Initialize method pointers.
+     */
+    for (int i = 0; i < num_specs; ++i) {
+        VTableSpec *spec   = &specs[i];
+        VTable     *parent = spec->parent ? *spec->parent : NULL;
 
-    return self;
-}
+        size_t vt_alloc_size = parent
+                               ? parent->vt_alloc_size
+                               : offsetof(VTable, method_ptrs);
+        vt_alloc_size += spec->num_novel * sizeof(cfish_method_t);
+        VTable *vtable = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
 
-VTable*
-VTable_init(VTable *self, const CharBuf *name) {
-    self->vtable  = CFISH_VTABLE;
-    self->name    = CB_Clone(name);
-    self->methods = VA_new(0);
+        vtable->ref.count      = 1;
+        vtable->parent         = parent;
+        vtable->flags          = 0;
+        vtable->obj_alloc_size = spec->obj_alloc_size;
+        vtable->vt_alloc_size  = vt_alloc_size;
 
-    VTable *parent = self->parent;
-    if (parent) {
-        size_t parent_ptrs_size = parent->vt_alloc_size
-                                  - offsetof(cfish_VTable, method_ptrs);
-        memcpy(self->method_ptrs, parent->method_ptrs, parent_ptrs_size);
+        if (parent) {
+            size_t parent_ptrs_size = parent->vt_alloc_size
+                                      - offsetof(VTable, method_ptrs);
+            memcpy(vtable->method_ptrs, parent->method_ptrs, parent_ptrs_size);
+        }
+
+        for (int i = 0; i < spec->num_fresh; ++i) {
+            MethodSpec *mspec = &spec->method_specs[i];
+            VTable_override(vtable, mspec->func, *mspec->offset);
+        }
+
+        *spec->vtable = vtable;
     }
 
-    return self;
-}
+    /* Pass 2:
+     * - Initialize 'vtable' instance variable.
+     */
+    for (int i = 0; i < num_specs; ++i) {
+        VTableSpec *spec   = &specs[i];
+        VTable     *vtable = *spec->vtable;
 
-void
-VTable_add_method(VTable *self, const CharBuf *name,
-                  lucy_method_t callback_func, size_t offset) {
-    Method *method = Method_new(name, callback_func, offset);
-    VA_Push(self->methods, (Obj*)method);
+        vtable->vtable = VTABLE;
+    }
+
+    /* Now it's safe to call methods.
+     *
+     * Pass 3:
+     * - Inititalize name and method array.
+     * - Register vtable.
+     */
+    for (int i = 0; i < num_specs; ++i) {
+        VTableSpec *spec   = &specs[i];
+        VTable     *vtable = *spec->vtable;
+
+        vtable->name    = CB_newf("%s", spec->name);
+        vtable->methods = VA_new(0);
+
+        for (int i = 0; i < spec->num_fresh; ++i) {
+            MethodSpec *mspec = &spec->method_specs[i];
+            if (mspec->is_novel) {
+                CharBuf *name = CB_newf("%s", mspec->name);
+                Method *method = Method_new(name, mspec->callback_func,
+                                            *mspec->offset);
+                VA_Push(vtable->methods, (Obj*)method);
+                DECREF(name);
+            }
+        }
+
+        VTable_add_to_registry(vtable);
+    }
 }
 
 void

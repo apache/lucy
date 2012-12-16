@@ -206,10 +206,33 @@ S_write_parcel_h(CFCBindCore *self) {
         "    (cfish_method(*((cfish_VTable**)_self), _full_meth ## _OFFSET )\\\n"
         "        != (cfish_method_t)_full_func)\n"
         "\n"
+        "/* Structs for VTable initialization.\n"
+        " */\n"
+        "\n"
+        "typedef struct cfish_MethodSpec {\n"
+        "    int             is_novel;\n"
+        "    const char     *name;\n"
+        "    cfish_method_t  func;\n"
+        "    cfish_method_t  callback_func;\n"
+        "    size_t         *offset;\n"
+        "} cfish_MethodSpec;\n"
+        "\n"
+        "typedef struct cfish_VTableSpec {\n"
+        "    cfish_VTable     **vtable;\n"
+        "    cfish_VTable     **parent;\n"
+        "    const char        *name;\n"
+        "    size_t             obj_alloc_size;\n"
+        "    size_t             num_fresh;\n"
+        "    size_t             num_novel;\n"
+        "    cfish_MethodSpec  *method_specs;\n"
+        "} cfish_VTableSpec;\n"
+        "\n"
         "#ifdef CFISH_USE_SHORT_NAMES\n"
         "  #define METHOD_PTR               CFISH_METHOD_PTR\n"
         "  #define SUPER_METHOD_PTR         CFISH_SUPER_METHOD_PTR\n"
         "  #define OVERRIDDEN               CFISH_OVERRIDDEN\n"
+        "  #define MethodSpec               cfish_MethodSpec\n"
+        "  #define VTableSpec               cfish_VTableSpec\n"
         "#endif\n"
         "\n"
         "void\n"
@@ -303,28 +326,6 @@ S_write_parcel_c(CFCBindCore *self) {
     vt_specs = CFCUtil_cat(vt_specs, "\n};\n", NULL);
     FREEMEM(ordered);
 
-    const char *vt_bootstrap = "";
-    if (strcmp(prefix, "lucy_") == 0) {
-        vt_bootstrap =
-            "    /* Bootstrap VTables.\n"
-            "     */\n"
-            "    cfish_VTable_override(CFISH_OBJ, (cfish_method_t)lucy_Obj_destroy, Lucy_Obj_Destroy_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_VTABLE, (cfish_method_t)lucy_VTable_make_obj, Lucy_VTable_Make_Obj_OFFSET);\n"
-            "    CFISH_CHARBUF->vtable = CFISH_VTABLE;\n"
-            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_Obj_dec_refcount, Lucy_Obj_Dec_RefCount_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_Obj_inc_refcount, Lucy_Obj_Inc_RefCount_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_cat_trusted_str, Lucy_CB_Cat_Trusted_Str_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_clone, Lucy_CB_Clone_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_destroy, Lucy_CB_Destroy_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_grow, Lucy_CB_Grow_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_CHARBUF, (cfish_method_t)lucy_CB_vcatf, Lucy_CB_VCatF_OFFSET);\n"
-            "    CFISH_VARRAY->vtable = CFISH_VTABLE;\n"
-            "    cfish_VTable_override(CFISH_VARRAY, (cfish_method_t)lucy_VA_grow, Lucy_VA_Grow_OFFSET);\n"
-            "    cfish_VTable_override(CFISH_VARRAY, (cfish_method_t)lucy_VA_push, Lucy_VA_Push_OFFSET);\n"
-            "    CFISH_METHOD->vtable = CFISH_VTABLE;\n"
-            "\n";
-    }
-
     char pattern[] =
         "%s\n"
         "\n"
@@ -334,24 +335,6 @@ S_write_parcel_c(CFCBindCore *self) {
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"
-        "typedef struct cfish_MethodSpec {\n"
-        "    int             is_novel;\n"
-        "    const char     *name;\n"
-        "    cfish_method_t  func;\n"
-        "    cfish_method_t  callback_func;\n"
-        "    size_t         *offset;\n"
-        "} cfish_MethodSpec;\n"
-        "\n"
-        "typedef struct cfish_VTableSpec {\n"
-        "    cfish_VTable     **vtable;\n"
-        "    cfish_VTable     **parent;\n"
-        "    const char        *name;\n"
-        "    size_t             obj_alloc_size;\n"
-        "    size_t             num_fresh;\n"
-        "    size_t             num_novel;\n"
-        "    cfish_MethodSpec  *method_specs;\n"
-        "} cfish_VTableSpec;\n"
-        "\n"
         "%s\n"
         "\n"
         "/* VTableSpec structs for initialization.\n"
@@ -360,47 +343,7 @@ S_write_parcel_c(CFCBindCore *self) {
         "\n"
         "void\n"
         "%sbootstrap_parcel() {\n"
-        "    int num_vtable_specs = %d;\n"
-        "\n"
-        "    /* Allocate memory for VTables.\n"
-        "     */\n"
-        "    for (int i = 0; i < num_vtable_specs; ++i) {\n"
-        "        cfish_VTableSpec *spec = &vtable_specs[i];\n"
-        "        cfish_VTable *parent = spec->parent ? *spec->parent : NULL;\n"
-        "        *spec->vtable = cfish_VTable_allocate(parent, 0,\n"
-        "                                              spec->obj_alloc_size,\n"
-        "                                              spec->num_novel);\n"
-        "    }\n"
-        "\n"
-        "%s"
-        "    /* Initialize VTables.\n"
-        "     */\n"
-        "    for (int i = 0; i < num_vtable_specs; ++i) {\n"
-        "        cfish_VTableSpec *spec = &vtable_specs[i];\n"
-        "        cfish_CharBuf *cb = cfish_CB_newf(\"%%s\", spec->name);\n"
-        "        cfish_VTable_init(*spec->vtable, cb);\n"
-        "        CFISH_DECREF(cb);\n"
-        "        for (int i = 0; i < spec->num_fresh; ++i) {\n"
-        "            cfish_MethodSpec *mspec = &spec->method_specs[i];\n"
-        "            if (mspec->is_novel) {\n"
-        "                cb = cfish_CB_newf(\"%%s\", mspec->name);\n"
-        "                cfish_VTable_add_method(*spec->vtable, cb,\n"
-        "                                        mspec->callback_func,\n"
-        "                                        *mspec->offset);\n"
-        "                CFISH_DECREF(cb);\n"
-        "            }\n"
-        "            cfish_VTable_override(*spec->vtable, mspec->func,\n"
-        "                                  *mspec->offset);\n"
-        "        }\n"
-        "    }\n"
-        "\n"
-        "    /* Register VTables.\n"
-        "     */\n"
-        "    for (int i = 0; i < num_vtable_specs; ++i) {\n"
-        "        cfish_VTableSpec *spec = &vtable_specs[i];\n"
-        "        cfish_VTable_add_to_registry(*spec->vtable);\n"
-        "    }\n"
-        "\n"
+        "    cfish_VTable_bootstrap(vtable_specs, %d);\n"
         "    %sinit_parcel();\n"
         "}\n"
         "\n"
@@ -413,14 +356,12 @@ S_write_parcel_c(CFCBindCore *self) {
                   + strlen(vt_specs)
                   + strlen(prefix)
                   + 10 // for num_specs
-                  + strlen(vt_bootstrap)
                   + strlen(prefix)
                   + strlen(self->footer)
                   + 100;
     char *file_content = (char*)MALLOCATE(size);
     sprintf(file_content, pattern, self->header, privacy_syms, includes,
-            c_data, vt_specs, prefix, num_specs, vt_bootstrap, prefix,
-            self->footer);
+            c_data, vt_specs, prefix, num_specs, prefix, self->footer);
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
