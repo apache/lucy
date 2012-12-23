@@ -28,6 +28,11 @@ struct CFCClass;
 char*
 CFCCClass_callback_decs(struct CFCClass *klass);
 
+/** Return the man page for the class.
+ */
+char*
+CFCCClass_create_man_page(struct CFCClass *klass);
+
 #ifdef __cplusplus
 }
 #endif

@@ -113,4 +113,58 @@ CFCC_write_callbacks(CFCC *self) {
     FREEMEM(file_content);
 }
 
+void
+CFCC_write_man_pages(CFCC *self) {
+    CFCHierarchy  *hierarchy = self->hierarchy;
+    CFCClass     **ordered   = CFCHierarchy_ordered_classes(hierarchy);
+
+    size_t num_classes = 0;
+    for (size_t i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        if (!CFCClass_included(klass)) { ++num_classes; }
+    }
+    char **man_pages = (char**)CALLOCATE(num_classes, sizeof(char*));
+
+    // Generate man pages, but don't write.  That way, if there's an error
+    // while generating the pages, we leak memory but don't clutter up the file 
+    // system.
+    for (size_t i = 0, j = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        if (CFCClass_included(klass)) { continue; }
+
+        char *man_page = CFCCClass_create_man_page(klass);
+        man_pages[j++] = man_page;
+    }
+
+    const char *dest = CFCHierarchy_get_dest(hierarchy);
+    char *man3_path
+        = CFCUtil_sprintf("%s" CHY_DIR_SEP "man" CHY_DIR_SEP "man3", dest);
+    if (!CFCUtil_is_dir(man3_path)) {
+        CFCUtil_make_path(man3_path);
+        if (!CFCUtil_is_dir(man3_path)) {
+            CFCUtil_die("Can't make path %s", man3_path);
+        }
+    }
+
+    // Write out any man pages that have changed.
+    for (size_t i = 0, j = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        if (CFCClass_included(klass)) { continue; }
+
+        char *man_page = man_pages[j++];
+        if (!man_page) { continue; }
+
+        const char *class_name = CFCClass_get_class_name(klass);
+        char *filename
+            = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s.3", man3_path, class_name);
+        CFCUtil_write_if_changed(filename, man_page, strlen(man_page));
+        FREEMEM(filename);
+        FREEMEM(man_page);
+    }
+
+    FREEMEM(man3_path);
+    FREEMEM(man_pages);
+    FREEMEM(ordered);
+}
+
 

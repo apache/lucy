@@ -49,6 +49,11 @@ CFCC_destroy(CFCC *self);
 void
 CFCC_write_callbacks(CFCC *self);
 
+/** Write all man pages.
+ */
+void
+CFCC_write_man_pages(CFCC *self);
+
 #ifdef __cplusplus
 }
 #endif
