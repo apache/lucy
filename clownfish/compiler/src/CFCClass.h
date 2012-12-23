@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 typedef struct CFCClass CFCClass;
 struct CFCParcel;
 struct CFCDocuComment;
