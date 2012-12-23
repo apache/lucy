@@ -131,3 +131,8 @@ CFCFunction_micro_sym(CFCFunction *self) {
     return CFCSymbol_micro_sym((CFCSymbol*)self);
 }
 
+int
+CFCFunction_public(CFCFunction *self) {
+    return CFCSymbol_public((CFCSymbol*)self);
+}
+

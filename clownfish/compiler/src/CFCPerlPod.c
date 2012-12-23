@@ -26,7 +26,6 @@
 #include "CFCParamList.h"
 #include "CFCFunction.h"
 #include "CFCDocuComment.h"
-#include "CFCSymbol.h"
 
 #ifndef true
   #define true 1
@@ -270,7 +269,7 @@ CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, CFCFunction *func,
                               const char *code_sample,
                               const char *class_name, int is_constructor) {
     // Only allow "public" subs to be exposed as part of the public API.
-    if (!CFCSymbol_public((CFCSymbol*)func)) {
+    if (!CFCFunction_public(func)) {
         CFCUtil_die("%s#%s is not public", class_name, alias);
     }
 

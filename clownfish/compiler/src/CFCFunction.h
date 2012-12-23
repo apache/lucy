@@ -107,6 +107,9 @@ CFCFunction_short_func_sym(CFCFunction *self);
 const char*
 CFCFunction_micro_sym(CFCFunction *self);
 
+int
+CFCFunction_public(CFCFunction *self);
+
 #ifdef __cplusplus
 }
 #endif
