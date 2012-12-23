@@ -25,7 +25,6 @@
 #include "CFCMethod.h"
 #include "CFCHierarchy.h"
 #include "CFCUtil.h"
-#include "CFCBindMethod.h"
 #include "CFCPerlClass.h"
 #include "CFCPerlSub.h"
 #include "CFCPerlConstructor.h"
