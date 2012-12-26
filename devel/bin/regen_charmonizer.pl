@@ -29,7 +29,7 @@ my $MELD_EXE = catfile( $CHAZ_DIR, 'buildbin', 'meld.pl' );
 
 # Clownfish compiler.
 {
-    my $probes = "Integers,Strings";
+    my $probes = "DirManip,Headers,Integers,Strings";
     my $main   = catfile(qw( clownfish compiler common charmonizer.main ));
     my $out    = $main;
     $out =~ s/\.main/.c/ or die "no match";

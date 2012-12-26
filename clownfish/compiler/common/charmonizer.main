@@ -84,6 +84,8 @@ int main(int argc, char **argv) {
     chaz_ConfWriterC_enable();
 
     /* Run probe modules. */
+    chaz_DirManip_run();
+    chaz_Headers_run();
     chaz_Integers_run();
     chaz_Strings_run();
 
