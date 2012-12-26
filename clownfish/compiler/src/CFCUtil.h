@@ -52,6 +52,12 @@ CFCUtil_strdup(const char *string);
 char*
 CFCUtil_strndup(const char *string, size_t len);
 
+/** Return a dynamically allocated string with content defined by a printf
+ * format string and additional arguments. Similar to asprintf().
+ */
+char*
+CFCUtil_sprintf(const char *fmt, ...);
+
 /** Concatenate a NULL-terminated list of strings onto the first, reallocating
  * with each argument.
  */

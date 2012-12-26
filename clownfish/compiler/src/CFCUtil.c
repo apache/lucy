@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -51,6 +53,50 @@ CFCUtil_strndup(const char *string, size_t len) {
     copy[len] = '\0';
     return copy;
 }
+
+#if defined(CHY_HAS_C99_SNPRINTF) || defined(CHY_HAS__SCPRINTF)
+
+char*
+CFCUtil_sprintf(const char *fmt, ...) {
+    va_list args;
+
+    va_start(args, fmt);
+#if defined(CHY_HAS_C99_SNPRINTF)
+    int size = vsnprintf(NULL, 0, fmt, args);
+    if (size < 0) { CFCUtil_die("snprintf failed"); }
+#else
+    int size = _vscprintf(fmt, args);
+    if (size < 0) { CFCUtil_die("_scprintf failed"); }
+#endif
+    va_end(args);
+
+    char *string = (char*)MALLOCATE((size_t)size + 1);
+    va_start(args, fmt);
+    vsprintf(string, fmt, args);
+    va_end(args);
+
+    return string;
+}
+
+#elif defined(CHY_HAS__SNPRINTF)
+
+char*
+CFCUtil_sprintf(const char *fmt, ...) {
+    for (size_t size = 32; size * 2 > size; size *= 2) {
+        char *string = (char*)MALLOCATE(size);
+        va_list args;
+        va_start(args, fmt);
+        int result = _vsnprintf(string, size, fmt, args);
+        va_end(args);
+        if (result >= 0 && (size_t)result < size) { return string; }
+    }
+    CFCUtil_die("_snprintf failed");
+    return NULL;
+}
+
+#else
+  #error "snprintf or replacement not available."
+#endif
 
 char*
 CFCUtil_cat(char *string, ...) {
