@@ -461,6 +461,133 @@ chaz_Probe_clean_up(void);
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Probe/DirManip.h"
+/* Charmonizer/Probe/DirManip.h
+ */
+
+#ifndef H_CHAZ_DIRMANIP
+#define H_CHAZ_DIRMANIP
+
+/* The DirManip module exports or aliases symbols related to directory and file
+ * manipulation.
+ *
+ * Defined if the header files dirent.h and direct.h are available, respectively:
+ *
+ * HAS_DIRENT_H
+ * HAS_DIRECT_H
+ *
+ * Defined if struct dirent has these members.
+ *
+ * HAS_DIRENT_D_NAMLEN
+ * HAS_DIRENT_D_TYPE
+ *
+ * The "makedir" macro will be aliased to the POSIX-specified two-argument
+ * "mkdir" interface:
+ *
+ * makedir
+ *
+ * On some systems, the second argument to makedir will be ignored, in which
+ * case this symbol will be true; otherwise, it will be false: (TODO: This
+ * isn't verified and may sometimes be incorrect.)
+ *
+ * MAKEDIR_MODE_IGNORED
+ *
+ * String representing the system's directory separator:
+ *
+ * DIR_SEP
+ *
+ * True if the remove() function removes directories, false otherwise:
+ *
+ * REMOVE_ZAPS_DIRS
+ */
+void chaz_DirManip_run(void);
+
+#endif /* H_CHAZ_DIR_SEP */
+
+
+
+
+/***************************************************************************/
+
+#line 20 "src/Charmonizer/Probe/Headers.h"
+/* Charmonizer/Probe/Headers.h
+ */
+
+#ifndef H_CHAZ_HEADERS
+#define H_CHAZ_HEADERS
+
+#include <stdio.h>
+/* #include "Charmonizer/Core/Defines.h" */
+
+/* Check whether a particular header file is available.  The test-compile is
+ * only run the first time a given request is made.
+ */
+int
+chaz_Headers_check(const char *header_name);
+
+/* Run the Headers module.
+ *
+ * Exported symbols:
+ *
+ * If HAS_C89 is declared, this system has all the header files described in
+ * Ansi C 1989.  HAS_C90 is a synonym.  (It would be surprising if they are
+ * not defined, because Charmonizer itself assumes C89.)
+ *
+ * HAS_C89
+ * HAS_C90
+ *
+ * One symbol is exported for each C89 header file:
+ *
+ * HAS_ASSERT_H
+ * HAS_CTYPE_H
+ * HAS_ERRNO_H
+ * HAS_FLOAT_H
+ * HAS_LIMITS_H
+ * HAS_LOCALE_H
+ * HAS_MATH_H
+ * HAS_SETJMP_H
+ * HAS_SIGNAL_H
+ * HAS_STDARG_H
+ * HAS_STDDEF_H
+ * HAS_STDIO_H
+ * HAS_STDLIB_H
+ * HAS_STRING_H
+ * HAS_TIME_H
+ *
+ * One symbol is exported for every POSIX header present, and HAS_POSIX is
+ * exported if they're all there.
+ *
+ * HAS_POSIX
+ *
+ * HAS_CPIO_H
+ * HAS_DIRENT_H
+ * HAS_FCNTL_H
+ * HAS_GRP_H
+ * HAS_PWD_H
+ * HAS_SYS_STAT_H
+ * HAS_SYS_TIMES_H
+ * HAS_SYS_TYPES_H
+ * HAS_SYS_UTSNAME_H
+ * HAS_WAIT_H
+ * HAS_TAR_H
+ * HAS_TERMIOS_H
+ * HAS_UNISTD_H
+ * HAS_UTIME_H
+ *
+ * If pthread.h is available, this will be exported:
+ *
+ * HAS_PTHREAD_H
+ */
+void
+chaz_Headers_run(void);
+
+#endif /* H_CHAZ_HEADERS */
+
+
+
+
+/***************************************************************************/
+
 #line 21 "src/Charmonizer/Probe/Integers.h"
 /* Charmonizer/Probe/Integers.h -- info about integer types and sizes.
  *
@@ -2347,6 +2474,436 @@ chaz_Probe_clean_up(void) {
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Probe/DirManip.c"
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
+/* #include "Charmonizer/Core/OperatingSystem.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Probe/DirManip.h" */
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+static struct {
+    int  mkdir_num_args;
+    char mkdir_command[7];
+} chaz_DirManip = { 0, "" };
+
+/* Source code for rmdir. */
+static int
+chaz_DirManip_compile_posix_mkdir(const char *header) {
+    static const char posix_mkdir_code[] =
+        CHAZ_QUOTE(  #include <%s>                                      )
+        CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
+        CHAZ_QUOTE(      if (argc != 2) { return 1; }                   )
+        CHAZ_QUOTE(      if (mkdir(argv[1], 0777) != 0) { return 2; }   )
+        CHAZ_QUOTE(      return 0;                                      )
+        CHAZ_QUOTE(  }                                                  );
+    char code_buf[sizeof(posix_mkdir_code) + 30];
+    int mkdir_available;
+    if (strlen(header) > 25) {
+        chaz_Util_die("Header name too long: '%s'", header);
+    }
+
+    /* Attempt compilation. */
+    sprintf(code_buf, posix_mkdir_code, header);
+    mkdir_available = chaz_CC_test_compile(code_buf);
+
+    /* Set vars on success. */
+    if (mkdir_available) {
+        strcpy(chaz_DirManip.mkdir_command, "mkdir");
+        if (strcmp(header, "direct.h") == 0) {
+            chaz_DirManip.mkdir_num_args = 1;
+        }
+        else {
+            chaz_DirManip.mkdir_num_args = 2;
+        }
+    }
+
+    return mkdir_available;
+}
+
+static int
+chaz_DirManip_compile_win_mkdir(void) {
+    static const char win_mkdir_code[] =
+        CHAZ_QUOTE(  #include <direct.h>                                )
+        CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
+        CHAZ_QUOTE(      if (argc != 2) { return 1; }                   )
+        CHAZ_QUOTE(      if (_mkdir(argv[1]) != 0) { return 2; }        )
+        CHAZ_QUOTE(      return 0;                                      )
+        CHAZ_QUOTE(  }                                                  );
+    int mkdir_available;
+
+    mkdir_available = chaz_CC_test_compile(win_mkdir_code);
+    if (mkdir_available) {
+        strcpy(chaz_DirManip.mkdir_command, "_mkdir");
+        chaz_DirManip.mkdir_num_args = 1;
+    }
+    return mkdir_available;
+}
+
+static void
+chaz_DirManip_try_mkdir(void) {
+    if (chaz_HeadCheck_check_header("windows.h")) {
+        if (chaz_DirManip_compile_win_mkdir())               { return; }
+        if (chaz_DirManip_compile_posix_mkdir("direct.h"))   { return; }
+    }
+    if (chaz_DirManip_compile_posix_mkdir("sys/stat.h")) { return; }
+}
+
+static int
+chaz_DirManip_compile_rmdir(const char *header) {
+    static const char rmdir_code[] =
+        CHAZ_QUOTE(  #include <%s>                                      )
+        CHAZ_QUOTE(  int main(int argc, char **argv) {                  )
+        CHAZ_QUOTE(      if (argc != 2) { return 1; }                   )
+        CHAZ_QUOTE(      if (rmdir(argv[1]) != 0) { return 2; }         )
+        CHAZ_QUOTE(      return 0;                                      )
+        CHAZ_QUOTE(  }                                                  );
+    char code_buf[sizeof(rmdir_code) + 30];
+    int rmdir_available;
+    if (strlen(header) > 25) {
+        chaz_Util_die("Header name too long: '%s'", header);
+    }
+    sprintf(code_buf, rmdir_code, header);
+    rmdir_available = chaz_CC_test_compile(code_buf);
+    return rmdir_available;
+}
+
+static void
+chaz_DirManip_try_rmdir(void) {
+    if (chaz_DirManip_compile_rmdir("unistd.h"))   { return; }
+    if (chaz_DirManip_compile_rmdir("dirent.h"))   { return; }
+    if (chaz_DirManip_compile_rmdir("direct.h"))   { return; }
+}
+
+static int
+chaz_DirManip_is_cygwin(void) {
+    static int is_cygwin = -1;
+    static const char cygwin_code[] =
+        CHAZ_QUOTE(#ifndef __CYGWIN__            )
+        CHAZ_QUOTE(  #error "Not Cygwin"         )
+        CHAZ_QUOTE(#endif                        )
+        CHAZ_QUOTE(int main() { return 0; }      );
+    if (is_cygwin == -1) {
+        is_cygwin = chaz_CC_test_compile(cygwin_code);
+    }
+    return is_cygwin;
+}
+
+void
+chaz_DirManip_run(void) {
+    char dir_sep[3];
+    int remove_zaps_dirs = false;
+    int has_dirent_h = chaz_HeadCheck_check_header("dirent.h");
+    int has_direct_h = chaz_HeadCheck_check_header("direct.h");
+    int has_dirent_d_namlen = false;
+    int has_dirent_d_type   = false;
+
+    chaz_ConfWriter_start_module("DirManip");
+    chaz_DirManip_try_mkdir();
+    chaz_DirManip_try_rmdir();
+
+    /* Header checks. */
+    if (has_dirent_h) {
+        chaz_ConfWriter_add_def("HAS_DIRENT_H", NULL);
+    }
+    if (has_direct_h) {
+        chaz_ConfWriter_add_def("HAS_DIRECT_H", NULL);
+    }
+
+    /* Check for members in struct dirent. */
+    if (has_dirent_h) {
+        has_dirent_d_namlen = chaz_HeadCheck_contains_member(
+                                  "struct dirent", "d_namlen",
+                                  "#include <sys/types.h>\n#include <dirent.h>"
+                              );
+        if (has_dirent_d_namlen) {
+            chaz_ConfWriter_add_def("HAS_DIRENT_D_NAMLEN", NULL);
+        }
+        has_dirent_d_type = chaz_HeadCheck_contains_member(
+                                "struct dirent", "d_type",
+                                "#include <sys/types.h>\n#include <dirent.h>"
+                            );
+        if (has_dirent_d_type) {
+            chaz_ConfWriter_add_def("HAS_DIRENT_D_TYPE", NULL);
+        }
+    }
+
+    if (chaz_DirManip.mkdir_num_args == 2) {
+        /* It's two args, but the command isn't "mkdir". */
+        char scratch[50];
+        if (strlen(chaz_DirManip.mkdir_command) > 30) {
+            chaz_Util_die("Command too long: '%s'", chaz_DirManip.mkdir_command);
+        }
+        sprintf(scratch, "%s(_dir, _mode)", chaz_DirManip.mkdir_command);
+        chaz_ConfWriter_add_def("makedir(_dir, _mode)", scratch);
+        chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "0");
+    }
+    else if (chaz_DirManip.mkdir_num_args == 1) {
+        /* It's one arg... mode arg will be ignored. */
+        char scratch[50];
+        if (strlen(chaz_DirManip.mkdir_command) > 30) {
+            chaz_Util_die("Command too long: '%s'", chaz_DirManip.mkdir_command);
+        }
+        sprintf(scratch, "%s(_dir)", chaz_DirManip.mkdir_command);
+        chaz_ConfWriter_add_def("makedir(_dir, _mode)", scratch);
+        chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
+    }
+
+    if (chaz_DirManip_is_cygwin()) {
+        strcpy(dir_sep, "/");
+    }
+    else if (chaz_HeadCheck_check_header("windows.h")) {
+        strcpy(dir_sep, "\\\\");
+    }
+    else {
+        strcpy(dir_sep, "/");
+    }
+
+    {
+        char scratch[5];
+        sprintf(scratch, "\"%s\"", dir_sep);
+        chaz_ConfWriter_add_def("DIR_SEP", scratch);
+        sprintf(scratch, "'%s'", dir_sep);
+        chaz_ConfWriter_add_def("DIR_SEP_CHAR", scratch);
+    }
+
+    /* See whether remove works on directories. */
+    chaz_OS_mkdir("_charm_test_remove_me");
+    if (0 == remove("_charm_test_remove_me")) {
+        remove_zaps_dirs = true;
+        chaz_ConfWriter_add_def("REMOVE_ZAPS_DIRS", NULL);
+    }
+    chaz_OS_rmdir("_charm_test_remove_me");
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/Headers.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Probe/Headers.h" */
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+
+#define CHAZ_HEADERS_MAX_KEEPERS 200
+
+static struct {
+    int keeper_count;
+    const char *keepers[CHAZ_HEADERS_MAX_KEEPERS + 1];
+} chaz_Headers = { 0, { NULL } };
+
+/* Add a header to the keepers array.
+ */
+static void
+chaz_Headers_keep(const char *header_name);
+
+/* Transform "header.h" into "CHY_HAS_HEADER_H, storing the result into
+ * `buffer`.
+ */
+static void
+chaz_Headers_encode_affirmation(const char *header_name, char *buffer,
+                                size_t buf_size);
+
+/* Probe for all C89 headers. */
+static void
+chaz_Headers_probe_c89(void);
+
+/* Probe for all POSIX headers. */
+static void
+chaz_Headers_probe_posix(void);
+
+/* Prove for selected Windows headers. */
+static void
+chaz_Headers_probe_win(void);
+
+int
+chaz_Headers_check(const char *header_name) {
+    return chaz_HeadCheck_check_header(header_name);
+}
+
+void
+chaz_Headers_run(void) {
+    int i;
+
+    chaz_ConfWriter_start_module("Headers");
+
+    chaz_Headers_probe_posix();
+    chaz_Headers_probe_c89();
+    chaz_Headers_probe_win();
+
+    /* One-offs. */
+    if (chaz_HeadCheck_check_header("pthread.h")) {
+        chaz_Headers_keep("pthread.h");
+    }
+
+    /* Append the config with every header detected so far. */
+    for (i = 0; chaz_Headers.keepers[i] != NULL; i++) {
+        char aff_buf[200];
+        chaz_Headers_encode_affirmation(chaz_Headers.keepers[i], aff_buf, 200);
+        chaz_ConfWriter_add_def(aff_buf, NULL);
+    }
+
+    chaz_ConfWriter_end_module();
+}
+
+static void
+chaz_Headers_keep(const char *header_name) {
+    if (chaz_Headers.keeper_count >= CHAZ_HEADERS_MAX_KEEPERS) {
+        chaz_Util_die("Too many keepers -- increase MAX_KEEPER_COUNT");
+    }
+    chaz_Headers.keepers[chaz_Headers.keeper_count++] = header_name;
+    chaz_Headers.keepers[chaz_Headers.keeper_count]   = NULL;
+}
+
+static void
+chaz_Headers_encode_affirmation(const char *header_name, char *buffer, size_t buf_size) {
+    char *buf, *buf_end;
+    size_t len = strlen(header_name) + sizeof("HAS_");
+    if (len + 1 > buf_size) {
+        chaz_Util_die("Buffer too small: %lu", (unsigned long)buf_size);
+    }
+
+    /* Start off with "HAS_". */
+    strcpy(buffer, "HAS_");
+
+    /* Transform one char at a time. */
+    for (buf = buffer + sizeof("HAS_") - 1, buf_end = buffer + len;
+         buf < buf_end;
+         header_name++, buf++
+        ) {
+        if (*header_name == '\0') {
+            *buf = '\0';
+            break;
+        }
+        else if (isalnum(*header_name)) {
+            *buf = toupper(*header_name);
+        }
+        else {
+            *buf = '_';
+        }
+    }
+}
+
+static void
+chaz_Headers_probe_c89(void) {
+    const char *c89_headers[] = {
+        "assert.h",
+        "ctype.h",
+        "errno.h",
+        "float.h",
+        "limits.h",
+        "locale.h",
+        "math.h",
+        "setjmp.h",
+        "signal.h",
+        "stdarg.h",
+        "stddef.h",
+        "stdio.h",
+        "stdlib.h",
+        "string.h",
+        "time.h",
+        NULL
+    };
+    int i;
+
+    /* Test for all c89 headers in one blast. */
+    if (chaz_HeadCheck_check_many_headers((const char**)c89_headers)) {
+        chaz_ConfWriter_add_def("HAS_C89", NULL);
+        chaz_ConfWriter_add_def("HAS_C90", NULL);
+        for (i = 0; c89_headers[i] != NULL; i++) {
+            chaz_Headers_keep(c89_headers[i]);
+        }
+    }
+    /* Test one-at-a-time. */
+    else {
+        for (i = 0; c89_headers[i] != NULL; i++) {
+            if (chaz_HeadCheck_check_header(c89_headers[i])) {
+                chaz_Headers_keep(c89_headers[i]);
+            }
+        }
+    }
+}
+
+static void
+chaz_Headers_probe_posix(void) {
+    const char *posix_headers[] = {
+        "cpio.h",
+        "dirent.h",
+        "fcntl.h",
+        "grp.h",
+        "pwd.h",
+        "sys/stat.h",
+        "sys/times.h",
+        "sys/types.h",
+        "sys/utsname.h",
+        "sys/wait.h",
+        "tar.h",
+        "termios.h",
+        "unistd.h",
+        "utime.h",
+        NULL
+    };
+    int i;
+
+    /* Try for all POSIX headers in one blast. */
+    if (chaz_HeadCheck_check_many_headers((const char**)posix_headers)) {
+        chaz_ConfWriter_add_def("HAS_POSIX", NULL);
+        for (i = 0; posix_headers[i] != NULL; i++) {
+            chaz_Headers_keep(posix_headers[i]);
+        }
+    }
+    /* Test one-at-a-time. */
+    else {
+        for (i = 0; posix_headers[i] != NULL; i++) {
+            if (chaz_HeadCheck_check_header(posix_headers[i])) {
+                chaz_Headers_keep(posix_headers[i]);
+            }
+        }
+    }
+}
+
+
+static void
+chaz_Headers_probe_win(void) {
+    const char *win_headers[] = {
+        "io.h",
+        "windows.h",
+        "process.h",
+        NULL
+    };
+    int i;
+
+    /* Test for all Windows headers in one blast */
+    if (chaz_HeadCheck_check_many_headers((const char**)win_headers)) {
+        for (i = 0; win_headers[i] != NULL; i++) {
+            chaz_Headers_keep(win_headers[i]);
+        }
+    }
+    /* Test one-at-a-time. */
+    else {
+        for (i = 0; win_headers[i] != NULL; i++) {
+            if (chaz_HeadCheck_check_header(win_headers[i])) {
+                chaz_Headers_keep(win_headers[i]);
+            }
+        }
+    }
+}
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Probe/Integers.c"
 /* #include "Charmonizer/Core/HeaderChecker.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
@@ -2922,6 +3479,8 @@ int main(int argc, char **argv) {
     chaz_ConfWriterC_enable();
 
     /* Run probe modules. */
+    chaz_DirManip_run();
+    chaz_Headers_run();
     chaz_Integers_run();
     chaz_Strings_run();
 

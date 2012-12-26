@@ -3039,6 +3039,8 @@ chaz_DirManip_run(void) {
         char scratch[5];
         sprintf(scratch, "\"%s\"", dir_sep);
         chaz_ConfWriter_add_def("DIR_SEP", scratch);
+        sprintf(scratch, "'%s'", dir_sep);
+        chaz_ConfWriter_add_def("DIR_SEP_CHAR", scratch);
     }
 
     /* See whether remove works on directories. */
