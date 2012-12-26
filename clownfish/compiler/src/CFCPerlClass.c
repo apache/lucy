@@ -491,20 +491,9 @@ CFCPerlClass_create_pod(CFCPerlClass *self) {
     "\n"
     "=cut\n"
     "\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(class_name)
-                  + strlen(brief)
-                  + strlen(synopsis)
-                  + strlen(description)
-                  + strlen(constructor_pod)
-                  + strlen(methods_pod)
-                  + strlen(inheritance)
-                  + 20;
-
-    char *pod = (char*)MALLOCATE(size);
-    sprintf(pod, pattern, class_name, brief, synopsis, description,
-            constructor_pod, methods_pod, inheritance);
+    char *pod
+        = CFCUtil_sprintf(pattern, class_name, brief, synopsis, description,
+                          constructor_pod, methods_pod, inheritance);
 
     FREEMEM(brief);
     FREEMEM(synopsis);

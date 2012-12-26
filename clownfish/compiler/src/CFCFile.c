@@ -67,8 +67,6 @@ CFCFile_init(CFCFile *self, CFCFileSpec *spec) {
     const char *path_part = CFCFileSpec_get_path_part(self->spec);
     size_t len = strlen(path_part);
     self->guard_name = (char*)MALLOCATE(len + sizeof("H_") + 1);
-    self->guard_start = (char*)MALLOCATE(len * 2 + 40);
-    self->guard_close = (char*)MALLOCATE(len + 20);
     memcpy(self->guard_name, "H_", 2);
     size_t i, j;
     for (i = 0, j = 2; i < len; i++) {
@@ -81,9 +79,9 @@ CFCFile_init(CFCFile *self, CFCFileSpec *spec) {
         }
     }
     self->guard_name[j] = '\0';
-    sprintf(self->guard_start, "#ifndef %s\n#define %s 1\n", self->guard_name,
-            self->guard_name);
-    sprintf(self->guard_close, "#endif /* %s */\n", self->guard_name);
+    self->guard_start = CFCUtil_sprintf("#ifndef %s\n#define %s 1\n",
+                                        self->guard_name, self->guard_name);
+    self->guard_close = CFCUtil_sprintf("#endif /* %s */\n", self->guard_name);
 
     return self;
 }

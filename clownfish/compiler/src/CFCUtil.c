@@ -374,25 +374,17 @@ CFCUtil_walk(const char *path, CFCUtil_walk_callback_t callback,
     if (!(stat_buf.st_mode & S_IFDIR)) {
         return;
     }
-    void   *dirhandle   = CFCUtil_opendir(path);
-    size_t  dir_len     = strlen(path);
-    size_t  subpath_cap = dir_len * 2;
-    char   *subpath     = (char*)MALLOCATE(subpath_cap);
-    const char *entry   = NULL;
+    void   *dirhandle = CFCUtil_opendir(path);
+    const char *entry = NULL;
     while (NULL != (entry = CFCUtil_dirnext(dirhandle))) {
         if (strcmp(entry, ".") == 0 || strcmp(entry, "..") == 0) {
             continue;
         }
-        size_t name_len = strlen(entry);
-        size_t needed = dir_len + 1 + name_len + 1;
-        if (needed > subpath_cap) {
-            subpath_cap = needed;
-            subpath = (char*)REALLOCATE(subpath, subpath_cap);
-        }
-        sprintf(subpath, "%s" CFCUTIL_PATH_SEP "%s", path, entry);
+        char *subpath = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s", path,
+                                        entry);
         CFCUtil_walk(subpath, callback, context);
+        FREEMEM(subpath);
     }
-    FREEMEM(subpath);
     CFCUtil_closedir(dirhandle, path);
 }
 

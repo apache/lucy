@@ -101,17 +101,9 @@ CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
         "\n"
         "%s\n"
         "\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(header)
-                  + strlen(include_guard_start)
-                  + strlen(content)
-                  + strlen(include_guard_close)
-                  + strlen(footer)
-                  + 50;
-    char *file_content = (char*)MALLOCATE(size);
-    sprintf(file_content, pattern, header, include_guard_start, content,
-            include_guard_close, footer);
+    char *file_content
+        = CFCUtil_sprintf(pattern, header, include_guard_start, content,
+                          include_guard_close, footer);
 
     // Unlink then write file.
     remove(h_path);

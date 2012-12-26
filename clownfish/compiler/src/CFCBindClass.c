@@ -96,10 +96,8 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 
     const char *full_vtable_var = CFCClass_full_vtable_var(client);
     const char *PREFIX = CFCClass_get_PREFIX(client);
-    self->method_specs_var  = (char*)MALLOCATE(strlen(full_vtable_var) + 20);
-    self->short_names_macro = (char*)MALLOCATE(strlen(PREFIX) + 20);
-    sprintf(self->method_specs_var, "%s_METHODS", full_vtable_var);
-    sprintf(self->short_names_macro, "%sUSE_SHORT_NAMES", PREFIX);
+    self->method_specs_var  = CFCUtil_sprintf("%s_METHODS", full_vtable_var);
+    self->short_names_macro = CFCUtil_sprintf("%sUSE_SHORT_NAMES", PREFIX);
 
     return self;
 }
@@ -156,14 +154,8 @@ S_to_c_header_inert(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(inert_var_defs)
-                  + strlen(inert_func_decs)
-                  + strlen(short_names)
-                  + 50;
-    char *content = (char*)MALLOCATE(size);
-    sprintf(content, pattern, inert_var_defs, inert_func_decs, short_names);
+    char *content = CFCUtil_sprintf(pattern, inert_var_defs, inert_func_decs,
+                                    short_names);
 
     FREEMEM(inert_var_defs);
     FREEMEM(inert_func_decs);
@@ -234,25 +226,11 @@ S_to_c_header_dynamic(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(parent_include)
-                  + strlen(privacy_symbol)
-                  + strlen(struct_def)
-                  + strlen(privacy_symbol)
-                  + strlen(inert_var_defs)
-                  + strlen(sub_declarations)
-                  + strlen(method_typedefs)
-                  + strlen(method_defs)
-                  + strlen(visibility)
-                  + strlen(vt_var)
-                  + strlen(short_names)
-                  + 100;
-
-    char *content = (char*)MALLOCATE(size);
-    sprintf(content, pattern, parent_include, privacy_symbol, struct_def,
-            privacy_symbol, inert_var_defs, sub_declarations, method_typedefs,
-            method_defs, visibility, vt_var, short_names);
+    char *content
+        = CFCUtil_sprintf(pattern, parent_include, privacy_symbol,
+                          struct_def, privacy_symbol, inert_var_defs,
+                          sub_declarations, method_typedefs, method_defs,
+                          visibility, vt_var, short_names);
 
     FREEMEM(struct_def);
     FREEMEM(parent_include);
@@ -368,15 +346,8 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n";
-    size_t size = sizeof(pattern)
-                  + strlen(offsets)
-                  + strlen(cb_funcs)
-                  + strlen(ms_var)
-                  + strlen(vt_var)
-                  + strlen(autocode)
-                  + 100;
-    char *code = (char*)MALLOCATE(size);
-    sprintf(code, pattern, offsets, cb_funcs, ms_var, vt_var, autocode);
+    char *code = CFCUtil_sprintf(pattern, offsets, cb_funcs, ms_var, vt_var,
+                                 autocode);
 
     FREEMEM(fresh_methods);
     FREEMEM(offsets);
@@ -401,12 +372,7 @@ S_struct_definition(CFCBindClass *self) {
     }
 
     char pattern[] = "struct %s {%s\n};\n";
-    size_t size = sizeof(pattern)
-                  + strlen(struct_sym)
-                  + strlen(member_decs)
-                  + 10;
-    char *struct_def = (char*)MALLOCATE(size);
-    sprintf(struct_def, pattern, struct_sym, member_decs);
+    char *struct_def = CFCUtil_sprintf(pattern, struct_sym, member_decs);
 
     FREEMEM(member_decs);
     return struct_def;
@@ -454,19 +420,8 @@ CFCBindClass_spec_def(CFCBindClass *self) {
         "        %d, /* num_novel */\n"
         "        %s /* method_specs */\n"
         "    }";
-
-    size_t size = sizeof(pattern)
-                  + strlen(vt_var)
-                  + strlen(parent_ref)
-                  + strlen(class_name)
-                  + strlen(struct_sym)
-                  + 10 // for num_fresh
-                  + 10 // for num_novel
-                  + strlen(ms_var)
-                  + 100;
-    char *code = (char*)MALLOCATE(size);
-    sprintf(code, pattern, vt_var, parent_ref, class_name, struct_sym,
-            num_fresh, num_novel, ms_var);
+    char *code = CFCUtil_sprintf(pattern, vt_var, parent_ref, class_name,
+                                 struct_sym, num_fresh, num_novel, ms_var);
 
     FREEMEM(parent_ref);
     return code;

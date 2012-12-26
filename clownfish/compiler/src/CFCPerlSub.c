@@ -159,16 +159,8 @@ S_allot_params_arg(CFCType *type, const char *label, int required) {
                                      ? "alloca(cfish_ZCB_size())"
                                      : "NULL";
         const char pattern[] = "ALLOT_OBJ(&%s, \"%s\", %u, %s, %s, %s)";
-        size_t size = sizeof(pattern)
-                      + label_len * 2
-                      + 20
-                      + 5
-                      + strlen(vtable_var)
-                      + strlen(zcb_allocation)
-                      + 50;
-        char *arg = (char*)MALLOCATE(size);
-        sprintf(arg, pattern, label, label, label_len, req_string, vtable_var,
-                zcb_allocation);
+        char *arg = CFCUtil_sprintf(pattern, label, label, label_len,
+                                    req_string, vtable_var, zcb_allocation);
         return arg;
     }
     else if (CFCType_is_primitive(type)) {
@@ -177,15 +169,8 @@ S_allot_params_arg(CFCType *type, const char *label, int required) {
             if (strcmp(prim_type, type_c_string) == 0) {
                 const char *allot = prim_type_to_allot_macro[i].allot_macro;
                 char pattern[] = "%s(&%s, \"%s\", %u, %s)";
-                size_t size = sizeof(pattern)
-                              + strlen(allot)
-                              + label_len * 2
-                              + 20
-                              + 5
-                              + 20; // extra
-                char *arg = (char*)MALLOCATE(size);
-                sprintf(arg, pattern, allot, label, label, label_len,
-                        req_string);
+                char *arg = CFCUtil_sprintf(pattern, allot, label, label,
+                                            label_len, req_string);
                 return arg;
             }
         }

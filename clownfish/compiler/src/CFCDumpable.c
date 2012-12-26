@@ -180,16 +180,9 @@ S_add_dump_method(CFCClass *klass) {
             "{\n"
             "    %s super_dump = SUPER_METHOD_PTR(%s, %s);\n"
             "    cfish_Hash *dump = (cfish_Hash*)super_dump(self);\n";
-        size_t amount = sizeof(pattern)
-                        + strlen(full_func_sym)
-                        + strlen(full_struct)
-                        + strlen(full_typedef) 
-                        + strlen(vtable_var)
-                        + strlen(full_meth)
-                        + 50;
-        char *autocode = (char*)MALLOCATE(amount);
-        sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
-                vtable_var, full_meth);
+        char *autocode
+            = CFCUtil_sprintf(pattern, full_func_sym, full_struct,
+                              full_typedef, vtable_var, full_meth);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(full_meth);
         FREEMEM(full_typedef);
@@ -209,12 +202,7 @@ S_add_dump_method(CFCClass *klass) {
             "    cfish_Hash *dump = cfish_Hash_new(0);\n"
             "    Cfish_Hash_Store_Str(dump, \"_class\", 6,\n"
             "        (cfish_Obj*)Cfish_CB_Clone(Cfish_Obj_Get_Class_Name((cfish_Obj*)self)));\n";
-        size_t amount = sizeof(pattern)
-                        + strlen(full_func_sym)
-                        + strlen(full_struct)
-                        + 50;
-        char *autocode = (char*)MALLOCATE(amount);
-        sprintf(autocode, pattern, full_func_sym, full_struct);
+        char *autocode = CFCUtil_sprintf(pattern, full_func_sym, full_struct);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
@@ -254,16 +242,10 @@ S_add_load_method(CFCClass *klass) {
             "    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);\n"
             "    %s super_load = SUPER_METHOD_PTR(%s, %s);\n"
             "    %s *loaded = (%s*)super_load(self, dump);\n";
-        size_t amount = sizeof(pattern)
-                        + strlen(full_func_sym)
-                        + strlen(full_struct) * 3
-                        + strlen(full_typedef)
-                        + strlen(vtable_var)
-                        + strlen(full_meth)
-                        + 50;
-        char *autocode = (char*)MALLOCATE(amount);
-        sprintf(autocode, pattern, full_func_sym, full_struct, full_typedef,
-                vtable_var, full_meth, full_struct, full_struct);
+        char *autocode
+            = CFCUtil_sprintf(pattern, full_func_sym, full_struct,
+                              full_typedef, vtable_var, full_meth, full_struct,
+                              full_struct);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(full_meth);
         FREEMEM(full_typedef);
@@ -286,13 +268,9 @@ S_add_load_method(CFCClass *klass) {
             "    cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);\n"
             "    %s *loaded = (%s*)Cfish_VTable_Make_Obj(vtable);\n"
             "    CHY_UNUSED_VAR(self);\n";
-        size_t amount = sizeof(pattern)
-                        + strlen(full_func_sym)
-                        + strlen(full_struct) * 3
-                        + 50;
-        char *autocode = (char*)MALLOCATE(amount);
-        sprintf(autocode, pattern, full_func_sym, full_struct, full_struct,
-                full_struct);
+        char *autocode
+            = CFCUtil_sprintf(pattern, full_func_sym, full_struct, full_struct,
+                              full_struct);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);

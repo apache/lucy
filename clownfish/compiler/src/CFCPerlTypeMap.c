@@ -61,56 +61,54 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
     }
     else if (CFCType_is_primitive(type)) {
         const char *specifier = CFCType_get_specifier(type);
-        size_t size = 80 + strlen(xs_var) * 2;
-        result = (char*)MALLOCATE(size);
 
         if (strcmp(specifier, "double") == 0) {
-            sprintf(result, "SvNV(%s)", xs_var);
+            result = CFCUtil_sprintf("SvNV(%s)", xs_var);
         }
         else if (strcmp(specifier, "float") == 0) {
-            sprintf(result, "(float)SvNV(%s)", xs_var);
+            result = CFCUtil_sprintf("(float)SvNV(%s)", xs_var);
         }
         else if (strcmp(specifier, "int") == 0) {
-            sprintf(result, "(int)SvIV(%s)", xs_var);
+            result = CFCUtil_sprintf("(int)SvIV(%s)", xs_var);
         }
         else if (strcmp(specifier, "short") == 0) {
-            sprintf(result, "(short)SvIV(%s)", xs_var);
+            result = CFCUtil_sprintf("(short)SvIV(%s)", xs_var);
         }
         else if (strcmp(specifier, "long") == 0) {
             const char pattern[] =
                 "((sizeof(long) <= sizeof(IV)) ? (long)SvIV(%s) "
                 ": (long)SvNV(%s))";
-            sprintf(result, pattern, xs_var, xs_var);
+            result = CFCUtil_sprintf(pattern, xs_var, xs_var);
         }
         else if (strcmp(specifier, "size_t") == 0) {
-            sprintf(result, "(size_t)SvIV(%s)", xs_var);
+            result = CFCUtil_sprintf("(size_t)SvIV(%s)", xs_var);
         }
         else if (strcmp(specifier, "uint64_t") == 0) {
-            sprintf(result, "(uint64_t)SvNV(%s)", xs_var);
+            result = CFCUtil_sprintf("(uint64_t)SvNV(%s)", xs_var);
         }
         else if (strcmp(specifier, "uint32_t") == 0) {
-            sprintf(result, "(uint32_t)SvUV(%s)", xs_var);
+            result = CFCUtil_sprintf("(uint32_t)SvUV(%s)", xs_var);
         }
         else if (strcmp(specifier, "uint16_t") == 0) {
-            sprintf(result, "(uint16_t)SvUV(%s)", xs_var);
+            result = CFCUtil_sprintf("(uint16_t)SvUV(%s)", xs_var);
         }
         else if (strcmp(specifier, "uint8_t") == 0) {
-            sprintf(result, "(uint8_t)SvUV(%s)", xs_var);
+            result = CFCUtil_sprintf("(uint8_t)SvUV(%s)", xs_var);
         }
         else if (strcmp(specifier, "int64_t") == 0) {
-            sprintf(result, "(int64_t)SvNV(%s)", xs_var);
+            result = CFCUtil_sprintf("(int64_t)SvNV(%s)", xs_var);
         }
         else if (strcmp(specifier, "int32_t") == 0) {
-            sprintf(result, "(int32_t)SvIV(%s)", xs_var);
+            result = CFCUtil_sprintf("(int32_t)SvIV(%s)", xs_var);
         }
         else if (strcmp(specifier, "int16_t") == 0) {
-            sprintf(result, "(int16_t)SvIV(%s)", xs_var);
+            result = CFCUtil_sprintf("(int16_t)SvIV(%s)", xs_var);
         }
         else if (strcmp(specifier, "int8_t") == 0) {
-            sprintf(result, "(int8_t)SvIV(%s)", xs_var);
+            result = CFCUtil_sprintf("(int8_t)SvIV(%s)", xs_var);
         }
         else if (strcmp(specifier, "bool") == 0) {
-            sprintf(result, "SvTRUE(%s) ? 1 : 0", xs_var);
+            result = CFCUtil_sprintf("SvTRUE(%s) ? 1 : 0", xs_var);
         }
         else {
             FREEMEM(result);
@@ -135,60 +133,58 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
     else if (CFCType_is_primitive(type)) {
         // Convert from a primitive type to a Perl scalar.
         const char *specifier = CFCType_get_specifier(type);
-        size_t size = 80 + strlen(cf_var) * 2;
-        result = (char*)MALLOCATE(size);
 
         if (strcmp(specifier, "double") == 0) {
-            sprintf(result, "newSVnv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSVnv(%s)", cf_var);
         }
         else if (strcmp(specifier, "float") == 0) {
-            sprintf(result, "newSVnv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSVnv(%s)", cf_var);
         }
         else if (strcmp(specifier, "int") == 0) {
-            sprintf(result, "newSViv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSViv(%s)", cf_var);
         }
         else if (strcmp(specifier, "short") == 0) {
-            sprintf(result, "newSViv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSViv(%s)", cf_var);
         }
         else if (strcmp(specifier, "long") == 0) {
             char pattern[] =
                 "((sizeof(long) <= sizeof(IV)) ? "
                 "newSViv((IV)%s) : newSVnv((NV)%s))";
-            sprintf(result, pattern, cf_var, cf_var);
+            result = CFCUtil_sprintf(pattern, cf_var, cf_var);
         }
         else if (strcmp(specifier, "size_t") == 0) {
-            sprintf(result, "newSViv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSViv(%s)", cf_var);
         }
         else if (strcmp(specifier, "uint64_t") == 0) {
             char pattern[] =
                 "sizeof(UV) == 8 ? "
                 "newSVuv((UV)%s) : newSVnv((NV)CHY_U64_TO_DOUBLE(%s))";
-            sprintf(result, pattern, cf_var, cf_var);
+            result = CFCUtil_sprintf(pattern, cf_var, cf_var);
         }
         else if (strcmp(specifier, "uint32_t") == 0) {
-            sprintf(result, "newSVuv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSVuv(%s)", cf_var);
         }
         else if (strcmp(specifier, "uint16_t") == 0) {
-            sprintf(result, "newSVuv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSVuv(%s)", cf_var);
         }
         else if (strcmp(specifier, "uint8_t") == 0) {
-            sprintf(result, "newSVuv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSVuv(%s)", cf_var);
         }
         else if (strcmp(specifier, "int64_t") == 0) {
             char pattern[] = "sizeof(IV) == 8 ? newSViv((IV)%s) : newSVnv((NV)%s)";
-            sprintf(result, pattern, cf_var, cf_var);
+            result = CFCUtil_sprintf(pattern, cf_var, cf_var);
         }
         else if (strcmp(specifier, "int32_t") == 0) {
-            sprintf(result, "newSViv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSViv(%s)", cf_var);
         }
         else if (strcmp(specifier, "int16_t") == 0) {
-            sprintf(result, "newSViv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSViv(%s)", cf_var);
         }
         else if (strcmp(specifier, "int8_t") == 0) {
-            sprintf(result, "newSViv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSViv(%s)", cf_var);
         }
         else if (strcmp(specifier, "bool") == 0) {
-            sprintf(result, "newSViv(%s)", cf_var);
+            result = CFCUtil_sprintf("newSViv(%s)", cf_var);
         }
         else {
             FREEMEM(result);

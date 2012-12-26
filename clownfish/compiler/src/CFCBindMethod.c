@@ -75,18 +75,13 @@ S_final_method_def(CFCMethod *method, CFCClass *klass) {
     char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
     CFCMethod_full_offset_sym(method, klass, full_offset_sym, offset_sym_size);
 
-    const char pattern[] = "extern size_t %s;\n#define %s(%s) \\\n    %s((%s)%s)\n";
-    size_t size = sizeof(pattern)
-                  + strlen(full_offset_sym)
-                  + strlen(full_meth_sym)
-                  + strlen(arg_names)
-                  + strlen(full_func_sym)
-                  + strlen(self_type)
-                  + strlen(arg_names)
-                  + 20;
-    char *method_def = (char*)MALLOCATE(size);
-    sprintf(method_def, pattern, full_offset_sym, full_meth_sym, arg_names,
-            full_func_sym, self_type, arg_names);
+    const char pattern[] =
+        "extern size_t %s;\n"
+        "#define %s(%s) \\\n"
+        "    %s((%s)%s)\n";
+    char *method_def
+        = CFCUtil_sprintf(pattern, full_offset_sym, full_meth_sym, arg_names,
+                          full_func_sym, self_type, arg_names);
 
     FREEMEM(full_offset_sym);
     FREEMEM(full_meth_sym);
@@ -139,26 +134,12 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
         "    const %s method = *((%s*)method_address);\n"
         "    %smethod((%s*)self%s);\n"
         "}\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(visibility)
-                  + strlen(full_offset_sym)
-                  + strlen(ret_type_str)
-                  + strlen(full_meth_sym)
-                  + strlen(invoker_struct)
-                  + strlen(params_minus_invoker)
-                  + strlen(full_offset_sym)
-                  + strlen(full_typedef)
-                  + strlen(full_typedef)
-                  + strlen(maybe_return)
-                  + strlen(common_struct)
-                  + strlen(arg_names_minus_invoker)
-                  + 40;
-    char *method_def = (char*)MALLOCATE(size);
-    sprintf(method_def, pattern, visibility, full_offset_sym, ret_type_str,
-            full_meth_sym, invoker_struct, params_minus_invoker,
-            full_offset_sym, full_typedef, full_typedef, maybe_return,
-            common_struct, arg_names_minus_invoker);
+    char *method_def
+        = CFCUtil_sprintf(pattern, visibility, full_offset_sym, ret_type_str,
+                          full_meth_sym, invoker_struct, params_minus_invoker,
+                          full_offset_sym, full_typedef, full_typedef,
+                          maybe_return, common_struct,
+                          arg_names_minus_invoker);
 
     FREEMEM(full_offset_sym);
     FREEMEM(full_meth_sym);
@@ -175,13 +156,8 @@ CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
     char *full_typedef = (char*)MALLOCATE(full_typedef_size);
     CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
 
-    size_t size = strlen(params)
-                  + strlen(ret_type)
-                  + strlen(full_typedef)
-                  + 20
-                  + sizeof("\0");
-    char *buf = (char*)MALLOCATE(size);
-    sprintf(buf, "typedef %s\n(*%s)(%s);\n", ret_type, full_typedef, params);
+    char *buf = CFCUtil_sprintf("typedef %s\n(*%s)(%s);\n", ret_type,
+                                full_typedef, params);
     FREEMEM(full_typedef);
     return buf;
 }
@@ -209,16 +185,9 @@ CFCBindMeth_spec_def(CFCMethod *method) {
         "        (cfish_method_t)%s, /* callback_func */\n"
         "        &%s /* offset */\n"
         "    }";
-    size_t size = sizeof(pattern)
-                  + 10 /* for is_novel */
-                  + strlen(macro_sym)
-                  + strlen(impl_sym)
-                  + strlen(full_override_sym)
-                  + strlen(full_offset_sym)
-                  + 30;
-    char *def = (char*)MALLOCATE(size);
-    sprintf(def, pattern, is_novel, macro_sym, impl_sym, full_override_sym,
-            full_offset_sym);
+    char *def
+        = CFCUtil_sprintf(pattern, is_novel, macro_sym, impl_sym,
+                          full_override_sym, full_offset_sym);
 
     FREEMEM(full_offset_sym);
     return def;
@@ -248,9 +217,8 @@ S_maybe_unreachable(CFCType *return_type) {
     }
     else {
         const char *ret_type_str = CFCType_to_c(return_type);
-        return_statement = (char*)MALLOCATE(strlen(ret_type_str) + 60);
-        sprintf(return_statement, "\n    CHY_UNREACHABLE_RETURN(%s);",
-                ret_type_str);
+        char pattern[] = "\n    CHY_UNREACHABLE_RETURN(%s);";
+        return_statement = CFCUtil_sprintf(pattern, ret_type_str);
     }
     return return_statement;
 }
@@ -277,18 +245,9 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
         "    cfish_CharBuf *klass = self ? Cfish_Obj_Get_Class_Name((cfish_Obj*)self) : %s->name;%s\n"
         "    CFISH_THROW(CFISH_ERR, \"Abstract method '%s' not defined by %%o\", klass);%s\n"
         "}\n";
-    size_t needed = sizeof(pattern)
-                    + strlen(ret_type_str)
-                    + strlen(full_func_sym)
-                    + strlen(params)
-                    + strlen(vtable_var)
-                    + strlen(unused)
-                    + strlen(macro_sym)
-                    + strlen(return_statement)
-                    + 50;
-    char *abstract_def = (char*)MALLOCATE(needed);
-    sprintf(abstract_def, pattern, ret_type_str, full_func_sym, params,
-            vtable_var, unused, macro_sym, return_statement);
+    char *abstract_def
+        = CFCUtil_sprintf(pattern, ret_type_str, full_func_sym, params,
+                          vtable_var, unused, macro_sym, return_statement);
 
     FREEMEM(unused);
     FREEMEM(return_statement);
@@ -305,13 +264,8 @@ CFCBindMeth_callback_dec(CFCMethod *method) {
     char pattern[] =
         "%s\n"
         "%s(%s);\n";
-    size_t size = sizeof(pattern)
-                  + strlen(ret_type_str)
-                  + strlen(override_sym)
-                  + strlen(params);
-
-    char *callback_dec = (char*)MALLOCATE(size);
-    sprintf(callback_dec, pattern, ret_type_str, override_sym, params);
+    char *callback_dec
+        = CFCUtil_sprintf(pattern, ret_type_str, override_sym, params);
 
     return callback_dec;
 }

@@ -135,17 +135,10 @@ CFCPerlConstructor_xsub_def(CFCPerlConstructor *self) {
         "    sv_2mortal(ST(0));\n"
         "    XSRETURN(1);\n"
         "}\n\n";
-    size_t size = sizeof(pattern)
-                  + strlen(c_name) * 2
-                  + strlen(allot_params)
-                  + strlen(self_type_str) * 2
-                  + strlen(refcount_mods)
-                  + strlen(self_type_str)
-                  + strlen(func_sym)
-                  + strlen(name_list);
-    char *xsub_def = (char*)MALLOCATE(size);
-    sprintf(xsub_def, pattern, c_name, c_name, allot_params, self_type_str,
-            self_type_str, refcount_mods, self_type_str, func_sym, name_list);
+    char *xsub_def
+        = CFCUtil_sprintf(pattern, c_name, c_name, allot_params, self_type_str,
+                          self_type_str, refcount_mods, self_type_str,
+                          func_sym, name_list);
 
     FREEMEM(refcount_mods);
     FREEMEM(allot_params);

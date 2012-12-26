@@ -32,15 +32,8 @@ CFCBindFunc_func_declaration(CFCFunction *func) {
     const char   *inline_prop    = CFCFunction_inline(func)
                                    ? "static CHY_INLINE "
                                    : "";
-    size_t size = strlen(inline_prop)
-                  + strlen(ret_type_str)
-                  + strlen(full_func_sym)
-                  + strlen(param_list_str)
-                  + 20
-                  + strlen("\0");
-    char *buf = (char*)MALLOCATE(size);
-    sprintf(buf, "%s%s\n%s(%s);", inline_prop, ret_type_str, full_func_sym,
-            param_list_str);
+    char *buf = CFCUtil_sprintf("%s%s\n%s(%s);", inline_prop, ret_type_str,
+                                full_func_sym, param_list_str);
     return buf;
 }
 

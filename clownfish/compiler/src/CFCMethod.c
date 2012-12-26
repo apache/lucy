@@ -113,8 +113,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     const char *prefix    = CFCMethod_get_prefix(self);
     const char *last_colon = strrchr(class_name, ':');
     const char *struct_sym = last_colon ? last_colon + 1 : class_name;
-    char *wanted = (char*)MALLOCATE(strlen(prefix) + strlen(struct_sym) + 1);
-    sprintf(wanted, "%s%s", prefix, struct_sym);
+    char *wanted = CFCUtil_sprintf("%s%s", prefix, struct_sym);
     int mismatch = strcmp(wanted, specifier);
     FREEMEM(wanted);
     if (mismatch) {
@@ -128,9 +127,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
 
     // Derive more symbols.
     const char *full_func_sym = CFCMethod_implementing_func_sym(self);
-    size_t amount = strlen(full_func_sym) + sizeof("_OVERRIDE") + 1;
-    self->full_override_sym = (char*)MALLOCATE(amount);
-    sprintf(self->full_override_sym, "%s_OVERRIDE", full_func_sym);
+    self->full_override_sym = CFCUtil_sprintf("%s_OVERRIDE", full_func_sym);
 
     // Assume that this method is novel until we discover when applying
     // inheritance that it overrides another.

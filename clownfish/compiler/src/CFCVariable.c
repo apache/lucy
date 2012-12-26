@@ -80,17 +80,10 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
     if (CFCType_is_composite(type) && CFCType_get_array(type) != NULL) {
         postfix = CFCType_get_array(type);
     }
-    size_t size = strlen(type_str) + sizeof(" ") + strlen(micro_sym) +
-                  strlen(postfix) + 1;
-    self->local_c = (char*)MALLOCATE(size);
-    sprintf(self->local_c, "%s %s%s", type_str, micro_sym, postfix);
-    self->local_dec = (char*)MALLOCATE(strlen(self->local_c) + sizeof(";\0"));
-    sprintf(self->local_dec, "%s;", self->local_c);
+    self->local_c = CFCUtil_sprintf("%s %s%s", type_str, micro_sym, postfix);
+    self->local_dec = CFCUtil_sprintf("%s;", self->local_c);
     const char *full_sym = CFCVariable_full_sym(self);
-    size_t full_size = strlen(type_str) + sizeof(" ") + strlen(full_sym) +
-                       strlen(postfix) + 1;
-    self->global_c = (char*)MALLOCATE(full_size);
-    sprintf(self->global_c, "%s %s%s", type_str, full_sym, postfix);
+    self->global_c = CFCUtil_sprintf("%s %s%s", type_str, full_sym, postfix);
 
     return self;
 }

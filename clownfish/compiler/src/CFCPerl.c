@@ -214,18 +214,9 @@ S_write_boot_h(CFCPerl *self) {
         "#endif /* %s */\n"
         "\n"
         "%s\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(self->header)
-                  + strlen(guard)
-                  + strlen(guard)
-                  + strlen(self->boot_func)
-                  + strlen(guard)
-                  + strlen(self->footer)
-                  + 20;
-    char *content = (char*)MALLOCATE(size);
-    sprintf(content, pattern, self->header, guard, guard, self->boot_func,
-            guard, self->footer);
+    char *content
+        = CFCUtil_sprintf(pattern, self->header, guard, guard, self->boot_func,
+                          guard, self->footer);
     CFCUtil_write_file(self->boot_h_path, content, strlen(content));
 
     FREEMEM(content);
@@ -266,16 +257,9 @@ S_write_boot_c(CFCPerl *self) {
                     "    Cfish_ZCB_Assign_Str(alias, \"%s\", %u);\n"
                     "    cfish_VTable_add_alias_to_registry(%s,\n"
                     "        (cfish_CharBuf*)alias);\n";
-
-                size_t new_size = sizeof(pattern)
-                                  + strlen(alias_adds)
-                                  + alias_len
-                                  + 20    // stringified alias_len
-                                  + strlen(vtable_var)
-                                  + 50;
-                char *new_alias_adds = (char*)MALLOCATE(new_size);
-                sprintf(new_alias_adds, pattern, alias_adds, alias,
-                        (unsigned)alias_len, vtable_var);
+                char *new_alias_adds
+                    = CFCUtil_sprintf(pattern, alias_adds, alias,
+                                      (unsigned)alias_len, vtable_var);
                 FREEMEM(alias_adds);
                 alias_adds = new_alias_adds;
             }
@@ -319,20 +303,10 @@ S_write_boot_c(CFCPerl *self) {
         "\n"
         "%s\n"
         "\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(self->header)
-                  + strlen(self->boot_h_file)
-                  + strlen(pound_includes)
-                  + strlen(self->boot_func)
-                  + strlen(prefix)
-                  + strlen(alias_adds)
-                  + strlen(isa_pushes)
-                  + strlen(self->footer)
-                  + 100;
-    char *content = (char*)MALLOCATE(size);
-    sprintf(content, pattern, self->header, self->boot_h_file, pound_includes,
-            self->boot_func, prefix, alias_adds, isa_pushes, self->footer);
+    char *content
+        = CFCUtil_sprintf(pattern, self->header, self->boot_h_file,
+                          pound_includes, self->boot_func, prefix, alias_adds,
+                          isa_pushes, self->footer);
     CFCUtil_write_file(self->boot_c_path, content, strlen(content));
 
     FREEMEM(content);
@@ -392,17 +366,10 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
     "\n"
     "%s\n"
     "\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(self->boot_h_file)
-                  + strlen(generated_xs)
-                  + strlen(self->boot_class) * 2
-                  + strlen(xs_init)
-                  + strlen(hand_rolled_xs)
-                  + 30;
-    char *contents = (char*)MALLOCATE(size);
-    sprintf(contents, pattern, self->boot_h_file, generated_xs,
-            self->boot_class, self->boot_class, xs_init, hand_rolled_xs);
+    char *contents
+        = CFCUtil_sprintf(pattern, self->boot_h_file, generated_xs,
+                          self->boot_class, self->boot_class, xs_init,
+                          hand_rolled_xs);
 
     return contents;
 }

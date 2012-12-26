@@ -239,13 +239,8 @@ S_self_assign_statement(CFCPerlMethod *self, CFCType *type,
                          ? "XSBind_maybe_sv_to_cfish_obj"
                          : "XSBind_sv_to_cfish_obj";
     char pattern[] = "%s self = (%s)%s(ST(0), %s, NULL);";
-    size_t size = sizeof(pattern)
-                  + strlen(type_c) * 2
-                  + strlen(binding_func)
-                  + strlen(vtable_var)
-                  + 10;
-    char *statement = (char*)MALLOCATE(size);
-    sprintf(statement, pattern, type_c, type_c, binding_func, vtable_var);
+    char *statement
+        = CFCUtil_sprintf(pattern, type_c, type_c, binding_func, vtable_var);
 
     return statement;
 }
@@ -278,16 +273,9 @@ S_xsub_def_labeled_params(CFCPerlMethod *self) {
         "    /* Execute */\n"
         "    %s\n"
         "}\n";
-    size_t size = sizeof(pattern)
-                  + strlen(c_name) * 2
-                  + strlen(self_micro_sym)
-                  + strlen(allot_params)
-                  + strlen(self_assign)
-                  + strlen(body)
-                  + 40;
-    char *xsub_def = (char*)MALLOCATE(size);
-    sprintf(xsub_def, pattern, c_name, c_name, self_micro_sym, allot_params,
-            self_assign, body);
+    char *xsub_def
+        = CFCUtil_sprintf(pattern, c_name, c_name, self_micro_sym,
+                          allot_params, self_assign, body);
 
     FREEMEM(self_assign);
     FREEMEM(allot_params);
@@ -326,17 +314,14 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
     }
     const char num_args_pattern[] =
         "if (items %s %u) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%s)\", GvNAME(CvGV(cv))); }";
-    size_t num_args_check_size = sizeof(num_args_pattern)
-                                 + strlen(xs_name_list)
-                                 + 30;
-    char *num_args_check = (char*)MALLOCATE(num_args_check_size);
+    char *num_args_check;
     if (min_required < num_vars) {
-        sprintf(num_args_check, num_args_pattern, "<", min_required,
-                xs_name_list);
+        num_args_check = CFCUtil_sprintf(num_args_pattern, "<", min_required,
+                                         xs_name_list);
     }
     else {
-        sprintf(num_args_check, num_args_pattern, "!=", num_vars,
-                xs_name_list);
+        num_args_check = CFCUtil_sprintf(num_args_pattern, "!=", num_vars,
+                                         xs_name_list);
     }
 
     // Var assignments.
@@ -367,15 +352,8 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
                 char pattern[] =
                     "\n    %s %s = ( items >= %u && XSBind_sv_defined(ST(%u)) )"
                     " ? %s : %s;";
-                size_t size = sizeof(pattern)
-                              + strlen(type_c)
-                              + strlen(var_name)
-                              + strlen(conversion)
-                              + strlen(val)
-                              + 100;
-                char *statement = (char*)MALLOCATE(size);
-                sprintf(statement, pattern, type_c, var_name, i, i,
-                        conversion, val);
+                char *statement = CFCUtil_sprintf(pattern, type_c, var_name, i,
+                                                  i, conversion, val);
                 var_assignments
                     = CFCUtil_cat(var_assignments, statement, NULL);
                 FREEMEM(statement);
@@ -403,15 +381,9 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
         "    /* Execute */\n"
         "    %s\n"
         "}\n";
-    size_t size = sizeof(pattern)
-                  + strlen(self->sub.c_name) * 2
-                  + strlen(num_args_check)
-                  + strlen(var_assignments)
-                  + strlen(body)
-                  + 20;
-    char *xsub = (char*)MALLOCATE(size);
-    sprintf(xsub, pattern, self->sub.c_name, self->sub.c_name, num_args_check,
-            var_assignments, body);
+    char *xsub
+        = CFCUtil_sprintf(pattern, self->sub.c_name, self->sub.c_name,
+                          num_args_check, var_assignments, body);
 
     FREEMEM(num_args_check);
     FREEMEM(var_assignments);
@@ -477,9 +449,8 @@ S_maybe_unreachable(CFCType *return_type) {
     }
     else {
         const char *ret_type_str = CFCType_to_c(return_type);
-        return_statement = (char*)MALLOCATE(strlen(ret_type_str) + 60);
-        sprintf(return_statement, "\n    CHY_UNREACHABLE_RETURN(%s);",
-                ret_type_str);
+        char pattern[] = "\n    CHY_UNREACHABLE_RETURN(%s);";
+        return_statement = CFCUtil_sprintf(pattern, ret_type_str);
     }
     return return_statement;
 }
@@ -498,8 +469,7 @@ S_callback_start(CFCMethod *method) {
     int num_to_extend = num_args == 0 ? 1
                       : num_args == 1 ? 2
                       : 1 + (num_args * 2);
-    char *params = (char*)MALLOCATE(sizeof(pattern) + 20);
-    sprintf(params, pattern, num_to_extend);
+    char *params = CFCUtil_sprintf(pattern, num_to_extend);
 
     // Iterate over arguments, mapping them to Perl scalars.
     CFCVariable **arg_vars = CFCParamList_get_variables(param_list);
@@ -623,17 +593,9 @@ S_invalid_callback_def(CFCMethod *method) {
         "%s(%s) {%s\n"
         "    CFISH_THROW(CFISH_ERR, \"Can't override %s via binding\");%s\n"
         "}\n";
-    size_t size = sizeof(pattern)
-                  + strlen(ret_type_str)
-                  + strlen(override_sym)
-                  + strlen(params)
-                  + strlen(unused)
-                  + strlen(full_method_sym)
-                  + strlen(unreachable)
-                  + 20;
-    char *callback_def = (char*)MALLOCATE(size);
-    sprintf(callback_def, pattern, ret_type_str, override_sym, params, unused,
-            full_method_sym, unreachable);
+    char *callback_def
+        = CFCUtil_sprintf(pattern, ret_type_str, override_sym, params, unused,
+                          full_method_sym, unreachable);
 
     FREEMEM(full_method_sym);
     FREEMEM(unreachable);
@@ -653,17 +615,9 @@ S_void_callback_def(CFCMethod *method, const char *callback_start,
         "%s"
         "    S_finish_callback_void(\"%s\");%s\n"
         "}\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(override_sym)
-                  + strlen(params)
-                  + strlen(callback_start)
-                  + strlen(micro_sym)
-                  + strlen(refcount_mods)
-                  + 20;
-    char *callback_def = (char*)MALLOCATE(size);
-    sprintf(callback_def, pattern, override_sym, params, callback_start,
-            micro_sym, refcount_mods);
+    char *callback_def
+        = CFCUtil_sprintf(pattern, override_sym, params, callback_start,
+                          micro_sym, refcount_mods);
 
     return callback_def;
 }
@@ -695,21 +649,10 @@ S_primitive_callback_def(CFCMethod *method, const char *callback_start,
         "    %s retval = (%s)%s(\"%s\");%s\n"
         "    return retval;\n"
         "}\n";
-    size_t size = sizeof(pattern)
-                  + strlen(ret_type_str)
-                  + strlen(override_sym)
-                  + strlen(params)
-                  + strlen(callback_start)
-                  + strlen(ret_type_str)
-                  + strlen(ret_type_str)
-                  + strlen(callback_func)
-                  + strlen(micro_sym)
-                  + strlen(refcount_mods)
-                  + 30;
-    char *callback_def = (char*)MALLOCATE(size);
-    sprintf(callback_def, pattern, ret_type_str, override_sym, params,
-            callback_start, ret_type_str, ret_type_str, callback_func,
-            micro_sym, refcount_mods);
+    char *callback_def
+        = CFCUtil_sprintf(pattern, ret_type_str, override_sym, params,
+                          callback_start, ret_type_str, ret_type_str,
+                          callback_func, micro_sym, refcount_mods);
 
     return callback_def;
 }
@@ -731,22 +674,10 @@ S_obj_callback_def(CFCMethod *method, const char *callback_start,
         "    %s retval = (%s)S_finish_callback_obj(self, \"%s\", %s);%s\n"
         "    return retval;\n"
         "}\n";
-
-    size_t size = sizeof(pattern)
-                  + strlen(ret_type_str)
-                  + strlen(override_sym)
-                  + strlen(params)
-                  + strlen(callback_start)
-                  + strlen(ret_type_str)
-                  + strlen(ret_type_str)
-                  + strlen(micro_sym)
-                  + strlen(nullable)
-                  + strlen(refcount_mods)
-                  + 30;
-    char *callback_def = (char*)MALLOCATE(size);
-    sprintf(callback_def, pattern, ret_type_str, override_sym, params,
-            callback_start, ret_type_str, ret_type_str, micro_sym, nullable,
-            refcount_mods);
+    char *callback_def
+        = CFCUtil_sprintf(pattern, ret_type_str, override_sym, params,
+                          callback_start, ret_type_str, ret_type_str,
+                          micro_sym, nullable, refcount_mods);
 
     return callback_def;
 }
