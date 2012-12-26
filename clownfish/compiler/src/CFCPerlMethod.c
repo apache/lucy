@@ -168,20 +168,16 @@ S_xsub_body(CFCPerlMethod *self) {
     }
 
     // Extract the method function pointer.
-    size_t typedef_size
-        = CFCMethod_full_typedef(method, klass, NULL, 0);
-    char *full_typedef = (char*)MALLOCATE(typedef_size);
-    CFCMethod_full_typedef(method, klass, full_typedef, typedef_size);
-
-    size_t meth_size
-        = CFCMethod_full_method_sym(method, klass, NULL, 0);
-    char *full_meth = (char*)MALLOCATE(meth_size);
-    CFCMethod_full_method_sym(method, klass, full_meth, meth_size);
-    body = CFCUtil_cat(body, full_typedef, " method = CFISH_METHOD_PTR(",
-                       CFCClass_full_vtable_var(klass), ", ",
-                       full_meth, ");\n    ", NULL);
+    char *full_typedef = CFCMethod_full_typedef(method, klass);
+    char *full_meth    = CFCMethod_full_method_sym(method, klass);
+    char *method_ptr
+        = CFCUtil_sprintf("%s method = CFISH_METHOD_PTR(%s, %s);\n    ",
+                          full_typedef, CFCClass_full_vtable_var(klass),
+                          full_meth);
+    body = CFCUtil_cat(body, method_ptr, NULL);
     FREEMEM(full_typedef);
     FREEMEM(full_meth);
+    FREEMEM(method_ptr);
 
     // Compensate for functions which eat refcounts.
     for (int i = 0; arg_vars[i] != NULL; i++) {
@@ -573,9 +569,7 @@ S_callback_refcount_mods(CFCMethod *method) {
 
 static char*
 S_invalid_callback_def(CFCMethod *method) {
-    size_t meth_sym_size = CFCMethod_full_method_sym(method, NULL, NULL, 0);
-    char *full_method_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, NULL, full_method_sym, meth_sym_size);
+    char *full_method_sym = CFCMethod_full_method_sym(method, NULL);
 
     const char *override_sym = CFCMethod_full_override_sym(method);
     CFCParamList *param_list = CFCMethod_get_param_list(method);

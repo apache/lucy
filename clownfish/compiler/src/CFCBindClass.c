@@ -262,21 +262,16 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
-        size_t off_sym_size 
-            = CFCMethod_full_offset_sym(method, client, NULL, 0);
-        char *full_offset_sym = (char*)MALLOCATE(off_sym_size);
-        CFCMethod_full_offset_sym(method, client, full_offset_sym,
-                                  off_sym_size);
-        char meth_num_str[20];
-        sprintf(meth_num_str, "%d", meth_num);
-
+        char *full_offset_sym = CFCMethod_full_offset_sym(method, client);
         // Create offset in bytes for the method from the top of the VTable
         // object.
-        offsets = CFCUtil_cat(offsets, "size_t ", full_offset_sym, " = ",
-                              "offsetof(cfish_VTable, method_ptrs) + ",
-                              meth_num_str, " * sizeof(cfish_method_t);\n",
-                              NULL);
+        const char pattern[] =
+            "size_t %s = offsetof(cfish_VTable, method_ptrs)"
+            " + %d * sizeof(cfish_method_t);\n";
+        char *offset = CFCUtil_sprintf(pattern, full_offset_sym, meth_num);
+        offsets = CFCUtil_cat(offsets, offset, NULL);
         FREEMEM(full_offset_sym);
+        FREEMEM(offset);
     }
 
     if (fresh_methods[0] != NULL) {
@@ -562,31 +557,26 @@ S_short_names(CFCBindClass *self) {
         CFCMethod  **methods = CFCClass_methods(client);
         for (int i = 0; methods[i] != NULL; i++) {
             CFCMethod *meth = methods[i];
+            static const char pattern[] = "  #define %s %s\n";
 
             // Method invocation symbols.
-            size_t size = CFCMethod_short_method_sym(meth, client, NULL, 0);
-            char *short_sym = (char*)MALLOCATE(size);
-            CFCMethod_short_method_sym(meth, client, short_sym, size);
-            size = CFCMethod_full_method_sym(meth, client, NULL, 0);
-            char *full_sym = (char*)MALLOCATE(size);
-            CFCMethod_full_method_sym(meth, client, full_sym, size);
-            short_names = CFCUtil_cat(short_names, "  #define ", short_sym,
-                                      " ", full_sym, "\n", NULL);
+            char *short_sym  = CFCMethod_short_method_sym(meth, client);
+            char *full_sym   = CFCMethod_full_method_sym(meth, client);
+            char *define_sym = CFCUtil_sprintf(pattern, short_sym, full_sym);
+            short_names = CFCUtil_cat(short_names, define_sym, NULL);
             FREEMEM(short_sym);
             FREEMEM(full_sym);
+            FREEMEM(define_sym);
 
             // Method typedefs.
-            size = CFCMethod_short_typedef(meth, client, NULL, 0);
-            char *short_typedef = (char*)MALLOCATE(size);
-            CFCMethod_short_typedef(meth, client, short_typedef, size);
-            size = CFCMethod_full_typedef(meth, client, NULL, 0);
-            char *full_typedef = (char*)MALLOCATE(size);
-            CFCMethod_full_typedef(meth, client, full_typedef, size);
-            short_names = CFCUtil_cat(short_names, "  #define ",
-                                      short_typedef, " ", full_typedef, "\n",
-                                      NULL);
+            char *short_typedef  = CFCMethod_short_typedef(meth, client);
+            char *full_typedef   = CFCMethod_full_typedef(meth, client);
+            char *define_typedef = CFCUtil_sprintf(pattern, short_typedef,
+                                                   full_typedef);
+            short_names = CFCUtil_cat(short_names, define_typedef, NULL);
             FREEMEM(short_typedef);
             FREEMEM(full_typedef);
+            FREEMEM(define_typedef);
         }
     }
     short_names = CFCUtil_cat(short_names, "#endif /* ",

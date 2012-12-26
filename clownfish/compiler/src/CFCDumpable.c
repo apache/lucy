@@ -165,13 +165,8 @@ S_add_dump_method(CFCClass *klass) {
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
-    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0); 
-    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
-
-    size_t full_meth_size = CFCMethod_full_method_sym(method, klass, NULL, 0); 
-    char *full_meth = (char*)MALLOCATE(full_meth_size);
-    CFCMethod_full_method_sym(method, klass, full_meth, full_meth_size);
+    char *full_typedef = CFCMethod_full_typedef(method, klass);
+    char *full_meth    = CFCMethod_full_method_sym(method, klass);
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =
@@ -226,13 +221,8 @@ S_add_load_method(CFCClass *klass) {
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
-    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0); 
-    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
-
-    size_t full_meth_size = CFCMethod_full_method_sym(method, klass, NULL, 0); 
-    char *full_meth = (char*)MALLOCATE(full_meth_size);
-    CFCMethod_full_method_sym(method, klass, full_meth, full_meth_size);
+    char *full_typedef = CFCMethod_full_typedef(method, klass);
+    char *full_meth    = CFCMethod_full_method_sym(method, klass);
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
         const char pattern[] =

@@ -67,13 +67,8 @@ S_final_method_def(CFCMethod *method, CFCClass *klass) {
     const char *arg_names 
         = CFCParamList_name_list(CFCMethod_get_param_list(method));
 
-    size_t meth_sym_size = CFCMethod_full_method_sym(method, klass, NULL, 0);
-    char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
-    
-    size_t offset_sym_size = CFCMethod_full_offset_sym(method, klass, NULL, 0); 
-    char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
-    CFCMethod_full_offset_sym(method, klass, full_offset_sym, offset_sym_size);
+    char *full_meth_sym   = CFCMethod_full_method_sym(method, klass);
+    char *full_offset_sym = CFCMethod_full_offset_sym(method, klass);
 
     const char pattern[] =
         "extern size_t %s;\n"
@@ -98,17 +93,9 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char *visibility = CFCClass_included(klass)
                              ? "CHY_IMPORT" : "CHY_EXPORT";
 
-    size_t meth_sym_size = CFCMethod_full_method_sym(method, klass, NULL, 0);
-    char *full_meth_sym = (char*)MALLOCATE(meth_sym_size);
-    CFCMethod_full_method_sym(method, klass, full_meth_sym, meth_sym_size);
-
-    size_t offset_sym_size = CFCMethod_full_offset_sym(method, klass, NULL, 0);
-    char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
-    CFCMethod_full_offset_sym(method, klass, full_offset_sym, offset_sym_size);
-
-    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0);
-    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
+    char *full_meth_sym   = CFCMethod_full_method_sym(method, klass);
+    char *full_offset_sym = CFCMethod_full_offset_sym(method, klass);
+    char *full_typedef    = CFCMethod_full_typedef(method, klass);
 
     // Prepare parameter lists, minus invoker.  The invoker gets forced to
     // "self" later.
@@ -151,11 +138,7 @@ char*
 CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
     const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
     const char *ret_type = CFCType_to_c(CFCMethod_get_return_type(method));
-
-    size_t full_typedef_size = CFCMethod_full_typedef(method, klass, NULL, 0);
-    char *full_typedef = (char*)MALLOCATE(full_typedef_size);
-    CFCMethod_full_typedef(method, klass, full_typedef, full_typedef_size);
-
+    char *full_typedef = CFCMethod_full_typedef(method, klass);
     char *buf = CFCUtil_sprintf("typedef %s\n(*%s)(%s);\n", ret_type,
                                 full_typedef, params);
     FREEMEM(full_typedef);
@@ -173,9 +156,7 @@ CFCBindMeth_spec_def(CFCMethod *method) {
         full_override_sym = CFCMethod_full_override_sym(method);
     }
 
-    size_t offset_sym_size = CFCMethod_full_offset_sym(method, NULL, NULL, 0);
-    char *full_offset_sym = (char*)MALLOCATE(offset_sym_size);
-    CFCMethod_full_offset_sym(method, NULL, full_offset_sym, offset_sym_size);
+    char *full_offset_sym = CFCMethod_full_offset_sym(method, NULL);
 
     char pattern[] =
         "    {\n"

@@ -884,47 +884,27 @@ ALIAS:
     short_typedef     = 4
     full_typedef      = 5
 CODE:
-    size_t size = 0;
+    char *buf;
     switch (ix) {
         case 1:
-            size = CFCMethod_short_method_sym(self, invoker, NULL, 0);
+            buf = CFCMethod_short_method_sym(self, invoker);
             break;
         case 2:
-            size = CFCMethod_full_method_sym(self, invoker, NULL, 0);
+            buf = CFCMethod_full_method_sym(self, invoker);
             break;
         case 3:
-            size = CFCMethod_full_offset_sym(self, invoker, NULL, 0);
+            buf = CFCMethod_full_offset_sym(self, invoker);
             break;
         case 4:
-            size = CFCMethod_short_typedef(self, invoker, NULL, 0);
+            buf = CFCMethod_short_typedef(self, invoker);
             break;
         case 5:
-            size = CFCMethod_full_typedef(self, invoker, NULL, 0);
+            buf = CFCMethod_full_typedef(self, invoker);
             break;
         default: croak("Unexpected ix: %d", (int)ix);
     }
-    RETVAL = newSV(size);
-    SvPOK_on(RETVAL);
-    char *buf = SvPVX(RETVAL);
-    switch (ix) {
-        case 1:
-            CFCMethod_short_method_sym(self, invoker, buf, size);
-            break;
-        case 2:
-            CFCMethod_full_method_sym(self, invoker, buf, size);
-            break;
-        case 3:
-            CFCMethod_full_offset_sym(self, invoker, buf, size);
-            break;
-        case 4:
-            CFCMethod_short_typedef(self, invoker, buf, size);
-            break;
-        case 5:
-            CFCMethod_full_typedef(self, invoker, buf, size);
-            break;
-        default: croak("Unexpected ix: %d", (int)ix);
-    }
-    SvCUR_set(RETVAL, strlen(buf));
+    RETVAL = newSVpvn(buf, strlen(buf));
+    FREEMEM(buf);
 OUTPUT: RETVAL
 
 void

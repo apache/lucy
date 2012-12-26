@@ -223,9 +223,8 @@ CFCMethod_finalize(CFCMethod *self) {
     return finalized;
 }
 
-size_t
-CFCMethod_short_method_sym(CFCMethod *self, CFCClass *invoker, char *buf,
-                           size_t buf_size) {
+static char*
+S_short_method_sym(CFCMethod *self, CFCClass *invoker, const char *postfix) {
     const char *cnick;
     if (invoker) {
         cnick = CFCClass_get_cnick(invoker);
@@ -233,16 +232,11 @@ CFCMethod_short_method_sym(CFCMethod *self, CFCClass *invoker, char *buf,
     else {
         cnick = CFCMethod_get_class_cnick(self);
     }
-    size_t needed = strlen(cnick) + 1 + strlen(self->macro_sym) + 1;
-    if (buf_size >= needed) {
-        sprintf(buf, "%s_%s", cnick, self->macro_sym);
-    }
-    return needed;
+    return CFCUtil_sprintf("%s_%s%s", cnick, self->macro_sym, postfix);
 }
 
-size_t
-CFCMethod_full_method_sym(CFCMethod *self, CFCClass *invoker, char *buf,
-                          size_t buf_size) {
+static char*
+S_full_method_sym(CFCMethod *self, CFCClass *invoker, const char *postfix) {
     const char *Prefix;
     const char *cnick;
     if (invoker) {
@@ -253,27 +247,23 @@ CFCMethod_full_method_sym(CFCMethod *self, CFCClass *invoker, char *buf,
         Prefix = CFCMethod_get_Prefix(self);
         cnick  = CFCMethod_get_class_cnick(self);
     }
-    size_t needed = strlen(Prefix)
-                    + strlen(cnick)
-                    + 1
-                    + strlen(self->macro_sym)
-                    + 1;
-    if (buf_size >= needed) {
-        sprintf(buf, "%s%s_%s", Prefix, cnick, self->macro_sym);
-    }
-    return needed;
+    return CFCUtil_sprintf("%s%s_%s%s", Prefix, cnick, self->macro_sym,
+                           postfix);
 }
 
-size_t
-CFCMethod_full_offset_sym(CFCMethod *self, CFCClass *invoker, char *buf,
-                          size_t buf_size) {
-    size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0)
-                    + strlen("_OFFSET");
-    if (buf_size >= needed) {
-        CFCMethod_full_method_sym(self, invoker, buf, buf_size);
-        strcat(buf, "_OFFSET");
-    }
-    return needed;
+char*
+CFCMethod_short_method_sym(CFCMethod *self, CFCClass *invoker) {
+    return S_short_method_sym(self, invoker, "");
+}
+
+char*
+CFCMethod_full_method_sym(CFCMethod *self, CFCClass *invoker) {
+    return S_full_method_sym(self, invoker, "");
+}
+
+char*
+CFCMethod_full_offset_sym(CFCMethod *self, CFCClass *invoker) {
+    return S_full_method_sym(self, invoker, "_OFFSET");
 }
 
 const char*
@@ -286,28 +276,14 @@ CFCMethod_micro_sym(CFCMethod *self) {
     return CFCSymbol_micro_sym((CFCSymbol*)self);
 }
 
-size_t
-CFCMethod_short_typedef(CFCMethod *self, CFCClass *invoker, char *buf,
-                        size_t buf_size) {
-    size_t needed = CFCMethod_short_method_sym(self, invoker, NULL, 0)
-                    + strlen("_t");
-    if (buf_size >= needed) {
-        CFCMethod_short_method_sym(self, invoker, buf, buf_size);
-        strcat(buf, "_t");
-    }
-    return needed;
+char*
+CFCMethod_short_typedef(CFCMethod *self, CFCClass *invoker) {
+    return S_short_method_sym(self, invoker, "_t");
 }
 
-size_t
-CFCMethod_full_typedef(CFCMethod *self, CFCClass *invoker, char *buf,
-                       size_t buf_size) {
-    size_t needed = CFCMethod_full_method_sym(self, invoker, NULL, 0)
-                    + strlen("_t");
-    if (buf_size >= needed) {
-        CFCMethod_full_method_sym(self, invoker, buf, buf_size);
-        strcat(buf, "_t");
-    }
-    return needed;
+char*
+CFCMethod_full_typedef(CFCMethod *self, CFCClass *invoker) {
+    return S_full_method_sym(self, invoker, "_t");
 }
 
 const char*
