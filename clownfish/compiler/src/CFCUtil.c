@@ -24,6 +24,11 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+// For mkdir.
+#ifdef CHY_HAS_DIRECT_H
+  #include <direct.h>
+#endif
+
 #ifndef true
     #define true 1
     #define false 0
@@ -335,7 +340,7 @@ CFCUtil_make_path(const char *path) {
             continue;
         }
 #endif
-        if (target[i] == CFCUTIL_PATH_SEP_CHAR || i == len) {
+        if (target[i] == CHY_DIR_SEP_CHAR || i == len) {
             target[i] = 0; // NULL-terminate.
             struct stat stat_buf;
             int stat_check = stat(target, &stat_buf);
@@ -351,7 +356,7 @@ CFCUtil_make_path(const char *path) {
                     return false;
                 }
             }
-            target[i] = CFCUTIL_PATH_SEP_CHAR;
+            target[i] = CHY_DIR_SEP_CHAR;
         }
     }
 
@@ -380,18 +385,21 @@ CFCUtil_walk(const char *path, CFCUtil_walk_callback_t callback,
         if (strcmp(entry, ".") == 0 || strcmp(entry, "..") == 0) {
             continue;
         }
-        char *subpath = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s", path,
-                                        entry);
+        char *subpath = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s", path, entry);
         CFCUtil_walk(subpath, callback, context);
         FREEMEM(subpath);
     }
     CFCUtil_closedir(dirhandle, path);
 }
 
-/******************************** WINDOWS **********************************/
-#ifdef _WIN32
+int
+CFCUtil_make_dir(const char *dir) {
+    return !chy_makedir(dir, 0777);
+}
 
-#include <direct.h>
+/******************************** WINDOWS **********************************/
+#if (defined(CHY_HAS_WINDOWS_H) && !defined(__CYGWIN__))
+
 #include <windows.h>
 
 typedef struct WinDH {
@@ -400,11 +408,6 @@ typedef struct WinDH {
     char path[MAX_PATH + 1];
     int first_time;
 } WinDH;
-
-int
-CFCUtil_make_dir(const char *dir) {
-    return !mkdir(dir);
-}
 
 void*
 CFCUtil_opendir(const char *dir) {
@@ -456,15 +459,9 @@ CFCUtil_closedir(void *dirhandle, const char *dir) {
 }
 
 /******************************** UNIXEN ***********************************/
-#else
+#elif defined(CHY_HAS_DIRENT_H)
 
 #include <dirent.h>
-
-int
-CFCUtil_make_dir(const char *dir) {
-    return !mkdir(dir, 0777);
-}
-
 
 void*
 CFCUtil_opendir(const char *dir) {
@@ -488,7 +485,9 @@ CFCUtil_closedir(void *dirhandle, const char *dir) {
     }
 }
 
-#endif /* Windows vs. Unix. */
+#else
+  #error "Need either dirent.h or windows.h"
+#endif // CHY_HAS_DIRENT_H vs. CHY_HAS_WINDOWS_H
 
 /***************************************************************************/
 

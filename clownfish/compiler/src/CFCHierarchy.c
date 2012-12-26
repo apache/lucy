@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -114,10 +116,8 @@ CFCHierarchy_init(CFCHierarchy *self, const char *dest) {
     self->num_classes  = 0;
     self->parser       = CFCParser_new();
 
-    self->inc_dest = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "include",
-                                     self->dest);
-    self->src_dest = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "source",
-                                     self->dest);
+    self->inc_dest = CFCUtil_sprintf("%s" CHY_DIR_SEP "include", self->dest);
+    self->src_dest = CFCUtil_sprintf("%s" CHY_DIR_SEP "source", self->dest);
     S_do_make_path(self->inc_dest);
     S_do_make_path(self->src_dest);
 
@@ -208,7 +208,7 @@ S_parse_parcel_files(const char *path, void *context) {
     (void)context; // unused
 
     // Ignore hidden files.
-    if (strstr(path, CFCUTIL_PATH_SEP ".") != NULL) {
+    if (strstr(path, CHY_DIR_SEP ".") != NULL) {
         return;
     }
 
@@ -235,7 +235,7 @@ S_find_cfh(const char *path, void *context) {
     char ***cfh_ptr = (char***)context;
     char **cfh_list = *cfh_ptr;
     // Ignore updirs and hidden files.
-    if (strstr(path, CFCUTIL_PATH_SEP ".") != NULL) {
+    if (strstr(path, CHY_DIR_SEP ".") != NULL) {
         return;
     }
     size_t path_len = strlen(path);
@@ -276,7 +276,7 @@ S_parse_cf_files(CFCHierarchy *self, const char *source_dir, int is_included) {
             path_part = (char*)REALLOCATE(path_part, path_part_max);
         }
         const char *src = source_path + source_dir_len;
-        while (*src == CFCUTIL_PATH_SEP_CHAR) {
+        while (*src == CHY_DIR_SEP_CHAR) {
             ++src;
             --path_part_len;
         }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -71,7 +73,7 @@ CFCFile_init(CFCFile *self, CFCFileSpec *spec) {
     size_t i, j;
     for (i = 0, j = 2; i < len; i++) {
         char c = path_part[i];
-        if (c == CFCUTIL_PATH_SEP_CHAR) {
+        if (c == CHY_DIR_SEP_CHAR) {
             self->guard_name[j++] = '_';
         }
         else if (isalnum(c)) {
@@ -147,7 +149,7 @@ S_some_path(CFCFile *self, const char *base_dir, const char *ext) {
     const char *path_part = CFCFileSpec_get_path_part(self->spec);
     char *buf;
     if (base_dir) {
-        buf = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s%s", base_dir,
+        buf = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s%s", base_dir,
                               path_part, ext);
     }
     else {

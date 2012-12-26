@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include <string.h>
 #include <stdio.h>
 
@@ -255,8 +257,7 @@ S_write_parcel_h(CFCBindCore *self) {
 
     // Unlink then write file.
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
-    char *filepath = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "parcel.h",
-                                     inc_dest);
+    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "parcel.h", inc_dest);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
     FREEMEM(filepath);
@@ -347,8 +348,7 @@ S_write_parcel_c(CFCBindCore *self) {
 
     // Unlink then open file.
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
-    char *filepath = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "parcel.c",
-                                     src_dest);
+    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "parcel.c", src_dest);
     remove(filepath);
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
     FREEMEM(filepath);

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -83,9 +85,9 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
     self->footer     = CFCUtil_strdup(footer);
 
     // Derive path to generated .xs file.
-    self->xs_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s.xs", lib_dir,
+    self->xs_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s.xs", lib_dir,
                                     boot_class);
-    S_replace_double_colons(self->xs_path, CFCUTIL_PATH_SEP_CHAR);
+    S_replace_double_colons(self->xs_path, CHY_DIR_SEP_CHAR);
 
     // Derive the name of the files containing bootstrapping code.
     const char *prefix   = CFCParcel_get_prefix(parcel);
@@ -93,9 +95,9 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
     self->boot_h_file = CFCUtil_sprintf("%sboot.h", prefix);
     self->boot_c_file = CFCUtil_sprintf("%sboot.c", prefix);
-    self->boot_h_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s", inc_dest,
+    self->boot_h_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s", inc_dest,
                                         self->boot_h_file);
-    self->boot_c_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s", src_dest,
+    self->boot_c_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s", src_dest,
                                         self->boot_c_file);
 
     // Derive the name of the bootstrap function.
@@ -156,9 +158,9 @@ CFCPerl_write_pod(CFCPerl *self) {
         const char *class_name = CFCPerlClass_get_class_name(registry[i]);
         char *pod = CFCPerlClass_create_pod(registry[i]);
         if (!pod) { continue; }
-        char *pod_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s.pod",
+        char *pod_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s.pod",
                                          self->lib_dir, class_name);
-        S_replace_double_colons(pod_path, CFCUTIL_PATH_SEP_CHAR);
+        S_replace_double_colons(pod_path, CHY_DIR_SEP_CHAR);
 
         pods[count] = pod;
         pod_paths[count] = pod_path;
@@ -575,7 +577,7 @@ CFCPerl_write_callbacks(CFCPerl *self) {
 
     // Write if changed.
     const char *src_dest = CFCHierarchy_get_source_dest(self->hierarchy);
-    char *filepath = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "callbacks.c",
+    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "callbacks.c",
                                      src_dest);
     CFCUtil_write_if_changed(filepath, content, strlen(content));
 

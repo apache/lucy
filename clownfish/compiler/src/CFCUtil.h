@@ -134,16 +134,6 @@ CFCUtil_slurp_text(const char *file_path, size_t *len_ptr);
 long
 CFCUtil_flength(void *file);
 
-/* A string and a char representing the path separator for this OS.
- */
-#ifdef _WIN32
-  #define CFCUTIL_PATH_SEP "\\"
-  #define CFCUTIL_PATH_SEP_CHAR '\\'
-#else
-  #define CFCUTIL_PATH_SEP "/"
-  #define CFCUTIL_PATH_SEP_CHAR '/'
-#endif
-
 /* Platform-agnostic opendir wrapper.
  */
 void*

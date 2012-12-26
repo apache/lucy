@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include <stdio.h>
 #include <string.h>
 #include "CFCBindFile.h"
@@ -36,7 +38,7 @@ CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
     char *h_path = CFCFile_h_path(file, dest);
     char *h_dir  = CFCUtil_strdup(h_path);
     for (size_t len = strlen(h_dir); len--;) {
-        if (h_dir[len] == CFCUTIL_PATH_SEP_CHAR) {
+        if (h_dir[len] == CHY_DIR_SEP_CHAR) {
             h_dir[len] = 0;
             break;
         }
