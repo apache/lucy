@@ -591,24 +591,22 @@ ALIAS:
     cfh_path     = 3
 CODE:
 {
-    size_t buf_size = CFCFile_path_buf_size(self, base_dir);
-    RETVAL = newSV(buf_size);
-    SvPOK_on(RETVAL);
-    char *buf = SvPVX(RETVAL);
+    char *buf;
     switch (ix) {
         case 1:
-            CFCFile_c_path(self, buf, buf_size, base_dir);
+            buf = CFCFile_c_path(self, base_dir);
             break;
         case 2:
-            CFCFile_h_path(self, buf, buf_size, base_dir);
+            buf = CFCFile_h_path(self, base_dir);
             break;
         case 3:
-            CFCFile_cfh_path(self, buf, buf_size, base_dir);
+            buf = CFCFile_cfh_path(self, base_dir);
             break;
         default:
             croak("unexpected ix value: %d", (int)ix);
     }
-    SvCUR_set(RETVAL, strlen(buf));
+    RETVAL = newSVpvn(buf, strlen(buf));
+    FREEMEM(buf);
 }
 OUTPUT: RETVAL
 

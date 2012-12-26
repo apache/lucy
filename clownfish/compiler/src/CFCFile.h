@@ -51,30 +51,21 @@ CFCFile_destroy(CFCFile *self);
 void
 CFCFile_add_block(CFCFile *self, CFCBase *block);
 
-/** Calculate the size of the buffer needed for a call to c_path(), h_path(),
- * or cfh_path().
- */
-size_t
-CFCFile_path_buf_size(CFCFile *self, const char *base_dir);
-
 /** Given a base directory, return a path name derived from the File's
  * path_part with a ".c" extension.
  */
-void
-CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size,
-               const char *base_dir);
+char*
+CFCFile_c_path(CFCFile *self, const char *base_dir);
 
 /** As c_path, but with a ".h" extension.
  */
-void
-CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size,
-               const char *base_dir);
+char*
+CFCFile_h_path(CFCFile *self, const char *base_dir);
 
 /** As c_path, but with a ".cfh" extension.
  */
-void
-CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size,
-                 const char *base_dir);
+char*
+CFCFile_cfh_path(CFCFile *self, const char *base_dir);
 
 /** Return all blocks as an array.
  */

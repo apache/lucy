@@ -142,24 +142,16 @@ CFCFile_add_block(CFCFile *self, CFCBase *block) {
     }
 }
 
-static void
-S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
-            const char *ext) {
-    size_t needed = CFCFile_path_buf_size(self, base_dir);
-    if (strlen(ext) > 4) {
-        CFCUtil_die("ext cannot be more than 4 characters.");
-    }
-    if (needed > buf_size) {
-        CFCUtil_die("Need buf_size of %lu, but got %lu",
-                    (unsigned long)needed, (unsigned long)buf_size);
-    }
+static char*
+S_some_path(CFCFile *self, const char *base_dir, const char *ext) {
     const char *path_part = CFCFileSpec_get_path_part(self->spec);
+    char *buf;
     if (base_dir) {
-        sprintf(buf, "%s" CFCUTIL_PATH_SEP "%s%s", base_dir, path_part,
-                ext);
+        buf = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s%s", base_dir,
+                              path_part, ext);
     }
     else {
-        sprintf(buf, "%s%s", path_part, ext);
+        buf = CFCUtil_sprintf("%s%s", path_part, ext);
     }
     for (size_t i = 0; buf[i] != '\0'; i++) {
         #ifdef _WIN32
@@ -168,37 +160,22 @@ S_some_path(CFCFile *self, char *buf, size_t buf_size, const char *base_dir,
         if (buf[i] == '\\') { buf[i] = '/'; }
         #endif
     }
+    return buf;
 }
 
-size_t
-CFCFile_path_buf_size(CFCFile *self, const char *base_dir) {
-    const char *path_part = CFCFileSpec_get_path_part(self->spec);
-    size_t size = strlen(path_part);
-    size += 4; // Max extension length.
-    size += 1; // NULL-termination.
-    if (base_dir) {
-        size += strlen(base_dir);
-        size += strlen(CFCUTIL_PATH_SEP);
-    }
-    return size;
+char*
+CFCFile_c_path(CFCFile *self, const char *base_dir) {
+    return S_some_path(self, base_dir, ".c");
 }
 
-void
-CFCFile_c_path(CFCFile *self, char *buf, size_t buf_size,
-               const char *base_dir) {
-    S_some_path(self, buf, buf_size, base_dir, ".c");
+char*
+CFCFile_h_path(CFCFile *self, const char *base_dir) {
+    return S_some_path(self, base_dir, ".h");
 }
 
-void
-CFCFile_h_path(CFCFile *self, char *buf, size_t buf_size,
-               const char *base_dir) {
-    S_some_path(self, buf, buf_size, base_dir, ".h");
-}
-
-void
-CFCFile_cfh_path(CFCFile *self, char *buf, size_t buf_size,
-                 const char *base_dir) {
-    S_some_path(self, buf, buf_size, base_dir, ".cfh");
+char*
+CFCFile_cfh_path(CFCFile *self, const char *base_dir) {
+    return S_some_path(self, base_dir, ".cfh");
 }
 
 CFCBase**

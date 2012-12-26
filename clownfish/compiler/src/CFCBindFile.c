@@ -33,10 +33,8 @@ CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
     CFCUTIL_NULL_CHECK(footer);
 
     // Make directories.
-    size_t h_path_buf_size = CFCFile_path_buf_size(file, dest);
-    char *h_path = (char*)MALLOCATE(h_path_buf_size);
-    CFCFile_h_path(file, h_path, h_path_buf_size, dest);
-    char *h_dir = CFCUtil_strdup(h_path);
+    char *h_path = CFCFile_h_path(file, dest);
+    char *h_dir  = CFCUtil_strdup(h_path);
     for (size_t len = strlen(h_dir); len--;) {
         if (h_dir[len] == CFCUTIL_PATH_SEP_CHAR) {
             h_dir[len] = 0;

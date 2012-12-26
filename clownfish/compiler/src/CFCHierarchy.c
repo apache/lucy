@@ -388,12 +388,8 @@ S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
     CFCUTIL_NULL_CHECK(file);
     const char *source_dir = CFCFile_get_source_dir(file);
     CFCUTIL_NULL_CHECK(source_dir);
-    size_t cfh_buf_size = CFCFile_path_buf_size(file, source_dir);
-    char *source_path = (char*)MALLOCATE(cfh_buf_size);
-    CFCFile_cfh_path(file, source_path, cfh_buf_size, source_dir);
-    size_t h_buf_size = CFCFile_path_buf_size(file, self->dest);
-    char *h_path = (char*)MALLOCATE(h_buf_size);
-    CFCFile_h_path(file, h_path, h_buf_size, self->dest);
+    char *source_path = CFCFile_cfh_path(file, source_dir);
+    char *h_path      = CFCFile_h_path(file, self->dest);
 
     if (!CFCUtil_current(source_path, h_path)) {
         modified = true;
