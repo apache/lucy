@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
 
     /* Run probe modules. */
     chaz_Integers_run();
+    chaz_Strings_run();
 
     /* Clean up. */
     chaz_Probe_clean_up();

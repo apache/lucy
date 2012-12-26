@@ -27,13 +27,14 @@ chdir catdir( $Bin, updir(), updir() );
 my $CHAZ_DIR = 'charmonizer';
 my $MELD_EXE = catfile( $CHAZ_DIR, 'buildbin', 'meld.pl' );
 
-# Clowfish compiler.
+# Clownfish compiler.
 {
-    my $main = catfile(qw( clownfish compiler common charmonizer.main ));
-    my $out  = $main;
+    my $probes = "Integers,Strings";
+    my $main   = catfile(qw( clownfish compiler common charmonizer.main ));
+    my $out    = $main;
     $out =~ s/\.main/.c/ or die "no match";
     unlink $out;
-    system( $MELD_EXE, '--probes=Integers', "--files=$main", "--out=$out" );
+    system( $MELD_EXE, "--probes=$probes", "--files=$main", "--out=$out" );
 }
 
 # Clownfish runtime.
