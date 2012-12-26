@@ -276,7 +276,7 @@ CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, CFCFunction *func,
 
     CFCParamList *param_list = CFCFunction_get_param_list(func);
     int num_vars = CFCParamList_num_vars(param_list);
-    char *pod = CFCUtil_cat(CFCUtil_strdup(""), "=head2 ", alias, NULL);
+    char *pod = CFCUtil_sprintf("=head2 %s", alias);
 
     // Get documentation, which may be inherited.
     CFCDocuComment *docucomment = CFCFunction_get_docucomment(func);

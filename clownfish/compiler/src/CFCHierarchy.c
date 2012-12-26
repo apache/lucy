@@ -114,10 +114,10 @@ CFCHierarchy_init(CFCHierarchy *self, const char *dest) {
     self->num_classes  = 0;
     self->parser       = CFCParser_new();
 
-    self->inc_dest = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
-                                 CFCUTIL_PATH_SEP, "include", NULL);
-    self->src_dest = CFCUtil_cat(CFCUtil_strdup(""), self->dest,
-                                 CFCUTIL_PATH_SEP, "source", NULL);
+    self->inc_dest = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "include",
+                                     self->dest);
+    self->src_dest = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "source",
+                                     self->dest);
     S_do_make_path(self->inc_dest);
     S_do_make_path(self->src_dest);
 

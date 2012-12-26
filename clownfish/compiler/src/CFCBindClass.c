@@ -386,8 +386,7 @@ CFCBindClass_spec_def(CFCBindClass *self) {
     // Create a pointer to the parent class's vtable.
     char *parent_ref;
     if (parent) {
-        parent_ref = CFCUtil_cat(CFCUtil_strdup("&"),
-                                 CFCClass_full_vtable_var(parent), NULL);
+        parent_ref = CFCUtil_sprintf("&%s", CFCClass_full_vtable_var(parent));
     }
     else {
         // No parent, e.g. Obj or inert classes.

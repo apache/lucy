@@ -83,29 +83,23 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
     self->footer     = CFCUtil_strdup(footer);
 
     // Derive path to generated .xs file.
-    self->xs_path = CFCUtil_cat(CFCUtil_strdup(""), lib_dir, CFCUTIL_PATH_SEP,
-                                boot_class, ".xs", NULL);
+    self->xs_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s.xs", lib_dir,
+                                    boot_class);
     S_replace_double_colons(self->xs_path, CFCUTIL_PATH_SEP_CHAR);
 
     // Derive the name of the files containing bootstrapping code.
     const char *prefix   = CFCParcel_get_prefix(parcel);
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
-    self->boot_h_file = CFCUtil_cat(CFCUtil_strdup(""), prefix, "boot.h",
-                                    NULL);
-    self->boot_c_file = CFCUtil_cat(CFCUtil_strdup(""), prefix, "boot.c",
-                                    NULL);
-    self->boot_h_path = CFCUtil_cat(CFCUtil_strdup(""), inc_dest,
-                                    CFCUTIL_PATH_SEP, self->boot_h_file,
-                                    NULL);
-    self->boot_c_path = CFCUtil_cat(CFCUtil_strdup(""), src_dest,
-                                    CFCUTIL_PATH_SEP, self->boot_c_file,
-                                    NULL);
+    self->boot_h_file = CFCUtil_sprintf("%sboot.h", prefix);
+    self->boot_c_file = CFCUtil_sprintf("%sboot.c", prefix);
+    self->boot_h_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s", inc_dest,
+                                        self->boot_h_file);
+    self->boot_c_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s", src_dest,
+                                        self->boot_c_file);
 
     // Derive the name of the bootstrap function.
-    self->boot_func
-        = CFCUtil_cat(CFCUtil_strdup(""), CFCParcel_get_prefix(parcel),
-                      boot_class, "_bootstrap", NULL);
+    self->boot_func = CFCUtil_sprintf("%s%s_bootstrap", prefix, boot_class);
     for (int i = 0; self->boot_func[i] != 0; i++) {
         if (!isalnum(self->boot_func[i])) {
             self->boot_func[i] = '_';
@@ -162,9 +156,8 @@ CFCPerl_write_pod(CFCPerl *self) {
         const char *class_name = CFCPerlClass_get_class_name(registry[i]);
         char *pod = CFCPerlClass_create_pod(registry[i]);
         if (!pod) { continue; }
-        char *pod_path
-            = CFCUtil_cat(CFCUtil_strdup(""), self->lib_dir, CFCUTIL_PATH_SEP,
-                          class_name, ".pod", NULL);
+        char *pod_path = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "%s.pod",
+                                         self->lib_dir, class_name);
         S_replace_double_colons(pod_path, CFCUTIL_PATH_SEP_CHAR);
 
         pods[count] = pod;
@@ -193,8 +186,7 @@ CFCPerl_write_pod(CFCPerl *self) {
 
 static void
 S_write_boot_h(CFCPerl *self) {
-    char *guard = CFCUtil_cat(CFCUtil_strdup(""), self->boot_class,
-                              "_BOOT", NULL);
+    char *guard = CFCUtil_sprintf("%s_BOOT", self->boot_class);
     S_replace_double_colons(guard, '_');
     for (char *ptr = guard; *ptr != '\0'; ptr++) {
         if (isalpha(*ptr)) {
@@ -583,8 +575,8 @@ CFCPerl_write_callbacks(CFCPerl *self) {
 
     // Write if changed.
     const char *src_dest = CFCHierarchy_get_source_dest(self->hierarchy);
-    char *filepath = CFCUtil_cat(CFCUtil_strdup(""), src_dest,
-                                 CFCUTIL_PATH_SEP, "callbacks.c", NULL);
+    char *filepath = CFCUtil_sprintf("%s" CFCUTIL_PATH_SEP "callbacks.c",
+                                     src_dest);
     CFCUtil_write_if_changed(filepath, content, strlen(content));
 
     FREEMEM(filepath);

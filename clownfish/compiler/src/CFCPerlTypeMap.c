@@ -41,6 +41,7 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
     if (CFCType_is_object(type)) {
         const char *struct_sym = CFCType_get_specifier(type);
         const char *vtable_var = CFCType_get_vtable_var(type);
+        const char *allocation;
         if (strcmp(struct_sym, "lucy_CharBuf") == 0
             || strcmp(struct_sym, "cfish_CharBuf") == 0
             || strcmp(struct_sym, "lucy_Obj") == 0
@@ -48,16 +49,14 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
            ) {
             // Share buffers rather than copy between Perl scalars and
             // Clownfish string types.
-            result = CFCUtil_cat(CFCUtil_strdup(""), "(", struct_sym,
-                                 "*)XSBind_sv_to_cfish_obj(", xs_var,
-                                 ", ", vtable_var,
-                                 ", alloca(cfish_ZCB_size()))", NULL);
+            allocation = "alloca(cfish_ZCB_size())";
         }
         else {
-            result = CFCUtil_cat(CFCUtil_strdup(""), "(", struct_sym,
-                                 "*)XSBind_sv_to_cfish_obj(", xs_var,
-                                 ", ", vtable_var, ", NULL)", NULL);
+            allocation = "NULL";
         }
+        const char pattern[] = "(%s*)XSBind_sv_to_cfish_obj(%s, %s, %s)";
+        result = CFCUtil_sprintf(pattern, struct_sym, xs_var, vtable_var,
+                                 allocation);
     }
     else if (CFCType_is_primitive(type)) {
         const char *specifier = CFCType_get_specifier(type);
@@ -125,10 +124,9 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
     char *result = NULL;
 
     if (CFCType_is_object(type)) {
-        result = CFCUtil_cat(CFCUtil_strdup(""), "(", cf_var,
-                             " == NULL ? newSV(0) : "
-                             "XSBind_cfish_to_perl((cfish_Obj*)",
-                             cf_var, "))", NULL);
+        const char pattern[] =
+            "(%s == NULL ? newSV(0) : XSBind_cfish_to_perl((cfish_Obj*)%s))";
+        result = CFCUtil_sprintf(pattern, cf_var, cf_var);
     }
     else if (CFCType_is_primitive(type)) {
         // Convert from a primitive type to a Perl scalar.
@@ -195,8 +193,7 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
         if (strcmp(type_str, "void*") == 0) {
             // Assume that void* is a reference SV -- either a hashref or an
             // arrayref.
-            result = CFCUtil_cat(CFCUtil_strdup(""), "newRV_inc((SV*)",
-                                 cf_var, ")", NULL);
+            result = CFCUtil_sprintf("newRV_inc((SV*)%s)", cf_var);
         }
     }
 

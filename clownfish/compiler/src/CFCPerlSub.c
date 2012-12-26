@@ -41,8 +41,7 @@ CFCPerlSub_init(CFCPerlSub *self, CFCParamList *param_list,
     self->class_name  = CFCUtil_strdup(class_name);
     self->alias       = CFCUtil_strdup(alias);
     self->use_labeled_params = use_labeled_params;
-    self->perl_name = CFCUtil_cat(CFCUtil_strdup(class_name), "::", alias,
-                                  NULL);
+    self->perl_name = CFCUtil_sprintf("%s::%s", class_name, alias);
 
     size_t c_name_len = strlen(self->perl_name) + sizeof("XS_") + 1;
     self->c_name = (char*)MALLOCATE(c_name_len);
