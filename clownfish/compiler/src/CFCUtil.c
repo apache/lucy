@@ -94,6 +94,7 @@ CFCUtil_sprintf(const char *fmt, ...) {
         int result = _vsnprintf(string, size, fmt, args);
         va_end(args);
         if (result >= 0 && (size_t)result < size) { return string; }
+        FREEMEM(string);
     }
     CFCUtil_die("_snprintf failed");
     return NULL;
