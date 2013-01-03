@@ -59,6 +59,9 @@ class Lucy::Index::RawPosting nickname RawPost
     uint32_t
     Dec_RefCount(RawPosting* self);
 
+    public int32_t
+    Compare_To(RawPosting *self, Obj *other);
+
     /** Throws an error.
      */
     public void

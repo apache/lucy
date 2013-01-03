@@ -51,6 +51,28 @@ RawPost_Destroy_IMP(RawPosting *self) {
     THROW(ERR, "Illegal attempt to destroy RawPosting object");
 }
 
+int32_t
+RawPost_Compare_To_IMP(RawPosting *self, Obj *other) {
+    RawPostingIVARS *const ivars = RawPost_IVARS(self);
+    RawPostingIVARS *const ovars = RawPost_IVARS((RawPosting*)other);
+    const size_t my_len    = ivars->content_len;
+    const size_t other_len = ovars->content_len;
+    const size_t len       = my_len < other_len ? my_len : other_len;
+    int32_t comparison = memcmp(ivars->blob, ovars->blob, len);
+
+    if (comparison == 0) {
+        // If a is a substring of b, it's less than b, so return a neg num.
+        comparison = (int32_t)((int64_t)my_len - (int64_t)other_len);
+
+        // Break ties by doc id.
+        if (comparison == 0) {
+            comparison = ivars->doc_id - ovars->doc_id;
+        }
+    }
+
+    return comparison;
+}
+
 uint32_t
 RawPost_Get_RefCount_IMP(RawPosting* self) {
     UNUSED_VAR(self);
