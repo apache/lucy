@@ -33,7 +33,7 @@ BBSortEx_new(uint32_t mem_threshold, VArray *external) {
 
 BBSortEx*
 BBSortEx_init(BBSortEx *self, uint32_t mem_threshold, VArray *external) {
-    SortEx_init((SortExternal*)self, sizeof(Obj*));
+    SortEx_init((SortExternal*)self);
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     ivars->external_tick = 0;
     ivars->external = (VArray*)INCREF(external);
@@ -133,7 +133,8 @@ BBSortEx_Refill_IMP(BBSortEx *self) {
 
         if (ivars->cache_max == ivars->cache_cap) {
             BBSortEx_Grow_Cache(self,
-                                Memory_oversize(ivars->cache_max + 1, ivars->width));
+                                Memory_oversize(ivars->cache_max + 1,
+                                                sizeof(Obj*)));
         }
         Obj **cache = (Obj**)ivars->cache;
         cache[ivars->cache_max++] = INCREF(elem);

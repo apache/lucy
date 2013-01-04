@@ -76,7 +76,7 @@ PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
               OutStream *lex_temp_out, OutStream *post_temp_out,
               OutStream *skip_out) {
     // Init.
-    SortEx_init((SortExternal*)self, sizeof(Obj*));
+    SortEx_init((SortExternal*)self);
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     ivars->doc_base         = 0;
     ivars->last_doc_id      = 0;

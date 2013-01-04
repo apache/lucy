@@ -60,11 +60,10 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     uint8_t      **slice_starts;
     uint32_t      *slice_sizes;
     uint32_t       mem_thresh;
-    size_t         width;
     bool           flipped;
 
     inert SortExternal*
-    init(SortExternal *self, size_t width);
+    init(SortExternal *self);
 
     /** Compare two sortable elements.
      */

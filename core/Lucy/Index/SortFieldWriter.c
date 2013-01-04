@@ -76,7 +76,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      OutStream *temp_ord_out, OutStream *temp_ix_out,
                      OutStream *temp_dat_out) {
     // Init.
-    SortEx_init((SortExternal*)self, sizeof(SFWriterElem*));
+    SortEx_init((SortExternal*)self);
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     ivars->null_ord        = -1;
     ivars->count           = 0;
