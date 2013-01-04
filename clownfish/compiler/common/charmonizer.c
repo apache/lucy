@@ -820,7 +820,7 @@ static struct {
     int       intval___clang__;
     int       warnings_as_errors;
 } chaz_CC = {
-    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
     "", "", "", "", "", "",
     0, 0, 0, 0, 0, 0
 };
