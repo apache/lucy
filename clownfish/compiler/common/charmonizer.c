@@ -537,6 +537,35 @@ chaz_Probe_compiler_is_msvc(void);
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Probe/BuildEnv.h"
+/* Charmonizer/Probe/BuildEnv.h -- Build environment.
+ *
+ * Capture various information about the build environment, including the C
+ * compiler's interface, the shell, the operating system, etc.
+ *
+ * The following symbols will be defined:
+ *
+ * CC - String representation of the C compiler executable.
+ * CFLAGS - C compiler flags.
+ * EXTRA_CFLAGS - Extra C compiler flags.
+ */
+
+#ifndef H_CHAZ_BUILDENV
+#define H_CHAZ_BUILDENV
+
+#include <stdio.h>
+
+/* Run the BuildEnv module.
+ */
+void chaz_BuildEnv_run(void);
+
+#endif /* H_CHAZ_BUILDENV */
+
+
+
+
+/***************************************************************************/
+
 #line 21 "src/Charmonizer/Probe/DirManip.h"
 /* Charmonizer/Probe/DirManip.h
  */
@@ -2740,6 +2769,26 @@ chaz_Probe_compiler_is_msvc(void) {
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Probe/BuildEnv.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Probe/BuildEnv.h" */
+
+void
+chaz_BuildEnv_run(void) {
+    chaz_ConfWriter_start_module("BuildEnv");
+
+    chaz_ConfWriter_add_def("CC", chaz_CC_get_cc());
+    chaz_ConfWriter_add_def("CFLAGS", chaz_CC_get_cflags());
+    chaz_ConfWriter_add_def("EXTRA_CFLAGS", chaz_CC_get_extra_cflags());
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Probe/DirManip.c"
 /* #include "Charmonizer/Core/ConfWriter.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
@@ -3688,6 +3737,35 @@ chaz_Strings_probe_c99_snprintf(void) {
 /* #include "Charmonizer/Probe.h" */
 /* #include "Charmonizer/Probe/Integers.h" */
 
+static void
+S_add_compiler_flags(struct chaz_CLIArgs *args) {
+    if (chaz_Probe_gcc_version_num()) {
+        if (getenv("LUCY_VALGRIND")) {
+            chaz_CC_add_extra_cflags("-fno-inline-functions");
+        }
+        else if (getenv("LUCY_DEBUG")) {
+            chaz_CC_add_extra_cflags(
+                "-DLUCY_DEBUG -pedantic -Wall -Wextra "
+                "-Wno-variadic-macros "
+            );
+        }
+
+        /* Tell GCC explicitly to run with maximum options. */
+        chaz_CC_add_extra_cflags("-std=gnu99 -D_GNU_SOURCE");
+    }
+    else if (chaz_Probe_compiler_is_msvc()) {
+        /* Compile as C++ under MSVC. */
+        chaz_CC_add_extra_cflags("-TP");
+
+        /* Thwart stupid warnings. */
+        chaz_CC_add_extra_cflags("-D_CRT_SECURE_NO_WARNINGS");
+        chaz_CC_add_extra_cflags("-D_SCL_SECURE_NO_WARNINGS");
+
+        /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
+        chaz_CC_add_extra_cflags("-Dfor=\"if(0);else for\"");
+    }
+}
+
 int main(int argc, const char **argv) {
     /* Initialize. */
     {
@@ -3697,9 +3775,11 @@ int main(int argc, const char **argv) {
             chaz_Probe_die_usage();
         }
         chaz_Probe_init(&args);
+        S_add_compiler_flags(&args);
     }
 
     /* Run probe modules. */
+    chaz_BuildEnv_run();
     chaz_DirManip_run();
     chaz_Headers_run();
     chaz_Integers_run();
