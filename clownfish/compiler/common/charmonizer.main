@@ -23,6 +23,35 @@
 #include "Charmonizer/Probe.h"
 #include "Charmonizer/Probe/Integers.h"
 
+static void
+S_add_compiler_flags(struct chaz_CLIArgs *args) {
+    if (chaz_Probe_gcc_version_num()) {
+        if (getenv("LUCY_VALGRIND")) {
+            chaz_CC_add_extra_cflags("-fno-inline-functions");
+        }
+        else if (getenv("LUCY_DEBUG")) {
+            chaz_CC_add_extra_cflags(
+                "-DLUCY_DEBUG -pedantic -Wall -Wextra "
+                "-Wno-variadic-macros "
+            );
+        }
+
+        /* Tell GCC explicitly to run with maximum options. */
+        chaz_CC_add_extra_cflags("-std=gnu99 -D_GNU_SOURCE");
+    }
+    else if (chaz_Probe_compiler_is_msvc()) {
+        /* Compile as C++ under MSVC. */
+        chaz_CC_add_extra_cflags("-TP");
+
+        /* Thwart stupid warnings. */
+        chaz_CC_add_extra_cflags("-D_CRT_SECURE_NO_WARNINGS");
+        chaz_CC_add_extra_cflags("-D_SCL_SECURE_NO_WARNINGS");
+
+        /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
+        chaz_CC_add_extra_cflags("-Dfor=\"if(0);else for\"");
+    }
+}
+
 int main(int argc, const char **argv) {
     /* Initialize. */
     {
@@ -32,9 +61,11 @@ int main(int argc, const char **argv) {
             chaz_Probe_die_usage();
         }
         chaz_Probe_init(&args);
+        S_add_compiler_flags(&args);
     }
 
     /* Run probe modules. */
+    chaz_BuildEnv_run();
     chaz_DirManip_run();
     chaz_Headers_run();
     chaz_Integers_run();

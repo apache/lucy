@@ -37,54 +37,11 @@ my $LEMON_DIR = catdir( $base_dir, 'lemon' );
 my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CFC_SOURCE_DIR = catdir( updir(), 'src' );
 
-sub extra_ccflags {
-    my $self          = shift;
-    my @extra_ccflags = qw( -DCFCPERL );
-
-    my $gcc_version 
-        = $ENV{REAL_GCC_VERSION}
-        || $self->config('gccversion')
-        || undef;
-    if ( defined $gcc_version ) {
-        $gcc_version =~ /^(\d+(\.\d+))/
-            or die "Invalid GCC version: $gcc_version";
-        $gcc_version = $1;
-
-        # Tell GCC explicitly to run with maximum options.
-        push @extra_ccflags, qw( -std=gnu99 -D_GNU_SOURCE );
-
-        if ( defined $ENV{LUCY_DEBUG} ) {
-            push @extra_ccflags, qw(
-                -DLUCY_DEBUG -DPERL_GCC_PEDANTIC -pedantic -Wall
-            );
-            push @extra_ccflags, qw( -Wextra )
-                if $gcc_version >= 3.4;    # correct
-            push @extra_ccflags, qw( -Wno-variadic-macros )
-                if $gcc_version > 3.4;    # at least not on gcc 3.4
-        }
-
-        if ( $ENV{LUCY_VALGRIND} ) {
-            push @extra_ccflags, qw( -fno-inline-functions );
-        }
-    }
-
-    # Compile as C++ under MSVC.
-    # Turn off stupid warnings, too.
-    # Redefine 'for' to fix broken 'for' scoping under MSVC6.
-    if ( $self->config('cc') =~ /^cl\b/ ) {
-        push @extra_ccflags, qw( -TP -D_CRT_SECURE_NO_WARNINGS );
-        push @extra_ccflags, '-Dfor="if(0);else for"';
-    }
-
-    return \@extra_ccflags;
-}
-
 sub new {
     my ( $class, %args ) = @_;
     return $class->SUPER::new(
         %args,
         recursive_test_files => 1,
-        extra_compiler_flags => __PACKAGE__->extra_ccflags,
         charmonizer_params   => {
             charmonizer_c => $CHARMONIZER_C,
         },
@@ -175,9 +132,16 @@ sub ACTION_lexers {
 
 sub ACTION_code {
     my $self = shift;
+
     $self->dispatch('charmony');
     $self->dispatch('ppport');
     $self->dispatch('parsers');
+
+    $self->extra_compiler_flags( join ' ',
+        '-DCFCPERL',
+        $self->charmony("EXTRA_CFLAGS")
+    );
+
     $self->SUPER::ACTION_code;
 }
 
