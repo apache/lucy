@@ -32,7 +32,6 @@ sub bind_bbsortex {
     my @hand_rolled = qw(
         Fetch
         Peek
-        Feed
     );
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Util::BBSortEx
@@ -67,14 +66,6 @@ CODE:
     }
 }
 OUTPUT: RETVAL
-
-void
-feed(self, bb)
-    lucy_BBSortEx *self;
-    cfish_ByteBuf *bb;
-CODE:
-    CFISH_INCREF(bb);
-    LUCY_BBSortEx_Feed(self, &bb);
 
 END_XS_CODE
 

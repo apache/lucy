@@ -83,14 +83,14 @@ SortEx_Clear_Cache_IMP(SortExternal *self) {
 }
 
 void
-SortEx_Feed_IMP(SortExternal *self, void *data) {
+SortEx_Feed_IMP(SortExternal *self, Obj *item) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     if (ivars->cache_max == ivars->cache_cap) {
         size_t amount = Memory_oversize(ivars->cache_max + 1, sizeof(Obj*));
         SortEx_Grow_Cache(self, amount);
     }
-    uint8_t *target = ivars->cache + ivars->cache_max * sizeof(Obj*);
-    memcpy(target, data, sizeof(Obj*));
+    Obj **elems = (Obj**)ivars->cache;
+    elems[ivars->cache_max] = item;
     ivars->cache_max++;
 }
 

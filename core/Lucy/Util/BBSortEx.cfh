@@ -34,7 +34,7 @@ class Lucy::Util::BBSortEx
         VArray *external = NULL);
 
     void
-    Feed(BBSortEx *self, void *data);
+    Feed(BBSortEx *self, decremented Obj *item);
 
     void
     Flush(BBSortEx *self);

@@ -138,7 +138,7 @@ MatchPost_Add_Inversion_To_Pool_IMP(MatchPosting *self,
         RawPosting *raw_posting
             = RawPost_new(MemPool_Grab(mem_pool, raw_post_bytes), doc_id,
                           freq, token_ivars->text, token_ivars->len);
-        PostPool_Feed(post_pool, &raw_posting);
+        PostPool_Feed(post_pool, (Obj*)raw_posting);
     }
 }
 

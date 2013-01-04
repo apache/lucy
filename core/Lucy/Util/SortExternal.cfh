@@ -79,13 +79,10 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     abstract void
     Flush(SortExternal *self);
 
-    /** Add data to the sort pool.
-     *
-     * @param data Pointer to the data being added, which must be exactly
-     * <code>width</code> bytes in size.
+    /** Add an item to the sort pool.
      */
     void
-    Feed(SortExternal *self, void *data);
+    Feed(SortExternal *self, decremented Obj *item);
 
     /** Flip the sortex from write mode to read mode.
      */
